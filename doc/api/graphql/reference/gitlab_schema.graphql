@@ -5606,7 +5606,7 @@ type Group {
     assigneeId: String
 
     """
-    Username of a user assigned to the issues
+    Username of a user assigned to the issue
     """
     assigneeUsername: String
 
@@ -5666,7 +5666,7 @@ type Group {
     last: Int
 
     """
-    Milestones applied to this issue
+    Milestone applied to this issue
     """
     milestoneTitle: [String]
 
@@ -10213,7 +10213,7 @@ type Project {
     assigneeId: String
 
     """
-    Username of a user assigned to the issues
+    Username of a user assigned to the issue
     """
     assigneeUsername: String
 
@@ -10258,7 +10258,7 @@ type Project {
     labelName: [String]
 
     """
-    Milestones applied to this issue
+    Milestone applied to this issue
     """
     milestoneTitle: [String]
 
@@ -10303,7 +10303,7 @@ type Project {
     assigneeId: String
 
     """
-    Username of a user assigned to the issues
+    Username of a user assigned to the issue
     """
     assigneeUsername: String
 
@@ -10343,7 +10343,7 @@ type Project {
     labelName: [String]
 
     """
-    Milestones applied to this issue
+    Milestone applied to this issue
     """
     milestoneTitle: [String]
 
@@ -10383,7 +10383,7 @@ type Project {
     assigneeId: String
 
     """
-    Username of a user assigned to the issues
+    Username of a user assigned to the issue
     """
     assigneeUsername: String
 
@@ -10443,7 +10443,7 @@ type Project {
     last: Int
 
     """
-    Milestones applied to this issue
+    Milestone applied to this issue
     """
     milestoneTitle: [String]
 

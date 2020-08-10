@@ -7,8 +7,12 @@ module Types
 
     authorize :read_issue
 
+    def self.available_issue_states
+      @available_issue_states ||= Issue.available_states.keys.push('all')
+    end
+
     ::Gitlab::IssuablesCountForState::STATES.each do |state|
-      next unless Issue.available_states.keys.push('all').include?(state)
+      next unless available_issue_states.include?(state.downcase)
 
       field state,
             GraphQL::INT_TYPE,

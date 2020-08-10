@@ -15615,7 +15615,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Milestones applied to this issue",
+                  "description": "Milestone applied to this issue",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -15629,7 +15629,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issues",
+                  "description": "Username of a user assigned to the issue",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -30531,7 +30531,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Milestones applied to this issue",
+                  "description": "Milestone applied to this issue",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -30545,7 +30545,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issues",
+                  "description": "Username of a user assigned to the issue",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -30742,7 +30742,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Milestones applied to this issue",
+                  "description": "Milestone applied to this issue",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -30756,7 +30756,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issues",
+                  "description": "Username of a user assigned to the issue",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -30919,7 +30919,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Milestones applied to this issue",
+                  "description": "Milestone applied to this issue",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -30933,7 +30933,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issues",
+                  "description": "Username of a user assigned to the issue",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",

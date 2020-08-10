@@ -15,10 +15,10 @@ module IssueResolverFields
               description: 'Labels applied to this issue'
     argument :milestone_title, GraphQL::STRING_TYPE.to_list_type,
               required: false,
-              description: 'Milestones applied to this issue'
+              description: 'Milestone applied to this issue'
     argument :assignee_username, GraphQL::STRING_TYPE,
               required: false,
-              description: 'Username of a user assigned to the issues'
+              description: 'Username of a user assigned to the issue'
     argument :assignee_id, GraphQL::STRING_TYPE,
               required: false,
               description: 'ID of a user assigned to the issues, "none" and "any" values supported'
@@ -56,7 +56,7 @@ module IssueResolverFields
     parent = object.respond_to?(:sync) ? object.sync : object
     return Issue.none if parent.nil?
 
-    # Will need to be be made group & namespace aware with
+    # Will need to be made group & namespace aware with
     # https://gitlab.com/gitlab-org/gitlab-foss/issues/54520
     args[:iids] ||= [args.delete(:iid)].compact if args[:iid]
     args[:attempt_project_search_optimizations] = true if args[:search].present?
