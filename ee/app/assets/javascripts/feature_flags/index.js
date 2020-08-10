@@ -13,6 +13,11 @@ export default () =>
         dataset: document.querySelector(this.$options.el).dataset,
       };
     },
+    provide() {
+      return {
+        projectName: this.dataset.projectName,
+      };
+    },
     render(createElement) {
       return createElement('feature-flags-component', {
         props: {
