@@ -69,11 +69,9 @@ export default {
       this.formIsOpen = false;
     },
   },
-  emptyMessage: s__(
-    'LicenseCompliance|There are currently no approved or blacklisted licenses in this project.',
-  ),
+  emptyMessage: s__('LicenseCompliance|There are currently no policies in this project.'),
   emptySearchMessage: s__(
-    'LicenseCompliance|There are currently no approved or blacklisted licenses that match in this project.',
+    'LicenseCompliance|There are currently no policies that match in this project.',
   ),
 };
 </script>

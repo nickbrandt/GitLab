@@ -14202,10 +14202,10 @@ msgstr ""
 msgid "LicenseCompliance|Remove license?"
 msgstr ""
 
-msgid "LicenseCompliance|There are currently no approved or blacklisted licenses in this project."
+msgid "LicenseCompliance|There are currently no policies in this project."
 msgstr ""
 
-msgid "LicenseCompliance|There are currently no approved or blacklisted licenses that match in this project."
+msgid "LicenseCompliance|There are currently no policies that match in this project."
 msgstr ""
 
 msgid "LicenseCompliance|This license already exists in this project."
