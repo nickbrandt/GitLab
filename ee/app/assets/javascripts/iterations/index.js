@@ -12,7 +12,7 @@ const apolloProvider = new VueApollo({
   defaultClient: createDefaultClient(),
 });
 
-export function initIterationsList() {
+export function initIterationsList(namespaceType) {
   const el = document.querySelector('.js-iterations-list');
 
   return new Vue({
@@ -23,6 +23,7 @@ export function initIterationsList() {
         props: {
           fullPath: el.dataset.fullPath,
           canAdmin: parseBoolean(el.dataset.canAdmin),
+          namespaceType,
           newIterationPath: el.dataset.newIterationPath,
         },
       });
