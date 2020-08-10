@@ -56,6 +56,7 @@ module EE
 
     def purchase_storage_url
       return unless ::Gitlab.dev_env_or_com?
+      return unless ::Gitlab::CurrentSettings.enforce_namespace_storage_limit?
       return unless ::Feature.enabled?(:buy_storage_link)
 
       EE::SUBSCRIPTIONS_MORE_STORAGE_URL
