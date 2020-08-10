@@ -46,7 +46,6 @@ export default {
     },
     hasConfiguredJob() {
       const { features } = this.configuration;
-
       return this.$options.featureTypes[camelCase(this.matchRule.name)].some(featureType => {
         return Boolean(
           features?.some(feature => {
