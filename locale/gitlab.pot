@@ -22486,7 +22486,7 @@ msgstr ""
 msgid "SlackIntegration|Select events below to enable notifications. The %{strong_open}Slack channel names%{strong_close} and %{strong_open}Slack username%{strong_close} fields are optional."
 msgstr ""
 
-msgid "SlackIntegration|This service send notifications about projects' events to Slack channels. To set up this service:"
+msgid "SlackIntegration|This service sends notifications about project events to Slack channels. To set up this service:"
 msgstr ""
 
 msgid "SlackService|2. Paste the %{strong_open}Token%{strong_close} into the field below"
