@@ -28,7 +28,7 @@ export default {
       },
       update(data) {
         const summary = data?.project?.pipeline?.securityReportSummary;
-        return Object.keys(summary).length ? summary : null;
+        return summary && Object.keys(summary).length ? summary : null;
       },
       skip() {
         return !this.glFeatures.pipelinesSecurityReportSummary;
