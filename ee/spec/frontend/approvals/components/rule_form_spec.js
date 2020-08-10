@@ -39,13 +39,13 @@ describe('EE Approvals RuleForm', () => {
   let store;
   let actions;
 
-  const createComponent = (props = {}) => {
+  const createComponent = (props = {}, options = {}) => {
     wrapper = shallowMount(localVue.extend(RuleForm), {
       propsData: props,
       store: new Vuex.Store(store),
       localVue,
       provide: {
-        glFeatures: { scopedApprovalRules: true },
+        glFeatures: { scopedApprovalRules: true, ...options.provide?.glFeatures },
       },
     });
   };
@@ -482,6 +482,68 @@ describe('EE Approvals RuleForm', () => {
       });
     });
 
+    describe('with approvalSuggestions enabled', () => {
+      describe('with initRuleFieldName set to Vulnerability-Check', () => {
+        beforeEach(() => {
+          createComponent(
+            {
+              initRule: null,
+              initRuleFieldName: 'Vulnerability-Check',
+            },
+            {
+              provide: {
+                glFeatures: { approvalSuggestions: true },
+              },
+            },
+          );
+        });
+
+        it('it disables the name text field', () => {
+          expect(findNameInput().attributes('disabled')).toBe('disabled');
+        });
+      });
+
+      describe('with initRuleFieldName set to License-Check', () => {
+        beforeEach(() => {
+          createComponent(
+            {
+              initRule: null,
+              initRuleFieldName: 'License-Check',
+            },
+            {
+              provide: {
+                glFeatures: { approvalSuggestions: true },
+              },
+            },
+          );
+        });
+
+        it('it disables the name text field', () => {
+          expect(findNameInput().attributes('disabled')).toBe('disabled');
+        });
+      });
+
+      describe('with initRuleFieldName set to any other string', () => {
+        beforeEach(() => {
+          createComponent(
+            {
+              initRule: null,
+              initRuleFieldName: 'Foo Bar Baz',
+            },
+            {
+              provide: {
+                glFeatures: { approvalSuggestions: true },
+              },
+            },
+          );
+        });
+
+        it('does not disable the name text field', () => {
+          expect(findNameInput().attributes('disabled')).toBe(undefined);
+        });
+      });
+    });
+
     describe('with new License-Check rule', () => {
       beforeEach(() => {
         createComponent({
@@ -494,10 +556,34 @@ describe('EE Approvals RuleForm', () => {
       });
     });
 
+    describe('with new Vulnerability-Check rule', () => {
+      beforeEach(() => {
+        createComponent({
+          initRule: { ...TEST_RULE, id: null, name: 'Vulnerability-Check' },
+        });
+      });
+
+      it('does not disable the name text field', () => {
+        expect(findNameInput().attributes('disabled')).toBe(undefined);
+      });
+    });
+
     describe('with editing the License-Check rule', () => {
       beforeEach(() => {
         createComponent({
           initRule: { ...TEST_RULE, name: 'License-Check' },
+        });
+      });
+
+      it('disables the name text field', () => {
+        expect(findNameInput().attributes('disabled')).toBe('disabled');
+      });
+    });
+
+    describe('with editing the Vulnerability-Check rule', () => {
+      beforeEach(() => {
+        createComponent({
+          initRule: { ...TEST_RULE, name: 'Vulnerability-Check' },
         });
       });
 

@@ -33,9 +33,8 @@ export default {
            * otherwise populate with existing rule
            */
           return state.data?.initRuleField ? undefined : state.data;
-        } 
-          return state.data;
-        
+        }
+        return state.data;
       },
       originalData: 'data',
     }),

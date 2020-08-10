@@ -55,21 +55,20 @@ export default {
         containsHiddenGroups: false,
         ...this.getInitialData(),
       };
-    } 
-      return {
-        name: '',
-        approvalsRequired: 1,
-        minApprovalsRequired: 0,
-        approvers: [],
-        approversToAdd: [],
-        branches: [],
-        branchesToAdd: [],
-        showValidation: false,
-        isFallback: false,
-        containsHiddenGroups: false,
-        ...this.getInitialData(),
-      };
-    
+    }
+    return {
+      name: '',
+      approvalsRequired: 1,
+      minApprovalsRequired: 0,
+      approvers: [],
+      approversToAdd: [],
+      branches: [],
+      branchesToAdd: [],
+      showValidation: false,
+      isFallback: false,
+      containsHiddenGroups: false,
+      ...this.getInitialData(),
+    };
   },
   computed: {
     ...mapState(['settings']),
@@ -168,9 +167,8 @@ export default {
         return (
           Boolean(this.isPersisted || this.initRuleFieldName) && READONLY_NAMES.includes(this.name)
         );
-      } 
-        return this.isPersisted && READONLY_NAMES.includes(this.name);
-      
+      }
+      return this.isPersisted && READONLY_NAMES.includes(this.name);
     },
     removeHiddenGroups() {
       return this.containsHiddenGroups && !this.approversByType[TYPE_HIDDEN_GROUPS];

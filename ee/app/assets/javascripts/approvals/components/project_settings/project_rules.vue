@@ -1,7 +1,7 @@
 <script>
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapActions } from 'vuex';
-import { __, n__, sprintf } from '~/locale';
+import { s__, n__, sprintf } from '~/locale';
 import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR } from '../../constants';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import Rules from '../rules.vue';
@@ -67,21 +67,21 @@ export default {
       return [
         {
           name: 'Vulnerability-Check',
-          description: __(
-            'One or more of the security scanners must be enabled %{linkStart}more information%{linkEnd}',
+          description: s__(
+            'SecurityApprovals|One or more of the security scanners must be enabled %{linkStart}more information%{linkEnd}',
           ),
-          enableDescription: __(
-            'Requires approval for vulnerabilties of Critical, High, or Unknown severity %{linkStart}more information%{linkEnd}',
+          enableDescription: s__(
+            'SecurityApprovals|Requires approval for vulnerabilties of Critical, High, or Unknown severity %{linkStart}more information%{linkEnd}',
           ),
           docsPath: this.vulnerabilityCheckHelpPagePath,
         },
         {
           name: 'License-Check',
-          description: __(
-            'License Scanning must be enabled %{linkStart}more information%{linkEnd}',
+          description: s__(
+            'SecurityApprovals|License Scanning must be enabled %{linkStart}more information%{linkEnd}',
           ),
-          enableDescription: __(
-            'Requires license policy rules for licenses of Allowed, or Denied %{linkStart}more information%{linkEnd}',
+          enableDescription: s__(
+            'SecurityApprovals|Requires license policy rules for licenses of Allowed, or Denied %{linkStart}more information%{linkEnd}',
           ),
           docsPath: this.licenseCheckHelpPagePath,
         },

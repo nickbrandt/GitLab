@@ -113,4 +113,41 @@ describe('Approvals ModalRuleCreate', () => {
       expect(form.props('initRule')).toEqual(TEST_RULE);
     });
   });
+
+  describe('with approvalSuggestions feature flag', () => {
+    beforeEach(() => {
+      createModalState.data = { ...TEST_RULE, initRuleField: true, name: 'Vulnerability-Check' };
+
+      factory({
+        provide: {
+          glFeatures: { approvalSuggestions: true },
+        },
+      });
+    });
+
+    it('renders add rule modal', () => {
+      const modal = wrapper.find(GlModalVuex);
+
+      expect(modal.exists()).toBe(true);
+
+      expect(modal.attributes('title')).toEqual('Add approval rule');
+      expect(modal.attributes('ok-title')).toEqual('Add approval rule');
+    });
+
+    it('renders form with initRuleFieldName', () => {
+      const modal = wrapper.find(GlModalVuex);
+      const form = modal.find(RuleForm);
+
+      expect(form.props().initRuleFieldName).toBe('Vulnerability-Check');
+      expect(form.exists()).toBe(true);
+    });
+
+    it('renders the form without passing in an existing rule', () => {
+      const modal = wrapper.find(GlModalVuex);
+      const form = modal.find(RuleForm);
+
+      expect(form.exists()).toBe(true);
+      expect(form.props('initRule')).toEqual(null);
+    });
+  });
 });
