@@ -1,41 +1,111 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlAlert } from '@gitlab/ui';
+import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
+import { GlAreaChart } from '@gitlab/ui/dist/charts';
 import ThroughputChart from 'ee/analytics/merge_request_analytics/components/throughput_chart.vue';
+import { THROUGHPUT_STRINGS } from 'ee/analytics/merge_request_analytics/constants';
+import { throughputChartData } from '../mock_data';
+
+const fullPath = 'gitlab-org/gitlab';
 
 describe('ThroughputChart', () => {
   let wrapper;
 
-  const createComponent = () => {
-    wrapper = shallowMount(ThroughputChart);
+  const displaysComponent = (component, visible) => {
+    const element = wrapper.find(component);
+
+    expect(element.exists()).toBe(visible);
   };
 
-  beforeEach(() => {
-    createComponent();
-  });
+  const createComponent = ({ loading = false, data = {} } = {}) => {
+    const $apollo = {
+      queries: {
+        throughputChartData: {
+          loading,
+        },
+      },
+    };
+
+    wrapper = shallowMount(ThroughputChart, {
+      mocks: { $apollo },
+      provide: {
+        fullPath,
+      },
+    });
+
+    wrapper.setData(data);
+  };
 
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
   });
 
-  it('displays the chart title', () => {
-    const chartTitle = wrapper.find('[data-testid="chartTitle"').text();
+  describe('default state', () => {
+    beforeEach(() => {
+      createComponent();
+    });
 
-    expect(chartTitle).toBe('Throughput');
+    it('displays the chart title', () => {
+      const chartTitle = wrapper.find('[data-testid="chartTitle"').text();
+
+      expect(chartTitle).toBe(THROUGHPUT_STRINGS.CHART_TITLE);
+    });
+
+    it('displays the chart description', () => {
+      const chartDescription = wrapper.find('[data-testid="chartDescription"').text();
+
+      expect(chartDescription).toBe(THROUGHPUT_STRINGS.CHART_DESCRIPTION);
+    });
+
+    it('displays an empty state message when there is no data', () => {
+      const alert = wrapper.find(GlAlert);
+
+      expect(alert.exists()).toBe(true);
+      expect(alert.text()).toBe(THROUGHPUT_STRINGS.NO_DATA);
+    });
+
+    it('does not display a loading icon', () => {
+      displaysComponent(GlLoadingIcon, false);
+    });
+
+    it('does not display the chart', () => {
+      displaysComponent(GlAreaChart, false);
+    });
   });
 
-  it('displays the chart description', () => {
-    const chartDescription = wrapper.find('[data-testid="chartDescription"').text();
+  describe('while loading', () => {
+    beforeEach(() => {
+      createComponent({ loading: true });
+    });
 
-    expect(chartDescription).toBe(
-      'The number of merge requests merged to the master branch by month.',
-    );
+    it('displays a loading icon', () => {
+      displaysComponent(GlLoadingIcon, true);
+    });
+
+    it('does not display the chart', () => {
+      displaysComponent(GlAreaChart, false);
+    });
+
+    it('does not display the no data message', () => {
+      displaysComponent(GlAlert, false);
+    });
   });
 
-  it('displays an empty state message when there is no data', () => {
-    const alert = wrapper.find(GlAlert);
+  describe('with data', () => {
+    beforeEach(() => {
+      createComponent({ data: { throughputChartData } });
+    });
 
-    expect(alert.exists()).toBe(true);
-    expect(alert.text()).toBe('There is no data available.');
+    it('displays the chart', () => {
+      displaysComponent(GlAreaChart, true);
+    });
+
+    it('does not display a loading icon', () => {
+      displaysComponent(GlLoadingIcon, false);
+    });
+
+    it('does not display the no data message', () => {
+      displaysComponent(GlAlert, false);
+    });
   });
 });
