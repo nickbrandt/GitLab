@@ -9,22 +9,6 @@ module BillingPlansHelper
     number_to_currency(value, unit: '$', strip_insignificant_zeros: true, format: "%u%n")
   end
 
-  def current_plan?(plan)
-    plan.purchase_link&.action == 'current_plan'
-  end
-
-  def plan_purchase_link(href, link_text)
-    if href
-      link_to link_text, href, class: 'btn btn-success'
-    else
-      button_tag link_text, class: 'btn disabled'
-    end
-  end
-
-  def new_gitlab_com_trial_url
-    "#{EE::SUBSCRIPTIONS_URL}/trials/new?gl_com=true"
-  end
-
   def subscription_plan_data_attributes(group, plan)
     return {} unless group
 
@@ -36,24 +20,10 @@ module BillingPlansHelper
     }
   end
 
-  def plan_upgrade_url(group, plan)
-    return unless group && plan&.id
-
-    "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{group.id}/upgrade/#{plan.id}"
-  end
-
   def use_new_purchase_flow?(namespace)
     namespace.group? &&
       namespace.actual_plan_name == Plan::FREE &&
       Feature.enabled?(:free_group_new_purchase_flow, current_user)
-  end
-
-  def plan_purchase_url(group, plan)
-    if use_new_purchase_flow?(group)
-      new_subscriptions_path(plan_id: plan.id, namespace_id: group.id)
-    else
-      "#{plan.purchase_link.href}&gl_namespace_id=#{group.id}"
-    end
   end
 
   def show_contact_sales_button?(purchase_link_action)
@@ -88,5 +58,21 @@ module BillingPlansHelper
 
   def namespace_for_user?(namespace)
     namespace == current_user.namespace
+  end
+
+  private
+
+  def plan_purchase_url(group, plan)
+    if use_new_purchase_flow?(group)
+      new_subscriptions_path(plan_id: plan.id, namespace_id: group.id)
+    else
+      "#{plan.purchase_link.href}&gl_namespace_id=#{group.id}"
+    end
+  end
+
+  def plan_upgrade_url(group, plan)
+    return unless group && plan&.id
+
+    "#{EE::SUBSCRIPTIONS_URL}/gitlab/namespaces/#{group.id}/upgrade/#{plan.id}"
   end
 end

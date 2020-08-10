@@ -3,20 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe BillingPlansHelper do
-  describe '#current_plan?' do
-    it 'returns true when current_plan' do
-      plan = Hashie::Mash.new(purchase_link: { action: 'current_plan' })
-
-      expect(helper.current_plan?(plan)).to be_truthy
-    end
-
-    it 'return false when not current_plan' do
-      plan = Hashie::Mash.new(purchase_link: { action: 'upgrade' })
-
-      expect(helper.current_plan?(plan)).to be_falsy
-    end
-  end
-
   describe '#subscription_plan_data_attributes' do
     let(:customer_portal_url) { "https://customers.gitlab.com/subscriptions" }
 
@@ -60,8 +46,6 @@ RSpec.describe BillingPlansHelper do
   end
 
   describe '#use_new_purchase_flow?' do
-    using RSpec::Parameterized::TableSyntax
-
     where free_group_new_purchase: [true, false],
           type: ['Group', nil],
           plan: Plan.all_plans
