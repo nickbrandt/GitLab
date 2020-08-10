@@ -26,6 +26,8 @@ effect on them until a wiki page is edited again and the content changes.
 
 ### Wiki page content size limit configuration
 
+The minimum value is 1024 bytes.
+
 This setting is not available through the [Admin Area settings](../../user/admin_area/settings/index.md).
 In order to configure this setting, use either the Rails console
 or the [Application settings API](../../api/settings.md).
