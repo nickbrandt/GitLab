@@ -161,20 +161,7 @@ export default {
               :aria-label="__('Delete')"
               @click="prepareProfileDeletion(item.id)"
             />
-            <!--
-            NOTE: The tooltip and `disable` on the button is temporary until the edit feature has been implemented
-            further details: https://gitlab.com/gitlab-org/gitlab/-/issues/222479#proposal
-           -->
-            <span
-              v-gl-tooltip.hover
-              :title="
-                s__(
-                  'DastProfiles|Edit feature will come soon. Please create a new profile if changes needed',
-                )
-              "
-            >
-              <gl-button disabled>{{ __('Edit') }}</gl-button>
-            </span>
+            <gl-button :href="item.editPath">{{ __('Edit') }}</gl-button>
           </div>
         </template>
 
