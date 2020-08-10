@@ -99,29 +99,3 @@ describe('toggleEpicSwimlanes', () => {
     );
   });
 });
-
-describe('receiveSwimlanesSuccess', () => {
-  it('should commit mutation RECEIVE_SWIMLANES_SUCCESS', done => {
-    testAction(
-      actions.receiveSwimlanesSuccess,
-      {},
-      {},
-      [{ type: types.RECEIVE_SWIMLANES_SUCCESS, payload: {} }],
-      [],
-      done,
-    );
-  });
-});
-
-describe('receiveSwimlanesFailure', () => {
-  it('should commit mutation RECEIVE_SWIMLANES_SUCCESS', done => {
-    testAction(
-      actions.receiveSwimlanesFailure,
-      null,
-      {},
-      [{ type: types.RECEIVE_SWIMLANES_FAILURE }],
-      [],
-      done,
-    );
-  });
-});

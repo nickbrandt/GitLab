@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { sortBy } from 'lodash';
+import boardsStore from '~/boards/stores/boards_store';
 import actionsCE from '~/boards/stores/actions';
 import boardsStoreEE from './boards_store_ee';
 import * as types from './mutation_types';
@@ -14,7 +16,7 @@ const notImplemented = () => {
 
 const gqlClient = createDefaultClient();
 
-const fetchEpicsSwimlanes = ({ endpoints }) => {
+const fetchEpicsSwimlanes = ({ endpoints, boardType }) => {
   const { fullPath, boardId } = endpoints;
 
   const query = epicsSwimlanes;
@@ -29,7 +31,8 @@ const fetchEpicsSwimlanes = ({ endpoints }) => {
       variables,
     })
     .then(({ data }) => {
-      return data;
+      const { lists } = data[boardType]?.board;
+      return lists?.nodes;
     });
 };
 
@@ -101,33 +104,25 @@ export default {
     notImplemented();
   },
 
-  toggleEpicSwimlanes: ({ state, commit, dispatch }) => {
+  toggleEpicSwimlanes: ({ state, commit }) => {
     commit(types.TOGGLE_EPICS_SWIMLANES);
 
     if (state.isShowingEpicsSwimlanes) {
       Promise.all([fetchEpicsSwimlanes(state), fetchEpics(state)])
-        .then(([swimlanes, epics]) => {
-          if (swimlanes) {
-            dispatch('receiveSwimlanesSuccess', swimlanes);
+        .then(([lists, epics]) => {
+          if (lists) {
+            let boardLists = lists.map(list =>
+              boardsStore.updateListPosition({ ...list, doNotFetchIssues: true }),
+            );
+            boardLists = sortBy([...boardLists], 'position');
+            commit(types.RECEIVE_BOARD_LISTS_SUCCESS, boardLists);
           }
 
           if (epics) {
-            dispatch('receiveEpicsSuccess', epics);
+            commit(types.RECEIVE_EPICS_SUCCESS, epics);
           }
         })
-        .catch(() => dispatch('receiveSwimlanesFailure'));
+        .catch(() => commit(types.RECEIVE_SWIMLANES_FAILURE));
     }
-  },
-
-  receiveSwimlanesSuccess: ({ commit }, swimlanes) => {
-    commit(types.RECEIVE_SWIMLANES_SUCCESS, swimlanes);
-  },
-
-  receiveSwimlanesFailure: ({ commit }) => {
-    commit(types.RECEIVE_SWIMLANES_FAILURE);
-  },
-
-  receiveEpicsSuccess: ({ commit }, swimlanes) => {
-    commit(types.RECEIVE_EPICS_SUCCESS, swimlanes);
   },
 };

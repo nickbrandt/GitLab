@@ -103,17 +103,17 @@ describe('TOGGLE_EPICS_SWIMLANES', () => {
   });
 });
 
-describe('RECEIVE_SWIMLANES_SUCCESS', () => {
-  it('sets epicsSwimlanesFetchInProgress to false and populates epicsSwimlanes with payload', () => {
+describe('RECEIVE_BOARD_LISTS_SUCCESS', () => {
+  it('sets epicsSwimlanesFetchInProgress to false and populates boardLists with payload', () => {
     const state = {
       epicsSwimlanesFetchInProgress: true,
-      epicsSwimlanes: {},
+      boardLists: {},
     };
 
-    mutations.RECEIVE_SWIMLANES_SUCCESS(state, mockLists);
+    mutations.RECEIVE_BOARD_LISTS_SUCCESS(state, mockLists);
 
     expect(state.epicsSwimlanesFetchInProgress).toBe(false);
-    expect(state.epicsSwimlanes).toEqual(mockLists);
+    expect(state.boardLists).toEqual(mockLists);
   });
 });
 

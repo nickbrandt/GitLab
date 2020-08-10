@@ -10,6 +10,7 @@ describe('BoardList Component', () => {
         path: '/test',
       },
       real_path: '',
+      webUrl: '',
     };
 
     const componentProps = {

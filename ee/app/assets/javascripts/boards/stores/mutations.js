@@ -69,8 +69,8 @@ export default {
     state.epicsSwimlanesFetchInProgress = true;
   },
 
-  [mutationTypes.RECEIVE_SWIMLANES_SUCCESS]: (state, swimlanes) => {
-    state.epicsSwimlanes = swimlanes;
+  [mutationTypes.RECEIVE_BOARD_LISTS_SUCCESS]: (state, boardLists) => {
+    state.boardLists = boardLists;
     state.epicsSwimlanesFetchInProgress = false;
   },
 
