@@ -199,7 +199,7 @@ export default {
       </p>
       <p v-html="instructionText.step4"></p>
       <template #modal-footer>
-        <gl-button category="tertiary" @click="cancel">
+        <gl-button category="secondary" @click="cancel">
           {{ s__('VisualReviewApp|Cancel') }}
         </gl-button>
         <gl-deprecated-dropdown
