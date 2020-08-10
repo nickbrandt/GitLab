@@ -157,7 +157,7 @@ RSpec.describe 'Requirements list', :js do
         end
 
         page.within('.requirement-form') do
-          expect(page.find('span')).to have_content("REQ-#{requirement1.iid}")
+          expect(page.find('span', match: :first)).to have_content("REQ-#{requirement1.iid}")
           expect(page.find('textarea#requirementTitle')['value']).to have_content("#{requirement1.title}")
           expect(page.find('.js-requirement-save')).to have_content('Save changes')
         end
