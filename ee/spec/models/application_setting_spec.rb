@@ -545,26 +545,15 @@ RSpec.describe ApplicationSetting do
     context 'for instances without a valid license' do
       before do
         allow(License).to receive(:current).and_return(nil)
+        expect(Rails.cache).to receive(:fetch).and_return(
+          ::ApplicationSetting::INSTANCE_REVIEW_MIN_USERS + users_over_minimum
+        )
       end
 
-      context 'when there are more users than minimum count' do
-        before do
-          expect(Rails.cache).to receive(:fetch).and_return(101)
-        end
+      where(users_over_minimum: [-1, 0, 1])
 
-        it 'is permitted' do
-          expect(subject).to be_truthy
-        end
-      end
-
-      context 'when there are less users than minimum count' do
-        before do
-          create(:user)
-        end
-
-        it 'is not permitted' do
-          expect(subject).to be_falsey
-        end
+      with_them do
+        it { is_expected.to be(users_over_minimum >= 0) }
       end
     end
   end
