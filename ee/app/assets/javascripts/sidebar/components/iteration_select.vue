@@ -91,8 +91,13 @@ export default {
   },
   computed: {
     iteration() {
-      // NOTE: Optional chaining guards when search result is empty
-      return this.iterations.find(({ id }) => id === this.currentIteration)?.title;
+      return this.iterations.find(({ id }) => id === this.currentIteration);
+    },
+    iterationTitle() {
+      return this.iteration?.title;
+    },
+    iterationUrl() {
+      return this.iteration?.webUrl;
     },
     showNoIterationContent() {
       return !this.editing && !this.currentIteration;
@@ -159,7 +164,7 @@ export default {
   <div>
     <div v-gl-tooltip class="sidebar-collapsed-icon">
       <gl-icon :size="16" :aria-label="$options.iterationText" name="iteration" />
-      <span class="collapse-truncated-title">{{ iteration }}</span>
+      <span class="collapse-truncated-title">{{ iterationTitle }}</span>
     </div>
     <div class="title hide-collapsed mt-3">
       {{ $options.iterationText }}
@@ -177,8 +182,8 @@ export default {
     </div>
     <div data-testid="select-iteration" class="hide-collapsed">
       <span v-if="showNoIterationContent" class="no-value">{{ $options.noIteration }}</span>
-      <gl-link v-else-if="!editing" href
-        ><strong>{{ iteration }}</strong></gl-link
+      <gl-link v-else-if="!editing" :href="iterationUrl"
+        ><strong>{{ iterationTitle }}</strong></gl-link
       >
     </div>
     <gl-new-dropdown

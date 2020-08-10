@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlNewDropdown, GlNewDropdownItem, GlButton, GlSearchBoxByType } from '@gitlab/ui';
+import { GlNewDropdown, GlNewDropdownItem, GlButton, GlLink, GlSearchBoxByType } from '@gitlab/ui';
 import createFlash from '~/flash';
 import IterationSelect from 'ee/sidebar/components/iteration_select.vue';
 import { iterationSelectTextMap } from 'ee/sidebar/constants';
@@ -62,6 +62,17 @@ describe('IterationSelect', () => {
       });
 
       expect(wrapper.find('[data-testid="select-iteration"]').text()).toBe('title');
+    });
+
+    it('links to the current iteration', () => {
+      createComponent({
+        data: {
+          iterations: [{ id: 'id', title: 'title', webUrl: 'webUrl' }],
+          currentIteration: 'id',
+        },
+      });
+
+      expect(wrapper.find(GlLink).attributes().href).toBe('webUrl');
     });
   });
 
