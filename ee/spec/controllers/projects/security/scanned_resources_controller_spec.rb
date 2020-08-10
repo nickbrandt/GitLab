@@ -30,13 +30,6 @@ RSpec.describe Projects::Security::ScannedResourcesController do
         end
       end
 
-      it 'returns a CSV representation of the scanned resources' do
-        expect_next_instance_of(::Gitlab::Ci::Parsers::Security::ScannedResources) do |instance|
-          expect(instance).to receive(:scanned_resources_for_csv).and_return([])
-        end
-        expect(subject).to have_gitlab_http_status(:ok)
-      end
-
       context 'when the pipeline id is missing' do
         let_it_be(:action_params) { { project_id: project, namespace_id: project.namespace } }
 
