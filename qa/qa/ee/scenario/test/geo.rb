@@ -141,7 +141,7 @@ module QA
             def reconfigure
               # Without this step, the /var/opt/gitlab/postgresql/data/pg_hba.conf
               # that is left behind from 'gitlab_ctl "replicate-geo-database ..'
-              # does not allow FDW to work.
+              # does not allow PostgreSQL to work.
               puts 'Reconfiguring ...'
 
               QA::Service::Omnibus.new(@name).act do
