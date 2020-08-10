@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlFilteredSearch } from '@gitlab/ui';
+import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import FilterBar from 'ee/analytics/code_review_analytics/components/filter_bar.vue';
 import createFiltersState from 'ee/analytics/code_review_analytics/store/modules/filters/state';
 import { mockMilestones, mockLabels } from '../mock_data';
@@ -42,19 +42,22 @@ describe('FilteredSearchBar', () => {
     shallowMount(FilterBar, {
       localVue,
       store,
+      propsData: {
+        projectPath: 'foo',
+      },
     });
 
   afterEach(() => {
     wrapper.destroy();
   });
 
-  const findFilteredSearch = () => wrapper.find(GlFilteredSearch);
+  const findFilteredSearch = () => wrapper.find(FilteredSearchBar);
   const getSearchToken = type =>
     findFilteredSearch()
-      .props('availableTokens')
-      .filter(token => token.type === type)[0];
+      .props('tokens')
+      .find(token => token.type === type);
 
-  it('renders GlFilteredSearch component', () => {
+  it('renders FilteredSearchBar component', () => {
     vuexStore = createStore();
     wrapper = createComponent(vuexStore);
 
@@ -71,7 +74,7 @@ describe('FilteredSearchBar', () => {
     });
 
     it('displays the milestone and label token', () => {
-      const tokens = findFilteredSearch().props('availableTokens');
+      const tokens = findFilteredSearch().props('tokens');
 
       expect(tokens).toHaveLength(2);
       expect(tokens[0].type).toBe(milestoneTokenType);
@@ -101,7 +104,7 @@ describe('FilteredSearchBar', () => {
     });
 
     it('clicks on the search button, setFilters is dispatched', () => {
-      findFilteredSearch().vm.$emit('submit', [
+      findFilteredSearch().vm.$emit('onFilter', [
         { type: 'milestone', value: { data: 'my-milestone', operator: '=' } },
         { type: 'label', value: { data: 'my-label', operator: '=' } },
       ]);
@@ -117,7 +120,7 @@ describe('FilteredSearchBar', () => {
     });
 
     it('removes wrapping double quotes from the data and dispatches setFilters', () => {
-      findFilteredSearch().vm.$emit('submit', [
+      findFilteredSearch().vm.$emit('onFilter', [
         { type: 'milestone', value: { data: '"milestone with spaces"', operator: '=' } },
       ]);
 
@@ -132,7 +135,7 @@ describe('FilteredSearchBar', () => {
     });
 
     it('removes wrapping single quotes from the data and dispatches setFilters', () => {
-      findFilteredSearch().vm.$emit('submit', [
+      findFilteredSearch().vm.$emit('onFilter', [
         { type: 'milestone', value: { data: "'milestone with spaces'", operator: '=' } },
       ]);
 
@@ -147,7 +150,7 @@ describe('FilteredSearchBar', () => {
     });
 
     it('does not remove inner double quotes from the data and dispatches setFilters ', () => {
-      findFilteredSearch().vm.$emit('submit', [
+      findFilteredSearch().vm.$emit('onFilter', [
         { type: 'milestone', value: { data: 'milestone "with" spaces', operator: '=' } },
       ]);
 

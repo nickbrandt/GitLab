@@ -21,6 +21,10 @@ export default {
       type: Number,
       required: true,
     },
+    projectPath: {
+      type: String,
+      required: true,
+    },
     newMergeRequestUrl: {
       type: String,
       required: true,
@@ -79,7 +83,7 @@ export default {
 
 <template>
   <div>
-    <filter-bar v-if="codeReviewAnalyticsHasNewSearch" />
+    <filter-bar v-if="codeReviewAnalyticsHasNewSearch" :project-path="projectPath" />
     <div class="mt-2">
       <gl-loading-icon v-show="isLoading" size="md" class="mt-3" />
       <template v-if="!isLoading">

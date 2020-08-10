@@ -44,7 +44,8 @@ export default {
     },
     sortOptions: {
       type: Array,
-      required: true,
+      default: () => [],
+      required: false,
     },
     initialFilterValue: {
       type: Array,
@@ -63,7 +64,7 @@ export default {
     },
   },
   data() {
-    let selectedSortOption = this.sortOptions[0].sortDirection.descending;
+    let selectedSortOption = this.sortOptions[0]?.sortDirection?.descending;
     let selectedSortDirection = SortDirection.descending;
 
     // Extract correct sortBy value based on initialSortBy
@@ -267,7 +268,7 @@ export default {
         </template>
       </template>
     </gl-filtered-search>
-    <gl-button-group class="sort-dropdown-container d-flex">
+    <gl-button-group v-if="selectedSortOption" class="sort-dropdown-container d-flex">
       <gl-dropdown :text="selectedSortOption.title" :right="true" class="w-100">
         <gl-dropdown-item
           v-for="sortBy in sortOptions"
