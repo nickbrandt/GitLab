@@ -10468,6 +10468,9 @@ msgstr ""
 msgid "FeatureFlags|There was an error retrieving user lists"
 msgstr ""
 
+msgid "FeatureFlags|To prevent accidental actions we ask you to confirm your intention. Please type %{projectName} to proceed or close this modal to cancel."
+msgstr ""
+
 msgid "FeatureFlags|Try again in a few moments or contact your support team."
 msgstr ""
 

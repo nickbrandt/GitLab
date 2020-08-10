@@ -37,6 +37,9 @@ describe('Feature flags', () => {
   const factory = (propsData = mockData, fn = shallowMount) => {
     wrapper = fn(FeatureFlagsComponent, {
       propsData,
+      provide: {
+        projectName: 'fakeProjectName',
+      },
     });
   };
 

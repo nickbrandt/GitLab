@@ -2,6 +2,7 @@
 
 #feature-flags-vue{ data: { endpoint: project_feature_flags_path(@project, format: :json),
   "project-id" => @project.id,
+  "project-name" => @project.name,
   "error-state-svg-path" => image_path('illustrations/feature_flag.svg'),
   "feature-flags-help-page-path" => help_page_path("operations/feature_flags"),
   "feature-flags-client-libraries-help-page-path" => help_page_path("operations/feature_flags", anchor: "choose-a-client-library"),
