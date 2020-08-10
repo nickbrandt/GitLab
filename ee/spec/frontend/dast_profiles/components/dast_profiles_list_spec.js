@@ -1,19 +1,24 @@
 import { merge } from 'lodash';
-import { mount } from '@vue/test-utils';
+import { mount, shallowMount, createWrapper } from '@vue/test-utils';
 import { within } from '@testing-library/dom';
+import { GlModal } from '@gitlab/ui';
 import DastProfilesList from 'ee/dast_profiles/components/dast_profiles_list.vue';
+
+const TEST_ERROR_MESSAGE = 'something went wrong';
 
 describe('EE - DastProfilesList', () => {
   let wrapper;
 
-  const createComponent = (options = {}) => {
+  const createComponentFactory = (mountFn = shallowMount) => (options = {}) => {
     const defaultProps = {
       profiles: [],
       hasMorePages: false,
       profilesPerPage: 10,
+      errorMessage: '',
+      errorDetails: [],
     };
 
-    wrapper = mount(
+    wrapper = mountFn(
       DastProfilesList,
       merge(
         {},
@@ -24,6 +29,9 @@ describe('EE - DastProfilesList', () => {
       ),
     );
   };
+
+  const createComponent = createComponentFactory();
+  const createFullComponent = createComponentFactory(mount);
 
   const withinComponent = () => within(wrapper.element);
   const getTable = () => withinComponent().getByRole('table', { name: /site profiles/i });
@@ -36,7 +44,11 @@ describe('EE - DastProfilesList', () => {
   const getAllTableRows = () => within(getTableBody()).getAllByRole('row');
   const getLoadMoreButton = () => wrapper.find('[data-testid="loadMore"]');
   const getAllLoadingIndicators = () => withinComponent().queryAllByTestId('loadingIndicator');
-  const getErrorMessage = () => withinComponent().queryByText(/error fetching the profiles list/i);
+  const getErrorMessage = () => withinComponent().queryByText(TEST_ERROR_MESSAGE);
+  const getErrorDetails = () => withinComponent().queryByRole('list', { name: /error details/i });
+  const getDeleteButtonWithin = element =>
+    createWrapper(within(element).queryByRole('button', { name: /delete/i }));
+  const getModal = () => wrapper.find(GlModal);
 
   afterEach(() => {
     wrapper.destroy();
@@ -48,7 +60,7 @@ describe('EE - DastProfilesList', () => {
 
     describe('initial load', () => {
       beforeEach(() => {
-        createComponent({ propsData: { isLoading: true, profilesPerPage } });
+        createFullComponent({ propsData: { isLoading: true, profilesPerPage } });
       });
 
       it('shows a loading indicator for each profile item', () => {
@@ -106,14 +118,13 @@ describe('EE - DastProfilesList', () => {
 
     const getTableRowForProfile = profile => getAllTableRows()[profiles.indexOf(profile)];
 
-    it('does not show loading indicators', () => {
-      createComponent({});
-      expect(getAllLoadingIndicators()).toHaveLength(0);
-    });
-
     describe('profiles list', () => {
       beforeEach(() => {
-        createComponent({ propsData: { profiles } });
+        createFullComponent({ propsData: { profiles } });
+      });
+
+      it('does not show loading indicators', () => {
+        expect(getAllLoadingIndicators()).toHaveLength(0);
       });
 
       it('renders a list of profiles', () => {
@@ -133,6 +144,7 @@ describe('EE - DastProfilesList', () => {
         expect(targetUrlCell.innerText).toContain(profile.targetUrl);
         expect(validationStatusCell.innerText).toContain(profile.validationStatus);
         expect(within(actionsCell).getByRole('button', { name: /edit/i })).not.toBe(null);
+        expect(within(actionsCell).getByRole('button', { name: /delete/i })).not.toBe(null);
       });
     });
 
@@ -145,14 +157,14 @@ describe('EE - DastProfilesList', () => {
 
       describe('with more profiles', () => {
         beforeEach(() => {
-          createComponent({ propsData: { profiles, hasMoreProfilesToLoad: true } });
+          createFullComponent({ propsData: { profiles, hasMoreProfilesToLoad: true } });
         });
 
         it('shows that there are more projects to be loaded', () => {
           expect(getLoadMoreButton().exists()).toBe(true);
         });
 
-        it('emits "loadMore" when the load-more button is clicked', async () => {
+        it('emits "loadMoreProfiles" when the load-more button is clicked', async () => {
           expect(wrapper.emitted('loadMoreProfiles')).toBe(undefined);
 
           await getLoadMoreButton().trigger('click');
@@ -161,19 +173,59 @@ describe('EE - DastProfilesList', () => {
         });
       });
     });
+
+    describe.each(profiles)('delete profile', profile => {
+      beforeEach(() => {
+        createFullComponent({ propsData: { profiles } });
+      });
+
+      const getCurrentProfileDeleteButton = () =>
+        getDeleteButtonWithin(getTableRowForProfile(profile));
+
+      it('opens a modal with the correct title when a delete button is clicked', async () => {
+        expect(getModal().isEmpty()).toBe(true);
+
+        getCurrentProfileDeleteButton().trigger('click');
+
+        await wrapper.vm.$nextTick();
+
+        expect(
+          within(getModal().element).getByText(/are you sure you want to delete this profile/i),
+        ).not.toBe(null);
+      });
+
+      it(`emits "@deleteProfile" with the right payload when the modal's primary action is triggered`, async () => {
+        expect(wrapper.emitted('deleteProfile')).toBe(undefined);
+
+        getCurrentProfileDeleteButton().trigger('click');
+
+        await wrapper.vm.$nextTick();
+
+        getModal().vm.$emit('ok');
+
+        expect(wrapper.emitted('deleteProfile')[0]).toEqual([profile.id]);
+      });
+    });
   });
 
   describe('errors', () => {
     it('does not show an error message by default', () => {
-      createComponent();
+      createFullComponent();
 
       expect(getErrorMessage()).toBe(null);
+      expect(getErrorDetails()).toBe(null);
     });
 
-    it('shows an error message', () => {
-      createComponent({ propsData: { hasError: true } });
+    it('shows an error message and details', () => {
+      const errorDetails = ['foo', 'bar'];
+      createFullComponent({
+        propsData: { errorMessage: TEST_ERROR_MESSAGE, errorDetails },
+      });
 
       expect(getErrorMessage()).not.toBe(null);
+      expect(getErrorDetails()).not.toBe(null);
+      expect(within(getErrorDetails()).getByText(errorDetails[0])).not.toBe(null);
+      expect(within(getErrorDetails()).getByText(errorDetails[1])).not.toBe(null);
     });
   });
 });
