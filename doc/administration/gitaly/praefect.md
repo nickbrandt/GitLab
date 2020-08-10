@@ -142,6 +142,16 @@ database on the same PostgreSQL server if using
 [Geo](../geo/replication/index.md). The replication state is internal to each instance
 of GitLab and should not be replicated.
 
+These instructions help set up a single PostgreSQL database, which creates a single point of
+failure. For greater fault tolerance, the following options are available:
+
+- For non-Geo installations, use one of the fault-tolerant
+  [PostgreSQL setups](../postgresql/index.md).
+- For Geo instances, either:
+  - Set up a separate [PostgreSQL instance](https://www.postgresql.org/docs/11/high-availability.html).
+  - Use a cloud-managed PostgreSQL service. AWS
+     [Relational Database Service](https://aws.amazon.com/rds/)) is recommended.
+
 To complete this section you will need:
 
 - 1 Praefect node
