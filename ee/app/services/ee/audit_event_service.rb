@@ -129,7 +129,7 @@ module EE
 
     # Creates an event record in DB
     #
-    # @return [SecurityEvent, nil] if record is persisted or nil if audit events
+    # @return [AuditEvent, nil] if record is persisted or nil if audit events
     #   features are not enabled
     def unauth_security_event
       return unless audit_events_enabled?
@@ -145,7 +145,7 @@ module EE
 
       payload[:ip_address] = ip_address if admin_audit_log_enabled?
 
-      SecurityEvent.create(payload)
+      ::AuditEvent.create(payload)
     end
 
     # Builds the @details attribute for user

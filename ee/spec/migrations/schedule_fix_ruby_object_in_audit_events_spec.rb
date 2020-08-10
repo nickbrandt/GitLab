@@ -11,7 +11,6 @@ RSpec.describe ScheduleFixRubyObjectInAuditEvents do
 
     audit_events.create!(
       author_id: -1,
-      type: 'SecurityEvent',
       entity_id: 1,
       entity_type: 'User',
       details: "---\n:failed_login: STANDARD\n:author_name: hacker\n" \
@@ -21,7 +20,6 @@ RSpec.describe ScheduleFixRubyObjectInAuditEvents do
 
     audit_events.create!(
       author_id: 1,
-      type: 'SecurityEvent',
       entity_id: 1,
       entity_type: 'User',
       details: "---\n:failed_login: STANDARD\n:author_name: homer\n" \

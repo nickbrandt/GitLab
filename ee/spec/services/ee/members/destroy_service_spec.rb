@@ -15,7 +15,7 @@ RSpec.describe Members::DestroyService do
 
   shared_examples_for 'logs an audit event' do
     specify do
-      expect { event }.to change { SecurityEvent.count }.by(1)
+      expect { event }.to change { AuditEvent.count }.by(1)
     end
   end
 

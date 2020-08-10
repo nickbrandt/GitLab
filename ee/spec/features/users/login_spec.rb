@@ -15,7 +15,7 @@ RSpec.describe 'Login' do
     user = create(:user, password: 'not-the-default')
 
     expect { gitlab_sign_in(user) }
-      .to change { SecurityEvent.where(entity_id: -1).count }.from(0).to(1)
+      .to change { AuditEvent.where(entity_id: -1).count }.from(0).to(1)
   end
 
   it 'creates a security event for an invalid OAuth login' do
@@ -29,7 +29,7 @@ RSpec.describe 'Login' do
     user = create(:omniauth_user, :two_factor, extern_uid: 'my-uid', provider: 'saml')
 
     expect { gitlab_sign_in_via('saml', user, 'wrong-uid') }
-      .to change { SecurityEvent.where(entity_id: -1).count }.from(0).to(1)
+      .to change { AuditEvent.where(entity_id: -1).count }.from(0).to(1)
   end
 
   describe 'smartcard authentication' do

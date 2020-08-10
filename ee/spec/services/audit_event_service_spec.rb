@@ -68,15 +68,15 @@ RSpec.describe AuditEventService do
       end
 
       it 'does not create an event' do
-        expect(SecurityEvent).not_to receive(:create)
+        expect(AuditEvent).not_to receive(:create)
 
-        expect { service.security_event }.not_to change(SecurityEvent, :count)
+        expect { service.security_event }.not_to change(AuditEvent, :count)
       end
     end
 
     context 'licensed' do
       it 'creates an event' do
-        expect { service.security_event }.to change(SecurityEvent, :count).by(1)
+        expect { service.security_event }.to change(AuditEvent, :count).by(1)
       end
 
       context 'on a read-only instance' do
@@ -85,7 +85,7 @@ RSpec.describe AuditEventService do
         end
 
         it 'does not create an event' do
-          expect { service.security_event }.not_to change(SecurityEvent, :count)
+          expect { service.security_event }.not_to change(AuditEvent, :count)
         end
       end
     end
