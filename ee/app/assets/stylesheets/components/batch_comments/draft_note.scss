@@ -4,18 +4,6 @@ $draft-actions-left-margin: 40px + $gl-padding;
   margin: 0;
   background: $orange-50;
 
-  .drafts-count-component {
-    @include transition(background-color);
-    background: rgba($green-500, 0.2);
-  }
-
-  button:focus,
-  button:hover {
-    .drafts-count-component {
-      background: $black-transparent;
-    }
-  }
-
   .referenced-commands.draft-note-commands {
     background: $orange-100;
     font-size: $label-font-size;
@@ -39,8 +27,9 @@ button[disabled] {
   &,
   &:focus,
   &:hover {
-    .drafts-count-component {
+    .gl-badge {
       background: $gl-gray-100;
+      color: $gl-gray-500;
     }
   }
 }
