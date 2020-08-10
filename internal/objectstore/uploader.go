@@ -4,12 +4,11 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"hash"
 	"io"
-	"net/http"
-
-	"gitlab.com/gitlab-org/labkit/log"
-	"gitlab.com/gitlab-org/labkit/mask"
+	"strings"
+	"time"
 )
 
 // Upload represents an upload to an ObjectStorage provider
@@ -33,16 +32,23 @@ type uploader struct {
 	uploadError error
 	// ctx is the internal context bound to the upload request
 	ctx context.Context
+
+	pr       *io.PipeReader
+	pw       *io.PipeWriter
+	strategy uploadStrategy
+	metrics  bool
 }
 
-func newUploader(ctx context.Context, w io.WriteCloser) uploader {
-	return uploader{w: w, c: w, ctx: ctx}
+func newUploader(strategy uploadStrategy) uploader {
+	pr, pw := io.Pipe()
+	return uploader{w: pw, c: pw, pr: pr, pw: pw, strategy: strategy, metrics: true}
 }
 
-func newMD5Uploader(ctx context.Context, w io.WriteCloser) uploader {
+func newMD5Uploader(strategy uploadStrategy, metrics bool) uploader {
+	pr, pw := io.Pipe()
 	hasher := md5.New()
-	mw := io.MultiWriter(w, hasher)
-	return uploader{w: mw, c: w, md5: hasher, ctx: ctx}
+	mw := io.MultiWriter(pw, hasher)
+	return uploader{w: mw, c: pw, pr: pr, pw: pw, md5: hasher, strategy: strategy, metrics: metrics}
 }
 
 // Close implements the standard io.Closer interface: it closes the http client request.
@@ -65,37 +71,6 @@ func (u *uploader) Write(p []byte) (int, error) {
 	return u.w.Write(p)
 }
 
-// syncAndDelete wait for Context to be Done and then performs the requested HTTP call
-func (u *uploader) syncAndDelete(url string) {
-	if url == "" {
-		return
-	}
-
-	<-u.ctx.Done()
-
-	req, err := http.NewRequest("DELETE", url, nil)
-	if err != nil {
-		log.WithError(err).WithField("object", mask.URL(url)).Warning("Delete failed")
-		return
-	}
-	// TODO: consider adding the context to the outgoing request for better instrumentation
-
-	// here we are not using u.ctx because we must perform cleanup regardless of parent context
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		log.WithError(err).WithField("object", mask.URL(url)).Warning("Delete failed")
-		return
-	}
-	resp.Body.Close()
-}
-
-func (u *uploader) extractETag(rawETag string) {
-	if rawETag != "" && rawETag[0] == '"' {
-		rawETag = rawETag[1 : len(rawETag)-1]
-	}
-	u.etag = rawETag
-}
-
 func (u *uploader) md5Sum() string {
 	if u.md5 == nil {
 		return ""
@@ -111,4 +86,85 @@ func (u *uploader) ETag() string {
 	<-u.ctx.Done()
 
 	return u.etag
+}
+
+func (u *uploader) Execute(ctx context.Context, deadline time.Time) {
+	if u.metrics {
+		objectStorageUploadsOpen.Inc()
+	}
+	uploadCtx, cancelFn := context.WithDeadline(ctx, deadline)
+	u.ctx = uploadCtx
+
+	if u.metrics {
+		go u.trackUploadTime()
+	}
+	go u.cleanup(ctx)
+	go func() {
+		defer cancelFn()
+		if u.metrics {
+			defer objectStorageUploadsOpen.Dec()
+		}
+		defer func() {
+			// This will be returned as error to the next write operation on the pipe
+			u.pr.CloseWithError(u.uploadError)
+		}()
+
+		err := u.strategy.Upload(uploadCtx, u.pr)
+		if err != nil {
+			u.uploadError = err
+			if u.metrics {
+				objectStorageUploadRequestsRequestFailed.Inc()
+			}
+			return
+		}
+
+		u.etag = u.strategy.ETag()
+
+		if u.md5 != nil {
+			err := compareMD5(u.md5Sum(), u.etag)
+			if err != nil {
+				u.uploadError = err
+				if u.metrics {
+					objectStorageUploadRequestsRequestFailed.Inc()
+				}
+			}
+		}
+	}()
+}
+
+func (u *uploader) trackUploadTime() {
+	started := time.Now()
+	<-u.ctx.Done()
+
+	if u.metrics {
+		objectStorageUploadTime.Observe(time.Since(started).Seconds())
+	}
+}
+
+func (u *uploader) cleanup(ctx context.Context) {
+	// wait for the upload to finish
+	<-u.ctx.Done()
+
+	if u.uploadError != nil {
+		if u.metrics {
+			objectStorageUploadRequestsRequestFailed.Inc()
+		}
+		u.strategy.Abort()
+		return
+	}
+
+	// We have now successfully uploaded the file to object storage. Another
+	// goroutine will hand off the object to gitlab-rails.
+	<-ctx.Done()
+
+	// gitlab-rails is now done with the object so it's time to delete it.
+	u.strategy.Delete()
+}
+
+func compareMD5(local, remote string) error {
+	if !strings.EqualFold(local, remote) {
+		return fmt.Errorf("ETag mismatch. expected %q got %q", local, remote)
+	}
+
+	return nil
 }

@@ -5,21 +5,34 @@ import (
 	"io"
 	"time"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
-
 	"github.com/aws/aws-sdk-go/aws"
-
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-
 	"gitlab.com/gitlab-org/labkit/log"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 )
 
 type S3Object struct {
 	credentials config.S3Credentials
 	config      config.S3Config
 	objectName  string
+	uploaded    bool
+
 	uploader
+}
+
+func NewS3Object(ctx context.Context, objectName string, s3Credentials config.S3Credentials, s3Config config.S3Config, deadline time.Time) (*S3Object, error) {
+	o := &S3Object{
+		credentials: s3Credentials,
+		config:      s3Config,
+		objectName:  objectName,
+	}
+
+	o.uploader = newUploader(o)
+	o.Execute(ctx, deadline)
+
+	return o, nil
 }
 
 func setEncryptionOptions(input *s3manager.UploadInput, s3Config config.S3Config) {
@@ -32,88 +45,48 @@ func setEncryptionOptions(input *s3manager.UploadInput, s3Config config.S3Config
 	}
 }
 
-func NewS3Object(ctx context.Context, objectName string, s3Credentials config.S3Credentials, s3Config config.S3Config, deadline time.Time) (*S3Object, error) {
-	pr, pw := io.Pipe()
-	objectStorageUploadsOpen.Inc()
-	uploadCtx, cancelFn := context.WithDeadline(ctx, deadline)
-
-	o := &S3Object{
-		uploader:    newUploader(uploadCtx, pw),
-		credentials: s3Credentials,
-		config:      s3Config,
+func (s *S3Object) Upload(ctx context.Context, r io.Reader) error {
+	sess, err := setupS3Session(s.credentials, s.config)
+	if err != nil {
+		log.WithError(err).Error("error creating S3 session")
+		return err
 	}
 
-	go o.trackUploadTime()
-	go o.cleanup(ctx)
+	uploader := s3manager.NewUploader(sess)
 
-	go func() {
-		defer cancelFn()
-		defer objectStorageUploadsOpen.Dec()
-		defer func() {
-			// This will be returned as error to the next write operation on the pipe
-			pr.CloseWithError(o.uploadError)
-		}()
+	input := &s3manager.UploadInput{
+		Bucket: aws.String(s.config.Bucket),
+		Key:    aws.String(s.objectName),
+		Body:   r,
+	}
 
-		sess, err := setupS3Session(s3Credentials, s3Config)
-		if err != nil {
-			o.uploadError = err
-			log.WithError(err).Error("error creating S3 session")
-			return
-		}
+	setEncryptionOptions(input, s.config)
 
-		o.objectName = objectName
-		uploader := s3manager.NewUploader(sess)
+	_, err = uploader.UploadWithContext(ctx, input)
+	if err != nil {
+		log.WithError(err).Error("error uploading S3 session")
+		return err
+	}
 
-		input := &s3manager.UploadInput{
-			Bucket: aws.String(s3Config.Bucket),
-			Key:    aws.String(objectName),
-			Body:   pr,
-		}
+	s.uploaded = true
 
-		setEncryptionOptions(input, s3Config)
-
-		_, err = uploader.UploadWithContext(uploadCtx, input)
-		if err != nil {
-			o.uploadError = err
-			objectStorageUploadRequestsRequestFailed.Inc()
-			log.WithError(err).Error("error uploading S3 session")
-			return
-		}
-	}()
-
-	return o, nil
+	return nil
 }
 
-func (o *S3Object) trackUploadTime() {
-	started := time.Now()
-	<-o.ctx.Done()
-	objectStorageUploadTime.Observe(time.Since(started).Seconds())
+func (s *S3Object) ETag() string {
+	return ""
 }
 
-func (o *S3Object) cleanup(ctx context.Context) {
-	// wait for the upload to finish
-	<-o.ctx.Done()
+func (s *S3Object) Abort() {
+	s.Delete()
+}
 
-	if o.uploadError != nil {
-		objectStorageUploadRequestsRequestFailed.Inc()
-		o.delete()
+func (s *S3Object) Delete() {
+	if !s.uploaded {
 		return
 	}
 
-	// We have now successfully uploaded the file to object storage. Another
-	// goroutine will hand off the object to gitlab-rails.
-	<-ctx.Done()
-
-	// gitlab-rails is now done with the object so it's time to delete it.
-	o.delete()
-}
-
-func (o *S3Object) delete() {
-	if o.objectName == "" {
-		return
-	}
-
-	session, err := setupS3Session(o.credentials, o.config)
+	session, err := setupS3Session(s.credentials, s.config)
 	if err != nil {
 		log.WithError(err).Error("error setting up S3 session in delete")
 		return
@@ -121,8 +94,8 @@ func (o *S3Object) delete() {
 
 	svc := s3.New(session)
 	input := &s3.DeleteObjectInput{
-		Bucket: aws.String(o.config.Bucket),
-		Key:    aws.String(o.objectName),
+		Bucket: aws.String(s.config.Bucket),
+		Key:    aws.String(s.objectName),
 	}
 
 	// Note we can't use the request context because in a successful
