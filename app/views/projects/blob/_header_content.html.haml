@@ -7,7 +7,7 @@
   = copy_file_path_button(blob.path)
 
   %small.mr-1
-    - if blob.mode == '120000'
+    - if blob.mode == Blob::MODE_SYMLINK
       = _('Symbolic link') << ' ·'
     = number_to_human_size(blob.raw_size)
 
