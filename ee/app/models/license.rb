@@ -121,6 +121,7 @@ class License < ApplicationRecord
     dast
     dependency_scanning
     enterprise_templates
+    api_fuzzing
     group_level_compliance_dashboard
     incident_management
     insights
