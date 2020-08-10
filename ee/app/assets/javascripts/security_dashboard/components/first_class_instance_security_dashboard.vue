@@ -7,7 +7,7 @@ import Filters from 'ee/security_dashboard/components/first_class_vulnerability_
 import projectsQuery from 'ee/security_dashboard/graphql/get_instance_security_dashboard_projects.query.graphql';
 import InstanceSecurityVulnerabilities from './first_class_instance_security_dashboard_vulnerabilities.vue';
 import { __, s__ } from '~/locale';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import ProjectManager from './first_class_project_manager/project_manager.vue';
 import CsvExportButton from './csv_export_button.vue';
 import vulnerabilityHistoryQuery from '../graphql/instance_vulnerability_history.query.graphql';

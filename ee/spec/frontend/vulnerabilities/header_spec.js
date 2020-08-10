@@ -11,7 +11,7 @@ import SplitButton from 'ee/vue_shared/security_reports/components/split_button.
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
 import VulnerabilitiesEventBus from 'ee/vulnerabilities/components/vulnerabilities_event_bus';
 import { FEEDBACK_TYPES, VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import * as urlUtility from '~/lib/utils/url_utility';
 import download from '~/lib/utils/downloader';
 import axios from '~/lib/utils/axios_utils';

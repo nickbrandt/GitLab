@@ -3,7 +3,7 @@ import testAction from 'helpers/vuex_action_helper';
 import * as actions from 'ee/status_page_settings/store/actions';
 import * as types from 'ee/status_page_settings/store/mutation_types';
 import axios from '~/lib/utils/axios_utils';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { refreshCurrentPage } from '~/lib/utils/url_utility';
 
 jest.mock('~/flash.js');

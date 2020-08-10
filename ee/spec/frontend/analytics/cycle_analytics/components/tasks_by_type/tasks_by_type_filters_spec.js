@@ -14,7 +14,7 @@ import waitForPromises from 'helpers/wait_for_promises';
 import createStore from 'ee/analytics/cycle_analytics/store';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import { groupLabels } from '../../mock_data';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 
 const selectedLabelIds = [groupLabels[0].id];
 

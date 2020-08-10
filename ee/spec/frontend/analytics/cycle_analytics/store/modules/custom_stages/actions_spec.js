@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
 import * as actions from 'ee/analytics/cycle_analytics/store/modules/custom_stages/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/modules/custom_stages/mutation_types';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
 import { selectedGroup, endpoints, rawCustomStage } from '../../../mock_data';
 

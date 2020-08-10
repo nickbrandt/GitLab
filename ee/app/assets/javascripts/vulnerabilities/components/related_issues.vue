@@ -6,7 +6,7 @@ import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
 import { sprintf, __ } from '~/locale';
 import { joinPaths } from '~/lib/utils/url_utility';
 import { RELATED_ISSUES_ERRORS } from '../constants';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { getFormattedIssue, getAddRelatedIssueRequestParams } from '../helpers';
 
 export default {

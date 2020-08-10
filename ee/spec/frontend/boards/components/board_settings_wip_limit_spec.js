@@ -8,7 +8,7 @@ import { noop } from 'lodash';
 import BoardSettingsWipLimit from 'ee_component/boards/components/board_settings_wip_limit.vue';
 import waitForPromises from 'helpers/wait_for_promises';
 import boardsStore from '~/boards/stores/boards_store';
-import flash from '~/flash';
+import { deprecatedCreateFlash as flash } from '~/flash';
 
 jest.mock('~/flash');
 

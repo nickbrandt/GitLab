@@ -4,7 +4,7 @@ import { GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 
 /**
  * Creates a searchable input for environments.
