@@ -53,6 +53,26 @@ RSpec.describe 'Running a DAST Scan' do
       expect(mutation_response['pipelineUrl']).to eq(expected_url)
     end
 
+    context 'when wrong type of global id is passed' do
+      let(:mutation) do
+        graphql_mutation(
+          :dast_on_demand_scan_create,
+          full_path: full_path,
+          dast_site_profile_id: dast_site_profile.dast_site.to_global_id.to_s
+        )
+      end
+
+      it_behaves_like 'a mutation that returns top-level errors' do
+        let(:match_errors) do
+          gid = dast_site_profile.dast_site.to_global_id
+
+          eq(["Variable $dastOnDemandScanCreateInput of type DastOnDemandScanCreateInput! " \
+              "was provided invalid value for dastSiteProfileId (\"#{gid}\" does not " \
+              "represent an instance of DastSiteProfile)"])
+        end
+      end
+    end
+
     context 'when pipeline creation fails' do
       before do
         allow_any_instance_of(Ci::Pipeline).to receive(:created_successfully?).and_return(false)

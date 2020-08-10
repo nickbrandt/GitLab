@@ -90,14 +90,6 @@ RSpec.describe Mutations::DastOnDemandScans::Create do
           expect(actual_url).to eq(expected_url)
         end
 
-        context 'when the wrong type of gid is used' do
-          let(:dast_site_profile_id) { project.to_global_id }
-
-          it 'raises an exception' do
-            expect { subject }.to raise_error(described_class::InvalidGlobalID)
-          end
-        end
-
         context 'when the dast_site_profile does not exist' do
           it 'raises an exception' do
             dast_site_profile.destroy!
