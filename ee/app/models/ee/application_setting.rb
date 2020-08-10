@@ -239,7 +239,7 @@ module EE
       when Project
         elasticsearch_indexes_project?(scope)
       else
-        true # Use elasticsearch for the global scope, even when limiting is on
+        false # Never use elasticsearch for the global scope when limiting is on
       end
     end
 

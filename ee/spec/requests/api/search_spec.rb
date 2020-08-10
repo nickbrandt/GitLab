@@ -61,7 +61,10 @@ RSpec.describe API::Search do
   shared_examples 'elasticsearch enabled' do |level:|
     context 'for merge_requests scope', :sidekiq_inline do
       before do
-        create_list(:merge_request, 3, :unique_branches, source_project: project, author: create(:user), milestone: create(:milestone, project: project), labels: [create(:label)])
+        create(:labeled_merge_request, target_branch: 'feature_1', source_project: project, labels: [create(:label), create(:label)])
+        create(:merge_request, target_branch: 'feature_2', source_project: project, author: create(:user))
+        create(:merge_request, target_branch: 'feature_3', source_project: project, milestone: create(:milestone, project: project))
+        create(:merge_request, target_branch: 'feature_4', source_project: project)
         ensure_elasticsearch_index!
       end
 
@@ -69,14 +72,19 @@ RSpec.describe API::Search do
 
       it 'avoids N+1 queries' do
         control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'merge_requests', search: '*' } }
-        create_list(:merge_request, 3, :unique_branches, source_project: project, author: create(:user), milestone: create(:milestone, project: project), labels: [create(:label)])
+
+        create(:labeled_merge_request, target_branch: 'feature_5', source_project: project, labels: [create(:label), create(:label)])
+        create(:merge_request, target_branch: 'feature_6', source_project: project, author: create(:user))
+        create(:merge_request, target_branch: 'feature_7', source_project: project, milestone: create(:milestone, project: project))
+        create(:merge_request, target_branch: 'feature_8', source_project: project)
+
         ensure_elasticsearch_index!
 
         expect { get api(endpoint, user), params: { scope: 'merge_requests', search: '*' } }.not_to exceed_query_limit(control)
       end
     end
 
-    context 'for wiki_blobs scope', :sidekiq_inline do
+    context 'for wiki_blobs scope', :sidekiq_might_not_need_inline do
       before do
         wiki = create(:project_wiki, project: project)
         create(:wiki_page, wiki: wiki, title: 'home', content: "Awesome page")
@@ -93,72 +101,71 @@ RSpec.describe API::Search do
       it_behaves_like 'pagination', scope: 'wiki_blobs'
     end
 
-    context 'for commits and blobs', :sidekiq_inline do
+    context 'for commits scope', :sidekiq_inline do
       before do
         project.repository.index_commits_and_blobs
         ensure_elasticsearch_index!
+
+        get api(endpoint, user), params: { scope: 'commits', search: 'folder' }
       end
 
-      context 'for commits scope' do
-        before do
-          get api(endpoint, user), params: { scope: 'commits', search: 'folder' }
-        end
+      it_behaves_like 'response is correct', schema: 'public_api/v4/commits_details', size: 2
 
-        it_behaves_like 'response is correct', schema: 'public_api/v4/commits_details', size: 2
+      it_behaves_like 'pagination', scope: 'commits'
 
-        it_behaves_like 'pagination', scope: 'commits'
+      it 'avoids N+1 queries' do
+        control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'commits', search: 'folder' } }
 
-        it 'avoids N+1 queries' do
-          control = ActiveRecord::QueryRecorder.new { get api(endpoint, user), params: { scope: 'commits', search: 'folder' } }
+        project_2 = create(:project, :public, :repository, :wiki_repo, name: 'awesome project 2')
+        project_3 = create(:project, :public, :repository, :wiki_repo, name: 'awesome project 3')
+        project_2.repository.index_commits_and_blobs
+        project_3.repository.index_commits_and_blobs
 
-          project_2 = create(:project, :public, :repository, :wiki_repo, name: 'awesome project 2')
-          project_3 = create(:project, :public, :repository, :wiki_repo, name: 'awesome project 3')
-          project_2.repository.index_commits_and_blobs
-          project_3.repository.index_commits_and_blobs
+        ensure_elasticsearch_index!
 
-          ensure_elasticsearch_index!
+        # Some N+1 queries still exist
+        expect { get api(endpoint, user), params: { scope: 'commits', search: 'folder' } }.not_to exceed_query_limit(control).with_threshold(9)
+      end
+    end
 
-          # Some N+1 queries still exist
-          expect { get api(endpoint, user), params: { scope: 'commits', search: 'folder' } }.not_to exceed_query_limit(control).with_threshold(9)
-        end
+    context 'for blobs scope', :sidekiq_might_not_need_inline do
+      before do
+        project.repository.index_commits_and_blobs
+        ensure_elasticsearch_index!
+
+        get api(endpoint, user), params: { scope: 'blobs', search: 'monitors' }
       end
 
-      context 'for blobs scope' do
-        before do
-          get api(endpoint, user), params: { scope: 'blobs', search: 'monitors' }
+      it_behaves_like 'response is correct', schema: 'public_api/v4/blobs'
+
+      it_behaves_like 'pagination', scope: 'blobs'
+
+      context 'filters' do
+        it 'by filename' do
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* filename:PROCESS.md' }
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(1)
+          expect(json_response.first['path']).to eq('PROCESS.md')
         end
 
-        it_behaves_like 'response is correct', schema: 'public_api/v4/blobs'
+        it 'by path' do
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* path:markdown' }
 
-        it_behaves_like 'pagination', scope: 'blobs'
-
-        context 'filters' do
-          it 'by filename' do
-            get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* filename:PROCESS.md' }
-
-            expect(response).to have_gitlab_http_status(:ok)
-            expect(json_response.size).to eq(1)
-            expect(json_response.first['path']).to eq('PROCESS.md')
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(1)
+          json_response.each do |file|
+            expect(file['path']).to match(%r[/markdown/])
           end
+        end
 
-          it 'by path' do
-            get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* path:markdown' }
+        it 'by extension' do
+          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* extension:md' }
 
-            expect(response).to have_gitlab_http_status(:ok)
-            expect(json_response.size).to eq(1)
-            json_response.each do |file|
-              expect(file['path']).to match(%r[/markdown/])
-            end
-          end
-
-          it 'by extension' do
-            get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* extension:md' }
-
-            expect(response).to have_gitlab_http_status(:ok)
-            expect(json_response.size).to eq(3)
-            json_response.each do |file|
-              expect(file['path']).to match(/\A.+\.md\z/)
-            end
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(3)
+          json_response.each do |file|
+            expect(file['path']).to match(/\A.+\.md\z/)
           end
         end
       end
@@ -229,7 +236,7 @@ RSpec.describe API::Search do
       end
     end
 
-    context 'for users scope', :sidekiq_might_not_need_inline do
+    context 'for users scope', :sidekiq_inline do
       before do
         create_list(:user, 2).each do |user|
           project.add_developer(user)
@@ -285,13 +292,7 @@ RSpec.describe API::Search do
             stub_ee_application_setting(elasticsearch_limit_indexing: true)
           end
 
-          context 'and namespace is indexed' do
-            before do
-              create :elasticsearch_indexed_namespace, namespace: group
-            end
-
-            it_behaves_like 'elasticsearch enabled', level: :global
-          end
+          it_behaves_like 'elasticsearch disabled'
         end
 
         context 'when elasticsearch_limit_indexing off' do

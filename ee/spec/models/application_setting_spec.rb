@@ -434,7 +434,7 @@ RSpec.describe ApplicationSetting do
       context 'global scope' do
         let(:scope) { nil }
 
-        it { is_expected.to eq(indexing && searching) }
+        it { is_expected.to eq(only_when_enabled_globally) }
       end
 
       context 'namespace (in scope)' do
