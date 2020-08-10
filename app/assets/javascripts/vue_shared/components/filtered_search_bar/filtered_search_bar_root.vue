@@ -83,7 +83,7 @@ export default {
     return {
       initialRender: true,
       recentSearchesPromise: null,
-      recentSearches: null,
+      recentSearches: [],
       filterValue: this.initialFilterValue,
       selectedSortOption,
       selectedSortDirection,
@@ -117,6 +117,9 @@ export default {
       return this.selectedSortDirection === SortDirection.ascending
         ? __('Sort direction: Ascending')
         : __('Sort direction: Descending');
+    },
+    filteredRecentSearches() {
+      return this.recentSearches.filter(item => typeof item !== 'string');
     },
   },
   watch: {
@@ -246,7 +249,7 @@ export default {
       v-model="filterValue"
       :placeholder="searchInputPlaceholder"
       :available-tokens="tokens"
-      :history-items="recentSearches"
+      :history-items="filteredRecentSearches"
       class="flex-grow-1"
       @history-item-selected="handleHistoryItemSelected"
       @clear-history="handleClearHistory"

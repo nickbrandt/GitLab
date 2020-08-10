@@ -5,6 +5,7 @@ export default () => ({
   filterQueryString: '',
   initialEpicsPath: '',
   filterParams: null,
+  groupLabelsEndpoint: '',
 
   // Data
   epicIid: '',
@@ -26,6 +27,7 @@ export default () => ({
   // UI Flags
   defaultInnerHeight: 0,
   isChildEpics: false,
+  hasFiltersApplied: false,
   epicsFetchInProgress: false,
   epicsFetchForTimeframeInProgress: false,
   epicsFetchFailure: false,

@@ -345,3 +345,13 @@ export const refreshMilestoneDates = ({ commit, state, getters }) => {
 };
 
 export const setBufferSize = ({ commit }, bufferSize) => commit(types.SET_BUFFER_SIZE, bufferSize);
+
+export const setEpicsState = ({ commit }, epicsState) => commit(types.SET_EPICS_STATE, epicsState);
+
+export const setFilterParams = ({ commit }, filterParams) =>
+  commit(types.SET_FILTER_PARAMS, filterParams);
+
+export const setSortedBy = ({ commit }, sortedBy) => commit(types.SET_SORTED_BY, sortedBy);
+
+// prevent babel-plugin-rewire from generating an invalid default during karma tests
+export default () => {};
