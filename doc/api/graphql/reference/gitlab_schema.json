@@ -40253,7 +40253,7 @@
             },
             {
               "name": "blob",
-              "description": "Snippet blob",
+              "description": "Snippet blob. Deprecated in 13.3: Use `blobs`",
               "args": [
 
               ],
@@ -40266,8 +40266,8 @@
                   "ofType": null
                 }
               },
-              "isDeprecated": false,
-              "deprecationReason": null
+              "isDeprecated": true,
+              "deprecationReason": "Use `blobs`. Deprecated in 13.3"
             },
             {
               "name": "blobs",
