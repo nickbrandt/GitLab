@@ -9,7 +9,7 @@ class Admin::CredentialsController < Admin::ApplicationController
 
   before_action :check_license_credentials_inventory_available!, only: [:index]
 
-  track_unique_visits :index, target_id: 'i_analytics_credential_inventory'
+  track_unique_visits :index, target_id: 'i_compliance_credential_inventory'
 
   private
 

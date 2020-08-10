@@ -121,7 +121,7 @@ RSpec.describe Groups::AuditEventsController do
 
       it_behaves_like 'tracking unique visits', :index do
         let(:request_params) { { group_id: group.to_param, sort: sort, entity_type: entity_type, entity_id: entity_id } }
-        let(:target_id) { 'g_analytics_audit_events' }
+        let(:target_id) { 'g_compliance_audit_events' }
       end
     end
 

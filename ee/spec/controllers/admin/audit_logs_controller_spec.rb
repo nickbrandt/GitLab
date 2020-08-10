@@ -27,7 +27,7 @@ RSpec.describe Admin::AuditLogsController do
 
       it_behaves_like 'tracking unique visits', :index do
         let(:request_params) { { 'entity_type': 'User' } }
-        let(:target_id) { 'i_analytics_audit_events' }
+        let(:target_id) { 'i_compliance_audit_events' }
       end
     end
   end

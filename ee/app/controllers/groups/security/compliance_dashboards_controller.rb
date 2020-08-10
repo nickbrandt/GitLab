@@ -7,7 +7,7 @@ class Groups::Security::ComplianceDashboardsController < Groups::ApplicationCont
 
   before_action :authorize_compliance_dashboard!
 
-  track_unique_visits :show, target_id: 'g_analytics_compliance_dashboard'
+  track_unique_visits :show, target_id: 'g_compliance_dashboard'
 
   def show
     @last_page = paginated_merge_requests.last_page?

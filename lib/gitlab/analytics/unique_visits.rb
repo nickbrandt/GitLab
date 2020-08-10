@@ -3,14 +3,12 @@
 module Gitlab
   module Analytics
     class UniqueVisits
-      TARGET_IDS = Set[
+      ANALYTICS_IDS = Set[
         'g_analytics_contribution',
         'g_analytics_insights',
         'g_analytics_issues',
         'g_analytics_productivity',
         'g_analytics_valuestream',
-        'g_analytics_compliance_dashboard',
-        'g_analytics_audit_events',
         'p_analytics_pipelines',
         'p_analytics_code_reviews',
         'p_analytics_valuestream',
@@ -18,9 +16,14 @@ module Gitlab
         'p_analytics_issues',
         'p_analytics_repo',
         'i_analytics_cohorts',
-        'i_analytics_dev_ops_score',
-        'i_analytics_credential_inventory',
-        'i_analytics_audit_events'
+        'i_analytics_dev_ops_score'
+      ]
+
+      COMPLIANCE_IDS = Set[
+        'g_compliance_dashboard',
+        'g_compliance_audit_events',
+        'i_compliance_credential_inventory',
+        'i_compliance_audit_events'
       ].freeze
 
       KEY_EXPIRY_LENGTH = 12.weeks
@@ -38,8 +41,10 @@ module Gitlab
       # @param [Integer] weeks time frame length in weeks
       # @return [Integer] number of unique visitors
       def unique_visits_for(targets:, start_week: 7.days.ago, weeks: 1)
-        target_ids = if targets == :any
-                       TARGET_IDS
+        target_ids = if targets == :analytics
+                       ANALYTICS_IDS
+                     elsif targets == :compliance
+                       COMPLIANCE_IDS
                      else
                        Array(targets)
                      end
@@ -54,9 +59,12 @@ module Gitlab
       private
 
       def key(target_id, time)
-        raise "Invalid target id #{target_id}" unless TARGET_IDS.include?(target_id.to_s)
+        target_ids = ANALYTICS_IDS + COMPLIANCE_IDS
 
-        target_key = target_id.to_s.gsub('analytics', '{analytics}')
+        raise "Invalid target id #{target_id}" unless target_ids.include?(target_id.to_s)
+
+        target_key = target_id.to_s.gsub('analytics', '{analytics}').gsub('compliance', '{compliance}')
+
         year_week = time.strftime('%G-%V')
 
         "#{target_key}-#{year_week}"

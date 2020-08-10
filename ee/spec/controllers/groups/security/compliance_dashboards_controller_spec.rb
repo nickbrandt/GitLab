@@ -50,7 +50,7 @@ RSpec.describe Groups::Security::ComplianceDashboardsController do
 
         it_behaves_like 'tracking unique visits', :show do
           let(:request_params) { { group_id: group.to_param } }
-          let(:target_id) { 'g_analytics_compliance_dashboard' }
+          let(:target_id) { 'g_compliance_dashboard' }
         end
       end
 

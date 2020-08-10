@@ -8,7 +8,7 @@ class Admin::AuditLogsController < Admin::ApplicationController
 
   before_action :check_license_admin_audit_log_available!
 
-  track_unique_visits :index, target_id: 'i_analytics_audit_events'
+  track_unique_visits :index, target_id: 'i_compliance_audit_events'
 
   PER_PAGE = 25
 
