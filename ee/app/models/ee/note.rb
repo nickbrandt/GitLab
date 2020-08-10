@@ -13,6 +13,11 @@ module EE
       scope :searchable, -> { where(system: false).includes(:noteable) }
       scope :by_humans, -> { user.joins(:author).merge(::User.humans) }
       scope :with_suggestions, -> { joins(:suggestions) }
+      scope :count_for_vulnerability_id, ->(vulnerability_id) do
+        where(noteable_type: Vulnerability.name, noteable_id: vulnerability_id)
+          .group(:noteable_id)
+          .count
+      end
     end
 
     # Original method in Elastic::ApplicationSearch
