@@ -148,7 +148,21 @@ module EE
         super + ee_runner_required_feature_names
       end
 
+      def secrets_provider?
+        variable_value('VAULT_SERVER_URL').present?
+      end
+
+      def variable_value(key)
+        variables_hash[key]
+      end
+
       private
+
+      def variables_hash
+        @variables_hash ||= variables.map do |variable|
+          [variable[:key], variable[:value]]
+        end.to_h
+      end
 
       def parse_security_artifact_blob(security_report, blob)
         report_clone = security_report.clone_as_blank
