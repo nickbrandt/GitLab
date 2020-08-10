@@ -90,7 +90,9 @@ describe('system note component', () => {
         expect(findDescriptionVersion().html()).toContain(diffData);
         expect(
           wrapper
-            .find('.description-version button.delete-description-history svg.ic-remove')
+            .find(
+              '.description-version button.delete-description-history svg[data-testid="remove-icon"]',
+            )
             .exists(),
         ).toBe(true);
         done();
