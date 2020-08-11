@@ -31,14 +31,14 @@ RSpec.describe GitlabSchema.types['Project'] do
     let_it_be(:query) do
       %(
         query {
-            project(fullPath: "#{project.full_path}") {
-             securityScanners {
-                   enabled
-                   available
-                   pipelineRun
-               }
-             }
-       }
+          project(fullPath: "#{project.full_path}") {
+            securityScanners {
+              enabled
+              available
+              pipelineRun
+            }
+          }
+        }
       )
     end
 
@@ -74,7 +74,7 @@ RSpec.describe GitlabSchema.types['Project'] do
     let_it_be(:query) do
       %(
         query {
-          project(fullPath:"#{project.full_path}") {
+          project(fullPath: "#{project.full_path}") {
             vulnerabilities {
               nodes {
                 title
