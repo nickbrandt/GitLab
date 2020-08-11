@@ -134,6 +134,7 @@ module Projects
           configured: configured,
           description: self.class.localized_scan_descriptions[type],
           link: help_page_path(SCAN_DOCS[type]),
+          configuration_path: configuration_path(type),
           name: localized_scan_names[type]
         }
       end
@@ -148,6 +149,12 @@ module Projects
 
       def project_settings
         ProjectSecuritySetting.safe_find_or_create_for(project)
+      end
+
+      def configuration_path(type)
+        {
+          sast: project_security_configuration_sast_path(project)
+        }[type]
       end
     end
   end

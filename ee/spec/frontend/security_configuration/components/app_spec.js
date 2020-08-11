@@ -2,8 +2,9 @@ import { mount } from '@vue/test-utils';
 import { merge } from 'lodash';
 import { GlAlert, GlLink } from '@gitlab/ui';
 import SecurityConfigurationApp from 'ee/security_configuration/components/app.vue';
-import CreateMergeRequestButton from 'ee/security_configuration/components/create_merge_request_button.vue';
+import ManageFeature from 'ee/security_configuration/components/manage_feature.vue';
 import stubChildren from 'helpers/stub_children';
+import { generateFeatures } from './helpers';
 
 const propsData = {
   features: [],
@@ -12,6 +13,7 @@ const propsData = {
   autoDevopsHelpPagePath: 'http://autoDevopsHelpPagePath',
   autoDevopsPath: 'http://autoDevopsPath',
   helpPagePath: 'http://helpPagePath',
+  gitlabCiPresent: false,
   autoFixSettingsProps: {},
   createSastMergeRequestPath: 'http://createSastMergeRequestPath',
 };
@@ -41,22 +43,10 @@ describe('Security Configuration App', () => {
     wrapper = null;
   });
 
-  const generateFeatures = (n, overrides = {}) => {
-    return [...Array(n).keys()].map(i => ({
-      type: `scan-type-${i}`,
-      name: `name-feature-${i}`,
-      description: `description-feature-${i}`,
-      link: `link-feature-${i}`,
-      configured: i % 2 === 0,
-      ...overrides,
-    }));
-  };
-
   const getPipelinesLink = () => wrapper.find({ ref: 'pipelinesLink' });
   const getFeaturesTable = () => wrapper.find({ ref: 'securityControlTable' });
   const getFeaturesRows = () => getFeaturesTable().findAll('tbody tr');
   const getAlert = () => wrapper.find(GlAlert);
-  const getCreateMergeRequestButton = () => wrapper.find(CreateMergeRequestButton);
   const getRowCells = row => {
     const [feature, status, manage] = row.findAll('td').wrappers;
     return { feature, status, manage };
@@ -142,7 +132,12 @@ describe('Security Configuration App', () => {
         expect(feature.text()).toMatch(features[i].name);
         expect(feature.text()).toMatch(features[i].description);
         expect(status.text()).toMatch(features[i].configured ? 'Enabled' : 'Not enabled');
-        expect(manage.find(GlLink).attributes('href')).toBe(features[i].link);
+        expect(manage.find(ManageFeature).props()).toMatchObject({
+          feature: features[i],
+          autoDevopsEnabled: propsData.autoDevopsEnabled,
+          gitlabCiPresent: propsData.gitlabCiPresent,
+          createSastMergeRequestPath: propsData.createSastMergeRequestPath,
+        });
       }
     });
 
@@ -156,46 +151,5 @@ describe('Security Configuration App', () => {
         expect(status.text()).toMatch('Enabled with Auto DevOps');
       });
     });
-  });
-
-  describe('enabling SAST by merge request', () => {
-    describe.each`
-      gitlabCiPresent | autoDevopsEnabled | buttonExpected
-      ${false}        | ${false}          | ${true}
-      ${false}        | ${true}           | ${true}
-      ${true}         | ${false}          | ${false}
-    `(
-      'given gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled',
-      ({ gitlabCiPresent, autoDevopsEnabled, buttonExpected }) => {
-        beforeEach(() => {
-          const features = generateFeatures(1, { type: 'sast', configured: false });
-
-          createComponent({
-            propsData: { features, gitlabCiPresent, autoDevopsEnabled },
-          });
-        });
-
-        if (buttonExpected) {
-          it('renders the CreateMergeRequestButton component', () => {
-            const button = getCreateMergeRequestButton();
-            expect(button.exists()).toBe(true);
-            expect(button.props()).toMatchObject({
-              endpoint: propsData.createSastMergeRequestPath,
-              autoDevopsEnabled,
-            });
-          });
-
-          it('does not render the documentation link', () => {
-            const { manage } = getRowCells(getFeaturesRows().at(0));
-
-            expect(manage.contains(GlLink)).toBe(false);
-          });
-        } else {
-          it('does not render the CreateMergeRequestButton component', () => {
-            expect(getCreateMergeRequestButton().exists()).toBe(false);
-          });
-        }
-      },
-    );
   });
 });
