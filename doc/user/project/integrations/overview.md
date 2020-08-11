@@ -80,6 +80,14 @@ all new projects on the instance.
 
 Read more about [Service templates in this document](services_templates.md).
 
+## Instance integrations
+
+Instance integrations are a way to control integrations across _all_ projects
+of an instance. On the project level you can choose whether to inherit the instance
+integration or not.
+
+Read more about [Instance integrations](instance_and_group_integrations.md)
+
 ## Troubleshooting integrations
 
 Some integrations use service hooks for integration with external applications. To confirm which ones use service hooks, see the [integrations listing](#integrations-listing) above. GitLab stores details of service hook requests made within the last 2 days. To view details of the requests, go to that integration's configuration page.
