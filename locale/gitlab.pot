@@ -8801,9 +8801,6 @@ msgstr ""
 msgid "Edit comment"
 msgstr ""
 
-msgid "Edit dashboard"
-msgstr ""
-
 msgid "Edit description"
 msgstr ""
 
@@ -15233,9 +15230,6 @@ msgstr ""
 msgid "Metrics|Create custom dashboard %{fileName}"
 msgstr ""
 
-msgid "Metrics|Create dashboard"
-msgstr ""
-
 msgid "Metrics|Create metric"
 msgstr ""
 
@@ -15269,7 +15263,13 @@ msgstr ""
 msgid "Metrics|Duplicate dashboard"
 msgstr ""
 
+msgid "Metrics|Duplicate this dashboard to edit dashboard YAML"
+msgstr ""
+
 msgid "Metrics|Duplicating..."
+msgstr ""
+
+msgid "Metrics|Edit dashboard YAML"
 msgstr ""
 
 msgid "Metrics|Edit metric"
@@ -15311,6 +15311,9 @@ msgid "Metrics|Metrics Settings"
 msgstr ""
 
 msgid "Metrics|Min"
+msgstr ""
+
+msgid "Metrics|More actions"
 msgstr ""
 
 msgid "Metrics|Must be a valid PromQL query."
