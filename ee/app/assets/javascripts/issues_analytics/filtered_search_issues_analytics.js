@@ -20,6 +20,7 @@ export default class FilteredSearchIssueAnalytics extends FilteredSearchManager 
       isGroupDecendent: true,
       stateFiltersSelector: '.issues-state-filters',
       isGroup: true,
+      useDefaultState: false,
       filteredSearchTokenKeys: issuesAnalyticsTokenKeys,
       placeholder: __('Filter results...'),
     });
