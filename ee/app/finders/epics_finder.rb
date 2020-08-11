@@ -43,7 +43,7 @@ class EpicsFinder < IssuableFinder
   end
 
   def self.array_params
-    @array_params ||= { label_name: [] }
+    @array_params ||= { issues: [], label_name: [] }
   end
 
   def self.valid_iid_query?(query)
