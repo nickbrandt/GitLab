@@ -30,7 +30,6 @@ module QA
 
         it 'adds the new member with access level as set in SAML SSO configuration' do
           managed_group_url = Flow::Saml.enable_saml_sso(@group, @saml_idp_service, default_membership_role)
-          page.visit Runtime::Scenario.gitlab_address
           Page::Main::Menu.perform(&:sign_out_if_signed_in)
 
           Flow::Login.sign_in(as: user)
@@ -43,7 +42,6 @@ module QA
           member_details = @group.list_members.find { |item| item['username'] == user.username }
 
           expect(member_details['access_level']).to eq(Resource::Members::AccessLevel::DEVELOPER)
-          Page::Main::Menu.perform(&:sign_out_if_signed_in)
         end
       end
 
