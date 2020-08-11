@@ -1,6 +1,7 @@
 <script>
 import { GlAlert, GlLoadingIcon, GlToggle } from '@gitlab/ui';
 import { createNamespacedHelpers } from 'vuex';
+import axios from '~/lib/utils/axios_utils';
 import { sprintf, s__ } from '~/locale';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { LEGACY_FLAG, NEW_FLAG_ALERT } from '../constants';
@@ -39,10 +40,24 @@ export default {
       type: String,
       required: true,
     },
+    showUserCallout: {
+      type: Boolean,
+      required: true,
+    },
+    userCalloutId: {
+      default: '',
+      type: String,
+      required: false,
+    },
+    userCalloutsPath: {
+      default: '',
+      type: String,
+      required: false,
+    },
   },
   data() {
     return {
-      userDidDismissNewFlagAlert: false,
+      userShouldSeeNewFlagAlert: this.showUserCallout,
     };
   },
   translations: {
@@ -91,7 +106,7 @@ export default {
       );
     },
     shouldShowNewFlagAlert() {
-      return !(this.hasNewVersionFlags || this.userDidDismissNewFlagAlert);
+      return !this.hasNewVersionFlags && this.userShouldSeeNewFlagAlert;
     },
   },
   created() {
@@ -106,6 +121,12 @@ export default {
       'fetchFeatureFlag',
       'toggleActive',
     ]),
+    dismissNewVersionFlagAlert() {
+      this.userShouldSeeNewFlagAlert = false;
+      axios.post(this.userCalloutsPath, {
+        feature_name: this.userCalloutId,
+      });
+    },
   },
 };
 </script>
@@ -115,7 +136,7 @@ export default {
       v-if="shouldShowNewFlagAlert"
       variant="warning"
       class="gl-my-5"
-      @dismiss="userDidDismissNewFlagAlert = true"
+      @dismiss="dismissNewVersionFlagAlert"
     >
       {{ $options.translations.newFlagAlert }}
     </gl-alert>

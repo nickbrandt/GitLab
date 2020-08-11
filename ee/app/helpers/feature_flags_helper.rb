@@ -10,4 +10,10 @@ module FeatureFlagsHelper
   def unleash_api_instance_id(project)
     project.feature_flags_client_token
   end
+
+  def feature_flag_issues_links_endpoint(project, feature_flag, user)
+    return '' unless Feature.enabled?(:feature_flags_issue_links, project, default_enabled: true) && can?(user, :read_issue_link, project)
+
+    project_feature_flag_issues_path(project, feature_flag)
+  end
 end

@@ -13,6 +13,9 @@ import axios from '~/lib/utils/axios_utils';
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
+const userCalloutId = 'feature_flags_new_version';
+const userCalloutsPath = `${TEST_HOST}/user_callouts`;
+
 describe('Edit feature flag form', () => {
   let wrapper;
   let mock;
@@ -36,6 +39,9 @@ describe('Edit feature flag form', () => {
         environmentsEndpoint: 'environments.json',
         projectId: '8',
         featureFlagIssuesEndpoint: `${TEST_HOST}/feature_flags/5/issues`,
+        showUserCallout: true,
+        userCalloutId,
+        userCalloutsPath,
       },
       store,
       provide: {
@@ -49,7 +55,6 @@ describe('Edit feature flag form', () => {
 
   beforeEach(done => {
     mock = new MockAdapter(axios);
-
     mock.onGet(`${TEST_HOST}/feature_flags.json`).replyOnce(200, {
       id: 21,
       iid: 5,
@@ -71,9 +76,7 @@ describe('Edit feature flag form', () => {
         },
       ],
     });
-
     factory();
-
     setImmediate(() => done());
   });
 
@@ -81,6 +84,8 @@ describe('Edit feature flag form', () => {
     wrapper.destroy();
     mock.restore();
   });
+
+  const findAlert = () => wrapper.find(GlAlert);
 
   it('should display the iid', () => {
     expect(wrapper.find('h3').text()).toContain('^5');
@@ -95,13 +100,12 @@ describe('Edit feature flag form', () => {
   });
 
   it('should not alert users that feature flags are changing soon', () => {
-    expect(wrapper.find(GlAlert).text()).not.toBe(NEW_FLAG_ALERT);
+    expect(findAlert().text()).toContain('GitLab is moving to a new way of managing feature flags');
   });
 
   describe('with error', () => {
     it('should render the error', () => {
       store.dispatch('edit/receiveUpdateFeatureFlagError', { message: ['The name is required'] });
-
       return wrapper.vm.$nextTick(() => {
         expect(wrapper.find('.alert-danger').exists()).toEqual(true);
         expect(wrapper.find('.alert-danger').text()).toContain('The name is required');
@@ -167,11 +171,28 @@ describe('Edit feature flag form', () => {
     beforeEach(() => factory({ provide: { glFeatures: { featureFlagsNewVersion: false } } }));
 
     it('should alert users that feature flags are changing soon', () => {
-      expect(wrapper.find(GlAlert).text()).toBe(NEW_FLAG_ALERT);
+      expect(findAlert().text()).toBe(NEW_FLAG_ALERT);
+    });
+  });
+
+  describe('dismissing new version alert', () => {
+    beforeEach(() => {
+      factory({ provide: { glFeatures: { featureFlagsNewVersion: false } } });
+      mock.onPost(userCalloutsPath, { feature_name: userCalloutId }).reply(200);
+      findAlert().vm.$emit('dismiss');
+      return wrapper.vm.$nextTick();
     });
 
-    it('the new feature flags alert should be dismissable', () => {
-      expect(wrapper.find(GlAlert).props('dismissible')).toBe(true);
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('should hide the alert', () => {
+      expect(findAlert().exists()).toBe(false);
+    });
+
+    it('should send the dismissal event', () => {
+      expect(mock.history.post.length).toBe(1);
     });
   });
 });
