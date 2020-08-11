@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jfbus/httprs"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/httprs"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
 	"gitlab.com/gitlab-org/labkit/mask"
