@@ -6,7 +6,7 @@ RSpec.describe GitlabSchema.types['DastSiteProfile'] do
   let_it_be(:dast_site_profile) { create(:dast_site_profile) }
   let_it_be(:project) { dast_site_profile.project }
   let_it_be(:user) { create(:user) }
-  let_it_be(:fields) { %i[id profileName targetUrl validationStatus userPermissions] }
+  let_it_be(:fields) { %i[id profileName targetUrl editPath validationStatus userPermissions] }
 
   subject do
     GitlabSchema.execute(
@@ -44,6 +44,7 @@ RSpec.describe GitlabSchema.types['DastSiteProfile'] do
                 id
                 profileName
                 targetUrl
+                editPath
                 validationStatus
               }
             }
@@ -74,9 +75,27 @@ RSpec.describe GitlabSchema.types['DastSiteProfile'] do
       end
     end
 
+    describe 'edit_path field' do
+      it 'is the relative path to edit the dast_site_profile' do
+        path = "/#{project.full_path}/-/on_demand_scans/profiles/dast_site_profiles/#{dast_site_profile.id}/edit"
+
+        expect(first_dast_site_profile['editPath']).to eq(path)
+      end
+    end
+
     describe 'validation_status field' do
       it 'is a placeholder validation status' do
         expect(first_dast_site_profile['validationStatus']).to eq('PENDING_VALIDATION')
+      end
+    end
+
+    context 'when there are no dast_site_profiles' do
+      let(:project) { create(:project) }
+
+      it 'has no nodes' do
+        nodes = subject.dig('data', 'project', 'dastSiteProfiles', 'nodes')
+
+        expect(nodes).to be_empty
       end
     end
   end

@@ -20,6 +20,12 @@ module Types
           description: 'The URL of the target to be scanned',
           resolve: -> (obj, _args, _ctx) { obj.dast_site.url }
 
+    field :edit_path, GraphQL::STRING_TYPE, null: true,
+          description: 'Relative web path to the edit page of a site profile',
+          resolve: -> (obj, _args, _ctx) do
+            Rails.application.routes.url_helpers.edit_project_dast_site_profile_path(obj.project, obj)
+          end
+
     field :validation_status, Types::DastSiteProfileValidationStatusEnum, null: true,
           description: 'The current validation status of the site profile',
           resolve: -> (_obj, _args, _ctx) { Types::DastSiteProfileValidationStatusEnum.enum['pending_validation'] }

@@ -21,6 +21,7 @@ RSpec.describe 'Query.project(fullPath).dastSiteProfiles' do
               id
               profileName
               targetUrl
+              editPath
               validationStatus
             }
           }
