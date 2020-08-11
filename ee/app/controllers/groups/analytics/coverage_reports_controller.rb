@@ -3,7 +3,6 @@
 class Groups::Analytics::CoverageReportsController < Groups::Analytics::ApplicationController
   check_feature_flag Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG
 
-  REPORT_WINDOW  = 90.days.freeze
   COVERAGE_PARAM = 'coverage'.freeze
 
   before_action :load_group
@@ -16,10 +15,6 @@ class Groups::Analytics::CoverageReportsController < Groups::Analytics::Applicat
   end
 
   private
-
-  def validate_param_type!
-    respond_422 unless allowed_param_types.include?(param_type)
-  end
 
   def render_csv(collection)
     CsvBuilders::SingleBatch.new(
@@ -42,27 +37,8 @@ class Groups::Analytics::CoverageReportsController < Groups::Analytics::Applicat
       current_user: current_user,
       group: @group,
       ref_path: params.require(:ref_path),
-      start_date: start_date,
-      end_date: end_date
+      start_date: Date.parse(params.require(:start_date)),
+      end_date: Date.parse(params.require(:end_date))
     }
-  end
-
-  def start_date
-    strong_memoize(:start_date) do
-      start_date = Date.parse(params.require(:start_date))
-
-      # The start_date cannot be older than `end_date - 90 days`
-      [start_date, end_date - REPORT_WINDOW].max
-    end
-  end
-
-  def end_date
-    strong_memoize(:end_date) do
-      Date.parse(params.require(:end_date))
-    end
-  end
-
-  def allowed_param_types
-    Ci::DailyBuildGroupReportResult::PARAM_TYPES
   end
 end
