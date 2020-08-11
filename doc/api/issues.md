@@ -178,6 +178,20 @@ the `weight` parameter:
 ]
 ```
 
+Users on GitLab [Ultimate](https://about.gitlab.com/pricing/) will also see
+the `health_status` parameter:
+
+```json
+[
+   {
+      "state" : "opened",
+      "description" : "Ratione dolores corrupti mollitia soluta quia.",
+      "health_status": "on_track",
+      ...
+   }
+]
+```
+
 **Note**: `assignee` column is deprecated, now we show it as a single-sized array `assignees` to conform to the GitLab EE API.
 
 **Note**: The `closed_by` attribute was [introduced in GitLab 10.6](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17042). This value will only be present for issues which were closed after GitLab 10.6 and when the user account that closed the issue still exists.
@@ -331,6 +345,20 @@ the `weight` parameter:
       "project_id" : 4,
       "description" : "Omnis vero earum sunt corporis dolor et placeat.",
       "weight": null,
+      ...
+   }
+]
+```
+
+Users on GitLab [Ultimate](https://about.gitlab.com/pricing/) will also see
+the `health_status` parameter:
+
+```json
+[
+   {
+      "project_id" : 4,
+      "description" : "Omnis vero earum sunt corporis dolor et placeat.",
+      "health_status": "at_risk",
       ...
    }
 ]
@@ -500,6 +528,20 @@ the `weight` parameter:
 ]
 ```
 
+Users on GitLab [Ultimate](https://about.gitlab.com/pricing/) will also see
+the `health_status` parameter:
+
+```json
+[
+   {
+      "project_id" : 4,
+      "description" : "Omnis vero earum sunt corporis dolor et placeat.",
+      "health_status": "at_risk",
+      ...
+   }
+]
+```
+
 **Note**: `assignee` column is deprecated, now we show it as a single-sized array `assignees` to conform to the GitLab EE API.
 
 **Note**: The `closed_by` attribute was [introduced in GitLab 10.6](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17042). This value will only be present for issues which were closed after GitLab 10.6 and when the user account that closed the issue still exists.
@@ -639,6 +681,20 @@ the `epic` property:
 }
 ```
 
+Users on GitLab [Ultimate](https://about.gitlab.com/pricing/) will also additionally see
+the `health_status` property:
+
+```json
+[
+   {
+      "project_id" : 4,
+      "description" : "Omnis vero earum sunt corporis dolor et placeat.",
+      "health_status": "on_track",
+      ...
+   }
+]
+```
+
 **Note**: `assignee` column is deprecated, now we show it as a single-sized array `assignees` to conform to the GitLab EE API.
 
 **Note**: The `closed_by` attribute was [introduced in GitLab 10.6](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/17042). This value will only be present for issues which were closed after GitLab 10.6 and when the user account that closed the issue still exists.
@@ -747,6 +803,20 @@ the `weight` parameter:
    "weight": null,
    ...
 }
+```
+
+Users on GitLab [Ultimate](https://about.gitlab.com/pricing/) will also see
+the `health_status` parameter:
+
+```json
+[
+   {
+      "project_id" : 4,
+      "description" : "Omnis vero earum sunt corporis dolor et placeat.",
+      "health_status": "on_track",
+      ...
+   }
+]
 ```
 
 **Note**: `assignee` column is deprecated, now we show it as a single-sized array `assignees` to conform to the GitLab EE API.
@@ -869,6 +939,20 @@ the `weight` parameter:
    "weight": null,
    ...
 }
+```
+
+Users on GitLab [Ultimate](https://about.gitlab.com/pricing/) will also see
+the `health_status` parameter:
+
+```json
+[
+   {
+      "project_id" : 4,
+      "description" : "Omnis vero earum sunt corporis dolor et placeat.",
+      "health_status": "on_track",
+      ...
+   }
+]
 ```
 
 NOTE: **Note:**
@@ -1022,6 +1106,20 @@ the `weight` parameter:
   "weight": null,
   ...
 }
+```
+
+Users on GitLab [Ultimate](https://about.gitlab.com/pricing/) will also see
+the `health_status` parameter:
+
+```json
+[
+   {
+      "project_id" : 4,
+      "description" : "Omnis vero earum sunt corporis dolor et placeat.",
+      "health_status": "on_track",
+      ...
+   }
+]
 ```
 
 **Note**: `assignee` column is deprecated, now we show it as a single-sized array `assignees` to conform to the GitLab EE API.

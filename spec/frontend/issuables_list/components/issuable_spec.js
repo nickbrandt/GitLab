@@ -476,16 +476,18 @@ describe('Issuable component', () => {
     });
   });
 
-  describe('with health status', () => {
-    it('renders', () => {
-      factory({ issuable });
-      expect(findHealthStatus().exists()).toBe(true);
-    });
+  if (IS_EE) {
+    describe('with health status', () => {
+      it('renders health status tag', () => {
+        factory({ issuable });
+        expect(findHealthStatus().exists()).toBe(true);
+      });
 
-    it('does not render when health status is absent', () => {
-      issuable.health_status = null;
-      factory({ issuable });
-      expect(findHealthStatus().exists()).toBe(false);
+      it('does not render when health status is absent', () => {
+        issuable.health_status = null;
+        factory({ issuable });
+        expect(findHealthStatus().exists()).toBe(false);
+      });
     });
-  });
+  }
 });
