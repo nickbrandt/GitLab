@@ -11,10 +11,9 @@ RSpec.describe Groups::Analytics::CoverageReportsController do
   let!(:first_coverage) { create_daily_coverage('rspec', 79.0, '2020-03-09') }
   let!(:last_coverage)  { create_daily_coverage('karma', 95.0, '2020-03-10') }
 
-  let(:index_request) do
-    get :index, params: {
+  let(:valid_request_params) do
+    {
       group_id: group.name,
-      param_type: 'coverage',
       start_date: '2020-03-01',
       end_date: '2020-03-31',
       ref_path: ref_path,
@@ -29,7 +28,7 @@ RSpec.describe Groups::Analytics::CoverageReportsController do
 
     describe 'GET index' do
       it 'responds 403' do
-        index_request
+        get :index, params: valid_request_params
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end
@@ -49,7 +48,7 @@ RSpec.describe Groups::Analytics::CoverageReportsController do
 
       describe 'GET index' do
         it 'responds 403 because the feature is not licensed' do
-          index_request
+          get :index, params: valid_request_params
 
           expect(response).to have_gitlab_http_status(:forbidden)
         end
@@ -64,7 +63,7 @@ RSpec.describe Groups::Analytics::CoverageReportsController do
 
       describe 'GET index' do
         it 'responds 403 because the feature is not licensed' do
-          index_request
+          get :index, params: valid_request_params
 
           expect(response).to have_gitlab_http_status(:forbidden)
         end
@@ -77,7 +76,7 @@ RSpec.describe Groups::Analytics::CoverageReportsController do
       end
 
       it 'responds 200 with CSV coverage data' do
-        index_request
+        get :index, params: valid_request_params
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(csv_response).to eq([
