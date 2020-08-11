@@ -228,18 +228,17 @@ describe('JiraImportApp', () => {
       expect(mutateSpy).toHaveBeenCalledWith(expect.objectContaining(mutationArguments));
     });
 
-    it('shows alert message with error message on error', async () => {
-      const mutate = jest.fn(() => Promise.reject());
+    describe('when there is an error', () => {
+      beforeEach(() => {
+        const mutate = jest.fn(() => Promise.reject());
+        wrapper = mountComponent({ mutate });
 
-      wrapper = mountComponent({ mutate });
+        getFormComponent().vm.$emit('initiateJiraImport', 'MTG');
+      });
 
-      getFormComponent().vm.$emit('initiateJiraImport', 'MTG');
-
-      // One tick doesn't update the dom to the desired state so we have two ticks here
-      await Vue.nextTick();
-      await Vue.nextTick();
-
-      expect(getAlert().text()).toBe('There was an error importing the Jira project.');
+      it('shows alert message with error message', async () => {
+        expect(getAlert().text()).toBe('There was an error importing the Jira project.');
+      });
     });
   });
 
@@ -261,8 +260,8 @@ describe('JiraImportApp', () => {
     });
   });
 
-  describe('on mount', () => {
-    it('makes a GraphQL mutation call to get user mappings', () => {
+  describe('on mount GraphQL user mapping mutation', () => {
+    it('is called with the expected arguments', () => {
       wrapper = mountComponent();
 
       const mutationArguments = {
@@ -277,22 +276,23 @@ describe('JiraImportApp', () => {
       expect(mutateSpy).toHaveBeenCalledWith(expect.objectContaining(mutationArguments));
     });
 
-    it('does not make a GraphQL mutation call to get user mappings when Jira is not configured', () => {
-      wrapper = mountComponent({ isJiraConfigured: false });
+    describe('when Jira is not configured', () => {
+      it('is not called', () => {
+        wrapper = mountComponent({ isJiraConfigured: false });
 
-      expect(mutateSpy).not.toHaveBeenCalled();
+        expect(mutateSpy).not.toHaveBeenCalled();
+      });
     });
 
-    it('shows error message when there is an error with the GraphQL mutation call', async () => {
-      const mutate = jest.fn(() => Promise.reject());
+    describe('when there is an error when called', () => {
+      beforeEach(() => {
+        const mutate = jest.fn(() => Promise.reject());
+        wrapper = mountComponent({ mutate });
+      });
 
-      wrapper = mountComponent({ mutate });
-
-      // One tick doesn't update the dom to the desired state so we have two ticks here
-      await Vue.nextTick();
-      await Vue.nextTick();
-
-      expect(getAlert().exists()).toBe(true);
+      it('shows error message', () => {
+        expect(getAlert().exists()).toBe(true);
+      });
     });
   });
 });

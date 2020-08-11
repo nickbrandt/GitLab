@@ -16,9 +16,13 @@ import {
 } from '@gitlab/ui';
 import { debounce } from 'lodash';
 import axios from '~/lib/utils/axios_utils';
-import { __ } from '~/locale';
-
-const debounceWait = 500;
+import {
+  debounceWait,
+  dropdownLabel,
+  previousImportsMessage,
+  tableConfig,
+  userMappingMessage,
+} from '../utils/constants';
 
 export default {
   name: 'JiraImportForm',
@@ -38,26 +42,10 @@ export default {
     GlTable,
   },
   currentUsername: gon.current_username,
-  dropdownLabel: __('The GitLab user to which the Jira user %{jiraDisplayName} will be mapped'),
-  previousImportsMessage: __(`You have imported from this project %{numberOfPreviousImports} times
-    before. Each new import will create duplicate issues.`),
-  tableConfig: [
-    {
-      key: 'jiraDisplayName',
-      label: __('Jira display name'),
-    },
-    {
-      key: 'arrow',
-      label: '',
-    },
-    {
-      key: 'gitlabUsername',
-      label: __('GitLab username'),
-    },
-  ],
-  userMappingMessage: __(`Jira users have been imported from the configured Jira instance.
-    They can be mapped by selecting a GitLab user from the dropdown in the "GitLab username" column.
-    When the form appears, the dropdown defaults to the user conducting the import.`),
+  dropdownLabel,
+  previousImportsMessage,
+  tableConfig,
+  userMappingMessage,
   props: {
     isSubmitting: {
       type: Boolean,
