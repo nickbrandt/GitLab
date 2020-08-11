@@ -1258,7 +1258,7 @@ Also, we don't recommend mixing `only/except` jobs with `rules` jobs in the same
 It may not cause YAML errors, but debugging the exact execution behavior can be complex
 due to the different default behaviors of `only/except` and `rules`.
 
-##### `rules:if`
+#### `rules:if`
 
 `rules:if` clauses determine whether or not jobs are added to a pipeline by evaluating
 a simple `if` statement. If the `if` statement is true, the job is either included
@@ -1387,7 +1387,7 @@ rules:
   - if: $CI_COMMIT_BRANCH && $CI_COMMIT_BEFORE_SHA != '0000000000000000000000000000000000000000'
 ```
 
-##### `rules:changes`
+#### `rules:changes`
 
 To determine if jobs should be added to a pipeline, `rules: changes` clauses check
 the files changed by Git push events.
@@ -1422,7 +1422,7 @@ In this example:
 To implement a rule similar to [`except: changes`](#onlychangesexceptchanges),
 use `when: never`.
 
-##### `rules:exists`
+#### `rules:exists`
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/24021) in GitLab 12.4.
 
@@ -1456,7 +1456,7 @@ NOTE: **Note:**
 For performance reasons, using `exists` with patterns is limited to 10000
 checks. After the 10000th check, rules with patterned globs will always match.
 
-##### `rules:allow_failure`
+#### `rules:allow_failure`
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/30235) in GitLab 12.8.
 
