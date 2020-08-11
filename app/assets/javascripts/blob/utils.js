@@ -4,7 +4,11 @@ export function initEditorLite({ el, blobPath, blobContent }) {
   if (!el) {
     throw new Error(`"el" parameter is required to initialize Editor`);
   }
-  const editor = new Editor();
+  const editor = new Editor({
+    scrollbar: {
+      alwaysConsumeMouseWheel: false,
+    },
+  });
   editor.createInstance({
     el,
     blobPath,
