@@ -53,7 +53,7 @@
     .well-segment.borderless.gl-mb-3.col-12.col-lg-9.gl-p-0
       = f.label :default_membership_role, class: 'label-bold' do
         = s_('GroupSAML|Default membership role')
-      = f.select :default_membership_role, options_for_select(::Gitlab::Access.options, saml_provider.default_membership_role), {}, class: 'form-control'
+      = f.select :default_membership_role, options_for_select(::Gitlab::Access.options, saml_provider.default_membership_role), {}, class: 'form-control', data: { qa_selector: 'default_membership_role_dropdown' }
       .form-text.text-muted
         = s_('GroupSAML|This will be set as the access level of users added to the group.')
 
