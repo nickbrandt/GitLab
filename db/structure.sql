@@ -19204,6 +19204,8 @@ CREATE UNIQUE INDEX index_ci_instance_variables_on_key ON public.ci_instance_var
 
 CREATE INDEX index_ci_job_artifacts_for_terraform_reports ON public.ci_job_artifacts USING btree (project_id, id) WHERE (file_type = 18);
 
+CREATE INDEX index_ci_job_artifacts_id_for_terraform_reports ON public.ci_job_artifacts USING btree (id) WHERE (file_type = 18);
+
 CREATE INDEX index_ci_job_artifacts_on_expire_at_and_job_id ON public.ci_job_artifacts USING btree (expire_at, job_id);
 
 CREATE INDEX index_ci_job_artifacts_on_file_store ON public.ci_job_artifacts USING btree (file_store);
