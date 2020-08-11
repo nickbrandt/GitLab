@@ -15642,6 +15642,9 @@ msgstr ""
 msgid "Mirroring will only be available if the feature is included in the plan of the selected group or user."
 msgstr ""
 
+msgid "Missing OAuth configuration for GitHub."
+msgstr ""
+
 msgid "Missing commit signatures endpoint!"
 msgstr ""
 
