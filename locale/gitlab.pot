@@ -17122,6 +17122,12 @@ msgstr ""
 msgid "PackageRegistry|Copy npm setup command"
 msgstr ""
 
+msgid "PackageRegistry|Copy registry include"
+msgstr ""
+
+msgid "PackageRegistry|Copy require package include"
+msgstr ""
+
 msgid "PackageRegistry|Copy yarn command"
 msgstr ""
 
@@ -17135,6 +17141,9 @@ msgid "PackageRegistry|Delete package"
 msgstr ""
 
 msgid "PackageRegistry|Filter by name"
+msgstr ""
+
+msgid "PackageRegistry|For more information on Composer packages in GitLab, %{linkStart}see the documentation.%{linkEnd}"
 msgstr ""
 
 msgid "PackageRegistry|For more information on the Conan registry, %{linkStart}see the documentation%{linkEnd}."
@@ -17255,6 +17264,12 @@ msgid "PackageRegistry|You are about to delete version %{version} of %{name}. Ar
 msgstr ""
 
 msgid "PackageRegistry|You may also need to setup authentication using an auth token. %{linkStart}See the documentation%{linkEnd} to find out more."
+msgstr ""
+
+msgid "PackageRegistry|composer.json registry include"
+msgstr ""
+
+msgid "PackageRegistry|composer.json require package include"
 msgstr ""
 
 msgid "PackageRegistry|npm"
