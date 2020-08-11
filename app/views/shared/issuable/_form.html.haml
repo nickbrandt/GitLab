@@ -83,7 +83,7 @@
 
 = render_if_exists 'shared/issuable/remove_approver'
 
-- if issuable.is_a?(Issue)
+- if issueable.respond_to?(:issue_type)
   = form.hidden_field :issue_type
 
 = form.hidden_field :lock_version
