@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { memoize, isString, cloneDeep, isNumber, uniqueId } from 'lodash';
 import {
-  GlDeprecatedButton,
+  GlButton,
   GlDeprecatedBadge as GlBadge,
   GlTooltip,
   GlTooltipDirective,
@@ -32,7 +32,7 @@ import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.
 
 export default {
   components: {
-    GlDeprecatedButton,
+    GlButton,
     GlBadge,
     GlFormTextarea,
     GlFormCheckbox,
@@ -340,9 +340,9 @@ export default {
             <h4>{{ s__('FeatureFlags|Strategies') }}</h4>
             <div class="flex align-items-baseline justify-content-between">
               <p class="mr-3">{{ $options.translations.newHelpText }}</p>
-              <gl-deprecated-button variant="success" category="secondary" @click="addStrategy">
+              <gl-button variant="success" category="secondary" @click="addStrategy">
                 {{ s__('FeatureFlags|Add strategy') }}
-              </gl-deprecated-button>
+              </gl-button>
             </div>
           </div>
         </div>
@@ -523,15 +523,14 @@ export default {
                   {{ s__('FeatureFlags|Remove') }}
                 </div>
                 <div class="table-mobile-content js-feature-flag-delete">
-                  <gl-deprecated-button
+                  <gl-button
                     v-if="!isAllEnvironment(scope.environmentScope) && canUpdateScope(scope)"
                     v-gl-tooltip
                     :title="s__('FeatureFlags|Remove')"
                     class="js-delete-scope btn-transparent pr-3 pl-3"
+                    icon="clear"
                     @click="removeScope(scope)"
-                  >
-                    <icon name="clear" />
-                  </gl-deprecated-button>
+                  />
                 </div>
               </div>
             </div>
@@ -592,7 +591,7 @@ export default {
     </fieldset>
 
     <div class="form-actions">
-      <gl-deprecated-button
+      <gl-button
         ref="submitButton"
         :disabled="readOnly"
         type="button"
@@ -601,14 +600,13 @@ export default {
         @click="handleSubmit"
       >
         {{ submitText }}
-      </gl-deprecated-button>
-      <gl-deprecated-button
+      </gl-button>
+      <gl-button
         :href="cancelPath"
-        variant="secondary"
         class="js-ff-cancel col-xs-12 float-right"
       >
         {{ __('Cancel') }}
-      </gl-deprecated-button>
+      </gl-button>
     </div>
   </form>
 </template>

@@ -1,6 +1,6 @@
 import { uniqueId } from 'lodash';
 import { shallowMount } from '@vue/test-utils';
-import { GlFormTextarea, GlFormCheckbox, GlDeprecatedButton } from '@gitlab/ui';
+import { GlFormTextarea, GlFormCheckbox, GlButton } from '@gitlab/ui';
 import Api from 'ee/api';
 import Form from 'ee/feature_flags/components/form.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
@@ -455,7 +455,7 @@ describe('feature flag form', () => {
     });
 
     it('adds an all users strategy when clicking the Add button', () => {
-      wrapper.find(GlDeprecatedButton).vm.$emit('click');
+      wrapper.find(GlButton).vm.$emit('click');
 
       return wrapper.vm.$nextTick().then(() => {
         const strategies = wrapper.findAll(Strategy);
