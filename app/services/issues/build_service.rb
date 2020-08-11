@@ -65,7 +65,7 @@ module Issues
     private
 
     def whitelisted_issue_params
-      base_params = [:title, :description, :confidential]
+      base_params = [:title, :description, :confidential, :issue_type]
       admin_params = [:milestone_id]
 
       if can?(current_user, :admin_issue, project)
@@ -75,16 +75,9 @@ module Issues
       end
     end
 
-    def optional_issue_params
-      optional_params = [:issue_type]
-
-      params.slice(*optional_params).reject { |_, v| v.nil? }
-    end
-
     def build_issue_params
       { author: current_user }.merge(issue_params_with_info_from_discussions)
         .merge(whitelisted_issue_params)
-        .merge(optional_issue_params)
     end
   end
 end
