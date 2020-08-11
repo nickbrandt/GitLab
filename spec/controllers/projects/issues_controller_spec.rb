@@ -181,10 +181,11 @@ RSpec.describe Projects::IssuesController do
         project.add_developer(user)
       end
 
-      it 'builds a new issue' do
+      it 'builds a new issue', :aggregate_failures do
         get :new, params: { namespace_id: project.namespace, project_id: project }
 
         expect(assigns(:issue)).to be_a_new(Issue)
+        expect(assigns(:issue).issue_type).to eq('issue')
       end
 
       where(:conf_value, :conf_result) do
@@ -218,7 +219,7 @@ RSpec.describe Projects::IssuesController do
         let(:issue_type) { 'issue' }
 
         before do
-          get :new, params: { namespace_id: project.namespace, project_id: project, issue_type: issue_type }
+          get :new, params: { namespace_id: project.namespace, project_id: project, issue: { issue_type: issue_type } }
         end
 
         subject { assigns(:issue).issue_type }
@@ -1065,6 +1066,14 @@ RSpec.describe Projects::IssuesController do
       }.merge(additional_params)
 
       project.issues.first
+    end
+
+    it 'creates the issue successfully', :aggregate_failures do
+      issue = post_new_issue
+
+      expect(issue).to be_a(Issue)
+      expect(issue.persisted?).to eq(true)
+      expect(issue.issue_type).to eq('issue')
     end
 
     context 'resolving discussions in MergeRequest' do

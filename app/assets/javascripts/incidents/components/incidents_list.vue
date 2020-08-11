@@ -183,7 +183,7 @@ export default {
       return mergeUrlParams(
         {
           issuable_template: this.incidentTemplateName,
-          issue_type: this.incidentType,
+          'issue[issue_type]': this.incidentType,
         },
         this.newIssuePath,
       );

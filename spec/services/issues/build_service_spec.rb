@@ -149,13 +149,13 @@ RSpec.describe Issues::BuildService do
     end
 
     context 'with optional params' do
-      it 'sets the params on the issue' do
+      it 'sets the issue_type on the issue' do
         issue = build_issue(issue_type: 'incident')
 
         expect(issue.issue_type).to eq('incident')
       end
 
-      it 'rejects the param if nil' do
+      it 'defaults to issue if issue_type nil' do
         issue = build_issue(issue_type: nil)
 
         expect(issue.issue_type).to eq('issue')
