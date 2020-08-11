@@ -85,6 +85,14 @@ RSpec.describe Groups::Analytics::CoverageReportsController do
           [first_coverage.date.to_s, first_coverage.group_name, project.name, first_coverage.data['coverage'].to_s]
         ])
       end
+
+      context 'with an invalid format' do
+        it 'responds 404' do
+          get :index, params: valid_request_params.merge(format: :json)
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
     end
   end
 
