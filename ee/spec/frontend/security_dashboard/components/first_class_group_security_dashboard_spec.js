@@ -64,7 +64,7 @@ describe('First Class Group Dashboard Component', () => {
   describe('when has projects', () => {
     beforeEach(() => {
       wrapper = createWrapper({
-        data: () => ({ projects: [{ id: 1 }], projectsWereFetched: true }),
+        data: () => ({ projects: [{ id: 1, name: 'GitLab Org' }], projectsWereFetched: true }),
       });
     });
 
@@ -79,12 +79,9 @@ describe('First Class Group Dashboard Component', () => {
       expect(findFilters().exists()).toBe(true);
     });
 
-    it('responds to the projectFetch event', () => {
+    it('loads projects from data', () => {
       const projects = [{ id: 1, name: 'GitLab Org' }];
-      findGroupVulnerabilities().vm.$listeners.projectFetch(projects);
-      return wrapper.vm.$nextTick(() => {
-        expect(findFilters().props('projects')).toEqual(projects);
-      });
+      expect(findFilters().props('projects')).toEqual(projects);
     });
 
     it('responds to the filterChange event', () => {

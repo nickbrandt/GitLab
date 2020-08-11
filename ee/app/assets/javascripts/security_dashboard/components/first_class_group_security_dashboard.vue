@@ -4,6 +4,7 @@ import SecurityDashboardLayout from 'ee/security_dashboard/components/security_d
 import GroupSecurityVulnerabilities from 'ee/security_dashboard/components/first_class_group_security_dashboard_vulnerabilities.vue';
 import Filters from 'ee/security_dashboard/components/first_class_vulnerability_filters.vue';
 import CsvExportButton from './csv_export_button.vue';
+import vulnerableProjectsQuery from '../graphql/vulnerable_projects.query.graphql';
 import DashboardNotConfigured from './empty_states/group_dashboard_not_configured.vue';
 
 export default {
@@ -25,6 +26,23 @@ export default {
       required: true,
     },
   },
+  apollo: {
+    projects: {
+      query: vulnerableProjectsQuery,
+      variables() {
+        return { fullPath: this.groupFullPath };
+      },
+      update(data) {
+        return data.group.projects.nodes;
+      },
+      result() {
+        this.projectsWereFetched = true;
+      },
+      error() {
+        this.projectsWereFetched = false;
+      },
+    },
+  },
   data() {
     return {
       filters: {},
@@ -40,10 +58,6 @@ export default {
   methods: {
     handleFilterChange(filters) {
       this.filters = filters;
-    },
-    handleProjectsFetch(projects) {
-      this.projects = projects;
-      this.projectsWereFetched = true;
     },
   },
 };
@@ -65,11 +79,7 @@ export default {
       <template #sticky>
         <filters :projects="projects" @filterChange="handleFilterChange" />
       </template>
-      <group-security-vulnerabilities
-        :group-full-path="groupFullPath"
-        :filters="filters"
-        @projectFetch="handleProjectsFetch"
-      />
+      <group-security-vulnerabilities :group-full-path="groupFullPath" :filters="filters" />
     </security-dashboard-layout>
   </div>
 </template>
