@@ -223,11 +223,14 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
   end
 
   def security_scan(type, configured:)
+    configuration_path = project_security_configuration_sast_path(project) if type == :sast
+
     {
       "type" => type.to_s,
       "configured" => configured,
       "description" => described_class.localized_scan_descriptions[type],
       "link" => help_page_path(described_class::SCAN_DOCS[type]),
+      "configuration_path" => configuration_path,
       "name" => described_class.localized_scan_names[type]
     }
   end
