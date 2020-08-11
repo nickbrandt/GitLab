@@ -18,7 +18,8 @@ module Security
       # Ensure we're not trying to insert data twice for this report
       return error("#{@report.type} report already stored for this pipeline, skipping...") if executed?
 
-      create_all_vulnerabilities!
+      vulnerability_ids = create_all_vulnerabilities!
+      mark_as_resolved_except(vulnerability_ids)
 
       success
     end
@@ -30,9 +31,14 @@ module Security
     end
 
     def create_all_vulnerabilities!
-      @report.findings.each do |finding|
-        create_vulnerability_finding(finding)
-      end
+      @report.findings.map { |finding| create_vulnerability_finding(finding).id }.uniq
+    end
+
+    def mark_as_resolved_except(vulnerability_ids)
+      project.vulnerabilities
+             .with_report_types(report.type)
+             .id_not_in(vulnerability_ids)
+             .update_all(resolved_on_default_branch: true)
     end
 
     def create_vulnerability_finding(finding)
@@ -100,7 +106,7 @@ module Security
 
     def create_vulnerability(vulnerability_finding, pipeline)
       if vulnerability_finding.vulnerability_id
-        Vulnerabilities::UpdateService.new(vulnerability_finding.project, pipeline.user, finding: vulnerability_finding).execute
+        Vulnerabilities::UpdateService.new(vulnerability_finding.project, pipeline.user, finding: vulnerability_finding, resolved_on_default_branch: false).execute
       else
         Vulnerabilities::CreateService.new(vulnerability_finding.project, pipeline.user, finding_id: vulnerability_finding.id).execute
       end
