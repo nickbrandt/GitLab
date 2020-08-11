@@ -1,5 +1,5 @@
 import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
-import { mount, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import Vue from 'vue';
 import axios from '~/lib/utils/axios_utils';
@@ -29,14 +29,12 @@ describe('JiraImportApp', () => {
   const mountComponent = ({
     isJiraConfigured = true,
     errorMessage = '',
-    selectedProject = 'MTG',
     showAlert = false,
     isInProgress = false,
     loading = false,
     mutate = mutateSpy,
-    mountFunction = shallowMount,
   } = {}) =>
-    mountFunction(JiraImportApp, {
+    shallowMount(JiraImportApp, {
       propsData: {
         inProgressIllustration: 'in-progress-illustration.svg',
         isJiraConfigured,
@@ -49,7 +47,6 @@ describe('JiraImportApp', () => {
       data() {
         return {
           isSubmitting: false,
-          selectedProject,
           userMappings,
           errorMessage,
           showAlert,
@@ -202,38 +199,6 @@ describe('JiraImportApp', () => {
     });
   });
 
-  describe('jira import form screen', () => {
-    describe('when selected project has been imported before', () => {
-      it('shows jira-import::MTG-3 label since project MTG has been imported 2 time before', () => {
-        wrapper = mountComponent();
-
-        expect(getFormComponent().props('importLabel')).toBe('jira-import::MTG-3');
-      });
-
-      it('shows warning alert to explain project MTG has been imported 2 times before', () => {
-        wrapper = mountComponent({ mountFunction: mount });
-
-        expect(getAlert().text()).toBe(
-          'You have imported from this project 2 times before. Each new import will create duplicate issues.',
-        );
-      });
-    });
-
-    describe('when selected project has not been imported before', () => {
-      beforeEach(() => {
-        wrapper = mountComponent({ selectedProject: 'MJP' });
-      });
-
-      it('shows jira-import::MJP-1 label since project MJP has not been imported before', () => {
-        expect(getFormComponent().props('importLabel')).toBe('jira-import::MJP-1');
-      });
-
-      it('does not show warning alert since project MJP has not been imported before', () => {
-        expect(getAlert().exists()).toBe(false);
-      });
-    });
-  });
-
   describe('initiating a Jira import', () => {
     it('calls the mutation with the expected arguments', () => {
       wrapper = mountComponent();
@@ -263,7 +228,7 @@ describe('JiraImportApp', () => {
       expect(mutateSpy).toHaveBeenCalledWith(expect.objectContaining(mutationArguments));
     });
 
-    it('shows alert message with error message on error', () => {
+    it('shows alert message with error message on error', async () => {
       const mutate = jest.fn(() => Promise.reject());
 
       wrapper = mountComponent({ mutate });
@@ -271,16 +236,15 @@ describe('JiraImportApp', () => {
       getFormComponent().vm.$emit('initiateJiraImport', 'MTG');
 
       // One tick doesn't update the dom to the desired state so we have two ticks here
-      return Vue.nextTick()
-        .then(Vue.nextTick)
-        .then(() => {
-          expect(getAlert().text()).toBe('There was an error importing the Jira project.');
-        });
+      await Vue.nextTick();
+      await Vue.nextTick();
+
+      expect(getAlert().text()).toBe('There was an error importing the Jira project.');
     });
   });
 
   describe('alert', () => {
-    it('can be dismissed', () => {
+    it('can be dismissed', async () => {
       wrapper = mountComponent({
         errorMessage: 'There was an error importing the Jira project.',
         showAlert: true,
@@ -291,9 +255,9 @@ describe('JiraImportApp', () => {
 
       getAlert().vm.$emit('dismiss');
 
-      return Vue.nextTick().then(() => {
-        expect(getAlert().exists()).toBe(false);
-      });
+      await Vue.nextTick();
+
+      expect(getAlert().exists()).toBe(false);
     });
   });
 
@@ -319,10 +283,14 @@ describe('JiraImportApp', () => {
       expect(mutateSpy).not.toHaveBeenCalled();
     });
 
-    it('shows error message when there is an error with the GraphQL mutation call', () => {
+    it('shows error message when there is an error with the GraphQL mutation call', async () => {
       const mutate = jest.fn(() => Promise.reject());
 
       wrapper = mountComponent({ mutate });
+
+      // One tick doesn't update the dom to the desired state so we have two ticks here
+      await Vue.nextTick();
+      await Vue.nextTick();
 
       expect(getAlert().exists()).toBe(true);
     });
