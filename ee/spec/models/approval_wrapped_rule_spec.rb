@@ -138,6 +138,12 @@ RSpec.describe ApprovalWrappedRule do
     end
   end
 
+  describe "#commented_approvers" do
+    it "returns an array" do
+      expect(subject.commented_approvers).to be_an(Array)
+    end
+  end
+
   describe '#unactioned_approvers' do
     context 'when some approvers has not approved yet' do
       before do
