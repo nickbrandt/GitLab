@@ -3,11 +3,11 @@
 class Groups::Analytics::CoverageReportsController < Groups::Analytics::ApplicationController
   check_feature_flag Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG
 
-  REPORT_WINDOW = 90.days.freeze
+  REPORT_WINDOW  = 90.days.freeze
+  COVERAGE_PARAM = 'coverage'.freeze
 
   before_action :load_group
   before_action -> { check_feature_availability!(:group_coverage_reports) }
-  before_action :validate_param_type!
 
   def index
     respond_to do |format|
@@ -28,7 +28,7 @@ class Groups::Analytics::CoverageReportsController < Groups::Analytics::Applicat
         date: 'date',
         group_name: 'group_name',
         project_name: -> (record) { record.project.name },
-        param_type => -> (record) { record.data[param_type] }
+        COVERAGE_PARAM => -> (record) { record.data[COVERAGE_PARAM] }
       }
     ).render
   end
@@ -64,9 +64,5 @@ class Groups::Analytics::CoverageReportsController < Groups::Analytics::Applicat
 
   def allowed_param_types
     Ci::DailyBuildGroupReportResult::PARAM_TYPES
-  end
-
-  def param_type
-    params.require(:param_type)
   end
 end
