@@ -3,7 +3,7 @@ import { GlAreaChart } from '@gitlab/ui/dist/charts';
 import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import throughputChartQueryBuilder from '../graphql/throughput_chart_query_builder';
-import { DEFAULT_NUMBER_OF_DAYS, THROUGHPUT_STRINGS } from '../constants';
+import { DEFAULT_NUMBER_OF_DAYS, THROUGHPUT_CHART_STRINGS } from '../constants';
 
 export default {
   name: 'ThroughputChart',
@@ -18,6 +18,7 @@ export default {
       throughputChartData: [],
       startDate: getDateInPast(new Date(), DEFAULT_NUMBER_OF_DAYS),
       endDate: new Date(),
+      hasError: false,
     };
   },
   apollo: {
@@ -30,13 +31,16 @@ export default {
           fullPath: this.fullPath,
         };
       },
+      error() {
+        this.hasError = true;
+      },
     },
   },
   computed: {
     chartOptions() {
       return {
         xAxis: {
-          name: THROUGHPUT_STRINGS.X_AXIS_TITLE,
+          name: THROUGHPUT_CHART_STRINGS.X_AXIS_TITLE,
           type: 'category',
           axisLabel: {
             formatter: value => {
@@ -45,33 +49,42 @@ export default {
           },
         },
         yAxis: {
-          name: THROUGHPUT_STRINGS.Y_AXIS_TITLE,
+          name: THROUGHPUT_CHART_STRINGS.Y_AXIS_TITLE,
         },
       };
     },
     formattedThroughputChartData() {
+      if (!this.throughputChartData) return [];
+
       const data = Object.keys(this.throughputChartData)
         .slice(0, -1) // Remove the __typeName key
         .map(value => [value, this.throughputChartData[value].count]);
 
       return [
         {
-          name: THROUGHPUT_STRINGS.Y_AXIS_TITLE,
+          name: THROUGHPUT_CHART_STRINGS.Y_AXIS_TITLE,
           data,
         },
       ];
     },
     chartDataLoading() {
-      return this.$apollo.queries.throughputChartData.loading;
+      return !this.hasError && this.$apollo.queries.throughputChartData.loading;
     },
     chartDataAvailable() {
-      return this.formattedThroughputChartData[0].data.length;
+      return this.formattedThroughputChartData[0]?.data.length;
+    },
+    alertDetails() {
+      return {
+        class: this.hasError ? 'danger' : 'info',
+        message: this.hasError
+          ? THROUGHPUT_CHART_STRINGS.ERROR_FETCHING_DATA
+          : THROUGHPUT_CHART_STRINGS.NO_DATA,
+      };
     },
   },
   strings: {
-    chartTitle: THROUGHPUT_STRINGS.CHART_TITLE,
-    chartDescription: THROUGHPUT_STRINGS.CHART_DESCRIPTION,
-    noData: THROUGHPUT_STRINGS.NO_DATA,
+    chartTitle: THROUGHPUT_CHART_STRINGS.CHART_TITLE,
+    chartDescription: THROUGHPUT_CHART_STRINGS.CHART_DESCRIPTION,
   },
 };
 </script>
@@ -87,6 +100,8 @@ export default {
       :data="formattedThroughputChartData"
       :option="chartOptions"
     />
-    <gl-alert v-else :dismissible="false" class="gl-mt-4">{{ $options.strings.noData }}</gl-alert>
+    <gl-alert v-else :variant="alertDetails.class" :dismissible="false" class="gl-mt-4">{{
+      alertDetails.message
+    }}</gl-alert>
   </div>
 </template>

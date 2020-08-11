@@ -24443,7 +24443,7 @@ msgstr ""
 msgid "There is already a repository with that name on disk"
 msgstr ""
 
-msgid "There is no data available."
+msgid "There is no chart data available."
 msgstr ""
 
 msgid "There is no data available. Please change your selection."
@@ -24609,6 +24609,9 @@ msgid "There was an error when subscribing to this label."
 msgstr ""
 
 msgid "There was an error when unsubscribing from this label."
+msgstr ""
+
+msgid "There was an error while fetching the chart data."
 msgstr ""
 
 msgid "There was an error while fetching value stream analytics data."
