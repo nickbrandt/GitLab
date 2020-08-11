@@ -333,6 +333,9 @@ msgstr ""
 msgid "%{cores} cores"
 msgstr ""
 
+msgid "%{count} %{scope} for term '%{term}'"
+msgstr ""
+
 msgid "%{count} LOC/commit"
 msgstr ""
 
