@@ -20004,7 +20004,7 @@
         {
           "kind": "OBJECT",
           "name": "IssueStatusCountsType",
-          "description": "Represents total number of issues for the represented statuses",
+          "description": "Represents total number of issues for the represented statuses.",
           "fields": [
             {
               "name": "all",

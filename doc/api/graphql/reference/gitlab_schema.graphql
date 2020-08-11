@@ -7253,7 +7253,7 @@ enum IssueState {
 }
 
 """
-Represents total number of issues for the represented statuses
+Represents total number of issues for the represented statuses.
 """
 type IssueStatusCountsType {
   """
