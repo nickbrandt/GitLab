@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { __, sprintf } from '~/locale';
 import CommaSeparatedListTokenSelector from '../components/comma_separated_list_token_selector.vue';
 
-export default (el, placeholder, qaSelector) => {
+export default (el, props = {}, qaSelector) => {
   // eslint-disable-next-line no-new
   new Vue({
     el,
@@ -10,21 +10,14 @@ export default (el, placeholder, qaSelector) => {
       CommaSeparatedListTokenSelector,
     },
     data() {
-      const {
-        hiddenInputId,
-        labelId,
-        regexValidator,
-        disallowedValues,
-        errorMessage,
-        disallowedValueErrorMessage,
-      } = document.querySelector(this.$options.el).dataset;
+      const { hiddenInputId, labelId, regexValidator, disallowedValues } = document.querySelector(
+        this.$options.el,
+      ).dataset;
 
       return {
         hiddenInputId,
         labelId,
         regexValidator,
-        errorMessage,
-        disallowedValueErrorMessage,
         ...(regexValidator ? { regexValidator: new RegExp(regexValidator) } : {}),
         ...(disallowedValues ? { disallowedValues: JSON.parse(disallowedValues) } : {}),
       };
@@ -39,9 +32,7 @@ export default (el, placeholder, qaSelector) => {
           ariaLabelledby: this.labelId,
           regexValidator: this.regexValidator,
           disallowedValues: this.disallowedValues,
-          errorMessage: this.errorMessage,
-          disallowedValueErrorMessage: this.disallowedValueErrorMessage,
-          placeholder,
+          ...props,
         },
         scopedSlots: {
           'user-defined-token-content': ({ inputText: value }) => {

@@ -8,9 +8,7 @@
   .js-allowed-email-domains{ data: { hidden_input_id: hidden_input_id,
     label_id: label_id,
     regex_validator: AllowedEmailDomain::VALID_DOMAIN_REGEX.source,
-    disallowed_values: AllowedEmailDomain::RESERVED_DOMAINS.to_json,
-    error_message: _('The domain you entered is misformatted.'),
-    disallowed_value_error_message: _('The domain you entered is not allowed.') } }
+    disallowed_values: AllowedEmailDomain::RESERVED_DOMAINS.to_json } }
   = f.hidden_field :allowed_email_domains_list, id: hidden_input_id
   .form-text.text-muted
     - read_more_link = link_to(_('Read more'), help_page_path('user/group/index', anchor: 'allowed-domain-restriction-premium'))
