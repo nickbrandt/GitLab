@@ -12,6 +12,8 @@ describe('CommaSeparatedListTokenSelector', () => {
   const defaultProps = {
     hiddenInputId: 'comma-separated-list',
     ariaLabelledby: 'comma-separated-list-label',
+    errorMessage: 'The value entered is invalid',
+    disallowedValueErrorMessage: 'The value entered is not allowed',
   };
 
   const createComponent = options => {
@@ -23,6 +25,31 @@ describe('CommaSeparatedListTokenSelector', () => {
         ...(options?.propsData || {}),
       },
     });
+  };
+
+  const findTokenSelector = () => wrapper.find(GlTokenSelector);
+
+  const findTokenSelectorInput = () => findTokenSelector().find('input[type="text"]');
+
+  const findTokenSelectorDropdown = () => findTokenSelector().find('[role="menu"]');
+
+  const findErrorMessageText = () =>
+    findTokenSelector()
+      .find('[role="menuitem"][disabled="disabled"]')
+      .text();
+
+  const setTokenSelectorInputValue = value => {
+    const tokenSelectorInput = findTokenSelectorInput();
+
+    tokenSelectorInput.element.value = value;
+    tokenSelectorInput.trigger('input');
+
+    return nextTick();
+  };
+
+  const tokenSelectorTriggerEnter = event => {
+    const tokenSelectorInput = findTokenSelectorInput();
+    tokenSelectorInput.trigger('keydown.enter', event);
   };
 
   beforeEach(() => {
@@ -63,7 +90,7 @@ describe('CommaSeparatedListTokenSelector', () => {
   });
 
   describe('when selected tokens changes', () => {
-    const setup = async () => {
+    const setup = () => {
       const tokens = [
         {
           id: 1,
@@ -81,7 +108,7 @@ describe('CommaSeparatedListTokenSelector', () => {
 
       createComponent();
 
-      await wrapper.setData({
+      return wrapper.setData({
         selectedTokens: tokens,
       });
     };
@@ -109,13 +136,160 @@ describe('CommaSeparatedListTokenSelector', () => {
     it('does not submit the form if token selector text input has a value', async () => {
       createComponent();
 
-      const tokenSelectorInput = wrapper.find(GlTokenSelector).find('input[type="text"]');
-      tokenSelectorInput.element.value = 'foo bar';
+      await setTokenSelectorInputValue('foo bar');
 
       const event = { preventDefault: jest.fn() };
-      await tokenSelectorInput.trigger('keydown.enter', event);
+      tokenSelectorTriggerEnter(event);
 
       expect(event.preventDefault).toHaveBeenCalled();
+    });
+
+    describe('when `regexValidator` prop is set', () => {
+      it('displays `errorMessage` if regex fails', async () => {
+        createComponent({
+          propsData: {
+            regexValidator: /baz/,
+          },
+        });
+
+        await setTokenSelectorInputValue('foo bar');
+
+        tokenSelectorTriggerEnter();
+
+        expect(findErrorMessageText()).toBe('The value entered is invalid');
+      });
+    });
+
+    describe('when `disallowedValues` prop is set', () => {
+      it('displays `disallowedValueErrorMessage` if value is in the disallowed list', async () => {
+        createComponent({
+          propsData: {
+            disallowedValues: ['foo', 'bar', 'baz'],
+          },
+        });
+
+        await setTokenSelectorInputValue('foo');
+
+        tokenSelectorTriggerEnter();
+
+        expect(findErrorMessageText()).toBe('The value entered is not allowed');
+      });
+    });
+
+    describe('when `regexValidator` and `disallowedValues` props are set', () => {
+      it('displays `errorMessage` if regex fails', async () => {
+        createComponent({
+          propsData: {
+            regexValidator: /baz/,
+            disallowedValues: ['foo', 'bar', 'baz'],
+          },
+        });
+
+        await setTokenSelectorInputValue('foo bar');
+
+        tokenSelectorTriggerEnter();
+
+        expect(findErrorMessageText()).toBe('The value entered is invalid');
+      });
+
+      it('displays `disallowedValueErrorMessage` if regex passes but value is in the disallowed list', async () => {
+        createComponent({
+          propsData: {
+            regexValidator: /foo/,
+            disallowedValues: ['foo', 'bar', 'baz'],
+          },
+        });
+
+        await setTokenSelectorInputValue('foo');
+
+        tokenSelectorTriggerEnter();
+
+        expect(findErrorMessageText()).toBe('The value entered is not allowed');
+      });
+    });
+  });
+
+  describe('when `regexValidator` and `disallowedValues` props are set', () => {
+    it('allows value to be added as a token if regex passes and value is not in the disallowed list', async () => {
+      createComponent({
+        propsData: {
+          regexValidator: /foo/,
+          disallowedValues: ['bar', 'baz'],
+        },
+        scopedSlots: {
+          'user-defined-token-content': '<span>Add "{{props.inputText}}"</span>',
+        },
+      });
+
+      await setTokenSelectorInputValue('foo');
+
+      tokenSelectorTriggerEnter();
+
+      expect(
+        findTokenSelector()
+          .find('[role="menuitem"]')
+          .text(),
+      ).toBe('Add "foo"');
+    });
+  });
+
+  describe('when `regexValidator` and `disallowedValues` props are not set', () => {
+    it('allows any value to be added', async () => {
+      createComponent({
+        scopedSlots: {
+          'user-defined-token-content': '<span>Add "{{props.inputText}}"</span>',
+        },
+      });
+
+      await setTokenSelectorInputValue('foo');
+
+      expect(
+        findTokenSelector()
+          .find('[role="menuitem"]')
+          .text(),
+      ).toBe('Add "foo"');
+    });
+  });
+
+  describe('when token selector text input is typed in after showing error message', () => {
+    it('hides error message', async () => {
+      createComponent({
+        propsData: {
+          regexValidator: /baz/,
+        },
+      });
+
+      await setTokenSelectorInputValue('foo');
+
+      tokenSelectorTriggerEnter();
+
+      expect(findErrorMessageText()).toBe('The value entered is invalid');
+
+      await setTokenSelectorInputValue('foo bar');
+
+      await nextTick();
+
+      expect(findTokenSelectorDropdown().classes()).not.toContain('show');
+    });
+  });
+
+  describe('when token selector text input is blurred after showing error message', () => {
+    it('hides error message', async () => {
+      createComponent({
+        propsData: {
+          regexValidator: /baz/,
+        },
+      });
+
+      await setTokenSelectorInputValue('foo');
+
+      tokenSelectorTriggerEnter();
+
+      findTokenSelectorInput().trigger('blur');
+
+      await nextTick();
+
+      expect(findTokenSelectorDropdown().classes()).not.toContain('show');
     });
   });
 });
