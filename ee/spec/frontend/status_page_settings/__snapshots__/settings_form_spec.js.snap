@@ -8,13 +8,13 @@ exports[`Status Page settings form default state should match the default snapsh
   <div
     class="settings-header"
   >
-    <h3
-      class="h4"
+    <h4
+      class="gl-my-3! gl-py-1"
     >
       
       Status page
     
-    </h3>
+    </h4>
      
     <gl-button-stub
       class="js-settings-toggle"
