@@ -4,6 +4,8 @@
       %b= _("Status:")
       = _("syntax is correct")
 
+  = render "projects/ci/lints/lint_warnings", warnings: @warnings
+
   .table-holder
     %table.table.table-bordered
       %thead
@@ -47,3 +49,5 @@
   %pre
     - @errors.each do |message|
       %p= message
+
+  = render "projects/ci/lints/lint_warnings", warnings: @warnings
