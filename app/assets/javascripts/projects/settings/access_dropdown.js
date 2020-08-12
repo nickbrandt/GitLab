@@ -7,8 +7,9 @@ import { LEVEL_TYPES, LEVEL_ID_PROP, ACCESS_LEVEL_NONE } from './constants';
 
 export default class AccessDropdown {
   constructor(options) {
-    const { $dropdown, accessLevel, accessLevelsData } = options;
+    const { $dropdown, accessLevel, accessLevelsData, hasLicense = true } = options;
     this.options = options;
+    this.hasLicense = hasLicense;
     this.groups = [];
     this.accessLevel = accessLevel;
     this.accessLevelsData = accessLevelsData.roles;
@@ -47,9 +48,18 @@ export default class AccessDropdown {
 
         e.preventDefault();
 
+        if (!this.hasLicense) {
+          // We're not multiselecting quite yet with FOSS:
+          // remove all preselected items before selecting this item
+          // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/37499
+          this.accessLevelsData.forEach(level => {
+            this.removeSelectedItem(level);
+          });
+        }
+
         if ($el.is('.is-active')) {
           if (this.noOneObj) {
-            if (item.id === this.noOneObj.id) {
+            if (item.id === this.noOneObj.id && this.hasLicense) {
               // remove all others selected items
               this.accessLevelsData.forEach(level => {
                 if (level.id !== item.id) {
@@ -286,21 +296,23 @@ export default class AccessDropdown {
   }
 
   getData(query, callback) {
-    Promise.all([
-      this.getUsers(query),
-      this.groupsData ? Promise.resolve(this.groupsData) : this.getGroups(),
-    ])
-      .then(([usersResponse, groupsResponse]) => {
-        this.groupsData = groupsResponse;
-        callback(this.consolidateData(usersResponse.data, groupsResponse.data));
-      })
-      .catch(() => Flash(__('Failed to load groups & users.')));
+    if (this.hasLicense) {
+      Promise.all([
+        this.getUsers(query),
+        this.groupsData ? Promise.resolve(this.groupsData) : this.getGroups(),
+      ])
+        .then(([usersResponse, groupsResponse]) => {
+          this.groupsData = groupsResponse;
+          callback(this.consolidateData(usersResponse.data, groupsResponse.data));
+        })
+        .catch(() => Flash(__('Failed to load groups & users.')));
+    } else {
+      callback(this.consolidateData());
+    }
   }
 
-  consolidateData(usersResponse, groupsResponse) {
+  consolidateData(usersResponse = [], groupsResponse = []) {
     let consolidatedData = [];
-    const map = [];
-    const selectedItems = this.getSelectedItems();
 
     // ID property is handled differently locally from the server
     //
@@ -317,14 +329,6 @@ export default class AccessDropdown {
     // For submit: `user_id`
 
     /*
-     * Build groups
-     */
-    const groups = groupsResponse.map(group => ({
-      ...group,
-      type: LEVEL_TYPES.GROUP,
-    }));
-
-    /*
      * Build roles
      */
     const roles = this.accessLevelsData.map(level => {
@@ -338,35 +342,6 @@ export default class AccessDropdown {
       return level;
     });
 
-    /*
-     * Build users
-     */
-    const users = selectedItems
-      .filter(item => item.type === LEVEL_TYPES.USER)
-      .map(item => {
-        // Save identifiers for easy-checking more later
-        map.push(LEVEL_TYPES.USER + item.user_id);
-
-        return {
-          id: item.user_id,
-          name: item.name,
-          username: item.username,
-          avatar_url: item.avatar_url,
-          type: LEVEL_TYPES.USER,
-        };
-      });
-
-    // Has to be checked against server response
-    // because the selected item can be in filter results
-    usersResponse.forEach(response => {
-      // Add is it has not been added
-      if (map.indexOf(LEVEL_TYPES.USER + response.id) === -1) {
-        const user = { ...response };
-        user.type = LEVEL_TYPES.USER;
-        users.push(user);
-      }
-    });
-
     if (roles.length) {
       consolidatedData = consolidatedData.concat(
         [{ type: 'header', content: s__('AccessDropdown|Roles') }],
@@ -374,23 +349,64 @@ export default class AccessDropdown {
       );
     }
 
-    if (groups.length) {
-      if (roles.length) {
-        consolidatedData = consolidatedData.concat([{ type: 'divider' }]);
+    if (this.hasLicense) {
+      const map = [];
+      const selectedItems = this.getSelectedItems();
+      /*
+       * Build groups
+       */
+      const groups = groupsResponse.map(group => ({
+        ...group,
+        type: LEVEL_TYPES.GROUP,
+      }));
+
+      /*
+       * Build users
+       */
+      const users = selectedItems
+        .filter(item => item.type === LEVEL_TYPES.USER)
+        .map(item => {
+          // Save identifiers for easy-checking more later
+          map.push(LEVEL_TYPES.USER + item.user_id);
+
+          return {
+            id: item.user_id,
+            name: item.name,
+            username: item.username,
+            avatar_url: item.avatar_url,
+            type: LEVEL_TYPES.USER,
+          };
+        });
+
+      // Has to be checked against server response
+      // because the selected item can be in filter results
+      usersResponse.forEach(response => {
+        // Add is it has not been added
+        if (map.indexOf(LEVEL_TYPES.USER + response.id) === -1) {
+          const user = { ...response };
+          user.type = LEVEL_TYPES.USER;
+          users.push(user);
+        }
+      });
+
+      if (groups.length) {
+        if (roles.length) {
+          consolidatedData = consolidatedData.concat([{ type: 'divider' }]);
+        }
+
+        consolidatedData = consolidatedData.concat(
+          [{ type: 'header', content: s__('AccessDropdown|Groups') }],
+          groups,
+        );
       }
 
-      consolidatedData = consolidatedData.concat(
-        [{ type: 'header', content: s__('AccessDropdown|Groups') }],
-        groups,
-      );
-    }
-
-    if (users.length) {
-      consolidatedData = consolidatedData.concat(
-        [{ type: 'divider' }],
-        [{ type: 'header', content: s__('AccessDropdown|Users') }],
-        users,
-      );
+      if (users.length) {
+        consolidatedData = consolidatedData.concat(
+          [{ type: 'divider' }],
+          [{ type: 'header', content: s__('AccessDropdown|Users') }],
+          users,
+        );
+      }
     }
 
     return consolidatedData;
