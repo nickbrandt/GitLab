@@ -119,22 +119,20 @@ module Elastic
       # documents gated by that project feature - e.g., "issues". The feature's
       # visibility level must be taken into account.
       def project_ids_query(user, project_ids, public_and_internal_projects, features = nil)
-        # When reading cross project is not allowed, only allow searching a
-        # a single project, so the `:read_*` ability is only checked once.
-        unless Ability.allowed?(user, :read_cross_project)
-          project_ids = [] if project_ids.is_a?(Array) && project_ids.size > 1
-        end
+        scoped_project_ids = scoped_project_ids(user, project_ids)
 
         # At least one condition must be present, so pick no projects for
         # anonymous users.
         # Pick private, internal and public projects the user is a member of.
         # Pick all private projects for admins & auditors.
-        conditions = pick_projects_by_membership(project_ids, user, features)
+        conditions = pick_projects_by_membership(scoped_project_ids, user, features)
 
         if public_and_internal_projects
           # Skip internal projects for anonymous and external users.
-          # Others are given access to all internal projects. Admins & auditors
-          # get access to internal projects where the feature is private.
+          # Others are given access to all internal projects.
+          #
+          # Admins & auditors get access to internal projects even
+          # if the feature is private.
           conditions += pick_projects_by_visibility(Project::INTERNAL, user, features) if user && !user.external?
 
           # All users, including anonymous, can access public projects.
@@ -173,7 +171,7 @@ module Elastic
           limit =
             { terms: { "#{feature}_access_level" => [::ProjectFeature::ENABLED, ::ProjectFeature::PRIVATE] } }
 
-          { bool: { filter: [condition, limit] } }
+          { bool: { filter: [condition, limit].compact } }
         end
       end
 
@@ -218,6 +216,20 @@ module Elastic
           .id_in(project_ids)
           .filter_by_feature_visibility(feature, user)
           .pluck_primary_key
+      end
+
+      def scoped_project_ids(current_user, project_ids)
+        return :any if project_ids == :any
+
+        project_ids ||= []
+
+        # When reading cross project is not allowed, only allow searching a
+        # a single project, so the `:read_*` ability is only checked once.
+        unless Ability.allowed?(current_user, :read_cross_project)
+          project_ids = [] if project_ids.size > 1
+        end
+
+        project_ids
       end
     end
   end

@@ -7,7 +7,7 @@ RSpec.describe Gitlab::SearchResults do
 
   let_it_be(:compliance_project) { create(:project, :with_compliance_framework, name: 'foo') }
 
-  subject { described_class.new(user, Project.all, 'foo') }
+  subject { described_class.new(user, 'foo') }
 
   describe '#projects' do
     it 'avoid N+1 queries' do

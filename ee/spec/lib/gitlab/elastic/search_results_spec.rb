@@ -152,7 +152,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     it 'lists issue when search by a valid iid' do
-      results = described_class.new(user, '#2', limit_project_ids, nil, false)
+      results = described_class.new(user, '#2', limit_project_ids, public_and_internal_projects: false)
       issues = results.objects('issues')
 
       expect(issues).not_to include @issue_1
