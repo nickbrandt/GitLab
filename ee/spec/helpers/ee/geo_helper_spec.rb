@@ -28,7 +28,7 @@ RSpec.describe EE::GeoHelper do
       expected_names = %w(
         repositories
         wikis
-        lfs
+        lfs_objects
         attachments
         job_artifacts
         container_repositories

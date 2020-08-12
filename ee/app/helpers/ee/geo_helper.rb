@@ -184,8 +184,8 @@ module EE
         {
           title: _('LFS object'),
           title_plural: _('LFS objects'),
-          name: 'lfs',
-          name_plural: 'lfs'
+          name: 'lfs_object',
+          name_plural: 'lfs_objects'
         },
         {
           title: _('Attachment'),
