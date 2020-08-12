@@ -15,7 +15,6 @@ import { s__ } from '~/locale';
 import flash, { FLASH_TYPES } from '~/flash';
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 import EnvironmentsDropdown from './environments_dropdown.vue';
 import Strategy from './strategy.vue';
 import {
@@ -39,7 +38,6 @@ export default {
     GlTooltip,
     GlSprintf,
     ToggleButton,
-    Icon,
     EnvironmentsDropdown,
     Strategy,
     RelatedIssuesRoot,
