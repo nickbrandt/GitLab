@@ -1,5 +1,19 @@
 # Changelog for gitlab-workhorse
 
+## v8.39.0
+
+### Fixed
+- Fix HTTP Range Requests not working on some S3 providers
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/549
+
+### Other
+- Vendor httprs module
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/550
+
+### Performance
+- Cache references in file
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/544
+
 ## v8.38.0
 
 ### Added
