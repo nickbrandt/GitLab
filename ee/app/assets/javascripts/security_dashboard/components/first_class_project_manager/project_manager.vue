@@ -21,7 +21,8 @@ export default {
   props: {
     isManipulatingProjects: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: false,
     },
     projects: {
       type: Array,
