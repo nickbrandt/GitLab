@@ -66,9 +66,14 @@ func (f *fakeRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
 
 const SZ = 4096
 
+const (
+	downgradeZeroToNoRange = 1 << iota
+	sendAcceptRanges
+)
+
 type RSFactory func() *HttpReadSeeker
 
-func newRSFactory(brokenServer bool) RSFactory {
+func newRSFactory(flags int) RSFactory {
 	return func() *HttpReadSeeker {
 		tmp, err := ioutil.TempFile(os.TempDir(), "httprs")
 		if err != nil {
@@ -83,13 +88,16 @@ func newRSFactory(brokenServer bool) RSFactory {
 			return nil
 		}
 		res := &http.Response{
-			Header: http.Header{
-				"Accept-Ranges": []string{"bytes"},
-			},
 			Request:       req,
 			ContentLength: SZ * 4,
 		}
-		return NewHttpReadSeeker(res, &http.Client{Transport: &fakeRoundTripper{src: tmp, downgradeZeroToNoRange: brokenServer}})
+
+		if flags&sendAcceptRanges > 0 {
+			res.Header = http.Header{"Accept-Ranges": []string{"bytes"}}
+		}
+
+		downgradeZeroToNoRange := (flags & downgradeZeroToNoRange) > 0
+		return NewHttpReadSeeker(res, &http.Client{Transport: &fakeRoundTripper{src: tmp, downgradeZeroToNoRange: downgradeZeroToNoRange}})
 	}
 }
 
@@ -138,8 +146,10 @@ func TestHttpReaderSeeker(t *testing.T) {
 		name  string
 		newRS func() *HttpReadSeeker
 	}{
-		{name: "compliant", newRS: newRSFactory(false)},
-		{name: "broken", newRS: newRSFactory(true)},
+		{name: "with no flags", newRS: newRSFactory(0)},
+		{name: "with only Accept-Ranges", newRS: newRSFactory(sendAcceptRanges)},
+		{name: "downgrade 0-range to no range", newRS: newRSFactory(downgradeZeroToNoRange)},
+		{name: "downgrade 0-range with Accept-Ranges", newRS: newRSFactory(downgradeZeroToNoRange | sendAcceptRanges)},
 	}
 
 	for _, test := range tests {
