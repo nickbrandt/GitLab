@@ -4,52 +4,53 @@ group: Configure
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
-# gitlab-agent
+# GitLab Kubernetes agent
 
 GitLab Kubernetes Agent is an active in-cluster component for solving any GitLab<->Kubernetes integration tasks.
 
-**This is a work in progress, it's not used anywhere yet.**
+NOTE: **Note:**
+This feature is a work in progress.
 
-Please see the [architecture](doc/architecture.md) document and other documents in the [doc](doc) directory for more information.
+Please see the [architecture](architecture.md) document and other documents in this directory for more information.
 
 ## Use cases and ideas
 
 Below are some ideas that can be built using the agent.
 
-* “Real-time” and resilient web hooks. Polling git repos scales poorly and so webhooks were invented. They remove polling, easing the load on infrastructure, and reduce the "event happened->it got noticed in an external system" latency. However, "webhooks" analog cannot work if cluster is behind a firewall. So an agent, runnning in the cluster, can connect to GitLab and receive a message when a change happens. Like web hooks, but the actual connection is initiated from the client, not from the server. Then the agent could:
+- **Real-time and resilient web hooks.** Polling Git repositories scales poorly and so webhooks were invented. They remove polling, easing the load on infrastructure, and reduce the "event happened->it got noticed in an external system" latency. However, "webhooks" analog can't work if cluster is behind a firewall. So an agent, running in the cluster, can connect to GitLab, and receive a message when a change happens. Like web hooks, but the actual connection is initiated from the client, not from the server. Then the agent could:
 
-  * Emulate a webhook inside of the cluster
+  - Emulate a webhook inside of the cluster
 
-  * Update a Kubernetes object with a new state. It can be a GitLab-specific object with some concrete schema about a git repository. Then we can have third-parties integrate with us via this object-based API. It can also be some integration-specific object.
+  - Update a Kubernetes object with a new state. It can be a GitLab-specific object with some concrete schema about a Git repository. Then we can have third-parties integrate with us via this object-based API. It can also be some integration-specific object.
 
-* “Real-time” data access. Agent can stream requested data back to GitLab. See https://gitlab.com/gitlab-org/gitlab/-/issues/212810.
+- **Real-time data access.** Agent can stream requested data back to GitLab. See the issue [Invert the model GitLab.com uses for Kubernetes integration by leveraging long lived reverse tunnels](https://gitlab.com/gitlab-org/gitlab/-/issues/212810).
 
-* Feature/component discovery. GitLab may need a third-party component to be installed in a cluster for a particular feature to work. Agent can do that component discovery. E.g. we need Prometheus for metrics and we probably can find it in the cluster (is this a bad example? it illustrates the idea though).
+- **Feature/component discovery.** GitLab may need a third-party component to be installed in a cluster for a particular feature to work. Agent can do that component discovery. E.g. we need Prometheus for metrics and we probably can find it in the cluster (is this a bad example? it illustrates the idea though).
 
-* Prometheus PromQL API proxying. Configure where Prometheus is available in the cluster, and allow GitLab to issue PromQL queries to the in-cluster Prometheus.
+- **Prometheus PromQL API proxying.** Configure where Prometheus is available in the cluster, and allow GitLab to issue PromQL queries to the in-cluster Prometheus.
 
-* Better [GitOps](https://www.gitops.tech/) support. A repository can be used as a IaC repo. On successful CI run on the main repo, a commit is merged into that IaC repo. Commit describes the new desired state of infrastructure in a particular cluster (or clusters). An agent in a corresponding cluster(s) picks up the update and applies it to the objects in the cluster. We can work with Argo-cd/Flux here to try to reuse existing code and integrate with the community-built tools.
+- **Better [GitOps](https://www.gitops.tech/) support.** A repository can be used as a IaC repository. On successful CI run on the main repository, a commit is merged into that IaC repository. Commit describes the new desired state of infrastructure in a particular cluster (or clusters). An agent in a corresponding cluster(s) picks up the update and applies it to the objects in the cluster. We can work with Argo-cd/Flux here to try to reuse existing code and integrate with the community-built tools.
 
-* “Infrastructure drift detection”. Monitor and alert on unexpected changes in Kubernetes objects that are managed in the IaC repo. Should support various ways to describe infrastructure (kustomize/helm/plain yaml/etc).
+- **Infrastructure drift detection.** Monitor and alert on unexpected changes in Kubernetes objects that are managed in the IaC repository. Should support various ways to describe infrastructure (`kustomize`, `helm`, plain YAML, etc).
 
-* Preview changes to IaC specs against the current state of the corresponding cluster right in the MR.
+- **Preview changes to IaC specs** against the current state of the corresponding cluster right in the MR.
 
-* “Live diff”. Building on top of the previous feature. In repo browser when a directory with IaC specs is opened, show a live comparison of what is in the repo and what is in the corresponding cluster.
+- **Live diff.** Building on top of the previous feature. In repository browser when a directory with IaC specs is opened, show a live comparison of what is in the repository and what is in the corresponding cluster.
 
-* Kubernetes has audit logs. We could build a page to view them and perhaps correlate with other GitLab events?
+- **Kubernetes has audit logs.** We could build a page to view them and perhaps correlate with other GitLab events?
 
-* See how we can support https://github.com/kubernetes-sigs/application.
+- See how we can support [`kubernetes-sigs/application`](https://github.com/kubernetes-sigs/application).
 
-  * In repo browser detect resource specs with the defined annotations and show the relevant meta information bits
-  * Have a panel showing live list of installed applications based on the annotations from the specification
+  - In repository browser detect resource specs with the defined annotations and show the relevant meta information bits
+  - Have a panel showing live list of installed applications based on the annotations from the specification
 
-* Emulate Kubernetes API and proxy it into the actual cluster via the agents (to overcome the firewall). Do we even need this?
+- **Emulate Kubernetes API** and proxy it into the actual cluster via the agents (to overcome the firewall). Do we even need this?
 
 ## Open questions and things to consider
 
 ### GitLab.com + `agentk`
 
-We have CloudFlare CDN in front of GitLab.com. The connections that `agentk` establishes are long-running by design. It may or may not be an issue. See https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/228
+We have CloudFlare CDN in front of GitLab.com. The connections that `agentk` establishes are long-running by design. It may or may not be an issue. See the epic [WebSocket and Git https nodes on Kubernetes](https://gitlab.com/groups/gitlab-com/gl-infra/-/epics/228).
 
 ### High availability and scalability
 
@@ -69,7 +70,7 @@ The difficulty of having multiple copies of the program is that only one of the 
   - Minimize disruptions if a copy of `kas` goes missing
   - Route traffic to the correct copy
 
-  We use [`nginx` as our ingress controller](https://docs.gitlab.com/charts/charts/nginx/index.html) and it does [support consistent hashing](https://www.nginx.com/resources/wiki/modules/consistent_hash/).
+  We use [`nginx` as our Ingress controller](https://docs.gitlab.com/charts/charts/nginx/index.html) and it does [support consistent hashing](https://www.nginx.com/resources/wiki/modules/consistent_hash/).
 
 - We could have `nginx` ask one (any) of `kas` where the right copy (the one that has the connection) running. `kas` can do a lookup in Redis where each cluster connection is registered and return the address to `nginx` via [X-Accel-Redirect](https://www.nginx.com/resources/wiki/start/topics/examples/x-accel/#x-accel-redirect) header.
 
@@ -83,13 +84,13 @@ In a cluster `agentk` can be deployed:
 - One or more per-namespace deployments, each concerned only with what is happening in a particular namespace. Note that namespace where `agentk` is deployed, and the namespace it's managing might be different namespaces.
 - Both of the above at the same time.
 
-Because of the above, each `agentk` copy must have its own identity for GitLab to be able to tell one from the other e.g. for troubleshooting reasons. Each copy should get a URL of `kas` and fetch the configuration from it. In that configuration the agent should see if it's per-namespace or cluster-wide. Configuration is stored in a Git repo on GitLab to promote IaC approach.
+Because of the above, each `agentk` copy must have its own identity for GitLab to be able to tell one from the other e.g. for troubleshooting reasons. Each copy should get a URL of `kas` and fetch the configuration from it. In that configuration the agent should see if it's per-namespace or cluster-wide. Configuration is stored in a Git repository on GitLab to promote IaC approach.
 
 Each `agentk` copy also gets its own `ServiceAccount` with minimum required permissions.
 
 ### Permissions within the cluster
 
-Currently customers are rightly concerned with us asking cluster-admin access. For GitOps and similar functionality something still has to have permissions to CRUD Kubernetes objects. The solution here is to give cluster operator (our customer) exclusive control of the permissions. Then they can allow the agent do only what they want it to be able to do. Where RBAC is not flexible enough (e.g. namespaces - don't want to allow CRUD for arbitrary namespaces but only some, based on some logic), we can provide an admission webhook that enforces some rules for the agent's `ServiceAccount` in addition to RBAC.
+Currently customers are rightly concerned with us asking `cluster-admin` access. For GitOps and similar functionality something still has to have permissions to create, update, and delete Kubernetes objects. The solution here is to give cluster operator (our customer) exclusive control of the permissions. Then they can allow the agent do only what they want it to be able to do. Where RBAC is not flexible enough (e.g. namespaces - don't want to allow CRUD for arbitrary namespaces but only some, based on some logic), we can provide an admission webhook that enforces some rules for the agent's `ServiceAccount` in addition to RBAC.
 
 ### Environments
 
@@ -97,9 +98,10 @@ How to map GitLab's [environments](https://gitlab.com/help/ci/environments) onto
 
 > It's important to know that:
 >
-> * Environments are like tags for your CI jobs, describing where code gets deployed.
+> - Environments are like tags for your CI jobs, describing where code gets deployed.
 
 We can follow this model and mark each agent as belonging to one or more environments. It's a many to many relationship:
+
 - Multiple agents can be part of an environment. Example: X prod clusters with some number of agents each
 - An agent can be part of multiple environments. Example: a cluster-wide agent where the cluster is used for both production and non-production deployments
 
