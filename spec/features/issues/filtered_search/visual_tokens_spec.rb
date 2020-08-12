@@ -53,7 +53,7 @@ RSpec.describe 'Visual tokens', :js do
     end
 
     it 'ends editing mode when document is clicked' do
-      find('#content-body').click
+      find('body').click
 
       expect_filtered_search_input_empty
       expect(page).to have_css('#js-dropdown-author', visible: false)
