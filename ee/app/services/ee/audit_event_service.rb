@@ -15,7 +15,6 @@ module EE
       old_access_level = @details[:old_access_level]
       user_id = member.id
       user_name = member.user ? member.user.name : 'Deleted User'
-      target_type = 'User'
 
       @details =
         case action
@@ -24,7 +23,7 @@ module EE
             remove: "user_access",
             author_name: @author.name,
             target_id: user_id,
-            target_type: target_type,
+            target_type: "User",
             target_details: user_name
           }
         when :expired
@@ -32,7 +31,7 @@ module EE
             remove: "user_access",
             author_name: member.created_by ? member.created_by.name : 'Deleted User',
             target_id: user_id,
-            target_type: target_type,
+            target_type: "User",
             target_details: user_name,
             system_event: true,
             reason: "access expired on #{member.expires_at}"
@@ -43,7 +42,7 @@ module EE
             as: ::Gitlab::Access.options_with_owner.key(member.access_level.to_i),
             author_name: @author.name,
             target_id: user_id,
-            target_type: target_type,
+            target_type: "User",
             target_details: user_name
           }
         when :update, :override
@@ -55,7 +54,7 @@ module EE
             expiry_to: member.expires_at,
             author_name: @author.name,
             target_id: user_id,
-            target_type: target_type,
+            target_type: "User",
             target_details: user_name
           }
         end
