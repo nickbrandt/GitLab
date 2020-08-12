@@ -19429,7 +19429,7 @@ msgstr ""
 msgid "PrometheusAlerts|Operator"
 msgstr ""
 
-msgid "PrometheusAlerts|Runbook"
+msgid "PrometheusAlerts|Runbook URL (optional)"
 msgstr ""
 
 msgid "PrometheusAlerts|Select query"
