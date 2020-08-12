@@ -20168,6 +20168,9 @@ msgstr ""
 msgid "Remove all or specific label(s)"
 msgstr ""
 
+msgid "Remove approver"
+msgstr ""
+
 msgid "Remove approvers"
 msgstr ""
 
