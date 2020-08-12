@@ -13,11 +13,10 @@ const (
 )
 
 type Ranges struct {
-	DefRefs           map[Id]Item
-	References        *References
-	Hovers            *Hovers
-	Cache             *cache
-	ProcessReferences bool
+	DefRefs    map[Id]Item
+	References *References
+	Hovers     *Hovers
+	Cache      *cache
 }
 
 type RawRange struct {
@@ -57,6 +56,11 @@ func NewRanges(config Config) (*Ranges, error) {
 		return nil, err
 	}
 
+	references, err := NewReferences(config)
+	if err != nil {
+		return nil, err
+	}
+
 	cache, err := newCache(config.TempPath, "ranges", Range{})
 	if err != nil {
 		return nil, err
@@ -64,7 +68,7 @@ func NewRanges(config Config) (*Ranges, error) {
 
 	return &Ranges{
 		DefRefs:    make(map[Id]Item),
-		References: NewReferences(config),
+		References: references,
 		Hovers:     hovers,
 		Cache:      cache,
 	}, nil
@@ -128,6 +132,7 @@ func (r *Ranges) Serialize(f io.Writer, rangeIds []Id, docs map[Id]string) error
 func (r *Ranges) Close() error {
 	return combineErrors(
 		r.Cache.Close(),
+		r.References.Close(),
 		r.Hovers.Close(),
 	)
 }
@@ -192,7 +197,9 @@ func (r *Ranges) addItem(line []byte) error {
 		}
 	}
 
-	r.References.Store(rawItem.RefId, references)
+	if err := r.References.Store(rawItem.RefId, references); err != nil {
+		return err
+	}
 
 	return nil
 }
