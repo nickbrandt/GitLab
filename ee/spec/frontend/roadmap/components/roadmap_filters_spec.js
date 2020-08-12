@@ -9,6 +9,7 @@ import {
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
 import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
+import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
 
 import { visitUrl, mergeUrlParams, updateHistory } from '~/lib/utils/url_utility';
 
@@ -93,6 +94,7 @@ describe('RoadmapFilters', () => {
         wrapper.vm.$store.dispatch('setFilterParams', {
           authorUsername: 'root',
           labelName: ['Bug'],
+          milestoneTitle: '4.0',
         });
         wrapper.vm.$store.dispatch('setSortedBy', 'end_date_asc');
 
@@ -101,7 +103,7 @@ describe('RoadmapFilters', () => {
         wrapper.vm.updateUrl();
 
         expect(global.window.location.href).toBe(
-          `${TEST_HOST}/?state=${EPICS_STATES.CLOSED}&sort=end_date_asc&author_username=root&label_name%5B%5D=Bug`,
+          `${TEST_HOST}/?state=${EPICS_STATES.CLOSED}&sort=end_date_asc&author_username=root&milestone_title=4.0&label_name%5B%5D=Bug`,
         );
       });
     });
@@ -185,6 +187,16 @@ describe('RoadmapFilters', () => {
             token: LabelToken,
             operators: [{ value: '=', description: 'is', default: 'true' }],
             fetchLabels: expect.any(Function),
+          },
+          {
+            type: 'milestone_title',
+            icon: 'clock',
+            title: 'Milestone',
+            unique: true,
+            symbol: '%',
+            token: MilestoneToken,
+            operators: [{ value: '=', description: 'is', default: 'true' }],
+            fetchMilestones: expect.any(Function),
           },
         ]);
       });

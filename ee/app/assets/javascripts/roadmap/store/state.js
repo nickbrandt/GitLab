@@ -6,6 +6,7 @@ export default () => ({
   initialEpicsPath: '',
   filterParams: null,
   groupLabelsEndpoint: '',
+  groupMilestonesEndpoint: '',
 
   // Data
   epicIid: '',
