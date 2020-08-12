@@ -112,9 +112,9 @@ RSpec.describe EE::NamespacesHelper do
     let_it_be(:admin) { create(:user, namespace: namespace) }
     let_it_be(:user) { create(:user) }
 
-    context 'when on .com' do
+    context 'when enforce_namespace_storage_limit setting enabled' do
       before do
-        allow(::Gitlab).to receive(:com?).and_return(true)
+        stub_application_setting(enforce_namespace_storage_limit: true)
       end
 
       context 'when current_user is admin of namespace' do
@@ -142,7 +142,11 @@ RSpec.describe EE::NamespacesHelper do
       end
     end
 
-    context 'when not on .com' do
+    context 'when enforce_namespace_storage_limit setting disabled' do
+      before do
+        stub_application_setting(enforce_namespace_storage_limit: false)
+      end
+
       context 'when current_user is admin of namespace' do
         before do
           allow(helper).to receive(:current_user).and_return(admin)
