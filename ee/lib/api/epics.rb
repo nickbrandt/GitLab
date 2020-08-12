@@ -39,12 +39,14 @@ module API
         optional :my_reaction_emoji, type: String, desc: 'Return epics reacted by the authenticated user by the given emoji'
         use :pagination
       end
-      get ':id/(-/)epics' do
-        epics = paginate(find_epics(finder_params: { group_id: user_group.id })).with_api_entity_associations
+      [':id/epics', ':id/-/epics'].each do |path|
+        get path do
+          epics = paginate(find_epics(finder_params: { group_id: user_group.id })).with_api_entity_associations
 
-        # issuable_metadata has to be set because `Entities::Epic` doesn't inherit from `Entities::IssuableEntity`
-        extra_options = { issuable_metadata: Gitlab::IssuableMetadata.new(current_user, epics).data, with_labels_details: declared_params[:with_labels_details] }
-        present epics, epic_options.merge(extra_options)
+          # issuable_metadata has to be set because `Entities::Epic` doesn't inherit from `Entities::IssuableEntity`
+          extra_options = { issuable_metadata: Gitlab::IssuableMetadata.new(current_user, epics).data, with_labels_details: declared_params[:with_labels_details] }
+          present epics, epic_options.merge(extra_options)
+        end
       end
 
       desc 'Get details of an epic' do
@@ -53,10 +55,12 @@ module API
       params do
         requires :epic_iid, type: Integer, desc: 'The internal ID of an epic'
       end
-      get ':id/(-/)epics/:epic_iid' do
-        authorize_can_read!
+      [':id/epics/:epic_iid', ':id/-/epics/:epic_iid'].each do |path|
+        get path do
+          authorize_can_read!
 
-        present epic, epic_options.merge(include_subscribed: true)
+          present epic, epic_options.merge(include_subscribed: true)
+        end
       end
 
       desc 'Create a new epic' do
