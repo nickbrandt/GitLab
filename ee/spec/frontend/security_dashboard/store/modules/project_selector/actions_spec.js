@@ -430,7 +430,7 @@ describe('EE projectSelector actions', () => {
       actions.receiveRemoveProjectError(mockDispatchContext);
 
       expect(createFlash).toHaveBeenCalledTimes(1);
-      expect(createFlash).toHaveBeenCalledWith('Something went wrong, unable to remove project');
+      expect(createFlash).toHaveBeenCalledWith('Something went wrong, unable to delete project');
     });
   });
 
