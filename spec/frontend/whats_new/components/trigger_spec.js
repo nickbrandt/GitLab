@@ -1,6 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import Vuex from 'vuex';
-
+import { GlButton } from '@gitlab/ui';
 import Trigger from '~/whats_new/components/trigger.vue';
 
 const localVue = createLocalVue();
@@ -37,7 +37,7 @@ describe('Trigger', () => {
   });
 
   it('dispatches openDrawer when clicking close', () => {
-    wrapper.find('a').trigger('click');
+    wrapper.find(GlButton).vm.$emit('click');
     expect(actions.openDrawer).toHaveBeenCalled();
   });
 });

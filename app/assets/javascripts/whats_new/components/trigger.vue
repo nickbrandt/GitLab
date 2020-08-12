@@ -1,10 +1,10 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlLink } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 
 export default {
   components: {
-    GlLink,
+    GlButton,
   },
   methods: {
     ...mapActions(['openDrawer']),
@@ -14,6 +14,6 @@ export default {
 
 <template>
   <li>
-    <gl-link @click="openDrawer">{{ __("See what's new at GitLab") }}</gl-link>
+    <gl-button variant="link" @click="openDrawer">{{ __("See what's new at GitLab") }}</gl-button>
   </li>
 </template>
