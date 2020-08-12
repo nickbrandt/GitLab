@@ -34,8 +34,18 @@ export default {
       'configLoading',
       'activeTab',
       'activePage',
-      'pageLoading',
+      'chartData',
     ]),
+    pageLoading() {
+      const requestedChartKeys = this.activePage?.charts?.map(chart => chart.title) || [];
+      const storeChartKeys = Object.keys(this.chartData);
+      const loadedCharts = storeChartKeys.filter(key => this.chartData[key].loaded);
+      const chartsLoaded =
+        Boolean(requestedChartKeys.length) &&
+        requestedChartKeys.every(key => loadedCharts.includes(key));
+      const chartsErrored = storeChartKeys.some(key => this.chartData[key].error);
+      return !chartsLoaded && !chartsErrored;
+    },
     pages() {
       const { configData, activeTab } = this;
 
