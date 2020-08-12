@@ -10,4 +10,10 @@ export const FILTER_TYPE = {
   any: 'any',
 };
 
+export const PAGE_TYPES = {
+  Issues: 'issues',
+  MergeRequests: 'merge_requests',
+  Epics: 'epics',
+};
+
 export const MAX_HISTORY_SIZE = 5;

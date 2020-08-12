@@ -20,6 +20,15 @@ const tokenKeys = [
     icon: 'labels',
     tag: '~label',
   },
+  {
+    formattedKey: __('Milestone'),
+    key: 'milestone',
+    type: 'string',
+    param: 'title',
+    symbol: '%',
+    icon: 'clock',
+    tag: '%milestone',
+  },
 ];
 
 const alternativeTokenKeys = [

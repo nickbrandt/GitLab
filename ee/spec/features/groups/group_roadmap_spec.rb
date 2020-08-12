@@ -55,6 +55,18 @@ RSpec.describe 'group epic roadmap', :js do
         end
       end
 
+      it 'renders author, label and milestone as supported tokens in filtered search bar' do
+        page.within('.epics-details-filters') do
+          page.find('.filtered-search-box-input-container input.filtered-search').click
+
+          tokens_list = page.all('.filtered-search-input-dropdown-menu ul li')
+          expect(tokens_list.length).to eq(4) # 4th item is for plain text search (invisible by default)
+          expect(tokens_list[0].text).to eq('Author')
+          expect(tokens_list[1].text).to eq('Label')
+          expect(tokens_list[2].text).to eq('Milestone')
+        end
+      end
+
       it 'renders the sort dropdown correctly' do
         page.within('.content-wrapper .content .epics-other-filters') do
           expect(page).to have_css('.filter-dropdown-container')

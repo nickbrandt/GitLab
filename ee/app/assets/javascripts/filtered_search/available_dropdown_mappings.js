@@ -3,6 +3,8 @@ import DropdownNonUser from '~/filtered_search/dropdown_non_user';
 import DropdownWeight from './dropdown_weight';
 import AvailableDropdownMappingsCE from '~/filtered_search/available_dropdown_mappings';
 
+import { PAGE_TYPES } from '~/filtered_search/constants';
+
 export default class AvailableDropdownMappings {
   constructor({
     container,
@@ -11,6 +13,7 @@ export default class AvailableDropdownMappings {
     milestonesEndpoint,
     epicsEndpoint,
     releasesEndpoint,
+    page,
     groupsOnly,
     includeAncestorGroups,
     includeDescendantGroups,
@@ -21,6 +24,7 @@ export default class AvailableDropdownMappings {
     this.milestonesEndpoint = milestonesEndpoint;
     this.epicsEndpoint = epicsEndpoint;
     this.releasesEndpoint = releasesEndpoint;
+    this.page = page;
     this.groupsOnly = groupsOnly;
     this.includeAncestorGroups = includeAncestorGroups;
     this.includeDescendantGroups = includeDescendantGroups;
@@ -75,7 +79,7 @@ export default class AvailableDropdownMappings {
   getMilestoneEndpoint() {
     let endpoint = `${this.milestonesEndpoint}.json`;
 
-    if (this.groupsOnly) {
+    if (this.groupsOnly && this.page !== PAGE_TYPES.Epics) {
       endpoint = `${endpoint}?only_group_milestones=true`;
     }
 
