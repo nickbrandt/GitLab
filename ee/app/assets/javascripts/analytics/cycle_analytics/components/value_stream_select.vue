@@ -14,7 +14,6 @@ import { mapState, mapActions } from 'vuex';
 import { sprintf, __ } from '~/locale';
 import { debounce } from 'lodash';
 import { DATA_REFETCH_DELAY } from '../../shared/constants';
-import { DEFAULT_VALUE_STREAM_ID } from '../constants';
 
 const ERRORS = {
   MIN_LENGTH: __('Name is required'),
@@ -30,10 +29,6 @@ const validate = ({ name }) => {
     errors.name.push(ERRORS.MIN_LENGTH);
   }
   return errors;
-};
-
-const hasCustomValueStream = vs => {
-  return Boolean(vs.length > 1 || vs[0].name.toLowerCase().trim() !== DEFAULT_VALUE_STREAM_ID);
 };
 
 export default {
@@ -70,7 +65,7 @@ export default {
       return this.errors.name?.join('\n');
     },
     hasValueStreams() {
-      return Boolean(this.data.length && hasCustomValueStream(this.data));
+      return Boolean(this.data.length);
     },
     selectedValueStreamName() {
       return this.selectedValueStream?.name || '';
@@ -124,7 +119,12 @@ export default {
 </script>
 <template>
   <gl-form>
-    <gl-dropdown v-if="hasValueStreams" :text="selectedValueStreamName" right>
+    <gl-dropdown
+      v-if="hasValueStreams"
+      data-testid="dropdown-value-streams"
+      :text="selectedValueStreamName"
+      right
+    >
       <gl-dropdown-item
         v-for="{ id, name: streamName } in data"
         :key="id"

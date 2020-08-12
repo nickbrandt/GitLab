@@ -23,6 +23,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
   path_nav_selector = '.js-path-navigation'
   filter_bar_selector = '.js-filter-bar'
   duration_stage_selector = '.js-dropdown-stages'
+  value_stream_selector = '[data-testid="dropdown-value-streams"]'
 
   3.times do |i|
     let_it_be("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
@@ -1018,6 +1019,11 @@ RSpec.describe 'Group Value Stream Analytics', :js do
 
   describe 'Create value stream', :js do
     let(:custom_value_stream_name) { "Test value stream" }
+    let(:value_stream_dropdown) { page.find(value_stream_selector) }
+
+    def toggle_value_stream_dropdown
+      value_stream_dropdown.click
+    end
 
     before do
       visit analytics_cycle_analytics_path
@@ -1026,6 +1032,8 @@ RSpec.describe 'Group Value Stream Analytics', :js do
     end
 
     it 'can create a value stream' do
+      toggle_value_stream_dropdown
+
       page.find_button(_('Create new Value Stream')).click
 
       fill_in 'create-value-stream-name', with: custom_value_stream_name

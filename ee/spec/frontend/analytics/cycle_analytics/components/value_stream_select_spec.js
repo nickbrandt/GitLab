@@ -84,6 +84,24 @@ describe('ValueStreamSelect', () => {
     });
   });
 
+  describe('Only the default value stream available', () => {
+    beforeEach(() => {
+      wrapper = createComponent({
+        initialState: {
+          valueStreams: [{ id: 'default', name: 'default' }],
+        },
+      });
+    });
+
+    it('does not display the create value stream button', () => {
+      expect(findCreateValueStreamButton().exists()).toBe(false);
+    });
+
+    it('displays the select value stream dropdown', () => {
+      expect(findSelectValueStreamDropdown().exists()).toBe(true);
+    });
+  });
+
   describe('No value streams available', () => {
     beforeEach(() => {
       wrapper = createComponent({
