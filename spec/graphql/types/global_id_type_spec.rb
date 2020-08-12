@@ -162,7 +162,7 @@ RSpec.describe Types::GlobalIDType do
       end
     end
 
-    context 'when the argument is declared as ID' do
+    context 'when the client declares the argument as ID the actual argument can be any type' do
       let(:document) do
         <<-GRAPHQL
         query($projectId: ID!){
@@ -182,7 +182,7 @@ RSpec.describe Types::GlobalIDType do
       end
     end
 
-    context 'when the argument is passed as GlobalID' do
+    context 'when the client passes the argument as GlobalID' do
       let(:document) do
         <<-GRAPHQL
         query($projectId: GlobalID!) {
@@ -202,7 +202,7 @@ RSpec.describe Types::GlobalIDType do
       end
     end
 
-    context 'when the argument is passed as ProjectID' do
+    context 'when the client passes the argument as ProjectID' do
       let(:document) do
         <<-GRAPHQL
         query($projectId: ProjectID!) {
