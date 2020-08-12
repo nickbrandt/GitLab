@@ -52,7 +52,6 @@ const defaultFeatureFlags = {
   hasDurationChart: true,
   hasDurationChartMedian: true,
   hasPathNavigation: false,
-  hasFilterBar: false,
   hasCreateMultipleValueStreams: false,
 };
 
@@ -192,7 +191,6 @@ describe('Cycle Analytics component', () => {
     wrapper = createComponent({
       featureFlags: {
         hasPathNavigation: true,
-        hasFilterBar: true,
       },
     });
   });
@@ -294,7 +292,6 @@ describe('Cycle Analytics component', () => {
             withStageSelected: true,
             featureFlags: {
               hasPathNavigation: true,
-              hasFilterBar: true,
             },
           });
         });
@@ -348,6 +345,10 @@ describe('Cycle Analytics component', () => {
 
         it('displays the stage table', () => {
           displaysStageTable(true);
+        });
+
+        it('displays the filter bar', () => {
+          displaysFilterBar(true);
         });
 
         it('displays the add stage button', () => {
@@ -405,38 +406,6 @@ describe('Cycle Analytics component', () => {
 
             it('displays the path navigation', () => {
               displaysPathNavigation(true);
-            });
-          });
-        });
-
-        describe('filter bar', () => {
-          describe('disabled', () => {
-            beforeEach(() => {
-              wrapper = createComponent({
-                withStageSelected: true,
-                featureFlags: {
-                  hasFilterBar: false,
-                },
-              });
-            });
-
-            it('does not display the filter bar', () => {
-              displaysFilterBar(false);
-            });
-          });
-
-          describe('enabled', () => {
-            beforeEach(() => {
-              wrapper = createComponent({
-                withStageSelected: true,
-                featureFlags: {
-                  hasFilterBar: true,
-                },
-              });
-            });
-
-            it('displays the filter bar', () => {
-              displaysFilterBar(true);
             });
           });
         });

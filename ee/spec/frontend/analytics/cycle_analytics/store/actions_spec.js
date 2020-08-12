@@ -117,44 +117,27 @@ describe('Cycle analytics actions', () => {
   });
 
   describe('setSelectedGroup', () => {
+    const { fullPath } = selectedGroup;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
     it('commits the setSelectedGroup mutation', () => {
       return testAction(
         actions.setSelectedGroup,
-        { ...selectedGroup },
+        { full_path: fullPath },
         state,
-        [{ type: types.SET_SELECTED_GROUP, payload: selectedGroup }],
-        [],
-      );
-    });
-
-    describe('with hasFilterBar=true', () => {
-      beforeEach(() => {
-        state = {
-          ...state,
-          featureFlags: {
-            ...state.featureFlags,
-            hasFilterBar: true,
-          },
-        };
-        mock = new MockAdapter(axios);
-      });
-
-      it('commits the setSelectedGroup mutation', () => {
-        return testAction(
-          actions.setSelectedGroup,
-          { full_path: selectedGroup.fullPath },
-          state,
-          [{ type: types.SET_SELECTED_GROUP, payload: { full_path: selectedGroup.fullPath } }],
-          [
-            {
-              type: 'filters/initialize',
-              payload: {
-                groupPath: selectedGroup.fullPath,
-              },
+        [{ type: types.SET_SELECTED_GROUP, payload: { full_path: fullPath } }],
+        [
+          {
+            type: 'filters/initialize',
+            payload: {
+              groupPath: fullPath,
             },
-          ],
-        );
-      });
+          },
+        ],
+      );
     });
   });
 

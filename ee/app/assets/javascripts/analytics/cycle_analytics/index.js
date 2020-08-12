@@ -16,7 +16,6 @@ export default () => {
     cycleAnalyticsScatterplotEnabled: hasDurationChart = false,
     cycleAnalyticsScatterplotMedianEnabled: hasDurationChartMedian = false,
     valueStreamAnalyticsPathNavigation: hasPathNavigation = false,
-    valueStreamAnalyticsFilterBar: hasFilterBar = false,
     valueStreamAnalyticsCreateMultipleValueStreams: hasCreateMultipleValueStreams = false,
     analyticsSimilaritySearch: hasAnalyticsSimilaritySearch = false,
   } = gon?.features;
@@ -27,7 +26,6 @@ export default () => {
       hasDurationChart,
       hasDurationChartMedian,
       hasPathNavigation,
-      hasFilterBar,
       hasCreateMultipleValueStreams,
       hasAnalyticsSimilaritySearch,
     },

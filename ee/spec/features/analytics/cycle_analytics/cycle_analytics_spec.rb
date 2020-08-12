@@ -177,19 +177,6 @@ RSpec.describe 'Group Value Stream Analytics', :js do
     end
   end
 
-  context 'with filter bar feature flag disabled' do
-    before do
-      stub_feature_flags(value_stream_analytics_filter_bar: false)
-
-      visit analytics_cycle_analytics_path
-      select_group
-    end
-
-    it 'does not show the filter bar' do
-      expect(page).not_to have_selector(filter_bar_selector)
-    end
-  end
-
   # Adding this context as part of a fix for https://gitlab.com/gitlab-org/gitlab/-/issues/233439
   # This can be removed when the feature flag is removed
   context 'create multiple value streams disabled' do
