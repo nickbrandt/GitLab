@@ -13,7 +13,7 @@ const WEIGHT = 'weight';
 const LABEL_PRIORITY = 'label_priority';
 export const RELATIVE_POSITION = 'relative_position';
 export const LOADING_LIST_ITEMS_LENGTH = 8;
-export const PAGE_SIZE = 20;
+export const PAGE_SIZE = 100;
 export const PAGE_SIZE_MANUAL = 100;
 
 export const sortOrderMap = {
