@@ -1,8 +1,10 @@
+import * as types from './mutation_types';
+
 export default {
-  closeDrawer(state) {
+  [types.CLOSE_DRAWER](state) {
     state.open = false;
   },
-  openDrawer(state) {
+  [types.OPEN_DRAWER](state) {
     state.open = true;
   },
 };

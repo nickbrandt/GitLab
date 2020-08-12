@@ -1,8 +1,10 @@
+import * as types from './mutation_types';
+
 export default {
   closeDrawer({ commit }) {
-    commit('closeDrawer');
+    commit(types.CLOSE_DRAWER);
   },
   openDrawer({ commit }) {
-    commit('openDrawer');
+    commit(types.OPEN_DRAWER);
   },
 };

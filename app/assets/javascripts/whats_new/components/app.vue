@@ -10,7 +10,7 @@ export default {
     ...mapState(['open']),
   },
   methods: {
-    ...mapActions(['closeDrawer', 'openDrawer']),
+    ...mapActions(['closeDrawer']),
   },
 };
 </script>
