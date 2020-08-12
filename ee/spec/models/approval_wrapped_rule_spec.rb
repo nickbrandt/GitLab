@@ -139,8 +139,16 @@ RSpec.describe ApprovalWrappedRule do
   end
 
   describe "#commented_approvers" do
+    let(:rule) { create(:approval_project_rule, project: merge_request.project, approvals_required: approvals_required, users: [approver1, approver3]) }
+
     it "returns an array" do
       expect(subject.commented_approvers).to be_an(Array)
+    end
+
+    it "returns an array of approvers who have commented" do
+      create(:note, project: merge_request.project, noteable: merge_request, author: approver1)
+
+      expect(subject.commented_approvers).to eq([approver1])
     end
   end
 
