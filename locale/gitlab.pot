@@ -22549,6 +22549,9 @@ msgstr ""
 msgid "SnippetsEmptyState|There are no snippets to show."
 msgstr ""
 
+msgid "Snippets|Delete file"
+msgstr ""
+
 msgid "Snippets|Description (optional)"
 msgstr ""
 
