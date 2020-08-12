@@ -2,7 +2,8 @@
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapActions } from 'vuex';
 import { s__, n__, sprintf } from '~/locale';
-import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR } from '../../constants';
+import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR , LICENSE_CHECK_NAME, VULNERABILITY_CHECK_NAME } from '../../constants';
+
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import Rules from '../rules.vue';
 import RuleControls from '../rule_controls.vue';
@@ -66,7 +67,7 @@ export default {
     securityRules() {
       return [
         {
-          name: 'Vulnerability-Check',
+          name: VULNERABILITY_CHECK_NAME,
           description: s__(
             'SecurityApprovals|One or more of the security scanners must be enabled %{linkStart}more information%{linkEnd}',
           ),
@@ -76,7 +77,7 @@ export default {
           docsPath: this.vulnerabilityCheckHelpPagePath,
         },
         {
-          name: 'License-Check',
+          name: LICENSE_CHECK_NAME,
           description: s__(
             'SecurityApprovals|License Scanning must be enabled %{linkStart}more information%{linkEnd}',
           ),
@@ -105,7 +106,7 @@ export default {
       immediate: true,
     },
   },
-  mounted() {
+  created() {
     // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
     if (this.isApprovalSuggestionsEnabled) {
       this.setSecurityConfigurationEndpoint(this.securityConfigurationPath);
@@ -212,7 +213,7 @@ export default {
           :rules="rules"
           :is-loading="isRulesLoading"
           :match-rule="securityRule"
-          @enable-btn-clicked="openCreateModal({ name: securityRule.name, initRuleField: true })"
+          @enable="openCreateModal({ name: securityRule.name, initRuleField: true })"
         />
       </template>
     </template>

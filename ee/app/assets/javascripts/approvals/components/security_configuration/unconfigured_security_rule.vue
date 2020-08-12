@@ -1,6 +1,7 @@
 <script>
 import { camelCase } from 'lodash';
 import { GlButton, GlLink, GlSprintf, GlSkeletonLoading } from '@gitlab/ui';
+import { LICENSE_CHECK_NAME, VULNERABILITY_CHECK_NAME, JOB_TYPES } from 'ee/approvals/constants';
 
 export default {
   components: {
@@ -11,15 +12,15 @@ export default {
   },
   featureTypes: {
     vulnerabilityCheck: [
-      'sast',
-      'dast',
-      'dependency_scanning',
-      'secret_detection',
-      'coverage_fuzzing',
+      JOB_TYPES.SAST,
+      JOB_TYPES.DAST,
+      JOB_TYPES.DEPENDENCY_SCANNING,
+      JOB_TYPES.SECRET_DETECTION,
+      JOB_TYPES.COVERAGE_FUZZING,
     ],
-    licenseCheck: ['license_scanning'],
+    licenseCheck: [JOB_TYPES.LICENSE_SCANNING],
   },
-  securityRules: ['Vulnerability-Check', 'License-Check'],
+  securityRules: [VULNERABILITY_CHECK_NAME, LICENSE_CHECK_NAME],
   props: {
     configuration: {
       type: Object,
@@ -45,13 +46,11 @@ export default {
       }, this);
     },
     hasConfiguredJob() {
-      const { features } = this.configuration;
+      const { features = [] } = this.configuration;
       return this.$options.featureTypes[camelCase(this.matchRule.name)].some(featureType => {
-        return Boolean(
-          features?.some(feature => {
-            return feature.type === featureType && feature.configured;
-          }),
-        );
+        return features.some(feature => {
+          return feature.type === featureType && feature.configured;
+        });
       });
     },
   },
@@ -89,7 +88,7 @@ export default {
           </div>
         </td>
         <td class="gl-px-2! gl-text-right">
-          <gl-button @click="$emit('enable-btn-clicked')">
+          <gl-button @click="$emit('enable')">
             {{ s__('Enable') }}
           </gl-button>
         </td>

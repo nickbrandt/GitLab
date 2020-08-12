@@ -1,4 +1,5 @@
 import Vuex from 'vuex';
+import { LICENSE_CHECK_NAME, VULNERABILITY_CHECK_NAME } from 'ee/approvals/constants';
 import UnconfiguredSecurityRule from 'ee/approvals/components/security_configuration/unconfigured_security_rule.vue';
 import createStore from 'ee/security_dashboard/store';
 import { mount, createLocalVue } from '@vue/test-utils';
@@ -10,27 +11,31 @@ localVue.use(Vuex);
 describe('UnconfiguredSecurityRule component', () => {
   let wrapper;
   let store;
+  let description;
+
+  const findDescription = () => wrapper.find(GlSprintf);
+  const findButton = () => wrapper.find(GlButton);
 
   const vulnCheckMatchRule = {
-    name: 'Vulnerability-Check',
+    name: VULNERABILITY_CHECK_NAME,
     description: 'vuln-check description without enable button',
     enableDescription: 'vuln-check description with enable button',
     docsPath: 'docs/vuln-check',
   };
 
   const licenseCheckMatchRule = {
-    name: 'License-Check',
+    name: LICENSE_CHECK_NAME,
     description: 'license-check description without enable button',
     enableDescription: 'license-check description with enable button',
     docsPath: 'docs/license-check',
   };
 
   const licenseCheckRule = {
-    name: 'License-Check',
+    name: LICENSE_CHECK_NAME,
   };
 
   const vulnCheckRule = {
-    name: 'Vulnerability-Check',
+    name: VULNERABILITY_CHECK_NAME,
   };
 
   const features = [
@@ -115,7 +120,7 @@ describe('UnconfiguredSecurityRule component', () => {
     });
 
     it('should render the loading skeleton', () => {
-      expect(wrapper.find(GlSkeletonLoading).exists()).toBe(true);
+      expect(wrapper.contains(GlSkeletonLoading)).toBe(true);
     });
   });
 
@@ -131,7 +136,7 @@ describe('UnconfiguredSecurityRule component', () => {
       });
 
       it('should not render the loading skeleton', () => {
-        expect(wrapper.find(GlSkeletonLoading).exists()).toBe(false);
+        expect(wrapper.contains(GlSkeletonLoading)).toBe(false);
       });
 
       it('should not render the row', () => {
@@ -147,16 +152,17 @@ describe('UnconfiguredSecurityRule component', () => {
           matchRule: vulnCheckMatchRule,
           isLoading: false,
         });
+        description = findDescription();
       });
 
       it('should not render the loading skeleton', () => {
-        expect(wrapper.find(GlSkeletonLoading).exists()).toBe(false);
+        expect(wrapper.contains(GlSkeletonLoading)).toBe(false);
       });
 
       it('should render the row with the enable decription and enable button', () => {
-        expect(wrapper.find(GlSprintf).exists()).toBe(true);
-        expect(wrapper.find(GlSprintf).text()).toBe(vulnCheckMatchRule.enableDescription);
-        expect(wrapper.find(GlButton).exists()).toBe(true);
+        expect(description.exists()).toBe(true);
+        expect(description.text()).toBe(vulnCheckMatchRule.enableDescription);
+        expect(findButton().exists()).toBe(true);
       });
     });
   });
@@ -170,16 +176,17 @@ describe('UnconfiguredSecurityRule component', () => {
           matchRule: licenseCheckMatchRule,
           isLoading: false,
         });
+        description = findDescription();
       });
 
       it('should not render the loading skeleton', () => {
-        expect(wrapper.find(GlSkeletonLoading).exists()).toBe(false);
+        expect(wrapper.contains(GlSkeletonLoading)).toBe(false);
       });
 
       it('should render the row with the decription and no button', () => {
-        expect(wrapper.find(GlSprintf).exists()).toBe(true);
-        expect(wrapper.find(GlSprintf).text()).toBe(licenseCheckMatchRule.description);
-        expect(wrapper.find(GlButton).exists()).toBe(false);
+        expect(description.exists()).toBe(true);
+        expect(description.text()).toBe(licenseCheckMatchRule.description);
+        expect(findButton().exists()).toBe(false);
       });
     });
 
@@ -191,16 +198,17 @@ describe('UnconfiguredSecurityRule component', () => {
           matchRule: licenseCheckMatchRule,
           isLoading: false,
         });
+        description = findDescription();
       });
 
       it('should not render the loading skeleton', () => {
-        expect(wrapper.find(GlSkeletonLoading).exists()).toBe(false);
+        expect(wrapper.contains(GlSkeletonLoading)).toBe(false);
       });
 
       it('should render the row with the decription and no button', () => {
-        expect(wrapper.find(GlSprintf).exists()).toBe(true);
-        expect(wrapper.find(GlSprintf).text()).toBe(licenseCheckMatchRule.description);
-        expect(wrapper.find(GlButton).exists()).toBe(false);
+        expect(description.exists()).toBe(true);
+        expect(description.text()).toBe(licenseCheckMatchRule.description);
+        expect(findButton().exists()).toBe(false);
       });
     });
   });

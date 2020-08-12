@@ -124,9 +124,8 @@ describe('Approvals ProjectRules', () => {
       expect(nameCell.find('.js-help').exists()).toBeFalsy();
     });
 
-    it('should not the unconfigured-security-rule component', () => {
-      const unconfiguredRules = wrapper.find(UnconfiguredSecurityRule);
-      expect(unconfiguredRules.exists()).toBe(false);
+    it('should not render the unconfigured-security-rule component', () => {
+      expect(wrapper.contains(UnconfiguredSecurityRule)).toBe(false);
     });
   });
 
@@ -150,8 +149,7 @@ describe('Approvals ProjectRules', () => {
     });
 
     it('should render the unconfigured-security-rule component', () => {
-      const unconfiguredRules = wrapper.find(UnconfiguredSecurityRule);
-      expect(unconfiguredRules.exists()).toBe(true);
+      expect(wrapper.contains(UnconfiguredSecurityRule)).toBe(true);
     });
   });
 });
