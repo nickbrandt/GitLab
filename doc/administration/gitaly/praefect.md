@@ -1181,7 +1181,7 @@ automatically.
 Repositories may be moved from one storage location using the [Project repository storage moves API](../../api/project_repository_storage_moves.md):
 
 ```shell
-curl --request POST --header "PRIVATE_TOKEN: <your_access_token>" --header "Content-Type: application/json" \
+curl --request POST --header "Private-Token: <your_access_token>" --header "Content-Type: application/json" \
 --data '{"destination_storage_name":"praefect"}' "https://gitlab.example.com/api/v4/projects/123/repository_storage_moves"
 ```
 
