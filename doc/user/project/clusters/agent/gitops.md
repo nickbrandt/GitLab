@@ -72,13 +72,13 @@ If it is, `kas` starts polling Gitaly for repository updates and sends the lates
 
 For repositories no longer in the list, `agentk` stops corresponding `GetObjectsToSynchronize()` calls.
 
-## Design 1 vs design 2
+## Design 1 versus design 2
 
 Shared issue: how to grant an agent access to a non-public repository?
 
 Design 1:
 
-- Pro: `agentk` uses `git-sync` to access repositories via the usual ssh+git or HTTPS protocols with usual authentication and authorization methods.
+- Pro: `agentk` uses `git-sync` to access repositories via the usual sSSH and Git, or HTTPS protocols with usual authentication and authorization methods.
   - Con: User needs to put credentials into a `Secret`. Which credentials? We don't have a mechanism for per-repo tokens for robots, do we?
   - Con: Rotating all credentials is more work vs rotating a single `agentk` token.
 - Con: Dependency on `git-sync` - an external component - that can be avoided.
