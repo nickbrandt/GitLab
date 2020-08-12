@@ -4,7 +4,7 @@ group: Configure
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
-# Configuration repository
+# Configuration repository for Kubernetes agent
 
 GitLab Kubernetes integration supports hosting configuration for multiple GitLab Kubernetes Agents in a single repository. These agents may be running in the same or in multiple clusters, with potentially more than one agent per cluster.
 
@@ -41,7 +41,7 @@ Minimal repository layout looks like this:
 
 ### `include` directive (not implemented)
 
-Agents likely have different configuration, but some of it may be identical. `config.yaml` supports inclusion syntax similar to `.gitlab-ci.yml` [`include` directive](https://docs.gitlab.com/ee/ci/yaml/#include). Only `include: 'some_file_name.yml'` syntax is supported at the moment.
+Agents likely have different configuration, but some of it may be identical. `config.yaml` supports inclusion syntax similar to `.gitlab-ci.yml` [`include` directive](../../../../ci/yaml/README.md#include). Only `include: 'some_file_name.yml'` syntax is supported at the moment.
 
 Example repository layout:
 
