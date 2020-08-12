@@ -11,28 +11,28 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 Instance level integrations allow you to set up [integrations](../overview.md) for all projects across your instance.
 Updating instance level integrations will update all projects inheriting from that integration.
 On a project level the instance level integration can be overwritten, in case you want use different settings or disable
-a integration. 
+an integration. 
 
 <i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
 For an introduction to the feature, see [Instance level integrations walk-through](https://youtu.be/bGq-MH--5BE).
 
 ## Setting up an instance level integration
 
-1.  Navigate to your Admin Area -> Settings -> Integrations
-2.  Choose the integration that you want to set up for projects on your instance
-3.  Fill out the details -> Save
+1.  Navigate to **Admin Area > Settings > Integrations**.
+2.  Choose the integration that you want to set up for projects on your instance.
+3.  Fill out the integration details and click "Save changes".
 
 Note: If you set up an instance level integration for the first time, you will set up the same integration for all existing projects that do not have an integration of the same type set up. Projects with an existing integration of the same type are not changed.
 
 ## Overwriting an integration on the project level
 
-1.  Navigate to your Project -> Settings -> Integrations
+1.  Navigate to **Project > Settings > Integrations**.
 2.  Choose the integration where you want to overwrite the instance settings.
 3.  In the dropdown choose: `Use custom settings`
 
     ![](./img/instance_level_dropdown.png)
 
-4.  Fill out the details -> Save
+4.  Fill out the integration details and click "Save changes".
 
 If you want to switch back to your instance level integration settings, please choose `Use instance level settings`
 
