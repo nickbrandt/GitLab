@@ -36,7 +36,7 @@ module QA
         end
       end
 
-      it 'creates and sets an incident template' do
+      it 'creates an incident template and opens an incident with template applied' do
         create_incident_template
 
         Page::Project::Menu.perform(&:go_to_operations_settings)
@@ -47,6 +47,12 @@ module QA
             incident_settings.select_issue_template('incident')
             incident_settings.save_incident_settings
           end
+        end
+
+        create_incident_issue
+
+        Page::Project::Issue::Show.perform do |issue|
+          expect(issue).to have_metrics_unfurled
         end
       end
 
@@ -154,6 +160,19 @@ module QA
           form.add_content(template)
           form.add_commit_message('Add Incident template')
           form.commit_changes
+        end
+      end
+
+      def create_incident_issue
+        Page::Project::Menu.perform(&:go_to_operations_incidents)
+
+        Page::Project::Operations::Incidents::Index.perform do |incidents_page|
+          incidents_page.create_incident
+        end
+
+        Page::Project::Issue::New.perform do |new_issue|
+          new_issue.fill_title('test incident')
+          new_issue.create_new_issue
         end
       end
     end
