@@ -51,7 +51,7 @@ module Gitlab
           hostname: alt_usage_data { Gitlab.config.gitlab.host },
           version: alt_usage_data { Gitlab::VERSION },
           installation_type: alt_usage_data { installation_type },
-          active_user_count: count(:active_user_count, User.active),
+          active_user_count: with_measuring(:active_user_count) { count(User.active) },
           edition: 'CE'
         }
       end
@@ -67,8 +67,8 @@ module Gitlab
 
         {
           counts: {
-            assignee_lists: count(:'counts.assignee_lists', List.assignee),
-            boards: count(:'counts.boards', Board),
+            assignee_lists: count(List.assignee),
+            boards: count(Board),
             ci_builds: count(::Ci::Build),
             ci_internal_pipelines: count(::Ci::Pipeline.internal),
             ci_external_pipelines: count(::Ci::Pipeline.external),
@@ -151,8 +151,8 @@ module Gitlab
             uploads: count(Upload),
             web_hooks: count(WebHook),
             labels: count(Label),
-            merge_requests: count(MergeRequest),
-            notes: count(Note)
+            merge_requests: with_measuring(:'counts.merge_requests') { count(MergeRequest) },
+            notes: with_measuring(:'counts.notes') { count(Note) }
           }.merge(
             services_usage,
             usage_counters,

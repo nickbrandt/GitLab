@@ -39,25 +39,21 @@ module Gitlab
 
       FALLBACK = -1
 
-      def count(metric_key, relation, column = nil, batch: true, start: nil, finish: nil)
-        ::Gitlab::Utils::Measuring.new({ class: "UsageData", metric_key: metric_key }).with_measuring do
-          if batch
-            Gitlab::Database::BatchCount.batch_count(relation, column, start: start, finish: finish)
-          else
-            relation.count
-          end
+      def count(relation, column = nil, batch: true, start: nil, finish: nil)
+        if batch
+          Gitlab::Database::BatchCount.batch_count(relation, column, start: start, finish: finish)
+        else
+          relation.count
         end
       rescue ActiveRecord::StatementInvalid
         FALLBACK
       end
 
       def distinct_count(relation, column = nil, batch: true, batch_size: nil, start: nil, finish: nil)
-        ::Gitlab::Utils::Measuring.new({ class: "UsageData", metric_key: metric_key }).with_measuring do
-          if batch
-            Gitlab::Database::BatchCount.batch_distinct_count(relation, column, batch_size: batch_size, start: start, finish: finish)
-          else
-            relation.distinct_count_by(column)
-          end
+        if batch
+          Gitlab::Database::BatchCount.batch_distinct_count(relation, column, batch_size: batch_size, start: start, finish: finish)
+        else
+          relation.distinct_count_by(column)
         end
       rescue ActiveRecord::StatementInvalid
         FALLBACK
@@ -78,6 +74,12 @@ module Gitlab
           redis_usage_counter(&block)
         elsif counter.present?
           redis_usage_data_totals(counter)
+        end
+      end
+
+      def with_measuring(key, &block)
+        ::Gitlab::Utils::Measuring.new({ class: "UsageData", metric_key: key }).with_measuring do
+          yield
         end
       end
 
