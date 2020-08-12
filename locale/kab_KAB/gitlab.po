@@ -1,20 +1,20 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the gitlab package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gitlab 1.0.0\n"
+"Project-Id-Version: gitlab-ee\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Last-Translator: \n"
+"Language-Team: Kabyle\n"
+"Language: kab_KAB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: gitlab-ee\n"
+"X-Crowdin-Project-ID: 288872\n"
+"X-Crowdin-Language: kab\n"
+"X-Crowdin-File: /master/locale/gitlab.pot\n"
+"X-Crowdin-File-ID: 6\n"
+"PO-Revision-Date: 2020-08-06 13:49\n"
 
 msgid " %{start} to %{end}"
 msgstr ""
@@ -668,9 +668,6 @@ msgid "%{size} MiB"
 msgstr ""
 
 msgid "%{size} bytes"
-msgstr ""
-
-msgid "%{sourceBranch} into %{targetBranch}"
 msgstr ""
 
 msgid "%{spammable_titlecase} was submitted to Akismet successfully."
@@ -1522,9 +1519,6 @@ msgid "Add issues"
 msgstr ""
 
 msgid "Add italic text"
-msgstr ""
-
-msgid "Add key"
 msgstr ""
 
 msgid "Add label(s)"
@@ -3241,6 +3235,9 @@ msgstr ""
 msgid "Artifact"
 msgstr ""
 
+msgid "Artifact ID"
+msgstr ""
+
 msgid "Artifact could not be deleted."
 msgstr ""
 
@@ -3828,9 +3825,6 @@ msgid "BillingPlans|monthly"
 msgstr ""
 
 msgid "BillingPlans|per user"
-msgstr ""
-
-msgid "BillingPlan|Contact sales"
 msgstr ""
 
 msgid "BillingPlan|Upgrade"
@@ -4919,9 +4913,6 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-msgid "Clear all repository checks"
-msgstr ""
-
 msgid "Clear chart filters"
 msgstr ""
 
@@ -5183,7 +5174,7 @@ msgstr ""
 msgid "ClusterIntegration|Choose the worker node %{startLink}instance type %{externalLinkIcon} %{endLink}."
 msgstr ""
 
-msgid "ClusterIntegration|Choose which applications to install on your Kubernetes cluster."
+msgid "ClusterIntegration|Choose which applications to install on your Kubernetes cluster. Helm Tiller is required to install any of the following applications."
 msgstr ""
 
 msgid "ClusterIntegration|Choose which of your environments will use this cluster."
@@ -5397,6 +5388,9 @@ msgid "ClusterIntegration|Helm Tiller"
 msgstr ""
 
 msgid "ClusterIntegration|Helm release failed to install"
+msgstr ""
+
+msgid "ClusterIntegration|Helm streamlines installing and managing Kubernetes applications. Tiller runs inside of your Kubernetes Cluster, and manages releases of your charts."
 msgstr ""
 
 msgid "ClusterIntegration|If you are setting up multiple clusters and are using Auto DevOps, %{help_link_start}read this first%{help_link_end}."
@@ -5904,6 +5898,9 @@ msgid "ClusterIntegration|You are about to uninstall %{appTitle} from your clust
 msgstr ""
 
 msgid "ClusterIntegration|You are about to update %{appTitle} on your cluster."
+msgstr ""
+
+msgid "ClusterIntegration|You must first install Helm Tiller before installing the applications below"
 msgstr ""
 
 msgid "ClusterIntegration|You must grant access to your organization’s AWS resources in order to create a new EKS cluster. To grant access, create a provision role using the account and external ID below and provide us the ARN."
@@ -6766,6 +6763,9 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
+msgid "Copy %{field}"
+msgstr ""
+
 msgid "Copy %{http_label} clone URL"
 msgstr ""
 
@@ -7028,9 +7028,6 @@ msgid "Create epic"
 msgstr ""
 
 msgid "Create file"
-msgstr ""
-
-msgid "Create from"
 msgstr ""
 
 msgid "Create group"
@@ -7818,9 +7815,6 @@ msgstr ""
 msgid "Delete variable"
 msgstr ""
 
-msgid "DeleteProject|Delete %{name}"
-msgstr ""
-
 msgid "DeleteProject|Failed to remove project repository. Please try again or contact administrator."
 msgstr ""
 
@@ -7886,20 +7880,12 @@ msgid_plural "Dependencies|%d additional vulnerabilities not shown"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "Dependencies|%d more"
-msgid_plural "Dependencies|%d more"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "Dependencies|%d vulnerability detected"
 msgid_plural "Dependencies|%d vulnerabilities detected"
 msgstr[0] ""
 msgstr[1] ""
 
 msgid "Dependencies|%{remainingLicensesCount} more"
-msgstr ""
-
-msgid "Dependencies|(top level)"
 msgstr ""
 
 msgid "Dependencies|All"
@@ -7912,9 +7898,6 @@ msgid "Dependencies|Component"
 msgstr ""
 
 msgid "Dependencies|Component name"
-msgstr ""
-
-msgid "Dependencies|Dependency path"
 msgstr ""
 
 msgid "Dependencies|Export as JSON"
@@ -7933,9 +7916,6 @@ msgid "Dependencies|Packager"
 msgstr ""
 
 msgid "Dependencies|The %{codeStartTag}dependency_scanning%{codeEndTag} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again."
-msgstr ""
-
-msgid "Dependencies|There may be multiple paths"
 msgstr ""
 
 msgid "Dependencies|Toggle vulnerability list"
@@ -9893,9 +9873,6 @@ msgstr ""
 msgid "Excluding merge commits. Limited to 6,000 commits."
 msgstr ""
 
-msgid "Existing branch name, tag, or commit SHA"
-msgstr ""
-
 msgid "Existing members and groups"
 msgstr ""
 
@@ -10381,16 +10358,10 @@ msgstr ""
 msgid "FeatureFlags|Flag becomes read only soon"
 msgstr ""
 
-msgid "FeatureFlags|Flag is read-only"
-msgstr ""
-
 msgid "FeatureFlags|Get started with feature flags"
 msgstr ""
 
 msgid "FeatureFlags|GitLab is moving to a new way of managing feature flags, and in 13.4, this feature flag will become read-only. Please create a new feature flag."
-msgstr ""
-
-msgid "FeatureFlags|GitLab is moving to a new way of managing feature flags. This feature flag is read-only, and it will be removed in 14.0. Please create a new feature flag."
 msgstr ""
 
 msgid "FeatureFlags|ID"
@@ -13037,9 +13008,6 @@ msgstr ""
 msgid "Install on clusters"
 msgstr ""
 
-msgid "Installation Commands"
-msgstr ""
-
 msgid "Installed"
 msgstr ""
 
@@ -13522,9 +13490,6 @@ msgstr ""
 msgid "JiraService| on branch %{branch_link}"
 msgstr ""
 
-msgid "JiraService|%{jira_docs_link_start}Enable the Jira integration%{jira_docs_link_end} to view your Jira issues in GitLab."
-msgstr ""
-
 msgid "JiraService|%{user_link} mentioned this issue in %{entity_link} of %{project_link}%{branch}:{quote}%{entity_message}{quote}"
 msgstr ""
 
@@ -13567,9 +13532,6 @@ msgstr ""
 msgid "JiraService|Password or API token"
 msgstr ""
 
-msgid "JiraService|This feature requires a Premium plan."
-msgstr ""
-
 msgid "JiraService|Transition ID(s)"
 msgstr ""
 
@@ -13583,9 +13545,6 @@ msgid "JiraService|Use a username for server version and an email for cloud vers
 msgstr ""
 
 msgid "JiraService|Username or Email"
-msgstr ""
-
-msgid "JiraService|Using Jira for issue tracking?"
 msgstr ""
 
 msgid "JiraService|View Jira issues in GitLab"
@@ -14104,6 +14063,9 @@ msgid "License History"
 msgstr ""
 
 msgid "License ID:"
+msgstr ""
+
+msgid "License URL"
 msgstr ""
 
 msgid "License-Check"
@@ -14703,6 +14665,9 @@ msgid "MattermostService|Suggestions:"
 msgstr ""
 
 msgid "MattermostService|This service allows users to perform common operations on this project by entering slash commands in Mattermost."
+msgstr ""
+
+msgid "Maven Metadata"
 msgstr ""
 
 msgid "Max Group Export Download requests per minute per user"
@@ -16337,9 +16302,6 @@ msgstr ""
 msgid "No schedules"
 msgstr ""
 
-msgid "No source selected"
-msgstr ""
-
 msgid "No stack trace for this error"
 msgstr ""
 
@@ -16628,6 +16590,9 @@ msgstr ""
 msgid "Number of files touched"
 msgstr ""
 
+msgid "OAuth configuration for GitHub missing."
+msgstr ""
+
 msgid "OK"
 msgstr ""
 
@@ -16670,16 +16635,10 @@ msgstr ""
 msgid "OnDemandScans|Attached branch is where the scan job runs."
 msgstr ""
 
-msgid "OnDemandScans|Could not fetch site profiles. Please refresh the page, or try again later."
-msgstr ""
-
 msgid "OnDemandScans|Could not run the scan. Please try again."
 msgstr ""
 
 msgid "OnDemandScans|Could not run the scan: %{backendErrorMessage}"
-msgstr ""
-
-msgid "OnDemandScans|Create a new site profile"
 msgstr ""
 
 msgid "OnDemandScans|Create new DAST scan"
@@ -16688,13 +16647,7 @@ msgstr ""
 msgid "OnDemandScans|DAST will scan the target URL and any discovered sub URLs."
 msgstr ""
 
-msgid "OnDemandScans|Manage profiles"
-msgstr ""
-
 msgid "OnDemandScans|New on-demand DAST scan"
-msgstr ""
-
-msgid "OnDemandScans|No profile yet. In order to create a new scan, you need to have at least one completed site profile."
 msgstr ""
 
 msgid "OnDemandScans|On-demand Scans"
@@ -16706,16 +16659,10 @@ msgstr ""
 msgid "OnDemandScans|Only a passive scan can be performed on demand."
 msgstr ""
 
-msgid "OnDemandScans|Passive"
-msgstr ""
-
 msgid "OnDemandScans|Passive DAST Scan"
 msgstr ""
 
 msgid "OnDemandScans|Please enter a valid URL format, ex: http://www.example.com/home"
-msgstr ""
-
-msgid "OnDemandScans|Run scan"
 msgstr ""
 
 msgid "OnDemandScans|Run this scan"
@@ -16724,22 +16671,10 @@ msgstr ""
 msgid "OnDemandScans|Scan mode"
 msgstr ""
 
-msgid "OnDemandScans|Scanner settings"
-msgstr ""
-
 msgid "OnDemandScans|Schedule or run scans immediately against target sites. Currently available on-demand scan type: DAST. %{helpLinkStart}More information%{helpLinkEnd}"
 msgstr ""
 
-msgid "OnDemandScans|Select one of the existing profiles"
-msgstr ""
-
-msgid "OnDemandScans|Site profiles"
-msgstr ""
-
 msgid "OnDemandScans|Target URL"
-msgstr ""
-
-msgid "OnDemandScans|Use existing site profile"
 msgstr ""
 
 msgid "Once a project is permanently deleted it %{strongStart}cannot be recovered%{strongEnd}. Permanently deleting this project will %{strongStart}immediately delete%{strongEnd} its respositories and %{strongStart}all related resources%{strongEnd} including issues, merge requests etc."
@@ -17005,6 +16940,9 @@ msgstr ""
 msgid "Package deleted successfully"
 msgstr ""
 
+msgid "Package information"
+msgstr ""
+
 msgid "Package recipe already exists"
 msgstr ""
 
@@ -17161,10 +17099,16 @@ msgstr ""
 msgid "PackageRegistry|Pip Command"
 msgstr ""
 
+msgid "PackageRegistry|Pipeline %{linkStart}%{linkEnd} triggered %{timestamp} by %{author}"
+msgstr ""
+
 msgid "PackageRegistry|Pipeline %{link} triggered %{datetime} by %{author}"
 msgstr ""
 
 msgid "PackageRegistry|Published to the %{project} Package Registry %{datetime}"
+msgstr ""
+
+msgid "PackageRegistry|Published to the repository at %{timestamp}"
 msgstr ""
 
 msgid "PackageRegistry|PyPi"
@@ -19561,9 +19505,6 @@ msgstr ""
 msgid "Prompt users to upload SSH keys"
 msgstr ""
 
-msgid "Protect"
-msgstr ""
-
 msgid "Protect variable"
 msgstr ""
 
@@ -19892,6 +19833,9 @@ msgid "Recent Searches Service is unavailable"
 msgstr ""
 
 msgid "Recent searches"
+msgstr ""
+
+msgid "Recipe"
 msgstr ""
 
 msgid "Reconfigure"
@@ -20998,9 +20942,6 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
-msgid "Save Push Rules"
-msgstr ""
-
 msgid "Save anyway"
 msgstr ""
 
@@ -21119,9 +21060,6 @@ msgid "Search branches"
 msgstr ""
 
 msgid "Search branches and tags"
-msgstr ""
-
-msgid "Search branches, tags, and commits"
 msgstr ""
 
 msgid "Search by Git revision"
@@ -21354,13 +21292,7 @@ msgstr ""
 msgid "SecurityConfiguration|Configure"
 msgstr ""
 
-msgid "SecurityConfiguration|Could not retrieve configuration data. Please refresh the page, or try again later."
-msgstr ""
-
-msgid "SecurityConfiguration|Create Merge Request"
-msgstr ""
-
-msgid "SecurityConfiguration|Customize common SAST settings to suit your requirements. Configuration changes made here override those provided by GitLab and are excluded from updates. For details of more advanced configuration options, see the %{linkStart}GitLab SAST documentation%{linkEnd}."
+msgid "SecurityConfiguration|Customize common SAST settings to suit your requirements. More advanced configuration options exist, which you can add to the configuration file this tool generates. It's important to note that if you make any configurations, they will be saved as overrides and will be %{strongStart}excluded from automatic updates%{strongEnd}."
 msgstr ""
 
 msgid "SecurityConfiguration|Enable via Merge Request"
@@ -21379,9 +21311,6 @@ msgid "SecurityConfiguration|Manage"
 msgstr ""
 
 msgid "SecurityConfiguration|Not enabled"
-msgstr ""
-
-msgid "SecurityConfiguration|SAST Configuration"
 msgstr ""
 
 msgid "SecurityConfiguration|Security Control"
@@ -21751,9 +21680,6 @@ msgid "Select required regulatory standard"
 msgstr ""
 
 msgid "Select shards to replicate"
-msgstr ""
-
-msgid "Select source"
 msgstr ""
 
 msgid "Select source branch"
@@ -23905,6 +23831,9 @@ msgstr ""
 msgid "TestReports|There was an error fetching the summary."
 msgstr ""
 
+msgid "TestReports|There was an error fetching the test reports."
+msgstr ""
+
 msgid "TestReports|There was an error fetching the test suite."
 msgstr ""
 
@@ -24980,9 +24909,6 @@ msgstr ""
 msgid "This project is archived and cannot be commented on."
 msgstr ""
 
-msgid "This project manages its dependencies using %{strong_start}%{manager_name}%{strong_end}"
-msgstr ""
-
 msgid "This project path either does not exist or you do not have access."
 msgstr ""
 
@@ -25041,9 +24967,6 @@ msgid "This user will be the author of all events in the activity feed that are 
 msgstr ""
 
 msgid "This variable can not be masked."
-msgstr ""
-
-msgid "This will clear repository check states for ALL projects in the database. This cannot be undone. Are you sure?"
 msgstr ""
 
 msgid "This will help us personalize your onboarding experience."
@@ -26179,6 +26102,9 @@ msgid "Updated"
 msgstr ""
 
 msgid "Updated %{updated_at} by %{updated_by}"
+msgstr ""
+
+msgid "Updated at"
 msgstr ""
 
 msgid "Updated to %{linkStart}chart v%{linkEnd}"
@@ -28863,9 +28789,6 @@ msgstr ""
 msgid "is not allowed. Try again with a different email address, or contact your GitLab admin."
 msgstr ""
 
-msgid "is not allowed. We do not currently support project-level iterations"
-msgstr ""
-
 msgid "is not an email you own"
 msgstr ""
 
@@ -29726,3 +29649,4 @@ msgstr ""
 
 msgid "yaml invalid"
 msgstr ""
+
