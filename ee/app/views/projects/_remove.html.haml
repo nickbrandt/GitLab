@@ -2,12 +2,12 @@
 - adjourned_deletion = project.adjourned_deletion?
 - adjourned_date = adjourned_deletion ? permanent_deletion_date(Time.now.utc).to_s : nil;
 - admin_help_path = help_page_path('user/admin_area/settings/visibility_and_access_controls', anchor: 'default-deletion-delay-premium-only')
-- recovery_help_path = help_page_path('user/project/settings/index', anchor: 'remove-a-project')
+- recovery_help_path = help_page_path('user/project/settings/index', anchor: 'delete-a-project')
 - confirm_phrase = s_('DeleteProject|Delete %{name}') % { name: project.full_name }
 
 - unless project.marked_for_deletion?
   .sub-section
-    %h4.danger-title= _('Remove project')
+    %h4.danger-title= _('Delete project')
     %p
       %strong= s_('Delayed Project Deletion (%{adjourned_deletion})') % { adjourned_deletion: adjourned_deletion ? 'Enabled' : 'Disabled' }
     - if adjourned_deletion

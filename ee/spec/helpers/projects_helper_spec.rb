@@ -276,7 +276,7 @@ RSpec.describe ProjectsHelper do
       it do
         deletion_date = helper.permanent_deletion_date(Time.now.utc)
 
-        expect(subject).to eq "Removing a project places it into a read-only state until #{deletion_date}, at which point the project will be permanently removed. Are you ABSOLUTELY sure?"
+        expect(subject).to eq "Deleting a project places it into a read-only state until #{deletion_date}, at which point the project will be permanently deleted. Are you ABSOLUTELY sure?"
       end
     end
 
@@ -284,7 +284,7 @@ RSpec.describe ProjectsHelper do
       let(:enabled) { false }
 
       it do
-        expect(subject).to eq "You are going to remove #{project.full_name}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?"
+        expect(subject).to eq "You are going to delete #{project.full_name}. Deleted projects CANNOT be restored! Are you ABSOLUTELY sure?"
       end
     end
   end

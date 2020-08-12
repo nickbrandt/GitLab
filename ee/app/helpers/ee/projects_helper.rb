@@ -90,7 +90,7 @@ module EE
       return super unless project.adjourned_deletion?
 
       date = permanent_deletion_date(Time.now.utc)
-      _("Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed. Are you ABSOLUTELY sure?") %
+      _("Deleting a project places it into a read-only state until %{date}, at which point the project will be permanently deleted. Are you ABSOLUTELY sure?") %
         { date: date }
     end
 

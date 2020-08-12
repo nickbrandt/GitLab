@@ -126,7 +126,7 @@ export default {
         .then(() => {
           this.$emit('handleProjectManipulation', false);
         })
-        .catch(() => createFlash(__('Something went wrong, unable to remove project')));
+        .catch(() => createFlash(__('Something went wrong, unable to delete project')));
     },
     searched(query) {
       this.searchQuery = query;

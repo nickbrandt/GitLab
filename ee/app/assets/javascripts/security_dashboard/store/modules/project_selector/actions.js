@@ -142,7 +142,7 @@ export const receiveRemoveProjectSuccess = ({ commit, dispatch }) => {
 export const receiveRemoveProjectError = ({ commit }) => {
   commit(types.RECEIVE_REMOVE_PROJECT_ERROR);
 
-  createFlash(__('Something went wrong, unable to remove project'));
+  createFlash(__('Something went wrong, unable to delete project'));
 };
 
 export const fetchSearchResults = ({ state, dispatch, commit }) => {
