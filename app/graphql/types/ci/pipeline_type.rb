@@ -43,8 +43,8 @@ module Types
             description: 'Stages of the pipeline',
             extras: [:lookahead],
             resolver: Resolvers::Ci::PipelineStagesResolver
-
-      # TODO: Add triggering user as a type
+      field :user, Types::UserType, null: true,
+            description: 'Pipeline user'
     end
   end
 end
