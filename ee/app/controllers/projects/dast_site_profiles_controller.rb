@@ -12,6 +12,7 @@ module Projects
         .dast_site_profiles
         .with_dast_site
         .find(params[:id])
+      @site_profile_gid = @site_profile.to_global_id
     end
 
     private

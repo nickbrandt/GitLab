@@ -1,13 +1,13 @@
 mutation dastSiteProfileUpdate(
-  $id: ID!
+  $id: DastSiteProfileID!
   $fullPath: ID!
   $profileName: String!
   $targetUrl: String
 ) {
-  project(fullPath: $fullPath) {
-    dastSiteProfileUpdate(input: { id: $id, profileName: $profileName, targetUrl: $targetUrl }) {
-      id
-      errors
-    }
+  dastSiteProfileUpdate(
+    input: { id: $id, fullPath: $fullPath, profileName: $profileName, targetUrl: $targetUrl }
+  ) {
+    id
+    errors
   }
 }
