@@ -45,6 +45,12 @@ export default {
   },
   methods: {
     findVersionId,
+    routeToVersion(versionId) {
+      this.$router.push({
+        path: this.$route.path,
+        query: { version: this.findVersionId(versionId) },
+      });
+    },
   },
 };
 </script>
@@ -56,7 +62,7 @@ export default {
       :key="version.id"
       :is-check-item="true"
       :is-checked="findVersionId(version.id) === currentVersionId"
-      @click="$router.push({ path: $route.path, query: { version: findVersionId(version.id) } })"
+      @click="routeToVersion(version.id)"
     >
       <template>
         {{ __('Version') }} {{ allVersions.length - index }}
