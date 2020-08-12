@@ -8,15 +8,9 @@ import { removeFlash, handleErrorOrRethrow, isStageNameExistsError } from '../ut
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
-export const setSelectedGroup = ({ commit, dispatch, state }, group) => {
+export const setSelectedGroup = ({ commit, dispatch }, group) => {
   commit(types.SET_SELECTED_GROUP, group);
-  const { featureFlags } = state;
-  if (featureFlags?.hasFilterBar) {
-    return dispatch('filters/initialize', {
-      groupPath: group.full_path,
-    });
-  }
-  return Promise.resolve();
+  return dispatch('filters/initialize', { groupPath: group.full_path });
 };
 
 export const setSelectedProjects = ({ commit }, projects) =>
@@ -256,16 +250,12 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
   if (initialData.group?.fullPath) {
-    if (featureFlags?.hasFilterBar) {
-      dispatch('filters/initialize', {
-        groupPath: initialData.group.fullPath,
-        ...initialData,
-      });
-    }
-
-    return dispatch('fetchCycleAnalyticsData').then(() =>
-      dispatch('initializeCycleAnalyticsSuccess'),
-    );
+    return Promise.resolve()
+      .then(() =>
+        dispatch('filters/initialize', { groupPath: initialData.group.fullPath, ...initialData }),
+      )
+      .then(() => dispatch('fetchCycleAnalyticsData'))
+      .then(() => dispatch('initializeCycleAnalyticsSuccess'));
   }
   return dispatch('initializeCycleAnalyticsSuccess');
 };
