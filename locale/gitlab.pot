@@ -15284,7 +15284,7 @@ msgstr ""
 msgid "Metrics|Duplicate dashboard"
 msgstr ""
 
-msgid "Metrics|Duplicate this dashboard to edit dashboard YAML"
+msgid "Metrics|Duplicate this dashboard to add panel or edit dashboard YAML."
 msgstr ""
 
 msgid "Metrics|Duplicating..."
