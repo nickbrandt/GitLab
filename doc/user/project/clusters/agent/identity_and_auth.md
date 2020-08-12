@@ -1,3 +1,9 @@
+---
+stage: Configure
+group: Configure
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # Identity and authentication
 
 This document uses the word `agent` to mean GitLab Kubernetes Agent on the conceptual level. The program that is the implementation of it is actually called `agentk`. See the [architecture page](architecture.md).

@@ -1,3 +1,9 @@
+---
+stage: Configure
+group: Configure
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # GitOps support
 
 GitLab Kubernetes Agent offers [GitOps](https://www.gitops.tech/) support. More specifically, the [pull-based version](https://www.gitops.tech/#pull-based-deployments).

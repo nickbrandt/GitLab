@@ -1,3 +1,9 @@
+---
+stage: Configure
+group: Configure
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # gitlab-agent
 
 GitLab Kubernetes Agent is an active in-cluster component for solving any GitLab<->Kubernetes integration tasks.
@@ -24,13 +30,13 @@ Below are some ideas that can be built using the agent.
 
 * Better [GitOps](https://www.gitops.tech/) support. A repository can be used as a IaC repo. On successful CI run on the main repo, a commit is merged into that IaC repo. Commit describes the new desired state of infrastructure in a particular cluster (or clusters). An agent in a corresponding cluster(s) picks up the update and applies it to the objects in the cluster. We can work with Argo-cd/Flux here to try to reuse existing code and integrate with the community-built tools.
 
-* “Infrastructure drift detection”. Monitor and alert on unexpected changes in Kubernetes objects that are managed in the IaC repo. Should support various ways to describe infrastructure (kustomize/helm/plain yaml/etc). 
+* “Infrastructure drift detection”. Monitor and alert on unexpected changes in Kubernetes objects that are managed in the IaC repo. Should support various ways to describe infrastructure (kustomize/helm/plain yaml/etc).
 
-* Preview changes to IaC specs against the current state of the corresponding cluster right in the MR. 
+* Preview changes to IaC specs against the current state of the corresponding cluster right in the MR.
 
-* “Live diff”. Building on top of the previous feature. In repo browser when a directory with IaC specs is opened, show a live comparison of what is in the repo and what is in the corresponding cluster. 
+* “Live diff”. Building on top of the previous feature. In repo browser when a directory with IaC specs is opened, show a live comparison of what is in the repo and what is in the corresponding cluster.
 
-* Kubernetes has audit logs. We could build a page to view them and perhaps correlate with other GitLab events? 
+* Kubernetes has audit logs. We could build a page to view them and perhaps correlate with other GitLab events?
 
 * See how we can support https://github.com/kubernetes-sigs/application.
 

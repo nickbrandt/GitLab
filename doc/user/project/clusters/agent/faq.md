@@ -1,3 +1,9 @@
+---
+stage: Configure
+group: Configure
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # Frequently Asked Questions
 
 This document collects random bits of knowledge about the project which do not fit anywhere else. Also, see [architecture-related FAQ](architecture.md#faq).
