@@ -295,18 +295,4 @@ describe('Insights store actions', () => {
       );
     });
   });
-
-  describe('setPageLoading', () => {
-    it('commits SET_PAGE_LOADING', () => {
-      const pageLoading = false;
-
-      return testAction(
-        actions.setPageLoading,
-        pageLoading,
-        null,
-        [{ type: 'SET_PAGE_LOADING', payload: false }],
-        [],
-      );
-    });
-  });
 });
