@@ -6,6 +6,7 @@ exports[`MetricChart component template when isLoading is false and chart data i
    
   <div
     class="bs-callout bs-callout-info"
+    data-testid="infoMessage"
   >
     
       There is no data available. Please change your selection.
