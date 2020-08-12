@@ -19600,6 +19600,8 @@ CREATE INDEX index_events_on_project_id_and_created_at ON public.events USING bt
 
 CREATE INDEX index_events_on_project_id_and_id ON public.events USING btree (project_id, id);
 
+CREATE INDEX index_events_on_project_id_and_id_desc_on_merged_action ON public.events USING btree (project_id, id DESC) WHERE (action = 7);
+
 CREATE INDEX index_events_on_target_type_and_target_id ON public.events USING btree (target_type, target_id);
 
 CREATE UNIQUE INDEX index_events_on_target_type_and_target_id_and_fingerprint ON public.events USING btree (target_type, target_id, fingerprint);
