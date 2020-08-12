@@ -32,7 +32,7 @@ describe('ItemTypeIconComponent', () => {
 
       vm = createComponent(ITEM_TYPE.GROUP);
 
-      expect(vm.$el.querySelector('svg').getAttribute('data-testid')).toBe('folder-icon');
+      expect(vm.$el.querySelector('svg').getAttribute('data-testid')).toBe('folder-o-icon');
       vm.$destroy();
     });
 
