@@ -2134,6 +2134,26 @@ build_job:
       artifacts: true
 ```
 
+Environment variables support for `project:`, `job:`, and `ref` was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/202093)
+in GitLab 13.3. This is under development, but it is ready for production use. It is deployed
+behind the `ci_expand_names_for_cross_pipeline_artifacts` feature flag, which is **disabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
+can enable it for your instance.
+
+For example:
+
+```yaml
+build_job:
+  stage: build
+  script:
+    - ls -lhR
+  needs:
+    - project: $CI_PROJECT_PATH
+      job: $DEPENDENCY_JOB_NAME
+      ref: $CI_COMMIT_BRANCH
+      artifacts: true
+```
+
 NOTE: **Note:**
 Downloading artifacts from jobs that are run in [`parallel:`](#parallel) is not supported.
 

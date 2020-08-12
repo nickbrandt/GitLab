@@ -79,6 +79,10 @@ module Gitlab
       def self.reset_ci_minutes_for_all_namespaces?
         ::Feature.enabled?(:reset_ci_minutes_for_all_namespaces, default_enabled: false)
       end
+
+      def self.expand_names_for_cross_pipeline_artifacts?(project)
+        ::Feature.enabled?(:ci_expand_names_for_cross_pipeline_artifacts, project)
+      end
     end
   end
 end
