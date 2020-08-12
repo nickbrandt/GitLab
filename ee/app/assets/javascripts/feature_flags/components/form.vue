@@ -601,10 +601,7 @@ export default {
       >
         {{ submitText }}
       </gl-button>
-      <gl-button
-        :href="cancelPath"
-        class="js-ff-cancel col-xs-12 float-right"
-      >
+      <gl-button :href="cancelPath" class="js-ff-cancel col-xs-12 float-right">
         {{ __('Cancel') }}
       </gl-button>
     </div>
