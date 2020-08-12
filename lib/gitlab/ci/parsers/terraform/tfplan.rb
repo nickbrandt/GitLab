@@ -14,6 +14,9 @@ module Gitlab
 
             if has_required_keys?(plan_data)
               terraform_reports.add_plan(job_id, valid_tfplan(plan_data, job_details))
+            elsif plan_data['resource_changes']
+              converted_data = generate_missing_keys(plan_data)
+              terraform_reports.add_plan(job_id, valid_tfplan(converted_data, job_details))
             else
               terraform_reports.add_plan(job_id, invalid_tfplan(:missing_json_keys, job_details))
             end
@@ -26,6 +29,16 @@ module Gitlab
           end
 
           private
+
+          def generate_missing_keys(plan_data)
+            # https://www.terraform.io/docs/internals/json-format.html#change-representation
+            changes = plan_data['resource_changes'].map { |x| x.dig('change', 'actions')&.last }
+            {
+              'create' => changes.count('create'),
+              'update' => changes.count('update'),
+              'delete' => changes.count('delete')
+            }
+          end
 
           def has_required_keys?(plan_data)
             (%w[create update delete] - plan_data.keys).empty?
