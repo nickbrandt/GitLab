@@ -166,6 +166,8 @@ Gitter
 globals
 Gmail
 Google
+goroutine
+goroutines
 Gosec
 Gradle
 Grafana
