@@ -8,7 +8,6 @@ module EE
       prepended do
         field :iteration, ::Types::IterationType,
               null: true,
-              resolve: -> (_obj, args, _ctx) { ::GitlabSchema.find_by_gid(args[:id]) },
               description: 'Find an iteration' do
           argument :id, ::Types::GlobalIDType[::Iteration],
                    required: true,
@@ -53,6 +52,10 @@ module EE
               null: true,
               resolver: ::Resolvers::InstanceSecurityDashboardResolver,
               description: 'Fields related to Instance Security Dashboard'
+      end
+
+      def iteration(id:)
+        ::GitlabSchema.find_by_gid(::Types::GlobalIDType[Iteration].coerce_isolated_input(id))
       end
     end
   end

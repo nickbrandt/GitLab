@@ -49,8 +49,7 @@ module Types
 
     field :milestone, ::Types::MilestoneType,
           null: true,
-          description: 'Find a milestone',
-          resolve: -> (_obj, args, _ctx) { GitlabSchema.find_by_gid(args[:id]) } do
+          description: 'Find a milestone' do
       argument :id, ::Types::GlobalIDType[Milestone],
                required: true,
                description: 'Find a milestone by its ID'
@@ -86,7 +85,13 @@ module Types
     end
 
     def issue(id:)
-      GitlabSchema.object_from_id(id, expected_type: ::Issue)
+      id = ::Types::GlobalIDType[::Issue].coerce_isolated_input(id)
+      GitlabSchema.find_by_gid(id)
+    end
+
+    def milestone(id:)
+      id = ::Types::GlobalIDType[Milestone].coerce_isolated_input(id)
+      GitlabSchema.find_by_gid(id)
     end
   end
 end

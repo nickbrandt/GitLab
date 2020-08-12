@@ -30,6 +30,8 @@ module Mutations
       def resolve(full_path:, dast_site_profile_id:, **args)
         project = authorized_find_project!(full_path: full_path)
 
+        # TODO: remove explicit coercion once compatibility layer is removed
+        dast_site_profile_id = ::Types::GlobalIDType[::DastSiteProfile].coerce_isolated_input(dast_site_profile_id)
         dast_site_profile = find_dast_site_profile(project: project, dast_site_profile_id: dast_site_profile_id)
         dast_site = dast_site_profile.dast_site
         dast_scanner_profile = find_dast_scanner_profile(project: project, dast_scanner_profile_id: args[:dast_scanner_profile_id])

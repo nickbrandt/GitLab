@@ -29,7 +29,9 @@ module Mutations
 
       authorize :create_on_demand_dast_scan
 
-      def resolve(full_path:, **service_args)
+      def resolve(full_path:, id:, **service_args)
+        # TODO: remove explicit coercion once compatibility layer has been removed
+        service_args[:id] = ::Types::GlobalIDType[::DastSiteProfile].coerce_isolated_input(id).model_id
         project = authorized_find_project!(full_path: full_path)
 
         service = ::DastSiteProfiles::UpdateService.new(project, current_user)
