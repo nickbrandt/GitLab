@@ -18793,6 +18793,9 @@ msgstr ""
 msgid "ProjectFileTree|Name"
 msgstr ""
 
+msgid "ProjectFileTree|Show more"
+msgstr ""
+
 msgid "ProjectLastActivity|Never"
 msgstr ""
 
