@@ -6,22 +6,30 @@ RSpec.describe Gitlab::Redis::HLL, :clean_gitlab_redis_shared_state do
   describe '.add' do
     context 'when checking key format' do
       it 'raise an error when using an invalid key format' do
-        expect { described_class.add(key: 'test', value: 1, expiry: 1.day) }.to raise_error(Gitlab::Redis::HLL::KeyFormatError)
-        expect { described_class.add(key: 'test-{metric', value: 1, expiry: 1.day) }.to raise_error(Gitlab::Redis::HLL::KeyFormatError)
-        expect { described_class.add(key: 'test-{metric}}', value: 1, expiry: 1.day) }.to raise_error(Gitlab::Redis::HLL::KeyFormatError)
+        [
+          'test',
+          'test-{metric',
+          'test-{metric}}'
+        ].each do |key|
+          expect { described_class.add(key: key, value: 1, expiry: 1.day) }.to raise_error(Gitlab::Redis::HLL::KeyFormatError)
+        end
       end
 
       it "doesn't raise error when having correct format" do
-        expect { described_class.add(key: 'test-{metric}', value: 1, expiry: 1.day) }.not_to raise_error
-        expect { described_class.add(key: 'test-{metric}-1', value: 1, expiry: 1.day) }.not_to raise_error
-        expect { described_class.add(key: 'test:{metric}-1', value: 1, expiry: 1.day) }.not_to raise_error
-        expect { described_class.add(key: '2020-216-{project_action}', value: 1, expiry: 1.day) }.not_to raise_error
-        expect { described_class.add(key: 'i_{analytics}_dev_ops_score-2020-32', value: 1, expiry: 1.day) }.not_to raise_error
+        [
+          'test-{metric}',
+          'test-{metric}-1',
+          'test:{metric}-1',
+          '2020-216-{project_action}',
+          'i_{analytics}_dev_ops_score-2020-32'
+        ].each do |key|
+          expect { described_class.add(key: key, value: 1, expiry: 1.day) }.not_to raise_error
+        end
       end
     end
   end
 
-  describe 'counts correct data for expand_vulnerabilities event' do
+  describe '.count' do
     before do
       described_class.add(key: '2020-32-{expand_vulnerabilities}', value: "user_id_1", expiry: 1.day)
       described_class.add(key: '2020-32-{expand_vulnerabilities}', value: "user_id_1", expiry: 1.day)
@@ -47,7 +55,7 @@ RSpec.describe Gitlab::Redis::HLL, :clean_gitlab_redis_shared_state do
       expect(described_class.count(keys: ['2020-33-{expand_vulnerabilities}', '2020-34-{expand_vulnerabilities}'])).to eq(2)
     end
 
-    it 'has one distinct user for weel 33' do
+    it 'has one distinct user for week 33' do
       expect(described_class.count(keys: ['2020-33-{expand_vulnerabilities}'])).to eq(1)
     end
 
