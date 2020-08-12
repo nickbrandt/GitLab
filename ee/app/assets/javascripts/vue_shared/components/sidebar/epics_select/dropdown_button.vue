@@ -34,6 +34,6 @@ export default {
     data-toggle="dropdown"
   >
     <span class="dropdown-toggle-text" :class="toggleTextClass">{{ buttonText }}</span>
-    <icon name="chevron-down" />
+    <icon name="chevron-down" class="dropdown-menu-toggle-icon" />
   </button>
 </template>
