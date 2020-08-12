@@ -7722,7 +7722,7 @@ msgstr ""
 msgid "Default classification label"
 msgstr ""
 
-msgid "Default deletion adjourned period"
+msgid "Default deletion delay"
 msgstr ""
 
 msgid "Default description template for issues"
@@ -12136,7 +12136,7 @@ msgstr ""
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
 msgstr ""
 
-msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day waiting period. This period can be %{customization_link} in instance settings"
+msgid "GroupSettings|Projects will be permanently deleted after a %{waiting_period}-day delay. This delay can be %{customization_link} in instance settings"
 msgstr ""
 
 msgid "GroupSettings|Select a sub-group as the custom project template source for this group."

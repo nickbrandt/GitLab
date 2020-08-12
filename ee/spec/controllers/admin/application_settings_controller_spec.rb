@@ -143,7 +143,7 @@ RSpec.describe Admin::ApplicationSettingsController do
       it_behaves_like 'settings for licensed features'
     end
 
-    context 'project deletion adjourned period' do
+    context 'project deletion delay' do
       let(:settings) { { deletion_adjourned_period: 6 } }
       let(:feature) { :adjourned_deletion_for_projects_and_groups }
 

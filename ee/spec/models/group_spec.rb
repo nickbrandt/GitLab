@@ -768,7 +768,7 @@ RSpec.describe Group do
   end
 
   describe '#self_or_ancestor_marked_for_deletion' do
-    context 'adjourned deletion feature is not available' do
+    context 'delayed deletion feature is not available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
         create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
@@ -779,7 +779,7 @@ RSpec.describe Group do
       end
     end
 
-    context 'adjourned deletion feature is available' do
+    context 'delayed deletion feature is available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
@@ -827,12 +827,12 @@ RSpec.describe Group do
   describe '#marked_for_deletion?' do
     subject { group.marked_for_deletion? }
 
-    context 'adjourned deletion feature is available' do
+    context 'delayed deletion feature is available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
-      context 'when the group is marked for adjourned deletion' do
+      context 'when the group is marked for delayed deletion' do
         before do
           create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
         end
@@ -840,17 +840,17 @@ RSpec.describe Group do
         it { is_expected.to be_truthy }
       end
 
-      context 'when the group is not marked for adjourned deletion' do
+      context 'when the group is not marked for delayed deletion' do
         it { is_expected.to be_falsey }
       end
     end
 
-    context 'adjourned deletion feature is not available' do
+    context 'delayed deletion feature is not available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
 
-      context 'when the group is marked for adjourned deletion' do
+      context 'when the group is marked for delayed deletion' do
         before do
           create(:group_deletion_schedule, group: group, marked_for_deletion_on: 1.day.ago)
         end
@@ -858,7 +858,7 @@ RSpec.describe Group do
         it { is_expected.to be_falsey }
       end
 
-      context 'when the group is not marked for adjourned deletion' do
+      context 'when the group is not marked for delayed deletion' do
         it { is_expected.to be_falsey }
       end
     end
@@ -875,12 +875,12 @@ RSpec.describe Group do
       it { is_expected.to be_truthy }
     end
 
-    context 'adjourned deletion feature is available' do
+    context 'delayed deletion feature is available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
-      context 'when adjourned deletion period is set to more than 0' do
+      context 'when delayed deletion period is set to more than 0' do
         before do
           stub_application_setting(deletion_adjourned_period: 1)
         end
@@ -888,7 +888,7 @@ RSpec.describe Group do
         it_behaves_like 'returns true'
       end
 
-      context 'when adjourned deletion period is set to 0' do
+      context 'when delayed deletion period is set to 0' do
         before do
           stub_application_setting(deletion_adjourned_period: 0)
         end
@@ -897,12 +897,12 @@ RSpec.describe Group do
       end
     end
 
-    context 'adjourned deletion feature is not available' do
+    context 'delayed deletion feature is not available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
 
-      context 'when adjourned deletion period is set to more than 0' do
+      context 'when delayed deletion period is set to more than 0' do
         before do
           stub_application_setting(deletion_adjourned_period: 1)
         end
@@ -910,7 +910,7 @@ RSpec.describe Group do
         it_behaves_like 'returns false'
       end
 
-      context 'when adjourned deletion period is set to 0' do
+      context 'when delayed deletion period is set to 0' do
         before do
           stub_application_setting(deletion_adjourned_period: 0)
         end
