@@ -48,7 +48,7 @@ module QA
             select_transfer_option(namespace.gsub(/([^\s])\/([^\s])/, '\1 / \2'))
             click_element(:transfer_button)
             fill_confirmation_text(project_name)
-            click_confirm_button
+            confirm_transfer
           end
 
           def click_export_project_link
