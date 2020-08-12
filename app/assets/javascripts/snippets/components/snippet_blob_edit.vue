@@ -92,7 +92,11 @@ export default {
 </script>
 <template>
   <div class="file-holder snippet">
-    <blob-header-edit v-model="filePath" data-qa-selector="file_name_field" />
+    <blob-header-edit
+      id="snippet_file_path"
+      v-model="filePath"
+      data-qa-selector="file_name_field"
+    />
     <gl-loading-icon
       v-if="isContentLoading"
       :label="__('Loading snippet')"

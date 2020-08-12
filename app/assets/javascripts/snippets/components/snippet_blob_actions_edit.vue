@@ -16,7 +16,7 @@ export default {
 
 <template>
   <div class="form-group file-editor">
-    <label>{{ s__('Snippets|File') }}</label>
+    <label for="snippet_file_path">{{ s__('Snippets|File') }}</label>
     <template v-if="blobs.length">
       <snippet-blob-edit v-for="blob in blobs" :key="blob.name" :blob="blob" v-on="$listeners" />
     </template>

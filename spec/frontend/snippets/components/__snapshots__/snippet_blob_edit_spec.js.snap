@@ -6,6 +6,7 @@ exports[`Snippet Blob Edit component rendering matches the snapshot 1`] = `
 >
   <blob-header-edit-stub
     data-qa-selector="file_name_field"
+    id="snippet_file_path"
     value="lorem.txt"
   />
    
