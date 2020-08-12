@@ -150,7 +150,7 @@ RSpec.describe API::Settings, 'EE Settings' do
     it_behaves_like 'settings for licensed features'
   end
 
-  context 'deletion adjourned period' do
+  context 'delayed deletion period' do
     let(:settings) { { deletion_adjourned_period: 5 } }
     let(:feature) { :adjourned_deletion_for_projects_and_groups }
 

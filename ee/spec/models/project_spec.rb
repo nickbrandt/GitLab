@@ -2369,7 +2369,7 @@ RSpec.describe Project do
   end
 
   describe '#ancestor_marked_for_deletion' do
-    context 'adjourned deletion feature is not available' do
+    context 'delayed deletion feature is not available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
@@ -2387,7 +2387,7 @@ RSpec.describe Project do
       end
     end
 
-    context 'adjourned deletion feature is available' do
+    context 'delayed deletion feature is available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end

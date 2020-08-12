@@ -1,7 +1,7 @@
 - return unless can?(current_user, :remove_project, project)
 - adjourned_deletion = project.adjourned_deletion?
 - adjourned_date = adjourned_deletion ? permanent_deletion_date(Time.now.utc).to_s : nil;
-- admin_help_path = help_page_path('user/admin_area/settings/visibility_and_access_controls', anchor: 'default-deletion-adjourned-period-premium-only')
+- admin_help_path = help_page_path('user/admin_area/settings/visibility_and_access_controls', anchor: 'default-deletion-delay-premium-only')
 - recovery_help_path = help_page_path('user/project/settings/index', anchor: 'remove-a-project')
 - confirm_phrase = s_('DeleteProject|Delete %{name}') % { name: project.full_name }
 

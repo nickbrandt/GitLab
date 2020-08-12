@@ -270,7 +270,7 @@ RSpec.describe ProjectsHelper do
       allow(project).to receive(:adjourned_deletion?).and_return(enabled)
     end
 
-    context 'when project has adjourned deletion enabled' do
+    context 'when project has delayed deletion enabled' do
       let(:enabled) { true }
 
       it do
@@ -280,7 +280,7 @@ RSpec.describe ProjectsHelper do
       end
     end
 
-    context 'when project has adjourned deletion disabled' do
+    context 'when project has delayed deletion disabled' do
       let(:enabled) { false }
 
       it do

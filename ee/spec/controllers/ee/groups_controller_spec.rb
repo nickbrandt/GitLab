@@ -94,7 +94,7 @@ RSpec.describe GroupsController do
         sign_in(user)
       end
 
-      context 'adjourned deletion feature is available' do
+      context 'delayed deletion feature is available' do
         before do
           stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
         end
@@ -130,7 +130,7 @@ RSpec.describe GroupsController do
         end
       end
 
-      context 'adjourned deletion feature is not available' do
+      context 'delayed deletion feature is not available' do
         before do
           stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
         end
@@ -168,13 +168,13 @@ RSpec.describe GroupsController do
         sign_in(user)
       end
 
-      context 'adjourned deletion feature is available' do
+      context 'delayed deletion feature is available' do
         before do
           stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
         end
 
         context 'success' do
-          it 'marks the group for adjourned deletion' do
+          it 'marks the group for delayed deletion' do
             expect { subject }.to change { group.reload.marked_for_deletion? }.from(false).to(true)
           end
 
@@ -184,7 +184,7 @@ RSpec.describe GroupsController do
             end
           end
 
-          it 'redirects to group path with notice about adjourned deletion' do
+          it 'redirects to group path with notice about delayed deletion' do
             subject
 
             expect(response).to redirect_to(group_path(group))
@@ -210,7 +210,7 @@ RSpec.describe GroupsController do
         end
       end
 
-      context 'adjourned deletion feature is not available' do
+      context 'delayed deletion feature is not available' do
         before do
           stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
         end
