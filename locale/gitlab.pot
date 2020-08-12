@@ -4550,9 +4550,6 @@ msgstr ""
 msgid "Check the %{docs_link_start}documentation%{docs_link_end}."
 msgstr ""
 
-msgid "Check your .gitlab-ci.yml"
-msgstr ""
-
 msgid "Check your Docker images for known vulnerabilities."
 msgstr ""
 
@@ -22459,6 +22456,9 @@ msgstr ""
 msgid "Similar issues"
 msgstr ""
 
+msgid "Simulate a pipeline created for the default branch"
+msgstr ""
+
 msgid "Single or combined queries"
 msgstr ""
 
@@ -26752,6 +26752,9 @@ msgid "Valid from"
 msgstr ""
 
 msgid "Validate"
+msgstr ""
+
+msgid "Validate your GitLab CI configuration"
 msgstr ""
 
 msgid "Validate your GitLab CI configuration file"
