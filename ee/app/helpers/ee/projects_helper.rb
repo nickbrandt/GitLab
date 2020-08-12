@@ -198,10 +198,7 @@ module EE
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
           not_enabled_scanners_help_path: help_page_path('user/application_security/index', anchor: 'quick-start'),
           no_pipeline_run_scanners_help_path: new_project_pipeline_path(project),
-          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
-          user_callouts_path: user_callouts_path,
-          user_callout_id: UserCalloutsHelper::STANDALONE_VULNERABILITIES_INTRODUCTION_BANNER,
-          show_introduction_banner: show_standalone_vulnerabilities_introduction_banner?.to_s
+          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index')
         }
       end
     end
