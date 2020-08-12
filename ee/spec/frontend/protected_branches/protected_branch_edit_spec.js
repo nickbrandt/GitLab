@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import MockAdapter from 'axios-mock-adapter';
-import ProtectedBranchEdit from 'ee/protected_branches/protected_branch_edit';
+import ProtectedBranchEdit from '~/protected_branches/protected_branch_edit';
 import { TEST_HOST } from 'helpers/test_constants';
 import flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
@@ -30,7 +30,7 @@ describe('EE ProtectedBranchEdit', () => {
       findCodeOwnerToggle().classList.add(IS_CHECKED_CLASS);
     }
 
-    return new ProtectedBranchEdit({ $wrap: $('#wrap') });
+    return new ProtectedBranchEdit({ $wrap: $('#wrap'), hasLicense: true });
   };
 
   afterEach(() => {
