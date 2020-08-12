@@ -39,7 +39,7 @@ module EE
         end
 
         def create_identity_and_member
-          return success_response if identity.save && member.errors.empty?
+          return success_response if member.valid? && identity.save
 
           error_response(objects: [identity, member])
         end

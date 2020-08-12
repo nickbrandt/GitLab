@@ -6,7 +6,12 @@ RSpec.describe ::EE::Gitlab::Scim::ProvisioningService do
   describe '#execute' do
     let(:group) { create(:group) }
     let(:service) { described_class.new(group, service_params) }
-    let!(:saml_provider) { create(:saml_provider, group: group, default_membership_role: Gitlab::Access::DEVELOPER) }
+    let(:enforced_sso) { false }
+    let!(:saml_provider) do
+      create(:saml_provider, group: group,
+                             enforced_sso: enforced_sso,
+                             default_membership_role: Gitlab::Access::DEVELOPER)
+    end
 
     before do
       stub_licensed_features(group_saml: true)
@@ -194,6 +199,22 @@ RSpec.describe ::EE::Gitlab::Scim::ProvisioningService do
 
           it 'creates the group member' do
             expect { service.execute }.to change { GroupMember.count }.by(1)
+          end
+
+          context 'with enforced SSO' do
+            let(:enforced_sso) { true }
+
+            it 'does not create the group member' do
+              expect { service.execute }.not_to change { GroupMember.count }
+            end
+
+            it 'does not create the SAML identity' do
+              expect { service.execute }.not_to change { Identity.count }
+            end
+
+            it 'does not create the SCIM identity' do
+              expect { service.execute }.not_to change { ScimIdentity.count }
+            end
           end
         end
 
