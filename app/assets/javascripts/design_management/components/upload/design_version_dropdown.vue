@@ -1,5 +1,5 @@
 <script>
-import { GlNewDropdown, GlNewDropdownItem } from '@gitlab/ui';
+import { GlNewDropdown, GlNewDropdownItem, GlSprintf } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import allVersionsMixin from '../../mixins/all_versions';
 import { findVersionId } from '../../utils/design_management_utils';
@@ -8,6 +8,7 @@ export default {
   components: {
     GlNewDropdown,
     GlNewDropdownItem,
+    GlSprintf,
   },
   mixins: [allVersionsMixin],
   computed: {
@@ -51,6 +52,12 @@ export default {
         query: { version: this.findVersionId(versionId) },
       });
     },
+    versionText(versionId) {
+      if (this.findVersionId(versionId) === this.latestVersionId) {
+        return __('Version %{versionNumber} (latest)');
+      }
+      return __('Version %{versionNumber}');
+    },
   },
 };
 </script>
@@ -64,12 +71,11 @@ export default {
       :is-checked="findVersionId(version.id) === currentVersionId"
       @click="routeToVersion(version.id)"
     >
-      <template>
-        {{ __('Version') }} {{ allVersions.length - index }}
-        <template v-if="findVersionId(version.id) === latestVersionId">
-          ({{ __('latest') }})
+      <gl-sprintf :message="versionText(version.id)">
+        <template #versionNumber>
+          {{ allVersions.length - index }}
         </template>
-      </template>
+      </gl-sprintf>
     </gl-new-dropdown-item>
   </gl-new-dropdown>
 </template>

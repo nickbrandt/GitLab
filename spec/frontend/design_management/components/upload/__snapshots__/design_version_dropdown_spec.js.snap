@@ -19,11 +19,9 @@ exports[`Design management design version dropdown component renders design vers
     ischeckitem="true"
     secondarytext=""
   >
-    
-      Version 2
-      
-        (latest)
-      
+    Version 
+        2
+       (latest)
   </gl-new-dropdown-item-stub>
   <gl-new-dropdown-item-stub
     avatarurl=""
@@ -33,10 +31,9 @@ exports[`Design management design version dropdown component renders design vers
     ischeckitem="true"
     secondarytext=""
   >
-    
-      Version 1
+    Version 
+        1
       
-    <!---->
   </gl-new-dropdown-item-stub>
 </gl-new-dropdown-stub>
 `;
@@ -60,11 +57,9 @@ exports[`Design management design version dropdown component renders design vers
     ischeckitem="true"
     secondarytext=""
   >
-    
-      Version 2
-      
-        (latest)
-      
+    Version 
+        2
+       (latest)
   </gl-new-dropdown-item-stub>
   <gl-new-dropdown-item-stub
     avatarurl=""
@@ -74,10 +69,9 @@ exports[`Design management design version dropdown component renders design vers
     ischeckitem="true"
     secondarytext=""
   >
-    
-      Version 1
+    Version 
+        1
       
-    <!---->
   </gl-new-dropdown-item-stub>
 </gl-new-dropdown-stub>
 `;
