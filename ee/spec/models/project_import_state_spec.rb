@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe ProjectImportState, type: :model do
+  include ::EE::GeoHelpers
+
   describe 'Project import job' do
     let(:project) { import_state.project }
 
@@ -33,6 +35,47 @@ RSpec.describe ProjectImportState, type: :model do
     let(:project) { import_state.project }
 
     context 'state transition: [:started] => [:finished]' do
+      context 'Geo repository update events' do
+        let(:repository_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+        let(:wiki_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+        let(:design_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+
+        before do
+          allow(::Geo::RepositoryUpdatedService)
+            .to receive(:new)
+            .with(project.repository)
+            .and_return(repository_updated_service)
+
+          allow(::Geo::RepositoryUpdatedService)
+            .to receive(:new)
+            .with(project.wiki.repository)
+            .and_return(wiki_updated_service)
+
+          allow(::Geo::RepositoryUpdatedService)
+            .to receive(:new)
+            .with(project.design_repository)
+            .and_return(design_updated_service)
+        end
+
+        it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node', :aggregate_failures do
+          stub_primary_node
+
+          expect(repository_updated_service).to receive(:execute).once
+          expect(wiki_updated_service).to receive(:execute).once
+          expect(design_updated_service).to receive(:execute).once
+
+          import_state.finish
+        end
+
+        it 'does not call Geo::RepositoryUpdatedService when not running on a Geo primary node', :aggregate_failures do
+          expect(repository_updated_service).not_to receive(:execute)
+          expect(wiki_updated_service).not_to receive(:execute)
+          expect(design_updated_service).not_to receive(:execute)
+
+          import_state.finish
+        end
+      end
+
       context 'elasticsearch indexing disabled for this project' do
         before do
           expect(project).to receive(:use_elasticsearch?).and_return(false)
