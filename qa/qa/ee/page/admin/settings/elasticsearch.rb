@@ -5,7 +5,7 @@ module QA
     module Page
       module Admin
         module Settings
-          class Integration < QA::Page::Base
+          class Elasticsearch < QA::Page::Base
             include QA::Page::Settings::Common
 
             view 'ee/app/views/admin/application_settings/_elasticsearch_form.html.haml' do
