@@ -171,7 +171,7 @@ module Elastic
           limit =
             { terms: { "#{feature}_access_level" => [::ProjectFeature::ENABLED, ::ProjectFeature::PRIVATE] } }
 
-          { bool: { filter: [condition, limit].compact } }
+          { bool: { filter: [condition, limit] } }
         end
       end
 
@@ -226,10 +226,23 @@ module Elastic
         # When reading cross project is not allowed, only allow searching a
         # a single project, so the `:read_*` ability is only checked once.
         unless Ability.allowed?(current_user, :read_cross_project)
-          project_ids = [] if project_ids.size > 1
+          return [] if project_ids.size > 1
         end
 
         project_ids
+      end
+
+      def authorized_project_ids(current_user, options = {})
+        return [] unless current_user
+
+        scoped_project_ids = scoped_project_ids(current_user, options[:project_ids])
+        authorized_project_ids = current_user.authorized_projects(Gitlab::Access::REPORTER).pluck_primary_key.to_set
+
+        # if the current search is limited to a subset of projects, we should do
+        # confidentiality check for these projects.
+        authorized_project_ids &= scoped_project_ids.to_set unless scoped_project_ids == :any
+
+        authorized_project_ids.to_a
       end
     end
   end

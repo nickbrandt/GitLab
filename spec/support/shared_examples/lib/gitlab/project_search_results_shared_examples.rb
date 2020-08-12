@@ -10,10 +10,6 @@ RSpec.shared_examples 'access restricted confidential issues' do
   let!(:security_issue_1) { create(:issue, :confidential, project: project, title: 'Security issue 1', author: author) }
   let!(:security_issue_2) { create(:issue, :confidential, title: 'Security issue 2', project: project, assignees: [assignee]) }
 
-  before do
-    stub_feature_flags(user_mode_in_session: false)
-  end
-
   subject(:objects) do
     described_class.new(user, query, project: project).objects('issues')
   end
