@@ -26,6 +26,7 @@ module EE
         mount_mutation ::Mutations::Pipelines::RunDastScan
         mount_mutation ::Mutations::DastOnDemandScans::Create
         mount_mutation ::Mutations::DastSiteProfiles::Create
+        mount_mutation ::Mutations::DastSiteProfiles::Update
         mount_mutation ::Mutations::DastSiteProfiles::Delete
         mount_mutation ::Mutations::DastScannerProfiles::Create
         mount_mutation ::Mutations::Security::CiConfiguration::ConfigureSast
