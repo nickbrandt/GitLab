@@ -13037,7 +13037,7 @@ msgstr ""
 msgid "Install on clusters"
 msgstr ""
 
-msgid "Installation Commands"
+msgid "Installation"
 msgstr ""
 
 msgid "Installed"
@@ -17158,9 +17158,6 @@ msgstr ""
 msgid "PackageRegistry|If you haven't already done so, you will need to add the below to your %{codeStart}pom.xml%{codeEnd} file."
 msgstr ""
 
-msgid "PackageRegistry|Installation"
-msgstr ""
-
 msgid "PackageRegistry|Is your favorite package manager missing? We'd love your help in building first-class support for it into GitLab! %{contributionLinkStart}Visit the contribution documentation%{contributionLinkEnd} to learn more about how to build support for new package managers into GitLab. Below is a list of package managers that are on our radar."
 msgstr ""
 
@@ -17207,9 +17204,6 @@ msgid "PackageRegistry|PyPi"
 msgstr ""
 
 msgid "PackageRegistry|Recipe: %{recipe}"
-msgstr ""
-
-msgid "PackageRegistry|Registry Setup"
 msgstr ""
 
 msgid "PackageRegistry|Remove package"
@@ -17266,13 +17260,13 @@ msgstr ""
 msgid "PackageRegistry|composer.json require package include"
 msgstr ""
 
-msgid "PackageRegistry|npm"
+msgid "PackageRegistry|npm command"
 msgstr ""
 
 msgid "PackageRegistry|published by %{author}"
 msgstr ""
 
-msgid "PackageRegistry|yarn"
+msgid "PackageRegistry|yarn command"
 msgstr ""
 
 msgid "PackageType|Composer"
@@ -20032,6 +20026,9 @@ msgid "Registration|Your first project"
 msgstr ""
 
 msgid "Registration|Your profile"
+msgstr ""
+
+msgid "Registry setup"
 msgstr ""
 
 msgid "Regulate approvals by authors/committers, based on compliance frameworks. Can be changed only at the instance level."
