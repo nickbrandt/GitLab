@@ -6,6 +6,15 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        field :iteration, ::Types::IterationType,
+              null: true,
+              resolve: -> (_obj, args, _ctx) { ::GitlabSchema.find_by_gid(args[:id]) },
+              description: 'Find an iteration' do
+          argument :id, ::Types::GlobalIDType[Iteration],
+                   required: true,
+                   description: 'Find an iteration by its ID'
+        end
+
         field :vulnerabilities,
               ::Types::VulnerabilityType.connection_type,
               null: true,
