@@ -12,10 +12,10 @@ This document uses the word `agent` to mean GitLab Kubernetes Agent on the conce
 
 Each agent has an identity that is unique within a GitLab installation. Each agent has an immutable name that is unique within the project the agent is attached to. Agent names follow the DNS label standard as defined in [RFC 1123](https://tools.ietf.org/html/rfc1123). This means the name must:
 
-- contain at most 63 characters.
-- contain only lowercase alphanumeric characters or `-`.
-- start with an alphanumeric character.
-- end with an alphanumeric character.
+- Contain at most 63 characters.
+- Contain only lowercase alphanumeric characters or `-`.
+- Start with an alphanumeric character.
+- End with an alphanumeric character.
 
 Kubernetes uses the [same naming restriction](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names) for some names.
 
@@ -43,6 +43,7 @@ Each agent may have 0 or more tokens in GitLab's database. Ability to have sever
 - A text field to store any comments the administrator may want to make about the token for future self.
 
 Tokens are immutable. Only the following fields can be updated:
+
 - Revocation flag. Can only be updated to `true` once. Immutable after that.
 - Revocation time. Set automatically to the current time when revocation flag is set. Immutable after that.
 - Comments field. Can be updated any number of times, including after the token has been revoked.
@@ -55,5 +56,5 @@ Tokens can be managed by users with `maintainer` and higher level of permissions
 
 GitLab will provide the following information as part of the response for a given Agent access token:
 
-- Agent config git repository (Note: we don't have per-folder authorization)
+- Agent configuration Git repository (Note: we don't have per-folder authorization)
 - Agent name
