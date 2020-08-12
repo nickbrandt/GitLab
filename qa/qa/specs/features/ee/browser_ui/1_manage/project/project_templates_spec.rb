@@ -70,17 +70,19 @@ module QA
         before do
           Flow::Login.sign_in_as_admin
 
-          Page::Main::Menu.perform(&:go_to_admin_area)
-          Page::Admin::Menu.perform(&:go_to_template_settings)
+          Support::Retrier.retry_until do
+            Page::Main::Menu.perform(&:go_to_admin_area)
+            Page::Admin::Menu.perform(&:go_to_template_settings)
 
-          EE::Page::Admin::Settings::Templates.perform do |templates|
-            templates.choose_custom_project_template("#{@template_container_group_name}")
-          end
+            EE::Page::Admin::Settings::Templates.perform do |templates|
+              templates.choose_custom_project_template("#{@template_container_group_name}")
+            end
 
-          Page::Admin::Menu.perform(&:go_to_template_settings)
+            Page::Admin::Menu.perform(&:go_to_template_settings)
 
-          EE::Page::Admin::Settings::Templates.perform do |templates|
-            expect(templates.current_custom_project_template).to include @template_container_group_name
+            EE::Page::Admin::Settings::Templates.perform do |templates|
+              templates.current_custom_project_template.include? @template_container_group_name
+            end
           end
 
           Resource::Group.fabricate_via_api!.visit!
