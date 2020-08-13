@@ -25,6 +25,7 @@ module QA
                 element :security_compliance_link
                 element :group_secure_submenu
                 element :security_dashboard_link
+                element :vulnerability_report_link
               end
 
               view 'ee/app/views/layouts/nav/_group_insights_link.html.haml' do
@@ -115,6 +116,14 @@ module QA
             hover_element(:security_compliance_link) do
               within_submenu(:group_secure_submenu) do
                 click_element(:security_dashboard_link)
+              end
+            end
+          end
+
+          def click_group_vulnerability_link
+            hover_element(:security_compliance_link) do
+              within_submenu(:group_secure_submenu) do
+                click_element(:vulnerability_report_link)
               end
             end
           end
