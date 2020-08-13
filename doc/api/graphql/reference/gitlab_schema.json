@@ -48991,6 +48991,34 @@
           "description": null,
           "fields": [
             {
+              "name": "emoji",
+              "description": "String representation of emoji",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "message",
+              "description": "User status message",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "messageHtml",
               "description": "HTML of the user status message",
               "args": [

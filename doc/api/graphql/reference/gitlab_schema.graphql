@@ -16722,6 +16722,16 @@ enum UserState {
 
 type UserStatus {
   """
+  String representation of emoji
+  """
+  emoji: String
+
+  """
+  User status message
+  """
+  message: String
+
+  """
   HTML of the user status message
   """
   messageHtml: String
