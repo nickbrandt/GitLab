@@ -69,6 +69,11 @@ export default {
       required: false,
       default: false,
     },
+    previewMarkdownPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -126,6 +131,7 @@ export default {
       :group-path="fullPath"
       :is-editing="true"
       :iteration="iteration"
+      :preview-markdown-path="previewMarkdownPath"
       @updated="isEditing = false"
       @cancel="isEditing = false"
     />
@@ -157,7 +163,7 @@ export default {
         </gl-new-dropdown>
       </div>
       <h3 ref="title" class="page-title">{{ iteration.title }}</h3>
-      <div ref="description" v-text="iteration.description"></div>
+      <div ref="description" v-html="iteration.descriptionHtml"></div>
       <iteration-report-summary :group-path="fullPath" :iteration-id="iteration.id" />
       <iteration-report-tabs :group-path="fullPath" :iteration-id="iteration.id" />
     </template>

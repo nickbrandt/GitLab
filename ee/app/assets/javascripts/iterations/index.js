@@ -52,7 +52,7 @@ export function initIterationForm() {
 export function initIterationReport() {
   const el = document.querySelector('.js-iteration');
 
-  const { fullPath, iterationIid, editIterationPath } = el.dataset;
+  const { fullPath, iterationIid, editIterationPath, previewMarkdownPath } = el.dataset;
   const canEdit = parseBoolean(el.dataset.canEdit);
 
   return new Vue({
@@ -65,6 +65,7 @@ export function initIterationReport() {
           iterationIid,
           canEdit,
           editIterationPath,
+          previewMarkdownPath,
         },
       });
     },

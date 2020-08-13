@@ -21043,6 +21043,20 @@
               "deprecationReason": null
             },
             {
+              "name": "descriptionHtml",
+              "description": "The GitLab Flavored Markdown rendering of `description`",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "dueDate",
               "description": "Timestamp of the iteration due date",
               "args": [
