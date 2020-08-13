@@ -16,7 +16,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     push_frontend_feature_flag(:ci_instance_variables_ui, default_enabled: true)
   end
 
-  VALID_SETTING_PANELS = %w(general integrations repository
+  VALID_SETTING_PANELS = %w(general repository
                             ci_cd reporting metrics_and_profiling
                             network preferences).freeze
 

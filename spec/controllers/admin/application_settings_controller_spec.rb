@@ -142,7 +142,7 @@ RSpec.describe Admin::ApplicationSettingsController do
     end
 
     describe 'verify panel actions' do
-      (Admin::ApplicationSettingsController::VALID_SETTING_PANELS - ['integrations']).each do |valid_action|
+      Admin::ApplicationSettingsController::VALID_SETTING_PANELS.each do |valid_action|
         it_behaves_like 'renders correct panels' do
           let(:action) { valid_action }
         end
