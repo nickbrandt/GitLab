@@ -7,6 +7,8 @@ RSpec.describe Types::UserStatusType do
 
   it 'exposes the expected fields' do
     expected_fields = %i[
+      emoji
+      message
       message_html
     ]
 
