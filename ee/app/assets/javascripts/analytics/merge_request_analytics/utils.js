@@ -1,4 +1,5 @@
 import { getMonthNames, dateFromParams } from '~/lib/utils/datetime_utility';
+import { dateFormats } from '../shared/constants';
 import dateFormat from 'dateformat';
 
 /**
@@ -18,12 +19,12 @@ import dateFormat from 'dateformat';
  * @return {Array} the computed month data
  */
 // eslint-disable-next-line import/prefer-default-export
-export const computeMonthRangeData = (startDate, endDate, format = 'yyyy-mm-dd') => {
+export const computeMonthRangeData = (startDate, endDate, format = dateFormats.isoDate) => {
   const monthData = [];
   const monthNames = getMonthNames(true);
 
   for (
-    let dateCursor = endDate;
+    let dateCursor = new Date(endDate);
     dateCursor >= startDate;
     dateCursor.setMonth(dateCursor.getMonth() - 1)
   ) {
