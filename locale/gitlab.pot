@@ -22366,6 +22366,12 @@ msgstr ""
 msgid "Showing last %{size} of log -"
 msgstr ""
 
+msgid "Showing latest version"
+msgstr ""
+
+msgid "Showing version #%{versionNumber}"
+msgstr ""
+
 msgid "Side-by-side"
 msgstr ""
 
@@ -26848,6 +26854,12 @@ msgid "Verify configuration"
 msgstr ""
 
 msgid "Version"
+msgstr ""
+
+msgid "Version %{versionNumber}"
+msgstr ""
+
+msgid "Version %{versionNumber} (latest)"
 msgstr ""
 
 msgid "View Documentation"
