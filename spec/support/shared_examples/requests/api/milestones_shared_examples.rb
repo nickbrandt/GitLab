@@ -102,6 +102,60 @@ RSpec.shared_examples 'group and project milestones' do |route_definition|
       expect(json_response.first['title']).to eq milestone.title
       expect(json_response.first['id']).to eq milestone.id
     end
+
+    context 'when include_parent_milestones is true' do
+      let(:route) { "/groups/#{sub_parent.id}/milestones" }
+      let(:params) { { include_parent_milestones: true } }
+
+      shared_examples 'request to list milestones with parent milestones' do
+        it 'includes parent milestones' do
+          get api(route, user), params: params
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(milestones.size)
+          expect(json_response.map { |entry| entry["id"] }).to eq(milestones.map(&:id))
+        end
+      end
+
+      context 'when user has access' do
+        before do
+          parent.add_developer(user)
+          sub_parent.add_developer(user)
+        end
+
+        it_behaves_like 'request to list milestones with parent milestones' do
+          let(:milestones) { [milestone, closed_milestone, sub_milestone] }
+        end
+
+        context 'when iids param is present' do
+          before do
+            params.merge(iids: [milestone.iid])
+          end
+
+          it_behaves_like 'request to list milestones with parent milestones' do
+            let(:milestones) { [milestone, closed_milestone, sub_milestone] }
+          end
+        end
+      end
+
+      context 'when user has no access to an ancestor group' do
+        let(:user2) { create(:user) }
+
+        before do
+          sub_parent.add_developer(user2)
+        end
+
+        it 'does not show ancestor group milestones' do
+          milestones = [sub_milestone]
+
+          get api(route, user2), params: params
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response.size).to eq(milestones.size)
+          expect(json_response.map { |entry| entry["id"] }).to eq(milestones.map(&:id))
+        end
+      end
+    end
   end
 
   describe "GET #{route_definition}/:milestone_id" do
