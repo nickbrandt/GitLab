@@ -89,13 +89,5 @@ RSpec.describe Projects::DastSiteProfilesController, type: :request do
     it_behaves_like 'a GET request' do
       let(:path) { edit_path }
     end
-
-    it 'assigns DAST site profile global ID' do
-      with_feature_available
-      with_user_authorized
-      get edit_project_dast_site_profile_path(project, dast_site_profile)
-
-      expect(assigns(:site_profile_gid)).to eq(dast_site_profile.to_global_id)
-    end
   end
 end
