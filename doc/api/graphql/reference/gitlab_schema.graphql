@@ -7720,6 +7720,11 @@ type Iteration {
   description: String
 
   """
+  The GitLab Flavored Markdown rendering of `description`
+  """
+  descriptionHtml: String
+
+  """
   Timestamp of the iteration due date
   """
   dueDate: Time

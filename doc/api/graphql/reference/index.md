@@ -1167,6 +1167,7 @@ Represents an iteration object.
 | ---   |  ---- | ----------  |
 | `createdAt` | Time! | Timestamp of iteration creation |
 | `description` | String | Description of the iteration |
+| `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `dueDate` | Time | Timestamp of the iteration due date |
 | `id` | ID! | ID of the iteration |
 | `iid` | ID! | Internal ID of the iteration |

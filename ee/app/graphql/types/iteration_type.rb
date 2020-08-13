@@ -20,6 +20,7 @@ module Types
 
     field :description, GraphQL::STRING_TYPE, null: true,
           description: 'Description of the iteration'
+    markdown_field :description_html, null: true
 
     field :state, Types::IterationStateEnum, null: false,
           description: 'State of the iteration'
