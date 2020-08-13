@@ -302,7 +302,6 @@ export default {
         />
       </gl-form-group>
       <gl-form-group
-        v-if="glFeatures.alertRunbooks"
         :label="s__('PrometheusAlerts|Runbook URL (optional)')"
         label-for="alert-runbook"
       >
