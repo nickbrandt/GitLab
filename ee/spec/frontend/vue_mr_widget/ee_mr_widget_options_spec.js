@@ -16,7 +16,6 @@ import mockData, {
 import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import axios from '~/lib/utils/axios_utils';
-import { MTWPS_MERGE_STRATEGY, MT_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 import {
   sastDiffSuccessMock,
   dastDiffSuccessMock,
@@ -942,20 +941,6 @@ describe('ee merge request widget options', () => {
         expect(vm.shouldRenderApprovals).toBeTruthy();
       });
     });
-
-    describe('shouldRenderMergeTrainHelperText', () => {
-      it('should return true if MTWPS is available and the user has not yet pressed the MTWPS button', () => {
-        vm = mountComponent(Component, {
-          mrData: {
-            ...mockData,
-            available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
-            auto_merge_enabled: false,
-          },
-        });
-
-        expect(vm.shouldRenderMergeTrainHelperText).toBe(true);
-      });
-    });
   });
 
   describe('rendering source branch removal status', () => {
@@ -1051,115 +1036,6 @@ describe('ee merge request widget options', () => {
       const ciWidget = vm.$el.querySelector('.mr-state-widget .label-branch');
 
       expect(ciWidget.innerHTML).toBe(sourceBranchLink);
-    });
-  });
-
-  describe('merge train helper text', () => {
-    const getHelperTextElement = () => vm.$el.querySelector('.js-merge-train-helper-text');
-
-    it('does not render the merge train helpe text if the MTWPS strategy is not available', () => {
-      vm = mountComponent(Component, {
-        mrData: {
-          ...mockData,
-          available_auto_merge_strategies: [MT_MERGE_STRATEGY],
-          pipeline: {
-            ...mockData.pipeline,
-            active: true,
-          },
-        },
-      });
-
-      const helperText = getHelperTextElement();
-
-      expect(helperText).not.toExist();
-    });
-
-    it('renders the correct merge train helper text when there is an existing merge train', () => {
-      vm = mountComponent(Component, {
-        mrData: {
-          ...mockData,
-          available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
-          merge_trains_count: 2,
-          merge_train_when_pipeline_succeeds_docs_path: 'path/to/help',
-          pipeline: {
-            ...mockData.pipeline,
-            id: 123,
-            active: true,
-          },
-        },
-      });
-
-      const helperText = getHelperTextElement();
-
-      expect(helperText).toExist();
-      expect(helperText.textContent).toContain(
-        'This merge request will be added to the merge train when pipeline #123 succeeds.',
-      );
-    });
-
-    it('renders the correct merge train helper text when there is no existing merge train', () => {
-      vm = mountComponent(Component, {
-        mrData: {
-          ...mockData,
-          available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
-          merge_trains_count: 0,
-          merge_train_when_pipeline_succeeds_docs_path: 'path/to/help',
-          pipeline: {
-            ...mockData.pipeline,
-            id: 123,
-            active: true,
-          },
-        },
-      });
-
-      const helperText = getHelperTextElement();
-
-      expect(helperText).toExist();
-      expect(helperText.textContent).toContain(
-        'This merge request will start a merge train when pipeline #123 succeeds.',
-      );
-    });
-
-    it('renders the correct pipeline link inside the message', () => {
-      vm = mountComponent(Component, {
-        mrData: {
-          ...mockData,
-          available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
-          merge_train_when_pipeline_succeeds_docs_path: 'path/to/help',
-          pipeline: {
-            ...mockData.pipeline,
-            id: 123,
-            path: 'path/to/pipeline',
-            active: true,
-          },
-        },
-      });
-
-      const pipelineLink = getHelperTextElement().querySelector('.js-pipeline-link');
-
-      expect(pipelineLink).toExist();
-      expect(pipelineLink.textContent).toContain('#123');
-      expect(pipelineLink).toHaveAttr('href', 'path/to/pipeline');
-    });
-
-    it('renders the documentation link inside the message', () => {
-      vm = mountComponent(Component, {
-        mrData: {
-          ...mockData,
-          available_auto_merge_strategies: [MTWPS_MERGE_STRATEGY],
-          merge_train_when_pipeline_succeeds_docs_path: 'path/to/help',
-          pipeline: {
-            ...mockData.pipeline,
-            active: true,
-          },
-        },
-      });
-
-      const pipelineLink = getHelperTextElement().querySelector('.js-documentation-link');
-
-      expect(pipelineLink).toExist();
-      expect(pipelineLink.textContent).toContain('More information');
-      expect(pipelineLink).toHaveAttr('href', 'path/to/help');
     });
   });
 
