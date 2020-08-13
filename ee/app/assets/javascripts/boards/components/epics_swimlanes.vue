@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import { n__ } from '~/locale';
 import { GlIcon, GlTooltipDirective } from '@gitlab/ui';
 import BoardListHeader from 'ee_else_ce/boards/components/board_list_header.vue';
@@ -39,14 +39,30 @@ export default {
       required: false,
       default: 0,
     },
+    rootPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
-    ...mapState(['epics']),
-    issuesCount() {
-      return this.lists.reduce((total, list) => total + list.issues.length, 0);
+    ...mapState(['epics', 'issuesByListId', 'isLoadingIssues']),
+    unassignedIssuesCount() {
+      return this.lists.reduce((total, list) => total + this.unassignedIssues(list).length, 0);
     },
-    issuesCountTooltipText() {
-      return n__(`%d unassigned issue`, `%d unassigned issues`, this.issuesCount);
+    unassignedIssuesCountTooltipText() {
+      return n__(`%d unassigned issue`, `%d unassigned issues`, this.unassignedIssuesCount);
+    },
+  },
+  mounted() {
+    this.fetchIssuesForAllLists();
+  },
+  methods: {
+    ...mapActions(['fetchIssuesForAllLists']),
+    unassignedIssues(list) {
+      if (this.issuesByListId[list.id]) {
+        return this.issuesByListId[list.id].filter(i => i.epic === null);
+      }
+      return [];
     },
   },
 };
@@ -78,7 +94,16 @@ export default {
       </div>
     </div>
     <div class="board-epics-swimlanes gl-display-table">
-      <epic-lane v-for="epic in epics" :key="epic.id" :epic="epic" :lists="lists" />
+      <epic-lane
+        v-for="epic in epics"
+        :key="epic.id"
+        :epic="epic"
+        :lists="lists"
+        :issues="issuesByListId"
+        :is-loading-issues="isLoadingIssues"
+        :disabled="disabled"
+        :root-path="rootPath"
+      />
       <div class="board-lane-unassigned-issues gl-sticky gl-display-inline-block gl-left-0">
         <div class="gl-left-0 gl-py-5 gl-px-3 gl-display-flex gl-align-items-center">
           <span
@@ -88,14 +113,14 @@ export default {
           </span>
           <span
             v-gl-tooltip.hover
-            :title="issuesCountTooltipText"
+            :title="unassignedIssuesCountTooltipText"
             class="gl-display-flex gl-align-items-center gl-text-gray-700"
             tabindex="0"
-            :aria-label="issuesCountTooltipText"
+            :aria-label="unassignedIssuesCountTooltipText"
             data-testid="issues-lane-issue-count"
           >
             <gl-icon class="gl-mr-2 gl-flex-shrink-0" name="issues" aria-hidden="true" />
-            <span aria-hidden="true">{{ issuesCount }}</span>
+            <span aria-hidden="true">{{ unassignedIssuesCount }}</span>
           </span>
         </div>
       </div>
@@ -104,9 +129,12 @@ export default {
           v-for="list in lists"
           :key="`${list.id}-issues`"
           :list="list"
-          :issues="list.issues"
+          :issues="unassignedIssues(list)"
           :group-id="groupId"
           :is-unassigned-issues-lane="true"
+          :is-loading="isLoadingIssues"
+          :disabled="disabled"
+          :root-path="rootPath"
         />
       </div>
     </div>
