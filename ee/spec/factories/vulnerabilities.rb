@@ -57,6 +57,20 @@ FactoryBot.define do
       end
     end
 
+    trait :with_notes do
+      transient do
+        notes_count { 3 }
+      end
+
+      after(:create) do |vulnerability, evaluator|
+        create_list(
+          :note_on_vulnerability,
+          evaluator.notes_count,
+          noteable: vulnerability,
+          project: vulnerability.project)
+      end
+    end
+
     trait :with_findings do
       after(:build) do |vulnerability|
         findings_with_solution = build_list(
