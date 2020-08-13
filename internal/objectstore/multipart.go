@@ -22,12 +22,16 @@ var ErrNotEnoughParts = errors.New("not enough Parts")
 // Multipart represents a MultipartUpload on a S3 compatible Object Store service.
 // It can be used as io.WriteCloser for uploading an object
 type Multipart struct {
+	PartURLs []string
 	// CompleteURL is a presigned URL for CompleteMultipartUpload
 	CompleteURL string
 	// AbortURL is a presigned URL for AbortMultipartUpload
 	AbortURL string
 	// DeleteURL is a presigned URL for RemoveObject
-	DeleteURL string
+	DeleteURL  string
+	PutHeaders map[string]string
+	partSize   int64
+	etag       string
 
 	uploader
 }
@@ -36,87 +40,117 @@ type Multipart struct {
 // then uploaded with S3 Upload Part. Once Multipart is Closed a final call to CompleteMultipartUpload will be sent.
 // In case of any error a call to AbortMultipartUpload will be made to cleanup all the resources
 func NewMultipart(ctx context.Context, partURLs []string, completeURL, abortURL, deleteURL string, putHeaders map[string]string, deadline time.Time, partSize int64) (*Multipart, error) {
-	pr, pw := io.Pipe()
-	uploadCtx, cancelFn := context.WithDeadline(ctx, deadline)
 	m := &Multipart{
+		PartURLs:    partURLs,
 		CompleteURL: completeURL,
 		AbortURL:    abortURL,
 		DeleteURL:   deleteURL,
-		uploader:    newUploader(uploadCtx, pw),
+		PutHeaders:  putHeaders,
+		partSize:    partSize,
 	}
 
-	go m.trackUploadTime()
-	go m.cleanup(ctx)
-
-	objectStorageUploadsOpen.Inc()
-
-	go func() {
-		defer cancelFn()
-		defer objectStorageUploadsOpen.Dec()
-		defer func() {
-			// This will be returned as error to the next write operation on the pipe
-			pr.CloseWithError(m.uploadError)
-		}()
-
-		cmu := &CompleteMultipartUpload{}
-		for i, partURL := range partURLs {
-			src := io.LimitReader(pr, partSize)
-			part, err := m.readAndUploadOnePart(partURL, putHeaders, src, i+1)
-			if err != nil {
-				m.uploadError = err
-				return
-			}
-			if part == nil {
-				break
-			} else {
-				cmu.Part = append(cmu.Part, part)
-			}
-		}
-
-		n, err := io.Copy(ioutil.Discard, pr)
-		if err != nil {
-			m.uploadError = fmt.Errorf("drain pipe: %v", err)
-			return
-		}
-		if n > 0 {
-			m.uploadError = ErrNotEnoughParts
-			return
-		}
-
-		if err := m.complete(cmu); err != nil {
-			m.uploadError = err
-			return
-		}
-	}()
+	m.uploader = newUploader(m)
+	m.Execute(ctx, deadline)
 
 	return m, nil
 }
 
-func (m *Multipart) trackUploadTime() {
-	started := time.Now()
-	<-m.ctx.Done()
-	objectStorageUploadTime.Observe(time.Since(started).Seconds())
-}
-
-func (m *Multipart) cleanup(ctx context.Context) {
-	// wait for the upload to finish
-	<-m.ctx.Done()
-
-	if m.uploadError != nil {
-		objectStorageUploadRequestsRequestFailed.Inc()
-		m.abort()
-		return
+func (m *Multipart) Upload(ctx context.Context, r io.Reader) error {
+	cmu := &CompleteMultipartUpload{}
+	for i, partURL := range m.PartURLs {
+		src := io.LimitReader(r, m.partSize)
+		part, err := m.readAndUploadOnePart(ctx, partURL, m.PutHeaders, src, i+1)
+		if err != nil {
+			return err
+		}
+		if part == nil {
+			break
+		} else {
+			cmu.Part = append(cmu.Part, part)
+		}
 	}
 
-	// We have now successfully uploaded the file to object storage. Another
-	// goroutine will hand off the object to gitlab-rails.
-	<-ctx.Done()
+	n, err := io.Copy(ioutil.Discard, r)
+	if err != nil {
+		return fmt.Errorf("drain pipe: %v", err)
+	}
+	if n > 0 {
+		return ErrNotEnoughParts
+	}
 
-	// gitlab-rails is now done with the object so it's time to delete it.
-	m.delete()
+	if err := m.complete(ctx, cmu); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
+func (m *Multipart) ETag() string {
+	return m.etag
+}
+func (m *Multipart) Abort() {
+	deleteURL(m.AbortURL)
+}
+
+func (m *Multipart) Delete() {
+	deleteURL(m.DeleteURL)
+}
+
+func (m *Multipart) readAndUploadOnePart(ctx context.Context, partURL string, putHeaders map[string]string, src io.Reader, partNumber int) (*completeMultipartUploadPart, error) {
+	file, err := ioutil.TempFile("", "part-buffer")
+	if err != nil {
+		return nil, fmt.Errorf("create temporary buffer file: %v", err)
+	}
+	defer func(path string) {
+		if err := os.Remove(path); err != nil {
+			log.WithError(err).WithField("file", path).Warning("Unable to delete temporary file")
+		}
+	}(file.Name())
+
+	n, err := io.Copy(file, src)
+	if err != nil {
+		return nil, fmt.Errorf("write part %d to disk: %v", partNumber, err)
+	}
+	if n == 0 {
+		return nil, nil
+	}
+
+	if _, err = file.Seek(0, io.SeekStart); err != nil {
+		return nil, fmt.Errorf("rewind part %d temporary dump : %v", partNumber, err)
+	}
+
+	etag, err := m.uploadPart(ctx, partURL, putHeaders, file, n)
+	if err != nil {
+		return nil, fmt.Errorf("upload part %d: %v", partNumber, err)
+	}
+	return &completeMultipartUploadPart{PartNumber: partNumber, ETag: etag}, nil
+}
+
+func (m *Multipart) uploadPart(ctx context.Context, url string, headers map[string]string, body io.Reader, size int64) (string, error) {
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		return "", fmt.Errorf("missing deadline")
+	}
+
+	part, err := newObject(ctx, url, "", headers, deadline, size, false)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = io.CopyN(part, body, size)
+	if err != nil {
+		return "", err
+	}
+
+	err = part.Close()
+	if err != nil {
+		return "", err
+	}
+
+	return part.ETag(), nil
+}
+
+func (m *Multipart) complete(ctx context.Context, cmu *CompleteMultipartUpload) error {
 	body, err := xml.Marshal(cmu)
 	if err != nil {
 		return fmt.Errorf("marshal CompleteMultipartUpload request: %v", err)
@@ -128,7 +162,7 @@ func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 	}
 	req.ContentLength = int64(len(body))
 	req.Header.Set("Content-Type", "application/xml")
-	req = req.WithContext(m.ctx)
+	req = req.WithContext(ctx)
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -154,69 +188,7 @@ func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 		return fmt.Errorf("empty CompleteMultipartUploadResult")
 	}
 
-	m.extractETag(result.ETag)
+	m.etag = extractETag(result.ETag)
 
 	return nil
-}
-
-func (m *Multipart) readAndUploadOnePart(partURL string, putHeaders map[string]string, src io.Reader, partNumber int) (*completeMultipartUploadPart, error) {
-	file, err := ioutil.TempFile("", "part-buffer")
-	if err != nil {
-		return nil, fmt.Errorf("create temporary buffer file: %v", err)
-	}
-	defer func(path string) {
-		if err := os.Remove(path); err != nil {
-			log.WithError(err).WithField("file", path).Warning("Unable to delete temporary file")
-		}
-	}(file.Name())
-
-	n, err := io.Copy(file, src)
-	if err != nil {
-		return nil, fmt.Errorf("write part %d to disk: %v", partNumber, err)
-	}
-	if n == 0 {
-		return nil, nil
-	}
-
-	if _, err = file.Seek(0, io.SeekStart); err != nil {
-		return nil, fmt.Errorf("rewind part %d temporary dump : %v", partNumber, err)
-	}
-
-	etag, err := m.uploadPart(partURL, putHeaders, file, n)
-	if err != nil {
-		return nil, fmt.Errorf("upload part %d: %v", partNumber, err)
-	}
-	return &completeMultipartUploadPart{PartNumber: partNumber, ETag: etag}, nil
-}
-
-func (m *Multipart) uploadPart(url string, headers map[string]string, body io.Reader, size int64) (string, error) {
-	deadline, ok := m.ctx.Deadline()
-	if !ok {
-		return "", fmt.Errorf("missing deadline")
-	}
-
-	part, err := newObject(m.ctx, url, "", headers, deadline, size, false)
-	if err != nil {
-		return "", err
-	}
-
-	_, err = io.CopyN(part, body, size)
-	if err != nil {
-		return "", err
-	}
-
-	err = part.Close()
-	if err != nil {
-		return "", err
-	}
-
-	return part.ETag(), nil
-}
-
-func (m *Multipart) delete() {
-	m.syncAndDelete(m.DeleteURL)
-}
-
-func (m *Multipart) abort() {
-	m.syncAndDelete(m.AbortURL)
 }
