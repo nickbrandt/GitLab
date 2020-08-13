@@ -95,4 +95,16 @@ export const getFormattedSummary = (rawSummary = {}) => {
   return formattedEntries.filter(entry => entry !== null);
 };
 
+/**
+ * We have disabled loading hasNextPage from GraphQL as it causes timeouts in database,
+ * instead we have to calculate that value based on the existence of endCursor. When endCursor
+ * is empty or has null value, that means that there is no next page to be loaded from GraphQL API.
+ *
+ * @param {Object} pageInfo
+ * @returns {Object}
+ */
+export const preparePageInfo = pageInfo => {
+  return { ...pageInfo, hasNextPage: Boolean(pageInfo?.endCursor) };
+};
+
 export default () => ({});

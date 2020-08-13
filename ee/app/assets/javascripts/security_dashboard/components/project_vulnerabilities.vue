@@ -6,6 +6,7 @@ import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/project_vulnerabilities.graphql';
 import securityScannersQuery from '../graphql/project_security_scanners.graphql';
 import { VULNERABILITIES_PER_PAGE } from '../store/constants';
+import { preparePageInfo } from '../helpers';
 
 export default {
   name: 'ProjectVulnerabilitiesApp',
@@ -47,7 +48,7 @@ export default {
       },
       update: ({ project }) => project.vulnerabilities.nodes,
       result({ data }) {
-        this.pageInfo = data.project.vulnerabilities.pageInfo;
+        this.pageInfo = preparePageInfo(data?.project?.vulnerabilities?.pageInfo);
       },
       error() {
         this.errorLoadingVulnerabilities = true;
