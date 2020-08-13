@@ -26,8 +26,4 @@ class Groups::Security::ComplianceDashboardsController < Groups::ApplicationCont
   def serialize(merge_requests)
     MergeRequestSerializer.new(current_user: current_user).represent(merge_requests, serializer: 'compliance_dashboard')
   end
-
-  def authorize_compliance_dashboard!
-    render_404 unless group_level_compliance_dashboard_available?(group)
-  end
 end

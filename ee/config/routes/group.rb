@@ -152,6 +152,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       resources :vulnerable_projects, only: [:index]
       resource :discover, only: [:show], controller: :discover
       resources :credentials, only: [:index]
+      resources :merge_commit_reports, only: [:index], constraints: { format: :csv }
     end
 
     resource :push_rules, only: [:edit, :update]
