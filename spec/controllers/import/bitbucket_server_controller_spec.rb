@@ -33,18 +33,15 @@ RSpec.describe Import::BitbucketServerController do
   describe 'POST create' do
     let(:project_name) { "my-project_123" }
 
-    # rubocop: disable CodeReuse/ActiveRecord
     before do
       allow(controller).to receive(:client).and_return(client)
       repo = double(name: project_name)
       allow(client).to receive(:repo).with(project_key, repo_slug).and_return(repo)
       assign_session_tokens
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     let_it_be(:project) { create(:project) }
 
-    # rubocop: disable CodeReuse/ActiveRecord
     it 'returns the new project' do
       allow(Gitlab::BitbucketServerImport::ProjectCreator)
         .to receive(:new).with(project_key, repo_slug, anything, project_name, user.namespace, user, anything)
@@ -54,12 +51,10 @@ RSpec.describe Import::BitbucketServerController do
 
       expect(response).to have_gitlab_http_status(:ok)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     context 'with project key with tildes' do
       let(:project_key) { '~someuser_123' }
 
-      # rubocop: disable CodeReuse/ActiveRecord
       it 'successfully creates a project' do
         allow(Gitlab::BitbucketServerImport::ProjectCreator)
           .to receive(:new).with(project_key, repo_slug, anything, project_name, user.namespace, user, anything)
@@ -69,7 +64,6 @@ RSpec.describe Import::BitbucketServerController do
 
         expect(response).to have_gitlab_http_status(:ok)
       end
-      # rubocop: enable CodeReuse/ActiveRecord
     end
 
     it 'returns an error when an invalid project key is used' do
@@ -84,7 +78,6 @@ RSpec.describe Import::BitbucketServerController do
       expect(response).to have_gitlab_http_status(:unprocessable_entity)
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     it 'returns an error when the project cannot be found' do
       allow(client).to receive(:repo).with(project_key, repo_slug).and_return(nil)
 
@@ -92,9 +85,7 @@ RSpec.describe Import::BitbucketServerController do
 
       expect(response).to have_gitlab_http_status(:unprocessable_entity)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     it 'returns an error when the project cannot be saved' do
       allow(Gitlab::BitbucketServerImport::ProjectCreator)
         .to receive(:new).with(project_key, repo_slug, anything, project_name, user.namespace, user, anything)
@@ -104,9 +95,7 @@ RSpec.describe Import::BitbucketServerController do
 
       expect(response).to have_gitlab_http_status(:unprocessable_entity)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
-    # rubocop: disable CodeReuse/ActiveRecord
     it "returns an error when the server can't be contacted" do
       allow(client).to receive(:repo).with(project_key, repo_slug).and_raise(::BitbucketServer::Connection::ConnectionError)
 
@@ -114,7 +103,6 @@ RSpec.describe Import::BitbucketServerController do
 
       expect(response).to have_gitlab_http_status(:unprocessable_entity)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     it_behaves_like 'project import rate limiter'
   end
