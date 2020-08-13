@@ -42,7 +42,7 @@ func allowedXSendfileDownload(t *testing.T, contentFilename string, filePath str
 
 		w.Header().Set("X-Sendfile", contentPath)
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
-		w.Header().Set("Content-Type", fmt.Sprintf(`application/octet-stream`))
+		w.Header().Set("Content-Type", "application/octet-stream")
 		w.WriteHeader(200)
 	}))
 	defer ts.Close()
