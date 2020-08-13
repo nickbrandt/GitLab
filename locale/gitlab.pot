@@ -27373,6 +27373,12 @@ msgstr ""
 msgid "Webhooks have moved. They can now be found under the Settings menu."
 msgstr ""
 
+msgid "Webhooks|Deployment events"
+msgstr ""
+
+msgid "Webhooks|This URL will be triggered when a deployment is finished/failed/canceled"
+msgstr ""
+
 msgid "Wednesday"
 msgstr ""
 
