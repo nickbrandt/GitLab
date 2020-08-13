@@ -16,6 +16,7 @@ import { visitUrl, mergeUrlParams, updateHistory, setUrlParams } from '~/lib/uti
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
 import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
+import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
 
 import { EPICS_STATES, PRESET_TYPES } from '../constants';
 
@@ -59,6 +60,7 @@ export default {
       'sortedBy',
       'fullPath',
       'groupLabelsEndpoint',
+      'groupMilestonesEndpoint',
       'filterParams',
     ]),
     selectedEpicStateTitle() {
@@ -108,16 +110,45 @@ export default {
             });
           },
         },
+        {
+          type: 'milestone_title',
+          icon: 'clock',
+          title: __('Milestone'),
+          unique: true,
+          symbol: '%',
+          token: MilestoneToken,
+          operators: [{ value: '=', description: __('is'), default: 'true' }],
+          fetchMilestones: (search = '') => {
+            return axios.get(this.groupMilestonesEndpoint).then(({ data }) => {
+              // TODO: Remove below condition check once either of the following is supported.
+              // a) Milestones Private API supports search param.
+              // b) Milestones Public API supports including child projects' milestones.
+              if (search) {
+                return {
+                  data: data.filter(m => m.title.toLowerCase().includes(search.toLowerCase())),
+                };
+              }
+              return { data };
+            });
+          },
+        },
       ];
     },
     getFilteredSearchValue() {
-      const { authorUsername, labelName, search } = this.filterParams || {};
+      const { authorUsername, labelName, milestoneTitle, search } = this.filterParams || {};
       const filteredSearchValue = [];
 
       if (authorUsername) {
         filteredSearchValue.push({
           type: 'author_username',
           value: { data: authorUsername },
+        });
+      }
+
+      if (milestoneTitle) {
+        filteredSearchValue.push({
+          type: 'milestone_title',
+          value: { data: milestoneTitle },
         });
       }
 
@@ -138,7 +169,7 @@ export default {
     },
     updateUrl() {
       const queryParams = urlParamsToObject(window.location.search);
-      const { authorUsername, labelName, search } = this.filterParams || {};
+      const { authorUsername, labelName, milestoneTitle, search } = this.filterParams || {};
 
       queryParams.state = this.epicsState;
       queryParams.sort = this.sortedBy;
@@ -147,6 +178,12 @@ export default {
         queryParams.author_username = authorUsername;
       } else {
         delete queryParams.author_username;
+      }
+
+      if (milestoneTitle) {
+        queryParams.milestone_title = milestoneTitle;
+      } else {
+        delete queryParams.milestone_title;
       }
 
       delete queryParams.label_name;
@@ -182,10 +219,18 @@ export default {
 
       filters.forEach(filter => {
         if (typeof filter === 'object') {
-          if (filter.type === 'author_username') {
-            filterParams.authorUsername = filter.value.data;
-          } else if (filter.type === 'label_name') {
-            labels.push(filter.value.data);
+          switch (filter.type) {
+            case 'author_username':
+              filterParams.authorUsername = filter.value.data;
+              break;
+            case 'milestone_title':
+              filterParams.milestoneTitle = filter.value.data;
+              break;
+            case 'label_name':
+              labels.push(filter.value.data);
+              break;
+            default:
+              break;
           }
         } else {
           filterParams.search = filter;
