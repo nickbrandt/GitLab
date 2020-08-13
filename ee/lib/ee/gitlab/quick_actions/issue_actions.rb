@@ -142,8 +142,8 @@ module EE
             StatusPage::MarkForPublicationService.publishable?(project, current_user, quick_action_target)
           end
           command :publish do
-            if StatusPage.mark_for_publication(project, current_user, quick_action_target).success?
-              StatusPage.trigger_publish(project, current_user, quick_action_target, action: :init)
+            if ::Gitlab::StatusPage.mark_for_publication(project, current_user, quick_action_target).success?
+              ::Gitlab::StatusPage.trigger_publish(project, current_user, quick_action_target, action: :init)
               @execution_message[:publish] = _('Issue published on status page.')
             else
               @execution_message[:publish] = _('Failed to publish issue on status page.')
