@@ -18,6 +18,9 @@ export default {
     location() {
       return this.vulnerability.location || {};
     },
+    stacktraceSnippet() {
+      return this.vulnerability.stacktrace_snippet || '';
+    },
     scanner() {
       return this.vulnerability.scanner || {};
     },
@@ -86,6 +89,11 @@ export default {
         },
       ].filter(x => x.content);
     },
+    shouldShowLocation() {
+      return (
+        this.location.crash_address || this.location.crash_type || this.location.stacktrace_snippet
+      );
+    },
   },
   methods: {
     getHeadersAsCodeBlockLines(headers) {
@@ -153,6 +161,23 @@ export default {
         >{{ location.operating_system }}
       </detail-item>
     </ul>
+
+    <template v-if="shouldShowLocation">
+      <h3>{{ __('Location') }}</h3>
+      <ul>
+        <detail-item
+          v-if="location.crash_address"
+          :sprintf-message="__('%{labelStart}Crash Address:%{labelEnd} %{crash_address}')"
+          >{{ location.crash_address }}
+        </detail-item>
+        <detail-item
+          v-if="location.stacktrace_snippet"
+          :sprintf-message="__('%{labelStart}Crash State:%{labelEnd} %{stacktrace_snippet}')"
+        >
+          <code-block :code="location.stacktrace_snippet" max-height="225px" />
+        </detail-item>
+      </ul>
+    </template>
 
     <template v-if="location.file">
       <h3>{{ __('Location') }}</h3>

@@ -76,6 +76,14 @@ RSpec.describe Gitlab::Danger::Helper do
     end
   end
 
+  describe "changed_files" do
+    it 'returns list of changed files matching given regex' do
+      expect(helper).to receive(:all_changed_files).and_return(%w[migration.rb usage_data.rb])
+
+      expect(helper.changed_files(/usage_data/)).to contain_exactly('usage_data.rb')
+    end
+  end
+
   describe '#all_ee_changes' do
     subject { helper.all_ee_changes }
 
@@ -98,21 +106,21 @@ RSpec.describe Gitlab::Danger::Helper do
 
     it 'delegates to CHANGELOG-EE.md existence if CI_PROJECT_NAME is set to something else' do
       stub_env('CI_PROJECT_NAME', 'something else')
-      expect(Dir).to receive(:exist?).with('../../ee') { true }
+      expect(Dir).to receive(:exist?).with(File.expand_path('../../../../ee', __dir__)) { true }
 
       is_expected.to be_truthy
     end
 
     it 'returns true if ee exists' do
       stub_env('CI_PROJECT_NAME', nil)
-      expect(Dir).to receive(:exist?).with('../../ee') { true }
+      expect(Dir).to receive(:exist?).with(File.expand_path('../../../../ee', __dir__)) { true }
 
       is_expected.to be_truthy
     end
 
     it "returns false if ee doesn't exist" do
       stub_env('CI_PROJECT_NAME', nil)
-      expect(Dir).to receive(:exist?).with('../../ee') { false }
+      expect(Dir).to receive(:exist?).with(File.expand_path('../../../../ee', __dir__)) { false }
 
       is_expected.to be_falsy
     end
@@ -166,7 +174,12 @@ RSpec.describe Gitlab::Danger::Helper do
   end
 
   describe '#categories_for_file' do
+    before do
+      allow(fake_git).to receive(:diff_for_file).with('usage_data.rb') { double(:diff, patch: "+ count(User.active)") }
+    end
+
     where(:path, :expected_categories) do
+      'usage_data.rb'   | [:database, :backend]
       'doc/foo.md'      | [:docs]
       'CONTRIBUTING.md' | [:docs]
       'LICENSE'         | [:docs]
@@ -212,6 +225,15 @@ RSpec.describe Gitlab::Danger::Helper do
       'ee/spec/foo'     | [:backend]
       'ee/spec/foo/bar' | [:backend]
 
+      'spec/features/foo'                            | [:test]
+      'ee/spec/features/foo'                         | [:test]
+      'spec/support/shared_examples/features/foo'    | [:test]
+      'ee/spec/support/shared_examples/features/foo' | [:test]
+      'spec/support/shared_contexts/features/foo'    | [:test]
+      'ee/spec/support/shared_contexts/features/foo' | [:test]
+      'spec/support/helpers/features/foo'            | [:test]
+      'ee/spec/support/helpers/features/foo'         | [:test]
+
       'generator_templates/foo' | [:backend]
       'vendor/languages.yml'    | [:backend]
       'vendor/licenses.csv'     | [:backend]
@@ -237,6 +259,7 @@ RSpec.describe Gitlab::Danger::Helper do
       '.editorconfig'                                         | [:engineering_productivity]
       'tooling/overcommit/foo'                                | [:engineering_productivity]
       '.codeclimate.yml'                                      | [:engineering_productivity]
+      '.gitlab/CODEOWNERS'                                    | [:engineering_productivity]
 
       'lib/gitlab/ci/templates/Security/SAST.gitlab-ci.yml'   | [:backend]
 
@@ -286,6 +309,37 @@ RSpec.describe Gitlab::Danger::Helper do
       subject { helper.categories_for_file(path) }
 
       it { is_expected.to eq(expected_categories) }
+    end
+
+    context 'having specific changes' do
+      it 'has database and backend categories' do
+        changed_files = ['usage_data.rb', 'lib/gitlab/usage_data.rb', 'ee/lib/ee/gitlab/usage_data.rb']
+
+        changed_files.each do |file|
+          allow(fake_git).to receive(:diff_for_file).with(file) { double(:diff, patch: "+ count(User.active)") }
+
+          expect(helper.categories_for_file(file)).to eq([:database, :backend])
+        end
+      end
+
+      it 'has backend category' do
+        allow(fake_git).to receive(:diff_for_file).with('usage_data.rb') { double(:diff, patch: "+ alt_usage_data(User.active)") }
+
+        expect(helper.categories_for_file('usage_data.rb')).to eq([:backend])
+      end
+
+      it 'has backend category for changes outside usage_data files' do
+        allow(fake_git).to receive(:diff_for_file).with('user.rb') { double(:diff, patch: "+ count(User.active)") }
+
+        expect(helper.categories_for_file('user.rb')).to eq([:backend])
+      end
+
+      it 'has backend category for files that are not usage_data.rb' do
+        changed_file = 'usage_data/topology.rb'
+        allow(fake_git).to receive(:diff_for_file).with(changed_file) { double(:diff, patch: "+ count(User.active)") }
+
+        expect(helper.categories_for_file(changed_file)).to eq([:backend])
+      end
     end
   end
 
@@ -338,6 +392,11 @@ RSpec.describe Gitlab::Danger::Helper do
     where(:mr_title, :expected_mr_title) do
       'My MR title'      | 'My MR title'
       'WIP: My MR title' | 'My MR title'
+      'Draft: My MR title' | 'My MR title'
+      '(Draft) My MR title' | 'My MR title'
+      '[Draft] My MR title' | 'My MR title'
+      '[DRAFT] My MR title' | 'My MR title'
+      'DRAFT: My MR title' | 'My MR title'
     end
 
     with_them do

@@ -5,6 +5,7 @@ module Projects
     class ConfigurationPresenter < Gitlab::View::Presenter::Delegated
       include Gitlab::Utils::StrongMemoize
       include AutoDevopsHelper
+      include LatestPipelineInformation
 
       presents :project
 
@@ -52,20 +53,32 @@ module Projects
           create_sast_merge_request_path: project_security_configuration_sast_path(project),
           auto_devops_path: auto_devops_settings_path(project),
           can_enable_auto_devops: can_enable_auto_devops?,
-          features: features.to_json,
+          features: features,
           help_page_path: help_page_path('user/application_security/index'),
           latest_pipeline_path: latest_pipeline_path,
-          auto_fix_enabled: {
-            dependency_scanning: project_settings.auto_fix_dependency_scanning,
-            container_scanning: project_settings.auto_fix_container_scanning
-          }.to_json,
+          auto_fix_enabled: autofix_enabled,
           can_toggle_auto_fix_settings: auto_fix_permission,
           gitlab_ci_present: gitlab_ci_present?,
           auto_fix_user_path: '/' # TODO: real link will be updated with https://gitlab.com/gitlab-org/gitlab/-/issues/215669
         }
       end
 
+      def to_html_data_attribute
+        data = to_h
+        data[:features] = data[:features].to_json
+        data[:auto_fix_enabled] = data[:auto_fix_enabled].to_json
+
+        data
+      end
+
       private
+
+      def autofix_enabled
+        {
+          dependency_scanning: project_settings.auto_fix_dependency_scanning,
+          container_scanning: project_settings.auto_fix_container_scanning
+        }
+      end
 
       def can_enable_auto_devops?
         feature_available?(:builds, current_user) &&
@@ -79,9 +92,7 @@ module Projects
 
       def features
         scans = scan_types.map do |scan_type|
-          if auto_devops_source?
-            scan(scan_type, configured: true)
-          elsif latest_builds_reports.include?(scan_type)
+          if scanner_enabled?(scan_type)
             scan(scan_type, configured: true)
           else
             scan(scan_type, configured: false)
@@ -90,29 +101,6 @@ module Projects
 
         # TODO: remove this line with #8912
         license_compliance_substitute(scans)
-      end
-
-      def latest_builds_reports
-        strong_memoize(:reports) do
-          latest_security_builds.map do |build|
-            if Feature.enabled?(:ci_build_metadata_config)
-              build.metadata.config_options[:artifacts][:reports].keys.map(&:to_sym)
-            else
-              build.options[:artifacts][:reports].keys
-            end
-          end.flatten
-        end
-      end
-
-      def latest_security_builds
-        return [] unless latest_default_branch_pipeline
-
-        ::Security::SecurityJobsFinder.new(pipeline: latest_default_branch_pipeline).execute +
-          ::Security::LicenseComplianceJobsFinder.new(pipeline: latest_default_branch_pipeline).execute
-      end
-
-      def latest_default_branch_pipeline
-        strong_memoize(:pipeline) { latest_pipeline_for_ref }
       end
 
       def latest_pipeline_path
@@ -142,15 +130,13 @@ module Projects
 
       def scan(type, configured: false)
         {
+          type: type,
           configured: configured,
           description: self.class.localized_scan_descriptions[type],
           link: help_page_path(SCAN_DOCS[type]),
+          configuration_path: configuration_path(type),
           name: localized_scan_names[type]
         }
-      end
-
-      def auto_devops_source?
-        latest_default_branch_pipeline&.auto_devops_source?
       end
 
       def scan_types
@@ -163,6 +149,12 @@ module Projects
 
       def project_settings
         ProjectSecuritySetting.safe_find_or_create_for(project)
+      end
+
+      def configuration_path(type)
+        {
+          sast: project_security_configuration_sast_path(project)
+        }[type]
       end
     end
   end

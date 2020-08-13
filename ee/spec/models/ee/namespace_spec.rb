@@ -14,7 +14,6 @@ RSpec.describe Namespace do
 
   it { is_expected.to have_one(:namespace_statistics) }
   it { is_expected.to have_one(:namespace_limit) }
-  it { is_expected.to have_one(:gitlab_subscription).dependent(:destroy) }
   it { is_expected.to have_one(:elasticsearch_indexed_namespace) }
 
   it { is_expected.to delegate_method(:extra_shared_runners_minutes).to(:namespace_statistics) }
@@ -29,6 +28,10 @@ RSpec.describe Namespace do
   it { is_expected.to delegate_method(:additional_purchased_storage_size=).to(:namespace_limit).with_arguments(:args) }
   it { is_expected.to delegate_method(:additional_purchased_storage_ends_on).to(:namespace_limit) }
   it { is_expected.to delegate_method(:additional_purchased_storage_ends_on=).to(:namespace_limit).with_arguments(:args) }
+  it { is_expected.to delegate_method(:temporary_storage_increase_ends_on).to(:namespace_limit) }
+  it { is_expected.to delegate_method(:temporary_storage_increase_ends_on=).to(:namespace_limit).with_arguments(:args) }
+  it { is_expected.to delegate_method(:temporary_storage_increase_enabled?).to(:namespace_limit) }
+  it { is_expected.to delegate_method(:eligible_for_temporary_storage_increase?).to(:namespace_limit) }
 
   shared_examples 'plan helper' do |namespace_plan|
     let(:namespace) { create(:namespace_with_plan, plan: "#{plan_name}_plan") }
@@ -164,6 +167,60 @@ RSpec.describe Namespace do
 
         it 'returns namespace with subscription set' do
           is_expected.to eq(gold_plan.id)
+        end
+      end
+    end
+
+    describe '.eligible_for_trial' do
+      let_it_be(:namespace) { create :namespace }
+
+      subject { described_class.eligible_for_trial.first }
+
+      context 'when there is no subscription' do
+        it { is_expected.to eq(namespace) }
+      end
+
+      context 'when there is a subscription' do
+        context 'with a plan that is eligible for a trial' do
+          where(plan: ::Plan::PLANS_ELIGIBLE_FOR_TRIAL)
+
+          with_them do
+            context 'and has not yet been trialed' do
+              before do
+                create :gitlab_subscription, plan, namespace: namespace
+              end
+
+              it { is_expected.to eq(namespace) }
+            end
+
+            context 'but has already had a trial' do
+              before do
+                create :gitlab_subscription, plan, :expired_trial, namespace: namespace
+              end
+
+              it { is_expected.to be_nil }
+            end
+
+            context 'but is currently being trialed' do
+              before do
+                create :gitlab_subscription, plan, :active_trial, namespace: namespace
+              end
+
+              it { is_expected.to be_nil }
+            end
+          end
+        end
+
+        context 'with a plan that is ineligible for a trial' do
+          where(plan: ::Plan::PAID_HOSTED_PLANS)
+
+          with_them do
+            before do
+              create :gitlab_subscription, plan, namespace: namespace
+            end
+
+            it { is_expected.to be_nil }
+          end
         end
       end
     end
@@ -1259,6 +1316,36 @@ RSpec.describe Namespace do
     end
   end
 
+  describe '#eligible_for_trial?' do
+    subject { namespace.eligible_for_trial? }
+
+    where(
+      on_dot_com: [true, false],
+      has_parent: [true, false],
+      never_had_trial: [true, false],
+      plan_eligible_for_trial: [true, false]
+    )
+
+    with_them do
+      before do
+        allow(Gitlab).to receive(:com?).and_return(on_dot_com)
+        allow(namespace).to receive(:has_parent?).and_return(has_parent)
+        allow(namespace).to receive(:never_had_trial?).and_return(never_had_trial)
+        allow(namespace).to receive(:plan_eligible_for_trial?).and_return(plan_eligible_for_trial)
+      end
+
+      context "when#{' not' unless params[:on_dot_com]} on .com" do
+        context "and the namespace #{params[:has_parent] ? 'has' : 'is'} a parent namespace" do
+          context "and the namespace has#{' not yet' if params[:never_had_trial]} been trialed" do
+            context "and the namespace is#{' not' unless params[:plan_eligible_for_trial]} eligible for a trial" do
+              it { is_expected.to eq(on_dot_com && !has_parent && never_had_trial && plan_eligible_for_trial) }
+            end
+          end
+        end
+      end
+    end
+  end
+
   describe '#file_template_project_id' do
     it 'is cleared before validation' do
       project = create(:project, namespace: namespace)
@@ -1311,14 +1398,31 @@ RSpec.describe Namespace do
   end
 
   describe '#over_storage_limit?' do
-    before do
-      allow_next_instance_of(::Namespace::RootStorageSize, namespace.root_ancestor) do |project|
-        allow(project).to receive(:above_size_limit?).and_return(true)
-      end
+    using RSpec::Parameterized::TableSyntax
+
+    where(:enforcement_setting_enabled, :feature_enabled, :above_size_limit, :result) do
+      false | false | false | false
+      false | false | true  | false
+      false | true  | false | false
+      false | true  | true  | false
+      true  | false | false | false
+      true  | false | true  | false
+      true  | true  | false | false
+      true  | true  | true  | true
     end
 
-    it 'returns a boolean indicating whether the root namespace is over the storage limit' do
-      expect(namespace.over_storage_limit?).to be true
+    with_them do
+      before do
+        stub_application_setting(enforce_namespace_storage_limit: enforcement_setting_enabled)
+        stub_feature_flags(namespace_storage_limit: feature_enabled)
+        allow_next_instance_of(EE::Namespace::RootStorageSize, namespace.root_ancestor) do |project|
+          allow(project).to receive(:above_size_limit?).and_return(above_size_limit)
+        end
+      end
+
+      it 'returns a boolean indicating whether the root namespace is over the storage limit' do
+        expect(namespace.over_storage_limit?).to be result
+      end
     end
   end
 
@@ -1486,6 +1590,28 @@ RSpec.describe Namespace do
 
       expect(namespace.namespace_limit).to be_present
       expect(namespace.namespace_limit).not_to be_persisted
+    end
+  end
+
+  describe '#enable_temporary_storage_increase!' do
+    it 'sets a date' do
+      namespace = build(:namespace)
+
+      Timecop.freeze do
+        namespace.enable_temporary_storage_increase!
+
+        expect(namespace.temporary_storage_increase_ends_on).to eq(30.days.from_now.to_date)
+      end
+    end
+
+    it 'is invalid when set twice' do
+      namespace = create(:namespace)
+
+      namespace.enable_temporary_storage_increase!
+      namespace.enable_temporary_storage_increase!
+
+      expect(namespace).to be_invalid
+      expect(namespace.errors[:"namespace_limit.temporary_storage_increase_ends_on"]).to be_present
     end
   end
 end

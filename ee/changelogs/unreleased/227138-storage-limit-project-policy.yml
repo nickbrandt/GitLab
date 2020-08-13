@@ -1,0 +1,5 @@
+---
+title: Block some project abilities when namespace over storage limit
+merge_request: 36734
+author:
+type: added

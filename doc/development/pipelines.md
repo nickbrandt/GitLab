@@ -13,10 +13,38 @@ as much as possible.
 
 ## Overview
 
-### Pipeline types
+Pipelines for the GitLab project are created using the [`workflow:rules` keyword](../ci/yaml/README.md#workflowrules)
+feature of the GitLab CI/CD.
 
-Since we use the [`rules:`](../ci/yaml/README.md#rules) and [`needs:`](../ci/yaml/README.md#needs) keywords extensively,
-we have four main pipeline types which are described below. Note that an MR that includes multiple types of changes would
+Pipelines are always created for the following scenarios:
+
+- `master` branch, including on schedules, pushes, merges, and so on.
+- Merge requests.
+- Tags.
+- Stable, `auto-deploy`, and security branches.
+
+Pipeline creation is also affected by the following CI variables:
+
+- If `$FORCE_GITLAB_CI` is set, pipelines are created.
+- If `$GITLAB_INTERNAL` is not set, pipelines are not created.
+
+No pipeline is created in any other cases (for example, when pushing a branch with no
+MR for it).
+
+The source of truth for these workflow rules is defined in <https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab-ci.yml>.
+
+### Pipelines for Merge Requests
+
+In general, pipelines for an MR fall into one or more of the following types,
+depending on the changes made in the MR:
+
+- [Docs-only MR pipeline](#docs-only-mr-pipeline): This is typically created for an MR that only changes documentation.
+- [Code-only MR pipeline](#code-only-mr-pipeline): This is typically created for an MR that only changes code, either backend or frontend.
+- [Frontend-only MR pipeline](#frontend-only-mr-pipeline): This is typically created for an MR that only changes frontend code.
+- [QA-only MR pipeline](#qa-only-mr-pipeline): This is typically created for an MR that only changes end to end tests related code.
+
+We use the [`rules:`](../ci/yaml/README.md#rules) and [`needs:`](../ci/yaml/README.md#needs) keywords extensively
+to determine the jobs that need to be run in a pipeline. Note that an MR that includes multiple types of changes would
 have a pipelines that include jobs from multiple types (e.g. a combination of docs-only and code-only pipelines).
 
 #### Docs-only MR pipeline
@@ -345,22 +373,6 @@ graph RL;
   end
 ```
 
-### `workflow:rules`
-
-We're using the [`workflow:rules` keyword](../ci/yaml/README.md#workflowrules) to
-define default rules to determine whether or not a pipeline is created.
-
-These rules are defined in <https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab-ci.yml>
-and are as follows:
-
-1. If `$FORCE_GITLAB_CI` is set, create a pipeline.
-1. For merge requests, create a pipeline.
-1. For `master` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
-1. For tags, create a pipeline.
-1. If `$GITLAB_INTERNAL` isn't set, don't create a pipeline.
-1. For stable, auto-deploy, and security branches, create a pipeline.
-1. For any other cases (e.g. when pushing a branch with no MR for it), no pipeline is created.
-
 ### PostgreSQL versions testing
 
 #### Current versions testing
@@ -535,7 +547,8 @@ The current stages are:
 - `pages`: This stage includes a job that deploys the various reports as
   GitLab Pages (e.g. [`coverage-ruby`](https://gitlab-org.gitlab.io/gitlab/coverage-ruby/),
   [`coverage-javascript`](https://gitlab-org.gitlab.io/gitlab/coverage-javascript/),
-  [`webpack-report`](https://gitlab-org.gitlab.io/gitlab/webpack-report/).
+  and `webpack-report` (found at `https://gitlab-org.gitlab.io/gitlab/webpack-report/`, but there is
+  [an issue with the deployment](https://gitlab.com/gitlab-org/gitlab/-/issues/233458)).
 
 ### Default image
 

@@ -43,7 +43,7 @@ module Geo
     end
 
     def replicables
-      current_node(fdw: false).attachments
+      ::Upload.replicables_for_geo_node
     end
 
     def syncable

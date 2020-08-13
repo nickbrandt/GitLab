@@ -5,7 +5,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 type: howto
 ---
 
-# Geo Troubleshooting **(PREMIUM ONLY)**
+# Troubleshooting Geo **(PREMIUM ONLY)**
 
 Setting up Geo requires careful attention to details and sometimes it's easy to
 miss a step.
@@ -26,7 +26,7 @@ Before attempting more advanced troubleshooting:
 
 ### Check the health of the **secondary** node
 
-Visit the **primary** node's **{admin}** **Admin Area >** **{location-dot}** **Geo** (`/admin/geo/nodes`) in
+Visit the **primary** node's **Admin Area > Geo** (`/admin/geo/nodes`) in
 your browser. We perform the following health checks on each **secondary** node
 to help identify if something is wrong:
 
@@ -43,6 +43,8 @@ For information on how to resolve common errors reported from the UI, see
 
 If the UI is not working, or you are unable to log in, you can run the Geo
 health check manually to get this information as well as a few more details.
+
+#### Health check Rake task
 
 This Rake task can be run on an app node in the **primary** or **secondary**
 Geo nodes:
@@ -76,6 +78,8 @@ All projects are in hashed storage? ... yes
 
 Checking Geo ... Finished
 ```
+
+#### Sync status Rake task
 
 Current sync information can be found manually by running this Rake task on any
 **secondary** app node:
@@ -128,8 +132,7 @@ Geo finds the current machine's Geo node name in `/etc/gitlab/gitlab.rb` by:
 - Using the `gitlab_rails['geo_node_name']` setting.
 - If that is not defined, using the `external_url` setting.
 
-This name is used to look up the node with the same **Name** in
-**{admin}** **Admin Area >** **{location-dot}** **Geo**.
+This name is used to look up the node with the same **Name** in **Admin Area > Geo**.
 
 To check if the current machine has a node name that matches a node in the
 database, run the check task:
@@ -205,7 +208,7 @@ sudo gitlab-rake gitlab:geo:check
 
    - Verify the correct password is set for `gitlab_rails['db_password']` that was used when creating the hash in  `postgresql['sql_user_password']` by running `gitlab-ctl pg-password-md5 gitlab` and entering the password.
 
-1. Check returns not a secondary node
+1. Check returns `not a secondary node`
 
    ```plaintext
    Checking Geo ...
@@ -257,7 +260,8 @@ sudo gitlab-rake gitlab:geo:check
 ## Fixing replication errors
 
 The following sections outline troubleshooting steps for fixing replication
-errors.
+errors (indicated by `Database replication working? ... no` in the
+[`geo:check` output](#health-check-rake-task).
 
 ### Message: `ERROR:  replication slots can only be used if max_replication_slots > 0`?
 
@@ -390,13 +394,13 @@ to respect the CIDR format (i.e. `1.2.3.4/32`).
 
 GitLab places a timeout on all repository clones, including project imports
 and Geo synchronization operations. If a fresh `git clone` of a repository
-on the **primary** takes more than a few minutes, you may be affected by this.
+on the **primary** takes more than the default three hours, you may be affected by this.
 
 To increase the timeout, add the following line to `/etc/gitlab/gitlab.rb`
 on the **secondary** node:
 
 ```ruby
-gitlab_rails['gitlab_shell_git_timeout'] = 10800
+gitlab_rails['gitlab_shell_git_timeout'] = 14400
 ```
 
 Then reconfigure GitLab:
@@ -405,7 +409,7 @@ Then reconfigure GitLab:
 sudo gitlab-ctl reconfigure
 ```
 
-This will increase the timeout to three hours (10800 seconds). Choose a time
+This will increase the timeout to four hours (14400 seconds). Choose a time
 long enough to accommodate a full clone of your largest repositories.
 
 ### New LFS objects are never replicated
@@ -452,13 +456,13 @@ to start again from scratch, there are a few steps that can help you:
    chown git:git /var/opt/gitlab/git-data/repositories
    ```
 
-   TIP: **Tip**
+   TIP: **Tip:**
    You may want to remove the `/var/opt/gitlab/git-data/repositories.old` in the future
    as soon as you confirmed that you don't need it anymore, to save disk space.
 
 1. _(Optional)_ Rename other data folders and create new ones
 
-   CAUTION: **Caution**:
+   CAUTION: **Caution:**
    You may still have files on the **secondary** node that have been removed from **primary** node but
    removal have not been reflected. If you skip this step, they will never be removed
    from this Geo node.
@@ -510,6 +514,82 @@ to start again from scratch, there are a few steps that can help you:
    gitlab-rake geo:db:refresh_foreign_tables
    ```
 
+## Fixing errors during a PostgreSQL upgrade or downgrade
+
+### Message: `ERROR: psql: FATAL:  role "gitlab-consul" does not exist`
+
+When
+[upgrading PostgreSQL on a Geo instance](https://docs.gitlab.com/omnibus/settings/database.html#upgrading-a-geo-instance), you might encounter the
+following error:
+
+```plaintext
+$ sudo gitlab-ctl pg-upgrade --target-version=11
+Checking for an omnibus managed postgresql: OK
+Checking if postgresql['version'] is set: OK
+Checking if we already upgraded: NOT OK
+Checking for a newer version of PostgreSQL to install
+Upgrading PostgreSQL to 11.7
+Checking if PostgreSQL bin files are symlinked to the expected location: OK
+Waiting 30 seconds to ensure tasks complete before PostgreSQL upgrade.
+See https://docs.gitlab.com/omnibus/settings/database.html#upgrade-packaged-postgresql-server for details
+If you do not want to upgrade the PostgreSQL server at this time, enter Ctrl-C and see the documentation for details
+
+Please hit Ctrl-C now if you want to cancel the operation.
+..............................Detected an HA cluster.
+Error running command: /opt/gitlab/embedded/bin/psql -qt -d gitlab_repmgr -h /var/opt/gitlab/postgresql -p 5432 -c "SELECT name FROM repmgr_gitlab_cluster.repl_nodes WHERE type='master' AND active != 'f'" -U gitlab-consul
+ERROR: psql: FATAL:  role "gitlab-consul" does not exist
+Traceback (most recent call last):
+    10: from /opt/gitlab/embedded/bin/omnibus-ctl:23:in `<main>'
+      9: from /opt/gitlab/embedded/bin/omnibus-ctl:23:in `load'
+      8: from /opt/gitlab/embedded/lib/ruby/gems/2.6.0/gems/omnibus-ctl-0.6.0/bin/omnibus-ctl:31:in `<top (required)>'
+      7: from /opt/gitlab/embedded/lib/ruby/gems/2.6.0/gems/omnibus-ctl-0.6.0/lib/omnibus-ctl.rb:746:in `run'
+      6: from /opt/gitlab/embedded/lib/ruby/gems/2.6.0/gems/omnibus-ctl-0.6.0/lib/omnibus-ctl.rb:204:in `block in add_command_under_category'
+      5: from /opt/gitlab/embedded/service/omnibus-ctl/pg-upgrade.rb:171:in `block in load_file'
+      4: from /opt/gitlab/embedded/service/omnibus-ctl-ee/lib/repmgr.rb:248:in `is_master?'
+      3: from /opt/gitlab/embedded/service/omnibus-ctl-ee/lib/repmgr.rb:100:in `execute_psql'
+      2: from /opt/gitlab/embedded/service/omnibus-ctl-ee/lib/repmgr.rb:113:in `cmd'
+      1: from /opt/gitlab/embedded/lib/ruby/gems/2.6.0/gems/mixlib-shellout-3.0.9/lib/mixlib/shellout.rb:287:in `error!'
+/opt/gitlab/embedded/lib/ruby/gems/2.6.0/gems/mixlib-shellout-3.0.9/lib/mixlib/shellout.rb:300:in `invalid!': Expected process to exit with [0], but received '2' (Mixlib::ShellOut::ShellCommandFailed)
+---- Begin output of /opt/gitlab/embedded/bin/psql -qt -d gitlab_repmgr -h /var/opt/gitlab/postgresql -p 5432 -c "SELECT name FROM repmgr_gitlab_cluster.repl_nodes WHERE type='master' AND active != 'f'" -U gitlab-consul ----
+STDOUT:
+STDERR: psql: FATAL:  role "gitlab-consul" does not exist
+---- End output of /opt/gitlab/embedded/bin/psql -qt -d gitlab_repmgr -h /var/opt/gitlab/postgresql -p 5432 -c "SELECT name FROM repmgr_gitlab_cluster.repl_nodes WHERE type='master' AND active != 'f'" -U gitlab-consul ----
+Ran /opt/gitlab/embedded/bin/psql -qt -d gitlab_repmgr -h /var/opt/gitlab/postgresql -p 5432 -c "SELECT name FROM repmgr_gitlab_cluster.repl_nodes WHERE type='master' AND active != 'f'" -U gitlab-consul returned 2
+```
+
+If you are upgrading the PostgreSQL read-replica of a Geo secondary node, and
+you are not using `consul` or `repmgr`, you may need to disable `consul` and/or
+`repmgr` services in `gitlab.rb`:
+
+```ruby
+consul['enable'] = false
+repmgr['enable'] = false
+```
+
+Then reconfigure GitLab:
+
+```shell
+sudo gitlab-ctl reconfigure
+```
+
+### Message: `ActiveRecord::StatementInvalid: PG::SqlclientUnableToEstablishSqlconnection: ERROR:  could not connect to server "gitlab_secondary"`
+
+When
+[upgrading PostgreSQL on a Geo instance](https://docs.gitlab.com/omnibus/settings/database.html#upgrading-a-geo-instance), or when downgrading, you
+might encounter the following error:
+
+```plaintext
+$ sudo gitlab-rake geo:db:refresh_foreign_tables
+
+Refreshing foreign tables for FDW: gitlab_secondary ... rake aborted!
+ActiveRecord::StatementInvalid: PG::SqlclientUnableToEstablishSqlconnection: ERROR:  could not connect to server "gitlab_secondary"
+DETAIL:  SSL error: certificate verify failed
+FATAL:  no pg_hba.conf entry for host "10.138.0.59", user "gitlab", database "gitlabhq_production", SSL off
+```
+
+You may need to `gitlab-ctl restart` the read-replica DB node for its PostgreSQL
+server to recognize recent changes.
+
 ## Fixing errors during a failover or when promoting a secondary to a primary node
 
 The following are possible errors that might be encountered during failover or
@@ -550,6 +630,35 @@ or `gitlab-ctl promote-to-primary-node`, either:
   if the failover was just a test. A [caching-related
   bug](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22021) was
   fixed.
+
+If the above does not work, another possible reason is that you have paused replication
+from the original primary node before attempting to promote this node.
+
+To double check this, you can do the following:
+
+- Get the current secondary node's ID using:
+
+  ```shell
+  sudo gitlab-rails runner 'puts GeoNode.current_node.id'
+  ```
+
+- Double check that the node is active through the database by running the following
+  on the secondary node, replacing `ID_FROM_ABOVE`:
+
+  ```shell
+  sudo gitlab-rails dbconsole
+
+  SELECT enabled FROM geo_nodes WHERE id = ID_FROM_ABOVE;
+  ```
+
+- If the above returned `f` it means that the replication was paused.
+  You can re-enable it through an `UPDATE` statement in the database:
+
+  ```shell
+  sudo gitlab-rails dbconsole
+
+  UPDATE geo_nodes SET enabled = 't' WHERE id = ID_FROM_ABOVE;
+  ```
 
 ### Message: ``NoMethodError: undefined method `secondary?' for nil:NilClass``
 
@@ -701,7 +810,8 @@ To check the configuration:
    Description          |
    ```
 
-   NOTE: **Note:** Pay particular attention to the host and port under
+   NOTE: **Note:**
+   Pay particular attention to the host and port under
    FDW options. That configuration should point to the Geo secondary
    database.
 
@@ -834,7 +944,7 @@ If you are able to log in to the **primary** node, but you receive this error
 when attempting to log into a **secondary**, you should check that the Geo
 node's URL matches its external URL.
 
-1. On the primary, visit **{admin}** **Admin Area >** **{location-dot}** **Geo**.
+1. On the primary, visit **Admin Area > Geo**.
 1. Find the affected **secondary** and click **Edit**.
 1. Ensure the **URL** field matches the value found in `/etc/gitlab/gitlab.rb`
    in `external_url "https://gitlab.example.com"` on the frontend server(s) of

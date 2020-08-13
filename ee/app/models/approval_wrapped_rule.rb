@@ -74,6 +74,12 @@ class ApprovalWrappedRule
     end
   end
 
+  def commented_approvers
+    strong_memoize(:commented_approvers) do
+      merge_request.note_authors & approvers
+    end
+  end
+
   def approved?
     strong_memoize(:approved) do
       approvals_left <= 0 || unactioned_approvers.size <= 0

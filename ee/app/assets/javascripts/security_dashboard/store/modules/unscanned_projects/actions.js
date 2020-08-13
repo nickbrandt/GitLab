@@ -35,6 +35,3 @@ export const receiveUnscannedProjectsError = ({ commit }) => {
 
   commit(RECEIVE_UNSCANNED_PROJECTS_ERROR);
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

@@ -1,0 +1,213 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PolicyEditorApp component given .yaml editor mode is enabled renders yaml editor 1`] = `
+<div
+  class="row"
+  data-testid="yaml-editor"
+>
+  <div
+    class="col-sm-12 col-md-12 col-lg-10 col-xl-8"
+  >
+    <div
+      class="gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100"
+    >
+      <h5
+        class="gl-m-0 gl-p-3 gl-bg-gray-10 gl-border-b-gray-100"
+      >
+        
+          YAML editor
+        
+      </h5>
+       
+      <network-policy-editor-stub
+        id="yamlEditor"
+        value=""
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PolicyEditorApp component renders the policy editor layout 1`] = `
+<section>
+  <header
+    class="my-3"
+  >
+    <h2
+      class="h3 mb-1"
+    >
+      
+      Policy description
+    
+    </h2>
+  </header>
+   
+  <div
+    class="row"
+  >
+    <div
+      class="col-sm-6 col-md-4 col-lg-3 col-xl-2"
+    >
+      <gl-form-group-stub
+        label="Policy type"
+        label-for="policyType"
+      >
+        <gl-form-select-stub
+          disabled=""
+          id="policyType"
+          options="[object Object]"
+          value="networkPolicy"
+        />
+      </gl-form-group-stub>
+    </div>
+     
+    <div
+      class="col-sm-6 col-md-6 col-lg-5 col-xl-4"
+    >
+      <gl-form-group-stub
+        label="Name"
+        label-for="policyName"
+      >
+        <gl-form-input-stub
+          id="policyName"
+        />
+      </gl-form-group-stub>
+    </div>
+  </div>
+   
+  <div
+    class="row"
+  >
+    <div
+      class="col-sm-12 col-md-10 col-lg-8 col-xl-6"
+    >
+      <gl-form-group-stub
+        label="Description"
+        label-for="policyDescription"
+      >
+        <gl-form-textarea-stub
+          id="policyDescription"
+          noresize="true"
+          value=""
+        />
+      </gl-form-group-stub>
+    </div>
+  </div>
+   
+  <div
+    class="row"
+  >
+    <environment-picker-stub />
+  </div>
+   
+  <div
+    class="row"
+  >
+    <div
+      class="col-md-auto"
+    >
+      <gl-form-group-stub
+        label="Policy status"
+        label-for="policyStatus"
+      >
+        <gl-toggle-stub
+          id="policyStatus"
+          labelposition="top"
+        />
+      </gl-form-group-stub>
+    </div>
+  </div>
+   
+  <div
+    class="row"
+  >
+    <div
+      class="col-md-auto"
+    >
+      <gl-form-group-stub
+        label="Editor mode"
+        label-for="editorMode"
+      >
+        <gl-segmented-control-stub
+          checked="rule"
+          options="[object Object],[object Object]"
+        />
+      </gl-form-group-stub>
+    </div>
+  </div>
+   
+  <hr />
+   
+  <div
+    class="row"
+    data-testid="rule-editor"
+  >
+    <div
+      class="col-sm-12 col-md-6 col-lg-7 col-xl-8"
+    >
+      <h4>
+        Rules
+      </h4>
+       
+      <policy-rule-builder-stub />
+       
+      <div
+        class="gl-my-2 gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100"
+      >
+        <gl-link-stub
+          href="#"
+        >
+          New rule
+        </gl-link-stub>
+      </div>
+       
+      <h4>
+        Actions
+      </h4>
+       
+      <policy-action-picker-stub />
+    </div>
+     
+    <div
+      class="col-sm-12 col-md-6 col-lg-5 col-xl-4"
+    >
+      <h5>
+        Policy preview
+      </h5>
+       
+      <policy-preview-stub />
+    </div>
+  </div>
+   
+  <!---->
+   
+  <hr />
+   
+  <div
+    class="row"
+  >
+    <div
+      class="col-md-auto"
+    >
+      <gl-button-stub
+        category="primary"
+        icon=""
+        size="medium"
+        type="submit"
+        variant="success"
+      >
+        Create policy
+      </gl-button-stub>
+       
+      <gl-button-stub
+        category="secondary"
+        icon=""
+        size="medium"
+        variant="default"
+      >
+        Cancel
+      </gl-button-stub>
+    </div>
+  </div>
+</section>
+`;

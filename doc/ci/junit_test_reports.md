@@ -140,6 +140,9 @@ java:
       junit: build/test-results/test/**/TEST-*.xml
 ```
 
+NOTE: **Note:**
+Support for `**` was added in [GitLab Runner 13.0](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/2620).
+
 #### Maven
 
 For parsing [Surefire](https://maven.apache.org/surefire/maven-surefire-plugin/)
@@ -247,8 +250,7 @@ display a list of test suites and cases reported from the XML file.
 ![Test Reports Widget](img/pipelines_junit_test_report_ui_v12_5.png)
 
 You can view all the known test suites and click on each of these to see further
-details, including the cases that makeup the suite. Cases are ordered by status,
-with failed showing at the top, skipped next and successful cases last.
+details, including the cases that make up the suite.
 
 You can also retrieve the reports via the [GitLab API](../api/pipelines.md#get-a-pipelines-test-report).
 
@@ -264,7 +266,7 @@ following command:
 ```ruby
 Feature.enable(:junit_pipeline_view)
 
-# Enable the feature for a specific project
+# Enable the feature for a specific project, GitLab 13.0 and above only.
 Feature.enable(:junit_pipeline_view, Project.find(<your-project-id-here>))
 ```
 

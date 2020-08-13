@@ -145,4 +145,17 @@ RSpec.describe Note do
       expect(described_class.by_humans).to match_array([user_note])
     end
   end
+
+  describe '.count_for_vulnerability_id' do
+    it 'counts notes by vulnerability id' do
+      vulnerability_1 = create(:vulnerability)
+      vulnerability_2 = create(:vulnerability)
+
+      create(:note, noteable: vulnerability_1, project: vulnerability_1.project)
+      create(:note, noteable: vulnerability_2, project: vulnerability_2.project)
+      create(:note, noteable: vulnerability_2, project: vulnerability_2.project)
+
+      expect(described_class.count_for_vulnerability_id([vulnerability_1.id, vulnerability_2.id])).to eq(vulnerability_1.id => 1, vulnerability_2.id => 2)
+    end
+  end
 end

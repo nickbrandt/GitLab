@@ -8,4 +8,5 @@ export default () => ({
   epicsSwimlanesFetchFailure: false,
   epicsSwimlanes: {},
   epics: {},
+  boardLists: [],
 });

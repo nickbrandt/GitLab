@@ -11,14 +11,16 @@ import { TEST_HOST } from 'helpers/test_constants';
 import {
   GlEmptyState,
   GlLoadingIcon,
-  GlDropdown,
-  GlDropdownItem,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownItem,
   GlDeprecatedButton,
 } from '@gitlab/ui';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
 import * as commonUtils from '~/lib/utils/common_utils';
 import * as urlUtils from '~/lib/utils/url_utility';
 import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
+import MetricChart from 'ee/analytics/productivity_analytics/components/metric_chart.vue';
+import httpStatusCodes from '~/lib/utils/http_status';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -42,7 +44,7 @@ describe('ProductivityApp component', () => {
 
   const mainChartData = { 1: 2, 2: 3 };
 
-  const createComponent = ({ props = {}, scatterplotEnabled = true } = {}) => {
+  const createComponent = ({ props = {}, options = {}, scatterplotEnabled = true } = {}) => {
     wrapper = shallowMount(ProductivityApp, {
       localVue,
       store,
@@ -57,6 +59,7 @@ describe('ProductivityApp component', () => {
       provide: {
         glFeatures: { productivityAnalyticsScatterplotEnabled: scatterplotEnabled },
       },
+      ...options,
     });
 
     wrapper.vm.$store.dispatch('setEndpoint', TEST_HOST);
@@ -78,7 +81,7 @@ describe('ProductivityApp component', () => {
   const findCommitBasedMetricChart = () => wrapper.find({ ref: 'commitBasedChart' });
   const findScatterplotMetricChart = () => wrapper.find({ ref: 'scatterplot' });
   const findMrTableSortSection = () => wrapper.find('.js-mr-table-sort');
-  const findSortFieldDropdown = () => findMrTableSortSection().find(GlDropdown);
+  const findSortFieldDropdown = () => findMrTableSortSection().find(GlDeprecatedDropdown);
   const findSortOrderToggle = () => findMrTableSortSection().find(GlDeprecatedButton);
   const findMrTableSection = () => wrapper.find('.js-mr-table');
   const findMrTable = () => findMrTableSection().find(MergeRequestTable);
@@ -430,7 +433,7 @@ describe('ProductivityApp component', () => {
 
                     it('should change the sort field', () => {
                       findSortFieldDropdown()
-                        .findAll(GlDropdownItem)
+                        .findAll(GlDeprecatedDropdownItem)
                         .at(0)
                         .vm.$emit('click');
 
@@ -497,6 +500,42 @@ describe('ProductivityApp component', () => {
             it('does not render the MR table', () => {
               expect(findMrTableSortSection().exists()).toBe(false);
               expect(findMrTableSection().exists()).toBe(false);
+            });
+          });
+
+          describe('with a server error', () => {
+            beforeEach(() => {
+              createComponent({
+                options: {
+                  stubs: {
+                    'metric-chart': MetricChart,
+                  },
+                },
+              });
+              wrapper.vm.$store.dispatch('charts/receiveChartDataError', {
+                chartKey: chartKeys.main,
+                error: { response: { status: httpStatusCodes.INTERNAL_SERVER_ERROR } },
+              });
+            });
+
+            it('sets isLoading=false on the metric chart', () => {
+              expect(findMainMetricChart().props('isLoading')).toBe(false);
+            });
+
+            it('passes a 500 status code to the metric chart', () => {
+              expect(findMainMetricChart().props('errorCode')).toBe(
+                httpStatusCodes.INTERNAL_SERVER_ERROR,
+              );
+            });
+
+            it('does not render any other charts', () => {
+              expect(findSecondaryChartsSection().exists()).toBe(false);
+            });
+
+            it('renders the proper info message', () => {
+              expect(findMainMetricChart().text()).toContain(
+                'There is too much data to calculate. Please change your selection.',
+              );
             });
           });
         });

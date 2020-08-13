@@ -130,7 +130,8 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
    connect to the **primary** node's database. For this reason, we need the address of
    each node.
 
-   NOTE: **Note:** For external PostgreSQL instances, see [additional instructions](external_database.md).
+   NOTE: **Note:**
+   For external PostgreSQL instances, see [additional instructions](external_database.md).
 
    If you are using a cloud provider, you can lookup the addresses for each
    Geo node through your cloud provider's management console.
@@ -165,6 +166,11 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
    The `listen_address` option opens PostgreSQL up to network connections with the interface
    corresponding to the given address. See [the PostgreSQL documentation](https://www.postgresql.org/docs/11/runtime-config-connection.html)
    for more details.
+
+   NOTE: **Note:**
+   If you need to use `0.0.0.0` or `*` as the listen_address, you will also need to add
+   `127.0.0.1/32` to the `postgresql['md5_auth_cidr_addresses']` setting, to allow Rails to connect through
+   `127.0.0.1`. For more information, see [omnibus-5258](https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5258).
 
    Depending on your network configuration, the suggested addresses may not
    be correct. If your **primary** node and **secondary** nodes connect over a local
@@ -419,7 +425,8 @@ data before running `pg_basebackup`.
 
 1. Execute the command below to start a backup/restore and begin the replication
 
-   CAUTION: **Warning:** Each Geo **secondary** node must have its own unique replication slot name.
+   CAUTION: **Warning:**
+   Each Geo **secondary** node must have its own unique replication slot name.
    Using the same slot name between two secondaries will break PostgreSQL replication.
 
    ```shell

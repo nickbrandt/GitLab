@@ -61,7 +61,7 @@ for. The rollout strategy will have no effect if the environment spec is disable
 It can be set to:
 
 - All users
-- [Percent rollout (logged in users)](#percent-rollout-logged-in-users)
+- [Percent of users](#percent-of-users)
   - Optionally, you can click the **Include additional user IDs** checkbox and add a list
     of specific users IDs to enable the feature for.
 - [User IDs](#user-ids)
@@ -69,9 +69,11 @@ It can be set to:
 ## Feature flag strategies
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/35555) in GitLab 13.0.
-> - It's deployed behind a feature flag, disabled by default.
+> - It was deployed behind a feature flag, disabled by default.
+> - It became [enabled by default](https://gitlab.com/gitlab-org/gitlab/-/issues/214684) in GitLab 13.2.
+> - It's recommended for production use.
 > - It's enabled on GitLab.com.
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-feature-flag-strategies). **(CORE ONLY)**
+> - For GitLab self-managed instances, a GitLab administrator can choose to [disable it](#enable-or-disable-feature-flag-strategies). **(CORE ONLY)**
 
 You can apply a feature flag strategy across multiple environments, without defining
 the strategy multiple times.
@@ -82,9 +84,9 @@ for granular feature flag controls. GitLab Feature Flags can have multiple strat
 and the supported strategies are:
 
 - [All users](#all-users)
-- [Percent rollout (logged in users)](#percent-rollout-logged-in-users)
+- [Percent of Users](#percent-of-users)
 - [User IDs](#user-ids)
-- [List](#list)
+- [User List](#user-list)
 
 Strategies can be added to feature flags when [creating a feature flag](#create-a-feature-flag),
 or by editing an existing feature flag after creation by navigating to **Operations > Feature Flags**
@@ -95,7 +97,7 @@ and clicking **{pencil}** (edit).
 Enables the feature for all users. It uses the [`default`](https://unleash.github.io/docs/activation_strategy#default)
 Unleash activation strategy.
 
-### Percent rollout (logged in users)
+### Percent of Users
 
 Enables the feature for a percentage of authenticated users. It uses the
 [`gradualRolloutUserId`](https://unleash.github.io/docs/activation_strategy#gradualrolloutuserid)
@@ -104,6 +106,9 @@ Unleash activation strategy.
 For example, set a value of 15% to enable the feature for 15% of authenticated users.
 
 The rollout percentage can be from 0% to 100%.
+
+NOTE: **Note:**
+Stickiness (consistent application behavior for the same user) is guaranteed for logged-in users, but not anonymous users.
 
 CAUTION: **Caution:**
 If this strategy is selected, then the Unleash client **must** be given a user
@@ -120,35 +125,83 @@ activation strategy.
 Enter user IDs as a comma-separated list of values. For example,
 `user@example.com, user2@example.com`, or `username1,username2,username3`, and so on.
 
+NOTE: **Note:**
+User IDs are identifiers for your application users. They do not need to be GitLab users.
+
 CAUTION: **Caution:**
 The Unleash client **must** be given a user ID for the feature to be enabled for
 target users. See the [Ruby example](#ruby-application-example) below.
 
-### List
+### User List
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/35930) in GitLab 13.1.
 
-Enables the feature for lists of users created with the [Feature Flag User List API](../api/feature_flag_user_lists.md).
+Enables the feature for lists of users created [in the Feature Flags UI](#create-a-user-list), or with the [Feature Flag User List API](../api/feature_flag_user_lists.md).
 Similar to [User IDs](#user-ids), it uses the Unleash [`userWithId`](https://unleash.github.io/docs/activation_strategy#userwithid)
 activation strategy.
 
+It's not possible to *disable* a feature for members of a user list, but you can achieve the same
+effect by enabling a feature for a user list that doesn't contain the excluded users.
+
+For example:
+
+- `Full-user-list` = `User1A, User1B, User2A, User2B, User3A, User3B, ...`
+- `Full-user-list-excluding-B-users` = `User1A, User2A, User3A, ...`
+
+#### Create a user list
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13308) in GitLab 13.3.
+
+To create a user list:
+
+1. In your project, navigate to **Operations > Feature Flags**.
+1. Click on **New list**.
+1. Enter a name for the list.
+1. Click **Create**.
+
+You can view a list's User IDs by clicking the **{pencil}** (edit) button next to it.
+When viewing a list, you can rename it by clicking the **Edit** button.
+
+#### Add users to a user list
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13308) in GitLab 13.3.
+
+To add users to a user list:
+
+1. In your project, navigate to **Operations > Feature Flags**.
+1. Click on the **{pencil}** (edit) button next to the list you want to add users to.
+1. Click on **Add Users**.
+1. Enter the user IDs as a comma-separated list of values. For example,
+   `user@example.com, user2@example.com`, or `username1,username2,username3`, and so on.
+1. Click on **Add**.
+
+#### Remove users from a user list
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/13308) in GitLab 13.3.
+
+To remove users from a user list:
+
+1. In your project, navigate to **Operations > Feature Flags**.
+1. Click on the **{pencil}** (edit) button next to the list you want to change.
+1. Click on the **{remove}** (remove) button next to the ID you want to remove.
+
 ### Enable or disable feature flag strategies
 
-This feature is under development, but is ready for testing. It's
-deployed behind a feature flag that is **disabled by default**.
+This feature is under development, but is ready for production use. It's
+deployed behind a feature flag that is **enabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../administration/feature_flags.md)
-can enable it for your instance.
-
-To enable it:
-
-```ruby
-Feature.enable(:feature_flags_new_version)
-```
+can disable it for your instance.
 
 To disable it:
 
 ```ruby
 Feature.disable(:feature_flags_new_version)
+```
+
+To enable it:
+
+```ruby
+Feature.enable(:feature_flags_new_version)
 ```
 
 ## Disable a feature flag for a specific environment
@@ -159,6 +212,7 @@ to disable a feature flag for a specific environment:
 1. Navigate to your project's **Operations > Feature Flags**.
 1. For the feature flag you want to disable, click the Pencil icon.
 1. To disable the flag:
+
    - In GitLab 13.0 and earlier: Slide the Status toggle for the environment. Or, to delete the
      environment spec, on the right, click the **Remove (X)** icon.
    - In GitLab 13.1 and later: For each strategy it applies to, under **Environments**, delete the environment.
@@ -187,9 +241,11 @@ To get the access credentials that your application needs to communicate with Gi
 1. Click the **Configure** button to view the following:
    - **API URL**: URL where the client (application) connects to get a list of feature flags.
    - **Instance ID**: Unique token that authorizes the retrieval of the feature flags.
-   - **Application name**: The name of the running environment. For instance,
-     if the application runs for a production server, the application name would be
-     `production` or similar. This value is used for the environment spec evaluation.
+   - **Application name**: The name of the *environment* the application runs in
+     (not the name of the application itself).
+
+     For example, if the application runs for a production server, the **Application name**
+     could be `production` or similar. This value is used for the environment spec evaluation.
 
 NOTE: **Note:**
 The meaning of these fields might change over time. For example, we are not sure
@@ -238,7 +294,7 @@ func init() {
     unleash.Initialize(
         unleash.WithUrl("https://gitlab.com/api/v4/feature_flags/unleash/42"),
         unleash.WithInstanceId("29QmjsW6KngPR5JNPMWx"),
-        unleash.WithAppName("production"),
+        unleash.WithAppName("production"), // Set to the running environment of your application
         unleash.WithListener(&metricsInterface{}),
     )
 }
@@ -271,7 +327,7 @@ require 'unleash/context'
 
 unleash = Unleash::Client.new({
   url: 'http://gitlab.com/api/v4/feature_flags/unleash/42',
-  app_name: 'production',
+  app_name: 'production', # Set to the running environment of your application
   instance_id: '29QmjsW6KngPR5JNPMWx'
 })
 
@@ -286,4 +342,36 @@ if unleash.is_enabled?("my_feature_name", unleash_context)
 else
   puts "hello, world!"
 end
+```
+
+## Feature Flag Related Issues
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/36617) in GitLab 13.2.
+> - It's deployed behind a feature flag, enabled by default.
+> - It's enabled on GitLab.com.
+> - It can't be enabled or disabled per-project
+> - It's recommended for production use.
+> - For GitLab self-managed instances, GitLab administrators can opt to disable it.
+
+You can link related issues to a feature flag. In the **Linked issues** section, click the `+` button and input the issue reference number or the full URL of the issue.
+
+This feature is similar to the [related issues](../user/project/issues/related_issues.md) feature.
+
+### Enable or disable Feature Flag Related Issues **(CORE ONLY)**
+
+Feature Flag Related Issues is under development but ready for production use.
+It is deployed behind a feature flag that is **enabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../administration/feature_flags.md)
+can opt to disable it for your instance.
+
+To disable it:
+
+```ruby
+Feature.disable(:feature_flags_issue_links)
+```
+
+To enable it:
+
+```ruby
+Feature.enable(:feature_flags_issue_links)
 ```

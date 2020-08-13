@@ -1,14 +1,15 @@
 <script>
 import { isEmpty } from 'lodash';
-import { GlDropdown, GlDropdownItem, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
+import httpStatusCodes from '~/lib/utils/http_status';
 
 export default {
   name: 'MetricChart',
   components: {
-    GlDropdown,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
     GlLoadingIcon,
     Icon,
   },
@@ -27,6 +28,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    errorCode: {
+      type: Number,
+      required: false,
+      default: null,
     },
     metricTypes: {
       type: Array,
@@ -52,8 +58,22 @@ export default {
       const foundMetric = this.metricTypes.find(m => m.key === this.selectedMetric);
       return foundMetric ? foundMetric.label : s__('MetricChart|Please select a metric');
     },
+    isServerError() {
+      return this.errorCode === httpStatusCodes.INTERNAL_SERVER_ERROR;
+    },
     hasChartData() {
       return !isEmpty(this.chartData);
+    },
+    infoMessage() {
+      if (this.isServerError) {
+        return s__(
+          'MetricChart|There is too much data to calculate. Please change your selection.',
+        );
+      } else if (!this.hasChartData) {
+        return s__('MetricChart|There is no data available. Please change your selection.');
+      }
+
+      return null;
     },
   },
   methods: {
@@ -68,18 +88,18 @@ export default {
     <h5 v-if="title">{{ title }}</h5>
     <gl-loading-icon v-if="isLoading" size="md" class="my-4 py-4" />
     <template v-else>
-      <div v-if="!hasChartData" ref="noData" class="bs-callout bs-callout-info">
-        {{ __('There is no data available. Please change your selection.') }}
+      <div v-if="infoMessage" data-testid="infoMessage" class="bs-callout bs-callout-info">
+        {{ infoMessage }}
       </div>
       <template v-else>
-        <gl-dropdown
+        <gl-deprecated-dropdown
           v-if="hasMetricTypes"
           class="mb-4 metric-dropdown"
           toggle-class="dropdown-menu-toggle w-100"
           menu-class="w-100 mw-100"
           :text="metricDropdownLabel"
         >
-          <gl-dropdown-item
+          <gl-deprecated-dropdown-item
             v-for="metric in metricTypes"
             :key="metric.key"
             active-class="is-active"
@@ -98,8 +118,8 @@ export default {
               />
               {{ metric.label }}
             </span>
-          </gl-dropdown-item>
-        </gl-dropdown>
+          </gl-deprecated-dropdown-item>
+        </gl-deprecated-dropdown>
         <p v-if="description" class="text-muted">{{ description }}</p>
         <div ref="chart">
           <slot v-if="hasChartData"></slot>

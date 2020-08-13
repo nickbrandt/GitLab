@@ -10,21 +10,21 @@ export default {
   childEpicPath: '/api/:version/groups/:id/epics/:epic_iid/epics',
   groupEpicsPath: '/api/:version/groups/:id/epics',
   epicIssuePath: '/api/:version/groups/:id/epics/:epic_iid/issues/:issue_id',
-  groupPackagesPath: '/api/:version/groups/:id/packages',
-  projectPackagesPath: '/api/:version/projects/:id/packages',
-  projectPackagePath: '/api/:version/projects/:id/packages/:package_id',
   cycleAnalyticsTasksByTypePath: '/groups/:id/-/analytics/type_of_work/tasks_by_type',
   cycleAnalyticsTopLabelsPath: '/groups/:id/-/analytics/type_of_work/tasks_by_type/top_labels',
   cycleAnalyticsSummaryDataPath: '/groups/:id/-/analytics/value_stream_analytics/summary',
   cycleAnalyticsTimeSummaryDataPath: '/groups/:id/-/analytics/value_stream_analytics/time_summary',
-  cycleAnalyticsGroupStagesAndEventsPath: '/groups/:id/-/analytics/value_stream_analytics/stages',
+  cycleAnalyticsGroupStagesAndEventsPath:
+    '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages',
+  cycleAnalyticsValueStreamsPath: '/groups/:id/-/analytics/value_stream_analytics/value_streams',
   cycleAnalyticsStageEventsPath:
-    '/groups/:id/-/analytics/value_stream_analytics/stages/:stage_id/records',
+    '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages/:stage_id/records',
   cycleAnalyticsStageMedianPath:
-    '/groups/:id/-/analytics/value_stream_analytics/stages/:stage_id/median',
-  cycleAnalyticsStagePath: '/groups/:id/-/analytics/value_stream_analytics/stages/:stage_id',
+    '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages/:stage_id/median',
+  cycleAnalyticsStagePath:
+    '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages/:stage_id',
   cycleAnalyticsDurationChartPath:
-    '/groups/:id/-/analytics/value_stream_analytics/stages/:stage_id/duration_chart',
+    '/groups/:id/-/analytics/value_stream_analytics/value_streams/:value_stream_id/stages/:stage_id/duration_chart',
   cycleAnalyticsGroupLabelsPath: '/groups/:namespace_path/-/labels.json',
   codeReviewAnalyticsPath: '/api/:version/analytics/code_review',
   groupActivityIssuesPath: '/api/:version/analytics/group_activity/issues_count',
@@ -37,6 +37,7 @@ export default {
   confirmOrderPath: '/-/subscriptions',
   vulnerabilityPath: '/api/:version/vulnerabilities/:id',
   vulnerabilityActionPath: '/api/:version/vulnerabilities/:id/:action',
+  vulnerabilityIssueLinksPath: '/api/:version/vulnerabilities/:id/issue_links',
   featureFlagUserLists: '/api/:version/projects/:id/feature_flags_user_lists',
   featureFlagUserList: '/api/:version/projects/:id/feature_flags_user_lists/:list_iid',
   applicationSettingsPath: '/api/:version/application/settings',
@@ -113,32 +114,6 @@ export default {
     return axios.delete(url);
   },
 
-  groupPackages(id, options = {}) {
-    const url = Api.buildUrl(this.groupPackagesPath).replace(':id', id);
-    return axios.get(url, options);
-  },
-
-  projectPackages(id, options = {}) {
-    const url = Api.buildUrl(this.projectPackagesPath).replace(':id', id);
-    return axios.get(url, options);
-  },
-
-  buildProjectPackageUrl(projectId, packageId) {
-    return Api.buildUrl(this.projectPackagePath)
-      .replace(':id', projectId)
-      .replace(':package_id', packageId);
-  },
-
-  projectPackage(projectId, packageId) {
-    const url = this.buildProjectPackageUrl(projectId, packageId);
-    return axios.get(url);
-  },
-
-  deleteProjectPackage(projectId, packageId) {
-    const url = this.buildProjectPackageUrl(projectId, packageId);
-    return axios.delete(url);
-  },
-
   cycleAnalyticsTasksByType(groupId, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsTasksByTypePath).replace(':id', groupId);
 
@@ -163,55 +138,73 @@ export default {
     return axios.get(url, { params });
   },
 
-  cycleAnalyticsGroupStagesAndEvents(groupId, params = {}) {
-    const url = Api.buildUrl(this.cycleAnalyticsGroupStagesAndEventsPath).replace(':id', groupId);
+  cycleAnalyticsGroupStagesAndEvents(groupId, valueStreamId, params = {}) {
+    const url = Api.buildUrl(this.cycleAnalyticsGroupStagesAndEventsPath)
+      .replace(':id', groupId)
+      .replace(':value_stream_id', valueStreamId);
 
     return axios.get(url, { params });
   },
 
-  cycleAnalyticsStageEvents(groupId, stageId, params = {}) {
+  cycleAnalyticsStageEvents(groupId, valueStreamId, stageId, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsStageEventsPath)
       .replace(':id', groupId)
+      .replace(':value_stream_id', valueStreamId)
       .replace(':stage_id', stageId);
 
     return axios.get(url, { params });
   },
 
-  cycleAnalyticsStageMedian(groupId, stageId, params = {}) {
+  cycleAnalyticsStageMedian(groupId, valueStreamId, stageId, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsStageMedianPath)
       .replace(':id', groupId)
+      .replace(':value_stream_id', valueStreamId)
       .replace(':stage_id', stageId);
 
     return axios.get(url, { params: { ...params } });
   },
 
-  cycleAnalyticsCreateStage(groupId, data) {
-    const url = Api.buildUrl(this.cycleAnalyticsGroupStagesAndEventsPath).replace(':id', groupId);
+  cycleAnalyticsCreateStage(groupId, valueStreamId, data) {
+    const url = Api.buildUrl(this.cycleAnalyticsGroupStagesAndEventsPath)
+      .replace(':id', groupId)
+      .replace(':value_stream_id', valueStreamId);
 
     return axios.post(url, data);
   },
 
-  cycleAnalyticsStageUrl(stageId, groupId) {
+  cycleAnalyticsCreateValueStream(groupId, data) {
+    const url = Api.buildUrl(this.cycleAnalyticsValueStreamsPath).replace(':id', groupId);
+    return axios.post(url, data);
+  },
+
+  cycleAnalyticsValueStreams(groupId, data) {
+    const url = Api.buildUrl(this.cycleAnalyticsValueStreamsPath).replace(':id', groupId);
+    return axios.get(url, data);
+  },
+
+  cycleAnalyticsStageUrl(groupId, valueStreamId, stageId) {
     return Api.buildUrl(this.cycleAnalyticsStagePath)
       .replace(':id', groupId)
+      .replace(':value_stream_id', valueStreamId)
       .replace(':stage_id', stageId);
   },
 
-  cycleAnalyticsUpdateStage(stageId, groupId, data) {
-    const url = this.cycleAnalyticsStageUrl(stageId, groupId);
+  cycleAnalyticsUpdateStage(groupId, valueStreamId, stageId, data) {
+    const url = this.cycleAnalyticsStageUrl(groupId, valueStreamId, stageId);
 
     return axios.put(url, data);
   },
 
-  cycleAnalyticsRemoveStage(stageId, groupId) {
-    const url = this.cycleAnalyticsStageUrl(stageId, groupId);
+  cycleAnalyticsRemoveStage(groupId, valueStreamId, stageId) {
+    const url = this.cycleAnalyticsStageUrl(groupId, valueStreamId, stageId);
 
     return axios.delete(url);
   },
 
-  cycleAnalyticsDurationChart(groupId, stageSlug, params = {}) {
+  cycleAnalyticsDurationChart(groupId, valueStreamId, stageSlug, params = {}) {
     const url = Api.buildUrl(this.cycleAnalyticsDurationChartPath)
       .replace(':id', groupId)
+      .replace(':value_stream_id', valueStreamId)
       .replace(':stage_id', stageSlug);
 
     return axios.get(url, {

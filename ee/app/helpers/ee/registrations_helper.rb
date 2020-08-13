@@ -16,6 +16,10 @@ module EE
       redirect_path&.starts_with?('/-/invites/')
     end
 
+    def in_oauth_flow?
+      redirect_path&.starts_with?(oauth_authorization_path)
+    end
+
     def setup_for_company_label_text
       if in_subscription_flow?
         _('Who will be using this GitLab subscription?')
@@ -23,6 +27,16 @@ module EE
         _('Who will be using this GitLab trial?')
       else
         _('Who will be using GitLab?')
+      end
+    end
+
+    def visibility_level_options
+      available_visibility_levels(@group).map do |level|
+        {
+          level: level,
+          label: visibility_level_label(level),
+          description: visibility_level_description(level, @group)
+        }
       end
     end
 

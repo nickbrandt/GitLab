@@ -37,6 +37,9 @@ export default {
   target_project_id: 19,
   target_project_full_path: '/group2/project2',
   merge_request_add_ci_config_path: '/group2/project2/new/pipeline',
+  is_dismissed_suggest_pipeline: false,
+  user_callouts_path: 'some/callout/path',
+  suggest_pipeline_feature_id: 'suggest_pipeline',
   new_project_pipeline_path: '/group2/project2/pipelines/new',
   metrics: {
     merged_by: {
@@ -211,6 +214,15 @@ export default {
     can_revert_on_current_merge_request: true,
     can_cherry_pick_on_current_merge_request: true,
   },
+  codeclimate: {
+    head_path: 'head.json',
+    base_path: 'base.json',
+  },
+  blob_path: {
+    base_path: 'blob_path',
+    head_path: 'blob_path',
+  },
+  codequality_help_path: 'code_quality.html',
   target_branch_path: '/root/acets-app/branches/master',
   source_branch_path: '/root/acets-app/branches/daaaa',
   conflict_resolution_ui_path: '/root/acets-app/-/merge_requests/22/conflicts',

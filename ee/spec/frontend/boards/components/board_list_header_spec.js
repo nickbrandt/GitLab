@@ -5,7 +5,7 @@ import AxiosMockAdapter from 'axios-mock-adapter';
 
 import BoardListHeader from 'ee/boards/components/board_list_header.vue';
 import List from '~/boards/models/list';
-import { ListType, inactiveListId } from '~/boards/constants';
+import { ListType, inactiveId } from '~/boards/constants';
 import axios from '~/lib/utils/axios_utils';
 import sidebarEventHub from '~/sidebar/event_hub';
 
@@ -29,7 +29,7 @@ describe('Board List Header Component', () => {
     window.gon = {};
     axiosMock = new AxiosMockAdapter(axios);
     axiosMock.onGet(`${TEST_HOST}/lists/1/issues`).reply(200, { issues: [] });
-    store = new Vuex.Store({ state: { activeListId: inactiveListId } });
+    store = new Vuex.Store({ state: { activeId: inactiveId } });
     jest.spyOn(store, 'dispatch').mockImplementation();
   });
 
@@ -145,7 +145,7 @@ describe('Board List Header Component', () => {
         });
 
         it('does not emits event when there is an active List', () => {
-          store.state.activeListId = listObj.id;
+          store.state.activeId = listObj.id;
           createComponent({ listType: hasSettings[0] });
           wrapper.vm.openSidebarSettings();
 

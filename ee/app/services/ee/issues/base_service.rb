@@ -26,7 +26,7 @@ module EE
 
       def find_epic(issue)
         id = params.delete(:epic_id)
-        return if id.to_i.zero?
+        return if id.to_i == 0
 
         group = issue.project.group
         return unless group.present?

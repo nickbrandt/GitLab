@@ -10,6 +10,7 @@ RSpec.describe 'Creating a DAST Site Profile' do
   let(:full_path) { project.full_path }
   let(:profile_name) { FFaker::Company.catch_phrase }
   let(:target_url) { FFaker::Internet.uri(:https) }
+  let(:dast_site_profile) { DastSiteProfile.find_by(project: project, name: profile_name) }
 
   let(:mutation) do
     graphql_mutation(
@@ -46,7 +47,19 @@ RSpec.describe 'Creating a DAST Site Profile' do
         project.add_developer(current_user)
       end
 
-      it_behaves_like 'a mutation that returns errors in the response', errors: ['Not implemented']
+      it 'returns the dast_site_profile id' do
+        post_graphql_mutation(mutation, current_user: current_user)
+
+        expect(mutation_response["id"]).to eq(dast_site_profile.to_global_id.to_s)
+      end
+
+      context 'when an unknown error occurs' do
+        before do
+          allow(DastSiteProfile).to receive(:create!).and_raise(StandardError)
+        end
+
+        it_behaves_like 'a mutation that returns top-level errors', errors: ['Internal server error']
+      end
     end
   end
 end

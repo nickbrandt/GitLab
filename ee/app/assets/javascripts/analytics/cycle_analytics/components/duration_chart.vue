@@ -25,11 +25,8 @@ export default {
       return Boolean(this.durationChartPlottableData.length);
     },
   },
-  mounted() {
-    this.fetchDurationData();
-  },
   methods: {
-    ...mapActions('durationChart', ['fetchDurationData', 'updateSelectedDurationChartStages']),
+    ...mapActions('durationChart', ['updateSelectedDurationChartStages']),
     onDurationStageSelect(stages) {
       this.updateSelectedDurationChartStages(stages);
     },

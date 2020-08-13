@@ -56,30 +56,30 @@ describe('Insights component', () => {
 
   describe('when config loaded', () => {
     const title = 'Bugs Per Team';
-    const page = {
-      title,
-    };
+    const chart1 = { title: 'foo' };
+    const chart2 = { title: 'bar' };
 
-    beforeEach(() => {
-      vm.$store.state.insights.configLoading = false;
-      vm.$store.state.insights.activePage = page;
-      vm.$store.state.insights.configData = {
-        bugsPerTeam: page,
+    describe('when charts have not been initialized', () => {
+      const page = {
+        title,
+        charts: [],
       };
-    });
 
-    it('has the correct nav tabs', () => {
-      return vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.js-insights-dropdown')).not.toBe(null);
-        expect(vm.$el.querySelector('.js-insights-dropdown .dropdown-item').innerText.trim()).toBe(
-          title,
-        );
-      });
-    });
-
-    describe('when loading page', () => {
       beforeEach(() => {
-        vm.$store.state.insights.pageLoading = true;
+        vm.$store.state.insights.configLoading = false;
+        vm.$store.state.insights.activePage = page;
+        vm.$store.state.insights.configData = {
+          bugsPerTeam: page,
+        };
+      });
+
+      it('has the correct nav tabs', () => {
+        return vm.$nextTick(() => {
+          expect(vm.$el.querySelector('.js-insights-dropdown')).not.toBe(null);
+          expect(
+            vm.$el.querySelector('.js-insights-dropdown .dropdown-item').innerText.trim(),
+          ).toBe(title);
+        });
       });
 
       it('disables the tab selector', () => {
@@ -87,6 +87,113 @@ describe('Insights component', () => {
           expect(
             vm.$el.querySelector('.js-insights-dropdown > button').getAttribute('disabled'),
           ).toBe('disabled');
+        });
+      });
+    });
+
+    describe('when charts have been initialized', () => {
+      const page = {
+        title,
+        charts: [chart1, chart2],
+      };
+
+      beforeEach(() => {
+        vm.$store.state.insights.configLoading = false;
+        vm.$store.state.insights.activePage = page;
+        vm.$store.state.insights.configData = {
+          bugsPerTeam: page,
+        };
+        vm.$store.state.insights.chartData = {
+          [chart1.title]: {},
+          [chart2.title]: {},
+        };
+      });
+
+      it('enables the tab selector', () => {
+        return vm.$nextTick(() => {
+          expect(
+            vm.$el.querySelector('.js-insights-dropdown > button').getAttribute('disabled'),
+          ).toBe('disabled');
+        });
+      });
+    });
+
+    describe('when some charts have been loaded', () => {
+      const page = {
+        title,
+        charts: [chart1],
+      };
+
+      beforeEach(() => {
+        vm.$store.state.insights.configLoading = false;
+        vm.$store.state.insights.activePage = page;
+        vm.$store.state.insights.configData = {
+          bugsPerTeam: page,
+        };
+        vm.$store.state.insights.chartData = {
+          [chart2.title]: { loaded: true },
+        };
+      });
+
+      it('disables the tab selector', () => {
+        return vm.$nextTick(() => {
+          expect(
+            vm.$el.querySelector('.js-insights-dropdown > button').getAttribute('disabled'),
+          ).toBe('disabled');
+        });
+      });
+    });
+
+    describe('when all charts have loaded', () => {
+      const page = {
+        title,
+        charts: [chart1, chart2],
+      };
+
+      beforeEach(() => {
+        vm.$store.state.insights.configLoading = false;
+        vm.$store.state.insights.activePage = page;
+        vm.$store.state.insights.configData = {
+          bugsPerTeam: page,
+        };
+        vm.$store.state.insights.chartData = {
+          [chart1.title]: { loaded: true },
+          [chart2.title]: { loaded: true },
+        };
+      });
+
+      it('enables the tab selector', () => {
+        return vm.$nextTick(() => {
+          expect(
+            vm.$el.querySelector('.js-insights-dropdown > button').getAttribute('disabled'),
+          ).toBe(null);
+        });
+      });
+    });
+
+    describe('when one chart has an error', () => {
+      const page = {
+        title,
+        charts: [chart1, chart2],
+      };
+
+      beforeEach(() => {
+        vm.$store.state.insights.configLoading = false;
+        vm.$store.state.insights.activePage = page;
+        vm.$store.state.insights.configData = {
+          bugsPerTeam: page,
+        };
+        vm.$store.state.insights.chartData = {
+          [chart1.title]: { error: 'Baz' },
+          [chart2.title]: { loaded: true },
+        };
+      });
+
+      it('enables the tab selector', () => {
+        return vm.$nextTick(() => {
+          expect(
+            vm.$el.querySelector('.js-insights-dropdown > button').getAttribute('disabled'),
+          ).toBe(null);
         });
       });
     });
@@ -105,6 +212,12 @@ describe('Insights component', () => {
         );
       });
     });
+
+    it('does not display dropdown', () => {
+      return vm.$nextTick(() => {
+        expect(vm.$el.querySelector('.js-insights-dropdown > button')).toBe(null);
+      });
+    });
   });
 
   describe('filtered out items', () => {
@@ -118,6 +231,12 @@ describe('Insights component', () => {
         expect(vm.$el.querySelector('.gl-alert-body').innerText.trim()).toContain(
           'This project is filtered out in the insights.yml file',
         );
+      });
+    });
+
+    it('does not display dropdown', () => {
+      return vm.$nextTick(() => {
+        expect(vm.$el.querySelector('.js-insights-dropdown > button')).toBe(null);
       });
     });
   });

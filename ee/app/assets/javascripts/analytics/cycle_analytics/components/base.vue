@@ -1,13 +1,11 @@
 <script>
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
-import { GlBreakpointInstance as bp } from '@gitlab/ui/dist/utils';
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { sprintf, __ } from '~/locale';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
-import { LAST_ACTIVITY_AT, DATE_RANGE_LIMIT } from '../../shared/constants';
+import { SIMILARITY_ORDER, LAST_ACTIVITY_AT, DATE_RANGE_LIMIT } from '../../shared/constants';
 import DateRange from '../../shared/components/daterange.vue';
 import StageTable from './stage_table.vue';
 import DurationChart from './duration_chart.vue';
@@ -81,6 +79,7 @@ export default {
       'startDate',
       'endDate',
       'medians',
+      'isLoadingValueStreams',
     ]),
     // NOTE: formEvents are fetched in the same request as the list of stages (fetchGroupStagesAndEvents)
     // so i think its ok to bind formEvents here even though its only used as a prop to the custom-stage-form
@@ -107,22 +106,21 @@ export default {
     shouldDisplayTypeOfWorkCharts() {
       return !this.hasNoAccessError && !this.isLoading;
     },
-    shouldDsiplayPathNavigation() {
+    shouldDisplayPathNavigation() {
       return this.featureFlags.hasPathNavigation && !this.hasNoAccessError && this.selectedStage;
     },
     shouldDisplayFilterBar() {
       // TODO: After we remove instance VSA currentGroupPath will be always set
       // https://gitlab.com/gitlab-org/gitlab/-/issues/223735
-      return this.featureFlags.hasFilterBar && this.currentGroupPath;
+      return this.currentGroupPath;
     },
     shouldDisplayCreateMultipleValueStreams() {
-      return Boolean(this.featureFlags.hasCreateMultipleValueStreams);
+      return Boolean(
+        this.featureFlags.hasCreateMultipleValueStreams && !this.isLoadingValueStreams,
+      );
     },
     isLoadingTypeOfWork() {
       return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
-    },
-    isXSBreakpoint() {
-      return bp.getBreakpointSize() === 'xs';
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -142,8 +140,15 @@ export default {
     stageCount() {
       return this.activeStages.length;
     },
-    hasProject() {
-      return this.selectedProjectIds.length > 0;
+    projectsQueryParams() {
+      return {
+        per_page: PROJECTS_PER_PAGE,
+        with_shared: false,
+        order_by: this.featureFlags.hasAnalyticsSimilaritySearch
+          ? SIMILARITY_ORDER
+          : LAST_ACTIVITY_AT,
+        include_subgroups: true,
+      };
     },
   },
 
@@ -159,7 +164,6 @@ export default {
       'removeStage',
       'updateStage',
       'reorderStage',
-      'setSelectedFilters',
     ]),
     ...mapActions('customStages', [
       'hideForm',
@@ -200,21 +204,11 @@ export default {
     onStageReorder(data) {
       this.reorderStage(data);
     },
-    onCreateValueStream({ name }) {
-      // stub - this will eventually trigger a vuex action
-      this.$toast.show(sprintf(__("'%{name}' Value Stream created"), { name }));
-    },
   },
   multiProjectSelect: true,
   dateOptions: [7, 30, 90],
   groupsQueryParams: {
     min_access_level: featureAccessLevel.EVERYONE,
-  },
-  projectsQueryParams: {
-    per_page: PROJECTS_PER_PAGE,
-    with_shared: false,
-    order_by: LAST_ACTIVITY_AT,
-    include_subgroups: true,
   },
   maxDateRange: DATE_RANGE_LIMIT,
   STAGE_ACTIONS,
@@ -228,17 +222,12 @@ export default {
       <h3>{{ __('Value Stream Analytics') }}</h3>
       <value-stream-select
         v-if="shouldDisplayCreateMultipleValueStreams"
-        class="gl-align-self-center"
-        :class="{
-          'gl-w-full': isXSBreakpoint,
-          'gl-mt-5': !isXSBreakpoint,
-        }"
-        @create="onCreateValueStream"
+        class="gl-align-self-start gl-sm-align-self-start gl-mt-0 gl-sm-mt-5"
       />
     </div>
-    <div class="mw-100">
-      <div class="mt-3 py-2 px-3 bg-gray-light border-top border-bottom">
-        <div v-if="shouldDsiplayPathNavigation" class="w-100 pb-2">
+    <div class="gl-max-w-full">
+      <div class="gl-mt-3 gl-py-2 gl-px-3 bg-gray-light border-top border-bottom">
+        <div v-if="shouldDisplayPathNavigation" class="gl-w-full gl-pb-2">
           <path-navigation
             class="js-path-navigation"
             :loading="isLoading"
@@ -264,7 +253,7 @@ export default {
               :key="selectedGroup.id"
               class="js-projects-dropdown-filter project-select"
               :group-id="selectedGroup.id"
-              :query-params="$options.projectsQueryParams"
+              :query-params="projectsQueryParams"
               :multi-select="$options.multiProjectSelect"
               :default-projects="selectedProjects"
               @selected="onProjectsSelect"
@@ -273,7 +262,6 @@ export default {
           <filter-bar
             v-if="shouldDisplayFilterBar"
             class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3 gl-border-none"
-            :disabled="!hasProject"
           />
           <div v-if="shouldDisplayFilters" class="gl-justify-content-end gl-white-space-nowrap">
             <date-range

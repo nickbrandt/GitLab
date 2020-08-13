@@ -36,7 +36,7 @@ module Geo
       resources = find_unsynced_jobs(batch_size: db_retrieve_batch_size)
       remaining_capacity = db_retrieve_batch_size - resources.count
 
-      if remaining_capacity.zero?
+      if remaining_capacity == 0
         resources
       else
         resources + find_low_priority_jobs(batch_size: remaining_capacity)

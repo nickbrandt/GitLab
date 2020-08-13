@@ -30,35 +30,41 @@ module Gitlab
         return Kaminari.paginate_array([]) if project.empty_repo? || query.blank?
         return Kaminari.paginate_array([]) unless root_ref?
 
-        project.repository.__elasticsearch__.elastic_search_as_found_blob(
-          query,
-          page: (page || 1).to_i,
-          per: per_page
-        )
+        strong_memoize(:blobs) do
+          project.repository.__elasticsearch__.elastic_search_as_found_blob(
+            query,
+            page: (page || 1).to_i,
+            per: per_page
+          )
+        end
       end
 
       def wiki_blobs(page: 1, per_page: DEFAULT_PER_PAGE)
         return Kaminari.paginate_array([]) unless Ability.allowed?(@current_user, :read_wiki, project)
 
         if project.wiki_enabled? && !project.wiki.empty? && query.present?
-          project.wiki.__elasticsearch__.elastic_search_as_wiki_page(
-            query,
-            page: (page || 1).to_i,
-            per: per_page
-          )
+          strong_memoize(:wiki_blobs) do
+            project.wiki.__elasticsearch__.elastic_search_as_wiki_page(
+              query,
+              page: (page || 1).to_i,
+              per: per_page
+            )
+          end
         else
           Kaminari.paginate_array([])
         end
       end
 
       def notes
-        opt = {
-          project_ids: limit_project_ids,
-          current_user: @current_user,
-          public_and_internal_projects: @public_and_internal_projects
-        }
+        strong_memoize(:notes) do
+          opt = {
+            project_ids: limit_project_ids,
+            current_user: @current_user,
+            public_and_internal_projects: @public_and_internal_projects
+          }
 
-        Note.elastic_search(query, options: opt)
+          Note.elastic_search(query, options: opt)
+        end
       end
 
       def commits(page: 1, per_page: DEFAULT_PER_PAGE, preload_method: nil)
@@ -69,12 +75,14 @@ module Gitlab
         else
           # We use elastic for default branch only
           if root_ref?
-            project.repository.find_commits_by_message_with_elastic(
-              query,
-              page: (page || 1).to_i,
-              per_page: per_page,
-              preload_method: preload_method
-            )
+            strong_memoize(:commits) do
+              project.repository.find_commits_by_message_with_elastic(
+                query,
+                page: (page || 1).to_i,
+                per_page: per_page,
+                preload_method: preload_method
+              )
+            end
           else
             offset = per_page * ((page || 1) - 1)
 

@@ -30,7 +30,7 @@ versions. If needed copy-paste GitLab code into the migration to make it forward
 compatible.
 
 For GitLab.com, please take into consideration that regular migrations (under `db/migrate`)
-are run before [Canary is deployed](https://about.gitlab.com/handbook/engineering/infrastructure/library/canary/#configuration-and-deployment),
+are run before [Canary is deployed](https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/library/canary/#configuration-and-deployment),
 and post-deployment migrations (`db/post_migrate`) are run after the deployment to production has finished.
 
 ## Schema Changes
@@ -88,7 +88,7 @@ body:
 For example:
 
 ```ruby
-class MyMigration < ActiveRecord::Migration[4.2]
+class MyMigration < ActiveRecord::Migration[6.0]
   DOWNTIME = true
   DOWNTIME_REASON = 'This migration requires downtime because ...'
 
@@ -380,7 +380,8 @@ Example changes:
 - `change_column_default`
 - `create_table` / `drop_table`
 
-**Note:** `with_lock_retries` method **cannot** be used within the `change` method, you must manually define the `up` and `down` methods to make the migration reversible.
+NOTE: **Note:**
+`with_lock_retries` method **cannot** be used within the `change` method, you must manually define the `up` and `down` methods to make the migration reversible.
 
 ### How the helper method works
 
@@ -411,7 +412,7 @@ migration. For this to work your migration needs to include the module
 `Gitlab::Database::MultiThreadedMigration`:
 
 ```ruby
-class MyMigration < ActiveRecord::Migration[4.2]
+class MyMigration < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
   include Gitlab::Database::MultiThreadedMigration
 end
@@ -421,7 +422,7 @@ You can then use the method `with_multiple_threads` to perform work in separate
 threads. For example:
 
 ```ruby
-class MyMigration < ActiveRecord::Migration[4.2]
+class MyMigration < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
   include Gitlab::Database::MultiThreadedMigration
 
@@ -440,7 +441,8 @@ the `with_multiple_threads` block, instead of re-using the global connection
 pool. This ensures each thread has its own connection object, and won't time
 out when trying to obtain one.
 
-**NOTE:** PostgreSQL has a maximum amount of connections that it allows. This
+NOTE: **Note:**
+PostgreSQL has a maximum amount of connections that it allows. This
 limit can vary from installation to installation. As a result, it's recommended
 you do not use more than 32 threads in a single migration. Usually, 4-8 threads
 should be more than enough.
@@ -455,7 +457,7 @@ by calling the method `disable_ddl_transaction!` in the body of your migration
 class like so:
 
 ```ruby
-class MyMigration < ActiveRecord::Migration[4.2]
+class MyMigration < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
   disable_ddl_transaction!
 
@@ -536,7 +538,7 @@ Here's an example where we add a new column with a foreign key
 constraint. Note it includes `index: true` to create an index for it.
 
 ```ruby
-class Migration < ActiveRecord::Migration[4.2]
+class Migration < ActiveRecord::Migration[6.0]
 
   def change
     add_reference :model, :other_model, index: true, foreign_key: { on_delete: :cascade }
@@ -604,7 +606,8 @@ In this particular case, the default value exists and we're just changing the me
 `request_access_enabled` column, which does not imply a rewrite of all the existing records
 in the `namespaces` table. Only when creating a new column with a default, all the records are going be rewritten.
 
-NOTE: **Note:**  A faster [ALTER TABLE ADD COLUMN with a non-null default](https://www.depesz.com/2018/04/04/waiting-for-postgresql-11-fast-alter-table-add-column-with-a-non-null-default/)
+NOTE: **Note:**
+A faster [ALTER TABLE ADD COLUMN with a non-null default](https://www.depesz.com/2018/04/04/waiting-for-postgresql-11-fast-alter-table-add-column-with-a-non-null-default/)
 was introduced on PostgresSQL 11.0, removing the need of rewriting the table when a new column with a default value is added.
 
 For the reasons mentioned above, it's safe to use `change_column_default` in a single-transaction migration
@@ -854,15 +857,25 @@ If you need more complex logic, you can define and use models local to a
 migration. For example:
 
 ```ruby
-class MyMigration < ActiveRecord::Migration[4.2]
+class MyMigration < ActiveRecord::Migration[6.0]
   class Project < ActiveRecord::Base
     self.table_name = 'projects'
+  end
+
+  def up
+    # Reset the column information of all the models that update the database
+    # to ensure the Active Record's knowledge of the table structure is current
+    Project.reset_column_information
+
+    # ... ...
   end
 end
 ```
 
 When doing so be sure to explicitly set the model's table name, so it's not
 derived from the class name or namespace.
+
+Be aware of the limitations [when using models in migrations](#using-models-in-migrations-discouraged).
 
 ### Renaming reserved paths
 
@@ -888,3 +901,78 @@ _namespaces_ that have a `project_id`.
 
 The `path` column for these rows will be renamed to their previous value followed
 by an integer. For example: `users` would turn into `users0`
+
+## Using models in migrations (discouraged)
+
+The use of models in migrations is generally discouraged. As such models are
+[contraindicated for background migrations](background_migrations.md#isolation),
+the model needs to be declared in the migration.
+
+If using a model in the migrations, you should first
+[clear the column cache](https://api.rubyonrails.org/classes/ActiveRecord/ModelSchema/ClassMethods.html#method-i-reset_column_information)
+using `reset_column_information`.
+
+This avoids problems where a column that you are using was altered and cached
+in a previous migration.
+
+### Example: Add a column `my_column` to the users table
+
+NOTE: **Note:**
+It is important not to leave out the `User.reset_column_information` command, in order to ensure that the old schema is dropped from the cache and ActiveRecord loads the updated schema information.
+
+```ruby
+class AddAndSeedMyColumn < ActiveRecord::Migration[6.0]
+  class User < ActiveRecord::Base
+    self.table_name = 'users'
+  end
+
+  def up
+    User.count # Any ActiveRecord calls on the model that caches the column information.
+
+    add_column :users, :my_column, :integer, default: 1
+
+    User.reset_column_information # The old schema is dropped from the cache.
+    User.find_each do |user|
+      user.my_column = 42 if some_condition # ActiveRecord sees the correct schema here.
+      user.save!
+    end
+  end
+end
+```
+
+The underlying table is modified and then accessed via ActiveRecord.
+
+Note that this also needs to be used if the table is modified in a previous, different migration,
+if both migrations are run in the same `db:migrate` process.
+
+This results in the following. Note the inclusion of `my_column`:
+
+```shell
+== 20200705232821 AddAndSeedMyColumn: migrating ==============================
+D, [2020-07-06T00:37:12.483876 #130101] DEBUG -- :    (0.2ms)  BEGIN
+D, [2020-07-06T00:37:12.521660 #130101] DEBUG -- :    (0.4ms)  SELECT COUNT(*) FROM "user"
+-- add_column(:users, :my_column, :integer, {:default=>1})
+D, [2020-07-06T00:37:12.523309 #130101] DEBUG -- :    (0.8ms)  ALTER TABLE "users" ADD "my_column" integer DEFAULT 1
+   -> 0.0016s
+D, [2020-07-06T00:37:12.650641 #130101] DEBUG -- :   AddAndSeedMyColumn::User Load (0.7ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1  [["LIMIT", 1000]]
+D, [2020-07-18T00:41:26.851769 #459802] DEBUG -- :   AddAndSeedMyColumn::User Update (1.1ms)  UPDATE "users" SET "my_column" = $1, "updated_at" = $2 WHERE "users"."id" = $3  [["my_column", 42], ["updated_at", "2020-07-17 23:41:26.849044"], ["id", 1]]
+D, [2020-07-06T00:37:12.653648 #130101] DEBUG -- :   ↳ config/initializers/config_initializers_active_record_locking.rb:13:in `_update_row'
+== 20200705232821 AddAndSeedMyColumn: migrated (0.1706s) =====================
+```
+
+If you skip clearing the schema cache (`User.reset_column_information`), the column is not
+used by ActiveRecord and the intended changes are not made, leading to the result below,
+where `my_column` is missing from the query.
+
+```shell
+== 20200705232821 AddAndSeedMyColumn: migrating ==============================
+D, [2020-07-06T00:37:12.483876 #130101] DEBUG -- :    (0.2ms)  BEGIN
+D, [2020-07-06T00:37:12.521660 #130101] DEBUG -- :    (0.4ms)  SELECT COUNT(*) FROM "user"
+-- add_column(:users, :my_column, :integer, {:default=>1})
+D, [2020-07-06T00:37:12.523309 #130101] DEBUG -- :    (0.8ms)  ALTER TABLE "users" ADD "my_column" integer DEFAULT 1
+   -> 0.0016s
+D, [2020-07-06T00:37:12.650641 #130101] DEBUG -- :   AddAndSeedMyColumn::User Load (0.7ms)  SELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1  [["LIMIT", 1000]]
+D, [2020-07-06T00:37:12.653459 #130101] DEBUG -- :   AddAndSeedMyColumn::User Update (0.5ms)  UPDATE "users" SET "updated_at" = $1 WHERE "users"."id" = $2  [["updated_at", "2020-07-05 23:37:12.652297"], ["id", 1]]
+D, [2020-07-06T00:37:12.653648 #130101] DEBUG -- :   ↳ config/initializers/config_initializers_active_record_locking.rb:13:in `_update_row'
+== 20200705232821 AddAndSeedMyColumn: migrated (0.1706s) =====================
+```

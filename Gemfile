@@ -41,7 +41,7 @@ gem 'omniauth-oauth2-generic', '~> 0.2.2'
 gem 'omniauth-saml', '~> 1.10'
 gem 'omniauth-shibboleth', '~> 1.3.0'
 gem 'omniauth-twitter', '~> 1.4'
-gem 'omniauth_crowd', '~> 2.2.0'
+gem 'omniauth_crowd', '~> 2.4.0'
 gem 'omniauth-authentiq', '~> 0.3.3'
 gem 'omniauth_openid_connect', '~> 0.3.5'
 gem 'omniauth-salesforce', '~> 1.0.5'
@@ -69,7 +69,7 @@ gem 'rubyzip', '~> 2.0.0', require: 'zip'
 gem 'acme-client', '~> 2.0', '>= 2.0.6'
 
 # Browser detection
-gem 'browser', '~> 2.5'
+gem 'browser', '~> 4.2'
 
 # GPG
 gem 'gpgme', '~> 2.0.19'
@@ -81,7 +81,9 @@ gem 'gitlab_omniauth-ldap', '~> 2.1.1', require: 'omniauth-ldap'
 gem 'net-ldap'
 
 # API
-gem 'grape', '~> 1.3.3'
+# Locked at Grape v1.4.0 until https://github.com/ruby-grape/grape/pull/2088 is merged
+# Remove config/initializers/grape_patch.rb
+gem 'grape', '= 1.4.0'
 gem 'grape-entity', '~> 0.7.1'
 gem 'rack-cors', '~> 1.0.6', require: 'rack/cors'
 
@@ -131,8 +133,10 @@ gem 'seed-fu', '~> 2.3.7'
 gem 'elasticsearch-model', '~> 6.1'
 gem 'elasticsearch-rails', '~> 6.1', require: 'elasticsearch/rails/instrumentation'
 gem 'elasticsearch-api',   '~> 6.8'
-gem 'aws-sdk'
-gem 'faraday_middleware-aws-signers-v4'
+gem 'aws-sdk-core', '~> 3'
+gem 'aws-sdk-cloudformation', '~> 1'
+gem 'aws-sdk-s3', '~> 1'
+gem 'faraday_middleware-aws-sigv4', '~>0.3.0'
 
 # Markdown and HTML processing
 gem 'html-pipeline', '~> 2.12'
@@ -140,7 +144,7 @@ gem 'deckar01-task_list', '2.3.1'
 gem 'gitlab-markup', '~> 1.7.1'
 gem 'github-markup', '~> 1.7.0', require: 'github/markup'
 gem 'commonmarker', '~> 0.20'
-gem 'kramdown', '~> 2.2.1'
+gem 'kramdown', '~> 2.3.0'
 gem 'RedCloth', '~> 4.3.2'
 gem 'rdoc', '~> 6.1.2'
 gem 'org-ruby', '~> 0.9.12'
@@ -149,7 +153,7 @@ gem 'wikicloth', '0.8.1'
 gem 'asciidoctor', '~> 2.0.10'
 gem 'asciidoctor-include-ext', '~> 0.3.1', require: false
 gem 'asciidoctor-plantuml', '~> 0.0.12'
-gem 'rouge', '~> 3.20.0'
+gem 'rouge', '~> 3.21.0'
 gem 'truncato', '~> 0.7.11'
 gem 'bootstrap_form', '~> 4.2.0'
 gem 'nokogiri', '~> 1.10.9'
@@ -186,7 +190,7 @@ gem 'acts-as-taggable-on', '~> 6.0'
 # Background jobs
 gem 'sidekiq', '~> 5.2.7'
 gem 'sidekiq-cron', '~> 1.0'
-gem 'redis-namespace', '~> 1.6.0'
+gem 'redis-namespace', '~> 1.7.0'
 gem 'gitlab-sidekiq-fetcher', '0.5.2', require: 'sidekiq-reliable-fetch'
 
 # Cron Parser
@@ -212,7 +216,7 @@ gem 're2', '~> 1.2.0'
 gem 'version_sorter', '~> 2.2.4'
 
 # Export Ruby Regex to Javascript
-gem 'js_regex', '~> 3.1'
+gem 'js_regex', '~> 3.4'
 
 # User agent parsing
 gem 'device_detector'
@@ -304,7 +308,7 @@ gem 'sentry-raven', '~> 2.9'
 gem 'premailer-rails', '~> 1.10.3'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '0.12.0'
+gem 'gitlab-labkit', '0.12.1'
 
 # I18n
 gem 'ruby_parser', '~> 3.8', require: false
@@ -326,7 +330,7 @@ group :metrics do
   gem 'method_source', '~> 0.8', require: false
 
   # Prometheus
-  gem 'prometheus-client-mmap', '~> 0.10.0'
+  gem 'prometheus-client-mmap', '~> 0.11.0'
   gem 'raindrops', '~> 0.18'
 end
 
@@ -335,10 +339,9 @@ group :development do
   gem 'danger', '~> 6.0', require: false
 
   gem 'letter_opener_web', '~> 1.3.4'
-  gem 'rblineprof', '~> 0.3.6', platform: :mri, require: false
 
   # Better errors handler
-  gem 'better_errors', '~> 2.5.0'
+  gem 'better_errors', '~> 2.7.1'
   gem 'binding_of_caller', '~> 0.8.0'
 
   # thin instead webrick
@@ -388,6 +391,8 @@ group :development, :test do
   gem 'png_quantizator', '~> 0.2.1', require: false
 
   gem 'parallel', '~> 1.19', require: false
+
+  gem 'rblineprof', '~> 0.3.6', platform: :mri, require: false
 end
 
 # Gems required in omnibus-gitlab pipeline
@@ -437,7 +442,7 @@ gem 'activerecord-explain-analyze', '~> 0.1', require: false
 gem 'oauth2', '~> 1.4'
 
 # Health check
-gem 'health_check', '~> 2.6.0'
+gem 'health_check', '~> 3.0'
 
 # System information
 gem 'vmstat', '~> 2.3.0'
@@ -457,11 +462,11 @@ group :ed25519 do
 end
 
 # Gitaly GRPC protocol definitions
-gem 'gitaly', '~> 13.2.0.pre.rc2'
+gem 'gitaly', '~> 13.3.0-rc1'
 
-gem 'grpc', '~> 1.24.0'
+gem 'grpc', '~> 1.30.2'
 
-gem 'google-protobuf', '~> 3.8.0'
+gem 'google-protobuf', '~> 3.12'
 
 gem 'toml-rb', '~> 1.0.0'
 
@@ -502,5 +507,7 @@ gem 'valid_email', '~> 0.1'
 # JSON
 gem 'json', '~> 2.3.0'
 gem 'json-schema', '~> 2.8.0'
+gem 'json_schemer', '~> 0.2.12'
 gem 'oj', '~> 3.10.6'
 gem 'multi_json', '~> 1.14.1'
+gem 'yajl-ruby', '~> 1.4.1', require: 'yajl'

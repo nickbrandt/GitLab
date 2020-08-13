@@ -28,6 +28,13 @@ module ClustersHelper
     }
   end
 
+  def js_cluster_form_data(cluster, can_edit)
+    {
+      enabled: cluster.enabled?.to_s,
+      editable: can_edit.to_s
+    }
+  end
+
   # This method is depreciated and will be removed when associated HAML files are moved to JavaScript
   def provider_icon(provider = nil)
     img_data = js_clusters_list_data.dig(:img_tags, provider&.to_sym) ||

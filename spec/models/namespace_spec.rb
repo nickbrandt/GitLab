@@ -17,6 +17,7 @@ RSpec.describe Namespace do
     it { is_expected.to have_many :children }
     it { is_expected.to have_one :root_storage_statistics }
     it { is_expected.to have_one :aggregation_schedule }
+    it { is_expected.to have_one :namespace_settings }
     it { is_expected.to have_many :custom_emoji }
   end
 
@@ -506,6 +507,7 @@ RSpec.describe Namespace do
         Gitlab.config.repositories.storages.default.legacy_disk_path
       end
     end
+
     let(:path_in_dir) { File.join(repository_storage_path, namespace.full_path) }
     let(:deleted_path) { namespace.full_path.gsub(namespace.path, "#{namespace.full_path}+#{namespace.id}+deleted") }
     let(:deleted_path_in_dir) { File.join(repository_storage_path, deleted_path) }

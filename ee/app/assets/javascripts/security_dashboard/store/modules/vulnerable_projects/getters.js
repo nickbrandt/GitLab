@@ -1,6 +1,7 @@
 import { SEVERITY_GROUPS, SEVERITY_LEVELS_ORDERED_BY_SEVERITY } from './constants';
 import { projectsForSeverityGroup, addMostSevereVulnerabilityInformation } from './utils';
 
+// eslint-disable-next-line import/prefer-default-export
 export const severityGroups = ({ projects }) => {
   // add data about it's most severe vulnerability to each project
   const projectsWithSeverityInformation = projects.map(
@@ -13,6 +14,3 @@ export const severityGroups = ({ projects }) => {
     projects: projectsForSeverityGroup(projectsWithSeverityInformation, severityGroup),
   }));
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

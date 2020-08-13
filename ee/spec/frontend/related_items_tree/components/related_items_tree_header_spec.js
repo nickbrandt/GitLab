@@ -61,7 +61,7 @@ describe('RelatedItemsTree', () => {
 
       it('returns string containing issue count based on available direct children within state', () => {
         expect(wrapper.find(GlTooltip).text()).toContain(`Issues •
-        1 open, 1 closed`);
+        2 open, 1 closed`);
       });
     });
 
@@ -232,7 +232,7 @@ describe('RelatedItemsTree', () => {
         const issuesEl = wrapper.findAll('.issue-count-badge > span').at(1);
         const issueIcon = issuesEl.find(GlIcon);
 
-        expect(issuesEl.text().trim()).toContain('2');
+        expect(issuesEl.text().trim()).toContain('3');
         expect(issueIcon.isVisible()).toBe(true);
         expect(issueIcon.props('name')).toBe('issues');
       });

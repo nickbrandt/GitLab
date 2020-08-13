@@ -16,11 +16,6 @@ module Elastic
         query_hash = project_ids_filter(query_hash, options)
         query_hash = confidentiality_filter(query_hash, options[:current_user])
 
-        query_hash[:sort] = [
-          { updated_at: { order: :desc } },
-          :_score
-        ]
-
         query_hash[:highlight] = highlight_options(options[:in])
 
         search(query_hash, options)

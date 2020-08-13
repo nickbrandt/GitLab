@@ -16,13 +16,13 @@ RSpec.describe Gitlab::Ci::Parsers::Security::CoverageFuzzing do
       end
     end
 
-    it 'parses all identifiers and occurrences' do
-      expect(report.occurrences.length).to eq(1)
+    it 'parses all identifiers and findings' do
+      expect(report.findings.length).to eq(1)
       expect(report.scanners.length).to eq(1)
     end
 
     it 'generates expected location' do
-      location = report.occurrences.first.location
+      location = report.findings.first.location
 
       expect(location).to be_a(::Gitlab::Ci::Reports::Security::Locations::CoverageFuzzing)
       expect(location).to have_attributes(

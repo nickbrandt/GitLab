@@ -36,6 +36,7 @@ module EE
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
       delegate :sha, to: :base_pipeline, prefix: :base_pipeline, allow_nil: true
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
+      delegate :merge_requests_disable_committers_approval?, to: :target_project, allow_nil: true
 
       scope :without_approvals, -> { left_outer_joins(:approvals).where(approvals: { id: nil }) }
       scope :with_approvals, -> { joins(:approvals) }
@@ -144,8 +145,10 @@ module EE
     end
 
     def has_denied_policies?
-      return false if ::Feature.disabled?(:license_compliance_denies_mr, project, default_enabled: false)
+      return false if ::Feature.disabled?(:license_compliance_denies_mr, project, default_enabled: true)
       return false unless has_license_scanning_reports?
+
+      return false if has_approved_license_check?
 
       actual_head_pipeline.license_scanning_report.violates?(project.software_license_policies)
     end
@@ -156,7 +159,8 @@ module EE
         container_scanning: report_type_enabled?(:container_scanning),
         dast: report_type_enabled?(:dast),
         dependency_scanning: report_type_enabled?(:dependency_scanning),
-        license_scanning: report_type_enabled?(:license_scanning)
+        license_scanning: report_type_enabled?(:license_scanning),
+        coverage_fuzzing: report_type_enabled?(:coverage_fuzzing)
       }
     end
 
@@ -230,6 +234,16 @@ module EE
       compare_reports(::Ci::CompareMetricsReportsService)
     end
 
+    def has_coverage_fuzzing_reports?
+      !!actual_head_pipeline&.has_reports?(::Ci::JobArtifact.coverage_fuzzing_reports)
+    end
+
+    def compare_coverage_fuzzing_reports(current_user)
+      return missing_report_error("coverage fuzzing") unless has_coverage_fuzzing_reports?
+
+      compare_reports(::Ci::CompareSecurityReportsService, current_user, 'coverage_fuzzing')
+    end
+
     def synchronize_approval_rules_from_target_project
       return if merged?
 
@@ -240,6 +254,12 @@ module EE
     end
 
     private
+
+    def has_approved_license_check?
+      if rule = approval_rules.license_compliance.last
+        ApprovalWrappedRule.wrap(self, rule).approved?
+      end
+    end
 
     def missing_report_error(report_type)
       { status: :error, status_reason: "This merge request does not have #{report_type} reports" }

@@ -18,6 +18,7 @@ RSpec.describe Groups::CreateService, '#execute' do
       let(:fail_condition!) do
         allow(Gitlab::VisibilityLevel).to receive(:allowed_for?).and_return(false)
       end
+
       let(:attributes) do
         {
            author_id: user.id,
@@ -61,7 +62,7 @@ RSpec.describe Groups::CreateService, '#execute' do
 
   context 'updating protected params' do
     let(:attrs) do
-      group_params.merge(shared_runners_minutes_limit: 1000, extra_shared_runners_minutes_limit: 100)
+      group_params.merge(shared_runners_minutes_limit: 1000, extra_shared_runners_minutes_limit: 100, delayed_project_removal: true)
     end
 
     context 'as an admin' do
@@ -72,6 +73,7 @@ RSpec.describe Groups::CreateService, '#execute' do
 
         expect(group.shared_runners_minutes_limit).to eq(1000)
         expect(group.extra_shared_runners_minutes_limit).to eq(100)
+        expect(group.delayed_project_removal).to be true
       end
     end
 
@@ -81,6 +83,7 @@ RSpec.describe Groups::CreateService, '#execute' do
 
         expect(group.shared_runners_minutes_limit).to be_nil
         expect(group.extra_shared_runners_minutes_limit).to be_nil
+        expect(group.delayed_project_removal).to be false
       end
     end
   end

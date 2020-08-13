@@ -185,7 +185,7 @@ RSpec.describe DashboardHelper, type: :helper do
     end
 
     with_them do
-      let(:user) { create(current_user) }
+      let(:user) { create(current_user) } # rubocop:disable Rails/SaveBang
       let(:license) { has_license && create(:license) }
       subject { helper.has_start_trial? }
 

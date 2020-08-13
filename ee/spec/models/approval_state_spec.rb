@@ -744,7 +744,7 @@ RSpec.describe ApprovalState do
           end
 
           it 'requires 1 approval' do
-            expect(subject.has_approved?(approver)).to eq(true)
+            expect(merge_request.approved_by?(approver)).to eq(true)
             expect(subject.approvals_left).to eq(1)
           end
 
@@ -754,24 +754,21 @@ RSpec.describe ApprovalState do
             end
 
             it 'becomes approved' do
-              expect(subject.has_approved?(approver1)).to eq(true)
+              expect(merge_request.approved_by?(approver1)).to eq(true)
               expect(subject.approved?).to eq(true)
             end
           end
         end
       end
-    end
 
-    describe '#has_approved?' do
-      it 'returns false if user is nil' do
-        expect(subject.has_approved?(nil)).to eq(false)
-      end
+      context 'when approval feature is disabled' do
+        it 'delegates the call to merge request' do
+          stub_licensed_features(merge_request_approvers: false)
 
-      it 'returns true if user has approved' do
-        create(:approval, merge_request: merge_request, user: approver1)
+          expect(merge_request).to receive(:can_be_approved_by?).with(approver1)
 
-        expect(subject.has_approved?(approver1)).to eq(true)
-        expect(subject.has_approved?(approver2)).to eq(false)
+          subject.can_approve?(approver1)
+        end
       end
     end
 
@@ -1350,19 +1347,6 @@ RSpec.describe ApprovalState do
             end
           end
         end
-      end
-    end
-
-    describe '#has_approved?' do
-      it 'returns false if user is nil' do
-        expect(subject.has_approved?(nil)).to eq(false)
-      end
-
-      it 'returns true if user has approved' do
-        create(:approval, merge_request: merge_request, user: approver1)
-
-        expect(subject.has_approved?(approver1)).to eq(true)
-        expect(subject.has_approved?(approver2)).to eq(false)
       end
     end
 

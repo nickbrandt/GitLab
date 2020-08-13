@@ -221,7 +221,7 @@ RSpec.describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
 
             rule = target.approval_rules.first
 
-            expect(rule.read_attribute(:code_owner)).to eq(true)
+            expect(rule.code_owner).to eq(true)
             expect(rule.users).to contain_exactly(*owners)
           end
         end

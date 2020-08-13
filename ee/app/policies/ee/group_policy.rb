@@ -21,6 +21,10 @@ module EE
         @subject.feature_available?(:cycle_analytics_for_groups)
       end
 
+      condition(:group_merge_request_analytics_available) do
+        @subject.feature_available?(:group_merge_request_analytics)
+      end
+
       condition(:group_activity_analytics_available) do
         @subject.beta_feature_available?(:group_activity_analytics)
       end
@@ -39,6 +43,10 @@ module EE
 
       condition(:security_dashboard_enabled) do
         @subject.feature_available?(:security_dashboard)
+      end
+
+      condition(:prevent_group_forking_available) do
+        @subject.feature_available?(:group_forking_protection)
       end
 
       condition(:needs_new_sso_session) do
@@ -87,6 +95,8 @@ module EE
         ::Feature.enabled?(:group_push_rules, @subject.root_ancestor) && @subject.feature_available?(:push_rules)
       end
 
+      condition(:over_storage_limit, scope: :subject) { @subject.over_storage_limit? }
+
       rule { public_group | logged_in_viewable }.policy do
         enable :read_wiki
         enable :download_wiki_code
@@ -122,8 +132,15 @@ module EE
       rule { has_access & group_activity_analytics_available }
         .enable :read_group_activity_analytics
 
+      rule { reporter & group_merge_request_analytics_available }
+        .enable :read_group_merge_request_analytics
+
       rule { reporter & cycle_analytics_available }.policy do
         enable :read_group_cycle_analytics, :create_group_stage, :read_group_stage, :update_group_stage, :delete_group_stage
+      end
+
+      rule { owner & ~has_parent & prevent_group_forking_available }.policy do
+        enable :change_prevent_group_forking
       end
 
       rule { can?(:read_group) & dependency_proxy_available }
@@ -253,6 +270,25 @@ module EE
       rule { admin & is_gitlab_com }.enable :update_subscription_limit
 
       rule { public_group }.enable :view_embedded_analytics_report
+
+      rule { over_storage_limit }.policy do
+        prevent :create_projects
+        prevent :create_epic
+        prevent :update_epic
+        prevent :admin_milestone
+        prevent :upload_file
+        prevent :admin_label
+        prevent :admin_list
+        prevent :admin_issue
+        prevent :admin_pipeline
+        prevent :add_cluster
+        prevent :create_cluster
+        prevent :update_cluster
+        prevent :admin_cluster
+        prevent :admin_group_member
+        prevent :create_deploy_token
+        prevent :create_subgroup
+      end
     end
 
     override :lookup_access_level!

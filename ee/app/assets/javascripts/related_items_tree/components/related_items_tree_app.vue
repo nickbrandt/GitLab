@@ -167,6 +167,7 @@ export default {
           :has-error="itemAddFailure"
           :item-add-failure-type="itemAddFailureType"
           :item-add-failure-message="itemAddFailureMessage"
+          :confidential="parentItem.confidential"
           @pendingIssuableRemoveRequest="handlePendingItemRemove"
           @addIssuableFormInput="handleAddItemFormInput"
           @addIssuableFormBlur="handleAddItemFormBlur"

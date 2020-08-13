@@ -40,7 +40,7 @@ Once [Group Single Sign-On](index.md) has been configured, we can:
 1. Click on the **Generate a SCIM token** button.
 1. Save the token and URL so they can be used in the next step.
 
-![SCIM token configuration](img/scim_token.png)
+![SCIM token configuration](img/scim_token_v13_3.png)
 
 ## Identity Provider configuration
 
@@ -49,7 +49,7 @@ Once [Group Single Sign-On](index.md) has been configured, we can:
 
 ### Azure configuration steps
 
-The SAML application that was created during [Single sign-on](index.md) setup for [Azure](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/configure-single-sign-on-non-gallery-applications) now needs to be set up for SCIM.
+The SAML application that was created during [Single sign-on](index.md) setup for [Azure](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/view-applications-portal) now needs to be set up for SCIM.
 
 1. Check the configuration for your GitLab SAML app and ensure that **Name identifier value** (NameID) points to `user.objectid` or another unique identifier. This will match the `extern_uid` used on GitLab.
 
@@ -92,7 +92,8 @@ You can then test the connection by clicking on **Test Connection**. If the conn
 
 1. Save your changes. For reference, you can view [an example configuration in the troubleshooting reference](../../../administration/troubleshooting/group_saml_scim.md#azure-active-directory).
 
-   NOTE: **Note:** If you used a unique identifier **other than** `objectId`, be sure to map it to `externalId`.
+   NOTE: **Note:**
+   If you used a unique identifier **other than** `objectId`, be sure to map it to `externalId`.
 
 1. Below the mapping list click on **Show advanced options > Edit attribute list for AppName**.
 
@@ -127,7 +128,8 @@ Before proceeding, be sure to complete the [GitLab configuration](#gitlab-config
 1. If you see an **Admin** button in the top right, click the button. This will
    ensure you are in the Admin area.
 
-   TIP: **Tip:** If you're using the Developer Console, click **Developer Console** in the top
+   TIP: **Tip:**
+   If you're using the Developer Console, click **Developer Console** in the top
    bar and select **Classic UI**. Otherwise, you may not see the buttons described
    in the following steps:
 
@@ -214,6 +216,10 @@ As a workaround, try an alternate mapping:
 1. Change the `displayName` source attribute to have `name.formatted` target attribute.
 
 #### How do I diagnose why a user is unable to sign in
+
+Ensure that the user has been added to the SCIM app.
+
+If you receive "User is not linked to a SAML account", then most likely the user already exists in GitLab. Have the user follow the [User access and linking setup](#user-access-and-linking-setup) instructions.
 
 The **Identity** (`extern_uid`) value stored by GitLab is updated by SCIM whenever `id` or `externalId` changes. Users won't be able to sign in unless the GitLab Identity (`extern_uid`) value matches the `NameId` sent by SAML.
 

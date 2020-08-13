@@ -6,60 +6,36 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Telemetry Guide
 
-At GitLab, we collect telemetry for the purpose of helping us build a better GitLab. Data about how GitLab is used is collected to better understand what parts of GitLab needs improvement and what features to build next. Telemetry also helps our team better understand the reasons why people use GitLab and with this knowledge we are able to make better product decisions.
+At GitLab, we collect telemetry for the purpose of helping us build a better product. Data helps GitLab understand which parts of the product need improvement and which features we should build next. Telemetry also helps our team better understand the reasons why people use GitLab. With this knowledge we are able to make better product decisions.
 
-We also encourage users to enable tracking, and we embrace full transparency with our tracking approach so it can be easily understood and trusted. By enabling tracking, users can:
+We encourage users to enable tracking, and we embrace full transparency with our tracking approach so it can be easily understood and trusted.
+
+By enabling tracking, users can:
 
 - Contribute back to the wider community.
 - Help GitLab improve on the product.
 
-This documentation consists of three guides providing an overview of Telemetry at GitLab.
-
-Telemetry Guide:
-
-  1. [Our tracking tools](#our-tracking-tools)
-  1. [What data can be tracked](#what-data-can-be-tracked)
-  1. [Telemetry systems overview](#telemetry-systems-overview)
-  1. [Snowflake data warehouse](#snowflake-data-warehouse)
-
-[Usage Ping Guide](usage_ping.md)
-
-  1. [What is Usage Ping](usage_ping.md#what-is-usage-ping)
-  1. [Usage Ping payload](usage_ping.md#usage-ping-payload)
-  1. [Disable Usage Ping](usage_ping.md#disable-usage-ping)
-  1. [Usage Ping request flow](usage_ping.md#usage-ping-request-flow)
-  1. [How Usage Ping works](usage_ping.md#how-usage-ping-works)
-  1. [Implementing Usage Ping](usage_ping.md#implementing-usage-ping)
-  1. [Developing and testing Usage Ping](usage_ping.md#developing-and-testing-usage-ping)
-
-[Snowplow Guide](snowplow.md)
-
-1. [What is Snowplow](snowplow.md#what-is-snowplow)
-1. [Snowplow schema](snowplow.md#snowplow-schema)
-1. [Enabling Snowplow](snowplow.md#enabling-snowplow)
-1. [Snowplow request flow](snowplow.md#snowplow-request-flow)
-1. [Implementing Snowplow JS (Frontend) tracking](snowplow.md#implementing-snowplow-js-frontend-tracking)
-1. [Implementing Snowplow Ruby (Backend) tracking](snowplow.md#implementing-snowplow-ruby-backend-tracking)
-1. [Developing and testing Snowplow](snowplow.md#developing-and-testing-snowplow)
-
-More useful links:
-
-- [Telemetry Direction](https://about.gitlab.com/direction/telemetry/)
-- [Data Analysis Process](https://about.gitlab.com/handbook/business-ops/data-team/#-data-analysis-process)
-- [Data for Product Managers](https://about.gitlab.com/handbook/business-ops/data-team/data-programs/data-for-product-managers/)
-- [Data Infrastructure](https://about.gitlab.com/handbook/business-ops/data-team/data-platform/data-infrastructure/)
-
 ## Our tracking tools
 
-We use several different technologies to gather product usage data.
+We use several different technologies to gather product usage data:
 
-### Snowplow JS (Frontend)
+- [Snowplow](#snowplow)
+- [Usage Ping](#usage-ping)
+- [Database import](#database-import)
+- [Log system](#log-system)
 
-Snowplow is an enterprise-grade marketing and product analytics platform which helps track the way users engage with our website and application. [Snowplow JS](https://github.com/snowplow/snowplow/wiki/javascript-tracker) is a frontend tracker for client-side events.
+### Snowplow
 
-### Snowplow Ruby (Backend)
+Snowplow is an enterprise-grade marketing and product analytics platform which helps track the way
+users engage with our website and application.
 
-Snowplow is an enterprise-grade marketing and product analytics platform which helps track the way users engage with our website and application. [Snowplow Ruby](https://github.com/snowplow/snowplow/wiki/ruby-tracker) is a backend tracker for server-side events.
+Snowplow consists of two components:
+
+- [Snowplow JS](https://github.com/snowplow/snowplow/wiki/javascript-tracker) tracks client-side
+  events.
+- [Snowplow Ruby](https://github.com/snowplow/snowplow/wiki/ruby-tracker) tracks server-side events.
+
+For more details, read the [Snowplow](snowplow.md) guide.
 
 ### Usage Ping
 
@@ -69,7 +45,7 @@ For more details, read the [Usage Ping](usage_ping.md) guide.
 
 ### Database import
 
-Database imports are full imports of data into GitLab's data warehouse. For GitLab.com, the PostgreSQL database is loaded into Snowflake data warehouse every 6 hours. For more details, see the [data team handbook](https://about.gitlab.com/handbook/business-ops/data-team/#extract-and-load).
+Database imports are full imports of data into GitLab's data warehouse. For GitLab.com, the PostgreSQL database is loaded into Snowflake data warehouse every 6 hours. For more details, see the [data team handbook](https://about.gitlab.com/handbook/business-ops/data-team/platform/#extract-and-load).
 
 ### Log system
 
@@ -81,27 +57,19 @@ Our different tracking tools allows us to track different types of events. The e
 
 | Event Type          | Snowplow JS (Frontend) | Snowplow Ruby (Backend) | Usage Ping          | Database import     | Log system          |
 |---------------------|------------------------|-------------------------|---------------------|---------------------|---------------------|
-| Database counts     | **{dotted-circle}**    | **{dotted-circle}**     | **{check-circle}**  | **{check-circle}**  | **{dotted-circle}** |
 | Pageview events     | **{check-circle}**     | **{check-circle}**      | **{dotted-circle}** | **{dotted-circle}** | **{dotted-circle}** |
 | UI events           | **{check-circle}**     | **{dotted-circle}**     | **{dotted-circle}** | **{dotted-circle}** | **{dotted-circle}** |
 | CRUD and API events | **{dotted-circle}**    | **{check-circle}**      | **{dotted-circle}** | **{dotted-circle}** | **{dotted-circle}** |
-| Event funnels       | **{check-circle}**     | **{check-circle}**      | **{dotted-circle}** | **{dotted-circle}** | **{dotted-circle}** |
-| PostgreSQL Data     | **{dotted-circle}**    | **{dotted-circle}**     | **{dotted-circle}** | **{check-circle}**  | **{dotted-circle}** |
-| Logs                | **{dotted-circle}**    | **{dotted-circle}**     | **{dotted-circle}** | **{dotted-circle}** | **{check-circle}**  |
-| External services   | **{dotted-circle}**    | **{dotted-circle}**     | **{dotted-circle}** | **{dotted-circle}** | **{dotted-circle}** |
-
-### Database counts
-
-- Number of Projects created by unique users
-- Number of users logged in the past 28 day
-
-Database counts are row counts for different tables in an instance’s database. These are SQL count queries which have been filtered, grouped, or aggregated which provide high level usage data. The full list of available tables can be found in [structure.sql](https://gitlab.com/gitlab-org/gitlab/-/blob/master/db/structure.sql).
+| Database records    | **{dotted-circle}**    | **{dotted-circle}**     | **{check-circle}**  | **{check-circle}**  | **{dotted-circle}** |
+| Instance logs         | **{dotted-circle}**    | **{dotted-circle}**     | **{dotted-circle}** | **{dotted-circle}** | **{check-circle}**  |
+| Instance settings   | **{dotted-circle}**    | **{dotted-circle}**     | **{check-circle}**  | **{dotted-circle}** | **{dotted-circle}** |
+| Instance integrations | **{dotted-circle}**  | **{dotted-circle}**     | **{check-circle}**  | **{dotted-circle}** | **{dotted-circle}** |
 
 ### Pageview events
 
 - Number of sessions that visited the /dashboard/groups page
 
-### UI Events
+### UI events
 
 - Number of sessions that clicked on a button or link
 - Number of sessions that closed a modal
@@ -116,22 +84,64 @@ UI events are any interface-driven actions from the browser including click data
 
 These are backend events that include the creation, read, update, deletion of records, and other events that might be triggered from layers other than those available in the interface.
 
-### Event funnels
-
-- Number of sessions that performed action A, B, then C
-- Conversion rate from step A to B
-
-### PostgreSQL data
+### Database records
 
 These are raw database records which can be explored using business intelligence tools like Sisense. The full list of available tables can be found in [structure.sql](https://gitlab.com/gitlab-org/gitlab/-/blob/master/db/structure.sql).
 
-### Logs
+### Instance logs
 
 These are raw logs such as the [Production logs](../../administration/logs.md#production_jsonlog), [API logs](../../administration/logs.md#api_jsonlog), or [Sidekiq logs](../../administration/logs.md#sidekiqlog). See the [overview of Logging Infrastructure](https://gitlab.com/gitlab-com/runbooks/tree/master/logging/doc#logging-infrastructure-overview) for more details.
 
-### External services
+### Instance settings
 
-These are external services a GitLab instance interacts with such as an [external storage provider](../../administration/static_objects_external_storage.md) or an [external container registry](../../administration/packages/container_registry.md#use-an-external-container-registry-with-gitlab-as-an-auth-endpoint). These services must be able to send data back into a GitLab instance for data to be tracked.
+These are settings of your instance such as the instance's Git version and if certain features are enabled such as `container_registry_enabled`.
+
+### Instance integrations
+
+These are integrations your GitLab instance interacts with such as an [external storage provider](../../administration/static_objects_external_storage.md) or an [external container registry](../../administration/packages/container_registry.md#use-an-external-container-registry-with-gitlab-as-an-auth-endpoint). These services must be able to send data back into a GitLab instance for data to be tracked.
+
+## Reporting level by segment
+
+Our reporting levels of aggregate or individual reporting varies by segment. For example, on Self-Managed Users, we can report at an aggregate user level using Usage Ping but not on an Individual user level.
+
+| Reporting level | SaaS Instance | SaaS Group | SaaS Session | SaaS User | Self-Managed Instance | Self-Managed Group | Self-Managed Session | Self-Managed User |
+|-----------------|---------------|------------|--------------|-----------|-----------------------|--------------------|----------------------|-------------------|
+| Aggregate       | ✅             | 📅         | ✅            | ✅         | ✅                     | 📅                 | ✅                    | ✅                 |
+| Individual      | ✅             | 📅         | ✅            | 🔄        | ✅                     | ✖️                 | ✖️                   | ✖️                |
+
+## Event types by segment
+
+The availability of event types and their tracking tools varies by segment. For example, on Self-Managed Users, we only have reporting using Database records via Usage Ping.
+
+| Event Types                         | SaaS Instance | SaaS Group | SaaS Session | SaaS User | Self-Managed Instance | Self-Managed Group | Self-Managed Session | Self-Managed User |
+|-------------------------------------|---------------|------------|--------------|-----------|-----------------------|--------------------|----------------------|-------------------|
+| Pageview events (Snowplow JS)       | ✅             | 📅         | ✅            | 🔄        | 🔄                    | 📅                 | 🔄                   | 🔄                |
+| Pageview events (Snowplow Ruby)     | ✅             | 📅         | ✅            | 🔄        | 🔄                    | 📅                 | 🔄                   | 🔄                |
+| UI events (Snowplow JS)             | ✅             | 📅         | ✅            | 🔄        | 🔄                    | 📅                 | 🔄                   | 🔄                |
+| CRUD and API events (Snowplow Ruby) | ✅             | 📅         | ✅            | 🔄        | 🔄                    | 📅                 | 🔄                   | 🔄                |
+| Database records (Usage Ping)       | ✅             | 📅         | ✖️           | ✅         | ✅                     | 📅                 | ✖️                   | ✅                 |
+| Database records (Database import)  | ✅             | ✅          | ✖️           | ✅         | ✖️                    | ✖️                 | ✖️                   | ✖️                |
+| Instance logs (Log system)          | ✖️            | ✖️         | ✖️           | ✖️        | ✖️                    | ✖️                 | ✖️                   | ✖️                |
+| Instance settings (Usage Ping)      | ✅             | 📅         | ✖️           | ✅         | ✅                     | 📅                 | ✖️                   | ✅                 |
+| Instance integrations (Usage Ping)  | ✅             | 📅         | ✖️           | ✅         | ✅                     | 📅                 | ✖️                   | ✅                 |
+
+**Legend**
+
+✅ Available, 🔄 In Progress, 📅 Planned, ✖️ Not Possible
+
+## Reporting time period by segment
+
+Our reporting time periods varies by segment. For example, on Self-Managed Users, we can report all time counts and 28 day counts in Usage Ping.
+
+| Reporting time period | SaaS Instance | SaaS Group | SaaS Session | SaaS User | Self-Managed Instance | Self-Managed Group | Self-Managed Session | Self-Managed User |
+|-----------------------|---------------|------------|--------------|-----------|-----------------------|--------------------|----------------------|-------------------|
+| All Time              | ✅             | 📅         | ✅            | ✅         | ✅                     | 📅                 | 🔄                   | ✅                 |
+| 28 Days               | ✅             | 📅         | ✅            | ✅         | ✅                     | 📅                 | 🔄                   | ✅                 |
+| Daily                 | ✅             | 📅         | ✅            | ✅         | ✖️                    | ✖️                 | ✖️                   | ✖️                |
+
+**Legend**
+
+✅ Available, 🔄 In Progress, 📅 Planned, ✖️ Not Possible
 
 ## Telemetry systems overview
 
@@ -145,7 +155,7 @@ The systems overview is a simplified diagram showing the interactions between Gi
 
 For Telemetry purposes, GitLab Inc has three major components:
 
-1. [Data Infrastructure](https://about.gitlab.com/handbook/business-ops/data-team/data-platform/data-infrastructure/): This contains everything managed by our data team including Sisense Dashboards for visualization, Snowflake for Data Warehousing, incoming data sources such as PostgreSQL Pipeline and S3 Bucket, and lastly our data collectors [GitLab.com's Snowplow Collector](https://about.gitlab.com/handbook/engineering/infrastructure/library/snowplow/) and GitLab's Versions Application.
+1. [Data Infrastructure](https://about.gitlab.com/handbook/business-ops/data-team/platform/infrastructure/): This contains everything managed by our data team including Sisense Dashboards for visualization, Snowflake for Data Warehousing, incoming data sources such as PostgreSQL Pipeline and S3 Bucket, and lastly our data collectors [GitLab.com's Snowplow Collector](https://gitlab.com/gitlab-com/gl-infra/readiness/-/tree/master/library/snowplow/) and GitLab's Versions Application.
 1. GitLab.com: This is the production GitLab application which is made up of a Client and Server. On the Client or browser side, a Snowplow JS Tracker (Frontend) is used to track client-side events. On the Server or application side, a Snowplow Ruby Tracker (Backend) is used to track server-side events. The server also contains Usage Ping which leverages a PostgreSQL database and a Redis in-memory data store to report on usage data. Lastly, the server also contains System Logs which are generated from running the GitLab application.
 1. [Monitoring infrastructure](https://about.gitlab.com/handbook/engineering/monitoring/): This is the infrastructure used to ensure GitLab.com is operating smoothly. System Logs are sent from GitLab.com to our monitoring infrastructure and collected by a FluentD collector. From FluentD, logs are either sent to long term Google Cloud Services cold storage via Stackdriver, or, they are sent to our Elastic Cluster via Cloud Pub/Sub which can be explored in real-time using Kibana.
 
@@ -186,3 +196,12 @@ There are several data sources available in Snowflake and Sisense each represent
 | analytics | These tables have typically undergone more data transformation. They will typically end in `_xf` to represent the fact that they are transformed | Access via Snowflake or Sisense  |
 
 If you are a Product Manager interested in the raw data, you will likely focus on the `analytics` and `analytics_staging` sources. The raw source is limited to the data and infrastructure teams. For more information, please see [Data For Product Managers: What's the difference between analytics_staging and analytics?](https://about.gitlab.com/handbook/business-ops/data-team/programs/data-for-product-managers/#whats-the-difference-between-analytics_staging-and-analytics)
+
+## Additional information
+
+More useful links:
+
+- [Telemetry Direction](https://about.gitlab.com/direction/telemetry/)
+- [Data Analysis Process](https://about.gitlab.com/handbook/business-ops/data-team/#data-analysis-process/)
+- [Data for Product Managers](https://about.gitlab.com/handbook/business-ops/data-team/programs/data-for-product-managers/)
+- [Data Infrastructure](https://about.gitlab.com/handbook/business-ops/data-team/platform/infrastructure/)

@@ -200,6 +200,11 @@ RSpec.describe 'Pipeline', :js do
           expect(page).to have_content('Function `simulateEvent` has 28 lines of code (exceeds 25 allowed). Consider refactoring.')
           expect(find_link('app/assets/javascripts/test_utils/simulate_drag.js:1')[:href]).to end_with(project_blob_path(project, File.join(pipeline.commit.id, 'app/assets/javascripts/test_utils/simulate_drag.js')) + '#L1')
         end
+
+        it 'contains events for data tracking', :aggregate_failures do
+          expect(page).to have_selector('[data-track-event="click_button"]')
+          expect(page).to have_selector('[data-track-label="get_codequality_report"]')
+        end
       end
     end
 

@@ -5,6 +5,8 @@ module Types
     class PipelineType < BaseObject
       graphql_name 'Pipeline'
 
+      connection_type_class(Types::CountableConnectionType)
+
       authorize :read_pipeline
 
       expose_permissions Types::PermissionTypes::Ci::Pipeline
@@ -37,6 +39,10 @@ module Types
             description: "Timestamp of the pipeline's completion"
       field :committed_at, Types::TimeType, null: true,
             description: "Timestamp of the pipeline's commit"
+      field :stages, Types::Ci::StageType.connection_type, null: true,
+            description: 'Stages of the pipeline',
+            extras: [:lookahead],
+            resolver: Resolvers::Ci::PipelineStagesResolver
 
       # TODO: Add triggering user as a type
     end

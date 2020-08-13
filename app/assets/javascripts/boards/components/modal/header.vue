@@ -67,12 +67,12 @@ export default {
       </h2>
     </header>
     <modal-tabs v-if="!loading && issuesCount > 0" />
-    <div v-if="showSearch" class="d-flex append-bottom-10">
+    <div v-if="showSearch" class="d-flex gl-mb-3">
       <modal-filters :store="filter" />
       <button
         ref="selectAllBtn"
         type="button"
-        class="btn btn-success btn-inverted prepend-left-10"
+        class="btn btn-success btn-inverted gl-ml-3"
         @click="toggleAll"
       >
         {{ selectAllText }}

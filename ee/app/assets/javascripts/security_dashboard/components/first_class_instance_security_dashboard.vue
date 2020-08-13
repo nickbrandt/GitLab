@@ -10,7 +10,8 @@ import Filters from 'ee/security_dashboard/components/first_class_vulnerability_
 import projectsQuery from 'ee/security_dashboard/graphql/get_instance_security_dashboard_projects.query.graphql';
 import ProjectManager from './first_class_project_manager/project_manager.vue';
 import CsvExportButton from './csv_export_button.vue';
-import vulnerabilityHistoryQuery from '../graphql/instance_vulnerability_history.graphql';
+import vulnerabilityHistoryQuery from '../graphql/instance_vulnerability_history.query.graphql';
+import vulnerabilityGradesQuery from '../graphql/instance_vulnerability_grades.query.graphql';
 import DashboardNotConfigured from './empty_states/instance_dashboard_not_configured.vue';
 
 export default {
@@ -27,10 +28,6 @@ export default {
     DashboardNotConfigured,
   },
   props: {
-    vulnerableProjectsEndpoint: {
-      type: String,
-      required: true,
-    },
     vulnerabilitiesExportEndpoint: {
       type: String,
       required: true,
@@ -52,6 +49,7 @@ export default {
       filters: {},
       showProjectSelector: false,
       vulnerabilityHistoryQuery,
+      vulnerabilityGradesQuery,
       projects: [],
       isManipulatingProjects: false,
     };
@@ -101,7 +99,10 @@ export default {
     <template #header>
       <header class="page-title-holder flex-fill d-flex align-items-center">
         <h2 class="page-title flex-grow">{{ s__('SecurityReports|Security Dashboard') }}</h2>
-        <csv-export-button :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint" />
+        <csv-export-button
+          v-if="shouldShowDashboard"
+          :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint"
+        />
         <gl-button
           class="page-title-controls ml-2"
           :variant="toggleButtonProps.variant"
@@ -134,7 +135,7 @@ export default {
     <template #aside>
       <template v-if="shouldShowDashboard">
         <vulnerability-chart :query="vulnerabilityHistoryQuery" class="mb-4" />
-        <vulnerability-severities :projects="projects" />
+        <vulnerability-severities :query="vulnerabilityGradesQuery" />
       </template>
     </template>
   </security-dashboard-layout>

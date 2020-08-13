@@ -5,7 +5,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 type: howto
 ---
 
-# Geo validation tests
+# Geo validation tests **(PREMIUM ONLY)**
 
 The Geo team performs manual testing and validation on common deployment configurations to ensure
 that Geo works when upgrading between minor GitLab versions and major PostgreSQL database versions.
@@ -16,11 +16,29 @@ This section contains a journal of recent validation tests and links to the rele
 
 The following are GitLab upgrade validation tests we performed.
 
+### July 2020
+
+[Upgrade Geo multi-node installation](https://gitlab.com/gitlab-org/gitlab/-/issues/225359):
+
+- Description: Tested upgrading from GitLab 12.10.12 to 13.0.10 package in a multi-node
+  configuration. As part of the issue to [Fix zero-downtime upgrade process/instructions for multi-node Geo deployments](https://gitlab.com/gitlab-org/gitlab/-/issues/22568), we monitored for downtime using the looping pipeline, HAProxy stats dashboards, and a script to log readiness status on both nodes.
+- Outcome: Partial success because we observed downtime during the upgrade of the primary and secondary sites.
+- Follow up issues/actions:
+  - [Investigate why `reconfigure` and `hup` cause downtime on multi-node Geo deployments](https://gitlab.com/gitlab-org/gitlab/-/issues/228898)
+  - [Geo multi-node deployment upgrade: investigate order when upgrading non-deploy nodes](https://gitlab.com/gitlab-org/gitlab/-/issues/228954)
+
+[Switch from repmgr to Patroni on a Geo primary site](https://gitlab.com/gitlab-org/gitlab/-/issues/224652):
+
+- Description: Tested switching from repmgr to Patroni on a multi-node Geo primary site. Used [the orchestrator tool](https://gitlab.com/gitlab-org/gitlab-orchestrator) to deploy a Geo installation with 3 database nodes managed by repmgr. With this approach, we were also able to address a related issue for [verifying a Geo installation with Patroni and PostgreSQL 11](https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5113).
+- Outcome: Partial success. We enabled Patroni on the primary site and set up database replication on the secondary site. However, we found that Patroni would delete the secondary site's replication slot whenever Patroni was restarted. Another issue is that when Patroni elects a new leader in the cluster, the secondary site will fail to automatically follow the new leader. Until these issues are resolved, we cannot officially support and recommend Patroni for Geo installations.
+- Follow up issues/actions:
+  - [Investigate permanent replication slot for Patroni with Geo single node secondary](https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5528)
+
 ### June 2020
 
-[Upgrade Geo multi-server installation](https://gitlab.com/gitlab-org/gitlab/-/issues/223284):
+[Upgrade Geo multi-node installation](https://gitlab.com/gitlab-org/gitlab/-/issues/223284):
 
-- Description: Tested upgrading from GitLab 12.9.10 to 12.10.12 package in a multi-server
+- Description: Tested upgrading from GitLab 12.9.10 to 12.10.12 package in a multi-node
   configuration. Monitored for downtime using the looping pipeline and HAProxy stats dashboards.
 - Outcome: Partial success because we observed downtime during the upgrade of the primary and secondary sites.
 - Follow up issues/actions:
@@ -28,9 +46,9 @@ The following are GitLab upgrade validation tests we performed.
   - [Geo:check Rake task: Exclude AuthorizedKeysCommand check if node not running Puma/Unicorn](https://gitlab.com/gitlab-org/gitlab/-/issues/225454)
   - [Update instructions in the next upgrade issue to include monitoring HAProxy dashboards](https://gitlab.com/gitlab-org/gitlab/-/issues/225359)
 
-[Upgrade Geo multi-server installation](https://gitlab.com/gitlab-org/gitlab/-/issues/208104):
+[Upgrade Geo multi-node installation](https://gitlab.com/gitlab-org/gitlab/-/issues/208104):
 
-- Description: Tested upgrading from GitLab 12.8.1 to 12.9.10 package in a multi-server
+- Description: Tested upgrading from GitLab 12.8.1 to 12.9.10 package in a multi-node
   configuration.
 - Outcome: Partial success because we did not run the looping pipeline during the demo to validate
   zero-downtime.

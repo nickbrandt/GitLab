@@ -1,47 +1,146 @@
 <script>
-import { GlAvatar, GlButton, GlFormGroup, GlFormSelect, GlLabel } from '@gitlab/ui';
+import {
+  GlAlert,
+  GlButton,
+  GlNewDropdown,
+  GlNewDropdownItem,
+  GlNewDropdownText,
+  GlFormGroup,
+  GlFormSelect,
+  GlIcon,
+  GlLabel,
+  GlLoadingIcon,
+  GlSearchBoxByType,
+  GlSprintf,
+  GlTable,
+} from '@gitlab/ui';
+import { debounce } from 'lodash';
+import axios from '~/lib/utils/axios_utils';
+import {
+  debounceWait,
+  dropdownLabel,
+  previousImportsMessage,
+  tableConfig,
+  userMappingMessage,
+} from '../utils/constants';
 
 export default {
   name: 'JiraImportForm',
   components: {
-    GlAvatar,
+    GlAlert,
     GlButton,
+    GlNewDropdown,
+    GlNewDropdownItem,
+    GlNewDropdownText,
     GlFormGroup,
     GlFormSelect,
+    GlIcon,
     GlLabel,
+    GlLoadingIcon,
+    GlSearchBoxByType,
+    GlSprintf,
+    GlTable,
   },
-  currentUserAvatarUrl: gon.current_user_avatar_url,
   currentUsername: gon.current_username,
+  dropdownLabel,
+  previousImportsMessage,
+  tableConfig,
+  userMappingMessage,
   props: {
-    importLabel: {
-      type: String,
+    isSubmitting: {
+      type: Boolean,
       required: true,
     },
     issuesPath: {
       type: String,
       required: true,
     },
+    jiraImports: {
+      type: Array,
+      required: true,
+    },
     jiraProjects: {
       type: Array,
       required: true,
     },
-    value: {
+    projectId: {
       type: String,
-      required: false,
-      default: undefined,
+      required: true,
+    },
+    userMappings: {
+      type: Array,
+      required: true,
     },
   },
   data() {
     return {
+      isFetching: false,
+      searchTerm: '',
+      selectedProject: undefined,
       selectState: null,
+      users: [],
     };
   },
+  computed: {
+    shouldShowNoMatchesFoundText() {
+      return !this.isFetching && this.users.length === 0;
+    },
+    numberOfPreviousImports() {
+      return this.jiraImports?.reduce?.(
+        (acc, jiraProject) => (jiraProject.jiraProjectKey === this.selectedProject ? acc + 1 : acc),
+        0,
+      );
+    },
+    hasPreviousImports() {
+      return this.numberOfPreviousImports > 0;
+    },
+    importLabel() {
+      return this.selectedProject
+        ? `jira-import::${this.selectedProject}-${this.numberOfPreviousImports + 1}`
+        : 'jira-import::KEY-1';
+    },
+  },
+  watch: {
+    searchTerm: debounce(function debouncedUserSearch() {
+      this.searchUsers();
+    }, debounceWait),
+  },
+  mounted() {
+    this.searchUsers()
+      .then(data => {
+        this.initialUsers = data;
+      })
+      .catch(() => {});
+  },
   methods: {
+    searchUsers() {
+      const params = {
+        active: true,
+        project_id: this.projectId,
+        search: this.searchTerm,
+      };
+
+      this.isFetching = true;
+
+      return axios
+        .get('/-/autocomplete/users.json', { params })
+        .then(({ data }) => {
+          this.users = data;
+          return data;
+        })
+        .finally(() => {
+          this.isFetching = false;
+        });
+    },
+    resetDropdown() {
+      this.searchTerm = '';
+      this.users = this.initialUsers;
+    },
     initiateJiraImport(event) {
       event.preventDefault();
-      if (this.value) {
+      if (this.selectedProject) {
         this.hideValidationError();
-        this.$emit('initiateJiraImport', this.value);
+        this.$emit('initiateJiraImport', this.selectedProject);
       } else {
         this.showValidationError();
       }
@@ -58,8 +157,16 @@ export default {
 
 <template>
   <div>
+    <gl-alert v-if="hasPreviousImports" variant="warning" :dismissible="false">
+      <gl-sprintf :message="$options.previousImportsMessage">
+        <template #numberOfPreviousImports>{{ numberOfPreviousImports }}</template>
+      </gl-sprintf>
+    </gl-alert>
+
     <h3 class="page-title">{{ __('New Jira import') }}</h3>
+
     <hr />
+
     <form @submit="initiateJiraImport">
       <gl-form-group
         class="row align-items-center"
@@ -70,17 +177,16 @@ export default {
       >
         <gl-form-select
           id="jira-project-select"
+          v-model="selectedProject"
           data-qa-selector="jira_project_dropdown"
           class="mb-2"
           :options="jiraProjects"
           :state="selectState"
-          :value="value"
-          @change="$emit('input', $event)"
         />
       </gl-form-group>
 
       <gl-form-group
-        class="row align-items-center"
+        class="row gl-align-items-center gl-mb-6"
         :label="__('Issue label')"
         label-cols-sm="2"
         label-for="jira-project-label"
@@ -94,46 +200,44 @@ export default {
         />
       </gl-form-group>
 
-      <hr />
+      <h4 class="gl-mb-4">{{ __('Jira-GitLab user mapping template') }}</h4>
 
-      <p class="offset-md-1">
-        {{
-          __(
-            "For each Jira issue successfully imported, we'll create a new GitLab issue with the following data:",
-          )
-        }}
-      </p>
+      <p>{{ $options.userMappingMessage }}</p>
 
-      <gl-form-group
-        class="row align-items-center mb-1"
-        :label="__('Title')"
-        label-cols-sm="2"
-        label-for="jira-project-title"
-      >
-        <p id="jira-project-title" class="mb-2">{{ __('jira.issue.summary') }}</p>
-      </gl-form-group>
-      <gl-form-group
-        class="row align-items-center mb-1"
-        :label="__('Reporter')"
-        label-cols-sm="2"
-        label-for="jira-project-reporter"
-      >
-        <gl-avatar
-          id="jira-project-reporter"
-          class="mb-2"
-          :src="$options.currentUserAvatarUrl"
-          :size="24"
-          :aria-label="$options.currentUsername"
-        />
-      </gl-form-group>
-      <gl-form-group
-        class="row align-items-center mb-1"
-        :label="__('Description')"
-        label-cols-sm="2"
-        label-for="jira-project-description"
-      >
-        <p id="jira-project-description" class="mb-2">{{ __('jira.issue.description.content') }}</p>
-      </gl-form-group>
+      <gl-table :fields="$options.tableConfig" :items="userMappings" fixed>
+        <template #cell(arrow)>
+          <gl-icon name="arrow-right" :aria-label="__('Will be mapped to')" />
+        </template>
+        <template #cell(gitlabUsername)="data">
+          <gl-new-dropdown
+            :text="data.value || $options.currentUsername"
+            class="w-100"
+            :aria-label="
+              sprintf($options.dropdownLabel, { jiraDisplayName: data.item.jiraDisplayName })
+            "
+            @hide="resetDropdown"
+          >
+            <gl-search-box-by-type v-model.trim="searchTerm" class="m-2" />
+
+            <div v-if="isFetching" class="gl-text-center">
+              <gl-loading-icon />
+            </div>
+
+            <gl-new-dropdown-item
+              v-for="user in users"
+              v-else
+              :key="user.id"
+              @click="$emit('updateMapping', data.item.jiraAccountId, user.id, user.username)"
+            >
+              {{ user.username }} ({{ user.name }})
+            </gl-new-dropdown-item>
+
+            <gl-new-dropdown-text v-show="shouldShowNoMatchesFoundText" class="text-secondary">
+              {{ __('No matches found') }}
+            </gl-new-dropdown-text>
+          </gl-new-dropdown>
+        </template>
+      </gl-table>
 
       <div class="footer-block row-content-block d-flex justify-content-between">
         <gl-button
@@ -141,9 +245,10 @@ export default {
           category="primary"
           variant="success"
           class="js-no-auto-disable"
+          :loading="isSubmitting"
           data-qa-selector="jira_issues_import_button"
         >
-          {{ __('Next') }}
+          {{ __('Continue') }}
         </gl-button>
         <gl-button :href="issuesPath">{{ __('Cancel') }}</gl-button>
       </div>

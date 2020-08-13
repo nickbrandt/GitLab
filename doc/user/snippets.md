@@ -1,3 +1,10 @@
+---
+stage: Create
+group: Editor
+info: "To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers"
+type: reference
+---
+
 # Snippets
 
 With GitLab Snippets you can store and share bits of code and text with other users.
@@ -95,6 +102,14 @@ button above the snippet content to copy the URL of your choice.
 This allows you to have a local copy of the snippet's repository and make
 changes as needed. You can commit those changes and push them to the remote
 master branch.
+
+### Reduce snippets repository size
+
+Since versioned Snippets are considered as part of the [namespace storage size](../user/admin_area/settings/account_and_limit_settings.md),
+it's recommended to keep snippets' repositories as compact as possible.
+
+For more information about tools to compact repositories,
+see the documentation on [reducing repository size](../user/project/repository/reducing_the_repo_size_using_git.md).
 
 ### Limitations
 

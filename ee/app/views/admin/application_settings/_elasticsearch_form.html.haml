@@ -69,6 +69,12 @@
               = recreate_index_text
 
           .form-group
+            = f.label :elasticsearch_indexed_file_size_limit_kb, _('Maximum file size indexed (KiB)'), class: 'label-bold'
+            = f.number_field :elasticsearch_indexed_file_size_limit_kb, value: @application_setting.elasticsearch_indexed_file_size_limit_kb, class: 'form-control'
+            .form-text.text-muted
+              = _('Any files larger than this limit will not be indexed, and thus will not be searchable.')
+
+          .form-group
             = f.label :elasticsearch_indexed_field_length_limit, _('Maximum field length'), class: 'label-bold'
             = f.number_field :elasticsearch_indexed_field_length_limit, value: @application_setting.elasticsearch_indexed_field_length_limit, class: 'form-control'
             .form-text.text-muted

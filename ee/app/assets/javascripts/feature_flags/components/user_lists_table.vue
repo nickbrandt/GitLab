@@ -81,7 +81,7 @@ export default {
           v-gl-tooltip
           :title="tooltipTitle(list.created_at)"
           data-testid="ffUserListTimestamp"
-          class="gl-text-gray-500 gl-mb-2"
+          class="gl-text-gray-300 gl-mb-2"
         >
           {{ createdTimeago(list) }}
         </span>

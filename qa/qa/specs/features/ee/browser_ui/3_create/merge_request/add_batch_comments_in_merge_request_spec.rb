@@ -8,6 +8,7 @@ module QA
           project.name = 'project-with-merge-request'
         end
       end
+
       let(:merge_request) do
         Resource::MergeRequest.fabricate_via_api! do |merge_request|
           merge_request.title = 'This is a merge request'

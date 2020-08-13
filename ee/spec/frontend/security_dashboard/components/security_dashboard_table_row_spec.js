@@ -5,6 +5,7 @@ import createStore from 'ee/security_dashboard/store';
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
 import mockDataVulnerabilities from '../store/modules/vulnerabilities/data/mock_data_vulnerabilities';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
+import { trimText } from 'helpers/text_helper';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -53,6 +54,11 @@ describe('Security Dashboard Table Row', () => {
       expect(findContent(0).text()).toEqual('');
     });
 
+    it('should render a `` for the report type and scanner', () => {
+      expect(findContent(3).text()).toEqual('');
+      expect(wrapper.find('vulnerability-vendor').exists()).toBeFalsy();
+    });
+
     it('should not render action buttons', () => {
       expect(wrapper.findAll('.action-buttons button')).toHaveLength(0);
     });
@@ -77,8 +83,10 @@ describe('Security Dashboard Table Row', () => {
       ).toContain(vulnerability.severity);
     });
 
-    it('should render the identifier name', () => {
-      expect(findContent(2).text()).toContain(vulnerability.identifiers[0].name);
+    it('should render the identifier cell', () => {
+      const { identifiers } = vulnerability;
+      expect(findContent(2).text()).toContain(identifiers[0].name);
+      expect(trimText(findContent(2).text())).toContain(`${identifiers.length - 1} more`);
     });
 
     it('should render the report type', () => {
@@ -87,6 +95,10 @@ describe('Security Dashboard Table Row', () => {
           .text()
           .toLowerCase(),
       ).toContain(vulnerability.report_type.toLowerCase());
+    });
+
+    it('should render the scanner vendor if the scanner does exist', () => {
+      expect(findContent(3).text()).toContain(vulnerability.scanner.vendor);
     });
 
     describe('the project name', () => {
@@ -228,6 +240,19 @@ describe('Security Dashboard Table Row', () => {
           );
         });
       });
+    });
+  });
+
+  describe('with less than two identifiers', () => {
+    const vulnerability = mockDataVulnerabilities[1];
+
+    beforeEach(() => {
+      createComponent(shallowMount, { props: { vulnerability } });
+    });
+
+    it('should render the identifier cell', () => {
+      const { identifiers } = vulnerability;
+      expect(findContent(2).text()).toBe(identifiers[0].name);
     });
   });
 });

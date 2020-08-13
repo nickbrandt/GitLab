@@ -113,6 +113,7 @@ RSpec.describe Projects::UpdateService, '#execute' do
         let(:operation) do
           update_project(project, user, visibility_level: Gitlab::VisibilityLevel::INTERNAL)
         end
+
         let(:fail_condition!) do
           allow_any_instance_of(Project).to receive(:update).and_return(false)
         end

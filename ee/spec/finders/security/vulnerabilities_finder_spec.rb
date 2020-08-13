@@ -74,7 +74,7 @@ RSpec.describe Security::VulnerabilitiesFinder do
     let(:vulnerable) { group }
 
     before do
-      project.update(namespace: group)
+      project.update!(namespace: group)
     end
 
     it 'only returns vulnerabilities matching the given projects' do

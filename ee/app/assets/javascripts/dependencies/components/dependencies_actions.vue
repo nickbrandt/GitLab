@@ -1,9 +1,9 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import {
-  GlDeprecatedButton,
-  GlDropdown,
-  GlDropdownItem,
+  GlButton,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownItem,
   GlIcon,
   GlTooltipDirective,
 } from '@gitlab/ui';
@@ -13,9 +13,9 @@ import { SORT_FIELDS, SORT_ORDER } from '../store/modules/list/constants';
 export default {
   name: 'DependenciesActions',
   components: {
-    GlDeprecatedButton,
-    GlDropdown,
-    GlDropdownItem,
+    GlButton,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
     GlIcon,
   },
   directives: {
@@ -72,8 +72,12 @@ export default {
 <template>
   <div class="btn-toolbar">
     <div class="btn-group flex-grow-1 mr-2">
-      <gl-dropdown :text="sortFieldName" class="flex-grow-1 text-center" right>
-        <gl-dropdown-item v-for="(name, id) in sortFields" :key="id" @click="setSortField(id)">
+      <gl-deprecated-dropdown :text="sortFieldName" class="flex-grow-1 text-center" right>
+        <gl-deprecated-dropdown-item
+          v-for="(name, id) in sortFields"
+          :key="id"
+          @click="setSortField(id)"
+        >
           <span class="d-flex">
             <gl-icon
               class="flex-shrink-0 gl-mr-2"
@@ -82,25 +86,26 @@ export default {
             />
             {{ name }}
           </span>
-        </gl-dropdown-item>
-      </gl-dropdown>
-      <gl-deprecated-button
+        </gl-deprecated-dropdown-item>
+      </gl-deprecated-dropdown>
+      <gl-button
         v-gl-tooltip
         :title="__('Sort direction')"
         class="flex-grow-0 js-sort-order"
         @click="toggleSortOrder"
       >
         <gl-icon :name="sortOrderIcon" />
-      </gl-deprecated-button>
+      </gl-button>
     </div>
-    <gl-deprecated-button
+    <gl-button
       v-gl-tooltip
       :href="downloadEndpoint"
       download="dependencies.json"
       :title="s__('Dependencies|Export as JSON')"
       class="js-download"
+      icon="export"
     >
-      <gl-icon name="export" />
-    </gl-deprecated-button>
+      {{ __('Export') }}
+    </gl-button>
   </div>
 </template>

@@ -83,8 +83,7 @@ export default () => {
       Board: () => import('ee_else_ce/boards/components/board_column.vue'),
       BoardSidebar,
       BoardAddIssuesModal,
-      BoardSettingsSidebar: () =>
-        import('ee_component/boards/components/board_settings_sidebar.vue'),
+      BoardSettingsSidebar: () => import('~/boards/components/board_settings_sidebar.vue'),
     },
     store,
     apolloProvider,
@@ -118,7 +117,7 @@ export default () => {
         boardId: this.boardId,
         fullPath: $boardApp.dataset.fullPath,
       };
-      this.setEndpoints(endpoints);
+      this.setInitialBoardData({ ...endpoints, boardType: this.parent });
       boardsStore.setEndpoints(endpoints);
       boardsStore.rootPath = this.boardsEndpoint;
 
@@ -190,7 +189,7 @@ export default () => {
       }
     },
     methods: {
-      ...mapActions(['setEndpoints']),
+      ...mapActions(['setInitialBoardData']),
       updateTokens() {
         this.filterManager.updateTokens();
       },
@@ -352,7 +351,7 @@ export default () => {
       template: `
         <div class="board-extra-actions">
           <button
-            class="btn btn-success prepend-left-10"
+            class="btn btn-success gl-ml-3"
             type="button"
             data-placement="bottom"
             ref="addIssuesButton"

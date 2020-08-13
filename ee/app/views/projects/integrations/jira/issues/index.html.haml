@@ -1,6 +1,7 @@
 - page_title _('Jira Issues')
 
-.top-area.gl-border-b-0.gl-justify-content-end
+.top-area.gl-border-b-0.gl-mt-6
+  = render 'shared/issuable/nav', type: :issues, display_count: false
   = render 'projects/integrations/jira/issues/nav_btns'
 
 .js-issuables-list{ data: { endpoint: expose_path(project_integrations_jira_issues_path(@project, format: :json)),

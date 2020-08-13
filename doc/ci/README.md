@@ -16,9 +16,9 @@ through the [continuous methodologies](introduction/index.md#introduction-to-cic
 - Continuous Delivery (CD)
 - Continuous Deployment (CD)
 
-NOTE: **Out-of-the-box management systems can decrease hours spent on maintaining toolchains by 10% or more.**
-Watch our
-["Mastering continuous software development"](https://about.gitlab.com/webcast/mastering-ci-cd/)
+NOTE: **Note:**
+Out-of-the-box management systems can decrease hours spent on maintaining toolchains by 10% or more.
+Watch our ["Mastering continuous software development"](https://about.gitlab.com/webcast/mastering-ci-cd/)
 webcast to learn about continuous methods and how GitLab’s built-in CI can help you simplify and scale software development.
 
 ## Overview
@@ -63,7 +63,7 @@ the following documents:
 If you're migrating from another CI/CD tool, check out our handy references:
 
 - [Migrating from CircleCI](migration/circleci.md)
-- [Migrating from Jenkins](jenkins/index.md)
+- [Migrating from Jenkins](migration/jenkins.md)
 
 You can also get started by using one of the
 [`.gitlab-ci.yml` templates](https://gitlab.com/gitlab-org/gitlab-foss/tree/master/lib/gitlab/ci/templates)
@@ -126,9 +126,10 @@ Its feature set is listed on the table below according to DevOps stages.
 | [ChatOps](chatops/README.md) | Trigger CI jobs from chat, with results sent back to the channel. |
 |---+---|
 | **Verify** ||
-| [Browser Performance Testing](../user/project/merge_requests/browser_performance_testing.md) | Quickly determine the performance impact of pending code changes. |
+| [Browser Performance Testing](../user/project/merge_requests/browser_performance_testing.md) | Quickly determine the browser performance impact of pending code changes. |
+| [Load Performance Testing](../user/project/merge_requests/load_performance_testing.md) | Quickly determine the server performance impact of pending code changes. |
 | [CI services](services/README.md) | Link Docker containers with your base image.|
-| [Code Quality](../user/project/merge_requests/code_quality.md) **(STARTER)** | Analyze your source code quality. |
+| [Code Quality](../user/project/merge_requests/code_quality.md) | Analyze your source code quality. |
 | [GitLab CI/CD for external repositories](ci_cd_for_external_repos/index.md) **(PREMIUM)** | Get the benefits of GitLab CI/CD combined with repositories in GitHub and Bitbucket Cloud. |
 | [Interactive Web Terminals](interactive_web_terminal/index.md) **(CORE ONLY)** | Open an interactive web terminal to debug the running jobs. |
 | [JUnit tests](junit_test_reports.md) | Identify script failures directly on merge requests. |

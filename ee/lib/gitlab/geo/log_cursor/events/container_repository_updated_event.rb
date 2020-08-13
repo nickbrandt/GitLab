@@ -18,7 +18,7 @@ module Gitlab
           private
 
           def skippable?
-            !!Gitlab.config.geo.registry_replication.enabled
+            !!::Geo::ContainerRepositoryRegistry.replication_enabled?
           end
 
           # rubocop: disable CodeReuse/ActiveRecord

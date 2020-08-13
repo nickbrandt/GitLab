@@ -67,17 +67,17 @@ to:
 ### Multiple Kubernetes clusters
 
 > - Introduced in [GitLab Premium](https://about.gitlab.com/pricing/) 10.3
-> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/35094) to GitLab core in 13.2.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/35094) to GitLab Core in 13.2.
 
 You can associate more than one Kubernetes cluster to your
 project. That way you can have different clusters for different environments,
 like dev, staging, production, and so on.
 
 Simply add another cluster, like you did the first time, and make sure to
-[set an environment scope](#setting-the-environment-scope-premium) that will
+[set an environment scope](#setting-the-environment-scope) that will
 differentiate the new cluster with the rest.
 
-#### Setting the environment scope **(PREMIUM)**
+#### Setting the environment scope
 
 When adding more than one Kubernetes cluster to your project, you need to differentiate
 them with an environment scope. The environment scope associates clusters with [environments](../../../ci/environments/index.md) similar to how the
@@ -224,7 +224,7 @@ Auto Monitoring) you will need the Kubernetes project integration enabled.
 
 [Read more about Auto DevOps](../../../topics/autodevops/index.md)
 
-NOTE: **Note**
+NOTE: **Note:**
 Kubernetes clusters can be used without Auto DevOps.
 
 ## Deploying to a Kubernetes cluster
@@ -275,7 +275,8 @@ For **non**-GitLab-managed clusters, the namespace can be customized using
 [`environment:kubernetes:namespace`](../../../ci/environments/index.md#configuring-kubernetes-deployments)
 in `.gitlab-ci.yml`.
 
-NOTE: **Note:** When using a [GitLab-managed cluster](#gitlab-managed-clusters), the
+NOTE: **Note:**
+When using a [GitLab-managed cluster](#gitlab-managed-clusters), the
 namespaces are created automatically prior to deployment and [can not be
 customized](https://gitlab.com/gitlab-org/gitlab/-/issues/38054).
 
@@ -351,7 +352,7 @@ Reasons for failure include:
   [`environment:name`](../../../ci/environments/index.md#defining-environments). If your job has no
   `environment:name` set, it will not be passed the Kubernetes credentials.
 
-NOTE: **NOTE:**
+NOTE: **Note:**
 Project-level clusters upgraded from GitLab 12.0 or older may be configured
 in a way that causes this error. Ensure you deselect the
 [GitLab-managed cluster](#gitlab-managed-clusters) option if you want to manage
@@ -367,7 +368,7 @@ Automatically detect and monitor Kubernetes metrics. Automatic monitoring of
 ### Visualizing cluster health
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/4701) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.6.
-> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/208224) to GitLab core in 13.2.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/208224) to GitLab Core in 13.2.
 
 When [Prometheus is deployed](#installing-applications), GitLab will automatically monitor the cluster's health. At the top of the cluster settings page, CPU and Memory utilization is displayed, along with the total amount available. Keeping an eye on cluster resources can be important, if the cluster runs out of memory pods may be shutdown or fail to start.
 

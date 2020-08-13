@@ -10,9 +10,12 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
 
   before_action :feature_flag, only: [:edit, :update, :destroy]
 
+  before_action :ensure_legacy_flags_writable!, only: [:update]
+
   before_action do
     push_frontend_feature_flag(:feature_flag_permissions)
     push_frontend_feature_flag(:feature_flags_new_version, project, default_enabled: true)
+    push_frontend_feature_flag(:feature_flags_legacy_read_only, project)
   end
 
   def index
@@ -104,6 +107,12 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
 
   def new_version_feature_flags_enabled?
     ::Feature.enabled?(:feature_flags_new_version, project, default_enabled: true)
+  end
+
+  def ensure_legacy_flags_writable!
+    if ::Feature.enabled?(:feature_flags_legacy_read_only, project) && feature_flag.legacy_flag?
+      render_error_json(['Legacy feature flags are read-only'])
+    end
   end
 
   def create_params

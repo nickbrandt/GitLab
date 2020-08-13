@@ -107,7 +107,7 @@ describe('GeoSettingsForm', () => {
       beforeEach(() => {
         createStore();
         createComponent();
-        findGeoSettingsTimeoutField().vm.$emit('input', data);
+        findGeoSettingsTimeoutField().setValue(data);
         findGeoSettingsTimeoutField().trigger('blur');
       });
 
@@ -134,7 +134,7 @@ describe('GeoSettingsForm', () => {
       beforeEach(() => {
         createStore();
         createComponent();
-        findGeoSettingsAllowedIpField().vm.$emit('input', data);
+        findGeoSettingsAllowedIpField().setValue(data);
         findGeoSettingsAllowedIpField().trigger('blur');
       });
 

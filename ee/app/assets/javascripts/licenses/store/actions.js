@@ -42,5 +42,3 @@ export const fetchDeleteLicense = ({ state, dispatch }, { id }) => {
       dispatch('receiveDeleteLicenseError', { id });
     });
 };
-
-export default () => {};

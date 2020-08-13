@@ -11,7 +11,9 @@ module Gitlab
             report_data = parse_report(json_data)
             raise SecurityReportParserError, "Invalid report format" unless report_data.is_a?(Hash)
 
-            report.scanned_resources = report_data.dig('scan', 'scanned_resources') || []
+            report.scanned_resources = create_scanned_resources(report_data.dig('scan', 'scanned_resources'))
+
+            create_scanner(report, report_data.dig('scan', 'scanner'))
 
             collate_remediations(report_data).each do |vulnerability|
               create_vulnerability(report, vulnerability, report_data["version"])
@@ -24,6 +26,17 @@ module Gitlab
           end
 
           protected
+
+          def create_scanned_resources(scanned_resources)
+            return [] unless scanned_resources
+
+            scanned_resources.map do |sr|
+              uri = URI.parse(sr['url'])
+              ::Gitlab::Ci::Reports::Security::ScannedResource.new(uri, sr['method'])
+            rescue URI::InvalidURIError
+              nil
+            end.compact
+          end
 
           def parse_report(json_data)
             Gitlab::Json.parse!(json_data)
@@ -53,8 +66,8 @@ module Gitlab
           def create_vulnerability(report, data, version)
             scanner = create_scanner(report, data['scanner'] || mutate_scanner_tool(data['tool']))
             identifiers = create_identifiers(report, data['identifiers'])
-            report.add_occurrence(
-              ::Gitlab::Ci::Reports::Security::Occurrence.new(
+            report.add_finding(
+              ::Gitlab::Ci::Reports::Security::Finding.new(
                 uuid: SecureRandom.uuid,
                 report_type: report.type,
                 name: data['message'],
@@ -103,13 +116,13 @@ module Gitlab
           end
 
           def parse_severity_level(input)
-            return input if ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.key?(input)
+            return input if ::Vulnerabilities::Finding::SEVERITY_LEVELS.key?(input)
 
             'unknown'
           end
 
           def parse_confidence_level(input)
-            return input if ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS.key?(input)
+            return input if ::Vulnerabilities::Finding::CONFIDENCE_LEVELS.key?(input)
 
             'unknown'
           end

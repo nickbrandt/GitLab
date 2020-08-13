@@ -70,12 +70,14 @@ RSpec.describe API::Projects do
     builds_enabled: false,
     snippets_enabled: false)
   end
+
   let(:project_member2) do
     create(:project_member,
     user: user4,
     project: project3,
     access_level: ProjectMember::MAINTAINER)
   end
+
   let(:project4) do
     create(:project,
     name: 'third_project',
@@ -386,6 +388,14 @@ RSpec.describe API::Projects do
           let(:current_user) { user }
           let(:projects) { [public_project, project, project2, project3].select { |p| p.id > project2.id } }
         end
+
+        context 'regression: empty string is ignored' do
+          it_behaves_like 'projects response' do
+            let(:filter) { { id_after: '' } }
+            let(:current_user) { user }
+            let(:projects) { [public_project, project, project2, project3] }
+          end
+        end
       end
 
       context 'and using id_before' do
@@ -393,6 +403,14 @@ RSpec.describe API::Projects do
           let(:filter) { { id_before: project2.id } }
           let(:current_user) { user }
           let(:projects) { [public_project, project, project2, project3].select { |p| p.id < project2.id } }
+        end
+
+        context 'regression: empty string is ignored' do
+          it_behaves_like 'projects response' do
+            let(:filter) { { id_before: '' } }
+            let(:current_user) { user }
+            let(:projects) { [public_project, project, project2, project3] }
+          end
         end
       end
 
@@ -1586,6 +1604,7 @@ RSpec.describe API::Projects do
         expect(json_response['ci_default_git_depth']).to eq(project.ci_default_git_depth)
         expect(json_response['merge_method']).to eq(project.merge_method.to_s)
         expect(json_response['readme_url']).to eq(project.readme_url)
+        expect(json_response).to have_key 'packages_enabled'
       end
 
       it 'returns a group link with expiration date' do
@@ -1927,6 +1946,13 @@ RSpec.describe API::Projects do
           expect(json_response).not_to have_key('repository_storage')
         end
       end
+    end
+
+    it 'exposes service desk attributes' do
+      get api("/projects/#{project.id}", user)
+
+      expect(json_response).to have_key 'service_desk_enabled'
+      expect(json_response).to have_key 'service_desk_address'
     end
   end
 
@@ -2332,6 +2358,20 @@ RSpec.describe API::Projects do
       expect(project_member).to be_persisted
     end
 
+    describe 'updating packages_enabled attribute' do
+      it 'is enabled by default' do
+        expect(project.packages_enabled).to be true
+      end
+
+      it 'disables project packages feature' do
+        put(api("/projects/#{project.id}", user), params: { packages_enabled: false })
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(project.reload.packages_enabled).to be false
+        expect(json_response['packages_enabled']).to eq(false)
+      end
+    end
+
     it 'returns 400 when nothing sent' do
       project_param = {}
 
@@ -2670,6 +2710,26 @@ RSpec.describe API::Projects do
 
           expect(response).to have_gitlab_http_status(:ok)
         end
+      end
+    end
+
+    context 'when updating service desk' do
+      subject { put(api("/projects/#{project.id}", user), params: { service_desk_enabled: true }) }
+
+      before do
+        project.update!(service_desk_enabled: false)
+
+        allow(::Gitlab::IncomingEmail).to receive(:enabled?).and_return(true)
+      end
+
+      it 'returns 200' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'enables the service_desk' do
+        expect { subject }.to change { project.reload.service_desk_enabled }.to(true)
       end
     end
   end

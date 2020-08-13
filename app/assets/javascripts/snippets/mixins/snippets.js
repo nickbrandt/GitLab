@@ -1,5 +1,8 @@
 import GetSnippetQuery from '../queries/snippet.query.graphql';
 
+const blobsDefault = [];
+
+// eslint-disable-next-line import/prefer-default-export
 export const getSnippetMixin = {
   apollo: {
     snippet: {
@@ -11,7 +14,7 @@ export const getSnippetMixin = {
       },
       update: data => data.snippets.edges[0]?.node,
       result(res) {
-        this.blobs = res.data.snippets.edges[0].node.blobs;
+        this.blobs = res.data.snippets.edges[0]?.node?.blobs || blobsDefault;
         if (this.onSnippetFetch) {
           this.onSnippetFetch(res);
         }
@@ -28,7 +31,7 @@ export const getSnippetMixin = {
     return {
       snippet: {},
       newSnippet: false,
-      blobs: [],
+      blobs: blobsDefault,
     };
   },
   computed: {
@@ -37,5 +40,3 @@ export const getSnippetMixin = {
     },
   },
 };
-
-export default () => {};

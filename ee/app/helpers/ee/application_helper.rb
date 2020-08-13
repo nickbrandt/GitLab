@@ -14,10 +14,11 @@ module EE
       return super unless ::Gitlab::Geo.secondary?
 
       if @limited_actions_message
-        s_('Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page.').html_safe
+        html_escape(s_('Geo|You are on a secondary, %{b_open}read-only%{b_close} Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page.')) %
+          { b_open: '<b>'.html_safe, b_close: '</b>'.html_safe }
       else
-        message = (s_('Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.') %
-          { primary_node: link_to('primary node', ::Gitlab::Geo.primary_node&.url || '#') }).html_safe
+        message = html_escape(s_('Geo|You are on a secondary, %{b_open}read-only%{b_close} Geo node. If you want to make changes, you must visit this page on the %{node_link_open}primary node%{node_link_close}.')) %
+          { node_link_open: "<a href=\"#{::Gitlab::Geo.primary_node&.url || '#'}\">".html_safe, node_link_close: "</a>".html_safe, b_open: '<b>'.html_safe, b_close: '</b>'.html_safe }
 
         return "#{message} #{lag_message}".html_safe if lag_message
 

@@ -110,6 +110,7 @@ module API
     end
 
     format :json
+    formatter :json, Gitlab::Json::GrapeFormatter
     content_type :txt, "text/plain"
 
     # Ensure the namespace is right, otherwise we might load Grape::API::Helpers
@@ -124,6 +125,7 @@ module API
       # Keep in alphabetical order
       mount ::API::AccessRequests
       mount ::API::Admin::Ci::Variables
+      mount ::API::Admin::InstanceClusters
       mount ::API::Admin::Sidekiq
       mount ::API::Appearance
       mount ::API::Applications
@@ -178,7 +180,18 @@ module API
       mount ::API::Discussions
       mount ::API::ResourceLabelEvents
       mount ::API::ResourceMilestoneEvents
+      mount ::API::ResourceStateEvents
       mount ::API::NotificationSettings
+      mount ::API::ProjectPackages
+      mount ::API::GroupPackages
+      mount ::API::PackageFiles
+      mount ::API::NugetPackages
+      mount ::API::PypiPackages
+      mount ::API::ComposerPackages
+      mount ::API::ConanPackages
+      mount ::API::MavenPackages
+      mount ::API::NpmPackages
+      mount ::API::GoProxy
       mount ::API::Pages
       mount ::API::PagesDomains
       mount ::API::ProjectClusters
@@ -224,6 +237,7 @@ module API
 
     mount ::API::Internal::Base
     mount ::API::Internal::Pages
+    mount ::API::Internal::Kubernetes
 
     route :any, '*path' do
       error!('404 Not Found', 404)

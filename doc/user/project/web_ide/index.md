@@ -1,3 +1,10 @@
+---
+stage: Create
+group: Editor
+info: "To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers"
+type: reference, how-to
+---
+
 # Web IDE
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/4539) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4.
@@ -45,6 +52,37 @@ If you are missing Syntax Highlighting support for any language, we prepared a s
 
 NOTE: **Note:**
 Single file editing is based on the [Ace Editor](https://ace.c9.io).
+
+### Schema based validation
+
+> - Support for `.gitlab-ci.yml` validation [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/218472) in GitLab 13.2.
+> - It was deployed behind a feature flag, disabled by default.
+> - It's enabled on GitLab.com.
+> - It cannot be enabled or disabled per-project.
+> - For GitLab self-managed instances, GitLab administrators can opt to [enable it](#enable-or-disable-schema-based-validation-core-only).
+
+The Web IDE provides validation support for certain JSON and YAML files using schemas
+based on the [JSON Schema Store](https://www.schemastore.org/json/). This feature is
+only supported for the `.gitlab-ci.yml` file.
+
+#### Enable or disable Schema based validation **(CORE ONLY)**
+
+Schema based validation is under development and not ready for production use. It is
+deployed behind a feature flag that is **disabled by default** for self-managed instances,
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can enable it for your instance.
+
+To enable it:
+
+```ruby
+Feature.enable(:schema_linting)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:schema_linting)
+```
 
 ### Themes
 
@@ -223,7 +261,8 @@ terminal will block the job from finishing for the duration configured in
 [`[session_server].session_timeout`](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-session_server-section)
 until you close the terminal window.
 
-NOTE: **Note:** Not all executors are
+NOTE: **Note:**
+Not all executors are
 [supported](https://docs.gitlab.com/runner/executors/#compatibility-chart).
 The [File Sync](#file-syncing-to-web-terminal) feature is supported on Kubernetes runners only.
 

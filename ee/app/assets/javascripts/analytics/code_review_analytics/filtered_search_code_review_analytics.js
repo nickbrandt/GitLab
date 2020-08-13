@@ -12,6 +12,7 @@ export default class FilteredSearchCodeReviewAnalytics extends FilteredSearchMan
       isGroupDecendent: true,
       stateFiltersSelector: '.issues-state-filters',
       isGroup: true,
+      useDefaultState: false,
       filteredSearchTokenKeys: CodeReviewAnalyticsFilteredSearchTokenKeys,
       placeholder: __('Filter results...'),
     });

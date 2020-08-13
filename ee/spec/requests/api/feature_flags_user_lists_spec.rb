@@ -59,7 +59,8 @@ RSpec.describe API::FeatureFlagsUserLists do
         'updated_at' => user_list.updated_at.as_json,
         'name' => 'list_a',
         'user_xids' => 'user1',
-        'path' => project_feature_flags_user_list_path(user_list.project, user_list)
+        'path' => project_feature_flags_user_list_path(user_list.project, user_list),
+        'edit_path' => edit_project_feature_flags_user_list_path(user_list.project, user_list)
       }])
     end
 
@@ -110,7 +111,7 @@ RSpec.describe API::FeatureFlagsUserLists do
       expect(response).to have_gitlab_http_status(:forbidden)
     end
 
-    it 'returns the feature flag' do
+    it 'returns the user list' do
       list = create_list(name: 'testers', user_xids: 'test1,test2')
 
       get api("/projects/#{project.id}/feature_flags_user_lists/#{list.iid}", developer)
@@ -124,11 +125,12 @@ RSpec.describe API::FeatureFlagsUserLists do
         'project_id' => project.id,
         'created_at' => list.created_at.as_json,
         'updated_at' => list.updated_at.as_json,
-        'path' => project_feature_flags_user_list_path(list.project, list)
+        'path' => project_feature_flags_user_list_path(list.project, list),
+        'edit_path' => edit_project_feature_flags_user_list_path(list.project, list)
       })
     end
 
-    it 'returns the correct feature flag identified by the iid' do
+    it 'returns the correct user list identified by the iid' do
       create_list(name: 'list_a', user_xids: 'test1')
       list_b = create_list(name: 'list_b', user_xids: 'test2')
 

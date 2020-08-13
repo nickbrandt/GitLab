@@ -77,12 +77,12 @@ module Gitlab
     # metric labels to their respective values.
     #
     # @return [Hash] mapping labels to their aggregate numeric values, or the empty hash if no results were found
-    def aggregate(aggregate_query, time: Time.now)
+    def aggregate(aggregate_query, time: Time.now, transform_value: :to_f)
       response = query(aggregate_query, time: time)
       response.to_h do |result|
         key = block_given? ? yield(result['metric']) : result['metric']
         _timestamp, value = result['value']
-        [key, value.to_i]
+        [key, value.public_send(transform_value)] # rubocop:disable GitlabSecurity/PublicSend
       end
     end
 
@@ -132,7 +132,7 @@ module Gitlab
 
     def http_options
       strong_memoize(:http_options) do
-        { follow_redirects: false }.merge(mapped_options)
+        { follow_redirects: false, open_timeout: 5, read_timeout: 10 }.merge(mapped_options)
       end
     end
 

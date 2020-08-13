@@ -48,6 +48,12 @@ RSpec.describe Projects::CreateService, '#execute' do
 
       expect(project.project_setting).to be_new_record
     end
+
+    it_behaves_like 'storing arguments in the application context' do
+      let(:expected_params) { { project: subject.full_path, related_class: described_class.to_s } }
+
+      subject { create_project(user, opts) }
+    end
   end
 
   context "admin creates project with other user's namespace_id" do
@@ -676,10 +682,6 @@ RSpec.describe Projects::CreateService, '#execute' do
     end
 
     it 'updates authorization for current_user' do
-      expect(Users::RefreshAuthorizedProjectsService).to(
-        receive(:new).with(user).and_call_original
-      )
-
       project = create_project(user, opts)
 
       expect(
@@ -711,10 +713,6 @@ RSpec.describe Projects::CreateService, '#execute' do
       end
 
       it 'updates authorization for current_user' do
-        expect(Users::RefreshAuthorizedProjectsService).to(
-          receive(:new).with(user).and_call_original
-        )
-
         project = create_project(user, opts)
 
         expect(

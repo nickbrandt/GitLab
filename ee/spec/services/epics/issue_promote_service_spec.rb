@@ -69,6 +69,7 @@ RSpec.describe Epics::IssuePromoteService do
             expect(epic.description).to eq(issue.description)
             expect(epic.author).to eq(user)
             expect(epic.group).to eq(group)
+            expect(epic.parent).to be_nil
           end
 
           it 'copies group labels assigned to the issue' do
@@ -101,6 +102,21 @@ RSpec.describe Epics::IssuePromoteService do
               expect(epic.user_mentions.where.not(note_id: nil).count).to eq 1
               expect(epic.user_mentions.count).to eq 2
             end
+          end
+        end
+
+        context 'when an issue belongs to an epic' do
+          let(:parent_epic) { create(:epic, group: group) }
+          let!(:epic_issue) { create(:epic_issue, epic: parent_epic, issue: issue) }
+
+          it 'creates a new epic with correct attributes' do
+            subject.execute(issue)
+
+            expect(epic.title).to eq(issue.title)
+            expect(epic.description).to eq(issue.description)
+            expect(epic.author).to eq(user)
+            expect(epic.group).to eq(group)
+            expect(epic.parent).to eq(parent_epic)
           end
         end
 

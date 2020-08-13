@@ -61,6 +61,14 @@ RSpec.shared_examples 'wiki controller actions' do
       expect(assigns(:sidebar_wiki_entries)).to be_nil
       expect(assigns(:sidebar_limited)).to be_nil
     end
+
+    context 'when the request is of non-html format' do
+      it 'returns a 404 error' do
+        get :pages, params: routing_params.merge(format: 'json')
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
   end
 
   describe 'GET #history' do
@@ -151,6 +159,14 @@ RSpec.shared_examples 'wiki controller actions' do
         expect(assigns(:page).title).to eq(wiki_title)
         expect(assigns(:sidebar_wiki_entries)).to contain_exactly(an_instance_of(WikiPage))
         expect(assigns(:sidebar_limited)).to be(false)
+      end
+
+      it 'increases the page view counter' do
+        expect do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+        end.to change { Gitlab::UsageDataCounters::WikiPageCounter.read(:view) }.by(1)
       end
 
       context 'when page content encoding is invalid' do

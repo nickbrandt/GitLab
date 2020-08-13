@@ -8,6 +8,8 @@ module WikiActions
   extend ActiveSupport::Concern
 
   included do
+    before_action { respond_to :html }
+
     before_action :authorize_read_wiki!
     before_action :authorize_create_wiki!, only: [:edit, :create]
     before_action :authorize_admin_wiki!, only: :destroy
@@ -64,6 +66,8 @@ module WikiActions
       # Assign vars expected by MarkupHelper
       @ref = params[:version_id]
       @path = page.path
+
+      Gitlab::UsageDataCounters::WikiPageCounter.count(:view)
 
       render 'shared/wikis/show'
     elsif file_blob

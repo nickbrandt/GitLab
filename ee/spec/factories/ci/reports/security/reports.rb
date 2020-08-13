@@ -8,7 +8,7 @@ FactoryBot.define do
     scanned_resources { [] }
 
     transient do
-      occurrences { [] }
+      findings { [] }
       scanners { [] }
       identifiers { [] }
     end
@@ -16,7 +16,7 @@ FactoryBot.define do
     after :build do |report, evaluator|
       evaluator.scanners.each { |s| report.add_scanner(s) }
       evaluator.identifiers.each { |id| report.add_identifier(id) }
-      evaluator.occurrences.each { |o| report.add_occurrence(o) }
+      evaluator.findings.each { |o| report.add_finding(o) }
     end
 
     skip_create

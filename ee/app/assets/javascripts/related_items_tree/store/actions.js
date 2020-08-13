@@ -589,6 +589,3 @@ export const fetchProjects = ({ state, dispatch }, searchKey = '') => {
     })
     .catch(() => dispatch('receiveProjectsFailure'));
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

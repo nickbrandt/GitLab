@@ -14,8 +14,19 @@ Epics let you manage your portfolio of projects more efficiently and with less
 effort by tracking groups of issues that share a theme, across projects and
 milestones.
 
-<!-- Possibly swap this file with one of a single epic -->
-![epics list view](img/epics_list_view_v12.5.png)
+An epic's page contains the following tabs:
+
+- **Epics and Issues**: epics and issues added to this epic. Child epics, and their issues, are
+  shown in a tree view.
+  - Click the chevron (**>**) next to a parent epic to reveal the child epics and issues.
+  - Hover over the total counts to see a breakdown of open and closed items.
+
+  NOTE: **Note:**
+  The number provided here includes all epics associated with this project. The number includes epics for which users may not currently have permission.
+
+- **Roadmap**: a roadmap view of child epics which have start and due dates.
+
+![epic view](img/epic_view_v13.0.png)
 
 ## Use cases
 
@@ -28,6 +39,7 @@ milestones.
 To learn what you can do with an epic, see [Manage epics](manage_epics.md). Possible actions include:
 
 - [Create an epic](manage_epics.md#create-an-epic)
+- [Edit an epic](manage_epics.md#edit-an-epic)
 - [Bulk-edit epics](../bulk_editing/index.md#bulk-edit-epics)
 - [Delete an epic](manage_epics.md#delete-an-epic)
 - [Close an epic](manage_epics.md#close-an-epic)
@@ -57,7 +69,8 @@ to add an issue to an epic, reorder issues, move issues between epics, or promot
 
 ## Issue health status in Epic tree **(ULTIMATE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/199184) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.10.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/199184) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.10.
+> - [Improved](https://gitlab.com/gitlab-org/gitlab/-/issues/220867) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.3. The health status of a closed issue will be hidden.
 
 You can report on and quickly respond to the health of individual issues and epics by setting a
 red, amber, or green [health status on an issue](../../project/issues/index.md#health-status-ultimate),
@@ -167,7 +180,7 @@ Once you write your comment, you can either:
 
 ### Activity sort order
 
-> [Introduced](https://https://gitlab.com/gitlab-org/gitlab/-/issues/214364) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/214364) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.2.
 
 You can reverse the default order and interact with the activity feed sorted by most recent items
 at the top. Your preference is saved via local storage and automatically applied to every issue

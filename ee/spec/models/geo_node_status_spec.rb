@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
+RSpec.describe GeoNodeStatus, :geo do
   include ::EE::GeoHelpers
 
   let!(:primary) { create(:geo_node, :primary) }
@@ -319,41 +319,47 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
     end
   end
 
+  describe '#repositories_synced_count' do
+    it 'returns the right number of synced registries' do
+      create(:geo_project_registry, :synced, project: project_1)
+      create(:geo_project_registry, :synced, project: project_3)
+      create(:geo_project_registry, :repository_syncing, project: project_4)
+      create(:geo_project_registry, :wiki_syncing)
+
+      expect(subject.repositories_synced_count).to eq(3)
+    end
+  end
+
+  describe '#wikis_synced_count' do
+    it 'returns the right number of synced registries' do
+      create(:geo_project_registry, :synced, project: project_1)
+      create(:geo_project_registry, :synced, project: project_3)
+      create(:geo_project_registry, :repository_syncing, project: project_4)
+      create(:geo_project_registry, :wiki_syncing)
+
+      expect(subject.wikis_synced_count).to eq(3)
+    end
+  end
+
   describe '#repositories_failed_count' do
-    before do
+    it 'returns the right number of failed registries' do
       create(:geo_project_registry, :sync_failed, project: project_1)
       create(:geo_project_registry, :sync_failed, project: project_3)
       create(:geo_project_registry, :repository_syncing, project: project_4)
       create(:geo_project_registry, :wiki_syncing)
-    end
 
-    it 'returns the right number of failed repos with no group restrictions' do
       expect(subject.repositories_failed_count).to eq(2)
-    end
-
-    it 'returns the right number of failed repos with group restrictions' do
-      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-
-      expect(subject.repositories_failed_count).to eq(1)
     end
   end
 
   describe '#wikis_failed_count' do
-    before do
+    it 'returns the right number of failed registries' do
       create(:geo_project_registry, :sync_failed, project: project_1)
       create(:geo_project_registry, :sync_failed, project: project_3)
       create(:geo_project_registry, :repository_syncing, project: project_4)
       create(:geo_project_registry, :wiki_syncing)
-    end
 
-    it 'returns the right number of failed repos with no group restrictions' do
       expect(subject.wikis_failed_count).to eq(2)
-    end
-
-    it 'returns the right number of failed repos with group restrictions' do
-      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-
-      expect(subject.wikis_failed_count).to eq(1)
     end
   end
 
@@ -782,9 +788,11 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       stub_current_geo_node(secondary)
     end
 
-    it 'returns the right number of verified repositories' do
-      create(:geo_project_registry, :repository_verified)
-      create(:geo_project_registry, :repository_verified)
+    it 'returns the right number of verified registries' do
+      create(:geo_project_registry, :repository_verified, project: project_1)
+      create(:geo_project_registry, :repository_verified, :repository_checksum_mismatch, project: project_3)
+      create(:geo_project_registry, :repository_verification_failed)
+      create(:geo_project_registry, :wiki_verified, project: project_4)
 
       expect(subject.repositories_verified_count).to eq(2)
     end
@@ -802,12 +810,13 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       stub_current_geo_node(secondary)
     end
 
-    it 'returns the right number of repositories that checksum mismatch' do
-      create(:geo_project_registry, :repository_checksum_mismatch)
-      create(:geo_project_registry, :repository_verification_failed)
+    it 'returns the right number of registries that checksum mismatch' do
+      create(:geo_project_registry, :repository_checksum_mismatch, project: project_1)
+      create(:geo_project_registry, :repository_checksum_mismatch, project: project_3)
       create(:geo_project_registry, :repository_verified)
+      create(:geo_project_registry, :wiki_checksum_mismatch, project: project_4)
 
-      expect(subject.repositories_checksum_mismatch_count).to eq(1)
+      expect(subject.repositories_checksum_mismatch_count).to eq(2)
     end
 
     it 'returns existing value when feature flag if off' do
@@ -823,9 +832,11 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       stub_current_geo_node(secondary)
     end
 
-    it 'returns the right number of failed repositories' do
-      create(:geo_project_registry, :repository_verification_failed)
-      create(:geo_project_registry, :repository_verification_failed)
+    it 'returns the right number of registries that verification failed' do
+      create(:geo_project_registry, :repository_verification_failed, project: project_1)
+      create(:geo_project_registry, :repository_verification_failed, project: project_3)
+      create(:geo_project_registry, :repository_verified)
+      create(:geo_project_registry, :wiki_verification_failed, project: project_4)
 
       expect(subject.repositories_verification_failed_count).to eq(2)
     end
@@ -843,12 +854,13 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       stub_current_geo_node(secondary)
     end
 
-    it 'returns the right number of repositories retrying verification' do
-      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: 1)
-      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: nil)
+    it 'returns the right number of registries retrying verification' do
+      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: 1, project: project_1)
+      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: nil, project: project_3)
       create(:geo_project_registry, :repository_verified)
+      create(:geo_project_registry, :repository_verification_failed, repository_verification_retry_count: 1, project: project_4)
 
-      expect(subject.repositories_retrying_verification_count).to eq(1)
+      expect(subject.repositories_retrying_verification_count).to eq(2)
     end
 
     it 'returns existing value when feature flag if off' do
@@ -864,9 +876,11 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       stub_current_geo_node(secondary)
     end
 
-    it 'returns the right number of verified wikis' do
-      create(:geo_project_registry, :wiki_verified)
-      create(:geo_project_registry, :wiki_verified)
+    it 'returns the right number of verified registries' do
+      create(:geo_project_registry, :wiki_verified, project: project_1)
+      create(:geo_project_registry, :wiki_verified, :wiki_checksum_mismatch, project: project_3)
+      create(:geo_project_registry, :wiki_verification_failed)
+      create(:geo_project_registry, :repository_verified, project: project_4)
 
       expect(subject.wikis_verified_count).to eq(2)
     end
@@ -884,12 +898,13 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       stub_current_geo_node(secondary)
     end
 
-    it 'returns the right number of wikis that checksum mismatch' do
-      create(:geo_project_registry, :wiki_checksum_mismatch)
-      create(:geo_project_registry, :wiki_verification_failed)
+    it 'returns the right number of registries that checksum mismatch' do
+      create(:geo_project_registry, :wiki_checksum_mismatch, project: project_1)
+      create(:geo_project_registry, :wiki_checksum_mismatch, project: project_3)
       create(:geo_project_registry, :wiki_verified)
+      create(:geo_project_registry, :repository_checksum_mismatch, project: project_4)
 
-      expect(subject.wikis_checksum_mismatch_count).to eq(1)
+      expect(subject.wikis_checksum_mismatch_count).to eq(2)
     end
 
     it 'returns existing value when feature flag if off' do
@@ -905,9 +920,11 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       stub_current_geo_node(secondary)
     end
 
-    it 'returns the right number of failed wikis' do
-      create(:geo_project_registry, :wiki_verification_failed)
-      create(:geo_project_registry, :wiki_verification_failed)
+    it 'returns the right number of registries that verification failed' do
+      create(:geo_project_registry, :wiki_verification_failed, project: project_1)
+      create(:geo_project_registry, :wiki_verification_failed, project: project_3)
+      create(:geo_project_registry, :wiki_verified)
+      create(:geo_project_registry, :repository_verification_failed, project: project_4)
 
       expect(subject.wikis_verification_failed_count).to eq(2)
     end
@@ -925,12 +942,13 @@ RSpec.describe GeoNodeStatus, :geo, :geo_fdw do
       stub_current_geo_node(secondary)
     end
 
-    it 'returns the right number of wikis retrying verification' do
-      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: 1)
-      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: nil)
+    it 'returns the right number of registries retrying verification' do
+      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: 1, project: project_1)
+      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: nil, project: project_3)
       create(:geo_project_registry, :wiki_verified)
+      create(:geo_project_registry, :wiki_verification_failed, wiki_verification_retry_count: 1, project: project_4)
 
-      expect(subject.wikis_retrying_verification_count).to eq(1)
+      expect(subject.wikis_retrying_verification_count).to eq(2)
     end
 
     it 'returns existing value when feature flag if off' do

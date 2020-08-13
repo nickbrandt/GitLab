@@ -38,6 +38,11 @@ class Member < ApplicationRecord
       scope: [:source_type, :source_id],
       allow_nil: true
     }
+  validates :user_id,
+    uniqueness: {
+      message: _('project bots cannot be added to other groups / projects')
+    },
+    if: :project_bot?
 
   # This scope encapsulates (most of) the conditions a row in the member table
   # must satisfy if it is a valid permission. Of particular note:
@@ -81,6 +86,7 @@ class Member < ApplicationRecord
   scope :owners, -> { active.where(access_level: OWNER) }
   scope :owners_and_maintainers, -> { active.where(access_level: [OWNER, MAINTAINER]) }
   scope :with_user, -> (user) { where(user: user) }
+  scope :preload_user_and_notification_settings, -> { preload(user: :notification_settings) }
 
   scope :with_source_id, ->(source_id) { where(source_id: source_id) }
   scope :including_source, -> { includes(:source) }
@@ -472,6 +478,10 @@ class Member < ApplicationRecord
 
   def update_highest_role_attribute
     user_id
+  end
+
+  def project_bot?
+    user&.project_bot?
   end
 end
 

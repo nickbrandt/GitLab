@@ -118,6 +118,26 @@ RSpec.describe MergeRequest do
 
             it { is_expected.to be_falsey }
           end
+
+          context 'with License-Check enabled' do
+            let!(:license_check) { create(:report_approver_rule, :license_scanning, merge_request: merge_request) }
+
+            context 'when rule is not approved' do
+              before do
+                allow_any_instance_of(ApprovalWrappedRule).to receive(:approved?).and_return(false)
+              end
+
+              it { is_expected.to be_truthy }
+            end
+
+            context 'when rule is approved' do
+              before do
+                allow_any_instance_of(ApprovalWrappedRule).to receive(:approved?).and_return(true)
+              end
+
+              it { is_expected.to be_falsey }
+            end
+          end
         end
       end
     end

@@ -13,9 +13,10 @@ import DashboardNotConfigured from 'ee/security_dashboard/components/empty_state
 describe('First Class Instance Dashboard Component', () => {
   let wrapper;
 
-  const defaultMocks = { $apollo: { queries: { projects: { loading: false } } } };
+  const defaultMocks = ({ loading = false } = {}) => ({
+    $apollo: { queries: { projects: { loading } } },
+  });
 
-  const vulnerableProjectsEndpoint = '/vulnerable/projects';
   const vulnerabilitiesExportEndpoint = '/vulnerabilities/exports';
 
   const findInstanceVulnerabilities = () => wrapper.find(FirstClassInstanceVulnerabilities);
@@ -26,14 +27,13 @@ describe('First Class Instance Dashboard Component', () => {
   const findEmptyState = () => wrapper.find(DashboardNotConfigured);
   const findFilters = () => wrapper.find(Filters);
 
-  const createWrapper = ({ data = {}, stubs }) => {
+  const createWrapper = ({ data = {}, stubs, mocks = defaultMocks() }) => {
     return shallowMount(FirstClassInstanceDashboard, {
       data() {
         return { ...data };
       },
-      mocks: { ...defaultMocks },
+      mocks,
       propsData: {
-        vulnerableProjectsEndpoint,
         vulnerabilitiesExportEndpoint,
       },
       stubs: {
@@ -91,21 +91,36 @@ describe('First Class Instance Dashboard Component', () => {
     });
   });
 
+  describe('when loading projects', () => {
+    beforeEach(() => {
+      wrapper = createWrapper({
+        mocks: defaultMocks({ loading: true }),
+        data: {
+          projects: [{ id: 1 }],
+        },
+      });
+    });
+
+    it('does not render the export button', () => {
+      expect(findCsvExportButton().exists()).toBe(false);
+    });
+  });
+
   describe('when uninitialized', () => {
     beforeEach(() => {
       wrapper = createWrapper({
         data: {
           isManipulatingProjects: false,
-          stubs: {
-            DashboardNotConfigured,
-            GlButton,
-          },
         },
       });
     });
 
     it('renders the empty state', () => {
       expect(findEmptyState().props()).toEqual({});
+    });
+
+    it('does not render the export button', () => {
+      expect(findCsvExportButton().exists()).toBe(false);
     });
 
     it('does not render the vulnerability list', () => {

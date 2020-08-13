@@ -1,13 +1,16 @@
-# Advanced Syntax Search **(STARTER ONLY)**
+---
+stage: Create
+group: Editor
+info: "To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers"
+type: reference
+---
 
-> **Notes:**
->
+# Advanced Syntax Search **(STARTER)**
+
 > - Introduced in [GitLab Enterprise Starter](https://about.gitlab.com/pricing/) 9.2
 
 NOTE: **GitLab.com availability:**
-Advanced Global Search (powered by Elasticsearch) is not yet available on GitLab.com.
-It will be progressively enabled for all paid groups in Q3 of 2020.
-[Follow this epic](https://gitlab.com/groups/gitlab-com/-/epics/649) for the latest updates on the timeline.
+Advanced Global Search (powered by Elasticsearch) is enabled for Bronze and above on GitLab.com since 2020-07-10.
 
 Use advanced queries for more targeted search results.
 

@@ -356,6 +356,7 @@ RSpec.describe Projects::CreateService, '#execute' do
       let(:fail_condition!) do
         allow(Gitlab::VisibilityLevel).to receive(:allowed_for?).and_return(false)
       end
+
       let(:attributes) do
         {
            author_id: user.id,

@@ -77,6 +77,10 @@ describe('User List', () => {
       expect(wrapper.find('[data-testid="add-users"]').text()).toBe('Add Users');
     });
 
+    it('shows an edit list button', () => {
+      expect(wrapper.find('[data-testid="edit-user-list"]').text()).toBe('Edit');
+    });
+
     it('shows a row for every id', () => {
       expect(wrapper.findAll('[data-testid="user-id-row"]')).toHaveLength(userIds.length);
     });

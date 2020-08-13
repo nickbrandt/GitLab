@@ -11,6 +11,8 @@ describe('Burnup chart', () => {
     dueDate: '2019-09-09T00:00:00.000Z',
   };
 
+  const findChart = () => wrapper.find(GlLineChart);
+
   const createComponent = (props = {}) => {
     wrapper = shallowMount(BurnupChart, {
       propsData: {
@@ -29,7 +31,7 @@ describe('Burnup chart', () => {
     ${[{ '2019-08-07T00:00:00.000Z': 100 }, { '2019-08-08T00:00:00.000Z': 99 }, { '2019-09-08T00:00:00.000Z': 1 }]}
   `('renders the lineChart correctly', ({ scope }) => {
     createComponent({ scope });
-    const chartData = wrapper.find(GlLineChart).props('data');
+    const chartData = findChart().props('data');
 
     expect(chartData).toEqual([
       {
@@ -37,5 +39,22 @@ describe('Burnup chart', () => {
         data: scope,
       },
     ]);
+  });
+
+  it('only shows integers on axis labels', () => {
+    const msInOneDay = 60 * 60 * 24 * 1000;
+    expect(findChart().props('option')).toMatchObject({
+      xAxis: {
+        type: 'time',
+        minInterval: msInOneDay,
+      },
+      yAxis: {
+        minInterval: 1,
+      },
+    });
+  });
+
+  it('does not show average or max values in legend', () => {
+    expect(findChart().props('includeLegendAvgMax')).toBe(false);
   });
 });

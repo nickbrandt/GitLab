@@ -1,8 +1,12 @@
 <script>
+import { __ } from '~/locale';
 import { GlAlert, GlDeprecatedButton, GlIntersectionObserver } from '@gitlab/ui';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/project_vulnerabilities.graphql';
+import securityScannersQuery from '../graphql/project_security_scanners.graphql';
 import { VULNERABILITIES_PER_PAGE } from '../store/constants';
+import { preparePageInfo } from '../helpers';
 
 export default {
   name: 'ProjectVulnerabilitiesApp',
@@ -12,6 +16,7 @@ export default {
     GlIntersectionObserver,
     VulnerabilityList,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     projectFullPath: {
       type: String,
@@ -27,6 +32,7 @@ export default {
     return {
       pageInfo: {},
       vulnerabilities: [],
+      securityScanners: {},
       errorLoadingVulnerabilities: false,
     };
   },
@@ -42,10 +48,34 @@ export default {
       },
       update: ({ project }) => project.vulnerabilities.nodes,
       result({ data }) {
-        this.pageInfo = data.project.vulnerabilities.pageInfo;
+        this.pageInfo = preparePageInfo(data?.project?.vulnerabilities?.pageInfo);
       },
       error() {
         this.errorLoadingVulnerabilities = true;
+      },
+    },
+    securityScanners: {
+      query: securityScannersQuery,
+      variables() {
+        return {
+          fullPath: this.projectFullPath,
+        };
+      },
+      error() {
+        this.securityScanners = {};
+      },
+      update({ project: { securityScanners = {} } = {} }) {
+        const { available = [], enabled = [], pipelineRun = [] } = securityScanners;
+        const translateScannerName = scannerName => this.$options.i18n[scannerName] || scannerName;
+
+        return {
+          available: available.map(translateScannerName),
+          enabled: enabled.map(translateScannerName),
+          pipelineRun: pipelineRun.map(translateScannerName),
+        };
+      },
+      skip() {
+        return !this.glFeatures.scannerAlerts;
       },
     },
   },
@@ -77,6 +107,12 @@ export default {
       this.$apollo.queries.vulnerabilities.refetch();
     },
   },
+  i18n: {
+    CONTAINER_SCANNING: __('Container Scanning'),
+    COVERAGE_FUZZING: __('Coverage Fuzzing'),
+    SECRET_DETECTION: __('Secret Detection'),
+    DEPENDENCY_SCANNING: __('Dependency Scanning'),
+  },
 };
 </script>
 
@@ -96,6 +132,7 @@ export default {
       :vulnerabilities="vulnerabilities"
       :should-show-identifier="true"
       :should-show-report-type="true"
+      :security-scanners="securityScanners"
       @refetch-vulnerabilities="refetchVulnerabilities"
     />
     <gl-intersection-observer

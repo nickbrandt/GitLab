@@ -30,8 +30,7 @@ can still be successfully merged into the target.
 When the merge request can't be merged, the pipeline runs against the source branch only. For example, when:
 
 - The target branch has changes that conflict with the changes in the source branch.
-- The merge request is a
-  [work in progress](../../../user/project/merge_requests/work_in_progress_merge_requests.md).
+- The merge request is a [**Draft** merge request](../../../user/project/merge_requests/work_in_progress_merge_requests.md).
 
 In these cases, the pipeline runs as a [pipeline for merge requests](../index.md)
 and is labeled as `detached`. If these cases no longer exist, new pipelines will
@@ -46,8 +45,6 @@ To enable pipelines for merge results:
 
 - You must have maintainer [permissions](../../../user/permissions.md).
 - You must be using [GitLab Runner](https://gitlab.com/gitlab-org/gitlab-runner) 11.9 or later.
-- You must not be forking or using cross-repo workflows. To follow progress,
-  see [#11934](https://gitlab.com/gitlab-org/gitlab/-/issues/11934).
 - You must not be using
   [fast forward merges](../../../user/project/merge_requests/fast_forward_merge.md) yet.
   To follow progress, see [#58226](https://gitlab.com/gitlab-org/gitlab/-/issues/26996).

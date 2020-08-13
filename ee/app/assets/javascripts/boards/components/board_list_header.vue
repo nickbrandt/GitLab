@@ -3,7 +3,7 @@ import { mapState, mapActions } from 'vuex';
 import BoardListHeaderFoss from '~/boards/components/board_list_header.vue';
 import { __, sprintf, s__ } from '~/locale';
 import boardsStore from '~/boards/stores/boards_store';
-import { inactiveListId } from '~/boards/constants';
+import { inactiveId } from '~/boards/constants';
 import eventHub from '~/sidebar/event_hub';
 
 export default {
@@ -14,7 +14,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['activeListId']),
+    ...mapState(['activeId']),
     issuesTooltip() {
       const { issuesSize, maxIssueCount } = this.list;
 
@@ -39,13 +39,13 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['setActiveListId']),
+    ...mapActions(['setActiveId']),
     openSidebarSettings() {
-      if (this.activeListId === inactiveListId) {
+      if (this.activeId === inactiveId) {
         eventHub.$emit('sidebar.closeAll');
       }
 
-      this.setActiveListId(this.list.id);
+      this.setActiveId(this.list.id);
     },
   },
 };

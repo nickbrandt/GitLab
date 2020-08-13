@@ -11,7 +11,6 @@ module EE
         def project_update_params
           super
             .merge(tracing_setting_params)
-            .merge(incident_management_setting_params)
             .merge(status_page_setting_params)
         end
 
@@ -24,10 +23,6 @@ module EE
           destroy = attr[:external_url].blank?
 
           { tracing_setting_attributes: attr.merge(_destroy: destroy) }
-        end
-
-        def incident_management_setting_params
-          params.slice(:incident_management_setting_attributes)
         end
 
         def status_page_setting_params

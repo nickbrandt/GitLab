@@ -2,7 +2,9 @@ import { mount } from '@vue/test-utils';
 import { merge } from 'lodash';
 import { GlAlert, GlLink } from '@gitlab/ui';
 import SecurityConfigurationApp from 'ee/security_configuration/components/app.vue';
+import ManageFeature from 'ee/security_configuration/components/manage_feature.vue';
 import stubChildren from 'helpers/stub_children';
+import { generateFeatures } from './helpers';
 
 const propsData = {
   features: [],
@@ -11,7 +13,9 @@ const propsData = {
   autoDevopsHelpPagePath: 'http://autoDevopsHelpPagePath',
   autoDevopsPath: 'http://autoDevopsPath',
   helpPagePath: 'http://helpPagePath',
+  gitlabCiPresent: false,
   autoFixSettingsProps: {},
+  createSastMergeRequestPath: 'http://createSastMergeRequestPath',
 };
 
 describe('Security Configuration App', () => {
@@ -36,20 +40,17 @@ describe('Security Configuration App', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
-
-  const generateFeatures = n => {
-    return [...Array(n).keys()].map(i => ({
-      name: `name-feature-${i}`,
-      description: `description-feature-${i}`,
-      link: `link-feature-${i}`,
-      configured: i % 2 === 0,
-    }));
-  };
 
   const getPipelinesLink = () => wrapper.find({ ref: 'pipelinesLink' });
   const getFeaturesTable = () => wrapper.find({ ref: 'securityControlTable' });
+  const getFeaturesRows = () => getFeaturesTable().findAll('tbody tr');
   const getAlert = () => wrapper.find(GlAlert);
+  const getRowCells = row => {
+    const [feature, status, manage] = row.findAll('td').wrappers;
+    return { feature, status, manage };
+  };
 
   describe('header', () => {
     it.each`
@@ -69,21 +70,14 @@ describe('Security Configuration App', () => {
 
   describe('Auto DevOps alert', () => {
     describe.each`
-      gitlabCiPresent | autoDevopsEnabled | canEnableAutoDevops | sastConfigurationByClick | shouldShowAlert
-      ${false}        | ${false}          | ${true}             | ${true}                  | ${true}
-      ${true}         | ${false}          | ${true}             | ${true}                  | ${false}
-      ${false}        | ${true}           | ${true}             | ${true}                  | ${false}
-      ${false}        | ${false}          | ${false}            | ${true}                  | ${false}
-      ${false}        | ${false}          | ${true}             | ${false}                 | ${false}
+      gitlabCiPresent | autoDevopsEnabled | canEnableAutoDevops | shouldShowAlert
+      ${false}        | ${false}          | ${true}             | ${true}
+      ${true}         | ${false}          | ${true}             | ${false}
+      ${false}        | ${true}           | ${true}             | ${false}
+      ${false}        | ${false}          | ${false}            | ${false}
     `(
-      'given gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled, canEnableAutoDevops is $canEnableAutoDevops, sastConfigurationByClick is $sastConfigurationByClick',
-      ({
-        gitlabCiPresent,
-        autoDevopsEnabled,
-        canEnableAutoDevops,
-        sastConfigurationByClick,
-        shouldShowAlert,
-      }) => {
+      'given gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled, canEnableAutoDevops is $canEnableAutoDevops',
+      ({ gitlabCiPresent, autoDevopsEnabled, canEnableAutoDevops, shouldShowAlert }) => {
         beforeEach(() => {
           createComponent({
             propsData: {
@@ -91,7 +85,6 @@ describe('Security Configuration App', () => {
               autoDevopsEnabled,
               canEnableAutoDevops,
             },
-            provide: { glFeatures: { sastConfigurationByClick } },
           });
         });
 
@@ -131,16 +124,32 @@ describe('Security Configuration App', () => {
       createComponent({ propsData: { features } });
 
       expect(getFeaturesTable().classes('b-table-stacked-md')).toBeTruthy();
-      const rows = getFeaturesTable().findAll('tbody tr');
+      const rows = getFeaturesRows();
       expect(rows).toHaveLength(5);
 
       for (let i = 0; i < features.length; i += 1) {
-        const [feature, status] = rows.at(i).findAll('td').wrappers;
+        const { feature, status, manage } = getRowCells(rows.at(i));
         expect(feature.text()).toMatch(features[i].name);
         expect(feature.text()).toMatch(features[i].description);
-        expect(feature.find(GlLink).attributes('href')).toBe(features[i].link);
-        expect(status.text()).toMatch(features[i].configured ? 'Enabled' : 'Not yet enabled');
+        expect(status.text()).toMatch(features[i].configured ? 'Enabled' : 'Not enabled');
+        expect(manage.find(ManageFeature).props()).toMatchObject({
+          feature: features[i],
+          autoDevopsEnabled: propsData.autoDevopsEnabled,
+          gitlabCiPresent: propsData.gitlabCiPresent,
+          createSastMergeRequestPath: propsData.createSastMergeRequestPath,
+        });
       }
+    });
+
+    describe('given a feature enabled by Auto DevOps', () => {
+      it('displays the expected status text', () => {
+        const features = generateFeatures(1, { configured: true });
+
+        createComponent({ propsData: { features, autoDevopsEnabled: true } });
+
+        const { status } = getRowCells(getFeaturesRows().at(0));
+        expect(status.text()).toMatch('Enabled with Auto DevOps');
+      });
     });
   });
 });

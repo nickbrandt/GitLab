@@ -24,7 +24,7 @@ RSpec.describe EE::ServicesHelper do
       let(:integration) { build(:slack_service) }
 
       it 'does not include Jira specific fields' do
-        is_expected.not_to include(:enable_jira_issues, :project_key, :edit_project_path)
+        is_expected.not_to include(:show_jira_issues_integration, :enable_jira_issues, :project_key, :edit_project_path)
       end
     end
 
@@ -32,7 +32,7 @@ RSpec.describe EE::ServicesHelper do
       let(:integration) { build(:jira_service) }
 
       it 'includes Jira specific fields' do
-        is_expected.to include(:enable_jira_issues, :project_key, :edit_project_path)
+        is_expected.to include(:show_jira_issues_integration, :enable_jira_issues, :project_key, :edit_project_path)
       end
     end
   end

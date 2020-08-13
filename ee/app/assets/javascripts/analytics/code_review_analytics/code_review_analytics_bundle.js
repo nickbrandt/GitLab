@@ -6,12 +6,12 @@ export default () => {
   const container = document.getElementById('js-code-review-analytics');
   const {
     projectId,
+    projectPath,
     newMergeRequestUrl,
     emptyStateSvgPath,
     milestonePath,
     labelsPath,
   } = container.dataset;
-
   if (!container) return;
 
   // eslint-disable-next-line no-new
@@ -22,6 +22,7 @@ export default () => {
       return h(CodeAnalyticsApp, {
         props: {
           projectId: Number(projectId),
+          projectPath,
           newMergeRequestUrl,
           emptyStateSvgPath,
           milestonePath,

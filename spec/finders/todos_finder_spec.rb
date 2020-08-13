@@ -232,6 +232,29 @@ RSpec.describe TodosFinder do
             expect(todos).to match_array([todo2, todo1])
           end
         end
+
+        context 'when filtering by target id' do
+          it 'returns the expected todos for the target' do
+            todos = finder.new(user, { type: 'Issue', target_id: issue.id }).execute
+
+            expect(todos).to match_array([todo1])
+          end
+
+          it 'returns the expected todos for multiple target ids' do
+            another_issue = create(:issue, project: project)
+            todo3 = create(:todo, user: user, project: project, target: another_issue)
+
+            todos = finder.new(user, { type: 'Issue', target_id: [issue.id, another_issue.id] }).execute
+
+            expect(todos).to match_array([todo1, todo3])
+          end
+
+          it 'returns the expected todos for empty target id collection' do
+            todos = finder.new(user, { target_id: [] }).execute
+
+            expect(todos).to match_array([todo1, todo2])
+          end
+        end
       end
 
       context 'external authorization' do
@@ -307,9 +330,9 @@ RSpec.describe TodosFinder do
     it 'returns the expected types' do
       expected_result =
         if Gitlab.ee?
-          %w[Epic Issue MergeRequest DesignManagement::Design]
+          %w[Epic Issue MergeRequest DesignManagement::Design AlertManagement::Alert]
         else
-          %w[Issue MergeRequest DesignManagement::Design]
+          %w[Issue MergeRequest DesignManagement::Design AlertManagement::Alert]
         end
 
       expect(described_class.todo_types).to contain_exactly(*expected_result)

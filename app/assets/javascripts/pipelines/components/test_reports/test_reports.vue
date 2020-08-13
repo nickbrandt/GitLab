@@ -28,12 +28,20 @@ export default {
     this.fetchSummary();
   },
   methods: {
-    ...mapActions(['fetchSummary', 'setSelectedSuiteIndex', 'removeSelectedSuiteIndex']),
+    ...mapActions([
+      'fetchTestSuite',
+      'fetchSummary',
+      'setSelectedSuiteIndex',
+      'removeSelectedSuiteIndex',
+    ]),
     summaryBackClick() {
       this.removeSelectedSuiteIndex();
     },
     summaryTableRowClick(index) {
       this.setSelectedSuiteIndex(index);
+
+      // Fetch the test suite when the user clicks to see more details
+      this.fetchTestSuite(index);
     },
     beforeEnterTransition() {
       document.documentElement.style.overflowX = 'hidden';

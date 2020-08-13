@@ -9,7 +9,7 @@ variables:
   # (SAST, Dependency Scanning, ...)
   SECURE_ANALYZERS_PREFIX: "registry.gitlab.com/gitlab-org/security-products/analyzers"
 
-  SAST_DEFAULT_ANALYZERS: "bandit, brakeman, gosec, spotbugs, flawfinder, phpcs-security-audit, security-code-scan, nodejs-scan, eslint, tslint, secrets, sobelow, pmd-apex, kubesec"
+  SAST_DEFAULT_ANALYZERS: "bandit, brakeman, gosec, spotbugs, flawfinder, phpcs-security-audit, security-code-scan, nodejs-scan, eslint, secrets, sobelow, pmd-apex, kubesec"
   SAST_EXCLUDED_PATHS: "spec, test, tests, tmp"
   SAST_ANALYZER_IMAGE_TAG: 2
   SAST_DISABLE_DIND: "true"
@@ -52,8 +52,7 @@ sast:
   rules:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
-    - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/
+    - if: $CI_COMMIT_BRANCH
   script:
     - /analyzer run
 
@@ -65,7 +64,6 @@ bandit-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /bandit/
       exists:
         - '**/*.py'
@@ -95,6 +93,8 @@ eslint-sast:
         - '**/*.html'
         - '**/*.js'
         - '**/*.jsx'
+        - '**/*.ts'
+        - '**/*.tsx'
 
 flawfinder-sast:
   extends: .sast-analyzer
@@ -104,7 +104,6 @@ flawfinder-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /flawfinder/
       exists:
         - '**/*.c'
@@ -118,7 +117,6 @@ kubesec-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /kubesec/ &&
           $SCAN_KUBERNETES_MANIFESTS == 'true'
 
@@ -130,7 +128,6 @@ gosec-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /gosec/
       exists:
         - '**/*.go'
@@ -143,7 +140,6 @@ nodejs-scan-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /nodejs-scan/
       exists:
         - 'package.json'
@@ -156,7 +152,6 @@ phpcs-security-audit-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /phpcs-security-audit/
       exists:
         - '**/*.php'
@@ -169,7 +164,6 @@ pmd-apex-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /pmd-apex/
       exists:
         - '**/*.cls'
@@ -182,7 +176,6 @@ secrets-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /secrets/
 
 security-code-scan-sast:
@@ -193,7 +186,6 @@ security-code-scan-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /security-code-scan/
       exists:
         - '**/*.csproj'
@@ -207,7 +199,6 @@ sobelow-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /sobelow/
       exists:
         - 'mix.exs'
@@ -220,22 +211,8 @@ spotbugs-sast:
     - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
       when: never
     - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
           $SAST_DEFAULT_ANALYZERS =~ /spotbugs/
       exists:
         - '**/*.groovy'
         - '**/*.java'
         - '**/*.scala'
-
-tslint-sast:
-  extends: .sast-analyzer
-  image:
-    name: "$SECURE_ANALYZERS_PREFIX/tslint:$SAST_ANALYZER_IMAGE_TAG"
-  rules:
-    - if: $SAST_DISABLED || $SAST_DISABLE_DIND == 'false'
-      when: never
-    - if: $CI_COMMIT_BRANCH &&
-          $GITLAB_FEATURES =~ /\bsast\b/ &&
-          $SAST_DEFAULT_ANALYZERS =~ /tslint/
-      exists:
-        - '**/*.ts'

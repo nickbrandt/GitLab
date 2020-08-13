@@ -15,6 +15,7 @@ import RecentSearchesStore from '~/filtered_search/stores/recent_searches_store'
 import RecentSearchesService from '~/filtered_search/services/recent_searches_service';
 import RecentSearchesStorageKeys from 'ee_else_ce/filtered_search/recent_searches_storage_keys';
 
+import { stripQuotes } from './filtered_search_utils';
 import { SortDirection } from './constants';
 
 export default {
@@ -44,7 +45,8 @@ export default {
     },
     sortOptions: {
       type: Array,
-      required: true,
+      default: () => [],
+      required: false,
     },
     initialFilterValue: {
       type: Array,
@@ -63,7 +65,7 @@ export default {
     },
   },
   data() {
-    let selectedSortOption = this.sortOptions[0].sortDirection.descending;
+    let selectedSortOption = this.sortOptions[0]?.sortDirection?.descending;
     let selectedSortDirection = SortDirection.descending;
 
     // Extract correct sortBy value based on initialSortBy
@@ -83,6 +85,7 @@ export default {
     return {
       initialRender: true,
       recentSearchesPromise: null,
+      recentSearches: [],
       filterValue: this.initialFilterValue,
       selectedSortOption,
       selectedSortDirection,
@@ -116,6 +119,9 @@ export default {
       return this.selectedSortDirection === SortDirection.ascending
         ? __('Sort direction: Ascending')
         : __('Sort direction: Descending');
+    },
+    filteredRecentSearches() {
+      return this.recentSearches.filter(item => typeof item !== 'string');
     },
   },
   watch: {
@@ -180,10 +186,43 @@ export default {
             this.recentSearchesStore.state.recentSearches.concat(searches),
           );
           this.recentSearchesService.save(resultantSearches);
+          this.recentSearches = resultantSearches;
         });
     },
-    getRecentSearches() {
-      return this.recentSearchesStore?.state.recentSearches;
+    /**
+     * When user hits Enter/Return key while typing tokens, we emit `onFilter`
+     * event immediately so at that time, we don't want to keep tokens dropdown
+     * visible on UI so this is essentially a hack which allows us to do that
+     * until `GlFilteredSearch` natively supports this.
+     * See this discussion https://gitlab.com/gitlab-org/gitlab/-/merge_requests/36421#note_385729546
+     */
+    blurSearchInput() {
+      const searchInputEl = this.$refs.filteredSearchInput.$el.querySelector(
+        '.gl-filtered-search-token-segment-input',
+      );
+      if (searchInputEl) {
+        searchInputEl.blur();
+      }
+    },
+    /**
+     * This method removes quotes enclosure from filter values which are
+     * done by `GlFilteredSearch` internally when filter value contains
+     * spaces.
+     */
+    removeQuotesEnclosure(filters = []) {
+      return filters.map(filter => {
+        if (typeof filter === 'object') {
+          const valueString = filter.value.data;
+          return {
+            ...filter,
+            value: {
+              data: stripQuotes(valueString),
+              operator: filter.value.operator,
+            },
+          };
+        }
+        return filter;
+      });
     },
     handleSortOptionClick(sortBy) {
       this.selectedSortOption = sortBy;
@@ -196,9 +235,13 @@ export default {
           : SortDirection.ascending;
       this.$emit('onSort', this.selectedSortOption.sortDirection[this.selectedSortDirection]);
     },
+    handleHistoryItemSelected(filters) {
+      this.$emit('onFilter', this.removeQuotesEnclosure(filters));
+    },
     handleClearHistory() {
       const resultantSearches = this.recentSearchesStore.setRecentSearches([]);
       this.recentSearchesService.save(resultantSearches);
+      this.recentSearches = [];
     },
     handleFilterSubmit(filters) {
       if (this.recentSearchesStorageKey) {
@@ -207,13 +250,15 @@ export default {
             if (filters.length) {
               const resultantSearches = this.recentSearchesStore.addRecentSearch(filters);
               this.recentSearchesService.save(resultantSearches);
+              this.recentSearches = resultantSearches;
             }
           })
           .catch(() => {
             // https://gitlab.com/gitlab-org/gitlab-foss/issues/30821
           });
       }
-      this.$emit('onFilter', filters);
+      this.blurSearchInput();
+      this.$emit('onFilter', this.removeQuotesEnclosure(filters));
     },
   },
 };
@@ -222,19 +267,19 @@ export default {
 <template>
   <div class="vue-filtered-search-bar-container d-md-flex">
     <gl-filtered-search
+      ref="filteredSearchInput"
       v-model="filterValue"
       :placeholder="searchInputPlaceholder"
       :available-tokens="tokens"
-      :history-items="getRecentSearches()"
+      :history-items="filteredRecentSearches"
       class="flex-grow-1"
-      @history-item-selected="$emit('onFilter', filters)"
+      @history-item-selected="handleHistoryItemSelected"
       @clear-history="handleClearHistory"
       @submit="handleFilterSubmit"
-      @clear="$emit('onFilter', [])"
     >
       <template #history-item="{ historyItem }">
-        <template v-for="token in historyItem">
-          <span v-if="typeof token === 'string'" :key="token" class="gl-px-1">"{{ token }}"</span>
+        <template v-for="(token, index) in historyItem">
+          <span v-if="typeof token === 'string'" :key="index" class="gl-px-1">"{{ token }}"</span>
           <span v-else :key="`${token.type}-${token.value.data}`" class="gl-px-1">
             <span v-if="tokenTitles[token.type]"
               >{{ tokenTitles[token.type] }} :{{ token.value.operator }}</span
@@ -244,7 +289,7 @@ export default {
         </template>
       </template>
     </gl-filtered-search>
-    <gl-button-group class="sort-dropdown-container d-flex">
+    <gl-button-group v-if="selectedSortOption" class="sort-dropdown-container d-flex">
       <gl-dropdown :text="selectedSortOption.title" :right="true" class="w-100">
         <gl-dropdown-item
           v-for="sortBy in sortOptions"

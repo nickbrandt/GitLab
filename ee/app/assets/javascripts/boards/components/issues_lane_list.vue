@@ -1,4 +1,5 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import eventHub from '~/boards/eventhub';
 import BoardCard from '~/boards/components/board_card.vue';
 import BoardNewIssue from '~/boards/components/board_new_issue.vue';
@@ -7,10 +8,15 @@ export default {
   components: {
     BoardCard,
     BoardNewIssue,
+    GlLoadingIcon,
   },
   props: {
     list: {
       type: Object,
+      required: true,
+    },
+    disabled: {
+      type: Boolean,
       required: true,
     },
     issues: {
@@ -26,6 +32,15 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    isLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    rootPath: {
+      type: String,
+      required: true,
     },
   },
   data() {
@@ -55,13 +70,14 @@ export default {
     class="board gl-px-3 gl-vertical-align-top gl-white-space-normal gl-display-flex gl-flex-shrink-0"
     :class="{ 'is-collapsed': !list.isExpanded }"
   >
-    <div class="board-inner gl-p-2 gl-rounded-base gl-relative gl-w-full">
+    <div class="board-inner gl-rounded-base gl-relative gl-w-full">
+      <gl-loading-icon v-if="isLoading" class="gl-p-2" />
       <board-new-issue
         v-if="list.type !== 'closed' && showIssueForm && isUnassignedIssuesLane"
         :group-id="groupId"
         :list="list"
       />
-      <ul v-if="list.isExpanded" class="gl-p-0 gl-m-0">
+      <ul v-if="list.isExpanded" class="gl-p-2 gl-m-0">
         <board-card
           v-for="(issue, index) in issues"
           ref="issue"
@@ -69,6 +85,7 @@ export default {
           :index="index"
           :list="list"
           :issue="issue"
+          :root-path="rootPath"
         />
       </ul>
     </div>

@@ -29,6 +29,7 @@ module EE
         unless current_user&.admin?
           params.delete(:shared_runners_minutes_limit)
           params.delete(:extra_shared_runners_minutes_limit)
+          params.delete(:delayed_project_removal)
         end
 
         super

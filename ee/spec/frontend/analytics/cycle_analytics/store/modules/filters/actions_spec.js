@@ -39,7 +39,7 @@ describe('Filters actions', () => {
       selectedMilestone: 'NEXT',
     };
 
-    it('dispatches setPaths, setFilters', () => {
+    it('dispatches setPaths, setSelectedFilters', () => {
       return actions
         .initialize(
           {
@@ -52,7 +52,9 @@ describe('Filters actions', () => {
         .then(() => {
           expect(mockDispatch).toHaveBeenCalledTimes(2);
           expect(mockDispatch).toHaveBeenCalledWith('setPaths', initialData);
-          expect(mockDispatch).toHaveBeenCalledWith('setFilters', initialData);
+          expect(mockDispatch).toHaveBeenCalledWith('setSelectedFilters', initialData, {
+            root: true,
+          });
         });
     });
 
@@ -78,7 +80,7 @@ describe('Filters actions', () => {
       selectedMilestone: 'NEXT',
     };
 
-    it('dispatches the root/setSelectedFilters action', () => {
+    it('dispatches the root/setSelectedFilters and root/fetchCycleAnalyticsData actions', () => {
       return testAction(
         actions.setFilters,
         nextFilters,
@@ -88,6 +90,10 @@ describe('Filters actions', () => {
           {
             type: 'setSelectedFilters',
             payload: nextFilters,
+          },
+          {
+            type: 'fetchCycleAnalyticsData',
+            payload: null,
           },
         ],
       );
@@ -106,6 +112,10 @@ describe('Filters actions', () => {
               ...nextFilters,
               selectedLabels: [filterLabels[1].title],
             },
+          },
+          {
+            type: 'fetchCycleAnalyticsData',
+            payload: null,
           },
         ],
       );

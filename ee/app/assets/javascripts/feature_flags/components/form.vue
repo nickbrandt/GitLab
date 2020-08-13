@@ -153,6 +153,13 @@ export default {
     showRelatedIssues() {
       return this.featureFlagIssuesEndpoint.length > 0;
     },
+    readOnly() {
+      return (
+        this.glFeatures.featureFlagsNewVersion &&
+        this.glFeatures.featureFlagsLegacyReadOnly &&
+        this.version === LEGACY_FLAG
+      );
+    },
   },
   mounted() {
     if (this.supportsStrategies) {
@@ -324,7 +331,7 @@ export default {
         v-if="showRelatedIssues"
         :endpoint="featureFlagIssuesEndpoint"
         :can-admin="true"
-        :is-linked-issue-block="false"
+        :show-categorized-issues="false"
       />
 
       <template v-if="supportsStrategies">
@@ -587,6 +594,7 @@ export default {
     <div class="form-actions">
       <gl-deprecated-button
         ref="submitButton"
+        :disabled="readOnly"
         type="button"
         variant="success"
         class="js-ff-submit col-xs-12"

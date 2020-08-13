@@ -15,7 +15,7 @@
             "value": ""
         },
         {
-            "field" : "SECURE_ANALYZER_IMAGE_TAG",
+            "field" : "SAST_ANALYZER_IMAGE_TAG",
             "label" : "Image tag",
             "type": "string",
             "options": [],
@@ -142,11 +142,6 @@
         {
             "name": "spotbugs",
             "label": "Spotbugs",
-            "enabled" : true
-        },
-        {
-            "name": "tslint",
-            "label": "TSLint",
             "enabled" : true
         },
         {

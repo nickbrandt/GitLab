@@ -4,6 +4,9 @@ module RequirementsManagement
   class TestReport < ApplicationRecord
     include Sortable
     include BulkInsertSafe
+    include IgnorableColumns
+
+    ignore_column :pipeline_id, remove_with: '13.4', remove_after: '2020-08-22'
 
     belongs_to :requirement, inverse_of: :test_reports
     belongs_to :author, inverse_of: :test_reports, class_name: 'User'

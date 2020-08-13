@@ -1,10 +1,14 @@
 import FeatureFlagsTable from 'ee/feature_flags/components/feature_flags_table.vue';
 import { shallowMount } from '@vue/test-utils';
-import { GlToggle } from '@gitlab/ui';
+import { GlToggle, GlBadge } from '@gitlab/ui';
 import { trimText } from 'helpers/text_helper';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+  ROLLOUT_STRATEGY_USER_ID,
+  ROLLOUT_STRATEGY_GITLAB_USER_LIST,
+  NEW_VERSION_FLAG,
+  LEGACY_FLAG,
   DEFAULT_PERCENT_ROLLOUT,
 } from 'ee/feature_flags/constants';
 
@@ -18,6 +22,7 @@ const getDefaultProps = () => ({
       description: 'flag description',
       destroy_path: 'destroy/path',
       edit_path: 'edit/path',
+      version: LEGACY_FLAG,
       scopes: [
         {
           id: 1,
@@ -97,7 +102,7 @@ describe('Feature flag table', () => {
     it('should render an environments specs badge with active class', () => {
       const envColumn = wrapper.find('.js-feature-flag-environments');
 
-      expect(trimText(envColumn.find('.badge-active').text())).toBe('scope');
+      expect(trimText(envColumn.find(GlBadge).text())).toBe('scope');
     });
 
     it('should render an actions column', () => {
@@ -142,7 +147,7 @@ describe('Feature flag table', () => {
     it('should render an environments specs badge with percentage', () => {
       const envColumn = wrapper.find('.js-feature-flag-environments');
 
-      expect(trimText(envColumn.find('.badge').text())).toBe('scope: 54%');
+      expect(trimText(envColumn.find(GlBadge).text())).toBe('scope: 54%');
     });
   });
 
@@ -155,7 +160,82 @@ describe('Feature flag table', () => {
     it('should render an environments specs badge with inactive class', () => {
       const envColumn = wrapper.find('.js-feature-flag-environments');
 
-      expect(trimText(envColumn.find('.badge-inactive').text())).toBe('scope');
+      expect(trimText(envColumn.find(GlBadge).text())).toBe('scope');
+    });
+  });
+
+  describe('with a new version flag', () => {
+    let badges;
+
+    beforeEach(() => {
+      const newVersionProps = {
+        ...props,
+        featureFlags: [
+          {
+            id: 1,
+            iid: 1,
+            active: true,
+            name: 'flag name',
+            description: 'flag description',
+            destroy_path: 'destroy/path',
+            edit_path: 'edit/path',
+            version: NEW_VERSION_FLAG,
+            scopes: [],
+            strategies: [
+              {
+                name: ROLLOUT_STRATEGY_ALL_USERS,
+                parameters: {},
+                scopes: [{ environment_scope: '*' }],
+              },
+              {
+                name: ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
+                parameters: { percentage: '50' },
+                scopes: [{ environment_scope: 'production' }, { environment_scope: 'staging' }],
+              },
+              {
+                name: ROLLOUT_STRATEGY_USER_ID,
+                parameters: { userIds: '1,2,3,4' },
+                scopes: [{ environment_scope: 'review/*' }],
+              },
+              {
+                name: ROLLOUT_STRATEGY_GITLAB_USER_LIST,
+                parameters: {},
+                user_list: { name: 'test list' },
+                scopes: [{ environment_scope: '*' }],
+              },
+            ],
+          },
+        ],
+      };
+      createWrapper(newVersionProps, { provide: { glFeatures: { featureFlagsNewVersion: true } } });
+
+      badges = wrapper.findAll('[data-testid="strategy-badge"]');
+    });
+
+    it('shows All Environments if the environment scope is *', () => {
+      expect(badges.at(0).text()).toContain('All Environments');
+    });
+
+    it('shows the environment scope if another is set', () => {
+      expect(badges.at(1).text()).toContain('production');
+      expect(badges.at(1).text()).toContain('staging');
+      expect(badges.at(2).text()).toContain('review/*');
+    });
+
+    it('shows All Users for the default strategy', () => {
+      expect(badges.at(0).text()).toContain('All Users');
+    });
+
+    it('shows the percent for a percent rollout', () => {
+      expect(badges.at(1).text()).toContain('Percent of users - 50%');
+    });
+
+    it('shows the number of users for users with ID', () => {
+      expect(badges.at(2).text()).toContain('User IDs - 4 users');
+    });
+
+    it('shows the name of a user list for user list', () => {
+      expect(badges.at(3).text()).toContain('User List - test list');
     });
   });
 

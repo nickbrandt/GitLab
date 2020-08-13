@@ -93,7 +93,7 @@ export default {
 
 <template>
   <rules :rules="rules">
-    <template slot="thead" slot-scope="{ name, members, approvalsRequired, branches }">
+    <template #thead="{ name, members, approvalsRequired, branches }">
       <tr class="d-none d-sm-table-row">
         <th class="w-25">{{ hasNamedRule ? name : members }}</th>
         <th :class="settings.allowMultiRule ? 'w-50 d-none d-sm-table-cell' : 'w-75'">
@@ -104,7 +104,7 @@ export default {
         <th></th>
       </tr>
     </template>
-    <template slot="tbody" slot-scope="{ rules }">
+    <template #tbody="{ rules }">
       <template v-for="(rule, index) in rules">
         <empty-rule
           v-if="rule.ruleType === 'any_approver'"
@@ -116,9 +116,7 @@ export default {
           :can-edit="canEdit(rule)"
         />
         <tr v-else :key="index">
-          <td class="js-name">
-            {{ rule.name }}
-          </td>
+          <td class="js-name">{{ rule.name }}</td>
           <td class="js-members" :class="settings.allowMultiRule ? 'd-none d-sm-table-cell' : null">
             <user-avatar-list :items="rule.approvers" :img-size="24" empty-text="" />
           </td>

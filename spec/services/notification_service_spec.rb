@@ -238,6 +238,26 @@ RSpec.describe NotificationService, :mailer do
         expect { subject }.to have_enqueued_email(user, mail: "access_token_about_to_expire_email")
       end
     end
+
+    describe '#access_token_expired' do
+      let_it_be(:user) { create(:user) }
+
+      subject { notification.access_token_expired(user) }
+
+      it 'sends email to the token owner' do
+        expect { subject }.to have_enqueued_email(user, mail: "access_token_expired_email")
+      end
+
+      context 'when user is not allowed to receive notifications' do
+        before do
+          user.block!
+        end
+
+        it 'does not send email to the token owner' do
+          expect { subject }.not_to have_enqueued_email(user, mail: "access_token_expired_email")
+        end
+      end
+    end
   end
 
   describe '#unknown_sign_in' do
@@ -2023,6 +2043,26 @@ RSpec.describe NotificationService, :mailer do
         let(:notification_trigger) { notification.resolve_all_discussions(merge_request, @u_disabled) }
       end
     end
+
+    describe '#merge_when_pipeline_succeeds' do
+      it 'send notification that merge will happen when pipeline succeeds' do
+        notification.merge_when_pipeline_succeeds(merge_request, assignee)
+        should_email(merge_request.author)
+        should_email(@u_watcher)
+        should_email(@subscriber)
+      end
+
+      it_behaves_like 'participating notifications' do
+        let(:participant) { create(:user, username: 'user-participant') }
+        let(:issuable) { merge_request }
+        let(:notification_trigger) { notification.merge_when_pipeline_succeeds(merge_request, @u_disabled) }
+      end
+
+      it_behaves_like 'project emails are disabled' do
+        let(:notification_target)  { merge_request }
+        let(:notification_trigger) { notification.merge_when_pipeline_succeeds(merge_request, @u_disabled) }
+      end
+    end
   end
 
   describe 'Projects', :deliver_mails_inline do
@@ -2034,16 +2074,66 @@ RSpec.describe NotificationService, :mailer do
     end
 
     describe '#project_was_moved' do
-      it 'notifies the expected users' do
-        notification.project_was_moved(project, "gitlab/gitlab")
+      context 'when notifications are disabled' do
+        before do
+          @u_custom_global.global_notification_setting.update!(moved_project: false)
+        end
 
-        should_email(@u_watcher)
-        should_email(@u_participating)
-        should_email(@u_lazy_participant)
-        should_email(@u_custom_global)
-        should_not_email(@u_guest_watcher)
-        should_not_email(@u_guest_custom)
-        should_not_email(@u_disabled)
+        it 'does not send a notification' do
+          notification.project_was_moved(project, "gitlab/gitlab")
+
+          should_not_email(@u_custom_global)
+        end
+      end
+
+      context 'with users at both project and group level' do
+        let(:maintainer) { create(:user) }
+        let(:developer) { create(:user) }
+        let(:group_owner) { create(:user) }
+        let(:group_maintainer) { create(:user) }
+        let(:group_developer) { create(:user) }
+        let(:blocked_user) { create(:user, :blocked) }
+        let(:invited_user) { create(:user) }
+
+        let!(:group) do
+          create(:group, :public) do |group|
+            project.group = group
+            project.save!
+
+            group.add_owner(group_owner)
+            group.add_maintainer(group_maintainer)
+            group.add_developer(group_developer)
+            # This is to check for dupes
+            group.add_maintainer(maintainer)
+            group.add_maintainer(blocked_user)
+          end
+        end
+
+        before do
+          project.add_maintainer(maintainer)
+          project.add_developer(developer)
+          project.add_maintainer(blocked_user)
+          reset_delivered_emails!
+        end
+
+        it 'notifies the expected users' do
+          notification.project_was_moved(project, "gitlab/gitlab")
+
+          should_email(@u_watcher)
+          should_email(@u_participating)
+          should_email(@u_lazy_participant)
+          should_email(@u_custom_global)
+          should_not_email(@u_guest_watcher)
+          should_not_email(@u_guest_custom)
+          should_not_email(@u_disabled)
+
+          should_email(maintainer)
+          should_email(group_owner)
+          should_email(group_maintainer)
+          should_not_email(group_developer)
+          should_not_email(developer)
+          should_not_email(blocked_user)
+        end
       end
 
       it_behaves_like 'project emails are disabled' do

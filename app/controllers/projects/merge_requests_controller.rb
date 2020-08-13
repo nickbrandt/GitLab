@@ -31,11 +31,14 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     push_frontend_feature_flag(:suggest_pipeline) if experiment_enabled?(:suggest_pipeline)
     push_frontend_feature_flag(:code_navigation, @project, default_enabled: true)
     push_frontend_feature_flag(:widget_visibility_polling, @project, default_enabled: true)
-    push_frontend_feature_flag(:merge_ref_head_comments, @project)
+    push_frontend_feature_flag(:merge_ref_head_comments, @project, default_enabled: true)
     push_frontend_feature_flag(:mr_commit_neighbor_nav, @project, default_enabled: true)
     push_frontend_feature_flag(:multiline_comments, @project)
     push_frontend_feature_flag(:file_identifier_hash)
-    push_frontend_feature_flag(:batch_suggestions, @project)
+    push_frontend_feature_flag(:batch_suggestions, @project, default_enabled: true)
+    push_frontend_feature_flag(:auto_expand_collapsed_diffs, @project, default_enabled: true)
+    push_frontend_feature_flag(:approvals_commented_by, @project, default_enabled: true)
+    push_frontend_feature_flag(:hide_jump_to_next_unresolved_in_threads, default_enabled: true)
   end
 
   before_action do
@@ -80,11 +83,13 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
         @note = @project.notes.new(noteable: @merge_request)
 
         @noteable = @merge_request
-        @commits_count = @merge_request.commits_count
+        @commits_count = @merge_request.commits_count + @merge_request.context_commits_count
         @issuable_sidebar = serializer.represent(@merge_request, serializer: 'sidebar')
         @current_user_data = UserSerializer.new(project: @project).represent(current_user, {}, MergeRequestUserEntity).to_json
         @show_whitespace_default = current_user.nil? || current_user.show_whitespace_in_diffs
+        @file_by_file_default = Feature.enabled?(:view_diffs_file_by_file, default_enabled: true) && current_user&.view_diffs_file_by_file
         @coverage_path = coverage_reports_project_merge_request_path(@project, @merge_request, format: :json) if @merge_request.has_coverage_reports?
+        @endpoint_metadata_url = endpoint_metadata_url(@project, @merge_request)
 
         set_pipeline_variables
 
@@ -112,6 +117,12 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def commits
+    # Get context commits from repository
+    @context_commits =
+      set_commits_for_rendering(
+        @merge_request.recent_context_commits
+      )
+
     # Get commits from repository
     # or from cache if already merged
     @commits =
@@ -401,7 +412,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     return access_denied! unless @merge_request.source_branch_exists?
 
     access_check = ::Gitlab::UserAccess
-      .new(current_user, project: @merge_request.source_project)
+      .new(current_user, container: @merge_request.source_project)
       .can_push_to_branch?(@merge_request.source_branch)
 
     access_denied! unless access_check
@@ -433,6 +444,13 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   def authorize_read_actual_head_pipeline!
     return render_404 unless can?(current_user, :read_build, merge_request.actual_head_pipeline)
+  end
+
+  def endpoint_metadata_url(project, merge_request)
+    params = request.query_parameters
+    params[:view] = cookies[:diff_view] if params[:view].blank? && cookies[:diff_view].present?
+
+    diffs_metadata_project_json_merge_request_path(project, merge_request, 'json', params)
   end
 end
 

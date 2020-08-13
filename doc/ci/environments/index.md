@@ -124,7 +124,7 @@ The environment `name` and `url` is exposed in various places
 within GitLab. Each time a job that has an environment specified
 succeeds, a deployment is recorded, along with the Git SHA, and environment name.
 
-CAUTION: **Caution**:
+CAUTION: **Caution:**
 Some characters are not allowed in environment names. Use only letters,
 numbers, spaces, and `-`, `_`, `/`, `{`, `}`, or `.`. Also, it must not start nor end with `/`.
 
@@ -810,6 +810,31 @@ stopped environment:
 ##### Delete environments through the API
 
 Environments can also be deleted by using the [Environments API](../../api/environments.md#delete-an-environment).
+
+### Prepare an environment
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/208655) in GitLab 13.2.
+
+By default, GitLab creates a [deployment](#viewing-deployment-history) every time a
+build with the specified environment runs. Newer deployments can also
+[cancel older ones](deployment_safety.md#skip-outdated-deployment-jobs).
+
+You may want to specify an environment keyword to
+[protect builds from unauthorized access](protected_environments.md), or to get
+access to [scoped variables](#scoping-environments-with-specs). In these cases,
+you can use the `action: prepare` keyword to ensure deployments won't be created,
+and no builds would be canceled:
+
+```yaml
+build:
+  stage: build
+  script:
+    - echo "Building the app"
+  environment:
+    name: staging
+    action: prepare
+    url: https://staging.example.com
+```
 
 ### Grouping similar environments
 

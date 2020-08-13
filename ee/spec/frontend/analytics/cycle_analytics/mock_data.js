@@ -29,13 +29,16 @@ export const endpoints = {
   groupLabels: /groups\/[A-Z|a-z|\d|\-|_]+\/-\/labels.json/,
   recentActivityData: /analytics\/value_stream_analytics\/summary/,
   timeMetricsData: /analytics\/value_stream_analytics\/time_summary/,
-  durationData: /analytics\/value_stream_analytics\/stages\/\d+\/duration_chart/,
-  stageData: /analytics\/value_stream_analytics\/stages\/\d+\/records/,
-  stageMedian: /analytics\/value_stream_analytics\/stages\/\d+\/median/,
-  baseStagesEndpoint: /analytics\/value_stream_analytics\/stages$/,
+  durationData: /analytics\/value_stream_analytics\/value_streams\/\d+\/stages\/\d+\/duration_chart/,
+  stageData: /analytics\/value_stream_analytics\/value_streams\/\d+\/stages\/\d+\/records/,
+  stageMedian: /analytics\/value_stream_analytics\/value_streams\/\d+\/stages\/\d+\/median/,
+  baseStagesEndpoint: /analytics\/value_stream_analytics\/value_streams\/\d+\/stages$/,
   tasksByTypeData: /analytics\/type_of_work\/tasks_by_type/,
   tasksByTypeTopLabelsData: /analytics\/type_of_work\/tasks_by_type\/top_labels/,
+  valueStreamData: /analytics\/value_stream_analytics\/value_streams/,
 };
+
+export const valueStreams = [{ id: 1, name: 'Value stream 1' }, { id: 2, name: 'Value stream 2' }];
 
 export const groupLabels = getJSONFixture(fixtureEndpoints.groupLabels).map(
   convertObjectPropsToCamelCase,

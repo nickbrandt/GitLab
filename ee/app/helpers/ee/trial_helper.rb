@@ -16,22 +16,20 @@ module EE
     def namespace_options_for_select(selected = nil)
       grouped_options = {
         'New' => [[_('Create group'), 0]],
-        'Groups' => trial_groups,
-        'Users' => trial_users
+        'Groups' => trial_group_namespaces.map { |n| [n.name, n.id] },
+        'Users' => trial_user_namespaces.map { |n| [n.name, n.id] }
       }
 
       grouped_options_for_select(grouped_options, selected, prompt: _('Please select'))
     end
 
-    def trial_users
-      user_namespace = current_user.namespace
-      return [] if user_namespace.gitlab_subscription&.trial?
-
-      [[user_namespace.name, user_namespace.id]]
+    def trial_group_namespaces
+      current_user.manageable_groups_eligible_for_trial
     end
 
-    def trial_groups
-      current_user.manageable_groups_eligible_for_trial.map { |g| [g.name, g.id] }
+    def trial_user_namespaces
+      user_namespace = current_user.namespace
+      user_namespace.eligible_for_trial? ? [user_namespace] : []
     end
 
     def show_trial_errors?(namespace, service_result)

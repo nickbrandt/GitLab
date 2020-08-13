@@ -10,6 +10,7 @@ class Geo::DesignRegistry < Geo::BaseRegistry
 
   belongs_to :project
 
+  scope :never_synced, -> { with_state(:pending).where(last_synced_at: nil) }
   scope :pending, -> { with_state(:pending) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
@@ -39,12 +40,32 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     end
   end
 
+  def self.delete_for_model_ids(project_ids)
+    # We only need to delete the registry entries here. The design
+    # repository deletion should happen when a project is destroyed.
+    #
+    # See: https://gitlab.com/gitlab-org/gitlab/-/issues/13429
+    where(project_id: project_ids).delete_all
+
+    project_ids
+  end
+
+  def self.finder_class
+    ::Geo::DesignRegistryFinder
+  end
+
+  def self.find_registry_differences(range)
+    finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
+  end
+
   # Search for a list of projects associated with registries,
   # based on the query given in `query`.
   #
   # @param [String] query term that will search over :path, :name and :description
   def self.with_search_by_project(query)
-    where(project: Geo::Fdw::Project.search(query))
+    return all if query.empty?
+
+    where(project_id: ::Project.search(query).limit(1000).pluck_primary_key)
   end
 
   def self.search(params)

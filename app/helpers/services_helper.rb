@@ -35,19 +35,6 @@ module ServicesHelper
     "#{event}_events"
   end
 
-  def service_event_action_field_name(action)
-    "#{action}_on_event_enabled"
-  end
-
-  def event_action_title(action)
-    case action
-    when "comment"
-      s_("ProjectService|Comment")
-    else
-      action.humanize
-    end
-  end
-
   def service_save_button(disabled: false)
     button_tag(class: 'btn btn-success', type: 'submit', disabled: disabled, data: { qa_selector: 'save_changes_button' }) do
       icon('spinner spin', class: 'hidden js-btn-spinner') +
@@ -95,12 +82,9 @@ module ServicesHelper
     end
   end
 
-  def integration_form_refactor?
-    Feature.enabled?(:integration_form_refactor, @project, default_enabled: true)
-  end
-
   def integration_form_data(integration)
     {
+      id: integration.id,
       show_active: integration.show_active_box?.to_s,
       activated: (integration.active || integration.new_record?).to_s,
       type: integration.to_param,
@@ -109,26 +93,17 @@ module ServicesHelper
       enable_comments: integration.comment_on_event_enabled.to_s,
       comment_detail: integration.comment_detail,
       trigger_events: trigger_events_for_service(integration),
-      fields: fields_for_service(integration)
+      fields: fields_for_service(integration),
+      inherit_from_id: integration.inherit_from_id
     }
   end
 
   def trigger_events_for_service(integration)
-    return [] unless integration_form_refactor?
-
     ServiceEventSerializer.new(service: integration).represent(integration.configurable_events).to_json
   end
 
   def fields_for_service(integration)
-    return [] unless integration_form_refactor?
-
     ServiceFieldSerializer.new(service: integration).represent(integration.global_fields).to_json
-  end
-
-  def show_service_trigger_events?(integration)
-    return false if integration.is_a?(JiraService) || integration_form_refactor?
-
-    integration.configurable_events.present?
   end
 
   def project_jira_issues_integration?

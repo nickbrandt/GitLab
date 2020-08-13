@@ -32,15 +32,17 @@ export default {
     };
   },
   computed: {
-    ...mapState(LICENSE_MANAGEMENT, ['managedLicenses', 'isLoadingManagedLicenses', 'isAdmin']),
+    ...mapState(LICENSE_MANAGEMENT, [
+      'managedLicenses',
+      'isLoadingManagedLicenses',
+      'isAdmin',
+      'knownLicenses',
+    ]),
     ...mapGetters(LICENSE_MANAGEMENT, [
       'isLicenseBeingUpdated',
       'hasPendingLicenses',
       'isAddingNewLicense',
     ]),
-    hasLicenseApprovals() {
-      return Boolean(this.glFeatures.licenseApprovals);
-    },
     showLoadingSpinner() {
       return this.isLoadingManagedLicenses && !this.hasPendingLicenses;
     },
@@ -67,11 +69,9 @@ export default {
       this.formIsOpen = false;
     },
   },
-  emptyMessage: s__(
-    'LicenseCompliance|There are currently no approved or blacklisted licenses in this project.',
-  ),
+  emptyMessage: s__('LicenseCompliance|There are currently no policies in this project.'),
   emptySearchMessage: s__(
-    'LicenseCompliance|There are currently no approved or blacklisted licenses that match in this project.',
+    'LicenseCompliance|There are currently no policies that match in this project.',
   ),
 };
 </script>
@@ -100,7 +100,7 @@ export default {
             {{ s__('LicenseCompliance|Add a license') }}
           </gl-button>
 
-          <license-approvals v-if="hasLicenseApprovals" class="gl-ml-3" />
+          <license-approvals class="gl-ml-3" />
         </div>
 
         <template v-else>
@@ -146,6 +146,7 @@ export default {
         <div v-if="formIsOpen" class="gl-mt-3 gl-mb-3">
           <add-license-form
             :managed-licenses="managedLicenses"
+            :known-licenses="knownLicenses"
             :loading="isAddingNewLicense"
             @addLicense="setLicenseApproval"
             @closeForm="closeAddLicenseForm"

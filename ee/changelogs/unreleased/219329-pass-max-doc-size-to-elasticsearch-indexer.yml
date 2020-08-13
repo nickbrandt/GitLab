@@ -1,0 +1,5 @@
+---
+title: Add setting for max indexed file size in Elasticsearch
+merge_request: 36925
+author:
+type: added

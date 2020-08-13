@@ -12,8 +12,7 @@ class Projects::ServicesController < Projects::ApplicationController
   before_action :set_deprecation_notice_for_prometheus_service, only: [:edit, :update]
   before_action :redirect_deprecated_prometheus_service, only: [:update]
   before_action only: :edit do
-    push_frontend_feature_flag(:integration_form_refactor, default_enabled: true)
-    push_frontend_feature_flag(:jira_integration, @project)
+    push_frontend_feature_flag(:jira_issues_integration, @project, { default_enabled: true })
   end
 
   respond_to :html
@@ -21,10 +20,12 @@ class Projects::ServicesController < Projects::ApplicationController
   layout "project_settings"
 
   def edit
+    @admin_integration = Service.instance_for(service.type)
   end
 
   def update
     @service.attributes = service_params[:service]
+    @service.inherit_from_id = nil if service_params[:service][:inherit_from_id].blank?
 
     saved = @service.save(context: :manual_change)
 

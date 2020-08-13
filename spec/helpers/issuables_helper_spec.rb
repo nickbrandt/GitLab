@@ -160,7 +160,7 @@ RSpec.describe IssuablesHelper do
       end
 
       before do
-        user.destroy
+        user.destroy!
       end
 
       it 'returns "Ghost user" as edited_by' do
@@ -325,6 +325,14 @@ RSpec.describe IssuablesHelper do
 
         expect(helper.issuable_squash_option?(issuable, project)).to eq(expectation)
       end
+    end
+  end
+
+  describe '#sidebar_milestone_tooltip_label' do
+    it 'escapes HTML in the milestone title' do
+      milestone = build(:milestone, title: '&lt;img onerror=alert(1)&gt;')
+
+      expect(helper.sidebar_milestone_tooltip_label(milestone)).to eq('&lt;img onerror=alert(1)&gt;<br/>Milestone')
     end
   end
 end

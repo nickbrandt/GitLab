@@ -6,6 +6,7 @@ module EE
       class FeatureFlag < Grape::Entity
         expose :name
         expose :description
+        expose :active
         expose :version, if: :feature_flags_new_version_enabled
         expose :created_at
         expose :updated_at

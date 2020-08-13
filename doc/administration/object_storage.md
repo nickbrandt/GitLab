@@ -15,7 +15,7 @@ GitLab has been tested on a number of object storage providers:
 
 - [Amazon S3](https://aws.amazon.com/s3/)
 - [Google Cloud Storage](https://cloud.google.com/storage)
-- [Digital Ocean Spaces](https://www.digitalocean.com/products/spaces)
+- [Digital Ocean Spaces](https://www.digitalocean.com/products/spaces/)
 - [Oracle Cloud Infrastructure](https://docs.cloud.oracle.com/en-us/iaas/Content/Object/Tasks/s3compatibleapi.htm)
 - [Openstack Swift](https://docs.openstack.org/swift/latest/s3_compat.html)
 - On-premises hardware and appliances from various storage vendors.
@@ -44,14 +44,20 @@ Using the consolidated object storage configuration has a number of advantages:
 - It enables the use of [encrypted S3 buckets](#encrypted-s3-buckets).
 - It [uploads files to S3 with proper `Content-MD5` headers](https://gitlab.com/gitlab-org/gitlab-workhorse/-/issues/222).
 
-NOTE: **Note:** Only AWS S3-compatible providers and Google are
+NOTE: **Note:**
+Only AWS S3-compatible providers and Google are
 supported at the moment since [direct upload
 mode](../development/uploads.md#direct-upload) must be used. Background
 upload is not supported in this mode. We recommend direct upload mode because
 it does not require a shared folder, and [this setting may become the default](https://gitlab.com/gitlab-org/gitlab/-/issues/27331).
 
-NOTE: **Note:** Consolidated object storage configuration cannot be used for
+NOTE: **Note:**
+Consolidated object storage configuration cannot be used for
 backups or Mattermost. See [the full table for a complete list](#storage-specific-configuration).
+
+NOTE: **Note:**
+Enabling consolidated object storage will enable object storage for all object types.
+If you wish to use local storage for specific object types, you can [selectively disable object storages](#selectively-disabling-object-storage).
 
 Most types of objects, such as CI artifacts, LFS files, upload
 attachments, and so on can be saved in object storage by specifying a single
@@ -253,7 +259,8 @@ gitlab_rails['object_store']['connection'] = {
 
 #### OpenStack-compatible connection settings
 
-NOTE: **Note:** This is not compatible with the consolidated object storage form.
+NOTE: **Note:**
+This is not compatible with the consolidated object storage form.
 OpenStack Swift is only supported with the storage-specific form. See the
 [S3 settings](#s3-compatible-connection-settings) if you want to use the consolidated form.
 
@@ -274,7 +281,8 @@ Here are the valid connection settings below for the Swift API, provided by
 
 #### Rackspace Cloud Files
 
-NOTE: **Note:** This is not compatible with the consolidated object
+NOTE: **Note:**
+This is not compatible with the consolidated object
 storage form. Rackspace Cloud is only supported with the storage-specific form.
 
 Here are the valid connection parameters for Rackspace Cloud, provided by
@@ -408,7 +416,8 @@ additional complexity and unnecessary redundancy. Since both GitLab
 Rails and Workhorse components need access to object storage, the
 consolidated form avoids excessive duplication of credentials.
 
-NOTE: **Note:** The consolidated object storage configuration is **only** used if all
+NOTE: **Note:**
+The consolidated object storage configuration is **only** used if all
 lines from the original form is omitted. To move to the consolidated form, remove the original configuration (for example, `artifacts_object_store_enabled`, `uploads_object_store_connection`, and so on.)
 
 ## Storage-specific configuration
@@ -422,7 +431,7 @@ supported by consolidated configuration form, refer to the following guides:
 | [Job artifacts](job_artifacts.md#using-object-storage) and [incremental logging](job_logs.md#new-incremental-logging-architecture) | Yes |
 | [LFS objects](lfs/index.md#storing-lfs-objects-in-remote-object-storage) | Yes |
 | [Uploads](uploads.md#using-object-storage-core-only) | Yes |
-| [Container Registry](packages/container_registry.md#container-registry-storage-driver) (optional feature) | No |
+| [Container Registry](packages/container_registry.md#use-object-storage) (optional feature) | No |
 | [Merge request diffs](merge_request_diffs.md#using-object-storage) | Yes |
 | [Mattermost](https://docs.mattermost.com/administration/config-settings.html#file-storage)| No |
 | [Packages](packages/index.md#using-object-storage) (optional feature) **(PREMIUM ONLY)** | Yes |
@@ -489,16 +498,18 @@ If you configure GitLab to use object storage for CI logs and artifacts,
 
 ### Proxy Download
 
-A number of the use cases for object storage allow client traffic to be redirected to the
-object storage back end, like when Git clients request large files via LFS or when
-downloading CI artifacts and logs.
+Clients can download files in object storage by receiving a pre-signed, time-limited URL,
+or by GitLab proxying the data from object storage to the client.
+Downloading files from object storage directly
+helps reduce the amount of egress traffic GitLab
+needs to process.
 
 When the files are stored on local block storage or NFS, GitLab has to act as a proxy.
 This is not the default behavior with object storage.
 
 The `proxy_download` setting controls this behavior: the default is generally `false`.
-Verify this in the documentation for each use case. Set it to `true` so that GitLab proxies
-the files.
+Verify this in the documentation for each use case. Set it to `true` if you want
+GitLab to proxy the files.
 
 When not proxying files, GitLab returns an
 [HTTP 302 redirect with a pre-signed, time-limited object storage URL](https://gitlab.com/gitlab-org/gitlab/-/issues/32117#note_218532298).
@@ -519,7 +530,9 @@ certificate, or may return common TLS errors such as:
    x509: certificate signed by unknown authority
    ```
 
-- Clients will need network access to the object storage. Errors that might result
+- Clients will need network access to the object storage.
+Network firewalls could block access.
+Errors that might result
 if this access is not in place include:
 
    ```plaintext
@@ -529,6 +542,10 @@ if this access is not in place include:
 Getting a `403 Forbidden` response is specifically called out on the
 [package repository documentation](packages/index.md#using-object-storage)
 as a side effect of how some build tools work.
+
+Additionally for a short time period users could share pre-signed, time-limited object storage URLs
+with others without authentication. Also bandwidth charges may be incurred
+between the object storage provider and the client.
 
 ### ETag mismatch
 

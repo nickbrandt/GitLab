@@ -1,10 +1,10 @@
 <script>
-import { GlDropdown, GlSearchBoxByType } from '@gitlab/ui';
+import { GlDeprecatedDropdown, GlSearchBoxByType } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
-    GlDropdown,
+    GlDeprecatedDropdown,
     GlSearchBoxByType,
     Icon,
   },
@@ -58,7 +58,7 @@ export default {
 <template>
   <div class="dashboard-filter">
     <strong class="js-name">{{ filter.name }}</strong>
-    <gl-dropdown
+    <gl-deprecated-dropdown
       ref="dropdown"
       class="d-block mt-1"
       menu-class="dropdown-extended-height"
@@ -127,6 +127,6 @@ export default {
       >
         {{ __('No matching results') }}
       </button>
-    </gl-dropdown>
+    </gl-deprecated-dropdown>
   </div>
 </template>

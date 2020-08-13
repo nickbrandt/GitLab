@@ -46,7 +46,7 @@ RSpec.describe "Admin::Users" do
   describe "GET /admin/users/:id" do
     describe 'Shared runners quota status' do
       before do
-        user.namespace.update(shared_runners_minutes_limit: 500)
+        user.namespace.update!(shared_runners_minutes_limit: 500)
       end
 
       context 'with projects with shared runners enabled' do

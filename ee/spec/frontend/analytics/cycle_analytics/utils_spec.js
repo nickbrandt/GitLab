@@ -1,5 +1,6 @@
 import { isNumber } from 'lodash';
 import { getDatesInRange } from '~/lib/utils/datetime_utility';
+import { slugify } from '~/lib/utils/text_utility';
 import {
   isStartEvent,
   isLabelEvent,
@@ -17,6 +18,7 @@ import {
   orderByDate,
   toggleSelectedLabel,
   transformStagesForPathNavigation,
+  prepareTimeMetricsData,
 } from 'ee/analytics/cycle_analytics/utils';
 import { toYmd } from 'ee/analytics/shared/utils';
 import {
@@ -38,6 +40,7 @@ import {
   stageMediansWithNumericIds,
   totalStage,
   pathNavIssueMetric,
+  timeMetricsData,
 } from './mock_data';
 import { CAPITALIZED_STAGE_NAME, PATH_HOME_ICON } from 'ee/analytics/cycle_analytics/constants';
 
@@ -320,6 +323,7 @@ describe('Cycle analytics utils', () => {
     it('will remove an id that exists', () => {
       expect(toggleSelectedLabel({ selectedLabelIds, value: 2 })).toEqual([1, 3]);
     });
+
     it('will add an id that does not exist', () => {
       expect(toggleSelectedLabel({ selectedLabelIds, value: 4 })).toEqual([1, 2, 3, 4]);
     });
@@ -366,6 +370,34 @@ describe('Cycle analytics utils', () => {
           expect(response[0]).toEqual(overview);
         });
       });
+    });
+  });
+
+  describe('prepareTimeMetricsData', () => {
+    let prepared;
+    const [{ title: firstTitle }, { title: secondTitle }] = timeMetricsData;
+    const firstKey = slugify(firstTitle);
+    const secondKey = slugify(secondTitle);
+
+    beforeEach(() => {
+      prepared = prepareTimeMetricsData(timeMetricsData, {
+        [firstKey]: 'Is a value that is good',
+      });
+    });
+
+    it('will add a `key` based on the title', () => {
+      expect(prepared).toMatchObject([{ key: firstKey }, { key: secondKey }]);
+    });
+
+    it('will add a `label` key', () => {
+      expect(prepared).toMatchObject([{ label: 'Lead Time' }, { label: 'Cycle Time' }]);
+    });
+
+    it('will add a tooltip text using the key if it is provided', () => {
+      expect(prepared).toMatchObject([
+        { tooltipText: 'Is a value that is good' },
+        { tooltipText: '' },
+      ]);
     });
   });
 });

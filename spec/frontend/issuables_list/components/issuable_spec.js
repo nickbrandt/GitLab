@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlSprintf, GlLabel } from '@gitlab/ui';
+import { GlSprintf, GlLabel, GlIcon } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import { trimText } from 'helpers/text_helper';
 import initUserPopovers from '~/user_popovers';
@@ -75,24 +75,31 @@ describe('Issuable component', () => {
     window.Date = DateOrig;
   });
 
-  const findConfidentialIcon = () => wrapper.find('.fa-eye-slash');
+  const checkExists = findFn => () => findFn().exists();
+  const hasIcon = (iconName, iconWrapper = wrapper) =>
+    iconWrapper.findAll(GlIcon).wrappers.some(icon => icon.props('name') === iconName);
+  const hasConfidentialIcon = () => hasIcon('eye-slash');
   const findTaskStatus = () => wrapper.find('.task-status');
   const findOpenedAgoContainer = () => wrapper.find('[data-testid="openedByMessage"]');
+  const findAuthor = () => wrapper.find({ ref: 'openedAgoByContainer' });
   const findMilestone = () => wrapper.find('.js-milestone');
   const findMilestoneTooltip = () => findMilestone().attributes('title');
   const findDueDate = () => wrapper.find('.js-due-date');
   const findLabels = () => wrapper.findAll(GlLabel);
-  const findWeight = () => wrapper.find('.js-weight');
+  const findWeight = () => wrapper.find('[data-testid="weight"]');
   const findAssignees = () => wrapper.find(IssueAssignees);
-  const findMergeRequestsCount = () => wrapper.find('.js-merge-requests');
-  const findUpvotes = () => wrapper.find('.js-upvotes');
-  const findDownvotes = () => wrapper.find('.js-downvotes');
-  const findNotes = () => wrapper.find('.js-notes');
+  const findBlockingIssuesCount = () => wrapper.find('[data-testid="blocking-issues"]');
+  const findMergeRequestsCount = () => wrapper.find('[data-testid="merge-requests"]');
+  const findUpvotes = () => wrapper.find('[data-testid="upvotes"]');
+  const findDownvotes = () => wrapper.find('[data-testid="downvotes"]');
+  const findNotes = () => wrapper.find('[data-testid="notes-count"]');
   const findBulkCheckbox = () => wrapper.find('input.selected-issuable');
   const findScopedLabels = () => findLabels().filter(w => isScopedLabel({ title: w.text() }));
   const findUnscopedLabels = () => findLabels().filter(w => !isScopedLabel({ title: w.text() }));
   const findIssuableTitle = () => wrapper.find('[data-testid="issuable-title"]');
+  const findIssuableStatus = () => wrapper.find('[data-testid="issuable-status"]');
   const containsJiraLogo = () => wrapper.contains('[data-testid="jira-logo"]');
+  const findHealthStatus = () => wrapper.find('.health-status');
 
   describe('when mounted', () => {
     it('initializes user popovers', () => {
@@ -169,19 +176,20 @@ describe('Issuable component', () => {
     });
 
     it.each`
-      desc                       | finder
-      ${'bulk editing checkbox'} | ${findBulkCheckbox}
-      ${'confidential icon'}     | ${findConfidentialIcon}
-      ${'task status'}           | ${findTaskStatus}
-      ${'milestone'}             | ${findMilestone}
-      ${'due date'}              | ${findDueDate}
-      ${'labels'}                | ${findLabels}
-      ${'weight'}                | ${findWeight}
-      ${'merge request count'}   | ${findMergeRequestsCount}
-      ${'upvotes'}               | ${findUpvotes}
-      ${'downvotes'}             | ${findDownvotes}
-    `('does not render $desc', ({ finder }) => {
-      expect(finder().exists()).toBe(false);
+      desc                       | check
+      ${'bulk editing checkbox'} | ${checkExists(findBulkCheckbox)}
+      ${'confidential icon'}     | ${hasConfidentialIcon}
+      ${'task status'}           | ${checkExists(findTaskStatus)}
+      ${'milestone'}             | ${checkExists(findMilestone)}
+      ${'due date'}              | ${checkExists(findDueDate)}
+      ${'labels'}                | ${checkExists(findLabels)}
+      ${'weight'}                | ${checkExists(findWeight)}
+      ${'blocking issues count'} | ${checkExists(findBlockingIssuesCount)}
+      ${'merge request count'}   | ${checkExists(findMergeRequestsCount)}
+      ${'upvotes'}               | ${checkExists(findUpvotes)}
+      ${'downvotes'}             | ${checkExists(findDownvotes)}
+    `('does not render $desc', ({ check }) => {
+      expect(check()).toBe(false);
     });
 
     it('show relative reference path', () => {
@@ -215,7 +223,7 @@ describe('Issuable component', () => {
     });
 
     it('renders the confidential icon', () => {
-      expect(findConfidentialIcon().exists()).toBe(true);
+      expect(hasConfidentialIcon()).toBe(true);
     });
   });
 
@@ -232,6 +240,24 @@ describe('Issuable component', () => {
 
     it('opens issuable in a new tab', () => {
       expect(findIssuableTitle().props('target')).toBe('_blank');
+    });
+
+    it('opens author in a new tab', () => {
+      expect(findAuthor().props('target')).toBe('_blank');
+    });
+
+    describe('with Jira status', () => {
+      const expectedStatus = 'In Progress';
+
+      beforeEach(() => {
+        issuable.status = expectedStatus;
+
+        factory({ issuable });
+      });
+
+      it('renders the Jira status', () => {
+        expect(findIssuableStatus().text()).toBe(expectedStatus);
+      });
     });
   });
 
@@ -264,11 +290,7 @@ describe('Issuable component', () => {
 
     it('renders milestone', () => {
       expect(findMilestone().exists()).toBe(true);
-      expect(
-        findMilestone()
-          .find('.fa-clock-o')
-          .exists(),
-      ).toBe(true);
+      expect(hasIcon('clock', findMilestone())).toBe(true);
       expect(findMilestone().text()).toEqual(TEST_MILESTONE.title);
     });
 
@@ -333,6 +355,33 @@ describe('Issuable component', () => {
     });
   });
 
+  describe('with labels for Jira issuable', () => {
+    beforeEach(() => {
+      issuable.labels = [...testLabels];
+      issuable.external_tracker = 'jira';
+
+      factory({ issuable });
+    });
+
+    it('renders labels', () => {
+      factory({ issuable });
+
+      const labels = findLabels().wrappers.map(label => ({
+        href: label.props('target'),
+        text: label.text(),
+        tooltip: label.attributes('description'),
+      }));
+
+      const expected = testLabels.map(label => ({
+        href: mergeUrlParams({ 'labels[]': label.name }, TEST_BASE_URL),
+        text: label.name,
+        tooltip: label.description,
+      }));
+
+      expect(labels).toEqual(expected);
+    });
+  });
+
   describe.each`
     weight
     ${0}
@@ -381,11 +430,12 @@ describe('Issuable component', () => {
   });
 
   describe.each`
-    desc                           | key                       | finder
-    ${'with merge requests count'} | ${'merge_requests_count'} | ${findMergeRequestsCount}
-    ${'with upvote count'}         | ${'upvotes'}              | ${findUpvotes}
-    ${'with downvote count'}       | ${'downvotes'}            | ${findDownvotes}
-    ${'with notes count'}          | ${'user_notes_count'}     | ${findNotes}
+    desc                            | key                        | finder
+    ${'with blocking issues count'} | ${'blocking_issues_count'} | ${findBlockingIssuesCount}
+    ${'with merge requests count'}  | ${'merge_requests_count'}  | ${findMergeRequestsCount}
+    ${'with upvote count'}          | ${'upvotes'}               | ${findUpvotes}
+    ${'with downvote count'}        | ${'downvotes'}             | ${findDownvotes}
+    ${'with notes count'}           | ${'user_notes_count'}      | ${findNotes}
   `('$desc', ({ key, finder }) => {
     beforeEach(() => {
       issuable[key] = TEST_META_COUNT;
@@ -393,7 +443,7 @@ describe('Issuable component', () => {
       factory({ issuable });
     });
 
-    it('renders merge requests count', () => {
+    it('renders correct count', () => {
       expect(finder().exists()).toBe(true);
       expect(finder().text()).toBe(TEST_META_COUNT.toString());
       expect(finder().classes('no-comments')).toBe(false);
@@ -425,4 +475,19 @@ describe('Issuable component', () => {
       });
     });
   });
+
+  if (IS_EE) {
+    describe('with health status', () => {
+      it('renders health status tag', () => {
+        factory({ issuable });
+        expect(findHealthStatus().exists()).toBe(true);
+      });
+
+      it('does not render when health status is absent', () => {
+        issuable.health_status = null;
+        factory({ issuable });
+        expect(findHealthStatus().exists()).toBe(false);
+      });
+    });
+  }
 });

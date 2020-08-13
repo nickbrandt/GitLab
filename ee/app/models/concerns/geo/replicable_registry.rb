@@ -22,6 +22,14 @@ module Geo::ReplicableRegistry
     def declarative_policy_class
       'Geo::RegistryPolicy'
     end
+
+    def registry_consistency_worker_enabled?
+      replicator_class.enabled?
+    end
+  end
+
+  def replicator_class
+    Gitlab::Geo::Replicator.for_class_name(self)
   end
 
   included do

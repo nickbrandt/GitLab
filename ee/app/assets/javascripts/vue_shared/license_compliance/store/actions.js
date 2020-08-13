@@ -12,6 +12,15 @@ export const setAPISettings = ({ commit }, data) => {
 export const setLicenseInModal = ({ commit }, license) => {
   commit(types.SET_LICENSE_IN_MODAL, license);
 };
+
+export const setIsAdmin = ({ commit }, payload) => {
+  commit(types.SET_IS_ADMIN, payload);
+};
+
+export const setKnownLicenses = ({ commit }, licenses) => {
+  commit(types.SET_KNOWN_LICENSES, licenses);
+};
+
 export const resetLicenseInModal = ({ commit }) => {
   commit(types.RESET_LICENSE_IN_MODAL);
 };
@@ -153,10 +162,6 @@ export const receiveLicenseCheckApprovalRuleError = ({ commit }, error) => {
   commit(types.RECEIVE_LICENSE_CHECK_APPROVAL_RULE_ERROR, error);
 };
 
-export const setIsAdmin = ({ commit }, payload) => {
-  commit(types.SET_IS_ADMIN, payload);
-};
-
 export const addPendingLicense = ({ state, commit }, id = null) => {
   if (!state.pendingLicenses.includes(id)) {
     commit(types.ADD_PENDING_LICENSE, id);
@@ -209,6 +214,3 @@ export const denyLicense = ({ dispatch }, license) => {
     dispatch('setLicenseApproval', { license, newStatus: LICENSE_APPROVAL_STATUS.DENIED });
   }
 };
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

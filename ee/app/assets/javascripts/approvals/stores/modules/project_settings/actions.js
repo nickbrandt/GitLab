@@ -106,5 +106,3 @@ export const requestDeleteRule = ({ dispatch }, rule) => {
 export const addEmptyRule = ({ commit }) => {
   commit(types.ADD_EMPTY_RULE);
 };
-
-export default () => {};

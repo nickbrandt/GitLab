@@ -2,6 +2,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { escape } from 'lodash';
 import { GlLoadingIcon } from '@gitlab/ui';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { __, sprintf } from '~/locale';
 import createFlash from '~/flash';
 import { hasDiff } from '~/helpers/diffs_helper';
@@ -16,6 +17,7 @@ export default {
     DiffContent,
     GlLoadingIcon,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     file: {
       type: Object,
@@ -29,6 +31,10 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    viewDiffsFileByFile: {
+      type: Boolean,
+      required: true,
     },
   },
   data() {
@@ -85,8 +91,25 @@ export default {
 
       this.setFileCollapsed({ filePath: this.file.file_path, collapsed: newVal });
     },
+    'file.file_hash': {
+      handler: function watchFileHash() {
+        if (
+          this.glFeatures.autoExpandCollapsedDiffs &&
+          this.viewDiffsFileByFile &&
+          this.file.viewer.collapsed
+        ) {
+          this.isCollapsed = false;
+          this.handleLoadCollapsedDiff();
+        } else {
+          this.isCollapsed = this.file.viewer.collapsed || false;
+        }
+      },
+      immediate: true,
+    },
     'file.viewer.collapsed': function setIsCollapsed(newVal) {
-      this.isCollapsed = newVal;
+      if (!this.viewDiffsFileByFile && !this.glFeatures.autoExpandCollapsedDiffs) {
+        this.isCollapsed = newVal;
+      }
     },
   },
   created() {
@@ -154,6 +177,7 @@ export default {
       :collapsible="true"
       :expanded="!isCollapsed"
       :add-merge-request-buttons="true"
+      :view-diffs-file-by-file="viewDiffsFileByFile"
       class="js-file-title file-title"
       @toggleFile="handleToggle"
       @showForkMessage="showForkMessage"

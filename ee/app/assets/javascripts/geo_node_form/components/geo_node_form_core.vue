@@ -69,7 +69,7 @@ export default {
           :class="{ 'is-invalid': Boolean(formErrors.name) }"
           data-qa-selector="node_name_field"
           type="text"
-          @input="checkName"
+          @update="checkName"
         />
         <span class="gl-text-gray-700 m-n5 gl-z-index-2">{{ 255 - nodeData.name.length }}</span>
       </div>
@@ -106,7 +106,7 @@ export default {
             :class="{ 'is-invalid': Boolean(formErrors.url) }"
             data-qa-selector="node_url_field"
             type="text"
-            @input="checkUrl"
+            @update="checkUrl"
           />
           <span class="gl-text-gray-700 m-n5 gl-z-index-2">{{ 255 - nodeData.url.length }}</span>
         </div>

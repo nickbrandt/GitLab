@@ -1,0 +1,5 @@
+---
+title: By default display only confirmed and detected vulnerabilities
+merge_request: 37914
+author:
+type: changed

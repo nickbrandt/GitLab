@@ -23,7 +23,7 @@ FactoryBot.define do
 
     trait :with_assignee do |alert|
       after(:create) do |alert|
-        alert.alert_assignees.create(assignee: create(:user))
+        alert.alert_assignees.create!(assignee: create(:user))
       end
     end
 
@@ -101,6 +101,16 @@ FactoryBot.define do
 
     trait :prometheus do
       monitoring_tool { Gitlab::AlertManagement::AlertParams::MONITORING_TOOLS[:prometheus] }
+      payload do
+        {
+          annotations: {
+            title: 'This is a prometheus error',
+            summary: 'Summary of the error',
+            description: 'Description of the error'
+          },
+          startsAt: started_at
+        }.with_indifferent_access
+      end
     end
 
     trait :all_fields do

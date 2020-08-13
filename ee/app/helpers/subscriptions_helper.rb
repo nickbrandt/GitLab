@@ -39,7 +39,7 @@ module SubscriptionsHelper
   end
 
   def group_data
-    current_user.managed_free_namespaces.with_counts(archived: false).map do |namespace|
+    current_user.manageable_groups_eligible_for_subscription.with_counts(archived: false).map do |namespace|
       {
         id: namespace.id,
         name: namespace.name,

@@ -1,4 +1,7 @@
 ---
+stage: Create
+group: Static Site Editor
+info: "To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers"
 type: reference, how-to
 description: "The static site editor enables users to edit content on static websites without prior knowledge of the underlying templating language, site architecture or Git commands."
 ---
@@ -50,7 +53,7 @@ the bottom-left corner of its pages:
 
 ![Edit this page button](img/edit_this_page_button_v12_10.png)
 
-When clicking it, GitLab will open up an editor window from which the content
+When you click it, GitLab opens up an editor window from which the content
 can be directly edited. When you're ready, you can submit your changes in a
 click of a button:
 
@@ -58,7 +61,7 @@ click of a button:
 
 When an editor submits their changes, in the background, GitLab automatically
 creates a new branch, commits their changes, and opens a merge request. The
-editor will land directly on the merge request, and then they can assign it to
+editor lands directly on the merge request, and then they can assign it to
 a colleague for review.
 
 ## Getting started
@@ -73,7 +76,7 @@ easily edit your content.
 template. You can either [fork it](../repository/forking_workflow.md#creating-a-fork)
 or [create a new project from a template](../../../gitlab-basics/create-project.md#built-in-templates).
 1. Edit the `data/config.yml` file adding your project's path.
-1. Editing the file will trigger a CI/CD pipeline to deploy your project with GitLab Pages.
+1. Editing the file triggers a CI/CD pipeline to deploy your project with GitLab Pages.
 1. When the pipeline finishes, from your project's left-side menu, go to **Settings > Pages** to find the URL of your new website.
 1. Visit your website and look at the bottom-left corner of the screen to see the new **Edit this page** button.
 

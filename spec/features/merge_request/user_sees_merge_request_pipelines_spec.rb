@@ -36,7 +36,7 @@ RSpec.describe 'Merge request > User sees pipelines triggered by merge request',
   end
 
   context 'when a user created a merge request in the parent project' do
-    let(:merge_request) do
+    let!(:merge_request) do
       create(:merge_request,
               source_project: project,
               target_project: project,
@@ -53,6 +53,7 @@ RSpec.describe 'Merge request > User sees pipelines triggered by merge request',
       Ci::CreatePipelineService.new(project, user, ref: 'feature')
                                 .execute(:merge_request_event, merge_request: merge_request)
     end
+
     let(:enable_mr_tabs_position_flag) { false }
 
     before do

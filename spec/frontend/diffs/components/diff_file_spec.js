@@ -15,6 +15,7 @@ describe('DiffFile', () => {
     vm = createComponentWithStore(Vue.extend(DiffFileComponent), createStore(), {
       file: JSON.parse(JSON.stringify(diffFileMockDataReadable)),
       canCurrentUserFork: false,
+      viewDiffsFileByFile: false,
     }).$mount();
     trackingSpy = mockTracking('_category_', vm.$el, jest.spyOn);
   });
@@ -113,6 +114,7 @@ describe('DiffFile', () => {
         vm = createComponentWithStore(Vue.extend(DiffFileComponent), createStore(), {
           file: JSON.parse(JSON.stringify(diffFileMockDataUnreadable)),
           canCurrentUserFork: false,
+          viewDiffsFileByFile: false,
         }).$mount();
 
         vm.renderIt = false;
@@ -121,6 +123,26 @@ describe('DiffFile', () => {
         vm.$nextTick(() => {
           expect(vm.$el.innerText).toContain('This diff is collapsed');
           expect(vm.$el.querySelectorAll('.js-click-to-expand').length).toEqual(1);
+
+          done();
+        });
+      });
+
+      it('should auto-expand collapsed files when viewDiffsFileByFile is true', done => {
+        vm.$destroy();
+        window.gon = {
+          features: { autoExpandCollapsedDiffs: true },
+        };
+        vm = createComponentWithStore(Vue.extend(DiffFileComponent), createStore(), {
+          file: JSON.parse(JSON.stringify(diffFileMockDataUnreadable)),
+          canCurrentUserFork: false,
+          viewDiffsFileByFile: true,
+        }).$mount();
+
+        vm.$nextTick(() => {
+          expect(vm.$el.innerText).not.toContain('This diff is collapsed');
+
+          window.gon = {};
 
           done();
         });
@@ -235,6 +257,7 @@ describe('DiffFile', () => {
       vm = createComponentWithStore(Vue.extend(DiffFileComponent), createStore(), {
         file: JSON.parse(JSON.stringify(diffFileMockDataUnreadable)),
         canCurrentUserFork: false,
+        viewDiffsFileByFile: false,
       }).$mount();
 
       jest.spyOn(vm, 'handleLoadCollapsedDiff').mockImplementation(() => {});

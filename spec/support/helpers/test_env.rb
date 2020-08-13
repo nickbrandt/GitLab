@@ -76,7 +76,7 @@ module TestEnv
     'png-lfs'                            => 'fe42f41',
     'sha-starting-with-large-number'     => '8426165',
     'invalid-utf8-diff-paths'            => '99e4853',
-    'compare-with-merge-head-source'     => 'b5f4399',
+    'compare-with-merge-head-source'     => 'f20a03d',
     'compare-with-merge-head-target'     => '2f1e176'
   }.freeze
 
@@ -508,6 +508,8 @@ module TestEnv
     # Allow local overrides of the component for tests during development
     return false if Rails.env.test? && File.symlink?(component_folder)
 
+    return false if component_matches_git_sha?(component_folder, expected_version)
+
     version = File.read(File.join(component_folder, 'VERSION')).strip
 
     # Notice that this will always yield true when using branch versions
@@ -516,6 +518,16 @@ module TestEnv
     version != expected_version
   rescue Errno::ENOENT
     true
+  end
+
+  def component_matches_git_sha?(component_folder, expected_version)
+    # Not a git SHA, so return early
+    return false unless expected_version =~ ::Gitlab::Git::COMMIT_ID
+
+    sha, exit_status = Gitlab::Popen.popen(%W(#{Gitlab.config.git.bin_path} rev-parse HEAD), component_folder)
+    return false if exit_status != 0
+
+    expected_version == sha.chomp
   end
 end
 

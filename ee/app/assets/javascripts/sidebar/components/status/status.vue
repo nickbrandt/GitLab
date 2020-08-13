@@ -5,9 +5,9 @@ import {
   GlButton,
   GlLoadingIcon,
   GlTooltip,
-  GlDropdownItem,
-  GlDropdown,
-  GlDropdownDivider,
+  GlDeprecatedDropdownItem,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownDivider,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { healthStatusTextMap } from '../../constants';
@@ -18,9 +18,9 @@ export default {
     GlButton,
     GlLoadingIcon,
     GlTooltip,
-    GlDropdown,
-    GlDropdownItem,
-    GlDropdownDivider,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownItem,
+    GlDeprecatedDropdownDivider,
   },
   mixins: [Tracking.mixin()],
   props: {
@@ -139,7 +139,7 @@ export default {
         class="dropdown dropdown-menu-selectable"
         :class="{ show: isDropdownShowing, 'd-none': !isDropdownShowing }"
       >
-        <gl-dropdown
+        <gl-deprecated-dropdown
           ref="dropdown"
           class="w-100"
           :text="dropdownText"
@@ -158,7 +158,7 @@ export default {
           </div>
 
           <div class="dropdown-content dropdown-body">
-            <gl-dropdown-item @click="handleDropdownClick(null)">
+            <gl-deprecated-dropdown-item @click="handleDropdownClick(null)">
               <gl-button
                 variant="link"
                 class="dropdown-item health-dropdown-item"
@@ -166,11 +166,11 @@ export default {
               >
                 {{ s__('Sidebar|No status') }}
               </gl-button>
-            </gl-dropdown-item>
+            </gl-deprecated-dropdown-item>
 
-            <gl-dropdown-divider class="divider health-divider" />
+            <gl-deprecated-dropdown-divider class="divider health-divider" />
 
-            <gl-dropdown-item
+            <gl-deprecated-dropdown-item
               v-for="option in statusOptions"
               :key="option.key"
               @click="handleDropdownClick(option.key)"
@@ -182,9 +182,9 @@ export default {
               >
                 {{ option.value }}
               </gl-button>
-            </gl-dropdown-item>
+            </gl-deprecated-dropdown-item>
           </div>
-        </gl-dropdown>
+        </gl-deprecated-dropdown>
       </div>
 
       <gl-loading-icon v-if="isFetching" :inline="true" />

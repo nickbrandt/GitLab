@@ -20,7 +20,7 @@ module EE
       }.with_indifferent_access.freeze
 
       EE_RUNNER_FEATURES = {
-        secrets: -> (build) { build.ci_secrets_management_available? && build.secrets?}
+        vault_secrets: -> (build) { build.ci_secrets_management_available? && build.secrets?}
       }.freeze
 
       prepended do
@@ -38,10 +38,6 @@ module EE
             .by_name(build_name)
             .for_ref(ref)
             .for_project_paths(project_path)
-        end
-
-        scope :security_scans_scanned_resources_count, -> (report_types) do
-          joins(:security_scans).where(security_scans: { scan_type: report_types }).group(:scan_type).sum(:scanned_resources_count)
         end
       end
 
@@ -148,7 +144,21 @@ module EE
         super + ee_runner_required_feature_names
       end
 
+      def secrets_provider?
+        variable_value('VAULT_SERVER_URL').present?
+      end
+
+      def variable_value(key)
+        variables_hash[key]
+      end
+
       private
+
+      def variables_hash
+        @variables_hash ||= variables.map do |variable|
+          [variable[:key], variable[:value]]
+        end.to_h
+      end
 
       def parse_security_artifact_blob(security_report, blob)
         report_clone = security_report.clone_as_blank

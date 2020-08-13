@@ -2,6 +2,7 @@
 import $ from 'jquery';
 import Vue from 'vue';
 import Vuex, { mapState, mapActions, mapGetters } from 'vuex';
+import { isInViewport } from '~/lib/utils/common_utils';
 import { __ } from '~/locale';
 
 import DropdownValueCollapsed from '~/vue_shared/components/sidebar/labels_select/dropdown_value_collapsed.vue';
@@ -74,6 +75,11 @@ export default {
       required: false,
       default: '',
     },
+    dropdownButtonText: {
+      type: String,
+      required: false,
+      default: __('Label'),
+    },
     labelsListTitle: {
       type: String,
       required: false,
@@ -95,9 +101,18 @@ export default {
       default: __('Manage group labels'),
     },
   },
+  data() {
+    return {
+      contentIsOnViewport: true,
+    };
+  },
   computed: {
     ...mapState(['showDropdownButton', 'showDropdownContents']),
-    ...mapGetters(['isDropdownVariantSidebar', 'isDropdownVariantStandalone']),
+    ...mapGetters([
+      'isDropdownVariantSidebar',
+      'isDropdownVariantStandalone',
+      'isDropdownVariantEmbedded',
+    ]),
     dropdownButtonVisible() {
       return this.isDropdownVariantSidebar ? this.showDropdownButton : true;
     },
@@ -108,6 +123,9 @@ export default {
         selectedLabels,
       });
     },
+    showDropdownContents(showDropdownContents) {
+      this.setContentIsOnViewport(showDropdownContents);
+    },
   },
   mounted() {
     this.setInitialState({
@@ -116,6 +134,7 @@ export default {
       allowLabelCreate: this.allowLabelCreate,
       allowMultiselect: this.allowMultiselect,
       allowScopedLabels: this.allowScopedLabels,
+      dropdownButtonText: this.dropdownButtonText,
       selectedLabels: this.selectedLabels,
       labelsFetchPath: this.labelsFetchPath,
       labelsManagePath: this.labelsManagePath,
@@ -193,6 +212,20 @@ export default {
     handleCollapsedValueClick() {
       this.$emit('toggleCollapse');
     },
+    setContentIsOnViewport(showDropdownContents) {
+      if (!this.isDropdownVariantEmbedded || !showDropdownContents) {
+        this.contentIsOnViewport = true;
+
+        return;
+      }
+
+      this.$nextTick(() => {
+        if (this.$refs.dropdownContents) {
+          const offset = { top: 100 };
+          this.contentIsOnViewport = isInViewport(this.$refs.dropdownContents.$el, offset);
+        }
+      });
+    },
   },
 };
 </script>
@@ -200,7 +233,10 @@ export default {
 <template>
   <div
     class="labels-select-wrapper position-relative"
-    :class="{ 'is-standalone': isDropdownVariantStandalone }"
+    :class="{
+      'is-standalone': isDropdownVariantStandalone,
+      'is-embedded': isDropdownVariantEmbedded,
+    }"
   >
     <template v-if="isDropdownVariantSidebar">
       <dropdown-value-collapsed
@@ -221,11 +257,12 @@ export default {
         ref="dropdownContents"
       />
     </template>
-    <template v-if="isDropdownVariantStandalone">
+    <template v-if="isDropdownVariantStandalone || isDropdownVariantEmbedded">
       <dropdown-button v-show="dropdownButtonVisible" />
       <dropdown-contents
         v-if="dropdownButtonVisible && showDropdownContents"
         ref="dropdownContents"
+        :render-on-top="!contentIsOnViewport"
       />
     </template>
   </div>

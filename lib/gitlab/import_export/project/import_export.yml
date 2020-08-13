@@ -205,6 +205,7 @@ excluded_attributes:
     - :state_id
     - :duplicated_to_id
     - :promoted_to_epic_id
+    - :blocking_issues_count
   merge_request:
     - :milestone_id
     - :sprint_id
@@ -274,6 +275,7 @@ excluded_attributes:
   timelogs:
     - :issue_id
     - :merge_request_id
+    - :note_id
   notes:
     - :noteable_id
     - :review_id
@@ -316,6 +318,7 @@ excluded_attributes:
     - :protected_branch_id
   push_access_levels:
     - :protected_branch_id
+    - :deploy_key_id
   unprotect_access_levels:
     - :protected_branch_id
   create_access_levels:

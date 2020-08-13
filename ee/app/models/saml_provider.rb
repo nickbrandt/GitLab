@@ -9,6 +9,7 @@ class SamlProvider < ApplicationRecord
   validates :group, presence: true, top_level_group: true
   validates :sso_url, presence: true, addressable_url: { schemes: %w(https), ascii_only: true }
   validates :certificate_fingerprint, presence: true, certificate_fingerprint: true
+  validates :default_membership_role, presence: true, inclusion: { in: Gitlab::Access.values }
 
   after_initialize :set_defaults, if: :new_record?
 

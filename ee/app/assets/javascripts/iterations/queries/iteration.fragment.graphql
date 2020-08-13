@@ -1,0 +1,8 @@
+fragment Iteration on Iteration {
+  dueDate
+  id
+  startDate
+  state
+  title
+  webPath
+}

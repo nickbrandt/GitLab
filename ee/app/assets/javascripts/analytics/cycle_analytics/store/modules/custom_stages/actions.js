@@ -65,15 +65,13 @@ export const receiveCreateStageError = (
   return dispatch('setStageFormErrors', errors);
 };
 
-export const createStage = ({ dispatch, rootState }, data) => {
-  const {
-    selectedGroup: { fullPath },
-  } = rootState;
+export const createStage = ({ dispatch, rootGetters }, data) => {
+  const { currentGroupPath, currentValueStreamId } = rootGetters;
 
   dispatch('clearFormErrors');
   dispatch('setSavingCustomStage');
 
-  return Api.cycleAnalyticsCreateStage(fullPath, data)
+  return Api.cycleAnalyticsCreateStage(currentGroupPath, currentValueStreamId, data)
     .then(response => {
       const { status, data: responseData } = response;
       return dispatch('receiveCreateStageSuccess', { status, data: responseData });

@@ -122,4 +122,33 @@ export default {
     state.selectedMilestone = selectedMilestone;
     state.selectedLabels = selectedLabels;
   },
+  [types.REQUEST_CREATE_VALUE_STREAM](state) {
+    state.isCreatingValueStream = true;
+    state.createValueStreamErrors = {};
+  },
+  [types.RECEIVE_CREATE_VALUE_STREAM_ERROR](state, { errors } = {}) {
+    state.isCreatingValueStream = false;
+    state.createValueStreamErrors = errors;
+  },
+  [types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS](state) {
+    state.isCreatingValueStream = false;
+    state.createValueStreamErrors = {};
+  },
+  [types.SET_SELECTED_VALUE_STREAM](state, streamId) {
+    state.selectedValueStream = state.valueStreams?.find(({ id }) => id === streamId) || null;
+  },
+  [types.REQUEST_VALUE_STREAMS](state) {
+    state.isLoadingValueStreams = true;
+    state.valueStreams = [];
+  },
+  [types.RECEIVE_VALUE_STREAMS_ERROR](state) {
+    state.isLoadingValueStreams = false;
+    state.valueStreams = [];
+  },
+  [types.RECEIVE_VALUE_STREAMS_SUCCESS](state, data) {
+    state.isLoadingValueStreams = false;
+    state.valueStreams = data.sort(({ name: aName = '' }, { name: bName = '' }) => {
+      return aName.toUpperCase() > bName.toUpperCase() ? 1 : -1;
+    });
+  },
 };

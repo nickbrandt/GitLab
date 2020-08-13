@@ -16,7 +16,6 @@ RSpec.describe EventCreateService do
 
       it "creates new event" do
         expect { service.open_issue(issue, issue.author) }.to change { Event.count }
-        expect { service.open_issue(issue, issue.author) }.to change { ResourceStateEvent.count }
       end
     end
 
@@ -27,7 +26,6 @@ RSpec.describe EventCreateService do
 
       it "creates new event" do
         expect { service.close_issue(issue, issue.author) }.to change { Event.count }
-        expect { service.close_issue(issue, issue.author) }.to change { ResourceStateEvent.count }
       end
     end
 
@@ -38,7 +36,6 @@ RSpec.describe EventCreateService do
 
       it "creates new event" do
         expect { service.reopen_issue(issue, issue.author) }.to change { Event.count }
-        expect { service.reopen_issue(issue, issue.author) }.to change { ResourceStateEvent.count }
       end
     end
   end
@@ -51,7 +48,6 @@ RSpec.describe EventCreateService do
 
       it "creates new event" do
         expect { service.open_mr(merge_request, merge_request.author) }.to change { Event.count }
-        expect { service.open_mr(merge_request, merge_request.author) }.to change { ResourceStateEvent.count }
       end
     end
 
@@ -62,7 +58,6 @@ RSpec.describe EventCreateService do
 
       it "creates new event" do
         expect { service.close_mr(merge_request, merge_request.author) }.to change { Event.count }
-        expect { service.close_mr(merge_request, merge_request.author) }.to change { ResourceStateEvent.count }
       end
     end
 
@@ -73,7 +68,6 @@ RSpec.describe EventCreateService do
 
       it "creates new event" do
         expect { service.merge_mr(merge_request, merge_request.author) }.to change { Event.count }
-        expect { service.merge_mr(merge_request, merge_request.author) }.to change { ResourceStateEvent.count }
       end
     end
 
@@ -84,7 +78,6 @@ RSpec.describe EventCreateService do
 
       it "creates new event" do
         expect { service.reopen_mr(merge_request, merge_request.author) }.to change { Event.count }
-        expect { service.reopen_mr(merge_request, merge_request.author) }.to change { ResourceStateEvent.count }
       end
     end
 
@@ -173,40 +166,58 @@ RSpec.describe EventCreateService do
     end
   end
 
-  describe '#wiki_event' do
+  describe '#wiki_event', :clean_gitlab_redis_shared_state do
     let_it_be(:user) { create(:user) }
     let_it_be(:wiki_page) { create(:wiki_page) }
     let_it_be(:meta) { create(:wiki_page_meta, :for_wiki_page, wiki_page: wiki_page) }
 
-    Event::WIKI_ACTIONS.each do |action|
-      context "The action is #{action}" do
-        let(:event) { service.wiki_event(meta, user, action) }
+    let(:fingerprint) { generate(:sha) }
 
-        it 'creates the event', :aggregate_failures do
-          expect(event).to have_attributes(
-            wiki_page?: true,
-            valid?: true,
-            persisted?: true,
-            action: action.to_s,
-            wiki_page: wiki_page,
-            author: user
-          )
-        end
+    def create_event
+      service.wiki_event(meta, user, action, fingerprint)
+    end
 
-        it 'is idempotent', :aggregate_failures do
-          expect { event }.to change(Event, :count).by(1)
-          duplicate = nil
-          expect { duplicate = service.wiki_event(meta, user, action) }.not_to change(Event, :count)
+    where(:action) { Event::WIKI_ACTIONS.map { |action| [action] } }
 
-          expect(duplicate).to eq(event)
-        end
+    with_them do
+      it 'creates the event' do
+        expect(create_event).to have_attributes(
+          wiki_page?: true,
+          valid?: true,
+          persisted?: true,
+          action: action.to_s,
+          wiki_page: wiki_page,
+          author: user,
+          fingerprint: fingerprint
+        )
+      end
+
+      it 'is idempotent', :aggregate_failures do
+        event = nil
+        expect { event = create_event }.to change(Event, :count).by(1)
+        duplicate = nil
+        expect { duplicate = create_event }.not_to change(Event, :count)
+
+        expect(duplicate).to eq(event)
+      end
+
+      it 'records the event in the event counter' do
+        stub_feature_flags(Gitlab::UsageDataCounters::TrackUniqueActions::FEATURE_FLAG => true)
+        counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+        tracking_params = { event_action: counter_class::WIKI_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+        expect { create_event }
+          .to change { counter_class.count_unique_events(tracking_params) }
+          .by(1)
       end
     end
 
     (Event.actions.keys - Event::WIKI_ACTIONS).each do |bad_action|
       context "The action is #{bad_action}" do
+        let(:action) { bad_action }
+
         it 'raises an error' do
-          expect { service.wiki_event(meta, user, bad_action) }.to raise_error(described_class::IllegalActionError)
+          expect { create_event }.to raise_error(described_class::IllegalActionError)
         end
       end
     end
@@ -231,6 +242,16 @@ RSpec.describe EventCreateService do
     subject { service.push(project, user, push_data) }
 
     it_behaves_like 'service for creating a push event', PushEventPayloadService
+
+    it 'records the event in the event counter' do
+      stub_feature_flags(Gitlab::UsageDataCounters::TrackUniqueActions::FEATURE_FLAG => true)
+      counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+      tracking_params = { event_action: counter_class::PUSH_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+      expect { subject }
+        .to change { counter_class.count_unique_events(tracking_params) }
+        .from(0).to(1)
+    end
   end
 
   describe '#bulk_push', :clean_gitlab_redis_shared_state do
@@ -245,6 +266,16 @@ RSpec.describe EventCreateService do
     subject { service.bulk_push(project, user, push_data) }
 
     it_behaves_like 'service for creating a push event', BulkPushEventPayloadService
+
+    it 'records the event in the event counter' do
+      stub_feature_flags(Gitlab::UsageDataCounters::TrackUniqueActions::FEATURE_FLAG => true)
+      counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+      tracking_params = { event_action: counter_class::PUSH_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+      expect { subject }
+        .to change { counter_class.count_unique_events(tracking_params) }
+        .from(0).to(1)
+    end
   end
 
   describe 'Project' do
@@ -263,21 +294,9 @@ RSpec.describe EventCreateService do
     end
   end
 
-  describe 'design events' do
+  describe 'design events', :clean_gitlab_redis_shared_state do
     let_it_be(:design) { create(:design, project: project) }
     let_it_be(:author) { user }
-
-    shared_examples 'feature flag gated multiple event creation' do
-      context 'the feature flag is off' do
-        before do
-          stub_feature_flags(design_activity_events: false)
-        end
-
-        specify { expect(result).to be_empty }
-        specify { expect { result }.not_to change { Event.count } }
-        specify { expect { result }.not_to exceed_query_limit(0) }
-      end
-    end
 
     describe '#save_designs' do
       let_it_be(:updated) { create_list(:design, 5) }
@@ -303,7 +322,15 @@ RSpec.describe EventCreateService do
         expect(events.map(&:design)).to match_array(updated)
       end
 
-      it_behaves_like 'feature flag gated multiple event creation'
+      it 'records the event in the event counter' do
+        stub_feature_flags(Gitlab::UsageDataCounters::TrackUniqueActions::FEATURE_FLAG => true)
+        counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+        tracking_params = { event_action: counter_class::DESIGN_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+        expect { result }
+          .to change { counter_class.count_unique_events(tracking_params) }
+          .from(0).to(1)
+      end
     end
 
     describe '#destroy_designs' do
@@ -323,7 +350,15 @@ RSpec.describe EventCreateService do
         expect(events.map(&:design)).to match_array(designs)
       end
 
-      it_behaves_like 'feature flag gated multiple event creation'
+      it 'records the event in the event counter' do
+        stub_feature_flags(Gitlab::UsageDataCounters::TrackUniqueActions::FEATURE_FLAG => true)
+        counter_class = Gitlab::UsageDataCounters::TrackUniqueActions
+        tracking_params = { event_action: counter_class::DESIGN_ACTION, date_from: Date.yesterday, date_to: Date.today }
+
+        expect { result }
+          .to change { counter_class.count_unique_events(tracking_params) }
+          .from(0).to(1)
+      end
     end
   end
 end

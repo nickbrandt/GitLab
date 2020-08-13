@@ -1,8 +1,7 @@
 - add_to_breadcrumbs s_('FeatureFlags|Feature Flags'), project_feature_flags_path(@project)
-- breadcrumb_title s_('FeatureFlags|Edit list')
-- page_title s_('FeatureFlags|Edit Feature Flag User List')
+- breadcrumb_title s_('FeatureFlags|Edit User List')
+- page_title s_('FeatureFlags|Edit User List')
 
-Edit list
-
-%label{ for: 'name' }= s_('FeatureFlags|Name')
-%input{ id: 'name', value: @user_list.name }
+#js-edit-user-list{ data: { 'user-lists-docs-path' => help_page_path('operations/feature_flags.md', anchor: 'user-list'),
+  'user-list-iid' => @user_list.iid,
+  'project-id' => @project.id } }

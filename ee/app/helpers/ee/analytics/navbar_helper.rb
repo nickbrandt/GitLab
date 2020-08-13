@@ -10,7 +10,8 @@ module EE
         super + [
           insights_navbar_link(project, current_user),
           code_review_analytics_navbar_link(project, current_user),
-          project_issues_analytics_navbar_link(project, current_user)
+          project_issues_analytics_navbar_link(project, current_user),
+          project_merge_request_analytics_navbar_link(project, current_user)
         ].compact
       end
 
@@ -21,7 +22,8 @@ module EE
           group_insights_navbar_link(group, current_user),
           issues_analytics_navbar_link(group, current_user),
           productivity_analytics_navbar_link(group, current_user),
-          group_cycle_analytics_navbar_link(group, current_user)
+          group_cycle_analytics_navbar_link(group, current_user),
+          group_merge_request_analytics_navbar_link(group, current_user)
         ].compact
       end
 
@@ -35,6 +37,28 @@ module EE
           title: _('Issues'),
           path: 'issues_analytics#show',
           link: project_analytics_issues_analytics_path(project)
+        )
+      end
+
+      def project_merge_request_analytics_navbar_link(project, current_user)
+        return unless project_nav_tab?(:merge_request_analytics)
+        return unless ::Gitlab::Analytics.project_merge_request_analytics_enabled?
+
+        navbar_sub_item(
+          title: _('Merge Request'),
+          path: 'projects/analytics/merge_requests_analytics#show',
+          link: project_analytics_merge_request_analytics_path(project)
+        )
+      end
+
+      def group_merge_request_analytics_navbar_link(group, current_user)
+        return unless ::Gitlab::Analytics.group_merge_request_analytics_enabled?
+        return unless group_sidebar_link?(:merge_request_analytics)
+
+        navbar_sub_item(
+          title: _('Merge Requests'),
+          path: 'groups/analytics/merge_requests_analytics#show',
+          link: group_analytics_merge_request_analytics_path(group)
         )
       end
 

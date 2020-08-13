@@ -3,6 +3,7 @@
 import { __ } from '~/locale';
 import Flash from '~/flash';
 import { redirectTo } from '~/lib/utils/url_utility';
+import { spriteIcon } from '~/lib/utils/common_utils';
 
 import GitlabSlackService from '../services/gitlab_slack_service';
 
@@ -59,11 +60,11 @@ export default {
 
   computed: {
     doubleHeadedArrowSvg() {
-      return gl.utils.spriteIcon('double-headed-arrow');
+      return spriteIcon('double-headed-arrow');
     },
 
     arrowRightSvg() {
-      return gl.utils.spriteIcon('arrow-right');
+      return spriteIcon('arrow-right');
     },
 
     hasProjects() {
@@ -110,10 +111,7 @@ export default {
       <div v-if="isSignedIn && hasProjects" class="inline">
         <strong>{{ __('Select GitLab project to link with your Slack team') }}</strong>
 
-        <select
-          v-model="selectedProjectId"
-          class="js-project-select form-control prepend-top-10 append-bottom-10"
-        >
+        <select v-model="selectedProjectId" class="js-project-select form-control gl-mt-3 gl-mb-3">
           <option v-for="project in projects" :key="project.id" :value="project.id">
             {{ project.name }}
           </option>
@@ -134,7 +132,7 @@ export default {
       </span>
     </div>
 
-    <div class="center prepend-top-20 append-bottom-10 gl-mr-2 gl-ml-2">
+    <div class="center prepend-top-20 gl-mb-3 gl-mr-2 gl-ml-2">
       <img v-once :src="gitlabForSlackGifPath" class="gitlab-slack-gif" />
     </div>
 
@@ -142,7 +140,7 @@ export default {
       <h3>{{ __('How it works') }}</h3>
 
       <div class="well gitlab-slack-well mx-auto">
-        <code class="code mx-auto append-bottom-10"
+        <code class="code mx-auto gl-mb-3"
           >/gitlab &lt;project-alias&gt; issue show &lt;id&gt;</code
         >
         <span>

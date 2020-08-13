@@ -1,4 +1,9 @@
-import { GlDropdown, GlDropdownItem, GlLoadingIcon, GlTooltip } from '@gitlab/ui';
+import {
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownItem,
+  GlLoadingIcon,
+  GlTooltip,
+} from '@gitlab/ui';
 import { mount, shallowMount } from '@vue/test-utils';
 import Vue from 'vue';
 import Status from 'ee/sidebar/components/status/status.vue';
@@ -10,9 +15,9 @@ const getTooltipText = wrapper => wrapper.find(GlTooltip).text();
 
 const getEditButton = wrapper => wrapper.find({ ref: 'editButton' });
 
-const getDropdownElement = wrapper => wrapper.find(GlDropdown);
+const getDropdownElement = wrapper => wrapper.find(GlDeprecatedDropdown);
 
-const getRemoveStatusItem = wrapper => wrapper.find(GlDropdownItem);
+const getRemoveStatusItem = wrapper => wrapper.find(GlDeprecatedDropdownItem);
 
 describe('Status', () => {
   let wrapper;
@@ -215,7 +220,7 @@ describe('Status', () => {
       });
 
       it('hides form when a dropdown item is clicked', () => {
-        const dropdownItem = wrapper.findAll(GlDropdownItem).at(1);
+        const dropdownItem = wrapper.findAll(GlDeprecatedDropdownItem).at(1);
 
         dropdownItem.vm.$emit('click');
 
@@ -241,7 +246,7 @@ describe('Status', () => {
       });
 
       it('shows 4 dropdown items', () => {
-        expect(wrapper.findAll(GlDropdownItem)).toHaveLength(4);
+        expect(wrapper.findAll(GlDeprecatedDropdownItem)).toHaveLength(4);
       });
 
       // Test that "On track", "Needs attention", and "At risk" are displayed
@@ -250,7 +255,7 @@ describe('Status', () => {
         (statusText, index) => {
           expect(
             wrapper
-              .findAll(GlDropdownItem)
+              .findAll(GlDeprecatedDropdownItem)
               .at(index + 1) // +1 in index to account for 1st item as `No status`
               .text(),
           ).toContain(statusText);
@@ -262,7 +267,7 @@ describe('Status', () => {
         'emits onFormSubmit event with argument "%s" when user selects the option and submits form',
         (status, index) => {
           wrapper
-            .findAll(GlDropdownItem)
+            .findAll(GlDeprecatedDropdownItem)
             .at(index + 1)
             .vm.$emit('click', { preventDefault: () => null });
 

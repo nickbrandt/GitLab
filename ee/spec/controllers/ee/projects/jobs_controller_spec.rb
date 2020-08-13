@@ -78,10 +78,11 @@ RSpec.describe Projects::JobsController do
           get_show(id: job.id, format: :json)
         end
 
-        it 'does not exposes quota information' do
+        it 'exposes quota information' do
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to match_response_schema('job/job_details', dir: 'ee')
-          expect(json_response['runners']).not_to have_key('quota')
+          expect(json_response['runners']['quota']['used']).to eq 0
+          expect(json_response['runners']['quota']['limit']).to eq 2
         end
       end
     end

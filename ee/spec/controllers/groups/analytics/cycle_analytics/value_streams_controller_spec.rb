@@ -6,7 +6,6 @@ RSpec.describe Groups::Analytics::CycleAnalytics::ValueStreamsController do
   let_it_be(:user) { create(:user) }
   let_it_be(:group, refind: true) { create(:group) }
   let(:params) { { group_id: group } }
-  let!(:value_stream) { create(:cycle_analytics_group_value_stream, group: group) }
 
   before do
     stub_feature_flags(Gitlab::Analytics::CYCLE_ANALYTICS_FEATURE_FLAG => true)
@@ -17,11 +16,27 @@ RSpec.describe Groups::Analytics::CycleAnalytics::ValueStreamsController do
   end
 
   describe 'GET #index' do
-    it 'succeeds' do
+    it 'returns an in-memory default value stream' do
       get :index, params: params
 
       expect(response).to have_gitlab_http_status(:ok)
-      expect(response).to match_response_schema('analytics/cycle_analytics/value_streams', dir: 'ee')
+
+      expect(json_response.size).to eq(1)
+      expect(json_response.first['id']).to eq(Analytics::CycleAnalytics::Stages::BaseService::DEFAULT_VALUE_STREAM_NAME)
+      expect(json_response.first['name']).to eq(Analytics::CycleAnalytics::Stages::BaseService::DEFAULT_VALUE_STREAM_NAME)
+    end
+
+    context 'when persisted value streams present' do
+      let!(:value_stream) { create(:cycle_analytics_group_value_stream, group: group) }
+
+      it 'succeeds' do
+        get :index, params: params
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('analytics/cycle_analytics/value_streams', dir: 'ee')
+        expect(json_response.first['id']).to eq(value_stream.id)
+        expect(json_response.first['name']).to eq(value_stream.name)
+      end
     end
   end
 

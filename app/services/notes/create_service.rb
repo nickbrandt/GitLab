@@ -66,13 +66,13 @@ module Notes
         Gitlab::Tracking.event('Notes::CreateService', 'execute', tracking_data_for(note))
       end
 
-      if Feature.enabled?(:merge_ref_head_comments, project) && note.for_merge_request? && note.diff_note? && note.start_of_discussion?
+      if Feature.enabled?(:merge_ref_head_comments, project, default_enabled: true) && note.for_merge_request? && note.diff_note? && note.start_of_discussion?
         Discussions::CaptureDiffNotePositionService.new(note.noteable, note.diff_file&.paths).execute(note.discussion)
       end
     end
 
     def do_commands(note, update_params, message, only_commands)
-      return if quick_actions_service.commands_executed_count.to_i.zero?
+      return if quick_actions_service.commands_executed_count.to_i == 0
 
       if update_params.present?
         quick_actions_service.apply_updates(update_params, note)

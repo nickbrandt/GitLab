@@ -219,7 +219,7 @@ By default, every group inherits the branch protection set at the global level.
 
 To change this setting for a specific group:
 
-1. Go to the group's **{settings}** **Settings > General** page.
+1. Go to the group's **Settings > General** page.
 1. Expand the **Permissions, LFS, 2FA** section.
 1. Select the desired option in the **Default branch protection** dropdown list.
 1. Click **Save changes**.
@@ -278,7 +278,7 @@ The group details view also shows the number of the following items created in t
 - Issues.
 - Members.
 
-These Group Activity Analytics can be enabled with the `group_activity_analytics` [feature flag](../../development/feature_flags/development.md#enabling-a-feature-flag-in-development).
+These Group Activity Analytics can be enabled with the `group_activity_analytics` [feature flag](../../development/feature_flags/development.md#enabling-a-feature-flag-locally-in-development).
 
 ![Recent Group Activity](img/group_activity_analytics_v12_10.png)
 
@@ -334,7 +334,7 @@ To share a given group, for example, 'Frontend' with another group, for example,
 
 All the members of the 'Engineering' group will have been added to 'Frontend'.
 
-## Manage group memberships via LDAP
+## Manage group memberships via LDAP **(STARTER ONLY)**
 
 Group syncing allows LDAP groups to be mapped to GitLab groups. This provides more control over per-group user management. To configure group syncing edit the `group_base` **DN** (`'OU=Global Groups,OU=GitLab INT,DC=GitLab,DC=org'`). This **OU** contains all groups that will be associated with GitLab groups.
 
@@ -426,6 +426,7 @@ When transferring groups, note:
 - You must update your local repositories to point to the new location.
 - If the immediate parent group's visibility is lower than the group's current visibility, visibility levels for subgroups and projects will change to match the new parent group's visibility.
 - Only explicit group membership is transferred, not inherited membership. If the group's owners have only inherited membership, this leaves the group without an owner. In this case, the user transferring the group becomes the group's owner.
+- Transfers will fail if [packages](../packages/index.md) exist in any of the projects within the group, or in any of its subgroups.
 
 ## Group settings
 
@@ -442,7 +443,7 @@ access further configurations for your group.
 
 #### Changing a group's path
 
-Changing a group's path can have unintended side effects. Read
+Changing a group's path (group URL) can have unintended side effects. Read
 [how redirects will behave](../project/index.md#redirects-when-changing-repository-paths)
 before proceeding.
 
@@ -450,19 +451,19 @@ If you are vacating the path so it can be claimed by another group or user,
 you may need to rename the group too, since both names and paths must
 be unique.
 
-To change your group path:
+To change your group path (group URL):
 
 1. Navigate to your group's **Settings > General** page.
 1. Expand the **Path, transfer, remove** section.
-1. Enter a new name under **Change group path**.
-1. Click **Change group path**.
+1. Enter a new name under **Change group URL**.
+1. Click **Change group URL**.
 
 CAUTION: **Caution:**
 It is currently not possible to rename a namespace if it contains a
 project with [Container Registry](../packages/container_registry/index.md) tags,
 because the project cannot be moved.
 
-TIP: **TIP:**
+TIP: **Tip:**
 If you want to retain ownership over the original namespace and
 protect the URL redirects, then instead of changing a group's path or renaming a
 username, you can create a new group and transfer projects to it.
@@ -471,7 +472,7 @@ username, you can create a new group and transfer projects to it.
 
 To remove a group and its contents:
 
-1. Navigate to your group's **{settings}** **Settings > General** page.
+1. Navigate to your group's **Settings > General** page.
 1. Expand the **Path, transfer, remove** section.
 1. In the Remove group section, click the **Remove group** button.
 1. Confirm the action when asked to.
@@ -479,7 +480,7 @@ To remove a group and its contents:
 This action either:
 
 - Removes the group, and also queues a background job to delete all projects in that group.
-- Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/premium/) or higher tiers, marks a group for deletion. The deletion will happen 7 days later by default, but this can be changed in the [instance settings](../admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
+- Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/premium/) or higher tiers, marks a group for deletion. The deletion will happen 7 days later by default, but this can be changed in the [instance settings](../admin_area/settings/visibility_and_access_controls.md#default-deletion-delay-premium-only).
 
 ### Restore a group **(PREMIUM)**
 
@@ -487,7 +488,7 @@ This action either:
 
 To restore a group that is marked for deletion:
 
-1. Navigate to your group's **{settings}** **Settings > General** page.
+1. Navigate to your group's **Settings > General** page.
 1. Expand the **Path, transfer, remove** section.
 1. In the Restore group section, click the **Restore group** button.
 
@@ -543,7 +544,7 @@ underlying projects, issues, etc, by IP address. This can help ensure that
 particular content doesn't leave the premises, while not blocking off access to
 the entire instance.
 
-Add one or more allowed IP subnets using CIDR notation in comma separated format to the group settings and anyone
+Add one or more allowed IP subnets using CIDR notation to the group settings and anyone
 coming from a different IP address won't be able to access the restricted
 content.
 
@@ -555,6 +556,12 @@ Restriction currently applies to:
 
 To avoid accidental lock-out, admins and group owners are able to access
 the group regardless of the IP restriction.
+
+To enable this feature:
+
+1. Navigate to the group’s **Settings > General** page.
+1. Expand the **Permissions, LFS, 2FA** section, and enter IP address ranges into **Allow access to the following IP addresses** field.
+1. Click **Save changes**.
 
 #### Allowed domain restriction **(PREMIUM)**
 
@@ -642,6 +649,40 @@ To enable this feature:
 
 1. Navigate to the group's **Settings > General** page.
 1. Expand the **Permissions, LFS, 2FA** section, and select **Disable group mentions**.
+1. Click **Save changes**.
+
+#### Enabling delayed Project removal **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/220382) in GitLab 13.2.
+
+By default, projects within a group are deleted immediately.
+Optionally, on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers,
+you can configure the projects within a group to be deleted after a delayed interval.
+
+During this interval period, the projects will be in a read-only state and can be restored, if required.
+The interval period defaults to 7 days, and can be modified by an admin in the [instance settings](../admin_area/settings/visibility_and_access_controls.md#default-deletion-delay-premium-only).
+
+To enable delayed deletion of projects:
+
+1. Navigate to the group's **Settings > General** page.
+1. Expand the **Permissions, LFS, 2FA** section, and check **Enable delayed project removal**.
+1. Click **Save changes**.
+
+#### Prevent project forking outside group **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216987) in GitLab 13.3.
+
+By default, projects within a group can be forked.
+Optionally, on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers,
+you can prevent the projects within a group from being forked outside of the current top-level group.
+
+Previously this setting was available only for groups enforcing group managed account. This setting will be
+removed from SAML setting page and migrated to group setting, but in the interim period of changes both of those settings will be taken into consideration, if even one is set to `true` then it will be assumed group does not allow forking projects outside.
+
+To enable prevent project forking:
+
+1. Navigate to the top-level group's **Settings > General** page.
+1. Expand the **Permissions, LFS, 2FA** section, and check **Prevent project forking outside current group**.
 1. Click **Save changes**.
 
 ### Advanced settings

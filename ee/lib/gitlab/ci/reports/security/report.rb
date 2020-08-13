@@ -10,7 +10,7 @@ module Gitlab
           attr_reader :created_at
           attr_reader :type
           attr_reader :commit_sha
-          attr_reader :occurrences
+          attr_reader :findings
           attr_reader :scanners
           attr_reader :identifiers
 
@@ -21,7 +21,7 @@ module Gitlab
             @type = type
             @commit_sha = commit_sha
             @created_at = created_at
-            @occurrences = []
+            @findings = []
             @scanners = {}
             @identifiers = {}
             @scanned_resources = []
@@ -39,8 +39,8 @@ module Gitlab
             identifiers[identifier.key] ||= identifier
           end
 
-          def add_occurrence(occurrence)
-            occurrences << occurrence
+          def add_finding(finding)
+            findings << finding
           end
 
           def clone_as_blank
@@ -62,7 +62,7 @@ module Gitlab
           end
 
           def safe?
-            severities = occurrences.map(&:severity).compact.map(&:downcase)
+            severities = findings.map(&:severity).compact.map(&:downcase)
             (severities & UNSAFE_SEVERITIES).empty?
           end
         end

@@ -132,10 +132,12 @@ describe('EE Approvals LicenseCompliance', () => {
   });
 
   describe.each`
-    givenApprovalRule                            | expectedStatus
-    ${{}}                                        | ${'inactive'}
-    ${{ name: 'Foo' }}                           | ${'inactive'}
-    ${{ name: TEST_LOCKED_APPROVALS_RULE_NAME }} | ${'active'}
+    givenApprovalRule                                                  | expectedStatus
+    ${{}}                                                              | ${'inactive'}
+    ${{ name: 'Foo', approvalsRequired: 0 }}                           | ${'inactive'}
+    ${{ name: 'Foo', approvalsRequired: 1 }}                           | ${'inactive'}
+    ${{ name: TEST_LOCKED_APPROVALS_RULE_NAME, approvalsRequired: 0 }} | ${'inactive'}
+    ${{ name: TEST_LOCKED_APPROVALS_RULE_NAME, approvalsRequired: 1 }} | ${'active'}
   `('when approval rule is "$givenApprovalRule.name"', ({ givenApprovalRule, expectedStatus }) => {
     beforeEach(() => {
       store.modules.approvals.state.rules = [givenApprovalRule];

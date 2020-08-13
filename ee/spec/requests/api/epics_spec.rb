@@ -156,6 +156,7 @@ RSpec.describe API::Epics do
                created_at: 3.days.ago,
                updated_at: 2.days.ago)
       end
+
       let!(:epic2) do
         create(:epic,
                author: user2,
@@ -165,6 +166,7 @@ RSpec.describe API::Epics do
                created_at: 2.days.ago,
                updated_at: 3.days.ago)
       end
+
       let!(:label) { create(:group_label, title: 'a-test', group: group) }
       let!(:label_link) { create(:label_link, label: label, target: epic2) }
 
@@ -518,6 +520,16 @@ RSpec.describe API::Epics do
         expect(json_response['references']['short']).to eq("&#{epic.iid}")
         expect(json_response['references']['relative']).to eq("&#{epic.iid}")
         expect(json_response['references']['full']).to eq("#{epic.group.path}&#{epic.iid}")
+      end
+
+      it 'exposes links' do
+        get api(url)
+
+        links = json_response['_links']
+
+        expect(links['self']).to end_with("/api/v4/groups/#{epic.group.id}/epics/#{epic.iid}")
+        expect(links['epic_issues']).to end_with("/api/v4/groups/#{epic.group.id}/epics/#{epic.iid}/issues")
+        expect(links['group']).to end_with("/api/v4/groups/#{epic.group.id}")
       end
 
       it_behaves_like 'can admin epics'

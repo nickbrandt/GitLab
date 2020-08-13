@@ -40,15 +40,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
     });
 
     it('passes down isLoading correctly', () => {
-      expect(findVulnerabilities().props()).toEqual({
-        filters: {},
-        isLoading: true,
-        shouldShowIdentifier: false,
-        shouldShowReportType: false,
-        shouldShowSelection: true,
-        shouldShowProjectNamespace: true,
-        vulnerabilities: [],
-      });
+      expect(findVulnerabilities().props()).toMatchObject({ isLoading: true });
     });
   });
 
@@ -112,6 +104,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
         filters: {},
         isLoading: false,
         shouldShowIdentifier: false,
+        securityScanners: {},
         shouldShowReportType: false,
         shouldShowSelection: true,
         shouldShowProjectNamespace: true,

@@ -69,8 +69,6 @@ module EventsHelper
   end
 
   def designs_visible?
-    return false unless Feature.enabled?(:design_activity_events)
-
     if @project
       design_activity_enabled?(@project)
     elsif @group
@@ -201,8 +199,7 @@ module EventsHelper
     elsif event.design_note?
       design_url(event.note_target, anchor: dom_id(event.note))
     else
-      polymorphic_url([event.project.namespace.becomes(Namespace),
-                       event.project, event.note_target],
+      polymorphic_url([event.project, event.note_target],
                         anchor: dom_id(event.target))
     end
   end

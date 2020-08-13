@@ -43,6 +43,9 @@ module EE
             params.delete(:file_template_project_id) unless
               group.feature_available?(:custom_file_templates_for_namespace)
 
+            params.delete(:prevent_forking_outside_group) unless
+              can?(current_user, :change_prevent_group_forking, group)
+
             super
           end
 

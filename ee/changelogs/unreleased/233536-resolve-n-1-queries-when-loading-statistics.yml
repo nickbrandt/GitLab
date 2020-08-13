@@ -1,0 +1,5 @@
+---
+title: Preload vulnerability statistics when loading vulnerable projects
+merge_request: 38905
+author:
+type: performance

@@ -8,6 +8,10 @@ module EE
 
         prepended do
           expose :weight, if: ->(issue, _) { issue.supports_weight? }
+
+          expose(:blocking_issues_count) do |issue, options|
+            issuable_metadata.blocking_issues_count
+          end
         end
       end
     end

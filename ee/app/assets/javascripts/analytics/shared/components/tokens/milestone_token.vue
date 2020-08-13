@@ -2,7 +2,7 @@
 import {
   GlFilteredSearchToken,
   GlFilteredSearchSuggestion,
-  GlDropdownDivider,
+  GlDeprecatedDropdownDivider,
   GlLoadingIcon,
 } from '@gitlab/ui';
 import { __ } from '~/locale';
@@ -13,7 +13,7 @@ export default {
   components: {
     GlFilteredSearchToken,
     GlFilteredSearchSuggestion,
-    GlDropdownDivider,
+    GlDeprecatedDropdownDivider,
     GlLoadingIcon,
   },
   inheritAttrs: false,
@@ -90,7 +90,7 @@ export default {
         :value="suggestion.value"
         >{{ suggestion.text }}</gl-filtered-search-suggestion
       >
-      <gl-dropdown-divider v-if="config.isLoading || milestones.length" />
+      <gl-deprecated-dropdown-divider v-if="config.isLoading || milestones.length" />
       <gl-loading-icon v-if="config.isLoading" />
       <template v-else>
         <gl-filtered-search-suggestion

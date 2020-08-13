@@ -18,7 +18,8 @@ module Security
       # Ensure we're not trying to insert data twice for this report
       return error("#{@report.type} report already stored for this pipeline, skipping...") if executed?
 
-      create_all_vulnerabilities!
+      vulnerability_ids = create_all_vulnerabilities!
+      mark_as_resolved_except(vulnerability_ids)
 
       success
     end
@@ -30,20 +31,25 @@ module Security
     end
 
     def create_all_vulnerabilities!
-      @report.occurrences.each do |occurrence|
-        create_vulnerability_finding(occurrence)
-      end
+      @report.findings.map { |finding| create_vulnerability_finding(finding).id }.uniq
     end
 
-    def create_vulnerability_finding(occurrence)
-      vulnerability_params = occurrence.to_hash.except(:compare_key, :identifiers, :location, :scanner)
-      vulnerability_finding = create_or_find_vulnerability_finding(occurrence, vulnerability_params)
+    def mark_as_resolved_except(vulnerability_ids)
+      project.vulnerabilities
+             .with_report_types(report.type)
+             .id_not_in(vulnerability_ids)
+             .update_all(resolved_on_default_branch: true)
+    end
 
-      update_vulnerability_scanner(occurrence)
+    def create_vulnerability_finding(finding)
+      vulnerability_params = finding.to_hash.except(:compare_key, :identifiers, :location, :scanner)
+      vulnerability_finding = create_or_find_vulnerability_finding(finding, vulnerability_params)
+
+      update_vulnerability_scanner(finding)
 
       update_vulnerability_finding(vulnerability_finding, vulnerability_params)
 
-      occurrence.identifiers.map do |identifier|
+      finding.identifiers.map do |identifier|
         create_or_update_vulnerability_identifier_object(vulnerability_finding, identifier)
       end
 
@@ -53,13 +59,13 @@ module Security
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def create_or_find_vulnerability_finding(occurrence, create_params)
-      return if occurrence.scanner.blank?
+    def create_or_find_vulnerability_finding(finding, create_params)
+      return if finding.scanner.blank?
 
       find_params = {
-        scanner: scanners_objects[occurrence.scanner.key],
-        primary_identifier: identifiers_objects[occurrence.primary_identifier.key],
-        location_fingerprint: occurrence.location.fingerprint
+        scanner: scanners_objects[finding.scanner.key],
+        primary_identifier: identifiers_objects[finding.primary_identifier.key],
+        location_fingerprint: finding.location.fingerprint
       }
 
       begin
@@ -74,11 +80,11 @@ module Security
       end
     end
 
-    def update_vulnerability_scanner(occurrence)
-      return if occurrence.scanner.blank?
+    def update_vulnerability_scanner(finding)
+      return if finding.scanner.blank?
 
-      scanner = scanners_objects[occurrence.scanner.key]
-      scanner.update!(occurrence.scanner.to_hash)
+      scanner = scanners_objects[finding.scanner.key]
+      scanner.update!(finding.scanner.to_hash)
     end
 
     def update_vulnerability_finding(vulnerability_finding, update_params)
@@ -100,7 +106,7 @@ module Security
 
     def create_vulnerability(vulnerability_finding, pipeline)
       if vulnerability_finding.vulnerability_id
-        Vulnerabilities::UpdateService.new(vulnerability_finding.project, pipeline.user, finding: vulnerability_finding).execute
+        Vulnerabilities::UpdateService.new(vulnerability_finding.project, pipeline.user, finding: vulnerability_finding, resolved_on_default_branch: false).execute
       else
         Vulnerabilities::CreateService.new(vulnerability_finding.project, pipeline.user, finding_id: vulnerability_finding.id).execute
       end

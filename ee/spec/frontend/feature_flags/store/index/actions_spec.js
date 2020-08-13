@@ -22,6 +22,7 @@ import {
   fetchUserLists,
   deleteUserList,
   receiveDeleteUserListError,
+  clearAlert,
 } from 'ee/feature_flags/store/modules/index/actions';
 import { mapToScopesViewModel } from 'ee/feature_flags/store/modules/helpers';
 import state from 'ee/feature_flags/store/modules/index/state';
@@ -547,7 +548,7 @@ describe('Feature flags actions', () => {
 
     describe('error', () => {
       beforeEach(() => {
-        Api.deleteFeatureFlagUserList.mockRejectedValue();
+        Api.deleteFeatureFlagUserList.mockRejectedValue({ response: { data: 'some error' } });
       });
 
       it('should dispatch receiveDeleteUserListError', done => {
@@ -558,20 +559,44 @@ describe('Feature flags actions', () => {
           [],
           [
             { type: 'requestDeleteUserList', payload: userList },
-            { type: 'receiveDeleteUserListError', payload: userList },
+            {
+              type: 'receiveDeleteUserListError',
+              payload: { list: userList, error: 'some error' },
+            },
           ],
           done,
         );
       });
     });
   });
+
   describe('receiveDeleteUserListError', () => {
     it('should commit RECEIVE_DELETE_USER_LIST_ERROR with the given list', done => {
       testAction(
         receiveDeleteUserListError,
-        userList,
+        { list: userList, error: 'mock error' },
         mockedState,
-        [{ type: 'RECEIVE_DELETE_USER_LIST_ERROR', payload: userList }],
+        [
+          {
+            type: 'RECEIVE_DELETE_USER_LIST_ERROR',
+            payload: { list: userList, error: 'mock error' },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('clearAlert', () => {
+    it('should commit RECEIVE_CLEAR_ALERT', done => {
+      const alertIndex = 3;
+
+      testAction(
+        clearAlert,
+        alertIndex,
+        mockedState,
+        [{ type: 'RECEIVE_CLEAR_ALERT', payload: alertIndex }],
         [],
         done,
       );

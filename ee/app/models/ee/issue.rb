@@ -25,6 +25,9 @@ module EE
         issue_ids = EpicIssue.where(epic_id: epics).select(:issue_id)
         id_in(issue_ids)
       end
+      scope :no_iteration, -> { where(sprint_id: nil) }
+      scope :any_iteration, -> { where.not(sprint_id: nil) }
+      scope :in_iterations, ->(iterations) { where(sprint_id: iterations) }
       scope :on_status_page, -> do
         joins(project: :status_page_setting)
         .where(status_page_settings: { enabled: true })
@@ -33,6 +36,12 @@ module EE
       end
       scope :counts_by_health_status, -> { reorder(nil).group(:health_status).count }
       scope :with_health_status, -> { where.not(health_status: nil) }
+      scope :distinct_epic_ids, -> do
+        epic_ids = except(:order, :select).joins(:epic_issue).reselect('epic_issues.epic_id').distinct
+        epic_ids = epic_ids.group('epic_issues.epic_id') if epic_ids.group_values.present?
+
+        epic_ids
+      end
 
       has_one :epic_issue
       has_one :epic, through: :epic_issue
@@ -205,6 +214,12 @@ module EE
       def weight_options
         [WEIGHT_NONE] + WEIGHT_RANGE.to_a
       end
+    end
+
+    def update_blocking_issues_count!
+      blocking_count = IssueLink.blocking_issues_count_for(self)
+
+      update!(blocking_issues_count: blocking_count)
     end
 
     private

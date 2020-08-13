@@ -20,7 +20,6 @@ import ClustersService from './services/clusters_service';
 import ClustersStore from './stores/clusters_store';
 import Applications from './components/applications.vue';
 import RemoveClusterConfirmation from './components/remove_cluster_confirmation.vue';
-import setupToggleButtons from '../toggle_buttons';
 import initProjectSelectDropdown from '~/project_select';
 import initServerlessSurveyBanner from '~/serverless/survey_banner';
 
@@ -68,6 +67,7 @@ export default class Clusters {
       deployBoardsHelpPath,
       cloudRunHelpPath,
       clusterId,
+      ciliumHelpPath,
     } = document.querySelector('.js-edit-cluster-form').dataset;
 
     this.clusterId = clusterId;
@@ -84,6 +84,7 @@ export default class Clusters {
       clustersHelpPath,
       deployBoardsHelpPath,
       cloudRunHelpPath,
+      ciliumHelpPath,
     );
     this.store.setManagePrometheusPath(managePrometheusPath);
     this.store.updateStatus(clusterStatus);
@@ -128,10 +129,6 @@ export default class Clusters {
     Clusters.initDismissableCallout();
     initSettingsPanels();
 
-    const toggleButtonsContainer = document.querySelector('.js-cluster-enable-toggle-area');
-    if (toggleButtonsContainer) {
-      setupToggleButtons(toggleButtonsContainer);
-    }
     this.initApplications(clusterType);
     this.initEnvironments();
 
@@ -184,6 +181,7 @@ export default class Clusters {
             providerType: this.state.providerType,
             preInstalledKnative: this.state.preInstalledKnative,
             rbac: this.state.rbac,
+            ciliumHelpPath: this.state.ciliumHelpPath,
           },
         });
       },

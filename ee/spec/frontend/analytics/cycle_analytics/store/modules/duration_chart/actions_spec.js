@@ -15,17 +15,22 @@ import {
   transformedDurationData,
   transformedDurationMedianData,
   endpoints,
+  valueStreams,
 } from '../../../mock_data';
 import { shouldFlashAMessage } from '../../../helpers';
 
 const selectedGroup = { fullPath: group.path };
 const [stage1, stage2] = stages;
+const hiddenStage = { ...stage1, hidden: true, id: 3, slug: 3 };
+const activeStages = [stage1, stage2];
+const [selectedValueStream] = valueStreams;
 
 const rootState = {
   startDate,
   endDate,
-  stages: [stage1, stage2],
+  stages: [...activeStages, hiddenStage],
   selectedGroup,
+  selectedValueStream,
   featureFlags: {
     hasDurationChart: true,
     hasDurationChartMedian: true,
@@ -33,8 +38,15 @@ const rootState = {
 };
 
 describe('DurationChart actions', () => {
-  let state;
   let mock;
+  const state = {
+    ...rootState,
+    ...getters,
+    ...rootGetters,
+    activeStages,
+    currentGroupPath: () => selectedGroup.fullPath,
+    currentValueStreamId: () => selectedValueStream.id,
+  };
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
@@ -49,59 +61,62 @@ describe('DurationChart actions', () => {
       mock.onGet(endpoints.durationData).reply(200, [...rawDurationData]);
     });
 
-    it("dispatches the 'receiveDurationDataSuccess' action on success", () => {
-      const dispatch = jest.fn();
+    it("dispatches the 'requestDurationData' and 'receiveDurationDataSuccess' actions on success", () => {
+      return testAction(
+        actions.fetchDurationData,
+        null,
+        state,
+        [],
+        [
+          { type: 'requestDurationData' },
+          {
+            type: 'receiveDurationDataSuccess',
+            payload: transformedDurationData,
+          },
+        ],
+      );
+    });
 
+    it('does not request hidden stages', () => {
+      const dispatch = jest.fn();
       return actions
         .fetchDurationData({
           dispatch,
           rootState,
-          rootGetters,
+          rootGetters: {
+            ...rootGetters,
+            activeStages,
+          },
         })
         .then(() => {
-          expect(dispatch).toHaveBeenCalledWith(
-            'receiveDurationDataSuccess',
-            transformedDurationData,
+          const requestedUrls = mock.history.get.map(({ url }) => url);
+          expect(requestedUrls).not.toContain(
+            `/groups/foo/-/analytics/value_stream_analytics/stages/${hiddenStage.id}/duration_chart`,
           );
         });
     });
 
-    it("dispatches the 'requestDurationData' action", () => {
-      const dispatch = jest.fn();
+    describe('receiveDurationDataError', () => {
+      beforeEach(() => {
+        mock.onGet(endpoints.durationData).reply(404);
+      });
 
-      return actions
-        .fetchDurationData({
-          dispatch,
-          rootState,
-          rootGetters,
-        })
-        .then(() => {
-          expect(dispatch).toHaveBeenNthCalledWith(1, 'requestDurationData');
-        });
-    });
+      it("dispatches the 'receiveDurationDataError' action when there is an error", () => {
+        const dispatch = jest.fn();
 
-    it("dispatches the 'receiveDurationDataError' action when there is an error", () => {
-      const brokenRootState = {
-        ...rootState,
-        stages: [
-          {
-            id: 'oops',
-          },
-        ],
-      };
-
-      const dispatch = jest.fn();
-
-      return actions
-        .fetchDurationData({
-          dispatch,
-          getters,
-          rootState: brokenRootState,
-          rootGetters,
-        })
-        .then(() => {
-          expect(dispatch).toHaveBeenCalledWith('receiveDurationDataError');
-        });
+        return actions
+          .fetchDurationData({
+            dispatch,
+            rootState,
+            rootGetters: {
+              ...rootGetters,
+              activeStages,
+            },
+          })
+          .then(() => {
+            expect(dispatch).toHaveBeenCalledWith('receiveDurationDataError');
+          });
+      });
     });
   });
 
@@ -292,42 +307,41 @@ describe('DurationChart actions', () => {
     });
 
     it('dispatches the receiveDurationMedianDataSuccess action on success', () => {
-      const dispatch = jest.fn();
-
-      return actions
-        .fetchDurationMedianData({
-          dispatch,
-          rootState,
-          rootGetters,
-        })
-        .then(() => {
-          expect(dispatch).toHaveBeenCalledWith(
-            'receiveDurationMedianDataSuccess',
-            transformedDurationMedianData,
-          );
-        });
-    });
-
-    it('dispatches the receiveDurationMedianDataError action when there is an error', () => {
-      const brokenRootState = {
-        ...rootState,
-        stages: [
+      return testAction(
+        actions.fetchDurationMedianData,
+        null,
+        state,
+        [],
+        [
           {
-            id: 'oops',
+            type: 'receiveDurationMedianDataSuccess',
+            payload: transformedDurationMedianData,
           },
         ],
-      };
-      const dispatch = jest.fn();
+      );
+    });
 
-      return actions
-        .fetchDurationMedianData({
-          dispatch,
-          rootState: brokenRootState,
-          rootGetters,
-        })
-        .then(() => {
-          expect(dispatch).toHaveBeenCalledWith('receiveDurationMedianDataError');
-        });
+    describe('receiveDurationMedianDataError', () => {
+      beforeEach(() => {
+        mock.onGet(endpoints.durationData).reply(404);
+      });
+
+      it('dispatches the receiveDurationMedianDataError action when there is an error', () => {
+        const dispatch = jest.fn();
+        return actions
+          .fetchDurationMedianData({
+            dispatch,
+            rootState,
+            rootGetters: { ...rootGetters, activeStages },
+          })
+          .then(() => {
+            const requestedUrls = mock.history.get.map(({ url }) => url);
+            expect(requestedUrls).not.toContain(
+              `/groups/foo/-/analytics/value_stream_analytics/stages/${hiddenStage.id}/duration_chart`,
+            );
+            expect(dispatch).toHaveBeenCalledWith('receiveDurationMedianDataError');
+          });
+      });
     });
   });
 

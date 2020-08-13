@@ -6,17 +6,33 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        field :iteration, ::Types::IterationType,
+              null: true,
+              resolve: -> (_obj, args, _ctx) { ::GitlabSchema.find_by_gid(args[:id]) },
+              description: 'Find an iteration' do
+          argument :id, ::Types::GlobalIDType[Iteration],
+                   required: true,
+                   description: 'Find an iteration by its ID'
+        end
+
         field :vulnerabilities,
               ::Types::VulnerabilityType.connection_type,
               null: true,
               description: "Vulnerabilities reported on projects on the current user's instance security dashboard",
               resolver: ::Resolvers::VulnerabilitiesResolver
 
+        field :vulnerabilities_count_by_day,
+              ::Types::VulnerabilitiesCountByDayType.connection_type,
+              null: true,
+              description: "Number of vulnerabilities per day for the projects on the current user's instance security dashboard",
+              resolver: ::Resolvers::VulnerabilitiesCountPerDayResolver
+
         field :vulnerabilities_count_by_day_and_severity,
               ::Types::VulnerabilitiesCountByDayAndSeverityType.connection_type,
               null: true,
               description: "Number of vulnerabilities per severity level, per day, for the projects on the current user's instance security dashboard",
-              resolver: ::Resolvers::VulnerabilitiesHistoryResolver
+              resolver: ::Resolvers::VulnerabilitiesHistoryResolver,
+              deprecated: { reason: 'Use `vulnerabilitiesCountByDay`', milestone: '13.3' }
 
         field :geo_node, ::Types::Geo::GeoNodeType,
               null: true,

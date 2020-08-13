@@ -129,6 +129,57 @@ RSpec.describe Issue do
           expect(described_class.in_epics([epic1])).to eq [epic_issue1.issue]
         end
       end
+
+      describe '.distinct_epic_ids' do
+        it 'returns distinct epic ids' do
+          expect(described_class.distinct_epic_ids.map(&:epic_id)).to match_array([epic1.id, epic2.id])
+        end
+
+        context 'when issues are grouped by labels' do
+          let_it_be(:label_link1) { create(:label_link, target: epic_issue1.issue) }
+          let_it_be(:label_link2) { create(:label_link, target: epic_issue1.issue) }
+
+          it 'respects query grouping and returns distinct epic ids' do
+            ids = described_class.with_label(
+              [label_link1.label.title, label_link2.label.title]
+            ).distinct_epic_ids.map(&:epic_id)
+            expect(ids).to eq([epic1.id])
+          end
+        end
+      end
+    end
+
+    context 'iterations' do
+      let_it_be(:iteration1) { create(:iteration) }
+      let_it_be(:iteration2) { create(:iteration) }
+      let_it_be(:iteration1_issue) { create(:issue, iteration: iteration1) }
+      let_it_be(:iteration2_issue) { create(:issue, iteration: iteration2) }
+      let_it_be(:issue_no_iteration) { create(:issue) }
+
+      before do
+        stub_licensed_features(iterations: true)
+      end
+
+      describe '.no_iteration' do
+        it 'returns only issues without an iteration assigned' do
+          expect(described_class.count).to eq 3
+          expect(described_class.no_iteration).to eq [issue_no_iteration]
+        end
+      end
+
+      describe '.any_iteration' do
+        it 'returns only issues with an iteration assigned' do
+          expect(described_class.count).to eq 3
+          expect(described_class.any_iteration).to contain_exactly(iteration1_issue, iteration2_issue)
+        end
+      end
+
+      describe '.in_iterations' do
+        it 'returns only issues in selected iterations' do
+          expect(described_class.count).to eq 3
+          expect(described_class.in_iterations([iteration1])).to eq [iteration1_issue]
+        end
+      end
     end
   end
 
@@ -702,6 +753,23 @@ RSpec.describe Issue do
         group.add_developer(user)
 
         expect(subject).to be_falsey
+      end
+    end
+
+    describe '#update_blocking_issues_count' do
+      it 'updates blocking issues count' do
+        issue = create(:issue, project: project)
+        blocked_issue_1 = create(:issue, project: project)
+        blocked_issue_2 = create(:issue, project: project)
+        blocked_issue_3 = create(:issue, project: project)
+        create(:issue_link, source: issue, target: blocked_issue_1, link_type: IssueLink::TYPE_BLOCKS)
+        create(:issue_link, source: blocked_issue_2, target: issue, link_type: IssueLink::TYPE_IS_BLOCKED_BY)
+        create(:issue_link, source: issue, target: blocked_issue_3, link_type: IssueLink::TYPE_BLOCKS)
+        # Set to 0 for proper testing, this is being set by IssueLink callbacks.
+        issue.update(blocking_issues_count: 0)
+
+        expect { issue.update_blocking_issues_count! }
+          .to change { issue.blocking_issues_count }.from(0).to(3)
       end
     end
   end

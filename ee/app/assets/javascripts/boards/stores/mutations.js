@@ -11,9 +11,6 @@ export default {
   [mutationTypes.SET_SHOW_LABELS]: (state, val) => {
     state.isShowingLabels = val;
   },
-  [mutationTypes.SET_ACTIVE_LIST_ID]: (state, id) => {
-    state.activeListId = id;
-  },
 
   [mutationTypes.REQUEST_AVAILABLE_BOARDS]: () => {
     notImplemented();
@@ -72,8 +69,8 @@ export default {
     state.epicsSwimlanesFetchInProgress = true;
   },
 
-  [mutationTypes.RECEIVE_SWIMLANES_SUCCESS]: (state, swimlanes) => {
-    state.epicsSwimlanes = swimlanes;
+  [mutationTypes.RECEIVE_BOARD_LISTS_SUCCESS]: (state, boardLists) => {
+    state.boardLists = boardLists;
     state.epicsSwimlanesFetchInProgress = false;
   },
 

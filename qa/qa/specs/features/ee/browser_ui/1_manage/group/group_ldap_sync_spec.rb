@@ -58,6 +58,7 @@ module QA
             }
           ]
         end
+
         let(:owner_user) { 'enguser1' }
         let(:sync_users) { ['ENG User 2', 'ENG User 3'] }
 
@@ -108,6 +109,7 @@ module QA
             }
           ]
         end
+
         let(:owner_user) { 'hruser1' }
         let(:sync_users) { ['HR User 2', 'HR User 3'] }
 

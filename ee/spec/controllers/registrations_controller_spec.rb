@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe RegistrationsController do
+  let_it_be(:user) { create(:user) }
+
   describe '#create' do
     context 'when the user opted-in' do
       let(:user_params) { { user: attributes_for(:user, email_opted_in: '1') } }
@@ -46,7 +48,7 @@ RSpec.describe RegistrationsController do
     subject { get :welcome }
 
     before do
-      sign_in(create(:user))
+      sign_in(user)
     end
 
     it 'renders the checkout layout' do
@@ -56,7 +58,7 @@ RSpec.describe RegistrationsController do
 
   describe '#update_registration' do
     before do
-      sign_in(create(:user))
+      sign_in(user)
     end
 
     subject(:update_registration) { patch :update_registration, params: { user: { role: 'software_developer', setup_for_company: 'false' } } }
@@ -87,10 +89,10 @@ RSpec.describe RegistrationsController do
       end
     end
 
-    describe 'tracking for the onboarding issues experiment' do
+    describe 'recording experiment user and track for the onboarding issues experiment' do
       using RSpec::Parameterized::TableSyntax
 
-      where(:on_gitlab_com, :experiment_enabled, :in_subscription_flow, :in_invitation_flow, :experiment_enabled_for_user, :expected_tracking) do
+      where(:on_gitlab_com, :experiment_enabled, :in_subscription_flow, :in_invitation_flow, :experiment_enabled_for_user, :experiment_group) do
         false | false | false | false | true  | nil
         false | false | false | true  | true  | nil
         false | false | true  | false | true  | nil
@@ -103,8 +105,8 @@ RSpec.describe RegistrationsController do
         true  | false | false | true  | true  | nil
         true  | false | true  | false | true  | nil
         true  | false | true  | true  | true  | nil
-        true  | true  | false | false | true  | 'experimental_group'
-        true  | true  | false | false | false | 'control_group'
+        true  | true  | false | false | true  | :experimental
+        true  | true  | false | false | false | :control
         true  | true  | false | true  | true  | nil
         true  | true  | true  | false | true  | nil
         true  | true  | true  | true  | true  | nil
@@ -119,13 +121,23 @@ RSpec.describe RegistrationsController do
           stub_experiment_for_user(onboarding_issues: experiment_enabled_for_user)
         end
 
-        it 'tracks when appropriate' do
-          if expected_tracking
+        it 'adds a user to experiments when appropriate' do
+          if experiment_group
+            expect(::Experiment).to receive(:add_user).with(:onboarding_issues, experiment_group, user)
+          else
+            expect(::Experiment).not_to receive(:add_user)
+          end
+
+          update_registration
+        end
+
+        it 'tracks a signed_up event when appropriate' do
+          if experiment_group
             expect(Gitlab::Tracking).to receive(:event).with(
               'Growth::Conversion::Experiment::OnboardingIssues',
               'signed_up',
               label: anything,
-              property: expected_tracking
+              property: "#{experiment_group}_group"
             )
           else
             expect(Gitlab::Tracking).not_to receive(:event)

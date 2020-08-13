@@ -1,6 +1,7 @@
 # Services API
 
->**Note:** This API requires an access token with Maintainer or Owner permissions
+NOTE: **Note:**
+This API requires an access token with Maintainer or Owner permissions
 
 ## List all active services
 
@@ -229,8 +230,8 @@ Parameters:
 | Parameter | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `token` | string | true | Buildkite project GitLab token |
-| `project_url` | string | true | `https://buildkite.com/example/project` |
-| `enable_ssl_verification` | boolean | false | Enable SSL verification |
+| `project_url` | string | true | Pipeline URL. For example, `https://buildkite.com/example/pipeline` |
+| `enable_ssl_verification` | boolean | false | DEPRECATED: This parameter has no effect since SSL verification will always be enabled |
 | `push_events` | boolean | false | Enable notifications for push events |
 
 ### Delete Buildkite service
@@ -496,12 +497,6 @@ GET /projects/:id/services/emails-on-push
 ## Confluence service
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/220934) in GitLab 13.2.
-> - It's deployed behind a feature flag, disabled by default.
-> - It's disabled on GitLab.com.
-> - It's able to be enabled or disabled per-project
-> - It's not recommended for production use.
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to
-    [enable it](#enable-or-disable-the-confluence-service-core-only). **(CORE ONLY)**
 
 Replaces the link to the internal wiki with a link to a Confluence Cloud Workspace.
 
@@ -533,31 +528,6 @@ Get Confluence service settings for a project.
 
 ```plaintext
 GET /projects/:id/services/confluence
-```
-
-### Enable or disable the Confluence service **(CORE ONLY)**
-
-The Confluence service is under development and not ready for production use. It is
-deployed behind a feature flag that is **disabled by default**.
-[GitLab administrators with access to the GitLab Rails console](../administration/feature_flags.md)
-can enable it for your instance. The Confluence service can be enabled or disabled per-project
-
-To enable it:
-
-```ruby
-# Instance-wide
-Feature.enable(:confluence_integration)
-# or by project
-Feature.enable(:confluence_integration, Project.find(<project id>))
-```
-
-To disable it:
-
-```ruby
-# Instance-wide
-Feature.disable(:confluence_integration)
-# or by project
-Feature.disable(:confluence_integration, Project.find(<project id>))
 ```
 
 ## External Wiki
@@ -667,9 +637,9 @@ GET /projects/:id/services/github
 
 ## Hangouts Chat
 
-Google GSuite team collaboration tool.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20290) in GitLab 11.2.
 
->**Note:** This service was [introduced in v11.2](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/20290)
+Google GSuite team collaboration tool.
 
 ### Create/Edit Hangouts Chat service
 
@@ -679,7 +649,8 @@ Set Hangouts Chat service for a project.
 PUT /projects/:id/services/hangouts-chat
 ```
 
->**Note:** Specific event parameters (for example, `push_events` flag) were [introduced in v10.4](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/11435)
+NOTE: **Note:**
+Specific event parameters (for example, `push_events` flag) were [introduced in v10.4](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/11435)
 
 Parameters:
 
@@ -1182,7 +1153,8 @@ Set Slack service for a project.
 PUT /projects/:id/services/slack
 ```
 
->**Note:** Specific event parameters (for example, `push_events` flag and `push_channel`) were [introduced in v10.4](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/11435)
+NOTE: **Note:**
+Specific event parameters (for example, `push_events` flag and `push_channel`) were [introduced in v10.4](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/11435)
 
 Parameters:
 
@@ -1291,7 +1263,8 @@ Set Mattermost service for a project.
 PUT /projects/:id/services/mattermost
 ```
 
->**Note:** Specific event parameters (for example, `push_events` flag and `push_channel`) were [introduced in v10.4](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/11435)
+NOTE: **Note:**
+Specific event parameters (for example, `push_events` flag and `push_channel`) were [introduced in v10.4](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/11435)
 
 Parameters:
 

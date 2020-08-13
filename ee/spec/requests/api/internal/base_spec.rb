@@ -208,6 +208,7 @@ RSpec.describe API::Internal::Base do
           protocol: 'ssh'
         }
       end
+
       let(:allowed_ip) { '150.168.0.1' }
 
       before do

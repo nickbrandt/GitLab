@@ -32,7 +32,7 @@ during jobs.
 ## Runner Configuration
 
 There are three methods to enable the use of `docker build` and `docker run`
-during jobs; each with their own tradeoffs.
+during jobs, each with their own tradeoffs.
 
 An alternative to using `docker build` is to [use kaniko](using_kaniko.md).
 This avoids having to execute Runner in privileged mode.
@@ -61,8 +61,8 @@ GitLab Runner then executes job scripts as the `gitlab-runner` user.
 
 1. Install Docker Engine on server.
 
-   For more information how to install Docker Engine on different systems
-   checkout the [Supported installations](https://docs.docker.com/engine/installation/).
+   For more information how to install Docker Engine on different systems,
+   check out the [Supported installations](https://docs.docker.com/engine/installation/).
 
 1. Add `gitlab-runner` user to `docker` group:
 
@@ -118,13 +118,13 @@ not without its own challenges:
 
 - When using Docker-in-Docker, each job is in a clean environment without the past
   history. Concurrent jobs work fine because every build gets its own
-  instance of Docker engine so they won't conflict with each other. But this
+  instance of Docker engine so they don't conflict with each other. But this
   also means that jobs can be slower because there's no caching of layers.
 - By default, Docker 17.09 and higher uses `--storage-driver overlay2` which is
   the recommended storage driver. See [Using the overlayfs driver](#use-the-overlayfs-driver)
   for details.
-- Since the `docker:19.03.11-dind` container and the Runner container don't share their
-  root filesystem, the job's working directory can be used as a mount point for
+- Since the `docker:19.03.12-dind` container and the Runner container don't share their
+  root file system, the job's working directory can be used as a mount point for
   child containers. For example, if you have files you want to share with a
   child container, you may create a subdirectory under `/builds/$CI_PROJECT_PATH`
   and use it as your mount point (for a more thorough explanation, check [issue
@@ -142,14 +142,14 @@ not without its own challenges:
 An example project using this approach can be found here: <https://gitlab.com/gitlab-examples/docker>.
 
 In the examples below, we are using Docker images tags to specify a
-specific version, such as `docker:19.03.11`. If tags like `docker:stable`
-are used, you have no control over what version is going to be used and this
-can lead to unpredictable behavior, especially when new versions are
+specific version, such as `docker:19.03.12`. If tags like `docker:stable`
+are used, you have no control over what version is used. This can lead to
+unpredictable behavior, especially when new versions are
 released.
 
 #### TLS enabled
 
-NOTE: **Note**
+NOTE: **Note:**
 Requires GitLab Runner 11.11 or later, but is not supported if GitLab
 Runner is installed using the [Helm
 chart](https://docs.gitlab.com/runner/install/kubernetes.html). See the
@@ -158,7 +158,7 @@ issue](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/issues/83) for
 details.
 
 The Docker daemon supports connection over TLS and it's done by default
-for Docker 19.03.11 or higher. This is the **suggested** way to use the
+for Docker 19.03.12 or higher. This is the **suggested** way to use the
 Docker-in-Docker service and
 [GitLab.com Shared Runners](../../user/gitlab_com/index.md#shared-runners)
 support this.
@@ -174,23 +174,23 @@ support this.
      --registration-token REGISTRATION_TOKEN \
      --executor docker \
      --description "My Docker Runner" \
-     --docker-image "docker:19.03.11" \
+     --docker-image "docker:19.03.12" \
      --docker-privileged \
      --docker-volumes "/certs/client"
    ```
 
-   The above command will register a new Runner to use the special
-   `docker:19.03.11` image, which is provided by Docker. **Notice that it's
+   The above command registers a new Runner to use the special
+   `docker:19.03.12` image, which is provided by Docker. **Notice that it's
    using the `privileged` mode to start the build and service
    containers.** If you want to use [Docker-in-Docker](https://www.docker.com/blog/docker-can-now-run-within-docker/) mode, you always
    have to use `privileged = true` in your Docker containers.
 
-   This will also mount `/certs/client` for the service and build
+   This also mounts `/certs/client` for the service and build
    container, which is needed for the Docker client to use the
-   certificates inside of that directory. For more information how
-   Docker with TLS works check <https://hub.docker.com/_/docker/#tls>.
+   certificates inside of that directory. For more information on how
+   Docker with TLS works, check <https://hub.docker.com/_/docker/#tls>.
 
-   The above command will create a `config.toml` entry similar to this:
+   The above command creates a `config.toml` entry similar to this:
 
    ```toml
    [[runners]]
@@ -199,7 +199,7 @@ support this.
      executor = "docker"
      [runners.docker]
        tls_verify = false
-       image = "docker:19.03.11"
+       image = "docker:19.03.12"
        privileged = true
        disable_cache = false
        volumes = ["/certs/client", "/cache"]
@@ -209,13 +209,13 @@ support this.
    ```
 
 1. You can now use `docker` in the build script (note the inclusion of the
-   `docker:19.03.11-dind` service):
+   `docker:19.03.12-dind` service):
 
    ```yaml
-   image: docker:19.03.11
+   image: docker:19.03.12
 
    variables:
-     # When using dind service, we need to instruct docker, to talk with
+     # When using dind service, we need to instruct docker to talk with
      # the daemon started inside of the service. The daemon is available
      # with a network connection instead of the default
      # /var/run/docker.sock socket. Docker 19.03 does this automatically
@@ -237,7 +237,7 @@ support this.
      DOCKER_TLS_CERTDIR: "/certs"
 
    services:
-     - docker:19.03.11-dind
+     - docker:19.03.12-dind
 
    before_script:
      - docker info
@@ -264,7 +264,7 @@ Assuming that the Runner `config.toml` is similar to:
   executor = "docker"
   [runners.docker]
     tls_verify = false
-    image = "docker:19.03.11"
+    image = "docker:19.03.12"
     privileged = true
     disable_cache = false
     volumes = ["/cache"]
@@ -274,10 +274,10 @@ Assuming that the Runner `config.toml` is similar to:
 ```
 
 You can now use `docker` in the build script (note the inclusion of the
-`docker:19.03.11-dind` service):
+`docker:19.03.12-dind` service):
 
 ```yaml
-image: docker:19.03.11
+image: docker:19.03.12
 
 variables:
   # When using dind service we need to instruct docker, to talk with the
@@ -298,7 +298,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 services:
-  - docker:19.03.11-dind
+  - docker:19.03.12-dind
 
 before_script:
   - docker info
@@ -318,7 +318,7 @@ container so that Docker is available in the context of that image.
 NOTE: **Note:**
 If you bind the Docker socket [when using GitLab Runner 11.11 or
 newer](https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/1261),
-you can no longer use `docker:19.03.11-dind` as a service because volume bindings
+you can no longer use `docker:19.03.12-dind` as a service because volume bindings
 are done to the services as well, making these incompatible.
 
 In order to do that, follow the steps:
@@ -333,17 +333,17 @@ In order to do that, follow the steps:
      --registration-token REGISTRATION_TOKEN \
      --executor docker \
      --description "My Docker Runner" \
-     --docker-image "docker:19.03.11" \
+     --docker-image "docker:19.03.12" \
      --docker-volumes /var/run/docker.sock:/var/run/docker.sock
    ```
 
-   The above command will register a new Runner to use the special
-   `docker:19.03.11` image which is provided by Docker. **Notice that it's using
+   The above command registers a new Runner to use the special
+   `docker:19.03.12` image which is provided by Docker. **Notice that it's using
    the Docker daemon of the Runner itself, and any containers spawned by Docker
-   commands will be siblings of the Runner rather than children of the Runner.**
+   commands are siblings of the Runner rather than children of the Runner.**
    This may have complications and limitations that are unsuitable for your workflow.
 
-   The above command will create a `config.toml` entry similar to this:
+   The above command creates a `config.toml` entry similar to this:
 
    ```toml
    [[runners]]
@@ -352,7 +352,7 @@ In order to do that, follow the steps:
      executor = "docker"
      [runners.docker]
        tls_verify = false
-       image = "docker:19.03.11"
+       image = "docker:19.03.12"
        privileged = false
        disable_cache = false
        volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
@@ -361,11 +361,11 @@ In order to do that, follow the steps:
    ```
 
 1. You can now use `docker` in the build script (note that you don't need to
-   include the `docker:19.03.11-dind` service as when using the Docker in Docker
+   include the `docker:19.03.12-dind` service as when using the Docker in Docker
    executor):
 
    ```yaml
-   image: docker:19.03.11
+   image: docker:19.03.12
 
    before_script:
      - docker info
@@ -387,7 +387,7 @@ aware of the following implications:
   containers.
 - Concurrent jobs may not work; if your tests
   create containers with specific names, they may conflict with each other.
-- Sharing files and directories from the source repo into containers may not
+- Sharing files and directories from the source repository into containers may not
   work as expected since volume mounting is done in the context of the host
   machine, not the build container. For example:
 
@@ -397,7 +397,7 @@ aware of the following implications:
 
 ## Making Docker-in-Docker builds faster with Docker layer caching
 
-When using Docker-in-Docker, Docker will download all layers of your image every
+When using Docker-in-Docker, Docker downloads all layers of your image every
 time you create a build. Recent versions of Docker (Docker 1.13 and above) can
 use a pre-existing image as a cache during the `docker build` step, considerably
 speeding up the build process.
@@ -419,10 +419,10 @@ any image that's used with the `--cache-from` argument must first be pulled
 Here's a `.gitlab-ci.yml` file showing how Docker caching can be used:
 
 ```yaml
-image: docker:19.03.11
+image: docker:19.03.12
 
 services:
-  - docker:19.03.11-dind
+  - docker:19.03.12-dind
 
 variables:
   # Use TLS https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
@@ -504,7 +504,7 @@ environment variable in the
 environment = ["DOCKER_DRIVER=overlay2"]
 ```
 
-If you're running multiple Runners you will have to modify all configuration files.
+If you're running multiple Runners, you have to modify all configuration files.
 
 NOTE: **Note:**
 Read more about the [Runner configuration](https://docs.gitlab.com/runner/configuration/)
@@ -523,7 +523,7 @@ This is a common error when you are using
 [Docker in Docker](#use-docker-in-docker-workflow-with-docker-executor)
 v19.03 or higher.
 
-This occurs because Docker starts on TLS automatically, so you need to do some set up.
+This occurs because Docker starts on TLS automatically, so you need to do some setup.
 If:
 
 - This is the first time setting it up, carefully read

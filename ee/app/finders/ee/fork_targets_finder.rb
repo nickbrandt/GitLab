@@ -11,14 +11,9 @@ module EE
       targets = super
 
       root_group = project.group&.root_ancestor
+      return targets unless root_group&.prevent_forking_outside_group?
 
-      return targets unless root_group&.saml_provider
-
-      if root_group.saml_provider.prohibited_outer_forks?
-        targets = targets.where(id: root_group.self_and_descendants)
-      end
-
-      targets
+      targets.where(id: root_group.self_and_descendants)
     end
     # rubocop: enable CodeReuse/ActiveRecord
   end

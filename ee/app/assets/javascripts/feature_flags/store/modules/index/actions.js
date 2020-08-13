@@ -72,14 +72,20 @@ export const deleteUserList = ({ state, dispatch }, list) => {
 
   return Api.deleteFeatureFlagUserList(state.projectId, list.iid)
     .then(() => dispatch('fetchUserLists'))
-    .catch(() => dispatch('receiveDeleteUserListError', list));
+    .catch(error =>
+      dispatch('receiveDeleteUserListError', {
+        list,
+        error: error?.response?.data ?? error,
+      }),
+    );
 };
 
 export const requestDeleteUserList = ({ commit }, list) =>
   commit(types.REQUEST_DELETE_USER_LIST, list);
 
-export const receiveDeleteUserListError = ({ commit }, list) =>
-  commit(types.RECEIVE_DELETE_USER_LIST_ERROR, list);
+export const receiveDeleteUserListError = ({ commit }, { error, list }) => {
+  commit(types.RECEIVE_DELETE_USER_LIST_ERROR, { error, list });
+};
 
 export const rotateInstanceId = ({ state, dispatch }) => {
   dispatch('requestRotateInstanceId');
@@ -96,5 +102,6 @@ export const receiveRotateInstanceIdSuccess = ({ commit }, response) =>
 export const receiveRotateInstanceIdError = ({ commit }) =>
   commit(types.RECEIVE_ROTATE_INSTANCE_ID_ERROR);
 
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
+export const clearAlert = ({ commit }, index) => {
+  commit(types.RECEIVE_CLEAR_ALERT, index);
+};

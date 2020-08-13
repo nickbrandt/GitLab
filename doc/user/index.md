@@ -1,4 +1,5 @@
 ---
+type: reference, index
 description: 'Read through the GitLab User documentation to learn how to use, configure, and customize GitLab and GitLab.com to your own needs.'
 ---
 
@@ -46,10 +47,10 @@ GitLab is a Git-based platform that integrates a great number of essential tools
 - Deploying personal and professional static websites with [GitLab Pages](project/pages/index.md).
 - Integrating with Docker by using [GitLab Container Registry](packages/container_registry/index.md).
 - Tracking the development lifecycle by using [GitLab Value Stream Analytics](project/cycle_analytics.md).
+- Provide support with [Service Desk](project/service_desk.md).
 
 With GitLab Enterprise Edition, you can also:
 
-- Provide support with [Service Desk](project/service_desk.md).
 - Improve collaboration with:
   - [Merge Request Approvals](project/merge_requests/merge_request_approvals.md). **(STARTER)**
   - [Multiple Assignees for Issues](project/issues/multiple_assignees_for_issues.md). **(STARTER)**

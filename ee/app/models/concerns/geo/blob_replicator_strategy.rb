@@ -13,27 +13,28 @@ module Geo
     end
 
     def handle_after_create_commit
+      return unless self.class.enabled?
+
       publish(:created, **created_params)
-
-      return unless Feature.enabled?(:geo_self_service_framework_replication, default_enabled: true)
-
       schedule_checksum_calculation if needs_checksum?
     end
 
     # Called by Gitlab::Geo::Replicator#consume
     def consume_event_created(**params)
-      return if excluded_by_selective_sync?
+      return unless in_replicables_for_geo_node?
 
       download
     end
 
     def handle_after_destroy
+      return unless self.class.enabled?
+
       publish(:deleted, **deleted_params)
     end
 
     # Called by Gitlab::Geo::Replicator#consume
     def consume_event_deleted(**params)
-      return if excluded_by_selective_sync?
+      return unless in_replicables_for_geo_node?
 
       replicate_destroy(params)
     end

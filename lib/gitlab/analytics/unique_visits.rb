@@ -3,7 +3,7 @@
 module Gitlab
   module Analytics
     class UniqueVisits
-      TARGET_IDS = Set[
+      ANALYTICS_IDS = Set[
         'g_analytics_contribution',
         'g_analytics_insights',
         'g_analytics_issues',
@@ -15,45 +15,65 @@ module Gitlab
         'p_analytics_insights',
         'p_analytics_issues',
         'p_analytics_repo',
-        'u_analytics_todos',
         'i_analytics_cohorts',
         'i_analytics_dev_ops_score'
+      ]
+
+      COMPLIANCE_IDS = Set[
+        'g_compliance_dashboard',
+        'g_compliance_audit_events',
+        'i_compliance_credential_inventory',
+        'i_compliance_audit_events'
       ].freeze
 
-      KEY_EXPIRY_LENGTH = 28.days
+      KEY_EXPIRY_LENGTH = 12.weeks
 
       def track_visit(visitor_id, target_id, time = Time.zone.now)
         target_key = key(target_id, time)
 
-        Gitlab::Redis::SharedState.with do |redis|
-          redis.multi do |multi|
-            multi.pfadd(target_key, visitor_id)
-            multi.expire(target_key, KEY_EXPIRY_LENGTH)
-          end
-        end
+        Gitlab::Redis::HLL.add(key: target_key, value: visitor_id, expiry: KEY_EXPIRY_LENGTH)
       end
 
-      def weekly_unique_visits_for_target(target_id, week_of: 7.days.ago)
-        Gitlab::Redis::SharedState.with do |redis|
-          redis.pfcount(key(target_id, week_of))
-        end
-      end
+      # Returns number of unique visitors for given targets in given time frame
+      #
+      # @param [String, Array[<String>]] targets ids of targets to count visits on. Special case for :any
+      # @param [ActiveSupport::TimeWithZone] start_week start of time frame
+      # @param [Integer] weeks time frame length in weeks
+      # @return [Integer] number of unique visitors
+      def unique_visits_for(targets:, start_week: 7.days.ago, weeks: 1)
+        target_ids = if targets == :analytics
+                       ANALYTICS_IDS
+                     elsif targets == :compliance
+                       COMPLIANCE_IDS
+                     else
+                       Array(targets)
+                     end
 
-      def weekly_unique_visits_for_any_target(week_of: 7.days.ago)
-        keys = TARGET_IDS.map { |target_id| key(target_id, week_of) }
+        timeframe_start = [start_week, weeks.weeks.ago].min
 
-        Gitlab::Redis::SharedState.with do |redis|
-          redis.pfcount(*keys)
-        end
+        redis_keys = keys(targets: target_ids, timeframe_start: timeframe_start, weeks: weeks)
+
+        Gitlab::Redis::HLL.count(keys: redis_keys)
       end
 
       private
 
       def key(target_id, time)
-        raise "Invalid target id #{target_id}" unless TARGET_IDS.include?(target_id.to_s)
+        target_ids = ANALYTICS_IDS + COMPLIANCE_IDS
+
+        raise "Invalid target id #{target_id}" unless target_ids.include?(target_id.to_s)
+
+        target_key = target_id.to_s.gsub('analytics', '{analytics}').gsub('compliance', '{compliance}')
 
         year_week = time.strftime('%G-%V')
-        "#{target_id}-{#{year_week}}"
+
+        "#{target_key}-#{year_week}"
+      end
+
+      def keys(targets:, timeframe_start:, weeks:)
+        (0..(weeks - 1)).map do |week_increment|
+          targets.map { |target_id| key(target_id, timeframe_start + week_increment * 7.days) }
+        end.flatten
       end
     end
   end

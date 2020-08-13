@@ -32,6 +32,17 @@ const findRadioInput = (inputs, value) => inputs.filter(input => input.element.v
 
 const findRadioInputs = wrapper => wrapper.findAll('[name="linked-issue-type-radio"]');
 
+const constructWrapper = props => {
+  return shallowMount(AddIssuableForm, {
+    propsData: {
+      inputValue: '',
+      pendingReferences: [],
+      pathIdSeparator,
+      ...props,
+    },
+  });
+};
+
 describe('AddIssuableForm', () => {
   let wrapper;
 
@@ -145,7 +156,7 @@ describe('AddIssuableForm', () => {
         wrapper = mount(AddIssuableForm, {
           propsData: {
             inputValue: '',
-            isLinkedIssueBlock: true,
+            showCategorizedIssues: true,
             issuableType: issuableTypesMap.ISSUE,
             pathIdSeparator,
             pendingReferences: [],
@@ -240,6 +251,42 @@ describe('AddIssuableForm', () => {
             done();
           });
         });
+      });
+    });
+  });
+
+  describe('computed', () => {
+    describe('transformedAutocompleteSources', () => {
+      const autoCompleteSources = {
+        issues: 'http://localhost/autocomplete/issues',
+        epics: 'http://localhost/autocomplete/epics',
+      };
+
+      it('returns autocomplete object', () => {
+        wrapper = constructWrapper({
+          autoCompleteSources,
+        });
+
+        expect(wrapper.vm.transformedAutocompleteSources).toBe(autoCompleteSources);
+
+        wrapper = constructWrapper({
+          autoCompleteSources,
+          confidential: false,
+        });
+
+        expect(wrapper.vm.transformedAutocompleteSources).toBe(autoCompleteSources);
+      });
+
+      it('returns autocomplete sources with query `confidential_only`, when it is confidential', () => {
+        wrapper = constructWrapper({
+          autoCompleteSources,
+          confidential: true,
+        });
+
+        const actualSources = wrapper.vm.transformedAutocompleteSources;
+
+        expect(actualSources.epics).toContain('?confidential_only=true');
+        expect(actualSources.issues).toContain('?confidential_only=true');
       });
     });
   });

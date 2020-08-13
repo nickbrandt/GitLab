@@ -48,11 +48,6 @@ export default {
     TrackEvent: TrackEventDirective,
   },
   props: {
-    externalDashboardUrl: {
-      type: String,
-      required: false,
-      default: '',
-    },
     hasMetrics: {
       type: Boolean,
       required: false,
@@ -69,10 +64,6 @@ export default {
       default: true,
     },
     documentationPath: {
-      type: String,
-      required: true,
-    },
-    addDashboardDocumentationPath: {
       type: String,
       required: true,
     },
@@ -161,7 +152,6 @@ export default {
     ...mapState('monitoringDashboard', [
       'dashboard',
       'emptyState',
-      'showEmptyState',
       'expandedPanel',
       'variables',
       'links',
@@ -169,6 +159,9 @@ export default {
       'hasDashboardValidationWarnings',
     ]),
     ...mapGetters('monitoringDashboard', ['selectedDashboard', 'getMetricStates']),
+    shouldShowEmptyState() {
+      return Boolean(this.emptyState);
+    },
     shouldShowVariablesSection() {
       return Boolean(this.variables.length);
     },
@@ -276,6 +269,14 @@ export default {
         return states[0];
       }
       return null;
+    },
+    /**
+     * Return true if the entire group is loading.
+     * @param {String} groupKey - Identifier for group
+     * @returns {boolean}
+     */
+    isGroupLoading(groupKey) {
+      return this.groupSingleEmptyState(groupKey) === metricStates.LOADING;
     },
     /**
      * A group should be not collapsed if any metric is loaded (OK)
@@ -399,22 +400,19 @@ export default {
       v-if="showHeader"
       ref="prometheusGraphsHeader"
       class="prometheus-graphs-header d-sm-flex flex-sm-wrap pt-2 pr-1 pb-0 pl-2 border-bottom bg-gray-light"
-      :add-dashboard-documentation-path="addDashboardDocumentationPath"
       :default-branch="defaultBranch"
       :rearrange-panels-available="rearrangePanelsAvailable"
       :custom-metrics-available="customMetricsAvailable"
       :custom-metrics-path="customMetricsPath"
       :validate-query-path="validateQueryPath"
-      :external-dashboard-url="externalDashboardUrl"
-      :has-metrics="hasMetrics"
       :is-rearranging-panels="isRearrangingPanels"
       :selected-time-range="selectedTimeRange"
       @dateTimePickerInvalid="onDateTimePickerInvalid"
       @setRearrangingPanels="onSetRearrangingPanels"
     />
-    <variables-section v-if="shouldShowVariablesSection && !showEmptyState" />
-    <links-section v-if="shouldShowLinksSection && !showEmptyState" />
-    <div v-if="!showEmptyState">
+    <template v-if="!shouldShowEmptyState">
+      <variables-section v-if="shouldShowVariablesSection" />
+      <links-section v-if="shouldShowLinksSection" />
       <dashboard-panel
         v-show="expandedPanel.panel"
         ref="expandedPanel"
@@ -449,6 +447,7 @@ export default {
           :key="`${groupData.group}.${groupData.priority}`"
           :name="groupData.group"
           :show-panels="showPanels"
+          :is-loading="isGroupLoading(groupData.key)"
           :collapse-group="collapseGroup(groupData.key)"
         >
           <vue-draggable
@@ -506,7 +505,7 @@ export default {
           </div>
         </graph-group>
       </div>
-    </div>
+    </template>
     <empty-state
       v-else
       :selected-state="emptyState"

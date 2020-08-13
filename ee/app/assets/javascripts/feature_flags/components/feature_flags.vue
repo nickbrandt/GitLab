@@ -2,13 +2,12 @@
 import { createNamespacedHelpers } from 'vuex';
 import { isEmpty } from 'lodash';
 import {
+  GlAlert,
+  GlButton,
   GlEmptyState,
   GlLoadingIcon,
-  GlDeprecatedButton,
   GlModalDirective,
   GlLink,
-  GlAlert,
-  GlSprintf,
 } from '@gitlab/ui';
 import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from '../constants';
 import FeatureFlagsTable from './feature_flags_table.vue';
@@ -34,12 +33,11 @@ export default {
     UserListsTable,
     NavigationTabs,
     TablePagination,
+    GlAlert,
+    GlButton,
     GlEmptyState,
     GlLoadingIcon,
-    GlDeprecatedButton,
     GlLink,
-    GlAlert,
-    GlSprintf,
     ConfigureFeatureFlagsModal,
   },
   directives: {
@@ -66,11 +64,11 @@ export default {
       type: String,
       required: true,
     },
-    featureFlagsAnchoredHelpPagePath: {
+    featureFlagsClientLibrariesHelpPagePath: {
       type: String,
       required: true,
     },
-    userListsApiDocPath: {
+    featureFlagsClientExampleHelpPagePath: {
       type: String,
       required: true,
     },
@@ -96,6 +94,11 @@ export default {
       required: false,
       default: '',
     },
+    newUserListPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -112,6 +115,7 @@ export default {
     ...mapState([
       FEATURE_FLAG_SCOPE,
       USER_LIST_SCOPE,
+      'alerts',
       'count',
       'pageInfo',
       'isLoading',
@@ -126,10 +130,6 @@ export default {
     },
     currentlyDisplayedData() {
       return this.dataForScope(this.scope);
-    },
-    shouldRenderTabs() {
-      /* Do not show tabs until after the first request to get the count */
-      return this.count[this.scope] !== undefined;
     },
     shouldRenderPagination() {
       return (
@@ -191,6 +191,7 @@ export default {
       'rotateInstanceId',
       'toggleFeatureFlag',
       'deleteUserList',
+      'clearAlert',
     ]),
     onChangeTab(scope) {
       this.scope = scope;
@@ -241,7 +242,8 @@ export default {
     <configure-feature-flags-modal
       v-if="canUserConfigure"
       :help-path="featureFlagsHelpPagePath"
-      :help-anchor="featureFlagsAnchoredHelpPagePath"
+      :help-client-libraries-path="featureFlagsClientLibrariesHelpPagePath"
+      :help-client-example-path="featureFlagsClientExampleHelpPagePath"
       :api-url="unleashApiUrl"
       :instance-id="instanceId"
       :is-rotating="isRotating"
@@ -250,44 +252,51 @@ export default {
       modal-id="configure-feature-flags"
       @token="rotateInstanceId()"
     />
-    <h3 class="page-title with-button">
-      {{ s__('FeatureFlags|Feature Flags') }}
-      <div class="pull-right">
-        <button
+    <div class="top-area">
+      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
+      <div class="nav-controls">
+        <gl-button
           v-if="canUserConfigure"
           v-gl-modal="'configure-feature-flags'"
-          type="button"
-          class="js-ff-configure gl-mr-3 btn-inverted btn btn-primary"
+          variant="info"
+          category="secondary"
+          data-qa-selector="configure_feature_flags_button"
+          data-testid="ff-configure-button"
+          class="gl-mr-3"
         >
           {{ s__('FeatureFlags|Configure') }}
-        </button>
+        </gl-button>
 
-        <gl-deprecated-button
+        <gl-button
+          v-if="newUserListPath"
+          :href="newUserListPath"
+          variant="success"
+          category="secondary"
+          class="gl-mr-3"
+          data-testid="ff-new-list-button"
+        >
+          {{ s__('FeatureFlags|New list') }}
+        </gl-button>
+
+        <gl-button
           v-if="hasNewPath"
           :href="newFeatureFlagPath"
           variant="success"
-          class="js-ff-new"
-          >{{ s__('FeatureFlags|New feature flag') }}</gl-deprecated-button
+          data-testid="ff-new-button"
         >
+          {{ s__('FeatureFlags|New feature flag') }}
+        </gl-button>
       </div>
-    </h3>
-    <gl-alert v-if="!isUserListAlertDismissed" @dismiss="isUserListAlertDismissed = true">
-      <gl-sprintf
-        :message="
-          __('User Lists can only be created and modified with %{linkStart}the API%{linkEnd}')
-        "
-      >
-        <template #link="{ content }">
-          <gl-link :href="userListsApiDocPath" target="_blank">
-            {{ content }}
-          </gl-link>
-        </template>
-      </gl-sprintf>
-    </gl-alert>
-
-    <div v-if="shouldRenderTabs" class="top-area scrolling-tabs-container inner-page-scroll-tabs">
-      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
     </div>
+    <gl-alert
+      v-for="(message, index) in alerts"
+      :key="index"
+      data-testid="serverErrors"
+      variant="danger"
+      @dismiss="clearAlert(index)"
+    >
+      {{ message }}
+    </gl-alert>
 
     <gl-loading-icon
       v-if="isLoading"

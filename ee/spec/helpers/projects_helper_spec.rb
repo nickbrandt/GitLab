@@ -87,6 +87,36 @@ RSpec.describe ProjectsHelper do
     end
   end
 
+  describe '#group_project_templates_count' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:parent_group) { create(:group, name: 'parent-group') }
+    let_it_be(:template_group) { create(:group, parent: parent_group, name: 'template-group') }
+    let_it_be(:template_project) { create(:project, group: template_group, name: 'template-project') }
+
+    before_all do
+      parent_group.update!(custom_project_templates_group_id: template_group.id)
+      parent_group.add_owner(user)
+    end
+
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+    end
+
+    it do
+      expect(helper.group_project_templates_count(parent_group.id)).to eq 1
+    end
+
+    context 'when template project is pending deletion' do
+      before do
+        template_project.update!(marked_for_deletion_at: Date.current)
+      end
+
+      it do
+        expect(helper.group_project_templates_count(parent_group.id)).to eq 0
+      end
+    end
+  end
+
   describe '#project_security_dashboard_config' do
     let_it_be(:user) { create(:user) }
     let_it_be(:group) { create(:group) }
@@ -121,17 +151,14 @@ RSpec.describe ProjectsHelper do
           has_vulnerabilities: 'true',
           project: { id: project.id, name: project.name },
           project_full_path: project.full_path,
-          vulnerabilities_endpoint: "/#{project.full_path}/-/security/vulnerability_findings",
-          vulnerabilities_summary_endpoint: "/#{project.full_path}/-/security/vulnerability_findings/summary",
           vulnerabilities_export_endpoint: "/api/v4/security/projects/#{project.id}/vulnerability_exports",
           vulnerability_feedback_help_path: '/help/user/application_security/index#interacting-with-the-vulnerabilities',
           no_vulnerabilities_svg_path: start_with('/assets/illustrations/issues-'),
           empty_state_svg_path: start_with('/assets/illustrations/security-dashboard-empty-state'),
           dashboard_documentation: '/help/user/application_security/security_dashboard/index',
           security_dashboard_help_path: '/help/user/application_security/security_dashboard/index',
-          user_callouts_path: '/-/user_callouts',
-          user_callout_id: 'standalone_vulnerabilities_introduction_banner',
-          show_introduction_banner: 'true'
+          not_enabled_scanners_help_path: help_page_path('user/application_security/index', anchor: 'quick-start'),
+          no_pipeline_run_scanners_help_path: new_project_pipeline_path(project)
         }
       end
 
@@ -152,6 +179,7 @@ RSpec.describe ProjectsHelper do
         projects/dependencies#index
         projects/licenses#index
         projects/threat_monitoring#show
+        projects/threat_monitoring#new
       ]
     end
 
@@ -232,6 +260,44 @@ RSpec.describe ProjectsHelper do
 
         expect(helper.show_discover_project_security?(project)).to eq(expected_value)
       end
+    end
+  end
+
+  describe '#remove_project_message' do
+    subject { helper.remove_project_message(project) }
+
+    before do
+      allow(project).to receive(:adjourned_deletion?).and_return(enabled)
+    end
+
+    context 'when project has delayed deletion enabled' do
+      let(:enabled) { true }
+
+      it do
+        deletion_date = helper.permanent_deletion_date(Time.now.utc)
+
+        expect(subject).to eq "Deleting a project places it into a read-only state until #{deletion_date}, at which point the project will be permanently deleted. Are you ABSOLUTELY sure?"
+      end
+    end
+
+    context 'when project has delayed deletion disabled' do
+      let(:enabled) { false }
+
+      it do
+        expect(subject).to eq "You are going to delete #{project.full_name}. Deleted projects CANNOT be restored! Are you ABSOLUTELY sure?"
+      end
+    end
+  end
+
+  describe '#scheduled_for_deletion?' do
+    context 'when project is NOT scheduled for deletion' do
+      it { expect(helper.scheduled_for_deletion?(project)).to be false }
+    end
+
+    context 'when project is scheduled for deletion' do
+      let_it_be(:archived_project) { create(:project, :archived, marked_for_deletion_at: 10.minutes.ago) }
+
+      it { expect(helper.scheduled_for_deletion?(archived_project)).to be true }
     end
   end
 end

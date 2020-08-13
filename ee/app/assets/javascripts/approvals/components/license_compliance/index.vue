@@ -25,7 +25,8 @@ export default {
       return this.rules?.find(({ name }) => name === this.licenseCheckRuleName);
     },
     hasLicenseCheckRule() {
-      return this.licenseCheckRule !== undefined;
+      const { licenseCheckRule: { approvalsRequired = 0 } = {} } = this;
+      return approvalsRequired > 0;
     },
     licenseCheckStatusText() {
       return this.hasLicenseCheckRule

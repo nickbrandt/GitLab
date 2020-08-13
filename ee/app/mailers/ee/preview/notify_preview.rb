@@ -39,18 +39,6 @@ module EE
         def send_unsubscribed_notification
           ::Notify.send_unsubscribed_notification(user.id).message
         end
-
-        def service_desk_new_note_email
-          cleanup do
-            note = create_note(noteable_type: 'Issue', noteable_id: issue.id, note: 'Issue note content')
-
-            ::Notify.service_desk_new_note_email(issue.id, note.id).message
-          end
-        end
-
-        def service_desk_thank_you_email
-          ::Notify.service_desk_thank_you_email(issue.id).message
-        end
       end
 
       private

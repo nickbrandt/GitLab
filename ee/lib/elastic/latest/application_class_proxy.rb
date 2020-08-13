@@ -71,11 +71,6 @@ module Elastic
             }
           end
 
-        query_hash[:sort] = [
-          { updated_at: { order: :desc } },
-          :_score
-        ]
-
         query_hash[:highlight] = highlight_options(fields)
 
         query_hash

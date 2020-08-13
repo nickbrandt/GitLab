@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { GlDeprecatedButton, GlFormCheckbox, GlSkeletonLoading } from '@gitlab/ui';
+import { GlDeprecatedButton, GlFormCheckbox, GlSkeletonLoading, GlSprintf } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
@@ -15,6 +15,7 @@ export default {
     GlDeprecatedButton,
     GlFormCheckbox,
     GlSkeletonLoading,
+    GlSprintf,
     Icon,
     SeverityBadge,
     VulnerabilityActionButtons,
@@ -64,11 +65,21 @@ export default {
       const path = this.vulnerability.create_vulnerability_feedback_issue_path;
       return Boolean(path) && !this.hasIssue;
     },
+    extraIdentifierCount() {
+      const { identifiers } = this.vulnerability;
+      return identifiers?.length - 1;
+    },
     isSelected() {
       return Boolean(this.selectedVulnerabilities[this.vulnerability.id]);
     },
+    shouldShowExtraIdentifierCount() {
+      return this.extraIdentifierCount > 0;
+    },
     useConvertReportType() {
       return convertReportType(this.vulnerability.report_type);
+    },
+    vulnerabilityVendor() {
+      return this.vulnerability.scanner?.vendor;
     },
   },
   methods: {
@@ -145,18 +156,29 @@ export default {
 
     <div class="table-section gl-white-space-normal section-15">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Identifier') }}</div>
-      <div
-        class="table-mobile-content gl-text-overflow-ellipsis gl-overflow-hidden"
-        :title="vulnerabilityIdentifier"
-      >
-        {{ vulnerabilityIdentifier }}
+      <div class="table-mobile-content">
+        <div class="gl-text-overflow-ellipsis gl-overflow-hidden" :title="vulnerabilityIdentifier">
+          {{ vulnerabilityIdentifier }}
+        </div>
+        <div v-if="shouldShowExtraIdentifierCount" class="gl-text-gray-300">
+          <gl-sprintf :message="__('+ %{count} more')">
+            <template #count>
+              {{ extraIdentifierCount }}
+            </template>
+          </gl-sprintf>
+        </div>
       </div>
     </div>
 
     <div class="table-section section-15">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Scanner') }}</div>
-      <div class="table-mobile-content text-capitalize">
-        {{ useConvertReportType }}
+      <div class="table-mobile-content">
+        <div class="text-capitalize">
+          {{ useConvertReportType }}
+        </div>
+        <div v-if="vulnerabilityVendor" class="gl-text-gray-300" data-testid="vulnerability-vendor">
+          {{ vulnerabilityVendor }}
+        </div>
       </div>
     </div>
 

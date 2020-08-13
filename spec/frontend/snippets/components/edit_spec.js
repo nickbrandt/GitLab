@@ -1,14 +1,13 @@
 import { shallowMount } from '@vue/test-utils';
-import axios from '~/lib/utils/axios_utils';
 import Flash from '~/flash';
 
 import { GlLoadingIcon } from '@gitlab/ui';
-import { joinPaths, redirectTo } from '~/lib/utils/url_utility';
+import { redirectTo } from '~/lib/utils/url_utility';
 
 import SnippetEditApp from '~/snippets/components/edit.vue';
 import SnippetDescriptionEdit from '~/snippets/components/snippet_description_edit.vue';
 import SnippetVisibilityEdit from '~/snippets/components/snippet_visibility_edit.vue';
-import SnippetBlobEdit from '~/snippets/components/snippet_blob_edit.vue';
+import SnippetBlobActionsEdit from '~/snippets/components/snippet_blob_actions_edit.vue';
 import TitleField from '~/vue_shared/components/form/title.vue';
 import FormFooterActions from '~/vue_shared/components/form/form_footer_actions.vue';
 import { SNIPPET_CREATE_MUTATION_ERROR, SNIPPET_UPDATE_MUTATION_ERROR } from '~/snippets/constants';
@@ -16,25 +15,17 @@ import { SNIPPET_CREATE_MUTATION_ERROR, SNIPPET_UPDATE_MUTATION_ERROR } from '~/
 import UpdateSnippetMutation from '~/snippets/mutations/updateSnippet.mutation.graphql';
 import CreateSnippetMutation from '~/snippets/mutations/createSnippet.mutation.graphql';
 
-import AxiosMockAdapter from 'axios-mock-adapter';
 import waitForPromises from 'helpers/wait_for_promises';
 import { ApolloMutation } from 'vue-apollo';
 
 jest.mock('~/lib/utils/url_utility', () => ({
-  getBaseURL: jest.fn().mockReturnValue('foo/'),
   redirectTo: jest.fn().mockName('redirectTo'),
-  joinPaths: jest
-    .fn()
-    .mockName('joinPaths')
-    .mockReturnValue('contentApiURL'),
 }));
 
 jest.mock('~/flash');
 
 let flashSpy;
 
-const contentMock = 'Foo Bar';
-const rawPathMock = '/foo/bar';
 const rawProjectPathMock = '/project/path';
 const newlyEditedSnippetUrl = 'http://foo.bar';
 const apiError = { message: 'Ufff' };
@@ -43,15 +34,27 @@ const mutationError = 'Bummer';
 const attachedFilePath1 = 'foo/bar';
 const attachedFilePath2 = 'alpha/beta';
 
+const actionWithContent = {
+  content: 'Foo Bar',
+};
+const actionWithoutContent = {
+  content: '',
+};
+
 const defaultProps = {
   snippetGid: 'gid://gitlab/PersonalSnippet/42',
   markdownPreviewPath: 'http://preview.foo.bar',
   markdownDocsPath: 'http://docs.foo.bar',
 };
+const defaultData = {
+  blobsActions: {
+    ...actionWithContent,
+    action: '',
+  },
+};
 
 describe('Snippet Edit app', () => {
   let wrapper;
-  let axiosMock;
 
   const resolveMutate = jest.fn().mockResolvedValue({
     data: {
@@ -138,7 +141,7 @@ describe('Snippet Edit app', () => {
 
       expect(wrapper.contains(TitleField)).toBe(true);
       expect(wrapper.contains(SnippetDescriptionEdit)).toBe(true);
-      expect(wrapper.contains(SnippetBlobEdit)).toBe(true);
+      expect(wrapper.contains(SnippetBlobActionsEdit)).toBe(true);
       expect(wrapper.contains(SnippetVisibilityEdit)).toBe(true);
       expect(wrapper.contains(FormFooterActions)).toBe(true);
     });
@@ -156,18 +159,21 @@ describe('Snippet Edit app', () => {
     });
 
     it.each`
-      title    | content  | expectation
-      ${''}    | ${''}    | ${true}
-      ${'foo'} | ${''}    | ${true}
-      ${''}    | ${'foo'} | ${true}
-      ${'foo'} | ${'bar'} | ${false}
+      title    | blobsActions                                   | expectation
+      ${''}    | ${{}}                                          | ${true}
+      ${''}    | ${{ actionWithContent }}                       | ${true}
+      ${''}    | ${{ actionWithoutContent }}                    | ${true}
+      ${'foo'} | ${{}}                                          | ${true}
+      ${'foo'} | ${{ actionWithoutContent }}                    | ${true}
+      ${'foo'} | ${{ actionWithoutContent, actionWithContent }} | ${true}
+      ${'foo'} | ${{ actionWithContent }}                       | ${false}
     `(
-      'disables submit button unless both title and content are present',
-      ({ title, content, expectation }) => {
+      'disables submit button unless both title and content for all blobs are present',
+      ({ title, blobsActions, expectation }) => {
         createComponent({
           data: {
             snippet: { title },
-            content,
+            blobsActions,
           },
         });
         const isBtnDisabled = Boolean(findSubmitButton().attributes('disabled'));
@@ -177,7 +183,7 @@ describe('Snippet Edit app', () => {
 
     it.each`
       isNew    | status        | expectation
-      ${true}  | ${`new`}      | ${`/snippets`}
+      ${true}  | ${`new`}      | ${`/-/snippets`}
       ${false} | ${`existing`} | ${newlyEditedSnippetUrl}
     `('sets correct href for the cancel button on a $status snippet', ({ isNew, expectation }) => {
       createComponent({
@@ -192,83 +198,31 @@ describe('Snippet Edit app', () => {
   });
 
   describe('functionality', () => {
-    describe('handling of the data from GraphQL response', () => {
-      const snippet = {
-        blob: {
-          rawPath: rawPathMock,
-        },
-      };
-      const getResSchema = newSnippet => {
-        return {
-          data: {
-            snippets: {
-              edges: newSnippet ? [] : [snippet],
-            },
-          },
+    describe('form submission handling', () => {
+      it('does not submit unchanged blobs', () => {
+        const foo = {
+          action: '',
         };
-      };
-
-      const bootstrapForExistingSnippet = resp => {
+        const bar = {
+          action: 'update',
+        };
         createComponent({
           data: {
-            snippet,
+            blobsActions: {
+              foo,
+              bar,
+            },
           },
         });
-
-        if (resp === 500) {
-          axiosMock.onGet('contentApiURL').reply(500);
-        } else {
-          axiosMock.onGet('contentApiURL').reply(200, contentMock);
-        }
-        wrapper.vm.onSnippetFetch(getResSchema());
-      };
-
-      const bootstrapForNewSnippet = () => {
-        createComponent();
-        wrapper.vm.onSnippetFetch(getResSchema(true));
-      };
-
-      beforeEach(() => {
-        axiosMock = new AxiosMockAdapter(axios);
-      });
-
-      afterEach(() => {
-        axiosMock.restore();
-      });
-
-      it('fetches blob content with the additional query', () => {
-        bootstrapForExistingSnippet();
+        clickSubmitBtn();
 
         return waitForPromises().then(() => {
-          expect(joinPaths).toHaveBeenCalledWith('foo/', rawPathMock);
-          expect(wrapper.vm.newSnippet).toBe(false);
-          expect(wrapper.vm.content).toBe(contentMock);
+          expect(resolveMutate).toHaveBeenCalledWith(
+            expect.objectContaining({ variables: { input: { blobActions: [bar] } } }),
+          );
         });
       });
 
-      it('flashes the error message if fetching content fails', () => {
-        bootstrapForExistingSnippet(500);
-
-        return waitForPromises().then(() => {
-          expect(flashSpy).toHaveBeenCalled();
-          expect(wrapper.vm.content).toBe('');
-        });
-      });
-
-      it('does not fetch content for new snippet', () => {
-        bootstrapForNewSnippet();
-
-        return waitForPromises().then(() => {
-          // we keep using waitForPromises to make sure we do not run failed test
-          expect(wrapper.vm.newSnippet).toBe(true);
-          expect(wrapper.vm.content).toBe('');
-          expect(joinPaths).not.toHaveBeenCalled();
-          expect(wrapper.vm.snippet).toEqual(wrapper.vm.$options.newSnippetSchema);
-        });
-      });
-    });
-
-    describe('form submission handling', () => {
       it.each`
         newSnippet | projectPath           | mutation                 | mutationName
         ${true}    | ${rawProjectPathMock} | ${CreateSnippetMutation} | ${'CreateSnippetMutation with projectPath'}
@@ -279,6 +233,7 @@ describe('Snippet Edit app', () => {
         createComponent({
           data: {
             newSnippet,
+            ...defaultData,
           },
           props: {
             ...defaultProps,
@@ -304,16 +259,6 @@ describe('Snippet Edit app', () => {
 
         return waitForPromises().then(() => {
           expect(redirectTo).toHaveBeenCalledWith(newlyEditedSnippetUrl);
-        });
-      });
-
-      it('makes sure there are no unsaved changes in the snippet', () => {
-        createComponent();
-        clickSubmitBtn();
-
-        return waitForPromises().then(() => {
-          expect(wrapper.vm.originalContent).toBe(wrapper.vm.content);
-          expect(wrapper.vm.hasChanges()).toBe(false);
         });
       });
 
@@ -434,27 +379,58 @@ describe('Snippet Edit app', () => {
       let event;
       let returnValueSetter;
 
-      beforeEach(() => {
-        createComponent();
+      const bootstrap = data => {
+        createComponent({
+          data,
+        });
 
         event = new Event('beforeunload');
         returnValueSetter = jest.spyOn(event, 'returnValue', 'set');
-      });
+      };
 
-      it('does not prevent page navigation if there are no changes to the snippet content', () => {
+      const actionsWithoutAction = {
+        blobsActions: {
+          foo: {
+            ...actionWithContent,
+            action: '',
+          },
+        },
+      };
+      const actionsWithUpdate = {
+        blobsActions: {
+          foo: {
+            ...actionWithContent,
+            action: 'update',
+          },
+        },
+      };
+      const actionsWithUpdateWhileSaving = {
+        blobsActions: {
+          foo: {
+            ...actionWithContent,
+            action: 'update',
+          },
+        },
+        isUpdating: true,
+      };
+
+      it.each`
+        bool                  | expectToBePrevented | data                            | condition
+        ${'does not prevent'} | ${false}            | ${undefined}                    | ${'there are no blobs'}
+        ${'does not prevent'} | ${false}            | ${actionsWithoutAction}         | ${'there are no changes to the blobs content'}
+        ${'prevents'}         | ${true}             | ${actionsWithUpdate}            | ${'there are changes to the blobs content'}
+        ${'does not prevent'} | ${false}            | ${actionsWithUpdateWhileSaving} | ${'the snippet is being saved'}
+      `('$bool page navigation if $condition', ({ expectToBePrevented, data }) => {
+        bootstrap(data);
         window.dispatchEvent(event);
 
-        expect(returnValueSetter).not.toHaveBeenCalled();
-      });
-
-      it('prevents page navigation if there are some changes in the snippet content', () => {
-        wrapper.setData({ content: 'new content' });
-
-        window.dispatchEvent(event);
-
-        expect(returnValueSetter).toHaveBeenCalledWith(
-          'Are you sure you want to lose unsaved changes?',
-        );
+        if (expectToBePrevented) {
+          expect(returnValueSetter).toHaveBeenCalledWith(
+            'Are you sure you want to lose unsaved changes?',
+          );
+        } else {
+          expect(returnValueSetter).not.toHaveBeenCalled();
+        }
       });
     });
   });

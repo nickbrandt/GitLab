@@ -62,6 +62,14 @@ together, allowing you to visualize their relationships on pipeline graphs.
 These relationships are displayed in the pipeline graph by showing inbound and
 outbound connections for upstream and downstream pipeline dependencies.
 
+When using:
+
+- Variables or [`rules`](yaml/README.md#rulesif) to control job behavior, the value of
+  the [`$CI_PIPELINE_SOURCE` predefined variable](variables/predefined_variables.md) is
+  `pipeline` for multi-project pipeline triggered through the API with `CI_JOB_TOKEN`.
+- [`only/except`](yaml/README.md#onlyexcept-basic) to control job behavior, use the
+  `pipelines` keyword.
+
 ## Creating multi-project pipelines from `.gitlab-ci.yml`
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/8997) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
@@ -99,6 +107,15 @@ The user that created the upstream pipeline needs to have access rights to the
 downstream project (`my/deployment` in this case). If a downstream project can
 not be found, or a user does not have access rights to create pipeline there,
 the `staging` job is going to be marked as _failed_.
+
+When using:
+
+- Variables or [`rules`](yaml/README.md#rulesif) to control job behavior, the value of
+  the [`$CI_PIPELINE_SOURCE` predefined variable](variables/predefined_variables.md) is
+  `pipeline` for multi-project pipelines triggered with a bridge job (using the
+  [`trigger:`](yaml/README.md#trigger) keyword).
+- [`only/except`](yaml/README.md#onlyexcept-basic) to control job behavior, use the
+  `pipelines` keyword.
 
 CAUTION: **Caution:**
 In the example, `staging` will be marked as succeeded as soon as a downstream pipeline
@@ -254,5 +271,5 @@ tag in a different project:
 
 Any pipelines that complete successfully for new tags in the subscribed project
 will now trigger a pipeline on the current project's default branch. The maximum
-number of upstream pipeline subscriptions is 2, for both the upstream and
-downstream projects.
+number of upstream pipeline subscriptions is 2 by default, for both the upstream and
+downstream projects. This [application limit](../administration/instance_limits.md#number-of-cicd-subscriptions-to-a-project) can be changed on self-managed instances by a GitLab administrator.

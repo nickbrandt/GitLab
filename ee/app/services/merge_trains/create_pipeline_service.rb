@@ -16,7 +16,7 @@ module MergeTrains
     def validate(merge_request)
       return error('merge trains is disabled') unless merge_request.project.merge_trains_enabled?
       return error('merge request is not on a merge train') unless merge_request.on_train?
-      return error('fork merge request is not supported') if merge_request.for_fork?
+      return error('fork merge request is not available for this project') if !Gitlab::Ci::Features.allow_to_create_merge_request_pipelines_in_target_project?(merge_request.target_project) && merge_request.for_fork?
 
       success
     end
@@ -26,7 +26,7 @@ module MergeTrains
 
       commit_message = commit_message(merge_request, previous_ref)
 
-      ::MergeRequests::MergeToRefService.new(merge_request.project, merge_request.merge_user,
+      ::MergeRequests::MergeToRefService.new(merge_request.target_project, merge_request.merge_user,
                                              target_ref: merge_request.train_ref_path,
                                              first_parent_ref: previous_ref,
                                              commit_message: commit_message)
@@ -39,7 +39,7 @@ module MergeTrains
     end
 
     def create_pipeline(merge_request, merge_status)
-      pipeline = ::Ci::CreatePipelineService.new(merge_request.source_project, merge_request.merge_user,
+      pipeline = ::Ci::CreatePipelineService.new(merge_request.target_project, merge_request.merge_user,
         ref: merge_request.train_ref_path,
         checkout_sha: merge_status[:commit_id],
         target_sha: merge_status[:target_id],

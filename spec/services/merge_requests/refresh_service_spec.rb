@@ -225,12 +225,13 @@ RSpec.describe MergeRequests::RefreshService do
         context 'when service runs on forked project' do
           let(:project) { @fork_project }
 
-          it 'creates legacy detached merge request pipeline for fork merge request', :sidekiq_might_not_need_inline do
+          it 'creates detached merge request pipeline for fork merge request', :sidekiq_inline do
             expect { subject }
               .to change { @fork_merge_request.pipelines_for_merge_request.count }.by(1)
 
-            expect(@fork_merge_request.pipelines_for_merge_request.first)
-              .to be_legacy_detached_merge_request_pipeline
+            merge_request_pipeline = @fork_merge_request.pipelines_for_merge_request.first
+            expect(merge_request_pipeline).to be_detached_merge_request_pipeline
+            expect(merge_request_pipeline.project).to eq(@project)
           end
         end
 
@@ -554,11 +555,13 @@ RSpec.describe MergeRequests::RefreshService do
                                              message: 'Test commit',
                                              branch_name: 'master')
       end
+
       let!(:second_commit) do
         @fork_project.repository.create_file(@user, 'test2.txt', 'More test data',
                                              message: 'Second test commit',
                                              branch_name: 'master')
       end
+
       let!(:forked_master_mr) do
         create(:merge_request,
                source_project: @fork_project,
@@ -566,6 +569,7 @@ RSpec.describe MergeRequests::RefreshService do
                target_branch: 'master',
                target_project: @project)
       end
+
       let(:force_push_commit) { @project.commit('feature').id }
 
       it 'reloads a new diff for a push to the forked project' do

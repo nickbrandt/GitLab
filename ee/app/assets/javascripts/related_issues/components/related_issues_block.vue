@@ -1,6 +1,5 @@
 <script>
-import { GlLink } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlLink, GlIcon, GlButton } from '@gitlab/ui';
 import AddIssuableForm from './add_issuable_form.vue';
 import RelatedIssuesList from './related_issues_list.vue';
 import {
@@ -13,8 +12,9 @@ import {
 export default {
   name: 'RelatedIssuesBlock',
   components: {
-    Icon,
     GlLink,
+    GlButton,
+    GlIcon,
     AddIssuableForm,
     RelatedIssuesList,
   },
@@ -77,7 +77,7 @@ export default {
       type: String,
       required: true,
     },
-    isLinkedIssueBlock: {
+    showCategorizedIssues: {
       type: Boolean,
       required: false,
       default: true,
@@ -88,12 +88,16 @@ export default {
       return this.relatedIssues.length > 0;
     },
     categorisedIssues() {
-      return Object.values(linkedIssueTypesMap)
-        .map(linkType => ({
-          linkType,
-          issues: this.relatedIssues.filter(issue => issue.linkType === linkType),
-        }))
-        .filter(obj => obj.issues.length > 0);
+      if (this.showCategorizedIssues) {
+        return Object.values(linkedIssueTypesMap)
+          .map(linkType => ({
+            linkType,
+            issues: this.relatedIssues.filter(issue => issue.linkType === linkType),
+          }))
+          .filter(obj => obj.issues.length > 0);
+      }
+
+      return [{ issues: this.relatedIssues }];
     },
     shouldShowTokenBody() {
       return this.hasRelatedIssues || this.isFetching;
@@ -114,52 +118,50 @@ export default {
       return issuableQaClassMap[this.issuableType];
     },
   },
-  created() {
-    this.linkedIssueTypesTextMap = linkedIssueTypesTextMap;
-  },
+  linkedIssueTypesTextMap,
 };
 </script>
 
 <template>
   <div id="related-issues" class="related-issues-block">
-    <div class="card card-slim">
+    <div class="card card-slim gl-overflow-hidden">
       <div :class="{ 'panel-empty-heading border-bottom-0': !hasBody }" class="card-header">
-        <h3 class="card-title mt-0 mb-0 h5 position-relative">
+        <h3
+          class="card-title h5 position-relative gl-my-0 gl-display-flex gl-align-items-center gl-h-7"
+        >
           <gl-link
             id="user-content-related-issues"
-            class="anchor position-absolute text-decoration-none"
+            class="anchor position-absolute gl-text-decoration-none"
             href="#related-issues"
             aria-hidden="true"
           />
-          {{ __('Linked issues') }}
-          <a v-if="hasHelpPath" :href="helpPath">
-            <i
-              class="related-issues-header-help-icon fa fa-question-circle"
-              :aria-label="__('Read more about related issues')"
-            ></i>
-          </a>
-          <div class="d-inline-flex lh-100 align-middle">
-            <div
-              class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge gl-display-inline-flex gl-mx-2"
-            >
-              <span class="issue-count-badge-count">
-                <icon :name="issuableTypeIcon" class="mr-1 text-secondary" />
+          <slot name="headerText">{{ __('Linked issues') }}</slot>
+          <gl-link
+            v-if="hasHelpPath"
+            :href="helpPath"
+            target="_blank"
+            class="gl-display-flex gl-align-items-center gl-ml-2 gl-text-gray-700"
+            :aria-label="__('Read more about related issues')"
+          >
+            <gl-icon name="question" :size="12" role="text" />
+          </gl-link>
+
+          <div class="gl-display-inline-flex">
+            <div class="js-related-issues-header-issue-count gl-display-inline-flex gl-mx-5">
+              <span class="gl-display-inline-flex gl-align-items-center">
+                <gl-icon :name="issuableTypeIcon" class="gl-mr-2 gl-text-gray-700" />
                 {{ badgeLabel }}
               </span>
             </div>
-            <button
+            <gl-button
               v-if="canAdmin"
-              ref="issueCountBadgeAddButton"
-              type="button"
-              :class="qaClass"
-              class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default"
-              :aria-label="__('Add an issue')"
-              data-placement="top"
               data-qa-selector="related_issues_plus_button"
+              icon="plus"
+              :aria-label="__('Add a related issue')"
+              :class="qaClass"
+              class="js-issue-count-badge-add-button"
               @click="$emit('toggleAddRelatedIssuesForm', $event)"
-            >
-              <i class="fa fa-plus" aria-hidden="true"></i>
-            </button>
+            />
           </div>
         </h3>
       </div>
@@ -174,7 +176,7 @@ export default {
           class="js-add-related-issues-form-area card-body bordered-box bg-white"
         >
           <add-issuable-form
-            :is-linked-issue-block="isLinkedIssueBlock"
+            :show-categorized-issues="showCategorizedIssues"
             :is-submitting="isSubmitting"
             :issuable-type="issuableType"
             :input-value="inputValue"
@@ -192,7 +194,7 @@ export default {
           <related-issues-list
             v-for="category in categorisedIssues"
             :key="category.linkType"
-            :heading="linkedIssueTypesTextMap[category.linkType]"
+            :heading="$options.linkedIssueTypesTextMap[category.linkType]"
             :can-admin="canAdmin"
             :can-reorder="canReorder"
             :is-fetching="isFetching"

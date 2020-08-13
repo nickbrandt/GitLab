@@ -82,6 +82,10 @@
 .gl-h-32 { height: px-to-rem($grid-size * 4); }
 .gl-h-64 { height: px-to-rem($grid-size * 8); }
 
+// Migrate this to Gitlab UI when FF is removed
+// https://gitlab.com/groups/gitlab-org/-/epics/2882
+.gl-h-200\! { height: px-to-rem($grid-size * 25) !important; }
+
 .d-sm-table-column {
   @include media-breakpoint-up(sm) {
     display: table-column !important;
@@ -108,4 +112,16 @@
 
 .gl-transition-property-stroke {
   transition-property: stroke;
+}
+
+.gl-top-66vh {
+  top: 66vh;
+}
+
+// Remove when https://gitlab.com/gitlab-org/gitlab-ui/-/issues/871
+// gets fixed on GitLab UI
+.gl-sm-w-auto\! {
+  @media (min-width: $breakpoint-sm) {
+    width: auto !important;
+  }
 }

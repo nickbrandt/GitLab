@@ -1,3 +1,9 @@
+---
+stage: Configure
+group: Configure
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # Chatops on GitLab.com
 
 ChatOps on GitLab.com allows GitLab team members to run various automation tasks on GitLab.com using Slack.
@@ -17,7 +23,8 @@ To request access to Chatops on GitLab.com:
     1. You could also use the "Sign in with" Google button to sign in, with your GitLab.com email address.
 1. Ask in the [#production](https://gitlab.slack.com/messages/production) channel for an existing member to add you to the `chatops` project in Ops. They can do it by running `/chatops run member add <username> gitlab-com/chatops --ops` command in that channel.
 
-NOTE: **Note:** If you had to change your username for GitLab.com on the first step, make sure [to reflect this information](https://gitlab.com/gitlab-com/www-gitlab-com#adding-yourself-to-the-team-page) on [the team page](https://about.gitlab.com/company/team/).
+NOTE: **Note:**
+If you had to change your username for GitLab.com on the first step, make sure [to reflect this information](https://gitlab.com/gitlab-com/www-gitlab-com#adding-yourself-to-the-team-page) on [the team page](https://about.gitlab.com/company/team/).
 
 ## See also
 

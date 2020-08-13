@@ -16,19 +16,18 @@ describe('Actions TestReports Store', () => {
   const testReports = getJSONFixture('pipelines/test_report.json');
   const summary = { total_count: 1 };
 
-  const fullReportEndpoint = `${TEST_HOST}/test_reports.json`;
+  const suiteEndpoint = `${TEST_HOST}/tests/:suite_name.json`;
   const summaryEndpoint = `${TEST_HOST}/test_reports/summary.json`;
   const defaultState = {
-    fullReportEndpoint,
+    suiteEndpoint,
     summaryEndpoint,
     testReports: {},
     selectedSuite: null,
-    summary: {},
   };
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
-    state = defaultState;
+    state = { ...defaultState };
   });
 
   afterEach(() => {
@@ -46,7 +45,7 @@ describe('Actions TestReports Store', () => {
         null,
         state,
         [{ type: types.SET_SUMMARY, payload: summary }],
-        [],
+        [{ type: 'toggleLoading' }, { type: 'toggleLoading' }],
         done,
       );
     });
@@ -55,11 +54,9 @@ describe('Actions TestReports Store', () => {
       testAction(
         actions.fetchSummary,
         null,
-        {
-          summaryEndpoint: null,
-        },
+        { summaryEndpoint: null },
         [],
-        [],
+        [{ type: 'toggleLoading' }, { type: 'toggleLoading' }],
         () => {
           expect(createFlash).toHaveBeenCalled();
           done();
@@ -68,29 +65,37 @@ describe('Actions TestReports Store', () => {
     });
   });
 
-  describe('fetch full report', () => {
+  describe('fetch test suite', () => {
     beforeEach(() => {
-      mock.onGet(fullReportEndpoint).replyOnce(200, testReports, {});
+      const buildIds = [1];
+      testReports.test_suites[0].build_ids = buildIds;
+      const endpoint = suiteEndpoint.replace(':suite_name', testReports.test_suites[0].name);
+      mock
+        .onGet(endpoint, { params: { build_ids: buildIds } })
+        .replyOnce(200, testReports.test_suites[0], {});
     });
 
-    it('sets testReports and shows tests', done => {
+    it('sets test suite and shows tests', done => {
+      const suite = testReports.test_suites[0];
+      const index = 0;
+
       testAction(
-        actions.fetchFullReport,
-        null,
-        state,
-        [{ type: types.SET_REPORTS, payload: testReports }],
+        actions.fetchTestSuite,
+        index,
+        { ...state, testReports },
+        [{ type: types.SET_SUITE, payload: { suite, index } }],
         [{ type: 'toggleLoading' }, { type: 'toggleLoading' }],
         done,
       );
     });
 
     it('should create flash on API error', done => {
+      const index = 0;
+
       testAction(
-        actions.fetchFullReport,
-        null,
-        {
-          fullReportEndpoint: null,
-        },
+        actions.fetchTestSuite,
+        index,
+        { ...state, testReports, suiteEndpoint: null },
         [],
         [{ type: 'toggleLoading' }, { type: 'toggleLoading' }],
         () => {
@@ -99,16 +104,25 @@ describe('Actions TestReports Store', () => {
         },
       );
     });
+
+    describe('when we already have the suite data', () => {
+      it('should not fetch suite', done => {
+        const index = 0;
+        testReports.test_suites[0].hasFullSuite = true;
+
+        testAction(actions.fetchTestSuite, index, { ...state, testReports }, [], [], done);
+      });
+    });
   });
 
   describe('set selected suite index', () => {
-    const selectedSuiteIndex = 0;
-
     it('sets selectedSuiteIndex', done => {
+      const selectedSuiteIndex = 0;
+
       testAction(
         actions.setSelectedSuiteIndex,
         selectedSuiteIndex,
-        state,
+        { ...state, hasFullReport: true },
         [{ type: types.SET_SELECTED_SUITE_INDEX, payload: selectedSuiteIndex }],
         [],
         done,

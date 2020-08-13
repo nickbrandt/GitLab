@@ -24,7 +24,7 @@ RSpec.describe 'Merge request > User sees approval widget', :js do
 
     # TODO: https://gitlab.com/gitlab-org/gitlab/issues/9430
     xit 'does not show checking ability text' do
-      expect(find('.js-mr-approvals')).not_to have_text('Checking ability to merge automatically')
+      expect(find('.js-mr-approvals')).not_to have_text('Checking if merge request can be merged')
       expect(find('.js-mr-approvals')).to have_selector('.approvals-body')
     end
   end

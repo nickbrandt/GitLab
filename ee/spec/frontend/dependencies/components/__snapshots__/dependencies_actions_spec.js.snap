@@ -7,12 +7,12 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
   <div
     class="btn-group flex-grow-1 mr-2"
   >
-    <gl-dropdown-stub
+    <gl-deprecated-dropdown-stub
       class="flex-grow-1 text-center"
       right=""
       text="Severity"
     >
-      <gl-dropdown-item-stub>
+      <gl-deprecated-dropdown-item-stub>
         <span
           class="d-flex"
         >
@@ -25,8 +25,8 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Component name
         
         </span>
-      </gl-dropdown-item-stub>
-      <gl-dropdown-item-stub>
+      </gl-deprecated-dropdown-item-stub>
+      <gl-deprecated-dropdown-item-stub>
         <span
           class="d-flex"
         >
@@ -39,8 +39,8 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Packager
         
         </span>
-      </gl-dropdown-item-stub>
-      <gl-dropdown-item-stub>
+      </gl-deprecated-dropdown-item-stub>
+      <gl-deprecated-dropdown-item-stub>
         <span
           class="d-flex"
         >
@@ -53,34 +53,37 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
           Severity
         
         </span>
-      </gl-dropdown-item-stub>
-    </gl-dropdown-stub>
+      </gl-deprecated-dropdown-item-stub>
+    </gl-deprecated-dropdown-stub>
      
-    <gl-deprecated-button-stub
+    <gl-button-stub
+      category="tertiary"
       class="flex-grow-0 js-sort-order"
-      size="md"
+      icon=""
+      size="medium"
       title="Sort direction"
-      variant="secondary"
+      variant="default"
     >
       <gl-icon-stub
         name="sort-lowest"
         size="16"
       />
-    </gl-deprecated-button-stub>
+    </gl-button-stub>
   </div>
    
-  <gl-deprecated-button-stub
+  <gl-button-stub
+    category="tertiary"
     class="js-download"
     download="dependencies.json"
     href="http://test.host/dependencies.json"
-    size="md"
+    icon="export"
+    size="medium"
     title="Export as JSON"
-    variant="secondary"
+    variant="default"
   >
-    <gl-icon-stub
-      name="export"
-      size="16"
-    />
-  </gl-deprecated-button-stub>
+    
+    Export
+  
+  </gl-button-stub>
 </div>
 `;

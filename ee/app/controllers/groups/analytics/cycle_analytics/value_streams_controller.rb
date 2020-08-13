@@ -11,7 +11,7 @@ class Groups::Analytics::CycleAnalytics::ValueStreamsController < Analytics::App
   end
 
   def index
-    render json: Analytics::GroupValueStreamSerializer.new.represent(@group.value_streams)
+    render json: Analytics::GroupValueStreamSerializer.new.represent(value_streams)
   end
 
   def create
@@ -28,5 +28,13 @@ class Groups::Analytics::CycleAnalytics::ValueStreamsController < Analytics::App
 
   def value_stream_params
     params.require(:value_stream).permit(:name)
+  end
+
+  def value_streams
+    @group.value_streams.presence || [in_memory_default_value_stream]
+  end
+
+  def in_memory_default_value_stream
+    @group.value_streams.new(name: Analytics::CycleAnalytics::Stages::BaseService::DEFAULT_VALUE_STREAM_NAME)
   end
 end

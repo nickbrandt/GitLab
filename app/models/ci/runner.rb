@@ -10,7 +10,7 @@ module Ci
     include TokenAuthenticatable
     include IgnorableColumns
 
-    add_authentication_token_field :token, encrypted: -> { Feature.enabled?(:ci_runners_tokens_optional_encryption, default_enabled: true) ? :optional : :required }
+    add_authentication_token_field :token, encrypted: -> { Feature.enabled?(:ci_runners_tokens_optional_encryption) ? :optional : :required }
 
     enum access_level: {
       not_protected: 0,
@@ -237,6 +237,10 @@ module Ci
 
     def belongs_to_one_project?
       runner_projects.count == 1
+    end
+
+    def belongs_to_more_than_one_project?
+      self.projects.limit(2).count(:all) > 1
     end
 
     def assigned_to_group?

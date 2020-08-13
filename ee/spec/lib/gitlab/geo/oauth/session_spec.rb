@@ -19,6 +19,23 @@ RSpec.describe Gitlab::Geo::Oauth::Session, :geo do
     it 'returns a valid url to the primary node' do
       expect(subject.authorize_url).to start_with(primary_node.internal_url)
     end
+
+    context 'secondary is configured with relative URL' do
+      def stub_relative_url(host, script_name)
+        url_options = { host: host, protocol: "http", port: nil, script_name: script_name }
+
+        allow(Rails.application.routes).to receive(:default_url_options).and_return(url_options)
+      end
+
+      it 'does not include secondary relative URL path' do
+        secondary_url = 'http://secondary.host/relative-path/'
+
+        stub_config_setting(url: secondary_url, https: false)
+        stub_relative_url('secondary.host', '/relative-path')
+
+        expect(subject.authorize_url).not_to include('relative-path')
+      end
+    end
   end
 
   describe '#authenticate' do

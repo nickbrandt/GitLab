@@ -234,18 +234,6 @@ module API
               name: :project_url,
               type: String,
               desc: 'Project URL'
-            },
-            {
-              required: false,
-              name: :description,
-              type: String,
-              desc: 'Description'
-            },
-            {
-              required: false,
-              name: :title,
-              type: String,
-              desc: 'Title'
             }
           ],
           'buildkite' => [
@@ -259,15 +247,15 @@ module API
               required: true,
               name: :project_url,
               type: String,
-              desc: 'The buildkite project URL'
+              desc: 'The Buildkite pipeline URL'
             },
             {
               required: false,
               name: :enable_ssl_verification,
               type: Boolean,
-              desc: 'Enable SSL verification for communication'
+              desc: 'DEPRECATED: This parameter has no effect since SSL verification will always be enabled'
             }
-          ],
+        ],
           'campfire' => [
             {
               required: true,
@@ -314,18 +302,6 @@ module API
               name: :project_url,
               type: String,
               desc: 'Project URL'
-            },
-            {
-              required: false,
-              name: :description,
-              type: String,
-              desc: 'Description'
-            },
-            {
-              required: false,
-              name: :title,
-              type: String,
-              desc: 'Title'
             }
           ],
           'discord' => [

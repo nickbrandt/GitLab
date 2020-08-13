@@ -1,49 +1,74 @@
-import { GlAvatar, GlButton, GlFormSelect, GlLabel } from '@gitlab/ui';
+import { GlAlert, GlButton, GlNewDropdown, GlFormSelect, GlLabel, GlTable } from '@gitlab/ui';
+import { getByRole } from '@testing-library/dom';
 import { mount, shallowMount } from '@vue/test-utils';
+import AxiosMockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import JiraImportForm from '~/jira_import/components/jira_import_form.vue';
-
-const importLabel = 'jira-import::MTG-1';
-const value = 'MTG';
-
-const mountComponent = ({ mountType } = {}) => {
-  const mountFunction = mountType === 'mount' ? mount : shallowMount;
-
-  return mountFunction(JiraImportForm, {
-    propsData: {
-      importLabel,
-      issuesPath: 'gitlab-org/gitlab-test/-/issues',
-      jiraProjects: [
-        {
-          text: 'My Jira Project',
-          value: 'MJP',
-        },
-        {
-          text: 'My Second Jira Project',
-          value: 'MSJP',
-        },
-        {
-          text: 'Migrate to GitLab',
-          value: 'MTG',
-        },
-      ],
-      value,
-    },
-  });
-};
+import {
+  imports,
+  issuesPath,
+  jiraProjects,
+  userMappings as defaultUserMappings,
+} from '../mock_data';
 
 describe('JiraImportForm', () => {
+  let axiosMock;
   let wrapper;
+
+  const currentUsername = 'mrgitlab';
+
+  const getAlert = () => wrapper.find(GlAlert);
 
   const getSelectDropdown = () => wrapper.find(GlFormSelect);
 
+  const getContinueButton = () => wrapper.find(GlButton);
+
   const getCancelButton = () => wrapper.findAll(GlButton).at(1);
 
+  const getLabel = () => wrapper.find(GlLabel);
+
+  const getTable = () => wrapper.find(GlTable);
+
+  const getUserDropdown = () => getTable().find(GlNewDropdown);
+
+  const getHeader = name => getByRole(wrapper.element, 'columnheader', { name });
+
+  const mountComponent = ({
+    isSubmitting = false,
+    selectedProject = 'MTG',
+    userMappings = defaultUserMappings,
+    mountFunction = shallowMount,
+  } = {}) =>
+    mountFunction(JiraImportForm, {
+      propsData: {
+        isSubmitting,
+        issuesPath,
+        jiraImports: imports,
+        jiraProjects,
+        projectId: '5',
+        userMappings,
+      },
+      data: () => ({
+        isFetching: false,
+        searchTerm: '',
+        selectedProject,
+        selectState: null,
+        users: [],
+      }),
+      currentUsername,
+    });
+
+  beforeEach(() => {
+    axiosMock = new AxiosMockAdapter(axios);
+  });
+
   afterEach(() => {
+    axiosMock.restore();
     wrapper.destroy();
     wrapper = null;
   });
 
-  describe('select dropdown', () => {
+  describe('select dropdown project selection', () => {
     it('is shown', () => {
       wrapper = mountComponent();
 
@@ -51,15 +76,43 @@ describe('JiraImportForm', () => {
     });
 
     it('contains a list of Jira projects to select from', () => {
-      wrapper = mountComponent({ mountType: 'mount' });
-
-      const optionItems = ['My Jira Project', 'My Second Jira Project', 'Migrate to GitLab'];
+      wrapper = mountComponent({ mountFunction: mount });
 
       getSelectDropdown()
         .findAll('option')
         .wrappers.forEach((optionEl, index) => {
-          expect(optionEl.text()).toBe(optionItems[index]);
+          expect(optionEl.text()).toBe(jiraProjects[index].text);
         });
+    });
+
+    describe('when selected project has been imported before', () => {
+      it('shows jira-import::MTG-3 label since project MTG has been imported 2 time before', () => {
+        wrapper = mountComponent();
+
+        expect(getLabel().props('title')).toBe('jira-import::MTG-3');
+      });
+
+      it('shows warning alert to explain project MTG has been imported 2 times before', () => {
+        wrapper = mountComponent({ mountFunction: mount });
+
+        expect(getAlert().text()).toBe(
+          'You have imported from this project 2 times before. Each new import will create duplicate issues.',
+        );
+      });
+    });
+
+    describe('when selected project has not been imported before', () => {
+      beforeEach(() => {
+        wrapper = mountComponent({ selectedProject: 'MJP' });
+      });
+
+      it('shows jira-import::MJP-1 label since project MJP has not been imported before', () => {
+        expect(getLabel().props('title')).toBe('jira-import::MJP-1');
+      });
+
+      it('does not show warning alert since project MJP has not been imported before', () => {
+        expect(getAlert().exists()).toBe(false);
+      });
     });
   });
 
@@ -68,68 +121,132 @@ describe('JiraImportForm', () => {
       wrapper = mountComponent();
     });
 
-    it('shows a label which will be applied to imported Jira projects', () => {
-      expect(wrapper.find(GlLabel).props('title')).toBe(importLabel);
+    it('shows a heading for the user mapping section', () => {
+      expect(
+        getByRole(wrapper.element, 'heading', { name: 'Jira-GitLab user mapping template' }),
+      ).toBeTruthy();
     });
 
     it('shows information to the user', () => {
       expect(wrapper.find('p').text()).toBe(
-        "For each Jira issue successfully imported, we'll create a new GitLab issue with the following data:",
-      );
-    });
-
-    it('shows jira.issue.summary for the Title', () => {
-      expect(wrapper.find('[id="jira-project-title"]').text()).toBe('jira.issue.summary');
-    });
-
-    it('shows an avatar for the Reporter', () => {
-      expect(wrapper.contains(GlAvatar)).toBe(true);
-    });
-
-    it('shows jira.issue.description.content for the Description', () => {
-      expect(wrapper.find('[id="jira-project-description"]').text()).toBe(
-        'jira.issue.description.content',
+        'Jira users have been imported from the configured Jira instance. They can be mapped by selecting a GitLab user from the dropdown in the "GitLab username" column. When the form appears, the dropdown defaults to the user conducting the import.',
       );
     });
   });
 
-  describe('Next button', () => {
-    beforeEach(() => {
-      wrapper = mountComponent();
+  describe('table', () => {
+    describe('headers', () => {
+      beforeEach(() => {
+        wrapper = mountComponent({ mountFunction: mount });
+      });
+
+      it('has a "Jira display name" column', () => {
+        expect(getHeader('Jira display name')).toBeTruthy();
+      });
+
+      it('has an "arrow" column', () => {
+        expect(getHeader('Arrow')).toBeTruthy();
+      });
+
+      it('has a "GitLab username" column', () => {
+        expect(getHeader('GitLab username')).toBeTruthy();
+      });
     });
 
-    it('is shown', () => {
-      expect(wrapper.find(GlButton).text()).toBe('Next');
+    describe('body', () => {
+      it('shows all user mappings', () => {
+        wrapper = mountComponent({ mountFunction: mount });
+
+        expect(getTable().findAll('tbody tr')).toHaveLength(2);
+      });
+
+      it('shows correct information in each cell', () => {
+        wrapper = mountComponent({ mountFunction: mount });
+
+        expect(getTable().element).toMatchSnapshot();
+      });
+
+      describe('when there is no Jira->GitLab user mapping', () => {
+        it('shows the logged in user in the dropdown', () => {
+          wrapper = mountComponent({
+            mountFunction: mount,
+            userMappings: [
+              {
+                jiraAccountId: 'aei23f98f-q23fj98qfj',
+                jiraDisplayName: 'Jane Doe',
+                jiraEmail: 'janedoe@example.com',
+                gitlabId: undefined,
+                gitlabUsername: undefined,
+              },
+            ],
+          });
+
+          expect(getUserDropdown().text()).toContain(currentUsername);
+        });
+      });
+
+      describe('when there is a Jira->GitLab user mapping', () => {
+        it('shows the mapped user in the dropdown', () => {
+          const gitlabUsername = 'mai';
+
+          wrapper = mountComponent({
+            mountFunction: mount,
+            userMappings: [
+              {
+                jiraAccountId: 'aei23f98f-q23fj98qfj',
+                jiraDisplayName: 'Jane Doe',
+                jiraEmail: 'janedoe@example.com',
+                gitlabId: 14,
+                gitlabUsername,
+              },
+            ],
+          });
+
+          expect(getUserDropdown().text()).toContain(gitlabUsername);
+        });
+      });
     });
   });
 
-  describe('Cancel button', () => {
-    beforeEach(() => {
-      wrapper = mountComponent();
+  describe('buttons', () => {
+    describe('"Continue" button', () => {
+      it('is shown', () => {
+        wrapper = mountComponent();
+
+        expect(getContinueButton().text()).toBe('Continue');
+      });
+
+      it('is in loading state when the form is submitting', async () => {
+        wrapper = mountComponent({ isSubmitting: true });
+
+        expect(getContinueButton().props('loading')).toBe(true);
+      });
     });
 
-    it('is shown', () => {
-      expect(getCancelButton().text()).toBe('Cancel');
-    });
+    describe('"Cancel" button', () => {
+      beforeEach(() => {
+        wrapper = mountComponent();
+      });
 
-    it('links to the Issues page', () => {
-      expect(getCancelButton().attributes('href')).toBe('gitlab-org/gitlab-test/-/issues');
+      it('is shown', () => {
+        expect(getCancelButton().text()).toBe('Cancel');
+      });
+
+      it('links to the Issues page', () => {
+        expect(getCancelButton().attributes('href')).toBe(issuesPath);
+      });
     });
   });
 
-  it('emits an "input" event when the input select value changes', () => {
-    wrapper = mountComponent({ mountType: 'mount' });
+  describe('form', () => {
+    it('emits an "initiateJiraImport" event with the selected dropdown value when submitted', () => {
+      const selectedProject = 'MTG';
 
-    getSelectDropdown().vm.$emit('change', value);
+      wrapper = mountComponent({ selectedProject });
 
-    expect(wrapper.emitted('input')[0]).toEqual([value]);
-  });
+      wrapper.find('form').trigger('submit');
 
-  it('emits an "initiateJiraImport" event with the selected dropdown value when submitted', () => {
-    wrapper = mountComponent();
-
-    wrapper.find('form').trigger('submit');
-
-    expect(wrapper.emitted('initiateJiraImport')[0]).toEqual([value]);
+      expect(wrapper.emitted('initiateJiraImport')[0]).toEqual([selectedProject]);
+    });
   });
 });

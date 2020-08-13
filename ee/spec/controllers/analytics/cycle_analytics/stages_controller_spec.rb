@@ -54,6 +54,19 @@ RSpec.describe Analytics::CycleAnalytics::StagesController do
       expect(response).to be_successful
     end
 
+    context 'when `default` value_stream_id is given' do
+      before do
+        params[:value_stream_id] = Analytics::CycleAnalytics::Stages::BaseService::DEFAULT_VALUE_STREAM_NAME
+      end
+
+      it 'returns only the default value stream stages' do
+        subject
+
+        expect(response).to be_successful
+        expect(json_response['stages'].size).to eq(Gitlab::Analytics::CycleAnalytics::DefaultStages.all.size)
+      end
+    end
+
     it 'renders `forbidden` based on the response of the service object' do
       expect_any_instance_of(Analytics::CycleAnalytics::Stages::ListService).to receive(:can?).and_return(false)
 

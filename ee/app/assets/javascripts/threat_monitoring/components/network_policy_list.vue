@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import {
   GlTable,
   GlEmptyState,
@@ -16,6 +16,8 @@ import { setUrlFragment } from '~/lib/utils/url_utility';
 import EnvironmentPicker from './environment_picker.vue';
 import NetworkPolicyEditor from './network_policy_editor.vue';
 
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+
 export default {
   components: {
     GlTable,
@@ -29,8 +31,13 @@ export default {
     EnvironmentPicker,
     NetworkPolicyEditor,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     documentationPath: {
+      type: String,
+      required: true,
+    },
+    newPolicyPath: {
       type: String,
       required: true,
     },
@@ -41,6 +48,7 @@ export default {
   computed: {
     ...mapState('networkPolicies', ['policies', 'isLoadingPolicies', 'isUpdatingPolicy']),
     ...mapState('threatMonitoring', ['currentEnvironmentId']),
+    ...mapGetters('networkPolicies', ['policiesWithDefaults']),
     documentationFullPath() {
       return setUrlFragment(this.documentationPath, 'container-network-policy');
     },
@@ -50,7 +58,7 @@ export default {
     selectedPolicy() {
       if (!this.hasSelectedPolicy) return null;
 
-      return this.policies.find(policy => policy.name === this.selectedPolicyName);
+      return this.policiesWithDefaults.find(policy => policy.name === this.selectedPolicyName);
     },
     hasPolicyChanges() {
       if (!this.hasSelectedPolicy) return false;
@@ -61,12 +69,13 @@ export default {
       );
     },
     hasAutoDevopsPolicy() {
-      return this.policies.some(policy => policy.isAutodevops);
+      return this.policiesWithDefaults.some(policy => policy.isAutodevops);
     },
   },
   methods: {
-    ...mapActions('networkPolicies', ['updatePolicy']),
+    ...mapActions('networkPolicies', ['createPolicy', 'updatePolicy']),
     getTimeAgoString(creationTimestamp) {
+      if (!creationTimestamp) return '';
       return getTimeago().format(creationTimestamp);
     },
     presentPolicyDrawer(rows) {
@@ -84,13 +93,19 @@ export default {
       bTable.clearSelected();
     },
     savePolicy() {
-      return this.updatePolicy({
+      const promise = this.selectedPolicy.creationTimestamp ? this.updatePolicy : this.createPolicy;
+      return promise({
         environmentId: this.currentEnvironmentId,
         policy: this.selectedPolicy,
-      }).then(() => {
-        this.initialManifest = this.selectedPolicy.manifest;
-        this.initialEnforcementStatus = this.selectedPolicy.isEnabled;
-      });
+      })
+        .then(() => {
+          this.initialManifest = this.selectedPolicy.manifest;
+          this.initialEnforcementStatus = this.selectedPolicy.isEnabled;
+        })
+        .catch(() => {
+          this.selectedPolicy.manifest = this.initialManifest;
+          this.selectedPolicy.isEnabled = this.initialEnforcementStatus;
+        });
     },
   },
   fields: [
@@ -141,15 +156,24 @@ export default {
     </div>
 
     <div class="pt-3 px-3 bg-gray-light">
-      <div class="row">
+      <div class="row justify-content-between align-items-center">
         <environment-picker ref="environmentsPicker" />
+        <div v-if="glFeatures.networkPolicyEditor" class="col-sm-auto">
+          <gl-button
+            category="secondary"
+            variant="info"
+            :href="newPolicyPath"
+            data-testid="new-policy"
+            >{{ s__('NetworkPolicies|New policy') }}</gl-button
+          >
+        </div>
       </div>
     </div>
 
     <gl-table
       ref="policiesTable"
       :busy="isLoadingPolicies"
-      :items="policies"
+      :items="policiesWithDefaults"
       :fields="$options.fields"
       head-variant="white"
       stacked="md"

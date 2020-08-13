@@ -1,15 +1,13 @@
 <script>
 import { escape } from 'lodash';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
-import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
   components: {
     EventItem,
-    GlDeprecatedButton,
-    LoadingButton,
+    GlButton,
   },
   props: {
     feedback: {
@@ -118,15 +116,12 @@ export default {
 
         <template #right-content>
           <div class="d-flex flex-grow-1 align-self-start flex-row-reverse">
-            <loading-button
-              :label="__('Delete comment')"
-              container-class="btn btn-remove"
-              @click="$emit('deleteDismissalComment')"
-            />
-
-            <gl-deprecated-button class="mr-2" @click="$emit('hideDismissalDeleteButtons')">
+            <gl-button category="primary" variant="danger" @click="$emit('deleteDismissalComment')">
+              {{ __('Delete comment') }}
+            </gl-button>
+            <gl-button class="mr-2" @click="$emit('hideDismissalDeleteButtons')">
               {{ __('Cancel') }}
-            </gl-deprecated-button>
+            </gl-button>
           </div>
         </template>
       </event-item>

@@ -98,6 +98,8 @@ export default {
         return {
           title: __('Sorry, your filter produced no results'),
           description: __('To widen your search, change or remove filters above'),
+          primaryLink: this.createIssuePath,
+          primaryText: __('New issue'),
         };
       } else if (this.filters.state === 'opened') {
         return {
@@ -275,8 +277,12 @@ export default {
       const {
         label_name: labels,
         milestone_title: milestoneTitle,
+        'not[label_name]': excludedLabels,
+        'not[milestone_title]': excludedMilestone,
         ...filters
       } = this.getQueryObject();
+
+      // TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/227880
 
       if (milestoneTitle) {
         filters.milestone = milestoneTitle;
@@ -288,15 +294,23 @@ export default {
         filters.state = 'opened';
       }
 
+      if (excludedLabels) {
+        filters['not[labels]'] = excludedLabels;
+      }
+
+      if (excludedMilestone) {
+        filters['not[milestone]'] = excludedMilestone;
+      }
+
       Object.assign(filters, sortOrderMap[this.sortKey]);
 
       this.filters = filters;
     },
     refetchIssuables() {
-      const ignored = ['utf8', 'state'];
+      const ignored = ['utf8'];
       const params = omit(this.filters, ignored);
 
-      historyPushState(setUrlParams(params, window.location.href, true));
+      historyPushState(setUrlParams(params, window.location.href, true, true));
       this.fetchIssuables();
     },
     handleFilter(filters) {
@@ -344,7 +358,13 @@ export default {
     </ul>
     <div v-else-if="issuables.length">
       <div v-if="isBulkEditing" class="issue px-3 py-3 border-bottom border-light">
-        <input type="checkbox" :checked="allIssuablesSelected" class="mr-2" @click="onSelectAll" />
+        <input
+          id="check-all-issues"
+          type="checkbox"
+          :checked="allIssuablesSelected"
+          class="mr-2"
+          @click="onSelectAll"
+        />
         <strong>{{ __('Select all') }}</strong>
       </div>
       <ul

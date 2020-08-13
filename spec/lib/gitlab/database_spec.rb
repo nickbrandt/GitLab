@@ -90,28 +90,62 @@ RSpec.describe Gitlab::Database do
   end
 
   describe '.postgresql_minimum_supported_version?' do
-    it 'returns false when using PostgreSQL 9.5' do
-      allow(described_class).to receive(:version).and_return('9.5')
-
-      expect(described_class.postgresql_minimum_supported_version?).to eq(false)
-    end
-
-    it 'returns false when using PostgreSQL 9.6' do
-      allow(described_class).to receive(:version).and_return('9.6')
-
-      expect(described_class.postgresql_minimum_supported_version?).to eq(false)
-    end
-
     it 'returns false when using PostgreSQL 10' do
       allow(described_class).to receive(:version).and_return('10')
 
       expect(described_class.postgresql_minimum_supported_version?).to eq(false)
     end
 
-    it 'returns true when using PostgreSQL 11 or newer' do
-      allow(described_class).to receive(:version).and_return('11.0')
+    it 'returns true when using PostgreSQL 11' do
+      allow(described_class).to receive(:version).and_return('11')
 
       expect(described_class.postgresql_minimum_supported_version?).to eq(true)
+    end
+
+    it 'returns true when using PostgreSQL 12' do
+      allow(described_class).to receive(:version).and_return('12')
+
+      expect(described_class.postgresql_minimum_supported_version?).to eq(true)
+    end
+  end
+
+  describe '.postgresql_upcoming_deprecation?' do
+    it 'returns true when database version is lower than the upcoming minimum' do
+      allow(described_class).to receive(:version).and_return('11')
+
+      expect(described_class.postgresql_upcoming_deprecation?).to eq(true)
+    end
+
+    it 'returns false when database version equals the upcoming minimum' do
+      allow(described_class).to receive(:version).and_return('12')
+
+      expect(described_class.postgresql_upcoming_deprecation?).to eq(false)
+    end
+
+    it 'returns false when database version is greater the upcoming minimum' do
+      allow(described_class).to receive(:version).and_return('13')
+
+      expect(described_class.postgresql_upcoming_deprecation?).to eq(false)
+    end
+  end
+
+  describe '.within_deprecation_notice_window?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:case_name, :days, :result) do
+      'outside window'  | Gitlab::Database::DEPRECATION_WINDOW_DAYS + 1 | false
+      'equal to window' | Gitlab::Database::DEPRECATION_WINDOW_DAYS     | true
+      'within window'   | Gitlab::Database::DEPRECATION_WINDOW_DAYS - 1 | true
+    end
+
+    with_them do
+      it "returns #{params[:result]} when #{params[:case_name]}" do
+        allow(Date)
+          .to receive(:today)
+          .and_return Date.parse(Gitlab::Database::UPCOMING_POSTGRES_VERSION_DETAILS[:gl_version_date]) - days
+
+        expect(described_class.within_deprecation_notice_window?).to eq(result)
+      end
     end
   end
 

@@ -253,7 +253,7 @@ Also:
 
 ### Create Merge Request
 
-Create a new branch and [WIP merge request](../merge_requests/work_in_progress_merge_requests.md)
+Create a new branch and [**Draft** merge request](../merge_requests/work_in_progress_merge_requests.md)
 in one action. The branch will be named `issuenumber-title` by default, but you can
 choose any name, and GitLab will verify that it is not already in use. The merge request
 will automatically inherit the milestone and labels of the issue, and will be set to
@@ -316,4 +316,4 @@ Read more how to [add or remove a zoom meeting](associate_zoom_meeting.md).
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/30906) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.1.
 
-If a status page application is associated with the project, you can use the `/publish` [quick action](../quick_actions.md) to publish the issue. Refer to [GitLab Status Page](../status_page/index.md) for more information.
+If a status page application is associated with the project, you can use the `/publish` [quick action](../quick_actions.md) to publish the issue. Refer to [GitLab Status Page](../../../operations/incident_management/status_page.md) for more information.

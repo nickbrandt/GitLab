@@ -2,7 +2,12 @@
 import $ from 'jquery';
 import GfmAutoComplete from 'ee_else_ce/gfm_auto_complete';
 import issueToken from './issue_token.vue';
-import { autoCompleteTextMap, inputPlaceholderTextMap, issuableTypesMap } from '../constants';
+import {
+  autoCompleteTextMap,
+  inputPlaceholderConfidentialTextMap,
+  inputPlaceholderTextMap,
+  issuableTypesMap,
+} from '../constants';
 
 const SPACE_FACTOR = 1;
 
@@ -51,6 +56,11 @@ export default {
       required: false,
       default: issuableTypesMap.ISSUE,
     },
+    confidential: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -61,9 +71,12 @@ export default {
   },
   computed: {
     inputPlaceholder() {
-      const { issuableType, allowAutoComplete } = this;
+      const { issuableType, allowAutoComplete, confidential } = this;
+      const inputPlaceholderMapping = confidential
+        ? inputPlaceholderConfidentialTextMap
+        : inputPlaceholderTextMap;
       const allowAutoCompleteText = autoCompleteTextMap[allowAutoComplete][issuableType];
-      return `${inputPlaceholderTextMap[issuableType]}${allowAutoCompleteText}`;
+      return `${inputPlaceholderMapping[issuableType]}${allowAutoCompleteText}`;
     },
     allowAutoComplete() {
       return Object.keys(this.autoCompleteSources).length > 0;

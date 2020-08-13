@@ -86,6 +86,8 @@ export default () => {
         fullPath: dataset.fullPath,
         epicIid: dataset.iid,
         newEpicEndpoint: dataset.newEpicEndpoint,
+        groupLabelsEndpoint: dataset.groupLabelsEndpoint,
+        groupMilestonesEndpoint: dataset.groupMilestonesEndpoint,
         epicsState: dataset.epicsState,
         sortedBy: dataset.sortedBy,
         filterQueryString,
@@ -108,8 +110,11 @@ export default () => {
         filterQueryString: this.filterQueryString,
         filterParams: this.filterParams,
         initialEpicsPath: this.initialEpicsPath,
+        groupLabelsEndpoint: this.groupLabelsEndpoint,
+        groupMilestonesEndpoint: this.groupMilestonesEndpoint,
         defaultInnerHeight: this.defaultInnerHeight,
         isChildEpics: this.isChildEpics,
+        hasFiltersApplied: this.hasFiltersApplied,
         allowSubEpics: this.allowSubEpics,
       });
     },
@@ -119,10 +124,7 @@ export default () => {
     render(createElement) {
       return createElement('roadmap-app', {
         props: {
-          store: this.store,
           presetType: this.presetType,
-          hasFiltersApplied: this.hasFiltersApplied,
-          epicsState: this.epicsState,
           newEpicEndpoint: this.newEpicEndpoint,
           emptyStateIllustrationPath: this.emptyStateIllustrationPath,
         },

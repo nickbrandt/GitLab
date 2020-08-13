@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class SubmitUsagePingService
-  URL = 'https://version.gitlab.com/usage_data'
+  PRODUCTION_URL = 'https://version.gitlab.com/usage_data'
+  STAGING_URL = 'https://gitlab-services-version-gitlab-com-staging.gs-staging.gitlab.org/usage_data'
 
   METRICS = %w[leader_issues instance_issues percentage_issues leader_notes instance_notes
                percentage_notes leader_milestones instance_milestones percentage_milestones
@@ -13,24 +14,25 @@ class SubmitUsagePingService
                percentage_projects_prometheus_active leader_service_desk_issues instance_service_desk_issues
                percentage_service_desk_issues].freeze
 
+  SubmissionError = Class.new(StandardError)
+
   def execute
-    return false unless Gitlab::CurrentSettings.usage_ping_enabled?
-    return false if User.single_user&.requires_usage_stats_consent?
+    return unless Gitlab::CurrentSettings.usage_ping_enabled?
+    return if User.single_user&.requires_usage_stats_consent?
+
+    payload = Gitlab::UsageData.to_json(force_refresh: true)
+    raise SubmissionError.new('Usage data is blank') if payload.blank?
 
     response = Gitlab::HTTP.post(
-      URL,
-      body: Gitlab::UsageData.to_json(force_refresh: true),
+      url,
+      body: payload,
       allow_local_requests: true,
       headers: { 'Content-type' => 'application/json' }
     )
 
+    raise SubmissionError.new("Unsuccessful response code: #{response.code}") unless response.success?
+
     store_metrics(response)
-
-    true
-  rescue Gitlab::HTTP::Error => e
-    Gitlab::AppLogger.info("Unable to contact GitLab, Inc.: #{e}")
-
-    false
   end
 
   private
@@ -43,5 +45,14 @@ class SubmitUsagePingService
     DevOpsScore::Metric.create!(
       metrics.slice(*METRICS)
     )
+  end
+
+  # See https://gitlab.com/gitlab-org/gitlab/-/issues/233615 for details
+  def url
+    if Rails.env.production?
+      PRODUCTION_URL
+    else
+      STAGING_URL
+    end
   end
 end

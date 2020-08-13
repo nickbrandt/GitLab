@@ -36,8 +36,8 @@ class GitlabSubscription < ApplicationRecord
     [0, max_seats_used - seats].max
   end
 
-  def has_a_paid_hosted_plan?
-    !trial? &&
+  def has_a_paid_hosted_plan?(include_trials: false)
+    (include_trials || !trial?) &&
       hosted? &&
       seats > 0 &&
       Plan::PAID_HOSTED_PLANS.include?(plan_name)
@@ -88,13 +88,18 @@ class GitlabSubscription < ApplicationRecord
     namespace_id.present?
   end
 
+  def automatically_index_in_elasticsearch?
+    return false unless ::Gitlab.dev_env_or_com?
+    return false if expired?
+
+    has_a_paid_hosted_plan?(include_trials: true)
+  end
+
   # Kick off Elasticsearch indexing for paid groups with new or upgraded paid, hosted subscriptions
   # Uses safe_find_or_create_by to avoid ActiveRecord::RecordNotUnique exception when upgrading from
   # one paid plan to another paid plan
   def index_namespace
-    return unless ::Feature.enabled?(:elasticsearch_index_only_paid_groups) &&
-        has_a_paid_hosted_plan? &&
-        saved_changes.key?('hosted_plan_id')
+    return unless automatically_index_in_elasticsearch?
 
     ElasticsearchIndexedNamespace.safe_find_or_create_by!(namespace_id: namespace_id)
   end

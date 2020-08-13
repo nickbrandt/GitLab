@@ -34,36 +34,6 @@ module Gitlab
           exit 1
         end
       end
-
-      def refresh_foreign_tables!
-        sql = <<~SQL
-            DROP SCHEMA IF EXISTS gitlab_secondary CASCADE;
-            CREATE SCHEMA gitlab_secondary;
-            IMPORT FOREIGN SCHEMA public
-              FROM SERVER gitlab_secondary
-              INTO gitlab_secondary;
-        SQL
-
-        Gitlab::Geo::DatabaseTasks.with_geo_db do
-          ActiveRecord::Base.transaction do
-            ActiveRecord::Base.connection.execute(sql)
-          end
-        end
-
-        Gitlab::Geo::Fdw.expire_cache!
-      end
-
-      def foreign_server_configured?
-        sql = <<~SQL
-          SELECT count(1)
-            FROM pg_foreign_server
-           WHERE srvname = '#{Gitlab::Geo::Fdw::FOREIGN_SERVER}';
-        SQL
-
-        Gitlab::Geo::DatabaseTasks.with_geo_db do
-          ActiveRecord::Base.connection.execute(sql).first.fetch('count').to_i == 1
-        end
-      end
     end
   end
 end

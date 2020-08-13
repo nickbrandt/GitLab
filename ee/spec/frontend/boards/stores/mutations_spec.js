@@ -1,5 +1,4 @@
 import mutations from 'ee/boards/stores/mutations';
-import { inactiveListId } from '~/boards/constants';
 import { mockLists, mockEpics } from '../mock_data';
 
 const expectNotImplemented = action => {
@@ -17,19 +16,6 @@ describe('SET_SHOW_LABELS', () => {
     mutations.SET_SHOW_LABELS(state, false);
 
     expect(state.isShowingLabels).toBe(false);
-  });
-});
-
-describe('SET_ACTIVE_LIST_ID', () => {
-  it('updates aciveListId to be the value that is passed', () => {
-    const expectedId = 1;
-    const state = {
-      activeListId: inactiveListId,
-    };
-
-    mutations.SET_ACTIVE_LIST_ID(state, expectedId);
-
-    expect(state.activeListId).toBe(expectedId);
   });
 });
 
@@ -117,17 +103,17 @@ describe('TOGGLE_EPICS_SWIMLANES', () => {
   });
 });
 
-describe('RECEIVE_SWIMLANES_SUCCESS', () => {
-  it('sets epicsSwimlanesFetchInProgress to false and populates epicsSwimlanes with payload', () => {
+describe('RECEIVE_BOARD_LISTS_SUCCESS', () => {
+  it('sets epicsSwimlanesFetchInProgress to false and populates boardLists with payload', () => {
     const state = {
       epicsSwimlanesFetchInProgress: true,
-      epicsSwimlanes: {},
+      boardLists: {},
     };
 
-    mutations.RECEIVE_SWIMLANES_SUCCESS(state, mockLists);
+    mutations.RECEIVE_BOARD_LISTS_SUCCESS(state, mockLists);
 
     expect(state.epicsSwimlanesFetchInProgress).toBe(false);
-    expect(state.epicsSwimlanes).toEqual(mockLists);
+    expect(state.boardLists).toEqual(mockLists);
   });
 });
 

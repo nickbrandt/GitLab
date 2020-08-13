@@ -136,6 +136,10 @@ module Gitlab
             'in the body of your migration class'
         end
 
+        index_name = index_name[:name] if index_name.is_a?(Hash)
+
+        raise 'remove_concurrent_index_by_name must get an index name as the second argument' if index_name.blank?
+
         options = options.merge({ algorithm: :concurrently })
 
         unless index_exists_by_name?(table_name, index_name)
@@ -811,7 +815,7 @@ module Gitlab
         BEFORE INSERT OR UPDATE
         ON #{table}
         FOR EACH ROW
-        EXECUTE PROCEDURE #{trigger}()
+        EXECUTE FUNCTION #{trigger}()
         EOF
       end
 
@@ -1058,7 +1062,7 @@ into similar problems in the future (e.g. when new tables are created).
           AND pg_class.relname = '#{table}'
         SQL
 
-        connection.select_value(check_sql).positive?
+        connection.select_value(check_sql) > 0
       end
 
       # Adds a check constraint to a table

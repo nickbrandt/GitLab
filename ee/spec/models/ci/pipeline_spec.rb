@@ -14,7 +14,7 @@ RSpec.describe Ci::Pipeline do
 
   it { is_expected.to have_many(:security_scans).through(:builds).class_name('Security::Scan') }
   it { is_expected.to have_many(:downstream_bridges) }
-  it { is_expected.to have_many(:vulnerability_findings).through(:vulnerabilities_finding_pipelines).class_name('Vulnerabilities::Occurrence') }
+  it { is_expected.to have_many(:vulnerability_findings).through(:vulnerabilities_finding_pipelines).class_name('Vulnerabilities::Finding') }
   it { is_expected.to have_many(:vulnerabilities_finding_pipelines).class_name('Vulnerabilities::FindingPipeline') }
 
   describe '.failure_reasons' do
@@ -53,8 +53,8 @@ RSpec.describe Ci::Pipeline do
     let!(:pipeline_3) { create(:ci_pipeline, project: project) }
 
     before do
-      create(:vulnerabilities_occurrence, pipelines: [pipeline_1], project: pipeline.project)
-      create(:vulnerabilities_occurrence, pipelines: [pipeline_2], project: pipeline.project)
+      create(:vulnerabilities_finding, pipelines: [pipeline_1], project: pipeline.project)
+      create(:vulnerabilities_finding, pipelines: [pipeline_2], project: pipeline.project)
     end
 
     it "returns pipeline with vulnerabilities" do
@@ -158,18 +158,18 @@ RSpec.describe Ci::Pipeline do
         expect(subject.reports.keys).to contain_exactly('sast', 'dependency_scanning', 'container_scanning')
 
         # for each of report categories, we have merged 2 reports with the same data (fixture)
-        expect(subject.get_report('sast', sast1_artifact).occurrences.size).to eq(33)
-        expect(subject.get_report('dependency_scanning', ds1_artifact).occurrences.size).to eq(4)
-        expect(subject.get_report('container_scanning', cs1_artifact).occurrences.size).to eq(8)
+        expect(subject.get_report('sast', sast1_artifact).findings.size).to eq(33)
+        expect(subject.get_report('dependency_scanning', ds1_artifact).findings.size).to eq(4)
+        expect(subject.get_report('container_scanning', cs1_artifact).findings.size).to eq(8)
       end
 
       context 'when builds are retried' do
         let(:build_sast_1) { create(:ci_build, :retried, name: 'sast_1', pipeline: pipeline, project: project) }
 
         it 'does not take retried builds into account' do
-          expect(subject.get_report('sast', sast1_artifact).occurrences.size).to eq(33)
-          expect(subject.get_report('dependency_scanning', ds1_artifact).occurrences.size).to eq(4)
-          expect(subject.get_report('container_scanning', cs1_artifact).occurrences.size).to eq(8)
+          expect(subject.get_report('sast', sast1_artifact).findings.size).to eq(33)
+          expect(subject.get_report('dependency_scanning', ds1_artifact).findings.size).to eq(4)
+          expect(subject.get_report('container_scanning', cs1_artifact).findings.size).to eq(8)
         end
       end
     end

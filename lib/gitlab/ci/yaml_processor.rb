@@ -92,6 +92,7 @@ module Gitlab
           cache: job[:cache],
           resource_group_key: job[:resource_group],
           scheduling_type: job[:scheduling_type],
+          secrets: job[:secrets],
           options: {
             image: job[:image],
             services: job[:services],
@@ -114,7 +115,7 @@ module Gitlab
       end
 
       def release(job)
-        job[:release] if Gitlab::Ci::Features.release_generation_enabled?
+        job[:release]
       end
 
       def stage_builds_attributes(stage)

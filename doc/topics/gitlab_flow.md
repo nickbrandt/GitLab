@@ -1,4 +1,7 @@
 ---
+stage: Create
+group: Source Code
+info: "To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers"
 disqus_identifier: 'https://docs.gitlab.com/ee/workflow/gitlab_flow.html'
 ---
 
@@ -176,9 +179,9 @@ The name of a branch might be dictated by organizational standards.
 When you are done or want to discuss the code, open a merge request.
 A merge request is an online place to discuss the change and review the code.
 
-If you open the merge request but do not assign it to anyone, it is a "Work In Progress" merge request.
+If you open the merge request but do not assign it to anyone, it is a [draft merge request](../user/project/merge_requests/work_in_progress_merge_requests.md).
 These are used to discuss the proposed implementation but are not ready for inclusion in the `master` branch yet.
-Start the title of the merge request with `[WIP]` or `WIP:` to prevent it from being merged before it's ready.
+Start the title of the merge request with `[Draft]`, `Draft:` or `(Draft)` to prevent it from being merged before it's ready.
 
 When you think the code is ready, assign the merge request to a reviewer.
 The reviewer can merge the changes when they think the code is ready for inclusion in the `master` branch.
@@ -266,11 +269,11 @@ One option is to use continuous integration (CI) to merge in `master` at the sta
 Another option is to only merge in from well-defined points in time, for example, a tagged release.
 You could also use [feature toggles](https://martinfowler.com/bliki/FeatureToggle.html) to hide incomplete features so you can still merge back into `master` every day.
 
-> **Note:** Don't confuse automatic branch testing with continuous integration.
-> Martin Fowler makes this distinction in [his article about feature branches](https://martinfowler.com/bliki/FeatureBranch.html):
->
-> "I've heard people say they are doing CI because they are running builds, perhaps using a CI server, on every branch with every commit.
-> That's continuous building, and a Good Thing, but there's no *integration*, so it's not CI."
+NOTE: **Note:**
+Don't confuse automatic branch testing with continuous integration.
+Martin Fowler makes this distinction in [his article about feature branches](https://martinfowler.com/bliki/FeatureBranch.html):
+"I've heard people say they are doing CI because they are running builds, perhaps using a CI server, on every branch with every commit.
+That's continuous building, and a Good Thing, but there's no *integration*, so it's not CI."
 
 In conclusion, you should try to prevent merge commits, but not eliminate them.
 Your codebase should be clean, but your history should represent what actually happened.

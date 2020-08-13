@@ -10,7 +10,9 @@ import {
 } from '@gitlab/ui';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import { __ } from '~/locale';
+import IterationReportSummary from './iteration_report_summary.vue';
 import IterationForm from './iteration_form.vue';
+import IterationReportTabs from './iteration_report_tabs.vue';
 import query from '../queries/group_iteration.query.graphql';
 
 const iterationStates = {
@@ -29,13 +31,15 @@ export default {
     GlNewDropdown,
     GlNewDropdownItem,
     IterationForm,
+    IterationReportSummary,
+    IterationReportTabs,
   },
   apollo: {
-    group: {
+    namespace: {
       query,
       variables() {
         return {
-          groupPath: this.groupPath,
+          groupPath: this.fullPath,
           iid: this.iterationIid,
         };
       },
@@ -52,7 +56,7 @@ export default {
     },
   },
   props: {
-    groupPath: {
+    fullPath: {
       type: String,
       required: true,
     },
@@ -70,17 +74,17 @@ export default {
     return {
       isEditing: false,
       error: '',
-      group: {
+      namespace: {
         iteration: {},
       },
     };
   },
   computed: {
     iteration() {
-      return this.group.iteration;
+      return this.namespace.iteration;
     },
     hasIteration() {
-      return !this.$apollo.queries.group.loading && this.iteration?.title;
+      return !this.$apollo.queries.namespace.loading && this.iteration?.title;
     },
     status() {
       switch (this.iteration.state) {
@@ -111,7 +115,7 @@ export default {
     <gl-alert v-if="error" variant="danger" @dismiss="error = ''">
       {{ error }}
     </gl-alert>
-    <gl-loading-icon v-if="$apollo.queries.group.loading" class="gl-py-5" size="lg" />
+    <gl-loading-icon v-if="$apollo.queries.namespace.loading" class="gl-py-5" size="lg" />
     <gl-empty-state
       v-else-if="!hasIteration"
       :title="__('Could not find iteration')"
@@ -119,7 +123,7 @@ export default {
     />
     <iteration-form
       v-else-if="isEditing"
-      :group-path="groupPath"
+      :group-path="fullPath"
       :is-editing="true"
       :iteration="iteration"
       @updated="isEditing = false"
@@ -153,7 +157,9 @@ export default {
         </gl-new-dropdown>
       </div>
       <h3 ref="title" class="page-title">{{ iteration.title }}</h3>
-      <div ref="description" v-html="iteration.description"></div>
+      <div ref="description" v-text="iteration.description"></div>
+      <iteration-report-summary :group-path="fullPath" :iteration-id="iteration.id" />
+      <iteration-report-tabs :group-path="fullPath" :iteration-id="iteration.id" />
     </template>
   </div>
 </template>

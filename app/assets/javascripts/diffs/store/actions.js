@@ -105,7 +105,9 @@ export const fetchDiffFiles = ({ state, commit }) => {
     .catch(() => worker.terminate());
 };
 
-export const fetchDiffFilesBatch = ({ commit, state }) => {
+export const fetchDiffFilesBatch = ({ commit, state, dispatch }) => {
+  const id = window?.location?.hash;
+  const isNoteLink = id.indexOf('#note') === 0;
   const urlParams = {
     per_page: DIFFS_PER_PAGE,
     w: state.showWhitespace ? '0' : '1',
@@ -125,16 +127,36 @@ export const fetchDiffFilesBatch = ({ commit, state }) => {
         commit(types.SET_DIFF_DATA_BATCH, { diff_files });
         commit(types.SET_BATCH_LOADING, false);
 
+        if (!isNoteLink && !state.currentDiffFileId) {
+          commit(types.UPDATE_CURRENT_DIFF_FILE_ID, diff_files[0].file_hash);
+        }
+
+        if (isNoteLink) {
+          dispatch('setCurrentDiffFileIdFromNote', id.split('_').pop());
+        }
+
         if (!pagination.next_page) {
           commit(types.SET_RETRIEVING_BATCHES, false);
+
+          // We need to check that the currentDiffFileId points to a file that exists
+          if (
+            state.currentDiffFileId &&
+            !state.diffFiles.some(f => f.file_hash === state.currentDiffFileId) &&
+            !isNoteLink
+          ) {
+            commit(types.UPDATE_CURRENT_DIFF_FILE_ID, state.diffFiles[0].file_hash);
+          }
+
           if (gon.features?.codeNavigation) {
             // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
             import('~/code_navigation').then(m =>
               m.default({
-                blobs: state.diffFiles.map(f => ({
-                  path: f.new_path,
-                  codeNavigationPath: f.code_navigation_path,
-                })),
+                blobs: state.diffFiles
+                  .filter(f => f.code_navigation_path)
+                  .map(f => ({
+                    path: f.new_path,
+                    codeNavigationPath: f.code_navigation_path,
+                  })),
                 definitionPathPrefix: state.definitionPathPrefix,
               }),
             );
@@ -213,9 +235,11 @@ export const setHighlightedRow = ({ commit }, lineCode) => {
 // This is adding line discussions to the actual lines in the diff tree
 // once for parallel and once for inline mode
 export const assignDiscussionsToDiff = (
-  { commit, state, rootState },
+  { commit, state, rootState, dispatch },
   discussions = rootState.notes.discussions,
 ) => {
+  const id = window?.location?.hash;
+  const isNoteLink = id.indexOf('#note') === 0;
   const diffPositionByLineCode = getDiffPositionByLineCode(
     state.diffFiles,
     state.useSingleDiffStyle,
@@ -231,6 +255,10 @@ export const assignDiscussionsToDiff = (
         hash,
       });
     });
+
+  if (isNoteLink) {
+    dispatch('setCurrentDiffFileIdFromNote', id.split('_').pop());
+  }
 
   Vue.nextTick(() => {
     eventHub.$emit('scrollToDiscussion');
@@ -450,6 +478,8 @@ export const toggleTreeOpen = ({ commit }, path) => {
 };
 
 export const scrollToFile = ({ state, commit }, path) => {
+  if (!state.treeEntries[path]) return;
+
   const { fileHash } = state.treeEntries[path];
   document.location.hash = fileHash;
 
@@ -713,5 +743,21 @@ export function moveToNeighboringCommit({ dispatch, state }, { direction }) {
   }
 }
 
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};
+export const setCurrentDiffFileIdFromNote = ({ commit, state, rootGetters }, noteId) => {
+  const note = rootGetters.notesById[noteId];
+
+  if (!note) return;
+
+  const fileHash = rootGetters.getDiscussion(note.discussion_id).diff_file?.file_hash;
+
+  if (fileHash && state.diffFiles.some(f => f.file_hash === fileHash)) {
+    commit(types.UPDATE_CURRENT_DIFF_FILE_ID, fileHash);
+  }
+};
+
+export const navigateToDiffFileIndex = ({ commit, state }, index) => {
+  const fileHash = state.diffFiles[index].file_hash;
+  document.location.hash = fileHash;
+
+  commit(types.UPDATE_CURRENT_DIFF_FILE_ID, fileHash);
+};

@@ -503,11 +503,33 @@ RSpec.describe ProjectsController do
 
   describe 'DELETE #destroy' do
     let(:owner) { create(:user) }
-    let(:project) { create(:project, namespace: owner.namespace)}
+    let(:group) { create(:group) }
+    let(:project) { create(:project, group: group)}
 
     before do
+      group.add_user(owner, Gitlab::Access::OWNER)
       controller.instance_variable_set(:@project, project)
       sign_in(owner)
+    end
+
+    shared_examples 'deletes project right away' do
+      it do
+        delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+        expect(project.marked_for_deletion?).to be_falsey
+        expect(response).to have_gitlab_http_status(:found)
+        expect(response).to redirect_to(dashboard_projects_path)
+      end
+    end
+
+    shared_examples 'marks project for deletion' do
+      it do
+        delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+        expect(project.reload.marked_for_deletion?).to be_truthy
+        expect(response).to have_gitlab_http_status(:found)
+        expect(response).to redirect_to(project_path(project))
+      end
     end
 
     context 'feature is available' do
@@ -515,36 +537,50 @@ RSpec.describe ProjectsController do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
-      it 'marks project for deletion' do
-        delete :destroy, params: { namespace_id: project.namespace, id: project }
+      context 'when feature is enabled for group' do
+        before do
+          allow(group).to receive(:delayed_project_removal?).and_return(true)
+        end
 
-        expect(project.reload.marked_for_deletion?).to be_truthy
-        expect(response).to have_gitlab_http_status(:found)
-        expect(response).to redirect_to(project_path(project))
-      end
+        it_behaves_like 'marks project for deletion'
 
-      it 'does not mark project for deletion because of error' do
-        message = 'Error'
+        it 'does not mark project for deletion because of error' do
+          message = 'Error'
 
-        expect(::Projects::MarkForDeletionService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: message })
-
-        delete :destroy, params: { namespace_id: project.namespace, id: project }
-
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to render_template(:edit)
-        expect(flash[:alert]).to include(message)
-      end
-
-      context 'when instance setting is set to 0 days' do
-        it 'deletes project right away' do
-          allow(Gitlab::CurrentSettings).to receive(:deletion_adjourned_period).and_return(0)
+          expect(::Projects::MarkForDeletionService).to receive_message_chain(:new, :execute).and_return({ status: :error, message: message })
 
           delete :destroy, params: { namespace_id: project.namespace, id: project }
 
-          expect(project.marked_for_deletion?).to be_falsey
-          expect(response).to have_gitlab_http_status(:found)
-          expect(response).to redirect_to(dashboard_projects_path)
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to render_template(:edit)
+          expect(flash[:alert]).to include(message)
         end
+
+        context 'when instance setting is set to 0 days' do
+          it 'deletes project right away' do
+            stub_application_setting(deletion_adjourned_period: 0)
+
+            delete :destroy, params: { namespace_id: project.namespace, id: project }
+
+            expect(project.marked_for_deletion?).to be_falsey
+            expect(response).to have_gitlab_http_status(:found)
+            expect(response).to redirect_to(dashboard_projects_path)
+          end
+        end
+      end
+
+      context 'when feature is disabled for group' do
+        before do
+          allow(group).to receive(:delayed_project_removal).and_return(false)
+        end
+
+        it_behaves_like 'deletes project right away'
+      end
+
+      context 'for projects in user namespace' do
+        let(:project) { create(:project, namespace: owner.namespace)}
+
+        it_behaves_like 'deletes project right away'
       end
     end
 
@@ -553,13 +589,7 @@ RSpec.describe ProjectsController do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
 
-      it 'deletes project right away' do
-        delete :destroy, params: { namespace_id: project.namespace, id: project }
-
-        expect(project.marked_for_deletion?).to be_falsey
-        expect(response).to have_gitlab_http_status(:found)
-        expect(response).to redirect_to(dashboard_projects_path)
-      end
+      it_behaves_like 'deletes project right away'
     end
   end
 

@@ -37,7 +37,7 @@
             %span= _('License Compliance')
 
       - if project_nav_tab?(:threat_monitoring)
-        = nav_link(path: 'projects/threat_monitoring#show') do
+        = nav_link(controller: ['projects/threat_monitoring']) do
           = link_to project_threat_monitoring_path(@project), title: _('Threat Monitoring') do
             %span= _('Threat Monitoring')
 

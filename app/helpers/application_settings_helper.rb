@@ -262,7 +262,7 @@ module ApplicationSettingsHelper
       :login_recaptcha_protection_enabled,
       :receive_max_input_size,
       :repository_checks_enabled,
-      :repository_storages,
+      :repository_storages_weighted,
       :require_two_factor_authentication,
       :restricted_visibility_levels,
       :rsa_key_restriction,
@@ -327,7 +327,8 @@ module ApplicationSettingsHelper
       :project_download_export_limit,
       :group_import_limit,
       :group_export_limit,
-      :group_download_export_limit
+      :group_download_export_limit,
+      :wiki_page_max_content_bytes
     ]
   end
 

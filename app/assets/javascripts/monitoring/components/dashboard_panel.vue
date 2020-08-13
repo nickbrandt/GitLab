@@ -1,17 +1,20 @@
 <script>
 import { mapState } from 'vuex';
-import { pickBy } from 'lodash';
+import { mapValues, pickBy } from 'lodash';
 import invalidUrl from '~/lib/utils/invalid_url';
+import { convertToFixedRange } from '~/lib/utils/datetime_range';
 import { relativePathToAbsolute, getBaseURL, visitUrl, isSafeURL } from '~/lib/utils/url_utility';
 import {
   GlResizeObserverDirective,
   GlIcon,
+  GlLink,
   GlLoadingIcon,
   GlNewDropdown as GlDropdown,
   GlNewDropdownItem as GlDropdownItem,
   GlNewDropdownDivider as GlDropdownDivider,
   GlModal,
   GlModalDirective,
+  GlSprintf,
   GlTooltip,
   GlTooltipDirective,
 } from '@gitlab/ui';
@@ -22,6 +25,7 @@ import MonitorEmptyChart from './charts/empty_chart.vue';
 import MonitorTimeSeriesChart from './charts/time_series.vue';
 import MonitorAnomalyChart from './charts/anomaly.vue';
 import MonitorSingleStatChart from './charts/single_stat.vue';
+import MonitorGaugeChart from './charts/gauge.vue';
 import MonitorHeatmapChart from './charts/heatmap.vue';
 import MonitorColumnChart from './charts/column.vue';
 import MonitorBarChart from './charts/bar.vue';
@@ -30,6 +34,7 @@ import MonitorStackedColumnChart from './charts/stacked_column.vue';
 import TrackEventDirective from '~/vue_shared/directives/track_event';
 import AlertWidget from './alert_widget.vue';
 import { timeRangeToUrl, downloadCSVOptions, generateLinkToChartOptions } from '../utils';
+import { graphDataToCsv } from '../csv_export';
 
 const events = {
   timeRangeZoom: 'timerangezoom',
@@ -41,12 +46,14 @@ export default {
     MonitorEmptyChart,
     AlertWidget,
     GlIcon,
+    GlLink,
     GlLoadingIcon,
     GlTooltip,
     GlDropdown,
     GlDropdownItem,
     GlDropdownDivider,
     GlModal,
+    GlSprintf,
   },
   directives: {
     GlResizeObserver: GlResizeObserverDirective,
@@ -128,6 +135,15 @@ export default {
         return getters[`${this.namespace}/selectedDashboard`];
       },
     }),
+    fixedCurrentTimeRange() {
+      // convertToFixedRange throws an error if the time range
+      // is not properly set.
+      try {
+        return convertToFixedRange(this.timeRange);
+      } catch {
+        return {};
+      }
+    },
     title() {
       return this.graphData?.title || '';
     },
@@ -148,13 +164,10 @@ export default {
       return null;
     },
     csvText() {
-      const chartData = this.graphData?.metrics[0].result[0].values || [];
-      const yLabel = this.graphData.y_label;
-      const header = `timestamp,${yLabel}\r\n`; // eslint-disable-line @gitlab/require-i18n-strings
-      return chartData.reduce((csv, data) => {
-        const row = data.join(',');
-        return `${csv}${row}\r\n`;
-      }, header);
+      if (this.graphData) {
+        return graphDataToCsv(this.graphData);
+      }
+      return null;
     },
     downloadCsv() {
       const data = new Blob([this.csvText], { type: 'text/plain' });
@@ -171,6 +184,9 @@ export default {
     basicChartComponent() {
       if (this.isPanelType(panelTypes.SINGLE_STAT)) {
         return MonitorSingleStatChart;
+      }
+      if (this.isPanelType(panelTypes.GAUGE_CHART)) {
+        return MonitorGaugeChart;
       }
       if (this.isPanelType(panelTypes.HEATMAP)) {
         return MonitorHeatmapChart;
@@ -217,7 +233,8 @@ export default {
       return (
         this.isPanelType(panelTypes.AREA_CHART) ||
         this.isPanelType(panelTypes.LINE_CHART) ||
-        this.isPanelType(panelTypes.SINGLE_STAT)
+        this.isPanelType(panelTypes.SINGLE_STAT) ||
+        this.isPanelType(panelTypes.GAUGE_CHART)
       );
     },
     editCustomMetricLink() {
@@ -328,6 +345,19 @@ export default {
         this.$refs.copyChartLink.$el.firstChild.click();
       }
     },
+    getAlertRunbooks(queries) {
+      const hasRunbook = alert => Boolean(alert.runbookUrl);
+      const graphAlertsWithRunbooks = pickBy(this.getGraphAlerts(queries), hasRunbook);
+      const alertToRunbookTransform = alert => {
+        const alertQuery = queries.find(query => query.metricId === alert.metricId);
+        return {
+          key: alert.metricId,
+          href: alert.runbookUrl,
+          label: alertQuery.label,
+        };
+      };
+      return mapValues(graphAlertsWithRunbooks, alertToRunbookTransform);
+    },
   },
   panelTypes,
 };
@@ -423,6 +453,25 @@ export default {
             >
               {{ __('Alerts') }}
             </gl-dropdown-item>
+            <gl-dropdown-item
+              v-for="runbook in getAlertRunbooks(graphData.metrics)"
+              :key="runbook.key"
+              :href="safeUrl(runbook.href)"
+              data-testid="runbookLink"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="gl-display-flex gl-justify-content-space-between gl-align-items-center">
+                <span>
+                  <gl-sprintf :message="s__('Metrics|View runbook - %{label}')">
+                    <template #label>
+                      {{ runbook.label }}
+                    </template>
+                  </gl-sprintf>
+                </span>
+                <gl-icon name="external-link" />
+              </span>
+            </gl-dropdown-item>
 
             <template v-if="graphData.links && graphData.links.length">
               <gl-dropdown-divider />
@@ -465,6 +514,7 @@ export default {
       :thresholds="getGraphAlertValues(graphData.metrics)"
       :group-id="groupId"
       :timezone="dashboardTimezone"
+      :time-range="fixedCurrentTimeRange"
       v-bind="$attrs"
       v-on="$listeners"
       @datazoom="onDatazoom"

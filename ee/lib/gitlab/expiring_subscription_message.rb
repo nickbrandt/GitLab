@@ -2,6 +2,9 @@
 
 module Gitlab
   class ExpiringSubscriptionMessage
+    GRACE_PERIOD_EXTENSION_DAYS = 30.days
+
+    include Gitlab::Utils::StrongMemoize
     include ActionView::Helpers::TextHelper
 
     attr_reader :subscribable, :signed_in, :is_admin, :namespace
@@ -26,7 +29,7 @@ module Gitlab
     private
 
     def license_message_subject
-      message = subscribable.expired? ? expired_subject : expiring_subject
+      message = expired_but_within_cutoff? ? expired_subject : expiring_subject
 
       message = content_tag(:strong, message)
 
@@ -46,19 +49,13 @@ module Gitlab
     end
 
     def expiring_subject
-      remaining_days = pluralize(subscribable.remaining_days, 'day')
-
-      if auto_renew?
-        _('Your subscription will automatically renew in %{remaining_days}.') % { remaining_days: remaining_days }
-      else
-        _('Your subscription will expire in %{remaining_days}.') % { remaining_days: remaining_days }
-      end
+      _('Your subscription will expire in %{remaining_days}.') % { remaining_days: remaining_days_formatted }
     end
 
     def expiration_blocking_message
       return '' unless subscribable.will_block_changes?
 
-      message = subscribable.expired? ? expired_message : expiring_message
+      message = expired_but_within_cutoff? ? expired_message : expiring_message
 
       content_tag(:p, message.html_safe)
     end
@@ -66,9 +63,7 @@ module Gitlab
     def expired_message
       return block_changes_message if subscribable.block_changes?
 
-      remaining_days = pluralize((subscribable.block_changes_at - Date.today).to_i, 'day')
-
-      _('No worries, you can still use all the %{strong}%{plan_name}%{strong_close} features for now. You have %{remaining_days} to renew your subscription.') % { plan_name: plan_name, remaining_days: remaining_days, strong: strong, strong_close: strong_close }
+      _('No worries, you can still use all the %{strong}%{plan_name}%{strong_close} features for now. You have %{remaining_days} to renew your subscription.') % { plan_name: plan_name, remaining_days: remaining_days_formatted, strong: strong, strong_close: strong_close }
     end
 
     def block_changes_message
@@ -81,7 +76,7 @@ module Gitlab
       if auto_renew?
         support_link = '<a href="mailto:support@gitlab.com">support@gitlab.com</a>'.html_safe
 
-        _('We tried to automatically renew your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} on %{expires_on} but something went wrong so your subscription was downgraded to the free plan. Don\'t worry, your data is safe. We suggest you check your payment method and get in touch with our support team (%{support_link}). They\'ll gladly help with your subscription renewal.') % { plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name, support_link: support_link, expires_on: subscribable.expires_at.strftime("%Y-%m-%d") }
+        _('We tried to automatically renew your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} on %{expires_on} but something went wrong so your subscription was downgraded to the free plan. Don\'t worry, your data is safe. We suggest you check your payment method and get in touch with our support team (%{support_link}). They\'ll gladly help with your subscription renewal.') % { plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name, support_link: support_link, expires_on: expires_at_or_cutoff_at.strftime("%Y-%m-%d") }
       else
         _('You didn\'t renew your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} so it was downgraded to the free plan.') % { plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name }
       end
@@ -90,21 +85,17 @@ module Gitlab
     def expiring_message
       return namespace_expiring_message if namespace
 
-      _('Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not to be able to create issues or merge requests as well as many other features.') % { expires_on: subscribable.expires_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close }
+      _('Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not to be able to create issues or merge requests as well as many other features.') % { expires_on: expires_at_or_cutoff_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close }
     end
 
     def namespace_expiring_message
-      if auto_renew?
-        _('We will automatically renew your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} on %{strong}%{expires_on}%{strong_close}. There\'s nothing that you need to do, we\'ll let you know when the renewal is complete. Need more seats, a higher plan or just want to review your payment method?') % { expires_on: subscribable.expires_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name }
-      else
-        message = []
+      message = []
 
-        message << _('Your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} will expire on %{strong}%{expires_on}%{strong_close}.') % { expires_on: subscribable.expires_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name }
+      message << _('Your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} will expire on %{strong}%{expires_on}%{strong_close}.') % { expires_on: expires_at_or_cutoff_at.strftime("%Y-%m-%d"), plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name }
 
-        message << expiring_features_message
+      message << expiring_features_message
 
-        message.join(' ')
-      end
+      message.join(' ')
     end
 
     def expiring_features_message
@@ -127,6 +118,8 @@ module Gitlab
     end
 
     def require_notification?
+      return false if expiring_auto_renew?
+
       auto_renew_choice_exists? && expired_subscribable_within_notification_window?
     end
 
@@ -134,11 +127,14 @@ module Gitlab
       auto_renew? != nil
     end
 
-    def expired_subscribable_within_notification_window?
-      return true unless subscribable.expired?
+    def expiring_auto_renew?
+      auto_renew? && !expired_but_within_cutoff?
+    end
 
-      expired_at = subscribable.expires_at
-      (expired_at..(expired_at + 30.days)).cover?(Date.today)
+    def expired_subscribable_within_notification_window?
+      return true unless expired_but_within_cutoff?
+
+      (expires_at_or_cutoff_at + GRACE_PERIOD_EXTENSION_DAYS) > Date.today
     end
 
     def plan_name
@@ -155,6 +151,45 @@ module Gitlab
 
     def auto_renew?
       subscribable.auto_renew?
+    end
+
+    def grace_period_effective_from
+      Date.parse('2020-07-22')
+    end
+
+    def self_managed?
+      subscribable.is_a?(::License)
+    end
+
+    def expires_at_or_cutoff_at
+      strong_memoize(:expires_at_or_cutoff_at) do
+        # self-managed licenses are unconcerned of our announcement.
+        if self_managed?
+          subscribable.expires_at
+        else
+          cutoff_at = grace_period_effective_from + GRACE_PERIOD_EXTENSION_DAYS
+
+          [subscribable.expires_at, cutoff_at].max
+        end
+      end
+    end
+
+    def expired_but_within_cutoff?
+      strong_memoize(:expired) do
+        subscribable.expired? && expires_at_or_cutoff_at < Date.today
+      end
+    end
+
+    def remaining_days_formatted
+      strong_memoize(:remaining_days_formatted) do
+        days = if expired_but_within_cutoff?
+                 (subscribable.block_changes_at - Date.today).to_i
+               else
+                 (expires_at_or_cutoff_at - Date.today).to_i
+               end
+
+        pluralize(days, 'day')
+      end
     end
   end
 end

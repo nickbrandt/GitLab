@@ -125,7 +125,7 @@ RSpec.describe ApplicationHelper do
         end
 
         it 'returns paths for autocomplete_sources_controller including epics for group projects' do
-          object.update(group: create(:group))
+          object.update!(group: create(:group))
 
           expect_autocomplete_data_sources(object, noteable_type, [:members, :issues, :mergeRequests, :labels, :milestones, :commands, :snippets, :epics])
         end
@@ -162,6 +162,7 @@ RSpec.describe ApplicationHelper do
       let(:expected_partial_path) do
         "app/views/#{File.dirname(partial)}/_#{File.basename(partial)}.html.haml"
       end
+
       let(:expected_view_path) do
         "app/views/#{File.dirname(view)}/#{File.basename(view)}.html.haml"
       end
@@ -185,6 +186,32 @@ RSpec.describe ApplicationHelper do
         ee_view = helper.lookup_context.find(view, [], false)
         expect(ee_view.short_identifier).to eq("ee/#{expected_view_path}")
       end
+    end
+  end
+
+  describe '#instance_review_permitted?' do
+    let_it_be(:non_admin_user) { create :user }
+    let_it_be(:admin_user) { create :user, :admin }
+
+    before do
+      allow(::Gitlab::CurrentSettings).to receive(:instance_review_permitted?).and_return(app_setting)
+      allow(helper).to receive(:current_user).and_return(current_user)
+    end
+
+    subject { helper.instance_review_permitted? }
+
+    where(app_setting: [true, false], is_admin: [true, false, nil])
+
+    with_them do
+      let(:current_user) do
+        if is_admin.nil?
+          nil
+        else
+          is_admin ? admin_user : non_admin_user
+        end
+      end
+
+      it { is_expected.to be(app_setting && is_admin) }
     end
   end
 

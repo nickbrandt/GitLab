@@ -80,6 +80,20 @@ RSpec.describe Resolvers::VulnerabilitiesResolver do
       it 'only returns vulnerabilities belonging to the given projects' do
         is_expected.to contain_exactly(project2_vulnerability)
       end
+
+      context 'with multiple project IDs' do
+        let(:filters) { { project_id: [project.id, project2.id] } }
+
+        it 'avoids N+1 queries' do
+          control_count = ActiveRecord::QueryRecorder.new do
+            resolve(described_class, obj: vulnerable, args: { project_id: [project2.id] }, ctx: { current_user: current_user })
+          end.count
+
+          expect do
+            subject
+          end.not_to exceed_query_limit(control_count)
+        end
+      end
     end
 
     context 'when resolving vulnerabilities for a project' do

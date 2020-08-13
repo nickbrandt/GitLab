@@ -47,6 +47,7 @@ const createComponent = ({ state, getters, props, actionMocks, isAdmin, options,
           managedLicenses,
           isLoadingManagedLicenses: true,
           isAdmin,
+          knownLicenses: [],
           ...state,
         },
         actions: {
@@ -147,30 +148,13 @@ describe('License Management', () => {
         });
       });
 
-      describe.each([true, false])(
-        'with licenseApprovals feature flag set to "%p"',
-        licenseApprovalsEnabled => {
-          beforeEach(() => {
-            createComponent({
-              state: { isLoadingManagedLicenses: false },
-              isAdmin: true,
-              options: {
-                provide: {
-                  glFeatures: { licenseApprovals: licenseApprovalsEnabled },
-                },
-              },
-            });
-          });
-
-          it('should render the license-approvals section accordingly', () => {
-            expect(wrapper.find(LicenseComplianceApprovals).exists()).toBe(licenseApprovalsEnabled);
-          });
-        },
-      );
-
       describe('when not loading', () => {
         beforeEach(() => {
           createComponent({ state: { isLoadingManagedLicenses: false }, isAdmin: true });
+        });
+
+        it('should render the license-approvals section accordingly', () => {
+          expect(wrapper.find(LicenseComplianceApprovals).exists()).toBe(true);
         });
 
         it('should render the form if the form is open and disable the form button', () => {

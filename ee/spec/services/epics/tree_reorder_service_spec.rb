@@ -237,7 +237,7 @@ RSpec.describe Epics::TreeReorderService do
               epic2.update(parent: epic1)
             end
 
-            it_behaves_like 'error for the tree update', "This epic can't be added because it must belong to the same group as the parent, or subgroup of the parent epic’s group"
+            it_behaves_like 'error for the tree update', "This epic cannot be added. An epic must belong to the same group or subgroup as its parent epic."
           end
 
           context 'when user does not have permissions to admin the new parent' do

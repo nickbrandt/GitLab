@@ -30,6 +30,14 @@ export const groupedDependencyText = ({ dependencyScanning }) =>
     messages.DEPENDENCY_SCANNING_IS_LOADING,
   );
 
+export const groupedCoverageFuzzingText = ({ coverageFuzzing }) =>
+  groupedReportText(
+    coverageFuzzing,
+    messages.COVERAGE_FUZZING,
+    messages.COVERAGE_FUZZING_HAS_ERROR,
+    messages.COVERAGE_FUZZING_IS_LOADING,
+  );
+
 export const summaryCounts = ({
   containerScanning,
   dast,
@@ -107,6 +115,9 @@ export const dependencyScanningStatusIcon = ({ dependencyScanning }) =>
 export const secretScanningStatusIcon = ({ secretScanning }) =>
   statusIcon(secretScanning.isLoading, secretScanning.hasError, secretScanning.newIssues.length);
 
+export const coverageFuzzingStatusIcon = ({ coverageFuzzing }) =>
+  statusIcon(coverageFuzzing.isLoading, coverageFuzzing.hasError, coverageFuzzing.newIssues.length);
+
 export const areReportsLoading = state =>
   state.sast.isLoading ||
   state.dast.isLoading ||
@@ -163,6 +174,3 @@ export const canCreateMergeRequest = state =>
 
 export const canDismissVulnerability = state =>
   Boolean(state.createVulnerabilityFeedbackDismissalPath);
-
-// prevent babel-plugin-rewire from generating an invalid default during karma tests
-export default () => {};

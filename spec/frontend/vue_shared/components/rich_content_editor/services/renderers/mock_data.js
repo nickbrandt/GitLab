@@ -12,27 +12,28 @@ export const normalTextNode = buildMockTextNode('This is just normal text.');
 
 // Token spec helpers
 
-const buildUneditableOpenToken = type => {
+const buildMockUneditableOpenToken = type => {
   return {
     type: 'openTag',
     tagName: type,
     attributes: { contenteditable: false },
     classNames: [
-      'gl-px-4 gl-py-2 gl-opacity-5 gl-bg-gray-100 gl-user-select-none gl-cursor-not-allowed',
+      'gl-px-4 gl-py-2 gl-my-5 gl-opacity-5 gl-bg-gray-100 gl-user-select-none gl-cursor-not-allowed',
     ],
   };
 };
 
-const buildUneditableCloseToken = type => {
+const buildMockUneditableCloseToken = type => {
   return { type: 'closeTag', tagName: type };
 };
 
 export const originToken = {
   type: 'text',
+  tagName: null,
   content: '{:.no_toc .hidden-md .hidden-lg}',
 };
-export const uneditableCloseToken = buildUneditableCloseToken('div');
-export const uneditableOpenTokens = [buildUneditableOpenToken('div'), originToken];
+export const uneditableCloseToken = buildMockUneditableCloseToken('div');
+export const uneditableOpenTokens = [buildMockUneditableOpenToken('div'), originToken];
 export const uneditableCloseTokens = [originToken, uneditableCloseToken];
 export const uneditableTokens = [...uneditableOpenTokens, uneditableCloseToken];
 
@@ -41,7 +42,17 @@ export const originInlineToken = {
   content: '<i>Inline</i> content',
 };
 export const uneditableInlineTokens = [
-  buildUneditableOpenToken('span'),
+  buildMockUneditableOpenToken('a'),
   originInlineToken,
-  buildUneditableCloseToken('span'),
+  buildMockUneditableCloseToken('a'),
+];
+
+export const uneditableBlockTokens = [
+  buildMockUneditableOpenToken('div'),
+  {
+    type: 'text',
+    tagName: null,
+    content: '<div><h1>Some header</h1><p>Some paragraph</p></div>',
+  },
+  buildMockUneditableCloseToken('div'),
 ];

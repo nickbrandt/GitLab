@@ -16,7 +16,7 @@ A top-level GitLab group is one that does not have any parent group itself. All 
 as well as projects of the top-level group's subgroups nesting down, are connected. Alternatively, you can specify
 a GitLab personal namespace in the Jira configuration, which will then connect the projects in that personal namespace to Jira.
 
-NOTE: **Note**:
+NOTE: **Note:**
 Note this is different from the [existing Jira](../user/project/integrations/jira.md) project integration, where the mapping
 is one GitLab project to the entire Jira instance.
 
@@ -55,7 +55,7 @@ There are no special requirements if you are using GitLab.com.
    replacing `<your-gitlab-instance-domain>` appropriately. So for example, if you are using GitLab.com,
    this would be `https://gitlab.com/login/oauth/callback`.
 
-   NOTE: **Note**:
+   NOTE: **Note:**
    If using a GitLab version earlier than 11.3, the `Redirect URI` must be
    `https://<your-gitlab-instance-domain>/-/jira/login/oauth/callback`. If you want Jira
    to have access to all projects, GitLab recommends an administrator creates the
@@ -90,7 +90,7 @@ There are no special requirements if you are using GitLab.com.
    replacing `<your-gitlab-instance-domain>` appropriately. So for example, if you are using GitLab.com,
    this would be `https://gitlab.com/`.
 
-   NOTE: **Note**:
+   NOTE: **Note:**
    If using a GitLab version earlier than 11.3 the `Host URL` value should be `https://<your-gitlab-instance-domain>/-/jira`
 
    For the `Client ID` field, use the `Application ID` value from the previous section.
@@ -105,12 +105,11 @@ There are no special requirements if you are using GitLab.com.
    for all the projects in the GitLab group you specified in the previous step. These are refreshed
    every 60 minutes.
 
-   > **Note:**
-   > In the future, we plan on implementing real-time integration. If you need
-   > to refresh the data manually, you can do this from the `Applications -> DVCS
-   > accounts` screen where you initially set up the integration:
-   >
-   > ![Refresh GitLab information in Jira](img/jira_dev_panel_manual_refresh.png)
+   In the future, we plan on implementing real-time integration. If you need
+   to refresh the data manually, you can do this from the `Applications -> DVCS
+   accounts` screen where you initially set up the integration:
+
+   ![Refresh GitLab information in Jira](img/jira_dev_panel_manual_refresh.png)
 
 To connect additional GitLab projects from other GitLab top-level groups (or personal namespaces), repeat the above
 steps with additional Jira DVCS accounts.

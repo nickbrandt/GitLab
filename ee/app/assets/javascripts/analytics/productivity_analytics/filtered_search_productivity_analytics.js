@@ -11,6 +11,7 @@ export default class FilteredSearchProductivityAnalytics extends FilteredSearchM
       isGroupDecendent: true,
       stateFiltersSelector: '.issues-state-filters',
       isGroup,
+      useDefaultState: false,
       filteredSearchTokenKeys: ProductivityAnalyticsFilteredSearchTokenKeys,
       placeholder: __('Filter results...'),
     });

@@ -82,7 +82,7 @@ RSpec.describe Projects::ServicesController do
             'active' => '1',
             'push_events' => '1',
             'token' => 'token',
-            'project_url' => 'http://test.com'
+            'project_url' => 'https://buildkite.com/organization/pipeline'
           }
         end
 
@@ -178,6 +178,23 @@ RSpec.describe Projects::ServicesController do
         let(:message)        { 'Jira settings saved, but not activated.' }
 
         it_behaves_like 'service update'
+      end
+
+      context 'wehn param `inherit_from_id` is set to empty string' do
+        let(:service_params) { { inherit_from_id: '' } }
+
+        it 'sets inherit_from_id to nil' do
+          expect(service.reload.inherit_from_id).to eq(nil)
+        end
+      end
+
+      context 'wehn param `inherit_from_id` is set to some value' do
+        let(:instance_service) { create(:jira_service, :instance) }
+        let(:service_params) { { inherit_from_id: instance_service.id } }
+
+        it 'sets inherit_from_id to value' do
+          expect(service.reload.inherit_from_id).to eq(instance_service.id)
+        end
       end
     end
 

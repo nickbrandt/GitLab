@@ -48,7 +48,7 @@ export default {
       };
     },
     discussionParticipants() {
-      return extractParticipants(this.issue.participants);
+      return extractParticipants(this.issue.participants.nodes);
     },
     resolvedDiscussions() {
       return this.discussions.filter(discussion => discussion.resolved);
@@ -94,7 +94,7 @@ export default {
       {{ issue.title }}
     </h2>
     <a
-      class="gl-text-gray-600 gl-text-decoration-none gl-mb-6 gl-display-block"
+      class="gl-text-gray-400 gl-text-decoration-none gl-mb-6 gl-display-block"
       :href="issue.webUrl"
       >{{ issue.webPath }}</a
     >
@@ -132,7 +132,7 @@ export default {
         data-testid="resolved-comments"
         :icon="resolvedCommentsToggleIcon"
         variant="link"
-        class="link-inherit-color gl-text-black-normal gl-text-decoration-none gl-font-weight-bold gl-mb-4"
+        class="link-inherit-color gl-text-body gl-text-decoration-none gl-font-weight-bold gl-mb-4"
         @click="$emit('toggleResolvedComments')"
         >{{ $options.resolveCommentsToggleText }} ({{ resolvedDiscussions.length }})
       </gl-button>

@@ -83,6 +83,15 @@ RSpec.describe AlertManagement::ProcessPrometheusAlertService do
         context 'when alert does not exist' do
           context 'when alert can be created' do
             it_behaves_like 'creates an alert management alert'
+
+            it 'processes the incident alert' do
+              expect(IncidentManagement::ProcessAlertWorker)
+                .to receive(:perform_async)
+                .with(nil, nil, kind_of(Integer))
+                .once
+
+              expect(subject).to be_success
+            end
           end
 
           context 'when alert cannot be created' do
@@ -102,6 +111,13 @@ RSpec.describe AlertManagement::ProcessPrometheusAlertService do
 
               execute
             end
+
+            it 'does not create incident issue' do
+              expect(IncidentManagement::ProcessAlertWorker)
+                .not_to receive(:perform_async)
+
+              expect(subject).to be_success
+            end
           end
 
           it { is_expected.to be_success }
@@ -117,19 +133,29 @@ RSpec.describe AlertManagement::ProcessPrometheusAlertService do
             expect { execute }.to change { alert.reload.resolved? }.to(true)
           end
 
-          context 'existing issue' do
-            let!(:alert) { create(:alert_management_alert, :with_issue, project: project, fingerprint: parsed_alert.gitlab_fingerprint) }
+          [true, false].each do |state_tracking_enabled|
+            context 'existing issue' do
+              before do
+                stub_feature_flags(track_resource_state_change_events: state_tracking_enabled)
+              end
 
-            it 'closes the issue' do
-              issue = alert.issue
+              let!(:alert) { create(:alert_management_alert, :with_issue, project: project, fingerprint: parsed_alert.gitlab_fingerprint) }
 
-              expect { execute }
-                .to change { issue.reload.state }
-                .from('opened')
-                .to('closed')
+              it 'closes the issue' do
+                issue = alert.issue
+
+                expect { execute }
+                  .to change { issue.reload.state }
+                  .from('opened')
+                  .to('closed')
+              end
+
+              if state_tracking_enabled
+                specify { expect { execute }.to change(ResourceStateEvent, :count).by(1) }
+              else
+                specify { expect { execute }.to change(Note, :count).by(1) }
+              end
             end
-
-            specify { expect { execute }.to change(Note, :count).by(1) }
           end
         end
 

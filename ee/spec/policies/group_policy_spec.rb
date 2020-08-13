@@ -630,6 +630,46 @@ RSpec.describe GroupPolicy do
     end
   end
 
+  describe 'change_prevent_group_forking' do
+    context 'when feature is disabled' do
+      context 'with owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.to be_disallowed(:change_prevent_group_forking) }
+      end
+
+      context 'with maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.to be_disallowed(:change_prevent_group_forking) }
+      end
+    end
+
+    context 'when feature is enabled' do
+      before do
+        stub_licensed_features(group_forking_protection: true)
+      end
+
+      context 'with owner' do
+        let(:current_user) { owner }
+
+        it { is_expected.to be_allowed(:change_prevent_group_forking) }
+
+        context 'when group has parent' do
+          let(:group) { create(:group, :private, parent: create(:group)) }
+
+          it { is_expected.to be_disallowed(:change_prevent_group_forking) }
+        end
+      end
+
+      context 'with maintainer' do
+        let(:current_user) { maintainer }
+
+        it { is_expected.to be_disallowed(:change_prevent_group_forking) }
+      end
+    end
+  end
+
   describe 'read_group_security_dashboard & create_vulnerability_export' do
     let(:abilities) { %i(read_group_security_dashboard create_vulnerability_export) }
 
@@ -881,7 +921,7 @@ RSpec.describe GroupPolicy do
 
       context 'without Group SAML enabled' do
         before do
-          saml_provider.update(enabled: false)
+          saml_provider.update!(enabled: false)
         end
 
         it { is_expected.to be_disallowed(:read_group_saml_identity) }
@@ -1019,6 +1059,32 @@ RSpec.describe GroupPolicy do
       let(:current_user) { public_send(role) }
 
       it { is_expected.to(allowed ? be_allowed(policy) : be_disallowed(policy)) }
+    end
+  end
+
+  context 'when group is locked because storage usage limit exceeded' do
+    let(:current_user) { owner }
+    let(:policies) do
+      %i[create_projects create_epic update_epic admin_milestone upload_file admin_label
+         admin_list admin_issue admin_pipeline add_cluster create_cluster update_cluster
+         admin_cluster admin_group_member create_deploy_token create_subgroup]
+    end
+
+    before do
+      allow(group).to receive(:over_storage_limit?).and_return(over_storage_limit)
+      stub_licensed_features(epics: true)
+    end
+
+    context 'when the group has exceeded its storage limit' do
+      let(:over_storage_limit) { true }
+
+      it { is_expected.to(be_disallowed(*policies)) }
+    end
+
+    context 'when the group has not exceeded its storage limit' do
+      let(:over_storage_limit) { false }
+
+      it { is_expected.to(be_allowed(*policies)) }
     end
   end
 

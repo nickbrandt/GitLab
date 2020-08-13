@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlDropdownItem } from '@gitlab/ui';
+import { GlDeprecatedDropdownItem } from '@gitlab/ui';
 import DateRangeDropdown from 'ee/analytics/shared/components/date_range_dropdown.vue';
 
 describe('DateRangeDropdown component', () => {
@@ -23,7 +23,7 @@ describe('DateRangeDropdown component', () => {
     createComponent();
   });
 
-  const findDropdownElements = () => wrapper.findAll(GlDropdownItem);
+  const findDropdownElements = () => wrapper.findAll(GlDeprecatedDropdownItem);
   const findFirstDropdownElement = () => findDropdownElements().at(0);
 
   afterEach(() => {

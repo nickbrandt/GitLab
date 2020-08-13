@@ -11,6 +11,11 @@ RSpec.describe DesignManagement::Design do
   let_it_be(:design3) { create(:design, :with_versions, issue: issue, versions_count: 1) }
   let_it_be(:deleted_design) { create(:design, :with_versions, deleted: true) }
 
+  it_behaves_like 'a class that supports relative positioning' do
+    let(:factory) { :design }
+    let(:default_params) { { issue: issue } }
+  end
+
   describe 'relations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:issue) }
@@ -143,6 +148,39 @@ RSpec.describe DesignManagement::Design do
           end
 
           expect(history).to eq(versions.map(&:second))
+        end
+      end
+    end
+
+    describe '.ordered' do
+      before do
+        design1.update!(relative_position: 2)
+        design2.update!(relative_position: 1)
+        design3.update!(relative_position: nil)
+        deleted_design.update!(relative_position: nil)
+      end
+
+      it 'sorts by relative position and ID in ascending order' do
+        expect(described_class.ordered(issue.project)).to eq([design2, design1, design3, deleted_design])
+      end
+
+      context 'when the :reorder_designs feature is enabled for the project' do
+        before do
+          stub_feature_flags(reorder_designs: issue.project)
+        end
+
+        it 'sorts by relative position and ID in ascending order' do
+          expect(described_class.ordered(issue.project)).to eq([design2, design1, design3, deleted_design])
+        end
+      end
+
+      context 'when the :reorder_designs feature is disabled' do
+        before do
+          stub_feature_flags(reorder_designs: false)
+        end
+
+        it 'sorts by ID in ascending order' do
+          expect(described_class.ordered(issue.project)).to eq([design1, design2, design3, deleted_design])
         end
       end
     end
@@ -563,6 +601,27 @@ RSpec.describe DesignManagement::Design do
       let(:composite_ids) do
         all_results.map { |design| { issue_id: design.issue_id, filename: design.filename } }
       end
+    end
+  end
+
+  describe '#immediately_before' do
+    let_it_be(:design) { create(:design, issue: issue, relative_position: 100) }
+    let_it_be(:next_design) { create(:design, issue: issue, relative_position: 200) }
+
+    it 'is true when there is no element positioned between this item and the next' do
+      expect(design.immediately_before?(next_design)).to be true
+    end
+
+    it 'is false when there is an element positioned between this item and the next' do
+      create(:design, issue: issue, relative_position: 150)
+
+      expect(design.immediately_before?(next_design)).to be false
+    end
+
+    it 'is false when the next design is to the left of this design' do
+      further_left = create(:design, issue: issue, relative_position: 50)
+
+      expect(design.immediately_before?(further_left)).to be false
     end
   end
 end

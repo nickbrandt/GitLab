@@ -53,8 +53,17 @@ module Gitlab
       },
       new_create_project_ui: {
         tracking_category: 'Manage::Import::Experiment::NewCreateProjectUi'
+      },
+      terms_opt_in: {
+        tracking_category: 'Growth::Acquisition::Experiment::TermsOptIn'
+      },
+      contact_sales_btn_in_app: {
+        tracking_category: 'Growth::Conversion::Experiment::ContactSalesInApp'
       }
     }.freeze
+
+    GROUP_CONTROL = :control
+    GROUP_EXPERIMENTAL = :experimental
 
     # Controller concern that checks if an `experimentation_subject_id cookie` is present and sets it if absent.
     # Used for A/B testing of experimental features. Exposes the `experiment_enabled?(experiment_name)` method
@@ -100,6 +109,12 @@ module Gitlab
         end
       end
 
+      def record_experiment_user(experiment_key)
+        return unless Experimentation.enabled?(experiment_key) && current_user
+
+        ::Experiment.add_user(experiment_key, tracking_group(experiment_key), current_user)
+      end
+
       private
 
       def dnt_enabled?
@@ -126,7 +141,7 @@ module Gitlab
         {
           category: tracking_category(experiment_key),
           action: action,
-          property: tracking_group(experiment_key),
+          property: "#{tracking_group(experiment_key)}_group",
           label: experimentation_subject_id,
           value: value
         }.compact
@@ -139,7 +154,7 @@ module Gitlab
       def tracking_group(experiment_key)
         return unless Experimentation.enabled?(experiment_key)
 
-        experiment_enabled?(experiment_key) ? 'experimental_group' : 'control_group'
+        experiment_enabled?(experiment_key) ? GROUP_EXPERIMENTAL : GROUP_CONTROL
       end
 
       def forced_enabled?(experiment_key)
@@ -167,7 +182,7 @@ module Gitlab
 
     Experiment = Struct.new(:key, :environment, :tracking_category, keyword_init: true) do
       def enabled?
-        experiment_percentage.positive?
+        experiment_percentage > 0
       end
 
       def enabled_for_environment?

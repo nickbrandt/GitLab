@@ -1,12 +1,21 @@
 import GeoNodesStore from 'ee/geo_nodes/store/geo_nodes_store';
 
-import { mockNodes, rawMockNodeDetails, mockNodeDetails } from '../mock_data';
+import {
+  mockNodes,
+  rawMockNodeDetails,
+  mockNodeDetails,
+  MOCK_REPLICABLE_TYPES,
+} from '../mock_data';
 
 describe('GeoNodesStore', () => {
   let store;
 
   beforeEach(() => {
-    store = new GeoNodesStore(mockNodeDetails.primaryVersion, mockNodeDetails.primaryRevision);
+    store = new GeoNodesStore(
+      mockNodeDetails.primaryVersion,
+      mockNodeDetails.primaryRevision,
+      MOCK_REPLICABLE_TYPES,
+    );
   });
 
   describe('constructor', () => {
@@ -16,6 +25,7 @@ describe('GeoNodesStore', () => {
       expect(typeof store.state.nodeDetails).toBe('object');
       expect(store.state.primaryVersion).toBe(mockNodeDetails.primaryVersion);
       expect(store.state.primaryRevision).toBe(mockNodeDetails.primaryRevision);
+      expect(store.state.replicableTypes).toBe(MOCK_REPLICABLE_TYPES);
     });
   });
 
@@ -60,12 +70,20 @@ describe('GeoNodesStore', () => {
 
   describe('formatNodeDetails', () => {
     it('returns formatted raw node details object', () => {
-      const nodeDetails = GeoNodesStore.formatNodeDetails(rawMockNodeDetails);
+      const nodeDetails = GeoNodesStore.formatNodeDetails(
+        rawMockNodeDetails,
+        store.state.replicableTypes,
+      );
 
       expect(nodeDetails.healthStatus).toBe(rawMockNodeDetails.health_status);
       expect(nodeDetails.replicationSlotWAL).toBe(
         rawMockNodeDetails.replication_slots_max_retained_wal_bytes,
       );
+
+      const syncStatusNames = nodeDetails.syncStatuses.map(({ namePlural }) => namePlural);
+      const replicableTypesNames = store.state.replicableTypes.map(({ namePlural }) => namePlural);
+
+      expect(syncStatusNames).toEqual(replicableTypesNames);
     });
   });
 });

@@ -1,14 +1,30 @@
-import { shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import Vuex from 'vuex';
+
 import { GlDeprecatedButton } from '@gitlab/ui';
 
 import CreateEpicForm from 'ee/related_items_tree/components/create_epic_form.vue';
+import createDefaultStore from 'ee/related_items_tree/store';
 
-const createComponent = (isSubmitting = false) =>
-  shallowMount(CreateEpicForm, {
+import { mockInitialConfig, mockParentItem } from '../mock_data';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
+
+const createComponent = (isSubmitting = false) => {
+  const store = createDefaultStore();
+
+  store.dispatch('setInitialConfig', mockInitialConfig);
+  store.dispatch('setInitialParentItem', mockParentItem);
+
+  return shallowMount(CreateEpicForm, {
+    localVue,
+    store,
     propsData: {
       isSubmitting,
     },
   });
+};
 
 describe('RelatedItemsTree', () => {
   describe('CreateEpicForm', () => {

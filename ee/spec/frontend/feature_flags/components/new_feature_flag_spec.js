@@ -9,6 +9,7 @@ import {
   DEFAULT_PERCENT_ROLLOUT,
   NEW_FLAG_ALERT,
 } from 'ee/feature_flags/constants';
+import { TEST_HOST } from 'spec/test_constants';
 import { allUsersStrategy } from '../mock_data';
 
 describe('New feature flag form', () => {
@@ -20,15 +21,25 @@ describe('New feature flag form', () => {
     },
   });
 
-  const factory = () => {
+  const factory = (opts = {}) => {
+    if (wrapper) {
+      wrapper.destroy();
+      wrapper = null;
+    }
     wrapper = shallowMount(NewFeatureFlag, {
       propsData: {
-        endpoint: 'feature_flags.json',
+        endpoint: `${TEST_HOST}/feature_flags.json`,
         path: '/feature_flags',
         environmentsEndpoint: 'environments.json',
         projectId: '8',
       },
       store,
+      provide: {
+        glFeatures: {
+          featureFlagsNewVersion: true,
+        },
+      },
+      ...opts,
     });
   };
 
@@ -76,8 +87,8 @@ describe('New feature flag form', () => {
     expect(wrapper.find(Form).props('scopes')).toContainEqual(defaultScope);
   });
 
-  it('should alert users that feature flags are changing soon', () => {
-    expect(wrapper.find(GlAlert).text()).toBe(NEW_FLAG_ALERT);
+  it('should not alert users that feature flags are changing soon', () => {
+    expect(wrapper.contains(GlAlert)).toBe(false);
   });
 
   it('should pass in the project ID', () => {
@@ -88,5 +99,17 @@ describe('New feature flag form', () => {
     const strategies = wrapper.find(Form).props('strategies');
 
     expect(strategies).toEqual([allUsersStrategy]);
+  });
+
+  describe('without new version flags', () => {
+    beforeEach(() => factory({ provide: { glFeatures: { featureFlagsNewVersion: false } } }));
+
+    it('should alert users that feature flags are changing soon', () => {
+      expect(wrapper.find(GlAlert).text()).toBe(NEW_FLAG_ALERT);
+    });
+
+    it('the new feature flags alert should be dismissable', () => {
+      expect(wrapper.find(GlAlert).props('dismissible')).toBe(true);
+    });
   });
 });

@@ -11,15 +11,15 @@ module Projects
     end
 
     def execute
-      if file_equals?(pages_config_file, pages_config_json)
-        return success(reload: false)
+      unless file_equals?(pages_config_file, pages_config_json)
+        update_file(pages_config_file, pages_config_json)
+        reload_daemon
       end
 
-      update_file(pages_config_file, pages_config_json)
-      reload_daemon
-      success(reload: true)
+      success
     rescue => e
-      error(e.message)
+      Gitlab::ErrorTracking.track_exception(e)
+      error(e.message, pass_back: { exception: e })
     end
 
     private

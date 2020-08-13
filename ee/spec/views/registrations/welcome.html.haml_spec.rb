@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe 'registrations/welcome' do
+  using RSpec::Parameterized::TableSyntax
+
   let_it_be(:user) { User.new }
 
   before do
@@ -10,6 +12,7 @@ RSpec.describe 'registrations/welcome' do
     allow(view).to receive(:in_subscription_flow?).and_return(in_subscription_flow)
     allow(view).to receive(:in_trial_flow?).and_return(in_trial_flow)
     allow(view).to receive(:in_invitation_flow?).and_return(in_invitation_flow)
+    allow(view).to receive(:in_oauth_flow?).and_return(in_oauth_flow)
     allow(view).to receive(:experiment_enabled?).with(:onboarding_issues).and_return(onboarding_issues_experiment_enabled)
 
     render
@@ -17,54 +20,44 @@ RSpec.describe 'registrations/welcome' do
 
   subject { rendered }
 
-  context 'in subscription flow' do
-    let(:in_subscription_flow) { true }
-    let(:in_trial_flow) { false }
-    let(:in_invitation_flow) { false }
-    let(:onboarding_issues_experiment_enabled) { false }
-
-    it { is_expected.to have_button('Continue') }
-    it { is_expected.to have_selector('#progress-bar') }
-    it { is_expected.to have_selector('label[for="user_setup_for_company"]', text: 'Who will be using this GitLab subscription?') }
+  where(:in_subscription_flow, :in_trial_flow, :in_invitation_flow, :in_oauth_flow, :onboarding_issues_experiment_enabled, :flow) do
+    false | false | false | false | false | :regular
+    true  | false | false | false | false | :subscription
+    false | true  | false | false | false | :trial
+    false | false | true  | false | false | :invitation
+    false | false | false | true  | false | :oauth
+    false | false | false | false | true  | :onboarding
+    false | false | true  | false | true  | :onboarding_invitation
+    false | false | false | true  | true  | :onboarding_oauth
   end
 
-  context 'in trial flow' do
-    let(:in_subscription_flow) { false }
-    let(:in_trial_flow) { true }
-    let(:in_invitation_flow) { false }
-    let(:onboarding_issues_experiment_enabled) { false }
-
-    it { is_expected.to have_button('Continue') }
-    it { is_expected.not_to have_selector('#progress-bar') }
-    it { is_expected.to have_selector('label[for="user_setup_for_company"]', text: 'Who will be using this GitLab trial?') }
-  end
-
-  context 'when onboarding issues experiment is enabled' do
-    let(:in_subscription_flow) { false }
-    let(:in_trial_flow) { false }
-    let(:in_invitation_flow) { false }
-    let(:onboarding_issues_experiment_enabled) { true }
-
-    it { is_expected.to have_button('Continue') }
-    it { is_expected.to have_selector('#progress-bar') }
-    it { is_expected.to have_selector('label[for="user_setup_for_company"]', text: 'Who will be using GitLab?') }
-
-    context 'when in invitation flow' do
-      let(:in_invitation_flow) { true }
-
-      it { is_expected.to have_button('Get started!') }
-      it { is_expected.not_to have_selector('#progress-bar') }
+  def button_text
+    if %i(subscription trial onboarding).include?(flow)
+      'Continue'
+    else
+      'Get started!'
     end
   end
 
-  context 'when neither in subscription nor in trial flow and onboarding issues experiment is disabled' do
-    let(:in_subscription_flow) { false }
-    let(:in_trial_flow) { false }
-    let(:in_invitation_flow) { false }
-    let(:onboarding_issues_experiment_enabled) { false }
+  def label_text
+    if flow == :subscription
+      'Who will be using this GitLab subscription?'
+    elsif flow == :trial
+      'Who will be using this GitLab trial?'
+    else
+      'Who will be using GitLab?'
+    end
+  end
 
-    it { is_expected.to have_button('Get started!') }
-    it { is_expected.not_to have_selector('#progress-bar') }
-    it { is_expected.to have_selector('label[for="user_setup_for_company"]', text: 'Who will be using GitLab?') }
+  with_them do
+    it { is_expected.to have_button(button_text) }
+    it { is_expected.to have_selector('label[for="user_setup_for_company"]', text: label_text) }
+    it do
+      if %i(subscription onboarding).include?(flow)
+        is_expected.to have_selector('#progress-bar')
+      else
+        is_expected.not_to have_selector('#progress-bar')
+      end
+    end
   end
 end

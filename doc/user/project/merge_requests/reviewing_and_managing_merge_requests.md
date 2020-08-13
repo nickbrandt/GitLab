@@ -1,4 +1,7 @@
 ---
+stage: Create
+group: Source Code
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 type: index, reference
 ---
 
@@ -64,6 +67,44 @@ list.
 
 ![Merge request diff file navigation](img/merge_request_diff_file_navigation.png)
 
+### File-by-file diff navigation
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/222790) in GitLab 13.2.
+> - It's deployed behind a feature flag, enabled by default.
+> - It's recommended for production use.
+> - It's enabled on GitLab.com.
+> - For GitLab self-managed instances, GitLab administrators can opt to [disable it](#enable-or-disable-file-by-file-diff-navigation-core-only).
+
+For larger merge requests it might sometimes be useful to review single files at a time. To enable,
+from your avatar on the top-right navbar, click **Settings**, and go to **Preferences** on the left
+sidebar. Scroll down to the **Behavior** section and select **Show one file at a time on merge request's Changes tab**.
+Click **Save changes** to apply.
+
+From there, when reviewing merge requests' **Changes** tab, you will see only one file at a time. You can then click the buttons **Prev** and **Next** to view the other files changed.
+
+![File-by-file diff navigation](img/file_by_file_v13_2.png)
+
+#### Enable or disable file-by-file diff navigation **(CORE ONLY)**
+
+File-by-file diff navigation is under development but ready for production use. It is
+deployed behind a feature flag that is **enabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can opt to disable it for your instance.
+
+To enable it:
+
+```ruby
+# Instance-wide
+Feature.enable(:view_diffs_file_by_file)
+```
+
+To disable it:
+
+```ruby
+# Instance-wide
+Feature.disable(:view_diffs_file_by_file>)
+```
+
 ### Merge requests commit navigation
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/18140) in GitLab 13.0.
@@ -94,7 +135,7 @@ specific commit page.
 
 ![MR diff](img/merge_request_diff.png)
 
->**Tip:**
+TIP: **Tip:**
 You can append `?w=1` while on the diffs page of a merge request to ignore any
 whitespace changes.
 
@@ -103,9 +144,51 @@ whitespace changes.
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/13950) in GitLab 11.5.
 
 GitLab provides a way of leaving comments in any part of the file being changed
-in a Merge Request. To do so, click the **...** button in the gutter of the Merge Request diff UI to expand the diff lines and leave a comment, just as you would for a changed line.
+in a Merge Request. To do so, click the **{comment}** **comment** icon in the gutter of the Merge Request diff UI to expand the diff lines and leave a comment, just as you would for a changed line.
 
 ![Comment on any diff file line](img/comment-on-any-diff-line.png)
+
+### Commenting on multiple lines
+
+> - [Introduced](https://gitlab.com/gitlab-org/ux-research/-/issues/870) in GitLab 13.2.
+> - It's deployed behind a feature flag, disabled by default.
+> - It's enabled on GitLab.com.
+> - It can be enabled or disabled per-project.
+> - It's recommended for production use.
+> - For GitLab self-managed instances, GitLab administrators can opt to [enable it](#enable-or-disable-multiline-comments-core-only). **(CORE ONLY)**
+
+GitLab provides a way to select which lines of code a comment refers to. After starting a comment
+a dropdown selector is shown to select the first line that this comment refers to.
+The last line is the line that the comment icon was initially clicked on.
+
+New comments default to single line comments by having the first and last lines
+the same. Selecting a different starting line turns this into a multiline comment.
+
+![Multiline comment selection highlighted](img/multiline-comment-highlighted.png)
+
+Once a multiline comment is saved the lines of code pertaining to that comment are listed directly
+above it.
+
+![Multiline comment selection displayed above comment](img/multiline-comment-saved.png)
+
+### Enable or disable multiline comments **(CORE ONLY)**
+
+The multiline comments feature is under development but ready for production use.
+It is deployed behind a feature flag that is **disabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can opt to enable it for your instance.
+
+To enable it:
+
+```ruby
+Feature.enable(:multiline_comments)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:multiline_comments)
+```
 
 ## Pipeline status in merge requests widgets
 
@@ -197,7 +280,7 @@ Merge Request again.
 Here are some tips that will help you be more efficient with merge requests in
 the command line.
 
-> **Note:**
+NOTE: **Note:**
 This section might move in its own document in the future.
 
 ### Checkout merge requests locally

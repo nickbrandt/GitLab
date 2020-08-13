@@ -1,5 +1,6 @@
 require 'sidekiq/web'
 require 'sidekiq/cron/web'
+require 'product_analytics/collector_app'
 
 Rails.application.routes.draw do
   concern :access_requestable do
@@ -24,7 +25,8 @@ Rails.application.routes.draw do
     controllers applications: 'oauth/applications',
                 authorized_applications: 'oauth/authorized_applications',
                 authorizations: 'oauth/authorizations',
-                token_info: 'oauth/token_info'
+                token_info: 'oauth/token_info',
+                tokens: 'oauth/tokens'
   end
 
   # This prefixless path is required because Jira gets confused if we set it up with a path
@@ -76,6 +78,7 @@ Rails.application.routes.draw do
     get '/autocomplete/projects' => 'autocomplete#projects'
     get '/autocomplete/award_emojis' => 'autocomplete#award_emojis'
     get '/autocomplete/merge_request_target_branches' => 'autocomplete#merge_request_target_branches'
+    get '/autocomplete/deploy_keys_with_owners' => 'autocomplete#deploy_keys_with_owners'
 
     Gitlab.ee do
       get '/autocomplete/project_groups' => 'autocomplete#project_groups'
@@ -175,6 +178,11 @@ Rails.application.routes.draw do
     # Used by third parties to verify CI_JOB_JWT, placeholder route
     # in case we decide to move away from doorkeeper-openid_connect
     get 'jwks' => 'doorkeeper/openid_connect/discovery#keys'
+
+    draw :snippets
+
+    # Product analytics collector
+    match '/collector/i', to: ProductAnalytics::CollectorApp.new, via: :all
   end
   # End of the /-/ scope.
 
@@ -253,7 +261,6 @@ Rails.application.routes.draw do
   draw :api
   draw :sidekiq
   draw :help
-  draw :snippets
   draw :google_api
   draw :import
   draw :uploads
@@ -264,11 +271,8 @@ Rails.application.routes.draw do
   draw :user
   draw :project
 
-  # Serve snippet routes under /-/snippets.
-  # To ensure an old unscoped routing is used for the UI we need to
-  # add prefix 'as' to the scope routing and place it below original routing.
   # Issue https://gitlab.com/gitlab-org/gitlab/-/issues/210024
-  scope '-', as: :scoped do
+  scope as: 'deprecated' do
     draw :snippets
   end
 

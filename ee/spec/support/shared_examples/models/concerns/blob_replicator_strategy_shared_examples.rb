@@ -20,6 +20,9 @@ RSpec.shared_examples 'a blob replicator' do
 
   it_behaves_like 'a replicator'
 
+  # This could be included in each model's spec, but including it here is DRYer.
+  include_examples 'a replicable model'
+
   describe '#handle_after_create_commit' do
     it 'creates a Geo::Event' do
       expect do
@@ -37,13 +40,22 @@ RSpec.shared_examples 'a blob replicator' do
       replicator.handle_after_create_commit
     end
 
-    it 'does not schedule the checksum calculation if feature flag is disabled' do
-      stub_feature_flags(geo_self_service_framework_replication: false)
+    context 'when replication feature flag is disabled' do
+      before do
+        stub_feature_flags("geo_#{replicator.replicable_name}_replication": false)
+      end
 
-      expect(Geo::BlobVerificationPrimaryWorker).not_to receive(:perform_async)
-      allow(replicator).to receive(:needs_checksum?).and_return(true)
+      it 'does not schedule the checksum calculation' do
+        expect(Geo::BlobVerificationPrimaryWorker).not_to receive(:perform_async)
 
-      replicator.handle_after_create_commit
+        replicator.handle_after_create_commit
+      end
+
+      it 'does not publish' do
+        expect(replicator).not_to receive(:publish)
+
+        replicator.handle_after_create_commit
+      end
     end
   end
 
@@ -55,6 +67,18 @@ RSpec.shared_examples 'a blob replicator' do
 
       expect(::Geo::Event.last.attributes).to include(
         "replicable_name" => replicator.replicable_name, "event_name" => "deleted", "payload" => { "model_record_id" => replicator.model_record.id, "blob_path" => replicator.blob_path })
+    end
+
+    context 'when replication feature flag is disabled' do
+      before do
+        stub_feature_flags("geo_#{replicator.replicable_name}_replication": false)
+      end
+
+      it 'does not publish' do
+        expect(replicator).not_to receive(:publish)
+
+        replicator.handle_after_create_commit
+      end
     end
   end
 
@@ -83,9 +107,9 @@ RSpec.shared_examples 'a blob replicator' do
   end
 
   describe '#consume_event_created' do
-    context "when the blob's project is not excluded by selective sync" do
+    context "when the blob's project is in replicables for this geo node" do
       it 'invokes Geo::BlobDownloadService' do
-        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(false)
+        expect(replicator).to receive(:in_replicables_for_geo_node?).and_return(true)
         service = double(:service)
 
         expect(service).to receive(:execute)
@@ -95,9 +119,9 @@ RSpec.shared_examples 'a blob replicator' do
       end
     end
 
-    context "when the blob's project is excluded by selective sync" do
+    context "when the blob's project is not in replicables for this geo node" do
       it 'does not invoke Geo::BlobDownloadService' do
-        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(true)
+        expect(replicator).to receive(:in_replicables_for_geo_node?).and_return(false)
 
         expect(::Geo::BlobDownloadService).not_to receive(:new)
 
@@ -107,9 +131,9 @@ RSpec.shared_examples 'a blob replicator' do
   end
 
   describe '#consume_event_deleted' do
-    context "when the blob's project is not excluded by selective sync" do
+    context "when the blob's project is in replicables for this geo node" do
       it 'invokes Geo::FileRegistryRemovalService' do
-        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(false)
+        expect(replicator).to receive(:in_replicables_for_geo_node?).and_return(true)
         service = double(:service)
 
         expect(service).to receive(:execute)
@@ -120,9 +144,9 @@ RSpec.shared_examples 'a blob replicator' do
       end
     end
 
-    context "when the blob's project is excluded by selective sync" do
+    context "when the blob's project is not in replicables for this geo node" do
       it 'does not invoke Geo::FileRegistryRemovalService' do
-        expect(replicator).to receive(:excluded_by_selective_sync?).and_return(true)
+        expect(replicator).to receive(:in_replicables_for_geo_node?).and_return(false)
 
         expect(::Geo::FileRegistryRemovalService).not_to receive(:new)
 
@@ -150,19 +174,6 @@ RSpec.shared_examples 'a blob replicator' do
 
     it 'is a Class' do
       expect(invoke_model).to be_a(Class)
-    end
-
-    # For convenience (and reliability), instead of asking developers to include shared examples on each model spec as well
-    context 'replicable model' do
-      it 'defines #replicator' do
-        expect(model_record).to respond_to(:replicator)
-      end
-
-      it 'invokes replicator.handle_after_create_commit on create' do
-        expect(replicator).to receive(:handle_after_create_commit)
-
-        model_record.save!
-      end
     end
   end
 end

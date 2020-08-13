@@ -3,10 +3,6 @@
 namespace :analytics do
   root to: 'analytics#index'
 
-  constraints(::Constraints::FeatureConstrainer.new(Gitlab::Analytics::REPORT_PAGES_FEATURE_FLAG)) do
-    get :report_pages, to: 'reports/pages#show'
-  end
-
   constraints(-> (req) { Gitlab::Analytics.cycle_analytics_enabled? }) do
     resource :cycle_analytics, only: :show, path: 'value_stream_analytics'
     scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do

@@ -171,7 +171,7 @@ module Gitlab
 
       def sectional_codeowners?
         strong_memoize(:sectional_codeowners_check) do
-          Feature.enabled?(:sectional_codeowners, @project, default_enabled: false)
+          Feature.enabled?(:sectional_codeowners, @project, default_enabled: true)
         end
       end
     end

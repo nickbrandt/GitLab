@@ -76,7 +76,7 @@ where:
 | `port`    | The port under which the external Registry domain will listen on. |
 | `api_url` | The internal API URL under which the Registry is exposed to. It defaults to `http://localhost:5000`. |
 | `key`     | The private key location that is a pair of Registry's `rootcertbundle`. Read the [token auth configuration documentation](https://docs.docker.com/registry/configuration/#token). |
-| `path`    | This should be the same directory like specified in Registry's `rootdirectory`. Read the [storage configuration documentation](https://docs.docker.com/registry/configuration/#storage). This path needs to be readable by the GitLab user, the web-server user and the Registry user. Read more in [#container-registry-storage-path](#container-registry-storage-path). |
+| `path`    | This should be the same directory like specified in Registry's `rootdirectory`. Read the [storage configuration documentation](https://docs.docker.com/registry/configuration/#storage). This path needs to be readable by the GitLab user, the web-server user and the Registry user. Read more in [#configure-storage-for-the-container-registry](#configure-storage-for-the-container-registry). |
 | `issuer`  | This should be the same value as configured in Registry's `issuer`. Read the [token auth configuration documentation](https://docs.docker.com/registry/configuration/#token). |
 
 NOTE: **Note:**
@@ -313,11 +313,31 @@ the Container Registry by themselves, follow the steps below.
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) for the changes to take effect.
 
-## Container Registry storage path
+## Configure storage for the Container Registry
+
+You can configure the Container Registry to use various storage backends by
+configuring a storage driver. By default the GitLab Container Registry
+is configured to use the [filesystem driver](#use-filesystem)
+configuration.
+
+The different supported drivers are:
+
+| Driver     | Description                         |
+|------------|-------------------------------------|
+| filesystem | Uses a path on the local filesystem |
+| Azure      | Microsoft Azure Blob Storage        |
+| gcs        | Google Cloud Storage                |
+| s3         | Amazon Simple Storage Service. Be sure to configure your storage bucket with the correct [S3 Permission Scopes](https://docs.docker.com/registry/storage-drivers/s3/#s3-permission-scopes). |
+| swift      | OpenStack Swift Object Storage      |
+| oss        | Aliyun OSS                          |
 
 NOTE: **Note:**
-For configuring storage in the cloud instead of the filesystem, see the
-[storage driver configuration](#container-registry-storage-driver).
+Although most S3 compatible services (like [MinIO](https://min.io/)) should work with the registry, we only guarantee support for AWS S3. Because we cannot assert the correctness of third-party S3 implementations, we can debug issues, but we cannot patch the registry unless an issue is reproducible against an AWS S3 bucket.
+
+Read more about the individual driver's configuration options in the
+[Docker Registry docs](https://docs.docker.com/registry/configuration/#storage).
+
+### Use filesystem
 
 If you want to store your images on the filesystem, you can change the storage
 path for the Container Registry, follow the steps below.
@@ -327,7 +347,8 @@ This path is accessible to:
 - The user running the Container Registry daemon.
 - The user running GitLab.
 
-CAUTION: **Warning** You should confirm that all GitLab, Registry and web server users
+CAUTION: **Warning:**
+You should confirm that all GitLab, Registry and web server users
 have access to this directory.
 
 **Omnibus GitLab installations**
@@ -358,30 +379,15 @@ The default location where images are stored in source installations, is
 
 1. Save the file and [restart GitLab](../restart_gitlab.md#installations-from-source) for the changes to take effect.
 
-### Container Registry storage driver
+### Use object storage
 
-You can configure the Container Registry to use a different storage backend by
-configuring a different storage driver. By default the GitLab Container Registry
-is configured to use the filesystem driver, which makes use of [storage path](#container-registry-storage-path)
-configuration.
-
-The different supported drivers are:
-
-| Driver     | Description                         |
-|------------|-------------------------------------|
-| filesystem | Uses a path on the local filesystem |
-| Azure      | Microsoft Azure Blob Storage        |
-| gcs        | Google Cloud Storage                |
-| s3         | Amazon Simple Storage Service. Be sure to configure your storage bucket with the correct [S3 Permission Scopes](https://docs.docker.com/registry/storage-drivers/s3/#s3-permission-scopes). |
-| swift      | OpenStack Swift Object Storage      |
-| oss        | Aliyun OSS                          |
-
-Read more about the individual driver's configuration options in the
-[Docker Registry docs](https://docs.docker.com/registry/configuration/#storage).
+If you want to store your images on object storage, you can change the storage
+driver for the Container Registry.
 
 [Read more about using object storage with GitLab](../object_storage.md).
 
-CAUTION: **Warning:** GitLab will not backup Docker images that are not stored on the
+CAUTION: **Warning:**
+GitLab will not backup Docker images that are not stored on the
 filesystem. Remember to enable backups with your object storage provider if
 desired.
 
@@ -435,21 +441,78 @@ storage:
 NOTE: **Note:**
 `your-s3-bucket` should only be the name of a bucket that exists, and can't include subdirectories.
 
-**Migrate without downtime**
+#### Migrate to object storage without downtime
 
-To migrate the data to AWS S3 without downtime:
+To migrate storage without stopping the Container Registry, set the Container Registry
+to read-only mode. On large instances, this may require the Container Registry
+to be in read-only mode for a while. During this time,
+you can pull from the Container Registry, but you cannot push.
 
-1. To reduce the amount of data to be migrated, run the [garbage collection tool without downtime](#performing-garbage-collection-without-downtime). Part of this process sets the registry to `read-only`.
-1. Copy the data to your AWS S3 bucket, for example with [AWS CLI's `cp`](https://docs.aws.amazon.com/cli/latest/reference/s3/cp.html) command.
-1. Configure your registry to use the S3 bucket for storage.
-1. Put the registry back to `read-write`.
-1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure) for the changes to take effect.
+1. Optional: To reduce the amount of data to be migrated, run the [garbage collection tool without downtime](#performing-garbage-collection-without-downtime).
+1. This example uses the `aws` CLI. If you haven't configured the
+   CLI before, you have to configure your credentials by running `sudo aws configure`.
+   Because a non-admin user likely can't access the Container Registry folder,
+   ensure you use `sudo`. To check your credential configuration, run
+   [`ls`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/ls.html) to list
+   all buckets.
+
+   ```shell
+   sudo aws --endpoint-url https://your-object-storage-backend.com s3 ls
+   ```
+
+   If you are using AWS as your back end, you do not need the [`--endpoint-url`](https://docs.aws.amazon.com/cli/latest/reference/#options).
+1. Copy initial data to your S3 bucket, for example with the `aws` CLI
+   [`cp`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/cp.html)
+   or [`sync`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/sync.html)
+   command. Make sure to keep the `docker` folder as the top-level folder inside the bucket.
+
+   ```shell
+   sudo aws --endpoint-url https://your-object-storage-backend.com s3 sync registry s3://mybucket
+   ```
+
+   TIP: **Tip:**
+   If you have a lot of data, you may be able to improve performance by
+   [running parallel sync operations](https://aws.amazon.com/premiumsupport/knowledge-center/s3-improve-transfer-sync-command/).
+
+1. To perform the final data sync,
+   [put the Container Registry in `read-only` mode](#performing-garbage-collection-without-downtime) and
+   [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+1. Sync any changes since the initial data load to your S3 bucket and delete files that exist in the destination bucket but not in the source:
+
+   ```shell
+   sudo aws --endpoint-url https://your-object-storage-backend.com s3 sync registry s3://mybucket --delete --dryrun
+   ```
+
+   After verifying the command is going to perform as expected, remove the
+   [`--dryrun`](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html)
+   flag and run the command.
+
+   DANGER: **Danger:**
+   The [`--delete`](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html)
+   flag will delete files that exist in the destination but not in the source.
+   Make sure not to swap the source and destination, or you will delete all data in the Registry.
+
+1. Verify all Container Registry files have been uploaded to object storage
+   by looking at the file count returned by these two commands:
+
+   ```shell
+   sudo find registry -type f | wc -l
+   ```
+
+   ```shell
+   sudo aws --endpoint-url https://your-object-storage-backend.com s3 ls s3://mybucket --recursive | wc -l
+   ```
+
+   The output of these commands should match, except for the content in the
+   `_uploads` directories and sub-directories.
+1. Configure your registry to [use the S3 bucket for storage](#use-object-storage).
+1. For the changes to take effect, set the Registry back to `read-write` mode and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ### Disable redirect for storage driver
 
 By default, users accessing a registry configured with a remote backend are redirected to the default backend for the storage driver. For example, registries can be configured using the `s3` storage driver, which redirects requests to a remote S3 bucket to alleviate load on the GitLab server.
 
-However, this behavior is undesirable for registries used by internal hosts that usually can't access public servers. To disable redirects, set the `disable` flag to true as follows. This makes all traffic to always go through the Registry service. This results in improved security (less surface attack as the storage backend is not publicly accessible), but worse performance (all traffic is redirected via the service).
+However, this behavior is undesirable for registries used by internal hosts that usually can't access public servers. To disable redirects and [proxy download](../object_storage.md#proxy-download), set the `disable` flag to true as follows. This makes all traffic always go through the Registry service. This results in improved security (less surface attack as the storage backend is not publicly accessible), but worse performance (all traffic is redirected via the service).
 
 **Omnibus GitLab installations**
 
@@ -668,6 +731,35 @@ notifications:
       backoff: 1000
 ```
 
+## Run the Cleanup policy now
+
+To reduce the amount of [Container Registry disk space used by a given project](../troubleshooting/gitlab_rails_cheat_sheet.md#registry-disk-space-usage-by-project),
+administrators can clean up image tags
+and [run garbage collection](#container-registry-garbage-collection).
+
+To remove image tags by running the cleanup policy, run the following commands in the
+[GitLab Rails console](../troubleshooting/navigating_gitlab_via_rails_console.md):
+
+```ruby
+# Numeric ID of the project whose container registry should be cleaned up
+P = <project_id>
+
+# Numeric ID of a developer, maintainer or owner in that project
+U = <user_id>
+
+# Get required details / objects
+user    = User.find_by_id(U)
+project = Project.find_by_id(P)
+repo    = ContainerRepository.find_by(project_id: P)
+policy  = ContainerExpirationPolicy.find_by(project_id: P)
+
+# Start the tag cleanup
+Projects::ContainerRepository::CleanupTagsService.new(project, user, policy.attributes.except("created_at", "updated_at")).execute(repo)
+```
+
+NOTE: **Note:**
+You can also [run cleanup on a schedule](../../user/packages/container_registry/index.md#cleanup-policy).
+
 ## Container Registry garbage collection
 
 NOTE: **Note:**
@@ -779,13 +871,15 @@ that you have backed up all registry data.
 
 > [Introduced](https://gitlab.com/gitlab-org/omnibus-gitlab/-/merge_requests/764) in GitLab 8.8.
 
-You can perform a garbage collection without stopping the Container Registry by setting
-it into a read-only mode and by not using the built-in command. During this time,
+You can perform garbage collection without stopping the Container Registry by putting
+it in read-only mode and by not using the built-in command. On large instances
+this could require Container Registry to be in read-only mode for a while.
+During this time,
 you will be able to pull from the Container Registry, but you will not be able to
 push.
 
 NOTE: **Note:**
-By default, the [registry storage path](#container-registry-storage-path)
+By default, the [registry storage path](#configure-storage-for-the-container-registry)
 is `/var/opt/gitlab/gitlab-rails/shared/registry`.
 
 To enable the read-only mode:

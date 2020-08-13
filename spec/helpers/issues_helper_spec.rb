@@ -162,7 +162,7 @@ RSpec.describe IssuesHelper do
     context 'with linked issue' do
       context 'with moved issue' do
         before do
-          issue.update(moved_to: new_issue)
+          issue.update!(moved_to: new_issue)
         end
 
         context 'when user has permission to see new issue' do
@@ -181,7 +181,7 @@ RSpec.describe IssuesHelper do
 
       context 'with duplicated issue' do
         before do
-          issue.update(duplicated_to: new_issue)
+          issue.update!(duplicated_to: new_issue)
         end
 
         context 'when user has permission to see new issue' do
@@ -203,10 +203,34 @@ RSpec.describe IssuesHelper do
       let(:user) { project.owner }
 
       before do
-        issue.update(moved_to: nil, duplicated_to: nil)
+        issue.update!(moved_to: nil, duplicated_to: nil)
       end
 
       it_behaves_like 'does not display link'
+    end
+  end
+
+  describe '#show_moved_service_desk_issue_warning?' do
+    let(:project1) { create(:project, service_desk_enabled: true) }
+    let(:project2) { create(:project, service_desk_enabled: true) }
+    let!(:old_issue) { create(:issue, author: User.support_bot, project: project1) }
+    let!(:new_issue) { create(:issue, author: User.support_bot, project: project2) }
+
+    before do
+      allow(Gitlab::IncomingEmail).to receive(:enabled?) { true }
+      allow(Gitlab::IncomingEmail).to receive(:supports_wildcard?) { true }
+
+      old_issue.update!(moved_to: new_issue)
+    end
+
+    it 'is true when moved issue project has service desk disabled' do
+      project2.update!(service_desk_enabled: false)
+
+      expect(helper.show_moved_service_desk_issue_warning?(new_issue)).to be(true)
+    end
+
+    it 'is false when moved issue project has service desk enabled' do
+      expect(helper.show_moved_service_desk_issue_warning?(new_issue)).to be(false)
     end
   end
 end

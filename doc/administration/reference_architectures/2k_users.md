@@ -1,27 +1,30 @@
 ---
 reading_time: true
+stage: Enablement
+group: Distribution
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
-# Reference architecture: up to 2,000 users
+# Reference architecture: up to 2,000 users **(CORE ONLY)**
 
 This page describes GitLab reference architecture for up to 2,000 users.
 For a full list of reference architectures, see
 [Available reference architectures](index.md#available-reference-architectures).
 
 > - **Supported users (approximate):** 2,000
-> - **High Availability:** False
+> - **High Availability:** No
 > - **Test requests per second (RPS) rates:** API: 40 RPS, Web: 4 RPS, Git: 4 RPS
 
-| Service                                  | Nodes  | Configuration           | GCP             | AWS            | Azure     |
-|------------------------------------------|--------|-------------------------|-----------------|----------------|-----------|
-| Load balancer                            | 1      | 2 vCPU, 1.8GB memory    | `n1-highcpu-2`  | `c5.large`     | `F2s v2`  |
-| PostgreSQL                               | 1      | 2 vCPU, 7.5GB memory    | `n1-standard-2` | `m5.large`     | `D2s v3`  |
-| Redis                                    | 1      | 1 vCPU, 3.75GB memory   | `n1-standard-1` | `m5.large`     | `D2s v3`  |
-| Gitaly                                   | 1      | 4 vCPU, 15GB memory     | `n1-standard-4` | `m5.xlarge`    | `D4s v3`  |
-| GitLab Rails                             | 2      | 8 vCPU, 7.2GB memory    | `n1-highcpu-8`  | `c5.2xlarge`   | `F8s v2`  |
-| Monitoring node                          | 1      | 2 vCPU, 1.8GB memory    | `n1-highcpu-2`  | `c5.large`     | `F2s v2`  |
-| Object storage                           | n/a    | n/a                     | n/a             | n/a            | n/a       |
-| NFS server (optional, not recommended)   | 1      | 4 vCPU, 3.6GB memory    | `n1-highcpu-4`  | `c5.xlarge`    | `F4s v2`  |
+| Service                                  | Nodes  | Configuration           | GCP            | AWS          | Azure   |
+|------------------------------------------|--------|-------------------------|----------------|--------------|---------|
+| Load balancer                            | 1      | 2 vCPU, 1.8GB memory    | n1-highcpu-2   | c5.large     | F2s v2  |
+| PostgreSQL                               | 1      | 2 vCPU, 7.5GB memory    | n1-standard-2  | m5.large     | D2s v3  |
+| Redis                                    | 1      | 1 vCPU, 3.75GB memory   | n1-standard-1  | m5.large     | D2s v3  |
+| Gitaly                                   | 1      | 4 vCPU, 15GB memory     | n1-standard-4  | m5.xlarge    | D4s v3  |
+| GitLab Rails                             | 2      | 8 vCPU, 7.2GB memory    | n1-highcpu-8   | c5.2xlarge   | F8s v2  |
+| Monitoring node                          | 1      | 2 vCPU, 1.8GB memory    | n1-highcpu-2   | c5.large     | F2s v2  |
+| Object storage                           | n/a    | n/a                     | n/a            | n/a          | n/a     |
+| NFS server (optional, not recommended)   | 1      | 4 vCPU, 3.6GB memory    | n1-highcpu-4   | c5.xlarge    | F4s v2  |
 
 The Google Cloud Platform (GCP) architectures were built and tested using the
 [Intel Xeon E5 v3 (Haswell)](https://cloud.google.com/compute/docs/cpu-platforms)
@@ -473,7 +476,7 @@ nodes (including the Gitaly node using the certificate) and on all client nodes
 that communicate with it following the procedure described in
 [GitLab custom certificate configuration](https://docs.gitlab.com/omnibus/settings/ssl.html#install-custom-public-certificates).
 
-NOTE: **Note**
+NOTE: **Note:**
 The self-signed certificate must specify the address you use to access the
 Gitaly server. If you are addressing the Gitaly server by a hostname, you can
 either use the Common Name field for this, or add it as a Subject Alternative
@@ -554,7 +557,7 @@ On each node perform the following:
 
    1. Specify the necessary NFS mounts in `/etc/fstab`.
       The exact contents of `/etc/fstab` will depend on how you chose
-      to configure your NFS server. See the [NFS documentation](../high_availability/nfs.md)
+      to configure your NFS server. See the [NFS documentation](../nfs.md)
       for examples and the various options.
 
    1. Create the shared directories. These may be different depending on your NFS
@@ -658,7 +661,8 @@ On each node perform the following:
    sudo gitlab-ctl tail gitaly
    ```
 
-NOTE: **Note:** When you specify `https` in the `external_url`, as in the example
+NOTE: **Note:**
+When you specify `https` in the `external_url`, as in the example
 above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
 certificates are not present, NGINX will fail to start. See the
 [NGINX documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
@@ -816,7 +820,7 @@ on the features you intend to use:
 1. [Object storage for LFS objects](../lfs/index.md#storing-lfs-objects-in-remote-object-storage).
 1. [Object storage for uploads](../uploads.md#using-object-storage-core-only).
 1. [Object storage for merge request diffs](../merge_request_diffs.md#using-object-storage).
-1. [Object storage for Container Registry](../packages/container_registry.md#container-registry-storage-driver) (optional feature).
+1. [Object storage for Container Registry](../packages/container_registry.md#use-object-storage) (optional feature).
 1. [Object storage for Mattermost](https://docs.mattermost.com/administration/config-settings.html#file-storage) (optional feature).
 1. [Object storage for packages](../packages/index.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
 1. [Object storage for Dependency Proxy](../packages/dependency_proxy.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
@@ -851,7 +855,7 @@ along with [Gitaly](#configure-gitaly), are recommended over using NFS whenever
 possible. However, if you intend to use GitLab Pages,
 [you must use NFS](troubleshooting.md#gitlab-pages-requires-nfs).
 
-For information about configuring NFS, see the [NFS documentation page](../high_availability/nfs.md).
+For information about configuring NFS, see the [NFS documentation page](../nfs.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">

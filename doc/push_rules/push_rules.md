@@ -1,4 +1,7 @@
 ---
+stage: Create
+group: Source Code
+info: "To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers"
 type: reference, howto
 ---
 
@@ -56,6 +59,13 @@ If you have other target branches, include them in your regex. (See [Enabling pu
 The default branch also defaults to being a [protected branch](../user/project/protected_branches.md),
 which already limits users from pushing directly.
 
+#### Default restricted branch names
+
+> Introduced in GitLab 12.10.
+
+By default, GitLab restricts certain formats of branch names for security purposes.
+Currently 40-character hexadecimal names, similar to Git commit hashes, are prohibited.
+
 ### Custom Push Rules **(CORE ONLY)**
 
 It's possible to create custom push rules rather than the push rules available in
@@ -91,7 +101,7 @@ The following options are available.
 | Maximum file size | **Starter** 7.12 | Pushes that contain added or updated files that exceed this file size (in MB) are rejected. Set to 0 to allow files of any size. Files tracked by Git LFS are exempted. |
 
 TIP: **Tip:**
-GitLab uses [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressions in push rules, and you can test them at the [GoLang regex tester](https://regex-golang.appspot.com/assets/html/index.html).
+GitLab uses [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressions in push rules, and you can test them at the [regex101 regex tester](https://regex101.com/).
 
 ## Prevent pushing secrets to the repository
 

@@ -8,6 +8,10 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
   let(:project) { create(:project) }
   let(:user)    { create(:user) }
 
+  before do
+    stub_licensed_features(jira_issues_integration: true)
+  end
+
   describe 'GET #index' do
     before do
       sign_in(user)
@@ -15,9 +19,9 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
       create(:jira_service, project: project)
     end
 
-    context 'when jira_integration feature disabled' do
+    context 'when jira_issues_integration licensed feature is not available' do
       it 'returns 404 status' do
-        stub_feature_flags(jira_integration: false)
+        stub_licensed_features(jira_issues_integration: false)
 
         get :index, params: { namespace_id: project.namespace, project_id: project }
 
@@ -66,7 +70,7 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
 
       it 'renders bad request for IntegrationError' do
         expect_any_instance_of(Projects::Integrations::Jira::IssuesFinder).to receive(:execute)
-          .and_raise(Projects::Integrations::Jira::IntegrationError, 'Integration error')
+          .and_raise(Projects::Integrations::Jira::IssuesFinder::IntegrationError, 'Integration error')
 
         get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
 
@@ -76,12 +80,12 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
 
       it 'renders bad request for RequestError' do
         expect_any_instance_of(Projects::Integrations::Jira::IssuesFinder).to receive(:execute)
-          .and_raise(Projects::Integrations::Jira::RequestError, 'Request error')
+          .and_raise(Projects::Integrations::Jira::IssuesFinder::RequestError, 'Request error')
 
         get :index, params: { namespace_id: project.namespace, project_id: project }, format: :json
 
         expect(response).to have_gitlab_http_status(:bad_request)
-        expect(json_response['errors']).to eq ['Request error']
+        expect(json_response['errors']).to eq ['An error occurred while requesting data from the Jira service']
       end
 
       it 'sets pagination headers' do

@@ -82,6 +82,10 @@ module Gitlab
           replicator.carrierwave_uploader.exists?
         end
       end
+
+      def in_replicables_for_geo_node?
+        self.class.replicables_for_geo_node.id_in(self).exists?
+      end
     end
   end
 end

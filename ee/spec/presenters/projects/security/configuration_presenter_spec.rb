@@ -19,7 +19,7 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
   end
 
   describe '#to_h' do
-    subject { described_class.new(project, auto_fix_permission: true, current_user: current_user).to_h }
+    subject { described_class.new(project, auto_fix_permission: true, current_user: current_user).to_html_data_attribute }
 
     it 'includes links to auto devops and secure product docs' do
       expect(subject[:auto_devops_help_page_path]).to eq(help_page_path('topics/autodevops/index'))
@@ -39,13 +39,16 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
 
     context "when the latest default branch pipeline's source is auto devops" do
       before do
-        create(
+        pipeline = create(
           :ci_pipeline,
           :auto_devops_source,
           project: project,
           ref: project.default_branch,
           sha: project.commit.sha
         )
+        create(:ci_build, :sast, pipeline: pipeline, status: 'success')
+        create(:ci_build, :dast, pipeline: pipeline, status: 'success')
+        create(:ci_build, :secret_detection, pipeline: pipeline, status: 'pending')
       end
 
       it 'reports that auto devops is enabled' do
@@ -56,14 +59,15 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
         expect(subject[:can_toggle_auto_fix_settings]).to be_truthy
       end
 
-      it 'reports that all security jobs are configured' do
+      it 'reports that all scanners are configured for which latest pipeline has builds' do
         expect(Gitlab::Json.parse(subject[:features])).to contain_exactly(
           security_scan(:dast, configured: true),
           security_scan(:sast, configured: true),
-          security_scan(:container_scanning, configured: true),
-          security_scan(:dependency_scanning, configured: true),
-          security_scan(:license_scanning, configured: true),
-          security_scan(:secret_detection, configured: true)
+          security_scan(:container_scanning, configured: false),
+          security_scan(:dependency_scanning, configured: false),
+          security_scan(:license_scanning, configured: false),
+          security_scan(:secret_detection, configured: true),
+          security_scan(:coverage_fuzzing, configured: false)
         )
       end
     end
@@ -84,7 +88,8 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
           security_scan(:license_scanning, configured: false),
-          security_scan(:secret_detection, configured: false)
+          security_scan(:secret_detection, configured: false),
+          security_scan(:coverage_fuzzing, configured: false)
         )
       end
     end
@@ -112,7 +117,8 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
           security_scan(:license_scanning, configured: false),
-          security_scan(:secret_detection, configured: true)
+          security_scan(:secret_detection, configured: true),
+          security_scan(:coverage_fuzzing, configured: false)
         )
       end
 
@@ -127,7 +133,8 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
           security_scan(:license_scanning, configured: false),
-          security_scan(:secret_detection, configured: false)
+          security_scan(:secret_detection, configured: false),
+          security_scan(:coverage_fuzzing, configured: false)
         )
       end
 
@@ -148,7 +155,8 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
           security_scan(:license_scanning, configured: false),
-          security_scan(:secret_detection, configured: false)
+          security_scan(:secret_detection, configured: false),
+          security_scan(:coverage_fuzzing, configured: false)
         )
       end
 
@@ -161,7 +169,8 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
           security_scan(:container_scanning, configured: false),
           security_scan(:dependency_scanning, configured: false),
           security_scan(:license_scanning, configured: true),
-          security_scan(:secret_detection, configured: true)
+          security_scan(:secret_detection, configured: true),
+          security_scan(:coverage_fuzzing, configured: false)
         )
       end
 
@@ -214,10 +223,14 @@ RSpec.describe Projects::Security::ConfigurationPresenter do
   end
 
   def security_scan(type, configured:)
+    configuration_path = project_security_configuration_sast_path(project) if type == :sast
+
     {
+      "type" => type.to_s,
       "configured" => configured,
       "description" => described_class.localized_scan_descriptions[type],
       "link" => help_page_path(described_class::SCAN_DOCS[type]),
+      "configuration_path" => configuration_path,
       "name" => described_class.localized_scan_names[type]
     }
   end

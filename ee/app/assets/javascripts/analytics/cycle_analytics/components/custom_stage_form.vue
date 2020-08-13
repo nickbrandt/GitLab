@@ -6,9 +6,9 @@ import {
   GlFormInput,
   GlFormSelect,
   GlLoadingIcon,
-  GlDropdown,
-  GlDropdownHeader,
-  GlDropdownItem,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownHeader,
+  GlDeprecatedDropdownItem,
   GlSprintf,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
@@ -76,9 +76,9 @@ export default {
     GlFormSelect,
     GlLoadingIcon,
     LabelsSelector,
-    GlDropdown,
-    GlDropdownHeader,
-    GlDropdownItem,
+    GlDeprecatedDropdown,
+    GlDeprecatedDropdownHeader,
+    GlDeprecatedDropdownItem,
     GlSprintf,
   },
   props: {
@@ -257,18 +257,21 @@ export default {
   <form v-else class="custom-stage-form m-4 mt-0">
     <div class="mb-1 d-flex flex-row justify-content-between">
       <h4>{{ formTitle }}</h4>
-      <gl-dropdown :text="__('Recover hidden stage')" class="js-recover-hidden-stage-dropdown">
-        <gl-dropdown-header>{{ __('Default stages') }}</gl-dropdown-header>
+      <gl-deprecated-dropdown
+        :text="__('Recover hidden stage')"
+        class="js-recover-hidden-stage-dropdown"
+      >
+        <gl-deprecated-dropdown-header>{{ __('Default stages') }}</gl-deprecated-dropdown-header>
         <template v-if="hasHiddenStages">
-          <gl-dropdown-item
+          <gl-deprecated-dropdown-item
             v-for="stage in hiddenStages"
             :key="stage.id"
             @click="handleRecoverStage(stage.id)"
-            >{{ stage.title }}</gl-dropdown-item
+            >{{ stage.title }}</gl-deprecated-dropdown-item
           >
         </template>
         <p v-else class="mx-3 my-2">{{ __('All default stages are currently visible') }}</p>
-      </gl-dropdown>
+      </gl-deprecated-dropdown>
     </div>
     <gl-form-group
       ref="name"

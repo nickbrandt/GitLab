@@ -46,6 +46,7 @@ RSpec.describe API::V3::Github do
       let(:merge_request) do
         create(:merge_request, source_project: project, target_project: project)
       end
+
       let!(:note) do
         create(:note, project: project, noteable: merge_request)
       end
@@ -203,6 +204,7 @@ RSpec.describe API::V3::Github do
     let!(:merge_request) do
       create(:merge_request, source_project: project, target_project: project, author: user, assignees: [assignee])
     end
+
     let!(:merge_request_2) do
       create(:merge_request, source_project: project2, target_project: project2, author: user, assignees: [assignee, assignee2])
     end
@@ -299,6 +301,15 @@ RSpec.describe API::V3::Github do
 
         it 'returns an array of projects belonging to group' do
           expect_project_under_namespace([project, project2], group, user)
+        end
+
+        context 'with a private group' do
+          let(:group) { create(:group, :private) }
+          let!(:project2) { create(:project, :private, group: group) }
+
+          it 'returns an array of projects belonging to group' do
+            expect_project_under_namespace([project, project2], group, user)
+          end
         end
       end
     end

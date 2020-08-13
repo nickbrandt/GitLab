@@ -3,7 +3,7 @@
 /* global ListLabel */
 
 import $ from 'jquery';
-import { isEqual, escape, sortBy, template } from 'lodash';
+import { difference, isEqual, escape, sortBy, template, union } from 'lodash';
 import { sprintf, s__, __ } from './locale';
 import axios from './lib/utils/axios_utils';
 import IssuableBulkUpdateActions from './issuable_bulk_update_actions';
@@ -477,13 +477,11 @@ export default class LabelsSelect {
 
     const linkOpenTag =
       '<a href="<%- issueUpdateURL.slice(0, issueUpdateURL.lastIndexOf("/")) %>?label_name[]=<%- encodeURIComponent(label.title) %>" class="gl-link gl-label-link has-tooltip" <%= linkAttrs %> title="<%= tooltipTitleTemplate({ label, isScopedLabel, enableScopedLabels, escapeStr }) %>">';
-    const spanOpenTag =
-      '<span class="gl-label-text" style="background-color: <%= escapeStr(label.color) %>; color: <%= escapeStr(label.text_color) %>;">';
     const labelTemplate = template(
       [
         '<span class="gl-label">',
         linkOpenTag,
-        spanOpenTag,
+        '<span class="gl-label-text <%= labelTextClass({ label, escapeStr }) %>" style="background-color: <%= escapeStr(label.color) %>;">',
         '<%- label.title %>',
         '</span>',
         '</a>',
@@ -491,18 +489,24 @@ export default class LabelsSelect {
       ].join(''),
     );
 
-    const rightLabelTextColor = ({ label, escapeStr }) => {
-      return escapeStr(label.text_color === '#FFFFFF' ? label.color : label.text_color);
+    const labelTextClass = ({ label, escapeStr }) => {
+      return escapeStr(
+        label.text_color === '#FFFFFF' ? 'gl-label-text-light' : 'gl-label-text-dark',
+      );
+    };
+
+    const rightLabelTextClass = ({ label, escapeStr }) => {
+      return escapeStr(label.text_color === '#333333' ? labelTextClass({ label, escapeStr }) : '');
     };
 
     const scopedLabelTemplate = template(
       [
         '<span class="gl-label gl-label-scoped" style="color: <%= escapeStr(label.color) %>; --label-inset-border: inset 0 0 0 2px <%= escapeStr(label.color) %>;">',
         linkOpenTag,
-        spanOpenTag,
+        '<span class="gl-label-text <%= labelTextClass({ label, escapeStr }) %>" style="background-color: <%= escapeStr(label.color) %>;">',
         '<%- label.title.slice(0, label.title.lastIndexOf("::")) %>',
         '</span>',
-        '<span class="gl-label-text" style="color: <%= rightLabelTextColor({ label, escapeStr }) %>;">',
+        '<span class="gl-label-text <%= rightLabelTextClass({ label, escapeStr }) %>">',
         '<%- label.title.slice(label.title.lastIndexOf("::") + 2) %>',
         '</span>',
         '</a>',
@@ -526,9 +530,9 @@ export default class LabelsSelect {
       [
         '<% labels.forEach(function(label){ %>',
         '<% if (isScopedLabel(label) && enableScopedLabels) { %>',
-        '<%= scopedLabelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, rightLabelTextColor, tooltipTitleTemplate, escapeStr, linkAttrs: \'data-html="true"\' }) %>',
+        '<%= scopedLabelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, labelTextClass, rightLabelTextClass, tooltipTitleTemplate, escapeStr, linkAttrs: \'data-html="true"\' }) %>',
         '<% } else { %>',
-        '<%= labelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, tooltipTitleTemplate, escapeStr, linkAttrs: "" }) %>',
+        '<%= labelTemplate({ label, issueUpdateURL, isScopedLabel, enableScopedLabels, labelTextClass, tooltipTitleTemplate, escapeStr, linkAttrs: "" }) %>',
         '<% } %>',
         '<% }); %>',
       ].join(''),
@@ -537,7 +541,8 @@ export default class LabelsSelect {
     return tpl({
       ...tplData,
       labelTemplate,
-      rightLabelTextColor,
+      labelTextClass,
+      rightLabelTextClass,
       scopedLabelTemplate,
       tooltipTitleTemplate,
       isScopedLabel,
@@ -560,45 +565,20 @@ export default class LabelsSelect {
     IssuableBulkUpdateActions.willUpdateLabels = true;
   }
   // eslint-disable-next-line class-methods-use-this
-  setDropdownData($dropdown, isMarking, value) {
-    const markedIds = $dropdown.data('marked') || [];
-    const unmarkedIds = $dropdown.data('unmarked') || [];
-    const indeterminateIds = $dropdown.data('indeterminate') || [];
+  setDropdownData($dropdown, isMarking, labelId) {
+    let userCheckedIds = $dropdown.data('user-checked') || [];
+    let userUncheckedIds = $dropdown.data('user-unchecked') || [];
 
     if (isMarking) {
-      markedIds.push(value);
-
-      let i = indeterminateIds.indexOf(value);
-      if (i > -1) {
-        indeterminateIds.splice(i, 1);
-      }
-
-      i = unmarkedIds.indexOf(value);
-      if (i > -1) {
-        unmarkedIds.splice(i, 1);
-      }
+      userCheckedIds = union(userCheckedIds, [labelId]);
+      userUncheckedIds = difference(userUncheckedIds, [labelId]);
     } else {
-      // If marked item (not common) is unmarked
-      const i = markedIds.indexOf(value);
-      if (i > -1) {
-        markedIds.splice(i, 1);
-      }
-
-      // If an indeterminate item is being unmarked
-      if (IssuableBulkUpdateActions.getOriginalIndeterminateIds().indexOf(value) > -1) {
-        unmarkedIds.push(value);
-      }
-
-      // If a marked item is being unmarked
-      // (a marked item could also be a label that is present in all selection)
-      if (IssuableBulkUpdateActions.getOriginalCommonIds().indexOf(value) > -1) {
-        unmarkedIds.push(value);
-      }
+      userUncheckedIds = union(userUncheckedIds, [labelId]);
+      userCheckedIds = difference(userCheckedIds, [labelId]);
     }
 
-    $dropdown.data('marked', markedIds);
-    $dropdown.data('unmarked', unmarkedIds);
-    $dropdown.data('indeterminate', indeterminateIds);
+    $dropdown.data('user-checked', userCheckedIds);
+    $dropdown.data('user-unchecked', userUncheckedIds);
   }
   // eslint-disable-next-line class-methods-use-this
   setOriginalDropdownData($container, $dropdown) {

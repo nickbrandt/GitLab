@@ -37,15 +37,16 @@ the `author` field. GitLab team members **should not**.
 - Any user-facing change **should** have a changelog entry. Example: "GitLab now
   uses system fonts for all text."
 - Performance improvements **should** have a changelog entry.
+- Changes that need to be documented in the Telemetry [Event Dictionary](telemetry/event_dictionary.md)
+  also require a changelog entry.
 - _Any_ contribution from a community member, no matter how small, **may** have
   a changelog entry regardless of these guidelines if the contributor wants one.
   Example: "Fixed a typo on the search results page."
 - Any docs-only changes **should not** have a changelog entry.
 - Any change behind a feature flag **should not** have a changelog entry - unless
-  the feature flag has been defaulted to true. The entry should be added
-  [in the merge request removing the feature flags](feature_flags/development.md).
-  If the change includes a database migration (regular, post, or data migration),
-  there should be a changelog entry for the migration change.
+  the feature flag has been defaulted to true.
+- A change that [removes a feature flag](feature_flags/development.md) **should** have a changelog entry -
+  only if the feature flag did not default to true already.
 - A fix for a regression introduced and then fixed in the same release (i.e.,
   fixing a bug introduced during a monthly release candidate) **should not**
   have a changelog entry.

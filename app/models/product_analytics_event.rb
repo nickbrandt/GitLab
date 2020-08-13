@@ -8,6 +8,8 @@ class ProductAnalyticsEvent < ApplicationRecord
 
   belongs_to :project
 
+  validates :event_id, :project_id, :v_collector, :v_etl, presence: true
+
   # There is no default Rails timestamps in the table.
   # collector_tstamp is a timestamp when a collector recorded an event.
   scope :order_by_time, -> { order(collector_tstamp: :desc) }
@@ -17,4 +19,12 @@ class ProductAnalyticsEvent < ApplicationRecord
   scope :timerange, ->(duration, today = Time.zone.today) {
     where('collector_tstamp BETWEEN ? AND ? ', today - duration + 1, today + 1)
   }
+
+  def self.count_by_graph(graph, days)
+    group(graph).timerange(days).count
+  end
+
+  def as_json_wo_empty
+    as_json.compact
+  end
 end
