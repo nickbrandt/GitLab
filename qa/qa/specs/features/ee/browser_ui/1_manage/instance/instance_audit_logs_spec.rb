@@ -2,7 +2,8 @@
 require 'securerandom'
 
 module QA
-  RSpec.describe 'Manage', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/218332', type: :investigating } do
+  # Issue to enable this test in live environments: https://gitlab.com/gitlab-org/quality/team-tasks/-/issues/614
+  RSpec.describe 'Manage', :skip_live_env do
     shared_examples 'audit event' do |expected_events|
       it 'logs audit events for UI operations' do
         sign_in
