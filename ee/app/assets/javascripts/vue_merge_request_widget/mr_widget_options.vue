@@ -1,5 +1,4 @@
 <script>
-import { isNumber, isString } from 'lodash';
 import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import GroupedMetricsReportsApp from 'ee/vue_shared/metrics_reports/grouped_metrics_reports_app.vue';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
@@ -12,12 +11,9 @@ import { s__, __, sprintf } from '~/locale';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
 import MrWidgetPolicyViolation from './components/states/mr_widget_policy_violation.vue';
-import MergeTrainHelperText from './components/merge_train_helper_text.vue';
-import { MTWPS_MERGE_STRATEGY } from '~/vue_merge_request_widget/constants';
 
 export default {
   components: {
-    MergeTrainHelperText,
     MrWidgetLicenses,
     MrWidgetGeoSecondaryNode,
     MrWidgetPolicyViolation,
@@ -154,16 +150,6 @@ export default {
       return this.checkReportStatus(
         this.isLoadingLoadPerformance,
         this.loadingLoadPerformanceFailed,
-      );
-    },
-
-    shouldRenderMergeTrainHelperText() {
-      return (
-        this.mr.pipeline &&
-        isNumber(this.mr.pipeline.id) &&
-        isString(this.mr.pipeline.path) &&
-        this.mr.preferredAutoMergeStrategy === MTWPS_MERGE_STRATEGY &&
-        !this.mr.autoMergeEnabled
       );
     },
     licensesApiPath() {
@@ -371,7 +357,6 @@ export default {
 
       <div class="mr-widget-section">
         <component :is="componentName" :mr="mr" :service="service" />
-
         <div class="mr-widget-info">
           <section v-if="mr.allowCollaboration" class="mr-info-list mr-links">
             <p>
@@ -404,13 +389,6 @@ export default {
           <source-branch-removal-status v-if="shouldRenderSourceBranchRemovalStatus" />
         </div>
       </div>
-      <merge-train-helper-text
-        v-if="shouldRenderMergeTrainHelperText"
-        :pipeline-id="mr.pipeline.id"
-        :pipeline-link="mr.pipeline.path"
-        :merge-train-length="mr.mergeTrainsCount"
-        :merge-train-when-pipeline-succeeds-docs-path="mr.mergeTrainWhenPipelineSucceedsDocsPath"
-      />
       <div v-if="shouldRenderMergeHelp" class="mr-widget-footer"><mr-widget-merge-help /></div>
     </div>
     <mr-widget-pipeline-container
