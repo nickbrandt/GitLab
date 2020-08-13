@@ -1,0 +1,39 @@
+query($fullPath: ID!, $startDate: Time!, $endDate: Time!, $limit: Int!) {
+  project(fullPath: $fullPath) {
+    mergeRequests(first: $limit, mergedAfter: $startDate, mergedBefore: $endDate) {
+      nodes {
+        iid
+        title
+        createdAt
+        mergedAt
+        webUrl
+        milestone {
+          title
+        }
+        assignees {
+          nodes {
+            avatarUrl
+            name
+            webUrl
+          }
+        }
+        diffStatsSummary {
+          additions
+          deletions
+        }
+        labels {
+          nodes {
+            title
+          }
+        }
+        pipelines {
+          nodes {
+            detailedStatus {
+              icon
+            }
+          }
+        }
+      }
+    }
+  }
+}

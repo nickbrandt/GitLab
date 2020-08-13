@@ -1,3 +1,8 @@
+export const startDate = new Date('2020-05-01');
+export const endDate = new Date('2020-08-01');
+
+export const fullPath = 'gitlab-org/gitlab';
+
 export const throughputChartData = {
   May: { count: 2, __typename: 'MergeRequestConnection' },
   Jun: { count: 4, __typename: 'MergeRequestConnection' },
@@ -40,3 +45,41 @@ export const throughputChartQuery = `query ($fullPath: ID!) {
   }
 }
 `;
+
+export const throughputTableHeaders = [
+  'Merge Request',
+  'Date Merged',
+  'Time to merge',
+  'Milestone',
+  'Pipelines',
+  'Line changes',
+  'Assignees',
+];
+
+export const throughputTableData = [
+  {
+    iid: '1',
+    title: 'Update README.md',
+    createdAt: '2020-08-06T16:53:50Z',
+    mergedAt: '2020-08-06T16:57:53Z',
+    webUrl: 'http://127.0.0.1:3001/gitlab-org/gitlab-shell/-/merge_requests/11',
+    milestone: { title: 'v1.0' },
+    assignees: {
+      nodes: [
+        {
+          avatarUrl:
+            'https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon',
+          name: 'Administrator',
+          webUrl: 'http://127.0.0.1:3001/root',
+        },
+      ],
+    },
+    diffStatsSummary: { additions: 2, deletions: 1 },
+    labels: {
+      nodes: [],
+    },
+    pipelines: {
+      nodes: [],
+    },
+  },
+];
