@@ -7355,9 +7355,9 @@ input IssueSetEpicInput {
   clientMutationId: String
 
   """
-  Global ID of the epic to be assigned to the issue
+  Global ID of the epic to be assigned to the issue, epic will be removed if absent or set to null
   """
-  epicId: ID!
+  epicId: ID
 
   """
   The IID of the issue to mutate
