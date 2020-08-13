@@ -7,7 +7,11 @@ module CredentialsInventoryActions
   def index
     @credentials = filter_credentials.page(params[:page]).preload_users.without_count # rubocop:disable Gitlab/ModuleWithInstanceVariables
 
-    render 'shared/credentials_inventory/index'
+    respond_to do |format|
+      format.html do
+        render 'shared/credentials_inventory/index'
+      end
+    end
   end
 
   private
