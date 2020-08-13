@@ -3932,6 +3932,9 @@ msgstr ""
 msgid "Boards|View scope"
 msgstr ""
 
+msgid "Both project and dashboard_path are required"
+msgstr ""
+
 msgid "Branch"
 msgstr ""
 
