@@ -1,22 +1,6 @@
 import { safeDump } from 'js-yaml';
-import { EndpointMatchModeAny } from '../constants';
 import { ruleSpec } from './rules';
-
-/*
- Convert enpdoint labels provided as a string into a kubernetes selector.
- Expected endpointLabels in format "one two:three"
-*/
-function endpointSelector({ endpointMatchMode, endpointLabels }) {
-  if (endpointMatchMode === EndpointMatchModeAny) return {};
-
-  return endpointLabels.split(/\s/).reduce((acc, item) => {
-    const [key, value = ''] = item.split(':');
-    if (key.length === 0) return acc;
-
-    acc[key] = value.trim();
-    return acc;
-  }, {});
-}
+import { endpointSelector } from './utils';
 
 /*
  Return kubernetes resource specification object for a policy.
