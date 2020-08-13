@@ -3,9 +3,7 @@ import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
 import ThroughputChart from 'ee/analytics/merge_request_analytics/components/throughput_chart.vue';
 import { THROUGHPUT_CHART_STRINGS } from 'ee/analytics/merge_request_analytics/constants';
-import { throughputChartData } from '../mock_data';
-
-const fullPath = 'gitlab-org/gitlab';
+import { throughputChartData, startDate, endDate, fullPath } from '../mock_data';
 
 describe('ThroughputChart', () => {
   let wrapper;
@@ -29,6 +27,10 @@ describe('ThroughputChart', () => {
       mocks: { $apollo },
       provide: {
         fullPath,
+      },
+      props: {
+        startDate,
+        endDate,
       },
     });
 

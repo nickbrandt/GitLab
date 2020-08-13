@@ -1,9 +1,8 @@
 <script>
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
 import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
-import { getDateInPast } from '~/lib/utils/datetime_utility';
 import throughputChartQueryBuilder from '../graphql/throughput_chart_query_builder';
-import { DEFAULT_NUMBER_OF_DAYS, THROUGHPUT_CHART_STRINGS } from '../constants';
+import { THROUGHPUT_CHART_STRINGS } from '../constants';
 
 export default {
   name: 'ThroughputChart',
@@ -13,11 +12,19 @@ export default {
     GlLoadingIcon,
   },
   inject: ['fullPath'],
+  props: {
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+    },
+  },
   data() {
     return {
       throughputChartData: [],
-      startDate: getDateInPast(new Date(), DEFAULT_NUMBER_OF_DAYS),
-      endDate: new Date(),
       hasError: false,
     };
   },
