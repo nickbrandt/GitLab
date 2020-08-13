@@ -7,9 +7,10 @@ module Mutations
 
       argument :epic_id,
                GraphQL::ID_TYPE,
-               required: true,
+               required: false,
                loads: Types::EpicType,
-               description: 'Global ID of the epic to be assigned to the issue'
+               description: 'Global ID of the epic to be assigned to the issue, ' \
+               'epic will be removed if absent or set to null'
 
       def resolve(project_path:, iid:, epic: nil)
         issue = authorized_find!(project_path: project_path, iid: iid)
