@@ -3255,6 +3255,20 @@
               "deprecationReason": null
             },
             {
+              "name": "issuesCount",
+              "description": "Count of issues in the list",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "label",
               "description": "Label of the list",
               "args": [
@@ -3370,6 +3384,20 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "totalWeight",
+              "description": "Total weight of all issues in the list",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null

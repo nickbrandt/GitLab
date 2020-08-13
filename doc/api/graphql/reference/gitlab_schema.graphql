@@ -1225,6 +1225,11 @@ type BoardList {
   ): IssueConnection
 
   """
+  Count of issues in the list
+  """
+  issuesCount: Int
+
+  """
   Label of the list
   """
   label: Label
@@ -1263,6 +1268,11 @@ type BoardList {
   Title of the list
   """
   title: String!
+
+  """
+  Total weight of all issues in the list
+  """
+  totalWeight: Int
 }
 
 """

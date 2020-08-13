@@ -207,6 +207,7 @@ Represents a list for an issue board
 | `assignee` | User | Assignee in the list |
 | `collapsed` | Boolean | Indicates if list is collapsed for this user |
 | `id` | ID! | ID (global ID) of the list |
+| `issuesCount` | Int | Count of issues in the list |
 | `label` | Label | Label of the list |
 | `limitMetric` | ListLimitMetric | The current limit metric for the list |
 | `listType` | String! | Type of the list |
@@ -215,6 +216,7 @@ Represents a list for an issue board
 | `milestone` | Milestone | Milestone of the list |
 | `position` | Int | Position of list within the board |
 | `title` | String! | Title of the list |
+| `totalWeight` | Int | Total weight of all issues in the list |
 
 ## BoardListCreatePayload
 
