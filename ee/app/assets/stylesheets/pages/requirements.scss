@@ -23,12 +23,6 @@
 }
 
 .requirements-list-container {
-  .gl-search-box-by-click {
-    .gl-filtered-search-scrollable {
-      border-radius: 0;
-    }
-  }
-
   .requirements-list {
     li .issuable-main-info {
       // These rules prevent adjecant REQ ID from wrapping
