@@ -792,9 +792,9 @@ Counts of descendent epics.
 
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
-| `closedEpics` | Int | Number of closed sub-epics |
+| `closedEpics` | Int | Number of closed child epics |
 | `closedIssues` | Int | Number of closed epic issues |
-| `openedEpics` | Int | Number of opened sub-epics |
+| `openedEpics` | Int | Number of opened child epics |
 | `openedIssues` | Int | Number of opened epic issues |
 
 ## EpicDescendantWeights

@@ -13649,7 +13649,7 @@
           "fields": [
             {
               "name": "closedEpics",
-              "description": "Number of closed sub-epics",
+              "description": "Number of closed child epics",
               "args": [
 
               ],
@@ -13677,7 +13677,7 @@
             },
             {
               "name": "openedEpics",
-              "description": "Number of opened sub-epics",
+              "description": "Number of opened child epics",
               "args": [
 
               ],

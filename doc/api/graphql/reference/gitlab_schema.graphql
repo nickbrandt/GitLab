@@ -4896,7 +4896,7 @@ Counts of descendent epics.
 """
 type EpicDescendantCount {
   """
-  Number of closed sub-epics
+  Number of closed child epics
   """
   closedEpics: Int
 
@@ -4906,7 +4906,7 @@ type EpicDescendantCount {
   closedIssues: Int
 
   """
-  Number of opened sub-epics
+  Number of opened child epics
   """
   openedEpics: Int
 
