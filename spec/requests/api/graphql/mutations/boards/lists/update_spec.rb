@@ -14,23 +14,42 @@ RSpec.describe 'Update of an existing board list' do
   let(:mutation) { graphql_mutation(:update_board_list, input) }
   let(:mutation_response) { graphql_mutation_response(:update_board_list) }
 
-  context 'the user is not allowed to admin board lists' do
+  context 'the user is not allowed to read board lists' do
     it_behaves_like 'a mutation that returns top-level errors',
       errors: ['The resource that you are attempting to access does not exist or you don\'t have permission to perform this action']
+  end
+
+  before do
+    list.update_preferences_for(current_user, collapsed: false)
   end
 
   context 'when user has permissions to admin board lists' do
     before do
       group.add_reporter(current_user)
-      list.update_preferences_for(current_user, collapsed: false)
     end
 
-    it 'updates the list' do
+    it 'updates the list position and collapsed state' do
       post_graphql_mutation(mutation, current_user: current_user)
 
       expect(response).to have_gitlab_http_status(:success)
       expect(mutation_response['list']).to include(
         'position' => 1,
+        'collapsed' => true
+      )
+    end
+  end
+
+  context 'when user has permissions to read board lists' do
+    before do
+      group.add_guest(current_user)
+    end
+
+    it 'updates the list collapsed state but not the list position' do
+      post_graphql_mutation(mutation, current_user: current_user)
+
+      expect(response).to have_gitlab_http_status(:success)
+      expect(mutation_response['list']).to include(
+        'position' => 0,
         'collapsed' => true
       )
     end

@@ -25,7 +25,7 @@ module Mutations
               description: 'Mutated list'
 
         def resolve(list: nil, **args)
-          authorize!(list)
+          raise_resource_not_available_error! unless can_read_list?(list)
           update_result = update_list(list, args)
 
           {
@@ -41,9 +41,10 @@ module Mutations
           service.execute(list)
         end
 
-        def authorize!(list)
-          raise_resource_not_available_error! unless list
-          raise_resource_not_available_error! unless Ability.allowed?(current_user, :admin_list, list.board)
+        def can_read_list?(list)
+          return false unless list.present?
+
+          Ability.allowed?(current_user, :read_list, list.board)
         end
       end
     end
