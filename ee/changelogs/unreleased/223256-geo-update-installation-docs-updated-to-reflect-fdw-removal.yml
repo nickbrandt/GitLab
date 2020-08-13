@@ -1,0 +1,5 @@
+---
+title: Remove Foreign Data Wrapper support from Geo docs
+merge_request: 39485
+author:
+type: removed
