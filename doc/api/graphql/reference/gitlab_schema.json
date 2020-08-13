@@ -578,6 +578,24 @@
               "deprecationReason": null
             },
             {
+              "name": "detailsUrl",
+              "description": "The URL of the alert detail page",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "discussions",
               "description": "All discussions on this noteable",
               "args": [
@@ -797,6 +815,20 @@
                   "name": "NoteConnection",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "prometheusAlert",
+              "description": "The alert condition for Prometheus",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PrometheusAlert",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -12334,6 +12366,20 @@
                   "name": "ID",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "latestOpenedMostSevereAlert",
+              "description": "The most severe open alert for the environment. If multiple alerts have equal severity, the most recent is returned.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "AlertManagementAlert",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -31458,6 +31504,57 @@
               "deprecationReason": null
             },
             {
+              "name": "environment",
+              "description": "A single environment of the project",
+              "args": [
+                {
+                  "name": "name",
+                  "description": "Name of the environment",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "search",
+                  "description": "Search query for environment name",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "states",
+                  "description": "States of environments that should be included in result",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Environment",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "environments",
               "description": "Environments of the project",
               "args": [
@@ -35643,6 +35740,55 @@
                 "kind": "SCALAR",
                 "name": "Float",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "PrometheusAlert",
+          "description": "The alert condition for Prometheus",
+          "fields": [
+            {
+              "name": "humanizedText",
+              "description": "The human-readable text of the alert condition",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "ID of the alert condition",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
