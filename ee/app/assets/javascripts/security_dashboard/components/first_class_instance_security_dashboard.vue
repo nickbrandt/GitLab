@@ -11,6 +11,7 @@ import projectsQuery from 'ee/security_dashboard/graphql/get_instance_security_d
 import ProjectManager from './first_class_project_manager/project_manager.vue';
 import CsvExportButton from './csv_export_button.vue';
 import vulnerabilityHistoryQuery from '../graphql/instance_vulnerability_history.query.graphql';
+import vulnerabilityGradesQuery from '../graphql/instance_vulnerability_grades.query.graphql';
 import DashboardNotConfigured from './empty_states/instance_dashboard_not_configured.vue';
 
 export default {
@@ -48,6 +49,7 @@ export default {
       filters: {},
       showProjectSelector: false,
       vulnerabilityHistoryQuery,
+      vulnerabilityGradesQuery,
       projects: [],
       isManipulatingProjects: false,
     };
@@ -133,7 +135,7 @@ export default {
     <template #aside>
       <template v-if="shouldShowDashboard">
         <vulnerability-chart :query="vulnerabilityHistoryQuery" class="mb-4" />
-        <vulnerability-severities :projects="projects" />
+        <vulnerability-severities :query="vulnerabilityGradesQuery" />
       </template>
     </template>
   </security-dashboard-layout>
