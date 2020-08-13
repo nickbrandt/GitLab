@@ -29,10 +29,6 @@ module EE
       allow(node).to receive(:selective_sync?).and_return(value)
     end
 
-    def stub_healthy_shards(shards)
-      ::Gitlab::ShardHealthCache.update(Array(shards))
-    end
-
     def create_project_on_shard(shard_name)
       project = create(:project)
 
