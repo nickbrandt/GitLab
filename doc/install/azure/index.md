@@ -16,7 +16,7 @@ Azure Virtual Machines (VM) are on-demand, scalable computing resources in Azure
 
 Your Linux distribution of choice installing on an Azure VM can help provide the benefits of virtualized compute resources. When using an Azure VM, you are responsible for the maintenance of the operating system and GitLab services will also need to be configured and maintained.
 
-For sizing specifications of the VM, you can use our [Reference Architecture documentation](https://docs.gitlab.com/ee/administration/reference_architectures/index.html#available-reference-architectures) to determine the appropriate size for your needs.
+For sizing specifications of the VM, you can use our [Reference Architecture documentation](../../administration/reference_architectures/index.md#available-reference-architectures) to determine the appropriate size for your needs.
 
 ## Installing Omnibus GitLab
 
