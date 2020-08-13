@@ -30,6 +30,11 @@ RSpec.describe Groups::Security::ComplianceDashboardsController do
             subject
             expect(assigns(:merge_requests)).to be_empty
           end
+
+          it 'sets merge requests count' do
+            subject
+            expect(assigns(:merge_requests_count)).to eq("0")
+          end
         end
 
         context 'when there are merge requests' do
@@ -45,6 +50,11 @@ RSpec.describe Groups::Security::ComplianceDashboardsController do
           it 'receives merge requests collection' do
             subject
             expect(assigns(:merge_requests)).not_to be_empty
+          end
+
+          it 'sets merge requests count' do
+            subject
+            expect(assigns(:merge_requests_count)).to eq("1")
           end
         end
 

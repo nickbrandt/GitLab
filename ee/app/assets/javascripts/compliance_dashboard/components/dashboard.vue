@@ -1,6 +1,6 @@
 <script>
 import Cookies from 'js-cookie';
-import { GlTabs, GlTab } from '@gitlab/ui';
+import { GlTabs, GlTab, GlBadge } from '@gitlab/ui';
 import { __ } from '~/locale';
 import MergeRequestsGrid from './merge_requests/grid.vue';
 import EmptyState from './empty_state.vue';
@@ -15,9 +15,14 @@ export default {
     GlTab,
     GlTabs,
     MergeCommitsExportButton,
+    GlBadge,
   },
   props: {
     emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
+    mergeRequestsCount: {
       type: String,
       required: true,
     },
@@ -74,6 +79,7 @@ export default {
       <gl-tab>
         <template #title>
           <span>{{ $options.strings.mergeRequestsTabLabel }}</span>
+          <gl-badge size="sm" class="gl-tab-counter-badge">{{ mergeRequestsCount }}</gl-badge>
         </template>
         <merge-requests-grid :merge-requests="mergeRequests" :is-last-page="isLastPage" />
       </gl-tab>

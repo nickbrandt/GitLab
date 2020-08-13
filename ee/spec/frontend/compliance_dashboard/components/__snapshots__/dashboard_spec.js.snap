@@ -42,6 +42,14 @@ exports[`ComplianceDashboard component when there are merge requests and the sho
         <span>
           Merge Requests
         </span>
+         
+        <gl-badge-stub
+          class="gl-tab-counter-badge"
+          size="sm"
+          variant="muted"
+        >
+          1,000+
+        </gl-badge-stub>
       </template>
     </b-tab-stub>
   </gl-tabs-stub>

@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import { shallowMount } from '@vue/test-utils';
-import { GlTabs, GlTab } from '@gitlab/ui';
+import { GlTabs, GlTab, GlBadge } from '@gitlab/ui';
 
 import ComplianceDashboard from 'ee/compliance_dashboard/components/dashboard.vue';
 import MergeRequestGrid from 'ee/compliance_dashboard/components/merge_requests/grid.vue';
@@ -14,7 +14,9 @@ describe('ComplianceDashboard component', () => {
   const isLastPage = false;
   const mergeRequests = createMergeRequests({ count: 2 });
   const mergeCommitsCsvExportPath = '/csv';
+  const mergeRequestsCount = '1,000+';
 
+  const findMergeRequestsCountBadge = () => wrapper.find(GlBadge);
   const findMergeRequestsGrid = () => wrapper.find(MergeRequestGrid);
   const findMergeCommitsExportButton = () => wrapper.find(MergeCommitsExportButton);
   const findDashboardTabs = () => wrapper.find(GlTabs);
@@ -23,6 +25,7 @@ describe('ComplianceDashboard component', () => {
     return shallowMount(ComplianceDashboard, {
       propsData: {
         mergeRequests,
+        mergeRequestsCount,
         isLastPage,
         mergeCommitsCsvExportPath,
         emptyStateSvgPath: 'empty.svg',
@@ -77,6 +80,10 @@ describe('ComplianceDashboard component', () => {
 
       it('renders the dashboard tabs', () => {
         expect(findDashboardTabs().exists()).toBe(true);
+      });
+
+      it('renders the merge requests count', () => {
+        expect(findMergeRequestsCountBadge().text()).toEqual(mergeRequestsCount);
       });
     });
   });

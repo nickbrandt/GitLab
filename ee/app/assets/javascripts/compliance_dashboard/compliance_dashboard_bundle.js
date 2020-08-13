@@ -5,7 +5,13 @@ import { parseBoolean } from '~/lib/utils/common_utils';
 export default () => {
   const el = document.getElementById('js-compliance-dashboard');
 
-  const { mergeRequests, emptyStateSvgPath, isLastPage, mergeCommitsCsvExportPath } = el.dataset;
+  const {
+    mergeRequests,
+    mergeRequestsCount,
+    isLastPage,
+    emptyStateSvgPath,
+    mergeCommitsCsvExportPath,
+  } = el.dataset;
 
   return new Vue({
     el,
@@ -13,6 +19,7 @@ export default () => {
       createElement(ComplianceDashboard, {
         props: {
           mergeRequests: JSON.parse(mergeRequests),
+          mergeRequestsCount: parseInt(mergeRequestsCount, 10),
           isLastPage: parseBoolean(isLastPage),
           emptyStateSvgPath,
           mergeCommitsCsvExportPath,
