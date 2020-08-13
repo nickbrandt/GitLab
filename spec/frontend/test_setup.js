@@ -8,6 +8,7 @@ import { initializeTestTimeout } from './__helpers__/timeout';
 import { getJSONFixture, loadHTMLFixture, setHTMLFixture } from './__helpers__/fixtures';
 import { setupManualMocks } from './mocks/mocks_helper';
 import customMatchers from './matchers';
+import { useFakeDate } from './helpers/fake_date';
 
 import './__helpers__/dom_shims';
 import './__helpers__/jquery';
@@ -19,6 +20,8 @@ jest.mock('@gitlab/favicon-overlay');
 process.on('unhandledRejection', global.promiseRejectionHandler);
 
 setupManualMocks();
+
+useFakeDate();
 
 afterEach(() =>
   // give Promises a bit more time so they fail the right test
