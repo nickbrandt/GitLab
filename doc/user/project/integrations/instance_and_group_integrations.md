@@ -4,37 +4,43 @@ group: Ecosystem
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
-# Instance level integrations
+# Project integration management **(CORE ONLY)**
 
-> Introduced in GitLab 13.3.
+> [Introduced in](https://gitlab.com/groups/gitlab-org/-/epics/2137) GitLab 13.3.
 
-Instance level integrations allow you to set up [integrations](overview.md) for all projects across your instance.
-Updating instance level integrations will update all projects inheriting from that integration.
-On a project level the instance level integration can be overwritten, in case you want use different settings or disable
-an integration.
+Project integrations can be configured and enabled by project administrators. As a GitLab instance administrator, you can set default configuration parameters for a given integration that all projects can inherit and use.
 
-<i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
-For an introduction to the feature, see [Instance level integrations walk-through](https://youtu.be/bGq-MH--5BE).
+You can update these default settings at any time, which will change the settings in use for all projects that are set to use instance-level defaults.
 
-## Setting up an instance level integration
+## Manage default settings for a project integration
 
 1. Navigate to **Admin Area > Settings > Integrations**.
-1. Choose the integration that you want to set up for projects on your instance.
-1. Fill out the integration details and click "Save changes".
+2. Select a project integration.
+3. Enter configuration details and click **Save changes**.
 
+For all projects that have a given integration set to use instance-level default settings, any changes you make to the instance defaults are immediately applied, changing their settings.
+
+Projects with custom settings or without the integration enabled at all may choose to use the latest instance-level defaults at any time.
+ 
 Note: If you set up an instance level integration for the first time, you will set up the same integration for all existing projects that do not have an integration of the same type set up. Projects with an existing integration of the same type are not changed.
 
-## Overwriting an integration on the project level
+## Use instance-level default settings for a project integration
 
 1. Navigate to **Project > Settings > Integrations**.
-1. Choose the integration where you want to overwrite the instance settings.
-1. In the dropdown choose: `Use custom settings`
+1. Choose the integration you want to enable or update.
+2. From the drop-down, select **Use instance-level settings**.
+3. Ensure the toggle is set to **Enabled**.
+4. Click **Save changes** 
 
-    ![Screenshot of project-level integration with dropdown to use instance-level settings](./img/instance_level_dropdown.png)
+![Screenshot of project-level integration with dropdown to use instance-level settings](./img/instance_level_dropdown.png)
 
-1. Fill out the integration details and click "Save changes".
+## Use custom settings for a project integration
 
-If you want to switch back to your instance level integration settings, please choose `Use instance level settings`
+1. Navigate to **Project > Settings > Integrations**.
+1. Choose the integration you want to enable or update.
+1. From the drop-down, select **Use custom settings**.
+1. Ensure the toggle is set to **Enabled** and enter all required settings.
+1. Click **Save changes**.
 
 ## Caveats
 
