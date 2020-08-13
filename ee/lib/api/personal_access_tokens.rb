@@ -34,16 +34,31 @@ module API
         unauthorized! unless Ability.allowed?(current_user, :read_user_personal_access_tokens, user(params[:user_id]))
       end
 
+      def find_token(id)
+        PersonalAccessToken.find(id) || not_found!
+      end
+
       def authenticate!
         unauthorized! unless ::License.feature_available?(:personal_access_token_api_management)
         super
       end
     end
 
-    get :personal_access_tokens do
-      tokens = PersonalAccessTokensFinder.new(finder_params(current_user), current_user).execute
+    resources :personal_access_tokens do
+      get do
+        tokens = PersonalAccessTokensFinder.new(finder_params(current_user), current_user).execute
 
-      present paginate(tokens), with: Entities::PersonalAccessToken
+        present paginate(tokens), with: Entities::PersonalAccessToken
+      end
+
+      delete ':id' do
+        service = ::PersonalAccessTokens::RevokeService.new(
+          current_user,
+          { token: find_token(params[:id]) }
+        ).execute
+
+        service.success? ? no_content! : bad_request!(nil)
+      end
     end
   end
 end
