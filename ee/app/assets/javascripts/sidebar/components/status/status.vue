@@ -2,7 +2,7 @@
 import Tracking from '~/tracking';
 import {
   GlIcon,
-  GlButton,
+  GlDeprecatedButton as GlButton,
   GlLoadingIcon,
   GlTooltip,
   GlDeprecatedDropdownItem,
