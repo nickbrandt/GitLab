@@ -10,5 +10,6 @@ class Groups::BillingsController < Groups::ApplicationController
     @top_most_group = @group.root_ancestor if @group.has_parent?
     current_plan = (@top_most_group || @group).plan_name_for_upgrading
     @plans_data = FetchSubscriptionPlansService.new(plan: current_plan).execute
+    record_experiment_user(:contact_sales_btn_in_app)
   end
 end

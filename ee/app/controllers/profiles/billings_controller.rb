@@ -7,5 +7,6 @@ class Profiles::BillingsController < Profiles::ApplicationController
     @plans_data = FetchSubscriptionPlansService
       .new(plan: current_user.namespace.plan_name_for_upgrading)
       .execute
+    record_experiment_user(:contact_sales_btn_in_app)
   end
 end
