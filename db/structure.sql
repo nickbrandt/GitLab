@@ -13068,7 +13068,8 @@ CREATE TABLE public.merge_request_diffs (
     commits_count integer,
     external_diff character varying,
     external_diff_store integer DEFAULT 1,
-    stored_externally boolean
+    stored_externally boolean,
+    files_count smallint
 );
 
 CREATE SEQUENCE public.merge_request_diffs_id_seq
