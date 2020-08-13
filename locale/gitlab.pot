@@ -7899,8 +7899,6 @@ msgstr ""
 msgid "Deleted chat nickname: %{chat_name}!"
 msgstr ""
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 msgid "Deleted in this version"
 msgstr ""
 
@@ -7910,13 +7908,6 @@ msgstr ""
 msgid "Deleted projects cannot be restored!"
 msgstr ""
 
-=======
->>>>>>> 086fa509029... Use "archive" in design management
-=======
-msgid "Deleted in this version"
-msgstr ""
-
->>>>>>> 5918a4550f2... Update modal text
 msgid "Deleting"
 msgstr ""
 
