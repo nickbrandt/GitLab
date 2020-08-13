@@ -285,8 +285,8 @@ RSpec.describe EpicLinks::CreateService do
                 expect(subject).to eq(
                   status: :error,
                   http_status: 422,
-                  message: "#{invalid_epic1.to_reference} cannot be added: Not-confidential epic cannot be assigned to a confidential parent epic. "\
-                           "#{invalid_epic2.to_reference} cannot be added: Not-confidential epic cannot be assigned to a confidential parent epic"
+                  message: "#{invalid_epic1.to_reference} cannot be added: A non-confidential epic cannot be assigned to a confidential parent epic. "\
+                           "#{invalid_epic2.to_reference} cannot be added: A non-confidential epic cannot be assigned to a confidential parent epic"
                 )
               end
             end

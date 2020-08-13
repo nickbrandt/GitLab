@@ -208,7 +208,7 @@ RSpec.describe Issue do
     describe 'confidential' do
       subject { build(:issue, :confidential) }
 
-      it 'is valid when changing to not-confidential and is associated with not-confidential epic' do
+      it 'is valid when changing to non-confidential and is associated with non-confidential epic' do
         subject.epic = build(:epic)
 
         subject.confidential = false
@@ -216,7 +216,7 @@ RSpec.describe Issue do
         expect(subject).to be_valid
       end
 
-      it 'is not valid when changing to not-confidential and is associated with confidential epic' do
+      it 'is not valid when changing to non-confidential and is associated with confidential epic' do
         subject.epic = build(:epic, :confidential)
 
         subject.confidential = false

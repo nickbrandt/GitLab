@@ -398,11 +398,11 @@ module EE
       return unless confidential?
 
       if issues.public_only.any?
-        errors.add :confidential, _('Cannot make epic confidential if it contains not-confidential issues')
+        errors.add :confidential, _('Cannot make the epic confidential if it contains non-confidential issues')
       end
 
       if children.public_only.any?
-        errors.add :confidential, _('Cannot make epic confidential if it contains not-confidential sub-epics')
+        errors.add :confidential, _('Cannot make the epic confidential if it contains non-confidential child epics')
       end
     end
 
@@ -410,7 +410,7 @@ module EE
       return unless parent
 
       if !confidential? && parent.confidential?
-        errors.add :confidential, _('Not-confidential epic cannot be assigned to a confidential parent epic')
+        errors.add :confidential, _('A non-confidential epic cannot be assigned to a confidential parent epic')
       end
     end
   end

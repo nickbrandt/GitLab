@@ -72,7 +72,7 @@ RSpec.describe Epic do
       expect(epic).to be_valid
     end
 
-    it 'is not valid if epic is confidential and has not-confidential issues' do
+    it 'is not valid if epic is confidential and has non-confidential issues' do
       epic = create(:epic_issue).epic
 
       epic.confidential = true
@@ -89,7 +89,7 @@ RSpec.describe Epic do
       expect(epic).to be_valid
     end
 
-    it 'is not valid if epic is confidential and has not-confidential subepics' do
+    it 'is not valid if epic is confidential and has non-confidential subepics' do
       epic = create(:epic, group: group)
       create(:epic, parent: epic, group: group)
 
