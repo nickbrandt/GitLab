@@ -7,18 +7,25 @@ RSpec.describe Projects::DastSiteProfilesController, type: :request do
   let(:user) { create(:user) }
   let(:dast_site_profile) { create(:dast_site_profile, project: project) }
 
+  def with_feature_available
+    stub_feature_flags(security_on_demand_scans_feature_flag: true)
+    stub_licensed_features(security_on_demand_scans: true)
+  end
+
+  def with_user_authorized
+    project.add_developer(user)
+    login_as(user)
+  end
+
   shared_examples 'a GET request' do
     context 'feature available' do
       before do
-        stub_feature_flags(security_on_demand_scans_feature_flag: true)
-        stub_licensed_features(security_on_demand_scans: true)
+        with_feature_available
       end
 
       context 'user authorized' do
         before do
-          project.add_developer(user)
-
-          login_as(user)
+          with_user_authorized
         end
 
         it 'can access page' do
@@ -45,9 +52,7 @@ RSpec.describe Projects::DastSiteProfilesController, type: :request do
 
     context 'feature not available' do
       before do
-        project.add_developer(user)
-
-        login_as(user)
+        with_user_authorized
       end
 
       context 'feature flag is disabled' do
@@ -79,8 +84,10 @@ RSpec.describe Projects::DastSiteProfilesController, type: :request do
   end
 
   describe 'GET #edit' do
+    let(:edit_path) { edit_project_dast_site_profile_path(project, dast_site_profile) }
+
     it_behaves_like 'a GET request' do
-      let(:path) { edit_project_dast_site_profile_path(project, dast_site_profile) }
+      let(:path) { edit_path }
     end
   end
 end
