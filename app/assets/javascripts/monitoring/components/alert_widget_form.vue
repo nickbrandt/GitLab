@@ -311,6 +311,7 @@ export default {
           :disabled="formDisabled"
           data-testid="alertRunbookField"
           type="text"
+          :placeholder="s__('PrometheusAlerts|https://gitlab.com/gitlab-com/runbooks')"
         />
       </gl-form-group>
     </div>
