@@ -27418,6 +27418,9 @@ msgstr ""
 msgid "What describes you best?"
 msgstr ""
 
+msgid "What's new at GitLab"
+msgstr ""
+
 msgid "What’s your experience level?"
 msgstr ""
 
