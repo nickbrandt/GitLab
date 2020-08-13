@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe StatusPage::Storage::S3MultipartUpload, :aws_s3 do
+RSpec.describe Gitlab::StatusPage::Storage::S3MultipartUpload, :aws_s3 do
   let(:region) { 'eu-west-1' }
   let(:bucket_name) { 'bucket_name' }
   let(:access_key_id) { 'key_id' }
@@ -81,7 +81,7 @@ RSpec.describe StatusPage::Storage::S3MultipartUpload, :aws_s3 do
           msg = error_message(aws_error, key: key)
 
           expect(s3_client).to receive(:abort_multipart_upload)
-          expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+          expect { result }.to raise_error(Gitlab::StatusPage::Storage::Error, msg)
         end
       end
 
@@ -95,7 +95,7 @@ RSpec.describe StatusPage::Storage::S3MultipartUpload, :aws_s3 do
           msg = error_message(aws_error, key: key)
 
           expect(s3_client).to receive(:abort_multipart_upload)
-          expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+          expect { result }.to raise_error(Gitlab::StatusPage::Storage::Error, msg)
         end
       end
     end

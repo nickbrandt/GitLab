@@ -16,7 +16,7 @@ module EE
           Epics::UpdateDatesService.new([issue.epic]).execute
         end
 
-        StatusPage.trigger_publish(project, current_user, issue) if issue.valid?
+        ::Gitlab::StatusPage.trigger_publish(project, current_user, issue) if issue.valid?
 
         result
       end

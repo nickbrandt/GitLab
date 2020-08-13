@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe StatusPage do
+RSpec.describe Gitlab::StatusPage do
   let(:project) { instance_double(Project) }
   let(:user) { instance_double(User) }
   let(:triggered_by) { instance_double(Issue) }

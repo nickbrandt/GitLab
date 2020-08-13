@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe StatusPage::Filter::MentionAnonymizationFilter do
+RSpec.describe Gitlab::StatusPage::Filter::MentionAnonymizationFilter do
   include FilterSpecHelper
 
   it 'replaces user link with anonymized text' do

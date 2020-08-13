@@ -37,7 +37,7 @@ RSpec.describe StatusPage::PublishService do
         it 'propagates the exception' do
           expect_to_upload_details(issue, status: 404)
 
-          expect { result }.to raise_error(StatusPage::Storage::Error)
+          expect { result }.to raise_error(Gitlab::StatusPage::Storage::Error)
         end
       end
     end
@@ -117,11 +117,11 @@ RSpec.describe StatusPage::PublishService do
   end
 
   def expect_to_upload_details(issue, **kwargs)
-    stub_aws_request(:put, StatusPage::Storage.details_path(issue.iid), **kwargs)
+    stub_aws_request(:put, Gitlab::StatusPage::Storage.details_path(issue.iid), **kwargs)
   end
 
   def expect_to_upload_list(**kwargs)
-    stub_aws_request(:put, StatusPage::Storage.list_path, **kwargs)
+    stub_aws_request(:put, Gitlab::StatusPage::Storage.list_path, **kwargs)
   end
 
   def stub_aws_request(method, path, status: 200)

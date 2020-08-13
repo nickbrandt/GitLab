@@ -2,12 +2,12 @@
 
 require 'spec_helper'
 
-RSpec.describe StatusPage::Pipeline::PostProcessPipeline do
+RSpec.describe Gitlab::StatusPage::Pipeline::PostProcessPipeline do
   describe '.filters' do
     let(:expected_filters) do
-      [StatusPage::Filter::MentionAnonymizationFilter] +
+      [Gitlab::StatusPage::Filter::MentionAnonymizationFilter] +
         ::Banzai::Pipeline::PostProcessPipeline.filters +
-        [StatusPage::Filter::ImageFilter]
+        [Gitlab::StatusPage::Filter::ImageFilter]
     end
 
     subject { described_class.filters }

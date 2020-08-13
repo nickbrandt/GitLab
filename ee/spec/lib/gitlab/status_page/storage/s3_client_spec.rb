@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe StatusPage::Storage::S3Client, :aws_s3 do
+RSpec.describe Gitlab::StatusPage::Storage::S3Client, :aws_s3 do
   let(:region) { 'eu-west-1' }
   let(:bucket_name) { 'bucket_name' }
   let(:access_key_id) { 'key_id' }
@@ -36,7 +36,7 @@ RSpec.describe StatusPage::Storage::S3Client, :aws_s3 do
         stub_responses(:put_object, aws_error)
 
         msg = error_message(aws_error, key: key)
-        expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+        expect { result }.to raise_error(Gitlab::StatusPage::Storage::Error, msg)
       end
     end
   end
@@ -59,7 +59,7 @@ RSpec.describe StatusPage::Storage::S3Client, :aws_s3 do
         stub_responses(:delete_object, aws_error)
 
         msg = error_message(aws_error, key: key)
-        expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+        expect { result }.to raise_error(Gitlab::StatusPage::Storage::Error, msg)
       end
     end
   end
@@ -113,7 +113,7 @@ RSpec.describe StatusPage::Storage::S3Client, :aws_s3 do
         stub_responses(:list_objects_v2, aws_error)
 
         msg = error_message(aws_error, prefix: key_prefix)
-        expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+        expect { result }.to raise_error(Gitlab::StatusPage::Storage::Error, msg)
       end
     end
   end
@@ -135,7 +135,7 @@ RSpec.describe StatusPage::Storage::S3Client, :aws_s3 do
       include_context 'oversized list_objects_v2 result'
 
       it 'returns result at max size' do
-        expect(result.count).to eq(StatusPage::Storage::MAX_UPLOADS)
+        expect(result.count).to eq(Gitlab::StatusPage::Storage::MAX_UPLOADS)
       end
     end
 
@@ -155,7 +155,7 @@ RSpec.describe StatusPage::Storage::S3Client, :aws_s3 do
         stub_responses(:list_objects_v2, aws_error)
 
         msg = error_message(aws_error, prefix: key_prefix)
-        expect { result }.to raise_error(StatusPage::Storage::Error, msg)
+        expect { result }.to raise_error(Gitlab::StatusPage::Storage::Error, msg)
       end
     end
   end

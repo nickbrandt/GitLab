@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe StatusPage::UsageDataCounters::IncidentCounter do
+RSpec.describe Gitlab::StatusPage::UsageDataCounters::IncidentCounter do
   it_behaves_like 'a redis usage counter', 'StatusPage::IncidentCounter', :publishes
   it_behaves_like 'a redis usage counter', 'StatusPage::IncidentCounter', :unpublishes
 
