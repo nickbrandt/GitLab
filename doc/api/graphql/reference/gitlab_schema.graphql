@@ -210,6 +210,11 @@ type AlertManagementAlert implements Noteable {
   details: JSON
 
   """
+  The URL of the alert detail page
+  """
+  detailsUrl: String!
+
+  """
   All discussions on this noteable
   """
   discussions(
@@ -293,6 +298,11 @@ type AlertManagementAlert implements Noteable {
     """
     last: Int
   ): NoteConnection!
+
+  """
+  The alert condition for Prometheus
+  """
+  prometheusAlert: PrometheusAlert
 
   """
   Runbook for the alert as defined in alert details
@@ -4417,6 +4427,11 @@ type Environment {
   ID of the environment
   """
   id: ID!
+
+  """
+  The most severe open alert for the environment. If multiple alerts have equal severity, the most recent is returned.
+  """
+  latestOpenedMostSevereAlert: AlertManagementAlert
 
   """
   Metrics dashboard schema for the environment
@@ -10554,6 +10569,26 @@ type Project {
   descriptionHtml: String
 
   """
+  A single environment of the project
+  """
+  environment(
+    """
+    Name of the environment
+    """
+    name: String
+
+    """
+    Search query for environment name
+    """
+    search: String
+
+    """
+    States of environments that should be included in result
+    """
+    states: [String!]
+  ): Environment
+
+  """
   Environments of the project
   """
   environments(
@@ -12114,6 +12149,21 @@ type ProjectStatistics {
   Wiki size of the project
   """
   wikiSize: Float
+}
+
+"""
+The alert condition for Prometheus
+"""
+type PrometheusAlert {
+  """
+  The human-readable text of the alert condition
+  """
+  humanizedText: String!
+
+  """
+  ID of the alert condition
+  """
+  id: ID!
 }
 
 type Query {
