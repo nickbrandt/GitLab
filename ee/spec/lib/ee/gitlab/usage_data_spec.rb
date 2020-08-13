@@ -27,6 +27,7 @@ RSpec.describe Gitlab::UsageData do
       create(:ee_ci_build, name: 'license_scanning', pipeline: pipeline)
       create(:ci_build, name: 'sast', pipeline: pipeline)
       create(:ci_build, name: 'secret_detection', pipeline: pipeline)
+      create(:ci_build, name: 'coverage_fuzzing', pipeline: pipeline)
 
       create(:prometheus_alert, project: projects[0])
       create(:prometheus_alert, project: projects[0])
@@ -86,6 +87,7 @@ RSpec.describe Gitlab::UsageData do
       expect(count_data.keys).to include(*%i(
         confidential_epics
         container_scanning_jobs
+        coverage_fuzzing_jobs
         dast_jobs
         dependency_list_usages_total
         dependency_scanning_jobs
@@ -150,6 +152,7 @@ RSpec.describe Gitlab::UsageData do
       expect(count_data[:license_management_jobs]).to eq(2)
       expect(count_data[:sast_jobs]).to eq(1)
       expect(count_data[:secret_detection_jobs]).to eq(1)
+      expect(count_data[:coverage_fuzzing_jobs]).to eq(1)
     end
 
     it 'correctly shows failure for combined license management' do
@@ -501,6 +504,7 @@ RSpec.describe Gitlab::UsageData do
     before do
       for_defined_days_back do
         create(:ci_build, name: 'container_scanning', user: user)
+        create(:ci_build, name: 'coverage_fuzzing', user: user)
         create(:ci_build, name: 'dast', user: user)
         create(:ci_build, name: 'dependency_scanning', user: user)
         create(:ci_build, name: 'license_management', user: user)
@@ -513,6 +517,7 @@ RSpec.describe Gitlab::UsageData do
       expect(described_class.usage_activity_by_stage_secure(described_class.last_28_days_time_period)).to eq(
         user_preferences_group_overview_security_dashboard: 3,
         user_container_scanning_jobs: 1,
+        user_coverage_fuzzing_jobs: 1,
         user_dast_jobs: 1,
         user_dependency_scanning_jobs: 1,
         user_license_management_jobs: 1,
@@ -581,6 +586,7 @@ RSpec.describe Gitlab::UsageData do
       expect(described_class.usage_activity_by_stage_secure(described_class.last_28_days_time_period)).to eq(
         user_preferences_group_overview_security_dashboard: 3,
         user_container_scanning_jobs: 1,
+        user_coverage_fuzzing_jobs: 1,
         user_dast_jobs: 3,
         user_dependency_scanning_jobs: 1,
         user_license_management_jobs: 1,
@@ -604,6 +610,7 @@ RSpec.describe Gitlab::UsageData do
       expect(described_class.usage_activity_by_stage_secure(described_class.last_28_days_time_period)).to eq(
         user_preferences_group_overview_security_dashboard: 3,
         user_container_scanning_jobs: 1,
+        user_coverage_fuzzing_jobs: 1,
         user_dast_jobs: 1,
         user_dependency_scanning_jobs: 1,
         user_license_management_jobs: 2,
@@ -626,6 +633,7 @@ RSpec.describe Gitlab::UsageData do
       expect(described_class.usage_activity_by_stage_secure(described_class.last_28_days_time_period)).to eq(
         user_preferences_group_overview_security_dashboard: 3,
         user_container_scanning_jobs: -1,
+        user_coverage_fuzzing_jobs: -1,
         user_dast_jobs: -1,
         user_dependency_scanning_jobs: -1,
         user_license_management_jobs: -1,
