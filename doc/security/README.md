@@ -7,6 +7,7 @@ type: index
 
 - [Password storage](password_storage.md)
 - [Password length limits](password_length_limits.md)
+- [How we generate passwords for users created via integrated authentication methods](passwords_for_integrated_authentication_methods.md)
 - [Restrict SSH key technologies and minimum length](ssh_keys_restrictions.md)
 - [Rate limits](rate_limits.md)
 - [Webhooks and insecure internal web services](webhooks.md)

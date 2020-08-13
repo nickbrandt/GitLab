@@ -324,3 +324,7 @@ of the OmniAuth users has admin permissions.
 
 You may also bypass the auto signin feature by browsing to
 `https://gitlab.example.com/users/sign_in?auto_sign_in=false`.
+
+## Passwords for users created via OmniAuth
+
+The [How we generate passwords for users created via integrated authentication methods](../security/passwords_for_integrated_authentication_methods.md) guide provides an overview of how GitLab generates and sets passwords for users created via OmniAuth.

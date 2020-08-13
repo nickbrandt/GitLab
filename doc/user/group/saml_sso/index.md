@@ -300,6 +300,10 @@ Group SAML on a self-managed instance is limited when compared to the recommende
           - { name: 'group_saml' }
     ```
 
+## Passwords for users created via SAML SSO for Groups
+
+The [How we generate passwords for users created via integrated authentication methods](../../../security/passwords_for_integrated_authentication_methods.md) guide provides an overview of how GitLab generates and sets passwords for users created via SAML SSO for Groups.
+
 ## Troubleshooting
 
 This section contains possible solutions for problems you might encounter.
