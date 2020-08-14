@@ -114,6 +114,22 @@ describe('RequirementForm', () => {
         expect(wrapperWithRequirement.vm.title).toBe('');
       });
     });
+
+    describe('drawerOpen', () => {
+      it('clears `title` value when `drawerOpen` prop is changed to false', async () => {
+        wrapper.setData({
+          title: 'Foo',
+        });
+
+        wrapper.setProps({
+          drawerOpen: false,
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.title).toBe('');
+      });
+    });
   });
 
   describe('methods', () => {
