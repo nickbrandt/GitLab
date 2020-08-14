@@ -1,5 +1,5 @@
 <script>
-import sanitize from 'sanitize-html';
+import { sanitize } from 'dompurify';
 
 const ALLOWED_TAGS = ['strong'];
 
@@ -12,7 +12,7 @@ export default {
   },
   computed: {
     sanitizedHtml() {
-      return sanitize(this.html, { allowedTags: ALLOWED_TAGS });
+      return sanitize(this.html, { ALLOWED_TAGS });
     },
   },
 };

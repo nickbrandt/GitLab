@@ -1,9 +1,11 @@
 import merge from 'lodash/merge';
+import { within } from '@testing-library/dom';
 import { mount, shallowMount } from '@vue/test-utils';
 import { GlAlert, GlForm, GlModal } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import DastSiteProfileForm from 'ee/dast_site_profiles_form/components/dast_site_profile_form.vue';
 import dastSiteProfileCreateMutation from 'ee/dast_site_profiles_form/graphql/dast_site_profile_create.mutation.graphql';
+import dastSiteProfileUpdateMutation from 'ee/dast_site_profiles_form/graphql/dast_site_profile_update.mutation.graphql';
 import { redirectTo } from '~/lib/utils/url_utility';
 
 jest.mock('~/lib/utils/url_utility', () => ({
@@ -23,6 +25,8 @@ const defaultProps = {
 
 describe('OnDemandScansApp', () => {
   let wrapper;
+
+  const withinComponent = () => within(wrapper.element);
 
   const findForm = () => wrapper.find(GlForm);
   const findProfileNameInput = () => wrapper.find('[data-testid="profile-name-input"]');
@@ -115,117 +119,133 @@ describe('OnDemandScansApp', () => {
     });
   });
 
-  describe('submission', () => {
-    const createdProfileId = 30203;
-
-    describe('on success', () => {
-      beforeEach(() => {
-        createComponent();
-        jest
-          .spyOn(wrapper.vm.$apollo, 'mutate')
-          .mockResolvedValue({ data: { dastSiteProfileCreate: { id: createdProfileId } } });
-        findProfileNameInput().vm.$emit('input', profileName);
-        findTargetUrlInput().vm.$emit('input', targetUrl);
-        submitForm();
-      });
-
-      it('sets loading state', () => {
-        expect(findSubmitButton().props('loading')).toBe(true);
-      });
-
-      it('triggers GraphQL mutation', () => {
-        expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith({
-          mutation: dastSiteProfileCreateMutation,
-          variables: {
-            profileName,
-            targetUrl,
-            fullPath,
-          },
-        });
-      });
-
-      it('redirects to the profiles library', () => {
-        expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
-      });
-
-      it('does not show an alert', () => {
-        expect(findAlert().exists()).toBe(false);
-      });
-    });
-
-    describe('on top-level error', () => {
-      beforeEach(() => {
-        createComponent();
-        jest.spyOn(wrapper.vm.$apollo, 'mutate').mockRejectedValue();
-        const input = findTargetUrlInput();
-        input.vm.$emit('input', targetUrl);
-        submitForm();
-      });
-
-      it('resets loading state', () => {
-        expect(findSubmitButton().props('loading')).toBe(false);
-      });
-
-      it('shows an error alert', () => {
-        expect(findAlert().exists()).toBe(true);
-      });
-    });
-
-    describe('on errors as data', () => {
-      const errors = ['error#1', 'error#2', 'error#3'];
-
-      beforeEach(() => {
-        createComponent();
-        jest
-          .spyOn(wrapper.vm.$apollo, 'mutate')
-          .mockResolvedValue({ data: { dastSiteProfileCreate: { pipelineUrl: null, errors } } });
-        const input = findTargetUrlInput();
-        input.vm.$emit('input', targetUrl);
-        submitForm();
-      });
-
-      it('resets loading state', () => {
-        expect(findSubmitButton().props('loading')).toBe(false);
-      });
-
-      it('shows an alert with the returned errors', () => {
-        const alert = findAlert();
-
-        expect(alert.exists()).toBe(true);
-        errors.forEach(error => {
-          expect(alert.text()).toContain(error);
-        });
-      });
-    });
-  });
-
-  describe('cancellation', () => {
+  describe.each`
+    title                  | siteProfile                                 | mutation                         | mutationVars | mutationKind
+    ${'New site profile'}  | ${null}                                     | ${dastSiteProfileCreateMutation} | ${{}}        | ${'dastSiteProfileCreate'}
+    ${'Edit site profile'} | ${{ id: 1, name: 'foo', targetUrl: 'bar' }} | ${dastSiteProfileUpdateMutation} | ${{ id: 1 }} | ${'dastSiteProfileUpdate'}
+  `('$title', ({ siteProfile, title, mutation, mutationVars, mutationKind }) => {
     beforeEach(() => {
-      createFullComponent();
-    });
-
-    describe('form empty', () => {
-      it('redirects to the profiles library', () => {
-        findCancelButton().vm.$emit('click');
-        expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
+      createFullComponent({
+        propsData: {
+          siteProfile,
+        },
       });
     });
 
-    describe('form not empty', () => {
-      beforeEach(() => {
-        findTargetUrlInput().setValue(targetUrl);
-        findProfileNameInput().setValue(profileName);
+    it('sets the correct title', () => {
+      expect(withinComponent().getByRole('heading', { name: title })).not.toBeNull();
+    });
+
+    it('populates the fields with the data passed in via the siteProfile prop', () => {
+      expect(findProfileNameInput().element.value).toBe(siteProfile?.name ?? '');
+    });
+
+    describe('submission', () => {
+      const createdProfileId = 30203;
+
+      describe('on success', () => {
+        beforeEach(() => {
+          jest
+            .spyOn(wrapper.vm.$apollo, 'mutate')
+            .mockResolvedValue({ data: { [mutationKind]: { id: createdProfileId } } });
+          findProfileNameInput().vm.$emit('input', profileName);
+          findTargetUrlInput().vm.$emit('input', targetUrl);
+          submitForm();
+        });
+
+        it('sets loading state', () => {
+          expect(findSubmitButton().props('loading')).toBe(true);
+        });
+
+        it('triggers GraphQL mutation', () => {
+          expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith({
+            mutation,
+            variables: {
+              profileName,
+              targetUrl,
+              fullPath,
+              ...mutationVars,
+            },
+          });
+        });
+
+        it('redirects to the profiles library', () => {
+          expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
+        });
+
+        it('does not show an alert', () => {
+          expect(findAlert().exists()).toBe(false);
+        });
       });
 
-      it('asks the user to confirm the action', () => {
-        jest.spyOn(findCancelModal().vm, 'show').mockReturnValue();
-        findCancelButton().trigger('click');
-        expect(findCancelModal().vm.show).toHaveBeenCalled();
+      describe('on top-level error', () => {
+        beforeEach(() => {
+          jest.spyOn(wrapper.vm.$apollo, 'mutate').mockRejectedValue();
+          const input = findTargetUrlInput();
+          input.vm.$emit('input', targetUrl);
+          submitForm();
+        });
+
+        it('resets loading state', () => {
+          expect(findSubmitButton().props('loading')).toBe(false);
+        });
+
+        it('shows an error alert', () => {
+          expect(findAlert().exists()).toBe(true);
+        });
       });
 
-      it('redirects to the profiles library if confirmed', () => {
-        findCancelModal().vm.$emit('ok');
-        expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
+      describe('on errors as data', () => {
+        const errors = ['error#1', 'error#2', 'error#3'];
+
+        beforeEach(() => {
+          jest
+            .spyOn(wrapper.vm.$apollo, 'mutate')
+            .mockResolvedValue({ data: { [mutationKind]: { errors } } });
+          const input = findTargetUrlInput();
+          input.vm.$emit('input', targetUrl);
+          submitForm();
+        });
+
+        it('resets loading state', () => {
+          expect(findSubmitButton().props('loading')).toBe(false);
+        });
+
+        it('shows an alert with the returned errors', () => {
+          const alert = findAlert();
+
+          expect(alert.exists()).toBe(true);
+          errors.forEach(error => {
+            expect(alert.text()).toContain(error);
+          });
+        });
+      });
+    });
+
+    describe('cancellation', () => {
+      describe('form unchanged', () => {
+        it('redirects to the profiles library', () => {
+          findCancelButton().vm.$emit('click');
+          expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
+        });
+      });
+
+      describe('form changed', () => {
+        beforeEach(() => {
+          findTargetUrlInput().setValue(targetUrl);
+          findProfileNameInput().setValue(profileName);
+        });
+
+        it('asks the user to confirm the action', () => {
+          jest.spyOn(findCancelModal().vm, 'show').mockReturnValue();
+          findCancelButton().trigger('click');
+          expect(findCancelModal().vm.show).toHaveBeenCalled();
+        });
+
+        it('redirects to the profiles library if confirmed', () => {
+          findCancelModal().vm.$emit('ok');
+          expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
+        });
       });
     });
   });

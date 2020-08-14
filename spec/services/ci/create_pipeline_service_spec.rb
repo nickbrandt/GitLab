@@ -93,6 +93,7 @@ RSpec.describe Ci::CreatePipelineService do
         let(:merge_request_1) do
           create(:merge_request, source_branch: 'feature', target_branch: "master", source_project: project)
         end
+
         let(:merge_request_2) do
           create(:merge_request, source_branch: 'feature', target_branch: "v1.1.0", source_project: project)
         end
@@ -982,7 +983,6 @@ RSpec.describe Ci::CreatePipelineService do
     context 'with release' do
       shared_examples_for 'a successful release pipeline' do
         before do
-          stub_feature_flags(ci_release_generation: true)
           stub_ci_pipeline_yaml_file(YAML.dump(config))
         end
 
@@ -1692,16 +1692,23 @@ RSpec.describe Ci::CreatePipelineService do
       context 'when pipeline on feature is created' do
         let(:ref_name) { 'refs/heads/feature' }
 
+        shared_examples 'has errors' do
+          it 'contains the expected errors' do
+            expect(pipeline.builds).to be_empty
+            expect(pipeline.yaml_errors).to eq("test_a: needs 'build_a'")
+            expect(pipeline.error_messages.map(&:content)).to contain_exactly("test_a: needs 'build_a'")
+            expect(pipeline.errors[:base]).to contain_exactly("test_a: needs 'build_a'")
+          end
+        end
+
         context 'when save_on_errors is enabled' do
           let(:pipeline) { execute_service(save_on_errors: true) }
 
           it 'does create a pipeline as test_a depends on build_a' do
             expect(pipeline).to be_persisted
-            expect(pipeline.builds).to be_empty
-            expect(pipeline.yaml_errors).to eq("test_a: needs 'build_a'")
-            expect(pipeline.messages.pluck(:content)).to contain_exactly("test_a: needs 'build_a'")
-            expect(pipeline.errors[:base]).to contain_exactly("test_a: needs 'build_a'")
           end
+
+          it_behaves_like 'has errors'
         end
 
         context 'when save_on_errors is disabled' do
@@ -1709,11 +1716,9 @@ RSpec.describe Ci::CreatePipelineService do
 
           it 'does not create a pipeline as test_a depends on build_a' do
             expect(pipeline).not_to be_persisted
-            expect(pipeline.builds).to be_empty
-            expect(pipeline.yaml_errors).to be_nil
-            expect(pipeline.messages).not_to be_empty
-            expect(pipeline.errors[:base]).to contain_exactly("test_a: needs 'build_a'")
           end
+
+          it_behaves_like 'has errors'
         end
       end
 

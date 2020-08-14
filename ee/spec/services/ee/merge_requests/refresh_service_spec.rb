@@ -20,6 +20,7 @@ RSpec.describe MergeRequests::RefreshService do
       target_branch: 'master',
       target_project: project)
   end
+
   let(:another_merge_request) do
     create(:merge_request,
       source_project: project,
@@ -27,6 +28,7 @@ RSpec.describe MergeRequests::RefreshService do
       target_branch: 'test',
       target_project: project)
   end
+
   let(:forked_merge_request) do
     create(:merge_request,
       source_project: forked_project,
@@ -34,6 +36,7 @@ RSpec.describe MergeRequests::RefreshService do
       target_branch: 'master',
       target_project: project)
   end
+
   let(:oldrev) { TestEnv::BRANCH_SHA[source_branch] }
   let(:newrev) { TestEnv::BRANCH_SHA['after-create-delete-modify-move'] } # Pretend source_branch is now updated
   let(:service) { described_class.new(project, current_user) }

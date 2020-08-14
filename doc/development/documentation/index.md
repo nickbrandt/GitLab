@@ -624,6 +624,7 @@ You can use markdownlint:
 
 - [On the command line](https://github.com/igorshubovych/markdownlint-cli#markdownlint-cli--).
 - [Within a code editor](#configure-editors).
+- [In a `pre-commit` hook](#configure-pre-commit-hooks).
 
 #### Vale
 
@@ -650,6 +651,9 @@ You can use Vale:
 
 - [On the command line](https://errata-ai.gitbook.io/vale/getting-started/usage).
 - [Within a code editor](#configure-editors).
+- [In a `pre-commit` hook](#configure-pre-commit-hooks). Vale only reports errors in the
+  `pre-commit` hook (the same configuration as the CI/CD pipelines), and does not report suggestions
+  or warnings.
 
 #### Install linters
 
@@ -693,13 +697,31 @@ To configure markdownlint within your editor, install one of the following as ap
 - [Sublime Text](https://packagecontrol.io/packages/SublimeLinter-contrib-markdownlint)
 - [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
 - [Atom](https://atom.io/packages/linter-node-markdownlint)
+- [Vim](https://github.com/dense-analysis/ale)
 
 To configure Vale within your editor, install one of the following as appropriate:
 
 - The Sublime Text [`SublimeLinter-contrib-vale` plugin](https://packagecontrol.io/packages/SublimeLinter-contrib-vale)
 - The Visual Studio Code [`testthedocs.vale` extension](https://marketplace.visualstudio.com/items?itemName=testthedocs.vale)
+- [Vim](https://github.com/dense-analysis/ale)
 
 We don't use [Vale Server](https://errata-ai.github.io/vale/#using-vale-with-a-text-editor-or-another-third-party-application).
+
+#### Configure pre-commit hooks
+
+Git [pre-commit hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) allow Git users to
+run tests or other processes before committing to a branch, with the ability to not commit to the branch if
+failures occur with these tests.
+
+[`overcommit`](https://github.com/sds/overcommit) is a Git hooks manager, making configuring,
+installing, and removing Git hooks easy.
+
+Sample configuration for `overcommit` is available in the
+[`.overcommit.yml.example`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/.overcommit.yml.example)
+file for the [`gitlab`](https://gitlab.com/gitlab-org/gitlab) project.
+
+To set up `overcommit` for documentation linting, see
+[Pre-commit static analysis](../contributing/style_guides.md#pre-commit-static-analysis).
 
 #### Disable Vale tests
 

@@ -113,10 +113,6 @@ module EE
       show
     end
 
-    def show_whats_new_dropdown_item?
-      ::Gitlab.com? && ::Feature.enabled?(:whats_new_dropdown)
-    end
-
     private
 
     def appearance

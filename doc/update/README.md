@@ -222,6 +222,11 @@ possible.
 
 ## Version specific upgrading instructions
 
+### 13.3.0
+
+The recommended Git version is Git v2.28. The minimum required version of Git
+v2.24 remains the same.
+
 ### 13.2.0
 
 GitLab installations that have multiple web nodes will need to be

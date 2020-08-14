@@ -4,24 +4,24 @@ FactoryBot.define do
   factory :vulnerability_statistic, class: 'Vulnerabilities::Statistic' do
     project
 
-    trait :a do
+    trait :grade_a do
       info { 1 }
     end
 
-    trait :b do
+    trait :grade_b do
       low { 1 }
     end
 
-    trait :c do
+    trait :grade_c do
       medium { 1 }
     end
 
-    trait :d do
+    trait :grade_d do
       high { 1 }
       unknown { 1 }
     end
 
-    trait :f do
+    trait :grade_f do
       critical { 1 }
     end
   end

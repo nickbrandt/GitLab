@@ -44,8 +44,8 @@ export default {
 
 <template>
   <div class="issuable-discussion">
-    <h3 class="gl-ml-6" data-testid="title">{{ __('History') }}</h3>
-    <ul class="timeline main-notes-list notes gl-my-4" data-testid="timeline">
+    <h3 class="gl-font-lg" data-testid="title">{{ __('History') }}</h3>
+    <ul class="timeline main-notes-list notes gl-mb-4" data-testid="timeline">
       <history-element icon="clock" data-testid="created-on">
         <gl-sprintf :message="$options.i18n.createdOn">
           <template #name>
@@ -76,7 +76,7 @@ export default {
         <history-element icon="commit" data-testid="commit">
           <gl-sprintf :message="$options.i18n.commitText">
             <template #link>
-              <gl-link :href="`../../commit/${packagePipeline.sha}`">{{
+              <gl-link :href="packagePipeline.project.commit_url">{{
                 packagePipeline.sha
               }}</gl-link>
             </template>
@@ -88,7 +88,7 @@ export default {
         <history-element icon="pipeline" data-testid="pipeline">
           <gl-sprintf :message="$options.i18n.pipelineText">
             <template #link>
-              <gl-link :href="`../../pipelines/${packagePipeline.id}`"
+              <gl-link :href="packagePipeline.project.pipeline_url"
                 >#{{ packagePipeline.id }}</gl-link
               >
             </template>

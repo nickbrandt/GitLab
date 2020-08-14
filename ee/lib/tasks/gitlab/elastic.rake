@@ -108,7 +108,7 @@ namespace :gitlab do
     task projects_not_indexed: :environment do
       not_indexed = Project.where.not(id: IndexStatus.select(:project_id).distinct)
 
-      if not_indexed.count.zero?
+      if not_indexed.count == 0
         puts 'All projects are currently indexed'.color(:green)
       else
         display_unindexed(not_indexed)

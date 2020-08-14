@@ -15,7 +15,7 @@ GitLab has been tested on a number of object storage providers:
 
 - [Amazon S3](https://aws.amazon.com/s3/)
 - [Google Cloud Storage](https://cloud.google.com/storage)
-- [Digital Ocean Spaces](https://www.digitalocean.com/products/spaces)
+- [Digital Ocean Spaces](https://www.digitalocean.com/products/spaces/)
 - [Oracle Cloud Infrastructure](https://docs.cloud.oracle.com/en-us/iaas/Content/Object/Tasks/s3compatibleapi.htm)
 - [Openstack Swift](https://docs.openstack.org/swift/latest/s3_compat.html)
 - On-premises hardware and appliances from various storage vendors.
@@ -54,6 +54,10 @@ it does not require a shared folder, and [this setting may become the default](h
 NOTE: **Note:**
 Consolidated object storage configuration cannot be used for
 backups or Mattermost. See [the full table for a complete list](#storage-specific-configuration).
+
+NOTE: **Note:**
+Enabling consolidated object storage will enable object storage for all object types.
+If you wish to use local storage for specific object types, you can [selectively disable object storages](#selectively-disabling-object-storage).
 
 Most types of objects, such as CI artifacts, LFS files, upload
 attachments, and so on can be saved in object storage by specifying a single

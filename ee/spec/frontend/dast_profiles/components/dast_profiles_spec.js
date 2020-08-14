@@ -19,8 +19,11 @@ describe('EE - DastProfiles', () => {
     const defaultMocks = {
       $apollo: {
         queries: {
-          siteProfiles: {},
+          siteProfiles: {
+            fetchMore: jest.fn().mockResolvedValue(),
+          },
         },
+        mutate: jest.fn().mockResolvedValue(),
       },
     };
 
@@ -99,28 +102,13 @@ describe('EE - DastProfiles', () => {
 
     it('passes down the correct default props', () => {
       expect(getSiteProfilesComponent().props()).toEqual({
-        hasError: false,
+        errorMessage: '',
+        errorDetails: [],
         hasMoreProfilesToLoad: false,
         isLoading: false,
         profilesPerPage: expect.any(Number),
         profiles: [],
       });
-    });
-
-    it.each([true, false])('passes down the error state', async hasError => {
-      wrapper.setData({ hasSiteProfilesLoadingError: hasError });
-
-      await wrapper.vm.$nextTick();
-
-      expect(getSiteProfilesComponent().props('hasError')).toBe(hasError);
-    });
-
-    it.each([true, false])('passes down the pagination information', async hasNextPage => {
-      wrapper.setData({ siteProfilesPageInfo: { hasNextPage } });
-
-      await wrapper.vm.$nextTick();
-
-      expect(getSiteProfilesComponent().props('hasMoreProfilesToLoad')).toBe(hasNextPage);
     });
 
     it.each([true, false])('passes down the loading state', loading => {
@@ -129,13 +117,45 @@ describe('EE - DastProfiles', () => {
       expect(getSiteProfilesComponent().props('isLoading')).toBe(loading);
     });
 
-    it('passes down the profiles data', async () => {
-      const siteProfiles = [{}];
-      wrapper.setData({ siteProfiles });
+    it.each`
+      givenData                                          | propName                   | expectedPropValue
+      ${{ errorMessage: 'foo' }}                         | ${'errorMessage'}          | ${'foo'}
+      ${{ siteProfilesPageInfo: { hasNextPage: true } }} | ${'hasMoreProfilesToLoad'} | ${true}
+      ${{ siteProfiles: [{ foo: 'bar' }] }}              | ${'profiles'}              | ${[{ foo: 'bar' }]}
+    `('passes down $propName correctly', async ({ givenData, propName, expectedPropValue }) => {
+      wrapper.setData(givenData);
 
       await wrapper.vm.$nextTick();
 
-      expect(getSiteProfilesComponent().props('profiles')).toBe(siteProfiles);
+      expect(getSiteProfilesComponent().props(propName)).toEqual(expectedPropValue);
+    });
+
+    it('fetches more results when "@loadMoreProfiles" is emitted', () => {
+      const {
+        $apollo: {
+          queries: {
+            siteProfiles: { fetchMore },
+          },
+        },
+      } = wrapper.vm;
+
+      expect(fetchMore).not.toHaveBeenCalled();
+
+      getSiteProfilesComponent().vm.$emit('loadMoreProfiles');
+
+      expect(fetchMore).toHaveBeenCalledTimes(1);
+    });
+
+    it('deletes profile when "@deleteProfile" is emitted', () => {
+      const {
+        $apollo: { mutate },
+      } = wrapper.vm;
+
+      expect(mutate).not.toHaveBeenCalled();
+
+      getSiteProfilesComponent().vm.$emit('deleteProfile');
+
+      expect(mutate).toHaveBeenCalledTimes(1);
     });
   });
 });

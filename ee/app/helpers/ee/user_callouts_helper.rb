@@ -12,7 +12,6 @@ module EE
     THREAT_MONITORING_INFO = 'threat_monitoring_info'
     ACCOUNT_RECOVERY_REGULAR_CHECK = 'account_recovery_regular_check'
     USERS_OVER_LICENSE_BANNER = 'users_over_license_banner'
-    STANDALONE_VULNERABILITIES_INTRODUCTION_BANNER = 'standalone_vulnerabilities_introduction_banner'
     ACTIVE_USER_COUNT_THRESHOLD = 'active_user_count_threshold'
     PERSONAL_ACCESS_TOKEN_EXPIRY = 'personal_access_token_expiry'
 
@@ -82,10 +81,6 @@ module EE
 
     def show_threat_monitoring_info?
       !user_dismissed?(THREAT_MONITORING_INFO)
-    end
-
-    def show_standalone_vulnerabilities_introduction_banner?
-      !user_dismissed?(STANDALONE_VULNERABILITIES_INTRODUCTION_BANNER)
     end
 
     def show_token_expiry_notification?

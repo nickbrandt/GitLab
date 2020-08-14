@@ -131,7 +131,7 @@ RSpec.describe Issues::UpdateService do
 
       context 'project iterations' do
         it 'creates a system note' do
-          project_iteration = create(:iteration, project: project)
+          project_iteration = create(:iteration, :skip_project_validation, project: project)
 
           expect do
             update_issue(iteration: project_iteration)

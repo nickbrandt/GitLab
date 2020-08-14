@@ -299,6 +299,7 @@ class Project < ApplicationRecord
   has_many :build_trace_chunks, class_name: 'Ci::BuildTraceChunk', through: :builds, source: :trace_chunks
   has_many :build_report_results, class_name: 'Ci::BuildReportResult', inverse_of: :project
   has_many :job_artifacts, class_name: 'Ci::JobArtifact'
+  has_many :pipeline_artifacts, class_name: 'Ci::PipelineArtifact', inverse_of: :project
   has_many :runner_projects, class_name: 'Ci::RunnerProject', inverse_of: :project
   has_many :runners, through: :runner_projects, source: :runner, class_name: 'Ci::Runner'
   has_many :variables, class_name: 'Ci::Variable'
@@ -650,6 +651,8 @@ class Project < ApplicationRecord
   scope :joins_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
   scope :for_group, -> (group) { where(group: group) }
   scope :for_group_and_its_subgroups, ->(group) { where(namespace_id: group.self_and_descendants.select(:id)) }
+  scope :for_repository_storage, -> (repository_storage) { where(repository_storage: repository_storage) }
+  scope :excluding_repository_storage, -> (repository_storage) { where.not(repository_storage: repository_storage) }
 
   class << self
     # Searches for a list of projects based on the query given in `query`.
@@ -1120,7 +1123,7 @@ class Project < ApplicationRecord
 
     limit = creator.projects_limit
     error =
-      if limit.zero?
+      if limit == 0
         _('Personal project creation is not allowed. Please contact your administrator with questions')
       else
         _('Your project limit is %{limit} projects! Please contact your administrator to increase it')
@@ -2467,12 +2470,26 @@ class Project < ApplicationRecord
   alias_method :service_desk_enabled?, :service_desk_enabled
 
   def service_desk_address
+    service_desk_custom_address || service_desk_incoming_address
+  end
+
+  def service_desk_incoming_address
     return unless service_desk_enabled?
 
     config = Gitlab.config.incoming_email
     wildcard = Gitlab::IncomingEmail::WILDCARD_PLACEHOLDER
 
     config.address&.gsub(wildcard, "#{full_path_slug}-#{id}-issue-")
+  end
+
+  def service_desk_custom_address
+    return unless ::Gitlab::ServiceDeskEmail.enabled?
+    return unless ::Feature.enabled?(:service_desk_custom_address, self)
+
+    key = service_desk_setting&.project_key
+    return unless key.present?
+
+    ::Gitlab::ServiceDeskEmail.address_for_key("#{full_path_slug}-#{key}")
   end
 
   def root_namespace

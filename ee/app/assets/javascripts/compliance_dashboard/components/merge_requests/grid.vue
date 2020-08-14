@@ -7,6 +7,7 @@ import timeagoMixin from '~/vue_shared/mixins/timeago';
 
 import ApprovalStatus from './approval_status.vue';
 import Approvers from './approvers.vue';
+import BranchDetails from './branch_details.vue';
 import MergeRequest from './merge_request.vue';
 import PipelineStatus from './pipeline_status.vue';
 import GridColumnHeading from '../shared/grid_column_heading.vue';
@@ -19,6 +20,7 @@ export default {
   components: {
     ApprovalStatus,
     Approvers,
+    BranchDetails,
     GridColumnHeading,
     MergeRequest,
     PipelineStatus,
@@ -51,6 +53,9 @@ export default {
     hasStatus(status) {
       return !isEmpty(status);
     },
+    hasBranchDetails(mergeRequest) {
+      return mergeRequest.target_branch && mergeRequest.source_branch;
+    },
   },
   strings: {
     mergeRequestLabel: __('Merge Request'),
@@ -69,7 +74,7 @@ export default {
 
 <template>
   <div>
-    <div class="dashboard-grid">
+    <div class="dashboard-grid gl-display-grid gl-grid-tpl-rows-auto">
       <grid-column-heading :heading="$options.strings.mergeRequestLabel" />
       <grid-column-heading :heading="$options.strings.approvalStatusLabel" class="gl-text-center" />
       <grid-column-heading :heading="$options.strings.pipelineStatusLabel" class="gl-text-center" />
@@ -105,6 +110,17 @@ export default {
           class="gl-text-right gl-border-b-solid gl-border-b-1 gl-border-b-gray-100 gl-p-5 gl-relative"
         >
           <approvers :approvers="mergeRequest.approved_by_users" />
+          <branch-details
+            v-if="hasBranchDetails(mergeRequest)"
+            :source-branch="{
+              name: mergeRequest.source_branch,
+              uri: mergeRequest.source_branch_uri,
+            }"
+            :target-branch="{
+              name: mergeRequest.target_branch,
+              uri: mergeRequest.target_branch_uri,
+            }"
+          />
           <span class="gl-text-gray-700">
             <time v-gl-tooltip.bottom="timeTooltip(mergeRequest.merged_at)">{{
               timeAgoString(mergeRequest.merged_at)

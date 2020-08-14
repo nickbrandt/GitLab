@@ -24,67 +24,135 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
       expect(report.findings.map(&:confidence)).not_to include("undefined")
     end
 
+    context 'parsing scanned resources' do
+      describe 'when the URL is invalid' do
+        let(:raw_json) do
+          {
+          "vulnerabilities": [],
+          "remediations": [],
+          "dependency_files": [],
+          "scan": {
+            "scanned_resources": [
+              {
+                "method": "GET",
+                "type": "url",
+                "url": "not a URL"
+              }
+            ]
+          }
+        }
+        end
+
+        it 'skips invalid URLs' do
+          parser.parse!(raw_json.to_json, report)
+
+          expect(report.scanned_resources).to be_empty
+        end
+      end
+
+      describe 'when the URLs are valid' do
+        let(:raw_json) do
+          {
+          "vulnerabilities": [],
+          "remediations": [],
+          "dependency_files": [],
+          "scan": {
+            "scanned_resources": [
+              {
+                "method": "GET",
+                "type": "url",
+                "url": "http://example.com/1"
+              },
+              {
+                "method": "POST",
+                "type": "url",
+                "url": "http://example.com/2"
+              },
+              {
+                "method": "GET",
+                "type": "url",
+                "url": "http://example.com/3"
+              }
+            ]
+          }
+        }
+        end
+
+        it 'creates a scanned resource for each URL' do
+          parser.parse!(raw_json.to_json, report)
+
+          expect(report.scanned_resources.length).to eq(3)
+        end
+
+        it 'converts the JSON to Scanned Resource objects' do
+          parser.parse!(raw_json.to_json, report)
+
+          expect(report.scanned_resources.first).to be_a(::Gitlab::Ci::Reports::Security::ScannedResource)
+        end
+      end
+    end
+
     context 'parsing remediations' do
       let(:raw_json) do
         {
-        "vulnerabilities": [
-          {
-            "category": "dependency_scanning",
-            "name": "Vulnerabilities in libxml2",
-            "message": "Vulnerabilities in libxml2 in nokogiri",
-            "description": "",
-            "cve": "CVE-1020",
-            "severity": "High",
-            "solution": "Upgrade to latest version.",
-            "scanner": { "id": "gemnasium", "name": "Gemnasium" },
-            "location": {},
-            "identifiers": [],
-            "links": [{ "url": "" }]
-          },
-          {
-            "id": "bb2fbeb1b71ea360ce3f86f001d4e84823c3ffe1a1f7d41ba7466b14cfa953d3",
-            "category": "dependency_scanning",
-            "name": "Regular Expression Denial of Service",
-            "message": "Regular Expression Denial of Service in debug",
-            "description": "",
-            "cve": "CVE-1030",
-            "severity": "Unknown",
-            "solution": "Upgrade to latest versions.",
+          "vulnerabilities": [
+            {
+              "category": "dependency_scanning",
+              "name": "Vulnerabilities in libxml2",
+              "message": "Vulnerabilities in libxml2 in nokogiri",
+              "description": "",
+              "cve": "CVE-1020",
+              "severity": "High",
+              "solution": "Upgrade to latest version.",
+              "scanner": { "id": "gemnasium", "name": "Gemnasium" },
+              "location": {},
+              "identifiers": [],
+              "links": [{ "url": "" }]
+            },
+            {
+              "id": "bb2fbeb1b71ea360ce3f86f001d4e84823c3ffe1a1f7d41ba7466b14cfa953d3",
+              "category": "dependency_scanning",
+              "name": "Regular Expression Denial of Service",
+              "message": "Regular Expression Denial of Service in debug",
+              "description": "",
+              "cve": "CVE-1030",
+              "severity": "Unknown",
+              "solution": "Upgrade to latest versions.",
+              "scanner": {
+                "id": "gemnasium",
+                "name": "Gemnasium"
+              },
+              "location": {},
+              "identifiers": [],
+              "links": [{ "url": "" }]
+            },
+            {
+              "category": "dependency_scanning",
+              "name": "Authentication bypass via incorrect DOM traversal and canonicalization",
+              "message": "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js",
+              "description": "",
+              "cve": "yarn/yarn.lock:saml2-js:gemnasium:9952e574-7b5b-46fa-a270-aeb694198a98",
+              "severity": "Unknown",
+              "solution": "Upgrade to fixed version.\r\n",
+              "scanner": {
+                "id": "gemnasium",
+                "name": "Gemnasium"
+              },
+              "location": {},
+              "identifiers": [],
+              "links": [{ "url": "" }, { "url": "" }]
+            }
+          ],
+          "remediations": [],
+          "dependency_files": [],
+          "scan": {
             "scanner": {
               "id": "gemnasium",
-              "name": "Gemnasium"
-            },
-            "location": {},
-            "identifiers": [],
-            "links": [{ "url": "" }]
-          },
-          {
-            "category": "dependency_scanning",
-            "name": "Authentication bypass via incorrect DOM traversal and canonicalization",
-            "message": "Authentication bypass via incorrect DOM traversal and canonicalization in saml2-js",
-            "description": "",
-            "cve": "yarn/yarn.lock:saml2-js:gemnasium:9952e574-7b5b-46fa-a270-aeb694198a98",
-            "severity": "Unknown",
-            "solution": "Upgrade to fixed version.\r\n",
-            "scanner": {
-              "id": "gemnasium",
-              "name": "Gemnasium"
-            },
-            "location": {},
-            "identifiers": [],
-            "links": [{ "url": "" }, { "url": "" }]
-          }
-        ],
-        "remediations": [],
-        "dependency_files": [],
-        "scan": {
-          "scanner": {
-            "id": "gemnasium",
-            "name": "Gemnasium",
-            "vendor": { "name": "GitLab" }
+              "name": "Gemnasium",
+              "vendor": { "name": "GitLab" }
+            }
           }
         }
-      }
       end
 
       it 'finds remediation with same cve' do

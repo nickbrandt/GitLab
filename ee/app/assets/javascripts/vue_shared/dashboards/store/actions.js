@@ -145,7 +145,7 @@ export const removeProject = ({ dispatch }, removePath) => {
 export const receiveRemoveProjectSuccess = ({ dispatch }) => dispatch('forceProjectsRequest');
 
 export const receiveRemoveProjectError = () => {
-  createFlash(__('Something went wrong, unable to remove project'));
+  createFlash(__('Something went wrong, unable to delete project'));
 };
 
 export const setSearchQuery = ({ commit }, query) => commit(types.SET_SEARCH_QUERY, query);

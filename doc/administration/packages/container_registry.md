@@ -331,6 +331,9 @@ The different supported drivers are:
 | swift      | OpenStack Swift Object Storage      |
 | oss        | Aliyun OSS                          |
 
+NOTE: **Note:**
+Although most S3 compatible services (like [MinIO](https://min.io/)) should work with the registry, we only guarantee support for AWS S3. Because we cannot assert the correctness of third-party S3 implementations, we can debug issues, but we cannot patch the registry unless an issue is reproducible against an AWS S3 bucket.
+
 Read more about the individual driver's configuration options in the
 [Docker Registry docs](https://docs.docker.com/registry/configuration/#storage).
 
@@ -449,14 +452,15 @@ you can pull from the Container Registry, but you cannot push.
 1. This example uses the `aws` CLI. If you haven't configured the
    CLI before, you have to configure your credentials by running `sudo aws configure`.
    Because a non-admin user likely can't access the Container Registry folder,
-   ensure you use `sudo`. To check your credential configuration, run [`ls`]
-   to list all buckets.
+   ensure you use `sudo`. To check your credential configuration, run
+   [`ls`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/ls.html) to list
+   all buckets.
 
    ```shell
    sudo aws --endpoint-url https://your-object-storage-backend.com s3 ls
    ```
 
-   If you are using AWS as your back end, you do not need the [`--endpoint-url`](https://docs.aws.amazon.com/cli/latest/reference/#:~:text=--endpoint-url).
+   If you are using AWS as your back end, you do not need the [`--endpoint-url`](https://docs.aws.amazon.com/cli/latest/reference/#options).
 1. Copy initial data to your S3 bucket, for example with the `aws` CLI
    [`cp`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/cp.html)
    or [`sync`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/sync.html)
@@ -465,6 +469,10 @@ you can pull from the Container Registry, but you cannot push.
    ```shell
    sudo aws --endpoint-url https://your-object-storage-backend.com s3 sync registry s3://mybucket
    ```
+
+   TIP: **Tip:**
+   If you have a lot of data, you may be able to improve performance by
+   [running parallel sync operations](https://aws.amazon.com/premiumsupport/knowledge-center/s3-improve-transfer-sync-command/).
 
 1. To perform the final data sync,
    [put the Container Registry in `read-only` mode](#performing-garbage-collection-without-downtime) and
@@ -484,6 +492,19 @@ you can pull from the Container Registry, but you cannot push.
    flag will delete files that exist in the destination but not in the source.
    Make sure not to swap the source and destination, or you will delete all data in the Registry.
 
+1. Verify all Container Registry files have been uploaded to object storage
+   by looking at the file count returned by these two commands:
+
+   ```shell
+   sudo find registry -type f | wc -l
+   ```
+
+   ```shell
+   sudo aws --endpoint-url https://your-object-storage-backend.com s3 ls s3://mybucket --recursive | wc -l
+   ```
+
+   The output of these commands should match, except for the content in the
+   `_uploads` directories and sub-directories.
 1. Configure your registry to [use the S3 bucket for storage](#use-object-storage).
 1. For the changes to take effect, set the Registry back to `read-write` mode and [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 

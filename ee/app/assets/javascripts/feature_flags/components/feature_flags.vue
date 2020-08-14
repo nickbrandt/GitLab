@@ -2,13 +2,12 @@
 import { createNamespacedHelpers } from 'vuex';
 import { isEmpty } from 'lodash';
 import {
+  GlAlert,
   GlButton,
   GlEmptyState,
   GlLoadingIcon,
   GlModalDirective,
   GlLink,
-  GlAlert,
-  GlSprintf,
 } from '@gitlab/ui';
 import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from '../constants';
 import FeatureFlagsTable from './feature_flags_table.vue';
@@ -34,12 +33,11 @@ export default {
     UserListsTable,
     NavigationTabs,
     TablePagination,
+    GlAlert,
+    GlButton,
     GlEmptyState,
     GlLoadingIcon,
-    GlButton,
     GlLink,
-    GlAlert,
-    GlSprintf,
     ConfigureFeatureFlagsModal,
   },
   directives: {
@@ -74,10 +72,6 @@ export default {
       type: String,
       required: true,
     },
-    userListsApiDocPath: {
-      type: String,
-      required: true,
-    },
     rotateInstanceIdPath: {
       type: String,
       required: false,
@@ -96,6 +90,11 @@ export default {
       required: true,
     },
     newFeatureFlagPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    newUserListPath: {
       type: String,
       required: false,
       default: '',
@@ -267,6 +266,18 @@ export default {
         >
           {{ s__('FeatureFlags|Configure') }}
         </gl-button>
+
+        <gl-button
+          v-if="newUserListPath"
+          :href="newUserListPath"
+          variant="success"
+          category="secondary"
+          class="gl-mr-3"
+          data-testid="ff-new-list-button"
+        >
+          {{ s__('FeatureFlags|New list') }}
+        </gl-button>
+
         <gl-button
           v-if="hasNewPath"
           :href="newFeatureFlagPath"
@@ -277,20 +288,6 @@ export default {
         </gl-button>
       </div>
     </div>
-    <gl-alert v-if="!isUserListAlertDismissed" @dismiss="isUserListAlertDismissed = true">
-      <gl-sprintf
-        :message="
-          __('User Lists can only be created and modified with %{linkStart}the API%{linkEnd}')
-        "
-      >
-        <template #link="{ content }">
-          <gl-link :href="userListsApiDocPath" target="_blank">
-            {{ content }}
-          </gl-link>
-        </template>
-      </gl-sprintf>
-    </gl-alert>
-
     <gl-alert
       v-for="(message, index) in alerts"
       :key="index"

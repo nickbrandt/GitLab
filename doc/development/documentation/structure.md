@@ -104,13 +104,11 @@ Link each one to an appropriate place for more information.
 
 ## Instructions
 
-"Instructions" is usually not the name of the heading.
-
-This is the part of the document where you can include one or more sets of instructions,
-each to accomplish a specific task.
+This is the part of the document where you can include one or more sets of instructions.
+Each topic should help users accomplish a specific task.
 
 Headers should describe the task the reader will achieve by following the instructions within,
-typically starting with a verb.
+typically starting with a verb. For example, `Create a package` or `Configure a pipeline`.
 
 Larger instruction sets may have subsections covering specific phases of the process.
 Where appropriate, provide examples of code or configuration files to better clarify
@@ -126,6 +124,32 @@ intended usage.
 - Use short and descriptive headings (up to ~50 chars). You can use one
   single heading like `## Configure X` for instructions when the feature
   is simple and the document is short.
+
+Example topic:
+
+## Create a teddy bear
+
+Start by writing a sentence or two about _why_ someone would want to perform this task.
+It's not always possible, but is a good practice. For example:
+
+Create a teddy bear when you need something to hug.
+
+Follow this information with the task steps.
+
+To create a teddy bear:
+
+1. Go to **Settings > CI/CD**.
+1. Expand **This** and click **This**.
+1. Do another step.
+
+After the numbered list, add a sentence with the expected result, if it
+is not obvious, and any next steps. For example:
+
+The teddy bear is now in the kitchen, in the cupboard above the sink.
+
+You can retrieve the teddy bear and put it on the couch with the other animals.
+
+Screenshots are not necessary. They are difficult to keep up-to-date and can clutter the page.
 
 <!-- ## Troubleshooting
 
@@ -190,7 +214,7 @@ conversions can be viewed on Google Analytics by navigating to **Behavior > Even
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/36576/) in GitLab 13.2 as GitLab Development documentation.
 
-'Good practice' examples demonstrate encouraged ways of writing code while comparing with examples of practices to avoid.
+"Good practice" examples demonstrate encouraged ways of writing code while comparing with examples of practices to avoid.
 These examples are labeled as "Bad" or "Good".
 In GitLab development guidelines, when presenting the cases, it is recommended
 to follow a **first-bad-then-good** strategy. First demonstrate the "Bad" practice (how things _could_ be done, which is often still working code),
@@ -205,3 +229,8 @@ With many examples being presented, a clear separation helps the reader to go di
 Consider offering an explanation (for example, a comment, a link to a resource, etc.) on why something is bad practice.
 - Better and best cases can be considered part of the good case(s) code block.
 In the same code block, precede each with comments: `# Better` and `# Best`.
+
+NOTE: **Note:**
+While the bad-then-good approach is acceptable for the GitLab development guidelines, do not use it
+for user documentation. For user documentation, use "Do" and "Don't." For example, see the
+[Pajamas Design System](https://design.gitlab.com/content/punctuation).

@@ -24,16 +24,4 @@ RSpec.configure do |config|
   config.around(:each, :geo_tracking_db) do |example|
     example.run if Gitlab::Geo.geo_database_configured?
   end
-
-  config.around(:each, :geo_fdw) do |example|
-    if Gitlab::Geo::Fdw.enabled? && Gitlab::Geo.geo_database_configured?
-      # Disable transactions because a foreign table can't see changes
-      # inside a transaction of a different connection.
-      self.class.use_transactional_tests = false
-
-      example.run
-
-      delete_from_all_tables!(except: deletion_except_tables)
-    end
-  end
 end

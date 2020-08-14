@@ -6,8 +6,8 @@ module Types
     graphql_name 'EpicDescendantCount'
     description 'Counts of descendent epics.'
 
-    field :opened_epics, GraphQL::INT_TYPE, null: true, description: 'Number of opened sub-epics'
-    field :closed_epics, GraphQL::INT_TYPE, null: true, description: 'Number of closed sub-epics'
+    field :opened_epics, GraphQL::INT_TYPE, null: true, description: 'Number of opened child epics'
+    field :closed_epics, GraphQL::INT_TYPE, null: true, description: 'Number of closed child epics'
     field :opened_issues, GraphQL::INT_TYPE, null: true, description: 'Number of opened epic issues'
     field :closed_issues, GraphQL::INT_TYPE, null: true, description: 'Number of closed epic issues'
   end

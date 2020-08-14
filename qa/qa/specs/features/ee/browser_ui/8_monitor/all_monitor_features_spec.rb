@@ -9,6 +9,7 @@ module QA
         @project = Resource::Project.fabricate_via_api! do |project|
           project.name = 'monitoring-project'
           project.auto_devops_enabled = true
+          project.template_name = 'express'
         end
 
         deploy_project_with_prometheus
@@ -35,7 +36,7 @@ module QA
         end
       end
 
-      it 'creates and sets an incident template' do
+      it 'creates an incident template and opens an incident with template applied' do
         create_incident_template
 
         Page::Project::Menu.perform(&:go_to_operations_settings)
@@ -47,6 +48,12 @@ module QA
             incident_settings.save_incident_settings
           end
         end
+
+        create_incident_issue
+
+        Page::Project::Issue::Show.perform do |issue|
+          expect(issue).to have_metrics_unfurled
+        end
       end
 
       private
@@ -55,7 +62,7 @@ module QA
         %w[
           CODE_QUALITY_DISABLED TEST_DISABLED LICENSE_MANAGEMENT_DISABLED
           SAST_DISABLED DAST_DISABLED DEPENDENCY_SCANNING_DISABLED
-          CONTAINER_SCANNING_DISABLED PERFORMANCE_DISABLED
+          CONTAINER_SCANNING_DISABLED PERFORMANCE_DISABLED SECRET_DETECTION_DISABLED
         ].each do |key|
           Resource::CiVariable.fabricate_via_api! do |resource|
             resource.project = @project
@@ -75,16 +82,9 @@ module QA
           cluster_settings.install_prometheus = true
         end
 
-        Resource::Repository::ProjectPush.fabricate! do |push|
-          push.project = @project
-          push.directory = Pathname
-                               .new(__dir__)
-                               .join('../../../../../fixtures/auto_devops_rack')
-          push.commit_message = 'Create AutoDevOps compatible Project for Monitoring'
-        end
-
-        Page::Project::Menu.perform(&:click_ci_cd_pipelines)
-        Page::Project::Pipeline::Index.perform(&:click_on_latest_pipeline)
+        Resource::Pipeline.fabricate_via_api! do |pipeline|
+          pipeline.project = @project
+        end.visit!
 
         Page::Project::Pipeline::Show.perform do |pipeline|
           pipeline.click_job('build')
@@ -160,6 +160,19 @@ module QA
           form.add_content(template)
           form.add_commit_message('Add Incident template')
           form.commit_changes
+        end
+      end
+
+      def create_incident_issue
+        Page::Project::Menu.perform(&:go_to_operations_incidents)
+
+        Page::Project::Operations::Incidents::Index.perform do |incidents_page|
+          incidents_page.create_incident
+        end
+
+        Page::Project::Issue::New.perform do |new_issue|
+          new_issue.fill_title('test incident')
+          new_issue.create_new_issue
         end
       end
     end

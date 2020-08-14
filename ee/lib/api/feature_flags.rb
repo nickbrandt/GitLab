@@ -81,9 +81,9 @@ module API
       end
 
       params do
-        requires :name, type: String, desc: 'The name of the feature flag'
+        requires :feature_flag_name, type: String, desc: 'The name of the feature flag'
       end
-      resource 'feature_flags/:name', requirements: FEATURE_FLAG_ENDPOINT_REQUIREMENTS do
+      resource 'feature_flags/:feature_flag_name', requirements: FEATURE_FLAG_ENDPOINT_REQUIREMENTS do
         desc 'Get a feature flag of a project' do
           detail 'This feature was introduced in GitLab 12.5'
           success EE::API::Entities::FeatureFlag
@@ -145,6 +145,7 @@ module API
           success EE::API::Entities::FeatureFlag
         end
         params do
+          optional :name, type: String, desc: 'The name of the feature flag'
           optional :description, type: String, desc: 'The description of the feature flag'
           optional :active, type: Boolean, desc: 'Active/inactive value of the flag'
           optional :strategies, type: Array do
@@ -237,9 +238,9 @@ module API
 
       def feature_flag
         @feature_flag ||= if feature_flags_new_version_enabled?
-                            user_project.operations_feature_flags.find_by_name!(params[:name])
+                            user_project.operations_feature_flags.find_by_name!(params[:feature_flag_name])
                           else
-                            user_project.operations_feature_flags.legacy_flag.find_by_name!(params[:name])
+                            user_project.operations_feature_flags.legacy_flag.find_by_name!(params[:feature_flag_name])
                           end
       end
 

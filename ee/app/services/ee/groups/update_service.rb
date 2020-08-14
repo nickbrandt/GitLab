@@ -93,6 +93,7 @@ module EE
       def handle_changes
         handle_allowed_email_domains_update
         handle_ip_restriction_update
+        handle_settings_update
       end
 
       def handle_ip_restriction_update
@@ -109,6 +110,13 @@ module EE
         comma_separated_domains = params.delete(:allowed_email_domains_list)
 
         AllowedEmailDomains::UpdateService.new(current_user, group, comma_separated_domains).execute
+      end
+
+      def handle_settings_update
+        settings_params = params.slice(:prevent_forking_outside_group)
+        params.delete(:prevent_forking_outside_group)
+
+        NamespaceSettings::UpdateService.new(current_user, group, settings_params).execute
       end
 
       def log_audit_event

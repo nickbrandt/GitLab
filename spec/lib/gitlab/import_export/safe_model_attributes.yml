@@ -217,6 +217,7 @@ MergeRequestDiff:
 - head_commit_sha
 - start_commit_sha
 - commits_count
+- files_count
 MergeRequestDiffCommit:
 - merge_request_diff_id
 - relative_order
@@ -287,6 +288,7 @@ MergeRequest::Metrics:
 - first_approved_at
 - first_reassigned_at
 - added_lines
+- target_project_id
 - removed_lines
 Ci::Pipeline:
 - id
@@ -658,6 +660,7 @@ PrometheusMetric:
 - group
 - common
 - identifier
+- dashboard_path
 PrometheusAlert:
 - threshold
 - operator
@@ -737,6 +740,8 @@ Board:
 - milestone_id
 - weight
 - name
+- hide_backlog_list
+- hide_closed_list
 List:
 - id
 - board_id
@@ -767,6 +772,7 @@ DesignManagement::Design:
 - id
 - project_id
 - filename
+- relative_position
 DesignManagement::Action:
 - id
 - event

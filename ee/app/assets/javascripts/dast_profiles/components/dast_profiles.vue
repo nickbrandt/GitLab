@@ -1,8 +1,11 @@
 <script>
 import * as Sentry from '@sentry/browser';
 import { GlButton, GlTab, GlTabs } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import ProfilesList from './dast_profiles_list.vue';
 import dastSiteProfilesQuery from '../graphql/dast_site_profiles.query.graphql';
+import dastSiteProfilesDelete from '../graphql/dast_site_profiles_delete.mutation.graphql';
+import * as cacheUtils from '../graphql/cache_utils';
 
 export default {
   components: {
@@ -25,31 +28,35 @@ export default {
     return {
       siteProfiles: [],
       siteProfilesPageInfo: {},
-      hasSiteProfilesLoadingError: false,
+      errorMessage: '',
+      errorDetails: [],
     };
   },
   apollo: {
-    siteProfiles: {
-      query: dastSiteProfilesQuery,
-      variables() {
-        return {
+    siteProfiles() {
+      return {
+        query: dastSiteProfilesQuery,
+        variables: {
           fullPath: this.projectFullPath,
           first: this.$options.profilesPerPage,
-        };
-      },
-      result({ data, error }) {
-        if (!error) {
-          this.siteProfilesPageInfo = data.project.siteProfiles.pageInfo;
-        }
-      },
-      update(data) {
-        const siteProfileEdges = data?.project?.siteProfiles?.edges ?? [];
+        },
+        result({ data, error }) {
+          if (!error) {
+            this.siteProfilesPageInfo = data.project.siteProfiles.pageInfo;
+          }
+        },
+        update(data) {
+          const siteProfileEdges = data?.project?.siteProfiles?.edges ?? [];
 
-        return siteProfileEdges.map(({ node }) => node);
-      },
-      error(e) {
-        this.handleLoadingError(e);
-      },
+          return siteProfileEdges.map(({ node }) => node);
+        },
+        error(error) {
+          this.handleError({
+            exception: error,
+            message: this.$options.i18n.errorMessages.fetchNetworkError,
+          });
+        },
+      };
     },
   },
   computed: {
@@ -61,34 +68,100 @@ export default {
     },
   },
   methods: {
-    handleLoadingError(e) {
-      Sentry.captureException(e);
-      this.hasSiteProfilesLoadingError = true;
+    handleError({ exception, message = '', details = [] }) {
+      Sentry.captureException(exception);
+      this.errorMessage = message;
+      this.errorDetails = details;
+    },
+    resetErrors() {
+      this.errorMessage = '';
+      this.errorDetails = [];
     },
     fetchMoreProfiles() {
-      const { $apollo, siteProfilesPageInfo } = this;
+      const {
+        $apollo,
+        siteProfilesPageInfo,
+        $options: { i18n },
+      } = this;
 
-      this.hasSiteProfilesLoadingError = false;
+      this.resetErrors();
 
       $apollo.queries.siteProfiles
         .fetchMore({
           variables: { after: siteProfilesPageInfo.endCursor },
-          updateQuery: (previousResult, { fetchMoreResult }) => {
-            const newResult = { ...fetchMoreResult };
-            const previousEdges = previousResult.project.siteProfiles.edges;
-            const newEdges = newResult.project.siteProfiles.edges;
-
-            newResult.project.siteProfiles.edges = [...previousEdges, ...newEdges];
-
-            return newResult;
-          },
+          updateQuery: cacheUtils.appendToPreviousResult,
         })
-        .catch(e => {
-          this.handleLoadingError(e);
+        .catch(error => {
+          this.handleError({ exception: error, message: i18n.errorMessages.fetchNetworkError });
+        });
+    },
+    deleteSiteProfile(profileToBeDeletedId) {
+      const {
+        projectFullPath,
+        handleError,
+        $options: { i18n },
+        $apollo: {
+          queries: {
+            siteProfiles: { options: siteProfilesQueryOptions },
+          },
+        },
+      } = this;
+
+      this.resetErrors();
+
+      this.$apollo
+        .mutate({
+          mutation: dastSiteProfilesDelete,
+          variables: {
+            projectFullPath,
+            profileId: profileToBeDeletedId,
+          },
+          update(
+            store,
+            {
+              data: {
+                dastSiteProfileDelete: { errors = [] },
+              },
+            },
+          ) {
+            if (errors.length === 0) {
+              cacheUtils.removeProfile({
+                store,
+                queryBody: {
+                  query: siteProfilesQueryOptions.query,
+                  variables: siteProfilesQueryOptions.variables,
+                },
+                profileToBeDeletedId,
+              });
+            } else {
+              handleError({
+                message: i18n.errorMessages.deletionBackendError,
+                details: errors,
+              });
+            }
+          },
+          optimisticResponse: cacheUtils.dastSiteProfilesDeleteResponse(),
+        })
+        .catch(error => {
+          this.handleError({
+            exception: error,
+            message: i18n.errorMessages.deletionNetworkError,
+          });
         });
     },
   },
   profilesPerPage: 10,
+  i18n: {
+    errorMessages: {
+      fetchNetworkError: s__(
+        'DastProfiles|Could not fetch site profiles. Please refresh the page, or try again later.',
+      ),
+      deletionNetworkError: s__(
+        'DastProfiles|Could not delete site profile. Please refresh the page, or try again later.',
+      ),
+      deletionBackendError: s__('DastProfiles|Could not delete site profiles:'),
+    },
+  },
 };
 </script>
 
@@ -124,12 +197,14 @@ export default {
         </template>
 
         <profiles-list
-          :has-error="hasSiteProfilesLoadingError"
+          :error-message="errorMessage"
+          :error-details="errorDetails"
           :has-more-profiles-to-load="hasMoreSiteProfiles"
           :is-loading="isLoadingSiteProfiles"
           :profiles-per-page="$options.profilesPerPage"
           :profiles="siteProfiles"
           @loadMoreProfiles="fetchMoreProfiles"
+          @deleteProfile="deleteSiteProfile"
         />
       </gl-tab>
     </gl-tabs>

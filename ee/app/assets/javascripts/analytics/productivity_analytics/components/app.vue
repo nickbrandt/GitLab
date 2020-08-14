@@ -71,6 +71,7 @@ export default {
     ...mapGetters(['getMetricTypes']),
     ...mapGetters('charts', [
       'chartLoading',
+      'chartErrorCode',
       'chartHasData',
       'getColumnChartData',
       'getColumnChartDatazoomOption',
@@ -199,6 +200,7 @@ export default {
           __('You can filter by \'days to merge\' by clicking on the columns in the chart.')
         "
         :is-loading="chartLoading(chartKeys.main)"
+        :error-code="chartErrorCode(chartKeys.main)"
         :chart-data="getColumnChartData(chartKeys.main)"
       >
         <gl-column-chart

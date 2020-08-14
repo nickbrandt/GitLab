@@ -56,16 +56,16 @@ Generate an access key for the IAM user, and configure GitLab with the credentia
 To create and add a new Kubernetes cluster to your project, group, or instance:
 
 1. Navigate to your:
-   - Project's **{cloud-gear}** **Operations > Kubernetes** page, for a project-level cluster.
-   - Group's **{cloud-gear}** **Kubernetes** page, for a group-level cluster.
-   - **Admin Area >** **{cloud-gear}** **Kubernetes**, for an instance-level cluster.
+   - Project's **Operations > Kubernetes** page, for a project-level cluster.
+   - Group's **Kubernetes** page, for a group-level cluster.
+   - **Admin Area > Kubernetes**, for an instance-level cluster.
 1. Click **Add Kubernetes cluster**.
 1. Under the **Create new cluster** tab, click **Amazon EKS**. You will be provided with an
    `Account ID` and `External ID` to use in the next step.
 1. In the [IAM Management Console](https://console.aws.amazon.com/iam/home), create an EKS management IAM role.
    To do so, follow the [Amazon EKS cluster IAM role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html) instructions
    to create a IAM role suitable for managing the AWS EKS cluster's resources on your behalf.
-   In addition to the policies that guide suggests, you must also include the `AmazonEKSServicePolicy`
+   In addition to the policies that guide suggests, you must also include the `AmazonEKSClusterPolicy`
    policy for this role in order for GitLab to manage the EKS cluster correctly.
 1. In the [IAM Management Console](https://console.aws.amazon.com/iam/home), create an IAM role:
    1. From the left panel, select **Roles**.
@@ -140,9 +140,9 @@ To create and add a new Kubernetes cluster to your project, group, or instance:
 1. Click **Authenticate with AWS**.
 1. Choose your cluster's settings:
    - **Kubernetes cluster name** - The name you wish to give the cluster.
-   - **Environment scope** - The [associated environment](index.md#setting-the-environment-scope-premium) to this cluster.
+   - **Environment scope** - The [associated environment](index.md#setting-the-environment-scope) to this cluster.
    - **Kubernetes version** - The Kubernetes version to use. Currently the only version supported is 1.14.
-   - **Role name** - Select the **EKS IAM role** you created earlier to allow Amazon EKS
+   - **Service role** - Select the **EKS IAM role** you created earlier to allow Amazon EKS
      and the Kubernetes control plane to manage AWS resources on your behalf.
 
      NOTE: **Note:**
@@ -208,7 +208,7 @@ NOTE: **Note:**
 This role should be the role you created by following the
 [EKS cluster IAM role](https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html) guide.
 In addition to the policies that guide suggests, you must also include the
-`AmazonEKSServicePolicy` policy for this role in order for GitLab to manage the EKS cluster correctly.
+`AmazonEKSClusterPolicy` policy for this role in order for GitLab to manage the EKS cluster correctly.
 
 ## Existing EKS cluster
 

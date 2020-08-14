@@ -9,6 +9,7 @@ const Api = {
   groupsPath: '/api/:version/groups.json',
   groupPath: '/api/:version/groups/:id',
   groupMembersPath: '/api/:version/groups/:id/members',
+  groupMilestonesPath: '/api/:version/groups/:id/milestones',
   subgroupsPath: '/api/:version/groups/:id/subgroups',
   namespacesPath: '/api/:version/namespaces.json',
   groupPackagesPath: '/api/:version/groups/:id/packages',
@@ -57,6 +58,8 @@ const Api = {
   pipelinesPath: '/api/:version/projects/:id/pipelines/',
   createPipelinePath: '/api/:version/projects/:id/pipeline',
   environmentsPath: '/api/:version/projects/:id/environments',
+  contextCommitsPath:
+    '/api/:version/projects/:id/merge_requests/:merge_request_iid/context_commits',
   rawFilePath: '/api/:version/projects/:id/repository/files/:path/raw',
   issuePath: '/api/:version/projects/:id/issues/:issue_iid',
   tagsPath: '/api/:version/projects/:id/repository/tags',
@@ -99,6 +102,17 @@ const Api = {
 
   groupMembers(id, options) {
     const url = Api.buildUrl(this.groupMembersPath).replace(':id', encodeURIComponent(id));
+
+    return axios.get(url, {
+      params: {
+        per_page: DEFAULT_PER_PAGE,
+        ...options,
+      },
+    });
+  },
+
+  groupMilestones(id, options) {
+    const url = Api.buildUrl(this.groupMilestonesPath).replace(':id', encodeURIComponent(id));
 
     return axios.get(url, {
       params: {
@@ -596,6 +610,30 @@ const Api = {
   environments(id) {
     const url = Api.buildUrl(this.environmentsPath).replace(':id', encodeURIComponent(id));
     return axios.get(url);
+  },
+
+  createContextCommits(id, mergeRequestIid, data) {
+    const url = Api.buildUrl(this.contextCommitsPath)
+      .replace(':id', encodeURIComponent(id))
+      .replace(':merge_request_iid', mergeRequestIid);
+
+    return axios.post(url, data);
+  },
+
+  allContextCommits(id, mergeRequestIid) {
+    const url = Api.buildUrl(this.contextCommitsPath)
+      .replace(':id', encodeURIComponent(id))
+      .replace(':merge_request_iid', mergeRequestIid);
+
+    return axios.get(url);
+  },
+
+  removeContextCommits(id, mergeRequestIid, data) {
+    const url = Api.buildUrl(this.contextCommitsPath)
+      .replace(':id', id)
+      .replace(':merge_request_iid', mergeRequestIid);
+
+    return axios.delete(url, { data });
   },
 
   getRawFile(id, path, params = { ref: 'master' }) {

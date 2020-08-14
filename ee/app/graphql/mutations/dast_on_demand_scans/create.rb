@@ -17,7 +17,7 @@ module Mutations
                required: true,
                description: 'The project the site profile belongs to.'
 
-      argument :dast_site_profile_id, GraphQL::ID_TYPE,
+      argument :dast_site_profile_id, ::Types::GlobalIDType[::DastSiteProfile],
                required: true,
                description: 'ID of the site profile to be used for the scan.'
 
@@ -47,14 +47,10 @@ module Mutations
       end
 
       def find_dast_site_profile(project:, dast_site_profile_id:)
-        global_id = GlobalID.parse(dast_site_profile_id)
-
-        raise InvalidGlobalID.new('Incorrect class') unless global_id.model_class == DastSiteProfile
-
         project
           .dast_site_profiles
           .with_dast_site
-          .find(global_id.model_id)
+          .find(dast_site_profile_id.model_id)
       end
 
       def success_response(project:, pipeline:)

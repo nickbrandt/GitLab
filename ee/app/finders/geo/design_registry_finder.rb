@@ -66,7 +66,7 @@ module Geo
     private
 
     def designs
-      current_node_non_fdw.designs
+      current_node.designs
     end
 
     def registries

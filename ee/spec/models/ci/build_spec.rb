@@ -519,6 +519,7 @@ RSpec.describe Ci::Build do
         }
       }
     end
+
     let(:build) { create(:ci_build, secrets: secrets) }
 
     subject { build.runner_required_feature_names }

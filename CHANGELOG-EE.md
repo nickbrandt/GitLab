@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.2.4 (2020-08-11)
+
+### Performance (1 change)
+
+- Preload all associations in Vulnerability GraphQL API. !38556
+
+
+## 13.2.3 (2020-08-05)
+
+- No changes.
+
 ## 13.2.2 (2020-07-29)
 
 - No changes.
@@ -372,6 +383,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Resolve duplicate use of shorcuts-tree. !36732
 
 
+## 13.1.6 (2020-08-05)
+
+- No changes.
+
 ## 13.1.5 (2020-07-23)
 
 ### Fixed (2 changes)
@@ -552,6 +567,14 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove optimized_elasticsearch_indexes_project feature flag. !33965
 - Relocate Go models. !34338 (Ethan Reesor (@firelizzard))
 
+
+## 13.0.12 (2020-08-05)
+
+- No changes.
+
+## 13.0.11 (2020-08-05)
+
+This version has been skipped due to packaging problems.
 
 ## 13.0.10 (2020-07-09)
 

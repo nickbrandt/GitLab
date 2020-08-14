@@ -154,7 +154,9 @@ export default {
 
       <gl-tab data-testid="policiesTab">
         <template #title>
-          <span data-testid="policiesTabTitle">{{ s__('Licenses|Policies') }}</span>
+          <span data-qa-selector="policies_tab" data-testid="policiesTabTitle">{{
+            s__('Licenses|Policies')
+          }}</span>
           <gl-badge pill>{{ policyCount }}</gl-badge>
         </template>
 

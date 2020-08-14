@@ -3,7 +3,7 @@
 module Geo
   class ContainerRepositoryRegistryFinder < RegistryFinder
     def count_syncable
-      current_node_non_fdw.container_repositories.count
+      container_repositories.count
     end
 
     def count_synced
@@ -19,7 +19,7 @@ module Geo
     end
 
     def find_registry_differences(range)
-      source_ids = current_node_non_fdw.container_repositories.id_in(range).pluck_primary_key
+      source_ids = container_repositories.id_in(range).pluck_primary_key
       tracked_ids = Geo::ContainerRepositoryRegistry.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
@@ -63,5 +63,11 @@ module Geo
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
+
+    private
+
+    def container_repositories
+      current_node.container_repositories
+    end
   end
 end

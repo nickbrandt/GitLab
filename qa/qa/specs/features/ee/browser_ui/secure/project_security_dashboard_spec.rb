@@ -60,10 +60,9 @@ module QA
       end
 
       it 'shows vulnerability details' do
+        Flow::Login.sign_in_unless_signed_in
         @project.visit!
-        Support::Retrier.retry_on_exception do
-          Page::Project::Menu.perform(&:click_on_security_dashboard)
-        end
+        Page::Project::Menu.perform(&:click_on_security_dashboard)
 
         EE::Page::Project::Secure::SecurityDashboard.perform do |security_dashboard|
           expect(security_dashboard).to have_vulnerability(description: vulnerability_name)

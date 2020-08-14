@@ -612,6 +612,62 @@ RSpec.describe Ci::Build do
     end
   end
 
+  describe '#available_artifacts?' do
+    let(:build) { create(:ci_build) }
+
+    subject { build.available_artifacts? }
+
+    context 'when artifacts are not expired' do
+      before do
+        build.artifacts_expire_at = Date.tomorrow
+      end
+
+      context 'when artifacts exist' do
+        before do
+          create(:ci_job_artifact, :archive, job: build)
+        end
+
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when artifacts do not exist' do
+        it { is_expected.to be_falsey }
+      end
+    end
+
+    context 'when artifacts are expired' do
+      before do
+        build.artifacts_expire_at = Date.yesterday
+      end
+
+      context 'when artifacts are not locked' do
+        before do
+          build.pipeline.locked = :unlocked
+        end
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'when artifacts are locked' do
+        before do
+          build.pipeline.locked = :artifacts_locked
+        end
+
+        context 'when artifacts exist' do
+          before do
+            create(:ci_job_artifact, :archive, job: build)
+          end
+
+          it { is_expected.to be_truthy }
+        end
+
+        context 'when artifacts do not exist' do
+          it { is_expected.to be_falsey }
+        end
+      end
+    end
+  end
+
   describe '#browsable_artifacts?' do
     subject { build.browsable_artifacts? }
 
@@ -2797,6 +2853,7 @@ RSpec.describe Ci::Build do
       let(:ci_registry) do
         { key: 'CI_REGISTRY', value: 'registry.example.com', public: true, masked: false }
       end
+
       let(:ci_registry_image) do
         { key: 'CI_REGISTRY_IMAGE', value: project.container_registry_url, public: true, masked: false }
       end
@@ -3051,6 +3108,14 @@ RSpec.describe Ci::Build do
       it 'inherits dependent variables' do
         expect(build.scoped_variables.to_hash).to include(job_variable.key => job_variable.value)
       end
+    end
+  end
+
+  describe '#simple_variables_without_dependencies' do
+    it 'does not load dependencies' do
+      expect(build).not_to receive(:dependency_variables)
+
+      build.simple_variables_without_dependencies
     end
   end
 

@@ -85,6 +85,31 @@ RSpec.describe MergeRequestsFinder do
         expect(merge_requests).to contain_exactly(merge_request5)
       end
 
+      context 'filters by merged_at date' do
+        before do
+          merge_request1.metrics.update!(merged_at: 5.days.ago)
+          merge_request2.metrics.update!(merged_at: 10.days.ago)
+        end
+
+        describe 'merged_after' do
+          subject { described_class.new(user, merged_after: 6.days.ago).execute }
+
+          it { is_expected.to eq([merge_request1]) }
+        end
+
+        describe 'merged_before' do
+          subject { described_class.new(user, merged_before: 6.days.ago).execute }
+
+          it { is_expected.to eq([merge_request2]) }
+        end
+
+        describe 'when both merged_after and merged_before is given' do
+          subject { described_class.new(user, merged_after: 15.days.ago, merged_before: 6.days.ago).execute }
+
+          it { is_expected.to eq([merge_request2]) }
+        end
+      end
+
       context 'filtering by group' do
         it 'includes all merge requests when user has access excluding merge requests from projects the user does not have access to' do
           private_project = allow_gitaly_n_plus_1 { create(:project, :private, group: group) }
@@ -335,9 +360,8 @@ RSpec.describe MergeRequestsFinder do
           let(:group_milestone) { create(:milestone, group: group) }
 
           before do
-            project2.update(namespace: group)
-            merge_request2.update(milestone: group_milestone)
-            merge_request3.update(milestone: group_milestone)
+            merge_request1.update!(milestone: group_milestone)
+            merge_request2.update!(milestone: group_milestone)
           end
 
           it 'returns merge requests assigned to that group milestone' do
@@ -345,7 +369,7 @@ RSpec.describe MergeRequestsFinder do
 
             merge_requests = described_class.new(user, params).execute
 
-            expect(merge_requests).to contain_exactly(merge_request2, merge_request3)
+            expect(merge_requests).to contain_exactly(merge_request1, merge_request2)
           end
 
           context 'using NOT' do
@@ -354,7 +378,7 @@ RSpec.describe MergeRequestsFinder do
             it 'returns MRs not assigned to that group milestone' do
               merge_requests = described_class.new(user, params).execute
 
-              expect(merge_requests).to contain_exactly(merge_request1, merge_request4, merge_request5)
+              expect(merge_requests).to contain_exactly(merge_request3, merge_request4, merge_request5)
             end
           end
         end

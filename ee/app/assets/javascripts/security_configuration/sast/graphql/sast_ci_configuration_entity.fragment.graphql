@@ -1,0 +1,8 @@
+fragment SastCiConfigurationEntityFragment on SastCiConfigurationEntity {
+  defaultValue
+  description
+  field
+  label
+  type
+  value
+}

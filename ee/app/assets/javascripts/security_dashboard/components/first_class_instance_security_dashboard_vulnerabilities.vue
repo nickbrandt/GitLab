@@ -4,6 +4,7 @@ import { fetchPolicies } from '~/lib/graphql';
 import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/instance_vulnerabilities.graphql';
 import { VULNERABILITIES_PER_PAGE } from '../store/constants';
+import { preparePageInfo } from '../helpers';
 
 export default {
   components: {
@@ -46,7 +47,7 @@ export default {
       update: ({ vulnerabilities }) => vulnerabilities.nodes,
       result({ data, loading }) {
         this.isFirstResultLoading = loading;
-        this.pageInfo = data.vulnerabilities.pageInfo;
+        this.pageInfo = preparePageInfo(data?.vulnerabilities?.pageInfo);
       },
       error() {
         this.errorLoadingVulnerabilities = true;

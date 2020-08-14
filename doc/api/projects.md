@@ -1832,16 +1832,16 @@ Example response:
 }
 ```
 
-## Remove project
+## Delete project
 
 This endpoint:
 
-- Removes a project including all associated resources (issues, merge requests etc).
+- Deletes a project including all associated resources (issues, merge requests etc).
 - From [GitLab 13.2](https://gitlab.com/gitlab-org/gitlab/-/issues/220382) on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers,
 group admins can [configure](../user/group/index.md#enabling-delayed-project-removal-premium) projects within a group
 to be deleted after a delayed period.
 When enabled, actual deletion happens after the number of days
-specified in the [default deletion period](../user/admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
+specified in the [default deletion delay](../user/admin_area/settings/visibility_and_access_controls.md#default-deletion-delay-premium-only).
 
 CAUTION: **Warning:**
 The default behavior of [Delayed Project deletion](https://gitlab.com/gitlab-org/gitlab/-/issues/32935) in GitLab 12.6
@@ -1985,6 +1985,7 @@ GET /projects/:id/hooks/:hook_id
   "job_events": true,
   "pipeline_events": true,
   "wiki_page_events": true,
+  "deployment_events": true,
   "enable_ssl_verification": true,
   "created_at": "2012-10-12T17:04:47Z"
 }
@@ -2013,6 +2014,7 @@ POST /projects/:id/hooks
 | `job_events` | boolean | no | Trigger hook on job events |
 | `pipeline_events` | boolean | no | Trigger hook on pipeline events |
 | `wiki_page_events` | boolean | no | Trigger hook on wiki events |
+| `deployment_events` | boolean | no | Trigger hook on deployment events |
 | `enable_ssl_verification` | boolean | no | Do SSL verification when triggering the hook |
 | `token` | string | no | Secret token to validate received payloads; this will not be returned in the response |
 
@@ -2040,6 +2042,7 @@ PUT /projects/:id/hooks/:hook_id
 | `job_events` | boolean | no | Trigger hook on job events |
 | `pipeline_events` | boolean | no | Trigger hook on pipeline events |
 | `wiki_events` | boolean | no | Trigger hook on wiki events |
+| `deployment_events` | boolean | no | Trigger hook on deployment events |
 | `enable_ssl_verification` | boolean | no | Do SSL verification when triggering the hook |
 | `token` | string | no | Secret token to validate received payloads; this will not be returned in the response |
 

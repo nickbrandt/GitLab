@@ -67,6 +67,7 @@ RSpec.describe Projects::DestroyService do
         expect_any_instance_of(Project)
           .to receive(:destroy!).and_raise(StandardError.new('Other error message'))
       end
+
       let(:attributes) do
         {
            author_id: user.id,

@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import Tracking from '~/tracking';
 import { s__ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
@@ -7,7 +7,7 @@ import LoadingButton from '~/vue_shared/components/loading_button.vue';
 export default {
   name: 'DismissalCommentModalFooter',
   components: {
-    GlDeprecatedButton,
+    GlButton,
     LoadingButton,
   },
   props: {
@@ -65,10 +65,9 @@ export default {
 
 <template>
   <div>
-    <gl-deprecated-button class="js-cancel" @click="$emit('cancel')">
+    <gl-button variant="default" category="primary" class="js-cancel" @click="$emit('cancel')">
       {{ __('Cancel') }}
-    </gl-deprecated-button>
-
+    </gl-button>
     <loading-button
       :loading="isDismissingVulnerability"
       :disabled="isDismissingVulnerability"

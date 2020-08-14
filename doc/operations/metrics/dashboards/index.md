@@ -8,7 +8,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/59974) in GitLab 12.1.
 
-By default, all projects include a GitLab-defined Prometheus dashboard, which
+By default, all projects include a [GitLab-defined Prometheus dashboard](default.md), which
 includes a few key metrics, but you can also define your own custom dashboards.
 
 You may create a [new dashboard from scratch](#add-a-new-dashboard-to-your-project)
@@ -20,21 +20,21 @@ The metrics as defined below do not support alerts, unlike
 
 ## Add a new dashboard to your project
 
-> UI option [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/223204) in GitLab 13.2.
+> UI option [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/228856) in GitLab 13.3.
 
 You can configure a custom dashboard by adding a new YAML file into your project's
 `.gitlab/dashboards/` directory. For the dashboard to display on your project's
-**{cloud-gear}** **Operations > Metrics** page, the files must have a `.yml`
+**Operations > Metrics** page, the files must have a `.yml`
 extension and be present in your project's **default** branch.
 
 To create a new dashboard from the GitLab user interface:
 
 1. Sign in to GitLab as a user with Maintainer or Owner
    [permissions](../../../user/permissions.md#project-members-permissions).
-1. Navigate to your dashboard at **{cloud-gear}** **Operations > Metrics**.
-1. In the top-right corner of your dashboard, click the **{file-addition-solid}** **Actions** menu,
+1. Navigate to your dashboard at **Operations > Metrics**.
+1. In the top-right corner of your dashboard, click the **{ellipsis_v}** **More actions** menu,
    and select **Create new**:
-   ![Monitoring Dashboard actions menu with create new item](img/actions_menu_create_new_dashboard_v13_2.png)
+   ![Monitoring Dashboard actions menu with create new item](img/actions_menu_create_new_dashboard_v13_3.png)
 1. In the modal window, click **Open Repository**, then follow the instructions
    for creating a new dashboard from the command line.
 
@@ -73,6 +73,28 @@ NOTE: **Note:**
 Configuration files nested under subdirectories of `.gitlab/dashboards` are not
 supported and won't be available in the UI.
 
+## Add a new metrics panel to a dashboard
+
+> UI option [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/228761) in GitLab 13.3.
+
+The metrics dashboard supports various [multiple panel types](../../../operations/metrics/dashboards/panel_types.md).
+You can quickly test how a panel configuration would display in your metrics dashboard
+with the **Add Panel** page:
+
+1. Sign in to GitLab as a user with Maintainer or Owner
+   [permissions](../../../user/permissions.md#project-members-permissions).
+1. Click **Add panel** in the **{ellipsis_v}** **More actions** menu.
+
+   NOTE: **Note:**
+   You can add panel only to custom dashboards.
+
+   ![Monitoring Dashboard actions menu with add panel item](img/actions_menu_create_add_panel_v13_3.png)
+1. In the **Define and preview panel** section, paste in the YAML you want to
+   preview in the **Panel YAML** field.
+1. Click **Preview panel**, and GitLab displays a preview of the chart below the
+   `Define and preview panel` section:
+   ![Monitoring Dashboard Add Panel page](img/metrics_dashboard_panel_preview_v13_3.png)
+
 ## Duplicate a GitLab-defined dashboard
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/37238) in GitLab 12.7.
@@ -83,7 +105,7 @@ The resulting `.yml` file can be customized and adapted to your project.
 You can decide to save the dashboard `.yml` file in the project's **default** branch or in a
 new branch.
 
-1. Click **Duplicate dashboard** in the actions menu.
+1. Click **Duplicate current dashboard** in the **{ellipsis_v}** **More actions** menu.
 
    NOTE: **Note:**
    You can duplicate only GitLab-defined dashboards.
@@ -101,12 +123,12 @@ Your custom dashboard is available at `https://example.com/project/-/metrics/cus
 
 To manage the settings for your metrics dashboard:
 
-1. Sign in as a user with project Maintainer or Admin
+1. Sign in as a user with project Maintainer or Administrator
    [permissions](../../../user/permissions.md#project-members-permissions).
-1. Navigate to your dashboard at **{cloud-gear}** **Operations > Metrics**.
+1. Navigate to your dashboard at **Operations > Metrics**.
 1. In the top-right corner of your dashboard, click **Metrics Settings**:
 
-   ![Monitoring Dashboard actions menu with create new item](img/metrics_settings_button_v13_2.png)
+   ![Monitoring Dashboard actions menu with create new item](img/metrics_settings_button_v13_3.png)
 
 ## Chart Context Menu
 
@@ -114,7 +136,7 @@ You can take action related to a chart's data by clicking the
 **{ellipsis_v}** **More actions** dropdown box above the upper right corner of
 any chart on a dashboard:
 
-![Context Menu](img/panel_context_menu_v13_0.png)
+![Context Menu](img/panel_context_menu_v13_3.png)
 
 The options are:
 
@@ -126,7 +148,10 @@ The options are:
   feature, logs narrow down to the selected time range. ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/122013) in GitLab 12.8.)
 - **Download CSV** - Data from Prometheus charts on the metrics dashboard can be downloaded as CSV.
 - [Copy link to chart](../embed.md#embedding-gitlab-managed-kubernetes-metrics)
-- [Alerts](../alerts.md)
+- **Alerts** - Display any [alerts](../alerts.md) configured for this metric.
+- **View Runbook** - Displays the runbook for an alert. For information about configuring
+  runbooks, read [Set up alerts for Prometheus metrics](../alerts.md).
+  ([Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/211844) in GitLab 13.3.)
 
 ### Timeline zoom and URL sharing
 

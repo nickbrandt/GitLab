@@ -110,14 +110,6 @@ module Vulnerabilities
         .where(vulnerability_occurrence_pipelines: { pipeline_id: pipelines })
     end
 
-    def self.count_by_day_and_severity(period)
-      joins(:finding_pipelines)
-        .select('CAST(vulnerability_occurrence_pipelines.created_at AS DATE) AS day', :severity, 'COUNT(distinct vulnerability_occurrences.id) as count')
-        .where(['vulnerability_occurrence_pipelines.created_at >= ?', Time.zone.now.beginning_of_day - period])
-        .group(:day, :severity)
-        .order('day')
-    end
-
     def self.counted_by_severity
       group(:severity).count.transform_keys do |severity|
         SEVERITY_LEVELS[severity]
@@ -292,6 +284,12 @@ module Vulnerabilities
 
     # Array.difference (-) method uses hash and eql? methods to do comparison
     def hash
+      # This is causing N+1 queries whenever we are calling findings, ActiveRecord uses #hash method to make sure the
+      # array with findings is uniq before preloading. This method is used only in Gitlab::Ci::Reports::Security::VulnerabilityReportsComparer
+      # where we are normalizing security report findings into instances of Vulnerabilities::Finding, this is why we are using original implementation
+      # when Finding is persisted and identifiers are not preloaded.
+      return super if persisted? && !identifiers.loaded?
+
       report_type.hash ^ location_fingerprint.hash ^ first_fingerprint.hash
     end
 

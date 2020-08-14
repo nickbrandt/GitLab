@@ -18,7 +18,7 @@ class NamespaceStatistics < ApplicationRecord
     limit = namespace.actual_shared_runners_minutes_limit(include_extra: false)
     extra_limit = namespace.extra_shared_runners_minutes_limit.to_i
 
-    return 0 if extra_limit.zero? || shared_runners_minutes <= limit
+    return 0 if extra_limit == 0 || shared_runners_minutes <= limit
 
     shared_runners_minutes - limit
   end

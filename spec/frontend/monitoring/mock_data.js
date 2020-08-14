@@ -1,3 +1,4 @@
+import invalidUrl from '~/lib/utils/invalid_url';
 // This import path needs to be relative for now because this mock data is used in
 // Karma specs too, where the helpers/test_constants alias can not be resolved
 import { TEST_HOST } from '../helpers/test_constants';
@@ -343,6 +344,11 @@ export const mockNamespaces = [`${baseNamespace}/1`, `${baseNamespace}/2`];
 
 export const mockTimeRange = { duration: { seconds: 120 } };
 
+export const mockFixedTimeRange = {
+  start: '2020-06-17T19:59:08.659Z',
+  end: '2020-07-17T19:59:08.659Z',
+};
+
 export const mockNamespacedData = {
   mockDeploymentData: ['mockDeploymentData'],
   mockProjectPath: '/mockProjectPath',
@@ -611,10 +617,28 @@ export const storeVariables = [
 
 export const dashboardHeaderProps = {
   defaultBranch: 'master',
-  addDashboardDocumentationPath: 'https://path/to/docs',
   isRearrangingPanels: false,
   selectedTimeRange: {
     start: '2020-01-01T00:00:00.000Z',
     end: '2020-01-01T01:00:00.000Z',
   },
+};
+
+export const dashboardActionsMenuProps = {
+  defaultBranch: 'master',
+  addingMetricsAvailable: true,
+  customMetricsPath: 'https://path/to/customMetrics',
+  validateQueryPath: 'https://path/to/validateQuery',
+  isOotbDashboard: true,
+};
+
+export const mockAlert = {
+  alert_path: 'alert_path',
+  id: 8,
+  metricId: 'mock_metric_id',
+  operator: '>',
+  query: 'testQuery',
+  runbookUrl: invalidUrl,
+  threshold: 5,
+  title: 'alert title',
 };

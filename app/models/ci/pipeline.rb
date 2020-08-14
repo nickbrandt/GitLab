@@ -83,6 +83,7 @@ module Ci
 
     has_many :daily_build_group_report_results, class_name: 'Ci::DailyBuildGroupReportResult', foreign_key: :last_pipeline_id
     has_many :latest_builds_report_results, through: :latest_builds, source: :report_results
+    has_many :pipeline_artifacts, class_name: 'Ci::PipelineArtifact', inverse_of: :pipeline, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
     accepts_nested_attributes_for :variables, reject_if: :persisted?
 
@@ -408,29 +409,13 @@ module Ci
 
     def legacy_stage(name)
       stage = Ci::LegacyStage.new(self, name: name)
-      stage unless stage.statuses_count.zero?
+      stage unless stage.statuses_count == 0
     end
 
     def ref_exists?
       project.repository.ref_exists?(git_ref)
     rescue Gitlab::Git::Repository::NoRepository
       false
-    end
-
-    def ordered_stages
-      if ::Gitlab::Ci::Features.atomic_processing?(project)
-        # The `Ci::Stage` contains all up-to date data
-        # as atomic processing updates all data in-bulk
-        stages
-      elsif complete?
-        # The `Ci::Stage` contains up-to date data only for `completed` pipelines
-        # this is due to asynchronous processing of pipeline, and stages possibly
-        # not updated inline with processing of pipeline
-        stages
-      else
-        # In other cases, we need to calculate stages dynamically
-        legacy_stages
-      end
     end
 
     def legacy_stages_using_sql
@@ -469,6 +454,7 @@ module Ci
       triggered_pipelines.preload(:source_job)
     end
 
+    # TODO: Remove usage of this method in templates
     def legacy_stages
       if ::Gitlab::Ci::Features.composite_status?(project)
         legacy_stages_using_composite_status
@@ -657,7 +643,7 @@ module Ci
     end
 
     def has_warnings?
-      number_of_warnings.positive?
+      number_of_warnings > 0
     end
 
     def number_of_warnings
@@ -820,7 +806,7 @@ module Ci
       return unless started_at
 
       seconds = (started_at - created_at).to_i
-      seconds unless seconds.zero?
+      seconds unless seconds == 0
     end
 
     def update_duration
@@ -911,12 +897,6 @@ module Ci
         latest_report_builds(Ci::JobArtifact.test_reports).preload(:project).find_each do |build|
           build.collect_test_reports!(test_reports)
         end
-      end
-    end
-
-    def test_reports_count
-      Rails.cache.fetch(['project', project.id, 'pipeline', id, 'test_reports_count'], force: false) do
-        test_reports.total_count
       end
     end
 
@@ -1051,10 +1031,6 @@ module Ci
 
     def persistent_ref
       @persistent_ref ||= PersistentRef.new(pipeline: self)
-    end
-
-    def find_successful_build_ids_by_names(names)
-      statuses.latest.success.where(name: names).pluck(:id)
     end
 
     def cacheable?

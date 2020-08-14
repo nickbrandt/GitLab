@@ -38,7 +38,7 @@ RSpec.describe GitlabSchema.types['Group'] do
     let_it_be(:query) do
       %(
         query {
-          group(fullPath:"#{group.full_path}") {
+          group(fullPath: "#{group.full_path}") {
             name
             vulnerabilities {
               nodes {

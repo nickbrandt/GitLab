@@ -188,5 +188,68 @@ RSpec.describe Ci::RegisterJobService do
         end
       end
     end
+
+    context 'secrets' do
+      let(:params) { { info: { features: { vault_secrets: true } } } }
+
+      subject(:service) { described_class.new(shared_runner) }
+
+      before do
+        stub_licensed_features(ci_secrets_management: true)
+      end
+
+      context 'when build has secrets defined' do
+        before do
+          pending_build.update!(
+            secrets: {
+              DATABASE_PASSWORD: {
+                vault: {
+                  engine: { name: 'kv-v2', path: 'kv-v2' },
+                  path: 'production/db',
+                  field: 'password'
+                }
+              }
+            }
+          )
+        end
+
+        context 'when there is no Vault server provided' do
+          it 'does not pick the build and drops the build' do
+            result = service.execute(params).build
+
+            aggregate_failures do
+              expect(result).to be_nil
+              expect(pending_build.reload).to be_failed
+              expect(pending_build.failure_reason).to eq('secrets_provider_not_found')
+              expect(pending_build).to be_secrets_provider_not_found
+            end
+          end
+        end
+
+        context 'when there is Vault server provided' do
+          it 'picks the build' do
+            create(:ci_variable, project: project, key: 'VAULT_SERVER_URL', value: 'https://vault.example.com')
+
+            build = service.execute(params).build
+
+            aggregate_failures do
+              expect(build).not_to be_nil
+              expect(build).to be_running
+            end
+          end
+        end
+      end
+
+      context 'when build has no secrets defined' do
+        it 'picks the build' do
+          build = service.execute(params).build
+
+          aggregate_failures do
+            expect(build).not_to be_nil
+            expect(build).to be_running
+          end
+        end
+      end
+    end
   end
 end

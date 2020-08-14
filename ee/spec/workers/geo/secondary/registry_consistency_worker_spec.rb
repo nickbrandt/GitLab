@@ -85,6 +85,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
       upload = create(:upload)
       package_file = create(:conan_package_file, :conan_package)
       container_repository = create(:container_repository, project: project)
+      terraform_state = create(:terraform_state, project: project)
 
       expect(Geo::LfsObjectRegistry.where(lfs_object_id: lfs_object.id).count).to eq(0)
       expect(Geo::JobArtifactRegistry.where(artifact_id: job_artifact.id).count).to eq(0)
@@ -93,6 +94,7 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
       expect(Geo::UploadRegistry.where(file_id: upload.id).count).to eq(0)
       expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(0)
       expect(Geo::ContainerRepositoryRegistry.where(container_repository_id: container_repository.id).count).to eq(0)
+      expect(Geo::TerraformStateRegistry.where(terraform_state_id: terraform_state.id).count).to eq(0)
 
       subject.perform
 
@@ -103,6 +105,24 @@ RSpec.describe Geo::Secondary::RegistryConsistencyWorker, :geo do
       expect(Geo::UploadRegistry.where(file_id: upload.id).count).to eq(1)
       expect(Geo::PackageFileRegistry.where(package_file_id: package_file.id).count).to eq(1)
       expect(Geo::ContainerRepositoryRegistry.where(container_repository_id: container_repository.id).count).to eq(1)
+      expect(Geo::TerraformStateRegistry.where(terraform_state_id: terraform_state.id).count).to eq(1)
+    end
+
+    context 'when geo_terraform_state_replication is disabled' do
+      before do
+        stub_feature_flags(geo_terraform_state_replication: false)
+      end
+
+      it 'returns false' do
+        expect(subject.perform).to be_falsey
+      end
+
+      it 'does not execute RegistryConsistencyService for terraform states' do
+        allow(Geo::RegistryConsistencyService).to receive(:new).and_call_original
+        expect(Geo::RegistryConsistencyService).not_to receive(:new).with(Geo::TerraformStateRegistry, batch_size: batch_size)
+
+        subject.perform
+      end
     end
 
     context 'when the current Geo node is disabled or primary' do

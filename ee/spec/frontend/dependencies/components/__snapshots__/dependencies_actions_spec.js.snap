@@ -56,17 +56,19 @@ exports[`DependenciesActions component matches the snapshot 1`] = `
       </gl-deprecated-dropdown-item-stub>
     </gl-deprecated-dropdown-stub>
      
-    <gl-deprecated-button-stub
+    <gl-button-stub
+      category="tertiary"
       class="flex-grow-0 js-sort-order"
-      size="md"
+      icon=""
+      size="medium"
       title="Sort direction"
-      variant="secondary"
+      variant="default"
     >
       <gl-icon-stub
         name="sort-lowest"
         size="16"
       />
-    </gl-deprecated-button-stub>
+    </gl-button-stub>
   </div>
    
   <gl-button-stub

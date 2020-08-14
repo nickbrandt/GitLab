@@ -5,23 +5,24 @@ export const I18N = {
   noIncidents: s__('IncidentManagement|No incidents to display.'),
   unassigned: s__('IncidentManagement|Unassigned'),
   createIncidentBtnLabel: s__('IncidentManagement|Create incident'),
-  searchPlaceholder: __('Search or filter results...'),
+  unPublished: s__('IncidentManagement|Unpublished'),
+  searchPlaceholder: __('Search results…'),
 };
 
-export const INCIDENT_STATE_TABS = [
+export const INCIDENT_STATUS_TABS = [
   {
     title: s__('IncidentManagement|Open'),
-    state: 'OPENED',
+    status: 'OPENED',
     filters: 'opened',
   },
   {
     title: s__('IncidentManagement|Closed'),
-    state: 'CLOSED',
+    status: 'CLOSED',
     filters: 'closed',
   },
   {
-    title: s__('IncidentManagement|All incidents'),
-    state: 'ALL',
+    title: s__('IncidentManagement|All'),
+    status: 'ALL',
     filters: 'all',
   },
 ];

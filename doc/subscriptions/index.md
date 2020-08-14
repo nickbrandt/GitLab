@@ -76,7 +76,7 @@ Every occupied seat, whether by person, job, or bot is counted in the subscripti
 renewal of a subscription won't be counted as active users for the renewal subscription. They may
 count as active users in the subscription period in which they were originally added.
 - Members with Guest permissions on an Ultimate subscription.
-- GitLab-created service accounts: `Ghost User` and `Support Bot`.
+- GitLab-created service accounts: `Ghost User`, `Support Bot` and [`Project bot users`](../user/project/settings/project_access_tokens.md#project-bot-users).
 
 ##### Users statistics
 
@@ -125,6 +125,19 @@ TIP: **Tip:**
 If you're purchasing a subscription for an existing **Core** self-managed
 instance, ensure you're purchasing enough seats to
 [cover your users](../user/admin_area/index.md#administering-users).
+
+### Credit card declined
+
+If your credit card is declined when purchasing a GitLab subscription, possible reasons include:
+
+- The credit card details provided are incorrect.
+- The credit card account has insufficient funds.
+- You are using a virtual credit card and it has insufficient funds, or has expired.
+- The transaction exceeds the credit limit.
+- The transaction exceeds the credit card's maximum transaction amount.
+
+Check with your financial institution to confirm if any of these reasons apply. If they don't
+apply, contact [GitLab Support](https://support.gitlab.com/hc/en-us/requests/new?ticket_form_id=360000071293).
 
 ## Manage your GitLab account
 

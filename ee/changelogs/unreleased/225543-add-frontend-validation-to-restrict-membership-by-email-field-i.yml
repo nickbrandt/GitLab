@@ -1,0 +1,5 @@
+---
+title: Add frontend validation to "Restrict membership by email domain" field
+merge_request: 38348
+author:
+type: changed

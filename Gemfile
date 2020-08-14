@@ -144,7 +144,7 @@ gem 'deckar01-task_list', '2.3.1'
 gem 'gitlab-markup', '~> 1.7.1'
 gem 'github-markup', '~> 1.7.0', require: 'github/markup'
 gem 'commonmarker', '~> 0.20'
-gem 'kramdown', '~> 2.2.1'
+gem 'kramdown', '~> 2.3.0'
 gem 'RedCloth', '~> 4.3.2'
 gem 'rdoc', '~> 6.1.2'
 gem 'org-ruby', '~> 0.9.12'
@@ -464,9 +464,9 @@ end
 # Gitaly GRPC protocol definitions
 gem 'gitaly', '~> 13.3.0-rc1'
 
-gem 'grpc', '~> 1.24.0'
+gem 'grpc', '~> 1.30.2'
 
-gem 'google-protobuf', '~> 3.8.0'
+gem 'google-protobuf', '~> 3.12'
 
 gem 'toml-rb', '~> 1.0.0'
 
@@ -507,5 +507,7 @@ gem 'valid_email', '~> 0.1'
 # JSON
 gem 'json', '~> 2.3.0'
 gem 'json-schema', '~> 2.8.0'
+gem 'json_schemer', '~> 0.2.12'
 gem 'oj', '~> 3.10.6'
 gem 'multi_json', '~> 1.14.1'
+gem 'yajl-ruby', '~> 1.4.1', require: 'yajl'

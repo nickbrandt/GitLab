@@ -22,6 +22,8 @@ RSpec.describe 'Group Value Stream Analytics', :js do
   stage_nav_selector = '.stage-nav'
   path_nav_selector = '.js-path-navigation'
   filter_bar_selector = '.js-filter-bar'
+  duration_stage_selector = '.js-dropdown-stages'
+  value_stream_selector = '[data-testid="dropdown-value-streams"]'
 
   3.times do |i|
     let_it_be("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
@@ -176,16 +178,22 @@ RSpec.describe 'Group Value Stream Analytics', :js do
     end
   end
 
-  context 'with filter bar feature flag disabled' do
+  # Adding this context as part of a fix for https://gitlab.com/gitlab-org/gitlab/-/issues/233439
+  # This can be removed when the feature flag is removed
+  context 'create multiple value streams disabled' do
     before do
-      stub_feature_flags(value_stream_analytics_filter_bar: false)
+      stub_feature_flags(value_stream_analytics_create_multiple_value_streams: false)
 
       visit analytics_cycle_analytics_path
       select_group
     end
 
-    it 'does not show the filter bar' do
-      expect(page).not_to have_selector(filter_bar_selector)
+    it 'displays the list of stages' do
+      expect(page).to have_selector(stage_nav_selector, visible: true)
+    end
+
+    it 'displays the duration chart' do
+      expect(page).to have_selector(duration_stage_selector, visible: true)
     end
   end
 
@@ -962,7 +970,7 @@ RSpec.describe 'Group Value Stream Analytics', :js do
       end
 
       context 'Duration chart' do
-        let(:duration_chart_dropdown) { page.find('.js-dropdown-stages') }
+        let(:duration_chart_dropdown) { page.find(duration_stage_selector) }
 
         let_it_be(:translated_default_stage_names) do
           Gitlab::Analytics::CycleAnalytics::DefaultStages.names.map do |name|
@@ -1011,6 +1019,11 @@ RSpec.describe 'Group Value Stream Analytics', :js do
 
   describe 'Create value stream', :js do
     let(:custom_value_stream_name) { "Test value stream" }
+    let(:value_stream_dropdown) { page.find(value_stream_selector) }
+
+    def toggle_value_stream_dropdown
+      value_stream_dropdown.click
+    end
 
     before do
       visit analytics_cycle_analytics_path
@@ -1019,6 +1032,8 @@ RSpec.describe 'Group Value Stream Analytics', :js do
     end
 
     it 'can create a value stream' do
+      toggle_value_stream_dropdown
+
       page.find_button(_('Create new Value Stream')).click
 
       fill_in 'create-value-stream-name', with: custom_value_stream_name

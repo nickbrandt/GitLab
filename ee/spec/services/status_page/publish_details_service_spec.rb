@@ -9,7 +9,7 @@ RSpec.describe StatusPage::PublishDetailsService do
   let(:user_notes) { [] }
   let(:incident_id) { 1 }
   let(:issue) { instance_double(Issue, notes: user_notes, description: 'Incident Occuring', iid: incident_id) }
-  let(:key) { StatusPage::Storage.details_path(incident_id) }
+  let(:key) { Gitlab::StatusPage::Storage.details_path(incident_id) }
   let(:content) { { id: incident_id } }
 
   let(:service) { described_class.new(project: project) }

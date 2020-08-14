@@ -123,7 +123,7 @@ RSpec.describe ::SystemNotes::IssuablesService do
     subject { service.change_iteration(iteration) }
 
     context 'for a project iteration' do
-      let(:iteration) { create(:iteration, project: project) }
+      let(:iteration) { create(:iteration, :skip_project_validation, project: project) }
 
       it_behaves_like 'a system note' do
         let(:action) { 'iteration' }

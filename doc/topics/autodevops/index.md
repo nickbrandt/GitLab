@@ -104,8 +104,10 @@ knowledge of the following:
 - [GitLab Runner](https://docs.gitlab.com/runner/)
 - [Prometheus](https://prometheus.io/docs/introduction/overview/)
 
-Auto DevOps provides great defaults for all the stages and makes use of [CI templates](https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates); you can, however,
-[customize](customize.md) almost everything to your needs.
+Auto DevOps provides great defaults for all the stages and makes use of
+[CI templates](https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates). You can, however,
+[customize](customize.md) almost everything to your needs, and
+[manage Auto DevOps with GitLab APIs](customize.md#extend-auto-devops-with-the-api).
 
 For an overview on the creation of Auto DevOps, read more
 [in this blog post](https://about.gitlab.com/blog/2017/06/29/whats-next-for-gitlab-ci/).
@@ -276,14 +278,14 @@ The following table is an example of how to configure the three different cluste
 
 To add a different cluster for each environment:
 
-1. Navigate to your project's **{cloud-gear}** **Operations > Kubernetes**.
+1. Navigate to your project's **Operations > Kubernetes**.
 1. Create the Kubernetes clusters with their respective environment scope, as
    described from the table above.
 1. After creating the clusters, navigate to each cluster and install
    Ingress. Wait for the Ingress IP address to be assigned.
 1. Make sure you've [configured your DNS](#auto-devops-base-domain) with the
    specified Auto DevOps domains.
-1. Navigate to each cluster's page, through **{cloud-gear}** **Operations > Kubernetes**,
+1. Navigate to each cluster's page, through **Operations > Kubernetes**,
    and add the domain based on its Ingress IP address.
 
 After completing configuration, you can test your setup by creating a merge request

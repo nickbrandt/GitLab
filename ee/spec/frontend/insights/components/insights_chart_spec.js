@@ -9,6 +9,7 @@ import {
 } from 'ee_jest/insights/mock_data';
 import InsightsChart from 'ee/insights/components/insights_chart.vue';
 import InsightsChartError from 'ee/insights/components/insights_chart_error.vue';
+import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import { CHART_TYPES } from 'ee/insights/constants';
 
 describe('Insights chart component', () => {
@@ -22,6 +23,20 @@ describe('Insights chart component', () => {
 
   afterEach(() => {
     wrapper.destroy();
+  });
+
+  describe('when chart is loading', () => {
+    it('displays the chart loader', () => {
+      wrapper = factory({
+        loaded: false,
+        type: CHART_TYPES.BAR,
+        title: chartInfo.title,
+        data: null,
+        error: '',
+      });
+
+      expect(wrapper.contains(ChartSkeletonLoader)).toBe(true);
+    });
   });
 
   describe('when chart is loaded', () => {

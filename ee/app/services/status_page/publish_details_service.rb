@@ -36,7 +36,7 @@ module StatusPage
       id = json[:id]
       return unless id
 
-      StatusPage::Storage.details_path(id)
+      Gitlab::StatusPage::Storage.details_path(id)
     end
 
     def publish_attachments(issue, user_notes)

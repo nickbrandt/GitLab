@@ -6,11 +6,21 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
-        field :securityScanners, ::Types::SecurityScanners, null: true,
+        field :security_scanners, ::Types::SecurityScanners, null: true,
           description: 'Information about security analyzers used in the project',
           resolve: -> (project, _args, ctx) do
             project
           end
+
+        field :dast_scanner_profiles,
+            ::Types::DastScannerProfileType.connection_type,
+            null: true,
+            description: 'The DAST scanner profiles associated with the project',
+            resolve: -> (project, _args, _ctx) do
+              return DastScannerProfile.none unless ::Feature.enabled?(:security_on_demand_scans_feature_flag, project)
+
+              project.dast_scanner_profiles
+            end
 
         field :vulnerabilities,
               ::Types::VulnerabilityType.connection_type,
@@ -26,11 +36,7 @@ module EE
 
         field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
                description: 'Counts for each severity of vulnerability of the project',
-               resolve: -> (obj, _args, ctx) do
-                 Hash.new(0).merge(
-                   obj.vulnerabilities.with_states([:detected, :confirmed]).counts_by_severity
-                 )
-               end
+               resolve: -> (obj, *) { obj.vulnerability_statistic || Hash.new(0) }
 
         field :requirement, ::Types::RequirementsManagement::RequirementType, null: true,
               description: 'Find a single requirement. Available only when feature flag `requirements_management` is enabled.',
@@ -63,6 +69,12 @@ module EE
         field :iterations, ::Types::IterationType.connection_type, null: true,
               description: 'Find iterations',
               resolver: ::Resolvers::IterationsResolver
+
+        field :dast_site_profiles,
+              ::Types::DastSiteProfileType.connection_type,
+              null: true,
+              description: 'DAST Site Profiles associated with the project',
+              resolve: -> (obj, _args, _ctx) { obj.dast_site_profiles.with_dast_site }
 
         def self.requirements_available?(project, user)
           ::Feature.enabled?(:requirements_management, project, default_enabled: true) && Ability.allowed?(user, :read_requirement, project)

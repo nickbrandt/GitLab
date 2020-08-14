@@ -76,6 +76,21 @@ describe('Cycle analytics mutations', () => {
     },
   );
 
+  describe(`${types.RECEIVE_VALUE_STREAMS_SUCCESS}`, () => {
+    const dummyValueStream = { id: 3, name: 'A new value stream' };
+    const sorted = [dummyValueStream, valueStreams[0], valueStreams[1]];
+    it('will sort the value streams alphabetically', () => {
+      state = { valueStreams: [] };
+      mutations[types.RECEIVE_VALUE_STREAMS_SUCCESS](state, [
+        valueStreams[1],
+        valueStreams[0],
+        dummyValueStream,
+      ]);
+
+      expect(state.valueStreams).toEqual(sorted);
+    });
+  });
+
   describe('with value streams available', () => {
     it.each`
       mutation                           | payload               | expectedState

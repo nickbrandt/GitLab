@@ -123,8 +123,6 @@ RSpec.describe Groups::SecurityFeaturesHelper do
   describe '#group_level_security_dashboard_data' do
     let(:expected_data) do
       {
-        vulnerabilities_endpoint: "/groups/#{group.full_path}/-/security/vulnerability_findings",
-        vulnerabilities_history_endpoint: "/groups/#{group.full_path}/-/security/vulnerability_findings/history",
         projects_endpoint: "http://localhost/api/v4/groups/#{group.id}/projects",
         group_full_path: group.full_path,
         no_vulnerabilities_svg_path: '/images/illustrations/issues.svg',

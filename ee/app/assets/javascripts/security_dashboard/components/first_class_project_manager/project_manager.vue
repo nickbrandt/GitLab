@@ -21,7 +21,8 @@ export default {
   props: {
     isManipulatingProjects: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: false,
     },
     projects: {
       type: Array,
@@ -126,7 +127,7 @@ export default {
         .then(() => {
           this.$emit('handleProjectManipulation', false);
         })
-        .catch(() => createFlash(__('Something went wrong, unable to remove project')));
+        .catch(() => createFlash(__('Something went wrong, unable to delete project')));
     },
     searched(query) {
       this.searchQuery = query;

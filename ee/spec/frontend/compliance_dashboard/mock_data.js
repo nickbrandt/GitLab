@@ -13,7 +13,7 @@ const createUser = id => ({
   web_url: `http://localhost:3000/user-${id}`,
 });
 
-export const createMergeRequest = ({ id = 1, pipeline, approvers, approvalStatus } = {}) => {
+export const createMergeRequest = ({ id = 1, props } = {}) => {
   const mergeRequest = {
     id,
     approved_by_users: [],
@@ -26,19 +26,7 @@ export const createMergeRequest = ({ id = 1, pipeline, approvers, approvalStatus
 
   mergeRequest.author = createUser(id);
 
-  if (pipeline) {
-    mergeRequest.pipeline_status = pipeline;
-  }
-
-  if (approvers) {
-    mergeRequest.approved_by_users = approvers;
-  }
-
-  if (approvalStatus) {
-    mergeRequest.approval_status = approvalStatus;
-  }
-
-  return mergeRequest;
+  return { ...mergeRequest, ...props };
 };
 
 export const createPipelineStatus = status => ({
@@ -59,14 +47,13 @@ export const createApprovers = count => {
     .map((_, id) => createUser(id));
 };
 
-export const createMergeRequests = ({ count = 1, options = {} } = {}) => {
+export const createMergeRequests = ({ count = 1, props = {} } = {}) => {
   return Array(count)
     .fill()
     .map((_, id) =>
       createMergeRequest({
         id,
-        approvalStatus: options.approvalStatus,
-        pipeline: options.addPipeline ? createPipelineStatus('success') : null,
+        props,
       }),
     );
 };

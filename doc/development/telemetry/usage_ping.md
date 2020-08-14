@@ -155,7 +155,7 @@ There are two batch counting methods provided, `Ordinary Batch Counters` and `Di
 
 Handles `ActiveRecord::StatementInvalid` error
 
-Simple count of a given ActiveRecord_Relation
+Simple count of a given ActiveRecord_Relation, does a non-distinct batch count, smartly reduces batch_size and handles errors.
 
 Method: `count(relation, column = nil, batch: true, start: nil, finish: nil)`
 
@@ -179,15 +179,16 @@ count(::Clusters::Cluster.aws_installed.enabled, :cluster_id, start: ::Clusters:
 
 Handles `ActiveRecord::StatementInvalid` error
 
-Distinct count of a given ActiveRecord_Relation on given column
+Distinct count of a given ActiveRecord_Relation on given column, a distinct batch count, smartly reduces batch_size and handles errors.
 
-Method: `distinct_count(relation, column = nil, batch: true, start: nil, finish: nil)`
+Method: `distinct_count(relation, column = nil, batch: true, batch_size: nil, start: nil, finish: nil)`
 
 Arguments:
 
 - `relation` the ActiveRecord_Relation to perform the count
 - `column` the column to perform the distinct count, by default is the primary key
 - `batch`: default `true` in order to use batch counting
+- `batch_size`: if none set it will use default value 10000 from `Gitlab::Database::BatchCounter`
 - `start`: custom start of the batch counting in order to avoid complex min calculations
 - `end`: custom end of the batch counting in order to avoid complex min calculations
 
@@ -212,11 +213,47 @@ Arguments:
 - `counter`: a counter from `Gitlab::UsageDataCounters`, that has `fallback_totals` method implemented
 - or a `block`: which is evaluated
 
+#### Ordinary Redis Counters
+
+Examples of implementation:
+
+- Using Redis methods [`INCR`](https://redis.io/commands/incr), [`GET`](https://redis.io/commands/get), and [`Gitlab::UsageDataCounters::WikiPageCounter`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data_counters/wiki_page_counter.rb)
+- Using Redis methods [`HINCRBY`](https://redis.io/commands/hincrby), [`HGETALL`](https://redis.io/commands/hgetall), and [`Gitlab::UsageCounters::PodLogs`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_counters/pod_logs.rb)
+
+#### Redis HLL Counters
+
+With `Gitlab::Redis::HLL` we have available data structures used to count unique values.
+
+Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PFCOUNT](https://redis.io/commands/pfcount).
+
+Recommendations:
+
+- Key should expire in 29 days.
+- If possible, data granularity should be a week. For example a key could be composed from the metric's name and week of the year, `2020-33-{metric_name}`.
+- Use a [feature flag](../../operations/feature_flags.md) in order to have a control over the impact when adding new metrics.
+- If possible, data granularity should be week, for example a key could be composed from metric name and week of the year, 2020-33-{metric_name}
+- Use a [feature flag](../../operations/feature_flags.md) in order to have a control over the impact when adding new metrics
+
+Examples of implementation:
+
+- [`Gitlab::UsageDataCounters::TrackUniqueActions`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data_counters/track_unique_actions.rb)
+- [`Gitlab::Analytics::UniqueVisits`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/analytics/unique_visits.rb)
+
 Example of usage:
 
 ```ruby
+# Redis Counters
 redis_usage_data(Gitlab::UsageDataCounters::WikiPageCounter)
 redis_usage_data { ::Gitlab::UsageCounters::PodLogs.usage_totals[:total] }
+
+# Redis HLL counter
+counter = Gitlab::UsageDataCounters::TrackUniqueActions
+redis_usage_data do
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::PUSH_ACTION,
+            date_from: time_period[:created_at].first,
+            date_to: time_period[:created_at].last
+          )
 ```
 
 Note that Redis counters are in the [process of being deprecated](https://gitlab.com/gitlab-org/gitlab/-/issues/216330) and you should instead try to use Snowplow events instead. We're in the process of building [self-managed event tracking](https://gitlab.com/gitlab-org/telemetry/-/issues/373) and once this is available, we will convert all Redis counters into Snowplow events.
@@ -318,6 +355,7 @@ We also use `#database-lab` and [explain.depesz.com](https://explain.depesz.com/
 - Use specialized indexes [example 1](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/26871), [example 2](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/26445).
 - Use defined `start` and `finish`, and simple queries, because these values can be memoized and reused, [example](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/37155).
 - Avoid joins and write the queries as simply as possible, [example](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/36316).
+- Set a custom `batch_size` for `distinct_count`, [example](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/38000).
 
 ### 4. Add the metric definition
 
@@ -340,6 +378,10 @@ Ensure you comply with the [Changelog entries guide](../changelog.md).
 ### 8. Ask for a Telemetry Review
 
 On GitLab.com, we have DangerBot setup to monitor Telemetry related files and DangerBot will recommend a Telemetry review. Mention `@gitlab-org/growth/telemetry/engineers` in your MR for a review.
+
+### 9. Verify your metric
+
+On GitLab.com, the Product Analytics team regularly monitors Usage Ping. They may alert you that your metrics need further optimization to run quicker and with greater success. You may also use the [Usage Ping QA dashboard](https://app.periscopedata.com/app/gitlab/632033/Usage-Ping-QA) to check how well your metric performs. The dashboard allows filtering by GitLab version, by "Self-managed" & "Saas" and shows you how many failures have occurred for each metric. Whenever you notice a high failure rate, you may re-optimize your metric.
 
 ### Optional: Test Prometheus based Usage Ping
 
@@ -591,7 +633,9 @@ The following is example content of the Usage Ping payload.
     "nodes": [
       {
         "node_memory_total_bytes": 33269903360,
+        "node_memory_utilization": 0.35,
         "node_cpus": 16,
+        "node_cpu_utilization": 0.2,
         "node_uname_info": {
           "machine": "x86_64",
           "sysname": "Linux",

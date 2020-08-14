@@ -19,10 +19,6 @@
         @include gl-relative;
       }
 
-      .sortable-cell {
-        padding-left: calc(0.75rem + 0.65em);
-      }
-
       th {
         @include gl-bg-transparent;
         @include gl-font-weight-bold;
@@ -42,6 +38,10 @@
           }
         }
       }
+
+      .sortable-cell {
+        padding-left: calc(0.75rem + 0.65em);
+      }
     }
   }
 
@@ -57,6 +57,11 @@
         &:hover {
           @include gl-bg-white;
           @include gl-border-none;
+        }
+
+        th,
+        td {
+          @include gl-pt-6;
         }
       }
 
@@ -76,26 +81,55 @@
           }
         }
       }
+
+      .b-table-empty-row {
+        td {
+          @include gl-border-b-0;
+
+          div {
+            text-align: unset !important;
+          }
+        }
+      }
+
+      .b-table-busy-slot {
+        td {
+          @include gl-border-b-0;
+
+          div {
+            text-align: center !important;
+          }
+        }
+      }
     }
   }
 
-  .gl-tab-nav-item {
-    color: $gl-gray-600;
+  .gl-tabs-nav {
+    border-bottom-width: 0;
 
-    > .gl-tab-counter-badge {
-      color: inherit;
-      @include gl-font-sm;
-      background-color: $white-normal;
+    .gl-tab-nav-item {
+      color: $gl-gray-600;
+
+      > .gl-tab-counter-badge {
+        color: inherit;
+        @include gl-font-sm;
+        background-color: $gray-50;
+      }
     }
   }
 
   @include media-breakpoint-down(xs) {
     .incident-management-list-header {
       flex-direction: column-reverse;
-    };
+    }
 
     .create-incident-button {
       @include gl-w-full;
     }
+  }
+
+  // TODO: Abstract to `@gitlab/ui` utility set: https://gitlab.com/gitlab-org/gitlab-ui/-/issues/921
+  .gl-fill-green-500 {
+    fill: $green-500;
   }
 }

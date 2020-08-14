@@ -497,6 +497,7 @@ If we need to test how our component renders when results from the GraphQL API a
         designs: {
           loading,
         },
+      },
     };
 
     wrapper = shallowMount(Index, {
@@ -591,7 +592,7 @@ These errors are located at the "top level" of a GraphQL response. These are non
 
 #### Handling top-level errors
 
-Apollo is aware of top-level errors, so we are able to leverage Apollo's various error-handling mechanisms to handle these errors (e.g. handling Promise rejections after invoking the [`mutate`](https://www.apollographql.com/docs/react/api/apollo-client/#ApolloClient.mutate) method, or handling the `error` event emitted from the [`ApolloMutation`](https://apollo.vuejs.org/api/apollo-mutation.html#events) component).
+Apollo is aware of top-level errors, so we are able to leverage Apollo's various error-handling mechanisms to handle these errors (e.g. handling Promise rejections after invoking the [`mutate`](https://www.apollographql.com/docs/react/api/core/ApolloClient/#ApolloClient.mutate) method, or handling the `error` event emitted from the [`ApolloMutation`](https://apollo.vuejs.org/api/apollo-mutation.html#events) component).
 
 Because these errors are not intended for users, error messages for top-level errors should be defined client-side.
 

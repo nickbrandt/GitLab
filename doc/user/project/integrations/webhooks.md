@@ -35,7 +35,7 @@ Navigate to the webhooks page by going to your project's
 **Settings ➔ Webhooks**.
 
 NOTE: **Note:**
-On GitLab.com, the [maximum number of webhooks](../../../user/gitlab_com/index.md#maximum-number-of-webhooks) per project, and per group, is limited.
+On GitLab.com, the [maximum number of webhooks and their size](../../../user/gitlab_com/index.md#webhooks) per project, and per group, is limited.
 
 ## Version history
 
@@ -1300,6 +1300,58 @@ X-Gitlab-Event: Job Hook
 ```
 
 Note that `commit.id` is the ID of the pipeline, not the ID of the commit.
+
+### Deployment events
+
+Triggered when deployment is finished/failed/canceled.
+
+**Request Header**:
+
+```plaintext
+X-Gitlab-Event: Deployment Hook
+```
+
+**Request Body**:
+
+```json
+{
+  "object_kind": "deployment",
+  "status": "success",
+  "deployable_id": 796,
+  "deployable_url": "http://10.126.0.2:3000/root/test-deployment-webhooks/-/jobs/796",
+  "environment": "staging",
+  "project": {
+    "id": 30,
+    "name": "test-deployment-webhooks",
+    "description": "",
+    "web_url": "http://10.126.0.2:3000/root/test-deployment-webhooks",
+    "avatar_url": null,
+    "git_ssh_url": "ssh://vlad@10.126.0.2:2222/root/test-deployment-webhooks.git",
+    "git_http_url": "http://10.126.0.2:3000/root/test-deployment-webhooks.git",
+    "namespace": "Administrator",
+    "visibility_level": 0,
+    "path_with_namespace": "root/test-deployment-webhooks",
+    "default_branch": "master",
+    "ci_config_path": "",
+    "homepage": "http://10.126.0.2:3000/root/test-deployment-webhooks",
+    "url": "ssh://vlad@10.126.0.2:2222/root/test-deployment-webhooks.git",
+    "ssh_url": "ssh://vlad@10.126.0.2:2222/root/test-deployment-webhooks.git",
+    "http_url": "http://10.126.0.2:3000/root/test-deployment-webhooks.git"
+  },
+  "short_sha": "279484c0",
+  "user": {
+    "name": "Administrator",
+    "username": "root",
+    "avatar_url": "https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=80&d=identicon",
+    "email": "admin@example.com"
+  },
+  "user_url": "http://10.126.0.2:3000/root",
+  "commit_url": "http://10.126.0.2:3000/root/test-deployment-webhooks/-/commit/279484c09fbe69ededfced8c1bb6e6d24616b468",
+  "commit_title": "Add new file"
+}
+```
+
+Note that `deployable_id` is the ID of the CI job.
 
 ## Image URL rewriting
 

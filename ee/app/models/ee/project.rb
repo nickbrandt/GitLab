@@ -57,6 +57,7 @@ module EE
       has_many :audit_events, as: :entity
       has_many :path_locks
       has_many :requirements, inverse_of: :project, class_name: 'RequirementsManagement::Requirement'
+      has_many :dast_scanner_profiles
 
       # the rationale behind vulnerabilities and vulnerability_findings can be found here:
       # https://gitlab.com/gitlab-org/gitlab/issues/10252#terminology
@@ -150,6 +151,7 @@ module EE
       scope :with_compliance_framework_settings, -> { preload(:compliance_framework_setting) }
       scope :has_vulnerabilities, -> { joins(:vulnerabilities).group(:id) }
       scope :has_vulnerability_statistics, -> { joins(:vulnerability_statistic) }
+      scope :with_vulnerability_statistics, -> { includes(:vulnerability_statistic) }
 
       scope :with_group_saml_provider, -> { preload(group: :saml_provider) }
 
@@ -233,9 +235,12 @@ module EE
       self.tracing_setting.try(:external_url)
     end
 
-    def latest_pipeline_with_security_reports
-      all_pipelines.newest_first(ref: default_branch).with_reports(::Ci::JobArtifact.security_reports).first ||
-        all_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
+    def latest_pipeline_with_security_reports(only_successful: false)
+      pipeline_scope = all_pipelines.newest_first(ref: default_branch)
+      pipeline_scope = pipeline_scope.success if only_successful
+
+      pipeline_scope.with_reports(::Ci::JobArtifact.security_reports).first ||
+        pipeline_scope.with_legacy_security_reports.first
     end
 
     def latest_pipeline_with_reports(reports)
@@ -578,13 +583,16 @@ module EE
     override :after_import
     def after_import
       super
-      repository.log_geo_updated_event
-      wiki.repository.log_geo_updated_event
-      design_repository.log_geo_updated_event
 
       # Index the wiki repository after import of non-forked projects only, the project repository is indexed
       # in ProjectImportState so ElasticSearch will get project repository changes when mirrors are updated
       ElasticCommitIndexerWorker.perform_async(id, nil, nil, true) if use_elasticsearch? && !forked?
+    end
+
+    def log_geo_updated_events
+      repository.log_geo_updated_event
+      wiki.repository.log_geo_updated_event
+      design_repository.log_geo_updated_event
     end
 
     override :import?
@@ -626,7 +634,7 @@ module EE
 
     def adjourned_deletion?
       feature_available?(:adjourned_deletion_for_projects_and_groups) &&
-        ::Gitlab::CurrentSettings.deletion_adjourned_period.positive? &&
+        ::Gitlab::CurrentSettings.deletion_adjourned_period > 0 &&
         group_deletion_mode_configured?
     end
 

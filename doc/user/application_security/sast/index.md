@@ -24,6 +24,8 @@ You can take advantage of SAST by doing one of the following:
 - [Including the SAST template](#configuration) in your existing `.gitlab-ci.yml` file.
 - Implicitly using [Auto SAST](../../../topics/autodevops/stages.md#auto-sast-ultimate) provided by
   [Auto DevOps](../../../topics/autodevops/index.md).
+- Using the [SAST Configuration tool](#configure-sast-in-the-ui) to create the necessary
+  `.gitlab-ci.yml` file for you.
 
 GitLab checks the SAST report, compares the found vulnerabilities between the
 source and target branches.
@@ -150,6 +152,19 @@ The results will be saved as a
 [SAST report artifact](../../../ci/pipelines/job_artifacts.md#artifactsreportssast-ultimate)
 that you can later download and analyze. Due to implementation limitations, we
 always take the latest SAST artifact available.
+
+### Configure SAST in the UI
+
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3659) in GitLab Ultimate 13.3.
+
+For projects that do not already have a `.gitlab-ci.yml` file, the above
+configuration can also be achieved by using the **SAST Configuration** tool.
+
+1. Navigate to **Security & Compliance > Configuration**.
+1. Click **Enable** on the Static Application Security Testing (SAST)
+row.
+
+A merge request is created, containing the necessary changes for you to review and merge.
 
 ### Customizing the SAST settings
 
@@ -326,9 +341,9 @@ Some analyzers make it possible to filter out vulnerabilities under a given thre
 | Environment variable          | Default value            | Description                                                                                                                                                                                                                 |
 |-------------------------------|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `SAST_EXCLUDED_PATHS`         | `spec, test, tests, tmp` | Exclude vulnerabilities from output based on the paths. This is a comma-separated list of patterns. Patterns can be globs, or file or folder paths (for example, `doc,spec` ). Parent directories will also match patterns. |
+| `SEARCH_MAX_DEPTH`            | 4                        | Maximum number of directories traversed when searching for source code files. |
 | `SAST_BANDIT_EXCLUDED_PATHS`  |                          | Comma-separated list of paths to exclude from scan. Uses Python's [`fnmatch` syntax](https://docs.python.org/2/library/fnmatch.html); For example: `'*/tests/*, */venv/*'`                                                  |
 | `SAST_BRAKEMAN_LEVEL`         | 1                        | Ignore Brakeman vulnerabilities under given confidence level. Integer, 1=Low 3=High.                                                                                                                                        |
-| `SAST_DISABLE_BABEL`          | `false`                  | Disable Babel processing for the NodeJsScan scanner. Set to `true` to disable Babel processing. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/33065) in GitLab 13.2.                                           |
 | `SAST_FLAWFINDER_LEVEL`       | 1                        | Ignore Flawfinder vulnerabilities under given risk level. Integer, 0=No risk, 5=High risk.                                                                                                                                  |
 | `SAST_GITLEAKS_ENTROPY_LEVEL` | 8.0                      | Minimum entropy for secret detection. Float, 0.0 = low, 8.0 = high.                                                                                                                                                         |
 | `SAST_GOSEC_LEVEL`            | 0                        | Ignore Gosec vulnerabilities under given confidence level. Integer, 0=Undefined, 1=Low, 2=Medium, 3=High.                                                                                                                   |
@@ -371,7 +386,7 @@ Some analyzers can be customized with environment variables.
 | `FAIL_NEVER`                          | SpotBugs             | Set to `1` to ignore compilation failure.                                                                                                                                                                                                  |
 | `SAST_GOSEC_CONFIG`                   | Gosec                | Path to configuration for Gosec (optional).                                                                                                                                                                                                |
 | `PHPCS_SECURITY_AUDIT_PHP_EXTENSIONS` | phpcs-security-audit | Comma separated list of additional PHP Extensions.                                                                                                                                                                                         |
-| `SEARCH_MAX_DEPTH`                    | any                  | Maximum number of directories traversed when searching for source code files. Default: `4`.                                                                                                                                                |
+| `SAST_DISABLE_BABEL`          | NodeJsScan                  | Disable Babel processing for the NodeJsScan scanner. Set to `true` to disable Babel processing. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/33065) in GitLab 13.2.                                           |
 
 #### Custom environment variables
 
@@ -507,6 +522,7 @@ To use SAST in an offline environment, you need:
 - To keep Docker-In-Docker disabled (default).
 - A GitLab Runner with the [`docker` or `kubernetes` executor](#requirements).
 - A Docker Container Registry with locally available copies of SAST [analyzer](https://gitlab.com/gitlab-org/security-products/analyzers) images.
+- Configure certificate checking of packages (optional).
 
 NOTE: **Note:**
 GitLab Runner has a [default `pull policy` of `always`](https://docs.gitlab.com/runner/executors/docker.html#using-the-always-pull-policy),
@@ -562,6 +578,13 @@ variables:
 
 The SAST job should now use local copies of the SAST analyzers to scan your code and generate
 security reports without requiring internet access.
+
+### Configure certificate checking of packages
+
+If a SAST job invokes a package manager, you must configure its certificate verification. In an
+offline environment, certificate verification with an external source isn't possible. Either use a
+self-signed certificate or disable certificate verification. Refer to the package manager's
+documentation for instructions.
 
 ## Troubleshooting
 

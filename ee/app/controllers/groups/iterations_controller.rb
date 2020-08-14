@@ -14,14 +14,14 @@ class Groups::IterationsController < Groups::ApplicationController
   private
 
   def check_iterations_available!
-    return render_404 unless group.feature_available?(:iterations)
+    render_404 unless group.feature_available?(:iterations)
   end
 
   def authorize_create_iteration!
-    return render_404 unless can?(current_user, :create_iteration, group)
+    render_404 unless can?(current_user, :create_iteration, group)
   end
 
   def authorize_show_iteration!
-    return render_404 unless can?(current_user, :read_iteration, group)
+    render_404 unless can?(current_user, :read_iteration, group)
   end
 end

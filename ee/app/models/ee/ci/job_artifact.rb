@@ -73,6 +73,23 @@ module EE
 
         super
       end
+
+      def replicables_for_geo_node(node = ::Gitlab::Geo.current_node)
+        not_expired.merge(selective_sync_scope(node))
+                   .merge(object_storage_scope(node))
+      end
+
+      def object_storage_scope(node)
+        return all if node.sync_object_storage?
+
+        with_files_stored_locally
+      end
+
+      def selective_sync_scope(node)
+        return all unless node.selective_sync?
+
+        project_id_in(node.projects)
+      end
     end
 
     def log_geo_deleted_event

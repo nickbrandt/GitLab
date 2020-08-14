@@ -10,7 +10,7 @@ module EE
 
     prepended do
       EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT = 10_000
-      INSTANCE_REVIEW_MIN_USERS = 100
+      INSTANCE_REVIEW_MIN_USERS = 50
       DEFAULT_NUMBER_OF_DAYS_BEFORE_REMOVAL = 7
 
       belongs_to :file_template_project, class_name: "Project"

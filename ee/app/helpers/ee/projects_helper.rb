@@ -90,8 +90,19 @@ module EE
       return super unless project.adjourned_deletion?
 
       date = permanent_deletion_date(Time.now.utc)
-      _("Removing a project places it into a read-only state until %{date}, at which point the project will be permanently removed. Are you ABSOLUTELY sure?") %
+      _("Deleting a project places it into a read-only state until %{date}, at which point the project will be permanently deleted. Are you ABSOLUTELY sure?") %
         { date: date }
+    end
+
+    def permanent_delete_message(project)
+      message = _('This action will %{strongOpen}permanently delete%{strongClose} %{codeOpen}%{project}%{codeClose} %{strongOpen}immediately%{strongClose}, including its repositories and all content: issues, merge requests, etc.')
+      html_escape(message) % remove_message_data(project)
+    end
+
+    def marked_for_removal_message(project)
+      date = permanent_deletion_date(Time.now.utc)
+      message = _('This action will %{strongOpen}permanently delete%{strongClose} %{codeOpen}%{project}%{codeClose} %{strongOpen}on %{date}%{strongClose}, including its repositories and all content: issues, merge requests, etc.')
+      html_escape(message) % remove_message_data(project).merge(date: date)
     end
 
     def permanent_deletion_date(date)
@@ -180,8 +191,6 @@ module EE
           has_vulnerabilities: 'true',
           project: { id: project.id, name: project.name },
           project_full_path: project.full_path,
-          vulnerabilities_endpoint: project_security_vulnerability_findings_path(project),
-          vulnerabilities_summary_endpoint: summary_project_security_vulnerability_findings_path(project),
           vulnerabilities_export_endpoint: api_v4_security_projects_vulnerability_exports_path(id: project.id),
           vulnerability_feedback_help_path: help_page_path("user/application_security/index", anchor: "interacting-with-the-vulnerabilities"),
           empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
@@ -189,10 +198,7 @@ module EE
           dashboard_documentation: help_page_path('user/application_security/security_dashboard/index'),
           not_enabled_scanners_help_path: help_page_path('user/application_security/index', anchor: 'quick-start'),
           no_pipeline_run_scanners_help_path: new_project_pipeline_path(project),
-          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index'),
-          user_callouts_path: user_callouts_path,
-          user_callout_id: UserCalloutsHelper::STANDALONE_VULNERABILITIES_INTRODUCTION_BANNER,
-          show_introduction_banner: show_standalone_vulnerabilities_introduction_banner?.to_s
+          security_dashboard_help_path: help_page_path('user/application_security/security_dashboard/index')
         }
       end
     end
@@ -281,6 +287,16 @@ module EE
       end
 
       nav_tabs
+    end
+
+    def remove_message_data(project)
+      {
+        project: project.path,
+        strongOpen: '<strong>'.html_safe,
+        strongClose: '</strong>'.html_safe,
+        codeOpen: '<code>'.html_safe,
+        codeClose: '</code>'.html_safe
+      }
     end
   end
 end

@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
 import waitForPromises from 'helpers/wait_for_promises';
 import UsersMockHelper from 'helpers/user_mock_data_helper';
@@ -65,7 +65,7 @@ describe('Vulnerability Header', () => {
     return user;
   };
 
-  const findGlDeprecatedButton = () => wrapper.find(GlDeprecatedButton);
+  const findGlButton = () => wrapper.find(GlButton);
   const findSplitButton = () => wrapper.find(SplitButton);
   const findBadge = () => wrapper.find({ ref: 'badge' });
   const findResolutionAlert = () => wrapper.find(ResolutionAlert);
@@ -172,15 +172,15 @@ describe('Vulnerability Header', () => {
   describe('single action button', () => {
     it('does not display if there are no actions', () => {
       createWrapper(getVulnerability({}));
-      expect(findGlDeprecatedButton().exists()).toBe(false);
+      expect(findGlButton().exists()).toBe(false);
     });
 
     describe('create issue', () => {
       beforeEach(() => createWrapper(getVulnerability({ shouldShowCreateIssueButton: true })));
 
       it('does display if there is only one action and not an issue already created', () => {
-        expect(findGlDeprecatedButton().exists()).toBe(true);
-        expect(findGlDeprecatedButton().text()).toBe('Create issue');
+        expect(findGlButton().exists()).toBe(true);
+        expect(findGlButton().text()).toBe('Create issue');
       });
 
       it('calls create issue endpoint on click and redirects to new issue', () => {
@@ -189,7 +189,7 @@ describe('Vulnerability Header', () => {
         mockAxios.onPost(defaultVulnerability.create_issue_url).reply(200, {
           issue_url: issueUrl,
         });
-        findGlDeprecatedButton().vm.$emit('click');
+        findGlButton().vm.$emit('click');
         return waitForPromises().then(() => {
           expect(mockAxios.history.post).toHaveLength(1);
           const [postRequest] = mockAxios.history.post;
@@ -212,7 +212,7 @@ describe('Vulnerability Header', () => {
 
       it('shows an error message when issue creation fails', () => {
         mockAxios.onPost(defaultVulnerability.create_issue_url).reply(500);
-        findGlDeprecatedButton().vm.$emit('click');
+        findGlButton().vm.$emit('click');
         return waitForPromises().then(() => {
           expect(mockAxios.history.post).toHaveLength(1);
           expect(createFlash).toHaveBeenCalledWith(
@@ -231,8 +231,8 @@ describe('Vulnerability Header', () => {
       });
 
       it('only renders the create merge request button', () => {
-        expect(findGlDeprecatedButton().exists()).toBe(true);
-        expect(findGlDeprecatedButton().text()).toBe('Resolve with merge request');
+        expect(findGlButton().exists()).toBe(true);
+        expect(findGlButton().text()).toBe('Resolve with merge request');
       });
 
       it('emits createMergeRequest when create merge request button is clicked', () => {
@@ -241,7 +241,7 @@ describe('Vulnerability Header', () => {
         mockAxios.onPost(defaultVulnerability.create_mr_url).reply(200, {
           merge_request_path: mergeRequestPath,
         });
-        findGlDeprecatedButton().vm.$emit('click');
+        findGlButton().vm.$emit('click');
         return waitForPromises().then(() => {
           expect(mockAxios.history.post).toHaveLength(1);
           const [postRequest] = mockAxios.history.post;
@@ -264,7 +264,7 @@ describe('Vulnerability Header', () => {
 
       it('shows an error message when merge request creation fails', () => {
         mockAxios.onPost(defaultVulnerability.create_mr_url).reply(500);
-        findGlDeprecatedButton().vm.$emit('click');
+        findGlButton().vm.$emit('click');
         return waitForPromises().then(() => {
           expect(mockAxios.history.post).toHaveLength(1);
           expect(createFlash).toHaveBeenCalledWith(
@@ -283,13 +283,12 @@ describe('Vulnerability Header', () => {
       });
 
       it('only renders the download patch button', () => {
-        expect(findGlDeprecatedButton().exists()).toBe(true);
-        expect(findGlDeprecatedButton().text()).toBe('Download patch to resolve');
+        expect(findGlButton().exists()).toBe(true);
+        expect(findGlButton().text()).toBe('Download patch to resolve');
       });
 
       it('emits downloadPatch when download patch button is clicked', () => {
-        const glDeprecatedButton = findGlDeprecatedButton();
-        glDeprecatedButton.vm.$emit('click');
+        findGlButton().vm.$emit('click');
         return wrapper.vm.$nextTick().then(() => {
           expect(download).toHaveBeenCalledWith({ fileData: diff, fileName: `remediation.patch` });
         });

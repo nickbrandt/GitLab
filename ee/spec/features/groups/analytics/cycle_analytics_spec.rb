@@ -21,7 +21,6 @@ RSpec.describe 'Group value stream analytics' do
       cycleAnalyticsScatterplotEnabled: true,
       cycleAnalyticsScatterplotMedianEnabled: true,
       valueStreamAnalyticsPathNavigation: true,
-      valueStreamAnalyticsFilterBar: true,
       analyticsSimilaritySearch: true
     )
   end
@@ -35,18 +34,6 @@ RSpec.describe 'Group value stream analytics' do
       visit group_analytics_cycle_analytics_path(group)
 
       expect(page).to have_pushed_frontend_feature_flags(valueStreamAnalyticsPathNavigation: false)
-    end
-  end
-
-  context 'when `value_stream_analytics_filter_bar` is disabled for a group' do
-    before do
-      stub_feature_flags(value_stream_analytics_filter_bar: false, thing: group)
-    end
-
-    it 'pushes disabled feature flag to the frontend' do
-      visit group_analytics_cycle_analytics_path(group)
-
-      expect(page).to have_pushed_frontend_feature_flags(valueStreamAnalyticsFilterBar: false)
     end
   end
 

@@ -48,11 +48,6 @@ export default {
     TrackEvent: TrackEventDirective,
   },
   props: {
-    externalDashboardUrl: {
-      type: String,
-      required: false,
-      default: '',
-    },
     hasMetrics: {
       type: Boolean,
       required: false,
@@ -69,10 +64,6 @@ export default {
       default: true,
     },
     documentationPath: {
-      type: String,
-      required: true,
-    },
-    addDashboardDocumentationPath: {
       type: String,
       required: true,
     },
@@ -409,14 +400,11 @@ export default {
       v-if="showHeader"
       ref="prometheusGraphsHeader"
       class="prometheus-graphs-header d-sm-flex flex-sm-wrap pt-2 pr-1 pb-0 pl-2 border-bottom bg-gray-light"
-      :add-dashboard-documentation-path="addDashboardDocumentationPath"
       :default-branch="defaultBranch"
       :rearrange-panels-available="rearrangePanelsAvailable"
       :custom-metrics-available="customMetricsAvailable"
       :custom-metrics-path="customMetricsPath"
       :validate-query-path="validateQueryPath"
-      :external-dashboard-url="externalDashboardUrl"
-      :has-metrics="hasMetrics"
       :is-rearranging-panels="isRearrangingPanels"
       :selected-time-range="selectedTimeRange"
       @dateTimePickerInvalid="onDateTimePickerInvalid"

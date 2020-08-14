@@ -86,6 +86,18 @@ RSpec.describe Issues::MoveService do
     end
   end
 
+  describe '#rewrite_related_vulnerability_issues' do
+    let(:user) { create(:user) }
+
+    let!(:vulnerabilities_issue_link) { create(:vulnerabilities_issue_link, issue: old_issue) }
+
+    it 'updates all vulnerability issue links with new issue' do
+      new_issue = move_service.execute(old_issue, new_project)
+
+      expect(vulnerabilities_issue_link.reload.issue).to eq(new_issue)
+    end
+  end
+
   describe '#rewrite_epic_issue' do
     context 'issue assigned to epic' do
       let!(:epic_issue) { create(:epic_issue, issue: old_issue) }

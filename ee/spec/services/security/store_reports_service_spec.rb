@@ -58,22 +58,5 @@ RSpec.describe Security::StoreReportsService do
         end
       end
     end
-
-    context 'history caching' do
-      it 'swallows errors' do
-        allow( Gitlab::Vulnerabilities::HistoryCache).to receive(:new)
-          .and_raise("error")
-
-        expect { subject }.not_to raise_error
-      end
-
-      it 'caches vulnerability history' do
-        expect_next_instance_of(Gitlab::Vulnerabilities::HistoryCache) do |instance|
-          expect(instance).to receive(:fetch)
-        end
-
-        subject
-      end
-    end
   end
 end

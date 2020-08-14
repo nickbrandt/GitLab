@@ -535,7 +535,7 @@ module Ci
           .append(key: 'CI_JOB_TOKEN', value: token.to_s, public: false, masked: true)
           .append(key: 'CI_BUILD_ID', value: id.to_s)
           .append(key: 'CI_BUILD_TOKEN', value: token.to_s, public: false, masked: true)
-          .append(key: 'CI_REGISTRY_USER', value: ::Gitlab::Auth::CI_REGISTRY_USER)
+          .append(key: 'CI_REGISTRY_USER', value: ::Gitlab::Auth::CI_JOB_USER)
           .append(key: 'CI_REGISTRY_PASSWORD', value: token.to_s, public: false, masked: true)
           .append(key: 'CI_REPOSITORY_URL', value: repo_url.to_s, public: false)
           .concat(deploy_token_variables)
@@ -645,6 +645,13 @@ module Ci
 
     def artifacts?
       !artifacts_expired? && artifacts_file&.exists?
+    end
+
+    # This method is similar to #artifacts? but it includes the artifacts
+    # locking mechanics. A new method was created to prevent breaking existing
+    # behavior and avoid introducing N+1s.
+    def available_artifacts?
+      (!artifacts_expired? || pipeline.artifacts_locked?) && job_artifacts_archive&.exists?
     end
 
     def artifacts_metadata?
@@ -857,8 +864,7 @@ module Ci
     end
 
     def multi_build_steps?
-      options.dig(:release)&.any? &&
-        Gitlab::Ci::Features.release_generation_enabled?
+      options.dig(:release)&.any?
     end
 
     def hide_secrets(trace)

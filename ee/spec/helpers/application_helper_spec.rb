@@ -162,6 +162,7 @@ RSpec.describe ApplicationHelper do
       let(:expected_partial_path) do
         "app/views/#{File.dirname(partial)}/_#{File.basename(partial)}.html.haml"
       end
+
       let(:expected_view_path) do
         "app/views/#{File.dirname(view)}/#{File.basename(view)}.html.haml"
       end
@@ -188,25 +189,29 @@ RSpec.describe ApplicationHelper do
     end
   end
 
-  describe '#show_whats_new_dropdown_item?' do
-    using RSpec::Parameterized::TableSyntax
+  describe '#instance_review_permitted?' do
+    let_it_be(:non_admin_user) { create :user }
+    let_it_be(:admin_user) { create :user, :admin }
 
-    subject { helper.show_whats_new_dropdown_item? }
-
-    where(:feature_flag, :gitlab_com, :result) do
-      true  | true  | true
-      true  | false | false
-      false | true  | false
-      false | false | false
+    before do
+      allow(::Gitlab::CurrentSettings).to receive(:instance_review_permitted?).and_return(app_setting)
+      allow(helper).to receive(:current_user).and_return(current_user)
     end
 
+    subject { helper.instance_review_permitted? }
+
+    where(app_setting: [true, false], is_admin: [true, false, nil])
+
     with_them do
-      before do
-        stub_feature_flags(whats_new_dropdown: feature_flag)
-        allow(::Gitlab).to receive(:com?).and_return(gitlab_com)
+      let(:current_user) do
+        if is_admin.nil?
+          nil
+        else
+          is_admin ? admin_user : non_admin_user
+        end
       end
 
-      it { is_expected.to be(result) }
+      it { is_expected.to be(app_setting && is_admin) }
     end
   end
 end

@@ -69,7 +69,7 @@ module EE
       opposite_sorting_param = epics_ordering_options_hash[sort] || epics_ordering_options_hash.key(sort)
       sort_icon = sort.end_with?('desc') ? 'sort-highest' : 'sort-lowest'
 
-      link_to sprite_icon(sort_icon, size: 16),
+      link_to sprite_icon(sort_icon),
               page_filter_path(sort: opposite_sorting_param),
               class: "btn btn-default has-tooltip qa-reverse-sort btn-sort-direction",
               title: _("Sort direction")

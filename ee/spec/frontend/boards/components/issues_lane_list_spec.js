@@ -51,6 +51,8 @@ describe('IssuesLaneList', () => {
       propsData: {
         list,
         issues: mockIssues,
+        disabled: false,
+        rootPath: '/',
       },
     });
   };

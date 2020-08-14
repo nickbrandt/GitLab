@@ -2,7 +2,7 @@
 import { mapActions, mapState } from 'vuex';
 import { mapComputed } from '~/vuex_shared/bindings';
 import {
-  GlDeprecatedButton,
+  GlDeprecatedButton as GlButton,
   GlSprintf,
   GlLink,
   GlIcon,
@@ -14,7 +14,7 @@ import { __, s__ } from '~/locale';
 
 export default {
   components: {
-    GlDeprecatedButton,
+    GlButton,
     GlSprintf,
     GlLink,
     GlFormGroup,
@@ -75,12 +75,12 @@ export default {
 <template>
   <section id="status-page" class="settings no-animate js-status-page-settings">
     <div class="settings-header">
-      <h3 ref="sectionHeader" class="h4">
+      <h4 ref="sectionHeader" class="gl-my-3! gl-py-1">
         {{ $options.i18n.headerText }}
-      </h3>
-      <gl-deprecated-button ref="toggleBtn" class="js-settings-toggle">{{
+      </h4>
+      <gl-button ref="toggleBtn" class="js-settings-toggle">{{
         $options.i18n.expandBtnLabel
-      }}</gl-deprecated-button>
+      }}</gl-button>
       <p ref="sectionSubHeader">
         {{ $options.i18n.subHeaderText }}
       </p>
@@ -180,16 +180,17 @@ export default {
         >
           <gl-form-input id="status-page-aws-secret-access-key " v-model="awsSecretKey" />
         </gl-form-group>
-
-        <gl-deprecated-button
-          ref="submitBtn"
-          :disabled="loading"
-          variant="success"
-          type="submit"
-          class="js-no-auto-disable"
-        >
-          {{ $options.i18n.saveBtnLabel }}
-        </gl-deprecated-button>
+        <div class="gl-display-flex gl-justify-content-end">
+          <gl-button
+            ref="submitBtn"
+            :disabled="loading"
+            variant="success"
+            type="submit"
+            class="js-no-auto-disable"
+          >
+            {{ $options.i18n.saveBtnLabel }}
+          </gl-button>
+        </div>
       </form>
     </div>
   </section>

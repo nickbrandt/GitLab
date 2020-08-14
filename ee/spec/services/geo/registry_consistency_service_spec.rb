@@ -15,6 +15,7 @@ RSpec.describe Geo::RegistryConsistencyService, :geo, :use_clean_rails_memory_st
   def model_class_factory_name(registry_class)
     return :project_with_design if registry_class == ::Geo::DesignRegistry
     return :package_file_with_file if registry_class == ::Geo::PackageFileRegistry
+    return :terraform_state if registry_class == ::Geo::TerraformStateRegistry
 
     registry_class::MODEL_CLASS.underscore.tr('/', '_').to_sym
   end

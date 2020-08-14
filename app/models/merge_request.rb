@@ -40,7 +40,7 @@ class MergeRequest < ApplicationRecord
   has_internal_id :iid, scope: :target_project, track_if: -> { !importing? }, init: ->(s) { s&.target_project&.merge_requests&.maximum(:iid) }
 
   has_many :merge_request_diffs
-  has_many :merge_request_context_commits
+  has_many :merge_request_context_commits, inverse_of: :merge_request
   has_many :merge_request_context_commit_diff_files, through: :merge_request_context_commits, source: :diff_files
 
   has_one :merge_request_diff,
@@ -264,10 +264,14 @@ class MergeRequest < ApplicationRecord
   end
   scope :by_target_branch, ->(branch_name) { where(target_branch: branch_name) }
   scope :preload_source_project, -> { preload(:source_project) }
+  scope :preload_target_project, -> { preload(:target_project) }
   scope :preload_routables, -> do
     preload(target_project: [:route, { namespace: :route }],
             source_project: [:route, { namespace: :route }])
   end
+  scope :preload_author, -> { preload(:author) }
+  scope :preload_approved_by_users, -> { preload(:approved_by_users) }
+  scope :preload_metrics, -> (relation) { preload(metrics: relation) }
 
   scope :with_auto_merge_enabled, -> do
     with_state(:opened).where(auto_merge_enabled: true)
@@ -427,7 +431,7 @@ class MergeRequest < ApplicationRecord
   end
 
   def context_commits(limit: nil)
-    @context_commits ||= merge_request_context_commits.limit(limit).map(&:to_commit)
+    @context_commits ||= merge_request_context_commits.order_by_committed_date_desc.limit(limit).map(&:to_commit)
   end
 
   def recent_context_commits
@@ -1607,7 +1611,12 @@ class MergeRequest < ApplicationRecord
 
   override :ensure_metrics
   def ensure_metrics
-    MergeRequest::Metrics.safe_find_or_create_by(merge_request_id: id).tap do |metrics_record|
+    # Backward compatibility: some merge request metrics records will not have target_project_id filled in.
+    # In that case the first `safe_find_or_create_by` will return false.
+    # The second finder call will be eliminated in https://gitlab.com/gitlab-org/gitlab/-/issues/233507
+    metrics_record = MergeRequest::Metrics.safe_find_or_create_by(merge_request_id: id, target_project_id: target_project_id) || MergeRequest::Metrics.safe_find_or_create_by(merge_request_id: id)
+
+    metrics_record.tap do |metrics_record|
       # Make sure we refresh the loaded association object with the newly created/loaded item.
       # This is needed in order to have the exact functionality than before.
       #
@@ -1617,6 +1626,8 @@ class MergeRequest < ApplicationRecord
       # merge_request.ensure_metrics
       # merge_request.metrics # should return the metrics record and not nil
       # merge_request.metrics.merge_request # should return the same MR record
+
+      metrics_record.target_project_id = target_project_id
       metrics_record.association(:merge_request).target = self
       association(:metrics).target = metrics_record
     end

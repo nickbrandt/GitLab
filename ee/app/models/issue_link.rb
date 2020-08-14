@@ -18,6 +18,9 @@ class IssueLink < ApplicationRecord
   TYPE_BLOCKS = 'blocks'
   TYPE_IS_BLOCKED_BY = 'is_blocked_by'
 
+  after_create :refresh_blocking_issue_cache
+  after_destroy :refresh_blocking_issue_cache
+
   enum link_type: { TYPE_RELATES_TO => 0, TYPE_BLOCKS => 1, TYPE_IS_BLOCKED_BY => 2 }
 
   class << self
@@ -42,6 +45,17 @@ class IssueLink < ApplicationRecord
   end
 
   private
+
+  def blocking_issue
+    case link_type
+    when TYPE_BLOCKS then source
+    when TYPE_IS_BLOCKED_BY then target
+    end
+  end
+
+  def refresh_blocking_issue_cache
+    blocking_issue&.update_blocking_issues_count!
+  end
 
   class << self
     def blocked_and_blocking_issues_union(issue_ids)
@@ -98,6 +112,10 @@ class IssueLink < ApplicationRecord
           .where(target_id: issues_ids)
           .group(:blocked_issue_id)
       ], remove_duplicates: false).select('blocked_issue_id, SUM(count) AS count').group('blocked_issue_id')
+    end
+
+    def blocking_issues_count_for(issue)
+      blocking_issues_for_collection(issue.id)[0]&.count.to_i
     end
   end
 

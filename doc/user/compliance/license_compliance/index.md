@@ -24,7 +24,9 @@ source and target branches, and shows the information right on the merge request
 Denied licenses will be clearly visible with an `x` red icon next to them
 as well as new licenses which need a decision from you. In addition, you can
 [manually allow or deny](#policies)
-licenses in your project's license compliance policy section.
+licenses in your project's license compliance policy section. If GitLab detects a denied license
+in a new commit, GitLab blocks any merge requests containing that commit and instructs the developer
+to remove the license.
 
 NOTE: **Note:**
 If the license compliance report doesn't have anything to compare to, no information
@@ -396,6 +398,30 @@ specifying a [`BUNDLE_SSL_CA_CERT`](https://bundler.io/v2.0/man/bundle-config.1.
 [environment variable](../../../ci/variables/README.md#custom-environment-variables)
 in the job definition.
 
+### Configuring Cargo projects
+
+#### Using private Cargo registries
+
+If you have a private Cargo registry you can use the
+[`registries`](https://doc.rust-lang.org/cargo/reference/registries.html)
+setting to specify its location.
+
+For example:
+
+```toml
+[registries]
+my-registry = { index = "https://my-intranet:8080/git/index" }
+```
+
+#### Custom root certificates for Cargo
+
+To supply a custom root certificate to complete TLS verification, do one of the following:
+
+- Use the `ADDITIONAL_CA_CERT_BUNDLE` [environment variable](#available-variables).
+- Specify a [`CARGO_HTTP_CAINFO`](https://doc.rust-lang.org/cargo/reference/environment-variables.html)
+  [environment variable](../../../ci/variables/README.md#custom-environment-variables)
+  in the job definition.
+
 ### Configuring Composer projects
 
 #### Using private Composer registries
@@ -699,10 +725,16 @@ in your project's sidebar, and you'll see the licenses displayed, where:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/22465) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
 
-The **Policies** tab allows you to see your project's software license policies
-and the associated classifications for each.
+Policies allow you to specify licenses that are `allowed` or `denied` in a project. If a `denied`
+license is newly committed it will disallow a merge request and instruct the developer to remove it.
+Note, the merge request will not be able to be merged until the `denied` license is removed.
+You may add a [`License-Check` approval rule](#enabling-license-approvals-within-a-project),
+which enables a designated approver that can approve and then merge a merge request with `denied` license.
 
-Policies can be configured by maintainers of the project.
+![Merge Request with denied licenses](img/denied_licenses_v13_3.png)
+
+The **Policies** tab in the project's license compliance section displays your project's license
+policies. Project maintainers can specify policies in this section.
 
 ![Edit Policy](img/policies_maintainer_edit_v13_2.png)
 ![Add Policy](img/policies_maintainer_add_v13_2.png)

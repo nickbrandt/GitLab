@@ -21,6 +21,7 @@ import { localTimeAgo } from './lib/utils/datetime_utility';
 import syntaxHighlight from './syntax_highlight';
 import Notes from './notes';
 import { polyfillSticky } from './lib/utils/sticky';
+import initAddContextCommitsTriggers from './add_context_commits_modal';
 import { __ } from './locale';
 
 // MergeRequestTabs
@@ -166,8 +167,6 @@ export default class MergeRequestTabs {
         if (this.setUrl) {
           this.setCurrentAction(action);
         }
-
-        this.eventHub.$emit('MergeRequestTabChange', this.getCurrentAction());
       }
     }
   }
@@ -251,6 +250,8 @@ export default class MergeRequestTabs {
         }
       }
     }
+
+    this.eventHub.$emit('MergeRequestTabChange', action);
   }
 
   scrollToElement(container) {
@@ -340,6 +341,7 @@ export default class MergeRequestTabs {
         this.scrollToElement('#commits');
 
         this.toggleLoading(false);
+        initAddContextCommitsTriggers();
       })
       .catch(() => {
         this.toggleLoading(false);

@@ -996,13 +996,14 @@ RSpec.describe User do
     end
   end
 
-  describe '#managed_free_namespaces' do
+  describe '#manageable_groups_eligible_for_subscription' do
     let_it_be(:user) { create(:user) }
     let_it_be(:licensed_group) { create(:group, gitlab_subscription: create(:gitlab_subscription, :bronze)) }
     let_it_be(:free_group_z) { create(:group, name: 'AZ', gitlab_subscription: create(:gitlab_subscription, :free)) }
     let_it_be(:free_group_a) { create(:group, name: 'AA', gitlab_subscription: create(:gitlab_subscription, :free)) }
+    let_it_be(:sub_group) { create(:group, name: 'SubGroup', parent: free_group_a) }
 
-    subject { user.managed_free_namespaces }
+    subject { user.manageable_groups_eligible_for_subscription }
 
     context 'user with no groups' do
       it { is_expected.to eq [] }
@@ -1047,6 +1048,8 @@ RSpec.describe User do
       end
 
       it { is_expected.to eq [free_group_a, free_group_z] }
+
+      it { is_expected.not_to include(sub_group) }
     end
   end
 

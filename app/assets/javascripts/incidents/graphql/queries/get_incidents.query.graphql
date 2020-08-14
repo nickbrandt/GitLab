@@ -1,7 +1,8 @@
 query getIncidents(
   $projectPath: ID!
-  $labelNames: [String]
-  $state: IssuableState
+  $issueTypes: [IssueType!]
+  $sort: IssueSort
+  $status: IssuableState
   $firstPageSize: Int
   $lastPageSize: Int
   $prevPageCursor: String = ""
@@ -11,8 +12,9 @@ query getIncidents(
   project(fullPath: $projectPath) {
     issues(
       search: $searchTerm
-      state: $state
-      labelName: $labelNames
+      types: $issueTypes
+      sort: $sort
+      state: $status
       first: $firstPageSize
       last: $lastPageSize
       after: $nextPageCursor
@@ -37,6 +39,7 @@ query getIncidents(
             webUrl
           }
         }
+        statusPagePublishedIncident
       }
       pageInfo {
         hasNextPage

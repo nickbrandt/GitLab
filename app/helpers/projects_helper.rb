@@ -104,7 +104,7 @@ module ProjectsHelper
   end
 
   def remove_project_message(project)
-    _("You are going to remove %{project_full_name}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?") %
+    _("You are going to delete %{project_full_name}. Deleted projects CANNOT be restored! Are you ABSOLUTELY sure?") %
       { project_full_name: project.full_name }
   end
 
@@ -748,6 +748,7 @@ module ProjectsHelper
       gcp
       logs
       product_analytics
+      metrics_dashboard
     ]
   end
 
@@ -774,7 +775,7 @@ module ProjectsHelper
   def project_access_token_available?(project)
     return false if ::Gitlab.com?
 
-    ::Feature.enabled?(:resource_access_token, project)
+    ::Feature.enabled?(:resource_access_token, project, default_enabled: true)
   end
 end
 

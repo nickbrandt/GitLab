@@ -79,6 +79,7 @@ class License < ApplicationRecord
     github_project_service_integration
     group_allowed_email_domains
     group_coverage_reports
+    group_forking_protection
     group_ip_restriction
     group_merge_request_analytics
     group_project_templates
@@ -120,11 +121,13 @@ class License < ApplicationRecord
     dast
     dependency_scanning
     enterprise_templates
+    api_fuzzing
     group_level_compliance_dashboard
     incident_management
     insights
     issuable_health_status
     license_scanning
+    personal_access_token_api_management
     personal_access_token_expiration_policy
     enforce_pat_expiration
     prometheus_alerts
@@ -540,9 +543,9 @@ class License < ApplicationRecord
       return if restricted_user_count >= prior_historical_max
     end
 
-    user_count = prior_historical_max.zero? ? current_active_users_count : prior_historical_max
+    user_count = prior_historical_max == 0 ? current_active_users_count : prior_historical_max
 
-    add_limit_error(current_period: prior_historical_max.zero?, user_count: user_count)
+    add_limit_error(current_period: prior_historical_max == 0, user_count: user_count)
   end
 
   def check_trueup

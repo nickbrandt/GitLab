@@ -10,11 +10,11 @@ RSpec.describe Vulnerabilities::ProjectsGrade do
   let_it_be(:project_4) { create(:project, group: group) }
   let_it_be(:project_5) { create(:project, group: group) }
 
-  let_it_be(:vulnerability_statistic_1) { create(:vulnerability_statistic, :a, project: project_1) }
-  let_it_be(:vulnerability_statistic_2) { create(:vulnerability_statistic, :b, project: project_2) }
-  let_it_be(:vulnerability_statistic_3) { create(:vulnerability_statistic, :b, project: project_3) }
-  let_it_be(:vulnerability_statistic_4) { create(:vulnerability_statistic, :c, project: project_4) }
-  let_it_be(:vulnerability_statistic_5) { create(:vulnerability_statistic, :f, project: project_5) }
+  let_it_be(:vulnerability_statistic_1) { create(:vulnerability_statistic, :grade_a, project: project_1) }
+  let_it_be(:vulnerability_statistic_2) { create(:vulnerability_statistic, :grade_b, project: project_2) }
+  let_it_be(:vulnerability_statistic_3) { create(:vulnerability_statistic, :grade_b, project: project_3) }
+  let_it_be(:vulnerability_statistic_4) { create(:vulnerability_statistic, :grade_c, project: project_4) }
+  let_it_be(:vulnerability_statistic_5) { create(:vulnerability_statistic, :grade_f, project: project_5) }
 
   describe '.grades_for' do
     let(:compare_key) { ->(projects_grade) { [projects_grade.grade, projects_grade.project_ids.sort] } }
@@ -78,6 +78,12 @@ RSpec.describe Vulnerabilities::ProjectsGrade do
     subject(:projects) { projects_grade.projects }
 
     it { is_expected.to match_array(expected_projects) }
+
+    it 'preloads vulnerability statistic once for whole collection' do
+      control_count = ActiveRecord::QueryRecorder.new { described_class.new(group, 1, [project_3.id]).projects.map(&:vulnerability_statistic) }.count
+
+      expect { described_class.new(group, 1, [project_3.id, project_4.id]).projects.map(&:vulnerability_statistic) }.not_to exceed_query_limit(control_count)
+    end
   end
 
   describe '#count' do

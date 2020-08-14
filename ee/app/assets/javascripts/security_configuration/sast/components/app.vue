@@ -1,50 +1,94 @@
 <script>
-import { GlIcon, GlLink, GlSprintf } from '@gitlab/ui';
+import { GlAlert, GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import sastCiConfigurationQuery from '../graphql/sast_ci_configuration.query.graphql';
+import ConfigurationForm from './configuration_form.vue';
+import { extractSastConfigurationEntities } from './utils';
 
 export default {
   components: {
-    GlIcon,
+    ConfigurationForm,
+    GlAlert,
     GlLink,
+    GlLoadingIcon,
     GlSprintf,
   },
-  props: {
+  inject: {
     sastDocumentationPath: {
-      type: String,
-      required: true,
+      from: 'sastDocumentationPath',
+      default: '',
+    },
+    projectPath: {
+      from: 'projectPath',
+      default: '',
     },
   },
-  helpText: s__(
-    `SecurityConfiguration|Customize common SAST settings to suit your
-    requirements. More advanced configuration options exist, which you can add
-    to the configuration file this tool generates. It's important to note that
-    if you make any configurations, they will be saved as overrides and will be
-    %{strongStart}excluded from automatic updates%{strongEnd}.`,
-  ),
+  apollo: {
+    sastConfigurationEntities: {
+      query: sastCiConfigurationQuery,
+      variables() {
+        return {
+          fullPath: this.projectPath,
+        };
+      },
+      update: extractSastConfigurationEntities,
+      result({ loading }) {
+        if (!loading && this.sastConfigurationEntities.length === 0) {
+          this.onError();
+        }
+      },
+      error() {
+        this.onError();
+      },
+    },
+  },
+  data() {
+    return {
+      sastConfigurationEntities: [],
+      hasLoadingError: false,
+    };
+  },
+  methods: {
+    onError() {
+      this.hasLoadingError = true;
+    },
+  },
+  i18n: {
+    helpText: s__(
+      `SecurityConfiguration|Customize common SAST settings to suit your
+      requirements. Configuration changes made here override those provided by
+      GitLab and are excluded from updates. For details of more advanced
+      configuration options, see the %{linkStart}GitLab SAST documentation%{linkEnd}.`,
+    ),
+    loadingErrorText: s__(
+      `SecurityConfiguration|Could not retrieve configuration data. Please
+      refresh the page, or try again later.`,
+    ),
+  },
 };
 </script>
 
 <template>
   <article>
-    <header class="my-3 gl-border-b-1 gl-border-b-gray-100 gl-border-b-solid">
+    <header class="gl-my-5 gl-border-b-1 gl-border-b-gray-100 gl-border-b-solid">
       <h2 class="h4">
-        {{ __('SAST Configuration') }}
-        <gl-link
-          :href="sastDocumentationPath"
-          class="vertical-align-middle"
-          target="_blank"
-          :aria-label="__('Help')"
-        >
-          <gl-icon name="question" />
-        </gl-link>
+        {{ s__('SecurityConfiguration|SAST Configuration') }}
       </h2>
       <p>
-        <gl-sprintf :message="$options.helpText">
-          <template #strong="{ content }">
-            <strong>{{ content }}</strong>
+        <gl-sprintf :message="$options.i18n.helpText">
+          <template #link="{ content }">
+            <gl-link :href="sastDocumentationPath" target="_blank" v-text="content" />
           </template>
         </gl-sprintf>
       </p>
     </header>
+
+    <gl-loading-icon v-if="$apollo.loading" size="lg" />
+
+    <gl-alert v-else-if="hasLoadingError" variant="danger" :dismissible="false">{{
+      $options.i18n.loadingErrorText
+    }}</gl-alert>
+
+    <configuration-form v-else :entities="sastConfigurationEntities" />
   </article>
 </template>

@@ -93,3 +93,106 @@ export const generateVulnerabilities = () => [
 ];
 
 export const vulnerabilities = generateVulnerabilities();
+
+export const generateProjectsWithSeverityCounts = () => [
+  {
+    id: 'gid://gitlab/Project/1',
+    name: 'Gitlab Test 1',
+    nameWithNamespace: 'Gitlab Org / Gitlab Test 1',
+    fullPath: 'gitlab-org/gitlab-test-1',
+    vulnerabilitySeveritiesCount: {
+      critical: 2,
+      high: 0,
+      info: 0,
+      low: 0,
+      medium: 0,
+      unknown: 0,
+    },
+  },
+  {
+    id: 'gid://gitlab/Project/2',
+    name: 'Gitlab Test 2',
+    nameWithNamespace: 'Gitlab Org / Gitlab Test 2',
+    fullPath: 'gitlab-org/gitlab-test-2',
+    vulnerabilitySeveritiesCount: {
+      critical: 0,
+      high: 1,
+      info: 0,
+      low: 0,
+      medium: 0,
+      unknown: 0,
+    },
+  },
+  {
+    id: 'gid://gitlab/Project/3',
+    name: 'Gitlab Test 3',
+    nameWithNamespace: 'Gitlab Org / Gitlab Test 3',
+    fullPath: 'gitlab-org/gitlab-test-3',
+    vulnerabilitySeveritiesCount: {
+      critical: 0,
+      high: 0,
+      info: 0,
+      low: 0,
+      medium: 5,
+      unknown: 0,
+    },
+  },
+  {
+    id: 'gid://gitlab/Project/4',
+    name: 'Gitlab Test 4',
+    nameWithNamespace: 'Gitlab Org / Gitlab Test 4',
+    fullPath: 'gitlab-org/gitlab-test-4',
+    vulnerabilitySeveritiesCount: {
+      critical: 0,
+      high: 0,
+      info: 0,
+      low: 0,
+      medium: 4,
+      unknown: 0,
+    },
+  },
+  {
+    id: 'gid://gitlab/Project/5',
+    name: 'Gitlab Test 5',
+    nameWithNamespace: 'Gitlab Org / Gitlab Test 5',
+    fullPath: 'gitlab-org/gitlab-test-5',
+    vulnerabilitySeveritiesCount: {
+      critical: 0,
+      high: 0,
+      info: 0,
+      low: 2,
+      medium: 0,
+      unknown: 0,
+    },
+  },
+  {
+    id: 'gid://gitlab/Project/6',
+    name: 'Gitlab Test 6',
+    nameWithNamespace: 'Gitlab Org / Gitlab Test 6',
+    fullPath: 'gitlab-org/gitlab-test-6',
+    vulnerabilitySeveritiesCount: {
+      critical: 0,
+      high: 0,
+      info: 0,
+      low: 0,
+      medium: 0,
+      unknown: 0,
+    },
+  },
+  {
+    id: 'gid://gitlab/Project/7',
+    name: 'Gitlab Test 7',
+    nameWithNamespace: 'Gitlab Org / Gitlab Test 7',
+    fullPath: 'gitlab-org/gitlab-test-7',
+    vulnerabilitySeveritiesCount: {
+      critical: 0,
+      high: 0,
+      info: 2,
+      low: 0,
+      medium: 0,
+      unknown: 0,
+    },
+  },
+];
+
+export const projectsWithSeverityCounts = generateProjectsWithSeverityCounts();

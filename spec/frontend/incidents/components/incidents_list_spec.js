@@ -7,11 +7,13 @@ import {
   GlPagination,
   GlSearchBoxByType,
   GlTab,
+  GlTabs,
+  GlBadge,
 } from '@gitlab/ui';
 import { visitUrl, joinPaths } from '~/lib/utils/url_utility';
 import IncidentsList from '~/incidents/components/incidents_list.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import { I18N, INCIDENT_STATE_TABS } from '~/incidents/constants';
+import { I18N, INCIDENT_STATUS_TABS } from '~/incidents/constants';
 import mockIncidents from '../mocks/incidents.json';
 
 jest.mock('~/lib/utils/url_utility', () => ({
@@ -24,20 +26,29 @@ describe('Incidents List', () => {
   let wrapper;
   const newIssuePath = 'namespace/project/-/issues/new';
   const incidentTemplateName = 'incident';
+  const incidentsCount = {
+    opened: 14,
+    closed: 1,
+    all: 16,
+  };
 
   const findTable = () => wrapper.find(GlTable);
   const findTableRows = () => wrapper.findAll('table tbody tr');
   const findAlert = () => wrapper.find(GlAlert);
   const findLoader = () => wrapper.find(GlLoadingIcon);
   const findTimeAgo = () => wrapper.findAll(TimeAgoTooltip);
+  const findDateColumnHeader = () =>
+    wrapper.find('[data-testid="incident-management-created-at-sort"]');
+  const findSearch = () => wrapper.find(GlSearchBoxByType);
   const findAssingees = () => wrapper.findAll('[data-testid="incident-assignees"]');
   const findCreateIncidentBtn = () => wrapper.find('[data-testid="createIncidentBtn"]');
-  const findSearch = () => wrapper.find(GlSearchBoxByType);
   const findClosedIcon = () => wrapper.findAll("[data-testid='incident-closed']");
   const findPagination = () => wrapper.find(GlPagination);
   const findStatusFilterTabs = () => wrapper.findAll(GlTab);
+  const findStatusFilterBadge = () => wrapper.findAll(GlBadge);
+  const findStatusTabs = () => wrapper.find(GlTabs);
 
-  function mountComponent({ data = { incidents: [] }, loading = false }) {
+  function mountComponent({ data = { incidents: [], incidentsCount: {} }, loading = false }) {
     wrapper = mount(IncidentsList, {
       data() {
         return data;
@@ -56,6 +67,7 @@ describe('Incidents List', () => {
         newIssuePath,
         incidentTemplateName,
         issuePath: '/project/isssues',
+        publishedAvailable: true,
       },
       stubs: {
         GlButton: true,
@@ -80,7 +92,7 @@ describe('Incidents List', () => {
 
   it('shows empty state', () => {
     mountComponent({
-      data: { incidents: { list: [] } },
+      data: { incidents: { list: [] }, incidentsCount: {} },
       loading: false,
     });
     expect(findTable().text()).toContain(I18N.noIncidents);
@@ -88,7 +100,7 @@ describe('Incidents List', () => {
 
   it('shows error state', () => {
     mountComponent({
-      data: { incidents: { list: [] }, errored: true },
+      data: { incidents: { list: [] }, incidentsCount: { all: 0 }, errored: true },
       loading: false,
     });
     expect(findTable().text()).toContain(I18N.noIncidents);
@@ -98,7 +110,7 @@ describe('Incidents List', () => {
   describe('Incident Management list', () => {
     beforeEach(() => {
       mountComponent({
-        data: { incidents: { list: mockIncidents } },
+        data: { incidents: { list: mockIncidents }, incidentsCount },
         loading: false,
       });
     });
@@ -150,7 +162,7 @@ describe('Incidents List', () => {
   describe('Create Incident', () => {
     beforeEach(() => {
       mountComponent({
-        data: { incidents: { list: [] } },
+        data: { incidents: { list: [] }, incidentsCount: {} },
         loading: false,
       });
     });
@@ -175,6 +187,7 @@ describe('Incidents List', () => {
             list: mockIncidents,
             pageInfo: { hasNextPage: true, hasPreviousPage: true },
           },
+          incidentsCount,
           errored: false,
         },
         loading: false,
@@ -237,6 +250,7 @@ describe('Incidents List', () => {
               list: [...mockIncidents, ...mockIncidents, ...mockIncidents],
               pageInfo: { hasNextPage: true, hasPreviousPage: true },
             },
+            incidentsCount,
             errored: false,
           },
           loading: false,
@@ -249,6 +263,7 @@ describe('Incidents List', () => {
       });
 
       it('returns `null` when currentPage is already last page', () => {
+        findStatusTabs().vm.$emit('input', 1);
         findPagination().vm.$emit('input', 1);
         return wrapper.vm.$nextTick(() => {
           expect(wrapper.vm.nextPage).toBeNull();
@@ -264,6 +279,7 @@ describe('Incidents List', () => {
               list: mockIncidents,
               pageInfo: { hasNextPage: true, hasPreviousPage: true },
             },
+            incidentsCount,
             errored: false,
           },
           loading: false,
@@ -283,10 +299,10 @@ describe('Incidents List', () => {
       });
     });
 
-    describe('State Filter Tabs', () => {
+    describe('Status Filter Tabs', () => {
       beforeEach(() => {
         mountComponent({
-          data: { incidents: mockIncidents },
+          data: { incidents: mockIncidents, incidentsCount },
           loading: false,
           stubs: {
             GlTab: true,
@@ -298,8 +314,37 @@ describe('Incidents List', () => {
         const tabs = findStatusFilterTabs().wrappers;
 
         tabs.forEach((tab, i) => {
-          expect(tab.attributes('data-testid')).toContain(INCIDENT_STATE_TABS[i].state);
+          expect(tab.attributes('data-testid')).toContain(INCIDENT_STATUS_TABS[i].status);
         });
+      });
+
+      it('should display filter tabs with alerts count badge for each status', () => {
+        const tabs = findStatusFilterTabs().wrappers;
+        const badges = findStatusFilterBadge();
+
+        tabs.forEach((tab, i) => {
+          const status = INCIDENT_STATUS_TABS[i].status.toLowerCase();
+          expect(tab.attributes('data-testid')).toContain(INCIDENT_STATUS_TABS[i].status);
+          expect(badges.at(i).text()).toContain(incidentsCount[status]);
+        });
+      });
+    });
+  });
+
+  describe('sorting the incident list by column', () => {
+    beforeEach(() => {
+      mountComponent({
+        data: { incidents: mockIncidents, incidentsCount },
+        loading: false,
+      });
+    });
+
+    it('updates sort with new direction and column key', () => {
+      expect(findDateColumnHeader().attributes('aria-sort')).toBe('descending');
+
+      findDateColumnHeader().trigger('click');
+      return wrapper.vm.$nextTick(() => {
+        expect(findDateColumnHeader().attributes('aria-sort')).toBe('ascending');
       });
     });
   });

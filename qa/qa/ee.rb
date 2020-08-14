@@ -105,6 +105,7 @@ module QA
           autoload :Repository, 'qa/ee/page/project/sub_menus/repository'
           autoload :Settings, 'qa/ee/page/project/sub_menus/settings'
           autoload :Project, 'qa/ee/page/project/sub_menus/project'
+          autoload :LicenseCompliance, 'qa/ee/page/project/sub_menus/license_compliance'
         end
 
         module Issue
@@ -148,6 +149,7 @@ module QA
           autoload :DependencyList, 'qa/ee/page/project/secure/dependency_list'
           autoload :SecurityDashboard, 'qa/ee/page/project/secure/security_dashboard'
           autoload :VulnerabilityDetails, 'qa/ee/page/project/secure/vulnerability_details'
+          autoload :LicenseCompliance, 'qa/ee/page/project/secure/license_compliance'
         end
 
         module PathLocks

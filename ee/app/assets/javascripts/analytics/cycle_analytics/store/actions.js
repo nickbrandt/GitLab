@@ -8,15 +8,9 @@ import { removeFlash, handleErrorOrRethrow, isStageNameExistsError } from '../ut
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
-export const setSelectedGroup = ({ commit, dispatch, state }, group) => {
+export const setSelectedGroup = ({ commit, dispatch }, group) => {
   commit(types.SET_SELECTED_GROUP, group);
-  const { featureFlags } = state;
-  if (featureFlags?.hasFilterBar) {
-    return dispatch('filters/initialize', {
-      groupPath: group.full_path,
-    });
-  }
-  return Promise.resolve();
+  return dispatch('filters/initialize', { groupPath: group.full_path });
 };
 
 export const setSelectedProjects = ({ commit }, projects) =>
@@ -256,16 +250,12 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
   if (initialData.group?.fullPath) {
-    if (featureFlags?.hasFilterBar) {
-      dispatch('filters/initialize', {
-        groupPath: initialData.group.fullPath,
-        ...initialData,
-      });
-    }
-
-    return dispatch('fetchCycleAnalyticsData').then(() =>
-      dispatch('initializeCycleAnalyticsSuccess'),
-    );
+    return Promise.resolve()
+      .then(() =>
+        dispatch('filters/initialize', { groupPath: initialData.group.fullPath, ...initialData }),
+      )
+      .then(() => dispatch('fetchCycleAnalyticsData'))
+      .then(() => dispatch('initializeCycleAnalyticsSuccess'));
   }
   return dispatch('initializeCycleAnalyticsSuccess');
 };
@@ -311,12 +301,15 @@ export const createValueStream = ({ commit, dispatch, getters }, data) => {
     });
 };
 
-export const setSelectedValueStream = ({ commit, dispatch }, streamId) => {
-  commit(types.SET_SELECTED_VALUE_STREAM, streamId);
-  return Promise.resolve()
+export const fetchValueStreamData = ({ dispatch }) =>
+  Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))
     .then(() => dispatch('fetchStageMedianValues'))
     .then(() => dispatch('durationChart/fetchDurationData'));
+
+export const setSelectedValueStream = ({ commit, dispatch }, streamId) => {
+  commit(types.SET_SELECTED_VALUE_STREAM, streamId);
+  return dispatch('fetchValueStreamData');
 };
 
 export const receiveValueStreamsSuccess = ({ commit, dispatch }, data = []) => {
@@ -344,5 +337,5 @@ export const fetchValueStreams = ({ commit, dispatch, getters, state }) => {
         commit(types.RECEIVE_VALUE_STREAMS_ERROR, data);
       });
   }
-  return dispatch('fetchGroupStagesAndEvents');
+  return dispatch('fetchValueStreamData');
 };

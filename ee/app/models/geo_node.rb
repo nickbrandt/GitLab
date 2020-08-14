@@ -237,25 +237,6 @@ class GeoNode < ApplicationRecord
     end
   end
 
-  def job_artifacts
-    return Ci::JobArtifact.all unless selective_sync?
-
-    query = Ci::JobArtifact.project_id_in(projects).select(:id)
-    cte = Gitlab::SQL::CTE.new(:restricted_job_artifacts, query)
-    job_artifact_table = Ci::JobArtifact.arel_table
-
-    inner_join_restricted_job_artifacts =
-      cte.table
-        .join(job_artifact_table, Arel::Nodes::InnerJoin)
-        .on(cte.table[:id].eq(job_artifact_table[:id]))
-        .join_sources
-
-    Ci::JobArtifact
-      .with(cte.to_arel)
-      .from(cte.table)
-      .joins(inner_join_restricted_job_artifacts)
-  end
-
   def container_repositories
     return ContainerRepository.none unless Geo::ContainerRepositoryRegistry.replication_enabled?
     return ContainerRepository.all unless selective_sync?
@@ -427,9 +408,5 @@ class GeoNode < ApplicationRecord
 
   def projects_for_selected_shards
     Project.within_shards(selective_sync_shards)
-  end
-
-  def project_model
-    Project
   end
 end

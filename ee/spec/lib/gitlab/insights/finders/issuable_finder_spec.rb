@@ -132,6 +132,7 @@ RSpec.describe Gitlab::Insights::Finders::IssuableFinder do
           filter_labels: [label_bug.title],
           collection_labels: [label_manage.title, label_plan.title, label_create.title])
       end
+
       let(:projects) { {} }
 
       subject { find(entity, query: query, projects: projects) }

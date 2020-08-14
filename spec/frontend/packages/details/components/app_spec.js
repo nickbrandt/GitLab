@@ -5,27 +5,25 @@ import Tracking from '~/tracking';
 import * as getters from '~/packages/details/store/getters';
 import PackagesApp from '~/packages/details/components/app.vue';
 import PackageTitle from '~/packages/details/components/package_title.vue';
-import PackageInformation from '~/packages/details/components/information.vue';
-import NpmInstallation from '~/packages/details/components/npm_installation.vue';
-import MavenInstallation from '~/packages/details/components/maven_installation.vue';
+
 import * as SharedUtils from '~/packages/shared/utils';
 import { TrackingActions } from '~/packages/shared/constants';
 import PackagesListLoader from '~/packages/shared/components/packages_list_loader.vue';
 import PackageListRow from '~/packages/shared/components/package_list_row.vue';
-import ConanInstallation from '~/packages/details/components/conan_installation.vue';
-import NugetInstallation from '~/packages/details/components/nuget_installation.vue';
-import PypiInstallation from '~/packages/details/components/pypi_installation.vue';
+
 import DependencyRow from '~/packages/details/components/dependency_row.vue';
 import PackageHistory from '~/packages/details/components/package_history.vue';
-import PackageActivity from '~/packages/details/components/activity.vue';
+import AdditionalMetadata from '~/packages/details/components/additional_metadata.vue';
+import InstallationCommands from '~/packages/details/components/installation_commands.vue';
+
 import {
+  composerPackage,
   conanPackage,
   mavenPackage,
   mavenFiles,
   npmPackage,
   npmFiles,
   nugetPackage,
-  pypiPackage,
 } from '../../mock_data';
 import stubChildren from 'helpers/stub_children';
 
@@ -78,13 +76,6 @@ describe('PackagesApp', () => {
 
   const packageTitle = () => wrapper.find(PackageTitle);
   const emptyState = () => wrapper.find(GlEmptyState);
-  const allPackageInformation = () => wrapper.findAll(PackageInformation);
-  const packageInformation = index => allPackageInformation().at(index);
-  const npmInstallation = () => wrapper.find(NpmInstallation);
-  const mavenInstallation = () => wrapper.find(MavenInstallation);
-  const conanInstallation = () => wrapper.find(ConanInstallation);
-  const nugetInstallation = () => wrapper.find(NugetInstallation);
-  const pypiInstallation = () => wrapper.find(PypiInstallation);
   const allFileRows = () => wrapper.findAll('.js-file-row');
   const firstFileDownloadLink = () => wrapper.find('.js-file-download');
   const deleteButton = () => wrapper.find('.js-delete-button');
@@ -99,8 +90,8 @@ describe('PackagesApp', () => {
   const noDependenciesMessage = () => wrapper.find('[data-testid="no-dependencies-message"]');
   const dependencyRows = () => wrapper.findAll(DependencyRow);
   const findPackageHistory = () => wrapper.find(PackageHistory);
-  const findPackageActivity = () => wrapper.find(PackageActivity);
-  const findOldPackageInfo = () => wrapper.find('[data-testid="old-package-info"]');
+  const findAdditionalMetadata = () => wrapper.find(AdditionalMetadata);
+  const findInstallationCommands = () => wrapper.find(InstallationCommands);
 
   afterEach(() => {
     wrapper.destroy();
@@ -120,35 +111,28 @@ describe('PackagesApp', () => {
     expect(emptyState()).toExist();
   });
 
-  it('renders package information and metadata for packages containing both information and metadata', () => {
+  it('package history has the right props', () => {
     createComponent();
-
-    expect(packageInformation(0)).toExist();
-    expect(packageInformation(1)).toExist();
+    expect(findPackageHistory().exists()).toBe(true);
+    expect(findPackageHistory().props('packageEntity')).toEqual(wrapper.vm.packageEntity);
+    expect(findPackageHistory().props('projectName')).toEqual(wrapper.vm.projectName);
   });
 
-  it('does not render package metadata for npm as npm packages do not contain metadata', () => {
-    createComponent({ packageEntity: npmPackage, packageFiles: npmFiles });
-
-    expect(packageInformation(0)).toExist();
-    expect(allPackageInformation()).toHaveLength(1);
+  it('additional metadata has the right props', () => {
+    createComponent();
+    expect(findAdditionalMetadata().exists()).toBe(true);
+    expect(findAdditionalMetadata().props('packageEntity')).toEqual(wrapper.vm.packageEntity);
   });
 
-  describe('installation instructions', () => {
-    describe.each`
-      packageEntity   | selector
-      ${conanPackage} | ${conanInstallation}
-      ${mavenPackage} | ${mavenInstallation}
-      ${npmPackage}   | ${npmInstallation}
-      ${nugetPackage} | ${nugetInstallation}
-      ${pypiPackage}  | ${pypiInstallation}
-    `('renders', ({ packageEntity, selector }) => {
-      it(`${packageEntity.package_type} instructions`, () => {
-        createComponent({ packageEntity });
+  it('installation commands has the right props', () => {
+    createComponent();
+    expect(findInstallationCommands().exists()).toBe(true);
+    expect(findInstallationCommands().props('packageEntity')).toEqual(wrapper.vm.packageEntity);
+  });
 
-        expect(selector()).toExist();
-      });
-    });
+  it('hides the files table if package type is COMPOSER', () => {
+    createComponent({ packageEntity: composerPackage });
+    expect(allFileRows().exists()).toBe(false);
   });
 
   it('renders a single file for an npm package as they only contain one file', () => {
@@ -293,32 +277,5 @@ describe('PackagesApp', () => {
         expect.any(Object),
       );
     });
-  });
-
-  describe('one column layout feature flag', () => {
-    describe.each`
-      oneColumnView | history  | oldInfo  | activity
-      ${true}       | ${true}  | ${false} | ${false}
-      ${false}      | ${false} | ${true}  | ${true}
-    `(
-      'with oneColumnView set to $oneColumnView',
-      ({ oneColumnView, history, oldInfo, activity }) => {
-        beforeEach(() => {
-          createComponent({ oneColumnView });
-        });
-
-        it('package history', () => {
-          expect(findPackageHistory().exists()).toBe(history);
-        });
-
-        it('old info block', () => {
-          expect(findOldPackageInfo().exists()).toBe(oldInfo);
-        });
-
-        it('package activity', () => {
-          expect(findPackageActivity().exists()).toBe(activity);
-        });
-      },
-    );
   });
 });

@@ -40,4 +40,18 @@ RSpec.describe 'User views iteration' do
       end
     end
   end
+
+  context 'without license' do
+    before do
+      stub_licensed_features(iterations: false)
+      sign_in(user)
+    end
+
+    it 'shows page not found' do
+      visit group_iteration_path(iteration.group, iteration)
+
+      expect(page).to have_title('Not Found')
+      expect(page).to have_content('Page Not Found')
+    end
+  end
 end

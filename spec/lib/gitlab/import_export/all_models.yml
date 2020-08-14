@@ -47,6 +47,7 @@ issues:
 - alert_management_alert
 - status_page_published_incident
 - namespace
+- note_authors
 events:
 - author
 - project
@@ -167,6 +168,7 @@ merge_requests:
 - deployments
 - user_mentions
 - system_note_metadata
+- note_authors
 external_pull_requests:
 - project
 merge_request_diff:
@@ -230,6 +232,7 @@ ci_pipelines:
 - daily_report_results
 - latest_builds_report_results
 - messages
+- pipeline_artifacts
 ci_refs:
 - project
 - ci_pipelines
@@ -466,6 +469,7 @@ project:
 - vulnerability_identifiers
 - vulnerability_scanners
 - dast_site_profiles
+- dast_scanner_profiles
 - dast_sites
 - operations_feature_flags
 - operations_feature_flags_client
@@ -518,6 +522,7 @@ project:
 - vulnerability_statistic
 - vulnerability_historical_statistics
 - product_analytics_events
+- pipeline_artifacts
 award_emoji:
 - awardable
 - user
@@ -668,6 +673,7 @@ epic:
 - events
 - resource_label_events
 - user_mentions
+- note_authors
 epic_issue:
 - epic
 - issue

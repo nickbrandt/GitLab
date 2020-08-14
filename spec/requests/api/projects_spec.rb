@@ -70,12 +70,14 @@ RSpec.describe API::Projects do
     builds_enabled: false,
     snippets_enabled: false)
   end
+
   let(:project_member2) do
     create(:project_member,
     user: user4,
     project: project3,
     access_level: ProjectMember::MAINTAINER)
   end
+
   let(:project4) do
     create(:project,
     name: 'third_project',
@@ -2361,14 +2363,12 @@ RSpec.describe API::Projects do
         expect(project.packages_enabled).to be true
       end
 
-      context 'without the need for a license' do
-        it 'disables project packages feature' do
-          put(api("/projects/#{project.id}", user), params: { packages_enabled: false })
+      it 'disables project packages feature' do
+        put(api("/projects/#{project.id}", user), params: { packages_enabled: false })
 
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(project.reload.packages_enabled).to be false
-          expect(json_response['packages_enabled']).to eq(false)
-        end
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(project.reload.packages_enabled).to be false
+        expect(json_response['packages_enabled']).to eq(false)
       end
     end
 

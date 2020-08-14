@@ -151,17 +151,12 @@ RSpec.describe ProjectsHelper do
           has_vulnerabilities: 'true',
           project: { id: project.id, name: project.name },
           project_full_path: project.full_path,
-          vulnerabilities_endpoint: "/#{project.full_path}/-/security/vulnerability_findings",
-          vulnerabilities_summary_endpoint: "/#{project.full_path}/-/security/vulnerability_findings/summary",
           vulnerabilities_export_endpoint: "/api/v4/security/projects/#{project.id}/vulnerability_exports",
           vulnerability_feedback_help_path: '/help/user/application_security/index#interacting-with-the-vulnerabilities',
           no_vulnerabilities_svg_path: start_with('/assets/illustrations/issues-'),
           empty_state_svg_path: start_with('/assets/illustrations/security-dashboard-empty-state'),
           dashboard_documentation: '/help/user/application_security/security_dashboard/index',
           security_dashboard_help_path: '/help/user/application_security/security_dashboard/index',
-          user_callouts_path: '/-/user_callouts',
-          user_callout_id: 'standalone_vulnerabilities_introduction_banner',
-          show_introduction_banner: 'true',
           not_enabled_scanners_help_path: help_page_path('user/application_security/index', anchor: 'quick-start'),
           no_pipeline_run_scanners_help_path: new_project_pipeline_path(project)
         }
@@ -275,21 +270,21 @@ RSpec.describe ProjectsHelper do
       allow(project).to receive(:adjourned_deletion?).and_return(enabled)
     end
 
-    context 'when project has adjourned deletion enabled' do
+    context 'when project has delayed deletion enabled' do
       let(:enabled) { true }
 
       it do
         deletion_date = helper.permanent_deletion_date(Time.now.utc)
 
-        expect(subject).to eq "Removing a project places it into a read-only state until #{deletion_date}, at which point the project will be permanently removed. Are you ABSOLUTELY sure?"
+        expect(subject).to eq "Deleting a project places it into a read-only state until #{deletion_date}, at which point the project will be permanently deleted. Are you ABSOLUTELY sure?"
       end
     end
 
-    context 'when project has adjourned deletion disabled' do
+    context 'when project has delayed deletion disabled' do
       let(:enabled) { false }
 
       it do
-        expect(subject).to eq "You are going to remove #{project.full_name}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?"
+        expect(subject).to eq "You are going to delete #{project.full_name}. Deleted projects CANNOT be restored! Are you ABSOLUTELY sure?"
       end
     end
   end

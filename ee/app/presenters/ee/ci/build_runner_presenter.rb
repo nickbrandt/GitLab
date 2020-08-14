@@ -27,16 +27,6 @@ module EE
           }
         }
       end
-
-      def variable_value(key)
-        variables_hash[key]
-      end
-
-      def variables_hash
-        @variables_hash ||= variables.map do |variable|
-          [variable[:key], variable[:value]]
-        end.to_h
-      end
     end
   end
 end

@@ -750,6 +750,7 @@ PUT /groups/:id
 | `file_template_project_id`           | integer | no       | **(PREMIUM)** The ID of a project to load custom file templates from. |
 | `shared_runners_minutes_limit`       | integer | no       | **(STARTER ONLY)** Pipeline minutes quota for this group (included in plan). Can be `nil` (default; inherit system default), `0` (unlimited) or `> 0` |
 | `extra_shared_runners_minutes_limit` | integer | no       | **(STARTER ONLY)** Extra pipeline minutes quota for this group (purchased in addition to the minutes included in the plan). |
+| `prevent_forking_outside_group`      | boolean | no       | **(PREMIUM)** When enabled, users can **not** fork projects from this group to external namespaces
 
 NOTE: **Note:**
 The `projects` and `shared_projects` attributes in the response are deprecated and will be [removed in API v5](https://gitlab.com/gitlab-org/gitlab/-/issues/213797).
@@ -846,7 +847,7 @@ Only available to group owners and administrators.
 This endpoint either:
 
 - Removes group, and queues a background job to delete all projects in the group as well.
-- Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers, marks a group for deletion. The deletion will happen 7 days later by default, but this can be changed in the [instance settings](../user/admin_area/settings/visibility_and_access_controls.md#default-deletion-adjourned-period-premium-only).
+- Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/) or higher tiers, marks a group for deletion. The deletion will happen 7 days later by default, but this can be changed in the [instance settings](../user/admin_area/settings/visibility_and_access_controls.md#default-deletion-delay-premium-only).
 
 ```plaintext
 DELETE /groups/:id

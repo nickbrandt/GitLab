@@ -1,0 +1,5 @@
+---
+title: 'Geo: Remove FDW warnings from configuration checks'
+merge_request: 38629
+author:
+type: removed

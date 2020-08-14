@@ -1513,41 +1513,81 @@ RSpec.describe Project do
   end
 
   describe '#latest_pipeline_with_security_reports' do
-    let(:project) { create(:project) }
-    let!(:pipeline_1) { create(:ci_pipeline, project: project) }
-    let!(:pipeline_2) { create(:ci_pipeline, project: project) }
-    let!(:pipeline_3) { create(:ci_pipeline, project: project) }
+    let(:only_successful) { false }
 
-    subject { project.latest_pipeline_with_security_reports }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:pipeline_1) { create(:ci_pipeline, :success, project: project) }
+    let_it_be(:pipeline_2) { create(:ci_pipeline, project: project) }
+    let_it_be(:pipeline_3) { create(:ci_pipeline, :success, project: project) }
 
-    context 'when legacy reports are used' do
-      before do
-        create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
-        create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
+    subject { project.latest_pipeline_with_security_reports(only_successful: only_successful) }
+
+    context 'when all pipelines are used' do
+      context 'when legacy reports are used' do
+        before do
+          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
+          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
+        end
+
+        it 'returns the latest pipeline with security reports' do
+          is_expected.to eq(pipeline_2)
+        end
       end
 
-      it "returns the latest pipeline with security reports" do
-        is_expected.to eq(pipeline_2)
+      context 'when new reports are used' do
+        before do
+          create(:ee_ci_build, :sast, pipeline: pipeline_1)
+          create(:ee_ci_build, :sast, pipeline: pipeline_2)
+        end
+
+        it 'returns the latest pipeline with security reports' do
+          is_expected.to eq(pipeline_2)
+        end
+
+        context 'when legacy used' do
+          before do
+            create(:ee_ci_build, :legacy_sast, pipeline: pipeline_3)
+          end
+
+          it 'prefers the new reports' do
+            is_expected.to eq(pipeline_2)
+          end
+        end
       end
     end
 
-    context 'when new reports are used' do
-      before do
-        create(:ee_ci_build, :sast, pipeline: pipeline_1)
-        create(:ee_ci_build, :sast, pipeline: pipeline_2)
-      end
+    context 'when only successful pipelines are used' do
+      let(:only_successful) { true }
 
-      it "returns the latest pipeline with security reports" do
-        is_expected.to eq(pipeline_2)
-      end
-
-      context 'when legacy used' do
+      context 'when legacy reports are used' do
         before do
-          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_3)
+          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
+          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
         end
 
-        it "prefers the new reports" do
-          is_expected.to eq(pipeline_2)
+        it "returns the latest succesful pipeline with security reports" do
+          is_expected.to eq(pipeline_1)
+        end
+      end
+
+      context 'when new reports are used' do
+        before do
+          create(:ee_ci_build, :sast, pipeline: pipeline_1)
+          create(:ee_ci_build, :sast, pipeline: pipeline_2)
+        end
+
+        it 'returns the latest successful pipeline with security reports' do
+          is_expected.to eq(pipeline_1)
+        end
+
+        context 'when legacy used' do
+          before do
+            create(:ee_ci_build, :legacy_sast, pipeline: pipeline_3)
+          end
+
+          it 'prefers the new reports' do
+            is_expected.to eq(pipeline_1)
+          end
         end
       end
     end
@@ -1668,80 +1708,86 @@ RSpec.describe Project do
   end
 
   describe '#after_import' do
-    let(:project) { create(:project) }
-    let(:repository_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
-    let(:wiki_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
-    let(:design_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+    let_it_be(:project) { create(:project) }
 
-    before do
-      create(:import_state, project: project)
+    context 'Geo repository update events' do
+      let_it_be(:import_state) { create(:import_state, :started, project: project) }
+      let(:repository_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+      let(:wiki_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
+      let(:design_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
 
-      allow(::Geo::RepositoryUpdatedService)
-        .to receive(:new)
-        .with(project.repository)
-        .and_return(repository_updated_service)
-
-      allow(::Geo::RepositoryUpdatedService)
-        .to receive(:new)
-        .with(project.wiki.repository)
-        .and_return(wiki_updated_service)
-
-      allow(::Geo::RepositoryUpdatedService)
-        .to receive(:new)
-        .with(project.design_repository)
-        .and_return(design_updated_service)
-    end
-
-    it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node' do
-      allow(Gitlab::Geo).to receive(:primary?).and_return(true)
-
-      expect(repository_updated_service).to receive(:execute).once
-      expect(wiki_updated_service).to receive(:execute).once
-      expect(design_updated_service).to receive(:execute).once
-
-      project.after_import
-    end
-
-    it 'does not call Geo::RepositoryUpdatedService when not running on a Geo primary node' do
-      allow(Gitlab::Geo).to receive(:primary?).and_return(false)
-
-      expect(repository_updated_service).not_to receive(:execute)
-      expect(wiki_updated_service).not_to receive(:execute)
-
-      project.after_import
-    end
-
-    context 'elasticsearch indexing disabled for this project' do
       before do
-        expect(project).to receive(:use_elasticsearch?).and_return(false)
+        allow(::Geo::RepositoryUpdatedService)
+          .to receive(:new)
+          .with(project.repository)
+          .and_return(repository_updated_service)
+
+        allow(::Geo::RepositoryUpdatedService)
+          .to receive(:new)
+          .with(project.wiki.repository)
+          .and_return(wiki_updated_service)
+
+        allow(::Geo::RepositoryUpdatedService)
+          .to receive(:new)
+          .with(project.design_repository)
+          .and_return(design_updated_service)
       end
 
-      it 'does not index the wiki repository' do
-        expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+      it 'calls Geo::RepositoryUpdatedService when running on a Geo primary node', :aggregate_failures do
+        stub_primary_node
+
+        expect(repository_updated_service).to receive(:execute).once
+        expect(wiki_updated_service).to receive(:execute).once
+        expect(design_updated_service).to receive(:execute).once
+
+        project.after_import
+      end
+
+      it 'does not call Geo::RepositoryUpdatedService when not running on a Geo primary node', :aggregate_failures do
+        expect(repository_updated_service).not_to receive(:execute)
+        expect(wiki_updated_service).not_to receive(:execute)
+        expect(design_updated_service).not_to receive(:execute)
 
         project.after_import
       end
     end
 
-    context 'elasticsearch indexing enabled for this project' do
-      before do
-        expect(project).to receive(:use_elasticsearch?).and_return(true)
-      end
+    context 'elasticsearch indexing' do
+      let_it_be(:import_state) { create(:import_state, project: project) }
 
-      it 'schedules a full index of the wiki repository' do
-        expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true)
-
-        project.after_import
-      end
-
-      context 'when project is forked' do
+      context 'elasticsearch indexing disabled for this project' do
         before do
-          expect(project).to receive(:forked?).and_return(true)
+          expect(project).to receive(:use_elasticsearch?).and_return(false)
         end
+
         it 'does not index the wiki repository' do
           expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
 
           project.after_import
+        end
+      end
+
+      context 'elasticsearch indexing enabled for this project' do
+        before do
+          expect(project).to receive(:use_elasticsearch?).and_return(true)
+        end
+
+        it 'schedules a full index of the wiki repository' do
+          expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil, nil, true)
+
+          project.after_import
+        end
+
+        context 'when project is forked' do
+          before do
+            expect(project).to receive(:forked?).and_return(true)
+          end
+
+          it 'does not index the wiki repository' do
+            expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
+
+            project.after_import
+          end
         end
       end
     end
@@ -2329,7 +2375,7 @@ RSpec.describe Project do
   end
 
   describe '#ancestor_marked_for_deletion' do
-    context 'adjourned deletion feature is not available' do
+    context 'delayed deletion feature is not available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end
@@ -2347,7 +2393,7 @@ RSpec.describe Project do
       end
     end
 
-    context 'adjourned deletion feature is available' do
+    context 'delayed deletion feature is available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end

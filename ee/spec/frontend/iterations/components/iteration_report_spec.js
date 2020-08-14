@@ -5,7 +5,7 @@ import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
 describe('Iterations tabs', () => {
   let wrapper;
   const defaultProps = {
-    groupPath: 'gitlab-org',
+    fullPath: 'gitlab-org',
     iterationIid: '3',
   };
 
@@ -18,7 +18,7 @@ describe('Iterations tabs', () => {
       propsData: props,
       mocks: {
         $apollo: {
-          queries: { group: { loading } },
+          queries: { namespace: { loading } },
         },
       },
       stubs: {
@@ -59,7 +59,7 @@ describe('Iterations tabs', () => {
     const iteration = {
       title: 'June week 1',
       id: 'gid://gitlab/Iteration/2',
-      description: 'The first week of June',
+      descriptionHtml: 'The first week of June',
       startDate: '2020-06-02',
       dueDate: '2020-06-08',
     };
@@ -70,7 +70,7 @@ describe('Iterations tabs', () => {
       });
 
       wrapper.setData({
-        group: {
+        namespace: {
           iteration,
         },
       });
@@ -89,24 +89,7 @@ describe('Iterations tabs', () => {
 
     it('shows title and description', () => {
       expect(findTitle().text()).toContain(iteration.title);
-      expect(findDescription().text()).toContain(iteration.description);
-    });
-
-    it('escapes html in description', async () => {
-      wrapper.setData({
-        group: {
-          iteration: {
-            ...iteration,
-            description: `<img src=x onerror=alert(document.domain)>`,
-          },
-        },
-      });
-
-      await wrapper.vm.$nextTick();
-
-      expect(findDescription().html()).toEqual(
-        '<div>&lt;img src=x onerror=alert(document.domain)&gt;</div>',
-      );
+      expect(findDescription().text()).toContain(iteration.descriptionHtml);
     });
   });
 });

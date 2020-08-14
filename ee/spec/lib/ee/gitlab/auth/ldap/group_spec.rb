@@ -47,6 +47,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Group do
           member_attr: 'member'
         )
       end
+
       let(:group2_entry) do
         ldap_group_entry(
           [user_dn('user3'), user_dn('user4')],
@@ -56,6 +57,7 @@ RSpec.describe EE::Gitlab::Auth::Ldap::Group do
           member_of: group1_entry.dn
         )
       end
+
       let(:group) { described_class.new(group1_entry, adapter) }
 
       it 'resolves the correct member_dns when there are nested groups' do

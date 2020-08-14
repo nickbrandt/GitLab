@@ -22,10 +22,10 @@ module Geo::ReplicableRegistry
     def declarative_policy_class
       'Geo::RegistryPolicy'
     end
-  end
 
-  def registry_consistency_worker_enabled?
-    replicator_class.enabled?
+    def registry_consistency_worker_enabled?
+      replicator_class.enabled?
+    end
   end
 
   def replicator_class

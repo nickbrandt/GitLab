@@ -27,8 +27,8 @@ describe('Release edit/new component', () => {
     };
 
     actions = {
-      fetchRelease: jest.fn(),
-      updateRelease: jest.fn(),
+      initializeRelease: jest.fn(),
+      saveRelease: jest.fn(),
       addEmptyAssetLink: jest.fn(),
     };
 
@@ -64,6 +64,8 @@ describe('Release edit/new component', () => {
         glFeatures: featureFlags,
       },
     });
+
+    wrapper.element.querySelectorAll('input').forEach(input => jest.spyOn(input, 'focus'));
   };
 
   beforeEach(() => {
@@ -81,14 +83,23 @@ describe('Release edit/new component', () => {
   });
 
   const findSubmitButton = () => wrapper.find('button[type=submit]');
+  const findForm = () => wrapper.find('form');
 
   describe(`basic functionality tests: all tests unrelated to the "${BACK_URL_PARAM}" parameter`, () => {
-    beforeEach(() => {
-      factory();
+    beforeEach(factory);
+
+    it('calls initializeRelease when the component is created', () => {
+      expect(actions.initializeRelease).toHaveBeenCalledTimes(1);
     });
 
-    it('calls fetchRelease when the component is created', () => {
-      expect(actions.fetchRelease).toHaveBeenCalledTimes(1);
+    it('focuses the first non-disabled input element once the page is shown', () => {
+      const firstEnabledInput = wrapper.element.querySelector('input:enabled');
+      const allInputs = wrapper.element.querySelectorAll('input');
+
+      allInputs.forEach(input => {
+        const expectedFocusCalls = input === firstEnabledInput ? 1 : 0;
+        expect(input.focus).toHaveBeenCalledTimes(expectedFocusCalls);
+      });
     });
 
     it('renders the description text at the top of the page', () => {
@@ -109,16 +120,15 @@ describe('Release edit/new component', () => {
       expect(findSubmitButton().attributes('type')).toBe('submit');
     });
 
-    it('calls updateRelease when the form is submitted', () => {
-      wrapper.find('form').trigger('submit');
-      expect(actions.updateRelease).toHaveBeenCalledTimes(1);
+    it('calls saveRelease when the form is submitted', () => {
+      findForm().trigger('submit');
+
+      expect(actions.saveRelease).toHaveBeenCalledTimes(1);
     });
   });
 
   describe(`when the URL does not contain a "${BACK_URL_PARAM}" parameter`, () => {
-    beforeEach(() => {
-      factory();
-    });
+    beforeEach(factory);
 
     it(`renders a "Cancel" button with an href pointing to "${BACK_URL_PARAM}"`, () => {
       const cancelButton = wrapper.find('.js-cancel-button');
@@ -140,6 +150,34 @@ describe('Release edit/new component', () => {
     it('renders a "Cancel" button with an href pointing to the main Releases page', () => {
       const cancelButton = wrapper.find('.js-cancel-button');
       expect(cancelButton.attributes().href).toBe(backUrl);
+    });
+  });
+
+  describe('when creating a new release', () => {
+    beforeEach(() => {
+      factory({
+        store: {
+          modules: {
+            detail: {
+              getters: {
+                isExistingRelease: () => false,
+              },
+            },
+          },
+        },
+      });
+    });
+
+    it('renders the submit button with the text "Create release"', () => {
+      expect(findSubmitButton().text()).toBe('Create release');
+    });
+  });
+
+  describe('when editing an existing release', () => {
+    beforeEach(factory);
+
+    it('renders the submit button with the text "Save changes"', () => {
+      expect(findSubmitButton().text()).toBe('Save changes');
     });
   });
 
@@ -205,6 +243,12 @@ describe('Release edit/new component', () => {
 
       it('renders the submit button as disabled', () => {
         expect(findSubmitButton().attributes('disabled')).toBe('disabled');
+      });
+
+      it('does not allow the form to be submitted', () => {
+        findForm().trigger('submit');
+
+        expect(actions.saveRelease).not.toHaveBeenCalled();
       });
     });
   });

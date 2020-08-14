@@ -37,6 +37,7 @@ module Gitlab
             .merge(usage_activity_by_stage)
             .merge(usage_activity_by_stage(:usage_activity_by_stage_monthly, last_28_days_time_period))
             .merge(analytics_unique_visits_data)
+            .merge(compliance_unique_visits_data)
         end
       end
 
@@ -63,7 +64,6 @@ module Gitlab
       # rubocop: disable Metrics/AbcSize
       # rubocop: disable CodeReuse/ActiveRecord
       def system_usage_data
-        alert_bot_incident_count = count(::Issue.authored(::User.alert_bot), start: issue_minimum_id, finish: issue_maximum_id)
         issues_created_manually_from_alerts = count(Issue.with_alert_management_alerts.not_authored_by(::User.alert_bot), start: issue_minimum_id, finish: issue_maximum_id)
 
         {
@@ -121,8 +121,8 @@ module Gitlab
             issues_created_from_alerts: total_alert_issues,
             issues_created_gitlab_alerts: issues_created_manually_from_alerts,
             issues_created_manually_from_alerts: issues_created_manually_from_alerts,
-            incident_issues: alert_bot_incident_count,
-            alert_bot_incident_issues: alert_bot_incident_count,
+            incident_issues: count(::Issue.incident, start: issue_minimum_id, finish: issue_maximum_id),
+            alert_bot_incident_issues: count(::Issue.authored(::User.alert_bot), start: issue_minimum_id, finish: issue_maximum_id),
             incident_labeled_issues: count(::Issue.with_label_attributes(::IncidentManagement::CreateIncidentLabelService::LABEL_PROPERTIES), start: issue_minimum_id, finish: issue_maximum_id),
             keys: count(Key),
             label_lists: count(List.label),
@@ -140,6 +140,7 @@ module Gitlab
             projects_with_terraform_reports: distinct_count(::Ci::JobArtifact.terraform_reports, :project_id),
             projects_with_terraform_states: distinct_count(::Terraform::State, :project_id),
             protected_branches: count(ProtectedBranch),
+            protected_branches_except_default: count(ProtectedBranch.where.not(name: ['main', 'master', Gitlab::CurrentSettings.default_branch_name])),
             releases: count(Release),
             remote_mirrors: count(RemoteMirror),
             personal_snippets: count(PersonalSnippet),
@@ -358,6 +359,7 @@ module Gitlab
           response["projects_#{service_name}_active".to_sym] = count(Service.active.where(template: false, instance: false, type: "#{service_name}_service".camelize))
           response["templates_#{service_name}_active".to_sym] = count(Service.active.where(template: true, type: "#{service_name}_service".camelize))
           response["instances_#{service_name}_active".to_sym] = count(Service.active.where(instance: true, type: "#{service_name}_service".camelize))
+          response["projects_inheriting_instance_#{service_name}_active".to_sym] = count(Service.active.where.not(inherit_from_id: nil).where(type: "#{service_name}_service".camelize))
         end.merge(jira_usage, jira_import_usage)
         # rubocop: enable UsageData/LargeTable:
       end
@@ -580,13 +582,23 @@ module Gitlab
       end
 
       def analytics_unique_visits_data
-        results = ::Gitlab::Analytics::UniqueVisits::TARGET_IDS.each_with_object({}) do |target_id, hash|
+        results = ::Gitlab::Analytics::UniqueVisits::ANALYTICS_IDS.each_with_object({}) do |target_id, hash|
           hash[target_id] = redis_usage_data { unique_visit_service.unique_visits_for(targets: target_id) }
         end
-        results['analytics_unique_visits_for_any_target'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :any) }
-        results['analytics_unique_visits_for_any_target_monthly'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :any, weeks: 4) }
+        results['analytics_unique_visits_for_any_target'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :analytics) }
+        results['analytics_unique_visits_for_any_target_monthly'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :analytics, weeks: 4) }
 
         { analytics_unique_visits: results }
+      end
+
+      def compliance_unique_visits_data
+        results = ::Gitlab::Analytics::UniqueVisits::COMPLIANCE_IDS.each_with_object({}) do |target_id, hash|
+          hash[target_id] = redis_usage_data { unique_visit_service.unique_visits_for(targets: target_id) }
+        end
+        results['compliance_unique_visits_for_any_target'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :compliance) }
+        results['compliance_unique_visits_for_any_target_monthly'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :compliance, weeks: 4) }
+
+        { compliance_unique_visits: results }
       end
 
       def action_monthly_active_users(time_period)

@@ -105,9 +105,11 @@ RSpec.describe API::FeatureFlags do
       let!(:feature_flag) do
         create(:operations_feature_flag, :new_version_flag, project: project, name: 'feature1')
       end
+
       let!(:strategy) do
         create(:operations_strategy, feature_flag: feature_flag, name: 'default', parameters: {})
       end
+
       let!(:scope) do
         create(:operations_scope, strategy: strategy, environment_scope: 'production')
       end
@@ -812,6 +814,17 @@ RSpec.describe API::FeatureFlags do
         expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
         expect(json_response['active']).to eq(false)
         expect(feature_flag.reload.active).to eq(false)
+      end
+
+      it 'updates the feature flag name' do
+        params = { name: 'new-name' }
+
+        put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(json_response['name']).to eq('new-name')
+        expect(feature_flag.reload.name).to eq('new-name')
       end
 
       it 'ignores a provided version parameter' do

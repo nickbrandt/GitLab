@@ -1,9 +1,9 @@
 <script>
 import { GlAlert, GlLink, GlSprintf, GlTable } from '@gitlab/ui';
-import { s__, __, sprintf } from '~/locale';
+import { s__, __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import AutoFixSettings from './auto_fix_settings.vue';
-import CreateMergeRequestButton from './create_merge_request_button.vue';
+import ManageFeature from './manage_feature.vue';
 
 export default {
   components: {
@@ -12,7 +12,7 @@ export default {
     GlSprintf,
     GlTable,
     AutoFixSettings,
-    CreateMergeRequestButton,
+    ManageFeature,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -60,8 +60,7 @@ export default {
     // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575
     createSastMergeRequestPath: {
       type: String,
-      required: false,
-      default: '',
+      required: true,
     },
   },
   computed: {
@@ -114,17 +113,6 @@ export default {
 
       return s__('SecurityConfiguration|Not enabled');
     },
-    getFeatureDocumentationLinkLabel(featureName) {
-      return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
-        featureName,
-      });
-    },
-    // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575
-    canCreateSASTMergeRequest(feature) {
-      return Boolean(
-        feature.type === 'sast' && this.createSastMergeRequestPath && !this.gitlabCiPresent,
-      );
-    },
   },
   autoDevopsAlertMessage: s__(`
     SecurityConfiguration|You can quickly enable all security scanning tools by
@@ -170,20 +158,12 @@ export default {
       </template>
 
       <template #cell(manage)="{ item }">
-        <create-merge-request-button
-          v-if="canCreateSASTMergeRequest(item)"
+        <manage-feature
+          :feature="item"
+          :gitlab-ci-present="gitlabCiPresent"
           :auto-devops-enabled="autoDevopsEnabled"
-          :endpoint="createSastMergeRequestPath"
+          :create-sast-merge-request-path="createSastMergeRequestPath"
         />
-
-        <gl-link
-          v-else
-          target="_blank"
-          :href="item.link"
-          :aria-label="getFeatureDocumentationLinkLabel(item.name)"
-        >
-          {{ s__('SecurityConfiguration|See documentation') }}
-        </gl-link>
       </template>
     </gl-table>
     <auto-fix-settings v-if="glFeatures.securityAutoFix" v-bind="autoFixSettingsProps" />

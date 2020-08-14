@@ -10,7 +10,7 @@ module QA
       PrometheusQueryError = Class.new(StandardError)
 
       def initialize
-        @gitlab = 'gitlab-gitaly-ha'
+        @gitlab = 'gitlab-gitaly-cluster'
         @praefect = 'praefect'
         @postgres = 'postgres'
         @primary_node = 'gitaly1'
@@ -27,19 +27,23 @@ module QA
       end
 
       def replicated?(project_id)
-        replicas = wait_until_shell_command(%(docker exec gitlab-gitaly-ha bash -c 'gitlab-rake "gitlab:praefect:replicas[#{project_id}]"')) do |line|
-          QA::Runtime::Logger.debug(line.chomp)
-          # The output of the rake task looks something like this:
-          #
-          # Project name                    | gitaly1 (primary)                        | gitaly2                                  | gitaly3
-          # ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-          # gitaly_cluster-3aff1f2bd14e6c98 | 23c4422629234d62b62adacafd0a33a8364e8619 | 23c4422629234d62b62adacafd0a33a8364e8619 | 23c4422629234d62b62adacafd0a33a8364e8619
-          #
-          break line if line.start_with?("gitaly_cluster")
-        end
+        Support::Retrier.retry_until(raise_on_failure: false) do
+          replicas = wait_until_shell_command(%(docker exec #{@gitlab} bash -c 'gitlab-rake "gitlab:praefect:replicas[#{project_id}]"')) do |line|
+            QA::Runtime::Logger.debug(line.chomp)
+            # The output of the rake task looks something like this:
+            #
+            # Project name                    | gitaly1 (primary)                        | gitaly2                                  | gitaly3
+            # ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+            # gitaly_cluster-3aff1f2bd14e6c98 | 23c4422629234d62b62adacafd0a33a8364e8619 | 23c4422629234d62b62adacafd0a33a8364e8619 | 23c4422629234d62b62adacafd0a33a8364e8619
+            #
+            break line if line.start_with?('gitaly_cluster')
+            break nil if line.include?('Something went wrong when getting replicas')
+          end
+          next false unless replicas
 
-        # We want to know if the checksums are identical
-        replicas.split('|').map(&:strip)[1..3].uniq.one?
+          # We want to know if the checksums are identical
+          replicas&.split('|')&.map(&:strip)&.slice(1..3)&.uniq&.one?
+        end
       end
 
       def start_primary_node
@@ -54,6 +58,14 @@ module QA
         stop_node(@praefect)
       end
 
+      def stop_secondary_node
+        stop_node(@secondary_node)
+      end
+
+      def start_secondary_node
+        start_node(@secondary_node)
+      end
+
       def start_node(name)
         shell "docker start #{name}"
       end
@@ -65,6 +77,7 @@ module QA
       def trigger_failover_by_stopping_primary_node
         QA::Runtime::Logger.info("Stopping node #{@primary_node} to trigger failover")
         stop_node(@primary_node)
+        wait_for_new_primary
       end
 
       def clear_replication_queue
@@ -109,7 +122,7 @@ module QA
       end
 
       def query_read_distribution
-        output = shell "docker exec gitlab-gitaly-ha bash -c 'curl -s http://localhost:9090/api/v1/query?query=gitaly_praefect_read_distribution'" do |line|
+        output = shell "docker exec #{@gitlab} bash -c 'curl -s http://localhost:9090/api/v1/query?query=gitaly_praefect_read_distribution'" do |line|
           QA::Runtime::Logger.debug(line)
           break line
         end
@@ -118,6 +131,18 @@ module QA
         raise PrometheusQueryError, "Unable to query read distribution metrics" unless result['status'] == 'success'
 
         result['data']['result'].map { |result| { node: result['metric']['storage'], value: result['value'][1].to_i } }
+      end
+
+      def replication_queue_incomplete_count
+        result = []
+        shell sql_to_docker_exec_cmd("select count(*) from replication_queue where state = 'ready' or state = 'in_progress';") do |line|
+          result << line
+        end
+        # The result looks like:
+        #   count
+        #   -----
+        #       1
+        result[2].to_i
       end
 
       def replication_queue_lock_count
@@ -153,15 +178,6 @@ module QA
 
         wait_for_health_check_all_nodes
         wait_for_reliable_connection
-      end
-
-      def reset_cluster
-        QA::Runtime::Logger.info('Reset Gitaly Cluster by starting all nodes and enabling writes')
-        start_node(@praefect)
-        start_node(@primary_node)
-        start_node(@secondary_node)
-        start_node(@tertiary_node)
-        wait_for_health_check_all_nodes
       end
 
       def verify_storage_move(source_storage, destination_storage)
@@ -276,6 +292,22 @@ module QA
         end
       end
 
+      def wait_for_secondary_node_health_check_failure
+        wait_for_health_check_failure(@secondary_node)
+      end
+
+      def wait_for_health_check_failure(node)
+        QA::Runtime::Logger.info("Waiting for Praefect to record a health check failure on #{node}")
+        wait_until_shell_command("docker exec #{@praefect} bash -c 'tail -n 1 /var/log/gitlab/praefect/current'") do |line|
+          QA::Runtime::Logger.debug(line.chomp)
+          log = JSON.parse(line)
+
+          log['msg'] == 'error when pinging healthcheck' && log['storage'] == node
+        rescue JSON::ParserError
+          # Ignore lines that can't be parsed as JSON
+        end
+      end
+
       def wait_for_gitaly_check
         Support::Waiter.repeat_until(max_attempts: 3) do
           storage_ok = false
@@ -292,23 +324,21 @@ module QA
         end
       end
 
-      def wait_for_gitlab_shell_check
-        wait_until_shell_command_matches(
-          "docker exec #{@gitlab} bash -c 'gitlab-rake gitlab:gitlab_shell:check'",
-          /Checking GitLab Shell ... Finished/
-        )
-      end
-
       # Waits until there is an increase in the number of reads for
-      # any node compared to the number of reads provided
+      # any node compared to the number of reads provided. If a node
+      # has no pre-read data, consider it to have had zero reads.
       def wait_for_read_count_change(pre_read_data)
         diff_found = false
         Support::Waiter.wait_until(sleep_interval: 5) do
           query_read_distribution.each_with_index do |data, index|
-            diff_found = true if data[:value] > pre_read_data[index][:value]
+            diff_found = true if data[:value] > value_for_node(pre_read_data, data[:node])
           end
           diff_found
         end
+      end
+
+      def value_for_node(data, node)
+        data.find(-> {{ value: 0 }}) { |item| item[:node] == node }[:value]
       end
 
       def wait_for_reliable_connection
@@ -316,11 +346,11 @@ module QA
         wait_for_praefect
         wait_for_sql_ping
         wait_for_storage_nodes
-        wait_for_gitlab_shell_check
+        wait_for_gitaly_check
       end
 
       def wait_for_replication(project_id)
-        Support::Waiter.wait_until(sleep_interval: 1) { replicated?(project_id) }
+        Support::Waiter.wait_until(sleep_interval: 1) { replication_queue_incomplete_count == 0 && replicated?(project_id) }
       end
 
       private

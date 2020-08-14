@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe GitlabSchema.types['Query'] do
   specify do
     expect(described_class).to have_graphql_fields(
+      :iteration,
       :geo_node,
       :vulnerabilities,
       :instance_security_dashboard,

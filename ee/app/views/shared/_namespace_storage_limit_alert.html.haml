@@ -21,7 +21,7 @@
       %h4.gl-alert-title= payload[:usage_message]
     - if alert_level != :error
       %button.js-namespace-storage-alert-dismiss.gl-alert-dismiss.gl-cursor-pointer{ type: 'button', 'aria-label' => _('Dismiss'), data: { id: root_namespace.id, level: alert_level } }
-        = sprite_icon('close', size: 16, css_class: 'gl-icon')
+        = sprite_icon('close', css_class: 'gl-icon')
     .gl-alert-body
       = payload[:explanation_message]
     - if link

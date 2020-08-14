@@ -57,27 +57,6 @@ RSpec.describe Projects::PipelinesController do
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response['pipelines'].count).to eq 12
       end
-
-      context 'with build_report_summary turned off' do
-        before do
-          stub_feature_flags(build_report_summary: false)
-        end
-
-        it 'does not execute N+1 queries' do
-          get_pipelines_index_json
-
-          control_count = ActiveRecord::QueryRecorder.new do
-            get_pipelines_index_json
-          end.count
-
-          create_all_pipeline_types
-
-          # There appears to be one extra query for Pipelines#has_warnings? for some reason
-          expect { get_pipelines_index_json }.not_to exceed_query_limit(control_count + 1)
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['pipelines'].count).to eq 12
-        end
-      end
     end
 
     it 'does not include coverage data for the pipelines' do
@@ -1007,76 +986,6 @@ RSpec.describe Projects::PipelinesController do
     def clear_controller_memoization
       controller.clear_memoization(:pipeline_test_report)
       controller.instance_variable_set(:@pipeline, nil)
-    end
-  end
-
-  describe 'GET test_report_count.json' do
-    subject(:test_reports_count_json) do
-      get :test_reports_count, params: {
-        namespace_id: project.namespace,
-        project_id: project,
-        id: pipeline.id
-      },
-      format: :json
-    end
-
-    context 'when feature is enabled' do
-      before do
-        stub_feature_flags(junit_pipeline_view: true)
-      end
-
-      context 'when pipeline does not have a test report' do
-        let(:pipeline) { create(:ci_pipeline, project: project) }
-
-        it 'renders an empty badge counter' do
-          test_reports_count_json
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['total_count']).to eq(0)
-        end
-      end
-
-      context 'when pipeline has a test report' do
-        let(:pipeline) { create(:ci_pipeline, :with_test_reports, project: project) }
-
-        it 'renders the badge counter value' do
-          test_reports_count_json
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['total_count']).to eq(4)
-        end
-      end
-
-      context 'when pipeline has corrupt test reports' do
-        let(:pipeline) { create(:ci_pipeline, project: project) }
-
-        before do
-          job = create(:ci_build, pipeline: pipeline)
-          create(:ci_job_artifact, :junit_with_corrupted_data, job: job, project: project)
-        end
-
-        it 'renders 0' do
-          test_reports_count_json
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['total_count']).to eq(0)
-        end
-      end
-    end
-
-    context 'when feature is disabled' do
-      let(:pipeline) { create(:ci_empty_pipeline, project: project) }
-
-      before do
-        stub_feature_flags(junit_pipeline_view: false)
-      end
-
-      it 'renders empty response' do
-        test_reports_count_json
-
-        expect(response).to have_gitlab_http_status(:no_content)
-        expect(response.body).to be_empty
-      end
     end
   end
 

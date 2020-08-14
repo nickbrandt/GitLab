@@ -13,6 +13,8 @@ For programmatic help adhering to the guidelines, see [Testing](index.md#testing
 See the GitLab handbook for further [writing style guidelines](https://about.gitlab.com/handbook/communication/#writing-style-guidelines)
 that apply to all GitLab content, not just documentation.
 
+View [a list of recent style guide updates](https://gitlab.com/dashboard/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&label_name[]=tw-style&not[label_name][]=docs%3A%3Afix).
+
 ## Documentation is the single source of truth (SSOT)
 
 ### Why a single source of truth
@@ -249,7 +251,7 @@ GitLab documentation should be clear and easy to understand.
 
 - Be clear, concise, and stick to the goal of the documentation.
 - Write in US English with US grammar. (Tested in [`British.yml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/.vale/gitlab/British.yml).)
-- Use inclusive language.
+- Use [inclusive language](#inclusive-language).
 
 ### Point of view
 
@@ -270,8 +272,12 @@ Use sentence case. For example:
 
 #### UI text
 
-When including user interface text, like button labels or menu items, use the same capitalization that's in the UI.
-Standards for this content are listed in the [Pajamas Design System Content section](https://design.gitlab.com/content/punctuation).
+When referring to specific user interface text, like a button label or menu item, use the same capitalization that is displayed in the UI.
+Standards for this content are listed in the [Pajamas Design System Content section](https://design.gitlab.com/content/punctuation/) and typically
+match what is called for in this Documentation Style Guide.
+
+If you think there is a mistake in the way the UI text is styled,
+create an issue or an MR to propose a change to the UI text.
 
 #### Feature names
 
@@ -282,6 +288,7 @@ Standards for this content are listed in the [Pajamas Design System Content sect
   - merge requests
   - milestones
   - reorder issues
+  - runner, runners, shared runners
 - **Some features are capitalized**, typically nouns naming GitLab-specific capabilities or tools. For example:
   - GitLab CI/CD
   - Repository Mirroring
@@ -289,6 +296,7 @@ Standards for this content are listed in the [Pajamas Design System Content sect
   - the To-Do List
   - the Web IDE
   - Geo
+  - GitLab Runner (see [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/233529) for details)
 
 Document any exceptions in this style guide. If you're not sure, ask a GitLab Technical Writer so that they can help decide and document the result.
 
@@ -304,6 +312,60 @@ Capitalize names of:
 - Methods or methodologies. For example, Continuous Integration, Continuous Deployment, Scrum, and Agile. (Tested in [`.markdownlint.json`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/.markdownlint.json).)
 
 Follow the capitalization style listed at the [authoritative source](#links-to-external-documentation) for the entity, which may use non-standard case styles. For example: GitLab and npm.
+
+### Inclusive language
+
+We strive to create documentation that is inclusive. This section includes guidance and examples in the
+following categories:
+
+- [Gender-specific wording](#avoid-gender-specific-wording).
+- [Ableist language](#avoid-ableist-language).
+- [Cultural sensitivity](#culturally-sensitive-language).
+
+We write our developer documentation with inclusivity and diversity in mind. This page is not an exhaustive reference, but describes some general guidelines and examples that illustrate some best practices to follow.
+
+#### Avoid gender-specific wording
+
+When possible, use gender-neutral pronouns. For example, you can use a singular
+[they](https://developers.google.com/style/pronouns#gender-neutral-pronouns) as a gender-neutral
+pronoun.
+
+Avoid the use of gender-specific pronouns, unless referring to a specific person.
+
+| Use                               | Avoid           |
+|-----------------------------------|-----------------|
+| People, humanity                  | Mankind         |
+| GitLab Team Members               | Manpower        |
+| You can install; They can install | He can install; She can install |
+
+If you need to set up [Fake user information](#fake-user-information), use diverse or non-gendered
+names with common surnames.
+
+#### Avoid ableist language
+
+Avoid terms that are also used in negative stereotypes for different groups.
+
+| Use                    | Avoid                |
+|------------------------|----------------------|
+| Check for completeness | Sanity check         |
+| Uncertain outliers     | Crazy outliers       |
+| Slows the service      | Cripples the service |
+| Placeholder variable   | Dummy variable       |
+| Active/Inactive        | Enabled/Disabled     |
+| On/Off                 | Enabled/Disabled     |
+
+Credit: [Avoid ableist language](https://developers.google.com/style/inclusive-documentation#ableist-language) in the Google Developer Style Guide.
+
+#### Culturally sensitive language
+
+Avoid terms that reflect negative cultural stereotypes and history. In most cases, you can replace terms such as `master` and `slave` with terms that are more precise and functional, such as `primary` and `secondary`.
+
+| Use                  | Avoid                 |
+|----------------------|-----------------------|
+| Primary / secondary  | Master / slave        |
+| Allowlist / denylist | Blacklist / whitelist |
+
+For more information see the following [Internet Draft specification](https://tools.ietf.org/html/draft-knodel-terminology-02).
 
 ### Language to avoid
 
@@ -1518,43 +1580,43 @@ GitLab Community Edition), don't split the product or feature name across lines.
 
 ### Product badges
 
-When a feature is available in EE-only tiers, add the corresponding tier according to the
-feature availability:
+When a feature is available in paid tiers, add the corresponding tier to the
+header or other page element according to the feature's availability:
 
-- For GitLab Core and GitLab.com Free: `**(CORE)**`.
-- For GitLab Starter and GitLab.com Bronze: `**(STARTER)**`.
-- For GitLab Premium and GitLab.com Silver: `**(PREMIUM)**`.
-- For GitLab Ultimate and GitLab.com Gold: `**(ULTIMATE)**`.
+| Tier in which feature is available                                     | Tier markup           |
+|:-----------------------------------------------------------------------|:----------------------|
+| GitLab Core and GitLab.com Free, and their higher tiers                | `**(CORE)**`          |
+| GitLab Starter and GitLab.com Bronze, and their higher tiers           | `**(STARTER)**`       |
+| GitLab Premium and GitLab.com Silver, and their higher tiers           | `**(PREMIUM)**`       |
+| GitLab Ultimate and GitLab.com Gold                                    | `**(ULTIMATE)**`      |
+| *Only* GitLab Core and higher tiers (no GitLab.com-based tiers)        | `**(CORE ONLY)**`     |
+| *Only* GitLab Starter and higher tiers (no GitLab.com-based tiers)     | `**(STARTER ONLY)**`  |
+| *Only* GitLab Premium and higher tiers (no GitLab.com-based tiers)     | `**(PREMIUM ONLY)**`  |
+| *Only* GitLab Ultimate (no GitLab.com-based tiers)                     | `**(ULTIMATE ONLY)**` |
+| *Only* GitLab.com Free and higher tiers (no self-managed instances)    | `**(FREE ONLY)**`     |
+| *Only* GitLab.com Bronze and higher tiers (no self-managed instances)  | `**(BRONZE ONLY)**`   |
+| *Only* GitLab.com Silver and higher tiers (no self-managed instances)  | `**(SILVER ONLY)**`   |
+| *Only* GitLab.com Gold (no self-managed instances)                     | `**(GOLD ONLY)**`     |
 
-To exclude GitLab.com tiers (when the feature is not available in GitLab.com), add the
-keyword "only":
+For clarity, all page title headers (H1s) must be have a tier markup for
+the lowest tier that has information on the documentation page.
 
-- For GitLab Core: `**(CORE ONLY)**`.
-- For GitLab Starter: `**(STARTER ONLY)**`.
-- For GitLab Premium: `**(PREMIUM ONLY)**`.
-- For GitLab Ultimate: `**(ULTIMATE ONLY)**`.
+If sections of a page apply to higher tier levels, they can be separately
+labeled with their own tier markup.
 
-For GitLab.com only tiers (when the feature is not available for self-managed instances):
+#### Product badge display behavior
 
-- For GitLab Free and higher tiers: `**(FREE ONLY)**`.
-- For GitLab Bronze and higher tiers: `**(BRONZE ONLY)**`.
-- For GitLab Silver and higher tiers: `**(SILVER ONLY)**`.
-- For GitLab Gold: `**(GOLD ONLY)**`.
+When using the tier markup with headers, the documentation page will
+display the full tier badge with the header line.
 
-The tier should be ideally added to headers, so that the full badge will be displayed.
-However, it can be also mentioned from paragraphs, list items, and table cells. For these cases,
-the tier mention will be represented by an orange info icon **(information)** that will show the tiers on hover.
+You can also use the tier markup with paragraphs, list items,
+and table cells. For these cases, the tier mention will be represented by an
+orange info icon **{information}** that will display the tiers when visitors
+point to the icon. For example:
 
-Use the lowest tier at the page level, even if higher-level tiers exist on the page. For example, you might have a page that is marked as Starter but a section badged as Premium.
-
-For example:
-
-- `**(STARTER)**` renders as **(STARTER)**
-- `**(STARTER ONLY)**` renders as **(STARTER ONLY)**
-- `**(SILVER ONLY)**` renders as **(SILVER ONLY)**
-
-The absence of tiers' mentions mean that the feature is available in GitLab Core,
-GitLab.com Free, and all higher tiers.
+- `**(STARTER)**` displays as **(STARTER)**
+- `**(STARTER ONLY)**` displays as **(STARTER ONLY)**
+- `**(SILVER ONLY)**` displays as **(SILVER ONLY)**
 
 #### How it works
 

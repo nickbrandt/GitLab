@@ -135,6 +135,24 @@ RSpec.describe Security::StoreReportService, '#execute' do
       subject
       expect(vulnerability.reload).to have_attributes(severity: 'medium', title: 'Probable insecure usage of temp file/directory.', title_html: 'Probable insecure usage of temp file/directory.')
     end
+
+    context 'when the existing vulnerability is resolved with the latest report' do
+      let!(:existing_vulnerability) { create(:vulnerability, report_type: report_type, project: project) }
+
+      it 'marks the vulnerability as resolved on default branch' do
+        expect { subject }.to change { existing_vulnerability.reload[:resolved_on_default_branch] }.from(false).to(true)
+      end
+    end
+
+    context 'when the existing resolved vulnerability is discovered again on the latest report' do
+      before do
+        vulnerability.update!(resolved_on_default_branch: true)
+      end
+
+      it 'marks the vulnerability as not resolved on default branch' do
+        expect { subject }.to change { vulnerability.reload[:resolved_on_default_branch] }.from(true).to(false)
+      end
+    end
   end
 
   context 'with existing data from same pipeline' do

@@ -28,9 +28,9 @@ This namespace:
 To see a list of available applications to install. For a:
 
 - [Project-level cluster](../project/clusters/index.md), navigate to your project's
-  **{cloud-gear}** **Operations > Kubernetes**.
+  **Operations > Kubernetes**.
 - [Group-level cluster](../group/clusters/index.md), navigate to your group's
-  **{cloud-gear}** **Kubernetes** page.
+  **Kubernetes** page.
 
 NOTE: **Note:**
 As of GitLab 11.6, Helm will be upgraded to the latest version supported
@@ -69,46 +69,22 @@ can lead to confusion during deployments.
 
 > - Introduced in GitLab 10.2 for project-level clusters.
 > - Introduced in GitLab 11.6 for group-level clusters.
-> - A local Tiller option was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/209736) in GitLab 13.2 behind a feature flag, enabled by default.
-> - The feature flag for local Tiller is enabled on GitLab.com.
+> - [Uses a local Tiller](https://gitlab.com/gitlab-org/gitlab/-/issues/209736) since GitLab 13.2.
 
 [Helm](https://helm.sh/docs/) is a package manager for Kubernetes and is
 used to install the GitLab-managed apps. GitLab runs each `helm` command
 in a pod within the `gitlab-managed-apps` namespace inside the cluster.
 
-As of GitLab 13.2, the integration uses a local
-[Tiller](https://v2.helm.sh/docs/glossary/#tiller) by default. When using a
-local Tiller, the Helm application does not need to be installed and will not
-be shown in the list of applications.
+GitLab's integration uses Helm 2 with a local
+[Tiller](https://v2.helm.sh/docs/glossary/#tiller) server for managing
+applications. Prior to [GitLab 13.2](https://gitlab.com/gitlab-org/gitlab/-/issues/209736),
+GitLab used an in-cluster Tiller server in the `gitlab-managed-apps`
+namespace. This server can now be safely removed.
 
 NOTE: **Note:**
 GitLab's Helm integration does not support installing applications behind a proxy,
 but a [workaround](../../topics/autodevops/index.md#install-applications-behind-a-proxy)
 is available.
-
-### Enable or disable local Tiller **(CORE ONLY)**
-
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/209736) in GitLab 13.2
-> - The option to disable local Tiller is [planned for removal](https://gitlab.com/gitlab-org/gitlab/-/issues/209736) in GitLab 13.3
-
-Local Tiller is under development, but is ready for production use. It is
-deployed behind a feature flag that is **enabled by default**.
-[GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
-can enable it for your instance.
-
-To enable it:
-
-```ruby
-# Instance-wide
-Feature.enable(:managed_apps_local_tiller)
-```
-
-To disable it:
-
-```ruby
-# Instance-wide
-Feature.disable(:managed_apps_local_tiller)
-```
 
 ### cert-manager
 
@@ -343,7 +319,7 @@ To help you tune your WAF rules, you can globally set your WAF to either
 To change your WAF's mode:
 
 1. [Install ModSecurity](../../topics/web_application_firewall/quick_start_guide.md) if you have not already done so.
-1. Navigate to **{cloud-gear}** **Operations > Kubernetes**.
+1. Navigate to **Operations > Kubernetes**.
 1. In **Applications**, scroll to **Ingress**.
 1. Under **Global default**, select your desired mode.
 1. Click **Save changes**.
@@ -535,7 +511,7 @@ To enable log shipping:
 
 1. Ensure your cluster contains at least 3 nodes of instance types larger than
    `f1-micro`, `g1-small`, or `n1-standard-1`.
-1. Navigate to **{cloud-gear}** **Operations > Kubernetes**.
+1. Navigate to **Operations > Kubernetes**.
 1. In **Kubernetes Cluster**, select a cluster.
 1. In the **Applications** section, find **Elastic Stack** and click **Install**.
 
@@ -601,7 +577,7 @@ your data. Fluentd sends logs in syslog format.
 
 To enable Fluentd:
 
-1. Navigate to **{cloud-gear}** **Operations > Kubernetes** and click
+1. Navigate to **Operations > Kubernetes** and click
    **Applications**. You will be prompted to enter a host, port and protocol
    where the WAF logs will be sent to via syslog.
 1. Provide the host domain name or URL in **SIEM Hostname**.
@@ -719,7 +695,7 @@ for the available configuration options.
 
 NOTE: **Note:**
 Support for installing the Ingress managed application is provided by the GitLab Configure group.
-If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/categories/#configure-group).
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/product-categories/#configure-group).
 
 ### Install cert-manager using GitLab CI/CD
 
@@ -760,7 +736,7 @@ available configuration options.
 
 NOTE: **Note:**
 Support for installing the Cert Manager managed application is provided by the GitLab Configure group.
-If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/categories/#configure-group).
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/product-categories/#configure-group).
 
 ### Install Sentry using GitLab CI/CD
 
@@ -969,6 +945,11 @@ You can customize Cilium's Helm variables by defining the
 management project. Refer to the
 [Cilium chart](https://github.com/cilium/cilium/tree/master/install/kubernetes/cilium)
 for the available configuration options.
+
+You can check Cilium's installation status on the cluster management page:
+
+- [Project-level cluster](../project/clusters/index.md): Navigate to your project's **Operations > Kubernetes** page.
+- [Group-level cluster](../group/clusters/index.md): Navigate to your group's **Kubernetes** page.
 
 CAUTION: **Caution:**
 Installation and removal of the Cilium requires a **manual**
@@ -1276,7 +1257,7 @@ available configuration options.
 
 NOTE: **Note:**
 Support for installing the JupyterHub managed application is provided by the GitLab Configure group.
-If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/categories/#configure-group).
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/product-categories/#configure-group).
 
 ### Install Elastic Stack using GitLab CI/CD
 
@@ -1391,7 +1372,7 @@ If you plan to use GitLab Serverless capabilities, be sure to set an A record wi
 
 NOTE: **Note:**
 Support for installing the Knative managed application is provided by the GitLab Configure group.
-If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/categories/#configure-group).
+If you run into unknown issues, please [open a new issue](https://gitlab.com/gitlab-org/gitlab/-/issues/new) and ping at least 2 people from the [Configure group](https://about.gitlab.com/handbook/product/product-categories/#configure-group).
 
 #### Knative Metrics
 

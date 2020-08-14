@@ -3,7 +3,7 @@
 module Geo
   class JobArtifactRegistryFinder < FileRegistryFinder
     def replicables
-      current_node(fdw: false).job_artifacts.not_expired
+      ::Ci::JobArtifact.replicables_for_geo_node
     end
 
     def syncable

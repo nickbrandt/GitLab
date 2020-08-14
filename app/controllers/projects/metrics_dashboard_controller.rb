@@ -10,18 +10,13 @@ module Projects
     before_action do
       push_frontend_feature_flag(:prometheus_computed_alerts)
       push_frontend_feature_flag(:disable_metric_dashboard_refresh_rate)
-      push_frontend_feature_flag(:alert_runbooks)
     end
 
     def show
-      if params[:page].present? && !Feature.enabled?(:metrics_dashboard_new_panel_page, project)
-        return render_404
-      end
-
       if environment
         render 'projects/environments/metrics'
       else
-        render_404
+        render 'projects/environments/empty_metrics'
       end
     end
 

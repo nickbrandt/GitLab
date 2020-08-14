@@ -27,6 +27,23 @@ export default {
       type: Array,
       required: true,
     },
+    issues: {
+      type: Object,
+      required: true,
+    },
+    isLoadingIssues: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    disabled: {
+      type: Boolean,
+      required: true,
+    },
+    rootPath: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -73,10 +90,12 @@ export default {
     },
   },
   methods: {
-    epicIssuesForList(listIssues) {
-      return this.epic.issues.filter(epicIssue =>
-        Boolean(listIssues.find(listIssue => String(listIssue.iid) === epicIssue.iid)),
-      );
+    epicIssuesForList(listId) {
+      if (this.issues[listId]) {
+        return this.issues[listId].filter(issue => issue.epic && issue.epic.id === this.epic.id);
+      }
+
+      return [];
     },
     toggleExpanded() {
       this.isExpanded = !this.isExpanded;
@@ -87,7 +106,7 @@ export default {
 
 <template>
   <div>
-    <div class="board-epic-lane gl-sticky gl-left-0 gl-display-inline-block gl-max-w-full">
+    <div class="board-epic-lane gl-sticky gl-left-0 gl-display-inline-block">
       <div class="gl-py-5 gl-px-3 gl-display-flex gl-align-items-center">
         <gl-button
           v-gl-tooltip.hover.right
@@ -137,7 +156,10 @@ export default {
         v-for="list in lists"
         :key="`${list.id}-issues`"
         :list="list"
-        :issues="epicIssuesForList(list.issues)"
+        :issues="epicIssuesForList(list.id)"
+        :is-loading="isLoadingIssues"
+        :disabled="disabled"
+        :root-path="rootPath"
       />
     </div>
   </div>

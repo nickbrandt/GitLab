@@ -1400,7 +1400,7 @@ RSpec.describe Namespace do
   describe '#over_storage_limit?' do
     using RSpec::Parameterized::TableSyntax
 
-    where(:is_dot_com, :feature_enabled, :above_size_limit, :result) do
+    where(:enforcement_setting_enabled, :feature_enabled, :above_size_limit, :result) do
       false | false | false | false
       false | false | true  | false
       false | true  | false | false
@@ -1413,7 +1413,7 @@ RSpec.describe Namespace do
 
     with_them do
       before do
-        allow(Gitlab).to receive(:dev_env_or_com?).and_return(is_dot_com)
+        stub_application_setting(enforce_namespace_storage_limit: enforcement_setting_enabled)
         stub_feature_flags(namespace_storage_limit: feature_enabled)
         allow_next_instance_of(EE::Namespace::RootStorageSize, namespace.root_ancestor) do |project|
           allow(project).to receive(:above_size_limit?).and_return(above_size_limit)

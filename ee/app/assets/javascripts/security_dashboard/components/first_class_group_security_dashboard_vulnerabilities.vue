@@ -3,6 +3,7 @@ import { GlAlert, GlButton, GlIntersectionObserver } from '@gitlab/ui';
 import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/group_vulnerabilities.graphql';
 import { VULNERABILITIES_PER_PAGE } from '../store/constants';
+import { preparePageInfo } from '../helpers';
 
 export default {
   components: {
@@ -41,8 +42,7 @@ export default {
       },
       update: ({ group }) => group.vulnerabilities.nodes,
       result({ data }) {
-        this.$emit('projectFetch', data.group.projects.nodes);
-        this.pageInfo = data.group.vulnerabilities.pageInfo;
+        this.pageInfo = preparePageInfo(data?.group?.vulnerabilities?.pageInfo);
       },
       error() {
         this.errorLoadingVulnerabilities = true;

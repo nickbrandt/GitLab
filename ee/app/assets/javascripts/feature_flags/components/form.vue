@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { memoize, isString, cloneDeep, isNumber, uniqueId } from 'lodash';
 import {
-  GlDeprecatedButton,
+  GlButton,
   GlDeprecatedBadge as GlBadge,
   GlTooltip,
   GlTooltipDirective,
@@ -15,7 +15,6 @@ import { s__ } from '~/locale';
 import flash, { FLASH_TYPES } from '~/flash';
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 import EnvironmentsDropdown from './environments_dropdown.vue';
 import Strategy from './strategy.vue';
 import {
@@ -32,14 +31,13 @@ import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.
 
 export default {
   components: {
-    GlDeprecatedButton,
+    GlButton,
     GlBadge,
     GlFormTextarea,
     GlFormCheckbox,
     GlTooltip,
     GlSprintf,
     ToggleButton,
-    Icon,
     EnvironmentsDropdown,
     Strategy,
     RelatedIssuesRoot,
@@ -152,6 +150,13 @@ export default {
     },
     showRelatedIssues() {
       return this.featureFlagIssuesEndpoint.length > 0;
+    },
+    readOnly() {
+      return (
+        this.glFeatures.featureFlagsNewVersion &&
+        this.glFeatures.featureFlagsLegacyReadOnly &&
+        this.version === LEGACY_FLAG
+      );
     },
   },
   mounted() {
@@ -333,9 +338,9 @@ export default {
             <h4>{{ s__('FeatureFlags|Strategies') }}</h4>
             <div class="flex align-items-baseline justify-content-between">
               <p class="mr-3">{{ $options.translations.newHelpText }}</p>
-              <gl-deprecated-button variant="success" category="secondary" @click="addStrategy">
+              <gl-button variant="success" category="secondary" @click="addStrategy">
                 {{ s__('FeatureFlags|Add strategy') }}
-              </gl-deprecated-button>
+              </gl-button>
             </div>
           </div>
         </div>
@@ -516,15 +521,14 @@ export default {
                   {{ s__('FeatureFlags|Remove') }}
                 </div>
                 <div class="table-mobile-content js-feature-flag-delete">
-                  <gl-deprecated-button
+                  <gl-button
                     v-if="!isAllEnvironment(scope.environmentScope) && canUpdateScope(scope)"
                     v-gl-tooltip
                     :title="s__('FeatureFlags|Remove')"
                     class="js-delete-scope btn-transparent pr-3 pl-3"
+                    icon="clear"
                     @click="removeScope(scope)"
-                  >
-                    <icon name="clear" />
-                  </gl-deprecated-button>
+                  />
                 </div>
               </div>
             </div>
@@ -585,22 +589,19 @@ export default {
     </fieldset>
 
     <div class="form-actions">
-      <gl-deprecated-button
+      <gl-button
         ref="submitButton"
+        :disabled="readOnly"
         type="button"
         variant="success"
         class="js-ff-submit col-xs-12"
         @click="handleSubmit"
       >
         {{ submitText }}
-      </gl-deprecated-button>
-      <gl-deprecated-button
-        :href="cancelPath"
-        variant="secondary"
-        class="js-ff-cancel col-xs-12 float-right"
-      >
+      </gl-button>
+      <gl-button :href="cancelPath" class="js-ff-cancel col-xs-12 float-right">
         {{ __('Cancel') }}
-      </gl-deprecated-button>
+      </gl-button>
     </div>
   </form>
 </template>

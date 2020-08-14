@@ -104,17 +104,17 @@ RSpec.describe GroupsHelper do
   describe '#remove_group_message' do
     subject { helper.remove_group_message(group) }
 
-    context 'adjourned deletion feature is available' do
+    context 'delayed deletion feature is available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: true)
       end
 
-      it 'returns the message related to adjourned deletion' do
+      it 'returns the message related to delayed deletion' do
         expect(subject).to include("The contents of this group, its subgroups and projects will be permanently removed after")
       end
     end
 
-    context 'adjourned deletion feature is not available' do
+    context 'delayed deletion feature is not available' do
       before do
         stub_licensed_features(adjourned_deletion_for_projects_and_groups: false)
       end

@@ -13,15 +13,25 @@ module Elastic
 
         options[:features] = 'issues'
         query_hash = project_ids_filter(query_hash, options)
-        query_hash = confidentiality_filter(query_hash, options[:current_user])
+        query_hash = confidentiality_filter(query_hash, options[:current_user], options[:project_ids])
 
         search(query_hash, options)
       end
 
       private
 
-      def confidentiality_filter(query_hash, current_user)
-        return query_hash if current_user && current_user.can_read_all_resources?
+      def user_has_access_to_confidential_issues?(authorized_project_ids, project_ids)
+        # is_a?(Array) is needed because we might receive project_ids: :any
+        return false unless authorized_project_ids && project_ids.is_a?(Array)
+
+        (project_ids - authorized_project_ids).empty?
+      end
+
+      def confidentiality_filter(query_hash, current_user, project_ids)
+        return query_hash if current_user&.can_read_all_resources?
+
+        authorized_project_ids = current_user&.authorized_projects(Gitlab::Access::REPORTER)&.pluck_primary_key
+        return query_hash if user_has_access_to_confidential_issues?(authorized_project_ids, project_ids)
 
         filter =
           if current_user
@@ -38,7 +48,7 @@ module Elastic
                             should: [
                               { term: { author_id: current_user.id } },
                               { term: { assignee_id: current_user.id } },
-                              { terms: { project_id: current_user.authorized_projects(Gitlab::Access::REPORTER).pluck_primary_key } }
+                              { terms: { project_id: authorized_project_ids } }
                             ]
                           }
                         }

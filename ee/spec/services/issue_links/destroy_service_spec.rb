@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe IssueLinks::DestroyService do
   describe '#execute' do
-    let(:project) { create(:project) }
+    let(:project) { create(:project_empty_repo) }
     let(:user) { create(:user) }
 
     subject { described_class.new(issue_link, user).execute }

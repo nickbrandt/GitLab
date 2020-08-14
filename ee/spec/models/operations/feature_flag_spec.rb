@@ -220,6 +220,7 @@ RSpec.describe Operations::FeatureFlag do
       create(:operations_feature_flag, project: project,
              name: 'feature1', active: true, version: 2)
     end
+
     let!(:strategy) do
       create(:operations_strategy, feature_flag: feature_flag,
              name: 'default', parameters: {})

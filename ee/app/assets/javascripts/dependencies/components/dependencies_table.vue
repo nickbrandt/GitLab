@@ -1,9 +1,10 @@
 <script>
 import { cloneDeep } from 'lodash';
-import { GlBadge, GlIcon, GlLink, GlButton, GlSkeletonLoading, GlTable } from '@gitlab/ui';
+import { GlBadge, GlIcon, GlButton, GlSkeletonLoading, GlTable } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import DependencyLicenseLinks from './dependency_license_links.vue';
 import DependencyVulnerabilities from './dependency_vulnerabilities.vue';
+import DependencyLocation from './dependency_location.vue';
 
 const tdClass = (value, key, item) => {
   const classes = [];
@@ -26,9 +27,9 @@ export default {
   components: {
     DependencyLicenseLinks,
     DependencyVulnerabilities,
+    DependencyLocation,
     GlBadge,
     GlIcon,
-    GlLink,
     GlButton,
     GlSkeletonLoading,
     GlTable,
@@ -118,10 +119,7 @@ export default {
     </template>
 
     <template #cell(location)="{ item }">
-      <gl-link :href="item.location.blob_path">
-        <gl-icon name="doc-text" class="align-middle" />
-        {{ item.location.path }}
-      </gl-link>
+      <dependency-location :location="item.location" />
     </template>
 
     <template #cell(license)="{ item }">

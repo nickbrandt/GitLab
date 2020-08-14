@@ -35,28 +35,25 @@ RSpec.describe EE::NamespaceStorageLimitAlertHelper do
   describe '#purchase_storage_url' do
     subject { helper.purchase_storage_url }
 
-    context 'when on .com' do
-      before do
-        allow(::Gitlab).to receive(:com?).and_return(true)
-      end
-
-      it { is_expected.to eq(EE::SUBSCRIPTIONS_MORE_STORAGE_URL) }
-
-      context 'when feature flag disabled' do
-        before do
-          stub_feature_flags(buy_storage_link: false)
-        end
-
-        it { is_expected.to be_nil }
-      end
+    where(:is_dot_com, :enforcement_setting_enabled, :feature_enabled, :result) do
+      false | false | false | nil
+      false | false | true  | nil
+      false | true  | false | nil
+      true  | false | false | nil
+      false | true  | true  | nil
+      true  | true  | false | nil
+      true  | false | true  | nil
+      true  | true  | true  | EE::SUBSCRIPTIONS_MORE_STORAGE_URL
     end
 
-    context 'when not on .com' do
+    with_them do
       before do
-        allow(::Gitlab).to receive(:com?).and_return(false)
+        allow(::Gitlab).to receive(:com?).and_return(is_dot_com)
+        stub_application_setting(enforce_namespace_storage_limit: enforcement_setting_enabled)
+        stub_feature_flags(buy_storage_link: feature_enabled)
       end
 
-      it { is_expected.to be_nil }
+      it { is_expected.to eq(result) }
     end
   end
 

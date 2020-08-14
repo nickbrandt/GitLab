@@ -22,20 +22,12 @@ module Gitlab
         ::Feature.enabled?(:ci_composite_status, project, default_enabled: true)
       end
 
-      def self.atomic_processing?(project)
-        ::Feature.enabled?(:ci_atomic_processing, project, default_enabled: true)
-      end
-
       def self.pipeline_latest?
         ::Feature.enabled?(:ci_pipeline_latest, default_enabled: true)
       end
 
       def self.pipeline_status_omit_commit_sha_in_cache_key?(project)
         Feature.enabled?(:ci_pipeline_status_omit_commit_sha_in_cache_key, project, default_enabled: true)
-      end
-
-      def self.release_generation_enabled?
-        ::Feature.enabled?(:ci_release_generation, default_enabled: true)
       end
 
       # Remove in https://gitlab.com/gitlab-org/gitlab/-/issues/224199
@@ -45,13 +37,11 @@ module Gitlab
 
       # Remove in https://gitlab.com/gitlab-org/gitlab/-/issues/227052
       def self.variables_api_filter_environment_scope?
-        ::Feature.enabled?(:ci_variables_api_filter_environment_scope, default_enabled: false)
+        ::Feature.enabled?(:ci_variables_api_filter_environment_scope, default_enabled: true)
       end
 
-      # This FF is only used for development purpose to test that warnings can be
-      # raised and propagated to the UI.
       def self.raise_job_rules_without_workflow_rules_warning?
-        ::Feature.enabled?(:ci_raise_job_rules_without_workflow_rules_warning)
+        ::Feature.enabled?(:ci_raise_job_rules_without_workflow_rules_warning, default_enabled: true)
       end
 
       def self.keep_latest_artifacts_for_ref_enabled?(project)
@@ -60,10 +50,6 @@ module Gitlab
 
       def self.destroy_only_unlocked_expired_artifacts_enabled?
         ::Feature.enabled?(:destroy_only_unlocked_expired_artifacts, default_enabled: false)
-      end
-
-      def self.parallel_matrix_enabled?
-        ::Feature.enabled?(:ci_parallel_matrix_enabled)
       end
 
       def self.bulk_insert_on_create?(project)
@@ -84,6 +70,18 @@ module Gitlab
 
       def self.job_entry_matches_all_keys?
         ::Feature.enabled?(:ci_job_entry_matches_all_keys)
+      end
+
+      def self.lint_creates_pipeline_with_dry_run?(project)
+        ::Feature.enabled?(:ci_lint_creates_pipeline_with_dry_run, project, default_enabled: true)
+      end
+
+      def self.reset_ci_minutes_for_all_namespaces?
+        ::Feature.enabled?(:reset_ci_minutes_for_all_namespaces, default_enabled: false)
+      end
+
+      def self.expand_names_for_cross_pipeline_artifacts?(project)
+        ::Feature.enabled?(:ci_expand_names_for_cross_pipeline_artifacts, project)
       end
     end
   end

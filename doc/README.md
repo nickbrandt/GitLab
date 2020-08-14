@@ -213,7 +213,8 @@ The following documentation relates to the DevOps **Create** stage:
 
 | Create topics - Integration and Automation                                    | Description                                                                                                            |
 |:------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------|
-| [GitLab API](api/README.md)                                                   | Integrate GitLab via a simple and powerful API.                                                                        |
+| [GitLab REST API](api/README.md)                                              | Integrate with GitLab using our REST API. |
+| [GitLab GraphQL API](api/graphql/index.md)                                    | Integrate with GitLab using our GraphQL API. |
 | [GitLab Integration](integration/README.md)                                   | Integrate with multiple third-party services with GitLab to allow external issue trackers and external authentication. |
 | [GitLab Webhooks](user/project/integrations/webhooks.md)                      | Let GitLab notify you when new code has been pushed to your project.                                                   |
 | [Jira Development Panel](integration/jira_development_panel.md) **(PREMIUM)** | See GitLab information in the Jira Development Panel.                                                                  |
@@ -382,14 +383,15 @@ The following documentation relates to the DevOps **Monitor** stage:
 GitLab Defend enables organizations to proactively protect cloud-native environments by providing
 context-aware technologies to reduce overall security risk. Defend is a natural extension of your
 existing operation's practices and provides security visibility across the entire DevSecOps
-lifecycle. This empowers your organization to apply DevSecOps best practices from the first line of
-code through monitoring and protecting your applications deployed into production.
+lifecycle. This visibility empowers your organization to apply DevSecOps best practices from the
+first line of code written and extends all the way through to greater monitoring and protection for
+your applications that are deployed in production.
 
 The following documentation relates to the DevOps **Defend** stage:
 
 | Defend topics                                                                                         | Description                                                            |
 |:------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------|
-| [Web Application Firewall with ModSecurity](user/compliance/compliance_dashboard/index.md) **(ULTIMATE)**  | Filter, monitor, and block HTTP traffic to and from a web application. |
+| [Web Application Firewall with ModSecurity](user/compliance/compliance_dashboard/index.md)  | Filter, monitor, and block HTTP traffic to and from a web application. |
 | [Container Host Security](user/clusters/applications.md#install-falco-using-gitlab-cicd)                   | Detect and respond to security threats at the Kubernetes, network, and host level. |
 | [Container Network Security](user/clusters/applications.md#install-cilium-using-gitlab-cicd)               |  Detect and block unauthorized network traffic between pods and to/from the internet.|
 
@@ -467,7 +469,8 @@ There are many ways to integrate with GitLab, including:
 
 | Topic                                                      | Description                                     |
 |:-----------------------------------------------------------|:------------------------------------------------|
-| [GitLab API](api/README.md)                                | Integrate GitLab via a simple and powerful API. |
+| [GitLab REST API](api/README.md)                           | Integrate with GitLab using our REST API. |
+| [GitLab GraphQL API](api/graphql/index.md)                 | Integrate with GitLab using our GraphQL API. |
 | [Integrations and automation](#integration-and-automation) | All GitLab integration and automation options.  |
 
 <div align="right">
