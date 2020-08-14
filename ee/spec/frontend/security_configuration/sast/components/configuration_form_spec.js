@@ -1,12 +1,12 @@
 import * as Sentry from '@sentry/browser';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import { GlAlert } from '@gitlab/ui';
-import axios from '~/lib/utils/axios_utils';
-import { redirectTo } from '~/lib/utils/url_utility';
 import waitForPromises from 'helpers/wait_for_promises';
 import { shallowMount } from '@vue/test-utils';
 import ConfigurationForm from 'ee/security_configuration/sast/components/configuration_form.vue';
 import DynamicFields from 'ee/security_configuration/sast/components/dynamic_fields.vue';
+import { redirectTo } from '~/lib/utils/url_utility';
+import axios from '~/lib/utils/axios_utils';
 import { makeEntities } from './helpers';
 
 jest.mock('~/lib/utils/url_utility', () => ({

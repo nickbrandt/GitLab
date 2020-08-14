@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlAlert } from '@gitlab/ui';
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
-import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import ThroughputChart from 'ee/analytics/merge_request_analytics/components/throughput_chart.vue';
 import { THROUGHPUT_CHART_STRINGS } from 'ee/analytics/merge_request_analytics/constants';
+import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import { throughputChartData, startDate, endDate, fullPath } from '../mock_data';
 
 describe('ThroughputChart', () => {

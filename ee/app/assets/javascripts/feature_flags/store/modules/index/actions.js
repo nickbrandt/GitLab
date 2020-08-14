@@ -1,5 +1,5 @@
-import * as types from './mutation_types';
 import Api from 'ee/api';
+import * as types from './mutation_types';
 import axios from '~/lib/utils/axios_utils';
 
 export const setFeatureFlagsEndpoint = ({ commit }, endpoint) =>

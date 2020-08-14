@@ -5,11 +5,11 @@ import tasksByTypeStore from 'ee/analytics/cycle_analytics/store/modules/type_of
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_chart.vue';
 import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_filters.vue';
-import { tasksByTypeData, taskByTypeFilters } from '../mock_data';
 import {
   TASKS_BY_TYPE_SUBJECT_MERGE_REQUEST,
   TASKS_BY_TYPE_FILTERS,
 } from 'ee/analytics/cycle_analytics/constants';
+import { tasksByTypeData, taskByTypeFilters } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

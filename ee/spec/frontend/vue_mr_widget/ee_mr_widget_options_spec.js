@@ -6,6 +6,14 @@ import { TEST_HOST } from 'helpers/test_constants';
 import waitForPromises from 'helpers/wait_for_promises';
 import { trimText } from 'helpers/text_helper';
 
+import {
+  sastDiffSuccessMock,
+  dastDiffSuccessMock,
+  containerScanningDiffSuccessMock,
+  dependencyScanningDiffSuccessMock,
+  secretScanningDiffSuccessMock,
+  coverageFuzzingDiffSuccessMock,
+} from 'ee_jest/vue_shared/security_reports/mock_data';
 import mockData, {
   baseBrowserPerformance,
   headBrowserPerformance,
@@ -16,14 +24,6 @@ import mockData, {
 import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import axios from '~/lib/utils/axios_utils';
-import {
-  sastDiffSuccessMock,
-  dastDiffSuccessMock,
-  containerScanningDiffSuccessMock,
-  dependencyScanningDiffSuccessMock,
-  secretScanningDiffSuccessMock,
-  coverageFuzzingDiffSuccessMock,
-} from 'ee_jest/vue_shared/security_reports/mock_data';
 
 const SAST_SELECTOR = '.js-sast-widget';
 const DAST_SELECTOR = '.js-dast-widget';

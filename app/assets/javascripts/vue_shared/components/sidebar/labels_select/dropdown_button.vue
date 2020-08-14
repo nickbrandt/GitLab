@@ -1,6 +1,6 @@
 <script>
-import { __, s__, sprintf } from '~/locale';
 import { GlIcon } from '@gitlab/ui';
+import { __, s__, sprintf } from '~/locale';
 
 export default {
   components: {

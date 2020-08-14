@@ -1,5 +1,4 @@
 <script>
-import Tracking from '~/tracking';
 import {
   GlIcon,
   GlButton,
@@ -9,6 +8,7 @@ import {
   GlDeprecatedDropdown,
   GlDeprecatedDropdownDivider,
 } from '@gitlab/ui';
+import Tracking from '~/tracking';
 import { s__ } from '~/locale';
 import { healthStatusTextMap } from '../../constants';
 

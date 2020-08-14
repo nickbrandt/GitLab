@@ -1,9 +1,9 @@
 import isPlainObject from 'lodash/isPlainObject';
-import { s__ } from '~/locale';
-import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import { ALL, BASE_FILTERS } from 'ee/security_dashboard/store/modules/filters/constants';
 import { REPORT_TYPES, SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
 import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
+import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
+import { s__ } from '~/locale';
 
 const parseOptions = obj =>
   Object.entries(obj).map(([id, name]) => ({ id: id.toUpperCase(), name }));

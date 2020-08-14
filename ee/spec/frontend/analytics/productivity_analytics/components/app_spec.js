@@ -16,10 +16,10 @@ import {
   GlDeprecatedButton,
 } from '@gitlab/ui';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
-import * as commonUtils from '~/lib/utils/common_utils';
-import * as urlUtils from '~/lib/utils/url_utility';
 import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
 import MetricChart from 'ee/analytics/productivity_analytics/components/metric_chart.vue';
+import * as commonUtils from '~/lib/utils/common_utils';
+import * as urlUtils from '~/lib/utils/url_utility';
 import httpStatusCodes from '~/lib/utils/http_status';
 
 const localVue = createLocalVue();

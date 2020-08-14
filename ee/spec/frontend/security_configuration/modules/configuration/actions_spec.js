@@ -1,11 +1,11 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import { TEST_HOST } from 'spec/test_constants';
 import testAction from 'helpers/vuex_action_helper';
 
 import createState from 'ee/security_configuration/modules/configuration/state';
 import * as types from 'ee/security_configuration/modules/configuration/mutation_types';
 import * as actions from 'ee/security_configuration/modules/configuration/actions';
+import axios from '~/lib/utils/axios_utils';
 
 describe('security configuration module actions', () => {
   let state;

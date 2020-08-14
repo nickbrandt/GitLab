@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { mapComputed } from '~/vuex_shared/bindings';
 import {
   GlDeprecatedButton as GlButton,
   GlSprintf,
@@ -10,6 +9,7 @@ import {
   GlFormInput,
   GlFormCheckbox,
 } from '@gitlab/ui';
+import { mapComputed } from '~/vuex_shared/bindings';
 import { __, s__ } from '~/locale';
 
 export default {

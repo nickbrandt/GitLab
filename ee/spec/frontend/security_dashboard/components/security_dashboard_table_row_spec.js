@@ -3,9 +3,9 @@ import { GlFormCheckbox } from '@gitlab/ui';
 import SecurityDashboardTableRow from 'ee/security_dashboard/components/security_dashboard_table_row.vue';
 import createStore from 'ee/security_dashboard/store';
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
-import mockDataVulnerabilities from '../store/modules/vulnerabilities/data/mock_data_vulnerabilities';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import { trimText } from 'helpers/text_helper';
+import mockDataVulnerabilities from '../store/modules/vulnerabilities/data/mock_data_vulnerabilities';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);

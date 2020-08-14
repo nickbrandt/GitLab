@@ -1,7 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
-import { sprintf, s__ } from '~/locale';
 import { GlIcon } from '@gitlab/ui';
+import { sprintf, s__ } from '~/locale';
 import formattingMixins from '../formatting_mixins';
 import SummaryDetails from './order_summary/summary_details.vue';
 

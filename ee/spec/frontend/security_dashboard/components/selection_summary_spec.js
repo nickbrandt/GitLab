@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils';
 import SelectionSummary from 'ee/security_dashboard/components/selection_summary.vue';
 import { GlFormSelect, GlButton } from '@gitlab/ui';
+import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
 import toast from '~/vue_shared/plugins/global_toast';
-import waitForPromises from 'helpers/wait_for_promises';
 
 jest.mock('~/flash');
 jest.mock('~/vue_shared/plugins/global_toast');

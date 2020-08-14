@@ -1,7 +1,4 @@
 import testAction from 'helpers/vuex_action_helper';
-import flash from '~/flash';
-import toast from '~/vue_shared/plugins/global_toast';
-import { normalizeHeaders, parseIntPagination } from '~/lib/utils/common_utils';
 import Api from 'ee/api';
 import * as actions from 'ee/geo_replicable/store/actions';
 import * as types from 'ee/geo_replicable/store/mutation_types';
@@ -9,6 +6,9 @@ import createState from 'ee/geo_replicable/store/state';
 import { ACTION_TYPES, PREV, NEXT, DEFAULT_PAGE_SIZE } from 'ee/geo_replicable/constants';
 import { gqClient } from 'ee/geo_replicable/utils';
 import buildReplicableTypeQuery from 'ee/geo_replicable/graphql/replicable_type_query_builder';
+import { normalizeHeaders, parseIntPagination } from '~/lib/utils/common_utils';
+import toast from '~/vue_shared/plugins/global_toast';
+import flash from '~/flash';
 import {
   MOCK_BASIC_FETCH_DATA_MAP,
   MOCK_BASIC_FETCH_RESPONSE,

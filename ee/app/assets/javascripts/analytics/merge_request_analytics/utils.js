@@ -1,6 +1,6 @@
+import dateFormat from 'dateformat';
 import { getMonthNames, dateFromParams } from '~/lib/utils/datetime_utility';
 import { dateFormats } from '../shared/constants';
-import dateFormat from 'dateformat';
 
 /**
  * A utility function which accepts a date range and returns

@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlNewDropdown, GlNewDropdownItem, GlButton, GlLink, GlSearchBoxByType } from '@gitlab/ui';
-import createFlash from '~/flash';
 import IterationSelect from 'ee/sidebar/components/iteration_select.vue';
 import { iterationSelectTextMap } from 'ee/sidebar/constants';
 import setIterationOnIssue from 'ee/sidebar/queries/set_iteration_on_issue.mutation.graphql';
+import createFlash from '~/flash';
 
 jest.mock('~/flash');
 

@@ -1,6 +1,6 @@
 <script>
-import { s__ } from '~/locale';
 import { GlModal, GlFormGroup, GlFormTextarea } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import { ADD_USER_MODAL_ID } from '../constants/show';
 
 export default {

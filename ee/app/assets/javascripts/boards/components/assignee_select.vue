@@ -1,7 +1,7 @@
 <script>
+import { GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import '~/gl_dropdown';
-import { GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import UsersSelect from '~/users_select';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
 
@@ -133,7 +133,7 @@ export default {
           aria-expanded="false"
           type="button"
         >
-          <span class="dropdown-toggle-text"> {{ placeholderText }} </span>
+          <span class="dropdown-toggle-text">{{ placeholderText }}</span>
           <gl-icon
             name="chevron-down"
             class="gl-absolute gl-top-3 gl-right-3 gl-text-gray-700"
@@ -141,8 +141,7 @@ export default {
           />
         </button>
         <div
-          class="dropdown-menu dropdown-select dropdown-menu-paging
-dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
+          class="dropdown-menu dropdown-select dropdown-menu-paging dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
         >
           <div class="dropdown-input">
             <input
@@ -161,7 +160,9 @@ dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
             />
           </div>
           <div class="dropdown-content"></div>
-          <div class="dropdown-loading"><gl-loading-icon /></div>
+          <div class="dropdown-loading">
+            <gl-loading-icon />
+          </div>
         </div>
       </div>
     </div>

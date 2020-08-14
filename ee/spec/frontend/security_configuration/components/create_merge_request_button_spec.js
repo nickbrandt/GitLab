@@ -2,11 +2,11 @@ import * as Sentry from '@sentry/browser';
 import { shallowMount } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import { GlButton } from '@gitlab/ui';
+import CreateMergeRequestButton from 'ee/security_configuration/components/create_merge_request_button.vue';
+import waitForPromises from 'helpers/wait_for_promises';
 import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
-import CreateMergeRequestButton from 'ee/security_configuration/components/create_merge_request_button.vue';
 import { redirectTo } from '~/lib/utils/url_utility';
-import waitForPromises from 'helpers/wait_for_promises';
 
 jest.mock('~/flash.js');
 jest.mock('~/lib/utils/url_utility', () => ({

@@ -2,9 +2,9 @@ import { shallowMount } from '@vue/test-utils';
 import { GlForm } from '@gitlab/ui';
 import { ApolloMutation } from 'vue-apollo';
 import EpicForm from 'ee/epic/components/epic_form.vue';
-import LabelsSelectVue from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
 import createEpic from 'ee/epic/queries/createEpic.mutation.graphql';
 import { TEST_HOST } from 'helpers/test_constants';
+import LabelsSelectVue from '~/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue';
 
 jest.mock('~/lib/utils/url_utility');
 

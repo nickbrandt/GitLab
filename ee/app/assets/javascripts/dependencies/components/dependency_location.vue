@@ -1,6 +1,6 @@
 <script>
-import { n__ } from '~/locale';
 import { GlIcon, GlLink, GlPopover, GlIntersperse } from '@gitlab/ui';
+import { n__ } from '~/locale';
 import DependencyPathViewer from './dependency_path_viewer.vue';
 
 export const VISIBLE_DEPENDENCY_COUNT = 2;

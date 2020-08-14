@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import AxiosMockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import { shallowMount } from '@vue/test-utils';
 import EpicLane from 'ee/boards/components/epic_lane.vue';
 import IssuesLaneList from 'ee/boards/components/issues_lane_list.vue';
 import { GlIcon } from '@gitlab/ui';
+import { TEST_HOST } from 'helpers/test_constants';
 import { mockEpic, mockLists, mockIssues } from '../mock_data';
 import List from '~/boards/models/list';
-import { TEST_HOST } from 'helpers/test_constants';
+import axios from '~/lib/utils/axios_utils';
 
 describe('EpicLane', () => {
   let wrapper;

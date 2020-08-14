@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlLineChart } from '@gitlab/ui/dist/charts';
-import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
 import BurnupChart from 'ee/burndown_chart/components/burnup_chart.vue';
+import ResizableChartContainer from '~/vue_shared/components/resizable_chart/resizable_chart_container.vue';
 
 describe('Burnup chart', () => {
   let wrapper;

@@ -1,8 +1,9 @@
 <script>
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
-import axios from '~/lib/utils/axios_utils';
 import { CancelToken } from 'axios';
+import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
+import axios from '~/lib/utils/axios_utils';
 import download from '~/lib/utils/downloader';
 import { redirectTo } from '~/lib/utils/url_utility';
 import createFlash from '~/flash';
@@ -13,7 +14,6 @@ import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
 import StatusDescription from './status_description.vue';
 import { VULNERABILITY_STATE_OBJECTS, FEEDBACK_TYPES, HEADER_ACTION_BUTTONS } from '../constants';
 import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
-import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 
 export default {
   name: 'VulnerabilityHeader',

@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import HeaderApp from 'ee/vulnerabilities/components/header.vue';
 import DetailsApp from 'ee/vulnerabilities/components/details.vue';
 import FooterApp from 'ee/vulnerabilities/components/footer.vue';
 import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 function createHeaderApp() {
   const el = document.getElementById('js-vulnerability-header');

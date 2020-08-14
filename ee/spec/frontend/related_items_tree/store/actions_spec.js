@@ -1,5 +1,4 @@
 import MockAdapter from 'axios-mock-adapter';
-import createFlash from '~/flash';
 import createDefaultState from 'ee/related_items_tree/store/state';
 import * as actions from 'ee/related_items_tree/store/actions';
 import * as types from 'ee/related_items_tree/store/mutation_types';
@@ -13,8 +12,9 @@ import {
 } from 'ee/related_issues/constants';
 
 import testAction from 'helpers/vuex_action_helper';
-import axios from '~/lib/utils/axios_utils';
 import { TEST_HOST } from 'spec/test_constants';
+import axios from '~/lib/utils/axios_utils';
+import createFlash from '~/flash';
 
 import {
   mockInitialConfig,
