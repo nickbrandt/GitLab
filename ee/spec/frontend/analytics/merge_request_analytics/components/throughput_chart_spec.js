@@ -1,6 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
+import { GlAlert } from '@gitlab/ui';
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
+import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import ThroughputChart from 'ee/analytics/merge_request_analytics/components/throughput_chart.vue';
 import { THROUGHPUT_CHART_STRINGS } from 'ee/analytics/merge_request_analytics/constants';
 import { throughputChartData, startDate, endDate, fullPath } from '../mock_data';
@@ -66,8 +67,8 @@ describe('ThroughputChart', () => {
       expect(alert.text()).toBe(THROUGHPUT_CHART_STRINGS.NO_DATA);
     });
 
-    it('does not display a loading icon', () => {
-      displaysComponent(GlLoadingIcon, false);
+    it('does not display a skeleton loader', () => {
+      displaysComponent(ChartSkeletonLoader, false);
     });
 
     it('does not display the chart', () => {
@@ -80,8 +81,8 @@ describe('ThroughputChart', () => {
       createComponent({ loading: true });
     });
 
-    it('displays a loading icon', () => {
-      displaysComponent(GlLoadingIcon, true);
+    it('displays a skeleton loader', () => {
+      displaysComponent(ChartSkeletonLoader, true);
     });
 
     it('does not display the chart', () => {
@@ -102,8 +103,8 @@ describe('ThroughputChart', () => {
       displaysComponent(GlAreaChart, true);
     });
 
-    it('does not display a loading icon', () => {
-      displaysComponent(GlLoadingIcon, false);
+    it('does not display the skeleton loader', () => {
+      displaysComponent(ChartSkeletonLoader, false);
     });
 
     it('does not display a no data message', () => {
@@ -120,8 +121,8 @@ describe('ThroughputChart', () => {
       displaysComponent(GlAreaChart, false);
     });
 
-    it('does not display a loading icon', () => {
-      displaysComponent(GlLoadingIcon, false);
+    it('does not display the skeleton loader', () => {
+      displaysComponent(ChartSkeletonLoader, false);
     });
 
     it('displays an error message', () => {
