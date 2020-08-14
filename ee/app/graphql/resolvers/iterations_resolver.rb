@@ -32,6 +32,9 @@ module Resolvers
 
       iterations = IterationsFinder.new(context[:current_user], iterations_finder_params(args)).execute
 
+      # Necessary for scopedPath computation in IterationPresenter
+      context[:parent_object] = parent
+
       Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection.new(iterations)
     end
 

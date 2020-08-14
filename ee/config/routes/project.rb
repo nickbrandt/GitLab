@@ -108,6 +108,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         resources :iterations, only: [:index, :show], constraints: { id: /\d+/ }
+
+        namespace :iterations do
+          resources :inherited, only: [:show], constraints: { id: /\d+/ }
+        end
       end
       # End of the /-/ scope.
 
