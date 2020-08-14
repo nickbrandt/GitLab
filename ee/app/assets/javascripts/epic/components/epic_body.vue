@@ -44,8 +44,8 @@ export default {
 </script>
 
 <template>
-  <div class="issuable-details content-block">
-    <div class="detail-page-description">
+  <div>
+    <div class="issuable-details detail-page-description content-block">
       <issuable-body
         :endpoint="endpoint"
         :update-endpoint="updateEndpoint"

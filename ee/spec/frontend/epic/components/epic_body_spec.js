@@ -37,13 +37,11 @@ describe('EpicBodyComponent', () => {
   });
 
   describe('template', () => {
-    it('renders component container element with classes `issuable-details` & `content-block`', () => {
-      expect(vm.$el.classList.contains('issuable-details')).toBe(true);
-      expect(vm.$el.classList.contains('content-block')).toBe(true);
-    });
-
-    it('renders epic body container element with class `detail-page-description`', () => {
-      expect(vm.$el.querySelector('.detail-page-description')).not.toBeNull();
+    it('renders epic body container element with class `detail-page-description` & `issuable-details` & `content-block`', () => {
+      const el = vm.$el.querySelector('.detail-page-description');
+      expect(el).not.toBeNull();
+      expect(el.classList.contains('issuable-details')).toBe(true);
+      expect(el.classList.contains('content-block')).toBe(true);
     });
 
     it('renders epic body elements', () => {
