@@ -39,23 +39,7 @@ export default {
     },
   },
   data() {
-    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-    if (this.glFeatures.approvalSuggestions) {
-      return {
-        name: this.defaultRuleName || '',
-        approvalsRequired: 1,
-        minApprovalsRequired: 0,
-        approvers: [],
-        approversToAdd: [],
-        branches: [],
-        branchesToAdd: [],
-        showValidation: false,
-        isFallback: false,
-        containsHiddenGroups: false,
-        ...this.getInitialData(),
-      };
-    }
-    return {
+    const defaults = {
       name: '',
       approvalsRequired: 1,
       minApprovalsRequired: 0,
@@ -68,6 +52,12 @@ export default {
       containsHiddenGroups: false,
       ...this.getInitialData(),
     };
+    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114  
+    if(this.glFeatures.approvalSuggestions){
+      return { ...defaults, name: this.defaultRuleName || ''};
+    }
+
+    return defaults
   },
   computed: {
     ...mapState(['settings']),

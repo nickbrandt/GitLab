@@ -1,7 +1,7 @@
 <script>
 import { camelCase } from 'lodash';
 import { GlButton, GlLink, GlSprintf, GlSkeletonLoading } from '@gitlab/ui';
-import { LICENSE_CHECK_NAME, VULNERABILITY_CHECK_NAME, JOB_TYPES } from 'ee/approvals/constants';
+import { JOB_TYPES } from 'ee/approvals/constants';
 
 export default {
   components: {
@@ -20,7 +20,6 @@ export default {
     ],
     licenseCheck: [JOB_TYPES.LICENSE_SCANNING],
   },
-  securityRules: [VULNERABILITY_CHECK_NAME, LICENSE_CHECK_NAME],
   props: {
     configuration: {
       type: Object,
