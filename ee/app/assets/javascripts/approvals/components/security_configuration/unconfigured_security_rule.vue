@@ -94,7 +94,7 @@ export default {
         </td>
       </template>
 
-      <td v-else class="js-name" colspan="3">
+      <td v-else class="js-name" colspan="5">
         <div>{{ matchRule.name }}</div>
         <div class="gl-text-gray-500">
           <gl-sprintf :message="matchRule.description">

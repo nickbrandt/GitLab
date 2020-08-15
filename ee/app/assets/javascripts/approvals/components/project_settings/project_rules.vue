@@ -165,48 +165,51 @@ export default {
 </script>
 
 <template>
-  <rules :rules="rules">
-    <template #thead="{ name, members, approvalsRequired, branches }">
-      <tr class="d-none d-sm-table-row">
-        <th class="w-25">{{ hasNamedRule ? name : members }}</th>
-        <th :class="settings.allowMultiRule ? 'w-50 d-none d-sm-table-cell' : 'w-75'">
-          <span v-if="hasNamedRule">{{ members }}</span>
-        </th>
-        <th v-if="settings.allowMultiRule">{{ branches }}</th>
-        <th>{{ approvalsRequired }}</th>
-        <th></th>
-      </tr>
-    </template>
-    <template #tbody="{ rules }">
-      <template v-for="(rule, index) in rules">
-        <empty-rule
-          v-if="rule.ruleType === 'any_approver'"
-          :key="index"
-          :rule="rule"
-          :allow-multi-rule="settings.allowMultiRule"
-          :is-mr-edit="false"
-          :eligible-approvers-docs-path="settings.eligibleApproversDocsPath"
-          :can-edit="canEdit(rule)"
-        />
-        <tr v-else :key="index">
-          <td class="js-name">{{ rule.name }}</td>
-          <td class="js-members" :class="settings.allowMultiRule ? 'd-none d-sm-table-cell' : null">
-            <user-avatar-list :items="rule.approvers" :img-size="24" empty-text="" />
-          </td>
-          <td v-if="settings.allowMultiRule" class="js-branches">
-            <rule-branches :rule="rule" />
-          </td>
-          <td class="js-approvals-required">
-            <rule-input :rule="rule" />
-          </td>
-          <td class="text-nowrap px-2 w-0 js-controls">
-            <rule-controls v-if="canEdit(rule)" :rule="rule" />
-          </td>
+  <div>
+    <rules :rules="rules">
+      <template #thead="{ name, members, approvalsRequired, branches }">
+        <tr class="d-none d-sm-table-row">
+          <th class="w-25">{{ hasNamedRule ? name : members }}</th>
+          <th :class="settings.allowMultiRule ? 'w-50 d-none d-sm-table-cell' : 'w-75'">
+            <span v-if="hasNamedRule">{{ members }}</span>
+          </th>
+          <th v-if="settings.allowMultiRule">{{ branches }}</th>
+          <th>{{ approvalsRequired }}</th>
+          <th></th>
         </tr>
       </template>
-
-      <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114 -->
-      <template v-if="glFeatures.approvalSuggestions">
+      <template #tbody="{ rules }">
+        <template v-for="(rule, index) in rules">
+          <empty-rule
+            v-if="rule.ruleType === 'any_approver'"
+            :key="index"
+            :rule="rule"
+            :allow-multi-rule="settings.allowMultiRule"
+            :is-mr-edit="false"
+            :eligible-approvers-docs-path="settings.eligibleApproversDocsPath"
+            :can-edit="canEdit(rule)"
+          />
+          <tr v-else :key="index">
+            <td class="js-name">{{ rule.name }}</td>
+            <td class="js-members" :class="settings.allowMultiRule ? 'd-none d-sm-table-cell' : null">
+              <user-avatar-list :items="rule.approvers" :img-size="24" empty-text="" />
+            </td>
+            <td v-if="settings.allowMultiRule" class="js-branches">
+              <rule-branches :rule="rule" />
+            </td>
+            <td class="js-approvals-required">
+              <rule-input :rule="rule" />
+            </td>
+            <td class="text-nowrap px-2 w-0 js-controls">
+              <rule-controls v-if="canEdit(rule)" :rule="rule" />
+            </td>
+          </tr>
+        </template>
+      </template>
+    </rules>
+    <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114 -->
+    <table class="table m-0" v-if="glFeatures.approvalSuggestions">
+      <tbody>
         <unconfigured-security-rule
           v-for="securityRule in securityRules"
           :key="securityRule.name"
@@ -216,7 +219,7 @@ export default {
           :match-rule="securityRule"
           @enable="openCreateModal({ defaultRuleName: securityRule.name })"
         />
-      </template>
-    </template>
-  </rules>
+      </tbody>
+    </table>
+  </div>
 </template>
