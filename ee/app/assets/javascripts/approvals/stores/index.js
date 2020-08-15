@@ -9,7 +9,9 @@ export const createStoreOptions = (approvalsModule, settings) => ({
     ...(approvalsModule ? { approvals: approvalsModule } : {}),
     createModal: modalModule(),
     deleteModal: modalModule(),
-    securityConfiguration: securityConfigurationModule(),
+    securityConfiguration: securityConfigurationModule({
+      securityConfigurationPath: settings.securityConfigurationPath,
+    }),
   },
 });
 

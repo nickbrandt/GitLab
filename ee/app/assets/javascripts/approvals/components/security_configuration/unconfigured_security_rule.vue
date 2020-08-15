@@ -41,9 +41,9 @@ export default {
   },
   computed: {
     hasApprovalRuleDefined() {
-      return this.rules?.some(rule => {
+      return this.rules.some(rule => {
         return this.matchRule.name === rule.name;
-      }, this);
+      });
     },
     hasConfiguredJob() {
       const { features = [] } = this.configuration;
@@ -76,6 +76,7 @@ export default {
     </td>
 
     <template v-else>
+      <!-- Suggested approval rule creation row -->
       <template v-if="hasConfiguredJob">
         <td class="js-name" colspan="4">
           <div>{{ matchRule.name }}</div>
@@ -94,6 +95,7 @@ export default {
         </td>
       </template>
 
+      <!-- Approval rule suggestion when lacking appropriate CI job for the rule -->
       <td v-else class="js-name" colspan="5">
         <div>{{ matchRule.name }}</div>
         <div class="gl-text-gray-500">

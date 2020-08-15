@@ -1,13 +1,8 @@
 <script>
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapActions } from 'vuex';
-import { s__, n__, sprintf } from '~/locale';
-import {
-  RULE_TYPE_ANY_APPROVER,
-  RULE_TYPE_REGULAR,
-  LICENSE_CHECK_NAME,
-  VULNERABILITY_CHECK_NAME,
-} from '../../constants';
+import { n__, sprintf } from '~/locale';
+import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR } from '../../constants';
 
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import Rules from '../rules.vue';
@@ -15,7 +10,7 @@ import RuleControls from '../rule_controls.vue';
 import EmptyRule from '../empty_rule.vue';
 import RuleInput from '../mr_edit/rule_input.vue';
 import RuleBranches from '../rule_branches.vue';
-import UnconfiguredSecurityRule from '../security_configuration/unconfigured_security_rule.vue';
+import UnconfiguredSecurityRules from '../security_configuration/unconfigured_security_rules.vue';
 
 export default {
   components: {
@@ -25,38 +20,15 @@ export default {
     EmptyRule,
     RuleInput,
     RuleBranches,
-    UnconfiguredSecurityRule,
+    UnconfiguredSecurityRules,
   },
   // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
   mixins: [glFeatureFlagsMixin()],
-  inject: {
-    securityConfigurationPath: {
-      type: String,
-      required: true,
-      from: 'securityConfigurationPath',
-      default: '',
-    },
-    vulnerabilityCheckHelpPagePath: {
-      type: String,
-      required: true,
-      from: 'vulnerabilityCheckHelpPagePath',
-      default: '',
-    },
-    licenseCheckHelpPagePath: {
-      type: String,
-      required: true,
-      from: 'licenseCheckHelpPagePath',
-      default: '',
-    },
-  },
   computed: {
     ...mapState(['settings']),
     ...mapState({
       rules: state => state.approvals.rules,
-      hasApprovalsLoaded: state => state.approvals.hasLoaded,
-      hasSecurityConfigurationLoaded: state => state.securityConfiguration.hasLoaded,
     }),
-    ...mapState('securityConfiguration', ['configuration']),
     hasNamedRule() {
       return this.rules.some(rule => rule.ruleType === RULE_TYPE_REGULAR);
     },
@@ -65,33 +37,6 @@ export default {
         this.settings.allowMultiRule &&
         !this.rules.some(rule => rule.ruleType === RULE_TYPE_ANY_APPROVER)
       );
-    },
-    isRulesLoading() {
-      return !this.hasApprovalsLoaded || !this.hasSecurityConfigurationLoaded;
-    },
-    securityRules() {
-      return [
-        {
-          name: VULNERABILITY_CHECK_NAME,
-          description: s__(
-            'SecurityApprovals|One or more of the security scanners must be enabled %{linkStart}more information%{linkEnd}',
-          ),
-          enableDescription: s__(
-            'SecurityApprovals|Requires approval for vulnerabilties of Critical, High, or Unknown severity %{linkStart}more information%{linkEnd}',
-          ),
-          docsPath: this.vulnerabilityCheckHelpPagePath,
-        },
-        {
-          name: LICENSE_CHECK_NAME,
-          description: s__(
-            'SecurityApprovals|License Scanning must be enabled %{linkStart}more information%{linkEnd}',
-          ),
-          enableDescription: s__(
-            'SecurityApprovals|Requires license policy rules for licenses of Allowed, or Denied %{linkStart}more information%{linkEnd}',
-          ),
-          docsPath: this.licenseCheckHelpPagePath,
-        },
-      ];
     },
   },
   watch: {
@@ -107,20 +52,8 @@ export default {
       immediate: true,
     },
   },
-  created() {
-    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-    if (this.glFeatures.approvalSuggestions) {
-      this.setSecurityConfigurationEndpoint(this.securityConfigurationPath);
-      this.fetchSecurityConfiguration();
-    }
-  },
   methods: {
     ...mapActions(['addEmptyRule']),
-    ...mapActions({ openCreateModal: 'createModal/open' }),
-    ...mapActions('securityConfiguration', [
-      'setSecurityConfigurationEndpoint',
-      'fetchSecurityConfiguration',
-    ]),
     summaryText(rule) {
       return this.settings.allowMultiRule
         ? this.summaryMultipleRulesText(rule)
@@ -191,7 +124,10 @@ export default {
           />
           <tr v-else :key="index">
             <td class="js-name">{{ rule.name }}</td>
-            <td class="js-members" :class="settings.allowMultiRule ? 'd-none d-sm-table-cell' : null">
+            <td
+              class="js-members"
+              :class="settings.allowMultiRule ? 'd-none d-sm-table-cell' : null"
+            >
               <user-avatar-list :items="rule.approvers" :img-size="24" empty-text="" />
             </td>
             <td v-if="settings.allowMultiRule" class="js-branches">
@@ -208,18 +144,6 @@ export default {
       </template>
     </rules>
     <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114 -->
-    <table class="table m-0" v-if="glFeatures.approvalSuggestions">
-      <tbody>
-        <unconfigured-security-rule
-          v-for="securityRule in securityRules"
-          :key="securityRule.name"
-          :configuration="configuration"
-          :rules="rules"
-          :is-loading="isRulesLoading"
-          :match-rule="securityRule"
-          @enable="openCreateModal({ defaultRuleName: securityRule.name })"
-        />
-      </tbody>
-    </table>
+    <unconfigured-security-rules v-if="glFeatures.approvalSuggestions" />
   </div>
 </template>

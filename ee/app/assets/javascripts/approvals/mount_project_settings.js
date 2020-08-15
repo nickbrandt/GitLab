@@ -12,11 +12,7 @@ export default function mountProjectSettingsApprovals(el) {
     return null;
   }
 
-  const {
-    securityConfigurationPath,
-    vulnerabilityCheckHelpPagePath,
-    licenseCheckHelpPagePath,
-  } = el.dataset;
+  const { vulnerabilityCheckHelpPagePath, licenseCheckHelpPagePath } = el.dataset;
 
   const store = createStore(projectSettingsModule(), {
     ...el.dataset,
@@ -29,7 +25,6 @@ export default function mountProjectSettingsApprovals(el) {
     el,
     store,
     provide: {
-      securityConfigurationPath,
       vulnerabilityCheckHelpPagePath,
       licenseCheckHelpPagePath,
     },
