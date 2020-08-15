@@ -25,30 +25,15 @@ export default {
   },
   computed: {
     ...mapState('createModal', {
-      rule(state) {
-        // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-        if (this.isApprovalSuggestionsEnabled) {
-          /*
-           * rule-form component expects undefined if we pre-populate the form input,
-           * otherwise populate with existing rule
-           */
-          return state.data?.initRuleField ? undefined : state.data;
-        }
-        return state.data;
-      },
-      originalData: 'data',
+      rule: 'data',
     }),
-    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-    isApprovalSuggestionsEnabled() {
-      return Boolean(this.glFeatures.approvalSuggestions);
-    },
-    initRuleFieldName() {
-      return this.originalData?.initRuleField && this.originalData?.name
-        ? this.originalData.name
-        : '';
-    },
     title() {
-      return this.rule ? __('Update approval rule') : __('Add approval rule');
+      return this.rule && !this.rule.defaultRuleName
+        ? __('Update approval rule')
+        : __('Add approval rule');
+    },
+    defaultRuleName() {
+      return this.rule && this.rule.defaultRuleName;
     },
   },
   methods: {
@@ -72,11 +57,11 @@ export default {
   >
     <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114 -->
     <rule-form
-      v-if="isApprovalSuggestionsEnabled"
+      v-if="glFeatures.approvalSuggestions"
       ref="form"
       :init-rule="rule"
       :is-mr-edit="isMrEdit"
-      :init-rule-field-name="initRuleFieldName"
+      :default-rule-name="defaultRuleName"
     />
     <rule-form v-else ref="form" :init-rule="rule" :is-mr-edit="isMrEdit" />
   </gl-modal-vuex>

@@ -32,7 +32,7 @@ export default {
       default: true,
       required: false,
     },
-    initRuleFieldName: {
+    defaultRuleName: {
       type: String,
       required: false,
       default: '',
@@ -40,10 +40,9 @@ export default {
   },
   data() {
     // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-    // Computed props not yet initilized can't use isApprovalSuggestionsEnabled
     if (this.glFeatures.approvalSuggestions) {
       return {
-        name: this.initRuleFieldName,
+        name: this.defaultRuleName || '',
         approvalsRequired: 1,
         minApprovalsRequired: 0,
         approvers: [],
@@ -72,9 +71,9 @@ export default {
   },
   computed: {
     ...mapState(['settings']),
-    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-    isApprovalSuggestionsEnabled() {
-      return Boolean(this.glFeatures.approvalSuggestions);
+    rule() {
+      // If we are creating a new rule with a suggested approval name
+      return this.defaultRuleName ? null : this.initRule;
     },
     approversByType() {
       return groupBy(this.approvers, x => x.type);
@@ -156,16 +155,16 @@ export default {
       );
     },
     isPersisted() {
-      return this.initRule && this.initRule.id;
+      return this.rule && this.rule.id;
     },
     isNameVisible() {
       return !this.settings.lockedApprovalsRuleName;
     },
     isNameDisabled() {
       // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-      if (this.isApprovalSuggestionsEnabled) {
+      if (this.glFeatures.approvalSuggestions) {
         return (
-          Boolean(this.isPersisted || this.initRuleFieldName) && READONLY_NAMES.includes(this.name)
+          Boolean(this.isPersisted || this.defaultRuleName) && READONLY_NAMES.includes(this.name)
         );
       }
       return this.isPersisted && READONLY_NAMES.includes(this.name);
@@ -175,7 +174,7 @@ export default {
     },
     submissionData() {
       return {
-        id: this.initRule && this.initRule.id,
+        id: this.rule && this.rule.id,
         name: this.settings.lockedApprovalsRuleName || this.name || DEFAULT_NAME,
         approvalsRequired: this.approvalsRequired,
         users: this.userIds,
@@ -258,7 +257,7 @@ export default {
      * Also delete the rule if necessary.
      */
     submitEmptySingleRule() {
-      const id = this.initRule && this.initRule.id;
+      const id = this.rule && this.rule.id;
 
       return Promise.all([this.submitFallback(), id ? this.deleteRule(id) : Promise.resolve()]);
     },
@@ -268,27 +267,27 @@ export default {
       return this.isValid;
     },
     getInitialData() {
-      if (!this.initRule) {
+      if (!this.rule) {
         return {};
       }
 
-      if (this.initRule.isFallback) {
+      if (this.rule.isFallback) {
         return {
-          approvalsRequired: this.initRule.approvalsRequired,
-          isFallback: this.initRule.isFallback,
+          approvalsRequired: this.rule.approvalsRequired,
+          isFallback: this.rule.isFallback,
         };
       }
 
-      const { containsHiddenGroups = false, removeHiddenGroups = false } = this.initRule;
+      const { containsHiddenGroups = false, removeHiddenGroups = false } = this.rule;
 
-      const users = this.initRule.users.map(x => ({ ...x, type: TYPE_USER }));
-      const groups = this.initRule.groups.map(x => ({ ...x, type: TYPE_GROUP }));
-      const branches = this.initRule.protectedBranches?.map(x => x.id) || [];
+      const users = this.rule.users.map(x => ({ ...x, type: TYPE_USER }));
+      const groups = this.rule.groups.map(x => ({ ...x, type: TYPE_GROUP }));
+      const branches = this.rule.protectedBranches?.map(x => x.id) || [];
 
       return {
-        name: this.initRule.name || '',
-        approvalsRequired: this.initRule.approvalsRequired || 0,
-        minApprovalsRequired: this.initRule.minApprovalsRequired || 0,
+        name: this.rule.name || '',
+        approvalsRequired: this.rule.approvalsRequired || 0,
+        minApprovalsRequired: this.rule.minApprovalsRequired || 0,
         containsHiddenGroups,
         approvers: groups
           .concat(users)
@@ -345,7 +344,7 @@ export default {
             v-model="branchesToAdd"
             :project-id="settings.projectId"
             :is-invalid="!!validation.branches"
-            :init-rule="initRule"
+            :init-rule="rule"
           />
           <div class="invalid-feedback">{{ validation.branches }}</div>
         </div>

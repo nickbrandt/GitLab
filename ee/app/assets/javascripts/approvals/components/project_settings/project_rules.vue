@@ -2,7 +2,12 @@
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapActions } from 'vuex';
 import { s__, n__, sprintf } from '~/locale';
-import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR , LICENSE_CHECK_NAME, VULNERABILITY_CHECK_NAME } from '../../constants';
+import {
+  RULE_TYPE_ANY_APPROVER,
+  RULE_TYPE_REGULAR,
+  LICENSE_CHECK_NAME,
+  VULNERABILITY_CHECK_NAME,
+} from '../../constants';
 
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import Rules from '../rules.vue';
@@ -88,10 +93,6 @@ export default {
         },
       ];
     },
-    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-    isApprovalSuggestionsEnabled() {
-      return Boolean(this.glFeatures.approvalSuggestions);
-    },
   },
   watch: {
     rules: {
@@ -108,7 +109,7 @@ export default {
   },
   created() {
     // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
-    if (this.isApprovalSuggestionsEnabled) {
+    if (this.glFeatures.approvalSuggestions) {
       this.setSecurityConfigurationEndpoint(this.securityConfigurationPath);
       this.fetchSecurityConfiguration();
     }
@@ -205,7 +206,7 @@ export default {
       </template>
 
       <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114 -->
-      <template v-if="isApprovalSuggestionsEnabled">
+      <template v-if="glFeatures.approvalSuggestions">
         <unconfigured-security-rule
           v-for="securityRule in securityRules"
           :key="securityRule.name"
@@ -213,7 +214,7 @@ export default {
           :rules="rules"
           :is-loading="isRulesLoading"
           :match-rule="securityRule"
-          @enable="openCreateModal({ name: securityRule.name, initRuleField: true })"
+          @enable="openCreateModal({ defaultRuleName: securityRule.name })"
         />
       </template>
     </template>
