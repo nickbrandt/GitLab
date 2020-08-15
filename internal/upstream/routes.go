@@ -283,7 +283,7 @@ func createUploadPreparers(cfg config.Config) uploadPreparers {
 
 	return uploadPreparers{
 		artifacts: defaultPreparer,
-		lfs:       lfs.NewLfsUploadPreparer(cfg),
+		lfs:       lfs.NewLfsUploadPreparer(cfg, defaultPreparer),
 		packages:  defaultPreparer,
 		uploads:   defaultPreparer,
 	}
