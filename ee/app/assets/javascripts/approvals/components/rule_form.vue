@@ -52,12 +52,12 @@ export default {
       containsHiddenGroups: false,
       ...this.getInitialData(),
     };
-    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114  
-    if(this.glFeatures.approvalSuggestions){
-      return { ...defaults, name: this.defaultRuleName || ''};
+    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+    if (this.glFeatures.approvalSuggestions) {
+      return { ...defaults, name: this.defaultRuleName || '' };
     }
 
-    return defaults
+    return defaults;
   },
   computed: {
     ...mapState(['settings']),

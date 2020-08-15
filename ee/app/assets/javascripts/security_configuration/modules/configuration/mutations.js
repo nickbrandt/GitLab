@@ -1,16 +1,12 @@
 import * as types from './mutation_types';
 
 export default {
-  [types.SET_SECURITY_CONFIGURATION_ENDPOINT](state, payload) {
-    state.securityConfigurationPath = payload;
-  },
   [types.REQUEST_SECURITY_CONFIGURATION](state) {
     state.isLoading = true;
     state.errorLoading = false;
   },
   [types.RECEIVE_SECURITY_CONFIGURATION_SUCCESS](state, payload) {
     state.isLoading = false;
-    state.hasLoaded = true;
     state.errorLoading = false;
     state.configuration = payload;
   },

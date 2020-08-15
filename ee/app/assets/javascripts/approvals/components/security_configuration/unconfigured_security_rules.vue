@@ -23,11 +23,11 @@ export default {
     ...mapState('securityConfiguration', ['configuration']),
     ...mapState({
       rules: state => state.approvals.rules,
-      hasApprovalsLoaded: state => state.approvals.hasLoaded,
-      hasSecurityConfigurationLoaded: state => state.securityConfiguration.hasLoaded,
+      isApprovalsLoading: state => state.approvals.isLoading,
+      isSecurityConfigurationLoading: state => state.securityConfiguration.isLoading,
     }),
     isRulesLoading() {
-      return !this.hasApprovalsLoaded || !this.hasSecurityConfigurationLoaded;
+      return this.isApprovalsLoading || this.isSecurityConfigurationLoading;
     },
     securityRules() {
       return [
@@ -56,7 +56,7 @@ export default {
   },
   created() {
     this.fetchSecurityConfiguration();
-  },  
+  },
   methods: {
     ...mapActions('securityConfiguration', ['fetchSecurityConfiguration']),
     ...mapActions({ openCreateModal: 'createModal/open' }),
