@@ -522,9 +522,6 @@ sudo -u git -H cp config/puma.rb.example config/puma.rb
 # cores you have available. You can get that number via the `nproc` command.
 sudo -u git -H editor config/puma.rb
 
-# Copy the example Rack attack config
-sudo -u git -H cp config/initializers/rack_attack.rb.example config/initializers/rack_attack.rb
-
 # Configure Git global settings for git user
 # 'autocrlf' is needed for the web editor
 sudo -u git -H git config --global core.autocrlf input
