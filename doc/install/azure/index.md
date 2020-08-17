@@ -12,7 +12,7 @@ We are currently working on a solution that will bring GitLab to the Azure Marke
 
 ## Selecting a Linux distribution
 
-Azure Virtual Machines (VM) are on-demand, scalable computing resources in Azure.  When installing GitLab, we recommend using [one of the many endorsed Linux distributions](https://azure.microsoft.com/en-us/overview/linux-on-azure/#supported-distributions).
+Azure Virtual Machines (VM) are on-demand, scalable computing resources in Azure. When installing GitLab, we recommend using [one of the many endorsed Linux distributions](https://azure.microsoft.com/en-us/overview/linux-on-azure/#supported-distributions).
 
 Your Linux distribution of choice installing on an Azure VM can help provide the benefits of virtualized compute resources. When using an Azure VM, you are responsible for the maintenance of the operating system and GitLab services will also need to be configured and maintained.
 
