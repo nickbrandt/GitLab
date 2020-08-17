@@ -2174,6 +2174,9 @@ msgstr ""
 msgid "AlertManagement|Resolved"
 msgstr ""
 
+msgid "AlertManagement|Runbook"
+msgstr ""
+
 msgid "AlertManagement|Service"
 msgstr ""
 
