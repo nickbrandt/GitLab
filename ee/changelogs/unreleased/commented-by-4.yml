@@ -1,0 +1,5 @@
+---
+title: Fix commented_by for any approvers rule
+merge_request: 39432
+author:
+type: fixed
