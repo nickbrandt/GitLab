@@ -95,7 +95,7 @@ export default {
       <gl-card :class="$options.cardClass" :body-class="$options.cardBodyClass">
         <span>{{ column.title }}</span>
         <span class="gl-font-size-h2 gl-font-weight-bold">{{ column.value }}</span>
-        <gl-icon v-if="column.icon" name="issues" :size="12" class="gl-text-gray-700" />
+        <gl-icon v-if="column.icon" name="issues" :size="12" class="gl-text-gray-500" />
       </gl-card>
     </div>
   </div>

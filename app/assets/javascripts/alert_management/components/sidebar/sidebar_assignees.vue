@@ -273,7 +273,7 @@ export default {
 
       <gl-loading-icon v-if="isUpdating" :inline="true" />
       <p v-else-if="!isDropdownShowing" class="value gl-m-0" :class="{ 'no-value': !userName }">
-        <span v-if="userName" class="gl-text-gray-700" data-testid="assigned-users">{{
+        <span v-if="userName" class="gl-text-gray-500" data-testid="assigned-users">{{
           assignedUser
         }}</span>
         <span v-else class="gl-display-flex gl-align-items-center">

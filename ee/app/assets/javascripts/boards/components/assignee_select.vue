@@ -136,7 +136,7 @@ export default {
           <span class="dropdown-toggle-text"> {{ placeholderText }} </span>
           <gl-icon
             name="chevron-down"
-            class="gl-absolute gl-top-3 gl-right-3 gl-text-gray-700"
+            class="gl-absolute gl-top-3 gl-right-3 gl-text-gray-500"
             :size="16"
           />
         </button>
@@ -157,7 +157,7 @@ dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
             />
             <gl-icon
               name="close"
-              class="dropdown-input-clear js-dropdown-input-clear gl-absolute gl-top-3 gl-right-5 gl-text-gray-700"
+              class="dropdown-input-clear js-dropdown-input-clear gl-absolute gl-top-3 gl-right-5 gl-text-gray-500"
             />
           </div>
           <div class="dropdown-content"></div>

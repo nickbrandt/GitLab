@@ -44,7 +44,7 @@ export default {
 </script>
 
 <template>
-  <div class="stats gl-text-gray-700">
+  <div class="stats gl-text-gray-500">
     <item-stats-value
       v-if="isGroup"
       :title="__('Subgroups')"

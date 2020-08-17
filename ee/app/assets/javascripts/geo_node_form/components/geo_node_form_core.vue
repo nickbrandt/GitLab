@@ -71,7 +71,7 @@ export default {
           type="text"
           @update="checkName"
         />
-        <span class="gl-text-gray-700 m-n5 gl-z-index-2">{{ 255 - nodeData.name.length }}</span>
+        <span class="gl-text-gray-500 m-n5 gl-z-index-2">{{ 255 - nodeData.name.length }}</span>
       </div>
     </gl-form-group>
     <section class="form-row">
@@ -108,7 +108,7 @@ export default {
             type="text"
             @update="checkUrl"
           />
-          <span class="gl-text-gray-700 m-n5 gl-z-index-2">{{ 255 - nodeData.url.length }}</span>
+          <span class="gl-text-gray-500 m-n5 gl-z-index-2">{{ 255 - nodeData.url.length }}</span>
         </div>
       </gl-form-group>
       <gl-form-group
@@ -127,7 +127,7 @@ export default {
             class="gl-pr-8!"
             type="text"
           />
-          <span class="gl-text-gray-700 m-n5 gl-z-index-2">{{
+          <span class="gl-text-gray-500 m-n5 gl-z-index-2">{{
             255 - nodeData.internalUrl.length
           }}</span>
         </div>

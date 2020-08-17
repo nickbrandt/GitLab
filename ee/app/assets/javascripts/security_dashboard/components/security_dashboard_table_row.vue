@@ -147,7 +147,7 @@ export default {
             :project-name="vulnerability.project.name"
           />
           <br />
-          <small v-if="vulnerabilityNamespace" class="gl-text-gray-700 gl-word-break-all">
+          <small v-if="vulnerabilityNamespace" class="gl-text-gray-500 gl-word-break-all">
             {{ vulnerabilityNamespace }}
           </small>
         </template>
