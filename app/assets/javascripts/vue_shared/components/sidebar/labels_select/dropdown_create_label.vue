@@ -13,7 +13,6 @@ export default {
   created() {
     this.suggestedColors = gon.suggested_label_colors;
   },
-  export default {
   components: {
     GlButton,
   },
@@ -72,14 +71,11 @@ export default {
           type="button"
           class="js-new-label-btn disabled"
           category="secondary"
-          variant="default">
+          variant="default"
+        >
           {{ __('Create') }}}
         </gl-button>
-        <gl-button
-          type="button"
-          class="js-cancel-label-btn"
-          category="secondary"
-          variant="default">
+        <gl-button type="button" class="js-cancel-label-btn" category="secondary" variant="default">
           {{ __('Cancel') }}
         </gl-button>
       </div>
