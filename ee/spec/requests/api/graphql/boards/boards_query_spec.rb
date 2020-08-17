@@ -21,7 +21,7 @@ RSpec.describe 'get list of boards' do
 
     def board_epic_query(board)
       epic_query = <<~EPIC
-        epics(issueFilters: {labelName: "#{label.title}"}) {
+        epics(issueFilters: {labelName: "#{label.title}", not: {authorUsername: "#{current_user.username}"}}) {
           nodes {
             id
             title
@@ -46,6 +46,7 @@ RSpec.describe 'get list of boards' do
       issue2 = create(:issue, project: issue_project, labels: [label])
       issue3 = create(:issue, project: issue_project)
       issue4 = create(:issue, project: issue_project, labels: [label])
+      issue5 = create(:issue, project: issue_project, labels: [label], author: current_user)
       epic1 = create(:epic, group: parent_group)
       epic2 = create(:epic, group: parent_group)
       epic3 = create(:epic, :closed, group: parent_group)
@@ -53,6 +54,7 @@ RSpec.describe 'get list of boards' do
       create(:epic_issue, issue: issue2, epic: epic1)
       create(:epic_issue, issue: issue3, epic: epic2)
       create(:epic_issue, issue: issue4, epic: epic3)
+      create(:epic_issue, issue: issue5, epic: epic2)
 
       post_graphql(board_epic_query(board), current_user: current_user)
 

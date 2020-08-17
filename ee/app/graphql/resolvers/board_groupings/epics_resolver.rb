@@ -16,13 +16,15 @@ module Resolvers
         return Epic.none unless group.present?
         return unless ::Feature.enabled?(:boards_with_swimlanes, group)
 
-        Epic.for_ids(board_epic_ids(args[:issue_filters]))
+        Epic.for_ids(board_epic_ids(args[:issue_filters].to_h))
       end
 
       private
 
       def board_epic_ids(issue_params)
         params = issue_params.to_h.merge(all_lists: true, board_id: board.id)
+        params[:not] = params[:not].to_h if params[:not].present?
+
         list_service = Boards::Issues::ListService.new(
           board.resource_parent,
           current_user,
