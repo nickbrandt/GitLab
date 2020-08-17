@@ -97,9 +97,13 @@ export default {
     emptyState() {
       if (this.issuables.length) {
         return {}; // Empty state shouldn't be shown here
-      } else if (this.isServiceDesk) {
+      }
+
+      if (this.isServiceDesk) {
         return emptyStateHelper(this.emptyStateMeta);
-      } else if (this.hasFilters) {
+      }
+
+      if (this.hasFilters) {
         return {
           title: __('Sorry, your filter produced no results'),
           svgPath: this.emptyStateMeta.svgPath,
@@ -107,7 +111,9 @@ export default {
           primaryLink: this.emptyStateMeta.createIssuePath,
           primaryText: __('New issue'),
         };
-      } else if (this.filters.state === 'opened') {
+      }
+
+      if (this.filters.state === 'opened') {
         return {
           title: __('There are no open issues'),
           svgPath: this.emptyStateMeta.svgPath,
