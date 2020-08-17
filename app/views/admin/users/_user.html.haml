@@ -8,12 +8,12 @@
     .table-mobile-header{ role: 'rowheader' }
       = _('Groups')
     .table-mobile-content
-      = user.groups.count
+      = user.authorized_groups.count
   .table-section.section-10
     .table-mobile-header{ role: 'rowheader' }
       = _('Projects')
     .table-mobile-content
-      = user.projects.count
+      = user.authorized_projects.count
   .table-section.section-10
     .table-mobile-header{ role: 'rowheader' }
       = _('Created on')
