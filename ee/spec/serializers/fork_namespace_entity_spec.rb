@@ -7,7 +7,13 @@ RSpec.describe ForkNamespaceEntity do
   let_it_be(:project) { create(:project) }
 
   let(:namespace) { create(:group_with_deletion_schedule, :with_avatar, description: 'test', marked_for_deletion_on: 1.day.ago) }
-  let(:entity) { described_class.new(namespace, current_user: user, project: project) }
+  let(:memberships) do
+    user.members.inject({}) do |memberships, member|
+      memberships[member.source_id] = member
+      memberships
+    end
+  end
+  let(:entity) { described_class.new(namespace, current_user: user, project: project, memberships: memberships) }
 
   subject(:json) { entity.as_json }
 
