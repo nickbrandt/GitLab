@@ -2,6 +2,17 @@ import ipaddr from 'ipaddr.js';
 import validateIpAddress from 'ee/validators/ip_address';
 
 describe('validateIpAddress', () => {
+  describe('when IP address is only integers', () => {
+    it.each`
+      address
+      ${1}
+      ${19}
+      ${192}
+    `('$address - returns false', ({ address }) => {
+      expect(validateIpAddress(address)).toBe(false);
+    });
+  });
+
   describe('when IP address is in valid CIDR format', () => {
     it('returns true', () => {
       ipaddr.parseCIDR = jest.fn(() => [
