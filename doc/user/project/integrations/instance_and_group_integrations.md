@@ -41,8 +41,8 @@ It is only possible to inherit the complete settings for an integration. Per-fie
 
 1. Navigate to **Project > Settings > Integrations**.
 1. Choose the integration you want to enable or update.
-2. From the drop-down, select **Use instance-level settings**.
-3. Ensure the toggle is set to **Enabled**.
+2. From the drop-down, select **Use default settings**.
+3. Ensure the toggle is set to **Enable integration**.
 4. Click **Save changes** 
 
 ![Screenshot of project-level integration with dropdown to use instance-level settings](./img/instance_level_dropdown.png)
@@ -52,5 +52,5 @@ It is only possible to inherit the complete settings for an integration. Per-fie
 1. Navigate to **Project > Settings > Integrations**.
 1. Choose the integration you want to enable or update.
 1. From the drop-down, select **Use custom settings**.
-1. Ensure the toggle is set to **Enabled** and enter all required settings.
+1. Ensure the toggle is set to **Enable integration** and enter all required settings.
 1. Click **Save changes**.
