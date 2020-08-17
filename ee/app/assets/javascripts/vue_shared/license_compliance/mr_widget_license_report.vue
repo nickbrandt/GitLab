@@ -2,13 +2,13 @@
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { GlLink } from '@gitlab/ui';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
-import ReportItem from '~/reports/components/report_item.vue';
-import SmartVirtualList from '~/vue_shared/components/smart_virtual_list.vue';
 import SetLicenseApprovalModal from 'ee/vue_shared/license_compliance/components/set_approval_status_modal.vue';
 import { componentNames } from 'ee/reports/components/issue_body';
+import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
+import ReportItem from '~/reports/components/report_item.vue';
+import SmartVirtualList from '~/vue_shared/components/smart_virtual_list.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import ReportSection from '~/reports/components/report_section.vue';
-import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
 import createStore from './store';
 
 const store = createStore();

@@ -1,12 +1,12 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
-import showToast from '~/vue_shared/plugins/global_toast';
 import App from 'ee/approvals/components/app.vue';
 import ModalRuleCreate from 'ee/approvals/components/modal_rule_create.vue';
 import ModalRuleRemove from 'ee/approvals/components/modal_rule_remove.vue';
 import { createStoreOptions } from 'ee/approvals/stores';
 import settingsModule from 'ee/approvals/stores/modules/project_settings';
+import showToast from '~/vue_shared/plugins/global_toast';
 
 jest.mock('~/vue_shared/plugins/global_toast');
 

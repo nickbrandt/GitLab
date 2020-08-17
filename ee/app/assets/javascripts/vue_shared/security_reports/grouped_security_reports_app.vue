@@ -2,6 +2,8 @@
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { once } from 'lodash';
 import { componentNames } from 'ee/reports/components/issue_body';
+import { GlButton, GlSprintf, GlLink, GlModalDirective } from '@gitlab/ui';
+import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';
@@ -11,9 +13,7 @@ import IssueModal from './components/modal.vue';
 import DastModal from './components/dast_modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
 import createStore from './store';
-import { GlButton, GlSprintf, GlLink, GlModalDirective } from '@gitlab/ui';
 import { mrStates } from '~/mr_popover/constants';
-import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
 import { fetchPolicies } from '~/lib/graphql';
 import securityReportSummaryQuery from './graphql/mr_security_report_summary.graphql';
 import SecuritySummary from './components/security_summary.vue';

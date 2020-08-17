@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
-import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import { environmentsList } from './mock_data';
 import EnvironmentsFolderViewComponent from '~/environments/folder/environments_folder_view.vue';
 

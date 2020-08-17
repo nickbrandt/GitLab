@@ -1,6 +1,6 @@
 <script>
-import { s__ } from '~/locale';
 import { GlButton, GlNewDropdown, GlDeprecatedDropdownItem } from '@gitlab/ui';
+import { s__ } from '~/locale';
 
 export default {
   i18n: {

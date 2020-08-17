@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
 import Api from 'ee/api';
 import * as valueStreamAnalyticsConstants from 'ee/analytics/cycle_analytics/constants';
+import * as analyticsMockData from 'ee_jest/analytics/cycle_analytics/mock_data';
 import axios from '~/lib/utils/axios_utils';
 import httpStatus from '~/lib/utils/http_status';
-import * as analyticsMockData from 'ee_jest/analytics/cycle_analytics/mock_data';
 
 describe('Api', () => {
   const dummyApiVersion = 'v3000';

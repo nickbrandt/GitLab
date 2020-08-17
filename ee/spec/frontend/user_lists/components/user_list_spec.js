@@ -4,10 +4,10 @@ import { mount } from '@vue/test-utils';
 import { uniq } from 'lodash';
 import { GlAlert, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import Api from 'ee/api';
-import { userList } from '../../feature_flags/mock_data';
 import { parseUserIds, stringifyUserIds } from 'ee/user_lists/store/utils';
 import createStore from 'ee/user_lists/store/show';
 import UserList from 'ee/user_lists/components/user_list.vue';
+import { userList } from '../../feature_flags/mock_data';
 
 jest.mock('ee/api');
 

@@ -1,9 +1,9 @@
 <script>
 import { escape } from 'lodash';
 import { mapState } from 'vuex';
+import { GlTable, GlLink, GlIcon, GlAvatarLink, GlAvatar, GlTooltipDirective } from '@gitlab/ui';
 import { __, sprintf, n__ } from '~/locale';
 import { getTimeago } from '~/lib/utils/datetime_utility';
-import { GlTable, GlLink, GlIcon, GlAvatarLink, GlAvatar, GlTooltipDirective } from '@gitlab/ui';
 import ApproversColumn from './approvers_column.vue';
 
 export default {

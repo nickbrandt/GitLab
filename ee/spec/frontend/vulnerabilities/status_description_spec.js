@@ -2,10 +2,10 @@ import { mount } from '@vue/test-utils';
 import { GlLink, GlSkeletonLoading, GlLoadingIcon } from '@gitlab/ui';
 import { capitalize } from 'lodash';
 import UsersMockHelper from 'helpers/user_mock_data_helper';
-import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import StatusText from 'ee/vulnerabilities/components/status_description.vue';
 import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
+import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 
 const NON_DETECTED_STATES = Object.keys(VULNERABILITY_STATE_OBJECTS);
 const ALL_STATES = ['detected', ...NON_DETECTED_STATES];

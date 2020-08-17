@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
 import ListIssueEE from 'ee/boards/models/issue';
+import { GlLabel } from '@gitlab/ui';
 import ListLabel from '~/boards/models/label';
 import IssueCardInner from '~/boards/components/issue_card_inner.vue';
 import defaultStore from '~/boards/stores';
-import { GlLabel } from '@gitlab/ui';
 
 describe('Issue card component', () => {
   let wrapper;

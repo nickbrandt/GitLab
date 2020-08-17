@@ -4,13 +4,12 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 
 import BoardListHeader from 'ee/boards/components/board_list_header.vue';
+import { TEST_HOST } from 'helpers/test_constants';
+import { listObj } from 'jest/boards/mock_data';
 import List from '~/boards/models/list';
 import { ListType, inactiveId } from '~/boards/constants';
 import axios from '~/lib/utils/axios_utils';
 import sidebarEventHub from '~/sidebar/event_hub';
-
-import { TEST_HOST } from 'helpers/test_constants';
-import { listObj } from 'jest/boards/mock_data';
 
 // board_promotion_state tries to mount on the real DOM,
 // so we are mocking it in this test

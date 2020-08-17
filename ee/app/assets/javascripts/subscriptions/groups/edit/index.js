@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import { parseBoolean } from '~/lib/utils/common_utils';
 import {
   STEPS,
   SUBSCRIPTON_FLOW_STEPS,
   ONBOARDING_ISSUES_EXPERIMENT_AND_SUBSCRIPTION_FLOW_STEPS,
 } from 'ee/registrations/constants';
 import ProgressBar from 'ee/registrations/components/progress_bar.vue';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 export default () => {
   const el = document.getElementById('progress-bar');

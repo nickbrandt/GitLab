@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import MockAdapter from 'axios-mock-adapter';
-import ProtectedBranchEdit from '~/protected_branches/protected_branch_edit';
 import { TEST_HOST } from 'helpers/test_constants';
+import ProtectedBranchEdit from '~/protected_branches/protected_branch_edit';
 import flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 

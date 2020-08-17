@@ -8,8 +8,8 @@ import createDefaultStore from 'ee/related_items_tree/store';
 import { issuableTypesMap } from 'ee/related_issues/constants';
 import CreateIssueForm from 'ee/related_items_tree/components/create_issue_form.vue';
 import AxiosMockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import { getJSONFixture } from 'helpers/fixtures';
+import axios from '~/lib/utils/axios_utils';
 
 import { mockInitialConfig, mockParentItem, mockEpics, mockIssues } from '../mock_data';
 

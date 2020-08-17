@@ -4,10 +4,6 @@ import MockAdapter from 'axios-mock-adapter';
 import waitForPromises from 'helpers/wait_for_promises';
 import UsersMockHelper from 'helpers/user_mock_data_helper';
 import Api from 'ee/api';
-import axios from '~/lib/utils/axios_utils';
-import download from '~/lib/utils/downloader';
-import * as urlUtility from '~/lib/utils/url_utility';
-import createFlash from '~/flash';
 import Header from 'ee/vulnerabilities/components/header.vue';
 import StatusDescription from 'ee/vulnerabilities/components/status_description.vue';
 import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
@@ -15,6 +11,10 @@ import SplitButton from 'ee/vue_shared/security_reports/components/split_button.
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
 import VulnerabilitiesEventBus from 'ee/vulnerabilities/components/vulnerabilities_event_bus';
 import { FEEDBACK_TYPES, VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
+import createFlash from '~/flash';
+import * as urlUtility from '~/lib/utils/url_utility';
+import download from '~/lib/utils/downloader';
+import axios from '~/lib/utils/axios_utils';
 
 const vulnerabilityStateEntries = Object.entries(VULNERABILITY_STATE_OBJECTS);
 const mockAxios = new MockAdapter(axios);

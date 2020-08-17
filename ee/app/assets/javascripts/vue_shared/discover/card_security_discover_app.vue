@@ -1,10 +1,10 @@
 <script>
 import { GlButton, GlTooltipDirective, GlCarousel, GlCarouselSlide } from '@gitlab/ui';
-import { sprintf, s__ } from '~/locale';
-import Tracking from '~/tracking';
 import securityDependencyImageUrl from 'ee_images/promotions/security-dependencies.png';
 import securityScanningImageUrl from 'ee_images/promotions/security-scanning.png';
 import securityDashboardImageUrl from 'ee_images/promotions/security-dashboard.png';
+import Tracking from '~/tracking';
+import { sprintf, s__ } from '~/locale';
 
 export default {
   directives: {

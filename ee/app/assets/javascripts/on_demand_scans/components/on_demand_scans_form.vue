@@ -1,7 +1,5 @@
 <script>
 import * as Sentry from '@sentry/browser';
-import { s__ } from '~/locale';
-import { redirectTo } from '~/lib/utils/url_utility';
 import {
   GlAlert,
   GlButton,
@@ -17,6 +15,8 @@ import {
   GlTooltipDirective,
 } from '@gitlab/ui';
 import dastSiteProfilesQuery from 'ee/dast_profiles/graphql/dast_site_profiles.query.graphql';
+import { s__ } from '~/locale';
+import { redirectTo } from '~/lib/utils/url_utility';
 import dastOnDemandScanCreateMutation from '../graphql/dast_on_demand_scan_create.mutation.graphql';
 import { SCAN_TYPES } from '../constants';
 

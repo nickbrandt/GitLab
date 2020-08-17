@@ -3,9 +3,9 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import BoardSettingsSidebar from '~/boards/components/board_settings_sidebar.vue';
 import BoardSettingsWipLimit from 'ee_component/boards/components/board_settings_wip_limit.vue';
 import BoardSettingsListTypes from 'ee_component/boards/components/board_settings_list_types.vue';
+import BoardSettingsSidebar from '~/boards/components/board_settings_sidebar.vue';
 import boardsStore from '~/boards/stores/boards_store';
 import { inactiveId } from '~/boards/constants';
 

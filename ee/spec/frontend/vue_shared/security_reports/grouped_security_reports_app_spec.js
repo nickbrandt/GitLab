@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
-import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
 import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_security_reports_app.vue';
 import state from 'ee/vue_shared/security_reports/store/state';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
@@ -9,10 +8,11 @@ import * as sastTypes from 'ee/vue_shared/security_reports/store/modules/sast/mu
 import { mount } from '@vue/test-utils';
 import { waitForMutation } from 'helpers/vue_test_utils_helper';
 import { trimText } from 'helpers/text_helper';
-import axios from '~/lib/utils/axios_utils';
-import { mrStates } from '~/mr_popover/constants';
 import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
 import { trackMrSecurityReportDetails } from 'ee/vue_shared/security_reports/store/constants';
+import axios from '~/lib/utils/axios_utils';
+import { mrStates } from '~/mr_popover/constants';
+import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
 import ReportSection from '~/reports/components/report_section.vue';
 
 import {

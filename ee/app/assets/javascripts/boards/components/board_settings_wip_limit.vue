@@ -1,9 +1,9 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import { GlButton, GlFormInput } from '@gitlab/ui';
+import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import flash from '~/flash';
 import { __, n__ } from '~/locale';
-import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import autofocusonshow from '~/vue_shared/directives/autofocusonshow';
 import { inactiveId } from '~/boards/constants';
 

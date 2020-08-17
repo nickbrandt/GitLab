@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils';
-import createFlash from '~/flash';
 import RecentActivityCard from 'ee/analytics/cycle_analytics/components/recent_activity_card.vue';
-import { group, recentActivityData } from '../mock_data';
 import Api from 'ee/api';
+import createFlash from '~/flash';
+import { group, recentActivityData } from '../mock_data';
 
 jest.mock('~/flash');
 

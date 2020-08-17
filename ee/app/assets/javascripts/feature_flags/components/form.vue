@@ -11,6 +11,7 @@ import {
   GlSprintf,
 } from '@gitlab/ui';
 import Api from 'ee/api';
+import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
 import { s__ } from '~/locale';
 import flash, { FLASH_TYPES } from '~/flash';
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -27,7 +28,6 @@ import {
   LEGACY_FLAG,
 } from '../constants';
 import { createNewEnvironmentScope } from '../store/modules/helpers';
-import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
 
 export default {
   components: {

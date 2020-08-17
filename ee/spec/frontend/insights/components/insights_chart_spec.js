@@ -9,8 +9,8 @@ import {
 } from 'ee_jest/insights/mock_data';
 import InsightsChart from 'ee/insights/components/insights_chart.vue';
 import InsightsChartError from 'ee/insights/components/insights_chart_error.vue';
-import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import { CHART_TYPES } from 'ee/insights/constants';
+import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 
 describe('Insights chart component', () => {
   let wrapper;

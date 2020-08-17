@@ -1,12 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
-import createFlash from '~/flash';
 
 import ProjectManager from 'ee/security_dashboard/components/first_class_project_manager/project_manager.vue';
 import ProjectList from 'ee/security_dashboard/components/first_class_project_manager/project_list.vue';
-import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import getProjects from 'ee/security_dashboard/graphql/get_projects.query.graphql';
 import waitForPromises from 'helpers/wait_for_promises';
+import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
+import createFlash from '~/flash';
 
 jest.mock('~/flash');
 

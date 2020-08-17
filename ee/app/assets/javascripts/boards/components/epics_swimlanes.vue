@@ -1,8 +1,8 @@
 <script>
 import { mapActions, mapState } from 'vuex';
-import { n__ } from '~/locale';
 import { GlIcon, GlTooltipDirective } from '@gitlab/ui';
 import BoardListHeader from 'ee_else_ce/boards/components/board_list_header.vue';
+import { n__ } from '~/locale';
 import EpicLane from './epic_lane.vue';
 import IssuesLaneList from './issues_lane_list.vue';
 
