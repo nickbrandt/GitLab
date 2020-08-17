@@ -16,6 +16,7 @@ RSpec.describe Projects::IncidentsHelper do
         'project-path' => project_path,
         'new-issue-path' => new_issue_path,
         'incident-template-name' => 'incident',
+        'incident-type' => 'incident',
         'issue-path' => issue_path
       }
     end
