@@ -99,7 +99,7 @@ export default {
 <template>
   <div>
     <h4 data-testid="chartTitle">{{ $options.strings.chartTitle }}</h4>
-    <div class="gl-text-gray-700" data-testid="chartDescription">
+    <div class="gl-text-gray-500" data-testid="chartDescription">
       {{ $options.strings.chartDescription }}
     </div>
     <chart-skeleton-loader v-if="chartDataLoading" />

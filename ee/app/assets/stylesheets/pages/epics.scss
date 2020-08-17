@@ -114,7 +114,7 @@
     @include gl-white-space-nowrap;
 
     .gl-button-text {
-      @include gl-text-gray-700;
+      @include gl-text-gray-500;
       @include gl-display-flex;
       @include gl-justify-content-space-between;
       @include gl-w-full;

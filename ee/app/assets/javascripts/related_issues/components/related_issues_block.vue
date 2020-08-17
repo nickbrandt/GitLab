@@ -140,7 +140,7 @@ export default {
             v-if="hasHelpPath"
             :href="helpPath"
             target="_blank"
-            class="gl-display-flex gl-align-items-center gl-ml-2 gl-text-gray-700"
+            class="gl-display-flex gl-align-items-center gl-ml-2 gl-text-gray-500"
             :aria-label="__('Read more about related issues')"
           >
             <gl-icon name="question" :size="12" role="text" />
@@ -149,7 +149,7 @@ export default {
           <div class="gl-display-inline-flex">
             <div class="js-related-issues-header-issue-count gl-display-inline-flex gl-mx-5">
               <span class="gl-display-inline-flex gl-align-items-center">
-                <gl-icon :name="issuableTypeIcon" class="gl-mr-2 gl-text-gray-700" />
+                <gl-icon :name="issuableTypeIcon" class="gl-mr-2 gl-text-gray-500" />
                 {{ badgeLabel }}
               </span>
             </div>

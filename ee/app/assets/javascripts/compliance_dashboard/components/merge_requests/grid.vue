@@ -106,7 +106,7 @@ export default {
               uri: mergeRequest.target_branch_uri,
             }"
           />
-          <span class="gl-text-gray-700">
+          <span class="gl-text-gray-500">
             <time v-gl-tooltip.bottom="timeTooltip(mergeRequest.merged_at)">{{
               timeAgoString(mergeRequest.merged_at)
             }}</time>

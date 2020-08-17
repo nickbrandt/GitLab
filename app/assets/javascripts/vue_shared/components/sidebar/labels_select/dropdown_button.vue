@@ -78,7 +78,7 @@ export default {
     <span class="dropdown-toggle-text"> {{ dropdownToggleText }} </span>
     <gl-icon
       name="chevron-down"
-      class="gl-absolute gl-top-3 gl-right-3 gl-text-gray-700"
+      class="gl-absolute gl-top-3 gl-right-3 gl-text-gray-500"
       :size="16"
     />
   </button>

@@ -48,7 +48,7 @@ exports[`MergeRequestsGrid component when intialized matches the snapshot 1`] = 
       <!---->
        
       <span
-        class="gl-text-gray-700"
+        class="gl-text-gray-500"
       >
         <time>
           merged 2 days ago
@@ -79,7 +79,7 @@ exports[`MergeRequestsGrid component when intialized matches the snapshot 1`] = 
       <!---->
        
       <span
-        class="gl-text-gray-700"
+        class="gl-text-gray-500"
       >
         <time>
           merged 2 days ago
