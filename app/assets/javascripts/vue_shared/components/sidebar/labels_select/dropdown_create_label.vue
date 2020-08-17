@@ -1,5 +1,6 @@
 <script>
 import { __ } from '~/locale';
+import { GlButton } from '@gitlab/ui';
 
 export default {
   props: {
@@ -12,27 +13,29 @@ export default {
   created() {
     this.suggestedColors = gon.suggested_label_colors;
   },
+  export default {
+  components: {
+    GlButton,
+  },
 };
 </script>
 
 <template>
   <div class="dropdown-page-two dropdown-new-label">
     <div class="dropdown-title">
-      <button
+      <gl-button
         :aria-label="__('Go back')"
-        type="button"
         class="dropdown-title-button dropdown-menu-back"
-      >
-        <i aria-hidden="true" class="fa fa-arrow-left" data-hidden="true"> </i>
-      </button>
+        icon="arrow-left"
+      />
       {{ headerTitle }}
-      <button
+      <gl-button
         :aria-label="__('Close')"
-        type="button"
         class="dropdown-title-button dropdown-menu-close"
+        icon="close"
       >
         <i aria-hidden="true" class="fa fa-times dropdown-menu-close-icon" data-hidden="true"> </i>
-      </button>
+      </gl-button>
     </div>
     <div class="dropdown-content">
       <div class="dropdown-labels-error js-label-error"></div>
@@ -65,12 +68,20 @@ export default {
         />
       </div>
       <div class="clearfix">
-        <button type="button" class="btn btn-primary float-left js-new-label-btn disabled">
-          {{ __('Create') }}
-        </button>
-        <button type="button" class="btn btn-default float-right js-cancel-label-btn">
+        <gl-button
+          type="button"
+          class="js-new-label-btn disabled"
+          category="secondary"
+          variant="default">
+          {{ __('Create') }}}
+        </gl-button>
+        <gl-button
+          type="button"
+          class="js-cancel-label-btn"
+          category="secondary"
+          variant="default">
           {{ __('Cancel') }}
-        </button>
+        </gl-button>
       </div>
     </div>
   </div>
