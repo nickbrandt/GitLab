@@ -171,6 +171,10 @@ RSpec.describe Security::StoreReportService, '#execute' do
       it 'does not create a new finding' do
         expect { subject }.not_to change { Vulnerabilities::Finding.count }
       end
+
+      it 'does not raise an error' do
+        expect { subject }.not_to raise_error
+      end
     end
   end
 
