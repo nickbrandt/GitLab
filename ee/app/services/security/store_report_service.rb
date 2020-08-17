@@ -31,7 +31,7 @@ module Security
     end
 
     def create_all_vulnerabilities!
-      @report.findings.map { |finding| create_vulnerability_finding(finding).id }.uniq
+      @report.findings.map { |finding| create_vulnerability_finding(finding)&.id }.compact.uniq
     end
 
     def mark_as_resolved_except(vulnerability_ids)
@@ -42,6 +42,8 @@ module Security
     end
 
     def create_vulnerability_finding(finding)
+      return if finding.scanner.blank?
+
       vulnerability_params = finding.to_hash.except(:compare_key, :identifiers, :location, :scanner)
       vulnerability_finding = create_or_find_vulnerability_finding(finding, vulnerability_params)
 
@@ -60,8 +62,6 @@ module Security
 
     # rubocop: disable CodeReuse/ActiveRecord
     def create_or_find_vulnerability_finding(finding, create_params)
-      return if finding.scanner.blank?
-
       find_params = {
         scanner: scanners_objects[finding.scanner.key],
         primary_identifier: identifiers_objects[finding.primary_identifier.key],
@@ -81,8 +81,6 @@ module Security
     end
 
     def update_vulnerability_scanner(finding)
-      return if finding.scanner.blank?
-
       scanner = scanners_objects[finding.scanner.key]
       scanner.update!(finding.scanner.to_hash)
     end
