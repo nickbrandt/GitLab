@@ -172,6 +172,11 @@ func main() {
 			redis.Configure(cfg.Redis, redis.DefaultDialFunc)
 			go redis.Process()
 		}
+
+		err = cfg.RegisterGoCloudURLOpeners()
+		if err != nil {
+			log.WithError(err).Fatal("could not load cloud credentials")
+		}
 	}
 
 	accessLogger, accessCloser, err := getAccessLogger(logConfig)

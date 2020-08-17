@@ -4,6 +4,8 @@ import (
 	"strings"
 	"time"
 
+	"gocloud.dev/blob"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 )
@@ -16,6 +18,12 @@ type ObjectStorageConfig struct {
 
 	S3Credentials config.S3Credentials
 	S3Config      config.S3Config
+
+	// GoCloud mux that maps azureblob:// and future URLs (e.g. s3://, gcs://, etc.) to a handler
+	URLMux *blob.URLMux
+
+	// Azure credentials are registered at startup in the GoCloud URLMux, so only the container name is needed
+	GoCloudConfig config.GoCloudConfig
 }
 
 // SaveFileOpts represents all the options available for saving a file to object store
@@ -66,7 +74,7 @@ func (s *SaveFileOpts) IsLocal() bool {
 
 // IsRemote checks if the options requires a remote upload
 func (s *SaveFileOpts) IsRemote() bool {
-	return s.PresignedPut != "" || s.IsMultipart()
+	return s.PresignedPut != "" || s.IsMultipart() || s.UseWorkhorseClient
 }
 
 // IsMultipart checks if the options requires a Multipart upload
@@ -97,6 +105,7 @@ func GetOpts(apiResponse *api.Response) *SaveFileOpts {
 	if opts.UseWorkhorseClient && objectStorageParams != nil {
 		opts.ObjectStorageConfig.Provider = objectStorageParams.Provider
 		opts.ObjectStorageConfig.S3Config = objectStorageParams.S3Config
+		opts.ObjectStorageConfig.GoCloudConfig = objectStorageParams.GoCloudConfig
 	}
 
 	// Backwards compatibility to ensure API servers that do not include the
@@ -120,11 +129,28 @@ func (c *ObjectStorageConfig) IsAWS() bool {
 	return strings.EqualFold(c.Provider, "AWS") || strings.EqualFold(c.Provider, "S3")
 }
 
-func (c *ObjectStorageConfig) IsValid() bool {
-	return c.S3Config.Bucket != "" && c.S3Config.Region != "" && c.credentialsValid()
+func (c *ObjectStorageConfig) IsAzure() bool {
+	return strings.EqualFold(c.Provider, "AzureRM")
 }
 
-func (c *ObjectStorageConfig) credentialsValid() bool {
+func (c *ObjectStorageConfig) IsGoCloud() bool {
+	return c.GoCloudConfig.URL != ""
+}
+
+func (c *ObjectStorageConfig) IsValid() bool {
+	if c.IsAWS() {
+		return c.S3Config.Bucket != "" && c.S3Config.Region != "" && c.s3CredentialsValid()
+	} else if c.IsGoCloud() {
+		// We could parse and validate the URL, but GoCloud providers
+		// such as AzureRM don't have a fallback to normal HTTP, so we
+		// always want to try the GoCloud path if there is a URL.
+		return true
+	}
+
+	return false
+}
+
+func (c *ObjectStorageConfig) s3CredentialsValid() bool {
 	// We need to be able to distinguish between two cases of AWS access:
 	// 1. AWS access via key and secret, but credentials not configured in Workhorse
 	// 2. IAM instance profiles used

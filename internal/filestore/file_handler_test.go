@@ -14,7 +14,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gocloud.dev/blob"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
@@ -184,9 +186,11 @@ func TestSaveFile(t *testing.T) {
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
 			assert := assert.New(t)
+			logHook := testhelper.SetupLogger()
 
 			var opts filestore.SaveFileOpts
 			var expectedDeletes, expectedPuts int
+			var expectedClientMode string
 
 			osStub, ts := test.StartObjectStore()
 			defer ts.Close()
@@ -203,6 +207,7 @@ func TestSaveFile(t *testing.T) {
 
 				expectedDeletes = 1
 				expectedPuts = 1
+				expectedClientMode = "http"
 			case remoteMultipart:
 				objectURL := ts.URL + test.ObjectPath
 
@@ -217,11 +222,18 @@ func TestSaveFile(t *testing.T) {
 				osStub.InitiateMultipartUpload(test.ObjectPath)
 				expectedDeletes = 1
 				expectedPuts = 2
+				expectedClientMode = "multipart"
 			}
 
 			if spec.local {
 				opts.LocalTempPath = tmpFolder
 				opts.TempFilePrefix = "test-file"
+
+				if expectedClientMode != "" {
+					expectedClientMode += "+local"
+				} else {
+					expectedClientMode = "local"
+				}
 			}
 
 			ctx, cancel := context.WithCancel(context.Background())
@@ -271,11 +283,20 @@ func TestSaveFile(t *testing.T) {
 			uploadFields := token.Claims.(*testhelper.UploadClaims).Upload
 
 			checkFileHandlerWithFields(t, fh, uploadFields, "", spec.remote == notRemote)
+
+			require.True(t, testhelper.WaitForLogEvent(logHook))
+			entries := logHook.AllEntries()
+			require.Equal(t, 1, len(entries))
+			msg := entries[0].Message
+			require.Contains(t, msg, "saved file")
+			require.Contains(t, msg, fmt.Sprintf("client_mode=%s", expectedClientMode))
 		})
 	}
 }
 
-func TestSaveFileWithWorkhorseClient(t *testing.T) {
+func TestSaveFileWithS3WorkhorseClient(t *testing.T) {
+	logHook := testhelper.SetupLogger()
+
 	s3Creds, s3Config, sess, ts := test.SetupS3(t, "")
 	defer ts.Close()
 
@@ -299,6 +320,71 @@ func TestSaveFileWithWorkhorseClient(t *testing.T) {
 	require.NoError(t, err)
 
 	test.S3ObjectExists(t, sess, s3Config, remoteObject, test.ObjectContent)
+
+	require.True(t, testhelper.WaitForLogEvent(logHook))
+	entries := logHook.AllEntries()
+	require.Equal(t, 1, len(entries))
+	msg := entries[0].Message
+	require.Contains(t, msg, "saved file")
+	require.Contains(t, msg, "client_mode=s3")
+}
+
+func TestSaveFileWithAzureWorkhorseClient(t *testing.T) {
+	logHook := testhelper.SetupLogger()
+
+	mux, bucketDir, cleanup := test.SetupGoCloudFileBucket(t, "azblob")
+	defer cleanup()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	remoteObject := "tmp/test-file/1"
+	opts := filestore.SaveFileOpts{
+		RemoteID:           "test-file",
+		Deadline:           testDeadline(),
+		UseWorkhorseClient: true,
+		RemoteTempObjectID: remoteObject,
+		ObjectStorageConfig: filestore.ObjectStorageConfig{
+			Provider:      "AzureRM",
+			URLMux:        mux,
+			GoCloudConfig: config.GoCloudConfig{URL: "azblob://test-container"},
+		},
+	}
+
+	_, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, &opts)
+	require.NoError(t, err)
+
+	test.GoCloudObjectExists(t, bucketDir, remoteObject)
+
+	require.True(t, testhelper.WaitForLogEvent(logHook))
+	entries := logHook.AllEntries()
+	require.Equal(t, 1, len(entries))
+	msg := entries[0].Message
+	require.Contains(t, msg, "saved file")
+	require.Contains(t, msg, "client_mode=\"go_cloud:AzureRM\"")
+}
+
+func TestSaveFileWithUnknownGoCloudScheme(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	mux := new(blob.URLMux)
+
+	remoteObject := "tmp/test-file/1"
+	opts := filestore.SaveFileOpts{
+		RemoteID:           "test-file",
+		Deadline:           testDeadline(),
+		UseWorkhorseClient: true,
+		RemoteTempObjectID: remoteObject,
+		ObjectStorageConfig: filestore.ObjectStorageConfig{
+			Provider:      "SomeCloud",
+			URLMux:        mux,
+			GoCloudConfig: config.GoCloudConfig{URL: "foo://test-container"},
+		},
+	}
+
+	_, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, &opts)
+	require.Error(t, err)
 }
 
 func TestSaveMultipartInBodyFailure(t *testing.T) {
