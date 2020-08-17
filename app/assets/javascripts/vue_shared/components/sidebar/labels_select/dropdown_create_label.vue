@@ -5,7 +5,8 @@ import { GlButton } from '@gitlab/ui';
 export default {
   components: {
     GlButton,
-  },props: {
+  },
+  props: {
     headerTitle: {
       type: String,
       required: false,
