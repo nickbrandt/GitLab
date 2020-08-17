@@ -1,6 +1,6 @@
 <script>
-import { __ } from '~/locale';
 import { GlAlert, GlDeprecatedButton, GlIntersectionObserver } from '@gitlab/ui';
+import { __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/project_vulnerabilities.graphql';

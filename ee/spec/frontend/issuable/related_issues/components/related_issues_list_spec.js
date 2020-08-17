@@ -1,5 +1,4 @@
 import { mount, shallowMount } from '@vue/test-utils';
-import IssueDueDate from '~/boards/components/issue_due_date.vue';
 import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
 import RelatedIssuesList from 'ee/related_issues/components/related_issues_list.vue';
 import {
@@ -10,6 +9,7 @@ import {
   issuable5,
 } from 'jest/vue_shared/components/issue/related_issuable_mock_data';
 import { PathIdSeparator } from 'ee/related_issues/constants';
+import IssueDueDate from '~/boards/components/issue_due_date.vue';
 
 describe('RelatedIssuesList', () => {
   let wrapper;

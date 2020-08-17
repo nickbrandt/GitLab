@@ -2,12 +2,12 @@
 import { mapActions } from 'vuex';
 import { GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlLoadingIcon } from '@gitlab/ui';
 import { getIssueStatusFromLicenseStatus } from 'ee/vue_shared/license_compliance/store/utils';
+import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
 
 import { LICENSE_APPROVAL_STATUS, LICENSE_APPROVAL_ACTION } from '../constants';
-import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
 
 const visibleClass = 'visible';
 const invisibleClass = 'invisible';

@@ -1,9 +1,9 @@
 import Vue from 'vue';
+import { GlToast } from '@gitlab/ui';
 import CycleAnalytics from './components/base.vue';
 import createStore from './store';
 import { buildCycleAnalyticsInitialData } from '../shared/utils';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import { GlToast } from '@gitlab/ui';
 
 Vue.use(GlToast);
 

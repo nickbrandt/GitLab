@@ -1,10 +1,10 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-import httpStatusCodes from '~/lib/utils/http_status';
 import * as actions from 'ee/analytics/cycle_analytics/store/modules/filters/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/modules/filters/mutation_types';
 import initialState from 'ee/analytics/cycle_analytics/store/modules/filters/state';
+import httpStatusCodes from '~/lib/utils/http_status';
 import createFlash from '~/flash';
 import { filterMilestones, filterUsers, filterLabels } from '../../../mock_data';
 

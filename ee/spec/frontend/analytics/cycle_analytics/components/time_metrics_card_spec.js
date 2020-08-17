@@ -1,8 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
-import createFlash from '~/flash';
 import TimeMetricsCard from 'ee/analytics/cycle_analytics/components/time_metrics_card.vue';
-import { group, timeMetricsData } from '../mock_data';
 import Api from 'ee/api';
+import createFlash from '~/flash';
+import { group, timeMetricsData } from '../mock_data';
 
 jest.mock('~/flash');
 

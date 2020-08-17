@@ -29,8 +29,8 @@ import state from 'ee/feature_flags/store/modules/index/state';
 import * as types from 'ee/feature_flags/store/modules/index/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
-import axios from '~/lib/utils/axios_utils';
 import Api from 'ee/api';
+import axios from '~/lib/utils/axios_utils';
 import { getRequestData, rotateData, featureFlag, userList } from '../../mock_data';
 
 jest.mock('ee/api.js');

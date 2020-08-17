@@ -6,12 +6,6 @@ import {
   GlNewDropdown as GlDropdown,
   GlNewDropdownItem as GlDropdownItem,
 } from '@gitlab/ui';
-import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
-import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
-import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
-import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
-
-import { visitUrl, mergeUrlParams, updateHistory } from '~/lib/utils/url_utility';
 
 import RoadmapFilters from 'ee/roadmap/components/roadmap_filters.vue';
 import createStore from 'ee/roadmap/store';
@@ -20,6 +14,11 @@ import { PRESET_TYPES, EPICS_STATES } from 'ee/roadmap/constants';
 import { mockSortedBy, mockTimeframeInitialDate } from 'ee_jest/roadmap/mock_data';
 
 import { TEST_HOST } from 'helpers/test_constants';
+import { visitUrl, mergeUrlParams, updateHistory } from '~/lib/utils/url_utility';
+import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
+import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
+import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
+import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 
 jest.mock('~/lib/utils/url_utility', () => ({
   mergeUrlParams: jest.fn(),

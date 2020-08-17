@@ -1,7 +1,7 @@
 <script>
+import { GlButton, GlLink } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { GlButton, GlLink } from '@gitlab/ui';
 import CreateMergeRequestButton from './create_merge_request_button.vue';
 
 export default {

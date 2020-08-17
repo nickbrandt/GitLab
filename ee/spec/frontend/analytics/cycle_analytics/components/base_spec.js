@@ -20,13 +20,13 @@ import Daterange from 'ee/analytics/shared/components/daterange.vue';
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import ValueStreamSelect from 'ee/analytics/cycle_analytics/components/value_stream_select.vue';
 import waitForPromises from 'helpers/wait_for_promises';
+import { toYmd } from 'ee/analytics/shared/utils';
+import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
 import httpStatusCodes from '~/lib/utils/http_status';
 import * as commonUtils from '~/lib/utils/common_utils';
 import * as urlUtils from '~/lib/utils/url_utility';
-import { toYmd } from 'ee/analytics/shared/utils';
 import * as mockData from '../mock_data';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
 
 const noDataSvgPath = 'path/to/no/data';
 const noAccessSvgPath = 'path/to/no/access';

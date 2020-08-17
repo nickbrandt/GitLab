@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
-import createFlash from '~/flash';
 import testAction from 'helpers/vuex_action_helper';
 import * as types from 'ee/approvals/stores/modules/base/mutation_types';
 import * as actions from 'ee/approvals/stores/modules/project_settings/actions';
 import { mapApprovalRuleRequest, mapApprovalSettingsResponse } from 'ee/approvals/mappers';
+import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 
 jest.mock('~/flash');

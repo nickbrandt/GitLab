@@ -1,6 +1,4 @@
 import { isNumber } from 'lodash';
-import { getDatesInRange } from '~/lib/utils/datetime_utility';
-import { slugify } from '~/lib/utils/text_utility';
 import {
   isStartEvent,
   isLabelEvent,
@@ -21,6 +19,9 @@ import {
   prepareTimeMetricsData,
 } from 'ee/analytics/cycle_analytics/utils';
 import { toYmd } from 'ee/analytics/shared/utils';
+import { CAPITALIZED_STAGE_NAME, PATH_HOME_ICON } from 'ee/analytics/cycle_analytics/constants';
+import { getDatesInRange } from '~/lib/utils/datetime_utility';
+import { slugify } from '~/lib/utils/text_utility';
 import {
   customStageEvents as events,
   customStageLabelEvents as labelEvents,
@@ -42,7 +43,6 @@ import {
   pathNavIssueMetric,
   timeMetricsData,
 } from './mock_data';
-import { CAPITALIZED_STAGE_NAME, PATH_HOME_ICON } from 'ee/analytics/cycle_analytics/constants';
 
 const labelEventIds = labelEvents.map(ev => ev.identifier);
 

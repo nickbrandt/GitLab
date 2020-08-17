@@ -5,8 +5,8 @@ import {
   GlDeprecatedDropdownDivider,
   GlLoadingIcon,
 } from '@gitlab/ui';
-import { __ } from '~/locale';
 import { debounce } from 'lodash';
+import { __ } from '~/locale';
 import { DEBOUNCE_DELAY } from '~/vue_shared/components/filtered_search_bar/constants';
 
 export default {

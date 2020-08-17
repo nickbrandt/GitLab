@@ -1,5 +1,5 @@
-import axios from '~/lib/utils/axios_utils';
 import * as Sentry from '@sentry/browser';
+import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 
 export const setSecurityConfigurationEndpoint = ({ commit }, endpoint) =>

@@ -10,11 +10,11 @@ import {
   GlButton,
   GlSprintf,
 } from '@gitlab/ui';
+import { debounce } from 'lodash';
 import axios from '~/lib/utils/axios_utils';
 import { s__, __ } from '~/locale';
 import alertSetAssignees from '../../graphql/mutations/alert_set_assignees.mutation.graphql';
 import SidebarAssignee from './sidebar_assignee.vue';
-import { debounce } from 'lodash';
 
 const DATA_REFETCH_DELAY = 250;
 

@@ -2,10 +2,9 @@ import { mount } from '@vue/test-utils';
 import StorageApp from 'ee/storage_counter/components/app.vue';
 import Project from 'ee/storage_counter/components/project.vue';
 import TemporaryStorageIncreaseModal from 'ee/storage_counter/components/temporary_storage_increase_modal.vue';
+import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
 import { projects, withRootStorageStatistics } from '../data';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
-
-import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
 
 const TEST_LIMIT = 1000;
 

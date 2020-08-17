@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
-import { userList } from '../../feature_flags/mock_data';
 import Form from 'ee/user_lists/components/user_list_form.vue';
+import { userList } from '../../feature_flags/mock_data';
 
 describe('ee/user_lists/components/user_list_form', () => {
   let wrapper;

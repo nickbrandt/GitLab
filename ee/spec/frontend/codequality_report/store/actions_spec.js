@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import * as actions from 'ee/codequality_report/store/actions';
 import * as types from 'ee/codequality_report/store/mutation_types';
 import { TEST_HOST } from 'helpers/test_constants';
 import testAction from 'helpers/vuex_action_helper';
+import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { unparsedIssues, parsedIssues } from '../mock_data';
 

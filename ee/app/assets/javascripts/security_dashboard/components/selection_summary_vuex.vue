@@ -1,7 +1,7 @@
 <script>
-import { __, n__ } from '~/locale';
 import { mapActions, mapGetters } from 'vuex';
 import { GlDeprecatedButton, GlFormSelect } from '@gitlab/ui';
+import { __, n__ } from '~/locale';
 
 const REASON_NONE = __('[No reason]');
 const REASON_WONT_FIX = __("Won't fix / Accept risk");

@@ -1,14 +1,14 @@
 import Vue from 'vue';
 import AxiosMockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import { shallowMount } from '@vue/test-utils';
 import IssuesLaneList from 'ee/boards/components/issues_lane_list.vue';
+import { listObj } from 'jest/boards/mock_data';
+import { TEST_HOST } from 'helpers/test_constants';
+import axios from '~/lib/utils/axios_utils';
 import BoardCard from '~/boards/components/board_card.vue';
 import { mockIssues } from '../mock_data';
 import List from '~/boards/models/list';
 import { ListType } from '~/boards/constants';
-import { listObj } from 'jest/boards/mock_data';
-import { TEST_HOST } from 'helpers/test_constants';
 
 describe('IssuesLaneList', () => {
   let wrapper;

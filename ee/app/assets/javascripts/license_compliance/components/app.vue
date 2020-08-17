@@ -10,11 +10,11 @@ import {
   GlDeprecatedBadge as GlBadge,
   GlAlert,
 } from '@gitlab/ui';
-import { LICENSE_LIST } from '../store/constants';
 import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
+import LicenseManagement from 'ee/vue_shared/license_compliance/license_management.vue';
+import { LICENSE_LIST } from '../store/constants';
 import DetectedLicensesTable from './detected_licenses_table.vue';
 import PipelineInfo from './pipeline_info.vue';
-import LicenseManagement from 'ee/vue_shared/license_compliance/license_management.vue';
 import DismissibleFeedbackAlert from '~/vue_shared/components/dismissible_feedback_alert.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { getLocationHash } from '~/lib/utils/url_utility';

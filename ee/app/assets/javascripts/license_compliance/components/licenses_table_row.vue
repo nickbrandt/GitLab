@@ -6,8 +6,8 @@ import {
   GlIcon,
   GlFriendlyWrap,
 } from '@gitlab/ui';
-import LicenseComponentLinks from './license_component_links.vue';
 import { LICENSE_APPROVAL_CLASSIFICATION } from 'ee/vue_shared/license_compliance/constants';
+import LicenseComponentLinks from './license_component_links.vue';
 
 export default {
   name: 'LicensesTableRow',

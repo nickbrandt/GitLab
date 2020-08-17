@@ -1,6 +1,4 @@
 <script>
-import { s__, sprintf } from '~/locale';
-import timeagoMixin from '~/vue_shared/mixins/timeago';
 import {
   GlButton,
   GlButtonGroup,
@@ -9,6 +7,8 @@ import {
   GlTooltipDirective,
   GlModalDirective,
 } from '@gitlab/ui';
+import { s__, sprintf } from '~/locale';
+import timeagoMixin from '~/vue_shared/mixins/timeago';
 
 export default {
   components: { GlButton, GlButtonGroup, GlModal, GlSprintf },

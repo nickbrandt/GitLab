@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils';
-import axios from '~/lib/utils/axios_utils';
 import MockAdapter from 'axios-mock-adapter';
-import { environment } from './mock_data';
-import EnvironmentsComponent from '~/environments/components/environments_app.vue';
 import CanaryDeploymentBoard from 'ee/environments/components/canary_deployment_callout.vue';
 import DeployBoard from 'ee/environments/components/deploy_board_component.vue';
+import axios from '~/lib/utils/axios_utils';
+import { environment } from './mock_data';
+import EnvironmentsComponent from '~/environments/components/environments_app.vue';
 
 describe('Environment', () => {
   let mock;

@@ -7,14 +7,14 @@ import {
   DEFAULT_DAYS_IN_PAST,
   TASKS_BY_TYPE_SUBJECT_ISSUE,
 } from 'ee/analytics/cycle_analytics/constants';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
 import { toYmd } from 'ee/analytics/shared/utils';
 import {
   getTasksByTypeData,
   transformRawTasksByTypeData,
   transformStagesForPathNavigation,
 } from 'ee/analytics/cycle_analytics/utils';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { getDateInPast, getDatesInRange } from '~/lib/utils/datetime_utility';
 
 const fixtureEndpoints = {
   customizableCycleAnalyticsStagesAndEvents: 'analytics/value_stream_analytics/stages.json', // customizable stages and events endpoint

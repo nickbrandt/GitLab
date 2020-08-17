@@ -8,10 +8,10 @@ import {
   GlSearchBoxByType,
   GlLoadingIcon,
 } from '@gitlab/ui';
-import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
 import CreateIssueForm from 'ee/related_items_tree/components/create_issue_form.vue';
 import createDefaultStore from 'ee/related_items_tree/store';
+import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
 import { mockInitialConfig, mockParentItem } from '../mock_data';
 

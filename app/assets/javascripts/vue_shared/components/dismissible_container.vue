@@ -1,6 +1,6 @@
 <script>
-import axios from '~/lib/utils/axios_utils';
 import { GlIcon } from '@gitlab/ui';
+import axios from '~/lib/utils/axios_utils';
 
 export default {
   components: {

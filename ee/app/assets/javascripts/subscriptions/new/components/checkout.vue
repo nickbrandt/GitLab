@@ -1,5 +1,4 @@
 <script>
-import { s__ } from '~/locale';
 import {
   STEPS,
   SUBSCRIPTON_FLOW_STEPS,
@@ -7,6 +6,7 @@ import {
 } from 'ee/registrations/constants';
 import { mapState } from 'vuex';
 import ProgressBar from 'ee/registrations/components/progress_bar.vue';
+import { s__ } from '~/locale';
 import SubscriptionDetails from './checkout/subscription_details.vue';
 import BillingAddress from './checkout/billing_address.vue';
 import PaymentMethod from './checkout/payment_method.vue';

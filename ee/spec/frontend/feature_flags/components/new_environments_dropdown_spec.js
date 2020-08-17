@@ -1,8 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { GlLoadingIcon, GlSearchBoxByType, GlNewDropdownItem } from '@gitlab/ui';
-import axios from '~/lib/utils/axios_utils';
 import NewEnvironmentsDropdown from 'ee/feature_flags/components/new_environments_dropdown.vue';
+import axios from '~/lib/utils/axios_utils';
 
 const TEST_HOST = '/test';
 const TEST_SEARCH = 'production';
