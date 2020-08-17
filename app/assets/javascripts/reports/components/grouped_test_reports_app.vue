@@ -116,6 +116,7 @@ export default {
     <template v-if="showViewFullReport" #actionButtons>
       <gl-button
         :href="testTabURL"
+        target="_blank"
         icon="external-link"
         data-testid="group-test-reports-full-link"
         class="gl-mr-3"
