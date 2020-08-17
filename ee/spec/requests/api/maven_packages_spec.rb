@@ -194,6 +194,24 @@ RSpec.describe API::MavenPackages do
       it_behaves_like 'downloads with a job token'
 
       it_behaves_like 'downloads with a deploy token'
+
+      it 'does not allow download by a unauthorized deploy token with same id as a user with access' do
+        unauthorized_deploy_token = create(:deploy_token, read_package_registry: true, write_package_registry: true)
+
+        another_user = create(:user)
+        project.add_developer(another_user)
+
+        # We force the id of the deploy token and the user to be the same
+        unauthorized_deploy_token.update!(id: another_user.id)
+
+        download_file(
+          package_file.file_name,
+          {},
+          Gitlab::Auth::AuthFinders::DEPLOY_TOKEN_HEADER => unauthorized_deploy_token.token
+        )
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
     end
 
     it 'rejects request if feature is not in the license' do
@@ -476,6 +494,20 @@ RSpec.describe API::MavenPackages do
       expect(response).to have_gitlab_http_status(:ok)
     end
 
+    it 'rejects requests by a unauthorized deploy token with same id as a user with access' do
+      unauthorized_deploy_token = create(:deploy_token, read_package_registry: true, write_package_registry: true)
+
+      another_user = create(:user)
+      project.add_developer(another_user)
+
+      # We force the id of the deploy token and the user to be the same
+      unauthorized_deploy_token.update!(id: another_user.id)
+
+      authorize_upload({}, headers.merge(Gitlab::Auth::AuthFinders::DEPLOY_TOKEN_HEADER => unauthorized_deploy_token.token))
+
+      expect(response).to have_gitlab_http_status(:forbidden)
+    end
+
     def authorize_upload(params = {}, request_headers = headers)
       put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/maven-metadata.xml/authorize"), params: params, headers: request_headers
     end
@@ -569,6 +601,20 @@ RSpec.describe API::MavenPackages do
         upload_file(params, headers_with_deploy_token)
 
         expect(response).to have_gitlab_http_status(:ok)
+      end
+
+      it 'rejects uploads by a unauthorized deploy token with same id as a user with access' do
+        unauthorized_deploy_token = create(:deploy_token, read_package_registry: true, write_package_registry: true)
+
+        another_user = create(:user)
+        project.add_developer(another_user)
+
+        # We force the id of the deploy token and the user to be the same
+        unauthorized_deploy_token.update!(id: another_user.id)
+
+        upload_file(params, headers.merge(Gitlab::Auth::AuthFinders::DEPLOY_TOKEN_HEADER => unauthorized_deploy_token.token))
+
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
 
       context 'version is not correct' do
