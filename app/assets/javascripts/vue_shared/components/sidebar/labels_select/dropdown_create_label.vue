@@ -3,7 +3,9 @@ import { __ } from '~/locale';
 import { GlButton } from '@gitlab/ui';
 
 export default {
-  props: {
+  components: {
+    GlButton,
+  },props: {
     headerTitle: {
       type: String,
       required: false,
@@ -12,9 +14,6 @@ export default {
   },
   created() {
     this.suggestedColors = gon.suggested_label_colors;
-  },
-  components: {
-    GlButton,
   },
 };
 </script>
