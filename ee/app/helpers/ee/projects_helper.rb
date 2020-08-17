@@ -105,12 +105,12 @@ module EE
       'security_approvals_help_page_path': help_page_path('user/application_security/index.md', anchor: 'security-approvals-in-merge-requests-ultimate'),
       'security_configuration_path': project_security_configuration_path(project),
       'vulnerability_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-security-approvals-within-a-project'),
-      'license_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-license-approvals-within-a-project')} }
+      'license_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-license-approvals-within-a-project') } }
     end
 
-    def can_modify_approvers(project = @project) 
+    def can_modify_approvers(project = @project)
       can?(current_user, :modify_approvers_rules, project)
-    end 
+    end
 
     def permanent_delete_message(project)
       message = _('This action will %{strongOpen}permanently delete%{strongClose} %{codeOpen}%{project}%{codeClose} %{strongOpen}immediately%{strongClose}, including its repositories and all content: issues, merge requests, etc.')

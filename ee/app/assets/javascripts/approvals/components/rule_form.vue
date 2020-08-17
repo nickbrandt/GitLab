@@ -54,7 +54,7 @@ export default {
     };
     // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
     if (this.glFeatures.approvalSuggestions) {
-      return { ...defaults, name: this.defaultRuleName || '' };
+      return { ...defaults, name: this.defaultRuleName || defaults.name };
     }
 
     return defaults;
@@ -145,7 +145,7 @@ export default {
       );
     },
     isPersisted() {
-      return this.rule && this.rule.id;
+      return this.initRule && this.initRule.id;
     },
     isNameVisible() {
       return !this.settings.lockedApprovalsRuleName;
@@ -164,7 +164,7 @@ export default {
     },
     submissionData() {
       return {
-        id: this.rule && this.rule.id,
+        id: this.initRule && this.initRule.id,
         name: this.settings.lockedApprovalsRuleName || this.name || DEFAULT_NAME,
         approvalsRequired: this.approvalsRequired,
         users: this.userIds,
@@ -247,7 +247,7 @@ export default {
      * Also delete the rule if necessary.
      */
     submitEmptySingleRule() {
-      const id = this.rule && this.rule.id;
+      const id = this.initRule && this.initRule.id;
 
       return Promise.all([this.submitFallback(), id ? this.deleteRule(id) : Promise.resolve()]);
     },
@@ -257,27 +257,27 @@ export default {
       return this.isValid;
     },
     getInitialData() {
-      if (!this.rule) {
+      if (!this.initRule || this.defaultRuleName) {
         return {};
       }
 
-      if (this.rule.isFallback) {
+      if (this.initRule.isFallback) {
         return {
-          approvalsRequired: this.rule.approvalsRequired,
-          isFallback: this.rule.isFallback,
+          approvalsRequired: this.initRule.approvalsRequired,
+          isFallback: this.initRule.isFallback,
         };
       }
 
-      const { containsHiddenGroups = false, removeHiddenGroups = false } = this.rule;
+      const { containsHiddenGroups = false, removeHiddenGroups = false } = this.initRule;
 
-      const users = this.rule.users.map(x => ({ ...x, type: TYPE_USER }));
-      const groups = this.rule.groups.map(x => ({ ...x, type: TYPE_GROUP }));
-      const branches = this.rule.protectedBranches?.map(x => x.id) || [];
+      const users = this.initRule.users.map(x => ({ ...x, type: TYPE_USER }));
+      const groups = this.initRule.groups.map(x => ({ ...x, type: TYPE_GROUP }));
+      const branches = this.initRule.protectedBranches?.map(x => x.id) || [];
 
       return {
-        name: this.rule.name || '',
-        approvalsRequired: this.rule.approvalsRequired || 0,
-        minApprovalsRequired: this.rule.minApprovalsRequired || 0,
+        name: this.initRule.name || '',
+        approvalsRequired: this.initRule.approvalsRequired || 0,
+        minApprovalsRequired: this.initRule.minApprovalsRequired || 0,
         containsHiddenGroups,
         approvers: groups
           .concat(users)
