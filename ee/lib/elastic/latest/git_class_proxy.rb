@@ -34,8 +34,16 @@ module Elastic
 
       private
 
-      def extract_repository_ids(options)
-        [options[:repository_id]].flatten
+      def options_filter_context(type, options)
+        repository_ids = [options[:repository_id]].flatten
+        languages = [options[:language]].flatten
+
+        filters = []
+        filters << { terms: { "#{type}.rid" => repository_ids } } if repository_ids.any?
+        filters << { terms: { "#{type}.language" => languages } } if languages.any?
+        filters << options[:additional_filter] if options[:additional_filter]
+
+        { filter: filters }
       end
 
       def search_commit(query, page: 1, per: 20, options: {})
@@ -43,40 +51,32 @@ module Elastic
         fields = %w(message^10 sha^5 author.name^2 author.email^2 committer.name committer.email).map {|i| "commit.#{i}"}
         query_with_prefix = query.split(/\s+/).map { |s| s.gsub(SHA_REGEX) { |sha| "#{sha}*" } }.join(' ')
 
+        bool_expr = Gitlab::Elastic::BoolExpr.new
         query_hash = {
-          query: {
-            bool: {
-              must: {
-                simple_query_string: {
-                  fields: fields,
-                  query: query_with_prefix,
-                  default_operator: :and
-                }
-              },
-              filter: [{ term: { 'type' => 'commit' } }]
-            }
-          },
+          query: { bool: bool_expr },
+
           size: per,
-          from: per * (page - 1)
+          from: per * (page - 1),
+          sort: [:_score]
         }
 
         if query.blank?
-          query_hash[:query][:bool][:must] = { match_all: {} }
+          bool_expr[:must] = { match_all: {} }
           query_hash[:track_scores] = true
-        end
-
-        repository_ids = extract_repository_ids(options)
-        if repository_ids.any?
-          query_hash[:query][:bool][:filter] << {
-            terms: {
-              'commit.rid' => repository_ids
+        else
+          bool_expr[:must] = {
+            simple_query_string: {
+              fields: fields,
+              query: query_with_prefix,
+              default_operator: :and
             }
           }
         end
 
-        if options[:additional_filter]
-          query_hash[:query][:bool][:filter] << options[:additional_filter]
-        end
+        options_filter_context = options_filter_context(:commit, options)
+
+        bool_expr[:filter] << { term: { type: 'commit' } }
+        bool_expr[:filter] += options_filter_context[:filter] if options_filter_context[:filter].any?
 
         if options[:highlight]
           es_fields = fields.map { |field| field.split('^').first }.each_with_object({}) do |field, memo|
@@ -108,47 +108,34 @@ module Elastic
           filter :extension, field: :path, parser: ->(input) { '*.' + input.downcase }
         end
 
+        bool_expr = Gitlab::Elastic::BoolExpr.new
         query_hash = {
-          query: {
-            bool: {
-              must: {
-                simple_query_string: {
-                  query: query.term,
-                  default_operator: :and,
-                  fields: %w[blob.content blob.file_name]
-                }
-              },
-              filter: [
-                { term: { type: type } }
-              ]
-            }
-          },
+          query: { bool: bool_expr },
           size: per,
-          from: per * (page - 1)
+          from: per * (page - 1),
+          sort: [:_score]
         }
 
-        query_hash[:query][:bool][:filter] += query.elasticsearch_filters(:blob)
-
-        repository_ids = extract_repository_ids(options)
-        if repository_ids.any?
-          query_hash[:query][:bool][:filter] << {
-            terms: {
-              'blob.rid' => repository_ids
-            }
+        # add the term matching
+        bool_expr[:must] = {
+          simple_query_string: {
+            query: query.term,
+            default_operator: :and,
+            fields: %w[blob.content blob.file_name]
           }
-        end
+        }
 
-        if options[:additional_filter]
-          query_hash[:query][:bool][:filter] << options[:additional_filter]
-        end
+        # add the document type filter
+        bool_expr[:filter] << { term: { type: type } }
 
-        if options[:language]
-          query_hash[:query][:bool][:filter] << {
-            terms: {
-              'blob.language' => [options[:language]].flatten
-            }
-          }
-        end
+        # add filters extracted from the query
+        query_filter_context = query.elasticsearch_filter_context(:blob)
+        bool_expr[:filter] += query_filter_context[:filter] if query_filter_context[:filter].any?
+        bool_expr[:must_not] += query_filter_context[:must_not] if query_filter_context[:must_not].any?
+
+        # add filters extracted from the `options`
+        options_filter_context = options_filter_context(:blob, options)
+        bool_expr[:filter] += options_filter_context[:filter] if options_filter_context[:filter].any?
 
         options[:order] = :default if options[:order].blank?
 
@@ -164,6 +151,8 @@ module Elastic
           }
         end
 
+        # inject the `id` part of repository as project id
+        repository_ids = [options[:repository_id]].flatten
         options[:project_ids] = repository_ids.map { |id| id.to_s[/\d+/].to_i } if type == 'wiki_blob' && repository_ids.any?
 
         res = search(query_hash, options)
