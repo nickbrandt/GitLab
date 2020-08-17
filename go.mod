@@ -32,5 +32,5 @@ require (
 	golang.org/x/tools v0.0.0-20200522201501-cb1345f3a375
 	google.golang.org/grpc v1.24.0
 	gopkg.in/yaml.v2 v2.2.8 // indirect
-	honnef.co/go/tools v0.0.1-2019.2.3
+	honnef.co/go/tools v0.0.1-2020.1.5
 )
