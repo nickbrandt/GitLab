@@ -17,8 +17,8 @@ It is only possible to inherit the complete settings for an integration. Per-fie
 ## Manage default settings for a project integration
 
 1. Navigate to **Admin Area > Settings > Integrations**.
-2. Select a project integration.
-3. Enter configuration details and click **Save changes**.
+1. Select a project integration.
+1. Enter configuration details and click **Save changes**.
 
 CAUTION: **Caution:**
 This may affect all or most of the projects on your GitLab instance. Please review the details below.
@@ -26,13 +26,13 @@ This may affect all or most of the projects on your GitLab instance. Please revi
 If this is the first time you are setting up instance-level settings for an integration:
 
 - The integration is enabled for all projects that do not already have this integration configured if you have the **Enable integration** toggle turned on in the instance-level settings.
-- Projects that already have the integration configured are not affected, but can choose to use the inherited settings at any time. 
+- Projects that already have the integration configured are not affected, but can choose to use the inherited settings at any time.
 
 When you make further changes to the instance defaults:
 
 - They are immediately applied to all projects that have the integration set to use instance-level default settings.
 - They are immediately applied to newer projects, created since you last saved defaults for the integration.
-   - If your instance-level default setting has the **Enable integration** toggle turned on, the integration is automatically enabled for all such projects.
+  - If your instance-level default setting has the **Enable integration** toggle turned on, the integration is automatically enabled for all such projects.
 - Projects with custom settings selected for the integration are not immediately affected and may choose to use the latest instance-level defaults at any time.
 
 It is only possible to inherit the complete settings for an integration. Per-field inheritance is [planned](https://gitlab.com/groups/gitlab-org/-/epics/2137). This would allow instance administrators to update settings inherited by projects without enabling the integration on all non-configured projects by default.
@@ -41,9 +41,9 @@ It is only possible to inherit the complete settings for an integration. Per-fie
 
 1. Navigate to **Project > Settings > Integrations**.
 1. Choose the integration you want to enable or update.
-2. From the drop-down, select **Use default settings**.
-3. Ensure the toggle is set to **Enable integration**.
-4. Click **Save changes** 
+1. From the drop-down, select **Use default settings**.
+1. Ensure the toggle is set to **Enable integration**.
+1. Click **Save changes**.
 
 ## Use custom settings for a project integration
 
