@@ -62,7 +62,6 @@ module Security
 
     # rubocop: disable CodeReuse/ActiveRecord
     def create_or_find_vulnerability_finding(finding, create_params)
-
       find_params = {
         scanner: scanners_objects[finding.scanner.key],
         primary_identifier: identifiers_objects[finding.primary_identifier.key],
@@ -82,7 +81,6 @@ module Security
     end
 
     def update_vulnerability_scanner(finding)
-
       scanner = scanners_objects[finding.scanner.key]
       scanner.update!(finding.scanner.to_hash)
     end
