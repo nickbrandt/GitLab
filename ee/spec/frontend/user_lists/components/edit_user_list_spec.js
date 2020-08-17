@@ -111,6 +111,7 @@ describe('ee/user_lists/components/edit_user_list', () => {
       it('should create a user list with the entered name', () => {
         expect(Api.updateFeatureFlagUserList).toHaveBeenCalledWith('1', {
           name: 'test',
+          iid: userList.iid,
         });
       });
 
