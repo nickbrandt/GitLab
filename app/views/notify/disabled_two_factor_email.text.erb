@@ -1,0 +1,5 @@
+<%= _('Hi %{username}!') % { username: sanitize_name(@user.name) } %>
+
+<%= _('Two-factor authentication has been disabled for your GitLab account.') %>
+
+<%= _('If you want to re-enable Two-factor authentication, visit %{two_factor_link}') % { two_factor_link: profile_two_factor_auth_url } %>
