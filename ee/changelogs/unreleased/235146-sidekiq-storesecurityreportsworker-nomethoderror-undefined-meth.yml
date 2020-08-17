@@ -1,0 +1,5 @@
+---
+title: Fix scanner check when creating vulnerability findings
+merge_request:
+author:
+type: fixed

@@ -153,6 +153,25 @@ RSpec.describe Security::StoreReportService, '#execute' do
         expect { subject }.to change { vulnerability.reload[:resolved_on_default_branch] }.from(true).to(false)
       end
     end
+
+    context 'when the finding does not include a scanner' do
+      let(:bad_pipeline) { create(:ci_pipeline, project: project) }
+      let(:bad_build) { create(:ci_build, pipeline: bad_pipeline) }
+      let!(:bad_artifact) { create(:ee_ci_job_artifact, :sast_with_missing_scanner, job: bad_build) }
+      let(:bad_report) { bad_pipeline.security_reports.get_report(report_type.to_s, bad_artifact) }
+      let(:report_type) { :sast }
+
+      before do
+        project.add_developer(user)
+        allow(bad_pipeline).to receive(:user).and_return(user)
+      end
+
+      subject { described_class.new(bad_pipeline, bad_report).execute }
+
+      it 'does not create a new finding' do
+        expect { subject }.not_to change { Vulnerabilities::Finding.count }
+      end
+    end
   end
 
   context 'with existing data from same pipeline' do
