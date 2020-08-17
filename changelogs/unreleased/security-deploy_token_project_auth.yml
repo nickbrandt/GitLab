@@ -1,5 +1,0 @@
----
-title: Project access is checked during deploy token authentication
-merge_request:
-author:
-type: security

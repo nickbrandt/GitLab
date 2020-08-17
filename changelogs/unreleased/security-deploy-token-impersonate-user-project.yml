@@ -1,5 +1,0 @@
----
-title: Stop deploy token being mis-used as user in ProjectPolicy and GroupPolicy
-merge_request:
-author:
-type: security
