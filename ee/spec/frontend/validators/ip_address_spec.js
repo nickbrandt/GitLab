@@ -22,7 +22,10 @@ describe('validateIpAddress', () => {
         24,
       ]);
 
-      expect(validateIpAddress('192.168.0.0/24')).toBe(true);
+      const result = validateIpAddress('192.168.0.0/24');
+
+      expect(ipaddr.parseCIDR).toHaveBeenCalledWith('192.168.0.0/24');
+      expect(result).toBe(true);
     });
   });
 
