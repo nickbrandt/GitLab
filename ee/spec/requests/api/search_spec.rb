@@ -141,31 +141,65 @@ RSpec.describe API::Search do
       it_behaves_like 'pagination', scope: 'blobs'
 
       context 'filters' do
-        it 'by filename' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* filename:PROCESS.md' }
-
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response.size).to eq(1)
-          expect(json_response.first['path']).to eq('PROCESS.md')
+        def results_filenames
+          json_response.map { |h| h['filename'] }.compact
         end
 
-        it 'by path' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* path:markdown' }
+        def results_paths
+          json_response.map { |h| h['path'] }.compact
+        end
 
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response.size).to eq(1)
-          json_response.each do |file|
-            expect(file['path']).to match(%r[/markdown/])
+        context 'with an including filter' do
+          it 'by filename' do
+            get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* filename:PROCESS.md' }
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response.size).to eq(1)
+            expect(results_filenames).to all(match(%r{PROCESS.md$}))
+          end
+
+          it 'by path' do
+            get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* path:files/markdown' }
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response.size).to eq(1)
+            expect(results_paths).to all(match(%r{^files/markdown/}))
+          end
+
+          it 'by extension' do
+            get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* extension:md' }
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(json_response.size).to eq(3)
+
+            expect(results_filenames).to all(match(%r{.*.md$}))
           end
         end
 
-        it 'by extension' do
-          get api("/projects/#{project.id}/search", user), params: { scope: 'blobs', search: 'mon* extension:md' }
+        context 'with an excluding filter' do
+          it 'by filename' do
+            get api(endpoint, user), params: { scope: 'blobs', search: '* -filename:PROCESS.md' }
 
-          expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response.size).to eq(3)
-          json_response.each do |file|
-            expect(file['path']).to match(/\A.+\.md\z/)
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(results_filenames).not_to include('PROCESS.md')
+            expect(json_response.size).to eq(20)
+          end
+
+          it 'by path' do
+            get api(endpoint, user), params: { scope: 'blobs', search: '* -path:files/markdown' }
+
+            expect(response).to have_gitlab_http_status(:ok)
+            expect(results_paths).not_to include(a_string_matching(%r{^files/markdown/}))
+            expect(json_response.size).to eq(20)
+          end
+
+          it 'by extension' do
+            get api(endpoint, user), params: { scope: 'blobs', search: '* -extension:md' }
+
+            expect(response).to have_gitlab_http_status(:ok)
+
+            expect(results_filenames).not_to include(a_string_matching(%r{.*.md$}))
+            expect(json_response.size).to eq(20)
           end
         end
       end
@@ -389,7 +423,7 @@ RSpec.describe API::Search do
           end
 
           it 'by path' do
-            get api(endpoint, user), params: { scope: 'blobs', search: 'mon path:markdown' }
+            get api(endpoint, user), params: { scope: 'blobs', search: 'mon path:files/markdown' }
 
             expect(response).to have_gitlab_http_status(:ok)
             expect(json_response.size).to eq(8)

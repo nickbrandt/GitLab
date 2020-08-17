@@ -114,7 +114,7 @@ export default {
           <span
             v-gl-tooltip.hover
             :title="unassignedIssuesCountTooltipText"
-            class="gl-display-flex gl-align-items-center gl-text-gray-700"
+            class="gl-display-flex gl-align-items-center gl-text-gray-500"
             tabindex="0"
             :aria-label="unassignedIssuesCountTooltipText"
             data-testid="issues-lane-issue-count"
