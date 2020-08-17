@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class GitlabSubscription < ApplicationRecord
+  include EachBatch
+
   default_value_for(:start_date) { Date.today }
   before_update :log_previous_state_for_update
   after_commit :index_namespace, on: [:create, :update]
@@ -20,6 +22,24 @@ class GitlabSubscription < ApplicationRecord
 
   scope :with_a_paid_hosted_plan, -> do
     with_hosted_plan(Plan::PAID_HOSTED_PLANS)
+  end
+
+  DAYS_AFTER_EXPIRATION_BEFORE_REMOVING_FROM_INDEX = 7
+
+  # We set a 7 days as the threshold for expiration before removing them from
+  # the index
+  def self.yield_long_expired_indexed_namespaces(&blk)
+    # Since the gitlab_subscriptions table will keep growing in size and the
+    # number of expired subscriptions will keep growing it is best to use
+    # `each_batch` to ensure we don't end up timing out the query. This may
+    # mean that the number of queries keeps growing but each one should be
+    # incredibly fast.
+    subscriptions = GitlabSubscription.where('end_date < ?', Date.today - DAYS_AFTER_EXPIRATION_BEFORE_REMOVING_FROM_INDEX)
+    subscriptions.each_batch(column: :namespace_id) do |relation|
+      ElasticsearchIndexedNamespace.where(namespace_id: relation.select(:namespace_id)).each do |indexed_namespace|
+        blk.call indexed_namespace
+      end
+    end
   end
 
   def seats_in_use
