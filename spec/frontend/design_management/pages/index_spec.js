@@ -30,7 +30,7 @@ const scrollIntoViewMock = jest.fn();
 HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
 
 const localVue = createLocalVue();
-let router = createRouter();
+const router = createRouter();
 localVue.use(VueRouter);
 
 const mockDesigns = [
