@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import MetricChart from 'ee/analytics/productivity_analytics/components/metric_chart.vue';
-import { GlLoadingIcon, GlDeprecatedDropdown, GlDeprecatedDropdownItem } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlAlert } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import httpStatusCodes from '~/lib/utils/http_status';
 
@@ -38,7 +38,7 @@ describe('MetricChart component', () => {
   });
 
   const findLoadingIndicator = () => wrapper.find(GlLoadingIcon);
-  const findInfoMessage = () => wrapper.find('[data-testid="infoMessage"]');
+  const findInfoMessage = () => wrapper.find(GlAlert);
   const findMetricDropdown = () => wrapper.find(GlDeprecatedDropdown);
   const findMetricDropdownItems = () => findMetricDropdown().findAll(GlDeprecatedDropdownItem);
   const findChartSlot = () => wrapper.find({ ref: 'chart' });
@@ -101,7 +101,7 @@ describe('MetricChart component', () => {
 
         describe('and there is no error', () => {
           it('shows a "no data" info text', () => {
-            expect(findInfoMessage().text()).toContain(
+            expect(findInfoMessage().text()).toBe(
               'There is no data available. Please change your selection.',
             );
           });
@@ -111,7 +111,7 @@ describe('MetricChart component', () => {
           it('shows a "too much data" info text', () => {
             factory({ isLoading, chartData: [], errorCode: httpStatusCodes.INTERNAL_SERVER_ERROR });
 
-            expect(findInfoMessage().text()).toContain(
+            expect(findInfoMessage().text()).toBe(
               'There is too much data to calculate. Please change your selection.',
             );
           });
