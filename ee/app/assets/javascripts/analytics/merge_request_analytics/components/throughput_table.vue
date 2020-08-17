@@ -220,7 +220,9 @@ export default {
     </template>
 
     <template #cell(milestone)="{ item }">
-      <div :data-testid="$options.testIds.MILESTONE">{{ item.milestone.title }}</div>
+      <div v-if="item.milestone" :data-testid="$options.testIds.MILESTONE">
+        {{ item.milestone.title }}
+      </div>
     </template>
 
     <template #cell(pipelines)="{ item }">

@@ -199,8 +199,20 @@ describe('ThroughputTable', () => {
         expect(findCol(TEST_IDS.TIME_TO_MERGE).text()).toBe('4 minutes');
       });
 
-      it('displays the correct milestone', () => {
-        expect(findCol(TEST_IDS.MILESTONE).text()).toBe('v1.0');
+      it('does not display a milestone if not present', () => {
+        expect(findCol(TEST_IDS.MILESTONE).exists()).toBe(false);
+      });
+
+      it('displays the correct milestone when available', async () => {
+        const title = 'v1.0';
+
+        additionalData({
+          milestone: { title },
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(findCol(TEST_IDS.MILESTONE).text()).toBe(title);
       });
 
       it('displays the correct pipeline count', () => {
