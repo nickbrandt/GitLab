@@ -964,9 +964,9 @@ RSpec.describe License do
     end
   end
 
-  describe '#auto_renew?' do
+  describe '#auto_renew' do
     it 'is false' do
-      expect(license.auto_renew?).to be false
+      expect(license.auto_renew).to be false
     end
   end
 end

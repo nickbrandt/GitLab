@@ -33,7 +33,7 @@ RSpec.describe Gitlab::ExpiringSubscriptionMessage do
       before do
         allow(subscribable).to receive(:plan).and_return('ultimate')
         allow(subscribable).to receive(:expires_at).and_return(expired_date)
-        allow(subscribable).to receive(:auto_renew?).and_return(auto_renew)
+        allow(subscribable).to receive(:auto_renew).and_return(auto_renew)
       end
 
       context 'subscribable should not notify admins' do

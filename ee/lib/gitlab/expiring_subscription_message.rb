@@ -9,6 +9,8 @@ module Gitlab
 
     attr_reader :subscribable, :signed_in, :is_admin, :namespace
 
+    delegate :auto_renew, to: :subscribable
+
     def initialize(subscribable:, signed_in:, is_admin:, namespace: nil)
       @subscribable = subscribable
       @signed_in = signed_in
@@ -38,7 +40,7 @@ module Gitlab
 
     def expired_subject
       if subscribable.block_changes?
-        if auto_renew?
+        if auto_renew
           _('Something went wrong with your automatic subscription renewal.')
         else
           _('Your subscription has been downgraded.')
@@ -73,7 +75,7 @@ module Gitlab
     end
 
     def namespace_block_changes_message
-      if auto_renew?
+      if auto_renew
         support_link = '<a href="mailto:support@gitlab.com">support@gitlab.com</a>'.html_safe
 
         _('We tried to automatically renew your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} on %{expires_on} but something went wrong so your subscription was downgraded to the free plan. Don\'t worry, your data is safe. We suggest you check your payment method and get in touch with our support team (%{support_link}). They\'ll gladly help with your subscription renewal.') % { plan_name: plan_name, strong: strong, strong_close: strong_close, namespace_name: namespace.name, support_link: support_link, expires_on: expires_at_or_cutoff_at.strftime("%Y-%m-%d") }
@@ -124,11 +126,11 @@ module Gitlab
     end
 
     def auto_renew_choice_exists?
-      auto_renew? != nil
+      !auto_renew.nil?
     end
 
     def expiring_auto_renew?
-      auto_renew? && !expired_but_within_cutoff?
+      !!auto_renew && !expired_but_within_cutoff?
     end
 
     def expired_subscribable_within_notification_window?
@@ -147,10 +149,6 @@ module Gitlab
 
     def strong_close
       '</strong>'.html_safe
-    end
-
-    def auto_renew?
-      subscribable.auto_renew?
     end
 
     def grace_period_effective_from
