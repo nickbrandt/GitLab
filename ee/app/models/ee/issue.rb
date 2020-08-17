@@ -17,6 +17,7 @@ module EE
       include WeightEventable
       include HealthStatus
 
+      scope :order_blocking_issues_desc, -> { reorder(blocking_issues_count: :desc) }
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
       scope :no_epic, -> { left_outer_joins(:epic_issue).where(epic_issues: { epic_id: nil }) }
@@ -204,6 +205,7 @@ module EE
       override :sort_by_attribute
       def sort_by_attribute(method, excluded_labels: [])
         case method.to_s
+        when 'blocking_issues_desc' then order_blocking_issues_desc.with_order_id_desc
         when 'weight', 'weight_asc' then order_weight_asc.with_order_id_desc
         when 'weight_desc'          then order_weight_desc.with_order_id_desc
         else
