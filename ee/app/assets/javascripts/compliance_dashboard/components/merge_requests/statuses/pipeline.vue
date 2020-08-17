@@ -1,5 +1,5 @@
 <script>
-import { GlTooltipDirective } from '@gitlab/ui';
+import { GlLink, GlTooltipDirective } from '@gitlab/ui';
 
 import { sprintf, s__ } from '~/locale';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
@@ -10,6 +10,7 @@ export default {
   },
   components: {
     CiIcon,
+    GlLink,
   },
   props: {
     status: {
@@ -31,7 +32,7 @@ export default {
 </script>
 
 <template>
-  <a :href="pipelineCiStatus.details_path">
+  <gl-link :href="pipelineCiStatus.details_path">
     <ci-icon v-gl-tooltip.left="pipelineTitle" class="gl-display-flex" :status="pipelineCiStatus" />
-  </a>
+  </gl-link>
 </template>
