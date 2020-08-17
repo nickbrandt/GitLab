@@ -10,7 +10,7 @@ export const createStoreOptions = (approvalsModule, settings) => ({
     createModal: modalModule(),
     deleteModal: modalModule(),
     securityConfiguration: securityConfigurationModule({
-      securityConfigurationPath: settings.securityConfigurationPath,
+      securityConfigurationPath: settings?.securityConfigurationPath || '',
     }),
   },
 });

@@ -488,7 +488,7 @@ describe('EE Approvals RuleForm', () => {
           createComponent(
             {
               initRule: null,
-              initRuleFieldName: 'Vulnerability-Check',
+              defaultRuleName: 'Vulnerability-Check',
             },
             {
               provide: {
@@ -508,7 +508,7 @@ describe('EE Approvals RuleForm', () => {
           createComponent(
             {
               initRule: null,
-              initRuleFieldName: 'License-Check',
+              defaultRuleName: 'License-Check',
             },
             {
               provide: {
@@ -528,7 +528,7 @@ describe('EE Approvals RuleForm', () => {
           createComponent(
             {
               initRule: null,
-              initRuleFieldName: 'Foo Bar Baz',
+              defaultRuleName: 'Foo Bar Baz',
             },
             {
               provide: {

@@ -5,7 +5,7 @@ import projectSettingsModule from 'ee/approvals/stores/modules/project_settings'
 import ProjectRules from 'ee/approvals/components/project_settings/project_rules.vue';
 import RuleInput from 'ee/approvals/components/mr_edit/rule_input.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
-import UnconfiguredSecurityRule from 'ee/approvals/components/security_configuration/unconfigured_security_rule.vue';
+import UnconfiguredSecurityRules from 'ee/approvals/components/security_configuration/unconfigured_security_rules.vue';
 import { createProjectRules } from '../../mocks';
 
 const TEST_RULES = createProjectRules();
@@ -125,7 +125,7 @@ describe('Approvals ProjectRules', () => {
     });
 
     it('should not render the unconfigured-security-rule component', () => {
-      expect(wrapper.contains(UnconfiguredSecurityRule)).toBe(false);
+      expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(false);
     });
   });
 
@@ -149,7 +149,31 @@ describe('Approvals ProjectRules', () => {
     });
 
     it('should render the unconfigured-security-rule component', () => {
-      expect(wrapper.contains(UnconfiguredSecurityRule)).toBe(true);
+      expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(true);
+    });
+  });
+
+  describe('when the approvalSuggestions feature flag is disabled', () => {
+    beforeEach(() => {
+      const rules = createProjectRules();
+      rules[0].name = 'Vulnerability-Check';
+      store.modules.approvals.state.rules = rules;
+      store.state.settings.allowMultiRule = true;
+    });
+
+    beforeEach(() => {
+      factory(
+        {},
+        {
+          provide: {
+            glFeatures: { approvalSuggestions: false },
+          },
+        },
+      );
+    });
+
+    it('should notrender the unconfigured-security-rule component', () => {
+      expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(false);
     });
   });
 });
