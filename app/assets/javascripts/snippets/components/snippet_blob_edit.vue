@@ -101,7 +101,7 @@ export default {
       v-if="isContentLoading"
       :label="__('Loading snippet')"
       size="lg"
-      class="loading-animation prepend-top-20 append-bottom-20"
+      class="loading-animation prepend-top-20 gl-mb-6"
     />
     <blob-content-edit v-else v-model="content" :file-global-id="id" :file-name="filePath" />
   </div>
