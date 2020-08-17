@@ -31,7 +31,7 @@ module Mutations
 
       def resolve(full_path:, profile_name:, spider_timeout: nil, target_timeout: nil)
         project = authorized_find!(full_path: full_path)
-        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project)
+        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project, default_enabled: true)
 
         service = ::DastScannerProfiles::CreateService.new(project, current_user)
         result = service.execute(name: profile_name, spider_timeout: spider_timeout, target_timeout: target_timeout)

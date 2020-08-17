@@ -19,7 +19,7 @@ module Mutations
 
       def resolve(full_path:, id:)
         project = authorized_find!(full_path: full_path)
-        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project)
+        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project, default_enabled: true)
 
         dast_site_profile = find_dast_site_profile(project: project, global_id: id)
         return { errors: dast_site_profile.errors.full_messages } unless dast_site_profile.destroy

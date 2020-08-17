@@ -17,7 +17,7 @@ module EE
             null: true,
             description: 'The DAST scanner profiles associated with the project',
             resolve: -> (project, _args, _ctx) do
-              return DastScannerProfile.none unless ::Feature.enabled?(:security_on_demand_scans_feature_flag, project)
+              return DastScannerProfile.none unless ::Feature.enabled?(:security_on_demand_scans_feature_flag, project, default_enabled: true)
 
               project.dast_scanner_profiles
             end
