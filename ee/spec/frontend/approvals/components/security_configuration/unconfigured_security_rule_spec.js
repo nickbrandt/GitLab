@@ -1,7 +1,6 @@
 import Vuex from 'vuex';
 import { LICENSE_CHECK_NAME, VULNERABILITY_CHECK_NAME } from 'ee/approvals/constants';
 import UnconfiguredSecurityRule from 'ee/approvals/components/security_configuration/unconfigured_security_rule.vue';
-import createStore from 'ee/security_dashboard/store';
 import { mount, createLocalVue } from '@vue/test-utils';
 import { GlSkeletonLoading, GlSprintf, GlButton } from '@gitlab/ui';
 
@@ -10,7 +9,6 @@ localVue.use(Vuex);
 
 describe('UnconfiguredSecurityRule component', () => {
   let wrapper;
-  let store;
   let description;
 
   const findDescription = () => wrapper.find(GlSprintf);
@@ -90,19 +88,15 @@ describe('UnconfiguredSecurityRule component', () => {
     },
   ];
 
-  const createWrapper = (props = {}) => {
+  const createWrapper = (props = {}, options = {}) => {
     wrapper = mount(UnconfiguredSecurityRule, {
       localVue,
-      store,
       propsData: {
         ...props,
       },
+      ...options,
     });
   };
-
-  beforeEach(() => {
-    store = createStore();
-  });
 
   afterEach(() => {
     wrapper.destroy();
@@ -145,13 +139,24 @@ describe('UnconfiguredSecurityRule component', () => {
     });
 
     describe('without a Vulnerability-Check rule defined', () => {
+      let enableButtonHandler;
+
       beforeEach(() => {
-        createWrapper({
-          rules: [],
-          configuration: { features },
-          matchRule: vulnCheckMatchRule,
-          isLoading: false,
-        });
+        enableButtonHandler = jest.fn();
+
+        createWrapper(
+          {
+            rules: [],
+            configuration: { features },
+            matchRule: vulnCheckMatchRule,
+            isLoading: false,
+          },
+          {
+            listeners: {
+              enable: enableButtonHandler,
+            },
+          },
+        );
         description = findDescription();
       });
 
@@ -163,6 +168,11 @@ describe('UnconfiguredSecurityRule component', () => {
         expect(description.exists()).toBe(true);
         expect(description.text()).toBe(vulnCheckMatchRule.enableDescription);
         expect(findButton().exists()).toBe(true);
+      });
+
+      it('should emit the "enable" event when the button is clicked', () => {
+        findButton().trigger('click');
+        expect(enableButtonHandler).toHaveBeenCalled();
       });
     });
   });

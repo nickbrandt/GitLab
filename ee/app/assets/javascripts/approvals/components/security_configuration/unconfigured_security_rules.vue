@@ -34,20 +34,20 @@ export default {
         {
           name: VULNERABILITY_CHECK_NAME,
           description: s__(
-            'SecurityApprovals|One or more of the security scanners must be enabled %{linkStart}more information%{linkEnd}',
+            'SecurityApprovals|One or more of the security scanners must be enabled. %{linkStart}More information%{linkEnd}',
           ),
           enableDescription: s__(
-            'SecurityApprovals|Requires approval for vulnerabilties of Critical, High, or Unknown severity %{linkStart}more information%{linkEnd}',
+            'SecurityApprovals|Requires approval for vulnerabilties of Critical, High, or Unknown severity. %{linkStart}More information%{linkEnd}',
           ),
           docsPath: this.vulnerabilityCheckHelpPagePath,
         },
         {
           name: LICENSE_CHECK_NAME,
           description: s__(
-            'SecurityApprovals|License Scanning must be enabled %{linkStart}more information%{linkEnd}',
+            'SecurityApprovals|License Scanning must be enabled. %{linkStart}More information%{linkEnd}',
           ),
           enableDescription: s__(
-            'SecurityApprovals|Requires license policy rules for licenses of Allowed, or Denied %{linkStart}more information%{linkEnd}',
+            'SecurityApprovals|Requires license policy rules for licenses of Allowed, or Denied. %{linkStart}More information%{linkEnd}',
           ),
           docsPath: this.licenseCheckHelpPagePath,
         },
