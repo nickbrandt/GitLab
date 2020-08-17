@@ -59,6 +59,21 @@ There are no plans to deprecate the REST API. To reduce the technical burden of
 supporting two APIs in parallel, they should share implementations as much as
 possible.
 
+### Deprecation process
+
+Fields and tables marked for removal from the GitLab GraphQL API and will be deprecated, but still available, for no shorter than 6 releases and then removed entirely.
+Removals will occur at X.0 and X.6 releases.
+
+For example, a field can be marked as deprecated (but still usable) in %12.7, but can be used until its removal in %13.6.
+When marked as deprecated, an alternative will be provided if there is one.
+That gives consumers of the GraphQL API a minimum of six months to update their GraphQL queries.
+
+The process is as follows:
+
+- The field is listed as deprecated in [GraphQL API Reference](reference/index.md)
+- Removals will be announced at least one release prior in the deprecation warnings section of the release post (at or prior to X.11 and X.5 releases)
+- Fields meeting criteria are removed in X.0 or X.6
+
 ## Available queries
 
 The GraphQL API includes the following queries at the root level:
