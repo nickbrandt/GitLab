@@ -14927,6 +14927,24 @@ CREATE SEQUENCE public.push_rules_id_seq
 
 ALTER SEQUENCE public.push_rules_id_seq OWNED BY public.push_rules.id;
 
+CREATE TABLE public.raw_usage_data (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    recorded_at timestamp with time zone NOT NULL,
+    sent_at timestamp with time zone,
+    payload jsonb NOT NULL
+);
+
+CREATE SEQUENCE public.raw_usage_data_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.raw_usage_data_id_seq OWNED BY public.raw_usage_data.id;
+
 CREATE TABLE public.redirect_routes (
     id integer NOT NULL,
     source_id integer NOT NULL,
@@ -17224,6 +17242,8 @@ ALTER TABLE ONLY public.protected_tags ALTER COLUMN id SET DEFAULT nextval('publ
 
 ALTER TABLE ONLY public.push_rules ALTER COLUMN id SET DEFAULT nextval('public.push_rules_id_seq'::regclass);
 
+ALTER TABLE ONLY public.raw_usage_data ALTER COLUMN id SET DEFAULT nextval('public.raw_usage_data_id_seq'::regclass);
+
 ALTER TABLE ONLY public.redirect_routes ALTER COLUMN id SET DEFAULT nextval('public.redirect_routes_id_seq'::regclass);
 
 ALTER TABLE ONLY public.release_links ALTER COLUMN id SET DEFAULT nextval('public.release_links_id_seq'::regclass);
@@ -18448,6 +18468,9 @@ ALTER TABLE ONLY public.protected_tags
 
 ALTER TABLE ONLY public.push_rules
     ADD CONSTRAINT push_rules_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.raw_usage_data
+    ADD CONSTRAINT raw_usage_data_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.redirect_routes
     ADD CONSTRAINT redirect_routes_pkey PRIMARY KEY (id);
@@ -20519,6 +20542,8 @@ CREATE UNIQUE INDEX index_push_event_payloads_on_event_id ON public.push_event_p
 CREATE INDEX index_push_rules_on_is_sample ON public.push_rules USING btree (is_sample) WHERE is_sample;
 
 CREATE INDEX index_push_rules_on_project_id ON public.push_rules USING btree (project_id);
+
+CREATE UNIQUE INDEX index_raw_usage_data_on_recorded_at ON public.raw_usage_data USING btree (recorded_at);
 
 CREATE UNIQUE INDEX index_redirect_routes_on_path ON public.redirect_routes USING btree (path);
 
