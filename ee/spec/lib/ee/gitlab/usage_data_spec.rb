@@ -315,7 +315,7 @@ RSpec.describe Gitlab::UsageData do
         create(:approval_project_rule, protected_branches: [protected_branch], project: project)
         create(:suggestion, note: create(:note, project: project))
         create(:code_owner_rule, merge_request: merge_request, approvals_required: 3)
-        create(:code_owner_rule, merge_request: merge_request, approvals_required: 7)
+        create(:code_owner_rule, merge_request: merge_request, approvals_required: 7, section: 'new_section')
         create(:approval_merge_request_rule, merge_request: merge_request)
         create_list(:code_owner_rule, 3, approvals_required: 2)
         create_list(:code_owner_rule, 2)
@@ -325,6 +325,7 @@ RSpec.describe Gitlab::UsageData do
         approval_project_rules: 6,
         approval_project_rules_with_target_branch: 2,
         projects_enforcing_code_owner_approval: 0,
+        projects_with_sectional_code_owner_rules: 2,
         merge_requests_with_added_rules: 12,
         merge_requests_with_optional_codeowners: 4,
         merge_requests_with_required_codeowners: 8,
@@ -337,6 +338,7 @@ RSpec.describe Gitlab::UsageData do
         approval_project_rules: 6,
         approval_project_rules_with_target_branch: 2,
         projects_enforcing_code_owner_approval: 0,
+        projects_with_sectional_code_owner_rules: 1,
         merge_requests_with_added_rules: 6,
         merge_requests_with_optional_codeowners: 2,
         merge_requests_with_required_codeowners: 4,

@@ -219,6 +219,7 @@ module EE
         def usage_activity_by_stage_create(time_period)
           super.merge({
             projects_enforcing_code_owner_approval: distinct_count(::Project.requiring_code_owner_approval.where(time_period), :creator_id),
+            projects_with_sectional_code_owner_rules: projects_with_sectional_code_owner_rules(time_period),
             merge_requests_with_added_rules: distinct_count(::ApprovalMergeRequestRule.where(time_period).with_added_approval_rules,
                                                             :merge_request_id,
                                                             start: approval_merge_request_rule_minimum_id,
@@ -389,6 +390,23 @@ module EE
           # rubocop: enable UsageData/LargeTable:
           count(::JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
         end
+        # rubocop:enable CodeReuse/ActiveRecord
+
+        # rubocop:disable CodeReuse/ActiveRecord
+        # rubocop: disable UsageData/DistinctCountByLargeForeignKey
+        def projects_with_sectional_code_owner_rules(time_period)
+          distinct_count(
+            ::ApprovalMergeRequestRule
+              .code_owner
+              .joins(:merge_request)
+              .where("section != ?", ::Gitlab::CodeOwners::Entry::DEFAULT_SECTION)
+              .where(time_period),
+            'merge_requests.target_project_id',
+            start: project_minimum_id,
+            finish: project_maximum_id
+          )
+        end
+        # rubocop: enable UsageData/DistinctCountByLargeForeignKey
         # rubocop:enable CodeReuse/ActiveRecord
       end
     end
