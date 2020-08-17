@@ -19,7 +19,7 @@ RSpec.describe Admin::ElasticsearchController do
       post :enqueue_index
 
       expect(controller).to set_flash[:notice].to include('/admin/sidekiq/queues/elastic_full_index')
-      expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+      expect(response).to redirect_to general_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
     end
 
     context 'without an index' do
@@ -33,7 +33,7 @@ RSpec.describe Admin::ElasticsearchController do
         post :enqueue_index
 
         expect(controller).to set_flash[:warning].to include('create an index before enabling indexing')
-        expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+        expect(response).to redirect_to general_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
       end
     end
   end
@@ -49,7 +49,7 @@ RSpec.describe Admin::ElasticsearchController do
       post :trigger_reindexing
 
       expect(controller).to set_flash[:notice].to include('reindexing triggered')
-      expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+      expect(response).to redirect_to general_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
     end
 
     it 'does not create a reindexing task if there is another one' do
@@ -59,7 +59,7 @@ RSpec.describe Admin::ElasticsearchController do
       post :trigger_reindexing
 
       expect(controller).to set_flash[:warning].to include('already in progress')
-      expect(response).to redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+      expect(response).to redirect_to general_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
     end
   end
 end

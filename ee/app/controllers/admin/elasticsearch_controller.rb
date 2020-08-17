@@ -14,7 +14,7 @@ class Admin::ElasticsearchController < Admin::ApplicationController
       flash[:warning] = _('Please create an index before enabling indexing')
     end
 
-    redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+    redirect_to redirect_path
   end
 
   # POST
@@ -27,6 +27,12 @@ class Admin::ElasticsearchController < Admin::ApplicationController
       flash[:notice] = _('Elasticsearch reindexing triggered')
     end
 
-    redirect_to integrations_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
+    redirect_to redirect_path
+  end
+
+  private
+
+  def redirect_path
+    general_admin_application_settings_path(anchor: 'js-elasticsearch-settings')
   end
 end
