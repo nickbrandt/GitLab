@@ -25,9 +25,9 @@ export default {
       rule: 'data',
     }),
     title() {
-      return this.rule && !this.rule.defaultRuleName
-        ? __('Update approval rule')
-        : __('Add approval rule');
+      return !this.rule || this.defaultRuleName
+        ? __('Add approval rule')
+        : __('Update approval rule');
     },
     defaultRuleName() {
       return this.rule && this.rule.defaultRuleName;

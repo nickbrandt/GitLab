@@ -102,7 +102,7 @@ describe('Approvals ModalRuleCreate', () => {
 
   describe('with approvalSuggestions feature flag', () => {
     beforeEach(() => {
-      createModalState.data = { ...TEST_RULE, initRuleField: true, name: 'Vulnerability-Check' };
+      createModalState.data = { ...TEST_RULE, defaultRuleName: 'Vulnerability-Check' };
 
       factory({
         provide: {
@@ -119,14 +119,14 @@ describe('Approvals ModalRuleCreate', () => {
       expect(modal.attributes('ok-title')).toEqual('Add approval rule');
     });
 
-    it('renders form with initRuleFieldName', () => {
-      expect(form.props().initRuleFieldName).toBe('Vulnerability-Check');
+    it('renders form with defaultRuleName', () => {
+      expect(form.props().defaultRuleName).toBe('Vulnerability-Check');
       expect(form.exists()).toBe(true);
     });
 
-    it('renders the form without passing in an existing rule', () => {
+    it('renders the form when passing in an existing rule', () => {
       expect(form.exists()).toBe(true);
-      expect(form.props('initRule')).toBeNull();
+      expect(form.props('initRule')).toEqual(createModalState.data);
     });
   });
 });
