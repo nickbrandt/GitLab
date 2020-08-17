@@ -11,6 +11,11 @@ module EE
       def load_forks
         super.with_compliance_framework_settings
       end
+
+      override :load_namespaces_with_associations
+      def load_namespaces_with_associations
+        super.preload(:deletion_schedule)
+      end
     end
   end
 end

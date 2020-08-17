@@ -10,12 +10,19 @@ RSpec.describe ForkNamespaceEntity do
   let_it_be(:project) { create(:project) }
 
   let(:namespace) { create(:group, :with_avatar, description: 'test') }
-  let(:entity) { described_class.new(namespace, current_user: user, project: project) }
+  let(:memberships) do
+    user.members.inject({}) do |memberships, member|
+      memberships[member.source_id] = member
+      memberships
+    end
+  end
+  let(:entity) { described_class.new(namespace, current_user: user, project: project, memberships: memberships) }
 
   subject(:json) { entity.as_json }
 
   before do
     project.add_maintainer(user)
+    namespace.add_developer(user)
   end
 
   it 'renders json' do
@@ -52,7 +59,6 @@ RSpec.describe ForkNamespaceEntity do
   end
 
   it 'exposes human readable permission level' do
-    namespace.add_developer(user)
     expect(json[:permission]).to eql 'Developer'
   end
 
