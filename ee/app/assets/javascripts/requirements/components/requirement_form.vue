@@ -62,6 +62,12 @@ export default {
       },
       deep: true,
     },
+    drawerOpen(value) {
+      // Clear `title` value on drawer close.
+      if (!value) {
+        this.title = '';
+      }
+    },
   },
   methods: {
     getDrawerHeaderHeight() {
