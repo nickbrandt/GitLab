@@ -8,9 +8,11 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 > [Introduced in](https://gitlab.com/groups/gitlab-org/-/epics/2137) GitLab 13.3.
 
-Project integrations can be configured and enabled by project administrators. As a GitLab instance administrator, you can set default configuration parameters for a given integration that all projects can inherit and use.
+Project integrations can be configured and enabled by project administrators. As a GitLab instance administrator, you can set default configuration parameters for a given integration that all projects can inherit and use, enabling the integration for all projects that are not already using custom settings.
 
-You can update these default settings at any time, which will change the settings in use for all projects that are set to use instance-level defaults.
+You can update these default settings at any time, changing the settings in use for all projects that are set to use instance-level defaults. This also enables the integration for all projects on which it was not already enabled.
+
+It is only possible to inherit the complete settings for an integration. Per-field inheritance is [planned](https://gitlab.com/groups/gitlab-org/-/epics/2137), as well as [group-level management](https://gitlab.com/groups/gitlab-org/-/epics/2543) of integration settings.
 
 ## Manage default settings for a project integration
 
@@ -18,11 +20,22 @@ You can update these default settings at any time, which will change the setting
 2. Select a project integration.
 3. Enter configuration details and click **Save changes**.
 
-For all projects that have a given integration set to use instance-level default settings, any changes you make to the instance defaults are immediately applied, changing their settings.
+CAUTION: **Caution:**
+This may affect all or most of the projects on your GitLab instance. Please review the details below.
 
-Projects with custom settings or without the integration enabled at all may choose to use the latest instance-level defaults at any time.
- 
-Note: If you set up an instance level integration for the first time, you will set up the same integration for all existing projects that do not have an integration of the same type set up. Projects with an existing integration of the same type are not changed.
+If this is the first time you are setting up instance-level settings for an integration:
+
+- The integration is enabled for all projects that do not already have this integration configured if you have the **Enable integration** toggle turned on in the instance-level settings.
+- Projects that already have the integration configured are not affected, but can choose to use the inherited settings at any time. 
+
+When you make further changes to the instance defaults:
+
+- They are immediately applied to all projects that have the integration set to use instance-level default settings.
+- They are immediately applied to newer projects, created since you last saved defaults for the integration.
+   - If your instance-level default setting has the **Enable integration** toggle turned on, the integration is automatically enabled for all such projects.
+- Projects with custom settings selected for the integration are not immediately affected and may choose to use the latest instance-level defaults at any time.
+
+It is only possible to inherit the complete settings for an integration. Per-field inheritance is [planned](https://gitlab.com/groups/gitlab-org/-/epics/2137). This would allow instance administrators to update settings inherited by projects without enabling the integration on all non-configured projects by default.
 
 ## Use instance-level default settings for a project integration
 
@@ -41,9 +54,3 @@ Note: If you set up an instance level integration for the first time, you will s
 1. From the drop-down, select **Use custom settings**.
 1. Ensure the toggle is set to **Enabled** and enter all required settings.
 1. Click **Save changes**.
-
-## Caveats
-
-Instance level integrations are just available for users of self-managed instances. We are currently working on enabling this logic on the group level as well, so that users of GitLab.com can also utilize this feature. [link tba]
-
-Currently it is just possible to inherit the complete settings for an integration. Per-field inheritance is planned. [link tba]
