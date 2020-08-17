@@ -48,6 +48,12 @@ RSpec.describe Groups::BillingsController do
 
         expect(assigns(:plans_data)).to eq(data)
       end
+
+      it 'records user for the contact_sales_btn_in_app experiment' do
+        expect(controller).to receive(:record_experiment_user).with(:contact_sales_btn_in_app)
+
+        get_index
+      end
     end
 
     context 'unauthorized' do
