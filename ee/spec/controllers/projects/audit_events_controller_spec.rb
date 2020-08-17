@@ -3,9 +3,10 @@
 require 'spec_helper'
 
 RSpec.describe Projects::AuditEventsController do
-  let(:user) { create(:user) }
-  let(:maintainer) { create(:user) }
-  let(:project) { create(:project, :private) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:maintainer) { create(:user) }
+  let_it_be(:project) { create(:project, :private) }
+  let_it_be(:events) { create_list(:project_audit_event, 5, entity_id: project.id) }
 
   describe 'GET #index' do
     let(:sort) { nil }
@@ -73,12 +74,11 @@ RSpec.describe Projects::AuditEventsController do
             it 'orders by id descending' do
               request
 
-              expect(assigns(:events)).to eq(project.audit_events.order(id: :desc))
-            end
-          end
+              actual_event_ids = assigns(:events).map { |event| event[:id] }
+              expected_event_ids = events.map(&:id).reverse
 
-          before do
-            create_list(:project_audit_event, 5, entity_id: project.id)
+              expect(actual_event_ids).to eq(expected_event_ids)
+            end
           end
 
           context 'when no sort order is specified' do
@@ -97,7 +97,10 @@ RSpec.describe Projects::AuditEventsController do
             it 'orders by id ascending' do
               request
 
-              expect(assigns(:events)).to eq(project.audit_events.order(id: :asc))
+              actual_event_ids = assigns(:events).map { |event| event[:id] }
+              expected_event_ids = events.map(&:id)
+
+              expect(actual_event_ids).to eq(expected_event_ids)
             end
           end
 
@@ -110,10 +113,19 @@ RSpec.describe Projects::AuditEventsController do
       end
 
       context 'pagination' do
-        it 'paginates audit events, without casting a count query' do
+        it 'sets instance variables' do
           request
 
-          expect(assigns(:events)).to be_kind_of(Kaminari::PaginatableWithoutCount)
+          expect(assigns(:is_last_page)).to be(true)
+        end
+
+        it 'paginates audit events, without casting a count query' do
+          serializer = instance_spy(AuditEventSerializer)
+          allow(AuditEventSerializer).to receive(:new).and_return(serializer)
+
+          request
+
+          expect(serializer).to have_received(:represent).with(kind_of(Kaminari::PaginatableWithoutCount))
         end
       end
 
