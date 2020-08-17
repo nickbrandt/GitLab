@@ -13,4 +13,4 @@
     %br
     = _('Multiple IP address ranges are supported.')
     %br
-    = _('Example: <code>192.168.0.0/24</code>. %{read_more_link}.').html_safe % { read_more_link: read_more_link }
+    = html_escape(_('Example: %{ip_address}. %{read_more_link}.')) % { read_more_link: read_more_link, ip_address: tag.code('192.168.0.0/24') }
