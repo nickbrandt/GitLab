@@ -56,7 +56,6 @@ export default {
       isUpdating: false,
       newSnippet: false,
       actions: [],
-      isLoaded: false,
     };
   },
   computed: {
@@ -133,8 +132,6 @@ export default {
       this.newSnippet = false;
     },
     onSnippetFetch(snippetRes) {
-      this.isLoaded = true;
-
       if (snippetRes.data.snippets.edges.length === 0) {
         this.onNewSnippetFetched();
       } else {
@@ -221,11 +218,7 @@ export default {
         :markdown-preview-path="markdownPreviewPath"
         :markdown-docs-path="markdownDocsPath"
       />
-      <snippet-blob-actions-edit
-        :is-ready="isLoaded"
-        :init-blobs="blobs"
-        @actions="updateActions"
-      />
+      <snippet-blob-actions-edit :init-blobs="blobs" @actions="updateActions" />
 
       <snippet-visibility-edit
         v-model="snippet.visibilityLevel"

@@ -23,7 +23,6 @@ describe('snippets/components/snippet_blob_actions_edit', () => {
     wrapper = shallowMount(SnippetBlobActionsEdit, {
       propsData: {
         initBlobs: TEST_BLOBS,
-        isReady: false,
         ...props,
       },
       provide: {
@@ -76,7 +75,7 @@ describe('snippets/components/snippet_blob_actions_edit', () => {
     ${false}    | ${'File'}  | ${false}   | ${false}
   `('with feature flag = $featureFlag', ({ featureFlag, label, showDelete, showAdd }) => {
     beforeEach(() => {
-      createComponent({ isReady: true }, featureFlag);
+      createComponent({}, featureFlag);
     });
 
     it('renders label', () => {
@@ -100,132 +99,118 @@ describe('snippets/components/snippet_blob_actions_edit', () => {
       createComponent();
     });
 
-    it('has no blobs yet', () => {
-      expect(findBlobsData()).toEqual([]);
+    it('emits no actions', () => {
+      expect(getLastActions()).toEqual([]);
     });
 
-    describe('when isReady', () => {
-      beforeEach(async () => {
-        wrapper.setProps({ isReady: true });
+    it('shows blobs', () => {
+      expect(findBlobsData()).toEqual(buildBlobsDataExpectation(TEST_BLOBS_UNLOADED));
+    });
 
-        await wrapper.vm.$nextTick();
+    it('shows add button', () => {
+      const button = findAddButton();
+
+      expect(button.text()).toBe(`Add another file ${TEST_BLOBS.length}/${SNIPPET_MAX_BLOBS}`);
+      expect(button.props('disabled')).toBe(false);
+    });
+
+    describe('when add is clicked', () => {
+      beforeEach(() => {
+        findAddButton().vm.$emit('click');
       });
 
-      it('emits no actions', () => {
+      it('adds blob with empty content', () => {
+        expect(findBlobsData()).toEqual(
+          buildBlobsDataExpectation([
+            ...TEST_BLOBS_UNLOADED,
+            {
+              content: '',
+              isLoaded: true,
+              path: '',
+            },
+          ]),
+        );
+      });
+
+      it('emits action', () => {
+        expect(getLastActions()).toEqual([
+          expect.objectContaining({
+            action: SNIPPET_BLOB_ACTION_CREATE,
+          }),
+        ]);
+      });
+    });
+
+    describe('when blob is deleted', () => {
+      beforeEach(() => {
+        triggerBlobDelete(1);
+      });
+
+      it('removes blob', () => {
+        expect(findBlobsData()).toEqual(buildBlobsDataExpectation(TEST_BLOBS_UNLOADED.slice(0, 1)));
+      });
+
+      it('emits action', () => {
+        expect(getLastActions()).toEqual([
+          expect.objectContaining({
+            ...testEntries.deleted.diff,
+            content: '',
+          }),
+        ]);
+      });
+    });
+
+    describe('when blob changes path', () => {
+      beforeEach(() => {
+        triggerBlobUpdate(0, { path: 'new/path' });
+      });
+
+      it('renames blob', () => {
+        expect(findBlobsData()[0]).toMatchObject({
+          blob: {
+            path: 'new/path',
+          },
+        });
+      });
+
+      it('emits action', () => {
+        expect(getLastActions()).toMatchObject([
+          {
+            action: SNIPPET_BLOB_ACTION_MOVE,
+            filePath: 'new/path',
+            previousPath: testEntries.updated.diff.filePath,
+          },
+        ]);
+      });
+    });
+
+    describe('when blob emits new content', () => {
+      const { content } = testEntries.updated.diff;
+      const originalContent = `${content}\noriginal content\n`;
+
+      beforeEach(() => {
+        triggerBlobUpdate(0, { content: originalContent });
+      });
+
+      it('loads new content', () => {
+        expect(findBlobsData()[0]).toMatchObject({
+          blob: {
+            content: originalContent,
+            isLoaded: true,
+          },
+        });
+      });
+
+      it('does not emit an action', () => {
         expect(getLastActions()).toEqual([]);
       });
 
-      it('shows blobs', () => {
-        expect(findBlobsData()).toEqual(buildBlobsDataExpectation(TEST_BLOBS_UNLOADED));
-      });
+      it('emits an action when content changes again', async () => {
+        triggerBlobUpdate(0, { content });
 
-      it('shows add button', () => {
-        const button = findAddButton();
+        await wrapper.vm.$nextTick();
 
-        expect(button.text()).toBe(`Add another file ${TEST_BLOBS.length}/${SNIPPET_MAX_BLOBS}`);
-        expect(button.props('disabled')).toBe(false);
-      });
-
-      describe('when add is clicked', () => {
-        beforeEach(() => {
-          findAddButton().vm.$emit('click');
-        });
-
-        it('adds blob with empty content', () => {
-          expect(findBlobsData()).toEqual(
-            buildBlobsDataExpectation([
-              ...TEST_BLOBS_UNLOADED,
-              {
-                content: '',
-                isLoaded: true,
-                path: '',
-              },
-            ]),
-          );
-        });
-
-        it('emits action', () => {
-          expect(getLastActions()).toEqual([
-            expect.objectContaining({
-              action: SNIPPET_BLOB_ACTION_CREATE,
-            }),
-          ]);
-        });
-      });
-
-      describe('when blob is deleted', () => {
-        beforeEach(() => {
-          triggerBlobDelete(1);
-        });
-
-        it('removes blob', () => {
-          expect(findBlobsData()).toEqual(
-            buildBlobsDataExpectation(TEST_BLOBS_UNLOADED.slice(0, 1)),
-          );
-        });
-
-        it('emits action', () => {
-          expect(getLastActions()).toEqual([
-            expect.objectContaining({
-              ...testEntries.deleted.diff,
-              content: '',
-            }),
-          ]);
-        });
-      });
-
-      describe('when blob changes path', () => {
-        beforeEach(() => {
-          triggerBlobUpdate(0, { path: 'new/path' });
-        });
-
-        it('renames blob', () => {
-          expect(findBlobsData()[0]).toMatchObject({
-            blob: {
-              path: 'new/path',
-            },
-          });
-        });
-
-        it('emits action', () => {
-          expect(getLastActions()).toMatchObject([
-            {
-              action: SNIPPET_BLOB_ACTION_MOVE,
-              filePath: 'new/path',
-              previousPath: testEntries.updated.diff.filePath,
-            },
-          ]);
-        });
-      });
-
-      describe('when blob emits new content', () => {
-        const { content } = testEntries.updated.diff;
-        const originalContent = `${content}\noriginal content\n`;
-
-        beforeEach(() => {
-          triggerBlobUpdate(0, { content: originalContent });
-        });
-
-        it('loads new content', () => {
-          expect(findBlobsData()[0]).toMatchObject({
-            blob: {
-              content: originalContent,
-              isLoaded: true,
-            },
-          });
-        });
-
-        it('does not emit an action', () => {
-          expect(getLastActions()).toEqual([]);
-        });
-
-        it('emits an action when content changes again', async () => {
-          triggerBlobUpdate(0, { content });
-
-          await wrapper.vm.$nextTick();
-
-          expect(getLastActions()).toEqual([testEntries.updated.diff]);
-        });
+        expect(getLastActions()).toEqual([testEntries.updated.diff]);
       });
     });
   });

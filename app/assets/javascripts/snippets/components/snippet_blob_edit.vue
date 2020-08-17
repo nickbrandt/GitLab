@@ -18,13 +18,12 @@ export default {
   props: {
     blob: {
       type: Object,
-      required: false,
-      default: null,
+      required: true,
     },
     canDelete: {
       type: Boolean,
       required: false,
-      default: false,
+      default: true,
     },
     showDelete: {
       type: Boolean,

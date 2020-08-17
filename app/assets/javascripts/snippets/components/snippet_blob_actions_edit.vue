@@ -14,14 +14,11 @@ export default {
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
+    // TODO: Build reactivity for initBlobs.
+    // What happens if this changes (i.e. blobs are being loaded through pages)?
     initBlobs: {
       type: Array,
       required: true,
-    },
-    isReady: {
-      type: Boolean,
-      required: false,
-      default: true,
     },
   },
   data() {
@@ -74,14 +71,6 @@ export default {
     },
   },
   watch: {
-    isReady: {
-      immediate: true,
-      handler(val) {
-        if (val) {
-          this.setup();
-        }
-      },
-    },
     actions: {
       immediate: true,
       handler(val) {
@@ -89,20 +78,20 @@ export default {
       },
     },
   },
+  created() {
+    const blobs = this.initBlobs.map(decorateBlob);
+    const blobsById = blobs.reduce((acc, x) => Object.assign(acc, { [x.id]: x }), {});
+
+    this.blobsOrig = blobsById;
+    this.blobs = cloneDeep(blobsById);
+    this.blobIds = blobs.map(x => x.id);
+
+    // Show 1 empty blob if none exist
+    if (!this.blobIds.length) {
+      this.addBlob();
+    }
+  },
   methods: {
-    setup() {
-      const blobs = this.initBlobs.map(decorateBlob);
-      const blobsById = blobs.reduce((acc, x) => Object.assign(acc, { [x.id]: x }), {});
-
-      this.blobsOrig = blobsById;
-      this.blobs = cloneDeep(blobsById);
-      this.blobIds = blobs.map(x => x.id);
-
-      // Show 1 empty blob if none exist
-      if (!this.blobIds.length) {
-        this.addBlob();
-      }
-    },
     updateBlobContent(id, content) {
       const origBlob = this.blobsOrig[id];
       const blob = this.blobs[id];
