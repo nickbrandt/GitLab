@@ -312,7 +312,7 @@ attribute. As a prerequisite, you must use an LDAP server that:
 
 ## Passwords for users created via smartcard authentication
 
-The [How we generate passwords for users created via integrated authentication methods](../../security/passwords_for_integrated_authentication_methods.md) guide provides an overview of how GitLab generates and sets passwords for users created via smartcard authentication.
+The [Generated passwords for users created through integrated authentication](../../security/passwords_for_integrated_authentication_methods.md) guide provides an overview of how GitLab generates and sets passwords for users created via smartcard authentication.
 
 <!-- ## Troubleshooting
 

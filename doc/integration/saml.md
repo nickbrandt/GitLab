@@ -586,7 +586,7 @@ Refer to the documentation for your SAML Identity Provider for information on ho
 
 ## Passwords for users created via SAML
 
-The [How we generate passwords for users created via integrated authentication methods](../security/passwords_for_integrated_authentication_methods.md) guide provides an overview of how GitLab generates and sets passwords for users created via SAML.
+The [Generated passwords for users created through integrated authentication](../security/passwords_for_integrated_authentication_methods.md) guide provides an overview of how GitLab generates and sets passwords for users created via SAML.
 
 ## Troubleshooting
 
