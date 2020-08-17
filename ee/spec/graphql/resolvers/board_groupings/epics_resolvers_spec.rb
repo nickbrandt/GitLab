@@ -13,11 +13,12 @@ RSpec.describe Resolvers::BoardGroupings::EpicsResolver do
   let_it_be(:board) { create(:board, project: project) }
   let_it_be(:group_board) { create(:board, group: group) }
 
-  let_it_be(:label) { create(:label, project: project, name: 'foo') }
-  let_it_be(:list) { create(:list, board: board, label: label) }
+  let_it_be(:label1) { create(:label, project: project, name: 'foo') }
+  let_it_be(:label2) { create(:label, project: project, name: 'bar') }
+  let_it_be(:list) { create(:list, board: board, label: label1) }
 
-  let_it_be(:issue1) { create(:issue, project: project, labels: [label]) }
-  let_it_be(:issue2) { create(:issue, project: project) }
+  let_it_be(:issue1) { create(:issue, project: project, labels: [label1]) }
+  let_it_be(:issue2) { create(:issue, project: project, labels: [label1, label2]) }
   let_it_be(:issue3) { create(:issue, project: other_project) }
 
   let_it_be(:epic1) { create(:epic, group: parent_group) }
@@ -71,9 +72,20 @@ RSpec.describe Resolvers::BoardGroupings::EpicsResolver do
       end
 
       it 'finds only epics for issues matching issue filters' do
-        result = resolve_board_epics(group_board, { issue_filters: { label_name: label.title } })
+        result = resolve_board_epics(
+          group_board, { issue_filters: { label_name: label1.title, not: { label_name: label2.title } } })
 
         expect(result).to match_array([epic1])
+      end
+
+      it 'accepts negated issue params' do
+        expect(Boards::Issues::ListService).to receive(:new).with(
+          group_board.resource_parent,
+          current_user,
+          { all_lists: true, board_id: group_board.id, label_name: 'foo', not: { label_name: %w(foo bar) } }
+        ).and_call_original
+
+        resolve_board_epics(group_board, { issue_filters: { label_name: 'foo', not: { label_name: %w(foo bar) } } })
       end
     end
   end

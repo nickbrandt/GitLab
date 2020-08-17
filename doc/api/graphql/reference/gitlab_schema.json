@@ -3017,7 +3017,7 @@
           "inputFields": [
             {
               "name": "labelName",
-              "description": "Label applied to issues",
+              "description": "Filter by label name",
               "type": {
                 "kind": "LIST",
                 "name": null,
@@ -3031,7 +3031,7 @@
             },
             {
               "name": "milestoneTitle",
-              "description": "Milestone applied to issues",
+              "description": "Filter by milestone title",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -3041,7 +3041,7 @@
             },
             {
               "name": "assigneeUsername",
-              "description": "Username of a user assigned to issues",
+              "description": "Filter by assignee username",
               "type": {
                 "kind": "LIST",
                 "name": null,
@@ -3055,7 +3055,7 @@
             },
             {
               "name": "authorUsername",
-              "description": "Username of the issues author",
+              "description": "Filter by author username",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -3065,7 +3065,7 @@
             },
             {
               "name": "releaseTag",
-              "description": "Release applied to issues",
+              "description": "Filter by release tag",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -3075,7 +3075,7 @@
             },
             {
               "name": "epicId",
-              "description": "Epic ID applied to issues",
+              "description": "Filter by epic ID",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -3085,7 +3085,7 @@
             },
             {
               "name": "myReactionEmoji",
-              "description": "Reaction emoji applied to issues",
+              "description": "Filter by reaction emoji",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -3095,10 +3095,20 @@
             },
             {
               "name": "weight",
-              "description": "Weight applied to issues",
+              "description": "Filter by weight",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "not",
+              "description": "List of negated params. Warning: this argument is experimental and a subject to change in future",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "NegatedBoardEpicIssueInput",
                 "ofType": null
               },
               "defaultValue": null
@@ -28885,6 +28895,105 @@
           "interfaces": [
 
           ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "NegatedBoardEpicIssueInput",
+          "description": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "labelName",
+              "description": "Filter by label name",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "milestoneTitle",
+              "description": "Filter by milestone title",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "assigneeUsername",
+              "description": "Filter by assignee username",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "authorUsername",
+              "description": "Filter by author username",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "releaseTag",
+              "description": "Filter by release tag",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "epicId",
+              "description": "Filter by epic ID",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "myReactionEmoji",
+              "description": "Filter by reaction emoji",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "weight",
+              "description": "Filter by weight",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },
