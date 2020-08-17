@@ -13,9 +13,7 @@ exports[`MetricChart component template when isLoading is false and chart data i
     title=""
     variant="info"
   >
-    
-      There is no data available. Please change your selection.
-    
+    There is no data available. Please change your selection.
   </gl-alert-stub>
 </div>
 `;

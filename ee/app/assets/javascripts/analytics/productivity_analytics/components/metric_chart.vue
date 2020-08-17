@@ -89,9 +89,7 @@ export default {
     <h5 v-if="title">{{ title }}</h5>
     <gl-loading-icon v-if="isLoading" size="md" class="my-4 py-4" />
     <template v-else>
-      <gl-alert v-if="infoMessage" :dismissible="false">
-        {{ infoMessage }}
-      </gl-alert>
+      <gl-alert v-if="infoMessage" :dismissible="false">{{ infoMessage }}</gl-alert>
       <template v-else>
         <gl-deprecated-dropdown
           v-if="hasMetricTypes"
