@@ -1066,6 +1066,14 @@ entry.
 - Remove removeIssue logic from list model. (nuwe1)
 
 
+## 13.1.7 (2020-08-17)
+
+### Security (2 changes)
+
+- Stop deploy token being mis-used as user in ProjectPolicy and GroupPolicy.
+- Project access is checked during deploy token authentication.
+
+
 ## 13.1.6 (2020-08-05)
 
 ### Security (11 changes)
