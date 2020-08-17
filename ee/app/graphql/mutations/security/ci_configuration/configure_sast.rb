@@ -12,11 +12,11 @@ module Mutations
           required: true,
           description: 'Full path of the project.'
 
-        argument :configuration, GraphQL::Types::JSON,
+        argument :configuration, GraphQL::Types::JSON, # rubocop:disable Graphql/JSONType
           required: true,
           description: 'Payload containing SAST variable values (https://docs.gitlab.com/ee/user/application_security/sast/#available-variables).'
 
-        field :result,
+        field :result, # rubocop:disable Graphql/JSONType
           GraphQL::Types::JSON,
           null: true,
           description: 'JSON containing the status of MR creation.'
