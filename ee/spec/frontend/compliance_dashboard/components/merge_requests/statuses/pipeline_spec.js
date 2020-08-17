@@ -1,16 +1,17 @@
 import { shallowMount } from '@vue/test-utils';
+import { GlLink } from '@gitlab/ui';
 
-import PipelineStatus from 'ee/compliance_dashboard/components/merge_requests/pipeline_status.vue';
-import { createPipelineStatus } from '../../mock_data';
+import Pipeline from 'ee/compliance_dashboard/components/merge_requests/statuses/pipeline.vue';
+import { createPipelineStatus } from '../../../mock_data';
 
-describe('PipelineStatus component', () => {
+describe('Pipeline component', () => {
   let wrapper;
 
   const findCiIcon = () => wrapper.find('.ci-icon');
-  const findCiLink = () => wrapper.find('a');
+  const findCiLink = () => wrapper.find(GlLink);
 
   const createComponent = status => {
-    return shallowMount(PipelineStatus, {
+    return shallowMount(Pipeline, {
       propsData: { status },
       stubs: {
         CiIcon: {

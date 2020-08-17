@@ -13,22 +13,6 @@ const createUser = id => ({
   web_url: `http://localhost:3000/user-${id}`,
 });
 
-export const createMergeRequest = ({ id = 1, props } = {}) => {
-  const mergeRequest = {
-    id,
-    approved_by_users: [],
-    issuable_reference: '!1',
-    merged_at: twoDaysAgo(),
-    milestone: null,
-    path: `/h5bp/html5-boilerplate/-/merge_requests/${id}`,
-    title: `Merge request ${id}`,
-  };
-
-  mergeRequest.author = createUser(id);
-
-  return { ...mergeRequest, ...props };
-};
-
 export const createPipelineStatus = status => ({
   details_path: '/h5bp/html5-boilerplate/pipelines/58',
   favicon: '',
@@ -40,6 +24,23 @@ export const createPipelineStatus = status => ({
   text: status,
   tooltip: status,
 });
+
+export const createMergeRequest = ({ id = 1, props } = {}) => {
+  const mergeRequest = {
+    id,
+    approved_by_users: [],
+    issuable_reference: '!1',
+    merged_at: twoDaysAgo(),
+    milestone: null,
+    path: `/h5bp/html5-boilerplate/-/merge_requests/${id}`,
+    title: `Merge request ${id}`,
+    author: createUser(id),
+    pipeline_status: createPipelineStatus('success'),
+    approval_status: 'success',
+  };
+
+  return { ...mergeRequest, ...props };
+};
 
 export const createApprovers = count => {
   return Array(count)

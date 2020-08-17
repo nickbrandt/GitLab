@@ -28,13 +28,11 @@ export default {
       return `status_${this.status}`;
     },
     group() {
-      const { status } = this;
-
-      if (status === 'warning') {
+      if (this.status === 'warning') {
         return APPROVAL_WARNING_ICON;
       }
 
-      return status;
+      return this.status;
     },
   },
   tooltips: {
