@@ -98,6 +98,10 @@
           = link_to _('Trigger cluster reindexing'), admin_elasticsearch_trigger_reindexing_path, class: 'btn btn-success', method: :post, disabled: @elasticsearch_reindexing_task&.in_progress?
           .form-text.text-muted
             = _('This feature should be used with an index that was created after 13.0')
+          - Elastic::ReindexingTask.old_indices_scheduled_for_deletion.each do |task|
+            .form-text.text-danger
+              = _("Unused, previous index '%{index_name}' will be deleted after %{time} automatically.") % { index_name: task.index_name_from, time: task.delete_original_index_at }
+              = link_to _('Cancel index deletion'), admin_elasticsearch_cancel_index_deletion_path(task_id: task.id), method: :post
           - if @elasticsearch_reindexing_task
             - expected_documents = @elasticsearch_reindexing_task.documents_count
             - processed_documents = @elasticsearch_reindexing_task.documents_count_target

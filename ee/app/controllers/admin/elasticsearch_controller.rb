@@ -30,6 +30,17 @@ class Admin::ElasticsearchController < Admin::ApplicationController
     redirect_to redirect_path
   end
 
+  # POST
+  # Cancel index deletion after a successful reindexing operation
+  def cancel_index_deletion
+    task = Elastic::ReindexingTask.find(params[:task_id])
+    task.update!(delete_original_index_at: nil)
+
+    flash[:notice] = _('Index deletion is canceled')
+
+    redirect_to redirect_path
+  end
+
   private
 
   def redirect_path
