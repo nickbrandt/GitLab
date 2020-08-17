@@ -56,7 +56,7 @@ export default {
       return `${this.pipelinePath}/test_report`;
     },
     showViewFullReport() {
-      return Boolean(this.glFeatures.junitPipelineView) && this.pipelinePath.length;
+      return this.pipelinePath.length;
     },
   },
   created() {
