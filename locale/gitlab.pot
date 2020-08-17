@@ -27831,9 +27831,6 @@ msgstr ""
 msgid "You can also upload existing files from your computer using the instructions below."
 msgstr ""
 
-msgid "You can also use project access tokens to authenticate against Git over HTTP."
-msgstr ""
-
 msgid "You can always edit this later"
 msgstr ""
 
