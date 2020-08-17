@@ -14906,6 +14906,9 @@ msgstr ""
 msgid "Merge in progress"
 msgstr ""
 
+msgid "Merge locally"
+msgstr ""
+
 msgid "Merge options"
 msgstr ""
 
@@ -20729,7 +20732,13 @@ msgstr ""
 msgid "Resolve all threads in new issue"
 msgstr ""
 
+msgid "Resolve conflicts"
+msgstr ""
+
 msgid "Resolve conflicts on source branch"
+msgstr ""
+
+msgid "Resolve these conflicts or ask someone with write access to this repository to merge it locally."
 msgstr ""
 
 msgid "Resolve thread"
@@ -24060,6 +24069,9 @@ msgstr ""
 msgid "The commit does not exist"
 msgstr ""
 
+msgid "The comparison view may be inaccurate due to merge conflicts."
+msgstr ""
+
 msgid "The connection will time out after %{timeout}. For repositories that take longer, use a clone/push combination."
 msgstr ""
 
@@ -24375,6 +24387,9 @@ msgid "The vulnerability is no longer detected. Verify the vulnerability has bee
 msgstr ""
 
 msgid "There are currently no events."
+msgstr ""
+
+msgid "There are merge conflicts"
 msgstr ""
 
 msgid "There are no %{replicableTypeName} to show"
