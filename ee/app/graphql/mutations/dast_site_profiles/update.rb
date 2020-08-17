@@ -31,7 +31,7 @@ module Mutations
 
       def resolve(full_path:, **service_args)
         project = authorized_find!(full_path: full_path)
-        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project)
+        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project, default_enabled: true)
 
         service = ::DastSiteProfiles::UpdateService.new(project, current_user)
         result = service.execute(service_args)
