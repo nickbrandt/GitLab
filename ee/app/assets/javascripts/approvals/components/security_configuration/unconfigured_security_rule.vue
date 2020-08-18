@@ -32,7 +32,7 @@ export default {
       </td>
       <td class="gl-px-2! gl-text-right">
         <gl-button @click="$emit('enable')">
-          {{ s__('Enable') }}
+          {{ __('Enable') }}
         </gl-button>
       </td>
     </template>

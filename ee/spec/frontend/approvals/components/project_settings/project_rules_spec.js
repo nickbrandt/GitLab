@@ -152,7 +152,7 @@ describe('Approvals ProjectRules', () => {
 
       it(`should ${
         approvalSuggestions ? '' : 'not'
-      } render the unconfigured-security-rule component`, () => {
+      } render the unconfigured-security-rules component`, () => {
         expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(approvalSuggestions);
       });
     },
