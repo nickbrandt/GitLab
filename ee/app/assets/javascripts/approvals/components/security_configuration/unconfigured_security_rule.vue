@@ -1,110 +1,52 @@
 <script>
-import { camelCase } from 'lodash';
-import { GlButton, GlLink, GlSprintf, GlSkeletonLoading } from '@gitlab/ui';
-import { JOB_TYPES } from 'ee/approvals/constants';
+import { GlButton, GlLink, GlSprintf } from '@gitlab/ui';
 
 export default {
   components: {
     GlButton,
     GlLink,
     GlSprintf,
-    GlSkeletonLoading,
-  },
-  featureTypes: {
-    vulnerabilityCheck: [
-      JOB_TYPES.SAST,
-      JOB_TYPES.DAST,
-      JOB_TYPES.DEPENDENCY_SCANNING,
-      JOB_TYPES.SECRET_DETECTION,
-      JOB_TYPES.COVERAGE_FUZZING,
-    ],
-    licenseCheck: [JOB_TYPES.LICENSE_SCANNING],
   },
   props: {
-    configuration: {
+    rule: {
       type: Object,
       required: true,
-    },
-    rules: {
-      type: Array,
-      required: true,
-    },
-    matchRule: {
-      type: Object,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  computed: {
-    hasApprovalRuleDefined() {
-      return this.rules.some(rule => {
-        return this.matchRule.name === rule.name;
-      });
-    },
-    hasConfiguredJob() {
-      const { features = [] } = this.configuration;
-      return this.$options.featureTypes[camelCase(this.matchRule.name)].some(featureType => {
-        return features.some(feature => {
-          return feature.type === featureType && feature.configured;
-        });
-      });
     },
   },
 };
 </script>
 
 <template>
-  <!-- 
-    Excessive conditional logic is due to:
-
-    - Can't create wrapper <div> for conditional rendering
-    because parent component is a table and expects a root <tr> element
-
-    - Can't have multiple root <tr> nodes
-
-    - Can't create wrapper <div> since <tr> expects a <td> child element
-
-    - Root element can't be another <template>
-  -->
-  <tr v-if="!hasApprovalRuleDefined || !hasConfiguredJob">
-    <td v-if="isLoading" colspan="3">
-      <gl-skeleton-loading :lines="3" />
-    </td>
-
-    <template v-else>
-      <!-- Suggested approval rule creation row -->
-      <template v-if="hasConfiguredJob">
-        <td class="js-name" colspan="4">
-          <div>{{ matchRule.name }}</div>
-          <div class="gl-text-gray-500">
-            <gl-sprintf :message="matchRule.enableDescription">
-              <template #link="{ content }">
-                <gl-link :href="matchRule.docsPath" target="_blank">{{ content }}</gl-link>
-              </template>
-            </gl-sprintf>
-          </div>
-        </td>
-        <td class="gl-px-2! gl-text-right">
-          <gl-button @click="$emit('enable')">
-            {{ s__('Enable') }}
-          </gl-button>
-        </td>
-      </template>
-
-      <!-- Approval rule suggestion when lacking appropriate CI job for the rule -->
-      <td v-else class="js-name" colspan="5">
-        <div>{{ matchRule.name }}</div>
+  <tr>
+    <!-- Suggested approval rule creation row -->
+    <template v-if="rule.hasConfiguredJob">
+      <td class="js-name" colspan="4">
+        <div>{{ rule.name }}</div>
         <div class="gl-text-gray-500">
-          <gl-sprintf :message="matchRule.description">
+          <gl-sprintf :message="rule.enableDescription">
             <template #link="{ content }">
-              <gl-link :href="matchRule.docsPath" target="_blank">{{ content }}</gl-link>
+              <gl-link :href="rule.docsPath" target="_blank">{{ content }}</gl-link>
             </template>
           </gl-sprintf>
         </div>
       </td>
+      <td class="gl-px-2! gl-text-right">
+        <gl-button @click="$emit('enable')">
+          {{ s__('Enable') }}
+        </gl-button>
+      </td>
     </template>
+
+    <!-- Approval rule suggestion when lacking appropriate CI job for the rule -->
+    <td v-else class="js-name" colspan="5">
+      <div>{{ rule.name }}</div>
+      <div class="gl-text-gray-500">
+        <gl-sprintf :message="rule.description">
+          <template #link="{ content }">
+            <gl-link :href="rule.docsPath" target="_blank">{{ content }}</gl-link>
+          </template>
+        </gl-sprintf>
+      </div>
+    </td>
   </tr>
 </template>

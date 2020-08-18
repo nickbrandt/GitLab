@@ -30,7 +30,7 @@ export default {
         : __('Update approval rule');
     },
     defaultRuleName() {
-      return this.rule && this.rule.defaultRuleName;
+      return this.rule?.defaultRuleName;
     },
   },
   methods: {

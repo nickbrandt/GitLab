@@ -124,7 +124,7 @@ describe('Approvals ProjectRules', () => {
       expect(nameCell.find('.js-help').exists()).toBeFalsy();
     });
 
-    it('should not render the unconfigured-security-rule component', () => {
+    it('should not render the unconfigured-security-rules component', () => {
       expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(false);
     });
   });
@@ -148,7 +148,7 @@ describe('Approvals ProjectRules', () => {
       );
     });
 
-    it('should render the unconfigured-security-rule component', () => {
+    it('should render the unconfigured-security-rules component', () => {
       expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(true);
     });
   });
@@ -172,7 +172,7 @@ describe('Approvals ProjectRules', () => {
       );
     });
 
-    it('should notrender the unconfigured-security-rule component', () => {
+    it('should not render the unconfigured-security-rule component', () => {
       expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(false);
     });
   });

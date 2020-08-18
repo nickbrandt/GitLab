@@ -1,14 +1,16 @@
 <script>
+import { camelCase } from 'lodash';
 import { mapState, mapActions } from 'vuex';
-import { LICENSE_CHECK_NAME, VULNERABILITY_CHECK_NAME } from 'ee/approvals/constants';
+import { GlSkeletonLoading } from '@gitlab/ui';
+import { LICENSE_CHECK_NAME, VULNERABILITY_CHECK_NAME, JOB_TYPES } from 'ee/approvals/constants';
 import { s__ } from '~/locale';
 import UnconfiguredSecurityRule from './unconfigured_security_rule.vue';
 
 export default {
   components: {
     UnconfiguredSecurityRule,
+    GlSkeletonLoading,
   },
-  props: {},
   inject: {
     vulnerabilityCheckHelpPagePath: {
       from: 'vulnerabilityCheckHelpPagePath',
@@ -18,6 +20,16 @@ export default {
       from: 'licenseCheckHelpPagePath',
       default: '',
     },
+  },
+  featureTypes: {
+    vulnerabilityCheck: [
+      JOB_TYPES.SAST,
+      JOB_TYPES.DAST,
+      JOB_TYPES.DEPENDENCY_SCANNING,
+      JOB_TYPES.SECRET_DETECTION,
+      JOB_TYPES.COVERAGE_FUZZING,
+    ],
+    licenseCheck: [JOB_TYPES.LICENSE_SCANNING],
   },
   computed: {
     ...mapState('securityConfiguration', ['configuration']),
@@ -53,6 +65,17 @@ export default {
         },
       ];
     },
+    unconfiguredRules() {
+      return this.securityRules.reduce((filtered, securityRule) => {
+        const hasApprovalRuleDefined = this.hasApprovalRuleDefined(securityRule);
+        const hasConfiguredJob = this.hasConfiguredJob(securityRule);
+
+        if (!hasApprovalRuleDefined || !hasConfiguredJob) {
+          filtered.push({ ...securityRule, hasConfiguredJob });
+        }
+        return filtered;
+      }, []);
+    },
   },
   created() {
     this.fetchSecurityConfiguration();
@@ -60,6 +83,19 @@ export default {
   methods: {
     ...mapActions('securityConfiguration', ['fetchSecurityConfiguration']),
     ...mapActions({ openCreateModal: 'createModal/open' }),
+    hasApprovalRuleDefined(matchRule) {
+      return this.rules.some(rule => {
+        return matchRule.name === rule.name;
+      });
+    },
+    hasConfiguredJob(matchRule) {
+      const { features = [] } = this.configuration;
+      return this.$options.featureTypes[camelCase(matchRule.name)].some(featureType => {
+        return features.some(feature => {
+          return feature.type === featureType && feature.configured;
+        });
+      });
+    },
   },
 };
 </script>
@@ -67,14 +103,18 @@ export default {
 <template>
   <table class="table m-0">
     <tbody>
+      <tr v-if="isRulesLoading">
+        <td colspan="3">
+          <gl-skeleton-loading :lines="3" />
+        </td>
+      </tr>
+
       <unconfigured-security-rule
-        v-for="securityRule in securityRules"
-        :key="securityRule.name"
-        :configuration="configuration"
-        :rules="rules"
-        :is-loading="isRulesLoading"
-        :match-rule="securityRule"
-        @enable="openCreateModal({ defaultRuleName: securityRule.name })"
+        v-for="rule in unconfiguredRules"
+        v-else
+        :key="rule.name"
+        :rule="rule"
+        @enable="openCreateModal({ defaultRuleName: rule.name })"
       />
     </tbody>
   </table>
