@@ -52,17 +52,17 @@ RSpec.describe Gitlab::Geo::GeoTasks do
       expect(subject).not_to receive(:abort)
 
       expect { subject.set_secondary_as_primary }.to output(/#{secondary.url} is now the primary Geo node/).to_stdout
-      expect(secondary.reload.primary).to be true
+      expect(secondary.reload).to be_primary
     end
 
     it 'sets the secondary as the primary node, even if the secondary is disabled' do
-      secondary.update_column(:enabled, true)
+      secondary.update_column(:enabled, false)
 
       expect(subject).not_to receive(:abort)
 
       expect { subject.set_secondary_as_primary }.to output(/#{secondary.url} is now the primary Geo node/).to_stdout
-      expect(secondary.reload.primary).to be true
-      expect(secondary.reload.enabled?).to be true
+      expect(secondary.reload).to be_primary
+      expect(secondary.reload).to be_enabled
     end
   end
 end
