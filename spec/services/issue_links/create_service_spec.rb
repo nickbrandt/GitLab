@@ -13,8 +13,6 @@ RSpec.describe IssueLinks::CreateService do
     end
 
     before do
-      stub_licensed_features(blocked_issues: true)
-
       project.add_developer(user)
     end
 
@@ -87,7 +85,7 @@ RSpec.describe IssueLinks::CreateService do
       let(:another_project_issue_ref) { another_project_issue.to_reference(project) }
 
       let(:params) do
-        { issuable_references: [issue_a_ref, another_project_issue_ref], link_type: 'is_blocked_by' }
+        { issuable_references: [issue_a_ref, another_project_issue_ref] }
       end
 
       before do
@@ -97,8 +95,8 @@ RSpec.describe IssueLinks::CreateService do
       it 'creates relationships' do
         expect { subject }.to change(IssueLink, :count).from(0).to(2)
 
-        expect(IssueLink.find_by!(target: issue_a)).to have_attributes(source: issue, link_type: 'is_blocked_by')
-        expect(IssueLink.find_by!(target: another_project_issue)).to have_attributes(source: issue, link_type: 'is_blocked_by')
+        expect(IssueLink.find_by!(target: issue_a)).to have_attributes(source: issue, link_type: 'relates_to')
+        expect(IssueLink.find_by!(target: another_project_issue)).to have_attributes(source: issue, link_type: 'relates_to')
       end
 
       it 'returns success status' do
@@ -129,7 +127,7 @@ RSpec.describe IssueLinks::CreateService do
 
       before do
         create :issue_link, source: issue, target: issue_b, link_type: IssueLink::TYPE_RELATES_TO
-        create :issue_link, source: issue, target: issue_c, link_type: IssueLink::TYPE_IS_BLOCKED_BY
+        create :issue_link, source: issue, target: issue_c, link_type: IssueLink::TYPE_RELATES_TO
       end
 
       let(:params) do
@@ -139,26 +137,19 @@ RSpec.describe IssueLinks::CreateService do
             issue_b.to_reference,
             issue_c.to_reference
           ],
-          link_type: IssueLink::TYPE_IS_BLOCKED_BY
+          link_type: IssueLink::TYPE_RELATES_TO
         }
       end
 
-      it 'creates notes only for new and changed relations' do
+      it 'creates notes only for new relations' do
         expect(SystemNoteService).to receive(:relate_issue).with(issue, issue_a, anything)
         expect(SystemNoteService).to receive(:relate_issue).with(issue_a, issue, anything)
-        expect(SystemNoteService).to receive(:relate_issue).with(issue, issue_b, anything)
-        expect(SystemNoteService).to receive(:relate_issue).with(issue_b, issue, anything)
+        expect(SystemNoteService).not_to receive(:relate_issue).with(issue, issue_b, anything)
+        expect(SystemNoteService).not_to receive(:relate_issue).with(issue_b, issue, anything)
         expect(SystemNoteService).not_to receive(:relate_issue).with(issue, issue_c, anything)
         expect(SystemNoteService).not_to receive(:relate_issue).with(issue_c, issue, anything)
 
         subject
-      end
-
-      it 'sets the same type of relation for selected references' do
-        expect(subject).to eq(status: :success)
-
-        expect(IssueLink.where(target: [issue_a, issue_b, issue_c]).pluck(:link_type))
-          .to eq([IssueLink::TYPE_IS_BLOCKED_BY, IssueLink::TYPE_IS_BLOCKED_BY, IssueLink::TYPE_IS_BLOCKED_BY])
       end
     end
 

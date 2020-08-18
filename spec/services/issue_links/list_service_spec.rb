@@ -9,8 +9,6 @@ RSpec.describe IssueLinks::ListService do
   let(:user_role) { :developer }
 
   before do
-    stub_licensed_features(blocked_issues: true)
-
     project.add_role(user, user_role)
   end
 

@@ -42,13 +42,7 @@ module IssuableLinks
 
     def create_links
       objects = linkable_issuables(referenced_issuables)
-      # it is important that this is not called after relate_issuables, as it relinks epic to the issuable
-      # see EpicLinks::EpicIssues#relate_issuables
-      affected_epics = affected_epics(objects)
-
       link_issuables(objects)
-
-      Epics::UpdateDatesService.new(affected_epics).execute unless affected_epics.blank?
     end
 
     def link_issuables(target_issuables)
@@ -88,10 +82,6 @@ module IssuableLinks
       references(extractor)
     end
 
-    def affected_epics(issues)
-      []
-    end
-
     def references(extractor)
       extractor.issues
     end
@@ -121,3 +111,5 @@ module IssuableLinks
     end
   end
 end
+
+IssuableLinks::CreateService.prepend_if_ee('EE::IssuableLinks::CreateService')
