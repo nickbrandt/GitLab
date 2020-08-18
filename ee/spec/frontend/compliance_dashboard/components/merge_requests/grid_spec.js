@@ -1,17 +1,19 @@
 import { shallowMount } from '@vue/test-utils';
 
+import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+
 import Approvers from 'ee/compliance_dashboard/components/merge_requests/approvers.vue';
 import BranchDetails from 'ee/compliance_dashboard/components/merge_requests/branch_details.vue';
 import MergeRequestsGrid from 'ee/compliance_dashboard/components/merge_requests/grid.vue';
 import Status from 'ee/compliance_dashboard/components/merge_requests/status.vue';
 
-import { createMergeRequests } from '../../mock_data';
+import { createMergeRequests, mergedAt } from '../../mock_data';
 
 describe('MergeRequestsGrid component', () => {
   let wrapper;
 
   const findMergeRequests = () => wrapper.findAll('[data-testid="merge-request"]');
-  const findTime = () => wrapper.find('time');
+  const findTime = () => wrapper.find(TimeAgoTooltip);
   const findStatuses = () => wrapper.findAll(Status);
   const findApprovers = () => wrapper.find(Approvers);
   const findBranchDetails = () => wrapper.find(BranchDetails);
@@ -91,7 +93,7 @@ describe('MergeRequestsGrid component', () => {
     });
 
     it('renders the "merged at" time', () => {
-      expect(findTime().text()).toBe('merged 2 days ago');
+      expect(findTime().props('time')).toEqual(mergedAt());
     });
   });
 });
