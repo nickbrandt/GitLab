@@ -107,10 +107,7 @@ class Projects::ForksController < Projects::ApplicationController
   end
 
   def memberships_hash
-    current_user.members.inject({}) do |memberships, member|
-      memberships[member.source_id] = member
-      memberships
-    end
+    current_user.members.index_by(&:source_id)
   end
 end
 

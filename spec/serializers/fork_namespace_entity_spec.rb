@@ -8,21 +8,18 @@ RSpec.describe ForkNamespaceEntity do
 
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
-
-  let(:namespace) { create(:group, :with_avatar, description: 'test') }
+  let_it_be(:namespace) { create(:group, :with_avatar, description: 'test') }
   let(:memberships) do
-    user.members.inject({}) do |memberships, member|
-      memberships[member.source_id] = member
-      memberships
-    end
+    user.members.index_by(&:source_id)
   end
+
   let(:entity) { described_class.new(namespace, current_user: user, project: project, memberships: memberships) }
 
   subject(:json) { entity.as_json }
 
   before do
-    project.add_maintainer(user)
     namespace.add_developer(user)
+    project.add_maintainer(user)
   end
 
   it 'renders json' do
