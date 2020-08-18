@@ -3,7 +3,7 @@ import { __, sprintf } from '~/locale';
 
 export default address => {
   if (!validateIpAddress(address)) {
-    return sprintf(__('%{address} is an invalid IP address range'), { address }, false);
+    return sprintf(__('%{address} is an invalid IP address range'), { address });
   }
 
   return '';
