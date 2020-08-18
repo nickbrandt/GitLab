@@ -10061,7 +10061,7 @@ CREATE TABLE public.ci_pipeline_artifacts (
     pipeline_id bigint NOT NULL,
     project_id bigint NOT NULL,
     size integer NOT NULL,
-    file_store smallint NOT NULL,
+    file_store smallint DEFAULT 1 NOT NULL,
     file_type smallint NOT NULL,
     file_format smallint NOT NULL,
     file text,
