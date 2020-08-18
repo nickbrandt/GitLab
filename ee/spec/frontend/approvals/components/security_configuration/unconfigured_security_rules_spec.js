@@ -47,7 +47,10 @@ describe('UnconfiguredSecurityRules component', () => {
     });
 
     it('should fetch the security configuration', () => {
-      expect(store.dispatch).toHaveBeenCalledWith('securityConfiguration/fetchSecurityConfiguration', undefined);
+      expect(store.dispatch).toHaveBeenCalledWith(
+        'securityConfiguration/fetchSecurityConfiguration',
+        undefined,
+      );
     });
 
     it('should render a unconfigured-security-rule component for every security rule ', () => {
@@ -56,21 +59,23 @@ describe('UnconfiguredSecurityRules component', () => {
   });
 
   describe.each`
-  approvalsLoading | securityConfigurationLoading   | shouldRender
-  ${false}         | ${false}                       | ${false}
-  ${true}          | ${false}                       | ${true}
-  ${false}         | ${true}                        | ${true}
-  ${true}          | ${true}                        | ${true}
-  `
-  ('while approvalsLoading is $approvalsLoading and securityConfigurationLoading is $securityConfigurationLoading', ({approvalsLoading, securityConfigurationLoading, shouldRender}) => {
-    beforeEach(() => {
-      createWrapper();
-      store.state.approvals.isLoading = approvalsLoading;
-      store.state.securityConfiguration.isLoading = securityConfigurationLoading;
-    });
+    approvalsLoading | securityConfigurationLoading | shouldRender
+    ${false}         | ${false}                     | ${false}
+    ${true}          | ${false}                     | ${true}
+    ${false}         | ${true}                      | ${true}
+    ${true}          | ${true}                      | ${true}
+  `(
+    'while approvalsLoading is $approvalsLoading and securityConfigurationLoading is $securityConfigurationLoading',
+    ({ approvalsLoading, securityConfigurationLoading, shouldRender }) => {
+      beforeEach(() => {
+        createWrapper();
+        store.state.approvals.isLoading = approvalsLoading;
+        store.state.securityConfiguration.isLoading = securityConfigurationLoading;
+      });
 
-    it(`should render the loading skeleton is ${shouldRender}`, () => {
-      expect(wrapper.contains(GlSkeletonLoading)).toBe(shouldRender);
-    });
-  });  
+      it(`should ${shouldRender ? '' : 'not'} render the loading skeleton`, () => {
+        expect(wrapper.contains(GlSkeletonLoading)).toBe(shouldRender);
+      });
+    },
+  );
 });

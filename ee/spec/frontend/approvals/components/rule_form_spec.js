@@ -483,65 +483,35 @@ describe('EE Approvals RuleForm', () => {
     });
 
     describe('with approvalSuggestions enabled', () => {
-      describe('with initRuleFieldName set to Vulnerability-Check', () => {
-        beforeEach(() => {
-          createComponent(
-            {
-              initRule: null,
-              defaultRuleName: 'Vulnerability-Check',
-            },
-            {
-              provide: {
-                glFeatures: { approvalSuggestions: true },
+      describe.each`
+        defaultRuleName          | expectedDisabledAttribute
+        ${'Vulnerability-Check'} | ${'disabled'}
+        ${'License-Check'}       | ${'disabled'}
+        ${'Foo Bar Baz'}         | ${undefined}
+      `(
+        'with defaultRuleName set to $defaultRuleName',
+        ({ defaultRuleName, expectedDisabledAttribute }) => {
+          beforeEach(() => {
+            createComponent(
+              {
+                initRule: null,
+                defaultRuleName,
               },
-            },
-          );
-        });
-
-        it('it disables the name text field', () => {
-          expect(findNameInput().attributes('disabled')).toBe('disabled');
-        });
-      });
-
-      describe('with initRuleFieldName set to License-Check', () => {
-        beforeEach(() => {
-          createComponent(
-            {
-              initRule: null,
-              defaultRuleName: 'License-Check',
-            },
-            {
-              provide: {
-                glFeatures: { approvalSuggestions: true },
+              {
+                provide: {
+                  glFeatures: { approvalSuggestions: true },
+                },
               },
-            },
-          );
-        });
+            );
+          });
 
-        it('it disables the name text field', () => {
-          expect(findNameInput().attributes('disabled')).toBe('disabled');
-        });
-      });
-
-      describe('with initRuleFieldName set to any other string', () => {
-        beforeEach(() => {
-          createComponent(
-            {
-              initRule: null,
-              defaultRuleName: 'Foo Bar Baz',
-            },
-            {
-              provide: {
-                glFeatures: { approvalSuggestions: true },
-              },
-            },
-          );
-        });
-
-        it('does not disable the name text field', () => {
-          expect(findNameInput().attributes('disabled')).toBe(undefined);
-        });
-      });
+          it(`it ${
+            expectedDisabledAttribute ? 'disables' : 'does not disable'
+          } the name text field`, () => {
+            expect(findNameInput().attributes('disabled')).toBe(expectedDisabledAttribute);
+          });
+        },
+      );
     });
 
     describe('with new License-Check rule', () => {

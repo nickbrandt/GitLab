@@ -129,51 +129,32 @@ describe('Approvals ProjectRules', () => {
     });
   });
 
-  describe('when the approvalSuggestions feature flag is enabled', () => {
-    beforeEach(() => {
-      const rules = createProjectRules();
-      rules[0].name = 'Vulnerability-Check';
-      store.modules.approvals.state.rules = rules;
-      store.state.settings.allowMultiRule = true;
-    });
+  describe.each([true, false])(
+    'when the approvalSuggestions feature flag is %p',
+    approvalSuggestions => {
+      beforeEach(() => {
+        const rules = createProjectRules();
+        rules[0].name = 'Vulnerability-Check';
+        store.modules.approvals.state.rules = rules;
+        store.state.settings.allowMultiRule = true;
+      });
 
-    beforeEach(() => {
-      factory(
-        {},
-        {
-          provide: {
-            glFeatures: { approvalSuggestions: true },
+      beforeEach(() => {
+        factory(
+          {},
+          {
+            provide: {
+              glFeatures: { approvalSuggestions },
+            },
           },
-        },
-      );
-    });
+        );
+      });
 
-    it('should render the unconfigured-security-rules component', () => {
-      expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(true);
-    });
-  });
-
-  describe('when the approvalSuggestions feature flag is disabled', () => {
-    beforeEach(() => {
-      const rules = createProjectRules();
-      rules[0].name = 'Vulnerability-Check';
-      store.modules.approvals.state.rules = rules;
-      store.state.settings.allowMultiRule = true;
-    });
-
-    beforeEach(() => {
-      factory(
-        {},
-        {
-          provide: {
-            glFeatures: { approvalSuggestions: false },
-          },
-        },
-      );
-    });
-
-    it('should not render the unconfigured-security-rule component', () => {
-      expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(false);
-    });
-  });
+      it(`should ${
+        approvalSuggestions ? '' : 'not'
+      } render the unconfigured-security-rule component`, () => {
+        expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(approvalSuggestions);
+      });
+    },
+  );
 });
