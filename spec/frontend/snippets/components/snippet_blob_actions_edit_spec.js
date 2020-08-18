@@ -217,7 +217,7 @@ describe('snippets/components/snippet_blob_actions_edit', () => {
 
   describe('with 1 blob', () => {
     beforeEach(() => {
-      createComponent({ initBlobs: [createBlobFromTestEntry(testEntries.created)], isReady: true });
+      createComponent({ initBlobs: [createBlobFromTestEntry(testEntries.created)] });
     });
 
     it('disables delete button', () => {
@@ -253,7 +253,7 @@ describe('snippets/components/snippet_blob_actions_edit', () => {
 
   describe('with 0 init blob', () => {
     beforeEach(() => {
-      createComponent({ initBlobs: [], isReady: true });
+      createComponent({ initBlobs: [] });
     });
 
     it('shows 1 blob by default', () => {
@@ -287,7 +287,7 @@ describe('snippets/components/snippet_blob_actions_edit', () => {
         .fill(1)
         .map(() => createBlobFromTestEntry(testEntries.created));
 
-      createComponent({ initBlobs, isReady: true });
+      createComponent({ initBlobs });
     });
 
     it('should have blobs', () => {

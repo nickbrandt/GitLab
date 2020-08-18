@@ -14,8 +14,6 @@ export default {
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
-    // TODO: Build reactivity for initBlobs.
-    // What happens if this changes (i.e. blobs are being loaded through pages)?
     initBlobs: {
       type: Array,
       required: true,
