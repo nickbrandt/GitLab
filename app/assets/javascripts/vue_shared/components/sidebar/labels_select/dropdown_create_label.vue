@@ -73,7 +73,7 @@ export default {
           category="secondary"
           variant="default"
         >
-          {{ __('Create') }}}
+          {{ __('Create') }}
         </gl-button>
         <gl-button type="button" class="js-cancel-label-btn" category="secondary" variant="default">
           {{ __('Cancel') }}
