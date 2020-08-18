@@ -2,6 +2,18 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 13.2.6 (2020-08-18)
+
+- No changes.
+
+## 13.2.5 (2020-08-17)
+
+### Security (2 changes)
+
+- Stop deploy token being mis-used as user in ProjectPolicy and GroupPolicy.
+- Project access is checked during deploy token authentication.
+
+
 ## 13.2.4 (2020-08-11)
 
 ### Security (1 change)
@@ -1058,6 +1070,18 @@ entry.
 - Remove removeIssue logic from list model. (nuwe1)
 
 
+## 13.1.8 (2020-08-18)
+
+- No changes.
+
+## 13.1.7 (2020-08-17)
+
+### Security (2 changes)
+
+- Stop deploy token being mis-used as user in ProjectPolicy and GroupPolicy.
+- Project access is checked during deploy token authentication.
+
+
 ## 13.1.6 (2020-08-05)
 
 ### Security (11 changes)
@@ -1607,6 +1631,18 @@ entry.
 - Add GraphQL snippet FileInputType. !34442
 - Update red hex values to match GitLab UI. !34544
 - Remove removeIssue logic from list model. (nuwe1)
+
+
+## 13.0.14 (2020-08-18)
+
+- No changes.
+
+## 13.0.13 (2020-08-17)
+
+### Security (2 changes)
+
+- Stop deploy token being mis-used as user in ProjectPolicy and GroupPolicy.
+- Project access is checked during deploy token authentication.
 
 
 ## 13.0.12 (2020-08-05)

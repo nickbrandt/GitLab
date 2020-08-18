@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.2.6 (2020-08-18)
+
+- No changes.
+
+## 13.2.5 (2020-08-17)
+
+- No changes.
+
 ## 13.2.4 (2020-08-11)
 
 ### Performance (1 change)
@@ -383,6 +391,14 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Resolve duplicate use of shorcuts-tree. !36732
 
 
+## 13.1.8 (2020-08-18)
+
+- No changes.
+
+## 13.1.7 (2020-08-17)
+
+- No changes.
+
 ## 13.1.6 (2020-08-05)
 
 - No changes.
@@ -567,6 +583,14 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove optimized_elasticsearch_indexes_project feature flag. !33965
 - Relocate Go models. !34338 (Ethan Reesor (@firelizzard))
 
+
+## 13.0.14 (2020-08-18)
+
+- No changes.
+
+## 13.0.13 (2020-08-17)
+
+- No changes.
 
 ## 13.0.12 (2020-08-05)
 
