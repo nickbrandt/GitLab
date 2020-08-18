@@ -21,8 +21,22 @@ module Analytics
       Gitlab::Analytics::UniqueVisits.new.track_visit(visitor_id, target_id)
     end
 
+    def track_compliance_visit(target_id)
+      return unless Feature.enabled?(:track_unique_visits)
+      return unless Gitlab::CurrentSettings.usage_ping_enabled?
+      return unless visitor_id
+
+      Gitlab::Analytics::ComplianceUniqueVisits.new.track_visit(visitor_id, target_id)
+    end
+
     class_methods do
       def track_unique_visits(controller_actions, target_id:)
+        after_action only: controller_actions, if: -> { request.format.html? && request.headers['DNT'] != '1' } do
+          track_visit(target_id)
+        end
+      end
+
+      def track_unique_compliance_visits(controller_actions, target_id:)
         after_action only: controller_actions, if: -> { request.format.html? && request.headers['DNT'] != '1' } do
           track_visit(target_id)
         end

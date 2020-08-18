@@ -24,14 +24,11 @@ RSpec.describe Gitlab::Analytics::ComplianceUniqueVisits, :clean_gitlab_redis_sh
       known_events = ::Gitlab::Analytics::ComplianceUniqueVisits::KNOWN_EVENTS
 
       unique_visits.track_visit(visitor3_id, target4_id, 7.days.ago)
-
       unique_visits.track_visit(visitor3_id, target5_id, 15.days.ago)
       unique_visits.track_visit(visitor2_id, target5_id, 15.days.ago)
 
       expect(unique_visits.unique_visits_for(targets: target4_id)).to eq(1)
-
       expect(unique_visits.unique_visits_for(targets: target5_id, start_week: 15.days.ago)).to eq(2)
-
 
       expect(unique_visits.unique_visits_for(targets: known_events)).to eq(1)
       expect(unique_visits.unique_visits_for(targets: known_events, start_week: 15.days.ago)).to eq(2)
