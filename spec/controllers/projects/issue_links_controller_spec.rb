@@ -10,7 +10,7 @@ RSpec.describe Projects::IssueLinksController do
   let_it_be(:issue2) { create(:issue, project: project) }
 
   describe 'GET #index' do
-    let_it_be(:issue_link) { create(:issue_link, source: issue1, target: issue2, link_type: 'is_blocked_by') }
+    let_it_be(:issue_link) { create(:issue_link, source: issue1, target: issue2, link_type: 'relates_to') }
 
     def get_link(user, issue)
       sign_in(user)
@@ -35,7 +35,7 @@ RSpec.describe Projects::IssueLinksController do
 
       link = json_response.first
       expect(link['id']).to eq(issue2.id)
-      expect(link['link_type']).to eq('is_blocked_by')
+      expect(link['link_type']).to eq('relates_to')
     end
   end
 
@@ -48,7 +48,7 @@ RSpec.describe Projects::IssueLinksController do
         project_id: issue.project,
         issue_id: issue.iid,
         issuable_references: [target.to_reference],
-        link_type: 'is_blocked_by'
+        link_type: 'relates_to'
       }
 
       post :create, params: post_params, as: :json
@@ -65,20 +65,7 @@ RSpec.describe Projects::IssueLinksController do
 
       link = json_response['issuables'].first
       expect(link['id']).to eq(issue2.id)
-      expect(link['link_type']).to eq('is_blocked_by')
-    end
-
-    context 'when blocked issues is disabled' do
-      before do
-        stub_licensed_features(blocked_issues: false)
-      end
-
-      it 'returns failure response' do
-        create_link(user, issue1, issue2)
-
-        expect(response).to have_gitlab_http_status(:forbidden)
-        expect(json_response['message']).to eq('Blocked issues not available for current license')
-      end
+      expect(link['link_type']).to eq('relates_to')
     end
   end
 end
