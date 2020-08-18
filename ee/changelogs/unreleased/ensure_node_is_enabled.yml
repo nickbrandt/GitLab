@@ -1,0 +1,5 @@
+---
+title: Ensure secondary is enabled on failover
+merge_request: 39615
+author:
+type: fixed

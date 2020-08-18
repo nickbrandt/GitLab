@@ -1,4 +1,5 @@
 <script>
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapActions } from 'vuex';
 import { groupBy, isNumber } from 'lodash';
 import { sprintf, __ } from '~/locale';
@@ -9,7 +10,8 @@ import { TYPE_USER, TYPE_GROUP, TYPE_HIDDEN_GROUPS } from '../constants';
 
 const DEFAULT_NAME = 'Default';
 const DEFAULT_NAME_FOR_LICENSE_REPORT = 'License-Check';
-const READONLY_NAMES = [DEFAULT_NAME_FOR_LICENSE_REPORT];
+const DEFAULT_NAME_FOR_VULNERABILITY_CHECK = 'Vulnerability-Check';
+const READONLY_NAMES = [DEFAULT_NAME_FOR_LICENSE_REPORT, DEFAULT_NAME_FOR_VULNERABILITY_CHECK];
 
 export default {
   components: {
@@ -17,6 +19,8 @@ export default {
     ApproversSelect,
     BranchesSelect,
   },
+  // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+  mixins: [glFeatureFlagsMixin()],
   props: {
     initRule: {
       type: Object,
@@ -28,9 +32,14 @@ export default {
       default: true,
       required: false,
     },
+    defaultRuleName: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
-    return {
+    const defaults = {
       name: '',
       approvalsRequired: 1,
       minApprovalsRequired: 0,
@@ -43,9 +52,19 @@ export default {
       containsHiddenGroups: false,
       ...this.getInitialData(),
     };
+    // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+    if (this.glFeatures.approvalSuggestions) {
+      return { ...defaults, name: this.defaultRuleName || defaults.name };
+    }
+
+    return defaults;
   },
   computed: {
     ...mapState(['settings']),
+    rule() {
+      // If we are creating a new rule with a suggested approval name
+      return this.defaultRuleName ? null : this.initRule;
+    },
     approversByType() {
       return groupBy(this.approvers, x => x.type);
     },
@@ -132,6 +151,12 @@ export default {
       return !this.settings.lockedApprovalsRuleName;
     },
     isNameDisabled() {
+      // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+      if (this.glFeatures.approvalSuggestions) {
+        return (
+          Boolean(this.isPersisted || this.defaultRuleName) && READONLY_NAMES.includes(this.name)
+        );
+      }
       return this.isPersisted && READONLY_NAMES.includes(this.name);
     },
     removeHiddenGroups() {
@@ -232,7 +257,7 @@ export default {
       return this.isValid;
     },
     getInitialData() {
-      if (!this.initRule) {
+      if (!this.initRule || this.defaultRuleName) {
         return {};
       }
 
@@ -309,7 +334,7 @@ export default {
             v-model="branchesToAdd"
             :project-id="settings.projectId"
             :is-invalid="!!validation.branches"
-            :init-rule="initRule"
+            :init-rule="rule"
           />
           <div class="invalid-feedback">{{ validation.branches }}</div>
         </div>

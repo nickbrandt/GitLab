@@ -11,25 +11,8 @@ describe('security configuration module actions', () => {
   let state;
 
   beforeEach(() => {
-    state = createState();
-  });
-
-  describe('setSecurityConfigurationEndpoint', () => {
-    const securityConfigurationPath = 123;
-
-    it('should commit the SET_SECURITY_CONFIGURATION_ENDPOINT mutation', async () => {
-      await testAction(
-        actions.setSecurityConfigurationEndpoint,
-        securityConfigurationPath,
-        state,
-        [
-          {
-            type: types.SET_SECURITY_CONFIGURATION_ENDPOINT,
-            payload: securityConfigurationPath,
-          },
-        ],
-        [],
-      );
+    state = createState({
+      securityConfigurationPath: `${TEST_HOST}/-/security/configuration.json`,
     });
   });
 
@@ -38,7 +21,6 @@ describe('security configuration module actions', () => {
     const configuration = {};
 
     beforeEach(() => {
-      state.securityConfigurationPath = `${TEST_HOST}/-/security/configuration.json`;
       mock = new MockAdapter(axios);
     });
 
