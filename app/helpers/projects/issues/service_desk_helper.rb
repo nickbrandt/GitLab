@@ -20,15 +20,15 @@ module Projects::Issues::ServiceDeskHelper
   def supported_meta(project)
     {
       service_desk_address: project.service_desk_address,
-      service_desk_help_page: expose_url('help/user/project/service_desk'),
-      edit_project_page: expose_url(edit_project_path(project)),
+      service_desk_help_page: help_page_path('user/project/service_desk'),
+      edit_project_page: edit_project_path(project),
       svg_path: image_path('illustrations/service_desk_empty.svg')
     }
   end
 
   def unsupported_meta(project)
     {
-      incoming_email_help_page: "#{expose_url('/help/administration/incoming_email')}\#set-it-up",
+      incoming_email_help_page: help_page_path('administration/incoming_email', anchor: 'set-it-up'),
       svg_path: image_path('illustrations/service-desk-setup.svg')
     }
   end
