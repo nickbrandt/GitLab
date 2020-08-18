@@ -42,9 +42,16 @@
   }
 
   .controls {
-    .requirement-edit .btn,
-    .requirement-archive .btn {
-      padding: $gl-padding-4 $gl-vert-padding;
+    align-items: flex-start;
+
+    @include media-breakpoint-down(xs) {
+      .requirement-archive {
+        margin-top: $gl-padding-4;
+      }
+
+      .requirement-edit {
+        margin-right: 0;
+      }
     }
   }
 
