@@ -65,7 +65,7 @@ RSpec.describe Issues::MoveService do
     let!(:issue_link_d) { create(:issue_link, source: authorized_issue_d, target: old_issue) }
 
     before do
-      stub_licensed_features(related_issues: true)
+      stub_licensed_features(blocked_issues: true)
       authorized_project.add_developer(user)
       authorized_project2.add_developer(user)
     end

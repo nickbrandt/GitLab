@@ -7,7 +7,7 @@ module EE
 
     prepended do
       with_scope :subject
-      condition(:related_issues_disabled) { !@subject.feature_available?(:related_issues) }
+      condition(:related_issues_disabled) { !@subject.feature_available?(:blocked_issues) }
 
       with_scope :subject
       condition(:repository_mirrors_enabled) { @subject.feature_available?(:repository_mirrors) }
@@ -197,16 +197,11 @@ module EE
 
       rule { ~group_timelogs_available }.prevent :read_group_timelogs
 
-      rule { can?(:read_issue) }.policy do
-        enable :read_issue_link
-      end
-
       rule { can?(:guest_access) & iterations_available }.enable :read_iteration
 
       rule { can?(:reporter_access) }.policy do
         enable :admin_board
         enable :read_deploy_board
-        enable :admin_issue_link
         enable :admin_epic_issue
         enable :read_group_timelogs
       end

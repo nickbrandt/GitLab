@@ -334,7 +334,7 @@ RSpec.describe Notes::QuickActionsService do
 
       context 'related issues are not enabled' do
         before do
-          stub_licensed_features(related_issues: false)
+          stub_licensed_features(blocked_issues: false)
         end
 
         it 'does not create issue relation' do
@@ -344,7 +344,7 @@ RSpec.describe Notes::QuickActionsService do
 
       context 'related issues are enabled' do
         before do
-          stub_licensed_features(related_issues: true)
+          stub_licensed_features(blocked_issues: true)
         end
 
         it 'creates issue relation' do

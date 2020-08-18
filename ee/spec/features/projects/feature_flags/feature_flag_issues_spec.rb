@@ -75,7 +75,7 @@ RSpec.describe 'Feature flag issue links', :js do
 
     context 'when the related issues feature is unavailable' do
       before do
-        stub_licensed_features(related_issues: false, feature_flags: true)
+        stub_licensed_features(blocked_issues: false, feature_flags: true)
       end
 
       it 'does not show the related issues widget' do
