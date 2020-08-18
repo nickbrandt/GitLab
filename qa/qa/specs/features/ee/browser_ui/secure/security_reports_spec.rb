@@ -97,12 +97,18 @@ module QA
         end
       end
 
-      it 'displays security reports in the group security dashboard', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/235804', type: :stale } do
+      it 'displays security reports in the group security dashboard' do
         Page::Main::Menu.perform(&:go_to_groups)
         Page::Dashboard::Groups.perform do |groups|
           groups.click_group @project.group.path
         end
         Page::Group::Menu.perform(&:click_group_security_link)
+
+        EE::Page::Group::Secure::Show.perform do |dashboard|
+          expect(dashboard).to have_security_status_project_for_severity('F', @project)
+        end
+
+        Page::Group::Menu.perform(&:click_group_vulnerability_link)
 
         EE::Page::Group::Secure::Show.perform do |dashboard|
           dashboard.filter_project(@project.name)
