@@ -211,7 +211,7 @@ module Vulnerabilities
     end
 
     def issue_feedback
-      feedback(feedback_type: 'issue')
+      Vulnerabilities::Feedback.find_by(issue: vulnerability&.related_issues) if vulnerability
     end
 
     def merge_request_feedback
