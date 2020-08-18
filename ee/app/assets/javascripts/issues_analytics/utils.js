@@ -1,6 +1,6 @@
 /**
  * This util method takes the global page filters and transforms parameters which
- * are not standardized between the internal issues analytics api and the public
+ * are not standardized between the internal issue analytics api and the public
  * issues api.
  *
  * @param {Object} filters the global filters used to fetch issues data

@@ -19,14 +19,14 @@ RSpec.describe 'Project navbar' do
     sign_in(user)
   end
 
-  context 'when issues analytics is available' do
+  context 'when issue analytics is available' do
     before do
       stub_licensed_features(issues_analytics: true)
 
       insert_after_sub_nav_item(
         _('Code Review'),
         within: _('Analytics'),
-        new_sub_nav_item_name: _('Issues')
+        new_sub_nav_item_name: _('Issue')
       )
 
       visit project_path(project)

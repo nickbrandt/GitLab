@@ -13381,6 +13381,9 @@ msgstr ""
 msgid "Issue %{issue_reference} has already been added to epic %{epic_reference}."
 msgstr ""
 
+msgid "Issue Analytics"
+msgstr ""
+
 msgid "Issue Boards"
 msgstr ""
 
@@ -13478,9 +13481,6 @@ msgid "IssueTracker|YouTrack issue tracker"
 msgstr ""
 
 msgid "Issues"
-msgstr ""
-
-msgid "Issues Analytics"
 msgstr ""
 
 msgid "Issues Rate Limits"
