@@ -15344,6 +15344,12 @@ msgstr ""
 msgid "Metrics|Check out the CI/CD documentation on deploying to an environment"
 msgstr ""
 
+msgid "Metrics|Collapse panel"
+msgstr ""
+
+msgid "Metrics|Collapse panel (Esc)"
+msgstr ""
+
 msgid "Metrics|Copy YAML"
 msgstr ""
 
@@ -15404,9 +15410,6 @@ msgid "Metrics|Expand panel"
 msgstr ""
 
 msgid "Metrics|For grouping similar metrics"
-msgstr ""
-
-msgid "Metrics|Go back (Esc)"
 msgstr ""
 
 msgid "Metrics|Invalid time range, please verify."
