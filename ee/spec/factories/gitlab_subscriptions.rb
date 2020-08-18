@@ -24,6 +24,10 @@ FactoryBot.define do
       trial_ends_on { Date.today.advance(days: -1) }
     end
 
+    trait :default do
+      association :hosted_plan, factory: :default_plan
+    end
+
     trait :free do
       hosted_plan_id { nil }
     end
