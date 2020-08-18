@@ -179,6 +179,16 @@ FactoryBot.define do
       end
     end
 
+    trait :sast_with_missing_identifiers do
+      file_type { :sast }
+      file_format { :raw }
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-sast-missing-identifiers.json'), 'application/json')
+      end
+    end
+
     trait :license_management do
       to_create { |instance| instance.save!(validate: false) }
 
