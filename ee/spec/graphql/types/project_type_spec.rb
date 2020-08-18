@@ -15,12 +15,105 @@ RSpec.describe GitlabSchema.types['Project'] do
 
   it 'includes the ee specific fields' do
     expected_fields = %w[
-      vulnerabilities vulnerability_scanners requirement_states_count
+      vulnerabilities sast_ci_configuration vulnerability_scanners requirement_states_count
       vulnerability_severities_count packages compliance_frameworks
       security_dashboard_path iterations
     ]
 
     expect(described_class).to include_graphql_fields(*expected_fields)
+  end
+
+  describe 'sast_ci_configuration' do
+    include_context 'read ci configuration for sast enabled project'
+    let(:error_message) { "This is an error for YamlProcessor." }
+
+    let_it_be(:query) do
+      %(
+        query {
+            project(fullPath: "#{project.full_path}") {
+                sastCiConfiguration {
+                  global {
+                    nodes {
+                      type
+                      options {
+                        nodes {
+                          label
+                          value
+                        }
+                      }
+                      field
+                      label
+                      defaultValue
+                      value
+                    }
+                  }
+                  pipeline {
+                    nodes {
+                      type
+                      options {
+                        nodes {
+                          label
+                          value
+                        }
+                      }
+                      field
+                      label
+                      defaultValue
+                      value
+                    }
+                  }
+                  analyzers {
+                    nodes {
+                      name
+                      label
+                      enabled
+                    }
+                  }
+                }
+              }
+        }
+      )
+    end
+
+    before do
+      allow(project.repository).to receive(:blob_data_at).and_return(gitlab_ci_yml_content)
+    end
+
+    subject { GitlabSchema.execute(query, context: { current_user: user }).as_json }
+
+    it "returns the project's sast configuration for global variables" do
+      secure_analyzers_prefix = subject.dig('data', 'project', 'sastCiConfiguration', 'global', 'nodes').first
+      expect(secure_analyzers_prefix['type']).to eq('string')
+      expect(secure_analyzers_prefix['field']).to eq('SECURE_ANALYZERS_PREFIX')
+      expect(secure_analyzers_prefix['label']).to eq('Image prefix')
+      expect(secure_analyzers_prefix['defaultValue']).to eq('registry.gitlab.com/gitlab-org/security-products/analyzers')
+      expect(secure_analyzers_prefix['value']).to be_nil
+      expect(secure_analyzers_prefix['options']).to be_nil
+    end
+
+    it "returns the project's sast configuration for pipeline variables" do
+      pipeline_stage = subject.dig('data', 'project', 'sastCiConfiguration', 'pipeline', 'nodes').first
+      expect(pipeline_stage['type']).to eq('string')
+      expect(pipeline_stage['field']).to eq('stage')
+      expect(pipeline_stage['label']).to eq('Stage')
+      expect(pipeline_stage['defaultValue']).to eq('test')
+      expect(pipeline_stage['value']).to be_nil
+    end
+
+    it "returns the project's sast configuration for analyzer variables" do
+      analyzer = subject.dig('data', 'project', 'sastCiConfiguration', 'analyzers', 'nodes').first
+      expect(analyzer['name']).to eq('brakeman')
+      expect(analyzer['label']).to eq('Brakeman')
+      expect(analyzer['enabled']).to eq(true)
+    end
+
+    it 'returns an error if there is an exception in YamlProcessor' do
+      allow_next_instance_of(::Security::CiConfiguration::SastParserService) do |service|
+        allow(service).to receive(:configuration).and_raise(::Gitlab::Ci::YamlProcessor::ValidationError.new(error_message))
+      end
+
+      expect(subject["errors"].first["message"]).to eql(error_message)
+    end
   end
 
   describe 'security_scanners' do
@@ -45,7 +138,6 @@ RSpec.describe GitlabSchema.types['Project'] do
     subject { GitlabSchema.execute(query, context: { current_user: user }).as_json }
 
     before do
-      project.add_developer(user)
       create(:ci_build, :success, :sast, pipeline: pipeline)
       create(:ci_build, :success, :dast, pipeline: pipeline)
       create(:ci_build, :success, :license_scanning, pipeline: pipeline)

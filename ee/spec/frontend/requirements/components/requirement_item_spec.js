@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 
-import { GlLink, GlDeprecatedButton, GlIcon, GlLoadingIcon } from '@gitlab/ui';
+import { GlLink, GlButton } from '@gitlab/ui';
 import RequirementItem from 'ee/requirements/components/requirement_item.vue';
 import RequirementStatusBadge from 'ee/requirements/components/requirement_status_badge.vue';
 
@@ -172,7 +172,7 @@ describe('RequirementItem', () => {
 
     it('renders requirement-status-badge component', () => {
       const statusBadgeElSm = wrapper.find('.issuable-main-info').find(RequirementStatusBadge);
-      const statusBadgeElMd = wrapper.find('.issuable-meta').find(RequirementStatusBadge);
+      const statusBadgeElMd = wrapper.find('.controls').find(RequirementStatusBadge);
 
       expect(statusBadgeElSm.exists()).toBe(true);
       expect(statusBadgeElMd.exists()).toBe(true);
@@ -182,12 +182,10 @@ describe('RequirementItem', () => {
     });
 
     it('renders element containing requirement `Edit` button when `requirement.userPermissions.updateRequirement` is true', () => {
-      const editButtonEl = wrapper.find('.controls .requirement-edit').find(GlDeprecatedButton);
+      const editButtonEl = wrapper.find('.controls .requirement-edit').find(GlButton);
 
       expect(editButtonEl.exists()).toBe(true);
       expect(editButtonEl.attributes('title')).toBe('Edit');
-      expect(editButtonEl.find(GlIcon).exists()).toBe(true);
-      expect(editButtonEl.find(GlIcon).props('name')).toBe('pencil');
     });
 
     it('does not render element containing requirement `Edit` button when `requirement.userPermissions.updateRequirement` is false', () => {
@@ -205,14 +203,10 @@ describe('RequirementItem', () => {
     });
 
     it('renders element containing requirement `Archive` button when `requirement.userPermissions.adminRequirement` is true', () => {
-      const archiveButtonEl = wrapper
-        .find('.controls .requirement-archive')
-        .find(GlDeprecatedButton);
+      const archiveButtonEl = wrapper.find('.controls .requirement-archive').find(GlButton);
 
       expect(archiveButtonEl.exists()).toBe(true);
       expect(archiveButtonEl.attributes('title')).toBe('Archive');
-      expect(archiveButtonEl.find(GlIcon).exists()).toBe(true);
-      expect(archiveButtonEl.find(GlIcon).props('name')).toBe('archive');
     });
 
     it('does not render element containing requirement `Archive` button when `requirement.userPermissions.adminRequirement` is false', () => {
@@ -229,23 +223,8 @@ describe('RequirementItem', () => {
       wrapperNoArchive.destroy();
     });
 
-    it('renders loading icon within archive button when `stateChangeRequestActive` prop is true', () => {
-      wrapper.setProps({
-        stateChangeRequestActive: true,
-      });
-
-      return wrapper.vm.$nextTick(() => {
-        expect(
-          wrapper
-            .find('.requirement-archive')
-            .find(GlLoadingIcon)
-            .exists(),
-        ).toBe(true);
-      });
-    });
-
     it('renders `Reopen` button when current requirement is archived and `requirement.userPermissions.adminRequirement` is true', () => {
-      const reopenButton = wrapperArchived.find('.requirement-reopen').find(GlDeprecatedButton);
+      const reopenButton = wrapperArchived.find('.requirement-reopen').find(GlButton);
 
       expect(reopenButton.exists()).toBe(true);
       expect(reopenButton.props('loading')).toBe(false);

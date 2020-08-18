@@ -87,6 +87,7 @@ describe('User Lists Edit Actions', () => {
         return testAction(actions.updateUserList, updatedList, state, [], [], () => {
           expect(Api.updateFeatureFlagUserList).toHaveBeenCalledWith('1', {
             name: updatedList.name,
+            iid: updatedList.iid,
           });
           expect(redirectTo).toHaveBeenCalledWith(userList.path);
         });
@@ -111,6 +112,7 @@ describe('User Lists Edit Actions', () => {
           () =>
             expect(Api.updateFeatureFlagUserList).toHaveBeenCalledWith('1', {
               name: updatedList.name,
+              iid: updatedList.iid,
             }),
         );
       });

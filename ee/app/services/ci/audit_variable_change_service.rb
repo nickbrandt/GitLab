@@ -23,6 +23,12 @@ module Ci
 
     def log_audit_event(action, variable)
       case variable.class.to_s
+      when ::Ci::Variable.to_s
+        ::AuditEventService.new(
+          current_user,
+          container,
+          action: action
+        ).for_project_variable(variable.key).security_event
       when ::Ci::GroupVariable.to_s
         ::AuditEventService.new(
           current_user,

@@ -171,7 +171,7 @@ export default {
       <gl-button
         v-if="canEdit"
         variant="link"
-        class="js-sidebar-dropdown-toggle edit-link gl-shadow-none float-right"
+        class="js-sidebar-dropdown-toggle edit-link gl-shadow-none float-right gl-reset-color! btn-link-hover"
         data-testid="iteration-edit-link"
         data-track-label="right_sidebar"
         data-track-property="iteration"

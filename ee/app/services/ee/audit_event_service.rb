@@ -170,6 +170,15 @@ module EE
       for_custom_model('project', @entity.full_path)
     end
 
+    # Builds the @details attribute for project variable
+    #
+    # This uses the [Ci::ProjectVariable] @entity as the target object being audited
+    #
+    # @return [AuditEventService]
+    def for_project_variable(project_variable_key)
+      for_custom_model('ci_variable', project_variable_key)
+    end
+
     # Builds the @details attribute for group
     #
     # This uses the [Group] @entity as the target object being audited

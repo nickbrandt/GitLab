@@ -340,6 +340,7 @@ module EE
 
         # rubocop:disable CodeReuse/ActiveRecord
         # rubocop: disable UsageData/LargeTable
+        # rubocop: disable UsageData/DistinctCountByLargeForeignKey
         def count_secure_pipelines(time_period)
           return {} if time_period.blank?
 
@@ -357,7 +358,8 @@ module EE
 
           pipelines_with_secure_jobs
         end
-        # rubocop: enabled UsageData/LargeTable
+        # rubocop: enable UsageData/LargeTable
+        # rubocop: enable UsageData/DistinctCountByLargeForeignKey
 
         def approval_merge_request_rule_minimum_id
           strong_memoize(:approval_merge_request_rule_minimum_id) do

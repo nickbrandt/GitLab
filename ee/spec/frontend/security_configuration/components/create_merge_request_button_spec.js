@@ -16,7 +16,7 @@ jest.mock('~/lib/utils/url_utility', () => ({
 const endpoint = '/endpoint';
 const { i18n } = CreateMergeRequestButton;
 const DEFAULT_BUTTON_PROPS = {
-  category: 'tertiary',
+  category: 'primary',
   variant: 'default',
 };
 const SUCCESS_BUTTON_PROPS = {
