@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.1.8 (2020-08-18)
+
+- No changes.
+
 ## 13.1.7 (2020-08-17)
 
 - No changes.
