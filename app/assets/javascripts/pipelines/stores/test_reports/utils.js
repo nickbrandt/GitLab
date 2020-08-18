@@ -13,7 +13,7 @@ export function iconForTestStatus(status) {
   }
 }
 
-export const formattedTime = seconds => {
+export const formattedTime = (seconds = 0) => {
   if (seconds < 1) {
     const milliseconds = secondsToMilliseconds(seconds);
     return sprintf(__('%{milliseconds}ms'), { milliseconds: milliseconds.toFixed(2) });
