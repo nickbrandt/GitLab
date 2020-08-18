@@ -14,7 +14,7 @@ module EE
 
       override :load_namespaces_with_associations
       def load_namespaces_with_associations
-        super.preload(:deletion_schedule)
+        super.with_deletion_schedule_only
       end
     end
   end
