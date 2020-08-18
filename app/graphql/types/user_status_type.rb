@@ -5,7 +5,7 @@ module Types
   class UserStatusType < BaseObject
     graphql_name 'UserStatus'
 
-    field :message_html, GraphQL::STRING_TYPE, null: true,
+    markdown_field :message_html, null: true,
       description: 'HTML of the user status message'
     field :message, GraphQL::STRING_TYPE, null: true,
       description: 'User status message'
