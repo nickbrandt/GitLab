@@ -30,11 +30,6 @@ export default {
       required: false,
       default: () => [],
     },
-    customValidator: {
-      type: Function,
-      required: false,
-      default: () => '',
-    },
     regexErrorMessage: {
       type: String,
       required: false,
