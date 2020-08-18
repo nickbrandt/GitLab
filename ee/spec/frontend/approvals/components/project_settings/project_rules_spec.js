@@ -5,6 +5,7 @@ import projectSettingsModule from 'ee/approvals/stores/modules/project_settings'
 import ProjectRules from 'ee/approvals/components/project_settings/project_rules.vue';
 import RuleInput from 'ee/approvals/components/mr_edit/rule_input.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
+import UnconfiguredSecurityRules from 'ee/approvals/components/security_configuration/unconfigured_security_rules.vue';
 import { createProjectRules } from '../../mocks';
 
 const TEST_RULES = createProjectRules();
@@ -29,11 +30,12 @@ describe('Approvals ProjectRules', () => {
   let wrapper;
   let store;
 
-  const factory = (props = {}) => {
+  const factory = (props = {}, options = {}) => {
     wrapper = mount(localVue.extend(ProjectRules), {
       propsData: props,
       store: new Vuex.Store(store),
       localVue,
+      ...options,
     });
   };
 
@@ -121,5 +123,38 @@ describe('Approvals ProjectRules', () => {
 
       expect(nameCell.find('.js-help').exists()).toBeFalsy();
     });
+
+    it('should not render the unconfigured-security-rules component', () => {
+      expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(false);
+    });
   });
+
+  describe.each([true, false])(
+    'when the approvalSuggestions feature flag is %p',
+    approvalSuggestions => {
+      beforeEach(() => {
+        const rules = createProjectRules();
+        rules[0].name = 'Vulnerability-Check';
+        store.modules.approvals.state.rules = rules;
+        store.state.settings.allowMultiRule = true;
+      });
+
+      beforeEach(() => {
+        factory(
+          {},
+          {
+            provide: {
+              glFeatures: { approvalSuggestions },
+            },
+          },
+        );
+      });
+
+      it(`should ${
+        approvalSuggestions ? '' : 'not'
+      } render the unconfigured-security-rules component`, () => {
+        expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(approvalSuggestions);
+      });
+    },
+  );
 });
