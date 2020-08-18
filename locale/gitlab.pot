@@ -5909,16 +5909,25 @@ msgstr ""
 msgid "ClusterIntegration|This option will allow you to install applications on RBAC clusters."
 msgstr ""
 
+msgid "ClusterIntegration|This project does not have billing enabled. To create a cluster, %{linkToBillingStart}enable billing%{linkToBillingEnd} and try again."
+msgstr ""
+
 msgid "ClusterIntegration|This will permanently delete the following resources:"
 msgstr ""
 
 msgid "ClusterIntegration|To access your application after deployment, point a wildcard DNS to the Knative Endpoint."
 msgstr ""
 
+msgid "ClusterIntegration|To create a cluster, first create a project on %{docsLinkStart}Google Cloud Platform%{docsLinkEnd}."
+msgstr ""
+
 msgid "ClusterIntegration|To remove your integration and resources, type %{clusterName} to confirm:"
 msgstr ""
 
 msgid "ClusterIntegration|To remove your integration, type %{clusterName} to confirm:"
+msgstr ""
+
+msgid "ClusterIntegration|To use a new project, first create one on %{docsLinkStart}Google Cloud Platform%{docsLinkEnd}."
 msgstr ""
 
 msgid "ClusterIntegration|Uninstall %{appTitle}"
@@ -5943,6 +5952,9 @@ msgid "ClusterIntegration|Validating project billing status"
 msgstr ""
 
 msgid "ClusterIntegration|We could not verify that one of your projects on GCP has billing enabled. Please try again."
+msgstr ""
+
+msgid "ClusterIntegration|We were unable to fetch any projects. Ensure that you have a project on %{docsLinkStart}Google Cloud Platform%{docsLinkEnd}."
 msgstr ""
 
 msgid "ClusterIntegration|With a Kubernetes cluster associated to this project, you can use review apps, deploy your applications, run your pipelines, and much more in an easy way."
@@ -25167,9 +25179,6 @@ msgid "This project does not have %{service_desk_link_start}Service Desk%{servic
 msgstr ""
 
 msgid "This project does not have a wiki homepage yet"
-msgstr ""
-
-msgid "This project does not have billing enabled. To create a cluster, %{linkToBillingStart}enable billing %{linkIcon}%{linkToBillingEnd} and try again."
 msgstr ""
 
 msgid "This project has no active access tokens."
