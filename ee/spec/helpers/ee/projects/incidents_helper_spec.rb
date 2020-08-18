@@ -17,7 +17,8 @@ RSpec.describe Projects::IncidentsHelper do
         'new-issue-path' => new_issue_path,
         'incident-template-name' => 'incident',
         'incident-type' => 'incident',
-        'issue-path' => issue_path
+        'issue-path' => issue_path,
+        'empty-list-svg-path' => match_asset_path('/assets/illustrations/incident-empty-state.svg')
       }
     end
 
@@ -30,13 +31,13 @@ RSpec.describe Projects::IncidentsHelper do
     context 'when status page feature is available' do
       let(:status_page_feature_available) { true }
 
-      it { is_expected.to eq(expected_incidents_data.merge('published-available' => 'true')) }
+      it { is_expected.to match(expected_incidents_data.merge('published-available' => 'true')) }
     end
 
     context 'when status page issue is not available' do
       let(:status_page_feature_available) { false }
 
-      it { is_expected.to eq(expected_incidents_data) }
+      it { is_expected.to match(expected_incidents_data) }
     end
   end
 end
