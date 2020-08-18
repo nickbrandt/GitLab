@@ -63,6 +63,7 @@ module Types
     mount_mutation Mutations::DesignManagement::Move
     mount_mutation Mutations::ContainerExpirationPolicies::Update
     mount_mutation Mutations::Ci::PipelineRetry
+    mount_mutation Mutations::Ci::PipelineDestroy
   end
 end
 
