@@ -215,6 +215,10 @@ RSpec.describe Epics::TreeReorderService do
           let!(:tree_object_1) { epic1 }
           let!(:tree_object_2) { epic2 }
 
+          before do
+            stub_licensed_features(epics: true, subepics: true)
+          end
+
           context 'when user does not have permissions to admin the previous parent' do
             let(:other_group) { create(:group) }
             let(:other_epic) { create(:epic, group: other_group) }
@@ -255,6 +259,19 @@ RSpec.describe Epics::TreeReorderService do
             before do
               epic1.update(group: another_group, parent: another_epic)
               epic2.update(group: another_group, parent: another_epic)
+            end
+
+            it_behaves_like 'error for the tree update', 'You don\'t have permissions to move the objects.'
+          end
+
+          context 'when new parent is another epic and subepics feature is disabled' do
+            let(:other_epic) { create(:epic, group: group) }
+            let(:new_parent_id) { GitlabSchema.id_from_object(epic) }
+            let(:epic3) { create(:epic, parent: other_epic, group: group) }
+            let(:tree_object_2) { epic3 }
+
+            before do
+              stub_licensed_features(epics: true, subepics: false)
             end
 
             it_behaves_like 'error for the tree update', 'You don\'t have permissions to move the objects.'
