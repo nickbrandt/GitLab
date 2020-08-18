@@ -9,6 +9,15 @@ const FLASH_TYPES = {
   WARNING: 'warning',
 };
 
+const adjustTopPadding = () => {
+  const mergeRequestEl = document.querySelector('.merge-request .detail-page-header');
+  const paddingForCloseButton = 'gl-pt-0';
+
+  if (mergeRequestEl) {
+    mergeRequestEl.classList.toggle(paddingForCloseButton);
+  }
+};
+
 const hideFlash = (flashEl, fadeTransition = true) => {
   if (fadeTransition) {
     Object.assign(flashEl.style, {
@@ -30,6 +39,8 @@ const hideFlash = (flashEl, fadeTransition = true) => {
       passive: true,
     },
   );
+
+  adjustTopPadding();
 
   if (!fadeTransition) flashEl.dispatchEvent(new Event('transitionend'));
 };
@@ -89,6 +100,8 @@ const createFlash = function createFlash(
 
   flashContainer.innerHTML = createFlashEl(message, type);
 
+  adjustTopPadding();
+
   const flashEl = flashContainer.querySelector(`.flash-${type}`);
 
   if (actionConfig) {
@@ -142,6 +155,8 @@ const newCreateFlash = function newCreateFlash({
   if (!flashContainer) return null;
 
   flashContainer.innerHTML = createFlashEl(message, type);
+
+  adjustTopPadding();
 
   const flashEl = flashContainer.querySelector(`.flash-${type}`);
 
