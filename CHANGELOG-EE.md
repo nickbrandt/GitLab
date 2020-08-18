@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.2.5 (2020-08-17)
+
+- No changes.
+
 ## 13.2.4 (2020-08-11)
 
 ### Performance (1 change)
