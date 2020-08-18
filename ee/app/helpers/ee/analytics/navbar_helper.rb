@@ -34,7 +34,7 @@ module EE
         return unless project_nav_tab?(:issues_analytics)
 
         navbar_sub_item(
-          title: _('Issues'),
+          title: _('Issue'),
           path: 'issues_analytics#show',
           link: project_analytics_issues_analytics_path(project)
         )
@@ -108,7 +108,7 @@ module EE
         return unless group_sidebar_link?(:analytics)
 
         navbar_sub_item(
-          title: _('Issues'),
+          title: _('Issue'),
           path: 'issues_analytics#show',
           link: group_issues_analytics_path(group)
         )
