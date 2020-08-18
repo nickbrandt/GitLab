@@ -20680,9 +20680,6 @@ msgstr ""
 msgid "Repository Settings"
 msgstr ""
 
-msgid "Repository URL"
-msgstr ""
-
 msgid "Repository check"
 msgstr ""
 
