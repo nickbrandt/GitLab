@@ -55,6 +55,33 @@ RSpec.describe Security::StoreReportService, '#execute' do
       end
     end
 
+    context 'with container scanning vulnerabilities' do
+      let(:artifact) { create(:ee_ci_job_artifact, :container_scanning) }
+      let(:project) { artifact.project }
+      let(:pipeline) { artifact.job.pipeline }
+      let(:report) { pipeline.security_reports.get_report('container_scanning', artifact) }
+
+      it 'saves with new location' do
+        new_locations = report.findings.map(&:location).map(&:new_fingerprint)
+        expect(subject).to eq({ status: :success })
+        saved_locations = Vulnerabilities::Finding.all.map(&:location_fingerprint)
+        expect(new_locations).to match_array(saved_locations)
+      end
+
+      it 'updates existing location' do
+        allow_any_instance_of(described_class).to receive(:executed?).and_return(false)
+        expect(subject).to eq({ status: :success })
+
+        old_fingerprint = report.findings.first.location.fingerprint
+        new_fingerprint = report.findings.first.location.new_fingerprint
+        Vulnerabilities::Finding.first.update_column(:location_fingerprint, old_fingerprint)
+
+        described_class.new(pipeline, report).execute
+
+        expect(Vulnerabilities::Finding.first.location_fingerprint).to eq(new_fingerprint)
+      end
+    end
+
     context 'invalid data' do
       let(:artifact) { create(:ee_ci_job_artifact, :sast) }
       let(:finding_without_name) { build(:ci_reports_security_finding, name: nil) }
