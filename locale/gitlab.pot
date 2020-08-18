@@ -29940,6 +29940,9 @@ msgstr ""
 msgid "vulnerability|Add comment & dismiss"
 msgstr ""
 
+msgid "vulnerability|Add comment and dismiss"
+msgstr ""
+
 msgid "vulnerability|Dismiss vulnerability"
 msgstr ""
 
