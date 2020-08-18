@@ -4,9 +4,11 @@ module Gitlab
   module Utils
     module Markdown
       PUNCTUATION_REGEXP = /[^\p{Word}\- ]/u.freeze
+      PRODUCT_SUFFIX = /\((CORE|STARTER|PREMIUM|ULTIMATE)(\s+ONLY)?\)/.freeze
 
       def string_to_anchor(string)
         string
+          .gsub(PRODUCT_SUFFIX, '')
           .strip
           .downcase
           .gsub(PUNCTUATION_REGEXP, '') # remove punctuation
