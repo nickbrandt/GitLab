@@ -65,7 +65,7 @@ module Gitlab
       end
 
       def self.ci_plan_needs_size_limit?(project)
-        ::Feature.enabled?(:ci_plan_needs_size_limit, project)
+        ::Feature.enabled?(:ci_plan_needs_size_limit, project, default_enabled: true)
       end
 
       def self.job_entry_matches_all_keys?
