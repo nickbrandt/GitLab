@@ -72,7 +72,9 @@ module Gitlab
           end
 
           def eql?(other)
-            hash == other.hash
+            report_type == other.report_type &&
+              location.fingerprint == other.location.fingerprint &&
+              primary_identifier.fingerprint == other.primary_identifier.fingerprint
           end
 
           def hash
