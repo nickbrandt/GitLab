@@ -1,5 +1,15 @@
 # Changelog for gitlab-workhorse
 
+## v8.40.0
+
+### Added
+- Add project level route for conan package uploads
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/558
+
+### Other
+- Refactor uploaders to use different upload strategies
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/553
+
 ## v8.39.0
 
 ### Fixed
