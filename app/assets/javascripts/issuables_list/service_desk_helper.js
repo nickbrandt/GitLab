@@ -3,6 +3,7 @@ import { __ } from '~/locale';
 /**
  * Returns the attributes used for gl-empty-state in the Service Desk issues list.
  */
+// eslint-disable-next-line import/prefer-default-export
 export function emptyStateHelper(emptyStateMeta) {
   const { isServiceDeskSupported, svgPath, serviceDeskHelpPage } = emptyStateMeta;
 
@@ -52,5 +53,3 @@ export function emptyStateHelper(emptyStateMeta) {
     primaryText: __('More information'),
   };
 }
-
-export default {};
