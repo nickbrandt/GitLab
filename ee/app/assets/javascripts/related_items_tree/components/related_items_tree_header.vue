@@ -3,7 +3,7 @@ import { mapState, mapActions } from 'vuex';
 
 import { GlTooltip, GlIcon } from '@gitlab/ui';
 
-import { issuableTypesMap } from 'ee/related_issues/constants';
+import { issuableTypesMap } from '~/related_issues/constants';
 
 import EpicActionsSplitButton from './epic_issue_actions_split_button.vue';
 import EpicHealthStatus from './epic_health_status.vue';

@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import RelatedIssues from 'ee/vulnerabilities/components/related_issues.vue';
-import RelatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
-import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
 import { FEEDBACK_TYPES } from 'ee/vulnerabilities/constants';
 import waitForPromises from 'helpers/wait_for_promises';
+import RelatedIssuesBlock from '~/related_issues/components/related_issues_block.vue';
+import { issuableTypesMap, PathIdSeparator } from '~/related_issues/constants';
 import axios from '~/lib/utils/axios_utils';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';

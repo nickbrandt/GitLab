@@ -3,7 +3,7 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 
 import { GlLoadingIcon } from '@gitlab/ui';
 
-import AddItemForm from 'ee/related_issues/components/add_issuable_form.vue';
+import AddItemForm from '~/related_issues/components/add_issuable_form.vue';
 import SlotSwitch from '~/vue_shared/components/slot_switch.vue';
 import CreateEpicForm from './create_epic_form.vue';
 import CreateIssueForm from './create_issue_form.vue';

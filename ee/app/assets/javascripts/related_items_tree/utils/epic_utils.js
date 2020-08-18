@@ -1,4 +1,4 @@
-import { PathIdSeparator } from 'ee/related_issues/constants';
+import { PathIdSeparator } from '~/related_issues/constants';
 import createGqClient, { fetchPolicies } from '~/lib/graphql';
 
 import { ChildType } from '../constants';
