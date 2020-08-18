@@ -3130,6 +3130,9 @@ msgstr ""
 msgid "April"
 msgstr ""
 
+msgid "Architecture not found for OS"
+msgstr ""
+
 msgid "Archive"
 msgstr ""
 
@@ -13204,6 +13207,9 @@ msgstr ""
 msgid "Invalid Login or password"
 msgstr ""
 
+msgid "Invalid OS"
+msgstr ""
+
 msgid "Invalid URL"
 msgstr ""
 
@@ -15735,6 +15741,12 @@ msgstr ""
 msgid "Missing OAuth configuration for GitHub."
 msgstr ""
 
+msgid "Missing OS"
+msgstr ""
+
+msgid "Missing arch"
+msgstr ""
+
 msgid "Missing commit signatures endpoint!"
 msgstr ""
 
@@ -16455,6 +16467,9 @@ msgid "No repository"
 msgstr ""
 
 msgid "No required pipeline"
+msgstr ""
+
+msgid "No runner executable"
 msgstr ""
 
 msgid "No runners found"
