@@ -1,6 +1,6 @@
 - if Feature.enabled?(:vue_issuables_list, @project)
-  - data_endpoint = local_assigns.fetch(:data_endpoint, expose_url(api_v4_projects_issues_path(id: @project.id)))
-  - default_empty_state_meta = { create_issue_path: expose_url(new_project_issue_path(@project)), svg_path: image_path('illustrations/issues.svg') }
+  - data_endpoint = local_assigns.fetch(:data_endpoint, expose_path(api_v4_projects_issues_path(id: @project.id)))
+  - default_empty_state_meta = { create_issue_path: new_project_issue_path(@project), svg_path: image_path('illustrations/issues.svg') }
   - data_empty_state_meta = local_assigns.fetch(:data_empty_state_meta, default_empty_state_meta)
   - type = local_assigns.fetch(:type, '')
   .js-issuables-list{ data: { endpoint: data_endpoint,
