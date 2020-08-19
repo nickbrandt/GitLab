@@ -6,7 +6,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::ContainerScanning do
   let(:parser) { described_class.new }
   let(:project) { artifact.project }
   let(:pipeline) { artifact.job.pipeline }
-  let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline.sha, 2.weeks.ago) }
+  let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline, 2.weeks.ago) }
 
   before do
     artifact.each_blob do |blob|

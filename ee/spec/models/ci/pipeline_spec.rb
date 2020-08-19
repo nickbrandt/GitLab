@@ -146,12 +146,9 @@ RSpec.describe Ci::Pipeline do
       let!(:cs1_artifact) { create(:ee_ci_job_artifact, :container_scanning, job: build_cs_1, project: project) }
       let!(:cs2_artifact) { create(:ee_ci_job_artifact, :container_scanning, job: build_cs_2, project: project) }
 
-      before do
-      end
-
-      it 'assigns pipeline commit_sha to the reports' do
-        expect(subject.commit_sha).to eq(pipeline.sha)
-        expect(subject.reports.values.map(&:commit_sha).uniq).to contain_exactly(pipeline.sha)
+      it 'assigns pipeline to the reports' do
+        expect(subject.pipeline).to eq(pipeline)
+        expect(subject.reports.values.map(&:pipeline).uniq).to contain_exactly(pipeline)
       end
 
       it 'returns security reports with collected data grouped as expected' do

@@ -157,7 +157,7 @@ RSpec.describe Ci::Build do
   end
 
   describe '#collect_security_reports!' do
-    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new(pipeline.sha) }
+    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new(pipeline) }
 
     subject { job.collect_security_reports!(security_reports) }
 

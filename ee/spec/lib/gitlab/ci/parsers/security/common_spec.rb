@@ -4,8 +4,10 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::Ci::Parsers::Security::Common do
   describe '#parse!' do
+    let_it_be(:pipeline) { create(:ci_pipeline) }
+
     let(:artifact) { build(:ee_ci_job_artifact, :dependency_scanning) }
-    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, 'sha', 2.weeks.ago) }
+    let(:report) { Gitlab::Ci::Reports::Security::Report.new(artifact.file_type, pipeline, 2.weeks.ago) }
     let(:parser) { described_class.new }
 
     before do

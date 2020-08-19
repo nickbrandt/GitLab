@@ -5,11 +5,9 @@ module Gitlab
     module Reports
       module Security
         class Report
-          UNSAFE_SEVERITIES = %w[unknown high critical].freeze
-
           attr_reader :created_at
           attr_reader :type
-          attr_reader :commit_sha
+          attr_reader :pipeline
           attr_reader :findings
           attr_reader :scanners
           attr_reader :identifiers
@@ -17,14 +15,18 @@ module Gitlab
           attr_accessor :scanned_resources
           attr_accessor :error
 
-          def initialize(type, commit_sha, created_at)
+          def initialize(type, pipeline, created_at)
             @type = type
-            @commit_sha = commit_sha
+            @pipeline = pipeline
             @created_at = created_at
             @findings = []
             @scanners = {}
             @identifiers = {}
             @scanned_resources = []
+          end
+
+          def commit_sha
+            pipeline.sha
           end
 
           def errored?
@@ -44,7 +46,7 @@ module Gitlab
           end
 
           def clone_as_blank
-            Report.new(type, commit_sha, created_at)
+            Report.new(type, pipeline, created_at)
           end
 
           def replace_with!(other)
@@ -55,15 +57,6 @@ module Gitlab
 
           def merge!(other)
             replace_with!(::Security::MergeReportsService.new(self, other).execute)
-          end
-
-          def unsafe_severity?
-            !safe?
-          end
-
-          def safe?
-            severities = findings.map(&:severity).compact.map(&:downcase)
-            (severities & UNSAFE_SEVERITIES).empty?
           end
         end
       end
