@@ -8,8 +8,8 @@ module EpicTreeSorting
   class_methods do
     def relative_positioning_query_base(object)
       from_union([
-        EpicIssue.select("id, relative_position, epic_id as parent_id, epic_id, 'epic_issue' as object_type").in_epic(object.parent_ids),
-        Epic.select("id, relative_position, parent_id, parent_id as epic_id, 'epic' as object_type").where(parent_id: object.parent_ids)
+        EpicIssue.select("id, relative_position, epic_id, 'epic_issue' as object_type").in_epic(object.parent_ids),
+        Epic.select("id, relative_position, parent_id as epic_id, 'epic' as object_type").where(parent_id: object.parent_ids)
       ])
     end
 
@@ -19,14 +19,11 @@ module EpicTreeSorting
   end
 
   included do
-    def move_sequence(start_pos, end_pos, delta, include_self = false)
+    def move_sequence(start_pos, end_pos, delta)
       items_to_update = scoped_items
         .select(:id, :object_type)
         .where('relative_position BETWEEN ? AND ?', start_pos, end_pos)
-
-      unless include_self
-        items_to_update = items_to_update.where.not('object_type = ? AND id = ?', self.class.table_name.singularize, self.id)
-      end
+        .where.not('object_type = ? AND id = ?', self.class.table_name.singularize, self.id)
 
       items_to_update.group_by { |item| item.object_type }.each do |type, group_items|
         ids = group_items.map(&:id)
