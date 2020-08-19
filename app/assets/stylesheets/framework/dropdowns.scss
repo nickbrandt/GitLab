@@ -1104,3 +1104,12 @@ header.header-content .dropdown-menu.frequent-items-dropdown-menu {
     }
   }
 }
+
+// This class won't be needed once we can directly add utility classes to the child
+// https://github.com/bootstrap-vue/bootstrap-vue/issues/5669
+.gl-dropdown-text-py-0 {
+  .b-dropdown-text {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
