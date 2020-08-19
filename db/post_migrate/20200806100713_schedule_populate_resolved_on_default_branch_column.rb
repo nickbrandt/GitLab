@@ -5,7 +5,7 @@ class SchedulePopulateResolvedOnDefaultBranchColumn < ActiveRecord::Migration[6.
 
   DOWNTIME = false
   BATCH_SIZE = 100
-  DELAY_INTERVAL = 2.minutes.to_i
+  DELAY_INTERVAL = 5.minutes.to_i
   MIGRATION_CLASS = 'PopulateResolvedOnDefaultBranchColumn'
   BASE_MODEL = EE::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchColumn::Vulnerability
 

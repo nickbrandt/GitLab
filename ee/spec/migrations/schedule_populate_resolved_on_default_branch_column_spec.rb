@@ -53,8 +53,8 @@ RSpec.describe SchedulePopulateResolvedOnDefaultBranchColumn do
       migrate!
 
       expect(BackgroundMigrationWorker.jobs.size).to be(2)
-      expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(2.minutes, project_1.id)
-      expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(4.minutes, project_2.id)
+      expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(5.minutes, project_1.id)
+      expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(10.minutes, project_2.id)
     end
   end
 end
