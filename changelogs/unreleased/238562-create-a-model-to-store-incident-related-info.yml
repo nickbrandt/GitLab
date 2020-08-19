@@ -1,0 +1,5 @@
+---
+title: Create IncidentData table to store incident related info
+merge_request: 39857
+author:
+type: added
