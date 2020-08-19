@@ -113,6 +113,7 @@ export default {
         :can-edit="canAdminBoard"
         :enable-scoped-labels="enableScopedLabels"
         ability-name="issue"
+        show-create
         @onLabelClick="handleLabelClick"
       >
         {{ __('Any label') }}
