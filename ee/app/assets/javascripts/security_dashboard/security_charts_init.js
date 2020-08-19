@@ -33,7 +33,6 @@ export default (el, dashboardType) => {
   if (dashboardType === DASHBOARD_TYPES.GROUP) {
     component = GroupSecurityCharts;
     props.groupFullPath = el.dataset.groupFullPath;
-    props.vulnerableProjectsEndpoint = el.dataset.vulnerableProjectsEndpoint;
   }
 
   const router = createRouter();
