@@ -39,8 +39,14 @@ module Elastic
         # ES6 is now single-type per index, so we implement our own typing
         data['type'] = 'project'
 
+        # Somehow projects are being created and sent for indexing without an associated project_feature
+        # https://gitlab.com/gitlab-org/gitlab/-/issues/232654
+        # When this happens, log the errors to help with debugging, and raise the error to prevent indexing bad data
         TRACKED_FEATURE_SETTINGS.each do |feature|
           data[feature] = target.project_feature.public_send(feature) # rubocop:disable GitlabSecurity/PublicSend
+        rescue NoMethodError => err
+          target.logger.error("Elasticsearch failed to read feature #{feature} for #{target.class} #{target.id}: #{err}")
+          raise
         end
 
         data

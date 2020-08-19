@@ -1,0 +1,5 @@
+---
+title: Add logging when indexing projects are missing project_feature attribute
+merge_request: 39255
+author:
+type: fixed
