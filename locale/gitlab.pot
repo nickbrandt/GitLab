@@ -12959,6 +12959,9 @@ msgstr ""
 msgid "IncidentManagement|All"
 msgstr ""
 
+msgid "IncidentManagement|All alerts promoted to incidents will automatically be displayed within the list. You can also create a new incident using the button below."
+msgstr ""
+
 msgid "IncidentManagement|Assignees"
 msgstr ""
 
@@ -12969,6 +12972,9 @@ msgid "IncidentManagement|Create incident"
 msgstr ""
 
 msgid "IncidentManagement|Date created"
+msgstr ""
+
+msgid "IncidentManagement|Display your incidents in a dedicated view"
 msgstr ""
 
 msgid "IncidentManagement|Incident"
