@@ -38,7 +38,6 @@ module EE
 
         # This class depends on Gitlab::CurrentSettings
         class Project < ActiveRecord::Base
-          include EachBatch
           include Routable
           include Visibility
           include ::Gitlab::Utils::StrongMemoize
@@ -325,6 +324,8 @@ module EE
 
         class Route < ActiveRecord::Base; end
         class Vulnerability < ActiveRecord::Base
+          include EachBatch
+
           scope :id_not_in, -> (ids) { where.not(id: ids) }
         end
         class VulnerabilityFinding < ActiveRecord::Base
