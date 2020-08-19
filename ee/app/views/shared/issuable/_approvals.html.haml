@@ -17,7 +17,10 @@
       'mr_id': issuable.iid,
       'mr_settings_path': presenter.api_approval_settings_path,
       'eligible_approvers_docs_path': help_page_path('user/project/merge_requests/merge_request_approvals', anchor: 'eligible-approvers'),
-      'project_settings_path': presenter.api_project_approval_settings_path } }
+      'project_settings_path': presenter.api_project_approval_settings_path,
+      'security_configuration_path': project_security_configuration_path(@target_project),
+      'vulnerability_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-security-approvals-within-a-project'),
+      'license_check_help_page_path': help_page_path('user/application_security/index', anchor: 'enabling-license-approvals-within-a-project') } }
       = sprite_icon('spinner', size: 24, css_class: 'gl-spinner')
     - if can_update_approvers
       - approver_presenter = MergeRequestApproverPresenter.new(issuable, skip_user: current_user)

@@ -6,7 +6,9 @@ import MRRules from 'ee/approvals/components/mr_edit/mr_rules.vue';
 import Rules from 'ee/approvals/components/rules.vue';
 import RuleControls from 'ee/approvals/components/rule_controls.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
+import UnconfiguredSecurityRules from 'ee/approvals/components/security_configuration/unconfigured_security_rules.vue';
 import { createEmptyRule, createMRRule, createMRRuleWithSource } from '../../mock_data';
+import { createProjectRules } from '../../mocks';
 
 const { HEADERS } = Rules;
 
@@ -19,7 +21,7 @@ describe('EE Approvals MRRules', () => {
   let approvalRules;
   let OriginalMutationObserver;
 
-  const factory = () => {
+  const factory = ({ options } = {}) => {
     if (approvalRules) {
       store.modules.approvals.state.rules = approvalRules;
     }
@@ -28,6 +30,7 @@ describe('EE Approvals MRRules', () => {
       localVue,
       store: new Vuex.Store(store),
       attachToDocument: true,
+      ...options,
     });
   };
 
@@ -118,6 +121,32 @@ describe('EE Approvals MRRules', () => {
       wrapper.destroy();
       expect(mockDisconnect).toHaveBeenCalled();
     });
+
+    describe.each([true, false])(
+      'when the approvalSuggestions feature flag is %p',
+      approvalSuggestions => {
+        beforeEach(() => {
+          const rules = createProjectRules();
+          rules[0].name = 'Vulnerability-Check';
+          approvalRules = rules;
+          store.state.settings.allowMultiRule = true;
+
+          factory({
+            options: {
+              provide: {
+                glFeatures: { approvalSuggestions },
+              },
+            },
+          });
+        });
+
+        it(`should ${
+          approvalSuggestions ? '' : 'not'
+        } render the unconfigured-security-rules component`, () => {
+          expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(approvalSuggestions);
+        });
+      },
+    );
 
     describe('rule indicator', () => {
       const falseOverriddenRule = createMRRuleWithSource({ overridden: false });

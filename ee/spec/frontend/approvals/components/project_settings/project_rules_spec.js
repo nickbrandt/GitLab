@@ -137,9 +137,7 @@ describe('Approvals ProjectRules', () => {
         rules[0].name = 'Vulnerability-Check';
         store.modules.approvals.state.rules = rules;
         store.state.settings.allowMultiRule = true;
-      });
 
-      beforeEach(() => {
         factory(
           {},
           {

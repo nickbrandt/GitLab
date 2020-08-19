@@ -1,4 +1,5 @@
 <script>
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { mapState, mapActions } from 'vuex';
 import { __ } from '~/locale';
 import { RULE_TYPE_ANY_APPROVER, RULE_TYPE_REGULAR, RULE_NAME_ANY_APPROVER } from '../../constants';
@@ -7,6 +8,7 @@ import Rules from '../rules.vue';
 import RuleControls from '../rule_controls.vue';
 import EmptyRule from '../empty_rule.vue';
 import RuleInput from './rule_input.vue';
+import UnconfiguredSecurityRules from '../security_configuration/unconfigured_security_rules.vue';
 
 let targetBranchMutationObserver;
 
@@ -17,7 +19,10 @@ export default {
     RuleControls,
     EmptyRule,
     RuleInput,
+    UnconfiguredSecurityRules,
   },
+  // TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114
+  mixins: [glFeatureFlagsMixin()],
   computed: {
     ...mapState(['settings']),
     ...mapState({
@@ -107,43 +112,50 @@ export default {
 </script>
 
 <template>
-  <rules :rules="rules">
-    <template #thead="{ name, members, approvalsRequired }">
-      <tr>
-        <th :class="hasNamedRule ? 'w-25' : 'w-75'">{{ hasNamedRule ? name : members }}</th>
-        <th :class="hasNamedRule ? 'w-50' : null">
-          <span v-if="hasNamedRule">{{ members }}</span>
-        </th>
-        <th>{{ approvalsRequired }}</th>
-        <th></th>
-      </tr>
-    </template>
-    <template #tbody="{ rules }">
-      <template v-for="(rule, index) in rules">
-        <empty-rule
-          v-if="rule.ruleType === 'any_approver'"
-          :key="index"
-          :rule="rule"
-          :allow-multi-rule="settings.allowMultiRule"
-          :eligible-approvers-docs-path="settings.eligibleApproversDocsPath"
-          :can-edit="canEdit"
-        />
-        <tr v-else :key="index">
-          <td>
-            <div class="js-name">{{ rule.name }}</div>
-            <div ref="indicator" class="text-muted">{{ indicatorText(rule) }}</div>
-          </td>
-          <td class="js-members" :class="settings.allowMultiRule ? 'd-none d-sm-table-cell' : null">
-            <user-avatar-list :items="rule.approvers" :img-size="24" />
-          </td>
-          <td class="js-approvals-required">
-            <rule-input :rule="rule" />
-          </td>
-          <td class="text-nowrap px-2 w-0 js-controls">
-            <rule-controls v-if="canEdit" :rule="rule" />
-          </td>
+  <div>
+    <rules :rules="rules">
+      <template #thead="{ name, members, approvalsRequired }">
+        <tr>
+          <th :class="hasNamedRule ? 'w-25' : 'w-75'">{{ hasNamedRule ? name : members }}</th>
+          <th :class="hasNamedRule ? 'w-50' : null">
+            <span v-if="hasNamedRule">{{ members }}</span>
+          </th>
+          <th>{{ approvalsRequired }}</th>
+          <th></th>
         </tr>
       </template>
-    </template>
-  </rules>
+      <template #tbody="{ rules }">
+        <template v-for="(rule, index) in rules">
+          <empty-rule
+            v-if="rule.ruleType === 'any_approver'"
+            :key="index"
+            :rule="rule"
+            :allow-multi-rule="settings.allowMultiRule"
+            :eligible-approvers-docs-path="settings.eligibleApproversDocsPath"
+            :can-edit="canEdit"
+          />
+          <tr v-else :key="index">
+            <td>
+              <div class="js-name">{{ rule.name }}</div>
+              <div ref="indicator" class="text-muted">{{ indicatorText(rule) }}</div>
+            </td>
+            <td
+              class="js-members"
+              :class="settings.allowMultiRule ? 'd-none d-sm-table-cell' : null"
+            >
+              <user-avatar-list :items="rule.approvers" :img-size="24" />
+            </td>
+            <td class="js-approvals-required">
+              <rule-input :rule="rule" />
+            </td>
+            <td class="text-nowrap px-2 w-0 js-controls">
+              <rule-controls v-if="canEdit" :rule="rule" />
+            </td>
+          </tr>
+        </template>
+      </template>
+    </rules>
+    <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/235114 -->
+    <unconfigured-security-rules v-if="glFeatures.approvalSuggestions" />
+  </div>
 </template>

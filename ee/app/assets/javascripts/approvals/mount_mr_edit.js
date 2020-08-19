@@ -16,6 +16,8 @@ export default function mountApprovalInput(el) {
     document.querySelector('#js-target-branch-title')?.textContent ||
     document.querySelector('#merge_request_target_branch')?.value;
 
+  const { vulnerabilityCheckHelpPagePath, licenseCheckHelpPagePath } = el.dataset;
+
   const store = createStore(mrEditModule(), {
     ...el.dataset,
     prefix: 'mr-edit',
@@ -28,6 +30,10 @@ export default function mountApprovalInput(el) {
   return new Vue({
     el,
     store,
+    provide: {
+      vulnerabilityCheckHelpPagePath,
+      licenseCheckHelpPagePath,
+    },
     render(h) {
       return h(MrEditApp);
     },
