@@ -888,7 +888,7 @@ production: &base
     # (default: false)
     auto_link_saml_user: false
 
-    # Allow users with existing accounts to login and auto link their account via OmniAuth
+    # Allow users with existing accounts to sign in and auto link their account via OmniAuth
     # login, without having to do a manual login first and manually add OmniAuth. Links on email.
     # (default: false)
     auto_link_user: false
