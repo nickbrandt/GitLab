@@ -37,27 +37,29 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     Timecop.freeze(reference_time) { example.run }
   end
 
-  it 'raise error if metrics are not in the same slot' do
-    expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_compliance_dashboard), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same slot')
+  describe '.unique_events' do
+    it 'raise error if metrics are not in the same slot' do
+      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_compliance_dashboard), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same slot')
+    end
+
+    it 'raise error if metrics are not in the same category' do
+      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_analytics_productivity), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same category')
+    end
+
+    it "raise error if metrics don't have same aggregation" do
+      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_analytics_valuestream), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should have same aggregation level')
+    end
+
+    it "raise error if metrics don't have same aggregation" do
+      expect { described_class.track_event(entity1, different_aggregation, Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownAggregation)
+    end
+
+    it 'raise error if metrics of unknown aggregation' do
+      expect { described_class.track_event(entity1, 'unknown', Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownEvent)
+    end
   end
 
-  it 'raise error if metrics are not in the same category' do
-    expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_analytics_productivity), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same category')
-  end
-
-  it "raise error if metrics don't have same aggregation" do
-    expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_analytics_valuestream), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should have same aggregation level')
-  end
-
-  it "raise error if metrics don't have same aggregation" do
-    expect { described_class.track_event(entity1, different_aggregation, Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownAggregation)
-  end
-
-  it "raise error if metrics don't have same aggregation" do
-    expect { described_class.track_event(entity1, 'unknown', Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownEvent)
-  end
-
-  context 'when tracking' do
+  describe '.unique_events' do
     before do
       # events in current week, should not be counted as week is not complete
       described_class.track_event(entity1, weekly_event, Date.current)
@@ -90,20 +92,22 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       described_class.track_event(entity4, daily_event, 29.days.ago)
     end
 
-    it 'gets correct data' do
-      # data for last complete week
-      expect(described_class.unique_events(event_names: weekly_event, start_date: 1.week.ago, end_date: Date.current)).to eq(1)
+    context 'when data for the last complete week' do
+      it { expect(described_class.unique_events(event_names: weekly_event, start_date: 1.week.ago, end_date: Date.current)).to eq(1) }
+    end
 
-      # data for last 4 complete weeks
-      expect(described_class.unique_events(event_names: weekly_event, start_date: 4.weeks.ago, end_date: Date.current)).to eq(2)
+    context 'when data for the last 4 complete weeks' do
+      it { expect(described_class.unique_events(event_names: weekly_event, start_date: 4.weeks.ago, end_date: Date.current)).to eq(2) }
+    end
 
-      # data for week 4 weeks ago
-      expect(described_class.unique_events(event_names: weekly_event, start_date: 4.weeks.ago, end_date: 3.weeks.ago)).to eq(1)
+    context 'when data for the week 4 weeks ago' do
+      it { expect(described_class.unique_events(event_names: weekly_event, start_date: 4.weeks.ago, end_date: 3.weeks.ago)).to eq(1) }
+    end
 
-      # daily aggregation
-      expect(described_class.unique_events(event_names: daily_event, start_date: 7.days.ago, end_date: Date.current)).to eq(2)
-      expect(described_class.unique_events(event_names: daily_event, start_date: 28.days.ago, end_date: Date.current)).to eq(3)
-      expect(described_class.unique_events(event_names: daily_event, start_date: 28.days.ago, end_date: 21.days.ago)).to eq(1)
+    context 'when using daily aggregation' do
+      it { expect(described_class.unique_events(event_names: daily_event, start_date: 7.days.ago, end_date: Date.current)).to eq(2) }
+      it { expect(described_class.unique_events(event_names: daily_event, start_date: 28.days.ago, end_date: Date.current)).to eq(3) }
+      it { expect(described_class.unique_events(event_names: daily_event, start_date: 28.days.ago, end_date: 21.days.ago)).to eq(1) }
     end
   end
 end
