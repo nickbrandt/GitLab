@@ -33,6 +33,7 @@ module EE
         mount ::API::PersonalAccessTokens
         mount ::API::ProjectMirror
         mount ::API::ProjectPushRule
+        mount ::API::GroupPushRule
         mount ::API::MergeTrains
         mount ::API::GroupHooks
         mount ::API::Scim
