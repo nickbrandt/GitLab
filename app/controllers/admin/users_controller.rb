@@ -115,7 +115,7 @@ class Admin::UsersController < Admin::ApplicationController
 
     if result[:status] == :success
       redirect_to admin_user_path(user),
-        notice: _('Two-factor Authentication has been disabled for this user')
+        notice: _('Two-factor authentication has been disabled for this user')
     else
       redirect_to admin_user_path(user), alert: result[:message]
     end

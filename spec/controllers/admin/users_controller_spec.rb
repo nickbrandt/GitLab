@@ -239,7 +239,7 @@ RSpec.describe Admin::UsersController do
         subject
 
         expect(flash[:notice])
-          .to eq _('Two-factor Authentication has been disabled for this user')
+          .to eq _('Two-factor authentication has been disabled for this user')
       end
     end
 

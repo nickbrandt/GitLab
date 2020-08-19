@@ -1,7 +1,6 @@
 %p
-  = _('Hi %{username}!') % { username: sanitize_name(@user.name) }
+  = say_hi(@user)
 %p
-  = _('Two-factor authentication has been disabled for your GitLab account.')
+  = two_factor_authentication_disabled_text
 %p
-  - two_factor_page_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: profile_two_factor_auth_url }
-  = html_escape(_('If you want to re-enable Two-factor authentication, visit the %{two_factor_page_start}Two-factor authentication settings%{two_factor_page_end} page.')) % { two_factor_page_start: two_factor_page_start, two_factor_page_end: '</a>'.html_safe }
+  = re_enable_two_factor_authentication_text(format: :html)
