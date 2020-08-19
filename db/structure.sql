@@ -12411,6 +12411,24 @@ CREATE SEQUENCE public.import_failures_id_seq
 
 ALTER SEQUENCE public.import_failures_id_seq OWNED BY public.import_failures.id;
 
+CREATE TABLE public.incident_data (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    project_id bigint NOT NULL,
+    issue_id bigint NOT NULL,
+    severity smallint DEFAULT 0 NOT NULL
+);
+
+CREATE SEQUENCE public.incident_data_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.incident_data_id_seq OWNED BY public.incident_data.id;
+
 CREATE TABLE public.index_statuses (
     id integer NOT NULL,
     project_id integer NOT NULL,
@@ -17039,6 +17057,8 @@ ALTER TABLE ONLY public.import_export_uploads ALTER COLUMN id SET DEFAULT nextva
 
 ALTER TABLE ONLY public.import_failures ALTER COLUMN id SET DEFAULT nextval('public.import_failures_id_seq'::regclass);
 
+ALTER TABLE ONLY public.incident_data ALTER COLUMN id SET DEFAULT nextval('public.incident_data_id_seq'::regclass);
+
 ALTER TABLE ONLY public.index_statuses ALTER COLUMN id SET DEFAULT nextval('public.index_statuses_id_seq'::regclass);
 
 ALTER TABLE ONLY public.insights ALTER COLUMN id SET DEFAULT nextval('public.insights_id_seq'::regclass);
@@ -18114,6 +18134,9 @@ ALTER TABLE ONLY public.import_export_uploads
 
 ALTER TABLE ONLY public.import_failures
     ADD CONSTRAINT import_failures_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.incident_data
+    ADD CONSTRAINT incident_data_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.index_statuses
     ADD CONSTRAINT index_statuses_pkey PRIMARY KEY (id);
@@ -19829,6 +19852,10 @@ CREATE INDEX index_import_failures_on_group_id_not_null ON public.import_failure
 CREATE INDEX index_import_failures_on_project_id_and_correlation_id_value ON public.import_failures USING btree (project_id, correlation_id_value) WHERE (retry_count = 0);
 
 CREATE INDEX index_import_failures_on_project_id_not_null ON public.import_failures USING btree (project_id) WHERE (project_id IS NOT NULL);
+
+CREATE UNIQUE INDEX index_incident_data_on_issue_id ON public.incident_data USING btree (issue_id);
+
+CREATE INDEX index_incident_data_on_project_id ON public.incident_data USING btree (project_id);
 
 CREATE UNIQUE INDEX index_index_statuses_on_project_id ON public.index_statuses USING btree (project_id);
 
@@ -21997,6 +22024,9 @@ ALTER TABLE ONLY public.approval_merge_request_rules
 ALTER TABLE ONLY public.namespace_statistics
     ADD CONSTRAINT fk_rails_0062050394 FOREIGN KEY (namespace_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.incident_data
+    ADD CONSTRAINT fk_rails_02042fa757 FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.clusters_applications_elastic_stacks
     ADD CONSTRAINT fk_rails_026f219f46 FOREIGN KEY (cluster_id) REFERENCES public.clusters(id) ON DELETE CASCADE;
 
@@ -22701,6 +22731,9 @@ ALTER TABLE ONLY public.alert_management_alert_assignees
 
 ALTER TABLE ONLY public.scim_identities
     ADD CONSTRAINT fk_rails_9421a0bffb FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.incident_data
+    ADD CONSTRAINT fk_rails_947abcd55a FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.packages_pypi_metadata
     ADD CONSTRAINT fk_rails_9698717cdd FOREIGN KEY (package_id) REFERENCES public.packages_packages(id) ON DELETE CASCADE;
