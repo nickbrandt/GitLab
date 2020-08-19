@@ -143,6 +143,17 @@ class User < ApplicationRecord
   has_many :project_authorizations, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
   has_many :authorized_projects, through: :project_authorizations, source: :project
 
+  #has_many :authorized_groups, through: :group_members, source: :group
+
+  # def authorized_groups
+  #   Group.unscoped do
+  #     Group.from_union([
+  #       groups,
+  #       authorized_projects.joins(:namespace).select('namespaces.*')
+  #     ])
+  #   end
+  # end
+
   has_many :user_interacted_projects
   has_many :project_interactions, through: :user_interacted_projects, source: :project, class_name: 'Project'
 
