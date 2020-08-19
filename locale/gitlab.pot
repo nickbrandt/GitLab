@@ -2108,7 +2108,7 @@ msgstr ""
 msgid "AlertManagement|Authorize external service"
 msgstr ""
 
-msgid "AlertManagement|Create issue"
+msgid "AlertManagement|Create incident"
 msgstr ""
 
 msgid "AlertManagement|Critical"
@@ -2234,7 +2234,7 @@ msgstr ""
 msgid "AlertManagement|View alerts in Opsgenie"
 msgstr ""
 
-msgid "AlertManagement|View issue"
+msgid "AlertManagement|View incident"
 msgstr ""
 
 msgid "AlertManagement|You have enabled the Opsgenie integration. Your alerts will be visible directly in Opsgenie."
