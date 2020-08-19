@@ -65,6 +65,7 @@ export default {
     <gl-button
       v-gl-tooltip
       class="js-remove-button"
+      category="tertiary"
       :title="title"
       :aria-label="title"
       icon="remove"
