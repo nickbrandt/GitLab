@@ -454,19 +454,13 @@ RSpec.describe Issue do
   end
 
   describe 'relative positioning with group boards' do
-    let(:group) { create(:group) }
-    let!(:board) { create(:board, group: group) }
-    let(:project) { create(:project, namespace: group) }
-    let(:project1) { create(:project, namespace: group) }
-    let(:issue) { build(:issue, project: project) }
-    let(:issue1) { build(:issue, project: project1) }
+    let_it_be(:group) { create(:group) }
+    let_it_be(:board) { create(:board, group: group) }
+    let_it_be(:project) { create(:project, namespace: group) }
+    let_it_be(:project1) { create(:project, namespace: group) }
+    let_it_be_with_reload(:issue) { create(:issue, project: project) }
+    let_it_be_with_reload(:issue1) { create(:issue, project: project1, relative_position: issue.relative_position + RelativePositioning::IDEAL_DISTANCE) }
     let(:new_issue) { build(:issue, project: project1, relative_position: nil) }
-
-    before do
-      [issue, issue1].each do |issue|
-        issue.move_to_end && issue.save
-      end
-    end
 
     describe '#max_relative_position' do
       it 'returns maximum position' do
@@ -546,18 +540,20 @@ RSpec.describe Issue do
         issue1.update relative_position: issue.relative_position
 
         new_issue.move_between(issue, issue1)
+        [issue, issue1].each(&:reset)
 
-        expect(new_issue.relative_position).to be > issue.relative_position
-        expect(issue.relative_position).to be < issue1.relative_position
+        expect(new_issue.relative_position)
+          .to be_between(issue.relative_position, issue1.relative_position).exclusive
       end
 
       it 'positions issues between other two if distance is 1' do
         issue1.update relative_position: issue.relative_position + 1
 
         new_issue.move_between(issue, issue1)
+        [issue, issue1].each(&:reset)
 
-        expect(new_issue.relative_position).to be > issue.relative_position
-        expect(issue.relative_position).to be < issue1.relative_position
+        expect(new_issue.relative_position)
+          .to be_between(issue.relative_position, issue1.relative_position).exclusive
       end
 
       it 'positions issue in the middle of other two if distance is big enough' do
@@ -566,24 +562,20 @@ RSpec.describe Issue do
 
         new_issue.move_between(issue, issue1)
 
-        expect(new_issue.relative_position).to eq(8000)
+        expect(new_issue.relative_position)
+          .to be_between(issue.relative_position, issue1.relative_position).exclusive
       end
 
       it 'positions issue closer to the middle if we are at the very top' do
-        issue1.update relative_position: 6000
+        new_issue.move_between(nil, issue)
 
-        new_issue.move_between(nil, issue1)
-
-        expect(new_issue.relative_position).to eq(6000 - RelativePositioning::IDEAL_DISTANCE)
+        expect(new_issue.relative_position).to eq(issue.relative_position - RelativePositioning::IDEAL_DISTANCE)
       end
 
       it 'positions issue closer to the middle if we are at the very bottom' do
-        issue.update relative_position: 6000
-        issue1.update relative_position: nil
+        new_issue.move_between(issue1, nil)
 
-        new_issue.move_between(issue, nil)
-
-        expect(new_issue.relative_position).to eq(6000 + RelativePositioning::IDEAL_DISTANCE)
+        expect(new_issue.relative_position).to eq(issue1.relative_position + RelativePositioning::IDEAL_DISTANCE)
       end
 
       it 'positions issue in the middle of other two if distance is not big enough' do
@@ -600,8 +592,10 @@ RSpec.describe Issue do
         issue1.update relative_position: 101
 
         new_issue.move_between(issue, issue1)
+        [issue, issue1].each(&:reset)
 
-        expect(new_issue.relative_position).to be_between(issue.relative_position, issue1.relative_position)
+        expect(new_issue.relative_position)
+          .to be_between(issue.relative_position, issue1.relative_position).exclusive
       end
 
       it 'uses rebalancing if there is no place' do
@@ -612,12 +606,15 @@ RSpec.describe Issue do
 
         new_issue.move_between(issue1, issue2)
         new_issue.save!
+        [issue, issue1, issue2].each(&:reset)
 
-        expect(new_issue.relative_position).to be_between(issue1.relative_position, issue2.relative_position)
-        expect(issue.reload.relative_position).not_to eq(100)
+        expect(new_issue.relative_position)
+          .to be_between(issue1.relative_position, issue2.relative_position).exclusive
+
+        expect([issue, issue1, issue2, new_issue].map(&:relative_position).uniq).to have_attributes(size: 4)
       end
 
-      it 'positions issue right if we pass none-sequential parameters' do
+      it 'positions issue right if we pass non-sequential parameters' do
         issue.update relative_position: 99
         issue1.update relative_position: 101
         issue2 = create(:issue, relative_position: 102, project: project)
