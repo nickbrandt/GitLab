@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { GlLoadingIcon, GlButtonGroup, GlButton, GlAlert } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlAlert, GlPagination } from '@gitlab/ui';
 import Mousetrap from 'mousetrap';
 import { __ } from '~/locale';
 import { getParameterByName, parseBoolean } from '~/lib/utils/common_utils';
@@ -37,7 +37,7 @@ export default {
     TreeList,
     GlLoadingIcon,
     PanelResizer,
-    GlButtonGroup,
+    GlPagination,
     GlButton,
     GlAlert,
   },
@@ -168,6 +168,16 @@ export default {
     },
     isDiffHead() {
       return parseBoolean(getParameterByName('diff_head'));
+    },
+    previousFile() {
+      const currentFile = this.currentDiffIndex + 1;
+
+      return currentFile >= 2 ? currentFile - 1 : null;
+    },
+    nextFile() {
+      const currentFile = this.currentDiffIndex + 1;
+
+      return currentFile < this.diffFiles.length ? currentFile + 1 : null;
     },
   },
   watch: {
@@ -509,23 +519,13 @@ export default {
               :can-current-user-fork="canCurrentUserFork"
               :view-diffs-file-by-file="viewDiffsFileByFile"
             />
-            <div v-if="viewDiffsFileByFile" class="d-flex gl-justify-content-center">
-              <gl-button-group>
-                <gl-button
-                  :disabled="currentDiffIndex === 0"
-                  data-testid="singleFilePrevious"
-                  @click="navigateToDiffFileIndex(currentDiffIndex - 1)"
-                >
-                  {{ __('Prev') }}
-                </gl-button>
-                <gl-button
-                  :disabled="currentDiffIndex === diffFiles.length - 1"
-                  data-testid="singleFileNext"
-                  @click="navigateToDiffFileIndex(currentDiffIndex + 1)"
-                >
-                  {{ __('Next') }}
-                </gl-button>
-              </gl-button-group>
+            <div v-if="viewDiffsFileByFile" class="file-by-file-navigation">
+              <gl-pagination
+                :value="currentDiffIndex + 1"
+                :prev-page="previousFile"
+                :next-page="nextFile"
+                @input="val => navigateToDiffFileIndex(val - 1)"
+              />
             </div>
           </template>
           <no-changes v-else :changes-empty-state-illustration="changesEmptyStateIllustration" />
