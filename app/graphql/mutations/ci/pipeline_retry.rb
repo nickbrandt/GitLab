@@ -5,6 +5,8 @@ module Mutations
     class PipelineRetry < Base
       graphql_name 'PipelineRetry'
 
+      authorize :update_pipeline
+
       def resolve(id:)
         pipeline = authorized_find!(id: id)
         project = pipeline.project

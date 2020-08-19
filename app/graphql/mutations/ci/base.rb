@@ -13,9 +13,6 @@ module Mutations
             null: true,
             description: 'The pipeline after mutation'
 
-      authorize :update_pipeline
-      authorize :destroy_pipeline
-
       private
 
       def find_object(id:)

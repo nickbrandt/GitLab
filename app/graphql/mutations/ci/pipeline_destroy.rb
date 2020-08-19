@@ -5,6 +5,8 @@ module Mutations
     class PipelineDestroy < Base
       graphql_name 'PipelineDestroy'
 
+      authorize :destroy_pipeline
+
       def resolve(id:)
         pipeline = authorized_find!(id: id)
         project = pipeline.project
