@@ -74,11 +74,17 @@ module Gitlab
           def eql?(other)
             report_type == other.report_type &&
               location.fingerprint == other.location.fingerprint &&
-              primary_identifier.fingerprint == other.primary_identifier.fingerprint
+              primary_fingerprint == other.primary_fingerprint
           end
 
           def hash
-            report_type.hash ^ location.fingerprint.hash ^ primary_identifier.fingerprint.hash
+            report_type.hash ^ location.fingerprint.hash ^ primary_fingerprint.hash
+          end
+
+          protected
+
+          def primary_fingerprint
+            primary_identifier&.fingerprint
           end
 
           def valid?
