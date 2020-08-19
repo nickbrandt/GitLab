@@ -236,11 +236,11 @@ module ApplicationHelper
   end
 
   def use_startup_css?
-    params[:startup_css] == 'true' || cookies['startup_css'] == 'true'
+    Feature.enabled?(:startup_css)
   end
 
   def stylesheet_link_tag_defer(path)
-    if use_startup_css?
+    if use_startup_css? && !Rails.env.test?
       stylesheet_link_tag(path, media: "print")
     else
       stylesheet_link_tag(path, media: "all")
