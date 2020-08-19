@@ -2264,7 +2264,7 @@ msgstr ""
 msgid "AlertSettings|Authorization key"
 msgstr ""
 
-msgid "AlertSettings|Authorization key has been successfully reset"
+msgid "AlertSettings|Authorization key has been successfully reset. Please save your changes now."
 msgstr ""
 
 msgid "AlertSettings|Copy"
