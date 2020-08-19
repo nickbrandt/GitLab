@@ -6,7 +6,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
   let(:entity1) { 'dfb9d2d2-f56c-4c77-8aeb-6cddc4a1f857' }
   let(:entity2) { '1dd9afb2-a3ee-4de1-8ae3-a405579c8584' }
   let(:entity3) { '34rfjuuy-ce56-sa35-ds34-dfer567dfrf2' }
-  let(:entity4) { '34rfjuuy-ce56-sa35-ds34-dferddddfrf2' }
+  let(:entity4) { '8b9a2671-2abf-4bec-a682-22f6a8f7bf31' }
 
   let(:weekly_event) { 'g_analytics_contribution' }
   let(:daily_event) { 'g_search' }

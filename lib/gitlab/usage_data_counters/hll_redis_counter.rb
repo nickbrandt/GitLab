@@ -23,7 +23,7 @@ module Gitlab
       # - name: g_compliance_dashboard # Unique event name
       #   redis_slot: compliance       # Optional slot name, if not defined it will use name as a slot, used for totals
       #   category: compliance         # Group events in categories
-      #   expiry: 29                   # Optional expiration time in days, defalut value 29 days for daily and 6.weeks for weekly
+      #   expiry: 29                   # Optional expiration time in days, default value 29 days for daily and 6.weeks for weekly
       #   aggregation: daily           # Aggregation level, keys are stored daily or weekly
       #
       # Usage:
@@ -36,9 +36,7 @@ module Gitlab
 
           raise UnknownEvent.new("Unknown event #{event_name}") unless event.present?
 
-          key = redis_key(event, time)
-
-          Gitlab::Redis::HLL.add(key: key, value: entity_id, expiry: expiry(event))
+          Gitlab::Redis::HLL.add(key: redis_key(event, time), value: entity_id, expiry: expiry(event))
         end
 
         def unique_events(event_names:, start_date:, end_date:)
@@ -70,7 +68,7 @@ module Gitlab
         end
 
         def known_events
-          @known_events ||= YAML.load_file( Rails.root.join(KNOWN_EVENTS_PATH)).map(&:with_indifferent_access)
+          @known_events ||= YAML.load_file(Rails.root.join(KNOWN_EVENTS_PATH)).map(&:with_indifferent_access)
         end
 
         def known_events_names
@@ -93,11 +91,9 @@ module Gitlab
         end
 
         def expiry(event)
-          if event[:expiry].present?
-            event[:expiry]
-          else
-            event[:aggregation].to_sym == :daily ? DEFAULT_DAILY_KEY_EXPIRY_LENGTH : DEFAULT_WEEKLY_KEY_EXPIRY_LENGTH
-          end
+          return event[:expiry] if event[:expiry].present?
+
+          event[:aggregation].to_sym == :daily ? DEFAULT_DAILY_KEY_EXPIRY_LENGTH : DEFAULT_WEEKLY_KEY_EXPIRY_LENGTH
         end
 
         def event_for(event_name)
