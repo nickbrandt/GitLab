@@ -77,8 +77,9 @@ Maintainers can:
   **Allowed to Deploy** dropdown menu.
 - Unprotect a protected environment by clicking the **Unprotect** button for that environment.
 
-Note that once an environment is unprotected, all access entries are deleted and would need to
-be re-entered should the environment be re-protected.
+NOTE: **Note:**
+After an environment is unprotected, all access entries are deleted and must
+be re-entered if the environment is re-protected.
 
 For more information, see [Deployment safety](deployment_safety.md).
 
