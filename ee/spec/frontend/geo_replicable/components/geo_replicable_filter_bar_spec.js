@@ -1,5 +1,5 @@
 import Vuex from 'vuex';
-import { createLocalVue, mount } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import {
   GlDeprecatedDropdown,
   GlDeprecatedDropdownItem,
@@ -25,7 +25,7 @@ describe('GeoReplicableFilterBar', () => {
   };
 
   const createComponent = () => {
-    wrapper = mount(GeoReplicableFilterBar, {
+    wrapper = shallowMount(GeoReplicableFilterBar, {
       localVue,
       store: createStore({ replicableType: MOCK_REPLICABLE_TYPE, graphqlFieldName: null }),
       methods: {
@@ -75,15 +75,33 @@ describe('GeoReplicableFilterBar', () => {
         const index = 1;
         findGlDropdownItems()
           .at(index)
-          .find('button')
-          .trigger('click');
+          .vm.$emit('click');
 
         expect(actionSpies.setFilter).toHaveBeenCalledWith(index);
       });
     });
 
-    it('renders a search box always', () => {
-      expect(findGlSearchBox().exists()).toBeTruthy();
+    describe('Search box', () => {
+      it('renders always', () => {
+        expect(findGlSearchBox().exists()).toBe(true);
+      });
+
+      it('has debounce prop', () => {
+        expect(findGlSearchBox().attributes('debounce')).toBe(DEFAULT_SEARCH_DELAY.toString());
+      });
+
+      describe('onSearch', () => {
+        const testSearch = 'test search';
+
+        beforeEach(() => {
+          findGlSearchBox().vm.$emit('input', testSearch);
+        });
+
+        it('calls fetchSyncNamespaces when input event is fired from GlSearchBoxByType', () => {
+          expect(actionSpies.setSearch).toHaveBeenCalledWith(testSearch);
+          expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
+        });
+      });
     });
 
     describe('Re-sync all button', () => {
@@ -92,34 +110,9 @@ describe('GeoReplicableFilterBar', () => {
       });
 
       it('calls initiateAllReplicableSyncs when clicked', () => {
-        findGlButton().trigger('click');
+        findGlButton().vm.$emit('click');
         expect(actionSpies.initiateAllReplicableSyncs).toHaveBeenCalled();
       });
-    });
-  });
-
-  // TODO: These specs should fixed once we have a proper mock for debounce
-  // https://gitlab.com/gitlab-org/gitlab/-/issues/213925
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip('when search changes', () => {
-    beforeEach(() => {
-      createComponent();
-      actionSpies.fetchReplicableItems.mockClear(); // Will get called on init
-      wrapper.vm.search = 'test search';
-    });
-
-    it(`should wait ${DEFAULT_SEARCH_DELAY}ms before calling setSearch`, () => {
-      expect(actionSpies.setSearch).not.toHaveBeenCalledWith('test search');
-
-      jest.runAllTimers(); // Debounce
-      expect(actionSpies.setSearch).toHaveBeenCalledWith('test search');
-    });
-
-    it(`should wait ${DEFAULT_SEARCH_DELAY}ms before calling fetchReplicableItems`, () => {
-      expect(actionSpies.fetchReplicableItems).not.toHaveBeenCalled();
-
-      jest.runAllTimers(); // Debounce
-      expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
     });
   });
 
