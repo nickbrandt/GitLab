@@ -62,6 +62,7 @@ module Gitlab
         def find_user
           user = find_by_uid_and_provider
 
+          user ||= find_by_email if auto_link_user?
           user ||= find_or_build_ldap_user if auto_link_ldap_user?
           user ||= build_new_user if signup_enabled?
 
@@ -269,6 +270,10 @@ module Gitlab
           Gitlab::CurrentSettings.current_application_settings
                                 .disabled_oauth_sign_in_sources
                                 .include?(auth_hash.provider)
+        end
+
+        def auto_link_user?
+          Gitlab.config.omniauth.auto_link_user
         end
       end
     end
