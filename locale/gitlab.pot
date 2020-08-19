@@ -10660,6 +10660,9 @@ msgstr ""
 msgid "File"
 msgstr ""
 
+msgid "File %{current} of %{total}"
+msgstr ""
+
 msgid "File Hooks"
 msgstr ""
 
