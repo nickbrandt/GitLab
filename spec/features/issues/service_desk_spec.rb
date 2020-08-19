@@ -37,7 +37,7 @@ RSpec.describe 'Service Desk Issue Tracker', :js do
         expect(page).to have_css('.empty-state')
         expect(page).to have_text('Service Desk is enabled but not yet active')
         expect(page).to have_text('You must set up incoming email before it becomes active')
-        expect(page).to have_link('More information', href: /#{help_page_path('administration/incoming_email', anchor: 'set-it-up')}/)
+        expect(page).to have_link('More information', href: help_page_path('administration/incoming_email', anchor: 'set-it-up'))
       end
     end
 
@@ -54,7 +54,7 @@ RSpec.describe 'Service Desk Issue Tracker', :js do
           it 'displays the large info box, documentation, and a button to configure' do
             aggregate_failures do
               expect(page).to have_css('.empty-state')
-              expect(page).to have_link('Read more', href: /#{help_page_path('user/project/service_desk')}/)
+              expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
               expect(page).to have_link('Turn on Service Desk')
             end
           end
@@ -76,14 +76,12 @@ RSpec.describe 'Service Desk Issue Tracker', :js do
     context 'when service desk has been activated' do
       context 'when there are no issues' do
         describe 'service desk info content' do
-          before do
-            visit service_desk_project_issues_path(project)
-          end
-
           it 'displays the large info box, documentation, and the address' do
+            visit service_desk_project_issues_path(project)
+
             aggregate_failures do
               expect(page).to have_css('.empty-state')
-              expect(page).to have_link('Read more', href: /#{help_page_path('user/project/service_desk')}/)
+              expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
               expect(page).not_to have_link('Turn on Service Desk')
               expect(page).to have_content(project.service_desk_address)
             end
@@ -95,16 +93,13 @@ RSpec.describe 'Service Desk Issue Tracker', :js do
 
               project.add_guest(user_2)
               sign_in(user_2)
-
-              wait_for_all_requests
-
               visit service_desk_project_issues_path(project)
             end
 
             it 'displays the large info box and the documentation link' do
               aggregate_failures do
                 expect(page).to have_css('.empty-state')
-                expect(page).to have_link('Read more', href: /#{help_page_path('user/project/service_desk')}/)
+                expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
                 expect(page).not_to have_link('Turn on Service Desk')
                 expect(page).not_to have_content(project.service_desk_address)
               end
@@ -127,7 +122,7 @@ RSpec.describe 'Service Desk Issue Tracker', :js do
           it 'displays the small info box, documentation, a button to configure service desk, and the address' do
             aggregate_failures do
               expect(page).to have_css('.non-empty-state')
-              expect(page).to have_link('Read more', href: /#{help_page_path('user/project/service_desk')}/)
+              expect(page).to have_link('Read more', href: help_page_path('user/project/service_desk'))
               expect(page).not_to have_link('Turn on Service Desk')
               expect(page).to have_content(project.service_desk_address)
             end
