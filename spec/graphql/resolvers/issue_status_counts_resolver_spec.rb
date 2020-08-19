@@ -9,10 +9,10 @@ RSpec.describe Resolvers::IssueStatusCountsResolver do
     let_it_be(:current_user) { create(:user) }
     let_it_be(:group) { create(:group) }
     let_it_be(:project) { create(:project, group: group) }
-    let_it_be(:issue) { create(:issue, project: project, state: :opened, created_at: 3.hours.ago, updated_at: 3.hours.ago) }
+    let_it_be(:issue)    { create(:issue, project: project, state: :opened, created_at: 3.hours.ago, updated_at: 3.hours.ago) }
     let_it_be(:incident) { create(:incident, project: project, state: :closed, created_at: 1.hour.ago, updated_at: 1.hour.ago, closed_at: 1.hour.ago) }
 
-    # This issue should not be included in the counts
+    # These issues should not be counted by counts, as they are from other projects
     let_it_be(:other_project) { create(:project) }
     let_it_be(:other_proj_issue) { create(:issue, state: :opened, project: other_project) }
 
@@ -40,6 +40,12 @@ RSpec.describe Resolvers::IssueStatusCountsResolver do
     end
 
     it_behaves_like 'returns expected results'
+
+    context 'project used as parent' do
+      let(:parent) { project }
+
+      it_behaves_like 'returns expected results'
+    end
 
     context 'group used as parent' do
       let(:parent) { project.group }
