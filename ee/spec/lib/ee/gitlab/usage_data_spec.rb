@@ -155,12 +155,6 @@ RSpec.describe Gitlab::UsageData do
       expect(count_data[:coverage_fuzzing_jobs]).to eq(1)
     end
 
-    it 'correctly shows failure for combined license management' do
-      allow(Gitlab::Database::BatchCount).to receive(:batch_count).and_raise(ActiveRecord::StatementInvalid)
-
-      expect(count_data[:license_management_jobs]).to eq(-1)
-    end
-
     it 'gathers group overview preferences usage data', :aggregate_failures do
       expect(subject[:counts][:user_preferences_group_overview_details]).to eq(User.active.count - 2) # we have exactly 2 active users with security dashboard set
       expect(subject[:counts][:user_preferences_group_overview_security_dashboard]).to eq 2
@@ -623,29 +617,6 @@ RSpec.describe Gitlab::UsageData do
         secret_detection_pipeline: 0,
         coverage_fuzzing_pipeline: 0,
         user_unique_users_all_secure_scanners: 1
-      )
-    end
-
-    it 'has to resort to 0 for counting license scan' do
-      allow(Gitlab::Database::BatchCount).to receive(:batch_distinct_count).and_raise(ActiveRecord::StatementInvalid)
-      allow(::Ci::Build).to receive(:distinct_count_by).and_raise(ActiveRecord::StatementInvalid)
-
-      expect(described_class.usage_activity_by_stage_secure(described_class.last_28_days_time_period)).to eq(
-        user_preferences_group_overview_security_dashboard: 3,
-        user_container_scanning_jobs: -1,
-        user_coverage_fuzzing_jobs: -1,
-        user_dast_jobs: -1,
-        user_dependency_scanning_jobs: -1,
-        user_license_management_jobs: -1,
-        user_sast_jobs: -1,
-        user_secret_detection_jobs: -1,
-        sast_pipeline: -1,
-        dependency_scanning_pipeline: -1,
-        container_scanning_pipeline: -1,
-        dast_pipeline: -1,
-        secret_detection_pipeline: -1,
-        coverage_fuzzing_pipeline: -1,
-        user_unique_users_all_secure_scanners: -1
       )
     end
   end
