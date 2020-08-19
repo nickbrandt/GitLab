@@ -12,9 +12,14 @@ module Security
       end
 
       def configuration
-        config = Gitlab::Json.parse(File.read(Rails.root.join(SAST_UI_SCHEMA_PATH))).with_indifferent_access
-        populate_values(config)
-        config
+        result = Gitlab::Json.parse(File.read(Rails.root.join(SAST_UI_SCHEMA_PATH))).with_indifferent_access
+        populate_default_value_for(result, :global)
+        populate_default_value_for(result, :pipeline)
+        fill_current_value_with_default_for(result, :global)
+        fill_current_value_with_default_for(result, :pipeline)
+        populate_current_value_for(result, :global)
+        populate_current_value_for(result, :pipeline)
+        result
       end
 
       private
@@ -23,16 +28,21 @@ module Security
         Gitlab::Template::GitlabCiYmlTemplate.find('SAST').content
       end
 
-      def populate_values(config)
-        set_each(config[:global], key: :default_value, with: sast_template_attributes)
-        set_each(config[:global], key: :value, with: gitlab_ci_yml_attributes)
-        set_each(config[:pipeline], key: :default_value, with: sast_template_attributes)
-        set_each(config[:pipeline], key: :value, with: gitlab_ci_yml_attributes)
+      def populate_default_value_for(config, level)
+        set_each(config[level], key: :default_value, with: sast_template_attributes)
+      end
+
+      def populate_current_value_for(config, level)
+        set_each(config[level], key: :value, with: gitlab_ci_yml_attributes)
+      end
+
+      def fill_current_value_with_default_for(config, level)
+        set_each(config[level], key: :value, with: sast_template_attributes)
       end
 
       def set_each(config_attributes, key:, with:)
         config_attributes.each do |entity|
-          entity[key] = with[entity[:field]]
+          entity[key] = with[entity[:field]] if with[entity[:field]]
         end
       end
 
