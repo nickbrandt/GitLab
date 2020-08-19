@@ -46,7 +46,7 @@ RSpec.describe "User sorts issues" do
     expect(find('.issues-filters a.is-active')).to have_content('Milestone')
   end
 
-  it "sorts by popularity", :js do
+  it 'sorts by popularity', :js do
     find('.filter-dropdown-container .dropdown').click
 
     page.within('ul.dropdown-menu.dropdown-menu-right li') do
