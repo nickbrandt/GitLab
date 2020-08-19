@@ -175,9 +175,9 @@ Automate GitLab via [API](../api/README.md).
 
 Learn what is [Git](../topics/git/index.md) and its best practices.
 
-## Instance statistics
+## Instance-level analytics
 
-See [various statistics](instance_statistics/index.md) of your GitLab instance.
+See [various statistics](admin_area/analytics/index.md) of your GitLab instance.
 
 ## Operations Dashboard **(PREMIUM)**
 
