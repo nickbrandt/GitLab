@@ -1,0 +1,5 @@
+---
+title: Fix the `Vulnerability-Check` and `License-Check` approval rules to be synched correctly after creating a merge request.
+merge_request: 39587
+author:
+type: fixed
