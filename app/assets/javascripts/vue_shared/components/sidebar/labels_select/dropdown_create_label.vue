@@ -24,17 +24,18 @@ export default {
     <div class="dropdown-title">
       <gl-button
         :aria-label="__('Go back')"
-        class="dropdown-title-button dropdown-menu-back"
+        class="dropdown-title-button dropdown-menu-back gl-top-0!"
+        category="tertiary"
         icon="arrow-left"
+
       />
       {{ headerTitle }}
       <gl-button
         :aria-label="__('Close')"
         class="dropdown-title-button dropdown-menu-close"
         icon="close"
-      >
-        <i aria-hidden="true" class="fa fa-times dropdown-menu-close-icon" data-hidden="true"> </i>
-      </gl-button>
+        category="tertiary"
+      />
     </div>
     <div class="dropdown-content">
       <div class="dropdown-labels-error js-label-error"></div>
