@@ -60,6 +60,7 @@ RSpec.describe Epics::IssuePromoteService do
 
           before do
             allow(Gitlab::Tracking).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
+            allow(ProductAnalytics::Tracker).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
 
             subject.execute(issue)
           end
@@ -145,6 +146,7 @@ RSpec.describe Epics::IssuePromoteService do
         context 'when issue has notes' do
           before do
             allow(Gitlab::Tracking).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
+            allow(ProductAnalytics::Tracker).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
             issue.reload
           end
 
