@@ -144,7 +144,7 @@ describe('Filters actions', () => {
       });
 
       it('dispatches RECEIVE_AUTHORS_SUCCESS with received data', () => {
-        testAction(
+        return testAction(
           actions.fetchAuthors,
           null,
           state,
@@ -153,7 +153,9 @@ describe('Filters actions', () => {
             { type: types.RECEIVE_AUTHORS_SUCCESS, payload: filterUsers },
           ],
           [],
-        );
+        ).then(({ data }) => {
+          expect(data).toBe(filterUsers);
+        });
       });
     });
 
@@ -187,7 +189,7 @@ describe('Filters actions', () => {
       });
 
       it('dispatches RECEIVE_MILESTONES_SUCCESS with received data', () => {
-        testAction(
+        return testAction(
           actions.fetchMilestones,
           null,
           { ...state, milestonesPath },
@@ -196,7 +198,9 @@ describe('Filters actions', () => {
             { type: types.RECEIVE_MILESTONES_SUCCESS, payload: filterMilestones },
           ],
           [],
-        );
+        ).then(({ data }) => {
+          expect(data).toBe(filterMilestones);
+        });
       });
     });
 
@@ -230,7 +234,7 @@ describe('Filters actions', () => {
       });
 
       it('dispatches RECEIVE_ASSIGNEES_SUCCESS with received data', () => {
-        testAction(
+        return testAction(
           actions.fetchAssignees,
           null,
           { ...state, milestonesPath },
@@ -239,7 +243,9 @@ describe('Filters actions', () => {
             { type: types.RECEIVE_ASSIGNEES_SUCCESS, payload: filterUsers },
           ],
           [],
-        );
+        ).then(({ data }) => {
+          expect(data).toBe(filterUsers);
+        });
       });
     });
 
@@ -273,7 +279,7 @@ describe('Filters actions', () => {
       });
 
       it('dispatches RECEIVE_LABELS_SUCCESS with received data', () => {
-        testAction(
+        return testAction(
           actions.fetchLabels,
           null,
           { ...state, labelsPath },
@@ -282,7 +288,9 @@ describe('Filters actions', () => {
             { type: types.RECEIVE_LABELS_SUCCESS, payload: filterLabels },
           ],
           [],
-        );
+        ).then(({ data }) => {
+          expect(data).toBe(filterLabels);
+        });
       });
     });
 

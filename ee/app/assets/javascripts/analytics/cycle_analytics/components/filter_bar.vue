@@ -1,10 +1,10 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlFilteredSearch } from '@gitlab/ui';
 import { __ } from '~/locale';
-import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
-import LabelToken from '../../shared/components/tokens/label_token.vue';
-import UserToken from '../../shared/components/tokens/user_token.vue';
+import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
+import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
+import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
+import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
 
 export const prepareTokens = ({
   milestone = null,
@@ -27,79 +27,68 @@ export const prepareTokens = ({
 export default {
   name: 'FilterBar',
   components: {
-    GlFilteredSearch,
+    FilteredSearchBar,
   },
-  data() {
-    return {
-      value: [],
-    };
+  props: {
+    groupPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState('filters', {
       milestones: state => state.milestones.data,
-      milestonesLoading: state => state.milestones.isLoading,
       labels: state => state.labels.data,
-      labelsLoading: state => state.labels.isLoading,
       authors: state => state.authors.data,
-      authorsLoading: state => state.authors.isLoading,
       assignees: state => state.assignees.data,
-      assigneesLoading: state => state.assignees.isLoading,
       initialTokens: state => state.initialTokens,
     }),
-    availableTokens() {
+    tokens() {
       return [
         {
           icon: 'clock',
           title: __('Milestone'),
           type: 'milestone',
           token: MilestoneToken,
-          milestones: this.milestones,
+          initialMilestones: this.milestones,
           unique: true,
           symbol: '%',
-          isLoading: this.milestonesLoading,
           operators: [{ value: '=', description: 'is', default: 'true' }],
-          fetchData: this.fetchMilestones,
+          fetchMilestones: this.fetchMilestones,
         },
         {
           icon: 'labels',
           title: __('Label'),
           type: 'labels',
           token: LabelToken,
-          labels: this.labels,
+          initialLabels: this.labels,
           unique: false,
           symbol: '~',
-          isLoading: this.labelsLoading,
           operators: [{ value: '=', description: 'is', default: 'true' }],
-          fetchData: this.fetchLabels,
+          fetchLabels: this.fetchLabels,
         },
         {
           icon: 'pencil',
           title: __('Author'),
           type: 'author',
-          token: UserToken,
-          users: this.authors,
+          token: AuthorToken,
+          initialAuthors: this.authors,
           unique: true,
-          isLoading: this.authorsLoading,
           operators: [{ value: '=', description: 'is', default: 'true' }],
-          fetchData: this.fetchAuthors,
+          fetchAuthors: this.fetchAuthors,
         },
         {
           icon: 'user',
           title: __('Assignees'),
           type: 'assignees',
-          token: UserToken,
-          users: this.assignees,
+          token: AuthorToken,
+          initialAuthors: this.assignees,
           unique: false,
-          isLoading: this.assigneesLoading,
           operators: [{ value: '=', description: 'is', default: 'true' }],
-          fetchData: this.fetchAssignees,
+          fetchAuthors: this.fetchAssignees,
         },
       ];
     },
-  },
-
-  mounted() {
-    this.initializeTokens();
   },
   methods: {
     ...mapActions('filters', [
@@ -109,15 +98,15 @@ export default {
       'fetchAuthors',
       'fetchAssignees',
     ]),
-    initializeTokens() {
+    initialFilterValue() {
       const {
         selectedMilestone: milestone = null,
         selectedAuthor: author = null,
         selectedAssignees: assignees = [],
         selectedLabels: labels = [],
       } = this.initialTokens;
-      const preparedTokens = prepareTokens({ milestone, author, assignees, labels });
-      this.value = preparedTokens;
+
+      return prepareTokens({ milestone, author, assignees, labels });
     },
     processFilters(filters) {
       return filters.reduce((acc, token) => {
@@ -142,7 +131,7 @@ export default {
       }, {});
     },
 
-    filteredSearchSubmit(filters) {
+    handleFilter(filters) {
       const { labels, milestone, author, assignees } = this.processFilters(filters);
 
       this.setFilters({
@@ -157,12 +146,12 @@ export default {
 </script>
 
 <template>
-  <gl-filtered-search
-    v-model="value"
-    :placeholder="__('Filter results')"
-    :clear-button-title="__('Clear')"
-    :close-button-title="__('Close')"
-    :available-tokens="availableTokens"
-    @submit="filteredSearchSubmit"
+  <filtered-search-bar
+    :namespace="groupPath"
+    recent-searches-storage-key="value-stream-analytics"
+    :search-input-placeholder="__('Filter results')"
+    :tokens="tokens"
+    :initial-filter-value="initialFilterValue()"
+    @onFilter="handleFilter"
   />
 </template>

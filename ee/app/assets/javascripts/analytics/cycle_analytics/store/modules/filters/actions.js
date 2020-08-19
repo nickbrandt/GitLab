@@ -21,7 +21,10 @@ export const fetchMilestones = ({ commit, state }, search_title = '') => {
 
   return axios
     .get(milestonesPath, { params: { search_title } })
-    .then(({ data }) => commit(types.RECEIVE_MILESTONES_SUCCESS, data))
+    .then(response => {
+      commit(types.RECEIVE_MILESTONES_SUCCESS, response.data);
+      return response;
+    })
     .catch(({ response }) => {
       const { status } = response;
       commit(types.RECEIVE_MILESTONES_ERROR, status);
@@ -34,7 +37,10 @@ export const fetchLabels = ({ commit, state }, search = '') => {
 
   return axios
     .get(state.labelsPath, { params: { search } })
-    .then(({ data }) => commit(types.RECEIVE_LABELS_SUCCESS, data))
+    .then(response => {
+      commit(types.RECEIVE_LABELS_SUCCESS, response.data);
+      return response;
+    })
     .catch(({ response }) => {
       const { status } = response;
       commit(types.RECEIVE_LABELS_ERROR, status);
@@ -46,7 +52,10 @@ const fetchUser = ({ commit, endpoint, query, action, errorMessage }) => {
   commit(`REQUEST_${action}`);
 
   return Api.groupMembers(endpoint, { query })
-    .then(({ data }) => commit(`RECEIVE_${action}_SUCCESS`, data))
+    .then(response => {
+      commit(`RECEIVE_${action}_SUCCESS`, response.data);
+      return response;
+    })
     .catch(({ response }) => {
       const { status } = response;
       commit(`RECEIVE_${action}_ERROR`, status);
@@ -84,7 +93,7 @@ export const setFilters = ({ dispatch }, nextFilters) => {
 
 export const initialize = ({ dispatch, commit }, initialFilters) => {
   commit(types.INITIALIZE, initialFilters);
-  return Promise.resolve()
-    .then(() => dispatch('setPaths', initialFilters))
-    .then(() => dispatch('setSelectedFilters', initialFilters, { root: true }));
+  return dispatch('setPaths', initialFilters).then(() =>
+    dispatch('setSelectedFilters', initialFilters, { root: true }),
+  );
 };

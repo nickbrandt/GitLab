@@ -667,11 +667,11 @@ describe('Cycle Analytics component', () => {
       created_after: toYmd(mockData.startDate),
       created_before: toYmd(mockData.endDate),
       group_id: selectedGroup.fullPath,
-      'project_ids[]': [],
+      'project_ids[]': null,
       milestone_title: null,
       author_username: null,
-      'assignee_username[]': [],
-      'label_name[]': [],
+      'assignee_username[]': null,
+      'label_name[]': null,
     };
 
     const selectedProjectIds = mockData.selectedProjects.map(({ id }) => id);

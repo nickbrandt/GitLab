@@ -10,7 +10,7 @@ import DateRange from '../../shared/components/daterange.vue';
 import StageTable from './stage_table.vue';
 import DurationChart from './duration_chart.vue';
 import TypeOfWorkCharts from './type_of_work_charts.vue';
-import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
+import UrlSync from '~/vue_shared/components/url_sync.vue';
 import { toYmd } from '../../shared/utils';
 import RecentActivityCard from './recent_activity_card.vue';
 import TimeMetricsCard from './time_metrics_card.vue';
@@ -40,8 +40,8 @@ export default {
     MetricCard,
     FilterBar,
     ValueStreamSelect,
+    UrlSync,
   },
-  mixins: [UrlSyncMixin],
   props: {
     emptyStateSvgPath: {
       type: String,
@@ -126,15 +126,19 @@ export default {
       return this.startDate && this.endDate;
     },
     query() {
+      const selectedProjectIds = this.selectedProjectIds?.length ? this.selectedProjectIds : null;
+      const selectedLabels = this.selectedLabels?.length ? this.selectedLabels : null;
+      const selectedAssignees = this.selectedAssignees?.length ? this.selectedAssignees : null;
+
       return {
         group_id: !this.hideGroupDropDown ? this.currentGroupPath : null,
-        'project_ids[]': this.selectedProjectIds,
+        'project_ids[]': selectedProjectIds,
         created_after: toYmd(this.startDate),
         created_before: toYmd(this.endDate),
         milestone_title: this.selectedMilestone,
         author_username: this.selectedAuthor,
-        'label_name[]': this.selectedLabels,
-        'assignee_username[]': this.selectedAssignees,
+        'label_name[]': selectedLabels,
+        'assignee_username[]': selectedAssignees,
       };
     },
     stageCount() {
@@ -259,10 +263,6 @@ export default {
               @selected="onProjectsSelect"
             />
           </div>
-          <filter-bar
-            v-if="shouldDisplayFilterBar"
-            class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3 gl-border-none"
-          />
           <div v-if="shouldDisplayFilters" class="gl-justify-content-end gl-white-space-nowrap">
             <date-range
               :start-date="startDate"
@@ -274,6 +274,11 @@ export default {
             />
           </div>
         </div>
+        <filter-bar
+          v-if="shouldDisplayFilterBar"
+          class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 gl-mr-3 gl-border-none"
+          :group-path="currentGroupPath"
+        />
       </div>
     </div>
     <gl-empty-state
@@ -356,6 +361,7 @@ export default {
             </template>
           </stage-table>
         </div>
+        <url-sync :query="query" />
       </div>
       <duration-chart v-if="shouldDisplayDurationChart" class="mt-3" :stages="activeStages" />
       <type-of-work-charts v-if="shouldDisplayTypeOfWorkCharts" :is-loading="isLoadingTypeOfWork" />
