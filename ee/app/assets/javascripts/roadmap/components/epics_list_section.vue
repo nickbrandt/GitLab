@@ -141,7 +141,7 @@ export default {
     },
     getEpicItemProps(index) {
       return {
-        key: index,
+        key: generateKey(this.displayedEpics[index]),
         props: {
           epic: this.displayedEpics[index],
           presetType: this.presetType,

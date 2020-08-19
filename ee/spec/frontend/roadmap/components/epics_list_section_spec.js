@@ -245,7 +245,7 @@ describe('EpicsListSectionComponent', () => {
       it('returns an object containing props for EpicItem component', () => {
         expect(wrapper.vm.getEpicItemProps(1)).toEqual(
           expect.objectContaining({
-            key: 1,
+            key: `epic-${wrapper.vm.epics[1].id}`,
             props: {
               epic: wrapper.vm.epics[1],
               presetType: wrapper.vm.presetType,
