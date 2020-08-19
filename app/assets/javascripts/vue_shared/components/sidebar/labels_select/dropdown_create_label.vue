@@ -27,6 +27,7 @@ export default {
         class="dropdown-title-button dropdown-menu-back gl-top-0!"
         category="tertiary"
         icon="arrow-left"
+
       />
       {{ headerTitle }}
       <gl-button
