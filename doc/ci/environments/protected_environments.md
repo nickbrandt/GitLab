@@ -47,27 +47,36 @@ To protect an environment:
 
 The protected environment will now appear in the list of protected environments.
 
-## Access via Group
+## Environment access by group membership
 
-A user may be granted access to protected environments as part of group membership.
-For Reporters, this is the only way they may be granted access.
+A user may be granted access to protected environments as part of
+[group membership](../../user/group/index.md). Users with
+[Reporter permissions](../../user/permissions.md), can only be granted access to
+protected environments with this method.
 
-## Access to deployment branch
+## Deployment branch access
 
-When a Developer is granted access to a protected environment, either as an individual
-contributor, via Role or via a group _and_ they also have access to either push or merge
-to the branch that production is deployed, they have the following privileges:
+Users with [Developer permissions](../../user/permissions.md) can be granted
+access to a protected environment through any of these methods:
 
-- stop environment
-- destroy environment
-- create an environment terminal
+- As an individual contributor, through a role.
+- Through a group membership.
 
-## Deployment-only access
+If the user also has push or merge access to the branch deployed on production,
+they have the following privileges:
 
-When a user has access granted to a protected environment, and does not have access to push
-or merge to the branch, they are granted access _only_ to deploy the environment.
+- [Stopping an environment](index.md#stopping-an-environment).
+- [Delete a stopped environment](index.md#delete-a-stopped-environment).
+- [Create an environment terminal](index.md#web-terminals).
 
-This is the only possible access level for Reporters.
+## Deployment-only access to protected environments
+
+Users granted access to a protected environment, but not push or merge access
+to the branch deployed to it, are only granted access to deploy the environment.
+
+NOTE: **Note:**
+Deployment-only access is the only possible access level for users with
+[Reporter permissions](../../user/permissions.md).
 
 ## Modifying and unprotecting environments
 
