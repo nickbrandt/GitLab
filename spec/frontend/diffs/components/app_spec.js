@@ -865,6 +865,15 @@ describe('diffs/components/app', () => {
         expect(paginator().attributes('nextpage')).toBe(undefined);
       });
 
+      it("doesn't display when there's fewer than 2 files", () => {
+        createComponent({ viewDiffsFileByFile: true }, ({ state }) => {
+          state.diffs.diffFiles.push({ file_hash: '123' });
+          state.diffs.currentDiffFileId = '123';
+        });
+
+        expect(fileByFileNav().exists()).toBe(false);
+      });
+
       it.each`
         currentDiffFileId | targetFile
         ${'123'}          | ${2}
