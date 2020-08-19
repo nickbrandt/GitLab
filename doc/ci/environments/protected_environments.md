@@ -47,6 +47,28 @@ To protect an environment:
 
 The protected environment will now appear in the list of protected environments.
 
+## Access via Group
+
+A user may be granted access to protected environments as part of group membership.
+For Reporters, this is the only way they may be granted access.
+
+## Access to deployment branch
+
+When a Developer is granted access to a protected environment, either as an individual
+contributor, via Role or via a group _and_ they also have access to either push or merge
+to the branch that production is deployed, they have the following privileges:
+
+- stop environment
+- destroy environment
+- create an environment terminal
+
+## Deployment-only access
+
+When a user has access granted to a protected environment, and does not have access to push
+or merge to the branch, they are granted access _only_ to deploy the environment.
+
+This is the only possible access level for Reporters.
+
 ## Modifying and unprotecting environments
 
 Maintainers can:
@@ -54,6 +76,9 @@ Maintainers can:
 - Update existing protected environments at any time by changing the access in the
   **Allowed to Deploy** dropdown menu.
 - Unprotect a protected environment by clicking the **Unprotect** button for that environment.
+
+Note that once an environment is unprotected, all access entries are deleted and would need to
+be re-entered should the environment be re-protected.
 
 For more information, see [Deployment safety](deployment_safety.md).
 
