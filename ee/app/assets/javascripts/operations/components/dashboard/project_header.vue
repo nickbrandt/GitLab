@@ -5,7 +5,6 @@ import { __ } from '~/locale';
 
 export default {
   components: {
-    Icon,
     ProjectAvatar,
     GlButton,
     GlLink,
