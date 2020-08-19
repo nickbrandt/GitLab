@@ -150,6 +150,7 @@ module Gitlab
         def find_ldap_person(auth_hash, adapter)
           Gitlab::Auth::Ldap::Person.find_by_uid(auth_hash.uid, adapter) ||
             Gitlab::Auth::Ldap::Person.find_by_email(auth_hash.uid, adapter) ||
+            Gitlab::Auth::Ldap::Person.find_by_email(auth_hash.email, adapter) ||
             Gitlab::Auth::Ldap::Person.find_by_dn(auth_hash.uid, adapter)
         rescue Gitlab::Auth::Ldap::LdapConnectionError
           nil
