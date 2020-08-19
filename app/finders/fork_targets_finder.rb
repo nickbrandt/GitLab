@@ -10,7 +10,7 @@ class ForkTargetsFinder
   def execute(options = {})
     return ::Namespace.where(id: user.manageable_namespaces).sort_by_type unless options[:only_groups]
 
-    ::Group.where(id: user.manageable_namespaces)
+    ::Group.where(id: user.manageable_groups)
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
