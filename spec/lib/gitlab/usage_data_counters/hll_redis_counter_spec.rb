@@ -37,19 +37,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     Timecop.freeze(reference_time) { example.run }
   end
 
-  describe '.unique_events' do
-    it 'raise error if metrics are not in the same slot' do
-      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_compliance_dashboard), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same slot')
-    end
-
-    it 'raise error if metrics are not in the same category' do
-      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_analytics_productivity), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same category')
-    end
-
-    it "raise error if metrics don't have same aggregation" do
-      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_analytics_valuestream), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should have same aggregation level')
-    end
-
+  describe '.track_event' do
     it "raise error if metrics don't have same aggregation" do
       expect { described_class.track_event(entity1, different_aggregation, Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownAggregation)
     end
@@ -90,6 +78,18 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       # Events 4 weeks ago
       described_class.track_event(entity3, daily_event, 28.days.ago)
       described_class.track_event(entity4, daily_event, 29.days.ago)
+    end
+
+    it 'raise error if metrics are not in the same slot' do
+      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_compliance_dashboard), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same slot')
+    end
+
+    it 'raise error if metrics are not in the same category' do
+      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_analytics_productivity), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same category')
+    end
+
+    it "raise error if metrics don't have same aggregation" do
+      expect { described_class.unique_events(event_names: %w(g_analytics_contribution g_analytics_valuestream), start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should have same aggregation level')
     end
 
     context 'when data for the last complete week' do
