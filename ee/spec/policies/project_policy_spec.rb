@@ -37,12 +37,8 @@ RSpec.describe ProjectPolicy do
   context 'basic permissions' do
     include_context 'ProjectPolicy context'
 
-    let(:additional_guest_permissions) do
-      %i[read_issue_link]
-    end
-
     let(:additional_reporter_permissions) do
-      %i[read_software_license_policy admin_issue_link]
+      %i[read_software_license_policy]
     end
 
     let(:additional_developer_permissions) do

@@ -16,7 +16,7 @@ RSpec.describe 'Related issues', :js do
 
   context 'widget visibility' do
     before do
-      stub_licensed_features(related_issues: true)
+      stub_licensed_features(blocked_issues: true)
     end
 
     context 'when not logged in' do
@@ -189,7 +189,7 @@ RSpec.describe 'Related issues', :js do
     let!(:issue_link_c) { create :issue_link, source: issue_a, target: issue_c }
 
     before do
-      stub_licensed_features(related_issues: true)
+      stub_licensed_features(blocked_issues: true)
       project.add_guest(user)
       gitlab_sign_in(user)
     end
@@ -240,7 +240,7 @@ RSpec.describe 'Related issues', :js do
 
     context 'with related_issues enabled' do
       before do
-        stub_licensed_features(related_issues: true)
+        stub_licensed_features(blocked_issues: true)
       end
 
       context 'without existing related issues' do

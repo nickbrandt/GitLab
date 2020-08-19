@@ -25,7 +25,7 @@ RSpec.describe Projects::IssueLinksController do
     end
 
     before do
-      stub_licensed_features(related_issues: true)
+      stub_licensed_features(blocked_issues: true)
       project.add_developer(user)
     end
 
@@ -58,7 +58,7 @@ RSpec.describe Projects::IssueLinksController do
     context 'when related issues are available on the project' do
       before do
         project.add_developer(user)
-        stub_licensed_features(related_issues: true)
+        stub_licensed_features(blocked_issues: true)
         stub_feature_flags(link_types: true)
       end
 
@@ -75,7 +75,7 @@ RSpec.describe Projects::IssueLinksController do
 
     context 'when related issues are not available on the project' do
       before do
-        stub_licensed_features(related_issues: false)
+        stub_licensed_features(blocked_issues: false)
       end
 
       it 'returns 403' do

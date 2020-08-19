@@ -8,7 +8,7 @@ RSpec.describe Projects::IssueLinksController do
   let(:issue) { create :issue, project: project }
 
   before do
-    stub_licensed_features(related_issues: true)
+    stub_licensed_features(blocked_issues: true)
   end
 
   describe 'GET /*namespace_id/:project_id/issues/:issue_id/links' do

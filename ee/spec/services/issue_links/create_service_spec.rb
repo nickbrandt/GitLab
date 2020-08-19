@@ -13,7 +13,7 @@ RSpec.describe IssueLinks::CreateService do
     end
 
     before do
-      stub_licensed_features(related_issues: true)
+      stub_licensed_features(blocked_issues: true)
 
       project.add_developer(user)
     end
