@@ -34,11 +34,13 @@ RSpec.describe Security::CiConfiguration::SastParserService do
       end
 
       context 'when .gitlab-ci.yml is absent' do
-        it 'assigns current values to nil' do
+        it 'populates the current values with the default values' do
           allow(project.repository).to receive(:blob_data_at).and_return(nil)
-          expect(secure_analyzers_prefix['value']).to be_nil
-          expect(sast_excluded_paths['value']).to be_nil
-          expect(sast_analyzer_image_tag['value']).to be_nil
+          expect(secure_analyzers_prefix['value']).to eql('registry.gitlab.com/gitlab-org/security-products/analyzers')
+          expect(sast_excluded_paths['value']).to eql('spec, test, tests, tmp')
+          expect(sast_analyzer_image_tag['value']).to eql('2')
+          expect(sast_pipeline_stage['value']).to eql('test')
+          expect(sast_search_max_depth['value']).to eql('4')
         end
       end
     end
