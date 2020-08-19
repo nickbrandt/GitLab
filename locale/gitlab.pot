@@ -25977,6 +25977,9 @@ msgstr ""
 msgid "To unsubscribe from this issue, please paste the following link into your browser:"
 msgstr ""
 
+msgid "To update Snippets with multiple files, you must use the `files` parameter"
+msgstr ""
+
 msgid "To view all %{scannedResourcesCount} scanned URLs, please download the CSV file"
 msgstr ""
 
