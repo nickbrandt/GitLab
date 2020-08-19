@@ -101,7 +101,7 @@ module DesignManagement
     scope :current, -> { visible_at_version(nil) }
 
     def self.relative_positioning_query_base(design)
-      on_issue(design.issue_id)
+      default_scoped.on_issue(design.issue_id)
     end
 
     def self.relative_positioning_parent_column
