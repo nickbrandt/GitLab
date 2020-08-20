@@ -24,7 +24,7 @@ export default {
     <div class="dropdown-title">
       <gl-button
         :aria-label="__('Go back')"
-        class="dropdown-title-button dropdown-menu-back gl-top-0!"
+        class="dropdown-title-button dropdown-menu-back gl-top-0! float-left"
         category="tertiary"
         icon="arrow-left"
 
@@ -32,7 +32,7 @@ export default {
       {{ headerTitle }}
       <gl-button
         :aria-label="__('Close')"
-        class="dropdown-title-button dropdown-menu-close"
+        class="dropdown-title-button dropdown-menu-close float-right"
         icon="close"
         category="tertiary"
       />
