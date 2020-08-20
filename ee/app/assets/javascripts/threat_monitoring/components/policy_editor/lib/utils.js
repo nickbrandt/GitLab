@@ -1,13 +1,11 @@
-import { EndpointMatchModeAny, PortMatchModeAny } from '../constants';
+import { PortMatchModeAny } from '../constants';
 
 /*
- Convert enpdoint labels provided as a string into a kubernetes selector.
- Expects endpointLabels in format "one two:three"
+ Convert space separated list of labels into a kubernetes selector.
+ Expects matchLabels in format "one two:three"
 */
-export function endpointSelector({ endpointMatchMode, endpointLabels }) {
-  if (endpointMatchMode === EndpointMatchModeAny) return {};
-
-  return endpointLabels.split(/\s/).reduce((acc, item) => {
+export function labelSelector(labels) {
+  return labels.split(/\s/).reduce((acc, item) => {
     const [key, value = ''] = item.split(':');
     if (key.length === 0) return acc;
 
@@ -21,7 +19,7 @@ export function endpointSelector({ endpointMatchMode, endpointLabels }) {
  Expects ports in format "80/tcp 81"
 */
 export function portSelectors({ portMatchMode, ports }) {
-  if (portMatchMode === PortMatchModeAny) return {};
+  if (portMatchMode === PortMatchModeAny) return [];
 
   return ports.split(/\s/).reduce((acc, item) => {
     const [port, protocol = 'tcp'] = item.split('/');
@@ -34,31 +32,9 @@ export function portSelectors({ portMatchMode, ports }) {
 }
 
 /*
- Convert list of labels provided as a string into a kubernetes endpoint selector.
- Expects matchLabels in format "one two:three"
+ Convert whitespace separated list of items provided as a string into a list.
+ Expects items in format "0.0.0.0/24 1.1.1.1/32"
 */
-export function ruleEndpointSelector(matchLabels) {
-  return matchLabels.split(/\s/).reduce((acc, item) => {
-    const [key, value = ''] = item.split(':');
-    if (key.length === 0) return acc;
-
-    acc[key] = value.trim();
-    return acc;
-  }, {});
-}
-
-/*
- Convert list of CIDRs provided as a string into a CIDR list expected by the kubernetes policy.
- Expects cidr in format "0.0.0.0/24 1.1.1.1/32"
-*/
-export function ruleCIDRList(cidr) {
-  return cidr.length === 0 ? [] : cidr.split(/\s/);
-}
-
-/*
- Convert list of FQDNs provided as a string into a FQDN list expected be the kubernetes policy.
- Expects fqdn in format "one-service.com another-service.com"
-*/
-export function ruleFQDNList(fqdn) {
-  return fqdn.length === 0 ? [] : fqdn.split(/\s/);
+export function splitItems(items) {
+  return items.split(/\s/).filter(item => item.length > 0);
 }

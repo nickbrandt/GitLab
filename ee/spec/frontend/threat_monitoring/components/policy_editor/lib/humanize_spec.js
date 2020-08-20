@@ -10,7 +10,7 @@ import {
   RuleTypeFQDN,
 } from 'ee/threat_monitoring/components/policy_editor/constants';
 
-describe('humatnizeNetworkPolicy', () => {
+describe('humanizeNetworkPolicy', () => {
   let policy;
   let rule;
 

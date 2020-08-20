@@ -6,7 +6,7 @@ import {
   RuleDirectionInbound,
   PortMatchModeAny,
 } from '../constants';
-import { portSelectors, ruleEndpointSelector, ruleCIDRList, ruleFQDNList } from './utils';
+import { portSelectors, labelSelector, splitItems } from './utils';
 
 /*
  Return kubernetes specification object that is shared by all rule types.
@@ -22,7 +22,7 @@ function commonSpec(rule) {
  Return kubernetes specification object for an endpoint rule.
 */
 function ruleEndpointSpec({ direction, matchLabels }) {
-  const matchSelector = ruleEndpointSelector(matchLabels);
+  const matchSelector = labelSelector(matchLabels);
   if (Object.keys(matchSelector).length === 0) return {};
 
   return {
@@ -49,7 +49,7 @@ function ruleEntitySpec({ direction, entities }) {
   Return kubernetes specification object for a cidr rule.
 */
 function ruleCIDRSpec({ direction, cidr }) {
-  const cidrList = ruleCIDRList(cidr);
+  const cidrList = splitItems(cidr);
   if (cidrList.length === 0) return {};
 
   return {
@@ -63,7 +63,7 @@ function ruleCIDRSpec({ direction, cidr }) {
 function ruleFQDNSpec({ direction, fqdn }) {
   if (direction === RuleDirectionInbound) return {};
 
-  const fqdnList = ruleFQDNList(fqdn);
+  const fqdnList = splitItems(fqdn);
   if (fqdnList.length === 0) return {};
 
   return {

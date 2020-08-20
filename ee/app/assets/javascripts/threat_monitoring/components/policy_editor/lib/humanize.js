@@ -7,13 +7,7 @@ import {
   RuleTypeCIDR,
   RuleTypeFQDN,
 } from '../constants';
-import {
-  endpointSelector,
-  portSelectors,
-  ruleEndpointSelector,
-  ruleCIDRList,
-  ruleFQDNList,
-} from './utils';
+import { portSelectors, labelSelector, splitItems } from './utils';
 
 const strongArgs = { strongOpen: '<strong>', strongClose: '</strong>' };
 
@@ -41,7 +35,7 @@ function humanizeNetworkPolicyRulePorts(rule) {
  Return humanizied description of an endpoint rule.
 */
 function humanizeNetworkPolicyRuleEndpoint({ matchLabels }) {
-  const matchSelector = ruleEndpointSelector(matchLabels);
+  const matchSelector = labelSelector(matchLabels);
   const labels = Object.keys(matchSelector)
     .map(key => `${key}: ${matchSelector[key]}`)
     .join(', ');
@@ -68,7 +62,7 @@ function humanizeNetworkPolicyRuleEntity({ entities }) {
  Return humanizied description of a cidr rule.
 */
 function humanizeNetworkPolicyRuleCIDR({ cidr }) {
-  const cidrList = ruleCIDRList(cidr);
+  const cidrList = splitItems(cidr);
   const cidrs =
     cidrList.length === 0 ? s__('NetworkPolicies|all IP addresses') : cidrList.join(', ');
   return `<strong>${cidrs}</strong>`;
@@ -78,7 +72,7 @@ function humanizeNetworkPolicyRuleCIDR({ cidr }) {
  Return humanizied description of a fqdn rule.
 */
 function humanizeNetworkPolicyRuleFQDN({ fqdn }) {
-  const fqdnList = ruleFQDNList(fqdn);
+  const fqdnList = splitItems(fqdn);
   const fqdns = fqdnList.length === 0 ? s__('NetworkPolicies|all DNS names') : fqdnList.join(', ');
   return `<strong>${fqdns}</strong>`;
 }
@@ -104,12 +98,11 @@ function humanizeNetworkPolicyRule(rule) {
 /*
  Return humanizied description of an endpoint matcher of a policy.
 */
-function humanizeEndpointSelector(policy) {
-  const { endpointMatchMode } = policy;
+function humanizeEndpointSelector({ endpointMatchMode, endpointLabels }) {
   if (endpointMatchMode === EndpointMatchModeAny)
     return sprintf(s__('NetworkPolicies|%{strongOpen}all%{strongClose} pods'), strongArgs, false);
 
-  const selector = endpointSelector(policy);
+  const selector = labelSelector(endpointLabels);
   const pods = Object.keys(selector)
     .map(key => `${key}: ${selector[key]}`)
     .join(', ');
@@ -146,5 +139,5 @@ export default function humanizeNetworkPolicy(policy) {
     return sprintf(template, { selector, ruleSelector, ports }, false);
   });
 
-  return humanizedRules.join(`<br><br>${__('and').toUpperCase()}<br><br>`);
+  return humanizedRules.join(`<br><br>${__('and').toLocaleUpperCase()}<br><br>`);
 }

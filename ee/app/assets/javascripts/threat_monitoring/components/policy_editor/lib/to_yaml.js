@@ -1,13 +1,14 @@
 import { safeDump } from 'js-yaml';
 import { ruleSpec } from './rules';
-import { endpointSelector } from './utils';
+import { labelSelector } from './utils';
+import { EndpointMatchModeAny } from '../constants';
 
 /*
  Return kubernetes resource specification object for a policy.
 */
-function spec(policy) {
-  const { description, rules, isEnabled } = policy;
-  const matchLabels = endpointSelector(policy);
+function spec({ description, rules, isEnabled, endpointMatchMode, endpointLabels }) {
+  const matchLabels =
+    endpointMatchMode === EndpointMatchModeAny ? {} : labelSelector(endpointLabels);
   const policySpec = {};
 
   if (description?.length > 0) {
