@@ -212,6 +212,28 @@ images. If you installed GitLab:
     sudo yum install perl-Image-ExifTool
     ```
 
+### GraphicsMagick (**experimental**)
+
+Workhorse has an experimental feature that allows us to rescale images on-the-fly.
+If you do not run Workhorse in a container where the `gm` tool is already installed,
+you will have to install it on your host machine instead:
+
+#### macOS
+
+```sh
+brew install graphicsmagick
+```
+
+#### Debian/Ubuntu
+
+```sh
+sudo apt-get install graphicsmagick
+```
+
+For installation on other platforms, please consult http://www.graphicsmagick.org/README.html.
+
+Note that Omnibus containers already come with `gm` installed.
+
 ## Error tracking
 
 GitLab-Workhorse supports remote error tracking with
