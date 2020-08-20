@@ -159,11 +159,22 @@ describe('Vulnerability Footer', () => {
     });
 
     describe('new notes polling', () => {
+      jest.useFakeTimers();
+
       const getDiscussion = (entries, index) => entries.at(index).props('discussion');
       const createNotesRequest = (...notes) =>
         mockAxios
           .onGet(minimumProps.notesUrl)
           .replyOnce(200, { notes, last_fetched_at: Date.now() });
+
+      // Following #217184 the vulnerability polling uses an initial timeout
+      // which we need to run and then wait for the subsequent request.
+      const startTimeoutsAndAwaitRequests = async () => {
+        expect(setTimeout).toHaveBeenCalledTimes(1);
+        jest.runAllTimers();
+
+        return axios.waitForAll();
+      };
 
       beforeEach(() => {
         const historyItems = [
@@ -178,7 +189,9 @@ describe('Vulnerability Footer', () => {
         const note = { id: 100, note: 'updated note', discussion_id: 1 };
         createNotesRequest(note);
 
-        return axios.waitForAll().then(() => {
+        return axios.waitForAll().then(async () => {
+          await startTimeoutsAndAwaitRequests();
+
           const entries = historyEntries();
           expect(entries).toHaveLength(2);
           const discussion = getDiscussion(entries, 0);
@@ -191,7 +204,9 @@ describe('Vulnerability Footer', () => {
         const note = { id: 101, note: 'new note', discussion_id: 1 };
         createNotesRequest(note);
 
-        return axios.waitForAll().then(() => {
+        return axios.waitForAll().then(async () => {
+          await startTimeoutsAndAwaitRequests();
+
           const entries = historyEntries();
           expect(entries).toHaveLength(2);
           const discussion = getDiscussion(entries, 0);
@@ -204,7 +219,9 @@ describe('Vulnerability Footer', () => {
         const note = { id: 300, note: 'new note on a new discussion', discussion_id: 3 };
         createNotesRequest(note);
 
-        return axios.waitForAll().then(() => {
+        return axios.waitForAll().then(async () => {
+          await startTimeoutsAndAwaitRequests();
+
           const entries = historyEntries();
           expect(entries).toHaveLength(3);
           const discussion = getDiscussion(entries, 2);
@@ -226,7 +243,9 @@ describe('Vulnerability Footer', () => {
       it('shows an error if the notes poll fails', () => {
         mockAxios.onGet(minimumProps.notesUrl).replyOnce(500);
 
-        return axios.waitForAll().then(() => {
+        return axios.waitForAll().then(async () => {
+          await startTimeoutsAndAwaitRequests();
+
           expect(historyEntries()).toHaveLength(2);
           expect(mockAxios.history.get).toHaveLength(2);
           expect(createFlash).toHaveBeenCalled();
@@ -238,6 +257,8 @@ describe('Vulnerability Footer', () => {
         const note = { system: true, id: 1, discussion_id: 3 };
         createNotesRequest(note);
         await axios.waitForAll();
+
+        await startTimeoutsAndAwaitRequests();
 
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGED');

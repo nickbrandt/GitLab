@@ -116,7 +116,8 @@ export default {
           if (!this.poll) this.createNotesPoll();
 
           if (!Visibility.hidden()) {
-            this.poll.makeRequest();
+            // delays the initial request by 6 seconds
+            this.poll.makeDelayedRequest(6 * 1000);
           }
 
           Visibility.change(() => {
