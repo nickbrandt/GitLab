@@ -32,7 +32,7 @@ RSpec.describe 'PipelineDestroy' do
     expect(graphql_errors).not_to be_empty
   end
 
-  it 'retries a pipeline' do
+  it 'destroys a pipeline' do
     post_graphql_mutation(mutation, current_user: user)
 
     expect(response).to have_gitlab_http_status(:success)

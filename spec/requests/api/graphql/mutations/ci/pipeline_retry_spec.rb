@@ -5,8 +5,8 @@ require 'spec_helper'
 RSpec.describe 'PipelineRetry' do
   include GraphqlHelpers
 
-  let(:user) { create(:user) }
-  let(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project) }
   let(:pipeline) { create(:ci_pipeline,  project: project, user: user) }
 
   let(:mutation) do
