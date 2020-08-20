@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { GlLoadingIcon, GlButton, GlAlert, GlPagination } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlAlert, GlPagination, GlSprintf } from '@gitlab/ui';
 import Mousetrap from 'mousetrap';
 import { __ } from '~/locale';
 import { getParameterByName, parseBoolean } from '~/lib/utils/common_utils';
@@ -40,6 +40,7 @@ export default {
     GlPagination,
     GlButton,
     GlAlert,
+    GlSprintf,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -169,15 +170,21 @@ export default {
     isDiffHead() {
       return parseBoolean(getParameterByName('diff_head'));
     },
-    previousFile() {
-      const currentFile = this.currentDiffIndex + 1;
-
-      return currentFile >= 2 ? currentFile - 1 : null;
+    showFileByFileNavigation() {
+      return this.diffFiles.length > 1 && this.viewDiffsFileByFile;
     },
-    nextFile() {
-      const currentFile = this.currentDiffIndex + 1;
+    currentFileNumber() {
+      return this.currentDiffIndex + 1;
+    },
+    previousFileNumber() {
+      const { currentDiffIndex } = this;
 
-      return currentFile < this.diffFiles.length ? currentFile + 1 : null;
+      return currentDiffIndex >= 1 ? currentDiffIndex : null;
+    },
+    nextFileNumber() {
+      const { currentFileNumber, diffFiles } = this;
+
+      return currentFileNumber < diffFiles.length ? currentFileNumber + 1 : null;
     },
   },
   watch: {
@@ -284,6 +291,9 @@ export default {
       'toggleShowTreeList',
       'navigateToDiffFileIndex',
     ]),
+    navigateToDiffFileNumber(number) {
+      this.navigateToDiffFileIndex(number - 1);
+    },
     refetchDiffData() {
       this.fetchData(false);
     },
@@ -519,13 +529,22 @@ export default {
               :can-current-user-fork="canCurrentUserFork"
               :view-diffs-file-by-file="viewDiffsFileByFile"
             />
-            <div v-if="viewDiffsFileByFile" class="file-by-file-navigation">
+            <div
+              v-if="showFileByFileNavigation"
+              data-testid="file-by-file-navigation"
+              class="gl-display-grid gl-text-center"
+            >
               <gl-pagination
-                :value="currentDiffIndex + 1"
-                :prev-page="previousFile"
-                :next-page="nextFile"
-                @input="val => navigateToDiffFileIndex(val - 1)"
+                class="gl-mx-auto"
+                :value="currentFileNumber"
+                :prev-page="previousFileNumber"
+                :next-page="nextFileNumber"
+                @input="navigateToDiffFileNumber"
               />
+              <gl-sprintf :message="__('File %{current} of %{total}')">
+                <template #current>{{ currentFileNumber }}</template>
+                <template #total>{{ diffFiles.length }}</template>
+              </gl-sprintf>
             </div>
           </template>
           <no-changes v-else :changes-empty-state-illustration="changesEmptyStateIllustration" />
