@@ -1,5 +1,4 @@
 import Rails from '@rails/ujs';
-import csrf from './csrf';
 
 export const initRails = () => {
   // eslint-disable-next-line no-underscore-dangle
@@ -17,8 +16,5 @@ export const initRails = () => {
     });
   }
 };
-
-// use our cached token for any Rails-generated AJAX requests
-Rails.csrfToken = () => csrf.token;
 
 export { Rails };
