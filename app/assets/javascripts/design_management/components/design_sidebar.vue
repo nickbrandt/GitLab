@@ -8,6 +8,7 @@ import { extractDiscussions, extractParticipants } from '../utils/design_managem
 import { ACTIVE_DISCUSSION_SOURCE_TYPES } from '../constants';
 import DesignDiscussion from './design_notes/design_discussion.vue';
 import Participants from '~/sidebar/components/participants/participants.vue';
+import TodoButton from '~/vue_shared/components/todo_button.vue';
 
 export default {
   components: {
@@ -16,6 +17,7 @@ export default {
     GlCollapse,
     GlButton,
     GlPopover,
+    TodoButton,
   },
   props: {
     design: {
@@ -102,6 +104,12 @@ export default {
 
 <template>
   <div class="image-notes" @click="handleSidebarClick">
+    <div
+      class="gl-display-flex gl-justify-content-space-between gl-border-b-1 gl-border-b-gray-100"
+    >
+      <span>{{ __('To-Do') }}</span>
+      <todo-button issuable-type="design" :issuable-id="design.iid" />
+    </div>
     <h2 class="gl-font-weight-bold gl-mt-0">
       {{ issue.title }}
     </h2>
