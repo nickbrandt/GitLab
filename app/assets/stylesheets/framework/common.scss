@@ -74,7 +74,7 @@
 
 .hint {
   font-style: italic;
-  color: $gl-gray-200;
+  color: $gray-200;
 }
 
 .light { color: $gl-text-color; }
@@ -162,13 +162,13 @@ table {
 .loading {
   margin: 20px auto;
   height: 40px;
-  color: $gl-gray-700;
+  color: $gray-700;
   font-size: 32px;
   text-align: center;
 }
 
 p.time {
-  color: $gl-gray-200;
+  color: $gray-200;
   font-size: 90%;
   margin: 30px 3px 3px 2px;
 }
@@ -246,7 +246,7 @@ li.note {
 
 .gitlab-promo {
   a {
-    color: $gl-gray-350;
+    color: $gray-300;
     margin-right: 30px;
   }
 }
