@@ -61,18 +61,20 @@ possible.
 
 ### Deprecation process
 
-Fields marked for removal from the GitLab GraphQL API and will be deprecated, but still available, for no shorter than 6 releases and then removed entirely.
-Removals will occur at X.0 and X.6 releases.
+Fields marked for removal from the GitLab GraphQL API are first **deprecated** but still available
+for at least six releases, and then **removed entirely**.
+Removals occur at X.0 and X.6 releases.
 
 For example, a field can be marked as deprecated (but still usable) in %12.7, but can be used until its removal in %13.6.
-When marked as deprecated, an alternative will be provided if there is one.
+When marked as deprecated, an alternative should be provided if there is one.
 That gives consumers of the GraphQL API a minimum of six months to update their GraphQL queries.
 
 The process is as follows:
 
-- The field is listed as deprecated in [GraphQL API Reference](reference/index.md)
-- Removals will be announced at least one release prior in the deprecation warnings section of the release post (at or prior to X.11 and X.5 releases)
-- Fields meeting criteria are removed in X.0 or X.6
+1. The field is listed as deprecated in [GraphQL API Reference](reference/index.md).
+1. Removals are announced at least one release prior in the Deprecation Warnings section of the
+   release post (at or prior to X.11 and X.5 releases).
+1. Fields meeting criteria are removed in X.0 or X.6.
 
 ## Available queries
 
