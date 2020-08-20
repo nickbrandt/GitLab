@@ -32,7 +32,7 @@ verify:
     GITALY_ADDRESS: "tcp://gitaly:8075"
   script:
   - go version
-  - apt-get update && apt-get -y install libimage-exiftool-perl
+  - apt-get update && apt-get -y install libimage-exiftool-perl graphicsmagick
   - make test
 
 test using go 1.13:
