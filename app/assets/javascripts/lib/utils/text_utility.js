@@ -323,8 +323,11 @@ const unicodeConversion = [
   [/ö/g, 'oe'],
   [/ü/g, 'ue'],
   [/ä/g, 'ae'],
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   [/Ö/g, 'Oe'],
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   [/Ü/g, 'Ue'],
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   [/Ä/g, 'Ae'],
 ];
 
@@ -338,11 +341,13 @@ const unicodeConversion = [
  * @returns {String}
  */
 export const convertUnicodeToAscii = string => {
-  for (let [regex, replacer] of unicodeConversion) {
-    string = string.replace(regex, replacer);
-  }
+  let convertedString = string;
 
-  return string;
+  unicodeConversion.forEach(([regex, replacer]) => {
+    convertedString = convertedString.replace(regex, replacer);
+  });
+
+  return convertedString;
 };
 
 /**
