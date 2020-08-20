@@ -10,7 +10,7 @@ RSpec.describe RedisTrackingHelper do
     let(:current_user) { create(:user) }
 
     before do
-      stub_feature_flags(redis_hll_g_compliance_dashboard: current_user)
+      stub_feature_flags(redis_hll_g_compliance_dashboard: true)
     end
 
     it 'does not track event if feature flag disabled' do
@@ -45,10 +45,10 @@ RSpec.describe RedisTrackingHelper do
       helper.track_unique_redis_hll_event(event_name)
     end
 
-    it 'does not tracks event if user is not logged in, but has the cookie already' do
+    it 'tracks event if user is not logged in, but has the cookie already' do
       helper.request.cookies[:visitor_id] = { value: SecureRandom.uuid, expires: 24.months }
 
-      expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
+      expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
 
       helper.track_unique_redis_hll_event(event_name)
     end

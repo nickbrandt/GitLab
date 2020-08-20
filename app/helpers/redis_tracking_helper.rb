@@ -31,7 +31,7 @@ module RedisTrackingHelper
   private
 
   def metric_feature_enabled?(event_name)
-    Feature.enabled?("redis_hll_#{event_name}", current_user)
+    Feature.enabled?("redis_hll_#{event_name}")
   end
 
   def visitor_id
