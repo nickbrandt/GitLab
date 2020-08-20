@@ -168,7 +168,7 @@ export default {
       <div
         class="linked-issues-card-body bg-gray-light"
         :class="{
-          'gl-p-3-deprecated-no-really-do-not-use-me': isFormVisible || shouldShowTokenBody,
+          'gl-p-5': isFormVisible || shouldShowTokenBody,
         }"
       >
         <div
