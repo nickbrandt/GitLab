@@ -15,6 +15,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :requirements, only: [:index]
         end
 
+        namespace :quality do
+          resources :test_cases, only: [:index]
+        end
+
         resources :feature_flags, param: :iid do
           resources :feature_flag_issues, only: [:index, :create, :destroy], as: 'issues', path: 'issues'
         end
