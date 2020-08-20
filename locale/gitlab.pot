@@ -14244,6 +14244,9 @@ msgstr ""
 msgid "License ID:"
 msgstr ""
 
+msgid "License overview"
+msgstr ""
+
 msgid "License-Check"
 msgstr ""
 
@@ -14368,6 +14371,9 @@ msgid "Licensed Features"
 msgstr ""
 
 msgid "Licensed to"
+msgstr ""
+
+msgid "Licensed to:"
 msgstr ""
 
 msgid "Licenses"
@@ -26959,6 +26965,9 @@ msgid "Users requesting access to %{strong_start}%{group_name}%{strong_end}"
 msgstr ""
 
 msgid "Users were successfully added."
+msgstr ""
+
+msgid "Users with a Guest role or those who don't belong to a Project or Group will not use a seat from your license."
 msgstr ""
 
 msgid "Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
