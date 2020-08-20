@@ -3,9 +3,12 @@ import MockAdapter from 'axios-mock-adapter';
 import RelatedIssues from 'ee/vulnerabilities/components/related_issues.vue';
 import RelatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
 import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
+import { FEEDBACK_TYPES } from 'ee/vulnerabilities/constants';
+import waitForPromises from 'helpers/wait_for_promises';
 import axios from '~/lib/utils/axios_utils';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
+import * as urlUtility from '~/lib/utils/url_utility';
 
 jest.mock('~/flash');
 
@@ -21,11 +24,25 @@ describe('Vulnerability related issues component', () => {
     canModifyRelatedIssues: true,
   };
 
+  const vulnerabilityId = 5131;
+  const createIssueUrl = '/create/issue';
+  const projectFingerprint = 'project-fingerprint';
+  const reportType = 'vulnerability';
   const issue1 = { id: 3, vulnerabilityLinkId: 987 };
   const issue2 = { id: 25, vulnerabilityLinkId: 876 };
 
-  const createWrapper = async (data = {}) => {
-    wrapper = shallowMount(RelatedIssues, { propsData, data: () => data });
+  const createWrapper = async (data = {}, opts) => {
+    wrapper = shallowMount(RelatedIssues, {
+      propsData,
+      data: () => data,
+      provide: {
+        vulnerabilityId,
+        projectFingerprint,
+        createIssueUrl,
+        reportType,
+      },
+      ...opts,
+    });
     // Need this special check because RelatedIssues creates the store and uses its state in the data function, so we
     // need to set the state of the store, not replace the state property.
     if (data.state) {
@@ -36,6 +53,7 @@ describe('Vulnerability related issues component', () => {
   const relatedIssuesBlock = () => wrapper.find(RelatedIssuesBlock);
   const blockProp = prop => relatedIssuesBlock().props(prop);
   const blockEmit = (eventName, data) => relatedIssuesBlock().vm.$emit(eventName, data);
+  const findCreateIssueButton = () => wrapper.find({ ref: 'createIssue' });
 
   afterEach(() => {
     wrapper.destroy();
@@ -237,6 +255,73 @@ describe('Vulnerability related issues component', () => {
       expect(mockAxios.history.delete).toHaveLength(1);
       expect(blockProp('relatedIssues')).toMatchObject([issue1, issue2]);
       expect(createFlash).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('when linked issue is already created', () => {
+    beforeEach(() => {
+      createWrapper(
+        {
+          isFetching: false,
+          state: { relatedIssues: [issue1, { ...issue2, vulnerabilityLinkType: 'created' }] },
+        },
+        { stubs: { RelatedIssuesBlock } },
+      );
+    });
+
+    it('does not display the create issue button', () => {
+      expect(findCreateIssueButton().exists()).toBe(false);
+    });
+  });
+
+  describe('when linked issue is not yet created', () => {
+    beforeEach(async () => {
+      mockAxios.onGet(propsData.endpoint).replyOnce(httpStatusCodes.OK, [issue1, issue2]);
+      createWrapper({}, { stubs: { RelatedIssuesBlock } });
+      await axios.waitForAll();
+    });
+
+    it('displays the create issue button', () => {
+      expect(findCreateIssueButton().exists()).toBe(true);
+    });
+
+    it('calls create issue endpoint on click and redirects to new issue', async () => {
+      const issueUrl = '/group/project/issues/123';
+      const spy = jest.spyOn(urlUtility, 'redirectTo');
+      mockAxios.onPost(propsData.createIssueUrl).reply(200, {
+        issue_url: issueUrl,
+      });
+
+      findCreateIssueButton().vm.$emit('click');
+
+      await waitForPromises();
+
+      const [postRequest] = mockAxios.history.post;
+      expect(mockAxios.history.post).toHaveLength(1);
+      expect(postRequest.url).toBe(createIssueUrl);
+      expect(spy).toHaveBeenCalledWith(issueUrl);
+      expect(JSON.parse(postRequest.data)).toMatchObject({
+        vulnerability_feedback: {
+          feedback_type: FEEDBACK_TYPES.ISSUE,
+          category: reportType,
+          project_fingerprint: projectFingerprint,
+          vulnerability_data: {
+            category: reportType,
+            vulnerability_id: vulnerabilityId,
+          },
+        },
+      });
+    });
+
+    it('shows an error message when issue creation fails', () => {
+      mockAxios.onPost(createIssueUrl).reply(500);
+      findCreateIssueButton().vm.$emit('click');
+      return waitForPromises().then(() => {
+        expect(mockAxios.history.post).toHaveLength(1);
+        expect(createFlash).toHaveBeenCalledWith(
+          'Something went wrong, could not create an issue.',
+        );
+      });
     });
   });
 });

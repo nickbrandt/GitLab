@@ -133,6 +133,8 @@ export default {
             :can-remove="canAdmin"
             :can-reorder="canReorder"
             :path-id-separator="pathIdSeparator"
+            :is-locked="issue.lockIssueRemoval"
+            :locked-message="issue.lockedMessage"
             event-namespace="relatedIssue"
             class="qa-related-issuable-item"
             @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
