@@ -1410,12 +1410,6 @@ msgstr[1] ""
 msgid "Add %{linkStart}assets%{linkEnd} to your Release. GitLab automatically includes read-only assets, like source code and release evidence."
 msgstr ""
 
-msgid "Add .gitlab-ci.yml to enable or configure SAST"
-msgstr ""
-
-msgid "Add .gitlab-ci.yml to enable or configure SAST security scanning using the GitLab managed template. You can [add variable overrides](https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings) to customize SAST settings."
-msgstr ""
-
 msgid "Add CHANGELOG"
 msgstr ""
 
@@ -22198,6 +22192,12 @@ msgid "Session duration (minutes)"
 msgstr ""
 
 msgid "Set %{epic_ref} as the parent epic."
+msgstr ""
+
+msgid "Set .gitlab-ci.yml to enable or configure SAST"
+msgstr ""
+
+msgid "Set .gitlab-ci.yml to enable or configure SAST security scanning using the GitLab managed template. You can [add variable overrides](https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings) to customize SAST settings."
 msgstr ""
 
 msgid "Set a default template for issue descriptions."
