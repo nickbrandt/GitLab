@@ -9,8 +9,10 @@ module Gitlab
 
           def process
             job_id =
-              unless skippable?
+              if replicable_project?(event.project_id)
                 registry.repository_updated!
+                registry.save
+
                 schedule_job(event)
               end
 
@@ -20,7 +22,7 @@ module Gitlab
           private
 
           def registry
-            @registry ||= ::Geo::DesignRegistry.safe_find_or_create_by(project_id: event.project_id)
+            @registry ||= ::Geo::DesignRegistry.find_or_initialize_by(project_id: event.project_id) # rubocop: disable CodeReuse/ActiveRecord
           end
 
           def schedule_job(event)
@@ -34,7 +36,7 @@ module Gitlab
               'Design repository update',
               project_id: event.project_id,
               scheduled_at: Time.now,
-              skippable: skippable?,
+              replicable_project: replicable_project?(event.project_id),
               job_id: job_id)
           end
         end
