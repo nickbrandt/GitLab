@@ -130,6 +130,7 @@ module Gitlab
             milestone_lists: count(List.milestone),
             milestones: count(Milestone),
             projects_with_packages: distinct_count(::Packages::Package, :project_id),
+            packages: count(::Packages::Package),
             pages_domains: count(PagesDomain),
             pool_repositories: count(PoolRepository),
             projects: count(Project),
