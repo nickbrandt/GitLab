@@ -15,6 +15,7 @@ module EE
       include Elastic::ApplicationVersionedSearch
       include UsageStatistics
       include WeightEventable
+      include IterationEventable
       include HealthStatus
 
       scope :order_blocking_issues_desc, -> { reorder(blocking_issues_count: :desc) }
