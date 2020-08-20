@@ -12746,6 +12746,12 @@ msgstr ""
 msgid "If you remove this license, GitLab will fall back on the previous license, if any."
 msgstr ""
 
+msgid "If you want to re-enable two-factor authentication, visit %{two_factor_link}"
+msgstr ""
+
+msgid "If you want to re-enable two-factor authentication, visit the %{settings_link_to} page."
+msgstr ""
+
 msgid "If your HTTP repository is not publicly accessible, add your credentials."
 msgstr ""
 
@@ -26076,10 +26082,22 @@ msgstr ""
 msgid "Two-factor Authentication Recovery codes"
 msgstr ""
 
-msgid "Two-factor Authentication has been disabled for this user"
+msgid "Two-factor authentication"
 msgstr ""
 
-msgid "Two-factor authentication"
+msgid "Two-factor authentication disabled"
+msgstr ""
+
+msgid "Two-factor authentication has been disabled for this user"
+msgstr ""
+
+msgid "Two-factor authentication has been disabled for your GitLab account."
+msgstr ""
+
+msgid "Two-factor authentication has been disabled successfully!"
+msgstr ""
+
+msgid "Two-factor authentication is not enabled for this user"
 msgstr ""
 
 msgid "Type"
@@ -29908,6 +29926,9 @@ msgid "toggle dropdown"
 msgstr ""
 
 msgid "triggered"
+msgstr ""
+
+msgid "two-factor authentication settings"
 msgstr ""
 
 msgid "unicode domains should use IDNA encoding"
