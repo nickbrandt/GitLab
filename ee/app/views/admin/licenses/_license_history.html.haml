@@ -1,3 +1,6 @@
+- return unless local_assigns.fetch(:licenses)
+- local_assigns.fetch(:license)
+
 - licensee_keys = @licenses.first.licensee.keys
 
 %h4= _('License History')
