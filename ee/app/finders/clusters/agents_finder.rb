@@ -2,9 +2,10 @@
 
 module Clusters
   class AgentsFinder
-    def initialize(project, current_user)
+    def initialize(project, current_user, params: {})
       @project = project
       @current_user = current_user
+      @params = params
     end
 
     def execute
