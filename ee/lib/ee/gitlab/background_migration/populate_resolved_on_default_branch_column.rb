@@ -42,24 +42,6 @@ module EE
           include Visibility
           include ::Gitlab::Utils::StrongMemoize
 
-          NEWEST_PIPELINE_FILTER_SQL = <<~SQL
-            (
-              "ci_pipelines"."id" IN (
-                SELECT
-                  "ci_pipelines"."id"
-                FROM
-                  "ci_pipelines"
-                WHERE
-                  "ci_pipelines"."project_id" = %{project_id}
-                  AND "ci_pipelines"."ref" = %{ref}
-                  AND "ci_pipelines"."status" IN ('success')
-                ORDER BY
-                  "ci_pipelines"."id" DESC
-                LIMIT 100
-              )
-            )
-          SQL
-
           FILE_TYPES = [5, 6, 7, 8, 21, 23].freeze
           LATEST_PIPELINE_WITH_REPORTS_SQL = <<~SQL
             SELECT
@@ -67,7 +49,9 @@ module EE
             FROM
               "ci_pipelines"
             WHERE
-              #{NEWEST_PIPELINE_FILTER_SQL}
+              ci_pipelines.project_id = %{project_id}
+              AND ci_pipelines.ref = %{ref}
+              AND ci_pipelines.status IN ('success')
               AND (EXISTS (
                 SELECT
                   1
