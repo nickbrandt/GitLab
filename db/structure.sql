@@ -12133,7 +12133,9 @@ CREATE TABLE public.gitlab_subscriptions (
     seats integer DEFAULT 0,
     trial boolean DEFAULT false,
     trial_starts_on date,
-    auto_renew boolean
+    auto_renew boolean,
+    seats_in_use integer DEFAULT 0 NOT NULL,
+    seats_owed integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE public.gitlab_subscriptions_id_seq

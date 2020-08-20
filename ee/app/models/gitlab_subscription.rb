@@ -99,7 +99,7 @@ class GitlabSubscription < ApplicationRecord
     attrs['gitlab_subscription_id'] = self.id
     attrs['change_type'] = change_type
 
-    omitted_attrs = %w(id created_at updated_at)
+    omitted_attrs = %w(id created_at updated_at seats_in_use seats_owed)
 
     GitlabSubscriptionHistory.create(attrs.except(*omitted_attrs))
   end
