@@ -171,7 +171,7 @@ Refer to Atlassian's documentation and Atlassian Support for assistance setting 
 
 - Download the class from Atlassian's knowledgebase to Jira's server, for example to `/tmp`.
 - Use the same Java runtime as Jira.
-- Pass all networing related parameters that Jira is called with such as proxy
+- Pass all networking-related parameters that Jira is called with, such as proxy
   settings or an alternative root truststore (`-Djavax.net.ssl.trustStore`):
 
 ```shell
