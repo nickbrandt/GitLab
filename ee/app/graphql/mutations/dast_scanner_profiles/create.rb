@@ -3,7 +3,7 @@
 module Mutations
   module DastScannerProfiles
     class Create < BaseMutation
-      include ResolvesProject
+      include AuthorizesProject
 
       graphql_name 'DastScannerProfileCreate'
 
@@ -30,7 +30,7 @@ module Mutations
       authorize :create_on_demand_dast_scan
 
       def resolve(full_path:, profile_name:, spider_timeout: nil, target_timeout: nil)
-        project = authorized_find!(full_path: full_path)
+        project = authorized_find_project!(full_path: full_path)
 
         service = ::DastScannerProfiles::CreateService.new(project, current_user)
         result = service.execute(name: profile_name, spider_timeout: spider_timeout, target_timeout: target_timeout)
@@ -40,12 +40,6 @@ module Mutations
         else
           { errors: result.errors }
         end
-      end
-
-      private
-
-      def find_object(full_path:)
-        resolve_project(full_path: full_path)
       end
     end
   end
