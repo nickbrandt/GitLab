@@ -1,5 +1,11 @@
 # Changelog for gitlab-workhorse
 
+## v8.41.0
+
+### Added
+- Add Azure blob store support
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/555
+
 ## v8.40.0
 
 ### Added
