@@ -6,4 +6,5 @@ namespace :security do
 
   resources :projects, only: [:index, :create, :destroy]
   resources :vulnerable_projects, only: [:index]
+  resources :vulnerabilities, only: [:index]
 end
