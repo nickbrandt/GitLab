@@ -103,11 +103,11 @@ class Projects::ForksController < Projects::ApplicationController
   end
 
   def load_namespaces_with_associations
-    fork_service.valid_fork_targets(only_groups: true).preload(:route)
+    @load_namespaces_with_associations ||= fork_service.valid_fork_targets(only_groups: true).preload(:route)
   end
 
   def memberships_hash
-    current_user.members.index_by(&:source_id)
+    current_user.members.where(source: load_namespaces_with_associations).index_by(&:source_id)
   end
 end
 
