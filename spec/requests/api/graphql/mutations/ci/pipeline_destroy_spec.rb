@@ -5,8 +5,8 @@ require 'spec_helper'
 RSpec.describe 'PipelineDestroy' do
   include GraphqlHelpers
 
-  let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
+  let_it_be(:user) { project.owner }
   let(:pipeline) { create(:ci_pipeline, :success, project: project, user: user) }
 
   let(:mutation) do
@@ -20,12 +20,6 @@ RSpec.describe 'PipelineDestroy' do
     )
   end
 
-  let(:mutation_response) { graphql_mutation_response(:pipeline_destroy) }
-
-  before do
-    project.add_maintainer(user)
-  end
-
   it 'returns an error if the user is not allowed to destroy the pipeline' do
     post_graphql_mutation(mutation, current_user: create(:user))
 
@@ -36,5 +30,6 @@ RSpec.describe 'PipelineDestroy' do
     post_graphql_mutation(mutation, current_user: user)
 
     expect(response).to have_gitlab_http_status(:success)
+    expect { pipeline.reload }.to raise_error(ActiveRecord::RecordNotFound)
   end
 end
