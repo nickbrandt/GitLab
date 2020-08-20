@@ -327,7 +327,7 @@ export default {
             v-if="isLatestVersion"
             variant="link"
             size="small"
-            class="gl-mr-3 js-select-all"
+            class="gl-mr-4 js-select-all"
             @click="toggleDesignsSelection"
             >{{ selectAllButtonText }}
           </gl-button>
