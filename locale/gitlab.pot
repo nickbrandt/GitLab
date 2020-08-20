@@ -1524,6 +1524,9 @@ msgstr ""
 msgid "Add comment now"
 msgstr ""
 
+msgid "Add comment to design"
+msgstr ""
+
 msgid "Add deploy freeze"
 msgstr ""
 
