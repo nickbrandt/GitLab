@@ -54,7 +54,7 @@ describe('Environments Folder View', () => {
 
     describe('deploy boards', () => {
       it('should render arrow to open deploy boards', () => {
-        expect(wrapper.find('.folder-icon.ic-chevron-right').exists()).toBe(true);
+        expect(wrapper.find('.folder-icon[data-testid="chevron-right-icon"]').exists()).toBe(true);
       });
     });
   });

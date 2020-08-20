@@ -124,10 +124,10 @@ describe('RelatedIssuableItem', () => {
     });
 
     it('renders milestone icon and name', () => {
-      const milestoneIcon = tokenMetadata().find('.item-milestone svg use');
+      const milestoneIcon = tokenMetadata().find('.item-milestone svg');
       const milestoneTitle = tokenMetadata().find('.item-milestone .milestone-title');
 
-      expect(milestoneIcon.attributes('href')).toContain('clock');
+      expect(milestoneIcon.attributes('data-testid')).toBe('clock-icon');
       expect(milestoneTitle.text()).toContain('Milestone title');
     });
 

@@ -71,8 +71,8 @@ describe('GeoReplicableStatus', () => {
         expect(wrapper.vm.icon.cssClass).toEqual(iconClass);
       });
 
-      it(`sets svg to ic-${iconName}`, () => {
-        expect(findIcon().classes()).toContain(`ic-${wrapper.vm.icon.name}`);
+      it(`sets svg to icon '${iconName}'`, () => {
+        expect(findIcon().attributes('data-testid')).toBe(`${wrapper.vm.icon.name}-icon`);
       });
     });
   });
