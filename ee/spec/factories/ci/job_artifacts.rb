@@ -184,8 +184,12 @@ FactoryBot.define do
       file_format { :raw }
 
       after(:build) do |artifact, _|
-        artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-sast-missing-identifiers.json'), 'application/json')
+        file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-sast-report.json'), 'application/json')
+        data = Gitlab::Json.parse(file.tempfile.read)['vulnerabilities'].each { |v| v.delete('identifiers') }.to_json
+        output = Tempfile.new("gl-sast-missing-identifiers")
+        output.write(data)
+        artifact.file = fixture_file_upload(output.path, 'application/json')
       end
     end
 

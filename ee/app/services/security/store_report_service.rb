@@ -17,6 +17,7 @@ module Security
     def execute
       # Ensure we're not trying to insert data twice for this report
       return error("#{@report.type} report already stored for this pipeline, skipping...") if executed?
+      raise ParseError, 'JSON parsing failed' if report.error.is_a?(Gitlab::Ci::Parsers::Security::Common::SecurityReportParserError)
 
       vulnerability_ids = create_all_vulnerabilities!
       mark_as_resolved_except(vulnerability_ids)
