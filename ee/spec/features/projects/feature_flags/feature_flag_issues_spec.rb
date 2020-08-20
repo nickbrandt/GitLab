@@ -72,19 +72,6 @@ RSpec.describe 'Feature flag issue links', :js do
         expect(page).not_to have_selector '#related-issues'
       end
     end
-
-    context 'when the related issues feature is unavailable' do
-      before do
-        stub_licensed_features(blocked_issues: false, feature_flags: true)
-      end
-
-      it 'does not show the related issues widget' do
-        visit(edit_project_feature_flag_path(project, feature_flag))
-
-        expect(page).to have_text 'Strategies'
-        expect(page).not_to have_selector '#related-issues'
-      end
-    end
   end
 
   describe 'unlinking a feature flag from an issue' do

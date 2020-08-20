@@ -7,9 +7,6 @@ module EE
 
     prepended do
       with_scope :subject
-      condition(:related_issues_disabled) { !@subject.feature_available?(:blocked_issues) }
-
-      with_scope :subject
       condition(:repository_mirrors_enabled) { @subject.feature_available?(:repository_mirrors) }
 
       with_scope :subject
@@ -188,11 +185,6 @@ module EE
         prevent :create_merge_request_in
         prevent :create_merge_request_from
         prevent :push_code
-      end
-
-      rule { related_issues_disabled }.policy do
-        prevent :read_issue_link
-        prevent :admin_issue_link
       end
 
       rule { ~group_timelogs_available }.prevent :read_group_timelogs
