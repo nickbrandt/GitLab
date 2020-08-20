@@ -1,5 +1,11 @@
 # Changelog for gitlab-workhorse
 
+## v8.42.0
+
+### Added
+- Resize images on-demand with `gm convert`
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/546
+
 ## v8.41.0
 
 ### Added
