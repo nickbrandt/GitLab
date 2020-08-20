@@ -155,6 +155,9 @@ export default {
               v-if="featureFlag.update_path"
               :value="featureFlag.active"
               :disabled="statusToggleDisabled(featureFlag)"
+              data-track-event="click_button"
+              data-track-label="feature_flag_toggle"
+              data-track-context="feature_flag_activity"
               @change="toggleFeatureFlag(featureFlag)"
             />
             <gl-badge v-else-if="featureFlag.active" variant="success">
