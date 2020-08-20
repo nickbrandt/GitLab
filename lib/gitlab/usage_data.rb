@@ -584,7 +584,7 @@ module Gitlab
       end
 
       def analytics_unique_visits_data
-        results = ::Gitlab::Analytics::UniqueVisits.analytics_ids.each_with_object({}) do |target_id, hash|
+        results = ::Gitlab::Analytics::UniqueVisits.analytics_events.each_with_object({}) do |target_id, hash|
           hash[target_id] = redis_usage_data { unique_visit_service.unique_visits_for(targets: target_id) }
         end
         results['analytics_unique_visits_for_any_target'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :analytics) }
@@ -594,7 +594,7 @@ module Gitlab
       end
 
       def compliance_unique_visits_data
-        results = ::Gitlab::Analytics::UniqueVisits.compliance_ids.each_with_object({}) do |target_id, hash|
+        results = ::Gitlab::Analytics::UniqueVisits.compliance_events.each_with_object({}) do |target_id, hash|
           hash[target_id] = redis_usage_data { unique_visit_service.unique_visits_for(targets: target_id) }
         end
         results['compliance_unique_visits_for_any_target'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :compliance) }
