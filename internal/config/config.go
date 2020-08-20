@@ -111,7 +111,11 @@ func LoadConfig(filename string) (*Config, error) {
 
 func (c *Config) RegisterGoCloudURLOpeners() error {
 	c.ObjectStorageConfig.URLMux = new(blob.URLMux)
+
 	creds := c.ObjectStorageCredentials
+	if creds == nil {
+		return nil
+	}
 
 	if strings.EqualFold(creds.Provider, "AzureRM") && creds.AzureCredentials.AccountName != "" && creds.AzureCredentials.AccountKey != "" {
 		accountName := azureblob.AccountName(creds.AzureCredentials.AccountName)
