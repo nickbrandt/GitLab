@@ -1,0 +1,5 @@
+---
+title: Resize images on-demand with `gm convert`
+merge_request: 546
+author:
+type: added
