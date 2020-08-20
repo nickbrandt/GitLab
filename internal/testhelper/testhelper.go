@@ -15,8 +15,11 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/labkit/log"
@@ -206,4 +209,26 @@ func ParseJWT(token *jwt.Token) (interface{}, error) {
 type UploadClaims struct {
 	Upload map[string]string `json:"upload"`
 	jwt.StandardClaims
+}
+
+func SetupLogger() *test.Hook {
+	logger, hook := test.NewNullLogger()
+	logrus.SetOutput(logger.Writer())
+
+	return hook
+}
+
+// logrus fires a Goroutine to write the output log, but there's no way to
+// flush all outstanding hooks to fire. We just wait up to a second
+// for an event to appear.
+func WaitForLogEvent(hook *test.Hook) bool {
+	for i := 0; i < 10; i++ {
+		if entry := hook.LastEntry(); entry != nil {
+			return true
+		}
+
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	return false
 }

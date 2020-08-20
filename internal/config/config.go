@@ -2,9 +2,14 @@ package config
 
 import (
 	"net/url"
+	"strings"
 	"time"
 
+	"github.com/Azure/azure-storage-blob-go/azblob"
 	"github.com/BurntSushi/toml"
+	"gitlab.com/gitlab-org/labkit/log"
+	"gocloud.dev/blob"
+	"gocloud.dev/blob/azureblob"
 )
 
 type TomlURL struct {
@@ -30,7 +35,12 @@ func (d *TomlDuration) UnmarshalTest(text []byte) error {
 type ObjectStorageCredentials struct {
 	Provider string
 
-	S3Credentials S3Credentials `toml:"s3"`
+	S3Credentials    S3Credentials    `toml:"s3"`
+	AzureCredentials AzureCredentials `toml:"azurerm"`
+}
+
+type ObjectStorageConfig struct {
+	URLMux *blob.URLMux `toml:"-"`
 }
 
 type S3Credentials struct {
@@ -46,6 +56,15 @@ type S3Config struct {
 	UseIamProfile        bool   `toml:"-"`
 	ServerSideEncryption string `toml:"-"` // Server-side encryption mode (e.g. AES256, aws:kms)
 	SSEKMSKeyID          string `toml:"-"` // Server-side encryption key-management service key ID (e.g. arn:aws:xxx)
+}
+
+type GoCloudConfig struct {
+	URL string `toml:"-"`
+}
+
+type AzureCredentials struct {
+	AccountName string `toml:"azure_storage_account_name"`
+	AccountKey  string `toml:"azure_storage_access_key"`
 }
 
 type RedisConfig struct {
@@ -75,6 +94,7 @@ type Config struct {
 	APIQueueLimit            uint                      `toml:"-"`
 	APIQueueTimeout          time.Duration             `toml:"-"`
 	APICILongPollingDuration time.Duration             `toml:"-"`
+	ObjectStorageConfig      ObjectStorageConfig       `toml:"-"`
 	ObjectStorageCredentials *ObjectStorageCredentials `toml:"object_storage"`
 	PropagateCorrelationID   bool                      `toml:"-"`
 }
@@ -87,4 +107,32 @@ func LoadConfig(filename string) (*Config, error) {
 	}
 
 	return cfg, nil
+}
+
+func (c *Config) RegisterGoCloudURLOpeners() error {
+	c.ObjectStorageConfig.URLMux = new(blob.URLMux)
+	creds := c.ObjectStorageCredentials
+
+	if strings.EqualFold(creds.Provider, "AzureRM") && creds.AzureCredentials.AccountName != "" && creds.AzureCredentials.AccountKey != "" {
+		accountName := azureblob.AccountName(creds.AzureCredentials.AccountName)
+		accountKey := azureblob.AccountKey(creds.AzureCredentials.AccountKey)
+
+		credential, err := azureblob.NewCredential(accountName, accountKey)
+		if err != nil {
+			log.WithError(err).Error("error creating Azure credentials")
+			return err
+		}
+
+		pipeline := azureblob.NewPipeline(credential, azblob.PipelineOptions{})
+
+		azureURLOpener := &azureblob.URLOpener{
+			AccountName: accountName,
+			Pipeline:    pipeline,
+			Options:     azureblob.Options{Credential: credential},
+		}
+
+		c.ObjectStorageConfig.URLMux.RegisterBucket(azureblob.Scheme, azureURLOpener)
+	}
+
+	return nil
 }

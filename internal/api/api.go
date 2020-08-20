@@ -76,8 +76,9 @@ type MultipartUploadParams struct {
 }
 
 type ObjectStorageParams struct {
-	Provider string
-	S3Config config.S3Config
+	Provider      string
+	S3Config      config.S3Config
+	GoCloudConfig config.GoCloudConfig
 }
 
 type RemoteObject struct {

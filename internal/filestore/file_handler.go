@@ -117,32 +117,41 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 		}
 	}()
 
-	useS3Client := opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsAWS() && opts.ObjectStorageConfig.IsValid()
+	var clientMode string
+	if opts.IsRemote() {
+		if opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsGoCloud() {
+			clientMode = fmt.Sprintf("go_cloud:%s", opts.ObjectStorageConfig.Provider)
+			p := &objectstore.GoCloudObjectParams{
+				Ctx:        ctx,
+				Mux:        opts.ObjectStorageConfig.URLMux,
+				BucketURL:  opts.ObjectStorageConfig.GoCloudConfig.URL,
+				ObjectName: opts.RemoteTempObjectID,
+				Deadline:   opts.Deadline,
+			}
+			remoteWriter, err = objectstore.NewGoCloudObject(p)
+		} else if opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsAWS() && opts.ObjectStorageConfig.IsValid() {
+			clientMode = "s3"
+			remoteWriter, err = objectstore.NewS3Object(ctx, opts.RemoteTempObjectID, opts.ObjectStorageConfig.S3Credentials, opts.ObjectStorageConfig.S3Config, opts.Deadline)
+		} else if opts.IsMultipart() {
+			clientMode = "multipart"
+			remoteWriter, err = objectstore.NewMultipart(ctx, opts.PresignedParts, opts.PresignedCompleteMultipart, opts.PresignedAbortMultipart, opts.PresignedDelete, opts.PutHeaders, opts.Deadline, opts.PartSize)
+		} else {
+			clientMode = "http"
+			remoteWriter, err = objectstore.NewObject(ctx, opts.PresignedPut, opts.PresignedDelete, opts.PutHeaders, opts.Deadline, size)
+		}
 
-	if useS3Client {
-		remoteWriter, err = objectstore.NewS3Object(ctx, opts.RemoteTempObjectID, opts.ObjectStorageConfig.S3Credentials, opts.ObjectStorageConfig.S3Config, opts.Deadline)
 		if err != nil {
 			return nil, err
 		}
-
-		writers = append(writers, remoteWriter)
-	} else if opts.IsMultipart() {
-		remoteWriter, err = objectstore.NewMultipart(ctx, opts.PresignedParts, opts.PresignedCompleteMultipart, opts.PresignedAbortMultipart, opts.PresignedDelete, opts.PutHeaders, opts.Deadline, opts.PartSize)
-		if err != nil {
-			return nil, err
-		}
-
-		writers = append(writers, remoteWriter)
-	} else if opts.IsRemote() {
-		remoteWriter, err = objectstore.NewObject(ctx, opts.PresignedPut, opts.PresignedDelete, opts.PutHeaders, opts.Deadline, size)
-		if err != nil {
-			return nil, err
-		}
-
 		writers = append(writers, remoteWriter)
 	}
 
 	if opts.IsLocal() {
+		if clientMode == "" {
+			clientMode = "local"
+		} else {
+			clientMode += "+local"
+		}
 		fileWriter, err := fh.uploadLocalFile(ctx, opts)
 		if err != nil {
 			return nil, err
@@ -172,12 +181,14 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 		"is_remote":        opts.IsRemote(),
 		"remote_id":        opts.RemoteID,
 		"temp_file_prefix": opts.TempFilePrefix,
-		"use_s3_client":    useS3Client,
+		"client_mode":      clientMode,
 	})
 
 	if opts.IsLocal() {
 		logger = logger.WithField("local_temp_path", opts.LocalTempPath)
-	} else if useS3Client {
+	}
+
+	if opts.IsRemote() {
 		logger = logger.WithField("remote_temp_object", opts.RemoteTempObjectID)
 	}
 

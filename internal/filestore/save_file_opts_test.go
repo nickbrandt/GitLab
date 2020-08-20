@@ -10,6 +10,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
 )
 
 func TestSaveFileOptsLocalAndRemote(t *testing.T) {
@@ -269,6 +270,66 @@ func TestUseWorkhorseClientEnabled(t *testing.T) {
 			require.Equal(t, apiResponse.RemoteObject.ID, opts.RemoteID)
 			require.Equal(t, apiResponse.RemoteObject.UseWorkhorseClient, opts.UseWorkhorseClient)
 			require.Equal(t, test.expected, opts.UseWorkhorseClientEnabled())
+			require.Equal(t, test.UseWorkhorseClient, opts.IsRemote())
+		})
+	}
+}
+
+func TestGoCloudConfig(t *testing.T) {
+	mux, _, cleanup := test.SetupGoCloudFileBucket(t, "azblob")
+	defer cleanup()
+
+	tests := []struct {
+		name     string
+		provider string
+		url      string
+		valid    bool
+	}{
+		{
+			name:     "valid AzureRM config",
+			provider: "AzureRM",
+			url:      "azblob:://test-container",
+			valid:    true,
+		},
+		{
+			name:     "invalid GoCloud scheme",
+			provider: "AzureRM",
+			url:      "unknown:://test-container",
+			valid:    true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			apiResponse := &api.Response{
+				TempPath: "/tmp",
+				RemoteObject: api.RemoteObject{
+					Timeout:            10,
+					ID:                 "id",
+					UseWorkhorseClient: true,
+					RemoteTempObjectID: "test-object",
+					ObjectStorage: &api.ObjectStorageParams{
+						Provider: test.provider,
+						GoCloudConfig: config.GoCloudConfig{
+							URL: test.url,
+						},
+					},
+				},
+			}
+			deadline := time.Now().Add(time.Duration(apiResponse.RemoteObject.Timeout) * time.Second)
+			opts := filestore.GetOpts(apiResponse)
+			opts.ObjectStorageConfig.URLMux = mux
+
+			require.Equal(t, apiResponse.TempPath, opts.LocalTempPath)
+			require.Equal(t, apiResponse.RemoteObject.RemoteTempObjectID, opts.RemoteTempObjectID)
+			require.WithinDuration(t, deadline, opts.Deadline, time.Second)
+			require.Equal(t, apiResponse.RemoteObject.ID, opts.RemoteID)
+			require.Equal(t, apiResponse.RemoteObject.UseWorkhorseClient, opts.UseWorkhorseClient)
+			require.Equal(t, test.provider, opts.ObjectStorageConfig.Provider)
+			require.Equal(t, apiResponse.RemoteObject.ObjectStorage.GoCloudConfig, opts.ObjectStorageConfig.GoCloudConfig)
+			require.True(t, opts.UseWorkhorseClientEnabled())
+			require.Equal(t, test.valid, opts.ObjectStorageConfig.IsValid())
+			require.True(t, opts.IsRemote())
 		})
 	}
 }

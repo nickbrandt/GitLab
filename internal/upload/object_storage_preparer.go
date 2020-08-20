@@ -7,6 +7,7 @@ import (
 )
 
 type ObjectStoragePreparer struct {
+	config      config.ObjectStorageConfig
 	credentials config.ObjectStorageCredentials
 }
 
@@ -17,11 +18,12 @@ func NewObjectStoragePreparer(c config.Config) Preparer {
 		creds = &config.ObjectStorageCredentials{}
 	}
 
-	return &ObjectStoragePreparer{credentials: *creds}
+	return &ObjectStoragePreparer{credentials: *creds, config: c.ObjectStorageConfig}
 }
 
 func (p *ObjectStoragePreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error) {
 	opts := filestore.GetOpts(a)
+	opts.ObjectStorageConfig.URLMux = p.config.URLMux
 	opts.ObjectStorageConfig.S3Credentials = p.credentials.S3Credentials
 
 	return opts, nil, nil

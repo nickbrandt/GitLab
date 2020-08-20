@@ -9,6 +9,8 @@ import (
 	"io"
 	"strings"
 	"time"
+
+	"gitlab.com/gitlab-org/labkit/log"
 )
 
 // Upload represents an upload to an ObjectStorage provider
@@ -123,6 +125,8 @@ func (u *uploader) Execute(ctx context.Context, deadline time.Time) {
 		if u.md5 != nil {
 			err := compareMD5(u.md5Sum(), u.etag)
 			if err != nil {
+				log.ContextLogger(ctx).WithError(err).Error("error comparing MD5 checksum")
+
 				u.uploadError = err
 				if u.metrics {
 					objectStorageUploadRequestsRequestFailed.Inc()
