@@ -1,5 +1,5 @@
 <script>
-import { GlAlert, GlDeprecatedButton, GlIntersectionObserver } from '@gitlab/ui';
+import { GlAlert, GlButton, GlIntersectionObserver } from '@gitlab/ui';
 import { __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import VulnerabilityList from './vulnerability_list.vue';
@@ -12,7 +12,7 @@ export default {
   name: 'ProjectVulnerabilitiesApp',
   components: {
     GlAlert,
-    GlDeprecatedButton,
+    GlButton,
     GlIntersectionObserver,
     VulnerabilityList,
   },
@@ -140,11 +140,11 @@ export default {
       class="text-center"
       @appear="fetchNextPage"
     >
-      <gl-deprecated-button
+      <gl-button
         :loading="isLoadingVulnerabilities"
         :disabled="isLoadingVulnerabilities"
         @click="fetchNextPage"
-        >{{ s__('SecurityReports|Load more vulnerabilities') }}</gl-deprecated-button
+        >{{ s__('SecurityReports|Load more vulnerabilities') }}</gl-button
       >
     </gl-intersection-observer>
   </div>
