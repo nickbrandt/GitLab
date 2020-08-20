@@ -17,7 +17,6 @@ module Mutations
           errors: errors_on_object(pipeline)
         }
       end
-
     end
   end
 end

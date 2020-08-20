@@ -8,13 +8,12 @@ module Mutations
       authorize :update_pipeline
 
       def resolve
-        ::Ci::CancelUserPipelinesService.new.execute(current_user)
+        result = ::Ci::CancelUserPipelinesService.new.execute(current_user)
 
         {
-          errors: []
+          errors: [result&.message]
         }
       end
-
     end
   end
 end

@@ -7,7 +7,7 @@ RSpec.describe 'PipelineDestroy' do
 
   let_it_be(:project) { create(:project) }
   let_it_be(:user) { project.owner }
-  let(:pipeline) { create(:ci_pipeline, :success, project: project, user: user) }
+  let_it_be(:pipeline) { create(:ci_pipeline, :success, project: project, user: user) }
 
   let(:mutation) do
     variables = {

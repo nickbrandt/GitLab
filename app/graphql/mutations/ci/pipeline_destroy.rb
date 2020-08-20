@@ -12,11 +12,11 @@ module Mutations
         project = pipeline.project
 
         ::Ci::DestroyPipelineService.new(project, current_user).execute(pipeline)
+      rescue ActiveRecord::RecordNotFound
         {
-          errors: []
+          errors: ['Pipeline not found']
         }
       end
-
     end
   end
 end

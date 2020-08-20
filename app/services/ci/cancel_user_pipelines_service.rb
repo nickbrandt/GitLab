@@ -7,6 +7,8 @@ module Ci
     # https://gitlab.com/gitlab-org/gitlab/issues/32332
     def execute(user)
       user.pipelines.cancelable.find_each(&:cancel_running)
+    rescue ActiveRecord::StaleObjectError
+      ServiceResponse.error(message: 'Error canceling pipeline')
     end
     # rubocop: enable CodeReuse/ActiveRecord
   end

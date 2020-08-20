@@ -7,7 +7,7 @@ RSpec.describe 'PipelineRetry' do
 
   let_it_be(:user) { create(:user) }
   let_it_be(:project) { create(:project) }
-  let(:pipeline) { create(:ci_pipeline,  project: project, user: user) }
+  let_it_be(:pipeline) { create(:ci_pipeline, project: project, user: user) }
 
   let(:mutation) do
     variables = {
@@ -25,7 +25,7 @@ RSpec.describe 'PipelineRetry' do
 
   let(:mutation_response) { graphql_mutation_response(:pipeline_retry) }
 
-  before do
+  before(:all) do
     project.add_maintainer(user)
   end
 

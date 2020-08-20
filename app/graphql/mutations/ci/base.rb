@@ -3,7 +3,6 @@
 module Mutations
   module Ci
     class Base < BaseMutation
-
       argument :id, GraphQL::ID_TYPE,
                 required: true,
                 description: 'The id of the pipeline to mutate'
