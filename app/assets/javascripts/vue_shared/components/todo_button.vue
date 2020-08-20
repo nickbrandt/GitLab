@@ -2,9 +2,6 @@
 import { GlButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 
-const MARK_TEXT = __('Mark as done');
-const TODO_TEXT = __('Add a To-Do');
-
 export default {
   components: {
     GlButton,
@@ -31,11 +28,7 @@ export default {
   },
   computed: {
     buttonLabel() {
-      return this.isTodo ? MARK_TEXT : TODO_TEXT;
-    },
-
-    buttonIcon() {
-      return this.isTodo ? 'todo-done' : 'todo-add';
+      return this.isTodo ? __('Mark as done') : __('Add a To-Do');
     },
   },
   methods: {
