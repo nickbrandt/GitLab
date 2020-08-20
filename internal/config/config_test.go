@@ -8,6 +8,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestLoadEmptyConfig(t *testing.T) {
+	config := ``
+
+	tmpFile, cfg := loadTempConfig(t, config)
+	defer os.Remove(tmpFile.Name())
+
+	require.Nil(t, cfg.ObjectStorageCredentials)
+
+	err := cfg.RegisterGoCloudURLOpeners()
+	require.NoError(t, err)
+}
+
 func TestLoadObjectStorageConfig(t *testing.T) {
 	config := `
 [object_storage]
