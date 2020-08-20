@@ -9,7 +9,7 @@ import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue'
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import initUserPopovers from '~/user_popovers';
 
 const mockAxios = new MockAdapter(axios);

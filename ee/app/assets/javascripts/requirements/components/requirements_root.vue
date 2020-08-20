@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/browser';
 import { GlPagination } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import Api from '~/api';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import { updateHistory, setUrlParams } from '~/lib/utils/url_utility';
 

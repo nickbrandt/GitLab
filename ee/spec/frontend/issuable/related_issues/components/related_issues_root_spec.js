@@ -10,7 +10,7 @@ import {
   issuable2,
 } from 'jest/vue_shared/components/issue/related_issuable_mock_data';
 import axios from '~/lib/utils/axios_utils';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 
 jest.mock('~/flash');
 

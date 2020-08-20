@@ -5,7 +5,7 @@ import {
   pathIndeterminateErrorMap,
   relatedIssuesRemoveErrorMap,
 } from 'ee/related_issues/constants';
-import flash from '~/flash';
+import { deprecatedCreateFlash as flash } from '~/flash';
 import { s__, __ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
 import httpStatusCodes from '~/lib/utils/http_status';

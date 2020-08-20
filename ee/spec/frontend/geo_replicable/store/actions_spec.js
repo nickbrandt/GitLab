@@ -8,7 +8,7 @@ import { gqClient } from 'ee/geo_replicable/utils';
 import buildReplicableTypeQuery from 'ee/geo_replicable/graphql/replicable_type_query_builder';
 import { normalizeHeaders, parseIntPagination } from '~/lib/utils/common_utils';
 import toast from '~/vue_shared/plugins/global_toast';
-import flash from '~/flash';
+import { deprecatedCreateFlash as flash } from '~/flash';
 import {
   MOCK_BASIC_FETCH_DATA_MAP,
   MOCK_BASIC_FETCH_RESPONSE,
