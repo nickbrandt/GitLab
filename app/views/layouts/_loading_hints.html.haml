@@ -1,0 +1,13 @@
+- if ActionController::Base.asset_host
+  %link{ rel: 'dns-prefetch', href: ActionController::Base.asset_host }
+  %link{ rel: 'preconnect', href: ActionController::Base.asset_host, crossorigin: '' }
+
+- if user_application_theme == 'gl-dark'
+  %link{ rel: 'preload', href: = stylesheet_url 'application_dark', as: 'style' }
+- else
+  %link{ rel: 'preload', href: = stylesheet_url 'application', as: 'style' }
+
+%link{ rel: 'preload', href: = stylesheet_url "highlight/themes/#{user_color_scheme}", as: 'style' }
+
+- if Gitlab::CurrentSettings.snowplow_enabled? && Gitlab::CurrentSettings.snowplow_collector_hostname
+  %link{ rel: 'preconnect', href: Gitlab::CurrentSettings.snowplow_collector_hostname, crossorigin: '' }
