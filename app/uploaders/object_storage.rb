@@ -218,8 +218,10 @@ module ObjectStorage
 
     # rubocop:disable Gitlab/ModuleWithInstanceVariables
     def object_store=(value)
-      @object_store = value || Store::LOCAL
-      @storage = storage_for(object_store)
+      with_callbacks(:object_store_change, value) do
+        @object_store = value || Store::LOCAL
+        @storage = storage_for(object_store)
+      end
     end
     # rubocop:enable Gitlab/ModuleWithInstanceVariables
 

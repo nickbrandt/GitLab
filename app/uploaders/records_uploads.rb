@@ -47,7 +47,7 @@ module RecordsUploads
 
     # rubocop: disable CodeReuse/ActiveRecord
     def uploads
-      Upload.order(id: :desc).where(uploader: self.class.to_s)
+      Upload.order(id: :desc).where(uploader: uploader_class)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 

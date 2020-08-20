@@ -8,6 +8,10 @@ module Versions
     include CarrierWave::Uploader::Versions
     include Gitlab::TemporarilyAllow
 
+    included do
+      after :object_store_change, :change_versions_object_store!
+    end
+
     SIZE_PATTERN = "w%d".freeze
 
     class_methods do
@@ -39,12 +43,23 @@ module Versions
       end
     end
 
+    ##
+    # Finds the correct uploader version with the given size, or schedule version recreation and returns original uploader.
+    #
+    # === Parameters
+    #
+    # [size (#Integer)] Version size
+    #
+    # === Returns
+    #
+    # [GitlabUploader] Returns version uploader or the original one.
+    #
     def find_or_create_version(size)
       return unless size
 
       version_type = self.class.version_name_for(size).to_sym
-
-      return unless version_exists?(version_type)
+      # fallback to the original uploader if size is not supported
+      return self unless version_exists?(version_type)
 
       version = versions[version_type]
 
@@ -53,32 +68,54 @@ module Versions
       else
         # If version is not found, recreate versions in the background
         enqueue_recreate_versions_job
+        # fallback to the original uploader if version is not found
+        self
       end
     end
 
     def recreate_versions_async!
-      temporarily_allow(process_async_key) do
+      with_allow_versions do
         recreate_versions!
       end
     end
 
+    def unsafe_migrate!(new_store)
+      with_allow_versions do
+        super
+      end
+    end
+
     def allowed?(file)
-      (file.present? || process_async?)
+      file.present? || process_async?
     end
 
     def process_async?
       temporarily_allowed?(process_async_key)
     end
 
-    def enqueue_recreate_versions_job
-      return unless upload
+    def schedule_background_recreate
+      return if self.class.background_upload_enabled?
 
+      enqueue_recreate_versions_job
+    end
+
+    private
+
+    def with_allow_versions
+      temporarily_allow(process_async_key) do
+        yield
+      end
+    end
+
+    def enqueue_recreate_versions_job
       CarrierWave::RecreateVersionsWorker.perform_async(model.class.to_s,
                                                         mounted_as,
                                                         model.id)
     end
 
-    private
+    def change_versions_object_store!(new_store)
+      active_versions.each { |name, v| v.object_store = new_store }
+    end
 
     def process_async_key
       "#{model.class.name}:#{model.id}:#{mounted_as}:process_async"

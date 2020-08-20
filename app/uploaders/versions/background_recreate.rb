@@ -17,15 +17,8 @@ module Versions
       return unless mount_points.any?
 
       run_after_commit do
-        mount_points.each { |mount| enqueue_recreate_versions_job(send(mount)) } # rubocop:disable GitlabSecurity/PublicSend
+        mount_points.each { |mount| send(mount).try(:schedule_background_recreate) } # rubocop:disable GitlabSecurity/PublicSend
       end
     end
-
-    private
-
-    def enqueue_recreate_versions_job(mount)
-      mount.try(:enqueue_recreate_versions_job)
-    end
-
   end
 end

@@ -76,7 +76,7 @@ class GitlabUploader < CarrierWave::Uploader::Base
   end
 
   def local_url
-    File.join('/', self.class.base_dir, dynamic_segment, full_filename(filename))
+    File.join('/', self.class.base_dir, dynamic_segment, filename)
   end
 
   def cached_size
