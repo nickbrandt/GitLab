@@ -22,8 +22,18 @@ if (process.env.NODE_ENV !== 'production') {
   };
 }
 
-/** This is a re-usable vue component for rendering a svg sprite icon
- *  @example
+/**
+ * This is a re-usable vue component for rendering a svg sprite icon
+ *
+ * DEPREACTION NOTICE:
+ *
+ * This component has been superseded by GlIcon from gitlab-ui and
+ * should be replaced.
+ *
+ * See more at: https://gitlab.com/gitlab-org/gitlab/-/issues/238985
+ *
+ * @deprecated
+ * @example
  *  <icon
  *    name="retry"
  *    :size="32"
