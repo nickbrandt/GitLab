@@ -1,20 +1,16 @@
 <script>
-import { GlLoadingIcon } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import tooltip from '~/vue_shared/directives/tooltip';
-
-import Icon from '~/vue_shared/components/icon.vue';
-
-const MARK_TEXT = __('Mark as done');
-const TODO_TEXT = __('Add a To-Do');
+import TodoButton from '~/vue_shared/components/todo_button.vue';
 
 export default {
   directives: {
     tooltip,
   },
   components: {
-    Icon,
+    GlIcon,
     GlLoadingIcon,
+    TodoButton,
   },
   props: {
     issuableId: {
@@ -42,55 +38,43 @@ export default {
     },
   },
   computed: {
-    buttonClasses() {
-      return this.collapsed
-        ? 'btn-blank btn-todo sidebar-collapsed-icon dont-change-state'
-        : 'btn btn-default btn-todo issuable-header-btn float-right';
-    },
-    buttonLabel() {
-      return this.isTodo ? MARK_TEXT : TODO_TEXT;
-    },
-    buttonTooltip() {
-      return !this.collapsed ? undefined : this.buttonLabel;
-    },
     collapsedButtonIconClasses() {
       return this.isTodo ? 'todo-undone' : '';
     },
     collapsedButtonIcon() {
       return this.isTodo ? 'todo-done' : 'todo-add';
     },
-    collapsedButtonIconVisible() {
-      return this.collapsed && !this.isActionActive;
-    },
-  },
-  methods: {
-    handleButtonClick() {
-      this.$emit('toggleTodo');
-    },
   },
 };
 </script>
 
 <template>
-  <button
-    v-tooltip
-    :class="buttonClasses"
-    :title="buttonTooltip"
-    :aria-label="buttonLabel"
-    :data-issuable-id="issuableId"
-    :data-issuable-type="issuableType"
-    type="button"
-    data-container="body"
-    data-placement="left"
-    data-boundary="viewport"
-    @click="handleButtonClick"
-  >
-    <icon
-      v-show="collapsedButtonIconVisible"
-      :class="collapsedButtonIconClasses"
-      :name="collapsedButtonIcon"
-    />
-    <span v-show="!collapsed" class="issuable-todo-inner">{{ buttonLabel }}</span>
-    <gl-loading-icon v-show="isActionActive" :inline="true" />
-  </button>
+  <todo-button
+    #default="{ toggleTodo, label }"
+    :class="!collapsed ? 'float-right' : ''"
+    :issuable-type="issuableType"
+    :issuable-id="issuableId"
+    :is-todo="isTodo"
+    :is-action-active="isActionActive"
+    @toggleTodo="$emit('toggleTodo', $event)"
+    ><button
+      v-if="collapsed"
+      v-tooltip
+      class="btn-blank sidebar-collapsed-icon"
+      type="button"
+      role="button"
+      :title="label"
+      :aria-label="label"
+      data-placement="left"
+      data-container="body"
+      data-boundary="viewport"
+      @click="toggleTodo"
+    >
+      <gl-icon
+        v-show="!isActionActive"
+        :class="collapsedButtonIconClasses"
+        :name="collapsedButtonIcon"
+      />
+      <gl-loading-icon v-show="isActionActive" :inline="true" /></button
+  ></todo-button>
 </template>
