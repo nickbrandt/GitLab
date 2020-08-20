@@ -126,7 +126,7 @@ The following table lists available parameters for jobs:
 | [`rules`](#rules)                                  | List of conditions to evaluate and determine selected attributes of a job, and whether or not it's created. May not be used alongside `only`/`except`.                              |
 | [`services`](#services)                            | Use Docker services images. Also available: `services:name`, `services:alias`, `services:entrypoint`, and `services:command`.                                                       |
 | [`stage`](#stage)                                  | Defines a job stage (default: `test`).                                                                                                                                              |
-| [`tags`](#tags)                                    | List of tags which are used to select a runner.                                                                                                                                       |
+| [`tags`](#tags)                                    | List of tags that are used to select a runner.                                                                                                                                       |
 | [`timeout`](#timeout)                              | Define a custom job-level timeout that takes precedence over the project-wide setting.                                                                                              |
 | [`trigger`](#trigger)                              | Defines a downstream pipeline trigger.                                                                                                                                              |
 | [`variables`](#variables)                          | Define job variables on a job level.                                                                                                                                                |
@@ -408,7 +408,7 @@ otherwise the external file is not included.
 | [`local`](#includelocal)        | Include a file from the local project repository.                 |
 | [`file`](#includefile)          | Include a file from a different project repository.               |
 | [`remote`](#includeremote)      | Include a file from a remote URL. Must be publicly accessible.    |
-| [`template`](#includetemplate)  | Include templates which are provided by GitLab.                   |
+| [`template`](#includetemplate)  | Include templates that are provided by GitLab.                    |
 
 The `include` methods do not support [variable expansion](../variables/where_variables_can_be_used.md#variables-usage).
 
@@ -455,7 +455,7 @@ include:
 ```
 
 TIP: **Tip:**
-Local includes can be used as a replacement for symbolic links which are not followed.
+Local includes can be used as a replacement for symbolic links that are not followed.
 
 This can be defined as a short local include:
 
@@ -616,7 +616,7 @@ For more information, see [Available settings for `services`](../docker/using_do
 ### `script`
 
 `script` is the only required keyword that a job needs. It's a shell script
-which is executed by the runner. For example:
+that is executed by the runner. For example:
 
 ```yaml
 job:
@@ -837,7 +837,7 @@ See [custom collapsible sections](../pipelines/index.md#custom-collapsible-secti
 
 ### `stage`
 
-`stage` is defined per-job and relies on [`stages`](#stages) which is defined
+`stage` is defined per-job and relies on [`stages`](#stages), which is defined
 globally. It allows to group jobs into different stages, and jobs of the same
 `stage` are executed in parallel (subject to [certain conditions](#using-your-own-runners)). For example:
 
@@ -1558,9 +1558,9 @@ the most out of your pipelines.
 `only` and `except` are two parameters that set a job policy to limit when
 jobs are created:
 
-1. `only` defines the names of branches and tags for which the job will run.
-1. `except` defines the names of branches and tags for which the job will
-    **not** run.
+1. `only` defines the names of branches and tags the job runs for.
+1. `except` defines the names of branches and tags the job does
+    **not** run for.
 
 There are a few rules that apply to the usage of job policy:
 
@@ -1968,8 +1968,8 @@ properly corrected any failures from previous pipelines.
 
 Without [pipelines for merge requests](../merge_request_pipelines/index.md), pipelines
 run on branches or tags that don't have an explicit association with a merge request.
-In this case, a previous SHA is used to calculate the diff, which equivalent to `git diff HEAD~`.
-This could result in some unexpected behavior, including:
+In this case, a previous SHA is used to calculate the diff, which is equivalent to `git diff HEAD~`.
+This can result in some unexpected behavior, including:
 
 - When pushing a new branch or a new tag to GitLab, the policy always evaluates to true.
 - When pushing a new commit, the changed files are calculated using the previous commit
@@ -2521,11 +2521,10 @@ deploy to production:
 >   including predefined, secure variables and `.gitlab-ci.yml` [`variables`](#variables).
 >   You however can't use variables defined under `script`.
 
-This is an optional value that when set, it exposes buttons in various places
-in GitLab which when clicked take you to the defined URL.
+This optional value exposes buttons that take you to the defined URL
 
-In the example below, if the job finishes successfully, it will create buttons
-in the merge requests and in the environments/deployments pages which will point
+In this example, if the job finishes successfully, it creates buttons
+in the merge requests and in the environments/deployments pages that point
 to `https://prod.example.com`.
 
 ```yaml
@@ -2694,7 +2693,7 @@ for inclusion in URLs. In this case, if the `deploy as review app` job was run
 in a branch named `pow`, this environment would be accessible with an URL like
 `https://review-pow.example.com/`.
 
-This of course implies that the underlying server which hosts the application
+This implies that the underlying server that hosts the application
 is properly configured.
 
 The common use case is to create dynamic environments for branches and use them
@@ -2713,7 +2712,7 @@ TIP: **Learn more:**
 Read how caching works and find out some good practices in the
 [caching dependencies documentation](../caching/index.md).
 
-`cache` is used to specify a list of files and directories which should be
+`cache` is used to specify a list of files and directories that should be
 cached between jobs. You can only use paths that are within the local working
 copy.
 
@@ -2722,7 +2721,7 @@ globally and all jobs will use that definition.
 
 #### `cache:paths`
 
-Use the `paths` directive to choose which files or directories will be cached. Paths
+Use the `paths` directive to choose which files or directories to cache. Paths
 are relative to the project directory (`$CI_PROJECT_DIR`) and can't directly link outside it.
 Wildcards can be used that follow the [glob](https://en.wikipedia.org/wiki/Glob_(programming))
 patterns and:
@@ -2777,8 +2776,8 @@ or any other way that fits your workflow. This way, you can fine tune caching,
 allowing you to cache data between different jobs or even different branches.
 
 The `cache:key` variable can use any of the
-[predefined variables](../variables/README.md), and the default key, if not
-set, is just literal `default` which means everything is shared between
+[predefined variables](../variables/README.md). The default key, if not
+set, is just literal `default`, which means everything is shared between
 pipelines and jobs by default, starting from GitLab 9.0.
 
 NOTE: **Note:**
@@ -2950,7 +2949,7 @@ skip the download step.
 > - Not all executors are [supported](https://docs.gitlab.com/runner/executors/#compatibility-chart).
 > - Job artifacts are only collected for successful jobs by default.
 
-`artifacts` is used to specify a list of files and directories which should be
+`artifacts` is used to specify a list of files and directories that are
 attached to the job when it [succeeds, fails, or always](#artifactswhen).
 
 The artifacts will be sent to GitLab after the job finishes and will
@@ -3093,11 +3092,11 @@ Note the following:
 
 > Introduced in GitLab 8.6 and GitLab Runner v1.1.0.
 
-The `name` directive allows you to define the name of the created artifacts
-archive. That way, you can have a unique name for every archive which could be
-useful when you'd like to download the archive from GitLab. The `artifacts:name`
+Use the `name` directive to define the name of the created artifacts
+archive. You can specify a unique name for every archive, which can be
+useful when you want to download the archive from GitLab. The `artifacts:name`
 variable can make use of any of the [predefined variables](../variables/README.md).
-The default name is `artifacts`, which becomes `artifacts.zip` when downloaded.
+The default name is `artifacts`, which becomes `artifacts.zip` when you download it.
 
 NOTE: **Note:**
 If your branch-name contains forward slashes
@@ -3303,7 +3302,7 @@ are passed, but you can use the `dependencies` parameter to define a limited
 list of jobs (or no jobs) to fetch artifacts from.
 
 To use this feature, define `dependencies` in context of the job and pass
-a list of all previous jobs from which the artifacts should be downloaded.
+a list of all previous jobs the artifacts should be downloaded from.
 You can only define jobs from stages that are executed before the current one.
 An error will be shown if you define jobs from the current stage or next ones.
 Defining an empty array will skip downloading any artifacts for that job.
@@ -3387,7 +3386,7 @@ job1:
 ### `retry`
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/3442) in GitLab 9.5.
-> - [Behavior expanded](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/3515) in GitLab 11.5 to control on which failures to retry.
+> - [Behavior expanded](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/3515) in GitLab 11.5 to control which failures to retry on.
 
 `retry` allows you to configure how many times a job is going to be retried in
 case of a failure.
@@ -3408,7 +3407,7 @@ test:
 ```
 
 By default, a job will be retried on all failure cases. To have a better control
-on which failures to retry, `retry` can be a hash with the following keys:
+over which failures to retry, `retry` can be a hash with the following keys:
 
 - `max`: The maximum number of retries.
 - `when`: The failure cases to retry.
@@ -4069,13 +4068,13 @@ These variables can be later used in all executed commands and scripts.
 The YAML-defined variables are also set to all created service containers,
 thus allowing to fine tune them.
 
-Except for the user defined variables, there are also the ones [set up by the
+Except for the user-defined variables, there are also variables [set up by the
 runner itself](../variables/README.md#predefined-environment-variables).
-One example would be `CI_COMMIT_REF_NAME` which has the value of
-the branch or tag name for which project is built. Apart from the variables
-you can set in `.gitlab-ci.yml`, there are also the so called
-[Variables](../variables/README.md#gitlab-cicd-environment-variables)
-which can be set in GitLab's UI.
+One example would be `CI_COMMIT_REF_NAME`, which has the value of
+the branch or tag name the project is built for. Apart from the variables
+you can set in `.gitlab-ci.yml`, there are also environment
+[variables](../variables/README.md#gitlab-cicd-environment-variables),
+which can be set in the GitLab UI.
 
 [YAML anchors for variables](#yaml-anchors-for-variables) are available.
 
@@ -4292,8 +4291,8 @@ You can set them globally or per-job in the [`variables`](#variables) section.
 NOTE: **Note:**
 As of GitLab 12.0, newly created projects will automatically have a [default `git depth` value of `50`](../pipelines/settings.md#git-shallow-clone).
 
-You can specify the depth of fetching and cloning using `GIT_DEPTH`. This allows
-shallow cloning of the repository which can significantly speed up cloning for
+You can specify the depth of fetching and cloning using `GIT_DEPTH`. This does a
+shallow clone of the repository and can significantly speed up cloning for
 repositories with a large number of commits or old, large binaries. The value is
 passed to `git fetch` and `git clone`.
 
@@ -4332,8 +4331,8 @@ This is the default configuration for `docker` and `kubernetes` executor.
 By default, GitLab Runner clones the repository in a unique subpath of the
 `$CI_BUILDS_DIR` directory. However, your project might require the code in a
 specific directory (Go projects, for example). In that case, you can specify
-the `GIT_CLONE_PATH` variable to tell the runner in which directory to clone the
-repository:
+the `GIT_CLONE_PATH` variable to tell the runner the directory to clone the
+repository in:
 
 ```yaml
 variables:
@@ -4407,7 +4406,7 @@ because `$CI_BUILDS_DIR` is not expanded.
 ## Special YAML features
 
 It's possible to use special YAML features like anchors (`&`), aliases (`*`)
-and map merging (`<<`), which will allow you to greatly reduce the complexity
+and map merging (`<<`), which allows you to greatly reduce the complexity
 of `.gitlab-ci.yml`.
 
 Read more about the various [YAML features](https://learnxinyminutes.com/docs/yaml/).
