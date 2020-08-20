@@ -311,6 +311,8 @@ module RelativePositioning
     else
       self.relative_position = self.class.position_between(max_pos, MAX_POSITION + 1)
     end
+  rescue NoSpaceLeft
+    self.relative_position = MAX_POSITION
   end
 
   def move_to_start
@@ -326,6 +328,8 @@ module RelativePositioning
     else
       self.relative_position = self.class.position_between(MIN_POSITION - 1, min_pos)
     end
+  rescue NoSpaceLeft
+    self.relative_position = MIN_POSITION
   end
 
   # Moves the sequence before the current item to the middle of the next gap
