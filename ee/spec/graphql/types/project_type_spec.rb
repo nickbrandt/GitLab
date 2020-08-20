@@ -45,6 +45,7 @@ RSpec.describe GitlabSchema.types['Project'] do
                       label
                       defaultValue
                       value
+                      size
                     }
                   }
                   pipeline {
@@ -60,6 +61,7 @@ RSpec.describe GitlabSchema.types['Project'] do
                       label
                       defaultValue
                       value
+                      size
                     }
                   }
                   analyzers {
@@ -88,6 +90,7 @@ RSpec.describe GitlabSchema.types['Project'] do
       expect(secure_analyzers_prefix['label']).to eq('Image prefix')
       expect(secure_analyzers_prefix['defaultValue']).to eq('registry.gitlab.com/gitlab-org/security-products/analyzers')
       expect(secure_analyzers_prefix['value']).to eq('registry.gitlab.com/gitlab-org/security-products/analyzers')
+      expect(secure_analyzers_prefix['size']).to eq('MEDIUM')
       expect(secure_analyzers_prefix['options']).to be_nil
     end
 
@@ -98,6 +101,7 @@ RSpec.describe GitlabSchema.types['Project'] do
       expect(pipeline_stage['label']).to eq('Stage')
       expect(pipeline_stage['defaultValue']).to eq('test')
       expect(pipeline_stage['value']).to eq('test')
+      expect(pipeline_stage['size']).to eq('MEDIUM')
     end
 
     it "returns the project's sast configuration for analyzer variables" do
