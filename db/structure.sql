@@ -15409,7 +15409,6 @@ CREATE TABLE public.services (
     tag_push_events boolean DEFAULT true,
     note_events boolean DEFAULT true NOT NULL,
     category character varying DEFAULT 'common'::character varying NOT NULL,
-    "default" boolean DEFAULT false,
     wiki_page_events boolean DEFAULT true,
     pipeline_events boolean DEFAULT false NOT NULL,
     confidential_issues_events boolean DEFAULT true NOT NULL,
