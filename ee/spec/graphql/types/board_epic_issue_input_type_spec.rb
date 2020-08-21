@@ -7,7 +7,7 @@ RSpec.describe GitlabSchema.types['BoardEpicIssueInput'] do
 
   it 'exposes negated issue arguments' do
     allowed_args = %w(labelName milestoneTitle assigneeUsername authorUsername
-                      releaseTag epicId myReactionEmoji weight not)
+                      releaseTag epicId myReactionEmoji weight not search)
 
     expect(described_class.arguments.keys).to match_array(allowed_args)
     expect(described_class.arguments['not'].type).to eq(Types::NegatedBoardEpicIssueInputType)
