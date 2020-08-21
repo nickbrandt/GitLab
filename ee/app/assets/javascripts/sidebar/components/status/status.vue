@@ -169,21 +169,11 @@ export default {
         <gl-dropdown
           ref="dropdown"
           class="gl-w-full"
+          header-text="{{ s__('Sidebar|Assign health status') }}"
           :text="dropdownText"
           @keydown.esc.native="hideDropdown"
           @hide="hideDropdown"
         >
-          <div class="dropdown-title">
-            <span class="health-title">{{ s__('Sidebar|Assign health status') }}</span>
-            <gl-button
-              :aria-label="__('Close')"
-              category="tertiary"
-              class="dropdown-title-button dropdown-menu-close"
-              icon="close"
-              @click="hideDropdown"
-            />
-          </div>
-
           <div class="dropdown-content dropdown-body">
             <gl-dropdown-item 
               @click="handleDropdownClick(null)"
