@@ -654,13 +654,16 @@
       when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *ci-review-patterns
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *code-qa-patterns
       when: manual
       allow_failure: true
     - <<: *if-dot-com-gitlab-org-schedule
+      allow_failure: true
 
 .review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise:
   rules:
@@ -668,6 +671,7 @@
       when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *ci-review-patterns
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
       allow_failure: true
@@ -691,6 +695,7 @@
       when: never
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *ci-review-patterns
+      allow_failure: true
     - <<: *if-dot-com-gitlab-org-merge-request
       changes: *frontend-patterns
       allow_failure: true
