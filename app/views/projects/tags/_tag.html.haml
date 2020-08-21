@@ -2,8 +2,8 @@
 - release = @releases.find { |release| release.tag == tag.name }
 %li.flex-row.allow-wrap
   .row-main-content
-    = icon('tag')
-    = link_to tag.name, project_tag_path(@project, tag.name), class: 'item-title ref-name gl-ml-2'
+    = sprite_icon('tag')
+    = link_to tag.name, project_tag_path(@project, tag.name), class: 'item-title ref-name'
 
     - if protected_tag?(@project, tag)
       %span.badge.badge-success.gl-ml-2
