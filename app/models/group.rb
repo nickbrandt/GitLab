@@ -22,6 +22,8 @@ class Group < Namespace
 
   has_many :group_members, -> { where(requested_at: nil) }, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
   alias_method :members, :group_members
+  has_many :full_access_members, -> { where(requested_at: nil).where.not(access_level: Gitlab::Access::UNASSIGNED) }, dependent: :destroy, as: :source, class_name: 'GroupMember' # rubocop:disable Cop/ActiveRecordDependent
+
   has_many :users, through: :group_members
   has_many :owners,
     -> { where(members: { access_level: Gitlab::Access::OWNER }) },
@@ -326,7 +328,7 @@ class Group < Namespace
   # rubocop: enable CodeReuse/ServiceClass
 
   def user_ids_for_project_authorizations
-    members_with_parents.where.not(access_level: Gitlab::Access::UNASSIGNED).pluck(:user_id)
+    members_with_parents.non_unassigned.pluck(:user_id)
   end
 
   def self_and_ancestors_ids

@@ -16,7 +16,7 @@ RSpec.describe GroupMembersFinder, '#execute' do
     member1 = group.add_maintainer(user1)
     member2 = group.add_maintainer(user2)
     member3 = group.add_maintainer(user3)
-    create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: create(:user), group: group)
+    create(:group_member, :unassigned, user: create(:user), group: group)
 
     result = described_class.new(group).execute
 

@@ -13,7 +13,8 @@ class GroupMember < Member
   # Make sure group member points only to group as it source
   default_value_for :source_type, SOURCE_TYPE
   validates :source_type, format: { with: /\ANamespace\z/ }
-  validates :access_level, inclusion: { in: Gitlab::Access.values_with_limited }, presence: true
+  validates :access_level, presence: true
+  validate :access_level_inclusion
 
   default_scope { where(source_type: SOURCE_TYPE) } # rubocop:disable Cop/DefaultScope
 
@@ -46,6 +47,12 @@ class GroupMember < Member
   end
 
   private
+
+  def access_level_inclusion
+    return if access_level.in?(Gitlab::Access.all_values)
+
+    errors.add(:access_level, "is not included in the list")
+  end
 
   def send_invite
     run_after_commit_or_now { notification_service.invite_group_member(self, @raw_invite_token) }

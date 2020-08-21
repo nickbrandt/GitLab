@@ -39,10 +39,6 @@ module Gitlab
         options_with_owner.values
       end
 
-      def values_with_limited
-        options_with_unassigned.values
-      end
-
       def options
         {
           "Guest"          => GUEST,
@@ -91,7 +87,7 @@ module Gitlab
       end
 
       def human_access(access)
-        options_with_unassigned.key(access)
+        options_with_owner.key(access)
       end
 
       def human_access_with_none(access)
