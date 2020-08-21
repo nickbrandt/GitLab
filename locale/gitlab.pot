@@ -3641,6 +3641,9 @@ msgstr ""
 msgid "Automatic certificate management using Let's Encrypt"
 msgstr ""
 
+msgid "Automatically close incident issues when the associated Prometheus alert resolves."
+msgstr ""
+
 msgid "Automatically create merge requests for vulnerabilities that have fixes available."
 msgstr ""
 
