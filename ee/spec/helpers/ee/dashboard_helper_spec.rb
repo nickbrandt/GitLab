@@ -197,32 +197,4 @@ RSpec.describe DashboardHelper, type: :helper do
       it { is_expected.to eq(output) }
     end
   end
-
-  describe 'analytics_nav_url' do
-    before do
-      allow(helper).to receive(:current_user).and_return(user)
-    end
-
-    context 'when analytics features are disabled' do
-      context 'and user has access to instance statistics features' do
-        before do
-          allow(helper).to receive(:can?) { true }
-        end
-
-        it 'returns the instance statistics root path' do
-          expect(helper.analytics_nav_url).to match(instance_statistics_root_path)
-        end
-      end
-
-      context 'and user does not have access to instance statistics features' do
-        before do
-          allow(helper).to receive(:can?) { false }
-        end
-
-        it 'returns the not found path' do
-          expect(helper.analytics_nav_url).to match('errors/not_found')
-        end
-      end
-    end
-  end
 end
