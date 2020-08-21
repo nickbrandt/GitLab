@@ -149,7 +149,6 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       resource :dashboard, only: [:show], controller: :dashboard
       resources :vulnerabilities, only: [:index]
       resource :compliance_dashboard, only: [:show]
-      resources :vulnerable_projects, only: [:index]
       resource :discover, only: [:show], controller: :discover
       resources :credentials, only: [:index]
       resources :merge_commit_reports, only: [:index], constraints: { format: :csv }
