@@ -194,6 +194,45 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
       )
     end
 
+    it 'includes project imports usage data' do
+      for_defined_days_back do
+        user = create(:user)
+
+        %w(gitlab_project gitlab github bitbucket bitbucket_server gitea git manifest).each do |type|
+          create(:project, import_type: type, creator_id: user.id)
+        end
+      end
+
+      expect(described_class.usage_activity_by_stage_manage({})).to include(
+        {
+          projects_imported: {
+            gitlab_project: 2,
+            gitlab: 2,
+            github: 2,
+            bitbucket: 2,
+            bitbucket_server: 2,
+            gitea: 2,
+            git: 2,
+            manifest: 2
+          }
+        }
+      )
+      expect(described_class.usage_activity_by_stage_manage(described_class.last_28_days_time_period)).to include(
+        {
+          projects_imported: {
+            gitlab_project: 1,
+            gitlab: 1,
+            github: 1,
+            bitbucket: 1,
+            bitbucket_server: 1,
+            gitea: 1,
+            git: 1,
+            manifest: 1
+          }
+        }
+      )
+    end
+
     def omniauth_providers
       [
         OpenStruct.new(name: 'google_oauth2'),

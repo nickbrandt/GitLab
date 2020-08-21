@@ -511,7 +511,17 @@ module Gitlab
           events: distinct_count(::Event.where(time_period), :author_id),
           groups: distinct_count(::GroupMember.where(time_period), :user_id),
           users_created: count(::User.where(time_period), start: user_minimum_id, finish: user_maximum_id),
-          omniauth_providers: filtered_omniauth_provider_names.reject { |name| name == 'group_saml' }
+          omniauth_providers: filtered_omniauth_provider_names.reject { |name| name == 'group_saml' },
+          projects_imported: {
+            gitlab_project: projects_imported_count('gitlab_project', time_period),
+            gitlab: projects_imported_count('gitlab', time_period),
+            github: projects_imported_count('github', time_period),
+            bitbucket: projects_imported_count('bitbucket', time_period),
+            bitbucket_server: projects_imported_count('bitbucket_server', time_period),
+            gitea: projects_imported_count('gitea', time_period),
+            git: projects_imported_count('git', time_period),
+            manifest: projects_imported_count('manifest', time_period)
+          }
         }
       end
       # rubocop: enable CodeReuse/ActiveRecord
@@ -773,6 +783,10 @@ module Gitlab
 
       def deployment_count(relation)
         count relation, start: deployment_minimum_id, finish: deployment_maximum_id
+      end
+
+      def projects_imported_count(from, time_period)
+        distinct_count(::Project.imported_from(from).where(time_period), :creator_id) # rubocop: disable CodeReuse/ActiveRecord
       end
     end
   end
