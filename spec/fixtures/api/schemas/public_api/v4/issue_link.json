@@ -3,12 +3,12 @@
   "properties" : {
      "source_issue": {
        "allOf": [
-          { "$ref": "../../../../../../../spec/fixtures/api/schemas/public_api/v4/issue.json" }
+          { "$ref": "../../../../../../spec/fixtures/api/schemas/public_api/v4/issue.json" }
         ]
      },
      "target_issue": {
        "allOf": [
-          { "$ref": "../../../../../../../spec/fixtures/api/schemas/public_api/v4/issue.json" }
+          { "$ref": "../../../../../../spec/fixtures/api/schemas/public_api/v4/issue.json" }
         ]
      },
      "link_type": {

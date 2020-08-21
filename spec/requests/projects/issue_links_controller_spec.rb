@@ -7,10 +7,6 @@ RSpec.describe Projects::IssueLinksController do
   let(:project) { create(:project_empty_repo) }
   let(:issue) { create :issue, project: project }
 
-  before do
-    stub_licensed_features(blocked_issues: true)
-  end
-
   describe 'GET /*namespace_id/:project_id/issues/:issue_id/links' do
     let(:issue_b) { create :issue, project: project }
     let!(:issue_link) { create :issue_link, source: issue, target: issue_b }
