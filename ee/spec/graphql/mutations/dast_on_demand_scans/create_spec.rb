@@ -12,6 +12,10 @@ RSpec.describe Mutations::DastOnDemandScans::Create do
 
   subject(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
 
+  before do
+    stub_licensed_features(security_on_demand_scans: true)
+  end
+
   describe '#resolve' do
     subject do
       mutation.resolve(
@@ -101,6 +105,14 @@ RSpec.describe Mutations::DastOnDemandScans::Create do
         context 'when on demand scan feature is not enabled' do
           it 'raises an exception' do
             stub_feature_flags(security_on_demand_scans_feature_flag: false)
+
+            expect { subject }.to raise_error(Gitlab::Graphql::Errors::ResourceNotAvailable)
+          end
+        end
+
+        context 'when on demand scan licensed feature is not available' do
+          it 'raises an exception' do
+            stub_licensed_features(security_on_demand_scans: false)
 
             expect { subject }.to raise_error(Gitlab::Graphql::Errors::ResourceNotAvailable)
           end
