@@ -15306,7 +15306,8 @@ CREATE TABLE public.security_scans (
     updated_at timestamp with time zone NOT NULL,
     build_id bigint NOT NULL,
     scan_type smallint NOT NULL,
-    scanned_resources_count integer
+    scanned_resources_count integer,
+    severity_stats jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 CREATE SEQUENCE public.security_scans_id_seq
