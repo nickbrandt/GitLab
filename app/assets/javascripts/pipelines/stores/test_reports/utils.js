@@ -1,5 +1,4 @@
 import { TestStatus } from '~/pipelines/constants';
-import { secondsToMilliseconds } from '~/lib/utils/datetime_utility';
 import { __, sprintf } from '../../../locale';
 
 export function iconForTestStatus(status) {
@@ -15,7 +14,7 @@ export function iconForTestStatus(status) {
 
 export const formattedTime = (seconds = 0) => {
   if (seconds < 1) {
-    const milliseconds = secondsToMilliseconds(seconds);
+    const milliseconds = seconds * 1000;
     return sprintf(__('%{milliseconds}ms'), { milliseconds: milliseconds.toFixed(2) });
   }
   return sprintf(__('%{seconds}s'), { seconds: seconds.toFixed(2) });
