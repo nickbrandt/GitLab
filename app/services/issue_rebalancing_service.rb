@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class IssueRebalancingService < Issues::BaseService
+class IssueRebalancingService
   MAX_ISSUE_COUNT = 100_000
   TooManyIssues = Class.new(StandardError)
 
