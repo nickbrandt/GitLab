@@ -151,6 +151,10 @@ requests you're assigned to.
 you have quick access to. You can also gather feedback on them through
 [Discussions](#discussions).
 
+## Features behind feature flags
+
+Understand what [features behind feature flags](feature_flags.md) mean.
+
 ## Keyboard shortcuts
 
 There are many [keyboard shortcuts](shortcuts.md) in GitLab to help you navigate between
