@@ -123,4 +123,18 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
       expect(report).to have_received(:replace_with!).with(merged_report)
     end
   end
+
+  describe '#severity_stats' do
+    let(:report) { create(:ci_reports_security_report) }
+
+    subject { report.severity_stats }
+
+    before do
+      report.add_finding(create(:ci_reports_security_finding, severity: :unknown))
+      report.add_finding(create(:ci_reports_security_finding, severity: :info))
+      report.add_finding(create(:ci_reports_security_finding, severity: :info))
+    end
+
+    it { is_expected.to eq({ unknown: { medium: 1 }, info: { medium: 2 } }) }
+  end
 end

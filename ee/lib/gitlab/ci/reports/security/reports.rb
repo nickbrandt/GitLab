@@ -8,6 +8,8 @@ module Gitlab
           attr_reader :reports, :pipeline
 
           delegate :empty?, to: :reports
+          delegate :values, to: :reports, prefix: :report
+          delegate :each, :map, to: :report_values
 
           def initialize(pipeline)
             @reports = {}

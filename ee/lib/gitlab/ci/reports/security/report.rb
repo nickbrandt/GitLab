@@ -58,6 +58,11 @@ module Gitlab
           def merge!(other)
             replace_with!(::Security::MergeReportsService.new(self, other).execute)
           end
+
+          def severity_stats
+            @severity_stats ||= findings.group_by(&:severity)
+                                        .transform_values { |findings| findings.group_by(&:confidence).transform_values(&:length) }
+          end
         end
       end
     end

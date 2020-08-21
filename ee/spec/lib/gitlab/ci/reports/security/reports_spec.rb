@@ -103,4 +103,11 @@ RSpec.describe Gitlab::Ci::Reports::Security::Reports do
       end
     end
   end
+
+  describe 'delegations' do
+    subject { security_reports }
+
+    it { is_expected.to delegate_method(:values).to(:reports).with_prefix(:report) }
+    it { is_expected.to delegate_method(:each).to(:report_values) }
+  end
 end
