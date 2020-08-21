@@ -537,6 +537,18 @@ module API
       )
     end
 
+    def redis_track_event(event_name, values, feature_name)
+      raise "Feature #{feature_name} not enabled" unless Feature.enabled?(feature_name)
+      raise "Usage ping not enabled" unless Gitlab::CurrentSettings.usage_ping_enabled?
+      raise "values is empty" unless values.present?
+
+      Gitlab::UsageDataCounters::HLLRedisCounter.track_event(values, event_name)
+    rescue => error
+      Rails.logger.warn( # rubocop:disable Gitlab/RailsLogger
+        "Redis tracking event failed for event: #{event_name}, message: #{error.message}"
+      )
+    end
+
     def with_api_params(&block)
       yield({ api: true, request: request })
     end
