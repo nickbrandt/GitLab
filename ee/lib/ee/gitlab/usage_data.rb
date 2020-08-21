@@ -393,7 +393,6 @@ module EE
         # rubocop:enable CodeReuse/ActiveRecord
 
         # rubocop:disable CodeReuse/ActiveRecord
-        # rubocop: disable UsageData/DistinctCountByLargeForeignKey
         def projects_with_sectional_code_owner_rules(time_period)
           distinct_count(
             ::ApprovalMergeRequestRule
@@ -406,7 +405,6 @@ module EE
             finish: project_maximum_id
           )
         end
-        # rubocop: enable UsageData/DistinctCountByLargeForeignKey
         # rubocop:enable CodeReuse/ActiveRecord
       end
     end
