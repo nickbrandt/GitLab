@@ -61,6 +61,9 @@ export default {
     resolvedCommentsToggleIcon() {
       return this.resolvedDiscussionsExpanded ? 'chevron-down' : 'chevron-right';
     },
+    hasPendingTodo() {
+      return Boolean(this.design.pendingTodo);
+    },
   },
   watch: {
     isResolvedCommentsPopoverHidden(newVal) {
@@ -108,7 +111,7 @@ export default {
       class="gl-display-flex gl-justify-content-space-between gl-border-b-1 gl-border-b-gray-100"
     >
       <span>{{ __('To-Do') }}</span>
-      <todo-button issuable-type="design" :issuable-id="design.iid" />
+      <todo-button issuable-type="design" :issuable-id="design.iid" :is-todo="hasPendingTodo" />
     </div>
     <h2 class="gl-font-weight-bold gl-mt-0">
       {{ issue.title }}
