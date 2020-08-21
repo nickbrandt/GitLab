@@ -11,10 +11,10 @@ module Mutations
         pipeline = authorized_find!(id: id)
         project = pipeline.project
 
-        ::Ci::DestroyPipelineService.new(project, current_user).execute(pipeline)
-      rescue ActiveRecord::RecordNotFound
+        result =  ::Ci::DestroyPipelineService.new(project, current_user).execute(pipeline)
         {
-          errors: ['Pipeline not found']
+          success: result.success?,
+          errors: result.errors
         }
       end
     end

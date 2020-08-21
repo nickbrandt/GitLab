@@ -6,12 +6,6 @@ module Mutations
       argument :id, GraphQL::ID_TYPE,
                 required: true,
                 description: 'The id of the pipeline to mutate'
-
-      field :pipeline,
-            Types::Ci::PipelineType,
-            null: true,
-            description: 'The pipeline after mutation'
-
       private
 
       def find_object(id:)

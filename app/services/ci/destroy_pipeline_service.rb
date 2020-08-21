@@ -8,6 +8,11 @@ module Ci
       Ci::ExpirePipelineCacheService.new.execute(pipeline, delete: true)
 
       pipeline.destroy!
+
+      ServiceResponse.success(message: 'Pipeline not found')
+    rescue ActiveRecord::RecordNotFound
+      ServiceResponse.error(message: 'Pipeline not found')
+
     end
   end
 end

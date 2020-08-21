@@ -5,6 +5,11 @@ module Mutations
     class PipelineRetry < Base
       graphql_name 'PipelineRetry'
 
+      field :pipeline,
+            Types::Ci::PipelineType,
+            null: true,
+            description: 'The pipeline after mutation'
+
       authorize :update_pipeline
 
       def resolve(id:)
