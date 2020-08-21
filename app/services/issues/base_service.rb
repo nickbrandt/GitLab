@@ -19,6 +19,16 @@ module Issues
 
     private
 
+    NO_REBALANCING_NEEDED = ((RelativePositioning::MIN_POSITION * 0.9999)..(RelativePositioning::MAX_POSITION * 0.9999)).freeze
+
+    def rebalance_if_needed(issue)
+      return unless issue
+      return if issue.relative_position.nil?
+      return if NO_REBALANCING_NEEDED.cover?(issue.relative_position)
+
+      IssueRebalancingWorker.perform_async(issue.id)
+    end
+
     def create_assignee_note(issue, old_assignees)
       SystemNoteService.change_issuable_assignees(
         issue, issue.project, current_user, old_assignees)
