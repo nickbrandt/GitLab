@@ -82,6 +82,24 @@ RSpec.describe Issues::CreateService do
         expect(issue.relative_position).to eq(project.issues.maximum(:relative_position))
       end
 
+      it 'does not rebalance if the flag is disabled' do
+        stub_feature_flags(rebalance_issues: false)
+
+        create(:issue, project: project, relative_position: RelativePositioning::MAX_POSITION)
+        expect(IssueRebalancingWorker).not_to receive(:perform_async).with(Integer)
+
+        expect(issue.relative_position).to eq(project.issues.maximum(:relative_position))
+      end
+
+      it 'does rebalance if the flag is enabled for the project' do
+        stub_feature_flags(rebalance_issues: project)
+
+        create(:issue, project: project, relative_position: RelativePositioning::MAX_POSITION)
+        expect(IssueRebalancingWorker).to receive(:perform_async).with(Integer)
+
+        expect(issue.relative_position).to eq(project.issues.maximum(:relative_position))
+      end
+
       it 'does not rebalance unless needed' do
         expect(IssueRebalancingWorker).not_to receive(:perform_async).with(Integer)
 
