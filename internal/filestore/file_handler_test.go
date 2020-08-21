@@ -54,33 +54,28 @@ func assertObjectStoreDeletedAsync(t *testing.T, expectedDeletes int, osStub *te
 }
 
 func TestSaveFileWrongSize(t *testing.T) {
-	assert := assert.New(t)
-	require := require.New(t)
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	tmpFolder, err := ioutil.TempDir("", "workhorse-test-tmp")
-	require.NoError(err)
+	require.NoError(t, err)
 	defer os.RemoveAll(tmpFolder)
 
 	opts := &filestore.SaveFileOpts{LocalTempPath: tmpFolder, TempFilePrefix: "test-file"}
 	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize+1, opts)
-	assert.Error(err)
+	assert.Error(t, err)
 	_, isSizeError := err.(filestore.SizeError)
-	assert.True(isSizeError, "Should fail with SizeError")
-	assert.Nil(fh)
+	assert.True(t, isSizeError, "Should fail with SizeError")
+	assert.Nil(t, fh)
 }
 
 func TestSaveFromDiskNotExistingFile(t *testing.T) {
-	assert := assert.New(t)
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	fh, err := filestore.SaveFileFromDisk(ctx, "/I/do/not/exist", &filestore.SaveFileOpts{})
-	assert.Error(err, "SaveFileFromDisk should fail")
-	assert.True(os.IsNotExist(err), "Provided file should not exists")
-	assert.Nil(fh, "On error FileHandler should be nil")
+	assert.Error(t, err, "SaveFileFromDisk should fail")
+	assert.True(t, os.IsNotExist(err), "Provided file should not exists")
+	assert.Nil(t, fh, "On error FileHandler should be nil")
 }
 
 func TestSaveFileWrongETag(t *testing.T) {
@@ -94,8 +89,6 @@ func TestSaveFileWrongETag(t *testing.T) {
 
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
-			assert := assert.New(t)
-
 			osStub, ts := test.StartObjectStoreWithCustomMD5(map[string]string{test.ObjectPath: "brokenMD5"})
 			defer ts.Close()
 
@@ -118,30 +111,27 @@ func TestSaveFileWrongETag(t *testing.T) {
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, opts)
-			assert.Nil(fh)
-			assert.Error(err)
-			assert.Equal(1, osStub.PutsCnt(), "File not uploaded")
+			assert.Nil(t, fh)
+			assert.Error(t, err)
+			assert.Equal(t, 1, osStub.PutsCnt(), "File not uploaded")
 
 			cancel() // this will trigger an async cleanup
 			assertObjectStoreDeletedAsync(t, 1, osStub)
-			assert.False(spec.multipart && osStub.IsMultipartUpload(test.ObjectPath), "there must be no multipart upload in progress now")
+			assert.False(t, spec.multipart && osStub.IsMultipartUpload(test.ObjectPath), "there must be no multipart upload in progress now")
 		})
 	}
 }
 
 func TestSaveFileFromDiskToLocalPath(t *testing.T) {
-	assert := assert.New(t)
-	require := require.New(t)
-
 	f, err := ioutil.TempFile("", "workhorse-test")
-	require.NoError(err)
+	require.NoError(t, err)
 	defer os.Remove(f.Name())
 
 	_, err = fmt.Fprint(f, test.ObjectContent)
-	require.NoError(err)
+	require.NoError(t, err)
 
 	tmpFolder, err := ioutil.TempDir("", "workhorse-test-tmp")
-	require.NoError(err)
+	require.NoError(t, err)
 	defer os.RemoveAll(tmpFolder)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -149,12 +139,12 @@ func TestSaveFileFromDiskToLocalPath(t *testing.T) {
 
 	opts := &filestore.SaveFileOpts{LocalTempPath: tmpFolder}
 	fh, err := filestore.SaveFileFromDisk(ctx, f.Name(), opts)
-	assert.NoError(err)
-	require.NotNil(fh)
+	assert.NoError(t, err)
+	require.NotNil(t, fh)
 
-	assert.NotEmpty(fh.LocalPath, "File not persisted on disk")
+	assert.NotEmpty(t, fh.LocalPath, "File not persisted on disk")
 	_, err = os.Stat(fh.LocalPath)
-	assert.NoError(err)
+	assert.NoError(t, err)
 }
 
 func TestSaveFile(t *testing.T) {
@@ -185,7 +175,6 @@ func TestSaveFile(t *testing.T) {
 
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
-			assert := assert.New(t)
 			logHook := testhelper.SetupLogger()
 
 			var opts filestore.SaveFileOpts
@@ -240,24 +229,24 @@ func TestSaveFile(t *testing.T) {
 			defer cancel()
 
 			fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, &opts)
-			assert.NoError(err)
+			assert.NoError(t, err)
 			require.NotNil(t, fh)
 
 			require.Equal(t, opts.RemoteID, fh.RemoteID)
 			require.Equal(t, opts.RemoteURL, fh.RemoteURL)
 
 			if spec.local {
-				assert.NotEmpty(fh.LocalPath, "File not persisted on disk")
+				assert.NotEmpty(t, fh.LocalPath, "File not persisted on disk")
 				_, err := os.Stat(fh.LocalPath)
-				assert.NoError(err)
+				assert.NoError(t, err)
 
 				dir := path.Dir(fh.LocalPath)
 				require.Equal(t, opts.LocalTempPath, dir)
 				filename := path.Base(fh.LocalPath)
 				beginsWithPrefix := strings.HasPrefix(filename, opts.TempFilePrefix)
-				assert.True(beginsWithPrefix, fmt.Sprintf("LocalPath filename %q do not begin with TempFilePrefix %q", filename, opts.TempFilePrefix))
+				assert.True(t, beginsWithPrefix, fmt.Sprintf("LocalPath filename %q do not begin with TempFilePrefix %q", filename, opts.TempFilePrefix))
 			} else {
-				assert.Empty(fh.LocalPath, "LocalPath must be empty for non local uploads")
+				assert.Empty(t, fh.LocalPath, "LocalPath must be empty for non local uploads")
 			}
 
 			require.Equal(t, test.ObjectSize, fh.Size)
@@ -388,8 +377,6 @@ func TestSaveFileWithUnknownGoCloudScheme(t *testing.T) {
 }
 
 func TestSaveMultipartInBodyFailure(t *testing.T) {
-	assert := assert.New(t)
-
 	osStub, ts := test.StartObjectStore()
 	defer ts.Close()
 
@@ -412,9 +399,9 @@ func TestSaveMultipartInBodyFailure(t *testing.T) {
 	defer cancel()
 
 	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, &opts)
-	assert.Nil(fh)
+	assert.Nil(t, fh)
 	require.Error(t, err)
-	assert.EqualError(err, test.MultipartUploadInternalError().Error())
+	assert.EqualError(t, err, test.MultipartUploadInternalError().Error())
 }
 
 func checkFileHandlerWithFields(t *testing.T, fh *filestore.FileHandler, fields map[string]string, prefix string, remote bool) {

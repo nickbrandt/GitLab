@@ -61,18 +61,15 @@ func TestSaveFileOptsLocalAndRemote(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-
-			assert := assert.New(t)
-
 			opts := filestore.SaveFileOpts{
 				LocalTempPath: test.localTempPath,
 				PresignedPut:  test.presignedPut,
 				PartSize:      test.partSize,
 			}
 
-			assert.Equal(test.isLocal, opts.IsLocal(), "IsLocal() mismatch")
-			assert.Equal(test.isRemote, opts.IsRemote(), "IsRemote() mismatch")
-			assert.Equal(test.isMultipart, opts.IsMultipart(), "IsMultipart() mismatch")
+			assert.Equal(t, test.isLocal, opts.IsLocal(), "IsLocal() mismatch")
+			assert.Equal(t, test.isRemote, opts.IsRemote(), "IsRemote() mismatch")
+			assert.Equal(t, test.isMultipart, opts.IsMultipart(), "IsMultipart() mismatch")
 		})
 	}
 }
@@ -114,8 +111,6 @@ func TestGetOpts(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-
-			assert := assert.New(t)
 			apiResponse := &api.Response{
 				TempPath: "/tmp",
 				RemoteObject: api.RemoteObject{
@@ -132,42 +127,40 @@ func TestGetOpts(t *testing.T) {
 			deadline := time.Now().Add(time.Duration(apiResponse.RemoteObject.Timeout) * time.Second)
 			opts := filestore.GetOpts(apiResponse)
 
-			assert.Equal(apiResponse.TempPath, opts.LocalTempPath)
-			assert.WithinDuration(deadline, opts.Deadline, time.Second)
-			assert.Equal(apiResponse.RemoteObject.ID, opts.RemoteID)
-			assert.Equal(apiResponse.RemoteObject.GetURL, opts.RemoteURL)
-			assert.Equal(apiResponse.RemoteObject.StoreURL, opts.PresignedPut)
-			assert.Equal(apiResponse.RemoteObject.DeleteURL, opts.PresignedDelete)
+			assert.Equal(t, apiResponse.TempPath, opts.LocalTempPath)
+			assert.WithinDuration(t, deadline, opts.Deadline, time.Second)
+			assert.Equal(t, apiResponse.RemoteObject.ID, opts.RemoteID)
+			assert.Equal(t, apiResponse.RemoteObject.GetURL, opts.RemoteURL)
+			assert.Equal(t, apiResponse.RemoteObject.StoreURL, opts.PresignedPut)
+			assert.Equal(t, apiResponse.RemoteObject.DeleteURL, opts.PresignedDelete)
 			if test.customPutHeaders {
-				assert.Equal(opts.PutHeaders, apiResponse.RemoteObject.PutHeaders)
+				assert.Equal(t, opts.PutHeaders, apiResponse.RemoteObject.PutHeaders)
 			} else {
-				assert.Equal(opts.PutHeaders, map[string]string{"Content-Type": "application/octet-stream"})
+				assert.Equal(t, opts.PutHeaders, map[string]string{"Content-Type": "application/octet-stream"})
 			}
 
 			if test.multipart == nil {
-				assert.False(opts.IsMultipart())
-				assert.Empty(opts.PresignedCompleteMultipart)
-				assert.Empty(opts.PresignedAbortMultipart)
-				assert.Zero(opts.PartSize)
-				assert.Empty(opts.PresignedParts)
+				assert.False(t, opts.IsMultipart())
+				assert.Empty(t, opts.PresignedCompleteMultipart)
+				assert.Empty(t, opts.PresignedAbortMultipart)
+				assert.Zero(t, opts.PartSize)
+				assert.Empty(t, opts.PresignedParts)
 			} else {
-				assert.True(opts.IsMultipart())
-				assert.Equal(test.multipart.CompleteURL, opts.PresignedCompleteMultipart)
-				assert.Equal(test.multipart.AbortURL, opts.PresignedAbortMultipart)
-				assert.Equal(test.multipart.PartSize, opts.PartSize)
-				assert.Equal(test.multipart.PartURLs, opts.PresignedParts)
+				assert.True(t, opts.IsMultipart())
+				assert.Equal(t, test.multipart.CompleteURL, opts.PresignedCompleteMultipart)
+				assert.Equal(t, test.multipart.AbortURL, opts.PresignedAbortMultipart)
+				assert.Equal(t, test.multipart.PartSize, opts.PartSize)
+				assert.Equal(t, test.multipart.PartURLs, opts.PresignedParts)
 			}
 		})
 	}
 }
 
 func TestGetOptsDefaultTimeout(t *testing.T) {
-	assert := assert.New(t)
-
 	deadline := time.Now().Add(filestore.DefaultObjectStoreTimeout)
 	opts := filestore.GetOpts(&api.Response{})
 
-	assert.WithinDuration(deadline, opts.Deadline, time.Minute)
+	assert.WithinDuration(t, deadline, opts.Deadline, time.Minute)
 }
 
 func TestUseWorkhorseClientEnabled(t *testing.T) {
@@ -251,7 +244,6 @@ func TestUseWorkhorseClientEnabled(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-
 			apiResponse := &api.Response{
 				TempPath: "/tmp",
 				RemoteObject: api.RemoteObject{

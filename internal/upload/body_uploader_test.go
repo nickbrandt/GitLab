@@ -101,26 +101,24 @@ func testUpload(auth PreAuthorizer, preparer Preparer, proxy http.Handler, body 
 }
 
 func echoProxy(t *testing.T, expectedBodyLength int) http.Handler {
-	require := require.New(t)
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
-		require.NoError(err)
+		require.NoError(t, err)
 
-		require.Equal("application/x-www-form-urlencoded", r.Header.Get("Content-Type"), "Wrong Content-Type header")
+		require.Equal(t, "application/x-www-form-urlencoded", r.Header.Get("Content-Type"), "Wrong Content-Type header")
 
-		require.Contains(r.PostForm, "file.md5")
-		require.Contains(r.PostForm, "file.sha1")
-		require.Contains(r.PostForm, "file.sha256")
-		require.Contains(r.PostForm, "file.sha512")
+		require.Contains(t, r.PostForm, "file.md5")
+		require.Contains(t, r.PostForm, "file.sha1")
+		require.Contains(t, r.PostForm, "file.sha256")
+		require.Contains(t, r.PostForm, "file.sha512")
 
-		require.Contains(r.PostForm, "file.path")
-		require.Contains(r.PostForm, "file.size")
-		require.Contains(r.PostForm, "file.gitlab-workhorse-upload")
-		require.Equal(strconv.Itoa(expectedBodyLength), r.PostFormValue("file.size"))
+		require.Contains(t, r.PostForm, "file.path")
+		require.Contains(t, r.PostForm, "file.size")
+		require.Contains(t, r.PostForm, "file.gitlab-workhorse-upload")
+		require.Equal(t, strconv.Itoa(expectedBodyLength), r.PostFormValue("file.size"))
 
 		token, err := jwt.ParseWithClaims(r.Header.Get(RewrittenFieldsHeader), &MultipartClaims{}, testhelper.ParseJWT)
-		require.NoError(err, "Wrong JWT header")
+		require.NoError(t, err, "Wrong JWT header")
 
 		rewrittenFields := token.Claims.(*MultipartClaims).RewrittenFields
 		if len(rewrittenFields) != 1 || len(rewrittenFields["file"]) == 0 {
@@ -128,22 +126,22 @@ func echoProxy(t *testing.T, expectedBodyLength int) http.Handler {
 		}
 
 		token, jwtErr := jwt.ParseWithClaims(r.PostFormValue("file.gitlab-workhorse-upload"), &testhelper.UploadClaims{}, testhelper.ParseJWT)
-		require.NoError(jwtErr, "Wrong signed upload fields")
+		require.NoError(t, jwtErr, "Wrong signed upload fields")
 
 		uploadFields := token.Claims.(*testhelper.UploadClaims).Upload
-		require.Contains(uploadFields, "name")
-		require.Contains(uploadFields, "path")
-		require.Contains(uploadFields, "remote_url")
-		require.Contains(uploadFields, "remote_id")
-		require.Contains(uploadFields, "size")
-		require.Contains(uploadFields, "md5")
-		require.Contains(uploadFields, "sha1")
-		require.Contains(uploadFields, "sha256")
-		require.Contains(uploadFields, "sha512")
+		require.Contains(t, uploadFields, "name")
+		require.Contains(t, uploadFields, "path")
+		require.Contains(t, uploadFields, "remote_url")
+		require.Contains(t, uploadFields, "remote_id")
+		require.Contains(t, uploadFields, "size")
+		require.Contains(t, uploadFields, "md5")
+		require.Contains(t, uploadFields, "sha1")
+		require.Contains(t, uploadFields, "sha256")
+		require.Contains(t, uploadFields, "sha512")
 
 		path := r.PostFormValue("file.path")
 		uploaded, err := os.Open(path)
-		require.NoError(err, "File not uploaded")
+		require.NoError(t, err, "File not uploaded")
 
 		//sending back the file for testing purpose
 		io.Copy(w, uploaded)
