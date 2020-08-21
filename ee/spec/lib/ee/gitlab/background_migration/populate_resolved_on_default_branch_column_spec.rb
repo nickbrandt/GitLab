@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe EE::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchColumn do
+RSpec.describe ::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchColumn do
   let(:users) { table(:users) }
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }

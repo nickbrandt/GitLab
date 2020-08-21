@@ -3,9 +3,9 @@
 module EE
   module Gitlab
     module BackgroundMigration
-      class PopulateResolvedOnDefaultBranchColumn
-        def perform(project_ids)
-          project_ids.each { |project_id| PopulateResolvedOnDefaultBranchColumnForProject.perform(project_id) }
+      module PopulateResolvedOnDefaultBranchColumn
+        def perform(*project_ids)
+          project_ids.flatten.each { |project_id| PopulateResolvedOnDefaultBranchColumnForProject.perform(project_id) }
         end
 
         module Routable

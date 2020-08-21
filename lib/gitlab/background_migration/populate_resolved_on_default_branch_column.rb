@@ -9,4 +9,4 @@ module Gitlab
   end
 end
 
-Gitlab::BackgroundMigration::UpdateVulnerabilityConfidence.prepend_if_ee('EE::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchColumn')
+Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchColumn.prepend_if_ee('EE::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchColumn')
