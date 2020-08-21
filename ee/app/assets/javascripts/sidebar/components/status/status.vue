@@ -163,7 +163,7 @@ export default {
 
       <div
         data-testid="dropdownWrapper"
-        class="dropdown dropdown-menu-selectable"
+        class="dropdown"
         :class="{ show: isDropdownShowing, 'gl-display-none': !isDropdownShowing }"
       >
         <gl-dropdown
@@ -185,16 +185,12 @@ export default {
           </div>
 
           <div class="dropdown-content dropdown-body">
-            <gl-dropdown-item @click="handleDropdownClick(null)">
-              <gl-button
-                category="tertiary"
-                :class= "[ 
-                  { 'is-active': isSelected(null) }, 
-                  'dropdown-item health-dropdown-item',
-                ]"
+            <gl-dropdown-item 
+              @click="handleDropdownClick(null)"
+              :is-check-item="true"
+              :is-checked="true"
               >
-                {{ s__('Sidebar|No status') }}
-              </gl-button>
+              {{ s__('Sidebar|No status') }}
             </gl-dropdown-item>
 
             <gl-dropdown-divider class="divider health-divider" />
@@ -202,17 +198,11 @@ export default {
             <gl-dropdown-item
               v-for="option in statusOptions"
               :key="option.key"
+              :is-check-item="true"
+              :is-checked="true"
               @click="handleDropdownClick(option.key)"
             >
-              <gl-button
-                category="tertiary"
-                :class= "[ 
-                  { 'is-active': isSelected(option.key) }, 
-                  'dropdown-item health-dropdown-item',
-                ]"
-              >
-                {{ option.value }}
-              </gl-button>
+              {{ option.value }}
             </gl-dropdown-item>
           </div>
         </gl-dropdown>
