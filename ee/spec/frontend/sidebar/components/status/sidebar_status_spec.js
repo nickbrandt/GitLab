@@ -3,21 +3,23 @@ import SidebarStatus from 'ee/sidebar/components/status/sidebar_status.vue';
 import Status from 'ee/sidebar/components/status/status.vue';
 
 describe('SidebarStatus', () => {
+  let mediator;
   let wrapper;
   let handleDropdownClickMock;
 
-  beforeEach(() => {
-    const mediator = {
+  const createMediator = states => {
+    mediator = {
       store: {
         isFetching: {
           status: true,
         },
         status: '',
+        ...states,
       },
     };
+  };
 
-    handleDropdownClickMock = jest.fn();
-
+  const createWrapper = (mockStore = {}) => {
     wrapper = shallowMount(SidebarStatus, {
       propsData: {
         mediator,
@@ -25,12 +27,46 @@ describe('SidebarStatus', () => {
       methods: {
         handleDropdownClick: handleDropdownClickMock,
       },
+      mocks: {
+        $store: mockStore,
+      },
     });
+  };
+
+  beforeEach(() => {
+    handleDropdownClickMock = jest.fn();
+    createMediator();
+    createWrapper();
   });
 
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
+  });
+
+  describe('computed', () => {
+    describe.each`
+      noteableState | isOpen
+      ${'opened'}   | ${true}
+      ${'reopened'} | ${true}
+      ${'closed'}   | ${false}
+    `('isOpen', ({ noteableState, isOpen }) => {
+      beforeEach(() => {
+        const mockStore = {
+          getters: {
+            getNoteableData: {
+              state: noteableState,
+            },
+          },
+        };
+        createMediator({ editable: true });
+        createWrapper(mockStore);
+      });
+
+      it(`returns ${isOpen} when issue is ${noteableState}`, () => {
+        expect(wrapper.vm.isOpen).toBe(isOpen);
+      });
+    });
   });
 
   describe('Status child component', () => {
