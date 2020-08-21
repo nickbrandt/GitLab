@@ -23,7 +23,6 @@ RSpec.describe EE::AuditEvents::RepositoryPushAuditEventService do
         author_name: user.name,
         entity_id: entity.id,
         entity_type: entity_type,
-        type: 'SecurityEvent',
         created_at: timestamp,
         ip_address: '127.0.0.1',
         details: {
