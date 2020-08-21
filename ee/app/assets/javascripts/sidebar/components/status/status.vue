@@ -1,7 +1,7 @@
 <script>
 import {
   GlIcon,
-  GlDeprecatedButton as GlButton,
+  GlButton,
   GlLoadingIcon,
   GlTooltipDirective as GlTooltip,
   GlDropdownItem,
@@ -150,8 +150,8 @@ export default {
         <span v-gl-tooltip.topleft="editTooltip" data-testid="editButtonTooltip" tabindex="0">
           <gl-button
             ref="editButton"
-            variant="link"
-            class="edit-link btn-link-hover"
+            category="tertiary"
+            class="gl-p-0"
             :disabled="!isEditable"
             @click.stop="toggleFormDropdown"
             @keydown.esc="hideDropdown"
@@ -177,7 +177,7 @@ export default {
             <span class="health-title">{{ s__('Sidebar|Assign health status') }}</span>
             <gl-button
               :aria-label="__('Close')"
-              variant="link"
+              category="tertiary"
               class="dropdown-title-button dropdown-menu-close"
               icon="close"
               @click="hideDropdown"
@@ -187,9 +187,11 @@ export default {
           <div class="dropdown-content dropdown-body">
             <gl-dropdown-item @click="handleDropdownClick(null)">
               <gl-button
-                variant="link"
-                class="dropdown-item health-dropdown-item"
-                :class="{ 'is-active': isSelected(null) }"
+                category="tertiary"
+                :class= "[ 
+                  { 'is-active': isSelected(null) }, 
+                  'dropdown-item health-dropdown-item',
+                ]"
               >
                 {{ s__('Sidebar|No status') }}
               </gl-button>
@@ -203,9 +205,11 @@ export default {
               @click="handleDropdownClick(option.key)"
             >
               <gl-button
-                variant="link"
-                class="dropdown-item health-dropdown-item"
-                :class="{ 'is-active': isSelected(option.key) }"
+                category="tertiary"
+                :class= "[ 
+                  { 'is-active': isSelected(option.key) }, 
+                  'dropdown-item health-dropdown-item',
+                ]"
               >
                 {{ option.value }}
               </gl-button>
