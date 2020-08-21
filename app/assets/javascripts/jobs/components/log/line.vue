@@ -1,5 +1,11 @@
 <script>
+import linkifyHtml from 'linkifyjs/html';
 import LineNumber from './line_number.vue';
+
+const linkifyOptions = {
+  className: '',
+  defaultProtocol: 'https',
+};
 
 export default {
   functional: true,
@@ -17,13 +23,12 @@ export default {
     const { line, path } = props;
 
     const chars = line.content.map(content => {
-      return h(
-        'span',
-        {
-          class: ['gl-white-space-pre-wrap', content.style],
+      return h('span', {
+        class: ['gl-white-space-pre-wrap', content.style],
+        domProps: {
+          innerHTML: linkifyHtml(content.text, linkifyOptions),
         },
-        content.text,
-      );
+      });
     });
 
     return h('div', { class: 'js-line log-line' }, [
