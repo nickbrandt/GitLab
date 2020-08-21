@@ -44,7 +44,6 @@ export const createPolicy = ({ state, commit }, { environmentId, policy }) => {
     .post(state.policiesEndpoint, {
       environment_id: environmentId,
       manifest: policy.manifest,
-      is_standard: policy.isStandard,
     })
     .then(({ data }) => {
       commit(types.RECEIVE_CREATE_POLICY_SUCCESS, data);
@@ -72,7 +71,6 @@ export const updatePolicy = ({ state, commit }, { environmentId, policy }) => {
       environment_id: environmentId,
       manifest: policy.manifest,
       enabled: policy.isEnabled,
-      is_standard: policy.isStandard,
     })
     .then(({ data }) => {
       commit(types.RECEIVE_UPDATE_POLICY_SUCCESS, {
