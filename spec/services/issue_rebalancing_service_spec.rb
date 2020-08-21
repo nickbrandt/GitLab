@@ -34,7 +34,6 @@ RSpec.describe IssueRebalancingService do
 
   it 'rebalances a set of issues with clumps at the end and start' do
     all_issues = start_clump + unclumped + end_clump.reverse
-
     service = described_class.new(project.issues.first)
 
     expect { service.execute }.not_to change { issues_in_position_order.map(&:id) }
@@ -46,7 +45,16 @@ RSpec.describe IssueRebalancingService do
     end
 
     expect(gaps).to all(be > RelativePositioning::MIN_GAP)
-    expect(all_issues.first.relative_position).to be > RelativePositioning::MIN_POSITION
-    expect(all_issues.last.relative_position).to be < RelativePositioning::MAX_POSITION
+    expect(all_issues.first.relative_position).to be > (RelativePositioning::MIN_POSITION * 0.9999)
+    expect(all_issues.last.relative_position).to be < (RelativePositioning::MAX_POSITION * 0.9999)
+  end
+
+  it 'is idempotent' do
+    service = described_class.new(project.issues.first)
+
+    expect do
+      service.execute
+      service.execute
+    end.not_to change { issues_in_position_order.map(&:id) }
   end
 end
