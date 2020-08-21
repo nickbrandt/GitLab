@@ -59,6 +59,9 @@ export default {
     statusText() {
       return this.status ? healthStatusTextMap[this.status] : s__('Sidebar|None');
     },
+    dropdownHeaderText() {
+      return s__('Sidebar|Assign health status');
+    },
     dropdownText() {
       return this.status ? healthStatusTextMap[this.status] : s__('Select health status');
     },
@@ -169,7 +172,7 @@ export default {
         <gl-dropdown
           ref="dropdown"
           class="gl-w-full"
-          header-text="{{ s__('Sidebar|Assign health status') }}"
+          :header-text="dropdownHeaderText"
           :text="dropdownText"
           @keydown.esc.native="hideDropdown"
           @hide="hideDropdown"
@@ -183,7 +186,7 @@ export default {
               {{ s__('Sidebar|No status') }}
             </gl-dropdown-item>
 
-            <gl-dropdown-divider class="divider health-divider" />
+            <gl-dropdown-divider />
 
             <gl-dropdown-item
               v-for="option in statusOptions"
