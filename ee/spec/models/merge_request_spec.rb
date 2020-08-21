@@ -880,4 +880,74 @@ RSpec.describe MergeRequest do
       expect(described_class.sort_by_attribute('review_time_desc')).to match([mr3, mr4, mr2, mr1, mr5])
     end
   end
+
+  describe '#missing_security_scan_types' do
+    let_it_be(:project) { create(:project, :repository) }
+    let_it_be(:merge_request) { create(:ee_merge_request, source_project: project) }
+
+    subject { merge_request.missing_security_scan_types }
+
+    context 'when there is no head pipeline' do
+      context 'when there is no base pipeline' do
+        it { is_expected.to be_empty }
+      end
+
+      context 'when there is a base pipeline' do
+        let_it_be(:base_pipeline) do
+          create(:ee_ci_pipeline,
+                 project: project,
+                 ref: merge_request.target_branch,
+                 sha: merge_request.diff_base_sha)
+        end
+
+        context 'when there is no security scan for the base pipeline' do
+          it { is_expected.to be_empty }
+        end
+
+        context 'when there are security scans for the base_pipeline' do
+          before do
+            build = create(:ci_build, :success, pipeline: base_pipeline, project: project)
+            create(:security_scan, build: build)
+          end
+
+          it { is_expected.to be_empty }
+        end
+      end
+    end
+
+    context 'when there is a head pipeline' do
+      before do
+        create(:ee_ci_pipeline, project: project, sha: merge_request.diff_head_sha)
+        merge_request.update_head_pipeline
+      end
+
+      context 'when there is no base pipeline' do
+        it { is_expected.to be_empty }
+      end
+
+      context 'when there is a base pipeline' do
+        let_it_be(:base_pipeline) do
+          create(:ee_ci_pipeline,
+                 project: project,
+                 ref: merge_request.target_branch,
+                 sha: merge_request.diff_base_sha)
+        end
+
+        context 'when there are missing security scans for the head pipeline' do
+          let(:missing_scan_type) { 'sast' }
+
+          before do
+            build = create(:ci_build, :success, pipeline: base_pipeline, project: project)
+            create(:security_scan, build: build, scan_type: missing_scan_type)
+          end
+
+          it { is_expected.to eq([missing_scan_type]) }
+        end
+
+        context 'when there is no missing security scan for the head pipeline' do
+          it { is_expected.to be_empty }
+        end
+      end
+    end
+  end
 end
