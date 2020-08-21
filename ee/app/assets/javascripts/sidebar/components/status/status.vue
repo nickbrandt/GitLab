@@ -188,7 +188,7 @@ export default {
             <gl-dropdown-item 
               @click="handleDropdownClick(null)"
               :is-check-item="true"
-              :is-checked="true"
+              :is-checked="isSelected(null)"
               >
               {{ s__('Sidebar|No status') }}
             </gl-dropdown-item>
@@ -199,7 +199,7 @@ export default {
               v-for="option in statusOptions"
               :key="option.key"
               :is-check-item="true"
-              :is-checked="true"
+              :is-checked="isSelected(option.key)"
               @click="handleDropdownClick(option.key)"
             >
               {{ option.value }}
