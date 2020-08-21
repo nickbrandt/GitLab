@@ -40,7 +40,7 @@ RSpec.describe 'Query.project(fullPath).dastScannerProfiles' do
     end
   end
 
-  context 'when a user does not have access to run_ondemand_dast_scan' do
+  context 'when the user can run a dast scan' do
     before do
       project.add_guest(current_user)
     end
