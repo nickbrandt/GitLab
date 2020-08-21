@@ -15,12 +15,11 @@ class RemoveOldExternalDiffMigrationIndex < ActiveRecord::Migration[6.0]
   end
 
   def down
-    # rubocop:disable Migration/ComplexIndexesRequireName
     add_concurrent_index(
       :merge_request_diffs,
       [:merge_request_id, :id],
-      where: { stored_externally: [nil, false] }
+      where: 'NOT stored_externally OR stored_externally IS NULL',
+      name: 'index_merge_request_diffs_on_merge_request_id_and_id_partial'
     )
-    # rubocop:enable Migration/ComplexIndexesRequireName
   end
 end

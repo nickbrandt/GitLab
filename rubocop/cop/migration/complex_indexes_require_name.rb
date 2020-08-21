@@ -18,6 +18,10 @@ module RuboCop
           (pair {(sym :name) (str "name")} _)
         PATTERN
 
+        def_node_matcher :unique_option?, <<~PATTERN
+          (pair {(:sym :unique) (str "unique")} _)
+        PATTERN
+
         def on_def(node)
           return unless in_migration?(node)
 
@@ -35,7 +39,13 @@ module RuboCop
         end
 
         def needs_name_option?(option_nodes)
+          return false if only_unique_option?(option_nodes)
+
           option_nodes.none? { |node| name_option?(node) }
+        end
+
+        def only_unique_option?(option_nodes)
+          option_nodes.size == 1 && unique_option?(option_nodes.first)
         end
       end
     end

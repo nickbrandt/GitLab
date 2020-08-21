@@ -35,6 +35,8 @@ RSpec.describe RuboCop::Cop::Migration::ComplexIndexesRequireName, type: :ruboco
 
             def down
               add_concurrent_index :test_indexes, :column4, 'unique' => true
+
+              add_concurrent_index :test_indexes, :column4, 'unique' => true, where: 'column4 IS NOT NULL'
               ^^^^^^^^^^^^^^^^^^^^ #{described_class::MSG}
 
               add_concurrent_index :test_indexes, :column5, using: :gin, name: INDEX_NAME
