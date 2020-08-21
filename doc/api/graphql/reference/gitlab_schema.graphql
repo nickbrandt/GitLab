@@ -6658,7 +6658,7 @@ type Group {
 }
 
 """
-Represents a Group Member
+Represents a Group Membership
 """
 type GroupMember implements MemberInterface {
   """
@@ -6687,9 +6687,19 @@ type GroupMember implements MemberInterface {
   group: Group
 
   """
+  ID of the member
+  """
+  id: ID!
+
+  """
   Date and time the membership was last updated
   """
   updatedAt: Time
+
+  """
+  User that is associated with the member object
+  """
+  user: User!
 
   """
   Permissions for the current user on the resource
@@ -8341,9 +8351,54 @@ interface MemberInterface {
   expiresAt: Time
 
   """
+  ID of the member
+  """
+  id: ID!
+
+  """
   Date and time the membership was last updated
   """
   updatedAt: Time
+
+  """
+  User that is associated with the member object
+  """
+  user: User!
+}
+
+"""
+The connection type for MemberInterface.
+"""
+type MemberInterfaceConnection {
+  """
+  A list of edges.
+  """
+  edges: [MemberInterfaceEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [MemberInterface]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type MemberInterfaceEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: MemberInterface
 }
 
 type MergeRequest implements Noteable {
@@ -11567,7 +11622,7 @@ type Project {
     Search query
     """
     search: String
-  ): ProjectMemberConnection
+  ): MemberInterfaceConnection
 
   """
   Indicates if there is public access to pipelines and job details of the project, including output logs and artifacts
@@ -12001,7 +12056,7 @@ type ProjectEdge {
 }
 
 """
-Represents a Project Member
+Represents a Project Membership
 """
 type ProjectMember implements MemberInterface {
   """
