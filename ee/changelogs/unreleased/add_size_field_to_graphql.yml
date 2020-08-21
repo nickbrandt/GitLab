@@ -1,5 +1,0 @@
----
-title: Add size field to graphql query to extract information about SAST Config UI
-merge_request: 39736
-author:
-type: added
