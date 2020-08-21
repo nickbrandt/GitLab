@@ -696,5 +696,11 @@ RSpec.describe ApplicationSetting do
 
       expect(setting.compliance_frameworks).to eq([1, 2, 3])
     end
+
+    it 'sets empty values' do
+      setting.compliance_frameworks = [""]
+
+      expect(setting.compliance_frameworks).to eq([])
+    end
   end
 end
