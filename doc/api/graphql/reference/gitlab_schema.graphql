@@ -10556,6 +10556,11 @@ enum PackageTypeEnum {
   CONAN
 
   """
+  Packages from the generic package manager
+  """
+  GENERIC
+
+  """
   Packages from the maven package manager
   """
   MAVEN
