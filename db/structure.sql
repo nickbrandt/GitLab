@@ -19458,6 +19458,8 @@ CREATE UNIQUE INDEX index_container_repositories_on_project_id_and_name ON publi
 
 CREATE INDEX index_container_repository_on_name_trigram ON public.container_repositories USING gin (name public.gin_trgm_ops);
 
+CREATE INDEX index_created_at_on_codeowner_approval_merge_request_rules ON public.approval_merge_request_rules USING btree (created_at) WHERE ((rule_type = 2) AND (section <> 'codeowners'::text));
+
 CREATE UNIQUE INDEX index_custom_emoji_on_namespace_id_and_name ON public.custom_emoji USING btree (namespace_id, name);
 
 CREATE UNIQUE INDEX index_daily_build_group_report_results_unique_columns ON public.ci_daily_build_group_report_results USING btree (project_id, ref_path, date, group_name);
