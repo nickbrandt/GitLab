@@ -11,12 +11,16 @@ export const THROUGHPUT_CHART_STRINGS = {
   X_AXIS_TITLE: __('Month'),
   CHART_DESCRIPTION: __('The number of merge requests merged by month.'),
   NO_DATA: __('There is no chart data available.'),
-  ERROR_FETCHING_DATA: __('There was an error while fetching the chart data.'),
+  ERROR_FETCHING_DATA: __(
+    'There was an error while fetching the chart data. Please refresh the page to try again.',
+  ),
 };
 
 export const THROUGHPUT_TABLE_STRINGS = {
   NO_DATA: __('There is no table data available.'),
-  ERROR_FETCHING_DATA: __('There was an error while fetching the table data.'),
+  ERROR_FETCHING_DATA: __(
+    'There was an error while fetching the table data. Please refresh the page to try again.',
+  ),
 };
 
 export const MERGE_REQUEST_ID_PREFIX = '!';

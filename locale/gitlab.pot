@@ -24881,10 +24881,10 @@ msgstr ""
 msgid "There was an error when unsubscribing from this label."
 msgstr ""
 
-msgid "There was an error while fetching the chart data."
+msgid "There was an error while fetching the chart data. Please refresh the page to try again."
 msgstr ""
 
-msgid "There was an error while fetching the table data."
+msgid "There was an error while fetching the table data. Please refresh the page to try again."
 msgstr ""
 
 msgid "There was an error while fetching value stream analytics %{requestTypeName} data."
