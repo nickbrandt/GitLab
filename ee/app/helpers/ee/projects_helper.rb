@@ -163,6 +163,7 @@ module EE
         projects/on_demand_scans#index
         projects/dast_profiles#index
         projects/dast_site_profiles#new
+        projects/dast_site_profiles#edit
         projects/dast_scanner_profiles#new
         projects/dependencies#index
         projects/licenses#index
@@ -182,6 +183,7 @@ module EE
         projects/on_demand_scans#index
         projects/dast_profiles#index
         projects/dast_site_profiles#new
+        projects/dast_site_profiles#edit
         projects/dast_scanner_profiles#new
       ]
     end
