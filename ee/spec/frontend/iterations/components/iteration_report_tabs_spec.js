@@ -150,7 +150,6 @@ describe('Iterations report tabs', () => {
             id,
             lastPageSize: 20,
             isGroup: true,
-            isProject: false,
           });
         });
       });
@@ -163,7 +162,6 @@ describe('Iterations report tabs', () => {
             id,
             firstPageSize: 20,
             isGroup: true,
-            isProject: false,
           });
         });
       });
@@ -190,7 +188,6 @@ describe('Iterations report tabs', () => {
         expect(wrapper.vm.queryVariables).toEqual({
           ...expected,
           isGroup: true,
-          isProject: false,
         });
       });
     });
@@ -207,7 +204,6 @@ describe('Iterations report tabs', () => {
         expect(wrapper.vm.queryVariables).toEqual({
           ...expected,
           isGroup: false,
-          isProject: true,
         });
       });
     });

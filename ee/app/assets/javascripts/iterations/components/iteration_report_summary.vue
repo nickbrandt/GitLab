@@ -57,7 +57,6 @@ export default {
         fullPath: this.fullPath,
         id: getIdFromGraphQLId(this.iterationId),
         isGroup: this.namespaceType === Namespace.Group,
-        isProject: this.namespaceType === Namespace.Project,
       };
     },
     completedPercent() {

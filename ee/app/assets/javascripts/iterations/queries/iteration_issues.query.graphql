@@ -3,8 +3,7 @@
 query IterationIssues(
   $fullPath: ID!
   $id: ID!
-  $isGroup: Boolean = false
-  $isProject: Boolean = false
+  $isGroup: Boolean = true
   $beforeCursor: String = ""
   $afterCursor: String = ""
   $firstPageSize: Int
@@ -21,7 +20,7 @@ query IterationIssues(
       ...IterationIssues
     }
   }
-  project(fullPath: $fullPath) @include(if: $isProject) {
+  project(fullPath: $fullPath) @skip(if: $isGroup) {
     issues(
       iterationId: [$id]
       before: $beforeCursor

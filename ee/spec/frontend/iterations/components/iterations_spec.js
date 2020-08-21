@@ -103,7 +103,6 @@ describe('Iterations', () => {
       expect(wrapper.vm.queryVariables).toEqual({
         beforeCursor: 'first-item',
         isGroup: true,
-        isProject: false,
         lastPageSize: 20,
         fullPath: defaultProps.fullPath,
         state: 'opened',
@@ -118,7 +117,6 @@ describe('Iterations', () => {
         firstPageSize: 20,
         fullPath: defaultProps.fullPath,
         isGroup: true,
-        isProject: false,
         state: 'opened',
       });
     });
@@ -161,7 +159,6 @@ describe('Iterations', () => {
         expect(wrapper.vm.queryVariables).toEqual({
           ...expected,
           isGroup: true,
-          isProject: false,
         });
       });
     });
@@ -178,7 +175,6 @@ describe('Iterations', () => {
         expect(wrapper.vm.queryVariables).toEqual({
           ...expected,
           isGroup: false,
-          isProject: true,
         });
       });
     });

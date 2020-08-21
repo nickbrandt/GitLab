@@ -15,8 +15,6 @@ describe('Iterations report', () => {
   const findTopbar = () => wrapper.find({ ref: 'topbar' });
   const findTitle = () => wrapper.find({ ref: 'title' });
   const findDescription = () => wrapper.find({ ref: 'description' });
-  const findIterationReportSummary = () => wrapper.find(IterationReportSummary);
-  const findIterationReportTabs = () => wrapper.find(IterationReportTabs);
 
   const mountComponent = ({ props = defaultProps, loading = false } = {}) => {
     wrapper = shallowMount(IterationReport, {
@@ -96,15 +94,19 @@ describe('Iterations report', () => {
     });
 
     it('passes correct props to IterationReportSummary', () => {
-      expect(findIterationReportSummary().props('fullPath')).toBe(defaultProps.fullPath);
-      expect(findIterationReportSummary().props('iterationId')).toBe(iteration.id);
-      expect(findIterationReportSummary().props('namespaceType')).toBe(Namespace.Group);
+      const iterationReportSummary = wrapper.find(IterationReportSummary);
+
+      expect(iterationReportSummary.props('fullPath')).toBe(defaultProps.fullPath);
+      expect(iterationReportSummary.props('iterationId')).toBe(iteration.id);
+      expect(iterationReportSummary.props('namespaceType')).toBe(Namespace.Group);
     });
 
     it('passes correct props to IterationReportTabs', () => {
-      expect(findIterationReportTabs().props('fullPath')).toBe(defaultProps.fullPath);
-      expect(findIterationReportTabs().props('iterationId')).toBe(iteration.id);
-      expect(findIterationReportTabs().props('namespaceType')).toBe(Namespace.Group);
+      const iterationReportTabs = wrapper.find(IterationReportTabs);
+
+      expect(iterationReportTabs.props('fullPath')).toBe(defaultProps.fullPath);
+      expect(iterationReportTabs.props('iterationId')).toBe(iteration.id);
+      expect(iterationReportTabs.props('namespaceType')).toBe(Namespace.Group);
     });
   });
 });

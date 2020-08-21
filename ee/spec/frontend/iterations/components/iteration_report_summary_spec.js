@@ -108,7 +108,6 @@ describe('Iterations report summary', () => {
         expect(wrapper.vm.queryVariables).toEqual({
           ...expected,
           isGroup: true,
-          isProject: false,
         });
       });
     });
@@ -125,7 +124,6 @@ describe('Iterations report summary', () => {
         expect(wrapper.vm.queryVariables).toEqual({
           ...expected,
           isGroup: false,
-          isProject: true,
         });
       });
     });
