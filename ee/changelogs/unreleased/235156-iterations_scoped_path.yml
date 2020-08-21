@@ -1,5 +1,0 @@
----
-title: Expose scopedPath and scopedUrl to Iteration type in GraphQL
-merge_request: 39543
-author:
-type: added

@@ -1,5 +1,0 @@
----
-title: Set default for current_value in SAST config UI
-merge_request: 39504
-author:
-type: fixed
