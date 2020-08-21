@@ -18,7 +18,6 @@ import { dateFormats } from '../shared/constants';
  *
  * @return {Array} the computed month data
  */
-// eslint-disable-next-line import/prefer-default-export
 export const computeMonthRangeData = (startDate, endDate, format = dateFormats.isoDate) => {
   const monthData = [];
   const monthNames = getMonthNames(true);

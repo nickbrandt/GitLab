@@ -7,7 +7,6 @@
  *
  * @returns {Object} the transformed filters for the public api
  */
-// eslint-disable-next-line import/prefer-default-export
 export const transformFilters = ({
   label_name: labels = null,
   milestone_title: milestone = null,
