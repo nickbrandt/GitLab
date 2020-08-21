@@ -10,12 +10,12 @@ module RedisTrackingHelper
   #
   # include RedisTrackingHelper
   #
-  # track_redis_hll_event :index, event_name: 'i_analytics_dev_ops_score'
+  # track_redis_hll_event :index, :show, name: 'i_analytics_dev_ops_score'
   #
   class_methods do
-    def track_redis_hll_event(controller_actions, event_name:)
+    def track_redis_hll_events(*controller_actions, name:)
       after_action only: controller_actions, if: -> { request.format.html? && request.headers['DNT'] != '1' } do
-        track_unique_redis_hll_event(event_name)
+        track_unique_redis_hll_event(name)
       end
     end
   end

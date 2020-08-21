@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe RedisTrackingHelper do
   include Devise::Test::ControllerHelpers
 
-  describe '.track_redis_hll_event' do
+  describe '.track_unique_redis_hll_event' do
     let(:event_name) { 'g_compliance_dashboard' }
     let(:current_user) { create(:user) }
 
