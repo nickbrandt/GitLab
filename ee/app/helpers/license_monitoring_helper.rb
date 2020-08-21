@@ -11,10 +11,6 @@ module LicenseMonitoringHelper
     { range: (1000..nil), percentage: true, value: 5 }
   ].freeze
 
-  def show_users_over_license_banner?
-    current_user&.admin? && license_is_over_capacity?
-  end
-
   def show_active_user_count_threshold_banner?
     return if ::Gitlab.com?
     return if current_license.nil? || current_license.trial?
