@@ -44,6 +44,9 @@ module EE
       has_many :approvals,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :approvers,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
 
+      has_many :unassigned_group_members, -> { where(access_level: [Gitlab::Access::UNASSIGNED]) }, source: 'GroupMember', class_name: 'GroupMember'
+      has_many :unassigned_groups, through: :unassigned_group_members, source: :group
+
       has_many :users_ops_dashboard_projects
       has_many :ops_dashboard_projects, through: :users_ops_dashboard_projects, source: :project
       has_many :users_security_dashboard_projects

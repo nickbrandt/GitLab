@@ -107,10 +107,10 @@ RSpec.describe GroupsFinder do
           end
 
           context 'being limited access member of parent group' do
-            it 'returns visible subgroups' do
-              create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: user, group: parent_group)
+            it 'do not return group with unassigned access' do
+              create(:group_member, :unassigned, user: user, group: parent_group)
 
-              is_expected.to contain_exactly(parent_group, public_subgroup, internal_subgroup)
+              is_expected.to contain_exactly(public_subgroup, internal_subgroup)
             end
           end
 

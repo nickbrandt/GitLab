@@ -115,7 +115,7 @@ RSpec.describe Gitlab::ProjectAuthorizations do
     end
   end
 
-  context 'user with limited access to group' do
+  context 'user with unassigned access to group' do
     let_it_be(:group) { create(:group) }
     let_it_be(:user) { create(:user) }
 
@@ -125,7 +125,7 @@ RSpec.describe Gitlab::ProjectAuthorizations do
       let!(:group_project) { create(:project, namespace: group) }
 
       before do
-        create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: user, group: group)
+        create(:group_member, :unassigned, user: user, group: group)
       end
 
       it 'does not create authorization' do
@@ -138,7 +138,7 @@ RSpec.describe Gitlab::ProjectAuthorizations do
       let!(:sub_group_project) { create(:project, namespace: sub_group) }
 
       before do
-        create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: user, group: group)
+        create(:group_member, :unassigned, user: user, group: group)
       end
 
       it 'does not create authorization' do
@@ -152,7 +152,7 @@ RSpec.describe Gitlab::ProjectAuthorizations do
 
       before do
         create(:group_group_link, shared_group: shared_group, shared_with_group: group)
-        create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: user, group: group)
+        create(:group_member, :unassigned, user: user, group: group)
       end
 
       it 'does not create authorization' do
@@ -166,7 +166,7 @@ RSpec.describe Gitlab::ProjectAuthorizations do
 
       before do
         create(:project_group_link, group: group, project: shared_project)
-        create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: user, group: group)
+        create(:group_member, :unassigned, user: user, group: group)
       end
 
       it 'does not create authorization' do

@@ -45,12 +45,12 @@ RSpec.describe MembersFinder, '#execute' do
     expect(result).to contain_exactly(member1)
   end
 
-  it 'does not return members of parent group with limited access' do
+  it 'does not return members of parent group with unassigned access' do
     nested_group.request_access(user1)
     member1 = group.add_maintainer(user2)
     member2 = nested_group.add_maintainer(user3)
     member3 = project.add_maintainer(user4)
-    create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: create(:user), group: group)
+    create(:group_member, :unassigned, user: create(:user), group: group)
 
     result = described_class.new(project, user2).execute
 

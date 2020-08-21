@@ -148,7 +148,7 @@ RSpec.describe Member do
 
       accepted_request_user = create(:user).tap { |u| project.request_access(u) }
       @accepted_request_member = project.requesters.find_by(user_id: accepted_request_user.id).tap { |m| m.accept_request }
-      @member_unassigned = create(:group_member, access_level: Gitlab::Access::UNASSIGNED, group: group)
+      @member_unassigned = create(:group_member, :unassigned, group: group)
     end
 
     describe '.access_for_user_ids' do

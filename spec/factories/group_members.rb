@@ -28,5 +28,11 @@ FactoryBot.define do
     trait :blocked do
       after(:build) { |group_member, _| group_member.user.block! }
     end
+
+    trait :unassigned do
+      to_create { |instance| instance.save!(validate: false) }
+
+      access_level { GroupMember::UNASSIGNED }
+    end
   end
 end

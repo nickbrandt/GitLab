@@ -114,7 +114,7 @@ RSpec.describe AuthorizedProjectUpdate::ProjectGroupLinkCreateService do
 
     context 'unapproved access requests' do
       before do
-        create(:group_member, access_level: Gitlab::Access::UNASSIGNED, user: group_user, group: group)
+        create(:group_member, :unassigned, user: group_user, group: group)
       end
 
       it 'does not create project authorization' do

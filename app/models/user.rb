@@ -133,8 +133,6 @@ class User < ApplicationRecord
            -> { where(members: { access_level: [Gitlab::Access::REPORTER, Gitlab::Access::DEVELOPER, Gitlab::Access::MAINTAINER, Gitlab::Access::OWNER] }) },
            through: :group_members,
            source: :group
-  has_many :unassigned_group_members, -> { where(access_level: [Gitlab::Access::UNASSIGNED]) }, source: 'GroupMember', class_name: 'GroupMember'
-  has_many :unassigned_groups, through: :unassigned_group_members, source: :group
 
   # Projects
   has_many :groups_projects,          through: :groups, source: :projects
@@ -872,7 +870,6 @@ class User < ApplicationRecord
     Group.unscoped do
       Group.from_union([
         groups,
-        unassigned_groups,
         authorized_projects.joins(:namespace).select('namespaces.*')
       ])
     end

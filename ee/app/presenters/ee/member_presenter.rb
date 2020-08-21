@@ -15,7 +15,7 @@ module EE
 
     override :valid_level_roles
     def valid_level_roles
-      return super if member.source.is_a?(Project) || source_allows_unassigned_role?(member)
+      return super if member.source.is_a?(Project)
 
       super.except("Unassigned")
     end
@@ -24,10 +24,6 @@ module EE
 
     def override_member_permission
       raise NotImplementedError
-    end
-
-    def source_allows_unassigned_role?(member)
-      member.source.unassigned_role_allowed?
     end
   end
 end
