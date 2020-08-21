@@ -539,12 +539,6 @@ module Ci
     end
     # rubocop: enable CodeReuse/ServiceClass
 
-    def mark_as_processable_after_stage(stage_idx)
-      builds.skipped.after_stage(stage_idx).find_each do |build|
-        Gitlab::OptimisticLocking.retry_lock(build, &:process)
-      end
-    end
-
     def lazy_ref_commit
       return unless ::Gitlab::Ci::Features.pipeline_latest?
 
