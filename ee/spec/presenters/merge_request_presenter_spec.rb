@@ -106,4 +106,54 @@ RSpec.describe MergeRequestPresenter do
       end
     end
   end
+
+  describe '#missing_security_scan_types' do
+    let(:presenter) { described_class.new(merge_request, current_user: user) }
+    let(:pipeline) { instance_double(Ci::Pipeline) }
+
+    subject(:missing_security_scan_types) { presenter.missing_security_scan_types }
+
+    before do
+      stub_feature_flags(missing_mr_security_scan_types: missing_mr_security_scan_types_feature_enabled?)
+      allow(merge_request).to receive(:actual_head_pipeline).and_return(pipeline)
+      allow(presenter).to receive(:can?).with(user, :read_pipeline, pipeline).and_return(can_read_pipeline?)
+    end
+
+    context 'when the `missing_mr_security_scan_types` feature flag is not enabled' do
+      let(:missing_mr_security_scan_types_feature_enabled?) { false }
+
+      context 'when the `current_user` can not read the pipeline' do
+        let(:can_read_pipeline?) { false }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'when the `current_user` can read the pipeline' do
+        let(:can_read_pipeline?) { true }
+
+        it { is_expected.to be_nil }
+      end
+    end
+
+    context 'when the `missing_mr_security_scan_types` feature flag is enabled' do
+      let(:missing_mr_security_scan_types_feature_enabled?) { true }
+
+      context 'when the `current_user` can not read the pipeline' do
+        let(:can_read_pipeline?) { false }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'when the `current_user` can read the pipeline' do
+        let(:can_read_pipeline?) { true }
+        let(:missing_types) { %w(sast) }
+
+        before do
+          allow(merge_request).to receive(:missing_security_scan_types).and_return(missing_types)
+        end
+
+        it { is_expected.to eq(missing_types) }
+      end
+    end
+  end
 end
