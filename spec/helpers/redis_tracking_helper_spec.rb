@@ -7,19 +7,20 @@ RSpec.describe RedisTrackingHelper do
 
   describe '.track_unique_redis_hll_event' do
     let(:event_name) { 'g_compliance_dashboard' }
+    let(:feature) { 'g_compliance_dashboard_feature' }
     let(:current_user) { create(:user) }
 
     before do
-      stub_feature_flags(redis_hll_g_compliance_dashboard: true)
+      stub_feature_flags(feature => true)
     end
 
     it 'does not track event if feature flag disabled' do
-      stub_feature_flags(redis_hll_g_compliance_dashboard: false)
+      stub_feature_flags(feature => false)
       sign_in(current_user)
 
       expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
-      helper.track_unique_redis_hll_event(event_name)
+      helper.track_unique_redis_hll_event(event_name, feature)
     end
 
     it 'does not track event if usage ping is disabled' do
@@ -28,13 +29,13 @@ RSpec.describe RedisTrackingHelper do
 
       expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
-      helper.track_unique_redis_hll_event(event_name)
+      helper.track_unique_redis_hll_event(event_name, feature)
     end
 
     it 'does not track event if user is not logged in' do
       expect_any_instance_of(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
-      helper.track_unique_redis_hll_event(event_name)
+      helper.track_unique_redis_hll_event(event_name, feature)
     end
 
     it 'tracks event if user is logged in' do
@@ -42,7 +43,7 @@ RSpec.describe RedisTrackingHelper do
 
       expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
 
-      helper.track_unique_redis_hll_event(event_name)
+      helper.track_unique_redis_hll_event(event_name, feature)
     end
 
     it 'tracks event if user is not logged in, but has the cookie already' do
@@ -50,7 +51,7 @@ RSpec.describe RedisTrackingHelper do
 
       expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
 
-      helper.track_unique_redis_hll_event(event_name)
+      helper.track_unique_redis_hll_event(event_name, feature)
     end
   end
 end
