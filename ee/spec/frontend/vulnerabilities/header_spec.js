@@ -123,7 +123,6 @@ describe('Vulnerability Header', () => {
 
     it('when the vulnerability state dropdown emits a change event, the vulnerabilities event bus event is emitted with the proper event', () => {
       const newState = 'dismiss';
-      const spy = jest.spyOn(VulnerabilitiesEventBus, '$emit');
       mockAxios.onPost().reply(201, { state: newState });
       expect(findBadge().text()).not.toBe(newState);
 
@@ -132,8 +131,7 @@ describe('Vulnerability Header', () => {
       dropdown.vm.$emit('change');
 
       return waitForPromises().then(() => {
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGE');
+        expect(wrapper.emitted()['vulnerability-state-change']).toBeTruthy();
       });
     });
 
@@ -374,7 +372,8 @@ describe('Vulnerability Header', () => {
       const vulnerability = { state: 'dismissed' };
       mockAxios.onGet(url).replyOnce(200, vulnerability);
       createWrapper();
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+
+      wrapper.vm.$emit('vulnerability-state-change');
       await waitForPromises();
 
       expect(findBadge().text()).toBe(vulnerability.state);
@@ -384,7 +383,7 @@ describe('Vulnerability Header', () => {
     it('shows an error message when the vulnerability cannot be loaded', async () => {
       mockAxios.onGet().replyOnce(500);
       createWrapper();
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+      wrapper.vm.$emit('vulnerability-state-change');
       await waitForPromises();
 
       expect(createFlash).toHaveBeenCalledTimes(1);
@@ -394,12 +393,12 @@ describe('Vulnerability Header', () => {
     it('cancels a pending refresh request if the vulnerability state has changed', async () => {
       mockAxios.onGet().reply(200);
       createWrapper();
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+      wrapper.vm.$emit('vulnerability-state-change');
 
       const source = wrapper.vm.refreshVulnerabilitySource;
       const spy = jest.spyOn(source, 'cancel');
 
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+      wrapper.vm.$emit('vulnerability-state-change');
       await waitForPromises();
 
       expect(createFlash).toHaveBeenCalledTimes(0);

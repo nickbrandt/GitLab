@@ -13,7 +13,6 @@ import ResolutionAlert from './resolution_alert.vue';
 import VulnerabilityStateDropdown from './vulnerability_state_dropdown.vue';
 import StatusDescription from './status_description.vue';
 import { VULNERABILITY_STATE_OBJECTS, FEEDBACK_TYPES, HEADER_ACTION_BUTTONS } from '../constants';
-import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
 
 export default {
   name: 'VulnerabilityHeader',
@@ -116,14 +115,6 @@ export default {
     },
   },
 
-  created() {
-    VulnerabilitiesEventBus.$on('VULNERABILITY_STATE_CHANGED', this.refreshVulnerability);
-  },
-
-  destroyed() {
-    VulnerabilitiesEventBus.$off('VULNERABILITY_STATE_CHANGED', this.refreshVulnerability);
-  },
-
   methods: {
     triggerClick(action) {
       const fn = this[action];
@@ -145,7 +136,7 @@ export default {
         })
         .finally(() => {
           this.isLoadingVulnerability = false;
-          VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGE');
+          this.$emit('vulnerability-state-change');
         });
     },
     createMergeRequest() {
@@ -237,9 +228,7 @@ export default {
           :class="
             `text-capitalize align-self-center issuable-status-box status-box status-box-${statusBoxStyle}`
           "
-        >
-          {{ vulnerability.state }}
-        </span>
+        >{{ vulnerability.state }}</span>
 
         <status-description
           class="issuable-meta"
@@ -273,9 +262,7 @@ export default {
           category="secondary"
           :loading="isProcessingAction"
           @click="triggerClick(actionButtons[0].action)"
-        >
-          {{ actionButtons[0].name }}
-        </gl-button>
+        >{{ actionButtons[0].name }}</gl-button>
       </div>
     </div>
   </div>
