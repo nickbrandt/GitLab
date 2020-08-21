@@ -14,26 +14,13 @@ module EE
         ::Gitlab::Elastic::SearchResults.new(
           current_user,
           params[:search],
-          elastic_projects,
           projects,
-          elastic_global
+          public_and_internal_projects: elastic_global
         )
       end
 
       def elasticsearchable_scope
         nil
-      end
-
-      def elastic_projects
-        strong_memoize(:elastic_projects) do
-          if current_user&.can_read_all_resources?
-            :any
-          elsif current_user
-            current_user.authorized_projects.pluck(:id) # rubocop: disable CodeReuse/ActiveRecord
-          else
-            []
-          end
-        end
       end
 
       def elastic_global

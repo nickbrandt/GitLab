@@ -1,0 +1,5 @@
+---
+title: Optimize the Advanced Search query for Issues and Notes.
+merge_request: 38095
+author:
+type: performance
