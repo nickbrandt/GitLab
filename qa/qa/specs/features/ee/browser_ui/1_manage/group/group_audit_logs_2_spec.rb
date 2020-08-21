@@ -13,8 +13,8 @@ module QA
     end
 
     describe 'Group' do
-      before(:all) do
-        @group = Resource::Group.fabricate_via_api! do |resource|
+      let(:group) do
+        Resource::Group.fabricate_via_api! do |resource|
           resource.path = "test-group-#{SecureRandom.hex(8)}"
         end
       end
@@ -22,7 +22,7 @@ module QA
       context 'Disable and Enable LFS', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/749' do
         before do
           sign_in
-          @group.visit!
+          group.visit!
           Page::Group::Menu.perform(&:click_group_general_settings_item)
           Page::Group::Settings::General.perform(&:set_lfs_disabled)
 
@@ -36,7 +36,7 @@ module QA
       context 'Enable and disable membership lock', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/723' do
         before do
           sign_in
-          @group.visit!
+          group.visit!
           Page::Group::Menu.perform(&:click_group_general_settings_item)
           Page::Group::Settings::General.perform(&:set_membership_lock_enabled)
 
@@ -50,7 +50,7 @@ module QA
       context 'Enable and disable allow user request access', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/725' do
         before do
           sign_in
-          @group.visit!
+          group.visit!
           Page::Group::Menu.perform(&:click_group_general_settings_item)
           Page::Group::Settings::General.perform(&:toggle_request_access)
 
@@ -106,7 +106,7 @@ module QA
       context 'Change project creation level', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/724' do
         before do
           sign_in
-          @group.visit!
+          group.visit!
           Page::Group::Menu.perform(&:click_group_general_settings_item)
           Page::Group::Settings::General.perform do |settings|
             settings.set_project_creation_level("Maintainers")
