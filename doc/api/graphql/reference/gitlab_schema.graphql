@@ -10646,11 +10646,6 @@ type PipelineDestroyPayload {
   Errors encountered during execution of the mutation.
   """
   errors: [String!]!
-
-  """
-  The pipeline after mutation
-  """
-  pipeline: Pipeline
 }
 
 """

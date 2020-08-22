@@ -12,7 +12,6 @@ module Ci
       ServiceResponse.success(message: 'Pipeline not found')
     rescue ActiveRecord::RecordNotFound
       ServiceResponse.error(message: 'Pipeline not found')
-
     end
   end
 end

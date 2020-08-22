@@ -25,7 +25,7 @@ RSpec.describe 'PipelineRetry' do
 
   let(:mutation_response) { graphql_mutation_response(:pipeline_retry) }
 
-  before(:all) do
+  before_all do
     project.add_maintainer(user)
   end
 

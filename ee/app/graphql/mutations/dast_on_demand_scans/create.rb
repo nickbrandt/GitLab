@@ -29,7 +29,7 @@ module Mutations
         dast_site_profile = find_dast_site_profile(project: project, dast_site_profile_id: dast_site_profile_id)
         dast_site = dast_site_profile.dast_site
 
-        service = Ci::RunDastScanService.new(project, current_user)
+        service = ::Ci::RunDastScanService.new(project, current_user)
         result = service.execute(branch: project.default_branch, target_url: dast_site.url)
 
         if result.success?

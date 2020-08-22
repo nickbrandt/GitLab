@@ -19,7 +19,7 @@ RSpec.describe 'PipelineCancel' do
 
   let(:mutation_response) { graphql_mutation_response(:pipeline_cancel) }
 
-  before(:all) do
+  before_all do
     project.add_maintainer(user)
   end
 

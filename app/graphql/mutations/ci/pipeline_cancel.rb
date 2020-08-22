@@ -11,6 +11,7 @@ module Mutations
         result = ::Ci::CancelUserPipelinesService.new.execute(current_user)
 
         {
+          success: result.success?,
           errors: [result&.message]
         }
       end
