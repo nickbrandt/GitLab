@@ -209,15 +209,6 @@ export default {
         });
     },
   },
-
-  created() {
-    this.$on('vulnerability-state-change', newState => {
-      // Indicates that the event emitter does not know the new state
-      if (!newState) {
-        this.refreshVulnerability();
-      }
-    });
-  },
 };
 </script>
 

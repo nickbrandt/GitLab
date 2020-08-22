@@ -1,12 +1,12 @@
 <script>
-import Vue from 'vue';
+import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 import VulnerabilityHeader from './header.vue';
 import VulnerabilityDetails from './details.vue';
 import VulnerabilityFooter from './footer.vue';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 
 export default {
+  // eslint-disable-next-line @gitlab/require-i18n-strings
   name: 'Vulnerability',
 
   components: { VulnerabilityHeader, VulnerabilityDetails, VulnerabilityFooter },
@@ -19,7 +19,7 @@ export default {
   },
 
   computed: {
-    footerInfo: function() {
+    footerInfo() {
       const {
         vulnerabilityFeedbackHelpPath,
         hasMr,
@@ -29,7 +29,6 @@ export default {
         issueFeedback,
         mergeRequestFeedback,
         notesUrl,
-        project,
         projectFingerprint,
         remediations,
         reportType,
@@ -76,9 +75,12 @@ export default {
   },
 
   methods: {
-    handleVulnerabilityStateChange(a) {
-      console.error('state-change', this.footerInfo);
-      this.$refs.footer.fetchDiscussions();
+    handleVulnerabilityStateChange(newState) {
+      if (newState) {
+        this.$refs.footer.fetchDiscussions();
+      } else {
+        this.$refs.header.refreshVulnerability();
+      }
     },
   },
 };
@@ -87,14 +89,15 @@ export default {
 <template>
   <div>
     <vulnerability-header
-      :initialVulnerability="vulnerability"
-      v-on:vulnerability-state-change="handleVulnerabilityStateChange"
-    ></vulnerability-header>
-    <vulnerability-details :vulnerability="vulnerability"></vulnerability-details>
+      ref="header"
+      :initial-vulnerability="vulnerability"
+      @vulnerability-state-change="handleVulnerabilityStateChange"
+    />
+    <vulnerability-details :vulnerability="vulnerability" />
     <vulnerability-footer
-      v-bind="footerInfo"
-      v-on:vulnerability-state-change="handleVulnerabilityStateChange"
       ref="footer"
-    ></vulnerability-footer>
+      v-bind="footerInfo"
+      @vulnerability-state-change="handleVulnerabilityStateChange"
+    />
   </div>
 </template>
