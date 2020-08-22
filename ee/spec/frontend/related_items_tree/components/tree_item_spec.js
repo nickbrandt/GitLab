@@ -134,14 +134,14 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders expand/collapse button', () => {
-        const chevronButton = wrapper.find(GlDeprecatedButton);
+        const chevronButton = wrapper.find(GlButton);
 
         expect(chevronButton.isVisible()).toBe(true);
         expect(chevronButton.attributes('title')).toBe('Collapse');
       });
 
       it('has the proper class on the expand/collapse button to avoid dragging', () => {
-        const chevronButton = wrapper.find(GlDeprecatedButton);
+        const chevronButton = wrapper.find(GlButton);
 
         expect(chevronButton.attributes('class')).toContain(treeItemChevronBtnClassName);
       });
