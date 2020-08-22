@@ -9,7 +9,6 @@ import StatusDescription from 'ee/vulnerabilities/components/status_description.
 import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
-import VulnerabilitiesEventBus from 'ee/vulnerabilities/components/vulnerabilities_event_bus';
 import { FEEDBACK_TYPES, VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import * as urlUtility from '~/lib/utils/url_utility';
@@ -139,7 +138,19 @@ describe('Vulnerability Header', () => {
       const dropdown = wrapper.find(VulnerabilityStateDropdown);
       mockAxios.onPost().reply(400);
 
-      dropdown.vm.$emit('change');
+      dropdown.vm.$emit('change', 'dismissed');
+
+      return waitForPromises().then(() => {
+        expect(mockAxios.history.post).toHaveLength(1);
+        expect(createFlash).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('when the vulnerability state changes but the change is undefined, an error message is displayed', () => {
+      const dropdown = wrapper.find(VulnerabilityStateDropdown);
+      mockAxios.onPost().reply(200);
+
+      dropdown.vm.$emit('change', undefined);
 
       return waitForPromises().then(() => {
         expect(mockAxios.history.post).toHaveLength(1);

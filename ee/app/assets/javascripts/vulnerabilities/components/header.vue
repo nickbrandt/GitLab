@@ -136,7 +136,7 @@ export default {
         })
         .finally(() => {
           this.isLoadingVulnerability = false;
-          this.$emit('vulnerability-state-change');
+          this.$emit('vulnerability-state-change', newState);
         });
     },
     createMergeRequest() {
@@ -208,6 +208,15 @@ export default {
           this.refreshVulnerabilitySource = undefined;
         });
     },
+  },
+
+  created() {
+    this.$on('vulnerability-state-change', newState => {
+      // Indicates that the event emitter does not know the new state
+      if (!newState) {
+        this.refreshVulnerability();
+      }
+    });
   },
 };
 </script>
