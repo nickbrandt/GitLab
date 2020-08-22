@@ -1,7 +1,7 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 
-import { GlTooltipDirective, GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
+import { GlTooltipDirective, GlLoadingIcon, GlButton } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 
@@ -17,7 +17,7 @@ export default {
     Icon,
     TreeItemBody,
     GlLoadingIcon,
-    GlDeprecatedButton,
+    GlButton,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -87,7 +87,7 @@ export default {
     }"
   >
     <div class="list-item-body d-flex align-items-center">
-      <gl-deprecated-button
+      <gl-button
         v-if="!childrenFetchInProgress && hasChildren"
         v-gl-tooltip.viewport.hover
         :title="chevronTooltip"
@@ -97,7 +97,7 @@ export default {
         @click="handleChevronClick"
       >
         <icon :name="chevronType" />
-      </gl-deprecated-button>
+      </gl-button>
       <gl-loading-icon v-if="childrenFetchInProgress" class="loading-icon" size="sm" />
       <tree-item-body
         class="tree-item-row"
