@@ -145,18 +145,6 @@ describe('Vulnerability Header', () => {
         expect(createFlash).toHaveBeenCalledTimes(1);
       });
     });
-
-    it('when the vulnerability state changes but the change is undefined, an error message is displayed', () => {
-      const dropdown = wrapper.find(VulnerabilityStateDropdown);
-      mockAxios.onPost().reply(200);
-
-      dropdown.vm.$emit('change', undefined);
-
-      return waitForPromises().then(() => {
-        expect(mockAxios.history.post).toHaveLength(1);
-        expect(createFlash).toHaveBeenCalledTimes(1);
-      });
-    });
   });
 
   describe('split button', () => {
@@ -374,48 +362,6 @@ describe('Vulnerability Header', () => {
         expect(mockAxios.history.get).toHaveLength(1);
         expect(findStatusDescription().props('isLoadingUser')).toBe(false);
       });
-    });
-  });
-
-  describe('when vulnerability state is changed', () => {
-    it('refreshes the vulnerability', async () => {
-      const url = Api.buildUrl(Api.vulnerabilityPath).replace(':id', defaultVulnerability.id);
-      const vulnerability = { state: 'dismissed' };
-      mockAxios.onGet(url).replyOnce(200, vulnerability);
-      createWrapper();
-
-      wrapper.vm.$emit('vulnerability-state-change');
-      await waitForPromises();
-
-      expect(findBadge().text()).toBe(vulnerability.state);
-      expect(findStatusDescription().props('vulnerability')).toMatchObject(vulnerability);
-    });
-
-    it('shows an error message when the vulnerability cannot be loaded', async () => {
-      mockAxios.onGet().replyOnce(500);
-      createWrapper();
-      wrapper.vm.$emit('vulnerability-state-change');
-      await waitForPromises();
-
-      expect(createFlash).toHaveBeenCalledTimes(1);
-      expect(mockAxios.history.get).toHaveLength(1);
-    });
-
-    it('cancels a pending refresh request if the vulnerability state has changed', async () => {
-      mockAxios.onGet().reply(200);
-      createWrapper();
-      wrapper.vm.$emit('vulnerability-state-change');
-
-      const source = wrapper.vm.refreshVulnerabilitySource;
-      const spy = jest.spyOn(source, 'cancel');
-
-      wrapper.vm.$emit('vulnerability-state-change');
-      await waitForPromises();
-
-      expect(createFlash).toHaveBeenCalledTimes(0);
-      expect(mockAxios.history.get).toHaveLength(1);
-      expect(spy).toHaveBeenCalled();
-      expect(wrapper.vm.refreshVulnerabilitySource).not.toBe(source); // Check that the source has changed.
     });
   });
 });
