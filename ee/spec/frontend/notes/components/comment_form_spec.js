@@ -133,7 +133,7 @@ describe('issue_comment_form component', () => {
 
       wrapper.vm.$nextTick(() => {
         const warning = wrapper.find('.gl-alert-warning');
-        const secondaryButton = warning.find('.gl-alert-actions .btn-secondary');
+        const secondaryButton = warning.find('.gl-alert-actions .btn-default');
         expect(secondaryButton.text()).toEqual('Cancel');
         secondaryButton.trigger('click');
         wrapper.vm.$nextTick(() => {
