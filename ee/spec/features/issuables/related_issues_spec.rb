@@ -3,45 +3,42 @@
 require 'spec_helper'
 
 RSpec.describe 'Related issues', :js do
-  let(:user) { create(:user) }
-  let(:project) { create(:project_empty_repo, :public) }
-  let(:project_b) { create(:project_empty_repo, :public) }
-  let(:project_unauthorized) { create(:project_empty_repo, :public) }
-  let(:issue_a) { create(:issue, project: project) }
-  let(:issue_b) { create(:issue, project: project) }
-  let(:issue_c) { create(:issue, project: project) }
-  let(:issue_d) { create(:issue, project: project) }
-  let(:issue_project_b_a) { create(:issue, project: project_b) }
-  let(:issue_project_unauthorized_a) { create(:issue, project: project_unauthorized) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project_empty_repo, :public) }
+  let_it_be(:project_b) { create(:project_empty_repo, :public) }
+  let_it_be(:project_unauthorized) { create(:project_empty_repo, :public) }
+  let_it_be(:issue_a) { create(:issue, project: project) }
+  let_it_be(:issue_b) { create(:issue, project: project) }
+  let_it_be(:issue_c) { create(:issue, project: project) }
+  let_it_be(:issue_d) { create(:issue, project: project) }
+  let_it_be(:issue_project_b_a) { create(:issue, project: project_b) }
+  let_it_be(:issue_project_unauthorized_a) { create(:issue, project: project_unauthorized) }
 
   context 'widget visibility' do
+    let_it_be(:issue, reload: true) { create(:issue, project: project) }
+    let_it_be(:project_private) { create(:project_empty_repo, :private) }
+    let_it_be(:project_internal) { create(:project_empty_repo, :internal) }
+    let_it_be(:issue_private) { create(:issue, project: project_private) }
+    let_it_be(:issue_internal) { create(:issue, project: project_internal) }
+
     before do
       stub_licensed_features(blocked_issues: true)
     end
 
     context 'when not logged in' do
       it 'does not show widget when internal project' do
-        project = create :project_empty_repo, :internal
-        issue = create :issue, project: project
-
-        visit project_issue_path(project, issue)
+        visit project_issue_path(project_internal, issue_internal)
 
         expect(page).not_to have_css('.related-issues-block')
       end
 
       it 'does not show widget when private project' do
-        project = create :project_empty_repo, :private
-        issue = create :issue, project: project
-
-        visit project_issue_path(project, issue)
+        visit project_issue_path(project_private, issue_private)
 
         expect(page).not_to have_css('.related-issues-block')
       end
 
       it 'shows widget when public project' do
-        project = create :project_empty_repo, :public
-        issue = create :issue, project: project
-
         visit project_issue_path(project, issue)
 
         expect(page).to have_css('.related-issues-block')
@@ -55,28 +52,19 @@ RSpec.describe 'Related issues', :js do
       end
 
       it 'shows widget when internal project' do
-        project = create :project_empty_repo, :internal
-        issue = create :issue, project: project
-
-        visit project_issue_path(project, issue)
+        visit project_issue_path(project_internal, issue_internal)
 
         expect(page).to have_css('.related-issues-block')
         expect(page).not_to have_selector('.js-issue-count-badge-add-button')
       end
 
       it 'does not show widget when private project' do
-        project = create :project_empty_repo, :private
-        issue = create :issue, project: project
-
-        visit project_issue_path(project, issue)
+        visit project_issue_path(project_private, issue_private)
 
         expect(page).not_to have_css('.related-issues-block')
       end
 
       it 'shows widget when public project' do
-        project = create :project_empty_repo, :public
-        issue = create :issue, project: project
-
         visit project_issue_path(project, issue)
 
         expect(page).to have_css('.related-issues-block')
@@ -84,8 +72,7 @@ RSpec.describe 'Related issues', :js do
       end
 
       it 'shows widget on their own public issue' do
-        project = create :project_empty_repo, :public
-        issue = create :issue, project: project, author: user
+        issue.update!(author: user)
 
         visit project_issue_path(project, issue)
 
@@ -96,36 +83,27 @@ RSpec.describe 'Related issues', :js do
 
     context 'when logged in and a guest' do
       before do
+        project_internal.add_guest(user)
+        project_private.add_guest(user)
+        project.add_guest(user)
         gitlab_sign_in(user)
       end
 
       it 'shows widget when internal project' do
-        project = create :project_empty_repo, :internal
-        issue = create :issue, project: project
-        project.add_guest(user)
-
-        visit project_issue_path(project, issue)
+        visit project_issue_path(project_internal, issue_internal)
 
         expect(page).to have_css('.related-issues-block')
         expect(page).not_to have_selector('.js-issue-count-badge-add-button')
       end
 
       it 'shows widget when private project' do
-        project = create :project_empty_repo, :private
-        issue = create :issue, project: project
-        project.add_guest(user)
-
-        visit project_issue_path(project, issue)
+        visit project_issue_path(project_private, issue_private)
 
         expect(page).to have_css('.related-issues-block')
         expect(page).not_to have_selector('.js-issue-count-badge-add-button')
       end
 
       it 'shows widget when public project' do
-        project = create :project_empty_repo, :public
-        issue = create :issue, project: project
-        project.add_guest(user)
-
         visit project_issue_path(project, issue)
 
         expect(page).to have_css('.related-issues-block')
@@ -135,36 +113,28 @@ RSpec.describe 'Related issues', :js do
 
     context 'when logged in and a reporter' do
       before do
+        project_internal.add_reporter(user)
+        project_private.add_reporter(user)
+        project.add_reporter(user)
+
         gitlab_sign_in(user)
       end
 
       it 'shows widget when internal project' do
-        project = create :project_empty_repo, :internal
-        issue = create :issue, project: project
-        project.add_reporter(user)
-
-        visit project_issue_path(project, issue)
+        visit project_issue_path(project_internal, issue_internal)
 
         expect(page).to have_css('.related-issues-block')
         expect(page).to have_selector('.js-issue-count-badge-add-button')
       end
 
       it 'shows widget when private project' do
-        project = create :project_empty_repo, :private
-        issue = create :issue, project: project
-        project.add_reporter(user)
-
-        visit project_issue_path(project, issue)
+        visit project_issue_path(project_private, issue_private)
 
         expect(page).to have_css('.related-issues-block')
         expect(page).to have_selector('.js-issue-count-badge-add-button')
       end
 
       it 'shows widget when public project' do
-        project = create :project_empty_repo, :public
-        issue = create :issue, project: project
-        project.add_reporter(user)
-
         visit project_issue_path(project, issue)
 
         expect(page).to have_css('.related-issues-block')
@@ -172,9 +142,7 @@ RSpec.describe 'Related issues', :js do
       end
 
       it 'shows widget on their own public issue' do
-        project = create :project_empty_repo, :public
-        issue = create :issue, project: project, author: user
-        project.add_reporter(user)
+        issue.update!(author: user)
 
         visit project_issue_path(project, issue)
 
@@ -185,8 +153,8 @@ RSpec.describe 'Related issues', :js do
   end
 
   context 'when user has no permission to manage related issues' do
-    let!(:issue_link_b) { create :issue_link, source: issue_a, target: issue_b }
-    let!(:issue_link_c) { create :issue_link, source: issue_a, target: issue_c }
+    let_it_be(:issue_link_b) { create :issue_link, source: issue_a, target: issue_b }
+    let_it_be(:issue_link_c) { create :issue_link, source: issue_a, target: issue_c }
 
     before do
       stub_licensed_features(blocked_issues: true)
@@ -225,8 +193,8 @@ RSpec.describe 'Related issues', :js do
     end
 
     context 'with related_issues disabled' do
-      let!(:issue_link_b) { create :issue_link, source: issue_a, target: issue_b }
-      let!(:issue_link_c) { create :issue_link, source: issue_a, target: issue_c }
+      let_it_be(:issue_link_b) { create :issue_link, source: issue_a, target: issue_b }
+      let_it_be(:issue_link_c) { create :issue_link, source: issue_a, target: issue_c }
 
       before do
         visit project_issue_path(project, issue_a)
@@ -340,8 +308,8 @@ RSpec.describe 'Related issues', :js do
       end
 
       context 'with existing related issues' do
-        let!(:issue_link_b) { create :issue_link, source: issue_a, target: issue_b }
-        let!(:issue_link_c) { create :issue_link, source: issue_a, target: issue_c }
+        let_it_be(:issue_link_b) { create :issue_link, source: issue_a, target: issue_b }
+        let_it_be(:issue_link_c) { create :issue_link, source: issue_a, target: issue_c }
 
         before do
           visit project_issue_path(project, issue_a)
