@@ -80,10 +80,13 @@ describe('UserToken', () => {
   describe('search', () => {
     describe('when no search term is given', () => {
       it('calls `fetchData` with an empty search term', () => {
-        createComponent({
-          config,
-          value,
-        });
+        createComponent(
+          {
+            config,
+            value,
+          },
+          { stubs },
+        );
 
         expect(config.fetchData).toHaveBeenCalledWith('');
       });
@@ -92,7 +95,7 @@ describe('UserToken', () => {
     describe('when the search term "Diddy Kong" is given', () => {
       const data = 'Diddy Kong';
       it('calls `fetchData` with the search term', () => {
-        createComponent({ config, value: { data } });
+        createComponent({ config, value: { data } }, { stubs });
 
         expect(config.fetchData).toHaveBeenCalledWith(data);
       });
