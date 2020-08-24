@@ -6,70 +6,84 @@ RSpec.describe RedisTracking do
   let(:event_name) { 'g_compliance_dashboard' }
   let(:feature) { 'g_compliance_dashboard_feature' }
   let(:user) { create(:user) }
-  let(:visitor_id) { 'b77218e4-eeb1-4e41-ba0e-c1354ea49f7a' }
 
-  let(:controller_class) do
-    Class.new do
-      include RedisTracking
+  controller(ApplicationController) do
+    include RedisTracking
+
+    track_redis_hll_event :index, name: 'i_analytics_dev_ops_score', feature: :g_compliance_dashboard_feature
+
+    def index
+      render html: 'index'
+    end
+
+    def new
+      render html: 'new'
     end
   end
 
-  let(:controller) { controller_class.new }
-
-  before do
-    allow(controller).to receive(:current_user).and_return(:user)
-  end
-
-  describe '.track_unique_redis_hll_event' do
-    it 'does not track event if feature flag disabled' do
+  context 'with feature disabled' do
+    it 'does not track the event' do
       stub_feature_flags(feature => false)
+
       expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
-      controller.track_unique_redis_hll_event(event_name, feature)
+      get :index
     end
+  end
 
-    it 'does not track the event when usage ping is disabled' do
+  context 'with usage ping disabled' do
+    it 'does not track the event' do
       stub_feature_flags(feature => true)
       allow(Gitlab::CurrentSettings).to receive(:usage_ping_enabled?).and_return(false)
-      allow(controller).to receive(:cookies).and_return({ visitor_id: visitor_id })
-      allow(controller).to receive(:current_user).and_return(nil)
 
-      expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event).with(visitor_id, event_name)
+      expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
-      controller.track_unique_redis_hll_event(event_name, feature)
+      get :index
     end
+  end
 
-    it 'does not track the event when there is no cookie and user is not logged in' do
+  context 'with feature enabled and usage ping enabled' do
+    before do
       stub_feature_flags(feature => true)
       allow(Gitlab::CurrentSettings).to receive(:usage_ping_enabled?).and_return(true)
-      allow(controller).to receive(:cookies).and_return({})
-      allow(controller).to receive(:current_user).and_return(nil)
-
-      expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event).with(visitor_id, event_name)
-
-      controller.track_unique_redis_hll_event(event_name, feature)
     end
 
-    it 'tracks the event with visitor_id and no user' do
-      stub_feature_flags(feature => true)
-      allow(Gitlab::CurrentSettings).to receive(:usage_ping_enabled?).and_return(true)
-      allow(controller).to receive(:cookies).and_return({ visitor_id: visitor_id })
-      allow(controller).to receive(:current_user).and_return(nil)
+    context 'when user is logged in' do
+      it 'tracks the event' do
+        sign_in(user)
 
-      expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event).with(visitor_id, event_name)
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
 
-      controller.track_unique_redis_hll_event(event_name, feature)
+        get :index
+      end
     end
 
-    it 'tracks the event with visitor_id and user' do
-      stub_feature_flags(feature => true)
-      allow(Gitlab::CurrentSettings).to receive(:usage_ping_enabled?).and_return(true)
-      allow(controller).to receive(:cookies).and_return({ visitor_id: visitor_id })
-      allow(controller).to receive(:current_user).and_return(:user)
+    context 'when user is not logged in and there is a visitor_id' do
+      before do
+        request.cookies['visitor_id'] = SecureRandom.uuid
+      end
 
-      expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event).with(visitor_id, event_name)
+      it 'tracks the event' do
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
 
-      controller.track_unique_redis_hll_event(event_name, feature)
+        get :index
+      end
+    end
+
+    context 'when user is not logged in and there is no visitor_id' do
+      it 'does not tracks the event' do
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
+
+        get :index
+      end
+    end
+
+    context 'for untracked action' do
+      it 'does not tracks the event' do
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
+
+        get :new
+      end
     end
   end
 end
