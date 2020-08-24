@@ -2,29 +2,6 @@
 
 module Geo
   class ContainerRepositoryRegistryFinder < RegistryFinder
-    def registry_count
-      registry_class.count
-    end
-    alias_method :count_registry, :registry_count
-
-    def count_synced
-      registry_class.synced.count
-    end
-
-    def count_failed
-      registry_class.failed.count
-    end
-
-    def find_registry_differences(range)
-      source_ids = replicables.id_in(range).pluck_primary_key
-      tracked_ids = registry_class.pluck_model_ids_in_range(range)
-
-      untracked_ids = source_ids - tracked_ids
-      unused_tracked_ids = tracked_ids - source_ids
-
-      [untracked_ids, unused_tracked_ids]
-    end
-
     # Returns Geo::ContainerRepositoryRegistry records that have never been synced.
     #
     # Does not care about selective sync, because it considers the Registry
