@@ -53,7 +53,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
         keys = redis.scan_each(match: "g_{analytics}_contribution-*").to_a
         expect(keys).not_to be_empty
 
-        redis.scan_each(match: "g_{analytics}_contribution-*").each do |key|
+        keys.each do |key|
           expect(redis.ttl(key)).to be_within(5.seconds).of(12.weeks)
         end
       end
@@ -66,7 +66,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
         keys = redis.scan_each(match: "g_{compliance}_dashboard-*").to_a
         expect(keys).not_to be_empty
 
-        redis.scan_each(match: "g_{compliance}_dashboard-*").each do |key|
+        keys.each do |key|
           expect(redis.ttl(key)).to be_within(5.seconds).of(6.weeks)
         end
       end
