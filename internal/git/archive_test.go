@@ -76,10 +76,10 @@ func TestSetArchiveHeaders(t *testing.T) {
 
 		setArchiveHeaders(w, testCase.in, "filename")
 
-		testhelper.AssertResponseWriterHeader(t, w, "Content-Type", testCase.out)
-		testhelper.AssertResponseWriterHeader(t, w, "Content-Length")
-		testhelper.AssertResponseWriterHeader(t, w, "Content-Disposition", `attachment; filename="filename"`)
-		testhelper.AssertResponseWriterHeader(t, w, "Cache-Control", "public, max-age=3600")
-		testhelper.AssertAbsentResponseWriterHeader(t, w, "Set-Cookie")
+		testhelper.RequireResponseWriterHeader(t, w, "Content-Type", testCase.out)
+		testhelper.RequireResponseWriterHeader(t, w, "Content-Length")
+		testhelper.RequireResponseWriterHeader(t, w, "Content-Disposition", `attachment; filename="filename"`)
+		testhelper.RequireResponseWriterHeader(t, w, "Cache-Control", "public, max-age=3600")
+		testhelper.RequireAbsentResponseWriterHeader(t, w, "Set-Cookie")
 	}
 }

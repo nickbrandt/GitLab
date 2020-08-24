@@ -38,7 +38,7 @@ func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, ur
 
 	response := httptest.NewRecorder()
 	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)
-	testhelper.AssertResponseCode(t, response, expectedCode)
+	testhelper.RequireResponseCode(t, response, expectedCode)
 	return response
 }
 

@@ -36,9 +36,9 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	testhelper.AssertResponseCode(t, w, 404)
-	testhelper.AssertResponseBody(t, w, errorPage)
-	testhelper.AssertResponseHeader(t, w, "Content-Type", "text/html; charset=utf-8")
+	testhelper.RequireResponseCode(t, w, 404)
+	testhelper.RequireResponseBody(t, w, errorPage)
+	testhelper.RequireResponseHeader(t, w, "Content-Type", "text/html; charset=utf-8")
 }
 
 func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
@@ -58,8 +58,8 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	testhelper.AssertResponseCode(t, w, 404)
-	testhelper.AssertResponseBody(t, w, errorResponse)
+	testhelper.RequireResponseCode(t, w, 404)
+	testhelper.RequireResponseBody(t, w, errorResponse)
 }
 
 func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
@@ -81,8 +81,8 @@ func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
 	st := &Static{dir}
 	st.ErrorPagesUnless(true, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
-	testhelper.AssertResponseCode(t, w, 500)
-	testhelper.AssertResponseBody(t, w, serverError)
+	testhelper.RequireResponseCode(t, w, 500)
+	testhelper.RequireResponseBody(t, w, serverError)
 }
 
 func TestIfErrorPageIsIgnoredIfCustomError(t *testing.T) {
@@ -105,8 +105,8 @@ func TestIfErrorPageIsIgnoredIfCustomError(t *testing.T) {
 	st := &Static{dir}
 	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
-	testhelper.AssertResponseCode(t, w, 500)
-	testhelper.AssertResponseBody(t, w, serverError)
+	testhelper.RequireResponseCode(t, w, 500)
+	testhelper.RequireResponseBody(t, w, serverError)
 }
 
 func TestErrorPageInterceptedByContentType(t *testing.T) {
@@ -140,12 +140,12 @@ func TestErrorPageInterceptedByContentType(t *testing.T) {
 		st := &Static{dir}
 		st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 		w.Flush()
-		testhelper.AssertResponseCode(t, w, 500)
+		testhelper.RequireResponseCode(t, w, 500)
 
 		if tc.intercepted {
-			testhelper.AssertResponseBody(t, w, errorPage)
+			testhelper.RequireResponseBody(t, w, errorPage)
 		} else {
-			testhelper.AssertResponseBody(t, w, serverError)
+			testhelper.RequireResponseBody(t, w, serverError)
 		}
 	}
 }
@@ -165,9 +165,9 @@ func TestIfErrorPageIsPresentedJSON(t *testing.T) {
 	st.ErrorPagesUnless(false, ErrorFormatJSON, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	testhelper.AssertResponseCode(t, w, 404)
-	testhelper.AssertResponseBody(t, w, errorPage)
-	testhelper.AssertResponseHeader(t, w, "Content-Type", "application/json; charset=utf-8")
+	testhelper.RequireResponseCode(t, w, 404)
+	testhelper.RequireResponseBody(t, w, errorPage)
+	testhelper.RequireResponseHeader(t, w, "Content-Type", "application/json; charset=utf-8")
 }
 
 func TestIfErrorPageIsPresentedText(t *testing.T) {
@@ -185,7 +185,7 @@ func TestIfErrorPageIsPresentedText(t *testing.T) {
 	st.ErrorPagesUnless(false, ErrorFormatText, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	testhelper.AssertResponseCode(t, w, 404)
-	testhelper.AssertResponseBody(t, w, errorPage)
-	testhelper.AssertResponseHeader(t, w, "Content-Type", "text/plain; charset=utf-8")
+	testhelper.RequireResponseCode(t, w, 404)
+	testhelper.RequireResponseBody(t, w, errorPage)
+	testhelper.RequireResponseHeader(t, w, "Content-Type", "text/plain; charset=utf-8")
 }

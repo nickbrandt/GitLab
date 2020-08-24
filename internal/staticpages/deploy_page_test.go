@@ -52,6 +52,6 @@ func TestIfDeployPageExist(t *testing.T) {
 	}
 	w.Flush()
 
-	testhelper.AssertResponseCode(t, w, 200)
-	testhelper.AssertResponseBody(t, w, deployPage)
+	testhelper.RequireResponseCode(t, w, 200)
+	testhelper.RequireResponseBody(t, w, deployPage)
 }

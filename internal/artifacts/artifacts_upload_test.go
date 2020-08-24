@@ -184,8 +184,8 @@ func TestUploadHandlerAddingMetadata(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.AssertResponseCode(t, response, http.StatusOK)
-	testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
+	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 }
 
 func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
@@ -194,8 +194,8 @@ func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.AssertResponseCode(t, response, http.StatusOK)
-	testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderMissing)
+	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderMissing)
 }
 
 func TestUploadHandlerForMultipleFiles(t *testing.T) {
@@ -208,7 +208,7 @@ func TestUploadHandlerForMultipleFiles(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
+	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
 }
 
 func TestUploadFormProcessing(t *testing.T) {
@@ -217,7 +217,7 @@ func TestUploadFormProcessing(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
+	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
 }
 
 func TestLsifFileProcessing(t *testing.T) {
@@ -236,8 +236,8 @@ func TestLsifFileProcessing(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.AssertResponseCode(t, response, http.StatusOK)
-	testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
+	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 }
 
 func TestInvalidLsifFileProcessing(t *testing.T) {
@@ -256,5 +256,5 @@ func TestInvalidLsifFileProcessing(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
+	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
 }

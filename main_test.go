@@ -503,7 +503,7 @@ func TestAPIFalsePositivesAreProxied(t *testing.T) {
 		assert.NoError(t, err, "%s %q: reading body", tc.method, tc.path)
 
 		assert.Equal(t, 200, resp.StatusCode, "%s %q: status code", tc.method, tc.path)
-		testhelper.AssertResponseHeader(t, resp, "Content-Type", "text/html")
+		testhelper.RequireResponseHeader(t, resp, "Content-Type", "text/html")
 		assert.Equal(t, string(goodResponse), string(respBody), "%s %q: response body", tc.method, tc.path)
 	}
 }

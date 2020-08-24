@@ -62,7 +62,7 @@ func TestUploadTempPathRequirement(t *testing.T) {
 	require.NoError(t, err)
 
 	HandleFileUploads(response, request, nilHandler, apiResponse, &testFormProcessor{}, opts)
-	testhelper.AssertResponseCode(t, response, 500)
+	testhelper.RequireResponseCode(t, response, 500)
 }
 
 func TestUploadHandlerForwardingRawData(t *testing.T) {
@@ -103,7 +103,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 
 	HandleFileUploads(response, httpRequest, handler, apiResponse, nil, opts)
 
-	testhelper.AssertResponseCode(t, response, 202)
+	testhelper.RequireResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
 	}
@@ -209,7 +209,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	require.NoError(t, err)
 
 	HandleFileUploads(response, httpRequest, handler, apiResponse, &testFormProcessor{}, opts)
-	testhelper.AssertResponseCode(t, response, 202)
+	testhelper.RequireResponseCode(t, response, 202)
 
 	cancel() // this will trigger an async cleanup
 	waitUntilDeleted(t, filePath)
@@ -286,7 +286,7 @@ func TestUploadHandlerDetectingInjectedMultiPartData(t *testing.T) {
 			require.NoError(t, err)
 
 			HandleFileUploads(response, httpRequest, handler, apiResponse, &testFormProcessor{}, opts)
-			testhelper.AssertResponseCode(t, response, test.response)
+			testhelper.RequireResponseCode(t, response, test.response)
 
 			cancel() // this will trigger an async cleanup
 			waitUntilDeleted(t, filePath)
@@ -321,7 +321,7 @@ func TestUploadProcessingField(t *testing.T) {
 
 	HandleFileUploads(response, httpRequest, nilHandler, apiResponse, &testFormProcessor{}, opts)
 
-	testhelper.AssertResponseCode(t, response, 500)
+	testhelper.RequireResponseCode(t, response, 500)
 }
 
 func TestUploadProcessingFile(t *testing.T) {
@@ -382,7 +382,7 @@ func TestUploadProcessingFile(t *testing.T) {
 
 			HandleFileUploads(response, httpRequest, nilHandler, apiResponse, &testFormProcessor{}, opts)
 
-			testhelper.AssertResponseCode(t, response, 200)
+			testhelper.RequireResponseCode(t, response, 200)
 		})
 	}
 
@@ -430,7 +430,7 @@ func TestInvalidFileNames(t *testing.T) {
 		require.NoError(t, err)
 
 		HandleFileUploads(response, httpRequest, nilHandler, apiResponse, &SavedFileTracker{Request: httpRequest}, opts)
-		testhelper.AssertResponseCode(t, response, testCase.code)
+		testhelper.RequireResponseCode(t, response, testCase.code)
 	}
 }
 
@@ -486,7 +486,7 @@ func TestUploadHandlerRemovingExif(t *testing.T) {
 	require.NoError(t, err)
 
 	HandleFileUploads(response, httpRequest, handler, apiResponse, &testFormProcessor{}, opts)
-	testhelper.AssertResponseCode(t, response, 200)
+	testhelper.RequireResponseCode(t, response, 200)
 }
 
 func TestUploadHandlerRemovingInvalidExif(t *testing.T) {
@@ -528,7 +528,7 @@ func TestUploadHandlerRemovingInvalidExif(t *testing.T) {
 	require.NoError(t, err)
 
 	HandleFileUploads(response, httpRequest, handler, apiResponse, &testFormProcessor{}, opts)
-	testhelper.AssertResponseCode(t, response, 422)
+	testhelper.RequireResponseCode(t, response, 422)
 }
 
 func newProxy(url string) *proxy.Proxy {

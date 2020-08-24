@@ -218,7 +218,7 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 
 	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 	require.Equal(t, string(testhelper.GitalyReceivePackResponseMock), split[1])
-	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
+	testhelper.RequireResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
 }
 
 func TestPostReceivePackProxiedToGitalyInterrupted(t *testing.T) {
@@ -314,7 +314,7 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 			)
 			defer resp.Body.Close()
 			require.Equal(t, 200, resp.StatusCode, "POST %q", resource)
-			testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
+			testhelper.RequireResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 
 			m.Lock()
 			requestFinished := requestReadFinished
@@ -609,10 +609,10 @@ func TestGetSnapshotProxiedToGitalySuccessfully(t *testing.T) {
 	assert.Equal(t, expectedBody, string(body), "GET %q: body", resp.Request.URL)
 	assert.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
 
-	testhelper.AssertResponseHeader(t, resp, "Content-Disposition", `attachment; filename="snapshot.tar"`)
-	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-tar")
-	testhelper.AssertResponseHeader(t, resp, "Content-Transfer-Encoding", "binary")
-	testhelper.AssertResponseHeader(t, resp, "Cache-Control", "private")
+	testhelper.RequireResponseHeader(t, resp, "Content-Disposition", `attachment; filename="snapshot.tar"`)
+	testhelper.RequireResponseHeader(t, resp, "Content-Type", "application/x-tar")
+	testhelper.RequireResponseHeader(t, resp, "Content-Transfer-Encoding", "binary")
+	testhelper.RequireResponseHeader(t, resp, "Cache-Control", "private")
 }
 
 func TestGetSnapshotProxiedToGitalyInterruptedStream(t *testing.T) {
