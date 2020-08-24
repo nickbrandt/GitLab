@@ -163,7 +163,7 @@ export default {
       <gl-sprintf
         :message="
           s__(
-            'EnvironmentsDashboard|This dashboard displays a maximum of 7 projects and 3 environments per project. %{readMoreLink}',
+            'EnvironmentsDashboard|This dashboard displays a maximum of 7 projects and 3 environments per project, and is linked to the Operations Dashboard. When you add or remove a project from one dashboard, GitLab adds or removes the project from the other. %{readMoreLink}',
           )
         "
       >
