@@ -210,4 +210,19 @@ RSpec.describe 'getting merge request listings nested in a project' do
       include_examples 'N+1 query check'
     end
   end
+
+  context 'when requestion notes count' do
+    let(:query) { query_merge_requests([:iid, query_graphql_field(:notes, nil, [:count])]) }
+
+    before do
+      create(:note, noteable: merge_request_a, project: merge_request_a.project)
+      post_graphql(query, current_user: current_user)
+    end
+
+    it 'contains notes count' do
+      mr_with_note = results.find { |h| h['iid'] == merge_request_a.iid.to_s }
+
+      expect(mr_with_note['notes']['count']).to eq(1)
+    end
+  end
 end

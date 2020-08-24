@@ -7,6 +7,8 @@ module Types
 
       authorize :read_note
 
+      connection_type_class(Types::CountableConnectionType)
+
       expose_permissions Types::PermissionTypes::Note
 
       implements(Types::ResolvableInterface)

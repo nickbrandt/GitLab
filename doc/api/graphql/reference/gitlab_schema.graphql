@@ -10103,6 +10103,11 @@ The connection type for Note.
 """
 type NoteConnection {
   """
+  Total count of collection
+  """
+  count: Int!
+
+  """
   A list of edges.
   """
   edges: [NoteEdge]
