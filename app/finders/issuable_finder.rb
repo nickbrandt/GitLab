@@ -204,7 +204,29 @@ class IssuableFinder
     end
   end
 
+  def parent=(obj)
+    @parent = obj
+  end
+
+  def parent_param=(obj)
+    @parent = obj
+    params[parent_param] = parent if parent
+  end
+
+  def parent_param
+    case parent
+    when Project
+      :project_id
+    when Group
+      :group_id
+    else
+      raise "Unexpected parent: #{parent.class}"
+    end
+  end
+
   private
+
+  attr_reader :parent
 
   def not_params
     strong_memoize(:not_params) do
