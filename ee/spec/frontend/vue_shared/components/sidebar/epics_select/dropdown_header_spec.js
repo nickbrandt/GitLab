@@ -1,8 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlDeprecatedButton, GlIcon } from '@gitlab/ui';
 import DropdownHeader from 'ee/vue_shared/components/sidebar/epics_select/dropdown_header.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 
 describe('EpicsSelect', () => {
   describe('DropdownHeader', () => {
@@ -36,7 +35,7 @@ describe('EpicsSelect', () => {
       });
 
       it('should render close button icon', () => {
-        const iconEl = wrapper.find(GlDeprecatedButton).find(Icon);
+        const iconEl = wrapper.find(GlDeprecatedButton).find(GlIcon);
 
         expect(iconEl.exists()).toBe(true);
         expect(iconEl.attributes('name')).toBe('close');
