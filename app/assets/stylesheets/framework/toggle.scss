@@ -55,6 +55,7 @@
     transition: all 0.2s ease;
     width: $default-icon-size;
     height: $default-icon-size;
+    // pointer-events: none;
   }
 
   .loading-icon {
