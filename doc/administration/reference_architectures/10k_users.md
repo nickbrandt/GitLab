@@ -325,6 +325,9 @@ If you use a cloud-managed service, or provide your own PostgreSQL:
 1. Configure the GitLab application servers with the appropriate details.
    This step is covered in [Configuring the GitLab Rails application](#configure-gitlab-rails).
 
+See [Configure GitLab using an external PostgreSQL service](../postgresql/external.md) for
+further configuration steps.
+
 ### Standalone PostgreSQL using Omnibus GitLab
 
 The following IPs will be used as an example:
