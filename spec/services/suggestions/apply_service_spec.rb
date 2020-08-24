@@ -67,11 +67,13 @@ RSpec.describe Suggestions::ApplyService do
       apply(suggestions)
 
       commit = project.repository.commit
+      author = suggestions.first.note.author
 
       expect(user.commit_email).not_to eq(user.email)
-      expect(commit.author_email).to eq(user.commit_email)
+      expect(commit.author_email).to eq(author.commit_email)
       expect(commit.committer_email).to eq(user.commit_email)
-      expect(commit.author_name).to eq(user.name)
+      expect(commit.author_name).to eq(author.name)
+      expect(commit.committer_name).to eq(user.name)
     end
 
     it 'tracks apply suggestion event' do
