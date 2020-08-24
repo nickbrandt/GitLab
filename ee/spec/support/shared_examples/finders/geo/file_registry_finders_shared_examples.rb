@@ -3,7 +3,7 @@
 RSpec.shared_examples 'a file registry finder' do
   it 'responds to file registry finder methods' do
     file_registry_finder_methods = %i{
-      syncable
+      registry_class
       registry_count
       count_synced
       count_failed

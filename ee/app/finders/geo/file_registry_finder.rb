@@ -5,34 +5,34 @@ module Geo
     # @!method registry_count
     #    Return a count of the registry records for the tracked file_type(s)
     def registry_count
-      syncable.count
+      registry_class.count
     end
 
     # @!method count_synced
     #    Return a count of the registry records for the tracked file_type(s)
     #    that are synced
     def count_synced
-      syncable.synced.count
+      registry_class.synced.count
     end
 
     # @!method count_failed
     #    Return a count of the registry records for the tracked file_type(s)
     #    that are sync failed
     def count_failed
-      syncable.failed.count
+      registry_class.failed.count
     end
 
     # @!method count_synced_missing_on_primary
     #    Return a count of the registry records for the tracked file_type(s)
     #    that are synced and missing on the primary
     def count_synced_missing_on_primary
-      syncable.synced.missing_on_primary.count
+      registry_class.synced.missing_on_primary.count
     end
 
     # @!method count_registry
     #    Return a count of the registry records for the tracked file_type(s)
     def count_registry
-      syncable.count
+      registry_class.count
     end
 
     # @!method find_registry_differences
@@ -55,7 +55,7 @@ module Geo
     # @return [Array] the first element is an Array of untracked IDs, and the second element is an Array of tracked IDs that are unused
     def find_registry_differences(range)
       source_ids = replicables.id_in(range).pluck(replicable_primary_key) # rubocop:disable CodeReuse/ActiveRecord
-      tracked_ids = syncable.pluck_model_ids_in_range(range)
+      tracked_ids = registry_class.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
       unused_tracked_ids = tracked_ids - source_ids
@@ -84,7 +84,7 @@ module Geo
     #
     # rubocop:disable CodeReuse/ActiveRecord
     def find_never_synced_registries(batch_size:, except_ids: [])
-      syncable
+      registry_class
         .never
         .model_id_not_in(except_ids)
         .limit(batch_size)
@@ -101,7 +101,7 @@ module Geo
     #
     # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_failed_registries(batch_size:, except_ids: [])
-      syncable
+      registry_class
         .failed
         .retry_due
         .model_id_not_in(except_ids)
@@ -119,7 +119,7 @@ module Geo
     #
     # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_synced_missing_on_primary_registries(batch_size:, except_ids: [])
-      syncable
+      registry_class
         .synced
         .missing_on_primary
         .retry_due
@@ -128,9 +128,9 @@ module Geo
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
-    # @!method syncable
+    # @!method registry_class
     #    Return an ActiveRecord::Base class for the tracked file_type(s)
-    def syncable
+    def registry_class
       raise NotImplementedError,
         "#{self.class} does not implement #{__method__}"
     end
@@ -143,11 +143,11 @@ module Geo
         "#{self.class} does not implement #{__method__}"
     end
 
-    # @!method syncable
+    # @!method registry_class
     #    Return the fully qualified name of the replicable primary key for the
     #    tracked file_type(s)
     def replicable_primary_key
-      syncable::MODEL_CLASS.arel_table[:id]
+      registry_class::MODEL_CLASS.arel_table[:id]
     end
 
     def local_storage_only?
