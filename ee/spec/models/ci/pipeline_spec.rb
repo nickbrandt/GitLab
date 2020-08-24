@@ -169,6 +169,14 @@ RSpec.describe Ci::Pipeline do
           expect(subject.get_report('container_scanning', cs1_artifact).findings.size).to eq(8)
         end
       end
+
+      context 'when the `report_types` parameter is provided' do
+        subject(:filtered_report_types) { pipeline.security_reports(report_types: %w(sast)).reports.values.map(&:type).uniq }
+
+        it 'returns only the reports which are requested' do
+          expect(filtered_report_types).to eq(%w(sast))
+        end
+      end
     end
 
     context 'when pipeline does not have any builds with security reports' do
