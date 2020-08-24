@@ -11420,6 +11420,16 @@ type Project {
     after: String
 
     """
+    Username of the assignee
+    """
+    assigneeUsername: String
+
+    """
+    Username of the author
+    """
+    authorUsername: String
+
+    """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
@@ -11453,6 +11463,11 @@ type Project {
     Merge requests merged before this date
     """
     mergedBefore: Time
+
+    """
+    Title of the milestone
+    """
+    milestoneTitle: String
 
     """
     Array of source branch names. All resolved merge requests will have one of these branches as their source.
@@ -16512,6 +16527,11 @@ type User {
     mergedBefore: Time
 
     """
+    Title of the milestone
+    """
+    milestoneTitle: String
+
+    """
     The global ID of the project the authored merge requests should be in. Incompatible with projectPath.
     """
     projectId: ID
@@ -16580,6 +16600,11 @@ type User {
     Merge requests merged before this date
     """
     mergedBefore: Time
+
+    """
+    Title of the milestone
+    """
+    milestoneTitle: String
 
     """
     The global ID of the project the authored merge requests should be in. Incompatible with projectPath.
