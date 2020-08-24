@@ -407,8 +407,24 @@ RSpec.describe Namespace do
           FileUtils.mkdir_p(File.join(pages_dir, project.full_path))
         end
 
+        after do
+          FileUtils.remove_entry(File.join(TestEnv.repos_path, parent.full_path), true)
+          FileUtils.remove_entry(File.join(uploads_dir, project.full_path), true)
+          FileUtils.remove_entry(File.join(pages_dir, project.full_path), true)
+        end
+
         context 'renaming child' do
-          it 'correctly moves the repository, uploads and pages' do
+          context 'when async_pages_move_namespace_rename is disabled' do
+            it 'correctly moves the repository, uploads and pages' do
+              stub_feature_flags(async_pages_move_namespace_rename: false)
+
+              child.update!(path: 'renamed')
+
+              expect_project_directories_at('parent/renamed')
+            end
+          end
+
+          it 'correctly moves the repository, uploads and pages', :sidekiq_inline do
             child.update!(path: 'renamed')
 
             expect_project_directories_at('parent/renamed')
@@ -416,7 +432,17 @@ RSpec.describe Namespace do
         end
 
         context 'renaming parent' do
-          it 'correctly moves the repository, uploads and pages' do
+          context 'when async_pages_move_namespace_rename is disabled' do
+            it 'correctly moves the repository, uploads and pages' do
+              stub_feature_flags(async_pages_move_namespace_rename: false)
+
+              parent.update!(path: 'renamed')
+
+              expect_project_directories_at('renamed/child')
+            end
+          end
+
+          it 'correctly moves the repository, uploads and pages', :sidekiq_inline do
             parent.update!(path: 'renamed')
 
             expect_project_directories_at('renamed/child')

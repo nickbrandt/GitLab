@@ -26,7 +26,16 @@ module Storage
         Gitlab::PagesTransfer.new.move_namespace(path, former_parent_full_path, parent_full_path)
       else
         Gitlab::UploadsTransfer.new.rename_namespace(full_path_before_last_save, full_path)
-        Gitlab::PagesTransfer.new.rename_namespace(full_path_before_last_save, full_path)
+
+        if ::Feature.enabled?(:async_pages_move_namespace_rename, self)
+          full_path_was = full_path_before_last_save
+
+          run_after_commit do
+            Gitlab::PagesTransfer.new.async.rename_namespace(full_path_was, full_path)
+          end
+        else
+          Gitlab::PagesTransfer.new.rename_namespace(full_path_before_last_save, full_path)
+        end
       end
 
       # If repositories moved successfully we need to
