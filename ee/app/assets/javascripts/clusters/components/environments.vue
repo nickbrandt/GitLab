@@ -1,14 +1,13 @@
 <script>
-import { GlTable, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { GlTable, GlEmptyState, GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 
 export default {
   components: {
     GlEmptyState,
     GlTable,
-    Icon,
+    GlIcon,
     TimeAgo,
     GlLoadingIcon,
     deploymentInstance: () => import('ee_component/vue_shared/components/deployment_instance.vue'),
@@ -153,7 +152,7 @@ export default {
 
         <!-- Empty state -->
         <div v-else class="deployments-empty d-flex">
-          <icon
+          <gl-icon
             name="warning"
             :size="18"
             class="cluster-deployments-warning mr-2 align-self-center flex-shrink-0"

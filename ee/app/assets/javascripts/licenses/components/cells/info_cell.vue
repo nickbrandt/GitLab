@@ -1,12 +1,11 @@
 <script>
-import { GlPopover } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlPopover, GlIcon } from '@gitlab/ui';
 import Cell from './cell.vue';
 
 export default {
   name: 'InfoCell',
   components: {
-    Icon,
+    GlIcon,
     GlPopover,
     Cell,
   },
@@ -44,7 +43,7 @@ export default {
       <span class="mr-2 text">{{ title }}</span>
 
       <button ref="popoverTarget" type="button" class="btn-link information-target">
-        <icon name="information" class="icon d-block" />
+        <gl-icon name="information" class="icon d-block" />
       </button>
 
       <gl-popover

@@ -1,10 +1,9 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import { getIssueStatusFromLicenseStatus } from 'ee/vue_shared/license_compliance/store/utils';
 import { LICENSE_MANAGEMENT } from 'ee/vue_shared/license_compliance/store/constants';
 import { s__ } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
 
 import { LICENSE_APPROVAL_STATUS, LICENSE_APPROVAL_ACTION } from '../constants';
@@ -18,7 +17,7 @@ export default {
     GlDeprecatedDropdown,
     GlDeprecatedDropdownItem,
     GlLoadingIcon,
-    Icon,
+    GlIcon,
     IssueStatusIcon,
   },
   props: {
@@ -78,11 +77,11 @@ export default {
           right
         >
           <gl-deprecated-dropdown-item @click="allowLicense(license)">
-            <icon :class="approveIconClass" name="mobile-issue-close" />
+            <gl-icon :class="approveIconClass" name="mobile-issue-close" />
             {{ $options[$options.LICENSE_APPROVAL_ACTION.ALLOW] }}
           </gl-deprecated-dropdown-item>
           <gl-deprecated-dropdown-item @click="denyLicense(license)">
-            <icon :class="blacklistIconClass" name="mobile-issue-close" />
+            <gl-icon :class="blacklistIconClass" name="mobile-issue-close" />
             {{ $options[$options.LICENSE_APPROVAL_ACTION.DENY] }}
           </gl-deprecated-dropdown-item>
         </gl-deprecated-dropdown>
@@ -94,7 +93,7 @@ export default {
           data-target="#modal-license-delete-confirmation"
           @click="setLicenseInModal(license)"
         >
-          <icon name="remove" />
+          <gl-icon name="remove" />
         </button>
       </div>
     </div>

@@ -1,8 +1,6 @@
 <script>
 import { uniqueId } from 'lodash';
-import { GlSkeletonLoader } from '@gitlab/ui';
-
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlSkeletonLoader, GlIcon } from '@gitlab/ui';
 
 import accordionEventBus from './accordion_event_bus';
 
@@ -11,7 +9,7 @@ const accordionItemUniqueId = name => uniqueId(`gl-accordion-item-${name}-`);
 export default {
   components: {
     GlSkeletonLoader,
-    Icon,
+    GlIcon,
   },
   props: {
     accordionId: {
@@ -107,7 +105,7 @@ export default {
             class="d-flex align-items-center p-2"
             :class="{ 'list-group-item-action': !isDisabled }"
           >
-            <icon
+            <gl-icon
               :size="16"
               class="mr-2 gl-text-gray-900"
               :name="isExpanded ? 'angle-down' : 'angle-right'"

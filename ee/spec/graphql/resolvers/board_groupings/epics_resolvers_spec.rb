@@ -78,6 +78,13 @@ RSpec.describe Resolvers::BoardGroupings::EpicsResolver do
         expect(result).to match_array([epic1])
       end
 
+      it 'finds only epics for issues matching search param' do
+        result = resolve_board_epics(
+          group_board, { issue_filters: { search: issue1.title } })
+
+        expect(result).to match_array([epic1])
+      end
+
       it 'accepts negated issue params' do
         expect(Boards::Issues::ListService).to receive(:new).with(
           group_board.resource_parent,

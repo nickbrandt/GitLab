@@ -1,10 +1,10 @@
 <script>
+import { GlIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
-    Icon,
+    GlIcon,
   },
   props: {
     selectedEpicTitle: {
@@ -34,6 +34,6 @@ export default {
     data-toggle="dropdown"
   >
     <span class="dropdown-toggle-text" :class="toggleTextClass">{{ buttonText }}</span>
-    <icon name="chevron-down" class="dropdown-menu-toggle-icon" />
+    <gl-icon name="chevron-down" class="dropdown-menu-toggle-icon" />
   </button>
 </template>
