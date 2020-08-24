@@ -16,7 +16,7 @@ RSpec.describe AuditEvent, type: :model do
   describe 'callbacks' do
     context 'parallel_persist' do
       let_it_be(:details) do
-        { author_name: 'Kungfu Panda', entity_path: 'gitlab-org/gitlab', target_details: 'Project X' }
+        { author_name: 'Kungfu Panda', entity_path: 'gitlab-org/gitlab', target_details: 'Project X', target_type: 'User' }
       end
       let_it_be(:event) { create(:project_audit_event, details: details, entity_path: nil, target_details: nil) }
 
