@@ -551,6 +551,9 @@ msgstr ""
 msgid "%{milestone} (expired)"
 msgstr ""
 
+msgid "%{milliseconds}ms"
+msgstr ""
+
 msgid "%{mrText}, this issue will be closed automatically."
 msgstr ""
 
@@ -661,6 +664,9 @@ msgid "%{reportType} %{status} detected no vulnerabilities."
 msgstr ""
 
 msgid "%{retryButtonStart}Try again%{retryButtonEnd} or %{newFileButtonStart}attach a new file%{newFileButtonEnd}"
+msgstr ""
+
+msgid "%{seconds}s"
 msgstr ""
 
 msgid "%{securityScanner} is not enabled for this project. %{linkStart}More information%{linkEnd}"
