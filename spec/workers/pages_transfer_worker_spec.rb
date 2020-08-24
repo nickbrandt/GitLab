@@ -13,8 +13,6 @@ RSpec.describe PagesTransferWorker do
       before do
         FileUtils.mkdir_p(pages_path_before)
         FileUtils.touch(config_path_before)
-
-        setup!
       end
 
       after do
@@ -54,7 +52,7 @@ RSpec.describe PagesTransferWorker do
       # Store the path before we change it
       let!(:args) { [project.path, subgroup.full_path, new_path] }
 
-      def setup!
+      before do
         # We need to skip hooks, otherwise the directory will be moved
         # via an ActiveRecord callback
         subgroup.update_columns(parent_id: group_2.id)
@@ -73,11 +71,11 @@ RSpec.describe PagesTransferWorker do
       let(:meth) { 'move_project' }
       let(:args) { [project.path, group_1.full_path, group_2.full_path] }
 
-      def setup!
-        project.update!(group: group_2)
+      include_examples 'moving a pages directory' do
+        before do
+          project.update!(group: group_2)
+        end
       end
-
-      include_examples 'moving a pages directory'
     end
 
     describe 'when method is rename_project' do
@@ -89,11 +87,11 @@ RSpec.describe PagesTransferWorker do
       # Store the path before we change it
       let!(:args) { [project.path, new_path, project.namespace.full_path] }
 
-      def setup!
-        project.update!(path: new_path)
+      include_examples 'moving a pages directory' do
+        before do
+          project.update!(path: new_path)
+        end
       end
-
-      include_examples 'moving a pages directory'
     end
 
     describe 'when method is rename_namespace' do
@@ -106,7 +104,7 @@ RSpec.describe PagesTransferWorker do
       # Store the path before we change it
       let!(:args) { [project.namespace.full_path, new_path] }
 
-      def setup!
+      before do
         # We need to skip hooks, otherwise the directory will be moved
         # via an ActiveRecord callback
         group.update_columns(path: new_path)
