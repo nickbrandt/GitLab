@@ -58,18 +58,18 @@ func TestChannelHappyPath(t *testing.T) {
 			if err := say(server, "\x01"+message); err != nil {
 				t.Fatal(err)
 			}
-			assertReadMessage(t, client, websocket.BinaryMessage, message)
+			requireReadMessage(t, client, websocket.BinaryMessage, message)
 
 			if err := say(client, message); err != nil {
 				t.Fatal(err)
 			}
 
 			// channel.k8s.io: client writes get put on channel 0, STDIN
-			assertReadMessage(t, server, websocket.BinaryMessage, "\x00"+message)
+			requireReadMessage(t, server, websocket.BinaryMessage, "\x00"+message)
 
 			// Closing the client should send an EOT signal to the server's STDIN
 			client.Close()
-			assertReadMessage(t, server, websocket.BinaryMessage, "\x00\x04")
+			requireReadMessage(t, server, websocket.BinaryMessage, "\x00\x04")
 		})
 	}
 }
@@ -260,7 +260,7 @@ func say(conn *websocket.Conn, message string) error {
 	return conn.WriteMessage(websocket.TextMessage, []byte(message))
 }
 
-func assertReadMessage(t *testing.T, conn *websocket.Conn, expectedMessageType int, expectedData string) {
+func requireReadMessage(t *testing.T, conn *websocket.Conn, expectedMessageType int, expectedData string) {
 	messageType, data, err := conn.ReadMessage()
 	if err != nil {
 		t.Fatal(err)

@@ -50,16 +50,16 @@ func TestDownloadingFromValidArchive(t *testing.T) {
 
 	response := testEntryServer(t, tempFile.Name(), "test.txt")
 
-	testhelper.AssertResponseCode(t, response, 200)
+	testhelper.RequireResponseCode(t, response, 200)
 
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"test.txt\"")
 
-	testhelper.AssertResponseBody(t, response, "testtest")
+	testhelper.RequireResponseBody(t, response, "testtest")
 }
 
 func TestDownloadingFromValidHTTPArchive(t *testing.T) {
@@ -84,16 +84,16 @@ func TestDownloadingFromValidHTTPArchive(t *testing.T) {
 
 	response := testEntryServer(t, fileServer.URL+"/archive.zip", "test.txt")
 
-	testhelper.AssertResponseCode(t, response, 200)
+	testhelper.RequireResponseCode(t, response, 200)
 
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"test.txt\"")
 
-	testhelper.AssertResponseBody(t, response, "testtest")
+	testhelper.RequireResponseBody(t, response, "testtest")
 }
 
 func TestDownloadingNonExistingFile(t *testing.T) {
@@ -107,17 +107,17 @@ func TestDownloadingNonExistingFile(t *testing.T) {
 	archive.Close()
 
 	response := testEntryServer(t, tempFile.Name(), "test")
-	testhelper.AssertResponseCode(t, response, 404)
+	testhelper.RequireResponseCode(t, response, 404)
 }
 
 func TestDownloadingFromInvalidArchive(t *testing.T) {
 	response := testEntryServer(t, "path/to/non/existing/file", "test")
-	testhelper.AssertResponseCode(t, response, 404)
+	testhelper.RequireResponseCode(t, response, 404)
 }
 
 func TestIncompleteApiResponse(t *testing.T) {
 	response := testEntryServer(t, "", "")
-	testhelper.AssertResponseCode(t, response, 500)
+	testhelper.RequireResponseCode(t, response, 500)
 }
 
 func TestDownloadingFromNonExistingHTTPArchive(t *testing.T) {
@@ -130,5 +130,5 @@ func TestDownloadingFromNonExistingHTTPArchive(t *testing.T) {
 
 	response := testEntryServer(t, fileServer.URL+"/not-existing-archive-file.zip", "test.txt")
 
-	testhelper.AssertResponseCode(t, response, 404)
+	testhelper.RequireResponseCode(t, response, 404)
 }

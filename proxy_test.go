@@ -66,8 +66,8 @@ func TestProxyRequest(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
-	testhelper.AssertResponseCode(t, w, 202)
-	testhelper.AssertResponseBody(t, w, "RESPONSE")
+	testhelper.RequireResponseCode(t, w, 202)
+	testhelper.RequireResponseBody(t, w, "RESPONSE")
 
 	if w.Header().Get("Custom-Response-Header") != "test" {
 		t.Fatal("Expected custom response header")
@@ -83,8 +83,8 @@ func TestProxyError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy("http://localhost:655575/", nil).ServeHTTP(w, httpRequest)
-	testhelper.AssertResponseCode(t, w, 502)
-	testhelper.AssertResponseBodyRegexp(t, w, regexp.MustCompile("dial tcp:.*invalid port.*"))
+	testhelper.RequireResponseCode(t, w, 502)
+	testhelper.RequireResponseBodyRegexp(t, w, regexp.MustCompile("dial tcp:.*invalid port.*"))
 }
 
 func TestProxyReadTimeout(t *testing.T) {
@@ -110,8 +110,8 @@ func TestProxyReadTimeout(t *testing.T) {
 	p := newProxy(ts.URL, rt)
 	w := httptest.NewRecorder()
 	p.ServeHTTP(w, httpRequest)
-	testhelper.AssertResponseCode(t, w, 502)
-	testhelper.AssertResponseBody(t, w, "GitLab is not responding")
+	testhelper.RequireResponseCode(t, w, 502)
+	testhelper.RequireResponseBody(t, w, "GitLab is not responding")
 }
 
 func TestProxyHandlerTimeout(t *testing.T) {
@@ -128,6 +128,6 @@ func TestProxyHandlerTimeout(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
-	testhelper.AssertResponseCode(t, w, 503)
-	testhelper.AssertResponseBody(t, w, "Request took too long")
+	testhelper.RequireResponseCode(t, w, 503)
+	testhelper.RequireResponseBody(t, w, "Request took too long")
 }

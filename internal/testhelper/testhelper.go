@@ -33,9 +33,10 @@ func ConfigureSecret() {
 
 var extractPatchSeriesMatcher = regexp.MustCompile(`^From (\w+)`)
 
-// AssertPatchSeries takes a `git format-patch` blob, extracts the From xxxxx
+// RequirePatchSeries takes a `git format-patch` blob, extracts the From xxxxx
 // lines and compares the SHAs to expected list.
-func AssertPatchSeries(t *testing.T, blob []byte, expected ...string) {
+func RequirePatchSeries(t *testing.T, blob []byte, expected ...string) {
+	t.Helper()
 	var actual []string
 	footer := make([]string, 3)
 
@@ -60,31 +61,36 @@ func AssertPatchSeries(t *testing.T, blob []byte, expected ...string) {
 	}
 }
 
-func AssertResponseCode(t *testing.T, response *httptest.ResponseRecorder, expectedCode int) {
+func RequireResponseCode(t *testing.T, response *httptest.ResponseRecorder, expectedCode int) {
+	t.Helper()
 	if response.Code != expectedCode {
 		t.Fatalf("for HTTP request expected to get %d, got %d instead", expectedCode, response.Code)
 	}
 }
 
-func AssertResponseBody(t *testing.T, response *httptest.ResponseRecorder, expectedBody string) {
+func RequireResponseBody(t *testing.T, response *httptest.ResponseRecorder, expectedBody string) {
+	t.Helper()
 	if response.Body.String() != expectedBody {
 		t.Fatalf("for HTTP request expected to receive %q, got %q instead as body", expectedBody, response.Body.String())
 	}
 }
 
-func AssertResponseBodyRegexp(t *testing.T, response *httptest.ResponseRecorder, expectedBody *regexp.Regexp) {
+func RequireResponseBodyRegexp(t *testing.T, response *httptest.ResponseRecorder, expectedBody *regexp.Regexp) {
+	t.Helper()
 	if !expectedBody.MatchString(response.Body.String()) {
 		t.Fatalf("for HTTP request expected to receive body matching %q, got %q instead", expectedBody.String(), response.Body.String())
 	}
 }
 
-func AssertResponseWriterHeader(t *testing.T, w http.ResponseWriter, header string, expected ...string) {
+func RequireResponseWriterHeader(t *testing.T, w http.ResponseWriter, header string, expected ...string) {
+	t.Helper()
 	actual := w.Header()[http.CanonicalHeaderKey(header)]
 
-	assertHeaderExists(t, header, actual, expected)
+	requireHeaderExists(t, header, actual, expected)
 }
 
-func AssertAbsentResponseWriterHeader(t *testing.T, w http.ResponseWriter, header string) {
+func RequireAbsentResponseWriterHeader(t *testing.T, w http.ResponseWriter, header string) {
+	t.Helper()
 	actual := w.Header()[http.CanonicalHeaderKey(header)]
 
 	if len(actual) != 0 {
@@ -92,7 +98,8 @@ func AssertAbsentResponseWriterHeader(t *testing.T, w http.ResponseWriter, heade
 	}
 }
 
-func AssertResponseHeader(t *testing.T, w interface{}, header string, expected ...string) {
+func RequireResponseHeader(t *testing.T, w interface{}, header string, expected ...string) {
+	t.Helper()
 	var actual []string
 
 	header = http.CanonicalHeaderKey(header)
@@ -104,13 +111,14 @@ func AssertResponseHeader(t *testing.T, w interface{}, header string, expected .
 	} else if resp, ok := w.(*httptest.ResponseRecorder); ok {
 		actual = resp.Header()[header]
 	} else {
-		t.Fatalf("invalid type of w passed AssertResponseHeader")
+		t.Fatalf("invalid type of w passed RequireResponseHeader")
 	}
 
-	assertHeaderExists(t, header, actual, expected)
+	requireHeaderExists(t, header, actual, expected)
 }
 
-func assertHeaderExists(t *testing.T, header string, actual, expected []string) {
+func requireHeaderExists(t *testing.T, header string, actual, expected []string) {
+	t.Helper()
 	if len(expected) != len(actual) {
 		t.Fatalf("for HTTP request expected to receive the header %q with %+v, got %+v", header, expected, actual)
 	}

@@ -84,16 +84,16 @@ func testEntryServer(t *testing.T, requestURL string, httpHeaders http.Header, a
 
 func TestDownloadingUsingSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/request", nil, false)
-	testhelper.AssertResponseCode(t, response, http.StatusOK)
+	testhelper.RequireResponseCode(t, response, http.StatusOK)
 
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"archive.txt\"")
 
-	testhelper.AssertResponseBody(t, response, testData)
+	testhelper.RequireResponseBody(t, response, testData)
 }
 
 func TestDownloadingAChunkOfDataWithSendURL(t *testing.T) {
@@ -104,19 +104,19 @@ func TestDownloadingAChunkOfDataWithSendURL(t *testing.T) {
 	}
 
 	response := testEntryServer(t, "/get/request", httpHeaders, false)
-	testhelper.AssertResponseCode(t, response, http.StatusPartialContent)
+	testhelper.RequireResponseCode(t, response, http.StatusPartialContent)
 
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"archive.txt\"")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Range",
 		"bytes 1-2/30")
 
-	testhelper.AssertResponseBody(t, response, "23")
+	testhelper.RequireResponseBody(t, response, "23")
 }
 
 func TestAccessingAlreadyDownloadedFileWithSendURL(t *testing.T) {
@@ -125,22 +125,22 @@ func TestAccessingAlreadyDownloadedFileWithSendURL(t *testing.T) {
 	}
 
 	response := testEntryServer(t, "/get/request", httpHeaders, false)
-	testhelper.AssertResponseCode(t, response, http.StatusNotModified)
+	testhelper.RequireResponseCode(t, response, http.StatusNotModified)
 }
 
 func TestAccessingRedirectWithSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/redirect", nil, false)
-	testhelper.AssertResponseCode(t, response, http.StatusTemporaryRedirect)
+	testhelper.RequireResponseCode(t, response, http.StatusTemporaryRedirect)
 }
 
 func TestAccessingAllowedRedirectWithSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/redirect", nil, true)
-	testhelper.AssertResponseCode(t, response, http.StatusOK)
+	testhelper.RequireResponseCode(t, response, http.StatusOK)
 
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"archive.txt\"")
 }
@@ -153,45 +153,45 @@ func TestAccessingAllowedRedirectWithChunkOfDataWithSendURL(t *testing.T) {
 	}
 
 	response := testEntryServer(t, "/get/redirect", httpHeaders, true)
-	testhelper.AssertResponseCode(t, response, http.StatusPartialContent)
+	testhelper.RequireResponseCode(t, response, http.StatusPartialContent)
 
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"archive.txt\"")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Content-Range",
 		"bytes 1-2/30")
 
-	testhelper.AssertResponseBody(t, response, "23")
+	testhelper.RequireResponseBody(t, response, "23")
 }
 
 func TestOriginalCacheHeadersPreservedWithSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/redirect", nil, true)
-	testhelper.AssertResponseCode(t, response, http.StatusOK)
+	testhelper.RequireResponseCode(t, response, http.StatusOK)
 
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Cache-Control",
 		"no-cache")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Expires",
 		"")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Date",
 		"Wed, 21 Oct 2015 05:28:00 GMT")
-	testhelper.AssertResponseWriterHeader(t, response,
+	testhelper.RequireResponseWriterHeader(t, response,
 		"Pragma",
 		"no-cache")
 }
 
 func TestDownloadingNonExistingFileUsingSendURL(t *testing.T) {
 	response := testEntryServer(t, "/invalid/path", nil, false)
-	testhelper.AssertResponseCode(t, response, http.StatusNotFound)
+	testhelper.RequireResponseCode(t, response, http.StatusNotFound)
 }
 
 func TestDownloadingNonExistingRemoteFileWithSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/file-not-existing", nil, false)
-	testhelper.AssertResponseCode(t, response, http.StatusNotFound)
+	testhelper.RequireResponseCode(t, response, http.StatusNotFound)
 }

@@ -13,5 +13,5 @@ func TestSetBlobHeaders(t *testing.T) {
 
 	setBlobHeaders(w)
 
-	testhelper.AssertAbsentResponseWriterHeader(t, w, "Set-Cookie")
+	testhelper.RequireAbsentResponseWriterHeader(t, w, "Set-Cookie")
 }

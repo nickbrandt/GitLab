@@ -36,5 +36,5 @@ func TestDevelopmentModeDisabled(t *testing.T) {
 	if executed {
 		t.Error("The handler should not get executed")
 	}
-	testhelper.AssertResponseCode(t, w, 404)
+	testhelper.RequireResponseCode(t, w, 404)
 }

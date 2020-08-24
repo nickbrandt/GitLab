@@ -61,7 +61,7 @@ var (
 	fakeOther = fake(other, []byte("foo"), nil)
 )
 
-func assertEqual(t *testing.T, expected, actual *fakeConn, msg string, args ...interface{}) {
+func requireEqualConn(t *testing.T, expected, actual *fakeConn, msg string, args ...interface{}) {
 	if expected.mt != actual.mt {
 		t.Logf("messageType expected to be %v but was %v", expected.mt, actual.mt)
 		t.Fatalf(msg, args...)
@@ -111,7 +111,7 @@ func TestReadMessage(t *testing.T) {
 			conn := Wrap(tc.input, subprotocol)
 			mt, data, err := conn.ReadMessage()
 			actual := fake(mt, data, err)
-			assertEqual(t, tc.expected, actual, "%s test case %v", subprotocol, i)
+			requireEqualConn(t, tc.expected, actual, "%s test case %v", subprotocol, i)
 		}
 	}
 }
@@ -149,7 +149,7 @@ func TestWriteMessage(t *testing.T) {
 			actual := fake(0, nil, tc.input.err)
 			conn := Wrap(actual, subprotocol)
 			actual.err = conn.WriteMessage(tc.input.mt, tc.input.data)
-			assertEqual(t, tc.expected, actual, "%s test case %v", subprotocol, i)
+			requireEqualConn(t, tc.expected, actual, "%s test case %v", subprotocol, i)
 		}
 	}
 }

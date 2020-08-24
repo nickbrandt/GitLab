@@ -177,7 +177,7 @@ func TestAllowedGetGitBlob(t *testing.T) {
 
 	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
 	assert.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
-	testhelper.AssertResponseHeader(t, resp, "Content-Length", strconv.Itoa(bodyLen))
+	testhelper.RequireResponseHeader(t, resp, "Content-Length", strconv.Itoa(bodyLen))
 	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 }
 
@@ -317,7 +317,7 @@ func TestAllowedGetGitFormatPatch(t *testing.T) {
 	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
 	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 
-	testhelper.AssertPatchSeries(
+	testhelper.RequirePatchSeries(
 		t,
 		body,
 		"372ab6950519549b14d220271ee2322caa44d4eb",

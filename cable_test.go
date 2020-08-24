@@ -35,10 +35,10 @@ func TestSingleBackend(t *testing.T) {
 	defer server.Close()
 
 	require.NoError(t, say(client, "hello"))
-	assertReadMessage(t, server, websocket.TextMessage, "hello")
+	requireReadMessage(t, server, websocket.TextMessage, "hello")
 
 	require.NoError(t, say(server, "world"))
-	assertReadMessage(t, client, websocket.TextMessage, "world")
+	requireReadMessage(t, client, websocket.TextMessage, "world")
 }
 
 func TestSeparateCableBackend(t *testing.T) {
@@ -62,10 +62,10 @@ func TestSeparateCableBackend(t *testing.T) {
 	defer server.Close()
 
 	require.NoError(t, say(client, "hello"))
-	assertReadMessage(t, server, websocket.TextMessage, "hello")
+	requireReadMessage(t, server, websocket.TextMessage, "hello")
 
 	require.NoError(t, say(server, "world"))
-	assertReadMessage(t, client, websocket.TextMessage, "world")
+	requireReadMessage(t, client, websocket.TextMessage, "world")
 }
 
 func startCableServer() (chan connWithReq, *httptest.Server) {
