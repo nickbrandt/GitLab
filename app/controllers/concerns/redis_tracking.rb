@@ -1,19 +1,18 @@
 # frozen_string_literal: true
 
-module RedisTrackingHelper
+# Example:
+#
+# # In controller include module
+# # Track event for index action
+#
+# include RedisTracking
+#
+# track_redis_hll_event :index, :show, name: 'i_analytics_dev_ops_score', feature: :my_feature
+module RedisTracking
   extend ActiveSupport::Concern
 
-  # Example:
-  #
-  # # In controller include helper
-  # # Track event for index action
-  #
-  # include RedisTrackingHelper
-  #
-  # track_redis_hll_event :index, :show, name: 'i_analytics_dev_ops_score', feature: :my_feature
-  #
   class_methods do
-    def track_redis_hll_events(*controller_actions, name:, feature:)
+    def track_redis_hll_event(*controller_actions, name:, feature:)
       after_action only: controller_actions, if: -> { request.format.html? && request.headers['DNT'] != '1' } do
         track_unique_redis_hll_event(name, feature)
       end
