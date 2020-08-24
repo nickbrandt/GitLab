@@ -45,7 +45,11 @@ export default {
 };
 </script>
 <template>
-  <gl-dropdown right :text="$options.MSG_EMBED" menu-class="gl-px-1! gl-pb-5!">
+  <gl-dropdown
+    right
+    :text="$options.MSG_EMBED"
+    menu-class="gl-px-1! gl-pb-5! gl-dropdown-menu-wide"
+  >
     <template v-for="{ name, value } in sections">
       <gl-dropdown-header :key="`header_${name}`" data-testid="header">{{
         name
@@ -53,7 +57,7 @@ export default {
       <gl-dropdown-text
         :key="`input_${name}`"
         tag="div"
-        class="gl-dropdown-text-py-0"
+        class="gl-dropdown-text-py-0 gl-dropdown-text-block"
         data-testid="input"
       >
         <gl-form-input-group :value="value" readonly select-on-click>
