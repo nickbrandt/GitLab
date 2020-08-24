@@ -1,10 +1,10 @@
 <script>
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 
 export default {
   name: 'ResolveDiscussionButton',
   components: {
-    GlLoadingIcon,
+    GlButton,
   },
   props: {
     isResolving: {
@@ -21,8 +21,13 @@ export default {
 </script>
 
 <template>
-  <button ref="button" type="button" class="btn btn-default ml-sm-2" @click="$emit('onClick')">
-    <gl-loading-icon v-if="isResolving" ref="isResolvingIcon" inline />
+  <gl-button
+    data-testid="discussion-resolve-button"
+    type="button"
+    class="ml-sm-2"
+    :loading="isResolving"
+    @click="$emit('onClick')"
+  >
     {{ buttonTitle }}
-  </button>
+  </gl-button>
 </template>

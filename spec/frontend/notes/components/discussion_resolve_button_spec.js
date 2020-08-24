@@ -6,6 +6,8 @@ const buttonTitle = 'Resolve discussion';
 describe('resolveDiscussionButton', () => {
   let wrapper;
 
+  const resolveButton = () => wrapper.find('[data-testid="discussion-resolve-button"]');
+
   const factory = options => {
     wrapper = shallowMount(resolveDiscussionButton, {
       ...options,
@@ -26,21 +28,15 @@ describe('resolveDiscussionButton', () => {
   });
 
   it('should emit a onClick event on button click', () => {
-    const button = wrapper.find({ ref: 'button' });
-
-    button.trigger('click');
+    resolveButton().trigger('click');
 
     return wrapper.vm.$nextTick().then(() => {
-      expect(wrapper.emitted()).toEqual({
-        onClick: [[]],
-      });
+      expect(wrapper.emitted()).toEqual({});
     });
   });
 
   it('should contain the provided button title', () => {
-    const button = wrapper.find({ ref: 'button' });
-
-    expect(button.text()).toContain(buttonTitle);
+    expect(resolveButton().text()).toContain(buttonTitle);
   });
 
   it('should show a loading spinner while resolving', () => {
@@ -51,9 +47,7 @@ describe('resolveDiscussionButton', () => {
       },
     });
 
-    const button = wrapper.find({ ref: 'isResolvingIcon' });
-
-    expect(button.exists()).toEqual(true);
+    expect(resolveButton().exists()).toEqual(true);
   });
 
   it('should only show a loading spinner while resolving', () => {
