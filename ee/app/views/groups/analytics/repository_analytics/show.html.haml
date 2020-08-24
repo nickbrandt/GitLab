@@ -7,4 +7,5 @@
 .d-flex.justify-content-between.align-items-center
   %h4.sub-header
     = _("Test Code Coverage")
-  = link_to _("Download historic test coverage data (.csv)"), group_analytics_coverage_reports_path(@group, format: :csv), class: 'btn btn-sm'
+  = link_to _("Download historic test coverage data (.csv)"), group_analytics_coverage_reports_path(@group, format: :csv, ref_path: "refs/heads/master", start_date: Date.today - 1.year, end_date: Date.today),
+      rel: 'nofollow', download: '', method: :get, class: 'gl-button btn-sm'
