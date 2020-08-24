@@ -1,7 +1,7 @@
 import { safeDump } from 'js-yaml';
 import { ruleSpec } from './rules';
 import { labelSelector } from './utils';
-import { EndpointMatchModeAny } from '../constants';
+import { EndpointMatchModeAny, DisabledByLabel } from '../constants';
 
 /*
  Return kubernetes resource specification object for a policy.
@@ -26,7 +26,7 @@ function spec({ description, rules, isEnabled, endpointMatchMode, endpointLabels
   if (!isEnabled) {
     policySpec.endpointSelector.matchLabels = {
       ...policySpec.endpointSelector.matchLabels,
-      'network-policy.gitlab.com/disabled_by': 'gitlab',
+      [DisabledByLabel]: 'gitlab',
     };
   }
 
