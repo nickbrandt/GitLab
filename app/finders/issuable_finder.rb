@@ -44,6 +44,7 @@ class IssuableFinder
   NEGATABLE_PARAMS_HELPER_KEYS = %i[project_id scope status include_subgroups].freeze
 
   attr_accessor :current_user, :params
+  attr_writer :parent
 
   delegate(*%i[assignee milestones], to: :params)
 
@@ -202,10 +203,6 @@ class IssuableFinder
 
       attempt_group_search_optimizations? || attempt_project_search_optimizations?
     end
-  end
-
-  def parent=(obj)
-    @parent = obj
   end
 
   def parent_param=(obj)
