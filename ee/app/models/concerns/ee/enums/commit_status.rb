@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module EE
-  module Ci
-    module PipelineEnums
+  module Enums
+    module CommitStatus
       extend ActiveSupport::Concern
 
       class_methods do
@@ -10,11 +10,9 @@ module EE
 
         override :failure_reasons
         def failure_reasons
-          super.merge(
-            activity_limit_exceeded: 20,
-            size_limit_exceeded: 21,
-            job_activity_limit_exceeded: 22
-          )
+          super.merge(protected_environment_failure: 1_000,
+                      upstream_bridge_project_not_found: 1_004,
+                      insufficient_upstream_permissions: 1_005)
         end
       end
     end
