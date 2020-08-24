@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import createStore from 'ee/threat_monitoring/store';
 import NetworkPolicyList from 'ee/threat_monitoring/components/network_policy_list.vue';
 import { GlTable } from '@gitlab/ui';
+import { useFakeDate } from 'helpers/fake_date';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 import { mockPoliciesResponse } from '../mock_data';
@@ -9,6 +10,8 @@ import { mockPoliciesResponse } from '../mock_data';
 const mockData = mockPoliciesResponse.map(policy => convertObjectPropsToCamelCase(policy));
 
 describe('NetworkPolicyList component', () => {
+  useFakeDate();
+
   let store;
   let wrapper;
 
