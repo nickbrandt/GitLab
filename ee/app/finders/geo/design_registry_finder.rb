@@ -3,24 +3,21 @@
 module Geo
   class DesignRegistryFinder < RegistryFinder
     def registry_count
-      designs.count
+      registry_class.count
     end
+    alias_method :count_registry, :registry_count
 
     def count_synced
-      registries.synced.count
+      registry_class.synced.count
     end
 
     def count_failed
-      registries.failed.count
-    end
-
-    def count_registry
-      registries.count
+      registry_class.failed.count
     end
 
     def find_registry_differences(range)
-      source_ids = designs.id_in(range).pluck_primary_key
-      tracked_ids = registries.pluck_model_ids_in_range(range)
+      source_ids = replicables.id_in(range).pluck_primary_key
+      tracked_ids = registry_class.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
       unused_tracked_ids = tracked_ids - source_ids
@@ -46,7 +43,7 @@ module Geo
     # @param [Array<Integer>] except_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
     def find_never_synced_registries(batch_size:, except_ids: [])
-      registries
+      registry_class
         .never_synced
         .model_id_not_in(except_ids)
         .limit(batch_size)
@@ -55,7 +52,7 @@ module Geo
 
     # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_dirty_registries(batch_size:, except_ids: [])
-      registries
+      registry_class
         .updated_recently
         .model_id_not_in(except_ids)
         .order(Gitlab::Database.nulls_first_order(:last_synced_at))
@@ -65,11 +62,11 @@ module Geo
 
     private
 
-    def designs
+    def replicables
       current_node.designs
     end
 
-    def registries
+    def registry_class
       Geo::DesignRegistry
     end
   end
