@@ -91,7 +91,11 @@ export default {
 </script>
 
 <template>
-  <div class="roadmap-shell" data-qa-selector="roadmap_shell" @scroll="handleScroll">
+  <div
+    class="roadmap-shell js-roadmap-shell"
+    data-qa-selector="roadmap_shell"
+    @scroll="handleScroll"
+  >
     <roadmap-timeline-section
       ref="roadmapTimeline"
       :preset-type="presetType"
