@@ -9,6 +9,11 @@ module Mutations
 
       field :id, GraphQL::ID_TYPE,
             null: true,
+            description: 'ID of the scanner profile.',
+            deprecated: { reason: 'Use `global_id`', milestone: '13.4' }
+
+      field :global_id, ::Types::GlobalIDType[::DastScannerProfile],
+            null: true,
             description: 'ID of the scanner profile.'
 
       argument :full_path, GraphQL::ID_TYPE,
@@ -36,7 +41,7 @@ module Mutations
         result = service.execute(name: profile_name, spider_timeout: spider_timeout, target_timeout: target_timeout)
 
         if result.success?
-          { id: result.payload.to_global_id, errors: [] }
+          { id: result.payload.to_global_id, global_id: result.payload.to_global_id, errors: [] }
         else
           { errors: result.errors }
         end
