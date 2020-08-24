@@ -60,7 +60,7 @@ RSpec.describe Geo::AttachmentRegistryFinder, :geo do
     end
   end
 
-  describe '#count_synced' do
+  describe '#synced_count' do
     it 'counts registries that has been synced' do
       create(:geo_upload_registry, :attachment, :failed, file_id: upload_1.id)
       create(:geo_upload_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
@@ -71,7 +71,7 @@ RSpec.describe Geo::AttachmentRegistryFinder, :geo do
       create(:geo_upload_registry, :attachment, file_id: upload_7.id, missing_on_primary: true)
       create(:geo_upload_registry, :attachment, :never_synced, file_id: upload_8.id)
 
-      expect(subject.count_synced).to eq 3
+      expect(subject.synced_count).to eq 3
     end
   end
 

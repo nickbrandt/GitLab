@@ -60,10 +60,10 @@ module Geo
     end
     alias_method :count_registry, :registry_count
 
-    # @!method count_synced
+    # @!method synced_count
     #    Return a count of the registry records for the tracked type
     #    that are synced
-    def count_synced
+    def synced_count
       registry_class.synced.count
     end
 

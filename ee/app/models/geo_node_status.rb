@@ -460,7 +460,7 @@ class GeoNodeStatus < ApplicationRecord
     return unless lfs_objects_replication_enabled
 
     self.lfs_objects_count = lfs_objects_finder.registry_count
-    self.lfs_objects_synced_count = lfs_objects_finder.count_synced
+    self.lfs_objects_synced_count = lfs_objects_finder.synced_count
     self.lfs_objects_failed_count = lfs_objects_finder.count_failed
     self.lfs_objects_registry_count = lfs_objects_finder.count_registry
     self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
@@ -470,7 +470,7 @@ class GeoNodeStatus < ApplicationRecord
     return unless job_artifacts_replication_enabled
 
     self.job_artifacts_count = job_artifacts_finder.registry_count
-    self.job_artifacts_synced_count = job_artifacts_finder.count_synced
+    self.job_artifacts_synced_count = job_artifacts_finder.synced_count
     self.job_artifacts_failed_count = job_artifacts_finder.count_failed
     self.job_artifacts_registry_count = job_artifacts_finder.count_registry
     self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
@@ -480,7 +480,7 @@ class GeoNodeStatus < ApplicationRecord
     return unless attachments_replication_enabled
 
     self.attachments_count = attachments_finder.registry_count
-    self.attachments_synced_count = attachments_finder.count_synced
+    self.attachments_synced_count = attachments_finder.synced_count
     self.attachments_failed_count = attachments_finder.count_failed
     self.attachments_registry_count = attachments_finder.count_registry
     self.attachments_synced_missing_on_primary_count = attachments_finder.count_synced_missing_on_primary
@@ -490,7 +490,7 @@ class GeoNodeStatus < ApplicationRecord
     return unless container_repositories_replication_enabled
 
     self.container_repositories_count = container_registry_finder.registry_count
-    self.container_repositories_synced_count = container_registry_finder.count_synced
+    self.container_repositories_synced_count = container_registry_finder.synced_count
     self.container_repositories_failed_count = container_registry_finder.count_failed
     self.container_repositories_registry_count = container_registry_finder.count_registry
   end
@@ -499,7 +499,7 @@ class GeoNodeStatus < ApplicationRecord
     return unless design_repositories_replication_enabled
 
     self.design_repositories_count = design_registry_finder.registry_count
-    self.design_repositories_synced_count = design_registry_finder.count_synced
+    self.design_repositories_synced_count = design_registry_finder.synced_count
     self.design_repositories_failed_count = design_registry_finder.count_failed
     self.design_repositories_registry_count = design_registry_finder.count_registry
   end

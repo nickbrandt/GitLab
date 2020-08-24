@@ -5,7 +5,7 @@ RSpec.shared_examples 'a file registry finder' do
     file_registry_finder_methods = %i{
       registry_class
       registry_count
-      count_synced
+      synced_count
       count_failed
       count_synced_missing_on_primary
       count_registry
