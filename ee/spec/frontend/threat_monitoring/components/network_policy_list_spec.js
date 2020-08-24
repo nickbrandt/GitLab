@@ -3,17 +3,15 @@ import { GlTable } from '@gitlab/ui';
 import createStore from 'ee/threat_monitoring/store';
 import NetworkPolicyList from 'ee/threat_monitoring/components/network_policy_list.vue';
 import { PREDEFINED_NETWORK_POLICIES } from 'ee/threat_monitoring/constants';
+import { useFakeDate } from 'helpers/fake_date';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import { mockPoliciesResponse } from '../mock_data';
-
-jest.mock('timeago.js', () => ({
-  format: jest.fn().mockReturnValue('2 weeks ago'),
-  register: jest.fn(),
-}));
 
 const mockData = mockPoliciesResponse.map(policy => convertObjectPropsToCamelCase(policy));
 
 describe('NetworkPolicyList component', () => {
+  useFakeDate();
+
   let store;
   let wrapper;
 
