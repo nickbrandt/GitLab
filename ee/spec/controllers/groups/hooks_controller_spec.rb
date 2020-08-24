@@ -38,7 +38,8 @@ RSpec.describe Groups::HooksController do
           tag_push_events: true,
           token: 'TEST TOKEN',
           url: 'http://example.com',
-          wiki_page_events: true
+          wiki_page_events: true,
+          deployment_events: true
         }
 
         post :create, params: { group_id: group.to_param, hook: hook_params }
@@ -78,7 +79,8 @@ RSpec.describe Groups::HooksController do
             tag_push_events: true,
             token: 'TEST TOKEN',
             url: 'http://example.com',
-            wiki_page_events: true
+            wiki_page_events: true,
+            deployment_events: true
           }
         end
 
