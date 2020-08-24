@@ -16,11 +16,12 @@ module Security
     ParseError = Class.new(Gitlab::Ci::Parsers::ParserError)
 
     attr_accessor :params
-    attr_reader :pipeline
+    attr_reader :pipeline, :adaptive
 
-    def initialize(pipeline:, params: {})
+    def initialize(pipeline:, params: {}, adaptive: false)
       @pipeline = pipeline
       @params = params
+      @adaptive = adaptive
     end
 
     def execute
