@@ -1,12 +1,10 @@
 <script>
-import { GlDeprecatedButton } from '@gitlab/ui';
-
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlDeprecatedButton, GlIcon } from '@gitlab/ui';
 
 export default {
   components: {
     GlDeprecatedButton,
-    Icon,
+    GlIcon,
   },
 };
 </script>
@@ -19,7 +17,7 @@ export default {
       variant="link"
       class="dropdown-title-button dropdown-menu-close"
     >
-      <icon name="close" />
+      <gl-icon name="close" />
     </gl-deprecated-button>
   </div>
 </template>
