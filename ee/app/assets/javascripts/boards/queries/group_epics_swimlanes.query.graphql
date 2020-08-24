@@ -1,15 +1,36 @@
 #import "ee_else_ce/boards/queries/board_list.fragment.graphql"
 #import "~/graphql_shared/fragments/epic.fragment.graphql"
 
-query GroupBoardEE($fullPath: ID!, $boardId: ID!) {
-  group(fullPath: $fullPath) {
+query BoardEE(
+  $fullPath: ID!
+  $boardId: ID!
+  $issueFilters: BoardEpicIssueInput
+  $withLists: Boolean = true
+  $isGroup: Boolean = false
+  $isProject: Boolean = false
+) {
+  group(fullPath: $fullPath) @include(if: $isGroup) {
     board(id: $boardId) {
-      lists {
+      lists @include(if: $withLists) {
         nodes {
           ...BoardListFragment
         }
       }
-      epics {
+      epics(issueFilters: $issueFilters) {
+        nodes {
+          ...EpicNode
+        }
+      }
+    }
+  }
+  project(fullPath: $fullPath) @include(if: $isProject) {
+    board(id: $boardId) {
+      lists @include(if: $withLists) {
+        nodes {
+          ...BoardListFragment
+        }
+      }
+      epics(issueFilters: $issueFilters) {
         nodes {
           ...EpicNode
         }
