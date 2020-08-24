@@ -14738,9 +14738,6 @@ msgstr ""
 msgid "Manifest import"
 msgstr ""
 
-msgid "Manual job"
-msgstr ""
-
 msgid "ManualOrdering|Couldn't save the order of the issues"
 msgstr ""
 
@@ -21098,6 +21095,9 @@ msgid "Run CI/CD pipelines for external repositories"
 msgstr ""
 
 msgid "Run housekeeping"
+msgstr ""
+
+msgid "Run manual or delayed jobs"
 msgstr ""
 
 msgid "Run tests against your code live using the Web Terminal"
