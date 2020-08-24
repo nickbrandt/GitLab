@@ -18,5 +18,15 @@ module Security
       secret_detection: 5,
       coverage_fuzzing: 6
     }
+
+    scope :ordered, -> { order(id: :asc) }
+    scope :by_scan_types, -> (scan_types) { where(scan_type: scan_types) }
+
+    def has_finding_for?(severities, confidence_levels)
+      severity_stats.values_at(*severities)
+                    .reduce(:merge)
+                    .values_at(*confidence_levels)
+                    .any?
+    end
   end
 end

@@ -109,6 +109,12 @@ module EE
         end
       end
 
+      def security_reports_for_builds(builds)
+        ::Gitlab::Ci::Reports::Security::Reports.new(self).tap do |security_reports|
+          builds.each { |build| build.collect_security_reports!(security_reports) }
+        end
+      end
+
       def license_scanning_report
         ::Gitlab::Ci::Reports::LicenseScanning::Report.new.tap do |license_management_report|
           builds.latest.with_reports(::Ci::JobArtifact.license_scanning_reports).each do |build|

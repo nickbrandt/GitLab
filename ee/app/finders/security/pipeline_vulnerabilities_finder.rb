@@ -24,8 +24,6 @@ module Security
     end
 
     def execute
-      requested_reports = pipeline_reports.select { |report_type| requested_type?(report_type) }
-
       findings = requested_reports.each_with_object([]) do |(type, report), findings|
         raise ParseError, 'JSON parsing failed' if report.error.is_a?(Gitlab::Ci::Parsers::Security::Common::SecurityReportParserError)
 
@@ -52,6 +50,24 @@ module Security
       # and exposing too much of its implementation details to the test suite.
       # See also https://stackoverflow.com/questions/15442298/is-sort-in-ruby-stable.
       Gitlab::Utils.stable_sort_by(findings) { |x| [-x.severity_value, -x.confidence_value] }
+    end
+
+    def requested_reports
+      if adaptive?
+        pipeline.security_reports_for_builds(builds)
+      else
+        pipeline_reports.select { |report_type| requested_type?(report_type) }
+      end
+    end
+
+    def builds
+      AdaptiveBuildFinder.new(
+        pipeline,
+        confidence_levels: confidence_levels,
+        report_types: report_types,
+        severities: severities,
+        page: params[:page]
+      )
     end
 
     def pipeline_reports
@@ -140,6 +156,10 @@ module Security
 
     def scanners
       Array(params.fetch(:scanner, []))
+    end
+
+    def adaptive?
+      params[:adaptive]
     end
   end
 end
