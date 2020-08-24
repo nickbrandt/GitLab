@@ -20,6 +20,10 @@ RSpec.describe EE::ServicesHelper do
   describe '#integration_form_data' do
     subject { helper.integration_form_data(integration) }
 
+    before do
+      assign(:project, project)
+    end
+
     context 'Slack service' do
       let(:integration) { build(:slack_service) }
 
