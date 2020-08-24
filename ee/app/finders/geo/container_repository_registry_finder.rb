@@ -3,24 +3,21 @@
 module Geo
   class ContainerRepositoryRegistryFinder < RegistryFinder
     def registry_count
-      container_repositories.count
+      registry_class.count
     end
+    alias_method :count_registry, :registry_count
 
     def count_synced
-      Geo::ContainerRepositoryRegistry.synced.count
+      registry_class.synced.count
     end
 
     def count_failed
-      Geo::ContainerRepositoryRegistry.failed.count
-    end
-
-    def count_registry
-      Geo::ContainerRepositoryRegistry.count
+      registry_class.failed.count
     end
 
     def find_registry_differences(range)
-      source_ids = container_repositories.id_in(range).pluck_primary_key
-      tracked_ids = Geo::ContainerRepositoryRegistry.pluck_model_ids_in_range(range)
+      source_ids = replicables.id_in(range).pluck_primary_key
+      tracked_ids = registry_class.pluck_model_ids_in_range(range)
 
       untracked_ids = source_ids - tracked_ids
       unused_tracked_ids = tracked_ids - source_ids
@@ -46,7 +43,7 @@ module Geo
     # @param [Array<Integer>] except_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
     def find_never_synced_registries(batch_size:, except_ids: [])
-      Geo::ContainerRepositoryRegistry
+      registry_class
         .never_synced
         .model_id_not_in(except_ids)
         .limit(batch_size)
@@ -55,7 +52,7 @@ module Geo
 
     # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_dirty_registries(batch_size:, except_ids: [])
-      Geo::ContainerRepositoryRegistry
+      registry_class
         .failed
         .retry_due
         .model_id_not_in(except_ids)
@@ -66,8 +63,12 @@ module Geo
 
     private
 
-    def container_repositories
+    def replicables
       current_node.container_repositories
+    end
+
+    def registry_class
+      Geo::ContainerRepositoryRegistry
     end
   end
 end
