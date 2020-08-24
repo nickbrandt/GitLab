@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { GlDeprecatedButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlLoadingIcon, GlIcon } from '@gitlab/ui';
 
 import TreeItem from 'ee/related_items_tree/components/tree_item.vue';
 import TreeItemBody from 'ee/related_items_tree/components/tree_item_body.vue';
@@ -10,8 +10,6 @@ import createDefaultStore from 'ee/related_items_tree/store';
 import * as epicUtils from 'ee/related_items_tree/utils/epic_utils';
 import { ChildType, treeItemChevronBtnClassName } from 'ee/related_items_tree/constants';
 import { PathIdSeparator } from 'ee/related_issues/constants';
-
-import Icon from '~/vue_shared/components/icon.vue';
 
 import { mockParentItem, mockQueryResponse, mockEpic1 } from '../mock_data';
 
@@ -147,8 +145,8 @@ describe('RelatedItemsTree', () => {
       });
 
       it('renders expand/collapse icon', () => {
-        const expandedIcon = wrapperExpanded.find(Icon);
-        const collapsedIcon = wrapperCollapsed.find(Icon);
+        const expandedIcon = wrapperExpanded.find(GlIcon);
+        const collapsedIcon = wrapperCollapsed.find(GlIcon);
 
         expect(expandedIcon.isVisible()).toBe(true);
         expect(expandedIcon.props('name')).toBe('chevron-down');
