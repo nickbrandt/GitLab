@@ -67,10 +67,10 @@ module Geo
       registry_class.synced.count
     end
 
-    # @!method count_failed
+    # @!method failed_count
     #    Return a count of the registry records for the tracked type
     #    that are sync failed
-    def count_failed
+    def failed_count
       registry_class.failed.count
     end
 

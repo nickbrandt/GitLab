@@ -75,7 +75,7 @@ RSpec.describe Geo::AttachmentRegistryFinder, :geo do
     end
   end
 
-  describe '#count_failed' do
+  describe '#failed_count' do
     it 'counts registries that sync has failed' do
       create(:geo_upload_registry, :attachment, :failed, file_id: upload_1.id)
       create(:geo_upload_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
@@ -86,7 +86,7 @@ RSpec.describe Geo::AttachmentRegistryFinder, :geo do
       create(:geo_upload_registry, :attachment, file_id: upload_7.id, missing_on_primary: true)
       create(:geo_upload_registry, :attachment, :never_synced, file_id: upload_8.id)
 
-      expect(subject.count_failed).to eq 3
+      expect(subject.failed_count).to eq 3
     end
   end
 
@@ -101,7 +101,7 @@ RSpec.describe Geo::AttachmentRegistryFinder, :geo do
       create(:geo_upload_registry, :attachment, file_id: upload_7.id, missing_on_primary: true)
       create(:geo_upload_registry, :attachment, :never_synced, file_id: upload_8.id)
 
-      expect(subject.count_synced_missing_on_primary).to eq 3
+      expect(subject.synced_count_missing_on_primary).to eq 3
     end
   end
 

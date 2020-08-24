@@ -75,7 +75,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
     end
   end
 
-  describe '#count_failed' do
+  describe '#failed_count' do
     it 'counts registries that sync has failed' do
       create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_1.id)
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_2.id, missing_on_primary: true)
@@ -86,7 +86,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_2.id, missing_on_primary: true)
       create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_remote_3.id)
 
-      expect(subject.count_failed).to eq 3
+      expect(subject.failed_count).to eq 3
     end
   end
 
