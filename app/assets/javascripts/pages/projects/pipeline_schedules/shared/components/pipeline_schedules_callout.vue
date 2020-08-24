@@ -1,6 +1,7 @@
 <script>
 import Vue from 'vue';
 import Cookies from 'js-cookie';
+import { GlIcon } from '@gitlab/ui';
 import Translate from '../../../../../vue_shared/translate';
 // Full path is needed for Jest to be able to correctly mock this file
 import illustrationSvg from '~/pages/projects/pipeline_schedules/shared/icons/intro_illustration.svg';
@@ -12,6 +13,9 @@ const cookieKey = 'pipeline_schedules_callout_dismissed';
 
 export default {
   name: 'PipelineSchedulesCallout',
+  components: {
+    GlIcon,
+  },
   data() {
     return {
       docsUrl: document.getElementById('pipeline-schedules-callout').dataset.docsUrl,
@@ -33,7 +37,7 @@ export default {
   <div v-if="!calloutDismissed" class="pipeline-schedules-user-callout user-callout">
     <div class="bordered-box landing content-block">
       <button id="dismiss-callout-btn" class="btn btn-default close" @click="dismissCallout">
-        <i aria-hidden="true" class="fa fa-times"> </i>
+        <gl-icon name="close" aria-hidden="true" />
       </button>
       <div class="svg-container" v-html="illustrationSvg"></div>
       <div class="user-callout-copy">
