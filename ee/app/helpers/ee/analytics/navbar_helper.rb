@@ -18,7 +18,7 @@ module EE
       override :group_analytics_navbar_links
       def group_analytics_navbar_links(group, current_user)
         super + [
-          repositories_analytics_navbar_link(group, current_user),
+          group_repository_analytics_navbar_link(group, current_user),
           contribution_analytics_navbar_link(group, current_user),
           group_insights_navbar_link(group, current_user),
           issues_analytics_navbar_link(group, current_user),
@@ -136,13 +136,13 @@ module EE
         )
       end
 
-      def repositories_analytics_navbar_link(group, current_user)
-        return unless group_sidebar_link?(:repositories_analytics)
+      def group_repository_analytics_navbar_link(group, current_user)
+        return unless group_sidebar_link?(:repository_analytics)
 
         navbar_sub_item(
           title: _('Repositories'),
-          path: 'groups/repositories_analytics#show',
-          link: group_repositories_analytics_path(group)
+          path: 'groups/analytics/repository_analytics#show',
+          link: group_analytics_repository_analytics_path(group)
         )
       end
     end
