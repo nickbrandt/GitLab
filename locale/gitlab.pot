@@ -7707,7 +7707,13 @@ msgstr ""
 msgid "DastProfiles|Manage profiles"
 msgstr ""
 
+msgid "DastProfiles|New Scanner Profile"
+msgstr ""
+
 msgid "DastProfiles|New Site Profile"
+msgstr ""
+
+msgid "DastProfiles|New scanner profile"
 msgstr ""
 
 msgid "DastProfiles|New site profile"
