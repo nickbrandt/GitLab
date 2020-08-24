@@ -8,6 +8,7 @@ import {
   GlToggle,
   GlSegmentedControl,
   GlButton,
+  GlAlert,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import EnvironmentPicker from '../environment_picker.vue';
@@ -22,6 +23,7 @@ import {
   RuleTypeEndpoint,
 } from './constants';
 import toYaml from './lib/to_yaml';
+import fromYaml from './lib/from_yaml';
 import { buildRule } from './lib/rules';
 import humanizeNetworkPolicy from './lib/humanize';
 
@@ -34,6 +36,7 @@ export default {
     GlToggle,
     GlSegmentedControl,
     GlButton,
+    GlAlert,
     EnvironmentPicker,
     NetworkPolicyEditor,
     PolicyRuleBuilder,
@@ -43,6 +46,8 @@ export default {
   data() {
     return {
       editorMode: EditorModeRule,
+      yamlEditorValue: '',
+      yamlEditorError: null,
       policy: {
         name: '',
         description: '',
@@ -66,6 +71,9 @@ export default {
     shouldShowYamlEditor() {
       return this.editorMode === EditorModeYAML;
     },
+    hasParsingError() {
+      return Boolean(this.yamlEditorError);
+    },
   },
   created() {
     this.fetchEnvironments();
@@ -85,12 +93,32 @@ export default {
       const rule = this.policy.rules[ruleIdx];
       this.policy.rules.splice(ruleIdx, 1, buildRule(ruleType, rule));
     },
+    loadYaml(manifest) {
+      this.yamlEditorValue = manifest;
+      this.yamlEditorError = null;
+
+      try {
+        Object.assign(this.policy, fromYaml(manifest));
+      } catch (error) {
+        this.yamlEditorError = error;
+      }
+    },
+    changeEditorMode(mode) {
+      if (mode === EditorModeYAML) {
+        this.yamlEditorValue = toYaml(this.policy);
+      }
+
+      this.editorMode = mode;
+    },
   },
   policyTypes: [{ value: 'networkPolicy', text: s__('NetworkPolicies|Network Policy') }],
   editorModes: [
     { value: EditorModeRule, text: s__('NetworkPolicies|Rule mode') },
     { value: EditorModeYAML, text: s__('NetworkPolicies|.yaml mode') },
   ],
+  parsingErrorMessage: s__(
+    'NetworkPolicies|Rule mode is unavailable for this policy. In some cases, we cannot parse the YAML file back into the rules editor.',
+  ),
 };
 </script>
 
@@ -139,13 +167,22 @@ export default {
     <div class="row">
       <div class="col-md-auto">
         <gl-form-group :label="s__('NetworkPolicies|Editor mode')" label-for="editorMode">
-          <gl-segmented-control v-model="editorMode" :options="$options.editorModes" />
+          <gl-segmented-control
+            data-testid="editor-mode"
+            :options="$options.editorModes"
+            :checked="editorMode"
+            @input="changeEditorMode"
+          />
         </gl-form-group>
       </div>
     </div>
     <hr />
     <div v-if="shouldShowRuleEditor" class="row" data-testid="rule-editor">
       <div class="col-sm-12 col-md-6 col-lg-7 col-xl-8">
+        <gl-alert v-if="hasParsingError" data-testid="parsing-alert" :dismissible="false">{{
+          $options.parsingErrorMessage
+        }}</gl-alert>
+
         <h4>{{ s__('NetworkPolicies|Rules') }}</h4>
         <policy-rule-builder
           v-for="(rule, idx) in policy.rules"
@@ -161,9 +198,14 @@ export default {
         />
 
         <div class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100">
-          <gl-button variant="link" category="primary" data-testid="add-rule" @click="addRule">{{
-            s__('Network Policy|New rule')
-          }}</gl-button>
+          <gl-button
+            variant="link"
+            category="primary"
+            data-testid="add-rule"
+            :disabled="hasParsingError"
+            @click="addRule"
+            >{{ s__('Network Policy|New rule') }}</gl-button
+          >
         </div>
 
         <h4>{{ s__('NetworkPolicies|Actions') }}</h4>
@@ -177,10 +219,19 @@ export default {
     <div v-if="shouldShowYamlEditor" class="row" data-testid="yaml-editor">
       <div class="col-sm-12 col-md-12 col-lg-10 col-xl-8">
         <div class="gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100">
-          <h5 class="gl-m-0 gl-p-3 gl-bg-gray-10 gl-border-b-gray-100">
+          <h5
+            class="gl-m-0 gl-p-4 gl-bg-gray-10 gl-border-1 gl-border-b-solid gl-border-b-gray-100"
+          >
             {{ s__('NetworkPolicies|YAML editor') }}
           </h5>
-          <network-policy-editor id="yamlEditor" value="" />
+          <div class="gl-p-4">
+            <network-policy-editor
+              :value="yamlEditorValue"
+              :height="400"
+              :read-only="false"
+              @input="loadYaml"
+            />
+          </div>
         </div>
       </div>
     </div>

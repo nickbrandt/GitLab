@@ -14,28 +14,54 @@ import {
   RuleTypeFQDN,
 } from '../constants';
 
+/*
+  Convert list of matchLabel selectors used by the endpoint rule to an
+  entity rule object expected by the rule builder.
+
+  We expect list of object in format:
+  [{ matchLabels: { foo: 'bar' } }, { matchLabels: { bar: 'baz' } }]
+  And will return a single rule object:
+  { matchLabels: 'foo:bar baz:bar' }
+*/
+function ruleTypeEndpointFunc(items) {
+  const labels = items
+    .reduce(
+      (acc, { matchLabels }) =>
+        acc.concat(Object.keys(matchLabels).map(key => `${key}:${matchLabels[key]}`)),
+      [],
+    )
+    .join(' ');
+  return { matchLabels: labels };
+}
+
+function ruleTypeEntityFunc(entities) {
+  return { entities };
+}
+
+function ruleTypeCIDRFunc(items) {
+  const cidr = items.join(' ');
+  return { cidr };
+}
+
+/*
+  Convert list of matchName selectors used by the fqdn rule to a
+  fqdn rule object expected by the rule builder.
+
+  We expect list of object in format:
+  [{ matchName: 'remote-service.com' }, { matchName: 'another-service.com' }]
+  And will return a single rule object:
+  { fqdn: 'remote-service.com another-service.com' }
+*/
+function ruleTypeFQDNFunc(items) {
+  const fqdn = items.map(({ matchName }) => matchName).join(' ');
+  return { fqdn };
+}
+
 const rulesFunc = {
-  [RuleTypeEndpoint](items) {
-    const labels = items
-      .reduce(
-        (acc, { matchLabels }) =>
-          acc.concat(Object.keys(matchLabels).map(key => `${key}:${matchLabels[key]}`)),
-        [],
-      )
-      .join(' ');
-    return { matchLabels: labels };
-  },
-  [RuleTypeEntity](entities) {
-    return { entities };
-  },
-  [RuleTypeCIDR](items) {
-    const cidr = items.join(' ');
-    return { cidr };
-  },
-  [RuleTypeFQDN](items) {
-    const fqdn = items.map(({ matchName }) => matchName).join(' ');
-    return { fqdn };
-  },
+  [RuleTypeEndpoint]: ruleTypeEndpointFunc,
+  [RuleTypeEntity]: ruleTypeEntityFunc,
+  [RuleTypeCIDR]: ruleTypeCIDRFunc,
+  [RuleTypeFQDN]: ruleTypeFQDNFunc,
 };
 
 /*
@@ -81,7 +107,9 @@ function parseRule(item, direction) {
 }
 
 /*
-  Construct a policy object expected by the policy editor from a yaml manifest
+  Construct a policy object expected by the policy editor from a yaml manifest.
+  Expected yaml structure is defined in the official documentation:
+    https://docs.cilium.io/en/v1.8/policy/language
 */
 export default function fromYaml(manifest) {
   const { metadata, spec } = safeLoad(manifest, { json: true });
