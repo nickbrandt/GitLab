@@ -64,13 +64,13 @@ describe('Pipeline New Form', () => {
   describe('Dropdown with branches and tags', () => {
     it('displays dropdown with all branches and tags', () => {
       createComponent();
-      expect(findDropdownItems().length).toBe(mockRefs.length);
+      expect(findDropdownItems()).toHaveLength(mockRefs.length);
     });
 
     it('when user enters search term the list is filtered', () => {
       createComponent('master');
 
-      expect(findDropdownItems().length).toBe(1);
+      expect(findDropdownItems()).toHaveLength(1);
       expect(
         findDropdownItems()
           .at(0)
@@ -88,11 +88,11 @@ describe('Pipeline New Form', () => {
 
       await wrapper.vm.$nextTick();
 
-      expect(findVariableRows().length).toBe(3);
+      expect(findVariableRows()).toHaveLength(3);
     });
 
     it('does not display remove icon for last row', () => {
-      expect(findRemoveIcons().length).toBe(2);
+      expect(findRemoveIcons()).toHaveLength(2);
     });
 
     it('removes ci variable row on remove icon button click', async () => {
@@ -102,7 +102,7 @@ describe('Pipeline New Form', () => {
 
       await wrapper.vm.$nextTick();
 
-      expect(findVariableRows().length).toBe(2);
+      expect(findVariableRows()).toHaveLength(2);
     });
 
     it('creates a pipeline on submit', async () => {
@@ -121,7 +121,7 @@ describe('Pipeline New Form', () => {
 
       await wrapper.vm.$nextTick();
 
-      expect(findVariableRows().length).toBe(4);
+      expect(findVariableRows()).toHaveLength(4);
     });
   });
 });
