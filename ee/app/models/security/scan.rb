@@ -24,7 +24,9 @@ module Security
 
     def has_finding_for?(severities, confidence_levels)
       severity_stats.values_at(*severities)
+                    .compact
                     .reduce(:merge)
+                    .to_h
                     .values_at(*confidence_levels)
                     .any?
     end

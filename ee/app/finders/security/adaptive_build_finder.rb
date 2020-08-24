@@ -37,7 +37,7 @@ module Security
               end
             end
 
-            break if cursor >= to
+            return builds if cursor >= to
           end
         end
       end

@@ -54,8 +54,8 @@ module Security
     end
 
     def requested_reports
-      if adaptive?
-        pipeline.security_reports_for_builds(builds)
+      if adaptive
+        pipeline.security_reports_for_builds(builds).reports
       else
         pipeline_reports.select { |report_type| requested_type?(report_type) }
       end
@@ -66,9 +66,10 @@ module Security
         pipeline,
         confidence_levels: confidence_levels,
         report_types: report_types,
-        severities: severities,
-        page: params[:page]
-      )
+        severities: severity_levels,
+        page: params[:page],
+        per_page: params[:per_page]
+      ).perform
     end
 
     def pipeline_reports
@@ -157,10 +158,6 @@ module Security
 
     def scanners
       Array(params.fetch(:scanner, []))
-    end
-
-    def adaptive?
-      params[:adaptive]
     end
   end
 end
