@@ -137,6 +137,7 @@ module EE
       end
 
       def group_repository_analytics_navbar_link(group, current_user)
+        return unless ::Gitlab::Analytics.group_coverage_reports_enabled?
         return unless group_sidebar_link?(:repository_analytics)
 
         navbar_sub_item(
