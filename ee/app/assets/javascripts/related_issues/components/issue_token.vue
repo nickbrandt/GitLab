@@ -1,9 +1,13 @@
 <script>
+import { GlIcon } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import relatedIssuableMixin from '~/vue_shared/mixins/related_issuable_mixin';
 
 export default {
   name: 'IssueToken',
+  components: {
+    GlIcon,
+  },
   mixins: [relatedIssuableMixin],
   props: {
     isCondensed: {
@@ -78,7 +82,7 @@ export default {
           'issuable-info': !isCondensed,
         }"
       >
-        <icon
+        <gl-icon
           v-if="hasState"
           v-tooltip
           :class="iconClass"
