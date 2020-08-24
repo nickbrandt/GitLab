@@ -18,6 +18,9 @@ class IssueRebalancingWorker # rubocop:disable Scalability/IdempotentWorker
   private
 
   def rebalance(issue)
+    gates = [issue.project, issue.project.group].compact
+    return unless gates.any? { |gate| Feature.enabled?(:rebalance_issues, gate) }
+
     IssueRebalancingService.new(issue).execute
   end
 end

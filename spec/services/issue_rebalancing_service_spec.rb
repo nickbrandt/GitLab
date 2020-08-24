@@ -57,4 +57,36 @@ RSpec.describe IssueRebalancingService do
       service.execute
     end.not_to change { issues_in_position_order.map(&:id) }
   end
+
+  it 'does nothing if the feature flag is disabled' do
+    stub_feature_flags(rebalance_issues: false)
+    issue = project.issues.first
+    issue.project
+    issue.project.group
+    old_pos = issue.relative_position
+
+    service = described_class.new(issue)
+
+    expect { service.execute }.not_to exceed_query_limit(0)
+    expect(old_pos).to eq(issue.reload.relative_position)
+  end
+
+  it 'acts if the flag is enabled for the project' do
+    issue = create(:issue, project: project, author: user, relative_position: max_pos)
+    stub_feature_flags(rebalance_issues: issue.project)
+
+    service = described_class.new(issue)
+
+    expect { service.execute }.to change { issue.reload.relative_position }
+  end
+
+  it 'acts if the flag is enabled for the group' do
+    issue = create(:issue, project: project, author: user, relative_position: max_pos)
+    project.update!(group: create(:group))
+    stub_feature_flags(rebalance_issues: issue.project.group)
+
+    service = described_class.new(issue)
+
+    expect { service.execute }.to change { issue.reload.relative_position }
+  end
 end

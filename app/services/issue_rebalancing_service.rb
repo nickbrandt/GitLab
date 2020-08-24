@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class IssueRebalancingService
-  MAX_ISSUE_COUNT = 100_000
+  MAX_ISSUE_COUNT = 10_000
   TooManyIssues = Class.new(StandardError)
 
   attr_reader :issue
@@ -12,6 +12,9 @@ class IssueRebalancingService
 
   # rubocop: disable CodeReuse/ActiveRecord
   def execute
+    gates = [issue.project, issue.project.group].compact
+    return unless gates.any? { |gate| Feature.enabled?(:rebalance_issues, gate) }
+
     base = Issue.relative_positioning_query_base(issue)
 
     n = base.count
@@ -36,23 +39,25 @@ class IssueRebalancingService
 
     start = 0 - (gaps / 2) * gap_size
 
-    indexed = base.reorder(:relative_position, :id).pluck(:id).each_with_index
+    Issue.transaction do
+      indexed = base.reorder(:relative_position, :id).pluck(:id).each_with_index
 
-    indexed.each_slice(500) do |pairs|
-      values = pairs.map do |id, index|
-        "(#{id}, #{start + (index * gap_size)})"
-      end.join(', ')
+      indexed.each_slice(500) do |pairs|
+        values = pairs.map do |id, index|
+          "(#{id}, #{start + (index * gap_size)})"
+        end.join(', ')
 
-      Issue.connection.exec_query(<<~SQL, "rebalance issue positions")
-        WITH cte(cte_id, new_pos) AS (
-         SELECT *
-         FROM (VALUES #{values}) as t (id, pos)
-        )
-        UPDATE #{Issue.table_name}
-        SET relative_position = cte.new_pos
-        FROM cte
-        WHERE cte_id = id
-      SQL
+        Issue.connection.exec_query(<<~SQL, "rebalance issue positions")
+          WITH cte(cte_id, new_pos) AS (
+           SELECT *
+           FROM (VALUES #{values}) as t (id, pos)
+          )
+          UPDATE #{Issue.table_name}
+          SET relative_position = cte.new_pos
+          FROM cte
+          WHERE cte_id = id
+        SQL
+      end
     end
   end
   # rubocop: enable CodeReuse/ActiveRecord
