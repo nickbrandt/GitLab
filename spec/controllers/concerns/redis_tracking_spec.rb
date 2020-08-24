@@ -10,6 +10,8 @@ RSpec.describe RedisTracking do
   controller(ApplicationController) do
     include RedisTracking
 
+    skip_before_action
+
     track_redis_hll_event :index, name: 'i_analytics_dev_ops_score', feature: :g_compliance_dashboard_feature
 
     def index
@@ -52,18 +54,6 @@ RSpec.describe RedisTracking do
       it 'tracks the event' do
         sign_in(user)
 
-        expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
-
-        get :index
-      end
-    end
-
-    context 'when user is not logged in and there is a visitor_id' do
-      before do
-        request.cookies['visitor_id'] = SecureRandom.uuid
-      end
-
-      it 'tracks the event' do
         expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
 
         get :index
