@@ -2,7 +2,7 @@
 
 module Geo
   class DesignRegistryFinder < RegistryFinder
-    def count_syncable
+    def registry_count
       designs.count
     end
 

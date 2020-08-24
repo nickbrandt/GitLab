@@ -2,7 +2,7 @@
 
 module Geo
   class ContainerRepositoryRegistryFinder < RegistryFinder
-    def count_syncable
+    def registry_count
       container_repositories.count
     end
 

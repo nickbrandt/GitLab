@@ -2,9 +2,9 @@
 
 module Geo
   class FileRegistryFinder < RegistryFinder
-    # @!method count_syncable
+    # @!method registry_count
     #    Return a count of the registry records for the tracked file_type(s)
-    def count_syncable
+    def registry_count
       syncable.count
     end
 

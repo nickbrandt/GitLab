@@ -21,13 +21,13 @@ RSpec.describe Geo::DesignRegistryFinder, :geo do
     stub_current_geo_node(secondary)
   end
 
-  describe '#count_syncable' do
+  describe '#registry_count' do
     it 'returns number of designs' do
       # Two designs for the same project to assert absence of duplicates
       create_list(:design, 2, project: project_1)
       create(:design, project: project_2)
 
-      result = subject.count_syncable
+      result = subject.registry_count
 
       expect(result).to eq(2)
     end

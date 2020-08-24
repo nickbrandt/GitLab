@@ -1243,40 +1243,40 @@ RSpec.describe GeoNodeStatus, :geo do
         stub_current_geo_node(primary)
       end
 
-      it 'does not call LfsObjectRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::LfsObjectRegistryFinder).not_to receive(:count_syncable)
+      it 'does not call LfsObjectRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::LfsObjectRegistryFinder).not_to receive(:registry_count)
 
         subject
       end
 
-      it 'does not call AttachmentRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::AttachmentRegistryFinder).not_to receive(:count_syncable)
+      it 'does not call AttachmentRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::AttachmentRegistryFinder).not_to receive(:registry_count)
 
         subject
       end
 
-      it 'does not call JobArtifactRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::JobArtifactRegistryFinder).not_to receive(:count_syncable)
+      it 'does not call JobArtifactRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::JobArtifactRegistryFinder).not_to receive(:registry_count)
 
         subject
       end
     end
 
     context 'on the secondary' do
-      it 'calls LfsObjectRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::LfsObjectRegistryFinder).to receive(:count_syncable)
+      it 'calls LfsObjectRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::LfsObjectRegistryFinder).to receive(:registry_count)
 
         subject
       end
 
-      it 'calls AttachmentRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:count_syncable)
+      it 'calls AttachmentRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:registry_count)
 
         subject
       end
 
-      it 'calls JobArtifactRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::JobArtifactRegistryFinder).to receive(:count_syncable)
+      it 'calls JobArtifactRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::JobArtifactRegistryFinder).to receive(:registry_count)
 
         subject
       end

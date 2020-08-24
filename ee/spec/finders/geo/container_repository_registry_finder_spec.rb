@@ -24,9 +24,9 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
     stub_registry_replication_config(enabled: true)
   end
 
-  describe '#count_syncable' do
+  describe '#registry_count' do
     it 'returns number of container repositories' do
-      expect(subject.count_syncable).to eq(6)
+      expect(subject.registry_count).to eq(6)
     end
   end
 
