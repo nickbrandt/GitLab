@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Projects
-  class DastProfilesController < Projects::ApplicationController
+  class DastScannerProfilesController < Projects::ApplicationController
     before_action :authorize_read_on_demand_scans!
 
-    def index
+    def new
     end
   end
 end
