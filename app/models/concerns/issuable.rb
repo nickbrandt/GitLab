@@ -185,6 +185,10 @@ module Issuable
       is_a?(TimeTrackable) && !incident?
     end
 
+    def supports_reference?
+      is_a?(Issue) && !incident?
+    end
+
     def incident?
       is_a?(Issue) && super
     end

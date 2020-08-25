@@ -843,6 +843,24 @@ RSpec.describe Issuable do
     end
   end
 
+  describe '#supports_reference?' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:issuable_type, :supports_reference) do
+      :issue         | true
+      :incident      | false
+      :merge_request | false
+    end
+
+    with_them do
+      let(:issuable) { build_stubbed(issuable_type) }
+
+      subject { issuable.supports_reference? }
+
+      it { is_expected.to eq(supports_reference) }
+    end
+  end
+
   describe '#incident?' do
     using RSpec::Parameterized::TableSyntax
 
