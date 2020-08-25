@@ -54,7 +54,7 @@ module Gitlab
               EXTRACT (EPOCH FROM now() - #{Gitlab::Database.pg_last_xact_replay_timestamp}())::INTEGER
             END
             AS replication_lag
-          SQL
+        SQL
       end
 
       def db_migrate_path
