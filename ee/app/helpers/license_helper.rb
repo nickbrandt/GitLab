@@ -22,9 +22,7 @@ module LicenseHelper
     return unless license.present?
     return unless license.exclude_guests_from_active_count?
 
-    content_tag :p do
-      "Users with a Guest role or those who don't belong to a Project or Group will not use a seat from your license."
-    end
+    s_("Users with a Guest role or those who don't belong to a Project or Group will not use a seat from your license.")
   end
 
   def current_license_title

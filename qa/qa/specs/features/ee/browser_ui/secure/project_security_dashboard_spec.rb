@@ -59,7 +59,7 @@ module QA
         @runner.remove_via_api!
       end
 
-      it 'shows vulnerability details' do
+      it 'shows vulnerability details', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/949' do
         Flow::Login.sign_in_unless_signed_in
         @project.visit!
         Page::Project::Menu.perform(&:click_on_security_dashboard)

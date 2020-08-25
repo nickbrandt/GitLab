@@ -306,7 +306,7 @@ module EE
     end
 
     def compliance_frameworks=(values)
-      cleaned = Array.wrap(values).sort.uniq
+      cleaned = Array.wrap(values).reject(&:blank?).sort.uniq
 
       write_attribute(:compliance_frameworks, cleaned)
     end
