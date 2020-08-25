@@ -21,8 +21,6 @@ const testTimeout = 10 * time.Second
 type osFactory func() (*test.ObjectstoreStub, *httptest.Server)
 
 func testObjectUploadNoErrors(t *testing.T, startObjectStore osFactory, useDeleteURL bool, contentType string) {
-	assert := assert.New(t)
-
 	osStub, ts := startObjectStore()
 	defer ts.Close()
 
@@ -43,21 +41,21 @@ func testObjectUploadNoErrors(t *testing.T, startObjectStore osFactory, useDelet
 
 	// copy data
 	n, err := io.Copy(object, strings.NewReader(test.ObjectContent))
-	assert.NoError(err)
-	assert.Equal(test.ObjectSize, n, "Uploaded file mismatch")
+	assert.NoError(t, err)
+	assert.Equal(t, test.ObjectSize, n, "Uploaded file mismatch")
 
 	// close HTTP stream
 	err = object.Close()
-	assert.NoError(err)
+	assert.NoError(t, err)
 
-	assert.Equal(contentType, osStub.GetHeader(test.ObjectPath, "Content-Type"))
+	assert.Equal(t, contentType, osStub.GetHeader(test.ObjectPath, "Content-Type"))
 
 	// Checking MD5 extraction
-	assert.Equal(osStub.GetObjectMD5(test.ObjectPath), object.ETag())
+	assert.Equal(t, osStub.GetObjectMD5(test.ObjectPath), object.ETag())
 
 	// Checking cleanup
 	cancel()
-	assert.Equal(1, osStub.PutsCnt(), "Object hasn't been uploaded")
+	assert.Equal(t, 1, osStub.PutsCnt(), "Object hasn't been uploaded")
 
 	var expectedDeleteCnt int
 	if useDeleteURL {
@@ -72,9 +70,9 @@ func testObjectUploadNoErrors(t *testing.T, startObjectStore osFactory, useDelet
 	}
 
 	if useDeleteURL {
-		assert.Equal(1, osStub.DeletesCnt(), "Object hasn't been deleted")
+		assert.Equal(t, 1, osStub.DeletesCnt(), "Object hasn't been deleted")
 	} else {
-		assert.Equal(0, osStub.DeletesCnt(), "Object has been deleted")
+		assert.Equal(t, 0, osStub.DeletesCnt(), "Object has been deleted")
 	}
 }
 
@@ -102,9 +100,6 @@ func TestObjectUpload(t *testing.T) {
 }
 
 func TestObjectUpload404(t *testing.T) {
-	assert := assert.New(t)
-	require := require.New(t)
-
 	ts := httptest.NewServer(http.NotFoundHandler())
 	defer ts.Close()
 
@@ -114,15 +109,15 @@ func TestObjectUpload404(t *testing.T) {
 	deadline := time.Now().Add(testTimeout)
 	objectURL := ts.URL + test.ObjectPath
 	object, err := objectstore.NewObject(ctx, objectURL, "", map[string]string{}, deadline, test.ObjectSize)
-	require.NoError(err)
+	require.NoError(t, err)
 	_, err = io.Copy(object, strings.NewReader(test.ObjectContent))
 
-	assert.NoError(err)
+	assert.NoError(t, err)
 	err = object.Close()
-	assert.Error(err)
+	assert.Error(t, err)
 	_, isStatusCodeError := err.(objectstore.StatusCodeError)
-	require.True(isStatusCodeError, "Should fail with StatusCodeError")
-	require.Contains(err.Error(), "404")
+	require.True(t, isStatusCodeError, "Should fail with StatusCodeError")
+	require.Contains(t, err.Error(), "404")
 }
 
 type endlessReader struct{}

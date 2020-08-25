@@ -59,30 +59,29 @@ func validateMetadata(r io.Reader) error {
 
 func TestGenerateZipMetadataFromFile(t *testing.T) {
 	var metaBuffer bytes.Buffer
-	require := require.New(t)
 
 	f, err := ioutil.TempFile("", "workhorse-metadata.zip-")
 	if f != nil {
 		defer os.Remove(f.Name())
 	}
-	require.NoError(err)
+	require.NoError(t, err)
 	defer f.Close()
 
 	err = generateTestArchive(f)
-	require.NoError(err)
+	require.NoError(t, err)
 	f.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	archive, err := zipartifacts.OpenArchive(ctx, f.Name())
-	require.NoError(err, "zipartifacts: OpenArchive failed")
+	require.NoError(t, err, "zipartifacts: OpenArchive failed")
 
 	err = zipartifacts.GenerateZipMetadata(&metaBuffer, archive)
-	require.NoError(err, "zipartifacts: GenerateZipMetadata failed")
+	require.NoError(t, err, "zipartifacts: GenerateZipMetadata failed")
 
 	err = validateMetadata(&metaBuffer)
-	require.NoError(err)
+	require.NoError(t, err)
 }
 
 func TestErrNotAZip(t *testing.T) {
