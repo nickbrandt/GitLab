@@ -92,7 +92,7 @@ module HamlLint
         File.open(path_to_file).any? do |line|
           result = line.match(MARKDOWN_HEADER)
 
-          # TODO:Do an exact match for anchors
+          # TODO:Do an exact match for anchors (Follow-up https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39850)
           anchor.start_with?(string_to_anchor(result[:header])) if result
         end
       end
