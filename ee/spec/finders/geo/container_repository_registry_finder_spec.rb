@@ -25,8 +25,11 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
   end
 
   describe '#registry_count' do
-    it 'returns number of container repositories' do
-      expect(subject.registry_count).to eq(6)
+    it 'returns number of container registries' do
+      create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
+      create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
+
+      expect(subject.registry_count).to eq(2)
     end
   end
 
@@ -49,7 +52,7 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
   end
 
   describe '#count_registry' do
-    it 'returns number of all registries' do
+    it 'returns number of container registries' do
       create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
       create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
 

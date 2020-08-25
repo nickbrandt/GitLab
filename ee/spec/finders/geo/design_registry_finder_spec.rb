@@ -22,14 +22,20 @@ RSpec.describe Geo::DesignRegistryFinder, :geo do
   end
 
   describe '#registry_count' do
-    it 'returns number of designs' do
-      # Two designs for the same project to assert absence of duplicates
-      create_list(:design, 2, project: project_1)
-      create(:design, project: project_2)
+    it 'returns number of desgin registries' do
+      create(:geo_design_registry, :synced, project_id: project_1.id)
+      create(:geo_design_registry, :sync_failed, project_id: project_2.id)
 
-      result = subject.registry_count
+      expect(subject.registry_count).to eq(2)
+    end
+  end
 
-      expect(result).to eq(2)
+  describe '#count_registry' do
+    it 'returns number of desgin registries' do
+      create(:geo_design_registry, :synced, project_id: project_1.id)
+      create(:geo_design_registry, :sync_failed, project_id: project_2.id)
+
+      expect(subject.count_registry).to eq(2)
     end
   end
 
@@ -48,15 +54,6 @@ RSpec.describe Geo::DesignRegistryFinder, :geo do
       create(:geo_design_registry, :sync_failed, project_id: project_2.id)
 
       expect(subject.failed_count).to eq(1)
-    end
-  end
-
-  describe '#count_registry' do
-    it 'returns number of all registries' do
-      create(:geo_design_registry, :synced, project_id: project_1.id)
-      create(:geo_design_registry, :sync_failed, project_id: project_2.id)
-
-      expect(subject.count_registry).to eq(2)
     end
   end
 
