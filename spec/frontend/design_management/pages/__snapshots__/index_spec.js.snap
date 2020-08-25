@@ -6,7 +6,7 @@ exports[`Design management index page designs does not render toolbar when there
   data-testid="designs-root"
 >
   <!---->
-
+   
   <div
     class="mt-4"
   >
@@ -37,7 +37,7 @@ exports[`Design management index page designs does not render toolbar when there
             notescount="0"
           />
         </design-dropzone-stub>
-
+         
         <!---->
       </li>
       <li
@@ -55,7 +55,7 @@ exports[`Design management index page designs does not render toolbar when there
             notescount="1"
           />
         </design-dropzone-stub>
-
+         
         <!---->
       </li>
       <li
@@ -73,12 +73,12 @@ exports[`Design management index page designs does not render toolbar when there
             notescount="0"
           />
         </design-dropzone-stub>
-
+         
         <!---->
       </li>
     </ol>
   </div>
-
+   
   <router-view-stub
     name="default"
   />
@@ -102,10 +102,10 @@ exports[`Design management index page designs renders designs list and header wi
         >
           Designs
         </span>
-
+         
         <design-version-dropdown-stub />
       </div>
-
+       
       <div
         class="qa-selector-toolbar gl-display-flex gl-align-items-center"
       >
@@ -117,9 +117,9 @@ exports[`Design management index page designs renders designs list and header wi
           variant="link"
         >
           Select all
-
+        
         </gl-button-stub>
-
+         
         <div>
           <delete-button-stub
             buttoncategory="secondary"
@@ -127,17 +127,17 @@ exports[`Design management index page designs renders designs list and header wi
             buttonsize="small"
             buttonvariant="warning"
           >
-
+            
             Archive selected
-
+          
           </delete-button-stub>
         </div>
-
+         
         <upload-button-stub />
       </div>
     </div>
   </header>
-
+   
   <div
     class="mt-4"
   >
@@ -168,7 +168,7 @@ exports[`Design management index page designs renders designs list and header wi
             notescount="0"
           />
         </design-dropzone-stub>
-
+         
         <input
           class="design-checkbox"
           type="checkbox"
@@ -189,7 +189,7 @@ exports[`Design management index page designs renders designs list and header wi
             notescount="1"
           />
         </design-dropzone-stub>
-
+         
         <input
           class="design-checkbox"
           type="checkbox"
@@ -210,7 +210,7 @@ exports[`Design management index page designs renders designs list and header wi
             notescount="0"
           />
         </design-dropzone-stub>
-
+         
         <input
           class="design-checkbox"
           type="checkbox"
@@ -218,7 +218,7 @@ exports[`Design management index page designs renders designs list and header wi
       </li>
     </ol>
   </div>
-
+   
   <router-view-stub
     name="default"
   />
@@ -231,7 +231,7 @@ exports[`Design management index page designs renders error 1`] = `
   data-testid="designs-root"
 >
   <!---->
-
+   
   <div
     class="mt-4"
   >
@@ -244,12 +244,12 @@ exports[`Design management index page designs renders error 1`] = `
       title=""
       variant="danger"
     >
-
+      
       An error occurred while loading designs. Please try again.
-
+    
     </gl-alert-stub>
   </div>
-
+   
   <router-view-stub
     name="default"
   />
@@ -262,7 +262,7 @@ exports[`Design management index page designs renders loading icon 1`] = `
   data-testid="designs-root"
 >
   <!---->
-
+   
   <div
     class="mt-4"
   >
@@ -272,7 +272,7 @@ exports[`Design management index page designs renders loading icon 1`] = `
       size="md"
     />
   </div>
-
+   
   <router-view-stub
     name="default"
   />
@@ -285,7 +285,7 @@ exports[`Design management index page when has no designs renders design dropzon
   data-testid="designs-root"
 >
   <!---->
-
+   
   <div
     class="mt-4"
   >
@@ -302,7 +302,7 @@ exports[`Design management index page when has no designs renders design dropzon
       </li>
     </ol>
   </div>
-
+   
   <router-view-stub
     name="default"
   />
