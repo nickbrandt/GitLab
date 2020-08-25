@@ -7,10 +7,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestGzipEncoding(t *testing.T) {
@@ -24,18 +25,12 @@ func TestGzipEncoding(t *testing.T) {
 	body := ioutil.NopCloser(&b)
 
 	req, err := http.NewRequest("POST", "http://address/test", body)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	req.Header.Set("Content-Encoding", "gzip")
 
 	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
-		if _, ok := r.Body.(*gzip.Reader); !ok {
-			t.Fatal("Expected gzip reader for body, but it's:", reflect.TypeOf(r.Body))
-		}
-		if r.Header.Get("Content-Encoding") != "" {
-			t.Fatal("Content-Encoding should be deleted")
-		}
+		require.IsType(t, &gzip.Reader{}, r.Body, "body type")
+		require.Empty(t, r.Header.Get("Content-Encoding"), "Content-Encoding should be deleted")
 	})).ServeHTTP(resp, req)
 
 	testhelper.RequireResponseCode(t, resp, 200)
@@ -48,18 +43,12 @@ func TestNoEncoding(t *testing.T) {
 	body := ioutil.NopCloser(&b)
 
 	req, err := http.NewRequest("POST", "http://address/test", body)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	req.Header.Set("Content-Encoding", "")
 
 	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
-		if r.Body != body {
-			t.Fatal("Expected the same body")
-		}
-		if r.Header.Get("Content-Encoding") != "" {
-			t.Fatal("Content-Encoding should be deleted")
-		}
+		require.Equal(t, body, r.Body, "Expected the same body")
+		require.Empty(t, r.Header.Get("Content-Encoding"), "Content-Encoding should be deleted")
 	})).ServeHTTP(resp, req)
 
 	testhelper.RequireResponseCode(t, resp, 200)
@@ -69,9 +58,7 @@ func TestInvalidEncoding(t *testing.T) {
 	resp := httptest.NewRecorder()
 
 	req, err := http.NewRequest("POST", "http://address/test", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	req.Header.Set("Content-Encoding", "application/unknown")
 
 	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {

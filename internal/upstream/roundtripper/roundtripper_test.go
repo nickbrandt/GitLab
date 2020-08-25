@@ -1,7 +1,10 @@
 package roundtripper
 
 import (
+	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestMustParseAddress(t *testing.T) {
@@ -10,26 +13,27 @@ func TestMustParseAddress(t *testing.T) {
 		{"[::1]:23", "http", "::1:23"},
 		{"4.5.6.7", "http", "4.5.6.7:http"},
 	}
-	for _, example := range successExamples {
-		result := mustParseAddress(example.address, example.scheme)
-		if example.expected != result {
-			t.Errorf("expected %q, got %q", example.expected, result)
-		}
+	for i, example := range successExamples {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			require.Equal(t, example.expected, mustParseAddress(example.address, example.scheme))
+		})
 	}
+}
 
+func TestMustParseAddressPanic(t *testing.T) {
 	panicExamples := []struct{ address, scheme string }{
 		{"1.2.3.4", ""},
 		{"1.2.3.4", "https"},
 	}
 
-	for _, panicExample := range panicExamples {
-		func() {
+	for i, panicExample := range panicExamples {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			defer func() {
 				if r := recover(); r == nil {
-					t.Errorf("expected panic for %v but none occurred", panicExample)
+					t.Fatal("expected panic")
 				}
 			}()
-			t.Log(mustParseAddress(panicExample.address, panicExample.scheme))
-		}()
+			mustParseAddress(panicExample.address, panicExample.scheme)
+		})
 	}
 }

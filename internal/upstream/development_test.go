@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestDevelopmentModeEnabled(t *testing.T) {
@@ -18,9 +20,8 @@ func TestDevelopmentModeEnabled(t *testing.T) {
 	NotFoundUnless(developmentMode, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
 	})).ServeHTTP(w, r)
-	if !executed {
-		t.Error("The handler should get executed")
-	}
+
+	require.True(t, executed, "The handler should get executed")
 }
 
 func TestDevelopmentModeDisabled(t *testing.T) {
@@ -33,8 +34,8 @@ func TestDevelopmentModeDisabled(t *testing.T) {
 	NotFoundUnless(developmentMode, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
 	})).ServeHTTP(w, r)
-	if executed {
-		t.Error("The handler should not get executed")
-	}
+
+	require.False(t, executed, "The handler should not get executed")
+
 	testhelper.RequireResponseCode(t, w, 404)
 }
