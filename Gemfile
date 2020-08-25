@@ -119,6 +119,7 @@ gem 'fog-local', '~> 0.6'
 gem 'fog-openstack', '~> 1.0'
 gem 'fog-rackspace', '~> 0.1.1'
 gem 'fog-aliyun', '~> 0.3'
+gem 'gitlab-fog-azure-rm', '~> 0.7', require: false
 
 # for Google storage
 gem 'google-api-client', '~> 0.33'
@@ -349,7 +350,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'bullet', '~> 6.0.2'
+  gem 'bullet', '~> 6.1.0'
   gem 'pry-byebug', '~> 3.5.1', platform: :mri
   gem 'pry-rails', '~> 0.3.9'
 

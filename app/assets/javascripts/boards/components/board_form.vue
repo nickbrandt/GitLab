@@ -1,6 +1,6 @@
 <script>
 import { __ } from '~/locale';
-import Flash from '~/flash';
+import { deprecatedCreateFlash as Flash } from '~/flash';
 import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
 import { visitUrl } from '~/lib/utils/url_utility';
 import boardsStore from '~/boards/stores/boards_store';
@@ -23,10 +23,6 @@ export default {
   props: {
     canAdminBoard: {
       type: Boolean,
-      required: true,
-    },
-    milestonePath: {
-      type: String,
       required: true,
     },
     labelsPath: {
@@ -201,7 +197,6 @@ export default {
           :collapse-scope="isNewForm"
           :board="board"
           :can-admin-board="canAdminBoard"
-          :milestone-path="milestonePath"
           :labels-path="labelsPath"
           :enable-scoped-labels="enableScopedLabels"
           :project-id="projectId"

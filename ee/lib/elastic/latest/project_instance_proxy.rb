@@ -44,9 +44,8 @@ module Elastic
         # When this happens, log the errors to help with debugging, and raise the error to prevent indexing bad data
         TRACKED_FEATURE_SETTINGS.each do |feature|
           data[feature] = target.project_feature.public_send(feature) # rubocop:disable GitlabSecurity/PublicSend
-        rescue NoMethodError => err
-          target.logger.error("Elasticsearch failed to read feature #{feature} for #{target.class} #{target.id}: #{err}")
-          raise
+        rescue NoMethodError => e
+          Gitlab::ErrorTracking.track_and_raise_exception(e, project_id: target.id, feature: feature)
         end
 
         data

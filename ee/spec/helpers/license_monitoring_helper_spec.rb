@@ -15,64 +15,6 @@ RSpec.describe LicenseMonitoringHelper do
     create(:historical_data, date: license.created_at + 1.month, active_user_count: active_user_count)
   end
 
-  describe '#show_users_over_license_banner?' do
-    subject { helper.show_users_over_license_banner? }
-
-    context 'when admin is logged in' do
-      before do
-        allow(helper).to receive(:current_user).and_return(admin)
-      end
-
-      context 'when license is above the threshold' do
-        let(:active_user_count) { license_seats_limit + 5 }
-
-        it { is_expected.to eq(true) }
-      end
-
-      context 'when license is below the threshold' do
-        let(:active_user_count) { 1 }
-
-        it { is_expected.to eq(false) }
-      end
-    end
-
-    context 'when regular user is logged in' do
-      before do
-        allow(helper).to receive(:current_user).and_return(user)
-      end
-
-      context 'when license is above the threshold' do
-        let(:active_user_count) { license_seats_limit + 5 }
-
-        it { is_expected.to eq(false) }
-      end
-
-      context 'when license is below the threshold' do
-        let(:active_user_count) { 1 }
-
-        it { is_expected.to eq(false) }
-      end
-    end
-
-    context 'with anonymous user' do
-      before do
-        allow(helper).to receive(:current_user).and_return(nil)
-      end
-
-      context 'when license is above the threshold' do
-        let(:active_user_count) { license_seats_limit + 5 }
-
-        it { is_expected.to be_falsey }
-      end
-
-      context 'when license is below the threshold' do
-        let(:active_user_count) { 1 }
-
-        it { is_expected.to be_falsey }
-      end
-    end
-  end
-
   describe '#show_active_user_count_threshold_banner?' do
     let_it_be(:active_user_count) { 1 }
 

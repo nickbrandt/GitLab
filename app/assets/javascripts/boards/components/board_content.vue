@@ -1,13 +1,14 @@
 <script>
-import { mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
+import { GlAlert } from '@gitlab/ui';
 import BoardColumn from 'ee_else_ce/boards/components/board_column.vue';
-import EpicsSwimlanes from 'ee_component/boards/components/epics_swimlanes.vue';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   components: {
     BoardColumn,
-    EpicsSwimlanes,
+    EpicsSwimlanes: () => import('ee_component/boards/components/epics_swimlanes.vue'),
+    GlAlert,
   },
   mixins: [glFeatureFlagMixin()],
   props: {
@@ -42,23 +43,38 @@ export default {
     },
   },
   computed: {
-    ...mapState(['isShowingEpicsSwimlanes', 'boardLists']),
+    ...mapState(['isShowingEpicsSwimlanes', 'boardLists', 'error']),
     isSwimlanesOn() {
       return this.glFeatures.boardsWithSwimlanes && this.isShowingEpicsSwimlanes;
     },
+    boardListsToUse() {
+      return this.glFeatures.graphqlBoardLists ? this.boardLists : this.lists;
+    },
+  },
+  mounted() {
+    if (this.glFeatures.graphqlBoardLists) {
+      this.fetchLists();
+      this.showPromotionList();
+    }
+  },
+  methods: {
+    ...mapActions(['fetchLists', 'showPromotionList']),
   },
 };
 </script>
 
 <template>
   <div>
+    <gl-alert v-if="error" variant="danger" :dismissible="false">
+      {{ error }}
+    </gl-alert>
     <div
       v-if="!isSwimlanesOn"
       class="boards-list gl-w-full gl-py-5 gl-px-3 gl-white-space-nowrap"
       data-qa-selector="boards_list"
     >
       <board-column
-        v-for="list in lists"
+        v-for="list in boardListsToUse"
         :key="list.id"
         ref="board"
         :can-admin-list="canAdminList"
@@ -73,7 +89,7 @@ export default {
     <epics-swimlanes
       v-else
       ref="swimlanes"
-      :lists="boardLists"
+      :lists="boardListsToUse"
       :can-admin-list="canAdminList"
       :disabled="disabled"
       :board-id="boardId"

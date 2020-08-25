@@ -1,5 +1,3 @@
-- return unless local_assigns.fetch(:license)
-
 .row
   .col-md-6
     .card
@@ -18,6 +16,12 @@
         %li
           %span.light= _('Plan:')
           %strong= @license.plan.capitalize
+          = ' - '
+          = link_to _('How to upgrade'),
+            help_page_path('subscriptions/index.md', anchor: 'upgrade-your-self-managed-subscription-tier'),
+            class: 'inline-link',
+            target: :_blank,
+            rel: :noreferrer
         %li
           %span.light= _('Uploaded:')
           %strong= time_ago_with_tooltip @license.created_at

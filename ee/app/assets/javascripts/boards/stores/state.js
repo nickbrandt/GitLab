@@ -5,8 +5,6 @@ export default () => ({
 
   isShowingEpicsSwimlanes: false,
   epicsSwimlanesFetchInProgress: false,
-  epicsSwimlanesFetchFailure: false,
-  epicsSwimlanes: {},
   epics: {},
-  boardLists: [],
+  issuesByEpicId: {},
 });

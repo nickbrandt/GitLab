@@ -174,7 +174,6 @@ module EE
                 merge_requests_with_required_codeowners: distinct_count(::ApprovalMergeRequestRule.code_owner_approval_required, :merge_request_id),
                 projects_mirrored_with_pipelines_enabled: count(::Project.mirrored_with_enabled_pipelines),
                 projects_reporting_ci_cd_back_to_github: count(::GithubService.active),
-                projects_with_packages: distinct_count(::Packages::Package, :project_id),
                 projects_with_tracing_enabled: count(ProjectTracingSetting),
                 status_page_projects: count(::StatusPage::ProjectSetting.enabled),
                 status_page_issues: count(::Issue.on_status_page, start: issue_minimum_id, finish: issue_maximum_id),
@@ -219,6 +218,7 @@ module EE
         def usage_activity_by_stage_create(time_period)
           super.merge({
             projects_enforcing_code_owner_approval: distinct_count(::Project.requiring_code_owner_approval.where(time_period), :creator_id),
+            projects_with_sectional_code_owner_rules: projects_with_sectional_code_owner_rules(time_period),
             merge_requests_with_added_rules: distinct_count(::ApprovalMergeRequestRule.where(time_period).with_added_approval_rules,
                                                             :merge_request_id,
                                                             start: approval_merge_request_rule_minimum_id,
@@ -263,13 +263,6 @@ module EE
             projects_prometheus_active: distinct_count(::Project.with_active_prometheus_service.where(time_period), :creator_id),
             projects_with_error_tracking_enabled: distinct_count(::Project.with_enabled_error_tracking.where(time_period), :creator_id),
             projects_with_tracing_enabled: distinct_count(::Project.with_tracing_enabled.where(time_period), :creator_id)
-          })
-        end
-
-        override :usage_activity_by_stage_package
-        def usage_activity_by_stage_package(time_period)
-          super.merge({
-            projects_with_packages: distinct_count(::Project.with_packages.where(time_period), :creator_id)
           })
         end
 
@@ -388,6 +381,21 @@ module EE
           max_id = JiraTrackerData.where(issues_enabled: true).maximum(:service_id)
           # rubocop: enable UsageData/LargeTable:
           count(::JiraService.active.includes(:jira_tracker_data).where(jira_tracker_data: { issues_enabled: true }), start: min_id, finish: max_id)
+        end
+        # rubocop:enable CodeReuse/ActiveRecord
+
+        # rubocop:disable CodeReuse/ActiveRecord
+        def projects_with_sectional_code_owner_rules(time_period)
+          distinct_count(
+            ::ApprovalMergeRequestRule
+              .code_owner
+              .joins(:merge_request)
+              .where("section != ?", ::Gitlab::CodeOwners::Entry::DEFAULT_SECTION)
+              .where(time_period),
+            'merge_requests.target_project_id',
+            start: project_minimum_id,
+            finish: project_maximum_id
+          )
         end
         # rubocop:enable CodeReuse/ActiveRecord
       end

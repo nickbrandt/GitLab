@@ -98,6 +98,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           scope :profiles do
             root 'dast_profiles#index', as: 'profiles'
             resources :dast_site_profiles, only: [:new, :edit]
+            resources :dast_scanner_profiles, only: [:new]
           end
         end
 

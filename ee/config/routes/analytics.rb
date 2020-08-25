@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 namespace :analytics do
-  root to: 'analytics#index'
+  root to: redirect('admin/dev_ops_score')
 
   constraints(-> (req) { Gitlab::Analytics.cycle_analytics_enabled? }) do
     resource :cycle_analytics, only: :show, path: 'value_stream_analytics'

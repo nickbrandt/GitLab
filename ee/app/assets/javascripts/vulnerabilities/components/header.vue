@@ -1,12 +1,12 @@
 <script>
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import Api from 'ee/api';
 import { CancelToken } from 'axios';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import axios from '~/lib/utils/axios_utils';
 import download from '~/lib/utils/downloader';
 import { redirectTo } from '~/lib/utils/url_utility';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { s__ } from '~/locale';
 import UsersCache from '~/lib/utils/users_cache';
 import ResolutionAlert from './resolution_alert.vue';
@@ -17,9 +17,10 @@ import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
 
 export default {
   name: 'VulnerabilityHeader',
+
   components: {
-    GlButton,
     GlLoadingIcon,
+    GlButton,
     ResolutionAlert,
     VulnerabilityStateDropdown,
     SplitButton,
@@ -35,8 +36,8 @@ export default {
 
   data() {
     return {
-      isLoadingVulnerability: false,
       isProcessingAction: false,
+      isLoadingVulnerability: false,
       isLoadingUser: false,
       vulnerability: this.initialVulnerability,
       user: undefined,
@@ -54,10 +55,6 @@ export default {
 
       if (this.canDownloadPatch) {
         buttons.push(HEADER_ACTION_BUTTONS.patchDownload);
-      }
-
-      if (!this.hasIssue) {
-        buttons.push(HEADER_ACTION_BUTTONS.issueCreation);
       }
 
       return buttons;
@@ -149,38 +146,6 @@ export default {
         .finally(() => {
           this.isLoadingVulnerability = false;
           VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGE');
-        });
-    },
-    createIssue() {
-      this.isProcessingAction = true;
-
-      const {
-        report_type: category,
-        project_fingerprint: projectFingerprint,
-        id,
-      } = this.vulnerability;
-
-      axios
-        .post(this.vulnerability.create_issue_url, {
-          vulnerability_feedback: {
-            feedback_type: FEEDBACK_TYPES.ISSUE,
-            category,
-            project_fingerprint: projectFingerprint,
-            vulnerability_data: {
-              ...this.vulnerability,
-              category,
-              vulnerability_id: id,
-            },
-          },
-        })
-        .then(({ data: { issue_url } }) => {
-          redirectTo(issue_url);
-        })
-        .catch(() => {
-          this.isProcessingAction = false;
-          createFlash(
-            s__('VulnerabilityManagement|Something went wrong, could not create an issue.'),
-          );
         });
     },
     createMergeRequest() {
@@ -299,7 +264,6 @@ export default {
           :disabled="isProcessingAction"
           class="js-split-button"
           @createMergeRequest="createMergeRequest"
-          @createIssue="createIssue"
           @downloadPatch="downloadPatch"
         />
         <gl-button

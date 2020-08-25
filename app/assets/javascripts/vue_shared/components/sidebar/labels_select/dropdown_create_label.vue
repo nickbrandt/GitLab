@@ -1,10 +1,13 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlTooltipDirective } from '@gitlab/ui';
 import { __ } from '~/locale';
 
 export default {
   components: {
     GlButton,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     headerTitle: {
@@ -14,7 +17,11 @@ export default {
     },
   },
   created() {
-    this.suggestedColors = gon.suggested_label_colors;
+    const rawLabelsColors = gon.suggested_label_colors;
+    this.suggestedColors = Object.keys(rawLabelsColors).map(colorCode => ({
+      colorCode,
+      title: rawLabelsColors[colorCode],
+    }));
   },
 };
 </script>
@@ -31,6 +38,7 @@ export default {
       {{ headerTitle }}
       <gl-button
         :aria-label="__('Close')"
+        category="tertiary"
         class="dropdown-title-button dropdown-menu-close float-right"
         icon="close"
         category="tertiary"
@@ -48,10 +56,12 @@ export default {
         <a
           v-for="(color, index) in suggestedColors"
           :key="index"
-          :data-color="color"
+          v-gl-tooltip
+          :data-color="color.colorCode"
           :style="{
-            backgroundColor: color,
+            backgroundColor: color.colorCode,
           }"
+          :title="color.title"
           href="#"
         >
           &nbsp;

@@ -5,6 +5,7 @@ module UserCalloutsHelper
   GKE_CLUSTER_INTEGRATION = 'gke_cluster_integration'
   GCP_SIGNUP_OFFER = 'gcp_signup_offer'
   SUGGEST_POPOVER_DISMISSED = 'suggest_popover_dismissed'
+  SERVICE_TEMPLATES_DEPRECATED = 'service_templates_deprecated'
   TABS_POSITION_HIGHLIGHT = 'tabs_position_highlight'
   WEBHOOKS_MOVED = 'webhooks_moved'
   CUSTOMIZE_HOMEPAGE = 'customize_homepage'
@@ -37,8 +38,8 @@ module UserCalloutsHelper
     !user_dismissed?(SUGGEST_POPOVER_DISMISSED)
   end
 
-  def show_tabs_feature_highlight?
-    current_user && !user_dismissed?(TABS_POSITION_HIGHLIGHT) && !Rails.env.test?
+  def show_service_templates_deprecated?
+    !user_dismissed?(SERVICE_TEMPLATES_DEPRECATED)
   end
 
   def show_webhooks_moved_alert?

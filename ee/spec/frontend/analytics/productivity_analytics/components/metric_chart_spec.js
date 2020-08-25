@@ -1,7 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
 import MetricChart from 'ee/analytics/productivity_analytics/components/metric_chart.vue';
-import { GlLoadingIcon, GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlAlert } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import {
+  GlLoadingIcon,
+  GlDeprecatedDropdown,
+  GlDeprecatedDropdownItem,
+  GlAlert,
+  GlIcon,
+} from '@gitlab/ui';
 import httpStatusCodes from '~/lib/utils/http_status';
 
 describe('MetricChart component', () => {
@@ -155,7 +160,7 @@ describe('MetricChart component', () => {
               expect(
                 findMetricDropdownItems()
                   .at(0)
-                  .find(Icon)
+                  .find(GlIcon)
                   .classes(),
               ).toContain('invisible');
             });

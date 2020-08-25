@@ -7,14 +7,51 @@ RSpec.describe Issuable::CommonSystemNotesService do
   let(:project) { create(:project) }
   let(:issuable) { create(:issue) }
 
+  RSpec.shared_examples 'issuable iteration changed' do
+    context 'when iteration is changed' do
+      let_it_be(:iteration) { create(:iteration) }
+
+      before do
+        issuable.update!(iteration: iteration)
+      end
+
+      it 'creates a resource iteration event' do
+        subject
+        event = issuable.reload.resource_iteration_events.last
+
+        expect(event).not_to be_nil
+        expect(event.iteration.id).to eq iteration.id
+        expect(event.user_id).to eq user.id
+      end
+
+      context 'when resource iteration event tracking is disabled' do
+        before do
+          stub_feature_flags(track_iteration_change_events: false)
+        end
+
+        it 'does not created a resource weight event' do
+          expect { subject }.not_to change { ResourceIterationEvent.count }
+        end
+
+        it 'does create a system note' do
+          expect { subject }.to change { Note.count }.from(0).to(1)
+
+          expect(Note.first.note).to eq("changed iteration to #{iteration.to_reference(issuable.resource_parent, format: :id)}")
+        end
+      end
+    end
+  end
+
   context 'on issuable update' do
+    subject { described_class.new(project, user).execute(issuable, old_labels: []) }
+
     context 'when weight is changed' do
       before do
         issuable.update!(weight: 5)
       end
 
-      it 'creates a resource label event' do
-        described_class.new(project, user).execute(issuable, old_labels: [])
+      it 'creates a resource weight event' do
+        subject
         event = issuable.reload.resource_weight_events.last
 
         expect(event).not_to be_nil
@@ -30,9 +67,7 @@ RSpec.describe Issuable::CommonSystemNotesService do
 
       context 'when setting a health_status' do
         it 'creates system note' do
-          expect do
-            described_class.new(project, user).execute(issuable, old_labels: [])
-          end.to change { Note.count }.from(0).to(1)
+          expect { subject }.to change { Note.count }.from(0).to(1)
 
           expect(Note.last.note).to eq('changed health status to **needs attention**')
         end
@@ -42,9 +77,7 @@ RSpec.describe Issuable::CommonSystemNotesService do
         it 'creates system note' do
           issuable.update!(health_status: nil)
 
-          expect do
-            described_class.new(project, user).execute(issuable, old_labels: [])
-          end.to change { Note.count }.from(0).to(1)
+          expect { subject }.to change { Note.count }.from(0).to(1)
 
           expect(Note.last.note).to eq('removed the health status')
         end
@@ -69,6 +102,8 @@ RSpec.describe Issuable::CommonSystemNotesService do
         expect(Note.second.note).to match('removed the finish date')
       end
     end
+
+    it_behaves_like 'issuable iteration changed'
   end
 
   context 'on issuable create' do
@@ -113,5 +148,7 @@ RSpec.describe Issuable::CommonSystemNotesService do
         expect(Note.first.note).to eq('changed weight to **5**')
       end
     end
+
+    it_behaves_like 'issuable iteration changed'
   end
 end

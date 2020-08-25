@@ -84,12 +84,24 @@ RSpec.describe 'Issue Sidebar' do
     end
 
     context 'when health status feature is available' do
-      it 'shows health status on sidebar' do
+      before do
         stub_licensed_features(issuable_health_status: true)
 
         visit_issue(project, issue)
+      end
 
+      it 'shows health status on sidebar' do
         expect(page).to have_selector('.block.health-status')
+      end
+
+      context 'when user closes an issue' do
+        it 'disables the edit button' do
+          page.find('[data-testid="close-issue-button"]').click
+
+          page.within('.health-status') do
+            expect(page).to have_button('Edit', disabled: true)
+          end
+        end
       end
     end
 

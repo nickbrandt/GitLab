@@ -1,8 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlDeprecatedButton, GlIcon } from '@gitlab/ui';
 import DropdownSearchInput from 'ee/vue_shared/components/sidebar/epics_select/dropdown_search_input.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 
 const createComponent = () =>
   shallowMount(DropdownSearchInput, {
@@ -89,7 +88,7 @@ describe('EpicsSelect', () => {
         });
 
         return wrapper.vm.$nextTick().then(() => {
-          const iconEl = wrapper.find(Icon);
+          const iconEl = wrapper.find(GlIcon);
 
           expect(iconEl.exists()).toBe(true);
           expect(iconEl.attributes('name')).toBe('search');

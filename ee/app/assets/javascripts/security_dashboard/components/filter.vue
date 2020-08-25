@@ -1,12 +1,11 @@
 <script>
-import { GlDeprecatedDropdown, GlSearchBoxByType } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlDeprecatedDropdown, GlSearchBoxByType, GlIcon } from '@gitlab/ui';
 
 export default {
   components: {
     GlDeprecatedDropdown,
     GlSearchBoxByType,
-    Icon,
+    GlIcon,
   },
   props: {
     filter: {
@@ -83,7 +82,7 @@ export default {
           :aria-label="__('Close')"
           @click="closeDropdown"
         >
-          <icon name="close" aria-hidden="true" class="vertical-align-middle" />
+          <gl-icon name="close" aria-hidden="true" class="vertical-align-middle" />
         </button>
       </div>
 
@@ -108,7 +107,7 @@ export default {
           @click="clickFilter(option)"
         >
           <span class="d-flex">
-            <icon
+            <gl-icon
               v-if="isSelected(option)"
               class="flex-shrink-0 js-check"
               name="mobile-issue-close"

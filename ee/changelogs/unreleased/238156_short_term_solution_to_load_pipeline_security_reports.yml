@@ -1,0 +1,6 @@
+---
+title: Load only the requested report artifacts into the memory for vulnerability_findings
+  endpoint
+merge_request: 39749
+author:
+type: performance

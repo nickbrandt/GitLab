@@ -202,7 +202,7 @@ exports[`LicenseCardBody renders a loading state if isRemoving 1`] = `
   <div
     class="p-5 d-flex justify-content-center align-items-center license-card-loading"
   >
-    <icon-stub
+    <gl-icon-stub
       name="spinner"
       size="16"
     />

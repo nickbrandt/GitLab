@@ -91,7 +91,7 @@ RSpec.describe 'Projects > Audit Events', :js do
       visit project_deploy_keys_path(project)
 
       accept_confirm do
-        find('.ic-remove').click
+        find('[data-testid="remove-icon"]').click
       end
 
       visit project_audit_events_path(project)

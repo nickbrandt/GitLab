@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Cookies from 'js-cookie';
 import BurnCharts from './components/burn_charts.vue';
 import BurndownChartData from './burn_chart_data';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
 

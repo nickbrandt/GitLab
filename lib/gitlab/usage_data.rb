@@ -129,6 +129,7 @@ module Gitlab
             lfs_objects: count(LfsObject),
             milestone_lists: count(List.milestone),
             milestones: count(Milestone),
+            projects_with_packages: distinct_count(::Packages::Package, :project_id),
             pages_domains: count(PagesDomain),
             pool_repositories: count(PoolRepository),
             projects: count(Project),
@@ -409,7 +410,7 @@ module Gitlab
       def successful_deployments_with_cluster(scope)
         scope
           .joins(cluster: :deployments)
-          .merge(Clusters::Cluster.enabled)
+          .merge(::Clusters::Cluster.enabled)
           .merge(Deployment.success)
       end
       # rubocop: enable UsageData/LargeTable
@@ -527,9 +528,13 @@ module Gitlab
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
+      # rubocop: disable CodeReuse/ActiveRecord
       def usage_activity_by_stage_package(time_period)
-        {}
+        {
+          projects_with_packages: distinct_count(::Project.with_packages.where(time_period), :creator_id)
+        }
       end
+      # rubocop: enable CodeReuse/ActiveRecord
 
       # Omitted because no user, creator or author associated: `boards`, `labels`, `milestones`, `uploads`
       # Omitted because too expensive: `epics_deepest_relationship_level`
@@ -604,27 +609,27 @@ module Gitlab
       end
 
       def action_monthly_active_users(time_period)
-        counter = Gitlab::UsageDataCounters::TrackUniqueActions
+        counter = Gitlab::UsageDataCounters::TrackUniqueEvents
 
         project_count = redis_usage_data do
-          counter.count_unique(
-            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::PUSH_ACTION,
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueEvents::PUSH_ACTION,
             date_from: time_period[:created_at].first,
             date_to: time_period[:created_at].last
           )
         end
 
         design_count = redis_usage_data do
-          counter.count_unique(
-            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::DESIGN_ACTION,
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueEvents::DESIGN_ACTION,
             date_from: time_period[:created_at].first,
             date_to: time_period[:created_at].last
           )
         end
 
         wiki_count = redis_usage_data do
-          counter.count_unique(
-            event_action: Gitlab::UsageDataCounters::TrackUniqueActions::WIKI_ACTION,
+          counter.count_unique_events(
+            event_action: Gitlab::UsageDataCounters::TrackUniqueEvents::WIKI_ACTION,
             date_from: time_period[:created_at].first,
             date_to: time_period[:created_at].last
           )
@@ -716,6 +721,18 @@ module Gitlab
         end
       end
 
+      def project_minimum_id
+        strong_memoize(:project_minimum_id) do
+          ::Project.minimum(:id)
+        end
+      end
+
+      def project_maximum_id
+        strong_memoize(:project_maximum_id) do
+          ::Project.maximum(:id)
+        end
+      end
+
       def clear_memoized
         clear_memoization(:issue_minimum_id)
         clear_memoization(:issue_maximum_id)
@@ -726,6 +743,8 @@ module Gitlab
         clear_memoization(:deployment_maximum_id)
         clear_memoization(:approval_merge_request_rule_minimum_id)
         clear_memoization(:approval_merge_request_rule_maximum_id)
+        clear_memoization(:project_minimum_id)
+        clear_memoization(:project_maximum_id)
       end
 
       # rubocop: disable CodeReuse/ActiveRecord

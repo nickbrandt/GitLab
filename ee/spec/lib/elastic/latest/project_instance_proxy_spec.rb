@@ -33,7 +33,10 @@ RSpec.describe Elastic::Latest::ProjectInstanceProxy do
     it 'raises an error for a project with an empty project_feature' do
       allow(project).to receive(:project_feature).and_return(nil)
 
-      expect(project.logger).to receive(:error)
+      expect(Gitlab::ErrorTracking).to receive(:track_and_raise_exception).with(
+        NoMethodError,
+        project_id: project.id,
+        feature: 'issues_access_level').and_call_original
       expect { subject.as_indexed_json }.to raise_error NoMethodError
     end
   end

@@ -5,7 +5,7 @@ module Mutations
     class Create < BaseMutation
       InvalidGlobalID = Class.new(StandardError)
 
-      include ResolvesProject
+      include AuthorizesProject
 
       graphql_name 'DastOnDemandScanCreate'
 
@@ -21,11 +21,10 @@ module Mutations
                required: true,
                description: 'ID of the site profile to be used for the scan.'
 
-      authorize :run_ondemand_dast_scan
+      authorize :create_on_demand_dast_scan
 
       def resolve(full_path:, dast_site_profile_id:)
-        project = authorized_find!(full_path: full_path)
-        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project, default_enabled: true)
+        project = authorized_find_project!(full_path: full_path)
 
         dast_site_profile = find_dast_site_profile(project: project, dast_site_profile_id: dast_site_profile_id)
         dast_site = dast_site_profile.dast_site
@@ -41,10 +40,6 @@ module Mutations
       end
 
       private
-
-      def find_object(full_path:)
-        resolve_project(full_path: full_path)
-      end
 
       def find_dast_site_profile(project:, dast_site_profile_id:)
         project

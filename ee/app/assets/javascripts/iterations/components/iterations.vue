@@ -153,7 +153,7 @@ export default {
         </gl-alert>
       </div>
       <div v-else>
-        <iterations-list :iterations="iterations" />
+        <iterations-list :iterations="iterations" :namespace-type="namespaceType" />
         <gl-pagination
           v-if="prevPage || nextPage"
           :value="pagination.currentPage"

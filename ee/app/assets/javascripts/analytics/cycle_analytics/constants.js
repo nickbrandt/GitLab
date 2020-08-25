@@ -78,3 +78,8 @@ export const CAPITALIZED_STAGE_NAME = Object.keys(STAGE_NAME).reduce((acc, stage
 export const PATH_HOME_ICON = 'home';
 
 export const DEFAULT_VALUE_STREAM_ID = 'default';
+
+export const OVERVIEW_METRICS = {
+  TIME_SUMMARY: 'TIME_SUMMARY',
+  RECENT_ACTIVITY: 'RECENT_ACTIVITY',
+};

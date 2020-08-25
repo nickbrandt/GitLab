@@ -7,7 +7,7 @@ module Security
         @project = project
         @current_user = current_user
         @params = params
-        @branch_name = @project.repository.next_branch('add-sast-config')
+        @branch_name = @project.repository.next_branch('set-sast-config')
       end
 
       def execute
@@ -23,10 +23,13 @@ module Security
       private
 
       def attributes
-        actions = Security::CiConfiguration::SastBuildActions.new(@project.auto_devops_enabled?, @params).generate
+        gitlab_ci_yml = @project.repository.gitlab_ci_yml_for(@project.repository.root_ref_sha)
+        existing_gitlab_ci_content = YAML.safe_load(gitlab_ci_yml) if gitlab_ci_yml
+
+        actions = Security::CiConfiguration::SastBuildActions.new(@project.auto_devops_enabled?, @params, existing_gitlab_ci_content).generate
 
         @project.repository.add_branch(@current_user, @branch_name, @project.default_branch)
-        message = _('Add .gitlab-ci.yml to enable or configure SAST')
+        message = _('Set .gitlab-ci.yml to enable or configure SAST')
 
         {
           commit_message: message,
@@ -37,7 +40,7 @@ module Security
       end
 
       def successful_change_path
-        description = _('Add .gitlab-ci.yml to enable or configure SAST security scanning using the GitLab managed template. You can [add variable overrides](https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings) to customize SAST settings.')
+        description = _('Set .gitlab-ci.yml to enable or configure SAST security scanning using the GitLab managed template. You can [add variable overrides](https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings) to customize SAST settings.')
         merge_request_params = { source_branch: @branch_name, description: description }
         Gitlab::Routing.url_helpers.project_new_merge_request_url(@project, merge_request: merge_request_params)
       end

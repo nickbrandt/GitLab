@@ -5,7 +5,7 @@ exports[`HeaderCell renders an inflexible cell with a title with an icon through
   class="license-header-cell"
 >
   <template>
-    <icon-stub
+    <gl-icon-stub
       class="icon"
       name="retry"
       size="16"

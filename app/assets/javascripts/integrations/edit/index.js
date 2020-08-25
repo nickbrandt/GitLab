@@ -19,6 +19,7 @@ function parseDatasetToProps(data) {
     projectKey,
     upgradePlanPath,
     editProjectPath,
+    learnMorePath,
     triggerEvents,
     fields,
     inheritFromId,
@@ -35,9 +36,7 @@ function parseDatasetToProps(data) {
   } = parseBooleanInData(booleanAttributes);
 
   return {
-    activeToggleProps: {
-      initialActivated: activated,
-    },
+    initialActivated: activated,
     showActive,
     type,
     triggerFieldsProps: {
@@ -53,6 +52,7 @@ function parseDatasetToProps(data) {
       upgradePlanPath,
       editProjectPath,
     },
+    learnMorePath,
     triggerEvents: JSON.parse(triggerEvents),
     fields: JSON.parse(fields),
     inheritFromId: parseInt(inheritFromId, 10),

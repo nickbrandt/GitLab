@@ -83,7 +83,9 @@ describe('Environment', () => {
       });
 
       it('should render arrow to open deploy boards', () => {
-        expect(wrapper.find('.deploy-board-icon .ic-chevron-down').exists()).toBe(true);
+        expect(wrapper.find('.deploy-board-icon [data-testid="chevron-down-icon"]').exists()).toBe(
+          true,
+        );
       });
     });
 

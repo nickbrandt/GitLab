@@ -176,6 +176,7 @@ RSpec.describe ProjectsHelper do
         projects/on_demand_scans#index
         projects/dast_profiles#index
         projects/dast_site_profiles#new
+        projects/dast_scanner_profiles#new
         projects/dependencies#index
         projects/licenses#index
         projects/threat_monitoring#show
@@ -186,6 +187,21 @@ RSpec.describe ProjectsHelper do
     subject { helper.sidebar_security_paths }
 
     it { is_expected.to eq(expected_security_paths) }
+  end
+
+  describe '#sidebar_on_demand_scans_paths' do
+    let(:expected_on_demand_scans_paths) do
+      %w[
+        projects/on_demand_scans#index
+        projects/dast_profiles#index
+        projects/dast_site_profiles#new
+        projects/dast_scanner_profiles#new
+      ]
+    end
+
+    subject { helper.sidebar_on_demand_scans_paths }
+
+    it { is_expected.to eq(expected_on_demand_scans_paths) }
   end
 
   describe '#get_project_nav_tabs' do

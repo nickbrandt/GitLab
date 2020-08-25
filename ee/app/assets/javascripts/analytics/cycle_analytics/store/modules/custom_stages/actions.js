@@ -1,5 +1,5 @@
 import Api from 'ee/api';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatusCodes from '~/lib/utils/http_status';
 import * as types from './mutation_types';

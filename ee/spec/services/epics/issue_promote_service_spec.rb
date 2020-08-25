@@ -60,6 +60,7 @@ RSpec.describe Epics::IssuePromoteService do
 
           before do
             allow(Gitlab::Tracking).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
+            allow(ProductAnalytics::Tracker).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
 
             subject.execute(issue)
           end
@@ -103,6 +104,18 @@ RSpec.describe Epics::IssuePromoteService do
               expect(epic.user_mentions.count).to eq 2
             end
           end
+
+          context 'when issue description has an attachment' do
+            let(:image_uploader) { build(:file_uploader, project: project) }
+            let(:description) { "A description and image: #{image_uploader.markdown_link}" }
+
+            it 'copies the description, rewriting the attachment' do
+              new_image_uploader = Upload.last.retrieve_uploader
+
+              expect(new_image_uploader.markdown_link).not_to eq(image_uploader.markdown_link)
+              expect(epic.description).to eq("A description and image: #{new_image_uploader.markdown_link}")
+            end
+          end
         end
 
         context 'when an issue belongs to an epic' do
@@ -130,19 +143,28 @@ RSpec.describe Epics::IssuePromoteService do
           end
         end
 
-        context 'when promoted issue has notes' do
-          let!(:discussion) { create(:discussion_note_on_issue, noteable: issue, project: issue.project) }
-
+        context 'when issue has notes' do
           before do
             allow(Gitlab::Tracking).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
+            allow(ProductAnalytics::Tracker).to receive(:event).with('epics', 'promote', an_instance_of(Hash))
             issue.reload
           end
 
-          it 'creates a new epic with all notes' do
+          it 'copies all notes' do
+            discussion = create(:discussion_note_on_issue, noteable: issue, project: issue.project)
+
             epic = subject.execute(issue)
             expect(epic.notes.count).to eq(issue.notes.count)
             expect(epic.notes.where(discussion_id: discussion.discussion_id).count).to eq(0)
             expect(issue.notes.where(discussion_id: discussion.discussion_id).count).to eq(1)
+          end
+
+          it 'copies note attachments' do
+            create(:discussion_note_on_issue, :with_attachment, noteable: issue, project: issue.project)
+
+            epic = subject.execute(issue)
+
+            expect(epic.notes.user.first.attachment).to be_kind_of(AttachmentUploader)
           end
         end
       end

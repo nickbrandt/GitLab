@@ -76,7 +76,7 @@ describe('dashboard', () => {
 
     it('renders the message', () => {
       expect(trimText(message.text())).toBe(
-        'This dashboard displays a maximum of 7 projects and 3 environments per project. More information',
+        'This dashboard displays a maximum of 7 projects and 3 environments per project, and is linked to the Operations Dashboard. When you add or remove a project from one dashboard, GitLab adds or removes the project from the other. More information',
       );
     });
 

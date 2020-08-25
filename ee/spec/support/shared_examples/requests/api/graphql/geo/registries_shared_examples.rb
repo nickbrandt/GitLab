@@ -12,8 +12,8 @@ RSpec.shared_examples 'gets registries for' do |args|
   include EE::GeoHelpers
 
   let_it_be(:secondary) { create(:geo_node) }
-  let!(:registry1) { create(registry_factory) }
-  let!(:registry2) { create(registry_factory) }
+  let!(:registry1) { create(registry_factory) } # rubocop:disable Rails/SaveBang
+  let!(:registry2) { create(registry_factory) } # rubocop:disable Rails/SaveBang
 
   let(:query) do
     <<~QUERY
@@ -54,8 +54,8 @@ RSpec.shared_examples 'gets registries for' do |args|
   end
 
   context 'when paginating' do
-    let!(:expected_registry1) { create(registry_factory) }
-    let!(:expected_registry2) { create(registry_factory) }
+    let!(:expected_registry1) { create(registry_factory) } # rubocop:disable Rails/SaveBang
+    let!(:expected_registry2) { create(registry_factory) } # rubocop:disable Rails/SaveBang
 
     def query(registries_params)
       <<~QUERY

@@ -32,11 +32,6 @@ export const VULNERABILITY_STATES = {
 };
 
 export const HEADER_ACTION_BUTTONS = {
-  issueCreation: {
-    name: s__('ciReport|Create issue'),
-    tagline: s__('ciReport|Investigate this vulnerability by creating an issue'),
-    action: 'createIssue',
-  },
   mergeRequestCreation: {
     name: s__('ciReport|Resolve with merge request'),
     tagline: s__('ciReport|Automatically apply the patch in a new branch'),

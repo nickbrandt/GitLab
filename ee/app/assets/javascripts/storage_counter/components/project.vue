@@ -1,6 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlLink } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlDeprecatedButton, GlLink, GlIcon } from '@gitlab/ui';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { numberToHumanSize, isOdd } from '~/lib/utils/number_utils';
 import { s__ } from '~/locale';
@@ -8,7 +7,7 @@ import StorageRow from './storage_row.vue';
 
 export default {
   components: {
-    Icon,
+    GlIcon,
     GlDeprecatedButton,
     GlLink,
     ProjectAvatar,
@@ -93,7 +92,7 @@ export default {
             :aria-label="__('Toggle project')"
             @click="toggleProject"
           >
-            <icon :name="iconName" class="folder-icon" />
+            <gl-icon :name="iconName" class="folder-icon" />
           </gl-deprecated-button>
 
           <project-avatar :project="projectAvatar" :size="20" />

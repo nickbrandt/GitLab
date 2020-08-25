@@ -9,7 +9,7 @@ RSpec.describe API::Variables do
   before do
     project.add_maintainer(user)
 
-    stub_licensed_features(extended_audit_events: true)
+    stub_licensed_features(audit_events: true)
   end
 
   describe 'POST /projects/:id/variables' do

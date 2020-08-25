@@ -13,6 +13,10 @@ RSpec.describe Mutations::Pipelines::RunDastScan do
 
   subject(:mutation) { described_class.new(object: nil, context: { current_user: user }, field: nil) }
 
+  before do
+    stub_licensed_features(security_on_demand_scans: true)
+  end
+
   describe '#resolve' do
     subject do
       mutation.resolve(

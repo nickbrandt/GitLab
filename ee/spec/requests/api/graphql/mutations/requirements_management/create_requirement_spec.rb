@@ -24,9 +24,7 @@ RSpec.describe 'Creating a Requirement' do
       stub_licensed_features(requirements: true)
     end
 
-    it_behaves_like 'a mutation that returns top-level errors',
-      errors: ['The resource that you are attempting to access does not exist '\
-               'or you don\'t have permission to perform this action']
+    it_behaves_like 'a mutation that returns a top-level access error'
 
     it 'does not create requirement' do
       expect { post_graphql_mutation(mutation, current_user: current_user) }.not_to change(RequirementsManagement::Requirement, :count)

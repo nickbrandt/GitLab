@@ -36,11 +36,11 @@ project.
 
 To allow for asynchronous issue handling, we use [milestones](https://gitlab.com/groups/gitlab-org/-/milestones)
 and [labels](https://gitlab.com/gitlab-org/gitlab/-/labels). Leads and product managers handle most of the
-scheduling into milestones. Labeling is a task for everyone.
+scheduling into milestones. Labeling is a task for everyone. (For some projects, labels can be set only by GitLab team members and not by community contributors).
 
 Most issues will have labels for at least one of the following:
 
-- Type: `~feature`, `~bug`, `~backstage`, `~documentation`, etc.
+- Type: `~feature`, `~bug`, `~tooling`, `~documentation`, etc.
 - Stage: `~"devops::plan"`, `~"devops::create"`, etc.
 - Group: `~"group::source code"`, `~"group::knowledge"`, `~"group::editor"`, etc.
 - Category: `~"Category:Code Analytics"`, `~"Category:DevOps Score"`, `~"Category:Templates"`, etc.
@@ -49,8 +49,8 @@ Most issues will have labels for at least one of the following:
 - Team: `~"Technical Writing"`, `~Delivery`
 - Specialization: `~frontend`, `~backend`, `~documentation`
 - Release Scoping: `~Deliverable`, `~Stretch`, `~"Next Patch Release"`
-- Priority: `~P::1`, `~P::2`, `~P::3`, `~P::4`
-- Severity: ~`S::1`, `~S::2`, `~S::3`, `~S::4`
+- Priority: `~"priority::1"`, `~"priority::2"`, `~"priority::3"`, `~"priority::4"`
+- Severity: ~`"severity::1"`, `~"severity::2"`, `~"severity::3"`, `~"severity::4"`
 
 All labels, their meaning and priority are defined on the
 [labels page](https://gitlab.com/gitlab-org/gitlab/-/labels).
@@ -67,7 +67,7 @@ The current type labels are:
 
 - ~feature
 - ~bug
-- ~backstage
+- ~tooling
 - ~"support request"
 - ~meta
 - ~documentation
@@ -93,9 +93,9 @@ Following is a non-exhaustive list of facet labels:
 - ~enhancement: This label can refine an issue that has the ~feature label.
 - ~"master:broken": This label can refine an issue that has the ~bug label.
 - ~"failure::flaky-test": This label can refine an issue that has the ~bug label.
-- ~"technical debt": This label can refine an issue that has the ~backstage label.
-- ~"static analysis": This label can refine an issue that has the ~backstage label.
-- ~"ci-build": This label can refine an issue that has the ~backstage label.
+- ~"technical debt": This label can refine an issue that has the ~tooling label.
+- ~"static analysis": This label can refine an issue that has the ~tooling label.
+- ~"ci-build": This label can refine an issue that has the ~tooling label.
 - ~performance: A performance issue could describe a ~bug or a ~feature.
 - ~security: A security issue could describe a ~bug or a ~feature.
 - ~database: A database issue could describe a ~bug or a ~feature.
@@ -275,10 +275,10 @@ or ~"Stretch". Any open issue for a previous milestone should be labeled
 
 We have the following priority labels:
 
-- ~P::1
-- ~P::2
-- ~P::3
-- ~P::4
+- ~"priority::1"
+- ~"priority::2"
+- ~"priority::3"
+- ~"priority::4"
 
 Please refer to the issue triage [priority label](https://about.gitlab.com/handbook/engineering/quality/issue-triage/#priority) section in our handbook to see how it's used.
 
@@ -286,10 +286,10 @@ Please refer to the issue triage [priority label](https://about.gitlab.com/handb
 
 We have the following severity labels:
 
-- ~S::1
-- ~S::2
-- ~S::3
-- ~S::4
+- ~"severity::1"
+- ~"severity::2"
+- ~"severity::3"
+- ~"severity::4"
 
 Please refer to the issue triage [severity label](https://about.gitlab.com/handbook/engineering/quality/issue-triage/#severity) section in our handbook to see how it's used.
 

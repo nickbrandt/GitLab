@@ -312,48 +312,6 @@ RSpec.describe Notes::QuickActionsService do
     end
   end
 
-  context '/relate' do
-    let(:other_issue) { create(:issue, project: project) }
-    let(:note_text) { "/relate #{other_issue.to_reference}" }
-    let(:note) { create(:note_on_issue, noteable: issue, project: project, note: note_text) }
-
-    context 'user cannot relate issues' do
-      before do
-        project.update(visibility: Gitlab::VisibilityLevel::PUBLIC)
-      end
-
-      it 'does not create issue relation' do
-        expect { execute(note) }.not_to change { IssueLink.count }
-      end
-    end
-
-    context 'user is allowed to relate issues' do
-      before do
-        group.add_developer(user)
-      end
-
-      context 'related issues are not enabled' do
-        before do
-          stub_licensed_features(related_issues: false)
-        end
-
-        it 'does not create issue relation' do
-          expect { execute(note) }.not_to change { IssueLink.count }
-        end
-      end
-
-      context 'related issues are enabled' do
-        before do
-          stub_licensed_features(related_issues: true)
-        end
-
-        it 'creates issue relation' do
-          expect { execute(note) }.to change { IssueLink.count }.by(1)
-        end
-      end
-    end
-  end
-
   context '/promote' do
     let(:note_text) { "/promote" }
     let(:note) { create(:note_on_issue, noteable: issue, project: project, note: note_text) }

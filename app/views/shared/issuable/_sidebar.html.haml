@@ -40,12 +40,13 @@
                 = _('None')
           .title.hide-collapsed
             = _('Milestone')
-            = icon('spinner spin', class: 'hidden block-loading', 'aria-hidden': 'true')
+            = loading_icon(css_class: 'gl-vertical-align-text-bottom hidden block-loading')
             - if can_edit_issuable
               = link_to _('Edit'), '#', class: 'js-sidebar-dropdown-toggle edit-link float-right', data: { qa_selector: "edit_milestone_link", track_label: "right_sidebar", track_property: "milestone", track_event: "click_edit_button", track_value: "" }
           .value.hide-collapsed
             - if milestone.present?
-              = link_to milestone[:title], milestone[:web_url], class: "bold has-tooltip", title: sidebar_milestone_remaining_days(milestone), data: { container: "body", html: 'true', boundary: 'viewport', qa_selector: 'milestone_link', qa_title: milestone[:title] }
+              - milestone_title = milestone[:expired] ? _("%{milestone_name} (Past due)").html_safe % { milestone_name: milestone[:title] } : milestone[:title]
+              = link_to milestone_title, milestone[:web_url], class: "bold has-tooltip", title: sidebar_milestone_remaining_days(milestone), data: { container: "body", html: 'true', boundary: 'viewport', qa_selector: 'milestone_link', qa_title: milestone[:title] }
             - else
               %span.no-value
                 = _('None')
@@ -55,21 +56,22 @@
             = dropdown_tag('Milestone', options: { title: _('Assign milestone'), toggle_class: 'js-milestone-select js-extra-options', filter: true, dropdown_class: 'dropdown-menu-selectable', placeholder: _('Search milestones'), data: { show_no: true, field_name: "#{issuable_type}[milestone_id]", project_id: issuable_sidebar[:project_id], issuable_id: issuable_sidebar[:id], milestones: issuable_sidebar[:project_milestones_path], ability_name: issuable_type, issue_update: issuable_sidebar[:issuable_json_path], use_id: true, default_no: true, selected: milestone[:title], null_default: true, display: 'static' }})
           - if @project.group.present?
             = render_if_exists 'shared/issuable/iteration_select', { can_edit: can_edit_issuable, group_path: @project.group.full_path, project_path: issuable_sidebar[:project_full_path], issue_iid: issuable_sidebar[:iid], issuable_type: issuable_type }
-        #issuable-time-tracker.block
-          // Fallback while content is loading
-          .title.hide-collapsed
-            = _('Time tracking')
-            = icon('spinner spin', 'aria-hidden': 'true')
 
+        - if issuable_sidebar[:supports_time_tracking]
+          #issuable-time-tracker.block
+            // Fallback while content is loading
+            .title.hide-collapsed
+              = _('Time tracking')
+              = icon('spinner spin', 'aria-hidden': 'true')
         - if issuable_sidebar.has_key?(:due_date)
           .block.due_date
             .sidebar-collapsed-icon.has-tooltip{ data: { placement: 'left', container: 'body', html: 'true', boundary: 'viewport' }, title: sidebar_due_date_tooltip_label(issuable_sidebar[:due_date]) }
-              = icon('calendar', 'aria-hidden': 'true')
+              = sprite_icon('calendar')
               %span.js-due-date-sidebar-value
                 = issuable_sidebar[:due_date].try(:to_s, :medium) || _('None')
             .title.hide-collapsed
               = _('Due date')
-              = icon('spinner spin', class: 'hidden block-loading', 'aria-hidden': 'true')
+              = loading_icon(css_class: 'gl-vertical-align-text-bottom hidden block-loading')
               - if can_edit_issuable
                 = link_to _('Edit'), '#', class: 'js-sidebar-dropdown-toggle edit-link float-right', data: { track_label: "right_sidebar", track_property: "due_date", track_event: "click_edit_button", track_value: "" }
             .value.hide-collapsed
@@ -100,12 +102,12 @@
         - selected_labels = issuable_sidebar[:labels]
         .block.labels
           .sidebar-collapsed-icon.js-sidebar-labels-tooltip{ title: issuable_labels_tooltip(selected_labels), data: { placement: "left", container: "body", boundary: 'viewport' } }
-            = icon('tags', 'aria-hidden': 'true')
+            = sprite_icon('labels')
             %span
               = selected_labels.size
           .title.hide-collapsed
             = _('Labels')
-            = icon('spinner spin', class: 'hidden block-loading', 'aria-hidden': 'true')
+            = loading_icon(css_class: 'gl-vertical-align-text-bottom hidden block-loading')
             - if can_edit_issuable
               = link_to _('Edit'), '#', class: 'js-sidebar-dropdown-toggle edit-link float-right', data: { qa_selector: "edit_labels_link", track_label: "right_sidebar", track_property: "labels", track_event: "click_edit_button", track_value: "" }
           .value.issuable-show-labels.dont-hide.hide-collapsed{ class: ("has-labels" if selected_labels.any?), data: { qa_selector: 'labels_block' } }
@@ -174,7 +176,7 @@
                 = dropdown_footer add_content_class: true do
                   %button.btn.btn-success.sidebar-move-issue-confirmation-button.js-move-issue-confirmation-button{ type: 'button', disabled: true }
                     = _('Move')
-                    = icon('spinner spin', class: 'sidebar-move-issue-confirmation-loading-icon')
+                    = loading_icon(css_class: 'gl-vertical-align-text-bottom sidebar-move-issue-confirmation-loading-icon')
 
       -# haml-lint:disable InlineJavaScript
       %script.js-sidebar-options{ type: "application/json" }= issuable_sidebar_options(issuable_sidebar).to_json.html_safe

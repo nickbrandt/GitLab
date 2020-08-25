@@ -6,7 +6,7 @@ import getInitialState from 'ee/threat_monitoring/store/modules/network_policies
 import { s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
 import httpStatus from '~/lib/utils/http_status';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { joinPaths } from '~/lib/utils/url_utility';
 
 import { mockPoliciesResponse } from '../../../mock_data';

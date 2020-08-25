@@ -1,12 +1,11 @@
 <script>
-import { GlDeprecatedButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlDeprecatedButton, GlLink, GlTooltipDirective, GlIcon } from '@gitlab/ui';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { __ } from '~/locale';
 
 export default {
   components: {
-    Icon,
+    GlIcon,
     ProjectAvatar,
     GlDeprecatedButton,
     GlLink,
@@ -70,7 +69,7 @@ export default {
       :title="title"
       @click="onRemove"
     >
-      <icon name="remove" />
+      <gl-icon name="remove" />
     </gl-deprecated-button>
   </div>
 </template>

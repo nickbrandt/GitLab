@@ -28,8 +28,8 @@ button[disabled] {
   &:focus,
   &:hover {
     .gl-badge {
-      background: $gl-gray-100;
-      color: $gl-gray-500;
+      background: $gray-100;
+      color: $gray-500;
     }
   }
 }
