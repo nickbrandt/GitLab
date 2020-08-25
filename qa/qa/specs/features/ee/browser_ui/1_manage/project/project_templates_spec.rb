@@ -55,7 +55,7 @@ module QA
           end
 
           create_project_using_template(project_name: 'Project using built-in project template',
-            namespace: Runtime::Namespace.name,
+            namespace: Runtime::Namespace.name(reset_cache: false),
             template_name: built_in)
 
           Page::Project::Show.perform(&:wait_for_import_success)
