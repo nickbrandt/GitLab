@@ -26049,6 +26049,9 @@ msgstr ""
 msgid "Trigger cluster reindexing"
 msgstr ""
 
+msgid "Trigger manual job"
+msgstr ""
+
 msgid "Trigger pipelines for mirror updates"
 msgstr ""
 
@@ -27064,6 +27067,9 @@ msgid "ValueStreamAnalytics|Median time from first commit to issue closed."
 msgstr ""
 
 msgid "ValueStreamAnalytics|Median time from issue created to issue closed."
+msgstr ""
+
+msgid "ValueStream|The Default Value Stream cannot be deleted"
 msgstr ""
 
 msgid "Variable"

@@ -13,7 +13,7 @@ import {
   LEGACY_FLAG,
   NEW_VERSION_FLAG,
 } from 'ee/feature_flags/constants';
-import RelatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
+import RelatedIssuesRoot from '~/related_issues/components/related_issues_root.vue';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import { featureFlag, userList, allUsersStrategy } from '../mock_data';
 

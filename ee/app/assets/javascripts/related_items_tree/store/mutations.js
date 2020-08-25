@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import { issuableTypesMap } from 'ee/related_issues/constants';
+import { issuableTypesMap } from '~/related_issues/constants';
 import * as types from './mutation_types';
 
 export default {
