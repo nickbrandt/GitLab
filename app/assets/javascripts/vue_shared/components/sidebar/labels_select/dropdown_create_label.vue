@@ -41,7 +41,6 @@ export default {
         category="tertiary"
         class="dropdown-title-button dropdown-menu-close float-right"
         icon="close"
-        category="tertiary"
       />
     </div>
     <div class="dropdown-content">
