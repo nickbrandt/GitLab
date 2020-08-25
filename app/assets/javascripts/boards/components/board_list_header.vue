@@ -1,4 +1,5 @@
 <script>
+import { mapActions } from 'vuex';
 import {
   GlButton,
   GlButtonGroup,
@@ -17,6 +18,7 @@ import boardsStore from '../stores/boards_store';
 import eventHub from '../eventhub';
 import { ListType } from '../constants';
 import { isScopedLabel } from '~/lib/utils/common_utils';
+import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   components: {
@@ -32,7 +34,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [isWipLimitsOn],
+  mixins: [isWipLimitsOn, glFeatureFlagMixin()],
   props: {
     list: {
       type: Object,
@@ -128,6 +130,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(['updateList']),
     showScopedLabels(label) {
       return boardsStore.scopedLabels.enabled && isScopedLabel(label);
     },
@@ -144,7 +147,11 @@ export default {
         }
 
         if (this.isLoggedIn) {
-          this.list.update();
+          if (this.glFeatures.boardsWithSwimlanes && this.isSwimlanesHeader) {
+            this.updateList({ listId: this.list.id, collapsed: !this.list.isExpanded });
+          } else {
+            this.list.update();
+          }
         }
 
         // When expanding/collapsing, the tooltip on the caret button sometimes stays open.

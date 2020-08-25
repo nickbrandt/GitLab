@@ -9,6 +9,7 @@ export default () => ({
   activeId: inactiveId,
   sidebarType: '',
   boardLists: [],
+  boardListsPreviousState: [],
   issuesByListId: {},
   issues: {},
   isLoadingIssues: false,

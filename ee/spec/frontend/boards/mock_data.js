@@ -12,6 +12,7 @@ export const mockLists = [
     maxIssueCount: 0,
     assignee: null,
     milestone: null,
+    preset: true,
   },
   {
     id: 'gid://gitlab/List/2',
@@ -29,6 +30,7 @@ export const mockLists = [
     maxIssueCount: 0,
     assignee: null,
     milestone: null,
+    preset: false,
   },
 ];
 

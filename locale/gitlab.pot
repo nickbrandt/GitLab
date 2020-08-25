@@ -2870,6 +2870,9 @@ msgstr ""
 msgid "An error occurred while updating the comment"
 msgstr ""
 
+msgid "An error occurred while updating the list. Please try again."
+msgstr ""
+
 msgid "An error occurred while validating group path"
 msgstr ""
 

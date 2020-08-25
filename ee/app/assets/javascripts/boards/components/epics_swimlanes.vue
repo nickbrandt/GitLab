@@ -1,7 +1,10 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlIcon, GlTooltipDirective } from '@gitlab/ui';
+import Draggable from 'vuedraggable';
 import BoardListHeader from 'ee_else_ce/boards/components/board_list_header.vue';
+import { draggableTag } from '../constants';
+import defaultSortableConfig from '~/sortable/sortable_config';
 import { n__ } from '~/locale';
 import EpicLane from './epic_lane.vue';
 import IssuesLaneList from './issues_lane_list.vue';
@@ -53,12 +56,44 @@ export default {
     unassignedIssuesCountTooltipText() {
       return n__(`%d unassigned issue`, `%d unassigned issues`, this.unassignedIssuesCount);
     },
+    treeRootWrapper() {
+      return this.canAdminList ? Draggable : draggableTag;
+    },
+    treeRootOptions() {
+      const options = {
+        ...defaultSortableConfig,
+        fallbackOnBody: false,
+        group: 'board-swimlanes',
+        tag: draggableTag,
+        draggable: '.is-draggable',
+        'ghost-class': 'swimlane-header-drag-active',
+        value: this.lists,
+      };
+
+      return this.canAdminList ? options : {};
+    },
   },
   mounted() {
     this.fetchIssuesForAllLists();
   },
   methods: {
-    ...mapActions(['fetchIssuesForAllLists']),
+    ...mapActions(['fetchIssuesForAllLists', 'moveList']),
+    handleDragOnEnd(params) {
+      const { newIndex, oldIndex, item } = params;
+      const { listId } = item.dataset;
+      const newPosition = newIndex - 1;
+      let moveNewIndexListUp = false;
+
+      if (newIndex < oldIndex) {
+        moveNewIndexListUp = true;
+      }
+
+      this.moveList({
+        listId,
+        position: newPosition,
+        moveNewIndexListUp,
+      });
+    },
   },
 };
 </script>
@@ -68,16 +103,22 @@ export default {
     class="board-swimlanes gl-white-space-nowrap gl-pb-5 gl-px-3"
     data_qa_selector="board_epics_swimlanes"
   >
-    <div
+    <component
+      :is="treeRootWrapper"
+      v-bind="treeRootOptions"
       class="board-swimlanes-headers gl-display-table gl-sticky gl-pt-5 gl-bg-white gl-top-0 gl-z-index-3"
+      @end="handleDragOnEnd"
     >
       <div
         v-for="list in lists"
         :key="list.id"
         :class="{
           'is-collapsed': !list.isExpanded,
+          'is-draggable': !list.preset,
         }"
         class="board gl-px-3 gl-vertical-align-top gl-white-space-normal"
+        :data-list-id="list.id"
+        data-testid="board-header-container"
       >
         <board-list-header
           :can-admin-list="canAdminList"
@@ -87,7 +128,7 @@ export default {
           :is-swimlanes-header="true"
         />
       </div>
-    </div>
+    </component>
     <div class="board-epics-swimlanes gl-display-table">
       <epic-lane
         v-for="epic in epics"
