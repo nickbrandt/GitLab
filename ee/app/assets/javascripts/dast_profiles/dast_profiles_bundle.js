@@ -10,11 +10,12 @@ export default () => {
   }
 
   const {
-    dataset: { newDastSiteProfilePath, projectFullPath },
+    dataset: { newDastScannerProfilePath, newDastSiteProfilePath, projectFullPath },
   } = el;
 
   const props = {
     newProfilePaths: {
+      scannerProfile: newDastScannerProfilePath,
       siteProfile: newDastSiteProfilePath,
     },
     projectFullPath,

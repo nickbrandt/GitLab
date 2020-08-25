@@ -1,9 +1,11 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import { within } from '@testing-library/dom';
 import { merge } from 'lodash';
+import { GlDropdown } from '@gitlab/ui';
 import DastProfiles from 'ee/dast_profiles/components/dast_profiles.vue';
 import DastProfilesList from 'ee/dast_profiles/components/dast_profiles_list.vue';
 
+const TEST_NEW_DAST_SCANNER_PROFILE_PATH = '/-/on_demand_scans/scanner_profiles/new';
 const TEST_NEW_DAST_SITE_PROFILE_PATH = '/-/on_demand_scans/site_profiles/new';
 const TEST_PROJECT_FULL_PATH = '/namespace/project';
 
@@ -13,6 +15,7 @@ describe('EE - DastProfiles', () => {
   const createComponentFactory = (mountFn = shallowMount) => (options = {}) => {
     const defaultProps = {
       newProfilePaths: {
+        scannerProfile: TEST_NEW_DAST_SCANNER_PROFILE_PATH,
         siteProfile: TEST_NEW_DAST_SITE_PROFILE_PATH,
       },
       projectFullPath: TEST_PROJECT_FULL_PATH,
@@ -45,28 +48,68 @@ describe('EE - DastProfiles', () => {
   const createComponent = createComponentFactory();
   const createFullComponent = createComponentFactory(mount);
 
+  const withFeatureFlag = (featureFlagName, { enabled, disabled }) => {
+    describe.each([true, false])(`with ${featureFlagName} enabled: "%s"`, featureFlagStatus => {
+      createComponent({
+        provide: {
+          glFeatures: {
+            [featureFlagName]: featureFlagStatus,
+          },
+        },
+      });
+
+      if (featureFlagStatus) {
+        enabled();
+      } else {
+        disabled();
+      }
+    });
+  };
+
   const withinComponent = () => within(wrapper.element);
   const getSiteProfilesComponent = () => wrapper.find(DastProfilesList);
+  const getDropdownComponent = () => wrapper.find(GlDropdown);
+  const getSiteProfilesDropdownItem = text =>
+    within(getDropdownComponent().element).queryByText(text);
 
   afterEach(() => {
     wrapper.destroy();
   });
 
   describe('header', () => {
-    beforeEach(() => {
-      createFullComponent();
-    });
-
     it('shows a heading that describes the purpose of the page', () => {
+      createFullComponent();
+
       const heading = withinComponent().getByRole('heading', { name: /manage profiles/i });
 
       expect(heading).not.toBe(null);
     });
 
-    it(`shows a "New Site Profile" anchor that links to ${TEST_NEW_DAST_SITE_PROFILE_PATH}`, () => {
-      const newProfileButton = withinComponent().getByRole('link', { name: /new site profile/i });
+    it('has a "New Profile" dropdown menu', () => {
+      createComponent();
 
-      expect(newProfileButton.getAttribute('href')).toBe(TEST_NEW_DAST_SITE_PROFILE_PATH);
+      expect(getDropdownComponent().props('text')).toBe('New Profile');
+    });
+
+    it(`shows a "Site Profile" dropdown item that links to ${TEST_NEW_DAST_SITE_PROFILE_PATH}`, () => {
+      createComponent();
+
+      expect(getSiteProfilesDropdownItem('Site Profile').getAttribute('href')).toBe(
+        TEST_NEW_DAST_SITE_PROFILE_PATH,
+      );
+    });
+
+    describe(`shows a "Scanner Profile" dropdown item that links to ${TEST_NEW_DAST_SCANNER_PROFILE_PATH}`, () => {
+      withFeatureFlag('onDemandScansScannerProfiles', {
+        enabled: () => {
+          expect(getSiteProfilesDropdownItem('Scanner Profile').getAttribute('href')).toBe(
+            TEST_NEW_DAST_SCANNER_PROFILE_PATH,
+          );
+        },
+        disabled: () => {
+          expect(getSiteProfilesDropdownItem('Scanner Profile')).toBe(null);
+        },
+      });
     });
   });
 
