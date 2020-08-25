@@ -64,7 +64,7 @@ RSpec.describe EE::TrialHelper do
       let_it_be(:subgroup2) { create :group, parent: group2, name: 'Sub-Group 2' }
       let_it_be(:subsubgroup1) { create :group, parent: subgroup2, name: 'Sub-Sub-Group 1' }
 
-      let(:all_groups) { [group1, group2, subgroup1, subgroup2, subsubgroup1].map(&:id) }
+      let(:top_level_groups) { [group1, group2].map(&:id) }
 
       before do
         group1.add_owner(user)
@@ -72,7 +72,7 @@ RSpec.describe EE::TrialHelper do
       end
 
       context 'and none of the groups have subscriptions' do
-        it { is_expected.to eq(all_groups) }
+        it { is_expected.to eq(top_level_groups) }
       end
 
       context 'and the groups have subscriptions' do
@@ -89,7 +89,7 @@ RSpec.describe EE::TrialHelper do
         let!(:subscription_subsubgroup1) { create :gitlab_subscription, :free, *subsubgroup1_traits, namespace: subsubgroup1 }
 
         context 'and none of the groups have been trialed yet' do
-          it { is_expected.to eq(all_groups) }
+          it { is_expected.to eq(top_level_groups) }
         end
 
         context 'and some of the groups are being or have been trialed' do
@@ -97,9 +97,7 @@ RSpec.describe EE::TrialHelper do
           let(:subgroup1_traits) { :expired_trial }
           let(:subgroup2_traits) { :active_trial }
 
-          let(:some_groups) { [group2, subsubgroup1].map(&:id) }
-
-          it { is_expected.to eq(some_groups) }
+          it { is_expected.to eq([group2.id]) }
         end
 
         context 'and all of the groups are being or have been trialed' do
