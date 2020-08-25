@@ -106,8 +106,8 @@ RSpec.describe LicenseHelper do
       context 'and guest are excluded from the active count' do
         let(:exclude_guests) { true }
 
-        it 'returns a tag with the message' do
-          expect(subject).to eq("<p>Users with a Guest role or those who don&#39;t belong to a Project or Group will not use a seat from your license.</p>")
+        it 'returns the message' do
+          expect(subject).to eq("Users with a Guest role or those who don't belong to a Project or Group will not use a seat from your license.")
         end
       end
 
