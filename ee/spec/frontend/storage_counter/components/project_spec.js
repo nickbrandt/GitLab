@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlDeprecatedButton } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import Project from 'ee/storage_counter/components/project.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
@@ -54,11 +54,11 @@ describe('Storage Counter project component', () => {
       it('toggles isOpen', () => {
         expect(wrapper.vm.isOpen).toEqual(false);
 
-        wrapper.find(GlDeprecatedButton).vm.$emit('click');
+        wrapper.find(GlButton).vm.$emit('click');
 
         expect(wrapper.vm.isOpen).toEqual(true);
 
-        wrapper.find(GlDeprecatedButton).vm.$emit('click');
+        wrapper.find(GlButton).vm.$emit('click');
 
         expect(wrapper.vm.isOpen).toEqual(false);
       });

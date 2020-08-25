@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlLink, GlIcon } from '@gitlab/ui';
+import { GlButton, GlLink, GlIcon } from '@gitlab/ui';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { numberToHumanSize, isOdd } from '~/lib/utils/number_utils';
 import { s__ } from '~/locale';
@@ -8,7 +8,7 @@ import StorageRow from './storage_row.vue';
 export default {
   components: {
     GlIcon,
-    GlDeprecatedButton,
+    GlButton,
     GlLink,
     ProjectAvatar,
     StorageRow,
@@ -87,13 +87,14 @@ export default {
       <div class="table-section section-wrap section-70 text-truncate" role="gridcell">
         <div class="table-mobile-header font-weight-bold" role="rowheader">{{ __('Project') }}</div>
         <div class="table-mobile-content">
-          <gl-deprecated-button
+          <gl-button
             class="btn-transparent float-left p-0 mr-2"
             :aria-label="__('Toggle project')"
+            category="tertiary"
             @click="toggleProject"
           >
             <gl-icon :name="iconName" class="folder-icon" />
-          </gl-deprecated-button>
+          </gl-button>
 
           <project-avatar :project="projectAvatar" :size="20" />
 
