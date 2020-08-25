@@ -1566,6 +1566,11 @@ type CiJobEdge {
   node: CiJob
 }
 
+"""
+Identifier of Ci::Pipeline
+"""
+scalar CiPipelineID
+
 type CiStage {
   """
   Group of jobs for the stage
@@ -10630,7 +10635,7 @@ input PipelineDestroyInput {
   """
   The id of the pipeline to mutate
   """
-  id: ID!
+  id: CiPipelineID!
 }
 
 """
@@ -10692,7 +10697,7 @@ input PipelineRetryInput {
   """
   The id of the pipeline to mutate
   """
-  id: ID!
+  id: CiPipelineID!
 }
 
 """

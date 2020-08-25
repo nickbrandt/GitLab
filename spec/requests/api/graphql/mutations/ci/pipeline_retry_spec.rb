@@ -11,7 +11,7 @@ RSpec.describe 'PipelineRetry' do
 
   let(:mutation) do
     variables = {
-      id: pipeline.id
+      id: pipeline.to_global_id.to_s
     }
     graphql_mutation(:pipeline_retry, variables,
                      <<-QL

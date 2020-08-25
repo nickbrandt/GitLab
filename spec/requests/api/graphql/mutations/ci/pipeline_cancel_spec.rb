@@ -9,13 +9,7 @@ RSpec.describe 'PipelineCancel' do
   let_it_be(:project) { create(:project) }
   let_it_be(:pipeline) { create(:ci_pipeline, :running, project: project, user: user) }
 
-  let(:mutation) do
-    graphql_mutation(:pipeline_cancel, {},
-      <<-QL
-        errors
-      QL
-    )
-  end
+  let(:mutation) { graphql_mutation(:pipeline_cancel, {}, 'errors') }
 
   let(:mutation_response) { graphql_mutation_response(:pipeline_cancel) }
 

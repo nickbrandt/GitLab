@@ -11,13 +11,9 @@ RSpec.describe 'PipelineDestroy' do
 
   let(:mutation) do
     variables = {
-      id: pipeline.id
+      id: pipeline.to_global_id.to_s
     }
-    graphql_mutation(:pipeline_destroy, variables,
-                     <<-QL
-                       errors
-                     QL
-    )
+    graphql_mutation(:pipeline_destroy, variables, 'errors')
   end
 
   it 'returns an error if the user is not allowed to destroy the pipeline' do

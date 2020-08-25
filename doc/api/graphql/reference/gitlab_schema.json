@@ -4250,6 +4250,16 @@
           "possibleTypes": null
         },
         {
+          "kind": "SCALAR",
+          "name": "CiPipelineID",
+          "description": "Identifier of Ci::Pipeline",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "CiStage",
           "description": null,
@@ -31883,7 +31893,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "CiPipelineID",
                   "ofType": null
                 }
               },
@@ -32083,7 +32093,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "CiPipelineID",
                   "ofType": null
                 }
               },
