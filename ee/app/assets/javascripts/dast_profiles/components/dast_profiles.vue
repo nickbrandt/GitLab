@@ -1,23 +1,29 @@
 <script>
 import * as Sentry from '@sentry/browser';
-import { GlButton, GlTab, GlTabs } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlTab, GlTabs } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ProfilesList from './dast_profiles_list.vue';
 import dastSiteProfilesQuery from '../graphql/dast_site_profiles.query.graphql';
 import dastSiteProfilesDelete from '../graphql/dast_site_profiles_delete.mutation.graphql';
 import * as cacheUtils from '../graphql/cache_utils';
+import getProfileSettings from '../settings/profiles';
 
 export default {
   components: {
-    GlButton,
+    GlDropdown,
+    GlDropdownItem,
     GlTab,
     GlTabs,
     ProfilesList,
   },
+  mixins: [glFeatureFlagMixin()],
   props: {
-    newDastSiteProfilePath: {
-      type: String,
+    newProfilePaths: {
+      type: Object,
       required: true,
+      validator: ({ scannerProfile, siteProfile }) =>
+        Boolean(scannerProfile) && Boolean(siteProfile),
     },
     projectFullPath: {
       type: String,
@@ -60,6 +66,14 @@ export default {
     },
   },
   computed: {
+    profileSettings() {
+      const { glFeatures, newProfilePaths } = this;
+
+      return getProfileSettings({
+        glFeatures,
+        options: { newProfilePaths },
+      });
+    },
     hasMoreSiteProfiles() {
       return this.siteProfilesPageInfo.hasNextPage;
     },
@@ -172,14 +186,20 @@ export default {
         <h2 class="my-0">
           {{ s__('DastProfiles|Manage Profiles') }}
         </h2>
-        <gl-button
-          :href="newDastSiteProfilePath"
-          category="primary"
+        <gl-dropdown
+          :text="s__('DastProfiles|New Profile')"
+          right
           variant="success"
           class="gl-ml-auto"
         >
-          {{ s__('DastProfiles|New Site Profile') }}
-        </gl-button>
+          <gl-dropdown-item
+            v-for="{ i18n, newProfilePath, key } in profileSettings"
+            :key="key"
+            :href="newProfilePath"
+          >
+            {{ i18n.title }}
+          </gl-dropdown-item>
+        </gl-dropdown>
       </div>
       <p>
         {{
