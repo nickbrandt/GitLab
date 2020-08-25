@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class IssueRebalancingWorker # rubocop:disable Scalability/IdempotentWorker
+class IssueRebalancingWorker
   include ApplicationWorker
 
   idempotent!
