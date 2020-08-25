@@ -12,11 +12,11 @@ module QA
               element :close_reopen_epic_button
             end
 
-            view 'ee/app/assets/javascripts/related_issues/components/add_issuable_form.vue' do
+            view 'app/assets/javascripts/related_issues/components/add_issuable_form.vue' do
               element :add_issue_button
             end
 
-            view 'ee/app/assets/javascripts/related_issues/components/related_issuable_input.vue' do
+            view 'app/assets/javascripts/related_issues/components/related_issuable_input.vue' do
               element :add_issue_input
             end
 

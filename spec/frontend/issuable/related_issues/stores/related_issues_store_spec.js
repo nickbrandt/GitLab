@@ -1,5 +1,3 @@
-import RelatedIssuesStore from 'ee/related_issues/stores/related_issues_store';
-
 import {
   issuable1,
   issuable2,
@@ -7,6 +5,7 @@ import {
   issuable4,
   issuable5,
 } from 'jest/vue_shared/components/issue/related_issuable_mock_data';
+import RelatedIssuesStore from '~/related_issues/stores/related_issues_store';
 
 describe('RelatedIssuesStore', () => {
   let store;
