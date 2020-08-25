@@ -215,6 +215,10 @@ describe('ThroughputTable', () => {
         expect(findCol(TEST_IDS.MILESTONE).text()).toBe(title);
       });
 
+      it('displays the correct commit count', () => {
+        expect(findCol(TEST_IDS.COMMITS).text()).toBe('1');
+      });
+
       it('displays the correct pipeline count', () => {
         expect(findCol(TEST_IDS.PIPELINES).text()).toBe('0');
       });

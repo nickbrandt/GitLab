@@ -33,6 +33,7 @@ query($fullPath: ID!, $startDate: Time!, $endDate: Time!, $limit: Int!) {
             }
           }
         }
+        commitCount
       }
     }
   }

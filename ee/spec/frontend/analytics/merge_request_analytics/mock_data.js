@@ -51,6 +51,7 @@ export const throughputTableHeaders = [
   'Date Merged',
   'Time to merge',
   'Milestone',
+  'Commits',
   'Pipelines',
   'Line changes',
   'Assignees',
@@ -81,5 +82,6 @@ export const throughputTableData = [
     pipelines: {
       nodes: [],
     },
+    commitCount: 1,
   },
 ];
