@@ -1,43 +1,85 @@
+---
+type: reference
+stage: Enablement
+group: Global Search
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # Elasticsearch integration **(STARTER ONLY)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/109 "Elasticsearch Merge Request") in GitLab [Starter](https://about.gitlab.com/pricing/) 8.4.
 > - Support for [Amazon Elasticsearch](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html) was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1305) in GitLab [Starter](https://about.gitlab.com/pricing/) 9.0.
 
-This document describes how to set up Elasticsearch with GitLab. Once enabled,
-you'll have the benefit of fast search response times and the advantage of two
-special searches:
+This document describes how to set up Elasticsearch with GitLab. After
+Elasticsearch is enabled, you'll have the benefit of fast search response times
+and the advantage of the following special searches:
 
 - [Advanced Global Search](../user/search/advanced_global_search.md)
 - [Advanced Syntax Search](../user/search/advanced_search_syntax.md)
 
-## Version Requirements
+## Version requirements
 
-<!-- Please remember to update ee/lib/system_check/app/elasticsearch_check.rb if this changes -->
+<!-- Remember to update ee/lib/system_check/app/elasticsearch_check.rb if this changes -->
 
-| GitLab version | Elasticsearch version |
-| -------------- | --------------------- |
-| GitLab Enterprise Edition 8.4 - 8.17   | Elasticsearch 2.4 with [Delete By Query Plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/2.4/plugins-delete-by-query.html) installed |
-| GitLab Enterprise Edition 9.0 - 11.4   | Elasticsearch 5.1 - 5.5 |
-| GitLab Enterprise Edition 11.5 - 12.6  | Elasticsearch 5.6 - 6.x |
-| GitLab Enterprise Edition 12.7+        | Elasticsearch 6.x - 7.x |
+| GitLab version                              | Elasticsearch version         |
+|---------------------------------------------|-------------------------------|
+| GitLab Enterprise Edition 12.7 or greater   | Elasticsearch 6.x through 7.x |
+| GitLab Enterprise Edition 11.5 through 12.6 | Elasticsearch 5.6 through 6.x |
+| GitLab Enterprise Edition 9.0 through 11.4  | Elasticsearch 5.1 through 5.5 |
+| GitLab Enterprise Edition 8.4 through 8.17  | Elasticsearch 2.4 with [Delete By Query Plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/2.4/plugins-delete-by-query.html) installed |
+
+## System requirements
+
+Elasticsearch requires additional resources in excess of those documented in the
+[GitLab system requirements](../install/requirements.md).
+
+The amount of resources (memory, CPU, storage) will vary greatly, based on the
+amount of data being indexed into the Elasticsearch cluster. According to
+[Elasticsearch official guidelines](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_memory),
+each node should have:
+
+- [Memory](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_memory): 8 GiB (minimum).
+- [CPU](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_cpus): Modern processor with multiple cores.
+- [Storage](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_disks): Use SSD storage. You will need enough storage for 50% of the total size of your Git repositories.
+
+A few notes on CPU and storage:
+
+- CPU requirements for Elasticsearch tend to be minimal. There are specific
+  scenarios where this isn't true, but GitLab.com isn't using Elasticsearch in
+  an exceptionally CPU-heavy way. More cores will be more performant than faster
+  CPUs. Extra concurrency from multiple cores will far outweigh a slightly
+  faster clock speed in Elasticsearch.
+
+- Storage requirements for Elasticsearch are important, especially for
+  indexing-heavy clusters. When possible use SSDs, whose speed is far superior
+  to any spinning media for Elasticsearch. In testing, nodes that use SSD storage
+  see boosts in both query and indexing performance.
+
+Keep in mind, these are **minimum requirements** for Elasticsearch.
+Heavily-utilized Elasticsearch clusters will likely require considerably more
+resources.
 
 ## Installing Elasticsearch
 
-Elasticsearch is _not_ included in the Omnibus packages or when you install from source. You must
-[install it separately](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/install-elasticsearch.html "Elasticsearch 7.x installation documentation"). Be sure to select your version.
-Providing detailed information on installing Elasticsearch is out of the scope
-of this document.
+Elasticsearch is *not* included in the Omnibus packages or when you install from
+source. You must [install it separately](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/install-elasticsearch.html "Elasticsearch 7.x installation documentation").
+Be sure to select your version. Providing detailed information on installing
+Elasticsearch is out of the scope of this document.
 
 NOTE: **Note:**
 Elasticsearch should be installed on a separate server, whether you install
-it yourself or use a cloud hosted offering like Elastic's [Elasticsearch Service](https://www.elastic.co/elasticsearch/service) (available on AWS, GCP, or Azure) or the
-[Amazon Elasticsearch](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html) service. Running Elasticsearch on the same server as GitLab is not recommended
-and will likely cause a degradation in GitLab instance performance.
+it yourself or use a cloud hosted offering like Elastic's [Elasticsearch Service](https://www.elastic.co/elasticsearch/service)
+(available on AWS, GCP, or Azure) or the [Amazon Elasticsearch](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html)
+service. Running Elasticsearch on the same server as GitLab is not recommended
+and can cause a degradation in GitLab instance performance.
 
 NOTE: **Note:**
-**For a single node Elasticsearch cluster the functional cluster health status will be yellow** (will never be green) because the primary shard is allocated but replicas can not be as there is no other node to which Elasticsearch can assign a replica.
+**For a single node Elasticsearch cluster the functional cluster health status
+will be yellow** (will never be green) because the primary shard is allocated but
+replicas can not be as there is no other node to which Elasticsearch can assign a
+replica.
 
-Once the data is added to the database or repository and [Elasticsearch is
+After the data is added to the database or repository and [Elasticsearch is
 enabled in the Admin Area](#enabling-elasticsearch) the search index will be
 updated automatically.
 
@@ -47,12 +89,13 @@ For indexing Git repository data, GitLab uses an [indexer written in Go](https:/
 
 The way you install the Go indexer depends on your version of GitLab:
 
-- For Omnibus GitLab 11.8 and above, see [Omnibus GitLab](#omnibus-gitlab).
-- For installations from source or older versions of Omnibus GitLab, install the indexer [From Source](#from-source).
+- For Omnibus GitLab 11.8 or greater, see [Omnibus GitLab](#omnibus-gitlab).
+- For installations from source or older versions of Omnibus GitLab,
+  [install the indexer from source](#from-source).
 
 ### Omnibus GitLab
 
-Since GitLab 11.8 the Go indexer is included in Omnibus GitLab.
+Starting with GitLab 11.8, the Go indexer is included in Omnibus GitLab.
 The former Ruby-based indexer was removed in [GitLab 12.3](https://gitlab.com/gitlab-org/gitlab/-/issues/6481).
 
 ### From source
@@ -80,7 +123,7 @@ To install on CentOS or RHEL, run:
 sudo yum install libicu-devel
 ```
 
-##### Mac OSX
+#### Mac OSX
 
 To install on macOS, run:
 
@@ -112,26 +155,7 @@ Example:
 PREFIX=/usr sudo -E make install
 ```
 
-Once installed, enable it under your instance's Elasticsearch settings explained [below](#enabling-elasticsearch).
-
-## System Requirements
-
-Elasticsearch requires additional resources in excess of those documented in the
-[GitLab system requirements](../install/requirements.md).
-
-The amount of resources (memory, CPU, storage) will vary greatly, based on the amount of data being indexed into the Elasticsearch cluster. According to [Elasticsearch official guidelines](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_memory), each node should have:
-
-- [RAM](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_disks): **8 GiB as the bare minimum**
-- [CPU](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_cpus): Modern processor with multiple cores
-- [Storage](https://www.elastic.co/guide/en/elasticsearch/guide/current/hardware.html#_disks): Use SSD storage. As a guide you will need enough storage for 50% of the total size of your Git repositories.
-
-A few notes on CPU and storage:
-
-- CPU requirements for Elasticsearch tend to be light. There are specific scenarios where this isn't true, but GitLab.com isn't using Elasticsearch in an exceptionally CPU-heavy way. More cores will be more performant than faster CPUs. Extra concurrency from multiple cores will far outweigh a slightly faster clock speed in Elasticsearch.
-
-- Storage requirements for Elasticsearch are important, especially for indexing-heavy clusters. When possible, use SSDs, Their speed is far superior to any spinning media for Elasticsearch. In testing, nodes that use SSD storage see boosts in both query and indexing performance.
-
-Keep in mind, these are **minimum requirements** for Elasticsearch. Heavily-utilized Elasticsearch clusters will likely require considerably more resources.
+After installation, be sure to [enable Elasticsearch](#enabling-elasticsearch).
 
 ## Enabling Elasticsearch
 
@@ -182,29 +206,30 @@ In order to enable Elasticsearch, you need to have admin access in GitLab.
 The following Elasticsearch settings are available:
 
 | Parameter                                             | Description |
-| ----------------------------------------------------- | ----------- |
-| `Elasticsearch indexing`                              | Enables/disables Elasticsearch indexing. You may want to enable indexing but disable search in order to give the index time to be fully completed, for example. Also, keep in mind that this option doesn't have any impact on existing data, this only enables/disables the background indexer which tracks data changes and ensures new data is indexed. |
-| `Elasticsearch pause indexing`                        | Enables/disables temporary indexing pause. This is useful for cluster migration/reindexing. All changes are still tracked, but they are not committed to the Elasticsearch index until unpaused. |
-| `Search with Elasticsearch enabled`                   | Enables/disables using Elasticsearch in search. |
+|-------------------------------------------------------|-------------|
+| `Elasticsearch indexing`                              | Enables or disables Elasticsearch indexing. You may want to enable indexing but disable search in order to give the index time to be fully completed, for example. Also, keep in mind that this option doesn't have any impact on existing data, this only enables/disables the background indexer which tracks data changes and ensures new data is indexed. |
+| `Elasticsearch pause indexing`                        | Enables or disables temporary indexing pause. This is useful for cluster migration/reindexing. All changes are still tracked, but they are not committed to the Elasticsearch index until unpaused. |
+| `Search with Elasticsearch enabled`                   | Enables or disables using Elasticsearch in search. |
 | `URL`                                                 | The URL to use for connecting to Elasticsearch. Use a comma-separated list to support clustering (e.g., `http://host1, https://host2:9200`). If your Elasticsearch instance is password protected, pass the `username:password` in the URL (e.g., `http://<username>:<password>@<elastic_host>:9200/`). |
 | `Number of Elasticsearch shards`                      | Elasticsearch indexes are split into multiple shards for performance reasons. In general, larger indexes need to have more shards. Changes to this value do not take effect until the index is recreated. You can read more about tradeoffs in the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/scalability.html). |
 | `Number of Elasticsearch replicas`                    | Each Elasticsearch shard can have a number of replicas. These are a complete copy of the shard, and can provide increased query performance or resilience against hardware failure. Increasing this value will greatly increase total disk space required by the index. |
 | `Limit namespaces and projects that can be indexed`   | Enabling this will allow you to select namespaces and projects to index. All other namespaces and projects will use database search instead. Please note that if you enable this option but do not select any namespaces or projects, none will be indexed. [Read more below](#limiting-namespaces-and-projects).
 | `Using AWS hosted Elasticsearch with IAM credentials` | Sign your Elasticsearch requests using [AWS IAM authorization](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html), [AWS EC2 Instance Profile Credentials](https://docs.aws.amazon.com/codedeploy/latest/userguide/getting-started-create-iam-instance-profile.html#getting-started-create-iam-instance-profile-cli), or [AWS ECS Tasks Credentials](https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-iam-roles.html). The policies must be configured to allow `es:*` actions. |
-| `AWS Region`                                          | The AWS region your Elasticsearch service is located in. |
+| `AWS Region`                                          | The AWS region in which your Elasticsearch service is located. |
 | `AWS Access Key`                                      | The AWS access key. |
 | `AWS Secret Access Key`                               | The AWS secret access key. |
 | `Maximum file size indexed`                           | See [the explanation in instance limits.](../administration/instance_limits.md#maximum-file-size-indexed). |
 | `Maximum field length`                                | See [the explanation in instance limits.](../administration/instance_limits.md#maximum-field-length). |
 | `Maximum bulk request size (MiB)` | The Maximum Bulk Request size is used by GitLab's Golang-based indexer processes and indicates how much data it ought to collect (and store in memory) in a given indexing process before submitting the payload to Elasticsearch’s Bulk API. This setting should be used with the Bulk request concurrency setting (see below) and needs to accommodate the resource constraints of both the Elasticsearch host(s) and the host(s) running GitLab's Golang-based indexer either from the `gitlab-rake` command or the Sidekiq tasks. |
-| `Bulk request concurrency` | The Bulk request concurrency indicates how many of GitLab's Golang-based indexer processes (or threads) can run in parallel to collect data to subsequently submit to Elasticsearch’s Bulk API. This increases indexing performance, but fills the Elasticsearch bulk requests queue faster. This setting should be used together with the Maximum bulk request size setting (see above) and needs to accommodate the resource constraints of both the Elasticsearch host(s) and the host(s) running GitLab's Golang-based indexer either from the `gitlab-rake` command or the Sidekiq tasks. |
+| `Bulk request concurrency`                            | The Bulk request concurrency indicates how many of GitLab's Golang-based indexer processes (or threads) can run in parallel to collect data to subsequently submit to Elasticsearch’s Bulk API. This increases indexing performance, but fills the Elasticsearch bulk requests queue faster. This setting should be used together with the Maximum bulk request size setting (see above) and needs to accommodate the resource constraints of both the Elasticsearch host(s) and the host(s) running GitLab's Golang-based indexer either from the `gitlab-rake` command or the Sidekiq tasks. |
 
 ### Limiting namespaces and projects
 
-If you select `Limit namespaces and projects that can be indexed`, more options will become available
+If you select `Limit namespaces and projects that can be indexed`, more options will become available.
+
 ![limit namespaces and projects options](img/limit_namespaces_projects_options.png)
 
-You can select namespaces and projects to index exclusively. Please note that if the namespace is a group it will include
+You can select namespaces and projects to index exclusively. Note that if the namespace is a group it will include
 any sub-groups and projects belonging to those sub-groups to be indexed as well.
 
 Elasticsearch only provides cross-group code/commit search (global) if all name-spaces are indexed. In this particular scenario where only a subset of namespaces are indexed, a global search will not provide a code or commit scope. This will be possible only in the scope of an indexed namespace. Currently there is no way to code/commit search in multiple indexed namespaces (when only a subset of namespaces has been indexed). For example if two groups are indexed, there is no way to run a single code search on both. You can only run a code search on the first group and then on the second.
@@ -400,26 +425,34 @@ Sidekiq processes](../administration/operations/extra_sidekiq_processes.md)
 
 ## Zero downtime reindexing
 
-The idea behind this reindexing method is to leverage Elasticsearch index alias feature to atomically swap between two indices.
-We will refer to each index as `primary` (online and used by GitLab for read/writes) and `secondary` (offline, for reindexing purpose).
+The idea behind this reindexing method is to leverage Elasticsearch index alias
+feature to atomically swap between two indices. We'll refer to each index as
+`primary` (online and used by GitLab for read/writes) and `secondary`
+(offline, for reindexing purpose).
 
-Instead of connecting directly to the `primary` index, we'll setup an index alias such as we can change the underlying index at will.
+Instead of connecting directly to the `primary` index, we'll setup an index
+alias such as we can change the underlying index at will.
 
 NOTE: **Note:**
-Any index attached to the production alias is deemed a `primary` and will end up being used by the GitLab Elasticsearch integration.
+Any index attached to the production alias is deemed a `primary` and will be
+used by the GitLab Elasticsearch integration.
 
 ### Pause the indexing
 
-Under **Admin Area > Integration > Elasticsearch**, check the **Pause Elasticsearch Indexing** setting and save.
+In the **Admin Area > Integration > Elasticsearch** section, select the
+**Pause Elasticsearch Indexing** setting, and then save your change.
 
-With this, all updates that should happen on your Elasticsearch index will be buffered and caught up once unpaused.
+With this, all updates that should happen on your Elasticsearch index will be
+buffered and caught up once unpaused.
 
 ### Setup
 
 TIP: **Tip:**
-If your index has been created with GitLab v13.0+ you can skip directly to [trigger the reindex](#trigger-the-reindex-via-the-elasticsearch-administration).
+If your index was created with GitLab 13.0 or greater, you can directly
+[trigger the reindex](#trigger-the-reindex-via-the-elasticsearch-administration).
 
-This process involves multiple shell commands and curl invocations, so a good initial setup will help down the road:
+This process involves several shell commands and curl invocations, so a good
+initial setup will help for later:
 
 ```shell
 # You can find this value under Admin Area > Integration > Elasticsearch > URL
@@ -431,10 +464,12 @@ export SECONDARY_INDEX="gitlab-production-$(date +%s)"
 ### Reclaiming the `gitlab-production` index name
 
 CAUTION: **Caution:**
-It is highly recommended that you take a snapshot of your cluster to make sure there is a recovery path if anything goes wrong.
+It is highly recommended that you take a snapshot of your cluster to ensure
+there is a recovery path if anything goes wrong.
 
 NOTE: **Note:**
-Due to a technical limitation, there will be a slight downtime because of the fact that we need to reclaim the current `primary` index to be used as the alias.
+Due to a technical limitation, there will be a slight downtime because of the
+fact that we need to reclaim the current `primary` index to be used as the alias.
 
 To reclaim the `gitlab-production` index name, you need to first create a `secondary` index and then trigger the re-index from `primary`.
 
@@ -452,7 +487,8 @@ sudo SKIP_ALIAS=1 gitlab-rake "gitlab:elastic:create_empty_index[$SECONDARY_INDE
 SKIP_ALIAS=1 bundle exec rake "gitlab:elastic:create_empty_index[$SECONDARY_INDEX]"
 ```
 
-The index should be created successfully, with the latest index options and mappings.
+The index should be created successfully, with the latest index options and
+mappings.
 
 #### Trigger the re-index from `primary`
 
@@ -473,9 +509,9 @@ To trigger the re-index from `primary` index:
     {"task":"3qw_Tr0YQLq7PF16Xek8YA:1012"}
     ```
 
-    Note the `task` value here as it will be useful to follow the reindex progress.
+    Note the `task` value, as it will be useful to follow the reindex progress.
 
-1. Wait for the reindex process to complete, by checking the `completed` value.
+1. Wait for the reindex process to complete by checking the `completed` value.
    Using the `task` value form the previous step:
 
     ```shell
@@ -489,10 +525,10 @@ To trigger the re-index from `primary` index:
     {"completed":false, …}
     ```
 
-    Once the returned value is `true`, you may continue to the next step.
+    After the returned value is `true`, continue to the next step.
 
-1. Make sure that the secondary index has data in it. You can use the Elasticsearch
-   API to look for the index size and compare our two indices:
+1. Ensure that the secondary index has data in it. You can use the
+   Elasticsearch API to look for the index size and compare our two indices:
 
     ```shell
     curl $CLUSTER_URL/$PRIMARY_INDEX/_count => 123123
@@ -502,7 +538,8 @@ To trigger the re-index from `primary` index:
     TIP: **Tip:**
     Comparing the document count is more accurate than using the index size, as improvements to the storage might cause the new index to be smaller than the original one.
 
-1. Once you are confident your `secondary` index is valid, you can process to the creation of the alias.
+1. After you are confident your `secondary` index is valid, you can process to
+   the creation of the alias.
 
     ```shell
     # Delete the original index
