@@ -101,7 +101,7 @@ RSpec.describe Issues::CreateService do
       end
 
       it 'does not rebalance unless needed' do
-        expect(IssueRebalancingWorker).not_to receive(:perform_async).with(Integer)
+        expect(IssueRebalancingWorker).not_to receive(:perform_async)
 
         expect(issue.relative_position).to eq(project.issues.maximum(:relative_position))
       end
