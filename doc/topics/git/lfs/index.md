@@ -109,9 +109,7 @@ To remove objects from LFS:
 
 ## File Locking
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/35856) in GitLab 10.5.
-
-TODO
+See the documentation on [File Locking](../../../user/project/file_lock.md).
 
 ## Troubleshooting
 
