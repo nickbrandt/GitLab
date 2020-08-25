@@ -849,7 +849,7 @@ RSpec.describe Issuable do
     where(:issuable_type, :supports_reference) do
       :issue         | true
       :incident      | false
-      :merge_request | false
+      :merge_request | true
     end
 
     with_them do

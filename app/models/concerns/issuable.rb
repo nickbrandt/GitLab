@@ -186,7 +186,7 @@ module Issuable
     end
 
     def supports_reference?
-      is_a?(Issue) && !incident?
+      (is_a?(Issue) || is_a?(Milestoneable)) && !incident?
     end
 
     def incident?
