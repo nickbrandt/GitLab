@@ -82,7 +82,7 @@ export default {
 
     <slot v-if="showRightSlot" name="right-content"></slot>
 
-    <div class="flex-shrink-0" v-else-if="showActionButtons">
+    <div v-else-if="showActionButtons" class="flex-shrink-0">
       <gl-deprecated-button
         v-for="button in actionButtons"
         :key="button.title"
