@@ -1723,7 +1723,7 @@ based on what features you intend to use:
 1. Configure [object storage for packages](../packages/index.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
 1. Configure [object storage for Dependency Proxy](../packages/dependency_proxy.md#using-object-storage) (optional feature). **(PREMIUM ONLY)**
 1. Configure [object storage for Pseudonymizer](../pseudonymizer.md#configuration) (optional feature). **(ULTIMATE ONLY)**
-1. Configure [object storage for autoscale Runner caching](https://docs.gitlab.com/runner/configuration/autoscale.html#distributed-runners-caching) (optional - for improved performance).
+1. Configure [object storage for autoscale runner caching](https://docs.gitlab.com/runner/configuration/autoscale.html#distributed-runners-caching) (optional - for improved performance).
 1. Configure [object storage for Terraform state files](../terraform_state.md#using-object-storage-core-only).
 
 Using separate buckets for each data type is the recommended approach for GitLab.
