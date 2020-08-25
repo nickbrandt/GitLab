@@ -152,7 +152,8 @@ RSpec.describe Projects::Settings::OperationsController do
             create_issue: 'false',
             send_email: 'false',
             issue_template_key: 'some-other-template',
-            pagerduty_active: 'true'
+            pagerduty_active: 'true',
+            auto_close_incident: 'true'
           }
         }
       end
@@ -187,6 +188,8 @@ RSpec.describe Projects::Settings::OperationsController do
         it_behaves_like 'a gitlab tracking event', { send_email: '0' }, 'disabled_sending_emails'
         it_behaves_like 'a gitlab tracking event', { pagerduty_active: '1' }, 'enabled_pagerduty_webhook'
         it_behaves_like 'a gitlab tracking event', { pagerduty_active: '0' }, 'disabled_pagerduty_webhook'
+        it_behaves_like 'a gitlab tracking event', { auto_close_incident: '1' }, 'enabled_auto_close_incident'
+        it_behaves_like 'a gitlab tracking event', { auto_close_incident: '0' }, 'disabled_auto_close_incident'
       end
     end
 
