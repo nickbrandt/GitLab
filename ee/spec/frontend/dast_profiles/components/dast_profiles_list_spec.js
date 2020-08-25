@@ -188,7 +188,7 @@ describe('EE - DastProfilesList', () => {
         getDeleteButtonWithin(getTableRowForProfile(profile));
 
       it('opens a modal with the correct title when a delete button is clicked', async () => {
-        expect(getModal().isEmpty()).toBe(true);
+        expect(getModal().html()).toBe('');
 
         getCurrentProfileDeleteButton().trigger('click');
 
