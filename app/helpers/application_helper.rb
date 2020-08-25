@@ -241,9 +241,9 @@ module ApplicationHelper
 
   def stylesheet_link_tag_defer(path)
     if use_startup_css?
-      stylesheet_link_tag(path, media: "print", crossorigin: ActionController::Base.asset_host ? 'anonymous' : nil )
+      stylesheet_link_tag(path, media: "print", crossorigin: ActionController::Base.asset_host ? 'anonymous' : nil)
     else
-      stylesheet_link_tag(path, media: "all" )
+      stylesheet_link_tag(path, media: "all")
     end
   end
 
