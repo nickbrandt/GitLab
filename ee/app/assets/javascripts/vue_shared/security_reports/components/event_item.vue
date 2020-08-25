@@ -1,12 +1,11 @@
 <script>
-import { GlTooltipDirective, GlDeprecatedButton } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlTooltipDirective, GlDeprecatedButton, GlIcon } from '@gitlab/ui';
 import NoteHeader from '~/notes/components/note_header.vue';
 
 export default {
   name: 'EventItem',
   components: {
-    Icon,
+    GlIcon,
     NoteHeader,
     GlDeprecatedButton,
   },
@@ -65,7 +64,7 @@ export default {
 <template>
   <div :id="noteId" class="d-flex align-items-center">
     <div class="circle-icon-container" :class="iconClass">
-      <icon :size="16" :name="iconName" />
+      <gl-icon :size="16" :name="iconName" />
     </div>
     <div class="ml-3 flex-grow-1" data-qa-selector="event_item_content">
       <note-header
@@ -93,7 +92,7 @@ export default {
         :title="button.title"
         @click="button.onClick"
       >
-        <icon :name="button.iconName" class="link-highlight" />
+        <gl-icon :name="button.iconName" class="link-highlight" />
       </gl-deprecated-button>
     </div>
   </div>

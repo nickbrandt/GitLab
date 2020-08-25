@@ -5,7 +5,7 @@ import BlobContentEdit from '~/blob/components/blob_edit_content.vue';
 import { getBaseURL, joinPaths } from '~/lib/utils/url_utility';
 import axios from '~/lib/utils/axios_utils';
 import { SNIPPET_BLOB_CONTENT_FETCH_ERROR } from '~/snippets/constants';
-import Flash from '~/flash';
+import { deprecatedCreateFlash as Flash } from '~/flash';
 import { sprintf } from '~/locale';
 
 export default {
@@ -80,7 +80,7 @@ export default {
       v-if="!blob.isLoaded"
       :label="__('Loading snippet')"
       size="lg"
-      class="loading-animation prepend-top-20 append-bottom-20"
+      class="loading-animation prepend-top-20 gl-mb-6"
     />
     <blob-content-edit
       v-else

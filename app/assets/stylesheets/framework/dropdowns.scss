@@ -164,9 +164,8 @@
     right: 8px;
   }
 
-  .ic-chevron-down {
+  .dropdown-menu-toggle-icon {
     position: absolute;
-    top: $gl-padding-8;
     right: $gl-padding-8;
     color: $gray-darkest;
   }
@@ -410,7 +409,7 @@
       flex-direction: column;
 
       .reference {
-        color: $gl-gray-400;
+        color: $gray-300;
         margin-top: $gl-padding-4;
       }
     }
@@ -627,7 +626,7 @@
 
   .fa,
   .input-icon,
-  .ic-search {
+  .dropdown-input-search {
     position: absolute;
     top: $gl-padding-8;
     right: 20px;
@@ -666,25 +665,25 @@
   width: 100%;
   min-height: 30px;
   padding: 0 7px;
-  color: $gl-gray-700;
+  color: $gray-700;
   line-height: 30px;
   border: 1px solid $dropdown-divider-bg;
   border-radius: 2px;
   outline: 0;
 
   &:focus {
-    color: $gl-gray-700;
+    color: $gray-700;
     border-color: $blue-300;
     box-shadow: 0 0 4px $dropdown-input-focus-shadow;
 
     ~ .fa {
-      color: $gl-gray-700;
+      color: $gray-700;
     }
   }
 
   &:hover {
     ~ .fa {
-      color: $gl-gray-700;
+      color: $gray-700;
     }
   }
 }
@@ -1070,7 +1069,7 @@ header.header-content .dropdown-menu.frequent-items-dropdown-menu {
       color: $dropdown-title-btn-color;
 
       &:hover {
-        color: $gl-gray-400;
+        color: $gray-300;
       }
     }
   }

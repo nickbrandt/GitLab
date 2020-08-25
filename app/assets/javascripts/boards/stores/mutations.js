@@ -1,4 +1,5 @@
 import * as mutationTypes from './mutation_types';
+import { __ } from '~/locale';
 
 const notImplemented = () => {
   /* eslint-disable-next-line @gitlab/require-i18n-strings */
@@ -6,14 +7,28 @@ const notImplemented = () => {
 };
 
 export default {
-  [mutationTypes.SET_INITIAL_BOARD_DATA]: (state, data) => {
-    const { boardType, ...endpoints } = data;
+  [mutationTypes.SET_INITIAL_BOARD_DATA](state, data) {
+    const { boardType, disabled, showPromotion, ...endpoints } = data;
     state.endpoints = endpoints;
     state.boardType = boardType;
+    state.disabled = disabled;
+    state.showPromotion = showPromotion;
+  },
+
+  [mutationTypes.RECEIVE_LISTS]: (state, lists) => {
+    state.boardLists = lists;
   },
 
   [mutationTypes.SET_ACTIVE_ID](state, id) {
     state.activeId = id;
+  },
+
+  [mutationTypes.SET_FILTERS](state, filterParams) {
+    state.filterParams = filterParams;
+  },
+
+  [mutationTypes.CREATE_LIST_FAILURE]: state => {
+    state.error = __('An error occurred while creating the list. Please try again.');
   },
 
   [mutationTypes.REQUEST_ADD_LIST]: () => {
@@ -62,7 +77,7 @@ export default {
   },
 
   [mutationTypes.RECEIVE_ISSUES_FOR_ALL_LISTS_FAILURE]: state => {
-    state.listIssueFetchFailure = true;
+    state.error = __('An error occurred while fetching the board issues. Please reload the page.');
     state.isLoadingIssues = false;
   },
 

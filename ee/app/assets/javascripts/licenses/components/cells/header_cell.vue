@@ -1,11 +1,11 @@
 <script>
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlIcon } from '@gitlab/ui';
 import Cell from './cell.vue';
 
 export default {
   name: 'HeaderCell',
   components: {
-    Icon,
+    GlIcon,
     Cell,
   },
   props: {
@@ -24,7 +24,7 @@ export default {
 <template>
   <cell class="license-header-cell" :is-flexible="false">
     <template slot="title">
-      <icon class="icon" :name="icon" />
+      <gl-icon class="icon" :name="icon" />
       <span class="ml-2 font-weight-bold">{{ title }}</span>
     </template>
   </cell>

@@ -26,7 +26,7 @@ module QA
         setup_jenkins
       end
 
-      it 'integrates and displays build status for MR pipeline in GitLab' do
+      it 'integrates and displays build status for MR pipeline in GitLab', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/719' do
         login_to_gitlab
 
         setup_project_integration_with_jenkins

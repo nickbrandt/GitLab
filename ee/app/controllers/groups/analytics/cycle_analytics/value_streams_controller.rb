@@ -24,6 +24,17 @@ class Groups::Analytics::CycleAnalytics::ValueStreamsController < Analytics::App
     end
   end
 
+  def destroy
+    value_stream = @group.value_streams.find(params[:id])
+
+    if value_stream.custom?
+      value_stream.delete
+      render json: {}, status: :ok
+    else
+      render json: { message: s_('ValueStream|The Default Value Stream cannot be deleted') }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def value_stream_params

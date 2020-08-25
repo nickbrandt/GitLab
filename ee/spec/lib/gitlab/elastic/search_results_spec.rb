@@ -10,12 +10,12 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
   let(:user) { create(:user) }
   let(:project_1) { create(:project, :public, :repository, :wiki_repo) }
   let(:project_2) { create(:project, :public, :repository, :wiki_repo) }
-  let(:limit_project_ids) { [project_1.id] }
+  let(:limit_projects) { [project_1] }
 
   describe '#formatted_count' do
     using RSpec::Parameterized::TableSyntax
 
-    let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
+    let(:results) { described_class.new(user, 'hello world', limit_projects) }
 
     where(:scope, :count_method, :expected) do
       'projects'       | :projects_count       | '1234'
@@ -43,7 +43,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
   end
 
   shared_examples_for 'a paginated object' do |object_type|
-    let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
+    let(:results) { described_class.new(user, 'hello world', limit_projects) }
 
     it 'does not explode when given a page as a string' do
       expect { results.objects(object_type, page: "2") }.not_to raise_error
@@ -135,7 +135,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     it_behaves_like 'a paginated object', 'issues'
 
     it 'lists found issues' do
-      results = described_class.new(user, 'hello world', limit_project_ids)
+      results = described_class.new(user, 'hello world', limit_projects)
       issues = results.objects('issues')
 
       expect(issues).to include @issue_1
@@ -145,14 +145,14 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     it 'returns empty list when issues are not found' do
-      results = described_class.new(user, 'security', limit_project_ids)
+      results = described_class.new(user, 'security', limit_projects)
 
       expect(results.objects('issues')).to be_empty
       expect(results.issues_count).to eq 0
     end
 
     it 'lists issue when search by a valid iid' do
-      results = described_class.new(user, '#2', limit_project_ids, nil, false)
+      results = described_class.new(user, '#2', limit_projects, public_and_internal_projects: false)
       issues = results.objects('issues')
 
       expect(issues).not_to include @issue_1
@@ -162,7 +162,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     it 'returns empty list when search by invalid iid' do
-      results = described_class.new(user, '#222', limit_project_ids)
+      results = described_class.new(user, '#222', limit_projects)
 
       expect(results.objects('issues')).to be_empty
       expect(results.issues_count).to eq 0
@@ -198,7 +198,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     it_behaves_like 'a paginated object', 'notes'
 
     it 'lists found notes' do
-      results = described_class.new(user, 'foo', limit_project_ids)
+      results = described_class.new(user, 'foo', limit_projects)
       notes = results.objects('notes')
 
       expect(notes).to include @note_1
@@ -208,7 +208,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     it 'returns empty list when notes are not found' do
-      results = described_class.new(user, 'security', limit_project_ids)
+      results = described_class.new(user, 'security', limit_projects)
 
       expect(results.objects('notes')).to be_empty
       expect(results.notes_count).to eq 0
@@ -218,7 +218,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
   describe 'confidential issues' do
     let(:project_3) { create(:project, :public) }
     let(:project_4) { create(:project, :public) }
-    let(:limit_project_ids) { [project_1.id, project_2.id, project_3.id] }
+    let(:limit_projects) { [project_1, project_2, project_3] }
     let(:author) { create(:user) }
     let(:assignee) { create(:user) }
     let(:non_member) { create(:user) }
@@ -240,7 +240,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       let(:query) { 'issue' }
 
       it 'does not list confidential issues for guests' do
-        results = described_class.new(nil, query, limit_project_ids)
+        results = described_class.new(nil, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -253,7 +253,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       it 'does not list confidential issues for non project members' do
-        results = described_class.new(non_member, query, limit_project_ids)
+        results = described_class.new(non_member, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -266,7 +266,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       it 'lists confidential issues for author' do
-        results = described_class.new(author, query, limit_project_ids)
+        results = described_class.new(author, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -279,7 +279,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       it 'lists confidential issues for assignee' do
-        results = described_class.new(assignee, query, limit_project_ids)
+        results = described_class.new(assignee, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -295,7 +295,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         project_1.add_developer(member)
         project_2.add_developer(member)
 
-        results = described_class.new(member, query, limit_project_ids)
+        results = described_class.new(member, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -308,7 +308,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       it 'lists all issues for admin' do
-        results = described_class.new(admin, query, limit_project_ids)
+        results = described_class.new(admin, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -325,7 +325,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       let(:query) { '#1' }
 
       it 'does not list confidential issues for guests' do
-        results = described_class.new(nil, query, limit_project_ids)
+        results = described_class.new(nil, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -338,7 +338,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       it 'does not list confidential issues for non project members' do
-        results = described_class.new(non_member, query, limit_project_ids)
+        results = described_class.new(non_member, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -351,7 +351,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       it 'lists confidential issues for author' do
-        results = described_class.new(author, query, limit_project_ids)
+        results = described_class.new(author, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -364,7 +364,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       it 'lists confidential issues for assignee' do
-        results = described_class.new(assignee, query, limit_project_ids)
+        results = described_class.new(assignee, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -380,7 +380,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         project_2.add_developer(member)
         project_3.add_developer(member)
 
-        results = described_class.new(member, query, limit_project_ids)
+        results = described_class.new(member, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -393,7 +393,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       it 'lists all issues for admin' do
-        results = described_class.new(admin, query, limit_project_ids)
+        results = described_class.new(admin, query, limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include @issue
@@ -439,7 +439,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     it_behaves_like 'a paginated object', 'merge_requests'
 
     it 'lists found merge requests' do
-      results = described_class.new(user, 'hello world', limit_project_ids)
+      results = described_class.new(user, 'hello world', limit_projects)
       merge_requests = results.objects('merge_requests')
 
       expect(merge_requests).to include @merge_request_1
@@ -449,14 +449,14 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     it 'returns empty list when merge requests are not found' do
-      results = described_class.new(user, 'security', limit_project_ids)
+      results = described_class.new(user, 'security', limit_projects)
 
       expect(results.objects('merge_requests')).to be_empty
       expect(results.merge_requests_count).to eq 0
     end
 
     it 'lists merge request when search by a valid iid' do
-      results = described_class.new(user, '#2', limit_project_ids)
+      results = described_class.new(user, '#2', limit_projects)
       merge_requests = results.objects('merge_requests')
 
       expect(merge_requests).not_to include @merge_request_1
@@ -466,7 +466,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     it 'returns empty list when search by invalid iid' do
-      results = described_class.new(user, '#222', limit_project_ids)
+      results = described_class.new(user, '#222', limit_projects)
 
       expect(results.objects('merge_requests')).to be_empty
       expect(results.merge_requests_count).to eq 0
@@ -500,7 +500,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
       ensure_elasticsearch_index!
 
-      result = described_class.new(user, 'term', [project.id])
+      result = described_class.new(user, 'term', [project])
 
       expect(result.issues_count).to eq(2)
       expect(result.merge_requests_count).to eq(2)
@@ -517,13 +517,13 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     def search_for(term)
-      described_class.new(user, term, [project_1.id]).objects('blobs').map(&:path)
+      described_class.new(user, term, [project_1]).objects('blobs').map(&:path)
     end
 
     it_behaves_like 'a paginated object', 'blobs'
 
     it 'finds blobs' do
-      results = described_class.new(user, 'def', limit_project_ids)
+      results = described_class.new(user, 'def', limit_projects)
       blobs = results.objects('blobs')
 
       expect(blobs.first.data).to include('def')
@@ -531,7 +531,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     it 'finds blobs by prefix search' do
-      results = described_class.new(user, 'defau*', limit_project_ids)
+      results = described_class.new(user, 'defau*', limit_projects)
       blobs = results.objects('blobs')
 
       expect(blobs.first.data).to include('default')
@@ -544,18 +544,18 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       project_2.add_reporter(user)
       ensure_elasticsearch_index!
 
-      results = described_class.new(user, 'def', [project_1.id])
+      results = described_class.new(user, 'def', [project_1])
       expect(results.blobs_count).to eq 5
       result_project_ids = results.objects('blobs').map(&:project_id)
       expect(result_project_ids.uniq).to eq([project_1.id])
 
-      results = described_class.new(user, 'def', [project_1.id, project_2.id])
+      results = described_class.new(user, 'def', [project_1, project_2])
 
       expect(results.blobs_count).to eq 10
     end
 
     it 'returns zero when blobs are not found' do
-      results = described_class.new(user, 'asdfg', limit_project_ids)
+      results = described_class.new(user, 'asdfg', limit_projects)
 
       expect(results.blobs_count).to eq 0
     end
@@ -720,7 +720,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
   end
 
   describe 'Wikis' do
-    let(:results) { described_class.new(user, 'term', limit_project_ids) }
+    let(:results) { described_class.new(user, 'term', limit_projects) }
 
     subject(:wiki_blobs) { results.objects('wiki_blobs') }
 
@@ -759,12 +759,12 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
       expect(results.wiki_blobs_count).to eq 1
 
-      results = described_class.new(user, 'term', [project_1.id, project_2.id])
+      results = described_class.new(user, 'term', [project_1, project_2])
       expect(results.wiki_blobs_count).to eq 2
     end
 
     it 'returns zero when wiki blobs are not found' do
-      results = described_class.new(user, 'asdfg', limit_project_ids)
+      results = described_class.new(user, 'asdfg', limit_projects)
 
       expect(results.wiki_blobs_count).to eq 0
     end
@@ -773,13 +773,13 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       let(:project_1) { create(:project, :public, :repository, :wiki_disabled) }
 
       context 'search by member' do
-        let(:limit_project_ids) { [project_1.id] }
+        let(:limit_projects) { [project_1] }
 
         it { is_expected.to be_empty }
       end
 
       context 'search by non-member' do
-        let(:limit_project_ids) { [] }
+        let(:limit_projects) { [] }
 
         it { is_expected.to be_empty }
       end
@@ -789,7 +789,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       let(:project_1) { create(:project, :public, :repository, :wiki_private, :wiki_repo) }
 
       context 'search by member' do
-        let(:limit_project_ids) { [project_1.id] }
+        let(:limit_projects) { [project_1] }
 
         before do
           project_1.add_guest(user)
@@ -799,7 +799,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       end
 
       context 'search by non-member' do
-        let(:limit_project_ids) { [] }
+        let(:limit_projects) { [] }
 
         it { is_expected.to be_empty }
       end
@@ -815,7 +815,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     it_behaves_like 'a paginated object', 'commits'
 
     it 'finds commits' do
-      results = described_class.new(user, 'add', limit_project_ids)
+      results = described_class.new(user, 'add', limit_projects)
       commits = results.objects('commits')
 
       expect(commits.first.message.downcase).to include("add")
@@ -828,15 +828,15 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       project_2.add_reporter(user)
       ensure_elasticsearch_index!
 
-      results = described_class.new(user, 'add', [project_1.id])
+      results = described_class.new(user, 'add', [project_1])
       expect(results.commits_count).to eq 24
 
-      results = described_class.new(user, 'add', [project_1.id, project_2.id])
+      results = described_class.new(user, 'add', [project_1, project_2])
       expect(results.commits_count).to eq 48
     end
 
     it 'returns zero when commits are not found' do
-      results = described_class.new(user, 'asdfg', limit_project_ids)
+      results = described_class.new(user, 'asdfg', limit_projects)
 
       expect(results.commits_count).to eq 0
     end
@@ -847,7 +847,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     let(:private_project1) { create(:project, :private, :repository, :wiki_repo, description: "Private project") }
     let(:private_project2) { create(:project, :private, :repository, :wiki_repo, description: "Private project where I'm a member") }
     let(:public_project) { create(:project, :public, :repository, :wiki_repo, description: "Public project") }
-    let(:limit_project_ids) { [private_project2.id] }
+    let(:limit_projects) { [private_project2] }
 
     before do
       private_project2.project_members.create(user: user, access_level: ProjectMember::DEVELOPER)
@@ -863,7 +863,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         ensure_elasticsearch_index!
 
         # Authenticated search
-        results = described_class.new(user, 'project', limit_project_ids)
+        results = described_class.new(user, 'project', limit_projects)
         issues = results.objects('issues')
 
         expect(issues).to include issue_1
@@ -903,8 +903,8 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
               internal_project.project_feature.update!(issues_access_level: ProjectFeature::DISABLED)
               ensure_elasticsearch_index!
 
-              project_ids = user.authorized_projects.pluck(:id)
-              results = described_class.new(user, 'project', project_ids)
+              projects = user.authorized_projects
+              results = described_class.new(user, 'project', projects)
               milestones = results.objects('milestones')
 
               expect(milestones).to match_array([milestone_1, milestone_3])
@@ -930,8 +930,8 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
           context 'when user can read milestones' do
             it 'returns right set of milestones' do
               # Authenticated search
-              project_ids = user.authorized_projects.pluck(:id)
-              results = described_class.new(user, 'project', project_ids)
+              projects = user.authorized_projects
+              results = described_class.new(user, 'project', projects)
               milestones = results.objects('milestones')
 
               expect(milestones).to match_array([milestone_1, milestone_3, milestone_4])
@@ -1012,7 +1012,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         ensure_elasticsearch_index!
 
         # Authenticated search
-        results = described_class.new(user, 'project', limit_project_ids)
+        results = described_class.new(user, 'project', limit_projects)
         milestones = results.objects('projects')
 
         expect(milestones).to include internal_project
@@ -1039,7 +1039,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         ensure_elasticsearch_index!
 
         # Authenticated search
-        results = described_class.new(user, 'project', limit_project_ids)
+        results = described_class.new(user, 'project', limit_projects)
         merge_requests = results.objects('merge_requests')
 
         expect(merge_requests).to include merge_request_1
@@ -1068,7 +1068,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
       it 'finds the right set of wiki blobs' do
         # Authenticated search
-        results = described_class.new(user, 'term', limit_project_ids)
+        results = described_class.new(user, 'term', limit_projects)
         blobs = results.objects('wiki_blobs')
 
         expect(blobs.map(&:project)).to match_array [internal_project, private_project2, public_project]
@@ -1100,7 +1100,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         ensure_elasticsearch_index!
 
         # Authenticated search
-        results = described_class.new(user, 'search', limit_project_ids)
+        results = described_class.new(user, 'search', limit_projects)
         commits = results.objects('commits')
 
         expect(commits.map(&:project)).to match_array [internal_project, private_project2, public_project]
@@ -1132,7 +1132,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         ensure_elasticsearch_index!
 
         # Authenticated search
-        results = described_class.new(user, 'tesla', limit_project_ids)
+        results = described_class.new(user, 'tesla', limit_projects)
         blobs = results.objects('blobs')
 
         expect(blobs.map(&:project)).to match_array [internal_project, private_project2, public_project]
@@ -1149,7 +1149,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
   end
 
   context 'query performance' do
-    let(:results) { described_class.new(user, 'hello world', limit_project_ids) }
+    let(:results) { described_class.new(user, 'hello world', limit_projects) }
 
     include_examples 'does not hit Elasticsearch twice for objects and counts', %w|projects notes blobs wiki_blobs commits issues merge_requests milestones|
   end

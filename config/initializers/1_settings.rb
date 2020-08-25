@@ -83,6 +83,7 @@ Settings.omniauth['external_providers'] = [] if Settings.omniauth['external_prov
 Settings.omniauth['block_auto_created_users'] = true if Settings.omniauth['block_auto_created_users'].nil?
 Settings.omniauth['auto_link_ldap_user'] = false if Settings.omniauth['auto_link_ldap_user'].nil?
 Settings.omniauth['auto_link_saml_user'] = false if Settings.omniauth['auto_link_saml_user'].nil?
+Settings.omniauth['auto_link_user'] = false if Settings.omniauth['auto_link_user'].nil?
 
 Settings.omniauth['sync_profile_from_provider'] = false if Settings.omniauth['sync_profile_from_provider'].nil?
 Settings.omniauth['sync_profile_attributes'] = ['email'] if Settings.omniauth['sync_profile_attributes'].nil?
@@ -632,6 +633,12 @@ ObjectStoreSettings.new(Settings).parse!
 #
 Settings['workhorse'] ||= Settingslogic.new({})
 Settings.workhorse['secret_file'] ||= Rails.root.join('.gitlab_workhorse_secret')
+
+#
+# GitLab KAS
+#
+Settings['gitlab_kas'] ||= Settingslogic.new({})
+Settings.gitlab_kas['secret_file'] ||= Rails.root.join('.gitlab_kas_secret')
 
 #
 # Repositories

@@ -10,6 +10,10 @@ RSpec.describe DastSiteProfiles::UpdateService do
   let(:new_profile_name) { SecureRandom.hex }
   let(:new_target_url) { FFaker::Internet.uri(:https) }
 
+  before do
+    stub_licensed_features(security_on_demand_scans: true)
+  end
+
   describe '#execute' do
     subject do
       described_class.new(project, user).execute(
@@ -24,7 +28,7 @@ RSpec.describe DastSiteProfiles::UpdateService do
     let(:errors) { subject.errors }
     let(:payload) { subject.payload }
 
-    context 'when the user does not have permission to run a dast scan' do
+    context 'when a user does not have access to the project' do
       it 'returns an error status' do
         expect(status).to eq(:error)
       end
@@ -79,6 +83,34 @@ RSpec.describe DastSiteProfiles::UpdateService do
 
         it 'populates message' do
           expect(message).to eq('DastSiteProfile not found')
+        end
+      end
+
+      context 'when on demand scan feature is disabled' do
+        before do
+          stub_feature_flags(security_on_demand_scans_feature_flag: false)
+        end
+
+        it 'returns an error status' do
+          expect(status).to eq(:error)
+        end
+
+        it 'populates message' do
+          expect(message).to eq('Insufficient permissions')
+        end
+      end
+
+      context 'when on demand scan licensed feature is not available' do
+        before do
+          stub_licensed_features(security_on_demand_scans: false)
+        end
+
+        it 'returns an error status' do
+          expect(status).to eq(:error)
+        end
+
+        it 'populates message' do
+          expect(message).to eq('Insufficient permissions')
         end
       end
     end

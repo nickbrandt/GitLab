@@ -1965,7 +1965,7 @@ RSpec.describe Ci::Pipeline, :mailer do
     let(:project) { create(:project, :repository) }
     let(:branch) { project.default_branch }
     let(:ref) { project.ci_refs.take }
-    let(:config_source) { Ci::PipelineEnums.config_sources[:parameter_source] }
+    let(:config_source) { Enums::Ci::Pipeline.config_sources[:parameter_source] }
     let!(:pipeline1) { create(:ci_pipeline, :success, project: project, ref: branch) }
     let!(:pipeline2) { create(:ci_pipeline, :success, project: project, ref: branch) }
     let!(:pipeline3) { create(:ci_pipeline, :failed, project: project, ref: branch) }
@@ -2945,6 +2945,38 @@ RSpec.describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, :success, project: project) }
 
       it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#has_coverage_reports?' do
+    subject { pipeline.has_coverage_reports? }
+
+    context 'when pipeline has builds with coverage reports' do
+      before do
+        create(:ci_build, :coverage_reports, pipeline: pipeline, project: project)
+      end
+
+      context 'when pipeline status is running' do
+        let(:pipeline) { create(:ci_pipeline, :running, project: project) }
+
+        it { expect(subject).to be_falsey }
+      end
+
+      context 'when pipeline status is success' do
+        let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+        it { expect(subject).to be_truthy }
+      end
+    end
+
+    context 'when pipeline does not have builds with coverage reports' do
+      before do
+        create(:ci_build, :artifacts, pipeline: pipeline, project: project)
+      end
+
+      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+      it { expect(subject).to be_falsey }
     end
   end
 

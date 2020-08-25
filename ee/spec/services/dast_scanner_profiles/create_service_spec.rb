@@ -9,6 +9,10 @@ RSpec.describe DastScannerProfiles::CreateService do
   let(:target_timeout) { 60 }
   let(:spider_timeout) { 600 }
 
+  before do
+    stub_licensed_features(security_on_demand_scans: true)
+  end
+
   describe '#execute' do
     subject do
       described_class.new(project, user).execute(
@@ -81,6 +85,34 @@ RSpec.describe DastScannerProfiles::CreateService do
 
         it 'populates message' do
           expect(message).to eq(['Name has already been taken'])
+        end
+      end
+
+      context 'when on demand scan feature is disabled' do
+        before do
+          stub_feature_flags(security_on_demand_scans_feature_flag: false)
+        end
+
+        it 'returns an error status' do
+          expect(status).to eq(:error)
+        end
+
+        it 'populates message' do
+          expect(message).to eq('Insufficient permissions')
+        end
+      end
+
+      context 'when on demand scan licensed feature is not available' do
+        before do
+          stub_licensed_features(security_on_demand_scans: false)
+        end
+
+        it 'returns an error status' do
+          expect(status).to eq(:error)
+        end
+
+        it 'populates message' do
+          expect(message).to eq('Insufficient permissions')
         end
       end
     end

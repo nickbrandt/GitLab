@@ -4,6 +4,9 @@ module Analytics
   class GroupValueStreamEntity < Grape::Entity
     expose :name
     expose :id
+    expose :is_custom do |object|
+      object.custom?
+    end
 
     private
 

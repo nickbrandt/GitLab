@@ -8,6 +8,10 @@ RSpec.describe Ci::RunDastScanService do
   let(:branch) { project.default_branch }
   let(:target_url) { FFaker::Internet.uri(:http) }
 
+  before do
+    stub_licensed_features(security_on_demand_scans: true)
+  end
+
   describe '.ci_template' do
     it 'builds a hash' do
       expect(described_class.ci_template).to be_a(Hash)
@@ -29,7 +33,7 @@ RSpec.describe Ci::RunDastScanService do
     let(:pipeline) { subject.payload }
     let(:message) { subject.message }
 
-    context 'when the user does not have permission to run a dast scan' do
+    context 'when a user does not have access to the project' do
       it 'returns an error status' do
         expect(status).to eq(:error)
       end
@@ -140,6 +144,34 @@ RSpec.describe Ci::RunDastScanService do
 
         it 'populates message' do
           expect(message).to eq(full_error_messages)
+        end
+      end
+
+      context 'when on demand scan feature is disabled' do
+        before do
+          stub_feature_flags(security_on_demand_scans_feature_flag: false)
+        end
+
+        it 'returns an error status' do
+          expect(status).to eq(:error)
+        end
+
+        it 'populates message' do
+          expect(message).to eq('Insufficient permissions')
+        end
+      end
+
+      context 'when on demand scan licensed feature is not available' do
+        before do
+          stub_licensed_features(security_on_demand_scans: false)
+        end
+
+        it 'returns an error status' do
+          expect(status).to eq(:error)
+        end
+
+        it 'populates message' do
+          expect(message).to eq('Insufficient permissions')
         end
       end
     end

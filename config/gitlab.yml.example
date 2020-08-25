@@ -888,6 +888,11 @@ production: &base
     # (default: false)
     auto_link_saml_user: false
 
+    # Allow users with existing accounts to sign in and auto link their account via OmniAuth
+    # login, without having to do a manual login first and manually add OmniAuth. Links on email.
+    # (default: false)
+    auto_link_user: false
+
     # Set different Omniauth providers as external so that all users creating accounts
     # via these providers will not be able to have access to internal projects. You
     # will need to use the full name of the provider, like `google_oauth2` for Google.
@@ -1087,6 +1092,11 @@ production: &base
     # File that contains the secret key for verifying access for gitlab-workhorse.
     # Default is '.gitlab_workhorse_secret' relative to Rails.root (i.e. root of the GitLab app).
     # secret_file: /home/git/gitlab/.gitlab_workhorse_secret
+
+  gitlab_kas:
+    # File that contains the secret key for verifying access for gitlab-kas.
+    # Default is '.gitlab_kas_secret' relative to Rails.root (i.e. root of the GitLab app).
+    # secret_file: /home/git/gitlab/.gitlab_kas_secret
 
   ## GitLab Elasticsearch settings
   elasticsearch:

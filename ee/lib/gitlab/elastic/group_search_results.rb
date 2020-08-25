@@ -11,15 +11,20 @@ module Gitlab
 
       attr_reader :group, :default_project_filter
 
-      def initialize(current_user, limit_project_ids, limit_projects, group, query, public_and_internal_projects, default_project_filter: false)
-        super(current_user, query, limit_project_ids, limit_projects, public_and_internal_projects)
-
-        @default_project_filter = default_project_filter
+      def initialize(current_user, query, limit_projects = nil, group:, public_and_internal_projects: false, default_project_filter: false)
         @group = group
+        @default_project_filter = default_project_filter
+
+        super(current_user, query, limit_projects, public_and_internal_projects: public_and_internal_projects)
       end
 
       def generic_search_results
-        @generic_search_results ||= Gitlab::GroupSearchResults.new(current_user, limit_projects, group, query, default_project_filter: default_project_filter)
+        @generic_search_results ||= Gitlab::GroupSearchResults.new(
+          current_user,
+          query,
+          limit_projects,
+          group: group
+        )
       end
     end
   end

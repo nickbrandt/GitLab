@@ -7,6 +7,7 @@ import Form from 'ee/feature_flags/components/form.vue';
 import editModule from 'ee/feature_flags/store/modules/edit';
 import EditFeatureFlag from 'ee/feature_flags/components/edit_feature_flag.vue';
 import { TEST_HOST } from 'spec/test_constants';
+import { mockTracking } from 'helpers/tracking_helper';
 import axios from '~/lib/utils/axios_utils';
 
 const localVue = createLocalVue();
@@ -147,6 +148,18 @@ describe('Edit feature flag form', () => {
       const expected = `${TEST_HOST}/feature_flags/5/issues`;
 
       expect(wrapper.find(Form).props('featureFlagIssuesEndpoint')).toBe(expected);
+    });
+
+    it('should track when the toggle is clicked', () => {
+      const toggle = wrapper.find(GlToggle);
+      const spy = mockTracking('_category_', toggle.element, jest.spyOn);
+
+      toggle.trigger('click');
+
+      expect(spy).toHaveBeenCalledWith('_category_', 'click_button', {
+        label: 'feature_flag_toggle',
+        context: 'feature_flag_activity',
+      });
     });
   });
 

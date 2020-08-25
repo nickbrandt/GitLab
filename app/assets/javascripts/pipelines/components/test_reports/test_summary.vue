@@ -1,15 +1,14 @@
 <script>
-import { GlDeprecatedButton, GlProgressBar } from '@gitlab/ui';
+import { GlDeprecatedButton, GlProgressBar, GlIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
-import { formatTime, secondsToMilliseconds } from '~/lib/utils/datetime_utility';
-import Icon from '~/vue_shared/components/icon.vue';
+import { formattedTime } from '../../stores/test_reports/utils';
 
 export default {
   name: 'TestSummary',
   components: {
     GlDeprecatedButton,
     GlProgressBar,
-    Icon,
+    GlIcon,
   },
   props: {
     report: {
@@ -39,7 +38,7 @@ export default {
       return 0;
     },
     formattedDuration() {
-      return formatTime(secondsToMilliseconds(this.report.total_time));
+      return formattedTime(this.report.total_time);
     },
     progressBarVariant() {
       if (this.successPercentage < 33) {
@@ -75,7 +74,7 @@ export default {
           class="gl-mr-3 js-back-button"
           @click="onBackClick"
         >
-          <icon name="angle-left" />
+          <gl-icon name="angle-left" />
         </gl-deprecated-button>
 
         <h4>{{ heading }}</h4>

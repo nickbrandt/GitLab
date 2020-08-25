@@ -6,8 +6,8 @@ import {
   GlModal,
   GlSearchBoxByType,
   GlModalDirective,
+  GlIcon,
 } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
 import ReviewAppLink from '~/vue_merge_request_widget/components/review_app_link.vue';
 import { s__, sprintf } from '~/locale';
@@ -19,7 +19,7 @@ export default {
     GlDeprecatedDropdownItem,
     GlModal,
     GlSearchBoxByType,
-    Icon,
+    GlIcon,
     ReviewAppLink,
     ModalCopyButton,
   },
@@ -195,7 +195,7 @@ export default {
           :title="copyToClipboard.mrId"
           :text="appMetadata.mergeRequestId.toString()"
           :modal-id="modalId"
-          css-classes="border-0 gl-pt-0 gl-pr-0 gl-pl-1-deprecated-no-really-do-not-use-me gl-pb-0"
+          css-classes="border-0 gl-pt-0 gl-pr-0 gl-pl-2 gl-pb-0"
         />
       </p>
       <p v-html="instructionText.step4"></p>
@@ -216,7 +216,7 @@ export default {
           <gl-search-box-by-type v-model.trim="changesSearchTerm" class="m-2" />
           <template #button-content>
             {{ s__('VisualReviewApp|Open review app') }}
-            <icon class="fgray" name="external-link" />
+            <gl-icon class="fgray" name="external-link" />
           </template>
           <gl-deprecated-dropdown-item
             v-for="change in filteredChanges"

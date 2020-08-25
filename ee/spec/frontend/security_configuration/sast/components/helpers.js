@@ -7,7 +7,6 @@
  *     generated entities.
  * @returns {Object[]}
  */
-// eslint-disable-next-line import/prefer-default-export
 export const makeEntities = (count, changes) =>
   [...Array(count).keys()].map(i => ({
     defaultValue: `defaultValue${i}`,

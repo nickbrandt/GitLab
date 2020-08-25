@@ -22,6 +22,7 @@ export default {
     issues: {
       type: Array,
       required: true,
+      default: () => [],
     },
     groupId: {
       type: Number,

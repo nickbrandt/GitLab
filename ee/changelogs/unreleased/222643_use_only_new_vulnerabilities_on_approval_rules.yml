@@ -1,5 +1,0 @@
----
-title: Fix MR approval rule update logic for Vulnerability-Check
-merge_request: 38589
-author:
-type: fixed

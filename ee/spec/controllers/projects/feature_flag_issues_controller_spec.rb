@@ -173,7 +173,7 @@ RSpec.describe Projects::FeatureFlagIssuesController do
     end
 
     it 'returns not found when related issues feature is unavailable' do
-      stub_licensed_features(related_issues: false)
+      stub_licensed_features(blocked_issues: false)
       feature_flag, _issue = setup
       sign_in(developer)
 
@@ -333,7 +333,7 @@ RSpec.describe Projects::FeatureFlagIssuesController do
     end
 
     it 'does not create a link when the related issues feature is unavailable' do
-      stub_licensed_features(related_issues: false)
+      stub_licensed_features(blocked_issues: false)
       feature_flag, issue = setup
       sign_in(developer)
 
@@ -401,7 +401,7 @@ RSpec.describe Projects::FeatureFlagIssuesController do
     end
 
     it 'does not unlink the issue when the related issues feature is unavailable' do
-      stub_licensed_features(related_issues: false)
+      stub_licensed_features(blocked_issues: false)
       feature_flag, issue, link = setup
       sign_in(developer)
 

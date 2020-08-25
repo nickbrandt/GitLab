@@ -2,7 +2,7 @@ import $ from 'jquery';
 import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'helpers/test_constants';
 import ProtectedBranchEdit from '~/protected_branches/protected_branch_edit';
-import flash from '~/flash';
+import { deprecatedCreateFlash as flash } from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 
 jest.mock('~/flash');

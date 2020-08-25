@@ -23,7 +23,7 @@ RSpec.describe Projects::VariablesController do
     end
 
     before do
-      stub_licensed_features(extended_audit_events: true)
+      stub_licensed_features(audit_events: true)
     end
 
     context 'when creating variable' do

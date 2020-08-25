@@ -1,49 +1,47 @@
-import Vue from 'vue';
-import AxiosMockAdapter from 'axios-mock-adapter';
-import { shallowMount } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import EpicLane from 'ee/boards/components/epic_lane.vue';
 import IssuesLaneList from 'ee/boards/components/issues_lane_list.vue';
 import { GlIcon } from '@gitlab/ui';
-import { TEST_HOST } from 'helpers/test_constants';
-import { mockEpic, mockLists, mockIssues } from '../mock_data';
-import List from '~/boards/models/list';
-import axios from '~/lib/utils/axios_utils';
+import getters from 'ee/boards/stores/getters';
+import { mockEpic, mockListsWithModel, mockIssuesByListId } from '../mock_data';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('EpicLane', () => {
   let wrapper;
-  let axiosMock;
 
-  beforeEach(() => {
-    axiosMock = new AxiosMockAdapter(axios);
-    axiosMock.onGet(`${TEST_HOST}/lists/1/issues`).reply(200, { issues: mockIssues });
-  });
+  const createStore = () => {
+    return new Vuex.Store({
+      state: {
+        issuesByListId: mockIssuesByListId,
+      },
+      getters,
+    });
+  };
 
   const createComponent = (props = {}) => {
-    const issues = mockLists.reduce((map, list) => {
-      return {
-        ...map,
-        [list.id]: mockIssues,
-      };
-    }, {});
+    const store = createStore();
 
     const defaultProps = {
       epic: mockEpic,
-      lists: mockLists.map(listMock => Vue.observable(new List(listMock))),
-      issues,
+      lists: mockListsWithModel,
       disabled: false,
       rootPath: '/',
     };
 
     wrapper = shallowMount(EpicLane, {
+      localVue,
       propsData: {
         ...defaultProps,
         ...props,
       },
+      store,
     });
   };
 
   afterEach(() => {
-    axiosMock.restore();
     wrapper.destroy();
   });
 
@@ -61,8 +59,8 @@ describe('EpicLane', () => {
       expect(wrapper.find(GlIcon).attributes('aria-label')).toEqual('Closed');
     });
 
-    it('displays total count of issues in epic', () => {
-      expect(wrapper.find('[data-testid="epic-lane-issue-count"]').text()).toContain(5);
+    it('displays count of issues in epic which belong to board', () => {
+      expect(wrapper.find('[data-testid="epic-lane-issue-count"]').text()).toContain(2);
     });
 
     it('displays 2 icons', () => {

@@ -25,6 +25,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
 
       it 'clears memoized values' do
         values = %i(issue_minimum_id issue_maximum_id
+                    project_minimum_id project_maximum_id
                     user_minimum_id user_maximum_id unique_visit_service
                     deployment_minimum_id deployment_maximum_id
                     approval_merge_request_rule_minimum_id
@@ -53,6 +54,21 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
       expect(described_class).to receive(:recorded_at).and_raise(Exception.new('Stopped calculating recorded_at'))
 
       expect { described_class.uncached_data }.to raise_error('Stopped calculating recorded_at')
+    end
+  end
+
+  describe 'usage_activity_by_stage_package' do
+    it 'includes accurate usage_activity_by_stage data' do
+      for_defined_days_back do
+        create(:project, packages: [create(:package)] )
+      end
+
+      expect(described_class.usage_activity_by_stage_package({})).to eq(
+        projects_with_packages: 2
+      )
+      expect(described_class.usage_activity_by_stage_package(described_class.last_28_days_time_period)).to eq(
+        projects_with_packages: 1
+      )
     end
   end
 
@@ -399,6 +415,8 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
       expect(count_data[:snippets]).to eq(6)
       expect(count_data[:personal_snippets]).to eq(2)
       expect(count_data[:project_snippets]).to eq(4)
+
+      expect(count_data[:projects_with_packages]).to eq(2)
     end
 
     it 'gathers object store usage correctly' do
@@ -912,7 +930,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     let(:time) { Time.zone.now }
 
     before do
-      counter = Gitlab::UsageDataCounters::TrackUniqueActions
+      counter = Gitlab::UsageDataCounters::TrackUniqueEvents
       project = Event::TARGET_TYPES[:project]
       wiki = Event::TARGET_TYPES[:wiki]
       design = Event::TARGET_TYPES[:design]

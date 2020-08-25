@@ -7,11 +7,11 @@ import {
   GlDeprecatedDropdownItem,
   GlDeprecatedButton,
   GlTooltipDirective,
+  GlIcon,
 } from '@gitlab/ui';
 import dateFormat from 'dateformat';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import Icon from '~/vue_shared/components/icon.vue';
 import { beginOfDayTime, endOfDayTime } from '~/lib/utils/datetime_utility';
 import MetricChart from './metric_chart.vue';
 import Scatterplot from '../../shared/components/scatterplot.vue';
@@ -28,7 +28,7 @@ export default {
     GlDeprecatedDropdownItem,
     GlColumnChart,
     GlDeprecatedButton,
-    Icon,
+    GlIcon,
     MetricChart,
     Scatterplot,
     MergeRequestTable,
@@ -313,7 +313,7 @@ export default {
                     @click="setSortField(metric.key)"
                   >
                     <span class="d-flex">
-                      <icon
+                      <gl-icon
                         class="flex-shrink-0 gl-mr-2"
                         :class="{
                           invisible: !isSelectedSortField(metric.key),
@@ -329,7 +329,7 @@ export default {
                   :title="sortTooltipTitle"
                   @click="toggleSortOrder"
                 >
-                  <icon :name="sortIcon" />
+                  <gl-icon :name="sortIcon" />
                 </gl-deprecated-button>
               </div>
             </div>

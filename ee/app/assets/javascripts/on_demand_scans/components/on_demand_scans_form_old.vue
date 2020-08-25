@@ -11,7 +11,7 @@ import {
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { isAbsolute, redirectTo } from '~/lib/utils/url_utility';
 import runDastScanMutation from '../graphql/run_dast_scan.mutation.graphql';
 import { SCAN_TYPES } from '../constants';

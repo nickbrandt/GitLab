@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils';
 import Environments from 'ee/clusters/components/environments.vue';
-import { GlTable, GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlTable, GlEmptyState, GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import environments from './mock_data';
 
 describe('Environments', () => {
@@ -102,7 +101,7 @@ describe('Environments', () => {
 
           if (status !== 'loading' && instances.length === 0) {
             const emptyState = tableRows.at(i).find('.deployments-empty');
-            const emptyStateIcon = emptyState.find(Icon);
+            const emptyStateIcon = emptyState.find(GlIcon);
 
             expect(emptyState.exists()).toBe(true);
             expect(emptyStateIcon.exists()).toBe(true);

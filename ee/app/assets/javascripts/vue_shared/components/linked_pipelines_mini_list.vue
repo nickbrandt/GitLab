@@ -1,6 +1,6 @@
 <script>
+import { GlIcon } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
-import icon from '~/vue_shared/components/icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 
 export default {
@@ -8,7 +8,7 @@ export default {
     tooltip,
   },
   components: {
-    icon,
+    GlIcon,
   },
   props: {
     triggeredBy: {
@@ -86,7 +86,7 @@ export default {
     }"
     class="linked-pipeline-mini-list inline-block"
   >
-    <icon v-if="isDownstream" class="arrow-icon" name="long-arrow" />
+    <gl-icon v-if="isDownstream" class="arrow-icon" name="long-arrow" />
 
     <a
       v-for="pipeline in linkedPipelinesTrimmed"
@@ -99,7 +99,7 @@ export default {
       data-placement="top"
       data-container="body"
     >
-      <icon :name="getStatusIcon(pipeline.details.status.icon)" />
+      <gl-icon :name="getStatusIcon(pipeline.details.status.icon)" />
     </a>
 
     <a
@@ -114,6 +114,6 @@ export default {
       {{ counterLabel }}
     </a>
 
-    <icon v-if="isUpstream" class="arrow-icon" name="long-arrow" />
+    <gl-icon v-if="isUpstream" class="arrow-icon" name="long-arrow" />
   </span>
 </template>

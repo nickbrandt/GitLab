@@ -5,7 +5,7 @@ import * as actions from 'ee/vue_shared/dashboards/store/actions';
 import testAction from 'helpers/vuex_action_helper';
 import { mockHeaders, mockText, mockProjectData } from 'ee_jest/vue_shared/dashboards/mock_data';
 import axios from '~/lib/utils/axios_utils';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 
 import clearState from '../helpers';
 

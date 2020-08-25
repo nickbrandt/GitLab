@@ -1,7 +1,7 @@
 <script>
 import Api from 'ee/api';
 import { __, s__ } from '~/locale';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import MetricCard from '../../shared/components/metric_card.vue';
 
 export default {

@@ -3,7 +3,7 @@
 module Mutations
   module DastSiteProfiles
     class Update < BaseMutation
-      include ResolvesProject
+      include AuthorizesProject
 
       graphql_name 'DastSiteProfileUpdate'
 
@@ -27,11 +27,10 @@ module Mutations
                required: false,
                description: 'The URL of the target to be scanned.'
 
-      authorize :run_ondemand_dast_scan
+      authorize :create_on_demand_dast_scan
 
       def resolve(full_path:, **service_args)
-        project = authorized_find!(full_path: full_path)
-        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project, default_enabled: true)
+        project = authorized_find_project!(full_path: full_path)
 
         service = ::DastSiteProfiles::UpdateService.new(project, current_user)
         result = service.execute(service_args)
@@ -41,12 +40,6 @@ module Mutations
         else
           { errors: result.errors }
         end
-      end
-
-      private
-
-      def find_object(full_path:)
-        resolve_project(full_path: full_path)
       end
     end
   end

@@ -9,7 +9,7 @@ module API
             authorize!(:read_package, project)
 
             presenter = ::Packages::Conan::PackagePresenter.new(
-              recipe,
+              package,
               current_user,
               project,
               conan_package_reference: params[:conan_package_reference]
@@ -94,6 +94,7 @@ module API
           def package
             strong_memoize(:package) do
               project.packages
+                .conan
                 .with_name(params[:package_name])
                 .with_version(params[:package_version])
                 .with_conan_channel(params[:package_channel])
@@ -155,6 +156,7 @@ module API
 
           def upload_package_file(file_type)
             authorize_upload!(project)
+            bad_request!('File is too large') if project.actual_limits.exceeded?(:conan_max_file_size, params['file.size'].to_i)
 
             current_package = find_or_create_package
 

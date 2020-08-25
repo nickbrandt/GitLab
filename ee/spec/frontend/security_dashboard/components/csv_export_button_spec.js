@@ -5,7 +5,7 @@ import { TEST_HOST } from 'helpers/test_constants';
 import CsvExportButton, {
   STORAGE_KEY,
 } from 'ee/security_dashboard/components/csv_export_button.vue';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import statusCodes from '~/lib/utils/http_status';
 import axios from '~/lib/utils/axios_utils';
 

@@ -1,4 +1,5 @@
 import mutationsCE from '~/boards/stores/mutations';
+import { __ } from '~/locale';
 import * as mutationTypes from './mutation_types';
 
 const notImplemented = () => {
@@ -75,7 +76,9 @@ export default {
   },
 
   [mutationTypes.RECEIVE_SWIMLANES_FAILURE]: state => {
-    state.epicsSwimlanesFetchFailure = true;
+    state.error = __(
+      'An error occurred while fetching the board swimlanes. Please reload the page.',
+    );
     state.epicsSwimlanesFetchInProgress = false;
   },
 
