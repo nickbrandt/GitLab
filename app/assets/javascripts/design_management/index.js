@@ -6,7 +6,7 @@ import apolloProvider from './graphql';
 export default () => {
   const el = document.querySelector('.js-design-management-new');
   const { issueIid, projectPath, issuePath } = el.dataset;
-  const router = createRouter(issuePath);
+  const router = createRouter(issuePath, apolloProvider.clients.defaultClient);
 
   apolloProvider.clients.defaultClient.cache.writeData({
     data: {
