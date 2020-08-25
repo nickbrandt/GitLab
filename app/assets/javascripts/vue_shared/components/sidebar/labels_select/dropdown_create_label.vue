@@ -1,7 +1,11 @@
 <script>
+import { GlIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 
 export default {
+  components: {
+    GlIcon,
+  },
   props: {
     headerTitle: {
       type: String,
@@ -17,7 +21,7 @@ export default {
 
 <template>
   <div class="dropdown-page-two dropdown-new-label">
-    <div class="dropdown-title">
+    <div class="dropdown-title gl-display-flex gl-justify-content-space-between">
       <button
         :aria-label="__('Go back')"
         type="button"
@@ -31,7 +35,7 @@ export default {
         type="button"
         class="dropdown-title-button dropdown-menu-close"
       >
-        <i aria-hidden="true" class="fa fa-times dropdown-menu-close-icon" data-hidden="true"> </i>
+        <gl-icon name="close" aria-hidden="true" class="dropdown-menu-close-icon" />
       </button>
     </div>
     <div class="dropdown-content">
@@ -44,12 +48,10 @@ export default {
       />
       <div class="suggest-colors suggest-colors-dropdown">
         <a
-          v-for="(color, index) in suggestedColors"
-          :key="index"
+          v-for="(color, hex) in suggestedColors"
+          :key="hex"
           :data-color="color"
-          :style="{
-            backgroundColor: color,
-          }"
+          :style="{ backgroundColor: hex }"
           href="#"
         >
           &nbsp;
