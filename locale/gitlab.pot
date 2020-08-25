@@ -21741,7 +21741,7 @@ msgstr ""
 msgid "SecurityReports|Add a project to your dashboard"
 msgstr ""
 
-msgid "SecurityReports|Add or remove projects from your dashboard"
+msgid "SecurityReports|Add or remove projects to monitor in the security area. Projects included in this list will have their results displayed in the security dashboard and vulnerability report."
 msgstr ""
 
 msgid "SecurityReports|Add projects"
@@ -21811,6 +21811,9 @@ msgid "SecurityReports|Load more vulnerabilities"
 msgstr ""
 
 msgid "SecurityReports|Monitor vulnerabilities in your code"
+msgstr ""
+
+msgid "SecurityReports|Monitored projects"
 msgstr ""
 
 msgid "SecurityReports|More info"
