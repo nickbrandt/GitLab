@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestIfNoDeployPageExist(t *testing.T) {
@@ -52,6 +54,6 @@ func TestIfDeployPageExist(t *testing.T) {
 	}
 	w.Flush()
 
-	testhelper.RequireResponseCode(t, w, 200)
+	require.Equal(t, 200, w.Code)
 	testhelper.RequireResponseBody(t, w, deployPage)
 }

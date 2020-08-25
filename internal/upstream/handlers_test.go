@@ -9,8 +9,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
-
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,7 +31,7 @@ func TestGzipEncoding(t *testing.T) {
 		require.Empty(t, r.Header.Get("Content-Encoding"), "Content-Encoding should be deleted")
 	})).ServeHTTP(resp, req)
 
-	testhelper.RequireResponseCode(t, resp, 200)
+	require.Equal(t, 200, resp.Code)
 }
 
 func TestNoEncoding(t *testing.T) {
@@ -51,7 +49,7 @@ func TestNoEncoding(t *testing.T) {
 		require.Empty(t, r.Header.Get("Content-Encoding"), "Content-Encoding should be deleted")
 	})).ServeHTTP(resp, req)
 
-	testhelper.RequireResponseCode(t, resp, 200)
+	require.Equal(t, 200, resp.Code)
 }
 
 func TestInvalidEncoding(t *testing.T) {
@@ -65,5 +63,5 @@ func TestInvalidEncoding(t *testing.T) {
 		t.Fatal("it shouldn't be executed")
 	})).ServeHTTP(resp, req)
 
-	testhelper.RequireResponseCode(t, resp, 500)
+	require.Equal(t, 500, resp.Code)
 }

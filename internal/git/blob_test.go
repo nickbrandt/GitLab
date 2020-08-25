@@ -4,7 +4,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSetBlobHeaders(t *testing.T) {
@@ -13,5 +13,5 @@ func TestSetBlobHeaders(t *testing.T) {
 
 	setBlobHeaders(w)
 
-	testhelper.RequireAbsentResponseWriterHeader(t, w, "Set-Cookie")
+	require.Empty(t, w.Header().Get("Set-Cookie"), "remove Set-Cookie")
 }

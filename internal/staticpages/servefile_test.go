@@ -11,6 +11,8 @@ import (
 	"testing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestServingNonExistingFile(t *testing.T) {
@@ -20,7 +22,7 @@ func TestServingNonExistingFile(t *testing.T) {
 	w := httptest.NewRecorder()
 	st := &Static{dir}
 	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 404)
+	require.Equal(t, 404, w.Code)
 }
 
 func TestServingDirectory(t *testing.T) {
@@ -34,7 +36,7 @@ func TestServingDirectory(t *testing.T) {
 	w := httptest.NewRecorder()
 	st := &Static{dir}
 	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 404)
+	require.Equal(t, 404, w.Code)
 }
 
 func TestServingMalformedUri(t *testing.T) {
@@ -44,7 +46,7 @@ func TestServingMalformedUri(t *testing.T) {
 	w := httptest.NewRecorder()
 	st := &Static{dir}
 	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 404)
+	require.Equal(t, 404, w.Code)
 }
 
 func TestExecutingHandlerWhenNoFileFound(t *testing.T) {
@@ -76,7 +78,7 @@ func TestServingTheActualFile(t *testing.T) {
 	w := httptest.NewRecorder()
 	st := &Static{dir}
 	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 200)
+	require.Equal(t, 200, w.Code)
 	if w.Body.String() != fileContent {
 		t.Error("We should serve the file: ", w.Body.String())
 	}
@@ -108,15 +110,15 @@ func testServingThePregzippedFile(t *testing.T, enableGzip bool) {
 	w := httptest.NewRecorder()
 	st := &Static{dir}
 	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 200)
+	require.Equal(t, 200, w.Code)
 	if enableGzip {
-		testhelper.RequireResponseWriterHeader(t, w, "Content-Encoding", "gzip")
+		testhelper.RequireResponseHeader(t, w, "Content-Encoding", "gzip")
 		if !bytes.Equal(w.Body.Bytes(), fileGzipContent.Bytes()) {
 			t.Error("We should serve the pregzipped file")
 		}
 	} else {
-		testhelper.RequireResponseCode(t, w, 200)
-		testhelper.RequireResponseWriterHeader(t, w, "Content-Encoding")
+		require.Equal(t, 200, w.Code)
+		testhelper.RequireResponseHeader(t, w, "Content-Encoding")
 		if w.Body.String() != fileContent {
 			t.Error("We should serve the file: ", w.Body.String())
 		}

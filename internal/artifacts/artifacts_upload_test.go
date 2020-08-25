@@ -184,7 +184,7 @@ func TestUploadHandlerAddingMetadata(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	require.Equal(t, http.StatusOK, response.Code)
 	testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 }
 
@@ -194,7 +194,7 @@ func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	require.Equal(t, http.StatusOK, response.Code)
 	testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderMissing)
 }
 
@@ -208,7 +208,7 @@ func TestUploadHandlerForMultipleFiles(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
+	require.Equal(t, http.StatusInternalServerError, response.Code)
 }
 
 func TestUploadFormProcessing(t *testing.T) {
@@ -217,7 +217,7 @@ func TestUploadFormProcessing(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
+	require.Equal(t, http.StatusInternalServerError, response.Code)
 }
 
 func TestLsifFileProcessing(t *testing.T) {
@@ -236,7 +236,7 @@ func TestLsifFileProcessing(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	require.Equal(t, http.StatusOK, response.Code)
 	testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 }
 
@@ -256,5 +256,5 @@ func TestInvalidLsifFileProcessing(t *testing.T) {
 	require.NoError(t, s.writer.Close())
 
 	response := testUploadArtifacts(t, s.writer.FormDataContentType(), s.url, s.buffer)
-	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
+	require.Equal(t, http.StatusInternalServerError, response.Code)
 }

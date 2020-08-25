@@ -59,7 +59,7 @@ func TestUploadTempPathRequirement(t *testing.T) {
 	require.NoError(t, err)
 
 	HandleFileUploads(response, request, nilHandler, apiResponse, &testFormProcessor{}, opts)
-	testhelper.RequireResponseCode(t, response, 500)
+	require.Equal(t, 500, response.Code)
 }
 
 func TestUploadHandlerForwardingRawData(t *testing.T) {
@@ -92,7 +92,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 
 	HandleFileUploads(response, httpRequest, handler, apiResponse, nil, opts)
 
-	testhelper.RequireResponseCode(t, response, 202)
+	require.Equal(t, 202, response.Code)
 	require.Equal(t, "RESPONSE", response.Body.String(), "response body")
 }
 
@@ -162,7 +162,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	require.NoError(t, err)
 
 	HandleFileUploads(response, httpRequest, handler, apiResponse, &testFormProcessor{}, opts)
-	testhelper.RequireResponseCode(t, response, 202)
+	require.Equal(t, 202, response.Code)
 
 	cancel() // this will trigger an async cleanup
 	waitUntilDeleted(t, filePath)
@@ -231,7 +231,7 @@ func TestUploadHandlerDetectingInjectedMultiPartData(t *testing.T) {
 			require.NoError(t, err)
 
 			HandleFileUploads(response, httpRequest, handler, apiResponse, &testFormProcessor{}, opts)
-			testhelper.RequireResponseCode(t, response, test.response)
+			require.Equal(t, test.response, response.Code)
 
 			cancel() // this will trigger an async cleanup
 			waitUntilDeleted(t, filePath)
@@ -262,7 +262,7 @@ func TestUploadProcessingField(t *testing.T) {
 
 	HandleFileUploads(response, httpRequest, nilHandler, apiResponse, &testFormProcessor{}, opts)
 
-	testhelper.RequireResponseCode(t, response, 500)
+	require.Equal(t, 500, response.Code)
 }
 
 func TestUploadProcessingFile(t *testing.T) {
@@ -317,7 +317,7 @@ func TestUploadProcessingFile(t *testing.T) {
 
 			HandleFileUploads(response, httpRequest, nilHandler, apiResponse, &testFormProcessor{}, opts)
 
-			testhelper.RequireResponseCode(t, response, 200)
+			require.Equal(t, 200, response.Code)
 		})
 	}
 
@@ -359,7 +359,7 @@ func TestInvalidFileNames(t *testing.T) {
 		require.NoError(t, err)
 
 		HandleFileUploads(response, httpRequest, nilHandler, apiResponse, &SavedFileTracker{Request: httpRequest}, opts)
-		testhelper.RequireResponseCode(t, response, testCase.code)
+		require.Equal(t, testCase.code, response.Code)
 	}
 }
 
@@ -415,7 +415,7 @@ func TestUploadHandlerRemovingExif(t *testing.T) {
 	require.NoError(t, err)
 
 	HandleFileUploads(response, httpRequest, handler, apiResponse, &testFormProcessor{}, opts)
-	testhelper.RequireResponseCode(t, response, 200)
+	require.Equal(t, 200, response.Code)
 }
 
 func TestUploadHandlerRemovingInvalidExif(t *testing.T) {
@@ -457,7 +457,7 @@ func TestUploadHandlerRemovingInvalidExif(t *testing.T) {
 	require.NoError(t, err)
 
 	HandleFileUploads(response, httpRequest, handler, apiResponse, &testFormProcessor{}, opts)
-	testhelper.RequireResponseCode(t, response, 422)
+	require.Equal(t, 422, response.Code)
 }
 
 func newProxy(url string) *proxy.Proxy {

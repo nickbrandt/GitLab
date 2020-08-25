@@ -8,6 +8,8 @@ import (
 	"gitlab.com/gitlab-org/gitaly/proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseBasename(t *testing.T) {
@@ -76,10 +78,10 @@ func TestSetArchiveHeaders(t *testing.T) {
 
 		setArchiveHeaders(w, testCase.in, "filename")
 
-		testhelper.RequireResponseWriterHeader(t, w, "Content-Type", testCase.out)
-		testhelper.RequireResponseWriterHeader(t, w, "Content-Length")
-		testhelper.RequireResponseWriterHeader(t, w, "Content-Disposition", `attachment; filename="filename"`)
-		testhelper.RequireResponseWriterHeader(t, w, "Cache-Control", "public, max-age=3600")
-		testhelper.RequireAbsentResponseWriterHeader(t, w, "Set-Cookie")
+		testhelper.RequireResponseHeader(t, w, "Content-Type", testCase.out)
+		testhelper.RequireResponseHeader(t, w, "Content-Length")
+		testhelper.RequireResponseHeader(t, w, "Content-Disposition", `attachment; filename="filename"`)
+		testhelper.RequireResponseHeader(t, w, "Cache-Control", "public, max-age=3600")
+		require.Empty(t, w.Header().Get("Set-Cookie"), "remove Set-Cookie")
 	}
 }

@@ -14,6 +14,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream/roundtripper"
+
+	"github.com/stretchr/testify/require"
 )
 
 func okHandler(w http.ResponseWriter, _ *http.Request, _ *api.Response) {
@@ -38,7 +40,7 @@ func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, ur
 
 	response := httptest.NewRecorder()
 	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)
-	testhelper.RequireResponseCode(t, response, expectedCode)
+	require.Equal(t, expectedCode, response.Code)
 	return response
 }
 

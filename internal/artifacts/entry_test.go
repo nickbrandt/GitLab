@@ -50,12 +50,12 @@ func TestDownloadingFromValidArchive(t *testing.T) {
 
 	response := testEntryServer(t, tempFile.Name(), "test.txt")
 
-	testhelper.RequireResponseCode(t, response, 200)
+	require.Equal(t, 200, response.Code)
 
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"test.txt\"")
 
@@ -84,12 +84,12 @@ func TestDownloadingFromValidHTTPArchive(t *testing.T) {
 
 	response := testEntryServer(t, fileServer.URL+"/archive.zip", "test.txt")
 
-	testhelper.RequireResponseCode(t, response, 200)
+	require.Equal(t, 200, response.Code)
 
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"test.txt\"")
 
@@ -107,17 +107,17 @@ func TestDownloadingNonExistingFile(t *testing.T) {
 	archive.Close()
 
 	response := testEntryServer(t, tempFile.Name(), "test")
-	testhelper.RequireResponseCode(t, response, 404)
+	require.Equal(t, 404, response.Code)
 }
 
 func TestDownloadingFromInvalidArchive(t *testing.T) {
 	response := testEntryServer(t, "path/to/non/existing/file", "test")
-	testhelper.RequireResponseCode(t, response, 404)
+	require.Equal(t, 404, response.Code)
 }
 
 func TestIncompleteApiResponse(t *testing.T) {
 	response := testEntryServer(t, "", "")
-	testhelper.RequireResponseCode(t, response, 500)
+	require.Equal(t, 500, response.Code)
 }
 
 func TestDownloadingFromNonExistingHTTPArchive(t *testing.T) {
@@ -130,5 +130,5 @@ func TestDownloadingFromNonExistingHTTPArchive(t *testing.T) {
 
 	response := testEntryServer(t, fileServer.URL+"/not-existing-archive-file.zip", "test.txt")
 
-	testhelper.RequireResponseCode(t, response, 404)
+	require.Equal(t, 404, response.Code)
 }

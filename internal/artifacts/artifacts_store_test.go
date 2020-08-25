@@ -136,7 +136,7 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 
 			contentBuffer, contentType := createTestMultipartForm(t, archiveData)
 			response := testUploadArtifacts(t, contentType, ts.URL+Path, &contentBuffer)
-			testhelper.RequireResponseCode(t, response, http.StatusOK)
+			require.Equal(t, http.StatusOK, response.Code)
 			testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 			assert.Equal(t, 1, storeServerCalled, "store should be called only once")
 			assert.Equal(t, 1, responseProcessorCalled, "response processor should be called only once")
@@ -167,7 +167,7 @@ func TestUploadHandlerSendingToExternalStorageAndStorageServerUnreachable(t *tes
 	defer ts.Close()
 
 	response := testUploadArtifactsFromTestZip(t, ts)
-	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
+	require.Equal(t, http.StatusInternalServerError, response.Code)
 }
 
 func TestUploadHandlerSendingToExternalStorageAndInvalidURLIsUsed(t *testing.T) {
@@ -193,7 +193,7 @@ func TestUploadHandlerSendingToExternalStorageAndInvalidURLIsUsed(t *testing.T) 
 	defer ts.Close()
 
 	response := testUploadArtifactsFromTestZip(t, ts)
-	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
+	require.Equal(t, http.StatusInternalServerError, response.Code)
 }
 
 func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) {
@@ -231,7 +231,7 @@ func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) 
 	defer ts.Close()
 
 	response := testUploadArtifactsFromTestZip(t, ts)
-	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
+	require.Equal(t, http.StatusInternalServerError, response.Code)
 	assert.Equal(t, 1, putCalledTimes, "upload should be called only once")
 }
 
@@ -272,7 +272,7 @@ func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testin
 	defer ts.Close()
 
 	response := testUploadArtifactsFromTestZip(t, ts)
-	testhelper.RequireResponseCode(t, response, http.StatusInternalServerError)
+	require.Equal(t, http.StatusInternalServerError, response.Code)
 	assert.Equal(t, 1, putCalledTimes, "upload should be called only once")
 }
 
@@ -308,7 +308,7 @@ func TestUploadHandlerMultipartUploadSizeLimit(t *testing.T) {
 
 	contentBuffer, contentType := createTestMultipartForm(t, make([]byte, uploadSize))
 	response := testUploadArtifacts(t, contentType, ts.URL+Path, &contentBuffer)
-	testhelper.RequireResponseCode(t, response, http.StatusRequestEntityTooLarge)
+	require.Equal(t, http.StatusRequestEntityTooLarge, response.Code)
 
 	// Poll because AbortMultipartUpload is async
 	for i := 0; os.IsMultipartUpload(test.ObjectPath) && i < 100; i++ {

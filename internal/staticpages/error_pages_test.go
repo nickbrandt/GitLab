@@ -36,7 +36,7 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	testhelper.RequireResponseCode(t, w, 404)
+	require.Equal(t, 404, w.Code)
 	testhelper.RequireResponseBody(t, w, errorPage)
 	testhelper.RequireResponseHeader(t, w, "Content-Type", "text/html; charset=utf-8")
 }
@@ -58,7 +58,7 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	testhelper.RequireResponseCode(t, w, 404)
+	require.Equal(t, 404, w.Code)
 	testhelper.RequireResponseBody(t, w, errorResponse)
 }
 
@@ -81,7 +81,7 @@ func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
 	st := &Static{dir}
 	st.ErrorPagesUnless(true, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
-	testhelper.RequireResponseCode(t, w, 500)
+	require.Equal(t, 500, w.Code)
 	testhelper.RequireResponseBody(t, w, serverError)
 }
 
@@ -105,7 +105,7 @@ func TestIfErrorPageIsIgnoredIfCustomError(t *testing.T) {
 	st := &Static{dir}
 	st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 	w.Flush()
-	testhelper.RequireResponseCode(t, w, 500)
+	require.Equal(t, 500, w.Code)
 	testhelper.RequireResponseBody(t, w, serverError)
 }
 
@@ -140,7 +140,7 @@ func TestErrorPageInterceptedByContentType(t *testing.T) {
 		st := &Static{dir}
 		st.ErrorPagesUnless(false, ErrorFormatHTML, h).ServeHTTP(w, nil)
 		w.Flush()
-		testhelper.RequireResponseCode(t, w, 500)
+		require.Equal(t, 500, w.Code)
 
 		if tc.intercepted {
 			testhelper.RequireResponseBody(t, w, errorPage)
@@ -165,7 +165,7 @@ func TestIfErrorPageIsPresentedJSON(t *testing.T) {
 	st.ErrorPagesUnless(false, ErrorFormatJSON, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	testhelper.RequireResponseCode(t, w, 404)
+	require.Equal(t, 404, w.Code)
 	testhelper.RequireResponseBody(t, w, errorPage)
 	testhelper.RequireResponseHeader(t, w, "Content-Type", "application/json; charset=utf-8")
 }
@@ -185,7 +185,7 @@ func TestIfErrorPageIsPresentedText(t *testing.T) {
 	st.ErrorPagesUnless(false, ErrorFormatText, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	testhelper.RequireResponseCode(t, w, 404)
+	require.Equal(t, 404, w.Code)
 	testhelper.RequireResponseBody(t, w, errorPage)
 	testhelper.RequireResponseHeader(t, w, "Content-Type", "text/plain; charset=utf-8")
 }
