@@ -22,11 +22,12 @@ module Issues
     NO_REBALANCING_NEEDED = ((RelativePositioning::MIN_POSITION * 0.9999)..(RelativePositioning::MAX_POSITION * 0.9999)).freeze
 
     def rebalance_if_needed(issue)
-      gates = [issue.project, issue.project.group].compact
-      return unless gates.any? { |gate| Feature.enabled?(:rebalance_issues, gate) }
       return unless issue
       return if issue.relative_position.nil?
       return if NO_REBALANCING_NEEDED.cover?(issue.relative_position)
+
+      gates = [issue.project, issue.project.group].compact
+      return unless gates.any? { |gate| Feature.enabled?(:rebalance_issues, gate) }
 
       IssueRebalancingWorker.perform_async(issue.id)
     end
