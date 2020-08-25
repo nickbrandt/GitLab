@@ -84,12 +84,12 @@ func testEntryServer(t *testing.T, requestURL string, httpHeaders http.Header, a
 
 func TestDownloadingUsingSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/request", nil, false)
-	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	require.Equal(t, http.StatusOK, response.Code)
 
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"archive.txt\"")
 
@@ -104,15 +104,15 @@ func TestDownloadingAChunkOfDataWithSendURL(t *testing.T) {
 	}
 
 	response := testEntryServer(t, "/get/request", httpHeaders, false)
-	testhelper.RequireResponseCode(t, response, http.StatusPartialContent)
+	require.Equal(t, http.StatusPartialContent, response.Code)
 
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"archive.txt\"")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Range",
 		"bytes 1-2/30")
 
@@ -125,22 +125,22 @@ func TestAccessingAlreadyDownloadedFileWithSendURL(t *testing.T) {
 	}
 
 	response := testEntryServer(t, "/get/request", httpHeaders, false)
-	testhelper.RequireResponseCode(t, response, http.StatusNotModified)
+	require.Equal(t, http.StatusNotModified, response.Code)
 }
 
 func TestAccessingRedirectWithSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/redirect", nil, false)
-	testhelper.RequireResponseCode(t, response, http.StatusTemporaryRedirect)
+	require.Equal(t, http.StatusTemporaryRedirect, response.Code)
 }
 
 func TestAccessingAllowedRedirectWithSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/redirect", nil, true)
-	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	require.Equal(t, http.StatusOK, response.Code)
 
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"archive.txt\"")
 }
@@ -153,15 +153,15 @@ func TestAccessingAllowedRedirectWithChunkOfDataWithSendURL(t *testing.T) {
 	}
 
 	response := testEntryServer(t, "/get/redirect", httpHeaders, true)
-	testhelper.RequireResponseCode(t, response, http.StatusPartialContent)
+	require.Equal(t, http.StatusPartialContent, response.Code)
 
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"archive.txt\"")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Content-Range",
 		"bytes 1-2/30")
 
@@ -170,28 +170,28 @@ func TestAccessingAllowedRedirectWithChunkOfDataWithSendURL(t *testing.T) {
 
 func TestOriginalCacheHeadersPreservedWithSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/redirect", nil, true)
-	testhelper.RequireResponseCode(t, response, http.StatusOK)
+	require.Equal(t, http.StatusOK, response.Code)
 
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Cache-Control",
 		"no-cache")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Expires",
 		"")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Date",
 		"Wed, 21 Oct 2015 05:28:00 GMT")
-	testhelper.RequireResponseWriterHeader(t, response,
+	testhelper.RequireResponseHeader(t, response,
 		"Pragma",
 		"no-cache")
 }
 
 func TestDownloadingNonExistingFileUsingSendURL(t *testing.T) {
 	response := testEntryServer(t, "/invalid/path", nil, false)
-	testhelper.RequireResponseCode(t, response, http.StatusNotFound)
+	require.Equal(t, http.StatusNotFound, response.Code)
 }
 
 func TestDownloadingNonExistingRemoteFileWithSendURL(t *testing.T) {
 	response := testEntryServer(t, "/get/file-not-existing", nil, false)
-	testhelper.RequireResponseCode(t, response, http.StatusNotFound)
+	require.Equal(t, http.StatusNotFound, response.Code)
 }

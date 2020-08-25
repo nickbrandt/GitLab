@@ -1,8 +1,6 @@
 package testhelper
 
 import (
-	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -13,7 +11,6 @@ import (
 	"path"
 	"regexp"
 	"runtime"
-	"strings"
 	"testing"
 	"time"
 
@@ -31,71 +28,9 @@ func ConfigureSecret() {
 	secret.SetPath(path.Join(RootDir(), "testdata/test-secret"))
 }
 
-var extractPatchSeriesMatcher = regexp.MustCompile(`^From (\w+)`)
-
-// RequirePatchSeries takes a `git format-patch` blob, extracts the From xxxxx
-// lines and compares the SHAs to expected list.
-func RequirePatchSeries(t *testing.T, blob []byte, expected ...string) {
-	t.Helper()
-	var actual []string
-	footer := make([]string, 3)
-
-	scanner := bufio.NewScanner(bytes.NewReader(blob))
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if matches := extractPatchSeriesMatcher.FindStringSubmatch(line); len(matches) == 2 {
-			actual = append(actual, matches[1])
-		}
-		footer = []string{footer[1], footer[2], line}
-	}
-
-	if strings.Join(actual, "\n") != strings.Join(expected, "\n") {
-		t.Fatalf("Patch series differs. Expected: %v. Got: %v", expected, actual)
-	}
-
-	// Check the last returned patch is complete
-	// Don't assert on the final line, it is a git version
-	if footer[0] != "-- " {
-		t.Fatalf("Expected end of patch, found: \n\t%q", strings.Join(footer, "\n\t"))
-	}
-}
-
-func RequireResponseCode(t *testing.T, response *httptest.ResponseRecorder, expectedCode int) {
-	t.Helper()
-	if response.Code != expectedCode {
-		t.Fatalf("for HTTP request expected to get %d, got %d instead", expectedCode, response.Code)
-	}
-}
-
 func RequireResponseBody(t *testing.T, response *httptest.ResponseRecorder, expectedBody string) {
 	t.Helper()
-	if response.Body.String() != expectedBody {
-		t.Fatalf("for HTTP request expected to receive %q, got %q instead as body", expectedBody, response.Body.String())
-	}
-}
-
-func RequireResponseBodyRegexp(t *testing.T, response *httptest.ResponseRecorder, expectedBody *regexp.Regexp) {
-	t.Helper()
-	if !expectedBody.MatchString(response.Body.String()) {
-		t.Fatalf("for HTTP request expected to receive body matching %q, got %q instead", expectedBody.String(), response.Body.String())
-	}
-}
-
-func RequireResponseWriterHeader(t *testing.T, w http.ResponseWriter, header string, expected ...string) {
-	t.Helper()
-	actual := w.Header()[http.CanonicalHeaderKey(header)]
-
-	requireHeaderExists(t, header, actual, expected)
-}
-
-func RequireAbsentResponseWriterHeader(t *testing.T, w http.ResponseWriter, header string) {
-	t.Helper()
-	actual := w.Header()[http.CanonicalHeaderKey(header)]
-
-	if len(actual) != 0 {
-		t.Fatalf("for HTTP request expected not to receive the header %q, got %+v", header, actual)
-	}
+	require.Equal(t, expectedBody, response.Body.String(), "response body")
 }
 
 func RequireResponseHeader(t *testing.T, w interface{}, header string, expected ...string) {
@@ -103,31 +38,18 @@ func RequireResponseHeader(t *testing.T, w interface{}, header string, expected 
 	var actual []string
 
 	header = http.CanonicalHeaderKey(header)
+	type headerer interface{ Header() http.Header }
 
-	if resp, ok := w.(*http.Response); ok {
+	switch resp := w.(type) {
+	case *http.Response:
 		actual = resp.Header[header]
-	} else if resp, ok := w.(http.ResponseWriter); ok {
+	case headerer:
 		actual = resp.Header()[header]
-	} else if resp, ok := w.(*httptest.ResponseRecorder); ok {
-		actual = resp.Header()[header]
-	} else {
-		t.Fatalf("invalid type of w passed RequireResponseHeader")
+	default:
+		t.Fatal("invalid type of w passed RequireResponseHeader")
 	}
 
-	requireHeaderExists(t, header, actual, expected)
-}
-
-func requireHeaderExists(t *testing.T, header string, actual, expected []string) {
-	t.Helper()
-	if len(expected) != len(actual) {
-		t.Fatalf("for HTTP request expected to receive the header %q with %+v, got %+v", header, expected, actual)
-	}
-
-	for i, value := range expected {
-		if value != actual[i] {
-			t.Fatalf("for HTTP request expected to receive the header %q with %+v, got %+v", header, expected, actual)
-		}
-	}
+	require.Equal(t, expected, actual, "values for HTTP header %s", header)
 }
 
 func TestServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httptest.Server {
@@ -183,10 +105,9 @@ func RootDir() string {
 }
 
 func LoadFile(t *testing.T, filePath string) string {
+	t.Helper()
 	content, err := ioutil.ReadFile(path.Join(RootDir(), filePath))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	return string(content)
 }
 

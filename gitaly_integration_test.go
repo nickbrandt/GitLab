@@ -4,13 +4,16 @@ package main
 
 import (
 	"archive/tar"
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -317,7 +320,7 @@ func TestAllowedGetGitFormatPatch(t *testing.T) {
 	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
 	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 
-	testhelper.RequirePatchSeries(
+	requirePatchSeries(
 		t,
 		body,
 		"372ab6950519549b14d220271ee2322caa44d4eb",
@@ -326,4 +329,30 @@ func TestAllowedGetGitFormatPatch(t *testing.T) {
 		"742518b2be68fc750bb4c357c0df821a88113286",
 		rightCommit,
 	)
+}
+
+var extractPatchSeriesMatcher = regexp.MustCompile(`^From (\w+)`)
+
+// RequirePatchSeries takes a `git format-patch` blob, extracts the From xxxxx
+// lines and compares the SHAs to expected list.
+func requirePatchSeries(t *testing.T, blob []byte, expected ...string) {
+	t.Helper()
+	var actual []string
+	footer := make([]string, 3)
+
+	scanner := bufio.NewScanner(bytes.NewReader(blob))
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if matches := extractPatchSeriesMatcher.FindStringSubmatch(line); len(matches) == 2 {
+			actual = append(actual, matches[1])
+		}
+		footer = []string{footer[1], footer[2], line}
+	}
+
+	require.Equal(t, strings.Join(expected, "\n"), strings.Join(actual, "\n"), "patch series")
+
+	// Check the last returned patch is complete
+	// Don't assert on the final line, it is a git version
+	require.Equal(t, "-- ", footer[0], "end of patch marker")
 }

@@ -5,8 +5,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
-
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,5 +35,5 @@ func TestDevelopmentModeDisabled(t *testing.T) {
 
 	require.False(t, executed, "The handler should not get executed")
 
-	testhelper.RequireResponseCode(t, w, 404)
+	require.Equal(t, 404, w.Code)
 }

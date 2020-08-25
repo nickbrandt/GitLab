@@ -17,6 +17,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream/roundtripper"
+
+	"github.com/stretchr/testify/require"
 )
 
 const testVersion = "123"
@@ -66,7 +68,7 @@ func TestProxyRequest(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 202)
+	require.Equal(t, 202, w.Code)
 	testhelper.RequireResponseBody(t, w, "RESPONSE")
 
 	if w.Header().Get("Custom-Response-Header") != "test" {
@@ -83,8 +85,8 @@ func TestProxyError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy("http://localhost:655575/", nil).ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 502)
-	testhelper.RequireResponseBodyRegexp(t, w, regexp.MustCompile("dial tcp:.*invalid port.*"))
+	require.Equal(t, 502, w.Code)
+	require.Regexp(t, regexp.MustCompile("dial tcp:.*invalid port.*"), w.Body.String(), "response body")
 }
 
 func TestProxyReadTimeout(t *testing.T) {
@@ -110,7 +112,7 @@ func TestProxyReadTimeout(t *testing.T) {
 	p := newProxy(ts.URL, rt)
 	w := httptest.NewRecorder()
 	p.ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 502)
+	require.Equal(t, 502, w.Code)
 	testhelper.RequireResponseBody(t, w, "GitLab is not responding")
 }
 
@@ -128,6 +130,6 @@ func TestProxyHandlerTimeout(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
-	testhelper.RequireResponseCode(t, w, 503)
+	require.Equal(t, 503, w.Code)
 	testhelper.RequireResponseBody(t, w, "Request took too long")
 }
