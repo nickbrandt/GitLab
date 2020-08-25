@@ -3,9 +3,12 @@ import Cookies from 'js-cookie';
 import { GlCollapse, GlButton, GlPopover } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import updateActiveDiscussionMutation from '../graphql/mutations/update_active_discussion.mutation.graphql';
-import { extractDiscussions, extractParticipants } from '../utils/design_management_utils';
-import { ACTIVE_DISCUSSION_SOURCE_TYPES } from '../constants';
+import {
+  extractDiscussions,
+  extractParticipants,
+  findNoteId,
+  createNoteAnchorId,
+} from '../utils/design_management_utils';
 import DesignDiscussion from './design_notes/design_discussion.vue';
 import Participants from '~/sidebar/components/participants/participants.vue';
 
@@ -66,14 +69,9 @@ export default {
       Cookies.set(this.$options.cookieKey, 'true', { expires: 365 * 10 });
       this.updateActiveDiscussion();
     },
-    updateActiveDiscussion(id) {
-      this.$apollo.mutate({
-        mutation: updateActiveDiscussionMutation,
-        variables: {
-          id,
-          source: ACTIVE_DISCUSSION_SOURCE_TYPES.discussion,
-        },
-      });
+    updateActiveDiscussion(noteGid) {
+      const newHash = noteGid === undefined ? '' : `#${createNoteAnchorId(findNoteId(noteGid))}`;
+      window.location.hash = newHash;
     },
     closeCommentForm() {
       this.comment = '';

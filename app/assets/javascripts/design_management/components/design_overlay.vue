@@ -1,9 +1,8 @@
 <script>
 import { __ } from '~/locale';
 import activeDiscussionQuery from '../graphql/queries/active_discussion.query.graphql';
-import updateActiveDiscussionMutation from '../graphql/mutations/update_active_discussion.mutation.graphql';
 import DesignNotePin from './design_note_pin.vue';
-import { ACTIVE_DISCUSSION_SOURCE_TYPES } from '../constants';
+import { findNoteId, createNoteAnchorId } from '../utils/design_management_utils';
 
 export default {
   name: 'DesignOverlay',
@@ -227,14 +226,9 @@ export default {
 
       this.setNewNoteCoordinates({ x: offsetX, y: offsetY });
     },
-    updateActiveDiscussion(id) {
-      this.$apollo.mutate({
-        mutation: updateActiveDiscussionMutation,
-        variables: {
-          id,
-          source: ACTIVE_DISCUSSION_SOURCE_TYPES.pin,
-        },
-      });
+    updateActiveDiscussion(noteGid) {
+      const newHash = `#${createNoteAnchorId(findNoteId(noteGid))}`;
+      window.location.hash = newHash;
     },
     isNoteInactive(note) {
       return this.activeDiscussion.id && this.activeDiscussion.id !== note.id;

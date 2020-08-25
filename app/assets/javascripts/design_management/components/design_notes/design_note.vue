@@ -6,7 +6,7 @@ import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import DesignReplyForm from './design_reply_form.vue';
-import { findNoteId } from '../../utils/design_management_utils';
+import { findNoteId, createNoteAnchorId } from '../../utils/design_management_utils';
 import { hasErrors } from '../../utils/cache_update';
 
 export default {
@@ -43,10 +43,13 @@ export default {
       return this.note.author;
     },
     noteAnchorId() {
-      return findNoteId(this.note.id);
+      return createNoteAnchorId(findNoteId(this.note.id));
+    },
+    noteAnchorHash() {
+      return `#${this.noteAnchorId}`;
     },
     isNoteLinked() {
-      return this.$route.hash === `#note_${this.noteAnchorId}`;
+      return this.$route.hash === this.noteAnchorHash;
     },
     mutationPayload() {
       return {
@@ -80,7 +83,7 @@ export default {
 </script>
 
 <template>
-  <timeline-entry-item :id="`note_${noteAnchorId}`" class="design-note note-form">
+  <timeline-entry-item class="design-note note-form">
     <user-avatar-link
       :link-href="author.webUrl"
       :img-src="author.avatarUrl"
@@ -104,7 +107,7 @@ export default {
           <span class="system-note-message"> <slot></slot> </span>
           <a
             class="note-timestamp system-note-separator gl-display-block gl-mb-2"
-            :href="`#note_${noteAnchorId}`"
+            :href="noteAnchorHash"
           >
             <time-ago-tooltip :time="note.createdAt" tooltip-placement="bottom" />
           </a>

@@ -14,7 +14,6 @@ import DesignSidebar from '../../components/design_sidebar.vue';
 import getDesignQuery from '../../graphql/queries/get_design.query.graphql';
 import createImageDiffNoteMutation from '../../graphql/mutations/create_image_diff_note.mutation.graphql';
 import updateImageDiffNoteMutation from '../../graphql/mutations/update_image_diff_note.mutation.graphql';
-import updateActiveDiscussionMutation from '../../graphql/mutations/update_active_discussion.mutation.graphql';
 import {
   extractDiscussions,
   extractDesign,
@@ -35,7 +34,6 @@ import {
 } from '../../utils/error_messages';
 import { trackDesignDetailView } from '../../utils/tracking';
 import { DESIGNS_ROUTE_NAME } from '../../router/constants';
-import { ACTIVE_DISCUSSION_SOURCE_TYPES } from '../../constants';
 
 export default {
   components: {
@@ -145,8 +143,6 @@ export default {
   mounted() {
     Mousetrap.bind('esc', this.closeDesign);
     this.trackEvent();
-    // We need to reset the active discussion when opening a new design
-    this.updateActiveDiscussion();
   },
   beforeDestroy() {
     Mousetrap.unbind('esc', this.closeDesign);
@@ -265,15 +261,6 @@ export default {
         this.$route.query.version || this.latestVersionId,
         this.isLatestVersion,
       );
-    },
-    updateActiveDiscussion(id) {
-      this.$apollo.mutate({
-        mutation: updateActiveDiscussionMutation,
-        variables: {
-          id,
-          source: ACTIVE_DISCUSSION_SOURCE_TYPES.discussion,
-        },
-      });
     },
     toggleResolvedComments() {
       this.resolvedDiscussionsExpanded = !this.resolvedDiscussionsExpanded;

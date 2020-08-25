@@ -70,7 +70,7 @@ export default {
         // We don't want scrollIntoView to be triggered from the discussion click itself
         if (
           discussionId &&
-          data.activeDiscussion.source === ACTIVE_DISCUSSION_SOURCE_TYPES.pin &&
+          // data.activeDiscussion.source === ACTIVE_DISCUSSION_SOURCE_TYPES.pin &&
           discussionId === this.discussion.notes[0].id
         ) {
           this.$el.scrollIntoView({
