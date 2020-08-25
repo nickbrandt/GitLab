@@ -126,6 +126,7 @@ export default {
       Api.changeVulnerabilityState(this.vulnerability.id, newState)
         .then(({ data }) => {
           Object.assign(this.vulnerability, data);
+          this.$emit('vulnerability-state-change');
         })
         .catch(() => {
           createFlash(
@@ -136,7 +137,6 @@ export default {
         })
         .finally(() => {
           this.isLoadingVulnerability = false;
-          this.$emit('vulnerability-state-change', newState);
         });
     },
     createMergeRequest() {
