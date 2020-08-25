@@ -715,6 +715,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
         CI_COMMIT_TITLE
         CI_COMMIT_DESCRIPTION
         CI_COMMIT_REF_PROTECTED
+        CI_COMMIT_TIMESTAMP
         CI_BUILD_REF
         CI_BUILD_BEFORE_SHA
         CI_BUILD_REF_NAME
