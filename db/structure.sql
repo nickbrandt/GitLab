@@ -13342,7 +13342,8 @@ CREATE TABLE public.namespace_root_storage_statistics (
     build_artifacts_size bigint DEFAULT 0 NOT NULL,
     storage_size bigint DEFAULT 0 NOT NULL,
     packages_size bigint DEFAULT 0 NOT NULL,
-    snippets_size bigint DEFAULT 0 NOT NULL
+    snippets_size bigint DEFAULT 0 NOT NULL,
+    pipeline_artifacts_size bigint DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE public.namespace_settings (
