@@ -19,12 +19,12 @@ RSpec.describe 'New project screen', :js do
 
   it 'shows the progress bar with the correct steps' do
     expect(subject).to have_content('Create/import your first project')
-    expect(subject).to have_content('1. Your profile 2. Your GitLab group 3. Your first project')
+    expect(subject).to have_content('Your profile Your GitLab group Your first project')
   end
 
   context 'when in the subscription flow' do
     let(:in_subscription_flow) { true }
 
-    it { is_expected.to have_content('1. Your profile 2. Checkout 3. Your GitLab group 4. Your first project') }
+    it { is_expected.to have_content('Your profile Checkout Your GitLab group Your first project') }
   end
 end

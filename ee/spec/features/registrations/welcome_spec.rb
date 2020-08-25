@@ -22,14 +22,14 @@ RSpec.describe 'Welcome screen', :js do
 
     it 'shows the welcome page without a progress bar' do
       expect(page).to have_content('Welcome to GitLab.com')
-      expect(page).not_to have_content('1. Your profile')
+      expect(page).not_to have_content('Your profile')
     end
 
     context 'when in the subscription flow' do
       let(:in_subscription_flow) { true }
 
       it 'shows the progress bar with the correct steps' do
-        expect(page).to have_content('1. Your profile 2. Checkout 3. Your GitLab group')
+        expect(page).to have_content('Your profile Checkout Your GitLab group')
       end
     end
 
@@ -37,14 +37,14 @@ RSpec.describe 'Welcome screen', :js do
       let(:part_of_onboarding_issues_experiment) { true }
 
       it 'shows the progress bar with the correct steps' do
-        expect(page).to have_content('1. Your profile 2. Your GitLab group 3. Your first project')
+        expect(page).to have_content('Your profile Your GitLab group Your first project')
       end
 
       context 'when in the invitation flow' do
         let(:in_invitation_flow) { true }
 
         it 'does not show the progress bar' do
-          expect(page).not_to have_content('1. Your profile')
+          expect(page).not_to have_content('Your profile')
         end
       end
     end
@@ -54,7 +54,7 @@ RSpec.describe 'Welcome screen', :js do
       let(:part_of_onboarding_issues_experiment) { true }
 
       it 'shows the progress bar with the correct steps' do
-        expect(page).to have_content('1. Your profile 2. Checkout 3. Your GitLab group 4. Your first project')
+        expect(page).to have_content('Your profile Checkout Your GitLab group Your first project')
       end
     end
   end
