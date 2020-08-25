@@ -48,7 +48,9 @@ export default {
       });
     },
     showCreateIssueForm() {
-      this.toggleCreateIssueForm({ toggleState: true });
+      this.toggleCreateIssueForm({
+        toggleState: true,
+      });
     },
     showAddEpicForm() {
       this.toggleAddItemForm({
@@ -57,7 +59,9 @@ export default {
       });
     },
     showCreateEpicForm() {
-      this.toggleCreateEpicForm({ toggleState: true });
+      this.toggleCreateEpicForm({
+        toggleState: true,
+      });
     },
   },
 };
