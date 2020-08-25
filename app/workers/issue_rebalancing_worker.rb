@@ -12,7 +12,7 @@ class IssueRebalancingWorker
 
     rebalance(issue)
   rescue ActiveRecord::RecordNotFound, IssueRebalancingService::TooManyIssues => e
-    Sidekiq.logger.warn(e)
+    Gitlab::ErrorTracking.log_exception(e, issue_id: issue_id)
   end
 
   private
