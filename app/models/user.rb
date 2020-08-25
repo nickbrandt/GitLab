@@ -58,6 +58,8 @@ class User < ApplicationRecord
   devise :lockable, :recoverable, :rememberable, :trackable,
          :validatable, :omniauthable, :confirmable, :registerable
 
+  include AdminChangedPasswordNotifier
+
   # This module adds async behaviour to Devise emails
   # and should be added after Devise modules are initialized.
   include AsyncDeviseEmail
