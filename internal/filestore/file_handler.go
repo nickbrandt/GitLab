@@ -119,7 +119,8 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 
 	var clientMode string
 	if opts.IsRemote() {
-		if opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsGoCloud() {
+		switch {
+		case opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsGoCloud():
 			clientMode = fmt.Sprintf("go_cloud:%s", opts.ObjectStorageConfig.Provider)
 			p := &objectstore.GoCloudObjectParams{
 				Ctx:        ctx,
@@ -129,15 +130,37 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 				Deadline:   opts.Deadline,
 			}
 			remoteWriter, err = objectstore.NewGoCloudObject(p)
-		} else if opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsAWS() && opts.ObjectStorageConfig.IsValid() {
+		case opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsAWS() && opts.ObjectStorageConfig.IsValid():
 			clientMode = "s3"
-			remoteWriter, err = objectstore.NewS3Object(ctx, opts.RemoteTempObjectID, opts.ObjectStorageConfig.S3Credentials, opts.ObjectStorageConfig.S3Config, opts.Deadline)
-		} else if opts.IsMultipart() {
+			remoteWriter, err = objectstore.NewS3Object(
+				ctx,
+				opts.RemoteTempObjectID,
+				opts.ObjectStorageConfig.S3Credentials,
+				opts.ObjectStorageConfig.S3Config,
+				opts.Deadline,
+			)
+		case opts.IsMultipart():
 			clientMode = "multipart"
-			remoteWriter, err = objectstore.NewMultipart(ctx, opts.PresignedParts, opts.PresignedCompleteMultipart, opts.PresignedAbortMultipart, opts.PresignedDelete, opts.PutHeaders, opts.Deadline, opts.PartSize)
-		} else {
+			remoteWriter, err = objectstore.NewMultipart(
+				ctx,
+				opts.PresignedParts,
+				opts.PresignedCompleteMultipart,
+				opts.PresignedAbortMultipart,
+				opts.PresignedDelete,
+				opts.PutHeaders,
+				opts.Deadline,
+				opts.PartSize,
+			)
+		default:
 			clientMode = "http"
-			remoteWriter, err = objectstore.NewObject(ctx, opts.PresignedPut, opts.PresignedDelete, opts.PutHeaders, opts.Deadline, size)
+			remoteWriter, err = objectstore.NewObject(
+				ctx,
+				opts.PresignedPut,
+				opts.PresignedDelete,
+				opts.PutHeaders,
+				opts.Deadline,
+				size,
+			)
 		}
 
 		if err != nil {
