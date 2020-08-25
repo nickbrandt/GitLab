@@ -114,13 +114,13 @@ RSpec.describe MergeRequestPresenter do
     subject(:missing_security_scan_types) { presenter.missing_security_scan_types }
 
     before do
-      stub_feature_flags(missing_mr_security_scan_types: missing_mr_security_scan_types_feature_enabled?)
+      stub_feature_flags(missing_mr_security_scan_types: feature_enabled?)
       allow(merge_request).to receive(:actual_head_pipeline).and_return(pipeline)
       allow(presenter).to receive(:can?).with(user, :read_pipeline, pipeline).and_return(can_read_pipeline?)
     end
 
     context 'when the `missing_mr_security_scan_types` feature flag is not enabled' do
-      let(:missing_mr_security_scan_types_feature_enabled?) { false }
+      let(:feature_enabled?) { false }
 
       context 'when the `current_user` can not read the pipeline' do
         let(:can_read_pipeline?) { false }
@@ -136,7 +136,7 @@ RSpec.describe MergeRequestPresenter do
     end
 
     context 'when the `missing_mr_security_scan_types` feature flag is enabled' do
-      let(:missing_mr_security_scan_types_feature_enabled?) { true }
+      let(:feature_enabled?) { true }
 
       context 'when the `current_user` can not read the pipeline' do
         let(:can_read_pipeline?) { false }
