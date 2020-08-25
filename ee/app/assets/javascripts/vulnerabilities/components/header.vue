@@ -228,8 +228,9 @@ export default {
           :class="
             `text-capitalize align-self-center issuable-status-box status-box status-box-${statusBoxStyle}`
           "
-          >{{ vulnerability.state }}</span
         >
+          {{ vulnerability.state }}
+        </span>
 
         <status-description
           class="issuable-meta"
@@ -263,8 +264,9 @@ export default {
           category="secondary"
           :loading="isProcessingAction"
           @click="triggerClick(actionButtons[0].action)"
-          >{{ actionButtons[0].name }}</gl-button
         >
+          {{ actionButtons[0].name }}
+        </gl-button>
       </div>
     </div>
   </div>
