@@ -12,11 +12,6 @@ export default {
       required: false,
       default: true,
     },
-    loading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   computed: {
     buttonLabel() {
@@ -27,7 +22,7 @@ export default {
 </script>
 
 <template>
-  <gl-button :loading="loading" :aria-label="buttonLabel" @click="$emit('click', $event)">
+  <gl-button v-bind="$attrs" :aria-label="buttonLabel" @click="$emit('click', $event)">
     {{ buttonLabel }}
   </gl-button>
 </template>

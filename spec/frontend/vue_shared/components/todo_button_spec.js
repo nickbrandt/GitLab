@@ -40,7 +40,7 @@ describe('Todo Button', () => {
     expect(wrapper.find(GlButton).text()).toBe(label);
   });
 
-  it('sets button props correctly when `loading` is true', () => {
+  it('binds additional props to GlButton', () => {
     createComponent({ loading: true });
 
     expect(wrapper.find(GlButton).props('loading')).toBe(true);
