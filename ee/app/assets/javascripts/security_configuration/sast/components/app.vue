@@ -46,14 +46,21 @@ export default {
     return {
       sastConfigurationEntities: [],
       hasLoadingError: false,
+      showFeedbackAlert: true,
     };
   },
   methods: {
+    dismissFeedbackAlert() {
+      this.showFeedbackAlert = false;
+    },
     onError() {
       this.hasLoadingError = true;
     },
   },
   i18n: {
+    feedbackAlertMessage: s__(`
+      As we continue to build more features for SAST, we'd love your feedback
+      on the SAST configuration feature in %{linkStart}this issue%{linkEnd}.`),
     helpText: s__(
       `SecurityConfiguration|Customize common SAST settings to suit your
       requirements. Configuration changes made here override those provided by
@@ -65,11 +72,25 @@ export default {
       refresh the page, or try again later.`,
     ),
   },
+  feedbackIssue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/225991',
 };
 </script>
 
 <template>
   <article>
+    <gl-alert
+      v-if="showFeedbackAlert"
+      data-testid="feedback-alert"
+      class="gl-mt-4"
+      @dismiss="dismissFeedbackAlert"
+    >
+      <gl-sprintf :message="$options.i18n.feedbackAlertMessage">
+        <template #link="{ content }">
+          <gl-link :href="$options.feedbackIssue" target="_blank">{{ content }}</gl-link>
+        </template>
+      </gl-sprintf>
+    </gl-alert>
+
     <header class="gl-my-5 gl-border-b-1 gl-border-b-gray-100 gl-border-b-solid">
       <h2 class="h4">
         {{ s__('SecurityConfiguration|SAST Configuration') }}
@@ -85,9 +106,13 @@ export default {
 
     <gl-loading-icon v-if="$apollo.loading" size="lg" />
 
-    <gl-alert v-else-if="hasLoadingError" variant="danger" :dismissible="false">{{
-      $options.i18n.loadingErrorText
-    }}</gl-alert>
+    <gl-alert
+      v-else-if="hasLoadingError"
+      variant="danger"
+      :dismissible="false"
+      data-testid="error-alert"
+      >{{ $options.i18n.loadingErrorText }}</gl-alert
+    >
 
     <configuration-form v-else :entities="sastConfigurationEntities" />
   </article>
