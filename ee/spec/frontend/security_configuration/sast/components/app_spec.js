@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlAlert, GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
+import { GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
 import SASTConfigurationApp from 'ee/security_configuration/sast/components/app.vue';
 import ConfigurationForm from 'ee/security_configuration/sast/components/configuration_form.vue';
 import { makeEntities } from './helpers';
@@ -41,11 +41,43 @@ describe('SAST Configuration App', () => {
   const findLink = (container = wrapper) => container.find(GlLink);
   const findConfigurationForm = () => wrapper.find(ConfigurationForm);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
-  const findErrorAlert = () => wrapper.find(GlAlert);
+  const findErrorAlert = () => wrapper.find('[data-testid="error-alert"]');
+  const findFeedbackAlert = () => wrapper.find('[data-testid="feedback-alert"]');
 
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
+  });
+
+  describe('feedback alert', () => {
+    beforeEach(() => {
+      createComponent({
+        stubs: { GlSprintf },
+      });
+    });
+
+    it('should be displayed', () => {
+      expect(findFeedbackAlert().exists()).toBe(true);
+    });
+
+    it('links to the feedback issue', () => {
+      const link = findFeedbackAlert().find(GlLink);
+      expect(link.attributes()).toMatchObject({
+        href: SASTConfigurationApp.feedbackIssue,
+        target: '_blank',
+      });
+    });
+
+    describe('when it is dismissed', () => {
+      beforeEach(() => {
+        findFeedbackAlert().vm.$emit('dismiss');
+        return wrapper.vm.$nextTick();
+      });
+
+      it('should not be displayed', () => {
+        expect(findFeedbackAlert().exists()).toBe(false);
+      });
+    });
   });
 
   describe('header', () => {
