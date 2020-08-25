@@ -1,6 +1,6 @@
 import { s__, sprintf } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
-import createFlash, { FLASH_TYPES } from '~/flash';
+import { deprecatedCreateFlash as createFlash, FLASH_TYPES } from '~/flash';
 import { joinPaths } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 

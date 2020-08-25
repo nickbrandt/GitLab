@@ -13,11 +13,5 @@ module Projects
         .with_dast_site
         .find(params[:id])
     end
-
-    private
-
-    def authorize_read_on_demand_scans!
-      access_denied! unless can?(current_user, :read_on_demand_scans, project)
-    end
   end
 end

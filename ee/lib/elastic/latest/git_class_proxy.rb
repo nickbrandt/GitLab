@@ -10,13 +10,15 @@ module Elastic
 
         case type
         when 'all'
-          results[:blobs] = search_blob(query, page: page, per: per, options: options)
-          results[:commits] = search_commit(query, page: page, per: per, options: options)
-          results[:wiki_blobs] = search_blob(query, type: 'wiki_blob', page: page, per: per, options: options)
+          results[:commits] = search_commit(query, page: page, per: per, options: options.merge(features: 'repository'))
+          results[:blobs] = search_blob(query, type: 'blob', page: page, per: per, options: options.merge(features: 'repository'))
+          results[:wiki_blobs] = search_blob(query, type: 'wiki_blob', page: page, per: per, options: options.merge(features: 'wiki'))
         when 'commit'
-          results[:commits] = search_commit(query, page: page, per: per, options: options)
-        when 'blob', 'wiki_blob'
-          results[type.pluralize.to_sym] = search_blob(query, type: type, page: page, per: per, options: options)
+          results[:commits] = search_commit(query, page: page, per: per, options: options.merge(features: 'repository'))
+        when 'blob'
+          results[:blobs] = search_blob(query, type: type, page: page, per: per, options: options.merge(features: 'repository'))
+        when 'wiki_blob'
+          results[:wiki_blobs] = search_blob(query, type: type, page: page, per: per, options: options.merge(features: 'wiki'))
         end
 
         results
@@ -54,11 +56,16 @@ module Elastic
         bool_expr = Gitlab::Elastic::BoolExpr.new
         query_hash = {
           query: { bool: bool_expr },
-
           size: per,
           from: per * (page - 1),
           sort: [:_score]
         }
+
+        # If there is a :current_user set in the `options`, we can assume
+        # we need to do a project visibility check.
+        #
+        # Note that `:current_user` might be `nil` for a anonymous user
+        query_hash = project_ids_filter(query_hash, options) if options.key?(:current_user)
 
         if query.blank?
           bool_expr[:must] = { match_all: {} }
@@ -73,10 +80,14 @@ module Elastic
           }
         end
 
-        options_filter_context = options_filter_context(:commit, options)
-
+        # add the document type filter
         bool_expr[:filter] << { term: { type: 'commit' } }
+
+        # add filters extracted from the options
+        options_filter_context = options_filter_context(:commit, options)
         bool_expr[:filter] += options_filter_context[:filter] if options_filter_context[:filter].any?
+
+        options[:order] = :default if options[:order].blank?
 
         if options[:highlight]
           es_fields = fields.map { |field| field.split('^').first }.each_with_object({}) do |field, memo|
@@ -89,8 +100,6 @@ module Elastic
             fields: es_fields
           }
         end
-
-        options[:order] = :default if options[:order].blank?
 
         res = search(query_hash, options)
         {
@@ -124,6 +133,12 @@ module Elastic
             fields: %w[blob.content blob.file_name]
           }
         }
+
+        # If there is a :current_user set in the `options`, we can assume
+        # we need to do a project visibility check.
+        #
+        # Note that `:current_user` might be `nil` for a anonymous user
+        query_hash = project_ids_filter(query_hash, options) if options.key?(:current_user)
 
         # add the document type filter
         bool_expr[:filter] << { term: { type: type } }

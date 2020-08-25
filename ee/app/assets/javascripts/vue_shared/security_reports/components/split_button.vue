@@ -1,12 +1,11 @@
 <script>
-import { GlDeprecatedDropdown, GlDeprecatedDropdownItem } from '@gitlab/ui';
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlIcon } from '@gitlab/ui';
 
 export default {
   components: {
     GlDeprecatedDropdown,
     GlDeprecatedDropdownItem,
-    Icon,
+    GlIcon,
   },
   props: {
     buttons: {
@@ -54,7 +53,7 @@ export default {
     >
       <div class="media">
         <div>
-          <icon v-if="selectedButton === button" class="gl-mr-2" name="mobile-issue-close" />
+          <gl-icon v-if="selectedButton === button" class="gl-mr-2" name="mobile-issue-close" />
         </div>
         <div class="media-body" :class="{ 'prepend-left-20': selectedButton !== button }">
           <strong>{{ button.name }}</strong>

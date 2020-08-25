@@ -1,17 +1,21 @@
 <script>
 import axios from 'axios';
+import { GlButton } from '@gitlab/ui';
 import RelatedIssuesStore from 'ee/related_issues/stores/related_issues_store';
 import RelatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
 import { issuableTypesMap, PathIdSeparator } from 'ee/related_issues/constants';
-import { sprintf, __ } from '~/locale';
-import { joinPaths } from '~/lib/utils/url_utility';
-import { RELATED_ISSUES_ERRORS } from '../constants';
-import createFlash from '~/flash';
+import { sprintf, __, s__ } from '~/locale';
+import { joinPaths, redirectTo } from '~/lib/utils/url_utility';
+import { RELATED_ISSUES_ERRORS, FEEDBACK_TYPES } from '../constants';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { getFormattedIssue, getAddRelatedIssueRequestParams } from '../helpers';
 
 export default {
   name: 'VulnerabilityRelatedIssues',
-  components: { RelatedIssuesBlock },
+  components: {
+    RelatedIssuesBlock,
+    GlButton,
+  },
   props: {
     endpoint: {
       type: String,
@@ -34,7 +38,9 @@ export default {
   },
   data() {
     this.store = new RelatedIssuesStore();
+
     return {
+      isProcessingAction: false,
       state: this.store.state,
       isFetching: false,
       isSubmitting: false,
@@ -46,11 +52,54 @@ export default {
     vulnerabilityProjectId() {
       return this.projectPath.replace(/^\//, ''); // Remove the leading slash, i.e. '/root/test' -> 'root/test'.
     },
+    isIssueAlreadyCreated() {
+      return Boolean(this.state.relatedIssues.find(i => i.lockIssueRemoval));
+    },
+  },
+  inject: {
+    vulnerabilityId: {
+      type: Number,
+    },
+    projectFingerprint: {
+      type: String,
+    },
+    createIssueUrl: {
+      type: String,
+    },
+    reportType: {
+      type: String,
+    },
   },
   created() {
     this.fetchRelatedIssues();
   },
   methods: {
+    createIssue() {
+      this.isProcessingAction = true;
+
+      return axios
+        .post(this.createIssueUrl, {
+          vulnerability_feedback: {
+            feedback_type: FEEDBACK_TYPES.ISSUE,
+            category: this.reportType,
+            project_fingerprint: this.projectFingerprint,
+            vulnerability_data: {
+              ...this.vulnerability,
+              category: this.reportType,
+              vulnerability_id: this.vulnerabilityId,
+            },
+          },
+        })
+        .then(({ data: { issue_url } }) => {
+          redirectTo(issue_url);
+        })
+        .catch(() => {
+          this.isProcessingAction = false;
+          createFlash(
+            s__('VulnerabilityManagement|Something went wrong, could not create an issue.'),
+          );
+        });
+    },
     toggleFormVisibility() {
       this.isFormVisible = !this.isFormVisible;
     },
@@ -119,7 +168,19 @@ export default {
         .get(this.endpoint)
         .then(({ data }) => {
           const issues = data.map(getFormattedIssue);
-          this.store.setRelatedIssues(issues);
+          this.store.setRelatedIssues(
+            issues.map(i => {
+              const lockIssueRemoval = i.vulnerability_link_type === 'created';
+
+              return {
+                ...i,
+                lockIssueRemoval,
+                lockedMessage: lockIssueRemoval
+                  ? s__('SecurityReports|Issues created from a vulnerability cannot be removed.')
+                  : undefined,
+              };
+            }),
+          );
         })
         .catch(() => {
           createFlash(__('An error occurred while fetching issues.'));
@@ -168,6 +229,19 @@ export default {
     @pendingIssuableRemoveRequest="removePendingReference"
     @relatedIssueRemoveRequest="removeRelatedIssue"
   >
-    <template #headerText>{{ __('Related issues') }}</template>
+    <template #headerText>
+      {{ __('Related issues') }}
+    </template>
+    <template v-if="!isIssueAlreadyCreated && !isFetching" #headerActions>
+      <gl-button
+        ref="createIssue"
+        variant="success"
+        category="secondary"
+        :loading="isProcessingAction"
+        @click="createIssue"
+      >
+        {{ __('Create issue') }}
+      </gl-button>
+    </template>
   </related-issues-block>
 </template>

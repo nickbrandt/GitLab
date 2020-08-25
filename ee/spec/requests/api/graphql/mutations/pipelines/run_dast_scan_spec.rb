@@ -26,6 +26,10 @@ RSpec.describe 'Running a DAST Scan' do
     graphql_mutation_response(:run_dast_scan)
   end
 
+  before do
+    stub_licensed_features(security_on_demand_scans: true)
+  end
+
   context 'when on demand scan feature is not enabled' do
     it_behaves_like 'a mutation that returns top-level errors',
                     errors: ['The resource that you are attempting to access does not ' \

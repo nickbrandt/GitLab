@@ -19,7 +19,9 @@
         %h4.gl-alert-title= _('You do not have an active license')
         = _('You have a license that activates at a future date. Please see the License History table below.')
 
-  = render 'info', license: @license
-  = render 'breakdown', license: @license
+  - if @license.present?
+    = render 'info'
+    = render 'breakdown'
 
-  = render 'license_history', license: @license, licenses: @licenses
+  - if @licenses.present?
+    = render 'license_history'

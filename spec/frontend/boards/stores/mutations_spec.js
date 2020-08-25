@@ -1,6 +1,7 @@
 import mutations from '~/boards/stores/mutations';
+import * as types from '~/boards/stores/mutation_types';
 import defaultState from '~/boards/stores/state';
-import { mockIssue } from '../mock_data';
+import { listObj, listObjDuplicate, mockIssue } from '../mock_data';
 
 const expectNotImplemented = action => {
   it('is not implemented', () => {
@@ -26,11 +27,30 @@ describe('Board Store Mutations', () => {
         fullPath: 'gitlab-org',
       };
       const boardType = 'group';
+      const disabled = false;
+      const showPromotion = false;
 
-      mutations.SET_INITIAL_BOARD_DATA(state, { ...endpoints, boardType });
+      mutations[types.SET_INITIAL_BOARD_DATA](state, {
+        ...endpoints,
+        boardType,
+        disabled,
+        showPromotion,
+      });
 
       expect(state.endpoints).toEqual(endpoints);
       expect(state.boardType).toEqual(boardType);
+      expect(state.disabled).toEqual(disabled);
+      expect(state.showPromotion).toEqual(showPromotion);
+    });
+  });
+
+  describe('RECEIVE_LISTS', () => {
+    it('Should set boardLists to state', () => {
+      const lists = [listObj, listObjDuplicate];
+
+      mutations[types.RECEIVE_LISTS](state, lists);
+
+      expect(state.boardLists).toEqual(lists);
     });
   });
 
@@ -41,6 +61,16 @@ describe('Board Store Mutations', () => {
       mutations.SET_ACTIVE_ID(state, expectedId);
 
       expect(state.activeId).toBe(expectedId);
+    });
+  });
+
+  describe('SET_FILTERS', () => {
+    it('updates filterParams to be the value that is passed', () => {
+      const filterParams = { labelName: 'label' };
+
+      mutations.SET_FILTERS(state, filterParams);
+
+      expect(state.filterParams).toBe(filterParams);
     });
   });
 
@@ -111,6 +141,23 @@ describe('Board Store Mutations', () => {
 
   describe('REQUEST_ADD_ISSUE', () => {
     expectNotImplemented(mutations.REQUEST_ADD_ISSUE);
+  });
+
+  describe('RECEIVE_ISSUES_FOR_ALL_LISTS_FAILURE', () => {
+    it('sets isLoadingIssues to false and sets error message', () => {
+      state = {
+        ...state,
+        isLoadingIssues: true,
+        error: undefined,
+      };
+
+      mutations.RECEIVE_ISSUES_FOR_ALL_LISTS_FAILURE(state);
+
+      expect(state.isLoadingIssues).toBe(false);
+      expect(state.error).toEqual(
+        'An error occurred while fetching the board issues. Please reload the page.',
+      );
+    });
   });
 
   describe('RECEIVE_ADD_ISSUE_SUCCESS', () => {

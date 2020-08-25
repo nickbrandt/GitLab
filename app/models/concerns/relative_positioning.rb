@@ -137,9 +137,10 @@ module RelativePositioning
     #                          If `true`, then all objects with `null` positions are placed _after_
     #                          all siblings with positions. If `false`, all objects with `null`
     #                          positions are placed _before_ all siblings with positions.
+    # @returns [Number] The number of moved records.
     def move_nulls(objects, at_end:)
       objects = objects.reject(&:relative_position)
-      return if objects.empty?
+      return 0 if objects.empty?
 
       representative = objects.first
       number_of_gaps = objects.size + 1 # 1 at left, one between each, and one at right
@@ -186,6 +187,8 @@ module RelativePositioning
           end
         end
       end
+
+      objects.size
     end
   end
 
@@ -292,13 +295,31 @@ module RelativePositioning
   def move_to_end
     max_pos = max_relative_position
 
-    self.relative_position = max_pos.nil? ? START_POSITION : self.class.position_between(max_pos, MAX_POSITION)
+    if max_pos.nil?
+      self.relative_position = START_POSITION
+    elsif gap_too_small?(max_pos, MAX_POSITION + 1)
+      max = relative_siblings.order(Gitlab::Database.nulls_last_order('relative_position', 'DESC')).first
+      max.move_sequence_before(true)
+      max.reset
+      self.relative_position = self.class.position_between(max.relative_position, MAX_POSITION + 1)
+    else
+      self.relative_position = self.class.position_between(max_pos, MAX_POSITION + 1)
+    end
   end
 
   def move_to_start
-    min_pos = max_relative_position
+    min_pos = min_relative_position
 
-    self.relative_position = min_pos.nil? ? START_POSITION : self.class.position_between(MIN_POSITION, min_pos)
+    if min_pos.nil?
+      self.relative_position = START_POSITION
+    elsif gap_too_small?(min_pos, MIN_POSITION - 1)
+      min = relative_siblings.order(Gitlab::Database.nulls_last_order('relative_position', 'ASC')).first
+      min.move_sequence_after(true)
+      min.reset
+      self.relative_position = self.class.position_between(MIN_POSITION - 1, min.relative_position)
+    else
+      self.relative_position = self.class.position_between(MIN_POSITION - 1, min_pos)
+    end
   end
 
   # Moves the sequence before the current item to the middle of the next gap

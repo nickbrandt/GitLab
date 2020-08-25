@@ -1,5 +1,5 @@
 import Api from 'ee/api';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
@@ -250,10 +250,7 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
   if (initialData.group?.fullPath) {
-    return Promise.resolve()
-      .then(() =>
-        dispatch('filters/initialize', { groupPath: initialData.group.fullPath, ...initialData }),
-      )
+    return dispatch('filters/initialize', { groupPath: initialData.group.fullPath, ...initialData })
       .then(() => dispatch('fetchCycleAnalyticsData'))
       .then(() => dispatch('initializeCycleAnalyticsSuccess'));
   }

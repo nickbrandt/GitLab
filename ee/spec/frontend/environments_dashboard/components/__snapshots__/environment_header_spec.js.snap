@@ -94,11 +94,11 @@ exports[`Environment Header renders name and link to app matches the snapshot 1`
     
   View app 
     <svg
-      aria-hidden="true"
-      class="fgray s16 ic-external-link"
+      class="fgray gl-icon s16"
+      data-testid="external-link-icon"
     >
       <use
-        xlink:href="#external-link"
+        href="#external-link"
       />
     </svg>
   </a>
@@ -132,7 +132,7 @@ exports[`Environment Header with environments grouped into a folder matches the 
     </gl-badge-stub>
   </div>
    
-  <icon-stub
+  <gl-icon-stub
     class="dashboard-card-icon"
     name="information"
     size="16"

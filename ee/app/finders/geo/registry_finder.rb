@@ -6,8 +6,6 @@ module Geo
 
     attr_reader :current_node_id
 
-    delegate :selective_sync?, to: :current_node, allow_nil: true
-
     def initialize(current_node_id: nil)
       @current_node_id = current_node_id
     end

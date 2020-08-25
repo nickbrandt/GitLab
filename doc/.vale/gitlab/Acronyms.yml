@@ -20,8 +20,8 @@ exceptions:
   - AWS
   - CLI
   - CNAME
-  - CPU
   - CORE
+  - CPU
   - CSS
   - CSV
   - DNS
@@ -38,6 +38,7 @@ exceptions:
   - IAM
   - IBM
   - IDE
+  - IID
   - IRC
   - ISO
   - JSON
@@ -56,11 +57,12 @@ exceptions:
   - PHP
   - POST
   - PUT
-  - RPC
   - RAM
+  - RPC
   - RSA
   - RSS
   - SAML
+  - SCIM
   - SCP
   - SCSS
   - SHA
@@ -76,9 +78,9 @@ exceptions:
   - TODO
   - TOML
   - UNIX
-  - USB
   - URI
   - URL
+  - USB
   - UUID
   - VPC
   - WIP

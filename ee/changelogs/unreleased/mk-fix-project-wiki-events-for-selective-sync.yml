@@ -1,5 +1,0 @@
----
-title: 'Geo: Skip project/wiki repo create/update events based on selective sync'
-merge_request: 39488
-author:
-type: fixed

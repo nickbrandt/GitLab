@@ -100,9 +100,9 @@ module IconsHelper
 
   def boolean_to_icon(value)
     if value
-      icon('circle', class: 'cgreen')
+      sprite_icon('check', css_class: 'cgreen')
     else
-      icon('power-off', class: 'clgray')
+      sprite_icon('power', css_class: 'clgray')
     end
   end
 

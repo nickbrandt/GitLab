@@ -31,6 +31,18 @@ module BillingPlansHelper
       purchase_link_action == 'upgrade'
   end
 
+  def experiment_tracking_data_for_button_click(button_label)
+    return {} unless Gitlab::Experimentation.enabled?(:contact_sales_btn_in_app)
+
+    {
+      track: {
+        event: 'click_button',
+        label: button_label,
+        property: experiment_tracking_category_and_group(:contact_sales_btn_in_app)
+      }
+    }
+  end
+
   def plan_feature_short_list(plan)
     return [] unless plan.features
 

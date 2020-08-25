@@ -125,13 +125,20 @@ export default {
       <gl-alert v-if="deprecatedAndReadOnly" variant="warning" :dismissible="false" class="gl-my-5">
         {{ $options.translations.legacyReadOnlyFlagAlert }}
       </gl-alert>
-      <div class="d-flex align-items-center mb-3 mt-3">
-        <gl-toggle :value="active" class="m-0 mr-3 js-feature-flag-status" @change="toggleActive" />
-        <h3 class="page-title m-0">{{ title }}</h3>
+      <div class="gl-display-flex gl-align-items-center gl-mb-4 gl-mt-4">
+        <gl-toggle
+          :value="active"
+          data-track-event="click_button"
+          data-track-label="feature_flag_toggle"
+          data-track-context="feature_flag_activity"
+          class="gl-mr-4 js-feature-flag-status"
+          @change="toggleActive"
+        />
+        <h3 class="page-title gl-m-0">{{ title }}</h3>
       </div>
 
       <div v-if="error.length" class="alert alert-danger">
-        <p v-for="(message, index) in error" :key="index" class="mb-0">{{ message }}</p>
+        <p v-for="(message, index) in error" :key="index" class="gl-mb-0">{{ message }}</p>
       </div>
 
       <feature-flag-form

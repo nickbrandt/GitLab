@@ -3,7 +3,7 @@
 module Mutations
   module DastScannerProfiles
     class Create < BaseMutation
-      include ResolvesProject
+      include AuthorizesProject
 
       graphql_name 'DastScannerProfileCreate'
 
@@ -27,11 +27,10 @@ module Mutations
                 required: false,
                 description: 'The maximum number of seconds allowed for the site under test to respond to a request.'
 
-      authorize :run_ondemand_dast_scan
+      authorize :create_on_demand_dast_scan
 
       def resolve(full_path:, profile_name:, spider_timeout: nil, target_timeout: nil)
-        project = authorized_find!(full_path: full_path)
-        raise_resource_not_available_error! unless Feature.enabled?(:security_on_demand_scans_feature_flag, project, default_enabled: true)
+        project = authorized_find_project!(full_path: full_path)
 
         service = ::DastScannerProfiles::CreateService.new(project, current_user)
         result = service.execute(name: profile_name, spider_timeout: spider_timeout, target_timeout: target_timeout)
@@ -41,12 +40,6 @@ module Mutations
         else
           { errors: result.errors }
         end
-      end
-
-      private
-
-      def find_object(full_path:)
-        resolve_project(full_path: full_path)
       end
     end
   end

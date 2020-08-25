@@ -14,40 +14,6 @@ RSpec.describe SystemNoteService do
   let_it_be(:issue)    { noteable }
   let_it_be(:epic)     { create(:epic, group: group) }
 
-  describe '.relate_issue' do
-    let(:noteable_ref) { double }
-    let(:noteable) { double }
-
-    before do
-      allow(noteable).to receive(:project).and_return(double)
-    end
-
-    it 'calls IssuableService' do
-      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
-        expect(service).to receive(:relate_issue).with(noteable_ref)
-      end
-
-      described_class.relate_issue(noteable, noteable_ref, double)
-    end
-  end
-
-  describe '.unrelate_issue' do
-    let(:noteable_ref) { double }
-    let(:noteable) { double }
-
-    before do
-      allow(noteable).to receive(:project).and_return(double)
-    end
-
-    it 'calls IssuableService' do
-      expect_next_instance_of(::SystemNotes::IssuablesService) do |service|
-        expect(service).to receive(:unrelate_issue).with(noteable_ref)
-      end
-
-      described_class.unrelate_issue(noteable, noteable_ref, double)
-    end
-  end
-
   describe '.change_weight_note' do
     it 'calls IssuableService' do
       expect_next_instance_of(::SystemNotes::IssuablesService) do |service|

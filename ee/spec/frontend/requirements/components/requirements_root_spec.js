@@ -15,7 +15,7 @@ import updateRequirement from 'ee/requirements/queries/updateRequirement.mutatio
 import { TEST_HOST } from 'helpers/test_constants';
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
 import FilteredSearchBarRoot from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 
 import {
   FilterState,

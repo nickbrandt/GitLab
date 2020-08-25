@@ -214,7 +214,7 @@ class Repository
     return false if with_slash.empty?
 
     prefixes = no_slash.map { |ref| Regexp.escape(ref) }.join('|')
-    prefix_regex = %r{^#{prefixes}/}
+    prefix_regex = %r{^(#{prefixes})/}
 
     with_slash.any? do |ref|
       prefix_regex.match?(ref)
@@ -314,12 +314,14 @@ class Repository
   def expire_tags_cache
     expire_method_caches(%i(tag_names tag_count has_ambiguous_refs?))
     @tags = nil
+    @tag_names_include = nil
   end
 
   def expire_branches_cache
     expire_method_caches(%i(branch_names merged_branch_names branch_count has_visible_content? has_ambiguous_refs?))
     @local_branches = nil
     @branch_exists_memo = nil
+    @branch_names_include = nil
   end
 
   def expire_statistics_caches

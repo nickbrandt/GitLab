@@ -4,6 +4,7 @@ UsageData/LargeTable:
     - 'lib/gitlab/usage_data.rb'
     - 'ee/lib/ee/gitlab/usage_data.rb'
   NonRelatedClasses:
+    - :Date
     - :Feature
     - :Gitlab
     - :Gitlab::AppLogger
@@ -43,3 +44,4 @@ UsageData/DistinctCountByLargeForeignKey:
     - :project_id
     - :issue_id
     - :merge_request_id
+    - :merge_requests.target_project_id

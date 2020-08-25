@@ -1,12 +1,11 @@
 <script>
-import { GlLink, GlSprintf, GlModalDirective, GlButton } from '@gitlab/ui';
+import { GlLink, GlSprintf, GlModalDirective, GlButton, GlIcon } from '@gitlab/ui';
 import Project from './project.vue';
 import UsageGraph from './usage_graph.vue';
 import query from '../queries/storage.query.graphql';
 import TemporaryStorageIncreaseModal from './temporary_storage_increase_modal.vue';
 import { numberToHumanSize } from '~/lib/utils/number_utils';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
@@ -14,7 +13,7 @@ export default {
     GlLink,
     GlButton,
     GlSprintf,
-    Icon,
+    GlIcon,
     UsageGraph,
     TemporaryStorageIncreaseModal,
   },
@@ -111,7 +110,7 @@ export default {
             target="_blank"
             :aria-label="s__('UsageQuota|Usage quotas help link')"
           >
-            <icon name="question" :size="12" />
+            <gl-icon name="question" :size="12" />
           </gl-link>
         </div>
         <div class="col-lg-6 text-lg-right">

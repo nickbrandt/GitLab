@@ -1,6 +1,5 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
-import { debounce } from 'lodash';
 import {
   GlSearchBoxByType,
   GlDeprecatedDropdown,
@@ -25,10 +24,10 @@ export default {
       get() {
         return this.searchFilter;
       },
-      set: debounce(function debounceSearch(newVal) {
-        this.setSearch(newVal);
+      set(val) {
+        this.setSearch(val);
         this.fetchReplicableItems();
-      }, DEFAULT_SEARCH_DELAY),
+      },
     },
     resyncText() {
       return sprintf(__('Resync all %{replicableType}'), {
@@ -45,6 +44,7 @@ export default {
   },
   actionTypes: ACTION_TYPES,
   filterStates: FILTER_STATES,
+  debounce: DEFAULT_SEARCH_DELAY,
 };
 </script>
 
@@ -68,6 +68,7 @@ export default {
           </gl-deprecated-dropdown>
           <gl-search-box-by-type
             v-model="search"
+            :debounce="$options.debounce"
             class="px-1 my-1 my-sm-0 bg-white w-100"
             type="text"
             :placeholder="__('Filter by name')"

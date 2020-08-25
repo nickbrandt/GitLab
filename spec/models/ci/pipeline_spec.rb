@@ -939,69 +939,59 @@ RSpec.describe Ci::Pipeline, :mailer do
 
         subject { pipeline.legacy_stages }
 
-        where(:ci_composite_status) do
-          [false, true]
+        context 'stages list' do
+          it 'returns ordered list of stages' do
+            expect(subject.map(&:name)).to eq(%w[build test deploy])
+          end
         end
 
-        with_them do
-          before do
-            stub_feature_flags(ci_composite_status: ci_composite_status)
+        context 'stages with statuses' do
+          let(:statuses) do
+            subject.map { |stage| [stage.name, stage.status] }
           end
 
-          context 'stages list' do
-            it 'returns ordered list of stages' do
-              expect(subject.map(&:name)).to eq(%w[build test deploy])
-            end
+          it 'returns list of stages with correct statuses' do
+            expect(statuses).to eq([%w(build failed),
+                                    %w(test success),
+                                    %w(deploy running)])
           end
 
-          context 'stages with statuses' do
-            let(:statuses) do
-              subject.map { |stage| [stage.name, stage.status] }
+          context 'when commit status is retried' do
+            before do
+              create(:commit_status, pipeline: pipeline,
+                                    stage: 'build',
+                                    name: 'mac',
+                                    stage_idx: 0,
+                                    status: 'success')
+
+              Ci::ProcessPipelineService
+                .new(pipeline)
+                .execute
             end
 
-            it 'returns list of stages with correct statuses' do
-              expect(statuses).to eq([%w(build failed),
+            it 'ignores the previous state' do
+              expect(statuses).to eq([%w(build success),
                                       %w(test success),
                                       %w(deploy running)])
             end
+          end
+        end
 
-            context 'when commit status is retried' do
-              before do
-                create(:commit_status, pipeline: pipeline,
-                                      stage: 'build',
-                                      name: 'mac',
-                                      stage_idx: 0,
-                                      status: 'success')
-
-                Ci::ProcessPipelineService
-                  .new(pipeline)
-                  .execute
-              end
-
-              it 'ignores the previous state' do
-                expect(statuses).to eq([%w(build success),
-                                        %w(test success),
-                                        %w(deploy running)])
-              end
-            end
+        context 'when there is a stage with warnings' do
+          before do
+            create(:commit_status, pipeline: pipeline,
+                                  stage: 'deploy',
+                                  name: 'prod:2',
+                                  stage_idx: 2,
+                                  status: 'failed',
+                                  allow_failure: true)
           end
 
-          context 'when there is a stage with warnings' do
-            before do
-              create(:commit_status, pipeline: pipeline,
-                                    stage: 'deploy',
-                                    name: 'prod:2',
-                                    stage_idx: 2,
-                                    status: 'failed',
-                                    allow_failure: true)
-            end
+          it 'populates stage with correct number of warnings' do
+            deploy_stage = pipeline.legacy_stages.third
 
-            it 'populates stage with correct number of warnings' do
-              deploy_stage = pipeline.legacy_stages.third
-
-              expect(deploy_stage).not_to receive(:statuses)
-              expect(deploy_stage).to have_warnings
-            end
+            expect(deploy_stage).not_to receive(:statuses)
+            expect(deploy_stage).to have_warnings
           end
         end
       end
@@ -1975,7 +1965,7 @@ RSpec.describe Ci::Pipeline, :mailer do
     let(:project) { create(:project, :repository) }
     let(:branch) { project.default_branch }
     let(:ref) { project.ci_refs.take }
-    let(:config_source) { Ci::PipelineEnums.config_sources[:parameter_source] }
+    let(:config_source) { Enums::Ci::Pipeline.config_sources[:parameter_source] }
     let!(:pipeline1) { create(:ci_pipeline, :success, project: project, ref: branch) }
     let!(:pipeline2) { create(:ci_pipeline, :success, project: project, ref: branch) }
     let!(:pipeline3) { create(:ci_pipeline, :failed, project: project, ref: branch) }
@@ -2955,6 +2945,38 @@ RSpec.describe Ci::Pipeline, :mailer do
       let(:pipeline) { create(:ci_pipeline, :success, project: project) }
 
       it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#has_coverage_reports?' do
+    subject { pipeline.has_coverage_reports? }
+
+    context 'when pipeline has builds with coverage reports' do
+      before do
+        create(:ci_build, :coverage_reports, pipeline: pipeline, project: project)
+      end
+
+      context 'when pipeline status is running' do
+        let(:pipeline) { create(:ci_pipeline, :running, project: project) }
+
+        it { expect(subject).to be_falsey }
+      end
+
+      context 'when pipeline status is success' do
+        let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+        it { expect(subject).to be_truthy }
+      end
+    end
+
+    context 'when pipeline does not have builds with coverage reports' do
+      before do
+        create(:ci_build, :artifacts, pipeline: pipeline, project: project)
+      end
+
+      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+      it { expect(subject).to be_falsey }
     end
   end
 

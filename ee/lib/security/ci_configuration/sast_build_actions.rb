@@ -3,31 +3,43 @@
 module Security
   module CiConfiguration
     class SastBuildActions
-      def initialize(auto_devops_enabled, params)
+      def initialize(auto_devops_enabled, params, existing_gitlab_ci_content)
         @auto_devops_enabled = auto_devops_enabled
         @params = params
+        @existing_gitlab_ci_content = existing_gitlab_ci_content || {}
       end
 
       def generate
-        config = {
-          'stages' => stages,
-          'variables' => parse_variables(global_variables),
-          'sast' => sast_block,
-          'include' => [{ 'template' => template }]
-        }.select { |k, v| v.present? }
+        action = @existing_gitlab_ci_content.present? ? 'update' : 'create'
 
-        content = config.to_yaml
-        content << "# You can override the above template(s) by including variable overrides\n"
-        content << "# See https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings\n"
+        update_existing_content!
 
-        [{ action: 'create', file_path: '.gitlab-ci.yml', content: content }]
+        [{ action: action, file_path: '.gitlab-ci.yml', content: prepare_existing_content }]
       end
 
       private
 
-      def stages
+      def update_existing_content!
+        @existing_gitlab_ci_content['stages'] = set_stages
+        @existing_gitlab_ci_content['variables'] = set_variables(global_variables, @existing_gitlab_ci_content)
+        @existing_gitlab_ci_content['sast'] = set_sast_block
+        @existing_gitlab_ci_content['include'] = set_includes
+
+        @existing_gitlab_ci_content.select! { |k, v| v.present? }
+        @existing_gitlab_ci_content['sast'].select! { |k, v| v.present? }
+      end
+
+      def set_includes
+        includes = @existing_gitlab_ci_content['include'] || []
+        includes = includes.is_a?(Array) ? includes : [includes]
+        includes << { 'template' => template }
+        includes.uniq
+      end
+
+      def set_stages
+        existing_stages = @existing_gitlab_ci_content['stages'] || []
         base_stages = @auto_devops_enabled ? auto_devops_stages : ['test']
-        (base_stages + [sast_stage]).uniq
+        (existing_stages + base_stages + [sast_stage]).uniq
       end
 
       def auto_devops_stages
@@ -40,24 +52,46 @@ module Security
       end
 
       # We only want to write variables that are set
-      def parse_variables(variables)
-        variables.map { |var| [var, @params[var]] }
-                 .to_h
-                 .select { |k, v| v.present? }
+      def set_variables(variables, hash_to_update = {})
+        hash_to_update['variables'] ||= {}
+        variables.each do |k, v|
+          hash_to_update['variables'][k] = @params[k]
+        end
+
+        hash_to_update['variables'].select { |k, v| v.present? }
       end
 
-      def sast_block
-        {
-          'variables' => parse_variables(sast_variables),
-          'stage' => sast_stage,
-          'script' => ['/analyzer run']
-        }.select { |k, v| v.present? }
+      def set_sast_block
+        sast_content = @existing_gitlab_ci_content['sast'] || {}
+        sast_content['variables'] = set_variables(sast_variables)
+        sast_content['stage'] = sast_stage
+        sast_content.select { |k, v| v.present? }
+      end
+
+      def prepare_existing_content
+        content = @existing_gitlab_ci_content.to_yaml
+        content = remove_document_delimeter(content)
+
+        content.prepend(sast_comment)
+      end
+
+      def remove_document_delimeter(content)
+        content.gsub(/^---\n/, '')
+      end
+
+      def sast_comment
+        <<~YAML
+          # You can override the included template(s) by including variable overrides
+          # See https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+          # Note that environment variables can be set in several places
+          # See https://docs.gitlab.com/ee/ci/variables/#priority-of-environment-variables
+        YAML
       end
 
       def template
         return 'Auto-DevOps.gitlab-ci.yml' if @auto_devops_enabled
 
-        'SAST.gitlab-ci.yml'
+        'Security/SAST.gitlab-ci.yml'
       end
 
       def global_variables

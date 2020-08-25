@@ -11,16 +11,20 @@ module Gitlab
       delegate :users, to: :generic_search_results
       delegate :limited_users_count, to: :generic_search_results
 
-      def initialize(current_user, query, project, repository_ref = nil)
-        @current_user = current_user
+      def initialize(current_user, query, project:, repository_ref: nil)
         @project = project
         @repository_ref = repository_ref.presence || project.default_branch
-        @query = query
-        @public_and_internal_projects = false
+
+        super(current_user, query, [project], public_and_internal_projects: false)
       end
 
       def generic_search_results
-        @generic_search_results ||= Gitlab::ProjectSearchResults.new(current_user, project, query, repository_ref)
+        @generic_search_results ||= Gitlab::ProjectSearchResults.new(
+          current_user,
+          query,
+          project: project,
+          repository_ref: repository_ref
+        )
       end
 
       private
@@ -93,10 +97,6 @@ module Gitlab
             )
           end
         end
-      end
-
-      def limit_project_ids
-        [project.id]
       end
 
       def root_ref?

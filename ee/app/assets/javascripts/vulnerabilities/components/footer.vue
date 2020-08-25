@@ -6,7 +6,7 @@ import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_re
 import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
 import Poll from '~/lib/utils/poll';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { s__, __ } from '~/locale';
 import RelatedIssues from './related_issues.vue';
 import HistoryEntry from './history_entry.vue';
@@ -116,7 +116,8 @@ export default {
           if (!this.poll) this.createNotesPoll();
 
           if (!Visibility.hidden()) {
-            this.poll.makeRequest();
+            // delays the initial request by 6 seconds
+            this.poll.makeDelayedRequest(6 * 1000);
           }
 
           Visibility.change(() => {

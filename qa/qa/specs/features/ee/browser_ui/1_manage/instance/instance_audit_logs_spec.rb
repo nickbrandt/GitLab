@@ -2,7 +2,8 @@
 require 'securerandom'
 
 module QA
-  RSpec.describe 'Manage', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/218332', type: :investigating } do
+  # Issue to enable this test in live environments: https://gitlab.com/gitlab-org/quality/team-tasks/-/issues/614
+  RSpec.describe 'Manage', :skip_live_env do
     shared_examples 'audit event' do |expected_events|
       it 'logs audit events for UI operations' do
         sign_in
@@ -18,7 +19,7 @@ module QA
     end
 
     describe 'Instance', :requires_admin do
-      context 'Failed sign in' do
+      context 'Failed sign in', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/736' do
         before do
           Runtime::Browser.visit(:gitlab, Page::Main::Login)
           invalid_user = QA::Resource::User.new.tap do |user|
@@ -35,7 +36,7 @@ module QA
         it_behaves_like 'audit event', ["Failed to login with STANDARD authentication"]
       end
 
-      context 'Successful sign in' do
+      context 'Successful sign in', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/737' do
         before do
           sign_in
         end
@@ -43,7 +44,7 @@ module QA
         it_behaves_like 'audit event', ["Signed in with STANDARD authentication"]
       end
 
-      context 'Add SSH key' do
+      context 'Add SSH key', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/738' do
         before do
           sign_in
           Resource::SSHKey.fabricate_via_browser_ui! do |resource|
@@ -54,7 +55,7 @@ module QA
         it_behaves_like 'audit event', ["Added SSH key"]
       end
 
-      context 'Add and delete email', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217831', type: :bug } do
+      context 'Add and delete email', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/217831', type: :bug }, status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/741' do
         before do
           sign_in
           new_email_address = 'new_email@example.com'
@@ -72,7 +73,7 @@ module QA
         it_behaves_like 'audit event', ["Added email", "Removed email"]
       end
 
-      context 'Change password', :skip_signup_disabled do
+      context 'Change password', :skip_signup_disabled, status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/740' do
         before do
           user = Resource::User.fabricate_via_api! do |user|
             user.username = "user_#{SecureRandom.hex(4)}"
@@ -95,7 +96,7 @@ module QA
         it_behaves_like 'audit event', ["Changed password"]
       end
 
-      context 'Start and stop user impersonation' do
+      context 'Start and stop user impersonation', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/739' do
         before do
           sign_in
           user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)

@@ -69,6 +69,7 @@ module EE
 
       scope :aimed_for_deletion, -> (date) { joins(:deletion_schedule).where('group_deletion_schedules.marked_for_deletion_on <= ?', date) }
       scope :with_deletion_schedule, -> { preload(deletion_schedule: :deleting_user) }
+      scope :with_deletion_schedule_only, -> { preload(:deletion_schedule) }
 
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })

@@ -1,7 +1,7 @@
 <script>
 import { GlPopover, GlIcon, GlLink, GlButton, GlTooltipDirective } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import pollUntilComplete from '~/lib/utils/poll_until_complete';

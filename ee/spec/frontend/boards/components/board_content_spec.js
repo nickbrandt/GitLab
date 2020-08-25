@@ -1,80 +1,98 @@
-import { mount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import BoardContent from 'ee_component/boards/components/board_content.vue';
-import List from '~/boards/models/list';
-import BoardColumn from 'ee_component/boards/components/board_column.vue';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlAlert } from '@gitlab/ui';
 import EpicsSwimlanes from 'ee_component/boards/components/epics_swimlanes.vue';
-import defaultState from 'ee_component/boards/stores/state';
-import { mockLists } from '../mock_data';
+import BoardColumn from 'ee_else_ce/boards/components/board_column.vue';
+import getters from 'ee/boards/stores/getters';
+import { mockListsWithModel, mockIssuesByListId } from '../mock_data';
+import BoardContent from '~/boards/components/board_content.vue';
 
 const localVue = createLocalVue();
-
 localVue.use(Vuex);
 
-describe('ee/BoardContent', () => {
-  let store;
+describe('BoardContent', () => {
   let wrapper;
-  let mock;
 
-  const createStore = (state = defaultState()) => {
-    store = new Vuex.Store({
+  const defaultState = {
+    isShowingEpicsSwimlanes: false,
+    boardLists: mockListsWithModel,
+    error: undefined,
+    issuesByListId: mockIssuesByListId,
+  };
+
+  const createStore = (state = defaultState) => {
+    return new Vuex.Store({
       state,
       actions: {
         fetchIssuesForAllLists: () => {},
       },
+      getters,
     });
   };
 
-  const createComponent = (boardsWithSwimlanes = false) => {
-    wrapper = mount(BoardContent, {
+  const createComponent = state => {
+    const store = createStore({
+      ...defaultState,
+      ...state,
+    });
+    wrapper = shallowMount(BoardContent, {
       localVue,
-      store,
       propsData: {
-        lists: mockLists.map(listMock => new List(listMock)),
+        lists: mockListsWithModel,
         canAdminList: true,
         groupId: 1,
         disabled: false,
-        issueLinkBase: '',
-        rootPath: '',
-        boardId: '',
+        issueLinkBase: '/',
+        rootPath: '/',
+        boardId: '1',
       },
+      store,
       provide: {
-        glFeatures: {
-          boardsWithSwimlanes,
-        },
+        glFeatures: { boardsWithSwimlanes: true },
       },
     });
   };
 
-  beforeEach(() => {
-    mock = new MockAdapter(axios);
-  });
-
   afterEach(() => {
-    mock.restore();
+    wrapper.destroy();
   });
 
-  describe('when isSwimlanes and boardsWithSwimlanes', () => {
+  describe('Swimlanes off', () => {
     beforeEach(() => {
-      createStore();
-
-      store.state.isShowingEpicsSwimlanes = true;
-
-      createComponent(true);
+      createComponent();
     });
 
-    it('renders EpicsSwimlanes', () => {
-      expect(wrapper.find(EpicsSwimlanes).exists()).toBe(true);
+    it('renders a BoardColumn component per list', () => {
+      expect(wrapper.findAll(BoardColumn)).toHaveLength(mockListsWithModel.length);
+    });
+
+    it('does not display EpicsSwimlanes component', () => {
+      expect(wrapper.contains(EpicsSwimlanes)).toBe(false);
+      expect(wrapper.contains(GlAlert)).toBe(false);
     });
   });
 
-  it('finds BoardColumns', () => {
-    createStore();
+  describe('Swimlanes on', () => {
+    beforeEach(() => {
+      createComponent({ isShowingEpicsSwimlanes: true });
+    });
 
-    createComponent();
+    it('does not display BoardColumn component', () => {
+      expect(wrapper.findAll(BoardColumn)).toHaveLength(0);
+    });
 
-    expect(wrapper.findAll(BoardColumn).length).toBe(mockLists.length);
+    it('displays EpicsSwimlanes component', () => {
+      expect(wrapper.contains('.board-swimlanes')).toBe(true);
+      expect(wrapper.contains(GlAlert)).toBe(false);
+    });
+
+    it('displays alert if an error occurs when fetching swimlanes', () => {
+      createComponent({
+        isShowingEpicsSwimlanes: true,
+        error: 'An error occurred while fetching the board swimlanes. Please reload the page.',
+      });
+
+      expect(wrapper.contains(GlAlert)).toBe(true);
+    });
   });
 });

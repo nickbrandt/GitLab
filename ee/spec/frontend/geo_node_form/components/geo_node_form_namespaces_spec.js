@@ -64,6 +64,18 @@ describe('GeoNodeFormNamespaces', () => {
       it('has debounce prop', () => {
         expect(findGlDropdownSearch().attributes('debounce')).toBe('500');
       });
+
+      describe('onSearch', () => {
+        const namespaceSearch = 'test search';
+
+        beforeEach(() => {
+          findGlDropdownSearch().vm.$emit('input', namespaceSearch);
+        });
+
+        it('calls fetchSyncNamespaces when input event is fired from GlSearchBoxByType', () => {
+          expect(actionSpies.fetchSyncNamespaces).toHaveBeenCalledWith(namespaceSearch);
+        });
+      });
     });
 
     describe('findDropdownItems', () => {
@@ -81,21 +93,6 @@ describe('GeoNodeFormNamespaces', () => {
 
       it('hides GlIcon if namespace not in selectedNamespaces', () => {
         expect(findGlIcons().wrappers.every(w => w.classes('invisible'))).toBe(true);
-      });
-    });
-  });
-
-  describe('watchers', () => {
-    describe('namespaceSearch', () => {
-      const namespaceSearch = 'test search';
-
-      beforeEach(() => {
-        createComponent();
-        findGlDropdownSearch().vm.$emit('input', namespaceSearch);
-      });
-
-      it('calls fetchSyncNamespaces when input event is fired from GlSearchBoxByType', () => {
-        expect(actionSpies.fetchSyncNamespaces).toHaveBeenCalledWith(namespaceSearch);
       });
     });
   });

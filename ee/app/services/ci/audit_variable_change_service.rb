@@ -5,7 +5,7 @@ module Ci
     include ::Audit::Changes
 
     def execute
-      return unless License.feature_available?(:extended_audit_events)
+      return unless container.feature_available?(:audit_events)
 
       case params[:action]
       when :create, :destroy

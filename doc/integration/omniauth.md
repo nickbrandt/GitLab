@@ -140,6 +140,23 @@ OmniAuth provider for an existing user.
 
 The chosen OmniAuth provider is now active and can be used to sign in to GitLab from then on.
 
+## Automatically Link Existing Users to OmniAuth Users
+
+You can automatically link OmniAuth users with existing GitLab users if their email addresses match by adding the following setting:
+
+**For Omnibus installations**
+
+```ruby
+gitlab_rails['omniauth_auto_link_user'] = true
+```
+
+**For installations from source**
+
+```yaml
+omniauth:
+  auto_link_user: true
+```
+
 ## Configure OmniAuth Providers as External
 
 > Introduced in GitLab 8.7.
@@ -324,3 +341,7 @@ of the OmniAuth users has admin permissions.
 
 You may also bypass the auto signin feature by browsing to
 `https://gitlab.example.com/users/sign_in?auto_sign_in=false`.
+
+## Passwords for users created via OmniAuth
+
+The [Generated passwords for users created through integrated authentication](../security/passwords_for_integrated_authentication_methods.md) guide provides an overview of how GitLab generates and sets passwords for users created via OmniAuth.

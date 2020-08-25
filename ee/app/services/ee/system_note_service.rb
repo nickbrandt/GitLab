@@ -16,14 +16,6 @@ module EE
       extend_if_ee('EE::SystemNoteService') # rubocop: disable Cop/InjectEnterpriseEditionModule
     end
 
-    def relate_issue(noteable, noteable_ref, user)
-      issuables_service(noteable, noteable.project, user).relate_issue(noteable_ref)
-    end
-
-    def unrelate_issue(noteable, noteable_ref, user)
-      issuables_service(noteable, noteable.project, user).unrelate_issue(noteable_ref)
-    end
-
     def epic_issue(epic, issue, user, type)
       epics_service(epic, user).epic_issue(issue, type)
     end

@@ -8,17 +8,23 @@ module Gitlab
           include BaseEvent
 
           def process
-            registry.repository_updated!
+            if should_sync?
+              registry.repository_updated!
 
-            job_id = ::Geo::ContainerRepositorySyncWorker.perform_async(event.container_repository_id)
+              job_id = ::Geo::ContainerRepositorySyncWorker.perform_async(event.container_repository_id)
+            end
 
             log_event(job_id)
           end
 
           private
 
-          def skippable?
-            !!::Geo::ContainerRepositoryRegistry.replication_enabled?
+          def should_sync?
+            strong_memoize(:should_sync) do
+              ::Geo::ContainerRepositoryRegistry.replication_enabled? &&
+                registry.container_repository &&
+                replicable_project?(registry.container_repository.project_id)
+            end
           end
 
           # rubocop: disable CodeReuse/ActiveRecord
@@ -33,8 +39,10 @@ module Gitlab
             super(
               'Docker Repository update',
               container_repository_id: registry.container_repository_id,
-              skippable: skippable?,
-              project: registry.container_repository.project_id,
+              should_sync: should_sync?,
+              replication_enabled: ::Geo::ContainerRepositoryRegistry.replication_enabled?,
+              replicable_project: replicable_project?(registry.container_repository.project_id),
+              project_id: registry.container_repository.project_id,
               job_id: job_id)
           end
         end

@@ -94,4 +94,37 @@ RSpec.describe BillingPlansHelper do
       it { is_expected.to eq(result) }
     end
   end
+
+  describe '#experiment_tracking_data_for_button_click' do
+    let(:button_label) { 'some_label' }
+    let(:experiment_enabled) { false }
+
+    subject { helper.experiment_tracking_data_for_button_click(button_label) }
+
+    before do
+      stub_experiment(contact_sales_btn_in_app: experiment_enabled)
+    end
+
+    context 'when the experiment is not enabled' do
+      it { is_expected.to eq({}) }
+    end
+
+    context 'when the experiment is enabled' do
+      let(:experiment_enabled) { true }
+
+      before do
+        allow(helper).to receive(:experiment_tracking_category_and_group).with(:contact_sales_btn_in_app).and_return("Category:control_group")
+      end
+
+      it 'returns a hash to be used as data-attributes in a view' do
+        is_expected.to eq({
+          track: {
+            event: 'click_button',
+            label: button_label,
+            property: 'Category:control_group'
+          }
+        })
+      end
+    end
+  end
 end

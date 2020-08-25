@@ -1,13 +1,12 @@
 <script>
-import { GlLink } from '@gitlab/ui';
+import { GlLink, GlIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 import { Cell, HeaderCell, InfoCell, DateCell } from '../cells';
 
 export default {
   name: 'LicenseCardBody',
   components: {
-    Icon,
+    GlIcon,
     Cell,
     HeaderCell,
     InfoCell,
@@ -75,7 +74,7 @@ export default {
       v-if="isRemoving"
       class="p-5 d-flex justify-content-center align-items-center license-card-loading"
     >
-      <icon name="spinner" /><span class="ml-2">{{ __('Removing license…') }}</span>
+      <gl-icon name="spinner" /><span class="ml-2">{{ __('Removing license…') }}</span>
     </div>
 
     <div v-else class="license-table js-license-table">

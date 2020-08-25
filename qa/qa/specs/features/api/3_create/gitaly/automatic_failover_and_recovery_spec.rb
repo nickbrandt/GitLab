@@ -2,7 +2,7 @@
 
 module QA
   RSpec.describe 'Create' do
-    context 'Gitaly automatic failover and manual recovery', :orchestrated, :gitaly_cluster do
+    context 'Gitaly automatic failover and manual recovery', :orchestrated, :gitaly_cluster, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/238953', type: :flaky } do
       # Variables shared between contexts. They're used and shared between
       # contexts so they can't be `let` variables.
       praefect_manager = Service::PraefectManager.new
@@ -28,7 +28,7 @@ module QA
         praefect_manager.reset_primary_to_original
       end
 
-      it 'automatically fails over' do
+      it 'automatically fails over', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/976' do
         # Create a new project with a commit and wait for it to replicate
         Resource::Repository::ProjectPush.fabricate! do |push|
           push.project = project
@@ -66,7 +66,7 @@ module QA
       end
 
       context 'when recovering from dataloss after failover' do
-        it 'allows reconciliation' do
+        it 'allows reconciliation', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/238187', type: :stale }, status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/977' do
           # Start the old primary node again
           praefect_manager.start_primary_node
           praefect_manager.wait_for_health_check_current_primary_node

@@ -1,10 +1,9 @@
 <script>
 import { isEmpty } from 'lodash';
-import { GlLoadingIcon, GlDeprecatedButton } from '@gitlab/ui';
+import { GlLoadingIcon, GlDeprecatedButton, GlIcon } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 
 /**
  * Creates a searchable input for environments.
@@ -31,7 +30,7 @@ export default {
   components: {
     GlDeprecatedButton,
     GlLoadingIcon,
-    Icon,
+    GlIcon,
   },
   props: {
     endpoint: {
@@ -172,7 +171,7 @@ export default {
 <template>
   <div>
     <div class="dropdown position-relative">
-      <icon name="search" class="seach-icon-input" />
+      <gl-icon name="search" class="seach-icon-input" />
 
       <input
         type="text"
@@ -189,7 +188,7 @@ export default {
         class="js-clear-search-input btn-transparent clear-search-input position-right-0"
         @click="clearInput"
       >
-        <icon name="clear" :aria-label="__('Clear input')" />
+        <gl-icon name="clear" :aria-label="__('Clear input')" />
       </gl-deprecated-button>
 
       <div

@@ -2,7 +2,7 @@ import { ApolloMutation } from 'vue-apollo';
 import { GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import waitForPromises from 'helpers/wait_for_promises';
-import Flash from '~/flash';
+import { deprecatedCreateFlash as Flash } from '~/flash';
 import * as urlUtils from '~/lib/utils/url_utility';
 import SnippetEditApp from '~/snippets/components/edit.vue';
 import SnippetDescriptionEdit from '~/snippets/components/snippet_description_edit.vue';
@@ -47,6 +47,8 @@ const createTestSnippet = () => ({
 
 describe('Snippet Edit app', () => {
   let wrapper;
+  const relativeUrlRoot = '/foo/';
+  const originalRelativeUrlRoot = gon.relative_url_root;
 
   const mutationTypes = {
     RESOLVE: jest.fn().mockResolvedValue({
@@ -104,12 +106,14 @@ describe('Snippet Edit app', () => {
   }
 
   beforeEach(() => {
+    gon.relative_url_root = relativeUrlRoot;
     jest.spyOn(urlUtils, 'redirectTo').mockImplementation();
   });
 
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
+    gon.relative_url_root = originalRelativeUrlRoot;
   });
 
   const findBlobActions = () => wrapper.find(SnippetBlobActionsEdit);
@@ -196,8 +200,8 @@ describe('Snippet Edit app', () => {
 
     it.each`
       projectPath       | snippetArg               | expectation
-      ${''}             | ${[]}                    | ${'/-/snippets'}
-      ${'project/path'} | ${[]}                    | ${'/project/path/-/snippets'}
+      ${''}             | ${[]}                    | ${`${relativeUrlRoot}-/snippets`}
+      ${'project/path'} | ${[]}                    | ${`${relativeUrlRoot}project/path/-/snippets`}
       ${''}             | ${[createTestSnippet()]} | ${TEST_WEB_URL}
       ${'project/path'} | ${[createTestSnippet()]} | ${TEST_WEB_URL}
     `(

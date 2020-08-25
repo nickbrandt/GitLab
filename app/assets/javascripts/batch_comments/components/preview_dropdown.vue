@@ -1,8 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlIcon } from '@gitlab/ui';
 import { sprintf, n__ } from '~/locale';
-import Icon from '~/vue_shared/components/icon.vue';
 import DraftsCount from './drafts_count.vue';
 import PublishButton from './publish_button.vue';
 import PreviewItem from './preview_item.vue';
@@ -10,7 +9,8 @@ import PreviewItem from './preview_item.vue';
 export default {
   components: {
     GlLoadingIcon,
-    Icon,
+    GlButton,
+    GlIcon,
     DraftsCount,
     PublishButton,
     PreviewItem,
@@ -29,7 +29,7 @@ export default {
   watch: {
     showPreviewDropdown() {
       if (this.showPreviewDropdown && this.$refs.dropdown) {
-        this.$nextTick(() => this.$refs.dropdown.focus());
+        this.$nextTick(() => this.$refs.dropdown.$el.focus());
       }
     },
   },
@@ -63,16 +63,18 @@ export default {
       show: showPreviewDropdown,
     }"
   >
-    <button
+    <gl-button
       ref="dropdown"
       type="button"
-      class="btn btn-success review-preview-dropdown-toggle qa-review-preview-toggle"
+      category="primary"
+      variant="success"
+      class="review-preview-dropdown-toggle qa-review-preview-toggle"
       @click="toggleReviewDropdown"
     >
       {{ __('Finish review') }}
       <drafts-count />
-      <icon name="angle-up" />
-    </button>
+      <gl-icon name="angle-up" />
+    </gl-button>
     <div
       class="dropdown-menu dropdown-menu-large dropdown-menu-right dropdown-open-top"
       :class="{
@@ -87,7 +89,7 @@ export default {
           class="dropdown-title-button dropdown-menu-close"
           @click="toggleReviewDropdown"
         >
-          <icon name="close" />
+          <gl-icon name="close" />
         </button>
       </div>
       <div class="dropdown-content">

@@ -1,7 +1,7 @@
 <script>
 import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 
-import Flash from '~/flash';
+import { deprecatedCreateFlash as Flash } from '~/flash';
 import { __, sprintf } from '~/locale';
 import TitleField from '~/vue_shared/components/form/title.vue';
 import { redirectTo } from '~/lib/utils/url_utility';
@@ -88,7 +88,9 @@ export default {
     },
     cancelButtonHref() {
       if (this.newSnippet) {
-        return this.projectPath ? `/${this.projectPath}/-/snippets` : `/-/snippets`;
+        return this.projectPath
+          ? `${gon.relative_url_root}${this.projectPath}/-/snippets`
+          : `${gon.relative_url_root}-/snippets`;
       }
       return this.snippet.webUrl;
     },
@@ -202,7 +204,7 @@ export default {
       v-if="isLoading"
       :label="__('Loading snippet')"
       size="lg"
-      class="loading-animation prepend-top-20 append-bottom-20"
+      class="loading-animation prepend-top-20 gl-mb-6"
     />
     <template v-else>
       <title-field

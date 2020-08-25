@@ -6,6 +6,7 @@ import createRouter from './router';
 import apolloProvider from './graphql/provider';
 
 import GroupSecurityCharts from './components/group_security_charts.vue';
+import InstanceSecurityCharts from './components/instance_security_charts.vue';
 
 export default (el, dashboardType) => {
   if (!el) {
@@ -33,7 +34,8 @@ export default (el, dashboardType) => {
   if (dashboardType === DASHBOARD_TYPES.GROUP) {
     component = GroupSecurityCharts;
     props.groupFullPath = el.dataset.groupFullPath;
-    props.vulnerableProjectsEndpoint = el.dataset.vulnerableProjectsEndpoint;
+  } else if (dashboardType === DASHBOARD_TYPES.INSTANCE) {
+    component = InstanceSecurityCharts;
   }
 
   const router = createRouter();

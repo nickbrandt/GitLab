@@ -2,7 +2,7 @@
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
-import { PROJECTS_PER_PAGE, STAGE_ACTIONS } from '../constants';
+import { PROJECTS_PER_PAGE } from '../constants';
 import GroupsDropdownFilter from '../../shared/components/groups_dropdown_filter.vue';
 import ProjectsDropdownFilter from '../../shared/components/projects_dropdown_filter.vue';
 import { SIMILARITY_ORDER, LAST_ACTIVITY_AT, DATE_RANGE_LIMIT } from '../../shared/constants';
@@ -10,16 +10,14 @@ import DateRange from '../../shared/components/daterange.vue';
 import StageTable from './stage_table.vue';
 import DurationChart from './duration_chart.vue';
 import TypeOfWorkCharts from './type_of_work_charts.vue';
-import UrlSyncMixin from '../../shared/mixins/url_sync_mixin';
+import UrlSync from '~/vue_shared/components/url_sync.vue';
 import { toYmd } from '../../shared/utils';
-import RecentActivityCard from './recent_activity_card.vue';
-import TimeMetricsCard from './time_metrics_card.vue';
 import StageTableNav from './stage_table_nav.vue';
 import CustomStageForm from './custom_stage_form.vue';
 import PathNavigation from './path_navigation.vue';
-import MetricCard from '../../shared/components/metric_card.vue';
 import FilterBar from './filter_bar.vue';
 import ValueStreamSelect from './value_stream_select.vue';
+import Metrics from './metrics.vue';
 
 export default {
   name: 'CycleAnalytics',
@@ -32,16 +30,14 @@ export default {
     ProjectsDropdownFilter,
     StageTable,
     TypeOfWorkCharts,
-    RecentActivityCard,
-    TimeMetricsCard,
     CustomStageForm,
     StageTableNav,
     PathNavigation,
-    MetricCard,
     FilterBar,
     ValueStreamSelect,
+    UrlSync,
+    Metrics,
   },
-  mixins: [UrlSyncMixin],
   props: {
     emptyStateSvgPath: {
       type: String,
@@ -126,15 +122,19 @@ export default {
       return this.startDate && this.endDate;
     },
     query() {
+      const selectedProjectIds = this.selectedProjectIds?.length ? this.selectedProjectIds : null;
+      const selectedLabels = this.selectedLabels?.length ? this.selectedLabels : null;
+      const selectedAssignees = this.selectedAssignees?.length ? this.selectedAssignees : null;
+
       return {
         group_id: !this.hideGroupDropDown ? this.currentGroupPath : null,
-        'project_ids[]': this.selectedProjectIds,
+        'project_ids[]': selectedProjectIds,
         created_after: toYmd(this.startDate),
         created_before: toYmd(this.endDate),
         milestone_title: this.selectedMilestone,
         author_username: this.selectedAuthor,
-        'label_name[]': this.selectedLabels,
-        'assignee_username[]': this.selectedAssignees,
+        'label_name[]': selectedLabels,
+        'assignee_username[]': selectedAssignees,
       };
     },
     stageCount() {
@@ -211,7 +211,6 @@ export default {
     min_access_level: featureAccessLevel.EVERYONE,
   },
   maxDateRange: DATE_RANGE_LIMIT,
-  STAGE_ACTIONS,
 };
 </script>
 <template>
@@ -259,10 +258,6 @@ export default {
               @selected="onProjectsSelect"
             />
           </div>
-          <filter-bar
-            v-if="shouldDisplayFilterBar"
-            class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 mt-md-0 gl-mr-3 gl-border-none"
-          />
           <div v-if="shouldDisplayFilters" class="gl-justify-content-end gl-white-space-nowrap">
             <date-range
               :start-date="startDate"
@@ -274,6 +269,11 @@ export default {
             />
           </div>
         </div>
+        <filter-bar
+          v-if="shouldDisplayFilterBar"
+          class="js-filter-bar filtered-search-box gl-display-flex gl-mt-3 gl-mr-3 gl-border-none"
+          :group-path="currentGroupPath"
+        />
       </div>
     </div>
     <gl-empty-state
@@ -299,23 +299,7 @@ export default {
         "
       />
       <div v-else-if="!errorCode">
-        <div class="js-recent-activity gl-mt-3 gl-display-flex">
-          <div class="gl-flex-fill-1 gl-pr-2">
-            <time-metrics-card
-              #default="{ metrics, loading }"
-              :group-path="currentGroupPath"
-              :additional-params="cycleAnalyticsRequestParams"
-            >
-              <metric-card :title="__('Time')" :metrics="metrics" :is-loading="loading" />
-            </time-metrics-card>
-          </div>
-          <div class="gl-flex-fill-1 gl-pl-2">
-            <recent-activity-card
-              :group-path="currentGroupPath"
-              :additional-params="cycleAnalyticsRequestParams"
-            />
-          </div>
-        </div>
+        <metrics :group-path="currentGroupPath" :request-params="cycleAnalyticsRequestParams" />
         <div v-if="isLoading">
           <gl-loading-icon class="mt-4" size="md" />
         </div>
@@ -351,11 +335,12 @@ export default {
                 :events="formEvents"
                 @createStage="onCreateCustomStage"
                 @updateStage="onUpdateCustomStage"
-                @clearErrors="$emit('clearFormErrors')"
+                @clearErrors="$emit('clear-form-errors')"
               />
             </template>
           </stage-table>
         </div>
+        <url-sync :query="query" />
       </div>
       <duration-chart v-if="shouldDisplayDurationChart" class="mt-3" :stages="activeStages" />
       <type-of-work-charts v-if="shouldDisplayTypeOfWorkCharts" :is-loading="isLoadingTypeOfWork" />

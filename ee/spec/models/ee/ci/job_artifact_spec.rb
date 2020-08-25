@@ -54,19 +54,48 @@ RSpec.describe Ci::JobArtifact do
   end
 
   describe '.security_reports' do
-    subject { Ci::JobArtifact.security_reports }
-
-    context 'when there is a security report' do
+    context 'when the `file_types` parameter is provided' do
       let!(:sast_artifact) { create(:ee_ci_job_artifact, :sast) }
-      let!(:secret_detection_artifact) { create(:ee_ci_job_artifact, :secret_detection) }
 
-      it { is_expected.to eq([sast_artifact, secret_detection_artifact]) }
+      subject { Ci::JobArtifact.security_reports(file_types: file_types) }
+
+      context 'when the provided file_types is array' do
+        let(:file_types) { %w(secret_detection) }
+
+        context 'when there is a security report with the given value' do
+          let!(:secret_detection_artifact) { create(:ee_ci_job_artifact, :secret_detection) }
+
+          it { is_expected.to eq([secret_detection_artifact]) }
+        end
+
+        context 'when there are no security reports with the given value' do
+          it { is_expected.to be_empty }
+        end
+      end
+
+      context 'when the provided file_types is string' do
+        let(:file_types) { 'secret_detection' }
+        let!(:secret_detection_artifact) { create(:ee_ci_job_artifact, :secret_detection) }
+
+        it { is_expected.to eq([secret_detection_artifact]) }
+      end
     end
 
-    context 'when there are no security reports' do
-      let!(:artifact) { create(:ci_job_artifact, :archive) }
+    context 'when the file_types parameter is not provided' do
+      subject { Ci::JobArtifact.security_reports }
 
-      it { is_expected.to be_empty }
+      context 'when there is a security report' do
+        let!(:sast_artifact) { create(:ee_ci_job_artifact, :sast) }
+        let!(:secret_detection_artifact) { create(:ee_ci_job_artifact, :secret_detection) }
+
+        it { is_expected.to match_array([sast_artifact, secret_detection_artifact]) }
+      end
+
+      context 'when there are no security reports' do
+        let!(:artifact) { create(:ci_job_artifact, :archive) }
+
+        it { is_expected.to be_empty }
+      end
     end
   end
 

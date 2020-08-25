@@ -22,7 +22,7 @@ RSpec.describe Members::UpdateService do
     specify do
       expect do
         described_class.new(current_user, params).execute(member, permission: permission)
-      end.to change { SecurityEvent.count }.by(1)
+      end.to change { AuditEvent.count }.by(1)
     end
   end
 

@@ -83,6 +83,7 @@
   - ".gitlab/ci/frontend.gitlab-ci.yml"
   - ".gitlab/ci/build-images.gitlab-ci.yml"
   - ".gitlab/ci/review.gitlab-ci.yml"
+  - "scripts/trigger-build"
 
 .ci-qa-patterns: &ci-qa-patterns
   - ".gitlab-ci.yml"
@@ -644,6 +645,7 @@
     - if: '$DAST_DISABLED || $GITLAB_FEATURES !~ /\bdast\b/'
       when: never
     - <<: *if-dot-com-gitlab-org-schedule
+      allow_failure: true
 
 ################
 # Review rules #
@@ -664,6 +666,8 @@
 
 .review:rules:mr-and-schedule-auto-if-frontend-manual-otherwise:
   rules:
+    - if: '$DAST_RUN == "true"' # Skip this job when DAST is run
+      when: never
     - <<: *if-not-ee
       when: never
     - <<: *if-dot-com-gitlab-org-merge-request

@@ -30,7 +30,7 @@ import {
   metricsDashboardPanelCount,
   dashboardProps,
 } from '../fixture_data';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 
 jest.mock('~/flash');
 
@@ -668,7 +668,11 @@ describe('Dashboard', () => {
         });
 
         it('shows a remove button, which removes a panel', () => {
-          expect(findFirstDraggableRemoveButton().isEmpty()).toBe(false);
+          expect(
+            findFirstDraggableRemoveButton()
+              .find('a')
+              .exists(),
+          ).toBe(true);
 
           expect(findDraggablePanels().length).toEqual(metricsDashboardPanelCount);
           findFirstDraggableRemoveButton().trigger('click');

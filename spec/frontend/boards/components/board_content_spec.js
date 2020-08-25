@@ -1,40 +1,66 @@
-import { mount } from '@vue/test-utils';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+import Vuex from 'vuex';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlAlert } from '@gitlab/ui';
+import EpicsSwimlanes from 'ee_component/boards/components/epics_swimlanes.vue';
+import BoardColumn from 'ee_else_ce/boards/components/board_column.vue';
+import { mockListsWithModel } from '../mock_data';
 import BoardContent from '~/boards/components/board_content.vue';
-import BoardColumn from '~/boards/components/board_column.vue';
-import List from '~/boards/models/list';
-import { listObj } from '../mock_data';
+
+const localVue = createLocalVue();
+localVue.use(Vuex);
 
 describe('BoardContent', () => {
   let wrapper;
-  let mock;
 
-  const createComponent = () => {
-    wrapper = mount(BoardContent, {
-      propsData: {
-        lists: [new List(listObj)],
-        canAdminList: true,
-        groupId: 1,
-        disabled: false,
-        issueLinkBase: '',
-        rootPath: '',
-        boardId: '',
+  const defaultState = {
+    isShowingEpicsSwimlanes: false,
+    boardLists: mockListsWithModel,
+    error: undefined,
+  };
+
+  const createStore = (state = defaultState) => {
+    return new Vuex.Store({
+      state,
+      actions: {
+        fetchIssuesForAllLists: () => {},
       },
     });
   };
 
+  const createComponent = state => {
+    const store = createStore({
+      ...defaultState,
+      ...state,
+    });
+    wrapper = shallowMount(BoardContent, {
+      localVue,
+      propsData: {
+        lists: mockListsWithModel,
+        canAdminList: true,
+        groupId: 1,
+        disabled: false,
+        issueLinkBase: '/',
+        rootPath: '/',
+        boardId: '1',
+      },
+      store,
+    });
+  };
+
   beforeEach(() => {
-    mock = new MockAdapter(axios);
+    createComponent();
   });
 
   afterEach(() => {
-    mock.restore();
+    wrapper.destroy();
   });
 
-  it('finds BoardColumns', () => {
-    createComponent();
+  it('renders a BoardColumn component per list', () => {
+    expect(wrapper.findAll(BoardColumn)).toHaveLength(mockListsWithModel.length);
+  });
 
-    expect(wrapper.findAll(BoardColumn).length).toBe(1);
+  it('does not display EpicsSwimlanes component', () => {
+    expect(wrapper.contains(EpicsSwimlanes)).toBe(false);
+    expect(wrapper.contains(GlAlert)).toBe(false);
   });
 });

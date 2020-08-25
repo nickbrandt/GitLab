@@ -1,9 +1,10 @@
 /* eslint-disable no-underscore-dangle, class-methods-use-this */
 import { escape, find, countBy } from 'lodash';
 import axios from '~/lib/utils/axios_utils';
-import Flash from '~/flash';
+import { deprecatedCreateFlash as Flash } from '~/flash';
 import { n__, s__, __ } from '~/locale';
 import { LEVEL_TYPES, LEVEL_ID_PROP, ACCESS_LEVEL_NONE } from './constants';
+import initDeprecatedJQueryDropdown from '~/deprecated_jquery_dropdown';
 
 export default class AccessDropdown {
   constructor(options) {
@@ -29,7 +30,7 @@ export default class AccessDropdown {
 
   initDropdown() {
     const { onSelect, onHide } = this.options;
-    this.$dropdown.glDropdown({
+    initDeprecatedJQueryDropdown(this.$dropdown, {
       data: this.getData.bind(this),
       selectable: true,
       filterable: true,

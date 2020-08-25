@@ -42,12 +42,15 @@ function createFooterApp() {
     vulnerabilityFeedbackHelpPath,
     hasMr,
     discussionsUrl,
+    createIssueUrl,
     state,
     issueFeedback,
     mergeRequestFeedback,
     notesUrl,
     project,
+    projectFingerprint,
     remediations,
+    reportType,
     solution,
     id,
     canModifyRelatedIssues,
@@ -85,6 +88,12 @@ function createFooterApp() {
 
   return new Vue({
     el,
+    provide: {
+      reportType,
+      createIssueUrl,
+      projectFingerprint,
+      vulnerabilityId: id,
+    },
     render: h =>
       h(FooterApp, {
         props,

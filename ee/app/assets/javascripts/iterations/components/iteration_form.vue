@@ -1,6 +1,6 @@
 <script>
 import { GlButton, GlForm, GlFormInput } from '@gitlab/ui';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { visitUrl } from '~/lib/utils/url_utility';
 import { __ } from '~/locale';
 import MarkdownField from '~/vue_shared/components/markdown/field.vue';

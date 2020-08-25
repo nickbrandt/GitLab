@@ -18,10 +18,6 @@ module Gitlab
         ::Feature.enabled?(:ci_instance_variables_ui, default_enabled: true)
       end
 
-      def self.composite_status?(project)
-        ::Feature.enabled?(:ci_composite_status, project, default_enabled: true)
-      end
-
       def self.pipeline_latest?
         ::Feature.enabled?(:ci_pipeline_latest, default_enabled: true)
       end
@@ -82,6 +78,14 @@ module Gitlab
 
       def self.expand_names_for_cross_pipeline_artifacts?(project)
         ::Feature.enabled?(:ci_expand_names_for_cross_pipeline_artifacts, project)
+      end
+
+      def self.project_transactionless_destroy?(project)
+        Feature.enabled?(:project_transactionless_destroy, project, default_enabled: false)
+      end
+
+      def self.coverage_report_view?(project)
+        ::Feature.enabled?(:coverage_report_view, project)
       end
     end
   end

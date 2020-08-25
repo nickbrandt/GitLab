@@ -1,12 +1,9 @@
 <script>
-import { GlDeprecatedButton } from '@gitlab/ui';
-
-import Icon from '~/vue_shared/components/icon.vue';
+import { GlButton } from '@gitlab/ui';
 
 export default {
   components: {
-    GlDeprecatedButton,
-    Icon,
+    GlButton,
   },
 };
 </script>
@@ -14,12 +11,11 @@ export default {
 <template>
   <div class="dropdown-title">
     <span>{{ __('Assign epic') }}</span>
-    <gl-deprecated-button
+    <gl-button
       :aria-label="__('Close')"
-      variant="link"
+      category="tertiary"
       class="dropdown-title-button dropdown-menu-close"
-    >
-      <icon name="close" />
-    </gl-deprecated-button>
+      icon="close"
+    />
   </div>
 </template>

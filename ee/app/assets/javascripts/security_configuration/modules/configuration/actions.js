@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/browser';
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 
-// eslint-disable-next-line import/prefer-default-export
 export const fetchSecurityConfiguration = ({ commit, state }) => {
   if (!state.securityConfigurationPath) {
     return commit(types.RECEIVE_SECURITY_CONFIGURATION_ERROR);

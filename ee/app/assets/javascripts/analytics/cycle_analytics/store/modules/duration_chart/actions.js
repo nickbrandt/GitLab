@@ -1,7 +1,7 @@
 import dateFormat from 'dateformat';
 import Api from 'ee/api';
 import { getDayDifference, getDateInPast } from '~/lib/utils/datetime_utility';
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { __ } from '~/locale';
 import * as types from './mutation_types';
 import { dateFormats } from '../../../../shared/constants';

@@ -1,4 +1,4 @@
-import createFlash from '~/flash';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { __ } from '~/locale';
 
 const FLASH_MESSAGES = {

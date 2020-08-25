@@ -24,7 +24,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
       item3.update!(relative_position: nil)
 
       items = [item1, item2, item3]
-      described_class.move_nulls_to_end(items)
+      expect(described_class.move_nulls_to_end(items)).to be(2)
 
       expect(items.sort_by(&:relative_position)).to eq(items)
       expect(item1.relative_position).to be(1000)
@@ -53,9 +53,8 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     it 'does not perform any moves if all items have their relative_position set' do
       item1.update!(relative_position: 1)
 
-      expect do
-        described_class.move_nulls_to_end([item1])
-      end.not_to change { item1.reset.relative_position }
+      expect(described_class.move_nulls_to_start([item1])).to be(0)
+      expect(item1.reload.relative_position).to be(1)
     end
 
     it 'manages to move nulls to the end even if there is a sequence at the end' do
@@ -97,7 +96,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
       item3.update!(relative_position: 1000)
 
       items = [item1, item2, item3]
-      described_class.move_nulls_to_start(items)
+      expect(described_class.move_nulls_to_start(items)).to be(2)
       items.map(&:reload)
 
       expect(items.sort_by(&:relative_position)).to eq(items)
@@ -120,7 +119,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
       item1.update!(relative_position: nil)
       item2.update!(relative_position: nil)
 
-      described_class.move_nulls_to_end([item1, item2])
+      described_class.move_nulls_to_start([item1, item2])
 
       expect(item1.relative_position).to be < item2.relative_position
     end
@@ -128,10 +127,8 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     it 'does not perform any moves if all items have their relative_position set' do
       item1.update!(relative_position: 1)
 
-      described_class.move_nulls_to_start([item1])
-      item1.reload
-
-      expect(item1.relative_position).to be(1)
+      expect(described_class.move_nulls_to_start([item1])).to be(0)
+      expect(item1.reload.relative_position).to be(1)
     end
   end
 
@@ -502,10 +499,55 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
   end
 
+  describe '#move_to_start' do
+    before do
+      [item1, item2].each do |item1|
+        item1.move_to_start && item1.save!
+      end
+    end
+
+    it 'moves item to the end' do
+      new_item.move_to_start
+
+      expect(new_item.relative_position).to be < item2.relative_position
+    end
+
+    it 'positions the item at MIN_POSITION when there is only one space left' do
+      item2.update!(relative_position: RelativePositioning::MIN_POSITION + 1)
+
+      new_item.move_to_start
+
+      expect(new_item.relative_position).to eq RelativePositioning::MIN_POSITION
+    end
+
+    it 'rebalances when there is already an item at the MIN_POSITION' do
+      item2.update!(relative_position: RelativePositioning::MIN_POSITION)
+
+      new_item.move_to_start
+      item2.reset
+
+      expect(new_item.relative_position).to be < item2.relative_position
+      expect(new_item.relative_position).to be >= RelativePositioning::MIN_POSITION
+    end
+
+    it 'deals with a run of elements at the start' do
+      item1.update!(relative_position: RelativePositioning::MIN_POSITION + 1)
+      item2.update!(relative_position: RelativePositioning::MIN_POSITION)
+
+      new_item.move_to_start
+      item1.reset
+      item2.reset
+
+      expect(item2.relative_position).to be < item1.relative_position
+      expect(new_item.relative_position).to be < item2.relative_position
+      expect(new_item.relative_position).to be >= RelativePositioning::MIN_POSITION
+    end
+  end
+
   describe '#move_to_end' do
     before do
       [item1, item2].each do |item1|
-        item1.move_to_end && item1.save
+        item1.move_to_end && item1.save!
       end
     end
 
@@ -513,6 +555,37 @@ RSpec.shared_examples 'a class that supports relative positioning' do
       new_item.move_to_end
 
       expect(new_item.relative_position).to be > item2.relative_position
+    end
+
+    it 'positions the item at MAX_POSITION when there is only one space left' do
+      item2.update!(relative_position: RelativePositioning::MAX_POSITION - 1)
+
+      new_item.move_to_end
+
+      expect(new_item.relative_position).to eq RelativePositioning::MAX_POSITION
+    end
+
+    it 'rebalances when there is already an item at the MAX_POSITION' do
+      item2.update!(relative_position: RelativePositioning::MAX_POSITION)
+
+      new_item.move_to_end
+      item2.reset
+
+      expect(new_item.relative_position).to be > item2.relative_position
+      expect(new_item.relative_position).to be <= RelativePositioning::MAX_POSITION
+    end
+
+    it 'deals with a run of elements at the end' do
+      item1.update!(relative_position: RelativePositioning::MAX_POSITION - 1)
+      item2.update!(relative_position: RelativePositioning::MAX_POSITION)
+
+      new_item.move_to_end
+      item1.reset
+      item2.reset
+
+      expect(item2.relative_position).to be > item1.relative_position
+      expect(new_item.relative_position).to be > item2.relative_position
+      expect(new_item.relative_position).to be <= RelativePositioning::MAX_POSITION
     end
   end
 

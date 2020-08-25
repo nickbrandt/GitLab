@@ -1,11 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 
-import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-
 import Approvers from 'ee/compliance_dashboard/components/merge_requests/approvers.vue';
 import BranchDetails from 'ee/compliance_dashboard/components/merge_requests/branch_details.vue';
 import MergeRequestsGrid from 'ee/compliance_dashboard/components/merge_requests/grid.vue';
 import Status from 'ee/compliance_dashboard/components/merge_requests/status.vue';
+import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 
 import { createMergeRequests, mergedAt } from '../../mock_data';
 

@@ -5,7 +5,9 @@
 module Ci
   class PipelineArtifact < ApplicationRecord
     extend Gitlab::Ci::Model
+    include UpdateProjectStatistics
     include Artifactable
+    include FileStoreMounter
 
     FILE_STORE_SUPPORTED = [
       ObjectStorage::Store::LOCAL,
@@ -13,6 +15,11 @@ module Ci
     ].freeze
 
     FILE_SIZE_LIMIT = 10.megabytes.freeze
+    EXPIRATION_DATE = 1.week.freeze
+
+    DEFAULT_FILE_NAMES = {
+      code_coverage: 'code_coverage.json'
+    }.freeze
 
     belongs_to :project, class_name: "Project", inverse_of: :pipeline_artifacts
     belongs_to :pipeline, class_name: "Ci::Pipeline", inverse_of: :pipeline_artifacts
@@ -22,22 +29,16 @@ module Ci
     validates :size, presence: true, numericality: { less_than_or_equal_to: FILE_SIZE_LIMIT }
     validates :file_type, presence: true
 
-    mount_uploader :file, Ci::PipelineArtifactUploader
-    before_save :set_size, if: :file_changed?
-    after_save :update_file_store, if: :saved_change_to_file?
+    mount_file_store_uploader Ci::PipelineArtifactUploader
+
+    update_project_statistics project_statistics_name: :pipeline_artifacts_size
 
     enum file_type: {
       code_coverage: 1
     }
 
-    def set_size
-      self.size = file.size
-    end
-
-    def update_file_store
-      # The file.object_store is set during `uploader.store!`
-      # which happens after object is inserted/updated
-      self.update_column(:file_store, file.object_store)
+    def self.has_code_coverage?
+      where(file_type: :code_coverage).exists?
     end
   end
 end

@@ -163,6 +163,7 @@ module EE
         projects/on_demand_scans#index
         projects/dast_profiles#index
         projects/dast_site_profiles#new
+        projects/dast_scanner_profiles#new
         projects/dependencies#index
         projects/licenses#index
         projects/threat_monitoring#show
@@ -173,6 +174,15 @@ module EE
     def sidebar_external_tracker_paths
       %w[
         projects/integrations/jira/issues#index
+      ]
+    end
+
+    def sidebar_on_demand_scans_paths
+      %w[
+        projects/on_demand_scans#index
+        projects/dast_profiles#index
+        projects/dast_site_profiles#new
+        projects/dast_scanner_profiles#new
       ]
     end
 

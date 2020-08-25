@@ -60,6 +60,22 @@ describe('RelatedIssuesBlock', () => {
     });
   });
 
+  describe('with headerActions slot', () => {
+    it('displays header actions slot data', () => {
+      const headerActions = '<button data-testid="custom-button">custom button</button>';
+
+      wrapper = shallowMount(RelatedIssuesBlock, {
+        propsData: {
+          pathIdSeparator: PathIdSeparator.Issue,
+          issuableType: 'issue',
+        },
+        slots: { headerActions },
+      });
+
+      expect(wrapper.find('[data-testid="custom-button"]').html()).toBe(headerActions);
+    });
+  });
+
   describe('with isFetching=true', () => {
     beforeEach(() => {
       wrapper = mount(RelatedIssuesBlock, {

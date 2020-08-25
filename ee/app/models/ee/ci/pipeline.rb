@@ -101,9 +101,11 @@ module EE
         batch_lookup_report_artifact_for_file_type(:license_scanning).present?
       end
 
-      def security_reports
+      def security_reports(report_types: [])
+        reports_scope = report_types.empty? ? ::Ci::JobArtifact.security_reports : ::Ci::JobArtifact.security_reports(file_types: report_types)
+
         ::Gitlab::Ci::Reports::Security::Reports.new(self).tap do |security_reports|
-          builds.latest.with_reports(::Ci::JobArtifact.security_reports).each do |build|
+          builds.latest.with_reports(reports_scope).each do |build|
             build.collect_security_reports!(security_reports)
           end
         end

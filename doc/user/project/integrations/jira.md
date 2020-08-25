@@ -22,7 +22,9 @@ Features include:
   - The Jira issue shows the activity and is closed or otherwise transitioned as specified in your GitLab settings.
 - **View a list of Jira issues directly in GitLab** **(PREMIUM)**
 
-For additional features, you can install the [Jira Development Panel integration](../../../integration/jira_development_panel.md). This enables you to:
+For additional features, you can install the
+[Jira Development Panel integration](../../../integration/jira_development_panel.md) **(PREMIUM)**.
+This enables you to:
 
 - In a Jira issue, display relevant GitLab information in the [development panel](https://support.atlassian.com/jira-software-cloud/docs/view-development-information-for-an-issue/), including related branches, commits, and merge requests.
 - Use Jira [Smart Commits](https://confluence.atlassian.com/fisheye/using-smart-commits-960155400.html) in GitLab to add Jira comments, log time spent on the issue, or apply any issue transition.
@@ -30,6 +32,9 @@ For additional features, you can install the [Jira Development Panel integration
 See the [feature comparison](jira_integrations.md#feature-comparison) for more details.
 
 ## Configuration
+
+<i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
+For an overview, see [Agile Management - GitLab-Jira Basic Integration](https://www.youtube.com/watch?v=fWvwkx5_00E&feature=youtu.be).
 
 Each GitLab project can be configured to connect to an entire Jira instance. That
 means one GitLab project can interact with _all_ Jira projects in that instance, once

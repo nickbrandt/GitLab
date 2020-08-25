@@ -18,11 +18,6 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      namespaceSearch: '',
-    };
-  },
   computed: {
     ...mapState(['synchronizationNamespaces']),
     dropdownTitle() {
@@ -33,11 +28,6 @@ export default {
     },
     noSyncNamespaces() {
       return this.synchronizationNamespaces.length === 0;
-    },
-  },
-  watch: {
-    namespaceSearch() {
-      this.fetchSyncNamespaces(this.namespaceSearch);
     },
   },
   methods: {
@@ -58,8 +48,8 @@ export default {
 </script>
 
 <template>
-  <gl-deprecated-dropdown :text="dropdownTitle" @show="fetchSyncNamespaces(namespaceSearch)">
-    <gl-search-box-by-type v-model="namespaceSearch" class="m-2" :debounce="500" />
+  <gl-deprecated-dropdown :text="dropdownTitle" @show="fetchSyncNamespaces('')">
+    <gl-search-box-by-type class="m-2" :debounce="500" @input="fetchSyncNamespaces" />
     <li v-for="namespace in synchronizationNamespaces" :key="namespace.id">
       <gl-deprecated-button class="d-flex align-items-center" @click="toggleNamespace(namespace)">
         <gl-icon :class="[{ invisible: !isSelected(namespace) }]" name="mobile-issue-close" />

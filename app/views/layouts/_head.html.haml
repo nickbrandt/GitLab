@@ -16,12 +16,7 @@
 %head{ prefix: "og: http://ogp.me/ns#" }
   %meta{ charset: "utf-8" }
 
-  - if ActionController::Base.asset_host
-    %link{ rel: 'dns-prefetch', href: ActionController::Base.asset_host }
-    %link{ rel: 'preconnect', href: ActionController::Base.asset_host, crossorigin: '' }
-
-  - if Gitlab::CurrentSettings.snowplow_enabled? && Gitlab::CurrentSettings.snowplow_collector_hostname
-    %link{ rel: 'preconnect', href: Gitlab::CurrentSettings.snowplow_collector_hostname, crossorigin: '' }
+  = render 'layouts/loading_hints'
 
   %meta{ 'http-equiv' => 'X-UA-Compatible', content: 'IE=edge' }
 
@@ -49,9 +44,7 @@
 
   = favicon_link_tag favicon, id: 'favicon', data: { original_href: favicon }, type: 'image/png'
 
-  - if use_startup_css?
-    %style{ type: "text/css" }
-      = Rails.application.assets_manifest.find_sources('startup/startup-general.css').first.to_s.html_safe
+  = render 'layouts/startup_css'
   - if user_application_theme == 'gl-dark'
     = stylesheet_link_tag_defer "application_dark"
   - else
@@ -61,7 +54,7 @@
 
   = stylesheet_link_tag_defer "highlight/themes/#{user_color_scheme}"
 
-  = render 'layouts/startup_css'
+  = render 'layouts/startup_css_activation'
 
   = Gon::Base.render_data(nonce: content_security_policy_nonce)
 

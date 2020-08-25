@@ -44,7 +44,6 @@ export default (el, dashboardType) => {
   } else if (dashboardType === DASHBOARD_TYPES.GROUP) {
     component = FirstClassGroupSecurityDashboard;
     props.groupFullPath = el.dataset.groupFullPath;
-    props.vulnerableProjectsEndpoint = el.dataset.vulnerableProjectsEndpoint;
   } else if (dashboardType === DASHBOARD_TYPES.INSTANCE) {
     component = FirstClassInstanceSecurityDashboard;
   }

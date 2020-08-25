@@ -1,15 +1,14 @@
 <script>
 import $ from 'jquery';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import Tracking from '~/tracking';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
-import icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
-    icon,
+    GlIcon,
     GlLoadingIcon,
   },
   directives: {
@@ -164,7 +163,7 @@ export default {
       data-boundary="viewport"
       @click="onCollapsedClick"
     >
-      <icon :size="16" name="weight" />
+      <gl-icon :size="16" name="weight" />
       <gl-loading-icon v-if="fetching" class="js-weight-collapsed-loading-icon" />
       <span v-else class="js-weight-collapsed-weight-label" v-html="collapsedWeightLabel"></span>
     </div>
@@ -192,7 +191,7 @@ export default {
         @keydown.enter="onSubmit"
       />
       <span v-if="!hasValidInput" class="gl-field-error">
-        <icon :size="24" name="merge-request-close-m" />
+        <gl-icon :size="24" name="merge-request-close-m" />
         {{ s__('Sidebar|Only numeral characters allowed') }}
       </span>
     </div>

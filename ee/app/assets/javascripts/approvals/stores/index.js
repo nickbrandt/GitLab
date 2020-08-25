@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
-import modalModule from '~/vuex_shared/modules/modal';
 import securityConfigurationModule from 'ee/security_configuration/modules/configuration';
+import modalModule from '~/vuex_shared/modules/modal';
 import state from './state';
 
 export const createStoreOptions = (approvalsModule, settings) => ({
