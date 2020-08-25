@@ -49,7 +49,7 @@ module EE
     end
 
     def missing_security_scan_types
-      merge_request.missing_security_scan_types if present_missing_security_scan_types?
+      merge_request.missing_security_scan_types if expose_missing_security_scan_types?
     end
 
     private
@@ -58,7 +58,7 @@ module EE
       approval_feature_available? && merge_request.iid
     end
 
-    def present_missing_security_scan_types?
+    def expose_missing_security_scan_types?
       ::Feature.enabled?(:missing_mr_security_scan_types, project) &&
         can?(current_user, :read_pipeline, merge_request.actual_head_pipeline)
     end
