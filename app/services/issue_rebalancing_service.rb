@@ -34,9 +34,7 @@ class IssueRebalancingService
     end
 
     # If there are 4 billion issues, then we cannot rebalance them
-    if gap_size < RelativePositioning::MIN_GAP
-      raise RelativePositioning::NoSpaceLeft
-    end
+    raise TooManyIssues if gap_size < RelativePositioning::MIN_GAP
 
     start = RelativePositioning::START_POSITION - (gaps / 2) * gap_size
 

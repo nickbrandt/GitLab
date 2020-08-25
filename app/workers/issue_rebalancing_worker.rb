@@ -11,7 +11,7 @@ class IssueRebalancingWorker # rubocop:disable Scalability/IdempotentWorker
     issue = Issue.find(issue_id)
 
     rebalance(issue)
-  rescue ActiveRecord::RecordNotFound, IssueRebalancingService::TooManyIssues, RelativePositioning::NoSpaceLeft => e
+  rescue ActiveRecord::RecordNotFound, IssueRebalancingService::TooManyIssues => e
     Sidekiq.logger.warn(e)
   end
 
