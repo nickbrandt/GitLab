@@ -69,6 +69,7 @@ export default {
         // We watch any changes to the active discussion from the design pins and scroll to this discussion if it exists
         // We don't want scrollIntoView to be triggered from the discussion click itself
         if (
+          this.$el &&
           discussionId &&
           // data.activeDiscussion.source === ACTIVE_DISCUSSION_SOURCE_TYPES.pin &&
           discussionId === this.discussion.notes[0].id
