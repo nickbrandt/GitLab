@@ -1,12 +1,14 @@
 <script>
+import { mapState, mapActions } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
+import BoardCardLayout from '~/boards/components/board_card_layout.vue';
 import eventHub from '~/boards/eventhub';
-import BoardCard from '~/boards/components/board_card.vue';
 import BoardNewIssue from '~/boards/components/board_new_issue.vue';
+import { ISSUABLE } from '~/boards/constants';
 
 export default {
   components: {
-    BoardCard,
+    BoardCardLayout,
     BoardNewIssue,
     GlLoadingIcon,
   },
@@ -49,6 +51,9 @@ export default {
       showIssueForm: false,
     };
   },
+  computed: {
+    ...mapState(['activeId']),
+  },
   created() {
     eventHub.$on(`toggle-issue-form-${this.list.id}`, this.toggleForm);
   },
@@ -56,11 +61,18 @@ export default {
     eventHub.$off(`toggle-issue-form-${this.list.id}`, this.toggleForm);
   },
   methods: {
+    ...mapActions(['setActiveId']),
     toggleForm() {
       this.showIssueForm = !this.showIssueForm;
       if (this.showIssueForm && this.isUnassignedIssuesLane) {
         this.$el.scrollIntoView(false);
       }
+    },
+    isActiveIssue(issue) {
+      return this.activeId === issue.id;
+    },
+    showIssue(issue) {
+      this.setActiveId({ id: issue.id, sidebarType: ISSUABLE });
     },
   },
 };
@@ -79,7 +91,7 @@ export default {
         :list="list"
       />
       <ul v-if="list.isExpanded" class="gl-p-2 gl-m-0">
-        <board-card
+        <board-card-layout
           v-for="(issue, index) in issues"
           ref="issue"
           :key="issue.id"
@@ -87,6 +99,8 @@ export default {
           :list="list"
           :issue="issue"
           :root-path="rootPath"
+          :is-active="isActiveIssue(issue)"
+          @show="showIssue(issue)"
         />
       </ul>
     </div>
