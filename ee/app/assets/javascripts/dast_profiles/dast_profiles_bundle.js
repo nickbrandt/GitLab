@@ -14,7 +14,9 @@ export default () => {
   } = el;
 
   const props = {
-    newDastSiteProfilePath,
+    newProfilePaths: {
+      siteProfile: newDastSiteProfilePath,
+    },
     projectFullPath,
   };
 

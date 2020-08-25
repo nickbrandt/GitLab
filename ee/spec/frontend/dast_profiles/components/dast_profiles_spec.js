@@ -12,7 +12,9 @@ describe('EE - DastProfiles', () => {
 
   const createComponentFactory = (mountFn = shallowMount) => (options = {}) => {
     const defaultProps = {
-      newDastSiteProfilePath: TEST_NEW_DAST_SITE_PROFILE_PATH,
+      newProfilePaths: {
+        siteProfile: TEST_NEW_DAST_SITE_PROFILE_PATH,
+      },
       projectFullPath: TEST_PROJECT_FULL_PATH,
     };
 

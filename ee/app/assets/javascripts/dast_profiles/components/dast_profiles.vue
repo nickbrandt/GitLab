@@ -17,13 +17,10 @@ export default {
   },
   mixins: [glFeatureFlagMixin()],
   props: {
-    newDastScannerProfilePath: {
-      type: String,
+    newProfilePaths: {
+      type: Object,
       required: true,
-    },
-    newDastSiteProfilePath: {
-      type: String,
-      required: true,
+      validator: ({ siteProfile }) => Boolean(siteProfile),
     },
     projectFullPath: {
       type: String,
@@ -179,7 +176,7 @@ export default {
           {{ s__('DastProfiles|Manage Profiles') }}
         </h2>
         <gl-button
-          :href="newDastSiteProfilePath"
+          :href="newProfilePaths.siteProfile"
           category="primary"
           variant="success"
           class="gl-ml-auto"
