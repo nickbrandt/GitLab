@@ -58,6 +58,14 @@ RSpec.describe Gitlab::Utils::Markdown do
       it 'ignores a product suffix' do
         is_expected.to eq 'my-header'
       end
+
+      context 'with only modifier' do
+        let(:string) { 'My Header (STARTER ONLY)' }
+
+        it 'ignores a product suffix' do
+          is_expected.to eq 'my-header'
+        end
+      end
     end
 
     context 'when string is empty' do
