@@ -1,98 +1,54 @@
-import Vuex from 'vuex';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlAlert } from '@gitlab/ui';
-import EpicsSwimlanes from 'ee_component/boards/components/epics_swimlanes.vue';
-import BoardColumn from 'ee_else_ce/boards/components/board_column.vue';
-import getters from 'ee/boards/stores/getters';
-import { mockListsWithModel, mockIssuesByListId } from '../mock_data';
+import { shallowMount } from '@vue/test-utils';
+import BoardContentSidebar from 'ee/boards/components/board_content_sidebar.vue';
 import BoardContent from '~/boards/components/board_content.vue';
+import { createStore } from '~/boards/stores';
 
-const localVue = createLocalVue();
-localVue.use(Vuex);
-
-describe('BoardContent', () => {
+describe('ee/BoardContent', () => {
   let wrapper;
+  let store;
+  window.gon = { features: {} };
 
-  const defaultState = {
-    isShowingEpicsSwimlanes: false,
-    boardLists: mockListsWithModel,
-    error: undefined,
-    issuesByListId: mockIssuesByListId,
-  };
-
-  const createStore = (state = defaultState) => {
-    return new Vuex.Store({
-      state,
-      actions: {
-        fetchIssuesForAllLists: () => {},
-      },
-      getters,
-    });
-  };
-
-  const createComponent = state => {
-    const store = createStore({
-      ...defaultState,
-      ...state,
-    });
+  const createComponent = () => {
     wrapper = shallowMount(BoardContent, {
-      localVue,
-      propsData: {
-        lists: mockListsWithModel,
-        canAdminList: true,
-        groupId: 1,
-        disabled: false,
-        issueLinkBase: '/',
-        rootPath: '/',
-        boardId: '1',
-      },
       store,
-      provide: {
-        glFeatures: { boardsWithSwimlanes: true },
+      propsData: {
+        lists: [],
+        canAdminList: false,
+        disabled: false,
+        issueLinkBase: '',
+        rootPath: '',
+        boardId: '',
+      },
+      stubs: {
+        'board-content-sidebar': BoardContentSidebar,
       },
     });
   };
+
+  beforeEach(() => {
+    store = createStore();
+  });
 
   afterEach(() => {
+    window.gon.features = {};
     wrapper.destroy();
   });
 
-  describe('Swimlanes off', () => {
+  describe.each`
+    featureFlag | state                                 | result
+    ${true}     | ${{ isShowingEpicsSwimlanes: true }}  | ${true}
+    ${true}     | ${{ isShowingEpicsSwimlanes: false }} | ${false}
+    ${false}    | ${{ isShowingEpicsSwimlanes: true }}  | ${false}
+    ${false}    | ${{ isShowingEpicsSwimlanes: false }} | ${false}
+  `('with featureFlag=$featureFlag and state=$state', ({ featureFlag, state, result }) => {
     beforeEach(() => {
+      gon.features.boardsWithSwimlanes = featureFlag;
+      Object.assign(store.state, state);
       createComponent();
     });
 
-    it('renders a BoardColumn component per list', () => {
-      expect(wrapper.findAll(BoardColumn)).toHaveLength(mockListsWithModel.length);
-    });
-
-    it('does not display EpicsSwimlanes component', () => {
-      expect(wrapper.contains(EpicsSwimlanes)).toBe(false);
-      expect(wrapper.contains(GlAlert)).toBe(false);
-    });
-  });
-
-  describe('Swimlanes on', () => {
-    beforeEach(() => {
-      createComponent({ isShowingEpicsSwimlanes: true });
-    });
-
-    it('does not display BoardColumn component', () => {
-      expect(wrapper.findAll(BoardColumn)).toHaveLength(0);
-    });
-
-    it('displays EpicsSwimlanes component', () => {
-      expect(wrapper.contains('.board-swimlanes')).toBe(true);
-      expect(wrapper.contains(GlAlert)).toBe(false);
-    });
-
-    it('displays alert if an error occurs when fetching swimlanes', () => {
-      createComponent({
-        isShowingEpicsSwimlanes: true,
-        error: 'An error occurred while fetching the board swimlanes. Please reload the page.',
-      });
-
-      expect(wrapper.contains(GlAlert)).toBe(true);
+    it(`renders BoardContentSidebar = ${result}`, () => {
+      expect(wrapper.find(BoardContentSidebar).exists()).toBe(result);
     });
   });
 });
