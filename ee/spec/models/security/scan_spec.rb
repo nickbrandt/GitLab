@@ -6,6 +6,7 @@ RSpec.describe Security::Scan do
   describe 'associations' do
     it { is_expected.to belong_to(:build) }
     it { is_expected.to have_one(:pipeline).through(:build).class_name('Ci::Pipeline') }
+    it { is_expected.to have_many(:findings) }
   end
 
   describe 'validations' do
