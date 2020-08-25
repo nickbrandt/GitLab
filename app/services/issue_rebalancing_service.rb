@@ -23,12 +23,13 @@ class IssueRebalancingService
       raise TooManyIssues, "#{n} issues"
     end
 
+    range = RelativePositioning::MAX_POSITION - RelativePositioning::MIN_POSITION
     gaps = n - 1
     gap_size = 0
     ratio = 0.5
 
     while gap_size < RelativePositioning::MIN_GAP && ratio < 1
-      gap_size = (ratio * RelativePositioning::MAX_POSITION) / (gaps / 2)
+      gap_size = [RelativePositioning::IDEAL_DISTANCE, (ratio * range) / gaps].min.floor
       ratio += 0.1
     end
 
@@ -37,7 +38,7 @@ class IssueRebalancingService
       raise RelativePositioning::NoSpaceLeft
     end
 
-    start = 0 - (gaps / 2) * gap_size
+    start = RelativePositioning::START_POSITION - (gaps / 2) * gap_size
 
     Issue.transaction do
       indexed = base.reorder(:relative_position, :id).pluck(:id).each_with_index
