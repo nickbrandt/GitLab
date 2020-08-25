@@ -38,6 +38,7 @@ export default {
       {{ headerTitle }}
       <gl-button
         :aria-label="__('Close')"
+        category="tertiary"
         class="dropdown-title-button dropdown-menu-close float-right"
         icon="close"
         category="tertiary"
