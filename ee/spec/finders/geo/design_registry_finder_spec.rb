@@ -30,15 +30,6 @@ RSpec.describe Geo::DesignRegistryFinder, :geo do
     end
   end
 
-  describe '#count_registry' do
-    it 'returns number of desgin registries' do
-      create(:geo_design_registry, :synced, project_id: project_1.id)
-      create(:geo_design_registry, :sync_failed, project_id: project_2.id)
-
-      expect(subject.count_registry).to eq(2)
-    end
-  end
-
   describe '#synced_count' do
     it 'returns number of synced registries' do
       create(:geo_design_registry, :synced, project_id: project_1.id)

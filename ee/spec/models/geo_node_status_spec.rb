@@ -726,7 +726,7 @@ RSpec.describe GeoNodeStatus, :geo do
       create(:geo_design_registry)
       create(:geo_design_registry, :synced)
 
-      expect(subject.design_repositories_registry_count).to eq(3)
+      expect(subject.design_repositories_count).to eq(3)
     end
   end
 

@@ -51,15 +51,6 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
     end
   end
 
-  describe '#count_registry' do
-    it 'returns number of container registries' do
-      create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
-      create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
-
-      expect(subject.count_registry).to eq(2)
-    end
-  end
-
   describe '#find_registry_differences' do
     context 'untracked IDs' do
       before do

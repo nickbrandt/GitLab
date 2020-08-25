@@ -35,21 +35,6 @@ RSpec.describe Geo::LfsObjectRegistryFinder, :geo do
     end
   end
 
-  describe '#count_registry' do
-    it 'counts registries for LFS objects' do
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
-      create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_3.id)
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_4.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_5.id, missing_on_primary: true, retry_at: 1.day.ago)
-      create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_remote_1.id)
-      create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
-      create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
-
-      expect(subject.count_registry).to eq 8
-    end
-  end
-
   describe '#synced_count' do
     it 'counts registries that has been synced' do
       create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)

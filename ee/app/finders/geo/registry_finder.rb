@@ -58,7 +58,6 @@ module Geo
     def registry_count
       registry_class.count
     end
-    alias_method :count_registry, :registry_count
 
     # @!method synced_count
     #    Return a count of the registry records for the tracked type
