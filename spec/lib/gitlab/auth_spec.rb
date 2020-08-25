@@ -24,13 +24,13 @@ RSpec.describe Gitlab::Auth, :use_clean_rails_memory_store_caching do
     end
 
     it 'DEFAULT_SCOPES contains all default scopes' do
-      expect(subject::DEFAULT_SCOPES).to eq [:api]
+      expect(subject::DEFAULT_SCOPES).to eq [:read_user]
     end
 
     it 'optional_scopes contains all non-default scopes' do
       stub_container_registry_config(enabled: true)
 
-      expect(subject.optional_scopes).to eq %i[read_user read_api read_repository write_repository read_registry write_registry sudo openid profile email]
+      expect(subject.optional_scopes).to eq %i[api read_api read_repository write_repository read_registry write_registry sudo openid profile email]
     end
   end
 
