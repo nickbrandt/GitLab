@@ -7,20 +7,12 @@ export default {
     GlButton,
   },
   props: {
-    issuableId: {
-      type: Number,
-      required: true,
-    },
-    issuableType: {
-      type: String,
-      required: true,
-    },
     isTodo: {
       type: Boolean,
       required: false,
       default: true,
     },
-    isActionActive: {
+    loading: {
       type: Boolean,
       required: false,
       default: false,
@@ -31,23 +23,11 @@ export default {
       return this.isTodo ? __('Mark as done') : __('Add a To-Do');
     },
   },
-  methods: {
-    toggleTodo() {
-      this.$emit('toggleTodo', {
-        issuableType: this.issuableType,
-        issuableId: this.issuableId,
-      });
-    },
-  },
 };
 </script>
 
 <template>
-  <div>
-    <slot :toggleTodo="toggleTodo" :label="buttonLabel">
-      <gl-button :loading="isActionActive" :aria-label="buttonLabel" @click="toggleTodo">
-        {{ buttonLabel }}
-      </gl-button></slot
-    >
-  </div>
+  <gl-button :loading="loading" :aria-label="buttonLabel" @click="$emit('click', $event)">
+    {{ buttonLabel }}
+  </gl-button>
 </template>

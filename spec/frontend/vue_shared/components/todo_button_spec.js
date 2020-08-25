@@ -1,19 +1,13 @@
-import { mount } from '@vue/test-utils';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { shallowMount, mount } from '@vue/test-utils';
+import { GlButton } from '@gitlab/ui';
 import TodoButton from '~/vue_shared/components/todo_button.vue';
-
-const defaultProps = {
-  issuableId: 1,
-  issuableType: 'epic',
-};
 
 describe('Todo Button', () => {
   let wrapper;
 
-  const createComponent = (props = {}) => {
-    wrapper = mount(TodoButton, {
+  const createComponent = (props = {}, mountFn = shallowMount) => {
+    wrapper = mountFn(TodoButton, {
       propsData: {
-        ...defaultProps,
         ...props,
       },
     });
@@ -29,12 +23,11 @@ describe('Todo Button', () => {
     expect(wrapper.find(GlButton).exists()).toBe(true);
   });
 
-  it('emits toggleTodo event when clicked', () => {
-    createComponent();
+  it('emits click event when clicked', () => {
+    createComponent({}, mount);
     wrapper.find(GlButton).trigger('click');
 
-    expect(wrapper.emitted().toggleTodo).toBeTruthy();
-    expect(wrapper.emitted().toggleTodo[0]).toEqual([defaultProps]);
+    expect(wrapper.emitted().click).toBeTruthy();
   });
 
   it.each`
@@ -47,9 +40,9 @@ describe('Todo Button', () => {
     expect(wrapper.find(GlButton).text()).toBe(label);
   });
 
-  it('renders loading icon when `isActionActive` is true', () => {
-    createComponent({ isActionActive: true });
+  it('sets button props correctly when `loading` is true', () => {
+    createComponent({ loading: true });
 
-    expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
+    expect(wrapper.find(GlButton).props('loading')).toBe(true);
   });
 });
