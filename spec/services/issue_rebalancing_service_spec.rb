@@ -89,4 +89,22 @@ RSpec.describe IssueRebalancingService do
 
     expect { service.execute }.to change { issue.reload.relative_position }
   end
+
+  it 'aborts if there are too many issues' do
+    issue = project.issues.first
+    base = double(count: 10_001)
+
+    allow(Issue).to receive(:relative_positioning_query_base).with(issue).and_return(base)
+
+    expect { described_class.new(issue).execute }.to raise_error(described_class::TooManyIssues)
+  end
+
+  it 'aborts if we cannot compute a suitable gap' do
+    issue = project.issues.first
+    service = described_class.new(issue)
+
+    allow(service).to receive(:gap_width).and_return(0)
+
+    expect { service.execute }.to raise_error(described_class::TooManyIssues)
+  end
 end
