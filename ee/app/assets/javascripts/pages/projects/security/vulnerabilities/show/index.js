@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import MainApp from 'ee/vulnerabilities/components/main.vue';
+import MainApp from 'ee/vulnerabilities/components/vulnerability.vue';
 
 function createMainApp() {
   const el = document.getElementById('js-vulnerability-main');
