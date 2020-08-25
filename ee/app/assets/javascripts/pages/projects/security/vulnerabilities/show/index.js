@@ -23,8 +23,5 @@ function createMainApp() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // createHeaderApp();
-  // createDetailsApp();
-  // createFooterApp();
   createMainApp();
 });
