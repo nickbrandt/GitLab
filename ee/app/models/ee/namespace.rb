@@ -40,6 +40,7 @@ module EE
       scope :eligible_for_trial, -> do
         left_joins(gitlab_subscription: :hosted_plan)
           .where(
+            parent_id: nil,
             gitlab_subscriptions: { trial: [nil, false], trial_ends_on: [nil] },
             plans: { name: [nil, *::Plan::PLANS_ELIGIBLE_FOR_TRIAL] }
           )

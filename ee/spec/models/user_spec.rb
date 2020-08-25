@@ -1058,6 +1058,7 @@ RSpec.describe User do
     let_it_be(:non_trialed_group_z) { create :group, name: 'Zeta', gitlab_subscription: create(:gitlab_subscription, :free) }
     let_it_be(:non_trialed_group_a) { create :group, name: 'Alpha', gitlab_subscription: create(:gitlab_subscription, :free) }
     let_it_be(:trialed_group) { create :group, name: 'Omitted', gitlab_subscription: create(:gitlab_subscription, :free, trial: true) }
+    let_it_be(:non_trialed_subgroup) { create :group, name: 'Sub-group', gitlab_subscription: create(:gitlab_subscription, :free), parent: non_trialed_group_a }
 
     subject { user.manageable_groups_eligible_for_trial }
 
@@ -1104,6 +1105,14 @@ RSpec.describe User do
       end
 
       it { is_expected.to eq [non_trialed_group_a, non_trialed_group_z] }
+    end
+
+    context 'owner of a top-level group with a sub-group' do
+      before do
+        non_trialed_group_a.add_owner(user)
+      end
+
+      it { is_expected.to eq [non_trialed_group_a] }
     end
   end
 
