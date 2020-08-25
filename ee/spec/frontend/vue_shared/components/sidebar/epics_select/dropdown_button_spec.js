@@ -38,7 +38,7 @@ describe('EpicsSelect', () => {
 
     describe('template', () => {
       it('should render button element', () => {
-        expect(wrapper.is('button')).toBe(true);
+        expect(wrapper.element.tagName).toBe('BUTTON');
         expect(wrapper.classes()).toEqual(
           expect.arrayContaining(['dropdown-menu-toggle', 'js-epic-select', 'js-extra-options']),
         );
