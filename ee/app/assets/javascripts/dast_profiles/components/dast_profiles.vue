@@ -2,6 +2,7 @@
 import * as Sentry from '@sentry/browser';
 import { GlButton, GlTab, GlTabs } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ProfilesList from './dast_profiles_list.vue';
 import dastSiteProfilesQuery from '../graphql/dast_site_profiles.query.graphql';
 import dastSiteProfilesDelete from '../graphql/dast_site_profiles_delete.mutation.graphql';
@@ -14,7 +15,12 @@ export default {
     GlTabs,
     ProfilesList,
   },
+  mixins: [glFeatureFlagMixin()],
   props: {
+    newDastScannerProfilePath: {
+      type: String,
+      required: true,
+    },
     newDastSiteProfilePath: {
       type: String,
       required: true,
