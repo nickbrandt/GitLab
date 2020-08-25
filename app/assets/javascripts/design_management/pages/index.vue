@@ -281,13 +281,8 @@ export default {
         .mutate({
           mutation: moveDesignMutation,
           variables: this.designMoveVariables(newIndex, element),
-          update: (store, { data: { designManagementMove } }) => {
-            return updateDesignsOnStoreAfterReorder(
-              store,
-              designManagementMove,
-              this.projectQueryBody,
-            );
-          },
+          update: (store, { data: { designManagementMove } }) =>
+            updateDesignsOnStoreAfterReorder(store, designManagementMove, this.projectQueryBody),
           optimisticResponse: moveDesignOptimisticResponse(this.reorderedDesigns),
         })
         .catch(() => {
