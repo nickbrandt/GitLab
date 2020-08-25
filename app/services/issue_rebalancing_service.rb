@@ -28,7 +28,7 @@ class IssueRebalancingService
     ratio = 0.5
 
     while gap_size < RelativePositioning::MIN_GAP && ratio < 1
-      gap_size = (ratio * Gitlab::Database::MAX_INT_VALUE) / (gaps / 2)
+      gap_size = (ratio * RelativePositioning::MAX_POSITION) / (gaps / 2)
       ratio += 0.1
     end
 
