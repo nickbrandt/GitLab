@@ -1,27 +1,23 @@
 import * as types from './mutation_types';
 
 export default {
-  [types.INITIALIZE](
-    state,
-    {
+  [types.SET_SELECTED_FILTERS](state, params) {
+    const {
       selectedAuthor = null,
       selectedMilestone = null,
       selectedAssignees = [],
       selectedLabels = [],
-    } = {},
-  ) {
-    state.initialTokens = {
-      selectedAuthor,
-      selectedMilestone,
-      selectedAssignees,
-      selectedLabels,
-    };
+    } = params;
+    state.authors.selected = selectedAuthor;
+    state.assignees.selected = selectedAssignees;
+    state.milestones.selected = selectedMilestone;
+    state.labels.selected = selectedLabels;
   },
-  [types.SET_MILESTONES_PATH](state, milestonesPath) {
-    state.milestonesPath = milestonesPath;
+  [types.SET_MILESTONES_ENDPOINT](state, milestonesEndpoint) {
+    state.milestonesEndpoint = milestonesEndpoint;
   },
-  [types.SET_LABELS_PATH](state, labelsPath) {
-    state.labelsPath = labelsPath;
+  [types.SET_LABELS_ENDPOINT](state, labelsEndpoint) {
+    state.labelsEndpoint = labelsEndpoint;
   },
   [types.REQUEST_MILESTONES](state) {
     state.milestones.isLoading = true;

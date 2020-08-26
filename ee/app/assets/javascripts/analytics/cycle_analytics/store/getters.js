@@ -10,34 +10,36 @@ export const hasNoAccessError = state => state.errorCode === httpStatus.FORBIDDE
 export const currentValueStreamId = ({ selectedValueStream }) =>
   selectedValueStream?.id || DEFAULT_VALUE_STREAM_ID;
 
-export const currentGroupPath = ({ selectedGroup }) =>
-  selectedGroup && selectedGroup.fullPath ? selectedGroup.fullPath : null;
+export const currentGroupPath = ({ selectedGroup }) => selectedGroup?.fullPath || null;
 
 export const currentGroupParentPath = ({ selectedGroup }, getters) =>
   selectedGroup?.parentId || getters.currentGroupPath;
 
 export const selectedProjectIds = ({ selectedProjects }) =>
-  selectedProjects.length ? selectedProjects.map(({ id }) => id) : [];
+  selectedProjects?.map(({ id }) => id) || [];
 
-export const cycleAnalyticsRequestParams = (
-  {
+export const cycleAnalyticsRequestParams = (state, getters) => {
+  const {
     startDate = null,
     endDate = null,
-    selectedAuthor = null,
-    selectedMilestone = null,
-    selectedAssignees = [],
-    selectedLabels = [],
-  },
-  getters,
-) => ({
-  project_ids: getters.selectedProjectIds,
-  created_after: startDate ? dateFormat(startDate, dateFormats.isoDate) : null,
-  created_before: endDate ? dateFormat(endDate, dateFormats.isoDate) : null,
-  author_username: selectedAuthor,
-  milestone_title: selectedMilestone,
-  assignee_username: selectedAssignees,
-  label_name: selectedLabels,
-});
+    filters: {
+      authors: { selected: selectedAuthor = null },
+      milestones: { selected: selectedMilestone = null },
+      assignees: { selected: selectedAssignees = [] },
+      labels: { selected: selectedLabels = [] },
+    },
+  } = state;
+
+  return {
+    project_ids: getters.selectedProjectIds,
+    created_after: startDate ? dateFormat(startDate, dateFormats.isoDate) : null,
+    created_before: endDate ? dateFormat(endDate, dateFormats.isoDate) : null,
+    author_username: selectedAuthor,
+    milestone_title: selectedMilestone,
+    assignee_username: selectedAssignees,
+    label_name: selectedLabels,
+  };
+};
 
 const filterStagesByHiddenStatus = (stages = [], isHidden = true) =>
   stages.filter(({ hidden = false }) => hidden === isHidden);

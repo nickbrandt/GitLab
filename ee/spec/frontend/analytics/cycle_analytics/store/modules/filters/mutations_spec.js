@@ -11,7 +11,12 @@ const labels = filterLabels.map(convertObjectPropsToCamelCase);
 
 describe('Filters mutations', () => {
   beforeEach(() => {
-    state = { initialTokens: {}, milestones: {}, authors: {}, labels: {}, assignees: {} };
+    state = {
+      authors: { selected: null },
+      milestones: { selected: null },
+      assignees: { selected: [] },
+      labels: { selected: [] },
+    };
   });
 
   afterEach(() => {
@@ -19,9 +24,9 @@ describe('Filters mutations', () => {
   });
 
   it.each`
-    mutation                     | stateKey            | value
-    ${types.SET_MILESTONES_PATH} | ${'milestonesPath'} | ${'new-milestone-path'}
-    ${types.SET_LABELS_PATH}     | ${'labelsPath'}     | ${'new-label-path'}
+    mutation                         | stateKey                | value
+    ${types.SET_MILESTONES_ENDPOINT} | ${'milestonesEndpoint'} | ${'new-milestone-endpoint'}
+    ${types.SET_LABELS_ENDPOINT}     | ${'labelsEndpoint'}     | ${'new-label-endpoint'}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state, value);
 
@@ -29,15 +34,15 @@ describe('Filters mutations', () => {
   });
 
   it.each`
-    mutation            | rootKey            | stateKey               | value
-    ${types.INITIALIZE} | ${'initialTokens'} | ${'selectedAuthor'}    | ${null}
-    ${types.INITIALIZE} | ${'initialTokens'} | ${'selectedMilestone'} | ${null}
-    ${types.INITIALIZE} | ${'initialTokens'} | ${'selectedAssignees'} | ${[]}
-    ${types.INITIALIZE} | ${'initialTokens'} | ${'selectedLabels'}    | ${[]}
-  `('$mutation will set $stateKey with a given value', ({ mutation, rootKey, stateKey, value }) => {
-    mutations[mutation](state);
+    mutation                      | stateKey        | value
+    ${types.SET_SELECTED_FILTERS} | ${'authors'}    | ${null}
+    ${types.SET_SELECTED_FILTERS} | ${'milestones'} | ${null}
+    ${types.SET_SELECTED_FILTERS} | ${'assignees'}  | ${[]}
+    ${types.SET_SELECTED_FILTERS} | ${'labels'}     | ${[]}
+  `('$mutation will set $stateKey with a given value', ({ mutation, stateKey, value }) => {
+    mutations[mutation](state, { [stateKey]: { selected: value } });
 
-    expect(state[rootKey][stateKey]).toEqual(value);
+    expect(state[stateKey].selected).toEqual(value);
   });
 
   it.each`

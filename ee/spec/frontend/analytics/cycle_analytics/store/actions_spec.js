@@ -16,6 +16,10 @@ import {
   valueStreams,
 } from '../mock_data';
 
+const groupPath = 'fake_group_path';
+const milestonesPath = 'fake_milestones_path';
+const labelsPath = 'fake_labels_path';
+
 const stageData = { events: [] };
 const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
 const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
@@ -99,6 +103,48 @@ describe('Cycle analytics actions', () => {
         [{ type: types.SET_SELECTED_VALUE_STREAM, payload: vs }],
         [{ type: 'fetchValueStreamData' }],
       );
+    });
+  });
+
+  describe('setPaths', () => {
+    describe('with endpoint paths provided', () => {
+      it('dispatches the filters/setEndpoints action', () => {
+        return testAction(
+          actions.setPaths,
+          { groupPath, milestonesPath, labelsPath },
+          state,
+          [],
+          [
+            {
+              type: 'filters/setEndpoints',
+              payload: {
+                labelsEndpoint: 'fake_labels_path.json',
+                milestonesEndpoint: 'fake_milestones_path.json',
+              },
+            },
+          ],
+        );
+      });
+    });
+
+    describe('without endpoint paths provided', () => {
+      it('dispatches the filters/setEndpoints action', () => {
+        return testAction(
+          actions.setPaths,
+          { groupPath },
+          state,
+          [],
+          [
+            {
+              type: 'filters/setEndpoints',
+              payload: {
+                labelsEndpoint: '/groups/fake_group_path/-/labels.json',
+                milestonesEndpoint: '/groups/fake_group_path/-/milestones.json',
+              },
+            },
+          ],
+        );
+      });
     });
   });
 
@@ -1045,6 +1091,12 @@ describe('Cycle analytics actions', () => {
           { type: 'durationChart/fetchDurationData' },
         ],
       );
+    });
+  });
+
+  describe('setFilters', () => {
+    it('dispatches the fetchCycleAnalyticsData action', () => {
+      return testAction(actions.setFilters, null, state, [], [{ type: 'fetchCycleAnalyticsData' }]);
     });
   });
 });

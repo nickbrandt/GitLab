@@ -5,6 +5,21 @@ import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { removeFlash, handleErrorOrRethrow, isStageNameExistsError } from '../utils';
 
+const appendExtension = path => (path.indexOf('.') > -1 ? path : `${path}.json`);
+
+export const setPaths = ({ dispatch }, options) => {
+  const { groupPath = '', milestonesPath = '', labelsPath = '' } = options;
+  // TODO: After we remove instance VSA we can rely on the paths from the BE
+  // https://gitlab.com/gitlab-org/gitlab/-/issues/223735
+  const milestonesEndpoint = milestonesPath || `/groups/${groupPath}/-/milestones`;
+  const labelsEndpoint = labelsPath || `/groups/${groupPath}/-/labels`;
+
+  return dispatch('filters/setEndpoints', {
+    labelsEndpoint: appendExtension(labelsEndpoint),
+    milestonesEndpoint: appendExtension(milestonesEndpoint),
+  });
+};
+
 export const setFeatureFlags = ({ commit }, featureFlags) =>
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
@@ -237,20 +252,33 @@ export const removeStage = ({ dispatch, getters }, stageId) => {
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
 
-export const setSelectedFilters = ({ commit }, filters = {}) =>
-  commit(types.SET_SELECTED_FILTERS, filters);
-
 export const initializeCycleAnalyticsSuccess = ({ commit }) =>
   commit(types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS);
 
 export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {}) => {
   commit(types.INITIALIZE_CYCLE_ANALYTICS, initialData);
 
-  const { featureFlags = {} } = initialData;
+  const {
+    featureFlags = {},
+    milestonesPath,
+    labelsPath,
+    selectedAuthor,
+    selectedMilestone,
+    selectedAssignees,
+    selectedLabels,
+  } = initialData;
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
   if (initialData.group?.fullPath) {
-    return dispatch('filters/initialize', { groupPath: initialData.group.fullPath, ...initialData })
+    return Promise.all([
+      dispatch('setPaths', { groupPath: initialData.group.fullPath, milestonesPath, labelsPath }),
+      dispatch('filters/initialize', {
+        selectedAuthor,
+        selectedMilestone,
+        selectedAssignees,
+        selectedLabels,
+      }),
+    ])
       .then(() => dispatch('fetchCycleAnalyticsData'))
       .then(() => dispatch('initializeCycleAnalyticsSuccess'));
   }
@@ -335,4 +363,8 @@ export const fetchValueStreams = ({ commit, dispatch, getters, state }) => {
       });
   }
   return dispatch('fetchValueStreamData');
+};
+
+export const setFilters = ({ dispatch }) => {
+  return dispatch('fetchCycleAnalyticsData');
 };
