@@ -65,7 +65,7 @@ RSpec.describe Geo::LfsObjectRegistryFinder, :geo do
     end
   end
 
-  describe '#count_synced_missing_on_primary' do
+  describe '#synced_missing_on_primary_count' do
     it 'counts registries that have been synced and are missing on the primary, excluding not synced ones' do
       create(:geo_lfs_object_registry, :failed, lfs_object_id: lfs_object_1.id)
       create(:geo_lfs_object_registry, lfs_object_id: lfs_object_2.id, missing_on_primary: true)
@@ -76,7 +76,7 @@ RSpec.describe Geo::LfsObjectRegistryFinder, :geo do
       create(:geo_lfs_object_registry, lfs_object_id: lfs_object_remote_2.id, missing_on_primary: true)
       create(:geo_lfs_object_registry, :never_synced, lfs_object_id: lfs_object_remote_3.id)
 
-      expect(subject.count_synced_missing_on_primary).to eq 3
+      expect(subject.synced_missing_on_primary_count).to eq 3
     end
   end
 

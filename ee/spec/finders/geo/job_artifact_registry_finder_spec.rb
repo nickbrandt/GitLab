@@ -75,7 +75,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
     end
   end
 
-  describe '#count_synced_missing_on_primary' do
+  describe '#synced_missing_on_primary_count' do
     it 'counts registries that have been synced and are missing on the primary, excluding not synced ones' do
       create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_1.id)
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_2.id, missing_on_primary: true)
@@ -86,7 +86,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_2.id, missing_on_primary: true)
       create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_remote_3.id)
 
-      expect(subject.count_synced_missing_on_primary).to eq 3
+      expect(subject.synced_missing_on_primary_count).to eq 3
     end
   end
 

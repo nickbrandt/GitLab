@@ -2,10 +2,10 @@
 
 module Geo
   class FileRegistryFinder < RegistryFinder
-    # @!method count_synced_missing_on_primary
+    # @!method synced_missing_on_primary_count
     #    Return a count of the registry records for the tracked file_type(s)
     #    that are synced and missing on the primary
-    def count_synced_missing_on_primary
+    def synced_missing_on_primary_count
       registry_class.synced.missing_on_primary.count
     end
 

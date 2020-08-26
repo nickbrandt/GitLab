@@ -7,7 +7,7 @@ RSpec.shared_examples 'a file registry finder' do
       registry_count
       synced_count
       failed_count
-      count_synced_missing_on_primary
+      synced_missing_on_primary_count
       find_retryable_failed_registries
       find_retryable_synced_missing_on_primary_registries
     }

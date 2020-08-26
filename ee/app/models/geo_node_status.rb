@@ -483,7 +483,7 @@ class GeoNodeStatus < ApplicationRecord
     self.lfs_objects_synced_count = lfs_objects_finder.synced_count
     self.lfs_objects_failed_count = lfs_objects_finder.failed_count
     self.lfs_objects_registry_count = lfs_objects_finder.registry_count
-    self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
+    self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.synced_missing_on_primary_count
   end
 
   def load_job_artifacts_data
@@ -493,7 +493,7 @@ class GeoNodeStatus < ApplicationRecord
     self.job_artifacts_synced_count = job_artifacts_finder.synced_count
     self.job_artifacts_failed_count = job_artifacts_finder.failed_count
     self.job_artifacts_registry_count = job_artifacts_finder.registry_count
-    self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
+    self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.synced_missing_on_primary_count
   end
 
   def load_attachments_data
@@ -503,7 +503,7 @@ class GeoNodeStatus < ApplicationRecord
     self.attachments_synced_count = attachments_finder.synced_count
     self.attachments_failed_count = attachments_finder.failed_count
     self.attachments_registry_count = attachments_finder.registry_count
-    self.attachments_synced_missing_on_primary_count = attachments_finder.count_synced_missing_on_primary
+    self.attachments_synced_missing_on_primary_count = attachments_finder.synced_missing_on_primary_count
   end
 
   def load_container_registry_data
