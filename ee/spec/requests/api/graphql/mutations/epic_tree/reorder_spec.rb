@@ -49,7 +49,7 @@ RSpec.describe 'Updating an epic tree' do
     end
   end
 
-  context 'when epic feature is enabled' do
+  context 'when epics and subepics features are enabled' do
     before do
       stub_licensed_features(epics: true, subepics: true)
     end
