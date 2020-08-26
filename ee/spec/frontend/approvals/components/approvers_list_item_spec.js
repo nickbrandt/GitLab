@@ -51,7 +51,7 @@ describe('Approvals ApproversListItem', () => {
       button.vm.$emit('click');
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.emittedByOrder()).toEqual([{ name: 'remove', args: [TEST_USER] }]);
+        expect(wrapper.emitted().remove).toEqual([[TEST_USER]]);
       });
     });
   });
