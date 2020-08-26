@@ -44,16 +44,6 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(nil).pluck(:project_id)
   end
 
-  def self.find_registry_differences(range)
-    source_ids = Gitlab::Geo.current_node.projects.id_in(range).pluck_primary_key
-    tracked_ids = self.pluck_model_ids_in_range(range)
-
-    untracked_ids = source_ids - tracked_ids
-    unused_tracked_ids = tracked_ids - source_ids
-
-    [untracked_ids, unused_tracked_ids]
-  end
-
   def self.find_failed_registries(batch_size:, except_ids: [])
     super
       .order(Gitlab::Database.nulls_first_order(:last_repository_synced_at))

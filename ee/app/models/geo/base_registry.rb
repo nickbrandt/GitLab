@@ -41,8 +41,26 @@ class Geo::BaseRegistry < Geo::TrackingBase
     end
   end
 
+  def self.delete_worker_class
+    ::Geo::FileRegistryRemovalWorker
+  end
+
   def self.replicator_class
     self::MODEL_CLASS.replicator_class
+  end
+
+  def self.find_registry_differences(range)
+    source_ids = self::MODEL_CLASS
+                  .replicables_for_geo_node
+                  .id_in(range)
+                  .pluck(self::MODEL_CLASS.arel_table[:id])
+
+    tracked_ids = self.pluck_model_ids_in_range(range)
+
+    untracked_ids = source_ids - tracked_ids
+    unused_tracked_ids = tracked_ids - source_ids
+
+    [untracked_ids, unused_tracked_ids]
   end
 
   def self.find_unsynced_registries(batch_size:, except_ids: [])
@@ -59,24 +77,6 @@ class Geo::BaseRegistry < Geo::TrackingBase
 
   def self.has_create_events?
     true
-  end
-
-  def self.delete_worker_class
-    ::Geo::FileRegistryRemovalWorker
-  end
-
-  def self.find_registry_differences(range)
-    source_ids = self::MODEL_CLASS
-                  .replicables_for_geo_node
-                  .id_in(range)
-                  .pluck(self::MODEL_CLASS.arel_table[:id])
-
-    tracked_ids = self.pluck_model_ids_in_range(range)
-
-    untracked_ids = source_ids - tracked_ids
-    unused_tracked_ids = tracked_ids - source_ids
-
-    [untracked_ids, unused_tracked_ids]
   end
 
   def model_record_id

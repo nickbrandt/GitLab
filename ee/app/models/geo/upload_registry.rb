@@ -12,12 +12,41 @@ class Geo::UploadRegistry < Geo::BaseRegistry
 
   scope :fresh, -> { order(created_at: :desc) }
 
-  def self.finder_class
-    ::Geo::AttachmentRegistryFinder
-  end
-
+  # Returns untracked uploads as well as tracked uploads that are unused.
+  #
+  # Untracked uploads is an array where each item is a tuple of [id, file_type]
+  # that is supposed to be synced but don't yet have a registry entry.
+  #
+  # Unused uploads is an array where each item is a tuple of [id, file_type]
+  # that is not supposed to be synced but already have a registry entry. For
+  # example:
+  #
+  #   - orphaned registries
+  #   - records that became excluded from selective sync
+  #   - records that are in object storage, and `sync_object_storage` became
+  #     disabled
+  #
+  # We compute both sets in this method to reduce the number of DB queries
+  # performed.
+  #
+  # @return [Array] the first element is an Array of untracked uploads, and the
+  #                 second element is an Array of tracked uploads that are unused.
+  #                 For example: [[[1, 'avatar'], [5, 'file']], [[3, 'attachment']]]
   def self.find_registry_differences(range)
-    finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
+    source =
+      self::MODEL_CLASS.replicables_for_geo_node
+          .id_in(range)
+          .pluck(self::MODEL_CLASS.arel_table[:id], self::MODEL_CLASS.arel_table[:uploader])
+          .map! { |id, uploader| [id, uploader.sub(/Uploader\z/, '').underscore] }
+
+    tracked =
+      self.model_id_in(range)
+          .pluck(:file_id, :file_type)
+
+    untracked = source - tracked
+    unused_tracked = tracked - source
+
+    [untracked, unused_tracked]
   end
 
   # If false, RegistryConsistencyService will frequently check the end of the

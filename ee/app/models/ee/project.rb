@@ -192,6 +192,10 @@ module EE
     class_methods do
       extend ::Gitlab::Utils::Override
 
+      def replicables_for_geo_node(node = ::Gitlab::Geo.current_node)
+        node.projects
+      end
+
       def search_by_visibility(level)
         where(visibility_level: ::Gitlab::VisibilityLevel.string_options[level])
       end

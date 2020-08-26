@@ -27,9 +27,5 @@ module Geo
         .limit(batch_size)
     end
     # rubocop:enable CodeReuse/ActiveRecord
-
-    def local_storage_only?
-      !current_node&.sync_object_storage
-    end
   end
 end

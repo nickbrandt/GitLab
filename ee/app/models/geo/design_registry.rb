@@ -51,12 +51,14 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     project_ids
   end
 
-  def self.finder_class
-    ::Geo::DesignRegistryFinder
-  end
-
   def self.find_registry_differences(range)
-    finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
+    source_ids = Gitlab::Geo.current_node.designs.id_in(range).pluck_primary_key
+    tracked_ids = self.pluck_model_ids_in_range(range)
+
+    untracked_ids = source_ids - tracked_ids
+    unused_tracked_ids = tracked_ids - source_ids
+
+    [untracked_ids, unused_tracked_ids]
   end
 
   def self.find_unsynced_registries(batch_size:, except_ids: [])

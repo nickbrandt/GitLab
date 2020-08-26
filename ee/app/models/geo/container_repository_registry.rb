@@ -38,14 +38,6 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
     end
   end
 
-  def self.finder_class
-    ::Geo::ContainerRepositoryRegistryFinder
-  end
-
-  def self.find_registry_differences(range)
-    finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
-  end
-
   def self.find_failed_registries(batch_size:, except_ids: [])
     super
       .order(Gitlab::Database.nulls_first_order(:last_synced_at))
