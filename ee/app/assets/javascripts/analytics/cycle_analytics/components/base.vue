@@ -65,10 +65,6 @@ export default {
       'selectedGroup',
       'selectedProjects',
       'selectedStage',
-      'selectedMilestone',
-      'selectedAuthor',
-      'selectedLabels',
-      'selectedAssignees',
       'stages',
       'currentStageEvents',
       'errorCode',
@@ -123,18 +119,12 @@ export default {
     },
     query() {
       const selectedProjectIds = this.selectedProjectIds?.length ? this.selectedProjectIds : null;
-      const selectedLabels = this.selectedLabels?.length ? this.selectedLabels : null;
-      const selectedAssignees = this.selectedAssignees?.length ? this.selectedAssignees : null;
 
       return {
         group_id: !this.hideGroupDropDown ? this.currentGroupPath : null,
-        'project_ids[]': selectedProjectIds,
+        project_ids: selectedProjectIds,
         created_after: toYmd(this.startDate),
         created_before: toYmd(this.endDate),
-        milestone_title: this.selectedMilestone,
-        author_username: this.selectedAuthor,
-        'label_name[]': selectedLabels,
-        'assignee_username[]': selectedAssignees,
       };
     },
     stageCount() {
