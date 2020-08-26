@@ -33,27 +33,6 @@ module EE
         !PushRule.global&.commit_committer_check
       end
 
-      with_scope :global
-      condition(:owner_cannot_modify_approvers_rules) do
-        License.feature_available?(:admin_merge_request_approvers_rules) &&
-          ::Gitlab::CurrentSettings.current_application_settings
-            .disable_overriding_approvers_per_merge_request
-      end
-
-      with_scope :global
-      condition(:owner_cannot_modify_merge_request_author_setting) do
-        License.feature_available?(:admin_merge_request_approvers_rules) &&
-          ::Gitlab::CurrentSettings.current_application_settings
-            .prevent_merge_requests_author_approval
-      end
-
-      with_scope :global
-      condition(:owner_cannot_modify_merge_request_committer_setting) do
-        License.feature_available?(:admin_merge_request_approvers_rules) &&
-          ::Gitlab::CurrentSettings.current_application_settings
-            .prevent_merge_requests_committers_approval
-      end
-
       with_scope :subject
       condition(:regulated_merge_request_approval_settings) do
         License.feature_available?(:admin_merge_request_approvers_rules) &&
@@ -62,18 +41,6 @@ module EE
 
       condition(:project_merge_request_analytics_available) do
         @subject.feature_available?(:project_merge_request_analytics)
-      end
-
-      condition(:cannot_modify_approvers_rules) do
-        regulated_merge_request_approval_settings?
-      end
-
-      condition(:cannot_modify_merge_request_author_setting) do
-        regulated_merge_request_approval_settings?
-      end
-
-      condition(:cannot_modify_merge_request_committer_setting) do
-        regulated_merge_request_approval_settings?
       end
 
       with_scope :subject
@@ -267,7 +234,6 @@ module EE
         enable :update_approvers
         enable :admin_feature_flags_client
         enable :modify_approvers_rules
-        enable :modify_approvers_list
         enable :modify_auto_fix_setting
         enable :modify_merge_request_author_setting
         enable :modify_merge_request_committer_setting
@@ -346,16 +312,9 @@ module EE
         prevent :read_project
       end
 
-      rule { cannot_modify_approvers_rules }.policy do
+      rule { regulated_merge_request_approval_settings }.policy do
         prevent :modify_approvers_rules
-        prevent :modify_approvers_list
-      end
-
-      rule { cannot_modify_merge_request_author_setting }.policy do
         prevent :modify_merge_request_author_setting
-      end
-
-      rule { cannot_modify_merge_request_committer_setting }.policy do
         prevent :modify_merge_request_committer_setting
       end
 
