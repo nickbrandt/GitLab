@@ -254,7 +254,9 @@ RSpec.describe GitlabSubscription do
 
   describe 'callbacks' do
     context 'after_commit :index_namespace' do
-      let(:gitlab_subscription) { build(:gitlab_subscription, plan) }
+      let_it_be(:namespace) { create(:namespace) }
+
+      let(:gitlab_subscription) { build(:gitlab_subscription, plan, namespace: namespace) }
       let(:dev_env_or_com) { true }
       let(:expiration_date) { Date.today + 10 }
       let(:plan) { :bronze }
@@ -271,7 +273,7 @@ RSpec.describe GitlabSubscription do
       end
 
       context 'when it is a trial' do
-        let(:gitlab_subscription) { build(:gitlab_subscription, :active_trial) }
+        let(:gitlab_subscription) { build(:gitlab_subscription, :active_trial, namespace: namespace) }
 
         it 'indexes the namespace' do
           expect(ElasticsearchIndexedNamespace).to receive(:safe_find_or_create_by!).with(namespace_id: gitlab_subscription.namespace_id)

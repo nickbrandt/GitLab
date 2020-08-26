@@ -18,8 +18,13 @@ RSpec.describe ElasticsearchIndexedNamespace do
   end
 
   it_behaves_like 'an elasticsearch indexed container' do
+    let_it_be(:namespace) { create(:namespace) }
+
     let(:container) { :elasticsearch_indexed_namespace }
-    let(:attribute) { :namespace_id }
+    let(:container_attributes) { { namespace: namespace } }
+
+    let(:required_attribute) { :namespace_id }
+
     let(:index_action) do
       expect(ElasticNamespaceIndexerWorker).to receive(:perform_async).with(subject.namespace_id, :index)
     end
