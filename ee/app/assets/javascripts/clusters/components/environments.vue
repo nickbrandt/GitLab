@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable vue/no-v-html */
 import { GlTable, GlEmptyState, GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';

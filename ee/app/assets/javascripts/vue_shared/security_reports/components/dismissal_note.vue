@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable vue/no-v-html */
 import { escape } from 'lodash';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { GlButton } from '@gitlab/ui';

@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable vue/no-v-html */
 import { mapGetters } from 'vuex';
 import { GlEmptyState } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
