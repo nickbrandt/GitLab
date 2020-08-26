@@ -3304,7 +3304,7 @@ msgstr ""
 msgid "Are you sure? Removing this GPG key does not affect already signed commits."
 msgstr ""
 
-msgid "Are you sure? The device will be signed out of GitLab."
+msgid "Are you sure? The device will be signed out of GitLab and all remember me tokens revoked."
 msgstr ""
 
 msgid "Are you sure? This will invalidate your registered applications and U2F devices."
