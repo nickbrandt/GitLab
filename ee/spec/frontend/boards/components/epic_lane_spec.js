@@ -4,7 +4,7 @@ import EpicLane from 'ee/boards/components/epic_lane.vue';
 import IssuesLaneList from 'ee/boards/components/issues_lane_list.vue';
 import { GlIcon } from '@gitlab/ui';
 import getters from 'ee/boards/stores/getters';
-import { mockEpic, mockListsWithModel, mockIssuesByListId } from '../mock_data';
+import { mockEpic, mockListsWithModel, mockIssuesByListId, issues } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -16,6 +16,7 @@ describe('EpicLane', () => {
     return new Vuex.Store({
       state: {
         issuesByListId: mockIssuesByListId,
+        issues,
       },
       getters,
     });

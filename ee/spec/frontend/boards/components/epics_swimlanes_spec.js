@@ -6,7 +6,7 @@ import EpicLane from 'ee/boards/components/epic_lane.vue';
 import IssueLaneList from 'ee/boards/components/issues_lane_list.vue';
 import getters from 'ee/boards/stores/getters';
 import { GlIcon } from '@gitlab/ui';
-import { mockListsWithModel, mockEpics, mockIssuesByListId } from '../mock_data';
+import { mockListsWithModel, mockEpics, mockIssuesByListId, issues } from '../mock_data';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -23,6 +23,7 @@ describe('EpicsSwimlanes', () => {
         epics: mockEpics,
         isLoadingIssues: false,
         issuesByListId: mockIssuesByListId,
+        issues,
       },
       getters,
     });

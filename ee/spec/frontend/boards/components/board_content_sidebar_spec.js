@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { GlDrawer } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
 import BoardContentSidebar from 'ee_component/boards/components/board_content_sidebar.vue';
@@ -10,7 +10,7 @@ describe('ee/BoardContentSidebar', () => {
   let store;
 
   const createComponent = () => {
-    wrapper = shallowMount(BoardContentSidebar, {
+    wrapper = mount(BoardContentSidebar, {
       store,
     });
   };
@@ -19,6 +19,8 @@ describe('ee/BoardContentSidebar', () => {
     store = createStore();
     store.state.sidebarType = ISSUABLE;
     store.state.activeId = 1;
+    store.state.issues = { '1': { title: 'One', referencePath: 'path' } };
+    store.state.activeId = '1';
 
     createComponent();
   });
@@ -33,6 +35,14 @@ describe('ee/BoardContentSidebar', () => {
 
   it('applies an open attribute', () => {
     expect(wrapper.find(GlDrawer).props('open')).toBe(true);
+  });
+
+  it('renders a title of an issue in the sidebar', () => {
+    expect(wrapper.find('[data-testid="issue-title"]').text()).toContain('One');
+  });
+
+  it('renders a referencePath of an issue in the sidebar', () => {
+    expect(wrapper.find('[data-testid="issue-title"]').text()).toContain('path');
   });
 
   describe('when we emit close', () => {

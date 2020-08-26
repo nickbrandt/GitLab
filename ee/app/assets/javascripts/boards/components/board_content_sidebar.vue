@@ -10,10 +10,13 @@ export default {
     GlDrawer,
   },
   computed: {
-    ...mapGetters(['isSidebarOpen']),
+    ...mapGetters(['isSidebarOpen', 'getActiveIssue']),
     ...mapState(['sidebarType']),
     showSidebar() {
       return this.sidebarType === ISSUABLE;
+    },
+    issueTitle() {
+      return this.getActiveIssue.title;
     },
   },
   methods: {
@@ -28,5 +31,12 @@ export default {
     :open="isSidebarOpen"
     :header-height="$options.headerHeight"
     @close="unsetActiveId"
-  />
+  >
+    <template #header>
+      <div data-testid="issue-title">
+        <p class="gl-font-weight-bold">{{ issueTitle }}</p>
+        <p class="gl-mb-0">{{ getActiveIssue.referencePath }}</p>
+      </div>
+    </template>
+  </gl-drawer>
 </template>

@@ -3,8 +3,10 @@ import gettersCE from '~/boards/stores/getters';
 export default {
   ...gettersCE,
 
-  getIssues: state => listId => {
-    return state.issuesByListId[listId] || [];
+  getIssues: (state, getters) => listId => {
+    const listIssueIds = state.issuesByListId[listId] || [];
+
+    return listIssueIds.map(id => getters.getIssueById(id));
   },
   getIssuesByEpic: (state, getters) => (listId, epicId) => {
     return getters.getIssues(listId).filter(issue => issue.epic && issue.epic.id === epicId);
