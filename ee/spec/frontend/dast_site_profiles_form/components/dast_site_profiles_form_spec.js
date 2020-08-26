@@ -66,7 +66,7 @@ describe('OnDemandScansApp', () => {
 
   it('renders properly', () => {
     createComponent();
-    expect(wrapper.isVueInstance()).toBe(true);
+    expect(wrapper.html()).not.toBe('');
   });
 
   describe('submit button', () => {
