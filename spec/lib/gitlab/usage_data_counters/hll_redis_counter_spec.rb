@@ -76,58 +76,57 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       expect { described_class.track_event(entity1, 'unknown', Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownEvent)
     end
 
-    describe 'expiry' do
-      context 'for weekly events' do
-        it 'sets the keys in Redis to expire automatically after the given expiry time' do
-          described_class.track_event(entity1, "g_analytics_contribution")
+    context 'for weekly events' do
+      it 'expire after given time' do
+        described_class.track_event(entity1, "g_analytics_contribution")
 
-          Gitlab::Redis::SharedState.with do |redis|
-            keys = redis.scan_each(match: "g_{analytics}_contribution-*").to_a
-            expect(keys).not_to be_empty
+        Gitlab::Redis::SharedState.with do |redis|
+          keys = redis.scan_each(match: "g_{analytics}_contribution-*").to_a
+          expect(keys).not_to be_empty
 
-            keys.each do |key|
-              expect(redis.ttl(key)).to be_within(5.seconds).of(12.weeks)
-            end
-          end
-        end
-
-        it 'sets the keys in Redis to expire automatically after 12 weeks' do
-          described_class.track_event(entity1, "g_analytics_contribution")
-
-          Gitlab::Redis::SharedState.with do |redis|
-            keys = redis.scan_each(match: "g_{analytics}_contribution-*").to_a
-            expect(keys).not_to be_empty
-
-            keys.each do |key|
-              expect(redis.ttl(key)).to be_within(5.seconds).of(12.weeks)
-            end
+          keys.each do |key|
+            expect(redis.ttl(key)).to be_within(5.seconds).of(12.weeks)
           end
         end
       end
 
-      context 'for daily events' do
-        it 'sets the keys in Redis to expire after the given expiry time' do
-          described_class.track_event(entity1, "g_analytics_search")
+      it 'expire after 6 weeks by default' do
+        described_class.track_event(entity1, "g_analytics_productivity")
 
-          Gitlab::Redis::SharedState.with do |redis|
-            keys = redis.scan_each(match: "*-g_{analytics}_search").to_a
-            expect(keys).not_to be_empty
+        Gitlab::Redis::SharedState.with do |redis|
+          keys = redis.scan_each(match: "g_{analytics}_productivity-*").to_a
+          expect(keys).not_to be_empty
 
-            keys.each do |key|
-              expect(redis.ttl(key)).to be_within(5.seconds).of(84.days)
-            end
+          keys.each do |key|
+            expect(redis.ttl(key)).to be_within(5.seconds).of(6.weeks)
           end
         end
-        it 'sets the keys in Redis to expire after 29 days by default' do
-          described_class.track_event(entity1, "no_slot")
+      end
+    end
 
-          Gitlab::Redis::SharedState.with do |redis|
-            keys = redis.scan_each(match: "*-{no_slot}").to_a
-            expect(keys).not_to be_empty
+    context 'for daily events' do
+      it 'expire after the given expiry time' do
+        described_class.track_event(entity1, "g_analytics_search")
 
-            keys.each do |key|
-              expect(redis.ttl(key)).to be_within(5.seconds).of(29.days)
-            end
+        Gitlab::Redis::SharedState.with do |redis|
+          keys = redis.scan_each(match: "*-g_{analytics}_search").to_a
+          expect(keys).not_to be_empty
+
+          keys.each do |key|
+            expect(redis.ttl(key)).to be_within(5.seconds).of(84.days)
+          end
+        end
+      end
+
+      it 'expire after 29 days by default' do
+        described_class.track_event(entity1, "no_slot")
+
+        Gitlab::Redis::SharedState.with do |redis|
+          keys = redis.scan_each(match: "*-{no_slot}").to_a
+          expect(keys).not_to be_empty
+
+          keys.each do |key|
+            expect(redis.ttl(key)).to be_within(5.seconds).of(29.days)
           end
         end
       end
@@ -178,7 +177,6 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       it "raise error if metrics don't have same aggregation" do
         expect { described_class.unique_events(event_names: [daily_event, weekly_event], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should have same aggregation level')
       end
-
 
       context 'when data for the last complete week' do
         it { expect(described_class.unique_events(event_names: weekly_event, start_date: 1.week.ago, end_date: Date.current)).to eq(1) }
