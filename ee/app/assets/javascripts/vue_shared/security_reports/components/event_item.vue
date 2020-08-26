@@ -63,7 +63,7 @@ export default {
 
 <template>
   <div :id="noteId" class="d-flex align-items-center">
-    <div class="circle-icon-container flex-shrink-0" :class="iconClass">
+    <div class="circle-icon-container gl-flex-shrink-0" :class="iconClass">
       <gl-icon :size="16" :name="iconName" />
     </div>
     <div class="ml-3 flex-grow-1" data-qa-selector="event_item_content">
@@ -82,7 +82,7 @@ export default {
 
     <slot v-if="showRightSlot" name="right-content"></slot>
 
-    <div v-else-if="showActionButtons" class="flex-shrink-0">
+    <div v-else-if="showActionButtons" class="gl-flex-shrink-0">
       <gl-deprecated-button
         v-for="button in actionButtons"
         :key="button.title"
