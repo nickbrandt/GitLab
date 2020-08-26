@@ -64,10 +64,6 @@ module Gitlab
         ::Feature.enabled?(:ci_plan_needs_size_limit, project, default_enabled: true)
       end
 
-      def self.job_entry_matches_all_keys?
-        ::Feature.enabled?(:ci_job_entry_matches_all_keys)
-      end
-
       def self.lint_creates_pipeline_with_dry_run?(project)
         ::Feature.enabled?(:ci_lint_creates_pipeline_with_dry_run, project, default_enabled: true)
       end
