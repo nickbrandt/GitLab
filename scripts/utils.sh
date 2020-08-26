@@ -1,3 +1,33 @@
+function echoerr() {
+  local header="${2}"
+
+  if [ -n "${header}" ]; then
+    printf "\n\033[0;31m** %s **\n\033[0m" "${1}" >&2;
+  else
+    printf "\033[0;31m%s\n\033[0m" "${1}" >&2;
+  fi
+}
+
+function echoinfo() {
+  local header="${2}"
+
+  if [ -n "${header}" ]; then
+    printf "\n\033[0;33m** %s **\n\033[0m" "${1}" >&2;
+  else
+    printf "\033[0;33m%s\n\033[0m" "${1}" >&2;
+  fi
+}
+
+function echosuccess() {
+  local header="${2}"
+
+  if [ -n "${header}" ]; then
+    printf "\n\033[0;32m** %s **\n\033[0m" "${1}" >&2;
+  else
+    printf "\033[0;32m%s\n\033[0m" "${1}" >&2;
+  fi
+}
+
 function retry() {
   if eval "$@"; then
     return 0
@@ -40,51 +70,47 @@ function install_tff_gem() {
 }
 
 function run_timed_command() {
-  local cmd="${1}"
+  local command="${1}"
+  local log_file="${2}"
   local start=$(date +%s)
-  echosuccess "\$ ${cmd}"
-  eval "${cmd}"
+
+  if [[ -n "${log_file}" ]]; then
+    command="${command} > ${log_file} 2>&1"
+  fi
+  echosuccess "\$ ${command}"
+  eval "${command}"
+
   local ret=$?
   local end=$(date +%s)
   local runtime=$((end-start))
 
+  echo "[run_timed_command] Return code for ${command} was ${ret}"
+
   if [[ $ret -eq 0 ]]; then
-    echosuccess "==> '${cmd}' succeeded in ${runtime} seconds."
+    echosuccess "==> '${command}' succeeded in ${runtime} seconds."
     return 0
   else
-    echoerr "==> '${cmd}' failed (${ret}) in ${runtime} seconds."
+    echoerr "==> '${command}' failed (${ret}) in ${runtime} seconds."
     return $ret
   fi
 }
 
-function echoerr() {
-  local header="${2}"
+function run_timed_command_with_tail_in_case_of_fail() {
+   local command="${1}"
+   local log_file="${2}"
 
-  if [ -n "${header}" ]; then
-    printf "\n\033[0;31m** %s **\n\033[0m" "${1}" >&2;
-  else
-    printf "\033[0;31m%s\n\033[0m" "${1}" >&2;
+   run_timed_command "${command}" "${log_file}"
+   local ret=$?
+
+   echo "[run_timed_command_with_tail_in_case_of_fail] Return code for run_timed_command was ${ret}"
+
+  if [[ $ret -ne 0 ]]; then
+    tail -n 200 "${log_file}"
+    echoerr "==> 'Compilation failed at some point! We printed the last 200 lines of stacktrace. For the full log, see ${CI_JOB_URL}/artifacts/file/${log_file}"
+    return $ret
   fi
-}
 
-function echoinfo() {
-  local header="${2}"
-
-  if [ -n "${header}" ]; then
-    printf "\n\033[0;33m** %s **\n\033[0m" "${1}" >&2;
-  else
-    printf "\033[0;33m%s\n\033[0m" "${1}" >&2;
-  fi
-}
-
-function echosuccess() {
-  local header="${2}"
-
-  if [ -n "${header}" ]; then
-    printf "\n\033[0;32m** %s **\n\033[0m" "${1}" >&2;
-  else
-    printf "\033[0;32m%s\n\033[0m" "${1}" >&2;
-  fi
+  return 0
 }
 
 function get_job_id() {
