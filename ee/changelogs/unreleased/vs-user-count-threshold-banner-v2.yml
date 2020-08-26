@@ -1,0 +1,5 @@
+---
+title: Use active user count instead historial max
+merge_request: 37916
+author:
+type: fixed

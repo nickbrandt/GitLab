@@ -1,4 +1,5 @@
 <script>
+import { mapActions } from 'vuex';
 import {
   GlFormGroup,
   GlFormSelect,
@@ -6,7 +7,6 @@ import {
   GlFormTextarea,
   GlToggle,
   GlSegmentedControl,
-  GlLink,
   GlButton,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
@@ -15,7 +15,13 @@ import NetworkPolicyEditor from '../network_policy_editor.vue';
 import PolicyRuleBuilder from './policy_rule_builder.vue';
 import PolicyPreview from './policy_preview.vue';
 import PolicyActionPicker from './policy_action_picker.vue';
-import { EditorModeRule, EditorModeYAML } from './constants';
+import {
+  EditorModeRule,
+  EditorModeYAML,
+  EndpointMatchModeAny,
+  RuleTypeEndpoint,
+} from './constants';
+import { buildRule } from './lib/rules';
 
 export default {
   components: {
@@ -25,7 +31,6 @@ export default {
     GlFormTextarea,
     GlToggle,
     GlSegmentedControl,
-    GlLink,
     GlButton,
     EnvironmentPicker,
     NetworkPolicyEditor,
@@ -34,7 +39,17 @@ export default {
     PolicyActionPicker,
   },
   data() {
-    return { editorMode: EditorModeRule };
+    return {
+      editorMode: EditorModeRule,
+      policy: {
+        name: '',
+        description: '',
+        isEnabled: false,
+        endpointMatchMode: EndpointMatchModeAny,
+        endpointLabels: '',
+        rules: [],
+      },
+    };
   },
   computed: {
     shouldShowRuleEditor() {
@@ -42,6 +57,25 @@ export default {
     },
     shouldShowYamlEditor() {
       return this.editorMode === EditorModeYAML;
+    },
+  },
+  created() {
+    this.fetchEnvironments();
+  },
+  methods: {
+    ...mapActions('threatMonitoring', ['fetchEnvironments']),
+    addRule() {
+      this.policy.rules.push(buildRule(RuleTypeEndpoint));
+    },
+    updateEndpointMatchMode(mode) {
+      this.policy.endpointMatchMode = mode;
+    },
+    updateEndpointLabels(labels) {
+      this.policy.endpointLabels = labels;
+    },
+    updateRuleType(ruleIdx, ruleType) {
+      const rule = this.policy.rules[ruleIdx];
+      this.policy.rules.splice(ruleIdx, 1, buildRule(ruleType, rule));
     },
   },
   policyTypes: [{ value: 'networkPolicy', text: s__('NetworkPolicies|Network Policy') }],
@@ -73,14 +107,14 @@ export default {
       </div>
       <div class="col-sm-6 col-md-6 col-lg-5 col-xl-4">
         <gl-form-group :label="s__('NetworkPolicies|Name')" label-for="policyName">
-          <gl-form-input id="policyName" />
+          <gl-form-input id="policyName" v-model="policy.name" />
         </gl-form-group>
       </div>
     </div>
     <div class="row">
       <div class="col-sm-12 col-md-10 col-lg-8 col-xl-6">
         <gl-form-group :label="s__('NetworkPolicies|Description')" label-for="policyDescription">
-          <gl-form-textarea id="policyDescription" />
+          <gl-form-textarea id="policyDescription" v-model="policy.description" />
         </gl-form-group>
       </div>
     </div>
@@ -90,7 +124,7 @@ export default {
     <div class="row">
       <div class="col-md-auto">
         <gl-form-group :label="s__('NetworkPolicies|Policy status')" label-for="policyStatus">
-          <gl-toggle id="policyStatus" />
+          <gl-toggle id="policyStatus" v-model="policy.isEnabled" />
         </gl-form-group>
       </div>
     </div>
@@ -105,10 +139,23 @@ export default {
     <div v-if="shouldShowRuleEditor" class="row" data-testid="rule-editor">
       <div class="col-sm-12 col-md-6 col-lg-7 col-xl-8">
         <h4>{{ s__('NetworkPolicies|Rules') }}</h4>
-        <policy-rule-builder />
+        <policy-rule-builder
+          v-for="(rule, idx) in policy.rules"
+          :key="idx"
+          class="gl-mb-4"
+          :rule="rule"
+          :endpoint-match-mode="policy.endpointMatchMode"
+          :endpoint-labels="policy.endpointLabels"
+          :endpoint-selector-disabled="idx > 0"
+          @rule-type-change="updateRuleType(idx, $event)"
+          @endpoint-match-mode-change="updateEndpointMatchMode"
+          @endpoint-labels-change="updateEndpointLabels"
+        />
 
-        <div class="gl-my-2 gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100">
-          <gl-link href="#">{{ s__('Network Policy|New rule') }}</gl-link>
+        <div class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100">
+          <gl-button variant="link" category="primary" data-testid="add-rule" @click="addRule">{{
+            s__('Network Policy|New rule')
+          }}</gl-button>
         </div>
 
         <h4>{{ s__('NetworkPolicies|Actions') }}</h4>

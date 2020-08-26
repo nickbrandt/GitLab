@@ -4,23 +4,17 @@ import { __ } from '~/locale';
 import Api from '~/api';
 import * as types from './mutation_types';
 
-const appendExtension = path => (path.indexOf('.') > -1 ? path : `${path}.json`);
-
-// TODO: After we remove instance VSA we can rely on the paths from the BE
-// https://gitlab.com/gitlab-org/gitlab/-/issues/223735
-export const setPaths = ({ commit }, { groupPath = '', milestonesPath = '', labelsPath = '' }) => {
-  const ms = milestonesPath || `/groups/${groupPath}/-/milestones`;
-  const ls = labelsPath || `/groups/${groupPath}/-/labels`;
-  commit(types.SET_MILESTONES_PATH, appendExtension(ms));
-  commit(types.SET_LABELS_PATH, appendExtension(ls));
+export const setEndpoints = ({ commit }, { milestonesEndpoint, labelsEndpoint }) => {
+  commit(types.SET_MILESTONES_ENDPOINT, milestonesEndpoint);
+  commit(types.SET_LABELS_ENDPOINT, labelsEndpoint);
 };
 
 export const fetchMilestones = ({ commit, state }, search_title = '') => {
   commit(types.REQUEST_MILESTONES);
-  const { milestonesPath } = state;
+  const { milestonesEndpoint } = state;
 
   return axios
-    .get(milestonesPath, { params: { search_title } })
+    .get(milestonesEndpoint, { params: { search_title } })
     .then(response => {
       commit(types.RECEIVE_MILESTONES_SUCCESS, response.data);
       return response;
@@ -36,7 +30,7 @@ export const fetchLabels = ({ commit, state }, search = '') => {
   commit(types.REQUEST_LABELS);
 
   return axios
-    .get(state.labelsPath, { params: { search } })
+    .get(state.labelsEndpoint, { params: { search } })
     .then(response => {
       commit(types.RECEIVE_LABELS_SUCCESS, response.data);
       return response;
@@ -85,15 +79,12 @@ export const fetchAssignees = ({ commit, rootGetters }, query = '') => {
   });
 };
 
-export const setFilters = ({ dispatch }, nextFilters) => {
-  return Promise.resolve()
-    .then(() => dispatch('setSelectedFilters', nextFilters, { root: true }))
-    .then(() => dispatch('fetchCycleAnalyticsData', null, { root: true }));
+export const setFilters = ({ commit, dispatch }, filters) => {
+  commit(types.SET_SELECTED_FILTERS, filters);
+
+  return dispatch('setFilters', filters, { root: true });
 };
 
-export const initialize = ({ dispatch, commit }, initialFilters) => {
-  commit(types.INITIALIZE, initialFilters);
-  return dispatch('setPaths', initialFilters).then(() =>
-    dispatch('setSelectedFilters', initialFilters, { root: true }),
-  );
+export const initialize = ({ commit }, initialFilters) => {
+  commit(types.SET_SELECTED_FILTERS, initialFilters);
 };

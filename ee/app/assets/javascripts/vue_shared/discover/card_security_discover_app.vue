@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable vue/no-v-html */
 import { GlButton, GlTooltipDirective, GlCarousel, GlCarouselSlide } from '@gitlab/ui';
 import securityDependencyImageUrl from 'ee_images/promotions/security-dependencies.png';
 import securityScanningImageUrl from 'ee_images/promotions/security-scanning.png';

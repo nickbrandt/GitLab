@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable vue/no-v-html */
 import $ from 'jquery';
 import { GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import { __, s__ } from '~/locale';

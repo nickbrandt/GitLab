@@ -1,26 +1,24 @@
 export default () => ({
-  milestonesPath: '',
-  labelsPath: '',
+  milestonesEndpoint: '',
+  labelsEndpoint: '',
   milestones: {
     isLoading: false,
     data: [],
+    selected: null,
   },
   labels: {
     isLoading: false,
     data: [],
+    selected: [],
   },
   authors: {
     isLoading: false,
     data: [],
+    selected: null,
   },
   assignees: {
     isLoading: false,
     data: [],
-  },
-  initialTokens: {
-    selectedMilestone: null,
-    selectedAuthor: null,
-    selectedAssignees: [],
-    selectedLabels: [],
+    selected: [],
   },
 });

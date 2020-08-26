@@ -13,7 +13,7 @@ RSpec.describe 'New group screen', :js do
 
   it 'shows the progress bar with the correct steps' do
     expect(page).to have_content('Create your group')
-    expect(page).to have_content('1. Your profile 2. Your GitLab group 3. Your first project')
+    expect(page).to have_content('Your profile Your GitLab group Your first project')
   end
 
   it 'autofills the group path' do

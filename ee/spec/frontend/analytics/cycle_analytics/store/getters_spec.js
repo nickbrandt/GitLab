@@ -121,10 +121,12 @@ describe('Cycle analytics getters', () => {
         startDate,
         endDate,
         selectedProjects,
-        selectedAuthor,
-        selectedMilestone,
-        selectedAssignees,
-        selectedLabels,
+        filters: {
+          authors: { selected: selectedAuthor },
+          milestones: { selected: selectedMilestone },
+          assignees: { selected: selectedAssignees },
+          labels: { selected: selectedLabels },
+        },
       };
     });
 
