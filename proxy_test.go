@@ -3,12 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
-	"strings"
 	"testing"
 	"time"
 
@@ -33,27 +32,20 @@ func newProxy(url string, rt http.RoundTripper) *proxy.Proxy {
 
 func TestProxyRequest(t *testing.T) {
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			t.Fatal("Expected POST request")
-		}
+		require.Equal(t, "POST", r.Method, "method")
+		require.Equal(t, "test", r.Header.Get("Custom-Header"), "custom header")
+		require.Equal(t, testVersion, r.Header.Get("Gitlab-Workhorse"), "version header")
 
-		if r.Header.Get("Custom-Header") != "test" {
-			t.Fatal("Missing custom header")
-		}
+		require.Regexp(
+			t,
+			regexp.MustCompile(`\A1`),
+			r.Header.Get("Gitlab-Workhorse-Proxy-Start"),
+			"expect Gitlab-Workhorse-Proxy-Start to start with 1",
+		)
 
-		if h := r.Header.Get("Gitlab-Workhorse"); h != testVersion {
-			t.Fatalf("Missing GitLab-Workhorse header: want %q, got %q", testVersion, h)
-		}
-
-		if h := r.Header.Get("Gitlab-Workhorse-Proxy-Start"); !strings.HasPrefix(h, "1") {
-			t.Fatalf("Expect Gitlab-Workhorse-Proxy-Start to start with 1, got %q", h)
-		}
-
-		var body bytes.Buffer
-		io.Copy(&body, r.Body)
-		if body.String() != "REQUEST" {
-			t.Fatal("Expected REQUEST in request body")
-		}
+		body, err := ioutil.ReadAll(r.Body)
+		require.NoError(t, err, "read body")
+		require.Equal(t, "REQUEST", string(body), "body contents")
 
 		w.Header().Set("Custom-Response-Header", "test")
 		w.WriteHeader(202)
@@ -61,9 +53,7 @@ func TestProxyRequest(t *testing.T) {
 	})
 
 	httpRequest, err := http.NewRequest("POST", ts.URL+"/url/path", bytes.NewBufferString("REQUEST"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	httpRequest.Header.Set("Custom-Header", "test")
 
 	w := httptest.NewRecorder()
@@ -71,16 +61,12 @@ func TestProxyRequest(t *testing.T) {
 	require.Equal(t, 202, w.Code)
 	testhelper.RequireResponseBody(t, w, "RESPONSE")
 
-	if w.Header().Get("Custom-Response-Header") != "test" {
-		t.Fatal("Expected custom response header")
-	}
+	require.Equal(t, "test", w.Header().Get("Custom-Response-Header"), "custom response header")
 }
 
 func TestProxyError(t *testing.T) {
 	httpRequest, err := http.NewRequest("POST", "/url/path", bytes.NewBufferString("REQUEST"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	httpRequest.Header.Set("Custom-Header", "test")
 
 	w := httptest.NewRecorder()
@@ -95,9 +81,7 @@ func TestProxyReadTimeout(t *testing.T) {
 	})
 
 	httpRequest, err := http.NewRequest("POST", "http://localhost/url/path", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	rt := badgateway.NewRoundTripper(false, &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
@@ -124,9 +108,7 @@ func TestProxyHandlerTimeout(t *testing.T) {
 	)
 
 	httpRequest, err := http.NewRequest("POST", "http://localhost/url/path", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)

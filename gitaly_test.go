@@ -167,6 +167,11 @@ func TestGetInfoRefsProxiedToGitalyInterruptedStream(t *testing.T) {
 		close(done)
 	}()
 
+	waitDone(t, done)
+}
+
+func waitDone(t *testing.T, done chan struct{}) {
+	t.Helper()
 	select {
 	case <-done:
 		return
@@ -252,12 +257,7 @@ func TestPostReceivePackProxiedToGitalyInterrupted(t *testing.T) {
 		close(done)
 	}()
 
-	select {
-	case <-done:
-		return
-	case <-time.After(10 * time.Second):
-		t.Fatal("time out waiting for gitaly handler to return")
-	}
+	waitDone(t, done)
 }
 
 // ReaderFunc is an adapter to turn a conforming function into an io.Reader.
@@ -319,9 +319,7 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 			m.Lock()
 			requestFinished := requestReadFinished
 			m.Unlock()
-			if !requestFinished {
-				t.Fatalf("response written before request was fully read")
-			}
+			require.True(t, requestFinished, "response written before request was fully read")
 
 			body := string(testhelper.ReadAll(t, resp.Body))
 			bodySplit := strings.SplitN(body, "\000", 2)
@@ -376,12 +374,7 @@ func TestPostUploadPackProxiedToGitalyInterrupted(t *testing.T) {
 		close(done)
 	}()
 
-	select {
-	case <-done:
-		return
-	case <-time.After(10 * time.Second):
-		t.Fatal("time out waiting for gitaly handler to return")
-	}
+	waitDone(t, done)
 }
 
 func TestGetDiffProxiedToGitalySuccessfully(t *testing.T) {
@@ -447,12 +440,7 @@ func TestGetBlobProxiedToGitalyInterruptedStream(t *testing.T) {
 		close(done)
 	}()
 
-	select {
-	case <-done:
-		return
-	case <-time.After(10 * time.Second):
-		t.Fatal("time out waiting for gitaly handler to return")
-	}
+	waitDone(t, done)
 }
 
 func TestGetArchiveProxiedToGitalySuccessfully(t *testing.T) {
@@ -521,12 +509,7 @@ func TestGetArchiveProxiedToGitalyInterruptedStream(t *testing.T) {
 		close(done)
 	}()
 
-	select {
-	case <-done:
-		return
-	case <-time.After(10 * time.Second):
-		t.Fatal("time out waiting for gitaly handler to return")
-	}
+	waitDone(t, done)
 }
 
 func TestGetDiffProxiedToGitalyInterruptedStream(t *testing.T) {
@@ -553,12 +536,7 @@ func TestGetDiffProxiedToGitalyInterruptedStream(t *testing.T) {
 		close(done)
 	}()
 
-	select {
-	case <-done:
-		return
-	case <-time.After(10 * time.Second):
-		t.Fatal("time out waiting for gitaly handler to return")
-	}
+	waitDone(t, done)
 }
 
 func TestGetPatchProxiedToGitalyInterruptedStream(t *testing.T) {
@@ -585,12 +563,7 @@ func TestGetPatchProxiedToGitalyInterruptedStream(t *testing.T) {
 		close(done)
 	}()
 
-	select {
-	case <-done:
-		return
-	case <-time.After(10 * time.Second):
-		t.Fatal("time out waiting for gitaly handler to return")
-	}
+	waitDone(t, done)
 }
 
 func TestGetSnapshotProxiedToGitalySuccessfully(t *testing.T) {
@@ -634,12 +607,7 @@ func TestGetSnapshotProxiedToGitalyInterruptedStream(t *testing.T) {
 		close(done)
 	}()
 
-	select {
-	case <-done:
-		return
-	case <-time.After(10 * time.Second):
-		t.Fatal("time out waiting for gitaly handler to return")
-	}
+	waitDone(t, done)
 }
 
 func buildGetSnapshotParams(gitalyAddress string, repo *gitalypb.Repository) string {
