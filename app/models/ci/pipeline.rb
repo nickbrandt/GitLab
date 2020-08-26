@@ -860,6 +860,10 @@ module Ci
       builds.latest.with_reports(reports_scope)
     end
 
+    def builds_with_coverage
+      builds.with_coverage
+    end
+
     def has_reports?(reports_scope)
       complete? && latest_report_builds(reports_scope).exists?
     end
