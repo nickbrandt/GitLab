@@ -107,46 +107,6 @@ export default class Editor {
     monacoEditor.setModelLanguage(this.model, id);
   }
 
-  /**
-   * @deprecated do not use .getValue() directly on the editor.
-   * This proxy-method will be removed in https://gitlab.com/gitlab-org/gitlab/-/issues/241025
-   * Rather use it on the exact instance
-   */
-  getValue() {
-    return this.instances[0].getValue();
-  }
-
-  /**
-   * @deprecated do not use .setValue() directly on the editor.
-   * This proxy-method will be removed in https://gitlab.com/gitlab-org/gitlab/-/issues/241025
-   * Rather use it on the exact instance
-   */
-  setValue(val) {
-    this.instances[0].setValue(val);
-  }
-
-  /**
-   * @deprecated do not use .focus() directly on the editor.
-   * This proxy-method will be removed in https://gitlab.com/gitlab-org/gitlab/-/issues/241025
-   * Rather use it on the exact instance
-   */
-  focus() {
-    this.instances[0].focus();
-  }
-
-  /**
-   * @deprecated do not use .updateOptions() directly on the editor.
-   * This proxy-method will be removed in https://gitlab.com/gitlab-org/gitlab/-/issues/241025
-   * Rather use it on the exact instance
-   */
-  updateOptions(options = {}) {
-    this.instances[0].updateOptions(options);
-  }
-
-  navigateFileStart() {
-    this.instances[0].setPosition(new Position(1, 1));
-  }
-
   use(exts = [], instance = null) {
     const extensions = Array.isArray(exts) ? exts : [exts];
     if (instance) {
