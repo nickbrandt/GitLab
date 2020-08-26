@@ -82,7 +82,7 @@ describe('OnDemandScansApp', () => {
   });
 
   it('renders properly', () => {
-    expect(wrapper.isVueInstance()).toBe(true);
+    expect(wrapper.html()).not.toBe('');
   });
 
   describe('computed props', () => {

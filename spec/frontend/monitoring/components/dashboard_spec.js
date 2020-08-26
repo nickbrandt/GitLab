@@ -707,8 +707,7 @@ describe('Dashboard', () => {
     });
 
     it('renders correctly', () => {
-      expect(wrapper.isVueInstance()).toBe(true);
-      expect(wrapper.exists()).toBe(true);
+      expect(wrapper.html()).not.toBe('');
     });
   });
 
