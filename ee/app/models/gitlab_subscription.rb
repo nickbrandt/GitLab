@@ -42,7 +42,7 @@ class GitlabSubscription < ApplicationRecord
     end
   end
 
-  def seats_in_use
+  def calculate_seats_in_use
     namespace.billable_members_count
   end
 
@@ -50,7 +50,7 @@ class GitlabSubscription < ApplicationRecord
   # with the historical max. We want to know how many extra users the customer
   # has added to their group (users above the number purchased on their subscription).
   # Then, on the next month we're going to automatically charge the customers for those extra users.
-  def seats_owed
+  def calculate_seats_owed
     return 0 unless has_a_paid_hosted_plan?
 
     [0, max_seats_used - seats].max
