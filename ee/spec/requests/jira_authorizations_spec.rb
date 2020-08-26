@@ -67,7 +67,9 @@ RSpec.describe 'Jira authorization requests' do
       context 'when code is invalid' do
         let(:code) { "invalid_code" }
 
-        it_behaves_like 'an unauthorized request'
+        it 'returns bad request' do
+          expect(response).to have_gitlab_http_status(:bad_request)
+        end
       end
     end
   end
