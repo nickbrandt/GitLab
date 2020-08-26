@@ -59,6 +59,11 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
   end
 
+  def self.find_failed_registries(batch_size:, except_ids: [])
+    super
+      .order(Gitlab::Database.nulls_first_order(:last_synced_at))
+  end
+
   # Search for a list of projects associated with registries,
   # based on the query given in `query`.
   #

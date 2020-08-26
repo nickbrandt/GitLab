@@ -54,7 +54,7 @@ module Geo
 
     def find_retryable_container_registry_ids(batch_size:)
       registry_finder
-        .find_retryable_dirty_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
+        .find_failed_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
         .pluck_model_foreign_key
     end
 

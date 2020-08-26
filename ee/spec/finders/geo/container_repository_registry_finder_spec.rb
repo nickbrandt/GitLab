@@ -206,7 +206,7 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
     end
   end
 
-  describe '#find_retryable_dirty_registries' do
+  describe '#find_failed_registries' do
     let_it_be(:registry_container_registry_1) { create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id) }
     let_it_be(:registry_container_registry_2) { create(:container_repository_registry, :sync_started, container_repository_id: container_repository_2.id) }
     let_it_be(:registry_container_registry_3) { create(:container_repository_registry, state: :failed, container_repository_id: container_repository_3.id, last_synced_at: nil) }
@@ -215,13 +215,13 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
     let_it_be(:registry_container_registry_6) { create(:container_repository_registry, state: :failed, container_repository_id: container_repository_6.id, last_synced_at: nil) }
 
     it 'returns registries for projects that have been recently updated' do
-      registries = subject.find_retryable_dirty_registries(batch_size: 10)
+      registries = subject.find_failed_registries(batch_size: 10)
 
       expect(registries).to match_ids(registry_container_registry_3, registry_container_registry_4, registry_container_registry_5, registry_container_registry_6)
     end
 
     it 'excludes except_ids' do
-      registries = subject.find_retryable_dirty_registries(batch_size: 10, except_ids: [container_repository_4.id, container_repository_5.id, container_repository_6.id])
+      registries = subject.find_failed_registries(batch_size: 10, except_ids: [container_repository_4.id, container_repository_5.id, container_repository_6.id])
 
       expect(registries).to match_ids(registry_container_registry_3)
     end

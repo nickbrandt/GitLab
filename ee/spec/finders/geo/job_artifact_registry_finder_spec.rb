@@ -338,7 +338,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
     end
   end
 
-  describe '#find_retryable_failed_registries' do
+  describe '#find_failed_registries' do
     it 'returns registries for job artifacts that have failed to sync' do
       registry_ci_job_artifact_1 = create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_1.id)
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_2.id, missing_on_primary: true)
@@ -349,7 +349,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_2.id, missing_on_primary: true)
       create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_remote_3.id)
 
-      registries = subject.find_retryable_failed_registries(batch_size: 10)
+      registries = subject.find_failed_registries(batch_size: 10)
 
       expect(registries).to match_ids(registry_ci_job_artifact_1, registry_ci_job_artifact_4, registry_ci_job_artifact_remote_1)
     end
@@ -364,7 +364,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_2.id, missing_on_primary: true)
       create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_remote_3.id)
 
-      registries = subject.find_retryable_failed_registries(batch_size: 10, except_ids: [ci_job_artifact_4.id])
+      registries = subject.find_failed_registries(batch_size: 10, except_ids: [ci_job_artifact_4.id])
 
       expect(registries).to match_ids(registry_ci_job_artifact_1, registry_ci_job_artifact_remote_1)
     end

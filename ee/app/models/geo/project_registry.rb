@@ -54,6 +54,11 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     [untracked_ids, unused_tracked_ids]
   end
 
+  def self.find_failed_registries(batch_size:, except_ids: [])
+    super
+      .order(Gitlab::Database.nulls_first_order(:last_repository_synced_at))
+  end
+
   def self.delete_worker_class
     ::GeoRepositoryDestroyWorker
   end

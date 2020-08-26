@@ -49,7 +49,7 @@ module Geo
     #
     #    Any registries that have ever been synced that currently need to be
     #    resynced will be handled by other find methods (like
-    #    #find_retryable_failed_registries)
+    #    #find_failed_registries)
     #
     #    You can pass a list with `except_ids:` so you can exclude items you
     #    already scheduled but haven't finished and aren't persisted to the database yet
@@ -63,6 +63,21 @@ module Geo
         .never_synced
         .model_id_not_in(except_ids)
         .limit(batch_size)
+    end
+    # rubocop:enable CodeReuse/ActiveRecord
+
+    # @!method find_failed_registries
+    #    Return an ActiveRecord::Relation of registry records marked as failed,
+    #    which are ready to be retried, excluding specified IDs, limited to
+    #    batch_size
+    #
+    # @param [Integer] batch_size used to limit the results returned
+    # @param [Array<Integer>] except_ids ids that will be ignored from the query
+    #
+    # rubocop:disable CodeReuse/ActiveRecord
+    def find_failed_registries(batch_size:, except_ids: [])
+      registry_class
+        .find_failed_registries(batch_size: batch_size, except_ids: except_ids)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 

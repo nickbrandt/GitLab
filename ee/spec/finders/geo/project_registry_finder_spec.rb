@@ -31,15 +31,15 @@ RSpec.describe Geo::ProjectRegistryFinder, :geo do
     end
   end
 
-  describe '#find_retryable_dirty_registries' do
+  describe '#find_failed_registries' do
     it 'returns registries for projects that have been recently updated or that have never been synced' do
-      registries = subject.find_retryable_dirty_registries(batch_size: 10)
+      registries = subject.find_failed_registries(batch_size: 10)
 
       expect(registries).to match_ids(registry_project_2, registry_project_3, registry_project_4, registry_project_5, registry_project_6)
     end
 
     it 'excludes except_ids' do
-      registries = subject.find_retryable_dirty_registries(batch_size: 10, except_ids: [project_4.id, project_5.id, project_6.id])
+      registries = subject.find_failed_registries(batch_size: 10, except_ids: [project_4.id, project_5.id, project_6.id])
 
       expect(registries).to match_ids(registry_project_2, registry_project_3)
     end

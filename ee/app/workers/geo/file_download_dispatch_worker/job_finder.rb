@@ -29,7 +29,7 @@ module Geo
 
       def find_failed_jobs(batch_size:)
         convert_registry_relation_to_job_args(
-          registry_finder.find_retryable_failed_registries(find_batch_params(batch_size))
+          registry_finder.find_failed_registries(find_batch_params(batch_size))
         )
       end
 

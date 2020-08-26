@@ -25,7 +25,7 @@ module Geo
     def find_project_ids_updated_recently(except_ids:, batch_size:)
       project_ids =
         registry_finder
-          .find_retryable_dirty_registries(batch_size: batch_size, except_ids: except_ids)
+          .find_failed_registries(batch_size: batch_size, except_ids: except_ids)
           .pluck_model_foreign_key
 
       find_project_ids_within_shard(project_ids, direction: :asc)
