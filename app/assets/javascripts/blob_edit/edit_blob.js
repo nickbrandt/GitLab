@@ -50,20 +50,20 @@ export default class EditBlob {
         const fileContentEl = document.getElementById('file-content');
         const form = document.querySelector('.js-edit-blob-form');
 
-        this.editor = new EditorLite();
+        const rootEditor = new EditorLite();
 
-        if (MarkdownExtension) {
-          this.editor.use(MarkdownExtension.default);
-        }
-
-        this.editor.createInstance({
+        this.editor = rootEditor.createInstance({
           el: editorEl,
           blobPath: fileNameEl.value,
           blobContent: editorEl.innerText,
         });
 
+        if (MarkdownExtension) {
+          rootEditor.use(MarkdownExtension.default, this.editor);
+        }
+
         fileNameEl.addEventListener('change', () => {
-          this.editor.updateModelLanguage(fileNameEl.value);
+          rootEditor.updateModelLanguage(fileNameEl.value);
         });
 
         form.addEventListener('submit', () => {
