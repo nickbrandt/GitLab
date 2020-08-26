@@ -158,6 +158,7 @@ export default {
     state.showCreateIssueForm = toggleState;
     state.showAddItemForm = false;
     state.showCreateEpicForm = false;
+    state.issuableType = issuableTypesMap.ISSUE;
   },
 
   [types.SET_PENDING_REFERENCES](state, references) {

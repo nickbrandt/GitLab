@@ -12481,6 +12481,21 @@ CREATE SEQUENCE public.ip_restrictions_id_seq
 
 ALTER SEQUENCE public.ip_restrictions_id_seq OWNED BY public.ip_restrictions.id;
 
+CREATE TABLE public.issuable_severities (
+    id bigint NOT NULL,
+    issue_id bigint NOT NULL,
+    severity smallint DEFAULT 0 NOT NULL
+);
+
+CREATE SEQUENCE public.issuable_severities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.issuable_severities_id_seq OWNED BY public.issuable_severities.id;
+
 CREATE TABLE public.issue_assignees (
     user_id integer NOT NULL,
     issue_id integer NOT NULL
@@ -13327,7 +13342,8 @@ CREATE TABLE public.namespace_root_storage_statistics (
     build_artifacts_size bigint DEFAULT 0 NOT NULL,
     storage_size bigint DEFAULT 0 NOT NULL,
     packages_size bigint DEFAULT 0 NOT NULL,
-    snippets_size bigint DEFAULT 0 NOT NULL
+    snippets_size bigint DEFAULT 0 NOT NULL,
+    pipeline_artifacts_size bigint DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE public.namespace_settings (
@@ -16114,7 +16130,6 @@ CREATE TABLE public.users (
     skype character varying DEFAULT ''::character varying NOT NULL,
     linkedin character varying DEFAULT ''::character varying NOT NULL,
     twitter character varying DEFAULT ''::character varying NOT NULL,
-    bio character varying,
     failed_attempts integer DEFAULT 0,
     locked_at timestamp without time zone,
     username character varying,
@@ -17053,6 +17068,8 @@ ALTER TABLE ONLY public.insights ALTER COLUMN id SET DEFAULT nextval('public.ins
 ALTER TABLE ONLY public.internal_ids ALTER COLUMN id SET DEFAULT nextval('public.internal_ids_id_seq'::regclass);
 
 ALTER TABLE ONLY public.ip_restrictions ALTER COLUMN id SET DEFAULT nextval('public.ip_restrictions_id_seq'::regclass);
+
+ALTER TABLE ONLY public.issuable_severities ALTER COLUMN id SET DEFAULT nextval('public.issuable_severities_id_seq'::regclass);
 
 ALTER TABLE ONLY public.issue_links ALTER COLUMN id SET DEFAULT nextval('public.issue_links_id_seq'::regclass);
 
@@ -18133,6 +18150,9 @@ ALTER TABLE ONLY public.internal_ids
 
 ALTER TABLE ONLY public.ip_restrictions
     ADD CONSTRAINT ip_restrictions_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.issuable_severities
+    ADD CONSTRAINT issuable_severities_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.issue_links
     ADD CONSTRAINT issue_links_pkey PRIMARY KEY (id);
@@ -19855,6 +19875,8 @@ CREATE UNIQUE INDEX index_internal_ids_on_usage_and_project_id ON public.interna
 
 CREATE INDEX index_ip_restrictions_on_group_id ON public.ip_restrictions USING btree (group_id);
 
+CREATE UNIQUE INDEX index_issuable_severities_on_issue_id ON public.issuable_severities USING btree (issue_id);
+
 CREATE UNIQUE INDEX index_issue_assignees_on_issue_id_and_user_id ON public.issue_assignees USING btree (issue_id, user_id);
 
 CREATE INDEX index_issue_assignees_on_user_id ON public.issue_assignees USING btree (user_id);
@@ -20985,6 +21007,8 @@ CREATE INDEX index_vulnerability_feedback_on_comment_author_id ON public.vulnera
 
 CREATE INDEX index_vulnerability_feedback_on_issue_id ON public.vulnerability_feedback USING btree (issue_id);
 
+CREATE INDEX index_vulnerability_feedback_on_issue_id_not_null ON public.vulnerability_feedback USING btree (id) WHERE (issue_id IS NOT NULL);
+
 CREATE INDEX index_vulnerability_feedback_on_merge_request_id ON public.vulnerability_feedback USING btree (merge_request_id);
 
 CREATE INDEX index_vulnerability_feedback_on_pipeline_id ON public.vulnerability_feedback USING btree (pipeline_id);
@@ -21114,8 +21138,6 @@ CREATE INDEX terraform_states_verification_checksum_partial ON public.terraform_
 CREATE INDEX terraform_states_verification_failure_partial ON public.terraform_states USING btree (verification_failure) WHERE (verification_failure IS NOT NULL);
 
 CREATE INDEX tmp_build_stage_position_index ON public.ci_builds USING btree (stage_id, stage_idx) WHERE (stage_idx IS NOT NULL);
-
-CREATE INDEX tmp_idx_on_user_id_where_bio_is_filled ON public.users USING btree (id) WHERE ((COALESCE(bio, ''::character varying))::text IS DISTINCT FROM ''::text);
 
 CREATE INDEX tmp_index_for_email_unconfirmation_migration ON public.emails USING btree (id) WHERE (confirmed_at IS NOT NULL);
 
@@ -22191,6 +22213,9 @@ ALTER TABLE ONLY public.protected_branch_unprotect_access_levels
 
 ALTER TABLE ONLY public.ci_freeze_periods
     ADD CONSTRAINT fk_rails_2e02bbd1a6 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+ALTER TABLE ONLY public.issuable_severities
+    ADD CONSTRAINT fk_rails_2fbb74ad6d FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.saml_providers
     ADD CONSTRAINT fk_rails_306d459be7 FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
