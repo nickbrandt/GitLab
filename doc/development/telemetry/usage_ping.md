@@ -238,31 +238,32 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
      redis_slot: compliance
      expiry: 42 # 6 weeks
      aggregation: weekly
+     feature: credential_inventory_feature
    ```
 
    Keys:
 
-   - `name`: unique event name.
-   - `category`: event category. Used for getting total counts for events in a category, for easier
+   - `name`: **required** unique event name.
+   - `category`:  **required** event category. Used for getting total counts for events in a category, for easier
      access to a group of events.
-   - `redis_slot`: optional Redis slot; default value: event name. Used if needed to calculate totals
+   - `redis_slot`:  **required** Redis slot. Used if needed to calculate totals
      for a group of metrics. Ensure keys are in the same slot. For example:
      `i_compliance_credential_inventory` with `redis_slot: 'compliance'` will build Redis key
      `i_{compliance}_credential_inventory-2020-34`. If `redis_slot` is not defined the Redis key will
      be `{i_compliance_credential_inventory}-2020-34`.
-   - `expiry`: expiry time in days. Default: 29 days for daily aggregation and 6 weeks for weekly
+   - `expiry`:  **optional** expiry time in days. Default: 29 days for daily aggregation and 6 weeks for weekly
      aggregation.
-   - `aggregation`: aggregation `:daily` or `:weekly`. The argument defines how we build the Redis
+   - `aggregation`:  **required** aggregation `:daily` or `:weekly`. The argument defines how we build the Redis
      keys for data storage. For `daily` we keep a key for metric per day of the year, for `weekly` we
      keep a key for metric per week of the year.
+   - `feature`:  **required** feature name under which the event will be tracked.
 
-1. Track event in controller using `RedisTracking` module with `track_redis_hll_event(*controller_actions, name:, feature:)`.
+1. Track event in controller using `RedisTracking` module with `track_redis_hll_event(*controller_actions, name:)`.
 
    Arguments:
 
    - `controller_actions`: controller actions we want to track.
    - `name`: event name.
-   - `feature`: feature name, all metrics we track should be under feature flag.
 
    Example usage:
 
@@ -272,7 +273,7 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
      include RedisTracking
 
      skip_before_action :authenticate_user!, only: :show
-     track_redis_hll_event :index, :show, name: 'i_analytics_dev_ops_score', feature: :g_compliance_dashboard_feature
+     track_redis_hll_event :index, :show, name: 'i_analytics_dev_ops_score'
 
      def index
        render html: 'index'
@@ -303,12 +304,16 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    - `start_date`: start date of the period for which we want to get event data.
    - `end_date`: end date of the period for which we want to get event data.
 
-Recommendations:
+1. Adding new category.
+
+   When adding new category, we should also update ad add the new metrics in [`usage_data.rb`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data.rb)
+
+Notes:
 
 - Key should expire in 29 days for daily and 42 days for weekly.
 - If possible, data granularity should be a week. For example a key could be composed from the
   metric's name and week of the year, `2020-33-{metric_name}`.
-- Use a [feature flag](../../operations/feature_flags.md) to have a control over the impact when
+- It is required to use a [feature flag](../../operations/feature_flags.md) to have a control over the impact when
   adding new metrics.
 
 Example usage:

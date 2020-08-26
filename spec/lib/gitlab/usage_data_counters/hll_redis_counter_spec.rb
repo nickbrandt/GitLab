@@ -16,16 +16,18 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
   let(:category_productivity) { 'g_analytics_productivity' }
   let(:no_slot) { 'no_slot' }
   let(:different_aggregation) { 'different_aggregation' }
+  let(:no_feature_event) { 'no_feature_event' }
   let(:custom_daily_event) { 'g_analytics_custom' }
 
   let(:known_events) do
     [
-      { name: weekly_event, redis_slot: "analytics", category: "analytics", expiry: 84, aggregation: "weekly" },
-      { name: daily_event, redis_slot: "analytics", category: "analytics", expiry: 84, aggregation: "daily" },
-      { name: category_productivity, redis_slot: "analytics", category: "productivity", aggregation: "weekly" },
-      { name: compliance_slot_event, redis_slot: "compliance", category: "compliance", aggregation: "weekly" },
-      { name: no_slot, category: "global", aggregation: "daily" },
-      { name: different_aggregation, category: "global", aggregation: "monthly" }
+      { name: weekly_event, redis_slot: "analytics", category: "analytics", expiry: 84, aggregation: "weekly", feature: :track_unique_visits },
+      { name: daily_event, redis_slot: "analytics", category: "analytics", expiry: 84, aggregation: "daily", feature: :track_unique_visits },
+      { name: category_productivity, redis_slot: "analytics", category: "productivity", aggregation: "weekly", feature: :track_unique_visits },
+      { name: compliance_slot_event, redis_slot: "compliance", category: "compliance", aggregation: "weekly", feature: :track_unique_visits },
+      { name: no_slot, category: "global", aggregation: "daily", feature: :track_unique_visits },
+      { name: different_aggregation, category: "global", aggregation: "monthly", feature: :track_unique_visits },
+      { name: no_feature_event, category: "global", aggregation: "daily" }
     ].map(&:with_indifferent_access)
   end
 
@@ -43,7 +45,29 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     Timecop.freeze(reference_time) { example.run }
   end
 
-  describe '.track_event' do
+  context 'with feature track_unique_visits disabled' do
+    before do
+      stub_feature_flags(track_unique_visits: false)
+    end
+
+    describe '.track_event' do
+      it "doesn not track the event" do
+        described_class.track_event(entity1, weekly_event, Date.current)
+
+        expect(Gitlab::Redis::HLL).not_to receive(:add)
+      end
+    end
+  end
+
+  context 'with track_unique_visits feature enabled' do
+    before do
+      stub_feature_flags(track_unique_visits: true)
+    end
+
+    it 'raise error if there is no feature' do
+      expect { described_class.track_event(entity1, no_feature_event, Date.current) } .to raise_error('Events should be under a feature flag')
+    end
+
     it "raise error if metrics don't have same aggregation" do
       expect { described_class.track_event(entity1, different_aggregation, Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownAggregation)
     end
@@ -52,129 +76,131 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       expect { described_class.track_event(entity1, 'unknown', Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownEvent)
     end
 
-    context 'for weekly events' do
-      it 'sets the keys in Redis to expire automatically after the given expiry time' do
-        described_class.track_event(entity1, "g_analytics_contribution")
+    describe 'expiry' do
+      context 'for weekly events' do
+        it 'sets the keys in Redis to expire automatically after the given expiry time' do
+          described_class.track_event(entity1, "g_analytics_contribution")
 
-        Gitlab::Redis::SharedState.with do |redis|
-          keys = redis.scan_each(match: "g_{analytics}_contribution-*").to_a
-          expect(keys).not_to be_empty
+          Gitlab::Redis::SharedState.with do |redis|
+            keys = redis.scan_each(match: "g_{analytics}_contribution-*").to_a
+            expect(keys).not_to be_empty
 
-          keys.each do |key|
-            expect(redis.ttl(key)).to be_within(5.seconds).of(12.weeks)
+            keys.each do |key|
+              expect(redis.ttl(key)).to be_within(5.seconds).of(12.weeks)
+            end
+          end
+        end
+
+        it 'sets the keys in Redis to expire automatically after 12 weeks' do
+          described_class.track_event(entity1, "g_analytics_contribution")
+
+          Gitlab::Redis::SharedState.with do |redis|
+            keys = redis.scan_each(match: "g_{analytics}_contribution-*").to_a
+            expect(keys).not_to be_empty
+
+            keys.each do |key|
+              expect(redis.ttl(key)).to be_within(5.seconds).of(12.weeks)
+            end
           end
         end
       end
 
-      it 'sets the keys in Redis to expire automatically after 6 weeks by default' do
-        described_class.track_event(entity1, "g_compliance_dashboard")
+      context 'for daily events' do
+        it 'sets the keys in Redis to expire after the given expiry time' do
+          described_class.track_event(entity1, "g_analytics_search")
 
-        Gitlab::Redis::SharedState.with do |redis|
-          keys = redis.scan_each(match: "g_{compliance}_dashboard-*").to_a
-          expect(keys).not_to be_empty
+          Gitlab::Redis::SharedState.with do |redis|
+            keys = redis.scan_each(match: "*-g_{analytics}_search").to_a
+            expect(keys).not_to be_empty
 
-          keys.each do |key|
-            expect(redis.ttl(key)).to be_within(5.seconds).of(6.weeks)
+            keys.each do |key|
+              expect(redis.ttl(key)).to be_within(5.seconds).of(84.days)
+            end
+          end
+        end
+        it 'sets the keys in Redis to expire after 29 days by default' do
+          described_class.track_event(entity1, "no_slot")
+
+          Gitlab::Redis::SharedState.with do |redis|
+            keys = redis.scan_each(match: "*-{no_slot}").to_a
+            expect(keys).not_to be_empty
+
+            keys.each do |key|
+              expect(redis.ttl(key)).to be_within(5.seconds).of(29.days)
+            end
           end
         end
       end
     end
 
-    context 'for daily events' do
-      it 'sets the keys in Redis to expire after the given expiry time' do
-        described_class.track_event(entity1, "g_analytics_search")
+    describe '.unique_events' do
+      before do
+        # events in current week, should not be counted as week is not complete
+        described_class.track_event(entity1, weekly_event, Date.current)
+        described_class.track_event(entity2, weekly_event, Date.current)
 
-        Gitlab::Redis::SharedState.with do |redis|
-          keys = redis.scan_each(match: "*-g_{analytics}_search").to_a
-          expect(keys).not_to be_empty
+        # Events last week
+        described_class.track_event(entity1, weekly_event, 2.days.ago)
+        described_class.track_event(entity1, weekly_event, 2.days.ago)
+        described_class.track_event(entity1, no_slot, 2.days.ago)
 
-          keys.each do |key|
-            expect(redis.ttl(key)).to be_within(5.seconds).of(84.days)
-          end
-        end
+        # Events 2 weeks ago
+        described_class.track_event(entity1, weekly_event, 2.weeks.ago)
+
+        # Events 4 weeks ago
+        described_class.track_event(entity3, weekly_event, 4.weeks.ago)
+        described_class.track_event(entity4, weekly_event, 29.days.ago)
+
+        # events in current day should be counted in daily aggregation
+        described_class.track_event(entity1, daily_event, Date.current)
+        described_class.track_event(entity2, daily_event, Date.current)
+
+        # Events last week
+        described_class.track_event(entity1, daily_event, 2.days.ago)
+        described_class.track_event(entity1, daily_event, 2.days.ago)
+
+        # Events 2 weeks ago
+        described_class.track_event(entity1, daily_event, 14.days.ago)
+
+        # Events 4 weeks ago
+        described_class.track_event(entity3, daily_event, 28.days.ago)
+        described_class.track_event(entity4, daily_event, 29.days.ago)
       end
 
-      it 'sets the keys in Redis to expire after 29 days by default' do
-        described_class.track_event(entity1, "no_slot")
-
-        Gitlab::Redis::SharedState.with do |redis|
-          keys = redis.scan_each(match: "*-{no_slot}").to_a
-          expect(keys).not_to be_empty
-
-          keys.each do |key|
-            expect(redis.ttl(key)).to be_within(5.seconds).of(29.days)
-          end
-        end
+      it 'raise error if metrics are not in the same slot' do
+        expect { described_class.unique_events(event_names: [compliance_slot_event, analytics_slot_event], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same slot')
       end
-    end
-  end
 
-  describe '.unique_events' do
-    before do
-      # events in current week, should not be counted as week is not complete
-      described_class.track_event(entity1, weekly_event, Date.current)
-      described_class.track_event(entity2, weekly_event, Date.current)
+      it 'raise error if metrics are not in the same category' do
+        expect { described_class.unique_events(event_names: [category_analytics, category_productivity], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same category')
+      end
 
-      # Events last week
-      described_class.track_event(entity1, weekly_event, 2.days.ago)
-      described_class.track_event(entity1, weekly_event, 2.days.ago)
-      described_class.track_event(entity1, no_slot, 2.days.ago)
+      it "raise error if metrics don't have same aggregation" do
+        expect { described_class.unique_events(event_names: [daily_event, weekly_event], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should have same aggregation level')
+      end
 
-      # Events 2 weeks ago
-      described_class.track_event(entity1, weekly_event, 2.weeks.ago)
 
-      # Events 4 weeks ago
-      described_class.track_event(entity3, weekly_event, 4.weeks.ago)
-      described_class.track_event(entity4, weekly_event, 29.days.ago)
+      context 'when data for the last complete week' do
+        it { expect(described_class.unique_events(event_names: weekly_event, start_date: 1.week.ago, end_date: Date.current)).to eq(1) }
+      end
 
-      # events in current day should be counted in daily aggregation
-      described_class.track_event(entity1, daily_event, Date.current)
-      described_class.track_event(entity2, daily_event, Date.current)
+      context 'when data for the last 4 complete weeks' do
+        it { expect(described_class.unique_events(event_names: weekly_event, start_date: 4.weeks.ago, end_date: Date.current)).to eq(2) }
+      end
 
-      # Events last week
-      described_class.track_event(entity1, daily_event, 2.days.ago)
-      described_class.track_event(entity1, daily_event, 2.days.ago)
+      context 'when data for the week 4 weeks ago' do
+        it { expect(described_class.unique_events(event_names: weekly_event, start_date: 4.weeks.ago, end_date: 3.weeks.ago)).to eq(1) }
+      end
 
-      # Events 2 weeks ago
-      described_class.track_event(entity1, daily_event, 14.days.ago)
+      context 'when using daily aggregation' do
+        it { expect(described_class.unique_events(event_names: daily_event, start_date: 7.days.ago, end_date: Date.current)).to eq(2) }
+        it { expect(described_class.unique_events(event_names: daily_event, start_date: 28.days.ago, end_date: Date.current)).to eq(3) }
+        it { expect(described_class.unique_events(event_names: daily_event, start_date: 28.days.ago, end_date: 21.days.ago)).to eq(1) }
+      end
 
-      # Events 4 weeks ago
-      described_class.track_event(entity3, daily_event, 28.days.ago)
-      described_class.track_event(entity4, daily_event, 29.days.ago)
-    end
-
-    it 'raise error if metrics are not in the same slot' do
-      expect { described_class.unique_events(event_names: [compliance_slot_event, analytics_slot_event], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same slot')
-    end
-
-    it 'raise error if metrics are not in the same category' do
-      expect { described_class.unique_events(event_names: [category_analytics, category_productivity], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same category')
-    end
-
-    it "raise error if metrics don't have same aggregation" do
-      expect { described_class.unique_events(event_names: [daily_event, weekly_event], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should have same aggregation level')
-    end
-
-    context 'when data for the last complete week' do
-      it { expect(described_class.unique_events(event_names: weekly_event, start_date: 1.week.ago, end_date: Date.current)).to eq(1) }
-    end
-
-    context 'when data for the last 4 complete weeks' do
-      it { expect(described_class.unique_events(event_names: weekly_event, start_date: 4.weeks.ago, end_date: Date.current)).to eq(2) }
-    end
-
-    context 'when data for the week 4 weeks ago' do
-      it { expect(described_class.unique_events(event_names: weekly_event, start_date: 4.weeks.ago, end_date: 3.weeks.ago)).to eq(1) }
-    end
-
-    context 'when using daily aggregation' do
-      it { expect(described_class.unique_events(event_names: daily_event, start_date: 7.days.ago, end_date: Date.current)).to eq(2) }
-      it { expect(described_class.unique_events(event_names: daily_event, start_date: 28.days.ago, end_date: Date.current)).to eq(3) }
-      it { expect(described_class.unique_events(event_names: daily_event, start_date: 28.days.ago, end_date: 21.days.ago)).to eq(1) }
-    end
-
-    context 'when no slot is set' do
-      it { expect(described_class.unique_events(event_names: no_slot, start_date: 7.days.ago, end_date: Date.current)).to eq(1) }
+      context 'when no slot is set' do
+        it { expect(described_class.unique_events(event_names: no_slot, start_date: 7.days.ago, end_date: Date.current)).to eq(1) }
+      end
     end
   end
 end

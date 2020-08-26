@@ -25,6 +25,7 @@ module Gitlab
       #   category: compliance         # Group events in categories
       #   expiry: 29                   # Optional expiration time in days, default value 29 days for daily and 6.weeks for weekly
       #   aggregation: daily           # Aggregation level, keys are stored daily or weekly
+      #   feature: track_unique_visits # Feature flag
       #
       # Usage:
       #
@@ -36,7 +37,13 @@ module Gitlab
 
           raise UnknownEvent.new("Unknown event #{event_name}") unless event.present?
 
-          Gitlab::Redis::HLL.add(key: redis_key(event, time), value: entity_id, expiry: expiry(event))
+          feature = feature_for(event)
+
+          raise 'Events should be under a feature flag' unless feature.present?
+
+          if Feature.enabled?(feature)
+            Gitlab::Redis::HLL.add(key: redis_key(event, time), value: entity_id, expiry: expiry(event))
+          end
         end
 
         def unique_events(event_names:, start_date:, end_date:)
@@ -94,6 +101,10 @@ module Gitlab
           return event[:expiry].days if event[:expiry].present?
 
           event[:aggregation].to_sym == :daily ? DEFAULT_DAILY_KEY_EXPIRY_LENGTH : DEFAULT_WEEKLY_KEY_EXPIRY_LENGTH
+        end
+
+        def feature_for(event)
+          event[:feature]
         end
 
         def event_for(event_name)

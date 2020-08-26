@@ -17,7 +17,8 @@ RSpec.describe Analytics::UniqueVisitsHelper do
       stub_feature_flags(track_unique_visits: false)
       sign_in(current_user)
 
-      expect_any_instance_of(Gitlab::Analytics::UniqueVisits).not_to receive(:track_visit)
+      expect_any_instance_of(Gitlab::Analytics::UniqueVisits).to receive(:track_visit)
+      expect(Gitlab::Redis::HLL).not_to receive(:add)
 
       helper.track_visit(target_id)
     end
@@ -26,13 +27,13 @@ RSpec.describe Analytics::UniqueVisitsHelper do
       sign_in(current_user)
       expect(Gitlab::CurrentSettings).to receive(:usage_ping_enabled?).and_return(false)
 
-      expect_any_instance_of(Gitlab::Analytics::UniqueVisits).not_to receive(:track_visit)
+      expect(Gitlab::Redis::HLL).not_to receive(:add)
 
       helper.track_visit(target_id)
     end
 
     it 'does not track visit if user is not logged in' do
-      expect_any_instance_of(Gitlab::Analytics::UniqueVisits).not_to receive(:track_visit)
+      expect(Gitlab::Redis::HLL).not_to receive(:add)
 
       helper.track_visit(target_id)
     end
@@ -40,7 +41,7 @@ RSpec.describe Analytics::UniqueVisitsHelper do
     it 'tracks visit if user is logged in' do
       sign_in(current_user)
 
-      expect_any_instance_of(Gitlab::Analytics::UniqueVisits).to receive(:track_visit)
+      expect(Gitlab::Redis::HLL).to receive(:add)
 
       helper.track_visit(target_id)
     end
@@ -48,7 +49,7 @@ RSpec.describe Analytics::UniqueVisitsHelper do
     it 'tracks visit if user is not logged in, but has the cookie already' do
       helper.request.cookies[:visitor_id] = { value: SecureRandom.uuid, expires: 24.months }
 
-      expect_any_instance_of(Gitlab::Analytics::UniqueVisits).to receive(:track_visit)
+      expect(Gitlab::Redis::HLL).to receive(:add)
 
       helper.track_visit(target_id)
     end

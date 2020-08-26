@@ -4,14 +4,14 @@ require "spec_helper"
 
 RSpec.describe RedisTracking do
   let(:event_name) { 'g_compliance_dashboard' }
-  let(:feature) { 'g_compliance_dashboard_feature' }
+  let(:feature) { 'track_unique_visits' }
   let(:user) { create(:user) }
 
   controller(ApplicationController) do
     include RedisTracking
 
     skip_before_action :authenticate_user!, only: :show
-    track_redis_hll_event :index, :show, name: 'i_analytics_dev_ops_score', feature: :g_compliance_dashboard_feature
+    track_redis_hll_event :index, :show, name: 'i_analytics_dev_ops_score'
 
     def index
       render html: 'index'
@@ -30,7 +30,7 @@ RSpec.describe RedisTracking do
     it 'does not track the event' do
       stub_feature_flags(feature => false)
 
-      expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
+      expect(Gitlab::Redis::HLL).not_to receive(:add)
 
       get :index
     end
@@ -57,7 +57,7 @@ RSpec.describe RedisTracking do
       it 'tracks the event' do
         sign_in(user)
 
-        expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
+        expect(Gitlab::Redis::HLL).to receive(:add)
 
         get :index
       end
