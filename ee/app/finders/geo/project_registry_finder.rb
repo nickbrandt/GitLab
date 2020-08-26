@@ -30,8 +30,7 @@ module Geo
     # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_dirty_registries(batch_size:, except_ids: [])
       Geo::ProjectRegistry
-        .dirty
-        .retry_due
+        .retryable
         .model_id_not_in(except_ids)
         .order(Gitlab::Database.nulls_first_order(:last_repository_synced_at))
         .limit(batch_size)

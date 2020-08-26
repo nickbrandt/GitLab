@@ -52,8 +52,7 @@ class Geo::BaseRegistry < Geo::TrackingBase
   end
 
   def self.find_failed_registries(batch_size:, except_ids: [])
-    failed
-      .retry_due
+    retryable
       .model_id_not_in(except_ids)
       .limit(batch_size)
   end

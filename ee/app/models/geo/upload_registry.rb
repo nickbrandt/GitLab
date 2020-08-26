@@ -10,9 +10,7 @@ class Geo::UploadRegistry < Geo::BaseRegistry
 
   belongs_to :upload, foreign_key: :file_id
 
-  scope :failed, -> { where(success: false).where.not(retry_count: nil) }
   scope :fresh, -> { order(created_at: :desc) }
-  scope :never_synced, -> { where(success: false, retry_count: nil) }
 
   def self.finder_class
     ::Geo::AttachmentRegistryFinder

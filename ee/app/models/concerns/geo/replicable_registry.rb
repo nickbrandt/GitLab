@@ -40,6 +40,7 @@ module Geo::ReplicableRegistry
     scope :synced, -> { with_state(:synced) }
     scope :pending, -> { with_state(:pending) }
     scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
+    scope :retryable, -> { failed.retry_due }
     scope :ordered, -> { order(:id) }
 
     state_machine :state, initial: :pending do

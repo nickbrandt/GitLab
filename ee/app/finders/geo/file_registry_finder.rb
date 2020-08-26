@@ -20,8 +20,7 @@ module Geo
     # rubocop:disable CodeReuse/ActiveRecord
     def find_retryable_failed_registries(batch_size:, except_ids: [])
       registry_class
-        .failed
-        .retry_due
+        .retryable
         .model_id_not_in(except_ids)
         .limit(batch_size)
     end

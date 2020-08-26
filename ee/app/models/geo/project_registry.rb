@@ -21,8 +21,9 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
 
   validates :project, presence: true, uniqueness: true
 
-  scope :never_synced, -> { where(last_repository_synced_at: nil) }
   scope :dirty, -> { where(arel_table[:resync_repository].eq(true).or(arel_table[:resync_wiki].eq(true))) }
+  scope :retryable, -> { dirty.retry_due }
+  scope :never_synced, -> { where(last_repository_synced_at: nil) }
   scope :synced_repos, -> { where(resync_repository: false) }
   scope :synced_wikis, -> { where(resync_wiki: false) }
   scope :failed_repos, -> { where(arel_table[:repository_retry_count].gt(0)) }

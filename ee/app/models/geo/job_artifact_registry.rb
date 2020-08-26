@@ -6,12 +6,6 @@ class Geo::JobArtifactRegistry < Geo::BaseRegistry
   MODEL_CLASS = ::Ci::JobArtifact
   MODEL_FOREIGN_KEY = :artifact_id
 
-  scope :never_synced, -> { where(success: false, retry_count: nil) }
-
-  def self.failed
-    where(success: false).where.not(retry_count: nil)
-  end
-
   def self.finder_class
     ::Geo::JobArtifactRegistryFinder
   end
