@@ -58,7 +58,7 @@ func TestFailedCloneNoGitaly(t *testing.T) {
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 
@@ -143,7 +143,7 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 func TestGetInfoRefsProxiedToGitalyInterruptedStream(t *testing.T) {
 	apiResponse := gitOkBody(t)
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	apiResponse.GitalyServer.Address = gitalyAddress
@@ -179,7 +179,7 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
 
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	apiResponse.GitalyServer.Address = "unix:" + socketPath
 	apiResponse.GitConfigOptions = []string{"git-config-hello=world"}
@@ -225,7 +225,7 @@ func TestPostReceivePackProxiedToGitalyInterrupted(t *testing.T) {
 	apiResponse := gitOkBody(t)
 
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	apiResponse.GitalyServer.Address = "unix:" + socketPath
 	ts := testAuthServer(nil, nil, 200, apiResponse)
@@ -280,7 +280,7 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 			apiResponse.ShowAllRefs = tc.showAllRefs
 
 			gitalyServer, socketPath := startGitalyServer(t, tc.code)
-			defer gitalyServer.Stop()
+			defer gitalyServer.GracefulStop()
 
 			apiResponse.GitalyServer.Address = "unix:" + socketPath
 			ts := testAuthServer(nil, nil, 200, apiResponse)
@@ -349,7 +349,7 @@ func TestPostUploadPackProxiedToGitalyInterrupted(t *testing.T) {
 	apiResponse := gitOkBody(t)
 
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	apiResponse.GitalyServer.Address = "unix:" + socketPath
 	ts := testAuthServer(nil, nil, 200, apiResponse)
@@ -386,7 +386,7 @@ func TestPostUploadPackProxiedToGitalyInterrupted(t *testing.T) {
 
 func TestGetDiffProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	repoStorage := "default"
@@ -406,7 +406,7 @@ func TestGetDiffProxiedToGitalySuccessfully(t *testing.T) {
 
 func TestGetPatchProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	repoStorage := "default"
@@ -426,7 +426,7 @@ func TestGetPatchProxiedToGitalySuccessfully(t *testing.T) {
 
 func TestGetBlobProxiedToGitalyInterruptedStream(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	repoStorage := "default"
@@ -457,7 +457,7 @@ func TestGetBlobProxiedToGitalyInterruptedStream(t *testing.T) {
 
 func TestGetArchiveProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	repoStorage := "default"
@@ -498,7 +498,7 @@ func TestGetArchiveProxiedToGitalySuccessfully(t *testing.T) {
 
 func TestGetArchiveProxiedToGitalyInterruptedStream(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	repoStorage := "default"
@@ -531,7 +531,7 @@ func TestGetArchiveProxiedToGitalyInterruptedStream(t *testing.T) {
 
 func TestGetDiffProxiedToGitalyInterruptedStream(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	repoStorage := "default"
@@ -563,7 +563,7 @@ func TestGetDiffProxiedToGitalyInterruptedStream(t *testing.T) {
 
 func TestGetPatchProxiedToGitalyInterruptedStream(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	repoStorage := "default"
@@ -595,7 +595,7 @@ func TestGetPatchProxiedToGitalyInterruptedStream(t *testing.T) {
 
 func TestGetSnapshotProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 	expectedBody := testhelper.GitalyGetSnapshotResponseMock
@@ -617,7 +617,7 @@ func TestGetSnapshotProxiedToGitalySuccessfully(t *testing.T) {
 
 func TestGetSnapshotProxiedToGitalyInterruptedStream(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
+	defer gitalyServer.GracefulStop()
 
 	gitalyAddress := "unix:" + socketPath
 

@@ -80,7 +80,7 @@ func startSmartHTTPServer(t testing.TB, s gitalypb.SmartHTTPServiceServer) (stri
 	}()
 
 	return fmt.Sprintf("%s://%s", ln.Addr().Network(), ln.Addr().String()), func() {
-		srv.Stop()
+		srv.GracefulStop()
 		assert.NoError(t, os.RemoveAll(tmp), "error removing temp dir %q", tmp)
 	}
 }
