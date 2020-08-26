@@ -23,7 +23,7 @@ export default {
 
 <template>
   <cell class="license-header-cell" :is-flexible="false">
-    <template slot="title">
+    <template #title>
       <gl-icon class="icon" :name="icon" />
       <span class="ml-2 font-weight-bold">{{ title }}</span>
     </template>
