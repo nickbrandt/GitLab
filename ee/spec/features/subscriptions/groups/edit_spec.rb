@@ -22,21 +22,21 @@ RSpec.describe 'Welcome screen', :js do
 
     it 'shows the group edit page without a progress bar' do
       expect(page).to have_content('Create your group')
-      expect(page).not_to have_content('1. Your profile')
+      expect(page).not_to have_content('Your profile')
     end
 
     context 'when showing for a new user' do
       let(:params) { { new_user: true } }
 
       it 'shows the progress bar with the correct steps' do
-        expect(page).to have_content('1. Your profile 2. Checkout 3. Your GitLab group')
+        expect(page).to have_content('Your profile Checkout Your GitLab group')
       end
 
       context 'when part of the onboarding issues experiment' do
         let(:part_of_onboarding_issues_experiment) { true }
 
         it 'shows the progress bar with the correct steps' do
-          expect(page).to have_content('1. Your profile 2. Checkout 3. Your GitLab group 4. Your first project')
+          expect(page).to have_content('Your profile Checkout Your GitLab group Your first project')
         end
       end
     end

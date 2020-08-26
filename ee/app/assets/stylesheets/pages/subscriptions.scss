@@ -43,6 +43,9 @@ $subscriptions-full-width-lg: 541px;
       width: 400px;
     }
 
+    list-style-position: inside;
+    list-style-type: decimal;
+
     .phase {
       border-bottom: 5px solid $gray-100;
       color: $gray-500;
