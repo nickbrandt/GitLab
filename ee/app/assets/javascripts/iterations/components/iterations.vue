@@ -77,7 +77,6 @@ export default {
       const vars = {
         fullPath: this.fullPath,
         isGroup: this.namespaceType === Namespace.Group,
-        isProject: this.namespaceType === Namespace.Project,
         state: this.state,
       };
 

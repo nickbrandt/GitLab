@@ -1,4 +1,4 @@
-fragment Iteration on Iteration {
+fragment IterationListItem on Iteration {
   dueDate
   id
   scopedPath

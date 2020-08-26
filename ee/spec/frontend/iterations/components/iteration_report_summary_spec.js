@@ -1,13 +1,14 @@
 import IterationReportSummary from 'ee/iterations/components/iteration_report_summary.vue';
 import { mount } from '@vue/test-utils';
 import { GlCard } from '@gitlab/ui';
+import { Namespace } from 'ee/iterations/constants';
 
-describe('Iterations report tabs', () => {
+describe('Iterations report summary', () => {
   let wrapper;
   const id = 3;
-  const groupPath = 'gitlab-org';
+  const fullPath = 'gitlab-org';
   const defaultProps = {
-    groupPath,
+    fullPath,
     iterationId: `gid://gitlab/Iteration/${id}`,
   };
 
@@ -86,6 +87,45 @@ describe('Iterations report tabs', () => {
       expect(findOpenCard().text()).toContain('0');
       expect(findInProgressCard().text()).toContain('0');
       expect(findCompletedCard().text()).toContain('0');
+    });
+  });
+
+  describe('IterationIssuesSummary query variables', () => {
+    const expected = {
+      fullPath: defaultProps.fullPath,
+      id,
+    };
+
+    describe('when group', () => {
+      it('has expected query variable values', () => {
+        mountComponent({
+          props: {
+            ...defaultProps,
+            namespaceType: Namespace.Group,
+          },
+        });
+
+        expect(wrapper.vm.queryVariables).toEqual({
+          ...expected,
+          isGroup: true,
+        });
+      });
+    });
+
+    describe('when project', () => {
+      it('has expected query variable values', () => {
+        mountComponent({
+          props: {
+            ...defaultProps,
+            namespaceType: Namespace.Project,
+          },
+        });
+
+        expect(wrapper.vm.queryVariables).toEqual({
+          ...expected,
+          isGroup: false,
+        });
+      });
     });
   });
 });
