@@ -18,7 +18,7 @@ class IssueRebalancingService
     start = RelativePositioning::START_POSITION - (gaps / 2) * gap_size
 
     Issue.transaction do
-      indexed_ids.each_slice(500) { |pairs| assign_positions(start, pairs) }
+      indexed_ids.each_slice(100) { |pairs| assign_positions(start, pairs) }
     end
   end
 
