@@ -26,6 +26,351 @@
 #     end
 #
 module RelativePositioning
+  class Gap
+    attr_reader :start_pos, :end_pos
+
+    def initialize(start_pos, end_pos)
+      @start_pos, @end_pos = start_pos, end_pos
+    end
+
+    def delta
+      ((start_pos - end_pos) / 2.0).abs.ceil.clamp(0, RelativePositioning::IDEAL_DISTANCE)
+    end
+  end
+
+  class ItemContext
+    include Gitlab::Utils::StrongMemoize
+
+    attr_reader :object, :model_class, :range
+    attr_accessor :ignoring
+
+    def initialize(object, range)
+      @object = object
+      @range = range
+      @model_class = object.class
+    end
+
+    def min_relative_position
+      strong_memoize(:min_relative_position) { calculate_relative_position('MIN') }
+    end
+
+    def max_relative_position
+      strong_memoize(:max_relative_position) { calculate_relative_position('MAX') }
+    end
+
+    def prev_relative_position
+      calculate_relative_position('MAX') { |r| nextify(r, false) } if object.relative_position
+    end
+
+    def next_relative_position
+      calculate_relative_position('MIN') { |r| nextify(r) } if object.relative_position
+    end
+
+    def nextify(relation, gt = true)
+      op = gt ? '>' : '<'
+      relation.where("relative_position #{op} ?", object.relative_position)
+    end
+
+    def relative_siblings(relation = scoped_items)
+      relation.id_not_in(object.id)
+    end
+
+    # Handles the possibility that the position is already occupied by a sibling
+    def place_at_position(position, lhs)
+      current_occupant = relative_siblings.find_by(relative_position: position)
+
+      if current_occupant.present?
+        Mover.new(position, range).move(object, lhs.object, current_occupant)
+      else
+        object.relative_position = position
+      end
+    end
+
+    def lhs_neighbour
+      scoped_items
+        .where('relative_position < ?', relative_position)
+        .reorder(relative_position: :desc)
+        .first
+        .then { |x| neighbour(x) }
+    end
+
+    def rhs_neighbour
+      scoped_items
+        .where('relative_position > ?', relative_position)
+        .reorder(relative_position: :asc)
+        .first
+        .then { |x| neighbour(x) }
+    end
+
+    def neighbour(item)
+      return unless item.present?
+
+      n = self.class.new(item, range)
+      n.ignoring = ignoring
+      n
+    end
+
+    def scoped_items
+      r = model_class.relative_positioning_query_base(object)
+      r = r.id_not_in(ignoring.id) if ignoring.present?
+      r
+    end
+
+    def calculate_relative_position(calculation)
+      # When calculating across projects, this is much more efficient than
+      # MAX(relative_position) without the GROUP BY, due to index usage:
+      # https://gitlab.com/gitlab-org/gitlab-foss/issues/54276#note_119340977
+      relation = scoped_items
+                   .order(Gitlab::Database.nulls_last_order('position', 'DESC'))
+                   .group(grouping_column)
+                   .limit(1)
+
+      relation = yield relation if block_given?
+
+      relation
+        .pluck(grouping_column, Arel.sql("#{calculation}(relative_position) AS position"))
+        .first&.last
+    end
+
+    def grouping_column
+      model_class.relative_positioning_parent_column
+    end
+
+    def max_sibling
+      sib = relative_siblings
+        .order(Gitlab::Database.nulls_last_order('relative_position', 'DESC'))
+        .first
+
+      self.class.new(sib, range)
+    end
+
+    def min_sibling
+      sib = relative_siblings
+        .order(Gitlab::Database.nulls_last_order('relative_position', 'ASC'))
+        .first
+
+      self.class.new(sib, range)
+    end
+
+    def shift_left
+      move_sequence_before(true)
+      object.reset
+    end
+
+    def shift_right
+      move_sequence_after(true)
+      object.reset
+    end
+
+    def create_space_left(gap: nil)
+      move_sequence_before(false, next_gap: gap)
+    end
+
+    def create_space_right(gap: nil)
+      move_sequence_after(false, next_gap: gap)
+    end
+
+    def move_sequence_before(include_self = false, next_gap: find_next_gap_before)
+      raise NoSpaceLeft unless next_gap.present?
+
+      delta = next_gap.delta
+
+      move_sequence(next_gap.start_pos, relative_position, -delta, include_self)
+    end
+
+    def move_sequence_after(include_self = false, next_gap: find_next_gap_after)
+      raise NoSpaceLeft unless next_gap.present?
+
+      delta = next_gap.delta
+
+      move_sequence(relative_position, next_gap.start_pos, delta, include_self)
+    end
+
+    def move_sequence(start_pos, end_pos, delta, include_self = false)
+      relation = include_self ? scoped_items : relative_siblings
+
+      relation
+        .where('relative_position BETWEEN ? AND ?', start_pos, end_pos)
+        .update_all("relative_position = relative_position + #{delta}")
+    end
+
+    def find_next_gap_before
+      items_with_next_pos = scoped_items
+                              .select('relative_position AS pos, LEAD(relative_position) OVER (ORDER BY relative_position DESC) AS next_pos')
+                              .where('relative_position <= ?', relative_position)
+                              .order(relative_position: :desc)
+
+      find_next_gap(items_with_next_pos, range.first)
+    end
+
+    def find_next_gap_after
+      items_with_next_pos = scoped_items
+                              .select('relative_position AS pos, LEAD(relative_position) OVER (ORDER BY relative_position ASC) AS next_pos')
+                              .where('relative_position >= ?', relative_position)
+                              .order(:relative_position)
+
+      find_next_gap(items_with_next_pos, range.last)
+    end
+
+    def find_next_gap(items_with_next_pos, default_end)
+      gap = model_class
+        .from(items_with_next_pos, :items)
+        .where('next_pos IS NULL OR ABS(pos::bigint - next_pos::bigint) >= ?', RelativePositioning::MIN_GAP)
+        .limit(1)
+        .pluck(:pos, :next_pos)
+        .first
+
+      return if gap.nil? || gap.first == default_end
+
+      Gap.new(gap.first, gap.second || default_end)
+    end
+
+    def relative_position
+      object.relative_position
+    end
+  end
+
+  class Mover
+    attr_reader :range, :start_position
+
+    def initialize(start, range)
+      @range = range
+      @start_position = start
+    end
+
+    def move_to_end(object)
+      focus = context(object, ignoring: object)
+      max_pos = focus.max_relative_position
+
+      move_to_range_end(focus, max_pos)
+    end
+
+    def move_to_start(object)
+      focus = context(object, ignoring: object)
+      min_pos = focus.min_relative_position
+
+      move_to_range_start(focus, min_pos)
+    end
+
+    def move(object, first, last)
+      raise ArgumentError unless object && (first || last) && (first != last)
+      # Moving a object next to itself is a no-op
+      return if object == first || object == last
+
+      lhs = context(first, ignoring: object)
+      rhs = context(last, ignoring: object)
+      focus = context(object)
+
+      lhs ||= rhs.lhs_neighbour
+      rhs ||= lhs.rhs_neighbour
+
+      if lhs.nil?
+        move_to_range_start(focus, rhs.relative_position)
+      elsif rhs.nil?
+        move_to_range_end(focus, lhs.relative_position)
+      else
+        pos_left, pos_right = create_space_between(lhs, rhs)
+        desired_position = position_between(pos_left, pos_right)
+        focus.place_at_position(desired_position, lhs)
+      end
+    end
+
+    private
+
+    def gap_too_small?(pos_a, pos_b)
+      return false unless pos_a && pos_b
+
+      (pos_a - pos_b).abs < MIN_GAP
+    end
+
+    def move_to_range_end(context, max_pos)
+      range_end = range.last + 1
+
+      new_pos = if max_pos.nil?
+                  start_position
+                elsif gap_too_small?(max_pos, range_end)
+                  max = context.max_sibling
+                  max.ignoring = context.object
+                  max.shift_left
+                  position_between(max.relative_position, range_end)
+                else
+                  position_between(max_pos, range_end)
+                end
+
+      context.object.relative_position = new_pos
+    end
+
+    def move_to_range_start(context, min_pos)
+      range_end = range.first - 1
+
+      new_pos = if min_pos.nil?
+                  start_position
+                elsif gap_too_small?(min_pos, range_end)
+                  sib = context.min_sibling
+                  sib.ignoring = context.object
+                  sib.shift_right
+                  position_between(sib.relative_position, range_end)
+                else
+                  position_between(min_pos, range_end)
+                end
+
+      context.object.relative_position = new_pos
+    end
+
+    def create_space_between(lhs, rhs)
+      pos_left = lhs&.relative_position
+      pos_right = rhs&.relative_position
+
+      return [pos_left, pos_right] unless gap_too_small?(pos_left, pos_right)
+
+      gap = rhs.find_next_gap_before
+
+      if gap.present?
+        rhs.create_space_left(gap: gap)
+        [pos_left - gap.delta, pos_right]
+      else
+        gap = lhs.find_next_gap_after
+        lhs.create_space_right(gap: gap)
+        [pos_left, pos_right + gap.delta]
+      end
+    end
+
+    def context(object, ignoring: nil)
+      return unless object
+
+      c = ItemContext.new(object, range)
+      c.ignoring = ignoring
+      c
+    end
+
+    def position_between(pos_before, pos_after)
+      pos_before ||= range.first
+      pos_after ||= range.last
+
+      pos_before, pos_after = [pos_before, pos_after].sort
+
+      gap_width = pos_after - pos_before
+
+      if gap_too_small?(pos_before, pos_after)
+        raise RelativePositioning::NoSpaceLeft
+      elsif gap_width > RelativePositioning::MAX_GAP
+        if pos_before <= range.first
+          pos_after - RelativePositioning::IDEAL_DISTANCE
+        elsif pos_after >= range.last
+          pos_before + RelativePositioning::IDEAL_DISTANCE
+        else
+          midpoint(pos_before, pos_after)
+        end
+      else
+        midpoint(pos_before, pos_after)
+      end
+    end
+
+    def midpoint(lower_bound, upper_bound)
+      ((lower_bound + upper_bound) / 2.0).ceil.clamp(lower_bound, upper_bound - 1)
+    end
+  end
+
   extend ActiveSupport::Concern
 
   STEPS = 10
