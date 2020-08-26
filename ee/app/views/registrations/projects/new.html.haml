@@ -4,7 +4,7 @@
 .row.flex-grow-1.bg-gray-light
   .d-flex.flex-column.align-items-center.w-100.p-3
     .new-project.d-flex.flex-column.align-items-center.pt-5
-      #progress-bar{ data: { is_in_subscription_flow: in_subscription_flow?.to_s } }
+      #progress-bar
       %h2.center= _('Create/import your first project')
       %p
         .center= html_escape(_('This project will live in your group %{strong_open}%{namespace}%{strong_close}. A project is where you house your files (repository), plan your work (issues), publish your documentation (wiki), and so much more.')) % { namespace: html_escape(@project.namespace.name), strong_open: '<strong>'.html_safe, strong_close: '</strong>'.html_safe }

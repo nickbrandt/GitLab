@@ -48,14 +48,5 @@ RSpec.describe 'Welcome screen', :js do
         end
       end
     end
-
-    context 'when in the subscription flow and part of the onboarding issues experiment' do
-      let(:in_subscription_flow) { true }
-      let(:part_of_onboarding_issues_experiment) { true }
-
-      it 'shows the progress bar with the correct steps' do
-        expect(page).to have_content('Your profile Checkout Your GitLab group Your first project')
-      end
-    end
   end
 end
