@@ -171,7 +171,7 @@ RSpec.describe Projects::Settings::OperationsController do
             new_incident_management_settings = params
 
             expect(Gitlab::Tracking).to receive(:event)
-              .with('IncidentManagement::Settings', event_key, kind_of(Hash))
+              .with('IncidentManagement::Settings', event_key, any_args)
 
             patch :update, params: project_params(project, incident_management_setting_attributes: new_incident_management_settings)
 
