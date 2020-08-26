@@ -3172,11 +3172,11 @@ RSpec.describe NotificationService, :mailer do
   end
 
   def should_email_nested_group_user(user, times: 1, recipients: email_recipients)
-    should_email(user, times: 1, recipients: email_recipients)
+    should_email(user, times: times, recipients: recipients)
   end
 
   def should_not_email_nested_group_user(user, recipients: email_recipients)
-    should_not_email(user, recipients: email_recipients)
+    should_not_email(user, recipients: recipients)
   end
 
   def add_users(project)
