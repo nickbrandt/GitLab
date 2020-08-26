@@ -95,7 +95,7 @@ class Projects::IssuesController < Projects::ApplicationController
       discussion_to_resolve: params[:discussion_to_resolve],
       confidential: !!Gitlab::Utils.to_boolean(params[:issue][:confidential])
     )
-    service = Issues::BuildService.new(project, current_user, build_params)
+    service = ::Issues::BuildService.new(project, current_user, build_params)
 
     @issue = @noteable = service.execute
 
