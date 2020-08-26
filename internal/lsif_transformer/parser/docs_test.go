@@ -12,7 +12,7 @@ func createLine(id, label, uri string) []byte {
 }
 
 func TestRead(t *testing.T) {
-	d, err := NewDocs(Config{ProcessReferences: true})
+	d, err := NewDocs(Config{})
 	require.NoError(t, err)
 	defer d.Close()
 
@@ -29,7 +29,7 @@ func TestRead(t *testing.T) {
 }
 
 func TestReadContainsLine(t *testing.T) {
-	d, err := NewDocs(Config{ProcessReferences: true})
+	d, err := NewDocs(Config{})
 	require.NoError(t, err)
 	defer d.Close()
 

@@ -19,8 +19,7 @@ type Parser struct {
 }
 
 type Config struct {
-	TempPath          string
-	ProcessReferences bool
+	TempPath string
 }
 
 func NewParser(r io.Reader, config Config) (*Parser, error) {
