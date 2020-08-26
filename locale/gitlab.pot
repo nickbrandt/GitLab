@@ -21777,9 +21777,6 @@ msgstr ""
 msgid "SecurityReports|Download Report"
 msgstr ""
 
-msgid "SecurityReports|Edit dashboard"
-msgstr ""
-
 msgid "SecurityReports|Either you don't have permission to view this dashboard or the dashboard has not been setup. Please check your permission settings with your administrator or check your dashboard configurations to proceed."
 msgstr ""
 
@@ -21835,9 +21832,6 @@ msgid "SecurityReports|Projects added"
 msgstr ""
 
 msgid "SecurityReports|Remove project from dashboard"
-msgstr ""
-
-msgid "SecurityReports|Return to dashboard"
 msgstr ""
 
 msgid "SecurityReports|Scan details"
