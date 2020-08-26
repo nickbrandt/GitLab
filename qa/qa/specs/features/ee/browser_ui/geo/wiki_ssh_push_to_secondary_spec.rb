@@ -34,7 +34,7 @@ module QA
         end
       end
 
-      it 'proxies wiki commit to primary node and ultmately replicates to secondary node' do
+      it 'proxies wiki commit to primary node and ultmately replicates to secondary node', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/694' do
         QA::Runtime::Logger.debug('*****Visiting the secondary geo node*****')
 
         QA::Flow::Login.while_signed_in(address: :geo_secondary) do

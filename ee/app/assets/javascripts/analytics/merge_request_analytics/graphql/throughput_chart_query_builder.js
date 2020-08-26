@@ -19,7 +19,9 @@ export default (startDate = null, endDate = null) => {
   const computedMonthData = monthData.map(value => {
     const { year, month, mergedAfter, mergedBefore } = value;
 
-    return `${month}_${year}: mergeRequests(mergedBefore: "${mergedBefore}", mergedAfter: "${mergedAfter}") { count }`;
+    // first: 0 is an optimization which makes sure we don't load merge request objects into memory (backend).
+    // Currently when requesting counts we also load the first 100 records (preloader problem).
+    return `${month}_${year}: mergeRequests(first: 0, mergedBefore: "${mergedBefore}", mergedAfter: "${mergedAfter}") { count }`;
   });
 
   return gql`

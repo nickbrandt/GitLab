@@ -13,7 +13,8 @@ import { __ } from '~/locale';
 import IterationReportSummary from './iteration_report_summary.vue';
 import IterationForm from './iteration_form.vue';
 import IterationReportTabs from './iteration_report_tabs.vue';
-import query from '../queries/group_iteration.query.graphql';
+import query from '../queries/iteration.query.graphql';
+import { Namespace } from '../constants';
 
 const iterationStates = {
   closed: 'closed',
@@ -35,20 +36,19 @@ export default {
     IterationReportTabs,
   },
   apollo: {
-    namespace: {
+    iteration: {
       query,
       variables() {
         return {
-          groupPath: this.fullPath,
+          fullPath: this.fullPath,
+          id: `gid://gitlab/Iteration/${this.iterationId}`,
           iid: this.iterationIid,
+          hasId: Boolean(this.iterationId),
+          hasIid: Boolean(this.iterationIid),
         };
       },
       update(data) {
-        const iteration = data?.group?.iterations?.nodes[0] || {};
-
-        return {
-          iteration,
-        };
+        return data.group?.iterations?.nodes[0] || data.iteration || {};
       },
       error(err) {
         this.error = err.message;
@@ -60,14 +60,26 @@ export default {
       type: String,
       required: true,
     },
+    iterationId: {
+      type: String,
+      required: false,
+      default: undefined,
+    },
     iterationIid: {
       type: String,
-      required: true,
+      required: false,
+      default: undefined,
     },
     canEdit: {
       type: Boolean,
       required: false,
       default: false,
+    },
+    namespaceType: {
+      type: String,
+      required: false,
+      default: Namespace.Group,
+      validator: value => Object.values(Namespace).includes(value),
     },
     previewMarkdownPath: {
       type: String,
@@ -79,17 +91,12 @@ export default {
     return {
       isEditing: false,
       error: '',
-      namespace: {
-        iteration: {},
-      },
+      iteration: {},
     };
   },
   computed: {
-    iteration() {
-      return this.namespace.iteration;
-    },
     hasIteration() {
-      return !this.$apollo.queries.namespace.loading && this.iteration?.title;
+      return !this.$apollo.queries.iteration.loading && this.iteration?.title;
     },
     status() {
       switch (this.iteration.state) {
@@ -120,7 +127,7 @@ export default {
     <gl-alert v-if="error" variant="danger" @dismiss="error = ''">
       {{ error }}
     </gl-alert>
-    <gl-loading-icon v-if="$apollo.queries.namespace.loading" class="gl-py-5" size="lg" />
+    <gl-loading-icon v-if="$apollo.queries.iteration.loading" class="gl-py-5" size="lg" />
     <gl-empty-state
       v-else-if="!hasIteration"
       :title="__('Could not find iteration')"
@@ -164,8 +171,16 @@ export default {
       </div>
       <h3 ref="title" class="page-title">{{ iteration.title }}</h3>
       <div ref="description" v-html="iteration.descriptionHtml"></div>
-      <iteration-report-summary :group-path="fullPath" :iteration-id="iteration.id" />
-      <iteration-report-tabs :group-path="fullPath" :iteration-id="iteration.id" />
+      <iteration-report-summary
+        :full-path="fullPath"
+        :iteration-id="iteration.id"
+        :namespace-type="namespaceType"
+      />
+      <iteration-report-tabs
+        :full-path="fullPath"
+        :iteration-id="iteration.id"
+        :namespace-type="namespaceType"
+      />
     </template>
   </div>
 </template>
