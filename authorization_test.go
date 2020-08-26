@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -31,9 +32,7 @@ func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, ur
 
 	// Create http request
 	httpRequest, err := http.NewRequest("GET", "/address", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	parsedURL := helper.URLMustParse(ts.URL)
 	testhelper.ConfigureSecret()
 	a := api.NewAPI(parsedURL, "123", roundtripper.NewTestBackendRoundTripper(parsedURL))
@@ -70,9 +69,8 @@ func TestPreAuthorizeJsonFailure(t *testing.T) {
 
 func TestPreAuthorizeContentTypeFailure(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, err := w.Write([]byte(`{"hello":"world"}`)); err != nil {
-			t.Fatalf("write auth response: %v", err)
-		}
+		_, err := w.Write([]byte(`{"hello":"world"}`))
+		require.NoError(t, err, "write auth response")
 	}))
 	defer ts.Close()
 
@@ -110,27 +108,16 @@ func TestPreAuthorizeJWT(t *testing.T) {
 
 			return secretBytes, nil
 		})
-		if err != nil {
-			t.Fatalf("decode token: %v", err)
-		}
+		require.NoError(t, err, "decode token")
 
 		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			t.Fatal("claims cast failed")
-		}
-
-		if !token.Valid {
-			t.Fatal("JWT token invalid")
-		}
-
-		if claims["iss"] != "gitlab-workhorse" {
-			t.Fatalf("execpted issuer gitlab-workhorse, got %q", claims["iss"])
-		}
+		require.True(t, ok, "claims cast")
+		require.True(t, token.Valid, "JWT token valid")
+		require.Equal(t, "gitlab-workhorse", claims["iss"], "JWT token issuer")
 
 		w.Header().Set("Content-Type", api.ResponseContentType)
-		if _, err := w.Write([]byte(`{"hello":"world"}`)); err != nil {
-			t.Fatalf("write auth response: %v", err)
-		}
+		_, err = w.Write([]byte(`{"hello":"world"}`))
+		require.NoError(t, err, "write auth response")
 	}))
 	defer ts.Close()
 

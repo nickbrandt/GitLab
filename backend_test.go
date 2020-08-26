@@ -2,9 +2,11 @@ package main
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-func TestParseAuthBackend(t *testing.T) {
+func TestParseAuthBackendFailure(t *testing.T) {
 	failures := []string{
 		"",
 		"ftp://localhost",
@@ -12,11 +14,14 @@ func TestParseAuthBackend(t *testing.T) {
 	}
 
 	for _, example := range failures {
-		if _, err := parseAuthBackend(example); err == nil {
-			t.Errorf("error expected for %q", example)
-		}
+		t.Run(example, func(t *testing.T) {
+			_, err := parseAuthBackend(example)
+			require.Error(t, err)
+		})
 	}
+}
 
+func TestParseAuthBackend(t *testing.T) {
 	successes := []struct{ input, host, scheme string }{
 		{"http://localhost:8080", "localhost:8080", "http"},
 		{"localhost:3000", "localhost:3000", "http"},
@@ -25,18 +30,12 @@ func TestParseAuthBackend(t *testing.T) {
 	}
 
 	for _, example := range successes {
-		result, err := parseAuthBackend(example.input)
-		if err != nil {
-			t.Errorf("parse %q: %v", example.input, err)
-			break
-		}
+		t.Run(example.input, func(t *testing.T) {
+			result, err := parseAuthBackend(example.input)
+			require.NoError(t, err)
 
-		if result.Host != example.host {
-			t.Errorf("example %q: expected %q, got %q", example.input, example.host, result.Host)
-		}
-
-		if result.Scheme != example.scheme {
-			t.Errorf("example %q: expected %q, got %q", example.input, example.scheme, result.Scheme)
-		}
+			require.Equal(t, example.host, result.Host, "host")
+			require.Equal(t, example.scheme, result.Scheme, "scheme")
+		})
 	}
 }

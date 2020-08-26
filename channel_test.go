@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/stretchr/testify/require"
 	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
@@ -45,9 +46,7 @@ func TestChannelHappyPath(t *testing.T) {
 			defer close()
 
 			client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
-			if err != nil {
-				t.Fatal(err)
-			}
+			require.NoError(t, err)
 
 			server := (<-serverConns).conn
 			defer server.Close()
@@ -55,14 +54,10 @@ func TestChannelHappyPath(t *testing.T) {
 			message := "test message"
 
 			// channel.k8s.io: server writes to channel 1, STDOUT
-			if err := say(server, "\x01"+message); err != nil {
-				t.Fatal(err)
-			}
+			require.NoError(t, say(server, "\x01"+message))
 			requireReadMessage(t, client, websocket.BinaryMessage, message)
 
-			if err := say(client, message); err != nil {
-				t.Fatal(err)
-			}
+			require.NoError(t, say(client, message))
 
 			// channel.k8s.io: client writes get put on channel 0, STDIN
 			requireReadMessage(t, server, websocket.BinaryMessage, "\x00"+message)
@@ -78,14 +73,8 @@ func TestChannelBadTLS(t *testing.T) {
 	_, clientURL, close := wireupChannel(envTerminalPath, badCA, "channel.k8s.io")
 	defer close()
 
-	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
-	if err != websocket.ErrBadHandshake {
-		t.Fatalf("Expected connection to fail ErrBadHandshake, got: %v", err)
-	}
-	if err == nil {
-		log.Info("TLS negotiation should have failed!")
-		defer client.Close()
-	}
+	_, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
+	require.Equal(t, websocket.ErrBadHandshake, err, "unexpected error %v", err)
 }
 
 func TestChannelSessionTimeout(t *testing.T) {
@@ -93,9 +82,7 @@ func TestChannelSessionTimeout(t *testing.T) {
 	defer close()
 
 	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	sc := <-serverConns
 	defer sc.conn.Close()
@@ -103,9 +90,7 @@ func TestChannelSessionTimeout(t *testing.T) {
 	client.SetReadDeadline(time.Now().Add(time.Duration(2) * time.Second))
 	_, _, err = client.ReadMessage()
 
-	if !websocket.IsCloseError(err, websocket.CloseAbnormalClosure) {
-		t.Fatalf("Client connection was not closed, got %v", err)
-	}
+	require.True(t, websocket.IsCloseError(err, websocket.CloseAbnormalClosure), "Client connection was not closed, got %v", err)
 }
 
 func TestChannelProxyForwardsHeadersFromUpstream(t *testing.T) {
@@ -115,16 +100,12 @@ func TestChannelProxyForwardsHeadersFromUpstream(t *testing.T) {
 	defer close()
 
 	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
 
 	sc := <-serverConns
 	defer sc.conn.Close()
-	if sc.req.Header.Get("Random-Header") != "Value" {
-		t.Fatal("Header specified by upstream not sent to remote")
-	}
+	require.Equal(t, "Value", sc.req.Header.Get("Random-Header"), "Header specified by upstream not sent to remote")
 }
 
 func TestChannelProxyForwardsXForwardedForFromClient(t *testing.T) {
@@ -134,21 +115,16 @@ func TestChannelProxyForwardsXForwardedForFromClient(t *testing.T) {
 	hdr := make(http.Header)
 	hdr.Set("X-Forwarded-For", "127.0.0.2")
 	client, _, err := dialWebsocket(clientURL, hdr, "terminal.gitlab.com")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer client.Close()
+
 	clientIP, _, err := net.SplitHostPort(client.LocalAddr().String())
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	sc := <-serverConns
 	defer sc.conn.Close()
 
-	if xff := sc.req.Header.Get("X-Forwarded-For"); xff != "127.0.0.2, "+clientIP {
-		t.Fatalf("X-Forwarded-For from client not sent to remote: %+v", xff)
-	}
+	require.Equal(t, "127.0.0.2, "+clientIP, sc.req.Header.Get("X-Forwarded-For"), "X-Forwarded-For from client not sent to remote")
 }
 
 func wireupChannel(channelPath string, modifier func(*api.Response), subprotocols ...string) (chan connWithReq, string, func()) {
@@ -262,15 +238,8 @@ func say(conn *websocket.Conn, message string) error {
 
 func requireReadMessage(t *testing.T, conn *websocket.Conn, expectedMessageType int, expectedData string) {
 	messageType, data, err := conn.ReadMessage()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
-	if messageType != expectedMessageType {
-		t.Fatalf("Expected message, %d, got %d", expectedMessageType, messageType)
-	}
-
-	if string(data) != expectedData {
-		t.Fatalf("Message was mangled in transit. Expected %q, got %q", expectedData, string(data))
-	}
+	require.Equal(t, expectedMessageType, messageType, "message type")
+	require.Equal(t, expectedData, string(data), "message data")
 }

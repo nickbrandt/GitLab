@@ -73,23 +73,18 @@ func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.
 			expectSignedRequest(t, r)
 
 			w.Header().Set("Content-Type", api.ResponseContentType)
-			if _, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir); err != nil {
-				t.Fatal(err)
-			}
+			_, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir)
+			require.NoError(t, err)
 			return
 		}
 
-		err := r.ParseMultipartForm(100000)
-		if err != nil {
-			t.Fatal(err)
-		}
-		nValues := 10 // file name, path, remote_url, remote_id, size, md5, sha1, sha256, sha512, gitlab-workhorse-upload for just the upload (no metadata because we are not POSTing a valid zip file)
-		if len(r.MultipartForm.Value) != nValues {
-			t.Errorf("Expected to receive exactly %d values", nValues)
-		}
-		if len(r.MultipartForm.File) != 0 {
-			t.Error("Expected to not receive any files")
-		}
+		require.NoError(t, r.ParseMultipartForm(100000))
+
+		const nValues = 10 // file name, path, remote_url, remote_id, size, md5, sha1, sha256, sha512, gitlab-workhorse-upload for just the upload (no metadata because we are not POSTing a valid zip file)
+		require.Len(t, r.MultipartForm.Value, nValues)
+
+		require.Empty(t, r.MultipartForm.File, "multipart form files")
+
 		if extraTests != nil {
 			extraTests(r)
 		}
@@ -202,43 +197,35 @@ func TestBlockingRewrittenFieldsHeader(t *testing.T) {
 		{"no multipart", "text/plain", nil, false},
 	}
 
-	if b, c, err := multipartBodyWithFile(); err == nil {
-		testCases[0].contentType = c
-		testCases[0].body = b
-	} else {
-		t.Fatal(err)
-	}
+	var err error
+	testCases[0].body, testCases[0].contentType, err = multipartBodyWithFile()
+	require.NoError(t, err)
 
 	for _, tc := range testCases {
 		ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
-			h := upload.RewrittenFieldsHeader
-			if _, ok := r.Header[h]; ok != tc.present {
-				t.Errorf("Expectation of presence (%v) violated", tc.present)
+			key := upload.RewrittenFieldsHeader
+			if tc.present {
+				require.Contains(t, r.Header, key)
+			} else {
+				require.NotContains(t, r.Header, key)
 			}
-			if r.Header.Get(h) == canary {
-				t.Errorf("Found canary %q in header %q", canary, h)
-			}
+
+			require.NotEqual(t, canary, r.Header.Get(key), "Found canary %q in header %q", canary, key)
 		})
 		defer ts.Close()
 		ws := startWorkhorseServer(ts.URL)
 		defer ws.Close()
 
 		req, err := http.NewRequest("POST", ws.URL+"/something", tc.body)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		req.Header.Set("Content-Type", tc.contentType)
 		req.Header.Set(upload.RewrittenFieldsHeader, canary)
 		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			t.Error(err)
-		}
+		require.NoError(t, err)
 		defer resp.Body.Close()
-		if resp.StatusCode != 200 {
-			t.Errorf("%s: expected HTTP 200, got %d", tc.desc, resp.StatusCode)
-		}
 
+		require.Equal(t, 200, resp.StatusCode, "status code")
 	}
 }
 
