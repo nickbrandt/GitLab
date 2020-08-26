@@ -12,7 +12,7 @@ module Gitlab
           include ::Gitlab::Config::Entry::Configurable
           include ::Gitlab::Config::Entry::Attributable
 
-          ALLOWED_KEYS = %i[terminal].freeze
+          ALLOWED_KEYS = %i[terminal json_schemas yaml_schemas].freeze
 
           validations do
             validates :config, allowed_keys: ALLOWED_KEYS
@@ -22,6 +22,16 @@ module Gitlab
             description: 'Configuration of the webide terminal.'
 
           attributes :terminal
+
+          entry :json_schemas, Entry::Schemas,
+            description: 'Configuration of JSON schemas'
+
+          attributes :json_schemas
+
+          entry :yaml_schemas, Entry::Schemas,
+            description: 'Configuration of YAML schemas'
+
+          attributes :yaml_schemas
         end
       end
     end

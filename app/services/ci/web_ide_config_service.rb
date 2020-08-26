@@ -10,12 +10,25 @@ module Ci
 
     attr_reader :config, :config_content
 
-    def execute
+    def load_terminal_config
       check_access!
       load_config_content!
       load_config!
 
       success(terminal: config.terminal_value)
+    rescue ValidationError => e
+      error(e.message)
+    end
+
+    def load_schemas_config
+      check_access!
+      load_config_content!
+      load_config!
+
+      success({
+        json_schemas: config.json_schemas_value,
+        yaml_schemas: config.yaml_schemas_value
+      })
     rescue ValidationError => e
       error(e.message)
     end

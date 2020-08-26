@@ -85,6 +85,7 @@ class License < ApplicationRecord
     group_merge_request_analytics
     group_project_templates
     group_saml
+    ide_schema_config
     issues_analytics
     jira_dev_panel_integration
     jira_issues_integration

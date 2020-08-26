@@ -511,6 +511,8 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      resources :project_schemas, path: :schemas, only: [:show] # rubocop: disable Cop/PutProjectRoutesUnderScope
+
       # Deprecated unscoped routing.
       scope as: 'deprecated' do
         # Issue https://gitlab.com/gitlab-org/gitlab/issues/118849
