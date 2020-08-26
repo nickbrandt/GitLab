@@ -71,6 +71,9 @@ msgstr ""
 msgid "\"%{path}\" did not exist on \"%{ref}\""
 msgstr ""
 
+msgid "\"el\" parameter is required for createInstance()"
+msgstr ""
+
 msgid "%d Scanned URL"
 msgid_plural "%d Scanned URLs"
 msgstr[0] ""
