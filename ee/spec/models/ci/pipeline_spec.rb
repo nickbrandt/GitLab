@@ -24,29 +24,6 @@ RSpec.describe Ci::Pipeline do
     end
   end
 
-  describe '.ci_sources' do
-    subject { described_class.ci_sources }
-
-    let(:all_config_sources) { described_class.config_sources }
-
-    before do
-      all_config_sources.each do |source, _value|
-        create(:ci_pipeline, config_source: source)
-      end
-    end
-
-    it 'contains pipelines having CI only config sources' do
-      expect(subject.map(&:config_source)).to contain_exactly(
-        'auto_devops_source',
-        'external_project_source',
-        'remote_source',
-        'repository_source',
-        'unknown_source'
-      )
-      expect(subject.size).to be < all_config_sources.size
-    end
-  end
-
   describe '#with_vulnerabilities scope' do
     let!(:pipeline_1) { create(:ci_pipeline, project: project) }
     let!(:pipeline_2) { create(:ci_pipeline, project: project) }
@@ -376,7 +353,7 @@ RSpec.describe Ci::Pipeline do
 
     context 'when pipeline is web terminal triggered' do
       before do
-        pipeline.config_source = 'webide_source'
+        pipeline.source = 'webide'
       end
 
       it 'does not schedule the pipeline cache worker' do
