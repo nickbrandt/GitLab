@@ -14,7 +14,7 @@
 
 - elsif show_burndown_placeholder?(milestone, warning)
   .burndown-hint.content-block.container-fluid
-    = icon("times", class: "dismiss-icon")
+    = sprite_icon('close', size: 16, css_class: 'dismiss-icon')
     .row
       .col-sm-4.col-12.svg-container
         = custom_icon('icon_burndown_chart_splash')
