@@ -1,5 +1,5 @@
 <script>
-/* eslint-disable @gitlab/vue-require-i18n-strings */
+/* eslint-disable @gitlab/vue-require-i18n-strings, vue/no-v-html */
 /**
  * Renders a deploy board.
  *

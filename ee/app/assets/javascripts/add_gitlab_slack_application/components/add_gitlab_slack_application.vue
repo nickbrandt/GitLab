@@ -1,5 +1,5 @@
 <script>
-/* eslint-disable @gitlab/vue-require-i18n-strings */
+/* eslint-disable @gitlab/vue-require-i18n-strings, vue/no-v-html */
 import { __ } from '~/locale';
 import { deprecatedCreateFlash as Flash } from '~/flash';
 import { redirectTo } from '~/lib/utils/url_utility';

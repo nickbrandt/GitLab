@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable vue/no-v-html */
 import { GlLink, GlIcon } from '@gitlab/ui';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
 import TotalTime from './total_time_component.vue';

@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable vue/no-v-html */
 import { GlDeprecatedButton, GlButton, GlLoadingIcon } from '@gitlab/ui';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
