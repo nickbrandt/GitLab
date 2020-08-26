@@ -4,9 +4,12 @@ import createStore from './store';
 
 export default () => {
   const el = document.querySelector('#js-policy-builder-app');
-  const { networkPoliciesEndpoint } = el.dataset;
+  const { environmentsEndpoint, networkPoliciesEndpoint } = el.dataset;
 
   const store = createStore();
+  store.dispatch('threatMonitoring/setEndpoints', {
+    environmentsEndpoint,
+  });
   store.dispatch('networkPolicies/setEndpoints', {
     networkPoliciesEndpoint,
   });

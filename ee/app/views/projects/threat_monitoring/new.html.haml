@@ -2,4 +2,6 @@
 - breadcrumb_title s_("NetworkPolicies|New policy")
 - page_title s_("NetworkPolicies|Policy editor")
 
-#js-policy-builder-app{ data: { network_policies_endpoint: project_security_network_policies_path(@project) } }
+#js-policy-builder-app{ data: { network_policies_endpoint: project_security_network_policies_path(@project),
+  environments_endpoint: project_environments_path(@project),
+} }
