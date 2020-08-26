@@ -34,6 +34,8 @@ export const extractDesigns = data => data.project.issue.designCollection.design
 
 export const extractDesign = data => (extractDesigns(data) || [])[0];
 
+export const toDiffNoteGid = noteId => `gid://gitlab/DiffNote/${noteId}`;
+
 /**
  * Generates optimistic response for a design upload mutation
  * @param {Array<File>} files

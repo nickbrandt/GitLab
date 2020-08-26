@@ -19,6 +19,7 @@ import {
   extractDiscussions,
   extractDesign,
   updateImageDiffNoteOptimisticResponse,
+  toDiffNoteGid,
 } from '../../utils/design_management_utils';
 import {
   updateStoreAfterAddImageDiffNote,
@@ -146,7 +147,9 @@ export default {
     Mousetrap.bind('esc', this.closeDesign);
     this.trackEvent();
     // We need to reset the active discussion when opening a new design
-    this.updateActiveDiscussion();
+    const [, noteId] = this.$route.hash.match(/#note_([0-9]+)/) || [];
+    const diffNoteGid = noteId ? toDiffNoteGid(noteId) : undefined;
+    return this.updateActiveDiscussion(diffNoteGid);
   },
   beforeDestroy() {
     Mousetrap.unbind('esc', this.closeDesign);

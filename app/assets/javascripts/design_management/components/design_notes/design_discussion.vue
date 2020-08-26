@@ -62,16 +62,17 @@ export default {
     activeDiscussion: {
       query: activeDiscussionQuery,
       result({ data }) {
-        const discussionId = data.activeDiscussion.id;
+        const activeDiscussionId = data.activeDiscussion.id;
         if (this.discussion.resolved && !this.resolvedDiscussionsExpanded) {
           return;
         }
         // We watch any changes to the active discussion from the design pins and scroll to this discussion if it exists
         // We don't want scrollIntoView to be triggered from the discussion click itself
         if (
-          discussionId &&
+          this.$el &&
+          activeDiscussionId &&
           data.activeDiscussion.source === ACTIVE_DISCUSSION_SOURCE_TYPES.pin &&
-          discussionId === this.discussion.notes[0].id
+          activeDiscussionId === this.discussion.notes[0].id
         ) {
           this.$el.scrollIntoView({
             behavior: 'smooth',
