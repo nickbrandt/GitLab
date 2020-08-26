@@ -2,7 +2,8 @@ import { languages } from 'monaco-editor';
 import {
   isTextFile,
   registerLanguages,
-  registerSchemas,
+  registerYamlSchemas,
+  registerJsonSchemas,
   trimPathComponents,
   insertFinalNewline,
   trimTrailingWhitespace,
@@ -159,7 +160,7 @@ describe('WebIDE utils', () => {
     });
   });
 
-  describe('registerSchemas', () => {
+  describe('registerYamlSchemas, registerJsonSchemas', () => {
     let options;
 
     beforeEach(() => {
@@ -197,13 +198,13 @@ describe('WebIDE utils', () => {
     });
 
     it.each`
-      language  | defaultsObj
-      ${'json'} | ${languages.json.jsonDefaults}
-      ${'yaml'} | ${languages.yaml.yamlDefaults}
+      language  | registerSchemas        | defaultsObj
+      ${'json'} | ${registerJsonSchemas} | ${languages.json.jsonDefaults}
+      ${'yaml'} | ${registerYamlSchemas} | ${languages.yaml.yamlDefaults}
     `(
       'registers the given schemas with monaco for lang: $language',
-      ({ language, defaultsObj }) => {
-        registerSchemas({ language, options });
+      ({ registerSchemas, defaultsObj }) => {
+        registerSchemas(options);
 
         expect(defaultsObj.setDiagnosticsOptions).toHaveBeenCalledWith(options);
       },

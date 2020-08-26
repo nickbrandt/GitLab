@@ -7,10 +7,11 @@ import ModelManager from './common/model_manager';
 import { editorOptions, defaultEditorOptions, defaultDiffEditorOptions } from './editor_options';
 import { themes } from './themes';
 import languages from './languages';
-import schemas from './schemas';
+import jsonSchemas from './schemas/json';
+import yamlSchemas from './schemas/yaml';
 import keymap from './keymap.json';
 import { clearDomElement } from '~/editor/utils';
-import { registerLanguages, registerSchemas } from '../utils';
+import { registerLanguages, registerYamlSchemas, registerJsonSchemas } from '../utils';
 
 function setupThemes() {
   themes.forEach(theme => {
@@ -47,7 +48,8 @@ export default class Editor {
     registerLanguages(...languages);
 
     if (gon.features?.schemaLinting) {
-      registerSchemas(...schemas);
+      registerYamlSchemas(yamlSchemas);
+      registerJsonSchemas(jsonSchemas);
     }
 
     this.debouncedUpdate = debounce(() => {
