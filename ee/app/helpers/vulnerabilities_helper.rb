@@ -18,7 +18,9 @@ module VulnerabilitiesHelper
       vulnerability_feedback_help_path: help_page_path('user/application_security/index', anchor: 'interacting-with-the-vulnerabilities'),
       related_issues_help_path: help_page_path('user/application_security/index', anchor: 'managing-related-issues-for-a-vulnerability'),
       pipeline: vulnerability_pipeline_data(pipeline),
-      can_modify_related_issues: current_user.can?(:admin_vulnerability_issue_link, vulnerability)
+      can_modify_related_issues: current_user.can?(:admin_vulnerability_issue_link, vulnerability),
+      issue_tracking_help_path: help_page_path('user/project/settings', anchor: 'sharing-and-permissions'),
+      permissions_help_path: help_page_path('user/permissions', anchor: 'project-members-permissions')
     }
 
     result.merge(vulnerability_data(vulnerability), vulnerability_finding_data(vulnerability))
