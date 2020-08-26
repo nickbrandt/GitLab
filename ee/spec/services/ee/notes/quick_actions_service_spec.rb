@@ -52,6 +52,20 @@ RSpec.describe Notes::QuickActionsService do
         end
       end
 
+      context 'on an incident' do
+        before do
+          issue.update!(issue_type: :incident)
+        end
+
+        it 'leaves the note empty' do
+          expect(execute(note)).to be_empty
+        end
+
+        it 'does not assigns the issue to the epic' do
+          expect { execute(note) }.not_to change { issue.reload.epic }
+        end
+      end
+
       context 'on a merge request' do
         let(:note_mr) { create(:note_on_merge_request, project: project, note: note_text) }
 
@@ -94,6 +108,16 @@ RSpec.describe Notes::QuickActionsService do
 
         it 'creates a system note' do
           expect { execute(note) }.to change { Note.system.count }.from(0).to(2)
+        end
+      end
+
+      context 'on an incident' do
+        before do
+          issue.update!(issue_type: :incident)
+        end
+
+        it 'leaves the note empty' do
+          expect(execute(note)).to be_empty
         end
       end
 
