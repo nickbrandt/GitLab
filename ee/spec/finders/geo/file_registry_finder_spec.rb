@@ -6,7 +6,7 @@ RSpec.describe Geo::FileRegistryFinder, :geo do
   context 'with abstract methods' do
     %w[
       replicables
-      syncable
+      registry_class
     ].each do |required_method|
       it "requires subclasses to implement #{required_method}" do
         expect { subject.send(required_method) }.to raise_error(NotImplementedError)

@@ -24,36 +24,30 @@ RSpec.describe Geo::ContainerRepositoryRegistryFinder, :geo do
     stub_registry_replication_config(enabled: true)
   end
 
-  describe '#count_syncable' do
-    it 'returns number of container repositories' do
-      expect(subject.count_syncable).to eq(6)
+  describe '#registry_count' do
+    it 'returns number of container registries' do
+      create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
+      create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
+
+      expect(subject.registry_count).to eq(2)
     end
   end
 
-  describe '#count_synced' do
+  describe '#synced_count' do
     it 'returns only synced registry' do
       create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
       create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
 
-      expect(subject.count_synced).to eq(1)
+      expect(subject.synced_count).to eq(1)
     end
   end
 
-  describe '#count_failed' do
+  describe '#failed_count' do
     it 'returns only failed registry' do
       create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
       create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
 
-      expect(subject.count_failed).to eq(1)
-    end
-  end
-
-  describe '#count_registry' do
-    it 'returns number of all registries' do
-      create(:container_repository_registry, :synced, container_repository_id: container_repository_1.id)
-      create(:container_repository_registry, :sync_failed, container_repository_id: container_repository_3.id)
-
-      expect(subject.count_registry).to eq(2)
+      expect(subject.failed_count).to eq(1)
     end
   end
 

@@ -31,7 +31,7 @@ module Geo
             .map! { |id, uploader| [id, uploader.sub(/Uploader\z/, '').underscore] }
 
       tracked =
-        syncable
+        registry_class
             .model_id_in(range)
             .pluck(:file_id, :file_type)
       # rubocop:enable CodeReuse/ActiveRecord
@@ -46,7 +46,7 @@ module Geo
       ::Upload.replicables_for_geo_node
     end
 
-    def syncable
+    def registry_class
       Geo::UploadRegistry
     end
   end

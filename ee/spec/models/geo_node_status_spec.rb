@@ -117,8 +117,19 @@ RSpec.describe GeoNodeStatus, :geo do
   end
 
   describe '#projects_count' do
-    it 'counts the number of projects' do
+    it 'counts the number of projects on a primary node' do
+      stub_current_geo_node(primary)
+
       expect(subject.projects_count).to eq 4
+    end
+
+    it 'counts the number of projects on a secondary node' do
+      stub_current_geo_node(secondary)
+
+      create(:geo_project_registry, :synced, project: project_1)
+      create(:geo_project_registry, project: project_3)
+
+      expect(subject.projects_count).to eq 2
     end
   end
 
@@ -374,17 +385,13 @@ RSpec.describe GeoNodeStatus, :geo do
       expect(subject.repositories_synced_in_percentage).to eq(0)
     end
 
-    it 'returns the right percentage with no group restrictions' do
+    it 'returns the right percentage' do
       create(:geo_project_registry, :synced, project: project_1)
+      create(:geo_project_registry, project: project_2)
+      create(:geo_project_registry, project: project_3)
+      create(:geo_project_registry, project: project_4)
 
       expect(subject.repositories_synced_in_percentage).to be_within(0.0001).of(25)
-    end
-
-    it 'returns the right percentage with group restrictions' do
-      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-      create(:geo_project_registry, :synced, project: project_1)
-
-      expect(subject.repositories_synced_in_percentage).to be_within(0.0001).of(50)
     end
   end
 
@@ -399,17 +406,13 @@ RSpec.describe GeoNodeStatus, :geo do
       expect(subject.wikis_synced_in_percentage).to eq(0)
     end
 
-    it 'returns the right percentage with no group restrictions' do
+    it 'returns the right percentage' do
       create(:geo_project_registry, :synced, project: project_1)
+      create(:geo_project_registry, project: project_2)
+      create(:geo_project_registry, project: project_3)
+      create(:geo_project_registry, project: project_4)
 
       expect(subject.wikis_synced_in_percentage).to be_within(0.0001).of(25)
-    end
-
-    it 'returns the right percentage with group restrictions' do
-      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-      create(:geo_project_registry, :synced, project: project_1)
-
-      expect(subject.wikis_synced_in_percentage).to be_within(0.0001).of(50)
     end
   end
 
@@ -583,16 +586,18 @@ RSpec.describe GeoNodeStatus, :geo do
   end
 
   describe '#container_repositories_count' do
-    let!(:container_1) { create(:container_repository) }
-    let!(:container_2) { create(:container_repository) }
+    let!(:container_1) { create(:container_repository_registry, :synced) }
+    let!(:container_2) { create(:container_repository_registry, :sync_failed) }
+    let!(:container_3) { create(:container_repository_registry, :sync_failed) }
+    let!(:container_4) { create(:container_repository) }
 
     context 'when container repositories replication is active' do
       before do
         stub_geo_setting(registry_replication: { enabled: true })
       end
 
-      it 'counts all the repositories' do
-        expect(subject.container_repositories_count).to eq(2)
+      it 'counts number of registries for repositories' do
+        expect(subject.container_repositories_count).to eq(3)
       end
     end
 
@@ -687,10 +692,6 @@ RSpec.describe GeoNodeStatus, :geo do
   end
 
   describe '#container_repositories_synced_in_percentage' do
-    let!(:container_repository_1) { create(:container_repository, project: project_1) }
-    let!(:container_repository_2) { create(:container_repository, project: project_1) }
-    let!(:container_list) { create_list(:container_repository, 2, project: project_3) }
-
     context 'when container repositories replication is active' do
       before do
         stub_geo_setting(registry_replication: { enabled: true })
@@ -700,34 +701,32 @@ RSpec.describe GeoNodeStatus, :geo do
         expect(subject.container_repositories_synced_in_percentage).to eq(0)
       end
 
-      it 'returns the right percentage with no group restrictions' do
-        create(:container_repository_registry, :synced, container_repository: container_repository_1)
+      it 'returns the right percentage' do
+        create(:container_repository_registry, :synced)
+        create(:container_repository_registry)
+        create(:container_repository_registry)
+        create(:container_repository_registry)
 
         expect(subject.container_repositories_synced_in_percentage).to be_within(0.0001).of(25)
-      end
-
-      it 'returns the right percentage with group restrictions' do
-        secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-        create(:container_repository_registry, :synced, container_repository: container_repository_1)
-
-        expect(subject.container_repositories_synced_in_percentage).to be_within(0.0001).of(50)
       end
     end
 
     it 'when container repositories replication is inactive returns 0' do
       stub_geo_setting(registry_replication: { enabled: false })
-      create(:container_repository_registry, :synced, container_repository: container_repository_1)
+
+      create(:container_repository_registry, :synced)
 
       expect(subject.container_repositories_synced_in_percentage).to eq(0)
     end
   end
 
   describe '#design_repositories_count' do
-    it 'counts all the designs' do
-      create(:design)
-      create(:design)
+    it 'counts number of registries for repositories' do
+      create(:geo_design_registry, :sync_failed)
+      create(:geo_design_registry)
+      create(:geo_design_registry, :synced)
 
-      expect(subject.design_repositories_count).to eq(2)
+      expect(subject.design_repositories_count).to eq(3)
     end
   end
 
@@ -764,20 +763,9 @@ RSpec.describe GeoNodeStatus, :geo do
       expect(subject.design_repositories_synced_in_percentage).to eq(0)
     end
 
-    it 'returns the right percentage with no group restrictions' do
+    it 'returns the right percentage' do
       create(:geo_design_registry, :synced)
       create(:geo_design_registry, :sync_failed)
-
-      expect(subject.design_repositories_synced_in_percentage).to be_within(0.0001).of(50)
-    end
-
-    it 'returns the right percentage with group restrictions' do
-      secondary.update!(selective_sync_type: 'namespaces', namespaces: [group])
-
-      create(:geo_design_registry, :synced, project: project_1)
-      create(:geo_design_registry, :sync_failed, project: project_2)
-      create(:geo_design_registry, :sync_failed, project: project_3)
-      create(:geo_design_registry, :sync_failed, project: project_4)
 
       expect(subject.design_repositories_synced_in_percentage).to be_within(0.0001).of(50)
     end
@@ -1006,7 +994,9 @@ RSpec.describe GeoNodeStatus, :geo do
 
   describe '#[]' do
     it 'returns values for each attribute' do
-      expect(subject[:projects_count]).to eq(4)
+      create(:geo_project_registry, project: project_1)
+
+      expect(subject[:projects_count]).to eq(1)
       expect(subject[:repositories_synced_count]).to eq(0)
     end
 
@@ -1243,40 +1233,40 @@ RSpec.describe GeoNodeStatus, :geo do
         stub_current_geo_node(primary)
       end
 
-      it 'does not call LfsObjectRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::LfsObjectRegistryFinder).not_to receive(:count_syncable)
+      it 'does not call LfsObjectRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::LfsObjectRegistryFinder).not_to receive(:registry_count)
 
         subject
       end
 
-      it 'does not call AttachmentRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::AttachmentRegistryFinder).not_to receive(:count_syncable)
+      it 'does not call AttachmentRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::AttachmentRegistryFinder).not_to receive(:registry_count)
 
         subject
       end
 
-      it 'does not call JobArtifactRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::JobArtifactRegistryFinder).not_to receive(:count_syncable)
+      it 'does not call JobArtifactRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::JobArtifactRegistryFinder).not_to receive(:registry_count)
 
         subject
       end
     end
 
     context 'on the secondary' do
-      it 'calls LfsObjectRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::LfsObjectRegistryFinder).to receive(:count_syncable)
+      it 'calls LfsObjectRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::LfsObjectRegistryFinder).to receive(:registry_count).twice
 
         subject
       end
 
-      it 'calls AttachmentRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:count_syncable)
+      it 'calls AttachmentRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::AttachmentRegistryFinder).to receive(:registry_count).twice
 
         subject
       end
 
-      it 'calls JobArtifactRegistryFinder#count_syncable' do
-        expect_any_instance_of(Geo::JobArtifactRegistryFinder).to receive(:count_syncable)
+      it 'calls JobArtifactRegistryFinder#registry_count' do
+        expect_any_instance_of(Geo::JobArtifactRegistryFinder).to receive(:registry_count).twice
 
         subject
       end

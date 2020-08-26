@@ -296,9 +296,6 @@ class GeoNodeStatus < ApplicationRecord
     self.version = Gitlab::VERSION
     self.revision = Gitlab.revision
 
-    self.projects_count = geo_node.projects.count
-    self.package_files_count = Geo::PackageFileReplicator.primary_total_count
-
     load_status_message
     load_event_data
     load_primary_data
@@ -424,10 +421,8 @@ class GeoNodeStatus < ApplicationRecord
   def load_primary_data
     return unless Gitlab::Geo.primary?
 
-    self.lfs_objects_count = LfsObject.count
-    self.job_artifacts_count = Ci::JobArtifact.not_expired.count
-    self.attachments_count = Upload.count
-
+    self.projects_count = geo_node.projects.count
+    self.package_files_count = Geo::PackageFileReplicator.primary_total_count
     self.replication_slots_count = geo_node.replication_slots_count
     self.replication_slots_used_count = geo_node.replication_slots_used_count
     self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
@@ -450,6 +445,7 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def load_repositories_data
+    self.projects_count = Geo::ProjectRegistry.count
     self.repositories_synced_count = Geo::ProjectRegistry.synced(:repository).count
     self.repositories_failed_count = Geo::ProjectRegistry.sync_failed(:repository).count
     self.wikis_synced_count = Geo::ProjectRegistry.synced(:wiki).count
@@ -459,54 +455,55 @@ class GeoNodeStatus < ApplicationRecord
   def load_lfs_objects_data
     return unless lfs_objects_replication_enabled
 
-    self.lfs_objects_count = lfs_objects_finder.count_syncable
-    self.lfs_objects_synced_count = lfs_objects_finder.count_synced
-    self.lfs_objects_failed_count = lfs_objects_finder.count_failed
-    self.lfs_objects_registry_count = lfs_objects_finder.count_registry
+    self.lfs_objects_count = lfs_objects_finder.registry_count
+    self.lfs_objects_synced_count = lfs_objects_finder.synced_count
+    self.lfs_objects_failed_count = lfs_objects_finder.failed_count
+    self.lfs_objects_registry_count = lfs_objects_finder.registry_count
     self.lfs_objects_synced_missing_on_primary_count = lfs_objects_finder.count_synced_missing_on_primary
   end
 
   def load_job_artifacts_data
     return unless job_artifacts_replication_enabled
 
-    self.job_artifacts_count = job_artifacts_finder.count_syncable
-    self.job_artifacts_synced_count = job_artifacts_finder.count_synced
-    self.job_artifacts_failed_count = job_artifacts_finder.count_failed
-    self.job_artifacts_registry_count = job_artifacts_finder.count_registry
+    self.job_artifacts_count = job_artifacts_finder.registry_count
+    self.job_artifacts_synced_count = job_artifacts_finder.synced_count
+    self.job_artifacts_failed_count = job_artifacts_finder.failed_count
+    self.job_artifacts_registry_count = job_artifacts_finder.registry_count
     self.job_artifacts_synced_missing_on_primary_count = job_artifacts_finder.count_synced_missing_on_primary
   end
 
   def load_attachments_data
     return unless attachments_replication_enabled
 
-    self.attachments_count = attachments_finder.count_syncable
-    self.attachments_synced_count = attachments_finder.count_synced
-    self.attachments_failed_count = attachments_finder.count_failed
-    self.attachments_registry_count = attachments_finder.count_registry
+    self.attachments_count = attachments_finder.registry_count
+    self.attachments_synced_count = attachments_finder.synced_count
+    self.attachments_failed_count = attachments_finder.failed_count
+    self.attachments_registry_count = attachments_finder.registry_count
     self.attachments_synced_missing_on_primary_count = attachments_finder.count_synced_missing_on_primary
   end
 
   def load_container_registry_data
     return unless container_repositories_replication_enabled
 
-    self.container_repositories_count = container_registry_finder.count_syncable
-    self.container_repositories_synced_count = container_registry_finder.count_synced
-    self.container_repositories_failed_count = container_registry_finder.count_failed
-    self.container_repositories_registry_count = container_registry_finder.count_registry
+    self.container_repositories_count = container_registry_finder.registry_count
+    self.container_repositories_synced_count = container_registry_finder.synced_count
+    self.container_repositories_failed_count = container_registry_finder.failed_count
+    self.container_repositories_registry_count = container_registry_finder.registry_count
   end
 
   def load_designs_data
     return unless design_repositories_replication_enabled
 
-    self.design_repositories_count = design_registry_finder.count_syncable
-    self.design_repositories_synced_count = design_registry_finder.count_synced
-    self.design_repositories_failed_count = design_registry_finder.count_failed
-    self.design_repositories_registry_count = design_registry_finder.count_registry
+    self.design_repositories_count = design_registry_finder.registry_count
+    self.design_repositories_synced_count = design_registry_finder.synced_count
+    self.design_repositories_failed_count = design_registry_finder.failed_count
+    self.design_repositories_registry_count = design_registry_finder.registry_count
   end
 
   def load_package_files_data
     # return unless package_files_replication_enabled # TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/221069
 
+    self.package_files_count = Geo::PackageFileReplicator.registry_count
     self.package_files_registry_count = Geo::PackageFileReplicator.registry_count
     self.package_files_synced_count = Geo::PackageFileReplicator.synced_count
     self.package_files_failed_count = Geo::PackageFileReplicator.failed_count
