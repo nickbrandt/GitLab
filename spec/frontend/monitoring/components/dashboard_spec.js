@@ -645,7 +645,7 @@ describe('Dashboard', () => {
 
         it('it enables draggables', () => {
           expect(findRearrangeButton().attributes('pressed')).toBeTruthy();
-          expect(findEnabledDraggables()).toEqual(findDraggables());
+          expect(findEnabledDraggables().wrappers).toEqual(findDraggables().wrappers);
         });
 
         it('metrics can be swapped', () => {
