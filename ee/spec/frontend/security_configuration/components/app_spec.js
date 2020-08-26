@@ -4,6 +4,7 @@ import { GlAlert, GlLink } from '@gitlab/ui';
 import SecurityConfigurationApp from 'ee/security_configuration/components/app.vue';
 import ManageFeature from 'ee/security_configuration/components/manage_feature.vue';
 import stubChildren from 'helpers/stub_children';
+import { useLocalStorageSpy } from 'helpers/local_storage_helper';
 import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 import { generateFeatures } from './helpers';
 
@@ -127,6 +128,35 @@ describe('Security Configuration App', () => {
         }
       },
     );
+
+    describe('dismissing the alert', () => {
+      useLocalStorageSpy();
+
+      beforeEach(() => {
+        createComponent({
+          propsData: {
+            gitlabCiPresent: false,
+            autoDevopsEnabled: false,
+            canEnableAutoDevops: true,
+          },
+          stubs: {
+            LocalStorageSync,
+          },
+        });
+
+        getAlert().vm.$emit('dismiss');
+      });
+
+      it('hides the alert', () => {
+        expect(getAlert().exists()).toBe(false);
+      });
+
+      it('saves dismissal in localStorage', () => {
+        expect(localStorage.setItem.mock.calls).toEqual([
+          [SecurityConfigurationApp.autoDevopsAlertStorageKey, 'true'],
+        ]);
+      });
+    });
   });
 
   describe('features table', () => {
