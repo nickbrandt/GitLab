@@ -1557,6 +1557,9 @@ msgstr ""
 msgid "Add environment"
 msgstr ""
 
+msgid "Add existing confidential %{issuableType}"
+msgstr ""
+
 msgid "Add header and footer to emails. Please note that color settings will only be applied within the application interface"
 msgstr ""
 
@@ -7199,6 +7202,9 @@ msgid "Create new board"
 msgstr ""
 
 msgid "Create new branch"
+msgstr ""
+
+msgid "Create new confidential %{issuableType}"
 msgstr ""
 
 msgid "Create new directory"
@@ -24531,6 +24537,9 @@ msgid "The number of times an upload record could not find its file"
 msgstr ""
 
 msgid "The one place for your designs"
+msgstr ""
+
+msgid "The parent epic is confidential and can only contain confidential epics and issues"
 msgstr ""
 
 msgid "The passphrase required to decrypt the private key. This is optional and the value is encrypted at rest."
