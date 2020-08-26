@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe Geo::UploadRegistry, :geo do
-  include EE::GeoHelpers
-
   let!(:failed) { create(:geo_upload_registry, :failed) }
   let!(:synced) { create(:geo_upload_registry) }
 
@@ -40,11 +38,11 @@ RSpec.describe Geo::UploadRegistry, :geo do
     end
   end
 
-  describe '.never' do
+  describe '.pending' do
     it 'returns registries that are never synced' do
-      never = create(:geo_upload_registry, retry_count: nil, success: false)
+      pending = create(:geo_upload_registry, retry_count: nil, success: false)
 
-      expect(described_class.never).to match_ids([never])
+      expect(described_class.pending).to match_ids([pending])
     end
   end
 
@@ -55,12 +53,12 @@ RSpec.describe Geo::UploadRegistry, :geo do
       described_class.with_status('synced')
     end
 
-    # Explained via: https://gitlab.com/gitlab-org/gitlab/-/issues/216049
-    it 'finds the registries with status "never" when filter is set to "pending"' do
-      expect(described_class).to receive(:never)
+    it 'finds the registries with status "pending" when filter is set to "pending"' do
+      expect(described_class).to receive(:pending)
 
       described_class.with_status('pending')
     end
+
     it 'finds the registries with status "failed"' do
       expect(described_class).to receive(:failed)
 

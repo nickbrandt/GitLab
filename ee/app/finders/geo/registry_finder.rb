@@ -38,7 +38,7 @@ module Geo
       [untracked_ids, unused_tracked_ids]
     end
 
-    # @!method find_never_synced_registries
+    # @!method find_unsynced_registries
     #    Return an ActiveRecord::Relation of the registry records for the
     #    tracked ype that have never been synced.
     #
@@ -58,11 +58,9 @@ module Geo
     # @param [Array<Integer>] except_ids ids that will be ignored from the query
     #
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_never_synced_registries(batch_size:, except_ids: [])
+    def find_unsynced_registries(batch_size:, except_ids: [])
       registry_class
-        .never_synced
-        .model_id_not_in(except_ids)
-        .limit(batch_size)
+        .find_unsynced_registries(batch_size: batch_size, except_ids: except_ids)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 

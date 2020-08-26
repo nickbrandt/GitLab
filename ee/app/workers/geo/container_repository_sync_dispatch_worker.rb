@@ -48,7 +48,7 @@ module Geo
 
     def find_container_repository_ids_not_synced(batch_size:)
       registry_finder
-        .find_never_synced_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
+        .find_unsynced_registries(batch_size: batch_size, except_ids: scheduled_repository_ids)
         .pluck_model_foreign_key
     end
 

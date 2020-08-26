@@ -121,7 +121,7 @@ RSpec.describe Geo::AttachmentRegistryFinder, :geo do
     end
   end
 
-  describe '#find_never_synced_registries' do
+  describe '#find_unsynced_registries' do
     it 'returns registries for uploads that have never been synced' do
       create(:geo_upload_registry, :attachment, :failed, file_id: upload_1.id)
       create(:geo_upload_registry, :attachment, file_id: upload_2.id, missing_on_primary: true)
@@ -132,7 +132,7 @@ RSpec.describe Geo::AttachmentRegistryFinder, :geo do
       create(:geo_upload_registry, :attachment, file_id: upload_7.id, missing_on_primary: true)
       registry_upload_8 = create(:geo_upload_registry, :attachment, :never_synced, file_id: upload_8.id)
 
-      registries = subject.find_never_synced_registries(batch_size: 10)
+      registries = subject.find_unsynced_registries(batch_size: 10)
 
       expect(registries).to match_ids(registry_upload_3, registry_upload_8)
     end
@@ -147,7 +147,7 @@ RSpec.describe Geo::AttachmentRegistryFinder, :geo do
       create(:geo_upload_registry, :attachment, file_id: upload_7.id, missing_on_primary: true)
       registry_upload_8 = create(:geo_upload_registry, :attachment, :never_synced, file_id: upload_8.id)
 
-      registries = subject.find_never_synced_registries(batch_size: 10, except_ids: [upload_3.id])
+      registries = subject.find_unsynced_registries(batch_size: 10, except_ids: [upload_3.id])
 
       expect(registries).to match_ids(registry_upload_8)
     end

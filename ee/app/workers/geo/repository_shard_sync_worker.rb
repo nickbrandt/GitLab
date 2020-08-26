@@ -78,7 +78,7 @@ module Geo
     def find_project_ids_not_synced(except_ids:, batch_size:)
       project_ids =
         registry_finder
-          .find_never_synced_registries(batch_size: batch_size, except_ids: except_ids)
+          .find_unsynced_registries(batch_size: batch_size, except_ids: except_ids)
           .pluck_model_foreign_key
 
       find_project_ids_within_shard(project_ids, direction: :desc)

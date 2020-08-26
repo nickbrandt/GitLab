@@ -306,7 +306,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
     end
   end
 
-  describe '#find_never_synced_registries' do
+  describe '#find_unsynced_registries' do
     it 'returns registries for job artifacts that have never been synced' do
       create(:geo_job_artifact_registry, :failed, artifact_id: ci_job_artifact_1.id)
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_2.id, missing_on_primary: true)
@@ -317,7 +317,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_2.id, missing_on_primary: true)
       registry_ci_job_artifact_remote_3 = create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_remote_3.id)
 
-      registries = subject.find_never_synced_registries(batch_size: 10)
+      registries = subject.find_unsynced_registries(batch_size: 10)
 
       expect(registries).to match_ids(registry_ci_job_artifact_3, registry_ci_job_artifact_remote_3)
     end
@@ -332,7 +332,7 @@ RSpec.describe Geo::JobArtifactRegistryFinder, :geo do
       create(:geo_job_artifact_registry, artifact_id: ci_job_artifact_remote_2.id, missing_on_primary: true)
       registry_ci_job_artifact_remote_3 = create(:geo_job_artifact_registry, :never_synced, artifact_id: ci_job_artifact_remote_3.id)
 
-      registries = subject.find_never_synced_registries(batch_size: 10, except_ids: [ci_job_artifact_3.id])
+      registries = subject.find_unsynced_registries(batch_size: 10, except_ids: [ci_job_artifact_3.id])
 
       expect(registries).to match_ids(registry_ci_job_artifact_remote_3)
     end

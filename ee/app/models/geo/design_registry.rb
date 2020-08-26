@@ -10,7 +10,7 @@ class Geo::DesignRegistry < Geo::BaseRegistry
 
   belongs_to :project
 
-  scope :never_synced, -> { with_state(:pending).where(last_synced_at: nil) }
+  scope :never, -> { with_state(:pending).where(last_synced_at: nil) }
   scope :pending, -> { with_state(:pending) }
   scope :failed, -> { with_state(:failed) }
   scope :synced, -> { with_state(:synced) }
@@ -57,6 +57,12 @@ class Geo::DesignRegistry < Geo::BaseRegistry
 
   def self.find_registry_differences(range)
     finder_class.new(current_node_id: Gitlab::Geo.current_node.id).find_registry_differences(range)
+  end
+
+  def self.find_unsynced_registries(batch_size:, except_ids: [])
+    never
+      .model_id_not_in(except_ids)
+      .limit(batch_size)
   end
 
   def self.find_failed_registries(batch_size:, except_ids: [])
