@@ -46,6 +46,10 @@ RSpec.describe 'User views iteration' do
         expect(page).to have_content(closed_issue.title)
         expect(page).not_to have_content(other_issue.title)
       end
+
+      it 'hides action dropdown for editing the iteration' do
+        expect(page).not_to have_button('Actions')
+      end
     end
   end
 
