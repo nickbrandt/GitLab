@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe IssueRebalancingWorker do
   describe '#perform' do
     let_it_be(:issue) { create(:issue) }
+
     it 'runs an instance of IssueRebalancingService' do
       service = double(execute: nil)
       expect(IssueRebalancingService).to receive(:new).with(issue).and_return(service)
