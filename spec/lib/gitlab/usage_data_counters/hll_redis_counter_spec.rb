@@ -53,7 +53,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     context 'for weekly events' do
-      it 'sets the keys in Redis to expire automatically after 12 weeks' do
+      it 'sets the keys in Redis to expire automatically after the given expiry time' do
         described_class.track_event(entity1, "g_analytics_contribution")
 
         Gitlab::Redis::SharedState.with do |redis|
@@ -81,7 +81,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     context 'for daily events' do
-      it 'sets the keys in Redis to expire after 84 days' do
+      it 'sets the keys in Redis to expire after the given expiry time' do
         described_class.track_event(entity1, "g_analytics_search")
 
         Gitlab::Redis::SharedState.with do |redis|
