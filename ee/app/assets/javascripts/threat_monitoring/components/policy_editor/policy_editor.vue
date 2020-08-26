@@ -1,5 +1,5 @@
 <script>
-import { mapActions } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import {
   GlFormGroup,
   GlFormSelect,
@@ -11,6 +11,7 @@ import {
   GlAlert,
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import { redirectTo } from '~/lib/utils/url_utility';
 import EnvironmentPicker from '../environment_picker.vue';
 import NetworkPolicyEditor from '../network_policy_editor.vue';
 import PolicyRuleBuilder from './policy_rule_builder.vue';
@@ -43,6 +44,12 @@ export default {
     PolicyPreview,
     PolicyActionPicker,
   },
+  props: {
+    threatMonitoringPath: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       editorMode: EditorModeRule,
@@ -65,6 +72,8 @@ export default {
     policyYaml() {
       return toYaml(this.policy);
     },
+    ...mapState('threatMonitoring', ['currentEnvironmentId']),
+    ...mapState('networkPolicies', ['errorUpdatingPolicy']),
     shouldShowRuleEditor() {
       return this.editorMode === EditorModeRule;
     },
@@ -80,6 +89,7 @@ export default {
   },
   methods: {
     ...mapActions('threatMonitoring', ['fetchEnvironments']),
+    ...mapActions('networkPolicies', ['createPolicy']),
     addRule() {
       this.policy.rules.push(buildRule(RuleTypeEndpoint));
     },
@@ -109,6 +119,15 @@ export default {
       }
 
       this.editorMode = mode;
+    },
+    savePolicy() {
+      const policy = { manifest: toYaml(this.policy) };
+      return this.createPolicy({
+        environmentId: this.currentEnvironmentId,
+        policy,
+      }).then(() => {
+        if (!this.errorUpdatingPolicy) redirectTo(this.threatMonitoringPath);
+      });
     },
   },
   policyTypes: [{ value: 'networkPolicy', text: s__('NetworkPolicies|Network Policy') }],
@@ -197,7 +216,7 @@ export default {
           @endpoint-labels-change="updateEndpointLabels"
         />
 
-        <div class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100">
+        <div class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100 gl-mb-5">
           <gl-button
             variant="link"
             category="primary"
@@ -209,6 +228,7 @@ export default {
         </div>
 
         <h4>{{ s__('NetworkPolicies|Actions') }}</h4>
+        <p>{{ s__('NetworkPolicies|Traffic that does not match any rule will be blocked.') }}</p>
         <policy-action-picker />
       </div>
       <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
@@ -238,10 +258,17 @@ export default {
     <hr />
     <div class="row">
       <div class="col-md-auto">
-        <gl-button type="submit" category="primary" variant="success">{{
-          s__('NetworkPolicies|Create policy')
+        <gl-button
+          type="submit"
+          category="primary"
+          variant="success"
+          data-testid="create-policy"
+          @click="savePolicy"
+          >{{ s__('NetworkPolicies|Create policy') }}</gl-button
+        >
+        <gl-button category="secondary" variant="default" :href="threatMonitoringPath">{{
+          __('Cancel')
         }}</gl-button>
-        <gl-button category="secondary" variant="default">{{ __('Cancel') }}</gl-button>
       </div>
     </div>
   </section>

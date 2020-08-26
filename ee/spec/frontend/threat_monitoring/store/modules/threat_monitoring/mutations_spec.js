@@ -48,6 +48,10 @@ describe('Threat Monitoring mutations', () => {
     it('sets errorLoadingEnvironments to false', () => {
       expect(state.errorLoadingEnvironments).toBe(false);
     });
+
+    it('sets currentEnvironmentId to 1', () => {
+      expect(state.currentEnvironmentId).toEqual(1);
+    });
   });
 
   describe(types.RECEIVE_ENVIRONMENTS_ERROR, () => {

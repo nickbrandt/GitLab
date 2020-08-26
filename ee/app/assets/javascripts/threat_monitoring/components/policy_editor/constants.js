@@ -3,6 +3,8 @@ export const EditorModeYAML = 'yaml';
 
 export const RuleTypeNetwork = 'network';
 
+export const RuleActionTypeAllow = 'allow';
+
 export const RuleDirectionInbound = 'ingress';
 export const RuleDirectionOutbound = 'egress';
 
