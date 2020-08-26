@@ -90,6 +90,8 @@ module EE
           end
 
           def reports
+            return [] unless default_branch
+
             @reports ||= artifacts.to_a.map(&:reports).flatten
           end
 
@@ -345,6 +347,7 @@ module EE
 
           def root_ref
             raw_repository&.root_ref
+          rescue Gitlab::Git::Repository::NoRepository
           end
 
           def empty?
@@ -392,6 +395,10 @@ module EE
             project.vulnerabilities
                    .id_not_in(existing_vulnerability_ids)
                    .update_all(resolved_on_default_branch: true)
+
+            log_info
+          rescue StandardError => e
+            log_error(e)
           end
 
           private
@@ -400,16 +407,47 @@ module EE
 
           delegate :reports, to: :project, private: true
 
+          def log_info
+            ::Gitlab::BackgroundMigration::Logger.info(
+              migrator: 'PopulateResolvedOnDefaultBranchColumnForProject',
+              message: 'Project migrated',
+              stats: stats,
+              project_id: project_id
+            )
+          end
+
+          def stats
+            {
+              all_count: findings.length,
+              valid_count: all_valid_findings.length,
+              existing_count: existing_vulnerability_ids.length
+            }
+          end
+
+          def log_error(error)
+            ::Gitlab::BackgroundMigration::Logger.error(
+              migrator: 'PopulateResolvedOnDefaultBranchColumnForProject',
+              message: error.message,
+              project_id: project_id
+            )
+          end
+
           def project
             @project ||= Project.find(project_id)
           end
 
           def existing_vulnerability_ids
-            all_findings_with_scanner.map { |finding| find_saved_finding_for(finding)&.vulnerability_id }.compact
+            @existing_vulnerability_ids ||= all_valid_findings.map { |finding| find_saved_finding_for(finding)&.vulnerability_id }.compact
           end
 
-          def all_findings_with_scanner
-            reports.flat_map(&:findings).select(&:scanner)
+          def all_valid_findings
+            @all_valid_findings ||= findings.select(&:scanner)
+                                           .select(&:primary_identifier)
+                                           .select(&:location)
+          end
+
+          def findings
+            @findings ||= reports.flat_map(&:findings)
           end
 
           def find_saved_finding_for(finding)
