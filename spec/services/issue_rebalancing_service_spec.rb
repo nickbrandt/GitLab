@@ -98,13 +98,4 @@ RSpec.describe IssueRebalancingService do
 
     expect { described_class.new(issue).execute }.to raise_error(described_class::TooManyIssues)
   end
-
-  it 'aborts if we cannot compute a suitable gap' do
-    issue = project.issues.first
-    service = described_class.new(issue)
-
-    allow(service).to receive(:gap_width).and_return(0)
-
-    expect { service.execute }.to raise_error(described_class::TooManyIssues)
-  end
 end

@@ -13,7 +13,7 @@ class IssueRebalancingService
     gates = [issue.project, issue.project.group].compact
     return unless gates.any? { |gate| Feature.enabled?(:rebalance_issues, gate) }
 
-    raise TooManyIssues, "#{issue_count} issues" unless gap_size.present?
+    raise TooManyIssues, "#{issue_count} issues" if issue_count > MAX_ISSUE_COUNT
 
     start = RelativePositioning::START_POSITION - (gaps / 2) * gap_size
 
@@ -25,8 +25,6 @@ class IssueRebalancingService
   private
 
   attr_reader :issue, :base
-
-  FULL_RANGE = RelativePositioning::MAX_POSITION - RelativePositioning::MIN_POSITION
 
   # rubocop: disable CodeReuse/ActiveRecord
   def indexed_ids
@@ -62,19 +60,12 @@ class IssueRebalancingService
   end
 
   def gap_size
-    @gap_size ||= begin
-      return if issue_count > MAX_ISSUE_COUNT
-
-      (0.4..0.9).step(0.1)
-        .map { |ratio| ratio * FULL_RANGE }
-        .map { |scaled_range| gap_width(scaled_range) }
-        .select { |gap| gap >= RelativePositioning::MIN_GAP }
-        .max
-    end
-  end
-
-  # What gap width do we need to use to spread our N gaps out over a given range?
-  def gap_width(range)
-    [RelativePositioning::IDEAL_DISTANCE, range / gaps].min.floor
+    # We could try to split the available range over the number of gaps we need,
+    # but IDEAL_DISTANCE * MAX_ISSUE_COUNT is only 0.1% of the available range,
+    # so we are guaranteed not to exhaust it by using this static value.
+    #
+    # If we raise MAX_ISSUE_COUNT or IDEAL_DISTANCE significantly, this may
+    # change!
+    RelativePositioning::IDEAL_DISTANCE
   end
 end
