@@ -2102,6 +2102,9 @@ msgstr[1] ""
 msgid "AlertManagement|Acknowledged"
 msgstr ""
 
+msgid "AlertManagement|Activity feed"
+msgstr ""
+
 msgid "AlertManagement|Alert"
 msgstr ""
 
@@ -2187,9 +2190,6 @@ msgid "AlertManagement|Open"
 msgstr ""
 
 msgid "AlertManagement|Opsgenie is enabled"
-msgstr ""
-
-msgid "AlertManagement|Overview"
 msgstr ""
 
 msgid "AlertManagement|Please try again."
