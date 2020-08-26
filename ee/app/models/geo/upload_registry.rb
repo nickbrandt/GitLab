@@ -12,7 +12,7 @@ class Geo::UploadRegistry < Geo::BaseRegistry
 
   scope :failed, -> { where(success: false).where.not(retry_count: nil) }
   scope :fresh, -> { order(created_at: :desc) }
-  scope :never, -> { where(success: false, retry_count: nil) }
+  scope :never_synced, -> { where(success: false, retry_count: nil) }
 
   def self.finder_class
     ::Geo::AttachmentRegistryFinder
@@ -54,7 +54,7 @@ class Geo::UploadRegistry < Geo::BaseRegistry
       self.public_send(status) # rubocop: disable GitlabSecurity/PublicSend
     # Explained via: https://gitlab.com/gitlab-org/gitlab/-/issues/216049
     when 'pending'
-      self.never
+      self.never_synced
     else
       all
     end
