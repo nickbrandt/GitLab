@@ -113,8 +113,8 @@ review-stop-failed-deployment:
 review-stop:
   extends:
     - .review-stop-base
-    - .review:rules:mr-only-manual
-  stage: review
+    - .review:rules:review-stop
+  stage: post-qa
   script:
     - delete_release
 
