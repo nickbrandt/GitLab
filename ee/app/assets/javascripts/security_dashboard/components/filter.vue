@@ -90,7 +90,7 @@ export default {
         v-if="filter.options.length >= 20"
         ref="searchBox"
         v-model="filterTerm"
-        class="m-2"
+        class="gl-m-3"
         :placeholder="__('Filter...')"
       />
 

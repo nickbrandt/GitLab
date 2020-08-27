@@ -278,7 +278,7 @@ export default {
             "
             @hide="resetDropdown"
           >
-            <gl-search-box-by-type v-model.trim="searchTerm" class="m-2" />
+            <gl-search-box-by-type v-model.trim="searchTerm" class="gl-m-3" />
 
             <div v-if="isFetching" class="gl-text-center">
               <gl-loading-icon />
