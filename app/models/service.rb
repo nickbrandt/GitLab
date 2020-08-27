@@ -154,7 +154,7 @@ class Service < ApplicationRecord
     for_template
   end
 
-  private_class_method def self.create_nonexistent_templates
+  def self.create_nonexistent_templates
     nonexistent_services = list_nonexistent_services_for(for_template)
     return if nonexistent_services.empty?
 
@@ -165,6 +165,7 @@ class Service < ApplicationRecord
       end
     end
   end
+  private_class_method :create_nonexistent_templates
 
   def self.find_or_initialize_integration(name, instance: false, group_id: nil)
     if name.in?(available_services_names)
@@ -176,15 +177,17 @@ class Service < ApplicationRecord
     scope + build_nonexistent_services_for(scope)
   end
 
-  private_class_method def self.build_nonexistent_services_for(scope)
+  def self.build_nonexistent_services_for(scope)
     list_nonexistent_services_for(scope).map do |service_type|
       service_type.constantize.new
     end
   end
+  private_class_method :build_nonexistent_services_for
 
-  private_class_method def self.list_nonexistent_services_for(scope)
+  def self.list_nonexistent_services_for(scope)
     available_services_types - scope.map(&:type)
   end
+  private_class_method :list_nonexistent_services_for
 
   def self.available_services_names
     service_names = services_names
