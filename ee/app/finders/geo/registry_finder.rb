@@ -43,13 +43,6 @@ module Geo
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
-    # @!method registry_class
-    #    Return an ActiveRecord::Base class for the tracked type
-    def registry_class
-      raise NotImplementedError,
-        "#{self.class} does not implement #{__method__}"
-    end
-
     # @!method registry_count
     #    Return a count of the registry records for the tracked type(s)
     def registry_count
@@ -68,6 +61,13 @@ module Geo
     #    that are sync failed
     def failed_count
       registry_class.failed.count
+    end
+
+    # @!method registry_class
+    #    Return an ActiveRecord::Base class for the tracked type
+    def registry_class
+      raise NotImplementedError,
+        "#{self.class} does not implement #{__method__}"
     end
   end
 end
