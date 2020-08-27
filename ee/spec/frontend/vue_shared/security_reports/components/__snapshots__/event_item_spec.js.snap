@@ -5,7 +5,7 @@ exports[`Event Item with action buttons renders the action buttons 1`] = `
   class="d-flex align-items-center"
 >
   <div
-    class="circle-icon-container ci-status-icon-success"
+    class="circle-icon-container gl-flex-shrink-0 gl-align-self-start ci-status-icon-success"
   >
     <svg
       class="gl-icon s16"
@@ -75,7 +75,9 @@ exports[`Event Item with action buttons renders the action buttons 1`] = `
      
   </div>
    
-  <div>
+  <div
+    class="gl-flex-shrink-0 gl-align-self-start"
+  >
     <button
       class="btn px-1 btn-transparent btn-md"
       title="Foo Action"
