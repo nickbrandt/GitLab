@@ -306,7 +306,7 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
 
 1. Adding new category.
 
-   When adding new category, we should also update ad add the new metrics in [`usage_data.rb`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data.rb)
+   When adding new category, we should also add the new metrics in [`usage_data.rb`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data.rb)
 
 Notes:
 
