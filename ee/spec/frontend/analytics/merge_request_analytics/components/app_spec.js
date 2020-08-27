@@ -26,10 +26,10 @@ describe('MergeRequestAnalyticsApp', () => {
   });
 
   it('displays the throughput chart component', () => {
-    expect(wrapper.contains(ThroughputChart)).toBe(true);
+    expect(wrapper.find(ThroughputChart).exists()).toBe(true);
   });
 
   it('displays the throughput table component', () => {
-    expect(wrapper.contains(ThroughputTable)).toBe(true);
+    expect(wrapper.find(ThroughputTable).exists()).toBe(true);
   });
 });

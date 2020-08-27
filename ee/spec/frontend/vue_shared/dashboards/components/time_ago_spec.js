@@ -15,7 +15,7 @@ describe('time ago component', () => {
 
   describe('render', () => {
     it('renders clock icon', () => {
-      expect(wrapper.contains('.js-dashboard-project-clock-icon')).toBe(true);
+      expect(wrapper.find('.js-dashboard-project-clock-icon').exists()).toBe(true);
     });
 
     it('renders time ago of finished time', () => {

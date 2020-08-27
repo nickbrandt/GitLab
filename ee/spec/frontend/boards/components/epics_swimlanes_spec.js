@@ -62,7 +62,7 @@ describe('EpicsSwimlanes', () => {
     });
 
     it('displays IssueLaneList component', () => {
-      expect(wrapper.contains(IssueLaneList)).toBe(true);
+      expect(wrapper.find(IssueLaneList).exists()).toBe(true);
     });
 
     it('displays issues icon and count for unassigned issue', () => {

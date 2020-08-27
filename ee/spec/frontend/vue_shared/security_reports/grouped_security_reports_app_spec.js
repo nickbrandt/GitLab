@@ -500,7 +500,7 @@ describe('Grouped security reports app', () => {
 
       return waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS).then(() => {
         expect(wrapper.text()).not.toContain('0 URLs scanned');
-        expect(wrapper.contains('[data-qa-selector="dast-ci-job-link"]')).toBe(false);
+        expect(wrapper.find('[data-qa-selector="dast-ci-job-link"]').exists()).toBe(false);
       });
     });
   });
@@ -528,7 +528,7 @@ describe('Grouped security reports app', () => {
       });
 
       it('should render the component', () => {
-        expect(wrapper.contains('[data-qa-selector="secret_scan_report"]')).toBe(true);
+        expect(wrapper.find('[data-qa-selector="secret_scan_report"]').exists()).toBe(true);
       });
 
       it('should set setSecretScanningDiffEndpoint', () => {
@@ -548,7 +548,7 @@ describe('Grouped security reports app', () => {
       });
 
       it('should not render the component', () => {
-        expect(wrapper.contains('[data-qa-selector="secret_scan_report"]')).toBe(false);
+        expect(wrapper.find('[data-qa-selector="secret_scan_report"]').exists()).toBe(false);
       });
     });
   });

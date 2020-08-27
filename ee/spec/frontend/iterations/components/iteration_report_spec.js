@@ -134,7 +134,7 @@ describe('Iterations report', () => {
           });
 
           it(`${canEditIteration ? 'is shown' : 'is hidden'}`, () => {
-            expect(wrapper.contains(GlNewDropdown)).toBe(canEditIteration);
+            expect(wrapper.find(GlNewDropdown).exists()).toBe(canEditIteration);
           });
         },
       );

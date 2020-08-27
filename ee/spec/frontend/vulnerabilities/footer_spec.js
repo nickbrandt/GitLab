@@ -78,13 +78,13 @@ describe('Vulnerability Footer', () => {
   describe('solution card', () => {
     it('does show solution card when there is one', () => {
       createWrapper({ ...minimumProps, solutionInfo: solutionInfoProp });
-      expect(wrapper.contains(SolutionCard)).toBe(true);
+      expect(wrapper.find(SolutionCard).exists()).toBe(true);
       expect(wrapper.find(SolutionCard).props()).toMatchObject(solutionInfoProp);
     });
 
     it('does not show solution card when there is not one', () => {
       createWrapper();
-      expect(wrapper.contains(SolutionCard)).toBe(false);
+      expect(wrapper.find(SolutionCard).exists()).toBe(false);
     });
   });
 
@@ -98,7 +98,7 @@ describe('Vulnerability Footer', () => {
 
     it('shows issue note when an issue exists for the vulnerability', () => {
       createWrapper({ ...minimumProps, [prop]: feedback });
-      expect(wrapper.contains(component)).toBe(true);
+      expect(wrapper.find(component).exists()).toBe(true);
       expect(wrapper.find(component).props()).toMatchObject({
         feedback,
       });
@@ -106,7 +106,7 @@ describe('Vulnerability Footer', () => {
 
     it('does not show issue note when there is no issue for the vulnerability', () => {
       createWrapper();
-      expect(wrapper.contains(component)).toBe(false);
+      expect(wrapper.find(component).exists()).toBe(false);
     });
   });
 

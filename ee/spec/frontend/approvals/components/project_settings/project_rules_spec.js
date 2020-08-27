@@ -125,7 +125,7 @@ describe('Approvals ProjectRules', () => {
     });
 
     it('should not render the unconfigured-security-rules component', () => {
-      expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(false);
+      expect(wrapper.find(UnconfiguredSecurityRules).exists()).toBe(false);
     });
   });
 
@@ -153,7 +153,7 @@ describe('Approvals ProjectRules', () => {
       it(`should ${
         approvalSuggestions ? '' : 'not'
       } render the unconfigured-security-rules component`, () => {
-        expect(wrapper.contains(UnconfiguredSecurityRules)).toBe(approvalSuggestions);
+        expect(wrapper.find(UnconfiguredSecurityRules).exists()).toBe(approvalSuggestions);
       });
     },
   );

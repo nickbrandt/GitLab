@@ -35,7 +35,7 @@ describe('Insights chart component', () => {
         error: '',
       });
 
-      expect(wrapper.contains(ChartSkeletonLoader)).toBe(true);
+      expect(wrapper.find(ChartSkeletonLoader).exists()).toBe(true);
     });
   });
 
@@ -49,7 +49,7 @@ describe('Insights chart component', () => {
         error: '',
       });
 
-      expect(wrapper.contains(GlColumnChart)).toBe(true);
+      expect(wrapper.find(GlColumnChart).exists()).toBe(true);
     });
 
     it('displays a line chart', () => {
@@ -61,7 +61,7 @@ describe('Insights chart component', () => {
         error: '',
       });
 
-      expect(wrapper.contains(GlLineChart)).toBe(true);
+      expect(wrapper.find(GlLineChart).exists()).toBe(true);
     });
 
     it('displays a stacked bar chart', () => {
@@ -73,7 +73,7 @@ describe('Insights chart component', () => {
         error: '',
       });
 
-      expect(wrapper.contains(GlStackedColumnChart)).toBe(true);
+      expect(wrapper.find(GlStackedColumnChart).exists()).toBe(true);
     });
 
     it('displays a bar chart when a pie chart is requested', () => {
@@ -85,7 +85,7 @@ describe('Insights chart component', () => {
         error: '',
       });
 
-      expect(wrapper.contains(GlColumnChart)).toBe(true);
+      expect(wrapper.find(GlColumnChart).exists()).toBe(true);
     });
   });
 
@@ -103,7 +103,7 @@ describe('Insights chart component', () => {
     });
 
     it('displays info about the error', () => {
-      expect(wrapper.contains(InsightsChartError)).toBe(true);
+      expect(wrapper.find(InsightsChartError).exists()).toBe(true);
     });
   });
 });
