@@ -147,10 +147,11 @@ export default {
   mounted() {
     Mousetrap.bind('esc', this.closeDesign);
     this.trackEvent();
-    // We need to reset the active discussion when opening a new design
-    const noteId = parseDesignRouteHash(this.$route.hash);
-    const diffNoteGid = noteId ? toDiffNoteGid(noteId) : undefined;
-    return this.updateActiveDiscussion(diffNoteGid);
+
+    // Set active discussion immediately.
+    // This will ensure that, if a note is specified in the URL hash,
+    // the browser will scroll to, and highlight, the note in the UI
+    this.updateActiveDiscussionFromUrl();
   },
   beforeDestroy() {
     Mousetrap.unbind('esc', this.closeDesign);
@@ -278,6 +279,11 @@ export default {
           source: ACTIVE_DISCUSSION_SOURCE_TYPES.discussion,
         },
       });
+    },
+    updateActiveDiscussionFromUrl() {
+      const noteId = parseDesignRouteHash(this.$route.hash);
+      const diffNoteGid = noteId ? toDiffNoteGid(noteId) : undefined;
+      return this.updateActiveDiscussion(diffNoteGid);
     },
     toggleResolvedComments() {
       this.resolvedDiscussionsExpanded = !this.resolvedDiscussionsExpanded;
