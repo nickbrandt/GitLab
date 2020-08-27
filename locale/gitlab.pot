@@ -2252,9 +2252,6 @@ msgstr ""
 msgid "AlertManagement|Triggered"
 msgstr ""
 
-msgid "AlertManagement|Unassigned"
-msgstr ""
-
 msgid "AlertManagement|Unknown"
 msgstr ""
 
