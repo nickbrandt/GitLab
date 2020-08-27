@@ -1,6 +1,8 @@
 <script>
 import { GlAlert, GlLink, GlSprintf, GlTable } from '@gitlab/ui';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import { s__, __ } from '~/locale';
+import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import AutoFixSettings from './auto_fix_settings.vue';
 import ManageFeature from './manage_feature.vue';
@@ -12,6 +14,7 @@ export default {
     GlSprintf,
     GlTable,
     AutoFixSettings,
+    LocalStorageSync,
     ManageFeature,
   },
   mixins: [glFeatureFlagsMixin()],
@@ -63,6 +66,9 @@ export default {
       required: true,
     },
   },
+  data: () => ({
+    autoDevopsAlertDismissed: 'false',
+  }),
   computed: {
     devopsMessage() {
       return this.autoDevopsEnabled
@@ -100,7 +106,12 @@ export default {
       ];
     },
     shouldShowAutoDevopsAlert() {
-      return Boolean(!this.autoDevopsEnabled && !this.gitlabCiPresent && this.canEnableAutoDevops);
+      return Boolean(
+        !parseBoolean(this.autoDevopsAlertDismissed) &&
+          !this.autoDevopsEnabled &&
+          !this.gitlabCiPresent &&
+          this.canEnableAutoDevops,
+      );
     },
   },
   methods: {
@@ -113,10 +124,14 @@ export default {
 
       return s__('SecurityConfiguration|Not enabled');
     },
+    dismissAutoDevopsAlert() {
+      this.autoDevopsAlertDismissed = 'true';
+    },
   },
   autoDevopsAlertMessage: s__(`
     SecurityConfiguration|You can quickly enable all security scanning tools by
     enabling %{linkStart}Auto DevOps%{linkEnd}.`),
+  autoDevopsAlertStorageKey: 'security_configuration_auto_devops_dismissed',
 };
 </script>
 
@@ -134,13 +149,18 @@ export default {
       </p>
     </header>
 
+    <local-storage-sync
+      v-model="autoDevopsAlertDismissed"
+      :storage-key="$options.autoDevopsAlertStorageKey"
+    />
+
     <gl-alert
       v-if="shouldShowAutoDevopsAlert"
       :title="__('Auto DevOps')"
       :primary-button-text="__('Enable Auto DevOps')"
       :primary-button-link="autoDevopsPath"
-      :dismissible="false"
       class="gl-mb-5"
+      @dismiss="dismissAutoDevopsAlert"
     >
       <gl-sprintf :message="$options.autoDevopsAlertMessage">
         <template #link="{ content }">

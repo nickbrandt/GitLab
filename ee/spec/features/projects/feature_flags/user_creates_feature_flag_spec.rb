@@ -84,7 +84,7 @@ RSpec.describe 'User creates feature flag', :js do
       it 'shows the created feature flag' do
         within_feature_flag_row(1) do
           expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-          expect(page).to have_css('.js-feature-flag-status button.is-checked')
+          expect_status_toggle_button_to_be_checked
 
           within_feature_flag_scopes do
             expect(page.find('[data-qa-selector="feature-flag-scope-info-badge"]:nth-child(1)')).to have_content('*')
@@ -114,7 +114,7 @@ RSpec.describe 'User creates feature flag', :js do
       it 'shows the created feature flag' do
         within_feature_flag_row(1) do
           expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-          expect(page).to have_css('.js-feature-flag-status button.is-checked')
+          expect_status_toggle_button_to_be_checked
 
           within_feature_flag_scopes do
             expect(page.find('[data-qa-selector="feature-flag-scope-muted-badge"]:nth-child(1)')).to have_content('*')
@@ -145,7 +145,7 @@ RSpec.describe 'User creates feature flag', :js do
       it 'shows the created feature flag' do
         within_feature_flag_row(1) do
           expect(page.find('.feature-flag-name')).to have_content('mr_train')
-          expect(page).to have_css('.js-feature-flag-status button.is-checked')
+          expect_status_toggle_button_to_be_checked
 
           within_feature_flag_scopes do
             expect(page.find('[data-qa-selector="feature-flag-scope-info-badge"]:nth-child(1)')).to have_content('*')
@@ -175,7 +175,7 @@ RSpec.describe 'User creates feature flag', :js do
       it 'shows the created feature flag' do
         within_feature_flag_row(1) do
           expect(page.find('.feature-flag-name')).to have_content('mr_train')
-          expect(page).to have_css('.js-feature-flag-status button.is-checked')
+          expect_status_toggle_button_to_be_checked
 
           within_feature_flag_scopes do
             expect(page.find('[data-qa-selector="feature-flag-scope-info-badge"]:nth-child(1)')).to have_content('*')

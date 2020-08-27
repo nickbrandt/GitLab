@@ -155,6 +155,7 @@ export default {
       return (
         this.glFeatures.featureFlagsNewVersion &&
         this.glFeatures.featureFlagsLegacyReadOnly &&
+        !this.glFeatures.featureFlagsLegacyReadOnlyOverride &&
         this.version === LEGACY_FLAG
       );
     },

@@ -26,6 +26,7 @@ RSpec.describe 'User sees feature flag list', :js do
       create_flag(project, 'mr_train', true).tap do |feature_flag|
         create_scope(feature_flag, 'production', false)
       end
+      stub_feature_flags(feature_flags_legacy_read_only_override: false)
     end
 
     it 'user sees the first flag' do
@@ -34,7 +35,7 @@ RSpec.describe 'User sees feature flag list', :js do
       within_feature_flag_row(1) do
         expect(page.find('.js-feature-flag-id')).to have_content('^1')
         expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-        expect(page).to have_css('.js-feature-flag-status button:not(.is-checked)')
+        expect_status_toggle_button_not_to_be_checked
 
         within_feature_flag_scopes do
           expect(page.find('[data-qa-selector="feature-flag-scope-muted-badge"]:nth-child(1)')).to have_content('*')
@@ -49,7 +50,7 @@ RSpec.describe 'User sees feature flag list', :js do
       within_feature_flag_row(2) do
         expect(page.find('.js-feature-flag-id')).to have_content('^2')
         expect(page.find('.feature-flag-name')).to have_content('drop_legacy_artifacts')
-        expect(page).to have_css('.js-feature-flag-status button:not(.is-checked)')
+        expect_status_toggle_button_not_to_be_checked
 
         within_feature_flag_scopes do
           expect(page.find('[data-qa-selector="feature-flag-scope-muted-badge"]:nth-child(1)')).to have_content('*')
@@ -63,7 +64,7 @@ RSpec.describe 'User sees feature flag list', :js do
       within_feature_flag_row(3) do
         expect(page.find('.js-feature-flag-id')).to have_content('^3')
         expect(page.find('.feature-flag-name')).to have_content('mr_train')
-        expect(page).to have_css('.js-feature-flag-status button.is-checked')
+        expect_status_toggle_button_to_be_checked
 
         within_feature_flag_scopes do
           expect(page.find('[data-qa-selector="feature-flag-scope-info-badge"]:nth-child(1)')).to have_content('*')
@@ -76,7 +77,7 @@ RSpec.describe 'User sees feature flag list', :js do
       visit(project_feature_flags_path(project))
 
       within_feature_flag_row(1) do
-        expect(page).to have_css('.js-feature-flag-status button.is-disabled')
+        expect_status_toggle_button_to_be_disabled
       end
     end
 
@@ -89,9 +90,34 @@ RSpec.describe 'User sees feature flag list', :js do
         visit(project_feature_flags_path(project))
 
         within_feature_flag_row(1) do
-          page.find('.js-feature-flag-status button').click
+          status_toggle_button.click
 
-          expect(page).to have_css('.js-feature-flag-status button.is-checked')
+          expect_status_toggle_button_to_be_checked
+        end
+
+        visit(project_audit_events_path(project))
+
+        expect(page).to(
+          have_text('Updated feature flag ci_live_trace. Updated active from "false" to "true".')
+        )
+      end
+    end
+
+    context 'when legacy feature flags are read-only but the override is active for a project' do
+      before do
+        stub_feature_flags(
+          feature_flags_legacy_read_only: true,
+          feature_flags_legacy_read_only_override: project
+        )
+      end
+
+      it 'user updates the status toggle' do
+        visit(project_feature_flags_path(project))
+
+        within_feature_flag_row(1) do
+          status_toggle_button.click
+
+          expect_status_toggle_button_to_be_checked
         end
 
         visit(project_audit_events_path(project))
@@ -115,7 +141,7 @@ RSpec.describe 'User sees feature flag list', :js do
       within_feature_flag_row(1) do
         status_toggle_button.click
 
-        expect(page).to have_css('.js-feature-flag-status button.is-checked')
+        expect_status_toggle_button_to_be_checked
       end
 
       visit(project_audit_events_path(project))

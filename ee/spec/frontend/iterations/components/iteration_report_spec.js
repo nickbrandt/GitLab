@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
+import { GlNewDropdown, GlEmptyState, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
 import IterationReport from 'ee/iterations/components/iteration_report.vue';
 import IterationReportSummary from 'ee/iterations/components/iteration_report_summary.vue';
 import IterationReportTabs from 'ee/iterations/components/iteration_report_tabs.vue';
@@ -107,6 +107,37 @@ describe('Iterations report', () => {
       expect(iterationReportTabs.props('fullPath')).toBe(defaultProps.fullPath);
       expect(iterationReportTabs.props('iterationId')).toBe(iteration.id);
       expect(iterationReportTabs.props('namespaceType')).toBe(Namespace.Group);
+    });
+
+    describe('actions dropdown to edit iteration', () => {
+      describe.each`
+        description                    | canEdit  | namespaceType        | canEditIteration
+        ${'has permissions'}           | ${true}  | ${Namespace.Group}   | ${true}
+        ${'has permissions'}           | ${true}  | ${Namespace.Project} | ${false}
+        ${'does not have permissions'} | ${false} | ${Namespace.Group}   | ${false}
+        ${'does not have permissions'} | ${false} | ${Namespace.Project} | ${false}
+      `(
+        'when user $description and they are viewing an iteration within a $namespaceType',
+        ({ canEdit, namespaceType, canEditIteration }) => {
+          beforeEach(() => {
+            mountComponent({
+              props: {
+                ...defaultProps,
+                canEdit,
+                namespaceType,
+              },
+            });
+
+            wrapper.setData({
+              iteration,
+            });
+          });
+
+          it(`${canEditIteration ? 'is shown' : 'is hidden'}`, () => {
+            expect(wrapper.contains(GlNewDropdown)).toBe(canEditIteration);
+          });
+        },
+      );
     });
   });
 });

@@ -4,6 +4,8 @@ import { GlAlert, GlLink } from '@gitlab/ui';
 import SecurityConfigurationApp from 'ee/security_configuration/components/app.vue';
 import ManageFeature from 'ee/security_configuration/components/manage_feature.vue';
 import stubChildren from 'helpers/stub_children';
+import { useLocalStorageSpy } from 'helpers/local_storage_helper';
+import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 import { generateFeatures } from './helpers';
 
 const propsData = {
@@ -38,6 +40,10 @@ describe('Security Configuration App', () => {
     );
   };
 
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
@@ -70,20 +76,28 @@ describe('Security Configuration App', () => {
 
   describe('Auto DevOps alert', () => {
     describe.each`
-      gitlabCiPresent | autoDevopsEnabled | canEnableAutoDevops | shouldShowAlert
-      ${false}        | ${false}          | ${true}             | ${true}
-      ${true}         | ${false}          | ${true}             | ${false}
-      ${false}        | ${true}           | ${true}             | ${false}
-      ${false}        | ${false}          | ${false}            | ${false}
+      gitlabCiPresent | autoDevopsEnabled | canEnableAutoDevops | dismissed | shouldShowAlert
+      ${false}        | ${false}          | ${true}             | ${false}  | ${true}
+      ${false}        | ${false}          | ${true}             | ${true}   | ${false}
+      ${true}         | ${false}          | ${true}             | ${false}  | ${false}
+      ${false}        | ${true}           | ${true}             | ${false}  | ${false}
+      ${false}        | ${false}          | ${false}            | ${false}  | ${false}
     `(
-      'given gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled, canEnableAutoDevops is $canEnableAutoDevops',
-      ({ gitlabCiPresent, autoDevopsEnabled, canEnableAutoDevops, shouldShowAlert }) => {
+      'given gitlabCiPresent is $gitlabCiPresent, autoDevopsEnabled is $autoDevopsEnabled, dismissed is $dismissed, canEnableAutoDevops is $canEnableAutoDevops',
+      ({ gitlabCiPresent, autoDevopsEnabled, canEnableAutoDevops, dismissed, shouldShowAlert }) => {
         beforeEach(() => {
+          if (dismissed) {
+            localStorage.setItem(SecurityConfigurationApp.autoDevopsAlertStorageKey, 'true');
+          }
+
           createComponent({
             propsData: {
               gitlabCiPresent,
               autoDevopsEnabled,
               canEnableAutoDevops,
+            },
+            stubs: {
+              LocalStorageSync,
             },
           });
         });
@@ -109,12 +123,40 @@ describe('Security Configuration App', () => {
               title: 'Auto DevOps',
               primaryButtonText: 'Enable Auto DevOps',
               primaryButtonLink: propsData.autoDevopsPath,
-              dismissible: false,
             });
           });
         }
       },
     );
+
+    describe('dismissing the alert', () => {
+      useLocalStorageSpy();
+
+      beforeEach(() => {
+        createComponent({
+          propsData: {
+            gitlabCiPresent: false,
+            autoDevopsEnabled: false,
+            canEnableAutoDevops: true,
+          },
+          stubs: {
+            LocalStorageSync,
+          },
+        });
+
+        getAlert().vm.$emit('dismiss');
+      });
+
+      it('hides the alert', () => {
+        expect(getAlert().exists()).toBe(false);
+      });
+
+      it('saves dismissal in localStorage', () => {
+        expect(localStorage.setItem.mock.calls).toEqual([
+          [SecurityConfigurationApp.autoDevopsAlertStorageKey, 'true'],
+        ]);
+      });
+    });
   });
 
   describe('features table', () => {

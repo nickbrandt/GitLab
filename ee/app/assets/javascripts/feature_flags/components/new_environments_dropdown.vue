@@ -78,7 +78,7 @@ export default {
     </template>
     <gl-search-box-by-type
       v-model.trim="environmentSearch"
-      class="m-2"
+      class="gl-m-3"
       @input="fetchEnvironments"
     />
     <gl-loading-icon v-if="isLoading" />

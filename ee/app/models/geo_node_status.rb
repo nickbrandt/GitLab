@@ -31,7 +31,25 @@ class GeoNodeStatus < ApplicationRecord
   alias_attribute :last_event_timestamp, :last_event_date_timestamp
   alias_attribute :cursor_last_event_timestamp, :cursor_last_event_date_timestamp
 
-  RESOURCE_STATUS_FIELDS = %w(
+  def self.status_fields_for(replicable_class)
+    {
+      "#{replicable_class.replicable_name_plural}_count".to_sym => "Number of #{replicable_class.replicable_title_plural} on the primary",
+      "#{replicable_class.replicable_name_plural}_checksummed_count".to_sym => "Number of #{replicable_class.replicable_title_plural} checksummed on the primary",
+      "#{replicable_class.replicable_name_plural}_checksum_failed_count".to_sym => "Number of #{replicable_class.replicable_title_plural} failed to checksum on primary",
+      "#{replicable_class.replicable_name_plural}_synced_count".to_sym => "Number of #{replicable_class.replicable_title_plural} in the registry",
+      "#{replicable_class.replicable_name_plural}_failed_count".to_sym => "Number of #{replicable_class.replicable_title_plural} synced on secondary",
+      "#{replicable_class.replicable_name_plural}_registry_count".to_sym => "Number of #{replicable_class.replicable_title_plural} failed to sync on secondary"
+    }
+  end
+
+  # Why are disabled classes included? See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/38959/diffs#note_402656534
+  def self.replicator_class_status_fields
+    Gitlab::Geo::REPLICATOR_CLASSES.map do |replicable_class|
+      status_fields_for(replicable_class).keys
+    end.flatten.map(&:to_s)
+  end
+
+  RESOURCE_STATUS_FIELDS = (%w(
     repository_verification_enabled
     repositories_replication_enabled
     repositories_synced_count
@@ -75,13 +93,14 @@ class GeoNodeStatus < ApplicationRecord
     design_repositories_count
     design_repositories_synced_count
     design_repositories_failed_count
-    package_files_count
-    package_files_checksummed_count
-    package_files_checksum_failed_count
-    package_files_synced_count
-    package_files_failed_count
-    package_files_registry_count
-  ).freeze
+  ) + replicator_class_status_fields).freeze
+
+  # Why are disabled classes included? See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/38959/diffs#note_402656534
+  def self.replicator_class_prometheus_metrics
+    Gitlab::Geo::REPLICATOR_CLASSES.map do |replicable_class|
+      status_fields_for(replicable_class)
+    end.reduce({}, :merge)
+  end
 
   # Be sure to keep this consistent with Prometheus naming conventions
   PROMETHEUS_METRICS = {
@@ -153,14 +172,8 @@ class GeoNodeStatus < ApplicationRecord
     design_repositories_count: 'Total number of syncable design repositories available on primary',
     design_repositories_synced_count: 'Number of syncable design repositories synced on secondary',
     design_repositories_failed_count: 'Number of syncable design repositories failed to sync on secondary',
-    design_repositories_registry_count: 'Number of design repositories in the registry',
-    package_files_count: 'Number of package files on primary',
-    package_files_checksummed_count: 'Number of package files checksummed on primary',
-    package_files_checksum_failed_count: 'Number of package files failed to checksum on primary',
-    package_files_registry_count: 'Number of package files in the registry',
-    package_files_synced_count: 'Number of package files synced on secondary',
-    package_files_failed_count: 'Number of package files failed to sync on secondary'
-  }.freeze
+    design_repositories_registry_count: 'Number of design repositories in the registry'
+  }.merge(replicator_class_prometheus_metrics).freeze
 
   EXPIRATION_IN_MINUTES = 10
   HEALTHY_STATUS = 'Healthy'.freeze
@@ -359,6 +372,14 @@ class GeoNodeStatus < ApplicationRecord
     end
   end
 
+  def self.add_attr_in_percentage_for_replicable_classes
+    Gitlab::Geo::REPLICATOR_CLASSES.each do |replicator|
+      replicable = replicator.replicable_name_plural
+      attr_in_percentage "#{replicable}_checksummed",  "#{replicable}_checksummed_count",  "#{replicable}_count"
+      attr_in_percentage "#{replicable}_synced",       "#{replicable}_synced_count",       "#{replicable}_registry_count"
+    end
+  end
+
   attr_in_percentage :repositories_synced,           :repositories_synced_count,           :repositories_count
   attr_in_percentage :repositories_checksummed,      :repositories_checksummed_count,      :repositories_count
   attr_in_percentage :repositories_verified,         :repositories_verified_count,         :repositories_count
@@ -372,8 +393,8 @@ class GeoNodeStatus < ApplicationRecord
   attr_in_percentage :replication_slots_used,        :replication_slots_used_count,        :replication_slots_count
   attr_in_percentage :container_repositories_synced, :container_repositories_synced_count, :container_repositories_count
   attr_in_percentage :design_repositories_synced,    :design_repositories_synced_count,    :design_repositories_count
-  attr_in_percentage :package_files_checksummed,     :package_files_checksummed_count,     :package_files_count
-  attr_in_percentage :package_files_synced,          :package_files_synced_count,          :package_files_registry_count
+
+  add_attr_in_percentage_for_replicable_classes
 
   def synced_in_percentage_for(replicator_class)
     public_send("#{replicator_class.replicable_name_plural}_synced_in_percentage") # rubocop:disable GitlabSecurity/PublicSend
@@ -422,10 +443,13 @@ class GeoNodeStatus < ApplicationRecord
     return unless Gitlab::Geo.primary?
 
     self.projects_count = geo_node.projects.count
-    self.package_files_count = Geo::PackageFileReplicator.primary_total_count
     self.replication_slots_count = geo_node.replication_slots_count
     self.replication_slots_used_count = geo_node.replication_slots_used_count
     self.replication_slots_max_retained_wal_bytes = geo_node.replication_slots_max_retained_wal_bytes
+
+    Gitlab::Geo::REPLICATOR_CLASSES.each do |replicator|
+      public_send("#{replicator.replicable_name_plural}_count=", replicator.primary_total_count) # rubocop:disable GitlabSecurity/PublicSend
+    end
   end
 
   def load_secondary_data
@@ -441,7 +465,7 @@ class GeoNodeStatus < ApplicationRecord
     load_attachments_data
     load_container_registry_data
     load_designs_data
-    load_package_files_data
+    load_ssf_replicable_data
   end
 
   def load_repositories_data
@@ -500,13 +524,13 @@ class GeoNodeStatus < ApplicationRecord
     self.design_repositories_registry_count = design_registry_finder.registry_count
   end
 
-  def load_package_files_data
-    # return unless package_files_replication_enabled # TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/221069
-
-    self.package_files_count = Geo::PackageFileReplicator.registry_count
-    self.package_files_registry_count = Geo::PackageFileReplicator.registry_count
-    self.package_files_synced_count = Geo::PackageFileReplicator.synced_count
-    self.package_files_failed_count = Geo::PackageFileReplicator.failed_count
+  def load_ssf_replicable_data
+    Gitlab::Geo::REPLICATOR_CLASSES.each do |replicator|
+      public_send("#{replicator.replicable_name_plural}_count=", replicator.registry_count) # rubocop:disable GitlabSecurity/PublicSend
+      public_send("#{replicator.replicable_name_plural}_registry_count=", replicator.registry_count) # rubocop:disable GitlabSecurity/PublicSend
+      public_send("#{replicator.replicable_name_plural}_synced_count=", replicator.synced_count) # rubocop:disable GitlabSecurity/PublicSend
+      public_send("#{replicator.replicable_name_plural}_failed_count=", replicator.failed_count) # rubocop:disable GitlabSecurity/PublicSend
+    end
   end
 
   def load_repository_check_data
@@ -534,8 +558,11 @@ class GeoNodeStatus < ApplicationRecord
     self.repositories_checksum_failed_count = repository_verification_finder.count_verification_failed_repositories
     self.wikis_checksummed_count = repository_verification_finder.count_verified_wikis
     self.wikis_checksum_failed_count = repository_verification_finder.count_verification_failed_wikis
-    self.package_files_checksummed_count = Geo::PackageFileReplicator.checksummed_count
-    self.package_files_checksum_failed_count = Geo::PackageFileReplicator.checksum_failed_count
+
+    Gitlab::Geo::REPLICATOR_CLASSES.each do |replicator|
+      public_send("#{replicator.replicable_name_plural}_checksummed_count=", replicator.checksummed_count) # rubocop:disable GitlabSecurity/PublicSend
+      public_send("#{replicator.replicable_name_plural}_checksum_failed_count=", replicator.checksum_failed_count) # rubocop:disable GitlabSecurity/PublicSend
+    end
   end
 
   def load_secondary_verification_data

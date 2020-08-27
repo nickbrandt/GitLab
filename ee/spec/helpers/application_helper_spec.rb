@@ -19,75 +19,71 @@ RSpec.describe ApplicationHelper do
     end
 
     context 'when in a Geo Secondary' do
+      let_it_be(:geo_primary) { create(:geo_node, :primary) }
+
       before do
         stub_current_geo_node(create(:geo_node))
       end
 
-      context 'when there is no Geo Primary node configured' do
-        it 'returns a read-only Geo message without a link to a primary node' do
-          expect(helper.read_only_message).to match(/If you want to make changes, you must visit this page on the .*primary node/)
-          expect(helper.read_only_message).not_to include('http://')
-        end
+      it 'includes button to visit primary node' do
+        expect(helper.read_only_message).to match(/Go to the primary site/)
+        expect(helper.read_only_message).to include(geo_primary.url)
       end
 
-      context 'when there is a Geo Primary node configured' do
-        let!(:geo_primary) { create(:geo_node, :primary) }
+      it 'returns a read-only Geo message with a link to primary node' do
+        expect(helper.read_only_message).to match(/If you want to make changes, you must visit the primary site./)
+        expect(helper.read_only_message).to include(geo_primary.url)
+      end
 
-        it 'returns a read-only Geo message with a link to primary node' do
-          expect(helper.read_only_message).to match(/If you want to make changes, you must visit this page on the .*primary node/)
+      it 'returns a limited actions message when @limited_actions_message is true' do
+        assign(:limited_actions_message, true)
+
+        expect(helper.read_only_message).to match(/You may be able to make a limited amount of changes or perform a limited amount of actions on this page/)
+        expect(helper.read_only_message).to include(geo_primary.url)
+      end
+
+      it 'includes a warning about database lag' do
+        allow_any_instance_of(::Gitlab::Geo::HealthCheck).to receive(:db_replication_lag_seconds).and_return(120)
+
+        expect(helper.read_only_message).to match(/If you want to make changes, you must visit the primary site./)
+        expect(helper.read_only_message).to match(/The database is currently 2 minutes behind the primary node/)
+        expect(helper.read_only_message).to include(geo_primary.url)
+      end
+
+      context 'event lag' do
+        it 'includes a lag warning about a node lag' do
+          event_log = create(:geo_event_log, created_at: 4.minutes.ago)
+          create(:geo_event_log, created_at: 3.minutes.ago)
+          create(:geo_event_log_state, event_id: event_log.id)
+
+          expect(helper.read_only_message).to match(/If you want to make changes, you must visit the primary site./)
+          expect(helper.read_only_message).to match(/The node is currently 3 minutes behind the primary/)
           expect(helper.read_only_message).to include(geo_primary.url)
         end
 
-        it 'returns a limited actions message when @limited_actions_message is true' do
-          assign(:limited_actions_message, true)
+        it 'does not include a lag warning because the last event is too fresh' do
+          event_log = create(:geo_event_log, created_at: 3.minutes.ago)
+          create(:geo_event_log)
+          create(:geo_event_log_state, event_id: event_log.id)
 
-          expect(helper.read_only_message).to match(/You may be able to make a limited amount of changes or perform a limited amount of actions on this page/)
-          expect(helper.read_only_message).not_to include('http://')
-        end
-
-        it 'includes a warning about database lag' do
-          allow_any_instance_of(::Gitlab::Geo::HealthCheck).to receive(:db_replication_lag_seconds).and_return(120)
-
-          expect(helper.read_only_message).to match(/If you want to make changes, you must visit this page on the .*primary node/)
-          expect(helper.read_only_message).to match(/The database is currently 2 minutes behind the primary node/)
+          expect(helper.read_only_message).to match(/If you want to make changes, you must visit the primary site./)
+          expect(helper.read_only_message).not_to match(/The node is currently 3 minutes behind the primary/)
           expect(helper.read_only_message).to include(geo_primary.url)
         end
 
-        context 'event lag' do
-          it 'includes a lag warning about a node lag' do
-            event_log = create(:geo_event_log, created_at: 4.minutes.ago)
-            create(:geo_event_log, created_at: 3.minutes.ago)
-            create(:geo_event_log_state, event_id: event_log.id)
+        it 'does not include a lag warning because the last event is processed' do
+          event_log = create(:geo_event_log, created_at: 3.minutes.ago)
+          create(:geo_event_log_state, event_id: event_log.id)
 
-            expect(helper.read_only_message).to match(/If you want to make changes, you must visit this page on the .*primary node/)
-            expect(helper.read_only_message).to match(/The node is currently 3 minutes behind the primary/)
-            expect(helper.read_only_message).to include(geo_primary.url)
-          end
+          expect(helper.read_only_message).to match(/If you want to make changes, you must visit the primary site./)
+          expect(helper.read_only_message).not_to match(/The node is currently 3 minutes behind the primary/)
+          expect(helper.read_only_message).to include(geo_primary.url)
+        end
 
-          it 'does not include a lag warning because the last event is too fresh' do
-            event_log = create(:geo_event_log, created_at: 3.minutes.ago)
-            create(:geo_event_log)
-            create(:geo_event_log_state, event_id: event_log.id)
-
-            expect(helper.read_only_message).to match(/If you want to make changes, you must visit this page on the .*primary node/)
-            expect(helper.read_only_message).not_to match(/The node is currently 3 minutes behind the primary/)
-            expect(helper.read_only_message).to include(geo_primary.url)
-          end
-
-          it 'does not include a lag warning because the last event is processed' do
-            event_log = create(:geo_event_log, created_at: 3.minutes.ago)
-            create(:geo_event_log_state, event_id: event_log.id)
-
-            expect(helper.read_only_message).to match(/If you want to make changes, you must visit this page on the .*primary node/)
-            expect(helper.read_only_message).not_to match(/The node is currently 3 minutes behind the primary/)
-            expect(helper.read_only_message).to include(geo_primary.url)
-          end
-
-          it 'does not include a lag warning because there are no events yet' do
-            expect(helper.read_only_message).to match(/If you want to make changes, you must visit this page on the .*primary node/)
-            expect(helper.read_only_message).not_to match(/minutes behind the primary/)
-            expect(helper.read_only_message).to include(geo_primary.url)
-          end
+        it 'does not include a lag warning because there are no events yet' do
+          expect(helper.read_only_message).to match(/If you want to make changes, you must visit the primary site./)
+          expect(helper.read_only_message).not_to match(/minutes behind the primary/)
+          expect(helper.read_only_message).to include(geo_primary.url)
         end
       end
     end

@@ -45,7 +45,10 @@ export default {
       return this.glFeatures.featureFlagsNewVersion;
     },
     isLegacyReadOnlyFlagsEnabled() {
-      return this.glFeatures.featureFlagsLegacyReadOnly;
+      return (
+        this.glFeatures.featureFlagsLegacyReadOnly &&
+        !this.glFeatures.featureFlagsLegacyReadOnlyOverride
+      );
     },
     modalTitle() {
       return sprintf(s__('FeatureFlags|Delete %{name}?'), {
@@ -150,17 +153,22 @@ export default {
         </div>
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
-          <div class="table-mobile-content js-feature-flag-status">
+          <div class="table-mobile-content">
             <gl-toggle
               v-if="featureFlag.update_path"
               :value="featureFlag.active"
               :disabled="statusToggleDisabled(featureFlag)"
+              data-testid="feature-flag-status-toggle"
               data-track-event="click_button"
               data-track-label="feature_flag_toggle"
               data-track-context="feature_flag_activity"
               @change="toggleFeatureFlag(featureFlag)"
             />
-            <gl-badge v-else-if="featureFlag.active" variant="success">
+            <gl-badge
+              v-else-if="featureFlag.active"
+              variant="success"
+              data-testid="feature-flag-status-badge"
+            >
               {{ s__('FeatureFlags|Active') }}
             </gl-badge>
             <gl-badge v-else variant="danger">{{ s__('FeatureFlags|Inactive') }}</gl-badge>
