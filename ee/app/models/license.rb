@@ -28,6 +28,7 @@ class License < ApplicationRecord
     ldap_group_sync
     member_lock
     merge_request_approvers
+    milestone_charts
     multiple_issue_assignees
     multiple_ldap_servers
     multiple_merge_request_assignees

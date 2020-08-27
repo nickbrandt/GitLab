@@ -1427,6 +1427,36 @@ type Branch {
   name: String!
 }
 
+"""
+Represents the total number of issues and their weights for a particular day.
+"""
+type BurnupChartDailyTotals {
+  """
+  Number of closed issues as of this day
+  """
+  completedCount: Int!
+
+  """
+  Total weight of closed issues as of this day
+  """
+  completedWeight: Int!
+
+  """
+  Date for burnup totals
+  """
+  date: ISO8601Date!
+
+  """
+  Number of issues as of this day
+  """
+  scopeCount: Int!
+
+  """
+  Total weight of issues as of this day
+  """
+  scopeWeight: Int!
+}
+
 type CiGroup {
   """
   Jobs in group
@@ -9549,6 +9579,11 @@ type MetricsDashboardAnnotationEdge {
 Represents a milestone.
 """
 type Milestone {
+  """
+  Daily scope and completed totals for burnup charts
+  """
+  burnupTimeSeries: [BurnupChartDailyTotals!]
+
   """
   Timestamp of milestone creation
   """

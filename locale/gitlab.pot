@@ -4187,6 +4187,9 @@ msgstr ""
 msgid "Burnup chart"
 msgstr ""
 
+msgid "Burnup chart could not be generated due to too many events"
+msgstr ""
+
 msgid "Business"
 msgstr ""
 
@@ -15696,10 +15699,16 @@ msgid_plural "Milestones"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Milestone does not support burnup charts"
+msgstr ""
+
 msgid "Milestone lists not available with your current license"
 msgstr ""
 
 msgid "Milestone lists show all issues from the selected milestone."
+msgstr ""
+
+msgid "Milestone must have a start and due date"
 msgstr ""
 
 msgid "MilestoneSidebar|Closed:"
