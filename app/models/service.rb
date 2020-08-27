@@ -26,6 +26,7 @@ class Service < ApplicationRecord
 
   default_value_for :active, false
   default_value_for :alert_events, true
+  default_value_for :category, 'common'
   default_value_for :commit_events, true
   default_value_for :confidential_issues_events, true
   default_value_for :confidential_note_events, true
@@ -80,8 +81,6 @@ class Service < ApplicationRecord
   scope :deployment_hooks, -> { where(deployment_events: true, active: true) }
   scope :alert_hooks, -> { where(alert_events: true, active: true) }
   scope :deployment, -> { where(category: 'deployment') }
-
-  default_value_for :category, 'common'
 
   def activated?
     active
