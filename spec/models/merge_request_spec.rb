@@ -881,8 +881,10 @@ RSpec.describe MergeRequest, factory_default: :keep do
   end
 
   describe '#diff_size' do
+    let_it_be(:project) { create(:project, :repository) }
+
     let(:merge_request) do
-      build(:merge_request, source_branch: 'expand-collapse-files', target_branch: 'master')
+      build(:merge_request, source_project: project, source_branch: 'expand-collapse-files', target_branch: 'master')
     end
 
     context 'when there are MR diffs' do
@@ -1512,7 +1514,9 @@ RSpec.describe MergeRequest, factory_default: :keep do
     end
 
     context 'new merge request' do
-      subject { build(:merge_request) }
+      let_it_be(:project) { create(:project, :repository) }
+
+      subject { build(:merge_request, source_project: project) }
 
       context 'compare commits' do
         before do
@@ -2116,11 +2120,13 @@ RSpec.describe MergeRequest, factory_default: :keep do
     end
 
     context 'when merge request is not persisted' do
+      let_it_be(:project) { create(:project, :repository) }
+
       context 'when compare commits are set in the service' do
         let(:commit) { spy('commit') }
 
         subject do
-          build(:merge_request, compare_commits: [commit, commit])
+          build(:merge_request, source_project: project, compare_commits: [commit, commit])
         end
 
         it 'returns commits from compare commits temporary data' do
@@ -2129,7 +2135,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
       end
 
       context 'when compare commits are not set in the service' do
-        subject { build(:merge_request) }
+        subject { build(:merge_request, source_project: project) }
 
         it 'returns array with diff head sha element only' do
           expect(subject.all_commit_shas).to eq [subject.diff_head_sha]
@@ -2637,9 +2643,9 @@ RSpec.describe MergeRequest, factory_default: :keep do
     let(:pipeline) { create(:ci_empty_pipeline) }
 
     context 'when it is only allowed to merge when build is green' do
-      let_it_be(:project) { create(:project, only_allow_merge_if_pipeline_succeeds: true) }
+      let_it_be(:project) { create(:project, :repository, only_allow_merge_if_pipeline_succeeds: true) }
 
-      subject { build(:merge_request, target_project: project) }
+      subject { build(:merge_request, source_project: project) }
 
       context 'and a failed pipeline is associated' do
         before do
@@ -2678,9 +2684,9 @@ RSpec.describe MergeRequest, factory_default: :keep do
     end
 
     context 'when it is only allowed to merge when build is green or skipped' do
-      let_it_be(:project) { create(:project, only_allow_merge_if_pipeline_succeeds: true, allow_merge_on_skipped_pipeline: true) }
+      let_it_be(:project) { create(:project, :repository, only_allow_merge_if_pipeline_succeeds: true, allow_merge_on_skipped_pipeline: true) }
 
-      subject { build(:merge_request, target_project: project) }
+      subject { build(:merge_request, source_project: project) }
 
       context 'and a failed pipeline is associated' do
         before do
@@ -2719,9 +2725,9 @@ RSpec.describe MergeRequest, factory_default: :keep do
     end
 
     context 'when merges are not restricted to green builds' do
-      let_it_be(:project) { create(:project, only_allow_merge_if_pipeline_succeeds: false) }
+      let_it_be(:project) { create(:project, :repository, only_allow_merge_if_pipeline_succeeds: false) }
 
-      subject { build(:merge_request, target_project: project) }
+      subject { build(:merge_request, source_project: project) }
 
       context 'and a failed pipeline is associated' do
         before do
