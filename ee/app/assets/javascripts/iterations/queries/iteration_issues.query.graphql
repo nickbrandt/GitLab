@@ -16,6 +16,7 @@ query IterationIssues(
       after: $afterCursor
       first: $firstPageSize
       last: $lastPageSize
+      includeSubgroups: true
     ) {
       ...IterationIssues
     }
