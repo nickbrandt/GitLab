@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlTooltip } from '@gitlab/ui';
-import Tooltips from '~/tooltips/components/tooltips.vue';
 import { useMockMutationObserver } from 'helpers/mock_dom_observer';
+import Tooltips from '~/tooltips/components/tooltips.vue';
 
 describe('tooltips/components/tooltips.vue', () => {
-  const { trigger: triggerMutate } = useMockMutationObserver();
+  const { trigger: triggerMutate, observersCount } = useMockMutationObserver();
   let wrapper;
 
   const buildWrapper = () => {
@@ -146,5 +146,15 @@ describe('tooltips/components/tooltips.vue', () => {
 
       expect(allTooltips()).toHaveLength(1);
     });
+  });
+
+  it('disconnects mutation observer on beforeDestroy', () => {
+    buildWrapper();
+    wrapper.vm.addTooltips([createTooltipTarget()]);
+
+    expect(observersCount()).toBe(1);
+
+    wrapper.destroy();
+    expect(observersCount()).toBe(0);
   });
 });

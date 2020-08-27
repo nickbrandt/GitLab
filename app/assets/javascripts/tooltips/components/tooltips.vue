@@ -43,6 +43,9 @@ export default {
       });
     });
   },
+  beforeDestroy() {
+    this.observer.disconnect();
+  },
   methods: {
     addTooltips(elements, config) {
       const newTooltips = elements
