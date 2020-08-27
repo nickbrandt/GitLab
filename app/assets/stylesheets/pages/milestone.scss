@@ -178,7 +178,9 @@ $status-box-line-height: 26px;
 
 .milestone-detail {
   border-bottom: 1px solid $border-color;
-  padding: 20px 0;
+  > h2 {
+    margin: 0;
+  }
 }
 
 @include media-breakpoint-down(xs) {
