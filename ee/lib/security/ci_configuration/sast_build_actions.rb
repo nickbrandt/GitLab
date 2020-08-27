@@ -3,10 +3,11 @@
 module Security
   module CiConfiguration
     class SastBuildActions
-      def initialize(auto_devops_enabled, params, existing_gitlab_ci_content)
+      def initialize(auto_devops_enabled, params, existing_gitlab_ci_content, default_sast_values)
         @auto_devops_enabled = auto_devops_enabled
         @params = params
         @existing_gitlab_ci_content = existing_gitlab_ci_content || {}
+        @default_sast_values = default_sast_values
       end
 
       def generate
@@ -51,14 +52,18 @@ module Security
         @params['stage'].presence ? @params['stage'] : 'test'
       end
 
-      # We only want to write variables that are set
       def set_variables(variables, hash_to_update = {})
         hash_to_update['variables'] ||= {}
-        variables.each do |k, v|
-          hash_to_update['variables'][k] = @params[k]
+
+        variables.each do |key|
+          if @params[key].present? && @params[key].to_s != @default_sast_values[key].to_s
+            hash_to_update['variables'][key] = @params[key]
+          else
+            hash_to_update['variables'].delete(key)
+          end
         end
 
-        hash_to_update['variables'].select { |k, v| v.present? }
+        hash_to_update['variables']
       end
 
       def set_sast_block
