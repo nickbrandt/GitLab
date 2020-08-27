@@ -68,7 +68,7 @@ RSpec.describe Resolvers::DesignManagement::DesignResolver do
         let(:args) { { id: GitlabSchema.id_from_object(create(:user)).to_s } }
 
         it 'complains meaningfully' do
-          expect { resolve_design }.to raise_error(::Gitlab::Graphql::Errors::ArgumentError, /not a valid id for DesignManagement::Design/)
+          expect { resolve_design }.to raise_error(::Gitlab::Graphql::Errors::ArgumentError, /not a valid ID for DesignManagement::Design/)
         end
       end
     end
