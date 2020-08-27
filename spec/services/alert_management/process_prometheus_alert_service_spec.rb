@@ -84,6 +84,10 @@ RSpec.describe AlertManagement::ProcessPrometheusAlertService do
           context 'when alert can be created' do
             it_behaves_like 'creates an alert management alert'
 
+            it 'creates a system note corresponding to alert creation' do
+              expect { subject }.to change(Note, :count).by(1)
+            end
+
             it 'processes the incident alert' do
               expect(IncidentManagement::ProcessAlertWorker)
                 .to receive(:perform_async)

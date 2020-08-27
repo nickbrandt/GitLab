@@ -54,6 +54,7 @@ module AlertManagement
       if new_alert.save
         new_alert.execute_services
         @am_alert = new_alert
+        SystemNoteService.create_new_alert(new_alert, Gitlab::AlertManagement::AlertParams::MONITORING_TOOLS[:prometheus])
         return
       end
 
