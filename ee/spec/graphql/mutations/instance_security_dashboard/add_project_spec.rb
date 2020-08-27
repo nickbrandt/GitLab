@@ -37,6 +37,22 @@ RSpec.describe Mutations::InstanceSecurityDashboard::AddProject do
         end
       end
 
+      context 'when security_dashboard is disabled for my project' do
+        context 'when project is not licensed to be added to the security dashboard' do
+          let(:selected_project) { my_project }
+
+          it 'does not add project to the security dashboard', :aggregate_failures do
+            expect(subject[:project]).to be_nil
+            expect(subject[:errors]).to eq([{
+              extensions: { code: :NOT_LICENSED },
+              message: "Cannot add project #{selected_project.name}. Only projects created under a Gold license are available in Security Dashboards.",
+              path: ['addProjectToSecurityDashboard']
+            }])
+            expect(user.security_dashboard_projects).to include(already_added_project)
+          end
+        end
+      end
+
       context 'when security_dashboard is enabled' do
         before do
           stub_licensed_features(security_dashboard: true)
@@ -48,6 +64,7 @@ RSpec.describe Mutations::InstanceSecurityDashboard::AddProject do
           it 'adds project to the security dashboard', :aggregate_failures do
             expect(subject[:project]).to eq(my_project)
             expect(subject[:errors]).to be_empty
+            expect(subject[:error_messages]).to be_empty
             expect(user.security_dashboard_projects).to include(my_project)
           end
         end
@@ -65,7 +82,11 @@ RSpec.describe Mutations::InstanceSecurityDashboard::AddProject do
 
           it 'does not add project to the security dashboard', :aggregate_failures do
             expect(subject[:project]).to be_nil
-            expect(subject[:errors]).to eq(['The project already belongs to your dashboard or you don\'t have permission to perform this action'])
+            expect(subject[:errors]).to eq([{
+              extensions: { code: :DUPLICATED },
+              message: "Cannot add project #{selected_project.name}. The project is already added to your Security Dashboard.",
+              path: ['addProjectToSecurityDashboard']
+            }])
             expect(user.security_dashboard_projects).to include(already_added_project)
           end
         end

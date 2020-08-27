@@ -8,14 +8,16 @@ RSpec.describe Dashboard::Projects::CreateService do
   let(:project) { create(:project) }
 
   describe '#execute' do
-    let(:projects_service) { double(Dashboard::Projects::ListService) }
+    let(:projects_finder) { double(ProjectsFinder) }
     let(:result) { service.execute(input) }
+    let(:feature_available) { true }
 
     before do
-      allow(Dashboard::Projects::ListService)
-        .to receive(:new).with(user, feature: :operations_dashboard).and_return(projects_service)
-      allow(projects_service)
-        .to receive(:execute).with(input).and_return(output)
+      allow(ProjectsFinder)
+        .to receive(:new).with(current_user: user, project_ids_relation: input, params: { min_access_level: ProjectMember::DEVELOPER }).and_return(projects_finder)
+      allow(projects_finder)
+        .to receive(:execute).and_return(output)
+      allow(project).to receive(:feature_available?).and_return(feature_available)
     end
 
     context 'with projects' do
@@ -34,6 +36,24 @@ RSpec.describe Dashboard::Projects::CreateService do
 
         it 'adds a project' do
           expect(result).to eq(expected_result(added_project_ids: [project.id]))
+        end
+      end
+
+      context 'with project without provided feature enabled' do
+        let(:input) { [project.id] }
+        let(:output) { [] }
+
+        it 'does not add a not found project' do
+          expect(result).to eq(expected_result(not_found_project_ids: [project.id]))
+        end
+      end
+
+      context 'with project without provided feature enabled' do
+        let(:input) { [project.id] }
+        let(:feature_available) { false }
+
+        it 'does not add a not licensed project' do
+          expect(result).to eq(expected_result(not_licensed_project_ids: [project.id]))
         end
       end
 
@@ -63,11 +83,12 @@ RSpec.describe Dashboard::Projects::CreateService do
 
   def expected_result(
     added_project_ids: [],
-    invalid_project_ids: [],
+    not_found_project_ids: [],
+    not_licensed_project_ids: [],
     duplicate_project_ids: []
   )
     described_class::Result.new(
-      added_project_ids, invalid_project_ids, duplicate_project_ids
+      added_project_ids, not_found_project_ids, not_licensed_project_ids, duplicate_project_ids
     )
   end
 end

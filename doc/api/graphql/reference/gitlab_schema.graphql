@@ -92,7 +92,12 @@ type AddProjectToSecurityDashboardPayload {
   """
   Errors encountered during execution of the mutation.
   """
-  errors: [String!]!
+  errorMessages: [String!]!
+
+  """
+  Enhanced errors encountered during execution of the mutation.
+  """
+  errors: [Error!]!
 
   """
   Project that was added to the Instance Security Dashboard
@@ -5715,6 +5720,30 @@ type EpicTreeReorderPayload {
   Errors encountered during execution of the mutation.
   """
   errors: [String!]!
+}
+
+type Error {
+  """
+  Error Extensions
+  """
+  extensions: ErrorExtensions!
+
+  """
+  Error Message
+  """
+  message: String!
+
+  """
+  Error Path
+  """
+  path: [String!]!
+}
+
+type ErrorExtensions {
+  """
+  Error Code
+  """
+  code: String!
 }
 
 type GeoNode {

@@ -26,6 +26,16 @@ module Mutations
       record.errors.full_messages
     end
 
+    def extended_error(message, path: [self.class.graphql_name.camelize(:lower)], code: nil)
+      {
+        message: message,
+        path: path,
+        extensions: {
+          code: code
+        }.compact
+      }.compact
+    end
+
     def ready?(**args)
       if Gitlab::Database.read_only?
         raise Gitlab::Graphql::Errors::ResourceNotAvailable, ERROR_MESSAGE

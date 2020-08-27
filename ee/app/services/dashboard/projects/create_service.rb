@@ -3,7 +3,11 @@
 module Dashboard
   module Projects
     class CreateService
-      Result = Struct.new(:added_project_ids, :invalid_project_ids, :duplicate_project_ids)
+      Result = Struct.new(:added_project_ids, :not_found_project_ids, :not_licensed_project_ids, :duplicate_project_ids) do
+        def invalid_project_ids
+          not_found_project_ids + not_licensed_project_ids
+        end
+      end
 
       def initialize(user, projects_relation, feature:)
         @user = user
@@ -12,12 +16,15 @@ module Dashboard
       end
 
       def execute(project_ids)
-        projects_to_add = load_projects(project_ids)
+        found_projects = find_projects(project_ids)
+        licensed_projects = select_available_projects(found_projects)
 
-        invalid = find_invalid_ids(projects_to_add, project_ids)
-        added, duplicate = add_projects(projects_to_add)
+        not_found = find_invalid_ids(found_projects, project_ids)
+        not_licensed = find_invalid_ids(licensed_projects, project_ids) - not_found
 
-        Result.new(added.map(&:id), invalid, duplicate.map(&:id))
+        added, duplicate = add_projects(licensed_projects)
+
+        Result.new(added.map(&:id), not_found, not_licensed, duplicate.map(&:id))
       end
 
       private
@@ -26,8 +33,24 @@ module Dashboard
                   :projects_relation,
                   :user
 
-      def load_projects(project_ids)
-        Dashboard::Projects::ListService.new(user, feature: feature).execute(project_ids)
+      def find_projects(project_ids)
+        ProjectsFinder.new(
+          current_user: user,
+          project_ids_relation: project_ids,
+          params: projects_finder_params
+        ).execute
+      end
+
+      def projects_finder_params
+        return {} if user.can?(:read_all_resources)
+
+        {
+          min_access_level: ProjectMember::DEVELOPER
+        }
+      end
+
+      def select_available_projects(projects)
+        projects.select { |project| project.feature_available?(feature) }
       end
 
       def find_invalid_ids(projects_to_add, project_ids)
