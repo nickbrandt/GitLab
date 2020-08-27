@@ -73,8 +73,8 @@ describe('Cycle analytics getters', () => {
   describe('cycleAnalyticsRequestParams', () => {
     const selectedAuthor = 'Gohan';
     const selectedMilestone = 'SSJ4';
-    const selectedAssignees = ['krillin', 'gotenks'];
-    const selectedLabels = ['cell saga', 'buu saga'];
+    const selectedAssigneeList = ['krillin', 'gotenks'];
+    const selectedLabelList = ['cell saga', 'buu saga'];
 
     beforeEach(() => {
       const fullPath = 'cool-beans';
@@ -88,8 +88,8 @@ describe('Cycle analytics getters', () => {
         filters: {
           authors: { selected: selectedAuthor },
           milestones: { selected: selectedMilestone },
-          assignees: { selected: selectedAssignees },
-          labels: { selected: selectedLabels },
+          assignees: { selectedList: selectedAssigneeList },
+          labels: { selectedList: selectedLabelList },
         },
       };
     });
@@ -101,8 +101,8 @@ describe('Cycle analytics getters', () => {
       ${'project_ids'}       | ${[1, 2]}
       ${'author_username'}   | ${selectedAuthor}
       ${'milestone_title'}   | ${selectedMilestone}
-      ${'assignee_username'} | ${selectedAssignees}
-      ${'label_name'}        | ${selectedLabels}
+      ${'assignee_username'} | ${selectedAssigneeList}
+      ${'label_name'}        | ${selectedLabelList}
     `('should return the $param with value $value', ({ param, value }) => {
       expect(
         getters.cycleAnalyticsRequestParams(state, { selectedProjectIds: [1, 2] }),
@@ -112,9 +112,9 @@ describe('Cycle analytics getters', () => {
     });
 
     it.each`
-      param                  | stateKey               | value
-      ${'assignee_username'} | ${'selectedAssignees'} | ${[]}
-      ${'label_name'}        | ${'selectedLabels'}    | ${[]}
+      param                  | stateKey                  | value
+      ${'assignee_username'} | ${'selectedAssigneeList'} | ${[]}
+      ${'label_name'}        | ${'selectedLabelList'}    | ${[]}
     `('should not return the $param when $stateKey=$value', ({ param, stateKey, value }) => {
       expect(
         getters.cycleAnalyticsRequestParams(

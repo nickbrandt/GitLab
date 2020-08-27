@@ -22,8 +22,8 @@ export const cycleAnalyticsRequestParams = (state, getters) => {
     filters: {
       authors: { selected: selectedAuthor = null },
       milestones: { selected: selectedMilestone = null },
-      assignees: { selected: selectedAssignees = [] },
-      labels: { selected: selectedLabels = [] },
+      assignees: { selectedList: selectedAssigneeList = [] },
+      labels: { selectedList: selectedLabelList = [] },
     },
   } = state;
 
@@ -33,8 +33,8 @@ export const cycleAnalyticsRequestParams = (state, getters) => {
     created_before: endDate ? dateFormat(endDate, dateFormats.isoDate) : null,
     author_username: selectedAuthor,
     milestone_title: selectedMilestone,
-    assignee_username: selectedAssignees,
-    label_name: selectedLabels,
+    assignee_username: selectedAssigneeList,
+    label_name: selectedLabelList,
   };
 };
 

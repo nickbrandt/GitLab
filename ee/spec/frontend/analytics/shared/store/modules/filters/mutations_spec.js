@@ -9,14 +9,16 @@ const milestones = filterMilestones.map(convertObjectPropsToCamelCase);
 const users = filterUsers.map(convertObjectPropsToCamelCase);
 const labels = filterLabels.map(convertObjectPropsToCamelCase);
 
+const filterValue = { value: 'foo' };
+
 describe('Filters mutations', () => {
   const errorCode = 500;
   beforeEach(() => {
     state = {
-      authors: { selected: null },
-      milestones: { selected: null },
-      assignees: { selected: [] },
-      labels: { selected: [] },
+      authors: { selected: null, selectedList: [] },
+      milestones: { selected: null, selectedList: [] },
+      assignees: { selected: null, selectedList: [] },
+      labels: { selected: null, selectedList: [] },
     };
   });
 
@@ -28,6 +30,7 @@ describe('Filters mutations', () => {
     mutation                         | stateKey                | value
     ${types.SET_MILESTONES_ENDPOINT} | ${'milestonesEndpoint'} | ${'new-milestone-endpoint'}
     ${types.SET_LABELS_ENDPOINT}     | ${'labelsEndpoint'}     | ${'new-label-endpoint'}
+    ${types.SET_GROUP_ENDPOINT}      | ${'groupEndpoint'}      | ${'new-group-endpoint'}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state, value);
 
@@ -35,16 +38,31 @@ describe('Filters mutations', () => {
   });
 
   it.each`
-    mutation                      | stateKey        | value
-    ${types.SET_SELECTED_FILTERS} | ${'authors'}    | ${null}
-    ${types.SET_SELECTED_FILTERS} | ${'milestones'} | ${null}
-    ${types.SET_SELECTED_FILTERS} | ${'assignees'}  | ${[]}
-    ${types.SET_SELECTED_FILTERS} | ${'labels'}     | ${[]}
-  `('$mutation will set $stateKey with a given value', ({ mutation, stateKey, value }) => {
-    mutations[mutation](state, { [stateKey]: { selected: value } });
+    mutation                      | stateKey        | stateProp         | filterName                 | value
+    ${types.SET_SELECTED_FILTERS} | ${'authors'}    | ${'selected'}     | ${'selectedAuthor'}        | ${null}
+    ${types.SET_SELECTED_FILTERS} | ${'authors'}    | ${'selected'}     | ${'selectedAuthor'}        | ${filterValue}
+    ${types.SET_SELECTED_FILTERS} | ${'authors'}    | ${'selectedList'} | ${'selectedAuthorList'}    | ${[]}
+    ${types.SET_SELECTED_FILTERS} | ${'authors'}    | ${'selectedList'} | ${'selectedAuthorList'}    | ${[filterValue]}
+    ${types.SET_SELECTED_FILTERS} | ${'milestones'} | ${'selected'}     | ${'selectedMilestone'}     | ${null}
+    ${types.SET_SELECTED_FILTERS} | ${'milestones'} | ${'selected'}     | ${'selectedMilestone'}     | ${filterValue}
+    ${types.SET_SELECTED_FILTERS} | ${'milestones'} | ${'selectedList'} | ${'selectedMilestoneList'} | ${[]}
+    ${types.SET_SELECTED_FILTERS} | ${'milestones'} | ${'selectedList'} | ${'selectedMilestoneList'} | ${[filterValue]}
+    ${types.SET_SELECTED_FILTERS} | ${'assignees'}  | ${'selected'}     | ${'selectedAssignee'}      | ${null}
+    ${types.SET_SELECTED_FILTERS} | ${'assignees'}  | ${'selected'}     | ${'selectedAssignee'}      | ${filterValue}
+    ${types.SET_SELECTED_FILTERS} | ${'assignees'}  | ${'selectedList'} | ${'selectedAssigneeList'}  | ${[]}
+    ${types.SET_SELECTED_FILTERS} | ${'assignees'}  | ${'selectedList'} | ${'selectedAssigneeList'}  | ${[filterValue]}
+    ${types.SET_SELECTED_FILTERS} | ${'labels'}     | ${'selected'}     | ${'selectedLabel'}         | ${null}
+    ${types.SET_SELECTED_FILTERS} | ${'labels'}     | ${'selected'}     | ${'selectedLabel'}         | ${filterValue}
+    ${types.SET_SELECTED_FILTERS} | ${'labels'}     | ${'selectedList'} | ${'selectedLabelList'}     | ${[]}
+    ${types.SET_SELECTED_FILTERS} | ${'labels'}     | ${'selectedList'} | ${'selectedLabelList'}     | ${[filterValue]}
+  `(
+    '$mutation will set $stateKey with a given value',
+    ({ mutation, stateKey, stateProp, filterName, value }) => {
+      mutations[mutation](state, { [filterName]: value });
 
-    expect(state[stateKey].selected).toEqual(value);
-  });
+      expect(state[stateKey][stateProp]).toEqual(value);
+    },
+  );
 
   it.each`
     mutation                            | rootKey         | stateKey       | value
