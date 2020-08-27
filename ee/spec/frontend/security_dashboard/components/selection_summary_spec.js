@@ -128,10 +128,8 @@ describe('Selection Summary component', () => {
     it('should emit an event to refetch the vulnerabilities when the request is successful', () => {
       dismissButton().trigger('submit');
       return waitForPromises().then(() => {
-        expect(wrapper.emittedByOrder()).toEqual([
-          { name: 'deselect-all-vulnerabilities', args: [] },
-          { name: 'refetch-vulnerabilities', args: [] },
-        ]);
+        expect(wrapper.emitted('deselect-all-vulnerabilities')).toEqual([[]]);
+        expect(wrapper.emitted('refetch-vulnerabilities')).toEqual([[]]);
       });
     });
 
@@ -139,7 +137,7 @@ describe('Selection Summary component', () => {
       mutateMock.mockRejectedValue();
       dismissButton().trigger('submit');
       return waitForPromises().then(() => {
-        expect(wrapper.emittedByOrder()).toEqual([{ name: 'refetch-vulnerabilities', args: [] }]);
+        expect(wrapper.emitted('refetch-vulnerabilities')).toEqual([[]]);
       });
     });
   });

@@ -1,12 +1,22 @@
 query IterationIssuesSummary($fullPath: ID!, $id: ID!, $isGroup: Boolean = true) {
   group(fullPath: $fullPath) @include(if: $isGroup) {
-    openIssues: issues(iterationId: [$id], state: opened, assigneeId: "none") {
+    openIssues: issues(
+      iterationId: [$id]
+      state: opened
+      assigneeId: "none"
+      includeSubgroups: true
+    ) {
       count
     }
-    assignedIssues: issues(iterationId: [$id], state: opened, assigneeId: "any") {
+    assignedIssues: issues(
+      iterationId: [$id]
+      state: opened
+      assigneeId: "any"
+      includeSubgroups: true
+    ) {
       count
     }
-    closedIssues: issues(iterationId: [$id], state: closed) {
+    closedIssues: issues(iterationId: [$id], state: closed, includeSubgroups: true) {
       count
     }
   }

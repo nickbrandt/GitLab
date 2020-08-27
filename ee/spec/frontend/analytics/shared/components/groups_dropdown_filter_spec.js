@@ -109,23 +109,13 @@ describe('GroupsDropdownFilter component', () => {
     it('should emit the "selected" event with the selected group', () => {
       selectDropdownAtIndex(0);
 
-      expect(wrapper.emittedByOrder()).toEqual([
-        {
-          name: 'selected',
-          args: [groups[0]],
-        },
-      ]);
+      expect(wrapper.emitted().selected).toEqual([[groups[0]]]);
     });
 
     it('should change selection when new group is clicked', () => {
       selectDropdownAtIndex(1);
 
-      expect(wrapper.emittedByOrder()).toEqual([
-        {
-          name: 'selected',
-          args: [groups[1]],
-        },
-      ]);
+      expect(wrapper.emitted().selected).toEqual([[groups[1]]]);
     });
 
     it('renders an avatar in the dropdown button when the group has an avatar_url', () => {
