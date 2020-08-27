@@ -107,18 +107,6 @@ RSpec.describe Groups::CreateService, '#execute' do
             commit_message_regex: sample.commit_message_regex
           )
         end
-
-        context 'when feature flag is switched off' do
-          before do
-            stub_feature_flags(group_push_rules: false)
-          end
-
-          it 'does not create push rule' do
-            group = create_group(user, group_params)
-
-            expect(group.push_rule).to be_nil
-          end
-        end
       end
 
       context 'when there are not push rules settings' do
