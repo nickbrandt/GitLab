@@ -96,6 +96,9 @@ export default {
     };
   },
   computed: {
+    canEditIteration() {
+      return this.canEdit && this.namespaceType === Namespace.Group;
+    },
     hasIteration() {
       return !this.$apollo.queries.iteration.loading && this.iteration?.title;
     },
@@ -155,7 +158,7 @@ export default {
           >{{ formatDate(iteration.startDate) }} – {{ formatDate(iteration.dueDate) }}</span
         >
         <gl-new-dropdown
-          v-if="canEdit"
+          v-if="canEditIteration"
           variant="default"
           toggle-class="gl-text-decoration-none gl-border-0! gl-shadow-none!"
           class="gl-ml-auto gl-text-secondary"
