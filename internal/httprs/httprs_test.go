@@ -111,7 +111,6 @@ func TestHttpWebServer(t *testing.T) {
 		So(err, ShouldBeNil)
 
 		server := httptest.NewServer(http.FileServer(http.Dir(dir)))
-		So(server, ShouldNotBeNil)
 
 		Convey("When requesting /file", func() {
 			res, err := http.Get(server.URL + "/file")

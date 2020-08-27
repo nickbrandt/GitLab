@@ -1,0 +1,5 @@
+---
+title: Fix race condition in httprs test
+merge_request: 584
+author:
+type: fixed
