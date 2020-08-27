@@ -315,7 +315,7 @@ describe('Design management design index page', () => {
       expect(mutate).toHaveBeenCalledTimes(1);
       expect(mutate).toHaveBeenCalledWith({
         mutation: updateActiveDiscussion,
-        variables: { id: 'gid://gitlab/DiffNote/123', source: 'discussion' },
+        variables: { id: 'gid://gitlab/DiffNote/123', source: 'url' },
       });
     });
   });

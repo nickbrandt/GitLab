@@ -66,19 +66,24 @@ export default {
         if (this.discussion.resolved && !this.resolvedDiscussionsExpanded) {
           return;
         }
-        // We watch any changes to the active discussion from the design pins and scroll to this discussion if it exists
-        // We don't want scrollIntoView to be triggered from the discussion click itself
-        if (
-          this.$el &&
-          activeDiscussionId &&
-          data.activeDiscussion.source === ACTIVE_DISCUSSION_SOURCE_TYPES.pin &&
-          activeDiscussionId === this.discussion.notes[0].id
-        ) {
-          this.$el.scrollIntoView({
-            behavior: 'smooth',
-            inline: 'start',
-          });
-        }
+
+        this.$nextTick(() => {
+          // We watch any changes to the active discussion from the design pins and scroll to this discussion if it exists
+          // We don't want scrollIntoView to be triggered from the discussion click itself
+          if (
+            this.$el &&
+            activeDiscussionId &&
+            [ACTIVE_DISCUSSION_SOURCE_TYPES.pin, ACTIVE_DISCUSSION_SOURCE_TYPES.url].includes(
+              data.activeDiscussion.source,
+            ) &&
+            activeDiscussionId === this.discussion.notes[0].id
+          ) {
+            this.$el.scrollIntoView({
+              behavior: 'smooth',
+              inline: 'start',
+            });
+          }
+        });
       },
     },
   },

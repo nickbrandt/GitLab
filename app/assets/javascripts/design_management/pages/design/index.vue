@@ -271,19 +271,19 @@ export default {
         this.isLatestVersion,
       );
     },
-    updateActiveDiscussion(id) {
+    updateActiveDiscussion(id, source = ACTIVE_DISCUSSION_SOURCE_TYPES.discussion) {
       this.$apollo.mutate({
         mutation: updateActiveDiscussionMutation,
         variables: {
           id,
-          source: ACTIVE_DISCUSSION_SOURCE_TYPES.discussion,
+          source,
         },
       });
     },
     updateActiveDiscussionFromUrl() {
       const noteId = parseDesignRouteHash(this.$route.hash);
       const diffNoteGid = noteId ? toDiffNoteGid(noteId) : undefined;
-      return this.updateActiveDiscussion(diffNoteGid);
+      return this.updateActiveDiscussion(diffNoteGid, ACTIVE_DISCUSSION_SOURCE_TYPES.url);
     },
     toggleResolvedComments() {
       this.resolvedDiscussionsExpanded = !this.resolvedDiscussionsExpanded;
