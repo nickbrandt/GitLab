@@ -129,161 +129,20 @@ class Service < ApplicationRecord
     end
   end
 
-  def activated?
-    active
-  end
-
-  def operating?
-    active && persisted?
-  end
-
-  def show_active_box?
-    true
-  end
-
-  def editable?
-    true
-  end
-
-  def category
-    read_attribute(:category).to_sym
-  end
-
-  def initialize_properties
-    self.properties = {} if properties.nil?
-  end
-
-  def title
-    # implement inside child
-  end
-
-  def description
-    # implement inside child
-  end
-
-  def help
-    # implement inside child
-  end
-
-  def to_param
-    # implement inside child
-    self.class.to_param
-  end
-
   def self.to_param
     raise NotImplementedError
-  end
-
-  def fields
-    # implement inside child
-    []
-  end
-
-  # Expose a list of fields in the JSON endpoint.
-  #
-  # This list is used in `Service#as_json(only: json_fields)`.
-  def json_fields
-    %w(active)
-  end
-
-  def to_service_hash
-    as_json(methods: :type, except: %w[id template instance project_id])
-  end
-
-  def to_data_fields_hash
-    data_fields.as_json(only: data_fields.class.column_names).except('id', 'service_id')
-  end
-
-  def event_channel_names
-    []
-  end
-
-  def event_names
-    self.class.event_names
   end
 
   def self.event_names
     self.supported_events.map { |event| ServicesHelper.service_event_field_name(event) }
   end
 
-  def event_field(event)
-    nil
-  end
-
-  def api_field_names
-    fields.map { |field| field[:name] }
-      .reject { |field_name| field_name =~ /(password|token|key|title|description)/ }
-  end
-
-  def global_fields
-    fields
-  end
-
-  def configurable_events
-    events = supported_events
-
-    # No need to disable individual triggers when there is only one
-    if events.count == 1
-      []
-    else
-      events
-    end
-  end
-
-  def configurable_event_actions
-    self.class.supported_event_actions
-  end
-
   def self.supported_event_actions
     %w()
   end
 
-  def supported_events
-    self.class.supported_events
-  end
-
   def self.supported_events
     %w(commit push tag_push issue confidential_issue merge_request wiki_page)
-  end
-
-  def execute(data)
-    # implement inside child
-  end
-
-  def test(data)
-    # default implementation
-    result = execute(data)
-    { success: result.present?, result: result }
-  end
-
-  # Disable test for instance-level services.
-  # https://gitlab.com/gitlab-org/gitlab/-/issues/213138
-  def can_test?
-    !instance?
-  end
-
-  # Returns a hash of the properties that have been assigned a new value since last save,
-  # indicating their original values (attr => original value).
-  # ActiveRecord does not provide a mechanism to track changes in serialized keys,
-  # so we need a specific implementation for service properties.
-  # This allows to track changes to properties set with the accessor methods,
-  # but not direct manipulation of properties hash.
-  def updated_properties
-    @updated_properties ||= ActiveSupport::HashWithIndifferentAccess.new
-  end
-
-  def reset_updated_properties
-    @updated_properties = nil
-  end
-
-  def async_execute(data)
-    return unless supported_events.include?(data[:object_kind])
-
-    ProjectServiceWorker.perform_async(id, data)
-  end
-
-  def issue_tracker?
-    self.category == :issue_tracker
   end
 
   def self.find_or_create_templates
@@ -370,6 +229,147 @@ class Service < ApplicationRecord
 
   def self.instance_for(type)
     find_by(instance: true, type: type)
+  end
+
+  def activated?
+    active
+  end
+
+  def operating?
+    active && persisted?
+  end
+
+  def show_active_box?
+    true
+  end
+
+  def editable?
+    true
+  end
+
+  def category
+    read_attribute(:category).to_sym
+  end
+
+  def initialize_properties
+    self.properties = {} if properties.nil?
+  end
+
+  def title
+    # implement inside child
+  end
+
+  def description
+    # implement inside child
+  end
+
+  def help
+    # implement inside child
+  end
+
+  def to_param
+    # implement inside child
+    self.class.to_param
+  end
+
+  def fields
+    # implement inside child
+    []
+  end
+
+  # Expose a list of fields in the JSON endpoint.
+  #
+  # This list is used in `Service#as_json(only: json_fields)`.
+  def json_fields
+    %w(active)
+  end
+
+  def to_service_hash
+    as_json(methods: :type, except: %w[id template instance project_id])
+  end
+
+  def to_data_fields_hash
+    data_fields.as_json(only: data_fields.class.column_names).except('id', 'service_id')
+  end
+
+  def event_channel_names
+    []
+  end
+
+  def event_names
+    self.class.event_names
+  end
+
+  def event_field(event)
+    nil
+  end
+
+  def api_field_names
+    fields.map { |field| field[:name] }
+      .reject { |field_name| field_name =~ /(password|token|key|title|description)/ }
+  end
+
+  def global_fields
+    fields
+  end
+
+  def configurable_events
+    events = supported_events
+
+    # No need to disable individual triggers when there is only one
+    if events.count == 1
+      []
+    else
+      events
+    end
+  end
+
+  def configurable_event_actions
+    self.class.supported_event_actions
+  end
+
+  def supported_events
+    self.class.supported_events
+  end
+
+  def execute(data)
+    # implement inside child
+  end
+
+  def test(data)
+    # default implementation
+    result = execute(data)
+    { success: result.present?, result: result }
+  end
+
+  # Disable test for instance-level services.
+  # https://gitlab.com/gitlab-org/gitlab/-/issues/213138
+  def can_test?
+    !instance?
+  end
+
+  # Returns a hash of the properties that have been assigned a new value since last save,
+  # indicating their original values (attr => original value).
+  # ActiveRecord does not provide a mechanism to track changes in serialized keys,
+  # so we need a specific implementation for service properties.
+  # This allows to track changes to properties set with the accessor methods,
+  # but not direct manipulation of properties hash.
+  def updated_properties
+    @updated_properties ||= ActiveSupport::HashWithIndifferentAccess.new
+  end
+
+  def reset_updated_properties
+    @updated_properties = nil
+  end
+
+  def async_execute(data)
+    return unless supported_events.include?(data[:object_kind])
+
+    ProjectServiceWorker.perform_async(id, data)
+  end
+
+  def issue_tracker?
+    self.category == :issue_tracker
   end
 
   # override if needed
