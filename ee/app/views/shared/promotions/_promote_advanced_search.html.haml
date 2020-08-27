@@ -8,11 +8,11 @@
       .user-callout-copy
         %h5
           - if Gitlab::CurrentSettings.should_check_namespace_plan?
-            = _('Upgrade your plan to activate Advanced Global Search.')
+            = _('Upgrade your plan to activate Advanced Search.')
           - else
-            = _('Improve search with Advanced Global Search and GitLab Enterprise Edition.')
+            = _('Improve search with Advanced Search and GitLab Enterprise Edition.')
         %p
-          = _('The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project.')
+          = _('The Advanced Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project.')
           = link_to _('Read more'), help_page_path('user/search/advanced_global_search.md'), target: '_blank'
 
         = render 'shared/promotions/promotion_link_project'
