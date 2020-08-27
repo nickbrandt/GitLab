@@ -33,6 +33,8 @@ module Gitlab
 
         cookies = set_cookie.split(COOKIE_SEPARATOR)
 
+        return result if same_site_none_incompatible?(headers['User-Agent'])
+
         cookies.each do |cookie|
           next if cookie.blank?
 
@@ -57,6 +59,23 @@ module Gitlab
 
       def ssl?
         Gitlab.config.gitlab.https
+      end
+
+      # Taken from https://www.chromium.org/updates/same-site/incompatible-clients
+      def same_site_none_incompatible?(user_agent)
+        return false unless user_agent.present?
+
+        browser = Browser.new(user_agent)
+        has_webkit_same_site_bug?(browser) || drops_unrecognized_same_site_cookies?(browser)
+      end
+
+      def has_webkit_same_site_bug?(browser)
+        browser.platform.ios?(12) ||
+          (browser.platform.mac?("~> 10.14") && browser.safari?)
+      end
+
+      def drops_unrecognized_same_site_cookies?(browser)
+        browser.uc_browser?("<12.13.2") || browser.chrome?([">= 51", "< 67"])
       end
     end
   end
