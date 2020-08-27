@@ -172,7 +172,7 @@ describe('moveList', () => {
 
     testAction(
       actions.moveList,
-      { listId: 'gid://gitlab/List/1', position: 0, moveNewIndexListUp: true },
+      { listId: 'gid://gitlab/List/1', newIndex: 1, adjustmentValue: 1 },
       state,
       [
         {
@@ -180,7 +180,12 @@ describe('moveList', () => {
           payload: { movedList: mockListsWithModel[0], listAtNewIndex: mockListsWithModel[1] },
         },
       ],
-      [{ type: 'updateList', payload: { listId: 'gid://gitlab/List/1', position: 0 } }],
+      [
+        {
+          type: 'updateList',
+          payload: { listId: 'gid://gitlab/List/1', position: 0, backupList: mockListsWithModel },
+        },
+      ],
       done,
     );
   });

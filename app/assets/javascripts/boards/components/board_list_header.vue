@@ -139,24 +139,28 @@ export default {
       eventHub.$emit(`toggle-issue-form-${this.list.id}`);
     },
     toggleExpanded() {
-      if (this.list.isExpandable) {
-        this.list.isExpanded = !this.list.isExpanded;
+      this.list.isExpanded = !this.list.isExpanded;
 
-        if (AccessorUtilities.isLocalStorageAccessSafe() && !this.isLoggedIn) {
-          localStorage.setItem(`${this.uniqueKey}.expanded`, this.list.isExpanded);
-        }
+      if (!this.isLoggedIn) {
+        this.addToLocalStorage();
+      } else {
+        this.updateListFunction();
+      }
 
-        if (this.isLoggedIn) {
-          if (this.glFeatures.boardsWithSwimlanes && this.isSwimlanesHeader) {
-            this.updateList({ listId: this.list.id, collapsed: !this.list.isExpanded });
-          } else {
-            this.list.update();
-          }
-        }
-
-        // When expanding/collapsing, the tooltip on the caret button sometimes stays open.
-        // Close all tooltips manually to prevent dangling tooltips.
-        this.$root.$emit('bv::hide::tooltip');
+      // When expanding/collapsing, the tooltip on the caret button sometimes stays open.
+      // Close all tooltips manually to prevent dangling tooltips.
+      this.$root.$emit('bv::hide::tooltip');
+    },
+    addToLocalStorage() {
+      if (AccessorUtilities.isLocalStorageAccessSafe()) {
+        localStorage.setItem(`${this.uniqueKey}.expanded`, this.list.isExpanded);
+      }
+    },
+    updateListFunction() {
+      if (this.glFeatures.boardsWithSwimlanes && this.isSwimlanesHeader) {
+        this.updateList({ listId: this.list.id, collapsed: !this.list.isExpanded });
+      } else {
+        this.list.update();
       }
     },
   },

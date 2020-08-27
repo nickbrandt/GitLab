@@ -148,23 +148,25 @@ export default {
     notImplemented();
   },
 
-  moveList: ({ state, commit, dispatch }, { listId, position, moveNewIndexListUp }) => {
+  moveList: ({ state, commit, dispatch }, { listId, newIndex, adjustmentValue }) => {
     const { boardLists } = state;
+    const backupList = [...boardLists];
     const movedList = boardLists.find(({ id }) => id === listId);
-    const listAtNewIndex = boardLists[position + 1];
-    movedList.position = position;
-    listAtNewIndex.position = moveNewIndexListUp
-      ? listAtNewIndex.position + 1
-      : listAtNewIndex.position - 1;
+
+    const newPosition = newIndex - 1;
+    const listAtNewIndex = boardLists[newIndex];
+
+    movedList.position = newPosition;
+    listAtNewIndex.position += adjustmentValue;
     commit(types.MOVE_LIST, {
       movedList,
       listAtNewIndex,
     });
 
-    dispatch('updateList', { listId, position });
+    dispatch('updateList', { listId, position: newPosition, backupList });
   },
 
-  updateList: ({ commit }, { listId, position, collapsed }) => {
+  updateList: ({ commit }, { listId, position, collapsed, backupList }) => {
     gqlClient
       .mutate({
         mutation: updateBoardListMutation,
@@ -176,11 +178,11 @@ export default {
       })
       .then(({ data }) => {
         if (data?.updateBoardList?.errors.length) {
-          commit(types.UPDATE_LIST_FAILURE);
+          commit(types.UPDATE_LIST_FAILURE, backupList);
         }
       })
       .catch(() => {
-        commit(types.UPDATE_LIST_FAILURE);
+        commit(types.UPDATE_LIST_FAILURE, backupList);
       });
   },
 

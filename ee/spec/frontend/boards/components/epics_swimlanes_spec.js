@@ -6,7 +6,6 @@ import BoardListHeader from 'ee_else_ce/boards/components/board_list_header.vue'
 import EpicLane from 'ee/boards/components/epic_lane.vue';
 import IssueLaneList from 'ee/boards/components/issues_lane_list.vue';
 import getters from 'ee/boards/stores/getters';
-import { draggableTag } from 'ee/boards/constants';
 import { GlIcon } from '@gitlab/ui';
 import { mockListsWithModel, mockEpics, mockIssuesByListId, issues } from '../mock_data';
 
@@ -52,44 +51,25 @@ describe('EpicsSwimlanes', () => {
   });
 
   describe('computed', () => {
-    beforeEach(() => {
-      createComponent();
-    });
-
     describe('treeRootWrapper', () => {
-      it('should return Draggable reference when canAdminList prop is true', () => {
-        wrapper.setProps({ canAdminList: true });
+      describe('when canAdminList prop is true', () => {
+        beforeEach(() => {
+          createComponent({ canAdminList: true });
+        });
 
-        expect(wrapper.vm.treeRootWrapper).toBe(Draggable);
+        it('should return Draggable reference when canAdminList prop is true', () => {
+          expect(wrapper.find(Draggable).exists()).toBe(true);
+        });
       });
 
-      it('should return string "div" when canAdminList prop is false', () => {
-        expect(wrapper.vm.treeRootWrapper).toBe(draggableTag);
-      });
-    });
+      describe('when canAdminList prop is false', () => {
+        beforeEach(() => {
+          createComponent();
+        });
 
-    describe('treeRootOptions', () => {
-      it('should return object containing Vue.Draggable config extended from `defaultSortableConfig` when canAdminList prop is true', () => {
-        wrapper.setProps({ canAdminList: true });
-
-        expect(wrapper.vm.treeRootOptions).toEqual(
-          expect.objectContaining({
-            animation: 200,
-            forceFallback: true,
-            fallbackClass: 'is-dragging',
-            fallbackOnBody: false,
-            ghostClass: 'is-ghost',
-            group: 'board-swimlanes',
-            tag: draggableTag,
-            draggable: '.is-draggable',
-            'ghost-class': 'swimlane-header-drag-active',
-            value: mockListsWithModel,
-          }),
-        );
-      });
-
-      it('should return an empty object when canAdminList prop is false', () => {
-        expect(wrapper.vm.treeRootOptions).toEqual(expect.objectContaining({}));
+        it('should not return Draggable reference when canAdminList prop is false', () => {
+          expect(wrapper.find(Draggable).exists()).toBe(false);
+        });
       });
     });
   });

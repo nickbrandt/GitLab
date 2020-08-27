@@ -1,5 +1,5 @@
-export const draggableTag = 'div';
+export const DRAGGABLE_TAG = 'div';
 
 export default {
-  draggableTag,
+  DRAGGABLE_TAG,
 };

@@ -3,7 +3,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlIcon, GlTooltipDirective } from '@gitlab/ui';
 import Draggable from 'vuedraggable';
 import BoardListHeader from 'ee_else_ce/boards/components/board_list_header.vue';
-import { draggableTag } from '../constants';
+import { DRAGGABLE_TAG } from '../constants';
 import defaultSortableConfig from '~/sortable/sortable_config';
 import { n__ } from '~/locale';
 import EpicLane from './epic_lane.vue';
@@ -57,14 +57,14 @@ export default {
       return n__(`%d unassigned issue`, `%d unassigned issues`, this.unassignedIssuesCount);
     },
     treeRootWrapper() {
-      return this.canAdminList ? Draggable : draggableTag;
+      return this.canAdminList ? Draggable : DRAGGABLE_TAG;
     },
     treeRootOptions() {
       const options = {
         ...defaultSortableConfig,
         fallbackOnBody: false,
         group: 'board-swimlanes',
-        tag: draggableTag,
+        tag: DRAGGABLE_TAG,
         draggable: '.is-draggable',
         'ghost-class': 'swimlane-header-drag-active',
         value: this.lists,
@@ -81,17 +81,11 @@ export default {
     handleDragOnEnd(params) {
       const { newIndex, oldIndex, item } = params;
       const { listId } = item.dataset;
-      const newPosition = newIndex - 1;
-      let moveNewIndexListUp = false;
-
-      if (newIndex < oldIndex) {
-        moveNewIndexListUp = true;
-      }
 
       this.moveList({
         listId,
-        position: newPosition,
-        moveNewIndexListUp,
+        newIndex,
+        adjustmentValue: newIndex < oldIndex ? 1 : -1,
       });
     },
   },
@@ -107,6 +101,7 @@ export default {
       :is="treeRootWrapper"
       v-bind="treeRootOptions"
       class="board-swimlanes-headers gl-display-table gl-sticky gl-pt-5 gl-bg-white gl-top-0 gl-z-index-3"
+      data-testid="board-swimlanes-headers"
       @end="handleDragOnEnd"
     >
       <div

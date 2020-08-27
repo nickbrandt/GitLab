@@ -48,16 +48,15 @@ export default {
 
   [mutationTypes.MOVE_LIST]: (state, { movedList, listAtNewIndex }) => {
     const { boardLists } = state;
-    state.boardListsPreviousState = boardLists;
     const movedListIndex = state.boardLists.findIndex(l => l.id === movedList.id);
     Vue.set(boardLists, movedListIndex, movedList);
     Vue.set(boardLists, movedListIndex.position + 1, listAtNewIndex);
-    state.boardLists = sortBy(boardLists, 'position');
+    Vue.set(state, 'boardLists', sortBy(boardLists, 'position'));
   },
 
-  [mutationTypes.UPDATE_LIST_FAILURE]: state => {
-    state.boardLists = state.boardListsPreviousState;
+  [mutationTypes.UPDATE_LIST_FAILURE]: (state, backupList) => {
     state.error = __('An error occurred while updating the list. Please try again.');
+    Vue.set(state, 'boardLists', backupList);
   },
 
   [mutationTypes.REQUEST_REMOVE_LIST]: () => {

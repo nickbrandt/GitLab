@@ -93,7 +93,7 @@ describe('Board Store Mutations', () => {
   });
 
   describe('MOVE_LIST', () => {
-    it('updates boardLists state with reordered lists and saves previous order', () => {
+    it('updates boardLists state with reordered lists', () => {
       state = {
         ...state,
         boardLists: mockListsWithModel,
@@ -105,7 +105,6 @@ describe('Board Store Mutations', () => {
       });
 
       expect(state.boardLists).toEqual([mockListsWithModel[1], mockListsWithModel[0]]);
-      expect(state.boardListsPreviousState).toEqual(mockListsWithModel);
     });
   });
 
@@ -114,11 +113,10 @@ describe('Board Store Mutations', () => {
       state = {
         ...state,
         boardLists: [mockListsWithModel[1], mockListsWithModel[0]],
-        boardListsPreviousState: mockListsWithModel,
         error: undefined,
       };
 
-      mutations.UPDATE_LIST_FAILURE(state);
+      mutations.UPDATE_LIST_FAILURE(state, mockListsWithModel);
 
       expect(state.boardLists).toEqual(mockListsWithModel);
       expect(state.error).toEqual('An error occurred while updating the list. Please try again.');
