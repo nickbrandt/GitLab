@@ -59,7 +59,7 @@ module Geo
     end
 
     def registry_finder
-      @registry_finder ||= Geo::ContainerRepositoryRegistryFinder.new(current_node_id: current_node.id)
+      @registry_finder ||= Geo::ContainerRepositoryRegistryFinder.new
     end
   end
 end

@@ -581,23 +581,23 @@ class GeoNodeStatus < ApplicationRecord
   end
 
   def attachments_finder
-    @attachments_finder ||= Geo::AttachmentRegistryFinder.new(current_node_id: geo_node.id)
+    @attachments_finder ||= Geo::AttachmentRegistryFinder.new
   end
 
   def lfs_objects_finder
-    @lfs_objects_finder ||= Geo::LfsObjectRegistryFinder.new(current_node_id: geo_node.id)
+    @lfs_objects_finder ||= Geo::LfsObjectRegistryFinder.new
   end
 
   def job_artifacts_finder
-    @job_artifacts_finder ||= Geo::JobArtifactRegistryFinder.new(current_node_id: geo_node.id)
+    @job_artifacts_finder ||= Geo::JobArtifactRegistryFinder.new
   end
 
   def container_registry_finder
-    @container_registry_finder ||= Geo::ContainerRepositoryRegistryFinder.new(current_node_id: geo_node.id)
+    @container_registry_finder ||= Geo::ContainerRepositoryRegistryFinder.new
   end
 
   def design_registry_finder
-    @design_registry_finder ||= Geo::DesignRegistryFinder.new(current_node_id: geo_node.id)
+    @design_registry_finder ||= Geo::DesignRegistryFinder.new
   end
 
   def repository_verification_finder

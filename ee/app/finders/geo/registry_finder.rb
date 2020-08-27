@@ -2,14 +2,6 @@
 
 module Geo
   class RegistryFinder
-    include ::Gitlab::Utils::StrongMemoize
-
-    attr_reader :current_node_id
-
-    def initialize(current_node_id: nil)
-      @current_node_id = current_node_id
-    end
-
     # @!method find_unsynced_registries
     #    Return an ActiveRecord::Relation of the registry records for the
     #    tracked ype that have never been synced.
@@ -76,14 +68,6 @@ module Geo
     #    that are sync failed
     def failed_count
       registry_class.failed.count
-    end
-
-    private
-
-    def current_node
-      strong_memoize(:current_node) do
-        GeoNode.find(current_node_id) if current_node_id
-      end
     end
   end
 end
