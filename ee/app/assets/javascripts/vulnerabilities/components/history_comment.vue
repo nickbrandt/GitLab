@@ -43,9 +43,6 @@ export default {
   },
 
   computed: {
-    commentNote() {
-      return this.comment?.note;
-    },
     actionButtons() {
       return [
         {
@@ -59,6 +56,9 @@ export default {
           title: __('Delete Comment'),
         },
       ];
+    },
+    initialComment() {
+      return this.comment && this.comment.note;
     },
   },
 
@@ -136,8 +136,8 @@ export default {
 <template>
   <history-comment-editor
     v-if="isEditingComment"
-    class="discussion-reply-holder m-3"
-    :initial-comment="commentNote"
+    class="discussion-reply-holder"
+    :initial-comment="initialComment"
     :is-saving="isSavingComment"
     @onSave="saveComment"
     @onCancel="cancelEditingComment"
@@ -155,7 +155,7 @@ export default {
     icon-class="timeline-icon m-0"
     class="m-3"
   >
-    <div v-html="comment.note"></div>
+    <div class="md" v-html="comment.note_html"></div>
 
     <template #right-content>
       <gl-button
