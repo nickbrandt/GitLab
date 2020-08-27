@@ -185,6 +185,8 @@ class Service < ApplicationRecord
   private_class_method :build_nonexistent_services_for
 
   def self.list_nonexistent_services_for(scope)
+    # Using #map instead of #pluck to save one query count. This is because
+    # ActiveRecord loaded the object here, so we don't need to query again later.
     available_services_types - scope.map(&:type)
   end
   private_class_method :list_nonexistent_services_for
