@@ -74,6 +74,8 @@ export default class Editor {
       model.dispose();
     });
 
+    instance.updateModelLanguage = path => this.updateModelLanguage(path);
+
     // Reference to the model on the editor level will go away in
     // https://gitlab.com/gitlab-org/gitlab/-/issues/241023
     // After that, the references to the model will be routed through
@@ -90,10 +92,6 @@ export default class Editor {
 
   renderEditor() {
     delete this.editorEl.dataset.editorLoading;
-  }
-
-  onChangeContent(fn) {
-    return this.model.onDidChangeContent(fn);
   }
 
   updateModelLanguage(path) {

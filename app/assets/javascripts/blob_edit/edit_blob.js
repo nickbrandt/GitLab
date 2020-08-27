@@ -63,7 +63,7 @@ export default class EditBlob {
         }
 
         fileNameEl.addEventListener('change', () => {
-          rootEditor.updateModelLanguage(fileNameEl.value);
+          this.editor.updateModelLanguage(fileNameEl.value);
         });
 
         form.addEventListener('submit', () => {
