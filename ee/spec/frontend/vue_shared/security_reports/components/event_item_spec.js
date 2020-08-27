@@ -86,7 +86,7 @@ describe('Event Item', () => {
 
     it('renders the action buttons', () => {
       expect(wrapper.findAll(GlDeprecatedButton)).toHaveLength(2);
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper.element).toMatchSnapshot();
     });
 
     it('emits the button events when clicked', () => {

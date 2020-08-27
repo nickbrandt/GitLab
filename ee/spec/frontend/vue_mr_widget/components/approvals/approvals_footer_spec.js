@@ -141,7 +141,7 @@ describe('EE MRWidget approvals footer', () => {
         button.trigger('click');
 
         return wrapper.vm.$nextTick().then(() => {
-          expect(wrapper.emittedByOrder()).toEqual([{ name: 'input', args: [true] }]);
+          expect(wrapper.emitted().input).toEqual([[true]]);
         });
       });
     });
@@ -187,7 +187,7 @@ describe('EE MRWidget approvals footer', () => {
         wrapper.vm
           .$nextTick()
           .then(() => {
-            expect(wrapper.emittedByOrder()).toEqual([{ name: 'input', args: [true] }]);
+            expect(wrapper.emitted().input).toEqual([[true]]);
           })
           .then(done)
           .catch(done.fail);

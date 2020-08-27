@@ -131,39 +131,20 @@ describe('ProjectsDropdownFilter component', () => {
       it('should emit the "selected" event with the selected project', () => {
         selectDropdownItemAtIndex(0);
 
-        expect(wrapper.emittedByOrder()).toEqual([
-          {
-            name: 'selected',
-            args: [[projects[0]]],
-          },
-        ]);
+        expect(wrapper.emitted().selected).toEqual([[[projects[0]]]]);
       });
 
       it('should change selection when new project is clicked', () => {
         selectDropdownItemAtIndex(1);
 
-        expect(wrapper.emittedByOrder()).toEqual([
-          {
-            name: 'selected',
-            args: [[projects[1]]],
-          },
-        ]);
+        expect(wrapper.emitted().selected).toEqual([[[projects[1]]]]);
       });
 
       it('selection should be emptied when a project is deselected', () => {
         selectDropdownItemAtIndex(0); // Select the item
         selectDropdownItemAtIndex(0); // deselect it
 
-        expect(wrapper.emittedByOrder()).toEqual([
-          {
-            name: 'selected',
-            args: [[projects[0]]],
-          },
-          {
-            name: 'selected',
-            args: [[]],
-          },
-        ]);
+        expect(wrapper.emitted().selected).toEqual([[[projects[0]]], [[]]]);
       });
 
       it('renders an avatar in the dropdown button when the project has an avatar_url', () => {
@@ -212,32 +193,14 @@ describe('ProjectsDropdownFilter component', () => {
         selectDropdownItemAtIndex(0);
         selectDropdownItemAtIndex(1);
 
-        expect(wrapper.emittedByOrder()).toEqual([
-          {
-            name: 'selected',
-            args: [[projects[0]]],
-          },
-          {
-            name: 'selected',
-            args: [[projects[0], projects[1]]],
-          },
-        ]);
+        expect(wrapper.emitted().selected).toEqual([[[projects[0]]], [[projects[0], projects[1]]]]);
       });
 
       it('should remove from selection when clicked again', () => {
         selectDropdownItemAtIndex(0);
         selectDropdownItemAtIndex(0);
 
-        expect(wrapper.emittedByOrder()).toEqual([
-          {
-            name: 'selected',
-            args: [[projects[0]]],
-          },
-          {
-            name: 'selected',
-            args: [[]],
-          },
-        ]);
+        expect(wrapper.emitted().selected).toEqual([[[projects[0]]], [[]]]);
       });
 
       it('renders the correct placeholder text when multiple projects are selected', () => {

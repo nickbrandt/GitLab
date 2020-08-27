@@ -84,10 +84,10 @@ describe('PathNavigation', () => {
       clickItemAt(1);
       clickItemAt(2);
 
-      expect(wrapper.emittedByOrder()).toEqual([
-        { name: 'selected', args: [transformedStagePathData[0]] },
-        { name: 'selected', args: [transformedStagePathData[1]] },
-        { name: 'selected', args: [transformedStagePathData[2]] },
+      expect(wrapper.emitted().selected).toEqual([
+        [transformedStagePathData[0]],
+        [transformedStagePathData[1]],
+        [transformedStagePathData[2]],
       ]);
     });
   });
