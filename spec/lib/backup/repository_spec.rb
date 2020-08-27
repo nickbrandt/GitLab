@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Backup::Repository do
-  let_it_be(:project) { create(:project, :wiki_repo) }
+  let_it_be(:project) { create(:project, :repository, :wiki_repo) }
 
   let(:progress) { StringIO.new }
 
@@ -29,6 +29,12 @@ RSpec.describe Backup::Repository do
     let(:storage_keys) { %w[default test_second_storage] }
 
     context 'no concurrency' do
+      it 'creates repository bundle' do
+        subject.dump(max_concurrency: 1, max_storage_concurrency: 1)
+
+        expect(File.exist?(File.join(Gitlab.config.backup.path, 'repositories', project.disk_path + '.bundle'))).to be_truthy
+      end
+
       it 'creates the expected number of threads' do
         expect(Thread).not_to receive(:new)
 
@@ -63,6 +69,16 @@ RSpec.describe Backup::Repository do
         expect do
           subject.dump(max_concurrency: 1, max_storage_concurrency: 1)
         end.not_to exceed_query_limit(control_count)
+      end
+
+      context 'legacy storage' do
+        let_it_be(:project) { create(:project, :repository, :legacy_storage, :wiki_repo) }
+
+        it 'creates repository bundle' do
+          subject.dump(max_concurrency: 1, max_storage_concurrency: 1)
+
+          expect(File.exist?(File.join(Gitlab.config.backup.path, 'repositories', project.disk_path + '.bundle'))).to be_truthy
+        end
       end
     end
 
@@ -204,27 +220,28 @@ RSpec.describe Backup::Repository do
     end
   end
 
-  describe '#empty_repo?' do
+  describe '#empty_repository?' do
     context 'for a wiki' do
       let(:wiki) { create(:project_wiki) }
+      let(:repository) { wiki.repository }
 
       it 'invalidates the emptiness cache' do
-        expect(wiki.repository).to receive(:expire_emptiness_caches).once
+        expect(repository).to receive(:expire_emptiness_caches).once
 
-        subject.send(:empty_repo?, wiki)
+        subject.send(:empty_repository?, repository)
       end
 
       context 'wiki repo has content' do
         let!(:wiki_page) { create(:wiki_page, wiki: wiki) }
 
-        it 'returns true, regardless of bad cache value' do
-          expect(subject.send(:empty_repo?, wiki)).to be(false)
+        it 'returns false, regardless of bad cache value' do
+          expect(subject.send(:empty_repository?, repository)).to be_falsy
         end
       end
 
       context 'wiki repo does not have content' do
         it 'returns true, regardless of bad cache value' do
-          expect(subject.send(:empty_repo?, wiki)).to be_truthy
+          expect(subject.send(:empty_repository?, repository)).to be_truthy
         end
       end
     end

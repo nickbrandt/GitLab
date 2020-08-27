@@ -41,24 +41,6 @@ module Backup
       raise errors.pop unless errors.empty?
     end
 
-    def backup_project(project)
-      path_to_project_bundle = path_to_bundle(project)
-      Gitlab::GitalyClient::RepositoryService.new(project.repository)
-        .create_bundle(path_to_project_bundle)
-
-      backup_custom_hooks(project)
-    rescue => e
-      progress_warn(project, e, 'Failed to backup repo')
-    end
-
-    def backup_custom_hooks(project)
-      FileUtils.mkdir_p(project_backup_path(project))
-
-      custom_hooks_path = custom_hooks_tar(project)
-      Gitlab::GitalyClient::RepositoryService.new(project.repository)
-        .backup_custom_hooks(custom_hooks_path)
-    end
-
     def restore_custom_hooks(project)
       return unless Dir.exist?(project_backup_path(project))
       return if Dir.glob("#{project_backup_path(project)}/custom_hooks*").none?
@@ -107,7 +89,7 @@ module Backup
       restore_object_pools
     end
 
-    protected
+    private
 
     def try_restore_repository(project)
       path_to_project_bundle = path_to_bundle(project)
@@ -144,8 +126,6 @@ module Backup
       FileUtils.mkdir_p(Gitlab.config.backup.path)
       FileUtils.mkdir(backup_repos_path, mode: 0700)
     end
-
-    private
 
     def dump_consecutive
       Project.includes(:route, :group, namespace: :owner).find_each(batch_size: 1000) do |project|
@@ -193,29 +173,32 @@ module Backup
     end
 
     def dump_project(project)
-      progress.puts " * #{display_repo_path(project)} ... "
+      backup_repository(project, Gitlab::GlRepository::PROJECT)
+      backup_repository(project, Gitlab::GlRepository::WIKI)
+    end
 
-      if project.hashed_storage?(:repository)
-        FileUtils.mkdir_p(File.dirname(File.join(backup_repos_path, project.disk_path)))
-      else
-        FileUtils.mkdir_p(File.join(backup_repos_path, project.namespace.full_path)) if project.namespace
+    def backup_repository(container, type)
+      repository = type.repository_for(container)
+
+      progress.puts " * #{display_repo_path(repository)} ... "
+
+      if empty_repository?(repository)
+        progress.puts " * #{display_repo_path(repository)} ... " + "[SKIPPED]".color(:cyan)
+        return
       end
 
-      if !empty_repo?(project)
-        backup_project(project)
-        progress.puts " * #{display_repo_path(project)} ... " + "[DONE]".color(:green)
-      else
-        progress.puts " * #{display_repo_path(project)} ... " + "[SKIPPED]".color(:cyan)
-      end
+      FileUtils.mkdir_p(project_backup_path(repository))
 
-      wiki = ProjectWiki.new(project)
+      path_to_project_bundle = path_to_bundle(repository)
+      repository.bundle_to_disk(path_to_project_bundle)
 
-      if !empty_repo?(wiki)
-        backup_project(wiki)
-        progress.puts " * #{display_repo_path(project)} ... " + "[DONE] Wiki".color(:green)
-      else
-        progress.puts " * #{display_repo_path(project)} ... " + "[SKIPPED] Wiki".color(:cyan)
-      end
+      custom_hooks_path = custom_hooks_tar(repository)
+      repository.gitaly_repository_client.backup_custom_hooks(custom_hooks_path)
+
+      progress.puts " * #{display_repo_path(repository)} ... " + "[DONE]".color(:green)
+
+    rescue => e
+      progress_warn(container, e, 'Failed to backup repo')
     end
 
     def progress_warn(project, cmd, output)
@@ -223,13 +206,13 @@ module Backup
       progress.puts "Ignoring error on #{display_repo_path(project)} - #{output}".color(:orange)
     end
 
-    def empty_repo?(project_or_wiki)
-      project_or_wiki.repository.expire_emptiness_caches
-      project_or_wiki.repository.empty?
+    def empty_repository?(repository)
+      repository.expire_emptiness_caches
+      repository.empty?
     end
 
     def display_repo_path(project)
-      project.hashed_storage?(:repository) ? "#{project.full_path} (#{project.disk_path})" : project.full_path
+      "#{project.full_path} (#{project.disk_path})"
     end
 
     def restore_object_pools
