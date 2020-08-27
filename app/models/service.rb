@@ -82,6 +82,53 @@ class Service < ApplicationRecord
   scope :alert_hooks, -> { where(alert_events: true, active: true) }
   scope :deployment, -> { where(category: 'deployment') }
 
+  # Provide convenient accessor methods for each serialized property.
+  # Also keep track of updated properties in a similar way as ActiveModel::Dirty
+  def self.prop_accessor(*args)
+    args.each do |arg|
+      class_eval <<~RUBY, __FILE__, __LINE__ + 1
+        unless method_defined?(arg)
+          def #{arg}
+            properties['#{arg}']
+          end
+        end
+
+        def #{arg}=(value)
+          self.properties ||= {}
+          updated_properties['#{arg}'] = #{arg} unless #{arg}_changed?
+          self.properties['#{arg}'] = value
+        end
+
+        def #{arg}_changed?
+          #{arg}_touched? && #{arg} != #{arg}_was
+        end
+
+        def #{arg}_touched?
+          updated_properties.include?('#{arg}')
+        end
+
+        def #{arg}_was
+          updated_properties['#{arg}']
+        end
+      RUBY
+    end
+  end
+
+  # Provide convenient boolean accessor methods for each serialized property.
+  # Also keep track of updated properties in a similar way as ActiveModel::Dirty
+  def self.boolean_accessor(*args)
+    self.prop_accessor(*args)
+
+    args.each do |arg|
+      class_eval <<~RUBY, __FILE__, __LINE__ + 1
+        def #{arg}?
+          # '!!' is used because nil or empty string is converted to nil
+          !!ActiveRecord::Type::Boolean.new.cast(#{arg})
+        end
+      RUBY
+    end
+  end
+
   def activated?
     active
   end
@@ -213,55 +260,6 @@ class Service < ApplicationRecord
   # https://gitlab.com/gitlab-org/gitlab/-/issues/213138
   def can_test?
     !instance?
-  end
-
-  # Provide convenient accessor methods
-  # for each serialized property.
-  # Also keep track of updated properties in a similar way as ActiveModel::Dirty
-  def self.prop_accessor(*args)
-    args.each do |arg|
-      class_eval <<~RUBY, __FILE__, __LINE__ + 1
-        unless method_defined?(arg)
-          def #{arg}
-            properties['#{arg}']
-          end
-        end
-
-        def #{arg}=(value)
-          self.properties ||= {}
-          updated_properties['#{arg}'] = #{arg} unless #{arg}_changed?
-          self.properties['#{arg}'] = value
-        end
-
-        def #{arg}_changed?
-          #{arg}_touched? && #{arg} != #{arg}_was
-        end
-
-        def #{arg}_touched?
-          updated_properties.include?('#{arg}')
-        end
-
-        def #{arg}_was
-          updated_properties['#{arg}']
-        end
-      RUBY
-    end
-  end
-
-  # Provide convenient boolean accessor methods
-  # for each serialized property.
-  # Also keep track of updated properties in a similar way as ActiveModel::Dirty
-  def self.boolean_accessor(*args)
-    self.prop_accessor(*args)
-
-    args.each do |arg|
-      class_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def #{arg}?
-          # '!!' is used because nil or empty string is converted to nil
-          !!ActiveRecord::Type::Boolean.new.cast(#{arg})
-        end
-      RUBY
-    end
   end
 
   # Returns a hash of the properties that have been assigned a new value since last save,
