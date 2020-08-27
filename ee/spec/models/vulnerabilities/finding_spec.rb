@@ -352,6 +352,20 @@ RSpec.describe Vulnerabilities::Finding do
     end
   end
 
+  describe '.preload_primary_identifiers!' do
+    let(:relation) { described_class.preload_primary_identifiers! }
+
+    subject(:preloaded_primary_identifiers) { relation.map(&:preloaded_primary_identifier).map(&:itself) }
+
+    before do
+      create_list(:vulnerabilities_finding, 5)
+    end
+
+    it 'preloads the primary_identifiers for the relation' do
+      expect { preloaded_primary_identifiers }.not_to exceed_query_limit(2)
+    end
+  end
+
   describe 'feedback' do
     let_it_be(:project) { create(:project) }
     let(:finding) do
@@ -662,5 +676,13 @@ RSpec.describe Vulnerabilities::Finding do
 
       expect(subject).to eq({ "test" => true })
     end
+  end
+
+  describe '#preloaded_primary_identifier' do
+    let(:finding) { create(:vulnerabilities_finding) }
+
+    subject { finding.preloaded_primary_identifier.itself }
+
+    it { is_expected.to eq(finding.primary_identifier) }
   end
 end

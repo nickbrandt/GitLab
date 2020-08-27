@@ -181,6 +181,10 @@ module Vulnerabilities
       end
     end
 
+    def self.preload_primary_identifiers!
+      all.tap { |s| s.each(&:preloaded_primary_identifier) }
+    end
+
     def feedback(feedback_type:)
       load_feedback.find { |f| f.feedback_type == feedback_type }
     end
@@ -279,7 +283,7 @@ module Vulnerabilities
     def eql?(other)
       other.report_type == report_type &&
         other.location_fingerprint == location_fingerprint &&
-        other.first_fingerprint == first_fingerprint
+        other.primary_fingerprint == primary_fingerprint
     end
 
     # Array.difference (-) method uses hash and eql? methods to do comparison
@@ -290,7 +294,7 @@ module Vulnerabilities
       # when Finding is persisted and identifiers are not preloaded.
       return super if persisted? && !identifiers.loaded?
 
-      report_type.hash ^ location_fingerprint.hash ^ first_fingerprint.hash
+      report_type.hash ^ location_fingerprint.hash ^ primary_fingerprint.hash
     end
 
     def severity_value
@@ -301,10 +305,20 @@ module Vulnerabilities
       self.class.confidences[self.confidence]
     end
 
+    def preloaded_primary_identifier
+      BatchLoader.for(primary_identifier_id).batch(replace_methods: false) do |identifier_ids, loader|
+        identifiers = Vulnerabilities::Identifier.where(id: identifier_ids)
+
+        identifier_ids.each do |identifier_id|
+          loader.call(identifier_id, identifiers.find { |i| i.id == identifier_id })
+        end
+      end
+    end
+
     protected
 
-    def first_fingerprint
-      identifiers.first&.fingerprint
+    def primary_fingerprint
+      preloaded_primary_identifier.itself&.fingerprint
     end
 
     private
