@@ -49,7 +49,7 @@ export default {
 
 <template>
   <gl-deprecated-dropdown :text="dropdownTitle" @show="fetchSyncNamespaces('')">
-    <gl-search-box-by-type class="m-2" :debounce="500" @input="fetchSyncNamespaces" />
+    <gl-search-box-by-type class="gl-m-3" :debounce="500" @input="fetchSyncNamespaces" />
     <li v-for="namespace in synchronizationNamespaces" :key="namespace.id">
       <gl-deprecated-button class="d-flex align-items-center" @click="toggleNamespace(namespace)">
         <gl-icon :class="[{ invisible: !isSelected(namespace) }]" name="mobile-issue-close" />
