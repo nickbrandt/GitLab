@@ -7411,6 +7411,9 @@ msgstr ""
 msgid "Custom hostname (for private commit emails)"
 msgstr ""
 
+msgid "Custom metrics"
+msgstr ""
+
 msgid "Custom notification events"
 msgstr ""
 
