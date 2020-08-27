@@ -145,6 +145,10 @@ class Service < ApplicationRecord
     %w(commit push tag_push issue confidential_issue merge_request wiki_page)
   end
 
+  def self.event_description(event)
+    ServicesHelper.service_event_description(event)
+  end
+
   def self.find_or_create_templates
     create_nonexistent_templates
     for_template
@@ -397,10 +401,6 @@ class Service < ApplicationRecord
     if project && !project.destroyed?
       project.cache_has_external_wiki
     end
-  end
-
-  def self.event_description(event)
-    ServicesHelper.service_event_description(event)
   end
 
   def valid_recipients?
