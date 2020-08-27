@@ -23,12 +23,12 @@ exports[`Dashboard template matches the default snapshot 1`] = `
         toggle-class="dropdown-menu-toggle"
       />
     </div>
-
+     
     <span
       aria-hidden="true"
       class="gl-pl-3 border-left gl-mb-3 d-none d-sm-block"
     />
-
+     
     <div
       class="mb-2 pr-2 d-flex d-sm-block"
     >
@@ -50,28 +50,28 @@ exports[`Dashboard template matches the default snapshot 1`] = `
           <gl-new-dropdown-header-stub>
             Environment
           </gl-new-dropdown-header-stub>
-
+           
           <gl-search-box-by-type-stub
             class="gl-m-3"
             clearbuttontitle="Clear"
             value=""
           />
-
+           
           <div
             class="flex-fill overflow-auto"
           />
-
+           
           <div
             class="text-secondary no-matches-message"
           >
-
+            
           No matching results
-
+        
           </div>
         </div>
       </gl-new-dropdown-stub>
     </div>
-
+     
     <div
       class="mb-2 pr-2 d-flex d-sm-block"
     >
@@ -83,24 +83,24 @@ exports[`Dashboard template matches the default snapshot 1`] = `
         value="[object Object]"
       />
     </div>
-
+     
     <div
       class="mb-2 pr-2 d-flex d-sm-block"
     >
       <refresh-button-stub />
     </div>
-
+     
     <div
       class="flex-grow-1"
     />
-
+     
     <div
       class="d-sm-flex"
     >
       <!---->
-
+       
       <!---->
-
+       
       <div
         class="gl-mb-3 gl-mr-3 d-flex d-sm-block"
       >
@@ -111,11 +111,11 @@ exports[`Dashboard template matches the default snapshot 1`] = `
           validatequerypath="/monitoring/monitor-project/prometheus/metrics/validate_query"
         />
       </div>
-
+       
       <!---->
     </div>
   </div>
-
+   
   <empty-state-stub
     clusterspath="/monitoring/monitor-project/-/clusters"
     documentationpath="/help/administration/monitoring/prometheus/index.md"
