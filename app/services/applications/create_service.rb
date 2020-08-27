@@ -11,16 +11,7 @@ module Applications
 
     # EE would override and use `request` arg
     def execute(request)
-      @application = Doorkeeper::Application.new(params)
-
-      unless params[:scopes].present?
-        @application.errors.add(:base, _("Scopes can't be blank"))
-
-        return @application
-      end
-
-      @application.save
-      @application
+      Doorkeeper::Application.create(params)
     end
   end
 end
