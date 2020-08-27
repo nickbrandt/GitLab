@@ -12,19 +12,17 @@ class Milestones::BurnupChartService
 
   EVENT_COUNT_LIMIT = 50_000
 
-  TooManyEventsError = Class.new(StandardError)
-
   def initialize(milestone)
-    raise ArgumentError, 'Milestone must have a start and due date' if milestone.start_date.blank? || milestone.due_date.blank?
-
     @milestone = milestone
   end
 
   def execute
+    return ServiceResponse.error(message: _('Milestone does not support burnup charts')) unless milestone.supports_burnup_charts?
+    return ServiceResponse.error(message: _('Milestone must have a start and due date')) if milestone.start_date.blank? || milestone.due_date.blank?
+    return ServiceResponse.error(message: _('Burnup chart could not be generated due to too many events')) if resource_events.num_tuples > EVENT_COUNT_LIMIT
+
     @issue_states = {}
     @chart_data = []
-
-    raise TooManyEventsError if resource_events.num_tuples > EVENT_COUNT_LIMIT
 
     resource_events.each do |event|
       case event['event_type']
@@ -37,7 +35,7 @@ class Milestones::BurnupChartService
       end
     end
 
-    chart_data
+    ServiceResponse.success(payload: chart_data)
   end
 
   private

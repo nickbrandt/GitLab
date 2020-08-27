@@ -20,6 +20,10 @@ module EE
       resource_parent&.feature_available?(feature_name) && supports_weight?
     end
 
+    def supports_burnup_charts?
+      resource_parent&.feature_available?(:milestone_charts) && supports_weight?
+    end
+
     def burnup_charts_available?
       ::Feature.enabled?(:burnup_charts, resource_parent)
     end

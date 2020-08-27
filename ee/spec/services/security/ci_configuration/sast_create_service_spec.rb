@@ -21,5 +21,19 @@ RSpec.describe Security::CiConfiguration::SastCreateService do
         expect(result[:success_path]).to match(/#{Gitlab::Routing.url_helpers.project_new_merge_request_url(project, {})}(.*)description(.*)source_branch/)
       end
     end
+
+    context 'with parameters' do
+      let(:params) do
+        { 'stage' => 'security',
+          'SEARCH_MAX_DEPTH' => 1,
+          'SECURE_ANALYZERS_PREFIX' => 'new_registry',
+          'SAST_EXCLUDED_PATHS' => 'spec,docs' }
+      end
+
+      it 'returns the path to create a new merge request' do
+        expect(result[:status]).to eq(:success)
+        expect(result[:success_path]).to match(/#{Gitlab::Routing.url_helpers.project_new_merge_request_url(project, {})}(.*)description(.*)source_branch/)
+      end
+    end
   end
 end

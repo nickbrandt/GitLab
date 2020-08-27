@@ -1288,7 +1288,7 @@ However, the following might help the reader connect the text to the user interf
 | **{monitor}** Monitoring | View GitLab system information, and information on background jobs, logs, health checks, requests profiles, and audit logs. |
 | **{messages}** Messages  | Send and manage broadcast messages for your users.                                                                          |
 
-Use an icon when you find youself having to describe an interface element. For example:
+Use an icon when you find yourself having to describe an interface element. For example:
 
 - Do: Click the Admin Area icon ( **{admin}** ).
 - Don't: Click the Admin Area icon (the wrench icon).
@@ -1738,8 +1738,13 @@ For guidance on developing GitLab with feature flags, see
 
 ## RESTful API
 
-Here is a list of must-have items for RESTful API documentation. Use them in the
-exact order that appears on this document. Further explanation is given below.
+REST API resources are documented in Markdown under [`/doc/api`](https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc/api). Each resource has its own Markdown file, which is linked from `api_resources.md`.
+
+When modifying the Markdown, also update the corresponding [OpenAPI definition](https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc/api/openapi) if one exists for the resource.
+If not, consider creating one. Match the latest [OpenAPI 3.0.x specification](https://swagger.io/specification/).
+(For more information, see the discussion in [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/16023#note_370901810).)
+
+In the Markdown doc for a resource (AKA endpoint):
 
 - Every method must have the REST API request. For example:
 
