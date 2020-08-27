@@ -2,6 +2,7 @@ import {
   renderUneditableLeaf,
   renderUneditableBranch,
   renderWithAttributeDefinitions,
+  willAlwaysRender,
 } from '~/vue_shared/components/rich_content_editor/services/renderers/render_utils';
 
 import {
@@ -43,15 +44,18 @@ describe('rich_content_editor/renderers/render_utils', () => {
     });
   });
 
+  describe('willAlwaysRender', () => {
+    it('always returns true', () => {
+      expect(willAlwaysRender()).toBe(true);
+    });
+  });
+
   describe('renderWithAttributeDefinitions', () => {
     let openTagToken;
     let closeTagToken;
     let node;
     const attributes = {
       'data-attribute-definition': attributeDefinition,
-      title: attributeDefinition,
-      'data-toggle': 'tooltip',
-      'data-placement': 'left',
     };
 
     beforeEach(() => {

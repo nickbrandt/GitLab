@@ -16,7 +16,10 @@ describe('rich_content_editor/renderers/render_attribute_definition', () => {
 
   describe('render', () => {
     it('returns an empty HTML comment', () => {
-      expect(renderer.render()).toEqual({ type: 'html', content: '<!-- -->' });
+      expect(renderer.render()).toEqual({
+        type: 'html',
+        content: '<!-- sse-attribute-definition -->',
+      });
     });
   });
 });

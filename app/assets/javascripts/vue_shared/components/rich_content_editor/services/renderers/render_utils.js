@@ -4,12 +4,12 @@ import {
   buildUneditableCloseToken,
 } from './build_uneditable_token';
 
-const attributeDefinitionRegexp = /(^{:.+}$)/;
-
 export const renderUneditableLeaf = (_, { origin }) => buildUneditableBlockTokens(origin());
 
 export const renderUneditableBranch = (_, { entering, origin }) =>
   entering ? buildUneditableOpenTokens(origin()) : buildUneditableCloseToken();
+
+const attributeDefinitionRegexp = /(^{:.+}$)/;
 
 export const isAttributeDefinition = text => attributeDefinitionRegexp.test(text);
 
@@ -20,22 +20,19 @@ const findAttributeDefinition = node => {
   return isAttributeDefinition(literal) ? literal : null;
 };
 
-export const renderWithAttributeDefinitions = (node, context) => {
+export const renderWithAttributeDefinitions = (node, { origin }) => {
   const attributes = findAttributeDefinition(node);
-  const origin = context.origin();
+  const token = origin();
 
-  if (origin.type === 'openTag' && attributes) {
-    Object.assign(origin, {
+  if (token.type === 'openTag' && attributes) {
+    Object.assign(token, {
       attributes: {
         'data-attribute-definition': attributes,
-        'data-toggle': 'tooltip',
-        'data-placement': 'left',
-        title: attributes,
       },
     });
   }
 
-  return origin;
+  return token;
 };
 
-export const canRender = () => true;
+export const willAlwaysRender = () => true;
