@@ -14,7 +14,7 @@ export default () => {
   } = el;
 
   const props = {
-    newProfilePaths: {
+    createNewProfilePaths: {
       scannerProfile: newDastScannerProfilePath,
       siteProfile: newDastSiteProfilePath,
     },

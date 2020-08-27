@@ -14,7 +14,7 @@ describe('EE - DastProfiles', () => {
 
   const createComponentFactory = (mountFn = shallowMount) => (options = {}) => {
     const defaultProps = {
-      newProfilePaths: {
+      createNewProfilePaths: {
         scannerProfile: TEST_NEW_DAST_SCANNER_PROFILE_PATH,
         siteProfile: TEST_NEW_DAST_SITE_PROFILE_PATH,
       },

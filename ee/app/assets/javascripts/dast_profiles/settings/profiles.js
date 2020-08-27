@@ -5,21 +5,21 @@ const hasNoFeatureFlagOrEnabled = glFeatures => ([, { featureFlag }]) => {
     return true;
   }
 
-  return glFeatures[featureFlag];
+  return Boolean(glFeatures[featureFlag]);
 };
 
-export default function({ glFeatures, options: { newProfilePaths } = {} }) {
+export default function({ glFeatures, options: { createNewProfilePaths } = {} }) {
   const settings = {
     siteProfiles: {
       key: 'siteProfiles',
-      newProfilePath: newProfilePaths.siteProfile,
+      createNewProfilePath: createNewProfilePaths.siteProfile,
       i18n: {
         title: s__('DastProfiles|Site Profile'),
       },
     },
     scannerProfiles: {
       key: 'scannerProfiles',
-      newProfilePath: newProfilePaths.scannerProfile,
+      createNewProfilePath: createNewProfilePaths.scannerProfile,
       featureFlag: 'securityOnDemandScansScannerProfiles',
       i18n: {
         title: s__('DastProfiles|Scanner Profile'),

@@ -19,7 +19,7 @@ export default {
   },
   mixins: [glFeatureFlagMixin()],
   props: {
-    newProfilePaths: {
+    createNewProfilePaths: {
       type: Object,
       required: true,
       validator: ({ scannerProfile, siteProfile }) =>
@@ -67,11 +67,11 @@ export default {
   },
   computed: {
     profileSettings() {
-      const { glFeatures, newProfilePaths } = this;
+      const { glFeatures, createNewProfilePaths } = this;
 
       return getProfileSettings({
         glFeatures,
-        options: { newProfilePaths },
+        options: { createNewProfilePaths },
       });
     },
     hasMoreSiteProfiles() {
@@ -166,6 +166,11 @@ export default {
   },
   profilesPerPage: 10,
   i18n: {
+    heading: s__('DastProfiles|Manage Profiles'),
+    newProfileDropdownLabel: s__('DastProfiles|New Profile'),
+    subHeading: s__(
+      'DastProfiles|Save commonly used configurations for target sites and scan specifications as profiles. Use these with an on-demand scan.',
+    ),
     errorMessages: {
       fetchNetworkError: s__(
         'DastProfiles|Could not fetch site profiles. Please refresh the page, or try again later.',
@@ -184,29 +189,25 @@ export default {
     <header>
       <div class="gl-display-flex gl-align-items-center gl-pt-6 gl-pb-4">
         <h2 class="my-0">
-          {{ s__('DastProfiles|Manage Profiles') }}
+          {{ $options.i18n.heading }}
         </h2>
         <gl-dropdown
-          :text="s__('DastProfiles|New Profile')"
-          right
+          :text="$options.i18n.newProfileDropdownLabel"
           variant="success"
+          right
           class="gl-ml-auto"
         >
           <gl-dropdown-item
-            v-for="{ i18n, newProfilePath, key } in profileSettings"
+            v-for="{ i18n, createNewProfilePath, key } in profileSettings"
             :key="key"
-            :href="newProfilePath"
+            :href="createNewProfilePath"
           >
             {{ i18n.title }}
           </gl-dropdown-item>
         </gl-dropdown>
       </div>
       <p>
-        {{
-          s__(
-            'DastProfiles|Save commonly used configurations for target sites and scan specifications as profiles. Use these with an on-demand scan.',
-          )
-        }}
+        {{ $options.i18n.subHeading }}
       </p>
     </header>
 
