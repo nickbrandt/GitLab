@@ -40,6 +40,14 @@ RSpec.describe MergeRequests::BuildService do
       it 'does not set the MR description from template' do
         expect(merge_request.description).not_to eq(template)
       end
+
+      context 'when description is provided' do
+        let(:description) { 'Description' }
+
+        it "sets the user's description" do
+          expect(merge_request.description).to eq(description)
+        end
+      end
     end
 
     context 'issuable default templates feature available' do
@@ -49,6 +57,14 @@ RSpec.describe MergeRequests::BuildService do
 
       it 'sets the MR description from template' do
         expect(merge_request.description).to eq(template)
+      end
+
+      context 'when description is provided' do
+        let(:description) { 'Description' }
+
+        it "prefers user's description to the default template" do
+          expect(merge_request.description).to eq(description)
+        end
       end
     end
   end
