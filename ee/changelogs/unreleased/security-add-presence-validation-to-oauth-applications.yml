@@ -1,5 +1,0 @@
----
-title: Update default OAuth Applications scope to 'read_user' & add scopes presence validation on OAuth Application creation
-merge_request: 797
-author:
-type: security

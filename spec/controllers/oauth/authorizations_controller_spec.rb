@@ -23,7 +23,7 @@ RSpec.describe Oauth::AuthorizationsController do
     context 'when the user is confirmed' do
       context 'when there is already an access token for the application with a matching scope' do
         before do
-          scopes = Doorkeeper::OAuth::Scopes.from_string('read_user')
+          scopes = Doorkeeper::OAuth::Scopes.from_string('api')
 
           allow(Doorkeeper.configuration).to receive(:scopes).and_return(scopes)
 
