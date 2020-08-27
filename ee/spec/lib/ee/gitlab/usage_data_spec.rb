@@ -307,6 +307,18 @@ RSpec.describe Gitlab::UsageData do
         create(:approval_merge_request_rule, merge_request: merge_request)
         create_list(:code_owner_rule, 3, approvals_required: 2)
         create_list(:code_owner_rule, 2)
+
+        create(:lfs_file_lock, project: project, path: 'a.txt')
+        create(:lfs_file_lock, project: project, path: 'b.txt')
+        create(:lfs_file_lock, user: user, project: project, path: 'c.txt')
+        create(:lfs_file_lock, user: user, project: project, path: 'd.txt')
+
+        create(:path_lock, project: project, path: '1.txt')
+        create(:path_lock, project: project, path: '2.txt')
+        create(:path_lock, project: project, path: '3.txt')
+        create(:path_lock, user: user, project: project, path: '4.txt')
+        create(:path_lock, user: user, project: project, path: '5.txt')
+        create(:path_lock, user: user, project: project, path: '6.txt')
       end
 
       expect(described_class.usage_activity_by_stage_create({})).to include(
@@ -320,7 +332,9 @@ RSpec.describe Gitlab::UsageData do
         projects_imported_from_github: 2,
         projects_with_repositories_enabled: 12,
         protected_branches: 2,
-        suggestions: 2
+        suggestions: 2,
+        users_using_lfs_locks: 6,
+        users_using_path_locks: 8
       )
       expect(described_class.usage_activity_by_stage_create(described_class.last_28_days_time_period)).to include(
         approval_project_rules: 6,
@@ -333,7 +347,9 @@ RSpec.describe Gitlab::UsageData do
         projects_imported_from_github: 1,
         projects_with_repositories_enabled: 6,
         protected_branches: 1,
-        suggestions: 1
+        suggestions: 1,
+        users_using_lfs_locks: 3,
+        users_using_path_locks: 4
       )
     end
   end
