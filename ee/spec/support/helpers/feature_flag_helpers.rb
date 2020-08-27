@@ -73,11 +73,19 @@ module FeatureFlagHelpers
   end
 
   def status_toggle_button
-    find('.js-feature-flag-status button')
+    find('[data-testid="feature-flag-status-toggle"] button')
   end
 
   def expect_status_toggle_button_to_be_checked
-    expect(page).to have_css('.js-feature-flag-status button.is-checked')
+    expect(page).to have_css('[data-testid="feature-flag-status-toggle"] button.is-checked')
+  end
+
+  def expect_status_toggle_button_not_to_be_checked
+    expect(page).to have_css('[data-testid="feature-flag-status-toggle"] button:not(.is-checked)')
+  end
+
+  def expect_status_toggle_button_to_be_disabled
+    expect(page).to have_css('[data-testid="feature-flag-status-toggle"] button.is-disabled')
   end
 
   def expect_user_to_see_feature_flags_index_page

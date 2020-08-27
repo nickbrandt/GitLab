@@ -915,7 +915,10 @@ RSpec.describe Projects::FeatureFlagsController do
     end
 
     before do
-      stub_feature_flags(feature_flags_legacy_read_only: false)
+      stub_feature_flags(
+        feature_flags_legacy_read_only: false,
+        feature_flags_legacy_read_only_override: false
+      )
     end
 
     subject { put(:update, params: params, format: :json) }
@@ -1305,6 +1308,18 @@ RSpec.describe Projects::FeatureFlagsController do
 
         expect(response).to have_gitlab_http_status(:bad_request)
         expect(json_response['message']).to eq(["Legacy feature flags are read-only"])
+      end
+
+      it 'updates the flag if the legacy read-only override is enabled for a particular project' do
+        stub_feature_flags(
+          feature_flags_legacy_read_only: true,
+          feature_flags_legacy_read_only_override: project
+        )
+
+        put_request(feature_flag, name: 'ci_new_live_trace')
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['name']).to eq('ci_new_live_trace')
       end
     end
 

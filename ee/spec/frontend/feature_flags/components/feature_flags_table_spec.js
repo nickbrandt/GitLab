@@ -80,8 +80,10 @@ describe('Feature flag table', () => {
     });
 
     it('Should render a status column', () => {
-      expect(wrapper.find('.js-feature-flag-status').exists()).toBe(true);
-      expect(trimText(wrapper.find('.js-feature-flag-status').text())).toEqual('Active');
+      const badge = wrapper.find('[data-testid="feature-flag-status-badge"]');
+
+      expect(badge.exists()).toBe(true);
+      expect(trimText(badge.text())).toEqual('Active');
     });
 
     it('Should render a feature flag column', () => {
