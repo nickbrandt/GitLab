@@ -221,7 +221,11 @@ describe('AlertManagementTable', () => {
         data: { alerts: { list: mockAlerts }, alertsCount, hasError: false },
         loading: false,
       });
-      expect(findStatusDropdown().contains('.dropdown-title')).toBe(false);
+      expect(
+        findStatusDropdown()
+          .find('.dropdown-title')
+          .exists(),
+      ).toBe(false);
     });
 
     it('shows correct severity icons', () => {
@@ -520,7 +524,11 @@ describe('AlertManagementTable', () => {
       await selectFirstStatusOption();
 
       expect(findAlertError().exists()).toBe(true);
-      expect(findAlertError().contains('[data-testid="htmlError"]')).toBe(true);
+      expect(
+        findAlertError()
+          .find('[data-testid="htmlError"]')
+          .exists(),
+      ).toBe(true);
     });
   });
 

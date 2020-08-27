@@ -43,9 +43,9 @@ describe('User Lists Table', () => {
     const lists = wrapper.findAll('[data-testid="ffUserList"]');
     expect(lists).toHaveLength(5);
     lists.wrappers.forEach(list => {
-      expect(list.contains('[data-testid="ffUserListName"]')).toBe(true);
-      expect(list.contains('[data-testid="ffUserListIds"]')).toBe(true);
-      expect(list.contains('[data-testid="ffUserListTimestamp"]')).toBe(true);
+      expect(list.find('[data-testid="ffUserListName"]').exists()).toBe(true);
+      expect(list.find('[data-testid="ffUserListIds"]').exists()).toBe(true);
+      expect(list.find('[data-testid="ffUserListTimestamp"]').exists()).toBe(true);
     });
   });
 

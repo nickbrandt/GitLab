@@ -118,12 +118,28 @@ describe('ProjectsDropdownFilter component', () => {
       });
 
       it('renders an avatar when the project has an avatar_url', () => {
-        expect(findDropdownAtIndex(0).contains('img.gl-avatar')).toBe(true);
-        expect(findDropdownAtIndex(0).contains('div.gl-avatar-identicon')).toBe(false);
+        expect(
+          findDropdownAtIndex(0)
+            .find('img.gl-avatar')
+            .exists(),
+        ).toBe(true);
+        expect(
+          findDropdownAtIndex(0)
+            .find('div.gl-avatar-identicon')
+            .exists(),
+        ).toBe(false);
       });
       it("renders an identicon when the project doesn't have an avatar_url", () => {
-        expect(findDropdownAtIndex(1).contains('img.gl-avatar')).toBe(false);
-        expect(findDropdownAtIndex(1).contains('div.gl-avatar-identicon')).toBe(true);
+        expect(
+          findDropdownAtIndex(1)
+            .find('img.gl-avatar')
+            .exists(),
+        ).toBe(false);
+        expect(
+          findDropdownAtIndex(1)
+            .find('div.gl-avatar-identicon')
+            .exists(),
+        ).toBe(true);
       });
     });
 
@@ -151,8 +167,16 @@ describe('ProjectsDropdownFilter component', () => {
         selectDropdownItemAtIndex(0);
 
         return wrapper.vm.$nextTick().then(() => {
-          expect(findDropdownButton().contains('img.gl-avatar')).toBe(true);
-          expect(findDropdownButton().contains('.gl-avatar-identicon')).toBe(false);
+          expect(
+            findDropdownButton()
+              .find('img.gl-avatar')
+              .exists(),
+          ).toBe(true);
+          expect(
+            findDropdownButton()
+              .find('.gl-avatar-identicon')
+              .exists(),
+          ).toBe(false);
         });
       });
 
@@ -160,8 +184,16 @@ describe('ProjectsDropdownFilter component', () => {
         selectDropdownItemAtIndex(1);
 
         return wrapper.vm.$nextTick().then(() => {
-          expect(findDropdownButton().contains('img.gl-avatar')).toBe(false);
-          expect(findDropdownButton().contains('.gl-avatar-identicon')).toBe(true);
+          expect(
+            findDropdownButton()
+              .find('img.gl-avatar')
+              .exists(),
+          ).toBe(false);
+          expect(
+            findDropdownButton()
+              .find('.gl-avatar-identicon')
+              .exists(),
+          ).toBe(true);
         });
       });
     });
@@ -178,13 +210,29 @@ describe('ProjectsDropdownFilter component', () => {
       });
 
       it('renders an avatar when the project has an avatar_url', () => {
-        expect(findDropdownAtIndex(0).contains('img.gl-avatar')).toBe(true);
-        expect(findDropdownAtIndex(0).contains('div.gl-avatar-identicon')).toBe(false);
+        expect(
+          findDropdownAtIndex(0)
+            .find('img.gl-avatar')
+            .exists(),
+        ).toBe(true);
+        expect(
+          findDropdownAtIndex(0)
+            .find('div.gl-avatar-identicon')
+            .exists(),
+        ).toBe(false);
       });
 
       it("renders an identicon when the project doesn't have an avatar_url", () => {
-        expect(findDropdownAtIndex(1).contains('img.gl-avatar')).toBe(false);
-        expect(findDropdownAtIndex(1).contains('div.gl-avatar-identicon')).toBe(true);
+        expect(
+          findDropdownAtIndex(1)
+            .find('img.gl-avatar')
+            .exists(),
+        ).toBe(false);
+        expect(
+          findDropdownAtIndex(1)
+            .find('div.gl-avatar-identicon')
+            .exists(),
+        ).toBe(true);
       });
     });
 
