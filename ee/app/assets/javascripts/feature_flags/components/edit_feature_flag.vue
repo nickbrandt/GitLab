@@ -85,7 +85,10 @@ export default {
       return this.glFeatures.featureFlagsNewVersion;
     },
     hasLegacyReadOnlyFlags() {
-      return this.glFeatures.featureFlagsLegacyReadOnly;
+      return (
+        this.glFeatures.featureFlagsLegacyReadOnly &&
+        !this.glFeatures.featureFlagsLegacyReadOnlyOverride
+      );
     },
     shouldShowNewFlagAlert() {
       return !(this.hasNewVersionFlags || this.userDidDismissNewFlagAlert);
@@ -128,10 +131,11 @@ export default {
       <div class="gl-display-flex gl-align-items-center gl-mb-4 gl-mt-4">
         <gl-toggle
           :value="active"
+          data-testid="feature-flag-status-toggle"
           data-track-event="click_button"
           data-track-label="feature_flag_toggle"
           data-track-context="feature_flag_activity"
-          class="gl-mr-4 js-feature-flag-status"
+          class="gl-mr-4"
           @change="toggleActive"
         />
         <h3 class="page-title gl-m-0">{{ title }}</h3>

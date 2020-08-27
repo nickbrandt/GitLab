@@ -14,7 +14,10 @@ RSpec.describe 'User updates feature flag', :js do
 
   before do
     stub_licensed_features(feature_flags: true)
-    stub_feature_flags(feature_flag_permissions: false)
+    stub_feature_flags(
+      feature_flag_permissions: false,
+      feature_flags_legacy_read_only_override: false
+    )
     sign_in(user)
   end
 
@@ -97,7 +100,7 @@ RSpec.describe 'User updates feature flag', :js do
         end
       end
 
-      context 'when user updates a status of a scope' do
+      context 'when user updates the status of a scope' do
         before do
           within_scope_row(2) do
             within_status { find('.project-feature-toggle').click }
@@ -110,7 +113,7 @@ RSpec.describe 'User updates feature flag', :js do
         it 'shows the updated feature flag' do
           within_feature_flag_row(1) do
             expect(page.find('.feature-flag-name')).to have_content('ci_live_trace')
-            expect(page).to have_css('.js-feature-flag-status button.is-checked')
+            expect_status_toggle_button_to_be_checked
 
             within_feature_flag_scopes do
               expect(page.find('.badge:nth-child(1)')).to have_content('*')
@@ -192,6 +195,21 @@ RSpec.describe 'User updates feature flag', :js do
 
         expect(page).to have_text 'This feature flag is read-only, and it will be removed in 14.0.'
         expect(page).to have_css('button.js-ff-submit.disabled')
+      end
+    end
+
+    context 'when legacy flags are read-only, but the override is active for one project' do
+      it 'the user can edit the flag' do
+        stub_feature_flags(feature_flags_legacy_read_only_override: project)
+
+        visit(edit_project_feature_flag_path(project, feature_flag))
+        status_toggle_button.click
+        click_button 'Save changes'
+
+        expect(page).to have_current_path(project_feature_flags_path(project))
+        within_feature_flag_row(1) do
+          expect_status_toggle_button_not_to_be_checked
+        end
       end
     end
   end
