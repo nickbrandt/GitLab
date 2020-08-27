@@ -5,31 +5,42 @@ require 'spec_helper'
 RSpec.describe Gitlab::Metrics::Dashboard::Importer do
   include MetricsDashboardHelpers
 
+  let_it_be(:dashboard_path) { '.gitlab/dashboards/sample_dashboard.yml' }
+  let_it_be(:project) { create(:project) }
+
+  before do
+    allow(subject).to receive(:dashboard_hash).and_return(dashboard_hash)
+  end
+
+  subject { described_class.new(dashboard_path, project) }
+
   describe '.execute' do
-    let_it_be(:dashboard_path) { '.gitlab/dashboards/sample_dashboard.yml' }
-    let_it_be(:dashboard_hash) { load_sample_dashboard }
-    let_it_be(:project) { create(:project) }
+    context 'valid dashboard hash' do
+      let(:dashboard_hash) { load_sample_dashboard }
 
-    subject { described_class.new(dashboard_path, project) }
-
-    before do
-      allow(subject).to receive(:dashboard_hash).and_return(dashboard_hash)
+      it 'imports metrics to database' do
+        expect { subject.execute }
+          .to change { PrometheusMetric.count }.from(0).to(3)
+      end
     end
 
-    it 'imports metrics to database' do
-      expect { subject.execute }
-        .to change { PrometheusMetric.count }.from(0).to(3)
+    context 'invalid dashboard hash' do
+      let(:dashboard_hash) { {} }
+
+      it 'returns false' do
+        expect(subject.execute).to be(false)
+      end
     end
   end
 
   describe '.execute!' do
-    let_it_be(:dashboard_path) { '.gitlab/dashboards/sample_dashboard.yml' }
-    let_it_be(:project) { create(:project) }
+    context 'valid dashboard hash' do
+      let(:dashboard_hash) { load_sample_dashboard }
 
-    subject { described_class.new(dashboard_path, project) }
-
-    before do
-      allow(subject).to receive(:dashboard_hash).and_return(dashboard_hash)
+      it 'imports metrics to database' do
+        expect { subject.execute }
+          .to change { PrometheusMetric.count }.from(0).to(3)
+      end
     end
 
     context 'invalid dashboard hash' do
