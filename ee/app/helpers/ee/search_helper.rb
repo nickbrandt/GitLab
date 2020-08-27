@@ -28,6 +28,13 @@ module EE
       end
     end
 
+    override :project_autocomplete
+    def project_autocomplete
+      return super unless @project && @project.feature_available?(:feature_flags)
+
+      super + [{ category: "In this project", label: _("Feature Flags"), url: project_feature_flags_path(@project) }]
+    end
+
     # This is a special case for snippet searches in .com.
     # The scope used to gather the snippets is too wide and
     # we have to process a lot of them, what leads to time outs.
