@@ -26,16 +26,16 @@ class Service < ApplicationRecord
 
   default_value_for :active, false
   default_value_for :alert_events, true
-  default_value_for :push_events, true
-  default_value_for :issues_events, true
-  default_value_for :confidential_issues_events, true
   default_value_for :commit_events, true
-  default_value_for :merge_requests_events, true
-  default_value_for :tag_push_events, true
-  default_value_for :note_events, true
+  default_value_for :confidential_issues_events, true
   default_value_for :confidential_note_events, true
+  default_value_for :issues_events, true
   default_value_for :job_events, true
+  default_value_for :merge_requests_events, true
+  default_value_for :note_events, true
   default_value_for :pipeline_events, true
+  default_value_for :push_events, true
+  default_value_for :tag_push_events, true
   default_value_for :wiki_page_events, true
 
   after_initialize :initialize_properties
