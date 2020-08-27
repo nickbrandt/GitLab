@@ -7,6 +7,7 @@ RSpec.describe 'Merge request > User edits MR' do
 
   before do
     stub_licensed_features(multiple_merge_request_assignees: false)
+    stub_feature_flags(merge_request_reviewers: true)
   end
 
   context 'non-fork merge request' do
