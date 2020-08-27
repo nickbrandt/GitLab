@@ -1,0 +1,5 @@
+---
+title: Drop Docker-in-Docker mode for Dependency Scanning
+merge_request: 40614
+author:
+type: removed
