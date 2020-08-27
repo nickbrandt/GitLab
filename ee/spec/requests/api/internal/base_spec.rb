@@ -277,4 +277,57 @@ RSpec.describe API::Internal::Base do
       )
     end
   end
+
+  describe 'POST /internal/personal_access_token' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:key) { create(:key, user: user) }
+
+    let(:instance_level_max_personal_access_token_lifetime) { nil }
+    let(:secret_token) { Gitlab::Shell.secret_token }
+
+    before do
+      stub_licensed_features(personal_access_token_expiration_policy: !!instance_level_max_personal_access_token_lifetime)
+      stub_application_setting(max_personal_access_token_lifetime: instance_level_max_personal_access_token_lifetime)
+    end
+
+    context 'with a max token lifetime on the instance' do
+      let(:instance_level_max_personal_access_token_lifetime) { 10 }
+
+      it 'returns an error message when the expiry date exceeds the max token lifetime' do
+        post api('/internal/personal_access_token'),
+             params: {
+               secret_token: secret_token,
+               key_id:  key.id,
+               name: 'newtoken',
+               scopes: %w(read_api read_repository),
+               expires_at: (instance_level_max_personal_access_token_lifetime + 1).days.from_now.to_date.to_s
+             }
+
+        aggregate_failures do
+          expect(json_response['success']).to eq(false)
+          expect(json_response['message']).to eq("Failed to create token: Expires at is invalid")
+        end
+      end
+
+      it 'returns a valid token when the expiry date does not exceed the max token lifetime' do
+        expires_at = instance_level_max_personal_access_token_lifetime.days.from_now.to_date.to_s
+
+        post api('/internal/personal_access_token'),
+             params: {
+               secret_token: secret_token,
+               key_id:  key.id,
+               name: 'newtoken',
+               scopes: %w(read_api read_repository),
+               expires_at: expires_at
+             }
+
+        aggregate_failures do
+          expect(json_response['success']).to eq(true)
+          expect(json_response['token']).to match(/\A\S{20}\z/)
+          expect(json_response['scopes']).to match_array(%w(read_api read_repository))
+          expect(json_response['expires_at']).to eq(expires_at)
+        end
+      end
+    end
+  end
 end
