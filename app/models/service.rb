@@ -138,11 +138,11 @@ class Service < ApplicationRecord
   end
 
   def self.supported_event_actions
-    %w()
+    %w[]
   end
 
   def self.supported_events
-    %w(commit push tag_push issue confidential_issue merge_request wiki_page)
+    %w[commit push tag_push issue confidential_issue merge_request wiki_page]
   end
 
   def self.event_description(event)
@@ -285,7 +285,7 @@ class Service < ApplicationRecord
   #
   # This list is used in `Service#as_json(only: json_fields)`.
   def json_fields
-    %w(active)
+    %w[active]
   end
 
   def to_service_hash
