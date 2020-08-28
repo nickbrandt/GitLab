@@ -7,7 +7,7 @@ module QA
         Flow::Login.sign_in
       end
 
-      it 'creates an epic', :reliable, status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/522' do
+      it 'creates an epic', :reliable, testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/522' do
         epic_title = 'Epic created via GUI'
         EE::Resource::Epic.fabricate_via_browser_ui! do |epic|
           epic.title = epic_title
@@ -16,7 +16,7 @@ module QA
         expect(page).to have_content(epic_title)
       end
 
-      it 'creates a confidential epic', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/967' do
+      it 'creates a confidential epic', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/967' do
         epic_title = 'Confidential epic created via GUI'
         EE::Resource::Epic.fabricate_via_browser_ui! do |epic|
           epic.title = epic_title
@@ -36,7 +36,7 @@ module QA
             epic.visit!
           end
 
-          it 'adds/removes issue to/from epic', :reliable, status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/526' do
+          it 'adds/removes issue to/from epic', :reliable, testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/526' do
             EE::Page::Group::Epic::Show.perform do |show|
               show.add_issue_to_epic(issue.web_url)
 
@@ -48,7 +48,7 @@ module QA
             end
           end
 
-          it 'comments on epic', :reliable, status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/525' do
+          it 'comments on epic', :reliable, testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/525' do
             comment = 'My Epic Comment'
             EE::Page::Group::Epic::Show.perform do |show|
               show.add_comment_to_epic(comment)
@@ -57,7 +57,7 @@ module QA
             expect(page).to have_content(comment)
           end
 
-          it 'closes and reopens an epic', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/524' do
+          it 'closes and reopens an epic', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/524' do
             EE::Page::Group::Epic::Show.perform(&:close_reopen_epic)
 
             expect(page).to have_content('Closed')
@@ -68,7 +68,7 @@ module QA
           end
         end
 
-        it 'adds/removes issue to/from epic using quick actions', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/523' do
+        it 'adds/removes issue to/from epic using quick actions', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/523' do
           issue.visit!
 
           Page::Project::Issue::Show.perform do |show|

@@ -11,7 +11,7 @@ module QA
       @project.visit!
     end
 
-    it 'allows configuration of alerts', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/869' do
+    it 'allows configuration of alerts', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/869' do
       Page::Project::Menu.perform(&:go_to_operations_metrics)
 
       Page::Project::Operations::Metrics::Show.perform do |on_dashboard|
@@ -23,7 +23,7 @@ module QA
       end
     end
 
-    it 'creates an incident template and opens an incident with template applied', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/981' do
+    it 'creates an incident template and opens an incident with template applied', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/981' do
       create_incident_template
 
       Page::Project::Menu.perform(&:go_to_operations_settings)
