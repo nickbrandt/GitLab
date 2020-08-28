@@ -82,10 +82,10 @@ describe('PolicyEditorApp component', () => {
     it('updates policy on yaml editor value change', async () => {
       const manifest = `apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
+description: test description
 metadata:
   name: test-policy
 spec:
-  description: test description
   endpointSelector:
     matchLabels:
       network-policy.gitlab.com/disabled_by: gitlab
