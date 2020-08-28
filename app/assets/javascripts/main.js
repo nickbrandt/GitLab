@@ -20,7 +20,6 @@ import { localTimeAgo } from './lib/utils/datetime_utility';
 import { getLocationHash, visitUrl } from './lib/utils/url_utility';
 
 // everything else
-import loadAwardsHandler from './awards_handler';
 import { deprecatedCreateFlash as Flash, removeFlashClickListener } from './flash';
 import initTodoToggle from './header';
 import initImporterStatus from './importer_status';
@@ -153,8 +152,6 @@ function deferredInitialisation() {
     // the navigation can't overlap the popover
     viewport: '.layout-page',
   });
-
-  loadAwardsHandler();
 
   // Adding a helper class to activate animations only after all is rendered
   setTimeout(() => $body.addClass('page-initialised'), 1000);
