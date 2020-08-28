@@ -49,7 +49,7 @@ describe('EE - DastProfiles', () => {
   const createFullComponent = createComponentFactory(mount);
 
   const withFeatureFlag = (featureFlagName, { enabled, disabled }) => {
-    describe.each([true, false])(`with ${featureFlagName} enabled: "%s"`, featureFlagStatus => {
+    it.each([true, false])(`with ${featureFlagName} enabled: "%s"`, featureFlagStatus => {
       createComponent({
         provide: {
           glFeatures: {

@@ -1,6 +1,6 @@
 import { s__ } from '~/locale';
 
-const hasNoFeatureFlagOrEnabled = glFeatures => ([, { featureFlag }]) => {
+const hasNoFeatureFlagOrIsEnabled = glFeatures => ([, { featureFlag }]) => {
   if (!featureFlag) {
     return true;
   }
@@ -8,7 +8,7 @@ const hasNoFeatureFlagOrEnabled = glFeatures => ([, { featureFlag }]) => {
   return Boolean(glFeatures[featureFlag]);
 };
 
-export default function({ glFeatures, options: { createNewProfilePaths } = {} }) {
+export const getProfileSettings = ({ createNewProfilePaths }, glFeatures) => {
   const settings = {
     siteProfiles: {
       key: 'siteProfiles',
@@ -27,5 +27,7 @@ export default function({ glFeatures, options: { createNewProfilePaths } = {} })
     },
   };
 
-  return Object.fromEntries(Object.entries(settings).filter(hasNoFeatureFlagOrEnabled(glFeatures)));
-}
+  return Object.fromEntries(
+    Object.entries(settings).filter(hasNoFeatureFlagOrIsEnabled(glFeatures)),
+  );
+};

@@ -7,7 +7,7 @@ import ProfilesList from './dast_profiles_list.vue';
 import dastSiteProfilesQuery from '../graphql/dast_site_profiles.query.graphql';
 import dastSiteProfilesDelete from '../graphql/dast_site_profiles_delete.mutation.graphql';
 import * as cacheUtils from '../graphql/cache_utils';
-import getProfileSettings from '../settings/profiles';
+import { getProfileSettings } from '../settings/profiles';
 
 export default {
   components: {
@@ -69,10 +69,12 @@ export default {
     profileSettings() {
       const { glFeatures, createNewProfilePaths } = this;
 
-      return getProfileSettings({
+      return getProfileSettings(
+        {
+          createNewProfilePaths,
+        },
         glFeatures,
-        options: { createNewProfilePaths },
-      });
+      );
     },
     hasMoreSiteProfiles() {
       return this.siteProfilesPageInfo.hasNextPage;
