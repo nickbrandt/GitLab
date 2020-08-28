@@ -60,6 +60,9 @@ export default {
   mounted() {
     this.checkIfTitleOverflows();
   },
+  updated() {
+    this.checkIfTitleOverflows();
+  },
   methods: {
     handleDropdownAction(action) {
       this.$emit(action);

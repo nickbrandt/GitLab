@@ -1,7 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import { GlLoadingIcon, GlNewDropdownItem } from '@gitlab/ui';
-import durationChartStore from 'ee/analytics/cycle_analytics/store/modules/duration_chart';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import StageDropdownFilter from 'ee/analytics/cycle_analytics/components/stage_dropdown_filter.vue';
@@ -19,7 +18,7 @@ const fakeStore = ({ initialGetters, initialState }) =>
   new Vuex.Store({
     modules: {
       durationChart: {
-        ...durationChartStore,
+        namespaced: true,
         getters: {
           durationChartPlottableData: () => durationData,
           ...initialGetters,
@@ -28,6 +27,7 @@ const fakeStore = ({ initialGetters, initialState }) =>
           isLoading: false,
           ...initialState,
         },
+        actions: actionSpies,
       },
     },
   });
@@ -46,7 +46,6 @@ function createComponent({
       stages,
       ...props,
     },
-    methods: actionSpies,
     stubs: {
       GlLoadingIcon: true,
       Scatterplot: true,
@@ -102,7 +101,11 @@ describe('DurationChart', () => {
     });
 
     it('calls the `updateSelectedDurationChartStages` action', () => {
-      expect(actionSpies.updateSelectedDurationChartStages).toHaveBeenCalledWith(selectedStages);
+      expect(actionSpies.updateSelectedDurationChartStages).toHaveBeenCalledWith(
+        expect.any(Object),
+        selectedStages,
+        undefined,
+      );
     });
   });
 
