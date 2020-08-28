@@ -19,6 +19,7 @@ const vulnerabilitiesExportEndpoint = `${TEST_HOST}/vulnerability_findings.csv`;
 describe('Csv Button Export', () => {
   let mock;
   let wrapper;
+  let spy;
 
   const issueUrl = 'https://gitlab.com/gitlab-org/gitlab/issues/197111';
   const findPopoverExternalLink = () => wrapper.find({ ref: 'popoverExternalLink' });
@@ -35,6 +36,23 @@ describe('Csv Button Export', () => {
         GlIcon,
         GlLoadingIcon,
       },
+    });
+  };
+
+  const setupMocksAndSpy = (statusLink, downloadLink, downloadAnchor, status = 'finished') => {
+    mock
+      .onPost(vulnerabilitiesExportEndpoint)
+      .reply(statusCodes.ACCEPTED, { _links: { self: statusLink } });
+    mock.onGet(statusLink).reply(() => {
+      // We need to mock it at this stage because vue internally uses
+      // document.createElement to mount the elements.
+      spy = jest.spyOn(document, 'createElement').mockImplementationOnce(() => {
+        // eslint-disable-next-line no-param-reassign
+        downloadAnchor.click = jest.fn();
+        return downloadAnchor;
+      });
+
+      return [statusCodes.OK, { _links: { download: downloadLink }, status }];
     });
   };
 
@@ -61,21 +79,8 @@ describe('Csv Button Export', () => {
       const downloadAnchor = document.createElement('a');
       const statusLink = '/poll/until/complete';
       const downloadLink = '/link/to/download';
-      let spy;
 
-      mock
-        .onPost(vulnerabilitiesExportEndpoint)
-        .reply(statusCodes.ACCEPTED, { _links: { self: statusLink } });
-      mock.onGet(statusLink).reply(() => {
-        // We need to mock it at this stage because vue internally uses
-        // document.createElement to mount the elements.
-        spy = jest.spyOn(document, 'createElement').mockImplementationOnce(() => {
-          downloadAnchor.click = jest.fn();
-          return downloadAnchor;
-        });
-
-        return [statusCodes.OK, { _links: { download: downloadLink } }];
-      });
+      setupMocksAndSpy(statusLink, downloadLink, downloadAnchor);
 
       findCsvExportButton().vm.$emit('click');
 
@@ -86,6 +91,22 @@ describe('Csv Button Export', () => {
           `csv-export-2020-04-12-10T14_32_35.csv`,
         );
         expect(downloadAnchor.click).toHaveBeenCalled();
+      });
+    });
+
+    it(`shows the flash error when the export job status is 'failed'`, () => {
+      setupMocksAndSpy(
+        '/poll/until/complete',
+        '/link/to/download',
+        document.createElement('a'),
+        'failed',
+      );
+
+      findCsvExportButton().vm.$emit('click');
+
+      return axios.waitForAll().then(() => {
+        expect(spy).not.toHaveBeenCalled();
+        expect(createFlash).toHaveBeenCalledWith('There was an error while generating the report.');
       });
     });
 
