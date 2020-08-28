@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Groups::Analytics::RepositoryAnalyticsController do
   let_it_be(:current_user) { create(:user) }
-  let_it_be(:group) { create :group }
+  let_it_be(:group) { create(:group) }
   let_it_be(:feature_flag_name) { Gitlab::Analytics::GROUP_COVERAGE_REPORTS_FEATURE_FLAG }
   let_it_be(:feature_name) { :group_repository_analytics }
 
@@ -22,7 +22,7 @@ RSpec.describe Groups::Analytics::RepositoryAnalyticsController do
       group.add_guest(current_user)
     end
 
-    it { is_expected.to be_successful }
+    specify { is_expected.to have_gitlab_http_status(:success) }
 
     context 'when license is missing' do
       before do
