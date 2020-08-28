@@ -190,6 +190,8 @@ FactoryBot.define do
         output = Tempfile.new("gl-sast-missing-identifiers")
         output.write(data)
         artifact.file = fixture_file_upload(output.path, 'application/json')
+        output.close
+        output.unlink
       end
     end
 
