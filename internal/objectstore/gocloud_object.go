@@ -7,6 +7,7 @@ import (
 
 	"gitlab.com/gitlab-org/labkit/log"
 	"gocloud.dev/blob"
+	"gocloud.dev/gcerrors"
 )
 
 type GoCloudObject struct {
@@ -95,6 +96,8 @@ func (o *GoCloudObject) Delete() {
 	}
 
 	if err := bucket.Delete(deleteCtx, o.objectName); err != nil {
-		log.WithError(err).Error("error deleting object", err)
+		if gcerrors.Code(err) != gcerrors.NotFound {
+			log.WithError(err).Error("error deleting object")
+		}
 	}
 }
