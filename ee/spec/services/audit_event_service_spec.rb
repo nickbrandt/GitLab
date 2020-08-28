@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 RSpec.describe AuditEventService do
-  let(:project) { create(:project) }
-  let(:user) { create(:user, current_sign_in_ip: '192.168.68.104') }
-  let(:project_member) { create(:project_member, user: user, expires_at: 1.day.from_now) }
+  let(:project) { build_stubbed(:project) }
+  let_it_be(:user) { create(:user, current_sign_in_ip: '192.168.68.104') }
+  let_it_be(:project_member) { create(:project_member, user: user, expires_at: 1.day.from_now) }
   let(:request_ip_address) { '127.0.0.1' }
 
   let(:details) { { action: :destroy, ip_address: request_ip_address } }
@@ -13,23 +13,24 @@ RSpec.describe AuditEventService do
 
   describe '#for_member' do
     let(:event) { service.for_member(project_member).security_event }
+    let(:event_details) { event[:details] }
 
     it 'generates event' do
-      expect(event[:details][:target_details]).to eq(user.name)
+      expect(event_details[:target_details]).to eq(user.name)
     end
 
     it 'handles deleted users' do
       expect(project_member).to receive(:user).and_return(nil)
-      expect(event[:details][:target_details]).to eq('Deleted User')
+      expect(event_details[:target_details]).to eq('Deleted User')
     end
 
     context 'user access expiry' do
       let(:service) { described_class.new(nil, project, { action: :expired }) }
 
       it 'generates a system event' do
-        expect(event[:details][:remove]).to eq('user_access')
-        expect(event[:details][:system_event]).to be_truthy
-        expect(event[:details][:reason]).to include('access expired on')
+        expect(event_details[:remove]).to eq('user_access')
+        expect(event_details[:system_event]).to be_truthy
+        expect(event_details[:reason]).to include('access expired on')
       end
     end
 
@@ -37,13 +38,13 @@ RSpec.describe AuditEventService do
       let(:details) { { action: :create } }
 
       it 'stores author name', :aggregate_failures do
-        expect(event.details[:author_name]).to eq(user.name)
+        expect(event_details[:author_name]).to eq(user.name)
         expect(event.author_name).to eq(user.name)
       end
     end
 
     it 'generates a system event' do
-      expect(event[:details][:target_type]).to eq('User')
+      expect(event_details[:target_type]).to eq('User')
       expect(event.target_type).to eq('User')
     end
 
@@ -470,7 +471,7 @@ RSpec.describe AuditEventService do
       end
 
       it 'logs an audit event' do
-        expect { event }.to change(AuditEvent, :count).by(1)
+        expect { event }.to change { AuditEvent.count }.by(1)
       end
 
       it 'does not have the entity_path' do
