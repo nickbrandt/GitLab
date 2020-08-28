@@ -1020,6 +1020,32 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     end
   end
 
+  describe '.search_unique_visits_data' do
+    subject { described_class.search_unique_visits_data }
+
+    before do
+      described_class.clear_memoization(:unique_visit_service)
+      events = ::Gitlab::UsageDataCounters::HLLRedisCounter.events_for_category('search')
+      events.each do |event|
+        allow(::Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:unique_events).with(event_names: event, start_date: 7.days.ago.to_date, end_date: Date.current).and_return(123)
+      end
+      allow(::Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:unique_events).with(event_names: events, start_date: 7.days.ago.to_date, end_date: Date.current).and_return(543)
+      allow(::Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:unique_events).with(event_names: events, start_date: 4.weeks.ago.to_date, end_date: Date.current).and_return(987)
+    end
+
+    it 'returns the number of unique visits to pages with search features' do
+      expect(subject).to eq({
+        search_unique_visits: {
+          'i_search_total' => 123,
+          'i_search_advanced' => 123,
+          'i_search_paid' => 123,
+          'search_unique_visits_for_any_target_weekly' => 543,
+          'search_unique_visits_for_any_target_monthly' => 987
+        }
+      })
+    end
+  end
+
   describe '.service_desk_counts' do
     subject { described_class.send(:service_desk_counts) }
 
