@@ -157,7 +157,7 @@ describe('Board List Header Component', () => {
       it('when collapsed, it displays info icon', () => {
         createComponent({ isSwimlanesHeader: true, collapsed: true });
 
-        expect(wrapper.contains('.board-header-collapsed-info-icon')).toBe(true);
+        expect(wrapper.find('.board-header-collapsed-info-icon').exists()).toBe(true);
       });
     });
   });

@@ -130,8 +130,16 @@ describe('GroupsDropdownFilter component', () => {
       selectDropdownAtIndex(1);
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(findDropdownButton().contains('img.gl-avatar')).toBe(false);
-        expect(findDropdownButton().contains('.gl-avatar-identicon')).toBe(true);
+        expect(
+          findDropdownButton()
+            .find('img.gl-avatar')
+            .exists(),
+        ).toBe(false);
+        expect(
+          findDropdownButton()
+            .find('.gl-avatar-identicon')
+            .exists(),
+        ).toBe(true);
       });
     });
   });

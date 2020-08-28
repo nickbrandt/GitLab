@@ -146,7 +146,7 @@ describe('Cycle Analytics component', () => {
   };
 
   const displaysMetrics = flag => {
-    expect(wrapper.contains(Metrics)).toBe(flag);
+    expect(wrapper.find(Metrics).exists()).toBe(flag);
   };
 
   const displaysStageTable = flag => {

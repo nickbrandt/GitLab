@@ -75,7 +75,7 @@ describe('DependenciesTable component', () => {
     });
 
     it('renders the loading skeleton', () => {
-      expect(wrapper.contains(GlSkeletonLoading)).toBe(true);
+      expect(wrapper.find(GlSkeletonLoading).exists()).toBe(true);
     });
 
     it('does not render any dependencies', () => {

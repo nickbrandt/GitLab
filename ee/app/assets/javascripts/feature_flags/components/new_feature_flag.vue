@@ -1,6 +1,7 @@
 <script>
 import { createNamespacedHelpers } from 'vuex';
 import { GlAlert } from '@gitlab/ui';
+import axios from '~/lib/utils/axios_utils';
 import store from '../store/index';
 import FeatureFlagForm from './form.vue';
 import {
@@ -39,10 +40,24 @@ export default {
       type: String,
       required: true,
     },
+    showUserCallout: {
+      type: Boolean,
+      required: true,
+    },
+    userCalloutId: {
+      default: '',
+      type: String,
+      required: false,
+    },
+    userCalloutsPath: {
+      default: '',
+      type: String,
+      required: false,
+    },
   },
   data() {
     return {
-      userDidDismissNewFlagAlert: false,
+      userShouldSeeNewFlagAlert: this.showUserCallout,
     };
   },
   translations: {
@@ -68,7 +83,7 @@ export default {
       return this.glFeatures.featureFlagsNewVersion;
     },
     shouldShowNewFlagAlert() {
-      return !(this.hasNewVersionFlags || this.userDidDismissNewFlagAlert);
+      return !this.hasNewVersionFlags && this.userShouldSeeNewFlagAlert;
     },
     strategies() {
       return [{ name: ROLLOUT_STRATEGY_ALL_USERS, parameters: {}, scopes: [] }];
@@ -80,6 +95,12 @@ export default {
   },
   methods: {
     ...mapActions(['createFeatureFlag', 'setEndpoint', 'setPath']),
+    dismissNewVersionFlagAlert() {
+      this.userShouldSeeNewFlagAlert = false;
+      axios.post(this.userCalloutsPath, {
+        feature_name: this.userCalloutId,
+      });
+    },
   },
 };
 </script>
@@ -89,7 +110,7 @@ export default {
       v-if="shouldShowNewFlagAlert"
       variant="warning"
       class="gl-my-5"
-      @dismiss="userDidDismissNewFlagAlert = true"
+      @dismiss="dismissNewVersionFlagAlert"
     >
       {{ $options.translations.newFlagAlert }}
     </gl-alert>

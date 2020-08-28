@@ -71,6 +71,11 @@ module EE
       group_reporter?(user, noteable.group)
     end
 
+    override :skip_notification?
+    def skip_notification?
+      for_vulnerability? || super
+    end
+
     private
 
     def system_note_for_epic?

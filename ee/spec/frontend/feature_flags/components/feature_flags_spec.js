@@ -270,7 +270,7 @@ describe('Feature flags', () => {
       });
 
       it('should display the user list table', () => {
-        expect(wrapper.contains(UserListsTable)).toBe(true);
+        expect(wrapper.find(UserListsTable).exists()).toBe(true);
       });
 
       it('should set the user lists to display', () => {

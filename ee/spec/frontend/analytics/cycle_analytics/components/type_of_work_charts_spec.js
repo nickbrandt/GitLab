@@ -1,7 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlLoadingIcon } from '@gitlab/ui';
-import tasksByTypeStore from 'ee/analytics/cycle_analytics/store/modules/type_of_work';
 import TypeOfWorkCharts from 'ee/analytics/cycle_analytics/components/type_of_work_charts.vue';
 import TasksByTypeChart from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_chart.vue';
 import TasksByTypeFilters from 'ee/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_filters.vue';
@@ -22,7 +21,7 @@ const fakeStore = ({ initialGetters, initialState }) =>
   new Vuex.Store({
     modules: {
       typeOfWork: {
-        ...tasksByTypeStore,
+        namespaced: true,
         getters: {
           tasksByTypeChartData: () => tasksByTypeData,
           selectedTasksByTypeFilters: () => taskByTypeFilters,
@@ -32,6 +31,7 @@ const fakeStore = ({ initialGetters, initialState }) =>
         state: {
           ...initialState,
         },
+        actions: actionSpies,
       },
     },
   });
@@ -41,7 +41,6 @@ describe('TypeOfWorkCharts', () => {
     return shallowMount(TypeOfWorkCharts, {
       localVue,
       store: fakeStore({ initialGetters, initialState }),
-      methods: actionSpies,
       stubs: {
         TasksByTypeChart: true,
         TasksByTypeFilters: true,
@@ -111,7 +110,11 @@ describe('TypeOfWorkCharts', () => {
     });
 
     it('calls the setTasksByTypeFilters method', () => {
-      expect(actionSpies.setTasksByTypeFilters).toHaveBeenCalledWith(payload);
+      expect(actionSpies.setTasksByTypeFilters).toHaveBeenCalledWith(
+        expect.any(Object),
+        payload,
+        undefined,
+      );
     });
   });
 

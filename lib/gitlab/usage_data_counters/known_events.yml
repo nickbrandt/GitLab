@@ -69,3 +69,30 @@
   category: analytics
   redis_slot: analytics
   aggregation: weekly
+- name: g_edit_by_web_ide
+  category: ide_edit
+  redis_slot: edit
+  expiry: 29
+  aggregation: daily
+- name: g_edit_by_sfe
+  category: ide_edit
+  redis_slot: edit
+  expiry: 29
+  aggregation: daily
+- name: g_edit_by_snippet_ide
+  category: ide_edit
+  redis_slot: edit
+  expiry: 29
+  aggregation: daily
+- name: i_search_total
+  category: search
+  redis_slot: search
+  aggregation: weekly
+- name: i_search_advanced
+  category: search
+  redis_slot: search
+  aggregation: weekly
+- name: i_search_paid
+  category: search
+  redis_slot: search
+  aggregation: weekly

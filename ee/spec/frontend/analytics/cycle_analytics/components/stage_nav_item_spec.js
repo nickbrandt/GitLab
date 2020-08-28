@@ -25,6 +25,10 @@ describe('StageNavItem', () => {
   const findStageTitle = () => wrapper.find({ ref: 'title' });
   const findStageMedian = () => wrapper.find({ ref: 'median' });
   const findDropdown = () => wrapper.find({ ref: 'dropdown' });
+  const setFakeTitleWidth = value =>
+    Object.defineProperty(wrapper.find({ ref: 'titleSpan' }).element, 'scrollWidth', {
+      value,
+    });
 
   afterEach(() => {
     wrapper.destroy();
@@ -79,12 +83,13 @@ describe('StageNavItem', () => {
           data() {
             return { isTitleOverflowing: true };
           },
-          methods: {
-            // making tbis a noop so it wont toggle 'isTitleOverflowing' on mount
-            checkIfTitleOverflows: () => {},
-          },
         },
       });
+
+      // JSDom does not calculate scrollWidth / offsetWidth so we fake it
+      setFakeTitleWidth(1000);
+      wrapper.vm.$forceUpdate();
+      return wrapper.vm.$nextTick();
     });
 
     it('renders the tooltip', () => {

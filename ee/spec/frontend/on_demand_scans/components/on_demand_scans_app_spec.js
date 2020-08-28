@@ -19,13 +19,13 @@ describe('OnDemandScansApp', () => {
   const findOnDemandScansForm = () => wrapper.find(OnDemandScansForm);
 
   const expectEmptyState = () => {
-    expect(wrapper.contains(OnDemandScansForm)).toBe(false);
-    expect(wrapper.contains(OnDemandScansEmptyState)).toBe(true);
+    expect(wrapper.find(OnDemandScansForm).exists()).toBe(false);
+    expect(wrapper.find(OnDemandScansEmptyState).exists()).toBe(true);
   };
 
   const expectForm = () => {
-    expect(wrapper.contains(OnDemandScansForm)).toBe(true);
-    expect(wrapper.contains(OnDemandScansEmptyState)).toBe(false);
+    expect(wrapper.find(OnDemandScansForm).exists()).toBe(true);
+    expect(wrapper.find(OnDemandScansEmptyState).exists()).toBe(false);
   };
 
   const createComponent = options => {

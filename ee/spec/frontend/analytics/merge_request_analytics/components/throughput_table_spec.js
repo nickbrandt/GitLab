@@ -40,7 +40,7 @@ describe('ThroughputTable', () => {
   };
 
   const displaysComponent = (component, visible) => {
-    expect(wrapper.contains(component)).toBe(visible);
+    expect(wrapper.find(component).exists()).toBe(visible);
   };
 
   const additionalData = data => {

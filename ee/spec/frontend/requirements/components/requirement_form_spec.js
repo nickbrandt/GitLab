@@ -165,7 +165,7 @@ describe('RequirementForm', () => {
 
   describe('template', () => {
     it('renders gl-drawer as component container element', () => {
-      expect(wrapper.contains(GlDrawer)).toBe(true);
+      expect(wrapper.find(GlDrawer).exists()).toBe(true);
     });
 
     it('renders element containing requirement reference when form is in edit mode', () => {
