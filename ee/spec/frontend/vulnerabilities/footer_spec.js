@@ -17,42 +17,23 @@ jest.mock('~/user_popovers');
 describe('Vulnerability Footer', () => {
   let wrapper;
 
-  const minimumProps = {
-    discussionsUrl: `/discussions`,
-    solutionInfo: {
-      hasDownload: false,
-      hasMr: false,
-      hasRemediation: false,
-      isStandaloneVulnerability: true,
-      remediation: null,
-      solution: undefined,
-      vulnerabilityFeedbackHelpPath:
-        '/help/user/application_security/index#interacting-with-the-vulnerabilities',
-    },
-    finding: {},
-    notesUrl: '/notes',
+  const vulnerability = {
+    id: 1,
+    discussions_url: '/discussions',
+    notes_url: '/notes',
     project: {
-      url: '/root/security-reports',
-      value: 'Administrator / Security Reports',
+      full_path: '/root/security-reports',
+      full_name: 'Administrator / Security Reports',
     },
-    vulnerabilityId: 1,
-    canModifyRelatedIssues: true,
-    relatedIssuesHelpPath: 'help/path',
+    can_modify_related_issues: true,
+    related_issues_help_path: 'help/path',
+    has_mr: false,
+    vulnerability_feedback_help_path: 'feedback/help/path',
   };
 
-  const solutionInfoProp = {
-    hasDownload: true,
-    hasMr: false,
-    isStandaloneVulnerability: true,
-    remediation: {},
-    solution: 'Upgrade to fixed version.\n',
-    vulnerabilityFeedbackHelpPath:
-      '/help/user/application_security/index#interacting-with-the-vulnerabilities',
-  };
-
-  const createWrapper = (props = minimumProps) => {
+  const createWrapper = (properties = {}) => {
     wrapper = shallowMount(VulnerabilityFooter, {
-      propsData: props,
+      propsData: { vulnerability: { ...vulnerability, ...properties } },
     });
   };
 
@@ -76,9 +57,18 @@ describe('Vulnerability Footer', () => {
 
   describe('solution card', () => {
     it('does show solution card when there is one', () => {
-      createWrapper({ ...minimumProps, solutionInfo: solutionInfoProp });
+      const properties = { remediations: [{ diff: [{}] }], solution: 'some solution' };
+
+      createWrapper(properties);
       expect(wrapper.find(SolutionCard).exists()).toBe(true);
-      expect(wrapper.find(SolutionCard).props()).toMatchObject(solutionInfoProp);
+      expect(wrapper.find(SolutionCard).props()).toEqual({
+        solution: properties.solution,
+        remediation: properties.remediations[0],
+        hasDownload: true,
+        hasMr: vulnerability.has_mr,
+        vulnerabilityFeedbackHelpPath: vulnerability.vulnerability_feedback_help_path,
+        isStandaloneVulnerability: true,
+      });
     });
 
     it('does not show solution card when there is not one', () => {
@@ -88,11 +78,11 @@ describe('Vulnerability Footer', () => {
   });
 
   describe('merge request note', () => {
-    // The object itself does not matter, we just want to make sure it's passed to the issue note.
+    // The object itself does not matter, we just want to make sure it's passed to the merge request note.
     const mergeRequestFeedback = {};
 
     it('shows merge request note when a merge request exists for the vulnerability', () => {
-      createWrapper({ ...minimumProps, mergeRequestFeedback });
+      createWrapper({ merge_request_feedback: mergeRequestFeedback });
       expect(wrapper.find(MergeRequestNote).exists()).toBe(true);
       expect(wrapper.find(MergeRequestNote).props('feedback')).toMatchObject(mergeRequestFeedback);
     });
@@ -104,53 +94,52 @@ describe('Vulnerability Footer', () => {
   });
 
   describe('state history', () => {
-    const discussionUrl = '/discussions';
-
     const historyList = () => wrapper.find({ ref: 'historyList' });
     const historyEntries = () => wrapper.findAll(HistoryEntry);
 
     it('does not render the history list if there are no history items', () => {
-      mockAxios.onGet(discussionUrl).replyOnce(200, []);
+      mockAxios.onGet(vulnerability.discussions_url).replyOnce(200, []);
       createWrapper();
       expect(historyList().exists()).toBe(false);
     });
 
-    it('renders the history list if there are history items', () => {
+    it('renders the history list if there are history items', async () => {
       // The shape of this object doesn't matter for this test, we just need to verify that it's passed to the history
       // entry.
       const historyItems = [{ id: 1, note: 'some note' }, { id: 2, note: 'another note' }];
-      mockAxios.onGet(discussionUrl).replyOnce(200, historyItems, { date: Date.now() });
+      mockAxios
+        .onGet(vulnerability.discussions_url)
+        .replyOnce(200, historyItems, { date: Date.now() });
       createWrapper();
+      await axios.waitForAll();
 
-      return axios.waitForAll().then(() => {
-        expect(historyList().exists()).toBe(true);
-        expect(historyEntries()).toHaveLength(2);
-        const entry1 = historyEntries().at(0);
-        const entry2 = historyEntries().at(1);
-        expect(entry1.props('discussion')).toEqual(historyItems[0]);
-        expect(entry2.props('discussion')).toEqual(historyItems[1]);
-      });
+      expect(historyList().exists()).toBe(true);
+      expect(historyEntries()).toHaveLength(2);
+      const entry1 = historyEntries().at(0);
+      const entry2 = historyEntries().at(1);
+      expect(entry1.props('discussion')).toEqual(historyItems[0]);
+      expect(entry2.props('discussion')).toEqual(historyItems[1]);
     });
 
-    it('calls initUserPopovers when a new history item is retrieved', () => {
+    it('calls initUserPopovers when a new history item is retrieved', async () => {
       const historyItems = [{ id: 1, note: 'some note' }];
-      mockAxios.onGet(discussionUrl).replyOnce(200, historyItems, { date: Date.now() });
+      mockAxios
+        .onGet(vulnerability.discussions_url)
+        .replyOnce(200, historyItems, { date: Date.now() });
 
       expect(initUserPopovers).not.toHaveBeenCalled();
       createWrapper();
+      await axios.waitForAll();
 
-      return axios.waitForAll().then(() => {
-        expect(initUserPopovers).toHaveBeenCalled();
-      });
+      expect(initUserPopovers).toHaveBeenCalled();
     });
 
-    it('shows an error the history list could not be retrieved', () => {
-      mockAxios.onGet(discussionUrl).replyOnce(500);
+    it('shows an error the history list could not be retrieved', async () => {
+      mockAxios.onGet(vulnerability.discussions_url).replyOnce(500);
       createWrapper();
+      await axios.waitForAll();
 
-      return axios.waitForAll().then(() => {
-        expect(createFlash).toHaveBeenCalledTimes(1);
-      });
+      expect(createFlash).toHaveBeenCalledTimes(1);
     });
 
     describe('new notes polling', () => {
@@ -159,12 +148,12 @@ describe('Vulnerability Footer', () => {
       const getDiscussion = (entries, index) => entries.at(index).props('discussion');
       const createNotesRequest = (...notes) =>
         mockAxios
-          .onGet(minimumProps.notesUrl)
+          .onGet(vulnerability.notes_url)
           .replyOnce(200, { notes, last_fetched_at: Date.now() });
 
       // Following #217184 the vulnerability polling uses an initial timeout
       // which we need to run and then wait for the subsequent request.
-      const startTimeoutsAndAwaitRequests = async () => {
+      const startTimeoutsAndAwaitRequests = () => {
         expect(setTimeout).toHaveBeenCalledTimes(1);
         jest.runAllTimers();
 
@@ -176,75 +165,68 @@ describe('Vulnerability Footer', () => {
           { id: 1, notes: [{ id: 100, note: 'some note', discussion_id: 1 }] },
           { id: 2, notes: [{ id: 200, note: 'another note', discussion_id: 2 }] },
         ];
-        mockAxios.onGet(discussionUrl).replyOnce(200, historyItems, { date: Date.now() });
+        mockAxios
+          .onGet(vulnerability.discussions_url)
+          .replyOnce(200, historyItems, { date: Date.now() });
         createWrapper();
       });
 
-      it('updates an existing note if it already exists', () => {
+      it('updates an existing note if it already exists', async () => {
         const note = { id: 100, note: 'updated note', discussion_id: 1 };
         createNotesRequest(note);
+        await axios.waitForAll();
+        await startTimeoutsAndAwaitRequests();
 
-        return axios.waitForAll().then(async () => {
-          await startTimeoutsAndAwaitRequests();
-
-          const entries = historyEntries();
-          expect(entries).toHaveLength(2);
-          const discussion = getDiscussion(entries, 0);
-          expect(discussion.notes.length).toBe(1);
-          expect(discussion.notes[0].note).toBe('updated note');
-        });
+        const entries = historyEntries();
+        expect(entries).toHaveLength(2);
+        const discussion = getDiscussion(entries, 0);
+        expect(discussion.notes.length).toBe(1);
+        expect(discussion.notes[0].note).toBe('updated note');
       });
 
-      it('adds a new note to an existing discussion if the note does not exist', () => {
+      it('adds a new note to an existing discussion if the note does not exist', async () => {
         const note = { id: 101, note: 'new note', discussion_id: 1 };
         createNotesRequest(note);
+        await axios.waitForAll();
+        await startTimeoutsAndAwaitRequests();
 
-        return axios.waitForAll().then(async () => {
-          await startTimeoutsAndAwaitRequests();
-
-          const entries = historyEntries();
-          expect(entries).toHaveLength(2);
-          const discussion = getDiscussion(entries, 0);
-          expect(discussion.notes.length).toBe(2);
-          expect(discussion.notes[1].note).toBe('new note');
-        });
+        const entries = historyEntries();
+        expect(entries).toHaveLength(2);
+        const discussion = getDiscussion(entries, 0);
+        expect(discussion.notes.length).toBe(2);
+        expect(discussion.notes[1].note).toBe('new note');
       });
 
-      it('creates a new discussion with a new note if the discussion does not exist', () => {
+      it('creates a new discussion with a new note if the discussion does not exist', async () => {
         const note = { id: 300, note: 'new note on a new discussion', discussion_id: 3 };
         createNotesRequest(note);
+        await axios.waitForAll();
+        await startTimeoutsAndAwaitRequests();
 
-        return axios.waitForAll().then(async () => {
-          await startTimeoutsAndAwaitRequests();
-
-          const entries = historyEntries();
-          expect(entries).toHaveLength(3);
-          const discussion = getDiscussion(entries, 2);
-          expect(discussion.notes.length).toBe(1);
-          expect(discussion.notes[0].note).toBe('new note on a new discussion');
-        });
+        const entries = historyEntries();
+        expect(entries).toHaveLength(3);
+        const discussion = getDiscussion(entries, 2);
+        expect(discussion.notes.length).toBe(1);
+        expect(discussion.notes[0].note).toBe('new note on a new discussion');
       });
 
-      it('calls initUserPopovers when a new note is retrieved', () => {
+      it('calls initUserPopovers when a new note is retrieved', async () => {
         expect(initUserPopovers).not.toHaveBeenCalled();
         const note = { id: 300, note: 'new note on a new discussion', discussion_id: 3 };
         createNotesRequest(note);
+        await axios.waitForAll();
 
-        return axios.waitForAll().then(() => {
-          expect(initUserPopovers).toHaveBeenCalled();
-        });
+        expect(initUserPopovers).toHaveBeenCalled();
       });
 
-      it('shows an error if the notes poll fails', () => {
-        mockAxios.onGet(minimumProps.notesUrl).replyOnce(500);
+      it('shows an error if the notes poll fails', async () => {
+        mockAxios.onGet(vulnerability.notes_url).replyOnce(500);
+        await axios.waitForAll();
+        await startTimeoutsAndAwaitRequests();
 
-        return axios.waitForAll().then(async () => {
-          await startTimeoutsAndAwaitRequests();
-
-          expect(historyEntries()).toHaveLength(2);
-          expect(mockAxios.history.get).toHaveLength(2);
-          expect(createFlash).toHaveBeenCalled();
-        });
+        expect(historyEntries()).toHaveLength(2);
+        expect(mockAxios.history.get).toHaveLength(2);
+        expect(createFlash).toHaveBeenCalled();
       });
 
       it('emits the vulnerability-state-change event when the system note is new', async () => {
@@ -253,9 +235,7 @@ describe('Vulnerability Footer', () => {
 
         const note = { system: true, id: 1, discussion_id: 3 };
         createNotesRequest(note);
-
         await axios.waitForAll();
-
         await startTimeoutsAndAwaitRequests();
 
         expect(handler).toHaveBeenCalledTimes(1);
@@ -269,16 +249,16 @@ describe('Vulnerability Footer', () => {
     it('has the correct props', () => {
       const endpoint = Api.buildUrl(Api.vulnerabilityIssueLinksPath).replace(
         ':id',
-        minimumProps.vulnerabilityId,
+        vulnerability.id,
       );
       createWrapper();
 
       expect(relatedIssues().exists()).toBe(true);
       expect(relatedIssues().props()).toMatchObject({
         endpoint,
-        canModifyRelatedIssues: minimumProps.canModifyRelatedIssues,
-        projectPath: minimumProps.project.url,
-        helpPath: minimumProps.relatedIssuesHelpPath,
+        canModifyRelatedIssues: vulnerability.can_modify_related_issues,
+        projectPath: vulnerability.project.full_path,
+        helpPath: vulnerability.related_issues_help_path,
       });
     });
   });

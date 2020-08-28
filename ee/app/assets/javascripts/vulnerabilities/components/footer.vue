@@ -3,6 +3,7 @@ import Visibility from 'visibilityjs';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import Api from 'ee/api';
+import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 import axios from '~/lib/utils/axios_utils';
 import Poll from '~/lib/utils/poll';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
@@ -15,37 +16,8 @@ export default {
   name: 'VulnerabilityFooter',
   components: { SolutionCard, MergeRequestNote, HistoryEntry, RelatedIssues },
   props: {
-    discussionsUrl: {
-      type: String,
-      required: true,
-    },
-    notesUrl: {
-      type: String,
-      required: true,
-    },
-    project: {
+    vulnerability: {
       type: Object,
-      required: true,
-    },
-    solutionInfo: {
-      type: Object,
-      required: true,
-    },
-    mergeRequestFeedback: {
-      type: Object,
-      required: false,
-      default: () => null,
-    },
-    vulnerabilityId: {
-      type: Number,
-      required: true,
-    },
-    canModifyRelatedIssues: {
-      type: Boolean,
-      required: true,
-    },
-    relatedIssuesHelpPath: {
-      type: String,
       required: true,
     },
   },
@@ -71,7 +43,36 @@ export default {
       return Boolean(this.solutionInfo.solution || this.solutionInfo.remediation);
     },
     issueLinksEndpoint() {
-      return Api.buildUrl(Api.vulnerabilityIssueLinksPath).replace(':id', this.vulnerabilityId);
+      return Api.buildUrl(Api.vulnerabilityIssueLinksPath).replace(':id', this.vulnerability.id);
+    },
+    project() {
+      return {
+        url: this.vulnerability.project.full_path,
+        value: this.vulnerability.project.full_name,
+      };
+    },
+    solutionInfo() {
+      const {
+        solution,
+        remediations,
+        state,
+        has_mr: hasMr,
+        vulnerability_feedback_help_path: vulnerabilityFeedbackHelpPath,
+      } = this.vulnerability;
+
+      const remediation = remediations?.[0];
+      const hasDownload = Boolean(
+        state !== VULNERABILITY_STATE_OBJECTS.resolved.state && remediation?.diff?.length && !hasMr,
+      );
+
+      return {
+        solution,
+        remediation,
+        hasDownload,
+        hasMr,
+        vulnerabilityFeedbackHelpPath,
+        isStandaloneVulnerability: true,
+      };
     },
   },
 
@@ -95,7 +96,7 @@ export default {
     },
     fetchDiscussions() {
       axios
-        .get(this.discussionsUrl)
+        .get(this.vulnerability.discussions_url)
         .then(({ data, headers: { date } }) => {
           this.discussionsDictionary = data.reduce((acc, discussion) => {
             acc[discussion.id] = discussion;
@@ -131,7 +132,9 @@ export default {
       this.poll = new Poll({
         resource: {
           fetchNotes: () =>
-            axios.get(this.notesUrl, { headers: { 'X-Last-Fetched-At': this.lastFetchedAt } }),
+            axios.get(this.vulnerability.notes_url, {
+              headers: { 'X-Last-Fetched-At': this.lastFetchedAt },
+            }),
         },
         method: 'fetchNotes',
         successCallback: ({ data: { notes, last_fetched_at: lastFetchedAt } }) => {
@@ -188,15 +191,19 @@ export default {
   <div data-qa-selector="vulnerability_footer">
     <solution-card v-if="hasSolution" v-bind="solutionInfo" />
 
-    <div v-if="mergeRequestFeedback" class="card gl-mt-5">
-      <merge-request-note :feedback="mergeRequestFeedback" :project="project" class="card-body" />
+    <div v-if="vulnerability.merge_request_feedback" class="card gl-mt-5">
+      <merge-request-note
+        :feedback="vulnerability.merge_request_feedback"
+        :project="project"
+        class="card-body"
+      />
     </div>
 
     <related-issues
       :endpoint="issueLinksEndpoint"
-      :can-modify-related-issues="canModifyRelatedIssues"
+      :can-modify-related-issues="vulnerability.can_modify_related_issues"
       :project-path="project.url"
-      :help-path="relatedIssuesHelpPath"
+      :help-path="vulnerability.related_issues_help_path"
     />
 
     <hr />
@@ -206,7 +213,7 @@ export default {
         v-for="discussion in discussions"
         :key="discussion.id"
         :discussion="discussion"
-        :notes-url="notesUrl"
+        :notes-url="vulnerability.notes_url"
       />
     </ul>
   </div>
