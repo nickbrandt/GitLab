@@ -38,6 +38,7 @@ module Gitlab
             .merge(usage_activity_by_stage(:usage_activity_by_stage_monthly, last_28_days_time_period))
             .merge(analytics_unique_visits_data)
             .merge(compliance_unique_visits_data)
+            .merge(search_unique_visits_data)
         end
       end
 
@@ -606,6 +607,18 @@ module Gitlab
         results['compliance_unique_visits_for_any_target_monthly'] = redis_usage_data { unique_visit_service.unique_visits_for(targets: :compliance, start_date: 4.weeks.ago.to_date, end_date: Date.current) }
 
         { compliance_unique_visits: results }
+      end
+
+      def search_unique_visits_data
+        events = ::Gitlab::UsageDataCounters::HLLRedisCounter.events_for_category('search')
+        results = events.each_with_object({}) do |event, hash|
+          hash[event] = redis_usage_data { ::Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names: event, start_date: 7.days.ago.to_date, end_date: Date.current) }
+        end
+
+        results['search_unique_visits_for_any_target_weekly'] = redis_usage_data { ::Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names: events, start_date: 7.days.ago.to_date, end_date: Date.current) }
+        results['search_unique_visits_for_any_target_monthly'] = redis_usage_data { ::Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names: events, start_date: 4.weeks.ago.to_date, end_date: Date.current) }
+
+        { search_unique_visits: results }
       end
 
       def action_monthly_active_users(time_period)
