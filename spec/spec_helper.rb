@@ -66,7 +66,7 @@ RSpec.configure do |config|
   config.display_try_failure_messages = true
 
   config.infer_spec_type_from_file_location!
-  config.full_backtrace = !!ENV['CI']
+  # config.full_backtrace = true
 
   unless ENV['CI']
     # Re-run failures locally with `--only-failures`
