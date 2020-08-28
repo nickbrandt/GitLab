@@ -12,20 +12,25 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
   let(:daily_event) { 'g_analytics_search' }
   let(:analytics_slot_event) { 'g_analytics_contribution' }
   let(:compliance_slot_event) { 'g_compliance_dashboard' }
-  let(:category_analytics) { 'g_analytics_search' }
-  let(:category_productivity) { 'g_analytics_productivity' }
+  let(:category_analytics_event) { 'g_analytics_search' }
+  let(:category_productivity_event) { 'g_analytics_productivity' }
   let(:no_slot) { 'no_slot' }
   let(:different_aggregation) { 'different_aggregation' }
   let(:custom_daily_event) { 'g_analytics_custom' }
 
+  let(:global_category) { 'global' }
+  let(:compliance_category) {'compliance' }
+  let(:productivity_category) {'productivity' }
+  let(:analytics_category) { 'analytics' }
+
   let(:known_events) do
     [
-      { name: weekly_event, redis_slot: "analytics", category: "analytics", expiry: 84, aggregation: "weekly" },
-      { name: daily_event, redis_slot: "analytics", category: "analytics", expiry: 84, aggregation: "daily" },
-      { name: category_productivity, redis_slot: "analytics", category: "productivity", aggregation: "weekly" },
-      { name: compliance_slot_event, redis_slot: "compliance", category: "compliance", aggregation: "weekly" },
-      { name: no_slot, category: "global", aggregation: "daily" },
-      { name: different_aggregation, category: "global", aggregation: "monthly" }
+      { name: weekly_event, redis_slot: "analytics", category: analytics_category, expiry: 84, aggregation: "weekly" },
+      { name: daily_event, redis_slot: "analytics", category: analytics_category, expiry: 84, aggregation: "daily" },
+      { name: category_productivity_event, redis_slot: "analytics", category: productivity_category, aggregation: "weekly" },
+      { name: compliance_slot_event, redis_slot: "compliance", category: compliance_category, aggregation: "weekly" },
+      { name: no_slot, category: global_category, aggregation: "daily" },
+      { name: different_aggregation, category: global_category, aggregation: "monthly" }
     ].map(&:with_indifferent_access)
   end
 
@@ -154,7 +159,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     it 'raise error if metrics are not in the same category' do
-      expect { described_class.unique_events(event_names: [category_analytics, category_productivity], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same category')
+      expect { described_class.unique_events(event_names: [category_analytics_event, category_productivity_event], start_date: 4.weeks.ago, end_date: Date.current) }.to raise_error('Events should be in same category')
     end
 
     it "raise error if metrics don't have same aggregation" do
@@ -181,6 +186,46 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
 
     context 'when no slot is set' do
       it { expect(described_class.unique_events(event_names: no_slot, start_date: 7.days.ago, end_date: Date.current)).to eq(1) }
+    end
+  end
+
+  describe '.categories' do
+    it 'gets all unique category names' do
+      expect(described_class.categories).to contain_exactly(global_category, analytics_category, productivity_category, compliance_category)
+    end
+  end
+
+  describe 'unique_events_data' do
+    let(:categories) { described_class.categories }
+
+    before do
+      categories.each do |category|
+        events = described_class.events_for_category(category)
+
+        events.each do |event|
+          allow(described_class).to receive(:unique_events).with(event_names: event, start_date: 7.days.ago.to_date, end_date: Date.current).and_return(123)
+        end
+
+        allow(described_class).to receive(:unique_events).with(event_names: events, start_date: 7.days.ago.to_date, end_date: Date.current).and_return(543)
+        allow(described_class).to receive(:unique_events).with(event_names: events, start_date: 4.weeks.ago.to_date, end_date: Date.current).and_return(987)
+      end
+    end
+
+    it 'returns the number of unique events' do
+      results = categories.each_with_object({}) do |category, category_results|
+        events = described_class.events_for_category(category)
+
+        event_results = events.each_with_object({}) do |event, hash|
+          hash[event] = 123
+        end
+
+        event_results["#{category}_total_unique_counts_for_week"] = 543
+        event_results["#{category}_total_unique_counts_for_month"] = 987
+
+        category_results["#{category}"] = event_results
+      end
+
+      expect(subject.unique_events_data).to eq(results)
     end
   end
 end

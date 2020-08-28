@@ -1140,6 +1140,24 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     end
   end
 
+  describe 'redis_hll_counters' do
+    subject { described_class.redis_hll_counters }
+
+    let(:categories) { ::Gitlab::UsageDataCounters::HLLRedisCounter.categories }
+
+    it 'has all know_events' do
+      expect(subject).to have_key(:redis_hll_counters)
+
+      expect(subject[:redis_hll_counters].keys).to match_array(categories)
+
+      categories.each do |category|
+        keys = ::Gitlab::UsageDataCounters::HLLRedisCounter.events_for_category(category) + ["#{category}_total_unique_counts_for_week", "#{category}_total_unique_counts_for_month"]
+
+        expect(subject[:redis_hll_counters][category].keys).to match_array(keys)
+      end
+    end
+  end
+
   describe '.service_desk_counts' do
     subject { described_class.send(:service_desk_counts) }
 

@@ -3,6 +3,8 @@
 module Gitlab
   module UsageDataCounters
     module HLLRedisCounter
+      include Gitlab::Utils::UsageData
+
       DEFAULT_WEEKLY_KEY_EXPIRY_LENGTH = 6.weeks
       DEFAULT_DAILY_KEY_EXPIRY_LENGTH = 29.days
       DEFAULT_REDIS_SLOT = ''.freeze
@@ -53,10 +55,29 @@ module Gitlab
           Gitlab::Redis::HLL.count(keys: keys)
         end
 
+        def categories
+          known_events.map { |event| event[:category] }.uniq
+        end
+
         # @param category [String] the category name
         # @return [Array<String>] list of event names for given category
         def events_for_category(category)
           known_events.select { |event| event[:category] == category.to_s }.map { |event| event[:name] }
+        end
+
+        def unique_events_data
+          categories.each_with_object({}) do |category, category_results|
+            events = events_for_category(category)
+
+            event_results = events.each_with_object({}) do |event, hash|
+              hash[event] = unique_events(event_names: event, start_date: 7.days.ago.to_date, end_date: Date.current)
+            end
+
+            event_results["#{category}_total_unique_counts_for_week"] = unique_events(event_names: events, start_date: 7.days.ago.to_date, end_date: Date.current)
+            event_results["#{category}_total_unique_counts_for_month"] = unique_events(event_names: events, start_date: 4.weeks.ago.to_date, end_date: Date.current)
+
+            category_results["#{category}"] = event_results
+          end
         end
 
         private
