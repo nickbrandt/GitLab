@@ -25,9 +25,12 @@ describe('ValueStreamSelect', () => {
         selectedValueStream: {},
         ...initialState,
       },
+      actions: {
+        createValueStream: createValueStreamMock,
+      },
     });
 
-  const createComponent = ({ data = {}, initialState = {}, methods = {} } = {}) =>
+  const createComponent = ({ data = {}, initialState = {} } = {}) =>
     shallowMount(ValueStreamSelect, {
       localVue,
       store: fakeStore({ initialState }),
@@ -35,10 +38,6 @@ describe('ValueStreamSelect', () => {
         return {
           ...data,
         };
-      },
-      methods: {
-        createValueStream: createValueStreamMock,
-        ...methods,
       },
       mocks: {
         $toast: {
@@ -163,7 +162,11 @@ describe('ValueStreamSelect', () => {
         });
 
         it('calls the "createValueStream" event when submitted', () => {
-          expect(createValueStreamMock).toHaveBeenCalledWith({ name: streamName });
+          expect(createValueStreamMock).toHaveBeenCalledWith(
+            expect.any(Object),
+            { name: streamName },
+            undefined,
+          );
         });
 
         it('clears the name field', () => {
