@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"io"
+	"io/ioutil"
 	"os"
 	"runtime"
 	"testing"
@@ -19,12 +21,12 @@ func BenchmarkGenerate(b *testing.B) {
 			file, err := os.Open(filePath)
 			require.NoError(b, err)
 
-			p, err := NewParser(file, Config{})
+			parser, err := NewParser(file, Config{})
 			require.NoError(b, err)
 
-			_, err = p.ZipReader()
+			_, err = io.Copy(ioutil.Discard, parser)
 			require.NoError(b, err)
-			require.NoError(b, p.Close())
+			require.NoError(b, parser.Close())
 		})
 	}
 

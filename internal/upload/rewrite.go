@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -124,7 +125,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 
 	opts.TempFilePrefix = filename
 
-	var inputReader io.Reader
+	var inputReader io.ReadCloser
 	var err error
 	switch {
 	case exif.IsExifFile(filename):
@@ -138,8 +139,10 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 			return err
 		}
 	default:
-		inputReader = p
+		inputReader = ioutil.NopCloser(p)
 	}
+
+	defer inputReader.Close()
 
 	fh, err := filestore.SaveFileFromReader(ctx, inputReader, -1, opts)
 	if err != nil {
@@ -166,36 +169,25 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 	return rew.filter.ProcessFile(ctx, name, fh, rew.writer)
 }
 
-func handleExifUpload(ctx context.Context, r io.Reader, filename string) (io.Reader, error) {
+func handleExifUpload(ctx context.Context, r io.Reader, filename string) (io.ReadCloser, error) {
 	log.WithContextFields(ctx, log.Fields{
 		"filename": filename,
 	}).Print("running exiftool to remove any metadata")
 
-	return exif.NewCleaner(ctx, r)
+	r, err := exif.NewCleaner(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+
+	return ioutil.NopCloser(r), nil
 }
 
-func handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string, preauth *api.Response) (io.Reader, error) {
+func handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string, preauth *api.Response) (io.ReadCloser, error) {
 	parserConfig := parser.Config{
 		TempPath: tempPath,
 	}
 
-	p, err := parser.NewParser(reader, parserConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	z, err := p.ZipReader()
-	if err != nil {
-		return nil, err
-	}
-
-	if err := p.Close(); err != nil {
-		log.WithContextFields(ctx, log.Fields{
-			"filename": filename,
-		}).Print("failed to close lsif parser: " + err.Error())
-	}
-
-	return z, nil
+	return parser.NewParser(reader, parserConfig)
 }
 
 func (rew *rewriter) copyPart(ctx context.Context, name string, p *multipart.Part) error {

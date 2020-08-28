@@ -38,24 +38,21 @@ func verifyCorrectnessOf(t *testing.T, tmpDir, fileName string) {
 }
 
 func createFiles(t *testing.T, filePath, tmpDir string) {
+	t.Helper()
 	file, err := os.Open(filePath)
 	require.NoError(t, err)
 
-	p, err := NewParser(file, Config{})
+	parser, err := NewParser(file, Config{})
 	require.NoError(t, err)
-
-	r, err := p.ZipReader()
-	require.NoError(t, err)
-
-	require.NoError(t, p.Close())
 
 	zipFileName := tmpDir + ".zip"
 	w, err := os.Create(zipFileName)
 	require.NoError(t, err)
 	defer os.RemoveAll(zipFileName)
 
-	_, err = io.Copy(w, r)
+	_, err = io.Copy(w, parser)
 	require.NoError(t, err)
+	require.NoError(t, parser.Close())
 
 	extractZipFiles(t, tmpDir, zipFileName)
 }
