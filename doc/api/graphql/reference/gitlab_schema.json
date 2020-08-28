@@ -7391,26 +7391,6 @@
               "defaultValue": null
             },
             {
-              "name": "fileName",
-              "description": "File name of the snippet",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "content",
-              "description": "Content of the snippet",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
               "name": "description",
               "description": "Description of the snippet",
               "type": {
@@ -48941,26 +48921,6 @@
             {
               "name": "title",
               "description": "Title of the snippet",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "fileName",
-              "description": "File name of the snippet",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "content",
-              "description": "Content of the snippet",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
