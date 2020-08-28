@@ -160,10 +160,6 @@ describe('diffs/components/app', () => {
         });
       }
 
-      beforeEach(() => {
-        wrapper.vm.glFeatures.singleMrDiffView = true;
-      });
-
       it('fetches diffs if it has none', done => {
         wrapper.vm.isLatestVersion = () => false;
 
