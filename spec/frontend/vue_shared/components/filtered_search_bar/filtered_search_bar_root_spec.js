@@ -63,10 +63,10 @@ describe('FilteredSearchBarRoot', () => {
 
       expect(wrapperNoSort.vm.filterValue).toEqual([]);
       expect(wrapperNoSort.vm.selectedSortOption).toBe(undefined);
-      expect(wrapperNoSort.contains(GlButtonGroup)).toBe(false);
-      expect(wrapperNoSort.contains(GlButton)).toBe(false);
-      expect(wrapperNoSort.contains(GlDropdown)).toBe(false);
-      expect(wrapperNoSort.contains(GlDropdownItem)).toBe(false);
+      expect(wrapperNoSort.find(GlButtonGroup).exists()).toBe(false);
+      expect(wrapperNoSort.find(GlButton).exists()).toBe(false);
+      expect(wrapperNoSort.find(GlDropdown).exists()).toBe(false);
+      expect(wrapperNoSort.find(GlDropdownItem).exists()).toBe(false);
     });
   });
 

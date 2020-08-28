@@ -102,8 +102,16 @@ describe('Feature flags strategy', () => {
     });
 
     it('should not show inputs for other parameters', () => {
-      expect(findStrategy().contains(GlFormTextarea)).toBe(false);
-      expect(findStrategy().contains(GlFormInput)).toBe(false);
+      expect(
+        findStrategy()
+          .find(GlFormTextarea)
+          .exists(),
+      ).toBe(false);
+      expect(
+        findStrategy()
+          .find(GlFormInput)
+          .exists(),
+      ).toBe(false);
     });
 
     it('should show the input for userListId with the correct value', () => {

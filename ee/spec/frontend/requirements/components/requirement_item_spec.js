@@ -243,7 +243,7 @@ describe('RequirementItem', () => {
       });
 
       return wrapperArchived.vm.$nextTick(() => {
-        expect(wrapperArchived.contains('.controls .requirement-reopen')).toBe(false);
+        expect(wrapperArchived.find('.controls .requirement-reopen').exists()).toBe(false);
       });
     });
   });
