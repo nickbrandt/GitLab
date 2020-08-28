@@ -196,8 +196,8 @@ describe('History Comment', () => {
           return wrapper.vm.$nextTick();
         })
         .then(() => {
-          expect(confirmDeleteButton().attributes('disabled')).toBeTruthy();
-          expect(cancelDeleteButton().attributes('disabled')).toBeTruthy();
+          expect(confirmDeleteButton().props('loading')).toBe(true);
+          expect(cancelDeleteButton().props('disabled')).toBe(true);
           return axios.waitForAll();
         })
         .then(() => {
