@@ -1,5 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount } from '@vue/test-utils';
+import MockAdapter from 'axios-mock-adapter';
 import { GlAlert } from '@gitlab/ui';
 import Form from 'ee/feature_flags/components/form.vue';
 import newModule from 'ee/feature_flags/store/modules/new';
@@ -10,7 +11,11 @@ import {
   NEW_FLAG_ALERT,
 } from 'ee/feature_flags/constants';
 import { TEST_HOST } from 'spec/test_constants';
+import axios from '~/lib/utils/axios_utils';
 import { allUsersStrategy } from '../mock_data';
+
+const userCalloutId = 'feature_flags_new_version';
+const userCalloutsPath = `${TEST_HOST}/user_callouts`;
 
 describe('New feature flag form', () => {
   let wrapper;
@@ -32,6 +37,9 @@ describe('New feature flag form', () => {
         path: '/feature_flags',
         environmentsEndpoint: 'environments.json',
         projectId: '8',
+        showUserCallout: true,
+        userCalloutId,
+        userCalloutsPath,
       },
       store,
       provide: {
@@ -50,6 +58,8 @@ describe('New feature flag form', () => {
   afterEach(() => {
     wrapper.destroy();
   });
+
+  const findAlert = () => wrapper.find(GlAlert);
 
   describe('with error', () => {
     it('should render the error', () => {
@@ -105,11 +115,31 @@ describe('New feature flag form', () => {
     beforeEach(() => factory({ provide: { glFeatures: { featureFlagsNewVersion: false } } }));
 
     it('should alert users that feature flags are changing soon', () => {
-      expect(wrapper.find(GlAlert).text()).toBe(NEW_FLAG_ALERT);
+      expect(findAlert().text()).toBe(NEW_FLAG_ALERT);
+    });
+  });
+
+  describe('dismissing new version alert', () => {
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+      mock.onPost(userCalloutsPath, { feature_name: userCalloutId }).reply(200);
+      factory({ provide: { glFeatures: { featureFlagsNewVersion: false } } });
+      findAlert().vm.$emit('dismiss');
+      return wrapper.vm.$nextTick();
     });
 
-    it('the new feature flags alert should be dismissable', () => {
-      expect(wrapper.find(GlAlert).props('dismissible')).toBe(true);
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('should hide the alert', () => {
+      expect(findAlert().exists()).toBe(false);
+    });
+
+    it('should send the dismissal event', () => {
+      expect(mock.history.post.length).toBe(1);
     });
   });
 });

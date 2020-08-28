@@ -6,4 +6,7 @@
 #js-new-feature-flag{ data: { endpoint: project_feature_flags_path(@project, format: :json),
                      feature_flags_path: project_feature_flags_path(@project),
                      environments_endpoint: search_project_environments_path(@project, format: :json),
+                     user_callouts_path: user_callouts_path,
+                     user_callout_id: UserCalloutsHelper::FEATURE_FLAGS_NEW_VERISION,
+                     show_user_callout: show_feature_flags_new_version?.to_s,
                      project_id: @project.id } }

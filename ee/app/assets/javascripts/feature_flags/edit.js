@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import EditFeatureFlag from 'ee/feature_flags/components/edit_feature_flag.vue';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 export default () => {
   const el = document.querySelector('#js-edit-feature-flag');
@@ -17,6 +18,9 @@ export default () => {
           environmentsEndpoint: el.dataset.environmentsEndpoint,
           projectId: el.dataset.projectId,
           featureFlagIssuesEndpoint: el.dataset.featureFlagIssuesEndpoint,
+          userCalloutsPath: el.dataset.userCalloutsPath,
+          userCalloutId: el.dataset.userCalloutId,
+          showUserCallout: parseBoolean(el.dataset.showUserCallout),
         },
       });
     },
