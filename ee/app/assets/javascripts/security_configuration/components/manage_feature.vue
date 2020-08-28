@@ -20,10 +20,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    gitlabCiPresent: {
-      type: Boolean,
-      required: true,
-    },
     createSastMergeRequestPath: {
       type: String,
       required: true,
@@ -31,17 +27,11 @@ export default {
   },
   computed: {
     canConfigureFeature() {
-      return Boolean(
-        this.glFeatures.sastConfigurationUi &&
-          this.feature.configuration_path &&
-          !this.gitlabCiPresent,
-      );
+      return Boolean(this.glFeatures.sastConfigurationUi && this.feature.configuration_path);
     },
     // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575
     canCreateSASTMergeRequest() {
-      return Boolean(
-        this.feature.type === 'sast' && this.createSastMergeRequestPath && !this.gitlabCiPresent,
-      );
+      return Boolean(this.feature.type === 'sast' && this.createSastMergeRequestPath);
     },
     getFeatureDocumentationLinkLabel() {
       return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
@@ -54,7 +44,7 @@ export default {
 
 <template>
   <gl-button
-    v-if="canConfigureFeature && autoDevopsEnabled"
+    v-if="canConfigureFeature && feature.configured"
     :href="feature.configuration_path"
     data-testid="configureButton"
     >{{ s__('SecurityConfiguration|Configure') }}</gl-button

@@ -180,7 +180,6 @@ export default {
       <template #cell(manage)="{ item }">
         <manage-feature
           :feature="item"
-          :gitlab-ci-present="gitlabCiPresent"
           :auto-devops-enabled="autoDevopsEnabled"
           :create-sast-merge-request-path="createSastMergeRequestPath"
         />

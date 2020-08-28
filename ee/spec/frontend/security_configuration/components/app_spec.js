@@ -177,7 +177,6 @@ describe('Security Configuration App', () => {
         expect(manage.find(ManageFeature).props()).toMatchObject({
           feature: features[i],
           autoDevopsEnabled: propsData.autoDevopsEnabled,
-          gitlabCiPresent: propsData.gitlabCiPresent,
           createSastMergeRequestPath: propsData.createSastMergeRequestPath,
         });
       }
