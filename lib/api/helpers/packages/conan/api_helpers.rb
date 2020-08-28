@@ -220,7 +220,7 @@ module API
 
             return unless token
 
-            ::Ci::Build.find_by_token(token.access_token_id.to_s)
+            ::Ci::AuthJobFinder.new(token: token.access_token_id.to_s).execute
           end
 
           def decode_oauth_token_from_jwt
