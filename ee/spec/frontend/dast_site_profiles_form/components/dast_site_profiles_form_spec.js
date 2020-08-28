@@ -4,6 +4,7 @@ import { mount, shallowMount } from '@vue/test-utils';
 import { GlAlert, GlForm, GlModal } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import DastSiteProfileForm from 'ee/dast_site_profiles_form/components/dast_site_profile_form.vue';
+import DastSiteValidation from 'ee/dast_site_profiles_form/components/dast_site_validation.vue';
 import dastSiteProfileCreateMutation from 'ee/dast_site_profiles_form/graphql/dast_site_profile_create.mutation.graphql';
 import dastSiteProfileUpdateMutation from 'ee/dast_site_profiles_form/graphql/dast_site_profile_update.mutation.graphql';
 import { redirectTo } from '~/lib/utils/url_utility';
@@ -23,13 +24,14 @@ const defaultProps = {
   fullPath,
 };
 
-describe('OnDemandScansApp', () => {
+describe('DastSiteProfileForm', () => {
   let wrapper;
 
   const withinComponent = () => within(wrapper.element);
 
   const findForm = () => wrapper.find(GlForm);
   const findProfileNameInput = () => wrapper.find('[data-testid="profile-name-input"]');
+  const findTargetUrlInputGroup = () => wrapper.find('[data-testid="target-url-input-group"]');
   const findTargetUrlInput = () => wrapper.find('[data-testid="target-url-input"]');
   const findSubmitButton = () =>
     wrapper.find('[data-testid="dast-site-profile-form-submit-button"]');
@@ -38,6 +40,9 @@ describe('OnDemandScansApp', () => {
   const findCancelModal = () => wrapper.find(GlModal);
   const submitForm = () => findForm().vm.$emit('submit', { preventDefault: () => {} });
   const findAlert = () => wrapper.find(GlAlert);
+  const findSiteValidationToggle = () =>
+    wrapper.find('[data-testid="dast-site-validation-toggle"]');
+  const findDastSiteValidation = () => wrapper.find(DastSiteValidation);
 
   const componentFactory = (mountFn = shallowMount) => options => {
     wrapper = mountFn(
@@ -116,6 +121,80 @@ describe('OnDemandScansApp', () => {
       await wrapper.vm.$nextTick();
 
       expect(wrapper.text()).not.toContain(errorMessage);
+    });
+  });
+
+  describe('validation', () => {
+    describe('with feature flag disabled', () => {
+      beforeEach(() => {
+        createComponent({
+          provide: {
+            glFeatures: { securityOnDemandScansSiteValidation: false },
+          },
+        });
+      });
+
+      it('does not render validation components', () => {
+        expect(findSiteValidationToggle().exists()).toBe(false);
+        expect(findDastSiteValidation().exists()).toBe(false);
+      });
+    });
+
+    describe('with feature flag enabled', () => {
+      beforeEach(() => {
+        createComponent({
+          provide: {
+            glFeatures: { securityOnDemandScansSiteValidation: true },
+          },
+        });
+      });
+
+      it('renders validation components', () => {
+        expect(findSiteValidationToggle().exists()).toBe(true);
+        expect(findDastSiteValidation().exists()).toBe(true);
+      });
+
+      it('toggle is disabled until target URL is valid', async () => {
+        expect(findSiteValidationToggle().props('disabled')).toBe(true);
+
+        await findTargetUrlInput().vm.$emit('input', targetUrl);
+
+        expect(findSiteValidationToggle().props('disabled')).toBe(false);
+      });
+
+      it('disables target URL input when validation is enabled', async () => {
+        const targetUrlInputGroup = findTargetUrlInputGroup();
+        const targetUrlInput = findTargetUrlInput();
+        await targetUrlInput.vm.$emit('input', targetUrl);
+
+        expect(targetUrlInputGroup.attributes('description')).toBeUndefined();
+        expect(targetUrlInput.attributes('disabled')).toBeUndefined();
+
+        await findSiteValidationToggle().vm.$emit('change', true);
+
+        expect(targetUrlInputGroup.attributes('description')).toBe(
+          'Validation must be turned off to change the target URL',
+        );
+        expect(targetUrlInput.attributes('disabled')).toBe('true');
+      });
+
+      // TODO: refactor this test case when actual GraphQL mutations are implemented
+      // See https://gitlab.com/gitlab-org/gitlab/-/issues/238578
+      it('when validation section is opened and validation succeeds, section is collapsed', async () => {
+        jest.useFakeTimers();
+        expect(wrapper.vm.showValidationSection).toBe(false);
+
+        findTargetUrlInput().vm.$emit('input', targetUrl);
+        await findSiteValidationToggle().vm.$emit('change', true);
+        jest.runAllTimers();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.showValidationSection).toBe(true);
+
+        await findDastSiteValidation().vm.$emit('success');
+
+        expect(wrapper.vm.showValidationSection).toBe(false);
+      });
     });
   });
 
