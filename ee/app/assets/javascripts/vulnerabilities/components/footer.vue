@@ -1,6 +1,5 @@
 <script>
 import Visibility from 'visibilityjs';
-import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import Api from 'ee/api';
@@ -14,7 +13,7 @@ import initUserPopovers from '~/user_popovers';
 
 export default {
   name: 'VulnerabilityFooter',
-  components: { IssueNote, SolutionCard, MergeRequestNote, HistoryEntry, RelatedIssues },
+  components: { SolutionCard, MergeRequestNote, HistoryEntry, RelatedIssues },
   props: {
     discussionsUrl: {
       type: String,
@@ -31,11 +30,6 @@ export default {
     solutionInfo: {
       type: Object,
       required: true,
-    },
-    issueFeedback: {
-      type: Object,
-      required: false,
-      default: () => null,
     },
     mergeRequestFeedback: {
       type: Object,
@@ -194,19 +188,8 @@ export default {
   <div data-qa-selector="vulnerability_footer">
     <solution-card v-if="hasSolution" v-bind="solutionInfo" />
 
-    <div v-if="issueFeedback || mergeRequestFeedback" class="card gl-mt-5">
-      <issue-note
-        v-if="issueFeedback"
-        :feedback="issueFeedback"
-        :project="project"
-        class="card-body"
-      />
-      <merge-request-note
-        v-if="mergeRequestFeedback"
-        :feedback="mergeRequestFeedback"
-        :project="project"
-        class="card-body"
-      />
+    <div v-if="mergeRequestFeedback" class="card gl-mt-5">
+      <merge-request-note :feedback="mergeRequestFeedback" :project="project" class="card-body" />
     </div>
 
     <related-issues
