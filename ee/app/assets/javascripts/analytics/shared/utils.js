@@ -114,3 +114,28 @@ export const filterBySearchTerm = (data = [], searchTerm = '', filterByKey = 'na
   if (!searchTerm?.length) return data;
   return data.filter(item => item[filterByKey].toLowerCase().includes(searchTerm.toLowerCase()));
 };
+
+export const prepareTokens = (tokens = {}) => {
+  const { milestone = null, author = null, assignees = [], labels = [] } = tokens;
+  const authorToken = author ? [{ type: 'author', value: { data: author } }] : [];
+  const milestoneToken = milestone ? [{ type: 'milestone', value: { data: milestone } }] : [];
+  const assigneeTokens = assignees?.map(data => ({ type: 'assignees', value: { data } })) || [];
+  const labelTokens = labels?.map(data => ({ type: 'labels', value: { data } })) || [];
+
+  return [...authorToken, ...milestoneToken, ...assigneeTokens, ...labelTokens];
+};
+
+export function processFilters(filters) {
+  return filters.reduce((acc, token) => {
+    const { type, value } = token;
+    const { operator } = value;
+    const tokenValue = value.data;
+
+    if (!acc[type]) {
+      acc[type] = [];
+    }
+
+    acc[type].push({ value: tokenValue, operator });
+    return acc;
+  }, {});
+}

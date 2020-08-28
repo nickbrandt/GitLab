@@ -1,15 +1,16 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-import * as actions from 'ee/analytics/cycle_analytics/store/modules/filters/actions';
-import * as types from 'ee/analytics/cycle_analytics/store/modules/filters/mutation_types';
-import initialState from 'ee/analytics/cycle_analytics/store/modules/filters/state';
+import * as actions from 'ee/analytics/shared/store/modules/filters/actions';
+import * as types from 'ee/analytics/shared/store/modules/filters/mutation_types';
+import initialState from 'ee/analytics/shared/store/modules/filters/state';
 import httpStatusCodes from '~/lib/utils/http_status';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
-import { filterMilestones, filterUsers, filterLabels } from '../../../mock_data';
+import { filterMilestones, filterUsers, filterLabels } from './mock_data';
 
 const milestonesEndpoint = 'fake_milestones_endpoint';
 const labelsEndpoint = 'fake_labels_endpoint';
+const groupEndpoint = 'fake_group_endpoint';
 
 jest.mock('~/flash');
 
@@ -35,6 +36,7 @@ describe('Filters actions', () => {
     const initialData = {
       milestonesEndpoint,
       labelsEndpoint,
+      groupEndpoint,
       selectedAuthor: 'Mr cool',
       selectedMilestone: 'NEXT',
     };
@@ -96,11 +98,12 @@ describe('Filters actions', () => {
     it('sets the api paths', () => {
       return testAction(
         actions.setEndpoints,
-        { milestonesEndpoint, labelsEndpoint },
+        { milestonesEndpoint, labelsEndpoint, groupEndpoint },
         state,
         [
           { payload: 'fake_milestones_endpoint', type: types.SET_MILESTONES_ENDPOINT },
           { payload: 'fake_labels_endpoint', type: types.SET_LABELS_ENDPOINT },
+          { payload: 'fake_group_endpoint', type: types.SET_GROUP_ENDPOINT },
         ],
         [],
       );

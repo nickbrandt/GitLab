@@ -8,15 +8,17 @@ import { removeFlash, handleErrorOrRethrow, isStageNameExistsError } from '../ut
 const appendExtension = path => (path.indexOf('.') > -1 ? path : `${path}.json`);
 
 export const setPaths = ({ dispatch }, options) => {
-  const { groupPath = '', milestonesPath = '', labelsPath = '' } = options;
+  const { group, milestonesPath = '', labelsPath = '' } = options;
   // TODO: After we remove instance VSA we can rely on the paths from the BE
   // https://gitlab.com/gitlab-org/gitlab/-/issues/223735
+  const groupPath = group?.parentId || group?.fullPath || '';
   const milestonesEndpoint = milestonesPath || `/groups/${groupPath}/-/milestones`;
   const labelsEndpoint = labelsPath || `/groups/${groupPath}/-/labels`;
 
   return dispatch('filters/setEndpoints', {
     labelsEndpoint: appendExtension(labelsEndpoint),
     milestonesEndpoint: appendExtension(milestonesEndpoint),
+    groupEndpoint: groupPath,
   });
 };
 
@@ -271,7 +273,7 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
 
   if (initialData.group?.fullPath) {
     return Promise.all([
-      dispatch('setPaths', { groupPath: initialData.group.fullPath, milestonesPath, labelsPath }),
+      dispatch('setPaths', { group: initialData.group, milestonesPath, labelsPath }),
       dispatch('filters/initialize', {
         selectedAuthor,
         selectedMilestone,

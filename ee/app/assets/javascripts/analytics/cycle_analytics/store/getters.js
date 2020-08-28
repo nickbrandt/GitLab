@@ -12,9 +12,6 @@ export const currentValueStreamId = ({ selectedValueStream }) =>
 
 export const currentGroupPath = ({ selectedGroup }) => selectedGroup?.fullPath || null;
 
-export const currentGroupParentPath = ({ selectedGroup }, getters) =>
-  selectedGroup?.parentId || getters.currentGroupPath;
-
 export const selectedProjectIds = ({ selectedProjects }) =>
   selectedProjects?.map(({ id }) => id) || [];
 

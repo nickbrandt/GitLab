@@ -4,6 +4,7 @@ import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filte
 import { __ } from '~/locale';
 import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
 import LabelToken from '../../shared/components/tokens/label_token.vue';
+import { processFilters } from '../../shared/utils';
 
 export default {
   components: {
@@ -45,7 +46,7 @@ export default {
         {
           icon: 'labels',
           title: __('Label'),
-          type: 'label',
+          type: 'labels',
           token: LabelToken,
           labels: this.labels,
           unique: false,
@@ -62,32 +63,13 @@ export default {
   },
   methods: {
     ...mapActions('filters', ['fetchMilestones', 'fetchLabels', 'setFilters']),
-    processFilters(filters) {
-      return filters.reduce((acc, token) => {
-        const { type, value } = token;
-        const { operator } = value;
-        let tokenValue = value.data;
-
-        // remove wrapping double quotes which were added for token values that include spaces
-        if (
-          (tokenValue[0] === "'" && tokenValue[tokenValue.length - 1] === "'") ||
-          (tokenValue[0] === '"' && tokenValue[tokenValue.length - 1] === '"')
-        ) {
-          tokenValue = tokenValue.slice(1, -1);
-        }
-
-        if (!acc[type]) {
-          acc[type] = [];
-        }
-
-        acc[type].push({ value: tokenValue, operator });
-        return acc;
-      }, {});
-    },
     handleFilter(filters) {
-      const { label: labelNames, milestone } = this.processFilters(filters);
-      const milestoneTitle = milestone ? milestone[0] : null;
-      this.setFilters({ labelNames, milestoneTitle });
+      const { labels, milestone } = processFilters(filters);
+
+      this.setFilters({
+        selectedMilestone: milestone ? milestone[0] : null,
+        selectedLabels: labels,
+      });
     },
   },
 };

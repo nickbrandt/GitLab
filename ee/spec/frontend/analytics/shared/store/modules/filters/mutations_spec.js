@@ -1,7 +1,7 @@
-import mutations from 'ee/analytics/cycle_analytics/store/modules/filters/mutations';
-import * as types from 'ee/analytics/cycle_analytics/store/modules/filters/mutation_types';
+import mutations from 'ee/analytics/shared/store/modules/filters/mutations';
+import * as types from 'ee/analytics/shared/store/modules/filters/mutation_types';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import { filterMilestones, filterUsers, filterLabels } from '../../../mock_data';
+import { filterMilestones, filterUsers, filterLabels } from './mock_data';
 
 let state = null;
 
@@ -10,6 +10,7 @@ const users = filterUsers.map(convertObjectPropsToCamelCase);
 const labels = filterLabels.map(convertObjectPropsToCamelCase);
 
 describe('Filters mutations', () => {
+  const errorCode = 500;
   beforeEach(() => {
     state = {
       authors: { selected: null },
@@ -50,23 +51,31 @@ describe('Filters mutations', () => {
     ${types.REQUEST_MILESTONES}         | ${'milestones'} | ${'isLoading'} | ${true}
     ${types.RECEIVE_MILESTONES_SUCCESS} | ${'milestones'} | ${'isLoading'} | ${false}
     ${types.RECEIVE_MILESTONES_SUCCESS} | ${'milestones'} | ${'data'}      | ${milestones}
+    ${types.RECEIVE_MILESTONES_SUCCESS} | ${'milestones'} | ${'errorCode'} | ${null}
     ${types.RECEIVE_MILESTONES_ERROR}   | ${'milestones'} | ${'isLoading'} | ${false}
     ${types.RECEIVE_MILESTONES_ERROR}   | ${'milestones'} | ${'data'}      | ${[]}
+    ${types.RECEIVE_MILESTONES_ERROR}   | ${'milestones'} | ${'errorCode'} | ${errorCode}
     ${types.REQUEST_AUTHORS}            | ${'authors'}    | ${'isLoading'} | ${true}
     ${types.RECEIVE_AUTHORS_SUCCESS}    | ${'authors'}    | ${'isLoading'} | ${false}
     ${types.RECEIVE_AUTHORS_SUCCESS}    | ${'authors'}    | ${'data'}      | ${users}
+    ${types.RECEIVE_AUTHORS_SUCCESS}    | ${'authors'}    | ${'errorCode'} | ${null}
     ${types.RECEIVE_AUTHORS_ERROR}      | ${'authors'}    | ${'isLoading'} | ${false}
     ${types.RECEIVE_AUTHORS_ERROR}      | ${'authors'}    | ${'data'}      | ${[]}
+    ${types.RECEIVE_AUTHORS_ERROR}      | ${'authors'}    | ${'errorCode'} | ${errorCode}
     ${types.REQUEST_LABELS}             | ${'labels'}     | ${'isLoading'} | ${true}
     ${types.RECEIVE_LABELS_SUCCESS}     | ${'labels'}     | ${'isLoading'} | ${false}
     ${types.RECEIVE_LABELS_SUCCESS}     | ${'labels'}     | ${'data'}      | ${labels}
+    ${types.RECEIVE_LABELS_SUCCESS}     | ${'labels'}     | ${'errorCode'} | ${null}
     ${types.RECEIVE_LABELS_ERROR}       | ${'labels'}     | ${'isLoading'} | ${false}
     ${types.RECEIVE_LABELS_ERROR}       | ${'labels'}     | ${'data'}      | ${[]}
+    ${types.RECEIVE_LABELS_ERROR}       | ${'labels'}     | ${'errorCode'} | ${errorCode}
     ${types.REQUEST_ASSIGNEES}          | ${'assignees'}  | ${'isLoading'} | ${true}
     ${types.RECEIVE_ASSIGNEES_SUCCESS}  | ${'assignees'}  | ${'isLoading'} | ${false}
     ${types.RECEIVE_ASSIGNEES_SUCCESS}  | ${'assignees'}  | ${'data'}      | ${users}
+    ${types.RECEIVE_ASSIGNEES_SUCCESS}  | ${'assignees'}  | ${'errorCode'} | ${null}
     ${types.RECEIVE_ASSIGNEES_ERROR}    | ${'assignees'}  | ${'isLoading'} | ${false}
     ${types.RECEIVE_ASSIGNEES_ERROR}    | ${'assignees'}  | ${'data'}      | ${[]}
+    ${types.RECEIVE_ASSIGNEES_ERROR}    | ${'assignees'}  | ${'errorCode'} | ${errorCode}
   `('$mutation will set $stateKey with a given value', ({ mutation, rootKey, stateKey, value }) => {
     mutations[mutation](state, value);
 
