@@ -11,7 +11,7 @@ module Security
 
     has_one :pipeline, class_name: 'Ci::Pipeline', through: :build
 
-    has_many :findings
+    has_many :findings, inverse_of: :scan
 
     enum scan_type: {
       sast: 1,

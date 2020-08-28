@@ -11,8 +11,8 @@ module Security
   class Finding < ApplicationRecord
     self.table_name = 'security_findings'
 
-    belongs_to :scan, optional: false
-    belongs_to :scanner, class_name: 'Vulnerabilities::Scanner', optional: false
+    belongs_to :scan, inverse_of: :findings, optional: false
+    belongs_to :scanner, class_name: 'Vulnerabilities::Scanner', inverse_of: :security_findings, optional: false
 
     # TODO: These are duplicated between this model and Vulnerabilities::Finding,
     # we should create a shared module to encapculate this in one place.
