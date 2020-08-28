@@ -8,7 +8,14 @@ module Elastic
           if query =~ /#(\d+)\z/
             iid_query_hash(Regexp.last_match(1))
           else
-            basic_query_hash(%w(title^2 description), query)
+            fields = %w(title^2 description)
+
+            # We can only allow searching the iid field if the query is
+            # just a number, otherwise Elasticsearch will error since this
+            # field is type integer.
+            fields << "iid^3" if query =~ /\A\d+\z/
+
+            basic_query_hash(fields, query)
           end
 
         options[:features] = 'issues'
