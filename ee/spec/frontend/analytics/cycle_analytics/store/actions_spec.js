@@ -58,7 +58,6 @@ describe('Cycle analytics actions', () => {
       stages: [],
       featureFlags: {
         hasDurationChart: true,
-        hasDurationChartMedian: true,
       },
       activeStages,
       selectedValueStream,

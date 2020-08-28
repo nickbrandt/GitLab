@@ -13,7 +13,6 @@ class Analytics::CycleAnalyticsController < Analytics::ApplicationController
 
   before_action do
     push_frontend_feature_flag(:cycle_analytics_scatterplot_enabled, default_enabled: true)
-    push_frontend_feature_flag(:cycle_analytics_scatterplot_median_enabled, default_enabled: true)
     push_frontend_feature_flag(:value_stream_analytics_path_navigation, @group)
     push_frontend_feature_flag(:value_stream_analytics_create_multiple_value_streams, default_enabled: true)
     push_frontend_feature_flag(:analytics_similarity_search, @group, default_enabled: true)

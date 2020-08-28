@@ -1,5 +1,5 @@
 <script>
-import { GlDeprecatedButton, GlIcon, GlTooltip } from '@gitlab/ui';
+import { GlButton, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
 import { approximateDuration } from '~/lib/utils/datetime_utility';
 import StageCardListItem from './stage_card_list_item.vue';
 
@@ -7,9 +7,11 @@ export default {
   name: 'StageNavItem',
   components: {
     StageCardListItem,
-    GlIcon,
-    GlDeprecatedButton,
+    GlButton,
     GlTooltip,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     isDefaultStage: {
@@ -106,31 +108,44 @@ export default {
           <span v-else class="stage-empty">{{ __('Not enough data') }}</span>
         </div>
         <div v-show="isHover" ref="dropdown" :class="[openMenuClasses]" class="dropdown w-25">
-          <gl-deprecated-button
+          <gl-button
+            v-gl-tooltip
+            category="tertiary"
+            icon="ellipsis_v"
             :title="__('More actions')"
             class="more-actions-toggle btn btn-transparent p-0"
             data-toggle="dropdown"
-          >
-            <gl-icon class="icon" name="ellipsis_v" />
-          </gl-deprecated-button>
+          />
           <ul class="more-actions-dropdown dropdown-menu dropdown-open-left">
             <template v-if="isDefaultStage">
               <li>
-                <gl-deprecated-button @click="handleDropdownAction('hide', $event)">
+                <gl-button
+                  category="tertiary"
+                  data-testid="hide-btn"
+                  @click="handleDropdownAction('hide', $event)"
+                >
                   {{ __('Hide stage') }}
-                </gl-deprecated-button>
+                </gl-button>
               </li>
             </template>
             <template v-else>
               <li>
-                <gl-deprecated-button @click="handleDropdownAction('edit', $event)">
+                <gl-button
+                  category="tertiary"
+                  data-testid="edit-btn"
+                  @click="handleDropdownAction('edit', $event)"
+                >
                   {{ __('Edit stage') }}
-                </gl-deprecated-button>
+                </gl-button>
               </li>
               <li>
-                <gl-deprecated-button @click="handleDropdownAction('remove', $event)">
+                <gl-button
+                  category="tertiary"
+                  data-testid="remove-btn"
+                  @click="handleDropdownAction('remove', $event)"
+                >
                   {{ __('Remove stage') }}
-                </gl-deprecated-button>
+                </gl-button>
               </li>
             </template>
           </ul>

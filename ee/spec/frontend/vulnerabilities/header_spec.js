@@ -9,7 +9,6 @@ import StatusDescription from 'ee/vulnerabilities/components/status_description.
 import ResolutionAlert from 'ee/vulnerabilities/components/resolution_alert.vue';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import VulnerabilityStateDropdown from 'ee/vulnerabilities/components/vulnerability_state_dropdown.vue';
-import VulnerabilitiesEventBus from 'ee/vulnerabilities/components/vulnerabilities_event_bus';
 import { FEEDBACK_TYPES, VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import * as urlUtility from '~/lib/utils/url_utility';
@@ -123,7 +122,6 @@ describe('Vulnerability Header', () => {
 
     it('when the vulnerability state dropdown emits a change event, the vulnerabilities event bus event is emitted with the proper event', () => {
       const newState = 'dismiss';
-      const spy = jest.spyOn(VulnerabilitiesEventBus, '$emit');
       mockAxios.onPost().reply(201, { state: newState });
       expect(findBadge().text()).not.toBe(newState);
 
@@ -132,8 +130,7 @@ describe('Vulnerability Header', () => {
       dropdown.vm.$emit('change');
 
       return waitForPromises().then(() => {
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGE');
+        expect(wrapper.emitted()['vulnerability-state-change']).toBeTruthy();
       });
     });
 
@@ -141,7 +138,7 @@ describe('Vulnerability Header', () => {
       const dropdown = wrapper.find(VulnerabilityStateDropdown);
       mockAxios.onPost().reply(400);
 
-      dropdown.vm.$emit('change');
+      dropdown.vm.$emit('change', 'dismissed');
 
       return waitForPromises().then(() => {
         expect(mockAxios.history.post).toHaveLength(1);
@@ -365,47 +362,6 @@ describe('Vulnerability Header', () => {
         expect(mockAxios.history.get).toHaveLength(1);
         expect(findStatusDescription().props('isLoadingUser')).toBe(false);
       });
-    });
-  });
-
-  describe('when vulnerability state is changed', () => {
-    it('refreshes the vulnerability', async () => {
-      const url = Api.buildUrl(Api.vulnerabilityPath).replace(':id', defaultVulnerability.id);
-      const vulnerability = { state: 'dismissed' };
-      mockAxios.onGet(url).replyOnce(200, vulnerability);
-      createWrapper();
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
-      await waitForPromises();
-
-      expect(findBadge().text()).toBe(vulnerability.state);
-      expect(findStatusDescription().props('vulnerability')).toMatchObject(vulnerability);
-    });
-
-    it('shows an error message when the vulnerability cannot be loaded', async () => {
-      mockAxios.onGet().replyOnce(500);
-      createWrapper();
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
-      await waitForPromises();
-
-      expect(createFlash).toHaveBeenCalledTimes(1);
-      expect(mockAxios.history.get).toHaveLength(1);
-    });
-
-    it('cancels a pending refresh request if the vulnerability state has changed', async () => {
-      mockAxios.onGet().reply(200);
-      createWrapper();
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
-
-      const source = wrapper.vm.refreshVulnerabilitySource;
-      const spy = jest.spyOn(source, 'cancel');
-
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
-      await waitForPromises();
-
-      expect(createFlash).toHaveBeenCalledTimes(0);
-      expect(mockAxios.history.get).toHaveLength(1);
-      expect(spy).toHaveBeenCalled();
-      expect(wrapper.vm.refreshVulnerabilitySource).not.toBe(source); // Check that the source has changed.
     });
   });
 });
