@@ -11,6 +11,8 @@ module Ci
 
     validates :data, json_schema: { filename: "daily_build_group_report_result_data" }
 
+    scope :with_preloaded_projects, -> { preload(:project) }
+
     def self.upsert_reports(data)
       upsert_all(data, unique_by: :index_daily_build_group_report_results_unique_columns) if data.any?
     end

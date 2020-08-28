@@ -19,6 +19,10 @@ module Ci
 
     private
 
+    def query
+      super.with_preloaded_projects
+    end
+
     def query_allowed?
       can?(current_user, :read_group_build_report_results, @group)
     end
