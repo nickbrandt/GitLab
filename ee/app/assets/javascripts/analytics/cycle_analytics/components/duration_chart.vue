@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     ...mapState('durationChart', ['isLoading']),
-    ...mapGetters('durationChart', ['durationChartPlottableData', 'durationChartMedianData']),
+    ...mapGetters('durationChart', ['durationChartPlottableData']),
     hasData() {
       return Boolean(this.durationChartPlottableData.length);
     },
@@ -53,7 +53,6 @@ export default {
       :y-axis-title="s__('CycleAnalytics|Total days to completion')"
       :tooltip-date-format="$options.durationChartTooltipDateFormat"
       :scatter-data="durationChartPlottableData"
-      :median-line-data="durationChartMedianData"
     />
     <div v-else ref="duration-chart-no-data" class="bs-callout bs-callout-info">
       {{ __('There is no data available. Please change your selection.') }}

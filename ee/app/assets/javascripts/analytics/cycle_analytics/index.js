@@ -14,7 +14,6 @@ export default () => {
   const store = createStore();
   const {
     cycleAnalyticsScatterplotEnabled: hasDurationChart = false,
-    cycleAnalyticsScatterplotMedianEnabled: hasDurationChartMedian = false,
     valueStreamAnalyticsPathNavigation: hasPathNavigation = false,
     valueStreamAnalyticsCreateMultipleValueStreams: hasCreateMultipleValueStreams = false,
     analyticsSimilaritySearch: hasAnalyticsSimilaritySearch = false,
@@ -24,7 +23,6 @@ export default () => {
     ...initialData,
     featureFlags: {
       hasDurationChart,
-      hasDurationChartMedian,
       hasPathNavigation,
       hasCreateMultipleValueStreams,
       hasAnalyticsSimilaritySearch,

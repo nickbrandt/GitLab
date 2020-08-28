@@ -19,7 +19,6 @@ RSpec.describe 'Group value stream analytics' do
 
     expect(page).to have_pushed_frontend_feature_flags(
       cycleAnalyticsScatterplotEnabled: true,
-      cycleAnalyticsScatterplotMedianEnabled: true,
       valueStreamAnalyticsPathNavigation: true,
       analyticsSimilaritySearch: true
     )
