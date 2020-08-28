@@ -1,0 +1,5 @@
+---
+title: Prevent Download For Failed Vulnerability Export Jobs
+merge_request: 40656
+author: Kev @KevSlashNull
+type: fixed
