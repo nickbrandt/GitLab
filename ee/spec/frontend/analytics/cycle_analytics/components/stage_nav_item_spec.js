@@ -24,6 +24,7 @@ describe('StageNavItem', () => {
   let wrapper = null;
   const findStageTitle = () => wrapper.find({ ref: 'title' });
   const findStageMedian = () => wrapper.find({ ref: 'median' });
+  const findDropdown = () => wrapper.find({ ref: 'dropdown' });
 
   afterEach(() => {
     wrapper.destroy();
@@ -45,6 +46,26 @@ describe('StageNavItem', () => {
 
     it('renders the stage title', () => {
       expect(findStageTitle().text()).toEqual(title);
+    });
+
+    it('renders the dropdown with edit and remove options', () => {
+      expect(findDropdown().exists()).toBe(true);
+      expect(wrapper.find('[data-testid="edit-btn"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="remove-btn"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="hide-btn"]').exists()).toBe(false);
+    });
+  });
+
+  describe('with data an a non-default state', () => {
+    beforeEach(() => {
+      wrapper = createComponent({ props: { isDefaultStage: true } });
+    });
+
+    it('renders the dropdown with a hide option', () => {
+      expect(findDropdown().exists()).toBe(true);
+      expect(wrapper.find('[data-testid="hide-btn"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="edit-btn"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="remove-btn"]').exists()).toBe(false);
     });
   });
 
