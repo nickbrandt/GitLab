@@ -11,7 +11,7 @@ module QA
     rspec.shared_context_metadata_behavior = :apply_to_host_groups
   end
 
-  RSpec.shared_context "cluster with Prometheus installed", shared_context: :metadata do
+  RSpec.shared_context "cluster with Prometheus installed", shared_context: :metadata, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/241546', type: :investigating } do
     before :all do
       @cluster = Service::KubernetesCluster.new(provider_class: Service::ClusterProvider::K3s).create!
       @project = Resource::Project.fabricate_via_api! do |project|
