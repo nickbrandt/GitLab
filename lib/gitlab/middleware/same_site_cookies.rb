@@ -30,10 +30,9 @@ module Gitlab
         set_cookie = headers['Set-Cookie']&.strip
 
         return result if set_cookie.blank? || !ssl?
+        return result if same_site_none_incompatible?(headers['User-Agent'])
 
         cookies = set_cookie.split(COOKIE_SEPARATOR)
-
-        return result if same_site_none_incompatible?(headers['User-Agent'])
 
         cookies.each do |cookie|
           next if cookie.blank?
@@ -41,11 +40,11 @@ module Gitlab
           # Chrome will drop SameSite=None cookies without the Secure
           # flag. If we remove this middleware, we may need to ensure
           # that all cookies set this flag.
-          if ssl? && !(cookie =~ /;\s*secure/i)
+          unless SECURE_REGEX.match?(cookie)
             cookie << '; Secure'
           end
 
-          unless cookie =~ /;\s*samesite=/i
+          unless SAME_SITE_REGEX.match?(cookie)
             cookie << '; SameSite=None'
           end
         end
@@ -57,25 +56,92 @@ module Gitlab
 
       private
 
+      # Taken from https://www.chromium.org/updates/same-site/incompatible-clients
+      # We use RE2 instead of the browser gem for performance.
+      IOS_REGEX = RE2('\(iP.+; CPU .*OS (\d+)[_\d]*.*\) AppleWebKit\/')
+      MACOS_REGEX = RE2('\(Macintosh;.*Mac OS X (\d+)_(\d+)[_\d]*.*\) AppleWebKit\/')
+      SAFARI_REGEX = RE2('Version\/.* Safari\/')
+      CHROMIUM_REGEX = RE2('Chrom(e|ium)')
+      CHROMIUM_VERSION_REGEX = RE2('Chrom[^ \/]+\/(\d+)')
+      UC_BROWSER_REGEX = RE2('UCBrowser\/')
+      UC_BROWSER_VERSION_REGEX = RE2('UCBrowser\/(\d+)\.(\d+)\.(\d+)')
+
+      SECURE_REGEX = RE2(';\s*secure', case_sensitive: false)
+      SAME_SITE_REGEX = RE2(';\s*samesite=', case_sensitive: false)
+
       def ssl?
         Gitlab.config.gitlab.https
       end
 
-      # Taken from https://www.chromium.org/updates/same-site/incompatible-clients
       def same_site_none_incompatible?(user_agent)
-        return false unless user_agent.present?
+        return false if user_agent.blank?
 
-        browser = Browser.new(user_agent)
-        has_webkit_same_site_bug?(browser) || drops_unrecognized_same_site_cookies?(browser)
+        has_webkit_same_site_bug?(user_agent) || drops_unrecognized_same_site_cookies?(user_agent)
       end
 
-      def has_webkit_same_site_bug?(browser)
-        browser.platform.ios?(12) ||
-          (browser.platform.mac?("~> 10.14") && browser.safari?)
+      def has_webkit_same_site_bug?(user_agent)
+        ios_version?(12, user_agent) ||
+          (macos_version?(10, 14, user_agent) && safari?(user_agent))
       end
 
-      def drops_unrecognized_same_site_cookies?(browser)
-        browser.uc_browser?("<12.13.2") || browser.chrome?([">= 51", "< 67"])
+      def drops_unrecognized_same_site_cookies?(user_agent)
+        if uc_browser?(user_agent)
+          return !uc_browser_version_at_least?(12, 13, 2, user_agent)
+        end
+
+        chromium_based?(user_agent) && chromium_version_between?(51, 66, user_agent)
+      end
+
+      def ios_version?(major, user_agent)
+        m = IOS_REGEX.match(user_agent)
+
+        return false if m.nil?
+
+        m[1].to_i == major
+      end
+
+      def macos_version?(major, minor, user_agent)
+        m = MACOS_REGEX.match(user_agent)
+
+        return false if m.nil?
+
+        m[1].to_i == major && m[2].to_i == minor
+      end
+
+      def safari?(user_agent)
+        SAFARI_REGEX.match?(user_agent)
+      end
+
+      def chromium_based?(user_agent)
+        CHROMIUM_REGEX.match?(user_agent)
+      end
+
+      def chromium_version_between?(from_major, to_major, user_agent)
+        m = CHROMIUM_VERSION_REGEX.match(user_agent)
+
+        return false if m.nil?
+
+        version = m[1].to_i
+        version >= from_major && version <= to_major
+      end
+
+      def uc_browser?(user_agent)
+        UC_BROWSER_REGEX.match?(user_agent)
+      end
+
+      def uc_browser_version_at_least?(major, minor, build, user_agent)
+        m = UC_BROWSER_VERSION_REGEX.match(user_agent)
+
+        return false if m.nil?
+
+        major_version = m[1].to_i
+        minor_version = m[2].to_i
+        build_version = m[3].to_i
+
+        return major_version > major if major_version != major
+        return minor_version > minor if minor_version != minor
+
+        build_version >= build
       end
     end
   end
