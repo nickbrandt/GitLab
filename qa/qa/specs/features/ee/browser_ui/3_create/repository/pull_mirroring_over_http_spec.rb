@@ -5,7 +5,7 @@ module QA
     # Use Admin credentials as a workaround for a permissions bug
     # See https://gitlab.com/gitlab-org/gitlab/issues/13769
     describe 'Pull mirror a repository over HTTP', :requires_admin do
-      it 'configures and syncs a (pull) mirrored repository with password auth', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/520' do
+      it 'configures and syncs a (pull) mirrored repository with password auth', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/520' do
         Flow::Login.sign_in_as_admin
 
         source = Resource::Repository::ProjectPush.fabricate! do |project_push|

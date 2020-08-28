@@ -7,7 +7,7 @@ module QA
       let(:file_content_secondary) { 'This is a Geo project! Commit from secondary.' }
 
       context 'regular git commit' do
-        it 'is proxied to the primary and ultimately replicated to the secondary', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/698' do
+        it 'is proxied to the primary and ultimately replicated to the secondary', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/698' do
           file_name = 'README.md'
           key_title = "Geo SSH to 2nd #{Time.now.to_f}"
           project = nil
@@ -90,7 +90,7 @@ module QA
       end
 
       context 'git-lfs commit' do
-        it 'is proxied to the primary and ultimately replicated to the secondary', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/697' do
+        it 'is proxied to the primary and ultimately replicated to the secondary', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/697' do
           key_title = "Geo SSH LFS to 2nd #{Time.now.to_f}"
           file_name_primary = 'README.md'
           file_name_secondary = 'README_MORE.md'

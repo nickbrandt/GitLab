@@ -4,7 +4,7 @@ module QA
   RSpec.describe 'Geo', :orchestrated, :geo do
     describe 'GitLab wiki SSH push' do
       context 'wiki commit' do
-        it 'is replicated to the secondary', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/688' do
+        it 'is replicated to the secondary', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/688' do
           wiki_content = 'This tests replication of wikis via SSH'
           push_content = 'This is from the Geo wiki push via SSH!'
           project = nil
