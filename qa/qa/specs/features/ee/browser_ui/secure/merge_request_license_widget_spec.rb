@@ -116,7 +116,7 @@ module QA
         Page::Project::Pipeline::Index.perform(&:wait_for_latest_pipeline_success)
       end
 
-      it 'manage licenses from the merge request', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/575' do
+      it 'manage licenses from the merge request', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/575' do
         @merge_request.visit!
 
         Page::MergeRequest::Show.perform do |show|

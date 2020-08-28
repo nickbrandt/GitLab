@@ -1,7 +1,8 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
+import * as utils from 'ee/analytics/shared/utils';
 import FilterBar from 'ee/analytics/code_review_analytics/components/filter_bar.vue';
-import createFiltersState from 'ee/analytics/code_review_analytics/store/modules/filters/state';
+import createFiltersState from 'ee/analytics/shared/store/modules/filters/state';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import { mockMilestones, mockLabels } from '../mock_data';
 
@@ -9,7 +10,7 @@ const localVue = createLocalVue();
 localVue.use(Vuex);
 
 const milestoneTokenType = 'milestone';
-const labelTokenType = 'label';
+const labelTokenType = 'labels';
 
 describe('FilteredSearchBar', () => {
   let wrapper;
@@ -101,64 +102,24 @@ describe('FilteredSearchBar', () => {
         labels: { data: mockLabels },
       });
       wrapper = createComponent(vuexStore);
+      jest.spyOn(utils, 'processFilters');
     });
 
     it('clicks on the search button, setFilters is dispatched', () => {
-      findFilteredSearch().vm.$emit('onFilter', [
+      const filters = [
         { type: 'milestone', value: { data: 'my-milestone', operator: '=' } },
-        { type: 'label', value: { data: 'my-label', operator: '=' } },
-      ]);
+        { type: 'labels', value: { data: 'my-label', operator: '=' } },
+      ];
+
+      findFilteredSearch().vm.$emit('onFilter', filters);
+
+      expect(utils.processFilters).toHaveBeenCalledWith(filters);
 
       expect(setFiltersMock).toHaveBeenCalledWith(
         expect.anything(),
         {
-          labelNames: [{ value: 'my-label', operator: '=' }],
-          milestoneTitle: { value: 'my-milestone', operator: '=' },
-        },
-        undefined,
-      );
-    });
-
-    it('removes wrapping double quotes from the data and dispatches setFilters', () => {
-      findFilteredSearch().vm.$emit('onFilter', [
-        { type: 'milestone', value: { data: '"milestone with spaces"', operator: '=' } },
-      ]);
-
-      expect(setFiltersMock).toHaveBeenCalledWith(
-        expect.anything(),
-        {
-          labelNames: undefined,
-          milestoneTitle: { value: 'milestone with spaces', operator: '=' },
-        },
-        undefined,
-      );
-    });
-
-    it('removes wrapping single quotes from the data and dispatches setFilters', () => {
-      findFilteredSearch().vm.$emit('onFilter', [
-        { type: 'milestone', value: { data: "'milestone with spaces'", operator: '=' } },
-      ]);
-
-      expect(setFiltersMock).toHaveBeenCalledWith(
-        expect.anything(),
-        {
-          labelNames: undefined,
-          milestoneTitle: { value: 'milestone with spaces', operator: '=' },
-        },
-        undefined,
-      );
-    });
-
-    it('does not remove inner double quotes from the data and dispatches setFilters ', () => {
-      findFilteredSearch().vm.$emit('onFilter', [
-        { type: 'milestone', value: { data: 'milestone "with" spaces', operator: '=' } },
-      ]);
-
-      expect(setFiltersMock).toHaveBeenCalledWith(
-        expect.anything(),
-        {
-          labelNames: undefined,
-          milestoneTitle: { value: 'milestone "with" spaces', operator: '=' },
+          selectedLabels: [{ value: 'my-label', operator: '=' }],
+          selectedMilestone: { value: 'my-milestone', operator: '=' },
         },
         undefined,
       );

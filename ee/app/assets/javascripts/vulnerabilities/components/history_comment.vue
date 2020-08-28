@@ -1,6 +1,6 @@
 <script>
 /* eslint-disable vue/no-v-html */
-import { GlDeprecatedButton, GlButton, GlLoadingIcon } from '@gitlab/ui';
+import { GlDeprecatedButton, GlButton } from '@gitlab/ui';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { __, s__ } from '~/locale';
@@ -13,7 +13,6 @@ export default {
     GlButton,
     EventItem,
     HistoryCommentEditor,
-    GlLoadingIcon,
   },
 
   props: {
@@ -161,10 +160,9 @@ export default {
       <gl-button
         ref="confirmDeleteButton"
         variant="danger"
-        :disabled="isDeletingComment"
+        :loading="isDeletingComment"
         @click="deleteComment"
       >
-        <gl-loading-icon v-if="isDeletingComment" class="mr-1" />
         {{ __('Delete') }}
       </gl-button>
       <gl-button
