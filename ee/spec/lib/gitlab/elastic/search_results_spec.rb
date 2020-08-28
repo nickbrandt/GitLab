@@ -118,14 +118,14 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       @issue_2 = create(
         :issue,
         project: project_1,
-        title: 'Issue 2',
+        title: 'Issue Two',
         description: 'Hello world, here I am!',
         iid: 2
       )
       @issue_3 = create(
         :issue,
         project: project_2,
-        title: 'Issue 3',
+        title: 'Issue Three',
         iid: 2
       )
 
@@ -138,9 +138,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       results = described_class.new(user, 'hello world', limit_projects)
       issues = results.objects('issues')
 
-      expect(issues).to include @issue_1
-      expect(issues).to include @issue_2
-      expect(issues).not_to include @issue_3
+      expect(issues).to contain_exactly(@issue_1, @issue_2)
       expect(results.issues_count).to eq 2
     end
 
@@ -155,9 +153,15 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       results = described_class.new(user, '#2', limit_projects, public_and_internal_projects: false)
       issues = results.objects('issues')
 
-      expect(issues).not_to include @issue_1
-      expect(issues).to include @issue_2
-      expect(issues).not_to include @issue_3
+      expect(issues).to contain_exactly(@issue_2)
+      expect(results.issues_count).to eq 1
+    end
+
+    it 'can also find an issue by iid without the prefixed #' do
+      results = described_class.new(user, '2', limit_projects, public_and_internal_projects: false)
+      issues = results.objects('issues')
+
+      expect(issues).to contain_exactly(@issue_2)
       expect(results.issues_count).to eq 1
     end
 
@@ -421,7 +425,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         :conflict,
         source_project: project_1,
         target_project: project_1,
-        title: 'Merge Request 2',
+        title: 'Merge Request Two',
         description: 'Hello world, here I am!',
         iid: 2
       )
@@ -429,7 +433,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         :merge_request,
         source_project: project_2,
         target_project: project_2,
-        title: 'Merge Request 3',
+        title: 'Merge Request Three',
         iid: 2
       )
 
@@ -439,12 +443,10 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     it_behaves_like 'a paginated object', 'merge_requests'
 
     it 'lists found merge requests' do
-      results = described_class.new(user, 'hello world', limit_projects)
+      results = described_class.new(user, 'hello world', limit_projects, public_and_internal_projects: false)
       merge_requests = results.objects('merge_requests')
 
-      expect(merge_requests).to include @merge_request_1
-      expect(merge_requests).to include @merge_request_2
-      expect(merge_requests).not_to include @merge_request_3
+      expect(merge_requests).to contain_exactly(@merge_request_1, @merge_request_2)
       expect(results.merge_requests_count).to eq 2
     end
 
@@ -456,12 +458,18 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
     end
 
     it 'lists merge request when search by a valid iid' do
-      results = described_class.new(user, '#2', limit_projects)
+      results = described_class.new(user, '!2', limit_projects, public_and_internal_projects: false)
       merge_requests = results.objects('merge_requests')
 
-      expect(merge_requests).not_to include @merge_request_1
-      expect(merge_requests).to include @merge_request_2
-      expect(merge_requests).not_to include @merge_request_3
+      expect(merge_requests).to contain_exactly(@merge_request_2)
+      expect(results.merge_requests_count).to eq 1
+    end
+
+    it 'can also find an issue by iid without the prefixed !' do
+      results = described_class.new(user, '2', limit_projects, public_and_internal_projects: false)
+      merge_requests = results.objects('merge_requests')
+
+      expect(merge_requests).to contain_exactly(@merge_request_2)
       expect(results.merge_requests_count).to eq 1
     end
 
