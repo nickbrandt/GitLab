@@ -50,7 +50,6 @@ const defaultStubs = {
 
 const defaultFeatureFlags = {
   hasDurationChart: true,
-  hasDurationChartMedian: true,
   hasPathNavigation: false,
   hasCreateMultipleValueStreams: false,
 };

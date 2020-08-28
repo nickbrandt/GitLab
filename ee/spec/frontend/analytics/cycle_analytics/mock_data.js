@@ -252,21 +252,6 @@ export const rawDurationMedianData = [
   },
 ];
 
-export const transformedDurationMedianData = [
-  {
-    slug: 1,
-    selected: true,
-    data: rawDurationMedianData,
-  },
-  {
-    slug: 2,
-    selected: true,
-    data: rawDurationMedianData,
-  },
-];
-
-export const durationChartPlottableMedianData = [['2018-12-31', 29], ['2019-01-01', 100]];
-
 export const selectedProjects = [
   {
     id: 1,
