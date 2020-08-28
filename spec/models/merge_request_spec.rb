@@ -4113,27 +4113,13 @@ RSpec.describe MergeRequest, factory_default: :keep do
     end
   end
 
-  describe '#builds_with_coverage' do
-    let(:builds) { subject.builds_with_coverage }
-    let(:head_pipeline) { create(:ci_empty_pipeline) }
-    let!(:rspec) { create(:ci_build, name: 'rspec', coverage: 97.1, pipeline: head_pipeline) }
-    let!(:jest) { create(:ci_build, name: 'jest', coverage: 94.1, pipeline: head_pipeline) }
-    let!(:karma) { create(:ci_build, name: 'karma', coverage: nil, pipeline: head_pipeline) }
-
-    context 'when head_pipeline is not present' do
-      it 'returns nil' do
-        expect(builds).to be_nil
-      end
-    end
-
-    context 'when head_pipeline is present' do
-      before do
-        subject.update_attribute(:head_pipeline_id, head_pipeline.id)
-      end
-
-      it 'returns the builds with coverage' do
-        expect(builds).to match_array([rspec, jest])
-      end
+  describe '#head_pipeline_builds_with_coverage' do
+    it do
+      is_expected
+        .to delegate_method(:builds_with_coverage)
+        .to(:head_pipeline)
+        .with_prefix
+        .with_arguments(allow_nil: true)
     end
   end
 end

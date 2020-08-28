@@ -296,7 +296,7 @@ RSpec.describe MergeRequestPollWidgetEntity do
     end
 
     before do
-      allow(resource).to receive(:builds_with_coverage).and_return(builds)
+      allow(resource).to receive(:head_pipeline_builds_with_coverage).and_return(builds)
     end
 
     it 'serializes the builds with coverage' do
