@@ -13,6 +13,8 @@ module Gitlab
           return false unless Dashboard::Validator.validate(dashboard_hash, project: project, dashboard_path: dashboard_path)
 
           Dashboard::Importers::PrometheusMetrics.new(dashboard_hash, project: project, dashboard_path: dashboard_path).execute
+        rescue Gitlab::Config::Loader::FormatError
+          false
         end
 
         def execute!
