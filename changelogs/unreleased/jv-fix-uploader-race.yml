@@ -1,0 +1,5 @@
+---
+title: Fix objectstore.uploader.uploadError race
+merge_request: 583
+author:
+type: fixed

@@ -100,9 +100,13 @@ func (u *uploader) Execute(ctx context.Context, deadline time.Time) {
 	if u.metrics {
 		go u.trackUploadTime()
 	}
-	go u.cleanup(ctx)
+
+	uploadDone := make(chan struct{})
+	go u.cleanup(ctx, uploadDone)
 	go func() {
 		defer cancelFn()
+		defer close(uploadDone)
+
 		if u.metrics {
 			defer objectStorageUploadsOpen.Dec()
 		}
@@ -145,10 +149,11 @@ func (u *uploader) trackUploadTime() {
 	}
 }
 
-func (u *uploader) cleanup(ctx context.Context) {
+func (u *uploader) cleanup(ctx context.Context, uploadDone chan struct{}) {
 	// wait for the upload to finish
 	<-u.ctx.Done()
 
+	<-uploadDone
 	if u.uploadError != nil {
 		if u.metrics {
 			objectStorageUploadRequestsRequestFailed.Inc()
