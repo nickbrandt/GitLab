@@ -70,6 +70,26 @@ RSpec.describe EE::RegistrationsHelper do
     end
   end
 
+  describe '#setup_for_company_label_text' do
+    before do
+      allow(helper).to receive(:in_subscription_flow?).and_return(in_subscription_flow)
+      allow(helper).to receive(:in_trial_flow?).and_return(in_trial_flow)
+    end
+
+    subject { helper.setup_for_company_label_text }
+
+    where(:in_subscription_flow, :in_trial_flow, :text) do
+      true | true | 'Who will be using this GitLab subscription?'
+      true | false | 'Who will be using this GitLab subscription?'
+      false | true | 'Who will be using this GitLab trial?'
+      false | false | 'Who will be using GitLab?'
+    end
+
+    with_them do
+      it { is_expected.to eq(text) }
+    end
+  end
+
   describe '#visibility_level_options' do
     let(:user) { build(:user) }
 
