@@ -6,7 +6,7 @@ RSpec.describe API::Helpers do
   include API::APIGuard::HelperMethods
   include described_class
 
-  let(:user) { create(:user) }
+  let_it_be(:user) { create(:user) }
   let(:route_authentication_setting) { {} }
   let(:csrf_token) { SecureRandom.base64(ActionController::RequestForgeryProtection::AUTHENTICITY_TOKEN_LENGTH) }
   let(:env) do
@@ -35,13 +35,22 @@ RSpec.describe API::Helpers do
 
   describe ".current_user" do
     describe "when authenticating using a job token" do
-      let(:job) { create(:ci_build, user: user) }
+      let_it_be(:job, reload: true) do
+        create(:ci_build, user: user, status: :running)
+      end
 
       context 'when route is allowed to be authenticated' do
         let(:route_authentication_setting) { { job_token_allowed: true } }
 
         it "returns a 401 response for an invalid token" do
           env[Gitlab::Auth::AuthFinders::JOB_TOKEN_HEADER] = 'invalid token'
+
+          expect { current_user }.to raise_error /401/
+        end
+
+        it "returns a 401 response for a job that's not running" do
+          job.update!(status: :success)
+          env[Gitlab::Auth::AuthFinders::JOB_TOKEN_HEADER] = job.token
 
           expect { current_user }.to raise_error /401/
         end
