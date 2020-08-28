@@ -42,7 +42,7 @@ RSpec.describe Gitlab::Auth::AuthFinders do
 
     context 'with a job token' do
       let(:route_authentication_setting) { { job_token_allowed: true } }
-      let(:job) { create(:ci_build, user: user) }
+      let(:job) { create(:ci_build, user: user, status: :running) }
 
       before do
         env['HTTP_AUTHORIZATION'] = "Bearer #{job.token}"
@@ -69,7 +69,7 @@ RSpec.describe Gitlab::Auth::AuthFinders do
   end
 
   describe '#find_user_from_bearer_token' do
-    let(:job) { create(:ci_build, user: user) }
+    let(:job) { create(:ci_build, user: user, status: :running) }
 
     subject { find_user_from_bearer_token }
 

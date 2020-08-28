@@ -37,7 +37,7 @@ module EE
           token = parsed_oauth_token
           return unless token
 
-          job = ::Ci::Build.find_by_token(token)
+          job = ::Ci::AuthJobFinder.new(token: token).execute
           return unless job
 
           @current_authenticated_job = job # rubocop:disable Gitlab/ModuleWithInstanceVariables
