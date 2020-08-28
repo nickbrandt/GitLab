@@ -25,8 +25,8 @@ You can access the dashboard from the top bar by clicking
 
 ![Environments Dashboard with projects](img/environments_dashboard_v12_5.png)
 
-The Environments Dashboard displays a maximum of 7 projects
-and 3 environments per project.
+The Environments Dashboard offers a paginated display of a maximum of 
+150 projects and 3 environments per project.
 
 The listed environments for each project are unique, such as
 "production", "staging", etc. Review apps and other grouped
@@ -46,6 +46,8 @@ health, including the latest commit, pipeline status, and deployment time.
 The Environments and [Operations](../../user/operations_dashboard/index.md)
 dashboards share the same list of projects. When you add or remove a
 project from one, GitLab adds or removes the project from the other.
+
+A maximum of 150 projects may be added.
 
 ## Environment dashboards on GitLab.com
 

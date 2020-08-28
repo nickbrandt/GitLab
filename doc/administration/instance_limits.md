@@ -424,6 +424,12 @@ panel_groups:
       label: Legend Label
 ```
 
+## Environment Dashboard limits **(PREMIUM)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/33895) in GitLab 13.4.
+
+The [Environment Dashboard](../ci/environments/environments_dashboard.md) supports the addition of a maximum of 150 projects.
+
 ## Environment data on Deploy Boards
 
 [Deploy Boards](../user/project/deploy_boards.md) load information from Kubernetes about
