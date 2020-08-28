@@ -103,7 +103,7 @@ describe('Security Reports modal footer', () => {
     });
 
     it('renders create merge request and issue button as a split button', () => {
-      expect(wrapper.contains('.js-split-button')).toBe(true);
+      expect(wrapper.find('.js-split-button').exists()).toBe(true);
       expect(wrapper.vm.actionButtons).toHaveLength(2);
       expect(wrapper.find(SplitButton).exists()).toBe(true);
       expect(wrapper.find('.js-split-button').text()).toContain('Resolve with merge request');

@@ -133,7 +133,7 @@ describe('Pipeline Security Dashboard component', () => {
           securityReportSummary,
         },
       });
-      expect(wrapper.contains(SecurityReportsSummary)).toBe(true);
+      expect(wrapper.find(SecurityReportsSummary).exists()).toBe(true);
     });
 
     it('does not show the summary if it is empty', () => {
@@ -142,7 +142,7 @@ describe('Pipeline Security Dashboard component', () => {
           securityReportSummary: null,
         },
       });
-      expect(wrapper.contains(SecurityReportsSummary)).toBe(false);
+      expect(wrapper.find(SecurityReportsSummary).exists()).toBe(false);
     });
   });
 });

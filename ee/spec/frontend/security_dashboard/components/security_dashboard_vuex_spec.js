@@ -124,7 +124,7 @@ describe('Security Dashboard component', () => {
     });
 
     it('renders the issue modal', () => {
-      expect(wrapper.contains(IssueModal)).toBe(true);
+      expect(wrapper.find(IssueModal).exists()).toBe(true);
     });
 
     it('passes the "vulnerabilityFeedbackHelpPath" prop to the issue modal', () => {

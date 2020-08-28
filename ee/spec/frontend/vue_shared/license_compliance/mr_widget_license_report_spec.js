@@ -308,7 +308,7 @@ describe('License Report MR Widget', () => {
       const props = { ...defaultProps, fullReportPath: null };
       mountComponent({ props });
 
-      expect(wrapper.contains(selector)).toBe(false);
+      expect(wrapper.find(selector).exists()).toBe(false);
     });
   });
 
@@ -329,7 +329,7 @@ describe('License Report MR Widget', () => {
       const props = { ...defaultProps, licenseManagementSettingsPath: null };
       mountComponent({ props });
 
-      expect(wrapper.contains(selector)).toBe(false);
+      expect(wrapper.find(selector).exists()).toBe(false);
     });
   });
 

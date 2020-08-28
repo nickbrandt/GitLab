@@ -196,7 +196,7 @@ describe('OnDemandScansApp', () => {
       });
 
       it('shows a skeleton loader', () => {
-        expect(wrapper.contains(GlSkeletonLoader)).toBe(true);
+        expect(wrapper.find(GlSkeletonLoader).exists()).toBe(true);
       });
     });
 

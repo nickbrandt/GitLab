@@ -38,7 +38,7 @@ describe('Storage Counter project component', () => {
   });
 
   it('renders project avatar', () => {
-    expect(wrapper.contains(ProjectAvatar)).toBe(true);
+    expect(wrapper.find(ProjectAvatar).exists()).toBe(true);
   });
 
   it('renders project name', () => {

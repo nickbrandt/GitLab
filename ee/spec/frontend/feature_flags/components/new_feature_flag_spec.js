@@ -88,7 +88,7 @@ describe('New feature flag form', () => {
   });
 
   it('should not alert users that feature flags are changing soon', () => {
-    expect(wrapper.contains(GlAlert)).toBe(false);
+    expect(wrapper.find(GlAlert).exists()).toBe(false);
   });
 
   it('should pass in the project ID', () => {

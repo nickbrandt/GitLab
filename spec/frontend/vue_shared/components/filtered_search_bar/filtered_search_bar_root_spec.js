@@ -52,10 +52,10 @@ describe('FilteredSearchBarRoot', () => {
       expect(wrapper.vm.filterValue).toEqual([]);
       expect(wrapper.vm.selectedSortOption).toBe(mockSortOptions[0].sortDirection.descending);
       expect(wrapper.vm.selectedSortDirection).toBe(SortDirection.descending);
-      expect(wrapper.contains(GlButtonGroup)).toBe(true);
-      expect(wrapper.contains(GlButton)).toBe(true);
-      expect(wrapper.contains(GlDropdown)).toBe(true);
-      expect(wrapper.contains(GlDropdownItem)).toBe(true);
+      expect(wrapper.find(GlButtonGroup).exists()).toBe(true);
+      expect(wrapper.find(GlButton).exists()).toBe(true);
+      expect(wrapper.find(GlDropdown).exists()).toBe(true);
+      expect(wrapper.find(GlDropdownItem).exists()).toBe(true);
     });
 
     it('does not initialize `selectedSortOption` and `selectedSortDirection` when `sortOptions` is not applied and hides the sort dropdown', () => {

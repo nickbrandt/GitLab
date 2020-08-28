@@ -60,8 +60,8 @@ describe('Insights component', () => {
     it('renders config loading state', async () => {
       vuexStore.state.insights.configLoading = true;
 
-      expect(wrapper.contains('.insights-config-loading')).toBe(true);
-      expect(wrapper.contains('.insights-wrapper')).toBe(false);
+      expect(wrapper.find('.insights-config-loading').exists()).toBe(true);
+      expect(wrapper.find('.insights-wrapper').exists()).toBe(false);
     });
   });
 
@@ -86,7 +86,7 @@ describe('Insights component', () => {
 
       it('has the correct nav tabs', async () => {
         await wrapper.vm.$nextTick();
-        expect(wrapper.contains(GlDeprecatedDropdown)).toBe(true);
+        expect(wrapper.find(GlDeprecatedDropdown).exists()).toBe(true);
         expect(
           wrapper
             .find(GlDeprecatedDropdown)
@@ -117,7 +117,7 @@ describe('Insights component', () => {
 
       it('has the correct nav tabs', async () => {
         await wrapper.vm.$nextTick();
-        expect(wrapper.contains(GlDeprecatedDropdown)).toBe(true);
+        expect(wrapper.find(GlDeprecatedDropdown).exists()).toBe(true);
         expect(
           wrapper
             .find(GlDeprecatedDropdown)
