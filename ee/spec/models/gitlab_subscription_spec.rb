@@ -53,7 +53,7 @@ RSpec.describe GitlabSubscription do
     end
   end
 
-  describe '#seats_in_use' do
+  describe '#calculate_seats_in_use' do
     let!(:user_1)         { create(:user) }
     let!(:user_2)         { create(:user) }
     let!(:blocked_user)   { create(:user, :blocked) }
@@ -68,14 +68,14 @@ RSpec.describe GitlabSubscription do
     it 'returns count of members' do
       group.add_developer(user_1)
 
-      expect(gitlab_subscription.seats_in_use).to eq(1)
+      expect(gitlab_subscription.calculate_seats_in_use).to eq(1)
     end
 
     it 'also counts users from subgroups' do
       group.add_developer(user_1)
       subgroup_1.add_developer(user_2)
 
-      expect(gitlab_subscription.seats_in_use).to eq(2)
+      expect(gitlab_subscription.calculate_seats_in_use).to eq(2)
     end
 
     it 'does not count duplicated members' do
@@ -83,7 +83,7 @@ RSpec.describe GitlabSubscription do
       subgroup_1.add_developer(user_2)
       subgroup_2.add_developer(user_2)
 
-      expect(gitlab_subscription.seats_in_use).to eq(2)
+      expect(gitlab_subscription.calculate_seats_in_use).to eq(2)
     end
 
     it 'does not count blocked members' do
@@ -91,7 +91,7 @@ RSpec.describe GitlabSubscription do
       group.add_developer(blocked_user)
 
       expect(group.member_count).to eq(2)
-      expect(gitlab_subscription.seats_in_use).to eq(1)
+      expect(gitlab_subscription.calculate_seats_in_use).to eq(1)
     end
 
     context 'with guest members' do
@@ -103,7 +103,7 @@ RSpec.describe GitlabSubscription do
         it 'excludes these members' do
           gitlab_subscription.update!(plan_code: 'gold')
 
-          expect(gitlab_subscription.seats_in_use).to eq(0)
+          expect(gitlab_subscription.calculate_seats_in_use).to eq(0)
         end
       end
 
@@ -112,7 +112,7 @@ RSpec.describe GitlabSubscription do
           it 'excludes these members' do
             gitlab_subscription.update!(plan_code: plan)
 
-            expect(gitlab_subscription.seats_in_use).to eq(1)
+            expect(gitlab_subscription.calculate_seats_in_use).to eq(1)
           end
         end
       end
@@ -130,13 +130,13 @@ RSpec.describe GitlabSubscription do
         [bronze_plan, silver_plan, gold_plan].each do |plan|
           gitlab_subscription.update!(hosted_plan: plan)
 
-          expect(gitlab_subscription.seats_in_use).to eq(1)
+          expect(gitlab_subscription.calculate_seats_in_use).to eq(1)
         end
       end
     end
   end
 
-  describe '#seats_owed' do
+  describe '#calculate_seats_owed' do
     let!(:gitlab_subscription) { create(:gitlab_subscription, subscription_attrs) }
 
     before do
@@ -145,7 +145,7 @@ RSpec.describe GitlabSubscription do
 
     shared_examples 'always returns a total of 0' do
       it 'does not update max_seats_used' do
-        expect(gitlab_subscription.seats_owed).to eq(0)
+        expect(gitlab_subscription.calculate_seats_owed).to eq(0)
       end
     end
 
@@ -171,7 +171,7 @@ RSpec.describe GitlabSubscription do
       let(:subscription_attrs) { { hosted_plan: bronze_plan } }
 
       it 'calculates the number of owed seats' do
-        expect(gitlab_subscription.reload.seats_owed).to eq(5)
+        expect(gitlab_subscription.reload.calculate_seats_owed).to eq(5)
       end
     end
   end
