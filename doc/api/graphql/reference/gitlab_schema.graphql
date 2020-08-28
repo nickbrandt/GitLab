@@ -2747,19 +2747,9 @@ input CreateSnippetInput {
   clientMutationId: String
 
   """
-  Content of the snippet
-  """
-  content: String
-
-  """
   Description of the snippet
   """
   description: String
-
-  """
-  File name of the snippet
-  """
-  fileName: String
 
   """
   The project full path the snippet is associated with
@@ -16567,19 +16557,9 @@ input UpdateSnippetInput {
   clientMutationId: String
 
   """
-  Content of the snippet
-  """
-  content: String
-
-  """
   Description of the snippet
   """
   description: String
-
-  """
-  File name of the snippet
-  """
-  fileName: String
 
   """
   The global id of the snippet to update
