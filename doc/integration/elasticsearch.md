@@ -746,6 +746,17 @@ Here are some common pitfalls and how to overcome them:
 
   You can run `sudo gitlab-rake gitlab:elastic:projects_not_indexed` to display projects that aren't indexed.
 
+- **No new data is added to the Elasticsearch index when I push code**
+
+  NOTE: **Note:**
+  This was [fixed in GitLab 13.2](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/35936) and the Rake task is not available for versions greater than that.
+
+  When performing the initial indexing of blobs, we lock all projects until the project finishes indexing. It could happen that an error during the process causes one or multiple projects to remain locked. In order to unlock them, run:
+
+  ```shell
+  sudo gitlab-rake gitlab:elastic:clear_locked_projects
+  ```
+
 - **"Can't specify parent if no parent field has been configured"**
 
   If you enabled Elasticsearch before GitLab 8.12 and have not rebuilt indexes you will get
