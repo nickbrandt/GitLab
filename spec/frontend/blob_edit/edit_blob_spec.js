@@ -6,10 +6,12 @@ jest.mock('~/editor/editor_lite');
 jest.mock('~/editor/editor_markdown_ext');
 
 describe('Blob Editing', () => {
+  const mockInstance = 'foo';
   beforeEach(() => {
     setFixtures(
-      `<div class="js-edit-blob-form"><div id="file_path"></div><div id="iditor"></div><input id="file-content"></div>`,
+      `<div class="js-edit-blob-form"><div id="file_path"></div><div id="editor"></div><input id="file-content"></div>`,
     );
+    jest.spyOn(EditorLite.prototype, 'createInstance').mockReturnValue(mockInstance);
   });
 
   const initEditor = (isMarkdown = false) => {
@@ -26,6 +28,6 @@ describe('Blob Editing', () => {
 
   it('loads MarkdownExtension only for the markdown files', async () => {
     await initEditor(true);
-    expect(EditorLite.prototype.use).toHaveBeenCalledWith(MarkdownExtension);
+    expect(EditorLite.prototype.use).toHaveBeenCalledWith(MarkdownExtension, mockInstance);
   });
 });

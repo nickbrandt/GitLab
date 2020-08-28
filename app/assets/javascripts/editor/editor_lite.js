@@ -1,4 +1,4 @@
-import { editor as monacoEditor, languages as monacoLanguages, Position, Uri } from 'monaco-editor';
+import { editor as monacoEditor, languages as monacoLanguages, Uri } from 'monaco-editor';
 import { DEFAULT_THEME, themes } from '~/ide/lib/themes';
 import languages from '~/ide/lib/languages';
 import { defaultEditorOptions } from '~/ide/lib/editor_options';
