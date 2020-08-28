@@ -10,7 +10,6 @@ import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { s__, __ } from '~/locale';
 import RelatedIssues from './related_issues.vue';
 import HistoryEntry from './history_entry.vue';
-import VulnerabilitiesEventBus from './vulnerabilities_event_bus';
 import initUserPopovers from '~/user_popovers';
 
 export default {
@@ -84,8 +83,6 @@ export default {
 
   created() {
     this.fetchDiscussions();
-
-    VulnerabilitiesEventBus.$on('VULNERABILITY_STATE_CHANGE', this.fetchDiscussions);
   },
 
   updated() {
@@ -187,7 +184,7 @@ export default {
 
       // Emit an event that tells the header to refresh the vulnerability.
       if (isVulnerabilityStateChanged) {
-        VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGED');
+        this.$emit('vulnerability-state-change');
       }
     },
   },

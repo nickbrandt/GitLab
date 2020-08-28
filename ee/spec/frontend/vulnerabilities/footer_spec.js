@@ -2,7 +2,6 @@ import { shallowMount } from '@vue/test-utils';
 import Api from 'ee/api';
 import VulnerabilityFooter from 'ee/vulnerabilities/components/footer.vue';
 import HistoryEntry from 'ee/vulnerabilities/components/history_entry.vue';
-import VulnerabilitiesEventBus from 'ee/vulnerabilities/components/vulnerabilities_event_bus';
 import RelatedIssues from 'ee/vulnerabilities/components/related_issues.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
@@ -64,11 +63,14 @@ describe('Vulnerability Footer', () => {
     mockAxios.reset();
   });
 
-  describe('vulnerabilities event bus listener', () => {
-    it('calls the discussion url on vulnerabilities event bus emit of VULNERABILITY_STATE_CHANGE', () => {
+  describe('fetching discussions', () => {
+    it('calls the discussion url on if fetchDiscussions is called by the root', async () => {
       createWrapper();
       jest.spyOn(axios, 'get');
-      VulnerabilitiesEventBus.$emit('VULNERABILITY_STATE_CHANGE');
+      wrapper.vm.fetchDiscussions();
+
+      await axios.waitForAll();
+
       expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
@@ -252,16 +254,18 @@ describe('Vulnerability Footer', () => {
         });
       });
 
-      it('emits the VULNERABILITY_STATE_CHANGED event when the system note is new', async () => {
-        const spy = jest.spyOn(VulnerabilitiesEventBus, '$emit');
+      it('emits the vulnerability-state-change event when the system note is new', async () => {
+        const handler = jest.fn();
+        wrapper.vm.$on('vulnerability-state-change', handler);
+
         const note = { system: true, id: 1, discussion_id: 3 };
         createNotesRequest(note);
+
         await axios.waitForAll();
 
         await startTimeoutsAndAwaitRequests();
 
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith('VULNERABILITY_STATE_CHANGED');
+        expect(handler).toHaveBeenCalledTimes(1);
       });
     });
   });
