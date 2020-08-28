@@ -1,29 +1,16 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import { __ } from '~/locale';
-import UrlSync from '~/vue_shared/components/url_sync.vue';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import MilestoneToken from '~/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue';
 import LabelToken from '~/vue_shared/components/filtered_search_bar/tokens/label_token.vue';
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
-
-export const prepareTokens = ({
-  milestone = null,
-  author = null,
-  assignees = [],
-  labels = [],
-} = {}) => {
-  const authorToken = author ? [{ type: 'author', value: { data: author } }] : [];
-  const milestoneToken = milestone ? [{ type: 'milestone', value: { data: milestone } }] : [];
-  const assigneeTokens = assignees?.length
-    ? assignees.map(data => ({ type: 'assignees', value: { data } }))
-    : [];
-  const labelTokens = labels?.length
-    ? labels.map(data => ({ type: 'labels', value: { data } }))
-    : [];
-
-  return [...authorToken, ...milestoneToken, ...assigneeTokens, ...labelTokens];
-};
+import UrlSync from '~/vue_shared/components/url_sync.vue';
+import {
+  DEFAULT_LABEL_NONE,
+  DEFAULT_LABEL_ANY,
+} from '~/vue_shared/components/filtered_search_bar/constants';
+import { prepareTokens, processFilters } from '../../shared/utils';
 
 export default {
   name: 'FilterBar',
@@ -66,6 +53,7 @@ export default {
           title: __('Label'),
           type: 'labels',
           token: LabelToken,
+          defaultLabels: [DEFAULT_LABEL_NONE, DEFAULT_LABEL_ANY],
           initialLabels: this.labelsData,
           unique: false,
           symbol: '~',
@@ -123,30 +111,8 @@ export default {
       } = this;
       return prepareTokens({ milestone, author, assignees, labels });
     },
-    processFilters(filters) {
-      return filters.reduce((acc, token) => {
-        const { type, value } = token;
-        const { operator } = value;
-        let tokenValue = value.data;
-
-        // remove wrapping double quotes which were added for token values that include spaces
-        if (
-          (tokenValue[0] === "'" && tokenValue[tokenValue.length - 1] === "'") ||
-          (tokenValue[0] === '"' && tokenValue[tokenValue.length - 1] === '"')
-        ) {
-          tokenValue = tokenValue.slice(1, -1);
-        }
-
-        if (!acc[type]) {
-          acc[type] = [];
-        }
-
-        acc[type].push({ value: tokenValue, operator });
-        return acc;
-      }, {});
-    },
     handleFilter(filters) {
-      const { labels, milestone, author, assignees } = this.processFilters(filters);
+      const { labels, milestone, author, assignees } = processFilters(filters);
 
       this.setFilters({
         selectedAuthor: author ? author[0].value : null,

@@ -4,8 +4,9 @@ import { GlLoadingIcon, GlEmptyState, GlBadge, GlPagination } from '@gitlab/ui';
 import CodeReviewAnalyticsApp from 'ee/analytics/code_review_analytics/components/app.vue';
 import MergeRequestTable from 'ee/analytics/code_review_analytics/components/merge_request_table.vue';
 import FilterBar from 'ee/analytics/code_review_analytics/components/filter_bar.vue';
+import * as actions from 'ee/analytics/code_review_analytics/store/actions';
 import createMergeRequestsState from 'ee/analytics/code_review_analytics/store/modules/merge_requests/state';
-import createFiltersState from 'ee/analytics/code_review_analytics/store/modules/filters/state';
+import createFiltersState from 'ee/analytics/shared/store/modules/filters/state';
 import { TEST_HOST } from 'helpers/test_constants';
 
 const mockFilterManagerSetup = jest.fn();
@@ -24,8 +25,7 @@ describe('CodeReviewAnalyticsApp component', () => {
 
   let setPage;
   let fetchMergeRequests;
-  let setMilestonesEndpoint;
-  let setLabelsEndpoint;
+  let setEndpoints;
 
   const pageInfo = {
     page: 1,
@@ -35,6 +35,7 @@ describe('CodeReviewAnalyticsApp component', () => {
 
   const createStore = (initialState = {}, getters = {}) =>
     new Vuex.Store({
+      actions,
       modules: {
         mergeRequests: {
           namespaced: true,
@@ -59,8 +60,7 @@ describe('CodeReviewAnalyticsApp component', () => {
             ...initialState.filters,
           },
           actions: {
-            setMilestonesEndpoint,
-            setLabelsEndpoint,
+            setEndpoints,
           },
         },
       },
@@ -88,8 +88,7 @@ describe('CodeReviewAnalyticsApp component', () => {
   beforeEach(() => {
     setPage = jest.fn();
     fetchMergeRequests = jest.fn();
-    setMilestonesEndpoint = jest.fn();
-    setLabelsEndpoint = jest.fn();
+    setEndpoints = jest.fn();
   });
 
   afterEach(() => {
@@ -118,12 +117,8 @@ describe('CodeReviewAnalyticsApp component', () => {
         expect(mockFilterManagerSetup).toHaveBeenCalled();
       });
 
-      it('does not call setMilestonesEndpoint action', () => {
-        expect(setMilestonesEndpoint).not.toHaveBeenCalled();
-      });
-
-      it('does not call setLabelsEndpoint action', () => {
-        expect(setLabelsEndpoint).not.toHaveBeenCalled();
+      it('does not call setEndpoints action', () => {
+        expect(setEndpoints).not.toHaveBeenCalled();
       });
     });
 
@@ -142,12 +137,8 @@ describe('CodeReviewAnalyticsApp component', () => {
           expect(mockFilterManagerSetup).not.toHaveBeenCalled();
         });
 
-        it('calls setMilestonesEndpoint action', () => {
-          expect(setMilestonesEndpoint).toHaveBeenCalled();
-        });
-
-        it('calls setLabelsEndpoint action', () => {
-          expect(setLabelsEndpoint).toHaveBeenCalled();
+        it('calls setEndpoints action', () => {
+          expect(setEndpoints).toHaveBeenCalled();
         });
       });
     });

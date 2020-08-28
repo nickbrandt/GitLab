@@ -16,7 +16,7 @@ import {
   valueStreams,
 } from '../mock_data';
 
-const groupPath = 'fake_group_path';
+const group = { parentId: 'fake_group_parent_id', fullPath: 'fake_group_full_path' };
 const milestonesPath = 'fake_milestones_path';
 const labelsPath = 'fake_labels_path';
 
@@ -107,16 +107,17 @@ describe('Cycle analytics actions', () => {
 
   describe('setPaths', () => {
     describe('with endpoint paths provided', () => {
-      it('dispatches the filters/setEndpoints action', () => {
+      it('dispatches the filters/setEndpoints action with enpoints', () => {
         return testAction(
           actions.setPaths,
-          { groupPath, milestonesPath, labelsPath },
+          { group, milestonesPath, labelsPath },
           state,
           [],
           [
             {
               type: 'filters/setEndpoints',
               payload: {
+                groupEndpoint: 'fake_group_parent_id',
                 labelsEndpoint: 'fake_labels_path.json',
                 milestonesEndpoint: 'fake_milestones_path.json',
               },
@@ -127,23 +128,66 @@ describe('Cycle analytics actions', () => {
     });
 
     describe('without endpoint paths provided', () => {
-      it('dispatches the filters/setEndpoints action', () => {
+      it('dispatches the filters/setEndpoints action and prefers group.parentId', () => {
         return testAction(
           actions.setPaths,
-          { groupPath },
+          { group },
           state,
           [],
           [
             {
               type: 'filters/setEndpoints',
               payload: {
-                labelsEndpoint: '/groups/fake_group_path/-/labels.json',
-                milestonesEndpoint: '/groups/fake_group_path/-/milestones.json',
+                groupEndpoint: 'fake_group_parent_id',
+                labelsEndpoint: '/groups/fake_group_parent_id/-/labels.json',
+                milestonesEndpoint: '/groups/fake_group_parent_id/-/milestones.json',
               },
             },
           ],
         );
       });
+
+      it('dispatches the filters/setEndpoints action and uses group.fullPath', () => {
+        const { fullPath } = group;
+        return testAction(
+          actions.setPaths,
+          { group: { fullPath } },
+          state,
+          [],
+          [
+            {
+              type: 'filters/setEndpoints',
+              payload: {
+                groupEndpoint: 'fake_group_full_path',
+                labelsEndpoint: '/groups/fake_group_full_path/-/labels.json',
+                milestonesEndpoint: '/groups/fake_group_full_path/-/milestones.json',
+              },
+            },
+          ],
+        );
+      });
+
+      it.each([undefined, null, { parentId: null }, { fullPath: null }, {}])(
+        'group=%s will return empty string',
+        value => {
+          return testAction(
+            actions.setPaths,
+            { group: value, milestonesPath, labelsPath },
+            state,
+            [],
+            [
+              {
+                type: 'filters/setEndpoints',
+                payload: {
+                  groupEndpoint: '',
+                  labelsEndpoint: 'fake_labels_path.json',
+                  milestonesEndpoint: 'fake_milestones_path.json',
+                },
+              },
+            ],
+          );
+        },
+      );
     });
   });
 

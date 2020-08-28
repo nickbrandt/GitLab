@@ -3,6 +3,8 @@ import {
   buildProjectFromDataset,
   buildCycleAnalyticsInitialData,
   filterBySearchTerm,
+  prepareTokens,
+  processFilters,
 } from 'ee/analytics/shared/utils';
 
 const groupDataset = {
@@ -230,6 +232,53 @@ describe('buildCycleAnalyticsInitialData', () => {
 
     it('with a key, filters by the provided key', () => {
       expect(filterBySearchTerm(data, 'ne', 'title')).toEqual([data[0]]);
+    });
+  });
+});
+
+describe('prepareTokens', () => {
+  describe('with empty data', () => {
+    it('returns an empty array', () => {
+      expect(prepareTokens()).toEqual([]);
+      expect(prepareTokens({})).toEqual([]);
+      expect(prepareTokens({ milestone: null, author: null, assignees: [], labels: [] })).toEqual(
+        [],
+      );
+    });
+  });
+
+  it.each`
+    token          | value                     | result
+    ${'milestone'} | ${'v1.0'}                 | ${[{ type: 'milestone', value: { data: 'v1.0' } }]}
+    ${'author'}    | ${'mr.popo'}              | ${[{ type: 'author', value: { data: 'mr.popo' } }]}
+    ${'labels'}    | ${['z-fighters']}         | ${[{ type: 'labels', value: { data: 'z-fighters' } }]}
+    ${'assignees'} | ${['krillin', 'piccolo']} | ${[{ type: 'assignees', value: { data: 'krillin' } }, { type: 'assignees', value: { data: 'piccolo' } }]}
+  `('with $token=$value sets the $token key', ({ token, value, result }) => {
+    const res = prepareTokens({ [token]: value });
+    expect(res).toEqual(result);
+  });
+});
+
+describe('processFilters', () => {
+  it('processes multiple filter values', () => {
+    const result = processFilters([
+      { type: 'milestone', value: { data: 'my-milestone', operator: '=' } },
+      { type: 'labels', value: { data: 'my-label', operator: '=' } },
+    ]);
+
+    expect(result).toStrictEqual({
+      labels: [{ value: 'my-label', operator: '=' }],
+      milestone: [{ value: 'my-milestone', operator: '=' }],
+    });
+  });
+
+  it('does not remove wrapping double quotes from the data', () => {
+    const result = processFilters([
+      { type: 'milestone', value: { data: '"milestone with spaces"', operator: '=' } },
+    ]);
+
+    expect(result).toStrictEqual({
+      milestone: [{ value: '"milestone with spaces"', operator: '=' }],
     });
   });
 });

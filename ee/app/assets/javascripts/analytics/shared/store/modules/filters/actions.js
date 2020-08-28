@@ -4,9 +4,10 @@ import { __ } from '~/locale';
 import Api from '~/api';
 import * as types from './mutation_types';
 
-export const setEndpoints = ({ commit }, { milestonesEndpoint, labelsEndpoint }) => {
+export const setEndpoints = ({ commit }, { milestonesEndpoint, labelsEndpoint, groupEndpoint }) => {
   commit(types.SET_MILESTONES_ENDPOINT, milestonesEndpoint);
   commit(types.SET_LABELS_ENDPOINT, labelsEndpoint);
+  commit(types.SET_GROUP_ENDPOINT, groupEndpoint);
 };
 
 export const fetchMilestones = ({ commit, state }, search_title = '') => {
@@ -57,23 +58,23 @@ const fetchUser = ({ commit, endpoint, query, action, errorMessage }) => {
     });
 };
 
-export const fetchAuthors = ({ commit, rootGetters }, query = '') => {
-  const { currentGroupParentPath } = rootGetters;
+export const fetchAuthors = ({ commit, state }, query = '') => {
+  const { groupEndpoint } = state;
   return fetchUser({
     commit,
     query,
-    endpoint: currentGroupParentPath,
+    endpoint: groupEndpoint,
     action: 'AUTHORS',
     errorMessage: __('Failed to load authors. Please try again.'),
   });
 };
 
-export const fetchAssignees = ({ commit, rootGetters }, query = '') => {
-  const { currentGroupParentPath } = rootGetters;
+export const fetchAssignees = ({ commit, state }, query = '') => {
+  const { groupEndpoint } = state;
   return fetchUser({
     commit,
     query,
-    endpoint: currentGroupParentPath,
+    endpoint: groupEndpoint,
     action: 'ASSIGNEES',
     errorMessage: __('Failed to load assignees. Please try again.'),
   });

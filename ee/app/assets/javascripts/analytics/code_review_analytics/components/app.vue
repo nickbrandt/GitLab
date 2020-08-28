@@ -67,15 +67,17 @@ export default {
       this.filterManager = new FilteredSearchCodeReviewAnalytics();
       this.filterManager.setup();
     } else {
-      this.setMilestonesEndpoint(this.milestonePath);
-      this.setLabelsEndpoint(this.labelsPath);
+      this.setEndpoints({
+        milestonesEndpoint: this.milestonePath,
+        labelsEndpoint: this.labelsPath,
+      });
     }
 
     this.setProjectId(this.projectId);
     this.fetchMergeRequests();
   },
   methods: {
-    ...mapActions('filters', ['setMilestonesEndpoint', 'setLabelsEndpoint']),
+    ...mapActions('filters', ['setEndpoints']),
     ...mapActions('mergeRequests', ['setProjectId', 'fetchMergeRequests', 'setPage']),
   },
 };
