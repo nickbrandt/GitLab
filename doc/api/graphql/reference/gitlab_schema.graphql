@@ -10698,6 +10698,11 @@ type Pipeline {
   beforeSha: String
 
   """
+  Specifies if a pipeline is cancelable
+  """
+  cancelable: Boolean!
+
+  """
   Timestamp of the pipeline's commit
   """
   committedAt: Time
@@ -10718,6 +10723,11 @@ type Pipeline {
   Timestamp of the pipeline's creation
   """
   createdAt: Time!
+
+  """
+  Specifies if a pipeline can be destroyed
+  """
+  destroyable: Boolean!
 
   """
   Detailed status of the pipeline
@@ -10743,6 +10753,11 @@ type Pipeline {
   Internal ID of the pipeline
   """
   iid: String!
+
+  """
+  Specifies if a pipeline is retryable
+  """
+  retryable: Boolean!
 
   """
   Vulnerability and scanned resource counts for each security scanner of the pipeline

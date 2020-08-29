@@ -57,7 +57,7 @@ module Types
             method: :cancelable?,
             null: false
       field :destroyable, GraphQL::BOOLEAN_TYPE,
-            description: 'Specifies if a pipeline cann be destroyed',
+            description: 'Specifies if a pipeline can be destroyed',
             null: false,
             resolve: -> (pipeline, _args, context) { Ability.allowed?(context[:current_user], :destroy_pipeline, pipeline) }
     end

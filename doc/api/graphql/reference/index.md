@@ -1650,15 +1650,18 @@ Information about pagination in a connection.
 | Name  | Type  | Description |
 | ---   |  ---- | ----------  |
 | `beforeSha` | String | Base SHA of the source branch |
+| `cancelable` | Boolean! | Specifies if a pipeline is cancelable |
 | `committedAt` | Time | Timestamp of the pipeline's commit |
 | `configSource` | PipelineConfigSourceEnum | Config source of the pipeline (UNKNOWN_SOURCE, REPOSITORY_SOURCE, AUTO_DEVOPS_SOURCE, WEBIDE_SOURCE, REMOTE_SOURCE, EXTERNAL_PROJECT_SOURCE, BRIDGE_SOURCE, PARAMETER_SOURCE) |
 | `coverage` | Float | Coverage percentage |
 | `createdAt` | Time! | Timestamp of the pipeline's creation |
+| `destroyable` | Boolean! | Specifies if a pipeline can be destroyed |
 | `detailedStatus` | DetailedStatus! | Detailed status of the pipeline |
 | `duration` | Int | Duration of the pipeline in seconds |
 | `finishedAt` | Time | Timestamp of the pipeline's completion |
 | `id` | ID! | ID of the pipeline |
 | `iid` | String! | Internal ID of the pipeline |
+| `retryable` | Boolean! | Specifies if a pipeline is retryable |
 | `securityReportSummary` | SecurityReportSummary | Vulnerability and scanned resource counts for each security scanner of the pipeline |
 | `sha` | String! | SHA of the pipeline's commit |
 | `startedAt` | Time | Timestamp when the pipeline was started |
