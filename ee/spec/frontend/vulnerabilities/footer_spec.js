@@ -4,7 +4,6 @@ import VulnerabilityFooter from 'ee/vulnerabilities/components/footer.vue';
 import HistoryEntry from 'ee/vulnerabilities/components/history_entry.vue';
 import RelatedIssues from 'ee/vulnerabilities/components/related_issues.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
-import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
@@ -88,25 +87,19 @@ describe('Vulnerability Footer', () => {
     });
   });
 
-  describe.each`
-    type               | prop                      | component
-    ${'issue'}         | ${'issueFeedback'}        | ${IssueNote}
-    ${'merge request'} | ${'mergeRequestFeedback'} | ${MergeRequestNote}
-  `('$type note', ({ prop, component }) => {
+  describe('merge request note', () => {
     // The object itself does not matter, we just want to make sure it's passed to the issue note.
-    const feedback = {};
+    const mergeRequestFeedback = {};
 
-    it('shows issue note when an issue exists for the vulnerability', () => {
-      createWrapper({ ...minimumProps, [prop]: feedback });
-      expect(wrapper.find(component).exists()).toBe(true);
-      expect(wrapper.find(component).props()).toMatchObject({
-        feedback,
-      });
+    it('shows merge request note when a merge request exists for the vulnerability', () => {
+      createWrapper({ ...minimumProps, mergeRequestFeedback });
+      expect(wrapper.find(MergeRequestNote).exists()).toBe(true);
+      expect(wrapper.find(MergeRequestNote).props('feedback')).toMatchObject(mergeRequestFeedback);
     });
 
-    it('does not show issue note when there is no issue for the vulnerability', () => {
+    it('does not show merge request note when there is no merge request for the vulnerability', () => {
       createWrapper();
-      expect(wrapper.find(component).exists()).toBe(false);
+      expect(wrapper.find(MergeRequestNote).exists()).toBe(false);
     });
   });
 
