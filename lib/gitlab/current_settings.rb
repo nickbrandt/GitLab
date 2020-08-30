@@ -56,6 +56,8 @@ module Gitlab
         elsif current_settings.present?
           current_settings
         else
+          check_application_settings_schema!
+
           ::ApplicationSetting.create_from_defaults
         end
       end
@@ -66,6 +68,22 @@ module Gitlab
 
       def in_memory_application_settings
         @in_memory_application_settings ||= ::ApplicationSetting.build_from_defaults
+      end
+
+      # Due to the frequency with which settings are accessed, it is
+      # likely that during a backup restore a running GitLab process
+      # will insert a new `application_settings` row before the
+      # constraints have been added to the table. This would add an
+      # extra row with ID 1 and prevent the primary key constraint from
+      # being added, which made ActiveRecord throw a
+      # IrreversibleOrderError anytime the settings were accessed
+      # (https://gitlab.com/gitlab-org/gitlab/-/issues/36405).  To
+      # prevent this from happening, we do a sanity check that the
+      # primary key constraint is present before inserting a new entry.
+      def check_application_settings_schema!
+        return if ActiveRecord::Base.connection.primary_key(ApplicationSetting.table_name).present?
+
+        raise "The `application_settings` table is missing a primary key constraint in the database schema"
       end
 
       def connect_to_db?
