@@ -111,7 +111,7 @@ module EE
 
     # override
     def weight
-      super if supports_weight?
+      super if weight_available?
     end
 
     # override
@@ -132,8 +132,9 @@ module EE
       changed_fields && (changed_fields & ELASTICSEARCH_PERMISSION_TRACKED_FIELDS).any?
     end
 
+    override :supports_weight?
     def supports_weight?
-      project&.feature_available?(:issue_weights)
+      !incident?
     end
 
     def can_assign_epic?(user)
