@@ -1,0 +1,6 @@
+fragment SastAnalyzerConfigurationEntityFragment on SastAnalyzerConfigurationEntity {
+  name
+  label
+  enabled
+  description
+}
