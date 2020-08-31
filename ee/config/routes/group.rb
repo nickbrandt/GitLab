@@ -124,7 +124,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
-    resources :iterations, only: [:index, :new, :show], constraints: { id: /\d+/ }
+    resources :iterations, only: [:index, :new, :edit, :show], constraints: { id: /\d+/ }
 
     resources :issues, only: [] do
       collection do

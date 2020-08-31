@@ -118,7 +118,7 @@ describe('FilteredSearchBar', () => {
       expect(setFiltersMock).toHaveBeenCalledWith(
         expect.anything(),
         {
-          selectedLabels: [{ value: 'my-label', operator: '=' }],
+          selectedLabelList: [{ value: 'my-label', operator: '=' }],
           selectedMilestone: { value: 'my-milestone', operator: '=' },
         },
         undefined,

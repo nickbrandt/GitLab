@@ -15,7 +15,8 @@ export default {
   props: {
     currentStage: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => {},
     },
     medians: {
       type: Object,
@@ -74,6 +75,10 @@ export default {
     medianValue(id) {
       return this.medians[id] ? this.medians[id] : null;
     },
+    isActiveStage(stageId) {
+      const { currentStage, isCreatingCustomStage } = this;
+      return Boolean(!isCreatingCustomStage && currentStage && stageId === currentStage.id);
+    },
   },
   STAGE_ACTIONS,
   noDragClass: NO_DRAG_CLASS,
@@ -87,7 +92,7 @@ export default {
       :key="`ca-stage-title-${stage.title}`"
       :title="stage.title"
       :value="medianValue(stage.id)"
-      :is-active="!isCreatingCustomStage && stage.id === currentStage.id"
+      :is-active="isActiveStage(stage.id)"
       :is-default-stage="!stage.custom"
       @remove="$emit($options.STAGE_ACTIONS.REMOVE, stage.id)"
       @hide="$emit($options.STAGE_ACTIONS.HIDE, { id: stage.id, hidden: true })"
@@ -97,7 +102,7 @@ export default {
     <add-stage-button
       :class="$options.noDragClass"
       :active="isCreatingCustomStage"
-      @showform="$emit('showAddStageForm')"
+      @showform="$emit('show-add-stage-form')"
     />
   </ul>
 </template>

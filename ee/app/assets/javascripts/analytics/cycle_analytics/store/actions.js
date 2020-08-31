@@ -122,22 +122,28 @@ export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
 };
 
 export const receiveCycleAnalyticsDataError = ({ commit }, { response }) => {
-  const { status = null } = response; // non api errors thrown won't have a status field
-  commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR, status);
+  const { status = httpStatus.INTERNAL_SERVER_ERROR } = response;
 
-  if (!status || status !== httpStatus.FORBIDDEN)
+  commit(types.RECEIVE_CYCLE_ANALYTICS_DATA_ERROR, status);
+  if (status !== httpStatus.FORBIDDEN) {
     createFlash(__('There was an error while fetching value stream analytics data.'));
+  }
 };
 
 export const fetchCycleAnalyticsData = ({ dispatch }) => {
   removeFlash();
 
-  dispatch('requestCycleAnalyticsData');
-
   return Promise.resolve()
+    .then(() => dispatch('requestCycleAnalyticsData'))
     .then(() => dispatch('fetchValueStreams'))
     .then(() => dispatch('receiveCycleAnalyticsDataSuccess'))
-    .catch(error => dispatch('receiveCycleAnalyticsDataError', error));
+    .catch(error => {
+      return Promise.all([
+        dispatch('receiveCycleAnalyticsDataError', error),
+        dispatch('durationChart/setLoading', false),
+        dispatch('typeOfWork/setLoading', false),
+      ]);
+    });
 };
 
 export const requestGroupStages = ({ commit }) => commit(types.REQUEST_GROUP_STAGES);
@@ -280,6 +286,8 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
         selectedAssignees,
         selectedLabels,
       }),
+      dispatch('durationChart/setLoading', true),
+      dispatch('typeOfWork/setLoading', true),
     ])
       .then(() => dispatch('fetchCycleAnalyticsData'))
       .then(() => dispatch('initializeCycleAnalyticsSuccess'));
@@ -313,7 +321,7 @@ export const reorderStage = ({ dispatch, getters }, initialData) => {
 
 export const receiveCreateValueStreamSuccess = ({ commit, dispatch }) => {
   commit(types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS);
-  return dispatch('fetchValueStreams');
+  return dispatch('fetchCycleAnalyticsData');
 };
 
 export const createValueStream = ({ commit, dispatch, getters }, data) => {
@@ -359,9 +367,12 @@ export const fetchValueStreams = ({ commit, dispatch, getters, state }) => {
 
     return Api.cycleAnalyticsValueStreams(currentGroupPath)
       .then(({ data }) => dispatch('receiveValueStreamsSuccess', data))
-      .catch(response => {
-        const { data } = response;
-        commit(types.RECEIVE_VALUE_STREAMS_ERROR, data);
+      .catch(error => {
+        const {
+          response: { status },
+        } = error;
+        commit(types.RECEIVE_VALUE_STREAMS_ERROR, status);
+        throw error;
       });
   }
   return dispatch('fetchValueStreamData');

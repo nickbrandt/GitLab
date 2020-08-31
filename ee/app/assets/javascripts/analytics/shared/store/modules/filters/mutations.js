@@ -4,14 +4,22 @@ export default {
   [types.SET_SELECTED_FILTERS](state, params) {
     const {
       selectedAuthor = null,
+      selectedAuthorList = [],
       selectedMilestone = null,
-      selectedAssignees = [],
-      selectedLabels = [],
+      selectedMilestoneList = [],
+      selectedAssignee = null,
+      selectedAssigneeList = [],
+      selectedLabel = null,
+      selectedLabelList = [],
     } = params;
     state.authors.selected = selectedAuthor;
-    state.assignees.selected = selectedAssignees;
+    state.authors.selectedList = selectedAuthorList;
+    state.assignees.selected = selectedAssignee;
+    state.assignees.selectedList = selectedAssigneeList;
     state.milestones.selected = selectedMilestone;
-    state.labels.selected = selectedLabels;
+    state.milestones.selectedList = selectedMilestoneList;
+    state.labels.selected = selectedLabel;
+    state.labels.selectedList = selectedLabelList;
   },
   [types.SET_MILESTONES_ENDPOINT](state, milestonesEndpoint) {
     state.milestonesEndpoint = milestonesEndpoint;

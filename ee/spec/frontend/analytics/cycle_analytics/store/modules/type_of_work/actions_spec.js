@@ -44,6 +44,18 @@ describe('Type of work actions', () => {
     state = { ...mockedState, selectedGroup: null };
   });
 
+  describe('setLoading', () => {
+    it(`commits the '${types.SET_LOADING}' action`, () => {
+      return testAction(
+        actions.setLoading,
+        true,
+        state,
+        [{ type: types.SET_LOADING, payload: true }],
+        [],
+      );
+    });
+  });
+
   describe('fetchTopRankedGroupLabels', () => {
     beforeEach(() => {
       gon.api_version = 'v4';

@@ -12,7 +12,7 @@ export const fetchMergeRequests = ({ commit, state, rootState }) => {
   const { projectId, pageInfo } = state;
 
   const { selected: milestoneTitle } = rootState.filters.milestones;
-  const { selected: labelNames } = rootState.filters.labels;
+  const { selectedList: labelNames } = rootState.filters.labels;
 
   const params = {
     project_id: projectId,

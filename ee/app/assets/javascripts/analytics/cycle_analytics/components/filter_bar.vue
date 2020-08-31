@@ -28,8 +28,8 @@ export default {
     ...mapState('filters', {
       selectedMilestone: state => state.milestones.selected,
       selectedAuthor: state => state.authors.selected,
-      selectedLabels: state => state.labels.selected,
-      selectedAssignees: state => state.assignees.selected,
+      selectedLabelList: state => state.labels.selectedList,
+      selectedAssigneeList: state => state.assignees.selectedList,
       milestonesData: state => state.milestones.data,
       labelsData: state => state.labels.data,
       authorsData: state => state.authors.data,
@@ -83,14 +83,16 @@ export default {
       ];
     },
     query() {
-      const selectedLabels = this.selectedLabels?.length ? this.selectedLabels : null;
-      const selectedAssignees = this.selectedAssignees?.length ? this.selectedAssignees : null;
+      const selectedLabelList = this.selectedLabelList?.length ? this.selectedLabelList : null;
+      const selectedAssigneeList = this.selectedAssigneeList?.length
+        ? this.selectedAssigneeList
+        : null;
 
       return {
         milestone_title: this.selectedMilestone,
         author_username: this.selectedAuthor,
-        label_name: selectedLabels,
-        assignee_username: selectedAssignees,
+        label_name: selectedLabelList,
+        assignee_username: selectedAssigneeList,
       };
     },
   },
@@ -106,8 +108,8 @@ export default {
       const {
         selectedMilestone: milestone = null,
         selectedAuthor: author = null,
-        selectedAssignees: assignees = [],
-        selectedLabels: labels = [],
+        selectedAssigneeList: assignees = [],
+        selectedLabelList: labels = [],
       } = this;
       return prepareTokens({ milestone, author, assignees, labels });
     },
@@ -117,8 +119,8 @@ export default {
       this.setFilters({
         selectedAuthor: author ? author[0].value : null,
         selectedMilestone: milestone ? milestone[0].value : null,
-        selectedAssignees: assignees ? assignees.map(a => a.value) : [],
-        selectedLabels: labels ? labels.map(l => l.value) : [],
+        selectedAssigneeList: assignees ? assignees.map(a => a.value) : [],
+        selectedLabelList: labels ? labels.map(l => l.value) : [],
       });
     },
   },

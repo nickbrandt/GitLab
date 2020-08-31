@@ -1,9 +1,10 @@
 import Vuex from 'vuex';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
-import { GlLoadingIcon, GlNewDropdownItem } from '@gitlab/ui';
+import { GlNewDropdownItem } from '@gitlab/ui';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import StageDropdownFilter from 'ee/analytics/cycle_analytics/components/stage_dropdown_filter.vue';
+import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import { allowedStages as stages, durationChartPlottableData as durationData } from '../mock_data';
 
 const localVue = createLocalVue();
@@ -47,7 +48,7 @@ function createComponent({
       ...props,
     },
     stubs: {
-      GlLoadingIcon: true,
+      ChartSkeletonLoader: true,
       Scatterplot: true,
       StageDropdownFilter: true,
       ...stubs,
@@ -61,7 +62,7 @@ describe('DurationChart', () => {
   const findNoDataContainer = _wrapper => _wrapper.find({ ref: 'duration-chart-no-data' });
   const findScatterPlot = _wrapper => _wrapper.find(Scatterplot);
   const findStageDropdown = _wrapper => _wrapper.find(StageDropdownFilter);
-  const findLoader = _wrapper => _wrapper.find(GlLoadingIcon);
+  const findLoader = _wrapper => _wrapper.find(ChartSkeletonLoader);
 
   const selectStage = (_wrapper, index = 0) => {
     findStageDropdown(_wrapper)
