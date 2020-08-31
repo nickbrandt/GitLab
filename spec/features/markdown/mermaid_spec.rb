@@ -65,7 +65,7 @@ RSpec.describe 'Mermaid rendering', :js do
 
     visit project_issue_path(project, issue)
 
-    wait_for_requests
+    # wait_for_requests
 
     page.within('.description') do
       expect(page).to have_selector('svg')
