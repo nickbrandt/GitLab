@@ -8548,6 +8548,11 @@ type MergeRequest implements Noteable {
   allowCollaboration: Boolean
 
   """
+  Indicates if the merge request has all the required approvals. Returns true if no required approvals are configured.
+  """
+  approved: Boolean!
+
+  """
   Users who approved the merge request
   """
   approvedBy(
