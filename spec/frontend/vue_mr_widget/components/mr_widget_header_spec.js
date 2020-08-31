@@ -22,8 +22,10 @@ describe('MRWidgetHeader', () => {
   });
 
   const expectDownloadDropdownItems = () => {
-    const downloadEmailPatchesEl = vm.$el.querySelector('.js-download-email-patches');
-    const downloadPlainDiffEl = vm.$el.querySelector('.js-download-plain-diff');
+    const downloadEmailPatchesEl = vm.$el.querySelector(
+      '.js-download-email-patches .dropdown-item',
+    );
+    const downloadPlainDiffEl = vm.$el.querySelector('.js-download-plain-diff .dropdown-item');
 
     expect(downloadEmailPatchesEl.textContent.trim()).toEqual('Email patches');
     expect(downloadEmailPatchesEl.getAttribute('href')).toEqual('/mr/email-patches');

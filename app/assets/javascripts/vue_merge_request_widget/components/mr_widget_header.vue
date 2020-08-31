@@ -12,7 +12,6 @@ import {
 import { n__, s__, sprintf } from '~/locale';
 import { mergeUrlParams, webIDEUrl } from '~/lib/utils/url_utility';
 import clipboardButton from '~/vue_shared/components/clipboard_button.vue';
-import tooltip from '~/vue_shared/directives/tooltip';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import MrWidgetIcon from './mr_widget_icon.vue';
 
@@ -162,19 +161,22 @@ export default {
           :aria-label="__('Download as')"
           icon="download"
           right
+          data-qa-selector="download_dropdown"
         >
           <gl-dropdown-header>{{ s__('Download as') }}</gl-dropdown-header>
           <gl-dropdown-item
             :href="mr.emailPatchesPath"
-            class="js-download-email-patches qa-download-email-patches"
+            class="js-download-email-patches"
             download
+            data-qa-selector="download_email_patches"
           >
             {{ s__('mrWidget|Email patches') }}
           </gl-dropdown-item>
           <gl-dropdown-item
             :href="mr.plainDiffPath"
-            class="js-download-plain-diff qa-download-plain-diff"
+            class="js-download-plain-diff"
             download
+            data-qa-selector="download_plain_diff"
           >
             {{ s__('mrWidget|Plain diff') }}
           </gl-dropdown-item>

@@ -8,7 +8,7 @@ module QA
         include Page::Component::Issuable::Sidebar
 
         view 'app/assets/javascripts/vue_merge_request_widget/components/mr_widget_header.vue' do
-          element :dropdown_toggle
+          element :download_dropdown
           element :download_email_patches
           element :download_plain_diff
           element :open_in_web_ide_button
