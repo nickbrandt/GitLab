@@ -40,7 +40,11 @@ func NewLfsUploadPreparer(c config.Config, objectPreparer upload.Preparer) uploa
 }
 
 func (l *uploadPreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, upload.Verifier, error) {
-	opts, _, _ := l.objectPreparer.Prepare(a)
+	opts, _, err := l.objectPreparer.Prepare(a)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	opts.TempFilePrefix = a.LfsOid
 
 	return opts, &object{oid: a.LfsOid, size: a.LfsSize}, nil

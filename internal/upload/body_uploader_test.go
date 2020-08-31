@@ -170,7 +170,12 @@ type alwaysLocalPreparer struct {
 }
 
 func (a *alwaysLocalPreparer) Prepare(_ *api.Response) (*filestore.SaveFileOpts, Verifier, error) {
-	return filestore.GetOpts(&api.Response{TempPath: os.TempDir()}), a.verifier, a.prepareError
+	opts, err := filestore.GetOpts(&api.Response{TempPath: os.TempDir()})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return opts, a.verifier, a.prepareError
 }
 
 type alwaysFailsVerifier struct{}

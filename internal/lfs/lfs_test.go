@@ -28,6 +28,7 @@ func TestLfsUploadPreparerWithConfig(t *testing.T) {
 	r := &api.Response{
 		LfsOid: lfsOid,
 		RemoteObject: api.RemoteObject{
+			ID:                 "the upload ID",
 			UseWorkhorseClient: true,
 			ObjectStorage: &api.ObjectStorageParams{
 				Provider: "AWS",
@@ -49,7 +50,7 @@ func TestLfsUploadPreparerWithConfig(t *testing.T) {
 
 func TestLfsUploadPreparerWithNoConfig(t *testing.T) {
 	c := config.Config{}
-	r := &api.Response{}
+	r := &api.Response{RemoteObject: api.RemoteObject{ID: "the upload ID"}}
 	uploadPreparer := upload.NewObjectStoragePreparer(c)
 	lfsPreparer := lfs.NewLfsUploadPreparer(c, uploadPreparer)
 	opts, verifier, err := lfsPreparer.Prepare(r)

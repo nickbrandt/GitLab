@@ -113,17 +113,6 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "ObjectStore and FileStore Upload",
-			preauth: api.Response{
-				TempPath: tempPath,
-				RemoteObject: api.RemoteObject{
-					StoreURL: storeServer.URL + "/url/put",
-					ID:       "store-id",
-					GetURL:   storeServer.URL + "/store-id",
-				},
-			},
-		},
 	}
 
 	for _, test := range tests {
@@ -197,12 +186,6 @@ func TestUploadHandlerSendingToExternalStorageAndInvalidURLIsUsed(t *testing.T) 
 }
 
 func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) {
-	tempPath, err := ioutil.TempDir("", "uploads")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tempPath)
-
 	putCalledTimes := 0
 
 	storeServerMux := http.NewServeMux()
@@ -220,7 +203,6 @@ func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) 
 	defer storeServer.Close()
 
 	authResponse := api.Response{
-		TempPath: tempPath,
 		RemoteObject: api.RemoteObject{
 			StoreURL: storeServer.URL + "/url/put",
 			ID:       "store-id",
@@ -236,12 +218,6 @@ func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) 
 }
 
 func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testing.T) {
-	tempPath, err := ioutil.TempDir("", "uploads")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tempPath)
-
 	putCalledTimes := 0
 
 	storeServerMux := http.NewServeMux()
@@ -260,7 +236,6 @@ func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testin
 	defer storeServer.Close()
 
 	authResponse := api.Response{
-		TempPath: tempPath,
 		RemoteObject: api.RemoteObject{
 			StoreURL: storeServer.URL + "/url/put",
 			ID:       "store-id",

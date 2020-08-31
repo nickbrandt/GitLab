@@ -29,33 +29,16 @@ func TestSaveFileOptsLocalAndRemote(t *testing.T) {
 			isLocal:       true,
 		},
 		{
-			name:          "Both paths",
-			localTempPath: "/tmp",
-			presignedPut:  "http://example.com",
-			isLocal:       true,
-			isRemote:      true,
-		},
-		{
 			name: "No paths",
 		},
 		{
 			name:         "Only remoteUrl",
 			presignedPut: "http://example.com",
-			isRemote:     true,
 		},
 		{
 			name:        "Multipart",
 			partSize:    10,
-			isRemote:    true,
 			isMultipart: true,
-		},
-		{
-			name:          "Multipart and Local",
-			partSize:      10,
-			localTempPath: "/tmp",
-			isRemote:      true,
-			isMultipart:   true,
-			isLocal:       true,
 		},
 	}
 
@@ -68,7 +51,6 @@ func TestSaveFileOptsLocalAndRemote(t *testing.T) {
 			}
 
 			assert.Equal(t, test.isLocal, opts.IsLocal(), "IsLocal() mismatch")
-			assert.Equal(t, test.isRemote, opts.IsRemote(), "IsRemote() mismatch")
 			assert.Equal(t, test.isMultipart, opts.IsMultipart(), "IsMultipart() mismatch")
 		})
 	}
@@ -112,7 +94,6 @@ func TestGetOpts(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			apiResponse := &api.Response{
-				TempPath: "/tmp",
 				RemoteObject: api.RemoteObject{
 					Timeout:          10,
 					ID:               "id",
@@ -125,7 +106,8 @@ func TestGetOpts(t *testing.T) {
 				},
 			}
 			deadline := time.Now().Add(time.Duration(apiResponse.RemoteObject.Timeout) * time.Second)
-			opts := filestore.GetOpts(apiResponse)
+			opts, err := filestore.GetOpts(apiResponse)
+			require.NoError(t, err)
 
 			assert.Equal(t, apiResponse.TempPath, opts.LocalTempPath)
 			assert.WithinDuration(t, deadline, opts.Deadline, time.Second)
@@ -156,9 +138,33 @@ func TestGetOpts(t *testing.T) {
 	}
 }
 
+func TestGetOptsFail(t *testing.T) {
+	testCases := []struct {
+		desc string
+		in   api.Response
+	}{
+		{
+			desc: "neither local nor remote",
+			in:   api.Response{},
+		},
+		{
+			desc: "both local and remote",
+			in:   api.Response{TempPath: "/foobar", RemoteObject: api.RemoteObject{ID: "id"}},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			_, err := filestore.GetOpts(&tc.in)
+			require.Error(t, err, "expect input to be rejected")
+		})
+	}
+}
+
 func TestGetOptsDefaultTimeout(t *testing.T) {
 	deadline := time.Now().Add(filestore.DefaultObjectStoreTimeout)
-	opts := filestore.GetOpts(&api.Response{})
+	opts, err := filestore.GetOpts(&api.Response{TempPath: "/foo/bar"})
+	require.NoError(t, err)
 
 	assert.WithinDuration(t, deadline, opts.Deadline, time.Minute)
 }
@@ -245,7 +251,6 @@ func TestUseWorkhorseClientEnabled(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			apiResponse := &api.Response{
-				TempPath: "/tmp",
 				RemoteObject: api.RemoteObject{
 					Timeout:            10,
 					ID:                 "id",
@@ -254,7 +259,8 @@ func TestUseWorkhorseClientEnabled(t *testing.T) {
 				},
 			}
 			deadline := time.Now().Add(time.Duration(apiResponse.RemoteObject.Timeout) * time.Second)
-			opts := filestore.GetOpts(apiResponse)
+			opts, err := filestore.GetOpts(apiResponse)
+			require.NoError(t, err)
 			opts.ObjectStorageConfig = test.objectStorageConfig
 
 			require.Equal(t, apiResponse.TempPath, opts.LocalTempPath)
@@ -262,7 +268,6 @@ func TestUseWorkhorseClientEnabled(t *testing.T) {
 			require.Equal(t, apiResponse.RemoteObject.ID, opts.RemoteID)
 			require.Equal(t, apiResponse.RemoteObject.UseWorkhorseClient, opts.UseWorkhorseClient)
 			require.Equal(t, test.expected, opts.UseWorkhorseClientEnabled())
-			require.Equal(t, test.UseWorkhorseClient, opts.IsRemote())
 		})
 	}
 }
@@ -294,7 +299,6 @@ func TestGoCloudConfig(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			apiResponse := &api.Response{
-				TempPath: "/tmp",
 				RemoteObject: api.RemoteObject{
 					Timeout:            10,
 					ID:                 "id",
@@ -309,7 +313,8 @@ func TestGoCloudConfig(t *testing.T) {
 				},
 			}
 			deadline := time.Now().Add(time.Duration(apiResponse.RemoteObject.Timeout) * time.Second)
-			opts := filestore.GetOpts(apiResponse)
+			opts, err := filestore.GetOpts(apiResponse)
+			require.NoError(t, err)
 			opts.ObjectStorageConfig.URLMux = mux
 
 			require.Equal(t, apiResponse.TempPath, opts.LocalTempPath)
@@ -321,7 +326,7 @@ func TestGoCloudConfig(t *testing.T) {
 			require.Equal(t, apiResponse.RemoteObject.ObjectStorage.GoCloudConfig, opts.ObjectStorageConfig.GoCloudConfig)
 			require.True(t, opts.UseWorkhorseClientEnabled())
 			require.Equal(t, test.valid, opts.ObjectStorageConfig.IsValid())
-			require.True(t, opts.IsRemote())
+			require.False(t, opts.IsLocal())
 		})
 	}
 }

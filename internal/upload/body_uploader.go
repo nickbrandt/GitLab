@@ -32,7 +32,8 @@ type Preparer interface {
 type DefaultPreparer struct{}
 
 func (s *DefaultPreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error) {
-	return filestore.GetOpts(a), nil, nil
+	opts, err := filestore.GetOpts(a)
+	return opts, nil, err
 }
 
 // BodyUploader is an http.Handler that perform a pre authorization call to rails before hijacking the request body and

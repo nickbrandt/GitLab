@@ -1,6 +1,7 @@
 package filestore
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -72,18 +73,13 @@ func (s *SaveFileOpts) IsLocal() bool {
 	return s.LocalTempPath != ""
 }
 
-// IsRemote checks if the options requires a remote upload
-func (s *SaveFileOpts) IsRemote() bool {
-	return s.PresignedPut != "" || s.IsMultipart() || s.UseWorkhorseClient
-}
-
 // IsMultipart checks if the options requires a Multipart upload
 func (s *SaveFileOpts) IsMultipart() bool {
 	return s.PartSize > 0
 }
 
 // GetOpts converts GitLab api.Response to a proper SaveFileOpts
-func GetOpts(apiResponse *api.Response) *SaveFileOpts {
+func GetOpts(apiResponse *api.Response) (*SaveFileOpts, error) {
 	timeout := time.Duration(apiResponse.RemoteObject.Timeout) * time.Second
 	if timeout == 0 {
 		timeout = DefaultObjectStoreTimeout
@@ -99,6 +95,14 @@ func GetOpts(apiResponse *api.Response) *SaveFileOpts {
 		UseWorkhorseClient: apiResponse.RemoteObject.UseWorkhorseClient,
 		RemoteTempObjectID: apiResponse.RemoteObject.RemoteTempObjectID,
 		Deadline:           time.Now().Add(timeout),
+	}
+
+	if opts.LocalTempPath != "" && opts.RemoteID != "" {
+		return nil, errors.New("API response has both TempPath and RemoteObject")
+	}
+
+	if opts.LocalTempPath == "" && opts.RemoteID == "" {
+		return nil, errors.New("API response has neither TempPath nor RemoteObject")
 	}
 
 	objectStorageParams := apiResponse.RemoteObject.ObjectStorage
@@ -122,7 +126,7 @@ func GetOpts(apiResponse *api.Response) *SaveFileOpts {
 		opts.PresignedParts = append([]string(nil), multiParams.PartURLs...)
 	}
 
-	return &opts
+	return &opts, nil
 }
 
 func (c *ObjectStorageConfig) IsAWS() bool {

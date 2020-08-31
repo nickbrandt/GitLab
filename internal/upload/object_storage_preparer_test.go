@@ -30,6 +30,7 @@ func TestPrepareWithS3Config(t *testing.T) {
 
 	r := &api.Response{
 		RemoteObject: api.RemoteObject{
+			ID:                 "the ID",
 			UseWorkhorseClient: true,
 			ObjectStorage: &api.ObjectStorageParams{
 				Provider: "AWS",
@@ -50,7 +51,7 @@ func TestPrepareWithS3Config(t *testing.T) {
 
 func TestPrepareWithNoConfig(t *testing.T) {
 	c := config.Config{}
-	r := &api.Response{}
+	r := &api.Response{RemoteObject: api.RemoteObject{ID: "id"}}
 	p := upload.NewObjectStoragePreparer(c)
 	opts, v, err := p.Prepare(r)
 
