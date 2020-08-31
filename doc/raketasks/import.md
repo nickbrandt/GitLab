@@ -1,6 +1,9 @@
 # Import bare repositories **(CORE ONLY)**
 
 Rake tasks are available to import bare repositories into a GitLab instance.
+When migrating from an existing GitLab instance,
+and to preserve ownership by users and their namespaces,
+please use [our project-based import/export](../user/project/settings/import_export.md).
 
 Note that:
 
