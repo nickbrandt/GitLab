@@ -1,23 +1,29 @@
 <script>
 import * as Sentry from '@sentry/browser';
-import { GlButton, GlTab, GlTabs } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlTab, GlTabs } from '@gitlab/ui';
 import { s__ } from '~/locale';
+import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ProfilesList from './dast_profiles_list.vue';
 import dastSiteProfilesQuery from '../graphql/dast_site_profiles.query.graphql';
 import dastSiteProfilesDelete from '../graphql/dast_site_profiles_delete.mutation.graphql';
 import * as cacheUtils from '../graphql/cache_utils';
+import { getProfileSettings } from '../settings/profiles';
 
 export default {
   components: {
-    GlButton,
+    GlDropdown,
+    GlDropdownItem,
     GlTab,
     GlTabs,
     ProfilesList,
   },
+  mixins: [glFeatureFlagMixin()],
   props: {
-    newDastSiteProfilePath: {
-      type: String,
+    createNewProfilePaths: {
+      type: Object,
       required: true,
+      validator: ({ scannerProfile, siteProfile }) =>
+        Boolean(scannerProfile) && Boolean(siteProfile),
     },
     projectFullPath: {
       type: String,
@@ -60,6 +66,16 @@ export default {
     },
   },
   computed: {
+    profileSettings() {
+      const { glFeatures, createNewProfilePaths } = this;
+
+      return getProfileSettings(
+        {
+          createNewProfilePaths,
+        },
+        glFeatures,
+      );
+    },
     hasMoreSiteProfiles() {
       return this.siteProfilesPageInfo.hasNextPage;
     },
@@ -152,6 +168,11 @@ export default {
   },
   profilesPerPage: 10,
   i18n: {
+    heading: s__('DastProfiles|Manage Profiles'),
+    newProfileDropdownLabel: s__('DastProfiles|New Profile'),
+    subHeading: s__(
+      'DastProfiles|Save commonly used configurations for target sites and scan specifications as profiles. Use these with an on-demand scan.',
+    ),
     errorMessages: {
       fetchNetworkError: s__(
         'DastProfiles|Could not fetch site profiles. Please refresh the page, or try again later.',
@@ -170,23 +191,25 @@ export default {
     <header>
       <div class="gl-display-flex gl-align-items-center gl-pt-6 gl-pb-4">
         <h2 class="my-0">
-          {{ s__('DastProfiles|Manage Profiles') }}
+          {{ $options.i18n.heading }}
         </h2>
-        <gl-button
-          :href="newDastSiteProfilePath"
-          category="primary"
+        <gl-dropdown
+          :text="$options.i18n.newProfileDropdownLabel"
           variant="success"
+          right
           class="gl-ml-auto"
         >
-          {{ s__('DastProfiles|New Site Profile') }}
-        </gl-button>
+          <gl-dropdown-item
+            v-for="{ i18n, createNewProfilePath, key } in profileSettings"
+            :key="key"
+            :href="createNewProfilePath"
+          >
+            {{ i18n.title }}
+          </gl-dropdown-item>
+        </gl-dropdown>
       </div>
       <p>
-        {{
-          s__(
-            'DastProfiles|Save commonly used configurations for target sites and scan specifications as profiles. Use these with an on-demand scan.',
-          )
-        }}
+        {{ $options.i18n.subHeading }}
       </p>
     </header>
 
