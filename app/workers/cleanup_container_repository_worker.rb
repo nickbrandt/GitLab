@@ -7,6 +7,8 @@ class CleanupContainerRepositoryWorker # rubocop:disable Scalability/IdempotentW
   feature_category :container_registry
   loggable_arguments 2
 
+  idempotent!
+
   attr_reader :container_repository, :current_user
 
   def perform(current_user_id, container_repository_id, params)
