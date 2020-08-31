@@ -9,7 +9,7 @@ module Resolvers
 
       def resolve(**args)
         ::Clusters::AgentsFinder
-          .new(project, context[:current_user])
+          .new(project, context[:current_user], params: args)
           .execute
       end
     end

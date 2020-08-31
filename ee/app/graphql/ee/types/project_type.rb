@@ -93,6 +93,12 @@ module EE
               description: 'DAST Site Profiles associated with the project',
               resolve: -> (obj, _args, _ctx) { obj.dast_site_profiles.with_dast_site }
 
+        field :cluster_agent,
+              ::Types::Clusters::AgentType,
+              null: true,
+              description: 'Find a single cluster agent by name',
+              resolver: ::Resolvers::Clusters::AgentResolver.single
+
         field :cluster_agents,
               ::Types::Clusters::AgentType.connection_type,
               null: true,

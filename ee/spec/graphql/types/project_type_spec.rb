@@ -228,4 +228,44 @@ RSpec.describe GitlabSchema.types['Project'] do
       expect(agents.first['project']['id']).to eq(project.to_global_id.to_s)
     end
   end
+
+  describe 'cluster_agent' do
+    let_it_be(:cluster_agent) { create(:cluster_agent, project: project, name: 'agent-name') }
+    let_it_be(:query) do
+      %(
+        query {
+          project(fullPath: "#{project.full_path}") {
+            clusterAgent(name: "#{cluster_agent.name}") {
+              id
+              name
+              createdAt
+              updatedAt
+
+              project {
+                id
+              }
+            }
+          }
+        }
+      )
+    end
+
+    subject { GitlabSchema.execute(query, context: { current_user: user }).as_json }
+
+    before do
+      stub_licensed_features(cluster_agents: true)
+
+      project.add_maintainer(user)
+    end
+
+    it 'returns associated cluster agents' do
+      agent = subject.dig('data', 'project', 'clusterAgent')
+
+      expect(agent['id']).to eq(cluster_agent.to_global_id.to_s)
+      expect(agent['name']).to eq('agent-name')
+      expect(agent['createdAt']).to be_present
+      expect(agent['updatedAt']).to be_present
+      expect(agent['project']['id']).to eq(project.to_global_id.to_s)
+    end
+  end
 end

@@ -13,12 +13,14 @@ RSpec.describe Resolvers::Clusters::AgentsResolver do
 
     let(:finder) { double(execute: :result) }
     let(:project) { create(:project) }
+    let(:args) { Hash(key: 'value') }
+    let(:ctx) { Hash(current_user: user) }
 
-    subject { resolve(described_class, obj: project, ctx: { current_user: user }) }
+    subject { resolve(described_class, obj: project, args: args, ctx: ctx) }
 
     it 'calls the agents finder' do
       expect(::Clusters::AgentsFinder).to receive(:new)
-        .with(project, user).and_return(finder)
+        .with(project, user, params: args).and_return(finder)
 
       expect(subject).to eq(:result)
     end

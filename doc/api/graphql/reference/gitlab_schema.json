@@ -34763,6 +34763,33 @@
               "deprecationReason": null
             },
             {
+              "name": "clusterAgent",
+              "description": "Find a single cluster agent by name",
+              "args": [
+                {
+                  "name": "name",
+                  "description": "Name of the cluster agent",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ClusterAgent",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "clusterAgents",
               "description": "Cluster agents associated with the project",
               "args": [

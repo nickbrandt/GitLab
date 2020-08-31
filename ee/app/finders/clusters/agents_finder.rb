@@ -11,12 +11,15 @@ module Clusters
     def execute
       return ::Clusters::Agent.none unless can_read_cluster_agents?
 
-      project.cluster_agents
+      agents = project.cluster_agents
+      agents = agents.with_name(params[:name]) if params[:name].present?
+
+      agents
     end
 
     private
 
-    attr_reader :project, :current_user
+    attr_reader :project, :current_user, :params
 
     def can_read_cluster_agents?
       project.feature_available?(:cluster_agents) && current_user.can?(:read_cluster, project)

@@ -11672,6 +11672,16 @@ type Project {
   ): BoardConnection
 
   """
+  Find a single cluster agent by name
+  """
+  clusterAgent(
+    """
+    Name of the cluster agent
+    """
+    name: String!
+  ): ClusterAgent
+
+  """
   Cluster agents associated with the project
   """
   clusterAgents(
