@@ -53,6 +53,18 @@ describe('DurationChart actions', () => {
     mock.restore();
   });
 
+  describe('setLoading', () => {
+    it(`commits the '${types.SET_LOADING}' action`, () => {
+      return testAction(
+        actions.setLoading,
+        true,
+        state,
+        [{ type: types.SET_LOADING, payload: true }],
+        [],
+      );
+    });
+  });
+
   describe('fetchDurationData', () => {
     beforeEach(() => {
       mock.onGet(endpoints.durationData).reply(200, [...rawDurationData]);

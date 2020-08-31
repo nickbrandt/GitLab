@@ -1,5 +1,5 @@
 <script>
-import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
+import { GlEmptyState } from '@gitlab/ui';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { featureAccessLevel } from '~/pages/projects/shared/permissions/constants';
 import { PROJECTS_PER_PAGE } from '../constants';
@@ -24,7 +24,6 @@ export default {
   components: {
     DateRange,
     DurationChart,
-    GlLoadingIcon,
     GlEmptyState,
     GroupsDropdownFilter,
     ProjectsDropdownFilter,
@@ -87,16 +86,16 @@ export default {
     ]),
     ...mapGetters('customStages', ['customStageFormActive']),
     shouldRenderEmptyState() {
-      return !this.selectedGroup;
+      return !this.selectedGroup && !this.isLoading;
     },
     shouldDisplayFilters() {
       return this.selectedGroup && !this.errorCode;
     },
     shouldDisplayDurationChart() {
-      return this.featureFlags.hasDurationChart && !this.hasNoAccessError && !this.isLoading;
+      return this.featureFlags.hasDurationChart && !this.hasNoAccessError;
     },
     shouldDisplayTypeOfWorkCharts() {
-      return !this.hasNoAccessError && !this.isLoading;
+      return !this.hasNoAccessError;
     },
     shouldDisplayPathNavigation() {
       return this.featureFlags.hasPathNavigation && !this.hasNoAccessError && this.selectedStage;
@@ -110,9 +109,6 @@ export default {
       return Boolean(
         this.featureFlags.hasCreateMultipleValueStreams && !this.isLoadingValueStreams,
       );
-    },
-    isLoadingTypeOfWork() {
-      return this.isLoadingTasksByTypeChartTopLabels || this.isLoadingTasksByTypeChart;
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
@@ -288,52 +284,47 @@ export default {
           )
         "
       />
-      <div v-else-if="!errorCode">
+      <div v-else>
         <metrics :group-path="currentGroupPath" :request-params="cycleAnalyticsRequestParams" />
-        <div v-if="isLoading">
-          <gl-loading-icon class="mt-4" size="md" />
-        </div>
-        <div v-else>
-          <stage-table
-            v-if="selectedStage"
-            :key="stageCount"
-            class="js-stage-table"
-            :current-stage="selectedStage"
-            :is-loading="isLoadingStage"
-            :is-empty-stage="isEmptyStage"
-            :custom-stage-form-active="customStageFormActive"
-            :current-stage-events="currentStageEvents"
-            :no-data-svg-path="noDataSvgPath"
-          >
-            <template #nav>
-              <stage-table-nav
-                :current-stage="selectedStage"
-                :stages="activeStages"
-                :medians="medians"
-                :is-creating-custom-stage="isCreatingCustomStage"
-                :custom-ordering="enableCustomOrdering"
-                @reorderStage="onStageReorder"
-                @selectStage="onStageSelect"
-                @editStage="onShowEditStageForm"
-                @showAddStageForm="onShowAddStageForm"
-                @hideStage="onUpdateCustomStage"
-                @removeStage="onRemoveStage"
-              />
-            </template>
-            <template v-if="customStageFormActive" #content>
-              <custom-stage-form
-                :events="formEvents"
-                @createStage="onCreateCustomStage"
-                @updateStage="onUpdateCustomStage"
-                @clearErrors="$emit('clear-form-errors')"
-              />
-            </template>
-          </stage-table>
-        </div>
+        <stage-table
+          :key="stageCount"
+          class="js-stage-table"
+          :current-stage="selectedStage"
+          :is-loading="isLoading"
+          :is-loading-stage="isLoadingStage"
+          :is-empty-stage="isEmptyStage"
+          :custom-stage-form-active="customStageFormActive"
+          :current-stage-events="currentStageEvents"
+          :no-data-svg-path="noDataSvgPath"
+        >
+          <template #nav>
+            <stage-table-nav
+              :current-stage="selectedStage"
+              :stages="activeStages"
+              :medians="medians"
+              :is-creating-custom-stage="isCreatingCustomStage"
+              :custom-ordering="enableCustomOrdering"
+              @reorderStage="onStageReorder"
+              @selectStage="onStageSelect"
+              @editStage="onShowEditStageForm"
+              @showAddStageForm="onShowAddStageForm"
+              @hideStage="onUpdateCustomStage"
+              @removeStage="onRemoveStage"
+            />
+          </template>
+          <template v-if="customStageFormActive" #content>
+            <custom-stage-form
+              :events="formEvents"
+              @createStage="onCreateCustomStage"
+              @updateStage="onUpdateCustomStage"
+              @clearErrors="$emit('clear-form-errors')"
+            />
+          </template>
+        </stage-table>
         <url-sync :query="query" />
       </div>
-      <duration-chart v-if="shouldDisplayDurationChart" class="mt-3" :stages="activeStages" />
-      <type-of-work-charts v-if="shouldDisplayTypeOfWorkCharts" :is-loading="isLoadingTypeOfWork" />
+      <duration-chart v-if="shouldDisplayDurationChart" class="gl-mt-3" :stages="activeStages" />
+      <type-of-work-charts v-if="shouldDisplayTypeOfWorkCharts" />
     </div>
   </div>
 </template>

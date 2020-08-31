@@ -1,4 +1,5 @@
 import { shallowMount, mount } from '@vue/test-utils';
+import { getByText } from '@testing-library/dom';
 import { GlLoadingIcon } from '@gitlab/ui';
 import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue';
 import { issueEvents, issueStage, allowedStages } from '../mock_data';
@@ -28,6 +29,7 @@ function createComponent(props = {}, shallow = false) {
     propsData: {
       currentStage: issueStage,
       isLoading: false,
+      isLoadingStage: false,
       isEmptyStage: false,
       currentStageEvents: issueEvents,
       noDataSvgPath,
@@ -115,6 +117,24 @@ describe('StageTable', () => {
   it('isLoading = true', () => {
     wrapper = createComponent({ isLoading: true }, true);
     expect(wrapper.find(GlLoadingIcon).exists()).toEqual(true);
+  });
+
+  describe('isLoadingStage = true', () => {
+    beforeEach(() => {
+      wrapper = createComponent({ isLoadingStage: true }, true);
+    });
+
+    it('will render the list of stages', () => {
+      const navEl = wrapper.find($sel.nav).element;
+
+      allowedStages.forEach(stage => {
+        expect(getByText(navEl, stage.title, { selector: 'li' })).not.toBe(null);
+      });
+    });
+
+    it('will render a loading icon', () => {
+      expect(wrapper.find(GlLoadingIcon).exists()).toEqual(true);
+    });
   });
 
   describe('isEmptyStage = true', () => {
