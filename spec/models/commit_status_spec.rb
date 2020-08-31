@@ -517,7 +517,11 @@ RSpec.describe CommitStatus do
       'rspec:linux: [aws, max memory, data]' => 'rspec:linux',
       'rspec: [inception: [something, other thing], value]' => 'rspec',
       'rspec:windows 0/1: [name, other]' => 'rspec:windows',
-      'rspec:windows: [name, other] 0/1' => 'rspec:windows'
+      'rspec:windows: [name, other] 0/1' => 'rspec:windows',
+      'rspec:windows: [name, 0/1] 0/1' => 'rspec:windows',
+      'rspec:windows: [0/1, name]' => 'rspec:windows',
+      'rspec:windows: [, ]' => 'rspec:windows',
+      'rspec:windows: [name]' => 'rspec:windows: [name]'
     }
 
     tests.each do |name, group_name|
