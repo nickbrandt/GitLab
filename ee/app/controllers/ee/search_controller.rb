@@ -5,7 +5,7 @@ module EE
     extend ActiveSupport::Concern
 
     prepended do
-      before_action :track_advanced_search, only: :show, if: -> { request.format.html? && request.headers['DNT'] != '1' }
+      before_action :track_advanced_search, only: :show, if: -> { ::Feature.enabled?(:search_track_unique_users) && request.format.html? && request.headers['DNT'] != '1' }
     end
 
     private
@@ -15,7 +15,8 @@ module EE
       track_unique_redis_hll_event("i_search_advanced", :search_track_unique_users) if search_service.use_elasticsearch?
 
       # track unique users who search against paid groups/projects
-      track_unique_redis_hll_event("i_search_paid", :search_track_unique_users) if (search_service.project || search_service.group)&.feature_available?(:elastic_search)
+      # this line is commented out because of https://gitlab.com/gitlab-org/gitlab/-/issues/243486
+      # track_unique_redis_hll_event("i_search_paid", :search_track_unique_users) if (search_service.project || search_service.group)&.feature_available?(:elastic_search)
     end
   end
 end
