@@ -257,6 +257,12 @@ module EE
       end
     end
 
+    def missing_security_scan_types
+      return [] unless actual_head_pipeline && base_pipeline
+
+      (base_pipeline.security_scans.pluck(:scan_type) - actual_head_pipeline.security_scans.pluck(:scan_type)).uniq
+    end
+
     private
 
     def has_approved_license_check?
