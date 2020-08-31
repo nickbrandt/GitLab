@@ -231,18 +231,18 @@ RSpec.describe GitlabSchema.types['Project'] do
 
   describe 'cluster_agent' do
     let_it_be(:cluster_agent) { create(:cluster_agent, project: project, name: 'agent-name') }
+    let_it_be(:agent_token) { create(:cluster_agent_token, agent: cluster_agent) }
     let_it_be(:query) do
       %(
         query {
           project(fullPath: "#{project.full_path}") {
             clusterAgent(name: "#{cluster_agent.name}") {
               id
-              name
-              createdAt
-              updatedAt
 
-              project {
-                id
+              tokens {
+                nodes {
+                  id
+                }
               }
             }
           }
@@ -260,12 +260,12 @@ RSpec.describe GitlabSchema.types['Project'] do
 
     it 'returns associated cluster agents' do
       agent = subject.dig('data', 'project', 'clusterAgent')
+      tokens = agent.dig('tokens', 'nodes')
 
       expect(agent['id']).to eq(cluster_agent.to_global_id.to_s)
-      expect(agent['name']).to eq('agent-name')
-      expect(agent['createdAt']).to be_present
-      expect(agent['updatedAt']).to be_present
-      expect(agent['project']['id']).to eq(project.to_global_id.to_s)
+
+      expect(tokens.count).to be(1)
+      expect(tokens.first['id']).to eq(agent_token.to_global_id.to_s)
     end
   end
 end
