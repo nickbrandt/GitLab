@@ -24,7 +24,7 @@ To import bare repositories into a GitLab instance:
    ownership and read/write/execute access for Git user and its group:
 
    ```shell
-   sudo -u git mkdir -p /var/opt/gitlab/git-data/repository-import-<date>/<optional_groupname>/<optional_subgroup>
+   sudo -u git mkdir -p /var/opt/gitlab/git-data/repository-import-$(date "+%Y-%m-%d")/<optional_groupname>/<optional_subgroup>
    ```
 
 1. Copy your bare repositories inside this newly created folder. Note:
@@ -32,15 +32,15 @@ To import bare repositories into a GitLab instance:
    - Any `.git` repositories found on any of the subfolders will be imported as projects.
    - Groups will be created as needed, these could be nested folders.
 
-   For example, if we copy the repositories to `/var/opt/gitlab/git-data/repository-import-<date>`,
+   For example, if we copy the repositories to `/var/opt/gitlab/git-data/repository-import-2020-08-22`,
    and repository `A` needs to be under the groups `G1` and `G2`, it must be created under those folders:
-   `/var/opt/gitlab/git-data/repository-import-<date>/G1/G2/A.git`.
+   `/var/opt/gitlab/git-data/repository-import-2020-08-22/G1/G2/A.git`.
 
    ```shell
-   sudo cp -r /old/git/foo.git /var/opt/gitlab/git-data/repository-import-<date>/<optional_groupname>/<optional_subgroup>
+   sudo cp -r /old/git/foo.git /var/opt/gitlab/git-data/repository-import-$(date "+%Y-%m-%d")/<optional_groupname>/<optional_subgroup>
 
    # Do this once when you are done copying git repositories
-   sudo chown -R git:git /var/opt/gitlab/git-data/repository-import-<date>
+   sudo chown -R git:git /var/opt/gitlab/git-data/repository-import-$(date "+%Y-%m-%d")
    ```
 
    `foo.git` needs to be owned by the `git` user and `git` users group.
@@ -52,7 +52,7 @@ To import bare repositories into a GitLab instance:
    - Omnibus Installation
 
    ```shell
-   sudo gitlab-rake gitlab:import:repos['/var/opt/gitlab/git-data/repository-import-<date>']
+   sudo gitlab-rake gitlab:import:repos['/var/opt/gitlab/git-data/repository-import-$(date "+%Y-%m-%d")']
    ```
 
    - Installation from source. Before running this command you need to change to the directory where
@@ -60,7 +60,7 @@ To import bare repositories into a GitLab instance:
 
    ```shell
    cd /home/git/gitlab
-   sudo -u git -H bundle exec rake gitlab:import:repos['/var/opt/gitlab/git-data/repository-import-<date>'] RAILS_ENV=production
+   sudo -u git -H bundle exec rake gitlab:import:repos['/var/opt/gitlab/git-data/repository-import-$(date "+%Y-%m-%d")'] RAILS_ENV=production
    ```
 
 ## Example output
