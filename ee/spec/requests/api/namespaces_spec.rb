@@ -246,13 +246,14 @@ RSpec.describe API::Namespaces do
       end
 
       it "updates the gitlab_subscription record" do
-        group1.create_gitlab_subscription!
+        existing_subscription = group1.create_gitlab_subscription!
 
         put api("/namespaces/#{group1.id}", admin), params: {
           gitlab_subscription_attributes: gitlab_subscription
         }
 
         expect(group1.reload.gitlab_subscription.reload.seats).to eq 20
+        expect(group1.gitlab_subscription).to eq existing_subscription
       end
 
       context 'when params are invalid' do

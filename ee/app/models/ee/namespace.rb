@@ -31,7 +31,7 @@ module EE
       has_one :gitlab_subscription
       has_one :elasticsearch_indexed_namespace
 
-      accepts_nested_attributes_for :gitlab_subscription
+      accepts_nested_attributes_for :gitlab_subscription, update_only: true
       accepts_nested_attributes_for :namespace_limit
 
       scope :include_gitlab_subscription, -> { includes(:gitlab_subscription) }
