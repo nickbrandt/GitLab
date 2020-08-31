@@ -8,12 +8,14 @@ class CreateSecurityFindingsTable < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    create_table :security_findings, if_not_exists: true do |t|
-      t.references :scan, null: false
-      t.references :scanner, null: false
-      t.integer :severity, limit: 2, index: true, null: false
-      t.integer :confidence, limit: 2, index: true, null: false
-      t.text :project_fingerprint, index: true, null: false
+    unless table_exists?(:security_findings)
+      create_table :security_findings do |t|
+        t.references :scan, null: false
+        t.references :scanner, null: false
+        t.integer :severity, limit: 2, index: true, null: false
+        t.integer :confidence, limit: 2, index: true, null: false
+        t.text :project_fingerprint, index: true, null: false
+      end
     end
 
     add_text_limit :security_findings, :project_fingerprint, 40
