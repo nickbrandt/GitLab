@@ -199,18 +199,14 @@ class CommitStatus < ApplicationRecord
   end
 
   # Extracts common job name for matrix and parallel builds:
-  # 'rspec:linux: [aws, max memory]' => 'rspec:linux'
   # 'rspec:linux: 1/10' => 'rspec:linux'
+  # 'rspec:linux: [aws, max memory]' => 'rspec:linux'
   #
   def group_name
-    if Gitlab::Ci::Features.new_matrix_job_names_enabled?
-      matches = name.to_s.match(/\A(.*?): \[+(.*, )+(.*)\]\z/)
-      group_name = matches.to_a[1] || name
-    else
-      group_name = name
-    end
-
-    group_name.to_s.gsub(%r{\d+[\s:/\\]+\d+\s*}, '').strip
+    group_name = name.to_s.gsub(%r{\d+[\s:\/\\]+\d+\s*}, '')
+    group_name.gsub!(%r{: \[.+, .+\]\s*\z}, '') if Gitlab::Ci::Features.new_matrix_job_names_enabled?
+    group_name.strip!
+    group_name
   end
 
   def failed_but_allowed?
