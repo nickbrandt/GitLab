@@ -57,6 +57,8 @@ namespace :gitlab do
         gitlab:assets:fix_urls
         gitlab:assets:check_page_bundle_mixins_css_for_sideeffects
       ].each(&::Gitlab::TaskHelpers.method(:invoke_and_time_task))
+
+      raise 'Assets compilation failed!'
     end
 
     desc 'GitLab | Assets | Compile all Webpack assets'

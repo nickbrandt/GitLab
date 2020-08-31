@@ -19,7 +19,7 @@
     - node --version
     - run_timed_command "retry yarn install --frozen-lockfile"
     - free -m
-    - run_timed_command "bin/rake gitlab:assets:compile > assets-compile.log 2>&1"
+    - run_timed_command "bin/rake gitlab:assets:compile > assets-compile.log"
     - run_timed_command "scripts/clean-old-cached-assets"
 
 compile-production-assets:
