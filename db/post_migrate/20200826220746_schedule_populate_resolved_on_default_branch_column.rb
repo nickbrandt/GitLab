@@ -19,7 +19,12 @@ class SchedulePopulateResolvedOnDefaultBranchColumn < ActiveRecord::Migration[6.
     end
   end
 
-  def down; end
+  def down
+    # no-op
+    # This migration schedules background tasks to populate
+    # `resolved_on_default_branch` column of `vulnerabilities`
+    # table so there is no rollback operation needed for this.
+  end
 
   private
 

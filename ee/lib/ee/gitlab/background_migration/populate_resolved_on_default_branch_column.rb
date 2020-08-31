@@ -42,6 +42,14 @@ module EE
           include Visibility
           include ::Gitlab::Utils::StrongMemoize
 
+          # These are the artifact file types to query
+          # only security report related artifacts.
+          # sast: 5
+          # dependency_scanning: 6
+          # container_scanning: 7
+          # dast: 8
+          # secret_detection: 21
+          # coverage_fuzzing: 23
           FILE_TYPES = [5, 6, 7, 8, 21, 23].freeze
           LATEST_PIPELINE_WITH_REPORTS_SQL = <<~SQL
             SELECT
@@ -83,8 +91,6 @@ module EE
           has_many :vulnerability_identifiers
           has_many :vulnerability_scanners
 
-          scope :has_vulnerabilities, -> { joins('INNER JOIN vulnerabilities v ON v.project_id = projects.id').group(:id) }
-
           def self.polymorphic_name
             'Project'
           end
@@ -92,7 +98,7 @@ module EE
           def reports
             return [] unless default_branch
 
-            @reports ||= artifacts.to_a.map(&:reports).flatten
+            @reports ||= artifacts.flat_map(&:reports)
           end
 
           private
@@ -100,7 +106,9 @@ module EE
           delegate :connection, to: :'self.class', private: true
 
           def artifacts
-            JobArtifact.for_pipeline(latest_pipeline_id).each { |artifact| artifact.project = self } if latest_pipeline_id
+            return [] unless latest_pipeline_id
+
+            JobArtifact.for_pipeline(latest_pipeline_id).each { |artifact| artifact.project = self }
           end
 
           def latest_pipeline_id
@@ -392,10 +400,7 @@ module EE
           end
 
           def perform
-            project.vulnerabilities
-                   .id_not_in(existing_vulnerability_ids)
-                   .update_all(resolved_on_default_branch: true)
-
+            update_vulnerabilities
             log_info
           rescue StandardError => e
             log_error(e)
@@ -406,6 +411,12 @@ module EE
           attr_accessor :project_id
 
           delegate :reports, to: :project, private: true
+
+          def update_vulnerabilities
+            @updated_count ||= project.vulnerabilities
+                                      .id_not_in(existing_vulnerability_ids)
+                                      .update_all(resolved_on_default_branch: true)
+          end
 
           def log_info
             ::Gitlab::BackgroundMigration::Logger.info(
@@ -420,7 +431,8 @@ module EE
             {
               all_count: findings.length,
               valid_count: all_valid_findings.length,
-              existing_count: existing_vulnerability_ids.length
+              existing_count: existing_vulnerability_ids.length,
+              updated_count: @updated_count
             }
           end
 
