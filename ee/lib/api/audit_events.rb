@@ -3,6 +3,7 @@
 module API
   class AuditEvents < ::Grape::API::Instance
     include ::API::PaginationParams
+    use ::API::UniqueCallTracking, event_name: 'i_compliance_audit_events_api', feature: :track_unique_visits
 
     before do
       authenticated_as_admin!
