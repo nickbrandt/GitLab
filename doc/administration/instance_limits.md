@@ -428,7 +428,7 @@ panel_groups:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/33895) in GitLab 13.4.
 
-The [Environment Dashboard](../ci/environments/environments_dashboard.md) supports the addition of a maximum of 150 projects.
+See [Environment Dashboard](../ci/environments/environments_dashboard.md#adding-a-project-to-the-dashboard) for the maximum number of displayed projects.
 
 ## Environment data on Deploy Boards
 
