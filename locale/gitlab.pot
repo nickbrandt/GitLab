@@ -5156,6 +5156,9 @@ msgstr ""
 msgid "ClusterAgent|This feature is only available for premium plans"
 msgstr ""
 
+msgid "ClusterAgent|User has insufficient permissions to create a token for this project"
+msgstr ""
+
 msgid "ClusterAgent|You have insufficient permissions to create a cluster agent for this project"
 msgstr ""
 
