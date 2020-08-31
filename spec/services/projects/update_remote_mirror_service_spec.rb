@@ -66,29 +66,26 @@ RSpec.describe Projects::UpdateRemoteMirrorService do
       end
     end
 
-    context "when the URL has escaped password sequences" do
-      let(:url) { "https://user:0a%23@test.example.com/project.git" }
+    context "when given URLs containing escaped elements" do
+      using RSpec::Parameterized::TableSyntax
 
-      before do
-        allow(remote_mirror).to receive(:url).and_return(url)
+      where(:url, :result_status) do
+        "https://user:0a%23@test.example.com/project.git"                               | :success
+        "https://git.example.com:1%2F%2F@source.developers.google.com/project.git"      | :success
+        CGI.escape("git://localhost:1234/some-path?some-query=some-val\#@example.com/") | :error
+        CGI.escape(CGI.escape("https://user:0a%23@test.example.com/project.git"))       | :error
       end
 
-      it "returns success when update succeeds" do
-        result = execute!
+      with_them do
+        before do
+          allow(remote_mirror).to receive(:url).and_return(url)
+        end
 
-        expect(result[:status]).to eq(:success)
-      end
-    end
+        it "returns expected status" do
+          result = execute!
 
-    context 'when the URL is localhost' do
-      let(:localhost_url) { "git://localhost:1234/some-path?some-query=some-val\#@example.com/" }
-
-      before do
-        allow(remote_mirror).to receive(:url).and_return(CGI.escape(localhost_url))
-      end
-
-      it 'fails and returns error status' do
-        expect(execute!).to eq(status: :error, message: 'The remote mirror URL is invalid.')
+          expect(result[:status]).to eq(result_status)
+        end
       end
     end
 
