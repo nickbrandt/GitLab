@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './components/app.vue';
 
-export default el => {
+export default (el, optionalFields) => {
   if (!el) {
     return;
   }
@@ -25,6 +25,7 @@ export default el => {
           members: this.members,
           groupId: this.groupId,
           currentUserId: this.currentUserId,
+          optionalFields,
         },
       });
     },

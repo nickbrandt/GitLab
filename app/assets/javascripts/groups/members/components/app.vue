@@ -1,8 +1,10 @@
 <script>
+import MembersList from '~/vue_shared/components/members/members_list.vue';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 export default {
   name: 'GroupMembersApp',
+  components: { MembersList },
   props: {
     groupId: {
       type: Number,
@@ -17,6 +19,11 @@ export default {
       type: Array,
       required: true,
     },
+    optionalFields: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   computed: {
     formattedMembers() {
@@ -27,7 +34,10 @@ export default {
 </script>
 
 <template>
-  <span>
-    <!-- Temporary empty template -->
-  </span>
+  <members-list
+    :source-id="groupId"
+    :current-user-id="currentUserId"
+    :members="formattedMembers"
+    :optional-fields="optionalFields"
+  />
 </template>

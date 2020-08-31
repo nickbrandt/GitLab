@@ -26,10 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
   memberExpirationDate('.js-access-expiration-date-groups');
   mountRemoveMemberModal();
 
-  initGroupMembersApp(document.querySelector('.js-group-members-list'));
-  initGroupMembersApp(document.querySelector('.js-group-linked-list'));
-  initGroupMembersApp(document.querySelector('.js-group-invited-members-list'));
-  initGroupMembersApp(document.querySelector('.js-group-access-requests-list'));
+  initGroupMembersApp(document.querySelector('.js-group-members-list'), ['granted', 'source']);
+  initGroupMembersApp(document.querySelector('.js-group-linked-list'), ['invited']);
+  initGroupMembersApp(document.querySelector('.js-group-invited-members-list'), ['invited']);
+  initGroupMembersApp(document.querySelector('.js-group-access-requests-list'), ['requested']);
 
   new Members(); // eslint-disable-line no-new
   new UsersSelect(); // eslint-disable-line no-new

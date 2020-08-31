@@ -209,6 +209,18 @@
   }
 }
 
+.members-table {
+  .col-meta,
+  .col-role,
+  .col-expiration {
+    width: px-to-rem(150px);
+  }
+
+  .col-actions {
+    width: px-to-rem(50px);
+  }
+}
+
 .card-mobile {
   .content-list.members-list li {
     display: block;
