@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import { Position } from 'monaco-editor';
 
 import Api from '~/api';
 import toast from '~/vue_shared/plugins/global_toast';
@@ -191,14 +190,7 @@ export default class FileTemplateMediator {
 
     this.editor.focus();
 
-    if (this.editor.navigateFileStart) {
-      // ACE. This will be removed and cleaned up
-      // in https://gitlab.com/gitlab-org/gitlab/-/issues/198610
-      this.editor.navigateFileStart();
-    } else {
-      // Editor Lite
-      this.editor.setPosition(new Position(1, 1));
-    }
+    this.editor.navigateFileStart();
   }
 
   findTemplateSelectorByKey(key) {

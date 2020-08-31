@@ -73,7 +73,6 @@ export default class Editor {
       this.instances.splice(index, 1);
       model.dispose();
     });
-
     instance.updateModelLanguage = path => this.updateModelLanguage(path);
 
     // Reference to the model on the editor level will go away in
