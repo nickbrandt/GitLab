@@ -44,7 +44,7 @@ RSpec.describe 'Mermaid rendering', :js do
     expect(page.html.scan(expected).count).to be(4)
   end
 
-  it 'renders only 2 Mermaid blocks and ', :js, quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/234081' } do
+  it 'renders only 2 Mermaid blocks and ', :js do
     description = <<~MERMAID
     ```mermaid
     graph LR
@@ -64,6 +64,8 @@ RSpec.describe 'Mermaid rendering', :js do
     issue = create(:issue, project: project, description: description)
 
     visit project_issue_path(project, issue)
+
+    wait_for_requests
 
     page.within('.description') do
       expect(page).to have_selector('svg')
