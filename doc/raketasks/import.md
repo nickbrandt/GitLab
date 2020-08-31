@@ -17,11 +17,14 @@ Note that:
 
 To import bare repositories into a GitLab instance:
 
-1. Create a new folder to import your Git repositories from. The new folder needs to have Git user
+1. Create a new folder to import your Git repositories from.
+   If the final projects should reside in a (sub)group's namespace,
+   instead of the admin's, create them as subfolders.
+   The new folder(s) needs to have Git user
    ownership and read/write/execute access for Git user and its group:
 
    ```shell
-   sudo -u git mkdir -p /var/opt/gitlab/git-data/repository-import-<date>/new_group
+   sudo -u git mkdir -p /var/opt/gitlab/git-data/repository-import-<date>/<optional_groupname>/<optional_subgroup>
    ```
 
 1. Copy your bare repositories inside this newly created folder. Note:
@@ -34,7 +37,7 @@ To import bare repositories into a GitLab instance:
    `/var/opt/gitlab/git-data/repository-import-<date>/G1/G2/A.git`.
 
    ```shell
-   sudo cp -r /old/git/foo.git /var/opt/gitlab/git-data/repository-import-<date>/new_group/
+   sudo cp -r /old/git/foo.git /var/opt/gitlab/git-data/repository-import-<date>/<optional_groupname>/<optional_subgroup>
 
    # Do this once when you are done copying git repositories
    sudo chown -R git:git /var/opt/gitlab/git-data/repository-import-<date>
