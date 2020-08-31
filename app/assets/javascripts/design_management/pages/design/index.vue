@@ -20,7 +20,7 @@ import {
   extractDesign,
   updateImageDiffNoteOptimisticResponse,
   toDiffNoteGid,
-  parseDesignRouteHash,
+  extractDesignNoteId,
 } from '../../utils/design_management_utils';
 import {
   updateStoreAfterAddImageDiffNote,
@@ -281,7 +281,7 @@ export default {
       });
     },
     updateActiveDiscussionFromUrl() {
-      const noteId = parseDesignRouteHash(this.$route.hash);
+      const noteId = extractDesignNoteId(this.$route.hash);
       const diffNoteGid = noteId ? toDiffNoteGid(noteId) : undefined;
       return this.updateActiveDiscussion(diffNoteGid, ACTIVE_DISCUSSION_SOURCE_TYPES.url);
     },

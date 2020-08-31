@@ -38,11 +38,11 @@ export const toDiffNoteGid = noteId => `gid://gitlab/DiffNote/${noteId}`;
 
 /**
  * Return the note ID from a URL hash parameter
- * @param {String} hash URL hash
+ * @param {String} urlHash URL hash, including `#` prefix
  */
-export const parseDesignRouteHash = hash => {
-  const [, noteId] = hash.match('#note_([0-9]+$)') || [];
-  return noteId;
+export const extractDesignNoteId = urlHash => {
+  const [, noteId] = urlHash.match('#note_([0-9]+$)') || [];
+  return noteId || null;
 };
 
 /**
