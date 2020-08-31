@@ -6,7 +6,7 @@ module Projects
     UpdateError = Class.new(Error)
 
     def execute
-      if project.import_url && Gitlab::UrlBlocker.blocked_url?(CGI.unescape(project.import_url))
+      if project.import_url && Gitlab::UrlBlocker.blocked_url?(CGI.unescape(Gitlab::UrlSanitizer.sanitize(project.import_url)))
         return error("The import URL is invalid.")
       end
 
