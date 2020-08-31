@@ -155,18 +155,53 @@ RSpec.describe Gitlab::Ci::Config::Entry::Job do
         end
 
         context 'when it is a release' do
-          let(:config) do
-            {
-              script: ["make changelog | tee release_changelog.txt"],
-              release: {
-                tag_name: "v0.06",
-                name: "Release $CI_TAG_NAME",
-                description: "./release_changelog.txt"
+          context 'with `:script`' do
+            let(:config) do
+              {
+                stage: "release",
+                image: "registry.gitlab.com/gitlab-org/release-cli:v0.2.0",
+                script: ["make changelog | tee release_changelog.txt"],
+                release: {
+                  tag_name: "v0.06",
+                  name: "Release $CI_TAG_NAME",
+                  description: "./release_changelog.txt"
+                }
               }
-            }
+            end
+
+            it { expect(entry).to be_valid }
           end
 
-          it { expect(entry).to be_valid }
+          context 'without `:script`' do
+            let(:config) do
+              {
+                stage: "release",
+                image: "registry.gitlab.com/gitlab-org/release-cli:v0.2.0",
+                release: {
+                  tag_name: "v0.06",
+                  name: "Release $CI_TAG_NAME",
+                  description: "./release_changelog.txt"
+                }
+              }
+            end
+
+            it { expect(entry).to be_valid }
+          end
+
+          context 'without `:image`' do
+            let(:config) do
+              {
+                stage: "release",
+                release: {
+                  tag_name: "v0.06",
+                  name: "Release $CI_TAG_NAME",
+                  description: "./release_changelog.txt"
+                }
+              }
+            end
+
+            it { expect(entry).not_to be_valid }
+          end
         end
       end
     end
@@ -486,6 +521,7 @@ RSpec.describe Gitlab::Ci::Config::Entry::Job do
           let(:config) do
             {
               script: ["make changelog | tee release_changelog.txt"],
+              image: "registry.gitlab.com/gitlab-org/release-cli:v0.2.0",
               release: {
                 tag_name: "v0.06",
                 name: "Release $CI_TAG_NAME"
@@ -496,6 +532,23 @@ RSpec.describe Gitlab::Ci::Config::Entry::Job do
           it "returns error" do
             expect(entry).not_to be_valid
             expect(entry.errors).to include "release description can't be blank"
+          end
+        end
+        
+        context 'when `image` is missing' do
+          let(:config) do
+            {
+              image: "registry.gitlab.com/gitlab-org/release-cli:v0.2.0",
+              release: {
+                tag_name: "v0.06",
+                name: "Release $CI_TAG_NAME"
+              }
+            }
+          end
+
+          it "returns error" do
+            expect(entry).not_to be_valid
+            expect(entry.errors).to include "image can't be blank"
           end
         end
       end

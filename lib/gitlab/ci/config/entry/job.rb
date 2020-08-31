@@ -21,7 +21,7 @@ module Gitlab
           validations do
             validates :config, allowed_keys: ALLOWED_KEYS + PROCESSABLE_ALLOWED_KEYS
             validates :config, required_keys: REQUIRED_BY_NEEDS, if: :has_needs?
-            validates :script, presence: true
+            validates :script, presence: true, unless: -> { release_job? }
 
             with_options allow_nil: true do
               validates :allow_failure, boolean: true
@@ -45,6 +45,13 @@ module Gitlab
 
               if missing_needs.any?
                 errors.add(:dependencies, "the #{missing_needs.join(", ")} should be part of needs")
+              end
+            end
+            validate do
+              next unless release_job?
+
+              unless config.has_key?(:image)
+                errors.add(:release, "image must be defined for release")
               end
             end
           end
@@ -151,6 +158,10 @@ module Gitlab
 
           def ignored?
             allow_failure.nil? ? manual_action? : allow_failure
+          end
+          
+          def release_job?
+            config.is_a?(Hash) && config.key?(:release)
           end
 
           def value
