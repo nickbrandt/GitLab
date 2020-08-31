@@ -66,7 +66,7 @@ RSpec.describe EnvironmentEntity do
 
         subject { entity.as_json.include?(:terminal_path) }
 
-        it_behaves_like 'protected environments access', false
+        it_behaves_like 'protected environments access', developer_access: false
       end
     end
   end
