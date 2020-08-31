@@ -10698,7 +10698,7 @@ type Pipeline {
   beforeSha: String
 
   """
-  Specifies if a pipeline is cancelable
+  Specifies if a pipeline can be canceled
   """
   cancelable: Boolean!
 
@@ -10723,11 +10723,6 @@ type Pipeline {
   Timestamp of the pipeline's creation
   """
   createdAt: Time!
-
-  """
-  Specifies if a pipeline can be destroyed
-  """
-  destroyable: Boolean!
 
   """
   Detailed status of the pipeline
@@ -10755,7 +10750,7 @@ type Pipeline {
   iid: String!
 
   """
-  Specifies if a pipeline is retryable
+  Specifies if a pipeline can be retried
   """
   retryable: Boolean!
 

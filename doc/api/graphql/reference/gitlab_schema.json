@@ -32017,7 +32017,7 @@
             },
             {
               "name": "cancelable",
-              "description": "Specifies if a pipeline is cancelable",
+              "description": "Specifies if a pipeline can be canceled",
               "args": [
 
               ],
@@ -32087,24 +32087,6 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "Time",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "destroyable",
-              "description": "Specifies if a pipeline can be destroyed",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
                   "ofType": null
                 }
               },
@@ -32195,7 +32177,7 @@
             },
             {
               "name": "retryable",
-              "description": "Specifies if a pipeline is retryable",
+              "description": "Specifies if a pipeline can be retried",
               "args": [
 
               ],
