@@ -42,7 +42,7 @@ module Security
     end
 
     def create_vulnerability_finding(finding)
-      return if finding.scanner.blank?
+      return if finding.scanner.blank? || finding.primary_identifier.blank?
 
       vulnerability_params = finding.to_hash.except(:compare_key, :identifiers, :location, :scanner)
       vulnerability_finding = create_or_find_vulnerability_finding(finding, vulnerability_params)

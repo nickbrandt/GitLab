@@ -1,0 +1,5 @@
+---
+title: Add identifier check when creating vulnerability findings
+merge_request: 39650
+author:
+type: fixed

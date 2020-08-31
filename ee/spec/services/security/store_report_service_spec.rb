@@ -203,6 +203,29 @@ RSpec.describe Security::StoreReportService, '#execute' do
         expect { subject }.not_to raise_error
       end
     end
+
+    context 'when the finding does not include a primary identifier' do
+      let(:bad_project) { bad_artifact.project }
+      let(:bad_pipeline) { bad_artifact.job.pipeline }
+      let!(:bad_artifact) { create(:ee_ci_job_artifact, :sast_with_missing_identifiers) }
+      let(:bad_report) { bad_pipeline.security_reports.get_report(report_type.to_s, bad_artifact) }
+      let(:report_type) { :sast }
+
+      before do
+        bad_project.add_developer(user)
+        allow(bad_pipeline).to receive(:user).and_return(user)
+      end
+
+      subject { described_class.new(bad_pipeline, bad_report).execute }
+
+      it 'does not create a new finding' do
+        expect { subject }.not_to change { Vulnerabilities::Finding.count }
+      end
+
+      it 'does not raise an error' do
+        expect { subject }.not_to raise_error
+      end
+    end
   end
 
   context 'with existing data from same pipeline' do
