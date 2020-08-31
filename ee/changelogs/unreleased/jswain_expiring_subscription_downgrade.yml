@@ -1,0 +1,5 @@
+---
+title: Only display downgraded message if on free plan
+merge_request: 41213
+author:
+type: changed
