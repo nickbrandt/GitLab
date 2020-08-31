@@ -1,5 +1,7 @@
 import Vue from 'vue';
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { GlLink } from '@gitlab/ui';
+import { shallowMount, mount } from '@vue/test-utils';
+import { trimText } from '../../../helpers/text_helper';
 import ReadyToMerge from '~/vue_merge_request_widget/components/states/ready_to_merge.vue';
 import SquashBeforeMerge from '~/vue_merge_request_widget/components/states/squash_before_merge.vue';
 import CommitsHeader from '~/vue_merge_request_widget/components/states/commits_header.vue';
@@ -17,289 +19,261 @@ jest.mock('~/commons/nav/user_merge_requests', () => ({
   refreshUserMergeRequestCounts: jest.fn(),
 }));
 
+let wrapper;
+
 const commitMessage = 'This is the commit message';
 const squashCommitMessage = 'This is the squash commit message';
 const commitMessageWithDescription = 'This is the commit message description';
-const createTestMr = customConfig => {
-  const mr = {
-    isPipelineActive: false,
-    pipeline: null,
-    isPipelineFailed: false,
-    isPipelinePassing: false,
-    isMergeAllowed: true,
-    isApproved: true,
-    onlyAllowMergeIfPipelineSucceeds: false,
-    ffOnlyEnabled: false,
-    hasCI: false,
-    ciStatus: null,
-    sha: '12345678',
-    squash: false,
-    squashIsEnabledByDefault: false,
-    squashIsReadonly: false,
-    squashIsSelected: false,
-    commitMessage,
-    squashCommitMessage,
-    commitMessageWithDescription,
-    shouldRemoveSourceBranch: true,
-    canRemoveSourceBranch: false,
-    targetBranch: 'master',
-    preferredAutoMergeStrategy: MWPS_MERGE_STRATEGY,
-    availableAutoMergeStrategies: [MWPS_MERGE_STRATEGY],
-    mergeImmediatelyDocsPath: 'path/to/merge/immediately/docs',
-  };
-
-  Object.assign(mr, customConfig.mr);
-
-  return mr;
+const mockDataMr = {
+  isPipelineActive: false,
+  pipeline: null,
+  isPipelineFailed: false,
+  isPipelinePassing: false,
+  isMergeAllowed: true,
+  isApproved: true,
+  onlyAllowMergeIfPipelineSucceeds: false,
+  ffOnlyEnabled: false,
+  hasCI: false,
+  ciStatus: null,
+  sha: '12345678',
+  squash: false,
+  squashIsEnabledByDefault: false,
+  squashIsReadonly: false,
+  squashIsSelected: false,
+  commitMessage,
+  squashCommitMessage,
+  commitMessageWithDescription,
+  shouldRemoveSourceBranch: true,
+  canRemoveSourceBranch: false,
+  targetBranch: 'master',
+  preferredAutoMergeStrategy: MWPS_MERGE_STRATEGY,
+  availableAutoMergeStrategies: [MWPS_MERGE_STRATEGY],
+  mergeImmediatelyDocsPath: 'path/to/merge/immediately/docs',
 };
+
+const findMismatchShaBlock = () => wrapper.find('[data-testid="shaMismatchBlock"]');
+const findFastForwardMessage = () => wrapper.find('[data-testid="mr-fast-forward-message"]');
+const findModifyCommitMessageBtn = () =>
+  wrapper.find('[data-testid="modify-commit-message-button"]');
+const findRemoveSourceBranchInput = () => wrapper.find('#remove-source-branch-input');
+const findResolveItemsMessage = () => wrapper.find('[data-testid="resolve-items-message"]');
 
 const createTestService = () => ({
   merge: jest.fn(),
   poll: jest.fn().mockResolvedValue(),
 });
 
-const createComponent = (customConfig = {}) => {
-  const Component = Vue.extend(ReadyToMerge);
-
-  return new Component({
-    el: document.createElement('div'),
+const createComponent = (customMrData = {}, mountFn = shallowMount) => {
+  return mountFn(ReadyToMerge, {
     propsData: {
-      mr: createTestMr(customConfig),
+      mr: { ...mockDataMr, ...customMrData },
       service: createTestService(),
     },
   });
 };
 
 describe('ReadyToMerge', () => {
-  let vm;
-
   beforeEach(() => {
-    vm = createComponent();
+    wrapper = createComponent();
   });
 
   afterEach(() => {
-    vm.$destroy();
-  });
-
-  describe('props', () => {
-    it('should have props', () => {
-      const { mr, service } = ReadyToMerge.props;
-
-      expect(mr.type instanceof Object).toBeTruthy();
-      expect(mr.required).toBeTruthy();
-
-      expect(service.type instanceof Object).toBeTruthy();
-      expect(service.required).toBeTruthy();
-    });
-  });
-
-  describe('data', () => {
-    it('should have default data', () => {
-      expect(vm.mergeWhenBuildSucceeds).toBeFalsy();
-      expect(vm.useCommitMessageWithDescription).toBeFalsy();
-      expect(vm.showCommitMessageEditor).toBeFalsy();
-      expect(vm.isMakingRequest).toBeFalsy();
-      expect(vm.isMergingImmediately).toBeFalsy();
-      expect(vm.commitMessage).toBe(vm.mr.commitMessage);
-      expect(vm.successSvg).toBeDefined();
-      expect(vm.warningSvg).toBeDefined();
-    });
+    wrapper.destroy();
+    wrapper = null;
   });
 
   describe('computed', () => {
     describe('isAutoMergeAvailable', () => {
       it('should return true when at least one merge strategy is available', () => {
-        vm.mr.availableAutoMergeStrategies = [MWPS_MERGE_STRATEGY];
-
-        expect(vm.isAutoMergeAvailable).toBe(true);
+        expect(wrapper.vm.isAutoMergeAvailable).toBe(true);
       });
 
       it('should return false when no merge strategies are available', () => {
-        vm.mr.availableAutoMergeStrategies = [];
+        wrapper.vm.mr.availableAutoMergeStrategies = [];
 
-        expect(vm.isAutoMergeAvailable).toBe(false);
+        expect(wrapper.vm.isAutoMergeAvailable).toBe(false);
       });
     });
 
     describe('status', () => {
       it('defaults to success', () => {
-        Vue.set(vm.mr, 'pipeline', true);
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'pipeline', true);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
 
-        expect(vm.status).toEqual('success');
+        expect(wrapper.status).toEqual('success');
       });
 
       it('returns failed when MR has CI but also has an unknown status', () => {
-        Vue.set(vm.mr, 'hasCI', true);
+        Vue.set(wrapper.mr, 'hasCI', true);
 
-        expect(vm.status).toEqual('failed');
+        expect(wrapper.status).toEqual('failed');
       });
 
       it('returns default when MR has no pipeline', () => {
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
 
-        expect(vm.status).toEqual('success');
+        expect(wrapper.status).toEqual('success');
       });
 
       it('returns pending when pipeline is active', () => {
-        Vue.set(vm.mr, 'pipeline', {});
-        Vue.set(vm.mr, 'isPipelineActive', true);
+        Vue.set(wrapper.mr, 'pipeline', {});
+        Vue.set(wrapper.mr, 'isPipelineActive', true);
 
-        expect(vm.status).toEqual('pending');
+        expect(wrapper.status).toEqual('pending');
       });
 
       it('returns failed when pipeline is failed', () => {
-        Vue.set(vm.mr, 'pipeline', {});
-        Vue.set(vm.mr, 'isPipelineFailed', true);
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'pipeline', {});
+        Vue.set(wrapper.mr, 'isPipelineFailed', true);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
 
-        expect(vm.status).toEqual('failed');
+        expect(wrapper.status).toEqual('failed');
       });
     });
 
     describe('mergeButtonVariant', () => {
       it('defaults to success class', () => {
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
 
-        expect(vm.mergeButtonVariant).toEqual('success');
+        expect(wrapper.mergeButtonVariant).toEqual('success');
       });
 
       it('returns success class for success status', () => {
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
-        Vue.set(vm.mr, 'pipeline', true);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'pipeline', true);
 
-        expect(vm.mergeButtonVariant).toEqual('success');
+        expect(wrapper.mergeButtonVariant).toEqual('success');
       });
 
       it('returns info class for pending status', () => {
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', [MTWPS_MERGE_STRATEGY]);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', [MTWPS_MERGE_STRATEGY]);
 
-        expect(vm.mergeButtonVariant).toEqual('info');
+        expect(wrapper.mergeButtonVariant).toEqual('info');
       });
 
       it('returns danger class for failed status', () => {
-        vm.mr.hasCI = true;
+        wrapper.mr.hasCI = true;
 
-        expect(vm.mergeButtonVariant).toEqual('danger');
+        expect(wrapper.mergeButtonVariant).toEqual('danger');
       });
     });
 
     describe('status icon', () => {
       it('defaults to tick icon', () => {
-        expect(vm.iconClass).toEqual('success');
+        expect(wrapper.iconClass).toEqual('success');
       });
 
       it('shows tick for success status', () => {
-        vm.mr.pipeline = true;
+        wrapper.mr.pipeline = true;
 
-        expect(vm.iconClass).toEqual('success');
+        expect(wrapper.iconClass).toEqual('success');
       });
 
       it('shows tick for pending status', () => {
-        vm.mr.pipeline = {};
-        vm.mr.isPipelineActive = true;
+        wrapper.mr.pipeline = {};
+        wrapper.mr.isPipelineActive = true;
 
-        expect(vm.iconClass).toEqual('success');
+        expect(wrapper.iconClass).toEqual('success');
       });
 
       it('shows warning icon for failed status', () => {
-        vm.mr.hasCI = true;
+        wrapper.mr.hasCI = true;
 
-        expect(vm.iconClass).toEqual('warning');
+        expect(wrapper.iconClass).toEqual('warning');
       });
 
       it('shows warning icon for merge not allowed', () => {
-        vm.mr.hasCI = true;
+        wrapper.mr.hasCI = true;
 
-        expect(vm.iconClass).toEqual('warning');
+        expect(wrapper.iconClass).toEqual('warning');
       });
     });
 
     describe('mergeButtonText', () => {
       it('should return "Merge" when no auto merge strategies are available', () => {
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
 
-        expect(vm.mergeButtonText).toEqual('Merge');
+        expect(wrapper.mergeButtonText).toEqual('Merge');
       });
 
       it('should return "Merge in progress"', () => {
-        Vue.set(vm, 'isMergingImmediately', true);
+        Vue.set(wrapper, 'isMergingImmediately', true);
 
-        expect(vm.mergeButtonText).toEqual('Merge in progress');
+        expect(wrapper.mergeButtonText).toEqual('Merge in progress');
       });
 
       it('should return "Merge when pipeline succeeds" when the MWPS auto merge strategy is available', () => {
-        Vue.set(vm, 'isMergingImmediately', false);
-        Vue.set(vm.mr, 'preferredAutoMergeStrategy', MWPS_MERGE_STRATEGY);
+        Vue.set(wrapper, 'isMergingImmediately', false);
+        Vue.set(wrapper.mr, 'preferredAutoMergeStrategy', MWPS_MERGE_STRATEGY);
 
-        expect(vm.mergeButtonText).toEqual('Merge when pipeline succeeds');
+        expect(wrapper.mergeButtonText).toEqual('Merge when pipeline succeeds');
       });
     });
 
     describe('autoMergeText', () => {
       it('should return Merge when pipeline succeeds', () => {
-        Vue.set(vm.mr, 'preferredAutoMergeStrategy', MWPS_MERGE_STRATEGY);
+        Vue.set(wrapper.mr, 'preferredAutoMergeStrategy', MWPS_MERGE_STRATEGY);
 
-        expect(vm.autoMergeText).toEqual('Merge when pipeline succeeds');
+        expect(wrapper.autoMergeText).toEqual('Merge when pipeline succeeds');
       });
     });
 
     describe('shouldShowMergeImmediatelyDropdown', () => {
       it('should return false if no pipeline is active', () => {
-        Vue.set(vm.mr, 'isPipelineActive', false);
-        Vue.set(vm.mr, 'onlyAllowMergeIfPipelineSucceeds', false);
+        Vue.set(wrapper.mr, 'isPipelineActive', false);
+        Vue.set(wrapper.mr, 'onlyAllowMergeIfPipelineSucceeds', false);
 
-        expect(vm.shouldShowMergeImmediatelyDropdown).toBe(false);
+        expect(wrapper.shouldShowMergeImmediatelyDropdown).toBe(false);
       });
 
       it('should return false if "Pipelines must succeed" is enabled for the current project', () => {
-        Vue.set(vm.mr, 'isPipelineActive', true);
-        Vue.set(vm.mr, 'onlyAllowMergeIfPipelineSucceeds', true);
+        Vue.set(wrapper.mr, 'isPipelineActive', true);
+        Vue.set(wrapper.mr, 'onlyAllowMergeIfPipelineSucceeds', true);
 
-        expect(vm.shouldShowMergeImmediatelyDropdown).toBe(false);
+        expect(wrapper.shouldShowMergeImmediatelyDropdown).toBe(false);
       });
 
       it('should return true if the MR\'s pipeline is active and "Pipelines must succeed" is not enabled for the current project', () => {
-        Vue.set(vm.mr, 'isPipelineActive', true);
-        Vue.set(vm.mr, 'onlyAllowMergeIfPipelineSucceeds', false);
+        Vue.set(wrapper.mr, 'isPipelineActive', true);
+        Vue.set(wrapper.mr, 'onlyAllowMergeIfPipelineSucceeds', false);
 
-        expect(vm.shouldShowMergeImmediatelyDropdown).toBe(true);
+        expect(wrapper.shouldShowMergeImmediatelyDropdown).toBe(true);
       });
     });
 
     describe('isMergeButtonDisabled', () => {
       it('should return false with initial data', () => {
-        Vue.set(vm.mr, 'isMergeAllowed', true);
+        Vue.set(wrapper.mr, 'isMergeAllowed', true);
 
-        expect(vm.isMergeButtonDisabled).toBe(false);
+        expect(wrapper.isMergeButtonDisabled).toBe(false);
       });
 
       it('should return true when there is no commit message', () => {
-        Vue.set(vm.mr, 'isMergeAllowed', true);
-        Vue.set(vm, 'commitMessage', '');
+        Vue.set(wrapper.mr, 'isMergeAllowed', true);
+        Vue.set(wrapper, 'commitMessage', '');
 
-        expect(vm.isMergeButtonDisabled).toBe(true);
+        expect(wrapper.isMergeButtonDisabled).toBe(true);
       });
 
       it('should return true if merge is not allowed', () => {
-        Vue.set(vm.mr, 'isMergeAllowed', false);
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
-        Vue.set(vm.mr, 'onlyAllowMergeIfPipelineSucceeds', true);
+        Vue.set(wrapper.mr, 'isMergeAllowed', false);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'onlyAllowMergeIfPipelineSucceeds', true);
 
-        expect(vm.isMergeButtonDisabled).toBe(true);
+        expect(wrapper.isMergeButtonDisabled).toBe(true);
       });
 
-      it('should return true when the vm instance is making request', () => {
-        Vue.set(vm.mr, 'isMergeAllowed', true);
-        Vue.set(vm, 'isMakingRequest', true);
+      it('should return true when the wrapper instance is making request', () => {
+        Vue.set(wrapper.mr, 'isMergeAllowed', true);
+        Vue.set(wrapper, 'isMakingRequest', true);
 
-        expect(vm.isMergeButtonDisabled).toBe(true);
+        expect(wrapper.isMergeButtonDisabled).toBe(true);
       });
     });
 
     describe('isMergeImmediatelyDangerous', () => {
       it('should always return false in CE', () => {
-        expect(vm.isMergeImmediatelyDangerous).toBe(false);
+        expect(wrapper.isMergeImmediatelyDangerous).toBe(false);
       });
     });
   });
@@ -307,43 +281,43 @@ describe('ReadyToMerge', () => {
   describe('methods', () => {
     describe('shouldShowMergeControls', () => {
       it('should return false when an external pipeline is running and required to succeed', () => {
-        Vue.set(vm.mr, 'isMergeAllowed', false);
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'isMergeAllowed', false);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
 
-        expect(vm.shouldShowMergeControls).toBe(false);
+        expect(wrapper.shouldShowMergeControls).toBe(false);
       });
 
       it('should return true when the build succeeded or build not required to succeed', () => {
-        Vue.set(vm.mr, 'isMergeAllowed', true);
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', []);
+        Vue.set(wrapper.mr, 'isMergeAllowed', true);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', []);
 
-        expect(vm.shouldShowMergeControls).toBe(true);
+        expect(wrapper.shouldShowMergeControls).toBe(true);
       });
 
       it('should return true when showing the MWPS button and a pipeline is running that needs to be successful', () => {
-        Vue.set(vm.mr, 'isMergeAllowed', false);
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', [MWPS_MERGE_STRATEGY]);
+        Vue.set(wrapper.mr, 'isMergeAllowed', false);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', [MWPS_MERGE_STRATEGY]);
 
-        expect(vm.shouldShowMergeControls).toBe(true);
+        expect(wrapper.shouldShowMergeControls).toBe(true);
       });
 
       it('should return true when showing the MWPS button but not required for the pipeline to succeed', () => {
-        Vue.set(vm.mr, 'isMergeAllowed', true);
-        Vue.set(vm.mr, 'availableAutoMergeStrategies', [MWPS_MERGE_STRATEGY]);
+        Vue.set(wrapper.mr, 'isMergeAllowed', true);
+        Vue.set(wrapper.mr, 'availableAutoMergeStrategies', [MWPS_MERGE_STRATEGY]);
 
-        expect(vm.shouldShowMergeControls).toBe(true);
+        expect(wrapper.shouldShowMergeControls).toBe(true);
       });
     });
 
     describe('updateMergeCommitMessage', () => {
       it('should revert flag and change commitMessage', () => {
-        expect(vm.commitMessage).toEqual(commitMessage);
-        vm.updateMergeCommitMessage(true);
+        expect(wrapper.commitMessage).toEqual(commitMessage);
+        wrapper.updateMergeCommitMessage(true);
 
-        expect(vm.commitMessage).toEqual(commitMessageWithDescription);
-        vm.updateMergeCommitMessage(false);
+        expect(wrapper.commitMessage).toEqual(commitMessageWithDescription);
+        wrapper.updateMergeCommitMessage(false);
 
-        expect(vm.commitMessage).toEqual(commitMessage);
+        expect(wrapper.commitMessage).toEqual(commitMessage);
       });
     });
 
@@ -360,21 +334,21 @@ describe('ReadyToMerge', () => {
       it('should handle merge when pipeline succeeds', done => {
         jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
         jest
-          .spyOn(vm.service, 'merge')
+          .spyOn(wrapper.service, 'merge')
           .mockReturnValue(returnPromise('merge_when_pipeline_succeeds'));
-        vm.removeSourceBranch = false;
-        vm.handleMergeButtonClick(true);
+        wrapper.removeSourceBranch = false;
+        wrapper.handleMergeButtonClick(true);
 
         setImmediate(() => {
-          expect(vm.isMakingRequest).toBeTruthy();
+          expect(wrapper.isMakingRequest).toBeTruthy();
           expect(eventHub.$emit).toHaveBeenCalledWith('MRWidgetUpdateRequested');
 
-          const params = vm.service.merge.mock.calls[0][0];
+          const params = wrapper.service.merge.mock.calls[0][0];
 
           expect(params).toEqual(
             expect.objectContaining({
-              sha: vm.mr.sha,
-              commit_message: vm.mr.commitMessage,
+              sha: wrapper.mr.sha,
+              commit_message: wrapper.mr.commitMessage,
               should_remove_source_branch: false,
               auto_merge_strategy: 'merge_when_pipeline_succeeds',
             }),
@@ -385,14 +359,14 @@ describe('ReadyToMerge', () => {
 
       it('should handle merge failed', done => {
         jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
-        jest.spyOn(vm.service, 'merge').mockReturnValue(returnPromise('failed'));
-        vm.handleMergeButtonClick(false, true);
+        jest.spyOn(wrapper.service, 'merge').mockReturnValue(returnPromise('failed'));
+        wrapper.handleMergeButtonClick(false, true);
 
         setImmediate(() => {
-          expect(vm.isMakingRequest).toBeTruthy();
+          expect(wrapper.isMakingRequest).toBeTruthy();
           expect(eventHub.$emit).toHaveBeenCalledWith('FailedToMerge', undefined);
 
-          const params = vm.service.merge.mock.calls[0][0];
+          const params = wrapper.service.merge.mock.calls[0][0];
 
           expect(params.should_remove_source_branch).toBeTruthy();
           expect(params.auto_merge_strategy).toBeUndefined();
@@ -401,15 +375,15 @@ describe('ReadyToMerge', () => {
       });
 
       it('should handle merge action accepted case', done => {
-        jest.spyOn(vm.service, 'merge').mockReturnValue(returnPromise('success'));
-        jest.spyOn(vm, 'initiateMergePolling').mockImplementation(() => {});
-        vm.handleMergeButtonClick();
+        jest.spyOn(wrapper.service, 'merge').mockReturnValue(returnPromise('success'));
+        jest.spyOn(wrapper, 'initiateMergePolling').mockImplementation(() => {});
+        wrapper.handleMergeButtonClick();
 
         setImmediate(() => {
-          expect(vm.isMakingRequest).toBeTruthy();
-          expect(vm.initiateMergePolling).toHaveBeenCalled();
+          expect(wrapper.isMakingRequest).toBeTruthy();
+          expect(wrapper.initiateMergePolling).toHaveBeenCalled();
 
-          const params = vm.service.merge.mock.calls[0][0];
+          const params = wrapper.service.merge.mock.calls[0][0];
 
           expect(params.should_remove_source_branch).toBeTruthy();
           expect(params.auto_merge_strategy).toBeUndefined();
@@ -420,17 +394,17 @@ describe('ReadyToMerge', () => {
 
     describe('initiateMergePolling', () => {
       it('should call simplePoll', () => {
-        vm.initiateMergePolling();
+        wrapper.initiateMergePolling();
 
         expect(simplePoll).toHaveBeenCalledWith(expect.any(Function), { timeout: 0 });
       });
 
       it('should call handleMergePolling', () => {
-        jest.spyOn(vm, 'handleMergePolling').mockImplementation(() => {});
+        jest.spyOn(wrapper, 'handleMergePolling').mockImplementation(() => {});
 
-        vm.initiateMergePolling();
+        wrapper.initiateMergePolling();
 
-        expect(vm.handleMergePolling).toHaveBeenCalled();
+        expect(wrapper.handleMergePolling).toHaveBeenCalled();
       });
     });
 
@@ -451,13 +425,13 @@ describe('ReadyToMerge', () => {
 
       it('should call start and stop polling when MR merged', done => {
         jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
-        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('merged'));
-        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
+        jest.spyOn(wrapper.service, 'poll').mockReturnValue(returnPromise('merged'));
+        jest.spyOn(wrapper, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
 
-        vm.handleMergePolling(
+        wrapper.handleMergePolling(
           () => {
             cpc = true;
           },
@@ -466,10 +440,10 @@ describe('ReadyToMerge', () => {
           },
         );
         setImmediate(() => {
-          expect(vm.service.poll).toHaveBeenCalled();
+          expect(wrapper.service.poll).toHaveBeenCalled();
           expect(eventHub.$emit).toHaveBeenCalledWith('MRWidgetUpdateRequested');
           expect(eventHub.$emit).toHaveBeenCalledWith('FetchActionsContent');
-          expect(vm.initiateRemoveSourceBranchPolling).toHaveBeenCalled();
+          expect(wrapper.initiateRemoveSourceBranchPolling).toHaveBeenCalled();
           expect(refreshUserMergeRequestCounts).toHaveBeenCalled();
           expect(cpc).toBeFalsy();
           expect(spc).toBeTruthy();
@@ -479,10 +453,10 @@ describe('ReadyToMerge', () => {
       });
 
       it('updates status box', done => {
-        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('merged'));
-        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
+        jest.spyOn(wrapper.service, 'poll').mockReturnValue(returnPromise('merged'));
+        jest.spyOn(wrapper, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
-        vm.handleMergePolling(() => {}, () => {});
+        wrapper.handleMergePolling(() => {}, () => {});
 
         setImmediate(() => {
           const statusBox = document.querySelector('.status-box');
@@ -495,10 +469,10 @@ describe('ReadyToMerge', () => {
       });
 
       it('hides close button', done => {
-        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('merged'));
-        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
+        jest.spyOn(wrapper.service, 'poll').mockReturnValue(returnPromise('merged'));
+        jest.spyOn(wrapper, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
-        vm.handleMergePolling(() => {}, () => {});
+        wrapper.handleMergePolling(() => {}, () => {});
 
         setImmediate(() => {
           expect(document.querySelector('.btn-close').classList.contains('hidden')).toBeTruthy();
@@ -508,10 +482,10 @@ describe('ReadyToMerge', () => {
       });
 
       it('updates merge request count badge', done => {
-        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('merged'));
-        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
+        jest.spyOn(wrapper.service, 'poll').mockReturnValue(returnPromise('merged'));
+        jest.spyOn(wrapper, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
-        vm.handleMergePolling(() => {}, () => {});
+        wrapper.handleMergePolling(() => {}, () => {});
 
         setImmediate(() => {
           expect(document.querySelector('.js-merge-counter').textContent).toBe('0');
@@ -521,13 +495,13 @@ describe('ReadyToMerge', () => {
       });
 
       it('should continue polling until MR is merged', done => {
-        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise('some_other_state'));
-        jest.spyOn(vm, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
+        jest.spyOn(wrapper.service, 'poll').mockReturnValue(returnPromise('some_other_state'));
+        jest.spyOn(wrapper, 'initiateRemoveSourceBranchPolling').mockImplementation(() => {});
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
 
-        vm.handleMergePolling(
+        wrapper.handleMergePolling(
           () => {
             cpc = true;
           },
@@ -548,7 +522,7 @@ describe('ReadyToMerge', () => {
       it('should emit event and call simplePoll', () => {
         jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
 
-        vm.initiateRemoveSourceBranchPolling();
+        wrapper.initiateRemoveSourceBranchPolling();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('SetBranchRemoveFlag', [true]);
         expect(simplePoll).toHaveBeenCalled();
@@ -567,12 +541,12 @@ describe('ReadyToMerge', () => {
 
       it('should call start and stop polling when MR merged', done => {
         jest.spyOn(eventHub, '$emit').mockImplementation(() => {});
-        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise(false));
+        jest.spyOn(wrapper.service, 'poll').mockReturnValue(returnPromise(false));
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
 
-        vm.handleRemoveBranchPolling(
+        wrapper.handleRemoveBranchPolling(
           () => {
             cpc = true;
           },
@@ -581,7 +555,7 @@ describe('ReadyToMerge', () => {
           },
         );
         setImmediate(() => {
-          expect(vm.service.poll).toHaveBeenCalled();
+          expect(wrapper.service.poll).toHaveBeenCalled();
 
           const args = eventHub.$emit.mock.calls[0];
 
@@ -599,12 +573,12 @@ describe('ReadyToMerge', () => {
       });
 
       it('should continue polling until MR is merged', done => {
-        jest.spyOn(vm.service, 'poll').mockReturnValue(returnPromise(true));
+        jest.spyOn(wrapper.service, 'poll').mockReturnValue(returnPromise(true));
 
         let cpc = false; // continuePollingCalled
         let spc = false; // stopPollingCalled
 
-        vm.handleRemoveBranchPolling(
+        wrapper.handleRemoveBranchPolling(
           () => {
             cpc = true;
           },
@@ -625,52 +599,31 @@ describe('ReadyToMerge', () => {
   describe('Remove source branch checkbox', () => {
     describe('when user can merge but cannot delete branch', () => {
       it('should be disabled in the rendered output', () => {
-        const checkboxElement = vm.$el.querySelector('#remove-source-branch-input');
-
-        expect(checkboxElement).toBeNull();
+        expect(findRemoveSourceBranchInput().exists()).toBe(false);
       });
     });
 
     describe('when user can merge and can delete branch', () => {
       beforeEach(() => {
-        vm = createComponent({
+        wrapper = createComponent({
           mr: { canRemoveSourceBranch: true },
         });
       });
 
       it('isRemoveSourceBranchButtonDisabled should be false', () => {
-        expect(vm.isRemoveSourceBranchButtonDisabled).toBe(false);
+        expect(wrapper.isRemoveSourceBranchButtonDisabled).toBe(false);
       });
 
       it('removed source branch should be enabled in rendered output', () => {
-        const checkboxElement = vm.$el.querySelector('#remove-source-branch-input');
-
-        expect(checkboxElement).not.toBeNull();
+        expect(findRemoveSourceBranchInput().exists()).toBe(true);
       });
     });
   });
 
   describe('render children components', () => {
-    let wrapper;
-    const localVue = createLocalVue();
-
-    const createLocalComponent = (customConfig = {}) => {
-      wrapper = shallowMount(localVue.extend(ReadyToMerge), {
-        localVue,
-        propsData: {
-          mr: createTestMr(customConfig),
-          service: createTestService(),
-        },
-      });
-    };
-
-    afterEach(() => {
-      wrapper.destroy();
-    });
-
     const findCheckboxElement = () => wrapper.find(SquashBeforeMerge);
     const findCommitsHeaderElement = () => wrapper.find(CommitsHeader);
-    const findCommitEditElements = () => wrapper.findAll(CommitEdit);
+    const findCommitEditElements = () => wrapper.findAll('[data-testid="squashLabel"]');
     const findCommitDropdownElement = () => wrapper.find(CommitMessageDropdown);
     const findFirstCommitEditLabel = () =>
       findCommitEditElements()
@@ -793,55 +746,55 @@ describe('ReadyToMerge', () => {
     });
 
     describe('commits edit components', () => {
-      describe('when fast-forward merge is enabled', () => {
+      const defaultMrData = {
+        ...mockDataMr,
+        ffOnlyEnabled: true,
+        squash: false,
+        enableSquashBeforeMerge: true,
+        commitsCount: 2,
+      };
+
+      fdescribe('when fast-forward merge is enabled', () => {
+        beforeEach(() => {
+          wrapper = createComponent(defaultMrData, mount);
+        });
+
         it('should not be rendered if squash is disabled', () => {
-          createLocalComponent({
-            mr: {
-              ffOnlyEnabled: true,
-              squash: false,
-              enableSquashBeforeMerge: true,
-              commitsCount: 2,
-            },
+          expect(findCommitEditElements().length).toBe(0);
+        });
+
+        it('should not be rendered if squash before merge is disabled', async () => {
+          wrapper.setProps({
+            mr: { ...defaultMrData, squash: true, enableSquashBeforeMerge: false },
           });
+
+          await wrapper.vm.$nextTick();
 
           expect(findCommitEditElements().length).toBe(0);
         });
 
-        it('should not be rendered if squash before merge is disabled', () => {
-          createLocalComponent({
-            mr: {
-              ffOnlyEnabled: true,
-              squash: true,
-              enableSquashBeforeMerge: false,
-              commitsCount: 2,
-            },
+        it('should not be rendered if there is only one commit', async () => {
+          wrapper.setProps({
+            mr: { ...defaultMrData, squash: true, commitsCount: 1 },
           });
+
+          await wrapper.vm.$nextTick();
 
           expect(findCommitEditElements().length).toBe(0);
         });
 
-        it('should not be rendered if there is only one commit', () => {
-          createLocalComponent({
+        it('should have one edit component if squash is enabled and there is more than 1 commit', async () => {
+          wrapper.setProps({
             mr: {
-              ffOnlyEnabled: true,
-              squash: true,
-              enableSquashBeforeMerge: true,
-              commitsCount: 1,
-            },
-          });
-
-          expect(findCommitEditElements().length).toBe(0);
-        });
-
-        it('should have one edit component if squash is enabled and there is more than 1 commit', () => {
-          createLocalComponent({
-            mr: {
-              ffOnlyEnabled: true,
+              ...defaultMrData,
               squashIsSelected: true,
-              enableSquashBeforeMerge: true,
               commitsCount: 2,
             },
           });
+
+          await wrapper.vm.$nextTick();
+
+          console.log(wrapper.html());
 
           expect(findCommitEditElements().length).toBe(1);
           expect(findFirstCommitEditLabel()).toBe('Squash commit message');
@@ -898,18 +851,31 @@ describe('ReadyToMerge', () => {
     });
 
     describe('commits dropdown', () => {
-      it('should not be rendered if squash is disabled', () => {
-        createLocalComponent();
-
-        expect(findCommitDropdownElement().exists()).toBeFalsy();
+      beforeEach(() => {
+        wrapper = createComponent({
+          enableSquashBeforeMerge: false,
+          squashIsSelected: true,
+          commitsCount: 0,
+        });
       });
 
-      it('should  be rendered if squash is enabled and there is more than 1 commit', () => {
-        createLocalComponent({
-          mr: { enableSquashBeforeMerge: true, squashIsSelected: true, commitsCount: 2 },
+      it('should not be rendered if squash is disabled', async () => {
+        expect(findCommitDropdownElement().exists()).toBe(false);
+      });
+
+      it('should be rendered if squash is enabled and there is more than 1 commit', async () => {
+        wrapper.setProps({
+          mr: {
+            ...mockDataMr,
+            enableSquashBeforeMerge: true,
+            squashIsSelected: true,
+            commitsCount: 2,
+          },
         });
 
-        expect(findCommitDropdownElement().exists()).toBeTruthy();
+        await wrapper.vm.$nextTick();
+
+        expect(findCommitDropdownElement().exists()).toBe(true);
       });
     });
   });
@@ -917,37 +883,33 @@ describe('ReadyToMerge', () => {
   describe('Merge controls', () => {
     describe('when allowed to merge', () => {
       beforeEach(() => {
-        vm = createComponent({
-          mr: { isMergeAllowed: true, canRemoveSourceBranch: true },
-        });
+        wrapper = createComponent({ isMergeAllowed: true, canRemoveSourceBranch: true });
       });
 
       it('shows remove source branch checkbox', () => {
-        expect(vm.$el.querySelector('.js-remove-source-branch-checkbox')).not.toBeNull();
+        expect(findRemoveSourceBranchInput().exists()).toBe(true);
       });
 
       it('shows modify commit message button', () => {
-        expect(vm.$el.querySelector('.js-modify-commit-message-button')).toBeDefined();
+        expect(findModifyCommitMessageBtn().exists()).toBe(true);
       });
 
       it('does not show message about needing to resolve items', () => {
-        expect(vm.$el.querySelector('.js-resolve-mr-widget-items-message')).toBeNull();
+        expect(findResolveItemsMessage().exists()).toBe(false);
       });
     });
 
     describe('when not allowed to merge', () => {
       beforeEach(() => {
-        vm = createComponent({
-          mr: { isMergeAllowed: false },
-        });
+        wrapper = createComponent({ isMergeAllowed: false, availableAutoMergeStrategies: [] });
       });
 
       it('does not show remove source branch checkbox', () => {
-        expect(vm.$el.querySelector('.js-remove-source-branch-checkbox')).toBeNull();
+        expect(findRemoveSourceBranchInput().exists()).toBe(false);
       });
 
       it('shows message to resolve all items before being allowed to merge', () => {
-        expect(vm.$el.querySelector('.js-resolve-mr-widget-items-message')).toBeDefined();
+        expect(findResolveItemsMessage().exists()).toBe(true);
       });
     });
   });
@@ -955,61 +917,58 @@ describe('ReadyToMerge', () => {
   describe('Merge request project settings', () => {
     describe('when the merge commit merge method is enabled', () => {
       beforeEach(() => {
-        vm = createComponent({
-          mr: { ffOnlyEnabled: false },
-        });
+        wrapper = createComponent({ ffOnlyEnabled: false });
       });
 
       it('should not show fast forward message', () => {
-        expect(vm.$el.querySelector('.mr-fast-forward-message')).toBeNull();
+        expect(findFastForwardMessage().exists()).toBe(false);
       });
 
       it('should show "Modify commit message" button', () => {
-        expect(vm.$el.querySelector('.js-modify-commit-message-button')).toBeDefined();
+        expect(findModifyCommitMessageBtn().exists()).toBe(true);
       });
     });
 
     describe('when the fast-forward merge method is enabled', () => {
       beforeEach(() => {
-        vm = createComponent({
-          mr: { ffOnlyEnabled: true },
-        });
+        wrapper = createComponent({ ffOnlyEnabled: true });
       });
 
       it('should show fast forward message', () => {
-        expect(vm.$el.querySelector('.mr-fast-forward-message')).toBeDefined();
+        expect(findFastForwardMessage().exists()).toBe(true);
       });
 
       it('should not show "Modify commit message" button', () => {
-        expect(vm.$el.querySelector('.js-modify-commit-message-button')).toBeNull();
+        expect(findModifyCommitMessageBtn().exists()).toBe(false);
       });
     });
   });
 
   describe('with a mismatched SHA', () => {
-    const findMismatchShaBlock = () => vm.$el.querySelector('.js-sha-mismatch');
-
+    const diffPath = '/merge_requests/1/diffs';
     beforeEach(() => {
-      vm = createComponent({
-        mr: {
-          isSHAMismatch: true,
-          mergeRequestDiffsPath: '/merge_requests/1/diffs',
-        },
+      wrapper = createComponent({
+        isSHAMismatch: true,
+        mergeRequestDiffsPath: diffPath,
       });
     });
 
     it('displays a warning message', () => {
-      expect(findMismatchShaBlock()).toExist();
+      expect(findMismatchShaBlock().exists()).toBe(true);
     });
 
     it('warns the user to refresh to review', () => {
-      expect(findMismatchShaBlock().textContent.trim()).toBe(
+      expect(trimText(findMismatchShaBlock().text())).toBe(
         'New changes were added. Reload the page to review them',
       );
     });
 
     it('displays link to the diffs tab', () => {
-      expect(findMismatchShaBlock().querySelector('a').href).toContain(vm.mr.mergeRequestDiffsPath);
+      expect(
+        findMismatchShaBlock()
+          .find(GlLink)
+          .attributes('href'),
+      ).toBe(diffPath);
     });
   });
 });

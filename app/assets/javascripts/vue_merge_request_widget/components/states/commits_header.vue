@@ -91,7 +91,11 @@ export default {
       <span v-if="expanded">{{ __('Collapse') }}</span>
       <span v-else>
         <span class="vertical-align-middle" v-html="message"></span>
-        <gl-deprecated-button variant="link" class="modify-message-button">
+        <gl-deprecated-button
+          variant="link"
+          class="modify-message-button"
+          data-testid="modify-commit-message-button"
+        >
           {{ modifyLinkMessage }}
         </gl-deprecated-button>
       </span>

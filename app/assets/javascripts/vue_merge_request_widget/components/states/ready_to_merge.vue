@@ -28,6 +28,11 @@ const MERGE_HOOK_VALIDATION_ERROR_STATUS = 'hook_validation_error';
 
 export default {
   name: 'ReadyToMerge',
+  i18n: {
+    shaMismatchMessage: __(
+      'New changes were added. %{linkStart}Reload the page to review them%{linkEnd}',
+    ),
+  },
   components: {
     statusIcon,
     SquashBeforeMerge,
@@ -144,18 +149,6 @@ export default {
     },
     shouldShowMergeEdit() {
       return !this.mr.ffOnlyEnabled;
-    },
-    shaMismatchLink() {
-      const href = this.mr.mergeRequestDiffsPath;
-
-      return sprintf(
-        __('New changes were added. %{linkStart}Reload the page to review them%{linkEnd}'),
-        {
-          linkStart: `<a href="${href}">`,
-          linkEnd: '</a>',
-        },
-        false,
-      );
     },
   },
   methods: {
@@ -362,7 +355,6 @@ export default {
                   id="remove-source-branch-input"
                   v-model="removeSourceBranch"
                   :disabled="isRemoveSourceBranchButtonDisabled"
-                  class="js-remove-source-branch-checkbox"
                   type="checkbox"
                 />
                 {{ __('Delete source branch') }}
@@ -377,7 +369,7 @@ export default {
               />
             </template>
             <template v-else>
-              <div class="bold js-resolve-mr-widget-items-message">
+              <div class="bold" data-testid="resolve-items-message">
                 <div
                   v-if="hasPipelineMustSucceedConflict"
                   class="gl-display-flex gl-align-items-center"
@@ -397,9 +389,19 @@ export default {
             </template>
           </div>
         </div>
-        <div v-if="mr.isSHAMismatch" class="d-flex align-items-center mt-2 js-sha-mismatch">
+        <div
+          v-if="mr.isSHAMismatch"
+          class="d-flex align-items-center mt-2"
+          data-testid="shaMismatchBlock"
+        >
           <gl-icon name="warning-solid" class="text-warning mr-1" />
-          <span class="text-warning" v-html="shaMismatchLink"></span>
+          <gl-sprintf :message="$options.i18n.shaMismatchMessage">
+            <template #link="{content}">
+              <gl-link :href="mr.mergeRequestDiffsPath" class="text-warning">
+                {{ content }}
+              </gl-link>
+            </template>
+          </gl-sprintf>
         </div>
       </div>
     </div>
@@ -411,7 +413,11 @@ export default {
       :merge-train-when-pipeline-succeeds-docs-path="mr.mergeTrainWhenPipelineSucceedsDocsPath"
     />
     <template v-if="shouldShowMergeControls">
-      <div v-if="mr.ffOnlyEnabled" class="mr-fast-forward-message">
+      <div
+        v-if="mr.ffOnlyEnabled"
+        class="mr-fast-forward-message"
+        data-testid="mr-fast-forward-message"
+      >
         {{ __('Fast-forward merge without a merge commit') }}
       </div>
       <commits-header
