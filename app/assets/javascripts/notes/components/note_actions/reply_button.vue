@@ -1,10 +1,9 @@
 <script>
-import { GlTooltipDirective, GlButton, GlIcon } from '@gitlab/ui';
+import { GlTooltipDirective, GlButton } from '@gitlab/ui';
 
 export default {
   name: 'ReplyButton',
   components: {
-    GlIcon,
     GlButton,
   },
   directives: {
