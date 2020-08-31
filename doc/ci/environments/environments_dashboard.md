@@ -47,7 +47,7 @@ The Environments and [Operations](../../user/operations_dashboard/index.md)
 dashboards share the same list of projects. When you add or remove a
 project from one, GitLab adds or removes the project from the other.
 
-A maximum of 150 projects may be added.
+You can add up to 150 projects for GitLab to display on this dashboard.
 
 ## Environment dashboards on GitLab.com
 
