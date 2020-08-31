@@ -21,10 +21,11 @@ export default {
       data-track-event="click_button"
       data-track-label="reply_comment_button"
       category="tertiary"
+      size="small"
+      icon="comment"
       :title="__('Reply to comment')"
+      :aria-label="__('Reply to comment')"
       @click="$emit('startReplying')"
-    >
-      <gl-icon name="comment" class="link-highlight" />
-    </gl-button>
+    />
   </div>
 </template>
