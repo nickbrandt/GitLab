@@ -18,7 +18,6 @@ export default {
     <gl-button
       ref="button"
       v-gl-tooltip
-      class="note-action-button"
       data-track-event="click_button"
       data-track-label="reply_comment_button"
       category="tertiary"
