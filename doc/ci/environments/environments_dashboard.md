@@ -25,8 +25,8 @@ You can access the dashboard from the top bar by clicking
 
 ![Environments Dashboard with projects](img/environments_dashboard_v12_5.png)
 
-The Environments Dashboard offers a paginated display of a maximum of 
-150 projects and 3 environments per project.
+The Environments dashboard displays a paginated list of projects that includes
+up to three environments per project.
 
 The listed environments for each project are unique, such as
 "production", "staging", etc. Review apps and other grouped
