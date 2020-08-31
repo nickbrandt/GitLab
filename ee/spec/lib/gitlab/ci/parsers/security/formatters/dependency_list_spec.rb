@@ -60,6 +60,7 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Formatters::DependencyList do
       'pip'      | 'Python (pip)'
       'maven'    | 'Java (Maven)'
       'composer' | 'PHP (Composer)'
+      'conan'    | 'C/C++ (Conan)'
       ''         | ''
     end
 

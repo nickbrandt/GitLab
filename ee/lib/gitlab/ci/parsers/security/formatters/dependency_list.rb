@@ -62,6 +62,8 @@ module Gitlab
                 'Java (Maven)'
               when 'composer'
                 'PHP (Composer)'
+              when 'conan'
+                'C/C++ (Conan)'
               else
                 package_manager
               end
