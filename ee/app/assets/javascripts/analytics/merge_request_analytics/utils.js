@@ -25,7 +25,7 @@ export const computeMonthRangeData = (startDate, endDate, format = dateFormats.i
   for (
     let dateCursor = new Date(endDate);
     dateCursor >= startDate;
-    dateCursor.setMonth(dateCursor.getMonth() - 1)
+    dateCursor.setMonth(dateCursor.getMonth(), 0)
   ) {
     const monthIndex = dateCursor.getMonth();
     const year = dateCursor.getFullYear();
