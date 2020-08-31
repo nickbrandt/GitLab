@@ -50,7 +50,8 @@ func testArtifactsUploadServer(t *testing.T, authResponse api.Response, bodyProc
 		w.Write(data)
 	})
 	mux.HandleFunc(Path, func(w http.ResponseWriter, r *http.Request) {
-		opts := filestore.GetOpts(&authResponse)
+		opts, err := filestore.GetOpts(&authResponse)
+		require.NoError(t, err)
 
 		if r.Method != "POST" {
 			t.Fatal("Expected POST request")
@@ -66,7 +67,7 @@ func testArtifactsUploadServer(t *testing.T, authResponse api.Response, bodyProc
 				t.Fatal("Expected file to be readable")
 				return
 			}
-		} else if opts.IsRemote() {
+		} else {
 			if r.FormValue("file.remote_url") == "" {
 				t.Fatal("Expected file to be remote accessible")
 				return

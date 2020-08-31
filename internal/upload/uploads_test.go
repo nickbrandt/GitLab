@@ -50,16 +50,10 @@ func (a *testFormProcessor) Name() string {
 }
 
 func TestUploadTempPathRequirement(t *testing.T) {
-	response := httptest.NewRecorder()
-	request, err := http.NewRequest("", "", nil)
-	require.NoError(t, err)
 	apiResponse := &api.Response{}
 	preparer := &DefaultPreparer{}
-	opts, _, err := preparer.Prepare(apiResponse)
-	require.NoError(t, err)
-
-	HandleFileUploads(response, request, nilHandler, apiResponse, &testFormProcessor{}, opts)
-	require.Equal(t, 500, response.Code)
+	_, _, err := preparer.Prepare(apiResponse)
+	require.Error(t, err)
 }
 
 func TestUploadHandlerForwardingRawData(t *testing.T) {

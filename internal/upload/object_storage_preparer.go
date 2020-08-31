@@ -22,7 +22,11 @@ func NewObjectStoragePreparer(c config.Config) Preparer {
 }
 
 func (p *ObjectStoragePreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error) {
-	opts := filestore.GetOpts(a)
+	opts, err := filestore.GetOpts(a)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	opts.ObjectStorageConfig.URLMux = p.config.URLMux
 	opts.ObjectStorageConfig.S3Credentials = p.credentials.S3Credentials
 

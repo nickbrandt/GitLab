@@ -168,9 +168,7 @@ func TestSaveFile(t *testing.T) {
 	}{
 		{name: "Local only", local: true},
 		{name: "Remote Single only", remote: remoteSingle},
-		{name: "Remote Single and Local", local: true, remote: remoteSingle},
 		{name: "Remote Multipart only", remote: remoteMultipart},
-		{name: "Remote Multipart and Local", local: true, remote: remoteMultipart},
 	}
 
 	for _, spec := range tests {
@@ -217,12 +215,7 @@ func TestSaveFile(t *testing.T) {
 			if spec.local {
 				opts.LocalTempPath = tmpFolder
 				opts.TempFilePrefix = "test-file"
-
-				if expectedClientMode != "" {
-					expectedClientMode += "+local"
-				} else {
-					expectedClientMode = "local"
-				}
+				expectedClientMode = "local"
 			}
 
 			ctx, cancel := context.WithCancel(context.Background())

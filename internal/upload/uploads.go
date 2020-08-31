@@ -24,11 +24,6 @@ type MultipartFormProcessor interface {
 }
 
 func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, preauth *api.Response, filter MultipartFormProcessor, opts *filestore.SaveFileOpts) {
-	if !opts.IsLocal() && !opts.IsRemote() {
-		helper.Fail500(w, r, fmt.Errorf("handleFileUploads: missing destination storage"))
-		return
-	}
-
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
 	defer writer.Close()

@@ -118,7 +118,7 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 	}()
 
 	var clientMode string
-	if opts.IsRemote() {
+	if !opts.IsLocal() {
 		switch {
 		case opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsGoCloud():
 			clientMode = fmt.Sprintf("go_cloud:%s", opts.ObjectStorageConfig.Provider)
@@ -167,14 +167,9 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 			return nil, err
 		}
 		writers = append(writers, remoteWriter)
-	}
+	} else {
+		clientMode = "local"
 
-	if opts.IsLocal() {
-		if clientMode == "" {
-			clientMode = "local"
-		} else {
-			clientMode += "+local"
-		}
 		fileWriter, err := fh.uploadLocalFile(ctx, opts)
 		if err != nil {
 			return nil, err
@@ -201,7 +196,7 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 		"copied_bytes":     fh.Size,
 		"is_local":         opts.IsLocal(),
 		"is_multipart":     opts.IsMultipart(),
-		"is_remote":        opts.IsRemote(),
+		"is_remote":        !opts.IsLocal(),
 		"remote_id":        opts.RemoteID,
 		"temp_file_prefix": opts.TempFilePrefix,
 		"client_mode":      clientMode,
@@ -209,9 +204,7 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 
 	if opts.IsLocal() {
 		logger = logger.WithField("local_temp_path", opts.LocalTempPath)
-	}
-
-	if opts.IsRemote() {
+	} else {
 		logger = logger.WithField("remote_temp_object", opts.RemoteTempObjectID)
 	}
 
@@ -219,7 +212,7 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 
 	fh.hashes = hashes.finish()
 
-	if opts.IsRemote() {
+	if !opts.IsLocal() {
 		// we need to close the writer in order to get ETag header
 		err = remoteWriter.Close()
 		if err != nil {
