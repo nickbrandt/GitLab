@@ -17,24 +17,38 @@ RSpec.describe SearchController do
       end
 
       context 'i_search_advanced' do
-        it_behaves_like 'tracking unique hll events', :show do
-          let(:request_params) { { scope: 'projects', search: 'term' } }
-          let(:target_id) { 'i_search_advanced' }
+        let(:target_id) { 'i_search_advanced' }
+        let(:request_params) { { scope: 'projects', search: 'term' } }
+
+        it_behaves_like 'tracking unique hll events', :show
+
+        it 'does not track if feature flag is disabled' do
+          stub_feature_flags(search_track_unique_users: false)
+          expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event).with(instance_of(String), target_id)
+
+          get :show, params: request_params, format: :html
         end
       end
 
-      context 'i_search_paid' do
-        let(:group) { create(:group) }
+      # i_search_paid is commented out because of https://gitlab.com/gitlab-org/gitlab/-/issues/243486
+      # context 'i_search_paid' do
+      #   let(:group) { create(:group) }
+      #   let(:request_params) { { group_id: group.id, scope: 'blobs', search: 'term' } }
+      #   let(:target_id) { 'i_search_paid' }
 
-        before do
-          allow(group).to receive(:feature_available?).with(:elastic_search).and_return(true)
-        end
+      #   before do
+      #     allow(group).to receive(:feature_available?).with(:elastic_search).and_return(true)
+      #   end
 
-        it_behaves_like 'tracking unique hll events', :show do
-          let(:request_params) { { group_id: group.id, scope: 'blobs', search: 'term' } }
-          let(:target_id) { 'i_search_paid' }
-        end
-      end
+      #   it_behaves_like 'tracking unique hll events', :show
+
+      #   it 'does not track if feature flag is disabled' do
+      #     stub_feature_flags(search_track_unique_users: false)
+      #     expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event).with(instance_of(String), target_id)
+
+      #     get :show, params: request_params, format: :html
+      #   end
+      # end
     end
   end
 end
