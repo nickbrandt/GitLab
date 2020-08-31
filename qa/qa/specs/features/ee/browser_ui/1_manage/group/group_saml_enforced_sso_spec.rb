@@ -28,7 +28,7 @@ module QA
         end
       end
 
-      it 'user clones and pushes to project within a group using Git HTTP', status_issue: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/675' do
+      it 'user clones and pushes to project within a group using Git HTTP', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/675' do
         Flow::Login.sign_in
 
         @project = Resource::Project.fabricate! do |project|

@@ -22,6 +22,8 @@ module EE
             end
           end
           segment ':id/audit_events' do
+            use ::API::UniqueCallTracking, event_name: 'i_compliance_audit_events_api', feature: :track_unique_visits
+
             before do
               authorize! :admin_project, user_project
               check_audit_events_available!(user_project)

@@ -20,29 +20,27 @@ RSpec.describe 'registrations/welcome' do
 
   subject { rendered }
 
-  where(:in_subscription_flow, :in_trial_flow, :in_invitation_flow, :in_oauth_flow, :onboarding_issues_experiment_enabled, :flow) do
-    false | false | false | false | false | :regular
-    true  | false | false | false | false | :subscription
-    false | true  | false | false | false | :trial
-    false | false | true  | false | false | :invitation
-    false | false | false | true  | false | :oauth
-    false | false | false | false | true  | :onboarding
-    false | false | true  | false | true  | :onboarding_invitation
-    false | false | false | true  | true  | :onboarding_oauth
+  where(:in_subscription_flow, :in_trial_flow, :in_invitation_flow, :in_oauth_flow, :onboarding_issues_experiment_enabled, :shows_progress_bar, :label_key, :is_continue_btn) do
+    false | false | false | false | false | false | nil           | false # regular
+    true  | false | false | false | false | true  | :subscription | true  # subscription
+    false | true  | false | false | false | false | :trial        | true  # trial
+    false | false | true  | false | false | false | nil           | false # invitation
+    false | false | false | true  | false | false | nil           | false # oauth
+    false | false | false | false | true  | true  | nil           | true  # onboarding
+    true  | false | false | false | true  | true  | :subscription | true  # onboarding + subscription
+    false | true  | false | false | true  | false | :trial        | true  # onboarding + trial
+    false | false | true  | false | true  | false | nil           | false # onboarding + invitation
+    false | false | false | true  | true  | false | nil           | false # onboarding + oauth
   end
 
   def button_text
-    if %i(subscription trial onboarding).include?(flow)
-      'Continue'
-    else
-      'Get started!'
-    end
+    is_continue_btn ? 'Continue' : 'Get started!'
   end
 
   def label_text
-    if flow == :subscription
+    if label_key == :subscription
       'Who will be using this GitLab subscription?'
-    elsif flow == :trial
+    elsif label_key == :trial
       'Who will be using this GitLab trial?'
     else
       'Who will be using GitLab?'
@@ -53,7 +51,7 @@ RSpec.describe 'registrations/welcome' do
     it { is_expected.to have_button(button_text) }
     it { is_expected.to have_selector('label[for="user_setup_for_company"]', text: label_text) }
     it do
-      if %i(subscription onboarding).include?(flow)
+      if shows_progress_bar
         is_expected.to have_selector('#progress-bar')
       else
         is_expected.not_to have_selector('#progress-bar')

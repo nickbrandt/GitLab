@@ -324,7 +324,7 @@ RSpec.describe GitlabSubscription do
     end
 
     it 'gitlab_subscription columns are contained in gitlab_subscription_history columns' do
-      diff_attrs = %w(updated_at)
+      diff_attrs = %w(updated_at seats_in_use seats_owed)
       expect(described_class.attribute_names - GitlabSubscriptionHistory.attribute_names).to eq(diff_attrs)
     end
 

@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import TimeAgo from 'ee/vue_shared/dashboards/components/time_ago.vue';
+import { differenceInMilliseconds } from '~/lib/utils/datetime_utility';
 
 describe('time ago component', () => {
   let wrapper;
@@ -7,7 +8,7 @@ describe('time ago component', () => {
   beforeEach(() => {
     wrapper = shallowMount(TimeAgo, {
       propsData: {
-        time: new Date(Date.now() - 86400000).toISOString(),
+        time: new Date(differenceInMilliseconds(86400000)).toISOString(),
         tooltipText: 'Finished',
       },
     });

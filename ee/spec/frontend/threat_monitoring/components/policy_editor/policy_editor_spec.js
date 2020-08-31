@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import PolicyEditorApp from 'ee/threat_monitoring/components/policy_editor/policy_editor.vue';
+import PolicyPreview from 'ee/threat_monitoring/components/policy_editor/policy_preview.vue';
 import PolicyRuleBuilder from 'ee/threat_monitoring/components/policy_editor/policy_rule_builder.vue';
 import createStore from 'ee/threat_monitoring/store';
 import {
@@ -29,6 +30,7 @@ describe('PolicyEditorApp component', () => {
 
   const findRuleEditor = () => wrapper.find('[data-testid="rule-editor"]');
   const findYamlEditor = () => wrapper.find('[data-testid="yaml-editor"]');
+  const findPreview = () => wrapper.find(PolicyPreview);
 
   beforeEach(() => {
     factory();
@@ -64,6 +66,32 @@ describe('PolicyEditorApp component', () => {
       const editor = findYamlEditor();
       expect(editor.exists()).toBe(true);
       expect(editor.element).toMatchSnapshot();
+    });
+  });
+
+  describe('given there is a name change', () => {
+    let initialValue;
+
+    beforeEach(() => {
+      initialValue = findPreview().props('policyYaml');
+      wrapper.find("[id='policyName']").vm.$emit('input', 'new');
+    });
+
+    it('updates policy yaml preview', () => {
+      expect(findPreview().props('policyYaml')).not.toEqual(initialValue);
+    });
+  });
+
+  describe('given there is a rule change', () => {
+    let initialValue;
+
+    beforeEach(() => {
+      initialValue = findPreview().props('policyDescription');
+      wrapper.find("[data-testid='add-rule']").vm.$emit('click');
+    });
+
+    it('updates policy description preview', () => {
+      expect(findPreview().props('policyDescription')).not.toEqual(initialValue);
     });
   });
 

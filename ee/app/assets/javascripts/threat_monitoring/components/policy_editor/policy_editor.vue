@@ -21,7 +21,9 @@ import {
   EndpointMatchModeAny,
   RuleTypeEndpoint,
 } from './constants';
+import toYaml from './lib/to_yaml';
 import { buildRule } from './lib/rules';
+import humanizeNetworkPolicy from './lib/humanize';
 
 export default {
   components: {
@@ -52,6 +54,12 @@ export default {
     };
   },
   computed: {
+    humanizedPolicy() {
+      return humanizeNetworkPolicy(this.policy);
+    },
+    policyYaml() {
+      return toYaml(this.policy);
+    },
     shouldShowRuleEditor() {
       return this.editorMode === EditorModeRule;
     },
@@ -163,7 +171,7 @@ export default {
       </div>
       <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4">
         <h5>{{ s__('NetworkPolicies|Policy preview') }}</h5>
-        <policy-preview />
+        <policy-preview :policy-yaml="policyYaml" :policy-description="humanizedPolicy" />
       </div>
     </div>
     <div v-if="shouldShowYamlEditor" class="row" data-testid="yaml-editor">

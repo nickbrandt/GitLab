@@ -87,29 +87,38 @@ RSpec.describe RegistrationsController do
 
         it { is_expected.not_to redirect_to new_users_sign_up_group_path }
       end
+
+      context 'when in trial flow' do
+        before do
+          allow(controller.helpers).to receive(:in_trial_flow?).and_return(true)
+        end
+
+        it { is_expected.not_to redirect_to new_users_sign_up_group_path }
+      end
     end
 
     describe 'recording experiment user and track for the onboarding issues experiment' do
       using RSpec::Parameterized::TableSyntax
 
-      where(:on_gitlab_com, :experiment_enabled, :in_subscription_flow, :in_invitation_flow, :experiment_enabled_for_user, :experiment_group) do
-        false | false | false | false | true  | nil
-        false | false | false | true  | true  | nil
-        false | false | true  | false | true  | nil
-        false | false | true  | true  | true  | nil
-        false | true  | false | false | true  | nil
-        false | true  | false | true  | true  | nil
-        false | true  | true  | false | true  | nil
-        false | true  | true  | true  | true  | nil
-        true  | false | false | false | true  | nil
-        true  | false | false | true  | true  | nil
-        true  | false | true  | false | true  | nil
-        true  | false | true  | true  | true  | nil
-        true  | true  | false | false | true  | :experimental
-        true  | true  | false | false | false | :control
-        true  | true  | false | true  | true  | nil
-        true  | true  | true  | false | true  | nil
-        true  | true  | true  | true  | true  | nil
+      where(:on_gitlab_com, :experiment_enabled, :in_subscription_flow, :in_invitation_flow, :in_trial_flow, :experiment_enabled_for_user, :experiment_group) do
+        false | false | false | false | false | true  | nil
+        false | false | false | true  | false | true  | nil
+        false | false | true  | false | false | true  | nil
+        false | false | true  | true  | false | true  | nil
+        false | true  | false | false | false | true  | nil
+        false | true  | false | true  | false | true  | nil
+        false | true  | true  | false | false | true  | nil
+        false | true  | true  | true  | false | true  | nil
+        true  | false | false | false | false | true  | nil
+        true  | false | false | true  | false | true  | nil
+        true  | false | true  | false | false | true  | nil
+        true  | false | true  | true  | false | true  | nil
+        true  | true  | false | false | false | true  | :experimental
+        true  | true  | false | false | false | false | :control
+        true  | true  | true  | false | false | true  | nil
+        true  | true  | false | true  | false | true  | nil
+        true  | true  | false | false | true  | true  | nil
+        true  | true  | true  | true  | true  | true  | nil
       end
 
       with_them do
@@ -118,6 +127,7 @@ RSpec.describe RegistrationsController do
           stub_experiment(onboarding_issues: experiment_enabled)
           allow(controller.helpers).to receive(:in_subscription_flow?).and_return(in_subscription_flow)
           allow(controller.helpers).to receive(:in_invitation_flow?).and_return(in_invitation_flow)
+          allow(controller.helpers).to receive(:in_trial_flow?).and_return(in_trial_flow)
           stub_experiment_for_user(onboarding_issues: experiment_enabled_for_user)
         end
 
