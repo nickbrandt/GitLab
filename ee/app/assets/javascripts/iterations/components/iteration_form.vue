@@ -210,7 +210,7 @@ export default {
         </div>
         <div class="form-group row">
           <div class="col-form-label col-sm-2">
-            <label for="iteration-due-date">{{ __('Due Date') }}</label>
+            <label for="iteration-due-date">{{ __('Due date') }}</label>
           </div>
           <div class="col-sm-10">
             <gl-form-input
