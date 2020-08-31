@@ -2,7 +2,6 @@ package parser
 
 import (
 	"archive/zip"
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -30,21 +29,41 @@ func NewParser(r io.Reader, config Config) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	zr, err := openZipReader(r, config.TempPath)
+	// ZIP files need to be seekable. Don't hold it all in RAM, use a tempfile
+	tempFile, err := ioutil.TempFile(config.TempPath, Lsif)
 	if err != nil {
 		return nil, err
 	}
-	reader := bufio.NewReader(zr)
 
-	for {
-		line, err := reader.ReadBytes('\n')
-		if err != nil {
-			break
-		}
+	defer tempFile.Close()
 
-		if err := docs.Read(line); err != nil {
-			return nil, err
-		}
+	if err := os.Remove(tempFile.Name()); err != nil {
+		return nil, err
+	}
+
+	size, err := io.Copy(tempFile, r)
+	if err != nil {
+		return nil, err
+	}
+
+	zr, err := zip.NewReader(tempFile, size)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(zr.File) == 0 {
+		return nil, errors.New("empty zip file")
+	}
+
+	file, err := zr.File[0].Open()
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+
+	if err := docs.Parse(file); err != nil {
+		return nil, err
 	}
 
 	pr, pw := io.Pipe()
@@ -53,7 +72,7 @@ func NewParser(r io.Reader, config Config) (io.ReadCloser, error) {
 		pr:   pr,
 	}
 
-	go parser.parse(pw)
+	go parser.transform(pw)
 
 	return parser, nil
 }
@@ -68,7 +87,7 @@ func (p *Parser) Close() error {
 	return p.Docs.Close()
 }
 
-func (p *Parser) parse(pw *io.PipeWriter) {
+func (p *Parser) transform(pw *io.PipeWriter) {
 	zw := zip.NewWriter(pw)
 
 	if err := p.Docs.SerializeEntries(zw); err != nil {
@@ -83,35 +102,4 @@ func (p *Parser) parse(pw *io.PipeWriter) {
 	}
 
 	pw.Close()
-}
-
-func openZipReader(reader io.Reader, tempDir string) (io.Reader, error) {
-	tempFile, err := ioutil.TempFile(tempDir, Lsif)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := os.Remove(tempFile.Name()); err != nil {
-		return nil, err
-	}
-
-	size, err := io.Copy(tempFile, reader)
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := tempFile.Seek(0, io.SeekStart); err != nil {
-		return nil, err
-	}
-
-	zr, err := zip.NewReader(tempFile, size)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(zr.File) == 0 {
-		return nil, errors.New("empty zip file")
-	}
-
-	return zr.File[0].Open()
 }

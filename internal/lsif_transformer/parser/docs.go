@@ -2,7 +2,9 @@ package parser
 
 import (
 	"archive/zip"
+	"bufio"
 	"encoding/json"
+	"io"
 	"strings"
 )
 
@@ -45,7 +47,19 @@ func NewDocs(config Config) (*Docs, error) {
 	}, nil
 }
 
-func (d *Docs) Read(line []byte) error {
+func (d *Docs) Parse(r io.Reader) error {
+	scanner := bufio.NewScanner(r)
+
+	for scanner.Scan() {
+		if err := d.process(scanner.Bytes()); err != nil {
+			return err
+		}
+	}
+
+	return scanner.Err()
+}
+
+func (d *Docs) process(line []byte) error {
 	l := Line{}
 	if err := json.Unmarshal(line, &l); err != nil {
 		return err
