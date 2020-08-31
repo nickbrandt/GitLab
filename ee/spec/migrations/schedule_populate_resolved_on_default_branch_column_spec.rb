@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-
-require Rails.root.join('db', 'post_migrate', '20200806100713_schedule_populate_resolved_on_default_branch_column.rb')
+require_migration!
 
 RSpec.describe SchedulePopulateResolvedOnDefaultBranchColumn do
   before do
