@@ -15,7 +15,7 @@ RSpec.describe Groups::Analytics::MergeRequestAnalyticsController do
     stub_licensed_features(feature_name => true)
   end
 
-  describe 'GET show' do
+  describe 'GET #show' do
     subject { get :show, params: { group_id: group } }
 
     before do
@@ -23,6 +23,11 @@ RSpec.describe Groups::Analytics::MergeRequestAnalyticsController do
     end
 
     it { is_expected.to be_successful }
+
+    it_behaves_like 'tracking unique visits', :show do
+      let(:request_params) { { group_id: group } }
+      let(:target_id) { 'g_analytics_merge_request' }
+    end
 
     context 'when license is missing' do
       before do

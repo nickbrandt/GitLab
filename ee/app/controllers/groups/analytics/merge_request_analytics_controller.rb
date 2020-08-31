@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Groups::Analytics::MergeRequestAnalyticsController < Groups::Analytics::ApplicationController
+  include Analytics::UniqueVisitsHelper
+
   check_feature_flag Gitlab::Analytics::GROUP_MERGE_REQUEST_ANALYTICS_FEATURE_FLAG
 
   layout 'group'
@@ -12,6 +14,8 @@ class Groups::Analytics::MergeRequestAnalyticsController < Groups::Analytics::Ap
   before_action -> {
     authorize_view_by_action!(:read_group_merge_request_analytics)
   }
+
+  track_unique_visits :show, target_id: 'g_analytics_merge_request'
 
   def show
   end
