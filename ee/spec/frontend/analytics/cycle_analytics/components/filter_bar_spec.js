@@ -23,8 +23,8 @@ const assigneesTokenType = 'assignees';
 const initialFilterBarState = {
   selectedMilestone: null,
   selectedAuthor: null,
-  selectedAssignees: null,
-  selectedLabels: null,
+  selectedAssigneeList: null,
+  selectedLabelList: null,
 };
 
 const defaultParams = {
@@ -91,7 +91,7 @@ describe('Filter bar', () => {
   });
 
   const selectedMilestone = [filterMilestones[0]];
-  const selectedLabels = [filterLabels[0]];
+  const selectedLabelList = [filterLabels[0]];
 
   const findFilteredSearch = () => wrapper.find(FilteredSearchBar);
   const getSearchToken = type =>
@@ -114,7 +114,7 @@ describe('Filter bar', () => {
     beforeEach(() => {
       store = createStore({
         milestones: { data: selectedMilestone },
-        labels: { data: selectedLabels },
+        labels: { data: selectedLabelList },
         authors: { data: [] },
         assignees: { data: [] },
       });
@@ -140,7 +140,7 @@ describe('Filter bar', () => {
     it('provides the initial label token', () => {
       const { initialLabels: labelToken } = getSearchToken(labelsTokenType);
 
-      expect(labelToken).toHaveLength(selectedLabels.length);
+      expect(labelToken).toHaveLength(selectedLabelList.length);
     });
   });
 
@@ -157,7 +157,7 @@ describe('Filter bar', () => {
     it('clicks on the search button, setFilters is dispatched', () => {
       const filters = [
         { type: 'milestone', value: { data: selectedMilestone[0].title, operator: '=' } },
-        { type: 'labels', value: { data: selectedLabels[0].title, operator: '=' } },
+        { type: 'labels', value: { data: selectedLabelList[0].title, operator: '=' } },
       ];
 
       findFilteredSearch().vm.$emit('onFilter', filters);
@@ -167,9 +167,9 @@ describe('Filter bar', () => {
       expect(setFiltersMock).toHaveBeenCalledWith(
         expect.anything(),
         {
-          selectedLabels: [selectedLabels[0].title],
+          selectedLabelList: [selectedLabelList[0].title],
           selectedMilestone: selectedMilestone[0].title,
-          selectedAssignees: [],
+          selectedAssigneeList: [],
           selectedAuthor: null,
         },
         undefined,
@@ -178,11 +178,11 @@ describe('Filter bar', () => {
   });
 
   describe.each`
-    stateKey               | payload                          | paramKey
-    ${'selectedMilestone'} | ${'12.0'}                        | ${'milestone_title'}
-    ${'selectedAuthor'}    | ${'rootUser'}                    | ${'author_username'}
-    ${'selectedLabels'}    | ${['Afternix', 'Brouceforge']}   | ${'label_name'}
-    ${'selectedAssignees'} | ${['rootUser', 'secondaryUser']} | ${'assignee_username'}
+    stateKey                  | payload                          | paramKey
+    ${'selectedMilestone'}    | ${'12.0'}                        | ${'milestone_title'}
+    ${'selectedAuthor'}       | ${'rootUser'}                    | ${'author_username'}
+    ${'selectedLabelList'}    | ${['Afternix', 'Brouceforge']}   | ${'label_name'}
+    ${'selectedAssigneeList'} | ${['rootUser', 'secondaryUser']} | ${'assignee_username'}
   `('with a $stateKey updates the $paramKey url parameter', ({ stateKey, payload, paramKey }) => {
     beforeEach(() => {
       commonUtils.historyPushState = jest.fn();
