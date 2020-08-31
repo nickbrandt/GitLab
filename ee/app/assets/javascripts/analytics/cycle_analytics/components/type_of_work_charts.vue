@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlLoadingIcon } from '@gitlab/ui';
+import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
 import TasksByTypeChart from './tasks_by_type/tasks_by_type_chart.vue';
 import TasksByTypeFilters from './tasks_by_type/tasks_by_type_filters.vue';
 import { s__, sprintf } from '~/locale';
@@ -9,7 +9,7 @@ import { TASKS_BY_TYPE_SUBJECT_ISSUE } from '../constants';
 
 export default {
   name: 'TypeOfWorkCharts',
-  components: { GlLoadingIcon, TasksByTypeChart, TasksByTypeFilters },
+  components: { ChartSkeletonLoader, TasksByTypeChart, TasksByTypeFilters },
   computed: {
     ...mapState('typeOfWork', ['isLoadingTasksByTypeChart', 'isLoadingTasksByTypeChartTopLabels']),
     ...mapGetters('typeOfWork', ['selectedTasksByTypeFilters', 'tasksByTypeChartData']),
@@ -63,7 +63,7 @@ export default {
 </script>
 <template>
   <div class="js-tasks-by-type-chart row">
-    <gl-loading-icon v-if="isLoading" size="md" class="col-12 my-4 py-4" />
+    <chart-skeleton-loader v-if="isLoading" class="gl-my-4 gl-py-4" />
     <div v-else class="col-12">
       <h3>{{ s__('CycleAnalytics|Type of work') }}</h3>
       <p>{{ summaryDescription }}</p>

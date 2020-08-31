@@ -1053,24 +1053,25 @@ describe('Cycle analytics actions', () => {
     });
 
     describe('with a failing request', () => {
-      const resp = { data: {} };
+      let mockCommit;
       beforeEach(() => {
-        mock.onGet(endpoints.valueStreamData).reply(httpStatusCodes.NOT_FOUND, resp);
+        mockCommit = jest.fn();
+        mock.onGet(endpoints.valueStreamData).reply(httpStatusCodes.NOT_FOUND);
       });
 
       it(`will commit ${types.RECEIVE_VALUE_STREAMS_ERROR}`, () => {
-        return testAction(
-          actions.fetchValueStreams,
-          null,
-          state,
-          [
-            { type: types.REQUEST_VALUE_STREAMS },
-            {
-              type: types.RECEIVE_VALUE_STREAMS_ERROR,
-            },
-          ],
-          [],
-        );
+        return actions.fetchValueStreams({ state, getters, commit: mockCommit }).catch(() => {
+          expect(mockCommit.mock.calls).toEqual([
+            ['REQUEST_VALUE_STREAMS'],
+            ['RECEIVE_VALUE_STREAMS_ERROR', httpStatusCodes.NOT_FOUND],
+          ]);
+        });
+      });
+
+      it(`throws an error`, () => {
+        return expect(
+          actions.fetchValueStreams({ state, getters, commit: mockCommit }),
+        ).rejects.toThrow('Request failed with status code 404');
       });
     });
 

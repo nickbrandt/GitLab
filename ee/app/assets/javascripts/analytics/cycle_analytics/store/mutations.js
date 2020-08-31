@@ -134,7 +134,8 @@ export default {
     state.isLoadingValueStreams = true;
     state.valueStreams = [];
   },
-  [types.RECEIVE_VALUE_STREAMS_ERROR](state) {
+  [types.RECEIVE_VALUE_STREAMS_ERROR](state, errCode) {
+    state.errCode = errCode;
     state.isLoadingValueStreams = false;
     state.valueStreams = [];
   },

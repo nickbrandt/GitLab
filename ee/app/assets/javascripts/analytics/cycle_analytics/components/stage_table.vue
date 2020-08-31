@@ -1,9 +1,10 @@
 <script>
-import { mapState } from 'vuex';
 import { GlTooltipDirective, GlLoadingIcon, GlEmptyState } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import StageEventList from './stage_event_list.vue';
 import StageTableHeader from './stage_table_header.vue';
+
+const MIN_TABLE_HEIGHT = 420;
 
 export default {
   name: 'StageTable',
@@ -19,13 +20,18 @@ export default {
   props: {
     currentStage: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => {},
     },
     isLoading: {
       type: Boolean,
       required: true,
     },
     isEmptyStage: {
+      type: Boolean,
+      required: true,
+    },
+    isLoadingStage: {
       type: Boolean,
       required: true,
     },
@@ -44,16 +50,15 @@ export default {
   },
   data() {
     return {
-      stageNavHeight: 0,
+      stageNavHeight: MIN_TABLE_HEIGHT,
     };
   },
   computed: {
-    ...mapState(['customStageFormInitialData']),
     stageEventsHeight() {
       return `${this.stageNavHeight}px`;
     },
     stageName() {
-      return this.currentStage ? this.currentStage.title : __('Related Issues');
+      return this.currentStage?.title || __('Related Issues');
     },
     shouldDisplayStage() {
       const { currentStageEvents = [], isLoading, isEmptyStage } = this;
@@ -88,15 +93,24 @@ export default {
       ];
     },
   },
-  mounted() {
-    this.$set(this, 'stageNavHeight', this.$refs.stageNav.clientHeight);
+  updated() {
+    if (!this.isLoading && this.$refs.stageNav) {
+      this.$set(this, 'stageNavHeight', this.$refs.stageNav.clientHeight);
+    }
   },
 };
 </script>
 <template>
   <div class="stage-panel-container">
-    <div class="card stage-panel">
-      <div class="card-header border-bottom-0">
+    <div
+      v-if="isLoading"
+      class="gl-display-flex gl-justify-content-center gl-align-items-center gl-w-full"
+      :style="{ height: stageEventsHeight }"
+    >
+      <gl-loading-icon size="lg" />
+    </div>
+    <div v-else class="card stage-panel">
+      <div class="card-header gl-border-b-0">
         <nav class="col-headers">
           <ul>
             <stage-table-header
@@ -111,12 +125,12 @@ export default {
         </nav>
       </div>
       <div class="stage-panel-body">
-        <nav ref="stageNav" class="stage-nav pl-2">
+        <nav ref="stageNav" class="stage-nav gl-pl-2">
           <slot name="nav"></slot>
         </nav>
         <div class="section stage-events overflow-auto" :style="{ height: stageEventsHeight }">
           <slot name="content">
-            <gl-loading-icon v-if="isLoading" class="mt-4" size="md" />
+            <gl-loading-icon v-if="isLoadingStage" class="gl-mt-4" size="md" />
             <template v-else>
               <stage-event-list
                 v-if="shouldDisplayStage"

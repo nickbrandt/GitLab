@@ -27,6 +27,7 @@ describe('DurationChart mutations', () => {
   it.each`
     mutation                                       | payload                                                  | expectedState
     ${types.UPDATE_SELECTED_DURATION_CHART_STAGES} | ${{ updatedDurationStageData: transformedDurationData }} | ${{ durationData: transformedDurationData }}
+    ${types.SET_LOADING}                           | ${true}                                                  | ${{ isLoading: true }}
   `(
     '$mutation with payload $payload will update state with $expectedState',
     ({ mutation, payload, expectedState }) => {

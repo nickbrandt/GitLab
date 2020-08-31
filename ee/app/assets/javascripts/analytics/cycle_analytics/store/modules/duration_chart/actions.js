@@ -3,6 +3,8 @@ import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { __ } from '~/locale';
 import * as types from './mutation_types';
 
+export const setLoading = ({ commit }, loading) => commit(types.SET_LOADING, loading);
+
 export const requestDurationData = ({ commit }) => commit(types.REQUEST_DURATION_DATA);
 
 export const receiveDurationDataError = ({ commit }) => {
