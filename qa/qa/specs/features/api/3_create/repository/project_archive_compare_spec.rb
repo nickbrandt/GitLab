@@ -51,7 +51,6 @@ module QA
           project.add_name_uuid = false
           project.name = project_name
           project.path_with_namespace = "#{user.username}/#{project_name}"
-          project.user = user
           project.api_client = api_client
         end
 

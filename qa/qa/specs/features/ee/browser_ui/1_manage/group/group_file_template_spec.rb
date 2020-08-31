@@ -50,7 +50,6 @@ module QA
 
         @group = Resource::Group.fabricate_via_api! do |group|
           group.path = 'template-group'
-          group.user = admin
           group.api_client = @api_client
         end
 
@@ -61,7 +60,6 @@ module QA
             project.description = 'Add group file templates'
             project.auto_devops_enabled = false
             project.initialize_with_readme = true
-            project.user = admin
             project.api_client = @api_client
           end
 
@@ -72,7 +70,6 @@ module QA
           commit.project = @file_template_project
           commit.commit_message = 'Add group file templates'
           commit.add_files(templates)
-          commit.user = admin
           commit.api_client = @api_client
         end
 
@@ -82,7 +79,6 @@ module QA
           project.description = 'Add files for group file templates'
           project.auto_devops_enabled = false
           project.initialize_with_readme = true
-          project.user = admin
           project.api_client = @api_client
         end
       end
