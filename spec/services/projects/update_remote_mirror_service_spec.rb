@@ -66,6 +66,20 @@ RSpec.describe Projects::UpdateRemoteMirrorService do
       end
     end
 
+    context "when the URL has escaped password sequences" do
+      let(:url) { "https://user:0a%23@test.example.com/project.git" }
+
+      before do
+        allow(remote_mirror).to receive(:url).and_return(url)
+      end
+
+      it "returns success when update succeeds" do
+        result = execute!
+
+        expect(result[:status]).to eq(:success)
+      end
+    end
+
     context 'when the URL is localhost' do
       let(:localhost_url) { "git://localhost:1234/some-path?some-query=some-val\#@example.com/" }
 
