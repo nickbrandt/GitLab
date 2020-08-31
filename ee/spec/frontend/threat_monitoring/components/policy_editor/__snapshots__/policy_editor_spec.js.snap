@@ -178,7 +178,18 @@ exports[`PolicyEditorApp component renders the policy editor layout 1`] = `
         Policy preview
       </h5>
        
-      <policy-preview-stub />
+      <policy-preview-stub
+        policydescription="Deny all traffic"
+        policyyaml="apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ''
+spec:
+  endpointSelector:
+    matchLabels:
+      network-policy.gitlab.com/disabled_by: gitlab
+"
+      />
     </div>
   </div>
    
