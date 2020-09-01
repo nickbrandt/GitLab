@@ -42,6 +42,7 @@ export default {
   // before the frontend adds support for them.
   entityTypeToComponent: {
     string: FormInput,
+    checkbox: CheckboxInput
   },
 };
 </script>
