@@ -1,9 +1,13 @@
 <script>
+<<<<<<< HEAD
 import { sanitize } from 'dompurify';
 import { GlFormTextarea, GlButton, GlLoadingIcon } from '@gitlab/ui';
+=======
+import { GlFormTextarea, GlButton } from '@gitlab/ui';
+>>>>>>> origin/master
 
 export default {
-  components: { GlFormTextarea, GlButton, GlLoadingIcon },
+  components: { GlFormTextarea, GlButton },
   props: {
     initialComment: {
       type: String,
@@ -44,9 +48,13 @@ export default {
         ref="saveButton"
         variant="success"
         :disabled="isSaveButtonDisabled"
+<<<<<<< HEAD
         @click="$emit('onSave', sanitizedComment)"
+=======
+        :loading="isSaving"
+        @click="$emit('onSave', trimmedComment)"
+>>>>>>> origin/master
       >
-        <gl-loading-icon v-if="isSaving" class="mr-1" />
         {{ __('Save comment') }}
       </gl-button>
       <gl-button ref="cancelButton" class="ml-1" :disabled="isSaving" @click="$emit('onCancel')">
