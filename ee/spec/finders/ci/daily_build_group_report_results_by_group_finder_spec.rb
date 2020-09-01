@@ -4,14 +4,17 @@ require 'spec_helper'
 
 RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
   describe '#execute' do
-    let(:user) { create(:user) }
+    let!(:user) { create(:user) }
 
-    let(:project) { create(:project, :private) }
+    let!(:project) { create(:project, :private) }
     let!(:project_coverage) { create_daily_coverage('rspec', 95.0, '2020-03-10', project) }
 
-    let(:group) { create(:group, :private) }
-    let(:group_project) { create(:project, namespace: group) }
-    let!(:group_project_coverage) { create_daily_coverage('rspec', 79.0, '2020-03-09', group_project) }
+    let!(:group) { create(:group, :private) }
+    let!(:group_project) { create(:project, namespace: group) }
+    let!(:group_project_coverage_rspec) { create_daily_coverage('rspec', 79.0, '2020-03-09', group_project) }
+
+    let!(:group_project_two) { create(:project, namespace: group) }
+    let!(:group_project_coverage_karma) { create_daily_coverage('karma', 89.0, '2020-03-09', group_project_two) }
 
     let(:subgroup) { create(:group, :private, parent: group) }
     let(:subgroup_project) { create(:project, namespace: subgroup) }
@@ -43,6 +46,12 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
 
       before do
         group.add_reporter(user)
+      end
+
+      it 'returns only coverages belonging to the passed group' do
+        expect(subject).to include(group_project_coverage_rspec, group_project_coverage_karma)
+        expect(subject).not_to include(project_coverage)
+        expect(subject).not_to include(subgroup_project_coverage)
       end
 
       context 'with a limit below 1000' do
@@ -90,6 +99,16 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
         it 'returns all projects' do
           expect(subject).to include(group_project_coverage)
           expect(subject).to include(excluded_coverage)
+        end
+      end
+
+      context 'when accessing projects from the result' do
+        it 'only does a single query' do
+          # Two permission queries from "members" and "licenses"
+          # One query from "ci_daily_build_group_report_results"
+          # One optional from "projects" if not joined due to direct querying
+          expect { subject.map(&:project) }.not_to exceed_query_limit(4)
+          expect(subject).to match_array([group_project_coverage_rspec, group_project_coverage_karma])
         end
       end
     end

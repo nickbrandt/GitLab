@@ -20,7 +20,7 @@ module Ci
     private
 
     def query
-      super.with_preloaded_projects
+      super.with_included_projects
     end
 
     def query_allowed?
