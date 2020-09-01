@@ -2,7 +2,10 @@
 import { GlTable, GlTooltipDirective } from '@gitlab/ui';
 import { __ } from '~/locale';
 import initUserPopovers from '~/user_popovers';
+import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import MemberInfo from './member_info.vue';
+import ExpiresAt from './expires_at.vue';
+import CreatedAt from './created_at.vue';
 
 const FIELDS = [
   {
@@ -58,7 +61,10 @@ export default {
   name: 'MembersList',
   components: {
     GlTable,
+    TimeAgoTooltip,
     MemberInfo,
+    ExpiresAt,
+    CreatedAt,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -128,6 +134,22 @@ export default {
       <a v-else v-gl-tooltip.hover :title="__('Inherited')" :href="source.webUrl">{{
         source.name
       }}</a>
+    </template>
+
+    <template #cell(invited)="{ item: { createdAt, createdBy } }">
+      <created-at :date="createdAt" :created-by="createdBy" />
+    </template>
+
+    <template #cell(granted)="{ item: { createdAt, createdBy } }">
+      <created-at :date="createdAt" :created-by="createdBy" />
+    </template>
+
+    <template #cell(requested)="{ item: { requestedAt } }">
+      <time-ago-tooltip v-if="requestedAt" :time="requestedAt" />
+    </template>
+
+    <template #cell(expires)="{ item: { expiresAt } }">
+      <expires-at :date="expiresAt" />
     </template>
 
     <template #head(actions)="{ label }">
