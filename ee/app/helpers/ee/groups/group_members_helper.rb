@@ -8,6 +8,11 @@ module EE::Groups::GroupMembersHelper
     super.merge(skip_ldap: @group.ldap_synced?)
   end
 
+  override :access_level_roles
+  def access_level_roles(group)
+    group.access_level_roles_for_group
+  end
+
   private
 
   override :members_data
