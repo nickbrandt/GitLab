@@ -102,7 +102,7 @@ export default {
     <add-stage-button
       :class="$options.noDragClass"
       :active="isCreatingCustomStage"
-      @showform="$emit('show-add-stage-form')"
+      @showform="$emit($options.STAGE_ACTIONS.ADD_STAGE)"
     />
   </ul>
 </template>
