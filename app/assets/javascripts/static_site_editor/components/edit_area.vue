@@ -96,7 +96,6 @@ export default {
 <template>
   <div class="d-flex flex-grow-1 flex-column h-100">
     <edit-header class="py-2" :title="title" />
-    <pre>{{ frontMatterObject }}</pre>
     <rich-content-editor
       ref="editor"
       :content="editableContent"
