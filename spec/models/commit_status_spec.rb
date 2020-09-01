@@ -521,7 +521,8 @@ RSpec.describe CommitStatus do
       'rspec:windows: [name, 0/1] 0/1' => 'rspec:windows',
       'rspec:windows: [0/1, name]' => 'rspec:windows',
       'rspec:windows: [, ]' => 'rspec:windows',
-      'rspec:windows: [name]' => 'rspec:windows: [name]'
+      'rspec:windows: [name]' => 'rspec:windows: [name]',
+      'rspec:windows: [name,other]' => 'rspec:windows: [name,other]'
     }
 
     tests.each do |name, group_name|
