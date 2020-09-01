@@ -135,7 +135,7 @@ export default {
 <template>
   <history-comment-editor
     v-if="isEditingComment"
-    class="discussion-reply-holder m-3"
+    class="discussion-reply-holder"
     :initial-comment="commentNote"
     :is-saving="isSavingComment"
     @onSave="saveComment"
