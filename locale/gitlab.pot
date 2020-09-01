@@ -21924,6 +21924,9 @@ msgstr ""
 msgid "SecurityReports|Project"
 msgstr ""
 
+msgid "SecurityReports|Project was not found or you do not have permission to add this project to Security Dashboards."
+msgstr ""
+
 msgid "SecurityReports|Projects added"
 msgstr ""
 
@@ -21999,7 +22002,7 @@ msgstr ""
 msgid "SecurityReports|To widen your search, change or remove filters above"
 msgstr ""
 
-msgid "SecurityReports|Unable to add %{invalidProjectsMessage}"
+msgid "SecurityReports|Unable to add %{invalidProjectsMessage}: %{errorMessage}"
 msgstr ""
 
 msgid "SecurityReports|Unable to add %{invalidProjects}"

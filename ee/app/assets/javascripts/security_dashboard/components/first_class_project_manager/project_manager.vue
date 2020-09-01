@@ -73,6 +73,10 @@ export default {
             mutation: addProjectToSecurityDashboard,
             variables: { id: project.id },
             update(store, { data: results }) {
+              if (!results.addProjectToSecurityDashboard.project) {
+                return;
+              }
+
               const data = store.readQuery({ query: projectsQuery });
               const newProject = results.addProjectToSecurityDashboard.project;
               data.instanceSecurityDashboard.projects.nodes.push({
@@ -82,23 +86,49 @@ export default {
               store.writeQuery({ query: projectsQuery, data });
             },
           })
+          .then(({ data }) => {
+            return {
+              error: data?.addProjectToSecurityDashboard?.errors?.[0],
+              project: data?.addProjectToSecurityDashboard?.project ?? project,
+            };
+          })
           .catch(() => {
-            return { error: true, project };
+            return {
+              error: s__(
+                'SecurityReports|Project was not found or you do not have permission to add this project to Security Dashboards.',
+              ),
+              project,
+            };
           });
       });
 
       return Promise.all(addProjectsPromises)
         .then(response => {
-          const invalidProjects = response.filter(value => value.error).map(value => value.project);
+          const invalidProjects = response.filter(value => value.error);
           this.$emit('handleProjectManipulation', false);
 
           if (invalidProjects.length) {
-            const invalidProjectsMessage = createInvalidProjectMessage(invalidProjects);
-            createFlash(
-              sprintf(s__('SecurityReports|Unable to add %{invalidProjectsMessage}'), {
-                invalidProjectsMessage,
-              }),
+            const invalidProjectsByErrorMessage = response.reduce((acc, value) => {
+              acc[value.error] = acc[value.error] ?? [];
+              acc[value.error].push(value.project);
+
+              return acc;
+            }, {});
+
+            const errorMessages = Object.entries(invalidProjectsByErrorMessage).map(
+              ([errorMessage, projects]) => {
+                const invalidProjectsMessage = createInvalidProjectMessage(projects);
+                return sprintf(
+                  s__('SecurityReports|Unable to add %{invalidProjectsMessage}: %{errorMessage}'),
+                  {
+                    invalidProjectsMessage,
+                    errorMessage,
+                  },
+                );
+              },
             );
+
+            createFlash(errorMessages.join('<br/>'));
           }
         })
         .finally(() => {
