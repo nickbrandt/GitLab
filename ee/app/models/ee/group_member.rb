@@ -3,7 +3,6 @@
 module EE
   module GroupMember
     extend ActiveSupport::Concern
-    extend ::Gitlab::Utils::Override
 
     prepended do
       extend ::Gitlab::Utils::Override
@@ -27,8 +26,6 @@ module EE
     end
 
     class_methods do
-      extend ::Gitlab::Utils::Override
-
       def member_of_group?(group, user)
         exists?(group: group, user: user)
       end
