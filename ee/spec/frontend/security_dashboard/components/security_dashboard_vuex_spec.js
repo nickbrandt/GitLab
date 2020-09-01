@@ -91,10 +91,6 @@ describe('Security Dashboard component', () => {
       expect(wrapper.find(VulnerabilityChart).exists()).toBe(true);
     });
 
-    it('does not render the vulnerability count list', () => {
-      expect(wrapper.find(VulnerabilityCountList).exists()).toBe(false);
-    });
-
     it('does not lock to a project', () => {
       expect(wrapper.vm.isLockedToProject).toBe(false);
     });
@@ -193,10 +189,6 @@ describe('Security Dashboard component', () => {
       createComponent({
         lockToProject: project,
       });
-    });
-
-    it('renders the vulnerability count list', () => {
-      expect(wrapper.find(VulnerabilityCountList).exists()).toBe(true);
     });
 
     it('locks to a given project', () => {

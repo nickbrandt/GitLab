@@ -6,7 +6,6 @@ import Filters from './filters.vue';
 import SecurityDashboardLayout from './security_dashboard_layout.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityChart from './vulnerability_chart.vue';
-import VulnerabilityCountList from './vulnerability_count_list_vuex.vue';
 import VulnerabilitySeverity from './vulnerability_severity.vue';
 import FuzzingArtifactsDownload from './fuzzing_artifacts_download.vue';
 import LoadingError from './loading_error.vue';
@@ -18,7 +17,6 @@ export default {
     SecurityDashboardLayout,
     SecurityDashboardTable,
     VulnerabilityChart,
-    VulnerabilityCountList,
     VulnerabilitySeverity,
     FuzzingArtifactsDownload,
     LoadingError,
@@ -27,11 +25,6 @@ export default {
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
-    },
-    vulnerabilitiesCountEndpoint: {
-      type: String,
-      required: false,
-      default: '',
     },
     vulnerabilitiesHistoryEndpoint: {
       type: String,
@@ -104,9 +97,6 @@ export default {
     shouldShowVulnerabilitySeverities() {
       return Boolean(this.vulnerableProjectsEndpoint);
     },
-    shouldShowCountList() {
-      return this.isLockedToProject && Boolean(this.vulnerabilitiesCountEndpoint);
-    },
   },
   watch: {
     'pageInfo.total': 'emitVulnerabilitiesCountChanged',
@@ -121,10 +111,8 @@ export default {
     this.setPipelineId(this.pipelineId);
     this.setHideDismissedToggleInitialState();
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
-    this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
     this.fetchVulnerabilities({ ...this.activeFilters, page: this.pageInfo.page });
-    this.fetchVulnerabilitiesCount(this.activeFilters);
     this.fetchVulnerabilitiesHistory(this.activeFilters);
     this.fetchPipelineJobs();
   },
@@ -137,11 +125,9 @@ export default {
       'createMergeRequest',
       'dismissVulnerability',
       'fetchVulnerabilities',
-      'fetchVulnerabilitiesCount',
       'fetchVulnerabilitiesHistory',
       'openDismissalCommentBox',
       'setPipelineId',
-      'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
       'showDismissalDeleteButtons',
@@ -168,7 +154,6 @@ export default {
     <template v-else>
       <security-dashboard-layout>
         <template #header>
-          <vulnerability-count-list v-if="shouldShowCountList" />
           <filters>
             <template v-if="hasFuzzingArtifacts" #buttons>
               <fuzzing-artifacts-download :jobs="fuzzingJobsWithArtifact" :project-id="projectId" />
