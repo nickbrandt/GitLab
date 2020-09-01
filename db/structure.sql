@@ -19329,6 +19329,8 @@ CREATE INDEX index_ci_job_variables_on_job_id ON public.ci_job_variables USING b
 
 CREATE UNIQUE INDEX index_ci_job_variables_on_key_and_job_id ON public.ci_job_variables USING btree (key, job_id);
 
+CREATE INDEX index_ci_pipeline_artifacts_on_expire_at ON public.ci_pipeline_artifacts USING btree (expire_at);
+
 CREATE INDEX index_ci_pipeline_artifacts_on_pipeline_id ON public.ci_pipeline_artifacts USING btree (pipeline_id);
 
 CREATE UNIQUE INDEX index_ci_pipeline_artifacts_on_pipeline_id_and_file_type ON public.ci_pipeline_artifacts USING btree (pipeline_id, file_type);
