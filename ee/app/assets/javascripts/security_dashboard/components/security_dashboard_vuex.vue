@@ -5,8 +5,6 @@ import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
 import SecurityDashboardLayout from './security_dashboard_layout.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
-import VulnerabilityChart from './vulnerability_chart.vue';
-import VulnerabilitySeverity from './vulnerability_severity.vue';
 import FuzzingArtifactsDownload from './fuzzing_artifacts_download.vue';
 import LoadingError from './loading_error.vue';
 
@@ -16,8 +14,6 @@ export default {
     IssueModal,
     SecurityDashboardLayout,
     SecurityDashboardTable,
-    VulnerabilityChart,
-    VulnerabilitySeverity,
     FuzzingArtifactsDownload,
     LoadingError,
   },
@@ -25,11 +21,6 @@ export default {
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
-    },
-    vulnerabilitiesHistoryEndpoint: {
-      type: String,
-      required: false,
-      default: '',
     },
     vulnerabilityFeedbackHelpPath: {
       type: String,
@@ -88,15 +79,6 @@ export default {
     isLockedToProject() {
       return this.lockToProject !== null;
     },
-    shouldShowAside() {
-      return this.shouldShowChart || this.shouldShowVulnerabilitySeverities;
-    },
-    shouldShowChart() {
-      return Boolean(this.vulnerabilitiesHistoryEndpoint);
-    },
-    shouldShowVulnerabilitySeverities() {
-      return Boolean(this.vulnerableProjectsEndpoint);
-    },
   },
   watch: {
     'pageInfo.total': 'emitVulnerabilitiesCountChanged',
@@ -111,9 +93,7 @@ export default {
     this.setPipelineId(this.pipelineId);
     this.setHideDismissedToggleInitialState();
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
-    this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
     this.fetchVulnerabilities({ ...this.activeFilters, page: this.pageInfo.page });
-    this.fetchVulnerabilitiesHistory(this.activeFilters);
     this.fetchPipelineJobs();
   },
   methods: {
@@ -129,7 +109,6 @@ export default {
       'openDismissalCommentBox',
       'setPipelineId',
       'setVulnerabilitiesEndpoint',
-      'setVulnerabilitiesHistoryEndpoint',
       'showDismissalDeleteButtons',
       'hideDismissalDeleteButtons',
       'undoDismiss',
@@ -166,14 +145,6 @@ export default {
             <slot name="emptyState"></slot>
           </template>
         </security-dashboard-table>
-
-        <template v-if="shouldShowAside" #aside>
-          <vulnerability-chart v-if="shouldShowChart" class="mb-3" />
-          <vulnerability-severity
-            v-if="shouldShowVulnerabilitySeverities"
-            :endpoint="vulnerableProjectsEndpoint"
-          />
-        </template>
       </security-dashboard-layout>
 
       <issue-modal
