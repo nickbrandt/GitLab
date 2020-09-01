@@ -90,7 +90,7 @@ module Projects
       end
 
       def gitlab_ci_present?
-        latest_pipeline_for_ref.try(:config_path) == Gitlab::FileDetector::PATTERNS[:gitlab_ci]
+        latest_pipeline.try(:config_path) == Gitlab::FileDetector::PATTERNS[:gitlab_ci]
       end
 
       def features
