@@ -9281,9 +9281,6 @@ msgstr ""
 msgid "Enable usage ping"
 msgstr ""
 
-msgid "Enable usage ping to get an overview of how you are using GitLab from a feature perspective."
-msgstr ""
-
 msgid "Enable/disable your service desk. %{link_start}Learn more about service desk%{link_end}."
 msgstr ""
 
@@ -13032,9 +13029,6 @@ msgid "Improve search with Advanced Search and GitLab Enterprise Edition."
 msgstr ""
 
 msgid "In %{time_to_now}"
-msgstr ""
-
-msgid "In order to enable instance-level analytics, please ask an admin to enable %{usage_ping_link_start}usage ping%{usage_ping_link_end}."
 msgstr ""
 
 msgid "In order to gather accurate feature usage data, it can take 1 to 2 weeks to see your index."
@@ -25974,6 +25968,9 @@ msgstr ""
 msgid "To view all %{scannedResourcesCount} scanned URLs, please download the CSV file"
 msgstr ""
 
+msgid "To view instance-level analytics, ask an admin to turn on %{docLinkStart}usage ping%{docLinkEnd}."
+msgstr ""
+
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
 msgstr ""
 
@@ -26281,6 +26278,9 @@ msgid "Turn on Service Desk"
 msgstr ""
 
 msgid "Turn on usage ping"
+msgstr ""
+
+msgid "Turn on usage ping to review instance-level analytics."
 msgstr ""
 
 msgid "Twitter"
@@ -26760,7 +26760,7 @@ msgstr ""
 msgid "Usage"
 msgstr ""
 
-msgid "Usage ping is not enabled"
+msgid "Usage ping is off"
 msgstr ""
 
 msgid "Usage statistics"
