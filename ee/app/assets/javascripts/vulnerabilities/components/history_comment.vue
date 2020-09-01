@@ -136,11 +136,7 @@ export default {
   <history-comment-editor
     v-if="isEditingComment"
     class="discussion-reply-holder"
-<<<<<<< HEAD
     :initial-comment="initialComment"
-=======
-    :initial-comment="commentNote"
->>>>>>> origin/master
     :is-saving="isSavingComment"
     @onSave="saveComment"
     @onCancel="cancelEditingComment"

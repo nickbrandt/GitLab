@@ -1,10 +1,6 @@
 <script>
-<<<<<<< HEAD
 import { sanitize } from 'dompurify';
-import { GlFormTextarea, GlButton, GlLoadingIcon } from '@gitlab/ui';
-=======
 import { GlFormTextarea, GlButton } from '@gitlab/ui';
->>>>>>> origin/master
 
 export default {
   components: { GlFormTextarea, GlButton },
@@ -48,12 +44,7 @@ export default {
         ref="saveButton"
         variant="success"
         :disabled="isSaveButtonDisabled"
-<<<<<<< HEAD
         @click="$emit('onSave', sanitizedComment)"
-=======
-        :loading="isSaving"
-        @click="$emit('onSave', trimmedComment)"
->>>>>>> origin/master
       >
         {{ __('Save comment') }}
       </gl-button>
