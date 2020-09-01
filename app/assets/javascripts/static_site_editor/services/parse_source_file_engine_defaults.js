@@ -1,4 +1,4 @@
-// Inspired gray-matter use from https://github.com/jonschlinkert/gray-matter/blob/master/lib/engines.js
+// Inspired by gray-matter use https://github.com/jonschlinkert/gray-matter/blob/master/lib/engines.js
 
 import jsYaml from 'js-yaml';
 

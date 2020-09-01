@@ -55,9 +55,6 @@ export default {
     editableContent() {
       return this.parsedSource.content(this.isWysiwygMode);
     },
-    frontMatterObject() {
-      return this.parsedSource.frontMatterObject(this.isWysiwygMode);
-    },
     isWysiwygMode() {
       return this.editorMode === EDITOR_TYPES.wysiwyg;
     },
