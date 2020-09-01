@@ -65,16 +65,19 @@ module DropdownsHelper
     has_back = options.fetch(:back, false)
     has_close = options.fetch(:close, true)
 
-    container_class = 'dropdown-title gl-display-flex'
-    margin_class = ''
+    container_class = %w[dropdown-title gl-display-flex]
+    margin_class = []
 
     if has_back && has_close
-      container_class += ' gl-justify-content-space-between'
+      container_class << 'gl-justify-content-space-between'
     elsif has_back
-      margin_class = ' gl-mr-auto'
+      margin_class << 'gl-mr-auto'
     elsif has_close
-      margin_class = ' gl-ml-auto'
+      margin_class << ' gl-ml-auto'
     end
+
+    container_class = container_class.join(' ')
+    margin_class = margin_class.join(' ')
 
     content_tag :div, class: container_class do
       title_output = []
