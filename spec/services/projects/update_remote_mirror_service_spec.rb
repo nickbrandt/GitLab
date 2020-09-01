@@ -79,6 +79,7 @@ RSpec.describe Projects::UpdateRemoteMirrorService do
       with_them do
         before do
           allow(remote_mirror).to receive(:url).and_return(url)
+          allow(service).to receive(:update_mirror).with(remote_mirror).and_return(true)
         end
 
         it "returns expected status" do
