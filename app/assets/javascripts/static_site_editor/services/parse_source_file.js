@@ -2,13 +2,19 @@ import escapeStringRegexp from 'escape-string-regexp';
 import getFrontMatterLanguageDefinition from './parse_source_file_language_support';
 
 const parseSourceFile = raw => {
-  const { open, close } = getFrontMatterLanguageDefinition(raw);
+  let engine;
+  const { open, close, loadEngine } = getFrontMatterLanguageDefinition(raw);
   const anyChar = '[\\s\\S]';
-  const frontMatterBlock = `^${escapeStringRegexp(open)}$${anyChar}*?^${escapeStringRegexp(
-    close,
-  )}$`;
-  const frontMatterRegex = new RegExp(`${frontMatterBlock}`, 'm');
-  const preGroupedRegex = new RegExp(`(${anyChar}*?)(${frontMatterBlock})(\\s*)(${anyChar}*)`, 'm'); // preFrontMatter, frontMatter, spacing, and content
+  const escapedOpen = escapeStringRegexp(open);
+  const escapedClose = escapeStringRegexp(close);
+  const frontMatterContentStr = `^${escapedOpen}$(${anyChar}*?)^${escapedClose}$`;
+  const frontMatterBlockStr = `^${escapedOpen}$${anyChar}*?^${escapedClose}$`;
+  const frontMatterContentRegex = new RegExp(`${frontMatterContentStr}`, 'm');
+  const frontMatterRegex = new RegExp(`${frontMatterBlockStr}`, 'm');
+  const preGroupedRegex = new RegExp(
+    `(${anyChar}*?)(${frontMatterBlockStr})(\\s*)(${anyChar}*)`,
+    'm',
+  ); // preFrontMatter, frontMatter, spacing, and content
   let initial;
   let editable;
 
@@ -55,6 +61,10 @@ const parseSourceFile = raw => {
 
   const frontMatter = () => editable.header;
 
+  const frontMatterContent = () => editable.header.match(frontMatterContentRegex)[1];
+
+  const frontMatterObject = () => engine?.parse(frontMatterContent());
+
   const setFrontMatter = val => {
     editable.header = val;
     refreshEditableRaw();
@@ -70,7 +80,16 @@ const parseSourceFile = raw => {
   initial = parse(raw);
   editable = parse(raw);
 
+  if (hasFrontMatter(raw)) {
+    loadEngine()
+      .then(payload => {
+        engine = payload;
+      })
+      .catch(() => {});
+  }
+
   return {
+    frontMatterObject,
     frontMatter,
     setFrontMatter,
     content,

@@ -1,9 +1,14 @@
+import { __ } from '~/locale';
 import { yaml, json } from './parse_source_file_engine_defaults';
 
+const resolver = engine => resolve => resolve(engine);
+const rejector = reject => reject(new Error(__('Front matter engine load failure.')));
+const loader = engine => () => new Promise(resolver(engine), rejector);
+
 const frontMatterLanguageDefinitions = [
-  { name: 'yaml', open: '---', close: '---', engine: yaml },
-  { name: 'toml', open: '+++', close: '+++', engine: null },
-  { name: 'json', open: '{', close: '}', engine: json },
+  { name: 'yaml', open: '---', close: '---', loadEngine: loader(yaml) },
+  { name: 'toml', open: '+++', close: '+++', loadEngine: loader(null) },
+  { name: 'json', open: '{', close: '}', loadEngine: loader(json) },
 ];
 
 const reInferredOpenDelimiter = /^(.+)\n/;
