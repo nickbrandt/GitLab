@@ -34,7 +34,7 @@ gemnasium-dependency_scanning:
   variables:
     DS_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/gemnasium:$DS_MAJOR_VERSION"
   rules:
-    - if: $DEPENDENCY_SCANNING_DISABLED || $DS_DISABLE_DIND == 'false'
+    - if: $DEPENDENCY_SCANNING_DISABLED
       when: never
     - if: $CI_COMMIT_BRANCH &&
           $GITLAB_FEATURES =~ /\bdependency_scanning\b/ &&
@@ -57,7 +57,7 @@ gemnasium-maven-dependency_scanning:
   variables:
     DS_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/gemnasium-maven:$DS_MAJOR_VERSION"
   rules:
-    - if: $DEPENDENCY_SCANNING_DISABLED || $DS_DISABLE_DIND == 'false'
+    - if: $DEPENDENCY_SCANNING_DISABLED
       when: never
     - if: $CI_COMMIT_BRANCH &&
           $GITLAB_FEATURES =~ /\bdependency_scanning\b/ &&
@@ -75,7 +75,7 @@ gemnasium-python-dependency_scanning:
   variables:
     DS_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/gemnasium-python:$DS_MAJOR_VERSION"
   rules:
-    - if: $DEPENDENCY_SCANNING_DISABLED || $DS_DISABLE_DIND == 'false'
+    - if: $DEPENDENCY_SCANNING_DISABLED
       when: never
     - if: $CI_COMMIT_BRANCH &&
           $GITLAB_FEATURES =~ /\bdependency_scanning\b/ &&
@@ -100,7 +100,7 @@ bundler-audit-dependency_scanning:
   variables:
     DS_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/bundler-audit:$DS_MAJOR_VERSION"
   rules:
-    - if: $DEPENDENCY_SCANNING_DISABLED || $DS_DISABLE_DIND == 'false'
+    - if: $DEPENDENCY_SCANNING_DISABLED
       when: never
     - if: $CI_COMMIT_BRANCH &&
           $GITLAB_FEATURES =~ /\bdependency_scanning\b/ &&
@@ -115,7 +115,7 @@ retire-js-dependency_scanning:
   variables:
     DS_ANALYZER_IMAGE: "$SECURE_ANALYZERS_PREFIX/retire.js:$DS_MAJOR_VERSION"
   rules:
-    - if: $DEPENDENCY_SCANNING_DISABLED || $DS_DISABLE_DIND == 'false'
+    - if: $DEPENDENCY_SCANNING_DISABLED
       when: never
     - if: $CI_COMMIT_BRANCH &&
           $GITLAB_FEATURES =~ /\bdependency_scanning\b/ &&
