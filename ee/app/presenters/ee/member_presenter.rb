@@ -13,13 +13,6 @@ module EE
       can?(current_user, override_member_permission, member)
     end
 
-    override :valid_level_roles
-    def valid_level_roles
-      return super if member.source.is_a?(Project)
-
-      super.except("Unassigned")
-    end
-
     private
 
     def override_member_permission

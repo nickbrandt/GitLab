@@ -112,7 +112,7 @@ RSpec.describe AuthorizedProjectUpdate::ProjectGroupLinkCreateService do
       end
     end
 
-    context 'unapproved access requests' do
+    context 'unassigned member' do
       before do
         create(:group_member, :unassigned, user: group_user, group: group)
       end
