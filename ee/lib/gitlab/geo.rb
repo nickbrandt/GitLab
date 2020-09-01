@@ -166,7 +166,7 @@ module Gitlab
       _(template) % { url: url }
     end
 
-    def self.replicator_classes
+    def self.enabled_replicator_classes
       REPLICATOR_CLASSES.select(&:enabled?)
     end
   end
