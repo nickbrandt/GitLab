@@ -22,8 +22,8 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   validates :project, presence: true, uniqueness: true
 
   scope :dirty, -> { where(arel_table[:resync_repository].eq(true).or(arel_table[:resync_wiki].eq(true))) }
-  scope :retryable, -> { dirty.retry_due }
-  scope :pending, -> { where(last_repository_synced_at: nil) }
+  scope :needs_sync_again, -> { dirty.retry_due }
+  scope :never_attempted_sync, -> { where(last_repository_synced_at: nil) }
   scope :synced_repos, -> { where(resync_repository: false) }
   scope :synced_wikis, -> { where(resync_wiki: false) }
   scope :failed_repos, -> { where(arel_table[:repository_retry_count].gt(0)) }
@@ -44,9 +44,8 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(nil).pluck(:project_id)
   end
 
-  def self.find_failed_registries(batch_size:, except_ids: [])
-    super
-      .order(Gitlab::Database.nulls_first_order(:last_repository_synced_at))
+  def self.find_registries_needs_sync_again(batch_size:, except_ids: [])
+    super.order(Gitlab::Database.nulls_first_order(:last_repository_synced_at))
   end
 
   def self.delete_worker_class

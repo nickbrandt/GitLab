@@ -2,7 +2,7 @@
 
 module Geo
   class ProjectRegistryFinder
-    # Returns ProjectRegistry records that have never been synced.
+    # Returns ProjectRegistry records that have never have an attempt tp sync.
     #
     # Does not care about selective sync, because it considers the Registry
     # table to be the single source of truth. The contract is that other
@@ -11,7 +11,7 @@ module Geo
     #
     # Any registries that have ever been synced that currently need to be
     # resynced will be handled by other find methods (like
-    # #find_failed_registries)
+    # #find_registries_needs_sync_again)
     #
     # You can pass a list with `except_ids:` so you can exclude items you
     # already scheduled but haven't finished and aren't persisted to the database yet
@@ -19,16 +19,16 @@ module Geo
     # @param [Integer] batch_size used to limit the results returned
     # @param [Array<Integer>] except_ids ids that will be ignored from the query
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_unsynced_registries(batch_size:, except_ids: [])
+    def find_registries_never_attempted_sync(batch_size:, except_ids: [])
       registry_class
-        .find_unsynced_registries(batch_size: batch_size, except_ids: except_ids)
+        .find_registries_never_attempted_sync(batch_size: batch_size, except_ids: except_ids)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 
     # rubocop:disable CodeReuse/ActiveRecord
-    def find_failed_registries(batch_size:, except_ids: [])
+    def find_registries_needs_sync_again(batch_size:, except_ids: [])
       registry_class
-        .find_failed_registries(batch_size: batch_size, except_ids: except_ids)
+        .find_registries_needs_sync_again(batch_size: batch_size, except_ids: except_ids)
     end
     # rubocop:enable CodeReuse/ActiveRecord
 

@@ -22,7 +22,7 @@ module Gitlab
       delegate :in_replicables_for_geo_node?, to: :model_record
 
       class << self
-        delegate :find_unsynced_registries, :find_failed_registries, to: :registry_class
+        delegate :find_registries_never_attempted_sync, :find_registries_needs_sync_again, to: :registry_class
       end
 
       # Declare supported event

@@ -6,9 +6,9 @@ module Geo::Syncable
   included do
     scope :failed, -> { where(success: false).where.not(retry_count: nil) }
     scope :missing_on_primary, -> { where(missing_on_primary: true) }
-    scope :pending, -> { where(success: false, retry_count: nil) }
+    scope :needs_sync_again, -> { failed.retry_due }
+    scope :never_attempted_sync, -> { where(success: false, retry_count: nil) }
     scope :retry_due, -> { where('retry_at is NULL OR retry_at < ?', Time.current) }
-    scope :retryable, -> { failed.retry_due }
     scope :synced, -> { where(success: true) }
   end
 end

@@ -9,9 +9,9 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
   belongs_to :container_repository
 
   scope :failed, -> { with_state(:failed) }
-  scope :pending, -> { with_state(:pending).where(last_synced_at: nil) }
+  scope :needs_sync_again, -> { failed.retry_due }
+  scope :never_attempted_sync, -> { with_state(:pending).where(last_synced_at: nil) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
-  scope :retryable, -> { failed.retry_due }
   scope :synced, -> { with_state(:synced) }
 
   state_machine :state, initial: :pending do
@@ -38,9 +38,8 @@ class Geo::ContainerRepositoryRegistry < Geo::BaseRegistry
     end
   end
 
-  def self.find_failed_registries(batch_size:, except_ids: [])
-    super
-      .order(Gitlab::Database.nulls_first_order(:last_synced_at))
+  def self.find_registries_needs_sync_again(batch_size:, except_ids: [])
+    super.order(Gitlab::Database.nulls_first_order(:last_synced_at))
   end
 
   def self.delete_for_model_ids(container_repository_ids)

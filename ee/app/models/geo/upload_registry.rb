@@ -77,8 +77,10 @@ class Geo::UploadRegistry < Geo::BaseRegistry
 
   def self.with_status(status)
     case status
-    when 'synced', 'failed', 'pending'
+    when 'synced', 'failed'
       self.public_send(status) # rubocop: disable GitlabSecurity/PublicSend
+    when 'pending'
+      never_attempted_sync
     else
       all
     end

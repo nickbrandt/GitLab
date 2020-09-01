@@ -63,14 +63,14 @@ class Geo::BaseRegistry < Geo::TrackingBase
     [untracked_ids, unused_tracked_ids]
   end
 
-  def self.find_unsynced_registries(batch_size:, except_ids: [])
-    pending
+  def self.find_registries_never_attempted_sync(batch_size:, except_ids: [])
+    never_attempted_sync
       .model_id_not_in(except_ids)
       .limit(batch_size)
   end
 
-  def self.find_failed_registries(batch_size:, except_ids: [])
-    retryable
+  def self.find_registries_needs_sync_again(batch_size:, except_ids: [])
+    needs_sync_again
       .model_id_not_in(except_ids)
       .limit(batch_size)
   end

@@ -10,12 +10,12 @@ class Geo::DesignRegistry < Geo::BaseRegistry
 
   belongs_to :project
 
-  scope :never, -> { with_state(:pending).where(last_synced_at: nil) }
-  scope :pending, -> { with_state(:pending) }
   scope :failed, -> { with_state(:failed) }
-  scope :synced, -> { with_state(:synced) }
+  scope :needs_sync_again, -> { failed.retry_due }
+  scope :never_attempted_sync, -> { with_state(:pending).where(last_synced_at: nil) }
+  scope :pending, -> { with_state(:pending) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
-  scope :retryable, -> { failed.retry_due }
+  scope :synced, -> { with_state(:synced) }
 
   state_machine :state, initial: :pending do
     state :started
@@ -61,15 +61,8 @@ class Geo::DesignRegistry < Geo::BaseRegistry
     [untracked_ids, unused_tracked_ids]
   end
 
-  def self.find_unsynced_registries(batch_size:, except_ids: [])
-    never
-      .model_id_not_in(except_ids)
-      .limit(batch_size)
-  end
-
-  def self.find_failed_registries(batch_size:, except_ids: [])
-    super
-      .order(Gitlab::Database.nulls_first_order(:last_synced_at))
+  def self.find_registries_needs_sync_again(batch_size:, except_ids: [])
+    super.order(Gitlab::Database.nulls_first_order(:last_synced_at))
   end
 
   # Search for a list of projects associated with registries,

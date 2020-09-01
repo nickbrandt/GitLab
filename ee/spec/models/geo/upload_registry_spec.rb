@@ -92,13 +92,13 @@ RSpec.describe Geo::UploadRegistry, :geo do
     end
   end
 
-  describe '.pending' do
+  describe '.never_attempted_sync' do
     it 'returns registries that are never synced' do
       create(:geo_upload_registry, :failed)
       create(:geo_upload_registry)
       pending = create(:geo_upload_registry, retry_count: nil, success: false)
 
-      expect(described_class.pending).to match_ids([pending])
+      expect(described_class.never_attempted_sync).to match_ids([pending])
     end
   end
 
@@ -109,8 +109,8 @@ RSpec.describe Geo::UploadRegistry, :geo do
       described_class.with_status('synced')
     end
 
-    it 'finds the registries with status "pending" when filter is set to "pending"' do
-      expect(described_class).to receive(:pending)
+    it 'finds the registries with status "never_attempted_sync" when filter is set to "pending"' do
+      expect(described_class).to receive(:never_attempted_sync)
 
       described_class.with_status('pending')
     end
