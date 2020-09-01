@@ -1,9 +1,12 @@
+import escapeStringRegexp from 'escape-string-regexp';
 import getFrontMatterLanguageDefinition from './parse_source_file_language_support';
 
-const parseSourceFile = (raw, options = { frontMatterLanguage: 'yaml' }) => {
-  const { open, close } = getFrontMatterLanguageDefinition(options.frontMatterLanguage);
+const parseSourceFile = raw => {
+  const { open, close } = getFrontMatterLanguageDefinition(raw);
   const anyChar = '[\\s\\S]';
-  const frontMatterBlock = `^${open}$${anyChar}*?^${close}$`;
+  const frontMatterBlock = `^${escapeStringRegexp(open)}$${anyChar}*?^${escapeStringRegexp(
+    close,
+  )}$`;
   const frontMatterRegex = new RegExp(`${frontMatterBlock}`, 'm');
   const preGroupedRegex = new RegExp(`(${anyChar}*?)(${frontMatterBlock})(\\s*)(${anyChar}*)`, 'm'); // preFrontMatter, frontMatter, spacing, and content
   let initial;
