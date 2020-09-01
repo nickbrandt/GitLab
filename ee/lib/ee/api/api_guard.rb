@@ -11,7 +11,7 @@ module EE
           deploy_token_from_request ||
             find_user_from_bearer_token ||
             find_user_from_job_token ||
-            find_user_from_warden
+            user_from_warden
         end
       end
     end
