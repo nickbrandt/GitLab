@@ -113,10 +113,10 @@ module Security
 
     def dismissal_feedback_by_fingerprint
       strong_memoize(:dismissal_feedback_by_fingerprint) do
-        pipeline.project.vulnerability_feedback
-          .with_associations
-          .where(feedback_type: 'dismissal') # rubocop:disable CodeReuse/ActiveRecord
-          .group_by(&:project_fingerprint)
+        pipeline.project
+                .vulnerability_feedback
+                .for_dismissal
+                .group_by(&:project_fingerprint)
       end
     end
 
