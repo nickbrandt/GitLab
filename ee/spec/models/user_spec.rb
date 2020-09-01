@@ -26,6 +26,7 @@ RSpec.describe User do
     it { is_expected.to have_many(:users_security_dashboard_projects) }
     it { is_expected.to have_many(:security_dashboard_projects) }
     it { is_expected.to have_many(:board_preferences) }
+    it { is_expected.to have_many(:boards_epic_user_preferences).class_name('Boards::EpicUserPreference') }
   end
 
   describe 'nested attributes' do

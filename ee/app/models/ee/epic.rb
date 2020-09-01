@@ -52,6 +52,7 @@ module EE
       has_many :epic_issues
       has_many :issues, through: :epic_issues
       has_many :user_mentions, class_name: "EpicUserMention", dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+      has_many :boards_epic_user_preferences, class_name: 'Boards::EpicUserPreference', inverse_of: :epic
 
       validates :group, presence: true
       validate :validate_parent, on: :create
