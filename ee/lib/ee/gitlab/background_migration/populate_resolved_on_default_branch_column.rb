@@ -87,29 +87,20 @@ module EE
 
           has_one :route, as: :source
           has_many :vulnerabilities
-          has_many :vulnerability_findings
-          has_many :vulnerability_identifiers
-          has_many :vulnerability_scanners
 
           def self.polymorphic_name
             'Project'
           end
 
-          def reports
-            return [] unless default_branch
+          def resolved_vulnerabilities
+            return Vulnerability.none unless latest_pipeline_id
 
-            @reports ||= artifacts.flat_map(&:reports)
+            vulnerabilities.not_found_in_pipeline_id(latest_pipeline_id)
           end
 
           private
 
           delegate :connection, to: :'self.class', private: true
-
-          def artifacts
-            return [] unless latest_pipeline_id
-
-            JobArtifact.for_pipeline(latest_pipeline_id).each { |artifact| artifact.project = self }
-          end
 
           def latest_pipeline_id
             strong_memoize(:latest_pipeline_id) { pipeline_with_reports&.fetch('id') }
@@ -204,140 +195,17 @@ module EE
           end
         end
 
-        class JobArtifact < ActiveRecord::Base
-          ARTIFACTS_SQL = <<~SQL
-            SELECT
-              "ci_job_artifacts".*
-            FROM "ci_job_artifacts"
-            INNER JOIN "ci_builds" ON "ci_job_artifacts"."job_id" = "ci_builds"."id"
-              AND "ci_builds"."commit_id" = %{commit_id}
-              AND "ci_builds"."type" = 'Ci::Build'
-              AND ("ci_builds"."retried" IS FALSE OR "ci_builds"."retried" IS NULL)
-            WHERE
-              "ci_job_artifacts"."file_type" IN (%{file_types})
-          SQL
-
-          FILE_FORMAT_ADAPTERS = {
-            gzip: ::Gitlab::Ci::Build::Artifacts::Adapters::GzipStream,
-            raw: ::Gitlab::Ci::Build::Artifacts::Adapters::RawStream
-          }.freeze
-
-          self.table_name = 'ci_job_artifacts'
-
-          enum file_format: {
-            raw: 1,
-            zip: 2,
-            gzip: 3
-          }, _suffix: true
-
-          enum file_location: {
-            legacy_path: 1,
-            hashed_path: 2
-          }
-
-          enum file_type: {
-            archive: 1,
-            metadata: 2,
-            trace: 3,
-            junit: 4,
-            sast: 5, ## EE-specific
-            dependency_scanning: 6, ## EE-specific
-            container_scanning: 7, ## EE-specific
-            dast: 8, ## EE-specific
-            codequality: 9, ## EE-specific
-            license_management: 10, ## EE-specific
-            license_scanning: 101, ## EE-specific till 13.0
-            performance: 11, ## EE-specific till 13.2
-            metrics: 12, ## EE-specific
-            metrics_referee: 13, ## runner referees
-            network_referee: 14, ## runner referees
-            lsif: 15, # LSIF data for code navigation
-            dotenv: 16,
-            cobertura: 17,
-            terraform: 18, # Transformed json
-            accessibility: 19,
-            cluster_applications: 20,
-            secret_detection: 21, ## EE-specific
-            requirements: 22, ## EE-specific
-            coverage_fuzzing: 23, ## EE-specific
-            browser_performance: 24, ## EE-specific
-            load_performance: 25 ## EE-specific
-          }
-
-          mount_uploader :file, JobArtifactUploader
-
-          attr_accessor :project
-          delegate :namespace, to: :project
-
-          def self.for_pipeline(pipeline_id)
-            find_by_sql(artifacts_sql_for(pipeline_id))
-          end
-
-          def self.artifacts_sql_for(pipeline_id)
-            format(ARTIFACTS_SQL, commit_id: pipeline_id, file_types: Project::FILE_TYPES.join(', '))
-          end
-
-          def reports
-            reports = []
-
-            each_blob do |blob|
-              report = ::Gitlab::Ci::Reports::Security::Report.new(file_type, nil, created_at)
-              parse_security_artifact_blob(report, blob)
-              reports << report
-            end
-
-            reports
-          end
-
-          def hashed_path?
-            super || file_location.nil?
-          end
-
-          private
-
-          def each_blob(&blk)
-            unless file_format_adapter_class
-              raise NotSupportedAdapterError, 'This file format requires a dedicated adapter'
-            end
-
-            file.open do |stream|
-              file_format_adapter_class.new(stream).each_blob(&blk)
-            end
-          end
-
-          def file_format_adapter_class
-            FILE_FORMAT_ADAPTERS[file_format.to_sym]
-          end
-
-          def parse_security_artifact_blob(security_report, blob)
-            report_clone = security_report.clone_as_blank
-            ::Gitlab::Ci::Parsers.fabricate!(security_report.type).parse!(blob, report_clone)
-            security_report.merge!(report_clone)
-          end
-        end
-
         class Route < ActiveRecord::Base; end
         class Vulnerability < ActiveRecord::Base
           include EachBatch
 
-          scope :id_not_in, -> (ids) { where.not(id: ids) }
-        end
-        class VulnerabilityFinding < ActiveRecord::Base
-          self.table_name = 'vulnerability_occurrences'
-
-          attribute(:project_fingerprint, ::Gitlab::Database::ShaAttribute.new)
-          attribute(:location_fingerprint, ::Gitlab::Database::ShaAttribute.new)
-
-          belongs_to :scanner, class_name: 'VulnerabilityScanner'
-          belongs_to :primary_identifier, class_name: 'VulnerabilityIdentifier'
-        end
-        class VulnerabilityScanner < ActiveRecord::Base
-          scope :by_external_id, -> (external_ids) { where(external_id: external_ids) }
-        end
-        class VulnerabilityIdentifier < ActiveRecord::Base
-          attribute(:fingerprint, ::Gitlab::Database::ShaAttribute.new)
-
-          scope :by_fingerprint, -> (fingerprints) { where(fingerprint: fingerprints) }
+          scope :not_found_in_pipeline_id, -> (pipeline_id) { where.not(id: found_in_pipeline(pipeline_id)) }
+          scope :found_in_pipeline, -> (pipeline_id) do
+            joins(<<~SQL)
+              INNER JOIN vulnerability_occurrences vo ON vo.vulnerability_id = vulnerabilities.id
+              INNER JOIN vulnerability_occurrence_pipelines vop ON vop.occurrence_id = vo.id AND vop.pipeline_id = #{pipeline_id}
+            SQL
+          end
         end
 
         # This class depends on following classes
@@ -410,11 +278,8 @@ module EE
 
           attr_accessor :project_id
 
-          delegate :reports, to: :project, private: true
-
           def update_vulnerabilities
-            @updated_count ||= project.vulnerabilities
-                                      .id_not_in(existing_vulnerability_ids)
+            @updated_count ||= project.resolved_vulnerabilities
                                       .update_all(resolved_on_default_branch: true)
           end
 
@@ -422,18 +287,9 @@ module EE
             ::Gitlab::BackgroundMigration::Logger.info(
               migrator: 'PopulateResolvedOnDefaultBranchColumnForProject',
               message: 'Project migrated',
-              stats: stats,
+              updated_count: @updated_count,
               project_id: project_id
             )
-          end
-
-          def stats
-            {
-              all_count: findings.length,
-              valid_count: all_valid_findings.length,
-              existing_count: existing_vulnerability_ids.length,
-              updated_count: @updated_count
-            }
           end
 
           def log_error(error)
@@ -446,52 +302,6 @@ module EE
 
           def project
             @project ||= Project.find(project_id)
-          end
-
-          def existing_vulnerability_ids
-            @existing_vulnerability_ids ||= all_valid_findings.map { |finding| find_saved_finding_for(finding)&.vulnerability_id }.compact
-          end
-
-          def all_valid_findings
-            @all_valid_findings ||= findings.select(&:scanner)
-                                           .select(&:primary_identifier)
-                                           .select(&:location)
-          end
-
-          def findings
-            @findings ||= reports.flat_map(&:findings)
-          end
-
-          def find_saved_finding_for(finding)
-            project.vulnerability_findings.find_by({
-              scanner: scanner_objects[finding.scanner.key],
-              primary_identifier: identifier_objects[finding.primary_identifier.key],
-              location_fingerprint: finding.location.fingerprint
-            })
-          end
-
-          def scanner_objects
-            @scanner_objects ||= project.vulnerability_scanners.by_external_id(all_scanner_external_ids).group_by(&:external_id)
-          end
-
-          def all_scanner_external_ids
-            all_scanners.map(&:external_id).uniq
-          end
-
-          def all_scanners
-            reports.map(&:scanners).flat_map(&:values)
-          end
-
-          def identifier_objects
-            @identifier_objects ||= project.vulnerability_identifiers.by_fingerprint(all_identifier_fingerprints).group_by(&:fingerprint)
-          end
-
-          def all_identifier_fingerprints
-            all_identifiers.map(&:fingerprint).uniq
-          end
-
-          def all_identifiers
-            reports.map(&:identifiers).flat_map(&:values)
           end
         end
       end

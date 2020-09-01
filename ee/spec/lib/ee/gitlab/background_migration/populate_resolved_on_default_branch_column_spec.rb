@@ -9,7 +9,9 @@ RSpec.describe ::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchCol
   let(:pipelines) { table(:ci_pipelines) }
   let(:vulnerabilities) { table(:vulnerabilities) }
   let(:findings) { table(:vulnerability_occurrences) }
+  let(:finding_pipelines) { table(:vulnerability_occurrence_pipelines) }
   let(:builds) { table(:ci_builds) }
+  let(:artifacts) { table(:ci_job_artifacts) }
   let(:scanners) { table(:vulnerability_scanners) }
   let(:vulnerability_identifiers) { table(:vulnerability_identifiers) }
 
@@ -60,8 +62,6 @@ RSpec.describe ::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchCol
       let(:pipeline) { pipelines.create!(project_id: project.id, ref: 'master', sha: 'adf43c3a', status: 'success') }
       let(:utility_object) { described_class.new(project.id) }
       let(:scanner) { scanners.create!(project_id: project.id, external_id: 'bandit', name: 'Bandit') }
-      let(:artifact_model) { EE::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchColumn::JobArtifact }
-      let(:artifact_fixture_path) { Rails.root.join('ee/spec/fixtures/security_reports/master/gl-sast-report.json') }
       let(:sha_attribute) { Gitlab::Database::ShaAttribute.new }
       let(:vulnerability_identifier) do
         vulnerability_identifiers.create!(
@@ -98,11 +98,9 @@ RSpec.describe ::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchCol
 
       before do
         build = builds.create!(commit_id: pipeline.id, retried: false, type: 'Ci::Build')
-        artifact = artifact_model.new(project_id: project.id, job_id: build.id, file_type: 5, file_format: 1)
-        artifact.file = fixture_file_upload(artifact_fixture_path, 'application/json')
-        artifact.save!
+        artifacts.create!(project_id: project.id, job_id: build.id, file_type: 5, file_format: 1)
 
-        findings.create!(
+        finding = findings.create!(
           project_id: project.id,
           vulnerability_id: existing_vulnerability.id,
           severity: 5,
@@ -116,6 +114,8 @@ RSpec.describe ::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchCol
           name: 'Solar blast vulnerability',
           metadata_version: '1',
           raw_metadata: '')
+
+        finding_pipelines.create!(occurrence_id: finding.id, pipeline_id: pipeline.id)
 
         allow(::Gitlab::CurrentSettings).to receive(:default_branch_name).and_return(:master)
       end
