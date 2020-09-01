@@ -102,8 +102,6 @@ RSpec.describe Gitlab::UsageData do
         operations_dashboard_users_with_projects_added
         pod_logs_usages_total
         projects_jenkins_active
-        projects_jira_dvcs_cloud_active
-        projects_jira_dvcs_server_active
         projects_jira_issuelist_active
         projects_mirrored_with_pipelines_enabled
         projects_reporting_ci_cd_back_to_github
@@ -431,27 +429,19 @@ RSpec.describe Gitlab::UsageData do
         create(:milestone_list, board: board, milestone: create(:milestone, project: project), user: user)
         create(:list, board: board, label: create(:label, project: project), user: user)
         create(:epic, author: user)
-        create(:jira_service, :jira_cloud_service, active: true, project: create(:project, :jira_dvcs_cloud, creator: user))
-        create(:jira_service, active: true, project: create(:project, :jira_dvcs_server, creator: user))
       end
 
       expect(described_class.usage_activity_by_stage_plan({})).to include(
         assignee_lists: 2,
         epics: 2,
         label_lists: 2,
-        milestone_lists: 2,
-        projects_jira_active: 2,
-        projects_jira_dvcs_cloud_active: 2,
-        projects_jira_dvcs_server_active: 2
+        milestone_lists: 2
       )
       expect(described_class.usage_activity_by_stage_plan(described_class.last_28_days_time_period)).to include(
         assignee_lists: 1,
         epics: 1,
         label_lists: 1,
-        milestone_lists: 1,
-        projects_jira_active: 1,
-        projects_jira_dvcs_cloud_active: 1,
-        projects_jira_dvcs_server_active: 1
+        milestone_lists: 1
       )
     end
   end

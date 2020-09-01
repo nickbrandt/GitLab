@@ -64,6 +64,24 @@ module API
         user_group.update!(push_rule: PushRule.create!(allowed_params))
         present user_group.push_rule, with: EE::API::Entities::GroupPushRule, user: current_user
       end
+
+      desc 'Edit push rule of a group' do
+        detail 'This feature was introduced in GitLab 13.4.'
+        success EE::API::Entities::GroupPushRule
+      end
+      params do
+        use :push_rule_params
+      end
+      put ":id/push_rule" do
+        push_rule = user_group.push_rule
+        not_found! unless push_rule
+
+        if push_rule.update(declared_params(include_missing: false))
+          present push_rule, with: EE::API::Entities::GroupPushRule, user: current_user
+        else
+          render_validation_error!(push_rule)
+        end
+      end
     end
   end
 end
