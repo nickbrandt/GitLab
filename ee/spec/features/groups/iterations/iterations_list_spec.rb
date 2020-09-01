@@ -23,24 +23,30 @@ RSpec.describe 'Iterations list', :js do
       end
 
       it 'shows iterations on each tab' do
-        expect(page).to have_link(started_iteration.title)
-        expect(page).to have_link(upcoming_iteration.title)
-        expect(page).not_to have_link(closed_iteration.title)
-        expect(page).not_to have_link(subgroup_iteration.title)
+        aggregate_failures do
+          expect(page).to have_link(started_iteration.title)
+          expect(page).to have_link(upcoming_iteration.title)
+          expect(page).not_to have_link(closed_iteration.title)
+          expect(page).not_to have_link(subgroup_iteration.title)
+        end
 
         click_link('Closed')
 
-        expect(page).to have_link(closed_iteration.title)
-        expect(page).not_to have_link(started_iteration.title)
-        expect(page).not_to have_link(upcoming_iteration.title)
-        expect(page).not_to have_link(subgroup_iteration.title)
+        aggregate_failures do
+          expect(page).to have_link(closed_iteration.title)
+          expect(page).not_to have_link(started_iteration.title)
+          expect(page).not_to have_link(upcoming_iteration.title)
+          expect(page).not_to have_link(subgroup_iteration.title)
+        end
 
         click_link('All')
 
-        expect(page).to have_link(started_iteration.title)
-        expect(page).to have_link(upcoming_iteration.title)
-        expect(page).to have_link(closed_iteration.title)
-        expect(page).not_to have_link(subgroup_iteration.title)
+        aggregate_failures do
+          expect(page).to have_link(started_iteration.title)
+          expect(page).to have_link(upcoming_iteration.title)
+          expect(page).to have_link(closed_iteration.title)
+          expect(page).not_to have_link(subgroup_iteration.title)
+        end
       end
 
       context 'when an iteration is clicked' do
@@ -60,24 +66,30 @@ RSpec.describe 'Iterations list', :js do
       end
 
       it 'shows iterations on each tab including ancestor iterations' do
-        expect(page).to have_link(started_iteration.title)
-        expect(page).to have_link(upcoming_iteration.title)
-        expect(page).not_to have_link(closed_iteration.title)
-        expect(page).to have_link(subgroup_iteration.title)
+        aggregate_failures do
+          expect(page).to have_link(started_iteration.title)
+          expect(page).to have_link(upcoming_iteration.title)
+          expect(page).not_to have_link(closed_iteration.title)
+          expect(page).to have_link(subgroup_iteration.title)
+        end
 
         click_link('Closed')
 
-        expect(page).to have_link(closed_iteration.title)
-        expect(page).not_to have_link(started_iteration.title)
-        expect(page).not_to have_link(upcoming_iteration.title)
-        expect(page).not_to have_link(subgroup_iteration.title)
+        aggregate_failures do
+          expect(page).to have_link(closed_iteration.title)
+          expect(page).not_to have_link(started_iteration.title)
+          expect(page).not_to have_link(upcoming_iteration.title)
+          expect(page).not_to have_link(subgroup_iteration.title)
+        end
 
         click_link('All')
 
-        expect(page).to have_link(started_iteration.title)
-        expect(page).to have_link(upcoming_iteration.title)
-        expect(page).to have_link(closed_iteration.title)
-        expect(page).to have_link(subgroup_iteration.title)
+        aggregate_failures do
+          expect(page).to have_link(started_iteration.title)
+          expect(page).to have_link(upcoming_iteration.title)
+          expect(page).to have_link(closed_iteration.title)
+          expect(page).to have_link(subgroup_iteration.title)
+        end
       end
     end
   end
