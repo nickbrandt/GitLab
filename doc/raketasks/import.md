@@ -18,10 +18,10 @@ Note that:
 To import bare repositories into a GitLab instance:
 
 1. Create a new folder to import your Git repositories from.
-   If the final projects should reside in a (sub)group's namespace,
-   instead of the admin's, create them as subfolders.
-   The new folder(s) needs to have Git user
-   ownership and read/write/execute access for Git user and its group:
+   You can also import projects into a (sub)group's namespace,
+   instead of the administrator's namespace. To do so, create subfolders and
+   give ownership and read/write/execute permissions of those subfolders to the
+   `git` user and its group:
 
    ```shell
    sudo -u git mkdir -p /var/opt/gitlab/git-data/repository-import-$(date "+%Y-%m-%d")/<optional_groupname>/<optional_subgroup>
