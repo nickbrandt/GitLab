@@ -7021,6 +7021,9 @@ msgstr ""
 msgid "Could not create group"
 msgstr ""
 
+msgid "Could not create issue"
+msgstr ""
+
 msgid "Could not create project"
 msgstr ""
 
@@ -21867,6 +21870,9 @@ msgstr ""
 msgid "SecurityReports|Either you don't have permission to view this dashboard or the dashboard has not been setup. Please check your permission settings with your administrator or check your dashboard configurations to proceed."
 msgstr ""
 
+msgid "SecurityReports|Ensure that %{trackingStart}issue tracking%{trackingEnd} is enabled for this project and you have %{permissionsStart}permission to create new issues%{permissionsEnd}."
+msgstr ""
+
 msgid "SecurityReports|Error fetching the vulnerability counts. Please check your network connection and try again."
 msgstr ""
 
@@ -27545,9 +27551,6 @@ msgid "VulnerabilityManagement|Something went wrong while trying to save the com
 msgstr ""
 
 msgid "VulnerabilityManagement|Something went wrong while trying to unlink the issue. Please try again later."
-msgstr ""
-
-msgid "VulnerabilityManagement|Something went wrong, could not create an issue."
 msgstr ""
 
 msgid "VulnerabilityManagement|Something went wrong, could not get user."
