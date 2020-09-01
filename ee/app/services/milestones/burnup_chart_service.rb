@@ -17,7 +17,7 @@ class Milestones::BurnupChartService
   end
 
   def execute
-    return ServiceResponse.error(message: _('Milestone does not support burnup charts')) unless milestone.supports_burnup_charts?
+    return ServiceResponse.error(message: _('Milestone does not support burnup charts')) unless milestone.supports_milestone_charts?
     return ServiceResponse.error(message: _('Milestone must have a start and due date')) if milestone.start_date.blank? || milestone.due_date.blank?
     return ServiceResponse.error(message: _('Burnup chart could not be generated due to too many events')) if resource_events.num_tuples > EVENT_COUNT_LIMIT
 

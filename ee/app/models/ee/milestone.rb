@@ -14,13 +14,7 @@ module EE
       resource_parent&.feature_available?(:issue_weights)
     end
 
-    def supports_burndown_charts?
-      feature_name = group_milestone? ? :group_burndown_charts : :burndown_charts
-
-      resource_parent&.feature_available?(feature_name) && supports_weight?
-    end
-
-    def supports_burnup_charts?
+    def supports_milestone_charts?
       resource_parent&.feature_available?(:milestone_charts) && supports_weight?
     end
 
