@@ -25,7 +25,6 @@ RSpec.describe GitlabSchema.types['Project'] do
 
   describe 'sast_ci_configuration' do
     include_context 'read ci configuration for sast enabled project'
-    let(:error_message) { "This is an error for YamlProcessor." }
 
     let_it_be(:query) do
       %(
@@ -109,14 +108,6 @@ RSpec.describe GitlabSchema.types['Project'] do
       expect(analyzer['name']).to eq('brakeman')
       expect(analyzer['label']).to eq('Brakeman')
       expect(analyzer['enabled']).to eq(true)
-    end
-
-    it 'returns an error if there is an exception in YamlProcessor' do
-      allow_next_instance_of(::Security::CiConfiguration::SastParserService) do |service|
-        allow(service).to receive(:configuration).and_raise(::Gitlab::Ci::YamlProcessor::ValidationError.new(error_message))
-      end
-
-      expect(subject["errors"].first["message"]).to eql(error_message)
     end
   end
 

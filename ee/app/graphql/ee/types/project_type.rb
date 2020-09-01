@@ -89,8 +89,6 @@ module EE
 
         def self.sast_ci_configuration(project)
           ::Security::CiConfiguration::SastParserService.new(project).configuration
-        rescue ::Gitlab::Ci::YamlProcessor::ValidationError => ex
-          raise ::GraphQL::ExecutionError, ex.message
         end
       end
     end
