@@ -1,5 +1,19 @@
 # Changelog for gitlab-workhorse
 
+## v8.44.0
+
+### Fixed
+- Fix objectstore.uploader.uploadError race
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/583
+- Silence errors when Azure objects have aleady been deleted
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/585
+- Fix race condition in httprs test
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/584
+
+### Performance
+- Remove an in-memory buffer for LSIF transformation
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/586
+
 ## v8.43.0
 
 ### Changed

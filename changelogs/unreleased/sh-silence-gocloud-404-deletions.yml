@@ -1,5 +1,0 @@
----
-title: Silence errors when Azure objects have aleady been deleted
-merge_request: 585
-author:
-type: fixed

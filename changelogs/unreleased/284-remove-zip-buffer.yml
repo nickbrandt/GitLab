@@ -1,5 +1,0 @@
----
-title: Remove an in-memory buffer for LSIF transformation
-merge_request: 586
-author:
-type: performance
