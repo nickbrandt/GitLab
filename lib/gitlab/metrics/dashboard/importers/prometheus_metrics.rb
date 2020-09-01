@@ -37,7 +37,7 @@ module Gitlab
           # rubocop: disable CodeReuse/ActiveRecord
           def create_or_update_metrics
             # TODO: use upsert and worker for callbacks?
-            prometheus_metrics_attributes&.each do |attributes|
+            prometheus_metrics_attributes.each do |attributes|
               prometheus_metric = PrometheusMetric.find_or_initialize_by(attributes.slice(:identifier, :project))
               prometheus_metric.update!(attributes.slice(*ALLOWED_ATTRIBUTES))
             end
