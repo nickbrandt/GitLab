@@ -44,6 +44,7 @@ export default {
         ref="saveButton"
         variant="success"
         :disabled="isSaveButtonDisabled"
+        :loading="isSaving"
         @click="$emit('onSave', sanitizedComment)"
       >
         {{ __('Save comment') }}
