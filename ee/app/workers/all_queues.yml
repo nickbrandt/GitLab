@@ -483,22 +483,6 @@
   :weight: 1
   :idempotent:
   :tags: []
-- :name: jira_connect:jira_connect_sync_branch
-  :feature_category: :integrations
-  :has_external_dependencies:
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 1
-  :idempotent:
-  :tags: []
-- :name: jira_connect:jira_connect_sync_merge_request
-  :feature_category: :integrations
-  :has_external_dependencies:
-  :urgency: :low
-  :resource_boundary: :unknown
-  :weight: 1
-  :idempotent:
-  :tags: []
 - :name: personal_access_tokens:personal_access_tokens_groups_policy
   :feature_category: :authentication_and_authorization
   :has_external_dependencies:

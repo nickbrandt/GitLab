@@ -10,7 +10,6 @@ RSpec.describe API::V3::Github do
 
   before do
     project.add_maintainer(user)
-    stub_licensed_features(jira_dev_panel_integration: true)
   end
 
   describe 'GET /orgs/:namespace/repos' do
@@ -123,7 +122,7 @@ RSpec.describe API::V3::Github do
           jira_get v3_api("/users/#{user.username}", user)
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(response).to match_response_schema('entities/github/user', dir: 'ee')
+          expect(response).to match_response_schema('entities/github/user')
         end
       end
 
@@ -220,7 +219,7 @@ RSpec.describe API::V3::Github do
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an(Array)
         expect(json_response.size).to eq(2)
-        expect(response).to match_response_schema('entities/github/pull_requests', dir: 'ee')
+        expect(response).to match_response_schema('entities/github/pull_requests')
       end
     end
 
@@ -231,7 +230,7 @@ RSpec.describe API::V3::Github do
         expect(response).to have_gitlab_http_status(:ok)
         expect(json_response).to be_an(Array)
         expect(json_response.size).to eq(1)
-        expect(response).to match_response_schema('entities/github/pull_requests', dir: 'ee')
+        expect(response).to match_response_schema('entities/github/pull_requests')
       end
     end
 
@@ -241,7 +240,7 @@ RSpec.describe API::V3::Github do
           jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", user)
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+          expect(response).to match_response_schema('entities/github/pull_request')
         end
       end
 
@@ -260,7 +259,7 @@ RSpec.describe API::V3::Github do
           jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls/#{merge_request.id}", admin)
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(response).to match_response_schema('entities/github/pull_request', dir: 'ee')
+          expect(response).to match_response_schema('entities/github/pull_request')
         end
       end
     end
@@ -274,7 +273,7 @@ RSpec.describe API::V3::Github do
 
       expect(response).to have_gitlab_http_status(:ok)
       expect(response).to include_pagination_headers
-      expect(response).to match_response_schema('entities/github/repositories', dir: 'ee')
+      expect(response).to match_response_schema('entities/github/repositories')
 
       projects.each do |project|
         hash = json_response.find do |hash|
@@ -327,36 +326,16 @@ RSpec.describe API::V3::Github do
         expect_project_under_namespace([parent_group_project, child_group_project], group.parent, user)
       end
 
-      context 'when namespace license checks are enabled' do
-        before do
-          enable_namespace_license_check!
-        end
+      it 'avoids N+1 queries' do
+        jira_get v3_api("/users/#{group.parent.path}/repos", user)
 
-        context 'when the root group does not have the correct license' do
-          it 'returns not found' do
-            jira_get v3_api("/users/#{group.parent.path}/repos", user)
+        control = ActiveRecord::QueryRecorder.new { jira_get v3_api("/users/#{group.parent.path}/repos", user) }
 
-            expect(response).to have_gitlab_http_status(:not_found)
-          end
-        end
+        new_group = create(:group, parent: group.parent)
+        create(:project, :repository, group: new_group, creator: user)
 
-        context 'when the root group has the correct license' do
-          before do
-            create(:gitlab_subscription, :gold, namespace: group.parent)
-          end
-
-          it 'avoids N+1 queries' do
-            jira_get v3_api("/users/#{group.parent.path}/repos", user)
-
-            control = ActiveRecord::QueryRecorder.new { jira_get v3_api("/users/#{group.parent.path}/repos", user) }
-
-            new_group = create(:group, parent: group.parent)
-            create(:project, :repository, group: new_group, creator: user)
-
-            expect { jira_get v3_api("/users/#{group.parent.path}/repos", user) }.not_to exceed_query_limit(control)
-            expect(response).to have_gitlab_http_status(:ok)
-          end
-        end
+        expect { jira_get v3_api("/users/#{group.parent.path}/repos", user) }.not_to exceed_query_limit(control)
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
@@ -387,18 +366,6 @@ RSpec.describe API::V3::Github do
 
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
-    end
-
-    it 'filters unlicensed namespace projects' do
-      licensed_project = create(:project, :empty_repo, group: group)
-      licensed_project.add_reporter(user)
-
-      create(:gitlab_subscription, :silver, namespace: licensed_project.namespace)
-
-      stub_application_setting_on_object(project, should_check_namespace_plan: true)
-      stub_application_setting_on_object(licensed_project, should_check_namespace_plan: true)
-
-      expect_project_under_namespace([licensed_project], group, user)
     end
 
     context 'namespace does not exist' do
@@ -441,7 +408,7 @@ RSpec.describe API::V3::Github do
         expect(response).to include_pagination_headers
         expect(json_response).to be_an(Array)
 
-        expect(response).to match_response_schema('entities/github/branches', dir: 'ee')
+        expect(response).to match_response_schema('entities/github/branches')
       end
 
       it 'returns 200 when project path include a dot' do
@@ -479,15 +446,6 @@ RSpec.describe API::V3::Github do
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
-
-      it 'returns 404 when not licensed' do
-        stub_licensed_features(jira_dev_panel_integration: false)
-        project.add_reporter(unauthorized_user)
-
-        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", unauthorized_user)
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
     end
   end
 
@@ -500,7 +458,7 @@ RSpec.describe API::V3::Github do
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('entities/github/commit', dir: 'ee')
+        expect(response).to match_response_schema('entities/github/commit')
       end
 
       it 'returns 200 when project path include a dot' do
@@ -533,16 +491,6 @@ RSpec.describe API::V3::Github do
     context 'unauthorized' do
       it 'returns 404 when lower access level' do
         project.add_guest(unauthorized_user)
-
-        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
-                   unauthorized_user)
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-
-      it 'returns 404 when not licensed' do
-        stub_licensed_features(jira_dev_panel_integration: false)
-        project.add_reporter(unauthorized_user)
 
         jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
                    unauthorized_user)

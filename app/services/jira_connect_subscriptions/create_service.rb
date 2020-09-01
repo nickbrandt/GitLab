@@ -9,8 +9,6 @@ module JiraConnectSubscriptions
         return error('Invalid namespace. Please make sure you have sufficient permissions', 401)
       end
 
-      return error('This feature is not available', 422) unless namespace.feature_available?(:jira_dev_panel_integration)
-
       create_subscription
     end
 

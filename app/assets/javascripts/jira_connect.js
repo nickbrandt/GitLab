@@ -4,7 +4,7 @@
 
 /**
  * This script is not going through Webpack bundling
- * as it is only included in `ee/app/views/jira_connect/subscriptions/index.html.haml`
+ * as it is only included in `app/views/jira_connect/subscriptions/index.html.haml`
  * which is going to be rendered within iframe on Jira app dashboard
  * hence any code written here needs to be IE11+ compatible (no fully ES6)
  */

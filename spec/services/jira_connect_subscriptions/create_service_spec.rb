@@ -24,11 +24,7 @@ RSpec.describe JiraConnectSubscriptions::CreateService do
     end
   end
 
-  context 'when jira_dev_panel_integration is available' do
-    before do
-      stub_licensed_features(jira_dev_panel_integration: true)
-    end
-
+  context 'when user does have access' do
     it 'creates a subscription' do
       expect { subject }.to change { installation.subscriptions.count }.from(0).to(1)
     end
@@ -36,24 +32,16 @@ RSpec.describe JiraConnectSubscriptions::CreateService do
     it 'returns success' do
       expect(subject[:status]).to eq(:success)
     end
-
-    context 'when path is invalid' do
-      let(:path) { 'some_invalid_namespace_path' }
-
-      it_behaves_like 'a failed execution'
-    end
-
-    context 'when user does not have access' do
-      subject { described_class.new(installation, create(:user), namespace_path: path).execute }
-
-      it_behaves_like 'a failed execution'
-    end
   end
 
-  context 'when jira_dev_panel_integration is not available' do
-    before do
-      stub_licensed_features(jira_dev_panel_integration: false)
-    end
+  context 'when path is invalid' do
+    let(:path) { 'some_invalid_namespace_path' }
+
+    it_behaves_like 'a failed execution'
+  end
+
+  context 'when user does not have access' do
+    subject { described_class.new(installation, create(:user), namespace_path: path).execute }
 
     it_behaves_like 'a failed execution'
   end

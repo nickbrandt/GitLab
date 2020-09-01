@@ -17,5 +17,5 @@ RSpec.describe Atlassian::JiraConnect::Serializers::RepositoryEntity do
     ).to_json
   end
 
-  it { is_expected.to match_schema('jira_connect/repository', dir: 'ee') }
+  it { is_expected.to match_schema('jira_connect/repository') }
 end

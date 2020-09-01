@@ -8,7 +8,6 @@
 module API
   module V3
     class Github < Grape::API::Instance
-      JIRA_DEV_PANEL_FEATURE = :jira_dev_panel_integration.freeze
       NO_SLASH_URL_PART_REGEX = %r{[^/]+}.freeze
       ENDPOINT_REQUIREMENTS = {
         namespace: NO_SLASH_URL_PART_REGEX,
@@ -54,15 +53,14 @@ module API
           project = find_project!(
             ::Gitlab::Jira::Dvcs.restore_full_path(params.slice(:namespace, :project).symbolize_keys)
           )
-          not_found! unless licensed?(project) && can?(current_user, :download_code, project)
+          not_found! unless can?(current_user, :download_code, project)
           project
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
         def find_merge_requests
-          merge_requests = authorized_merge_requests.reorder(updated_at: :desc).preload(:target_project)
-          merge_requests = paginate(merge_requests)
-          merge_requests.select { |mr| licensed?(mr.target_project) }
+          merge_requests = authorized_merge_requests.reorder(updated_at: :desc)
+          paginate(merge_requests)
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
@@ -90,10 +88,6 @@ module API
           notes.select { |n| n.readable_by?(current_user) }
         end
         # rubocop: enable CodeReuse/ActiveRecord
-
-        def licensed?(routable)
-          routable.feature_available?(JIRA_DEV_PANEL_FEATURE)
-        end
       end
 
       resource :orgs do
@@ -115,7 +109,7 @@ module API
 
         get ':namespace/repos' do
           namespace = Namespace.find_by_full_path(params[:namespace])
-          not_found!('Namespace') unless namespace && licensed?(namespace)
+          not_found!('Namespace') unless namespace
 
           projects = current_user.can_read_all_resources? ? Project.all : current_user.authorized_projects
           projects = projects.in_namespace(namespace.self_and_descendants)

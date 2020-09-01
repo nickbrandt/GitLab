@@ -114,7 +114,6 @@ module EE
       end
 
       rule { maintainer }.policy do
-        enable :create_jira_connect_subscription
         enable :maintainer_access
         enable :admin_wiki
       end

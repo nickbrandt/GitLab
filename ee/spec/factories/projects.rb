@@ -23,18 +23,6 @@ FactoryBot.modify do
       last_repository_updated_at { rand(1.year).seconds.ago }
     end
 
-    trait :jira_dvcs_cloud do
-      before(:create) do |project|
-        create(:project_feature_usage, :dvcs_cloud, project: project)
-      end
-    end
-
-    trait :jira_dvcs_server do
-      before(:create) do |project|
-        create(:project_feature_usage, :dvcs_server, project: project)
-      end
-    end
-
     trait :github_imported do
       import_type { 'github' }
     end
