@@ -612,6 +612,46 @@ RSpec.describe Ci::Build do
     end
   end
 
+  describe '#locked_artifacts?' do
+    subject(:locked_artifacts) { build.locked_artifacts? }
+
+    context 'when pipeline is artifacts_locked' do
+      before do
+        build.pipeline.artifacts_locked!
+      end
+
+      context 'artifacts archive does not exist' do
+        let(:build) { create(:ci_build) }
+
+        it { is_expected.to be_falsy }
+      end
+
+      context 'artifacts archive exists' do
+        let(:build) { create(:ci_build, :artifacts) }
+
+        it { is_expected.to be_truthy }
+      end
+    end
+
+    context 'when pipeline is unlocked' do
+      before do
+        build.pipeline.unlocked!
+      end
+
+      context 'artifacts archive does not exist' do
+        let(:build) { create(:ci_build) }
+
+        it { is_expected.to be_falsy }
+      end
+
+      context 'artifacts archive exists' do
+        let(:build) { create(:ci_build, :artifacts) }
+
+        it { is_expected.to be_falsy }
+      end
+    end
+  end
+
   describe '#available_artifacts?' do
     let(:build) { create(:ci_build) }
 
