@@ -69,6 +69,12 @@ RSpec.describe 'Query.project(fullPath).dastScannerProfiles' do
       it { is_expected.to eq(dast_scanner_profile.to_global_id.to_s) }
     end
 
+    describe 'first dast scanner profile globalId' do
+      subject { response_data.dig('project', 'dastScannerProfiles', 'nodes').first['globalId'] }
+
+      it { is_expected.to eq(dast_scanner_profile.to_global_id.to_s) }
+    end
+
     context 'when on demand scan feature flag is disabled' do
       before do
         stub_feature_flags(security_on_demand_scans_feature_flag: false)
