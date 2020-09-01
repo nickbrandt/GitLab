@@ -16,7 +16,8 @@ RSpec.describe Epic do
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to have_many(:epic_issues) }
     it { is_expected.to have_many(:children) }
-    it { is_expected.to have_many(:user_mentions).class_name("EpicUserMention") }
+    it { is_expected.to have_many(:user_mentions).class_name('EpicUserMention') }
+    it { is_expected.to have_many(:boards_epic_user_preferences).class_name('Boards::EpicUserPreference') }
   end
 
   describe 'scopes' do
