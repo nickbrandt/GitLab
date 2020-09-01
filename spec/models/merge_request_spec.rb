@@ -4114,8 +4114,8 @@ RSpec.describe MergeRequest, factory_default: :keep do
   end
 
   describe '#head_pipeline_builds_with_coverage' do
-    it do
-      is_expected
+    it 'delegates to head_pipeline' do
+      expect(subject)
         .to delegate_method(:builds_with_coverage)
         .to(:head_pipeline)
         .with_prefix

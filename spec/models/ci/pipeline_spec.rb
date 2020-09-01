@@ -3442,14 +3442,15 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
   end
 
   describe "#builds_with_coverage" do
-    let!(:rspec) { create(:ci_build, name: 'rspec', coverage: 97.1, pipeline: pipeline) }
-    let!(:jest) { create(:ci_build, name: 'jest', coverage: 94.1, pipeline: pipeline) }
-    let!(:karma) { create(:ci_build, name: 'karma', coverage: nil, pipeline: pipeline) }
-
-    subject(:builds) { pipeline.builds_with_coverage }
-
     it 'returns builds with coverage only' do
-      expect(builds).to match_array([rspec, jest])
+      rspec = create(:ci_build, name: 'rspec', coverage: 97.1, pipeline: pipeline)
+      jest  = create(:ci_build, name: 'jest', coverage: 94.1, pipeline: pipeline)
+      karma = create(:ci_build, name: 'karma', coverage: nil, pipeline: pipeline)
+
+      builds = pipeline.builds_with_coverage
+
+      expect(builds).to include(rspec, jest)
+      expect(builds).not_to include(karma)
     end
   end
 end
