@@ -60,13 +60,17 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
   describe 'usage_activity_by_stage_package' do
     it 'includes accurate usage_activity_by_stage data' do
       for_defined_days_back do
-        create(:project, packages: [create(:package)] )
+        user = create(:user)
+        create(:project, creator: user, packages: [create(:package, creator_id: user.id)])
       end
 
       expect(described_class.usage_activity_by_stage_package({})).to eq(
+        packages: 2,
         projects_with_packages: 2
       )
+
       expect(described_class.usage_activity_by_stage_package(described_class.last_28_days_time_period)).to eq(
+        packages: 1,
         projects_with_packages: 1
       )
     end

@@ -98,10 +98,10 @@ FactoryBot.define do
       create(:grafana_integration, project: projects[1], enabled: true)
       create(:grafana_integration, project: projects[2], enabled: false)
 
-      create(:package, project: projects[0])
-      create(:package, project: projects[0])
-      create(:package, project: projects[1])
-      create(:package, created_at: 2.months.ago, project: projects[1])
+      create(:package, project: projects[0], creator_id: projects[0].creator_id)
+      create(:package, project: projects[0], creator_id: projects[0].creator_id)
+      create(:package, project: projects[1], creator_id: projects[1].creator_id)
+      create(:package, created_at: 2.months.ago, project: projects[1], creator_id: projects[1].creator_id)
 
       ProjectFeature.first.update_attribute('repository_access_level', 0)
 
