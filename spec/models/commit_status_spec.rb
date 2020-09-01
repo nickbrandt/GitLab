@@ -494,6 +494,10 @@ RSpec.describe CommitStatus do
   end
 
   describe '#group_name' do
+    let(:commit_status) do
+      build(:commit_status, pipeline: pipeline, stage: 'test')
+    end
+
     subject { commit_status.group_name }
 
     tests = {
