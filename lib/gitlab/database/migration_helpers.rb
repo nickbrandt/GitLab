@@ -1234,7 +1234,7 @@ into similar problems in the future (e.g. when new tables are created).
           This query will grant the user superuser permissions, ensuring any database extensions
           can be installed through migrations.
 
-          For more information please refer to doc/install/postgresql_extensions.md.
+          For more information, refer to https://docs.gitlab.com/ee/install/postgresql_extensions.html.
         MSG
 
         raise
@@ -1263,7 +1263,7 @@ into similar problems in the future (e.g. when new tables are created).
           This query will grant the user superuser permissions, ensuring any database extensions
           can be dropped through migrations.
 
-          For more information please refer to doc/install/postgresql_extensions.md.
+          For more information, refer to https://docs.gitlab.com/ee/install/postgresql_extensions.html.
         MSG
 
         raise
