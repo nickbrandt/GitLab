@@ -73,20 +73,19 @@ describe('History Comment Editor', () => {
     expect(wrapper.emitted().onCancel).toHaveLength(1);
   });
 
-  it('disables the save button when there is no text or only whitespace in the textarea', () => {
+  it('disables the save button when there is no text or only whitespace in the textarea', async () => {
     createWrapper({ initialComment: 'some comment' });
     textarea().vm.$emit('input', '    ');
+    await wrapper.vm.$nextTick();
 
-    return wrapper.vm.$nextTick().then(() => {
-      expect(saveButton().attributes('disabled')).toBeTruthy();
-    });
+    expect(saveButton().props('disabled')).toBe(true);
   });
 
-  it('disables all elements when the isSaving prop is true', () => {
+  it('disables all elements when the comment is being saved', () => {
     createWrapper({ isSaving: true });
 
     expect(textarea().attributes('disabled')).toBeTruthy();
-    expect(saveButton().attributes('disabled')).toBeTruthy();
-    expect(cancelButton().attributes('disabled')).toBeTruthy();
+    expect(saveButton().props('loading')).toBe(true);
+    expect(cancelButton().props('disabled')).toBe(true);
   });
 });

@@ -13,6 +13,8 @@ function createMainApp() {
       createIssueUrl: vulnerability.create_issue_url,
       projectFingerprint: vulnerability.project_fingerprint,
       vulnerabilityId: vulnerability.id,
+      issueTrackingHelpPath: vulnerability.issueTrackingHelpPath,
+      permissionsHelpPath: vulnerability.permissionsHelpPath,
     },
 
     render: h =>
