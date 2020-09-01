@@ -29,6 +29,7 @@ module Ci
       junit: 'junit.xml',
       accessibility: 'gl-accessibility.json',
       codequality: 'gl-code-quality-report.json',
+      security: 'gl-security-report.json',
       sast: 'gl-sast-report.json',
       secret_detection: 'gl-secret-detection-report.json',
       dependency_scanning: 'gl-dependency-scanning-report.json',
@@ -70,6 +71,7 @@ module Ci
       # When they will be only used by backend, they can be `gzipped`.
       accessibility: :raw,
       codequality: :raw,
+      security: :raw,
       sast: :raw,
       secret_detection: :raw,
       dependency_scanning: :raw,
@@ -103,6 +105,7 @@ module Ci
       browser_performance
       load_performance
       sast
+      security
       secret_detection
       requirements
     ].freeze
@@ -195,7 +198,8 @@ module Ci
       requirements: 22, ## EE-specific
       coverage_fuzzing: 23, ## EE-specific
       browser_performance: 24, ## EE-specific
-      load_performance: 25 ## EE-specific
+      load_performance: 25, ## EE-specific
+      security: 26 ## EE-specific
     }
 
     # `file_location` indicates where actual files are stored.

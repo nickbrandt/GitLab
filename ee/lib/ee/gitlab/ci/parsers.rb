@@ -18,7 +18,8 @@ module EE
                 coverage_fuzzing: ::Gitlab::Ci::Parsers::Security::CoverageFuzzing,
                 secret_detection: ::Gitlab::Ci::Parsers::Security::SecretDetection,
                 metrics: ::Gitlab::Ci::Parsers::Metrics::Generic,
-                requirements: ::Gitlab::Ci::Parsers::RequirementsManagement::Requirement
+                requirements: ::Gitlab::Ci::Parsers::RequirementsManagement::Requirement,
+                security: ::Gitlab::Ci::Parsers::Security::Security
             })
           end
         end

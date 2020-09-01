@@ -11,7 +11,7 @@ module EE
     prepended do
       after_destroy :log_geo_deleted_event
 
-      SECURITY_REPORT_FILE_TYPES = %w[sast secret_detection dependency_scanning container_scanning dast coverage_fuzzing].freeze
+      SECURITY_REPORT_FILE_TYPES = %w[security sast secret_detection dependency_scanning container_scanning dast coverage_fuzzing].freeze
       LICENSE_SCANNING_REPORT_FILE_TYPES = %w[license_management license_scanning].freeze
       DEPENDENCY_LIST_REPORT_FILE_TYPES = %w[dependency_scanning].freeze
       METRICS_REPORT_FILE_TYPES = %w[metrics].freeze

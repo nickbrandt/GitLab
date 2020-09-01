@@ -39,6 +39,7 @@ module EE
         # to access the file types for given reports
         REPORT_LICENSED_FEATURES = {
           codequality: nil,
+          security: %i[sast],
           sast: %i[sast],
           secret_detection: %i[secret_detection],
           dependency_scanning: %i[dependency_scanning],
@@ -92,7 +93,9 @@ module EE
       end
 
       def batch_lookup_report_artifact_for_file_type(file_type)
+        puts ">> 111"
         return unless available_licensed_report_type?(file_type)
+        puts ">> 111.1"
 
         super
       end

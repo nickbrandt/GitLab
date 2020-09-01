@@ -39,6 +39,10 @@ module Gitlab
             @project_fingerprint = generate_project_fingerprint
           end
 
+          def details
+            @raw_metadata['details']
+          end
+
           def to_hash
             %i[
               compare_key
@@ -53,6 +57,7 @@ module Gitlab
               scanner
               severity
               uuid
+              details
             ].each_with_object({}) do |key, hash|
               hash[key] = public_send(key) # rubocop:disable GitlabSecurity/PublicSend
             end
