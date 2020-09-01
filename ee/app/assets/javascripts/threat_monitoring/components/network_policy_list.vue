@@ -235,7 +235,13 @@ export default {
         <div v-if="hasSelectedPolicy">
           <h5>{{ s__('NetworkPolicies|Policy definition') }}</h5>
           <p>{{ s__("NetworkPolicies|Define this policy's location, conditions and actions.") }}</p>
-          <network-policy-editor ref="policyEditor" v-model="selectedPolicy.manifest" />
+          <div class="gl-p-3 gl-bg-gray-50">
+            <network-policy-editor
+              ref="policyEditor"
+              v-model="selectedPolicy.manifest"
+              class="network-policy-editor"
+            />
+          </div>
 
           <h5 class="mt-4">{{ s__('NetworkPolicies|Enforcement status') }}</h5>
           <p>{{ s__('NetworkPolicies|Choose whether to enforce this policy.') }}</p>

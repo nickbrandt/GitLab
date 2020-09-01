@@ -12,17 +12,21 @@ exports[`PolicyEditorApp component given .yaml editor mode is enabled renders ya
       class="gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100"
     >
       <h5
-        class="gl-m-0 gl-p-3 gl-bg-gray-10 gl-border-b-gray-100"
+        class="gl-m-0 gl-p-4 gl-bg-gray-10 gl-border-1 gl-border-b-solid gl-border-b-gray-100"
       >
         
           YAML editor
         
       </h5>
        
-      <network-policy-editor-stub
-        id="yamlEditor"
-        value=""
-      />
+      <div
+        class="gl-p-4"
+      >
+        <network-policy-editor-stub
+          height="400"
+          value=""
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -131,6 +135,7 @@ exports[`PolicyEditorApp component renders the policy editor layout 1`] = `
       >
         <gl-segmented-control-stub
           checked="rule"
+          data-testid="editor-mode"
           options="[object Object],[object Object]"
         />
       </gl-form-group-stub>
@@ -146,6 +151,8 @@ exports[`PolicyEditorApp component renders the policy editor layout 1`] = `
     <div
       class="col-sm-12 col-md-6 col-lg-7 col-xl-8"
     >
+      <!---->
+       
       <h4>
         Rules
       </h4>

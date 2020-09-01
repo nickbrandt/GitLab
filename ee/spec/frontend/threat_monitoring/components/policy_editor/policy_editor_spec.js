@@ -2,12 +2,16 @@ import { shallowMount } from '@vue/test-utils';
 import PolicyEditorApp from 'ee/threat_monitoring/components/policy_editor/policy_editor.vue';
 import PolicyPreview from 'ee/threat_monitoring/components/policy_editor/policy_preview.vue';
 import PolicyRuleBuilder from 'ee/threat_monitoring/components/policy_editor/policy_rule_builder.vue';
+import NetworkPolicyEditor from 'ee/threat_monitoring/components/network_policy_editor.vue';
 import createStore from 'ee/threat_monitoring/store';
 import {
   RuleDirectionInbound,
   PortMatchModeAny,
   RuleTypeEndpoint,
+  EditorModeYAML,
+  EndpointMatchModeLabel,
 } from 'ee/threat_monitoring/components/policy_editor/constants';
+import fromYaml from 'ee/threat_monitoring/components/policy_editor/lib/from_yaml';
 
 describe('PolicyEditorApp component', () => {
   let store;
@@ -31,6 +35,9 @@ describe('PolicyEditorApp component', () => {
   const findRuleEditor = () => wrapper.find('[data-testid="rule-editor"]');
   const findYamlEditor = () => wrapper.find('[data-testid="yaml-editor"]');
   const findPreview = () => wrapper.find(PolicyPreview);
+  const findAddRuleButton = () => wrapper.find('[data-testid="add-rule"]');
+  const findYAMLParsingAlert = () => wrapper.find('[data-testid="parsing-alert"]');
+  const findNetworkPolicyEditor = () => wrapper.find(NetworkPolicyEditor);
 
   beforeEach(() => {
     factory();
@@ -49,11 +56,15 @@ describe('PolicyEditorApp component', () => {
     expect(findYamlEditor().exists()).toBe(false);
   });
 
+  it('does not render parsing error alert', () => {
+    expect(findYAMLParsingAlert().exists()).toBe(false);
+  });
+
   describe('given .yaml editor mode is enabled', () => {
     beforeEach(() => {
       factory({
         data: () => ({
-          editorMode: 'yaml',
+          editorMode: EditorModeYAML,
         }),
       });
     });
@@ -66,6 +77,38 @@ describe('PolicyEditorApp component', () => {
       const editor = findYamlEditor();
       expect(editor.exists()).toBe(true);
       expect(editor.element).toMatchSnapshot();
+    });
+
+    it('updates policy on yaml editor value change', async () => {
+      const manifest = `apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: test-policy
+spec:
+  description: test description
+  endpointSelector:
+    matchLabels:
+      network-policy.gitlab.com/disabled_by: gitlab
+      foo: bar
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        foo: bar`;
+      findNetworkPolicyEditor().vm.$emit('input', manifest);
+
+      expect(wrapper.vm.policy).toMatchObject({
+        name: 'test-policy',
+        description: 'test description',
+        isEnabled: false,
+        endpointMatchMode: EndpointMatchModeLabel,
+        endpointLabels: 'foo:bar',
+        rules: [
+          {
+            ruleType: RuleTypeEndpoint,
+            matchLabels: 'foo:bar',
+          },
+        ],
+      });
     });
   });
 
@@ -97,7 +140,7 @@ describe('PolicyEditorApp component', () => {
 
   it('adds a new rule', async () => {
     expect(wrapper.findAll(PolicyRuleBuilder).length).toEqual(0);
-    const button = wrapper.find("[data-testid='add-rule']");
+    const button = findAddRuleButton();
     button.vm.$emit('click');
     button.vm.$emit('click');
     await wrapper.vm.$nextTick();
@@ -113,6 +156,36 @@ describe('PolicyEditorApp component', () => {
         ports: '',
       });
       expect(builder.props().endpointSelectorDisabled).toEqual(idx !== 0);
+    });
+  });
+
+  it('updates yaml editor value on switch to yaml editor', async () => {
+    wrapper.find("[id='policyName']").vm.$emit('input', 'test-policy');
+    wrapper.find("[data-testid='editor-mode']").vm.$emit('input', EditorModeYAML);
+    await wrapper.vm.$nextTick();
+
+    const editor = findNetworkPolicyEditor();
+    expect(editor.exists()).toBe(true);
+    expect(fromYaml(editor.props('value'))).toMatchObject({
+      name: 'test-policy',
+    });
+  });
+
+  describe('given there is a yaml parsing error', () => {
+    beforeEach(() => {
+      factory({
+        data: () => ({
+          yamlEditorError: {},
+        }),
+      });
+    });
+
+    it('renders parsing error alert', () => {
+      expect(findYAMLParsingAlert().exists()).toBe(true);
+    });
+
+    it('disables add rule button', () => {
+      expect(findAddRuleButton().props('disabled')).toBe(true);
     });
   });
 });
