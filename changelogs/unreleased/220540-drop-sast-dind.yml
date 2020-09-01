@@ -1,0 +1,5 @@
+---
+title: Drop Docker-in-Docker mode for SAST
+merge_request: 40989
+author:
+type: removed
