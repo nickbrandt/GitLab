@@ -257,4 +257,113 @@ RSpec.describe API::GroupPushRule, 'GroupPushRule', api: true do
       end
     end
   end
+
+  describe 'PUT /groups/:id/push_rule' do
+    subject { put api("/groups/#{group.id}/push_rule", admin), params: attributes_for_update }
+
+    let(:group) { create(:group) }
+
+    let_it_be(:attributes_for_update) do
+      {
+        author_email_regex: '^[A-Za-z0-9.]+@disney.com$',
+        reject_unsigned_commits: true,
+        commit_committer_check: false
+      }
+    end
+
+    before do
+      push_rule = create(:push_rule, **attributes)
+      group.update!(push_rule: push_rule)
+    end
+
+    context 'when unlicensed' do
+      it_behaves_like 'not found when feature is unavailable'
+    end
+
+    context 'authorized user' do
+      context 'when licensed' do
+        include_context 'licensed features available'
+
+        it do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+        end
+
+        it 'updates attributes as expected' do
+          expect { subject }.to change { group.reload.push_rule.author_email_regex }
+                               .from(attributes[:author_email_regex])
+                               .to(attributes_for_update[:author_email_regex])
+        end
+
+        context 'when push rule does not exist for group' do
+          let_it_be(:group_without_push_rule) { create(:group) }
+
+          it 'returns not found' do
+            put api("/groups/#{group_without_push_rule.id}/push_rule", admin), params: attributes_for_update
+
+            expect(response).to have_gitlab_http_status(:not_found)
+            expect(json_response['message']).to include('Not Found')
+          end
+        end
+
+        context 'permissions' do
+          subject { put api("/groups/#{group.id}/push_rule", user), params: attributes_for_update }
+
+          it_behaves_like 'allow access to api based on role'
+        end
+
+        context 'when no rule is specified' do
+          it do
+            put api("/groups/#{group.id}/push_rule", admin), params: {}
+
+            expect(response).to have_gitlab_http_status(:bad_request)
+            expect(json_response['error']).to include('at least one parameter must be provided')
+          end
+        end
+      end
+
+      context 'when reject_unsigned_commits is unavailable' do
+        before do
+          stub_licensed_features(reject_unsigned_commits: false)
+          stub_licensed_features(push_rules: true, commit_committer_check: true)
+        end
+
+        it 'returns forbidden' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:forbidden)
+        end
+
+        context 'and reject_unsigned_commits is not set' do
+          it 'returns status ok' do
+            put api("/groups/#{group.id}/push_rule", admin), params: attributes_for_update.except(:reject_unsigned_commits)
+
+            expect(response).to have_gitlab_http_status(:ok)
+          end
+        end
+      end
+
+      context 'when commit_committer_check is unavailable' do
+        before do
+          stub_licensed_features(commit_committer_check: false)
+          stub_licensed_features(push_rules: true, reject_unsigned_commits: true)
+        end
+
+        it do
+          subject
+
+          expect(response).to have_gitlab_http_status(:forbidden)
+        end
+
+        context 'and commit_committer_check is not set' do
+          it 'returns status ok' do
+            put api("/groups/#{group.id}/push_rule", admin), params: attributes_for_update.except(:commit_committer_check)
+
+            expect(response).to have_gitlab_http_status(:ok)
+          end
+        end
+      end
+    end
+  end
 end
