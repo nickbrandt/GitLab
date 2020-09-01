@@ -616,6 +616,10 @@ RSpec.describe Ci::Build do
     subject(:locked_artifacts) { build.locked_artifacts? }
 
     context 'when pipeline is artifacts_locked' do
+      before do
+        build.pipeline.artifacts_locked!
+      end
+
       context 'artifacts archive does not exist' do
         let(:build) { create(:ci_build) }
 
