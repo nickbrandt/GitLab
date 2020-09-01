@@ -397,6 +397,10 @@ class Group < Namespace
     ])
   end
 
+  def users_count
+    members.non_unassigned.count
+  end
+
   # Returns all users that are members of projects
   # belonging to the current group or sub-groups
   def project_users_with_descendants

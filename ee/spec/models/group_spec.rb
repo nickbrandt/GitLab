@@ -668,6 +668,34 @@ RSpec.describe Group do
     end
   end
 
+  describe '#unassigned_role_allowed?' do
+    subject { group.unassigned_role_allowed? }
+
+    context 'licensed' do
+      before do
+        stub_licensed_features(unassigned_role: true)
+      end
+
+      it 'returns true for licensed instance' do
+        is_expected.to be true
+      end
+
+      it 'returns false for subgroup in licensed instance' do
+        expect(create(:group, parent: group).unassigned_role_allowed?).to be false
+      end
+    end
+
+    context 'unlicensed' do
+      before do
+        stub_licensed_features(unassigned_role: false)
+      end
+
+      it 'returns false unlicensed instance' do
+        is_expected.to be false
+      end
+    end
+  end
+
   describe '#saml_discovery_token' do
     it 'returns existing tokens' do
       group = create(:group, saml_discovery_token: 'existing')
