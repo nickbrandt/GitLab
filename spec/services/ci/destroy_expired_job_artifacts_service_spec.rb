@@ -132,8 +132,8 @@ RSpec.describe Ci::DestroyExpiredJobArtifactsService, :clean_gitlab_redis_shared
       end
 
       context 'when artifacts are not expired' do
-        let!(:pipeline_artifact_1) { create(:ci_pipeline_artifact, expire_at: 2.days) }
-        let!(:pipeline_artifact_2) { create(:ci_pipeline_artifact, expire_at: 2.days) }
+        let!(:pipeline_artifact_1) { create(:ci_pipeline_artifact, expire_at: 2.days.from_now) }
+        let!(:pipeline_artifact_2) { create(:ci_pipeline_artifact, expire_at: 2.days.from_now) }
 
         it 'do not destroy pipeline artifacts' do
           expect { subject }.not_to change { Ci::PipelineArtifact.count }
