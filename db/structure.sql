@@ -8930,6 +8930,22 @@ CREATE SEQUENCE public.analytics_cycle_analytics_project_stages_id_seq
 
 ALTER SEQUENCE public.analytics_cycle_analytics_project_stages_id_seq OWNED BY public.analytics_cycle_analytics_project_stages.id;
 
+CREATE TABLE public.analytics_instance_statistics_measurements (
+    id bigint NOT NULL,
+    count bigint NOT NULL,
+    recorded_at timestamp with time zone NOT NULL,
+    identifier smallint NOT NULL
+);
+
+CREATE SEQUENCE public.analytics_instance_statistics_measurements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.analytics_instance_statistics_measurements_id_seq OWNED BY public.analytics_instance_statistics_measurements.id;
+
 CREATE TABLE public.analytics_language_trend_repository_languages (
     file_count integer DEFAULT 0 NOT NULL,
     programming_language_id bigint NOT NULL,
@@ -16814,6 +16830,8 @@ ALTER TABLE ONLY public.analytics_cycle_analytics_group_value_streams ALTER COLU
 
 ALTER TABLE ONLY public.analytics_cycle_analytics_project_stages ALTER COLUMN id SET DEFAULT nextval('public.analytics_cycle_analytics_project_stages_id_seq'::regclass);
 
+ALTER TABLE ONLY public.analytics_instance_statistics_measurements ALTER COLUMN id SET DEFAULT nextval('public.analytics_instance_statistics_measurements_id_seq'::regclass);
+
 ALTER TABLE ONLY public.appearances ALTER COLUMN id SET DEFAULT nextval('public.appearances_id_seq'::regclass);
 
 ALTER TABLE ONLY public.application_setting_terms ALTER COLUMN id SET DEFAULT nextval('public.application_setting_terms_id_seq'::regclass);
@@ -17711,6 +17729,9 @@ ALTER TABLE ONLY public.analytics_cycle_analytics_group_value_streams
 
 ALTER TABLE ONLY public.analytics_cycle_analytics_project_stages
     ADD CONSTRAINT analytics_cycle_analytics_project_stages_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.analytics_instance_statistics_measurements
+    ADD CONSTRAINT analytics_instance_statistics_measurements_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.appearances
     ADD CONSTRAINT appearances_pkey PRIMARY KEY (id);
@@ -20324,6 +20345,8 @@ CREATE UNIQUE INDEX index_on_deploy_keys_id_and_type_and_public ON public.keys U
 CREATE INDEX index_on_id_partial_with_legacy_storage ON public.projects USING btree (id) WHERE ((storage_version < 2) OR (storage_version IS NULL));
 
 CREATE INDEX index_on_identities_lower_extern_uid_and_provider ON public.identities USING btree (lower((extern_uid)::text), provider);
+
+CREATE UNIQUE INDEX index_on_instance_statistics_recorded_at_and_identifier ON public.analytics_instance_statistics_measurements USING btree (identifier, recorded_at);
 
 CREATE INDEX index_on_users_name_lower ON public.users USING btree (lower((name)::text));
 
