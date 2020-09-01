@@ -62,22 +62,14 @@ export default {
     activeDiscussion: {
       query: activeDiscussionQuery,
       result({ data }) {
-        const activeDiscussionId = data.activeDiscussion.id;
         if (this.discussion.resolved && !this.resolvedDiscussionsExpanded) {
           return;
         }
 
         this.$nextTick(() => {
-          // We watch any changes to the active discussion from the design pins and scroll to this discussion if it exists
-          // We don't want scrollIntoView to be triggered from the discussion click itself
-          if (
-            this.$el &&
-            activeDiscussionId &&
-            [ACTIVE_DISCUSSION_SOURCE_TYPES.pin, ACTIVE_DISCUSSION_SOURCE_TYPES.url].includes(
-              data.activeDiscussion.source,
-            ) &&
-            activeDiscussionId === this.discussion.notes[0].id
-          ) {
+          // We watch any changes to the active discussion from the design pins and scroll to this discussion if it exists.
+          // We don't want scrollIntoView to be triggered from the discussion click itself.
+          if (this.$el && this.shouldScrollToDiscussion(data.activeDiscussion)) {
             this.$el.scrollIntoView({
               behavior: 'smooth',
               inline: 'start',
@@ -141,6 +133,18 @@ export default {
     },
     isFormVisible() {
       return this.isFormRendered && this.discussionWithOpenForm === this.discussion.id;
+    },
+    shouldScrollToDiscussion(activeDiscussion) {
+      const ALLOWED_ACTIVE_DISCUSSION_SOURCES = [
+        ACTIVE_DISCUSSION_SOURCE_TYPES.pin,
+        ACTIVE_DISCUSSION_SOURCE_TYPES.url,
+      ];
+      const { id: activeDiscussionId, source: activeDiscussionSource } = activeDiscussion;
+
+      return (
+        ALLOWED_ACTIVE_DISCUSSION_SOURCES.includes(activeDiscussionSource) &&
+        activeDiscussionId === this.discussion.notes[0].id
+      );
     },
   },
   methods: {
