@@ -1,5 +1,10 @@
 <script>
-import { GlLink, GlSprintf, GlSkeletonLoading, GlLoadingIcon } from '@gitlab/ui';
+import {
+  GlLink,
+  GlSprintf,
+  GlDeprecatedSkeletonLoading as GlSkeletonLoading,
+  GlLoadingIcon,
+} from '@gitlab/ui';
 import { s__ } from '~/locale';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';

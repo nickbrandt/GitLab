@@ -1,5 +1,9 @@
 import { mount } from '@vue/test-utils';
-import { GlLink, GlSkeletonLoading, GlLoadingIcon } from '@gitlab/ui';
+import {
+  GlLink,
+  GlDeprecatedSkeletonLoading as GlSkeletonLoading,
+  GlLoadingIcon,
+} from '@gitlab/ui';
 import { capitalize } from 'lodash';
 import UsersMockHelper from 'helpers/user_mock_data_helper';
 import StatusText from 'ee/vulnerabilities/components/status_description.vue';
