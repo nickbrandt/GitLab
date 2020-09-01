@@ -13270,6 +13270,9 @@ msgstr ""
 msgid "Integrations|Comment settings:"
 msgstr ""
 
+msgid "Integrations|Default settings are inherited from the group level."
+msgstr ""
+
 msgid "Integrations|Default settings are inherited from the instance level."
 msgstr ""
 
