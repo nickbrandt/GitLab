@@ -723,7 +723,7 @@ sudo cp /opt/gitlab/embedded/ssl/certs/cacert.pem /var/opt/gitlab/gitlab-rails/s
 ### 502 error when connecting to GitLab Pages proxy when server does not listen over IPv6
 
 In some cases, NGINX might default to using IPv6 to connect to the GitLab Pages
-proxy even when the server does not listen over IPv6. You can identify when
+service even when the server does not listen over IPv6. You can identify when
 this is happening if you see something similar to the log entry below in the
 `gitlab_pages_error.log`:
 
@@ -731,7 +731,8 @@ this is happening if you see something similar to the log entry below in the
 2020/02/24 16:32:05 [error] 112654#0: *4982804 connect() failed (111: Connection refused) while connecting to upstream, client: 123.123.123.123, server: ~^(?<group>.*)\.pages\.example\.com$, request: "GET /-/group/project/-/jobs/1234/artifacts/artifact.txt HTTP/1.1", upstream: "http://[::1]:8090//-/group/project/-/jobs/1234/artifacts/artifact.txt", host: "group.example.com"
 ```
 
-To resolve this, set an explicit IP and port for the GitLab Pages listen proxy:
+To resolve this, set an explicit IP and port for the GitLab Pages `listen_proxy` setting
+to define the explicit address that the GitLab Pages daemon should listen on:
 
 ```ruby
 gitlab_pages['listen_proxy'] = '127.0.0.1:8090'
