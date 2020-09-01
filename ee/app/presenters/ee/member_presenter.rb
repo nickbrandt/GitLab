@@ -18,5 +18,9 @@ module EE
     def override_member_permission
       raise NotImplementedError
     end
+
+    def source_allows_minimal_access_role?(member)
+      member.source.minimal_access_role_allowed?
+    end
   end
 end

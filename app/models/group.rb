@@ -348,6 +348,7 @@ class Group < Namespace
       end
 
     group_hierarchy_members = GroupMember.active_without_invites_and_requests
+                                         .non_minimal_access
                                          .where(source_id: source_ids)
 
     GroupMember.from_union([group_hierarchy_members,
@@ -572,6 +573,14 @@ class Group < Namespace
 
   def default_owner
     owners.first || parent&.default_owner || owner
+  end
+
+  def access_level_roles_for_group
+    GroupMember.access_level_roles
+  end
+
+  def access_level_values_for_group
+    access_level_roles_for_group.values
   end
 
   private
