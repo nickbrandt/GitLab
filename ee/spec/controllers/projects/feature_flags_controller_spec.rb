@@ -62,11 +62,11 @@ RSpec.describe Projects::FeatureFlagsController do
     subject { get(:index, params: view_params, format: :json) }
 
     let!(:feature_flag_active) do
-      create(:operations_feature_flag, project: project, active: true)
+      create(:operations_feature_flag, project: project, active: true, name: 'feature_flag_a')
     end
 
     let!(:feature_flag_inactive) do
-      create(:operations_feature_flag, project: project, active: false)
+      create(:operations_feature_flag, project: project, active: false, name: 'feature_flag_b')
     end
 
     it 'returns all feature flags as json response' do
@@ -219,7 +219,7 @@ RSpec.describe Projects::FeatureFlagsController do
 
     context 'with version 1 and 2 feature flags' do
       let!(:new_version_feature_flag) do
-        create(:operations_feature_flag, :new_version_flag, project: project)
+        create(:operations_feature_flag, :new_version_flag, project: project, name: 'feature_flag_c')
       end
 
       it 'returns all feature flags as json response' do
