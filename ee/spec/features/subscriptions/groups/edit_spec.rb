@@ -7,13 +7,11 @@ RSpec.describe 'Welcome screen', :js do
   let_it_be(:group) { create(:group) }
 
   let(:params) { {} }
-  let(:part_of_onboarding_issues_experiment) { false }
 
   describe 'on GitLab.com' do
     before do
       group.add_owner(user)
       gitlab_sign_in(user)
-      stub_experiment_for_user(onboarding_issues: part_of_onboarding_issues_experiment)
       stub_request(:get, 'https://customers.gitlab.com/gitlab_plans?plan=free')
         .to_return(status: 200, body: '{}', headers: {})
 
@@ -30,14 +28,6 @@ RSpec.describe 'Welcome screen', :js do
 
       it 'shows the progress bar with the correct steps' do
         expect(page).to have_content('Your profile Checkout Your GitLab group')
-      end
-
-      context 'when part of the onboarding issues experiment' do
-        let(:part_of_onboarding_issues_experiment) { true }
-
-        it 'shows the progress bar with the correct steps' do
-          expect(page).to have_content('Your profile Checkout Your GitLab group Your first project')
-        end
       end
     end
   end
