@@ -64,10 +64,6 @@ RSpec.describe JiraConnect::SubscriptionsController do
         end
 
         context 'dev panel integration is available' do
-          before do
-            stub_licensed_features(jira_dev_panel_integration: true)
-          end
-
           it 'creates a subscription' do
             expect { subject }.to change { installation.subscriptions.count }.from(0).to(1)
           end
@@ -76,18 +72,6 @@ RSpec.describe JiraConnect::SubscriptionsController do
             subject
 
             expect(response).to have_gitlab_http_status(:ok)
-          end
-        end
-
-        context 'dev panel integration is not available' do
-          before do
-            stub_licensed_features(jira_dev_panel_integration: false)
-          end
-
-          it 'returns 422' do
-            subject
-
-            expect(response).to have_gitlab_http_status(:unprocessable_entity)
           end
         end
       end

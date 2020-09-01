@@ -189,8 +189,6 @@ module EE
         override :jira_usage
         def jira_usage
           super.merge(
-            projects_jira_dvcs_cloud_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled),
-            projects_jira_dvcs_server_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false)),
             projects_jira_issuelist_active: projects_jira_issuelist_active
           )
         end
@@ -275,10 +273,7 @@ module EE
             assignee_lists: distinct_count(::List.assignee.where(time_period), :user_id),
             epics: distinct_count(::Epic.where(time_period), :author_id),
             label_lists: distinct_count(::List.label.where(time_period), :user_id),
-            milestone_lists: distinct_count(::List.milestone.where(time_period), :user_id),
-            projects_jira_active: distinct_count(::Project.with_active_jira_services.where(time_period), :creator_id),
-            projects_jira_dvcs_cloud_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_cloud.where(time_period), :creator_id),
-            projects_jira_dvcs_server_active: distinct_count(::Project.with_active_jira_services.with_jira_dvcs_server.where(time_period), :creator_id)
+            milestone_lists: distinct_count(::List.milestone.where(time_period), :user_id)
           })
         end
 
