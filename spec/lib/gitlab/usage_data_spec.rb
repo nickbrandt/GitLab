@@ -1069,7 +1069,6 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
           'g_compliance_audit_events' => 123,
           'i_compliance_credential_inventory' => 123,
           'i_compliance_audit_events' => 123,
-          'i_compliance_audit_events_api' => 123,
           'compliance_unique_visits_for_any_target' => 543,
           'compliance_unique_visits_for_any_target_monthly' => 987
         }
