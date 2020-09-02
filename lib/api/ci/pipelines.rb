@@ -115,7 +115,7 @@ module API
         end
 
         desc 'Get pipeline jobs' do
-          success Entities::Job
+          success Entities::Ci::Job
         end
         params do
           requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
@@ -133,11 +133,11 @@ module API
 
           builds = builds.with_preloads
 
-          present paginate(builds), with: Entities::Job
+          present paginate(builds), with: Entities::Ci::Job
         end
 
         desc 'Get pipeline bridge jobs' do
-          success Entities::Bridge
+          success Entities::Ci::Bridge
         end
         params do
           requires :pipeline_id, type: Integer, desc: 'The pipeline ID'
@@ -156,7 +156,7 @@ module API
 
           bridges = bridges.with_preloads
 
-          present paginate(bridges), with: Entities::Bridge
+          present paginate(bridges), with: Entities::Ci::Bridge
         end
 
         desc 'Gets the variables for a given pipeline' do
