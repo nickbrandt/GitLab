@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { GlSkeletonLoading } from '@gitlab/ui';
+import { GlDeprecatedSkeletonLoading as GlSkeletonLoading } from '@gitlab/ui';
 import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
 import MetricCard from 'ee/analytics/shared/components/metric_card.vue';
 

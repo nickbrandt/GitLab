@@ -1,5 +1,11 @@
 <script>
-import { GlCard, GlSkeletonLoading, GlLink, GlIcon, GlTooltipDirective } from '@gitlab/ui';
+import {
+  GlCard,
+  GlDeprecatedSkeletonLoading as GlSkeletonLoading,
+  GlLink,
+  GlIcon,
+  GlTooltipDirective,
+} from '@gitlab/ui';
 
 export default {
   name: 'MetricCard',
