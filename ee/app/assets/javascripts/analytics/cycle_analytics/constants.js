@@ -56,6 +56,7 @@ export const STAGE_ACTIONS = {
   HIDE: 'hideStage',
   CREATE: 'createStage',
   UPDATE: 'updateStage',
+  ADD_STAGE: 'showAddStageForm',
 };
 
 export const STAGE_NAME = {

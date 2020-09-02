@@ -13,6 +13,7 @@ import StageTable from 'ee/analytics/cycle_analytics/components/stage_table.vue'
 import StageTableNav from 'ee/analytics/cycle_analytics/components/stage_table_nav.vue';
 import StageNavItem from 'ee/analytics/cycle_analytics/components/stage_nav_item.vue';
 import AddStageButton from 'ee/analytics/cycle_analytics/components/add_stage_button.vue';
+import CustomStageForm from 'ee/analytics/cycle_analytics/components/custom_stage_form.vue';
 import FilterBar from 'ee/analytics/cycle_analytics/components/filter_bar.vue';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import Daterange from 'ee/analytics/shared/components/daterange.vue';
@@ -136,6 +137,8 @@ describe('Cycle Analytics component', () => {
       .find(StageTableNav)
       .findAll(StageNavItem)
       .at(index);
+
+  const findAddStageButton = () => wrapper.find(AddStageButton);
 
   const displaysProjectsDropdownFilter = flag => {
     expect(wrapper.find(ProjectsDropdownFilter).exists()).toBe(flag);
@@ -427,6 +430,31 @@ describe('Cycle Analytics component', () => {
 
               expect(third.props('isActive')).toBe(true);
               expect(first.props('isActive')).toBe(false);
+            });
+          });
+
+          describe('Add stage button', () => {
+            beforeEach(() => {
+              wrapper = createComponent({
+                opts: {
+                  stubs: {
+                    StageTable,
+                    StageTableNav,
+                    AddStageButton,
+                  },
+                },
+                withStageSelected: true,
+              });
+            });
+
+            it('can navigate to the custom stage form', () => {
+              expect(wrapper.find(CustomStageForm).exists()).toBe(false);
+
+              findAddStageButton().trigger('click');
+
+              return wrapper.vm.$nextTick().then(() => {
+                expect(wrapper.find(CustomStageForm).exists()).toBe(true);
+              });
             });
           });
         });
