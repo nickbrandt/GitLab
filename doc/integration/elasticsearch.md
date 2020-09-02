@@ -169,8 +169,8 @@ To enable Elasticsearch, you need to have admin access to GitLab:
    and expand the **Elasticsearch** section.
 
    NOTE: **Note:**
-   You'll need an active Starter [license](../user/admin_area/license.md),
-   otherwise the Elasticsearch section will not be visible.
+   To see the Elasticsearch section, you need an active Starter
+   [license](../user/admin_area/license.md).
 
 1. Configure the [Elasticsearch settings](#elasticsearch-configuration) for
    your Elasticsearch cluster. Do not enable **Elasticsearch indexing** or
