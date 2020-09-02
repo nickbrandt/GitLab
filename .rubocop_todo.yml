@@ -18,20 +18,6 @@ Capybara/CurrentPathExpectation:
 Layout/ArgumentAlignment:
   Enabled: false
 
-# Offense count: 72
-# Cop supports --auto-correct.
-Layout/EmptyLinesAroundArguments:
-  Exclude:
-    - 'app/models/concerns/discussion_on_diff.rb'
-    - 'app/models/concerns/resolvable_discussion.rb'
-    - 'app/models/diff_discussion.rb'
-    - 'app/models/discussion.rb'
-    - 'ee/spec/models/geo/project_registry_spec.rb'
-    - 'lib/banzai/pipeline/broadcast_message_pipeline.rb'
-    - 'lib/banzai/pipeline/gfm_pipeline.rb'
-    - 'lib/banzai/pipeline/single_line_pipeline.rb'
-    - 'spec/features/markdown/copy_as_gfm_spec.rb'
-
 # Offense count: 413
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, IndentationWidth.
