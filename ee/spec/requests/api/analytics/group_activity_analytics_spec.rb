@@ -13,7 +13,7 @@ RSpec.describe API::Analytics::GroupActivityAnalytics do
 
   shared_examples 'GET group_activity' do |activity, count|
     let(:feature_available) { true }
-    let(:feature_enabled_for) { group }
+    let(:feature_enabled) { true }
     let(:params) { { group_path: group.full_path } }
     let(:current_user) { reporter }
     let(:request) do
@@ -21,8 +21,8 @@ RSpec.describe API::Analytics::GroupActivityAnalytics do
     end
 
     before do
-      stub_feature_flags(group_activity_analytics: feature_enabled_for)
       stub_licensed_features(group_activity_analytics: feature_available)
+      stub_feature_flags(group_activity_analytics: feature_enabled)
 
       request
     end
@@ -39,7 +39,7 @@ RSpec.describe API::Analytics::GroupActivityAnalytics do
 
     context 'when feature is not available in plan' do
       let(:feature_available) { false }
-      let(:feature_enabled_for) { false }
+      let(:feature_enabled) { false }
 
       it 'is returns `forbidden`' do
         expect(response).to have_gitlab_http_status(:forbidden)
@@ -47,7 +47,7 @@ RSpec.describe API::Analytics::GroupActivityAnalytics do
     end
 
     context 'when feature is disabled globally' do
-      let(:feature_enabled_for) { false }
+      let(:feature_enabled) { false }
 
       it 'is returns `forbidden`' do
         expect(response).to have_gitlab_http_status(:forbidden)
