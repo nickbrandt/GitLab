@@ -1,13 +1,14 @@
-# Track events using Redis HyperLogLog
-
-Track unique events using Redis HyperLogLog
+# Track Usage Data events
 
 > Introduced in GitLab 13.4
 
-## Track unique users count using Redis HLL
+## Increment unique users count using Redis HLL
+
+Increment unique users for given event name.
+In order to be able to increment the values the related feature `usage_data<event_name>` should be enabled.
 
 ```plaintext
-POST /redis_track_event
+POST /increment_unique_users
 ```
 
 | Attribute | Type | Required | Description |
@@ -15,7 +16,7 @@ POST /redis_track_event
 | `name` | string | yes | The event name it should be tracked |
 
 ```shell
-curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/redis_track_event" --data "name=event_name"
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/usage_data/increment_unique_users" --data "name=event_name"
 ```
 
 ### Response

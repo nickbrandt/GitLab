@@ -537,7 +537,8 @@ module API
       )
     end
 
-    def redis_track_event(event_name, values, feature_name)
+    def increment_unique_events(event_name, values)
+      feature_name = "usage_data_#{event_name}"
       raise "Feature #{feature_name} not enabled" unless Feature.enabled?(feature_name)
       raise "Usage ping not enabled" unless Gitlab::CurrentSettings.usage_ping_enabled?
       raise "values is empty" unless values.present?

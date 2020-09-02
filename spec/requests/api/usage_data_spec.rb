@@ -2,11 +2,11 @@
 
 require 'spec_helper'
 
-RSpec.describe API::RedisTrackEvent do
+RSpec.describe API::UsageData do
   let_it_be(:user) { create(:user) }
 
-  describe 'POST /redis_track_event' do
-    let(:endpoint) { '/redis_track_event' }
+  describe 'POST /usage_data/increment_unique_users' do
+    let(:endpoint) { '/usage_data/increment_unique_users' }
     let(:known_event) { 'g_compliance_dashboard' }
     let(:unknown_event) { 'unknown' }
 

@@ -234,7 +234,7 @@ module API
       mount ::API::Tags
       mount ::API::Templates
       mount ::API::Todos
-      mount ::API::RedisTrackEvent
+      mount ::API::UsageData
       mount ::API::Triggers
       mount ::API::UserCounts
       mount ::API::Users
