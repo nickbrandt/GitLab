@@ -565,7 +565,7 @@ RSpec.describe API::Ci::Pipelines do
         let(:api_user) { nil }
 
         it 'does not return bridges' do
-        expect(json_response['message']).to eq '404 Project Not Found'
+          expect(json_response['message']).to eq '404 Project Not Found'
           expect(response).to have_gitlab_http_status(:not_found)
         end
       end

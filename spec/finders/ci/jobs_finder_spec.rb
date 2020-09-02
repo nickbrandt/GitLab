@@ -10,7 +10,6 @@ RSpec.describe Ci::JobsFinder, '#execute' do
   let_it_be(:job_1) { create(:ci_build) }
   let_it_be(:job_2) { create(:ci_build, :running) }
   let_it_be(:job_3) { create(:ci_build, :success, pipeline: pipeline) }
-  let_it_be(:bridge) { create(:ci_bridge, pipeline: pipeline) }
 
   let(:params) { {} }
 

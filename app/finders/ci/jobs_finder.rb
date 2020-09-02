@@ -19,7 +19,8 @@ module Ci
       if params[:scope].is_a?(Array)
         unknown = params[:scope] - ::CommitStatus::AVAILABLE_STATUSES
         raise ArgumentError, 'Scope contains invalid value(s)' unless unknown.empty?
-        builds.where(status: params[:scope])
+
+        builds.where(status: params[:scope]) # rubocop: disable CodeReuse/ActiveRecord
       else
         filter_by_scope(builds)
       end
@@ -27,7 +28,7 @@ module Ci
       type.none
     end
 
-    # private
+    private
 
     attr_reader :current_user, :pipeline, :project, :params, :type
 
@@ -51,6 +52,7 @@ module Ci
     def pipeline_jobs
       return unless pipeline
       raise Gitlab::Access::AccessDeniedError unless can?(current_user, :read_build, pipeline)
+
       jobs_by_type(pipeline, type).latest
     end
 
