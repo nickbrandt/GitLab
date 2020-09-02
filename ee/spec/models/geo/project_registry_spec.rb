@@ -361,7 +361,6 @@ RSpec.describe Geo::ProjectRegistry, :geo do
         repository_verification_retry_count: nil,
         repository_retry_count: nil,
         repository_retry_at: nil
-
       )
     end
   end
@@ -1182,7 +1181,6 @@ RSpec.describe Geo::ProjectRegistry, :geo do
         repository_verification_retry_count: nil,
         repository_retry_count: nil,
         repository_retry_at: nil
-
       )
     end
   end

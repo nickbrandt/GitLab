@@ -17215,6 +17215,9 @@ msgstr ""
 msgid "Only project members will be imported. Group members will be skipped."
 msgstr ""
 
+msgid "Only projects created under a Gold license are available in Security Dashboards."
+msgstr ""
+
 msgid "Only verified users with an email address in any of these domains can be added to the group."
 msgstr ""
 
@@ -19136,6 +19139,9 @@ msgid "Project uploads"
 msgstr ""
 
 msgid "Project visibility level will be changed to match namespace rules when transferring to a group."
+msgstr ""
+
+msgid "Project was not found or you do not have permission to add this project to Security Dashboards."
 msgstr ""
 
 msgid "Project: %{name}"
@@ -24690,6 +24696,9 @@ msgid "The project can be accessed by anyone, regardless of authentication."
 msgstr ""
 
 msgid "The project can be accessed without any authentication."
+msgstr ""
+
+msgid "The project has already been added to your dashboard."
 msgstr ""
 
 msgid "The project is accessible only by members of the project. Access must be granted explicitly to each user."
