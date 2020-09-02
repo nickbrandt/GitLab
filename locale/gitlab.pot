@@ -13115,6 +13115,9 @@ msgstr ""
 msgid "IncidentManagement|Published to status page"
 msgstr ""
 
+msgid "IncidentManagement|There are no closed incidents"
+msgstr ""
+
 msgid "IncidentManagement|There was an error displaying the incidents."
 msgstr ""
 
