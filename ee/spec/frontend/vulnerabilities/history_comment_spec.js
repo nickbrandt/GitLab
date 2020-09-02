@@ -24,6 +24,7 @@ describe('History Comment', () => {
   const comment = {
     id: 'id',
     note: 'note',
+    note_html: '<p>note</p>',
     author: {},
     updated_at: new Date().toISOString(),
     current_user: {
@@ -142,7 +143,7 @@ describe('History Comment', () => {
       expectExistingCommentView();
       expect(eventItem().props('author')).toBe(comment.author);
       expect(eventItem().props('createdAt')).toBe(comment.updated_at);
-      expect(eventItem().element.innerHTML).toContain(comment.note);
+      expect(eventItem().element.innerHTML).toContain(comment.note_html);
     });
 
     it('shows the comment editor when the edit button is clicked', () => {
@@ -160,7 +161,7 @@ describe('History Comment', () => {
         })
         .then(() => {
           expectExistingCommentView();
-          expect(eventItem().element.innerHTML).toContain(comment.note);
+          expect(eventItem().element.innerHTML).toContain(comment.note_html);
         });
     });
 
@@ -181,7 +182,7 @@ describe('History Comment', () => {
         })
         .then(() => {
           expectExistingCommentView();
-          expect(eventItem().element.innerHTML).toContain(comment.note);
+          expect(eventItem().element.innerHTML).toContain(comment.note_html);
         });
     });
 
