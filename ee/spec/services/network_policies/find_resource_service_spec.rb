@@ -15,6 +15,7 @@ RSpec.describe NetworkPolicies::FindResourceService do
       ingress: [{ from: [{ namespaceSelector: { matchLabels: { project: 'myproject' } } }] }]
     )
   end
+
   let(:kind) { Gitlab::Kubernetes::NetworkPolicy::KIND }
 
   describe '#execute' do
