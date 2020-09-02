@@ -66,7 +66,7 @@ module Security
 
       def build_sast_attributes(content)
         options = { project: @project, user: current_user, sha: @project.repository.commit.sha }
-        sast_attributes = Gitlab::Ci::YamlProcessor.new(content, options).build_attributes(:sast)
+        sast_attributes = Gitlab::Ci::YamlProcessor.new(content, options).build_attributes(".sast-analyzer")
         extract_required_attributes(sast_attributes)
       end
 

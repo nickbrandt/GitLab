@@ -7,7 +7,8 @@ variables:
 
 stages:
   - our_custom_security_stage
-sast:
-  stage:  our_custom_security_stage
+
+.sast-analyzer:
+  stage: our_custom_security_stage
   variables:
     SEARCH_MAX_DEPTH: 8
