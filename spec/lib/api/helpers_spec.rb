@@ -210,7 +210,7 @@ RSpec.describe API::Helpers do
 
       it 'logs an exception if usage ping is not enabled' do
         stub_application_setting(usage_ping_enabled: false)
-        expect(Rails.logger).to receive(:warn).with(/Redis tracking event failed/)
+        expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{event_name}, message: Usage ping not enabled")
 
         subject.redis_track_event(event_name, value, feature)
       end
@@ -218,7 +218,7 @@ RSpec.describe API::Helpers do
       it 'logs an exception for unknown event' do
         stub_application_setting(usage_ping_enabled: true)
 
-        expect(Rails.logger).to receive(:warn).with(/Redis tracking event failed/)
+        expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{unknown_event}, message: Unknown event #{unknown_event}")
 
         subject.redis_track_event(unknown_event, value, feature)
       end
@@ -230,7 +230,7 @@ RSpec.describe API::Helpers do
       end
 
       it "logs an exception" do
-        expect(Rails.logger).to receive(:warn).with(/Redis tracking event failed/)
+        expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{event_name}, message: Feature #{feature} not enabled")
 
         subject.redis_track_event(event_name, value, feature)
       end
