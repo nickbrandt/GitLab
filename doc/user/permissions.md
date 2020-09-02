@@ -370,17 +370,15 @@ Beware though that even if a user is external, if they already have Reporter or
 higher permissions in any project or group, they are **not** counted as a
 free guest user.
 
-## Auditor users **(PREMIUM ONLY)**
+## Users with unassigned role **(PREMIUM ONLY)**
 
->[Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/998) in [GitLab Premium](https://about.gitlab.com/pricing/) 8.17.
+>[Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/40942) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.4.
 
-Auditor users are given read-only access to all projects, groups, and other
-resources on the GitLab instance.
+Administrators can add members with "Unassigned" role to the parent group but they don't automatically have access to projects/groups underneath. They need to be added to the specific subgroups/projects explicitly.
 
-An Auditor user should be able to access all projects and groups of a GitLab instance
-with the permissions described on the documentation on [auditor users permissions](../administration/auditor_users.md#permissions-and-restrictions-of-an-auditor-user).
-
-[Read more about Auditor users.](../administration/auditor_users.md)
+Users with unassigned access to the group can list this group in UI and via API,
+but cannot see any details, cannot enter group's page or list any of its children
+subgroups or projects.
 
 ## Project features
 
