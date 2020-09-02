@@ -8586,6 +8586,9 @@ msgstr ""
 msgid "Diff limits"
 msgstr ""
 
+msgid "Diff view settings"
+msgstr ""
+
 msgid "Difference between start date and now"
 msgstr ""
 
