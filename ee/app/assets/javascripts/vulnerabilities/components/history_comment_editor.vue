@@ -1,4 +1,5 @@
 <script>
+import { sanitize } from 'dompurify';
 import { GlFormTextarea, GlButton } from '@gitlab/ui';
 
 export default {
@@ -21,10 +22,10 @@ export default {
   },
   computed: {
     isSaveButtonDisabled() {
-      return this.isSaving || !this.trimmedComment.length;
+      return this.isSaving || !this.sanitizedComment.length;
     },
-    trimmedComment() {
-      return this.comment.trim();
+    sanitizedComment() {
+      return sanitize(this.comment.trim());
     },
   },
 };
@@ -44,7 +45,7 @@ export default {
         variant="success"
         :disabled="isSaveButtonDisabled"
         :loading="isSaving"
-        @click="$emit('onSave', trimmedComment)"
+        @click="$emit('onSave', sanitizedComment)"
       >
         {{ __('Save comment') }}
       </gl-button>
