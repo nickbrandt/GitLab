@@ -19,6 +19,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestS3ObjectUpload(t *testing.T) {
@@ -59,18 +60,14 @@ func TestS3ObjectUpload(t *testing.T) {
 			test.CheckS3Metadata(t, sess, config, objectName)
 
 			cancel()
-			deleted := false
 
-			retry(3, time.Second, func() error {
+			testhelper.Retry(t, 5*time.Second, func() error {
 				if test.S3ObjectDoesNotExist(t, sess, config, objectName) {
-					deleted = true
 					return nil
-				} else {
-					return fmt.Errorf("file is still present, retrying")
 				}
-			})
 
-			require.True(t, deleted)
+				return fmt.Errorf("file is still present")
+			})
 		})
 	}
 }
@@ -152,24 +149,4 @@ func TestS3ObjectUploadCancel(t *testing.T) {
 
 	_, err = io.Copy(object, strings.NewReader(test.ObjectContent))
 	require.Error(t, err)
-}
-
-func retry(attempts int, sleep time.Duration, fn func() error) error {
-	if err := fn(); err != nil {
-		if s, ok := err.(stop); ok {
-			// Return the original error for later checking
-			return s.error
-		}
-
-		if attempts--; attempts > 0 {
-			time.Sleep(sleep)
-			return retry(attempts, 2*sleep, fn)
-		}
-		return err
-	}
-	return nil
-}
-
-type stop struct {
-	error
 }

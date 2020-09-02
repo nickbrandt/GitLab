@@ -69,6 +69,36 @@ func TestSaveFileWrongSize(t *testing.T) {
 	assert.Nil(t, fh)
 }
 
+func TestSaveFileWithKnownSizeExceedLimit(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	tmpFolder, err := ioutil.TempDir("", "workhorse-test-tmp")
+	require.NoError(t, err)
+	defer os.RemoveAll(tmpFolder)
+
+	opts := &filestore.SaveFileOpts{LocalTempPath: tmpFolder, TempFilePrefix: "test-file", MaximumSize: test.ObjectSize - 1}
+	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, opts)
+	assert.Error(t, err)
+	_, isSizeError := err.(filestore.SizeError)
+	assert.True(t, isSizeError, "Should fail with SizeError")
+	assert.Nil(t, fh)
+}
+
+func TestSaveFileWithUnknownSizeExceedLimit(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	tmpFolder, err := ioutil.TempDir("", "workhorse-test-tmp")
+	require.NoError(t, err)
+	defer os.RemoveAll(tmpFolder)
+
+	opts := &filestore.SaveFileOpts{LocalTempPath: tmpFolder, TempFilePrefix: "test-file", MaximumSize: test.ObjectSize - 1}
+	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), -1, opts)
+	assert.Equal(t, err, filestore.ErrEntityTooLarge)
+	assert.Nil(t, fh)
+}
+
 func TestSaveFromDiskNotExistingFile(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

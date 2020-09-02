@@ -148,6 +148,8 @@ type Response struct {
 	ProcessLsif bool
 	// Detects whether LSIF artifact will be parsed with references
 	ProcessLsifReferences bool
+	// The maximum accepted size in bytes of the upload
+	MaximumSize int64
 }
 
 // singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy
