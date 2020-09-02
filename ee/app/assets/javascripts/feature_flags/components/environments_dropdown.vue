@@ -171,7 +171,7 @@ export default {
 <template>
   <div>
     <div class="dropdown position-relative">
-      <gl-icon name="search" class="seach-icon-input" />
+      <gl-icon name="search" class="search-icon-input" />
 
       <input
         type="text"
