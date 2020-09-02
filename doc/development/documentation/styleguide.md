@@ -631,8 +631,8 @@ Additional examples are available in the [Pajamas guide for punctuation](https:/
 
 ### Placeholder text
 
-Often in examples, a writer will provide a command or configuration that is
-complete apart from a value specific to the reader.
+Often in examples, a writer will provide a command or configuration that
+uses values specific to the reader.
 
 In these cases, use [`<` and `>`](https://en.wikipedia.org/wiki/Usage_message#Pattern)
 to call out where a reader must replace text with their own value.
