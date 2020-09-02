@@ -99,7 +99,11 @@ export default {
     updateDiscussionWithOpenForm(id) {
       this.discussionWithOpenForm = id;
     },
+    toggleTodo() {
+      // TODO implement
+    },
   },
+  showTodoButton: gon.features?.designManagementTodoButton,
   resolveCommentsToggleText: s__('DesignManagement|Resolved Comments'),
   cookieKey: 'hide_design_resolved_comments_popover',
 };
@@ -108,10 +112,16 @@ export default {
 <template>
   <div class="image-notes" @click="handleSidebarClick">
     <div
+      v-if="$options.showTodoButton"
       class="gl-display-flex gl-justify-content-space-between gl-border-b-1 gl-border-b-gray-100"
     >
       <span>{{ __('To-Do') }}</span>
-      <todo-button issuable-type="design" :issuable-id="design.iid" :is-todo="hasPendingTodo" />
+      <todo-button
+        issuable-type="design"
+        :issuable-id="design.iid"
+        :is-todo="hasPendingTodo"
+        @click="toggleTodo"
+      />
     </div>
     <h2 class="gl-font-weight-bold gl-mt-0">
       {{ issue.title }}
