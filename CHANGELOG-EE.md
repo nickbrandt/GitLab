@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.3.4 (2020-09-02)
+
+- No changes.
+
 ## 13.3.3 (2020-09-02)
 
 ### Security (2 changes)
@@ -261,6 +265,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Store/Update new location fingerprint for container scanning vulnerabilities. !39696
 - Replace -800 hex value, replace usages with -700. !39734
 
+
+## 13.2.8 (2020-09-02)
+
+- No changes.
 
 ## 13.2.7 (2020-09-02)
 
@@ -660,6 +668,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Alert Opsgenie integration errors. !36648
 - Resolve duplicate use of shorcuts-tree. !36732
 
+
+## 13.1.10 (2020-09-02)
+
+- No changes.
 
 ## 13.1.9 (2020-09-02)
 
