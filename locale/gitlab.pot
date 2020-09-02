@@ -515,9 +515,6 @@ msgstr ""
 msgid "%{level_name} is not allowed since the fork source project has lower visibility."
 msgstr ""
 
-msgid "%{lineOneStart}Drag and drop to upload your designs%{lineOneEnd} or %{linkStart}click to upload%{linkEnd}."
-msgstr ""
-
 msgid "%{link_start}Learn more%{link_end} about what information is shared with GitLab Inc."
 msgstr ""
 
@@ -7039,9 +7036,6 @@ msgstr ""
 msgid "Could not create wiki page"
 msgstr ""
 
-msgid "Could not delete %{design}. Please try again."
-msgstr ""
-
 msgid "Could not delete chat nickname %{chat_name}."
 msgstr ""
 
@@ -8046,9 +8040,6 @@ msgstr ""
 msgid "Deleted chat nickname: %{chat_name}!"
 msgstr ""
 
-msgid "Deleted in this version"
-msgstr ""
-
 msgid "Deleted projects"
 msgstr ""
 
@@ -8487,9 +8478,6 @@ msgstr ""
 msgid "DesignManagement|Are you sure you want to cancel creating this comment?"
 msgstr ""
 
-msgid "DesignManagement|Are you sure you want to delete the selected designs?"
-msgstr ""
-
 msgid "DesignManagement|Cancel changes"
 msgstr ""
 
@@ -8518,15 +8506,6 @@ msgid "DesignManagement|Could not update discussion. Please try again."
 msgstr ""
 
 msgid "DesignManagement|Could not update note. Please try again."
-msgstr ""
-
-msgid "DesignManagement|Delete"
-msgstr ""
-
-msgid "DesignManagement|Delete designs confirmation"
-msgstr ""
-
-msgid "DesignManagement|Delete selected"
 msgstr ""
 
 msgid "DesignManagement|Deselect all"
@@ -8743,9 +8722,6 @@ msgid "Discuss a specific suggestion or question that needs to be resolved."
 msgstr ""
 
 msgid "Discuss a specific suggestion or question."
-msgstr ""
-
-msgid "Discussion"
 msgstr ""
 
 msgid "Discussion to reply to cannot be found"
@@ -22753,12 +22729,6 @@ msgstr ""
 msgid "Showing %{pageSize} of %{total} issues"
 msgstr ""
 
-msgid "Showing Latest Version"
-msgstr ""
-
-msgid "Showing Version #%{versionNumber}"
-msgstr ""
-
 msgid "Showing all issues"
 msgstr ""
 
@@ -24657,9 +24627,6 @@ msgid "The number of merge requests merged by month."
 msgstr ""
 
 msgid "The number of times an upload record could not find its file"
-msgstr ""
-
-msgid "The one place for your designs"
 msgstr ""
 
 msgid "The parent epic is confidential and can only contain confidential epics and issues"
