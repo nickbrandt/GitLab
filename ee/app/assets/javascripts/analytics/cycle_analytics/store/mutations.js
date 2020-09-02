@@ -127,6 +127,18 @@ export default {
     state.isCreatingValueStream = false;
     state.createValueStreamErrors = {};
   },
+  [types.REQUEST_DELETE_VALUE_STREAM](state) {
+    state.isDeletingValueStream = true;
+    state.deleteValueStreamError = null;
+  },
+  [types.RECEIVE_DELETE_VALUE_STREAM_ERROR](state, message) {
+    state.isDeletingValueStream = false;
+    state.deleteValueStreamError = message;
+  },
+  [types.RECEIVE_DELETE_VALUE_STREAM_SUCCESS](state) {
+    state.isDeletingValueStream = false;
+    state.deleteValueStreamError = null;
+  },
   [types.SET_SELECTED_VALUE_STREAM](state, streamId) {
     state.selectedValueStream = state.valueStreams?.find(({ id }) => id === streamId) || null;
   },
@@ -141,8 +153,10 @@ export default {
   },
   [types.RECEIVE_VALUE_STREAMS_SUCCESS](state, data) {
     state.isLoadingValueStreams = false;
-    state.valueStreams = data.sort(({ name: aName = '' }, { name: bName = '' }) => {
-      return aName.toUpperCase() > bName.toUpperCase() ? 1 : -1;
-    });
+    state.valueStreams = data
+      .map(convertObjectPropsToCamelCase)
+      .sort(({ name: aName = '' }, { name: bName = '' }) => {
+        return aName.toUpperCase() > bName.toUpperCase() ? 1 : -1;
+      });
   },
 };

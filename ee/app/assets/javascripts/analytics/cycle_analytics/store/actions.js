@@ -352,6 +352,19 @@ export const createValueStream = ({ commit, dispatch, getters }, data) => {
     });
 };
 
+export const deleteValueStream = ({ commit, dispatch, getters }, valueStreamId) => {
+  const { currentGroupPath } = getters;
+  commit(types.REQUEST_DELETE_VALUE_STREAM);
+
+  return Api.cycleAnalyticsDeleteValueStream(currentGroupPath, valueStreamId)
+    .then(() => commit(types.RECEIVE_DELETE_VALUE_STREAM_SUCCESS))
+    .then(() => dispatch('fetchCycleAnalyticsData'))
+    .catch(({ response } = {}) => {
+      const { data: { message } = null } = response;
+      commit(types.RECEIVE_DELETE_VALUE_STREAM_ERROR, message);
+    });
+};
+
 export const fetchValueStreamData = ({ dispatch }) =>
   Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))

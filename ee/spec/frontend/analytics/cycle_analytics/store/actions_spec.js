@@ -1019,6 +1019,61 @@ describe('Cycle analytics actions', () => {
     });
   });
 
+  describe('deleteValueStream', () => {
+    const payload = 'my-fake-value-stream';
+
+    beforeEach(() => {
+      state = { selectedGroup };
+    });
+
+    describe('with no errors', () => {
+      beforeEach(() => {
+        mock.onDelete(endpoints.valueStreamData).replyOnce(httpStatusCodes.OK, {});
+      });
+
+      it(`commits the ${types.REQUEST_DELETE_VALUE_STREAM} and ${types.RECEIVE_DELETE_VALUE_STREAM_SUCCESS} actions`, () => {
+        return testAction(
+          actions.deleteValueStream,
+          payload,
+          state,
+          [
+            {
+              type: types.REQUEST_DELETE_VALUE_STREAM,
+            },
+            {
+              type: types.RECEIVE_DELETE_VALUE_STREAM_SUCCESS,
+            },
+          ],
+          [{ type: 'fetchCycleAnalyticsData' }],
+        );
+      });
+    });
+
+    describe('with errors', () => {
+      const message = { message: 'failed to delete the value stream' };
+      const resp = { message };
+      beforeEach(() => {
+        mock.onDelete(endpoints.valueStreamData).replyOnce(httpStatusCodes.NOT_FOUND, resp);
+      });
+
+      it(`commits the ${types.REQUEST_DELETE_VALUE_STREAM} and ${types.RECEIVE_DELETE_VALUE_STREAM_ERROR} actions `, () => {
+        return testAction(
+          actions.deleteValueStream,
+          payload,
+          state,
+          [
+            { type: types.REQUEST_DELETE_VALUE_STREAM },
+            {
+              type: types.RECEIVE_DELETE_VALUE_STREAM_ERROR,
+              payload: message,
+            },
+          ],
+          [],
+        );
+      });
+    });
+  });
+
   describe('fetchValueStreams', () => {
     beforeEach(() => {
       state = {

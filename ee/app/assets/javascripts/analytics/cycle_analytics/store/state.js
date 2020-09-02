@@ -22,7 +22,10 @@ export default () => ({
 
   isLoadingValueStreams: false,
   isCreatingValueStream: false,
+  isDeletingValueStream: false,
+
   createValueStreamErrors: {},
+  deleteValueStreamError: null,
 
   stages: [],
   summary: [],
