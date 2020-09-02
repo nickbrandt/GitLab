@@ -621,13 +621,6 @@ Style/MixinUsage:
     - 'spec/factories/notes.rb'
     - 'spec/lib/gitlab/import_export/version_checker_spec.rb'
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/MultilineIfModifier:
-  Exclude:
-    - 'app/services/ci/process_pipeline_service.rb'
-    - 'lib/api/commit_statuses.rb'
-
 # Offense count: 29
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, MinBodyLength.
