@@ -13,12 +13,10 @@ import (
 )
 
 type dirOpener struct {
-	u      *url.URL // last url passed to OpenBucketURL
 	tmpDir string
 }
 
 func (o *dirOpener) OpenBucketURL(ctx context.Context, u *url.URL) (*blob.Bucket, error) {
-	o.u = u
 	return fileblob.OpenBucket(o.tmpDir, nil)
 }
 
