@@ -123,15 +123,6 @@ Lint/NonDeterministicRequireOrder:
     - 'qa/spec/spec_helper.rb'
     - 'spec/spec_helper.rb'
 
-# Offense count: 3
-# Configuration parameters: AllowedImplicitNamespaces.
-# AllowedImplicitNamespaces: Gem
-Lint/RaiseException:
-  Exclude:
-    - 'db/migrate/20190402150158_backport_enterprise_schema.rb'
-    - 'ee/spec/requests/api/helpers_spec.rb'
-    - 'spec/requests/api/helpers_spec.rb'
-
 # Offense count: 27
 # Cop supports --auto-correct.
 Lint/RedundantCopDisableDirective:
