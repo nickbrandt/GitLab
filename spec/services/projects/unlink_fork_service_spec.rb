@@ -5,11 +5,12 @@ require 'spec_helper'
 RSpec.describe Projects::UnlinkForkService, :use_clean_rails_memory_store_caching do
   include ProjectForksHelper
 
-  subject { described_class.new(forked_project, user) }
+  subject { described_class.new(forked_project, user, params) }
 
   let(:project) { create(:project, :public) }
   let!(:forked_project) { fork_project(project, user) }
   let(:user) { create(:user) }
+  let(:params) { {} }
 
   context 'with opened merge request on the source project' do
     let(:merge_request) { create(:merge_request, source_project: forked_project, target_project: forked_project.forked_from_project) }
@@ -45,6 +46,21 @@ RSpec.describe Projects::UnlinkForkService, :use_clean_rails_memory_store_cachin
 
     expect(forked_project.fork_network_member).to be_nil
     expect(forked_project.reload.fork_network).to be_nil
+  end
+
+  context 'when keep_root_fork_member is true' do
+    let(:params) { { keep_root_fork_member: true } }
+
+    it 'does not remove the link to the fork network' do
+      expect(forked_project.fork_network_member).to be_present
+      expect(forked_project.fork_network).to be_present
+
+      subject.execute
+      forked_project.reload
+
+      expect(forked_project.fork_network_member).to be_present
+      expect(forked_project.fork_network).to be_present
+    end
   end
 
   it 'refreshes the forks count cache of the source project' do

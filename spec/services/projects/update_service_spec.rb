@@ -18,7 +18,7 @@ RSpec.describe Projects::UpdateService do
       def expect_to_call_unlink_fork_service
         service = Projects::UnlinkForkService.new(project, user)
 
-        expect(Projects::UnlinkForkService).to receive(:new).with(project, user).and_return(service)
+        expect(Projects::UnlinkForkService).to receive(:new).with(project, user, keep_root_fork_member: true).and_return(service)
         expect(service).to receive(:execute).and_call_original
       end
 

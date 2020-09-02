@@ -89,7 +89,7 @@ module Projects
 
       if project.visibility_level_decreased? && project.unlink_forks_upon_visibility_decrease_enabled?
         # It's a system-bounded operation, so no extra authorization check is required.
-        Projects::UnlinkForkService.new(project, current_user).execute
+        Projects::UnlinkForkService.new(project, current_user, keep_root_fork_member: true).execute
       end
 
       update_pages_config if changing_pages_related_config?

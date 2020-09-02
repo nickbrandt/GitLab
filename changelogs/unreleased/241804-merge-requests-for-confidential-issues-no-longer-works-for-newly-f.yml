@@ -1,0 +1,5 @@
+---
+title: Fixes issue where changing project visibility disconnected it from the parent fork
+merge_request: 41103
+author:
+type: fixed

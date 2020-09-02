@@ -29,7 +29,8 @@ module Projects
       Project.transaction do
         # Get out of the fork network as a member and
         # remove references from all its direct forks.
-        @project.fork_network_member.destroy
+        @project.fork_network_member.destroy unless params[:keep_root_fork_member]
+
         @project.forked_to_members.update_all(forked_from_project_id: nil)
 
         # The project is not necessarily a fork, so update the fork network originating
