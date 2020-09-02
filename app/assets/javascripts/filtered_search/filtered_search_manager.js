@@ -649,10 +649,7 @@ export default class FilteredSearchManager {
           hasFilteredSearch = true;
           const canEdit = this.canEdit && this.canEdit(key, sanitizedValue);
           const { uppercaseTokenName, capitalizeTokenValue } = match;
-          const isSupportBot = keyParam === 'author_username' && value === 'support-bot';
-          const operator = isSupportBot
-            ? '='
-            : FilteredSearchVisualTokens.getOperatorToken(sanitizedValue);
+          const operator = FilteredSearchVisualTokens.getOperatorToken(sanitizedValue);
           const sanitizedToken = FilteredSearchVisualTokens.getValueToken(sanitizedValue);
           FilteredSearchVisualTokens.addFilterVisualToken(
             key,
