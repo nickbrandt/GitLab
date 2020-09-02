@@ -11,6 +11,10 @@ module API
       'issues' => ->(iid) { find_project_issue(iid) }
     }.freeze
 
+    rescue_from ArgumentError do |e|
+      render_api_error!(e.message, 400)
+    end
+
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end

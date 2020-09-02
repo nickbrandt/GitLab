@@ -34,6 +34,13 @@ RSpec.describe API::Todos do
     end
 
     context 'when authenticated' do
+      context 'when invalid params' do
+        it "returns argument error" do
+          get api('/todos', john_doe), params: { type: 'InvalidType' }
+          expect(response).to have_gitlab_http_status(:bad_request)
+        end
+      end
+
       it 'returns an array of pending todos for current user' do
         get api('/todos', john_doe)
 
