@@ -294,7 +294,7 @@ module EE
           def update_vulnerabilities
             return if project.resolved_vulnerabilities.none?
 
-            project.vulnerabilities.each_batch do |relation|
+            project.vulnerabilities.each_batch(of: 100) do |relation|
               self.updated_count += relation.merge(project.resolved_vulnerabilities)
                                             .update_all(resolved_on_default_branch: true)
             end
