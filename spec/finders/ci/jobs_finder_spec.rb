@@ -10,6 +10,7 @@ RSpec.describe Ci::JobsFinder, '#execute' do
   let_it_be(:job_1) { create(:ci_build) }
   let_it_be(:job_2) { create(:ci_build, :running) }
   let_it_be(:job_3) { create(:ci_build, :success, pipeline: pipeline) }
+  let_it_be(:bridge) { create(:ci_bridge, pipeline: pipeline) }
 
   let(:params) { {} }
 
@@ -51,6 +52,15 @@ RSpec.describe Ci::JobsFinder, '#execute' do
         let(:params) { { scope: scope } }
 
         it { expect(subject).to match_array([jobs[index]]) }
+      end
+    end
+
+    context 'scope is an array' do
+      let(:jobs) { [job_1, job_2, job_3] }
+      let(:params) {{ scope: ['running'] }}
+
+      it 'filters by the job statuses in the scope' do
+        expect(subject).to match_array([job_2])
       end
     end
   end
