@@ -729,7 +729,7 @@ RSpec.describe ApplicationSetting do
         it do
           is_expected.to validate_numericality_of(:diff_max_patch_bytes)
           .only_integer
-          .is_greater_than_or_equal_to(Gitlab::Git::Diff::DEFAULT_MAX_PATCH_BYTES)
+          .is_greater_than_or_equal_to(Gitlab::Git::Diff.default_max_patch_bytes)
           .is_less_than_or_equal_to(Gitlab::Git::Diff::MAX_PATCH_BYTES_UPPER_BOUND)
         end
       end

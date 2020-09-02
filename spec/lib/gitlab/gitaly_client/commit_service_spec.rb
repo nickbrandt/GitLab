@@ -28,7 +28,7 @@ RSpec.describe Gitlab::GitalyClient::CommitService do
           safe_max_files: 100,
           safe_max_lines: 5000,
           safe_max_bytes: 512000,
-          max_patch_bytes: 102400
+          max_patch_bytes: Gitlab::Git::Diff.default_max_patch_bytes
         )
 
         expect_any_instance_of(Gitaly::DiffService::Stub).to receive(:commit_diff).with(request, kind_of(Hash))
@@ -53,7 +53,7 @@ RSpec.describe Gitlab::GitalyClient::CommitService do
           safe_max_files: 100,
           safe_max_lines: 5000,
           safe_max_bytes: 512000,
-          max_patch_bytes: 102400
+          max_patch_bytes: Gitlab::Git::Diff.default_max_patch_bytes
         )
 
         expect_any_instance_of(Gitaly::DiffService::Stub).to receive(:commit_diff).with(request, kind_of(Hash))

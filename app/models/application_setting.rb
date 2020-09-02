@@ -230,7 +230,7 @@ class ApplicationSetting < ApplicationRecord
   validates :diff_max_patch_bytes,
             presence: true,
             numericality: { only_integer: true,
-                            greater_than_or_equal_to: Gitlab::Git::Diff::DEFAULT_MAX_PATCH_BYTES,
+                            greater_than_or_equal_to: Gitlab::Git::Diff.default_max_patch_bytes,
                             less_than_or_equal_to: Gitlab::Git::Diff::MAX_PATCH_BYTES_UPPER_BOUND }
 
   validates :user_default_internal_regex, js_regex: true, allow_nil: true

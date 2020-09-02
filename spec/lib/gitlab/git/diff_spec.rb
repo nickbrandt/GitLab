@@ -156,6 +156,28 @@ EOT
     end
   end
 
+  describe ".default_max_patch_bytes" do
+    context "when :increased_default_max_patch_bytes is enabled" do
+      before do
+        stub_feature_flags(increased_default_max_patch_bytes: true)
+      end
+
+      it "returns 200kb" do
+        expect(described_class.default_max_patch_bytes).to eq 204800
+      end
+    end
+
+    context "when :increased_default_max_patch_bytes is disabled" do
+      before do
+        stub_feature_flags(increased_default_max_patch_bytes: false)
+      end
+
+      it "returns 200kb" do
+        expect(described_class.default_max_patch_bytes).to eq 102400
+      end
+    end
+  end
+
   describe 'straight diffs' do
     let(:options) { { straight: true } }
     let(:diffs) { described_class.between(repository, 'feature', 'master', options) }

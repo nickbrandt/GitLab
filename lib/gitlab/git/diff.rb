@@ -34,6 +34,20 @@ module Gitlab
       SERIALIZE_KEYS = %i(diff new_path old_path a_mode b_mode new_file renamed_file deleted_file too_large).freeze
 
       class << self
+        # Experimental feature flag to gather insight on performance impact of
+        #   increasing the default patch bytes limit. If deemed sucessful, we
+        #   will update the value of DEFAULT_MAX_PATCH_BYTES. Note that users
+        #   can still set a custom value for their application by changing the
+        #   value of `ApplicationSettings#diff_max_patch_bytes`
+        #
+        def default_max_patch_bytes
+          if Feature.enabled?(:increased_default_max_patch_bytes)
+            200.kilobytes
+          else
+            DEFAULT_MAX_PATCH_BYTES
+          end
+        end
+
         def between(repo, head, base, options = {}, *paths)
           straight = options.delete(:straight) || false
 

@@ -24,6 +24,20 @@ module Gitlab
         current_application_settings.respond_to?(name, include_private) || super
       end
 
+      # Experimental feature flag to gather insight on performance impact of
+      #   increasing the default patch bytes limit. If deemed sucessful, we
+      #   will update the value of DEFAULT_MAX_PATCH_BYTES. Note that users
+      #   can still set a custom value for their application by changing the
+      #   value of `ApplicationSettings#diff_max_patch_bytes`
+      #
+      def diff_max_patch_bytes
+        if Feature.enabled?(:increased_default_max_patch_bytes)
+          200.kilobytes
+        else
+          current_application_settings.diff_max_patch_bytes
+        end
+      end
+
       private
 
       def ensure_application_settings!
