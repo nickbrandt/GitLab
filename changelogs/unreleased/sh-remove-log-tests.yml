@@ -1,0 +1,5 @@
+---
+title: Drop tests that check for log messages
+merge_request: 591
+author:
+type: other

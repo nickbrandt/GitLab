@@ -203,11 +203,8 @@ func TestSaveFile(t *testing.T) {
 
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
-			logHook := testhelper.SetupLogger()
-
 			var opts filestore.SaveFileOpts
 			var expectedDeletes, expectedPuts int
-			var expectedClientMode string
 
 			osStub, ts := test.StartObjectStore()
 			defer ts.Close()
@@ -224,7 +221,6 @@ func TestSaveFile(t *testing.T) {
 
 				expectedDeletes = 1
 				expectedPuts = 1
-				expectedClientMode = "http"
 			case remoteMultipart:
 				objectURL := ts.URL + test.ObjectPath
 
@@ -239,13 +235,11 @@ func TestSaveFile(t *testing.T) {
 				osStub.InitiateMultipartUpload(test.ObjectPath)
 				expectedDeletes = 1
 				expectedPuts = 2
-				expectedClientMode = "multipart"
 			}
 
 			if spec.local {
 				opts.LocalTempPath = tmpFolder
 				opts.TempFilePrefix = "test-file"
-				expectedClientMode = "local"
 			}
 
 			ctx, cancel := context.WithCancel(context.Background())
@@ -295,20 +289,11 @@ func TestSaveFile(t *testing.T) {
 			uploadFields := token.Claims.(*testhelper.UploadClaims).Upload
 
 			checkFileHandlerWithFields(t, fh, uploadFields, "", spec.remote == notRemote)
-
-			require.True(t, testhelper.WaitForLogEvent(logHook))
-			entries := logHook.AllEntries()
-			require.Equal(t, 1, len(entries))
-			msg := entries[0].Message
-			require.Contains(t, msg, "saved file")
-			require.Contains(t, msg, fmt.Sprintf("client_mode=%s", expectedClientMode))
 		})
 	}
 }
 
 func TestSaveFileWithS3WorkhorseClient(t *testing.T) {
-	logHook := testhelper.SetupLogger()
-
 	s3Creds, s3Config, sess, ts := test.SetupS3(t, "")
 	defer ts.Close()
 
@@ -332,18 +317,9 @@ func TestSaveFileWithS3WorkhorseClient(t *testing.T) {
 	require.NoError(t, err)
 
 	test.S3ObjectExists(t, sess, s3Config, remoteObject, test.ObjectContent)
-
-	require.True(t, testhelper.WaitForLogEvent(logHook))
-	entries := logHook.AllEntries()
-	require.Equal(t, 1, len(entries))
-	msg := entries[0].Message
-	require.Contains(t, msg, "saved file")
-	require.Contains(t, msg, "client_mode=s3")
 }
 
 func TestSaveFileWithAzureWorkhorseClient(t *testing.T) {
-	logHook := testhelper.SetupLogger()
-
 	mux, bucketDir, cleanup := test.SetupGoCloudFileBucket(t, "azblob")
 	defer cleanup()
 
@@ -367,13 +343,6 @@ func TestSaveFileWithAzureWorkhorseClient(t *testing.T) {
 	require.NoError(t, err)
 
 	test.GoCloudObjectExists(t, bucketDir, remoteObject)
-
-	require.True(t, testhelper.WaitForLogEvent(logHook))
-	entries := logHook.AllEntries()
-	require.Equal(t, 1, len(entries))
-	msg := entries[0].Message
-	require.Contains(t, msg, "saved file")
-	require.Contains(t, msg, "client_mode=\"go_cloud:AzureRM\"")
 }
 
 func TestSaveFileWithUnknownGoCloudScheme(t *testing.T) {
