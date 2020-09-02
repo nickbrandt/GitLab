@@ -3,11 +3,11 @@
 require 'spec_helper'
 
 RSpec.describe Security::StoreFindingsMetadataService do
-  let(:security_scan) { create(:security_scan) }
-  let(:project) { security_scan.project }
-  let(:security_finding) { build(:ci_reports_security_finding) }
-  let(:security_scanner) { build(:ci_reports_security_scanner) }
-  let(:report) do
+  let_it_be(:security_scan) { create(:security_scan) }
+  let_it_be(:project) { security_scan.project }
+  let_it_be(:security_finding) { build(:ci_reports_security_finding) }
+  let_it_be(:security_scanner) { build(:ci_reports_security_scanner) }
+  let_it_be(:report) do
     build(
       :ci_reports_security_report,
       findings: [security_finding],
@@ -31,6 +31,10 @@ RSpec.describe Security::StoreFindingsMetadataService do
     end
 
     context 'when the given security scan does not have any findings' do
+      before do
+        security_scan.findings.delete_all
+      end
+
       it 'creates the security finding entries in database' do
         expect { store_findings }.to change { security_scan.findings.count }.by(1)
                                  .and change { security_scan.findings.last&.severity }.to(security_finding.severity.to_s)
