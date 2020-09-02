@@ -1,6 +1,5 @@
 <script>
-/* eslint-disable vue/no-v-html */
-import { GlDeprecatedButton, GlButton } from '@gitlab/ui';
+import { GlDeprecatedButton, GlButton, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
 import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { __, s__ } from '~/locale';
@@ -14,6 +13,8 @@ export default {
     EventItem,
     HistoryCommentEditor,
   },
+
+  directives: { SafeHtml },
 
   props: {
     comment: {
@@ -154,7 +155,7 @@ export default {
     icon-class="timeline-icon m-0"
     class="m-3"
   >
-    <div class="md" v-html="comment.note_html"></div>
+    <div v-safe-html="comment.note_html" class="md"></div>
 
     <template #right-content>
       <gl-button
