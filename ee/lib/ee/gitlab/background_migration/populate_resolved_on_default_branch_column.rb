@@ -199,11 +199,14 @@ module EE
         class Vulnerability < ActiveRecord::Base
           include EachBatch
 
-          scope :not_found_in_pipeline_id, -> (pipeline_id) { where.not(id: found_in_pipeline(pipeline_id)) }
-          scope :found_in_pipeline, -> (pipeline_id) do
-            joins(<<~SQL)
-              INNER JOIN vulnerability_occurrences vo ON vo.vulnerability_id = vulnerabilities.id
-              INNER JOIN vulnerability_occurrence_pipelines vop ON vop.occurrence_id = vo.id AND vop.pipeline_id = #{pipeline_id}
+          scope :not_found_in_pipeline_id, -> (pipeline_id) do
+            where(<<~SQL)
+              NOT EXISTS (
+                SELECT 1
+                FROM vulnerability_occurrences vo
+                INNER JOIN vulnerability_occurrence_pipelines vop ON vop.occurrence_id = vo.id
+                WHERE vo.vulnerability_id = vulnerabilities.id AND vop.pipeline_id = #{pipeline_id}
+              )
             SQL
           end
         end
@@ -265,6 +268,7 @@ module EE
 
           def initialize(project_id)
             self.project_id = project_id
+            self.updated_count = 0
           end
 
           def perform
@@ -274,20 +278,24 @@ module EE
             log_error(e)
           end
 
+          attr_accessor :project_id, :updated_count
+
           private
 
-          attr_accessor :project_id
-
           def update_vulnerabilities
-            @updated_count ||= project.resolved_vulnerabilities
-                                      .update_all(resolved_on_default_branch: true)
+            return if project.resolved_vulnerabilities.none?
+
+            project.vulnerabilities.each_batch do |relation|
+              self.updated_count += relation.merge(project.resolved_vulnerabilities)
+                                            .update_all(resolved_on_default_branch: true)
+            end
           end
 
           def log_info
             ::Gitlab::BackgroundMigration::Logger.info(
               migrator: 'PopulateResolvedOnDefaultBranchColumnForProject',
               message: 'Project migrated',
-              updated_count: @updated_count,
+              updated_count: updated_count,
               project_id: project_id
             )
           end
