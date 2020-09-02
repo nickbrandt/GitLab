@@ -18,42 +18,23 @@ jest.mock('~/user_popovers');
 describe('Vulnerability Footer', () => {
   let wrapper;
 
-  const minimumProps = {
-    discussionsUrl: `/discussions`,
-    solutionInfo: {
-      hasDownload: false,
-      hasMr: false,
-      hasRemediation: false,
-      isStandaloneVulnerability: true,
-      remediation: null,
-      solution: undefined,
-      vulnerabilityFeedbackHelpPath:
-        '/help/user/application_security/index#interacting-with-the-vulnerabilities',
-    },
-    finding: {},
-    notesUrl: '/notes',
+  const vulnerability = {
+    id: 1,
+    discussions_url: '/discussions',
+    notes_url: '/notes',
     project: {
-      url: '/root/security-reports',
-      value: 'Administrator / Security Reports',
+      full_path: '/root/security-reports',
+      full_name: 'Administrator / Security Reports',
     },
-    vulnerabilityId: 1,
-    canModifyRelatedIssues: true,
-    relatedIssuesHelpPath: 'help/path',
+    can_modify_related_issues: true,
+    related_issues_help_path: 'help/path',
+    has_mr: false,
+    vulnerability_feedback_help_path: 'feedback/help/path',
   };
 
-  const solutionInfoProp = {
-    hasDownload: true,
-    hasMr: false,
-    isStandaloneVulnerability: true,
-    remediation: {},
-    solution: 'Upgrade to fixed version.\n',
-    vulnerabilityFeedbackHelpPath:
-      '/help/user/application_security/index#interacting-with-the-vulnerabilities',
-  };
-
-  const createWrapper = (props = minimumProps) => {
+  const createWrapper = (properties = {}) => {
     wrapper = shallowMount(VulnerabilityFooter, {
-      propsData: props,
+      propsData: { vulnerability: { ...vulnerability, ...properties } },
     });
   };
 
@@ -77,9 +58,18 @@ describe('Vulnerability Footer', () => {
 
   describe('solution card', () => {
     it('does show solution card when there is one', () => {
-      createWrapper({ ...minimumProps, solutionInfo: solutionInfoProp });
+      const properties = { remediations: [{ diff: [{}] }], solution: 'some solution' };
+      createWrapper(properties);
+
       expect(wrapper.find(SolutionCard).exists()).toBe(true);
-      expect(wrapper.find(SolutionCard).props()).toMatchObject(solutionInfoProp);
+      expect(wrapper.find(SolutionCard).props()).toEqual({
+        solution: properties.solution,
+        remediation: properties.remediations[0],
+        hasDownload: true,
+        hasMr: vulnerability.has_mr,
+        vulnerabilityFeedbackHelpPath: vulnerability.vulnerability_feedback_help_path,
+        isStandaloneVulnerability: true,
+      });
     });
 
     it('does not show solution card when there is not one', () => {
@@ -89,19 +79,17 @@ describe('Vulnerability Footer', () => {
   });
 
   describe.each`
-    type               | prop                      | component
-    ${'issue'}         | ${'issueFeedback'}        | ${IssueNote}
-    ${'merge request'} | ${'mergeRequestFeedback'} | ${MergeRequestNote}
+    type               | prop                        | component
+    ${'issue'}         | ${'issue_feedback'}         | ${IssueNote}
+    ${'merge request'} | ${'merge_request_feedback'} | ${MergeRequestNote}
   `('$type note', ({ prop, component }) => {
     // The object itself does not matter, we just want to make sure it's passed to the issue note.
     const feedback = {};
 
     it('shows issue note when an issue exists for the vulnerability', () => {
-      createWrapper({ ...minimumProps, [prop]: feedback });
+      createWrapper({ [prop]: feedback });
       expect(wrapper.find(component).exists()).toBe(true);
-      expect(wrapper.find(component).props()).toMatchObject({
-        feedback,
-      });
+      expect(wrapper.find(component).props('feedback')).toBe(feedback);
     });
 
     it('does not show issue note when there is no issue for the vulnerability', () => {
@@ -111,7 +99,7 @@ describe('Vulnerability Footer', () => {
   });
 
   describe('state history', () => {
-    const discussionUrl = '/discussions';
+    const discussionUrl = vulnerability.discussions_url;
 
     const historyList = () => wrapper.find({ ref: 'historyList' });
     const historyEntries = () => wrapper.findAll(HistoryEntry);
@@ -166,7 +154,7 @@ describe('Vulnerability Footer', () => {
       const getDiscussion = (entries, index) => entries.at(index).props('discussion');
       const createNotesRequest = (...notes) =>
         mockAxios
-          .onGet(minimumProps.notesUrl)
+          .onGet(vulnerability.notes_url)
           .replyOnce(200, { notes, last_fetched_at: Date.now() });
 
       // Following #217184 the vulnerability polling uses an initial timeout
@@ -243,7 +231,7 @@ describe('Vulnerability Footer', () => {
       });
 
       it('shows an error if the notes poll fails', () => {
-        mockAxios.onGet(minimumProps.notesUrl).replyOnce(500);
+        mockAxios.onGet(vulnerability.notes_url).replyOnce(500);
 
         return axios.waitForAll().then(async () => {
           await startTimeoutsAndAwaitRequests();
@@ -276,16 +264,16 @@ describe('Vulnerability Footer', () => {
     it('has the correct props', () => {
       const endpoint = Api.buildUrl(Api.vulnerabilityIssueLinksPath).replace(
         ':id',
-        minimumProps.vulnerabilityId,
+        vulnerability.id,
       );
       createWrapper();
 
       expect(relatedIssues().exists()).toBe(true);
       expect(relatedIssues().props()).toMatchObject({
         endpoint,
-        canModifyRelatedIssues: minimumProps.canModifyRelatedIssues,
-        projectPath: minimumProps.project.url,
-        helpPath: minimumProps.relatedIssuesHelpPath,
+        canModifyRelatedIssues: vulnerability.can_modify_related_issues,
+        projectPath: vulnerability.project.full_path,
+        helpPath: vulnerability.related_issues_help_path,
       });
     });
   });

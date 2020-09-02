@@ -38,7 +38,9 @@ export default {
       isProcessingAction: false,
       isLoadingVulnerability: false,
       isLoadingUser: false,
-      vulnerability: this.initialVulnerability,
+      // Spread operator because the header could modify the `project`
+      // prop leading to an error in the footer component.
+      vulnerability: { ...this.initialVulnerability },
       user: undefined,
       refreshVulnerabilitySource: undefined,
     };
