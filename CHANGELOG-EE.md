@@ -266,6 +266,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Replace -800 hex value, replace usages with -700. !39734
 
 
+## 13.2.8 (2020-09-02)
+
+- No changes.
+
 ## 13.2.7 (2020-09-02)
 
 ### Security (2 changes)
