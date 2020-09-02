@@ -623,17 +623,6 @@ Style/EmptyLambdaParameter:
     - 'app/models/ci/build.rb'
     - 'app/models/ci/runner.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-Style/EmptyLiteral:
-  Exclude:
-    - 'lib/gitlab/fogbugz_import/importer.rb'
-    - 'lib/gitlab/git/diff_collection.rb'
-    - 'lib/gitlab/gitaly_client.rb'
-    - 'spec/helpers/merge_requests_helper_spec.rb'
-    - 'spec/lib/gitlab/workhorse_spec.rb'
-    - 'spec/requests/api/jobs_spec.rb'
-
 # Offense count: 170
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
