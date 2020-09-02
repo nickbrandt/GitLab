@@ -10,10 +10,10 @@ class Geo::DesignRegistry < Geo::BaseRegistry
 
   belongs_to :project
 
+  scope :dirty, -> { with_state(:pending).where.not(last_synced_at: nil) }
   scope :failed, -> { with_state(:failed) }
-  scope :needs_sync_again, -> { failed.retry_due }
+  scope :needs_sync_again, -> { dirty.or(failed.retry_due) }
   scope :never_attempted_sync, -> { with_state(:pending).where(last_synced_at: nil) }
-  scope :pending, -> { with_state(:pending) }
   scope :retry_due, -> { where(arel_table[:retry_at].eq(nil).or(arel_table[:retry_at].lt(Time.current))) }
   scope :synced, -> { with_state(:synced) }
 
