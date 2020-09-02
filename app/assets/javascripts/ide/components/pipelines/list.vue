@@ -1,7 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { escape } from 'lodash';
-import { GlLoadingIcon, GlIcon, GlSafeHtmlDirective } from '@gitlab/ui';
+import { GlLoadingIcon, GlIcon, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
 import { sprintf, __ } from '../../../locale';
 import CiIcon from '../../../vue_shared/components/ci_icon.vue';
 import Tabs from '../../../vue_shared/components/tabs/tabs';
@@ -22,7 +22,7 @@ export default {
     GlLoadingIcon,
   },
   directives: {
-    GlSafeHtmlDirective,
+    SafeHtml,
   },
   computed: {
     ...mapState(['pipelinesEmptyStateSvgPath', 'links']),
