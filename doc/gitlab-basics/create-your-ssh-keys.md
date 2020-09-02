@@ -26,5 +26,5 @@ To add the SSH public key to GitLab, see
 
 NOTE: **Note:**
 Once you add a key, you can't edit it. If it did not paste properly, it
-[this does not work](../ssh/README.md#testing-that-everything-is-set-up-correctly), and
+[will not work](../ssh/README.md#testing-that-everything-is-set-up-correctly), and
 you need to remove the key from GitLab and try adding it again.
