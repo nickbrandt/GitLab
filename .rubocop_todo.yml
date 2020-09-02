@@ -113,14 +113,6 @@ Lint/UriEscapeUnescape:
     - 'spec/lib/google_api/auth_spec.rb'
     - 'spec/requests/api/files_spec.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-Lint/UriRegexp:
-  Exclude:
-    - 'app/models/concerns/mentionable/reference_regexes.rb'
-    - 'app/services/projects/download_service.rb'
-    - 'lib/gitlab/ci/pipeline/chain/config/content/remote.rb'
-
 # Offense count: 65
 # Cop supports --auto-correct.
 Migration/DepartmentName:
