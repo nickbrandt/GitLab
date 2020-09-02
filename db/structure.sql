@@ -21038,6 +21038,8 @@ CREATE INDEX index_vulnerabilities_on_milestone_id ON public.vulnerabilities USI
 
 CREATE INDEX index_vulnerabilities_on_project_id ON public.vulnerabilities USING btree (project_id);
 
+CREATE INDEX index_vulnerabilities_on_project_id_and_id ON public.vulnerabilities USING btree (project_id, id);
+
 CREATE INDEX index_vulnerabilities_on_resolved_by_id ON public.vulnerabilities USING btree (resolved_by_id);
 
 CREATE INDEX index_vulnerabilities_on_start_date_sourcing_milestone_id ON public.vulnerabilities USING btree (start_date_sourcing_milestone_id);
