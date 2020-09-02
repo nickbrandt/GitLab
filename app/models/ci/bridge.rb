@@ -21,6 +21,8 @@ module Ci
 
     validates :ref, presence: true
 
+    scope :order_id_desc, -> { order('ci_builds.id DESC') }
+
     # rubocop:disable Cop/ActiveRecordSerialize
     serialize :options
     serialize :yaml_variables, ::Gitlab::Serializer::Ci::Variables
@@ -48,7 +50,7 @@ module Ci
       raise NotImplementedError
     end
 
-    def self.preload_metadata
+    def self.with_preloads
       preload(
         :metadata,
         downstream_pipeline: [project: [:route, { namespace: :route }]],

@@ -411,7 +411,8 @@ RSpec.describe API::Ci::Pipelines do
         let(:api_user) { nil }
 
         it 'does not return jobs' do
-          expect(response).to have_gitlab_http_status(:unauthorized)
+          expect(json_response['message']).to eq '404 Project Not Found'
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 
@@ -427,7 +428,7 @@ RSpec.describe API::Ci::Pipelines do
   end
 
   describe 'GET /projects/:id/pipelines/:pipeline_id/bridges' do
-    let!(:bridge) { create(:ci_bridge, pipeline: pipeline) }
+    let_it_be(:bridge) { create(:ci_bridge, pipeline: pipeline) }
     let(:downstream_pipeline) { create(:ci_pipeline) }
 
     let!(:pipeline_source) do
@@ -564,7 +565,8 @@ RSpec.describe API::Ci::Pipelines do
         let(:api_user) { nil }
 
         it 'does not return bridges' do
-          expect(response).to have_gitlab_http_status(:unauthorized)
+        expect(json_response['message']).to eq '404 Project Not Found'
+          expect(response).to have_gitlab_http_status(:not_found)
         end
       end
 

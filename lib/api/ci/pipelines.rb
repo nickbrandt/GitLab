@@ -124,10 +124,14 @@ module API
         end
 
         get ':id/pipelines/:pipeline_id/jobs' do
-          authenticate!
+          authorize!(:read_pipeline, user_project)
 
-          builds = ::Ci::PipelineJobsFinder.new(current_user, user_project, params).execute
-          builds = builds.preload_job_artifacts
+          pipeline = user_project.all_pipelines.find(params[:pipeline_id])
+          builds = ::Ci::JobsFinder
+            .new(current_user: current_user, pipeline: pipeline, params: params)
+            .execute
+
+          builds = builds.with_preloads
 
           present paginate(builds), with: Entities::Job
         end
@@ -142,14 +146,15 @@ module API
         end
 
         get ':id/pipelines/:pipeline_id/bridges' do
-          authenticate!
+          authorize!(:read_build, user_project)
 
-          bridges = ::Ci::PipelineJobsFinder.new(
-            current_user,
-            user_project,
-            params.merge(type: :bridges)
-          ).execute
-          bridges = bridges.preload_metadata
+          pipeline = user_project.all_pipelines.find(params[:pipeline_id])
+
+          bridges = ::Ci::JobsFinder
+            .new(current_user: current_user, pipeline: pipeline, params: params, type: ::Ci::Bridge)
+            .execute
+
+          bridges = bridges.with_preloads
 
           present paginate(bridges), with: Entities::Bridge
         end
