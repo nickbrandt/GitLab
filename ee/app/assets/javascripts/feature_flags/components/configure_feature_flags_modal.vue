@@ -1,5 +1,4 @@
 <script>
-/* eslint-disable vue/no-v-html */
 import {
   GlFormGroup,
   GlFormInput,
@@ -9,6 +8,7 @@ import {
   GlSprintf,
   GlLink,
   GlIcon,
+  GlSafeHtmlDirective as SafeHtml,
 } from '@gitlab/ui';
 import { s__, __, sprintf } from '~/locale';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
@@ -40,6 +40,7 @@ export default {
 
   directives: {
     GlTooltip: GlTooltipDirective,
+    SafeHtml,
   },
 
   props: {
@@ -150,7 +151,7 @@ export default {
     <template #modal-title>
       {{ $options.modalTitle }}
     </template>
-    <p v-html="helpText"></p>
+    <p v-safe-html="helpText"></p>
     <callout category="warning">
       <gl-sprintf
         :message="
