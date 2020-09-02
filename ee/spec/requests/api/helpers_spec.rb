@@ -25,7 +25,7 @@ RSpec.describe API::Helpers do
   let(:params) { request.params }
 
   def error!(message, status, header)
-    raise Exception.new("#{status} - #{message}")
+    raise StandardError.new("#{status} - #{message}")
   end
 
   before do

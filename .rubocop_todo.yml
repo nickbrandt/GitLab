@@ -69,20 +69,6 @@ Layout/LineLength:
 Layout/MultilineOperationIndentation:
   Enabled: false
 
-# Offense count: 9
-# Cop supports --auto-correct.
-Layout/RescueEnsureAlignment:
-  Exclude:
-    - 'app/models/blob_viewer/dependency_manager.rb'
-    - 'app/models/project.rb'
-    - 'app/services/prometheus/proxy_service.rb'
-    - 'app/workers/delete_stored_files_worker.rb'
-    - 'config/initializers/1_settings.rb'
-    - 'config/initializers/trusted_proxies.rb'
-    - 'lib/gitlab/background_migration/archive_legacy_traces.rb'
-    - 'lib/gitlab/highlight.rb'
-    - 'lib/tasks/gitlab/lfs/migrate.rake'
-
 # Offense count: 36
 # Cop supports --auto-correct.
 Layout/SpaceAroundMethodCallOperator:
@@ -122,15 +108,6 @@ Lint/NonDeterministicRequireOrder:
     - 'ee/spec/spec_helper.rb'
     - 'qa/spec/spec_helper.rb'
     - 'spec/spec_helper.rb'
-
-# Offense count: 3
-# Configuration parameters: AllowedImplicitNamespaces.
-# AllowedImplicitNamespaces: Gem
-Lint/RaiseException:
-  Exclude:
-    - 'db/migrate/20190402150158_backport_enterprise_schema.rb'
-    - 'ee/spec/requests/api/helpers_spec.rb'
-    - 'spec/requests/api/helpers_spec.rb'
 
 # Offense count: 27
 # Cop supports --auto-correct.
