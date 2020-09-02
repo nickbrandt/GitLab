@@ -2834,6 +2834,9 @@ msgstr ""
 msgid "An error occurred while retrieving diff files"
 msgstr ""
 
+msgid "An error occurred while retrieving projects."
+msgstr ""
+
 msgid "An error occurred while saving LDAP override status. Please try again."
 msgstr ""
 
@@ -5007,6 +5010,9 @@ msgid "ClassificationLabelUnavailable|is unavailable: %{reason}"
 msgstr ""
 
 msgid "Cleanup policy for tags"
+msgstr ""
+
+msgid "Cleanup policy maximum processing time (seconds)"
 msgstr ""
 
 msgid "Clear"
@@ -24101,6 +24107,9 @@ msgid "Tagged this commit to %{tag_name}."
 msgstr ""
 
 msgid "Tags"
+msgstr ""
+
+msgid "Tags are deleted until the timeout is reached. Any remaining tags are included the next time the policy runs. To remove the time limit, set it to 0."
 msgstr ""
 
 msgid "Tags feed"
