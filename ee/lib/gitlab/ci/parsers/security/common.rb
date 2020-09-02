@@ -21,6 +21,7 @@ module Gitlab
           rescue JSON::ParserError
             raise SecurityReportParserError, 'JSON parsing failed'
           rescue => e
+            puts "ERROR: #{e}"
             Gitlab::ErrorTracking.track_and_raise_for_dev_exception(e)
             raise SecurityReportParserError, "#{report.type} security report parsing failed"
           end

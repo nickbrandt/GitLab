@@ -1,25 +1,23 @@
 <script>
 import ReportItemLabel from './label.vue';
+import ReportItemText from './text.vue';
 import ReportItemList from './list.vue';
 import ReportItemHexInt from './hex_int.vue';
-import ReportItemPlain from './plain.vue';
 import ReportItemFileLocation from './file_location.vue';
 import ReportItemModuleLocation from './module_location.vue';
 import ReportItemCode from './code.vue';
-import ReportItemLabelValue from './label_value.vue';
 import ReportItemLink from './link.vue';
 
 export default {
   name: 'ReportItemNamedList',
   components: {
-    ReportItemList,
     ReportItemLabel,
+    ReportItemList,
+    ReportItemText,
     ReportItemModuleLocation,
     ReportItemFileLocation,
     ReportItemHexInt,
-    ReportItemPlain,
     ReportItemCode,
-    ReportItemLabelValue,
     ReportItemLink
   },
   props: {
@@ -40,14 +38,10 @@ export default {
   <table class="table report-item-table">
     <tr v-for="(item, name) in items">
       <td class="report-item-label-td">
-          <label class="font-weight-bold">{{name}}</label>
+        <report-item-label v-bind="item" />
       </td>
 
-      <td v-if="item.type == 'label'">
-        <report-item-label-value :value="item.value" />
-      </td>
-
-      <td v-else>
+      <td>
         <component
           :is="'report-item-' + item.type"
           v-bind="item"

@@ -8928,6 +8928,22 @@ CREATE SEQUENCE public.analytics_cycle_analytics_project_stages_id_seq
 
 ALTER SEQUENCE public.analytics_cycle_analytics_project_stages_id_seq OWNED BY public.analytics_cycle_analytics_project_stages.id;
 
+CREATE TABLE public.analytics_instance_statistics_measurements (
+    id bigint NOT NULL,
+    count bigint NOT NULL,
+    recorded_at timestamp with time zone NOT NULL,
+    identifier smallint NOT NULL
+);
+
+CREATE SEQUENCE public.analytics_instance_statistics_measurements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.analytics_instance_statistics_measurements_id_seq OWNED BY public.analytics_instance_statistics_measurements.id;
+
 CREATE TABLE public.analytics_language_trend_repository_languages (
     file_count integer DEFAULT 0 NOT NULL,
     programming_language_id bigint NOT NULL,
@@ -9669,6 +9685,23 @@ CREATE TABLE public.boards (
     hide_backlog_list boolean DEFAULT false NOT NULL,
     hide_closed_list boolean DEFAULT false NOT NULL
 );
+
+CREATE TABLE public.boards_epic_user_preferences (
+    id bigint NOT NULL,
+    board_id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    epic_id bigint NOT NULL,
+    collapsed boolean DEFAULT false NOT NULL
+);
+
+CREATE SEQUENCE public.boards_epic_user_preferences_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.boards_epic_user_preferences_id_seq OWNED BY public.boards_epic_user_preferences.id;
 
 CREATE SEQUENCE public.boards_id_seq
     START WITH 1
@@ -14163,7 +14196,9 @@ CREATE TABLE public.plan_limits (
     maven_max_file_size bigint DEFAULT 52428800 NOT NULL,
     npm_max_file_size bigint DEFAULT 52428800 NOT NULL,
     nuget_max_file_size bigint DEFAULT 52428800 NOT NULL,
-    pypi_max_file_size bigint DEFAULT 52428800 NOT NULL
+    pypi_max_file_size bigint DEFAULT 52428800 NOT NULL,
+    generic_packages_max_file_size bigint DEFAULT '5368709120'::bigint NOT NULL,
+    ci_max_artifact_size_security integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE public.plan_limits_id_seq
@@ -15354,6 +15389,25 @@ CREATE SEQUENCE public.scim_oauth_access_tokens_id_seq
     CACHE 1;
 
 ALTER SEQUENCE public.scim_oauth_access_tokens_id_seq OWNED BY public.scim_oauth_access_tokens.id;
+
+CREATE TABLE public.security_findings (
+    id bigint NOT NULL,
+    scan_id bigint NOT NULL,
+    scanner_id bigint NOT NULL,
+    severity smallint NOT NULL,
+    confidence smallint NOT NULL,
+    project_fingerprint text NOT NULL,
+    CONSTRAINT check_b9508c6df8 CHECK ((char_length(project_fingerprint) <= 40))
+);
+
+CREATE SEQUENCE public.security_findings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.security_findings_id_seq OWNED BY public.security_findings.id;
 
 CREATE TABLE public.security_scans (
     id bigint NOT NULL,
@@ -16799,6 +16853,8 @@ ALTER TABLE ONLY public.analytics_cycle_analytics_group_value_streams ALTER COLU
 
 ALTER TABLE ONLY public.analytics_cycle_analytics_project_stages ALTER COLUMN id SET DEFAULT nextval('public.analytics_cycle_analytics_project_stages_id_seq'::regclass);
 
+ALTER TABLE ONLY public.analytics_instance_statistics_measurements ALTER COLUMN id SET DEFAULT nextval('public.analytics_instance_statistics_measurements_id_seq'::regclass);
+
 ALTER TABLE ONLY public.appearances ALTER COLUMN id SET DEFAULT nextval('public.appearances_id_seq'::regclass);
 
 ALTER TABLE ONLY public.application_setting_terms ALTER COLUMN id SET DEFAULT nextval('public.application_setting_terms_id_seq'::regclass);
@@ -16846,6 +16902,8 @@ ALTER TABLE ONLY public.board_project_recent_visits ALTER COLUMN id SET DEFAULT 
 ALTER TABLE ONLY public.board_user_preferences ALTER COLUMN id SET DEFAULT nextval('public.board_user_preferences_id_seq'::regclass);
 
 ALTER TABLE ONLY public.boards ALTER COLUMN id SET DEFAULT nextval('public.boards_id_seq'::regclass);
+
+ALTER TABLE ONLY public.boards_epic_user_preferences ALTER COLUMN id SET DEFAULT nextval('public.boards_epic_user_preferences_id_seq'::regclass);
 
 ALTER TABLE ONLY public.broadcast_messages ALTER COLUMN id SET DEFAULT nextval('public.broadcast_messages_id_seq'::regclass);
 
@@ -17351,6 +17409,8 @@ ALTER TABLE ONLY public.scim_identities ALTER COLUMN id SET DEFAULT nextval('pub
 
 ALTER TABLE ONLY public.scim_oauth_access_tokens ALTER COLUMN id SET DEFAULT nextval('public.scim_oauth_access_tokens_id_seq'::regclass);
 
+ALTER TABLE ONLY public.security_findings ALTER COLUMN id SET DEFAULT nextval('public.security_findings_id_seq'::regclass);
+
 ALTER TABLE ONLY public.security_scans ALTER COLUMN id SET DEFAULT nextval('public.security_scans_id_seq'::regclass);
 
 ALTER TABLE ONLY public.self_managed_prometheus_alert_events ALTER COLUMN id SET DEFAULT nextval('public.self_managed_prometheus_alert_events_id_seq'::regclass);
@@ -17695,6 +17755,9 @@ ALTER TABLE ONLY public.analytics_cycle_analytics_group_value_streams
 ALTER TABLE ONLY public.analytics_cycle_analytics_project_stages
     ADD CONSTRAINT analytics_cycle_analytics_project_stages_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.analytics_instance_statistics_measurements
+    ADD CONSTRAINT analytics_instance_statistics_measurements_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.appearances
     ADD CONSTRAINT appearances_pkey PRIMARY KEY (id);
 
@@ -17775,6 +17838,9 @@ ALTER TABLE ONLY public.board_project_recent_visits
 
 ALTER TABLE ONLY public.board_user_preferences
     ADD CONSTRAINT board_user_preferences_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.boards_epic_user_preferences
+    ADD CONSTRAINT boards_epic_user_preferences_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.boards
     ADD CONSTRAINT boards_pkey PRIMARY KEY (id);
@@ -18607,6 +18673,9 @@ ALTER TABLE ONLY public.scim_identities
 ALTER TABLE ONLY public.scim_oauth_access_tokens
     ADD CONSTRAINT scim_oauth_access_tokens_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.security_findings
+    ADD CONSTRAINT security_findings_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY public.security_scans
     ADD CONSTRAINT security_scans_pkey PRIMARY KEY (id);
 
@@ -18947,6 +19016,8 @@ CREATE UNIQUE INDEX any_approver_merge_request_rule_type_unique_index ON public.
 
 CREATE UNIQUE INDEX any_approver_project_rule_type_unique_index ON public.approval_project_rules USING btree (project_id) WHERE (rule_type = 3);
 
+CREATE INDEX approval_mr_rule_index_merge_request_id ON public.approval_merge_request_rules USING btree (merge_request_id);
+
 CREATE UNIQUE INDEX approval_rule_name_index_for_code_owners ON public.approval_merge_request_rules USING btree (merge_request_id, code_owner, name) WHERE ((code_owner = true) AND (section IS NULL));
 
 CREATE UNIQUE INDEX backup_labels_group_id_project_id_title_idx ON public.backup_labels USING btree (group_id, project_id, title);
@@ -19221,6 +19292,14 @@ CREATE INDEX index_board_user_preferences_on_user_id ON public.board_user_prefer
 
 CREATE UNIQUE INDEX index_board_user_preferences_on_user_id_and_board_id ON public.board_user_preferences USING btree (user_id, board_id);
 
+CREATE INDEX index_boards_epic_user_preferences_on_board_id ON public.boards_epic_user_preferences USING btree (board_id);
+
+CREATE UNIQUE INDEX index_boards_epic_user_preferences_on_board_user_epic_unique ON public.boards_epic_user_preferences USING btree (board_id, user_id, epic_id);
+
+CREATE INDEX index_boards_epic_user_preferences_on_epic_id ON public.boards_epic_user_preferences USING btree (epic_id);
+
+CREATE INDEX index_boards_epic_user_preferences_on_user_id ON public.boards_epic_user_preferences USING btree (user_id);
+
 CREATE INDEX index_boards_on_group_id ON public.boards USING btree (group_id);
 
 CREATE INDEX index_boards_on_milestone_id ON public.boards USING btree (milestone_id);
@@ -19330,6 +19409,8 @@ CREATE INDEX index_ci_job_artifacts_on_project_id_for_security_reports ON public
 CREATE INDEX index_ci_job_variables_on_job_id ON public.ci_job_variables USING btree (job_id);
 
 CREATE UNIQUE INDEX index_ci_job_variables_on_key_and_job_id ON public.ci_job_variables USING btree (key, job_id);
+
+CREATE INDEX index_ci_pipeline_artifacts_on_expire_at ON public.ci_pipeline_artifacts USING btree (expire_at);
 
 CREATE INDEX index_ci_pipeline_artifacts_on_pipeline_id ON public.ci_pipeline_artifacts USING btree (pipeline_id);
 
@@ -20295,6 +20376,8 @@ CREATE INDEX index_on_id_partial_with_legacy_storage ON public.projects USING bt
 
 CREATE INDEX index_on_identities_lower_extern_uid_and_provider ON public.identities USING btree (lower((extern_uid)::text), provider);
 
+CREATE UNIQUE INDEX index_on_instance_statistics_recorded_at_and_identifier ON public.analytics_instance_statistics_measurements USING btree (identifier, recorded_at);
+
 CREATE INDEX index_on_users_name_lower ON public.users USING btree (lower((name)::text));
 
 CREATE INDEX index_open_project_tracker_data_on_service_id ON public.open_project_tracker_data USING btree (service_id);
@@ -20336,6 +20419,8 @@ CREATE INDEX index_packages_dependency_links_on_dependency_id ON public.packages
 CREATE INDEX index_packages_maven_metadata_on_package_id_and_path ON public.packages_maven_metadata USING btree (package_id, path);
 
 CREATE INDEX index_packages_nuget_dl_metadata_on_dependency_link_id ON public.packages_nuget_dependency_link_metadata USING btree (dependency_link_id);
+
+CREATE UNIQUE INDEX index_packages_on_project_id_name_version_unique_when_generic ON public.packages_packages USING btree (project_id, name, version) WHERE (package_type = 7);
 
 CREATE INDEX index_packages_package_files_file_store_is_null ON public.packages_package_files USING btree (id) WHERE (file_store IS NULL);
 
@@ -20766,6 +20851,16 @@ CREATE UNIQUE INDEX index_scim_oauth_access_tokens_on_group_id_and_token_encrypt
 CREATE INDEX index_secure_ci_builds_on_user_id_created_at_parser_features ON public.ci_builds USING btree (user_id, created_at) WHERE (((type)::text = 'Ci::Build'::text) AND ((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('license_scanning'::character varying)::text, ('sast'::character varying)::text, ('coverage_fuzzing'::character varying)::text, ('secret_detection'::character varying)::text])));
 
 CREATE INDEX index_security_ci_builds_on_name_and_id_parser_features ON public.ci_builds USING btree (name, id) WHERE (((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text, ('secret_detection'::character varying)::text, ('coverage_fuzzing'::character varying)::text, ('license_scanning'::character varying)::text])) AND ((type)::text = 'Ci::Build'::text));
+
+CREATE INDEX index_security_findings_on_confidence ON public.security_findings USING btree (confidence);
+
+CREATE INDEX index_security_findings_on_project_fingerprint ON public.security_findings USING btree (project_fingerprint);
+
+CREATE INDEX index_security_findings_on_scan_id ON public.security_findings USING btree (scan_id);
+
+CREATE INDEX index_security_findings_on_scanner_id ON public.security_findings USING btree (scanner_id);
+
+CREATE INDEX index_security_findings_on_severity ON public.security_findings USING btree (severity);
 
 CREATE INDEX index_self_managed_prometheus_alert_events_on_environment_id ON public.self_managed_prometheus_alert_events USING btree (environment_id);
 
@@ -22245,6 +22340,9 @@ ALTER TABLE ONLY public.group_custom_attributes
 ALTER TABLE ONLY public.cluster_agents
     ADD CONSTRAINT fk_rails_25e9fc2d5d FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.boards_epic_user_preferences
+    ADD CONSTRAINT fk_rails_268c57d62d FOREIGN KEY (board_id) REFERENCES public.boards(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.group_wiki_repositories
     ADD CONSTRAINT fk_rails_26f867598c FOREIGN KEY (group_id) REFERENCES public.namespaces(id) ON DELETE CASCADE;
 
@@ -22641,6 +22739,9 @@ ALTER TABLE ONLY public.list_user_preferences
 ALTER TABLE ONLY public.project_custom_attributes
     ADD CONSTRAINT fk_rails_719c3dccc5 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.security_findings
+    ADD CONSTRAINT fk_rails_729b763a54 FOREIGN KEY (scanner_id) REFERENCES public.vulnerability_scanners(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.dast_scanner_profiles
     ADD CONSTRAINT fk_rails_72a8ba7141 FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -22680,6 +22781,9 @@ ALTER TABLE ONLY public.x509_certificates
 ALTER TABLE ONLY public.pages_domain_acme_orders
     ADD CONSTRAINT fk_rails_76581b1c16 FOREIGN KEY (pages_domain_id) REFERENCES public.pages_domains(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY public.boards_epic_user_preferences
+    ADD CONSTRAINT fk_rails_76c4e9732d FOREIGN KEY (epic_id) REFERENCES public.epics(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY public.ci_subscriptions_projects
     ADD CONSTRAINT fk_rails_7871f9a97b FOREIGN KEY (upstream_project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
 
@@ -22712,6 +22816,9 @@ ALTER TABLE ONLY public.approval_merge_request_rules_users
 
 ALTER TABLE ONLY public.dast_site_profiles
     ADD CONSTRAINT fk_rails_83e309d69e FOREIGN KEY (project_id) REFERENCES public.projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.boards_epic_user_preferences
+    ADD CONSTRAINT fk_rails_851fe1510a FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.deployment_merge_requests
     ADD CONSTRAINT fk_rails_86a6d8bf12 FOREIGN KEY (merge_request_id) REFERENCES public.merge_requests(id) ON DELETE CASCADE;
@@ -22967,6 +23074,9 @@ ALTER TABLE ONLY public.approval_project_rules_users
 
 ALTER TABLE ONLY public.lists
     ADD CONSTRAINT fk_rails_baed5f39b7 FOREIGN KEY (milestone_id) REFERENCES public.milestones(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.security_findings
+    ADD CONSTRAINT fk_rails_bb63863cf1 FOREIGN KEY (scan_id) REFERENCES public.security_scans(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.approval_merge_request_rules_users
     ADD CONSTRAINT fk_rails_bc8972fa55 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;

@@ -7,7 +7,7 @@ export default {
     CodeBlock,
   },
   props: {
-    code: {
+    value: {
       type: String,
       required: true,
     },
@@ -32,5 +32,5 @@ export default {
 };
 </script>
 <template>
-  <code-block :code="code" />
+  <code-block :code="value" />
 </template>

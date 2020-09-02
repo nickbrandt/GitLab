@@ -31,6 +31,7 @@ module Gitlab
 
           def create_location(tracking_data)
             type = tracking_data['type']
+
             if type == 'source'
               ::Gitlab::Ci::Reports::Security::Tracking::Source.new(
                 file_path: tracking_data['file'],

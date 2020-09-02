@@ -4,7 +4,7 @@ module Gitlab
   module Ci
     module Reports
       module Security
-        module Locations
+        module Tracking
           class Source < Base
             attr_reader :file_path
             attr_reader :start_line

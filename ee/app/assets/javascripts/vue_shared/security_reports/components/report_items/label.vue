@@ -1,31 +1,40 @@
 <script>
-import ReportItemLabelValue from './label_value.vue';
+import Jed from 'jed';
+import { languageCode } from "~/locale";
 
 export default {
   name: 'ReportItemLabel',
   components: {
-    ReportItemLabelValue
   },
   props: {
     name: {
-      type: String,
+      type: Array,
       required: true,
     },
-    value: {
-      type: String,
+    description: {
+      type: Array,
       required: true,
-    },
+    }
   },
+  computed: {
+    langText() {
+    }
+  },
+  mounted() {
+    let langItems = {
+      name: [],
+      description: [],
+    };
+    this.name.forEach(item => langItems
+    this.locale = new Jed();
+  }
 }
 </script>
 
 <template>
   <tr>
     <td class="report-item-label-td">
-        <label class="font-weight-bold">{{name}}</label>
-    </td>
-    <td>
-      <report-item-label-value :value="value" />
+        <label class="font-weight-bold">{{langText}}</label>
     </td>
   </tr>
 </template>

@@ -4,7 +4,7 @@ module Gitlab
   module Ci
     module Reports
       module Security
-        module Locations
+        module Tracking
           class Hashed < Base
             attr_reader :data
 
