@@ -255,12 +255,12 @@ module QA
         end
 
         def view_email_patches
-          click_element :dropdown_toggle
+          click_element :download_dropdown
           visit_link_in_element(:download_email_patches)
         end
 
         def view_plain_diff
-          click_element :dropdown_toggle
+          click_element :download_dropdown
           visit_link_in_element(:download_plain_diff)
         end
 
