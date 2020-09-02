@@ -57,9 +57,18 @@ module EE
             FROM
               "ci_pipelines"
             WHERE
-              ci_pipelines.project_id = %{project_id}
-              AND ci_pipelines.ref = %{ref}
-              AND ci_pipelines.status IN ('success')
+              ("ci_pipelines"."id" IN (
+                SELECT
+                  "ci_pipelines"."id"
+                FROM
+                  "ci_pipelines"
+                WHERE
+                  ci_pipelines.project_id = %{project_id}
+                  AND ci_pipelines.ref = %{ref}
+                  AND ci_pipelines.status IN ('success')
+                ORDER BY
+                  "ci_pipelines"."id" DESC
+                LIMIT 100))
               AND (EXISTS (
                 SELECT
                   1
