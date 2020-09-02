@@ -149,14 +149,14 @@ You can automatically link OmniAuth users with existing GitLab users if their em
 **For Omnibus installations**
 
 ```ruby
-gitlab_rails['omniauth_auto_link_user'] = true
+gitlab_rails['omniauth_auto_link_user'] = ["saml", "twitter"]
 ```
 
 **For installations from source**
 
 ```yaml
 omniauth:
-  auto_link_user: true
+  auto_link_user: ["saml", "twitter"]
 ```
 
 ## Configure OmniAuth Providers as External

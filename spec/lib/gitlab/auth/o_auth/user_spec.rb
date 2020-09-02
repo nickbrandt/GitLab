@@ -202,9 +202,17 @@ RSpec.describe Gitlab::Auth::OAuth::User do
         include_examples "to verify compliance with allow_single_sign_on"
       end
 
-      context "with auto_link_user enabled" do
+      context "with auto_link_user enabled for a different provider" do
         before do
-          stub_omniauth_config(auto_link_user: true)
+          stub_omniauth_config(auto_link_user: ['saml'])
+        end
+
+        include_examples "to verify compliance with allow_single_sign_on"
+      end
+
+      context "with auto_link_user enabled for the correct provider" do
+        before do
+          stub_omniauth_config(auto_link_user: ['twitter'])
         end
 
         context "and a current GitLab user with a matching email" do
@@ -421,7 +429,7 @@ RSpec.describe Gitlab::Auth::OAuth::User do
 
       context "with both auto_link_user and auto_link_ldap_user enabled" do
         before do
-          stub_omniauth_config(auto_link_user: true, auto_link_ldap_user: true)
+          stub_omniauth_config(auto_link_user: ['twitter'], auto_link_ldap_user: true)
         end
 
         context "and at least one LDAP provider is defined" do

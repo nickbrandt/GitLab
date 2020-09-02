@@ -273,7 +273,12 @@ module Gitlab
         end
 
         def auto_link_user?
-          Gitlab.config.omniauth.auto_link_user
+          providers = Gitlab.config.omniauth.auto_link_user
+          if providers.is_a?(Array)
+            providers.include?(auth_hash.provider)
+          else
+            providers
+          end
         end
       end
     end
