@@ -8,6 +8,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const azureConfig = `
+[object_storage]
+provider = "AzureRM"
+
+[object_storage.azurerm]
+azure_storage_account_name = "azuretester"
+azure_storage_access_key = "deadbeef"
+`
+
 func TestLoadEmptyConfig(t *testing.T) {
 	config := ``
 
@@ -47,15 +56,7 @@ aws_secret_access_key = "gdk-minio"
 }
 
 func TestRegisterGoCloudURLOpeners(t *testing.T) {
-	config := `
-[object_storage]
-provider = "AzureRM"
-
-[object_storage.azurerm]
-azure_storage_account_name = "azuretester"
-azure_storage_access_key = "deadbeef"
-`
-	tmpFile, cfg := loadTempConfig(t, config)
+	tmpFile, cfg := loadTempConfig(t, azureConfig)
 	defer os.Remove(tmpFile.Name())
 
 	require.NotNil(t, cfg.ObjectStorageCredentials, "Expected object storage credentials")
