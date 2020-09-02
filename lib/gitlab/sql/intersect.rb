@@ -2,20 +2,21 @@
 
 module Gitlab
   module SQL
-    # Class for building SQL UNION statements.
+    # Class for building SQL INTERSECT statements.
     #
     # ORDER BYs are dropped from the relations as the final sort order is not
     # guaranteed any way.
     #
     # Example usage:
     #
-    #     union = Gitlab::SQL::Union.new([user.personal_projects, user.projects])
-    #     sql   = union.to_sql
+    #     hierarchies = [group1.self_and_hierarchy, group2.self_and_hierarchy]
+    #     intersect   = Gitlab::SQL::Intersect.new(hierarchies)
+    #     sql         = intersect.to_sql
     #
     #     Project.where("id IN (#{sql})")
-    class Union < SetOperator
+    class Intersect < SetOperator
       def self.operator_keyword
-        'UNION'
+        'INTERSECT'
       end
     end
   end
