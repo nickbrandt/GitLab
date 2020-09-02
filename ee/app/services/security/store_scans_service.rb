@@ -9,9 +9,7 @@ module Security
     def execute
       return if canceled_or_skipped?
 
-      ActiveRecord::Base.transaction do
-        security_reports.each { |_, report| store_scan_for(report) }
-      end
+      security_reports.each { |_, report| store_scan_for(report) }
     end
 
     private
@@ -29,9 +27,11 @@ module Security
     end
 
     def store_scan_for(report)
-      security_scan = Security::Scan.safe_find_or_create_by!(build: build, scan_type: report.type)
+      ActiveRecord::Base.transaction do
+        security_scan = Security::Scan.safe_find_or_create_by!(build: build, scan_type: report.type)
 
-      StoreFindingsMetadataService.execute(security_scan, report)
+        StoreFindingsMetadataService.execute(security_scan, report)
+      end
     end
   end
 end
