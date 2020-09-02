@@ -9,7 +9,7 @@ import { updateHistory, setUrlParams } from '~/lib/utils/url_utility';
 
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import AuthorToken from '~/vue_shared/components/filtered_search_bar/tokens/author_token.vue';
-import { ANY_AUTHOR } from '~/vue_shared/components/filtered_search_bar/constants';
+import { DEFAULT_LABEL_ANY } from '~/vue_shared/components/filtered_search_bar/constants';
 
 import RequirementsTabs from './requirements_tabs.vue';
 import RequirementsLoading from './requirements_loading.vue';
@@ -472,7 +472,7 @@ export default {
       filters.forEach(filter => {
         if (typeof filter === 'string') {
           textSearch = filter;
-        } else if (filter.value.data !== ANY_AUTHOR) {
+        } else if (filter.value.data !== DEFAULT_LABEL_ANY.value) {
           authors.push(filter.value.data);
         }
       });
