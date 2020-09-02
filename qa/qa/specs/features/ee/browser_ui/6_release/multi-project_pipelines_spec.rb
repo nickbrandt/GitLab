@@ -75,7 +75,7 @@ module QA
         runner.remove_via_api!
       end
 
-      it 'creates a multi-project pipeline', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/560' do
+      it 'creates a multi-project pipeline', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/560', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/243797', type: :investigating } do
         Page::MergeRequest::Show.perform do |show|
           pipeline_passed = show.retry_until(reload: true, max_attempts: 20, sleep_interval: 6) do
             show.has_content?(/Pipeline #\d+ passed/)
