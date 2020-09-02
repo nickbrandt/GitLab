@@ -1,6 +1,5 @@
 <script>
-/* eslint-disable vue/no-v-html */
-import { GlPopover, GlSprintf, GlButton } from '@gitlab/ui';
+import { GlPopover, GlSprintf, GlButton, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
 import { parseBoolean, scrollToElement, setCookie, getCookie } from '~/lib/utils/common_utils';
 import { s__ } from '~/locale';
 import Tracking from '~/tracking';
@@ -31,6 +30,9 @@ export default {
     GlPopover,
     GlSprintf,
     GlButton,
+  },
+  directives: {
+    SafeHtml,
   },
   mixins: [trackingMixin],
   props: {
@@ -114,7 +116,7 @@ export default {
     :css-classes="['suggest-gitlab-ci-yml', 'ml-4']"
   >
     <template #title>
-      <span v-html="suggestTitle"></span>
+      <span v-safe-html="suggestTitle"></span>
       <span class="ml-auto">
         <gl-button
           :aria-label="__('Close')"
