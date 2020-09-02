@@ -110,14 +110,6 @@ Layout/RescueEnsureAlignment:
 Layout/SpaceAroundMethodCallOperator:
   Enabled: false
 
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: AllowForAlignment.
-Layout/SpaceBeforeFirstArg:
-  Exclude:
-    - 'spec/requests/api/runner_spec.rb'
-    - 'spec/support/shared_examples/requests/api/custom_attributes_shared_examples.rb'
-
 # Offense count: 642
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
