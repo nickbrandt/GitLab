@@ -1,5 +1,4 @@
 <script>
-/* eslint-disable vue/no-v-html */
 import $ from 'jquery';
 import { mapGetters, mapActions } from 'vuex';
 import { escape } from 'lodash';
