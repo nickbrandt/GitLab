@@ -12,11 +12,12 @@ module EE
 
     def track_advanced_search
       # track unique users of advanced global search
-      track_unique_redis_hll_event("i_search_advanced", :search_track_unique_users) if search_service.use_elasticsearch?
+      track_unique_redis_hll_event('i_search_advanced', :search_track_unique_users) if search_service.use_elasticsearch?
 
-      # track unique users who search against paid groups/projects
-      # this line is commented out because of https://gitlab.com/gitlab-org/gitlab/-/issues/243486
-      # track_unique_redis_hll_event("i_search_paid", :search_track_unique_users) if (search_service.project || search_service.group)&.feature_available?(:elastic_search)
+      # track unique paid users (users who already use elasticsearch and users who could use it if they enable elasticsearch integration)
+      # for gitlab.com we check if the search uses elasticsearch
+      # for self-managed we check if the licensed feature available
+      track_unique_redis_hll_event('i_search_paid', :search_track_unique_users) if (::Gitlab.com? && search_service.use_elasticsearch?) || (!::Gitlab.com? && License.feature_available?(:elastic_search))
     end
   end
 end
