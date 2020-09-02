@@ -129,7 +129,7 @@ bar at the top of the page. Under **More**, select **Security**.
 
 ![Instance Security Dashboard navigation link](img/instance_security_dashboard_link_v12_4.png)
 
-Before adding projects to the dashboard, you will see the empty state
+The dashboard is empty before you add projects to it.
 
 ![Uninitialized Instance Security Dashboard](img/instance_security_dashboard_empty_v13_4.png)
 
