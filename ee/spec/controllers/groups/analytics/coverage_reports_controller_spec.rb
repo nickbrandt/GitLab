@@ -76,6 +76,13 @@ RSpec.describe Groups::Analytics::CoverageReportsController do
       end
 
       it 'responds 200 with CSV coverage data' do
+        expect(Gitlab::Tracking).to receive(:event).with(
+          described_class.name,
+          'download_code_coverage_csv',
+          label: 'group_id',
+          value: group.id
+        )
+
         get :index, params: valid_request_params
 
         expect(response).to have_gitlab_http_status(:ok)
