@@ -33,7 +33,7 @@ export default {
         :aria-label="__('Go back')"
         category="tertiary"
         class="dropdown-title-button dropdown-menu-back"
-        icon="close"
+        icon="arrow-left"
       />
       {{ headerTitle }}
       <button
