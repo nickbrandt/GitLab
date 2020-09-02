@@ -252,15 +252,6 @@ RSpec/ExpectChange:
 RSpec/ExpectInHook:
   Enabled: false
 
-# Offense count: 9
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: it_behaves_like, it_should_behave_like
-RSpec/ItBehavesLike:
-  Exclude:
-    - 'spec/lib/gitlab/git/commit_spec.rb'
-    - 'spec/services/notification_service_spec.rb'
-
 # Offense count: 68
 # Cop supports --auto-correct.
 RSpec/LetBeforeExamples:
