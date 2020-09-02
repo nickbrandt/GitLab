@@ -216,6 +216,13 @@ export const mockEpics = [
 ];
 
 export const mockIssuesByListId = {
-  'gid://gitlab/List/1': [mockIssue, mockIssue3, mockIssue4],
-  'gid://gitlab/List/2': mockIssues,
+  'gid://gitlab/List/1': [mockIssue.id, mockIssue3.id, mockIssue4.id],
+  'gid://gitlab/List/2': mockIssues.map(({ id }) => id),
+};
+
+export const issues = {
+  [mockIssue.id]: mockIssue,
+  [mockIssue2.id]: mockIssue2,
+  [mockIssue3.id]: mockIssue3,
+  [mockIssue4.id]: mockIssue4,
 };
