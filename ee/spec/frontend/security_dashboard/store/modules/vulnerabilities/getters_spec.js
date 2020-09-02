@@ -5,34 +5,12 @@ import mockHistoryData from './data/mock_data_vulnerabilities_history.json';
 
 describe('vulnerabilities module getters', () => {
   describe('dashboardError', () => {
-    it('should return true when both error states exist', () => {
+    it('should return true when the list error exists', () => {
       const errorLoadingVulnerabilities = true;
-      const errorLoadingVulnerabilitiesCount = true;
-      const state = { errorLoadingVulnerabilities, errorLoadingVulnerabilitiesCount };
+      const state = { errorLoadingVulnerabilities };
       const result = getters.dashboardError(state);
 
       expect(result).toBe(true);
-    });
-  });
-
-  describe('dashboardCountError', () => {
-    it('should return true if the count error exists', () => {
-      const state = {
-        errorLoadingVulnerabilitiesCount: true,
-      };
-      const result = getters.dashboardCountError(state);
-
-      expect(result).toBe(true);
-    });
-
-    it('should return false if the list error exists as well', () => {
-      const state = {
-        errorLoadingVulnerabilities: true,
-        errorLoadingVulnerabilitiesCount: true,
-      };
-      const result = getters.dashboardCountError(state);
-
-      expect(result).toBe(false);
     });
   });
 
@@ -44,16 +22,6 @@ describe('vulnerabilities module getters', () => {
       const result = getters.dashboardListError(state);
 
       expect(result).toBe(true);
-    });
-
-    it('should return false if the count error exists as well', () => {
-      const state = {
-        errorLoadingVulnerabilities: true,
-        errorLoadingVulnerabilitiesCount: true,
-      };
-      const result = getters.dashboardListError(state);
-
-      expect(result).toBe(false);
     });
   });
 

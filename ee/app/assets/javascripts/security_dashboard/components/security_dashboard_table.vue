@@ -17,7 +17,6 @@ export default {
   computed: {
     ...mapState('vulnerabilities', [
       'errorLoadingVulnerabilities',
-      'errorLoadingVulnerabilitiesCount',
       'isLoadingVulnerabilities',
       'isDismissingVulnerabilities',
       'pageInfo',
@@ -33,8 +32,7 @@ export default {
       return (
         this.vulnerabilities &&
         !this.vulnerabilities.length &&
-        !this.errorLoadingVulnerabilities &&
-        !this.errorLoadingVulnerabilitiesCount
+        !this.errorLoadingVulnerabilities
       );
     },
     showPagination() {

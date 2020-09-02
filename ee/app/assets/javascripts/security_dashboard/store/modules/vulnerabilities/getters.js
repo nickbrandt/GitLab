@@ -1,11 +1,9 @@
 import { LOADING_VULNERABILITIES_ERROR_CODES } from './constants';
 
 export const dashboardError = state =>
-  state.errorLoadingVulnerabilities && state.errorLoadingVulnerabilitiesCount;
+  state.errorLoadingVulnerabilities
 export const dashboardListError = state =>
-  state.errorLoadingVulnerabilities && !state.errorLoadingVulnerabilitiesCount;
-export const dashboardCountError = state =>
-  !state.errorLoadingVulnerabilities && state.errorLoadingVulnerabilitiesCount;
+  state.errorLoadingVulnerabilities
 
 export const loadingVulnerabilitiesFailedWithRecognizedErrorCode = state =>
   state.errorLoadingVulnerabilities &&
