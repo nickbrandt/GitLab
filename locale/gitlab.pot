@@ -24829,7 +24829,7 @@ msgstr ""
 msgid "The remote repository is being updated..."
 msgstr ""
 
-msgid "The repository can be commited to, and issues, comments and other entities can be created."
+msgid "The repository can be committed to, and issues, comments and other entities can be created."
 msgstr ""
 
 msgid "The repository for this project does not exist."
