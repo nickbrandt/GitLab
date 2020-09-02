@@ -101,14 +101,6 @@ Layout/SpaceInsideParens:
 Lint/MissingCopEnableDirective:
   Enabled: false
 
-# Offense count: 11
-# Cop supports --auto-correct.
-Lint/NonDeterministicRequireOrder:
-  Exclude:
-    - 'ee/spec/spec_helper.rb'
-    - 'qa/spec/spec_helper.rb'
-    - 'spec/spec_helper.rb'
-
 # Offense count: 27
 # Cop supports --auto-correct.
 Lint/RedundantCopDisableDirective:
