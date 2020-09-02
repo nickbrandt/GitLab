@@ -439,9 +439,11 @@ class License < ApplicationRecord
     restricted_attr(:trial)
   end
 
-  def exclude_guests_from_active_count?
+  def ultimate?
     plan == License::ULTIMATE_PLAN
   end
+
+  alias_method :exclude_guests_from_active_count?, :ultimate?
 
   def remaining_days
     return 0 if expired?

@@ -767,6 +767,26 @@ RSpec.describe License do
     end
   end
 
+  describe '#ultimate?' do
+    using RSpec::Parameterized::TableSyntax
+
+    let(:license) { build(:license, plan: plan) }
+
+    subject { license.ultimate? }
+
+    where(:plan, :expected) do
+      nil | false
+      described_class::STARTER_PLAN | false
+      described_class::PREMIUM_PLAN | false
+      described_class::EARLY_ADOPTER_PLAN | false
+      described_class::ULTIMATE_PLAN | true
+    end
+
+    with_them do
+      it { is_expected.to eq(expected) }
+    end
+  end
+
   describe 'Trial Licenses' do
     before do
       ApplicationSetting.create_from_defaults
