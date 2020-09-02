@@ -18,17 +18,6 @@ Capybara/CurrentPathExpectation:
 Layout/ArgumentAlignment:
   Enabled: false
 
-# Offense count: 13
-# Cop supports --auto-correct.
-Layout/ClosingParenthesisIndentation:
-  Exclude:
-    - 'db/post_migrate/20180704145007_update_project_indexes.rb'
-    - 'ee/db/geo/migrate/20180405074130_add_partial_index_project_repository_verification.rb'
-    - 'spec/services/issues/resolve_discussions_spec.rb'
-    - 'spec/services/projects/update_service_spec.rb'
-    - 'spec/support/helpers/stub_object_storage.rb'
-    - 'spec/workers/remove_unreferenced_lfs_objects_worker_spec.rb'
-
 # Offense count: 72
 # Cop supports --auto-correct.
 Layout/EmptyLinesAroundArguments:
