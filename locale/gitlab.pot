@@ -27738,6 +27738,9 @@ msgstr ""
 msgid "Vulnerability|Description"
 msgstr ""
 
+msgid "Vulnerability|Detected"
+msgstr ""
+
 msgid "Vulnerability|Evidence"
 msgstr ""
 
