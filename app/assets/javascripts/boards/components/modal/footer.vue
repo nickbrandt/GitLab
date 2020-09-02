@@ -67,13 +67,13 @@ export default {
 <template>
   <footer class="form-actions add-issues-footer">
     <div class="float-left">
-      <gl-button :disabled="submitDisabled" class="btn btn-success" type="button" @click="addIssues">
+      <gl-button :disabled="submitDisabled" category="primary" variant="success" @click="addIssues">
         {{ submitText }}
       </gl-button>
       <span class="inline add-issues-footer-to-list">{{ __('to list') }}</span>
       <lists-dropdown />
     </div>
-    <gl-button class="btn btn-default float-right" type="button" @click="toggleModal(false)">
+    <gl-button class="float-right" @click="toggleModal(false)">
       {{ __('Cancel') }}
     </gl-button>
   </footer>
