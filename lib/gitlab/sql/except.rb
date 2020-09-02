@@ -2,20 +2,20 @@
 
 module Gitlab
   module SQL
-    # Class for building SQL UNION statements.
+    # Class for building SQL EXCEPT statements.
     #
     # ORDER BYs are dropped from the relations as the final sort order is not
     # guaranteed any way.
     #
     # Example usage:
     #
-    #     union = Gitlab::SQL::Union.new([user.personal_projects, user.projects])
-    #     sql   = union.to_sql
+    #     except = Gitlab::SQL::Except.new([user.projects, user.personal_projects])
+    #     sql    = except.to_sql
     #
     #     Project.where("id IN (#{sql})")
-    class Union < SetOperator
+    class Except < SetOperator
       def self.operator_keyword
-        'UNION'
+        'EXCEPT'
       end
     end
   end
