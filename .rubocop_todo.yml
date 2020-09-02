@@ -18,17 +18,6 @@ Capybara/CurrentPathExpectation:
 Layout/ArgumentAlignment:
   Enabled: false
 
-# Offense count: 13
-# Cop supports --auto-correct.
-Layout/ClosingParenthesisIndentation:
-  Exclude:
-    - 'db/post_migrate/20180704145007_update_project_indexes.rb'
-    - 'ee/db/geo/migrate/20180405074130_add_partial_index_project_repository_verification.rb'
-    - 'spec/services/issues/resolve_discussions_spec.rb'
-    - 'spec/services/projects/update_service_spec.rb'
-    - 'spec/support/helpers/stub_object_storage.rb'
-    - 'spec/workers/remove_unreferenced_lfs_objects_worker_spec.rb'
-
 # Offense count: 72
 # Cop supports --auto-correct.
 Layout/EmptyLinesAroundArguments:
@@ -56,17 +45,6 @@ Layout/FirstArrayElementIndentation:
 # SupportedStyles: special_inside_parentheses, consistent, align_braces
 Layout/FirstHashElementIndentation:
   Enabled: false
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: consistent, align_parentheses
-Layout/FirstParameterIndentation:
-  Exclude:
-    - 'lib/gitlab/cross_project_access.rb'
-    - 'lib/gitlab/data_builder/push.rb'
-    - 'spec/support/helpers/repo_helpers.rb'
-    - 'spec/support/helpers/stub_object_storage.rb'
 
 # Offense count: 2164
 # Cop supports --auto-correct.
@@ -109,14 +87,6 @@ Layout/RescueEnsureAlignment:
 # Cop supports --auto-correct.
 Layout/SpaceAroundMethodCallOperator:
   Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: AllowForAlignment.
-Layout/SpaceBeforeFirstArg:
-  Exclude:
-    - 'spec/requests/api/runner_spec.rb'
-    - 'spec/support/shared_examples/requests/api/custom_attributes_shared_examples.rb'
 
 # Offense count: 642
 # Cop supports --auto-correct.
