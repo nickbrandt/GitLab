@@ -57,17 +57,6 @@ Layout/FirstArrayElementIndentation:
 Layout/FirstHashElementIndentation:
   Enabled: false
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: consistent, align_parentheses
-Layout/FirstParameterIndentation:
-  Exclude:
-    - 'lib/gitlab/cross_project_access.rb'
-    - 'lib/gitlab/data_builder/push.rb'
-    - 'spec/support/helpers/repo_helpers.rb'
-    - 'spec/support/helpers/stub_object_storage.rb'
-
 # Offense count: 2164
 # Cop supports --auto-correct.
 # Configuration parameters: AllowMultipleStyles, EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle.
