@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.3.3 (2020-09-02)
+
+### Security (2 changes)
+
+- Sanitize vulnerability history comment.
+- Fix displaying epics visibility in issue sidebar.
+
+
 ## 13.3.2 (2020-08-28)
 
 - No changes.

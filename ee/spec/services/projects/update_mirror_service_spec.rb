@@ -62,6 +62,43 @@ RSpec.describe Projects::UpdateMirrorService do
       end
     end
 
+    context "when the URL is blocked" do
+      before do
+        allow(Gitlab::UrlBlocker).to receive(:blocked_url?).and_return(true)
+
+        stub_fetch_mirror(project)
+      end
+
+      it "fails and returns error status" do
+        expect(service.execute[:status]).to eq(:error)
+      end
+    end
+
+    context "when given URLs containing escaped elements" do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:url, :result_status) do
+        "https://user:0a%23@test.example.com/project.git"                               | :success
+        "https://git.example.com:1%2F%2F@source.developers.google.com/project.git"      | :success
+        CGI.escape("git://localhost:1234/some-path?some-query=some-val\#@example.com/") | :error
+        CGI.escape(CGI.escape("https://user:0a%23@test.example.com/project.git"))       | :error
+      end
+
+      with_them do
+        before do
+          allow(project).to receive(:import_url).and_return(url)
+
+          stub_fetch_mirror(project)
+        end
+
+        it "returns expected status" do
+          result = service.execute
+
+          expect(result[:status]).to eq(result_status)
+        end
+      end
+    end
+
     context "updating tags" do
       it "creates new tags" do
         stub_fetch_mirror(project)
@@ -107,6 +144,8 @@ RSpec.describe Projects::UpdateMirrorService do
 
       before do
         allow(project).to receive(:import_url).and_return(mirror_path)
+
+        allow(Gitlab::UrlBlocker).to receive(:blocked_url?).and_return(false)
       end
 
       context 'when mirror_overwrites_diverged_branches is true' do
