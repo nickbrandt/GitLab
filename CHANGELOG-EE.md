@@ -661,6 +661,14 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Resolve duplicate use of shorcuts-tree. !36732
 
 
+## 13.1.9 (2020-09-02)
+
+### Security (2 changes)
+
+- Sanitize vulnerability history comment.
+- Fix displaying epics visibility in issue sidebar.
+
+
 ## 13.1.8 (2020-08-18)
 
 - No changes.
