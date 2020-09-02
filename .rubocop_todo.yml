@@ -540,12 +540,6 @@ Style/BarePercentLiterals:
   Enabled: false
 
 # Offense count: 5
-Style/CommentedKeyword:
-  Exclude:
-    - 'lib/tasks/gitlab/backup.rake'
-    - 'spec/tasks/gitlab/backup_rake_spec.rb'
-
-# Offense count: 5
 # Cop supports --auto-correct.
 Style/EachWithObject:
   Exclude:
