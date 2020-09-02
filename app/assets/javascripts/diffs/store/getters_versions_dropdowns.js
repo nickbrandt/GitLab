@@ -22,7 +22,8 @@ export const diffCompareDropdownTargetVersions = (state, getters) => {
     version_index: DIFF_COMPARE_BASE_VERSION_INDEX,
     href: state.mergeRequestDiff.base_version_path,
     isBase: true,
-    selected: isBaseSelected,
+    selected:
+      isBaseSelected || (defaultMergeRefForDiffs && !state.mergeRequestDiff.head_version_path),
   };
 
   const headVersion = {
@@ -44,8 +45,10 @@ export const diffCompareDropdownTargetVersions = (state, getters) => {
 
   return [
     ...state.mergeRequestDiffs.slice(1).map(formatVersion),
-    defaultMergeRefForDiffs && baseVersion,
-    headVersion,
+    (!defaultMergeRefForDiffs ||
+      (defaultMergeRefForDiffs && !state.mergeRequestDiff.head_version_path)) &&
+      baseVersion,
+    state.mergeRequestDiff.head_version_path && headVersion,
   ].filter(a => a);
 };
 
