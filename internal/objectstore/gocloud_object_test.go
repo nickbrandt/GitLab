@@ -49,21 +49,17 @@ func TestGoCloudObjectUpload(t *testing.T) {
 	require.Equal(t, []byte(test.ObjectContent), received)
 
 	cancel()
-	deleted := false
 
-	retry(3, time.Second, func() error {
+	testhelper.Retry(t, 5*time.Second, func() error {
 		exists, err := bucket.Exists(ctx, objectName)
 		require.NoError(t, err)
 
 		if exists {
-			return fmt.Errorf("file %s is still present, retrying", objectName)
+			return fmt.Errorf("file %s is still present", objectName)
 		} else {
-			deleted = true
 			return nil
 		}
 	})
-
-	require.True(t, deleted)
 
 	// Verify no log noise when deleting a file that already is gone
 	object.Delete()

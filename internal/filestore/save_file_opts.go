@@ -51,6 +51,8 @@ type SaveFileOpts struct {
 	ObjectStorageConfig ObjectStorageConfig
 	// Deadline it the S3 operation deadline, the upload will be aborted if not completed in time
 	Deadline time.Time
+	// The maximum accepted size in bytes of the upload
+	MaximumSize int64
 
 	//MultipartUpload parameters
 	// PartSize is the exact size of each uploaded part. Only the last one can be smaller
@@ -95,6 +97,7 @@ func GetOpts(apiResponse *api.Response) (*SaveFileOpts, error) {
 		UseWorkhorseClient: apiResponse.RemoteObject.UseWorkhorseClient,
 		RemoteTempObjectID: apiResponse.RemoteObject.RemoteTempObjectID,
 		Deadline:           time.Now().Add(timeout),
+		MaximumSize:        apiResponse.MaximumSize,
 	}
 
 	if opts.LocalTempPath != "" && opts.RemoteID != "" {

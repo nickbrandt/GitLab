@@ -260,13 +260,12 @@ func TestUploadHandlerMultipartUploadSizeLimit(t *testing.T) {
 
 	objectURL := server.URL + test.ObjectPath
 
-	partSize := int64(1)
 	uploadSize := 10
 	preauth := api.Response{
 		RemoteObject: api.RemoteObject{
 			ID: "store-id",
 			MultipartUpload: &api.MultipartUploadParams{
-				PartSize:    partSize,
+				PartSize:    1,
 				PartURLs:    []string{objectURL + "?partNumber=1"},
 				AbortURL:    objectURL, // DELETE
 				CompleteURL: objectURL, // POST
@@ -291,4 +290,48 @@ func TestUploadHandlerMultipartUploadSizeLimit(t *testing.T) {
 	}
 	assert.False(t, os.IsMultipartUpload(test.ObjectPath), "MultipartUpload should not be in progress anymore")
 	assert.Empty(t, os.GetObjectMD5(test.ObjectPath), "upload should have failed, so the object should not exists")
+}
+
+func TestUploadHandlerMultipartUploadMaximumSizeFromApi(t *testing.T) {
+	os, server := test.StartObjectStore()
+	defer server.Close()
+
+	err := os.InitiateMultipartUpload(test.ObjectPath)
+	require.NoError(t, err)
+
+	objectURL := server.URL + test.ObjectPath
+
+	uploadSize := int64(10)
+	maxSize := uploadSize - 1
+	preauth := api.Response{
+		MaximumSize: maxSize,
+		RemoteObject: api.RemoteObject{
+			ID: "store-id",
+			MultipartUpload: &api.MultipartUploadParams{
+				PartSize:    uploadSize,
+				PartURLs:    []string{objectURL + "?partNumber=1"},
+				AbortURL:    objectURL, // DELETE
+				CompleteURL: objectURL, // POST
+			},
+		},
+	}
+
+	responseProcessor := func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("it should not be called")
+	}
+
+	ts := testArtifactsUploadServer(t, preauth, responseProcessor)
+	defer ts.Close()
+
+	contentBuffer, contentType := createTestMultipartForm(t, make([]byte, uploadSize))
+	response := testUploadArtifacts(t, contentType, ts.URL+Path, &contentBuffer)
+	require.Equal(t, http.StatusRequestEntityTooLarge, response.Code)
+
+	testhelper.Retry(t, 5*time.Second, func() error {
+		if os.GetObjectMD5(test.ObjectPath) == "" {
+			return nil
+		}
+
+		return fmt.Errorf("file is still present")
+	})
 }

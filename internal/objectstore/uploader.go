@@ -8,6 +8,7 @@ import (
 	"hash"
 	"io"
 	"strings"
+	"sync"
 	"time"
 
 	"gitlab.com/gitlab-org/labkit/log"
@@ -16,6 +17,7 @@ import (
 // Upload represents an upload to an ObjectStorage provider
 type Upload interface {
 	io.WriteCloser
+	CloseWithError(error) error
 	ETag() string
 }
 
@@ -28,7 +30,6 @@ type uploader struct {
 	md5 hash.Hash
 
 	w io.Writer
-	c io.Closer
 
 	// uploadError is the last error occourred during upload
 	uploadError error
@@ -39,25 +40,34 @@ type uploader struct {
 	pw       *io.PipeWriter
 	strategy uploadStrategy
 	metrics  bool
+
+	// closeOnce is used to prevent multiple calls to pw.Close
+	// which may result to Close overriding the error set by CloseWithError
+	// Bug fixed in v1.14: https://github.com/golang/go/commit/f45eb9ff3c96dfd951c65d112d033ed7b5e02432
+	closeOnce sync.Once
 }
 
 func newUploader(strategy uploadStrategy) uploader {
 	pr, pw := io.Pipe()
-	return uploader{w: pw, c: pw, pr: pr, pw: pw, strategy: strategy, metrics: true}
+	return uploader{w: pw, pr: pr, pw: pw, strategy: strategy, metrics: true}
 }
 
 func newMD5Uploader(strategy uploadStrategy, metrics bool) uploader {
 	pr, pw := io.Pipe()
 	hasher := md5.New()
 	mw := io.MultiWriter(pw, hasher)
-	return uploader{w: mw, c: pw, pr: pr, pw: pw, md5: hasher, strategy: strategy, metrics: metrics}
+	return uploader{w: mw, pr: pr, pw: pw, md5: hasher, strategy: strategy, metrics: metrics}
 }
 
 // Close implements the standard io.Closer interface: it closes the http client request.
 // This method will also wait for the connection to terminate and return any error occurred during the upload
 func (u *uploader) Close() error {
-	if err := u.c.Close(); err != nil {
-		return err
+	var closeError error
+	u.closeOnce.Do(func() {
+		closeError = u.pw.Close()
+	})
+	if closeError != nil {
+		return closeError
 	}
 
 	<-u.ctx.Done()
@@ -67,6 +77,14 @@ func (u *uploader) Close() error {
 	}
 
 	return u.uploadError
+}
+
+func (u *uploader) CloseWithError(err error) error {
+	u.closeOnce.Do(func() {
+		u.pw.CloseWithError(err)
+	})
+
+	return nil
 }
 
 func (u *uploader) Write(p []byte) (int, error) {

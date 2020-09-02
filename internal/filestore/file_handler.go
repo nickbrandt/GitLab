@@ -166,7 +166,14 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 		if err != nil {
 			return nil, err
 		}
+
 		writers = append(writers, remoteWriter)
+
+		defer func() {
+			if err != nil {
+				remoteWriter.CloseWithError(err)
+			}
+		}()
 	} else {
 		clientMode = "local"
 
@@ -182,10 +189,24 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 		return nil, errors.New("missing upload destination")
 	}
 
+	if opts.MaximumSize > 0 {
+		if size > opts.MaximumSize {
+			return nil, SizeError(fmt.Errorf("the upload size %d is over maximum of %d bytes", size, opts.MaximumSize))
+		}
+
+		// We allow to read an extra byte to check later if we exceed the max size
+		reader = &io.LimitedReader{R: reader, N: opts.MaximumSize + 1}
+	}
+
 	multiWriter := io.MultiWriter(writers...)
 	fh.Size, err = io.Copy(multiWriter, reader)
 	if err != nil {
 		return nil, err
+	}
+
+	if opts.MaximumSize > 0 && fh.Size > opts.MaximumSize {
+		// An extra byte was read thus exceeding the max size
+		return nil, ErrEntityTooLarge
 	}
 
 	if size != -1 && size != fh.Size {

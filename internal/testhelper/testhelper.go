@@ -161,3 +161,16 @@ func WaitForLogEvent(hook *test.Hook) bool {
 
 	return false
 }
+
+func Retry(t testing.TB, timeout time.Duration, fn func() error) {
+	t.Helper()
+	start := time.Now()
+	var err error
+	for ; time.Since(start) < timeout; time.Sleep(time.Millisecond) {
+		err = fn()
+		if err == nil {
+			return
+		}
+	}
+	t.Fatalf("test timeout after %v; last error: %v", timeout, err)
+}
