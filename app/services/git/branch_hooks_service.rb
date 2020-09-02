@@ -76,10 +76,15 @@ module Git
     def branch_change_hooks
       enqueue_process_commit_messages
       enqueue_jira_connect_sync_messages
+      enqueue_metrics_dashboard_sync if Feature.enabled?(:sync_metrics_dashboards, project)
     end
 
     def branch_remove_hooks
       project.repository.after_remove_branch(expire_cache: false)
+    end
+
+    def enqueue_metrics_dashboard_sync
+      ::Metrics::Dashboard::SyncDashboardsWorker.perform_async(project.id)
     end
 
     # Schedules processing of commit messages

@@ -4,6 +4,7 @@ class PrometheusAlert < ApplicationRecord
   include Sortable
   include UsageStatistics
   include Presentable
+  include EachBatch
 
   OPERATORS_MAP = {
     lt: "<",
