@@ -7,6 +7,7 @@ import ReportItemFileLocation from './file_location.vue';
 import ReportItemModuleLocation from './module_location.vue';
 import ReportItemCode from './code.vue';
 import ReportItemUrl from './url.vue';
+import ReportItemCommit from './commit.vue';
 
 export default {
   name: 'ReportItemNamedList',
@@ -19,6 +20,7 @@ export default {
     ReportItemInt,
     ReportItemCode,
     ReportItemUrl,
+    ReportItemCommit
   },
   props: {
     items: {

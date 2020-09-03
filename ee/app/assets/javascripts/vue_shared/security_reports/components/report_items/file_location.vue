@@ -1,7 +1,7 @@
 <script>
 
-import { getBaseURL } from '~/lib/utils/url_utility';
 import { GlFriendlyWrap, GlLink } from '@gitlab/ui';
+import { getBaseURL } from '~/lib/utils/url_utility';
 
 export default {
   name: 'ReportItemFileLocation',
@@ -36,7 +36,7 @@ export default {
   computed: {
     linkToFile() {
       const base = getBaseURL();
-      const project = this.vuln.project;
+      const { project } = this.vuln;
       return `${base}//${project.full_path}/-/tree/master/${this.file_name}${this.linesFragment}`;
     },
     linesFragment() {

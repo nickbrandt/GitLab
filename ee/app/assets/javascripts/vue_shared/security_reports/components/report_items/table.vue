@@ -7,7 +7,7 @@ import ReportItemFileLocation from './file_location.vue';
 import ReportItemModuleLocation from './module_location.vue';
 import ReportItemCode from './code.vue';
 import ReportItemUrl from './url.vue';
-import ReportItemTable from './table.vue';
+import ReportItemCommit from './commit.vue';
 
 export default {
   name: 'ReportItemTable',
@@ -20,16 +20,22 @@ export default {
     ReportItemInt,
     ReportItemCode,
     ReportItemUrl,
-    ReportItemTable
+    ReportItemCommit
   },
   props: {
     header: {
       type: Array,
       required: false,
+      default: ()=> [],
     },
     rows: {
       type: Array,
       required: false,
+      default: ()=> [],
+    },
+    vuln: {
+      type: Object,
+      required: true,
     }
   },
   computed: {

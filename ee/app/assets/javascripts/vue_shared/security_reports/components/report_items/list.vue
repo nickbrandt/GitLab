@@ -7,6 +7,7 @@ import ReportItemInt from './int.vue';
 import ReportItemCode from './code.vue';
 import ReportItemUrl from './url.vue';
 import ReportItemTable from './table.vue';
+import ReportItemCommit from './commit.vue';
 
 export default {
   name: 'ReportItemList',
@@ -18,7 +19,8 @@ export default {
     ReportItemCode, 
     ReportItemFileLocation,
     ReportItemUrl,
-    ReportItemTable
+    ReportItemTable,
+    ReportItemCommit
   },
   props: {
     items: {
