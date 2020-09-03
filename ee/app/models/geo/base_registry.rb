@@ -41,29 +41,12 @@ class Geo::BaseRegistry < Geo::TrackingBase
     end
   end
 
-  def self.replicator_class
-    self::MODEL_CLASS.replicator_class
-  end
-
-  def self.find_unsynced_registries(batch_size:, except_ids: [])
-    pending
-      .model_id_not_in(except_ids)
-      .limit(batch_size)
-  end
-
-  def self.find_failed_registries(batch_size:, except_ids: [])
-    failed
-      .retry_due
-      .model_id_not_in(except_ids)
-      .limit(batch_size)
-  end
-
-  def self.has_create_events?
-    true
-  end
-
   def self.delete_worker_class
     ::Geo::FileRegistryRemovalWorker
+  end
+
+  def self.replicator_class
+    self::MODEL_CLASS.replicator_class
   end
 
   def self.find_registry_differences(range)
@@ -78,6 +61,22 @@ class Geo::BaseRegistry < Geo::TrackingBase
     unused_tracked_ids = tracked_ids - source_ids
 
     [untracked_ids, unused_tracked_ids]
+  end
+
+  def self.find_registries_never_attempted_sync(batch_size:, except_ids: [])
+    never_attempted_sync
+      .model_id_not_in(except_ids)
+      .limit(batch_size)
+  end
+
+  def self.find_registries_needs_sync_again(batch_size:, except_ids: [])
+    needs_sync_again
+      .model_id_not_in(except_ids)
+      .limit(batch_size)
+  end
+
+  def self.has_create_events?
+    true
   end
 
   def model_record_id
