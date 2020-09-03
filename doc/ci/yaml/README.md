@@ -3221,7 +3221,7 @@ Send all untracked files but [exclude](#artifactsexclude) `*.txt`:
 artifacts:
   untracked: true
   exclude:
-    - *.txt
+    - "*.txt"
 ```
 
 #### `artifacts:when`
