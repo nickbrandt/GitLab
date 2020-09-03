@@ -1,5 +1,5 @@
 mutation dastSiteProfileDelete($projectFullPath: ID!, $profileId: DastSiteProfileID!) {
-  dastSiteProfileDelete(input: { fullPath: $projectFullPath, id: $profileId }) {
+  siteProfilesDelete: dastSiteProfileDelete(input: { fullPath: $projectFullPath, id: $profileId }) {
     errors
   }
 }

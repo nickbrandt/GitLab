@@ -3,7 +3,6 @@ import { within } from '@testing-library/dom';
 import { merge } from 'lodash';
 import { GlDropdown } from '@gitlab/ui';
 import DastProfiles from 'ee/dast_profiles/components/dast_profiles.vue';
-import DastProfilesList from 'ee/dast_profiles/components/dast_profiles_list.vue';
 
 const TEST_NEW_DAST_SCANNER_PROFILE_PATH = '/-/on_demand_scans/scanner_profiles/new';
 const TEST_NEW_DAST_SITE_PROFILE_PATH = '/-/on_demand_scans/site_profiles/new';
@@ -27,8 +26,18 @@ describe('EE - DastProfiles', () => {
           siteProfiles: {
             fetchMore: jest.fn().mockResolvedValue(),
           },
+          scannerProfiles: {
+            fetchMore: jest.fn().mockResolvedValue(),
+          },
         },
         mutate: jest.fn().mockResolvedValue(),
+        addSmartQuery: jest.fn(),
+      },
+    };
+
+    const defaultProvide = {
+      glFeatures: {
+        securityOnDemandScansScannerProfiles: true,
       },
     };
 
@@ -39,6 +48,7 @@ describe('EE - DastProfiles', () => {
         {
           propsData: defaultProps,
           mocks: defaultMocks,
+          provide: defaultProvide,
         },
         options,
       ),
@@ -67,7 +77,7 @@ describe('EE - DastProfiles', () => {
   };
 
   const withinComponent = () => within(wrapper.element);
-  const getSiteProfilesComponent = () => wrapper.find(DastProfilesList);
+  const getProfilesComponent = profileType => wrapper.find(`[data-testid="${profileType}List"]`);
   const getDropdownComponent = () => wrapper.find(GlDropdown);
   const getSiteProfilesDropdownItem = text =>
     within(getDropdownComponent().element).queryByText(text);
@@ -125,8 +135,9 @@ describe('EE - DastProfiles', () => {
     });
 
     it.each`
-      tabName            | shouldBeSelectedByDefault
-      ${'Site Profiles'} | ${true}
+      tabName               | shouldBeSelectedByDefault
+      ${'Site Profiles'}    | ${true}
+      ${'Scanner Profiles'} | ${false}
     `(
       'shows a "$tabName" tab which has "selected" set to "$shouldBeSelectedByDefault"',
       ({ tabName, shouldBeSelectedByDefault }) => {
@@ -140,65 +151,70 @@ describe('EE - DastProfiles', () => {
     );
   });
 
-  describe('site profiles', () => {
+  describe.each`
+    description                | profileType
+    ${'Site Profiles List'}    | ${'siteProfiles'}
+    ${'Scanner Profiles List'} | ${'scannerProfiles'}
+  `('$description', ({ profileType }) => {
     beforeEach(() => {
       createComponent();
     });
 
     it('passes down the correct default props', () => {
-      expect(getSiteProfilesComponent().props()).toEqual({
+      expect(getProfilesComponent(profileType).props()).toEqual({
         errorMessage: '',
         errorDetails: [],
         hasMoreProfilesToLoad: false,
         isLoading: false,
         profilesPerPage: expect.any(Number),
         profiles: [],
+        fields: expect.any(Array),
       });
     });
 
-    it.each([true, false])('passes down the loading state', loading => {
-      createComponent({ mocks: { $apollo: { queries: { siteProfiles: { loading } } } } });
+    it.each([true, false])('passes down the loading state when loading is "%s"', loading => {
+      createComponent({ mocks: { $apollo: { queries: { [profileType]: { loading } } } } });
 
-      expect(getSiteProfilesComponent().props('isLoading')).toBe(loading);
+      expect(getProfilesComponent(profileType).props('isLoading')).toBe(loading);
     });
 
     it.each`
-      givenData                                          | propName                   | expectedPropValue
-      ${{ errorMessage: 'foo' }}                         | ${'errorMessage'}          | ${'foo'}
-      ${{ siteProfilesPageInfo: { hasNextPage: true } }} | ${'hasMoreProfilesToLoad'} | ${true}
-      ${{ siteProfiles: [{ foo: 'bar' }] }}              | ${'profiles'}              | ${[{ foo: 'bar' }]}
+      givenData                                                                   | propName                   | expectedPropValue
+      ${{ errorMessage: 'foo' }}                                                  | ${'errorMessage'}          | ${'foo'}
+      ${{ profileTypes: { [profileType]: { pageInfo: { hasNextPage: true } } } }} | ${'hasMoreProfilesToLoad'} | ${true}
+      ${{ profileTypes: { [profileType]: { profiles: [{ foo: 'bar' }] } } }}      | ${'profiles'}              | ${[{ foo: 'bar' }]}
     `('passes down $propName correctly', async ({ givenData, propName, expectedPropValue }) => {
       wrapper.setData(givenData);
 
       await wrapper.vm.$nextTick();
 
-      expect(getSiteProfilesComponent().props(propName)).toEqual(expectedPropValue);
+      expect(getProfilesComponent(profileType).props(propName)).toEqual(expectedPropValue);
     });
 
-    it('fetches more results when "@loadMoreProfiles" is emitted', () => {
+    it('fetches more results when "@load-more-profiles" is emitted', () => {
       const {
         $apollo: {
           queries: {
-            siteProfiles: { fetchMore },
+            [profileType]: { fetchMore },
           },
         },
       } = wrapper.vm;
 
       expect(fetchMore).not.toHaveBeenCalled();
 
-      getSiteProfilesComponent().vm.$emit('loadMoreProfiles');
+      getProfilesComponent(profileType).vm.$emit('load-more-profiles');
 
       expect(fetchMore).toHaveBeenCalledTimes(1);
     });
 
-    it('deletes profile when "@deleteProfile" is emitted', () => {
+    it('deletes profile when "@delete-profile" is emitted', () => {
       const {
         $apollo: { mutate },
       } = wrapper.vm;
 
       expect(mutate).not.toHaveBeenCalled();
 
-      getSiteProfilesComponent().vm.$emit('deleteProfile');
+      getProfilesComponent(profileType).vm.$emit('delete-profile');
 
       expect(mutate).toHaveBeenCalledTimes(1);
     });

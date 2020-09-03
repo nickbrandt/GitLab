@@ -27,6 +27,10 @@ export default {
       type: Array,
       required: true,
     },
+    fields: {
+      type: Array,
+      required: true,
+    },
     errorMessage: {
       type: String,
       required: false,
@@ -76,10 +80,17 @@ export default {
     modalId() {
       return `dast-profiles-list-${uniqueId()}`;
     },
+    tableFields() {
+      const defaultClasses = ['gl-word-break-all'];
+      const dataFields = this.fields.map(key => ({ key, class: defaultClasses }));
+      const staticFields = [{ key: 'actions' }];
+
+      return [...dataFields, ...staticFields];
+    },
   },
   methods: {
     handleDelete() {
-      this.$emit('deleteProfile', this.toBeDeletedProfileId);
+      this.$emit('delete-profile', this.toBeDeletedProfileId);
     },
     prepareProfileDeletion(profileId) {
       this.toBeDeletedProfileId = profileId;
@@ -89,25 +100,6 @@ export default {
       this.toBeDeletedProfileId = null;
     },
   },
-  tableFields: [
-    {
-      key: 'profileName',
-      class: 'gl-word-break-all',
-    },
-    {
-      key: 'targetUrl',
-      class: 'gl-word-break-all',
-    },
-    {
-      key: 'validationStatus',
-      // NOTE: hidden for now, since the site validation is still WIP and will be finished in an upcoming iteration
-      // roadmap: https://gitlab.com/groups/gitlab-org/-/epics/2912#ui-configuration
-      class: 'gl-display-none!',
-    },
-    {
-      key: 'actions',
-    },
-  ],
 };
 </script>
 <template>
@@ -116,13 +108,13 @@ export default {
       <gl-table
         :aria-label="s__('DastProfiles|Site Profiles')"
         :busy="isLoadingInitialProfiles"
-        :fields="$options.tableFields"
+        :fields="tableFields"
         :items="profiles"
         stacked="md"
         thead-class="gl-display-none"
       >
         <template v-if="hasError" #top-row>
-          <td :colspan="$options.tableFields.length">
+          <td :colspan="tableFields.length">
             <gl-alert class="gl-my-4" variant="danger" :dismissible="false">
               {{ errorMessage }}
               <ul
@@ -161,7 +153,22 @@ export default {
               :aria-label="__('Delete')"
               @click="prepareProfileDeletion(item.id)"
             />
-            <gl-button :href="item.editPath">{{ __('Edit') }}</gl-button>
+            <gl-button v-if="item.editPath" :href="item.editPath">{{ __('Edit') }}</gl-button>
+            <!--
+            NOTE: The tooltip and `disable` on the button is temporary until the edit feature has been implemented
+            further details: https://gitlab.com/groups/gitlab-org/-/epics/3786 (iteration outline)
+           -->
+            <span
+              v-else
+              v-gl-tooltip.hover
+              :title="
+                s__(
+                  'DastProfiles|Edit feature will come soon. Please create a new profile if changes needed',
+                )
+              "
+            >
+              <gl-button disabled>{{ __('Edit') }}</gl-button>
+            </span>
           </div>
         </template>
 
@@ -181,7 +188,7 @@ export default {
         <gl-button
           data-testid="loadMore"
           :loading="isLoading && !hasError"
-          @click="$emit('loadMoreProfiles')"
+          @click="$emit('load-more-profiles')"
         >
           {{ __('Load more') }}
         </gl-button>
