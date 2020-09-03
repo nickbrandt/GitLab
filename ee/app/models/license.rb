@@ -11,7 +11,6 @@ class License < ApplicationRecord
   EES_FEATURES = %i[
     audit_events
     blocked_issues
-    burndown_charts
     code_owners
     code_review_analytics
     contribution_analytics
@@ -19,7 +18,6 @@ class License < ApplicationRecord
     elastic_search
     group_activity_analytics
     group_bulk_edit
-    group_burndown_charts
     group_webhooks
     issuable_default_templates
     issue_weights
@@ -156,7 +154,6 @@ class License < ApplicationRecord
   # introduced.
   EARLY_ADOPTER_FEATURES = %i[
     audit_events
-    burndown_charts
     contribution_analytics
     cross_project_pipelines
     deploy_board
