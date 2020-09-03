@@ -77,6 +77,10 @@ module Security
         finding_hash = report_finding.to_hash
           .except(:compare_key, :identifiers, :location, :scanner)
 
+        puts "report_finding: #{report_finding}"
+        puts "report_finding: #{report_finding.inspect}"
+        puts "finding.to_hash: #{finding_hash.inspect}"
+
         finding = Vulnerabilities::Finding.new(finding_hash)
         # assigning Vulnerabilities to Findings to enable the computed state
         finding.location_fingerprint = report_finding.location.fingerprint

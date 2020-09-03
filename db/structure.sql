@@ -74,12 +74,14 @@ CREATE TABLE public.audit_events_part_5fc467ac26 (
     details text,
     ip_address inet,
     author_name text,
-    target_details text,
     entity_path text,
+    target_details text,
     created_at timestamp without time zone NOT NULL,
     target_type text,
+    CONSTRAINT check_492aaa021d CHECK ((char_length(entity_path) <= 5500)),
     CONSTRAINT check_83ff8406e2 CHECK ((char_length(author_name) <= 255)),
-    CONSTRAINT check_97a8c868e7 CHECK ((char_length(target_type) <= 255))
+    CONSTRAINT check_97a8c868e7 CHECK ((char_length(target_type) <= 255)),
+    CONSTRAINT check_d493ec90b5 CHECK ((char_length(target_details) <= 5500))
 )
 PARTITION BY RANGE (created_at);
 
@@ -9188,7 +9190,7 @@ CREATE TABLE public.application_settings (
     throttle_protected_paths_enabled boolean DEFAULT false NOT NULL,
     throttle_protected_paths_requests_per_period integer DEFAULT 10 NOT NULL,
     throttle_protected_paths_period_in_seconds integer DEFAULT 60 NOT NULL,
-    protected_paths character varying(255)[] DEFAULT '{/users/password,/users/sign_in,/api/v3/session.json,/api/v3/session,/api/v4/session.json,/api/v4/session,/users,/users/confirmation,/unsubscribes/,/import/github/personal_access_token,/admin/session}'::character varying[],
+    protected_paths character varying(255)[] DEFAULT '{/users/password,/users/sign_in,/api/v3/session.json,/api/v3/session,/api/v4/session.json,/api/v4/session,/users,/users/confirmation,/unsubscribes/,/import/github/personal_access_token,/admin/session,/oauth/authorize,/oauth/token}'::character varying[],
     throttle_incident_management_notification_enabled boolean DEFAULT false NOT NULL,
     throttle_incident_management_notification_period_in_seconds integer DEFAULT 3600,
     throttle_incident_management_notification_per_period integer DEFAULT 3600,
@@ -9253,17 +9255,18 @@ CREATE TABLE public.application_settings (
     compliance_frameworks smallint[] DEFAULT '{}'::smallint[] NOT NULL,
     notify_on_unknown_sign_in boolean DEFAULT true NOT NULL,
     default_branch_name text,
-    maintenance_mode boolean DEFAULT false NOT NULL,
-    maintenance_mode_message text,
     project_import_limit integer DEFAULT 6 NOT NULL,
     project_export_limit integer DEFAULT 6 NOT NULL,
     project_download_export_limit integer DEFAULT 1 NOT NULL,
     group_import_limit integer DEFAULT 6 NOT NULL,
     group_export_limit integer DEFAULT 6 NOT NULL,
     group_download_export_limit integer DEFAULT 1 NOT NULL,
+    maintenance_mode boolean DEFAULT false NOT NULL,
+    maintenance_mode_message text,
     wiki_page_max_content_bytes bigint DEFAULT 52428800 NOT NULL,
     elasticsearch_indexed_file_size_limit_kb integer DEFAULT 1024 NOT NULL,
     enforce_namespace_storage_limit boolean DEFAULT false NOT NULL,
+    container_registry_delete_tags_service_timeout integer DEFAULT 250 NOT NULL,
     CONSTRAINT check_51700b31b5 CHECK ((char_length(default_branch_name) <= 255)),
     CONSTRAINT check_9c6c447a13 CHECK ((char_length(maintenance_mode_message) <= 255)),
     CONSTRAINT check_d03919528d CHECK ((char_length(container_registry_vendor) <= 255)),
@@ -9477,6 +9480,32 @@ CREATE TABLE public.ar_internal_metadata (
     updated_at timestamp(6) without time zone NOT NULL
 );
 
+CREATE TABLE public.atlassian_identities (
+    user_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    expires_at timestamp with time zone,
+    extern_uid text NOT NULL,
+    encrypted_token bytea,
+    encrypted_token_iv bytea,
+    encrypted_refresh_token bytea,
+    encrypted_refresh_token_iv bytea,
+    CONSTRAINT atlassian_identities_refresh_token_iv_length_constraint CHECK ((octet_length(encrypted_refresh_token_iv) <= 12)),
+    CONSTRAINT atlassian_identities_refresh_token_length_constraint CHECK ((octet_length(encrypted_refresh_token) <= 512)),
+    CONSTRAINT atlassian_identities_token_iv_length_constraint CHECK ((octet_length(encrypted_token_iv) <= 12)),
+    CONSTRAINT atlassian_identities_token_length_constraint CHECK ((octet_length(encrypted_token) <= 2048)),
+    CONSTRAINT check_32f5779763 CHECK ((char_length(extern_uid) <= 255))
+);
+
+CREATE SEQUENCE public.atlassian_identities_user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.atlassian_identities_user_id_seq OWNED BY public.atlassian_identities.user_id;
+
 CREATE TABLE public.audit_events (
     id integer NOT NULL,
     author_id integer NOT NULL,
@@ -9487,8 +9516,8 @@ CREATE TABLE public.audit_events (
     created_at timestamp without time zone,
     ip_address inet,
     author_name text,
-    target_details text,
     entity_path text,
+    target_details text,
     target_type text,
     CONSTRAINT check_492aaa021d CHECK ((char_length(entity_path) <= 5500)),
     CONSTRAINT check_82294106dd CHECK ((char_length(target_type) <= 255)),
@@ -9528,7 +9557,7 @@ CREATE TABLE public.aws_roles (
     user_id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    role_arn character varying(2048) NOT NULL,
+    role_arn character varying(2048),
     role_external_id character varying(64) NOT NULL
 );
 
@@ -9978,14 +10007,11 @@ ALTER SEQUENCE public.ci_daily_build_group_report_results_id_seq OWNED BY public
 CREATE TABLE public.ci_freeze_periods (
     id bigint NOT NULL,
     project_id bigint NOT NULL,
-    freeze_start text NOT NULL,
-    freeze_end text NOT NULL,
-    cron_timezone text NOT NULL,
+    freeze_start character varying(998) NOT NULL,
+    freeze_end character varying(998) NOT NULL,
+    cron_timezone character varying(255) NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
-    CONSTRAINT check_4a7939e04e CHECK ((char_length(freeze_end) <= 998)),
-    CONSTRAINT check_a92607bd2b CHECK ((char_length(freeze_start) <= 998)),
-    CONSTRAINT check_b14055adc3 CHECK ((char_length(cron_timezone) <= 255))
+    updated_at timestamp with time zone NOT NULL
 );
 
 CREATE SEQUENCE public.ci_freeze_periods_id_seq
@@ -13183,7 +13209,8 @@ CREATE TABLE public.merge_request_metrics (
     first_reassigned_at timestamp with time zone,
     added_lines integer,
     removed_lines integer,
-    target_project_id integer
+    target_project_id integer,
+    CONSTRAINT check_e03d0900bf CHECK ((target_project_id IS NOT NULL))
 );
 
 CREATE SEQUENCE public.merge_request_metrics_id_seq
@@ -13999,7 +14026,8 @@ CREATE TABLE public.packages_packages (
     updated_at timestamp with time zone NOT NULL,
     name character varying NOT NULL,
     version character varying,
-    package_type smallint NOT NULL
+    package_type smallint NOT NULL,
+    creator_id integer
 );
 
 CREATE SEQUENCE public.packages_packages_id_seq
@@ -14164,6 +14192,7 @@ CREATE TABLE public.plan_limits (
     ci_pipeline_schedules integer DEFAULT 10 NOT NULL,
     offset_pagination_limit integer DEFAULT 50000 NOT NULL,
     ci_instance_level_variables integer DEFAULT 25 NOT NULL,
+    storage_size_limit integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_lsif integer DEFAULT 20 NOT NULL,
     ci_max_artifact_size_archive integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_metadata integer DEFAULT 0 NOT NULL,
@@ -14188,7 +14217,6 @@ CREATE TABLE public.plan_limits (
     ci_max_artifact_size_secret_detection integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_requirements integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_coverage_fuzzing integer DEFAULT 0 NOT NULL,
-    storage_size_limit integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_browser_performance integer DEFAULT 0 NOT NULL,
     ci_max_artifact_size_load_performance integer DEFAULT 0 NOT NULL,
     ci_needs_size_limit integer DEFAULT 50 NOT NULL,
@@ -14633,10 +14661,11 @@ CREATE TABLE public.project_settings (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     push_rule_id bigint,
-    show_default_award_emojis boolean DEFAULT true NOT NULL,
+    show_default_award_emojis boolean DEFAULT true,
     allow_merge_on_skipped_pipeline boolean,
     squash_option smallint DEFAULT 3,
-    has_confluence boolean DEFAULT false NOT NULL
+    has_confluence boolean DEFAULT false NOT NULL,
+    CONSTRAINT check_bde223416c CHECK ((show_default_award_emojis IS NOT NULL))
 );
 
 CREATE TABLE public.project_statistics (
@@ -16103,9 +16132,9 @@ CREATE TABLE public.user_details (
     user_id bigint NOT NULL,
     job_title character varying(200) DEFAULT ''::character varying NOT NULL,
     bio character varying(255) DEFAULT ''::character varying NOT NULL,
-    webauthn_xid text,
     bio_html text,
     cached_markdown_version integer,
+    webauthn_xid text,
     CONSTRAINT check_245664af82 CHECK ((char_length(webauthn_xid) <= 100))
 );
 
@@ -16565,8 +16594,7 @@ CREATE TABLE public.vulnerability_occurrences (
     name character varying NOT NULL,
     metadata_version character varying NOT NULL,
     raw_metadata text NOT NULL,
-    vulnerability_id bigint,
-    details jsonb DEFAULT '"{}"'::jsonb NOT NULL
+    vulnerability_id bigint
 );
 
 CREATE SEQUENCE public.vulnerability_occurrences_id_seq
@@ -16882,6 +16910,8 @@ ALTER TABLE ONLY public.approvals ALTER COLUMN id SET DEFAULT nextval('public.ap
 ALTER TABLE ONLY public.approver_groups ALTER COLUMN id SET DEFAULT nextval('public.approver_groups_id_seq'::regclass);
 
 ALTER TABLE ONLY public.approvers ALTER COLUMN id SET DEFAULT nextval('public.approvers_id_seq'::regclass);
+
+ALTER TABLE ONLY public.atlassian_identities ALTER COLUMN user_id SET DEFAULT nextval('public.atlassian_identities_user_id_seq'::regclass);
 
 ALTER TABLE ONLY public.audit_events ALTER COLUMN id SET DEFAULT nextval('public.audit_events_id_seq'::regclass);
 
@@ -17802,6 +17832,9 @@ ALTER TABLE ONLY public.approvers
 
 ALTER TABLE ONLY public.ar_internal_metadata
     ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
+
+ALTER TABLE ONLY public.atlassian_identities
+    ADD CONSTRAINT atlassian_identities_pkey PRIMARY KEY (user_id);
 
 ALTER TABLE ONLY public.audit_events_part_5fc467ac26
     ADD CONSTRAINT audit_events_part_5fc467ac26_pkey PRIMARY KEY (id, created_at);
@@ -19026,7 +19059,7 @@ CREATE INDEX backup_labels_group_id_title_idx ON public.backup_labels USING btre
 
 CREATE INDEX backup_labels_project_id_idx ON public.backup_labels USING btree (project_id);
 
-CREATE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
+CREATE UNIQUE INDEX backup_labels_project_id_title_idx ON public.backup_labels USING btree (project_id, title) WHERE (group_id = NULL::integer);
 
 CREATE INDEX backup_labels_template_idx ON public.backup_labels USING btree (template) WHERE template;
 
@@ -19043,8 +19076,6 @@ CREATE INDEX commit_id_and_note_id_index ON public.commit_user_mentions USING bt
 CREATE UNIQUE INDEX design_management_designs_versions_uniqueness ON public.design_management_designs_versions USING btree (design_id, version_id);
 
 CREATE INDEX design_user_mentions_on_design_id_and_note_id_index ON public.design_user_mentions USING btree (design_id, note_id);
-
-CREATE INDEX dev_index_route_on_path_trigram ON public.routes USING gin (path public.gin_trgm_ops);
 
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_and_note_id_index ON public.epic_user_mentions USING btree (epic_id, note_id);
 
@@ -19241,6 +19272,8 @@ CREATE INDEX index_approver_groups_on_target_id_and_target_type ON public.approv
 CREATE INDEX index_approvers_on_target_id_and_target_type ON public.approvers USING btree (target_id, target_type);
 
 CREATE INDEX index_approvers_on_user_id ON public.approvers USING btree (user_id);
+
+CREATE UNIQUE INDEX index_atlassian_identities_on_extern_uid ON public.atlassian_identities USING btree (extern_uid);
 
 CREATE INDEX index_audit_events_on_entity_id_entity_type_id_desc_author_id ON public.audit_events USING btree (entity_id, entity_type, id DESC, author_id);
 
@@ -20427,6 +20460,8 @@ CREATE INDEX index_packages_package_files_file_store_is_null ON public.packages_
 CREATE INDEX index_packages_package_files_on_file_store ON public.packages_package_files USING btree (file_store);
 
 CREATE INDEX index_packages_package_files_on_package_id_and_file_name ON public.packages_package_files USING btree (package_id, file_name);
+
+CREATE INDEX index_packages_packages_on_creator_id ON public.packages_packages USING btree (creator_id);
 
 CREATE INDEX index_packages_packages_on_name_trigram ON public.packages_packages USING gin (name public.gin_trgm_ops);
 
@@ -22010,6 +22045,9 @@ ALTER TABLE ONLY public.ci_builds
 ALTER TABLE ONLY public.design_management_versions
     ADD CONSTRAINT fk_c1440b4896 FOREIGN KEY (author_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY public.packages_packages
+    ADD CONSTRAINT fk_c188f0dba4 FOREIGN KEY (creator_id) REFERENCES public.users(id) ON DELETE SET NULL;
+
 ALTER TABLE ONLY public.geo_event_log
     ADD CONSTRAINT fk_c1f241c70d FOREIGN KEY (upload_deleted_event_id) REFERENCES public.geo_upload_deleted_events(id) ON DELETE CASCADE;
 
@@ -23101,6 +23139,9 @@ ALTER TABLE ONLY public.resource_weight_events
 
 ALTER TABLE ONLY public.design_management_designs
     ADD CONSTRAINT fk_rails_bfe283ec3c FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.atlassian_identities
+    ADD CONSTRAINT fk_rails_c02928bc18 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.serverless_domain_cluster
     ADD CONSTRAINT fk_rails_c09009dee1 FOREIGN KEY (pages_domain_id) REFERENCES public.pages_domains(id) ON DELETE CASCADE;

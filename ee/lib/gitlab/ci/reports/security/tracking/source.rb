@@ -7,19 +7,19 @@ module Gitlab
         module Tracking
           class Source < Base
             attr_reader :file_path
-            attr_reader :start_line
-            attr_reader :end_line
+            attr_reader :line_start
+            attr_reader :line_end
 
-            def initialize(file_path:, start_line:, end_line:)
+            def initialize(file_path:, line_start:, line_end:)
               @file_path = file_path
-              @start_line = start_line
-              @end_line = end_line
+              @line_start = line_start
+              @line_end = line_end
             end
 
             private
 
             def fingerprint_data
-              "#{file_path}:#{start_line}:#{end_line}"
+              "#{file_path}:#{line_start}:#{line_end}"
             end
           end
         end

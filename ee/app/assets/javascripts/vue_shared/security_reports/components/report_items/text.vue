@@ -1,4 +1,5 @@
 <script>
+import { dynI8n } from "./dynamic_i8n";
 
 export default {
   name: 'ReportItemText',
@@ -6,12 +7,18 @@ export default {
   },
   props: {
     value: {
+      type: Array,
       required: true
     }
   },
+  computed: {
+    valueText() {
+      return dynI8n(this.value);
+    }
+  }
 };
 </script>
 
 <template>
-  <div>{{ value }}</div>
+  <div>{{ valueText }}</div>
 </template>

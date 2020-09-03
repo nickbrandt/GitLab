@@ -3,9 +3,10 @@ import ReportItemText from './text.vue';
 import ReportItemNamedList from './named_list.vue';
 import ReportItemModuleLocation from './module_location.vue';
 import ReportItemFileLocation from './file_location.vue';
-import ReportItemHexInt from './hex_int.vue';
+import ReportItemInt from './int.vue';
 import ReportItemCode from './code.vue';
-import ReportItemLink from './link.vue';
+import ReportItemUrl from './url.vue';
+import ReportItemTable from './table.vue';
 
 export default {
   name: 'ReportItemList',
@@ -13,15 +14,20 @@ export default {
     ReportItemText,
     ReportItemNamedList,
     ReportItemModuleLocation,
-    ReportItemHexInt,
+    ReportItemInt,
     ReportItemCode, 
     ReportItemFileLocation,
-    ReportItemLink
+    ReportItemUrl,
+    ReportItemTable
   },
   props: {
     items: {
       type: Array,
       required: true
+    },
+    vuln: {
+      type: Object,
+      required: true,
     }
   },
   computed: {
@@ -36,6 +42,7 @@ export default {
       :is="'report-item-' + item.type"
       v-if="item.type"
       v-bind="item"
+      :vuln="vuln"
     />
   </table>
 </template>

@@ -1,45 +1,41 @@
 <script>
 import { GlFriendlyWrap, GlLink } from '@gitlab/ui';
+import { dynI8n } from "./dynamic_i8n";
 
 export default {
-  name: 'ReportItemLink',
+  name: 'ReportItemUrl',
   components: {
     GlLink,
     GlFriendlyWrap
   },
   props: {
-    url: {
+    text: {
+      type: Array,
+      default: ()=> [],
+      required: false,
+    },
+    href: {
       type: String,
       required: true,
-    },
-    text: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    alt: {
-      type: String,
-      default: null,
-      required: false,
     }
   },
   computed: {
     linkText() {
       let res = "";
-      if (this.text) {
-        res = this.text;
+      if (this.text.length > 0) {
+        res = dynI8n(this.text);
       } else {
-        res = this.url;
+        res = this.href;
       }
       return res;
     }
-  }
+  },
 }
 </script>
 
 <template>
   <div>
-    <gl-link :ref="alt" :href="url" target="_blank">
+    <gl-link :href="href" target="_blank">
       <gl-friendly-wrap :text="linkText" />
     </gl-link>
   </div>

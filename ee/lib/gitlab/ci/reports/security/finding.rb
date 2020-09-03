@@ -57,7 +57,6 @@ module Gitlab
               scanner
               severity
               uuid
-              details
             ].each_with_object({}) do |key, hash|
               hash[key] = public_send(key) # rubocop:disable GitlabSecurity/PublicSend
             end

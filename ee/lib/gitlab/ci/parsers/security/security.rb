@@ -35,10 +35,12 @@ module Gitlab
             if type == 'source'
               ::Gitlab::Ci::Reports::Security::Tracking::Source.new(
                 file_path: tracking_data['file'],
-                start_line: tracking_data['start_line'],
-                end_line: tracking_data['end_line'])
+                line_start: tracking_data['line_start'],
+                line_end: tracking_data['line_end'])
             elsif type == 'hash'
-              ::Gitlab::Ci::Reports::Security::Tracking::Hashed.new(tracking_data['data'])
+              ::Gitlab::Ci::Reports::Security::Tracking::Hashed.new(
+                data: tracking_data['data']
+              )
             else
               ::Gitlab::Ci::Reports::Security::Tracking::Hashed.new(Time.now)
             end

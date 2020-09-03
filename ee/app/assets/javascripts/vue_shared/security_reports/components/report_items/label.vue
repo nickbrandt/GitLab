@@ -1,10 +1,12 @@
 <script>
-import Jed from 'jed';
-import { languageCode } from "~/locale";
+import { GlIcon, GlFriendlyWrap } from '@gitlab/ui';
+import { dynI8n } from "./dynamic_i8n";
 
 export default {
   name: 'ReportItemLabel',
   components: {
+    GlFriendlyWrap,
+    GlIcon
   },
   props: {
     name: {
@@ -13,28 +15,30 @@ export default {
     },
     description: {
       type: Array,
-      required: true,
+      required: false,
+      default: ()=> [],
     }
   },
   computed: {
-    langText() {
-    }
+    nameText() {
+      return dynI8n(this.name);
+    },
+    descriptionText() {
+      return dynI8n(this.description);
+    },
   },
-  mounted() {
-    let langItems = {
-      name: [],
-      description: [],
-    };
-    this.name.forEach(item => langItems
-    this.locale = new Jed();
-  }
 }
 </script>
 
 <template>
   <tr>
     <td class="report-item-label-td">
-        <label class="font-weight-bold">{{langText}}</label>
+        <label class="font-weight-bold">
+          <gl-friendly-wrap :text="nameText" />
+        </label>
+        <span v-if="description.length > 0" :title="descriptionText">
+          <gl-icon name="question" :size="12" />
+        </span>
     </td>
   </tr>
 </template>

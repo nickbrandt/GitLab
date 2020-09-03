@@ -1,4 +1,6 @@
 <script>
+
+import { getBaseURL } from '~/lib/utils/url_utility';
 import { GlFriendlyWrap, GlLink } from '@gitlab/ui';
 
 export default {
@@ -8,20 +10,24 @@ export default {
     GlLink,
   },
   props: {
-    path: {
+    vuln: {
+      type: Object,
+      required: true,
+    },
+    file_name: {
       type: String,
       required: true
     },
-    lineStart: {
+    line_start: {
       type: Number,
       required: true
     },
-    lineEnd: {
+    line_end: {
       type: Number,
       default: null,
       required: false
     },
-    gitRef: {
+    git_ref: {
       type: String,
       default: null,
       required: false
@@ -29,16 +35,25 @@ export default {
   },
   computed: {
     linkToFile() {
-      return "some_link";
+      const base = getBaseURL();
+      const project = this.vuln.project;
+      return `${base}//${project.full_path}/-/tree/master/${this.file_name}${this.linesFragment}`;
+    },
+    linesFragment() {
+      let res = `#L${this.line_start}`;
+      if (this.line_end !== null) {
+        res += `-${this.line_end}`;
+      }
+      return res;
     },
     fileWithLines() {
       let lineDesc = '';
-      if (this.lineEnd !== null) {
-        lineDesc = `${this.lineStart}-${this.lineEnd}`;
+      if (this.line_end !== null) {
+        lineDesc = `${this.line_start}-${this.line_end}`;
       } else {
-        lineDesc = `${this.lineStart}`;
+        lineDesc = `${this.line_start}`;
       }
-      return `${this.path}:${lineDesc}`;
+      return `${this.file_name}:${lineDesc}`;
     },
   },
 };

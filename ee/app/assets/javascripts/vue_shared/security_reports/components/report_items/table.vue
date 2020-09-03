@@ -7,9 +7,10 @@ import ReportItemFileLocation from './file_location.vue';
 import ReportItemModuleLocation from './module_location.vue';
 import ReportItemCode from './code.vue';
 import ReportItemUrl from './url.vue';
+import ReportItemTable from './table.vue';
 
 export default {
-  name: 'ReportItemNamedList',
+  name: 'ReportItemTable',
   components: {
     ReportItemLabel,
     ReportItemList,
@@ -19,37 +20,43 @@ export default {
     ReportItemInt,
     ReportItemCode,
     ReportItemUrl,
+    ReportItemTable
   },
   props: {
-    items: {
-      type: Object,
-      required: true,
+    header: {
+      type: Array,
+      required: false,
     },
-    vuln: {
-      type: Object,
-      required: true,
+    rows: {
+      type: Array,
+      required: false,
     }
   },
   computed: {
   },
   beforeCreate() {
     this.$options.components.ReportItemList = require('./list.vue').default;
-    this.$options.components.ReportItemTable = require('./table.vue').default;
   },
 };
 </script>
 
 <template>
-  <table class="table report-item-table">
-    <tr v-for="(item, name) in items" class="report-item-table-tr">
-      <td class="report-item-label-td report-item-table-td">
-        <report-item-label v-bind="item" />
-      </td>
-
-      <td class="report-item-table-td">
+  <table class="table report-item-data-table">
+    <tr v-if="header">
+      <th v-for="heading in header" class="report-item-data-table-th">
         <component
-          :is="'report-item-' + item.type"
-          v-bind="item"
+          :is="'report-item-' + heading.type"
+          v-bind="heading"
+          :vuln="vuln"
+        />
+      </th>
+    </tr>
+
+    <tr v-for="row in rows">
+      <td v-for="cell in row" class="report-item-data-table-td">
+        <component
+          :is="'report-item-' + cell.type"
+          v-bind="cell"
           :vuln="vuln"
         />
       </td>
