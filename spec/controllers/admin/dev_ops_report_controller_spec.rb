@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Admin::DevOpsScoreController do
+RSpec.describe Admin::DevOpsReportController do
   describe 'GET #show' do
     context 'as admin' do
       let(:user) { create(:admin) }
