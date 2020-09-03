@@ -1528,7 +1528,7 @@ same rule.
 
 In the following example:
 
-- If the dockerfile or any file in `/docker/scripts` has changed, and var=blah,
+- If the `Dockerfile` file or any file in `/docker/scripts` has changed, and var=blah,
   then the job runs manually
 - Otherwise, the job isn't included in the pipeline.
 
