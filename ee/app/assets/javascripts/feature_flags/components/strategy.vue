@@ -7,8 +7,7 @@ import {
   GlFormTextarea,
   GlFormGroup,
   GlToken,
-  GlDeprecatedButton,
-  GlIcon,
+  GlButton,
 } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
 import {
@@ -28,8 +27,7 @@ export default {
     GlFormTextarea,
     GlFormSelect,
     GlToken,
-    GlDeprecatedButton,
-    GlIcon,
+    GlButton,
     NewEnvironmentsDropdown,
   },
   model: {
@@ -64,7 +62,6 @@ export default {
   translations: {
     allEnvironments: __('All environments'),
     environmentsLabel: __('Environments'),
-    removeLabel: s__('FeatureFlag|Delete strategy'),
     rolloutPercentageDescription: __('Enter a whole number between 0 and 100'),
     rolloutPercentageInvalid: s__(
       'FeatureFlags|Percent rollout must be a whole number between 0 and 100',
@@ -269,16 +266,12 @@ export default {
       </div>
 
       <div class="align-self-end align-self-md-stretch order-first offset-md-0 order-md-0 ml-auto">
-        <gl-deprecated-button
+        <gl-button
           data-testid="delete-strategy-button"
           variant="danger"
+          icon="remove"
           @click="$emit('delete')"
-        >
-          <span class="d-md-none">
-            {{ $options.translations.removeLabel }}
-          </span>
-          <gl-icon class="d-none d-md-inline-flex" name="remove" />
-        </gl-deprecated-button>
+        />
       </div>
     </div>
     <div class="flex flex-column">
