@@ -7,31 +7,15 @@ module EE
 
       override :before_create
       def before_create(issue)
-        handle_issue_epic_link(issue)
+        handle_epic(issue)
 
         super
       end
 
-      def handle_issue_epic_link(issue)
-        return unless params.key?(:epic)
+      def handle_epic(issue)
+        issue.confidential = true if epic_param&.confidential
 
-        epic = params.delete(:epic)
-
-        if epic
-          issue.confidential = true if epic.confidential?
-
-          EpicIssues::CreateService.new(epic, current_user, { target_issuable: issue }).execute
-        else
-          destroy_epic_link(issue)
-        end
-      end
-
-      def destroy_epic_link(issue)
-        link = EpicIssue.find_by_issue_id(issue.id)
-
-        return unless link
-
-        EpicIssues::DestroyService.new(link, current_user).execute
+        super
       end
     end
   end

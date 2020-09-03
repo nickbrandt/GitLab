@@ -11,6 +11,10 @@ module EE
                    ::Types::HealthStatusEnum,
                    required: false,
                    description: 'The desired health status'
+          argument :epic_id,
+                   GraphQL::ID_TYPE,
+                   required: false,
+                   description: 'The ID of the parent epic. NULL when removing the association'
         end
       end
     end
