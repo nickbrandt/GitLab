@@ -1,29 +1,29 @@
 import {
   appendToPreviousResult,
   removeProfile,
-  dastSiteProfilesDeleteResponse,
+  dastProfilesDeleteResponse,
 } from 'ee/dast_profiles/graphql/cache_utils';
 
 describe('EE - DastProfiles GraphQL CacheUtils', () => {
   describe('appendToPreviousResult', () => {
-    it('appends new results to previous', () => {
-      const previousResult = { project: { siteProfiles: { edges: ['foo'] } } };
-      const fetchMoreResult = { project: { siteProfiles: { edges: ['bar'] } } };
+    it.each(['siteProfiles', 'scannerProfiles'])('appends new results to previous', profileType => {
+      const previousResult = { project: { [profileType]: { edges: ['foo'] } } };
+      const fetchMoreResult = { project: { [profileType]: { edges: ['bar'] } } };
 
-      const expected = { project: { siteProfiles: { edges: ['foo', 'bar'] } } };
-      const result = appendToPreviousResult(previousResult, { fetchMoreResult });
+      const expected = { project: { [profileType]: { edges: ['foo', 'bar'] } } };
+      const result = appendToPreviousResult(profileType)(previousResult, { fetchMoreResult });
 
       expect(result).toEqual(expected);
     });
   });
 
   describe('removeProfile', () => {
-    it('removes the profile with the given id from the cache', () => {
+    it.each(['foo', 'bar'])('removes the profile with the given id from the cache', profileType => {
       const mockQueryBody = { query: 'foo', variables: { foo: 'bar' } };
       const mockProfiles = [{ id: 0 }, { id: 1 }];
       const mockData = {
         project: {
-          siteProfiles: {
+          [profileType]: {
             edges: [{ node: mockProfiles[0] }, { node: mockProfiles[1] }],
           },
         },
@@ -36,14 +36,15 @@ describe('EE - DastProfiles GraphQL CacheUtils', () => {
       removeProfile({
         store: mockStore,
         queryBody: mockQueryBody,
-        profileToBeDeletedId: mockProfiles[0].id,
+        profileId: mockProfiles[0].id,
+        profileType,
       });
 
       expect(mockStore.writeQuery).toHaveBeenCalledWith({
         ...mockQueryBody,
         data: {
           project: {
-            siteProfiles: {
+            [profileType]: {
               edges: [{ node: mockProfiles[1] }],
             },
           },
@@ -52,12 +53,20 @@ describe('EE - DastProfiles GraphQL CacheUtils', () => {
     });
   });
 
-  describe('dastSiteProfilesDeleteResponse', () => {
+  describe('dastProfilesDeleteResponse', () => {
     it('returns a mutation response with the correct shape', () => {
-      expect(dastSiteProfilesDeleteResponse()).toEqual({
+      const mockMutationName = 'mutationName';
+      const mockPayloadTypeName = 'payloadTypeName';
+
+      expect(
+        dastProfilesDeleteResponse({
+          mutationName: mockMutationName,
+          payloadTypeName: mockPayloadTypeName,
+        }),
+      ).toEqual({
         __typename: 'Mutation',
-        dastSiteProfileDelete: {
-          __typename: 'DastSiteProfileDeletePayload',
+        [mockMutationName]: {
+          __typename: mockPayloadTypeName,
           errors: [],
         },
       });

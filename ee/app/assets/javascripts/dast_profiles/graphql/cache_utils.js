@@ -2,16 +2,15 @@
  * Appends paginated results to existing ones
  * - to be used with $apollo.queries.x.fetchMore
  *
- * @param previousResult
- * @param fetchMoreResult
- * @returns {*}
+ * @param {*} profileType
+ * @returns {function(*, {fetchMoreResult: *}): *}
  */
-export const appendToPreviousResult = (previousResult, { fetchMoreResult }) => {
+export const appendToPreviousResult = profileType => (previousResult, { fetchMoreResult }) => {
   const newResult = { ...fetchMoreResult };
-  const previousEdges = previousResult.project.siteProfiles.edges;
-  const newEdges = newResult.project.siteProfiles.edges;
+  const previousEdges = previousResult.project[profileType].edges;
+  const newEdges = newResult.project[profileType].edges;
 
-  newResult.project.siteProfiles.edges = [...previousEdges, ...newEdges];
+  newResult.project[profileType].edges = [...previousEdges, ...newEdges];
 
   return newResult;
 };
@@ -19,15 +18,16 @@ export const appendToPreviousResult = (previousResult, { fetchMoreResult }) => {
 /**
  * Removes profile with given id from the cache and writes the result to it
  *
+ * @param profileId
+ * @param profileType
  * @param store
  * @param queryBody
- * @param profileToBeDeletedId
  */
-export const removeProfile = ({ store, queryBody, profileToBeDeletedId }) => {
+export const removeProfile = ({ profileId, profileType, store, queryBody }) => {
   const data = store.readQuery(queryBody);
 
-  data.project.siteProfiles.edges = data.project.siteProfiles.edges.filter(({ node }) => {
-    return node.id !== profileToBeDeletedId;
+  data.project[profileType].edges = data.project[profileType].edges.filter(({ node }) => {
+    return node.id !== profileId;
   });
 
   store.writeQuery({ ...queryBody, data });
@@ -36,13 +36,15 @@ export const removeProfile = ({ store, queryBody, profileToBeDeletedId }) => {
 /**
  * Returns an object representing a optimistic response for site-profile deletion
  *
- * @returns {{__typename: string, dastSiteProfileDelete: {__typename: string, errors: []}}}
+ * @param mutationName
+ * @param payloadTypeName
+ * @returns {{[p: string]: string, __typename: string}}
  */
-export const dastSiteProfilesDeleteResponse = () => ({
+export const dastProfilesDeleteResponse = ({ mutationName, payloadTypeName }) => ({
   // eslint-disable-next-line @gitlab/require-i18n-strings
   __typename: 'Mutation',
-  dastSiteProfileDelete: {
-    __typename: 'DastSiteProfileDeletePayload',
+  [mutationName]: {
+    __typename: payloadTypeName,
     errors: [],
   },
 });
