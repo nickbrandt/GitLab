@@ -84,7 +84,7 @@ This Ruby Regex specialty can have security impact, as often regular expressions
 
 GitLab specific examples can be found [here](https://gitlab.com/gitlab-org/gitlab/-/issues/36029#note_251262187) and [there](https://gitlab.com/gitlab-org/gitlab/-/issues/33569).
 
-Another example would be this fictional Ruby On Rails controller:
+Another example would be this fictional Ruby on Rails controller:
 
 ```ruby
 class PingController < ApplicationController
@@ -127,9 +127,9 @@ class Email < ApplicationRecord
   DOMAIN_MATCH = Regexp.new('([a-zA-Z0-9]+)+\.com')
 
   validates :domain_matches
-  
+
   private
-  
+
   def domain_matches
     errors.add(:email, 'does not match') if email =~ DOMAIN_MATCH
   end
