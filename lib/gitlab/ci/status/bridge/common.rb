@@ -10,14 +10,18 @@ module Gitlab
           end
 
           def has_details?
-            false
+            can?(user, :read_pipeline, subject.first_downstream_pipeline)
+          end
+
+          def details_path
+            return unless subject.first_downstream_pipeline
+
+            pipeline = subject.first_downstream_pipeline
+            project_pipeline_path(pipeline.project, pipeline)
           end
 
           def has_action?
             false
-          end
-
-          def details_path
           end
         end
       end
