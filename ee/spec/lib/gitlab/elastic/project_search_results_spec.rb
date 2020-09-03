@@ -3,12 +3,13 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic do
-  let(:user) { create(:user) }
-  let(:project) { create(:project, :public, :repository) }
+  let_it_be(:user) { create(:user) }
+  let_it_be(:project) { create(:project, :public, :repository) }
   let(:query) { 'hello world' }
   let(:repository_ref) { nil }
+  let(:filters) { {} }
 
-  subject(:results) { described_class.new(user, query, project: project, repository_ref: repository_ref) }
+  subject(:results) { described_class.new(user, query, project: project, repository_ref: repository_ref, filters: filters) }
 
   before do
     stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
@@ -30,9 +31,9 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     it { expect(results.query).to eq('hello world') }
   end
 
-  describe "search", :sidekiq_might_not_need_inline do
-    let(:project) { create(:project, :public, :repository, :wiki_repo) }
-    let(:private_project) { create(:project, :repository, :wiki_repo) }
+  describe "search", :sidekiq_inline do
+    let_it_be(:project) { create(:project, :public, :repository, :wiki_repo) }
+    let_it_be(:private_project) { create(:project, :repository, :wiki_repo) }
 
     before do
       [project, private_project].each do |project|
@@ -56,7 +57,7 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     end
 
     context 'visibility checks' do
-      let(:project) { create(:project, :public, :wiki_repo) }
+      let_it_be(:project) { create(:project, :public, :wiki_repo) }
       let(:query) { 'term' }
 
       before do
@@ -65,6 +66,19 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic do
 
       it 'shows wiki for guests' do
         expect(results.wiki_blobs_count).to eq(1)
+      end
+    end
+
+    context 'filtering' do
+      include_examples 'search issues scope filters by state' do
+        let!(:project) { create(:project, :public) }
+        let!(:closed_issue) { create(:issue, :closed, project: project, title: 'foo closed') }
+        let!(:opened_issue) { create(:issue, :opened, project: project, title: 'foo opened') }
+        let(:query) { 'foo' }
+
+        before do
+          ensure_elasticsearch_index!
+        end
       end
     end
   end
@@ -147,13 +161,14 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     it { expect(results.limited_users_count).to eq(1) }
 
     describe 'pagination' do
-      let(:query) {}
+      let(:query) { }
 
-      let!(:user2) { create(:user).tap { |u| project.add_user(u, Gitlab::Access::REPORTER) } }
+      let_it_be(:user2) { create(:user).tap { |u| project.add_user(u, Gitlab::Access::REPORTER) } }
 
       it 'returns the correct page of results' do
-        expect(results.objects('users', page: 1, per_page: 1)).to eq([project.owner])
-        expect(results.objects('users', page: 2, per_page: 1)).to eq([user2])
+        # UsersFinder defaults to order_id_desc, the newer result will be first
+        expect(results.objects('users', page: 1, per_page: 1)).to eq([user2])
+        expect(results.objects('users', page: 2, per_page: 1)).to eq([project.owner])
       end
 
       it 'returns the correct number of results for one page' do

@@ -21,11 +21,24 @@ module Elastic
         options[:features] = 'issues'
         query_hash = project_ids_filter(query_hash, options)
         query_hash = confidentiality_filter(query_hash, options)
+        query_hash = state_filter(query_hash, options)
 
         search(query_hash, options)
       end
 
       private
+
+      def state_filter(query_hash, options)
+        state = options[:state]
+
+        return query_hash if state.blank? || state == 'all'
+        return query_hash unless %w(all opened closed).include?(state)
+
+        filter = { match: { state: state } }
+
+        query_hash[:query][:bool][:filter] << filter
+        query_hash
+      end
 
       def confidentiality_filter(query_hash, options)
         current_user = options[:current_user]

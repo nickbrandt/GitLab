@@ -24,7 +24,8 @@ module EE
           params[:search],
           projects,
           group: group,
-          public_and_internal_projects: elastic_global
+          public_and_internal_projects: elastic_global,
+          filters: { state: params[:state] }
         )
       end
     end

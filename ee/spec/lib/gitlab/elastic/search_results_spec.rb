@@ -171,6 +171,20 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       expect(results.objects('issues')).to be_empty
       expect(results.issues_count).to eq 0
     end
+
+    context 'filtering' do
+      let!(:project) { create(:project, :public) }
+      let!(:closed_issue) { create(:issue, :closed, project: project, title: 'foo closed') }
+      let!(:opened_issue) { create(:issue, :opened, project: project, title: 'foo opened') }
+
+      let(:results) { described_class.new(user, 'foo', [project], filters: filters) }
+
+      include_examples 'search issues scope filters by state' do
+        before do
+          ensure_elasticsearch_index!
+        end
+      end
+    end
   end
 
   describe 'notes' do

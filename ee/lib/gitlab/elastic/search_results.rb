@@ -7,7 +7,7 @@ module Gitlab
 
       DEFAULT_PER_PAGE = Gitlab::SearchResults::DEFAULT_PER_PAGE
 
-      attr_reader :current_user, :query, :public_and_internal_projects
+      attr_reader :current_user, :query, :public_and_internal_projects, :filters
 
       # Limit search results by passed projects
       # It allows us to search only for projects user has access to
@@ -16,11 +16,12 @@ module Gitlab
       delegate :users, to: :generic_search_results
       delegate :limited_users_count, to: :generic_search_results
 
-      def initialize(current_user, query, limit_projects = nil, public_and_internal_projects: true)
+      def initialize(current_user, query, limit_projects = nil, public_and_internal_projects: true, filters: {})
         @current_user = current_user
         @query = query
         @limit_projects = limit_projects
         @public_and_internal_projects = public_and_internal_projects
+        @filters = filters
       end
 
       def objects(scope, page: 1, per_page: DEFAULT_PER_PAGE, preload_method: nil)
@@ -221,7 +222,10 @@ module Gitlab
 
       def issues
         strong_memoize(:issues) do
-          Issue.elastic_search(query, options: base_options)
+          options = base_options
+          options[:state] = filters[:state] if filters.key?(:state)
+
+          Issue.elastic_search(query, options: options)
         end
       end
 
