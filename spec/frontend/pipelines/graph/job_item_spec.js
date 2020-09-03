@@ -6,6 +6,7 @@ describe('pipeline graph job item', () => {
   let wrapper;
 
   const findJobWithoutLink = () => wrapper.find('[data-testid="job-without-link"]');
+  const findJobWithLink = () => wrapper.find('[data-testid="job-with-link"]');
 
   const createWrapper = propsData => {
     wrapper = mount(JobItem, {
@@ -88,7 +89,6 @@ describe('pipeline graph job item', () => {
     });
 
     it('should apply hover class and provided class name', () => {
-      expect(findJobWithoutLink().classes()).toContain(triggerActiveClass);
       expect(findJobWithoutLink().classes()).toContain('css-class-job-name');
     });
   });
@@ -151,7 +151,7 @@ describe('pipeline graph job item', () => {
         job: delayedJobFixture,
       });
 
-      expect(wrapper.find('.js-pipeline-graph-job-link').attributes('title')).toEqual(
+      expect(findJobWithLink().attributes('title')).toEqual(
         `delayed job - delayed manual action (${wrapper.vm.remainingTime})`,
       );
     });
@@ -160,20 +160,20 @@ describe('pipeline graph job item', () => {
   describe('trigger job highlighting', () => {
     it('trigger job should stay highlighted when downstream is expanded', () => {
       createWrapper({
-        job: mockJobWithoutDetails,
+        job: mockJob,
         pipelineExpanded: { jobName: mockJob.name, expanded: true },
       });
 
-      expect(findJobWithoutLink().classes()).toContain(triggerActiveClass);
+      expect(findJobWithLink().classes()).toContain(triggerActiveClass);
     });
 
     it('trigger job should not be highlighted when downstream is closed', () => {
       createWrapper({
-        job: mockJobWithoutDetails,
+        job: mockJob,
         pipelineExpanded: { jobName: mockJob.name, expanded: false },
       });
 
-      expect(findJobWithoutLink().classes()).not.toContain(triggerActiveClass);
+      expect(findJobWithLink().classes()).not.toContain(triggerActiveClass);
     });
   });
 });

@@ -132,8 +132,9 @@ export default {
       v-gl-tooltip="{ boundary, placement: 'bottom' }"
       :href="status.details_path"
       :title="tooltipText"
-      :class="cssClassJobName"
+      :class="jobClasses"
       class="js-pipeline-graph-job-link qa-job-link menu-item"
+      data-testid="job-with-link"
     >
       <job-name-component :name="job.name" :status="job.status" />
     </gl-link>
@@ -142,7 +143,7 @@ export default {
       v-else
       v-gl-tooltip="{ boundary, placement: 'bottom' }"
       :title="tooltipText"
-      :class="jobClasses"
+      :class="cssClassJobName"
       class="js-job-component-tooltip non-details-job-component"
       data-testid="job-without-link"
     >
