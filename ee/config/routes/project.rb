@@ -19,14 +19,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :test_cases, only: [:index]
         end
 
-        resources :feature_flags, param: :iid do
-          resources :feature_flag_issues, only: [:index, :create, :destroy], as: 'issues', path: 'issues'
-        end
-        resource :feature_flags_client, only: [] do
-          post :reset_token
-        end
-        resources :feature_flags_user_lists, param: :iid, only: [:new, :edit, :show]
-
         resources :autocomplete_sources, only: [] do
           collection do
             get 'epics'
