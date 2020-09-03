@@ -137,6 +137,7 @@ class License < ApplicationRecord
     report_approver_rules
     requirements
     sast
+    sast_custom_rulesets
     secret_detection
     security_dashboard
     security_on_demand_scans
