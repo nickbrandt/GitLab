@@ -53,16 +53,16 @@ export const receiveStageDataError = ({ commit }) => {
   createFlash(__('There was an error fetching data for the selected stage'));
 };
 
-export const fetchStageData = ({ dispatch, getters }, slug) => {
+export const fetchStageData = ({ dispatch, getters }, stageId) => {
   const { cycleAnalyticsRequestParams = {}, currentValueStreamId, currentGroupPath } = getters;
   dispatch('requestStageData');
 
-  return Api.cycleAnalyticsStageEvents(
-    currentGroupPath,
-    currentValueStreamId,
-    slug,
+  return Api.cycleAnalyticsStageEvents({
+    groupId: currentGroupPath,
+    valueStreamId: currentValueStreamId,
+    stageId,
     cycleAnalyticsRequestParams,
-  )
+  })
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
     .catch(error => dispatch('receiveStageDataError', error));
 };
@@ -77,13 +77,11 @@ export const receiveStageMedianValuesError = ({ commit }) => {
   createFlash(__('There was an error fetching median data for stages'));
 };
 
-const fetchStageMedian = (currentGroupPath, currentValueStreamId, stageId, params) =>
-  Api.cycleAnalyticsStageMedian(currentGroupPath, currentValueStreamId, stageId, params).then(
-    ({ data }) => ({
-      id: stageId,
-      ...data,
-    }),
-  );
+const fetchStageMedian = ({ groupId, valueStreamId, stageId, params }) =>
+  Api.cycleAnalyticsStageMedian({ groupId, valueStreamId, stageId, params }).then(({ data }) => ({
+    id: stageId,
+    ...data,
+  }));
 
 export const fetchStageMedianValues = ({ dispatch, getters }) => {
   const {
@@ -97,12 +95,12 @@ export const fetchStageMedianValues = ({ dispatch, getters }) => {
   dispatch('requestStageMedianValues');
   return Promise.all(
     stageIds.map(stageId =>
-      fetchStageMedian(
-        currentGroupPath,
-        currentValueStreamId,
+      fetchStageMedian({
+        groupId: currentGroupPath,
+        valueStreamId: currentValueStreamId,
         stageId,
         cycleAnalyticsRequestParams,
-      ),
+      }),
     ),
   )
     .then(data => dispatch('receiveStageMedianValuesSuccess', data))
@@ -182,9 +180,13 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
   dispatch('requestGroupStages');
   dispatch('customStages/setStageEvents', []);
 
-  return Api.cycleAnalyticsGroupStagesAndEvents(groupId, valueStreamId, {
-    start_date: created_after,
-    project_ids,
+  return Api.cycleAnalyticsGroupStagesAndEvents({
+    groupId,
+    valueStreamId,
+    data: {
+      start_date: created_after,
+      project_ids,
+    },
   })
     .then(({ data: { stages = [], events = [] } }) => {
       dispatch('receiveGroupStagesSuccess', stages);
@@ -232,7 +234,12 @@ export const updateStage = ({ dispatch, getters }, { id, ...params }) => {
   dispatch('requestUpdateStage');
   dispatch('customStages/setSavingCustomStage');
 
-  return Api.cycleAnalyticsUpdateStage(currentGroupPath, currentValueStreamId, id, params)
+  return Api.cycleAnalyticsUpdateStage({
+    groupId: currentGroupPath,
+    valueStreamId: currentValueStreamId,
+    stageId: id,
+    data: params,
+  })
     .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
     .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
       dispatch('receiveUpdateStageError', { status, responseData, data: { id, ...params } }),
@@ -255,7 +262,11 @@ export const removeStage = ({ dispatch, getters }, stageId) => {
   const { currentGroupPath, currentValueStreamId } = getters;
   dispatch('requestRemoveStage');
 
-  return Api.cycleAnalyticsRemoveStage(currentGroupPath, currentValueStreamId, stageId)
+  return Api.cycleAnalyticsRemoveStage({
+    groupId: currentGroupPath,
+    valueStreamId: currentValueStreamId,
+    stageId,
+  })
     .then(() => dispatch('receiveRemoveStageSuccess'))
     .catch(error => dispatch('receiveRemoveStageError', error));
 };
@@ -312,7 +323,12 @@ export const reorderStage = ({ dispatch, getters }, initialData) => {
 
   const params = moveAfterId ? { move_after_id: moveAfterId } : { move_before_id: moveBeforeId };
 
-  return Api.cycleAnalyticsUpdateStage(currentGroupPath, currentValueStreamId, id, params)
+  return Api.cycleAnalyticsUpdateStage({
+    groupId: currentGroupPath,
+    valueStreamId: currentValueStreamId,
+    stageId: id,
+    data: params,
+  })
     .then(({ data }) => dispatch('receiveReorderStageSuccess', data))
     .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
       dispatch('receiveReorderStageError', { status, responseData }),

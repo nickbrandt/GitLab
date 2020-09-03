@@ -381,7 +381,7 @@ describe('Api', () => {
         const expectedUrl = valueStreamBaseUrl({ id: valueStreamId, resource: 'stages' });
         mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
-        Api.cycleAnalyticsGroupStagesAndEvents(groupId, valueStreamId, params)
+        Api.cycleAnalyticsGroupStagesAndEvents({ groupId, valueStreamId, params })
           .then(responseObj =>
             expectRequestWithCorrectParameters(responseObj, {
               response,
@@ -404,7 +404,7 @@ describe('Api', () => {
         });
         mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
-        Api.cycleAnalyticsStageEvents(groupId, valueStreamId, stageId, params)
+        Api.cycleAnalyticsStageEvents({ groupId, valueStreamId, stageId, params })
           .then(responseObj =>
             expectRequestWithCorrectParameters(responseObj, {
               response,
@@ -427,7 +427,7 @@ describe('Api', () => {
         });
         mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
-        Api.cycleAnalyticsStageMedian(groupId, valueStreamId, stageId, params)
+        Api.cycleAnalyticsStageMedian({ groupId, valueStreamId, stageId, params })
           .then(responseObj =>
             expectRequestWithCorrectParameters(responseObj, {
               response,
@@ -456,7 +456,7 @@ describe('Api', () => {
         });
         mock.onPost(expectedUrl).reply(httpStatus.OK, response);
 
-        Api.cycleAnalyticsCreateStage(groupId, valueStreamId, customStage)
+        Api.cycleAnalyticsCreateStage({ groupId, valueStreamId, data: customStage })
           .then(({ data, config: { data: reqData, url } }) => {
             expect(data).toEqual(response);
             expect(JSON.parse(reqData)).toMatchObject(customStage);
@@ -478,7 +478,7 @@ describe('Api', () => {
         });
         mock.onPut(expectedUrl).reply(httpStatus.OK, response);
 
-        Api.cycleAnalyticsUpdateStage(groupId, valueStreamId, stageId, stageData)
+        Api.cycleAnalyticsUpdateStage({ groupId, valueStreamId, stageId, data: stageData })
           .then(({ data, config: { data: reqData, url } }) => {
             expect(data).toEqual(response);
             expect(JSON.parse(reqData)).toMatchObject(stageData);
@@ -498,7 +498,7 @@ describe('Api', () => {
         });
         mock.onDelete(expectedUrl).reply(httpStatus.OK, response);
 
-        Api.cycleAnalyticsRemoveStage(groupId, valueStreamId, stageId)
+        Api.cycleAnalyticsRemoveStage({ groupId, valueStreamId, stageId })
           .then(({ data, config: { url } }) => {
             expect(data).toEqual(response);
 
@@ -519,7 +519,7 @@ describe('Api', () => {
         });
         mock.onGet(expectedUrl).reply(httpStatus.OK, response);
 
-        Api.cycleAnalyticsDurationChart(groupId, valueStreamId, stageId, params)
+        Api.cycleAnalyticsDurationChart({ groupId, valueStreamId, stageId, params })
           .then(responseObj =>
             expectRequestWithCorrectParameters(responseObj, {
               response,
