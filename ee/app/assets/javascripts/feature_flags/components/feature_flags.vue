@@ -125,6 +125,32 @@ export default {
       'isRotating',
       'hasRotateError',
     ]),
+    secondaryButtonClasses() {
+      return ['gl-mb-3', 'gl-lg-mr-3', 'gl-lg-mb-0'];
+    },
+    navigationControlsClasses() {
+      return [
+        'gl-display-flex',
+        'gl-flex-direction-column',
+        'gl-mt-3',
+        'gl-lg-flex-direction-row',
+        'gl-lg-flex-fill-1',
+        'gl-lg-justify-content-end',
+        'gl-lg-mt-0',
+      ];
+    },
+    topAreaBaseClasses() {
+      return [
+        'gl-border-1',
+        'gl-border-b-gray-100',
+        'gl-border-b-solid',
+        'gl-flex-wrap',
+        'gl-display-flex',
+        'gl-flex-direction-column-reverse',
+        'gl-lg-align-items-center',
+        'gl-lg-flex-direction-row',
+      ];
+    },
     canUserRotateToken() {
       return this.rotateInstanceIdPath !== '';
     },
@@ -252,9 +278,14 @@ export default {
       modal-id="configure-feature-flags"
       @token="rotateInstanceId()"
     />
-    <div class="top-area">
-      <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
-      <div class="nav-controls">
+    <div :class="topAreaBaseClasses">
+      <navigation-tabs
+        :tabs="tabs"
+        scope="featureflags"
+        class="gl-border-none!"
+        @onChangeTab="onChangeTab"
+      />
+      <div :class="navigationControlsClasses">
         <gl-button
           v-if="canUserConfigure"
           v-gl-modal="'configure-feature-flags'"
@@ -262,7 +293,7 @@ export default {
           category="secondary"
           data-qa-selector="configure_feature_flags_button"
           data-testid="ff-configure-button"
-          class="gl-mr-3"
+          :class="secondaryButtonClasses"
         >
           {{ s__('FeatureFlags|Configure') }}
         </gl-button>
@@ -272,7 +303,7 @@ export default {
           :href="newUserListPath"
           variant="success"
           category="secondary"
-          class="gl-mr-3"
+          :class="secondaryButtonClasses"
           data-testid="ff-new-list-button"
         >
           {{ s__('FeatureFlags|New list') }}
