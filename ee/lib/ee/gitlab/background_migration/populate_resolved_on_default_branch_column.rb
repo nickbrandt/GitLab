@@ -42,6 +42,8 @@ module EE
           include Visibility
           include ::Gitlab::Utils::StrongMemoize
 
+          self.table_name = 'projects'
+
           # These are the artifact file types to query
           # only security report related artifacts.
           # sast: 5
@@ -191,6 +193,8 @@ module EE
           include Routable
           include Visibility
 
+          self.table_name = 'namespaces'
+
           belongs_to :parent, class_name: 'Namespace'
 
           def self.find_sti_class(type_name)
@@ -204,9 +208,13 @@ module EE
           end
         end
 
-        class Route < ActiveRecord::Base; end
+        class Route < ActiveRecord::Base
+          self.table_name = 'routes'
+        end
         class Vulnerability < ActiveRecord::Base
           include EachBatch
+
+          self.table_name = 'vulnerabilities'
 
           scope :not_found_in_pipeline_id, -> (pipeline_id) do
             where(<<~SQL)
