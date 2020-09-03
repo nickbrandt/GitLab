@@ -61,8 +61,8 @@ export default {
     resolvedCommentsToggleIcon() {
       return this.resolvedDiscussionsExpanded ? 'chevron-down' : 'chevron-right';
     },
-    hasPendingTodo() {
-      return Boolean(this.design.pendingTodo);
+    showTodoButton() {
+      return gon.features?.designManagementTodoButton;
     },
   },
   watch: {
@@ -99,29 +99,20 @@ export default {
     updateDiscussionWithOpenForm(id) {
       this.discussionWithOpenForm = id;
     },
-    toggleTodo() {
-      // TODO implement
-    },
   },
-  showTodoButton: gon.features?.designManagementTodoButton,
   resolveCommentsToggleText: s__('DesignManagement|Resolved Comments'),
   cookieKey: 'hide_design_resolved_comments_popover',
 };
 </script>
 
 <template>
-  <div class="image-notes" @click="handleSidebarClick">
+  <div class="image-notes" :class="{ 'gl-pt-0': showTodoButton }" @click="handleSidebarClick">
     <div
-      v-if="$options.showTodoButton"
-      class="gl-display-flex gl-justify-content-space-between gl-border-b-1 gl-border-b-gray-100"
+      v-if="showTodoButton"
+      class="gl-py-4 gl-mb-4 gl-display-flex gl-justify-content-space-between gl-align-items-center gl-border-b-1 gl-border-b-solid gl-border-b-gray-100"
     >
       <span>{{ __('To-Do') }}</span>
-      <todo-button
-        issuable-type="design"
-        :issuable-id="design.iid"
-        :is-todo="hasPendingTodo"
-        @click="toggleTodo"
-      />
+      <todo-button issuable-type="design" :issuable-id="design.iid" />
     </div>
     <h2 class="gl-font-weight-bold gl-mt-0">
       {{ issue.title }}
