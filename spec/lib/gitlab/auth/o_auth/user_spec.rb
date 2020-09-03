@@ -207,7 +207,19 @@ RSpec.describe Gitlab::Auth::OAuth::User do
           stub_omniauth_config(auto_link_user: ['saml'])
         end
 
-        include_examples "to verify compliance with allow_single_sign_on"
+        context "and a current GitLab user with a matching email" do
+          let!(:existing_user) { create(:user, email: 'john@mail.com', username: 'john') }
+
+          it "adds the OmniAuth identity to the GitLab user account" do
+            oauth_user.save
+
+            expect(gl_user).not_to be_valid
+          end
+        end
+
+        context "and no current GitLab user with a matching email" do
+          include_examples "to verify compliance with allow_single_sign_on"
+        end
       end
 
       context "with auto_link_user enabled for the correct provider" do
