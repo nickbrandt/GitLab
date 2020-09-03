@@ -21456,6 +21456,63 @@ msgstr ""
 msgid "Runners page."
 msgstr ""
 
+msgid "Runners|Active"
+msgstr ""
+
+msgid "Runners|Architecture"
+msgstr ""
+
+msgid "Runners|Can run untagged jobs"
+msgstr ""
+
+msgid "Runners|Description"
+msgstr ""
+
+msgid "Runners|Group"
+msgstr ""
+
+msgid "Runners|IP Address"
+msgstr ""
+
+msgid "Runners|Last contact"
+msgstr ""
+
+msgid "Runners|Locked to this project"
+msgstr ""
+
+msgid "Runners|Maximum job timeout"
+msgstr ""
+
+msgid "Runners|Name"
+msgstr ""
+
+msgid "Runners|Platform"
+msgstr ""
+
+msgid "Runners|Property Name"
+msgstr ""
+
+msgid "Runners|Protected"
+msgstr ""
+
+msgid "Runners|Revision"
+msgstr ""
+
+msgid "Runners|Shared"
+msgstr ""
+
+msgid "Runners|Specific"
+msgstr ""
+
+msgid "Runners|Tags"
+msgstr ""
+
+msgid "Runners|Value"
+msgstr ""
+
+msgid "Runners|Version"
+msgstr ""
+
 msgid "Runners|You have used %{quotaUsed} out of %{quotaLimit} of your shared Runners pipeline minutes."
 msgstr ""
 
