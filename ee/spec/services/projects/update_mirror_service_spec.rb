@@ -228,7 +228,7 @@ RSpec.describe Projects::UpdateMirrorService do
             let(:protected_branch_name) { "#{branch_prefix}existing-branch" }
 
             before do
-              project.update(only_mirror_protected_branches: true)
+              project.update!(only_mirror_protected_branches: true)
             end
 
             it 'creates a new protected branch' do
@@ -321,7 +321,7 @@ RSpec.describe Projects::UpdateMirrorService do
         let(:pull_mirror_branch_prefix) { 'upstream/' }
 
         before do
-          project.update(pull_mirror_branch_prefix: pull_mirror_branch_prefix)
+          project.update!(pull_mirror_branch_prefix: pull_mirror_branch_prefix)
         end
 
         it "doesn't create unprefixed branches" do
