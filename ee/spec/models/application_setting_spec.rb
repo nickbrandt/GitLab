@@ -397,11 +397,12 @@ RSpec.describe ApplicationSetting do
     end
   end
 
-  describe '#invalidate_elasticsearch_indexes_project_cache!' do
-    it 'deletes the ElasticsearchEnabledCache for projects' do
+  describe '#invalidate_elasticsearch_indexes_cache' do
+    it 'deletes the ElasticsearchEnabledCache for projects and namespaces' do
       expect(::Gitlab::Elastic::ElasticsearchEnabledCache).to receive(:delete).with(:project)
+      expect(::Gitlab::Elastic::ElasticsearchEnabledCache).to receive(:delete).with(:namespace)
 
-      setting.invalidate_elasticsearch_indexes_project_cache!
+      setting.invalidate_elasticsearch_indexes_cache!
     end
   end
 

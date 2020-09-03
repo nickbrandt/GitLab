@@ -152,15 +152,20 @@ module EE
       end
     end
 
-    def invalidate_elasticsearch_indexes_project_cache!
-      ::Gitlab::Elastic::ElasticsearchEnabledCache.delete(:project)
-    end
-
     def elasticsearch_indexes_namespace?(namespace)
       return false unless elasticsearch_indexing?
       return true unless elasticsearch_limit_indexing?
 
-      elasticsearch_limited_namespaces.exists?(namespace.id)
+      elasticsearch_limited_namespaces.exists?(namespace.id) unless ::Feature.enabled?(:elasticsearch_indexes_namespace_cache)
+
+      ::Gitlab::Elastic::ElasticsearchEnabledCache.fetch(:namespace, namespace.id) do
+        elasticsearch_limited_namespaces.exists?(namespace.id)
+      end
+    end
+
+    def invalidate_elasticsearch_indexes_cache!
+      ::Gitlab::Elastic::ElasticsearchEnabledCache.delete(:project)
+      ::Gitlab::Elastic::ElasticsearchEnabledCache.delete(:namespace)
     end
 
     def elasticsearch_limited_projects(ignore_namespaces = false)

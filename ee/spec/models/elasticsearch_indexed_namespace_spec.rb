@@ -56,7 +56,7 @@ RSpec.describe ElasticsearchIndexedNamespace do
 
     describe '.index_first_n_namespaces_of_plan' do
       it 'creates records, scoped by plan and ordered by namespace id' do
-        expect(::Gitlab::CurrentSettings).to receive(:invalidate_elasticsearch_indexes_project_cache!).and_call_original.exactly(3).times
+        expect(::Gitlab::CurrentSettings).to receive(:invalidate_elasticsearch_indexes_cache!).and_call_original.exactly(3).times
 
         ids = namespaces.map(&:id)
 
@@ -84,7 +84,7 @@ RSpec.describe ElasticsearchIndexedNamespace do
       end
 
       it 'creates records, scoped by plan and ordered by namespace id' do
-        expect(::Gitlab::CurrentSettings).to receive(:invalidate_elasticsearch_indexes_project_cache!).and_call_original.exactly(3).times
+        expect(::Gitlab::CurrentSettings).to receive(:invalidate_elasticsearch_indexes_cache!).and_call_original.exactly(3).times
 
         ids = namespaces.map(&:id)
 
