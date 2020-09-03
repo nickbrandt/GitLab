@@ -26,6 +26,8 @@ module Ci
       fog: 3
     }
 
+    scope :live, -> { redis }
+
     class << self
       def all_stores
         @all_stores ||= self.data_stores.keys
@@ -129,6 +131,7 @@ module Ci
       current_data = data
       old_store_class = current_store
 
+      ## TODO allow final chunk update if build pending state exists
       unless current_data&.bytesize.to_i == CHUNK_SIZE
         raise FailedToPersistDataError, 'Data is not fulfilled in a bucket'
       end
