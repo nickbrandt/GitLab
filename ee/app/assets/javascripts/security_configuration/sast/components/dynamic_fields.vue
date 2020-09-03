@@ -1,10 +1,12 @@
 <script>
 import FormInput from './form_input.vue';
+import CheckboxInput from './checkbox_input.vue';
 import { isValidConfigurationEntity } from './utils';
 
 export default {
   components: {
     FormInput,
+    CheckboxInput,
   },
   model: {
     prop: 'entities',
@@ -19,6 +21,7 @@ export default {
   },
   methods: {
     componentForEntity({ type }) {
+      debugger;
       return this.$options.entityTypeToComponent[type];
     },
     onInput(fieldName, newValue) {
@@ -42,7 +45,7 @@ export default {
   // before the frontend adds support for them.
   entityTypeToComponent: {
     string: FormInput,
-    checkbox: CheckboxInput
+    checkbox: CheckboxInput,
   },
 };
 </script>

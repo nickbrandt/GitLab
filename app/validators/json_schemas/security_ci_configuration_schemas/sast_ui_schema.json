@@ -52,66 +52,92 @@
         {
             "name": "brakeman",
             "label": "Brakeman",
+            "description": "Go",
+            "type": "checkbox",
             "enabled" : true
         },
         {
             "name": "bandit",
             "label": "Bandit",
+            "description": "C++", 
+            "type": "checkbox",           
             "enabled" : true
         },
         {
             "name": "eslint",
             "label": "ESLint",
+            "description": "",  
+            "type": "checkbox",          
             "enabled" : true
         },
         {
             "name": "flawfinder",
             "label": "Flawfinder",
+            "description": "",  
+            "type": "checkbox",          
             "enabled" : true
         },
         {
             "name": "kubesec",
             "label": "kubesec",
+            "description": "",   
+            "type": "checkbox",         
             "enabled" : true
         },
         {
             "name": "nodejsscan",
             "label": "Node.js Scan",
+            "description": "",
+            "type": "checkbox",            
             "enabled" : true
         },
         {
             "name": "gosec",
             "label": "Golang Security Checker",
+            "description": "",
+            "type": "checkbox",            
             "enabled" : true
         },
         {
             "name": "phpcs-security-audit",
             "label": "PHP Security Audit",
+            "description": "", 
+            "type": "checkbox",           
             "enabled" : true
         },
         {
             "name": "pmd-apex",
             "label": "PMD APEX",
+            "description": "",
+            "type": "checkbox",            
             "enabled" : true
         },
         {
             "name": "security-code-scan",
             "label": "Security Code Scan",
+            "description": "", 
+            "type": "checkbox",           
             "enabled" : true
         },
         {
             "name": "sobelow",
             "label": "Sobelow",
+            "description": "",
+            "type": "checkbox",            
             "enabled" : true
         },
         {
             "name": "spotbugs",
             "label": "Spotbugs",
+            "description": "",
+            "type": "checkbox",            
             "enabled" : true
         },
         {
             "name": "secrets",
             "label": "Secrets",
+            "description": "", 
+            "type": "checkbox",           
             "enabled" : true
         }
     ]

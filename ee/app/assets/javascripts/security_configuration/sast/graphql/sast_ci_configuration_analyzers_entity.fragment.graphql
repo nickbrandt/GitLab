@@ -1,0 +1,7 @@
+fragment SastCiConfigurationAnalyzersEntityFragment on SastCiConfigurationAnalyzersEntity{
+  name
+  label
+  type
+  enabled
+  description
+}

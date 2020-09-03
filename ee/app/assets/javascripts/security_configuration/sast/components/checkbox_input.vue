@@ -19,36 +19,26 @@ export default {
     event: 'input',
   },
   props: {
-    value: {
-      type: String,
-      required: true,
-    },
-    defaultValue: {
-      type: String,
-      required: true,
-    },
-    field: {
+    name: {
       type: String,
       required: true,
     },
     label: {
       type: String,
       required: true,
-    },
+    },    
     description: {
       type: String,
       required: true,
     },
+    enabled: {
+      type: Boolean,
+      required: true,
+    },
   },
   computed: {
-    isCustomValue() {
-      return this.value !== this.defaultValue;
-    },
   },
   methods: {
-    resetToDefaultValue() {
-      this.$emit('input', this.defaultValue);
-    },
   },
   i18n: {
     CUSTOM_VALUE_MESSAGE,
@@ -57,20 +47,10 @@ export default {
 </script>
 
 <template>
-  <gl-form-group :label-for="field">
-    <template #label>
-      {{ label }}
-      <gl-form-text class="gl-mt-3">{{ description }}</gl-form-text>
-    </template>
-
-    <gl-form-checkbox :id="field" :value="value" @input="$emit('input', $event)" />
-
-    <template v-if="isCustomValue" #description>
-      <gl-sprintf :message="$options.i18n.CUSTOM_VALUE_MESSAGE">
-        <template #anchor="{ content }">
-          <gl-link @click="resetToDefaultValue" v-text="content" />
-        </template>
-      </gl-sprintf>
-    </template>
+  <gl-form-group :label-for="name">
+    <gl-form-checkbox :id="name" :value="enabled" @input="$emit('input', $event)">
+      <span>{{ label }}</span>
+      <span v-if="description">({{ description }})</span>
+    </gl-form-checkbox>
   </gl-form-group>
 </template>

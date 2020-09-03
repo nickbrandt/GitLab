@@ -14,6 +14,9 @@ module Types
         field :label, GraphQL::STRING_TYPE, null: true,
           description: 'Analyzer label used in the config UI.'
 
+        field :type, GraphQL::STRING_TYPE, null: true,
+        description: 'Type of the field value.'          
+
         field :enabled, GraphQL::BOOLEAN_TYPE, null: true,
           description: 'Indicates whether an analyzer is enabled.'
 
