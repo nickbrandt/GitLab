@@ -234,7 +234,6 @@ module API
       mount ::API::Tags
       mount ::API::Templates
       mount ::API::Todos
-      mount ::API::UsageData
       mount ::API::Triggers
       mount ::API::UserCounts
       mount ::API::Users
@@ -246,6 +245,7 @@ module API
     mount ::API::Internal::Base
     mount ::API::Internal::Pages
     mount ::API::Internal::Kubernetes
+    mount ::API::Internal::UsageData
 
     version 'v3', using: :path do
       # Although the following endpoints are kept behind V3 namespace,

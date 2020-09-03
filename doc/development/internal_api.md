@@ -370,3 +370,33 @@ Example response:
   "reference_counter_decreased": true
 }
 ```
+
+## Usage Data
+
+> Introduced in GitLab 13.4
+
+### Increment unique values count using Redis HLL
+
+Increment unique values for given event name.
+In order to be able to increment the values the related feature `usage_data<event_name>` should be enabled.
+
+```plaintext
+POST /increment_unique_values
+```
+
+| Attribute | Type | Required | Description |
+| :-------- | :--- | :------- | :---------- |
+| `name` | string | yes | The event name it should be tracked |
+| `values` | array | yes | The values counted |
+
+```shell
+curl --header "Gitlab-Shared-Secret: <Base64 encoded secret> "https://gitlab.example.com/api/v4/usage_data/increment_unique_users" --data "name=event_name&values[]=value1&values[]=value2"
+```
+
+#### Response
+
+Return 200 if tracking failed for any reason.
+
+- `401 Unauthorized` if not authorized
+- `400 Bad request` if name parameter is missing
+- `200` if event was tracked or any errors
