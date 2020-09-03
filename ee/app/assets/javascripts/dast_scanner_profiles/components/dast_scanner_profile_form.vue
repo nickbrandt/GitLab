@@ -168,8 +168,12 @@ export default {
     modalTitle: s__('DastProfiles|Do you want to discard this scanner profile?'),
     modalOkTitle: __('Discard'),
     modalCancelTitle: __('Cancel'),
-    spiderTimeoutTooltip: '',
-    targetTimeoutTooltip: '',
+    spiderTimeoutTooltip: s__(
+      'DastProfiles|The maximum number of seconds allowed for the spider to traverse the site.',
+    ),
+    targetTimeoutTooltip: s__(
+      'DastProfiles|The maximum number of seconds allowed for the site under test to respond to a request.',
+    ),
   },
 };
 </script>
@@ -207,7 +211,6 @@ export default {
         <template #label>
           {{ s__('DastProfiles|Spider timeout') }}
           <gl-icon
-            v-if="$options.i18n.spiderTimeoutTooltip"
             v-gl-tooltip.hover
             name="information-o"
             class="gl-vertical-align-text-bottom gl-text-gray-400 gl-ml-2"
@@ -240,7 +243,6 @@ export default {
         <template #label>
           {{ s__('DastProfiles|Target timeout') }}
           <gl-icon
-            v-if="$options.i18n.targetTimeoutTooltip"
             v-gl-tooltip.hover
             name="information-o"
             class="gl-vertical-align-text-bottom gl-text-gray-400 gl-ml-2"

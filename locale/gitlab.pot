@@ -7845,6 +7845,12 @@ msgstr ""
 msgid "DastProfiles|Target timeout"
 msgstr ""
 
+msgid "DastProfiles|The maximum number of seconds allowed for the site under test to respond to a request."
+msgstr ""
+
+msgid "DastProfiles|The maximum number of seconds allowed for the spider to traverse the site."
+msgstr ""
+
 msgid "Data is still calculating..."
 msgstr ""
 
