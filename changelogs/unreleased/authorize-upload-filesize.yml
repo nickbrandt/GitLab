@@ -1,5 +1,0 @@
----
-title: Reject upload when filesize exceeds MaximumSize returned by authorize endpoint
-merge_request:
-author:
-type: added

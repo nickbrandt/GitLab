@@ -1,5 +1,17 @@
 # Changelog for gitlab-workhorse
 
+## v8.45.0
+
+### Added
+- Reject upload when filesize exceeds MaximumSize returned by authorize endpoint
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
+
+### Other
+- Eliminate unnecessary code in GoCloud test stubs
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/590
+- Drop tests that check for log messages
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/591
+
 ## v8.44.0
 
 ### Fixed
