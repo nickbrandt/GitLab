@@ -1,0 +1,5 @@
+---
+title: Replace v-html with v-safe-html in weight.vue
+merge_request: 41325
+author:
+type: other
