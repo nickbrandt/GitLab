@@ -664,13 +664,6 @@ Style/RescueModifier:
 Style/RescueStandardError:
   Enabled: false
 
-# Offense count: 50
-# Cop supports --auto-correct.
-# Configuration parameters: AllowIfMethodIsEmpty.
-Style/SingleLineMethods:
-  Exclude:
-    - 'lib/gitlab/ci/ansi2html.rb'
-
 # Offense count: 102
 # Cop supports --auto-correct.
 # Configuration parameters: .
