@@ -5,6 +5,62 @@ require 'spec_helper'
 RSpec.describe EE::TrialHelper do
   using RSpec::Parameterized::TableSyntax
 
+  describe '#should_ask_company_question?' do
+    before do
+      allow(helper).to receive(:glm_params).and_return(glm_source ? { glm_source: glm_source } : {})
+    end
+
+    subject { helper.should_ask_company_question? }
+
+    where(:glm_source, :result) do
+      'about.gitlab.com'  | false
+      'abouts.gitlab.com' | true
+      'about.gitlab.org'  | true
+      'about.gitlob.com'  | true
+      nil                 | true
+    end
+
+    with_them do
+      it { is_expected.to eq(result) }
+    end
+  end
+
+  describe '#glm_params' do
+    let(:glm_source) { nil }
+    let(:glm_content) { nil }
+    let(:params) do
+      ActionController::Parameters.new({
+        controller: 'FooBar', action: 'stuff', id: '123'
+      }.tap do |p|
+        p[:glm_source] = glm_source if glm_source
+        p[:glm_content] = glm_content if glm_content
+      end)
+    end
+
+    before do
+      allow(helper).to receive(:params).and_return(params)
+    end
+
+    subject { helper.glm_params }
+
+    it 'is memoized' do
+      expect(helper).to receive(:strong_memoize)
+
+      subject
+    end
+
+    where(:glm_source, :glm_content, :result) do
+      nil       | nil       | {}
+      'source'  | nil       | { glm_source: 'source' }
+      nil       | 'content' | { glm_content: 'content' }
+      'source'  | 'content' | { glm_source: 'source', glm_content: 'content' }
+    end
+
+    with_them do
+      it { is_expected.to eq(HashWithIndifferentAccess.new(result)) }
+    end
+  end
+
   describe '#namespace_options_for_select' do
     let_it_be(:user) { create :user }
     let_it_be(:group1) { create :group }

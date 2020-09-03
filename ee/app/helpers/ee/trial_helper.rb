@@ -13,6 +13,16 @@ module EE
       ], selected)
     end
 
+    def should_ask_company_question?
+      glm_params[:glm_source] != 'about.gitlab.com'
+    end
+
+    def glm_params
+      strong_memoize(:glm_params) do
+        params.slice(:glm_source, :glm_content).to_unsafe_h
+      end
+    end
+
     def namespace_options_for_select(selected = nil)
       grouped_options = {
         'New' => [[_('Create group'), 0]],
