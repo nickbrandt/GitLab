@@ -498,17 +498,6 @@ Security/YAMLLoad:
     - 'spec/initializers/secret_token_spec.rb'
     - 'spec/lib/gitlab/prometheus/additional_metrics_parser_spec.rb'
 
-# Offense count: 10
-# Configuration parameters: EnforcedStyle, AllowModifiersOnSymbols.
-# SupportedStyles: inline, group
-Style/AccessModifierDeclarations:
-  Exclude:
-    - 'app/helpers/issues_helper.rb'
-    - 'app/helpers/lazy_image_tag_helper.rb'
-    - 'lib/gitlab/cache/request_cache.rb'
-    - 'lib/gitlab/request_profiler.rb'
-    - 'spec/support/forgery_protection.rb'
-
 # Offense count: 148
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
