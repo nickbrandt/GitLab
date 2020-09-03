@@ -23008,9 +23008,6 @@ msgstr ""
 msgid "Save space and find tags in the Container Registry more easily. Enable the cleanup policy to remove stale tags and keep only the ones you need."
 msgstr ""
 
-msgid "Save variables"
-msgstr ""
-
 msgid "Saved scan settings and target site settings which are reusable."
 msgstr ""
 
