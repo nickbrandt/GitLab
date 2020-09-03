@@ -40,7 +40,7 @@ export default {
     },
   },
   mounted() {
-    this.getTrace();
+    this.getLogs();
   },
   methods: {
     ...mapActions('pipelines', ['fetchJobLogs', 'setDetailJob']),
@@ -66,7 +66,7 @@ export default {
         this.scrollPos = '';
       }
     }),
-    getTrace() {
+    getLogs() {
       return this.fetchJobLogs().then(() => this.scrollDown());
     },
   },
