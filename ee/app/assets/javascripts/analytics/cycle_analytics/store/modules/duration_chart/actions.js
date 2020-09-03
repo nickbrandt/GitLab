@@ -24,12 +24,12 @@ export const fetchDurationData = ({ dispatch, commit, rootGetters }) => {
     activeStages.map(stage => {
       const { slug } = stage;
 
-      return Api.cycleAnalyticsDurationChart(
-        currentGroupPath,
-        currentValueStreamId,
-        slug,
+      return Api.cycleAnalyticsDurationChart({
+        groupId: currentGroupPath,
+        valueStreamId: currentValueStreamId,
+        stageId: slug,
         cycleAnalyticsRequestParams,
-      ).then(({ data }) => ({
+      }).then(({ data }) => ({
         slug,
         selected: true,
         data,
