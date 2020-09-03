@@ -7,12 +7,29 @@ module Issues
       return false if group && !can?(current_user, :read_group, group)
 
       attrs = issue_params(group)
+      return move_to_end(issue) if params[:placement] == :end
       return false if attrs.empty?
 
       update(issue, attrs)
     end
 
     private
+
+    def move_to_end(issue)
+      issue.move_to_end
+      return false unless issue.save
+
+      rebalance_if_needed(issue)
+      true
+    rescue RelativePositioning::NoSpaceLeft
+      gates = [issue.project, issue.project.group].compact
+
+      if gates.any? { |gate| Feature.enabled?(:rebalance_issues, gate) }
+        IssueRebalancingWorker.perform_async(nil, issue.project_id)
+      end
+
+      issue.update(relative_position: RelativePositioning::MAX_POSITION)
+    end
 
     def group
       return unless params[:group_full_path]
