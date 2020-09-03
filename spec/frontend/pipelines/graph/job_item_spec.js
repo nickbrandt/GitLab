@@ -61,7 +61,7 @@ describe('pipeline graph job item', () => {
 
         expect(link.attributes('href')).toBe(mockJob.status.details_path);
 
-        expect(link.attributes('title')).toEqual(`${mockJob.name} - ${mockJob.status.label}`);
+        expect(link.attributes('title')).toBe(`${mockJob.name} - ${mockJob.status.label}`);
 
         expect(wrapper.find('.ci-status-icon-success').exists()).toBe(true);
 
@@ -85,7 +85,7 @@ describe('pipeline graph job item', () => {
       expect(wrapper.find('.ci-status-icon-success').exists()).toBe(true);
       expect(wrapper.find('a').exists()).toBe(false);
 
-      expect(trimText(wrapper.find('.ci-status-text').text())).toEqual(mockJobWithoutDetails.name);
+      expect(trimText(wrapper.find('.ci-status-text').text())).toBe(mockJobWithoutDetails.name);
     });
 
     it('should apply hover class and provided class name', () => {
@@ -139,9 +139,7 @@ describe('pipeline graph job item', () => {
         },
       });
 
-      expect(wrapper.find('.js-job-component-tooltip').attributes('title')).toEqual(
-        'test - success',
-      );
+      expect(wrapper.find('.js-job-component-tooltip').attributes('title')).toBe('test - success');
     });
   });
 
@@ -151,7 +149,7 @@ describe('pipeline graph job item', () => {
         job: delayedJobFixture,
       });
 
-      expect(findJobWithLink().attributes('title')).toEqual(
+      expect(findJobWithLink().attributes('title')).toBe(
         `delayed job - delayed manual action (${wrapper.vm.remainingTime})`,
       );
     });
