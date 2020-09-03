@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { GlModal } from '@gitlab/ui';
 
@@ -40,7 +40,7 @@ const createComponent = (parentItem = mockParentItem, item = mockItem) => {
     item,
   });
 
-  return shallowMount(TreeItemRemoveModal, {
+  return mount(TreeItemRemoveModal, {
     localVue,
     store,
   });
