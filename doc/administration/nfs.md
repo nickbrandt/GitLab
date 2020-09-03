@@ -31,10 +31,10 @@ bug](https://bugzilla.redhat.com/show_bug.cgi?id=1783554) that causes
 following GitLab versions include a fix to work properly with that
 kernel version:
 
-1. [12.10.12](https://about.gitlab.com/releases/2020/06/25/gitlab-12-10-12-released/)
-1. [13.0.7](https://about.gitlab.com/releases/2020/06/25/gitlab-13-0-7-released/)
-1. [13.1.1](https://about.gitlab.com/releases/2020/06/24/gitlab-13-1-1-released/)
-1. 13.2 and up
+- [12.10.12](https://about.gitlab.com/releases/2020/06/25/gitlab-12-10-12-released/)
+- [13.0.7](https://about.gitlab.com/releases/2020/06/25/gitlab-13-0-7-released/)
+- [13.1.1](https://about.gitlab.com/releases/2020/06/24/gitlab-13-1-1-released/)
+- 13.2 and up
 
 If you are using that kernel version, be sure to upgrade GitLab to avoid
 errors.
