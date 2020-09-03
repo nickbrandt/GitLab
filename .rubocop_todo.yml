@@ -548,13 +548,6 @@ Style/EachWithObject:
 Style/EmptyElse:
   Enabled: false
 
-# Offense count: 11
-# Cop supports --auto-correct.
-Style/EmptyLambdaParameter:
-  Exclude:
-    - 'app/models/ci/build.rb'
-    - 'app/models/ci/runner.rb'
-
 # Offense count: 170
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
