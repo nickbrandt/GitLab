@@ -192,7 +192,7 @@ RSpec.describe Groups::EpicsController do
         end
 
         context 'using label_name filter' do
-          let(:label) { create(:label) }
+          let(:label) { create(:group_label, group: group) }
           let!(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
 
           it 'returns all epics with given label' do

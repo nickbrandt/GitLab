@@ -6,7 +6,7 @@ RSpec.describe API::Epics do
   let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, group: group) }
-  let_it_be(:label) { create(:label) }
+  let(:label) { create(:group_label, group: group) }
   let!(:epic) { create(:labeled_epic, group: group, labels: [label]) }
   let(:params) { nil }
 
