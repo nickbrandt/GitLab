@@ -385,51 +385,6 @@ RSpec.describe 'Group Value Stream Analytics', :js do
     end
   end
 
-  describe 'Tasks by type chart', :js do
-    context 'enabled' do
-      before do
-        sign_in(user)
-      end
-
-      context 'with data available' do
-        before do
-          3.times do |i|
-            create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [group_label1])
-            create(:labeled_issue, created_at: i.days.ago, project: create(:project, group: group), labels: [group_label2])
-          end
-
-          select_group
-        end
-
-        it 'displays the chart' do
-          expect(page).to have_text(s_('CycleAnalytics|Type of work'))
-
-          expect(page).to have_text(s_('CycleAnalytics|Tasks by type'))
-        end
-
-        it 'has 2 labels selected' do
-          expect(page).to have_text('Showing Issues and 2 labels')
-        end
-
-        it 'has chart filters' do
-          expect(page).to have_css('.js-tasks-by-type-chart-filters')
-        end
-      end
-
-      context 'no data available' do
-        before do
-          select_group
-        end
-
-        it 'shows the no data available message' do
-          expect(page).to have_text(s_('CycleAnalytics|Type of work'))
-
-          expect(page).to have_text(_('There is no data available. Please change your selection.'))
-        end
-      end
-    end
-  end
-
   describe 'Customizable cycle analytics', :js do
     custom_stage_name = 'Cool beans'
     custom_stage_with_labels_name = 'Cool beans - now with labels'
@@ -917,52 +872,6 @@ RSpec.describe 'Group Value Stream Analytics', :js do
 
             expect(page.find('.flash-notice')).to have_text(_('Stage removed'))
             expect(nav).not_to have_text(custom_stage_name)
-          end
-        end
-      end
-
-      context 'Duration chart' do
-        let(:duration_chart_dropdown) { page.find(duration_stage_selector) }
-
-        let_it_be(:translated_default_stage_names) do
-          Gitlab::Analytics::CycleAnalytics::DefaultStages.names.map do |name|
-            stage = Analytics::CycleAnalytics::GroupStage.new(name: name)
-            Analytics::CycleAnalytics::StagePresenter.new(stage).title
-          end.freeze
-        end
-
-        def duration_chart_stages
-          duration_chart_dropdown.all('.dropdown-item').collect(&:text)
-        end
-
-        def toggle_duration_chart_dropdown
-          duration_chart_dropdown.click
-        end
-
-        before do
-          select_group
-        end
-
-        it 'has all the default stages' do
-          toggle_duration_chart_dropdown
-
-          expect(duration_chart_stages).to eq(translated_default_stage_names)
-        end
-
-        context 'hidden stage' do
-          before do
-            toggle_more_options(first_default_stage)
-
-            click_button(_('Hide stage'))
-
-            # wait for the stage list to laod
-            expect(nav).to have_content(s_('CycleAnalyticsStage|Plan'))
-          end
-
-          it 'will not appear in the duration chart dropdown' do
-            toggle_duration_chart_dropdown
-
-            expect(duration_chart_stages).not_to include(s_('CycleAnalyticsStage|Issue'))
           end
         end
       end
