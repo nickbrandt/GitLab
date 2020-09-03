@@ -22933,6 +22933,9 @@ msgstr ""
 msgid "Snippets|Add another file %{num}/%{total}"
 msgstr ""
 
+msgid "Snippets|Authored %{time_ago} by %{author}"
+msgstr ""
+
 msgid "Snippets|Delete file"
 msgstr ""
 
