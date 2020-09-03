@@ -1,3 +1,5 @@
+- return unless can?(current_user, :admin_operations, @project)
+
 .form-group.row.gl-mb-0
   = form.label :type, 'Type', class: 'col-form-label col-sm-2'
   .col-sm-10

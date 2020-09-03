@@ -188,6 +188,20 @@ RSpec.describe "User creates issue" do
       end
     end
 
+    context 'form does not render type dropdown when admin_operations are false' do
+      let(:project) { create(:project) }
+
+      before do
+        allow(helper).to receive(:can?)
+          .with(current_user, :admin_operations, project) { false }
+        visit new_project_issue_path(project)
+      end
+
+      it 'does not show the type selector drop-down' do
+        expect(page).to have_selector('.js-issuable-type-filter-dropdown-wrap')
+      end
+    end
+
     context 'form create handles issue creation by default' do
       let(:project) { create(:project) }
 
