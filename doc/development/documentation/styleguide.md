@@ -305,7 +305,7 @@ Do not include the same information in multiple places.
 
 ### References across documents
 
-- Give each folder an index.md page that introduces the topic, introduces the
+- Give each folder an `index.md` page that introduces the topic, introduces the
   pages within, and links to the pages within (including to the index pages of
   any next-level subpaths).
 - To ensure discoverability, ensure each new or renamed doc is linked from its
