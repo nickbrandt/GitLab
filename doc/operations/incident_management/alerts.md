@@ -32,7 +32,9 @@ The alert list displays the following information:
   - **Acknowledged**: Someone is actively investigating the problem.
   - **Resolved**: No further work is required.
   
-Check out a [live example](https://gitlab.com/gitlab-examples/ops/incident-setup/everyone/tanuki-inc/-/alert_management) in GitLab to see Alerts in action.
+TIP: **Tip:**
+Check out a [live example](https://gitlab.com/gitlab-examples/ops/incident-setup/everyone/tanuki-inc/-/alert_management)
+in GitLab to examine alerts in action.
 
 ## Enable Alerts
 
