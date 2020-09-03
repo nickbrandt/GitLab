@@ -1,7 +1,6 @@
 <script>
-/* eslint-disable vue/no-v-html */
 import $ from 'jquery';
-import { GlLoadingIcon, GlIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlIcon, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import Tracking from '~/tracking';
 import eventHub from '~/sidebar/event_hub';
@@ -14,6 +13,7 @@ export default {
   },
   directives: {
     tooltip,
+    SafeHtml,
   },
   mixins: [Tracking.mixin({ label: 'right_sidebar' })],
   props: {
@@ -166,7 +166,11 @@ export default {
     >
       <gl-icon :size="16" name="weight" />
       <gl-loading-icon v-if="fetching" class="js-weight-collapsed-loading-icon" />
-      <span v-else class="js-weight-collapsed-weight-label" v-html="collapsedWeightLabel"></span>
+      <span
+        v-else
+        v-safe-html="collapsedWeightLabel"
+        class="js-weight-collapsed-weight-label"
+      ></span>
     </div>
     <div class="title hide-collapsed">
       {{ s__('Sidebar|Weight') }}
