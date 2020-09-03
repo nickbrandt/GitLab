@@ -11,7 +11,7 @@ class SchedulePopulateResolvedOnDefaultBranchColumn < ActiveRecord::Migration[6.
   disable_ddl_transaction!
 
   def up
-    return unless run_migration?
+    return unless Gitlab.ee?
 
     EE::Gitlab::BackgroundMigration::PopulateResolvedOnDefaultBranchColumn::Vulnerability.distinct.each_batch(of: BATCH_SIZE, column: :project_id) do |batch, index|
       project_ids = batch.pluck(:project_id)
@@ -24,11 +24,5 @@ class SchedulePopulateResolvedOnDefaultBranchColumn < ActiveRecord::Migration[6.
     # This migration schedules background tasks to populate
     # `resolved_on_default_branch` column of `vulnerabilities`
     # table so there is no rollback operation needed for this.
-  end
-
-  private
-
-  def run_migration?
-    Gitlab.ee? && table_exists?(:projects) && table_exists?(:vulnerabilities)
   end
 end
