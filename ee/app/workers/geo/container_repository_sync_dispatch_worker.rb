@@ -42,7 +42,7 @@ module Geo
       if remaining_capacity == 0
         resources
       else
-        resources + fin_jobs_needs_sync_again(batch_size: remaining_capacity)
+        resources + find_jobs_needs_sync_again(batch_size: remaining_capacity)
       end
     end
 
@@ -52,7 +52,7 @@ module Geo
         .pluck_model_foreign_key
     end
 
-    def fin_jobs_needs_sync_again(batch_size:)
+    def find_jobs_needs_sync_again(batch_size:)
       registry_finder
         .find_registries_needs_sync_again(batch_size: batch_size, except_ids: scheduled_repository_ids)
         .pluck_model_foreign_key

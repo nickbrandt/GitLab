@@ -4,14 +4,14 @@ module Geo
   class RegistryFinder
     # @!method find_registries_never_attempted_sync
     #    Return an ActiveRecord::Relation of the registry records for the
-    #    tracked ype that have never have an attempt to sync.
+    #    tracked type that this secondary has never attempted to sync.
     #
     #    Does not care about selective sync, because it considers the Registry
     #    table to be the single source of truth. The contract is that other
     #    processes need to ensure that the table only contains records that should
     #    be synced.
     #
-    #    Any registries that have ever been synced that currently need to be
+    #    Any registries that this secondary has ever attempted to sync that currently need to be
     #    resynced will be handled by other find methods (like
     #    #find_registries_needs_sync_again)
     #

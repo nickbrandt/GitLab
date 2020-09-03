@@ -2,14 +2,14 @@
 
 module Geo
   class ProjectRegistryFinder
-    # Returns ProjectRegistry records that have never have an attempt tp sync.
+    # Returns ProjectRegistry records where sync has never been attempted.
     #
     # Does not care about selective sync, because it considers the Registry
     # table to be the single source of truth. The contract is that other
     # processes need to ensure that the table only contains records that should
     # be synced.
     #
-    # Any registries that have ever been synced that currently need to be
+    # Any registries that this secondary has ever attempted to sync that currently need to be
     # resynced will be handled by other find methods (like
     # #find_registries_needs_sync_again)
     #
