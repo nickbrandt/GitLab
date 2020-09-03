@@ -37,7 +37,7 @@ describe('pipeline graph job item', () => {
   };
   const mockJobWithoutDetails = {
     id: 4257,
-    name: 'test',
+    name: 'job_without_details',
     status: {
       icon: 'status_success',
       text: 'passed',
@@ -85,7 +85,7 @@ describe('pipeline graph job item', () => {
       expect(wrapper.find('.ci-status-icon-success').exists()).toBe(true);
       expect(wrapper.find('a').exists()).toBe(false);
 
-      expect(trimText(wrapper.find('.ci-status-text').text())).toEqual(mockJob.name);
+      expect(trimText(wrapper.find('.ci-status-text').text())).toEqual(mockJobWithoutDetails.name);
     });
 
     it('should apply hover class and provided class name', () => {
@@ -158,22 +158,32 @@ describe('pipeline graph job item', () => {
   });
 
   describe('trigger job highlighting', () => {
-    it('trigger job should stay highlighted when downstream is expanded', () => {
-      createWrapper({
-        job: mockJob,
-        pipelineExpanded: { jobName: mockJob.name, expanded: true },
-      });
+    it.each`
+      job                      | jobName                       | expanded | link
+      ${mockJob}               | ${mockJob.name}               | ${true}  | ${true}
+      ${mockJobWithoutDetails} | ${mockJobWithoutDetails.name} | ${true}  | ${false}
+    `(
+      `trigger job should stay highlighted when downstream is expanded`,
+      ({ job, jobName, expanded, link }) => {
+        createWrapper({ job, pipelineExpanded: { jobName, expanded } });
+        const findJobEl = link ? findJobWithLink : findJobWithoutLink;
 
-      expect(findJobWithLink().classes()).toContain(triggerActiveClass);
-    });
+        expect(findJobEl().classes()).toContain(triggerActiveClass);
+      },
+    );
 
-    it('trigger job should not be highlighted when downstream is closed', () => {
-      createWrapper({
-        job: mockJob,
-        pipelineExpanded: { jobName: mockJob.name, expanded: false },
-      });
+    it.each`
+      job                      | jobName                       | expanded | link
+      ${mockJob}               | ${mockJob.name}               | ${false} | ${true}
+      ${mockJobWithoutDetails} | ${mockJobWithoutDetails.name} | ${false} | ${false}
+    `(
+      `trigger job should stay highlighted when downstream is expanded`,
+      ({ job, jobName, expanded, link }) => {
+        createWrapper({ job, pipelineExpanded: { jobName, expanded } });
+        const findJobEl = link ? findJobWithLink : findJobWithoutLink;
 
-      expect(findJobWithLink().classes()).not.toContain(triggerActiveClass);
-    });
+        expect(findJobEl().classes()).not.toContain(triggerActiveClass);
+      },
+    );
   });
 });

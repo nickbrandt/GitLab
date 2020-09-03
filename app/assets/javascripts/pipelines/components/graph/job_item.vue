@@ -143,7 +143,7 @@ export default {
       v-else
       v-gl-tooltip="{ boundary, placement: 'bottom' }"
       :title="tooltipText"
-      :class="cssClassJobName"
+      :class="jobClasses"
       class="js-job-component-tooltip non-details-job-component"
       data-testid="job-without-link"
     >
