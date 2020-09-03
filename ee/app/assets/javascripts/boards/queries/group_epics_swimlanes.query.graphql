@@ -4,7 +4,7 @@
 query BoardEE(
   $fullPath: ID!
   $boardId: ID!
-  $issueFilters: BoardEpicIssueInput
+  $issueFilters: BoardIssueInput
   $withLists: Boolean = true
   $isGroup: Boolean = false
   $isProject: Boolean = false
