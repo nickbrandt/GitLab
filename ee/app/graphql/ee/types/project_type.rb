@@ -42,8 +42,8 @@ module EE
               resolver: ::Resolvers::Vulnerabilities::ScannersResolver
 
         field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
-               description: 'Counts for each severity of vulnerability of the project',
-               resolve: -> (obj, *) { obj.vulnerability_statistic || Hash.new(0) }
+               description: 'Counts for each vulnerability severity in the project',
+               resolver: ::Resolvers::VulnerabilitySeveritiesCountResolver
 
         field :requirement, ::Types::RequirementsManagement::RequirementType, null: true,
               description: 'Find a single requirement. Available only when feature flag `requirements_management` is enabled.',
