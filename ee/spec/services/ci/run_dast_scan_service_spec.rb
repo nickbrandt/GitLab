@@ -27,7 +27,7 @@ RSpec.describe Ci::RunDastScanService do
   end
 
   describe '#execute' do
-    subject { described_class.new(project, user).execute(branch: branch, target_url: target_url) }
+    subject { described_class.new(project, user).execute(branch: branch, target_url: target_url, spider_timeout: 42, target_timeout: 21) }
 
     let(:status) { subject.status }
     let(:pipeline) { subject.payload }
@@ -115,6 +115,15 @@ RSpec.describe Ci::RunDastScanService do
           }, {
             'key' => 'DAST_WEBSITE',
             'value' => target_url,
+            'public' => true
+          },
+          {
+            'key' => 'DAST_SPIDER_MINS',
+            'value' => '42',
+            'public' => true
+          }, {
+            'key' => 'DAST_TARGET_AVAILABILITY_TIMEOUT',
+            'value' => '21',
             'public' => true
           }, {
             'key' => 'GIT_STRATEGY',
