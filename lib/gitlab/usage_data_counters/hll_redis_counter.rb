@@ -56,7 +56,7 @@ module Gitlab
         end
 
         def categories
-          known_events.map { |event| event[:category] }.uniq
+          @categories ||= known_events.map { |event| event[:category] }.uniq
         end
 
         # @param category [String] the category name
@@ -67,20 +67,31 @@ module Gitlab
 
         def unique_events_data
           categories.each_with_object({}) do |category, category_results|
-            events = events_for_category(category)
+            events_names = events_for_category(category)
 
-            event_results = events.each_with_object({}) do |event, hash|
+            event_results = events_names.each_with_object({}) do |event, hash|
               hash[event] = unique_events(event_names: event, start_date: 7.days.ago.to_date, end_date: Date.current)
             end
 
-            event_results["#{category}_total_unique_counts_for_week"] = unique_events(event_names: events, start_date: 7.days.ago.to_date, end_date: Date.current)
-            event_results["#{category}_total_unique_counts_for_month"] = unique_events(event_names: events, start_date: 4.weeks.ago.to_date, end_date: Date.current)
+            if eligible_for_totals?(events_names)
+              event_results["#{category}_total_unique_counts_weekly"] = unique_events(event_names: events_names, start_date: 7.days.ago.to_date, end_date: Date.current)
+              event_results["#{category}_total_unique_counts_monthly"] = unique_events(event_names: events_names, start_date: 4.weeks.ago.to_date, end_date: Date.current)
+            end
 
             category_results["#{category}"] = event_results
           end
         end
 
         private
+
+        # Allow to add totals for events that are in the same redis slot, category and have the same aggregation level
+        # and if there are more than 1 event
+        def eligible_for_totals?(events_names)
+          return false if events_names.size <= 1
+
+          events = events_for(events_names)
+          events_in_same_slot?(events) && events_in_same_category?(events) && events_same_aggregation?(events)
+        end
 
         def keys_for_aggregation(aggregation, events:, start_date:, end_date:)
           if aggregation.to_sym == :daily
@@ -99,8 +110,11 @@ module Gitlab
         end
 
         def events_in_same_slot?(events)
+          # if we check one event then redis_slot is only one to check
+          return true if events.size == 1
+
           slot = events.first[:redis_slot]
-          events.all? { |event| event[:redis_slot] == slot }
+          events.all? { |event| event[:redis_slot].present? && event[:redis_slot] == slot }
         end
 
         def events_in_same_category?(events)

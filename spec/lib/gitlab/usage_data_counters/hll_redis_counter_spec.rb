@@ -54,6 +54,12 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
   end
 
+  describe '.categories' do
+    it 'gets all unique category names' do
+      expect(described_class.categories).to contain_exactly(global_category, analytics_category, productivity_category, compliance_category)
+    end
+  end
+
   describe '.track_event' do
     it "raise error if metrics don't have same aggregation" do
       expect { described_class.track_event(entity1, different_aggregation, Date.current) } .to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownAggregation)
@@ -189,41 +195,44 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
   end
 
-  describe '.categories' do
-    it 'gets all unique category names' do
-      expect(described_class.categories).to contain_exactly(global_category, analytics_category, productivity_category, compliance_category)
-    end
-  end
-
   describe 'unique_events_data' do
     let(:categories) { described_class.categories }
 
-    before do
-      categories.each do |category|
-        events = described_class.events_for_category(category)
-
-        events.each do |event|
-          allow(described_class).to receive(:unique_events).with(event_names: event, start_date: 7.days.ago.to_date, end_date: Date.current).and_return(123)
-        end
-
-        allow(described_class).to receive(:unique_events).with(event_names: events, start_date: 7.days.ago.to_date, end_date: Date.current).and_return(543)
-        allow(described_class).to receive(:unique_events).with(event_names: events, start_date: 4.weeks.ago.to_date, end_date: Date.current).and_return(987)
-      end
+    let(:known_events) do
+      [
+        { name: 'event1_slot', redis_slot: "slot", category: 'category1', aggregation: "weekly" },
+        { name: 'event2_slot', redis_slot: "slot", category: 'category1', aggregation: "weekly" },
+        { name: 'event3', category: 'category2', aggregation: "weekly" },
+        { name: 'event4', category: 'category2', aggregation: "weekly" }
+      ].map(&:with_indifferent_access)
     end
 
-    it 'returns the number of unique events' do
-      results = categories.each_with_object({}) do |category, category_results|
-        events = described_class.events_for_category(category)
+    before do
+      allow(described_class).to receive(:known_events).and_return(known_events)
+      allow(described_class).to receive(:categories).and_return(%w(category1 category2))
 
-        event_results = events.each_with_object({}) do |event, hash|
-          hash[event] = 123
-        end
+      described_class.track_event(entity1, 'event1_slot', 2.days.ago)
+      described_class.track_event(entity2, 'event2_slot', 2.days.ago)
+      described_class.track_event(entity3, 'event2_slot', 2.weeks.ago)
 
-        event_results["#{category}_total_unique_counts_for_week"] = 543
-        event_results["#{category}_total_unique_counts_for_month"] = 987
+      # events in different slots
+      described_class.track_event(entity2, 'event3', 2.days.ago)
+      described_class.track_event(entity2, 'event4', 2.days.ago)
+    end
 
-        category_results["#{category}"] = event_results
-      end
+    it 'returns the number of unique events for all known events' do
+      results = {
+       'category1' => {
+          'event1_slot' => 1,
+          'event2_slot' => 1,
+          'category1_total_unique_counts_weekly' => 2,
+          'category1_total_unique_counts_monthly' => 3
+       },
+       'category2' => {
+          'event3' => 1,
+          'event4' => 1
+       }
+      }
 
       expect(subject.unique_events_data).to eq(results)
     end
