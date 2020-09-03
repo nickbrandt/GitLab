@@ -16,8 +16,6 @@ import (
 )
 
 func TestGoCloudObjectUpload(t *testing.T) {
-	logHook := testhelper.SetupLogger()
-
 	mux, _, cleanup := test.SetupGoCloudFileBucket(t, "azuretest")
 	defer cleanup()
 
@@ -60,9 +58,4 @@ func TestGoCloudObjectUpload(t *testing.T) {
 			return nil
 		}
 	})
-
-	// Verify no log noise when deleting a file that already is gone
-	object.Delete()
-	entries := logHook.AllEntries()
-	require.Equal(t, 0, len(entries))
 }
