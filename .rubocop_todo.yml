@@ -638,13 +638,6 @@ Style/RedundantInterpolation:
 Style/RedundantSelf:
   Enabled: false
 
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/RedundantSort:
-  Exclude:
-    - 'app/presenters/packages/nuget/search_results_presenter.rb'
-    - 'spec/presenters/packages/nuget/search_results_presenter_spec.rb'
-
 # Offense count: 120
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, AllowInnerSlashes.
