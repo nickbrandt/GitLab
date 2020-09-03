@@ -13,6 +13,8 @@ class IssuePlacementWorker
   def perform(issue_id, placement = :end)
     issue = Issue.find(issue_id)
 
+    # here we are placing not just this issue, but it and all issues created since, and up to five-minutes before.
+    # This is to deal with out-of-order execution of the worker, while preserving creation order.
     to_place = Issue
       .relative_positioning_query_base(issue)
       .where(Issue.arel_table[:created_at].gteq(issue.created_at - 5.minutes))
