@@ -177,7 +177,7 @@ describe('pipeline graph job item', () => {
       ${mockJob}               | ${mockJob.name}               | ${false} | ${true}
       ${mockJobWithoutDetails} | ${mockJobWithoutDetails.name} | ${false} | ${false}
     `(
-      `trigger job should stay highlighted when downstream is expanded`,
+      `trigger job should not be highlighted when downstream is not expanded`,
       ({ job, jobName, expanded, link }) => {
         createWrapper({ job, pipelineExpanded: { jobName, expanded } });
         const findJobEl = link ? findJobWithLink : findJobWithoutLink;
