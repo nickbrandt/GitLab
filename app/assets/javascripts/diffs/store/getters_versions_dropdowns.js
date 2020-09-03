@@ -11,7 +11,7 @@ export const diffCompareDropdownTargetVersions = (state, getters) => {
   // startVersion only exists if the user has selected a version other
   // than "base" so if startVersion is null then base must be selected
 
-  const defaultMergeRefForDiffs = window.gon?.features?.defaultMergeRefForDiffs;
+  const defaultMergeRefForDiffs = window.gon?.features?.defaultMergeRefForDiffs || false;
   const diffHeadParam = getParameterByName('diff_head');
   const diffHead = parseBoolean(diffHeadParam) || (!diffHeadParam && defaultMergeRefForDiffs);
   const isBaseSelected = !state.startVersion && !diffHead;
