@@ -81,10 +81,6 @@ module EE
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
       has_many :merge_trains, foreign_key: 'target_project_id', inverse_of: :target_project
 
-      has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
-      has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
-      has_many :operations_feature_flags_user_lists, class_name: 'Operations::FeatureFlags::UserList'
-
       has_many :project_aliases
 
       has_many :upstream_project_subscriptions, class_name: 'Ci::Subscriptions::Project', foreign_key: :downstream_project_id, inverse_of: :downstream_project
