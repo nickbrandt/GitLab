@@ -1,6 +1,11 @@
 query($fullPath: ID!, $startDate: Time!, $endDate: Time!, $limit: Int!) {
   project(fullPath: $fullPath) {
-    mergeRequests(first: $limit, mergedAfter: $startDate, mergedBefore: $endDate) {
+    mergeRequests(
+      first: $limit
+      mergedAfter: $startDate
+      mergedBefore: $endDate
+      sort: MERGED_AT_DESC
+    ) {
       nodes {
         iid
         title
