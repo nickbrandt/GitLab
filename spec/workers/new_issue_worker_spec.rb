@@ -49,10 +49,9 @@ RSpec.describe NewIssueWorker do
       end
 
       it 'moves the issue to the end' do
-        other_issue = create(:issue, project: project, relative_position: 100)
+        expect(IssuePlacementWorker).to receive(:perform_async).with(issue.id, :end)
 
-        expect { worker.perform(issue.id, user.id) }
-          .to change { issue.reset.relative_position }.to(be > other_issue.relative_position)
+        worker.perform(issue.id, user.id)
       end
 
       it 'creates a notification for the mentioned user' do
