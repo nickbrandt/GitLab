@@ -8371,10 +8371,10 @@ monaco-yaml@^2.4.1:
   optionalDependencies:
     prettier "^1.19.1"
 
-mousetrap@^1.4.6:
-  version "1.4.6"
-  resolved "https://registry.yarnpkg.com/mousetrap/-/mousetrap-1.4.6.tgz#eaca72e22e56d5b769b7555873b688c3332e390a"
-  integrity sha1-6spy4i5W1bdpt1VYc7aIwzMuOQo=
+mousetrap@1.6.5:
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/mousetrap/-/mousetrap-1.6.5.tgz#8a766d8c272b08393d5f56074e0b5ec183485bf9"
+  integrity sha512-QNo4kEepaIBwiT8CDhP98umTetp+JNfQYBWvC1pc6/OAibuXtRcxZ58Qz8skvEHYvURne/7R8T5VoOI7rDsEUA==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
