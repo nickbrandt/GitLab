@@ -49,20 +49,29 @@ export default {
       type: String,
       required: true,
     },
+    existingPolicy: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
+    const policy = this.existingPolicy
+      ? fromYaml(this.existingPolicy.manifest)
+      : {
+          name: '',
+          description: '',
+          isEnabled: false,
+          endpointMatchMode: EndpointMatchModeAny,
+          endpointLabels: '',
+          rules: [],
+        };
+
     return {
       editorMode: EditorModeRule,
       yamlEditorValue: '',
       yamlEditorError: null,
-      policy: {
-        name: '',
-        description: '',
-        isEnabled: false,
-        endpointMatchMode: EndpointMatchModeAny,
-        endpointLabels: '',
-        rules: [],
-      },
+      policy,
     };
   },
   computed: {
@@ -83,13 +92,21 @@ export default {
     hasParsingError() {
       return Boolean(this.yamlEditorError);
     },
+    isEditing() {
+      return Boolean(this.existingPolicy);
+    },
+    saveButtonText() {
+      return this.isEditing
+        ? s__('NetworkPolicies|Save changes')
+        : s__('NetworkPolicies|Create policy');
+    },
   },
   created() {
     this.fetchEnvironments();
   },
   methods: {
     ...mapActions('threatMonitoring', ['fetchEnvironments']),
-    ...mapActions('networkPolicies', ['createPolicy']),
+    ...mapActions('networkPolicies', ['createPolicy', 'updatePolicy']),
     addRule() {
       this.policy.rules.push(buildRule(RuleTypeEndpoint));
     },
@@ -121,11 +138,13 @@ export default {
       this.editorMode = mode;
     },
     savePolicy() {
+      const saveFn = this.isEditing ? this.updatePolicy : this.createPolicy;
       const policy = { manifest: toYaml(this.policy) };
-      return this.createPolicy({
-        environmentId: this.currentEnvironmentId,
-        policy,
-      }).then(() => {
+      if (this.isEditing) {
+        policy.name = this.existingPolicy.name;
+      }
+
+      return saveFn({ environmentId: this.currentEnvironmentId, policy }).then(() => {
         if (!this.errorUpdatingPolicy) redirectTo(this.threatMonitoringPath);
       });
     },
@@ -262,9 +281,9 @@ export default {
           type="submit"
           category="primary"
           variant="success"
-          data-testid="create-policy"
+          data-testid="save-policy"
           @click="savePolicy"
-          >{{ s__('NetworkPolicies|Create policy') }}</gl-button
+          >{{ saveButtonText }}</gl-button
         >
         <gl-button category="secondary" variant="default" :href="threatMonitoringPath">{{
           __('Cancel')

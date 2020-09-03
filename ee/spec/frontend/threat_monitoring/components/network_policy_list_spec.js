@@ -29,7 +29,7 @@ describe('NetworkPolicyList component', () => {
     wrapper = mount(NetworkPolicyList, {
       propsData: {
         documentationPath: 'documentation_path',
-        newPolicyPath: 'new_policy_path',
+        newPolicyPath: '/policies/new',
         ...propsData,
       },
       data,
@@ -86,7 +86,11 @@ describe('NetworkPolicyList component', () => {
       expect(wrapper.find(PolicyDrawer).exists()).toBe(false);
     });
 
-    describe('given selected policy is a cilium policy', () => {
+    it('does not render edit button', () => {
+      expect(wrapper.find('[data-testid="edit-button"]').exists()).toBe(false);
+    });
+
+    describe('given there is a selected policy', () => {
       beforeEach(() => {
         factory({
           provide: {
@@ -94,20 +98,33 @@ describe('NetworkPolicyList component', () => {
               networkPolicyEditor: true,
             },
           },
-          data: () => ({
-            selectedPolicyName: 'policy',
-          }),
+          data: () => ({ selectedPolicyName: 'policy' }),
+        });
+      });
+    });
+
+    describe('given selected policy is a cilium policy', () => {
+      const manifest = `apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: policy
+spec:
+  endpointSelector: {}`;
+
+      beforeEach(() => {
+        factory({
+          provide: {
+            glFeatures: {
+              networkPolicyEditor: true,
+            },
+          },
+          data: () => ({ selectedPolicyName: 'policy' }),
           state: {
             policies: [
               {
                 name: 'policy',
-                isEnabled: false,
-                manifest: `apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
-  name: test-policy
-spec:
-  endpointSelector: {}`,
+                creationTimestamp: new Date(),
+                manifest,
               },
             ],
           },
@@ -116,6 +133,12 @@ spec:
 
       it('renders the new policy drawer', () => {
         expect(wrapper.find(PolicyDrawer).exists()).toBe(true);
+      });
+
+      it('renders edit button', () => {
+        const button = wrapper.find('[data-testid="edit-button"]');
+        expect(button.exists()).toBe(true);
+        expect(button.attributes().href).toBe('/policies/policy/edit?environment_id=-1');
       });
     });
   });

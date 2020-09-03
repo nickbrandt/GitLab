@@ -12,7 +12,7 @@ import {
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { getTimeago } from '~/lib/utils/datetime_utility';
-import { setUrlFragment } from '~/lib/utils/url_utility';
+import { setUrlFragment, mergeUrlParams } from '~/lib/utils/url_utility';
 import EnvironmentPicker from './environment_picker.vue';
 import NetworkPolicyEditor from './network_policy_editor.vue';
 import PolicyDrawer from './policy_editor/policy_drawer.vue';
@@ -74,13 +74,28 @@ export default {
     hasAutoDevopsPolicy() {
       return this.policiesWithDefaults.some(policy => policy.isAutodevops);
     },
+    hasCiliumSelectedPolicy() {
+      return this.hasSelectedPolicy
+        ? this.selectedPolicy.manifest.includes(CiliumNetworkPolicyKind)
+        : false;
+    },
     shouldShowCiliumDrawer() {
-      if (!this.hasSelectedPolicy) return false;
-
+      return this.glFeatures.networkPolicyEditor && this.hasCiliumSelectedPolicy;
+    },
+    shouldShowEditButton() {
       return (
         this.glFeatures.networkPolicyEditor &&
-        this.selectedPolicy.manifest.includes(CiliumNetworkPolicyKind)
+        this.hasCiliumSelectedPolicy &&
+        Boolean(this.selectedPolicy.creationTimestamp)
       );
+    },
+    editPolicyPath() {
+      return this.hasSelectedPolicy
+        ? mergeUrlParams(
+            { environment_id: this.currentEnvironmentId },
+            this.newPolicyPath.replace('new', `${this.selectedPolicyName}/edit`),
+          )
+        : '';
     },
   },
   methods: {
@@ -230,6 +245,14 @@ export default {
           <h3 class="gl-mb-3">{{ selectedPolicy.name }}</h3>
           <div>
             <gl-button ref="cancelButton" @click="deselectPolicy">{{ __('Cancel') }}</gl-button>
+            <gl-button
+              v-if="shouldShowEditButton"
+              data-testid="edit-button"
+              category="primary"
+              variant="info"
+              :href="editPolicyPath"
+              >{{ s__('NetworkPolicies|Edit policy') }}</gl-button
+            >
             <gl-button
               ref="applyButton"
               category="primary"

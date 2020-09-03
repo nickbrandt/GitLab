@@ -217,7 +217,7 @@ spec:
     >
       <gl-button-stub
         category="primary"
-        data-testid="create-policy"
+        data-testid="save-policy"
         icon=""
         size="medium"
         type="submit"

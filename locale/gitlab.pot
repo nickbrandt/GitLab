@@ -16322,6 +16322,9 @@ msgstr ""
 msgid "NetworkPolicies|Description"
 msgstr ""
 
+msgid "NetworkPolicies|Edit policy"
+msgstr ""
+
 msgid "NetworkPolicies|Editor mode"
 msgstr ""
 
@@ -16398,6 +16401,9 @@ msgid "NetworkPolicies|Rule mode is unavailable for this policy. In some cases, 
 msgstr ""
 
 msgid "NetworkPolicies|Rules"
+msgstr ""
+
+msgid "NetworkPolicies|Save changes"
 msgstr ""
 
 msgid "NetworkPolicies|Something went wrong, failed to update policy"
