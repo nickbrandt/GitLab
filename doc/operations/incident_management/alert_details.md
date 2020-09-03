@@ -11,7 +11,11 @@ Navigate to the Alert details view by visiting the
 list. You need least Developer [permissions](../../user/permissions.md) to access
 alerts.
 
-To check out live examples of GitLab alerts, please visit the [alert list](https://gitlab.com/gitlab-examples/ops/incident-setup/everyone/tanuki-inc/-/alert_management) in this demo project. Click on any alert in that list to view the alert details page.
+TIP: **Tip:**
+To review live examples of GitLab alerts, visit the
+[alert list](https://gitlab.com/gitlab-examples/ops/incident-setup/everyone/tanuki-inc/-/alert_management)
+for this demo project. Click any alert in the list to examine its alert details
+page.
 
 Alerts provide **Overview** and **Alert details** tabs to give you the right
 amount of information you need.
