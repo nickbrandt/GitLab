@@ -139,6 +139,7 @@ export default {
         :is-loading-issues="isLoadingIssues"
         :disabled="disabled"
         :root-path="rootPath"
+        :can-admin-list="canAdminList"
       />
       <div class="board-lane-unassigned-issues-title gl-sticky gl-display-inline-block gl-left-0">
         <div class="gl-left-0 gl-py-5 gl-px-3 gl-display-flex gl-align-items-center">
@@ -171,6 +172,7 @@ export default {
           :is-loading="isLoadingIssues"
           :disabled="disabled"
           :root-path="rootPath"
+          :can-admin-list="canAdminList"
         />
       </div>
     </div>

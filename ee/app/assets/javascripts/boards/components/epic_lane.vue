@@ -41,6 +41,11 @@ export default {
       type: String,
       required: true,
     },
+    canAdminList: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -155,6 +160,7 @@ export default {
         :root-path="rootPath"
         :epic-id="epic.id"
         :epic-is-confidential="epic.confidential"
+        :can-admin-list="canAdminList"
       />
     </div>
   </div>
