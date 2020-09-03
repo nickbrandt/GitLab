@@ -38321,16 +38321,10 @@ msgstr ""
 msgid "most recent deployment"
 msgstr ""
 
-msgid "mrWidgetCommitsAdded|%{commitCount} and %{mergeCommitCount} will be added to %{targetBranch}."
+msgid "mrWidgetCommitsAdded|%{commitCount} and 1 merge commit will be added to %{targetBranch}."
 msgstr ""
 
 msgid "mrWidgetCommitsAdded|%{commitCount} will be added to %{targetBranch}."
-msgstr ""
-
-msgid "mrWidgetCommitsAdded|1 merge commit"
-msgstr ""
-
-msgid "mrWidgetNothingToMerge|This merge request contains no changes."
 msgstr ""
 
 msgid "mrWidgetNothingToMerge|Use merge requests to propose changes to your project and discuss them with your team. To make changes, push a commit or edit this merge request to use a different branch. With %{linkStart}CI/CD%{linkEnd}, automatically test your changes before merging."

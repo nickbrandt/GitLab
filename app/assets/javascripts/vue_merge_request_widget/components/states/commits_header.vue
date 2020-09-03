@@ -1,12 +1,12 @@
 <script>
-/* eslint-disable vue/no-v-html */
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlSprintf } from '@gitlab/ui';
 import { escape } from 'lodash';
-import { __, n__, sprintf, s__ } from '~/locale';
+import { __, n__, s__ } from '~/locale';
 
 export default {
   components: {
     GlButton,
+    GlSprintf,
   },
   props: {
     isSquashEnabled: {
@@ -47,22 +47,15 @@ export default {
     ariaLabel() {
       return this.expanded ? __('Collapse') : __('Expand');
     },
-    message() {
-      const message = this.isFastForwardEnabled
+    commitsDescription() {
+      return this.isFastForwardEnabled
         ? s__('mrWidgetCommitsAdded|%{commitCount} will be added to %{targetBranch}.')
         : s__(
-            'mrWidgetCommitsAdded|%{commitCount} and %{mergeCommitCount} will be added to %{targetBranch}.',
+            'mrWidgetCommitsAdded|%{commitCount} and 1 merge commit will be added to %{targetBranch}.',
           );
-
-      return sprintf(
-        message,
-        {
-          commitCount: `<strong class="commits-count-message">${this.commitsCountMessage}</strong>`,
-          mergeCommitCount: `<strong>${s__('mrWidgetCommitsAdded|1 merge commit')}</strong>`,
-          targetBranch: `<span class="label-branch">${escape(this.targetBranch)}</span>`,
-        },
-        false,
-      );
+    },
+    escapedTargetBranch() {
+      return escape(this.targetBranch);
     },
   },
   methods: {
@@ -89,7 +82,16 @@ export default {
       />
       <span v-if="expanded">{{ __('Collapse') }}</span>
       <span v-else>
-        <span class="vertical-align-middle" v-html="message"></span>
+        <span class="vertical-align-middle"
+          ><gl-sprintf :message="commitsDescription">
+            <template #commitCount>
+              <strong class="commits-count-message">{{ commitsCountMessage }}</strong>
+            </template>
+            <template #targetBranch>
+              <span class="label-branch">{{ escapedTargetBranch }}</span>
+            </template>
+          </gl-sprintf></span
+        >
         <gl-button variant="link" class="modify-message-button">
           {{ modifyLinkMessage }}
         </gl-button>
