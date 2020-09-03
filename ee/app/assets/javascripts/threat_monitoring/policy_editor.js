@@ -4,7 +4,7 @@ import createStore from './store';
 
 export default () => {
   const el = document.querySelector('#js-policy-builder-app');
-  const { environmentsEndpoint, networkPoliciesEndpoint } = el.dataset;
+  const { environmentsEndpoint, networkPoliciesEndpoint, threatMonitoringPath } = el.dataset;
 
   const store = createStore();
   store.dispatch('threatMonitoring/setEndpoints', {
@@ -18,7 +18,9 @@ export default () => {
     el,
     store,
     render(createElement) {
-      return createElement(PolicyEditorApp, {});
+      return createElement(PolicyEditorApp, {
+        props: { threatMonitoringPath },
+      });
     },
   });
 };

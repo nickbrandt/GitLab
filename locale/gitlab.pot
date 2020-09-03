@@ -16170,6 +16170,9 @@ msgstr ""
 msgid "NetworkPolicies|%{ifLabelStart}if%{ifLabelEnd} %{ruleType} %{isLabelStart}is%{isLabelEnd} %{ruleDirection} %{ruleSelector} %{directionLabelStart}and is outbound to a%{directionLabelEnd} %{rule} %{portsLabelStart}on%{portsLabelEnd} %{ports}"
 msgstr ""
 
+msgid "NetworkPolicies|%{labelStart}Then%{labelEnd} %{action} %{spanStart}the network traffic.%{spanEnd}"
+msgstr ""
+
 msgid "NetworkPolicies|%{number} selected"
 msgstr ""
 
@@ -16189,6 +16192,9 @@ msgid "NetworkPolicies|Actions"
 msgstr ""
 
 msgid "NetworkPolicies|All selected"
+msgstr ""
+
+msgid "NetworkPolicies|Allow"
 msgstr ""
 
 msgid "NetworkPolicies|Allow all inbound traffic to %{selector} from %{ruleSelector} on %{ports}"
@@ -16297,6 +16303,9 @@ msgid "NetworkPolicies|Something went wrong, unable to fetch policies"
 msgstr ""
 
 msgid "NetworkPolicies|Status"
+msgstr ""
+
+msgid "NetworkPolicies|Traffic that does not match any rule will be blocked."
 msgstr ""
 
 msgid "NetworkPolicies|YAML editor"

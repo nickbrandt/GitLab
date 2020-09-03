@@ -133,7 +133,7 @@ export default {
   <div
     class="gl-bg-gray-10 gl-border-solid gl-border-1 gl-border-gray-100 gl-rounded-base px-3 pt-3"
   >
-    <gl-form inline>
+    <gl-form inline @submit.prevent>
       <gl-sprintf :message="sprintfTemplate">
         <template #ifLabel="{ content }">
           <label for="ruleType" class="text-uppercase gl-font-lg gl-mr-4 gl-mb-5!">{{

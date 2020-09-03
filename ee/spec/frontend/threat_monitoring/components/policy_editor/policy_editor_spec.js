@@ -12,6 +12,10 @@ import {
   EndpointMatchModeLabel,
 } from 'ee/threat_monitoring/components/policy_editor/constants';
 import fromYaml from 'ee/threat_monitoring/components/policy_editor/lib/from_yaml';
+import toYaml from 'ee/threat_monitoring/components/policy_editor/lib/to_yaml';
+import { redirectTo } from '~/lib/utils/url_utility';
+
+jest.mock('~/lib/utils/url_utility');
 
 describe('PolicyEditorApp component', () => {
   let store;
@@ -22,9 +26,15 @@ describe('PolicyEditorApp component', () => {
     Object.assign(store.state.threatMonitoring, {
       ...state,
     });
+    Object.assign(store.state.networkPolicies, {
+      ...state,
+    });
+
+    jest.spyOn(store, 'dispatch').mockImplementation(() => Promise.resolve());
 
     wrapper = shallowMount(PolicyEditorApp, {
       propsData: {
+        threatMonitoringPath: '/threat-monitoring',
         ...propsData,
       },
       store,
@@ -45,7 +55,6 @@ describe('PolicyEditorApp component', () => {
 
   afterEach(() => {
     wrapper.destroy();
-    wrapper = null;
   });
 
   it('renders the policy editor layout', () => {
@@ -186,6 +195,34 @@ spec:
 
     it('disables add rule button', () => {
       expect(findAddRuleButton().props('disabled')).toBe(true);
+    });
+  });
+
+  it('creates policy and redirects to a threat monitoring path', async () => {
+    wrapper.find("[data-testid='create-policy']").vm.$emit('click');
+
+    await wrapper.vm.$nextTick();
+    expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/createPolicy', {
+      environmentId: -1,
+      policy: { manifest: toYaml(wrapper.vm.policy) },
+    });
+    expect(redirectTo).toHaveBeenCalledWith('/threat-monitoring');
+  });
+
+  describe('given there is a createPolicy error', () => {
+    beforeEach(() => {
+      factory({
+        state: {
+          errorUpdatingPolicy: true,
+        },
+      });
+    });
+
+    it('it does not redirect', async () => {
+      wrapper.find("[data-testid='create-policy']").vm.$emit('click');
+
+      await wrapper.vm.$nextTick();
+      expect(redirectTo).not.toHaveBeenCalledWith('/threat-monitoring');
     });
   });
 });
