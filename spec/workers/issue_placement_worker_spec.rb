@@ -37,12 +37,13 @@ RSpec.describe IssuePlacementWorker do
       described_class.new.perform(issue.id)
     end
 
-    it 'limits the sweep to QUERY_LIMIT records' do
+    it 'limits the sweep to QUERY_LIMIT records, and reschedules placement' do
       # Ensure there are more than N issues in this set
       n = described_class::QUERY_LIMIT
       create_list(:issue, n - 5, **unplaced)
 
       expect(Issue).to receive(:move_nulls_to_end).with(have_attributes(count: n)).and_call_original
+      expect(described_class).to receive(:perform_async).with(issue_d.id)
 
       described_class.new.perform(issue.id)
 
