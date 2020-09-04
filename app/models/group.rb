@@ -20,9 +20,9 @@ class Group < Namespace
 
   UpdateSharedRunnersError = Class.new(StandardError)
 
-  has_many :group_members, -> { where(requested_at: nil) }, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
+  has_many :all_group_members, -> { where(requested_at: nil) }, dependent: :destroy, as: :source, class_name: 'GroupMember' # rubocop:disable Cop/ActiveRecordDependent
+  has_many :group_members, -> { where(requested_at: nil).where.not(members: { access_level: Gitlab::Access::MINIMAL_ACCESS }) }, dependent: :destroy, as: :source # rubocop:disable Cop/ActiveRecordDependent
   alias_method :members, :group_members
-  has_many :full_access_members, -> { where(requested_at: nil).where.not(access_level: Gitlab::Access::UNASSIGNED) }, dependent: :destroy, as: :source, class_name: 'GroupMember' # rubocop:disable Cop/ActiveRecordDependent
 
   has_many :users, through: :group_members
   has_many :owners,
@@ -270,7 +270,7 @@ class Group < Namespace
     add_user(user, :owner, current_user: current_user)
   end
 
-  def member?(user, min_access_level = Gitlab::Access::UNASSIGNED)
+  def member?(user, min_access_level = Gitlab::Access::GUEST)
     return false unless user
 
     max_member_access_for_user(user) >= min_access_level
@@ -328,7 +328,7 @@ class Group < Namespace
   # rubocop: enable CodeReuse/ServiceClass
 
   def user_ids_for_project_authorizations
-    members_with_parents.non_unassigned.pluck(:user_id)
+    members_with_parents.pluck(:user_id)
   end
 
   def self_and_ancestors_ids
@@ -347,6 +347,7 @@ class Group < Namespace
       end
 
     group_hierarchy_members = GroupMember.active_without_invites_and_requests
+                                         .non_minimal_access
                                          .where(source_id: source_ids)
 
     GroupMember.from_union([group_hierarchy_members,
@@ -354,7 +355,7 @@ class Group < Namespace
   end
 
   def members_from_self_and_ancestors_with_effective_access_level
-    members_with_parents.non_unassigned.select([:user_id, 'MAX(access_level) AS access_level'])
+    members_with_parents.select([:user_id, 'MAX(access_level) AS access_level'])
                         .group(:user_id)
   end
 
@@ -398,7 +399,7 @@ class Group < Namespace
   end
 
   def users_count
-    members.non_unassigned.count
+    members.count
   end
 
   # Returns all users that are members of projects

@@ -10,7 +10,7 @@ module Gitlab
     AccessDeniedError = Class.new(StandardError)
 
     NO_ACCESS      = 0
-    UNASSIGNED     = 5
+    MINIMAL_ACCESS = 5
     GUEST          = 10
     REPORTER       = 20
     DEVELOPER      = 30

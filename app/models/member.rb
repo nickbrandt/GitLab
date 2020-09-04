@@ -84,7 +84,7 @@ class Member < ApplicationRecord
   scope :developers, -> { active.where(access_level: DEVELOPER) }
   scope :maintainers, -> { active.where(access_level: MAINTAINER) }
   scope :non_guests, -> { where('members.access_level > ?', GUEST) }
-  scope :non_unassigned, -> { where('members.access_level > ?', UNASSIGNED) }
+  scope :non_minimal_access, -> { where('members.access_level > ?', MINIMAL_ACCESS) }
   scope :owners, -> { active.where(access_level: OWNER) }
   scope :owners_and_maintainers, -> { active.where(access_level: [OWNER, MAINTAINER]) }
   scope :with_user, -> (user) { where(user: user) }

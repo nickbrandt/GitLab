@@ -29,10 +29,10 @@ FactoryBot.define do
       after(:build) { |group_member, _| group_member.user.block! }
     end
 
-    trait :unassigned do
+    trait :minimal_access do
       to_create { |instance| instance.save!(validate: false) }
 
-      access_level { GroupMember::UNASSIGNED }
+      access_level { GroupMember::MINIMAL_ACCESS }
     end
   end
 end
