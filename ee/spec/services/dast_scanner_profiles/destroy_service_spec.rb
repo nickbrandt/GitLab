@@ -2,14 +2,10 @@
 
 require 'spec_helper'
 
-RSpec.describe DastScannerProfiles::UpdateService do
+RSpec.describe DastScannerProfiles::DestroyService do
   let_it_be(:user) { create(:user) }
   let_it_be(:dast_scanner_profile, reload: true) { create(:dast_scanner_profile, target_timeout: 200, spider_timeout: 5000) }
   let(:project) { dast_scanner_profile.project }
-
-  let_it_be(:new_profile_name) { SecureRandom.hex }
-  let_it_be(:new_target_timeout) { dast_scanner_profile.target_timeout + 1 }
-  let_it_be(:new_spider_timeout) { dast_scanner_profile.spider_timeout + 1 }
 
   before do
     stub_licensed_features(security_on_demand_scans: true)
@@ -18,10 +14,7 @@ RSpec.describe DastScannerProfiles::UpdateService do
   describe '#execute' do
     subject do
       described_class.new(project, user).execute(
-        id: dast_scanner_profile_id,
-        profile_name: new_profile_name,
-        target_timeout: new_target_timeout,
-        spider_timeout: new_spider_timeout
+        id: dast_scanner_profile_id
       )
     end
 
@@ -40,7 +33,7 @@ RSpec.describe DastScannerProfiles::UpdateService do
       end
     end
 
-    context 'when the user can run a dast scan' do
+    context 'when the user can run a DAST scan' do
       before do
         project.add_developer(user)
       end
@@ -49,14 +42,8 @@ RSpec.describe DastScannerProfiles::UpdateService do
         expect(status).to eq(:success)
       end
 
-      it 'updates the dast_scanner_profile' do
-        updated_dast_scanner_profile = payload.reload
-
-        aggregate_failures do
-          expect(updated_dast_scanner_profile.name).to eq(new_profile_name)
-          expect(updated_dast_scanner_profile.target_timeout).to eq(new_target_timeout)
-          expect(updated_dast_scanner_profile.spider_timeout).to eq(new_spider_timeout)
-        end
+      it 'deletes the dast_scanner_profile' do
+        expect { subject }.to change { DastScannerProfile.count }.by(-1)
       end
 
       it 'returns a dast_scanner_profile payload' do
