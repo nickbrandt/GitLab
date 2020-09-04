@@ -7707,6 +7707,9 @@ msgstr ""
 msgid "DAG visualization requires at least 3 dependent jobs."
 msgstr ""
 
+msgid "DAST Profiles"
+msgstr ""
+
 msgid "DNS"
 msgstr ""
 
@@ -21487,6 +21490,9 @@ msgstr ""
 msgid "Save variables"
 msgstr ""
 
+msgid "Saved scan settings and target site settings which are reusable."
+msgstr ""
+
 msgid "Saving"
 msgstr ""
 
@@ -21820,6 +21826,9 @@ msgid "SecurityApprovals|Requires license policy rules for licenses of Allowed, 
 msgstr ""
 
 msgid "SecurityConfiguration|An error occurred while creating the merge request."
+msgstr ""
+
+msgid "SecurityConfiguration|Available for on-demand DAST"
 msgstr ""
 
 msgid "SecurityConfiguration|Configure"

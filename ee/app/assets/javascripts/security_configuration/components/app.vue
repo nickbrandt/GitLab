@@ -93,10 +93,9 @@ export default {
           thClass,
         },
         {
-          key: 'configured',
+          key: 'status',
           label: s__('SecurityConfiguration|Status'),
           thClass,
-          formatter: this.getStatusText,
         },
         {
           key: 'manage',
@@ -115,15 +114,6 @@ export default {
     },
   },
   methods: {
-    getStatusText(value) {
-      if (value) {
-        return this.autoDevopsEnabled
-          ? s__('SecurityConfiguration|Enabled with Auto DevOps')
-          : s__('SecurityConfiguration|Enabled');
-      }
-
-      return s__('SecurityConfiguration|Not enabled');
-    },
     dismissAutoDevopsAlert() {
       this.autoDevopsAlertDismissed = 'true';
     },
