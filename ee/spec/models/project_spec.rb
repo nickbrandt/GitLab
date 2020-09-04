@@ -1099,13 +1099,16 @@ RSpec.describe Project do
     let(:project) { create(:project) }
     let!(:approval_rules) { create_list(:approval_project_rule, 2, project: project) }
     let!(:any_approver_rule) { create(:approval_project_rule, rule_type: :any_approver, project: project) }
+    let(:branch) { nil }
+
+    subject { project.visible_user_defined_rules(branch: branch) }
 
     before do
       stub_licensed_features(multiple_approval_rules: true)
     end
 
     it 'returns all approval rules' do
-      expect(project.visible_user_defined_rules).to eq([any_approver_rule, *approval_rules])
+      expect(subject).to eq([any_approver_rule, *approval_rules])
     end
 
     context 'when multiple approval rules is not available' do
@@ -1114,7 +1117,19 @@ RSpec.describe Project do
       end
 
       it 'returns the first approval rule' do
-        expect(project.visible_user_defined_rules).to eq([any_approver_rule])
+        expect(subject).to eq([any_approver_rule])
+      end
+    end
+
+    context 'when branch is provided' do
+      let(:branch) { 'master' }
+
+      it 'caches the rules' do
+        expect(project).to receive(:user_defined_rules).and_call_original
+        subject
+
+        expect(project).not_to receive(:user_defined_rules)
+        subject
       end
     end
   end
