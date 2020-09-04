@@ -1,0 +1,5 @@
+---
+title: Support custom JSON schema validation in the Web IDE
+merge_request: 41700
+author:
+type: added
