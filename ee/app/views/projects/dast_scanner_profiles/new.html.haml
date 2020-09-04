@@ -3,4 +3,5 @@
 - breadcrumb_title s_('DastProfiles|New scanner profile')
 - page_title s_('DastProfiles|New scanner profile')
 
-.js-dast-scanner-profile-form
+.js-dast-scanner-profile-form{ data: { project_full_path: @project.path_with_namespace,
+profiles_library_path: project_profiles_path(@project) } }
