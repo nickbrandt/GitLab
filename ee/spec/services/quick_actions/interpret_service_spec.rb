@@ -362,6 +362,16 @@ RSpec.describe QuickActions::InterpretService do
               expect(message).to eq("Issue #{issue.to_reference} has already been added to epic #{epic.to_reference}.")
             end
           end
+
+          context 'when issuable does not support epics' do
+            it 'does not assign an incident to an epic' do
+              incident = create(:incident, project: project)
+
+              _, updates = service.execute(content, incident)
+
+              expect(updates).to be_empty
+            end
+          end
         end
 
         context 'when epic does not exist' do
@@ -720,13 +730,18 @@ RSpec.describe QuickActions::InterpretService do
 
     context 'remove_epic command' do
       let(:epic) { create(:epic, group: group) }
-      let(:content) { "/remove_epic #{epic.to_reference(project)}" }
+      let(:content) { "/remove_epic" }
 
       before do
+        stub_licensed_features(epics: true)
         issue.update!(epic: epic)
       end
 
       context 'when epics are disabled' do
+        before do
+          stub_licensed_features(epics: false)
+        end
+
         it 'does not recognize /remove_epic' do
           _, updates = service.execute(content, issue)
 
@@ -743,6 +758,16 @@ RSpec.describe QuickActions::InterpretService do
           _, updates = service.execute(content, issue)
 
           expect(updates).to eq(epic: nil)
+        end
+      end
+
+      context 'when issuable does not support epics' do
+        it 'does not recognize /remove_epic' do
+          incident = create(:incident, project: project, epic: epic)
+
+          _, updates = service.execute(content, incident)
+
+          expect(updates).to be_empty
         end
       end
     end

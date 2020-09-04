@@ -12,7 +12,8 @@ module EE
           explanation _('Adds an issue to an epic.')
           types Issue
           condition do
-            quick_action_target.project.group&.feature_available?(:epics) &&
+            quick_action_target.supports_epic? &&
+              quick_action_target.project.group&.feature_available?(:epics) &&
               current_user.can?(:"admin_#{quick_action_target.to_ability_name}", quick_action_target)
           end
           params '<&epic | group&epic | Epic URL>'
@@ -42,6 +43,7 @@ module EE
           types Issue
           condition do
             quick_action_target.persisted? &&
+              quick_action_target.supports_epic? &&
               quick_action_target.project.group&.feature_available?(:epics) &&
               current_user.can?(:"admin_#{quick_action_target.to_ability_name}", quick_action_target)
           end
