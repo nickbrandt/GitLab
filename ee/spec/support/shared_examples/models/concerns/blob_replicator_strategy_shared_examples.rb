@@ -131,37 +131,31 @@ RSpec.shared_examples 'a blob replicator' do
   end
 
   describe '#consume_event_deleted' do
-    before do
-      # If a delete event was published from the primary, then the model
-      # record generally does not exist anymore.
-      model_record.delete
-    end
+    let!(:model_record_id) { replicator.model_record_id }
+    let!(:blob_path) { replicator.blob_path }
+    let!(:deleted_params) { { model_record_id: model_record_id, blob_path: blob_path } }
 
-    # The replicator is instantiated by Geo::EventService on the secondary side,
-    # after the model_record no longer exists. This ensures the tests do not
-    # have access to a model_record instance, only model_record_id. Using this
-    # replicator helps avoid a regression of
-    # https://gitlab.com/gitlab-org/gitlab/-/issues/233040
-    let(:secondary_side_replicator) { ::Gitlab::Geo::Replicator.for_replicable_params(replicable_name: replicator.replicable_name, replicable_id: replicator.model_record_id) }
+    context 'when model_record was deleted from the DB and the replicator only has its ID' do
+      before do
+        model_record.delete
+      end
 
-    it 'invokes Geo::FileRegistryRemovalService' do
-      service = double(:service)
+      # The replicator is instantiated by Geo::EventService on the secondary
+      # side, after the model_record no longer exists. This line ensures the
+      # replicator does not hold an instance of ActiveRecord::Base, which helps
+      # avoid a regression of
+      # https://gitlab.com/gitlab-org/gitlab/-/issues/233040
+      let(:secondary_side_replicator) { replicator.class.new(model_record: nil, model_record_id: model_record_id) }
 
-      expect(service).to receive(:execute)
-      expect(::Geo::FileRegistryRemovalService)
-        .to receive(:new).with(secondary_side_replicator.replicable_name, secondary_side_replicator.model_record_id, 'blob_path').and_return(service)
+      it 'invokes Geo::FileRegistryRemovalService' do
+        service = double(:service)
 
-      secondary_side_replicator.consume_event_deleted({ blob_path: 'blob_path' })
-    end
+        expect(service).to receive(:execute)
+        expect(::Geo::FileRegistryRemovalService)
+          .to receive(:new).with(secondary_side_replicator.replicable_name, model_record_id, blob_path).and_return(service)
 
-    # `in_replicables_for_geo_node?` returns false if the record does not exist,
-    # therefore it is unlikely to be useful during a delete event. This test is
-    # intended to avoid a regression of
-    # https://gitlab.com/gitlab-org/gitlab/-/issues/233040
-    it 'does not invoke in_replicables_for_geo_node?' do
-      expect(secondary_side_replicator).not_to receive(:in_replicables_for_geo_node?)
-
-      secondary_side_replicator.consume_event_deleted({ blob_path: 'blob_path' })
+        secondary_side_replicator.consume_event_deleted(deleted_params)
+      end
     end
   end
 
@@ -184,6 +178,16 @@ RSpec.shared_examples 'a blob replicator' do
 
     it 'is a Class' do
       expect(invoke_model).to be_a(Class)
+    end
+  end
+
+  describe '#blob_path' do
+    context 'when the file is locally stored' do
+      it 'returns a valid path to a file' do
+        file_exist = File.exist?(replicator.blob_path)
+
+        expect(file_exist).to be_truthy
+      end
     end
   end
 end

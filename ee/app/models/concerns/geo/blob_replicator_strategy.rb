@@ -49,7 +49,7 @@ module Geo
     #
     # @return [String] File path
     def blob_path
-      carrierwave_uploader.class.absolute_path(carrierwave_uploader)
+      carrierwave_uploader.path
     end
 
     def calculate_checksum!
