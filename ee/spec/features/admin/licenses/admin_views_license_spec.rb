@@ -40,7 +40,7 @@ RSpec.describe "Admin views license" do
       context "when license blocks changes" do
         let_it_be(:license) { build(:license, data: build(:gitlab_license, expires_at: Date.yesterday, block_changes_at: Date.today).export).save!(validate: false) }
 
-        it { expect(page).to have_content "You didn't renew your Starter subscription so it was downgraded to the GitLab Core Plan" }
+        it { expect(page).to have_content "You didn't renew your subscription so it was downgraded to the GitLab Core Plan" }
       end
     end
 
