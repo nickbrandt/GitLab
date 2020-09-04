@@ -123,7 +123,7 @@ export const receiveJobLogsError = ({ commit, dispatch }) => {
   dispatch(
     'setErrorMessage',
     {
-      text: __('An error occurred while fetching the job trace.'),
+      text: __('An error occurred while fetching the job logs.'),
       action: () =>
         dispatch('fetchJobLogs').then(() => dispatch('setErrorMessage', null, { root: true })),
       actionText: __('Please try again'),

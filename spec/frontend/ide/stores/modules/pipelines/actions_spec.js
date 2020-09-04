@@ -341,7 +341,7 @@ describe('IDE pipelines actions', () => {
           {
             type: 'setErrorMessage',
             payload: {
-              text: 'An error occurred while fetching the job trace.',
+              text: 'An error occurred while fetching the job logs.',
               action: expect.any(Function),
               actionText: 'Please try again',
               actionPayload: null,
