@@ -75,9 +75,9 @@ describe('Configure Feature Flags Modal', () => {
 
     it('should have links to the documentation', () => {
       const help = wrapper.find('p');
-      const link = help.find('a[href="/help/path"]');
+      const link = help.find('gl-link-stub[href="/help/path"]');
       expect(link.exists()).toBe(true);
-      const anchoredLink = help.find('a[href="/help/path/#flags"]');
+      const anchoredLink = help.find('gl-link-stub[href="/help/path/#flags"]');
       expect(anchoredLink.exists()).toBe(true);
     });
 
