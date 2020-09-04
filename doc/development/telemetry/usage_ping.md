@@ -288,7 +288,7 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    end
    ```
 
-1. Track event in API using `increment_unique_events(event_name, values)` helper method
+1. Track event in API using `increment_unique_values(event_name, values)` helper method
 
    In order to be able to track the events usage ping should be enabled and event feature `usage_data_<event_name>` should be enabled.
 
@@ -305,7 +305,7 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
        user: current_user, subject: user_group
      ).execute
 
-     increment_unique_events('i_list_repositories', current_user.id)
+     increment_unique_values('i_list_repositories', current_user.id)
 
      present paginate(repositories), with: Entities::ContainerRegistry::Repository, tags: params[:tags], tags_count: params[:tags_count]
    end
