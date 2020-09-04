@@ -9541,6 +9541,9 @@ msgstr ""
 msgid "Environments in %{name}"
 msgstr ""
 
+msgid "EnvironmentsAlert|%{severity} • %{title} %{text}. %{linkStart}View Details%{linkEnd} · %{startedAt} "
+msgstr ""
+
 msgid "EnvironmentsDashboard|Add a project to the dashboard"
 msgstr ""
 
