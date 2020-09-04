@@ -10,7 +10,7 @@ RSpec.describe Security::VulnerabilitiesController do
 
     it_behaves_like Security::ApplicationController do
       let(:security_application_controller_child_action) do
-        get :index
+        subject
       end
     end
 
