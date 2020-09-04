@@ -75,6 +75,12 @@ RSpec.describe Issues::CreateService do
         expect(Todo.where(attributes).count).to eq 1
       end
 
+      it 'moves the issue to the end, in an asynchronous worker' do
+        expect(IssuePlacementWorker).to receive(:perform_async).with(Integer)
+
+        described_class.new(project, user, opts).execute
+      end
+
       context 'when label belongs to project group' do
         let(:group) { create(:group) }
         let(:group_labels) { create_pair(:group_label, group: group) }

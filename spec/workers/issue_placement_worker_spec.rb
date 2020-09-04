@@ -4,38 +4,40 @@ require 'spec_helper'
 
 RSpec.describe IssuePlacementWorker do
   describe '#perform' do
+    let_it_be(:time) { Time.now.utc }
     let_it_be(:project) { create_default(:project) }
-    let_it_be(:issue) { create(:issue, relative_position: nil) }
-    let_it_be(:issue_a) { create(:issue, relative_position: nil, created_at: issue.created_at - 1.minute) }
-    let_it_be(:issue_b) { create(:issue, relative_position: nil, created_at: issue.created_at - 6.minutes) }
-    let_it_be(:issue_c) { create(:issue, relative_position: nil, created_at: issue.created_at + 1.minute) }
-    let_it_be(:issue_d) { create(:issue, relative_position: nil, created_at: issue.created_at + 6.minutes) }
-    let_it_be(:issue_e) { create(:issue, relative_position: 10, created_at: issue.created_at + 3.minutes) }
+    let_it_be(:issue) { create(:issue, relative_position: nil, created_at: time) }
+    let_it_be(:issue_a) { create(:issue, relative_position: nil, created_at: time - 1.minute) }
+    let_it_be(:issue_b) { create(:issue, relative_position: nil, created_at: time - 6.minutes) }
+    let_it_be(:issue_c) { create(:issue, relative_position: nil, created_at: time + 1.minute) }
+    let_it_be(:issue_d) { create(:issue, relative_position: nil, created_at: time + 6.minutes) }
+    let_it_be(:issue_e) { create(:issue, relative_position: 10, created_at: time + 3.minutes) }
+    let_it_be(:issue_f) { create(:issue, relative_position: nil, created_at: time + 1.minute) }
 
-    let_it_be(:irrelevant) { create(:issue, project: create(:project), created_at: issue.created_at - 30.seconds) }
+    let_it_be(:irrelevant) { create(:issue, project: create(:project), relative_position: nil, created_at: time) }
 
     it 'places all issues created at most 5 minutes before this one at the end, most recent last' do
-      described_class.new.perform(issue.id, :end)
+      expect do
+        described_class.new.perform(issue.id)
+      end.not_to change { irrelevant.reset.relative_position }
 
       expect(project.issues.order_relative_position_asc)
-        .to eq([issue_e, issue_a, issue, issue_c, issue_d, issue_b])
+        .to eq([issue_e, issue_b, issue_a, issue, issue_c, issue_f, issue_d])
+      expect(project.issues.where(relative_position: nil)).not_to exist
     end
 
-    it 'places all issues created at most 5 minutes before this one at the start, most recent first' do
-      described_class.new.perform(issue.id, :start)
+    it 'limits the sweep to QUERY_LIMIT records' do
+      issues = create_list(:issue, described_class::QUERY_LIMIT + 1, relative_position: nil)
 
-      expect(project.issues.order_relative_position_asc)
-        .to eq([issue_d, issue_c, issue, issue_a, issue_e, issue_b])
+      described_class.new.perform(issues.first.id)
+
+      expect(project.issues.where(relative_position: nil)).to exist
     end
 
     it 'anticipates the failure to find the issue' do
       id = non_existing_record_id
 
-      expect(Gitlab::ErrorTracking)
-        .to receive(:log_exception)
-        .with(ActiveRecord::RecordNotFound, issue_id: id, placement: :end)
-
-      described_class.new.perform(id, :end)
+      expect { described_class.new.perform(id) }.not_to raise_error
     end
 
     it 'anticipates the failure to place the issues, and schedules rebalancing' do
@@ -44,9 +46,9 @@ RSpec.describe IssuePlacementWorker do
       expect(IssueRebalancingWorker).to receive(:perform_async).with(nil, project.id)
       expect(Gitlab::ErrorTracking)
         .to receive(:log_exception)
-        .with(RelativePositioning::NoSpaceLeft, issue_id: issue.id, placement: :end)
+        .with(RelativePositioning::NoSpaceLeft, issue_id: issue.id)
 
-      described_class.new.perform(issue.id, :end)
+      described_class.new.perform(issue.id)
     end
   end
 end

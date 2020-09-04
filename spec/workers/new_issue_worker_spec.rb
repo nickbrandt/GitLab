@@ -48,12 +48,6 @@ RSpec.describe NewIssueWorker do
         expect { worker.perform(issue.id, user.id) }.to change { Event.count }.from(0).to(1)
       end
 
-      it 'moves the issue to the end' do
-        expect(IssuePlacementWorker).to receive(:perform_async).with(issue.id, :end)
-
-        worker.perform(issue.id, user.id)
-      end
-
       it 'creates a notification for the mentioned user' do
         expect(Notify).to receive(:new_issue_email).with(mentioned.id, issue.id, NotificationReason::MENTIONED)
                             .and_return(double(deliver_later: true))

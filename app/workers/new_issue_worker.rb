@@ -15,7 +15,6 @@ class NewIssueWorker # rubocop:disable Scalability/IdempotentWorker
     ::EventCreateService.new.open_issue(issuable, user)
     ::NotificationService.new.new_issue(issuable, user)
     issuable.create_cross_references!(user)
-    IssuePlacementWorker.perform_async(issue_id, :end)
   end
 
   def issuable_class

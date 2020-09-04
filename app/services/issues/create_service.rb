@@ -21,6 +21,7 @@ module Issues
       user = current_user
       issue.run_after_commit do
         NewIssueWorker.perform_async(issue.id, user.id)
+        IssuePlacementWorker.perform_async(issue.id)
       end
     end
 
