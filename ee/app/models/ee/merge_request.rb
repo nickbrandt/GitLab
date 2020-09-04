@@ -164,7 +164,8 @@ module EE
         dast: report_type_enabled?(:dast),
         dependency_scanning: report_type_enabled?(:dependency_scanning),
         license_scanning: report_type_enabled?(:license_scanning),
-        coverage_fuzzing: report_type_enabled?(:coverage_fuzzing)
+        coverage_fuzzing: report_type_enabled?(:coverage_fuzzing),
+        secret_detection: report_type_enabled?(:secret_detection)
       }
     end
 

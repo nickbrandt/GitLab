@@ -229,6 +229,7 @@ export default {
     'dependencyScanning',
     'containerScanning',
     'coverageFuzzing',
+    'secretDetection',
   ],
 };
 </script>
