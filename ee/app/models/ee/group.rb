@@ -401,8 +401,17 @@ module EE
       root_ancestor.saml_provider&.prohibited_outer_forks?
     end
 
-    def unassigned_role_allowed?
-      feature_available?(:unassigned_role) && !has_parent?
+    def minimal_access_role_allowed?
+      feature_available?(:minimal_access_role) && !has_parent?
+    end
+
+    override :member?
+    def member?(user, min_access_level = minimal_member_access_level)
+      super
+    end
+
+    def minimal_member_access_level
+      minimal_access_role_allowed? ? ::Gitlab::Access::MINIMAL_ACCESS : ::Gitlab::Access::GUEST
     end
 
     private

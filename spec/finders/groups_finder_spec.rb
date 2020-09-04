@@ -107,8 +107,8 @@ RSpec.describe GroupsFinder do
           end
 
           context 'being limited access member of parent group' do
-            it 'do not return group with unassigned access' do
-              create(:group_member, :unassigned, user: user, group: parent_group)
+            it 'do not return group with minimal_access access' do
+              create(:group_member, :minimal_access, user: user, group: parent_group)
 
               is_expected.to contain_exactly(public_subgroup, internal_subgroup)
             end

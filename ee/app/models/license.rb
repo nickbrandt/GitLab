@@ -108,7 +108,7 @@ class License < ApplicationRecord
     smartcard_auth
     group_timelogs
     type_of_work_analytics
-    unassigned_role
+    minimal_access_role
     unprotection_restrictions
     ci_project_subscriptions
   ]

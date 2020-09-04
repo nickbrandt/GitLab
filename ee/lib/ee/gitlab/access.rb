@@ -16,9 +16,9 @@ module EE
           @vulnerability_access_levels ||= options_with_owner.except('Guest')
         end
 
-        def options_with_unassigned
+        def options_with_minimal_access
           options_with_owner.merge(
-            "Unassigned" => ::Gitlab::Access::UNASSIGNED
+            "Minimal Access" => ::Gitlab::Access::MINIMAL_ACCESS
           )
         end
       end

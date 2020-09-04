@@ -81,7 +81,7 @@ RSpec.describe AuthorizedProjectUpdate::ProjectCreateService do
         before do
           create(:group_member, access_level: Gitlab::Access::REPORTER, group: group, user: group_user)
           create(:group_member, access_level: Gitlab::Access::MAINTAINER, group: shared_with_group, user: group_user)
-          create(:group_member, :unassigned, group: shared_with_group, user: create(:user))
+          create(:group_member, :minimal_access, group: shared_with_group, user: create(:user))
 
           create(:group_group_link, shared_group: group, shared_with_group: shared_with_group, group_access: Gitlab::Access::DEVELOPER)
 
@@ -99,7 +99,7 @@ RSpec.describe AuthorizedProjectUpdate::ProjectCreateService do
           expect(project_authorization).to exist
         end
 
-        it 'does not create project authorization for user with limited access' do
+        it 'does not create project authorization for user with minimal access' do
           expect { service.execute }.to(
             change { ProjectAuthorization.count }.from(0).to(1))
         end
@@ -124,9 +124,9 @@ RSpec.describe AuthorizedProjectUpdate::ProjectCreateService do
       end
     end
 
-    context 'member with unassigned access' do
+    context 'member with minimal access' do
       before do
-        create(:group_member, :unassigned, user: group_user, group: group)
+        create(:group_member, :minimal_access, user: group_user, group: group)
       end
 
       it 'does not create project authorization' do
