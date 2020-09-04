@@ -116,7 +116,7 @@ export default {
     :css-classes="['suggest-gitlab-ci-yml', 'ml-4']"
   >
     <template #title>
-      <span v-safe-html="suggestTitle"></span>
+      <span>{{ suggestTitle }}</span>
       <span class="ml-auto">
         <gl-button
           :aria-label="__('Close')"
