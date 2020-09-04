@@ -1,5 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
+import Draggable from 'vuedraggable';
 import EpicsSwimlanes from 'ee/boards/components/epics_swimlanes.vue';
 import BoardListHeader from 'ee_else_ce/boards/components/board_list_header.vue';
 import EpicLane from 'ee/boards/components/epic_lane.vue';
@@ -29,7 +30,7 @@ describe('EpicsSwimlanes', () => {
     });
   };
 
-  const createComponent = () => {
+  const createComponent = (props = {}) => {
     const store = createStore();
     const defaultProps = {
       lists: mockListsWithModel,
@@ -40,13 +41,37 @@ describe('EpicsSwimlanes', () => {
 
     wrapper = shallowMount(EpicsSwimlanes, {
       localVue,
-      propsData: defaultProps,
+      propsData: { ...defaultProps, ...props },
       store,
     });
   };
 
   afterEach(() => {
     wrapper.destroy();
+  });
+
+  describe('computed', () => {
+    describe('treeRootWrapper', () => {
+      describe('when canAdminList prop is true', () => {
+        beforeEach(() => {
+          createComponent({ canAdminList: true });
+        });
+
+        it('should return Draggable reference when canAdminList prop is true', () => {
+          expect(wrapper.find(Draggable).exists()).toBe(true);
+        });
+      });
+
+      describe('when canAdminList prop is false', () => {
+        beforeEach(() => {
+          createComponent();
+        });
+
+        it('should not return Draggable reference when canAdminList prop is false', () => {
+          expect(wrapper.find(Draggable).exists()).toBe(false);
+        });
+      });
+    });
   });
 
   describe('template', () => {
@@ -68,7 +93,25 @@ describe('EpicsSwimlanes', () => {
 
     it('displays issues icon and count for unassigned issue', () => {
       expect(wrapper.find(GlIcon).props('name')).toEqual('issues');
-      expect(wrapper.find('[data-testid="issues-lane-issue-count"').text()).toEqual('2');
+      expect(wrapper.find('[data-testid="issues-lane-issue-count"]').text()).toEqual('2');
+    });
+
+    it('makes non preset lists draggable', () => {
+      expect(
+        wrapper
+          .findAll('[data-testid="board-header-container"]')
+          .at(1)
+          .classes(),
+      ).toContain('is-draggable');
+    });
+
+    it('does not make preset lists draggable', () => {
+      expect(
+        wrapper
+          .findAll('[data-testid="board-header-container"]')
+          .at(0)
+          .classes(),
+      ).not.toContain('is-draggable');
     });
   });
 });
