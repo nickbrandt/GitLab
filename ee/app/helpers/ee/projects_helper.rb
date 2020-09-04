@@ -261,11 +261,8 @@ module EE
     end
 
     def show_discover_project_security?(project)
-      security_feature_available_at = DateTime.new(2019, 11, 1)
-
       !!current_user &&
         ::Gitlab.com? &&
-        current_user.created_at > security_feature_available_at &&
         !project.feature_available?(:security_dashboard) &&
         can?(current_user, :admin_namespace, project.root_ancestor) &&
         current_user.ab_feature_enabled?(:discover_security)

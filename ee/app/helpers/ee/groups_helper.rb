@@ -74,11 +74,8 @@ module EE
     end
 
     def show_discover_group_security?(group)
-      security_feature_available_at = DateTime.new(2019, 11, 1)
-
       !!current_user &&
         ::Gitlab.com? &&
-        current_user.created_at > security_feature_available_at &&
         !@group.feature_available?(:security_dashboard) &&
         can?(current_user, :admin_group, @group) &&
         current_user.ab_feature_enabled?(:discover_security)
