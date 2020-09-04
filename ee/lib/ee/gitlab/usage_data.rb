@@ -116,7 +116,7 @@ module EE
 
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           license_scan_count = results.delete(:license_scanning_jobs)
-          results[:license_management_jobs] += license_scan_count > 0 ? license_scan_count : 0
+          results[:license_management_jobs] += license_scan_count > 0 ? license_scan_count : 0 if license_scan_count.is_a?(Integer)
 
           results
         end
@@ -324,7 +324,7 @@ module EE
           # handle license rename https://gitlab.com/gitlab-org/gitlab/issues/8911
           combined_license_key = "#{prefix}license_management_jobs".to_sym
           license_scan_count = results.delete("#{prefix}license_scanning_jobs".to_sym)
-          results[combined_license_key] += license_scan_count > 0 ? license_scan_count : 0
+          results[combined_license_key] += license_scan_count > 0 ? license_scan_count : 0 if license_scan_count.is_a?(Integer)
 
           super.merge(results)
         end
