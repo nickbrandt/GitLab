@@ -126,7 +126,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
     approvers = ApprovalWrappedRule.wrap(merge_request, self).approved_approvers
 
-    self.approved_approver_ids = approvers.map(&:id)
+    self.approved_approver_ids = approvers.pluck(:id)
   end
 
   def refresh_required_approvals!(project_approval_rule)
