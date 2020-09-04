@@ -162,11 +162,9 @@ describe('ValueStreamSelect', () => {
         });
 
         it('calls the "createValueStream" event when submitted', () => {
-          expect(createValueStreamMock).toHaveBeenCalledWith(
-            expect.any(Object),
-            { name: streamName },
-            undefined,
-          );
+          expect(createValueStreamMock).toHaveBeenCalledWith(expect.any(Object), {
+            name: streamName,
+          });
         });
 
         it('clears the name field', () => {

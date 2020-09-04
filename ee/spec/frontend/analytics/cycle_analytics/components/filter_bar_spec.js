@@ -168,16 +168,12 @@ describe('Filter bar', () => {
 
       expect(utils.processFilters).toHaveBeenCalledWith(filters);
 
-      expect(setFiltersMock).toHaveBeenCalledWith(
-        expect.anything(),
-        {
-          selectedLabelList: [{ value: selectedLabelList[0].title, operator: '=' }],
-          selectedMilestone: { value: selectedMilestone[0].title, operator: '=' },
-          selectedAssigneeList: [],
-          selectedAuthor: null,
-        },
-        undefined,
-      );
+      expect(setFiltersMock).toHaveBeenCalledWith(expect.anything(), {
+        selectedLabelList: [{ value: selectedLabelList[0].title, operator: '=' }],
+        selectedMilestone: { value: selectedMilestone[0].title, operator: '=' },
+        selectedAssigneeList: [],
+        selectedAuthor: null,
+      });
     });
   });
 

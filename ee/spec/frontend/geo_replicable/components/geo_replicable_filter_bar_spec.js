@@ -78,7 +78,7 @@ describe('GeoReplicableFilterBar', () => {
           .at(index)
           .vm.$emit('click');
 
-        expect(actionSpies.setFilter).toHaveBeenCalledWith(expect.any(Object), index, undefined);
+        expect(actionSpies.setFilter).toHaveBeenCalledWith(expect.any(Object), index);
       });
     });
 
@@ -99,11 +99,7 @@ describe('GeoReplicableFilterBar', () => {
         });
 
         it('calls fetchSyncNamespaces when input event is fired from GlSearchBoxByType', () => {
-          expect(actionSpies.setSearch).toHaveBeenCalledWith(
-            expect.any(Object),
-            testSearch,
-            undefined,
-          );
+          expect(actionSpies.setSearch).toHaveBeenCalledWith(expect.any(Object), testSearch);
           expect(actionSpies.fetchReplicableItems).toHaveBeenCalled();
         });
       });
@@ -130,7 +126,7 @@ describe('GeoReplicableFilterBar', () => {
     });
 
     it('should call setFilter with the filterIndex', () => {
-      expect(actionSpies.setFilter).toHaveBeenCalledWith(expect.any(Object), testValue, undefined);
+      expect(actionSpies.setFilter).toHaveBeenCalledWith(expect.any(Object), testValue);
     });
 
     it('should call fetchReplicableItems', () => {

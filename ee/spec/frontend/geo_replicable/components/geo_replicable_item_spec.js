@@ -83,15 +83,11 @@ describe('GeoReplicableItem', () => {
 
         it('calls initiateReplicableSync when clicked', () => {
           findGlButton().trigger('click');
-          expect(actionSpies.initiateReplicableSync).toHaveBeenCalledWith(
-            expect.any(Object),
-            {
-              projectId: mockReplicable.projectId,
-              name: mockReplicable.name,
-              action: ACTION_TYPES.RESYNC,
-            },
-            undefined,
-          );
+          expect(actionSpies.initiateReplicableSync).toHaveBeenCalledWith(expect.any(Object), {
+            projectId: mockReplicable.projectId,
+            name: mockReplicable.name,
+            action: ACTION_TYPES.RESYNC,
+          });
         });
       });
     });
