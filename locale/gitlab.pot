@@ -3214,9 +3214,6 @@ msgstr ""
 msgid "Are you ABSOLUTELY SURE you wish to delete this project?"
 msgstr ""
 
-msgid "Are you setting up GitLab for a company?"
-msgstr ""
-
 msgid "Are you sure that you want to archive this project?"
 msgstr ""
 
@@ -13134,9 +13131,6 @@ msgid "In order to gather accurate feature usage data, it can take 1 to 2 weeks 
 msgstr ""
 
 msgid "In order to personalize your experience with GitLab%{br_tag}we would like to know a bit more about you."
-msgstr ""
-
-msgid "In order to tailor your experience with GitLab we%{br_tag}would like to know a bit more about you."
 msgstr ""
 
 msgid "In progress"
@@ -27982,13 +27976,10 @@ msgstr ""
 msgid "Welcome to GitLab"
 msgstr ""
 
-msgid "Welcome to GitLab %{name}!"
+msgid "Welcome to GitLab%{br_tag}%{name}!"
 msgstr ""
 
 msgid "Welcome to GitLab, %{first_name}!"
-msgstr ""
-
-msgid "Welcome to GitLab.com%{br_tag}@%{name}!"
 msgstr ""
 
 msgid "Welcome to the guided GitLab tour"

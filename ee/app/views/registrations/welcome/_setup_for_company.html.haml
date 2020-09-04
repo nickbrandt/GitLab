@@ -1,0 +1,11 @@
+- if Gitlab.com?
+  .row
+    .form-group.col-sm-12
+      = f.label :setup_for_company, setup_for_company_label_text, class: 'label-bold'
+      .d-flex.flex-column.flex-lg-row
+        .flex-grow-1
+          = f.radio_button :setup_for_company, true
+          = f.label :setup_for_company, _('My company or team'), class: 'normal', value: 'true'
+        .flex-grow-1
+          = f.radio_button :setup_for_company, false
+          = f.label :setup_for_company, _('Just me'), class: 'normal', value: 'false'
