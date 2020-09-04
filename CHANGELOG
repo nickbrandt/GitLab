@@ -1,5 +1,11 @@
 # Changelog for gitlab-workhorse
 
+## v8.46.0
+
+### Added
+- Support Azure custom storage domains
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/593
+
 ## v8.45.0
 
 ### Added
