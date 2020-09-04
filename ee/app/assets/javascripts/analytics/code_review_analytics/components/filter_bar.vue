@@ -4,7 +4,7 @@ import { __ } from '~/locale';
 import MilestoneToken from '../../shared/components/tokens/milestone_token.vue';
 import LabelToken from '../../shared/components/tokens/label_token.vue';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
-import { processFilters } from '../../shared/utils';
+import { processFilters } from '~/vue_shared/components/filtered_search_bar/filtered_search_utils';
 
 export default {
   components: {
