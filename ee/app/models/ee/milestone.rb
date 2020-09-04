@@ -10,12 +10,12 @@ module EE
       has_many :boards
     end
 
-    def supports_weight?
+    def weight_available?
       resource_parent&.feature_available?(:issue_weights)
     end
 
     def supports_milestone_charts?
-      resource_parent&.feature_available?(:milestone_charts) && supports_weight?
+      resource_parent&.feature_available?(:milestone_charts) && weight_available?
     end
 
     def burnup_charts_available?
