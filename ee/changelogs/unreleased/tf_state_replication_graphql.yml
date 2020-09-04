@@ -1,0 +1,5 @@
+---
+title: "Geo: Add graphql endpoints for terraform state"
+merge_request: 40317
+author:
+type: added
