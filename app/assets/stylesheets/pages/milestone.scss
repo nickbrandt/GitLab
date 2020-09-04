@@ -178,15 +178,6 @@ $status-box-line-height: 26px;
 
 .milestone-detail {
   border-bottom: 1px solid $border-color;
-
-  > h2 {
-    margin: 0;
-  }
-
-  .description {
-    border-top: 1px solid $border-color;
-    padding: $gl-padding 0 0;
-  }
 }
 
 @include media-breakpoint-down(xs) {
