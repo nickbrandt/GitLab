@@ -133,19 +133,24 @@ export default {
 
       <div class="branch-actions d-flex">
         <template v-if="mr.isOpen">
-          <gl-button
+          <span
             v-if="!mr.sourceBranchRemoved"
             v-gl-tooltip
-            :href="webIdePath"
             :title="ideButtonTitle"
-            :disabled="!mr.canPushToSourceBranch"
-            class="js-web-ide gl-display-none d-md-inline-block gl-mr-3"
+            class="gl-display-none d-md-inline-block gl-mr-3"
             tabindex="0"
-            role="button"
-            data-qa-selector="open_in_web_ide_button"
           >
-            {{ s__('mrWidget|Open in Web IDE') }}
-          </gl-button>
+            <gl-button
+              :href="mr.canPushToSourceBranch ? webIdePath : null"
+              :disabled="!mr.canPushToSourceBranch"
+              class="js-web-ide"
+              tabindex="0"
+              role="button"
+              data-qa-selector="open_in_web_ide_button"
+            >
+              {{ s__('mrWidget|Open in Web IDE') }}
+            </gl-button>
+          </span>
           <gl-button
             :disabled="mr.sourceBranchRemoved"
             data-target="#modal_merge_info"
