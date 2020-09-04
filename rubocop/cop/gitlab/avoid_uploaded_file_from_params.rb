@@ -3,7 +3,8 @@
 module RuboCop
   module Cop
     module Gitlab
-      # This cop checks for `UploadedFile.from_params` usage. See XXX
+      # This cop checks for `UploadedFile.from_params` usage.
+      # See https://docs.gitlab.com/ee/development/uploads.html#how-to-add-a-new-upload-route
       #
       # @example
       #
