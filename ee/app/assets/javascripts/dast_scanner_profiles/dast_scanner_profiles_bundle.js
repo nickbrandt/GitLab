@@ -8,11 +8,20 @@ export default () => {
     return false;
   }
 
+  const { projectFullPath, profilesLibraryPath } = el.dataset;
+
+  const props = {
+    projectFullPath,
+    profilesLibraryPath,
+  };
+
   return new Vue({
     el,
     apolloProvider,
     render(h) {
-      return h(DastScannerProfileForm);
+      return h(DastScannerProfileForm, {
+        props,
+      });
     },
   });
 };

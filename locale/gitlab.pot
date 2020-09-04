@@ -7731,6 +7731,9 @@ msgstr ""
 msgid "DastProfiles|Are you sure you want to delete this profile?"
 msgstr ""
 
+msgid "DastProfiles|Could not create the scanner profile. Please try again."
+msgstr ""
+
 msgid "DastProfiles|Could not create the site profile. Please try again."
 msgstr ""
 
@@ -7744,6 +7747,9 @@ msgid "DastProfiles|Could not fetch site profiles. Please refresh the page, or t
 msgstr ""
 
 msgid "DastProfiles|Could not update the site profile. Please try again."
+msgstr ""
+
+msgid "DastProfiles|Do you want to discard this scanner profile?"
 msgstr ""
 
 msgid "DastProfiles|Do you want to discard this site profile?"
@@ -7764,10 +7770,13 @@ msgstr ""
 msgid "DastProfiles|Manage profiles"
 msgstr ""
 
-msgid "DastProfiles|New Profile"
+msgid "DastProfiles|Minimum = 0 (no timeout enabled), Maximum = 2880 minutes"
 msgstr ""
 
-msgid "DastProfiles|New Scanner Profile"
+msgid "DastProfiles|Minimum = 1 second, Maximum = 3600 seconds"
+msgstr ""
+
+msgid "DastProfiles|New Profile"
 msgstr ""
 
 msgid "DastProfiles|New scanner profile"
@@ -7780,6 +7789,9 @@ msgid "DastProfiles|No profiles created yet"
 msgstr ""
 
 msgid "DastProfiles|Please enter a valid URL format, ex: http://www.example.com/home"
+msgstr ""
+
+msgid "DastProfiles|Please enter a valid timeout value"
 msgstr ""
 
 msgid "DastProfiles|Profile name"
@@ -7800,7 +7812,13 @@ msgstr ""
 msgid "DastProfiles|Site Profiles"
 msgstr ""
 
+msgid "DastProfiles|Spider timeout"
+msgstr ""
+
 msgid "DastProfiles|Target URL"
+msgstr ""
+
+msgid "DastProfiles|Target timeout"
 msgstr ""
 
 msgid "Data is still calculating..."
@@ -21736,6 +21754,9 @@ msgid "Seats in license"
 msgstr ""
 
 msgid "Secondary"
+msgstr ""
+
+msgid "Seconds"
 msgstr ""
 
 msgid "Secret"
