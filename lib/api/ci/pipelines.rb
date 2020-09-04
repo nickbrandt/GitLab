@@ -127,9 +127,15 @@ module API
           authorize!(:read_pipeline, user_project)
 
           pipeline = user_project.all_pipelines.find(params[:pipeline_id])
-          builds = ::Ci::JobsFinder
-            .new(current_user: current_user, pipeline: pipeline, params: params)
-            .execute
+
+          if Feature.enabled?(:ci_jobs_finder_refactor)
+            builds = ::Ci::JobsFinder
+              .new(current_user: current_user, pipeline: pipeline, params: params)
+              .execute
+          else
+            builds = pipeline.builds
+            builds = filter_builds(builds, params[:scope])
+          end
 
           builds = builds.with_preloads
 
@@ -150,9 +156,14 @@ module API
 
           pipeline = user_project.all_pipelines.find(params[:pipeline_id])
 
-          bridges = ::Ci::JobsFinder
-            .new(current_user: current_user, pipeline: pipeline, params: params, type: ::Ci::Bridge)
-            .execute
+          if Feature.enabled?(:ci_jobs_finder_refactor)
+            bridges = ::Ci::JobsFinder
+              .new(current_user: current_user, pipeline: pipeline, params: params, type: ::Ci::Bridge)
+              .execute
+          else
+            bridges = pipeline.bridges
+            bridges = filter_builds(bridges, params[:scope])
+          end
 
           bridges = bridges.with_preloads
 
@@ -233,6 +244,21 @@ module API
       end
 
       helpers do
+        if Feature.disabled?(:ci_jobs_finder_refactor)
+          # rubocop: disable CodeReuse/ActiveRecord
+          def filter_builds(builds, scope)
+            return builds if scope.nil? || scope.empty?
+
+            available_statuses = ::CommitStatus::AVAILABLE_STATUSES
+
+            unknown = scope - available_statuses
+            render_api_error!('Scope contains invalid value(s)', 400) unless unknown.empty?
+
+            builds.where(status: scope)
+          end
+          # rubocop: enable CodeReuse/ActiveRecord
+        end
+
         def pipeline
           strong_memoize(:pipeline) do
             user_project.all_pipelines.find(params[:pipeline_id])

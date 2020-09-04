@@ -25,13 +25,23 @@ module Ci
     attr_reader :current_user, :pipeline, :project, :params, :type
 
     def init_collection
-      pipeline_jobs || project_jobs || all_jobs
+      if Feature.enabled?(:ci_jobs_finder_refactor)
+        pipeline_jobs || project_jobs || all_jobs
+      else
+        project ? project_builds : all_jobs
+      end
     end
 
     def all_jobs
       raise Gitlab::Access::AccessDeniedError unless current_user&.admin?
 
       type.all
+    end
+
+    def project_builds
+      raise Gitlab::Access::AccessDeniedError unless can?(current_user, :read_build, project)
+
+      project.builds.relevant
     end
 
     def project_jobs
@@ -49,7 +59,9 @@ module Ci
     end
 
     def filter_by_scope(builds)
-      return filter_by_statuses!(params[:scope], builds) if params[:scope].is_a?(Array)
+      if Feature.enabled?(:ci_jobs_finder_refactor)
+        return filter_by_statuses!(params[:scope], builds) if params[:scope].is_a?(Array)
+      end
 
       case params[:scope]
       when 'pending'
