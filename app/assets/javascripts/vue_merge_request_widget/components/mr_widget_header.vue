@@ -139,7 +139,7 @@ export default {
             :href="webIdePath"
             :title="ideButtonTitle"
             :disabled="!mr.canPushToSourceBranch"
-            class="js-web-ide d-none d-md-inline-block gl-mr-3"
+            class="js-web-ide gl-display-none d-md-inline-block gl-mr-3"
             tabindex="0"
             role="button"
             data-qa-selector="open_in_web_ide_button"
