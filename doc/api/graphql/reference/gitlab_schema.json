@@ -22433,6 +22433,12 @@
               "description": "Incident issue type",
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "TEST_CASE",
+              "description": "Test Case issue type",
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null
