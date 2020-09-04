@@ -1,0 +1,5 @@
+---
+title: Replace deprecated buttons with new GlButton component from GitLab UI
+merge_request: 41154
+author:
+type: other
