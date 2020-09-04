@@ -4491,6 +4491,44 @@ RSpec.describe User do
     end
   end
 
+  describe '#notification_settings_for_groups' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:groups) { create_list(:group, 2) }
+
+    subject { user.notification_settings_for_groups(arg) }
+
+    before do
+      groups.each do |group|
+        group.add_maintainer(user)
+      end
+    end
+
+    shared_examples_for 'notification_settings_for_groups method' do
+      it 'returns NotificationSetting objects for provided groups', :aggregate_failures do
+        expect(subject.count).to eq(groups.count)
+        expect(subject.map(&:source_id)).to match_array(groups.map(&:id))
+      end
+    end
+
+    context 'when given an ActiveRecord relationship' do
+      let_it_be(:arg) { Group.where(id: groups.map(&:id)) }
+
+      it_behaves_like 'notification_settings_for_groups method'
+
+      it 'uses #select to maintain lazy querying behavior' do
+        expect(arg).to receive(:select).and_call_original
+
+        subject
+      end
+    end
+
+    context 'when given an Array of Groups' do
+      let_it_be(:arg) { groups }
+
+      it_behaves_like 'notification_settings_for_groups method'
+    end
+  end
+
   describe '#notification_email_for' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }
