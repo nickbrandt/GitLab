@@ -8040,9 +8040,6 @@ msgstr ""
 msgid "Delete Comment"
 msgstr ""
 
-msgid "Delete Package"
-msgstr ""
-
 msgid "Delete Snippet"
 msgstr ""
 
