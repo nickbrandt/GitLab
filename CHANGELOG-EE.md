@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.3.5 (2020-09-04)
+
+### Fixed (1 change)
+
+- Add missing path to project vulnerability. !40935
+
+
 ## 13.3.4 (2020-09-02)
 
 - No changes.
