@@ -92,7 +92,7 @@ module EE
       end
 
       condition(:push_rules_available) do
-        ::Feature.enabled?(:group_push_rules, @subject.root_ancestor) && @subject.feature_available?(:push_rules)
+        @subject.feature_available?(:push_rules)
       end
 
       condition(:over_storage_limit, scope: :subject) { @subject.over_storage_limit? }
