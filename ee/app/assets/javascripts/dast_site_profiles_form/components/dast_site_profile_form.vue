@@ -1,9 +1,20 @@
 <script>
 import * as Sentry from '@sentry/browser';
 import { isEqual } from 'lodash';
-import { GlAlert, GlButton, GlForm, GlFormGroup, GlFormInput, GlModal } from '@gitlab/ui';
+import {
+  GlAlert,
+  GlButton,
+  GlCollapse,
+  GlForm,
+  GlFormGroup,
+  GlFormInput,
+  GlModal,
+  GlToggle,
+} from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import { isAbsolute, redirectTo } from '~/lib/utils/url_utility';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import DastSiteValidation from './dast_site_validation.vue';
 import dastSiteProfileCreateMutation from '../graphql/dast_site_profile_create.mutation.graphql';
 import dastSiteProfileUpdateMutation from '../graphql/dast_site_profile_update.mutation.graphql';
 
@@ -21,11 +32,15 @@ export default {
   components: {
     GlAlert,
     GlButton,
+    GlCollapse,
     GlForm,
     GlFormGroup,
     GlFormInput,
     GlModal,
+    GlToggle,
+    DastSiteValidation,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     fullPath: {
       type: String,
@@ -43,6 +58,7 @@ export default {
   },
   data() {
     const { name = '', targetUrl = '' } = this.siteProfile || {};
+    const isSiteValid = false;
     const form = {
       profileName: initField(name),
       targetUrl: initField(targetUrl),
@@ -50,8 +66,11 @@ export default {
     return {
       form,
       initialFormValues: extractFormValues(form),
+      isFetchingValidationStatus: false,
       loading: false,
       showAlert: false,
+      isSiteValid,
+      validateSite: isSiteValid,
     };
   },
   computed: {
@@ -86,8 +105,34 @@ export default {
       return Object.values(this.form).some(({ value }) => !value);
     },
     isSubmitDisabled() {
-      return this.formHasErrors || this.someFieldEmpty;
+      return (this.validateSite && !this.isSiteValid) || this.formHasErrors || this.someFieldEmpty;
     },
+    showValidationSection() {
+      return this.validateSite && !this.isSiteValid && !this.isFetchingValidationStatus;
+    },
+  },
+  watch: {
+    async validateSite(validate) {
+      if (!validate) {
+        this.isSiteValid = false;
+      } else {
+        // TODO: In the next iteration, this should be changed to:
+        // * Trigger a GraphQL query to retrieve the site's validation status
+        // * If the site is not validated, this should also trigger the dastSiteTokenCreate GraphQL
+        //   mutation to create the validation token and pass it down to the validation component.
+        // See https://gitlab.com/gitlab-org/gitlab/-/issues/238578
+        this.isFetchingValidationStatus = true;
+        await new Promise(resolve => {
+          setTimeout(resolve, 1000);
+        });
+        this.isFetchingValidationStatus = false;
+      }
+    },
+  },
+  created() {
+    if (this.isEdit) {
+      this.validateTargetUrl();
+    }
   },
   methods: {
     validateTargetUrl() {
@@ -184,7 +229,13 @@ export default {
     <hr />
 
     <gl-form-group
+      data-testid="target-url-input-group"
       :invalid-feedback="form.targetUrl.feedback"
+      :description="
+        validateSite
+          ? s__('DastProfiles|Validation must be turned off to change the target URL')
+          : null
+      "
       :label="s__('DastProfiles|Target URL')"
     >
       <gl-form-input
@@ -193,9 +244,41 @@ export default {
         data-testid="target-url-input"
         type="url"
         :state="form.targetUrl.state"
+        :disabled="validateSite"
         @input="validateTargetUrl"
       />
     </gl-form-group>
+
+    <template v-if="glFeatures.securityOnDemandScansSiteValidation">
+      <gl-form-group :label="s__('DastProfiles|Validate target site')">
+        <template #description>
+          <p v-if="!isSiteValid" class="gl-mt-3">
+            {{ s__('DastProfiles|Site must be validated to run an active scan.') }}
+          </p>
+          <p v-else class="gl-text-green-500 gl-mt-3">
+            {{
+              s__(
+                'DastProfiles|Validation succeeded. Both active and passive scans can be run against the target site.',
+              )
+            }}
+          </p>
+        </template>
+        <gl-toggle
+          v-model="validateSite"
+          data-testid="dast-site-validation-toggle"
+          :disabled="!form.targetUrl.state"
+          :is-loading="isFetchingValidationStatus"
+        />
+      </gl-form-group>
+
+      <gl-collapse :visible="showValidationSection">
+        <dast-site-validation
+          token="asd"
+          :target-url="form.targetUrl.value"
+          @success="isSiteValid = true"
+        />
+      </gl-collapse>
+    </template>
 
     <hr />
 
