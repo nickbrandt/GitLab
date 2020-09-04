@@ -93,6 +93,12 @@ module EE
               description: 'DAST Site Profiles associated with the project',
               resolve: -> (obj, _args, _ctx) { obj.dast_site_profiles.with_dast_site }
 
+        field :cluster_agents,
+              ::Types::Clusters::AgentType.connection_type,
+              null: true,
+              description: 'Cluster agents associated with the project',
+              resolver: ::Resolvers::Clusters::AgentsResolver
+
         def self.requirements_available?(project, user)
           ::Feature.enabled?(:requirements_management, project, default_enabled: true) && Ability.allowed?(user, :read_requirement, project)
         end
