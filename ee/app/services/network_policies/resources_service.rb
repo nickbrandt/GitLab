@@ -15,6 +15,9 @@ module NetworkPolicies
       policies = @platform.kubeclient
         .get_network_policies(namespace: @kubernetes_namespace)
         .map { |resource| Gitlab::Kubernetes::NetworkPolicy.from_resource(resource) }
+      policies += @platform.kubeclient
+        .get_cilium_network_policies(namespace: @kubernetes_namespace)
+        .map { |resource| Gitlab::Kubernetes::CiliumNetworkPolicy.from_resource(resource) }
       ServiceResponse.success(payload: policies)
     rescue Kubeclient::HttpError => e
       kubernetes_error_response(e)

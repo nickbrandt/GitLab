@@ -16,14 +16,26 @@ RSpec.describe NetworkPolicies::ResourcesService do
     )
   end
 
+  let(:cilium_policy) do
+    Gitlab::Kubernetes::CiliumNetworkPolicy.new(
+      name: 'cilium_policy',
+      namespace: 'another',
+      resource_version: '102',
+      selector: { matchLabels: { role: 'db' } },
+      ingress: [{ endpointFrom: [{ matchLabels: { project: 'myproject' } }] }]
+    )
+  end
+
   describe '#execute' do
     subject { service.execute }
 
     it 'returns success response with policies from the deployment namespace' do
       expect(kubeclient).to receive(:get_network_policies).with(namespace: environment.deployment_namespace) { [policy.generate] }
+      expect(kubeclient).to receive(:get_cilium_network_policies).with(namespace: environment.deployment_namespace) { [cilium_policy.generate] }
       expect(subject).to be_success
-      expect(subject.payload.count).to eq(1)
+      expect(subject.payload.count).to eq(2)
       expect(subject.payload.first.as_json).to eq(policy.as_json)
+      expect(subject.payload.last.as_json).to eq(cilium_policy.as_json)
     end
 
     context 'without deployment_platform' do
