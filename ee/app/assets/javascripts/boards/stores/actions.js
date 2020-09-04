@@ -1,4 +1,4 @@
-import { sortBy } from 'lodash';
+import { sortBy, pick } from 'lodash';
 import Cookies from 'js-cookie';
 import axios from '~/lib/utils/axios_utils';
 import boardsStore from '~/boards/stores/boards_store';
@@ -6,11 +6,13 @@ import { __ } from '~/locale';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import actionsCE from '~/boards/stores/actions';
 import { BoardType, ListType } from '~/boards/constants';
+import { EpicFilterType } from '../constants';
 import boardsStoreEE from './boards_store_ee';
 import * as types from './mutation_types';
+import { fullEpicId } from '../boards_util';
 
 import createDefaultClient from '~/lib/graphql';
-import groupEpicsSwimlanesQuery from '../queries/group_epics_swimlanes.query.graphql';
+import epicsSwimlanesQuery from '../queries/epics_swimlanes.query.graphql';
 
 const notImplemented = () => {
   /* eslint-disable-next-line @gitlab/require-i18n-strings */
@@ -21,6 +23,27 @@ const gqlClient = createDefaultClient();
 
 export default {
   ...actionsCE,
+
+  setFilters: ({ commit }, filters) => {
+    const filterParams = pick(filters, [
+      'assigneeUsername',
+      'authorUsername',
+      'epicId',
+      'labelName',
+      'milestoneTitle',
+      'releaseTag',
+      'search',
+      'weight',
+    ]);
+
+    if (filterParams.epicId === EpicFilterType.any || filterParams.epicId === EpicFilterType.none) {
+      filterParams.epicWildcardId = filterParams.epicId.toUpperCase();
+      filterParams.epicId = undefined;
+    } else if (filterParams.epicId) {
+      filterParams.epicId = fullEpicId(filterParams.epicId);
+    }
+    commit(types.SET_FILTERS, filterParams);
+  },
 
   fetchEpicsSwimlanes({ state, commit }, withLists = true) {
     const { endpoints, boardType, filterParams } = state;
@@ -37,7 +60,7 @@ export default {
 
     return gqlClient
       .query({
-        query: groupEpicsSwimlanesQuery,
+        query: epicsSwimlanesQuery,
         variables,
       })
       .then(({ data }) => {

@@ -22,29 +22,27 @@ RSpec.describe 'epics swimlanes', :js do
   let_it_be(:epic_issue2) { create(:epic_issue, epic: epic2, issue: issue2) }
 
   context 'switch to swimlanes view' do
-    context 'feature flag on' do
-      before do
-        stub_licensed_features(epics: true)
-        sign_in(user)
-        visit_board_page
+    before do
+      stub_licensed_features(epics: true)
+      sign_in(user)
+      visit_board_page
 
-        page.within('.board-swimlanes-toggle-wrapper') do
-          page.find('.dropdown-toggle').click
-          page.find('.dropdown-item', text: 'Epic').click
-        end
+      page.within('.board-swimlanes-toggle-wrapper') do
+        page.find('.dropdown-toggle').click
+        page.find('.dropdown-item', text: 'Epic').click
       end
+    end
 
-      it 'displays epics swimlanes when selecting Epic in Group by dropdown' do
-        expect(page).to have_css('.board-swimlanes')
+    it 'displays epics swimlanes when selecting Epic in Group by dropdown' do
+      expect(page).to have_css('.board-swimlanes')
 
-        epic_lanes = page.all(:css, '.board-epic-lane')
-        expect(epic_lanes.length).to eq(2)
-      end
+      epic_lanes = page.all(:css, '.board-epic-lane')
+      expect(epic_lanes.length).to eq(2)
+    end
 
-      it 'displays issue not assigned to epic in unassigned issues lane' do
-        page.within('.board-lane-unassigned-issues') do
-          expect(page.find('span[data-testid="issues-lane-issue-count"]')).to have_content('1')
-        end
+    it 'displays issue not assigned to epic in unassigned issues lane' do
+      page.within('.board-lane-unassigned-issues-title') do
+        expect(page.find('span[data-testid="issues-lane-issue-count"]')).to have_content('1')
       end
     end
   end
