@@ -283,8 +283,8 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
     labelsPath,
     selectedAuthor,
     selectedMilestone,
-    selectedAssignees,
-    selectedLabels,
+    selectedAssigneeList,
+    selectedLabelList,
   } = initialData;
   commit(types.SET_FEATURE_FLAGS, featureFlags);
 
@@ -294,8 +294,8 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
       dispatch('filters/initialize', {
         selectedAuthor,
         selectedMilestone,
-        selectedAssignees,
-        selectedLabels,
+        selectedAssigneeList,
+        selectedLabelList,
       }),
       dispatch('durationChart/setLoading', true),
       dispatch('typeOfWork/setLoading', true),

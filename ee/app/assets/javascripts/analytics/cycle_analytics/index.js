@@ -3,6 +3,7 @@ import { GlToast } from '@gitlab/ui';
 import CycleAnalytics from './components/base.vue';
 import createStore from './store';
 import { buildCycleAnalyticsInitialData } from '../shared/utils';
+import { urlQueryToFilter } from '~/vue_shared/components/filtered_search_bar/filtered_search_utils';
 import { parseBoolean } from '~/lib/utils/common_utils';
 
 Vue.use(GlToast);
@@ -19,8 +20,19 @@ export default () => {
     analyticsSimilaritySearch: hasAnalyticsSimilaritySearch = false,
   } = gon?.features;
 
+  const {
+    author_username = null,
+    milestone_title = null,
+    assignee_username = [],
+    label_name = [],
+  } = urlQueryToFilter(window.location.search);
+
   store.dispatch('initializeCycleAnalytics', {
     ...initialData,
+    selectedAuthor: author_username,
+    selectedMilestone: milestone_title,
+    selectedAssigneeList: assignee_username,
+    selectedLabelList: label_name,
     featureFlags: {
       hasDurationChart,
       hasPathNavigation,
