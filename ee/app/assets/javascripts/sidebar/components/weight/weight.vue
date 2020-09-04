@@ -66,23 +66,12 @@ export default {
       return this.checkIfNoValue(this.weight);
     },
     collapsedWeightLabel() {
-      let label = this.weight;
-      if (this.checkIfNoValue(this.weight)) {
-        label = this.noValueLabel;
-      }
-
-      // Truncate with ellipsis after five digits
-      if (this.weight > 99999) {
-        label = `${this.weight.toString().substr(0, 5)}&hellip;`;
-      }
-
-      return label;
+      return this.checkIfNoValue(this.weight)
+        ? this.noValueLabel
+        : this.weight.toString().substr(0, 5);
     },
     noValueLabel() {
       return s__('Sidebar|None');
-    },
-    changeWeightLabel() {
-      return s__('Sidebar|Change weight');
     },
     dropdownToggleLabel() {
       let label = this.weight;
@@ -166,11 +155,12 @@ export default {
     >
       <gl-icon :size="16" name="weight" />
       <gl-loading-icon v-if="fetching" class="js-weight-collapsed-loading-icon" />
-      <span
-        v-else
-        v-safe-html="collapsedWeightLabel"
-        class="js-weight-collapsed-weight-label"
-      ></span>
+      <span v-else class="js-weight-collapsed-weight-label">
+        {{ collapsedWeightLabel
+        }}<template v-if="weight > 99999"
+          >&hellip;</template
+        >
+      </span>
     </div>
     <div class="title hide-collapsed">
       {{ s__('Sidebar|Weight') }}
