@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::StaticSiteEditor::Config do
-  subject(:config) { described_class.new(repository, ref, file_path, return_url) }
+RSpec.describe Gitlab::StaticSiteEditor::Config::GeneratedConfig do
+  subject(:config) { described_class.new(repository, ref, path, return_url) }
 
   let_it_be(:namespace) { create(:namespace, name: 'namespace') }
   let_it_be(:root_group) { create(:group, name: 'group') }
@@ -13,11 +13,11 @@ RSpec.describe Gitlab::StaticSiteEditor::Config do
   let_it_be(:repository) { project.repository }
 
   let(:ref) { 'master' }
-  let(:file_path) { 'README.md' }
+  let(:path) { 'README.md' }
   let(:return_url) { 'http://example.com' }
 
-  describe '#payload' do
-    subject { config.payload }
+  describe '#data' do
+    subject { config.data }
 
     it 'returns data for the frontend component' do
       is_expected.to eq(
@@ -49,7 +49,7 @@ RSpec.describe Gitlab::StaticSiteEditor::Config do
       before do
         repository.create_file(
           project.creator,
-          file_path,
+          path,
           '',
           message: 'message',
           branch_name: 'master'
@@ -57,7 +57,7 @@ RSpec.describe Gitlab::StaticSiteEditor::Config do
       end
 
       context 'when feature flag is enabled' do
-        let(:file_path) { 'FEATURE_ON.md.erb' }
+        let(:path) { 'FEATURE_ON.md.erb' }
 
         before do
           stub_feature_flags(sse_erb_support: project)
@@ -67,7 +67,7 @@ RSpec.describe Gitlab::StaticSiteEditor::Config do
       end
 
       context 'when feature flag is disabled' do
-        let(:file_path) { 'FEATURE_OFF.md.erb' }
+        let(:path) { 'FEATURE_OFF.md.erb' }
 
         before do
           stub_feature_flags(sse_erb_support: false)
@@ -78,7 +78,7 @@ RSpec.describe Gitlab::StaticSiteEditor::Config do
     end
 
     context 'when file path is nested' do
-      let(:file_path) { 'lib/README.md' }
+      let(:path) { 'lib/README.md' }
 
       it { is_expected.to include(base_url: '/namespace/project/-/sse/master%2Flib%2FREADME.md') }
     end
@@ -90,19 +90,19 @@ RSpec.describe Gitlab::StaticSiteEditor::Config do
     end
 
     context 'when file does not have a markdown extension' do
-      let(:file_path) { 'README.txt' }
+      let(:path) { 'README.txt' }
 
       it { is_expected.to include(is_supported_content: 'false') }
     end
 
     context 'when file does not have an extension' do
-      let(:file_path) { 'README' }
+      let(:path) { 'README' }
 
       it { is_expected.to include(is_supported_content: 'false') }
     end
 
     context 'when file does not exist' do
-      let(:file_path) { 'UNKNOWN.md' }
+      let(:path) { 'UNKNOWN.md' }
 
       it { is_expected.to include(is_supported_content: 'false') }
     end
