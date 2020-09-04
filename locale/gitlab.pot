@@ -1162,7 +1162,7 @@ msgstr ""
 msgid "A merge request approval is required when a security report contains a new vulnerability of high, critical, or unknown severity."
 msgstr ""
 
-msgid "A merge request approval is required when the license compliance report contains a blacklisted license."
+msgid "A merge request approval is required when the license compliance report contains a denied license."
 msgstr ""
 
 msgid "A new Auto DevOps pipeline has been created, go to %{pipelines_link_start}Pipelines page%{pipelines_link_end} for details"

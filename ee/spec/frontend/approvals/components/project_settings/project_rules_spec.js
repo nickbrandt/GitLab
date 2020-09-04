@@ -5,6 +5,7 @@ import projectSettingsModule from 'ee/approvals/stores/modules/project_settings'
 import ProjectRules from 'ee/approvals/components/project_settings/project_rules.vue';
 import RuleInput from 'ee/approvals/components/mr_edit/rule_input.vue';
 import UnconfiguredSecurityRules from 'ee/approvals/components/security_configuration/unconfigured_security_rules.vue';
+import RuleName from 'ee/approvals/components/rule_name.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import { createProjectRules } from '../../mocks';
 
@@ -66,6 +67,8 @@ describe('Approvals ProjectRules', () => {
           approvalsRequired: rule.approvalsRequired,
         })),
       );
+
+      expect(wrapper.findAll(RuleName).length).toBe(rows.length);
     });
 
     it('should always have any_approver rule', () => {
@@ -93,6 +96,7 @@ describe('Approvals ProjectRules', () => {
 
     it('does not render name', () => {
       expect(findCell(row, 'name').exists()).toBe(false);
+      expect(wrapper.find(RuleName).exists()).toBe(false);
     });
 
     it('should only display 1 rule', () => {
@@ -137,9 +141,7 @@ describe('Approvals ProjectRules', () => {
         rules[0].name = 'Vulnerability-Check';
         store.modules.approvals.state.rules = rules;
         store.state.settings.allowMultiRule = true;
-      });
 
-      beforeEach(() => {
         factory(
           {},
           {
