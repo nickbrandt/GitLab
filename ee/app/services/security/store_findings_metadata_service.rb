@@ -56,10 +56,10 @@ module Security
     end
 
     def existing_scanners
-      project.vulnerability_scanners
-             .with_external_id(scanner_external_ids)
-             .group_by(&:external_id)
-             .transform_values(&:first)
+      @existing_scanners ||= project.vulnerability_scanners
+                                    .with_external_id(scanner_external_ids)
+                                    .group_by(&:external_id)
+                                    .transform_values(&:first)
     end
 
     def scanner_external_ids
