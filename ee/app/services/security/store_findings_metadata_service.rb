@@ -3,8 +3,6 @@
 module Security
   # This service class stores the findings metadata for all pipelines.
   class StoreFindingsMetadataService < ::BaseService
-    include Gitlab::Utils::StrongMemoize
-
     attr_reader :security_scan, :report
 
     def self.execute(security_scan, report)
