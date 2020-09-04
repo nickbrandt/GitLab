@@ -129,10 +129,12 @@ func (c *Config) RegisterGoCloudURLOpeners() error {
 
 		pipeline := azureblob.NewPipeline(credential, azblob.PipelineOptions{})
 
-		azureURLOpener := &azureblob.URLOpener{
-			AccountName: accountName,
-			Pipeline:    pipeline,
-			Options:     azureblob.Options{Credential: credential},
+		azureURLOpener := &azureURLOpener{
+			&azureblob.URLOpener{
+				AccountName: accountName,
+				Pipeline:    pipeline,
+				Options:     azureblob.Options{Credential: credential},
+			},
 		}
 
 		c.ObjectStorageConfig.URLMux.RegisterBucket(azureblob.Scheme, azureURLOpener)
