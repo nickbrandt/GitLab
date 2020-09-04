@@ -14,6 +14,7 @@ RSpec.describe 'registrations/welcome' do
     allow(view).to receive(:in_invitation_flow?).and_return(in_invitation_flow)
     allow(view).to receive(:in_oauth_flow?).and_return(in_oauth_flow)
     allow(view).to receive(:experiment_enabled?).with(:onboarding_issues).and_return(onboarding_issues_experiment_enabled)
+    allow(Gitlab).to receive(:com?).and_return(true)
 
     render
   end

@@ -48,6 +48,36 @@ RSpec.describe 'Signup on EE' do
         expect(user.email_opted_in_at).to be_nil
       end
     end
+
+    context 'when role is required' do
+      before do
+        stub_experiment(signup_flow: true)
+        stub_experiment_for_user(signup_flow: true)
+      end
+
+      it 'redirects to step 2 of the signup process, sets the role and setup for company and redirects back' do
+        visit new_user_registration_path
+
+        fill_in 'new_user_first_name', with: user_attrs[:name].split(' ').first
+        fill_in 'new_user_last_name', with: user_attrs[:name].split(' ').last
+        fill_in 'new_user_username', with: user_attrs[:username]
+        fill_in 'new_user_email', with: user_attrs[:email]
+        fill_in 'new_user_password', with: user_attrs[:password]
+        click_button 'Register'
+        visit new_project_path
+
+        expect(page).to have_current_path(users_sign_up_welcome_path)
+
+        select 'Software Developer', from: 'user_role'
+        choose 'user_setup_for_company_true'
+        click_button 'Get started!'
+        user = User.find_by_username(user_attrs[:username])
+
+        expect(user.software_developer_role?).to be_truthy
+        expect(user.setup_for_company).to be_truthy
+        expect(page).to have_current_path(new_project_path)
+      end
+    end
   end
 
   context 'not for Gitlab.com' do
