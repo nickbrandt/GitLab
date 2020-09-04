@@ -13079,6 +13079,9 @@ msgstr ""
 msgid "In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
+msgid "Incident"
+msgstr ""
+
 msgid "Incident Management Limits"
 msgstr ""
 
@@ -22249,6 +22252,9 @@ msgid "Select timeframe"
 msgstr ""
 
 msgid "Select timezone"
+msgstr ""
+
+msgid "Select type"
 msgstr ""
 
 msgid "Select user"
