@@ -184,7 +184,10 @@ describe('Security Configuration App', () => {
 
     describe('given a feature enabled by Auto DevOps', () => {
       it('displays the expected status text', () => {
-        const features = generateFeatures(1, { configured: true });
+        const features = generateFeatures(1, {
+          configured: true,
+          status: 'Enabled with Auto DevOps',
+        });
 
         createComponent({ propsData: { features, autoDevopsEnabled: true } });
 

@@ -33,6 +33,9 @@ export default {
     canCreateSASTMergeRequest() {
       return Boolean(this.feature.type === 'sast' && this.createSastMergeRequestPath);
     },
+    canManageProfiles() {
+      return this.feature.type === 'dast_profiles';
+    },
     getFeatureDocumentationLinkLabel() {
       return sprintf(s__('SecurityConfiguration|Feature documentation for %{featureName}'), {
         featureName: this.feature.name,
@@ -44,7 +47,16 @@ export default {
 
 <template>
   <gl-button
-    v-if="canConfigureFeature && feature.configured"
+    v-if="canManageProfiles"
+    variant="success"
+    category="primary"
+    :href="feature.configuration_path"
+    data-testid="manageButton"
+    >{{ s__('SecurityConfiguration|Manage') }}</gl-button
+  >
+
+  <gl-button
+    v-else-if="canConfigureFeature && feature.configured"
     :href="feature.configuration_path"
     data-testid="configureButton"
     >{{ s__('SecurityConfiguration|Configure') }}</gl-button

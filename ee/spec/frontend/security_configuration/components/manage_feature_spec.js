@@ -86,6 +86,22 @@ describe('ManageFeature component', () => {
     });
   });
 
+  describe('given a feature with type "dast-profiles"', () => {
+    beforeEach(() => {
+      [feature] = generateFeatures(1, { type: 'dast_profiles', configuration_path: 'foo' });
+
+      createComponent({
+        propsData: { feature, autoDevopsEnabled: true },
+      });
+    });
+
+    it('shows the DAST Profiles manage button', () => {
+      const button = findTestId('manageButton');
+      expect(button.exists()).toBe(true);
+      expect(button.attributes('href')).toBe(feature.configuration_path);
+    });
+  });
+
   describe('given a feature type that is not "sast"', () => {
     beforeEach(() => {
       [feature] = generateFeatures(1, { type: 'something_that_is_not_sast' });
