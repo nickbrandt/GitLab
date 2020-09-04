@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.2.9 (2020-09-04)
+
+### Fixed (1 change)
+
+- Geo: Replicate repository changes when mirrors are updated. !39295
+
+
 ## 13.2.8 (2020-09-02)
 
 - No changes.
