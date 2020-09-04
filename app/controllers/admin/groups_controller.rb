@@ -83,7 +83,7 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 
   def group_members
-    @group.members.non_unassigned
+    @group.members
   end
 
   def group_params

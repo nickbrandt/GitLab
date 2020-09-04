@@ -148,7 +148,7 @@ RSpec.describe Member do
 
       accepted_request_user = create(:user).tap { |u| project.request_access(u) }
       @accepted_request_member = project.requesters.find_by(user_id: accepted_request_user.id).tap { |m| m.accept_request }
-      @member_unassigned = create(:group_member, :unassigned, group: group)
+      @member_with_minimal_access = create(:group_member, :minimal_access, group: group)
     end
 
     describe '.access_for_user_ids' do
@@ -179,13 +179,13 @@ RSpec.describe Member do
       it { expect(described_class.non_invite).to include @accepted_request_member }
     end
 
-    describe '.non_unassigned' do
-      it { expect(described_class.non_unassigned).to include @maintainer }
-      it { expect(described_class.non_unassigned).to include @invited_member }
-      it { expect(described_class.non_unassigned).to include @accepted_invite_member }
-      it { expect(described_class.non_unassigned).to include @requested_member }
-      it { expect(described_class.non_unassigned).to include @accepted_request_member }
-      it { expect(described_class.non_unassigned).not_to include @member_unassigned }
+    describe '.non_minimal_access' do
+      it { expect(described_class.non_minimal_access).to include @maintainer }
+      it { expect(described_class.non_minimal_access).to include @invited_member }
+      it { expect(described_class.non_minimal_access).to include @accepted_invite_member }
+      it { expect(described_class.non_minimal_access).to include @requested_member }
+      it { expect(described_class.non_minimal_access).to include @accepted_request_member }
+      it { expect(described_class.non_minimal_access).not_to include @member_with_minimal_access }
     end
 
     describe '.request' do
