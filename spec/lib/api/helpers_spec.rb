@@ -190,7 +190,7 @@ RSpec.describe API::Helpers do
   end
 
   describe '#increment_unique_values' do
-    let(:value) { "9f302fea-f828-4ca9-aef4-e10bd723c0b3" }
+    let(:value) { '9f302fea-f828-4ca9-aef4-e10bd723c0b3' }
     let(:event_name) { 'my_event' }
     let(:unknown_event) { 'unknown' }
     let(:feature) { "usage_data_#{event_name}" }
@@ -222,6 +222,14 @@ RSpec.describe API::Helpers do
 
         subject.increment_unique_values(unknown_event, value)
       end
+
+      it 'log an exception for nil values' do
+        stub_application_setting(usage_ping_enabled: true)
+
+        expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{unknown_event}, message: values is empty")
+
+        subject.increment_unique_values(unknown_event, nil)
+      end
     end
 
     context 'with feature disabled' do
@@ -229,7 +237,7 @@ RSpec.describe API::Helpers do
         stub_feature_flags(feature => false)
       end
 
-      it "logs an exception" do
+      it 'logs an exception' do
         expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{event_name}, message: Feature #{feature} not enabled")
 
         subject.increment_unique_values(event_name, value)

@@ -295,7 +295,7 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    Arguments:
 
    - `event_name`: event name.
-   - `values`: values we count unique events
+   - `values`: values counted, one value or array of values.
 
    Example usage:
 
