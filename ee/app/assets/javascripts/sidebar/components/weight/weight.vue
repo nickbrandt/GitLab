@@ -74,12 +74,7 @@ export default {
       return s__('Sidebar|None');
     },
     dropdownToggleLabel() {
-      let label = this.weight;
-      if (this.checkIfNoValue(this.weight)) {
-        label = s__('Sidebar|Weight');
-      }
-
-      return label;
+      return this.checkIfNoValue(this.weight) ? s__('Sidebar|Weight') : this.weight;
     },
     shouldShowWeight() {
       return !this.fetching && !this.shouldShowEditField;
