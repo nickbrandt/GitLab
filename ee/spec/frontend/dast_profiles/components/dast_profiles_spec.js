@@ -1,7 +1,8 @@
-import { mount, shallowMount } from '@vue/test-utils';
+import { mount, shallowMount, createWrapper } from '@vue/test-utils';
 import { within } from '@testing-library/dom';
 import { merge } from 'lodash';
 import { GlDropdown } from '@gitlab/ui';
+import setWindowLocation from 'helpers/set_window_location_helper';
 import DastProfiles from 'ee/dast_profiles/components/dast_profiles.vue';
 
 const TEST_NEW_DAST_SCANNER_PROFILE_PATH = '/-/on_demand_scans/scanner_profiles/new';
@@ -81,6 +82,11 @@ describe('EE - DastProfiles', () => {
   const getDropdownComponent = () => wrapper.find(GlDropdown);
   const getSiteProfilesDropdownItem = text =>
     within(getDropdownComponent().element).queryByText(text);
+  const getTab = ({ tabName, selected }) =>
+    withinComponent().getByRole('tab', {
+      name: tabName,
+      selected,
+    });
 
   afterEach(() => {
     wrapper.destroy();
@@ -124,31 +130,69 @@ describe('EE - DastProfiles', () => {
   });
 
   describe('tabs', () => {
-    beforeEach(() => {
-      createFullComponent();
+    const originalLocation = window.location;
+
+    describe('without location hash set', () => {
+      beforeEach(() => {
+        createFullComponent();
+      });
+
+      it('shows a tab-list that contains the different profile categories', () => {
+        const tabList = withinComponent().getByRole('tablist');
+
+        expect(tabList).not.toBe(null);
+      });
+
+      it.each`
+        tabName               | shouldBeSelectedByDefault
+        ${'Site Profiles'}    | ${true}
+        ${'Scanner Profiles'} | ${false}
+      `(
+        'shows a "$tabName" tab which has "selected" set to "$shouldBeSelectedByDefault"',
+        ({ tabName, shouldBeSelectedByDefault }) => {
+          const tab = getTab({
+            tabName,
+            selected: shouldBeSelectedByDefault,
+          });
+
+          expect(tab).not.toBe(null);
+        },
+      );
     });
 
-    it('shows a tab-list that contains the different profile categories', () => {
-      const tabList = withinComponent().getByRole('tablist');
+    describe.each`
+      tabName               | givenLocationHash
+      ${'Site Profiles'}    | ${'site-profiles'}
+      ${'Scanner Profiles'} | ${'scanner-profiles'}
+    `('with location hash set to "$givenLocationHash"', ({ tabName, givenLocationHash }) => {
+      beforeEach(() => {
+        setWindowLocation(`http://foo.com/index#${givenLocationHash}`);
+        createFullComponent();
+      });
 
-      expect(tabList).not.toBe(null);
-    });
+      afterEach(() => {
+        window.location = originalLocation;
+      });
 
-    it.each`
-      tabName               | shouldBeSelectedByDefault
-      ${'Site Profiles'}    | ${true}
-      ${'Scanner Profiles'} | ${false}
-    `(
-      'shows a "$tabName" tab which has "selected" set to "$shouldBeSelectedByDefault"',
-      ({ tabName, shouldBeSelectedByDefault }) => {
-        const tab = withinComponent().getByRole('tab', {
-          name: tabName,
-          selected: shouldBeSelectedByDefault,
+      it(`has "${tabName}" selected`, () => {
+        const tab = getTab({
+          tabName,
+          selected: true,
         });
 
         expect(tab).not.toBe(null);
-      },
-    );
+      });
+
+      it('updates the browsers URL to contain the selected tab', () => {
+        window.location.hash = '';
+
+        const tab = getTab({ tabName });
+
+        createWrapper(tab).trigger('click');
+
+        expect(window.location.hash).toBe(givenLocationHash);
+      });
+    });
   });
 
   describe.each`

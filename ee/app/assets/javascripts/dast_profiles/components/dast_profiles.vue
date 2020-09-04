@@ -1,7 +1,9 @@
 <script>
 import * as Sentry from '@sentry/browser';
 import { GlDropdown, GlDropdownItem, GlTab, GlTabs } from '@gitlab/ui';
+import { camelCase, kebabCase } from 'lodash';
 import { s__ } from '~/locale';
+import { getLocationHash } from '~/lib/utils/url_utility';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import ProfilesList from './dast_profiles_list.vue';
 import * as cacheUtils from '../graphql/cache_utils';
@@ -46,11 +48,23 @@ export default {
         glFeatures,
       );
     },
+    tabIndex: {
+      get() {
+        const activeTabIndex = Object.keys(this.profileSettings).indexOf(
+          camelCase(getLocationHash()),
+        );
+
+        return Math.max(0, activeTabIndex);
+      },
+    },
   },
   created() {
     this.addSmartQueriesForEnabledProfileTypes();
   },
   methods: {
+    setLocationHash(profileType) {
+      window.location.hash = kebabCase(profileType);
+    },
     addSmartQueriesForEnabledProfileTypes() {
       Object.values(this.profileSettings).forEach(({ profileType, graphQL: { query } }) => {
         this.makeProfileTypeReactive(profileType);
@@ -227,10 +241,14 @@ export default {
       </p>
     </header>
 
-    <gl-tabs>
-      <gl-tab v-for="(data, profileType) in profileSettings" :key="profileType">
+    <gl-tabs v-model="tabIndex">
+      <gl-tab
+        v-for="(settings, profileType) in profileSettings"
+        :key="profileType"
+        @click="setLocationHash(profileType)"
+      >
         <template #title>
-          <span>{{ profileSettings[profileType].i18n.tabName }}</span>
+          <span>{{ settings.i18n.tabName }}</span>
         </template>
 
         <profiles-list
@@ -241,7 +259,7 @@ export default {
           :is-loading="isLoadingProfiles(profileType)"
           :profiles-per-page="$options.profilesPerPage"
           :profiles="profileTypes[profileType].profiles"
-          :fields="profileSettings[profileType].tableFields"
+          :fields="settings.tableFields"
           @load-more-profiles="fetchMoreProfiles(profileType)"
           @delete-profile="deleteProfile(profileType, $event)"
         />
