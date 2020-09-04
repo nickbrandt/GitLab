@@ -43,7 +43,7 @@ describe('Design management design sidebar component', () => {
   const findNewDiscussionDisclaimer = () =>
     wrapper.find('[data-testid="new-discussion-disclaimer"]');
 
-  function createComponent(props = {}) {
+  function createComponent(props = {}, { enableTodoButton } = {}) {
     wrapper = shallowMount(DesignSidebar, {
       propsData: {
         design,
@@ -58,6 +58,9 @@ describe('Design management design sidebar component', () => {
         },
       },
       stubs: { GlPopover },
+      provide: {
+        glFeatures: { designManagementTodoButton: enableTodoButton },
+      },
     });
   }
 
@@ -250,12 +253,7 @@ describe('Design management design sidebar component', () => {
 
   describe('when `design_management_todo_button` feature flag is enabled', () => {
     beforeEach(() => {
-      window.gon = {
-        features: {
-          designManagementTodoButton: true,
-        },
-      };
-      createComponent();
+      createComponent({}, { enableTodoButton: true });
     });
 
     it('renders sidebar root element with no top padding', () => {
