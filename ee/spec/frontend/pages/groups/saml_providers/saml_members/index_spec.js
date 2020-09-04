@@ -71,7 +71,7 @@ describe('SAML providers members app', () => {
       const changeFn = wrapper.find(TablePagination).props('change');
       changeFn(2);
       return wrapper.vm.$nextTick(() => {
-        expect(fetchPageMock).toHaveBeenCalledWith(expect.anything(), 2, undefined);
+        expect(fetchPageMock).toHaveBeenCalledWith(expect.anything(), 2);
       });
     });
   });

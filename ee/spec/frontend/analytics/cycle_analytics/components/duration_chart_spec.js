@@ -105,7 +105,6 @@ describe('DurationChart', () => {
       expect(actionSpies.updateSelectedDurationChartStages).toHaveBeenCalledWith(
         expect.any(Object),
         selectedStages,
-        undefined,
       );
     });
   });

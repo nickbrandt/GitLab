@@ -80,7 +80,6 @@ describe('GeoNodeFormNamespaces', () => {
           expect(actionSpies.fetchSyncNamespaces).toHaveBeenCalledWith(
             expect.any(Object),
             namespaceSearch,
-            undefined,
           );
         });
       });

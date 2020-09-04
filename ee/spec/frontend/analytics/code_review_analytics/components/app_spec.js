@@ -241,7 +241,7 @@ describe('CodeReviewAnalyticsApp component', () => {
     });
 
     it('should call the setPage action', () => {
-      expect(setPage).toHaveBeenCalledWith(expect.anything(), 2, undefined);
+      expect(setPage).toHaveBeenCalledWith(expect.anything(), 2);
     });
 
     it('should call fetchMergeRequests action', () => {

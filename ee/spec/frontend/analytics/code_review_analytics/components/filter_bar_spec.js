@@ -115,14 +115,10 @@ describe('FilteredSearchBar', () => {
 
       expect(utils.processFilters).toHaveBeenCalledWith(filters);
 
-      expect(setFiltersMock).toHaveBeenCalledWith(
-        expect.anything(),
-        {
-          selectedLabelList: [{ value: 'my-label', operator: '=' }],
-          selectedMilestone: { value: 'my-milestone', operator: '=' },
-        },
-        undefined,
-      );
+      expect(setFiltersMock).toHaveBeenCalledWith(expect.anything(), {
+        selectedLabelList: [{ value: 'my-label', operator: '=' }],
+        selectedMilestone: { value: 'my-milestone', operator: '=' },
+      });
     });
   });
 });
