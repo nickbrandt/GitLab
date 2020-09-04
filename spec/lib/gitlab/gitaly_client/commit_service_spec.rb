@@ -12,6 +12,8 @@ RSpec.describe Gitlab::GitalyClient::CommitService do
   let(:commit) { project.commit(revision) }
   let(:client) { described_class.new(repository) }
 
+  stub_feature_flags(increased_default_max_patch_bytes: false)
+
   describe '#diff_from_parent' do
     context 'when a commit has a parent' do
       it 'sends an RPC request with the parent ID as left commit' do

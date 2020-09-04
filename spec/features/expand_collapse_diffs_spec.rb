@@ -12,6 +12,8 @@ RSpec.describe 'Expand and collapse diffs', :js do
     allow(Gitlab::Git::Diff).to receive(:size_limit).and_return(100.kilobytes)
     allow(Gitlab::Git::Diff).to receive(:collapse_limit).and_return(10.kilobytes)
 
+    stub_feature_flags(increased_default_max_patch_bytes: false)
+
     sign_in(create(:admin))
 
     # Ensure that undiffable.md is in .gitattributes

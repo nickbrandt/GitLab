@@ -724,6 +724,10 @@ RSpec.describe ApplicationSetting do
   context 'diff limit settings' do
     describe '#diff_max_patch_bytes' do
       context 'validations' do
+        before do
+          stub_feature_flags(increased_default_max_patch_bytes: false)
+        end
+
         it { is_expected.to validate_presence_of(:diff_max_patch_bytes) }
 
         it do
