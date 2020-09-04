@@ -15,15 +15,7 @@ module Ci
 
     def execute
       builds = init_collection.order_id_desc
-
-      if params[:scope].is_a?(Array)
-        unknown = params[:scope] - ::CommitStatus::AVAILABLE_STATUSES
-        raise ArgumentError, 'Scope contains invalid value(s)' unless unknown.empty?
-
-        builds.where(status: params[:scope]) # rubocop: disable CodeReuse/ActiveRecord
-      else
-        filter_by_scope(builds)
-      end
+      filter_by_scope(builds)
     rescue Gitlab::Access::AccessDeniedError
       type.none
     end
@@ -57,6 +49,8 @@ module Ci
     end
 
     def filter_by_scope(builds)
+      return filter_by_statuses!(params[:scope], builds) if params[:scope].is_a?(Array)
+
       case params[:scope]
       when 'pending'
         builds.pending.reverse_order
@@ -67,6 +61,13 @@ module Ci
       else
         builds
       end
+    end
+
+    def filter_by_statuses!(statuses, builds)
+      unknown_statuses = params[:scope] - ::CommitStatus::AVAILABLE_STATUSES
+      raise ArgumentError, 'Scope contains invalid value(s)' unless unknown_statuses.empty?
+
+      builds.where(status: params[:scope]) # rubocop: disable CodeReuse/ActiveRecord
     end
 
     def jobs_by_type(relation, type)

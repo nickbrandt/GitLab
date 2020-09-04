@@ -21,8 +21,6 @@ module Ci
 
     validates :ref, presence: true
 
-    scope :order_id_desc, -> { order('ci_builds.id DESC') }
-
     # rubocop:disable Cop/ActiveRecordSerialize
     serialize :options
     serialize :yaml_variables, ::Gitlab::Serializer::Ci::Variables

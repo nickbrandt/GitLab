@@ -175,7 +175,6 @@ module Ci
     end
 
     scope :queued_before, ->(time) { where(arel_table[:queued_at].lt(time)) }
-    scope :order_id_desc, -> { order('ci_builds.id DESC') }
 
     scope :preload_project_and_pipeline_project, -> do
       preload(Ci::Pipeline::PROJECT_ROUTE_AND_NAMESPACE_ROUTE,
