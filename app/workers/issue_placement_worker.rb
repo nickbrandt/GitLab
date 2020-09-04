@@ -27,6 +27,7 @@ class IssuePlacementWorker
       .limit(QUERY_LIMIT)
 
     Issue.move_nulls_to_end(to_place.to_a.reverse)
+    Issues::BaseService.new(nil).rebalance_if_needed(to_place.max_by(&:relative_position))
   rescue RelativePositioning::NoSpaceLeft => e
     Gitlab::ErrorTracking.log_exception(e, issue_id: issue_id)
     IssueRebalancingWorker.perform_async(nil, issue.project_id)

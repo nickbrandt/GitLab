@@ -5,16 +5,19 @@ require 'spec_helper'
 RSpec.describe IssuePlacementWorker do
   describe '#perform' do
     let_it_be(:time) { Time.now.utc }
-    let_it_be(:project) { create_default(:project) }
-    let_it_be(:issue) { create(:issue, relative_position: nil, created_at: time) }
-    let_it_be(:issue_a) { create(:issue, relative_position: nil, created_at: time - 1.minute) }
-    let_it_be(:issue_b) { create(:issue, relative_position: nil, created_at: time - 6.minutes) }
-    let_it_be(:issue_c) { create(:issue, relative_position: nil, created_at: time + 1.minute) }
-    let_it_be(:issue_d) { create(:issue, relative_position: nil, created_at: time + 6.minutes) }
-    let_it_be(:issue_e) { create(:issue, relative_position: 10, created_at: time + 3.minutes) }
-    let_it_be(:issue_f) { create(:issue, relative_position: nil, created_at: time + 1.minute) }
+    let_it_be(:project) { create(:project) }
+    let_it_be(:author) { create(:user) }
+    let_it_be(:common_attrs) { { author: author, project: project } }
+    let_it_be(:unplaced) { common_attrs.merge(relative_position: nil) }
+    let_it_be(:issue) { create(:issue, **unplaced, created_at: time) }
+    let_it_be(:issue_a) { create(:issue, **unplaced, created_at: time - 1.minute) }
+    let_it_be(:issue_b) { create(:issue, **unplaced, created_at: time - 2.minutes) }
+    let_it_be(:issue_c) { create(:issue, **unplaced, created_at: time + 1.minute) }
+    let_it_be(:issue_d) { create(:issue, **unplaced, created_at: time + 2.minutes) }
+    let_it_be(:issue_e) { create(:issue, **common_attrs, relative_position: 10, created_at: time + 1.minute) }
+    let_it_be(:issue_f) { create(:issue, **unplaced, created_at: time + 1.minute) }
 
-    let_it_be(:irrelevant) { create(:issue, project: create(:project), relative_position: nil, created_at: time) }
+    let_it_be(:irrelevant) { create(:issue, relative_position: nil, created_at: time) }
 
     it 'places all issues created at most 5 minutes before this one at the end, most recent last' do
       expect do
@@ -26,10 +29,18 @@ RSpec.describe IssuePlacementWorker do
       expect(project.issues.where(relative_position: nil)).not_to exist
     end
 
-    it 'limits the sweep to QUERY_LIMIT records' do
-      issues = create_list(:issue, described_class::QUERY_LIMIT + 1, relative_position: nil)
+    it 'schedules rebalancing if needed' do
+      issue_a.update!(relative_position: RelativePositioning::MAX_POSITION)
 
-      described_class.new.perform(issues.first.id)
+      expect(IssueRebalancingWorker).to receive(:perform_async).with(nil, project.id)
+
+      described_class.new.perform(issue.id)
+    end
+
+    it 'limits the sweep to QUERY_LIMIT records' do
+      create_list(:issue, described_class::QUERY_LIMIT - 5, **unplaced)
+
+      described_class.new.perform(issue.id)
 
       expect(project.issues.where(relative_position: nil)).to exist
     end
