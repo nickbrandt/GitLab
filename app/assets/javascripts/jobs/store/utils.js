@@ -17,7 +17,7 @@ export const parseLine = (line = {}, lineNumber) => ({
  * @param Number lineNumber
  */
 export const parseHeaderLine = (line = {}, lineNumber) => ({
-  isClosed: false,
+  isClosed: line.section_options ? line.section_options.collapsed === 'true' : false,
   isHeader: true,
   line: parseLine(line, lineNumber),
   lines: [],
