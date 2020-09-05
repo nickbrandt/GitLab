@@ -11,11 +11,11 @@ RSpec.shared_context 'ProjectPolicy context' do
 
   let(:base_guest_permissions) do
     %i[
-      read_project read_board read_list read_wiki read_issue
-      read_project_for_iids read_issue_iid read_label
-      read_milestone read_snippet read_project_member read_note
-      create_project create_issue create_note upload_file create_merge_request_in
-      award_emoji
+      award_emoji create_issue create_merge_request_in create_note
+      create_project read_board read_issue read_issue_iid read_issue_link
+      read_label read_list read_milestone read_note read_project
+      read_project_for_iids read_project_member read_release read_snippet
+      read_wiki upload_file
     ]
   end
 
