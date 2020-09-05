@@ -14,10 +14,6 @@ RSpec.describe ProjectPolicy do
   let_it_be(:admin) { create(:admin) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
-  let(:team_member_reporter_permissions) do
-    %i[build_download_code build_read_container_image]
-  end
-
   let(:developer_permissions) do
     %i[
       admin_tag admin_milestone admin_merge_request update_merge_request create_commit_status
