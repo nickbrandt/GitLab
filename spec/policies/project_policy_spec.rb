@@ -14,17 +14,6 @@ RSpec.describe ProjectPolicy do
   let_it_be(:admin) { create(:admin) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
-  let(:base_maintainer_permissions) do
-    %i[
-      push_to_delete_protected_branch update_snippet
-      admin_snippet admin_project_member admin_note admin_wiki admin_project
-      admin_commit_status admin_build admin_container_image
-      admin_pipeline admin_environment admin_deployment destroy_release add_cluster
-      read_deploy_token create_deploy_token destroy_deploy_token
-      admin_terraform_state
-    ]
-  end
-
   let(:public_permissions) do
     %i[
       download_code fork_project read_commit_status read_pipeline
