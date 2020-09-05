@@ -14,14 +14,6 @@ RSpec.describe ProjectPolicy do
   let_it_be(:admin) { create(:admin) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
-  let(:owner_permissions) do
-    %i[
-      change_namespace change_visibility_level rename_project remove_project
-      archive_project remove_fork_project destroy_merge_request destroy_issue
-      set_issue_iid set_issue_created_at set_issue_updated_at set_note_created_at
-    ]
-  end
-
   # Used in EE specs
   let(:additional_guest_permissions) { [] }
   let(:additional_reporter_permissions) { [] }

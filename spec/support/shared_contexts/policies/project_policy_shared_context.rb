@@ -68,9 +68,10 @@ RSpec.shared_context 'ProjectPolicy context' do
 
   let(:base_owner_permissions) do
     %i[
-      change_namespace change_visibility_level rename_project remove_project
-      archive_project remove_fork_project destroy_merge_request destroy_issue
-      set_issue_iid set_issue_created_at set_issue_updated_at set_note_created_at
+      archive_project change_namespace change_visibility_level destroy_issue
+      destroy_merge_request remove_fork_project remove_project rename_project
+      set_issue_created_at set_issue_iid set_issue_updated_at
+      set_note_created_at
     ]
   end
 
