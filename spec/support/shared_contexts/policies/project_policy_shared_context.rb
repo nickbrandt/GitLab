@@ -60,9 +60,9 @@ RSpec.shared_context 'ProjectPolicy context' do
 
   let(:public_permissions) do
     %i[
-      download_code fork_project read_commit_status read_pipeline
-      read_container_image build_download_code build_read_container_image
-      download_wiki_code read_release
+      build_download_code build_read_container_image download_code
+      download_wiki_code fork_project read_commit_status read_container_image
+      read_pipeline read_release
     ]
   end
 

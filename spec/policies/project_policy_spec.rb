@@ -14,14 +14,6 @@ RSpec.describe ProjectPolicy do
   let_it_be(:admin) { create(:admin) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
-  let(:public_permissions) do
-    %i[
-      download_code fork_project read_commit_status read_pipeline
-      read_container_image build_download_code build_read_container_image
-      download_wiki_code read_release
-    ]
-  end
-
   let(:owner_permissions) do
     %i[
       change_namespace change_visibility_level rename_project remove_project
