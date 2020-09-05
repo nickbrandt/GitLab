@@ -65,6 +65,7 @@ RSpec.describe ProjectPolicy do
         read_project_security_dashboard read_vulnerability read_vulnerability_scanner
         read_software_license_policy
         read_threat_monitoring read_merge_train
+        read_release
       ]
     end
 
