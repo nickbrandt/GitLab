@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe ProjectPolicy do
   include ExternalAuthorizationServiceHelpers
   include_context 'ProjectPolicy context'
+
   let_it_be(:other_user) { create(:user) }
   let_it_be(:guest) { create(:user) }
   let_it_be(:reporter) { create(:user) }
@@ -13,15 +14,6 @@ RSpec.describe ProjectPolicy do
   let_it_be(:owner) { create(:user) }
   let_it_be(:admin) { create(:admin) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
-
-  # Used in EE specs
-  let(:additional_guest_permissions) { [] }
-  let(:additional_reporter_permissions) { [] }
-  let(:additional_maintainer_permissions) { [] }
-
-  let(:guest_permissions) { base_guest_permissions + additional_guest_permissions }
-  let(:reporter_permissions) { base_reporter_permissions + additional_reporter_permissions }
-  let(:maintainer_permissions) { base_maintainer_permissions + additional_maintainer_permissions }
 
   before do
     project.add_guest(guest)
