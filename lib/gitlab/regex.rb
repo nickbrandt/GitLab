@@ -221,7 +221,7 @@ module Gitlab
     end
 
     def build_trace_section_regex
-      @build_trace_section_regexp ||= /section_((?:start)|(?:end)):(\d+):([a-zA-Z0-9_.-]+)\r\033\[0K/.freeze
+      @build_trace_section_regexp ||= /section_((?:start)|(?:end)):(\d+):([a-zA-Z0-9_.-]+)(\[(?:\w+=\w+)(?:, ?(?:\w+=\w+))*\])?\r\033\[0K/.freeze
     end
 
     def markdown_code_or_html_blocks
