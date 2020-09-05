@@ -11,10 +11,6 @@ module API
       'issues' => ->(iid) { find_project_issue(iid) }
     }.freeze
 
-    rescue_from ArgumentError do |e|
-      render_api_error!(e.message, 400)
-    end
-
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
@@ -43,8 +39,19 @@ module API
 
     resource :todos do
       helpers do
+        params :todo_filters do
+          optional :action_id, Integer
+          optional :action, Array[String], values: Todo::ACTION_NAMES.values.map(&:to_s)
+          optional :author_id, Integer
+          optional :state, String, values: Todo.state_machine.states.map(&:name).map(&:to_s)
+          optional :target_id, Integer
+          optional :type, Array[String], values: TodosFinder.todo_types
+          optional :project_id, Integer
+          optional :group_id, Integer
+        end
+
         def find_todos
-          TodosFinder.new(current_user, params).execute
+          TodosFinder.new(current_user, declared_params(include_missing: false)).execute
         end
 
         def issuable_and_awardable?(type)
@@ -76,7 +83,7 @@ module API
         success Entities::Todo
       end
       params do
-        use :pagination
+        use :pagination, :todo_filters
       end
       get do
         todos = paginate(find_todos.with_entity_associations)
