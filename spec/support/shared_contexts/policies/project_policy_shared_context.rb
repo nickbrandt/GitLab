@@ -21,10 +21,12 @@ RSpec.shared_context 'ProjectPolicy context' do
 
   let(:base_reporter_permissions) do
     %i[
-      download_code fork_project create_snippet update_issue
-      admin_issue admin_label admin_list read_commit_status read_build
-      read_container_image read_pipeline read_environment read_deployment
-      read_merge_request download_wiki_code read_sentry_issue read_prometheus
+      admin_issue admin_issue_link admin_label admin_list create_snippet
+      download_code download_wiki_code fork_project metrics_dashboard
+      read_build read_commit_status read_confidential_issues
+      read_container_image read_deployment read_environment read_merge_request
+      read_metrics_dashboard_annotation read_pipeline read_prometheus
+      read_sentry_issue update_issue
     ]
   end
 
