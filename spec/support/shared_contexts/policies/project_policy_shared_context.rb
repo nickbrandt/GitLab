@@ -36,12 +36,15 @@ RSpec.shared_context 'ProjectPolicy context' do
 
   let(:developer_permissions) do
     %i[
-      admin_milestone admin_merge_request update_merge_request create_commit_status
-      update_commit_status create_build update_build create_pipeline
-      update_pipeline create_merge_request_from create_wiki push_code
-      resolve_note create_container_image update_container_image
-      create_environment create_deployment update_deployment create_release update_release
-      update_environment daily_statistics
+      admin_merge_request admin_milestone admin_tag create_build
+      create_commit_status create_container_image create_deployment
+      create_environment create_merge_request_from
+      create_metrics_dashboard_annotation create_pipeline create_release
+      create_wiki daily_statistics delete_metrics_dashboard_annotation
+      destroy_container_image push_code read_pod_logs read_terraform_state
+      resolve_note update_build update_commit_status update_container_image
+      update_deployment update_environment update_merge_request
+      update_metrics_dashboard_annotation update_pipeline update_release
     ]
   end
 

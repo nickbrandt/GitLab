@@ -14,18 +14,6 @@ RSpec.describe ProjectPolicy do
   let_it_be(:admin) { create(:admin) }
   let(:project) { create(:project, :public, namespace: owner.namespace) }
 
-  let(:developer_permissions) do
-    %i[
-      admin_tag admin_milestone admin_merge_request update_merge_request create_commit_status
-      update_commit_status create_build update_build create_pipeline
-      update_pipeline create_merge_request_from create_wiki push_code
-      resolve_note create_container_image update_container_image destroy_container_image daily_statistics
-      create_environment update_environment create_deployment update_deployment create_release update_release
-      create_metrics_dashboard_annotation delete_metrics_dashboard_annotation update_metrics_dashboard_annotation
-      read_terraform_state read_pod_logs
-    ]
-  end
-
   let(:base_maintainer_permissions) do
     %i[
       push_to_delete_protected_branch update_snippet
