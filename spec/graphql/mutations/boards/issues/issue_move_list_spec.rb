@@ -61,6 +61,28 @@ RSpec.describe Mutations::Boards::Issues::IssueMoveList do
         expect(issue1.relative_position).to be < existing_issue2.relative_position
         expect(issue1.relative_position).to be > existing_issue1.relative_position
       end
+
+      context 'when only repositioning the issue' do
+        let_it_be(:issue2) { create(:labeled_issue, project: project, labels: [development], relative_position: 50) }
+        let(:move_params) { {} }
+
+        it 'repositions the issue when only move_before_id is present' do
+          move_params[:move_before_id] = issue2.id
+          issue1.update!(relative_position: 100)
+          subject
+
+          expect(issue1.reload.labels).to eq([development])
+          expect(issue1.relative_position).to be < issue2.relative_position
+        end
+
+        it 'repositions the issue when only move_after_id is present' do
+          move_params[:move_after_id] = issue2.id
+          subject
+
+          expect(issue1.reload.labels).to eq([development])
+          expect(issue1.relative_position).to be > issue2.relative_position
+        end
+      end
     end
 
     context 'when user have no access to resources' do

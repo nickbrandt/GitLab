@@ -36,7 +36,9 @@ module Mutations
                   description: 'ID of issue after which the current issue will be positioned at'
 
         def ready?(**args)
-          if move_arguments(args).blank?
+          move_arguments = args.slice(:from_list_id, :to_list_id, :move_before_id, :move_after_id)
+
+          if move_arguments.blank?
             raise Gitlab::Graphql::Errors::ArgumentError,
                   'At least one of the arguments fromListId, toListId, afterId or beforeId is required'
           end
@@ -54,7 +56,9 @@ module Mutations
           authorize_board!(board)
 
           issue = authorized_find!(project_path: args[:project_path], iid: args[:iid])
-          move_params = { id: issue.id, board_id: board.id }.merge(move_arguments(args))
+          move_params = { id: issue.id, board_id: board.id }
+            .merge(move_list_arguments(args))
+            .merge(reposition_arguments(args))
 
           move_issue(board, issue, move_params)
 
@@ -76,8 +80,11 @@ module Mutations
           args.slice(:from_list_id, :to_list_id)
         end
 
-        def move_arguments(args)
-          args.slice(:from_list_id, :to_list_id, :move_after_id, :move_before_id)
+        def reposition_arguments(args)
+          {
+            move_after_id: args[:move_before_id],
+            move_before_id: args[:move_after_id]
+          }
         end
 
         def authorize_board!(board)
