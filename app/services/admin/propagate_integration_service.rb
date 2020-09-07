@@ -52,16 +52,16 @@ module Admin
 
     def create_integration_for_projects_without_integration
       loop do
-        batch = Project.uncached { Project.ids_without_integration(integration, BATCH_SIZE) }
+        batch_ids = Project.uncached { Project.ids_without_integration(integration, BATCH_SIZE) }
 
-        bulk_create_from_integration(batch) unless batch.empty?
+        bulk_create_from_integration(batch_ids) unless batch_ids.empty?
 
-        break if batch.size < BATCH_SIZE
+        break if batch_ids.size < BATCH_SIZE
       end
     end
 
-    def bulk_create_from_integration(batch)
-      service_list = ServiceList.new(batch, service_hash).to_array
+    def bulk_create_from_integration(batch_ids)
+      service_list = ServiceList.new(batch_ids, service_hash).to_array
 
       Project.transaction do
         results = bulk_insert(*service_list)
@@ -72,7 +72,7 @@ module Admin
           bulk_insert(*data_list)
         end
 
-        run_callbacks(batch)
+        run_callbacks(batch_ids)
       end
     end
 
@@ -83,13 +83,13 @@ module Admin
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def run_callbacks(batch)
+    def run_callbacks(batch_ids)
       if integration.issue_tracker?
-        Project.where(id: batch).update_all(has_external_issue_tracker: true)
+        Project.where(id: batch_ids).update_all(has_external_issue_tracker: true)
       end
 
       if active_external_wiki?
-        Project.where(id: batch).update_all(has_external_wiki: true)
+        Project.where(id: batch_ids).update_all(has_external_wiki: true)
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
