@@ -47,7 +47,7 @@ module Backup
         return
       end
 
-      directory = connect_to_remote_directory(connection_settings)
+      directory = connect_to_remote_directory(Gitlab.config.backup.upload)
 
       if directory.files.create(create_attributes)
         progress.puts "done".color(:green)
@@ -195,11 +195,11 @@ module Backup
       @backup_file_list.map {|item| item.gsub("#{FILE_NAME_SUFFIX}", "")}
     end
 
-    def connect_to_remote_directory(connection_settings)
-      settings = connection_settings.symbolize_keys
-      load_provider(settings)
-      # our settings use string keys, but Fog expects symbols
-      connection = ::Fog::Storage.new(settings)
+    def connect_to_remote_directory(options)
+      config = ObjectStorage::Config.new(options)
+      config.load_provider
+
+      connection = ::Fog::Storage.new(config.credentials)
 
       # We only attempt to create the directory for local backups. For AWS
       # and other cloud providers, we cannot guarantee the user will have
@@ -209,14 +209,6 @@ module Backup
       else
         connection.directories.new(key: remote_directory)
       end
-    end
-
-    def load_provider(settings)
-      provider = settings[:provider]
-
-      return unless provider.present?
-
-      require 'fog/azurerm' if provider == 'AzureRM'
     end
 
     def remote_directory
