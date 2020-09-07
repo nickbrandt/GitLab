@@ -11,10 +11,7 @@ module Projects
     end
 
     def edit
-      @site_profile = @project
-        .dast_site_profiles
-        .with_dast_site
-        .find(params[:id])
+      @site_profile = DastSiteProfilesFinder.new(project_id: @project.id, id: params[:id]).execute.first! # rubocop: disable CodeReuse/ActiveRecord
     end
   end
 end
