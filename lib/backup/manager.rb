@@ -196,8 +196,10 @@ module Backup
     end
 
     def connect_to_remote_directory(connection_settings)
+      settings = connection_settings.symbolize_keys
+      load_provider(settings)
       # our settings use string keys, but Fog expects symbols
-      connection = ::Fog::Storage.new(connection_settings.symbolize_keys)
+      connection = ::Fog::Storage.new(settings)
 
       # We only attempt to create the directory for local backups. For AWS
       # and other cloud providers, we cannot guarantee the user will have
@@ -207,6 +209,14 @@ module Backup
       else
         connection.directories.new(key: remote_directory)
       end
+    end
+
+    def load_provider(settings)
+      provider = settings[:provider]
+
+      return unless provider.present?
+
+      require 'fog/azurerm' if provider == 'AzureRM'
     end
 
     def remote_directory
