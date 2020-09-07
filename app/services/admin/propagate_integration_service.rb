@@ -63,7 +63,7 @@ module Admin
     def bulk_create_from_integration(batch_ids)
       service_list = ServiceList.new(batch_ids, service_hash).to_array
 
-      Project.transaction do
+      Service.transaction do
         results = bulk_insert(*service_list)
 
         if data_fields_present?
