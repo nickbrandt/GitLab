@@ -189,6 +189,12 @@ module Issuable
       is_a?(Issue) && super
     end
 
+    def severity
+      return IssuableSeverity::DEFAULT unless incident?
+
+      issuable_severity&.severity || IssuableSeverity::DEFAULT
+    end
+
     private
 
     def description_max_length_for_new_records_is_valid

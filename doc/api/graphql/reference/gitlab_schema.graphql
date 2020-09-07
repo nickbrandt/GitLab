@@ -5680,6 +5680,11 @@ type EpicIssue implements Noteable {
   relativePosition: Int
 
   """
+  Severity level of the incident
+  """
+  severity: IssuableSeverity
+
+  """
   State of the issue
   """
   state: IssueState!
@@ -7269,6 +7274,36 @@ type InstanceSecurityDashboard {
 }
 
 """
+Incident severity
+"""
+enum IssuableSeverity {
+  """
+  Critical severity
+  """
+  CRITICAL
+
+  """
+  High severity
+  """
+  HIGH
+
+  """
+  Low severity
+  """
+  LOW
+
+  """
+  Medium severity
+  """
+  MEDIUM
+
+  """
+  Unknown severity
+  """
+  UNKNOWN
+}
+
+"""
 State of a GitLab issue or merge request
 """
 enum IssuableState {
@@ -7513,6 +7548,11 @@ type Issue implements Noteable {
   Relative position of the issue (used for positioning in epic tree and issue boards)
   """
   relativePosition: Int
+
+  """
+  Severity level of the incident
+  """
+  severity: IssuableSeverity
 
   """
   State of the issue
