@@ -4,29 +4,29 @@ module Admin
   class PropagateServiceTemplate
     BATCH_SIZE = 100
 
-    delegate :data_fields_present?, to: :template
+    delegate :data_fields_present?, to: :integration
 
-    def self.propagate(template)
-      new(template).propagate
+    def self.propagate(integration)
+      new(integration).propagate
     end
 
-    def initialize(template)
-      @template = template
+    def initialize(integration)
+      @integration = integration
     end
 
     def propagate
-      return unless template.active?
+      return unless integration.active?
 
       propagate_projects_with_template
     end
 
     private
 
-    attr_reader :template
+    attr_reader :integration
 
     def propagate_projects_with_template
       loop do
-        batch_ids = Project.uncached { Project.ids_without_integration(template, BATCH_SIZE) }
+        batch_ids = Project.uncached { Project.ids_without_integration(integration, BATCH_SIZE) }
 
         bulk_create_from_template(batch_ids) unless batch_ids.empty?
 
@@ -41,7 +41,7 @@ module Admin
         results = bulk_insert(*service_list)
 
         if data_fields_present?
-          data_list = DataList.new(results, data_fields_hash, template.data_fields.class).to_array
+          data_list = DataList.new(results, data_fields_hash, integration.data_fields.class).to_array
 
           bulk_insert(*data_list)
         end
@@ -57,16 +57,16 @@ module Admin
     end
 
     def service_hash
-      @service_hash ||= template.to_service_hash
+      @service_hash ||= integration.to_service_hash
     end
 
     def data_fields_hash
-      @data_fields_hash ||= template.to_data_fields_hash
+      @data_fields_hash ||= integration.to_data_fields_hash
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
     def run_callbacks(batch_ids)
-      if template.issue_tracker?
+      if integration.issue_tracker?
         Project.where(id: batch_ids).update_all(has_external_issue_tracker: true)
       end
 
@@ -77,7 +77,7 @@ module Admin
     # rubocop: enable CodeReuse/ActiveRecord
 
     def active_external_wiki?
-      template.type == 'ExternalWikiService'
+      integration.type == 'ExternalWikiService'
     end
   end
 end
