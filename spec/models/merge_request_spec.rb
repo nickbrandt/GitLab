@@ -4145,4 +4145,22 @@ RSpec.describe MergeRequest, factory_default: :keep do
         .with_arguments(allow_nil: true)
     end
   end
+
+  describe '#allows_reviewers?' do
+    it 'returns false without merge_request_reviewers feature' do
+      stub_feature_flags(merge_request_reviewers: false)
+
+      merge_request = build_stubbed(:merge_request)
+
+      expect(merge_request.allows_reviewers?).to be(false)
+    end
+
+    it 'returns true with merge_request_reviewers feature' do
+      stub_feature_flags(merge_request_reviewers: true)
+
+      merge_request = build_stubbed(:merge_request)
+
+      expect(merge_request.allows_reviewers?).to be(true)
+    end
+  end
 end
