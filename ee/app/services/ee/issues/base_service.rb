@@ -31,7 +31,8 @@ module EE
       def set_epic_param(issue)
         return unless epic_param_present?
 
-        epic = epic_param || find_epic(issue)
+        epic_id = params.delete(:epic_id)
+        epic = epic_param || find_epic(issue, epic_id)
 
         unless epic
           params[:epic] = nil
@@ -45,8 +46,7 @@ module EE
         params[:epic] = epic
       end
 
-      def find_epic(issue)
-        epic_id = params.delete(:epic_id)
+      def find_epic(issue, epic_id)
         return if epic_id.to_i == 0
 
         group = issue.project.group

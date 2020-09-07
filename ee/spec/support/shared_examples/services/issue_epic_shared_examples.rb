@@ -61,6 +61,31 @@ RSpec.shared_examples 'issue with epic_id parameter' do
       end
     end
 
+    context 'when epic param is also present' do
+      context 'when epic_id belongs to another valid epic' do
+        let(:other_epic) { create(:epic, group: group) }
+        let(:params) { { title: 'issue1', epic: epic, epic_id: other_epic.id } }
+
+        it 'creates epic issue link based on the epic param' do
+          issue = execute
+
+          expect(issue.reload).to be_persisted
+          expect(issue.epic).to eq(epic)
+        end
+      end
+
+      context 'when epic_id is empty' do
+        let(:params) { { title: 'issue1', epic: epic, epic_id: '' } }
+
+        it 'creates epic issue link based on the epic param' do
+          issue = execute
+
+          expect(issue.reload).to be_persisted
+          expect(issue.epic).to eq(epic)
+        end
+      end
+    end
+
     context 'when a project is from a subgroup of the epic group' do
       before do
         subgroup = create(:group, parent: group)
