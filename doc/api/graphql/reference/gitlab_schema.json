@@ -15513,6 +15513,20 @@
               "deprecationReason": null
             },
             {
+              "name": "severity",
+              "description": "Severity level of the incident",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "ENUM",
+                "name": "IssuableSeverity",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "state",
               "description": "State of the issue",
               "args": [
@@ -19425,6 +19439,47 @@
         },
         {
           "kind": "ENUM",
+          "name": "IssuableSeverity",
+          "description": "Incident severity",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "UNKNOWN",
+              "description": "Unknown severity",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "LOW",
+              "description": "Low severity",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "MEDIUM",
+              "description": "Medium severity",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "HIGH",
+              "description": "High severity",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "CRITICAL",
+              "description": "Critical severity",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
           "name": "IssuableState",
           "description": "State of a GitLab issue or merge request",
           "fields": null,
@@ -20070,6 +20125,20 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "severity",
+              "description": "Severity level of the incident",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "ENUM",
+                "name": "IssuableSeverity",
                 "ofType": null
               },
               "isDeprecated": false,
