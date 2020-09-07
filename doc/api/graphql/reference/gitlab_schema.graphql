@@ -7665,12 +7665,12 @@ input IssueMoveListInput {
   iid: String!
 
   """
-  ID of issue after which the current issue will be positioned at
+  ID of issue that should be placed after the current issue
   """
   moveAfterId: ID
 
   """
-  ID of issue before which the current issue will be positioned at
+  ID of issue that should be placed before the current issue
   """
   moveBeforeId: ID
 
