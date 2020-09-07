@@ -24,6 +24,8 @@ class GitlabSubscription < ApplicationRecord
     with_hosted_plan(Plan::PAID_HOSTED_PLANS)
   end
 
+  scope :preload_for_refresh_seat, -> { preload([{ namespace: :route }, :hosted_plan]) }
+
   DAYS_AFTER_EXPIRATION_BEFORE_REMOVING_FROM_INDEX = 7
 
   # We set a 7 days as the threshold for expiration before removing them from
