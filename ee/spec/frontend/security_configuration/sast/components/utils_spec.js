@@ -1,8 +1,9 @@
 import {
   isValidConfigurationEntity,
+  isValidAnalyzerEntity,
   extractSastConfigurationEntities,
 } from 'ee/security_configuration/sast/components/utils';
-import { makeEntities } from './helpers';
+import { makeEntities, makeAnalyzerEntities } from './helpers';
 
 describe('isValidConfigurationEntity', () => {
   const validEntities = makeEntities(3);
@@ -26,6 +27,30 @@ describe('isValidConfigurationEntity', () => {
 
   it.each(invalidEntities)('returns false for an invalid entity', invalidEntity => {
     expect(isValidConfigurationEntity(invalidEntity)).toBe(false);
+  });
+});
+
+describe('isValidAnalyzerEntity', () => {
+  const validEntities = makeAnalyzerEntities(3);
+
+  const invalidEntities = [
+    null,
+    undefined,
+    [],
+    {},
+    ...makeAnalyzerEntities(1, { name: undefined }),
+    ...makeAnalyzerEntities(1, { label: undefined }),
+    ...makeAnalyzerEntities(1, { description: undefined }),
+    ...makeAnalyzerEntities(1, { enabled: undefined }),
+    ...makeAnalyzerEntities(1, { enabled: '' }),
+  ];
+
+  it.each(validEntities)('returns true for a valid entity', entity => {
+    expect(isValidAnalyzerEntity(entity)).toBe(true);
+  });
+
+  it.each(invalidEntities)('returns false for an invalid entity', invalidEntity => {
+    expect(isValidAnalyzerEntity(invalidEntity)).toBe(false);
   });
 });
 
