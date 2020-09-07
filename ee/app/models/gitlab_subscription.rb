@@ -56,6 +56,13 @@ class GitlabSubscription < ApplicationRecord
     [0, max_seats_used - seats].max
   end
 
+  # Refresh seat related attribute (without persisting them)
+  def refresh_seat_attributes!
+    self.seats_in_use = calculate_seats_in_use
+    self.max_seats_used = [max_seats_used, seats_in_use].max
+    self.seats_owed = calculate_seats_owed
+  end
+
   def has_a_paid_hosted_plan?(include_trials: false)
     (include_trials || !trial?) &&
       hosted? &&

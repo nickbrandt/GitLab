@@ -176,6 +176,38 @@ RSpec.describe GitlabSubscription do
     end
   end
 
+  describe '#refresh_seat_attributes!' do
+    subject { create(:gitlab_subscription, seats: 3, max_seats_used: 2) }
+
+    before do
+      expect(subject).to receive(:calculate_seats_in_use).and_return(calculate_seats_in_use)
+    end
+
+    context 'when current seats in use is lower than recorded max_seats_used' do
+      let(:calculate_seats_in_use) { 1 }
+
+      it 'does not increase max_seats_used' do
+        expect do
+          subject.refresh_seat_attributes!
+        end.to change(subject, :seats_in_use).from(0).to(1)
+          .and not_change(subject, :max_seats_used)
+          .and not_change(subject, :seats_owed)
+      end
+    end
+
+    context 'when current seats in use is higher than seats and max_seats_used' do
+      let(:calculate_seats_in_use) { 4 }
+
+      it 'increases seats and max_seats_used' do
+        expect do
+          subject.refresh_seat_attributes!
+        end.to change(subject, :seats_in_use).from(0).to(4)
+          .and change(subject, :max_seats_used).from(2).to(4)
+          .and change(subject, :seats_owed).from(0).to(1)
+      end
+    end
+  end
+
   describe '#expired?' do
     let(:gitlab_subscription) { create(:gitlab_subscription, end_date: end_date) }
 

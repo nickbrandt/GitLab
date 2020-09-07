@@ -16,12 +16,9 @@ class UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker # rubocop:disable Scalab
       tuples = []
 
       subscriptions.each do |subscription|
-        seats_in_use = subscription.calculate_seats_in_use
-        max_seats_used = [subscription.max_seats_used, seats_in_use].max
-        subscription.max_seats_used = max_seats_used
-        seats_owed = subscription.calculate_seats_owed
+        subscription.refresh_seat_attributes!
 
-        tuples << [subscription.id, max_seats_used, seats_in_use, seats_owed]
+        tuples << [subscription.id, subscription.max_seats_used, subscription.seats_in_use, subscription.seats_owed]
       end
 
       if tuples.present?
