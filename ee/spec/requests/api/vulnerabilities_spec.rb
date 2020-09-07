@@ -38,7 +38,7 @@ RSpec.describe API::Vulnerabilities do
           get_vulnerabilities
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response.map { |v| v['id'] }).to contain_exactly(project.vulnerabilities.second.id)
+          expect(json_response.map { |v| v['id'] }).to contain_exactly(project.vulnerabilities.order_severity_desc.second.id)
         end
       end
 
