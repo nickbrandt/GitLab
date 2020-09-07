@@ -2709,9 +2709,11 @@ class Project < ApplicationRecord
   end
 
   def oids(objects, oids: [])
-    collection = oids.any? ? objects.where(oid: oids) : objects
+    objects = objects.where(oid: oids) if oids.any?
 
-    collection.pluck(:oid)
+    [].tap do |out|
+      objects.each_batch { |relation| out.concat(relation.pluck(:oid)) }
+    end
   end
 end
 
