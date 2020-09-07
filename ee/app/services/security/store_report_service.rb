@@ -42,7 +42,10 @@ module Security
     end
 
     def create_vulnerability_finding(finding)
-      return put_warning_for(finding) && nil unless finding.valid?
+      unless finding.valid?
+        put_warning_for(finding)
+        return
+      end
 
       vulnerability_params = finding.to_hash.except(:compare_key, :identifiers, :location, :scanner)
       vulnerability_finding = create_or_find_vulnerability_finding(finding, vulnerability_params)
