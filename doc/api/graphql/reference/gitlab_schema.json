@@ -34393,6 +34393,12 @@
               "description": "Packages from the generic package manager",
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "GOLANG",
+              "description": "Packages from the golang package manager",
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null
