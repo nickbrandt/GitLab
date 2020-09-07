@@ -17,6 +17,6 @@ RSpec.describe "projects/dast_scanner_profiles/new", type: :view do
   end
 
   it 'passes DAST profiles library URL' do
-    expect(rendered).to include '/on_demand_scans/profiles'
+    expect(rendered).to include '/on_demand_scans/profiles#scanner-profiles'
   end
 end
