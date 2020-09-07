@@ -41,49 +41,10 @@ module Backup
       raise errors.pop unless errors.empty?
     end
 
-    def restore_custom_hooks(project)
-      return unless Dir.exist?(project_backup_path(project))
-      return if Dir.glob("#{project_backup_path(project)}/custom_hooks*").none?
-
-      custom_hooks_path = custom_hooks_tar(project)
-      Gitlab::GitalyClient::RepositoryService.new(project.repository)
-        .restore_custom_hooks(custom_hooks_path)
-    end
-
     def restore
       Project.find_each(batch_size: 1000) do |project|
-        progress.print " * #{project.full_path} ... "
-
-        restore_repo_success =
-          begin
-            try_restore_repository(project)
-          rescue => err
-            progress.puts "Error: #{err}".color(:red)
-            false
-          end
-
-        if restore_repo_success
-          progress.puts "[DONE]".color(:green)
-        else
-          progress.puts "[Failed] restoring #{project.full_path} repository".color(:red)
-        end
-
-        wiki = ProjectWiki.new(project)
-        wiki.repository.remove rescue nil
-        path_to_wiki_bundle = path_to_bundle(wiki)
-
-        if File.exist?(path_to_wiki_bundle)
-          progress.print " * #{wiki.full_path} ... "
-          begin
-            wiki.repository.create_from_bundle(path_to_wiki_bundle)
-            restore_custom_hooks(wiki)
-
-            progress.puts "[DONE]".color(:green)
-          rescue => e
-            progress.puts "[Failed] restoring #{wiki.full_path} wiki".color(:red)
-            progress.puts "Error #{e}".color(:red)
-          end
-        end
+        restore_repository(project, Gitlab::GlRepository::PROJECT)
+        restore_repository(project, Gitlab::GlRepository::WIKI)
       end
 
       restore_object_pools
@@ -91,30 +52,45 @@ module Backup
 
     private
 
-    def try_restore_repository(project)
-      path_to_project_bundle = path_to_bundle(project)
-      project.repository.remove rescue nil
+    def restore_repository(container, type)
+      repository = type.repository_for(container)
+      repository_bundle_path = path_to_bundle(repository)
 
-      if File.exist?(path_to_project_bundle)
-        project.repository.create_from_bundle(path_to_project_bundle)
-        restore_custom_hooks(project)
-      else
-        project.repository.create_repository
+      progress.puts " * #{display_repo_path(repository)} ... "
+
+      repository.remove rescue nil
+
+      if File.exist?(repository_bundle_path)
+        repository.create_from_bundle(repository_bundle_path)
+        restore_custom_hooks(repository)
+      elsif type.project?
+        repository.create_repository
       end
 
-      true
+      progress.puts " * #{display_repo_path(repository)} ... " + "[DONE]".color(:green)
+
+    rescue => e
+      progress_warn(container, e, 'Failed to restore repo')
     end
 
-    def path_to_bundle(project)
-      File.join(backup_repos_path, project.disk_path + '.bundle')
+    def restore_custom_hooks(repository)
+      return unless Dir.exist?(repository_backup_path(repository))
+      return if Dir.glob("#{repository_backup_path(repository)}/custom_hooks*").none?
+
+      custom_hooks_path = custom_hooks_tar(repository)
+      repository.gitaly_repository_client.restore_custom_hooks(custom_hooks_path)
     end
 
-    def project_backup_path(project)
-      File.join(backup_repos_path, project.disk_path)
+    def path_to_bundle(repository)
+      File.join(backup_repos_path, repository.disk_path + '.bundle')
     end
 
-    def custom_hooks_tar(project)
-      File.join(project_backup_path(project), "custom_hooks.tar")
+    def repository_backup_path(repository)
+      File.join(backup_repos_path, repository.disk_path)
+    end
+
+    def custom_hooks_tar(repository)
+      File.join(repository_backup_path(repository), "custom_hooks.tar")
     end
 
     def backup_repos_path
@@ -187,10 +163,10 @@ module Backup
         return
       end
 
-      FileUtils.mkdir_p(project_backup_path(repository))
+      FileUtils.mkdir_p(repository_backup_path(repository))
 
-      path_to_project_bundle = path_to_bundle(repository)
-      repository.bundle_to_disk(path_to_project_bundle)
+      repository_bundle_path = path_to_bundle(repository)
+      repository.bundle_to_disk(repository_bundle_path)
 
       custom_hooks_path = custom_hooks_tar(repository)
       repository.gitaly_repository_client.backup_custom_hooks(custom_hooks_path)
@@ -211,8 +187,8 @@ module Backup
       repository.empty?
     end
 
-    def display_repo_path(project)
-      "#{project.full_path} (#{project.disk_path})"
+    def display_repo_path(repository)
+      "#{repository.full_path} (#{repository.disk_path})"
     end
 
     def restore_object_pools
