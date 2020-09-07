@@ -1,0 +1,5 @@
+---
+title: Fix Update location fingerprint for existing CS vulnerabilities
+merge_request: 41671
+author:
+type: fixed
