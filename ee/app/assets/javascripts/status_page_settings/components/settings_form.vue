@@ -1,7 +1,7 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import {
-  GlDeprecatedButton as GlButton,
+  GlButton,
   GlSprintf,
   GlLink,
   GlIcon,
@@ -185,6 +185,7 @@ export default {
             ref="submitBtn"
             :disabled="loading"
             variant="success"
+            category="primary"
             type="submit"
             class="js-no-auto-disable"
           >
