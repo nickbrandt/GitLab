@@ -6928,6 +6928,11 @@ type Group {
     severity: [VulnerabilitySeverity!]
 
     """
+    List vulnerabilities by sort order
+    """
+    sort: VulnerabilitySort = severity_desc
+
+    """
     Filter vulnerabilities by state
     """
     state: [VulnerabilityState!]
@@ -12690,6 +12695,11 @@ type Project {
     severity: [VulnerabilitySeverity!]
 
     """
+    List vulnerabilities by sort order
+    """
+    sort: VulnerabilitySort = severity_desc
+
+    """
     Filter vulnerabilities by state
     """
     state: [VulnerabilityState!]
@@ -13450,6 +13460,11 @@ type Query {
     Filter vulnerabilities by severity
     """
     severity: [VulnerabilitySeverity!]
+
+    """
+    List vulnerabilities by sort order
+    """
+    sort: VulnerabilitySort = severity_desc
 
     """
     Filter vulnerabilities by state
@@ -18387,6 +18402,21 @@ enum VulnerabilitySeverity {
   LOW
   MEDIUM
   UNKNOWN
+}
+
+"""
+Vulnerability sort values
+"""
+enum VulnerabilitySort {
+  """
+  Severity in ascending order
+  """
+  severity_asc
+
+  """
+  Severity in descending order
+  """
+  severity_desc
 }
 
 """

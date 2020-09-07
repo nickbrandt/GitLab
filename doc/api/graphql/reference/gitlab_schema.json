@@ -19048,6 +19048,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "sort",
+                  "description": "List vulnerabilities by sort order",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "VulnerabilitySort",
+                    "ofType": null
+                  },
+                  "defaultValue": "severity_desc"
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
@@ -37133,6 +37143,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "sort",
+                  "description": "List vulnerabilities by sort order",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "VulnerabilitySort",
+                    "ofType": null
+                  },
+                  "defaultValue": "severity_desc"
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
@@ -39460,6 +39480,16 @@
                     }
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "sort",
+                  "description": "List vulnerabilities by sort order",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "VulnerabilitySort",
+                    "ofType": null
+                  },
+                  "defaultValue": "severity_desc"
                 },
                 {
                   "name": "after",
@@ -54028,6 +54058,29 @@
             {
               "name": "CRITICAL",
               "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "VulnerabilitySort",
+          "description": "Vulnerability sort values",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "severity_desc",
+              "description": "Severity in descending order",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "severity_asc",
+              "description": "Severity in ascending order",
               "isDeprecated": false,
               "deprecationReason": null
             }
