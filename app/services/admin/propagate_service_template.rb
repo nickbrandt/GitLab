@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Projects
+module Admin
   class PropagateServiceTemplate
     BATCH_SIZE = 100
 
