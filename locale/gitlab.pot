@@ -6325,6 +6325,9 @@ msgstr ""
 msgid "Compare"
 msgstr ""
 
+msgid "Compare %{oldCommitId}...%{newCommitId}"
+msgstr ""
+
 msgid "Compare Git revisions"
 msgstr ""
 
@@ -6338,6 +6341,9 @@ msgid "Compare changes with the last commit"
 msgstr ""
 
 msgid "Compare changes with the merge request target branch"
+msgstr ""
+
+msgid "Compare submodule commit revisions"
 msgstr ""
 
 msgid "Compare with previous version"
