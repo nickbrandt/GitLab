@@ -17,14 +17,14 @@ module Admin
     def propagate
       return unless integration.active?
 
-      propagate_projects_with_template
+      create_integration_for_projects_without_integration
     end
 
     private
 
     attr_reader :integration
 
-    def propagate_projects_with_template
+    def create_integration_for_projects_without_integration
       loop do
         batch_ids = Project.uncached { Project.ids_without_integration(integration, BATCH_SIZE) }
 
