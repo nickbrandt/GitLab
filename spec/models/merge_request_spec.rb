@@ -2467,6 +2467,57 @@ RSpec.describe MergeRequest, factory_default: :keep do
 
       expect(subject.mergeable?).to be_truthy
     end
+
+    context 'with skip_ci_check option' do
+      using RSpec::Parameterized::TableSyntax
+
+      before do
+        allow(subject).to receive_messages(check_mergeability: nil,
+                                           can_be_merged?: true,
+                                           broken?: false)
+      end
+
+      where(:mergeable_ci_state, :skip_ci_check, :expected_mergeable) do
+        false | false | false
+        false | true  | true
+        true  | false | true
+        true  | true  | true
+      end
+
+      with_them do
+        it 'overrides mergeable_ci_state?' do
+          allow(subject).to receive(:mergeable_ci_state?) { mergeable_ci_state }
+
+          expect(subject.mergeable?(skip_ci_check: skip_ci_check)).to eq(expected_mergeable)
+        end
+      end
+    end
+
+    context 'with skip_discussions_check option' do
+      using RSpec::Parameterized::TableSyntax
+
+      before do
+        allow(subject).to receive_messages(mergeable_ci_state?: true,
+                                           check_mergeability: nil,
+                                           can_be_merged?: true,
+                                           broken?: false)
+      end
+
+      where(:mergeable_discussions_state, :skip_discussions_check, :expected_mergeable) do
+        false | false | false
+        false | true  | true
+        true  | false | true
+        true  | true  | true
+      end
+
+      with_them do
+        it 'overrides mergeable_discussions_state?' do
+          allow(subject).to receive(:mergeable_discussions_state?) { mergeable_discussions_state }
+
+          expect(subject.mergeable?(skip_discussions_check: skip_discussions_check)).to eq(expected_mergeable)
+        end
+      end
+    end
   end
 
   describe '#check_mergeability' do
@@ -2569,6 +2620,10 @@ RSpec.describe MergeRequest, factory_default: :keep do
 
         it 'returns false' do
           expect(subject.mergeable_state?).to be_falsey
+        end
+
+        it 'returns true when skipping ci check' do
+          expect(subject.mergeable_state?(skip_ci_check: true)).to be(true)
         end
       end
 
