@@ -61,7 +61,7 @@ module Admin
     end
 
     def bulk_create_from_integration(batch)
-      service_list = ServiceList.new(batch, service_hash, { 'inherit_from_id' => integration.id }).to_array
+      service_list = ServiceList.new(batch, service_hash).to_array
 
       Project.transaction do
         results = bulk_insert(*service_list)
