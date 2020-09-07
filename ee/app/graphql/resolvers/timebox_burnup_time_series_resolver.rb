@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module Resolvers
-  class MilestoneBurnupTimeSeriesResolver < BaseResolver
+  class TimeboxBurnupTimeSeriesResolver < BaseResolver
     type [Types::BurnupChartDailyTotalsType], null: true
 
-    alias_method :milestone, :synchronized_object
+    alias_method :timebox, :synchronized_object
 
     def resolve(*args)
-      return [] unless milestone.burnup_charts_available?
+      return [] unless timebox.burnup_charts_available?
 
-      response = TimeboxBurnupChartService.new(milestone).execute
+      response = TimeboxBurnupChartService.new(timebox).execute
 
       raise GraphQL::ExecutionError, response.message if response.error?
 
