@@ -28,13 +28,13 @@ module Admin
       loop do
         batch_ids = Project.uncached { Project.ids_without_integration(integration, BATCH_SIZE) }
 
-        bulk_create_from_template(batch_ids) unless batch_ids.empty?
+        bulk_create_from_integration(batch_ids) unless batch_ids.empty?
 
         break if batch_ids.size < BATCH_SIZE
       end
     end
 
-    def bulk_create_from_template(batch_ids)
+    def bulk_create_from_integration(batch_ids)
       service_list = ServiceList.new(batch_ids, service_hash).to_array
 
       Service.transaction do
