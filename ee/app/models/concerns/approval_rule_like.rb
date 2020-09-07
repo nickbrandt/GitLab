@@ -71,7 +71,7 @@ module ApprovalRuleLike
 
     source_rule.name != name ||
       source_rule.approvals_required != approvals_required ||
-      source_rule.user_ids.to_set != user_ids.to_set ||
-      source_rule.group_ids.to_set != group_ids.to_set
+      groups.where.not(id: source_rule.groups.select(:id)).any? ||
+      users.where.not(id: source_rule.users.select(:id)).any?
   end
 end

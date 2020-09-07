@@ -74,8 +74,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   end
 
   def self.applicable_to_branch(branch)
-    includes(:users, :groups, approval_project_rule: [:users, :groups, :protected_branches]).select do |rule|
-      next true unless rule.approval_project_rule.present?
+    joins(:approval_project_rule).select do |rule|
       next true if rule.overridden?
 
       rule.approval_project_rule.applies_to_branch?(branch)
