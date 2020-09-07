@@ -540,17 +540,15 @@ module API
     # @param event_name [String] the event name
     # @param values [Array|String] the values counted
     def increment_unique_values(event_name, values)
-      raise "values is empty" unless values.present?
+      return unless values.present?
 
       feature_name = "usage_data_#{event_name}"
-      raise "Feature #{feature_name} not enabled" unless Feature.enabled?(feature_name)
-      raise "Usage ping not enabled" unless Gitlab::CurrentSettings.usage_ping_enabled?
+      return unless Feature.enabled?(feature_name)
+      return unless Gitlab::CurrentSettings.usage_ping_enabled?
 
       Gitlab::UsageDataCounters::HLLRedisCounter.track_event(values, event_name)
     rescue => error
-      Rails.logger.warn( # rubocop:disable Gitlab/RailsLogger
-        "Redis tracking event failed for event: #{event_name}, message: #{error.message}"
-      )
+      Gitlab::AppLogger.warn("Redis tracking event failed for event: #{event_name}, message: #{error.message}")
     end
 
     def with_api_params(&block)

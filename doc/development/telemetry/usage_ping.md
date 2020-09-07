@@ -288,9 +288,9 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    end
    ```
 
-1. Track event in API using `increment_unique_values(event_name, values)` helper method
+1. Track event in API using `increment_unique_values(event_name, values)` helper method.
 
-   In order to be able to track the events usage ping should be enabled and event feature `usage_data_<event_name>` should be enabled.
+   In order to be able to track the event, Usage Ping must be enabled and the event feature `usage_data_<event_name>` must be enabled.
 
    Arguments:
 

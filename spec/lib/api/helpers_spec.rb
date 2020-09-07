@@ -208,9 +208,9 @@ RSpec.describe API::Helpers do
         subject.increment_unique_values(event_name, value)
       end
 
-      it 'logs an exception if usage ping is not enabled' do
+      it 'does not track event usage ping is not enabled' do
         stub_application_setting(usage_ping_enabled: false)
-        expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{event_name}, message: Usage ping not enabled")
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
         subject.increment_unique_values(event_name, value)
       end
@@ -218,15 +218,15 @@ RSpec.describe API::Helpers do
       it 'logs an exception for unknown event' do
         stub_application_setting(usage_ping_enabled: true)
 
-        expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{unknown_event}, message: Unknown event #{unknown_event}")
+        expect(Gitlab::AppLogger).to receive(:warn).with("Redis tracking event failed for event: #{unknown_event}, message: Unknown event #{unknown_event}")
 
         subject.increment_unique_values(unknown_event, value)
       end
 
-      it 'log an exception for nil values' do
+      it 'does not track event for nil values' do
         stub_application_setting(usage_ping_enabled: true)
 
-        expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{unknown_event}, message: values is empty")
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
         subject.increment_unique_values(unknown_event, nil)
       end
@@ -237,8 +237,8 @@ RSpec.describe API::Helpers do
         stub_feature_flags(feature => false)
       end
 
-      it 'logs an exception' do
-        expect(Rails.logger).to receive(:warn).with("Redis tracking event failed for event: #{event_name}, message: Feature #{feature} not enabled")
+      it 'does not track event' do
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
         subject.increment_unique_values(event_name, value)
       end
