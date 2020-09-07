@@ -31,8 +31,6 @@ export default {
   data() {
     return {
       profileTypes: {},
-      errorMessage: '',
-      errorDetails: [],
     };
   },
   computed: {
@@ -72,6 +70,8 @@ export default {
       this.$set(this.profileTypes, profileType, {
         profiles: [],
         pageInfo: {},
+        errorMessage: '',
+        errorDetails: [],
       });
     },
     hasMoreProfiles(profileType) {
@@ -92,37 +92,38 @@ export default {
             const profiles = profileEdges.map(({ node }) => node);
             const pageInfo = project?.[profileType].pageInfo;
 
-            this.profileTypes[profileType] = {
-              profiles,
-              pageInfo,
-            };
+            this.profileTypes[profileType].profiles = profiles;
+            this.profileTypes[profileType].pageInfo = pageInfo;
           }
         },
         error(error) {
           this.handleError({
+            profileType,
             exception: error,
             message: this.profileSettings[profileType].i18n.errorMessages.fetchNetworkError,
           });
         },
       };
     },
-    handleError({ exception, message = '', details = [] }) {
+    handleError({ profileType, exception, message = '', details = [] }) {
       Sentry.captureException(exception);
-      this.errorMessage = message;
-      this.errorDetails = details;
+      this.profileTypes[profileType].errorMessage = message;
+      this.profileTypes[profileType].errorDetails = details;
     },
-    resetErrors() {
-      this.errorMessage = '';
-      this.errorDetails = [];
+    resetErrors(profileType) {
+      this.profileTypes[profileType].errorMessage = '';
+      this.profileTypes[profileType].errorDetails = [];
     },
     fetchMoreProfiles(profileType) {
       const {
         $apollo,
-        $options: { i18n },
+        profileSettings: {
+          [profileType]: { i18n },
+        },
       } = this;
       const { pageInfo } = this.profileTypes[profileType];
 
-      this.resetErrors();
+      this.resetErrors(profileType);
 
       $apollo.queries[profileType]
         .fetchMore({
@@ -130,7 +131,11 @@ export default {
           updateQuery: cacheUtils.appendToPreviousResult(profileType),
         })
         .catch(error => {
-          this.handleError({ exception: error, message: i18n.errorMessages.fetchNetworkError });
+          this.handleError({
+            profileType,
+            exception: error,
+            message: i18n.errorMessages.fetchNetworkError,
+          });
         });
     },
     deleteProfile(profileType, profileId) {
@@ -150,7 +155,7 @@ export default {
         },
       } = this;
 
-      this.resetErrors();
+      this.resetErrors(profileType);
 
       this.$apollo
         .mutate({
@@ -183,6 +188,7 @@ export default {
         })
         .catch(error => {
           this.handleError({
+            profileType,
             exception: error,
             message: i18n.errorMessages.deletionNetworkError,
           });
@@ -235,8 +241,8 @@ export default {
 
         <profiles-list
           :data-testid="`${profileType}List`"
-          :error-message="errorMessage"
-          :error-details="errorDetails"
+          :error-message="profileTypes[profileType].errorMessage"
+          :error-details="profileTypes[profileType].errorDetails"
           :has-more-profiles-to-load="hasMoreProfiles(profileType)"
           :is-loading="isLoadingProfiles(profileType)"
           :profiles-per-page="$options.profilesPerPage"
