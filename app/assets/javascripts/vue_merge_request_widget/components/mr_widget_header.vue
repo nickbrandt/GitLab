@@ -138,10 +138,10 @@ export default {
             v-gl-tooltip
             :title="ideButtonTitle"
             class="gl-display-none d-md-inline-block gl-mr-3"
-            tabindex="0"
+            :tabindex="!mr.canPushToSourceBranch ? 0 : null"
           >
             <gl-button
-              :href="mr.canPushToSourceBranch ? webIdePath : null"
+              :href="webIdePath"
               :disabled="!mr.canPushToSourceBranch"
               class="js-web-ide"
               tabindex="0"
