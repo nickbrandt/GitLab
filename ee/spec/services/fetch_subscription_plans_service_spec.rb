@@ -26,7 +26,7 @@ RSpec.describe FetchSubscriptionPlansService do
       end
 
       it 'logs failure' do
-        expect(Rails).to receive_message_chain(:logger, :info).with('Unable to connect to GitLab Customers App Error message')
+        expect(Gitlab::AppLogger).to receive(:info).with('Unable to connect to GitLab Customers App Error message')
 
         subject
       end
