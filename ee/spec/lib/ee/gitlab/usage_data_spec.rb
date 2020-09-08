@@ -251,15 +251,6 @@ RSpec.describe Gitlab::UsageData do
     end
   end
 
-  describe '.uncached_data' do
-    describe '.usage_activity_by_stage' do
-      it 'includes usage_activity_by_stage data' do
-        expect(described_class.uncached_data).to include(:usage_activity_by_stage)
-        expect(described_class.uncached_data).to include(:usage_activity_by_stage_monthly)
-      end
-    end
-  end
-
   describe 'usage_activity_by_stage_configure' do
     it 'includes accurate usage_activity_by_stage data' do
       for_defined_days_back do
