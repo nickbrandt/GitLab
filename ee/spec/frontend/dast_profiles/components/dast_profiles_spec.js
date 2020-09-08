@@ -223,7 +223,8 @@ describe('EE - DastProfiles', () => {
 
     it.each`
       givenData                                                                   | propName                   | expectedPropValue
-      ${{ errorMessage: 'foo' }}                                                  | ${'errorMessage'}          | ${'foo'}
+      ${{ profileTypes: { [profileType]: { errorMessage: 'foo' } } }}             | ${'errorMessage'}          | ${'foo'}
+      ${{ profileTypes: { [profileType]: { errorDetails: ['foo'] } } }}           | ${'errorDetails'}          | ${['foo']}
       ${{ profileTypes: { [profileType]: { pageInfo: { hasNextPage: true } } } }} | ${'hasMoreProfilesToLoad'} | ${true}
       ${{ profileTypes: { [profileType]: { profiles: [{ foo: 'bar' }] } } }}      | ${'profiles'}              | ${[{ foo: 'bar' }]}
     `('passes down $propName correctly', async ({ givenData, propName, expectedPropValue }) => {
