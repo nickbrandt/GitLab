@@ -3,7 +3,7 @@
 require 'yaml'
 
 module Backup
-  class Repository
+  class Repositories
     attr_reader :progress
 
     def initialize(progress)
@@ -53,44 +53,11 @@ module Backup
     private
 
     def restore_repository(container, type)
-      repository = type.repository_for(container)
-      repository_bundle_path = path_to_bundle(repository)
-
-      progress.puts " * #{display_repo_path(repository)} ... "
-
-      repository.remove rescue nil
-
-      if File.exist?(repository_bundle_path)
-        repository.create_from_bundle(repository_bundle_path)
-        restore_custom_hooks(repository)
-      elsif type.project?
-        repository.create_repository
-      end
-
-      progress.puts " * #{display_repo_path(repository)} ... " + "[DONE]".color(:green)
-
-    rescue => e
-      progress_warn(container, e, 'Failed to restore repo')
-    end
-
-    def restore_custom_hooks(repository)
-      return unless Dir.exist?(repository_backup_path(repository))
-      return if Dir.glob("#{repository_backup_path(repository)}/custom_hooks*").none?
-
-      custom_hooks_path = custom_hooks_tar(repository)
-      repository.gitaly_repository_client.restore_custom_hooks(custom_hooks_path)
-    end
-
-    def path_to_bundle(repository)
-      File.join(backup_repos_path, repository.disk_path + '.bundle')
-    end
-
-    def repository_backup_path(repository)
-      File.join(backup_repos_path, repository.disk_path)
-    end
-
-    def custom_hooks_tar(repository)
-      File.join(repository_backup_path(repository), "custom_hooks.tar")
+      BackupRestorer.new(
+        progress,
+        type.repository_for(container),
+        backup_repos_path
+      ).restore(always_create: type.project?)
     end
 
     def backup_repos_path
@@ -154,41 +121,11 @@ module Backup
     end
 
     def backup_repository(container, type)
-      repository = type.repository_for(container)
-
-      progress.puts " * #{display_repo_path(repository)} ... "
-
-      if empty_repository?(repository)
-        progress.puts " * #{display_repo_path(repository)} ... " + "[SKIPPED]".color(:cyan)
-        return
-      end
-
-      FileUtils.mkdir_p(repository_backup_path(repository))
-
-      repository_bundle_path = path_to_bundle(repository)
-      repository.bundle_to_disk(repository_bundle_path)
-
-      custom_hooks_path = custom_hooks_tar(repository)
-      repository.gitaly_repository_client.backup_custom_hooks(custom_hooks_path)
-
-      progress.puts " * #{display_repo_path(repository)} ... " + "[DONE]".color(:green)
-
-    rescue => e
-      progress_warn(container, e, 'Failed to backup repo')
-    end
-
-    def progress_warn(project, cmd, output)
-      progress.puts "[WARNING] Executing #{cmd}".color(:orange)
-      progress.puts "Ignoring error on #{display_repo_path(project)} - #{output}".color(:orange)
-    end
-
-    def empty_repository?(repository)
-      repository.expire_emptiness_caches
-      repository.empty?
-    end
-
-    def display_repo_path(repository)
-      "#{repository.full_path} (#{repository.disk_path})"
+      BackupRestorer.new(
+        progress,
+        type.repository_for(container),
+        backup_repos_path
+      ).backup
     end
 
     def restore_object_pools
@@ -200,6 +137,83 @@ module Backup
         pool.save
 
         pool.schedule
+      end
+    end
+
+    class BackupRestorer
+      attr_accessor :progress, :repository, :backup_repos_path
+
+      def initialize(progress, repository, backup_repos_path)
+        @progress = progress
+        @repository = repository
+        @backup_repos_path = backup_repos_path
+      end
+
+      def backup
+        progress.puts " * #{display_repo_path} ... "
+
+        if repository.empty?
+          progress.puts " * #{display_repo_path} ... " + "[SKIPPED]".color(:cyan)
+          return
+        end
+
+        FileUtils.mkdir_p(repository_backup_path)
+
+        repository.bundle_to_disk(path_to_bundle)
+        repository.gitaly_repository_client.backup_custom_hooks(custom_hooks_tar)
+
+        progress.puts " * #{display_repo_path} ... " + "[DONE]".color(:green)
+
+      rescue => e
+        progress_warn(e, 'Failed to backup repo')
+      end
+
+      def restore(always_create: false)
+        progress.puts " * #{display_repo_path} ... "
+
+        repository.remove rescue nil
+
+        if File.exist?(path_to_bundle)
+          repository.create_from_bundle(path_to_bundle)
+          restore_custom_hooks
+        elsif always_create
+          repository.create_repository
+        end
+
+        progress.puts " * #{display_repo_path} ... " + "[DONE]".color(:green)
+
+      rescue => e
+        progress_warn(e, 'Failed to restore repo')
+      end
+
+      private
+
+      def display_repo_path
+        "#{repository.full_path} (#{repository.disk_path})"
+      end
+
+      def repository_backup_path
+        @repository_backup_path ||= File.join(backup_repos_path, repository.disk_path)
+      end
+
+      def path_to_bundle
+        @path_to_bundle ||= File.join(backup_repos_path, repository.disk_path + '.bundle')
+      end
+
+      def restore_custom_hooks
+        return unless Dir.exist?(repository_backup_path)
+        return if Dir.glob("#{repository_backup_path}/custom_hooks*").none?
+
+        repository.gitaly_repository_client.restore_custom_hooks(custom_hooks_tar)
+      end
+
+      def custom_hooks_tar
+        File.join(repository_backup_path, "custom_hooks.tar")
+      end
+
+      def progress_warn(cmd, output)
+        progress.puts "[WARNING] Executing #{cmd}".color(:orange)
+        progress.puts "Ignoring error on #{display_repo_path} - #{output}".color(:orange)
       end
     end
 

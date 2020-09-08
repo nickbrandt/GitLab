@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Backup::Repository do
+RSpec.describe Backup::Repositories do
   let(:progress) { StringIO.new }
 
   subject { described_class.new(progress) }
@@ -190,46 +190,15 @@ RSpec.describe Backup::Repository do
     end
 
     it 'cleans existing repositories' do
-      wiki_repository_spy = spy(:wiki)
+      expect(Repository).to receive(:new).twice.and_wrap_original do |method, *original_args|
+        repository = method.call(*original_args)
 
-      allow_next_instance_of(ProjectWiki) do |project_wiki|
-        allow(project_wiki).to receive(:repository).and_return(wiki_repository_spy)
-      end
+        expect(repository).to receive(:remove)
 
-      expect_next_instance_of(Repository) do |repo|
-        expect(repo).to receive(:remove)
+        repository
       end
 
       subject.restore
-
-      expect(wiki_repository_spy).to have_received(:remove)
-    end
-  end
-
-  describe '#empty_repository?' do
-    context 'for a wiki' do
-      let(:wiki) { create(:project_wiki) }
-      let(:repository) { wiki.repository }
-
-      it 'invalidates the emptiness cache' do
-        expect(repository).to receive(:expire_emptiness_caches).once
-
-        subject.send(:empty_repository?, repository)
-      end
-
-      context 'wiki repo has content' do
-        let!(:wiki_page) { create(:wiki_page, wiki: wiki) }
-
-        it 'returns false, regardless of bad cache value' do
-          expect(subject.send(:empty_repository?, repository)).to be_falsy
-        end
-      end
-
-      context 'wiki repo does not have content' do
-        it 'returns true, regardless of bad cache value' do
-          expect(subject.send(:empty_repository?, repository)).to be_truthy
-        end
-      end
     end
   end
 end
