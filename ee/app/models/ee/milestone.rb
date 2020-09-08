@@ -10,13 +10,11 @@ module EE
       has_many :boards
     end
 
-    def weight_available?
-      resource_parent&.feature_available?(:issue_weights)
-    end
-
     def supports_milestone_charts?
       resource_parent&.feature_available?(:milestone_charts) && weight_available?
     end
+
+    alias_method :supports_timebox_charts?, :supports_milestone_charts?
 
     def burnup_charts_available?
       ::Feature.enabled?(:burnup_charts, resource_parent)

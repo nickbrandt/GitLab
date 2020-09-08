@@ -773,6 +773,12 @@ msgstr ""
 msgid "%{timebox_name} should belong either to a project or a group."
 msgstr ""
 
+msgid "%{timebox_type} does not support burnup charts"
+msgstr ""
+
+msgid "%{timebox_type} must have a start and due date"
+msgstr ""
+
 msgid "%{title} %{operator} %{threshold}"
 msgstr ""
 
@@ -15857,16 +15863,10 @@ msgid_plural "Milestones"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "Milestone does not support burnup charts"
-msgstr ""
-
 msgid "Milestone lists not available with your current license"
 msgstr ""
 
 msgid "Milestone lists show all issues from the selected milestone."
-msgstr ""
-
-msgid "Milestone must have a start and due date"
 msgstr ""
 
 msgid "MilestoneSidebar|Closed:"
