@@ -1,9 +1,7 @@
 <script>
-import { cloneDeep } from 'lodash';
 import { GlFormCheckbox, GlFormGroup } from '@gitlab/ui';
 import DynamicFields from './dynamic_fields.vue';
 import { isValidAnalyzerEntity } from './utils';
-
 
 export default {
   components: {
@@ -15,11 +13,6 @@ export default {
     prop: 'entity',
     event: 'input',
   },
-  data() {
-    return {
-      configurationEntities: cloneDeep(this.entity.configuration),
-    };
-  },  
   props: {
     // SastCiConfigurationAnalyzersEntity from GraphQL endpoint
     entity: {
@@ -28,15 +21,20 @@ export default {
       validator: isValidAnalyzerEntity,
     },
   },
+  computed: {
+    hasConfiguration() {
+      return this.entity.configuration?.length > 0;
+    },
+  },
   methods: {
     onToggle(value) {
       const entity = { ...this.entity, enabled: value };
       this.$emit('input', entity);
     },
-    onConfigurationUpdate(value) {
-      const entity = { ...this.entity, configuration: formEntities}
-      this.$emit('input', entity)
-    }
+    onConfigurationUpdate(configuration) {
+      const entity = { ...this.entity, configuration };
+      this.$emit('input', entity);
+    },
   },
 };
 </script>
@@ -46,8 +44,14 @@ export default {
     <gl-form-checkbox :id="entity.name" :checked="entity.enabled" @input="onToggle">
       <span class="gl-font-weight-bold">{{ entity.label }}</span>
       <span v-if="entity.description" class="gl-text-gray-500">({{ entity.description }})</span>
-    </gl-form-checkbox>    
+    </gl-form-checkbox>
 
-    <dynamic-fields v-model="configurationEntities" @input="onConfigurationUpdate" />
+    <dynamic-fields
+      v-if="hasConfiguration"
+      :disabled="!entity.enabled"
+      class="gl-ml-6"
+      :entities="entity.configuration"
+      @input="onConfigurationUpdate"
+    />
   </gl-form-group>
 </template>

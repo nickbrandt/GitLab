@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import AnalyzerConfiguration from 'ee/security_configuration/sast/components/analyzer_configuration.vue';
+import DynamicFields from 'ee/security_configuration/sast/components/dynamic_fields.vue';
 
 describe('AnalyzerConfiguration component', () => {
   let wrapper;
@@ -63,6 +64,51 @@ describe('AnalyzerConfiguration component', () => {
 
       it('emits a input event with the checked value', () => {
         expect(wrapper.emitted('input')).toEqual([[{ ...entity, enabled: !initiallyChecked }]]);
+      });
+    });
+  });
+
+  describe('configuration form', () => {
+    describe('when there are no SastCiConfigurationEntity', () => {
+      beforeEach(() => {
+        createComponent({
+          props: { entity },
+        });
+      });
+
+      it('does not render the nested dynamic forms', () => {
+        expect(wrapper.find(DynamicFields).exists()).toBe(false);
+      });
+    });
+
+    describe('when there are one or more SastCiConfigurationEntity', () => {
+      const analyzerEntity = {
+        ...entity,
+        enabled: false,
+        configuration: [
+          {
+            defaultValue: 'defaultVal',
+            description: 'desc',
+            field: 'field',
+            type: 'string',
+            value: 'val',
+            label: 'label',
+          },
+        ],
+      };
+
+      beforeEach(() => {
+        createComponent({
+          props: { entity: analyzerEntity },
+        });
+      });
+
+      it('it renders the nested dynamic forms', () => {
+        expect(wrapper.find(DynamicFields).exists()).toBe(true);
+      });
+
+      it('passes the disabled prop to dynamic fields component', () => {
+        expect(wrapper.find(DynamicFields).vm.$attrs.disabled).toBe(!analyzerEntity.enabled);
       });
     });
   });

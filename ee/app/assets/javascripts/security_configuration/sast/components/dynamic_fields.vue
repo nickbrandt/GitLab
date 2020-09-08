@@ -1,9 +1,11 @@
 <script>
+import { GlFormGroup } from '@gitlab/ui';
 import FormInput from './form_input.vue';
 import { isValidConfigurationEntity } from './utils';
 
 export default {
   components: {
+    GlFormGroup,
     FormInput,
   },
   model: {
@@ -47,7 +49,7 @@ export default {
 </script>
 
 <template>
-  <div>
+  <gl-form-group>
     <component
       :is="componentForEntity(entity)"
       v-for="entity in entities"
@@ -56,5 +58,5 @@ export default {
       v-bind="entity"
       @input="onInput(entity.field, $event)"
     />
-  </div>
+  </gl-form-group>
 </template>
