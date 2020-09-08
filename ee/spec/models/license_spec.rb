@@ -850,26 +850,6 @@ RSpec.describe License do
     end
   end
 
-  describe '#promo_feature_available?' do
-    subject { described_class.promo_feature_available?(:container_scanning) }
-
-    context 'with promo_container_scanning disabled' do
-      before do
-        stub_feature_flags(promo_container_scanning: false)
-      end
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'with promo_container_scanning enabled' do
-      before do
-        stub_feature_flags(promo_container_scanning: true)
-      end
-
-      it { is_expected.to be_truthy }
-    end
-  end
-
   describe '.history' do
     before(:all) do
       described_class.delete_all

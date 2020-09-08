@@ -809,17 +809,6 @@ RSpec.describe Project do
                   is_expected.to eq(false)
                 end
               end
-
-              context 'with promo feature flag' do
-                let(:allowed_on_global_license) { true }
-
-                before do
-                  project.clear_memoization(:licensed_feature_available)
-                  stub_feature_flags("promo_#{feature}" => true)
-                end
-
-                it { is_expected.to be_truthy }
-              end
             end
           end
 

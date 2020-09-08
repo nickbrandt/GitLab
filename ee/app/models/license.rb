@@ -298,10 +298,6 @@ class License < ApplicationRecord
       Gitlab::CurrentSettings.license_trial_ends_on
     end
 
-    def promo_feature_available?(feature)
-      ::Feature.enabled?("promo_#{feature}", default_enabled: false)
-    end
-
     def history
       all.sort_by { |license| [license.starts_at, license.created_at, license.expires_at] }.reverse
     end
