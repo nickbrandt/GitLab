@@ -1,21 +1,34 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
+import MockAdapter from 'axios-mock-adapter';
 import ResetButton from 'ee/pages/admin/users/pipeline_minutes/reset_button.vue';
+import axios from '~/lib/utils/axios_utils';
 
 const defaultProps = { resetMinutesPath: '/adming/reset_minutes' };
+const toastMock = {
+  show: jest.fn(),
+};
 
 describe('Reset pipeline minutes button', () => {
   let wrapper;
+  let mock;
 
   beforeEach(() => {
     wrapper = shallowMount(ResetButton, {
       provide: {
         ...defaultProps,
       },
+      mocks: {
+        $toast: toastMock,
+      },
     });
+
+    mock = new MockAdapter(axios);
+    mock.onPost(defaultProps.resetMinutesPath).reply(200, {});
   });
 
   afterEach(() => {
+    mock.restore();
     wrapper.destroy();
     wrapper = null;
   });
@@ -28,9 +41,13 @@ describe('Reset pipeline minutes button', () => {
     expect(button.text()).toBe('Reset pipeline minutes');
   });
 
-  it('should contain an href attribute set to the "resetMinutesPath" prop', () => {
-    const button = findResetButton();
+  it('should call do a network request when reseting the pipelines', () => {
+    const axiosSpy = jest.spyOn(axios, 'post');
 
-    expect(button.attributes('href')).toBe(defaultProps.resetMinutesPath);
+    wrapper.vm.resetPipelineMinutes();
+
+    return wrapper.vm.$nextTick().then(() => {
+      expect(axiosSpy).toHaveBeenCalled();
+    });
   });
 });

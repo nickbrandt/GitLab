@@ -1,5 +1,11 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import Vue from 'vue';
+import { GlButton, GlToast } from '@gitlab/ui';
+import { __ } from '~/locale';
+import axios from '~/lib/utils/axios_utils';
+import statusCodes from '~/lib/utils/http_status';
+
+Vue.use(GlToast);
 
 export default {
   components: {
@@ -9,6 +15,22 @@ export default {
     resetMinutesPath: {
       type: String,
       default: '',
+    },
+  },
+  methods: {
+    resetPipelineMinutes() {
+      return axios
+        .post(this.resetMinutesPath)
+        .then(resp => {
+          if (resp.status === statusCodes.OK) {
+            this.$toast.show(__('User pipeline minutes were successfully reset.'));
+          }
+        })
+        .catch(() =>
+          this.$toast.show(__('There was an error resetting user pipeline minutes.'), {
+            type: 'error',
+          }),
+        );
     },
   },
 };
@@ -25,7 +47,7 @@ export default {
         )
       }}
     </p>
-    <gl-button target="_self" :href="resetMinutesPath" data-method="post">
+    <gl-button @click="resetPipelineMinutes">
       {{ s__('SharedRunnersMinutesSettings|Reset pipeline minutes') }}
     </gl-button>
   </div>
