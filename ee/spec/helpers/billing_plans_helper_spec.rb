@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe BillingPlansHelper do
   describe '#subscription_plan_data_attributes' do
-    let(:customer_portal_url) { "https://customers.gitlab.com/subscriptions" }
+    let(:customer_portal_url) { "#{EE::SUBSCRIPTIONS_URL}/subscriptions" }
 
     let(:group) { build(:group) }
     let(:plan) do
