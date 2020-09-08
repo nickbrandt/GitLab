@@ -5318,9 +5318,6 @@ msgstr ""
 msgid "CiVariable|Create wildcard"
 msgstr ""
 
-msgid "CiVariable|Error occurred while saving variables"
-msgstr ""
-
 msgid "CiVariable|Masked"
 msgstr ""
 
@@ -5337,9 +5334,6 @@ msgid "CiVariable|Toggle masked"
 msgstr ""
 
 msgid "CiVariable|Toggle protected"
-msgstr ""
-
-msgid "CiVariable|Validation failed"
 msgstr ""
 
 msgid "Classification Label (optional)"
