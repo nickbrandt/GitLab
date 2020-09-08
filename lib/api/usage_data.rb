@@ -2,8 +2,15 @@
 
 module API
   class UsageData < Grape::API::Instance
-    before do
-      forbidden!('Invalid CSRF token is provided') unless verified_request?
+    before { authenticate! }
+
+    ALLOWED_ARRAY_SIZE = 10
+    ALLOWED_VALUE_SIZE = 36
+
+    helpers do
+      def valid_values(values)
+        values.size <= ALLOWED_ARRAY_SIZE && values.all? { |value| value.is_a?(String) && value.size <= ALLOWED_VALUE_SIZE }
+      end
     end
 
     namespace 'usage_data' do
@@ -18,6 +25,10 @@ module API
       post 'increment_unique_values' do
         event_name = params[:name]
         values = params[:values]
+
+        unless valid_values(values)
+          render_api_error!('values needs to be an array of maxim 10 elements of strings of size maximum 36', 400)
+        end
 
         increment_unique_values(event_name, values)
 

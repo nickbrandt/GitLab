@@ -10,24 +10,18 @@ RSpec.describe API::UsageData do
     let(:known_event) { 'g_compliance_dashboard' }
     let(:unknown_event) { 'unknown' }
 
-    context 'without CSRF token' do
+    context 'without authentication' do
       it 'returns 401 response' do
-        allow(Gitlab::RequestForgeryProtection).to receive(:verified?).and_return(false)
-
         post api(endpoint), params: { values: [user.id] }
 
-        expect(response).to have_gitlab_http_status(:forbidden)
+        expect(response).to have_gitlab_http_status(:unauthorized)
       end
     end
 
-    context 'without CSRF token' do
-      before do
-        allow(Gitlab::RequestForgeryProtection).to receive(:verified?).and_return(true)
-      end
-
+    context 'without authentication' do
       context 'when name is missing from params' do
         it 'returns bad request' do
-          post api(endpoint), params: { values: [user.id] }
+          post api(endpoint, user), params: { values: [user.id] }
 
           expect(response).to have_gitlab_http_status(:bad_request)
         end
@@ -35,7 +29,7 @@ RSpec.describe API::UsageData do
 
       context 'with correct params' do
         it 'returns status ok' do
-          post api(endpoint), params: { name: known_event, values: [user.id] }
+          post api(endpoint, user), params: { name: known_event, values: [user.id] }
 
           expect(response).to have_gitlab_http_status(:ok)
         end
@@ -43,9 +37,25 @@ RSpec.describe API::UsageData do
 
       context 'with unknown event' do
         it 'returns status ok' do
-          post api(endpoint), params: { name: unknown_event, values: [user.id] }
+          post api(endpoint, user), params: { name: unknown_event, values: [user.id] }
 
           expect(response).to have_gitlab_http_status(:ok)
+        end
+      end
+
+      context 'with 11 elements' do
+        it 'returns bad request' do
+          post api(endpoint, user), params: { name: known_event, values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] }
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+        end
+      end
+
+      context 'with value of 37 chars' do
+        it 'returns bad request' do
+          post api(endpoint, user), params: { name: known_event, values: ['48ee87e2-7da5-4299-a56d-0424d5c5dab1e'] }
+
+          expect(response).to have_gitlab_http_status(:bad_request)
         end
       end
     end

@@ -315,7 +315,10 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
 1. Track event using `UsageData` API
 
    Increment unique values count using Redis HLL, for given event name.
+
    In order to be able to increment the values the related feature `usage_data<event_name>` should be enabled.
+
+   It is allowed to send an array of maximum 10 strings of maximum size 36.
 
    ```plaintext
    POST /usage_data/increment_unique_values
@@ -324,14 +327,14 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    | Attribute | Type | Required | Description |
    | :-------- | :--- | :------- | :---------- |
    | `name` | string | yes | The event name it should be tracked |
-   | `values` | array | yes | The values counted |
+   | `values` | array | yes | The values counted, maximum 10 string elements of size 36 |
 
    Response
 
    Return 200 if tracking failed for any reason.
 
-   - `403 Forbidden` if invalid CSRF token is provided
-   - `400 Bad request` if name parameter is missing
+   - `401 Unauthorized` if user is not authenticated
+   - `400 Bad request` if name parameter is missing, or validation errors
    - `200` if event was tracked or any errors
 
 1. Track event using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event(entity_id, event_name)`.
