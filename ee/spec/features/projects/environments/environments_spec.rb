@@ -46,7 +46,7 @@ RSpec.describe 'Environments page', :js do
 
       it 'shows an enabled play button' do
         find('.js-environment-actions-dropdown').click
-        play_button = %q{button.js-manual-action-link.no-btn.btn}
+        play_button = %q{button.js-manual-action-link}
 
         expect(page).to have_selector(play_button)
       end
@@ -130,7 +130,7 @@ RSpec.describe 'Environments page', :js do
 
       it 'show a disabled play button' do
         find('.js-environment-actions-dropdown').click
-        disabled_play_button = %q{button.js-manual-action-link.no-btn.btn.disabled}
+        disabled_play_button = %q{button.js-manual-action-link.disabled}
 
         expect(page).to have_selector(disabled_play_button)
       end
