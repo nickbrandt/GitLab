@@ -2510,6 +2510,9 @@ msgstr ""
 msgid "Almost there"
 msgstr ""
 
+msgid "Already blocked"
+msgstr ""
+
 msgid "Also called \"Issuer\" or \"Relying party trust identifier\""
 msgstr ""
 
@@ -3957,6 +3960,9 @@ msgid "Bitbucket import"
 msgstr ""
 
 msgid "Blame"
+msgstr ""
+
+msgid "Block user"
 msgstr ""
 
 msgid "Blocked"
@@ -14079,6 +14085,9 @@ msgstr ""
 msgid "Join Zoom meeting"
 msgstr ""
 
+msgid "Joined %{time_ago}"
+msgstr ""
+
 msgid "Jul"
 msgstr ""
 
@@ -15476,6 +15485,9 @@ msgid "Merges this merge request when the pipeline succeeds."
 msgstr ""
 
 msgid "Merging immediately isn't recommended as it may negatively impact the existing merge train. Read the %{docsLinkStart}documentation%{docsLinkEnd} for more information."
+msgstr ""
+
+msgid "Message"
 msgstr ""
 
 msgid "Messages"
@@ -20746,6 +20758,9 @@ msgstr ""
 msgid "Remove priority"
 msgstr ""
 
+msgid "Remove report"
+msgstr ""
+
 msgid "Remove secondary node"
 msgstr ""
 
@@ -20756,6 +20771,9 @@ msgid "Remove stage"
 msgstr ""
 
 msgid "Remove time estimate"
+msgstr ""
+
+msgid "Remove user & report"
 msgstr ""
 
 msgid "Removed"
@@ -20924,6 +20942,9 @@ msgid "Report abuse to admin"
 msgstr ""
 
 msgid "Reported %{timeAgo} by %{reportedBy}"
+msgstr ""
+
+msgid "Reported by %{reporter}"
 msgstr ""
 
 msgid "Reporting"
@@ -26523,6 +26544,12 @@ msgid "URL of the external storage that will serve the repository static objects
 msgstr ""
 
 msgid "URL or request ID"
+msgstr ""
+
+msgid "USER %{user} WILL BE REMOVED! Are you sure?"
+msgstr ""
+
+msgid "USER WILL BE BLOCKED! Are you sure?"
 msgstr ""
 
 msgid "UTC"
