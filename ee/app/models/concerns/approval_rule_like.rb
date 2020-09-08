@@ -77,18 +77,48 @@ module ApprovalRuleLike
   private
 
   def different_users_or_groups?
-    prepared_column = 'different_elements'
-    prepared_groups, prepared_users = [different_groups, different_users].map { |rel| rel.limit(1).select("1 as #{prepared_column}") }
-    union = Gitlab::SQL::Union.new([prepared_groups, prepared_users]) # rubocop: disable Gitlab/Union
+    results = ApplicationRecord.connection.execute(<<-SQL.squish)
+      SELECT different_elements
+      FROM (
+        (SELECT 1 AS different_elements
+        FROM "#{self.class.table_name}_groups"
+        WHERE "#{self.class.table_name}_groups"."#{self.class.underscore}_id" = #{self.id}
+          AND "#{self.class.table_name}_groups"."group_id" NOT IN
+            (SELECT group_id
+              FROM "#{source_rule.class.table_name}_groups"
+              WHERE "#{source_rule.class.table_name}_groups"."#{source_rule.class.underscore}_id" = #{source_rule.id})
+        LIMIT 1)
+      UNION
+        (SELECT 1 AS different_elements
+        FROM "#{self.class.table_name}_users"
+        WHERE "#{self.class.table_name}_users"."#{self.class.underscore}_id" = #{self.id}
+          AND "#{self.class.table_name}_users"."user_id" NOT IN
+            (SELECT user_id
+              FROM "#{source_rule.class.table_name}_users"
+              WHERE "#{source_rule.class.table_name}_users"."#{source_rule.class.underscore}_id" = #{source_rule.id})
+        LIMIT 1)) AS tmp_table
+    SQL
 
-    ActiveRecord::Base.connection.execute("Select #{prepared_column} from (#{union.to_sql}) AS tmp_table").first.present?
+    results.first.present?
   end
 
-  def different_groups
-    groups.where.not(id: source_rule.groups.select(:id))
-  end
+  # def old_different_users_or_groups?
+  #   prepared_column = 'different_elements'
+  #   prepared_groups, prepared_users = [different_groups, different_users].map { |rel| rel.limit(1).select("1 as #{prepared_column}") }
+  #   union = Gitlab::SQL::Union.new([prepared_groups, prepared_users]) # rubocop: disable Gitlab/Union
 
-  def different_users
-    users.where.not(id: source_rule.users.select(:id))
-  end
+  #   ActiveRecord::Base.connection.execute("Select #{prepared_column} from (#{union.to_sql}) AS tmp_table").first.present?
+  # end
+
+  # def different_groups
+  #   groups.where.not(id: source_rule.groups.select(:id))
+  # end
+
+  # def different_users
+  #   users.where.not(id: source_rule.users.select(:id))
+  # end
 end
+
+
+
+

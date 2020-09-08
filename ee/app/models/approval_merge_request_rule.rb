@@ -74,7 +74,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   end
 
   def self.applicable_to_branch(branch)
-    select do |rule|
+    includes(:approval_project_rule).select do |rule|
       next true unless rule.approval_project_rule.present?
       next true if rule.overridden?
 
