@@ -418,7 +418,13 @@ module EE
       return user_defined_rules.take(1) unless multiple_approval_rules_available?
       return user_defined_rules unless branch
 
-      user_defined_rules.applicable_to_branch(branch)
+      rules = strong_memoize(:visible_user_defined_rules) do
+        Hash.new do |h, key|
+          h[key] = user_defined_rules.applicable_to_branch(key)
+        end
+      end
+
+      rules[branch]
     end
 
     def visible_user_defined_inapplicable_rules(branch)
