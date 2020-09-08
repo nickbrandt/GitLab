@@ -14,7 +14,7 @@ RSpec.describe NewEpicWorker do
       end
 
       it 'logs an error' do
-        expect(Rails.logger).to receive(:error).with('NewEpicWorker: couldn\'t find Epic with ID=99, skipping job')
+        expect(Gitlab::AppLogger).to receive(:error).with('NewEpicWorker: couldn\'t find Epic with ID=99, skipping job')
 
         worker.perform(99, create(:user).id)
       end
@@ -28,7 +28,7 @@ RSpec.describe NewEpicWorker do
       end
 
       it 'logs an error' do
-        expect(Rails.logger).to receive(:error).with('NewEpicWorker: couldn\'t find User with ID=99, skipping job')
+        expect(Gitlab::AppLogger).to receive(:error).with('NewEpicWorker: couldn\'t find User with ID=99, skipping job')
 
         worker.perform(create(:epic).id, 99)
       end
