@@ -11481,6 +11481,9 @@ msgstr ""
 msgid "Geo|Please refer to Geo Troubleshooting."
 msgstr ""
 
+msgid "Geo|Primary node"
+msgstr ""
+
 msgid "Geo|Project"
 msgstr ""
 
@@ -11523,6 +11526,9 @@ msgstr ""
 msgid "Geo|Review replication status, and resynchronize and reverify items with the primary node."
 msgstr ""
 
+msgid "Geo|Secondary node"
+msgstr ""
+
 msgid "Geo|Status"
 msgstr ""
 
@@ -11560,6 +11566,9 @@ msgid "Geo|URL can't be blank"
 msgstr ""
 
 msgid "Geo|URL must be a valid url (ex: https://gitlab.com)"
+msgstr ""
+
+msgid "Geo|Undefined"
 msgstr ""
 
 msgid "Geo|Unknown state"
