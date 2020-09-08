@@ -47223,6 +47223,20 @@
               "deprecationReason": null
             },
             {
+              "name": "note",
+              "description": "The note where the quick action to add the logged time was executed",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Note",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "spentAt",
               "description": "Timestamp of when the time tracked was spent at",
               "args": [

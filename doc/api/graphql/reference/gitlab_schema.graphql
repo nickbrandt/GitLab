@@ -16053,6 +16053,11 @@ type Timelog {
   issue: Issue
 
   """
+  The note where the quick action to add the logged time was executed
+  """
+  note: Note
+
+  """
   Timestamp of when the time tracked was spent at
   """
   spentAt: Time
