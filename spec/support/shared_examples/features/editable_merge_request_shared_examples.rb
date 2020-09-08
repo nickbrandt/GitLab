@@ -11,15 +11,6 @@ RSpec.shared_examples 'an editable merge request' do
       expect(page).to have_content user.name
     end
 
-    find('.js-reviewer-search').click
-    page.within '.dropdown-menu-user' do
-      click_link user.name
-    end
-    expect(find('input[name="merge_request[reviewer_ids][]"]', visible: false).value).to match(user.id.to_s)
-    page.within '.js-reviewer-search' do
-      expect(page).to have_content user.name
-    end
-
     click_button 'Milestone'
     page.within '.issue-milestone' do
       click_link milestone.title
@@ -132,4 +123,17 @@ end
 
 def get_textarea_height
   page.evaluate_script('document.getElementById("merge_request_description").offsetHeight')
+end
+
+RSpec.shared_examples 'an editable merge request with reviewers' do
+  it 'updates merge request', :js do
+    find('.js-reviewer-search').click
+    page.within '.dropdown-menu-user' do
+      click_link user.name
+    end
+    expect(find('input[name="merge_request[reviewer_ids][]"]', visible: false).value).to match(user.id.to_s)
+    page.within '.js-reviewer-search' do
+      expect(page).to have_content user.name
+    end
+  end
 end

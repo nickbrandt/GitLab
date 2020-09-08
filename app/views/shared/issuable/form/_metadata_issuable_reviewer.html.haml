@@ -4,7 +4,7 @@
     - issuable.reviewers.each do |reviewer|
       = hidden_field_tag "#{issuable.to_ability_name}[reviewer_ids][]", reviewer.id, id: nil, data: { meta: reviewer.name, avatar_url: reviewer.avatar_url, name: reviewer.name, username: reviewer.username }
 
-    - if issuable.reviewers.length === 0
+    - if issuable.reviewers.empty?
       = hidden_field_tag "#{issuable.to_ability_name}[reviewer_ids][]", 0, id: nil, data: { meta: '' }
 
     = dropdown_tag(users_dropdown_label(issuable.reviewers), options: reviewers_dropdown_options(issuable.to_ability_name))
