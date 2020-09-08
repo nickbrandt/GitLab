@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-require Rails.root.join('db', 'post_migrate', '20200907123723_fix_update_location_fingerprint_for_cs_findings.rb')
+require Rails.root.join('db', 'post_migrate', '20200824140259_update_location_fingerprint_for_cs_findings.rb')
 
-RSpec.describe FixUpdateLocationFingerprintForCsFindings, :migration do
+RSpec.describe UpdateLocationFingerprintForCsFindings, :migration do
   let(:namespaces) { table(:namespaces) }
   let(:users) { table(:users) }
   let(:group) { namespaces.create!(name: 'foo', path: 'foo') }
@@ -43,7 +43,7 @@ RSpec.describe FixUpdateLocationFingerprintForCsFindings, :migration do
 
     migrate!
 
-    location_fingerprints = findings.pluck(:location_fingerprint).flat_map { |x| Gitlab::Database::ShaAttribute.new.deserialize(x) }
+    location_fingerprints = findings.select(:location_fingerprint).pluck(:location_fingerprint)
 
     expect(location_fingerprints).to match_array(new_fingerprints)
   end
@@ -56,17 +56,17 @@ RSpec.describe FixUpdateLocationFingerprintForCsFindings, :migration do
     findings.create!(finding_params(1))
     findings.create!(finding_params(2))
 
-    before_location_fingerprints = findings.pluck(:location_fingerprint).flat_map { |x| Gitlab::Database::ShaAttribute.new.deserialize(x) }
+    before_location_fingerprints = findings.select(:location_fingerprint).pluck(:location_fingerprint)
 
     migrate!
 
-    after_location_fingerprints = findings.pluck(:location_fingerprint).flat_map { |x| Gitlab::Database::ShaAttribute.new.deserialize(x) }
+    after_location_fingerprints = findings.select(:location_fingerprint).pluck(:location_fingerprint)
 
     expect(after_location_fingerprints).to match_array(before_location_fingerprints)
   end
 
   def create_identifier(number_of)
-    (1..number_of).each do |identifier_id|
+    (1..number_of).to_a.each do |identifier_id|
       identifiers.create!(id: identifier_id,
                           project_id: 123,
                           fingerprint: 'd432c2ad2953e8bd587a3a43b3ce309b5b0154c' + identifier_id.to_s,

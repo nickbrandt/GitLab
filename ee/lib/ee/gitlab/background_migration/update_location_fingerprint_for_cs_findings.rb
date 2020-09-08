@@ -7,7 +7,6 @@ module EE
         extend ::Gitlab::Utils::Override
 
         class Finding < ActiveRecord::Base
-          include ::ShaAttribute
           include ::EachBatch
 
           self.table_name = 'vulnerability_occurrences'
@@ -17,8 +16,6 @@ module EE
           }.with_indifferent_access.freeze
 
           enum report_type: REPORT_TYPES
-
-          sha_attribute :location_fingerprint
 
           # Copied from Reports::Security::Locations
           def calculate_new_fingerprint(image, package_name)
@@ -61,11 +58,7 @@ module EE
 
                     next if new_fingerprint.nil?
 
-                    begin
-                      finding.update_column(:location_fingerprint, new_fingerprint)
-                    rescue ActiveRecord::RecordNotUnique
-                      Gitlab::BackgroundMigration::Logger.warn("Duplicate finding found with finding id #{finding.id}")
-                    end
+                    finding.update_column(:location_fingerprint, new_fingerprint)
                   end
         end
       end
