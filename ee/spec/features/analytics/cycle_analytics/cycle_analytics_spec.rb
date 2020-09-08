@@ -29,14 +29,10 @@ RSpec.describe 'Group Value Stream Analytics', :js do
     let_it_be("issue_#{i}".to_sym) { create(:issue, title: "New Issue #{i}", project: project, created_at: 2.days.ago) }
   end
 
-  def wait_for_stages_to_load
-    expect(page).to have_selector '.js-stage-table'
-  end
-
   def select_group(target_group = group)
     visit group_analytics_cycle_analytics_path(target_group)
 
-    wait_for_stages_to_load
+    wait_for_requests
   end
 
   def select_project
