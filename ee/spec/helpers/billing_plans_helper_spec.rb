@@ -46,8 +46,7 @@ RSpec.describe BillingPlansHelper do
   end
 
   describe '#use_new_purchase_flow?' do
-    where free_group_new_purchase: [true, false],
-          type: ['Group', nil],
+    where type: ['Group', nil],
           plan: Plan.all_plans
 
     with_them do
@@ -59,13 +58,12 @@ RSpec.describe BillingPlansHelper do
 
       before do
         allow(helper).to receive(:current_user).and_return(user)
-        stub_feature_flags free_group_new_purchase_flow: free_group_new_purchase
       end
 
       subject { helper.use_new_purchase_flow?(namespace) }
 
       it do
-        result = free_group_new_purchase && type == 'Group' && plan == Plan::FREE
+        result = type == 'Group' && plan == Plan::FREE
 
         is_expected.to be(result)
       end
