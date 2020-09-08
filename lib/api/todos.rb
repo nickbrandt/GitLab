@@ -40,11 +40,9 @@ module API
     resource :todos do
       helpers do
         params :todo_filters do
-          optional :action_id, Integer
-          optional :action, Array[String], values: Todo::ACTION_NAMES.values.map(&:to_s)
+          optional :action, String, values: Todo::ACTION_NAMES.values.map(&:to_s)
           optional :author_id, Integer
           optional :state, String, values: Todo.state_machine.states.map(&:name).map(&:to_s)
-          optional :target_id, Integer
           optional :type, Array[String], values: TodosFinder.todo_types
           optional :project_id, Integer
           optional :group_id, Integer
