@@ -6,6 +6,7 @@ import { EDITOR_TYPES } from '~/vue_shared/components/rich_content_editor/consta
 import EditArea from '~/static_site_editor/components/edit_area.vue';
 import PublishToolbar from '~/static_site_editor/components/publish_toolbar.vue';
 import EditHeader from '~/static_site_editor/components/edit_header.vue';
+import EditDrawer from '~/static_site_editor/components/edit_drawer.vue';
 import UnsavedChangesConfirmDialog from '~/static_site_editor/components/unsaved_changes_confirm_dialog.vue';
 
 import {
@@ -36,6 +37,7 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
   };
 
   const findEditHeader = () => wrapper.find(EditHeader);
+  const findEditDrawer = () => wrapper.find(EditDrawer);
   const findRichContentEditor = () => wrapper.find(RichContentEditor);
   const findPublishToolbar = () => wrapper.find(PublishToolbar);
   const findUnsavedChangesConfirmDialog = () => wrapper.find(UnsavedChangesConfirmDialog);
@@ -51,6 +53,10 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
   it('renders edit header', () => {
     expect(findEditHeader().exists()).toBe(true);
     expect(findEditHeader().props('title')).toBe(title);
+  });
+
+  it('does not render edit drawer', () => {
+    expect(findEditDrawer().exists()).toBe(false);
   });
 
   it('renders rich content editor with a format pass', () => {
@@ -145,6 +151,56 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
       findRichContentEditor().vm.$emit('modeChange', EDITOR_TYPES.markdown);
 
       expect(resetInitialValue).toHaveBeenCalledWith(`${content} format-pass format-pass`);
+    });
+  });
+
+  describe('when hasMatter', () => {
+    beforeEach(() => {
+      wrapper.setData({ hasMatter: true, isDrawerOpen: false });
+
+      wrapper.vm.$nextTick();
+    });
+
+    afterEach(() => {
+      wrapper.setData({ hasMatter: false });
+    });
+
+    it('renders a closed edit drawer', () => {
+      expect(findEditDrawer().exists()).toBe(true);
+      expect(findEditDrawer().props('isOpen')).toBe(false);
+    });
+
+    it('opens the edit drawer', () => {
+      findPublishToolbar().vm.$emit('editSettings');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.vm.isDrawerOpen).toBe(true);
+        expect(findEditDrawer().props('isOpen')).toBe(true);
+      });
+    });
+
+    it('closes the edit drawer', () => {
+      wrapper.setData({ isDrawerOpen: true });
+
+      findEditDrawer().vm.$emit('close');
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.vm.isDrawerOpen).toBe(false);
+        expect(findEditDrawer().props('isOpen')).toBe(false);
+      });
+    });
+
+    it('forwards the matter settings', () => {
+      expect(findEditDrawer().props('settings')).toBe(wrapper.vm.editableMatter);
+    });
+
+    it('syncs matter changes', () => {
+      const newSettings = { title: 'test' };
+      const spySyncParsedSource = jest.spyOn(wrapper.vm.parsedSource, 'syncMatter');
+
+      findEditDrawer().vm.$emit('updateSettings', newSettings);
+
+      expect(spySyncParsedSource).toHaveBeenCalledWith(newSettings);
     });
   });
 

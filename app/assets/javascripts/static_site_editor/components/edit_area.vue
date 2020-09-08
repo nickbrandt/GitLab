@@ -2,6 +2,7 @@
 import RichContentEditor from '~/vue_shared/components/rich_content_editor/rich_content_editor.vue';
 import PublishToolbar from './publish_toolbar.vue';
 import EditHeader from './edit_header.vue';
+import EditDrawer from './edit_drawer.vue';
 import UnsavedChangesConfirmDialog from './unsaved_changes_confirm_dialog.vue';
 import parseSourceFile from '~/static_site_editor/services/parse_source_file';
 import { EDITOR_TYPES } from '~/vue_shared/components/rich_content_editor/constants';
@@ -15,6 +16,7 @@ export default {
     RichContentEditor,
     PublishToolbar,
     EditHeader,
+    EditDrawer,
     UnsavedChangesConfirmDialog,
   },
   props: {
@@ -48,12 +50,20 @@ export default {
       parsedSource: parseSourceFile(this.preProcess(true, this.content)),
       editorMode: EDITOR_TYPES.wysiwyg,
       isModified: false,
+      isDrawerOpen: false,
+      hasMatter: false,
     };
   },
   imageRepository: imageRepository(),
   computed: {
     editableContent() {
       return this.parsedSource.content(this.isWysiwygMode);
+    },
+    editableMatter() {
+      return this.isDrawerOpen ? this.parsedSource.matter() : {};
+    },
+    hasSettingsButton() {
+      return this.hasMatter && this.isWysiwygMode;
     },
     isWysiwygMode() {
       return this.editorMode === EDITOR_TYPES.wysiwyg;
@@ -67,15 +77,30 @@ export default {
         : templater.unwrap(formattedContent);
       return templatedContent;
     },
+    refreshEditHelpers() {
+      this.isModified = this.parsedSource.isModified();
+      this.hasMatter = this.parsedSource.hasMatter();
+    },
+    onDrawerOpen() {
+      this.isDrawerOpen = true;
+      this.refreshEditHelpers();
+    },
+    onDrawerClose() {
+      this.isDrawerOpen = false;
+      this.refreshEditHelpers();
+    },
     onInputChange(newVal) {
       this.parsedSource.syncContent(newVal, this.isWysiwygMode);
-      this.isModified = this.parsedSource.isModified();
+      this.refreshEditHelpers();
     },
     onModeChange(mode) {
       this.editorMode = mode;
 
       const preProcessedContent = this.preProcess(this.isWysiwygMode, this.editableContent);
       this.$refs.editor.resetInitialValue(preProcessedContent);
+    },
+    onUpdateSettings(settings) {
+      this.parsedSource.syncMatter(settings);
     },
     onUploadImage({ file, imageUrl }) {
       this.$options.imageRepository.add(file, imageUrl);
@@ -93,6 +118,13 @@ export default {
 <template>
   <div class="d-flex flex-grow-1 flex-column h-100">
     <edit-header class="py-2" :title="title" />
+    <edit-drawer
+      v-if="hasMatter"
+      :is-open="isDrawerOpen"
+      :settings="editableMatter"
+      @close="onDrawerClose"
+      @updateSettings="onUpdateSettings"
+    />
     <rich-content-editor
       ref="editor"
       :content="editableContent"
@@ -106,9 +138,11 @@ export default {
     <unsaved-changes-confirm-dialog :modified="isModified" />
     <publish-toolbar
       class="gl-fixed gl-left-0 gl-bottom-0 gl-w-full"
+      :is-show-edit="hasSettingsButton"
       :return-url="returnUrl"
       :saveable="isModified"
       :saving-changes="savingChanges"
+      @editSettings="onDrawerOpen"
       @submit="onSubmit"
     />
   </div>
