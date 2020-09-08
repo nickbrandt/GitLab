@@ -49,6 +49,10 @@ describe('App', () => {
     expect(getDrawer().exists()).toBe(true);
   });
 
+  it('dispatches openDrawer when mounted', () => {
+    expect(actions.openDrawer).toHaveBeenCalled();
+  });
+
   it('dispatches closeDrawer when clicking close', () => {
     getDrawer().vm.$emit('close');
     expect(actions.closeDrawer).toHaveBeenCalled();
