@@ -16370,6 +16370,9 @@ msgstr ""
 msgid "NetworkPolicies|Allow all outbound traffic from %{selector} to %{ruleSelector} on %{ports}"
 msgstr ""
 
+msgid "NetworkPolicies|Are you sure you want to delete this policy? This action cannot be undone."
+msgstr ""
+
 msgid "NetworkPolicies|Choose whether to enforce this policy."
 msgstr ""
 
@@ -16377,6 +16380,12 @@ msgid "NetworkPolicies|Create policy"
 msgstr ""
 
 msgid "NetworkPolicies|Define this policy's location, conditions and actions."
+msgstr ""
+
+msgid "NetworkPolicies|Delete policy"
+msgstr ""
+
+msgid "NetworkPolicies|Delete policy: %{policy}"
 msgstr ""
 
 msgid "NetworkPolicies|Deny all traffic"
