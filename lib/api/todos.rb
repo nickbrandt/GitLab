@@ -43,7 +43,7 @@ module API
           optional :action, String, values: Todo::ACTION_NAMES.values.map(&:to_s)
           optional :author_id, Integer
           optional :state, String, values: Todo.state_machine.states.map(&:name).map(&:to_s)
-          optional :type, Array[String], values: TodosFinder.todo_types
+          optional :type, String, values: TodosFinder.todo_types
           optional :project_id, Integer
           optional :group_id, Integer
         end
