@@ -19,27 +19,30 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
 
     let(:ref_path) { 'refs/heads/master' }
     let(:limit) { nil }
+    let(:project_ids) { nil }
 
-    subject do
-      described_class.new(
+    let(:attributes) do
+      {
         current_user: user,
         group: group,
+        project_ids: project_ids,
         ref_path: ref_path,
         start_date: '2020-03-09',
         end_date: '2020-03-10',
         limit: limit
-      ).execute
+      }
+    end
+
+    subject do
+      described_class.new(attributes).execute
     end
 
     context 'when current user is allowed to :read_group_build_report_results' do
+      let(:excluded_group_project) { create(:project, namespace: group) }
+      let!(:excluded_coverage) { create_daily_coverage('unreported', 95.0, '2020-03-10', excluded_group_project) }
+
       before do
         group.add_reporter(user)
-      end
-
-      it 'returns only coverages belonging to the passed group' do
-        expect(subject).to include(group_project_coverage)
-        expect(subject).not_to include(project_coverage)
-        expect(subject).not_to include(subgroup_project_coverage)
       end
 
       context 'with a limit below 1000' do
@@ -61,6 +64,32 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
       context 'without a limit' do
         it 'uses the max constant' do
           expect(subject.limit_value).to eq(Ci::DailyBuildGroupReportResultsByGroupFinder::GROUP_QUERY_RESULT_LIMIT)
+        end
+      end
+
+      context 'with nil project_ids' do
+        it 'returns only coverages belonging to the passed group' do
+          expect(subject).to include(group_project_coverage)
+          expect(subject).not_to include(project_coverage)
+          expect(subject).not_to include(subgroup_project_coverage)
+        end
+      end
+
+      context 'with passed project_ids' do
+        let(:project_ids) { [group_project.id] }
+
+        it 'filters out non-specified projects' do
+          expect(subject).to include(group_project_coverage)
+          expect(subject).not_to include(excluded_coverage)
+        end
+      end
+
+      context 'with empty project_ids' do
+        let(:project_ids) { [] }
+
+        it 'returns all projects' do
+          expect(subject).to include(group_project_coverage)
+          expect(subject).to include(excluded_coverage)
         end
       end
     end

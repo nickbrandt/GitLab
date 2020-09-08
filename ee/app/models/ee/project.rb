@@ -109,6 +109,7 @@ module EE
           .limit(limit)
       end
 
+      scope :including_project, ->(project) { where(id: project) }
       scope :with_wiki_enabled, -> { with_feature_enabled(:wiki) }
       scope :within_shards, -> (shard_names) { where(repository_storage: Array(shard_names)) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
