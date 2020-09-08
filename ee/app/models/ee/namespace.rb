@@ -148,8 +148,6 @@ module EE
     end
 
     def feature_available_in_plan?(feature)
-      return true if ::License.promo_feature_available?(feature)
-
       available_features = strong_memoize(:features_available_in_plan) do
         Hash.new do |h, f|
           h[f] = (plans.map(&:name) & self.class.plans_with_feature(f)).any?
