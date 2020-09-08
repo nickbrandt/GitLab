@@ -1,7 +1,7 @@
-import { mount, shallowMount, createWrapper } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import { within } from '@testing-library/dom';
 import { merge } from 'lodash';
-import { GlDropdown } from '@gitlab/ui';
+import { GlDropdown, GlTabs } from '@gitlab/ui';
 import setWindowLocation from 'helpers/set_window_location_helper';
 import DastProfiles from 'ee/dast_profiles/components/dast_profiles.vue';
 
@@ -82,6 +82,7 @@ describe('EE - DastProfiles', () => {
   const getDropdownComponent = () => wrapper.find(GlDropdown);
   const getSiteProfilesDropdownItem = text =>
     within(getDropdownComponent().element).queryByText(text);
+  const getTabsComponent = () => wrapper.find(GlTabs);
   const getTab = ({ tabName, selected }) =>
     withinComponent().getByRole('tab', {
       name: tabName,
@@ -161,10 +162,10 @@ describe('EE - DastProfiles', () => {
     });
 
     describe.each`
-      tabName               | givenLocationHash
-      ${'Site Profiles'}    | ${'site-profiles'}
-      ${'Scanner Profiles'} | ${'scanner-profiles'}
-    `('with location hash set to "$givenLocationHash"', ({ tabName, givenLocationHash }) => {
+      tabName               | index | givenLocationHash
+      ${'Site Profiles'}    | ${0}  | ${'site-profiles'}
+      ${'Scanner Profiles'} | ${1}  | ${'scanner-profiles'}
+    `('with location hash set to "$givenLocationHash"', ({ tabName, index, givenLocationHash }) => {
       beforeEach(() => {
         setWindowLocation(`http://foo.com/index#${givenLocationHash}`);
         createFullComponent();
@@ -186,9 +187,7 @@ describe('EE - DastProfiles', () => {
       it('updates the browsers URL to contain the selected tab', () => {
         window.location.hash = '';
 
-        const tab = getTab({ tabName });
-
-        createWrapper(tab).trigger('click');
+        getTabsComponent().vm.$emit('input', index);
 
         expect(window.location.hash).toBe(givenLocationHash);
       });
