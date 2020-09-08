@@ -15,6 +15,7 @@ describe('App', () => {
 
   const buildWrapper = () => {
     actions = {
+      openDrawer: jest.fn(),
       closeDrawer: jest.fn(),
     };
 
