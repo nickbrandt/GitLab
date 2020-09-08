@@ -13,6 +13,44 @@ const expectNotImplemented = action => {
   });
 };
 
+describe('setFilters', () => {
+  it('should commit mutation SET_FILTERS, updates epicId with global id', done => {
+    const state = {
+      filters: {},
+    };
+
+    const filters = { labelName: 'label', epicId: 1 };
+    const updatedFilters = { labelName: 'label', epicId: 'gid://gitlab/Epic/1' };
+
+    testAction(
+      actions.setFilters,
+      filters,
+      state,
+      [{ type: types.SET_FILTERS, payload: updatedFilters }],
+      [],
+      done,
+    );
+  });
+
+  it('should commit mutation SET_FILTERS, updates epicWildcardId', done => {
+    const state = {
+      filters: {},
+    };
+
+    const filters = { labelName: 'label', epicId: 'None' };
+    const updatedFilters = { labelName: 'label', epicWildcardId: 'NONE' };
+
+    testAction(
+      actions.setFilters,
+      filters,
+      state,
+      [{ type: types.SET_FILTERS, payload: updatedFilters }],
+      [],
+      done,
+    );
+  });
+});
+
 describe('setShowLabels', () => {
   it('should commit mutation SET_SHOW_LABELS', done => {
     const state = {

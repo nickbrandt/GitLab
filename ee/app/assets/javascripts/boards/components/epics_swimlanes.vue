@@ -134,7 +134,7 @@ export default {
         :disabled="disabled"
         :root-path="rootPath"
       />
-      <div class="board-lane-unassigned-issues gl-sticky gl-display-inline-block gl-left-0">
+      <div class="board-lane-unassigned-issues-title gl-sticky gl-display-inline-block gl-left-0">
         <div class="gl-left-0 gl-py-5 gl-px-3 gl-display-flex gl-align-items-center">
           <span
             class="gl-mr-3 gl-font-weight-bold gl-white-space-nowrap gl-text-overflow-ellipsis gl-overflow-hidden"
@@ -154,7 +154,7 @@ export default {
           </span>
         </div>
       </div>
-      <div class="gl-display-flex">
+      <div class="gl-display-flex" data-testid="board-lane-unassigned-issues">
         <issues-lane-list
           v-for="list in lists"
           :key="`${list.id}-issues`"
