@@ -56,15 +56,19 @@ export default {
 
         return Math.max(0, activeTabIndex);
       },
+      set(newTabIndex) {
+        const profileTypeName = Object.keys(this.profileSettings)[newTabIndex];
+
+        if (profileTypeName) {
+          window.location.hash = kebabCase(profileTypeName);
+        }
+      },
     },
   },
   created() {
     this.addSmartQueriesForEnabledProfileTypes();
   },
   methods: {
-    setLocationHash(profileType) {
-      window.location.hash = kebabCase(profileType);
-    },
     addSmartQueriesForEnabledProfileTypes() {
       Object.values(this.profileSettings).forEach(({ profileType, graphQL: { query } }) => {
         this.makeProfileTypeReactive(profileType);
@@ -242,11 +246,7 @@ export default {
     </header>
 
     <gl-tabs v-model="tabIndex">
-      <gl-tab
-        v-for="(settings, profileType) in profileSettings"
-        :key="profileType"
-        @click="setLocationHash(profileType)"
-      >
+      <gl-tab v-for="(settings, profileType) in profileSettings" :key="profileType">
         <template #title>
           <span>{{ settings.i18n.tabName }}</span>
         </template>
