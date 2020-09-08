@@ -9,7 +9,7 @@ RSpec.describe GitlabSubscription do
     stub_feature_flags(elasticsearch_index_only_paid_groups: false)
   end
 
-  %i[free_plan bronze_plan silver_plan gold_plan early_adopter_plan].each do |plan|
+  %i[free_plan bronze_plan silver_plan gold_plan].each do |plan|
     let_it_be(plan) { create(plan) }
   end
 
@@ -40,14 +40,12 @@ RSpec.describe GitlabSubscription do
     describe '.with_hosted_plan' do
       let!(:gold_subscription) { create(:gitlab_subscription, hosted_plan: gold_plan) }
       let!(:silver_subscription) { create(:gitlab_subscription, hosted_plan: silver_plan) }
-      let!(:early_adopter_subscription) { create(:gitlab_subscription, hosted_plan: early_adopter_plan) }
 
       let!(:trial_subscription) { create(:gitlab_subscription, hosted_plan: gold_plan, trial: true) }
 
       it 'scopes to the plan' do
         expect(described_class.with_hosted_plan('gold')).to contain_exactly(gold_subscription)
         expect(described_class.with_hosted_plan('silver')).to contain_exactly(silver_subscription)
-        expect(described_class.with_hosted_plan('early_adopter')).to contain_exactly(early_adopter_subscription)
         expect(described_class.with_hosted_plan('bronze')).to be_empty
       end
     end
@@ -161,12 +159,6 @@ RSpec.describe GitlabSubscription do
       include_examples 'always returns a total of 0'
     end
 
-    context 'with an early adopter plan' do
-      let(:subscription_attrs) { { hosted_plan: early_adopter_plan } }
-
-      include_examples 'always returns a total of 0'
-    end
-
     context 'with a paid plan' do
       let(:subscription_attrs) { { hosted_plan: bronze_plan } }
 
@@ -242,7 +234,6 @@ RSpec.describe GitlabSubscription do
       'bronze'        | 1 | true  | true
       'bronze'        | 1 | false | false
       'silver'        | 1 | true  | true
-      'early_adopter' | 1 | true  | false
     end
 
     with_them do

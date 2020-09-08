@@ -317,11 +317,6 @@ RSpec.describe License do
           .to include(:multiple_issue_assignees, :deploy_board, :file_locks)
       end
 
-      it 'returns features for early adopter plan' do
-        expect(described_class.features_for_plan('premium'))
-          .to include(:deploy_board, :file_locks)
-      end
-
       it 'returns empty array if no features for given plan' do
         expect(described_class.features_for_plan('bronze')).to eq([])
       end
@@ -778,7 +773,6 @@ RSpec.describe License do
       nil | false
       described_class::STARTER_PLAN | false
       described_class::PREMIUM_PLAN | false
-      described_class::EARLY_ADOPTER_PLAN | false
       described_class::ULTIMATE_PLAN | true
     end
 
