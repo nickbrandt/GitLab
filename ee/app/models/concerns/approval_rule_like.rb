@@ -71,7 +71,24 @@ module ApprovalRuleLike
 
     source_rule.name != name ||
       source_rule.approvals_required != approvals_required ||
-      groups.where.not(id: source_rule.groups.select(:id)).any? ||
-      users.where.not(id: source_rule.users.select(:id)).any?
+      different_users_or_groups?
+  end
+
+  private
+
+  def different_users_or_groups?
+    prepared_column = 'different_elements'
+    prepared_groups, prepared_users = [different_groups, different_users].map { |rel| rel.limit(1).select("1 as #{prepared_column}") }
+    union = Gitlab::SQL::Union.new([prepared_groups, prepared_users]) # rubocop: disable Gitlab/Union
+
+    ActiveRecord::Base.connection.execute("Select #{prepared_column} from (#{union.to_sql}) AS tmp_table").first.present?
+  end
+
+  def different_groups
+    groups.where.not(id: source_rule.groups.select(:id))
+  end
+
+  def different_users
+    users.where.not(id: source_rule.users.select(:id))
   end
 end
