@@ -731,6 +731,7 @@ RSpec.describe Event do
                      else
                        {}
                      end
+
         target = kind == :project ? nil : build(kind, **extra_data)
 
         [kind, build(:event, :created, author: project.owner, project: project, target: target)]
