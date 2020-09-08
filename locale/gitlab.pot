@@ -16855,6 +16855,9 @@ msgstr ""
 msgid "No parent group"
 msgstr ""
 
+msgid "No plan"
+msgstr ""
+
 msgid "No pods available"
 msgstr ""
 
