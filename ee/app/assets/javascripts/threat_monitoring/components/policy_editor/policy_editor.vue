@@ -120,6 +120,9 @@ export default {
       const rule = this.policy.rules[ruleIdx];
       this.policy.rules.splice(ruleIdx, 1, buildRule(ruleType, rule));
     },
+    removeRule(ruleIdx) {
+      this.policy.rules.splice(ruleIdx, 1);
+    },
     loadYaml(manifest) {
       this.yamlEditorValue = manifest;
       this.yamlEditorError = null;
@@ -233,6 +236,7 @@ export default {
           @rule-type-change="updateRuleType(idx, $event)"
           @endpoint-match-mode-change="updateEndpointMatchMode"
           @endpoint-labels-change="updateEndpointLabels"
+          @remove="removeRule(idx)"
         />
 
         <div class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100 gl-mb-5">

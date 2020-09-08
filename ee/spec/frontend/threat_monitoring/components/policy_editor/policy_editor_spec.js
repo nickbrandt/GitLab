@@ -171,6 +171,16 @@ spec:
     });
   });
 
+  it('removes a new rule', async () => {
+    findAddRuleButton().vm.$emit('click');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.findAll(PolicyRuleBuilder).length).toEqual(1);
+
+    wrapper.find(PolicyRuleBuilder).vm.$emit('remove');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.findAll(PolicyRuleBuilder).length).toEqual(0);
+  });
+
   it('updates yaml editor value on switch to yaml editor', async () => {
     findPolicyName().vm.$emit('input', 'test-policy');
     wrapper.find("[data-testid='editor-mode']").vm.$emit('input', EditorModeYAML);
