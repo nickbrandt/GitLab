@@ -6,11 +6,18 @@ import { __, s__ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
 import DynamicFields from './dynamic_fields.vue';
+// START TODO: Only for debugging
+import AnalyzerConfiguration from './analyzer_configuration.vue';
+// END TODO
 import { isValidConfigurationEntity } from './utils';
+import analyzer_configurationVue from './analyzer_configuration.vue';
 
 export default {
   components: {
     DynamicFields,
+    // START TODO: Only for debugging
+    AnalyzerConfiguration,
+    // END TODO
     GlAlert,
     GlButton,
   },
@@ -34,6 +41,17 @@ export default {
   data() {
     return {
       formEntities: cloneDeep(this.entities),
+      // START TODO: Only for debugging
+      analyzerEntity: {
+        name: 'name',
+        label: 'label',
+        description: 'description',
+        enabled: true,
+        configuration: [{
+          defaultValue:'def', description: 'desc', field:'foo', type: 'string', value:'val', label: 'label'
+        }]
+      },
+      // END TODO
       hasSubmissionError: false,
       isSubmitting: false,
     };
@@ -80,6 +98,10 @@ export default {
 <template>
   <form @submit.prevent="onSubmit">
     <dynamic-fields v-model="formEntities" />
+
+    <!-- START TODO: Only for debugging -->
+    <analyzer-configuration v-model="analyzerEntity" />
+    <!-- END TODO -->
 
     <hr />
 
