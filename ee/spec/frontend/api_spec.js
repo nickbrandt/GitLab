@@ -370,6 +370,22 @@ describe('Api', () => {
       });
     });
 
+    describe('cycleAnalyticsDeleteValueStream', () => {
+      it('delete the custom value stream', done => {
+        const response = {};
+        const expectedUrl = valueStreamBaseUrl({ resource: `value_streams/${valueStreamId}` });
+        mock.onDelete(expectedUrl).reply(httpStatus.OK, response);
+
+        Api.cycleAnalyticsDeleteValueStream(groupId, valueStreamId)
+          .then(({ data, config: { url } }) => {
+            expect(data).toEqual(response);
+            expect(url).toEqual(expectedUrl);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
     describe('cycleAnalyticsGroupStagesAndEvents', () => {
       it('fetches custom stage events and all stages', done => {
         const response = { events: [], stages: [] };
