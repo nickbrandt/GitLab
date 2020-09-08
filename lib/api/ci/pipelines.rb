@@ -133,6 +133,7 @@ module API
               .new(current_user: current_user, pipeline: pipeline, params: params)
               .execute
           else
+            authorize!(:read_build, pipeline)
             builds = pipeline.builds
             builds = filter_builds(builds, params[:scope])
           end
@@ -161,6 +162,7 @@ module API
               .new(current_user: current_user, pipeline: pipeline, params: params, type: ::Ci::Bridge)
               .execute
           else
+            authorize!(:read_pipeline, pipeline)
             bridges = pipeline.bridges
             bridges = filter_builds(bridges, params[:scope])
           end
@@ -244,20 +246,20 @@ module API
       end
 
       helpers do
-        if Feature.disabled?(:ci_jobs_finder_refactor)
-          # rubocop: disable CodeReuse/ActiveRecord
-          def filter_builds(builds, scope)
-            return builds if scope.nil? || scope.empty?
+        # NOTE: This method should be removed once the ci_jobs_finder_refactor FF is
+        # removed. https://gitlab.com/gitlab-org/gitlab/-/issues/245183
+        # rubocop: disable CodeReuse/ActiveRecord
+        def filter_builds(builds, scope)
+          return builds if scope.nil? || scope.empty?
 
-            available_statuses = ::CommitStatus::AVAILABLE_STATUSES
+          available_statuses = ::CommitStatus::AVAILABLE_STATUSES
 
-            unknown = scope - available_statuses
-            render_api_error!('Scope contains invalid value(s)', 400) unless unknown.empty?
+          unknown = scope - available_statuses
+          render_api_error!('Scope contains invalid value(s)', 400) unless unknown.empty?
 
-            builds.where(status: scope)
-          end
-          # rubocop: enable CodeReuse/ActiveRecord
+          builds.where(status: scope)
         end
+        # rubocop: enable CodeReuse/ActiveRecord
 
         def pipeline
           strong_memoize(:pipeline) do
