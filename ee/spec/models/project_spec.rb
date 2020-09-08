@@ -270,11 +270,11 @@ RSpec.describe Project do
   describe 'setting up a mirror' do
     context 'when new project' do
       it 'creates import_state and sets next_execution_timestamp to now' do
-        project = build(:project, :mirror)
+        project = build(:project, :mirror, creator: create(:user))
 
         Timecop.freeze do
           expect do
-            project.save
+            project.save!
           end.to change { ProjectImportState.count }.by(1)
 
           expect(project.import_state.next_execution_timestamp).to be_like_time(Time.current)
