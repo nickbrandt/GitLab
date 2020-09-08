@@ -27,6 +27,7 @@ module EE
 
         field :timelogs, ::Types::TimelogType.connection_type, null: false,
               description: 'Time logged in issues by group members',
+              extras: [:lookahead],
               complexity: 5,
               resolver: ::Resolvers::TimelogResolver
 
