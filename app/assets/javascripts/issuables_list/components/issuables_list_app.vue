@@ -20,7 +20,8 @@ import Issuable from './issuable.vue';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 import {
   sortOrderMap,
-  availableSortOptionsJira,
+  AVAILABLE_SORT_OPTIONS,
+  LIST_TYPE,
   RELATIVE_POSITION,
   PAGE_SIZE,
   PAGE_SIZE_MANUAL,
@@ -56,7 +57,7 @@ export default {
       type: String,
       required: true,
     },
-    projectPath: {
+    path: {
       type: String,
       required: false,
       default: '',
@@ -74,7 +75,6 @@ export default {
   },
   data() {
     return {
-      availableSortOptionsJira,
       filters: {},
       isBulkEditing: false,
       issuables: [],
@@ -93,6 +93,9 @@ export default {
       // this works, we will need to rethink this if we start tracking
       // [id]: false for not selected values.
       return this.issuables.length === Object.keys(this.selection).length;
+    },
+    availableSortOptions() {
+      return AVAILABLE_SORT_OPTIONS[this.type];
     },
     emptyState() {
       if (this.issuables.length) {
@@ -173,10 +176,10 @@ export default {
       };
     },
     isServiceDesk() {
-      return this.type === 'service_desk';
+      return this.type === LIST_TYPE.SERVICE_DESK;
     },
     isJira() {
-      return this.type === 'jira';
+      return this.type === LIST_TYPE.JIRA;
     },
     initialFilterValue() {
       const value = [];
@@ -362,7 +365,7 @@ export default {
       :namespace="projectPath"
       :search-input-placeholder="__('Search Jira issues')"
       :tokens="[]"
-      :sort-options="availableSortOptionsJira"
+      :sort-options="availableSortOptions"
       :initial-filter-value="initialFilterValue"
       :initial-sort-by="initialSortBy"
       class="row-content-block"
