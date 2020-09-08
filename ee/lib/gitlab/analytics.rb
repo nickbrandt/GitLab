@@ -15,10 +15,12 @@ module Gitlab
       PRODUCTIVITY_ANALYTICS_FEATURE_FLAG
     ].freeze
 
+    # Improve that in https://gitlab.com/gitlab-org/gitlab/-/issues/246768
     FEATURE_FLAG_DEFAULTS = {
       PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => true,
       GROUP_COVERAGE_REPORTS_FEATURE_FLAG => true,
-      CYCLE_ANALYTICS_FEATURE_FLAG => true
+      CYCLE_ANALYTICS_FEATURE_FLAG => true,
+      PROJECT_MERGE_REQUEST_ANALYTICS_FEATURE_FLAG => true
     }.freeze
 
     FEATURE_FLAGS_TYPE = {
@@ -26,7 +28,8 @@ module Gitlab
       PRODUCTIVITY_ANALYTICS_FEATURE_FLAG => :licensed,
       GROUP_COVERAGE_REPORTS_FEATURE_FLAG => :licensed,
       GROUP_MERGE_REQUEST_ANALYTICS_FEATURE_FLAG => :licensed,
-      CYCLE_ANALYTICS_FEATURE_FLAG => :development
+      CYCLE_ANALYTICS_FEATURE_FLAG => :development,
+      PROJECT_MERGE_REQUEST_ANALYTICS_FEATURE_FLAG => :licensed
     }.freeze
 
     def self.any_features_enabled?
