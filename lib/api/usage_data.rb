@@ -2,7 +2,9 @@
 
 module API
   class UsageData < Grape::API::Instance
-    before { authenticate! }
+    before do
+      forbidden!('Invalid CSRF token is provided') unless verified_request?
+    end
 
     namespace 'usage_data' do
       desc 'Track usage data events' do

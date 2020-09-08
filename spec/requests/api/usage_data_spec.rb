@@ -10,35 +10,43 @@ RSpec.describe API::UsageData do
     let(:known_event) { 'g_compliance_dashboard' }
     let(:unknown_event) { 'unknown' }
 
-    context 'when unauthenticated' do
-      it 'retruns 401 response' do
+    context 'without CSRF token' do
+      it 'returns 401 response' do
+        allow(Gitlab::RequestForgeryProtection).to receive(:verified?).and_return(false)
+
         post api(endpoint), params: { values: [user.id] }
 
-        expect(response).to have_gitlab_http_status(:unauthorized)
+        expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
 
-    context 'when name is missing from params' do
-      it 'returns bad request' do
-        post api(endpoint, user), params: { values: [user.id] }
-
-        expect(response).to have_gitlab_http_status(:bad_request)
+    context 'without CSRF token' do
+      before do
+        allow(Gitlab::RequestForgeryProtection).to receive(:verified?).and_return(true)
       end
-    end
 
-    context 'with correct params' do
-      it 'returns status ok' do
-        post api(endpoint, user), params: { name: known_event, values: [user.id] }
+      context 'when name is missing from params' do
+        it 'returns bad request' do
+          post api(endpoint), params: { values: [user.id] }
 
-        expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to have_gitlab_http_status(:bad_request)
+        end
       end
-    end
 
-    context 'with unknown event' do
-      it 'returns status ok' do
-        post api(endpoint, user), params: { name: unknown_event, values: [user.id] }
+      context 'with correct params' do
+        it 'returns status ok' do
+          post api(endpoint), params: { name: known_event, values: [user.id] }
 
-        expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to have_gitlab_http_status(:ok)
+        end
+      end
+
+      context 'with unknown event' do
+        it 'returns status ok' do
+          post api(endpoint), params: { name: unknown_event, values: [user.id] }
+
+          expect(response).to have_gitlab_http_status(:ok)
+        end
       end
     end
   end

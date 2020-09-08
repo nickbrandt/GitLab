@@ -330,15 +330,9 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
 
    Return 200 if tracking failed for any reason.
 
-   - `401 Unauthorized` if not authorized
+   - `403 Forbidden` if invalid CSRF token is provided
    - `400 Bad request` if name parameter is missing
    - `200` if event was tracked or any errors
-
-   Example usage:
-
-   ```shell
-   curl --header "Authorization: Bearer OAUTH-TOKEN" "https://gitlab.example.com/api/v4/usage_data/increment_unique_users" --data "name=event_name&values[]=value1&values[]=value2"
-   ```
 
 1. Track event using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event(entity_id, event_name)`.
 
