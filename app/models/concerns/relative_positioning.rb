@@ -69,8 +69,11 @@ module RelativePositioning
     end
 
     def nextify(relation, gt = true)
-      op = gt ? '>' : '<'
-      relation.where("relative_position #{op} ?", object.relative_position)
+      if gt
+        relation.where("relative_position > ?", relative_position)
+      else
+        relation.where("relative_position < ?", relative_position)
+      end
     end
 
     def relative_siblings(relation = scoped_items)
