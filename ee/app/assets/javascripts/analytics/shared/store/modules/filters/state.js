@@ -2,6 +2,7 @@ export default () => ({
   milestonesEndpoint: '',
   labelsEndpoint: '',
   groupEndpoint: '',
+  projectEndpoint: '',
   milestones: {
     isLoading: false,
     errorCode: null,
