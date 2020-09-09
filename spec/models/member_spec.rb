@@ -149,7 +149,7 @@ RSpec.describe Member do
 
       accepted_request_user = create(:user).tap { |u| project.request_access(u) }
       @accepted_request_member = project.requesters.find_by(user_id: accepted_request_user.id).tap { |m| m.accept_request }
-      @member_with_minimal_access = create(:group_member, :minimal_access, group: group)
+      @member_with_minimal_access = create(:group_member, :minimal_access, source: group)
     end
 
     describe '.access_for_user_ids' do

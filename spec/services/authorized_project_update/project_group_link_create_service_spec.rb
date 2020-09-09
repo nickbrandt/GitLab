@@ -114,7 +114,7 @@ RSpec.describe AuthorizedProjectUpdate::ProjectGroupLinkCreateService do
 
     context 'minimal access member' do
       before do
-        create(:group_member, :minimal_access, user: group_user, group: group)
+        create(:group_member, :minimal_access, user: group_user, source: group)
       end
 
       it 'does not create project authorization' do
