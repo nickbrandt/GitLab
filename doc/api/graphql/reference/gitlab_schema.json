@@ -5971,7 +5971,7 @@
           "inputFields": [
             {
               "name": "projectPath",
-              "description": "Full path of the project.",
+              "description": "Full path of the project",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -5985,13 +5985,13 @@
             },
             {
               "name": "configuration",
-              "description": "Payload containing SAST variable values (https://docs.gitlab.com/ee/user/application_security/sast/#available-variables).",
+              "description": "SAST CI configuration for the project",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "JSON",
+                  "kind": "INPUT_OBJECT",
+                  "name": "SastCiConfigurationInput",
                   "ofType": null
                 }
               },
@@ -6058,14 +6058,32 @@
               "deprecationReason": null
             },
             {
-              "name": "result",
-              "description": "JSON containing the status of MR creation.",
+              "name": "status",
+              "description": "Status of creating the commit for the supplied SAST CI configuration",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "successPath",
+              "description": "Redirect path to use when the response is successful",
               "args": [
 
               ],
               "type": {
                 "kind": "SCALAR",
-                "name": "JSON",
+                "name": "String",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -42809,6 +42827,106 @@
           "interfaces": [
 
           ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SastCiConfigurationEntityInput",
+          "description": "Represents an entity in SAST CI configuration",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "field",
+              "description": "CI keyword of entity",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "defaultValue",
+              "description": "Default value that is used if value is empty",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "value",
+              "description": "Current value of the entity",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SastCiConfigurationInput",
+          "description": "Represents a CI configuration of SAST",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "global",
+              "description": "List of global entities related to SAST configuration",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SastCiConfigurationEntityInput",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "pipeline",
+              "description": "List of pipeline entities related to SAST configuration",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SastCiConfigurationEntityInput",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },

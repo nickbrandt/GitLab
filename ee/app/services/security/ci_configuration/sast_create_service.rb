@@ -15,6 +15,8 @@ module Security
 
         if result[:status] == :success
           result[:success_path] = successful_change_path
+        else
+          result[:errors] = result[:message]
         end
 
         result
