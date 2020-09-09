@@ -109,7 +109,6 @@ We recommend using the [consolidated object storage settings](../object_storage.
 
    ```ruby
    gitlab_rails['packages_enabled'] = true
-   gitlab_rails['packages_storage_path'] = "/var/opt/gitlab/gitlab-rails/shared/packages"
    gitlab_rails['packages_object_store_enabled'] = true
    gitlab_rails['packages_object_store_remote_directory'] = "packages" # The bucket name.
    gitlab_rails['packages_object_store_direct_upload'] = false         # Use Object Storage directly for uploads instead of background uploads if enabled (Default: false).
