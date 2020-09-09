@@ -21,7 +21,11 @@ namespace :admin do
   resource :email, only: [:show, :create]
   resources :audit_logs, controller: 'audit_logs', only: [:index]
   resources :audit_log_reports, only: [:index], constraints: { format: :csv }
-  resources :credentials, only: [:index]
+  resources :credentials, only: [:index] do
+    member do
+      put :revoke
+    end
+  end
 
   resource :license, only: [:show, :new, :create, :destroy] do
     get :download, on: :member
