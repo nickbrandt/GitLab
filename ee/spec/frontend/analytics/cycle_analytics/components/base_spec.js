@@ -689,8 +689,8 @@ describe('Cycle Analytics component', () => {
       wrapper.vm.$store.dispatch('initializeCycleAnalytics', initialCycleAnalyticsState);
     });
 
-    it('sets the created_after and created_before url parameters', () => {
-      return shouldMergeUrlParams(wrapper, defaultParams);
+    it('sets the created_after and created_before url parameters', async () => {
+      await shouldMergeUrlParams(wrapper, defaultParams);
     });
 
     describe('with hideGroupDropDown=true', () => {
@@ -712,8 +712,8 @@ describe('Cycle Analytics component', () => {
         });
       });
 
-      it('sets the group_id url parameter', () => {
-        return shouldMergeUrlParams(wrapper, {
+      it('sets the group_id url parameter', async () => {
+        await shouldMergeUrlParams(wrapper, {
           ...defaultParams,
           created_after: toYmd(mockData.startDate),
           created_before: toYmd(mockData.endDate),
@@ -729,8 +729,8 @@ describe('Cycle Analytics component', () => {
         });
       });
 
-      it('sets the group_id url parameter', () => {
-        return shouldMergeUrlParams(wrapper, {
+      it('sets the group_id url parameter', async () => {
+        await shouldMergeUrlParams(wrapper, {
           ...defaultParams,
           group_id: fakeGroup.fullPath,
         });
@@ -747,8 +747,8 @@ describe('Cycle Analytics component', () => {
         return wrapper.vm.$nextTick();
       });
 
-      it('sets the project_ids url parameter', () => {
-        return shouldMergeUrlParams(wrapper, {
+      it('sets the project_ids url parameter', async () => {
+        await shouldMergeUrlParams(wrapper, {
           ...defaultParams,
           created_after: toYmd(mockData.startDate),
           created_before: toYmd(mockData.endDate),
