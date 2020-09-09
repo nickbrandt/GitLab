@@ -115,6 +115,17 @@ module EE
         )
       end
 
+      def group_repository_analytics_navbar_link(group, current_user)
+        return unless ::Gitlab::Analytics.group_coverage_reports_enabled?
+        return unless group_sidebar_link?(:repository_analytics)
+
+        navbar_sub_item(
+          title: _('Repositories'),
+          path: 'groups/analytics/repository_analytics#show',
+          link: group_analytics_repository_analytics_path(group)
+        )
+      end
+
       def insights_navbar_link(project, current_user)
         return unless project_nav_tab?(:project_insights)
 
@@ -133,17 +144,6 @@ module EE
           title: _('Code Review'),
           path: 'projects/analytics/code_reviews#index',
           link: project_analytics_code_reviews_path(project)
-        )
-      end
-
-      def group_repository_analytics_navbar_link(group, current_user)
-        return unless ::Gitlab::Analytics.group_coverage_reports_enabled?
-        return unless group_sidebar_link?(:repository_analytics)
-
-        navbar_sub_item(
-          title: _('Repositories'),
-          path: 'groups/analytics/repository_analytics#show',
-          link: group_analytics_repository_analytics_path(group)
         )
       end
     end
