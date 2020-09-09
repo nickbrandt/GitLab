@@ -28,6 +28,7 @@ RSpec.describe Gitlab::UsageData do
       create(:ci_build, name: 'sast', pipeline: pipeline)
       create(:ci_build, name: 'secret_detection', pipeline: pipeline)
       create(:ci_build, name: 'coverage_fuzzing', pipeline: pipeline)
+      create(:ci_pipeline, source: :ondemand_dast_scan, project: projects[0])
 
       create(:prometheus_alert, project: projects[0])
       create(:prometheus_alert, project: projects[0])
@@ -145,6 +146,7 @@ RSpec.describe Gitlab::UsageData do
       expect(count_data[:sast_jobs]).to eq(1)
       expect(count_data[:secret_detection_jobs]).to eq(1)
       expect(count_data[:coverage_fuzzing_jobs]).to eq(1)
+      expect(count_data[:dast_on_demand_pipelines]).to eq(1)
     end
 
     it 'gathers group overview preferences usage data', :aggregate_failures do
