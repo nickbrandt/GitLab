@@ -6372,6 +6372,9 @@ msgstr ""
 msgid "Commit…"
 msgstr ""
 
+msgid "Community forum"
+msgstr ""
+
 msgid "Company"
 msgstr ""
 
