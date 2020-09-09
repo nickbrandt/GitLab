@@ -3,7 +3,7 @@
 module Types
   class DastSiteProfileType < BaseObject
     graphql_name 'DastSiteProfile'
-    description 'Represents a DAST Site Profile.'
+    description 'Represents a DAST Site Profile'
 
     authorize :create_on_demand_dast_scan
 
