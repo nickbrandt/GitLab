@@ -369,8 +369,8 @@ class IssuableBaseService < BaseService
     associations
   end
 
-  def has_changes?(issuable, old_labels: [], old_assignees: [])
-    valid_attrs = [:title, :description, :assignee_ids, :milestone_id, :target_branch]
+  def has_changes?(issuable, old_labels: [], old_assignees: [], old_reviewers: [])
+    valid_attrs = [:title, :description, :assignee_ids, :reviewer_ids, :milestone_id, :target_branch]
 
     attrs_changed = valid_attrs.any? do |attr|
       issuable.previous_changes.include?(attr.to_s)
@@ -380,7 +380,9 @@ class IssuableBaseService < BaseService
 
     assignees_changed = issuable.assignees != old_assignees
 
-    attrs_changed || labels_changed || assignees_changed
+    reviewers_changed = issuable.reviewers != old_reviewers if issuable.allows_reviewers?
+
+    attrs_changed || labels_changed || assignees_changed || reviewers_changed
   end
 
   def invalidate_cache_counts(issuable, users: [])
