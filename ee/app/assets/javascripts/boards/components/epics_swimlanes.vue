@@ -49,9 +49,15 @@ export default {
   },
   computed: {
     ...mapState(['epics', 'isLoadingIssues']),
-    ...mapGetters(['unassignedIssues']),
+    ...mapGetters(['getUnassignedIssues']),
+    unassignedIssues() {
+      return listId => this.getUnassignedIssues(listId);
+    },
     unassignedIssuesCount() {
-      return this.lists.reduce((total, list) => total + this.unassignedIssues(list.id).length, 0);
+      return this.lists.reduce(
+        (total, list) => total + this.getUnassignedIssues(list.id).length,
+        0,
+      );
     },
     unassignedIssuesCountTooltipText() {
       return n__(`%d unassigned issue`, `%d unassigned issues`, this.unassignedIssuesCount);

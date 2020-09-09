@@ -12,7 +12,7 @@ export default {
     return getters.getIssues(listId).filter(issue => issue.epic && issue.epic.id === epicId);
   },
 
-  unassignedIssues: (state, getters) => listId => {
-    return getters.getIssues(listId).filter(i => i.epic === null);
+  getUnassignedIssues: (state, getters) => listId => {
+    return getters.getIssues(listId).filter(i => Boolean(i.epic) === false);
   },
 };
