@@ -2165,6 +2165,9 @@ msgstr ""
 msgid "AlertManagement|Events"
 msgstr ""
 
+msgid "AlertManagement|Full Alert Payload"
+msgstr ""
+
 msgid "AlertManagement|High"
 msgstr ""
 
@@ -2265,6 +2268,9 @@ msgid "AlertManagement|Triggered"
 msgstr ""
 
 msgid "AlertManagement|Unknown"
+msgstr ""
+
+msgid "AlertManagement|Value"
 msgstr ""
 
 msgid "AlertManagement|View alerts in Opsgenie"
