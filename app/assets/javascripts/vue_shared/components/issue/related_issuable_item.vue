@@ -1,7 +1,7 @@
 <script>
 /* eslint-disable vue/no-v-html */
 import '~/commons/bootstrap';
-import { GlIcon, GlTooltip, GlTooltipDirective } from '@gitlab/ui';
+import { GlIcon, GlTooltip, GlTooltipDirective, GlButton } from '@gitlab/ui';
 import { sprintf } from '~/locale';
 import IssueMilestone from './issue_milestone.vue';
 import IssueAssignees from './issue_assignees.vue';
@@ -19,6 +19,7 @@ export default {
     GlTooltip,
     IssueWeight: () => import('ee_component/boards/components/issue_card_weight.vue'),
     IssueDueDate,
+    GlButton,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -176,19 +177,19 @@ export default {
     >
       <gl-icon name="lock" />
     </span>
-    <button
+    <gl-button
       v-else-if="canRemove"
       ref="removeButton"
       v-gl-tooltip
       :disabled="removeDisabled"
-      type="button"
-      class="btn btn-default btn-svg btn-item-remove js-issue-item-remove-button"
+      class="js-issue-item-remove-button"
       data-qa-selector="remove_related_issue_button"
       :title="__('Remove')"
       :aria-label="__('Remove')"
       @click="onRemoveRequest"
+      icon="close"
+      category="tertiary"
     >
-      <gl-icon class="btn-item-remove-icon" name="close" />
-    </button>
+    </gl-button>
   </div>
 </template>
