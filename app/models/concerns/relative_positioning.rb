@@ -38,6 +38,8 @@ module RelativePositioning
     end
   end
 
+  # This class is API private - it should not be explicitly instantiated
+  # outside of tests
   class ItemContext
     include Gitlab::Utils::StrongMemoize
 
@@ -72,7 +74,7 @@ module RelativePositioning
     end
 
     def relative_siblings(relation = scoped_items)
-      relation.id_not_in(object.id)
+      object.relative_siblings(relation)
     end
 
     # Handles the possibility that the position is already occupied by a sibling
@@ -237,9 +239,7 @@ module RelativePositioning
     def move_sequence(start_pos, end_pos, delta, include_self = false)
       relation = include_self ? scoped_items : relative_siblings
 
-      relation
-        .where('relative_position BETWEEN ? AND ?', start_pos, end_pos)
-        .update_all("relative_position = relative_position + #{delta}")
+      object.update_relative_siblings(relation, (start_pos..end_pos), delta)
     end
 
     def find_next_gap_before
@@ -559,38 +559,47 @@ module RelativePositioning
     end
   end
 
+  def self.mover
+    Mover.new(START_POSITION, (MIN_POSITION..MAX_POSITION))
+  end
+
   def move_between(before, after)
-    mover = Mover.new(START_POSITION, (MIN_POSITION..MAX_POSITION))
     before, after = [before, after].sort_by(&:relative_position) if before && after
 
-    mover.move(self, before, after)
+    RelativePositioning.mover.move(self, before, after)
   end
 
   def move_after(before = self)
-    mover = Mover.new(START_POSITION, (MIN_POSITION..MAX_POSITION))
-
-    mover.move(self, before, nil)
+    RelativePositioning.mover.move(self, before, nil)
   end
 
   def move_before(after = self)
-    mover = Mover.new(START_POSITION, (MIN_POSITION..MAX_POSITION))
-
-    mover.move(self, nil, after)
+    RelativePositioning.mover.move(self, nil, after)
   end
 
   def move_to_end
-    mover = Mover.new(START_POSITION, (MIN_POSITION..MAX_POSITION))
-
-    mover.move_to_end(self)
+    RelativePositioning.mover.move_to_end(self)
   rescue NoSpaceLeft
     self.relative_position = MAX_POSITION
   end
 
   def move_to_start
-    mover = Mover.new(START_POSITION, (MIN_POSITION..MAX_POSITION))
-
-    mover.move_to_start(self)
+    RelativePositioning.mover.move_to_start(self)
   rescue NoSpaceLeft
     self.relative_position = MIN_POSITION
+  end
+
+  # This method is used during rebalancing - override it to customise the update
+  # logic:
+  def update_relative_siblings(relation, range, delta)
+    relation
+      .where(relative_position: range)
+      .update_all("relative_position = relative_position + #{delta}")
+  end
+
+  # This method is used to exclude the current self from a relation. Customize
+  # this if `id <> :id` is not sufficient
+  def relative_siblings(relation)
+    relation.id_not_in(id)
   end
 end
