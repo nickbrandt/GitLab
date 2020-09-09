@@ -1,0 +1,5 @@
+---
+title: coverage fuzzing bugfix - remove merge_request event trigger
+merge_request: 41906
+author:
+type: fixed
