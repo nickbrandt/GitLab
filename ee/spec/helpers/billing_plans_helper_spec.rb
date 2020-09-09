@@ -63,7 +63,7 @@ RSpec.describe BillingPlansHelper do
       subject { helper.use_new_purchase_flow?(namespace) }
 
       it do
-        result = type == 'Group' && plan == Plan::FREE
+        result = plan == Plan::FREE
 
         is_expected.to be(result)
       end
