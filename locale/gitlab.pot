@@ -22762,9 +22762,6 @@ msgstr ""
 msgid "Sidebar|Assign health status"
 msgstr ""
 
-msgid "Sidebar|Change weight"
-msgstr ""
-
 msgid "Sidebar|Health status"
 msgstr ""
 
