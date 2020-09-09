@@ -1105,6 +1105,9 @@ msgstr ""
 msgid ":%{startLine} to %{endLine}"
 msgstr ""
 
+msgid "A %{incident_docs_start}modified issue%{incident_docs_end} to guide the resolution of incidents."
+msgstr ""
+
 msgid "A 'Runner' is a process which runs a job. You can set up as many Runners as you need."
 msgstr ""
 
