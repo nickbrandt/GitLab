@@ -130,7 +130,7 @@ RSpec.describe 'User creates feature flag', :js do
 
         within_scope_row(2) do
           within_environment_spec do
-            find('.js-env-input').set("review/*")
+            find('.js-env-search > input').set("review/*")
             find('.js-create-button').click
           end
         end
@@ -164,7 +164,7 @@ RSpec.describe 'User creates feature flag', :js do
 
         within_scope_row(2) do
           within_environment_spec do
-            find('.js-env-input').set('prod')
+            find('.js-env-search > input').set('prod')
             click_button 'production'
           end
         end

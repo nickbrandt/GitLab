@@ -5054,9 +5054,6 @@ msgstr ""
 msgid "Clear due date"
 msgstr ""
 
-msgid "Clear input"
-msgstr ""
-
 msgid "Clear recent searches"
 msgstr ""
 

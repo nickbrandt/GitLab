@@ -410,7 +410,7 @@ export default {
                     class="col-12"
                     :value="scope.environmentScope"
                     :endpoint="environmentsEndpoint"
-                    :disabled="!canUpdateScope(scope)"
+                    :disabled="!canUpdateScope(scope) || scope.environmentScope !== ''"
                     @selectEnvironment="env => (scope.environmentScope = env)"
                     @createClicked="env => (scope.environmentScope = env)"
                     @clearInput="env => (scope.environmentScope = '')"

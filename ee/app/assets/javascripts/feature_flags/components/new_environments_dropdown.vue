@@ -1,4 +1,5 @@
 <script>
+import { debounce } from 'lodash';
 import {
   GlNewDropdown,
   GlNewDropdownDivider,
@@ -30,7 +31,6 @@ export default {
     return {
       environmentSearch: '',
       results: [],
-      filter: '',
       isLoading: false,
     };
   },
@@ -40,23 +40,21 @@ export default {
   },
   computed: {
     createEnvironmentLabel() {
-      return sprintf(__('Create %{environment}'), { environment: this.filter });
+      return sprintf(__('Create %{environment}'), { environment: this.environmentSearch });
     },
   },
   methods: {
     addEnvironment(newEnvironment) {
       this.$emit('add', newEnvironment);
       this.environmentSearch = '';
-      this.filter = '';
+      this.results = [];
     },
-    fetchEnvironments() {
-      this.filter = this.environmentSearch;
+    fetchEnvironments: debounce(function debouncedFetchEnvironments() {
       this.isLoading = true;
-
       axios
-        .get(this.endpoint, { params: { query: this.filter } })
+        .get(this.endpoint, { params: { query: this.environmentSearch } })
         .then(({ data }) => {
-          this.results = data;
+          this.results = data || [];
         })
         .catch(() => {
           createFlash(__('Something went wrong on our end. Please try again.'));
@@ -64,12 +62,15 @@ export default {
         .finally(() => {
           this.isLoading = false;
         });
+    }, 250),
+    setFocus() {
+      this.$refs.searchBox.focusInput();
     },
   },
 };
 </script>
 <template>
-  <gl-new-dropdown class="js-new-environments-dropdown">
+  <gl-new-dropdown class="js-new-environments-dropdown" @shown="setFocus">
     <template #button-content>
       <span class="d-md-none mr-1">
         {{ $options.translations.addEnvironmentsLabel }}
@@ -77,9 +78,11 @@ export default {
       <gl-icon class="d-none d-md-inline-flex" name="plus" />
     </template>
     <gl-search-box-by-type
+      ref="searchBox"
       v-model.trim="environmentSearch"
       class="gl-m-3"
-      @input="fetchEnvironments"
+      @focus="fetchEnvironments"
+      @keyup="fetchEnvironments"
     />
     <gl-loading-icon v-if="isLoading" />
     <gl-new-dropdown-item
@@ -90,12 +93,12 @@ export default {
     >
       {{ environment }}
     </gl-new-dropdown-item>
-    <template v-else-if="filter.length">
-      <span ref="noResults" class="text-secondary p-2">
+    <template v-else-if="environmentSearch.length">
+      <span ref="noResults" class="text-secondary gl-p-3">
         {{ $options.translations.noMatchingResults }}
       </span>
       <gl-new-dropdown-divider />
-      <gl-new-dropdown-item @click="addEnvironment(filter)">
+      <gl-new-dropdown-item @click="addEnvironment(environmentSearch)">
         {{ createEnvironmentLabel }}
       </gl-new-dropdown-item>
     </template>
