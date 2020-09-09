@@ -1,6 +1,6 @@
 <script>
 import $ from 'jquery';
-import { GlLoadingIcon, GlIcon, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
+import { GlLoadingIcon, GlIcon } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import Tracking from '~/tracking';
 import eventHub from '~/sidebar/event_hub';
