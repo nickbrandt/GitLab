@@ -251,6 +251,35 @@ RSpec.describe Gitlab::Auth::OAuth::User do
         end
       end
 
+      context "with auto_link_user enabled for all providers" do
+        before do
+          stub_omniauth_config(auto_link_user: true)
+        end
+
+        context "and a current GitLab user with a matching email" do
+          let!(:existing_user) { create(:user, email: 'john@mail.com', username: 'john') }
+
+          it "adds the OmniAuth identity to the GitLab user account" do
+            oauth_user.save
+
+            expect(gl_user).to be_valid
+            expect(gl_user.username).to eql 'john'
+            expect(gl_user.email).to eql 'john@mail.com'
+            expect(gl_user.identities.length).to be 1
+            identities_as_hash = gl_user.identities.map { |id| { provider: id.provider, extern_uid: id.extern_uid } }
+            expect(identities_as_hash).to match_array(
+              [
+                { provider: 'twitter', extern_uid: uid }
+              ]
+            )
+          end
+        end
+
+        context "and no current GitLab user with a matching email" do
+          include_examples "to verify compliance with allow_single_sign_on"
+        end
+      end
+
       context "with auto_link_ldap_user disabled (default)" do
         before do
           stub_omniauth_config(auto_link_ldap_user: false)
