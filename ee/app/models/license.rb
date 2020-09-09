@@ -132,6 +132,7 @@ class License < ApplicationRecord
     prometheus_alerts
     pseudonymizer
     release_evidence_test_artifacts
+    environment_alerts
     report_approver_rules
     requirements
     sast
