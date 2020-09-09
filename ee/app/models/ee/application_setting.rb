@@ -156,7 +156,7 @@ module EE
       return false unless elasticsearch_indexing?
       return true unless elasticsearch_limit_indexing?
 
-      elasticsearch_limited_namespaces.exists?(namespace.id) unless ::Feature.enabled?(:elasticsearch_indexes_namespace_cache)
+      elasticsearch_limited_namespaces.exists?(namespace.id) unless ::Feature.enabled?(:elasticsearch_indexes_namespace_cache, default_enabled: true)
 
       ::Gitlab::Elastic::ElasticsearchEnabledCache.fetch(:namespace, namespace.id) do
         elasticsearch_limited_namespaces.exists?(namespace.id)
