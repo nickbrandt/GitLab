@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import dateFormat from 'dateformat';
 import {
   GlTable,
@@ -13,6 +14,7 @@ import {
 } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { approximateDuration, differenceInSeconds } from '~/lib/utils/datetime_utility';
+import { filterToQueryObject } from '~/vue_shared/components/filtered_search_bar/filtered_search_utils';
 import { dateFormats } from '../../shared/constants';
 import throughputTableQuery from '../graphql/queries/throughput_table.query.graphql';
 import {
@@ -114,11 +116,19 @@ export default {
     throughputTableData: {
       query: throughputTableQuery,
       variables() {
+        const options = filterToQueryObject({
+          labels: this.selectedLabelList,
+          authorUsername: this.selectedAuthor,
+          assigneeUsername: this.selectedAssignee,
+          milestoneTitle: this.selectedMilestone,
+        });
+
         return {
           fullPath: this.fullPath,
           limit: MAX_RECORDS,
           startDate: dateFormat(this.startDate, dateFormats.isoDate),
           endDate: dateFormat(this.endDate, dateFormats.isoDate),
+          ...options,
         };
       },
       update: data => data.project.mergeRequests.nodes,
@@ -131,6 +141,12 @@ export default {
     },
   },
   computed: {
+    ...mapState('filters', {
+      selectedMilestone: state => state.milestones.selected,
+      selectedAuthor: state => state.authors.selected,
+      selectedLabelList: state => state.labels.selectedList,
+      selectedAssignee: state => state.assignees.selected,
+    }),
     tableDataAvailable() {
       return this.throughputTableData.length;
     },

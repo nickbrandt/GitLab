@@ -30,6 +30,9 @@ export default {
   [types.SET_GROUP_ENDPOINT](state, groupEndpoint) {
     state.groupEndpoint = groupEndpoint;
   },
+  [types.SET_PROJECT_ENDPOINT](state, projectEndpoint) {
+    state.projectEndpoint = projectEndpoint;
+  },
   [types.REQUEST_MILESTONES](state) {
     state.milestones.isLoading = true;
   },

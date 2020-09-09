@@ -4,10 +4,12 @@ import { __ } from '~/locale';
 import Api from '~/api';
 import * as types from './mutation_types';
 
-export const setEndpoints = ({ commit }, { milestonesEndpoint, labelsEndpoint, groupEndpoint }) => {
+export const setEndpoints = ({ commit }, params) => {
+  const { milestonesEndpoint, labelsEndpoint, groupEndpoint, projectEndpoint } = params;
   commit(types.SET_MILESTONES_ENDPOINT, milestonesEndpoint);
   commit(types.SET_LABELS_ENDPOINT, labelsEndpoint);
   commit(types.SET_GROUP_ENDPOINT, groupEndpoint);
+  commit(types.SET_PROJECT_ENDPOINT, projectEndpoint);
 };
 
 export const fetchMilestones = ({ commit, state }, search_title = '') => {
@@ -43,10 +45,18 @@ export const fetchLabels = ({ commit, state }, search = '') => {
     });
 };
 
-const fetchUser = ({ commit, endpoint, query, action, errorMessage }) => {
+function fetchUser(options = {}) {
+  const { commit, projectEndpoint, groupEndpoint, query, action, errorMessage } = options;
   commit(`REQUEST_${action}`);
 
-  return Api.groupMembers(endpoint, { query })
+  let fetchUserPromise;
+  if (projectEndpoint) {
+    fetchUserPromise = Api.projectUsers(projectEndpoint, query).then(data => ({ data }));
+  } else {
+    fetchUserPromise = Api.groupMembers(groupEndpoint, { query });
+  }
+
+  return fetchUserPromise
     .then(response => {
       commit(`RECEIVE_${action}_SUCCESS`, response.data);
       return response;
@@ -56,25 +66,29 @@ const fetchUser = ({ commit, endpoint, query, action, errorMessage }) => {
       commit(`RECEIVE_${action}_ERROR`, status);
       createFlash(errorMessage);
     });
-};
+}
 
 export const fetchAuthors = ({ commit, state }, query = '') => {
-  const { groupEndpoint } = state;
+  const { projectEndpoint, groupEndpoint } = state;
+
   return fetchUser({
     commit,
     query,
-    endpoint: groupEndpoint,
+    projectEndpoint,
+    groupEndpoint,
     action: 'AUTHORS',
     errorMessage: __('Failed to load authors. Please try again.'),
   });
 };
 
 export const fetchAssignees = ({ commit, state }, query = '') => {
-  const { groupEndpoint } = state;
+  const { projectEndpoint, groupEndpoint } = state;
+
   return fetchUser({
     commit,
     query,
-    endpoint: groupEndpoint,
+    projectEndpoint,
+    groupEndpoint,
     action: 'ASSIGNEES',
     errorMessage: __('Failed to load assignees. Please try again.'),
   });
