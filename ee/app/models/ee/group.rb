@@ -407,7 +407,11 @@ module EE
 
     override :member?
     def member?(user, min_access_level = minimal_member_access_level)
-      super
+      if min_access_level == ::Gitlab::Access::MINIMAL_ACCESS && minimal_access_role_allowed?
+        all_group_members.find_by(user_id: user.id).present?
+      else
+        super
+      end
     end
 
     def minimal_member_access_level
