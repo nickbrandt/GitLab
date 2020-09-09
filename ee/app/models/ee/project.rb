@@ -737,7 +737,7 @@ module EE
 
     def user_defined_rules
       strong_memoize(:user_defined_rules) do
-        approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc)
+        approval_rules.regular_or_any_approver.order(rule_type: :desc, id: :asc).to_a
       end
     end
 
