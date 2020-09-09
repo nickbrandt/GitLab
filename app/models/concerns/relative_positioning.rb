@@ -565,6 +565,7 @@ module RelativePositioning
 
   def move_between(before, after)
     mover = Mover.new(START_POSITION, (MIN_POSITION..MAX_POSITION))
+    before, after = [before, after].sort_by(&:relative_position) if before && after
 
     mover.move(self, before, after)
   end
