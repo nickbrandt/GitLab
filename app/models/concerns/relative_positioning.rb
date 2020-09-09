@@ -323,6 +323,14 @@ module RelativePositioning
       end
     end
 
+    def context(object, ignoring: nil)
+      return unless object
+
+      c = ItemContext.new(object, range)
+      c.ignoring = ignoring
+      c
+    end
+
     private
 
     def gap_too_small?(pos_a, pos_b)
@@ -381,14 +389,6 @@ module RelativePositioning
         lhs.create_space_right(gap: gap)
         [pos_left, pos_right + gap.delta]
       end
-    end
-
-    def context(object, ignoring: nil)
-      return unless object
-
-      c = ItemContext.new(object, range)
-      c.ignoring = ignoring
-      c
     end
 
     # This method takes two integer values (positions) and
@@ -463,7 +463,7 @@ module RelativePositioning
     private
 
     # @api private
-    def gap_size(object, gaps:, at_end:, starting_from:)
+    def gap_size(context, gaps:, at_end:, starting_from:)
       total_width = IDEAL_DISTANCE * gaps
       size = if at_end && starting_from + total_width >= MAX_POSITION
                (MAX_POSITION - starting_from) / gaps
@@ -473,23 +473,17 @@ module RelativePositioning
                IDEAL_DISTANCE
              end
 
-      # Shift max elements leftwards if there isn't enough space
       return [size, starting_from] if size >= MIN_GAP
 
-      order = at_end ? :desc : :asc
-      terminus = object
-        .send(:relative_siblings) # rubocop:disable GitlabSecurity/PublicSend
-        .where('relative_position IS NOT NULL')
-        .order(relative_position: order)
-        .first
-
       if at_end
-        terminus.move_sequence_before(true)
-        max_relative_position = terminus.reset.relative_position
+        terminus = context.max_sibling
+        terminus.shift_left
+        max_relative_position = terminus.relative_position
         [[(MAX_POSITION - max_relative_position) / gaps, IDEAL_DISTANCE].min, max_relative_position]
       else
-        terminus.move_sequence_after(true)
-        min_relative_position = terminus.reset.relative_position
+        terminus = min_sibling
+        terminus.shift_right
+        min_relative_position = terminus.relative_position
         [[(min_relative_position - MIN_POSITION) / gaps, IDEAL_DISTANCE].min, min_relative_position]
       end
     end
@@ -507,8 +501,10 @@ module RelativePositioning
       objects = objects.reject(&:relative_position)
       return 0 if objects.empty?
 
-      representative = objects.first
       number_of_gaps = objects.size # 1 to the nearest neighbour, and one between each
+      mover = Mover.new(START_POSITION, (MIN_POSITION..MAX_POSITION))
+      representative = mover.context(objects.first)
+
       position = if at_end
                    representative.max_relative_position
                  else
