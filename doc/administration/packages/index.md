@@ -123,6 +123,8 @@ We recommend using the [consolidated object storage settings](../object_storage.
      #'region' => 'eu-west-1',
      #'aws_access_key_id' => 'AWS_ACCESS_KEY_ID',
      #'aws_secret_access_key' => 'AWS_SECRET_ACCESS_KEY',
+     ## If an IAM profile is being used with AWS, omit the aws_access_key_id and aws_secret_access_key and uncomment
+     #'use_iam_profile' => true,
      ##
      ## If the provider is other than AWS (an S3-compatible one), uncomment the following
      ##
