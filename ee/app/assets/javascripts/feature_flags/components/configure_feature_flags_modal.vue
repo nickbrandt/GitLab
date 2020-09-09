@@ -8,7 +8,6 @@ import {
   GlSprintf,
   GlLink,
   GlIcon,
-  GlSafeHtmlDirective as SafeHtml,
 } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
 import ModalCopyButton from '~/vue_shared/components/modal_copy_button.vue';
@@ -40,7 +39,6 @@ export default {
 
   directives: {
     GlTooltip: GlTooltipDirective,
-    SafeHtml,
   },
 
   props: {
@@ -146,10 +144,12 @@ export default {
         "
       >
         <template #docsLinkAnchored="{ content }">
-          <gl-link :href="helpClientLibrariesPath" target="_blank">{{ content }}</gl-link>
+          <gl-link :href="helpClientLibrariesPath" target="_blank" data-testid="help-client-link">
+            {{ content }}
+          </gl-link>
         </template>
         <template #docsLink="{ content }">
-          <gl-link :href="helpPath" target="_blank">{{ content }}</gl-link>
+          <gl-link :href="helpPath" target="_blank" data-testid="help-link">{{ content }}</gl-link>
         </template>
       </gl-sprintf>
     </p>

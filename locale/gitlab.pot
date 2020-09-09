@@ -10716,7 +10716,7 @@ msgstr ""
 msgid "FeatureFlags|Include additional user IDs"
 msgstr ""
 
-msgid "FeatureFlags|Install a %{docs_link_anchored_start}compatible client library%{docs_link_anchored_end} and specify the API URL, application name, and instance ID during the configuration setup. %{docs_link_start}More Information%{docs_link_end}"
+msgid "FeatureFlags|Install a %{docsLinkAnchoredStart}compatible client library%{docsLinkAnchoredEnd} and specify the API URL, application name, and instance ID during the configuration setup. %{docsLinkStart}More Information%{docsLinkEnd}"
 msgstr ""
 
 msgid "FeatureFlags|Instance ID"
