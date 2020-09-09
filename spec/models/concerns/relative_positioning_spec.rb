@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe RelativePositioning do
   let_it_be(:default_user) { create_default(:user) }
-  let_it_be(:project) { create(:project) }
+  let_it_be(:project, reload: true) { create(:project) }
 
   def create_issue(pos)
     create(:issue, project: project, relative_position: pos)
@@ -22,24 +22,29 @@ RSpec.describe RelativePositioning do
     describe '#move_to_end' do
       shared_examples 'able to place a new item at the end' do
         it 'can place any new item' do
+          existing_issues = project.issues.to_a
           new_item = create_issue(nil)
 
           subject.move_to_end(new_item)
           new_item.save!
 
           expect(new_item.relative_position).to eq(project.issues.maximum(:relative_position))
+          expect(project.issues.reorder(:relative_position).pluck(:id)).to eq(existing_issues.map(&:id) + [new_item.id])
         end
       end
 
       shared_examples 'able to move existing items to the end' do
         it 'can move any existing item' do
           issue = issues[index]
+          other_issues = issues.reject { |i| i == issue }
+
           subject.move_to_end(issue)
           issue.save!
           project.reset
 
           expect(project.issues.pluck(:relative_position)).to all(be_between(range.first, range.last))
           expect(issue.relative_position).to eq(project.issues.maximum(:relative_position))
+          expect(project.issues.reorder(:relative_position).pluck(:id)).to eq(other_issues.map(&:id) + [issue.id])
         end
       end
 
@@ -98,24 +103,29 @@ RSpec.describe RelativePositioning do
     describe '#move_to_start' do
       shared_examples 'able to place a new item at the start' do
         it 'can place any new item' do
+          existing_issues = project.issues.to_a
           new_item = create_issue(nil)
 
           subject.move_to_start(new_item)
           new_item.save!
 
           expect(new_item.relative_position).to eq(project.issues.minimum(:relative_position))
+          expect(project.issues.reorder(:relative_position).pluck(:id)).to eq([new_item.id] + existing_issues.map(&:id))
         end
       end
 
       shared_examples 'able to move existing items to the start' do
         it 'can move any existing item' do
           issue = issues[index]
+          other_issues = issues.reject { |i| i == issue }
+
           subject.move_to_start(issue)
           issue.save!
           project.reset
 
           expect(project.issues.pluck(:relative_position)).to all(be_between(range.first, range.last))
           expect(issue.relative_position).to eq(project.issues.minimum(:relative_position))
+          expect(project.issues.reorder(:relative_position).pluck(:id)).to eq([issue.id] + other_issues.map(&:id))
         end
       end
 
@@ -173,6 +183,9 @@ RSpec.describe RelativePositioning do
 
     describe '#move' do
       shared_examples 'able to move a new item' do
+        let(:other_issues) { project.issues.reorder(relative_position: :asc).to_a }
+        let!(:previous_order) { other_issues.map(&:id) }
+
         it 'can place any new item betwen two others' do
           new_item = create_issue(nil)
 
@@ -183,6 +196,9 @@ RSpec.describe RelativePositioning do
 
           expect(new_item.relative_position).to be_between(range.first, range.last)
           expect(new_item.relative_position).to be_between(lhs.relative_position, rhs.relative_position)
+
+          ids = project.issues.reorder(:relative_position).pluck(:id).reject { |id| id == new_item.id }
+          expect(ids).to eq(previous_order)
         end
 
         it 'can place any new item after another' do
@@ -194,6 +210,9 @@ RSpec.describe RelativePositioning do
 
           expect(new_item.relative_position).to be_between(range.first, range.last)
           expect(new_item.relative_position).to be > lhs.relative_position
+
+          ids = project.issues.reorder(:relative_position).pluck(:id).reject { |id| id == new_item.id }
+          expect(ids).to eq(previous_order)
         end
 
         it 'can place any new item before another' do
@@ -205,12 +224,17 @@ RSpec.describe RelativePositioning do
 
           expect(new_item.relative_position).to be_between(range.first, range.last)
           expect(new_item.relative_position).to be < rhs.relative_position
+
+          ids = project.issues.reorder(:relative_position).pluck(:id).reject { |id| id == new_item.id }
+          expect(ids).to eq(previous_order)
         end
       end
 
       shared_examples 'able to move an existing item' do
         let(:item) { issues[index] }
         let(:positions) { project.reset.issues.pluck(:relative_position) }
+        let(:other_issues) { project.issues.reorder(:relative_position).to_a.reject { |i| i == item } }
+        let!(:previous_order) { other_issues.map(&:id) }
 
         it 'can place any item betwen two others' do
           subject.move(item, lhs, rhs)
@@ -221,6 +245,9 @@ RSpec.describe RelativePositioning do
           expect(positions).to all(be_between(range.first, range.last))
           expect(positions).to match_array(positions.uniq)
           expect(item.relative_position).to be_between(lhs.relative_position, rhs.relative_position)
+
+          ids = project.issues.reorder(:relative_position).pluck(:id).reject { |id| id == item.id }
+          expect(ids).to eq(previous_order)
         end
 
         it 'can place any item after another' do
@@ -238,6 +265,9 @@ RSpec.describe RelativePositioning do
             .where(relative_position: (expected_sequence.first.relative_position..expected_sequence.last.relative_position))
 
           expect(sequence).to eq(expected_sequence)
+
+          ids = project.issues.reorder(:relative_position).pluck(:id).reject { |id| id == item.id }
+          expect(ids).to eq(previous_order)
         end
 
         it 'can place any item before another' do
@@ -255,6 +285,9 @@ RSpec.describe RelativePositioning do
             .where(relative_position: (expected_sequence.first.relative_position..expected_sequence.last.relative_position))
 
           expect(sequence).to eq(expected_sequence)
+
+          ids = project.issues.reorder(:relative_position).pluck(:id).reject { |id| id == item.id }
+          expect(ids).to eq(previous_order)
         end
       end
 
@@ -303,10 +336,14 @@ RSpec.describe RelativePositioning do
       end
 
       context 'there are a couple of siblings' do
-        where(:pos_a, :pos_b) { range.to_a.product(range.to_a).reject { |x, y| x == y } }
+        where(:pos_movable, :pos_a, :pos_b) do
+          xs = range.to_a
+
+          xs.product(xs).product(xs).map(&:flatten).select { |vals| vals == vals.uniq }
+        end
 
         with_them do
-          let!(:issues) { [range.first, pos_a, pos_b].sort.map { |p| create_issue(p) } }
+          let!(:issues) { ([pos_movable] + [pos_a, pos_b].sort).map { |p| create_issue(p) } }
           let(:index) { 0 }
           let(:lhs) { issues[1] }
           let(:rhs) { issues[2] }
