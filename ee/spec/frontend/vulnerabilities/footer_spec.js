@@ -3,6 +3,8 @@ import Api from 'ee/api';
 import VulnerabilityFooter from 'ee/vulnerabilities/components/footer.vue';
 import HistoryEntry from 'ee/vulnerabilities/components/history_entry.vue';
 import RelatedIssues from 'ee/vulnerabilities/components/related_issues.vue';
+import StatusDescription from 'ee/vulnerabilities/components/status_description.vue';
+import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import IssueNote from 'ee/vue_shared/security_reports/components/issue_note.vue';
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
@@ -30,6 +32,7 @@ describe('Vulnerability Footer', () => {
     related_issues_help_path: 'help/path',
     has_mr: false,
     vulnerability_feedback_help_path: 'feedback/help/path',
+    pipeline: {},
   };
 
   const createWrapper = (properties = {}) => {
@@ -274,6 +277,22 @@ describe('Vulnerability Footer', () => {
         canModifyRelatedIssues: vulnerability.can_modify_related_issues,
         projectPath: vulnerability.project.full_path,
         helpPath: vulnerability.related_issues_help_path,
+      });
+    });
+  });
+
+  describe('detection note', () => {
+    const detectionNote = () => wrapper.find('[data-testid="detection-note"]');
+    const statusDescription = () => wrapper.find(StatusDescription);
+    const vulnerabilityStates = Object.keys(VULNERABILITY_STATES);
+
+    it.each(vulnerabilityStates)(`shows detection note when vulnerability state is '%s'`, state => {
+      createWrapper({ state });
+
+      expect(detectionNote().exists()).toBe(true);
+      expect(statusDescription().props('vulnerability')).toEqual({
+        state: 'detected',
+        pipeline: vulnerability.pipeline,
       });
     });
   });

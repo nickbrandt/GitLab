@@ -5,17 +5,27 @@ import SolutionCard from 'ee/vue_shared/security_reports/components/solution_car
 import MergeRequestNote from 'ee/vue_shared/security_reports/components/merge_request_note.vue';
 import Api from 'ee/api';
 import { VULNERABILITY_STATE_OBJECTS } from 'ee/vulnerabilities/constants';
+import { GlIcon } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 import Poll from '~/lib/utils/poll';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { s__, __ } from '~/locale';
 import RelatedIssues from './related_issues.vue';
 import HistoryEntry from './history_entry.vue';
+import StatusDescription from './status_description.vue';
 import initUserPopovers from '~/user_popovers';
 
 export default {
   name: 'VulnerabilityFooter',
-  components: { IssueNote, SolutionCard, MergeRequestNote, HistoryEntry, RelatedIssues },
+  components: {
+    IssueNote,
+    SolutionCard,
+    MergeRequestNote,
+    HistoryEntry,
+    RelatedIssues,
+    GlIcon,
+    StatusDescription,
+  },
   props: {
     vulnerability: {
       type: Object,
@@ -74,6 +84,12 @@ export default {
     },
     issueLinksEndpoint() {
       return Api.buildUrl(Api.vulnerabilityIssueLinksPath).replace(':id', this.vulnerability.id);
+    },
+    vulnerabilityDetectionData() {
+      return {
+        state: 'detected',
+        pipeline: this.vulnerability.pipeline,
+      };
     },
   },
 
@@ -216,6 +232,19 @@ export default {
       :project-path="project.url"
       :help-path="vulnerability.related_issues_help_path"
     />
+
+    <div class="notes" data-testid="detection-note">
+      <div class="system-note gl-display-flex gl-align-items-center gl-p-0! gl-mt-6!">
+        <div class="timeline-icon gl-m-0!">
+          <gl-icon name="search-dot" class="circle-icon-container" />
+        </div>
+        <status-description
+          :vulnerability="vulnerabilityDetectionData"
+          :is-state-bolded="true"
+          class="gl-ml-5"
+        />
+      </div>
+    </div>
 
     <hr />
 
