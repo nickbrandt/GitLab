@@ -50,7 +50,7 @@ RSpec.describe MembersFinder, '#execute' do
     member1 = group.add_maintainer(user2)
     member2 = nested_group.add_maintainer(user3)
     member3 = project.add_maintainer(user4)
-    create(:group_member, :minimal_access, user: create(:user), group: group)
+    create(:group_member, :minimal_access, user: create(:user), source: group)
 
     result = described_class.new(project, user2).execute
 

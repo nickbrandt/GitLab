@@ -714,7 +714,7 @@ RSpec.describe Group do
     context 'with `minimal_access_role` licensed' do
       before do
         stub_licensed_features(minimal_access_role: true)
-        create(:group_member, :minimal_access, user: user, group: group)
+        create(:group_member, :minimal_access, user: user, source: group)
       end
 
       context 'when group is a subgroup' do
