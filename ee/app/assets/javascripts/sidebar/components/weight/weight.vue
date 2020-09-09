@@ -13,7 +13,6 @@ export default {
   },
   directives: {
     tooltip,
-    SafeHtml,
   },
   mixins: [Tracking.mixin({ label: 'right_sidebar' })],
   props: {
