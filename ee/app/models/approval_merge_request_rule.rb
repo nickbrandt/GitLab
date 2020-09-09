@@ -73,15 +73,6 @@ class ApprovalMergeRequestRule < ApplicationRecord
     retry
   end
 
-  def self.applicable_to_branch(branch)
-    includes(:users, :groups, approval_project_rule: [:users, :groups, :protected_branches]).select do |rule|
-      next true unless rule.approval_project_rule.present?
-      next true if rule.overridden?
-
-      rule.approval_project_rule.applies_to_branch?(branch)
-    end
-  end
-
   def audit_add(_model)
     # no-op
     # only audit on project rule

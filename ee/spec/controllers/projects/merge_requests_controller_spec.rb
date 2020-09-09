@@ -37,6 +37,35 @@ RSpec.describe Projects::MergeRequestsController do
     sign_in(viewer)
   end
 
+  describe 'GET index' do
+    let(:merge_request) { create(:merge_request_with_diffs, target_project: project, source_project: project) }
+
+    def get_merge_requests(page = nil)
+      get :index,
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project,
+          state: 'opened',
+          page: page.to_param
+        }
+    end
+
+    context 'when filtering by opened state' do
+      context 'with opened merge requests' do
+        render_views
+        let!(:merge_requests) { create_list(:merge_request, 20, :unique_branches, target_project: project, source_project: project) }
+
+        it 'lists those merge requests' do
+          create_list(:approval, 10)
+
+          expect {
+            get_merge_requests
+          }.not_to exceed_query_limit(175)
+        end
+      end
+    end
+  end
+
   describe 'PUT update' do
     before do
       project.update(approvals_before_merge: 2)
@@ -44,12 +73,12 @@ RSpec.describe Projects::MergeRequestsController do
 
     def update_merge_request(params = {})
       post :update,
-           params: {
-             namespace_id: merge_request.target_project.namespace.to_param,
-             project_id: merge_request.target_project.to_param,
-             id: merge_request.iid,
-             merge_request: params
-           }
+        params: {
+          namespace_id: merge_request.target_project.namespace.to_param,
+          project_id: merge_request.target_project.to_param,
+          id: merge_request.iid,
+          merge_request: params
+        }
     end
 
     context 'when the merge request requires approval' do
