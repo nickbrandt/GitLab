@@ -65,20 +65,24 @@ push_frontend_feature_flag(:my_ops_flag, project, type: :ops)
 
 `licensed` feature flags are used to temporarily disable licensed features. There
 should be a one-to-one mapping of `licensed` feature flags to licensed features.
-`licensed` feature flags likely do not have rollout issues.
 
 `licensed` feature flags must be `default_enabled: true`, because that's the only
 supported option in the current implementation. This is under development as per
 the [related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/218667.
 
-The `licensed` type has a dedicated set of functions to check if a licensed feature
-is available for a project or namespace. This check validates if the license is assigned
-to the namespace and feature flag itself:
+The `licensed` type has a dedicated set of functions to check if a licensed
+feature is available for a project or namespace. This check validates
+if the license is assigned to the namespace and feature flag itself.
+The `licensed` feature flag has the same name as a licensed feature name:
 
 ```ruby
-# Check if feature flag is enabled
+# Good: checks if feature flag is enabled
 project.feature_available?(:my_licensed_feature)
 namespace.feature_available?(:my_licensed_feature)
+
+# Bad: licensed flag must be accessed via `feature_available?`
+Feature.enabled?(:my_licensed_feature, type: :licensed)
+push_frontend_feature_flag(:my_licensed_feature, type: :licensed)
 ```
 
 ## Feature flag definition and validation
