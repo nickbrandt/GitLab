@@ -67,11 +67,9 @@ push_frontend_feature_flag(:my_ops_flag, project, type: :ops)
 should be a one-to-one mapping of `licensed` feature flags to licensed features.
 `licensed` feature flags likely do not have rollout issues.
 
-A `licensed` feature flag by its nature likely does not have a rollout
-issue. The `licensed` feature flags by default has to be `default_enabled: true`
-as current implementation does not allow otherwise.
-This aspect is currently in works as part of
-https://gitlab.com/gitlab-org/gitlab/-/issues/218667.
+`licensed` feature flags must be `default_enabled: true`, because that's the only
+supported option in the current implementation. This is under development as per
+the [related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/218667.
 
 The `licensed` type has a dedicated set of functions to check if a licensed feature
 is available for a project or namespace. This check validates if the license is assigned
