@@ -11,7 +11,7 @@ RSpec.describe API::UsageData do
     let(:unknown_event) { 'unknown' }
 
     context 'usage_data_api feature not enabled' do
-      it 'retruns not_found' do
+      it 'returns not_found' do
         stub_feature_flags(usage_data_api: false)
 
         post api(endpoint, user), params: { values: [user.id] }
