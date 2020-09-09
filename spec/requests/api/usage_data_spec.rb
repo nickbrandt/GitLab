@@ -10,6 +10,16 @@ RSpec.describe API::UsageData do
     let(:known_event) { 'g_compliance_dashboard' }
     let(:unknown_event) { 'unknown' }
 
+    context 'usage_data_api feature not enabled' do
+      it 'retruns not_found' do
+        stub_feature_flags(usage_data_api: false)
+
+        post api(endpoint, user), params: { values: [user.id] }
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
     context 'without authentication' do
       it 'returns 401 response' do
         post api(endpoint), params: { values: [user.id] }
@@ -18,7 +28,11 @@ RSpec.describe API::UsageData do
       end
     end
 
-    context 'without authentication' do
+    context 'with authentication' do
+      before do
+        stub_feature_flags(usage_data_api: true)
+      end
+
       context 'when name is missing from params' do
         it 'returns bad request' do
           post api(endpoint, user), params: { values: [user.id] }

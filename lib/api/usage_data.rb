@@ -14,6 +14,10 @@ module API
     end
 
     namespace 'usage_data' do
+      before do
+        not_found! unless Feature.enabled?(:usage_data_api, default_enabled: true)
+      end
+
       desc 'Track usage data events' do
         detail 'This feature was introduced in GitLab 13.4.'
       end
@@ -22,6 +26,7 @@ module API
         requires :name, type: String, desc: 'The event name it should be tracked'
         requires :values, type: Array, desc: 'The values counted'
       end
+
       post 'increment_unique_values' do
         event_name = params[:name]
         values = params[:values]
