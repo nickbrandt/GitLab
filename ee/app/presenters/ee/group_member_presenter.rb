@@ -14,7 +14,7 @@ module EE
 
     override :access_level_roles
     def access_level_roles
-      member.source.access_level_roles_for_group
+      member.source.access_level_roles
     end
 
     private

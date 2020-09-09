@@ -418,8 +418,8 @@ module EE
       minimal_access_role_allowed? ? ::Gitlab::Access::MINIMAL_ACCESS : ::Gitlab::Access::GUEST
     end
 
-    override :access_level_roles_for_group
-    def access_level_roles_for_group
+    override :access_level_roles
+    def access_level_roles
       levels = ::GroupMember.access_level_roles
       return levels unless minimal_access_role_allowed?
 
