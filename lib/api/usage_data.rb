@@ -6,7 +6,7 @@ module API
 
     namespace 'usage_data' do
       before do
-        not_found! unless Feature.enabled?(:usage_data_api, default_enabled: true)
+        not_found! unless Feature.enabled?(:usage_data_api)
       end
 
       desc 'Track usage data events' do
@@ -14,11 +14,11 @@ module API
       end
 
       params do
-        requires :name, type: String, desc: 'The event name it should be tracked'
+        requires :event, type: String, desc: 'The event name it should be tracked'
       end
 
       post 'increment_unique_users' do
-        event_name = params[:name]
+        event_name = params[:event]
 
         increment_unique_values(event_name, current_user.id)
 

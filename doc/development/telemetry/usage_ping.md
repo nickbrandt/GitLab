@@ -324,7 +324,7 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
 
    | Attribute | Type | Required | Description |
    | :-------- | :--- | :------- | :---------- |
-   | `name` | string | yes | The event name it should be tracked |
+   | `event` | string | yes | The event name it should be tracked |
 
 
    Response
@@ -332,7 +332,7 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    Return 200 if tracking failed for any reason.
 
    - `401 Unauthorized` if user is not authenticated
-   - `400 Bad request` if name parameter is missing
+   - `400 Bad request` if event parameter is missing
    - `200` if event was tracked or any errors
 
 1. Track event using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event(entity_id, event_name)`.

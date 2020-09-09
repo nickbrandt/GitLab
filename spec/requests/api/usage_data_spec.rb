@@ -14,7 +14,7 @@ RSpec.describe API::UsageData do
       it 'retruns not_found' do
         stub_feature_flags(usage_data_api: false)
 
-        post api(endpoint, user), params: { name: known_event }
+        post api(endpoint, user), params: { event: known_event }
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -22,7 +22,7 @@ RSpec.describe API::UsageData do
 
     context 'without authentication' do
       it 'returns 401 response' do
-        post api(endpoint), params: { name: known_event }
+        post api(endpoint), params: { event: known_event }
 
         expect(response).to have_gitlab_http_status(:unauthorized)
       end
@@ -33,7 +33,7 @@ RSpec.describe API::UsageData do
         stub_feature_flags(usage_data_api: true)
       end
 
-      context 'when name is missing from params' do
+      context 'when event is missing from params' do
         it 'returns bad request' do
           post api(endpoint, user), params: {}
 
@@ -43,7 +43,7 @@ RSpec.describe API::UsageData do
 
       context 'with correct params' do
         it 'returns status ok' do
-          post api(endpoint, user), params: { name: known_event }
+          post api(endpoint, user), params: { event: known_event }
 
           expect(response).to have_gitlab_http_status(:ok)
         end
@@ -51,7 +51,7 @@ RSpec.describe API::UsageData do
 
       context 'with unknown event' do
         it 'returns status ok' do
-          post api(endpoint, user), params: { name: unknown_event }
+          post api(endpoint, user), params: { event: unknown_event }
 
           expect(response).to have_gitlab_http_status(:ok)
         end
