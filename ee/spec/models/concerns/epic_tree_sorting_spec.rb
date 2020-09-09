@@ -22,7 +22,7 @@ RSpec.describe EpicTreeSorting do
     it 'moves an epic_issue' do
       epic_issue2.move_after(epic2)
 
-      expect(epic_issue2.relative_position).to be_between(epic2.reload.relative_position, epic3.reload.relative_position).exclusive
+      expect(epic_issue2.relative_position).to be_between(epic2.reload.relative_position, epic3.reload.relative_position)
       expect(epic_issue3.reload.relative_position).to be > epic3.reload.relative_position
     end
   end
