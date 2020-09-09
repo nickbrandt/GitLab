@@ -326,7 +326,6 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    | :-------- | :--- | :------- | :---------- |
    | `event` | string | yes | The event name it should be tracked |
 
-
    Response
 
    Return 200 if tracking failed for any reason.
