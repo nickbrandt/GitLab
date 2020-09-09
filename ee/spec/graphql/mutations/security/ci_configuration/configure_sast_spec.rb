@@ -10,16 +10,16 @@ RSpec.describe Mutations::Security::CiConfiguration::ConfigureSast do
 
   let_it_be(:service_result_json) do
     {
-      result: "3ec1b6e9a1f564da65f7c084e2497cf930dfa1c7",
       status: "success",
-      success_path: "http://127.0.0.1:3000/root/demo-historic-secrets/-/merge_requests/new?"
+      success_path: "http://127.0.0.1:3000/root/demo-historic-secrets/-/merge_requests/new?",
+      errors: nil
     }
   end
 
   let_it_be(:service_error_result_json) do
     {
-      result: "3ec1b6e9a1f564da65f7c084e2497cf930dfa1c7",
       status: "error",
+      success_path: nil,
       errors: %w(error1 error2)
     }
   end
@@ -32,12 +32,16 @@ RSpec.describe Mutations::Security::CiConfiguration::ConfigureSast do
     )
   end
 
+  before do
+    stub_feature_flags(security_sast_configuration: true)
+  end
+
   specify { expect(described_class).to require_graphql_authorizations(:push_code) }
 
   describe '#resolve' do
     subject { mutation.resolve(project_path: project.full_path, configuration: {}) }
 
-    let(:result) { subject[:result] }
+    let(:result) { subject }
 
     it 'raises an error if the resource is not accessible to the user' do
       expect { subject }.to raise_error(Gitlab::Graphql::Errors::ResourceNotAvailable)
@@ -77,8 +81,16 @@ RSpec.describe Mutations::Security::CiConfiguration::ConfigureSast do
           expect(result).to match(
             status: 'success',
             success_path: service_result_json[:success_path],
-            errors: be_nil
+            errors: []
           )
+        end
+      end
+
+      context 'when sast configuration feature is not enabled' do
+        it 'raises an exception' do
+          stub_feature_flags(security_sast_configuration: false)
+
+          expect { subject }.to raise_error(Gitlab::Graphql::Errors::ResourceNotAvailable)
         end
       end
 

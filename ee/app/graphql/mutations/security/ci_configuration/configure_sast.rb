@@ -10,37 +10,55 @@ module Mutations
 
         argument :project_path, GraphQL::ID_TYPE,
           required: true,
-          description: 'Full path of the project.'
+          description: 'Full path of the project'
 
-        argument :configuration, GraphQL::Types::JSON, # rubocop:disable Graphql/JSONType
+        argument :configuration, ::Types::CiConfiguration::Sast::InputType,
           required: true,
-          description: 'Payload containing SAST variable values (https://docs.gitlab.com/ee/user/application_security/sast/#available-variables).'
+          description: 'SAST CI configuration for the project'
 
-        field :result, # rubocop:disable Graphql/JSONType
-          GraphQL::Types::JSON,
-          null: true,
-          description: 'JSON containing the status of MR creation.'
+        field :status, GraphQL::STRING_TYPE, null: false,
+          description: 'Status of creating the commit for the supplied SAST CI configuration'
+
+        field :success_path, GraphQL::STRING_TYPE, null: true,
+          description: 'Redirect path to use when the response is successful'
 
         authorize :push_code
 
         def resolve(project_path:, configuration:)
           project = authorized_find!(full_path: project_path)
-          format_json(::Security::CiConfiguration::SastCreateService.new(project, current_user, configuration).execute)
+          validate_flag!(project)
+
+          sast_create_service_params = format_for_service(configuration)
+          result = ::Security::CiConfiguration::SastCreateService.new(project, current_user, sast_create_service_params).execute
+          prepare_response(result)
         end
 
         private
+
+        def validate_flag!(project)
+          return if ::Feature.enabled?(:security_sast_configuration, project)
+
+          raise Gitlab::Graphql::Errors::ResourceNotAvailable, 'security_sast_configuration flag is not enabled on this project'
+        end
 
         def find_object(full_path:)
           resolve_project(full_path: full_path)
         end
 
-        def format_json(result)
+        # Temporary formatting necessary for supporting REST API
+        # Will be removed during the implementation of
+        # https://gitlab.com/gitlab-org/gitlab/-/issues/246737
+        def format_for_service(configuration)
+          global_defaults = configuration["global"]&.collect {|k| [k["field"], k["defaultValue"]]}.to_h
+          pipeline_defaults = configuration["pipeline"]&.collect {|k| [k["field"], k["defaultValue"]]}.to_h
+          global_defaults.merge!(pipeline_defaults)
+        end
+
+        def prepare_response(result)
           {
-            result: {
-              status: result[:status],
-              success_path: result[:success_path],
-              errors: result[:errors]
-            }
+            status: result[:status],
+            success_path: result[:success_path],
+            errors: Array(result[:errors])
           }
         end
       end
