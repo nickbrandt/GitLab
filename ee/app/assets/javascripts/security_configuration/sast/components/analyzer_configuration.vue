@@ -27,8 +27,8 @@ export default {
     },
   },
   methods: {
-    onToggle(value) {
-      const entity = { ...this.entity, enabled: value };
+    onToggle(enabled) {
+      const entity = { ...this.entity, enabled };
       this.$emit('input', entity);
     },
     onConfigurationUpdate(configuration) {

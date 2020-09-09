@@ -21,6 +21,7 @@ describe('AnalyzerConfiguration component', () => {
   };
 
   const findInputElement = () => wrapper.find('input[type="checkbox"]');
+  const findDynamicFields = () => wrapper.find(DynamicFields);
 
   afterEach(() => {
     wrapper.destroy();
@@ -77,7 +78,7 @@ describe('AnalyzerConfiguration component', () => {
       });
 
       it('does not render the nested dynamic forms', () => {
-        expect(wrapper.find(DynamicFields).exists()).toBe(false);
+        expect(findDynamicFields().exists()).toBe(false);
       });
     });
 
@@ -104,11 +105,22 @@ describe('AnalyzerConfiguration component', () => {
       });
 
       it('it renders the nested dynamic forms', () => {
-        expect(wrapper.find(DynamicFields).exists()).toBe(true);
+        expect(findDynamicFields().exists()).toBe(true);
+      });
+
+      it('it emits an input event when dynamic form fields emits an input event', () => {
+        findDynamicFields().vm.$emit('input', analyzerEntity.configuration);
+
+        const [[payload]] = wrapper.emitted('input');
+        expect(payload).toEqual(analyzerEntity);
       });
 
       it('passes the disabled prop to dynamic fields component', () => {
-        expect(wrapper.find(DynamicFields).vm.$attrs.disabled).toBe(!analyzerEntity.enabled);
+        expect(findDynamicFields().vm.$attrs.disabled).toBe(!analyzerEntity.enabled);
+      });
+
+      it('passes the entities prop to the dynamic fields component', () => {
+        expect(findDynamicFields().props('entities')).toBe(analyzerEntity.configuration);
       });
     });
   });
