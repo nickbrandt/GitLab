@@ -18,6 +18,11 @@ export default {
       required: true,
       validator: value => value.every(isValidConfigurationEntity),
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   methods: {
     componentForEntity({ type }) {
@@ -49,7 +54,7 @@ export default {
 </script>
 
 <template>
-  <gl-form-group>
+  <gl-form-group :disabled="disabled">
     <component
       :is="componentForEntity(entity)"
       v-for="entity in entities"

@@ -44,6 +44,17 @@ describe('DynamicFields component', () => {
       fields = findFields();
     });
 
+    describe.each([true, false])('when the disabled prop is %s', disabled => {
+      beforeEach(() => {
+        entities = makeEntities(3);
+        createComponent({ entities, disabled });
+      });
+
+      it(`it is passed a disabled prop set to ${disabled}`, () => {
+        expect(wrapper.props('disabled')).toBe(disabled);
+      });
+    });
+
     it('renders each field with the correct component', () => {
       entities.forEach((entity, i) => {
         const field = fields.at(i);

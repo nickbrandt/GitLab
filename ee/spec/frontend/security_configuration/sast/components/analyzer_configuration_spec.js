@@ -116,7 +116,7 @@ describe('AnalyzerConfiguration component', () => {
       });
 
       it('passes the disabled prop to dynamic fields component', () => {
-        expect(findDynamicFields().vm.$attrs.disabled).toBe(!analyzerEntity.enabled);
+        expect(findDynamicFields().props('disabled')).toBe(!analyzerEntity.enabled);
       });
 
       it('passes the entities prop to the dynamic fields component', () => {
