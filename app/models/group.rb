@@ -575,12 +575,12 @@ class Group < Namespace
     owners.first || parent&.default_owner || owner
   end
 
-  def access_level_roles_for_group
+  def access_level_roles
     GroupMember.access_level_roles
   end
 
-  def access_level_values_for_group
-    access_level_roles_for_group.values
+  def access_level_values
+    access_level_roles.values
   end
 
   private

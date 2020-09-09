@@ -66,7 +66,7 @@ RSpec.describe GroupMemberPresenter do
       before do
         allow(group_member).to receive(:highest_group_member)
         allow(group_member).to receive_message_chain(:class, :access_level_roles).and_return(::Gitlab::Access.options_with_owner)
-        expect(group).to receive(:access_level_roles_for_group).and_return(::Gitlab::Access.options_with_minimal_access)
+        expect(group).to receive(:access_level_roles).and_return(::Gitlab::Access.options_with_minimal_access)
       end
 
       it { expect(presenter.valid_level_roles).to eq(::Gitlab::Access.options_with_minimal_access) }
