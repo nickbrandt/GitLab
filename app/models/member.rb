@@ -59,6 +59,7 @@ class Member < ApplicationRecord
     left_join_users
       .where(user_ok)
       .where(requested_at: nil)
+      .non_minimal_access
       .reorder(nil)
   end
 
@@ -67,6 +68,8 @@ class Member < ApplicationRecord
     left_join_users
       .where(users: { state: 'active' })
       .non_request
+      .non_invite
+      .non_minimal_access
       .reorder(nil)
   end
 

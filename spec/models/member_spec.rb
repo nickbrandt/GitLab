@@ -265,6 +265,34 @@ RSpec.describe Member do
       it { is_expected.not_to include @blocked_maintainer }
       it { is_expected.not_to include @blocked_developer }
     end
+
+    describe '.active' do
+      subject { described_class.active.to_a }
+
+      it { is_expected.to include @owner }
+      it { is_expected.to include @maintainer }
+      it { is_expected.to include @invited_member }
+      it { is_expected.to include @accepted_invite_member }
+      it { is_expected.not_to include @requested_member }
+      it { is_expected.to include @accepted_request_member }
+      it { is_expected.not_to include @blocked_maintainer }
+      it { is_expected.not_to include @blocked_developer }
+      it { is_expected.not_to include @member_with_minimal_access }
+    end
+
+    describe '.active_without_invites_and_requests' do
+      subject { described_class.active_without_invites_and_requests.to_a }
+
+      it { is_expected.to include @owner }
+      it { is_expected.to include @maintainer }
+      it { is_expected.not_to include @invited_member }
+      it { is_expected.to include @accepted_invite_member }
+      it { is_expected.not_to include @requested_member }
+      it { is_expected.to include @accepted_request_member }
+      it { is_expected.not_to include @blocked_maintainer }
+      it { is_expected.not_to include @blocked_developer }
+      it { is_expected.not_to include @member_with_minimal_access }
+    end
   end
 
   describe "Delegate methods" do

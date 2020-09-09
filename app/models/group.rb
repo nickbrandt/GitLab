@@ -347,7 +347,6 @@ class Group < Namespace
       end
 
     group_hierarchy_members = GroupMember.active_without_invites_and_requests
-                                         .non_minimal_access
                                          .where(source_id: source_ids)
 
     GroupMember.from_union([group_hierarchy_members,
@@ -637,6 +636,7 @@ class Group < Namespace
       .where(group_member_table[:requested_at].eq(nil))
       .where(group_member_table[:source_id].eq(group_group_link_table[:shared_with_group_id]))
       .where(group_member_table[:source_type].eq('Namespace'))
+      .non_minimal_access
   end
 
   def smallest_value_arel(args, column_alias)
