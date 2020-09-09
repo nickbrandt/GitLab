@@ -137,7 +137,7 @@ RSpec.describe 'User updates feature flag', :js do
         before do
           within_scope_row(3) do
             within_environment_spec do
-              find('.js-env-input').set('production')
+              find('.js-env-search > input').set('production')
               find('.js-create-button').click
             end
           end
