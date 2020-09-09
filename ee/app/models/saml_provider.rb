@@ -86,7 +86,7 @@ class SamlProvider < ApplicationRecord
   def access_level_inclusion
     return errors.add(:default_membership_role, "is dependent on a group") unless group
 
-    levels = group.access_level_values_for_group
+    levels = group.access_level_values
     return if default_membership_role.in?(levels)
 
     errors.add(:default_membership_role, "is not included in the list")

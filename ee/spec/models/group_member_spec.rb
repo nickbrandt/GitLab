@@ -129,7 +129,7 @@ RSpec.describe GroupMember do
         context 'when group is a subgroup' do
           let(:subgroup) { create(:group, parent: group) }
 
-          it 'users can have access levels from guest to owner' do
+          it 'users cannot have minimal access level' do
             expect(build(:group_member, group: subgroup, user: create(:user), access_level: ::Gitlab::Access::MINIMAL_ACCESS)).to be_invalid
           end
         end

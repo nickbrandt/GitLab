@@ -81,7 +81,7 @@ module EE
 
     override :access_level_inclusion
     def access_level_inclusion
-      levels = source.access_level_values_for_group
+      levels = source.access_level_values
       return if access_level.in?(levels)
 
       errors.add(:access_level, "is not included in the list")
