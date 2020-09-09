@@ -13,6 +13,7 @@ import {
 } from 'ee/threat_monitoring/components/policy_editor/constants';
 import fromYaml from 'ee/threat_monitoring/components/policy_editor/lib/from_yaml';
 import toYaml from 'ee/threat_monitoring/components/policy_editor/lib/to_yaml';
+import { buildRule } from 'ee/threat_monitoring/components/policy_editor/lib/rules';
 import { redirectTo } from '~/lib/utils/url_utility';
 
 jest.mock('~/lib/utils/url_utility');
@@ -48,6 +49,8 @@ describe('PolicyEditorApp component', () => {
   const findAddRuleButton = () => wrapper.find('[data-testid="add-rule"]');
   const findYAMLParsingAlert = () => wrapper.find('[data-testid="parsing-alert"]');
   const findNetworkPolicyEditor = () => wrapper.find(NetworkPolicyEditor);
+  const findPolicyName = () => wrapper.find("[id='policyName']");
+  const findSavePolicy = () => wrapper.find("[data-testid='save-policy']");
 
   beforeEach(() => {
     factory();
@@ -126,7 +129,7 @@ spec:
 
     beforeEach(() => {
       initialValue = findPreview().props('policyYaml');
-      wrapper.find("[id='policyName']").vm.$emit('input', 'new');
+      findPolicyName().vm.$emit('input', 'new');
     });
 
     it('updates policy yaml preview', () => {
@@ -169,7 +172,7 @@ spec:
   });
 
   it('updates yaml editor value on switch to yaml editor', async () => {
-    wrapper.find("[id='policyName']").vm.$emit('input', 'test-policy');
+    findPolicyName().vm.$emit('input', 'test-policy');
     wrapper.find("[data-testid='editor-mode']").vm.$emit('input', EditorModeYAML);
     await wrapper.vm.$nextTick();
 
@@ -199,7 +202,7 @@ spec:
   });
 
   it('creates policy and redirects to a threat monitoring path', async () => {
-    wrapper.find("[data-testid='create-policy']").vm.$emit('click');
+    findSavePolicy().vm.$emit('click');
 
     await wrapper.vm.$nextTick();
     expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/createPolicy', {
@@ -219,10 +222,64 @@ spec:
     });
 
     it('it does not redirect', async () => {
-      wrapper.find("[data-testid='create-policy']").vm.$emit('click');
+      findSavePolicy().vm.$emit('click');
 
       await wrapper.vm.$nextTick();
       expect(redirectTo).not.toHaveBeenCalledWith('/threat-monitoring');
+    });
+  });
+
+  describe('given existingPolicy property was provided', () => {
+    const manifest = toYaml({
+      name: 'policy',
+      endpointLabels: '',
+      rules: [buildRule()],
+    });
+
+    beforeEach(() => {
+      factory({
+        propsData: {
+          existingPolicy: { name: 'policy', manifest },
+        },
+      });
+    });
+
+    it('presents existing policy', () => {
+      expect(findPolicyName().attributes().value).toEqual('policy');
+      expect(wrapper.findAll(PolicyRuleBuilder).length).toEqual(1);
+    });
+
+    it('updates existing policy and redirects to a threat monitoring path', async () => {
+      const saveButton = findSavePolicy();
+      expect(saveButton.text()).toEqual('Save changes');
+      saveButton.vm.$emit('click');
+
+      await wrapper.vm.$nextTick();
+      expect(store.dispatch).toHaveBeenCalledWith('networkPolicies/updatePolicy', {
+        environmentId: -1,
+        policy: { name: 'policy', manifest: toYaml(wrapper.vm.policy) },
+      });
+      expect(redirectTo).toHaveBeenCalledWith('/threat-monitoring');
+    });
+
+    describe('given there is a updatePolicy error', () => {
+      beforeEach(() => {
+        factory({
+          propsData: {
+            existingPolicy: { name: 'policy', manifest },
+          },
+          state: {
+            errorUpdatingPolicy: true,
+          },
+        });
+      });
+
+      it('it does not redirect', async () => {
+        findSavePolicy().vm.$emit('click');
+
+        await wrapper.vm.$nextTick();
+        expect(redirectTo).not.toHaveBeenCalledWith('/threat-monitoring');
+      });
     });
   });
 });

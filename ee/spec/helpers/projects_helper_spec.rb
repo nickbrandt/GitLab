@@ -182,6 +182,7 @@ RSpec.describe ProjectsHelper do
         projects/licenses#index
         projects/threat_monitoring#show
         projects/threat_monitoring#new
+        projects/threat_monitoring#edit
       ]
     end
 
