@@ -121,6 +121,10 @@ module EE
           results
         end
 
+        def on_demand_pipelines_usage
+          { dast_on_demand_pipelines: count(::Ci::Pipeline.ondemand_dast_scan) }
+        end
+
         # Note: when adding a preference, check if it's mapped to an attribute of a User model. If so, name
         # the base key part after a corresponding User model attribute, use its possible values as suffix values.
         override :user_preferences_usage
@@ -181,6 +185,7 @@ module EE
               },
               requirements_counts,
               security_products_usage,
+              on_demand_pipelines_usage,
               epics_deepest_relationship_level,
               operations_dashboard_usage)
           end
