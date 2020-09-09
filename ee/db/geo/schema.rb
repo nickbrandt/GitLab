@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_30_133800) do
+ActiveRecord::Schema.define(version: 2020_08_27_120552) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -89,6 +89,19 @@ ActiveRecord::Schema.define(version: 2020_07_30_133800) do
     t.index ["lfs_object_id"], name: "index_lfs_object_registry_on_lfs_object_id", unique: true
     t.index ["retry_at"], name: "index_lfs_object_registry_on_retry_at"
     t.index ["success"], name: "index_lfs_object_registry_on_success"
+  end
+
+  create_table "merge_request_diff_registry", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "retry_at"
+    t.datetime_with_timezone "last_synced_at"
+    t.bigint "merge_request_diff_id", null: false
+    t.integer "state", limit: 2, default: 0, null: false
+    t.integer "retry_count", limit: 2, default: 0
+    t.text "last_sync_failure"
+    t.index ["merge_request_diff_id"], name: "index_merge_request_diff_registry_on_mr_diff_id"
+    t.index ["retry_at"], name: "index_merge_request_diff_registry_on_retry_at"
+    t.index ["state"], name: "index_merge_request_diff_registry_on_state"
   end
 
   create_table "package_file_registry", id: :serial, force: :cascade do |t|
@@ -180,4 +193,5 @@ ActiveRecord::Schema.define(version: 2020_07_30_133800) do
     t.index ["state"], name: "index_terraform_state_registry_on_state"
     t.index ["terraform_state_id"], name: "index_terraform_state_registry_on_terraform_state_id"
   end
+
 end
