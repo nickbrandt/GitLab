@@ -74,7 +74,7 @@ module RelativePositioning
     end
 
     def relative_siblings(relation = scoped_items)
-      object.relative_siblings(relation)
+      object.exclude_self(relation)
     end
 
     # Handles the possibility that the position is already occupied by a sibling
@@ -114,7 +114,7 @@ module RelativePositioning
 
     def scoped_items
       r = model_class.relative_positioning_query_base(object)
-      r = r.id_not_in(ignoring.id) if ignoring.present?
+      r = object.exclude_self(r, excluded: ignoring) if ignoring.present?
       r
     end
 
@@ -597,9 +597,9 @@ module RelativePositioning
       .update_all("relative_position = relative_position + #{delta}")
   end
 
-  # This method is used to exclude the current self from a relation. Customize
-  # this if `id <> :id` is not sufficient
-  def relative_siblings(relation)
-    relation.id_not_in(id)
+  # This method is used to exclude the current self (or another object)
+  # from a relation. Customize this if `id <> :id` is not sufficient
+  def exclude_self(relation, excluded: self)
+    relation.id_not_in(excluded.id)
   end
 end

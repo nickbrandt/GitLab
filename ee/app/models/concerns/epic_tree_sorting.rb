@@ -34,9 +34,13 @@ module EpicTreeSorting
       end
     end
 
-    override :relative_siblings
-    def relative_siblings(relation)
-      relation.where.not('object_type = ? AND id = ?', self.class.table_name.singularize, self.id)
+    override :exclude_self
+    def exclude_self(relation, excluded: self)
+      return relation unless excluded&.id.present?
+
+      object_type = excluded.try(:object_type) || excluded.class.table_name.singularize
+
+      relation.where.not('object_type = ? AND id = ?', object_type, excluded.id)
     end
   end
 end
