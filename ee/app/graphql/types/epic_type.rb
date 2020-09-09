@@ -14,6 +14,7 @@ module Types
     present_using EpicPresenter
 
     implements(Types::Notes::NoteableType)
+    implements(Types::CurrentUserTodos)
 
     field :id, GraphQL::ID_TYPE, null: false,
           description: 'ID of the epic'
