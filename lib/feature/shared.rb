@@ -33,7 +33,7 @@ class Feature
         EOS
       },
       licensed: {
-        description: 'Forever, used like a config to enable rollout licensed features for certain users',
+        description: 'Permanent feature flags used to temporarily disable licensed features.',
         optional: true,
         rollout_issue: false,
         default_enabled: true,

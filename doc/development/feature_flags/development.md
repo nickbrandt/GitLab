@@ -63,10 +63,9 @@ push_frontend_feature_flag(:my_ops_flag, project, type: :ops)
 
 ### `licensed` type
 
-`licensed` feature flags are implicit feature flags
-that are one-to-one mapping of all licensed features.
-These feature flags are used to temporarily disable
-licensed features.
+`licensed` feature flags are used to temporarily disable licensed features. There
+should be a one-to-one mapping of `licensed` feature flags to licensed features.
+`licensed` feature flags likely do not have rollout issues.
 
 A `licensed` feature flag by its nature likely does not have a rollout
 issue. The `licensed` feature flags by default has to be `default_enabled: true`
@@ -74,9 +73,9 @@ as current implementation does not allow otherwise.
 This aspect is currently in works as part of
 https://gitlab.com/gitlab-org/gitlab/-/issues/218667.
 
-The `licensed` type have a dedicated set of functions to check
-if a licensed feature is available in a context of a project or namespace.
-This check validates license assigned to namespace and feature flag itself:
+The `licensed` type has a dedicated set of functions to check if a licensed feature
+is available for a project or namespace. This check validates if the license is assigned
+to the namespace and feature flag itself:
 
 ```ruby
 # Check if feature flag is enabled
@@ -317,12 +316,12 @@ a by default enabled feature flag with the same name as the provided argument.
 unless the feature is explicitly disabled or limited to a percentage of users,
 the feature flag check will default to `true`.**
 
-CAUTION: **Caution:**
-Due to current limitations of `feature_available?` the YAML definition
-for licensed feature flags accepts only `default_enabled: true`.
-This is subject to be improved as part of the https://gitlab.com/gitlab-org/gitlab/-/issues/218667.
+NOTE: **Note:**
+Due to limitations with `feature_available?`, the YAML definition for `licensed` feature
+flags accepts only `default_enabled: true`. This is under development as per the
+[related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/218667).
 
-#### Beta/alpha licensed feature flags
+#### Alpha/beta licensed feature flags
 
 This is relevant when developing the feature using
 [several smaller merge requests](https://about.gitlab.com/handbook/values/#make-small-merge-requests), or when the feature is considered to be an
@@ -339,11 +338,12 @@ method, according to our [definitions](https://about.gitlab.com/handbook/product
 _explicitly_ enabled.
 
 CAUTION: **Caution:**
-If the `beta_feature_available?` or `alpha_feature_available?` is used
-the YAML definition of feature flag needs to use `default_enabled: [false, true]`
-as the usage of the feature flag is undefined. These methods are subject to be removed as part of the discusions https://gitlab.com/gitlab-org/gitlab/-/issues/218667.
+If `alpha_feature_available?` or `beta_feature_available?` is used, the YAML definition
+for the feature flag must use `default_enabled: [false, true]`, because the usage
+of the feature flag is undefined. These methods may change, as per the
+[related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/218667).
 
-The resulting YAML should be similar to this:
+The resulting YAML should be similar to:
 
 ```yaml
 name: scoped_labels
