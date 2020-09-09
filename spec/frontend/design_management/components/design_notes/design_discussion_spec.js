@@ -233,7 +233,7 @@ describe('Design discussions component', () => {
       { discussionComment: 'test', isFormRendered: true },
     );
 
-    findReplyForm().vm.$emit('submitForm');
+    findReplyForm().vm.$emit('submit-form');
     expect(mutate).toHaveBeenCalledWith(mutationVariables);
 
     return mutate()
@@ -254,7 +254,7 @@ describe('Design discussions component', () => {
     return wrapper.vm
       .$nextTick()
       .then(() => {
-        findReplyForm().vm.$emit('cancelForm');
+        findReplyForm().vm.$emit('cancel-form');
 
         expect(wrapper.vm.discussionComment).toBe('');
         return wrapper.vm.$nextTick();
@@ -325,6 +325,6 @@ describe('Design discussions component', () => {
     createComponent();
     findReplyPlaceholder().vm.$emit('onClick');
 
-    expect(wrapper.emitted('openForm')).toBeTruthy();
+    expect(wrapper.emitted('open-form')).toBeTruthy();
   });
 });

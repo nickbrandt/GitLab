@@ -1,6 +1,6 @@
 <script>
 import { ApolloMutation } from 'vue-apollo';
-import { GlTooltipDirective, GlIcon, GlLoadingIcon, GlLink } from '@gitlab/ui';
+import { GlTooltipDirective, GlIcon, GlLoadingIcon, GlLink, GlBadge } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import ReplyPlaceholder from '~/notes/components/discussion_reply_placeholder.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
@@ -26,6 +26,7 @@ export default {
     GlLink,
     ToggleRepliesWidget,
     TimeAgoTooltip,
+    GlBadge,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -158,14 +159,14 @@ export default {
       }
     },
     onCreateNoteError(err) {
-      this.$emit('createNoteError', err);
+      this.$emit('create-note-error', err);
     },
     hideForm() {
       this.isFormRendered = false;
       this.discussionComment = '';
     },
     showForm() {
-      this.$emit('openForm', this.discussion.id);
+      this.$emit('open-form', this.discussion.id);
       this.isFormRendered = true;
     },
     toggleResolvedStatus() {
@@ -177,11 +178,11 @@ export default {
         })
         .then(({ data }) => {
           if (data.errors?.length > 0) {
-            this.$emit('resolveDiscussionError', data.errors[0]);
+            this.$emit('resolve-discussion-error', data.errors[0]);
           }
         })
         .catch(err => {
-          this.$emit('resolveDiscussionError', err);
+          this.$emit('resolve-discussion-error', err);
         })
         .finally(() => {
           this.isResolving = false;
@@ -202,13 +203,12 @@ export default {
 
 <template>
   <div class="design-discussion-wrapper">
-    <div
-      class="badge badge-pill gl-display-flex gl-align-items-center gl-justify-content-center"
+    <gl-badge
+      class="gl-display-flex gl-align-items-center gl-justify-content-center gl-cursor-pointer"
       :class="{ resolved: discussion.resolved }"
-      type="button"
     >
       {{ discussion.index }}
-    </div>
+    </gl-badge>
     <ul
       class="design-discussion bordered-box gl-relative gl-p-0 gl-list-style-none"
       data-qa-selector="design_discussion_content"
@@ -218,7 +218,7 @@ export default {
         :markdown-preview-path="markdownPreviewPath"
         :is-resolving="isResolving"
         :class="{ 'gl-bg-blue-50': isDiscussionActive }"
-        @error="$emit('updateNoteError', $event)"
+        @error="$emit('update-note-error', $event)"
       >
         <template v-if="discussion.resolvable" #resolveDiscussion>
           <button
@@ -226,7 +226,6 @@ export default {
             :class="{ 'is-active': discussion.resolved }"
             :title="resolveCheckboxText"
             :aria-label="resolveCheckboxText"
-            type="button"
             class="line-resolve-btn note-action-button gl-mr-3"
             data-testid="resolve-button"
             @click.stop="toggleResolvedStatus"
@@ -262,7 +261,7 @@ export default {
         :markdown-preview-path="markdownPreviewPath"
         :is-resolving="isResolving"
         :class="{ 'gl-bg-blue-50': isDiscussionActive }"
-        @error="$emit('updateNoteError', $event)"
+        @error="$emit('update-note-error', $event)"
       />
       <li v-show="isReplyPlaceholderVisible" class="reply-wrapper">
         <reply-placeholder
@@ -286,8 +285,8 @@ export default {
             v-model="discussionComment"
             :is-saving="loading"
             :markdown-preview-path="markdownPreviewPath"
-            @submitForm="mutate"
-            @cancelForm="hideForm"
+            @submit-form="mutate"
+            @cancel-form="hideForm"
           >
             <template v-if="discussion.resolvable" #resolveCheckbox>
               <label data-testid="resolve-checkbox">

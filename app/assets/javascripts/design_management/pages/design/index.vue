@@ -367,8 +367,8 @@ export default {
               v-model="comment"
               :is-saving="loading"
               :markdown-preview-path="markdownPreviewPath"
-              @submitForm="mutate"
-              @cancelForm="closeCommentForm"
+              @submit-form="mutate"
+              @cancel-form="closeCommentForm"
             /> </apollo-mutation
         ></template>
       </design-sidebar>
