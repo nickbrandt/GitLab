@@ -4,8 +4,4 @@
   %h3
     = _("Repositories Analytics")
 
-.gl-display-flex.gl-justify-content-space-between.gl-align-items-center
-  %h4.sub-header
-    = _("RepositoriesAnalytics|Test Code Coverage")
-  = link_to _("RepositoriesAnalytics|Download historic test coverage data (.csv)"), group_analytics_coverage_reports_path(@group, format: :csv, ref_path: "refs/heads/master", start_date: Date.today - 1.year, end_date: Date.today),
-      rel: 'nofollow', download: '', method: :get, class: 'gl-button btn-sm'
+#js-group-repository-analytics{ data: { group_analytics_coverage_reports_path: group_analytics_coverage_reports_path(@group, format: :csv, ref_path: "refs/heads/master") } }
