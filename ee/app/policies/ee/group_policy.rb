@@ -25,6 +25,10 @@ module EE
         @subject.feature_available?(:group_merge_request_analytics)
       end
 
+      condition(:group_repository_analytics_available) do
+        @subject.feature_available?(:group_repository_analytics)
+      end
+
       condition(:group_activity_analytics_available) do
         @subject.feature_available?(:group_activity_analytics) && ::Feature.enabled?(:group_activity_analytics, @subject, default_enabled: true)
       end
@@ -130,6 +134,9 @@ module EE
 
       rule { has_access & group_activity_analytics_available }
         .enable :read_group_activity_analytics
+
+      rule { has_access & group_repository_analytics_available }
+        .enable :read_group_repository_analytics
 
       rule { reporter & group_merge_request_analytics_available }
         .enable :read_group_merge_request_analytics
