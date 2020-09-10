@@ -401,6 +401,23 @@ module EE
       root_ancestor.saml_provider&.prohibited_outer_forks?
     end
 
+    def minimal_access_role_allowed?
+      feature_available?(:minimal_access_role) && !has_parent?
+    end
+
+    override :member?
+    def member?(user, min_access_level = minimal_member_access_level)
+      if min_access_level == ::Gitlab::Access::MINIMAL_ACCESS && minimal_access_role_allowed?
+        all_group_members.find_by(user_id: user.id).present?
+      else
+        super
+      end
+    end
+
+    def minimal_member_access_level
+      minimal_access_role_allowed? ? ::Gitlab::Access::MINIMAL_ACCESS : ::Gitlab::Access::GUEST
+    end
+
     private
 
     def custom_project_templates_group_allowed
