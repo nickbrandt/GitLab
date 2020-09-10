@@ -180,9 +180,9 @@ export default {
     <gl-button
       v-else-if="canRemove"
       ref="removeButton"
+      v-gl-tooltip
       icon="close"
       category="tertiary"
-      v-gl-tooltip
       :disabled="removeDisabled"
       class="js-issue-item-remove-button"
       data-qa-selector="remove_related_issue_button"
