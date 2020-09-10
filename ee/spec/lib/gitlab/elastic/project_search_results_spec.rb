@@ -70,14 +70,31 @@ RSpec.describe Gitlab::Elastic::ProjectSearchResults, :elastic do
     end
 
     context 'filtering' do
-      include_examples 'search issues scope filters by state' do
+      context 'issues' do
         let!(:project) { create(:project, :public) }
-        let!(:closed_issue) { create(:issue, :closed, project: project, title: 'foo closed') }
-        let!(:opened_issue) { create(:issue, :opened, project: project, title: 'foo opened') }
+        let!(:closed_result) { create(:issue, :closed, project: project, title: 'foo closed') }
+        let!(:opened_result) { create(:issue, :opened, project: project, title: 'foo opened') }
         let(:query) { 'foo' }
+        let(:scope) { 'issues' }
 
-        before do
-          ensure_elasticsearch_index!
+        include_examples 'search results filtered by state' do
+          before do
+            ensure_elasticsearch_index!
+          end
+        end
+      end
+
+      context 'merge_requests' do
+        let!(:project) { create(:project, :public) }
+        let!(:opened_result) { create(:merge_request, :opened, source_project: project, title: 'foo opened') }
+        let!(:closed_result) { create(:merge_request, :closed, source_project: project, title: 'foo closed') }
+        let(:query) { 'foo' }
+        let(:scope) { 'merge_requests' }
+
+        include_examples 'search results filtered by state' do
+          before do
+            ensure_elasticsearch_index!
+          end
         end
       end
     end
