@@ -25,6 +25,28 @@ RSpec.shared_examples 'authorize read pipeline' do
   end
 end
 
+RSpec.shared_examples 'pending pipeline response' do
+  context 'when pipeline is pending' do
+    let(:comparison_status) { nil }
+
+    before do
+      merge_request.head_pipeline.run!
+    end
+
+    it 'sends polling interval' do
+      expect(::Gitlab::PollingInterval).to receive(:set_header)
+
+      subject
+    end
+
+    it 'returns 204 HTTP status' do
+      subject
+
+      expect(response).to have_gitlab_http_status(:no_content)
+    end
+  end
+end
+
 RSpec.describe Projects::MergeRequestsController do
   include ProjectForksHelper
 
@@ -332,6 +354,8 @@ RSpec.describe Projects::MergeRequestsController do
         .with(::Ci::CompareSecurityReportsService, viewer, 'dependency_scanning').and_return(comparison_status)
     end
 
+    it_behaves_like 'pending pipeline response'
+
     context 'when comparison is being processed' do
       let(:comparison_status) { { status: :parsing } }
 
@@ -402,6 +426,8 @@ RSpec.describe Projects::MergeRequestsController do
         .with(::Ci::CompareSecurityReportsService, viewer, 'container_scanning').and_return(comparison_status)
     end
 
+    it_behaves_like 'pending pipeline response'
+
     context 'when comparison is being processed' do
       let(:comparison_status) { { status: :parsing } }
 
@@ -471,6 +497,8 @@ RSpec.describe Projects::MergeRequestsController do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
         .with(::Ci::CompareSecurityReportsService, viewer, 'sast').and_return(comparison_status)
     end
+
+    it_behaves_like 'pending pipeline response'
 
     context 'when comparison is being processed' do
       let(:comparison_status) { { status: :parsing } }
@@ -543,6 +571,8 @@ RSpec.describe Projects::MergeRequestsController do
         .with(::Ci::CompareSecurityReportsService, viewer, 'secret_detection').and_return(comparison_status)
     end
 
+    it_behaves_like 'pending pipeline response'
+
     context 'when comparison is being processed' do
       let(:comparison_status) { { status: :parsing } }
 
@@ -612,6 +642,8 @@ RSpec.describe Projects::MergeRequestsController do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
         .with(::Ci::CompareSecurityReportsService, viewer, 'dast').and_return(comparison_status)
     end
+
+    it_behaves_like 'pending pipeline response'
 
     context 'when comparison is being processed' do
       let(:comparison_status) { { status: :parsing } }
@@ -683,6 +715,8 @@ RSpec.describe Projects::MergeRequestsController do
       allow_any_instance_of(::MergeRequest).to receive(:compare_reports)
         .with(::Ci::CompareLicenseScanningReportsService, viewer).and_return(comparison_status)
     end
+
+    it_behaves_like 'pending pipeline response'
 
     context 'when comparison is being processed' do
       let(:comparison_status) { { status: :parsing } }
