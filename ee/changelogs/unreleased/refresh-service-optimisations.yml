@@ -1,0 +1,5 @@
+---
+title: Move approval reset to new service and worker
+merge_request: 42001
+author:
+type: performance

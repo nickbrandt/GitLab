@@ -13,6 +13,7 @@ RSpec.describe MergeRequests::RefreshService do
   let(:fork_user) { create(:user) }
 
   let(:source_branch) { 'between-create-delete-modify-move' }
+
   let(:merge_request) do
     create(:merge_request,
       source_project: project,
@@ -353,6 +354,7 @@ RSpec.describe MergeRequests::RefreshService do
         it 'resets approvals' do
           service.execute(oldrev, newrev, 'refs/heads/master')
           reload_mrs
+          MergeRequestResetApprovalsWorker.drain
 
           expect(merge_request.approvals).to be_empty
           expect(forked_merge_request.approvals).not_to be_empty
@@ -451,6 +453,7 @@ RSpec.describe MergeRequests::RefreshService do
             allow(service).to receive(:execute_hooks)
             service.execute(oldrev, newrev, 'refs/heads/master')
             reload_mrs
+            MergeRequestResetApprovalsWorker.drain
           end
 
           it 'resets approvals' do
@@ -494,6 +497,7 @@ RSpec.describe MergeRequests::RefreshService do
               allow(service).to receive(:execute_hooks)
               service.execute(oldrev, newrev, 'refs/heads/master')
               reload_mrs
+              MergeRequestResetApprovalsWorker.drain
             end
 
             it 'resets the approvals' do
@@ -507,6 +511,7 @@ RSpec.describe MergeRequests::RefreshService do
               allow(service).to receive(:execute_hooks)
               service.execute(oldrev, newrev, 'refs/heads/master')
               reload_mrs
+              MergeRequestResetApprovalsWorker.drain
             end
 
             it 'resets the approvals' do
