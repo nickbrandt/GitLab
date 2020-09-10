@@ -85,10 +85,10 @@ module Gitlab
 
           private
 
-          def entry(entry_name, entry_klass, **entry_attributes)
+          def entry(entry_name, entry_klass, entry_attributes = {})
             entry_name = entry_name.to_sym
 
-            builder.build_node!(entry_name, entry_klass, entry_attributes)
+            builder.build_factory!(entry_name, entry_klass, entry_attributes)
 
             helpers(entry_name)
           end
@@ -98,30 +98,30 @@ module Gitlab
             builder.push_entries_config!(entries_klasses, entries_attributes)
           end
 
-          def dynamic_helpers(*nodes)
-            helpers(*nodes, dynamic: true)
+          def dynamic_helpers(*entry_names)
+            helpers(*entry_names, dynamic: true)
           end
 
-          def helpers(*nodes, dynamic: false)
-            nodes.each do |symbol|
-              if method_defined?("#{symbol}_defined?") || method_defined?("#{symbol}_entry") || method_defined?("#{symbol}_value")
-                raise ArgumentError, "Method '#{symbol}_defined?', '#{symbol}_entry' or '#{symbol}_value' already defined in '#{name}'"
+          def helpers(*entry_names, dynamic: false)
+            entry_names.each do |entry_name|
+              if method_defined?("#{entry_name}_defined?") || method_defined?("#{entry_name}_entry") || method_defined?("#{entry_name}_value")
+                raise ArgumentError, "Method '#{entry_name}_defined?', '#{entry_name}_entry' or '#{entry_name}_value' already defined in '#{name}'"
               end
 
-              unless builder.nodes.to_h[symbol]
-                raise ArgumentError, "Entry for #{symbol} is undefined" unless dynamic
+              unless builder.nodes[entry_name]
+                raise ArgumentError, "Entry for #{entry_name} is undefined" unless dynamic
               end
 
-              define_method("#{symbol}_defined?") do
-                entries[symbol]&.specified?
+              define_method("#{entry_name}_defined?") do
+                entries[entry_name]&.specified?
               end
 
-              define_method("#{symbol}_entry") do
-                entries[symbol]
+              define_method("#{entry_name}_entry") do
+                entries[entry_name]
               end
 
-              define_method("#{symbol}_value") do
-                entry = entries[symbol]
+              define_method("#{entry_name}_value") do
+                entry = entries[entry_name]
                 entry.value if entry&.valid?
               end
             end

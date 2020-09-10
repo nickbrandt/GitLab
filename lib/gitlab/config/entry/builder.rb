@@ -11,8 +11,8 @@ module Gitlab
           @entries_attributes = {}
         end
 
-        def build_node!(entry_name, entry_klass, **entry_attributes)
-          @nodes[entry_name] = build_node(entry_name, entry_klass, entry_attributes)
+        def build_factory!(entry_name, entry_klass, **entry_attributes)
+          @nodes[entry_name] = build_factory(entry_name, entry_klass, entry_attributes)
         end
 
         def push_entries_config!(entries_klasses, **entries_attributes)
@@ -29,37 +29,32 @@ module Gitlab
         private
 
         def create_static_entries(config, parent_node)
-          entries = {}
+          return {} unless config.is_a?(Hash)
 
-          @nodes.each do |node_name, node|
-            next unless config.is_a?(Hash)
-
-            entries[node_name] = create_node(node, node_name, config[node_name], parent_node)
+          @nodes.to_h do |node_name, node|
+            [
+              node_name,
+              create_node(node, node_name, config[node_name], parent_node)
+            ]
           end
-
-          entries
         end
 
         def create_dynamic_entries(config, parent_node)
-          entries = {}
+          return {} unless entries_defined?
 
-          return entries unless entries_defined?
-
-          config.each do |entry_name, entry_value|
+          config.to_h do |entry_name, entry_value|
             klass = entries_klass(parent_node, entry_name, entry_value)
             next unless klass
 
             @entries_attributes[:metadata] = (@entries_attributes[:metadata] || {}).merge(name: entry_name)
-            factory = build_node(entry_name, klass, **@entries_attributes)
+            factory = build_factory(entry_name, klass, **@entries_attributes)
 
-            entries[entry_name] = create_node(factory, entry_name, entry_value, parent_node)
+            [entry_name, create_node(factory, entry_name, entry_value, parent_node)]
           end
-
-          entries
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
-        def build_node(entry_name, entry_klass, description: nil, default: nil, inherit: nil, reserved: nil, metadata: {})
+        def build_factory(entry_name, entry_klass, description: nil, default: nil, inherit: nil, reserved: nil, metadata: {})
           ::Gitlab::Config::Entry::Factory.new(entry_klass)
             .with(key: entry_name.to_s)
             .with(description: description && description % entry_name.to_s)
