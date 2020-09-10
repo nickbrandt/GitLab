@@ -661,7 +661,7 @@ RSpec.describe Group do
           stub_licensed_features(group_project_templates: false)
         end
 
-        it 'returns false unlicensed instance' do
+        it 'returns false for unlicensed instance' do
           is_expected.to be false
         end
       end
