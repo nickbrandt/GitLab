@@ -10,11 +10,14 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
     let!(:project_coverage) { create_daily_coverage('rspec', 95.0, '2020-03-10', project) }
 
     let!(:group) { create(:group, :private) }
-    let!(:group_project) { create(:project, namespace: group) }
-    let!(:group_project_coverage_rspec) { create_daily_coverage('rspec', 79.0, '2020-03-09', group_project) }
+    let!(:rspec_project) { create(:project, namespace: group) }
+    let!(:rspec_project_coverage) { create_daily_coverage('rspec', 79.0, '2020-03-09', rspec_project) }
 
-    let!(:group_project_two) { create(:project, namespace: group) }
-    let!(:group_project_coverage_karma) { create_daily_coverage('karma', 89.0, '2020-03-09', group_project_two) }
+    let!(:karma_project) { create(:project, namespace: group) }
+    let!(:karma_project_coverage) { create_daily_coverage('karma', 89.0, '2020-03-09', karma_project) }
+
+    let(:generic_project) { create(:project, namespace: group) }
+    let!(:generic_coverage) { create_daily_coverage('unreported', 95.0, '2020-03-10', generic_project) }
 
     let(:subgroup) { create(:group, :private, parent: group) }
     let(:subgroup_project) { create(:project, namespace: subgroup) }
@@ -41,15 +44,12 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
     end
 
     context 'when current user is allowed to :read_group_build_report_results' do
-      let(:excluded_group_project) { create(:project, namespace: group) }
-      let!(:excluded_coverage) { create_daily_coverage('unreported', 95.0, '2020-03-10', excluded_group_project) }
-
       before do
         group.add_reporter(user)
       end
 
       it 'returns only coverages belonging to the passed group' do
-        expect(subject).to include(group_project_coverage_rspec, group_project_coverage_karma)
+        expect(subject).to include(rspec_project_coverage, karma_project_coverage)
         expect(subject).not_to include(project_coverage)
         expect(subject).not_to include(subgroup_project_coverage)
       end
@@ -78,18 +78,18 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
 
       context 'with nil project_ids' do
         it 'returns only coverages belonging to the passed group' do
-          expect(subject).to include(group_project_coverage)
+          expect(subject).to match_array([rspec_project_coverage, karma_project_coverage, generic_coverage])
           expect(subject).not_to include(project_coverage)
           expect(subject).not_to include(subgroup_project_coverage)
         end
       end
 
       context 'with passed project_ids' do
-        let(:project_ids) { [group_project.id] }
+        let(:project_ids) { [rspec_project.id] }
 
         it 'filters out non-specified projects' do
-          expect(subject).to include(group_project_coverage)
-          expect(subject).not_to include(excluded_coverage)
+          expect(subject).to match_array([rspec_project_coverage])
+          expect(subject).not_to include(karma_project_coverage, generic_coverage)
         end
       end
 
@@ -97,18 +97,18 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
         let(:project_ids) { [] }
 
         it 'returns all projects' do
-          expect(subject).to include(group_project_coverage)
-          expect(subject).to include(excluded_coverage)
+          expect(subject).to match_array([rspec_project_coverage, karma_project_coverage, generic_coverage])
         end
       end
 
       context 'when accessing projects from the result' do
-        it 'only does a single query' do
-          # Two permission queries from "members" and "licenses"
-          # One query from "ci_daily_build_group_report_results"
-          # One optional from "projects" if not joined due to direct querying
-          expect { subject.map(&:project) }.not_to exceed_query_limit(4)
-          expect(subject).to match_array([group_project_coverage_rspec, group_project_coverage_karma])
+        it 'executes the same number of queries regardless of the number of records returned' do
+          control = ActiveRecord::QueryRecorder.new do
+            described_class.new(attributes.merge(limit: 1)).execute.map(&:project)
+          end
+
+          expect { subject.map(&:project) }.not_to exceed_query_limit(control)
+          expect(subject).to match_array([rspec_project_coverage, karma_project_coverage, generic_coverage])
         end
       end
     end

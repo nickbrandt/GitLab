@@ -20,7 +20,10 @@ module Ci
     private
 
     def query
-      super.with_included_projects
+      Ci::DailyBuildGroupReportResult.with_included_projects.recent_results(
+        query_params,
+        limit: limit
+      )
     end
 
     def query_allowed?
