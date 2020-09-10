@@ -178,10 +178,10 @@ export default {
       <gl-icon name="lock" />
     </span>
     <gl-button
-      icon="close"
-      category="tertiary"
       v-else-if="canRemove"
       ref="removeButton"
+      icon="close"
+      category="tertiary"
       v-gl-tooltip
       :disabled="removeDisabled"
       class="js-issue-item-remove-button"
