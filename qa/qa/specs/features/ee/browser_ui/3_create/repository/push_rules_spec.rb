@@ -55,7 +55,7 @@ module QA
             error: Regexp.escape("File name #{@file_name_limitation} was blacklisted by the pattern #{@file_name_limitation}"))
         end
 
-        it 'restricts users by email format', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/652' do
+        it 'restricts users by email format', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/652', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/247131', type: :investigating } do
           gitlab_user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
           @project.add_member(gitlab_user, Resource::Members::AccessLevel::MAINTAINER)
 
@@ -110,7 +110,7 @@ module QA
           end
         end
 
-        it 'rejects non-member users', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/879' do
+        it 'rejects non-member users', testcase: 'https://gitlab.com/gitlab-org/quality/testcases/-/issues/879', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/224465', type: :investigating } do
           non_member_user = Resource::User.new.tap do |user|
             user.username = ''
             user.password = ''
