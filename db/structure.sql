@@ -21400,6 +21400,8 @@ CREATE INDEX tmp_build_stage_position_index ON public.ci_builds USING btree (sta
 
 CREATE INDEX tmp_index_for_email_unconfirmation_migration ON public.emails USING btree (id) WHERE (confirmed_at IS NOT NULL);
 
+CREATE INDEX tmp_index_for_fixing_inconsistent_vulnerability_occurrences ON public.vulnerability_occurrences USING btree (id) WHERE ((length(location_fingerprint) = 40) AND (report_type = 2));
+
 CREATE UNIQUE INDEX unique_merge_request_metrics_by_merge_request_id ON public.merge_request_metrics USING btree (merge_request_id);
 
 CREATE UNIQUE INDEX users_security_dashboard_projects_unique_index ON public.users_security_dashboard_projects USING btree (project_id, user_id);
