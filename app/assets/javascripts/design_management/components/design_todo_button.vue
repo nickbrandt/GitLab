@@ -5,7 +5,7 @@ import createDesignTodoMutation from '../graphql/mutations/create_design_todo.mu
 import TodoButton from '~/vue_shared/components/todo_button.vue';
 import allVersionsMixin from '../mixins/all_versions';
 import { updateStoreAfterDeleteDesignTodo } from '../utils/cache_update';
-import { findIssueId } from '../utils/design_management_utils';
+import { findIssueId, dispatchDocumentEvent } from '../utils/design_management_utils';
 import { CREATE_DESIGN_TODO_ERROR, DELETE_DESIGN_TODO_ERROR } from '../utils/error_messages';
 
 export default {
@@ -59,6 +59,21 @@ export default {
     },
   },
   methods: {
+    updateGlobalTodoCount(additionalTodoCount) {
+      const currentCount = parseInt(document.querySelector('.js-todos-count').innerText, 10);
+
+      dispatchDocumentEvent('todo:toggle', {
+        detail: {
+          count: Math.max(currentCount + additionalTodoCount, 0),
+        },
+      });
+    },
+    incrementGlobalTodoCount() {
+      this.updateGlobalTodoCount(1);
+    },
+    decrementGlobalTodoCount() {
+      this.updateGlobalTodoCount(-1);
+    },
     createTodo() {
       this.todoLoading = true;
       return this.$apollo
@@ -74,6 +89,9 @@ export default {
               this.$emit('error', Error(createDesignTodoError.message));
             }
           },
+        })
+        .then(() => {
+          this.incrementGlobalTodoCount();
         })
         .catch(err => {
           this.$emit('error', Error(CREATE_DESIGN_TODO_ERROR));
@@ -114,6 +132,9 @@ export default {
               );
             }
           },
+        })
+        .then(() => {
+          this.decrementGlobalTodoCount();
         })
         .catch(err => {
           this.$emit('error', Error(DELETE_DESIGN_TODO_ERROR));
