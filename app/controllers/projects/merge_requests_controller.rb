@@ -452,7 +452,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     params = request.query_parameters
     params[:view] = cookies[:diff_view] if params[:view].blank? && cookies[:diff_view].present?
 
-    if Feature.enabled?(:default_merge_ref_for_diffs, @project)
+    if Feature.enabled?(:default_merge_ref_for_diffs, project)
       params = params.merge(diff_head: true)
     end
 
