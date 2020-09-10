@@ -49,9 +49,9 @@ module Mutations
         # Will be removed during the implementation of
         # https://gitlab.com/gitlab-org/gitlab/-/issues/246737
         def format_for_service(configuration)
-          global_defaults = configuration["global"]&.collect {|k| [k["field"], k["defaultValue"]]}.to_h
-          pipeline_defaults = configuration["pipeline"]&.collect {|k| [k["field"], k["defaultValue"]]}.to_h
-          global_defaults.merge!(pipeline_defaults)
+          global_values = configuration["global"]&.collect {|k| [k["field"], k["value"]]}.to_h
+          pipeline_values = configuration["pipeline"]&.collect {|k| [k["field"], k["value"]]}.to_h
+          global_values.merge!(pipeline_values)
         end
 
         def prepare_response(result)
