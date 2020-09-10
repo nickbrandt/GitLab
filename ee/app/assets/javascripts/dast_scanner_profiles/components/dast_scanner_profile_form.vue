@@ -169,7 +169,7 @@ export default {
     modalOkTitle: __('Discard'),
     modalCancelTitle: __('Cancel'),
     spiderTimeoutTooltip: s__(
-      'DastProfiles|The maximum number of seconds allowed for the spider to traverse the site.',
+      'DastProfiles|The maximum number of minutes allowed for the spider to traverse the site.',
     ),
     targetTimeoutTooltip: s__(
       'DastProfiles|The maximum number of seconds allowed for the site under test to respond to a request.',

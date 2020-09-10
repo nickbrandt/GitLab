@@ -20,7 +20,7 @@ module Types
           method: :name
 
     field :spider_timeout, GraphQL::INT_TYPE, null: true,
-          description: 'The maximum number of seconds allowed for the spider to traverse the site'
+          description: 'The maximum number of minutes allowed for the spider to traverse the site'
 
     field :target_timeout, GraphQL::INT_TYPE, null: true,
           description: 'The maximum number of seconds allowed for the site under test to respond to a request'
