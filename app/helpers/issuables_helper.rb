@@ -465,6 +465,7 @@ module IssuablesHelper
       rootPath: root_path,
       fullPath: issuable[:project_full_path],
       iid: issuable[:iid],
+      severity: issuable[:severity],
       timeTrackingLimitToHours: Gitlab::CurrentSettings.time_tracking_limit_to_hours
     }
   end
