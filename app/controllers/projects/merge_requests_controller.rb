@@ -58,11 +58,6 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   def index
     @merge_requests = @issuables
-    #
-    # ActiveRecord::Associations::Preloader.new.preload(
-    #   @merge_requests,
-    #   { approval_rules: [:users, :groups, approval_project_rule: [:users, :groups, :protected_branches]] }
-    # )
 
     respond_to do |format|
       format.html
