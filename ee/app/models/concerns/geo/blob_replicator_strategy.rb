@@ -34,8 +34,6 @@ module Geo
 
     # Called by Gitlab::Geo::Replicator#consume
     def consume_event_deleted(**params)
-      return unless in_replicables_for_geo_node?
-
       replicate_destroy(params)
     end
 
@@ -51,7 +49,7 @@ module Geo
     #
     # @return [String] File path
     def blob_path
-      carrierwave_uploader.class.absolute_path(carrierwave_uploader)
+      carrierwave_uploader.path
     end
 
     def calculate_checksum!
@@ -100,7 +98,7 @@ module Geo
     def replicate_destroy(event_data)
       ::Geo::FileRegistryRemovalService.new(
         replicable_name,
-        model_record.id,
+        model_record_id,
         event_data[:blob_path]
       ).execute
     end
