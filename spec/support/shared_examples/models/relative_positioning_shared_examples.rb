@@ -1,5 +1,19 @@
 # frozen_string_literal: true
 
+# Notes for implementing classes:
+#
+# The following let bindings should be defined:
+# - `factory`: A symbol naming a factory to use to create items
+# - `default_params`: A HashMap of factory parameters to pass to the factory.
+#
+# The `default_params` should include the relative parent, so that any item
+# created with these parameters passed to the `factory` will be considered in
+# the same set of items relative to each other.
+#
+# For the purposes of efficiency, it is a good idea to bind the parent in
+# `let_it_be`, so that it is re-used across examples, but be careful that it
+# does not have any other children - it should only be used within this set of
+# shared examples.
 RSpec.shared_examples 'a class that supports relative positioning' do
   let(:item1) { create_item }
   let(:item2) { create_item }
