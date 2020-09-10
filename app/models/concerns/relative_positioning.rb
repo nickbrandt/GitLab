@@ -171,12 +171,12 @@ module RelativePositioning
       object.reset
     end
 
-    def create_space_left(gap: nil)
-      move_sequence_before(false, next_gap: gap)
+    def create_space_left
+      find_next_gap_before.tap { |gap| move_sequence_before(false, next_gap: gap) }
     end
 
-    def create_space_right(gap: nil)
-      move_sequence_after(false, next_gap: gap)
+    def create_space_right
+      find_next_gap_after.tap { |gap| move_sequence_after(false, next_gap: gap) }
     end
 
     # Moves the sequence before the current item to the middle of the next gap
@@ -386,16 +386,11 @@ module RelativePositioning
 
       return [pos_left, pos_right] unless gap_too_small?(pos_left, pos_right)
 
-      gap = rhs.find_next_gap_before
-
-      if gap.present?
-        rhs.create_space_left(gap: gap)
-        [pos_left - gap.delta, pos_right]
-      else
-        gap = lhs.find_next_gap_after
-        lhs.create_space_right(gap: gap)
-        [pos_left, pos_right + gap.delta]
-      end
+      gap = rhs.create_space_left
+      [pos_left - gap.delta, pos_right]
+    rescue NoSpaceLeft
+      gap = lhs.create_space_right
+      [pos_left, pos_right + gap.delta]
     end
 
     # This method takes two integer values (positions) and
