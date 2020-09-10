@@ -1,6 +1,5 @@
 <script>
-import { GlButton } from '@gitlab/ui';
-import { GlFormGroup, GlFormRadioGroup, GlLoadingIcon } from '@gitlab/ui';
+import { GlFormGroup, GlFormRadioGroup, GlButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 import RelatedIssuableInput from './related_issuable_input.vue';
 import { mergeUrlParams } from '~/lib/utils/url_utility';
@@ -18,7 +17,6 @@ export default {
   components: {
     GlFormGroup,
     GlFormRadioGroup,
-    GlLoadingIcon,
     RelatedIssuableInput,
     GlButton,
   },
