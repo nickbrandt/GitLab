@@ -41,6 +41,12 @@ module EE
               description: 'Vulnerability scanners reported on the project vulnerabilties',
               resolver: ::Resolvers::Vulnerabilities::ScannersResolver
 
+        field :vulnerabilities_count_by_day,
+              ::Types::VulnerabilitiesCountByDayType.connection_type,
+              null: true,
+              description: 'Number of vulnerabilities per day for the project',
+              resolver: ::Resolvers::VulnerabilitiesCountPerDayResolver
+
         field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
                description: 'Counts for each vulnerability severity in the project',
                resolver: ::Resolvers::VulnerabilitySeveritiesCountResolver
