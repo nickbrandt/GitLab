@@ -184,7 +184,7 @@ export default {
       icon="close"
       category="tertiary"
       :disabled="removeDisabled"
-      class="js-issue-item-remove-button"
+      class="js-issue-item-remove-button gl-ml-3"
       data-qa-selector="remove_related_issue_button"
       :title="__('Remove')"
       :aria-label="__('Remove')"
