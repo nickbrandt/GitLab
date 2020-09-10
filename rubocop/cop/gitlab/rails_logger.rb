@@ -24,26 +24,10 @@ module RuboCop
           (send (const nil? :Rails) :logger ... )
         PATTERN
 
-        WHITELISTED_DIRECTORIES = %w[
-          spec
-        ].freeze
-
         def on_send(node)
-          return if in_whitelisted_directory?(node)
           return unless rails_logger?(node)
 
           add_offense(node, location: :expression)
-        end
-
-        def in_whitelisted_directory?(node)
-          path = file_path_for_node(node)
-
-          WHITELISTED_DIRECTORIES.any? do |directory|
-            path.start_with?(
-              File.join(rails_root, directory),
-              File.join(rails_root, 'ee', directory)
-            )
-          end
         end
       end
     end
