@@ -35,8 +35,8 @@ module Ci
           reset_shared_runners_seconds!(namespaces)
           reset_ci_minutes_notifications!(namespaces)
         end
-      rescue ActiveRecord::ActiveRecordError
-        @errors << { count: namespaces.size, first_id: namespaces.first.id, last_id: namespaces.last.id }
+      rescue ActiveRecord::ActiveRecordError => e
+        @errors << { count: namespaces.size, first_id: namespaces.first.id, last_id: namespaces.last.id, error: e.message }
       end
 
       # This service is responsible for the logic that recalculates the extra shared runners

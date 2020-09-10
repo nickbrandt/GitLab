@@ -138,7 +138,7 @@ RSpec.describe Ci::Minutes::BatchResetService do
         let(:ids_range) { nil }
 
         before do
-          expect(Namespace).to receive(:transaction).once.ordered.and_raise(ActiveRecord::ActiveRecordError)
+          expect(Namespace).to receive(:transaction).once.ordered.and_raise(ActiveRecord::ActiveRecordError, 'something went wrong')
           expect(Namespace).to receive(:transaction).once.ordered.and_call_original
         end
 
@@ -157,7 +157,7 @@ RSpec.describe Ci::Minutes::BatchResetService do
             Ci::Minutes::BatchResetService::BatchNotResetError.new(
               'Some namespace shared runner minutes were not reset.'
             ),
-            { namespace_ranges: [{ count: 3, first_id: 1, last_id: 3 }] }
+            { namespace_ranges: [{ count: 3, first_id: 1, last_id: 3, error: 'something went wrong' }] }
           ).once.and_call_original
 
           expect { subject }.to raise_error(Ci::Minutes::BatchResetService::BatchNotResetError)
