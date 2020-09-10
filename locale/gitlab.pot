@@ -872,6 +872,9 @@ msgstr ""
 msgid "'%{name}' Value Stream created"
 msgstr ""
 
+msgid "'%{name}' Value Stream deleted"
+msgstr ""
+
 msgid "'%{name}' stage already exists"
 msgstr ""
 
@@ -3248,6 +3251,9 @@ msgid "Are you sure you want to cancel editing this comment?"
 msgstr ""
 
 msgid "Are you sure you want to close this blocked issue?"
+msgstr ""
+
+msgid "Are you sure you want to delete \"%{name}\" Value Stream?"
 msgstr ""
 
 msgid "Are you sure you want to delete %{name}?"
@@ -8089,10 +8095,16 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+msgid "Delete %{name}"
+msgstr ""
+
 msgid "Delete Comment"
 msgstr ""
 
 msgid "Delete Snippet"
+msgstr ""
+
+msgid "Delete Value Stream"
 msgstr ""
 
 msgid "Delete account"
