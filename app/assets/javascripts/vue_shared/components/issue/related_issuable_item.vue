@@ -189,6 +189,6 @@ export default {
       :title="__('Remove')"
       :aria-label="__('Remove')"
       @click="onRemoveRequest"
-    >
+    />
   </div>
 </template>
