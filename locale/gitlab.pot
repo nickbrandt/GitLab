@@ -13252,16 +13252,28 @@ msgstr ""
 msgid "IncidentManagement|Create incident"
 msgstr ""
 
+msgid "IncidentManagement|Critical - S1"
+msgstr ""
+
 msgid "IncidentManagement|Date created"
 msgstr ""
 
 msgid "IncidentManagement|Display your incidents in a dedicated view"
 msgstr ""
 
+msgid "IncidentManagement|High - S2"
+msgstr ""
+
 msgid "IncidentManagement|Incident"
 msgstr ""
 
 msgid "IncidentManagement|Incidents"
+msgstr ""
+
+msgid "IncidentManagement|Low - S4"
+msgstr ""
+
+msgid "IncidentManagement|Medium - S3"
 msgstr ""
 
 msgid "IncidentManagement|No incidents to display."
@@ -13283,6 +13295,9 @@ msgid "IncidentManagement|There was an error displaying the incidents."
 msgstr ""
 
 msgid "IncidentManagement|Unassigned"
+msgstr ""
+
+msgid "IncidentManagement|Unknown"
 msgstr ""
 
 msgid "IncidentManagement|Unpublished"
@@ -22932,6 +22947,15 @@ msgid "Setup"
 msgstr ""
 
 msgid "Severity"
+msgstr ""
+
+msgid "SeverityWidget|Severity"
+msgstr ""
+
+msgid "SeverityWidget|Severity: %{severity}"
+msgstr ""
+
+msgid "SeverityWidget|There was an error while updating severity."
 msgstr ""
 
 msgid "Shards (%{shards})"
