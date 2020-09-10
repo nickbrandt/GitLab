@@ -1,12 +1,12 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import DynamicFields from 'ee/security_configuration/sast/components/dynamic_fields.vue';
 import { makeEntities } from './helpers';
 
 describe('DynamicFields component', () => {
   let wrapper;
 
-  const createComponent = (props = {}) => {
-    wrapper = shallowMount(DynamicFields, {
+  const createComponent = (props = {}, mountFn = shallowMount) => {
+    wrapper = mountFn(DynamicFields, {
       propsData: {
         ...props,
       },
@@ -34,6 +34,21 @@ describe('DynamicFields component', () => {
     });
   });
 
+  describe.each([true, false])('given the disabled prop is %p', disabled => {
+    beforeEach(() => {
+      createComponent({ entities: [], disabled }, mount);
+    });
+
+    it('uses a fieldset as the root element', () => {
+      expect(wrapper.element.tagName).toBe('FIELDSET');
+    });
+
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/fieldset#attr-disabled
+    it(`${disabled ? 'sets' : 'does not set'} the disabled attribute on the root element`, () => {
+      expect('disabled' in wrapper.attributes()).toBe(disabled);
+    });
+  });
+
   describe('given valid entities', () => {
     let entities;
     let fields;
@@ -42,17 +57,6 @@ describe('DynamicFields component', () => {
       entities = makeEntities(3);
       createComponent({ entities });
       fields = findFields();
-    });
-
-    describe.each([true, false])('when the disabled prop is %s', disabled => {
-      beforeEach(() => {
-        entities = makeEntities(3);
-        createComponent({ entities, disabled });
-      });
-
-      it(`it is passed a disabled prop set to ${disabled}`, () => {
-        expect(wrapper.props('disabled')).toBe(disabled);
-      });
     });
 
     it('renders each field with the correct component', () => {
