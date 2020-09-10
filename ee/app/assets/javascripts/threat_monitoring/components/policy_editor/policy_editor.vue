@@ -9,8 +9,10 @@ import {
   GlSegmentedControl,
   GlButton,
   GlAlert,
+  GlModal,
+  GlModalDirective,
 } from '@gitlab/ui';
-import { s__ } from '~/locale';
+import { s__, __, sprintf } from '~/locale';
 import { redirectTo } from '~/lib/utils/url_utility';
 import EnvironmentPicker from '../environment_picker.vue';
 import NetworkPolicyEditor from '../network_policy_editor.vue';
@@ -38,12 +40,14 @@ export default {
     GlSegmentedControl,
     GlButton,
     GlAlert,
+    GlModal,
     EnvironmentPicker,
     NetworkPolicyEditor,
     PolicyRuleBuilder,
     PolicyPreview,
     PolicyActionPicker,
   },
+  directives: { GlModal: GlModalDirective },
   props: {
     threatMonitoringPath: {
       type: String,
@@ -82,7 +86,12 @@ export default {
       return toYaml(this.policy);
     },
     ...mapState('threatMonitoring', ['currentEnvironmentId']),
-    ...mapState('networkPolicies', ['errorUpdatingPolicy']),
+    ...mapState('networkPolicies', [
+      'isUpdatingPolicy',
+      'isRemovingPolicy',
+      'errorUpdatingPolicy',
+      'errorRemovingPolicy',
+    ]),
     shouldShowRuleEditor() {
       return this.editorMode === EditorModeRule;
     },
@@ -100,13 +109,16 @@ export default {
         ? s__('NetworkPolicies|Save changes')
         : s__('NetworkPolicies|Create policy');
     },
+    deleteModalTitle() {
+      return sprintf(s__('NetworkPolicies|Delete policy: %{policy}'), { policy: this.policy.name });
+    },
   },
   created() {
     this.fetchEnvironments();
   },
   methods: {
     ...mapActions('threatMonitoring', ['fetchEnvironments']),
-    ...mapActions('networkPolicies', ['createPolicy', 'updatePolicy']),
+    ...mapActions('networkPolicies', ['createPolicy', 'updatePolicy', 'deletePolicy']),
     addRule() {
       this.policy.rules.push(buildRule(RuleTypeEndpoint));
     },
@@ -119,6 +131,9 @@ export default {
     updateRuleType(ruleIdx, ruleType) {
       const rule = this.policy.rules[ruleIdx];
       this.policy.rules.splice(ruleIdx, 1, buildRule(ruleType, rule));
+    },
+    removeRule(ruleIdx) {
+      this.policy.rules.splice(ruleIdx, 1);
     },
     loadYaml(manifest) {
       this.yamlEditorValue = manifest;
@@ -148,6 +163,13 @@ export default {
         if (!this.errorUpdatingPolicy) redirectTo(this.threatMonitoringPath);
       });
     },
+    removePolicy() {
+      const policy = { name: this.existingPolicy.name, manifest: toYaml(this.policy) };
+
+      return this.deletePolicy({ environmentId: this.currentEnvironmentId, policy }).then(() => {
+        if (!this.errorRemovingPolicy) redirectTo(this.threatMonitoringPath);
+      });
+    },
   },
   policyTypes: [{ value: 'networkPolicy', text: s__('NetworkPolicies|Network Policy') }],
   editorModes: [
@@ -157,6 +179,16 @@ export default {
   parsingErrorMessage: s__(
     'NetworkPolicies|Rule mode is unavailable for this policy. In some cases, we cannot parse the YAML file back into the rules editor.',
   ),
+  deleteModal: {
+    id: 'delete-modal',
+    secondary: {
+      text: s__('NetworkPolicies|Delete policy'),
+      attributes: { variant: 'danger' },
+    },
+    cancel: {
+      text: __('Cancel'),
+    },
+  },
 };
 </script>
 
@@ -233,6 +265,7 @@ export default {
           @rule-type-change="updateRuleType(idx, $event)"
           @endpoint-match-mode-change="updateEndpointMatchMode"
           @endpoint-labels-change="updateEndpointLabels"
+          @remove="removeRule(idx)"
         />
 
         <div class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100 gl-mb-5">
@@ -282,13 +315,36 @@ export default {
           category="primary"
           variant="success"
           data-testid="save-policy"
+          :loading="isUpdatingPolicy"
           @click="savePolicy"
           >{{ saveButtonText }}</gl-button
+        >
+        <gl-button
+          v-if="isEditing"
+          v-gl-modal="'delete-modal'"
+          category="secondary"
+          variant="danger"
+          data-testid="delete-policy"
+          :loading="isRemovingPolicy"
+          >{{ s__('NetworkPolicies|Delete policy') }}</gl-button
         >
         <gl-button category="secondary" variant="default" :href="threatMonitoringPath">{{
           __('Cancel')
         }}</gl-button>
       </div>
     </div>
+    <gl-modal
+      modal-id="delete-modal"
+      :title="deleteModalTitle"
+      :action-secondary="$options.deleteModal.secondary"
+      :action-cancel="$options.deleteModal.cancel"
+      @secondary="removePolicy"
+    >
+      {{
+        s__(
+          'NetworkPolicies|Are you sure you want to delete this policy? This action cannot be undone.',
+        )
+      }}
+    </gl-modal>
   </section>
 </template>

@@ -1,5 +1,5 @@
 <script>
-import { GlSprintf, GlForm, GlFormSelect, GlFormInput } from '@gitlab/ui';
+import { GlSprintf, GlForm, GlFormSelect, GlFormInput, GlButton } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import {
   RuleTypeNetwork,
@@ -25,6 +25,7 @@ export default {
     GlForm,
     GlFormSelect,
     GlFormInput,
+    GlButton,
     PolicyRuleEndpoint,
     PolicyRuleEntity,
     'policy-rule-cidr': PolicyRuleCIDR,
@@ -131,7 +132,7 @@ export default {
 
 <template>
   <div
-    class="gl-bg-gray-10 gl-border-solid gl-border-1 gl-border-gray-100 gl-rounded-base px-3 pt-3"
+    class="gl-bg-gray-10 gl-border-solid gl-border-1 gl-border-gray-100 gl-rounded-base px-3 pt-3 gl-relative"
   >
     <gl-form inline @submit.prevent>
       <gl-sprintf :message="sprintfTemplate">
@@ -226,5 +227,13 @@ export default {
         </template>
       </gl-sprintf>
     </gl-form>
+
+    <gl-button
+      icon="remove"
+      size="small"
+      class="gl-absolute gl-top-3 gl-right-3"
+      data-testid="remove-rule"
+      @click="$emit('remove')"
+    />
   </div>
 </template>

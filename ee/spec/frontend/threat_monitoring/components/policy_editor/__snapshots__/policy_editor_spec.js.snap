@@ -226,6 +226,8 @@ spec:
         Create policy
       </gl-button-stub>
        
+      <!---->
+       
       <gl-button-stub
         category="secondary"
         href="/threat-monitoring"
@@ -237,5 +239,19 @@ spec:
       </gl-button-stub>
     </div>
   </div>
+   
+  <gl-modal-stub
+    actioncancel="[object Object]"
+    actionsecondary="[object Object]"
+    modalclass=""
+    modalid="delete-modal"
+    size="md"
+    title="Delete policy: "
+    titletag="h4"
+  >
+    
+    Are you sure you want to delete this policy? This action cannot be undone.
+  
+  </gl-modal-stub>
 </section>
 `;

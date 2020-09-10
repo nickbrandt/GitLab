@@ -88,3 +88,27 @@ export const updatePolicy = ({ state, commit }, { environmentId, policy }) => {
       commitPolicyError(commit, types.RECEIVE_UPDATE_POLICY_ERROR, error?.response?.data),
     );
 };
+
+export const deletePolicy = ({ state, commit }, { environmentId, policy }) => {
+  if (!state.policiesEndpoint || !environmentId || !policy) {
+    return commitPolicyError(commit, types.RECEIVE_DELETE_POLICY_ERROR);
+  }
+
+  commit(types.REQUEST_DELETE_POLICY);
+
+  return axios
+    .delete(joinPaths(state.policiesEndpoint, policy.name), {
+      params: {
+        environment_id: environmentId,
+        manifest: policy.manifest,
+      },
+    })
+    .then(() => {
+      commit(types.RECEIVE_DELETE_POLICY_SUCCESS, {
+        policy,
+      });
+    })
+    .catch(error =>
+      commitPolicyError(commit, types.RECEIVE_DELETE_POLICY_ERROR, error?.response?.data),
+    );
+};
