@@ -54,6 +54,10 @@ RSpec.describe Gitlab::Ci::Config::Entry::Secrets do
         entry.compose!
       end
 
+      it 'composes entry with configured description' do
+        expect(entry[:DATABASE_PASSWORD].description).to eq("DATABASE_PASSWORD secret definition")
+      end
+
       describe '#value' do
         it 'returns key value' do
           expect(entry.value).to eq(config)

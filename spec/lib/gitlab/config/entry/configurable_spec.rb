@@ -31,8 +31,8 @@ RSpec.describe Gitlab::Config::Entry::Configurable do
     end
   end
 
-  describe 'configured entries' do
-    let(:entry_class) { double('entry_class', default: nil) }
+  describe 'configured entry' do
+    let(:entry_class) { instance_double(Gitlab::Config::Entry::Node, default: nil) }
 
     before do
       entry.class_exec(entry_class) do |entry_class|
@@ -75,6 +75,39 @@ RSpec.describe Gitlab::Config::Entry::Configurable do
       it 'returns all nodes with reserved: true' do
         expect(entry.reserved_node_names).to contain_exactly(:object)
       end
+    end
+  end
+
+  describe 'configured entries' do
+    let(:entry_class) { Gitlab::Config::Entry::Node }
+
+    let(:instance) do
+      entry.class_exec(entry_class) do |entry_class|
+        entries entry_class,
+          description: 'test object %s',
+          inherit: true,
+          reserved: true,
+          default: 'antarctica'
+      end
+      instance = entry.new({ hello: :world })
+      instance.compose!
+
+      instance
+    end
+
+    describe '#value' do
+      it 'has valid value' do
+        expect(instance.valid?).to eq(true)
+        expect(instance.value).to eq(hello: :world)
+      end
+    end
+
+    describe '#decendants' do
+      it { expect(instance.descendants.first.value).to eq(:world) }
+      it { expect(instance.descendants.first.description).to eq("test object hello") }
+      it { expect(instance.descendants.first.parent.value).to eq(hello: :world) }
+      it { expect(instance.descendants.first.default).to eq('antarctica') }
+      it { expect(instance.descendants.first.class).to eq(entry_class) }
     end
   end
 end

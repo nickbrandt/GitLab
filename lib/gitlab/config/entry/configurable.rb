@@ -14,6 +14,26 @@ module Gitlab
       #   script: ...
       #   artifacts: ...
       #
+      # Use `entry` to configure descendant entry nodes with explicit keys that do not vary per instance
+      #  for example:
+      #
+      #   entry :default, Entry::Default,
+      #       description: 'Default configuration for all jobs.',
+      #       default: {}
+      #
+      # Use `entries` to configure descendant entry nodes where keys vary per instance
+      #  for example:
+      #
+      #   entries [Entry::Hidden, Entry::Job, Entry::Bridge],
+      #       description: "%s job definition."
+      #
+      #  The first argument can be an Entry class or an array of classes but when multiple classes are passed
+      #  The parent class needs to implement a class method to find the correct class based on name and config, for example:
+      #
+      # def self.find_type(name, config)
+      #   # Finder logic here
+      # end
+
       module Configurable
         extend ActiveSupport::Concern
 
@@ -29,13 +49,8 @@ module Gitlab
           return unless valid?
 
           super do
-            self.class.nodes.each do |key, factory|
-              # If we override the config type validation
-              # we can end with different config types like String
-              next unless config.is_a?(Hash)
-
-              entry_create!(key, config[key])
-            end
+            built_entries = self.class.builder.create_entries(config, self)
+            entries.merge!(built_entries)
 
             yield if block_given?
 
@@ -45,54 +60,43 @@ module Gitlab
           end
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
-        def entry_create!(key, value)
-          factory = self.class
-            .nodes[key]
-            .value(value)
-            .with(key: key, parent: self)
-
-          entries[key] = factory.create!
-        end
-        # rubocop: enable CodeReuse/ActiveRecord
-
         def skip_config_hash_validation?
           false
         end
 
         class_methods do
-          def nodes
-            return {} unless @nodes
+          include Gitlab::Utils::StrongMemoize
 
-            @nodes.transform_values(&:dup)
+          def nodes
+            return {} unless builder.nodes
+
+            builder.nodes.transform_values(&:dup)
           end
 
           def reserved_node_names
-            self.nodes.select do |_, node|
-              node.reserved?
-            end.keys
+            self.nodes.select { |_, node| node.reserved? }.keys
+          end
+
+          def builder
+            strong_memoize(:builder) do
+              ::Gitlab::Config::Entry::Builder.new
+            end
           end
 
           private
 
-          # rubocop: disable CodeReuse/ActiveRecord
-          def entry(key, entry, description: nil, default: nil, inherit: nil, reserved: nil, metadata: {})
-            entry_name = key.to_sym
-            raise ArgumentError, "Entry '#{key}' already defined in '#{name}'" if @nodes.to_h[entry_name]
+          def entry(entry_name, entry_klass, **entry_attributes)
+            entry_name = entry_name.to_sym
 
-            factory = ::Gitlab::Config::Entry::Factory.new(entry)
-              .with(description: description)
-              .with(default: default)
-              .with(inherit: inherit)
-              .with(reserved: reserved)
-              .metadata(metadata)
-
-            @nodes ||= {}
-            @nodes[entry_name] = factory
+            builder.build_node!(entry_name, entry_klass, entry_attributes)
 
             helpers(entry_name)
           end
-          # rubocop: enable CodeReuse/ActiveRecord
+
+          # For use when config is a hash with arbitrary keys
+          def entries(entries_klasses, **entries_attributes)
+            builder.push_entries_config!(entries_klasses, entries_attributes)
+          end
 
           def dynamic_helpers(*nodes)
             helpers(*nodes, dynamic: true)
@@ -104,7 +108,7 @@ module Gitlab
                 raise ArgumentError, "Method '#{symbol}_defined?', '#{symbol}_entry' or '#{symbol}_value' already defined in '#{name}'"
               end
 
-              unless @nodes.to_h[symbol]
+              unless builder.nodes.to_h[symbol]
                 raise ArgumentError, "Entry for #{symbol} is undefined" unless dynamic
               end
 

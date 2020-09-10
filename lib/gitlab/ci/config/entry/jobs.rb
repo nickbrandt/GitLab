@@ -8,6 +8,7 @@ module Gitlab
         # Entry that represents a set of jobs.
         #
         class Jobs < ::Gitlab::Config::Entry::Node
+          include ::Gitlab::Config::Entry::Configurable
           include ::Gitlab::Config::Entry::Validatable
 
           validations do
@@ -40,6 +41,8 @@ module Gitlab
 
           private_constant :TYPES
 
+          entries TYPES, description: "%s job definition."
+
           def self.all_types
             TYPES
           end
@@ -49,29 +52,6 @@ module Gitlab
               type.matching?(name, config)
             end
           end
-
-          # rubocop: disable CodeReuse/ActiveRecord
-          def compose!(deps = nil)
-            super do
-              @config.each do |name, config|
-                node = self.class.find_type(name, config)
-                next unless node
-
-                factory = ::Gitlab::Config::Entry::Factory.new(node)
-                  .value(config || {})
-                  .metadata(name: name)
-                  .with(key: name, parent: self,
-                        description: "#{name} job definition.")
-
-                @entries[name] = factory.create!
-              end
-
-              @entries.each_value do |entry|
-                entry.compose!(deps)
-              end
-            end
-          end
-          # rubocop: enable CodeReuse/ActiveRecord
         end
       end
     end
