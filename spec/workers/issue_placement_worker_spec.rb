@@ -38,7 +38,7 @@ RSpec.describe IssuePlacementWorker do
     end
 
     context 'there are more than QUERY_LIMIT unplaced issues' do
-      let_it_be(:unplaced) do
+      before_all do
         # Ensure there are more than N issues in this set
         n = described_class::QUERY_LIMIT
         create_list(:issue, n - 5, **unplaced)

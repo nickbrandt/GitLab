@@ -27,8 +27,7 @@ class IssuePlacementWorker
       .limit(QUERY_LIMIT + 1)
       .to_a
 
-    leftover = to_place.last if to_place.count > QUERY_LIMIT
-    to_place = to_place.take(QUERY_LIMIT)
+    leftover = to_place.pop if to_place.count > QUERY_LIMIT
 
     Issue.move_nulls_to_end(to_place)
     Issues::BaseService.new(nil).rebalance_if_needed(to_place.max_by(&:relative_position))
