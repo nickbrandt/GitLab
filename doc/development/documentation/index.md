@@ -340,7 +340,7 @@ You can combine one or more of the following:
    any GitLab SVG icon, but prefer the `question-o`:
 
    ```haml
-   = link_to icon('question-circle'), help_page_path('user/permissions')
+   = link_to sprite_icon('question-o'), help_page_path('user/permissions')
    ```
 
 1. **Using a button link.** Useful in places where text would be out of context
