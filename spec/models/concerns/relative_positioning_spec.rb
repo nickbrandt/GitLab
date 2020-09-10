@@ -12,7 +12,7 @@ RSpec.describe RelativePositioning do
 
   # Increase the range size to convice yourself that this covers ALL arrangements
   range = (101..104)
-  indices = range.each_with_index.to_a.map(&:second)
+  indices = (0..).take(range.size)
 
   let(:start) { ((range.first + range.last) / 2.0).floor }
 
