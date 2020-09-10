@@ -21905,7 +21905,7 @@
             },
             {
               "name": "moveBeforeId",
-              "description": "ID of issue before which the current issue will be positioned at",
+              "description": "ID of issue that should be placed before the current issue",
               "type": {
                 "kind": "SCALAR",
                 "name": "ID",
@@ -21915,7 +21915,7 @@
             },
             {
               "name": "moveAfterId",
-              "description": "ID of issue after which the current issue will be positioned at",
+              "description": "ID of issue that should be placed after the current issue",
               "type": {
                 "kind": "SCALAR",
                 "name": "ID",
