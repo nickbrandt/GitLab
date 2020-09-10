@@ -78,10 +78,6 @@ module Gitlab
       def self.child_of_child_pipeline_enabled?(project)
         ::Feature.enabled?(:ci_child_of_child_pipeline, project, default_enabled: false)
       end
-
-      def self.ci_jobs_finder_refactor?
-        ::Feature.enabled?(:ci_jobs_finder_refactor, default_enabled: false)
-      end
     end
   end
 end
