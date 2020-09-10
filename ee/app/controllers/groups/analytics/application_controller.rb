@@ -2,6 +2,7 @@
 
 class Groups::Analytics::ApplicationController < ApplicationController
   include RoutableActions
+  include GracefulTimeoutHandling
 
   private
 
