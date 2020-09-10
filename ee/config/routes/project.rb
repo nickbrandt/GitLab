@@ -34,7 +34,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         resources :subscriptions, only: [:create, :destroy]
 
         resource :threat_monitoring, only: [:show], controller: :threat_monitoring do
-          resources :policies, only: [:new], controller: :threat_monitoring
+          resources :policies, only: [:new, :edit], controller: :threat_monitoring
         end
 
         resources :protected_environments, only: [:create, :update, :destroy], constraints: { id: /\d+/ } do
