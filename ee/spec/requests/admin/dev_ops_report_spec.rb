@@ -9,9 +9,9 @@ RSpec.describe 'admin dev ops analytics' do
     login_as(user)
   end
 
-  it 'redirects from -/analytics to admin/dev_ops_score' do
+  it 'redirects from -/analytics to admin/dev_ops_report' do
     get '/-/analytics'
 
-    expect(response).to redirect_to(admin_dev_ops_score_path)
+    expect(response).to redirect_to(admin_dev_ops_report_path)
   end
 end

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import UserCallout from '~/user_callout';
-import UsagePingDisabled from '~/admin/dev_ops_score/components/usage_ping_disabled.vue';
+import UsagePingDisabled from '~/admin/dev_ops_report/components/usage_ping_disabled.vue';
 
 document.addEventListener('DOMContentLoaded', () => {
   // eslint-disable-next-line no-new
