@@ -488,7 +488,7 @@ module RelativePositioning
         max_relative_position = terminus.relative_position
         [[(MAX_POSITION - max_relative_position) / gaps, IDEAL_DISTANCE].min, max_relative_position]
       else
-        terminus = min_sibling
+        terminus = context.min_sibling
         terminus.shift_right
         min_relative_position = terminus.relative_position
         [[(min_relative_position - MIN_POSITION) / gaps, IDEAL_DISTANCE].min, min_relative_position]
@@ -574,26 +574,43 @@ module RelativePositioning
     before, after = [before, after].sort_by(&:relative_position) if before && after
 
     RelativePositioning.mover.move(self, before, after)
+  rescue ActiveRecord::QueryCanceled, NoSpaceLeft => e
+    could_not_move(e)
+    raise e
   end
 
   def move_after(before = self)
     RelativePositioning.mover.move(self, before, nil)
+  rescue ActiveRecord::QueryCanceled, NoSpaceLeft => e
+    could_not_move(e)
+    raise e
   end
 
   def move_before(after = self)
     RelativePositioning.mover.move(self, nil, after)
+  rescue ActiveRecord::QueryCanceled, NoSpaceLeft => e
+    could_not_move(e)
+    raise e
   end
 
   def move_to_end
     RelativePositioning.mover.move_to_end(self)
-  rescue NoSpaceLeft
+  rescue NoSpaceLeft => e
+    could_not_move(e)
     self.relative_position = MAX_POSITION
+  rescue ActiveRecord::QueryCanceled => e
+    could_not_move(e)
+    raise e
   end
 
   def move_to_start
     RelativePositioning.mover.move_to_start(self)
-  rescue NoSpaceLeft
+  rescue NoSpaceLeft => e
+    could_not_move(e)
     self.relative_position = MIN_POSITION
+  rescue ActiveRecord::QueryCanceled => e
+    could_not_move(e)
+    raise e
   end
 
   # This method is used during rebalancing - override it to customise the update
@@ -608,5 +625,9 @@ module RelativePositioning
   # from a relation. Customize this if `id <> :id` is not sufficient
   def exclude_self(relation, excluded: self)
     relation.id_not_in(excluded.id)
+  end
+
+  # Override if you want to be notified of failures to move
+  def could_not_move(exception)
   end
 end

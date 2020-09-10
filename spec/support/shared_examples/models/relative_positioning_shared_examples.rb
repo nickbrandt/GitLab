@@ -5,6 +5,8 @@ RSpec.shared_examples 'a class that supports relative positioning' do
   let(:item2) { create_item }
   let(:new_item) { create_item }
 
+  let(:set_size) { RelativePositioning.mover.context(item1).scoped_items.count }
+
   def create_item(params = {})
     create(factory, params.merge(default_params))
   end
@@ -383,7 +385,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'places items at most IDEAL_DISTANCE from the start when the range is open' do
-      n = item1.send(:scoped_items).count
+      n = set_size
 
       expect([item1, item2].map(&:relative_position)).to all(be >= (RelativePositioning::START_POSITION - (n * RelativePositioning::IDEAL_DISTANCE)))
     end
@@ -434,7 +436,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
     end
 
     it 'places items at most IDEAL_DISTANCE from the start when the range is open' do
-      n = item1.send(:scoped_items).count
+      n = set_size
 
       expect([item1, item2].map(&:relative_position)).to all(be <= (RelativePositioning::START_POSITION + (n * RelativePositioning::IDEAL_DISTANCE)))
     end
