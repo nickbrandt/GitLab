@@ -12807,6 +12807,15 @@ msgstr ""
 msgid "Highest role:"
 msgstr ""
 
+msgid "HighlightBar|Alert events:"
+msgstr ""
+
+msgid "HighlightBar|Alert start time:"
+msgstr ""
+
+msgid "HighlightBar|Original alert:"
+msgstr ""
+
 msgid "History"
 msgstr ""
 
