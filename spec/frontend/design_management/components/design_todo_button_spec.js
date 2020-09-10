@@ -4,6 +4,7 @@ import DesignTodoButton from '~/design_management/components/design_todo_button.
 import createDesignTodoMutation from '~/design_management/graphql/mutations/create_design_todo.mutation.graphql';
 import todoMarkDoneMutation from '~/graphql_shared/mutations/todo_mark_done.mutation.graphql';
 import mockDesign from '../mock_data/design';
+import * as utils from '~/design_management/utils/design_management_utils';
 
 const mockDesignWithPendingTodos = {
   ...mockDesign,
@@ -52,6 +53,7 @@ describe('Design management design todo button', () => {
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
+    jest.clearAllMocks();
   });
 
   it('renders TodoButton component', () => {
@@ -69,6 +71,11 @@ describe('Design management design todo button', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
+        utils.dispatchDocumentEvent = jest.fn();
+        jest.spyOn(document, 'querySelector').mockReturnValue({
+          innerText: 2,
+        });
+
         createComponent({ design: mockDesignWithPendingTodos }, { mountFn: mount });
         wrapper.trigger('click');
         return wrapper.vm.$nextTick();
@@ -86,6 +93,15 @@ describe('Design management design todo button', () => {
         expect(mutate).toHaveBeenCalledTimes(1);
         expect(mutate).toHaveBeenCalledWith(todoMarkDoneMutationVariables);
       });
+
+      it('calls dispatchDocumentEvent to update global To-Do counter correctly', () => {
+        expect(utils.dispatchDocumentEvent).toHaveBeenCalledTimes(1);
+        expect(utils.dispatchDocumentEvent).toHaveBeenCalledWith('todo:toggle', {
+          detail: {
+            count: 1,
+          },
+        });
+      });
     });
   });
 
@@ -100,6 +116,11 @@ describe('Design management design todo button', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
+        utils.dispatchDocumentEvent = jest.fn();
+        jest.spyOn(document, 'querySelector').mockReturnValue({
+          innerText: 2,
+        });
+
         createComponent({}, { mountFn: mount });
         wrapper.trigger('click');
         return wrapper.vm.$nextTick();
@@ -120,6 +141,15 @@ describe('Design management design todo button', () => {
 
         expect(mutate).toHaveBeenCalledTimes(1);
         expect(mutate).toHaveBeenCalledWith(createDesignTodoMutationVariables);
+      });
+
+      it('calls dispatchDocumentEvent to update global To-Do counter correctly', () => {
+        expect(utils.dispatchDocumentEvent).toHaveBeenCalledTimes(1);
+        expect(utils.dispatchDocumentEvent).toHaveBeenCalledWith('todo:toggle', {
+          detail: {
+            count: 3,
+          },
+        });
       });
     });
   });
