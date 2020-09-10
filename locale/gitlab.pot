@@ -1833,9 +1833,6 @@ msgstr ""
 msgid "AdminProjects|Delete Project %{projectName}?"
 msgstr ""
 
-msgid "AdminProjects|Delete project"
-msgstr ""
-
 msgid "AdminSettings|Apply integration settings to all Projects"
 msgstr ""
 
