@@ -21,9 +21,11 @@ module Elastic
           end
 
         options[:features] = 'issues'
-        query_hash = project_ids_filter(query_hash, options)
-        query_hash = confidentiality_filter(query_hash, options)
-        query_hash = state_filter(query_hash, options)
+        QueryFactory.query_context(:issue) do
+          query_hash = QueryFactory.query_context(:authorized) { project_ids_filter(query_hash, options) }
+          query_hash = QueryFactory.query_context(:confidentiality) { confidentiality_filter(query_hash, options) }
+          query_hash = QueryFactory.query_context(:match) { state_filter(query_hash, options) }
+        end
         query_hash = apply_sort(query_hash, options)
 
         search(query_hash, options)
@@ -51,13 +53,14 @@ module Elastic
           return query_hash if authorized_project_ids.to_set == scoped_project_ids.to_set
         end
 
-        filter = { term: { confidential: false } }
+        context = QueryFactory.current_query_context
+        filter = { term: { confidential: { _name: context.name(:non_confidential), value: false } } }
 
         if current_user
           filter = {
               bool: {
                 should: [
-                  { term: { confidential: false } },
+                  { term: { confidential: { _name: context.name(:non_confidential), value: false } } },
                   {
                     bool: {
                       must: [
@@ -65,9 +68,9 @@ module Elastic
                         {
                           bool: {
                             should: [
-                              { term: { author_id: current_user.id } },
-                              { term: { assignee_id: current_user.id } },
-                              { terms: { project_id: authorized_project_ids } }
+                              { term: { author_id: { _name: context.name(:as_author), value: current_user.id } } },
+                              { term: { assignee_id: { _name: context.name(:as_assignee), value: current_user.id } } },
+                              { terms: { _name: context.name(:project, :membership, :id), project_id: authorized_project_ids } }
                             ]
                           }
                         }
