@@ -190,6 +190,5 @@ export default {
       :aria-label="__('Remove')"
       @click="onRemoveRequest"
     >
-    </gl-button>
   </div>
 </template>
