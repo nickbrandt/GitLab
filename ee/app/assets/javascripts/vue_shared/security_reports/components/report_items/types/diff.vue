@@ -1,6 +1,5 @@
 <script>
 import { GlButtonGroup, GlButton } from '@gitlab/ui';
-import ReportItemCode from './code.vue';
 import { diffChars } from 'diff';
 
 export default {
@@ -8,7 +7,6 @@ export default {
   components: {
     GlButtonGroup,
     GlButton,
-    ReportItemCode,
   },
   props: {
     before: {
@@ -61,7 +59,7 @@ export default {
   methods: {
     shouldShowLine(line) {
       return (
-        this.view == 'diff' ||
+        this.view === 'diff' ||
         line.type === 'normal' ||
         (line.type === 'removed' && this.view === 'before') ||
         (line.type === 'added' && this.view === 'after')

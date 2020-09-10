@@ -18,6 +18,8 @@ export default {
   },
   beforeCreate() {
     // eslint-disable-next-line global-require
+    this.$options.components.ReportItemMarkdown = require('./types/markdown.vue').default;
+    // eslint-disable-next-line global-require
     this.$options.components.ReportItemDiff = require('./types/diff.vue').default;
     // eslint-disable-next-line global-require
     this.$options.components.ReportItemFileLocation = require('./types/file_location.vue').default;
