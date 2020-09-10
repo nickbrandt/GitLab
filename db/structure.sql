@@ -18580,6 +18580,8 @@ CREATE INDEX idx_jira_connect_subscriptions_on_installation_id ON public.jira_co
 
 CREATE UNIQUE INDEX idx_jira_connect_subscriptions_on_installation_id_namespace_id ON public.jira_connect_subscriptions USING btree (jira_connect_installation_id, namespace_id);
 
+CREATE INDEX idx_members_created_at_user_id_invite_token ON public.members USING btree (created_at) WHERE ((invite_token IS NOT NULL) AND (user_id IS NULL));
+
 CREATE INDEX idx_merge_requests_on_id_and_merge_jid ON public.merge_requests USING btree (id, merge_jid) WHERE ((merge_jid IS NOT NULL) AND (state_id = 4));
 
 CREATE INDEX idx_merge_requests_on_source_project_and_branch_state_opened ON public.merge_requests USING btree (source_project_id, source_branch) WHERE (state_id = 1);
@@ -23869,5 +23871,6 @@ COPY "schema_migrations" (version) FROM STDIN;
 20200716120419
 20200717040735
 20200728182311
+20200916120837
 \.
 
