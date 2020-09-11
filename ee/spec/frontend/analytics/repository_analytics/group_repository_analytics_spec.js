@@ -8,15 +8,15 @@ describe('Group repository analytics app', () => {
   useFakeDate();
   let wrapper;
 
-  const defaultProps = {
+  const injectedProperties = {
     groupAnalyticsCoverageReportsPath: '/coverage.csv?ref_path=refs/heads/master',
   };
 
   const createComponent = () => {
     wrapper = shallowMount(GroupRepositoryAnalytics, {
       localVue,
-      propsData: {
-        ...defaultProps,
+      provide: {
+        ...injectedProperties,
       },
     });
   };
@@ -34,7 +34,7 @@ describe('Group repository analytics app', () => {
     const reportButton = wrapper.find('[data-testid="group-code-coverage-csv-button"]');
     // Due to the fake_date helper, we can always expect today's date to be 2020-07-06
     // and one year ago to be 2019-07-06
-    const expectedPath = `${defaultProps.groupAnalyticsCoverageReportsPath}&start_date=2019-07-06&end_date=2020-07-06`;
+    const expectedPath = `${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2019-07-06&end_date=2020-07-06`;
 
     expect(reportButton.exists()).toBe(true);
     expect(reportButton.attributes('href')).toBe(expectedPath);
