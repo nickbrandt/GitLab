@@ -27,7 +27,6 @@ RSpec.describe Gitlab::ErrorTracking::Processor::GrpcErrorProcessor do
           extra: {
             caller: 'test'
           },
-          message: "GRPC::DeadlineExceeded: 4:DeadlineExceeded. debug_error_string:{\"hello\":1}",
           fingerprint: [
             "GRPC::DeadlineExceeded",
             "4:Deadline Exceeded. debug_error_string:{\"created\":\"@1598938192.005782000\",\"description\":\"Error received from peer unix:/home/git/gitalypraefect.socket\",\"file\":\"src/core/lib/surface/call.cc\",\"file_line\":1055,\"grpc_message\":\"Deadline Exceeded\",\"grpc_status\":4}"
@@ -37,7 +36,6 @@ RSpec.describe Gitlab::ErrorTracking::Processor::GrpcErrorProcessor do
 
       let(:expected) do
         {
-          message: "GRPC::DeadlineExceeded: 4:DeadlineExceeded.",
           fingerprint: [
             "GRPC::DeadlineExceeded",
             "4:Deadline Exceeded."
