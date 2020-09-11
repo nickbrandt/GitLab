@@ -16382,6 +16382,9 @@ msgstr ""
 msgid "Namespace"
 msgstr ""
 
+msgid "Namespace ID:"
+msgstr ""
+
 msgid "Namespace is empty"
 msgstr ""
 
