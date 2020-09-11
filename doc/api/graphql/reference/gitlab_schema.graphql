@@ -9273,9 +9273,19 @@ type MergeRequest implements CurrentUserTodos & Noteable {
   author: User
 
   """
+  Indicates if auto merge is enabled for the merge request
+  """
+  autoMergeEnabled: Boolean!
+
+  """
   Number of commits in the merge request
   """
   commitCount: Int
+
+  """
+  Indicates if the merge request has conflicts
+  """
+  conflicts: Boolean!
 
   """
   Timestamp of when the merge request was created
@@ -9570,7 +9580,7 @@ type MergeRequest implements CurrentUserTodos & Noteable {
     Filter pipelines by their status
     """
     status: PipelineStatusEnum
-  ): PipelineConnection!
+  ): PipelineConnection
 
   """
   Alias for target_project
@@ -9826,6 +9836,11 @@ type MergeRequestPermissions {
   Indicates the user can perform `admin_merge_request` on this resource
   """
   adminMergeRequest: Boolean!
+
+  """
+  Indicates the user can perform `can_merge` on this resource
+  """
+  canMerge: Boolean!
 
   """
   Indicates the user can perform `cherry_pick_on_current_merge_request` on this resource

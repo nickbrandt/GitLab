@@ -110,6 +110,7 @@ describe('ee merge request widget options', () => {
         mock.onGet(VULNERABILITY_FEEDBACK_ENDPOINT).reply(200, []);
 
         vm = mountComponent(Component, { mrData: gl.mrWidgetData });
+        vm.loading = false;
 
         expect(
           findSecurityWidget()

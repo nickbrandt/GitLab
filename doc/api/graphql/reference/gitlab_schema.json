@@ -25713,6 +25713,24 @@
               "deprecationReason": null
             },
             {
+              "name": "autoMergeEnabled",
+              "description": "Indicates if auto merge is enabled for the merge request",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "commitCount",
               "description": "Number of commits in the merge request",
               "args": [
@@ -25722,6 +25740,24 @@
                 "kind": "SCALAR",
                 "name": "Int",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "conflicts",
+              "description": "Indicates if the merge request has conflicts",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -26466,13 +26502,9 @@
                 }
               ],
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "PipelineConnection",
-                  "ofType": null
-                }
+                "kind": "OBJECT",
+                "name": "PipelineConnection",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -27289,6 +27321,24 @@
             {
               "name": "adminMergeRequest",
               "description": "Indicates the user can perform `admin_merge_request` on this resource",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "canMerge",
+              "description": "Indicates the user can perform `can_merge` on this resource",
               "args": [
 
               ],
