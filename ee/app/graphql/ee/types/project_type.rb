@@ -101,6 +101,7 @@ module EE
 
         field :cluster_agents,
               ::Types::Clusters::AgentType.connection_type,
+              extras: [:lookahead],
               null: true,
               description: 'Cluster agents associated with the project',
               resolver: ::Resolvers::Clusters::AgentsResolver
