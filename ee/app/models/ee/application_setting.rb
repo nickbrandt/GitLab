@@ -244,7 +244,7 @@ module EE
       when Project
         elasticsearch_indexes_project?(scope)
       else
-        false # Never use elasticsearch for the global scope when limiting is on
+        ::Feature.enabled?(:advanced_global_search_for_limited_indexing)
       end
     end
 
