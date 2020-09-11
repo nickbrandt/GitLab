@@ -1,18 +1,24 @@
 - page_title _("CI Lint")
 - page_description _("Validate your GitLab CI configuration file")
-- content_for :library_javascripts do
-  = page_specific_javascript_tag('lib/ace.js')
+- unless Feature.enabled?(:monaco_ci)
+  - content_for :library_javascripts do
+    = page_specific_javascript_tag('lib/ace.js')
 
 %h2.pt-3.pb-3= _("Validate your GitLab CI configuration")
 
 .project-ci-linter
-  = form_tag project_ci_lint_path(@project), method: :post do
+  = form_tag project_ci_lint_path(@project), method: :post, class: 'js-ci-lint-form' do
     .row
       .col-sm-12
         .file-holder
           .js-file-title.file-title.clearfix
             = _("Contents of .gitlab-ci.yml")
-          #ci-editor.ci-editor= @content
+          - if Feature.enabled?(:monaco_ci)
+            .file-editor.code
+              .js-edit-mode-pane.qa-editor#editor{ data: { 'editor-loading': true } }<
+                %pre.editor-loading-content= params[:content]
+          - else
+            #ci-editor.ci-editor= @content
         = text_area_tag(:content, @content, class: 'hidden form-control span1', rows: 7, require: true)
       .col-sm-12
         .float-left.gl-mt-3
