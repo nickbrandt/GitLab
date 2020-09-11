@@ -167,12 +167,3 @@ export const createPendingTodo = todoId => {
     id: createTodoGid(todoId),
   };
 };
-
-/**
- * Dispatch an event on the document
- * @param {String} eventName
- * @param {Object} eventData
- */
-export const dispatchDocumentEvent = (eventName, eventData) => {
-  document.dispatchEvent(new CustomEvent(eventName, eventData));
-};

@@ -4,7 +4,6 @@ import DesignTodoButton from '~/design_management/components/design_todo_button.
 import createDesignTodoMutation from '~/design_management/graphql/mutations/create_design_todo.mutation.graphql';
 import todoMarkDoneMutation from '~/graphql_shared/mutations/todo_mark_done.mutation.graphql';
 import mockDesign from '../mock_data/design';
-import * as utils from '~/design_management/utils/design_management_utils';
 
 const mockDesignWithPendingTodos = {
   ...mockDesign,
@@ -70,8 +69,10 @@ describe('Design management design todo button', () => {
     });
 
     describe('when clicked', () => {
+      let dispatchEventSpy;
+
       beforeEach(() => {
-        utils.dispatchDocumentEvent = jest.fn();
+        dispatchEventSpy = jest.spyOn(document, 'dispatchEvent');
         jest.spyOn(document, 'querySelector').mockReturnValue({
           innerText: 2,
         });
@@ -95,12 +96,11 @@ describe('Design management design todo button', () => {
       });
 
       it('calls dispatchDocumentEvent to update global To-Do counter correctly', () => {
-        expect(utils.dispatchDocumentEvent).toHaveBeenCalledTimes(1);
-        expect(utils.dispatchDocumentEvent).toHaveBeenCalledWith('todo:toggle', {
-          detail: {
-            count: 1,
-          },
-        });
+        const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+
+        expect(dispatchEventSpy).toHaveBeenCalledTimes(1);
+        expect(dispatchedEvent.detail).toEqual({ count: 1 });
+        expect(dispatchedEvent.type).toBe('todo:toggle');
       });
     });
   });
@@ -115,8 +115,10 @@ describe('Design management design todo button', () => {
     });
 
     describe('when clicked', () => {
+      let dispatchEventSpy;
+
       beforeEach(() => {
-        utils.dispatchDocumentEvent = jest.fn();
+        dispatchEventSpy = jest.spyOn(document, 'dispatchEvent');
         jest.spyOn(document, 'querySelector').mockReturnValue({
           innerText: 2,
         });
@@ -144,12 +146,11 @@ describe('Design management design todo button', () => {
       });
 
       it('calls dispatchDocumentEvent to update global To-Do counter correctly', () => {
-        expect(utils.dispatchDocumentEvent).toHaveBeenCalledTimes(1);
-        expect(utils.dispatchDocumentEvent).toHaveBeenCalledWith('todo:toggle', {
-          detail: {
-            count: 3,
-          },
-        });
+        const dispatchedEvent = dispatchEventSpy.mock.calls[0][0];
+
+        expect(dispatchEventSpy).toHaveBeenCalledTimes(1);
+        expect(dispatchedEvent.detail).toEqual({ count: 3 });
+        expect(dispatchedEvent.type).toBe('todo:toggle');
       });
     });
   });
