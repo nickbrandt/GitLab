@@ -688,6 +688,7 @@ epic:
 - due_date_sourcing_epic
 - events
 - resource_label_events
+- resource_state_events
 - user_mentions
 - note_authors
 - boards_epic_user_preferences
