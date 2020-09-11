@@ -2,18 +2,21 @@ import { setHTMLFixture } from 'helpers/fixtures';
 import initAlertHandler from '~/alert_handler';
 
 describe('Alert Handler', () => {
-  const ALERT_SELECTOR = 'gl-alert';
-  const CLOSE_SELECTOR = 'gl-alert-dismiss';
-  const ALERT_HTML = `<div class="${ALERT_SELECTOR}"><button class="${CLOSE_SELECTOR}">Dismiss</button></div>`;
+  const ALERT_CLASS = 'gl-alert';
+  const BANNER_CLASS = 'gl-banner';
+  const CLOSE_LABEL = 'Dismiss';
 
-  const findFirstAlert = () => document.querySelector(`.${ALERT_SELECTOR}`);
-  const findAllAlerts = () => document.querySelectorAll(`.${ALERT_SELECTOR}`);
-  const findFirstCloseButton = () => document.querySelector(`.${CLOSE_SELECTOR}`);
+  const generateHtml = parentClass => `<div class="${parentClass}"><button aria-label="${CLOSE_LABEL}">Dismiss</button></div>`;
+
+  const findFirstAlert = () => document.querySelector(`.${ALERT_CLASS}`);
+  const findFirstBanner = () => document.querySelector(`.${BANNER_CLASS}`);
+  const findAllAlerts = () => document.querySelectorAll(`.${ALERT_CLASS}`);
+  const findFirstCloseButton = () => document.querySelector(`[aria-label="${CLOSE_LABEL}"]`);
 
   describe('initAlertHandler', () => {
     describe('with one alert', () => {
       beforeEach(() => {
-        setHTMLFixture(ALERT_HTML);
+        setHTMLFixture(generateHtml(ALERT_CLASS));
         initAlertHandler();
       });
 
@@ -29,7 +32,7 @@ describe('Alert Handler', () => {
 
     describe('with two alerts', () => {
       beforeEach(() => {
-        setHTMLFixture(ALERT_HTML + ALERT_HTML);
+        setHTMLFixture(generateHtml(ALERT_CLASS) + generateHtml(ALERT_CLASS));
         initAlertHandler();
       });
 
@@ -42,5 +45,21 @@ describe('Alert Handler', () => {
         expect(findAllAlerts()).toHaveLength(1);
       });
     });
+
+    describe('with a dismissible banner', () => {
+      beforeEach(() => {
+        setHTMLFixture(generateHtml(BANNER_CLASS));
+        initAlertHandler();
+      });
+
+      it('should render the banner', () => {
+        expect(findFirstBanner()).toExist();
+      });
+
+      it('should dismiss the banner on click', () => {
+        findFirstCloseButton().click();
+        expect(findFirstBanner()).not.toExist();
+      });
+    })
   });
 });
