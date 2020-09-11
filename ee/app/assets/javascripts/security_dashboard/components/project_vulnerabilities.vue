@@ -130,8 +130,6 @@ export default {
       :is-loading="isLoadingFirstVulnerabilities"
       :filters="filters"
       :vulnerabilities="vulnerabilities"
-      :should-show-identifier="true"
-      :should-show-report-type="true"
       :security-scanners="securityScanners"
       @refetch-vulnerabilities="refetchVulnerabilities"
     />

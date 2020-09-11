@@ -119,9 +119,7 @@ describe('First Class Instance Dashboard Vulnerabilities Component', () => {
       expect(findVulnerabilities().props()).toEqual({
         filters: {},
         isLoading: false,
-        shouldShowIdentifier: false,
         securityScanners: {},
-        shouldShowReportType: false,
         shouldShowSelection: true,
         shouldShowProjectNamespace: true,
         vulnerabilities,
