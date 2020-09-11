@@ -22,7 +22,8 @@ module Gitlab
     REPLICATOR_CLASSES = [
       ::Geo::MergeRequestDiffReplicator,
       ::Geo::PackageFileReplicator,
-      ::Geo::TerraformStateReplicator
+      ::Geo::TerraformStateReplicator,
+      ::Geo::SnippetRepositoryReplicator
     ].freeze
 
     def self.current_node

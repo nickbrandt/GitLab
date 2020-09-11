@@ -42,7 +42,7 @@ RSpec.shared_examples 'a blob replicator' do
 
     context 'when replication feature flag is disabled' do
       before do
-        stub_feature_flags("geo_#{replicator.replicable_name}_replication": false)
+        stub_feature_flags(replicator.replication_enabled_feature_key => false)
       end
 
       it 'does not schedule the checksum calculation' do
@@ -71,7 +71,7 @@ RSpec.shared_examples 'a blob replicator' do
 
     context 'when replication feature flag is disabled' do
       before do
-        stub_feature_flags("geo_#{replicator.replicable_name}_replication": false)
+        stub_feature_flags(replicator.replication_enabled_feature_key => false)
       end
 
       it 'does not publish' do

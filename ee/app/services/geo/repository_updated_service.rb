@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# This service is deprecated. Don't add new resources to here.
+# Use the new Self-Service Framework instead.
 module Geo
   class RepositoryUpdatedService
     include ::Gitlab::Geo::ProjectLogHelpers

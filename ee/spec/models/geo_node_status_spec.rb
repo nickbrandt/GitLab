@@ -1150,6 +1150,7 @@ RSpec.describe GeoNodeStatus, :geo do
     Geo::MergeRequestDiffReplicator | :external_merge_request_diff | :geo_merge_request_diff_registry
     Geo::PackageFileReplicator | :package_file | :geo_package_file_registry
     Geo::TerraformStateReplicator | :terraform_state | :geo_terraform_state_registry
+    Geo::SnippetRepositoryReplicator | :snippet_repository | :geo_snippet_repository_registry
   end
 
   with_them do
