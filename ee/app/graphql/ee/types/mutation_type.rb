@@ -37,6 +37,7 @@ module EE
         mount_mutation ::Mutations::DastScannerProfiles::Delete
         mount_mutation ::Mutations::Security::CiConfiguration::ConfigureSast
         mount_mutation ::Mutations::Namespaces::IncreaseStorageTemporarily
+        mount_mutation ::Mutations::QualityManagement::TestCases::Create
       end
     end
   end
