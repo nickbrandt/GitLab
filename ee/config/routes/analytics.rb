@@ -4,7 +4,6 @@ namespace :analytics do
   root to: redirect('admin/dev_ops_score')
 
   constraints(-> (req) { Gitlab::Analytics.cycle_analytics_enabled? }) do
-    resource :cycle_analytics, only: :show, path: 'value_stream_analytics'
     scope module: :cycle_analytics, as: 'cycle_analytics', path: 'value_stream_analytics' do
       resources :stages, only: [:index, :create, :update, :destroy] do
         member do
