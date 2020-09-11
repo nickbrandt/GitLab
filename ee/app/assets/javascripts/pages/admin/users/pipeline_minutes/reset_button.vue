@@ -1,11 +1,8 @@
 <script>
-import Vue from 'vue';
-import { GlButton, GlToast } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
 import statusCodes from '~/lib/utils/http_status';
-
-Vue.use(GlToast);
 
 export default {
   components: {
@@ -19,7 +16,7 @@ export default {
   },
   methods: {
     resetPipelineMinutes() {
-      return axios
+      axios
         .post(this.resetMinutesPath)
         .then(resp => {
           if (resp.status === statusCodes.OK) {
