@@ -244,7 +244,10 @@ module Gitlab
 
       def merge_requests
         strong_memoize(:merge_requests) do
-          MergeRequest.elastic_search(query, options: base_options)
+          options = base_options
+          options[:state] = filters[:state] if filters.key?(:state)
+
+          MergeRequest.elastic_search(query, options: options)
         end
       end
 

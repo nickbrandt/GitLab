@@ -17,11 +17,28 @@ RSpec.describe Gitlab::Elastic::GroupSearchResults, :elastic do
 
   context 'issues search', :sidekiq_inline do
     let!(:project) { create(:project, :public, group: group) }
-    let!(:closed_issue) { create(:issue, :closed, project: project, title: 'foo closed') }
-    let!(:opened_issue) { create(:issue, :opened, project: project, title: 'foo opened') }
-    let(:query) { 'foo' }
+    let!(:closed_result) { create(:issue, :closed, project: project, title: 'foo closed') }
+    let!(:opened_result) { create(:issue, :opened, project: project, title: 'foo opened') }
 
-    include_examples 'search issues scope filters by state' do
+    let(:query) { 'foo' }
+    let(:scope) { 'issues' }
+
+    include_examples 'search results filtered by state' do
+      before do
+        ensure_elasticsearch_index!
+      end
+    end
+  end
+
+  context 'merge_requests search', :sidekiq_inline do
+    let!(:project) { create(:project, :public, group: group) }
+    let!(:opened_result) { create(:merge_request, :opened, source_project: project, title: 'foo opened') }
+    let!(:closed_result) { create(:merge_request, :closed, source_project: project, title: 'foo closed') }
+
+    let(:query) { 'foo' }
+    let(:scope) { 'merge_requests' }
+
+    include_examples 'search results filtered by state' do
       before do
         ensure_elasticsearch_index!
       end
