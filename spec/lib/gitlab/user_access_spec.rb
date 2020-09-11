@@ -196,6 +196,57 @@ RSpec.describe Gitlab::UserAccess do
         expect(access.can_merge_to_branch?(@branch.name)).to be_falsey
       end
     end
+
+    context 'push to a protected branch of this project via a deploy key' do
+      let(:protected_branch) { create(:protected_branch, :no_one_can_push, project: project) }
+
+      context 'when a user cannot push to a project and branch does not allow collaboration' do
+        let(:deploy_key) { create(:deploy_key, user: user) }
+
+        before do
+          project.add_guest(user)
+          allow(project).to receive(:branch_allows_collaboration?).with(user, protected_branch.name).and_return(false)
+
+          create(:deploy_keys_project, :write_access, project: protected_branch.project, deploy_key: deploy_key)
+          create(:protected_branch_push_access_level, protected_branch: protected_branch, deploy_key: deploy_key)
+        end
+
+        context 'when the project has active deploy key owned by this user' do
+          it 'returns true' do
+            expect(access.can_push_to_branch?(protected_branch.name)).to be_truthy
+          end
+        end
+
+        context 'when the project has active deploy keys, but not by this user' do
+          let(:deploy_key) { create(:deploy_key, user: create(:user)) }
+
+          it 'returns false' do
+            expect(access.can_push_to_branch?(protected_branch.name)).to be_falsey
+          end
+        end
+
+        context 'when there is another branch' do
+          let(:another_branch) { create(:protected_branch, :no_one_can_push, project: project) }
+
+          before do
+            allow(project).to receive(:branch_allows_collaboration?).with(user, another_branch.name).and_return(false)
+          end
+
+          it 'returns false when trying to push to that other branch' do
+            expect(access.can_push_to_branch?(another_branch.name)).to be_falsey
+          end
+
+          context 'and the deploy key added for the first protected branch is also added for this other branch' do
+            it 'returns true for both protected branches' do
+              create(:protected_branch_push_access_level, protected_branch: another_branch, deploy_key: deploy_key)
+
+              expect(access.can_push_to_branch?(protected_branch.name)).to be_truthy
+              expect(access.can_push_to_branch?(another_branch.name)).to be_truthy
+            end
+          end
+        end
+      end
+    end
   end
 
   describe '#can_create_tag?' do
