@@ -20950,6 +20950,9 @@ msgstr ""
 msgid "Remove user & report"
 msgstr ""
 
+msgid "Remove user from group"
+msgstr ""
+
 msgid "Removed"
 msgstr ""
 
