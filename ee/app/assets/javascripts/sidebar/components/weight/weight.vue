@@ -5,6 +5,7 @@ import { __, s__ } from '~/locale';
 import Tracking from '~/tracking';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
+import { MAX_DISPLAY_WEIGHT } from '../../constants';
 
 export default {
   components: {
@@ -52,6 +53,7 @@ export default {
       hasValidInput: true,
       shouldShowEditField: false,
       collapsedAfterUpdate: false,
+      maxDisplayWeight: MAX_DISPLAY_WEIGHT,
     };
   },
   computed: {
@@ -151,7 +153,7 @@ export default {
       <gl-loading-icon v-if="fetching" class="js-weight-collapsed-loading-icon" />
       <span v-else class="js-weight-collapsed-weight-label">
         {{ collapsedWeightLabel
-        }}<template v-if="weight > 99999"
+        }}<template v-if="weight > maxDisplayWeight"
           >&hellip;</template
         >
       </span>
