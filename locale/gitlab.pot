@@ -13345,6 +13345,9 @@ msgstr ""
 msgid "IncidentManagement|Published to status page"
 msgstr ""
 
+msgid "IncidentManagement|Severity"
+msgstr ""
+
 msgid "IncidentManagement|There are no closed incidents"
 msgstr ""
 
