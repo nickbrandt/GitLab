@@ -177,13 +177,35 @@ RSpec.describe Search::GlobalService do
       end
     end
 
-    context 'when ES is not used' do
+    context 'when elasticearch_search is disabled' do
       before do
-        stub_ee_application_setting(elasticsearch_limit_indexing: true)
+        stub_ee_application_setting(elasticsearch_search: false)
       end
 
       it 'does not include ES-specific scopes' do
         expect(described_class.new(user, {}).allowed_scopes).not_to include('commits')
+      end
+    end
+
+    context 'when elasticsearch_limit_indexing is enabled' do
+      before do
+        stub_ee_application_setting(elasticsearch_limit_indexing: true)
+      end
+
+      context 'when advanced_global_search_for_limited_indexing feature flag is disabled' do
+        before do
+          stub_feature_flags(advanced_global_search_for_limited_indexing: false)
+        end
+
+        it 'does not include ES-specific scopes' do
+          expect(described_class.new(user, {}).allowed_scopes).not_to include('commits')
+        end
+      end
+
+      context 'when advanced_global_search_for_limited_indexing feature flag is enabled' do
+        it 'includes ES-specific scopes' do
+          expect(described_class.new(user, {}).allowed_scopes).to include('commits')
+        end
       end
     end
   end

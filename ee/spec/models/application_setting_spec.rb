@@ -407,8 +407,8 @@ RSpec.describe ApplicationSetting do
   end
 
   describe '#search_using_elasticsearch?' do
-    # Constructs a truth table with 16 entries to run the specs against
-    where(indexing: [true, false], searching: [true, false], limiting: [true, false])
+    # Constructs a truth table to run the specs against
+    where(indexing: [true, false], searching: [true, false], limiting: [true, false], advanced_global_search_for_limited_indexing: [true, false])
 
     with_them do
       let_it_be(:included_project_container) { create(:elasticsearch_indexed_project) }
@@ -430,12 +430,14 @@ RSpec.describe ApplicationSetting do
           elasticsearch_search: searching,
           elasticsearch_limit_indexing: limiting
         )
+
+        stub_feature_flags(advanced_global_search_for_limited_indexing: advanced_global_search_for_limited_indexing)
       end
 
       context 'global scope' do
         let(:scope) { nil }
 
-        it { is_expected.to eq(only_when_enabled_globally) }
+        it { is_expected.to eq(indexing && searching && (!limiting || advanced_global_search_for_limited_indexing)) }
       end
 
       context 'namespace (in scope)' do
