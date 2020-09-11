@@ -4,7 +4,7 @@ The GitLab product is made up of several service components that run as independ
 
 ## Integration phases
 
-The following outline re-uses the [maturity metric](https://about.gitlab.com/direction/maturity) naming as an example of the various phases of integrating a component. These are only loosely coupled to a components actual maturity, and are intended as a guide for implementation order. (For example, a component does not need to be enabled by default to be Lovable, and being enabled by default does not on its own cause a component to be Lovable.)
+The following outline re-uses the [maturity metric](https://about.gitlab.com/direction/maturity) naming as an example of the various phases of integrating a component. These are only loosely coupled to a components actual maturity, and are intended as a guide for implementation order (for example, a component does not need to be enabled by default to be Lovable, and being enabled by default does not on its own cause a component to be Lovable).
 
 - Proposed
   - [Proposing a new component](#proposing-a-new-component)
@@ -70,14 +70,14 @@ The first step of bundling a new service is to provide it in the development env
 
 **Standard install methods**
 
-In order for a service to be bundled for end-users or `gitlab.com`, it needs to be included in the standard install methods.
+In order for a service to be bundled for end-users or GitLab.com, it needs to be included in the standard install methods:
 
 - [Included in the Omnibus package](https://gitlab.com/gitlab-org/omnibus-gitlab)
 - [Included in the GitLab Helm charts](https://gitlab.com/gitlab-org/charts/gitlab)
 
 ## Handling service dependencies
 
-Dependencies should be kept up to date and be tracked for security updates. For the rails codebase the JavaScript and Ruby dependencies are
+Dependencies should be kept up to date and be tracked for security updates. For the Rails codebase, the JavaScript and Ruby dependencies are
 scanned for vulnerabilities using GitLab [dependency scanning](../user/application_security/dependency_scanning/index.md).
 
 In addition, any system dependencies used in Omnibus packages or the Cloud Native images should be added to the [dependency update automation](https://about.gitlab.com/handbook/engineering/development/enablement/distribution/maintenance/dependencies.io.html#adding-new-dependencies).
@@ -86,4 +86,4 @@ In addition, any system dependencies used in Omnibus packages or the Cloud Nativ
 
 If the service component needs to be updated or released with the monthly GitLab release, then the component should be added to the [release tools automation](https://gitlab.com/gitlab-org/release-tools). This project is maintained by the [Delivery team](https://about.gitlab.com/handbook/engineering/infrastructure/team/delivery/). A list of the projects managed this way can be found in the [release tools project directory](https://about.gitlab.com/handbook/engineering/infrastructure/team/delivery/).
 
-For example: during the monthly GitLab release, the desired version of Gitaly, GitLab Workhorse, GitLab Shell, etc, need to synchronized through the various release pipelines.
+For example, during the monthly GitLab release, the desired version of Gitaly, GitLab Workhorse, GitLab Shell, etc., need to synchronized through the various release pipelines.
