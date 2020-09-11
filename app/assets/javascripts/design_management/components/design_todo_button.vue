@@ -60,6 +60,22 @@ export default {
     },
   },
   methods: {
+    updateGlobalTodoCount(additionalTodoCount) {
+      const currentCount = parseInt(document.querySelector('.js-todos-count').innerText, 10);
+      const todoToggleEvent = new CustomEvent('todo:toggle', {
+        detail: {
+          count: Math.max(currentCount + additionalTodoCount, 0),
+        },
+      });
+
+      document.dispatchEvent(todoToggleEvent);
+    },
+    incrementGlobalTodoCount() {
+      this.updateGlobalTodoCount(1);
+    },
+    decrementGlobalTodoCount() {
+      this.updateGlobalTodoCount(-1);
+    },
     createTodo() {
       this.todoLoading = true;
       return this.$apollo
@@ -75,6 +91,9 @@ export default {
               this.$emit('error', Error(createDesignTodoError.message));
             }
           },
+        })
+        .then(() => {
+          this.incrementGlobalTodoCount();
         })
         .catch(err => {
           this.$emit('error', Error(CREATE_DESIGN_TODO_ERROR));
@@ -115,6 +134,9 @@ export default {
               );
             }
           },
+        })
+        .then(() => {
+          this.decrementGlobalTodoCount();
         })
         .catch(err => {
           this.$emit('error', Error(DELETE_DESIGN_TODO_ERROR));
