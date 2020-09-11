@@ -53,7 +53,6 @@ export default {
       hasValidInput: true,
       shouldShowEditField: false,
       collapsedAfterUpdate: false,
-      maxDisplayWeight: MAX_DISPLAY_WEIGHT,
     };
   },
   computed: {
@@ -135,6 +134,7 @@ export default {
       eventHub.$emit('updateWeight', '', this.id);
     },
   },
+  maxDisplayWeight: MAX_DISPLAY_WEIGHT,
 };
 </script>
 
@@ -153,7 +153,7 @@ export default {
       <gl-loading-icon v-if="fetching" class="js-weight-collapsed-loading-icon" />
       <span v-else class="js-weight-collapsed-weight-label">
         {{ collapsedWeightLabel
-        }}<template v-if="weight > maxDisplayWeight"
+        }}<template v-if="weight > $options.maxDisplayWeight"
           >&hellip;</template
         >
       </span>
