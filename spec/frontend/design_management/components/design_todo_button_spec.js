@@ -112,6 +112,7 @@ describe('Design management design todo button', () => {
           variables: {
             atVersion: null,
             filenames: ['my-design.jpg'],
+            designId: '1',
             issueId: '1',
             issueIid: '10',
             projectPath: 'project-path',
