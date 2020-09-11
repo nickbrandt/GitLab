@@ -11,10 +11,11 @@ module Gitlab
       attr_reader :object, :model_class, :range
       attr_accessor :ignoring
 
-      def initialize(object, range)
+      def initialize(object, range, ignoring: nil)
         @object = object
         @range = range
         @model_class = object.class
+        @ignoring = ignoring
       end
 
       def min_relative_position
@@ -75,9 +76,7 @@ module Gitlab
       def neighbour(item)
         return unless item.present?
 
-        n = self.class.new(item, range)
-        n.ignoring = ignoring
-        n
+        self.class.new(item, range, ignoring: ignoring)
       end
 
       def scoped_items
@@ -111,7 +110,7 @@ module Gitlab
           .order(Gitlab::Database.nulls_last_order('relative_position', 'DESC'))
           .first
 
-        self.class.new(sib, range)
+        neighbour(sib)
       end
 
       def min_sibling
@@ -119,7 +118,7 @@ module Gitlab
           .order(Gitlab::Database.nulls_last_order('relative_position', 'ASC'))
           .first
 
-        self.class.new(sib, range)
+        neighbour(sib)
       end
 
       def shift_left

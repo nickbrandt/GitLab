@@ -50,9 +50,7 @@ module Gitlab
       def context(object, ignoring: nil)
         return unless object
 
-        c = ItemContext.new(object, range)
-        c.ignoring = ignoring
-        c
+        ItemContext.new(object, range, ignoring: ignoring)
       end
 
       private
