@@ -42,12 +42,12 @@ export default {
           gfm: true,
           project: this.vuln.project.full_path.slice(1),
         })
-        .then((res) => res.data)
-        .then((data) => {
+        .then(res => res.data)
+        .then(data => {
           this.markdown = data.html;
           this.loading = false;
         })
-        .catch((e) => {
+        .catch(e => {
           if (e.status !== 200) {
             this.loadError = true;
           }

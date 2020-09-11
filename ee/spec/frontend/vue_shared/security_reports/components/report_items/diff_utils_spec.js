@@ -4,6 +4,31 @@ import {
   createDiffData,
 } from 'ee/vue_shared/security_reports/components/report_items/diff_utils';
 
+function actionType(action) {
+  let type;
+  if (action.removed === undefined && action.added === undefined) {
+    type = 'normal';
+  } else if (action.removed) {
+    type = 'removed';
+  } else if (action.added) {
+    type = 'added';
+  }
+  return [type, action.value];
+}
+
+function checkLineActions(line, actionSpecs) {
+  const lineActions = line.actions.map(action => actionType(action));
+  expect(lineActions).toEqual(actionSpecs);
+  expect(line.actions.length).toEqual(actionSpecs.length);
+}
+
+function checkLine(line, oldLine, newLine, lineType, actionSpecs) {
+  expect(line.type).toEqual(lineType);
+  expect(line.old_line).toEqual(oldLine);
+  expect(line.new_line).toEqual(newLine);
+  checkLineActions(line, actionSpecs);
+}
+
 describe('Report Items Diff Utils', () => {
   describe('groupActionsByLines', () => {
     it('Correctly groups single-line changes by lines', () => {
@@ -13,17 +38,7 @@ describe('Report Items Diff Utils', () => {
       const actions = diffChars(before, after);
       const lines = groupActionsByLines(actions);
       expect(lines.length).toEqual(1);
-
-      const line = lines[0];
-      expect(line.actions.length).toEqual(3);
-      expect(line.actions[0].removed).toEqual(true);
-      expect(line.actions[0].value).toEqual('hello');
-
-      expect(line.actions[1].added).toEqual(true);
-      expect(line.actions[1].value).toEqual('HELLO');
-
-      expect(line.actions[2].added || line.actions[2].removed).toEqual(undefined);
-      expect(line.actions[2].value).toEqual(' world');
+      checkLineActions(lines[0], [['removed', 'hello'], ['added', 'HELLO'], ['normal', ' world']]);
     });
 
     it('Correctly groups whole-line deletions by lines', () => {
@@ -34,15 +49,45 @@ describe('Report Items Diff Utils', () => {
       const lines = groupActionsByLines(actions);
       expect(lines.length).toEqual(2);
 
-      const line0 = lines[0];
-      expect(line0.actions.length).toEqual(1);
-      expect(line0.actions[0].removed).toEqual(true);
-      expect(line0.actions[0].value).toEqual('a');
+      checkLineActions(lines[0], [['removed', 'a']]);
+      checkLineActions(lines[1], [['normal', 'b']]);
+    });
 
-      const line1 = lines[1];
-      expect(line1.actions.length).toEqual(1);
-      expect(line1.actions[0].removed || line1.actions[0].added).toEqual(undefined);
-      expect(line1.actions[0].value).toEqual('b');
+    it('Correctly groups whole-line insertions by lines', () => {
+      const before = 'x\ny\nz';
+      const after = 'x\ny\ny\nz';
+
+      const actions = diffChars(before, after);
+      const lines = groupActionsByLines(actions);
+      expect(lines.length).toEqual(3);
+
+      checkLineActions(lines[0], [['normal', 'x']]);
+      checkLineActions(lines[1], [['normal', 'y']]);
+      checkLineActions(lines[2], [['added', 'y\n'], ['normal', 'z']]);
+    });
+
+    it('Correctly groups empty line deletions', () => {
+      const before = '\n\n';
+      const after = '\n';
+
+      const actions = diffChars(before, after);
+      const lines = groupActionsByLines(actions);
+      expect(lines.length).toEqual(2);
+
+      checkLineActions(lines[0], [['normal', '']]);
+      checkLineActions(lines[1], [['removed', '']]);
+    });
+
+    it('Correctly groups empty line additions', () => {
+      const before = '\n';
+      const after = '\n\n\n';
+
+      const actions = diffChars(before, after);
+      const lines = groupActionsByLines(actions);
+      expect(lines.length).toEqual(2);
+
+      checkLineActions(lines[0], [['normal', '']]);
+      checkLineActions(lines[1], [['added', '\n\n']]);
     });
   });
 
@@ -54,23 +99,8 @@ describe('Report Items Diff Utils', () => {
       const lines = createDiffData(before, after);
       expect(lines.length).toEqual(2);
       expect(lines[0].type).toEqual('removed');
-      expect(lines[0].actions.length).toEqual(2);
-
-      const act00 = lines[0].actions[0];
-      expect(act00.removed).toEqual(true);
-      expect(act00.value).toEqual('hello');
-
-      const act01 = lines[0].actions[1];
-      expect(act01.removed || act01.added).toEqual(undefined);
-      expect(act01.value).toEqual(' world');
-
-      const act10 = lines[1].actions[0];
-      expect(act10.added).toEqual(true);
-      expect(act10.value).toEqual('HELLO');
-
-      const act11 = lines[1].actions[1];
-      expect(act11.removed || act01.added).toEqual(undefined);
-      expect(act11.value).toEqual(' world');
+      checkLine(lines[0], 1, undefined, 'removed', [['removed', 'hello'], ['normal', ' world']]);
+      checkLine(lines[1], undefined, 1, 'added', [['added', 'HELLO'], ['normal', ' world']]);
     });
 
     it('Correctly creates diff lines for single line deletions', () => {
@@ -79,13 +109,67 @@ describe('Report Items Diff Utils', () => {
 
       const lines = createDiffData(before, after);
       expect(lines.length).toEqual(2);
-      expect(lines[0].type).toEqual('removed');
-      expect(lines[0].actions.length).toEqual(1);
-      expect(lines[0].actions[0].value).toEqual('a');
+      checkLine(lines[0], 1, undefined, 'removed', [['removed', 'a']]);
+      checkLine(lines[1], 2, 1, 'normal', [['normal', 'b']]);
+    });
 
-      expect(lines[1].type).toEqual('normal');
-      expect(lines[1].actions.length).toEqual(1);
-      expect(lines[1].actions[0].value).toEqual('b');
+    it('Correctly tracks line numbers for single-line additions', () => {
+      const before = 'x\ny\nz';
+      const after = 'x\ny\ny\nz';
+
+      const lines = createDiffData(before, after);
+      expect(lines.length).toEqual(4);
+
+      checkLine(lines[0], 1, 1, 'normal', [['normal', 'x']]);
+      checkLine(lines[1], 2, 2, 'normal', [['normal', 'y']]);
+      checkLine(lines[2], undefined, 3, 'added', [['added', 'y']]);
+      checkLine(lines[3], 3, 4, 'normal', [['normal', 'z']]);
+    });
+
+    it('Correctly tracks line numbers for multi-line additions', () => {
+      const before = 'Hello there\nHello world\nhello again';
+      const after = 'Hello there\nHello World\nanew line\nhello again\nhello again';
+
+      const lines = createDiffData(before, after);
+      expect(lines.length).toEqual(6);
+
+      checkLine(lines[0], 1, 1, 'normal', [['normal', 'Hello there']]);
+      checkLine(lines[1], 2, undefined, 'removed', [
+        ['normal', 'Hello '],
+        ['removed', 'w'],
+        ['normal', 'orld'],
+      ]);
+      checkLine(lines[2], undefined, 2, 'added', [
+        ['normal', 'Hello '],
+        ['added', 'W'],
+        ['normal', 'orld'],
+      ]);
+      checkLine(lines[3], undefined, 3, 'added', [['added', 'anew line']]);
+      checkLine(lines[4], 3, 4, 'normal', [['normal', 'hello again']]);
+      checkLine(lines[5], undefined, 5, 'added', [['added', 'hello again']]);
+    });
+
+    it('Correctly diffs empty line deletions', () => {
+      const before = '\n\n';
+      const after = '\n';
+
+      const lines = createDiffData(before, after);
+      expect(lines.length).toEqual(2);
+
+      checkLine(lines[0], 1, 1, 'normal', [['normal', '']]);
+      checkLine(lines[1], 2, undefined, 'removed', [['removed', '']]);
+    });
+
+    it('Correctly diffs empty line additions', () => {
+      const before = '\n';
+      const after = '\n\n\n';
+
+      const lines = createDiffData(before, after);
+      expect(lines.length).toEqual(3);
+
+      checkLine(lines[0], 1, 1, 'normal', [['normal', '']]);
+      checkLine(lines[1], undefined, 2, 'added', [['added', '']]);
+      checkLine(lines[2], undefined, 3, 'added', [['added', '']]);
     });
   });
 });

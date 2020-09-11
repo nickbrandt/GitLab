@@ -6,9 +6,16 @@
 import { diffChars } from 'diff';
 
 export function splitAction(action) {
-  const splitValues = action.value.split('\n');
+  const splitValues = action.value.split(/(\n)/);
+  if (
+    splitValues.length >= 2 &&
+    splitValues[splitValues.length - 1] === '' &&
+    splitValues[splitValues.length - 2] === '\n'
+  ) {
+    splitValues.pop();
+  }
   const res = [];
-  splitValues.forEach((splitValue) => {
+  splitValues.forEach(splitValue => {
     res.push({
       added: action.added,
       removed: action.removed,
@@ -18,84 +25,118 @@ export function splitAction(action) {
   return res;
 }
 
-export function createDistinctLines(type, startIdx, actions, lineKey) {
+function setLineNumbers(lines) {
+  let beforeLineNo = 1;
+  let afterLineNo = 1;
+  lines.forEach(l => {
+    const line = l;
+    if (line.type === 'normal') {
+      line.old_line = beforeLineNo;
+      line.new_line = afterLineNo;
+      beforeLineNo += 1;
+      afterLineNo += 1;
+    } else if (line.type === 'removed') {
+      line.old_line = beforeLineNo;
+      beforeLineNo += 1;
+    } else if (line.type === 'added') {
+      line.new_line = afterLineNo;
+      afterLineNo += 1;
+    }
+  });
+}
+
+function splitLinesInline(lines) {
   const res = [];
-  let currLineNo = startIdx;
+  const createLine = type => {
+    return { type, actions: [], old_line: undefined, new_line: undefined };
+  };
+  const hasNonEmpty = (line, type) => {
+    let typeCount = 0;
+    for (let i = 0; i < line.actions.length; i += 1) {
+      const action = line.actions[i];
+      if (action[type]) {
+        typeCount += 1;
+        if (action.value !== '') {
+          return true;
+        }
+      }
+    }
+    return typeCount === line.actions.length;
+  };
+
+  lines.forEach(line => {
+    const beforeLine = createLine('normal');
+    let afterLine = createLine('added');
+
+    let totalNormal = 0;
+    let totalRemoved = 0;
+    let totalAdded = 0;
+    const maybeAddAfter = () => {
+      if (totalAdded > 0 && hasNonEmpty(afterLine, 'added')) {
+        res.push(afterLine);
+      }
+    };
+
+    line.actions.forEach(action => {
+      if (!action.added && !action.removed) {
+        totalNormal += 1;
+        beforeLine.actions.push(action);
+        afterLine.actions.push(action);
+      } else if (action.removed) {
+        totalRemoved += 1;
+        beforeLine.actions.push(action);
+        beforeLine.type = 'removed';
+      } else if (action.added) {
+        splitAction(action).forEach(split => {
+          if (split.value === '\n') {
+            maybeAddAfter();
+            totalAdded = 0;
+            afterLine = createLine('added');
+          } else {
+            totalAdded += 1;
+            afterLine.actions.push(split);
+          }
+        });
+      }
+    });
+    if (totalNormal > 0 || totalRemoved > 0) {
+      res.push(beforeLine);
+    }
+    maybeAddAfter();
+  });
+
+  setLineNumbers(res);
+  return res;
+}
+
+export function groupActionsByLines(actions) {
+  const res = [];
   let currLine = null;
   const newLine = () => {
     if (currLine !== null) {
       res.push(currLine);
     }
-    currLineNo += 1;
-    currLine = { type, actions: [] };
-    currLine[lineKey] = currLineNo;
+    currLine = { actions: [] };
   };
   newLine();
 
-  actions.forEach((action) => {
-    const splitActions = splitAction(action);
-    currLine.actions.push(splitActions[0]);
-    splitActions.slice(1).forEach((sAction) => {
-      newLine();
-      currLine.actions.push(sAction);
-    });
-  });
-  res.push(currLine);
-
-  return res;
-}
-
-export function splitLinesInline(lines) {
-  const res = [];
-  lines.forEach((line, idx) => {
-    const removed = [];
-    const added = [];
-    const normal = [];
-
-    line.actions.forEach((action) => {
-      if (action.removed) {
-        removed.push(action);
-      } else if (action.added) {
-        added.push(action);
-      } else {
-        removed.push(action);
-        added.push(action);
-        normal.push(action);
-      }
-    });
-    if (normal.length === 1 && removed.length === 1 && added.length === 1) {
-      res.push({ type: 'normal', old_line: idx + 1, actions: normal });
-      return;
-    }
-
-    if (removed.length > 0) {
-      res.push(...createDistinctLines('removed', idx, removed, 'old_line'));
-    }
-    if (added.length > 0) {
-      res.push(...createDistinctLines('added', idx, added, 'new_line'));
+  actions.forEach(action => {
+    if (action.added) {
+      currLine.actions.push(action);
+    } else {
+      splitAction(action).forEach(split => {
+        if (split.value === '\n') {
+          newLine();
+        } else {
+          currLine.actions.push(split);
+        }
+      });
     }
   });
-  return res;
-}
-
-export function groupActionsByLines(actions) {
-  const lines = [];
-  let currLine = { actions: [] };
-
-  while (actions.length > 0) {
-    const action = actions.shift();
-    if (action.value !== '') {
-      const splitActions = splitAction(action);
-      currLine.actions.push(splitActions[0]);
-      if (splitActions.length > 1) {
-        lines.push(currLine);
-        currLine = { actions: [] };
-        splitActions.slice(1).forEach((x) => actions.unshift(x));
-      }
-    }
+  if (currLine.actions.length > 0) {
+    newLine();
   }
-  lines.push(currLine);
-  return lines;
+  return res;
 }
 
 /**
@@ -107,7 +148,7 @@ export function groupActionsByLines(actions) {
  *     old_line: undefined or number,
  *   }
  *
- * Actions objects have the form
+ * Action objects have the form
  *
  *   {
  *     added: true | false,

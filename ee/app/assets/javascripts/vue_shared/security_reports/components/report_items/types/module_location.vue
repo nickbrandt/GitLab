@@ -1,17 +1,16 @@
 <script>
 export default {
   name: 'ReportItemModuleLocation',
-  components: {
-  },
+  components: {},
   props: {
     module: {
       type: String,
-      required: true
+      required: true,
     },
     offset: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     hexOffset() {
@@ -20,13 +19,13 @@ export default {
         res = `0${res}`;
       }
       return `0x${res}`;
-    }
+    },
   },
 };
 </script>
 
 <template>
   <div>
-    <code>{{module}}+{{hexOffset}}</code>
+    <code>{{ module }}+{{ hexOffset }}</code>
   </div>
 </template>

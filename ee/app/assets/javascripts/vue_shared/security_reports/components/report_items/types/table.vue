@@ -8,17 +8,17 @@ export default {
     header: {
       type: Array,
       required: false,
-      default: ()=> [],
+      default: () => [],
     },
     rows: {
       type: Array,
       required: false,
-      default: ()=> [],
+      default: () => [],
     },
     vuln: {
       type: Object,
       required: true,
-    }
+    },
   },
 };
 </script>

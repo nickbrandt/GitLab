@@ -7,12 +7,12 @@ export default {
   props: {
     items: {
       type: Array,
-      required: true
+      required: true,
     },
     vuln: {
       type: Object,
       required: true,
-    }
+    },
   },
 };
 </script>

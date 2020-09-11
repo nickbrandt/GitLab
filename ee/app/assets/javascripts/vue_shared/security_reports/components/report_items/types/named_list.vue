@@ -13,7 +13,7 @@ export default {
     vuln: {
       type: Object,
       required: true,
-    }
+    },
   },
 };
 </script>

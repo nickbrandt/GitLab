@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     isValidComponentType(type) {
-      const validTypes = Object.keys(this.$options.components).map((name) => camelToKebab(name));
+      const validTypes = Object.keys(this.$options.components).map(name => camelToKebab(name));
       return validTypes.indexOf(type) !== -1;
     },
   },

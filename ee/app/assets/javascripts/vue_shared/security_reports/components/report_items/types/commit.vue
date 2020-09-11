@@ -1,5 +1,4 @@
 <script>
-
 import { GlFriendlyWrap, GlLink } from '@gitlab/ui';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import { getBaseURL } from '~/lib/utils/url_utility';
@@ -18,7 +17,7 @@ export default {
     },
     value: {
       type: String,
-      required: true
+      required: true,
     },
   },
   computed: {
@@ -36,12 +35,7 @@ export default {
 
 <template>
   <div class="d-flex">
-    <gl-link
-      ref="commitLink"
-      :href="linkToCommit"
-      target="_blank"
-      class="commit-sha"
-    >
+    <gl-link ref="commitLink" :href="linkToCommit" target="_blank" class="commit-sha">
       <gl-friendly-wrap :text="shortSha" />
     </gl-link>
     <clipboard-button

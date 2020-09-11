@@ -1,32 +1,32 @@
 <script>
 const FORMAT_DEFAULT = 'default';
 const FORMAT_HEX = 'hex';
-const VALID_FORMATS = [ FORMAT_DEFAULT, FORMAT_HEX ];
+const VALID_FORMATS = [FORMAT_DEFAULT, FORMAT_HEX];
 
 export default {
   name: 'ReportItemInt',
   props: {
     value: {
       type: Number,
-      required: true
+      required: true,
     },
     format: {
       type: String,
       required: false,
       default: 'default',
-      validator: (val)=> VALID_FORMATS.includes(val),
-    }
+      validator: val => VALID_FORMATS.includes(val),
+    },
   },
   computed: {
     displayVal() {
-      switch(this.format) {
+      switch (this.format) {
         case FORMAT_HEX:
           return this.hexVal();
         case FORMAT_DEFAULT:
         default:
           return this.value;
       }
-    }
+    },
   },
   methods: {
     hexVal() {
@@ -35,13 +35,13 @@ export default {
         res = `0${res}`;
       }
       return `0x${res}`;
-    }
+    },
   },
 };
 </script>
 
 <template>
   <div>
-    <code :title="value">{{displayVal}}</code>
+    <code :title="value">{{ displayVal }}</code>
   </div>
 </template>

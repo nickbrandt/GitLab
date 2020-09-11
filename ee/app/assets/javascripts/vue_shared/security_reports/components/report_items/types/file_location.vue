@@ -1,5 +1,4 @@
 <script>
-
 import { GlFriendlyWrap, GlLink } from '@gitlab/ui';
 import { getBaseURL } from '~/lib/utils/url_utility';
 
@@ -16,21 +15,21 @@ export default {
     },
     file_name: {
       type: String,
-      required: true
+      required: true,
     },
     line_start: {
       type: Number,
-      required: true
+      required: true,
     },
     line_end: {
       type: Number,
       default: null,
-      required: false
+      required: false,
     },
     git_ref: {
       type: String,
       default: null,
-      required: false
+      required: false,
     },
   },
   computed: {
@@ -61,11 +60,7 @@ export default {
 
 <template>
   <div>
-    <gl-link
-      ref="fileLink"
-      :href="linkToFile"
-      target="_blank"
-    >
+    <gl-link ref="fileLink" :href="linkToFile" target="_blank">
       <gl-friendly-wrap :text="fileWithLines" />
     </gl-link>
   </div>
