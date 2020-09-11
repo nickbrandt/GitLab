@@ -96,7 +96,8 @@ module EE
           params '*iteration:"iteration name"'
           types Issue
           condition do
-            current_user.can?(:"admin_#{quick_action_target.to_ability_name}", project) &&
+            quick_action_target.supports_iterations? &&
+              current_user.can?(:"admin_#{quick_action_target.to_ability_name}", project) &&
               quick_action_target.project.group&.feature_available?(:iterations) &&
               find_iterations(project, state: 'active').any?
           end
@@ -117,7 +118,8 @@ module EE
           end
           types Issue
           condition do
-            quick_action_target.persisted? &&
+            quick_action_target.supports_iterations? &&
+              quick_action_target.persisted? &&
               quick_action_target.sprint_id? &&
               quick_action_target.project.group&.feature_available?(:iterations) &&
               current_user.can?(:"admin_#{quick_action_target.to_ability_name}", project)

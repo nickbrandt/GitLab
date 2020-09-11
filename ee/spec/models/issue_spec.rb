@@ -739,4 +739,24 @@ RSpec.describe Issue do
       end
     end
   end
+
+  describe '#supports_iterations?' do
+    let(:group) { build_stubbed(:group) }
+    let(:project_with_group) { build_stubbed(:project, group: group) }
+
+    where(:issuable_type, :project, :supports_iterations) do
+      [
+        [:issue, :project_with_group, true],
+        [:incident, :project_with_group, false]
+      ]
+    end
+
+    with_them do
+      let(:issue) { build_stubbed(issuable_type, project: send(project)) }
+
+      subject { issue.supports_iterations? }
+
+      it { is_expected.to eq(supports_iterations) }
+    end
+  end
 end

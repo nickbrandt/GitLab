@@ -272,6 +272,16 @@ RSpec.describe QuickActions::InterpretService do
           expect(updates).to be_empty
         end
       end
+
+      context 'when issuable does not support iterations' do
+        it 'does not assign an iteration to an incident' do
+          incident = create(:incident, project: project)
+
+          _, updates = service.execute(content, incident)
+
+          expect(updates).to be_empty
+        end
+      end
     end
 
     context 'remove_iteration command' do
@@ -314,6 +324,16 @@ RSpec.describe QuickActions::InterpretService do
 
         it 'does not recognize /remove_iteration' do
           _, updates = service.execute(content, issue)
+
+          expect(updates).to be_empty
+        end
+      end
+
+      context 'when issuable does not support iterations' do
+        it 'does not assign an iteration to an incident' do
+          incident = create(:incident, project: project)
+
+          _, updates = service.execute(content, incident)
 
           expect(updates).to be_empty
         end
