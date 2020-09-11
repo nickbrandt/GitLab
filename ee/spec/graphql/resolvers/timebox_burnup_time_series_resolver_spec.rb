@@ -30,7 +30,7 @@ RSpec.describe Resolvers::TimeboxBurnupTimeSeriesResolver do
 
     context 'when the feature flag is enabled' do
       before do
-        stub_feature_flags(burnup_charts: true)
+        stub_feature_flags(burnup_charts: true, iteration_charts: true)
       end
 
       it 'returns burnup chart data' do
