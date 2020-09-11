@@ -234,7 +234,7 @@ export default {
 };
 </script>
 <template>
-  <div v-if="mr" class="mr-state-widget gl-mt-3">
+  <div v-if="isLoaded" class="mr-state-widget gl-mt-3">
     <mr-widget-header :mr="mr" />
     <mr-widget-suggest-pipeline
       v-if="shouldSuggestPipelines"
