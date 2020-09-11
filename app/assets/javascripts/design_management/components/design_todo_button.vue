@@ -5,7 +5,7 @@ import createDesignTodoMutation from '../graphql/mutations/create_design_todo.mu
 import TodoButton from '~/vue_shared/components/todo_button.vue';
 import allVersionsMixin from '../mixins/all_versions';
 import { updateStoreAfterDeleteDesignTodo } from '../utils/cache_update';
-import { findIssueId } from '../utils/design_management_utils';
+import { findIssueId, findDesignId } from '../utils/design_management_utils';
 import { CREATE_DESIGN_TODO_ERROR, DELETE_DESIGN_TODO_ERROR } from '../utils/error_messages';
 
 export default {
@@ -45,6 +45,7 @@ export default {
       return {
         projectPath: this.projectPath,
         issueId: findIssueId(this.design.issue.id),
+        designId: findDesignId(this.design.id),
         issueIid: this.issueIid,
         filenames: [this.$route.params.id],
         atVersion: this.designsVersion,
