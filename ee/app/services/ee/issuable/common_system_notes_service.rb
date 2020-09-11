@@ -64,7 +64,7 @@ module EE
       end
 
       def iteration_changes_tracking_enabled?
-        ::Feature.enabled?(:track_iteration_change_events, issuable.project)
+        ::Feature.enabled?(:track_iteration_change_events, issuable.project, default_enabled: true)
       end
     end
   end
