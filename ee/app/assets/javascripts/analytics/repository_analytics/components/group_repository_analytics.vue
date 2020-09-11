@@ -8,10 +8,10 @@ export default {
   components: {
     GlButton,
   },
-  props: {
+  inject: {
     groupAnalyticsCoverageReportsPath: {
       type: String,
-      required: true,
+      default: '',
     },
   },
   computed: {
