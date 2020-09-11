@@ -182,4 +182,53 @@ RSpec.describe 'Environments page', :js do
       end
     end
   end
+
+  context 'when environment has an open alert' do
+    let!(:alert) do
+      create(:alert_management_alert, :triggered, :prometheus,
+        title: 'HTTP Error Rate', project: project,
+        environment: environment, prometheus_alert: prometheus_alert)
+    end
+
+    let!(:prometheus_alert) do
+      create(:prometheus_alert, project: project, environment: environment,
+        prometheus_metric: prometheus_metric)
+    end
+
+    let!(:prometheus_metric) do
+      create(:prometheus_metric, project: project, unit: '%')
+    end
+
+    before do
+      stub_licensed_features(environment_alerts: true)
+    end
+
+    it 'shows the open alert for the environment row' do
+      visit project_environments_path(project)
+
+      within(find('div[data-testid="alert"]')) do
+        expect(page).to have_content('Critical')
+        expect(page).to have_content('HTTP Error Rate exceeded 1.0%')
+        expect(page).to have_link('View Details', href: alert.present.details_url)
+      end
+
+      # and it's not shown when the alert is resolved.
+      alert.resolve!
+      visit project_environments_path(project)
+
+      expect(page).not_to have_css('div[data-testid="alert"]')
+    end
+
+    context 'when user does not have a license for the feature' do
+      before do
+        stub_licensed_features(environment_alerts: false)
+      end
+
+      it 'does not show the open alert for the environment row' do
+        visit project_environments_path(project)
+
+        expect(page).not_to have_css('div[data-testid="alert"]')
+      end
+    end
+  end
 end
