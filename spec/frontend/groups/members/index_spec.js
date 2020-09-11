@@ -5,14 +5,13 @@ import { membersJsonString, membersParsed } from './mock_data';
 
 describe('initGroupMembersApp', () => {
   let el;
+  let vm;
   let wrapper;
 
   const setup = () => {
-    const vm = initGroupMembersApp(el);
+    vm = initGroupMembersApp(el);
     wrapper = createWrapper(vm);
   };
-
-  const getGroupMembersApp = () => wrapper.find(GroupMembersApp);
 
   beforeEach(() => {
     el = document.createElement('div');
@@ -31,28 +30,36 @@ describe('initGroupMembersApp', () => {
     wrapper = null;
   });
 
-  it('parses and passes `currentUserId` prop to `GroupMembersApp`', () => {
+  it('renders `GroupMembersApp`', () => {
     setup();
 
-    expect(getGroupMembersApp().props('currentUserId')).toBe(123);
+    expect(wrapper.find(GroupMembersApp).exists()).toBe(true);
   });
 
-  it('does not pass `currentUserId` prop if not provided by the data attribute (user is not logged in)', () => {
-    el.removeAttribute('data-current-user-id');
+  it('parses and sets `currentUserId` in Vuex store', () => {
     setup();
 
-    expect(getGroupMembersApp().props('currentUserId')).toBeNull();
+    expect(vm.$store.state.currentUserId).toBe(123);
   });
 
-  it('parses and passes `groupId` prop to `GroupMembersApp`', () => {
-    setup();
+  describe('when `data-current-user-id` is not set (user is not logged in)', () => {
+    it('sets `currentUserId` as `null` in Vuex store', () => {
+      el.removeAttribute('data-current-user-id');
+      setup();
 
-    expect(getGroupMembersApp().props('groupId')).toBe(234);
+      expect(vm.$store.state.currentUserId).toBeNull();
+    });
   });
 
-  it('parses and passes `members` prop to `GroupMembersApp`', () => {
+  it('parses and sets `data-group-id` as `sourceId` in Vuex store', () => {
     setup();
 
-    expect(getGroupMembersApp().props('members')).toEqual(membersParsed);
+    expect(vm.$store.state.sourceId).toBe(234);
+  });
+
+  it('parses and sets `members` in Vuex store', () => {
+    setup();
+
+    expect(vm.$store.state.members).toEqual(membersParsed);
   });
 });
