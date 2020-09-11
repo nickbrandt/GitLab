@@ -46,21 +46,13 @@ module EE
       def handle_weight_change
         return unless issuable.previous_changes.include?('weight')
 
-        if weight_changes_tracking_enabled?
-          EE::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.current).execute
-        else
-          ::SystemNoteService.change_weight_note(issuable, issuable.project, current_user)
-        end
+        ::ResourceEvents::ChangeWeightService.new([issuable], current_user, Time.current).execute
       end
 
       def handle_health_status_change
         return unless issuable.previous_changes.include?('health_status')
 
         ::SystemNoteService.change_health_status_note(issuable, issuable.project, current_user)
-      end
-
-      def weight_changes_tracking_enabled?
-        !issuable.is_a?(Epic) && ::Feature.enabled?(:track_issue_weight_change_events, issuable.project, default_enabled: true)
       end
 
       def iteration_changes_tracking_enabled?
