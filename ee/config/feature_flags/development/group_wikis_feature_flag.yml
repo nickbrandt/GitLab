@@ -1,5 +1,5 @@
 ---
-name: group_wiki
+name: group_wikis_feature_flag
 introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/29176
 rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/207888
 group: group::knowledge
