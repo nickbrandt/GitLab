@@ -9,6 +9,8 @@ module Types
 
     authorize :read_iteration
 
+    implements ::Types::TimeboxBurnupTimeSeriesInterface
+
     field :id, GraphQL::ID_TYPE, null: false,
           description: 'ID of the iteration'
 

@@ -1295,6 +1295,7 @@ Represents an iteration object.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
+| `burnupTimeSeries` | BurnupChartDailyTotals! => Array | Daily scope and completed totals for burnup charts |
 | `createdAt` | Time! | Timestamp of iteration creation |
 | `description` | String | Description of the iteration |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
