@@ -2,8 +2,8 @@
 import { mapActions, mapState } from 'vuex';
 import {
   GlAlert,
-  GlDeprecatedDropdown,
-  GlDeprecatedDropdownItem,
+  GlDropdown,
+  GlDropdownItem,
   GlEmptyState,
   GlLoadingIcon,
 } from '@gitlab/ui';
@@ -16,8 +16,8 @@ export default {
     GlLoadingIcon,
     InsightsPage,
     GlEmptyState,
-    GlDeprecatedDropdown,
-    GlDeprecatedDropdownItem,
+    GlDropdown,
+    GlDropdownItem,
   },
   props: {
     endpoint: {
@@ -130,7 +130,7 @@ export default {
       </gl-alert>
     </div>
     <div v-else-if="configPresent" class="insights-wrapper">
-      <gl-deprecated-dropdown
+      <gl-dropdown
         class="js-insights-dropdown w-100"
         data-qa-selector="insights_dashboard_dropdown"
         menu-class="w-100 mw-100"
@@ -138,14 +138,14 @@ export default {
         :text="__('Select Page')"
         :disabled="pageLoading"
       >
-        <gl-deprecated-dropdown-item
+        <gl-dropdown-item
           v-for="page in pages"
           :key="page.scope"
           class="w-100"
           @click="onChangePage(page.scope)"
-          >{{ page.name }}</gl-deprecated-dropdown-item
+          >{{ page.name }}</gl-dropdown-item
         >
-      </gl-deprecated-dropdown>
+      </gl-dropdown>
       <gl-alert v-if="notice != ''">
         {{ notice }}
       </gl-alert>
