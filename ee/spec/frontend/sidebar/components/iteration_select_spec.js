@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlNewDropdown, GlNewDropdownItem, GlButton, GlLink, GlSearchBoxByType } from '@gitlab/ui';
+import { GlDropdown, GlNewDropdownItem, GlButton, GlLink, GlSearchBoxByType } from '@gitlab/ui';
 import IterationSelect from 'ee/sidebar/components/iteration_select.vue';
 import { iterationSelectTextMap } from 'ee/sidebar/constants';
 import setIterationOnIssue from 'ee/sidebar/queries/set_iteration_on_issue.mutation.graphql';
@@ -88,12 +88,12 @@ describe('IterationSelect', () => {
     it('opens the dropdown on click of the edit button', () => {
       createComponent({ props: { canEdit: true } });
 
-      expect(wrapper.find(GlNewDropdown).isVisible()).toBe(false);
+      expect(wrapper.find(GlDropdown).isVisible()).toBe(false);
 
       toggleDropdown();
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.find(GlNewDropdown).isVisible()).toBe(true);
+        expect(wrapper.find(GlDropdown).isVisible()).toBe(true);
       });
     });
 
@@ -113,7 +113,7 @@ describe('IterationSelect', () => {
       const spy = jest.fn();
       createComponent({ props: { canEdit: true } });
 
-      expect(wrapper.find(GlNewDropdown).isVisible()).toBe(false);
+      expect(wrapper.find(GlDropdown).isVisible()).toBe(false);
 
       toggleDropdown(spy);
 
@@ -127,7 +127,7 @@ describe('IterationSelect', () => {
         it('shows GlNewDropdown', () => {
           createComponent({ props: { canEdit: true }, data: { editing: true } });
 
-          expect(wrapper.find(GlNewDropdown).isVisible()).toBe(true);
+          expect(wrapper.find(GlDropdown).isVisible()).toBe(true);
         });
 
         describe('GlDropdownItem with the right title and id', () => {
@@ -283,12 +283,12 @@ describe('IterationSelect', () => {
           });
 
           it('closes the dropdown', () => {
-            expect(wrapper.find(GlNewDropdown).isVisible()).toBe(true);
+            expect(wrapper.find(GlDropdown).isVisible()).toBe(true);
 
             toggleDropdown();
 
             return wrapper.vm.$nextTick().then(() => {
-              expect(wrapper.find(GlNewDropdown).isVisible()).toBe(false);
+              expect(wrapper.find(GlDropdown).isVisible()).toBe(false);
             });
           });
         });

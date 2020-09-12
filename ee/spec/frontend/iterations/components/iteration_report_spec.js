@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import {
-  GlNewDropdown,
+  GlDropdown,
   GlNewDropdownItem,
   GlEmptyState,
   GlLoadingIcon,
@@ -229,7 +229,7 @@ describe('Iterations report', () => {
           });
 
           it(`${canEditIteration ? 'is shown' : 'is hidden'}`, () => {
-            expect(wrapper.find(GlNewDropdown).exists()).toBe(canEditIteration);
+            expect(wrapper.find(GlDropdown).exists()).toBe(canEditIteration);
           });
         },
       );

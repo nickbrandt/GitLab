@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlNewDropdown as GlDropdown, GlNewDropdownItem as GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlNewDropdownItem as GlDropdownItem } from '@gitlab/ui';
 import { __ } from '~/locale';
 
 export default {

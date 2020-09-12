@@ -1,6 +1,6 @@
 <script>
 import {
-  GlNewDropdown as GlDropdown,
+  GlDropdown,
   GlNewDropdownHeader as GlDropdownHeader,
   GlNewDropdownItem as GlDropdownItem,
 } from '@gitlab/ui';

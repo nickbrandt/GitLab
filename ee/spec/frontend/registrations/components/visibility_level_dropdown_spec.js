@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlNewDropdown, GlNewDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlNewDropdownItem } from '@gitlab/ui';
 import Component from 'ee/registrations/components/visibility_level_dropdown.vue';
 
 describe('Visibility Level Dropdown', () => {
@@ -31,7 +31,7 @@ describe('Visibility Level Dropdown', () => {
 
   const hiddenInputValue = () =>
     wrapper.find("input[name='group[visibility_level]']").attributes('value');
-  const dropdownText = () => wrapper.find(GlNewDropdown).props('text');
+  const dropdownText = () => wrapper.find(GlDropdown).props('text');
   const findDropdownItems = () =>
     wrapper.findAll(GlNewDropdownItem).wrappers.map(option => ({
       text: option.text(),

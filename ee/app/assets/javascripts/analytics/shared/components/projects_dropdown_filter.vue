@@ -4,7 +4,7 @@ import {
   GlIcon,
   GlLoadingIcon,
   GlAvatar,
-  GlNewDropdown as GlDropdown,
+  GlDropdown,
   GlNewDropdownHeader as GlDropdownHeader,
   GlNewDropdownItem as GlDropdownItem,
   GlSearchBoxByType,

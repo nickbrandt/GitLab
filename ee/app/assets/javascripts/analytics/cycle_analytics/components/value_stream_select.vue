@@ -2,7 +2,7 @@
 import {
   GlAlert,
   GlButton,
-  GlNewDropdown as GlDropdown,
+  GlDropdown,
   GlNewDropdownItem as GlDropdownItem,
   GlNewDropdownDivider as GlDropdownDivider,
   GlForm,

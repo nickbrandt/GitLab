@@ -1,7 +1,7 @@
 <script>
 import { debounce } from 'lodash';
 import {
-  GlNewDropdown,
+  GlDropdown,
   GlNewDropdownDivider,
   GlNewDropdownItem,
   GlIcon,
@@ -14,7 +14,7 @@ import { deprecatedCreateFlash as createFlash } from '~/flash';
 
 export default {
   components: {
-    GlNewDropdown,
+    GlDropdown,
     GlNewDropdownDivider,
     GlNewDropdownItem,
     GlSearchBoxByType,
@@ -70,7 +70,7 @@ export default {
 };
 </script>
 <template>
-  <gl-new-dropdown class="js-new-environments-dropdown" @shown="setFocus">
+  <gl-dropdown class="js-new-environments-dropdown" @shown="setFocus">
     <template #button-content>
       <span class="d-md-none mr-1">
         {{ $options.translations.addEnvironmentsLabel }}
@@ -102,5 +102,5 @@ export default {
         {{ createEnvironmentLabel }}
       </gl-new-dropdown-item>
     </template>
-  </gl-new-dropdown>
+  </gl-dropdown>
 </template>

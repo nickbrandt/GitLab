@@ -2,7 +2,7 @@
 import {
   GlButton,
   GlLink,
-  GlNewDropdown,
+  GlDropdown,
   GlNewDropdownItem,
   GlSearchBoxByType,
   GlNewDropdownHeader,
@@ -24,7 +24,7 @@ export default {
   components: {
     GlButton,
     GlLink,
-    GlNewDropdown,
+    GlDropdown,
     GlNewDropdownItem,
     GlSearchBoxByType,
     GlNewDropdownHeader,
@@ -186,7 +186,7 @@ export default {
         ><strong>{{ iterationTitle }}</strong></gl-link
       >
     </div>
-    <gl-new-dropdown
+    <gl-dropdown
       v-show="editing"
       ref="newDropdown"
       data-toggle="dropdown"
@@ -206,6 +206,6 @@ export default {
         @click="setIteration(iterationItem.id)"
         >{{ iterationItem.title }}</gl-new-dropdown-item
       >
-    </gl-new-dropdown>
+    </gl-dropdown>
   </div>
 </template>
