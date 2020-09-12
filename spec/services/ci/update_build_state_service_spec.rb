@@ -74,7 +74,9 @@ RSpec.describe Ci::UpdateBuildStateService do
   end
 
   context 'when build has a checksum' do
-    let(:params) { { checksum: 'crc32:12345678', state: 'success' } }
+    let(:params) do
+      { checksum: 'crc32:12345678', state: 'failed', failure_reason: 'script_failure' }
+    end
 
     context 'when build trace has been migrated' do
       before do
@@ -84,7 +86,7 @@ RSpec.describe Ci::UpdateBuildStateService do
       it 'updates a build state' do
         subject.execute
 
-        expect(build).to be_success
+        expect(build).to be_failed
       end
 
       it 'responds with 200 OK status' do
@@ -133,6 +135,72 @@ RSpec.describe Ci::UpdateBuildStateService do
         expect(metrics)
           .to have_received(:increment_trace_operation)
           .with(operation: :accepted)
+      end
+
+      it 'creates a pending state record' do
+        subject.execute
+
+        build.pending_state.then do |status|
+          expect(status).to be_present
+          expect(status.state).to eq 'failed'
+          expect(status.trace_checksum).to eq 'crc32:12345678'
+          expect(status.failure_reason).to eq 'script_failure'
+        end
+      end
+
+      context 'when build pending state is outdated' do
+        before do
+          build.create_pending_state(
+            state: 'failed',
+            trace_checksum: 'crc32:12345678',
+            failure_reason: 'script_failure',
+            created_at: 10.minutes.ago
+          )
+        end
+
+        it 'responds with 200 OK' do
+          result = subject.execute
+
+          expect(result.status).to eq 200
+        end
+
+        it 'updates build state' do
+          subject.execute
+
+          expect(build.reload).to be_failed
+          expect(build.failure_reason).to eq 'script_failure'
+        end
+
+        it 'increments discarded traces metric' do
+          subject.execute
+
+          expect(metrics)
+            .to have_received(:increment_trace_operation)
+            .with(operation: :discarded)
+        end
+      end
+
+      context 'when build pending state has changes' do
+        before do
+          build.create_pending_state(
+            state: 'success',
+            created_at: 10.minutes.ago
+          )
+        end
+
+        it 'uses stored state and responds with 200 OK' do
+          result = subject.execute
+
+          expect(result.status).to eq 200
+        end
+
+        it 'increments flaky trace metric' do
+          subject.execute
+
+          expect(metrics)
+            .to have_received(:increment_trace_operation)
+            .with(operation: :flaky)
+        end
       end
 
       context 'when live traces are disabled' do
