@@ -5,7 +5,7 @@ import {
   GlDropdown,
   GlNewDropdownItem,
   GlNewDropdownHeader,
-  GlNewDropdownDivider,
+  GlDropdownDivider,
   GlSearchBoxByType,
   GlModalDirective,
 } from '@gitlab/ui';
@@ -20,7 +20,7 @@ export default {
     GlDropdown,
     GlNewDropdownItem,
     GlNewDropdownHeader,
-    GlNewDropdownDivider,
+    GlDropdownDivider,
     GlSearchBoxByType,
   },
   directives: {
@@ -101,7 +101,7 @@ export default {
             <gl-icon class="text-muted gl-flex-shrink-0 gl-ml-3 gl-align-self-center" name="star" />
           </div>
         </gl-new-dropdown-item>
-        <gl-new-dropdown-divider
+        <gl-dropdown-divider
           v-if="starredDashboards.length && nonStarredDashboards.length"
           ref="starredListDivider"
         />

@@ -4,7 +4,7 @@ import {
   GlButton,
   GlDropdown,
   GlNewDropdownItem as GlDropdownItem,
-  GlNewDropdownDivider as GlDropdownDivider,
+  GlDropdownDivider,
   GlForm,
   GlFormInput,
   GlFormGroup,

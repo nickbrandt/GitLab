@@ -6,7 +6,7 @@ import {
   GlNewDropdownHeader,
   GlNewDropdownItem,
   GlSearchBoxByType,
-  GlNewDropdownDivider,
+  GlDropdownDivider,
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { redirectTo } from '~/lib/utils/url_utility';
@@ -22,7 +22,7 @@ export default {
     GlNewDropdownHeader,
     GlNewDropdownItem,
     GlSearchBoxByType,
-    GlNewDropdownDivider,
+    GlDropdownDivider,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -116,7 +116,7 @@ export default {
       <gl-new-dropdown-header>
         {{ __('Search by author') }}
       </gl-new-dropdown-header>
-      <gl-new-dropdown-divider />
+      <gl-dropdown-divider />
       <gl-search-box-by-type
         v-model.trim="authorInput"
         class="gl-m-3"
@@ -126,7 +126,7 @@ export default {
       <gl-new-dropdown-item :is-checked="!currentAuthor" @click="selectAuthor(null)">
         {{ __('Any Author') }}
       </gl-new-dropdown-item>
-      <gl-new-dropdown-divider />
+      <gl-dropdown-divider />
       <gl-new-dropdown-item
         v-for="author in commitsAuthors"
         :key="author.id"

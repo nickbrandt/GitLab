@@ -1,7 +1,7 @@
 <script>
 import {
   GlDropdown,
-  GlNewDropdownDivider,
+  GlDropdownDivider,
   GlNewDropdownHeader,
   GlNewDropdownItem,
   GlLoadingIcon,
@@ -18,7 +18,7 @@ const SEARCH_DEBOUNCE_MS = 250;
 export default {
   components: {
     GlDropdown,
-    GlNewDropdownDivider,
+    GlDropdownDivider,
     GlNewDropdownHeader,
     GlNewDropdownItem,
     GlLoadingIcon,
@@ -200,7 +200,7 @@ export default {
       <span class="text-center d-block">{{ $options.translations.selectMilestone }}</span>
     </gl-new-dropdown-header>
 
-    <gl-new-dropdown-divider />
+    <gl-dropdown-divider />
 
     <gl-search-box-by-type
       ref="searchBox"
@@ -217,17 +217,17 @@ export default {
       </span>
     </gl-new-dropdown-item>
 
-    <gl-new-dropdown-divider />
+    <gl-dropdown-divider />
 
     <template v-if="isLoading">
       <gl-loading-icon />
-      <gl-new-dropdown-divider />
+      <gl-dropdown-divider />
     </template>
     <template v-else-if="noResults">
       <div class="dropdown-item-space">
         <span ref="noResults" class="pl-4">{{ $options.translations.noResultsLabel }}</span>
       </div>
-      <gl-new-dropdown-divider />
+      <gl-dropdown-divider />
     </template>
     <template v-else-if="dropdownItems.length">
       <gl-new-dropdown-item
@@ -240,7 +240,7 @@ export default {
           {{ item }}
         </span>
       </gl-new-dropdown-item>
-      <gl-new-dropdown-divider />
+      <gl-dropdown-divider />
     </template>
 
     <gl-new-dropdown-item v-for="(item, idx) in extraLinks" :key="idx" :href="item.url">
