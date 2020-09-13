@@ -3,18 +3,18 @@
 require 'spec_helper'
 
 RSpec.describe Issues::CreateService do
-  let(:project) { create(:project) }
-  let(:user) { create(:user) }
+  let_it_be_with_reload(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
 
   describe '#execute' do
+    let_it_be(:assignee) { create(:user) }
+    let_it_be(:milestone) { create(:milestone, project: project) }
     let(:issue) { described_class.new(project, user, opts).execute }
-    let(:assignee) { create(:user) }
-    let(:milestone) { create(:milestone, project: project) }
 
     context 'when params are valid' do
-      let(:labels) { create_pair(:label, project: project) }
+      let_it_be(:labels) { create_pair(:label, project: project) }
 
-      before do
+      before_all do
         project.add_maintainer(user)
         project.add_maintainer(assignee)
       end
@@ -66,9 +66,9 @@ RSpec.describe Issues::CreateService do
       end
 
       context 'when current user cannot admin issues in the project' do
-        let(:guest) { create(:user) }
+        let_it_be(:guest) { create(:user) }
 
-        before do
+        before_all do
           project.add_guest(guest)
         end
 
@@ -263,7 +263,7 @@ RSpec.describe Issues::CreateService do
 
     context 'issue create service' do
       context 'assignees' do
-        before do
+        before_all do
           project.add_maintainer(user)
         end
 
@@ -329,7 +329,7 @@ RSpec.describe Issues::CreateService do
           }
         end
 
-        before do
+        before_all do
           project.add_maintainer(user)
           project.add_maintainer(assignee)
         end
@@ -343,11 +343,11 @@ RSpec.describe Issues::CreateService do
     end
 
     context 'resolving discussions' do
-      let(:discussion) { create(:diff_note_on_merge_request).to_discussion }
-      let(:merge_request) { discussion.noteable }
-      let(:project) { merge_request.source_project }
+      let_it_be(:discussion) { create(:diff_note_on_merge_request).to_discussion }
+      let_it_be(:merge_request) { discussion.noteable }
+      let_it_be(:project) { merge_request.source_project }
 
-      before do
+      before_all do
         project.add_maintainer(user)
       end
 
