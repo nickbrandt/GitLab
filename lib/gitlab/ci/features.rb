@@ -66,6 +66,10 @@ module Gitlab
       def self.new_artifact_file_reader_enabled?(project)
         ::Feature.enabled?(:ci_new_artifact_file_reader, project, default_enabled: true)
       end
+
+      def self.one_dimensional_matrix_enabled?
+        ::Feature.enabled?(:one_dimensional_matrix, default_enabled: false)
+      end
     end
   end
 end
