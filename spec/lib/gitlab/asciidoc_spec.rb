@@ -462,6 +462,29 @@ module Gitlab
           expect(render(input, context)).to include(output.strip)
         end
       end
+
+      context 'with Kroki enabled' do
+        before do
+          allow_any_instance_of(ApplicationSetting).to receive(:kroki_enabled).and_return(true)
+          allow_any_instance_of(ApplicationSetting).to receive(:kroki_url).and_return('https://kroki.io')
+        end
+        it 'converts a graphviz diagram to image' do
+          input = <<~ADOC
+            [graphviz]
+            ....
+            digraph G {
+              Hello->World
+            }
+            ....
+          ADOC
+
+          output = <<~HTML
+            <div><a class="no-attachment-icon" href="https://kroki.io/graphviz/svg/eNpLyUwvSizIUHBXqOZSUPBIzcnJ17ULzy_KSeGqBQCEzQka" target="_blank" rel="noopener noreferrer"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="lazy" data-src="https://kroki.io/graphviz/svg/eNpLyUwvSizIUHBXqOZSUPBIzcnJ17ULzy_KSeGqBQCEzQka"></a></div>
+          HTML
+
+          expect(render(input, context)).to include(output.strip)
+        end
+      end
     end
 
     context 'with project' do

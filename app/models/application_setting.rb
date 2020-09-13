@@ -128,6 +128,10 @@ class ApplicationSetting < ApplicationRecord
             presence: true,
             if: :unique_ips_limit_enabled
 
+  validates :kroki_url,
+            presence: true,
+            if: :kroki_enabled
+
   validates :plantuml_url,
             presence: true,
             if: :plantuml_enabled

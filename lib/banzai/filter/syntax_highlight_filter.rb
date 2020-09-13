@@ -14,7 +14,7 @@ module Banzai
       LANG_PARAMS_ATTR = 'data-lang-params'
 
       def call
-        doc.search('pre:not([data-math-style]):not([data-mermaid-style]) > code').each do |node|
+        doc.search('pre:not([data-math-style]):not([data-mermaid-style]):not([data-kroki-style]) > code').each do |node|
           highlight_node(node)
         end
 
@@ -86,7 +86,7 @@ module Banzai
       end
 
       def use_rouge?(language)
-        %w(math mermaid plantuml suggestion).exclude?(language)
+        (%w(math suggestion) + ::Gitlab::Kroki::DIAGRAM_TYPES).exclude?(language)
       end
     end
   end

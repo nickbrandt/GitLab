@@ -48,6 +48,12 @@ module Gitlab
       extensions = proc do
         include_processor ::Gitlab::Asciidoc::IncludeProcessor.new(context)
         block ::Gitlab::Asciidoc::MermaidBlockProcessor
+
+        if Gitlab::CurrentSettings.kroki_enabled
+          ::Gitlab::Kroki::DIAGRAM_TYPES.each do |name|
+            block ::Gitlab::Asciidoc::KrokiBlockProcessor, name
+          end
+        end
       end
 
       extra_attrs = path_attrs(context[:requested_path])
