@@ -5,16 +5,9 @@ require 'spec_helper'
 RSpec.describe ProjectPolicy do
   include ExternalAuthorizationServiceHelpers
   include AdminModeHelper
+  include_context 'ProjectPolicy context'
 
-  let_it_be(:owner) { create(:user) }
-  let_it_be(:admin) { create(:admin) }
-  let_it_be(:maintainer) { create(:user) }
-  let_it_be(:developer) { create(:user) }
-  let_it_be(:reporter) { create(:user) }
-  let_it_be(:guest) { create(:user) }
-  let_it_be(:non_member) { create(:user) }
-  let_it_be(:project, refind: true) { create(:project, :public, namespace: owner.namespace) }
-  let_it_be(:private_project, refind: true) { create(:project, :private, namespace: owner.namespace) }
+  let(:project) { public_project }
 
   subject { described_class.new(current_user, project) }
 
@@ -22,21 +15,7 @@ RSpec.describe ProjectPolicy do
     stub_licensed_features(license_scanning: true)
   end
 
-  before_all do
-    project.add_maintainer(maintainer)
-    project.add_developer(developer)
-    project.add_reporter(reporter)
-    project.add_guest(guest)
-
-    private_project.add_maintainer(maintainer)
-    private_project.add_developer(developer)
-    private_project.add_reporter(reporter)
-    private_project.add_guest(guest)
-  end
-
   context 'basic permissions' do
-    include_context 'ProjectPolicy context'
-
     let(:additional_reporter_permissions) do
       %i[read_software_license_policy]
     end
@@ -178,7 +157,7 @@ RSpec.describe ProjectPolicy do
       end
 
       context 'when user is logged out' do
-        let(:current_user) { nil }
+        let(:current_user) { anonymous }
 
         it { is_expected.to be_allowed(:read_iteration) }
         it { is_expected.to be_disallowed(:create_iteration, :admin_iteration) }
@@ -194,7 +173,7 @@ RSpec.describe ProjectPolicy do
         end
 
         context 'when user is logged out' do
-          let(:current_user) { nil }
+          let(:current_user) { anonymous }
 
           it { is_expected.to be_disallowed(:read_iteration, :create_iteration, :admin_iteration) }
         end
@@ -207,8 +186,7 @@ RSpec.describe ProjectPolicy do
 
     context 'when the feature is disabled' do
       before do
-        project.issues_enabled = false
-        project.save!
+        project.update!(issues_enabled: false)
       end
 
       it 'disables boards permissions' do
@@ -512,7 +490,7 @@ RSpec.describe ProjectPolicy do
       end
 
       context 'with anonymous' do
-        let(:current_user) { nil }
+        let(:current_user) { anonymous }
 
         it { is_expected.to be_disallowed(permission) }
       end
@@ -595,7 +573,7 @@ RSpec.describe ProjectPolicy do
       end
 
       context 'with anonymous' do
-        let(:current_user) { nil }
+        let(:current_user) { anonymous }
 
         it { is_expected.to be_disallowed(:read_threat_monitoring) }
       end
@@ -735,7 +713,7 @@ RSpec.describe ProjectPolicy do
     end
 
     context 'with anonymous' do
-      let(:current_user) { nil }
+      let(:current_user) { anonymous }
 
       it { is_expected.to be_disallowed(:admin_software_license_policy) }
     end
@@ -763,7 +741,7 @@ RSpec.describe ProjectPolicy do
         let(:current_user) { create(:user) }
 
         context 'with public access to repository' do
-          let(:project) { create(:project, :public) }
+          let(:project) { public_project }
 
           it { is_expected.to be_allowed(:read_dependencies) }
         end
@@ -827,7 +805,7 @@ RSpec.describe ProjectPolicy do
         end
 
         context 'with anonymous' do
-          let(:current_user) { nil }
+          let(:current_user) { anonymous }
 
           it { is_expected.to be_disallowed(:read_dependencies) }
         end
@@ -887,7 +865,7 @@ RSpec.describe ProjectPolicy do
         end
 
         context 'with anonymous' do
-          let(:current_user) { nil }
+          let(:current_user) { anonymous }
 
           it { is_expected.to be_disallowed(:read_licenses) }
         end
@@ -906,7 +884,6 @@ RSpec.describe ProjectPolicy do
   end
 
   describe 'publish_status_page' do
-    let(:anonymous) { nil }
     let(:feature) { :status_page }
     let(:policy) { :publish_status_page }
 
@@ -1152,7 +1129,7 @@ RSpec.describe ProjectPolicy do
     end
 
     context 'with anonymous' do
-      let(:current_user) { nil }
+      let(:current_user) { anonymous }
 
       it { is_expected.to be_disallowed(:read_group_timelogs) }
     end
