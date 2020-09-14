@@ -515,6 +515,14 @@
   :weight: 3
   :idempotent:
   :tags: []
+- :name: security_scans:security_store_scans
+  :feature_category: :static_application_security_testing
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 2
+  :idempotent:
+  :tags: []
 - :name: security_scans:store_security_reports
   :feature_category: :static_application_security_testing
   :has_external_dependencies:
