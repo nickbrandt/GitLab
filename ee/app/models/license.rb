@@ -197,6 +197,14 @@ class License < ApplicationRecord
     usage_quotas
   ].freeze
 
+  ACTIVE_USER_COUNT_THRESHOLD_LEVELS = [
+    { range: (2..15), percentage: false, value: 1 },
+    { range: (16..25), percentage: false, value: 2 },
+    { range: (26..99), percentage: true, value: 10 },
+    { range: (100..999), percentage: true, value: 8 },
+    { range: (1000..nil), percentage: true, value: 5 }
+  ].freeze
+
   validate :valid_license
   validate :check_users_limit, if: :new_record?, unless: :validate_with_trueup?
   validate :check_trueup, unless: :persisted?, if: :validate_with_trueup?
@@ -470,6 +478,28 @@ class License < ApplicationRecord
 
   def auto_renew
     false
+  end
+
+  def active_user_count_threshold
+    ACTIVE_USER_COUNT_THRESHOLD_LEVELS.find do |threshold|
+      threshold[:range].include?(restricted_user_count)
+    end
+  end
+
+  def active_user_count_threshold_reached?
+    return false if restricted_user_count.nil?
+    return false if current_active_users_count <= 1
+    return false if current_active_users_count > restricted_user_count
+
+    active_user_count_threshold[:value] >= if active_user_count_threshold[:percentage]
+                                             remaining_user_count.fdiv(current_active_users_count) * 100
+                                           else
+                                             remaining_user_count
+                                           end
+  end
+
+  def remaining_user_count
+    restricted_user_count - current_active_users_count
   end
 
   private
