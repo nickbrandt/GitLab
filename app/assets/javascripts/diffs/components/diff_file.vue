@@ -3,13 +3,14 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import { escape } from 'lodash';
 import { GlButton, GlLoadingIcon, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { __, sprintf } from '~/locale';
+import { sprintf } from '~/locale';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { hasDiff } from '~/helpers/diffs_helper';
 import eventHub from '../../notes/event_hub';
 import DiffFileHeader from './diff_file_header.vue';
 import DiffContent from './diff_content.vue';
 import { diffViewerErrors } from '~/ide/constants';
+import { GENERIC_ERROR, DIFF_FILE } from '../i18n';
 
 export default {
   components: {
@@ -22,6 +23,10 @@ export default {
     SafeHtml,
   },
   mixins: [glFeatureFlagsMixin()],
+  i18n: {
+    genericError: GENERIC_ERROR,
+    ...DIFF_FILE,
+  },
   props: {
     file: {
       type: Object,
@@ -54,7 +59,7 @@ export default {
     ...mapGetters('diffs', ['getDiffFileDiscussions']),
     viewBlobLink() {
       return sprintf(
-        __('You can %{linkStart}view the blob%{linkEnd} instead.'),
+        this.$options.i18n.blobView,
         {
           linkStart: `<a href="${escape(this.file.view_path)}">`,
           linkEnd: '</a>',
@@ -76,9 +81,7 @@ export default {
     },
     forkMessage() {
       return sprintf(
-        __(
-          "You're not allowed to %{tag_start}edit%{tag_end} files in this project directly. Please fork this project, make your changes there, and submit a merge request.",
-        ),
+        this.$options.i18n.editInFork,
         {
           tag_start: '<span class="js-file-fork-suggestion-section-action">',
           tag_end: '</span>',
@@ -149,7 +152,7 @@ export default {
         })
         .catch(() => {
           this.isLoadingCollapsedDiff = false;
-          createFlash(__('Something went wrong on our end. Please try again!'));
+          createFlash(this.$options.i18n.genericError);
         });
     },
     showForkMessage() {
@@ -189,14 +192,14 @@ export default {
       <a
         :href="file.fork_path"
         class="js-fork-suggestion-button btn btn-grouped btn-inverted btn-success"
-        >{{ __('Fork') }}</a
+        >{{ $options.i18n.fork }}</a
       >
       <button
         class="js-cancel-fork-suggestion-button btn btn-grouped"
         type="button"
         @click="hideForkMessage"
       >
-        {{ __('Cancel') }}
+        {{ $options.i18n.cancel }}
       </button>
     </div>
     <gl-loading-icon v-if="showLoadingIcon" class="diff-content loading" />
@@ -208,14 +211,14 @@ export default {
         <template v-else>
           <div v-show="isCollapsed" class="gl-p-7 gl-text-center collapsed-file-warning">
             <p class="gl-mb-8 gl-mt-5">
-              {{ __('This file is collapsed.') }}
+              {{ $options.i18n.collapsed }}
             </p>
             <gl-button
               class="gl-alert-action gl-mb-5"
               data-testid="expandButton"
               @click="handleToggle"
             >
-              {{ __('Expand file') }}
+              {{ $options.i18n.expand }}
             </gl-button>
           </div>
           <diff-content
