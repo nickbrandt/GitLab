@@ -93,6 +93,13 @@
               = _('Maximum concurrency of Elasticsearch bulk requests per indexing operation.')
               = _('This only applies to repository indexing operations.')
 
+          .form-group
+            = f.label :elasticsearch_client_request_timeout, _('Client request timeout'), class: 'label-bold'
+            = f.number_field :elasticsearch_client_request_timeout, value: @application_setting.elasticsearch_client_request_timeout, class: 'form-control'
+            .form-text.text-muted
+              = _('Elasticsearch HTTP client timeout value in seconds.')
+              = _('Setting this to 0 means using the system default timeout value.')
+
         .sub-section
           %h4= _('Elasticsearch zero-downtime reindexing')
           = link_to _('Trigger cluster reindexing'), admin_elasticsearch_trigger_reindexing_path, class: 'btn btn-success', method: :post, disabled: @elasticsearch_reindexing_task&.in_progress?
