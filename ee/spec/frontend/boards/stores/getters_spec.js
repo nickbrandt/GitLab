@@ -1,6 +1,7 @@
 import getters from 'ee/boards/stores/getters';
 import {
   mockIssue,
+  mockIssue2,
   mockIssue3,
   mockIssue4,
   mockIssues,
@@ -13,6 +14,16 @@ describe('EE Boards Store Getters', () => {
     issuesByListId: mockIssuesByListId,
     issues,
   };
+
+  describe('getIssues', () => {
+    it('returns issues for a given listId', () => {
+      const getIssueById = issueId => [mockIssue, mockIssue2].find(({ id }) => id === issueId);
+
+      expect(getters.getIssues(boardsState, { getIssueById })('gid://gitlab/List/2')).toEqual(
+        mockIssues,
+      );
+    });
+  });
 
   describe('getIssuesByEpic', () => {
     it('returns issues for a given listId and epicId', () => {
