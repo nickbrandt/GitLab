@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,7 +38,7 @@ func TestFixRemoteAddr(t *testing.T) {
 
 		FixRemoteAddr(req)
 
-		assert.Equal(t, tc.expected, req.RemoteAddr)
+		require.Equal(t, tc.expected, req.RemoteAddr)
 	}
 }
 
@@ -92,8 +91,8 @@ func TestReadRequestBody(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/test", bytes.NewBuffer(data))
 
 	result, err := ReadRequestBody(rw, req, 1000)
-	assert.NoError(t, err)
-	assert.Equal(t, data, result)
+	require.NoError(t, err)
+	require.Equal(t, data, result)
 }
 
 func TestReadRequestBodyLimit(t *testing.T) {
@@ -102,7 +101,7 @@ func TestReadRequestBodyLimit(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/test", bytes.NewBuffer(data))
 
 	_, err := ReadRequestBody(rw, req, 2)
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 func TestCloneRequestWithBody(t *testing.T) {
@@ -111,26 +110,26 @@ func TestCloneRequestWithBody(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/test", bytes.NewBuffer(input))
 	newReq := CloneRequestWithNewBody(req, newInput)
 
-	assert.NotEqual(t, req, newReq)
-	assert.NotEqual(t, req.Body, newReq.Body)
-	assert.NotEqual(t, len(newInput), newReq.ContentLength)
+	require.NotEqual(t, req, newReq)
+	require.NotEqual(t, req.Body, newReq.Body)
+	require.NotEqual(t, len(newInput), newReq.ContentLength)
 
 	var buffer bytes.Buffer
 	io.Copy(&buffer, newReq.Body)
-	assert.Equal(t, newInput, buffer.Bytes())
+	require.Equal(t, newInput, buffer.Bytes())
 }
 
 func TestApplicationJson(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/test", nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	assert.True(t, IsApplicationJson(req), "expected to match 'application/json' as 'application/json'")
+	require.True(t, IsApplicationJson(req), "expected to match 'application/json' as 'application/json'")
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	assert.True(t, IsApplicationJson(req), "expected to match 'application/json; charset=utf-8' as 'application/json'")
+	require.True(t, IsApplicationJson(req), "expected to match 'application/json; charset=utf-8' as 'application/json'")
 
 	req.Header.Set("Content-Type", "text/plain")
-	assert.False(t, IsApplicationJson(req), "expected not to match 'text/plain' as 'application/json'")
+	require.False(t, IsApplicationJson(req), "expected not to match 'text/plain' as 'application/json'")
 }
 
 func TestFail500WorksWithNils(t *testing.T) {
@@ -140,8 +139,8 @@ func TestFail500WorksWithNils(t *testing.T) {
 
 	Fail500(w, nil, nil)
 
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
-	assert.Equal(t, "Internal server error\n", body.String())
+	require.Equal(t, http.StatusInternalServerError, w.Code)
+	require.Equal(t, "Internal server error\n", body.String())
 }
 
 func TestLogError(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/rafaeljusto/redigomock"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -16,12 +16,12 @@ import (
 func mockRedisServer(t *testing.T, connectReceived *bool) string {
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 
-	assert.Nil(t, err)
+	require.Nil(t, err)
 
 	go func() {
 		defer ln.Close()
 		conn, err := ln.Accept()
-		assert.Nil(t, err)
+		require.Nil(t, err)
 		*connectReceived = true
 		conn.Write([]byte("OK\n"))
 	}()
@@ -68,10 +68,10 @@ func TestDefaultDialFunc(t *testing.T) {
 			dialer := DefaultDialFunc(cfg, true)
 			conn, err := dialer()
 
-			assert.Nil(t, err)
+			require.Nil(t, err)
 			conn.Receive()
 
-			assert.True(t, connectReceived)
+			require.True(t, connectReceived)
 		})
 	}
 }
@@ -79,17 +79,18 @@ func TestDefaultDialFunc(t *testing.T) {
 func TestConfigureNoConfig(t *testing.T) {
 	pool = nil
 	Configure(nil, nil)
-	assert.Nil(t, pool, "Pool should be nil")
+	require.Nil(t, pool, "Pool should be nil")
 }
 
 func TestConfigureMinimalConfig(t *testing.T) {
 	cfg := &config.RedisConfig{URL: config.TomlURL{}, Password: ""}
 	Configure(cfg, DefaultDialFunc)
-	if assert.NotNil(t, pool, "Pool should not be nil") {
-		assert.Equal(t, 1, pool.MaxIdle)
-		assert.Equal(t, 1, pool.MaxActive)
-		assert.Equal(t, 3*time.Minute, pool.IdleTimeout)
-	}
+
+	require.NotNil(t, pool, "Pool should not be nil")
+	require.Equal(t, 1, pool.MaxIdle)
+	require.Equal(t, 1, pool.MaxActive)
+	require.Equal(t, 3*time.Minute, pool.IdleTimeout)
+
 	pool = nil
 }
 
@@ -104,24 +105,25 @@ func TestConfigureFullConfig(t *testing.T) {
 		ReadTimeout: &r,
 	}
 	Configure(cfg, DefaultDialFunc)
-	if assert.NotNil(t, pool, "Pool should not be nil") {
-		assert.Equal(t, i, pool.MaxIdle)
-		assert.Equal(t, a, pool.MaxActive)
-		assert.Equal(t, 3*time.Minute, pool.IdleTimeout)
-	}
+
+	require.NotNil(t, pool, "Pool should not be nil")
+	require.Equal(t, i, pool.MaxIdle)
+	require.Equal(t, a, pool.MaxActive)
+	require.Equal(t, 3*time.Minute, pool.IdleTimeout)
+
 	pool = nil
 }
 
 func TestGetConnFail(t *testing.T) {
 	conn := Get()
-	assert.Nil(t, conn, "Expected `conn` to be nil")
+	require.Nil(t, conn, "Expected `conn` to be nil")
 }
 
 func TestGetConnPass(t *testing.T) {
 	_, teardown := setupMockPool()
 	defer teardown()
 	conn := Get()
-	assert.NotNil(t, conn, "Expected `conn` to be non-nil")
+	require.NotNil(t, conn, "Expected `conn` to be non-nil")
 }
 
 func TestGetStringPass(t *testing.T) {
@@ -129,22 +131,22 @@ func TestGetStringPass(t *testing.T) {
 	defer teardown()
 	conn.Command("GET", "foobar").Expect("baz")
 	str, err := GetString("foobar")
-	if assert.NoError(t, err, "Expected `err` to be nil") {
-		var value string
-		assert.IsType(t, value, str, "Expected value to be a string")
-		assert.Equal(t, "baz", str, "Expected it to be equal")
-	}
+
+	require.NoError(t, err, "Expected `err` to be nil")
+	var value string
+	require.IsType(t, value, str, "Expected value to be a string")
+	require.Equal(t, "baz", str, "Expected it to be equal")
 }
 
 func TestGetStringFail(t *testing.T) {
 	_, err := GetString("foobar")
-	assert.Error(t, err, "Expected error when not connected to redis")
+	require.Error(t, err, "Expected error when not connected to redis")
 }
 
 func TestSentinelConnNoSentinel(t *testing.T) {
 	s := sentinelConn("", []config.TomlURL{})
 
-	assert.Nil(t, s, "Sentinel without urls should return nil")
+	require.Nil(t, s, "Sentinel without urls should return nil")
 }
 
 func TestSentinelConnDialURL(t *testing.T) {
@@ -173,18 +175,18 @@ func TestSentinelConnDialURL(t *testing.T) {
 			}
 
 			s := sentinelConn("foobar", sentinelUrls)
-			assert.Equal(t, len(addrs), len(s.Addrs))
+			require.Equal(t, len(addrs), len(s.Addrs))
 
 			for i := range addrs {
-				assert.Equal(t, addrs[i], s.Addrs[i])
+				require.Equal(t, addrs[i], s.Addrs[i])
 			}
 
 			conn, err := s.Dial(s.Addrs[0])
 
-			assert.Nil(t, err)
+			require.Nil(t, err)
 			conn.Receive()
 
-			assert.True(t, connectReceived)
+			require.True(t, connectReceived)
 		})
 	}
 }
@@ -199,21 +201,21 @@ func TestSentinelConnTwoURLs(t *testing.T) {
 	}
 
 	s := sentinelConn("foobar", sentinelUrls)
-	assert.Equal(t, len(addrs), len(s.Addrs))
+	require.Equal(t, len(addrs), len(s.Addrs))
 
 	for i := range addrs {
-		assert.Equal(t, addrs[i], s.Addrs[i])
+		require.Equal(t, addrs[i], s.Addrs[i])
 	}
 }
 
 func TestDialOptionsBuildersPassword(t *testing.T) {
 	dopts := dialOptionsBuilder(&config.RedisConfig{Password: "foo"}, false)
-	assert.Equal(t, 1, len(dopts))
+	require.Equal(t, 1, len(dopts))
 }
 
 func TestDialOptionsBuildersSetTimeouts(t *testing.T) {
 	dopts := dialOptionsBuilder(nil, true)
-	assert.Equal(t, 2, len(dopts))
+	require.Equal(t, 2, len(dopts))
 }
 
 func TestDialOptionsBuildersSetTimeoutsConfig(t *testing.T) {
@@ -222,11 +224,11 @@ func TestDialOptionsBuildersSetTimeoutsConfig(t *testing.T) {
 		WriteTimeout: &config.TomlDuration{Duration: time.Second * time.Duration(15)},
 	}
 	dopts := dialOptionsBuilder(cfg, true)
-	assert.Equal(t, 2, len(dopts))
+	require.Equal(t, 2, len(dopts))
 }
 
 func TestDialOptionsBuildersSelectDB(t *testing.T) {
 	db := 3
 	dopts := dialOptionsBuilder(&config.RedisConfig{DB: &db}, false)
-	assert.Equal(t, 1, len(dopts))
+	require.Equal(t, 1, len(dopts))
 }

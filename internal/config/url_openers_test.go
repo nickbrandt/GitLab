@@ -6,7 +6,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gocloud.dev/blob/azureblob"
 )
@@ -110,10 +109,10 @@ func TestTestURLOpenersForParams(t *testing.T) {
 			err := setOptionsFromURLParams(test.query, &o.Options)
 
 			if test.wantErr {
-				assert.NotNil(t, err)
+				require.NotNil(t, err)
 			} else {
-				assert.Nil(t, err)
-				assert.Equal(t, test.wantOpts, o.Options)
+				require.Nil(t, err)
+				require.Equal(t, test.wantOpts, o.Options)
 			}
 		})
 	}
