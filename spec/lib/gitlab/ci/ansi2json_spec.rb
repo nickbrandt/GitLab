@@ -329,6 +329,32 @@ RSpec.describe Gitlab::Ci::Ansi2json do
             ])
         end
       end
+
+      context 'with section options' do
+        let(:option_section_start) { "section_start:#{section_start_time.to_i}:#{section_name}[collapsed=true,unused_option=123]\r\033[0K"}
+
+        it 'provides section options when set' do
+          trace = "#{option_section_start}hello#{section_end}"
+          expect(convert_json(trace)).to eq([
+            {
+              offset: 0,
+              content: [{ text: "hello" }],
+              section: 'prepare-script',
+              section_header: true,
+              section_options: {
+                'collapsed' => 'true',
+                'unused_option' => '123'
+              }
+            },
+            {
+              offset: 83,
+              content: [],
+              section: 'prepare-script',
+              section_duration: '01:03'
+            }
+          ])
+        end
+      end
     end
 
     describe 'incremental updates' do
