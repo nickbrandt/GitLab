@@ -14085,7 +14085,9 @@ ALTER SEQUENCE public.packages_packages_id_seq OWNED BY public.packages_packages
 
 CREATE TABLE public.packages_pypi_metadata (
     package_id bigint NOT NULL,
-    required_python character varying(50) NOT NULL
+    required_python text,
+    CONSTRAINT check_0d9aed55b2 CHECK ((required_python IS NOT NULL)),
+    CONSTRAINT check_379019d5da CHECK ((char_length(required_python) <= 255))
 );
 
 CREATE TABLE public.packages_tags (
