@@ -9,10 +9,11 @@ import {
   GlNewDropdownItem as GlDropdownItem,
   GlTooltipDirective,
 } from '@gitlab/ui';
-import { n__, s__, sprintf } from '~/locale';
 import { mergeUrlParams, webIDEUrl } from '~/lib/utils/url_utility';
+import { n__, s__, sprintf } from '~/locale';
 import clipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
+import MrWebIdeButton from '~/vue_shared/components/mr_web_ide_button.vue';
 import MrWidgetIcon from './mr_widget_icon.vue';
 
 export default {
@@ -20,6 +21,7 @@ export default {
   components: {
     clipboardButton,
     TooltipOnTruncate,
+    MrWebIdeButton,
     MrWidgetIcon,
     GlButton,
     GlDropdown,
@@ -62,26 +64,15 @@ export default {
       });
     },
     webIdePath() {
-      if (this.mr.canPushToSourceBranch) {
-        return mergeUrlParams(
-          {
-            target_project:
-              this.mr.sourceProjectFullPath !== this.mr.targetProjectFullPath
-                ? this.mr.targetProjectFullPath
-                : '',
-          },
-          webIDEUrl(`/${this.mr.sourceProjectFullPath}/merge_requests/${this.mr.iid}`),
-        );
-      }
-
-      return null;
-    },
-    ideButtonTitle() {
-      return !this.mr.canPushToSourceBranch
-        ? s__(
-            'mrWidget|You are not allowed to edit this project directly. Please fork to make changes.',
-          )
-        : '';
+      return mergeUrlParams(
+        {
+          target_project:
+            this.mr.sourceProjectFullPath !== this.mr.targetProjectFullPath
+              ? this.mr.targetProjectFullPath
+              : '',
+        },
+        webIDEUrl(`/${this.mr.sourceProjectFullPath}/merge_requests/${this.mr.iid}`),
+      );
     },
   },
   mounted() {
@@ -133,24 +124,14 @@ export default {
 
       <div class="branch-actions d-flex">
         <template v-if="mr.isOpen">
-          <span
+          <mr-web-ide-button
             v-if="!mr.sourceBranchRemoved"
-            v-gl-tooltip
-            :title="ideButtonTitle"
+            :path="webIdePath"
+            :disabled="!mr.canPushToSourceBranch"
             class="gl-display-none d-md-inline-block gl-mr-3"
-            :tabindex="!mr.canPushToSourceBranch ? 0 : null"
           >
-            <gl-button
-              :href="webIdePath"
-              :disabled="!mr.canPushToSourceBranch"
-              class="js-web-ide"
-              tabindex="0"
-              role="button"
-              data-qa-selector="open_in_web_ide_button"
-            >
-              {{ s__('mrWidget|Open in Web IDE') }}
-            </gl-button>
-          </span>
+            {{ s__('mrWidget|Open in Web IDE') }}
+          </mr-web-ide-button>
           <gl-button
             :disabled="mr.sourceBranchRemoved"
             data-target="#modal_merge_info"
