@@ -6,7 +6,10 @@ describe('Alert Handler', () => {
   const BANNER_CLASS = 'gl-banner';
   const CLOSE_LABEL = 'Dismiss';
 
-  const generateHtml = parentClass => `<div class="${parentClass}"><button aria-label="${CLOSE_LABEL}">Dismiss</button></div>`;
+  const generateHtml = parentClass =>
+    `<div class="${parentClass}">
+      <button aria-label="${CLOSE_LABEL}">Dismiss</button>
+    </div>`;
 
   const findFirstAlert = () => document.querySelector(`.${ALERT_CLASS}`);
   const findFirstBanner = () => document.querySelector(`.${BANNER_CLASS}`);
@@ -60,6 +63,6 @@ describe('Alert Handler', () => {
         findFirstCloseButton().click();
         expect(findFirstBanner()).not.toExist();
       });
-    })
+    });
   });
 });
