@@ -44,7 +44,7 @@ RSpec.describe 'Group navbar' do
       insert_after_sub_nav_item(
         _('Contribution'),
         within: _('Analytics'),
-        new_sub_nav_item_name: _('Merge Requests')
+        new_sub_nav_item_name: _('Merge Request')
       )
 
       visit group_path(group)
