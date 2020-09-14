@@ -21,7 +21,6 @@ RSpec.describe Admin::CredentialsController do
         end
 
         it_behaves_like 'tracking unique visits', :index do
-          let(:request_params) { {} }
           let(:target_id) { 'i_compliance_credential_inventory' }
         end
 
