@@ -6,7 +6,7 @@ import {
   GlAvatar,
   GlDropdown,
   GlNewDropdownHeader as GlDropdownHeader,
-  GlNewDropdownItem as GlDropdownItem,
+  GlDropdownItem,
   GlSearchBoxByType,
 } from '@gitlab/ui';
 import { n__, s__, __ } from '~/locale';

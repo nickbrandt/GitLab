@@ -3,7 +3,7 @@ import {
   GlButton,
   GlLink,
   GlDropdown,
-  GlNewDropdownItem,
+  GlDropdownItem,
   GlSearchBoxByType,
   GlNewDropdownHeader,
   GlIcon,
@@ -25,7 +25,7 @@ export default {
     GlButton,
     GlLink,
     GlDropdown,
-    GlNewDropdownItem,
+    GlDropdownItem,
     GlSearchBoxByType,
     GlNewDropdownHeader,
     GlIcon,
@@ -199,13 +199,13 @@ export default {
         __('Assign Iteration')
       }}</gl-new-dropdown-header>
       <gl-search-box-by-type ref="search" v-model="searchTerm" class="gl-m-3" />
-      <gl-new-dropdown-item
+      <gl-dropdown-item
         v-for="iterationItem in iterations"
         :key="iterationItem.id"
         :is-check-item="true"
         :is-checked="isIterationChecked(iterationItem.id)"
         @click="setIteration(iterationItem.id)"
-        >{{ iterationItem.title }}</gl-new-dropdown-item
+        >{{ iterationItem.title }}</gl-dropdown-item
       >
     </gl-dropdown>
   </div>

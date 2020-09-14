@@ -4,7 +4,7 @@ import { mapState, mapActions } from 'vuex';
 import {
   GlDropdown,
   GlNewDropdownHeader,
-  GlNewDropdownItem,
+  GlDropdownItem,
   GlSearchBoxByType,
   GlDropdownDivider,
   GlTooltipDirective,
@@ -20,7 +20,7 @@ export default {
   components: {
     GlDropdown,
     GlNewDropdownHeader,
-    GlNewDropdownItem,
+    GlDropdownItem,
     GlSearchBoxByType,
     GlDropdownDivider,
   },
@@ -123,11 +123,11 @@ export default {
         :placeholder="__('Search')"
         @input="searchAuthors"
       />
-      <gl-new-dropdown-item :is-checked="!currentAuthor" @click="selectAuthor(null)">
+      <gl-dropdown-item :is-checked="!currentAuthor" @click="selectAuthor(null)">
         {{ __('Any Author') }}
-      </gl-new-dropdown-item>
+      </gl-dropdown-item>
       <gl-dropdown-divider />
-      <gl-new-dropdown-item
+      <gl-dropdown-item
         v-for="author in commitsAuthors"
         :key="author.id"
         :is-checked="author.name === currentAuthor"
@@ -136,7 +136,7 @@ export default {
         @click="selectAuthor(author)"
       >
         {{ author.name }}
-      </gl-new-dropdown-item>
+      </gl-dropdown-item>
     </gl-dropdown>
   </div>
 </template>

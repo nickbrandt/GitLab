@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
-import { GlLoadingIcon, GlSearchBoxByType, GlNewDropdownItem } from '@gitlab/ui';
+import { GlLoadingIcon, GlSearchBoxByType, GlDropdownItem } from '@gitlab/ui';
 import NewEnvironmentsDropdown from 'ee/feature_flags/components/new_environments_dropdown.vue';
 import axios from '~/lib/utils/axios_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
@@ -36,7 +36,7 @@ describe('New Environments Dropdown', () => {
 
     it('should not show any dropdown items', () => {
       axiosMock.onGet(TEST_HOST).reply(() => {
-        expect(wrapper.findAll(GlNewDropdownItem)).toHaveLength(0);
+        expect(wrapper.findAll(GlDropdownItem)).toHaveLength(0);
       });
       wrapper.find(GlSearchBoxByType).vm.$emit('focus');
       return axios.waitForAll();
@@ -53,7 +53,7 @@ describe('New Environments Dropdown', () => {
         .waitForAll()
         .then(() => wrapper.vm.$nextTick())
         .then(() => {
-          item = wrapper.find(GlNewDropdownItem);
+          item = wrapper.find(GlDropdownItem);
         });
     });
 
@@ -78,7 +78,7 @@ describe('New Environments Dropdown', () => {
       wrapper.find(GlSearchBoxByType).vm.$emit('focus');
       wrapper.find(GlSearchBoxByType).vm.$emit('input', 'prod');
       return axios.waitForAll().then(() => {
-        items = wrapper.findAll(GlNewDropdownItem);
+        items = wrapper.findAll(GlDropdownItem);
       });
     });
 

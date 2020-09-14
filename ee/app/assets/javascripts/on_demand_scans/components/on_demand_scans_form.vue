@@ -9,7 +9,7 @@ import {
   GlIcon,
   GlLink,
   GlDropdown,
-  GlNewDropdownItem as GlDropdownItem,
+  GlDropdownItem,
   GlSkeletonLoader,
   GlSprintf,
   GlTooltipDirective,

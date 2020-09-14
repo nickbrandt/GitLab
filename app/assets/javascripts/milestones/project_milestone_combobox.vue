@@ -3,7 +3,7 @@ import {
   GlDropdown,
   GlDropdownDivider,
   GlNewDropdownHeader,
-  GlNewDropdownItem,
+  GlDropdownItem,
   GlLoadingIcon,
   GlSearchBoxByType,
   GlIcon,
@@ -20,7 +20,7 @@ export default {
     GlDropdown,
     GlDropdownDivider,
     GlNewDropdownHeader,
-    GlNewDropdownItem,
+    GlDropdownItem,
     GlLoadingIcon,
     GlSearchBoxByType,
     GlIcon,
@@ -211,11 +211,11 @@ export default {
       @keydown.enter.prevent="onSearchBoxEnter"
     />
 
-    <gl-new-dropdown-item @click="onMilestoneClicked(null)">
+    <gl-dropdown-item @click="onMilestoneClicked(null)">
       <span :class="{ 'pl-4': true, 'selected-item': selectedMilestones.length === 0 }">
         {{ $options.translations.noMilestone }}
       </span>
-    </gl-new-dropdown-item>
+    </gl-dropdown-item>
 
     <gl-dropdown-divider />
 
@@ -230,7 +230,7 @@ export default {
       <gl-dropdown-divider />
     </template>
     <template v-else-if="dropdownItems.length">
-      <gl-new-dropdown-item
+      <gl-dropdown-item
         v-for="item in dropdownItems"
         :key="item"
         role="milestone option"
@@ -239,12 +239,12 @@ export default {
         <span :class="{ 'pl-4': true, 'selected-item': isSelectedMilestone(item) }">
           {{ item }}
         </span>
-      </gl-new-dropdown-item>
+      </gl-dropdown-item>
       <gl-dropdown-divider />
     </template>
 
-    <gl-new-dropdown-item v-for="(item, idx) in extraLinks" :key="idx" :href="item.url">
+    <gl-dropdown-item v-for="(item, idx) in extraLinks" :key="idx" :href="item.url">
       <span class="pl-4">{{ item.text }}</span>
-    </gl-new-dropdown-item>
+    </gl-dropdown-item>
   </gl-dropdown>
 </template>

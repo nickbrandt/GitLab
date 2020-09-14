@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
-import { GlNewDropdownItem } from '@gitlab/ui';
+import { GlDropdownItem } from '@gitlab/ui';
 import Scatterplot from 'ee/analytics/shared/components/scatterplot.vue';
 import DurationChart from 'ee/analytics/cycle_analytics/components/duration_chart.vue';
 import StageDropdownFilter from 'ee/analytics/cycle_analytics/components/stage_dropdown_filter.vue';
@@ -66,7 +66,7 @@ describe('DurationChart', () => {
 
   const selectStage = (_wrapper, index = 0) => {
     findStageDropdown(_wrapper)
-      .findAll(GlNewDropdownItem)
+      .findAll(GlDropdownItem)
       .at(index)
       .vm.$emit('click');
   };
