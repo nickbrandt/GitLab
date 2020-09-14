@@ -1134,28 +1134,36 @@ RSpec.describe User do
 
     subject { user.authorized_groups }
 
-    context 'with minimal access role feature switched off' do
+    context 'with minimal access role feature unavailable' do
       it { is_expected.to contain_exactly private_group, project_group }
     end
 
-    context 'with minimal access feature switched on' do
+    context 'with minimal access feature available' do
       before do
         stub_licensed_features(minimal_access_role: true)
-        allow(Gitlab::CurrentSettings)
-          .to receive(:should_check_namespace_plan?)
-          .and_return(false)
       end
 
-      it { is_expected.to contain_exactly private_group, project_group, minimal_access_group }
-    end
+      context 'feature turned on for all groups' do
+        before do
+          allow(Gitlab::CurrentSettings)
+            .to receive(:should_check_namespace_plan?)
+            .and_return(false)
+        end
 
-    context 'with minimal access feature switched on for one group only' do
-      before do
-        create(:gitlab_subscription, :gold, namespace: minimal_access_group)
-        create(:group_member, :minimal_access, user: user, source: create(:group))
+        it { is_expected.to contain_exactly private_group, project_group, minimal_access_group }
       end
 
-      it { is_expected.to contain_exactly private_group, project_group, minimal_access_group }
+      context 'feature available for specific groups only' do
+        before do
+          allow(Gitlab::CurrentSettings)
+            .to receive(:should_check_namespace_plan?)
+            .and_return(true)
+          create(:gitlab_subscription, :gold, namespace: minimal_access_group)
+          create(:group_member, :minimal_access, user: user, source: create(:group))
+        end
+
+        it { is_expected.to contain_exactly private_group, project_group, minimal_access_group }
+      end
     end
   end
 

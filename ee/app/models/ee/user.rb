@@ -414,7 +414,8 @@ module EE
     end
 
     def available_minimal_access_groups
-      return minimal_access_groups if !::Gitlab::CurrentSettings.should_check_namespace_plan? && License.feature_available?(:minimal_access_role)
+      return ::Group.none unless License.feature_available?(:minimal_access_role)
+      return minimal_access_groups unless ::Gitlab::CurrentSettings.should_check_namespace_plan?
 
       minimal_access_groups.with_feature_available_in_plan(:minimal_access_role)
     end
