@@ -1,9 +1,5 @@
 <script>
-import {
-  GlDropdown,
-  GlNewDropdownHeader as GlDropdownHeader,
-  GlNewDropdownItem as GlDropdownItem,
-} from '@gitlab/ui';
+import { GlDropdown, GlNewDropdownHeader as GlDropdownHeader, GlDropdownItem } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 
 export default {

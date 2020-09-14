@@ -3,7 +3,7 @@ import {
   GlAlert,
   GlButton,
   GlDropdown,
-  GlNewDropdownItem as GlDropdownItem,
+  GlDropdownItem,
   GlDropdownDivider,
   GlForm,
   GlFormInput,

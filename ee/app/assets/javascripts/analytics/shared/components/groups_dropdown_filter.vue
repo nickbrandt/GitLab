@@ -6,7 +6,7 @@ import {
   GlAvatar,
   GlDropdown,
   GlNewDropdownHeader as GlDropdownHeader,
-  GlNewDropdownItem as GlDropdownItem,
+  GlDropdownItem,
   GlSearchBoxByType,
   GlSafeHtmlDirective as SafeHtml,
 } from '@gitlab/ui';

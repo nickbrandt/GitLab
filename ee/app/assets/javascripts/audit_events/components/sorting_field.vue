@@ -1,5 +1,5 @@
 <script>
-import { GlDropdown, GlNewDropdownHeader, GlNewDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlNewDropdownHeader, GlDropdownItem } from '@gitlab/ui';
 import { s__ } from '~/locale';
 
 const SORTING_TITLE = s__('SortOptions|Sort by:');
@@ -18,7 +18,7 @@ export default {
   components: {
     GlDropdown,
     GlNewDropdownHeader,
-    GlNewDropdownItem,
+    GlDropdownItem,
   },
   props: {
     sortBy: {
@@ -49,7 +49,7 @@ export default {
   <div>
     <gl-dropdown :text="selectedOption.text" class="w-100 flex-column flex-lg-row form-group">
       <gl-new-dropdown-header> {{ $options.SORTING_TITLE }}</gl-new-dropdown-header>
-      <gl-new-dropdown-item
+      <gl-dropdown-item
         v-for="option in $options.SORTING_OPTIONS"
         :key="option.key"
         :is-check-item="true"
@@ -57,7 +57,7 @@ export default {
         @click="onItemClick(option.key)"
       >
         {{ option.text }}
-      </gl-new-dropdown-item>
+      </gl-dropdown-item>
     </gl-dropdown>
   </div>
 </template>

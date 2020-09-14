@@ -4,7 +4,7 @@ import {
   GlFormGroup,
   GlSegmentedControl,
   GlDropdown,
-  GlNewDropdownItem as GlDropdownItem,
+  GlDropdownItem,
   GlDropdownDivider,
 } from '@gitlab/ui';
 
