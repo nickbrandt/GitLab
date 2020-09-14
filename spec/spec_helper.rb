@@ -202,7 +202,7 @@ RSpec.configure do |config|
 
       # The following can be removed once we are confident the
       # unified diff lines works as expected
-      stub_feature_flags(unified_diff_lines: false)
+      # stub_feature_flags(unified_diff_lines: false)
 
       # Merge request widget GraphQL requests are disabled in the tests
       # for now whilst we migrate as much as we can over the GraphQL
