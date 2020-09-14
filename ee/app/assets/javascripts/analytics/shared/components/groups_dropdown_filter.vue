@@ -5,7 +5,7 @@ import {
   GlLoadingIcon,
   GlAvatar,
   GlDropdown,
-  GlNewDropdownHeader as GlDropdownHeader,
+  GlDropdownSectionHeader,
   GlDropdownItem,
   GlSearchBoxByType,
   GlSafeHtmlDirective as SafeHtml,
@@ -22,7 +22,7 @@ export default {
     GlLoadingIcon,
     GlAvatar,
     GlDropdown,
-    GlDropdownHeader,
+    GlDropdownSectionHeader,
     GlDropdownItem,
     GlSearchBoxByType,
   },
@@ -133,7 +133,7 @@ export default {
       </div>
       <gl-icon class="gl-ml-2" name="chevron-down" />
     </template>
-    <gl-dropdown-header>{{ __('Groups') }}</gl-dropdown-header>
+    <gl-dropdown-section-header>{{ __('Groups') }}</gl-dropdown-section-header>
     <gl-search-box-by-type v-model.trim="searchTerm" class="gl-m-3" />
     <gl-dropdown-item
       v-for="group in availableGroups"
