@@ -26696,6 +26696,9 @@ msgstr ""
 msgid "Trending"
 msgstr ""
 
+msgid "Trials|Create a new group to start your GitLab Gold trial."
+msgstr ""
+
 msgid "Trials|Go back to GitLab"
 msgstr ""
 
@@ -26703,6 +26706,15 @@ msgid "Trials|Skip Trial (Continue with Free Account)"
 msgstr ""
 
 msgid "Trials|You can always resume this process by selecting your avatar and choosing 'Start a Gold trial'"
+msgstr ""
+
+msgid "Trials|You can apply your trial to a new group or an existing group."
+msgstr ""
+
+msgid "Trials|You can apply your trial to a new group or your personal account."
+msgstr ""
+
+msgid "Trials|You can apply your trial to a new group, an existing group, or your personal account."
 msgstr ""
 
 msgid "Trials|You won't get a free trial right now but you can always resume this process by clicking on your avatar and choosing 'Start a free trial'"
@@ -28773,9 +28785,6 @@ msgid "You can also upload existing files from your computer using the instructi
 msgstr ""
 
 msgid "You can always edit this later"
-msgstr ""
-
-msgid "You can apply your Trial to your Personal account or create a New Group."
 msgstr ""
 
 msgid "You can create a new one or check them in your %{pat_link_start}personal access tokens%{pat_link_end} settings"
