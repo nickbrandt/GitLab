@@ -45,7 +45,7 @@ module Ci
     def overwrite_trace!
       metrics.increment_trace_operation(operation: :overwrite)
 
-      build.trace.set(params[:trace]) # TODO, disable by default using a new FF
+      build.trace.set(params[:trace]) if Gitlab::Ci::Features.trace_overwrite?
     end
 
     def update_build_state!
@@ -118,7 +118,7 @@ module Ci
     end
 
     def chunks_migration_enabled?
-      Feature.enabled?(:ci_enable_live_trace, build.project)
+      ::Gitlab::Ci::Features.accept_trace?(build.project)
     end
   end
 end
