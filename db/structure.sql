@@ -20960,6 +20960,8 @@ CREATE INDEX index_security_findings_on_project_fingerprint ON public.security_f
 
 CREATE INDEX index_security_findings_on_scan_id ON public.security_findings USING btree (scan_id);
 
+CREATE INDEX index_security_findings_on_scan_id_and_deduplicated ON public.security_findings USING btree (scan_id, deduplicated);
+
 CREATE INDEX index_security_findings_on_scanner_id ON public.security_findings USING btree (scanner_id);
 
 CREATE INDEX index_security_findings_on_severity ON public.security_findings USING btree (severity);
