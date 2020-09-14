@@ -15468,6 +15468,7 @@ CREATE TABLE public.security_findings (
     severity smallint NOT NULL,
     confidence smallint NOT NULL,
     project_fingerprint text NOT NULL,
+    deduplicated boolean DEFAULT false NOT NULL,
     CONSTRAINT check_b9508c6df8 CHECK ((char_length(project_fingerprint) <= 40))
 );
 
