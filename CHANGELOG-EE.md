@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.3.6 (2020-09-14)
+
+### Fixed (1 change)
+
+- Enable secret detection for MR Widget. !41582
+
+
 ## 13.3.5 (2020-09-04)
 
 ### Fixed (1 change)
