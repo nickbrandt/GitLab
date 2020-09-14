@@ -1,12 +1,12 @@
 <script>
-import { GlDropdown, GlNewDropdownHeader as GlDropdownHeader, GlDropdownItem } from '@gitlab/ui';
+import { GlDropdown, GlDropdownSectionHeader, GlDropdownItem } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
 
 export default {
   name: 'StageDropdownFilter',
   components: {
     GlDropdown,
-    GlDropdownHeader,
+    GlDropdownSectionHeader,
     GlDropdownItem,
   },
   props: {
@@ -66,7 +66,7 @@ export default {
     :text="selectedStagesLabel"
     right
   >
-    <gl-dropdown-header>{{ s__('CycleAnalytics|Stages') }}</gl-dropdown-header>
+    <gl-dropdown-section-header>{{ s__('CycleAnalytics|Stages') }}</gl-dropdown-section-header>
     <gl-dropdown-item
       v-for="stage in stages"
       :key="stage.id"

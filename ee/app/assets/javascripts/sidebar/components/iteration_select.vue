@@ -5,7 +5,7 @@ import {
   GlDropdown,
   GlDropdownItem,
   GlSearchBoxByType,
-  GlNewDropdownHeader,
+  GlDropdownSectionHeader,
   GlIcon,
   GlTooltipDirective,
 } from '@gitlab/ui';
@@ -27,7 +27,7 @@ export default {
     GlDropdown,
     GlDropdownItem,
     GlSearchBoxByType,
-    GlNewDropdownHeader,
+    GlDropdownSectionHeader,
     GlIcon,
   },
   props: {
@@ -195,9 +195,9 @@ export default {
       class="dropdown gl-w-full"
       :class="{ show: editing }"
     >
-      <gl-new-dropdown-header class="d-flex justify-content-center">{{
+      <gl-dropdown-section-header class="d-flex justify-content-center">{{
         __('Assign Iteration')
-      }}</gl-new-dropdown-header>
+      }}</gl-dropdown-section-header>
       <gl-search-box-by-type ref="search" v-model="searchTerm" class="gl-m-3" />
       <gl-dropdown-item
         v-for="iterationItem in iterations"
