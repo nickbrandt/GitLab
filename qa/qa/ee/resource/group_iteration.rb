@@ -9,7 +9,9 @@ module QA
         attr_accessor :title
 
         attribute :group do
-          QA::Resource::Group.fabricate_via_api!
+          QA::Resource::Group.fabricate_via_api! do |group|
+            group.path = "group-to-test-iterations-#{SecureRandom.hex(8)}"
+          end
         end
 
         attribute :id
