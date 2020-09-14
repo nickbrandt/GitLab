@@ -18,6 +18,10 @@ module Gitlab
         @ignoring = ignoring
       end
 
+      def positioned?
+        relative_position.present?
+      end
+
       def min_relative_position
         strong_memoize(:min_relative_position) { calculate_relative_position('MIN') }
       end

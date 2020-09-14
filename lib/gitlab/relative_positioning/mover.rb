@@ -25,25 +25,23 @@ module Gitlab
       end
 
       def move(object, first, last)
-        raise ArgumentError unless object && (first || last) && (first != last)
-        # Moving a object next to itself is a no-op
-        return if object == first || object == last
+        raise ArgumentError, 'object is required' unless object
 
         lhs = context(first, ignoring: object)
         rhs = context(last, ignoring: object)
         focus = context(object)
+        range = RelativePositioning.range(lhs, rhs)
 
-        lhs ||= rhs.lhs_neighbour
-        rhs ||= lhs.rhs_neighbour
-
-        if lhs.nil?
-          move_to_range_start(focus, rhs.relative_position)
-        elsif rhs.nil?
-          move_to_range_end(focus, lhs.relative_position)
+        if range.cover?(focus)
+          # Moving a object already within a range is a no-op
+        elsif range.open_on_left?
+          move_to_range_start(focus, range.rhs.relative_position)
+        elsif range.open_on_right?
+          move_to_range_end(focus, range.lhs.relative_position)
         else
-          pos_left, pos_right = create_space_between(lhs, rhs)
+          pos_left, pos_right = create_space_between(range)
           desired_position = position_between(pos_left, pos_right)
-          focus.place_at_position(desired_position, lhs)
+          focus.place_at_position(desired_position, range.lhs)
         end
       end
 
@@ -95,16 +93,16 @@ module Gitlab
         context.object.relative_position = new_pos
       end
 
-      def create_space_between(lhs, rhs)
-        pos_left = lhs&.relative_position
-        pos_right = rhs&.relative_position
+      def create_space_between(range)
+        pos_left = range.lhs&.relative_position
+        pos_right = range.rhs&.relative_position
 
         return [pos_left, pos_right] unless gap_too_small?(pos_left, pos_right)
 
-        gap = rhs.create_space_left
+        gap = range.rhs.create_space_left
         [pos_left - gap.delta, pos_right]
       rescue NoSpaceLeft
-        gap = lhs.create_space_right
+        gap = range.lhs.create_space_right
         [pos_left, pos_right + gap.delta]
       end
 
