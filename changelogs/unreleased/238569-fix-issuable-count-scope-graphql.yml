@@ -1,5 +1,0 @@
----
-title: Fix issue counts to be scoped by given project or group
-merge_request: 39914
-author:
-type: fixed
