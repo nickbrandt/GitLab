@@ -1,10 +1,16 @@
 <script>
-import { GlTooltipDirective, GlDeprecatedButton, GlIcon } from '@gitlab/ui';
+import {
+  GlTooltipDirective,
+  GlIcon,
+  GlDeprecatedDropdown as GlDropdown,
+  GlDeprecatedDropdownItem as GlDropdownItem,
+} from '@gitlab/ui';
 import { __ } from '~/locale';
 
 export default {
   components: {
-    GlDeprecatedButton,
+    GlDropdown,
+    GlDropdownItem,
     GlIcon,
   },
   directives: {
@@ -12,6 +18,11 @@ export default {
   },
   props: {
     editPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    ideEditPath: {
       type: String,
       required: false,
       default: '',
@@ -32,33 +43,47 @@ export default {
         return __("Can't edit as source branch was deleted");
       }
 
-      return __('Edit file');
+      return '';
     },
     isDisabled() {
       return !this.editPath;
     },
   },
   methods: {
-    handleEditClick(evt) {
+    handleShow(evt) {
       if (this.canCurrentUserFork && !this.canModifyBlob) {
         evt.preventDefault();
         this.$emit('showForkMessage');
+      } else {
+        this.$emit('open');
       }
+    },
+    handleHide() {
+      this.$emit('close');
     },
   },
 };
 </script>
 
 <template>
-  <span v-gl-tooltip.top :title="tooltipTitle">
-    <gl-deprecated-button
-      :href="editPath"
+  <div v-gl-tooltip.top="tooltipTitle" class="gl-display-flex">
+    <gl-dropdown
+      toggle-class="rounded-0"
       :disabled="isDisabled"
       :class="{ 'cursor-not-allowed': isDisabled }"
-      class="rounded-0 js-edit-blob"
-      @click.native="handleEditClick"
+      right
+      data-testid="edit_file"
+      @show="handleShow"
+      @hide="handleHide"
     >
-      <gl-icon name="pencil" />
-    </gl-deprecated-button>
-  </span>
+      <template #button-content>
+        <span class="gl-dropdown-toggle-text"><gl-icon name="pencil"/></span>
+        <gl-icon class="gl-dropdown-caret" name="chevron-down" aria-hidden="true" />
+      </template>
+      <gl-dropdown-item v-if="editPath" :href="editPath">{{ __('Edit file') }}</gl-dropdown-item>
+      <gl-dropdown-item v-if="ideEditPath" :href="ideEditPath">{{
+        __('Edit in Web IDE')
+      }}</gl-dropdown-item>
+    </gl-dropdown>
+  </div>
 </template>

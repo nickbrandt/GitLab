@@ -9255,6 +9255,9 @@ msgstr ""
 msgid "Edit identity for %{user_name}"
 msgstr ""
 
+msgid "Edit in Web IDE"
+msgstr ""
+
 msgid "Edit issues"
 msgstr ""
 
