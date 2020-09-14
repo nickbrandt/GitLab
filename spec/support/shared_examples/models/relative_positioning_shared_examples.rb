@@ -17,7 +17,7 @@
 RSpec.shared_examples 'a class that supports relative positioning' do
   let(:item1) { create_item }
   let(:item2) { create_item }
-  let(:new_item) { create_item }
+  let(:new_item) { create_item(relative_position: nil) }
 
   let(:set_size) { RelativePositioning.mover.context(item1).scoped_items.count }
 

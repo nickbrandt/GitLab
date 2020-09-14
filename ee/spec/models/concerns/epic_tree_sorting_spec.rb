@@ -108,7 +108,7 @@ RSpec.describe EpicTreeSorting do
 
     def move_sequence(range)
       dx = 500
-      RelativePositioning.mover.context(item).move_sequence(range.first, range.last, dx)
+      RelativePositioning.mover.context(item).send(:move_sequence, range.first, range.last, dx)
     end
 
     context 'when self is an epic' do
