@@ -32,10 +32,6 @@ FactoryBot.define do
       hosted_plan_id { nil }
     end
 
-    trait :early_adopter do
-      association :hosted_plan, factory: :early_adopter_plan
-    end
-
     trait :bronze do
       association :hosted_plan, factory: :bronze_plan
     end

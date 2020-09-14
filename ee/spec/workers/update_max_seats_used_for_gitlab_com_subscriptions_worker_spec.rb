@@ -6,7 +6,6 @@ RSpec.describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker do
   subject { described_class.new }
 
   let_it_be(:bronze_plan) { create(:bronze_plan) }
-  let_it_be(:early_adopter_plan) { create(:early_adopter_plan) }
   let_it_be(:gitlab_subscription, refind: true) { create(:gitlab_subscription, seats: 1) }
   let_it_be(:gitlab_subscription_2, refind: true) { create(:gitlab_subscription, seats: 11) }
 
@@ -77,12 +76,6 @@ RSpec.describe UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker do
 
     context 'with a trial plan' do
       let(:subscription_attrs) { { hosted_plan: bronze_plan, trial: true } }
-
-      include_examples 'updates only paid plans'
-    end
-
-    context 'with an early adopter plan' do
-      let(:subscription_attrs) { { hosted_plan: early_adopter_plan } }
 
       include_examples 'updates only paid plans'
     end
