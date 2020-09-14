@@ -8,6 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-11 14:23+1000\n"
+"PO-Revision-Date: 2020-09-11 14:23+1000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -140,6 +142,11 @@ msgstr[1] ""
 msgid "%d commits"
 msgstr ""
 
+msgid "%d completed issue"
+msgid_plural "%d completed issues"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d contribution"
 msgid_plural "%d contributions"
 msgstr[0] ""
@@ -240,6 +247,11 @@ msgid_plural "%d more comments"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d open issue"
+msgid_plural "%d open issues"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d personal project will be removed and cannot be restored."
 msgid_plural "%d personal projects will be removed and cannot be restored."
 msgstr[0] ""
@@ -333,6 +345,9 @@ msgstr ""
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
+msgid "%{completedCount} completed weight"
+msgstr ""
+
 msgid "%{completedWeight} of %{totalWeight} weight completed"
 msgstr ""
 
@@ -387,6 +402,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "%{count} related %{pluralized_subject}: %{links}"
+msgstr ""
+
+msgid "%{count} total weight"
 msgstr ""
 
 msgid "%{dashboard_path} could not be found."
@@ -804,9 +822,6 @@ msgid "%{total_warnings} warning(s) found:"
 msgstr ""
 
 msgid "%{total} open issue weight"
-msgstr ""
-
-msgid "%{total} open issues"
 msgstr ""
 
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
@@ -10003,6 +10018,9 @@ msgid "Error deleting %{issuableType}"
 msgstr ""
 
 msgid "Error deleting project. Check logs for error details."
+msgstr ""
+
+msgid "Error fetching burnup chart data"
 msgstr ""
 
 msgid "Error fetching diverging counts for branches. Please try again."
