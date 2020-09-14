@@ -11329,9 +11329,6 @@ msgstr ""
 msgid "Finished"
 msgstr ""
 
-msgid "First Name is too long (maximum is %{max_length} characters)."
-msgstr ""
-
 msgid "First Seen"
 msgstr ""
 
@@ -11339,6 +11336,9 @@ msgid "First day of the week"
 msgstr ""
 
 msgid "First name"
+msgstr ""
+
+msgid "First name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
 msgid "First seen"
@@ -14821,9 +14821,6 @@ msgstr ""
 msgid "Last Accessed On"
 msgstr ""
 
-msgid "Last Name is too long (maximum is %{max_length} characters)."
-msgstr ""
-
 msgid "Last Pipeline"
 msgstr ""
 
@@ -14855,6 +14852,9 @@ msgid "Last item before this page loaded in your browser:"
 msgstr ""
 
 msgid "Last name"
+msgstr ""
+
+msgid "Last name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
 msgid "Last reply by"
@@ -23806,9 +23806,6 @@ msgid "SignUp|First Name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
 msgid "SignUp|Last Name is too long (maximum is %{max_length} characters)."
-msgstr ""
-
-msgid "SignUp|Name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
 msgid "SignUp|Username is too long (maximum is %{max_length} characters)."
