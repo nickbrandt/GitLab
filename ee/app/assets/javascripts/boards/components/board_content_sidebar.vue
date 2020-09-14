@@ -3,10 +3,12 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import { GlDrawer } from '@gitlab/ui';
 import { ISSUABLE } from '~/boards/constants';
 import { contentTop } from '~/lib/utils/common_utils';
+import IssuableAssignees from '~/sidebar/components/assignees/issuable_assignees.vue';
 
 export default {
   headerHeight: `${contentTop()}px`,
   components: {
+    IssuableAssignees,
     GlDrawer,
   },
   computed: {
@@ -37,6 +39,10 @@ export default {
         <p class="gl-font-weight-bold">{{ issueTitle }}</p>
         <p class="gl-mb-0">{{ getActiveIssue.referencePath }}</p>
       </div>
+    </template>
+
+    <template>
+      <issuable-assignees :users="getActiveIssue.assignees" />
     </template>
   </gl-drawer>
 </template>
