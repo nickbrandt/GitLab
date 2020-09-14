@@ -20,6 +20,7 @@ module Ci
       if accept_request?
         accept_build_state!
       else
+        check_migration_state
         update_build_state!
       end
     end
@@ -48,12 +49,15 @@ module Ci
       build.trace.set(params[:trace]) if Gitlab::Ci::Features.trace_overwrite?
     end
 
-    def update_build_state!
-      # TODO, simplify this, doesn't work in case of timeout too
-      if accept_available? && has_chunks?
+    def check_migration_state
+      return unless accept_available?
+
+      if has_chunks? && !live_chunks_pending?
         metrics.increment_trace_operation(operation: :finalized)
       end
+    end
 
+    def update_build_state!
       case build_state
       when 'running'
         build.touch if build.needs_touch?

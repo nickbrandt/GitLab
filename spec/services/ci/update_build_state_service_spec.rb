@@ -178,6 +178,14 @@ RSpec.describe Ci::UpdateBuildStateService do
             .to have_received(:increment_trace_operation)
             .with(operation: :discarded)
         end
+
+        it 'does not increment finalized trace metric' do
+          subject.execute
+
+          expect(metrics)
+            .not_to have_received(:increment_trace_operation)
+            .with(operation: :finalized)
+        end
       end
 
       context 'when build pending state has changes' do
