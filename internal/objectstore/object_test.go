@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore"
@@ -41,21 +40,21 @@ func testObjectUploadNoErrors(t *testing.T, startObjectStore osFactory, useDelet
 
 	// copy data
 	n, err := io.Copy(object, strings.NewReader(test.ObjectContent))
-	assert.NoError(t, err)
-	assert.Equal(t, test.ObjectSize, n, "Uploaded file mismatch")
+	require.NoError(t, err)
+	require.Equal(t, test.ObjectSize, n, "Uploaded file mismatch")
 
 	// close HTTP stream
 	err = object.Close()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Equal(t, contentType, osStub.GetHeader(test.ObjectPath, "Content-Type"))
+	require.Equal(t, contentType, osStub.GetHeader(test.ObjectPath, "Content-Type"))
 
 	// Checking MD5 extraction
-	assert.Equal(t, osStub.GetObjectMD5(test.ObjectPath), object.ETag())
+	require.Equal(t, osStub.GetObjectMD5(test.ObjectPath), object.ETag())
 
 	// Checking cleanup
 	cancel()
-	assert.Equal(t, 1, osStub.PutsCnt(), "Object hasn't been uploaded")
+	require.Equal(t, 1, osStub.PutsCnt(), "Object hasn't been uploaded")
 
 	var expectedDeleteCnt int
 	if useDeleteURL {
@@ -70,9 +69,9 @@ func testObjectUploadNoErrors(t *testing.T, startObjectStore osFactory, useDelet
 	}
 
 	if useDeleteURL {
-		assert.Equal(t, 1, osStub.DeletesCnt(), "Object hasn't been deleted")
+		require.Equal(t, 1, osStub.DeletesCnt(), "Object hasn't been deleted")
 	} else {
-		assert.Equal(t, 0, osStub.DeletesCnt(), "Object has been deleted")
+		require.Equal(t, 0, osStub.DeletesCnt(), "Object has been deleted")
 	}
 }
 
@@ -112,9 +111,9 @@ func TestObjectUpload404(t *testing.T) {
 	require.NoError(t, err)
 	_, err = io.Copy(object, strings.NewReader(test.ObjectContent))
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	err = object.Close()
-	assert.Error(t, err)
+	require.Error(t, err)
 	_, isStatusCodeError := err.(objectstore.StatusCodeError)
 	require.True(t, isStatusCodeError, "Should fail with StatusCodeError")
 	require.Contains(t, err.Error(), "404")
