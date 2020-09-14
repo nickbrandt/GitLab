@@ -461,6 +461,26 @@ this line should be hidden when collapsed
 section_end:1560896353:my_first_section\r\e[0K
 ```
 
+#### Pre-collapsed sections
+
+You can make the job log automatically collapse the collapsible sections by adding the `collapsed` option to the section start.
+
+You must add the string `[collapsed=true]` after the section name and before the `\r`:
+
+- Section start marker with options: `section_start:UNIX_TIMESTAMP:SECTION_NAME[collapsed=true]\r\e[0K` + `TEXT_OF_SECTION_HEADER`
+- Section end marker stays untouched: `section_end:UNIX_TIMESTAMP:SECTION_NAME\r\e[0K`
+
+You must add the updated section start text to the CI configuration. For example,
+using `echo`:
+
+```yaml
+job1:
+  script:
+    - echo -e "section_start:`date +%s`:my_first_section[collapsed=true]\r\e[0KHeader of the 1st collapsible section"
+    - echo 'this line should be hidden automatically after loading the job log'
+    - echo -e "section_end:`date +%s`:my_first_section\r\e[0K"
+```
+
 ## Visualize pipelines
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-foss/-/merge_requests/5742) in GitLab 8.11.
