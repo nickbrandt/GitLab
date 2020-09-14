@@ -14257,6 +14257,11 @@ type Release {
   Relative web path to the tag associated with the release
   """
   tagPath: String
+
+  """
+  Indicates the release is an upcoming release
+  """
+  upcomingRelease: Boolean
 }
 
 """
