@@ -177,8 +177,11 @@ module API
 
           Gitlab::Metrics.add_event(:update_build)
 
-          ::Ci::UpdateBuildStateService.new(job, params).then do |service|
-            service.execute.then { |result| status result.status }
+          service = ::Ci::UpdateBuildStateService
+            .new(job, declared_params(include_missing: false))
+
+          service.execute.then do |result|
+            status result.status
           end
         end
 
