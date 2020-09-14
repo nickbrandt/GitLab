@@ -6,7 +6,7 @@ export default {
     GlButton,
   },
   props: {
-    isShowEdit: {
+    hasSettings: {
       type: Boolean,
       required: false,
       default: false,
@@ -36,9 +36,9 @@ export default {
         s__('StaticSiteEditor|Return to site')
       }}</gl-button>
       <gl-button
-        v-if="isShowEdit"
+        v-if="hasSettings"
         ref="settings"
-        :loading="savingChanges"
+        :disabled="savingChanges"
         @click="$emit('editSettings')"
       >
         <span>{{ __('Settings') }}</span>

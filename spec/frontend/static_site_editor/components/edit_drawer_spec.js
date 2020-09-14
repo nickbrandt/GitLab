@@ -27,6 +27,7 @@ describe('~/static_site_editor/components/edit_drawer.vue', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   it('renders the GlDrawer', () => {
@@ -41,7 +42,7 @@ describe('~/static_site_editor/components/edit_drawer.vue', () => {
     expect(findFrontMatterControls().props('settings')).toBe(wrapper.props('settings'));
   });
 
-  it('is closed be default', () => {
+  it('is closed by default', () => {
     expect(findGlDrawer().props('open')).toBe(false);
   });
 

@@ -10,7 +10,7 @@ describe('Static Site Editor Toolbar', () => {
   const buildWrapper = (propsData = {}) => {
     wrapper = shallowMount(PublishToolbar, {
       propsData: {
-        isShowEdit: false,
+        hasSettings: false,
         saveable: false,
         ...propsData,
       },
@@ -58,7 +58,7 @@ describe('Static Site Editor Toolbar', () => {
 
   describe('when providing settings CTA', () => {
     it('enables Submit Changes button', () => {
-      buildWrapper({ isShowEdit: true });
+      buildWrapper({ hasSettings: true });
 
       expect(findEditSettingsButton().exists()).toBe(true);
     });

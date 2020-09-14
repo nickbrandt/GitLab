@@ -50,8 +50,8 @@ export default {
       parsedSource: parseSourceFile(this.preProcess(true, this.content)),
       editorMode: EDITOR_TYPES.wysiwyg,
       isModified: false,
-      isDrawerOpen: false,
       hasMatter: false,
+      isDrawerOpen: false,
     };
   },
   imageRepository: imageRepository(),
@@ -62,12 +62,15 @@ export default {
     editableMatter() {
       return this.isDrawerOpen ? this.parsedSource.matter() : {};
     },
-    hasSettingsButton() {
+    hasSettings() {
       return this.hasMatter && this.isWysiwygMode;
     },
     isWysiwygMode() {
       return this.editorMode === EDITOR_TYPES.wysiwyg;
     },
+  },
+  created() {
+    this.refreshEditHelpers();
   },
   methods: {
     preProcess(isWrap, value) {
@@ -138,7 +141,7 @@ export default {
     <unsaved-changes-confirm-dialog :modified="isModified" />
     <publish-toolbar
       class="gl-fixed gl-left-0 gl-bottom-0 gl-w-full"
-      :is-show-edit="hasSettingsButton"
+      :has-settings="hasSettings"
       :return-url="returnUrl"
       :saveable="isModified"
       :saving-changes="savingChanges"

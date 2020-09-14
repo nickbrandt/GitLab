@@ -48,6 +48,7 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   it('renders edit header', () => {
@@ -55,8 +56,8 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
     expect(findEditHeader().props('title')).toBe(title);
   });
 
-  it('does not render edit drawer', () => {
-    expect(findEditDrawer().exists()).toBe(false);
+  it('renders edit drawer', () => {
+    expect(findEditDrawer().exists()).toBe(true);
   });
 
   it('renders rich content editor with a format pass', () => {
@@ -76,6 +77,18 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
   it('renders unsaved changes confirm dialog', () => {
     expect(findUnsavedChangesConfirmDialog().exists()).toBe(true);
     expect(findUnsavedChangesConfirmDialog().props('modified')).toBe(false);
+  });
+
+  it.each`
+    key
+    ${'isModified'}
+    ${'hasMatter'}
+  `('updates $key data when refreshEditHelpers is called', ({ key }) => {
+    const spy = jest.spyOn(wrapper.vm.parsedSource, key);
+
+    wrapper.vm.refreshEditHelpers();
+
+    expect(spy).toHaveBeenCalled();
   });
 
   describe('when content changes', () => {
@@ -154,17 +167,7 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
     });
   });
 
-  describe('when hasMatter', () => {
-    beforeEach(() => {
-      wrapper.setData({ hasMatter: true, isDrawerOpen: false });
-
-      wrapper.vm.$nextTick();
-    });
-
-    afterEach(() => {
-      wrapper.setData({ hasMatter: false });
-    });
-
+  describe('when content has front matter', () => {
     it('renders a closed edit drawer', () => {
       expect(findEditDrawer().exists()).toBe(true);
       expect(findEditDrawer().props('isOpen')).toBe(false);
@@ -174,13 +177,12 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
       findPublishToolbar().vm.$emit('editSettings');
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.vm.isDrawerOpen).toBe(true);
         expect(findEditDrawer().props('isOpen')).toBe(true);
       });
     });
 
     it('closes the edit drawer', () => {
-      wrapper.setData({ isDrawerOpen: true });
+      buildWrapper({ isDrawerOpen: true });
 
       findEditDrawer().vm.$emit('close');
 
@@ -201,6 +203,20 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
       findEditDrawer().vm.$emit('updateSettings', newSettings);
 
       expect(spySyncParsedSource).toHaveBeenCalledWith(newSettings);
+    });
+  });
+
+  describe('when content lacks front matter', () => {
+    beforeEach(() => {
+      buildWrapper({ content: body });
+    });
+
+    afterEach(() => {
+      wrapper.destroy();
+    });
+
+    it('does not render edit drawer', () => {
+      expect(findEditDrawer().exists()).toBe(false);
     });
   });
 
