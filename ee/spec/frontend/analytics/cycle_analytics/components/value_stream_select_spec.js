@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlButton, GlNewDropdown as GlDropdown, GlFormGroup } from '@gitlab/ui';
+import { GlButton, GlDropdown, GlFormGroup } from '@gitlab/ui';
 import ValueStreamSelect from 'ee/analytics/cycle_analytics/components/value_stream_select.vue';
 import { valueStreams } from '../mock_data';
 import { findDropdownItemText } from '../helpers';
