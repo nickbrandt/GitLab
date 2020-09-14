@@ -299,7 +299,7 @@ RSpec.shared_examples 'a class that supports relative positioning' do
           .to change { item3.reload.relative_position }.by(be < 0)
       end
 
-      context 'there is no space to the left' do
+      context 'there is no space to the left after moving STEPS times' do
         let(:start) { RelativePositioning::MIN_POSITION + (2 * RelativePositioning::IDEAL_DISTANCE) }
 
         it 'rebalances to the right' do
