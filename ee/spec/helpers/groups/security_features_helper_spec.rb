@@ -9,18 +9,19 @@ RSpec.describe Groups::SecurityFeaturesHelper do
   let_it_be(:user, refind: true) { create(:user) }
 
   before do
+    allow(helper).to receive(:can?) { |*args| Ability.allowed?(*args) }
     allow(helper).to receive(:current_user).and_return(user)
   end
 
   describe '#group_level_security_dashboard_available?' do
-    where(:security_dashboard_feature_enabled, :result) do
-      true  | true
+    where(:read_group_security_dashboard_permission, :result) do
       false | false
+      true  | true
     end
 
     with_them do
       before do
-        stub_licensed_features(security_dashboard: security_dashboard_feature_enabled)
+        allow(helper).to receive(:can?).with(user, :read_group_security_dashboard, group).and_return(read_group_security_dashboard_permission)
       end
 
       it 'returns the expected result' do

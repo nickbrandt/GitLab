@@ -109,11 +109,18 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
         stub_licensed_features(security_dashboard: true)
       end
 
-      it 'is visible' do
-        render
+      context 'when the user has access to Compliance dashboard' do
+        before do
+          group.add_developer(user)
+          allow(view).to receive(:current_user).and_return(user)
+        end
 
-        expect(rendered).to have_link 'Security & Compliance'
-        expect(rendered).to have_link 'Security'
+        it 'is visible' do
+          render
+
+          expect(rendered).to have_link 'Security & Compliance'
+          expect(rendered).to have_link 'Security'
+        end
       end
     end
 
