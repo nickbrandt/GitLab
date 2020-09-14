@@ -13911,6 +13911,9 @@ msgstr ""
 msgid "IssueTracker|Custom issue tracker"
 msgstr ""
 
+msgid "IssueTracker|EWM work items tracker"
+msgstr ""
+
 msgid "IssueTracker|Redmine issue tracker"
 msgstr ""
 
