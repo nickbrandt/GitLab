@@ -74,6 +74,10 @@ module EE
                 presence: true,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
+      validates :elasticsearch_client_request_timeout,
+                presence: true,
+                numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+
       validates :email_additional_text,
                 allow_blank: true,
                 length: { maximum: EMAIL_ADDITIONAL_TEXT_CHARACTER_LIMIT }
@@ -113,6 +117,7 @@ module EE
           elasticsearch_replicas: 1,
           elasticsearch_shards: 5,
           elasticsearch_url: ENV['ELASTIC_URL'] || 'http://localhost:9200',
+          elasticsearch_client_request_timeout: 0,
           email_additional_text: nil,
           enforce_namespace_storage_limit: false,
           enforce_pat_expiration: true,
@@ -260,14 +265,15 @@ module EE
 
     def elasticsearch_config
       {
-        url:                   elasticsearch_url,
-        aws:                   elasticsearch_aws,
-        aws_access_key:        elasticsearch_aws_access_key,
-        aws_secret_access_key: elasticsearch_aws_secret_access_key,
-        aws_region:            elasticsearch_aws_region,
-        max_bulk_size_bytes:   elasticsearch_max_bulk_size_mb.megabytes,
-        max_bulk_concurrency:  elasticsearch_max_bulk_concurrency
-      }
+        url:                    elasticsearch_url,
+        aws:                    elasticsearch_aws,
+        aws_access_key:         elasticsearch_aws_access_key,
+        aws_secret_access_key:  elasticsearch_aws_secret_access_key,
+        aws_region:             elasticsearch_aws_region,
+        max_bulk_size_bytes:    elasticsearch_max_bulk_size_mb.megabytes,
+        max_bulk_concurrency:   elasticsearch_max_bulk_concurrency,
+        client_request_timeout: (elasticsearch_client_request_timeout if elasticsearch_client_request_timeout > 0)
+      }.compact
     end
 
     def email_additional_text

@@ -65,6 +65,12 @@ RSpec.describe ApplicationSetting do
     it { is_expected.not_to allow_value(1.1).for(:elasticsearch_max_bulk_concurrency) }
     it { is_expected.not_to allow_value(-1).for(:elasticsearch_max_bulk_concurrency) }
 
+    it { is_expected.to allow_value(30).for(:elasticsearch_client_request_timeout) }
+    it { is_expected.to allow_value(0).for(:elasticsearch_client_request_timeout) }
+    it { is_expected.not_to allow_value(nil).for(:elasticsearch_client_request_timeout) }
+    it { is_expected.not_to allow_value(1.1).for(:elasticsearch_client_request_timeout) }
+    it { is_expected.not_to allow_value(-1).for(:elasticsearch_client_request_timeout) }
+
     it { is_expected.to allow_value(nil).for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("").for(:required_instance_ci_template) }
     it { is_expected.not_to allow_value("  ").for(:required_instance_ci_template) }
@@ -288,7 +294,8 @@ RSpec.describe ApplicationSetting do
         elasticsearch_aws_access_key: 'test-access-key',
         elasticsearch_aws_secret_access_key: 'test-secret-access-key',
         elasticsearch_max_bulk_size_mb: 67,
-        elasticsearch_max_bulk_concurrency: 8
+        elasticsearch_max_bulk_concurrency: 8,
+        elasticsearch_client_request_timeout: 30
       )
 
       expect(setting.elasticsearch_config).to eq(
@@ -298,8 +305,15 @@ RSpec.describe ApplicationSetting do
         aws_access_key: 'test-access-key',
         aws_secret_access_key: 'test-secret-access-key',
         max_bulk_size_bytes: 67.megabytes,
-        max_bulk_concurrency: 8
+        max_bulk_concurrency: 8,
+        client_request_timeout: 30
       )
+
+      setting.update!(
+        elasticsearch_client_request_timeout: 0
+      )
+
+      expect(setting.elasticsearch_config).not_to include(:client_request_timeout)
     end
 
     context 'limiting namespaces and projects' do

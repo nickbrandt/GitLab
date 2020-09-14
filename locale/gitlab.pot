@@ -5167,6 +5167,9 @@ msgstr ""
 msgid "Client authentication key password"
 msgstr ""
 
+msgid "Client request timeout"
+msgstr ""
+
 msgid "Clients"
 msgstr ""
 
@@ -9247,6 +9250,9 @@ msgid "Elasticsearch"
 msgstr ""
 
 msgid "Elasticsearch AWS IAM credentials"
+msgstr ""
+
+msgid "Elasticsearch HTTP client timeout value in seconds."
 msgstr ""
 
 msgid "Elasticsearch indexing restrictions"
@@ -23043,6 +23049,9 @@ msgid "Sets time estimate to %{time_estimate}."
 msgstr ""
 
 msgid "Sets weight to %{weight}."
+msgstr ""
+
+msgid "Setting this to 0 means using the system default timeout value."
 msgstr ""
 
 msgid "Settings"
