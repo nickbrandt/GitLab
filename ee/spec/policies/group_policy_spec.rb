@@ -1075,9 +1075,9 @@ RSpec.describe GroupPolicy do
     def set_access_level(access_level)
       case access_level
       when ProjectFeature::ENABLED
-        stub_feature_flags(group_wikis_feature_flag: true)
+        stub_feature_flags(group_wikis: true)
       when ProjectFeature::DISABLED
-        stub_feature_flags(group_wikis_feature_flag: false)
+        stub_feature_flags(group_wikis: false)
       when ProjectFeature::PRIVATE
         skip('Access level private is not supported yet for group wikis, see https://gitlab.com/gitlab-org/gitlab/-/issues/208412')
       end
@@ -1085,7 +1085,7 @@ RSpec.describe GroupPolicy do
 
     context 'when the feature flag is disabled on this group' do
       before do
-        stub_feature_flags(group_wikis_feature_flag: create(:group))
+        stub_feature_flags(group_wikis: create(:group))
       end
 
       it 'does not include the wiki permissions' do
