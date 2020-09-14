@@ -1,7 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { escape } from 'lodash';
-import { GlLoadingIcon, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
+import { GlButton, GlLoadingIcon, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { __, sprintf } from '~/locale';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
@@ -15,6 +15,7 @@ export default {
   components: {
     DiffFileHeader,
     DiffContent,
+    GlButton,
     GlLoadingIcon,
   },
   directives: {
@@ -205,11 +206,17 @@ export default {
           <div v-safe-html="errorMessage" class="nothing-here-block"></div>
         </div>
         <template v-else>
-          <div v-show="isCollapsed" class="nothing-here-block diff-collapsed">
-            {{ __('This diff is collapsed.') }}
-            <a class="click-to-expand js-click-to-expand" href="#" @click.prevent="handleToggle">{{
-              __('Click to expand it.')
-            }}</a>
+          <div v-show="isCollapsed" class="gl-p-7 gl-text-center collapsed-file-warning">
+            <p class="gl-mb-8 gl-mt-5">
+              {{ __('This file is collapsed.') }}
+            </p>
+            <gl-button
+              class="gl-alert-action gl-mb-5"
+              data-testid="expandButton"
+              @click="handleToggle"
+            >
+              {{ __('Expand file') }}
+            </gl-button>
           </div>
           <diff-content
             v-show="!isCollapsed && !isFileTooLarge"
