@@ -3,7 +3,7 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import {
   GlDeprecatedButton,
   GlDropdown,
-  GlNewDropdownDivider,
+  GlDropdownDivider,
   GlNewDropdownItem,
   GlModal,
   GlIcon,
@@ -24,7 +24,7 @@ export default {
   components: {
     GlDeprecatedButton,
     GlDropdown,
-    GlNewDropdownDivider,
+    GlDropdownDivider,
     GlNewDropdownItem,
     GlModal,
     GlIcon,
@@ -268,7 +268,7 @@ export default {
       {{ selectedDashboard.starred ? $options.i18n.unstarDashboard : $options.i18n.starDashboard }}
     </gl-new-dropdown-item>
 
-    <gl-new-dropdown-divider />
+    <gl-dropdown-divider />
 
     <gl-new-dropdown-item
       v-gl-modal="$options.modalIds.createDashboard"

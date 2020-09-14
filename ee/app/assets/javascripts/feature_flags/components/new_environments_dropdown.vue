@@ -2,7 +2,7 @@
 import { debounce } from 'lodash';
 import {
   GlDropdown,
-  GlNewDropdownDivider,
+  GlDropdownDivider,
   GlNewDropdownItem,
   GlIcon,
   GlLoadingIcon,
@@ -15,7 +15,7 @@ import { deprecatedCreateFlash as createFlash } from '~/flash';
 export default {
   components: {
     GlDropdown,
-    GlNewDropdownDivider,
+    GlDropdownDivider,
     GlNewDropdownItem,
     GlSearchBoxByType,
     GlIcon,
@@ -97,7 +97,7 @@ export default {
       <span ref="noResults" class="text-secondary gl-p-3">
         {{ $options.translations.noMatchingResults }}
       </span>
-      <gl-new-dropdown-divider />
+      <gl-dropdown-divider />
       <gl-new-dropdown-item @click="addEnvironment(environmentSearch)">
         {{ createEnvironmentLabel }}
       </gl-new-dropdown-item>

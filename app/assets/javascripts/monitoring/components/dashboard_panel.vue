@@ -8,7 +8,7 @@ import {
   GlLoadingIcon,
   GlDropdown,
   GlNewDropdownItem as GlDropdownItem,
-  GlNewDropdownDivider as GlDropdownDivider,
+  GlDropdownDivider,
   GlModal,
   GlModalDirective,
   GlSprintf,

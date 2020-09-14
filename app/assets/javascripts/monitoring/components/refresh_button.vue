@@ -6,7 +6,7 @@ import {
   GlButton,
   GlDropdown,
   GlNewDropdownItem,
-  GlNewDropdownDivider,
+  GlDropdownDivider,
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { n__, __ } from '~/locale';
@@ -50,7 +50,7 @@ export default {
     GlButton,
     GlDropdown,
     GlNewDropdownItem,
-    GlNewDropdownDivider,
+    GlDropdownDivider,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -164,7 +164,7 @@ export default {
         @click="removeRefreshInterval()"
         >{{ __('Off') }}</gl-new-dropdown-item
       >
-      <gl-new-dropdown-divider />
+      <gl-dropdown-divider />
       <gl-new-dropdown-item
         v-for="(option, i) in $options.refreshIntervals"
         :key="i"
