@@ -7,6 +7,7 @@ import { getParameterByName, parseBoolean } from '~/lib/utils/common_utils';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import PanelResizer from '~/vue_shared/components/panel_resizer.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import MrWebIdeButton from '~/vue_shared/components/mr_web_ide_button.vue';
 import { isSingleViewStyle } from '~/helpers/diffs_helper';
 import { updateHistory } from '~/lib/utils/url_utility';
 import eventHub from '../../notes/event_hub';
@@ -43,6 +44,7 @@ export default {
     PanelResizer,
     GlPagination,
     GlSprintf,
+    MrWebIdeButton,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -106,8 +108,14 @@ export default {
       required: false,
       default: false,
     },
+    webIdeButtonOptions: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
+    console.log(this.webIdeButtonOptions);
     const treeWidth =
       parseInt(localStorage.getItem(TREE_LIST_WIDTH_STORAGE_KEY), 10) || INITIAL_TREE_WIDTH;
 
@@ -415,7 +423,16 @@ export default {
         :merge-request-diffs="mergeRequestDiffs"
         :is-limited-container="isLimitedContainer"
         :diff-files-count-text="numTotalFiles"
-      />
+      >
+        <template #actions="{ actionClass }">
+          <mr-web-ide-button
+            v-if="webIdeButtonOptions.show"
+            :class="['mr-action-button', actionClass]"
+            :path="webIdeButtonOptions.path"
+            :disabled="webIdeButtonOptions.disabled"
+          />
+        </template>
+      </compare-versions>
 
       <hidden-files-warning
         v-if="renderOverflowWarning"

@@ -762,7 +762,8 @@ $mr-widget-min-height: 69px;
 
   // Shortening button height by 1px to make compare-versions
   // header 56px and fit into our 8px design grid
-  button {
+  button,
+  .gl-button {
     height: 34px;
   }
 

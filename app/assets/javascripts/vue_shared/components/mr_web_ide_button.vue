@@ -28,6 +28,9 @@ export default {
           )
         : '';
     },
+    href() {
+      return this.disabled ? '#' : this.path;
+    },
   },
 };
 </script>
@@ -35,7 +38,7 @@ export default {
 <template>
   <span v-gl-tooltip :title="ideButtonTitle" :tabindex="disabled ? 0 : null">
     <gl-button
-      :href="path"
+      :href="href"
       :disabled="disabled"
       class="js-web-ide"
       tabindex="0"

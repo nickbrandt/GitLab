@@ -119,6 +119,7 @@ export default {
           :added-lines="addedLines"
           :removed-lines="removedLines"
         />
+        <slot name="actions" v-bind="{ actionClass: 'gl-mr-3' }"></slot>
         <gl-button
           v-if="commit || startVersion"
           :href="latestVersionPath"

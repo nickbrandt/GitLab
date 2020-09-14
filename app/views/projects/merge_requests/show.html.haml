@@ -83,7 +83,8 @@
         dismiss_endpoint: user_callouts_path,
         show_suggest_popover: show_suggest_popover?.to_s,
         show_whitespace_default: @show_whitespace_default.to_s,
-        file_by_file_default: @file_by_file_default.to_s }
+        file_by_file_default: @file_by_file_default.to_s,
+        web_ide_button_options: @merge_request.present(current_user: current_user).web_ide_button_data.to_json }
 
     .mr-loading-status
       .loading.hide

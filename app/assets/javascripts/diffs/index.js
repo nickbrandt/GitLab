@@ -79,6 +79,7 @@ export default function initDiffsApp(store) {
         showSuggestPopover: parseBoolean(dataset.showSuggestPopover),
         showWhitespaceDefault: parseBoolean(dataset.showWhitespaceDefault),
         viewDiffsFileByFile: parseBoolean(dataset.fileByFileDefault),
+        webIdeButtonOptions: JSON.parse(dataset.webIdeButtonOptions),
       };
     },
     computed: {
@@ -117,6 +118,7 @@ export default function initDiffsApp(store) {
           dismissEndpoint: this.dismissEndpoint,
           showSuggestPopover: this.showSuggestPopover,
           viewDiffsFileByFile: this.viewDiffsFileByFile,
+          webIdeButtonOptions: this.webIdeButtonOptions,
         },
       });
     },

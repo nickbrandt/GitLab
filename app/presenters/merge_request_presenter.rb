@@ -238,6 +238,22 @@ class MergeRequestPresenter < Gitlab::View::Presenter::Delegated
     APPROVALS_WIDGET_BASE_TYPE
   end
 
+  def web_ide_button_data
+    web_ide_path_base = File.join([ide_path, 'project', source_project.full_path, 'merge_requests', iid.to_s])
+
+    if target_project != source_project
+      web_ide_path = "#{web_ide_path_base}?#{{ target_project: target_project.full_path }.to_query}"
+    else
+      web_ide_path = web_ide_path_base
+    end
+
+    {
+      show: source_branch_exists?,
+      disabled: !can_push_to_source_branch?,
+      path: web_ide_path
+    }
+  end
+
   private
 
   def cached_can_be_reverted?
