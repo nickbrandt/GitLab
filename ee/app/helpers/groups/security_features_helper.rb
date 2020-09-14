@@ -2,7 +2,7 @@
 
 module Groups::SecurityFeaturesHelper
   def group_level_security_dashboard_available?(group)
-    group.feature_available?(:security_dashboard)
+    can?(current_user, :read_group_security_dashboard, group)
   end
 
   def group_level_compliance_dashboard_available?(group)
