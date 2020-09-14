@@ -18,6 +18,10 @@ module Gitlab
         @ignoring = ignoring
       end
 
+      def ==(other)
+        other.is_a?(self.class) && other.object == object && other.range == range && other.ignoring == ignoring
+      end
+
       def positioned?
         relative_position.present?
       end
@@ -143,6 +147,43 @@ module Gitlab
         find_next_gap_after.tap { |gap| move_sequence_after(false, next_gap: gap) }
       end
 
+      def find_next_gap_before
+        items_with_next_pos = scoped_items
+                                .select('relative_position AS pos, LEAD(relative_position) OVER (ORDER BY relative_position DESC) AS next_pos')
+                                .where('relative_position <= ?', relative_position)
+                                .order(relative_position: :desc)
+
+        find_next_gap(items_with_next_pos, range.first)
+      end
+
+      def find_next_gap_after
+        items_with_next_pos = scoped_items
+                                .select('relative_position AS pos, LEAD(relative_position) OVER (ORDER BY relative_position ASC) AS next_pos')
+                                .where('relative_position >= ?', relative_position)
+                                .order(:relative_position)
+
+        find_next_gap(items_with_next_pos, range.last)
+      end
+
+      def find_next_gap(items_with_next_pos, default_end)
+        gap = model_class
+          .from(items_with_next_pos, :items)
+          .where('next_pos IS NULL OR ABS(pos::bigint - next_pos::bigint) >= ?', MIN_GAP)
+          .limit(1)
+          .pluck(:pos, :next_pos)
+          .first
+
+        return if gap.nil? || gap.first == default_end
+
+        Gap.new(gap.first, gap.second || default_end)
+      end
+
+      def relative_position
+        object.relative_position
+      end
+
+      private
+
       # Moves the sequence before the current item to the middle of the next gap
       # For example, we have
       #
@@ -211,41 +252,6 @@ module Gitlab
         relation = include_self ? scoped_items : relative_siblings
 
         object.update_relative_siblings(relation, (start_pos..end_pos), delta)
-      end
-
-      def find_next_gap_before
-        items_with_next_pos = scoped_items
-                                .select('relative_position AS pos, LEAD(relative_position) OVER (ORDER BY relative_position DESC) AS next_pos')
-                                .where('relative_position <= ?', relative_position)
-                                .order(relative_position: :desc)
-
-        find_next_gap(items_with_next_pos, range.first)
-      end
-
-      def find_next_gap_after
-        items_with_next_pos = scoped_items
-                                .select('relative_position AS pos, LEAD(relative_position) OVER (ORDER BY relative_position ASC) AS next_pos')
-                                .where('relative_position >= ?', relative_position)
-                                .order(:relative_position)
-
-        find_next_gap(items_with_next_pos, range.last)
-      end
-
-      def find_next_gap(items_with_next_pos, default_end)
-        gap = model_class
-          .from(items_with_next_pos, :items)
-          .where('next_pos IS NULL OR ABS(pos::bigint - next_pos::bigint) >= ?', MIN_GAP)
-          .limit(1)
-          .pluck(:pos, :next_pos)
-          .first
-
-        return if gap.nil? || gap.first == default_end
-
-        Gap.new(gap.first, gap.second || default_end)
-      end
-
-      def relative_position
-        object.relative_position
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord

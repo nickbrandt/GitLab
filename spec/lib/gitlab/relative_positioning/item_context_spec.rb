@@ -11,11 +11,15 @@ RSpec.describe Gitlab::RelativePositioning::ItemContext do
   end
 
   # Increase the range size to convice yourself that this covers ALL arrangements
+  # We use plain variables here so we can use them in `where` blocks.
   range = (101..108)
   indices = (0..).take(range.size)
 
   let(:start) { ((range.first + range.last) / 2.0).floor }
   let(:subjects) { issues.map { |i| described_class.new(i.reset, range) } }
+
+  # This allows us to refer to range in methods and examples
+  let_it_be(:full_range) { range }
 
   context 'there are gaps at the start and end' do
     let_it_be(:issues) { (range.first.succ..range.last.pred).map { |pos| create_issue(pos) } }
@@ -36,10 +40,22 @@ RSpec.describe Gitlab::RelativePositioning::ItemContext do
         expect(subject.find_next_gap_after).not_to be_present
       end
 
+      it 'is possible to create_space_right, which will move the gap to immediately after' do
+        subject.create_space_right
+
+        expect(subject.find_next_gap_after).to have_attributes(start_pos: subject.relative_position)
+      end
+
       it 'is possible to shift_left, which will consume the gap at the start' do
         subject.shift_left
 
         expect(subject.find_next_gap_before).not_to be_present
+      end
+
+      it 'is possible to create_space_left, which will move the gap to immediately before' do
+        subject.create_space_left
+
+        expect(subject.find_next_gap_before).to have_attributes(start_pos: subject.relative_position)
       end
     end
   end
@@ -80,10 +96,19 @@ RSpec.describe Gitlab::RelativePositioning::ItemContext do
       end
     end
 
+    def issue_at(position)
+      issues.find { |i| i.relative_position == position }
+    end
+
     where(:current_pos) { range.select(&:even?) }
 
     with_them do
       let(:subject) { subjects.find { |s| s.relative_position == current_pos } }
+      let(:siblings) { subjects.reject { |s| s.relative_position == current_pos } }
+
+      def covered_by_range(pos)
+        full_range.cover?(pos) ? pos : nil
+      end
 
       it 'finds the closest gap' do
         closest_gap_before = gaps
@@ -98,6 +123,34 @@ RSpec.describe Gitlab::RelativePositioning::ItemContext do
         expect(subject).to have_attributes(
           find_next_gap_before: closest_gap_before,
           find_next_gap_after: closest_gap_after
+        )
+      end
+
+      it 'finds the neighbours' do
+        expect(subject).to have_attributes(
+          lhs_neighbour: subject.neighbour(issue_at(subject.relative_position - 2)),
+          rhs_neighbour: subject.neighbour(issue_at(subject.relative_position + 2))
+        )
+      end
+
+      it 'finds the next relative_positions' do
+        expect(subject).to have_attributes(
+          prev_relative_position: covered_by_range(subject.relative_position - 2),
+          next_relative_position: covered_by_range(subject.relative_position + 2)
+        )
+      end
+
+      it 'finds the min/max positions' do
+        expect(subject).to have_attributes(
+          min_relative_position: issues.first.relative_position,
+          max_relative_position: issues.last.relative_position
+        )
+      end
+
+      it 'finds the min/max siblings' do
+        expect(subject).to have_attributes(
+          min_sibling: siblings.first,
+          max_sibling: siblings.last
         )
       end
     end
@@ -117,7 +170,7 @@ RSpec.describe Gitlab::RelativePositioning::ItemContext do
         to_the_right_of_gap = subjects.select { |s| free_space < s.relative_position }
 
         expect(to_the_right_of_gap)
-          .to all(have_attributes(find_next_gap_before: eq(expected_gap)))
+          .to all(have_attributes(find_next_gap_before: eq(expected_gap), find_next_gap_after: be_nil))
       end
 
       it 'can always find a gap after if there is space to the right' do
@@ -126,7 +179,7 @@ RSpec.describe Gitlab::RelativePositioning::ItemContext do
         to_the_left_of_gap = subjects.select { |s| s.relative_position < free_space }
 
         expect(to_the_left_of_gap)
-          .to all(have_attributes(find_next_gap_after: eq(expected_gap)))
+          .to all(have_attributes(find_next_gap_before: be_nil, find_next_gap_after: eq(expected_gap)))
       end
     end
   end
