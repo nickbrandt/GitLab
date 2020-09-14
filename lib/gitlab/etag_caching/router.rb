@@ -6,7 +6,7 @@ module Gitlab
       Route = Struct.new(:regexp, :name)
       # We enable an ETag for every request matching the regex.
       # To match a regex the path needs to match the following:
-      #   - Don't contain a reserved word (expect for the words used in the
+      #   - Don't contain a reserved word (except for the words used in the
       #     regex itself)
       #   - Ending in `noteable/issue/<id>/notes` for the `issue_notes` route
       #   - Ending in `issues/id`/realtime_changes` for the `issue_title` route
@@ -18,14 +18,6 @@ module Gitlab
       RESERVED_WORDS_PREFIX = %Q(^(?!.*\/(#{RESERVED_WORDS_REGEX})\/).*)
 
       ROUTES = [
-        Gitlab::EtagCaching::Router::Route.new(
-          %r(#{RESERVED_WORDS_PREFIX}/noteable/issue/\d+/notes\z),
-          'issue_notes'
-        ),
-        Gitlab::EtagCaching::Router::Route.new(
-          %r(#{RESERVED_WORDS_PREFIX}/noteable/merge_request/\d+/notes\z),
-          'merge_request_notes'
-        ),
         Gitlab::EtagCaching::Router::Route.new(
           %r(#{RESERVED_WORDS_PREFIX}/issues/\d+/realtime_changes\z),
           'issue_title'
@@ -82,5 +74,3 @@ module Gitlab
     end
   end
 end
-
-Gitlab::EtagCaching::Router.prepend_if_ee('EE::Gitlab::EtagCaching::Router')

@@ -1,0 +1,5 @@
+---
+title: Remove notes for issues, merge requests, and epics from ETag caching
+merge_request: 42226
+author:
+type: fixed

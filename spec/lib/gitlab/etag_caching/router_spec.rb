@@ -3,24 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::EtagCaching::Router do
-  it 'matches issue notes endpoint' do
-    result = described_class.match(
-      '/my-group/and-subgroup/here-comes-the-project/noteable/issue/1/notes'
-    )
-
-    expect(result).to be_present
-    expect(result.name).to eq 'issue_notes'
-  end
-
-  it 'matches MR notes endpoint' do
-    result = described_class.match(
-      '/my-group/and-subgroup/here-comes-the-project/noteable/merge_request/1/notes'
-    )
-
-    expect(result).to be_present
-    expect(result.name).to eq 'merge_request_notes'
-  end
-
   it 'matches issue title endpoint' do
     result = described_class.match(
       '/my-group/my-project/-/issues/123/realtime_changes'

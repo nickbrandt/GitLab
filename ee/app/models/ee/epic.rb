@@ -116,10 +116,6 @@ module EE
 
       MAX_HIERARCHY_DEPTH = 5
 
-      def etag_caching_enabled?
-        true
-      end
-
       before_save :set_fixed_start_date, if: :start_date_is_fixed?
       before_save :set_fixed_due_date, if: :due_date_is_fixed?
 

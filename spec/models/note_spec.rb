@@ -1199,56 +1199,16 @@ RSpec.describe Note do
     let_it_be(:issue) { create(:issue) }
     let(:note) { build(:note, project: issue.project, noteable: issue) }
 
-    def expect_expiration(noteable)
-      expect_any_instance_of(Gitlab::EtagCaching::Store)
-        .to receive(:touch)
-        .with("/#{noteable.project.namespace.to_param}/#{noteable.project.to_param}/noteable/#{noteable.class.name.underscore}/#{noteable.id}/notes")
-    end
-
-    it "expires cache for note's issue when note is saved" do
-      expect_expiration(note.noteable)
+    it "expires cache for note's issuable when note is saved" do
+      expect(note.noteable).to receive(:expire_note_etag_cache)
 
       note.save!
     end
 
-    it "expires cache for note's issue when note is destroyed" do
-      expect_expiration(note.noteable)
+    it "expires cache for note's issuable when note is destroyed" do
+      expect(note.noteable).to receive(:expire_note_etag_cache)
 
       note.destroy!
-    end
-
-    context 'when issuable etag caching is disabled' do
-      it 'does not store cache key' do
-        allow(note.noteable).to receive(:etag_caching_enabled?).and_return(false)
-
-        expect_any_instance_of(Gitlab::EtagCaching::Store).not_to receive(:touch)
-
-        note.save!
-      end
-    end
-
-    context 'for merge requests' do
-      let_it_be(:merge_request) { create(:merge_request) }
-
-      context 'when adding a note to the MR' do
-        let(:note) { build(:note, noteable: merge_request, project: merge_request.project) }
-
-        it 'expires the MR note etag cache' do
-          expect_expiration(merge_request)
-
-          note.save!
-        end
-      end
-
-      context 'when adding a note to a commit on the MR' do
-        let(:note) { build(:note_on_commit, commit_id: merge_request.commits.first.id, project: merge_request.project) }
-
-        it 'expires the MR note etag cache' do
-          expect_expiration(merge_request)
-
-          note.save!
-        end
-      end
     end
   end
 
