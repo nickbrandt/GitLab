@@ -43,7 +43,7 @@ RSpec.describe GroupMembersFinder do
         stub_licensed_features(minimal_access_role: true)
       end
 
-      it 'returns only members with minimal access' do
+      it 'also returns members with minimal access' do
         result = finder.execute(include_relations: [:direct, :descendants])
 
         expect(result.to_a).to match_array([group_owner_membership, group_member_membership, dedicated_member_account_membership, group_minimal_access_membership])
