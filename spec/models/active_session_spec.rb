@@ -158,6 +158,38 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
     end
   end
 
+  describe '.scopes_for_user' do
+    let(:session_id_1) { '6919a6f1bb119dd7396fadc38fd18d0d' }
+    let(:session_id_2) { '59822c7d9fcdfa03725eff41782ad97d' }
+
+    before do
+      Gitlab::Redis::SharedState.with do |redis|
+        redis.set("session:user:gitlab:#{user.id}:#{session_id_2}", Marshal.dump({ session_id: 'a' }))
+        redis.set("session:user:gitlab:#{user.id}:#{session_id_2}", Marshal.dump({ session_id: 'a' }))
+
+        redis.sadd("session:lookup:user:gitlab:#{user.id}", [session_id_1, session_id_2])
+
+        redis.sadd("session:user:scope:gitlab:{#{user.id}}:#{session_id_1}", [1, 2, 3])
+        redis.sadd("session:user:scope:gitlab:{#{user.id}}:#{session_id_2}", [4, 5, 6])
+      end
+    end
+
+    it { expect(ActiveSession.scopes_for_user(user)).to contain_exactly(*%w[1 2 3 4 5 6]) }
+  end
+
+  describe '.scopes_for_session_id' do
+    let(:session_id) { '6919a6f1bb119dd7396fadc38fd18d0d' }
+    let(:scopes) { %w[scope1 scope2] }
+
+    before do
+      Gitlab::Redis::SharedState.with do |redis|
+        redis.sadd("session:user:scope:gitlab:{#{user.id}}:#{session_id}", scopes)
+      end
+    end
+
+    it { expect(ActiveSession.scopes_for_session_id(user, session_id)).to contain_exactly(*scopes) }
+  end
+
   describe '.set' do
     it 'sets a new redis entry for the user session and a lookup entry' do
       ActiveSession.set(user, request)
@@ -235,6 +267,21 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
         end
       end
     end
+
+    context 'with scope' do
+      let_it_be(:scope) { 'some_scope' }
+
+      before do
+        ActiveSession.set(user, request, scope: scope)
+      end
+
+      it 'sets a new redis entry for the user session scope' do
+        Gitlab::Redis::SharedState.with do |redis|
+          key = "session:user:scope:gitlab:{#{user.id}}:#{session.id.private_id}"
+          expect(redis.smembers(key)).to eq [scope]
+        end
+      end
+    end
   end
 
   describe '.destroy_with_rack_session_id' do
@@ -271,6 +318,20 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
 
       Gitlab::Redis::SharedState.with do |redis|
         expect(redis.scan_each(match: "session:lookup:user:gitlab:#{user.id}").to_a).to be_empty
+      end
+    end
+
+    it 'removes session scopes' do
+      key = "session:user:scope:gitlab:{#{user.id}}:#{request.session.id}"
+
+      Gitlab::Redis::SharedState.with do |redis|
+        redis.sadd(key, [1, 2, 3])
+      end
+
+      ActiveSession.destroy_with_rack_session_id(user, request.session.id)
+
+      Gitlab::Redis::SharedState.with do |redis|
+        expect(redis.scan_each(match: key).to_a).to be_empty
       end
     end
 
@@ -446,12 +507,16 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
         redis.set("session:user:gitlab:#{user.id}:6919a6f1bb119dd7396fadc38fd18d0d", '')
         redis.sadd("session:lookup:user:gitlab:#{user.id}", '6919a6f1bb119dd7396fadc38fd18d0d')
         redis.sadd("session:lookup:user:gitlab:#{user.id}", '59822c7d9fcdfa03725eff41782ad97d')
+        redis.sadd("session:user:scope:gitlab:{#{user.id}}:6919a6f1bb119dd7396fadc38fd18d0d", %w[1 2 3])
+        redis.sadd("session:user:scope:gitlab:{#{user.id}}:59822c7d9fcdfa03725eff41782ad97d", %w[4 5 6])
       end
 
       ActiveSession.cleanup(user)
 
       Gitlab::Redis::SharedState.with do |redis|
         expect(redis.smembers("session:lookup:user:gitlab:#{user.id}")).to eq ['6919a6f1bb119dd7396fadc38fd18d0d']
+        expect(redis.smembers("session:user:scope:gitlab:{#{user.id}}:6919a6f1bb119dd7396fadc38fd18d0d")).to eq %w[1 2 3]
+        expect(redis.smembers("session:user:scope:gitlab:{#{user.id}}:59822c7d9fcdfa03725eff41782ad97d")).to be_empty
       end
     end
 

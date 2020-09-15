@@ -31,6 +31,7 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
   def redirect_identity_linked
     flash[:notice] = "SAML for #{@unauthenticated_group.name} was added to your connected accounts"
 
+    sign_in(current_user, event: :authentication)
     redirect_to after_sign_in_path_for(current_user)
   end
 
@@ -38,7 +39,12 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
   def redirect_identity_exists
     flash[:notice] = "Already signed in with SAML for #{@unauthenticated_group.name}"
 
+    sign_in(current_user, event: :authentication)
     redirect_to after_sign_in_path_for(current_user)
+  end
+
+  def session_scope(group)
+    "namespace_#{group.id}"
   end
 
   override :redirect_identity_link_failed
@@ -61,6 +67,12 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
   def sign_in(resource_or_scope, *args)
     store_active_saml_session
 
+    # Scope the session by the group.
+    opts = args.last
+    opts.merge!(
+      gl_scope: session_scope(@unauthenticated_group),
+      force: true
+    )
     super
   end
 

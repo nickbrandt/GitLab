@@ -54,10 +54,13 @@ RSpec.describe Groups::OmniauthCallbacksController do
 
     shared_examples 'works with session enforcement' do
       it 'stores that a SAML session is active' do
-        expect(Gitlab::Auth::GroupSaml::SsoEnforcer).to receive(:new).with(saml_provider).and_call_original
-        expect_any_instance_of(Gitlab::Auth::GroupSaml::SsoEnforcer).to receive(:update_session)
+        freeze_time do
+          post provider, params: { group_id: group }
 
-        post provider, params: { group_id: group }
+          expect(session[Gitlab::Auth::GroupSaml::SsoState::SESSION_STORE_KEY]).to include({
+             saml_provider.id => DateTime.current
+          })
+        end
       end
     end
 
@@ -77,6 +80,12 @@ RSpec.describe Groups::OmniauthCallbacksController do
         expect(audit_event_service).to receive_message_chain(:for_authentication, :security_event)
 
         post provider, params: { group_id: group }
+      end
+
+      it 'scopes the session authorization' do
+        post provider, params: { group_id: group }
+
+        expect(ActiveSession.scopes_for_user(user)).to eq ["namespace_#{group.id}"]
       end
 
       include_examples 'works with session enforcement'

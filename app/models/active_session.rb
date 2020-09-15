@@ -1,5 +1,30 @@
 # frozen_string_literal: true
 
+# Backing store for GitLab session data.
+#
+# The raw session information is stored by the Rails session store
+# (config/initializers/session_store.rb). These entries are accessible by the
+# rack_key_name class method and consistute the base of the session data
+# entries. All other entries in the session store can be traced back to these
+# entries.
+#
+# After a user logs in (config/initializers/warden.rb) a further entry is made
+# in the session store. This entry holds a record of the user's logged in
+# session. These are accessible with the key_name(user_id, session_id) class
+# method. These entries will expire. Lookups to these entries are lazilly
+# cleaned on future user access.
+#
+# The user's logged in session information is referenced by two lookup entries.
+#
+# The first is a reference to all sessions that belong to a specific user. A
+# user may login through multiple browsers/devices and thus record multiple
+# login sessions. These are accessible through the lookup_key_name(user_id)
+# class method.
+#
+# The second lookup entry is a reference to which part of the system a user
+# login has been authorized to access. This is accessible through the
+# session_scopes_key_name(user_id, session_id) class method.
+#
 class ActiveSession
   include ActiveModel::Model
 
@@ -30,7 +55,7 @@ class ActiveSession
     Gitlab::CryptoHelper.aes256_gcm_encrypt(session_id)
   end
 
-  def self.set(user, request)
+  def self.set(user, request, scope: nil)
     Gitlab::Redis::SharedState.with do |redis|
       session_private_id = request.session.id.private_id
       client = DeviceDetector.new(request.user_agent)
@@ -61,6 +86,13 @@ class ActiveSession
           lookup_key_name(user.id),
           session_private_id
         )
+
+        if scope
+          redis.sadd(
+            session_scopes_key_name(user.id, session_private_id),
+            scope
+          )
+        end
 
         # We remove the ActiveSession stored by using public_id to avoid
         # duplicate entries
@@ -103,9 +135,14 @@ class ActiveSession
   end
 
   def self.destroy_sessions(redis, user, session_ids)
-    key_names = session_ids.map { |session_id| key_name(user.id, session_id) }
-
     redis.srem(lookup_key_name(user.id), session_ids)
+
+    key_names = session_ids.flat_map do |session_id|
+      [
+        key_name(user.id, session_id),
+        session_scopes_key_name(user.id, session_id)
+      ]
+    end
 
     Gitlab::Instrumentation::RedisClusterValidator.allow_cross_slot_commands do
       redis.del(key_names)
@@ -143,12 +180,20 @@ class ActiveSession
     list(user).reject(&:is_impersonated)
   end
 
-  def self.key_name(user_id, session_id = '*')
+  def self.rack_key_name(session_id)
+    "#{Gitlab::Redis::SharedState::SESSION_NAMESPACE}:#{session_id}"
+  end
+
+  def self.key_name(user_id, session_id)
     "#{Gitlab::Redis::SharedState::USER_SESSIONS_NAMESPACE}:#{user_id}:#{session_id}"
   end
 
   def self.lookup_key_name(user_id)
     "#{Gitlab::Redis::SharedState::USER_SESSIONS_LOOKUP_NAMESPACE}:#{user_id}"
+  end
+
+  def self.session_scopes_key_name(user_id, session_id)
+    "#{Gitlab::Redis::SharedState::USER_SESSIONS_SCOPES_NAMESPACE}:{#{user_id}}:#{session_id}"
   end
 
   def self.list_sessions(user)
@@ -185,6 +230,22 @@ class ActiveSession
     end
   end
 
+  def self.scopes_for_user(user)
+    Gitlab::Redis::SharedState.with do |redis|
+      keys = session_ids_for_user(user.id).map do |session_id|
+        session_scopes_key_name(user.id, session_id)
+      end
+
+      keys.present? ? redis.sunion(keys) : []
+    end
+  end
+
+  def self.scopes_for_session_id(user, session_id)
+    Gitlab::Redis::SharedState.with do |redis|
+      redis.smembers(session_scopes_key_name(user.id, session_id))
+    end
+  end
+
   # Deserializes a session Hash object from Redis.
   #
   # raw_session - Raw bytes from Redis
@@ -197,7 +258,7 @@ class ActiveSession
   end
 
   def self.rack_session_keys(rack_session_ids)
-    rack_session_ids.map { |session_id| "#{Gitlab::Redis::SharedState::SESSION_NAMESPACE}:#{session_id}" }
+    rack_session_ids.map { |session_id| rack_key_name(session_id) }
   end
 
   def self.raw_active_session_entries(redis, session_ids, user_id)
@@ -247,6 +308,7 @@ class ActiveSession
     redis.pipelined do
       session_ids_and_entries.reject { |_session_id, entry| entry }.each do |session_id, _entry|
         redis.srem(lookup_key_name(user.id), session_id)
+        redis.del(session_scopes_key_name(user.id, session_id))
       end
     end
 
