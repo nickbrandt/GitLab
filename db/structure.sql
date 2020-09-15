@@ -9853,8 +9853,8 @@ CREATE TABLE public.ci_build_pending_states (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     build_id bigint NOT NULL,
-    state integer,
-    failure_reason integer,
+    state smallint,
+    failure_reason smallint,
     trace_checksum bytea
 );
 
