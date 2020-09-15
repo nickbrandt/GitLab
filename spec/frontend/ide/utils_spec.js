@@ -14,59 +14,77 @@ import {
 describe('WebIDE utils', () => {
   describe('isTextFile', () => {
     it('returns false for known binary types', () => {
-      expect(isTextFile('file content', 'image/png', 'my.png')).toBeFalsy();
+      expect(isTextFile('my.png', 'file content', 'image/png')).toBeFalsy();
       // mime types are case insensitive
-      expect(isTextFile('file content', 'IMAGE/PNG', 'my.png')).toBeFalsy();
+      expect(isTextFile('my.png', 'file content', 'IMAGE/PNG')).toBeFalsy();
     });
 
     it('returns true for known text types', () => {
-      expect(isTextFile('file content', 'text/plain', 'my.txt')).toBeTruthy();
+      expect(isTextFile('my.txt', 'file content', 'text/plain')).toBeTruthy();
       // mime types are case insensitive
-      expect(isTextFile('file content', 'TEXT/PLAIN', 'my.txt')).toBeTruthy();
+      expect(isTextFile('my.txt', 'file content', 'TEXT/PLAIN')).toBeTruthy();
     });
 
     it('returns true for file extensions that Monaco supports syntax highlighting for', () => {
       // test based on both MIME and extension
-      expect(isTextFile('{"éêė":"value"}', 'application/json', 'my.json')).toBeTruthy();
-      expect(isTextFile('{"éêė":"value"}', 'application/json', '.tsconfig')).toBeTruthy();
-      expect(isTextFile('SELECT "éêė" from tablename', 'application/sql', 'my.sql')).toBeTruthy();
+      expect(isTextFile('my.json', '{"éêė":"value"}', 'application/json')).toBeTruthy();
+      expect(isTextFile('.tsconfig', '{"éêė":"value"}', 'application/json')).toBeTruthy();
+      expect(isTextFile('my.sql', 'SELECT "éêė" from tablename', 'application/sql')).toBeTruthy();
     });
 
     it('returns true even irrespective of whether the mimes, extensions or file names are lowercase or upper case', () => {
-      expect(isTextFile('{"éêė":"value"}', 'application/json', 'MY.JSON')).toBeTruthy();
-      expect(isTextFile('SELECT "éêė" from tablename', 'application/sql', 'MY.SQL')).toBeTruthy();
+      expect(isTextFile('MY.JSON', '{"éêė":"value"}', 'application/json')).toBeTruthy();
+      expect(isTextFile('MY.SQL', 'SELECT "éêė" from tablename', 'application/sql')).toBeTruthy();
       expect(
-        isTextFile('var code = "something"', 'application/javascript', 'Gruntfile'),
+        isTextFile('Gruntfile', 'var code = "something"', 'application/javascript'),
       ).toBeTruthy();
       expect(
         isTextFile(
+          'dockerfile',
           'MAINTAINER Александр "alexander11354322283@me.com"',
           'application/octet-stream',
-          'dockerfile',
         ),
       ).toBeTruthy();
     });
 
     it('returns false if filename is same as the expected extension', () => {
-      expect(isTextFile('SELECT "éêė" from tablename', 'application/sql', 'sql')).toBeFalsy();
+      expect(isTextFile('sql', 'SELECT "éêė" from tablename', 'application/sql')).toBeFalsy();
     });
 
     it('returns true for ASCII only content for unknown types', () => {
-      expect(isTextFile('plain text', 'application/x-new-type', 'hello.mytype')).toBeTruthy();
+      expect(isTextFile('hello.mytype', 'plain text', 'application/x-new-type')).toBeTruthy();
     });
 
     it('returns true for relevant filenames', () => {
       expect(
         isTextFile(
+          'Dockerfile',
           'MAINTAINER Александр "alexander11354322283@me.com"',
           'application/octet-stream',
-          'Dockerfile',
         ),
       ).toBeTruthy();
     });
 
     it('returns false for non-ASCII content for unknown types', () => {
-      expect(isTextFile('{"éêė":"value"}', 'application/octet-stream', 'my.random')).toBeFalsy();
+      expect(isTextFile('my.random', '{"éêė":"value"}', 'application/octet-stream')).toBeFalsy();
+    });
+
+    it.each`
+      filename        | result
+      ${'myfile.txt'} | ${true}
+      ${'Dockerfile'} | ${true}
+      ${'img.png'}    | ${false}
+      ${'abc.js'}     | ${true}
+      ${'abc.random'} | ${false}
+      ${'image.jpeg'} | ${false}
+    `('returns $result for $filename', ({ filename, result }) => {
+      expect(isTextFile(filename)).toBe(result);
+    });
+
+    it('returns true if content is empty string but false if content is not passed', () => {
+      expect(isTextFile('abc.dat')).toBe(false);
+      expect(isTextFile('abc.dat', '')).toBe(true);
+      expect(isTextFile('abc.dat', '  ')).toBe(true);
     });
   });
 
