@@ -10,6 +10,12 @@ RSpec.describe IncidentManagement::Incidents::UpdateSeverityService do
 
     subject(:update_severity) { described_class.new(issuable, user, severity).execute }
 
+    shared_examples 'adds a system note' do
+      it do
+        expect { update_severity }.to change { issuable.notes.where(author: user).count }.by(1)
+      end
+    end
+
     context 'when issuable not an incident' do
       %i(issue merge_request).each do |issuable_type|
         let(:issuable) { build_stubbed(issuable_type) }
@@ -17,7 +23,11 @@ RSpec.describe IncidentManagement::Incidents::UpdateSeverityService do
         it { is_expected.to be_nil }
 
         it 'does not set severity' do
-          expect { subject }.not_to change(IssuableSeverity, :count)
+          expect { update_severity }.not_to change(IssuableSeverity, :count)
+        end
+
+        it 'does not add a system note' do
+          expect { update_severity }.not_to change { issuable.notes.count }
         end
       end
     end
@@ -33,6 +43,8 @@ RSpec.describe IncidentManagement::Incidents::UpdateSeverityService do
         it 'sets severity to specified value' do
           expect { update_severity }.to change { issuable.severity }.to('low')
         end
+
+        it_behaves_like 'adds a system note'
       end
 
       context 'when issuable has an issuable severity' do
@@ -45,6 +57,8 @@ RSpec.describe IncidentManagement::Incidents::UpdateSeverityService do
         it 'updates existing issuable severity' do
           expect { update_severity }.to change { issuable_severity.severity }.to(severity)
         end
+
+        it_behaves_like 'adds a system note'
       end
 
       context 'when severity value is unsupported' do
@@ -55,6 +69,8 @@ RSpec.describe IncidentManagement::Incidents::UpdateSeverityService do
 
           expect(issuable.issuable_severity.severity).to eq(IssuableSeverity::DEFAULT)
         end
+
+        it_behaves_like 'adds a system note'
       end
     end
   end

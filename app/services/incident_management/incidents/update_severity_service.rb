@@ -14,7 +14,8 @@ module IncidentManagement
       def execute
         return unless issuable.incident?
 
-        issuable_severity.update(severity: severity)
+        update_severity!
+        add_system_note
       end
 
       private
@@ -23,6 +24,14 @@ module IncidentManagement
 
       def issuable_severity
         issuable.issuable_severity || issuable.build_issuable_severity(issue_id: issuable.id)
+      end
+
+      def update_severity!
+        issuable_severity.update!(severity: severity)
+      end
+
+      def add_system_note
+        SystemNoteService.change_incident_severity(issuable, current_user)
       end
     end
   end
