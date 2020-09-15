@@ -10461,9 +10461,6 @@ msgstr ""
 msgid "Expand approvers"
 msgstr ""
 
-msgid "Expand file"
-msgstr ""
-
 msgid "Expand milestones"
 msgstr ""
 
@@ -26024,9 +26021,6 @@ msgid "This feature should be used with an index that was created after 13.0"
 msgstr ""
 
 msgid "This field is required."
-msgstr ""
-
-msgid "This file is collapsed."
 msgstr ""
 
 msgid "This group"
