@@ -3,6 +3,7 @@ package parser
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -42,7 +43,7 @@ func createFiles(t *testing.T, filePath, tmpDir string) {
 	file, err := os.Open(filePath)
 	require.NoError(t, err)
 
-	parser, err := NewParser(file, Config{})
+	parser, err := NewParser(context.Background(), file, Config{})
 	require.NoError(t, err)
 
 	zipFileName := tmpDir + ".zip"
