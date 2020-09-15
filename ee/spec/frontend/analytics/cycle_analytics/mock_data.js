@@ -75,13 +75,12 @@ export const reviewStage = getStageByTitle(dummyState.stages, 'review');
 export const codeStage = getStageByTitle(dummyState.stages, 'code');
 export const testStage = getStageByTitle(dummyState.stages, 'test');
 export const stagingStage = getStageByTitle(dummyState.stages, 'staging');
-export const totalStage = getStageByTitle(dummyState.stages, 'total');
 
 export const allowedStages = [issueStage, planStage, codeStage];
 
 const deepCamelCase = obj => convertObjectPropsToCamelCase(obj, { deep: true });
 
-export const defaultStages = ['issue', 'plan', 'review', 'code', 'test', 'staging', 'production'];
+export const defaultStages = ['issue', 'plan', 'review', 'code', 'test', 'staging'];
 
 const stageFixtures = defaultStages.reduce((acc, stage) => {
   const events = getJSONFixture(fixtureEndpoints.stageEvents(stage));
@@ -111,14 +110,12 @@ export const stageMediansWithNumericIds = defaultStages.reduce((acc, stage) => {
 export const endDate = new Date(2019, 0, 14);
 export const startDate = getDateInPast(endDate, DEFAULT_DAYS_IN_PAST);
 
-export const rawIssueEvents = stageFixtures.issue;
 export const issueEvents = deepCamelCase(stageFixtures.issue);
 export const planEvents = deepCamelCase(stageFixtures.plan);
 export const reviewEvents = deepCamelCase(stageFixtures.review);
 export const codeEvents = deepCamelCase(stageFixtures.code);
 export const testEvents = deepCamelCase(stageFixtures.test);
 export const stagingEvents = deepCamelCase(stageFixtures.staging);
-export const totalEvents = deepCamelCase(stageFixtures.production);
 export const rawCustomStage = {
   title: 'Coolest beans stage',
   hidden: false,
