@@ -66,9 +66,13 @@ class GroupMembersFinder < UnionFinder
     group.members
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def relation_group_members(relation)
-    GroupMember.non_request.non_minimal_access
+    all_group_members(relation).non_minimal_access
+  end
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  def all_group_members(relation)
+    GroupMember.non_request
       .where(source_id: relation.select(:id))
       .where.not(user_id: group.users.select(:id))
   end

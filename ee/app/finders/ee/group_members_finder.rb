@@ -18,19 +18,13 @@ module EE::GroupMembersFinder
   def group_members_list
     return group.all_group_members if group.minimal_access_role_allowed?
 
-    group.members
+    super
   end
 
   override :relation_group_members
-  # rubocop: disable CodeReuse/ActiveRecord
   def relation_group_members(relation)
-    members = ::GroupMember.non_request
-      .where(source_id: relation.select(:id))
-      .where.not(user_id: group.users.select(:id))
+    return all_group_members(relation) if group.minimal_access_role_allowed?
 
-    return members if group.minimal_access_role_allowed?
-
-    members.non_minimal_access
+    super
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 end
