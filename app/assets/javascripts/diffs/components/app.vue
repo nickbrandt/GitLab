@@ -28,6 +28,9 @@ import {
   TREE_HIDE_STATS_WIDTH,
   MR_TREE_SHOW_KEY,
   CENTERED_LIMITED_CONTAINER_CLASSES,
+  ALERT_OVERFLOW_HIDDEN,
+  ALERT_MERGE_CONFLICT,
+  ALERT_COLLAPSED_FILES,
 } from '../constants';
 
 export default {
@@ -47,6 +50,11 @@ export default {
     GlSprintf,
   },
   mixins: [glFeatureFlagsMixin()],
+  alerts: {
+    ALERT_OVERFLOW_HIDDEN,
+    ALERT_MERGE_CONFLICT,
+    ALERT_COLLAPSED_FILES,
+  },
   props: {
     endpoint: {
       type: String,
@@ -195,15 +203,15 @@ export default {
       let visible = false;
 
       if (this.renderOverflowWarning) {
-        visible = 'overflow';
+        visible = this.$options.alerts.ALERT_OVERFLOW_HIDDEN;
       } else if (this.isDiffHead && this.hasConflicts) {
-        visible = 'merge-conflict';
+        visible = this.$options.alerts.ALERT_MERGE_CONFLICT;
       } else if (
         this.hasCollapsedFile &&
         !this.collapsedWarningDismissed &&
         !this.viewDiffsFileByFile
       ) {
-        visible = 'collapsed';
+        visible = this.$options.alerts.ALERT_COLLAPSED_FILES;
       }
 
       return visible;
@@ -441,20 +449,20 @@ export default {
       />
 
       <hidden-files-warning
-        v-if="visibleWarning == 'overflow'"
+        v-if="visibleWarning == $options.alerts.ALERT_OVERFLOW_HIDDEN"
         :visible="numVisibleFiles"
         :total="numTotalFiles"
         :plain-diff-path="plainDiffPath"
         :email-patch-path="emailPatchPath"
       />
       <merge-conflict-warning
-        v-if="visibleWarning == 'merge-conflict'"
+        v-if="visibleWarning == $options.alerts.ALERT_MERGE_CONFLICT"
         :limited="isLimitedContainer"
         :resolution-path="conflictResolutionPath"
         :mergeable="canMerge"
       />
       <collapsed-files-warning
-        v-if="visibleWarning == 'collapsed'"
+        v-if="visibleWarning == $options.alerts.ALERT_COLLAPSED_FILES"
         :limited="isLimitedContainer"
         @dismiss="dismissCollapsedWarning"
       />
