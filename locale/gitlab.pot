@@ -8,8 +8,6 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-11 14:23+1000\n"
-"PO-Revision-Date: 2020-09-11 14:23+1000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -304,6 +302,11 @@ msgstr[1] ""
 
 msgid "%d vulnerability dismissed"
 msgid_plural "%d vulnerabilities dismissed"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d warning found:"
+msgid_plural "%d warnings found:"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -822,6 +825,9 @@ msgid "%{total_warnings} warning(s) found:"
 msgstr ""
 
 msgid "%{total} open issue weight"
+msgstr ""
+
+msgid "%{total} warnings found: showing first %{warningsDisplayed}"
 msgstr ""
 
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
@@ -25037,6 +25043,9 @@ msgid "The fork relationship has been removed."
 msgstr ""
 
 msgid "The form contains the following error:"
+msgstr ""
+
+msgid "The form contains the following warning:"
 msgstr ""
 
 msgid "The global settings require you to enable Two-Factor Authentication for your account."
