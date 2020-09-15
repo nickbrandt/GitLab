@@ -21,6 +21,10 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
     })
   end
 
+  before do
+    allow(request).to receive(:params).and_return({})
+  end
+
   describe '#current?' do
     it 'returns true if the active session matches the current session' do
       active_session = ActiveSession.new(session_id: rack_session)
@@ -206,6 +210,22 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
             updated_at: Time.zone.parse('2018-03-12 09:07')
           )
         end
+      end
+    end
+
+    context 'when request.params["group_id"] is available' do
+      let(:group) { create(:group) }
+
+      before do
+        allow(request).to receive(:params).and_return({ group_id: group.id })
+      end
+
+      it 'adds a namespace_id session attibute' do
+        ActiveSession.set(user, request)
+        session = ActiveSession.list(user)
+
+        expect(session.count).to eq 1
+        expect(session.first).to have_attributes(namespace_id: group.id)
       end
     end
   end

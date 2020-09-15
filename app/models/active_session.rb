@@ -9,7 +9,8 @@ class ActiveSession
   attr_accessor :created_at, :updated_at,
     :ip_address, :browser, :os,
     :device_name, :device_type,
-    :is_impersonated, :session_id
+    :is_impersonated, :session_id,
+    :namespace_id
 
   def current?(session)
     return false if session_id.nil? || session.id.nil?
@@ -34,6 +35,7 @@ class ActiveSession
       session_id = request.session.id.public_id
       client = DeviceDetector.new(request.user_agent)
       timestamp = Time.current
+      namespace_id = request.params[:group_id]
 
       active_user_session = new(
         ip_address: request.remote_ip,
@@ -44,6 +46,7 @@ class ActiveSession
         created_at: user.current_sign_in_at || timestamp,
         updated_at: timestamp,
         session_id: session_id,
+        namespace_id: namespace_id,
         is_impersonated: request.session[:impersonator_id].present?
       )
 
