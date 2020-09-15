@@ -197,6 +197,7 @@ module QA
       autoload :Epic, 'qa/ee/resource/epic'
       autoload :GroupLabel, 'qa/ee/resource/group_label'
       autoload :GroupIteration, 'qa/ee/resource/group_iteration'
+      autoload :ImportRepoWithCICD, 'qa/ee/resource/import_repo_with_ci_cd'
 
       module Board
         autoload :BaseBoard, 'qa/ee/resource/board/base_board'
