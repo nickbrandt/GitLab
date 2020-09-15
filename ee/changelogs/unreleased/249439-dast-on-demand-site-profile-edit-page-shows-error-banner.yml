@@ -1,0 +1,5 @@
+---
+title: 'DAST on-demand site profiles: prevent error banner from showing'
+merge_request: 42300
+author:
+type: fixed
