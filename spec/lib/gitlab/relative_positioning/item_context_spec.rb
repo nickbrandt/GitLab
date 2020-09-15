@@ -10,9 +10,7 @@ RSpec.describe Gitlab::RelativePositioning::ItemContext do
     create(:issue, project: project, relative_position: pos)
   end
 
-  # Increase the range size to convice yourself that this covers ALL arrangements
-  # We use plain variables here so we can use them in `where` blocks.
-  range = (101..108)
+  range = (101..107) # A deliberately small range, so we can test everything
   indices = (0..).take(range.size)
 
   let(:start) { ((range.first + range.last) / 2.0).floor }
@@ -34,34 +32,65 @@ RSpec.describe Gitlab::RelativePositioning::ItemContext do
     with_them do
       subject { subjects[index] }
 
+      let(:positions) { subject.scoped_items.map(&:relative_position) }
+
       it 'is possible to shift_right, which will consume the gap at the end' do
         subject.shift_right
 
         expect(subject.find_next_gap_after).not_to be_present
+
+        expect(positions).to all(be_between(range.first, range.last))
+        expect(positions).to eq(positions.uniq)
       end
 
       it 'is possible to create_space_right, which will move the gap to immediately after' do
         subject.create_space_right
 
         expect(subject.find_next_gap_after).to have_attributes(start_pos: subject.relative_position)
+        expect(positions).to all(be_between(range.first, range.last))
+        expect(positions).to eq(positions.uniq)
       end
 
       it 'is possible to shift_left, which will consume the gap at the start' do
         subject.shift_left
 
         expect(subject.find_next_gap_before).not_to be_present
+        expect(positions).to all(be_between(range.first, range.last))
+        expect(positions).to eq(positions.uniq)
       end
 
       it 'is possible to create_space_left, which will move the gap to immediately before' do
         subject.create_space_left
 
         expect(subject.find_next_gap_before).to have_attributes(start_pos: subject.relative_position)
+        expect(positions).to all(be_between(range.first, range.last))
+        expect(positions).to eq(positions.uniq)
       end
     end
   end
 
   context 'there is a gap of multiple spaces' do
     let_it_be(:issues) { [range.first, range.last].map { |pos| create_issue(pos) } }
+
+    it 'is impossible to move the last element to the right' do
+      expect { subjects.last.shift_right }.to raise_error(Gitlab::RelativePositioning::NoSpaceLeft)
+    end
+
+    it 'is impossible to move the first element to the left' do
+      expect { subjects.first.shift_left }.to raise_error(Gitlab::RelativePositioning::NoSpaceLeft)
+    end
+
+    it 'is possible to move the last element to the left' do
+      subject = subjects.last
+
+      expect { subject.shift_left }.to change { subject.relative_position }.by(be < 0)
+    end
+
+    it 'is possible to move the first element to the right' do
+      subject = subjects.first
+
+      expect { subject.shift_right }.to change { subject.relative_position }.by(be > 0)
+    end
 
     it 'is possible to find the gap from the right' do
       gap = Gitlab::RelativePositioning::Gap.new(range.last, range.first)
