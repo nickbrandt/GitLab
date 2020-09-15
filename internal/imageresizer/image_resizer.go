@@ -20,8 +20,6 @@ import (
 
 	"gitlab.com/gitlab-org/labkit/tracing"
 
-	"github.com/sirupsen/logrus"
-
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
@@ -31,9 +29,9 @@ type resizer struct{ senddata.Prefix }
 var SendScaledImage = &resizer{"send-scaled-img:"}
 
 type resizeParams struct {
-	Location string
-	Width    uint
-	Format   string
+	Location    string
+	ContentType string
+	Width       uint
 }
 
 type processCounter struct {
@@ -111,26 +109,45 @@ func (r *resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 	}
 	defer sourceImageReader.Close()
 
-	// Past this point we attempt to rescale the image; if this should fail for any reason, we
+	logFields := func(bytesWritten int64) *log.Fields {
+		return &log.Fields{
+			"bytes_written":     bytesWritten,
+			"duration_s":        time.Since(start).Seconds(),
+			"target_width":      params.Width,
+			"content_type":      params.ContentType,
+			"original_filesize": filesize,
+		}
+	}
+
+	// We first attempt to rescale the image; if this should fail for any reason, we
 	// simply fail over to rendering out the original image unchanged.
-	imageReader, resizeCmd := tryResizeImage(req.Context(), sourceImageReader, params.Width, logger)
+	imageReader, resizeCmd, err := tryResizeImage(req, sourceImageReader, logger.Writer(), params)
+	if err != nil {
+		// something failed, but we can still write out the original image, do don't return early
+		helper.LogErrorWithFields(req, err, *logFields(0))
+	}
 	defer helper.CleanUpProcessGroup(resizeCmd)
 	imageResizeCompleted.Inc()
 
 	w.Header().Del("Content-Length")
 	bytesWritten, err := io.Copy(w, imageReader)
 	if err != nil {
-		helper.Fail500(w, req, err)
-		return
+		handleFailedCommand(w, req, bytesWritten, err, logFields(bytesWritten))
+	} else if err = resizeCmd.Wait(); err != nil {
+		handleFailedCommand(w, req, bytesWritten, err, logFields(bytesWritten))
+	} else {
+		logger.WithFields(*logFields(bytesWritten)).Printf("ImageResizer: Success")
 	}
+}
 
-	logger.WithFields(log.Fields{
-		"bytes_written":     bytesWritten,
-		"duration_s":        time.Since(start).Seconds(),
-		"target_width":      params.Width,
-		"format":            params.Format,
-		"original_filesize": filesize,
-	}).Printf("ImageResizer: Success")
+func handleFailedCommand(w http.ResponseWriter, req *http.Request, bytesWritten int64, err error, logFields *log.Fields) {
+	if err != nil {
+		if bytesWritten <= 0 {
+			helper.Fail500(w, req, err)
+		} else {
+			helper.LogErrorWithFields(req, err, *logFields)
+		}
+	}
 }
 
 func (r *resizer) unpackParameters(paramsData string) (*resizeParams, error) {
@@ -143,30 +160,51 @@ func (r *resizer) unpackParameters(paramsData string) (*resizeParams, error) {
 		return nil, fmt.Errorf("ImageResizer: Location is empty")
 	}
 
+	if params.ContentType == "" {
+		return nil, fmt.Errorf("ImageResizer: Image MIME type must be set")
+	}
+
 	return &params, nil
 }
 
 // Attempts to rescale the given image data, or in case of errors, falls back to the original image.
-func tryResizeImage(ctx context.Context, r io.Reader, width uint, logger *logrus.Entry) (io.Reader, *exec.Cmd) {
+func tryResizeImage(req *http.Request, r io.Reader, errorWriter io.Writer, params *resizeParams) (io.Reader, *exec.Cmd, error) {
 	if !numScalerProcs.tryIncrement() {
-		return r, nil
+		return r, nil, fmt.Errorf("ImageResizer: too many running scaler processes")
 	}
 
+	ctx := req.Context()
 	go func() {
 		<-ctx.Done()
 		numScalerProcs.decrement()
 	}()
 
-	resizeCmd, resizedImageReader, err := startResizeImageCommand(ctx, r, logger.Writer(), width)
-	if err != nil {
-		logger.WithError(err).Error("ImageResizer: failed forking into graphicsmagick")
-		return r, nil
+	width := params.Width
+	gmFileSpec := determineFilePrefix(params.ContentType)
+	if gmFileSpec == "" {
+		return r, nil, fmt.Errorf("ImageResizer: unexpected MIME type: %s", params.ContentType)
 	}
-	return resizedImageReader, resizeCmd
+
+	resizeCmd, resizedImageReader, err := startResizeImageCommand(ctx, r, errorWriter, width, gmFileSpec)
+	if err != nil {
+		return r, nil, fmt.Errorf("ImageResizer: failed forking into graphicsmagick")
+	}
+	return resizedImageReader, resizeCmd, nil
 }
 
-func startResizeImageCommand(ctx context.Context, imageReader io.Reader, errorWriter io.Writer, width uint) (*exec.Cmd, io.ReadCloser, error) {
-	cmd := exec.CommandContext(ctx, "gm", "convert", "-resize", fmt.Sprintf("%dx", width), "-", "-")
+func determineFilePrefix(contentType string) string {
+	switch contentType {
+	case "image/png":
+		return "png:"
+	case "image/jpeg":
+		return "jpg:"
+	default:
+		return ""
+	}
+}
+
+func startResizeImageCommand(ctx context.Context, imageReader io.Reader, errorWriter io.Writer, width uint, gmFileSpec string) (*exec.Cmd, io.ReadCloser, error) {
+	cmd := exec.CommandContext(ctx, "gm", "convert", "-resize", fmt.Sprintf("%dx", width), gmFileSpec+"-", "-")
 	cmd.Stdin = imageReader
 	cmd.Stderr = errorWriter
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
