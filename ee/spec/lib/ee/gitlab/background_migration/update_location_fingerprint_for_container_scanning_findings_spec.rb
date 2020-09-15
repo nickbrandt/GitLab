@@ -92,7 +92,7 @@ RSpec.describe Gitlab::BackgroundMigration::UpdateLocationFingerprintForContaine
       primary_identifier_id: primary_identifier_id,
       project_fingerprint: attrs[:project_fingerprint],
       location_fingerprint: Digest::SHA1.hexdigest(SecureRandom.hex(10)),
-      uuid: attrs[:uuid],
+      uuid: SecureRandom.uuid,
       name: attrs[:name],
       metadata_version: '1.3',
       raw_metadata: attrs[:raw_metadata]

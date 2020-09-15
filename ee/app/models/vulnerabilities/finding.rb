@@ -5,6 +5,8 @@ module Vulnerabilities
     include ShaAttribute
     include ::Gitlab::Utils::StrongMemoize
     include Presentable
+    include IgnorableColumns
+    ignore_column :uuid, remove_with: "13.7", remove_after: "2020-12-22"
 
     # https://gitlab.com/groups/gitlab-org/-/epics/3148
     # https://gitlab.com/gitlab-org/gitlab/-/issues/214563#note_370782508 is why the table names are not renamed
@@ -67,7 +69,6 @@ module Vulnerabilities
 
     validates :scanner, presence: true
     validates :project, presence: true
-    validates :uuid, presence: true
 
     validates :primary_identifier, presence: true
     validates :project_fingerprint, presence: true

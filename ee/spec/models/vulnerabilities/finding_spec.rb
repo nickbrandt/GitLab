@@ -23,7 +23,6 @@ RSpec.describe Vulnerabilities::Finding do
 
     it { is_expected.to validate_presence_of(:scanner) }
     it { is_expected.to validate_presence_of(:project) }
-    it { is_expected.to validate_presence_of(:uuid) }
     it { is_expected.to validate_presence_of(:project_fingerprint) }
     it { is_expected.to validate_presence_of(:primary_identifier) }
     it { is_expected.to validate_presence_of(:location_fingerprint) }
@@ -37,7 +36,7 @@ RSpec.describe Vulnerabilities::Finding do
 
   context 'database uniqueness' do
     let(:finding) { create(:vulnerabilities_finding) }
-    let(:new_finding) { finding.dup.tap { |o| o.uuid = SecureRandom.uuid } }
+    let(:new_finding) { finding.dup }
 
     it "when all index attributes are identical" do
       expect { new_finding.save! }.to raise_error(ActiveRecord::RecordNotUnique)

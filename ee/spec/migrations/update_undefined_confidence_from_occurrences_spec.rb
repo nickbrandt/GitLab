@@ -45,7 +45,7 @@ RSpec.describe UpdateUndefinedConfidenceFromOccurrences, :migration do
                             primary_identifier_id: 1,
                             project_fingerprint: vul1[:project_fingerprint],
                             location_fingerprint: vul1[:location_fingerprint],
-                            uuid: vul1[:uuid],
+                            uuid: SecureRandom.uuid,
                             name: vul1[:name],
                             metadata_version: '1.3',
                             raw_metadata: vul1[:raw_metadata])
@@ -59,7 +59,7 @@ RSpec.describe UpdateUndefinedConfidenceFromOccurrences, :migration do
                             primary_identifier_id: 2,
                             project_fingerprint: vul2[:project_fingerprint],
                             location_fingerprint: vul2[:location_fingerprint],
-                            uuid: vul2[:uuid],
+                            uuid: SecureRandom.uuid,
                             name: vul2[:name],
                             metadata_version: '1.3',
                             raw_metadata: vul2[:raw_metadata])
@@ -94,7 +94,7 @@ RSpec.describe UpdateUndefinedConfidenceFromOccurrences, :migration do
                             primary_identifier_id: 1,
                             project_fingerprint: vul1[:project_fingerprint],
                             location_fingerprint: vul1[:location_fingerprint],
-                            uuid: vul1[:uuid],
+                            uuid: SecureRandom.uuid,
                             name: vul1[:name],
                             metadata_version: '1.3',
                             raw_metadata: vul1[:raw_metadata])

@@ -24,8 +24,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
         raw_metadata: 'I am a stringified json object',
         report_type: :sast,
         scanner: scanner,
-        severity: :high,
-        uuid: 'cadf8cf0a8228fa92a0f4897a0314083bb38'
+        severity: :high
       }
     end
 
@@ -44,13 +43,12 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
           raw_metadata: 'I am a stringified json object',
           report_type: :sast,
           scanner: scanner,
-          severity: :high,
-          uuid: 'cadf8cf0a8228fa92a0f4897a0314083bb38'
+          severity: :high
         )
       end
     end
 
-    %i[compare_key identifiers location metadata_version name raw_metadata report_type scanner uuid].each do |attribute|
+    %i[compare_key identifiers location metadata_version name raw_metadata report_type scanner].each do |attribute|
       context "when attribute #{attribute} is missing" do
         before do
           params.delete(attribute)
@@ -90,8 +88,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
         raw_metadata: occurrence.raw_metadata,
         report_type: occurrence.report_type,
         scanner: occurrence.scanner,
-        severity: occurrence.severity,
-        uuid: occurrence.uuid
+        severity: occurrence.severity
       })
     end
   end

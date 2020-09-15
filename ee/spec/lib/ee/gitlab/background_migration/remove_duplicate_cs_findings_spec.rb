@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::BackgroundMigration::RemoveDuplicateCsFindings, :migration, schema: 20200916172616 do
+RSpec.describe Gitlab::BackgroundMigration::RemoveDuplicateCsFindings, :migration, schema: 20200910131218 do
   let(:namespaces) { table(:namespaces) }
   let(:notes) { table(:notes) }
   let(:group) { namespaces.create!(name: 'foo', path: 'foo') }
@@ -116,7 +116,7 @@ RSpec.describe Gitlab::BackgroundMigration::RemoveDuplicateCsFindings, :migratio
       primary_identifier_id: primary_identifier_id,
       project_fingerprint: attrs[:project_fingerprint],
       location_fingerprint: Digest::SHA1.hexdigest(SecureRandom.hex(10)),
-      uuid: attrs[:uuid],
+      uuid: SecureRandom.uuid,
       name: attrs[:name],
       metadata_version: '1.3',
       raw_metadata: attrs[:raw_metadata]
