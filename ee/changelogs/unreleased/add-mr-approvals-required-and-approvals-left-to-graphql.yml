@@ -1,0 +1,5 @@
+---
+title: Expose approvals required and approvals left for merge requests in GraphQL
+merge_request: 42354
+author:
+type: changed
