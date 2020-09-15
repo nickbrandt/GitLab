@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlLink } from '@gitlab/ui';
-import HighlightBar from '~/issue_show/components/incidents/highlight_bar/higlight_bar.vue';
+import HighlightBar from '~/issue_show/components/incidents/highlight_bar.vue';
 import { formatDate } from '~/lib/utils/datetime_utility';
 
 jest.mock('~/lib/utils/datetime_utility');
@@ -9,7 +9,7 @@ describe('Highlight Bar', () => {
   let wrapper;
 
   const alert = {
-    createdAt: '2020-05-29T10:39:22Z',
+    startedAt: '2020-05-29T10:39:22Z',
     detailsUrl: 'http://127.0.0.1:3000/root/unique-alerts/-/alert_management/1/details',
     eventCount: 1,
     title: 'Alert 1',
@@ -17,12 +17,8 @@ describe('Highlight Bar', () => {
 
   const mountComponent = () => {
     wrapper = shallowMount(HighlightBar, {
-      provide: {
-        fullPath: 'project/id',
-        iid: '1',
-      },
-      data() {
-        return { alert };
+      propsData: {
+        alert,
       },
     });
   };
@@ -50,7 +46,7 @@ describe('Highlight Bar', () => {
     const formattedDate = '2020-05-29 UTC';
     formatDate.mockReturnValueOnce(formattedDate);
     mountComponent();
-    expect(formatDate).toHaveBeenCalledWith(alert.createdAt, 'yyyy-mm-dd Z');
+    expect(formatDate).toHaveBeenCalledWith(alert.startedAt, 'yyyy-mm-dd Z');
     expect(wrapper.text()).toContain(formattedDate);
   });
 
