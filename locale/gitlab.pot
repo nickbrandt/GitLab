@@ -18735,9 +18735,6 @@ msgstr ""
 msgid "Please refer to %{docs_url}"
 msgstr ""
 
-msgid "Please retype the email address."
-msgstr ""
-
 msgid "Please select"
 msgstr ""
 
