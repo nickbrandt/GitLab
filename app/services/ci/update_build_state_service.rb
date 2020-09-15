@@ -28,7 +28,7 @@ module Ci
     private
 
     def accept_build_state!
-      if ACCEPT_TIMEOUT.ago > ensure_pending_state.created_at
+      if Time.current - ensure_pending_state.created_at > ACCEPT_TIMEOUT
         metrics.increment_trace_operation(operation: :discarded)
 
         return update_build_state!
@@ -116,7 +116,7 @@ module Ci
         failure_reason: params.dig(:failure_reason)
       )
     rescue ActiveRecord::RecordNotFound
-      metrics.increment_trace_operation(operation: :flaky)
+      metrics.increment_trace_operation(operation: :conflict)
 
       build.pending_state
     end

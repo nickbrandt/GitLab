@@ -202,12 +202,12 @@ RSpec.describe Ci::UpdateBuildStateService do
           expect(result.status).to eq 200
         end
 
-        it 'increments flaky trace metric' do
+        it 'increments conflict trace metric' do
           subject.execute
 
           expect(metrics)
             .to have_received(:increment_trace_operation)
-            .with(operation: :flaky)
+            .with(operation: :conflict)
         end
       end
 
