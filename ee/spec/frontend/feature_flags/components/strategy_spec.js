@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlFormSelect, GlFormTextarea, GlFormInput, GlToken, GlButton } from '@gitlab/ui';
+import { GlFormSelect, GlFormTextarea, GlFormInput, GlLink, GlToken, GlButton } from '@gitlab/ui';
 import {
   PERCENT_ROLLOUT_GROUP_ID,
   ROLLOUT_STRATEGY_ALL_USERS,
@@ -12,10 +12,16 @@ import NewEnvironmentsDropdown from 'ee/feature_flags/components/new_environment
 
 import { userList } from '../mock_data';
 
+const provide = {
+  strategyTypeDocsPagePath: 'link-to-strategy-docs',
+  environmentsScopeDocsPath: 'link-scope-docs',
+};
+
 describe('Feature flags strategy', () => {
   let wrapper;
 
   const findStrategy = () => wrapper.find('[data-testid="strategy"]');
+  const findDocsLinks = () => wrapper.findAll(GlLink);
 
   const factory = (
     opts = {
@@ -25,6 +31,7 @@ describe('Feature flags strategy', () => {
         endpoint: '',
         userLists: [userList],
       },
+      provide,
     },
   ) => {
     if (wrapper) {
@@ -39,6 +46,18 @@ describe('Feature flags strategy', () => {
       wrapper.destroy();
       wrapper = null;
     }
+  });
+
+  describe('helper links', () => {
+    const propsData = { strategy: {}, index: 0, endpoint: '', userLists: [userList] };
+    factory({ propsData, provide });
+
+    it('should display 2 helper links', () => {
+      const links = findDocsLinks();
+      expect(links.exists()).toBe(true);
+      expect(links.at(0).attributes('href')).toContain('docs');
+      expect(links.at(1).attributes('href')).toContain('docs');
+    });
   });
 
   describe.each`
@@ -56,7 +75,7 @@ describe('Feature flags strategy', () => {
       }
       strategy = { name, parameters };
       propsData = { strategy, index: 0, endpoint: '' };
-      factory({ propsData });
+      factory({ propsData, provide });
     });
 
     it('should set the select to match the strategy name', () => {
@@ -86,13 +105,14 @@ describe('Feature flags strategy', () => {
       });
     }
   });
+
   describe('with strategy gitlabUserList', () => {
     let propsData;
     let strategy;
     beforeEach(() => {
       strategy = { name: ROLLOUT_STRATEGY_GITLAB_USER_LIST, userListId: '2', parameters: {} };
       propsData = { strategy, index: 0, endpoint: '', userLists: [userList] };
-      factory({ propsData });
+      factory({ propsData, provide });
     });
 
     it('should set the select to match the strategy name', () => {
@@ -150,7 +170,7 @@ describe('Feature flags strategy', () => {
           scopes: [{ environmentScope: '*' }],
         };
         const propsData = { strategy, index: 0, endpoint: '' };
-        factory({ propsData });
+        factory({ propsData, provide });
       });
 
       it('should change the parameters if a different strategy is chosen', () => {
@@ -225,7 +245,7 @@ describe('Feature flags strategy', () => {
           scopes: [],
         };
         const propsData = { strategy, index: 0, endpoint: '' };
-        factory({ propsData });
+        factory({ propsData, provide });
       });
 
       it('should display selected scopes', () => {

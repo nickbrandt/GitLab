@@ -107,7 +107,7 @@ export default {
     ),
 
     newHelpText: s__(
-      'FeatureFlags|Enable features for specific users and specific environments by defining feature flag strategies.',
+      'FeatureFlags|Enable features for specific users and environments by configuring feature flag strategies.',
     ),
     noStrategiesText: s__('FeatureFlags|Feature Flag has no strategies'),
   },
