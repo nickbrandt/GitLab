@@ -14,7 +14,7 @@ RSpec.describe RelativePositioning::Mover do
     create(:issue, author: user, project: parent, relative_position: pos)
   end
 
-  range = (101..106)
+  range = (101..105)
   indices = (0..).take(range.size)
 
   let(:start) { ((range.first + range.last) / 2.0).floor }
