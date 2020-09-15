@@ -184,11 +184,18 @@ describe('DastSiteProfileForm', () => {
       await findSiteValidationToggle().vm.$emit('change', true);
     };
 
-    describe('with feature flag disabled', () => {
+    describe.each`
+      title                  | siteProfile
+      ${'New site profile'}  | ${null}
+      ${'Edit site profile'} | ${{ id: 1, name: 'foo', targetUrl: 'bar' }}
+    `('$title with feature flag disabled', ({ siteProfile }) => {
       beforeEach(() => {
         createComponent({
           provide: {
             glFeatures: { securityOnDemandScansSiteValidation: false },
+          },
+          propsData: {
+            siteProfile,
           },
         });
       });
@@ -196,6 +203,10 @@ describe('DastSiteProfileForm', () => {
       it('does not render validation components', () => {
         expect(findSiteValidationToggle().exists()).toBe(false);
         expect(findDastSiteValidation().exists()).toBe(false);
+      });
+
+      it('does not check the target URLs validation status', () => {
+        expect(requestHandlers.dastSiteValidation).not.toHaveBeenCalled();
       });
     });
 
