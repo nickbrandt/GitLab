@@ -16,15 +16,21 @@ export const diffCompareDropdownTargetVersions = (state, getters) => {
   const diffHead = parseBoolean(diffHeadParam) || (!diffHeadParam && defaultMergeRefForDiffs);
   const isBaseSelected = !state.startVersion && !diffHead;
   const isHeadSelected = !state.startVersion && diffHead;
+  let baseVersion = null;
 
-  const baseVersion = {
-    versionName: state.targetBranchName,
-    version_index: DIFF_COMPARE_BASE_VERSION_INDEX,
-    href: state.mergeRequestDiff.base_version_path,
-    isBase: true,
-    selected:
-      isBaseSelected || (defaultMergeRefForDiffs && !state.mergeRequestDiff.head_version_path),
-  };
+  if (
+    !defaultMergeRefForDiffs ||
+    (defaultMergeRefForDiffs && !state.mergeRequestDiff.head_version_path)
+  ) {
+    baseVersion = {
+      versionName: state.targetBranchName,
+      version_index: DIFF_COMPARE_BASE_VERSION_INDEX,
+      href: state.mergeRequestDiff.base_version_path,
+      isBase: true,
+      selected:
+        isBaseSelected || (defaultMergeRefForDiffs && !state.mergeRequestDiff.head_version_path),
+    };
+  }
 
   const headVersion = {
     versionName: state.targetBranchName,
@@ -45,9 +51,7 @@ export const diffCompareDropdownTargetVersions = (state, getters) => {
 
   return [
     ...state.mergeRequestDiffs.slice(1).map(formatVersion),
-    (!defaultMergeRefForDiffs ||
-      (defaultMergeRefForDiffs && !state.mergeRequestDiff.head_version_path)) &&
-      baseVersion,
+    baseVersion,
     state.mergeRequestDiff.head_version_path && headVersion,
   ].filter(a => a);
 };
