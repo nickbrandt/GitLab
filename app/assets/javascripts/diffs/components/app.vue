@@ -18,6 +18,7 @@ import TreeList from './tree_list.vue';
 
 import HiddenFilesWarning from './hidden_files_warning.vue';
 import MergeConflictWarning from './merge_conflict_warning.vue';
+import CollapsedFilesWarning from './collapsed_files_warning.vue';
 
 import {
   TREE_LIST_WIDTH_STORAGE_KEY,
@@ -37,6 +38,7 @@ export default {
     NoChanges,
     HiddenFilesWarning,
     MergeConflictWarning,
+    CollapsedFilesWarning,
     CommitWidget,
     TreeList,
     GlLoadingIcon,
@@ -114,6 +116,7 @@ export default {
     return {
       treeWidth,
       diffFilesLength: 0,
+      collapsedWarningDismissed: false,
     };
   },
   computed: {
@@ -142,7 +145,7 @@ export default {
       'canMerge',
       'hasConflicts',
     ]),
-    ...mapGetters('diffs', ['isParallelView', 'currentDiffIndex']),
+    ...mapGetters('diffs', ['hasCollapsedFile', 'isParallelView', 'currentDiffIndex']),
     ...mapGetters(['isNotesFetched', 'getNoteableData']),
     diffs() {
       if (!this.viewDiffsFileByFile) {
@@ -187,6 +190,23 @@ export default {
       const { currentFileNumber, diffFiles } = this;
 
       return currentFileNumber < diffFiles.length ? currentFileNumber + 1 : null;
+    },
+    visibleWarning() {
+      let visible = false;
+
+      if (this.renderOverflowWarning) {
+        visible = 'overflow';
+      } else if (this.isDiffHead && this.hasConflicts) {
+        visible = 'merge-conflict';
+      } else if (
+        this.hasCollapsedFile &&
+        !this.collapsedWarningDismissed &&
+        !this.viewDiffsFileByFile
+      ) {
+        visible = 'collapsed';
+      }
+
+      return visible;
     },
   },
   watch: {
@@ -401,6 +421,9 @@ export default {
         this.toggleShowTreeList(false);
       }
     },
+    dismissCollapsedWarning() {
+      this.collapsedWarningDismissed = true;
+    },
   },
   minTreeWidth: MIN_TREE_WIDTH,
   maxTreeWidth: MAX_TREE_WIDTH,
@@ -418,17 +441,22 @@ export default {
       />
 
       <hidden-files-warning
-        v-if="renderOverflowWarning"
+        v-if="visibleWarning == 'overflow'"
         :visible="numVisibleFiles"
         :total="numTotalFiles"
         :plain-diff-path="plainDiffPath"
         :email-patch-path="emailPatchPath"
       />
       <merge-conflict-warning
-        v-if="isDiffHead && hasConflicts"
+        v-if="visibleWarning == 'merge-conflict'"
         :limited="isLimitedContainer"
         :resolution-path="conflictResolutionPath"
         :mergeable="canMerge"
+      />
+      <collapsed-files-warning
+        v-if="visibleWarning == 'collapsed'"
+        :limited="isLimitedContainer"
+        @dismiss="dismissCollapsedWarning"
       />
 
       <div

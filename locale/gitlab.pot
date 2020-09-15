@@ -10374,6 +10374,9 @@ msgstr ""
 msgid "Expand all"
 msgstr ""
 
+msgid "Expand all files"
+msgstr ""
+
 msgid "Expand approvers"
 msgstr ""
 
@@ -11214,6 +11217,9 @@ msgid "Font Color"
 msgstr ""
 
 msgid "Footer message"
+msgstr ""
+
+msgid "For a faster browsing experience, some files are collapsed by default."
 msgstr ""
 
 msgid "For help setting up the Service Desk for your instance, please contact an administrator."
@@ -23554,6 +23560,9 @@ msgid "Snowplow"
 msgstr ""
 
 msgid "Solution"
+msgstr ""
+
+msgid "Some changes are not shown"
 msgstr ""
 
 msgid "Some child epics may be hidden due to applied filters"
