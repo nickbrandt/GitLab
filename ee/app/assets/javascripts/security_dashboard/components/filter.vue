@@ -1,9 +1,9 @@
 <script>
-import { GlDeprecatedDropdown, GlSearchBoxByType, GlIcon } from '@gitlab/ui';
+import { GlDropdown, GlSearchBoxByType, GlIcon } from '@gitlab/ui';
 
 export default {
   components: {
-    GlDeprecatedDropdown,
+    GlDropdown,
     GlSearchBoxByType,
     GlIcon,
   },
@@ -57,7 +57,7 @@ export default {
 <template>
   <div class="dashboard-filter">
     <strong class="js-name">{{ filter.name }}</strong>
-    <gl-deprecated-dropdown
+    <gl-dropdown
       ref="dropdown"
       class="d-block mt-1"
       menu-class="dropdown-extended-height"
@@ -125,6 +125,6 @@ export default {
       >
         {{ __('No matching results') }}
       </button>
-    </gl-deprecated-dropdown>
+    </gl-dropdown>
   </div>
 </template>
