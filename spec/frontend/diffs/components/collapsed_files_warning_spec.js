@@ -11,20 +11,16 @@ const propsData = {
 };
 const limitedClasses = CENTERED_LIMITED_CONTAINER_CLASSES.split(' ');
 
-function getAlertActionButton(wrapper) {
-  return wrapper.find('.gl-alert-actions button.gl-alert-action:first-child').element;
-}
-
-function getAlertCloseButton(wrapper) {
-  return wrapper.find('[data-testid="close-icon"]').element.parentNode;
-}
-
 describe('CollapsedFilesWarning', () => {
   const localVue = createLocalVue();
   let store;
   let wrapper;
 
   localVue.use(Vuex);
+
+  const getAlertActionButton = () =>
+    wrapper.find(CollapsedFilesWarning).find('button.gl-alert-action:first-child');
+  const getAlertCloseButton = () => wrapper.find(CollapsedFilesWarning).find('button');
 
   const createComponent = (props = {}, { full } = { full: false }) => {
     const mounter = full ? mount : shallowMount;
@@ -73,7 +69,7 @@ describe('CollapsedFilesWarning', () => {
 
     expect(wrapper.vm.isDismissed).toBe(false);
 
-    getAlertCloseButton(wrapper).click();
+    getAlertCloseButton().element.click();
 
     expect(wrapper.vm.isDismissed).toBe(true);
   });
@@ -83,7 +79,7 @@ describe('CollapsedFilesWarning', () => {
 
     jest.spyOn(wrapper.vm.$store, 'dispatch').mockReturnValue(undefined);
 
-    getAlertActionButton(wrapper).click();
+    getAlertActionButton().vm.$emit('click');
 
     expect(wrapper.vm.$store.dispatch).toHaveBeenCalledWith('diffs/expandAllFiles', undefined);
   });
