@@ -79,18 +79,6 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
     expect(findUnsavedChangesConfirmDialog().props('modified')).toBe(false);
   });
 
-  it.each`
-    key
-    ${'isModified'}
-    ${'hasMatter'}
-  `('updates $key data when refreshEditHelpers is called', ({ key }) => {
-    const spy = jest.spyOn(wrapper.vm.parsedSource, key);
-
-    wrapper.vm.refreshEditHelpers();
-
-    expect(spy).toHaveBeenCalled();
-  });
-
   describe('when content changes', () => {
     beforeEach(() => {
       findRichContentEditor().vm.$emit('input', newBody);
@@ -196,6 +184,10 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
       expect(findEditDrawer().props('settings')).toBe(wrapper.vm.editableMatter);
     });
 
+    it('enables toolbar submit button', () => {
+      expect(findPublishToolbar().props('hasSettings')).toBe(true);
+    });
+
     it('syncs matter changes', () => {
       const newSettings = { title: 'test' };
       const spySyncParsedSource = jest.spyOn(wrapper.vm.parsedSource, 'syncMatter');
@@ -217,6 +209,10 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
 
     it('does not render edit drawer', () => {
       expect(findEditDrawer().exists()).toBe(false);
+    });
+
+    it('does not enable toolbar submit button', () => {
+      expect(findPublishToolbar().props('hasSettings')).toBe(false);
     });
   });
 
