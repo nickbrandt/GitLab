@@ -1,28 +1,20 @@
 <script>
 import { GlLink } from '@gitlab/ui';
 import { formatDate } from '~/lib/utils/datetime_utility';
-import getHighlightBarInfo from './graphql/queries/get_highlight_bar_info.graphql';
 
 export default {
   components: {
     GlLink,
   },
-  inject: ['fullPath', 'iid'],
-  apollo: {
+  props: {
     alert: {
-      query: getHighlightBarInfo,
-      variables() {
-        return {
-          fullPath: this.fullPath,
-          iid: this.iid,
-        };
-      },
-      update: data => data.project?.issue?.alertManagementAlert,
+      type: Object,
+      required: true,
     },
   },
   computed: {
     startTime() {
-      return formatDate(this.alert.createdAt, 'yyyy-mm-dd Z');
+      return formatDate(this.alert.startedAt, 'yyyy-mm-dd Z');
     },
   },
 };
@@ -30,7 +22,6 @@ export default {
 
 <template>
   <div
-    v-if="alert"
     class="gl-border-solid gl-border-1 gl-border-gray-100 gl-p-5 gl-mb-3 gl-rounded-base gl-display-flex gl-justify-content-space-between"
   >
     <div class="text-truncate gl-pr-3">
