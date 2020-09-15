@@ -19,7 +19,7 @@ describe('Filter component', () => {
     wrapper = mount(Filter, {
       stubs: {
         ...stubChildren(Filter),
-        GlDeprecatedDropdown: false,
+        GlDropdown: false,
         GlSearchBoxByType: false,
       },
       propsData,
