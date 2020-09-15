@@ -152,7 +152,10 @@ export default {
   async created() {
     if (this.isEdit) {
       this.validateTargetUrl();
-      await this.fetchValidationStatus();
+
+      if (this.glFeatures.securityOnDemandScansSiteValidation) {
+        await this.fetchValidationStatus();
+      }
     }
   },
   methods: {
