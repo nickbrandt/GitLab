@@ -9,7 +9,7 @@ module Elastic
         state = options[:state]
 
         return query_hash if state.blank? || state == 'all'
-        return query_hash unless %w(all opened closed merged).include?(state)
+        return query_hash unless API::Helpers::SearchHelpers.search_states.include?(state)
 
         filter = { match: { state: state } }
 
