@@ -10779,7 +10779,7 @@ msgstr ""
 msgid "FeatureFlags|Edit User List"
 msgstr ""
 
-msgid "FeatureFlags|Enable features for specific users and specific environments by defining feature flag strategies."
+msgid "FeatureFlags|Enable features for specific users and environments by configuring feature flag strategies."
 msgstr ""
 
 msgid "FeatureFlags|Environment Spec"
@@ -22656,7 +22656,7 @@ msgstr ""
 msgid "Select status"
 msgstr ""
 
-msgid "Select strategy activation method"
+msgid "Select strategy activation method."
 msgstr ""
 
 msgid "Select subscription"
@@ -22669,6 +22669,9 @@ msgid "Select the branch you want to set as the default for this project. All me
 msgstr ""
 
 msgid "Select the custom project template source group."
+msgstr ""
+
+msgid "Select the environment scope for this feature flag."
 msgstr ""
 
 msgid "Select timeframe"
