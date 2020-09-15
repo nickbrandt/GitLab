@@ -325,4 +325,17 @@ describe('text_utility', () => {
       expect(textUtils.hasContent(txt)).toEqual(result);
     });
   });
+
+  describe('joinSentences', () => {
+    it.each`
+      input                                 | output
+      ${[]}                                 | ${''}
+      ${['Lorem ipsum']}                    | ${'Lorem ipsum'}
+      ${['Lorem ipsum', null, 'Dolar sit']} | ${'Lorem ipsum. Dolar sit'}
+      ${['Lorem ipsum!', 'Dolar sit']}      | ${'Lorem ipsum! Dolar sit'}
+      ${['Lorem ipsum? ', 'Dolar sit']}     | ${'Lorem ipsum? Dolar sit'}
+    `('joins the sentences with periods ($input)', ({ input, output }) => {
+      expect(textUtils.joinSentences(...input)).toBe(output);
+    });
+  });
 });

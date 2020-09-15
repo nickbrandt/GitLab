@@ -2673,9 +2673,6 @@ msgstr ""
 msgid "An error occurred while checking group path. Please refresh and try again."
 msgstr ""
 
-msgid "An error occurred while committing your changes."
-msgstr ""
-
 msgid "An error occurred while creating the issue. Please try again."
 msgstr ""
 
@@ -4106,7 +4103,7 @@ msgstr ""
 msgid "Branch %{branch_name} was created. To set up auto deploy, choose a GitLab CI Yaml template and commit your changes. %{link_to_autodeploy_doc}"
 msgstr ""
 
-msgid "Branch has changed"
+msgid "Branch changed"
 msgstr ""
 
 msgid "Branch is already taken"
@@ -4410,6 +4407,9 @@ msgid "CLOSED"
 msgstr ""
 
 msgid "CLOSED (MOVED)"
+msgstr ""
+
+msgid "CODEOWNERS rule violation"
 msgstr ""
 
 msgid "CONTRIBUTING"
@@ -7124,6 +7124,9 @@ msgid "Could not authorize chat nickname. Try again!"
 msgstr ""
 
 msgid "Could not change HEAD: branch '%{branch}' does not exist"
+msgstr ""
+
+msgid "Could not commit. An unexpected error occurred."
 msgstr ""
 
 msgid "Could not connect to FogBugz, check your URL"
@@ -25643,9 +25646,6 @@ msgstr ""
 msgid "This board's scope is reduced"
 msgstr ""
 
-msgid "This branch has changed since you started editing. Would you like to create a new branch?"
-msgstr ""
-
 msgid "This chart could not be displayed"
 msgstr ""
 
@@ -26992,6 +26992,9 @@ msgid "Undo Ignore"
 msgstr ""
 
 msgid "Undo ignore"
+msgstr ""
+
+msgid "Unexpected error"
 msgstr ""
 
 msgid "Unfortunately, your email message to GitLab could not be processed."
@@ -28651,6 +28654,9 @@ msgid "Work in progress Limit"
 msgstr ""
 
 msgid "Workflow Help"
+msgstr ""
+
+msgid "Would you like to create a new branch?"
 msgstr ""
 
 msgid "Write"
