@@ -76,6 +76,23 @@ describe('Vulnerabilities app component', () => {
     it('should not render the alert', () => {
       expect(findAlert().exists()).toBe(false);
     });
+
+    it('defaults to severity column for sorting', () => {
+      expect(wrapper.vm.sortBy).toBe('severity');
+    });
+
+    it('defaults to desc as sorting direction', () => {
+      expect(wrapper.vm.sortDirection).toBe('desc');
+    });
+
+    it('handles sorting', () => {
+      findVulnerabilityList().vm.$listeners['sort-changed']({
+        sortBy: 'description',
+        sortDesc: false,
+      });
+      expect(wrapper.vm.sortBy).toBe('description');
+      expect(wrapper.vm.sortDirection).toBe('asc');
+    });
   });
 
   describe('with more than a page of vulnerabilities', () => {
