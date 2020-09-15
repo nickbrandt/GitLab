@@ -187,7 +187,7 @@ func handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename 
 		TempPath: tempPath,
 	}
 
-	return parser.NewParser(reader, parserConfig)
+	return parser.NewParser(ctx, reader, parserConfig)
 }
 
 func (rew *rewriter) copyPart(ctx context.Context, name string, p *multipart.Part) error {

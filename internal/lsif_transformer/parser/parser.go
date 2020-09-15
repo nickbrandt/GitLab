@@ -2,11 +2,14 @@ package parser
 
 import (
 	"archive/zip"
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
+
+	"gitlab.com/gitlab-org/labkit/log"
 )
 
 var (
@@ -23,7 +26,7 @@ type Config struct {
 	TempPath string
 }
 
-func NewParser(r io.Reader, config Config) (io.ReadCloser, error) {
+func NewParser(ctx context.Context, r io.Reader, config Config) (io.ReadCloser, error) {
 	docs, err := NewDocs(config)
 	if err != nil {
 		return nil, err
@@ -45,6 +48,7 @@ func NewParser(r io.Reader, config Config) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.WithContextFields(ctx, log.Fields{"lsif_zip_cache_bytes": size}).Print("cached incoming LSIF zip on disk")
 
 	zr, err := zip.NewReader(tempFile, size)
 	if err != nil {
