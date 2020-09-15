@@ -954,6 +954,10 @@ module Ci
       var[:value]&.to_i if var
     end
 
+    def remove_pending_state!
+      pending_state.try(:delete)
+    end
+
     private
 
     def auto_retry
