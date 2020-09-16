@@ -12,7 +12,8 @@ export default {
     state.environments = payload;
     state.isLoadingEnvironments = false;
     state.errorLoadingEnvironments = false;
-    if (payload.length > 0) state.currentEnvironmentId = payload[0].id;
+    if (payload.length > 0 && state.currentEnvironmentId === -1)
+      state.currentEnvironmentId = payload[0].id;
   },
   [types.RECEIVE_ENVIRONMENTS_ERROR](state) {
     state.isLoadingEnvironments = false;

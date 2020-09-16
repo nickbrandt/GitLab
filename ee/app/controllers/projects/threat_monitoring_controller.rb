@@ -9,11 +9,11 @@ module Projects
     end
 
     def edit
-      environment = project.environments.find(params[:environment_id])
+      @environment = project.environments.find(params[:environment_id])
       @policy_name = params[:id]
       response = NetworkPolicies::FindResourceService.new(
         resource_name: @policy_name,
-        environment: environment,
+        environment: @environment,
         kind: Gitlab::Kubernetes::CiliumNetworkPolicy::KIND
       ).execute
 
