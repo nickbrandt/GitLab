@@ -4,26 +4,25 @@ require 'spec_helper'
 
 RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
   describe '#execute' do
-    let!(:user) { create(:user) }
+    let_it_be(:user) { create(:user) }
 
-    let!(:project) { create(:project, :private) }
-    let!(:project_coverage) { create_daily_coverage('rspec', 95.0, '2020-03-10', project) }
+    let_it_be(:project) { create(:project, :private) }
+    let_it_be(:project_coverage) { create_daily_coverage('rspec', 95.0, '2020-03-10', project) }
 
-    let!(:group) { create(:group, :private) }
-    let!(:rspec_project) { create(:project, namespace: group) }
-    let!(:rspec_project_coverage) { create_daily_coverage('rspec', 79.0, '2020-03-09', rspec_project) }
+    let_it_be(:group) { create(:group, :private) }
+    let_it_be(:rspec_project) { create(:project, namespace: group) }
+    let_it_be(:rspec_project_coverage) { create_daily_coverage('rspec', 79.0, '2020-03-09', rspec_project) }
 
-    let!(:karma_project) { create(:project, namespace: group) }
-    let!(:karma_project_coverage) { create_daily_coverage('karma', 89.0, '2020-03-09', karma_project) }
+    let_it_be(:karma_project) { create(:project, namespace: group) }
+    let_it_be(:karma_project_coverage) { create_daily_coverage('karma', 89.0, '2020-03-09', karma_project) }
 
-    let(:generic_project) { create(:project, namespace: group) }
-    let!(:generic_coverage) { create_daily_coverage('unreported', 95.0, '2020-03-10', generic_project) }
+    let_it_be(:generic_project) { create(:project, namespace: group) }
+    let_it_be(:generic_coverage) { create_daily_coverage('unreported', 95.0, '2020-03-10', generic_project) }
 
-    let(:subgroup) { create(:group, :private, parent: group) }
-    let(:subgroup_project) { create(:project, namespace: subgroup) }
-    let!(:subgroup_project_coverage) { create_daily_coverage('rspec', 89.0, '2020-03-09', subgroup_project) }
+    let_it_be(:subgroup) { create(:group, :private, parent: group) }
+    let_it_be(:subgroup_project) { create(:project, namespace: subgroup) }
+    let_it_be(:subgroup_project_coverage) { create_daily_coverage('rspec', 89.0, '2020-03-09', subgroup_project) }
 
-    let(:ref_path) { 'refs/heads/master' }
     let(:limit) { nil }
     let(:project_ids) { nil }
 
@@ -32,7 +31,7 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
         current_user: user,
         group: group,
         project_ids: project_ids,
-        ref_path: ref_path,
+        ref_path: 'refs/heads/master',
         start_date: '2020-03-09',
         end_date: '2020-03-10',
         limit: limit
@@ -126,7 +125,7 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
     create(
       :ci_daily_build_group_report_result,
       project: project,
-      ref_path: ref_path,
+      ref_path: 'refs/heads/master',
       group_name: group_name,
       data: { 'coverage' => coverage },
       date: date
