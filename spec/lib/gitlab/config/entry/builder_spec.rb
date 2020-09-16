@@ -11,27 +11,27 @@ RSpec.describe Gitlab::Config::Entry::Builder, :aggregate_failures do
     }
   end
 
+  let(:entry_klass) { Gitlab::Config::Entry::Node }
+
   subject(:builder) { described_class.new }
 
-  describe '#push_entries_config!' do
+  describe '#build_factory!' do
     before do
-      builder.push_entries_config!(Class, { foo: :bar })
+      builder.build_factory!(entry_klass, description: 'some entry')
     end
 
-    it 'assigns classes to entries_klasses' do
-      expect(builder.instance_variable_get(:@entries_klasses)).to eq(Class)
-    end
+    let(:factory) { builder.instance_variable_get(:@entries_factory) }
 
-    it 'assigns attributes to entries_attributes' do
-      expect(builder.instance_variable_get(:@entries_attributes)).to eq({ foo: :bar })
+    it 'assigns entries_factory' do
+      expect(factory.class).to eq(Gitlab::Config::Entry::Factory)
+      expect(factory.entry_class).to eq(entry_klass)
+      expect(factory.description).to eq('some entry')
     end
   end
 
-  describe '#build_factory!' do
-    let(:entry_klass) { Gitlab::Config::Entry::Node }
-
+  describe '#build_factories!' do
     before do
-      builder.build_factory!('hello', entry_klass, reserved: true)
+      builder.build_factories!('hello', entry_klass, reserved: true)
     end
 
     it 'assigns nodes' do

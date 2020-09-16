@@ -18,14 +18,14 @@ module Gitlab
       #  for example:
       #
       #   entry :default, Entry::Default,
-      #       description: 'Default configuration for all jobs.',
+      #       description: 'Default configuration for all jobs',
       #       default: {}
       #
       # Use `entries` to configure descendant entry nodes where keys vary per instance
       #  for example:
       #
       #   entries [Entry::Hidden, Entry::Job, Entry::Bridge],
-      #       description: "%s job definition."
+      #       description: "%s job definition"
       #
       #  The first argument can be an Entry class or an array of classes but when multiple classes are passed
       #  The parent class needs to implement a class method to find the correct class based on name and config, for example:
@@ -88,14 +88,14 @@ module Gitlab
           def entry(entry_name, entry_klass, entry_attributes = {})
             entry_name = entry_name.to_sym
 
-            builder.build_factory!(entry_name, entry_klass, entry_attributes)
+            builder.build_factories!(entry_name, entry_klass, entry_attributes)
 
             helpers(entry_name)
           end
 
           # For use when config is a hash with arbitrary keys
           def entries(entries_klasses, **entries_attributes)
-            builder.push_entries_config!(entries_klasses, entries_attributes)
+            builder.build_factory!(entries_klasses, entries_attributes)
           end
 
           def dynamic_helpers(*entry_names)

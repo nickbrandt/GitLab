@@ -6,84 +6,71 @@ module Gitlab
         attr_reader :nodes
 
         def initialize
-          @nodes = {}
-          @entries_klasses = nil
-          @entries_attributes = {}
+          @nodes = {} # { <key> : <Gitlab::Config::Entry::Factory>, ... }
+          @entries_factory = nil # <Gitlab::Config::Entry::Factory>
         end
 
-        def build_factory!(entry_name, entry_klass, **entry_attributes)
-          @nodes[entry_name] = build_factory(entry_name, entry_klass, entry_attributes)
+        def build_factories!(entry_name, entry_klass, **entry_attributes)
+          entry_attributes = entry_attributes.merge(entry_name: entry_name)
+          @nodes[entry_name] = build_factory(entry_klass, entry_attributes)
         end
 
-        def push_entries_config!(entries_klasses, **entries_attributes)
-          @entries_klasses = entries_klasses
-          @entries_attributes = entries_attributes
+        def build_factory!(entries_klasses, **entries_attributes)
+          return unless entries_klasses
+
+          @entries_factory = build_factory(entries_klasses, entries_attributes)
         end
 
         def create_entries(config, parent_node)
-          create_static_entries(config, parent_node).merge(
-            create_dynamic_entries(config, parent_node)
+          create_entries_from_nodes(config, parent_node).merge(
+            create_entries_from_config(config, parent_node)
           )
         end
 
         private
 
-        def create_static_entries(config, parent_node)
+        def create_entries_from_nodes(config, parent_node)
           return {} unless config.is_a?(Hash)
 
-          @nodes.to_h do |node_name, node|
+          @nodes.to_h do |entry_name, factory|
             [
-              node_name,
-              create_node(node, node_name, config[node_name], parent_node)
+              entry_name,
+              create_node(factory, entry_name, config[entry_name], parent_node)
             ]
           end
         end
 
-        def create_dynamic_entries(config, parent_node)
-          return {} unless entries_defined?
+        def create_entries_from_config(config, parent_node)
+          return {} unless @entries_factory
 
           config.to_h do |entry_name, entry_value|
-            klass = entries_klass(parent_node, entry_name, entry_value)
-            next unless klass
-
-            @entries_attributes[:metadata] = (@entries_attributes[:metadata] || {}).merge(name: entry_name)
-            factory = build_factory(entry_name, klass, **@entries_attributes)
-
-            [entry_name, create_node(factory, entry_name, entry_value, parent_node)]
+            [
+              entry_name,
+              create_node(@entries_factory, entry_name, entry_value, parent_node)
+            ]
           end
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
-        def build_factory(entry_name, entry_klass, description: nil, default: nil, inherit: nil, reserved: nil, metadata: {})
-          ::Gitlab::Config::Entry::Factory.new(entry_klass)
-            .with(key: entry_name.to_s)
-            .with(description: description && description % entry_name.to_s)
+        def build_factory(entry_klasses, entry_name: nil, description: nil, default: nil, inherit: nil, reserved: nil, metadata: {})
+          factory = ::Gitlab::Config::Entry::Factory.new(entry_klasses)
+            .with(description: description)
             .with(default: default)
             .with(inherit: inherit)
             .with(reserved: reserved)
             .metadata(metadata)
+
+          entry_name ? factory.with(key: entry_name.to_s) : factory
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         def create_node(factory, key, value, parent_node)
-          factory
-            .value(value)
-            .with(key: key, parent: parent_node).create! # rubocop: disable CodeReuse/ActiveRecord
+          factory.with(
+            key: key,
+            parent: parent_node,
+            description: factory.description % key.to_s
+          ).value(value).create!
         end
-
-        def entries_defined?
-          @entries_klasses
-        end
-
-        def entries_klass(parent_node, name = nil, config = nil)
-          Array(@entries_klasses).then do |klasses|
-            if klasses.one?
-              klasses.first
-            else
-              parent_node.class.find_type(name, config)
-            end
-          end
-        end
+        # rubocop: enable CodeReuse/ActiveRecord
       end
     end
   end

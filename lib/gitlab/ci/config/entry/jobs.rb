@@ -41,7 +41,7 @@ module Gitlab
 
           private_constant :TYPES
 
-          entries TYPES, description: "%s job definition."
+          entries TYPES, description: "%s job definition"
 
           def self.all_types
             TYPES

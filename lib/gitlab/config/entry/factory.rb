@@ -11,10 +11,11 @@ module Gitlab
 
         attr_reader :entry_class
 
-        def initialize(entry_class)
-          @entry_class = entry_class
+        def initialize(entry_classes)
+          @entry_classes = entry_classes
+          @entry_class = Array(@entry_classes).one? ? Array(@entry_classes).first : nil
           @metadata = {}
-          @attributes = { default: entry_class.default }
+          @attributes = entry_class ? { default: entry_class.default } : {}
         end
 
         def value(value)
@@ -51,6 +52,9 @@ module Gitlab
         def create!
           raise InvalidFactory unless defined?(@value)
 
+          set_entry_class
+          @metadata[:name] = @attributes[:key]
+
           ##
           # We assume that unspecified entry is undefined.
           # See issue #18775.
@@ -63,6 +67,16 @@ module Gitlab
         end
 
         private
+
+        def set_entry_class
+          @entry_class = Array(@entry_classes).then do |klasses|
+            if klasses.one?
+              klasses.first
+            else
+              @attributes[:parent].class.find_type(@attributes[:key], @value)
+            end
+          end
+        end
 
         def fabricate_unspecified
           ##
