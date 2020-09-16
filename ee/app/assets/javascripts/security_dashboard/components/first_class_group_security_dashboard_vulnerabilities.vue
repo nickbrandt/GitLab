@@ -1,4 +1,5 @@
 <script>
+import produce from 'immer';
 import { GlAlert, GlButton, GlIntersectionObserver } from '@gitlab/ui';
 import VulnerabilityList from './vulnerability_list.vue';
 import vulnerabilitiesQuery from '../graphql/group_vulnerabilities.graphql';
@@ -66,10 +67,14 @@ export default {
         this.$apollo.queries.vulnerabilities.fetchMore({
           variables: { after: this.pageInfo.endCursor },
           updateQuery: (previousResult, { fetchMoreResult }) => {
-            fetchMoreResult.group.vulnerabilities.nodes.unshift(
-              ...previousResult.group.vulnerabilities.nodes,
-            );
-            return fetchMoreResult;
+            const results = produce(fetchMoreResult, draftData => {
+              // eslint-disable-next-line no-param-reassign
+              draftData.group.vulnerabilities.nodes = [
+                ...previousResult.group.vulnerabilities.nodes,
+                ...draftData.group.vulnerabilities.nodes,
+              ];
+            });
+            return results;
           },
         });
       }
