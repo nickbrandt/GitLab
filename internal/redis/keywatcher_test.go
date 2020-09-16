@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/rafaeljusto/redigomock"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -76,8 +76,8 @@ func TestWatchKeySeenChange(t *testing.T) {
 
 	go func() {
 		val, err := WatchKey(runnerKey, "something", time.Second)
-		assert.NoError(t, err, "Expected no error")
-		assert.Equal(t, WatchKeyStatusSeenChange, val, "Expected value to change")
+		require.NoError(t, err, "Expected no error")
+		require.Equal(t, WatchKeyStatusSeenChange, val, "Expected value to change")
 		wg.Done()
 	}()
 
@@ -96,8 +96,8 @@ func TestWatchKeyNoChange(t *testing.T) {
 
 	go func() {
 		val, err := WatchKey(runnerKey, "something", time.Second)
-		assert.NoError(t, err, "Expected no error")
-		assert.Equal(t, WatchKeyStatusNoChange, val, "Expected notification without change to value")
+		require.NoError(t, err, "Expected no error")
+		require.Equal(t, WatchKeyStatusNoChange, val, "Expected notification without change to value")
 		wg.Done()
 	}()
 
@@ -112,8 +112,8 @@ func TestWatchKeyTimeout(t *testing.T) {
 	conn.Command("GET", runnerKey).Expect("something")
 
 	val, err := WatchKey(runnerKey, "something", time.Millisecond)
-	assert.NoError(t, err, "Expected no error")
-	assert.Equal(t, WatchKeyStatusTimeout, val, "Expected value to not change")
+	require.NoError(t, err, "Expected no error")
+	require.Equal(t, WatchKeyStatusTimeout, val, "Expected value to not change")
 
 	// Clean up watchers since Process isn't doing that for us (not running)
 	deleteWatchers(runnerKey)
@@ -126,8 +126,8 @@ func TestWatchKeyAlreadyChanged(t *testing.T) {
 	conn.Command("GET", runnerKey).Expect("somethingelse")
 
 	val, err := WatchKey(runnerKey, "something", time.Second)
-	assert.NoError(t, err, "Expected no error")
-	assert.Equal(t, WatchKeyStatusAlreadyChanged, val, "Expected value to have already changed")
+	require.NoError(t, err, "Expected no error")
+	require.Equal(t, WatchKeyStatusAlreadyChanged, val, "Expected value to have already changed")
 
 	// Clean up watchers since Process isn't doing that for us (not running)
 	deleteWatchers(runnerKey)
@@ -151,8 +151,8 @@ func TestWatchKeyMassivelyParallel(t *testing.T) {
 	for i := 0; i < runTimes; i++ {
 		go func() {
 			val, err := WatchKey(runnerKey, "something", time.Second)
-			assert.NoError(t, err, "Expected no error")
-			assert.Equal(t, WatchKeyStatusSeenChange, val, "Expected value to change")
+			require.NoError(t, err, "Expected no error")
+			require.Equal(t, WatchKeyStatusSeenChange, val, "Expected value to change")
 			wg.Done()
 		}()
 	}

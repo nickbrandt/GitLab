@@ -7,7 +7,6 @@ import (
 	"testing"
 	"testing/iotest"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +26,7 @@ func TestCountingResponseWriterStatus(t *testing.T) {
 	crw := NewCountingResponseWriter(&testResponseWriter{})
 	crw.WriteHeader(123)
 	crw.WriteHeader(456)
-	assert.Equal(t, 123, crw.Status())
+	require.Equal(t, 123, crw.Status())
 }
 
 func TestCountingResponseWriterCount(t *testing.T) {
@@ -36,7 +35,7 @@ func TestCountingResponseWriterCount(t *testing.T) {
 		_, err := crw.Write(bytes.Repeat([]byte{'.'}, n))
 		require.NoError(t, err)
 	}
-	assert.Equal(t, int64(63), crw.Count())
+	require.Equal(t, int64(63), crw.Count())
 }
 
 func TestCountingResponseWriterWrite(t *testing.T) {
@@ -47,5 +46,5 @@ func TestCountingResponseWriterWrite(t *testing.T) {
 	_, err := io.Copy(crw, iotest.OneByteReader(bytes.NewReader(testData)))
 	require.NoError(t, err)
 
-	assert.Equal(t, string(testData), string(trw.data))
+	require.Equal(t, string(testData), string(trw.data))
 }

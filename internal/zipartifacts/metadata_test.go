@@ -11,7 +11,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
@@ -99,5 +98,5 @@ func TestErrNotAZip(t *testing.T) {
 	defer cancel()
 
 	_, err = zipartifacts.OpenArchive(ctx, f.Name())
-	assert.Equal(t, zipartifacts.ErrorCode[zipartifacts.CodeNotZip], err, "OpenArchive requires a zip file")
+	require.Equal(t, zipartifacts.ErrorCode[zipartifacts.CodeNotZip], err, "OpenArchive requires a zip file")
 }

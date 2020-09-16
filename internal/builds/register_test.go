@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
 )
@@ -33,7 +33,7 @@ func expectHandlerWithWatcher(t *testing.T, watchHandler WatchKeyHandler, data s
 
 	h.ServeHTTP(rw, req)
 
-	assert.Equal(t, expectedHttpStatus, rw.Code, msgAndArgs...)
+	require.Equal(t, expectedHttpStatus, rw.Code, msgAndArgs...)
 }
 
 func expectHandler(t *testing.T, data string, contentType string, expectedHttpStatus int, msgAndArgs ...interface{}) {
@@ -79,7 +79,7 @@ func expectWatcherToBeExecuted(t *testing.T, watchKeyStatus redis.WatchKeyStatus
 	parsableData := `{"token":"token","last_update":"last_update"}`
 
 	expectHandlerWithWatcher(t, watchKeyHandler, parsableData, "application/json", httpStatus, msgAndArgs...)
-	assert.True(t, executed, msgAndArgs...)
+	require.True(t, executed, msgAndArgs...)
 }
 
 func TestRegisterHandlerWatcherError(t *testing.T) {
