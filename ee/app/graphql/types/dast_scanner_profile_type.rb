@@ -3,7 +3,7 @@
 module Types
   class DastScannerProfileType < BaseObject
     graphql_name 'DastScannerProfile'
-    description 'Represents a DAST scanner profile.'
+    description 'Represents a DAST scanner profile'
 
     authorize :create_on_demand_dast_scan
 

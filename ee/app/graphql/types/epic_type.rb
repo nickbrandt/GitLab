@@ -5,7 +5,7 @@ module Types
     include ::Gitlab::Graphql::Aggregations::Epics::Constants
 
     graphql_name 'Epic'
-    description 'Represents an epic.'
+    description 'Represents an epic'
 
     authorize :read_epic
 
