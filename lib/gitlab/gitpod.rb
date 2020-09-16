@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module Gitlab
-  class Sourcegraph
+  class Gitpod
     class << self
       def feature_conditional?
         feature.conditional?
       end
 
       def feature_available?
-        # The sourcegraph_bundle feature could be conditionally applied, so check if `!off?`
+        # The gitpod_bundle feature could be conditionally applied, so check if `!off?`
         !feature.off?
       end
 
@@ -16,10 +16,14 @@ module Gitlab
         feature.enabled?(actor)
       end
 
+      def feature_and_settings_enabled?(actor = nil)
+        feature_enabled?(actor) && Gitlab::CurrentSettings.gitpod_enabled
+      end
+
       private
 
       def feature
-        Feature.get(:sourcegraph) # rubocop:disable Gitlab/AvoidFeatureGet
+        Feature.get(:gitpod) # rubocop:disable Gitlab/AvoidFeatureGet
       end
     end
   end
