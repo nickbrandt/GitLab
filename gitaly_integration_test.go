@@ -16,7 +16,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gitlab.com/gitlab-org/gitaly/proto/go/gitalypb"
 
@@ -178,10 +177,10 @@ func TestAllowedGetGitBlob(t *testing.T) {
 	require.NoError(t, err)
 	shortBody := string(body[:len(expectedBody)])
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	require.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
 	testhelper.RequireResponseHeader(t, resp, "Content-Length", strconv.Itoa(bodyLen))
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+	requireNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 }
 
 func TestAllowedGetGitArchive(t *testing.T) {
@@ -205,8 +204,8 @@ func TestAllowedGetGitArchive(t *testing.T) {
 
 	resp, body, err := doSendDataRequest("/archive.tar", "git-archive", jsonParams)
 	require.NoError(t, err)
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	requireNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 
 	// Ensure the tar file is readable
 	foundEntry := false
@@ -223,7 +222,7 @@ func TestAllowedGetGitArchive(t *testing.T) {
 		}
 	}
 
-	assert.True(t, foundEntry, "Couldn't find %v directory entry", archivePrefix)
+	require.True(t, foundEntry, "Couldn't find %v directory entry", archivePrefix)
 }
 
 func TestAllowedGetGitArchiveOldPayload(t *testing.T) {
@@ -250,8 +249,8 @@ func TestAllowedGetGitArchiveOldPayload(t *testing.T) {
 
 	resp, body, err := doSendDataRequest("/archive.tar", "git-archive", jsonParams)
 	require.NoError(t, err)
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	requireNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 
 	// Ensure the tar file is readable
 	foundEntry := false
@@ -268,7 +267,7 @@ func TestAllowedGetGitArchiveOldPayload(t *testing.T) {
 		}
 	}
 
-	assert.True(t, foundEntry, "Couldn't find %v directory entry", archivePrefix)
+	require.True(t, foundEntry, "Couldn't find %v directory entry", archivePrefix)
 }
 
 func TestAllowedGetGitDiff(t *testing.T) {
@@ -293,9 +292,9 @@ func TestAllowedGetGitDiff(t *testing.T) {
 	require.NoError(t, err)
 	shortBody := string(body[:len(expectedBody)])
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	require.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
+	requireNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 }
 
 func TestAllowedGetGitFormatPatch(t *testing.T) {
@@ -317,8 +316,8 @@ func TestAllowedGetGitFormatPatch(t *testing.T) {
 	resp, body, err := doSendDataRequest("/something", "git-format-patch", jsonParams)
 	require.NoError(t, err)
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	requireNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 
 	requirePatchSeries(
 		t,

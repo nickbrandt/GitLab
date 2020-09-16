@@ -19,7 +19,6 @@ import (
 
 	"github.com/golang/protobuf/jsonpb" //lint:ignore SA1019 https://gitlab.com/gitlab-org/gitlab-workhorse/-/issues/274
 	"github.com/golang/protobuf/proto"  //lint:ignore SA1019 https://gitlab.com/gitlab-org/gitlab-workhorse/-/issues/274
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -53,7 +52,7 @@ func TestFailedCloneNoGitaly(t *testing.T) {
 	cloneCmd := exec.Command("git", "clone", fmt.Sprintf("%s/%s", ws.URL, testRepo), checkoutDir)
 	out, err := cloneCmd.CombinedOutput()
 	t.Log(string(out))
-	assert.Error(t, err, "git clone should have failed")
+	require.Error(t, err, "git clone should have failed")
 }
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
@@ -214,14 +213,14 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyRequest := &gitalypb.PostReceivePackRequest{}
 	require.NoError(t, jsonpb.UnmarshalString(split[0], gitalyRequest))
 
-	assert.Equal(t, apiResponse.Repository.StorageName, gitalyRequest.Repository.StorageName)
-	assert.Equal(t, apiResponse.Repository.RelativePath, gitalyRequest.Repository.RelativePath)
-	assert.Equal(t, apiResponse.GL_ID, gitalyRequest.GlId)
-	assert.Equal(t, apiResponse.GL_USERNAME, gitalyRequest.GlUsername)
-	assert.Equal(t, apiResponse.GitConfigOptions, gitalyRequest.GitConfigOptions)
-	assert.Equal(t, gitProtocol, gitalyRequest.GitProtocol)
+	require.Equal(t, apiResponse.Repository.StorageName, gitalyRequest.Repository.StorageName)
+	require.Equal(t, apiResponse.Repository.RelativePath, gitalyRequest.Repository.RelativePath)
+	require.Equal(t, apiResponse.GL_ID, gitalyRequest.GlId)
+	require.Equal(t, apiResponse.GL_USERNAME, gitalyRequest.GlUsername)
+	require.Equal(t, apiResponse.GitConfigOptions, gitalyRequest.GitConfigOptions)
+	require.Equal(t, gitProtocol, gitalyRequest.GitProtocol)
 
-	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
+	require.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 	require.Equal(t, string(testhelper.GitalyReceivePackResponseMock), split[1])
 	testhelper.RequireResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
 }
@@ -246,7 +245,7 @@ func TestPostReceivePackProxiedToGitalyInterrupted(t *testing.T) {
 		bytes.NewReader(testhelper.GitalyReceivePackResponseMock),
 	)
 	require.NoError(t, err)
-	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
+	require.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 
 	// This causes the server stream to be interrupted instead of consumed entirely.
 	resp.Body.Close()
@@ -363,7 +362,7 @@ func TestPostUploadPackProxiedToGitalyInterrupted(t *testing.T) {
 		bytes.NewReader(testhelper.GitalyUploadPackResponseMock),
 	)
 	require.NoError(t, err)
-	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
+	require.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 
 	// This causes the server stream to be interrupted instead of consumed entirely.
 	resp.Body.Close()
@@ -393,8 +392,8 @@ func TestGetDiffProxiedToGitalySuccessfully(t *testing.T) {
 	resp, body, err := doSendDataRequest("/something", "git-diff", jsonParams)
 	require.NoError(t, err)
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	require.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
 }
 
 func TestGetPatchProxiedToGitalySuccessfully(t *testing.T) {
@@ -413,8 +412,8 @@ func TestGetPatchProxiedToGitalySuccessfully(t *testing.T) {
 	resp, body, err := doSendDataRequest("/something", "git-format-patch", jsonParams)
 	require.NoError(t, err)
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	require.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
 }
 
 func TestGetBlobProxiedToGitalyInterruptedStream(t *testing.T) {
@@ -469,9 +468,9 @@ func TestGetArchiveProxiedToGitalySuccessfully(t *testing.T) {
 		resp, body, err := doSendDataRequest("/archive.tar.gz", "git-archive", jsonParams)
 		require.NoError(t, err)
 
-		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-		assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
-		assert.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
+		require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+		require.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
+		require.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
 
 		if tc.cacheDisabled {
 			_, err := os.Stat(tc.archivePath)
@@ -578,9 +577,9 @@ func TestGetSnapshotProxiedToGitalySuccessfully(t *testing.T) {
 	resp, body, err := doSendDataRequest("/api/v4/projects/:id/snapshot", "git-snapshot", params)
 	require.NoError(t, err)
 
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, string(body), "GET %q: body", resp.Request.URL)
-	assert.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
+	require.Equal(t, http.StatusOK, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	require.Equal(t, expectedBody, string(body), "GET %q: body", resp.Request.URL)
+	require.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
 
 	testhelper.RequireResponseHeader(t, resp, "Content-Disposition", `attachment; filename="snapshot.tar"`)
 	testhelper.RequireResponseHeader(t, resp, "Content-Type", "application/x-tar")

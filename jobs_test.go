@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func startWorkhorseServerWithLongPolling(authBackend string, pollingDuration time.Duration) *httptest.Server {
@@ -33,7 +33,7 @@ func testJobsLongPolling(t *testing.T, pollingDuration time.Duration, requestJob
 	defer ws.Close()
 
 	resp, err := requestJob(ws.URL, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer resp.Body.Close()
 
 	return resp
@@ -41,12 +41,12 @@ func testJobsLongPolling(t *testing.T, pollingDuration time.Duration, requestJob
 
 func testJobsLongPollingEndpointDisabled(t *testing.T, requestJob requestJobFunction) {
 	resp := testJobsLongPolling(t, 0, requestJob)
-	assert.NotEqual(t, "yes", resp.Header.Get("Gitlab-Ci-Builds-Polling"))
+	require.NotEqual(t, "yes", resp.Header.Get("Gitlab-Ci-Builds-Polling"))
 }
 
 func testJobsLongPollingEndpoint(t *testing.T, requestJob requestJobFunction) {
 	resp := testJobsLongPolling(t, time.Minute, requestJob)
-	assert.Equal(t, "yes", resp.Header.Get("Gitlab-Ci-Builds-Polling"))
+	require.Equal(t, "yes", resp.Header.Get("Gitlab-Ci-Builds-Polling"))
 }
 
 func TestJobsLongPollingEndpointDisabled(t *testing.T) {
