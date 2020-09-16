@@ -13321,9 +13321,6 @@ msgstr ""
 msgid "In order to enable Service Desk for your instance, you must first set up incoming email."
 msgstr ""
 
-msgid "In order to gather accurate feature usage data, it can take 1 to 2 weeks to see your index."
-msgstr ""
-
 msgid "In order to personalize your experience with GitLab%{br_tag}we would like to know a bit more about you."
 msgstr ""
 
@@ -14008,6 +14005,9 @@ msgid "Issue|Title"
 msgstr ""
 
 msgid "It looks like you have some draft commits in this branch."
+msgstr ""
+
+msgid "It may be several days before you see feature usage data."
 msgstr ""
 
 msgid "It must have a header row and at least two columns: the first column is the issue title and the second column is the issue description. The separator is automatically detected."
@@ -17737,6 +17737,9 @@ msgid "Other versions"
 msgstr ""
 
 msgid "Other visibility settings have been disabled by the administrator."
+msgstr ""
+
+msgid "Our documentation includes an example DevOps Score report."
 msgstr ""
 
 msgid "Out-of-compliance with this project's policies and should be removed"
