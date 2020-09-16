@@ -85,6 +85,7 @@ class License < ApplicationRecord
     group_project_templates
     group_repository_analytics
     group_saml
+    ide_schema_config
     issues_analytics
     jira_issues_integration
     ldap_group_sync_filter
