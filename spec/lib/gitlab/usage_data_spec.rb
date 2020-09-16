@@ -1167,18 +1167,18 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     it 'has all know_events' do
       expect(subject).to have_key(:redis_hll_counters)
 
-      expect(subject[:redis_hll_counters].keys).to match_array(categories)
+      expect(subject[:redis_hll_counters].keys).to match_array([:counts_weekly, :counts_monthly])
 
-      categories.each do |category|
-        keys = ::Gitlab::UsageDataCounters::HLLRedisCounter.events_for_category(category)
+      [:counts_weekly, :counts_monthly].each do |type|
+        categories.each do |category|
+          metrics = ::Gitlab::UsageDataCounters::HLLRedisCounter.events_for_category(category)
 
-        metrics = keys.map { |key| "#{key}_weekly" } + keys.map { |key| "#{key}_monthly" }
+          if ineligible_total_categories.exclude?(category)
+            metrics.append("total_unique_counts")
+          end
 
-        if ineligible_total_categories.exclude?(category)
-          metrics.append("#{category}_total_unique_counts_weekly", "#{category}_total_unique_counts_monthly")
+          expect(subject[:redis_hll_counters][type][category].keys).to match_array(metrics)
         end
-
-        expect(subject[:redis_hll_counters][category].keys).to match_array(metrics)
       end
     end
   end

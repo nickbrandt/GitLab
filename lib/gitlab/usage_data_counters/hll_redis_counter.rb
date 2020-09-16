@@ -12,6 +12,7 @@ module Gitlab
 
       KNOWN_EVENTS_PATH = 'lib/gitlab/usage_data_counters/known_events.yml'.freeze
       ALLOWED_AGGREGATIONS = %i(daily weekly).freeze
+      COUNTS_TYPES = %i(weekly monthly).freeze
 
       # Track event on entity_id
       # Increment a Redis HLL counter for unique event_name and entity_id
@@ -68,21 +69,10 @@ module Gitlab
         end
 
         def unique_events_data
-          categories.each_with_object({}) do |category, category_results|
-            events_names = events_for_category(category)
-
-            event_results = events_names.each_with_object({}) do |event, hash|
-              hash["#{event}_weekly"] = unique_events(event_names: event, start_date: 7.days.ago.to_date, end_date: Date.current)
-              hash["#{event}_monthly"] = unique_events(event_names: event, start_date: 28.days.ago.to_date, end_date: Date.current)
-            end
-
-            if eligible_for_totals?(events_names)
-              event_results["#{category}_total_unique_counts_weekly"] = unique_events(event_names: events_names, start_date: 7.days.ago.to_date, end_date: Date.current)
-              event_results["#{category}_total_unique_counts_monthly"] = unique_events(event_names: events_names, start_date: 4.weeks.ago.to_date, end_date: Date.current)
-            end
-
-            category_results["#{category}"] = event_results
-          end
+          {
+            counts_weekly: counts_for(:weekly),
+            counts_monthly: counts_for(:monthly)
+          }
         end
 
         def known_event?(event_name)
@@ -90,6 +80,31 @@ module Gitlab
         end
 
         private
+
+        # type is one of weekly, monthly
+        def counts_for(type)
+          return unless type.in?(COUNTS_TYPES)
+
+          period = if type == :weekly
+                     { start_date: 7.days.ago.to_date, end_date: Date.current }
+                   else
+                     { start_date: 4.weeks.ago.to_date, end_date: Date.current }
+                   end
+
+          categories.each_with_object({}) do |category, category_results|
+            events_names = events_for_category(category)
+
+            event_results = events_names.each_with_object({}) do |event, hash|
+              hash["#{event}"] = unique_events(period.merge(event_names: event))
+            end
+
+            if eligible_for_totals?(events_names)
+              event_results["total_unique_counts"] = unique_events(period.merge(event_names: events_names))
+            end
+
+            category_results["#{category}"] = event_results
+          end
+        end
 
         # Allow to add totals for events that are in the same redis slot, category and have the same aggregation level
         # and if there are more than 1 event
