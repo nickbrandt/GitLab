@@ -26,7 +26,6 @@ module Mutations
 
         def resolve(project_path:, configuration:)
           project = authorized_find!(full_path: project_path)
-          validate_flag!(project)
 
           sast_create_service_params = format_for_service(configuration)
           result = ::Security::CiConfiguration::SastCreateService.new(project, current_user, sast_create_service_params).execute
@@ -34,12 +33,6 @@ module Mutations
         end
 
         private
-
-        def validate_flag!(project)
-          return if ::Feature.enabled?(:security_sast_configuration, project)
-
-          raise Gitlab::Graphql::Errors::ResourceNotAvailable, 'security_sast_configuration flag is not enabled on this project'
-        end
 
         def find_object(full_path:)
           resolve_project(full_path: full_path)

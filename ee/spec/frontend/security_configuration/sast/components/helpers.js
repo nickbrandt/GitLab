@@ -14,9 +14,29 @@ export const makeEntities = (count, changes) =>
     field: `field${i}`,
     label: `label${i}`,
     type: 'string',
-    value: `defaultValue${i}`,
+    value: `value${i}`,
     ...changes,
   }));
+
+/**
+ * Creates a mock SastCiConfiguration GraphQL object instance.
+ *
+ * @param {number} totalEntities - The total number of entities to create.
+ * @returns {SastCiConfiguration}
+ */
+export const makeSastCiConfiguration = (totalEntities = 2) => {
+  // Call makeEntities just once to ensure unique fields
+  const entities = makeEntities(totalEntities);
+
+  return {
+    global: {
+      nodes: entities.slice(0, totalEntities - 1),
+    },
+    pipeline: {
+      nodes: entities.slice(totalEntities - 1),
+    },
+  };
+};
 
 /**
  * Creates an array of objects matching the shape of a GraphQl

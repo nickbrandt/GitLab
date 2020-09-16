@@ -1,7 +1,7 @@
 import {
   isValidConfigurationEntity,
   isValidAnalyzerEntity,
-  extractSastConfigurationEntities,
+  toSastCiConfigurationEntityInput,
 } from 'ee/security_configuration/sast/components/utils';
 import { makeEntities, makeAnalyzerEntities } from './helpers';
 
@@ -54,36 +54,20 @@ describe('isValidAnalyzerEntity', () => {
   });
 });
 
-describe('extractSastConfigurationEntities', () => {
-  describe.each`
-    context                    | response
-    ${'which is empty'}        | ${{}}
-    ${'with no project'}       | ${{ project: null }}
-    ${'with no configuration'} | ${{ project: {} }}
-  `('given a response $context', ({ response }) => {
-    it('returns an empty array', () => {
-      expect(extractSastConfigurationEntities(response)).toEqual([]);
+describe('toSastCiConfigurationEntityInput', () => {
+  let entity = makeEntities(1);
+
+  describe('given a SastCiConfigurationEntity', () => {
+    beforeEach(() => {
+      [entity] = makeEntities(1);
     });
-  });
 
-  describe('given a valid response', () => {
-    it('returns an array of entities from the global and pipeline sections', () => {
-      const globalEntities = makeEntities(3, { description: 'global' });
-      const pipelineEntities = makeEntities(3, { description: 'pipeline' });
-
-      const response = {
-        project: {
-          sastCiConfiguration: {
-            global: { nodes: globalEntities },
-            pipeline: { nodes: pipelineEntities },
-          },
-        },
-      };
-
-      expect(extractSastConfigurationEntities(response)).toEqual([
-        ...globalEntities,
-        ...pipelineEntities,
-      ]);
+    it('returns a SastCiConfigurationEntityInput object', () => {
+      expect(toSastCiConfigurationEntityInput(entity)).toEqual({
+        field: entity.field,
+        defaultValue: entity.defaultValue,
+        value: entity.value,
+      });
     });
   });
 });

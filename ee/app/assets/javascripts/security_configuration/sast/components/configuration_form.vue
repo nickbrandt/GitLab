@@ -3,10 +3,10 @@ import { GlAlert, GlButton } from '@gitlab/ui';
 import * as Sentry from '@sentry/browser';
 import { cloneDeep } from 'lodash';
 import { __, s__ } from '~/locale';
-import axios from '~/lib/utils/axios_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
 import DynamicFields from './dynamic_fields.vue';
-import { isValidConfigurationEntity } from './utils';
+import configureSastMutation from '../graphql/configure_sast.mutation.graphql';
+import { toSastCiConfigurationEntityInput } from './utils';
 
 export default {
   components: {
@@ -23,17 +23,22 @@ export default {
       from: 'securityConfigurationPath',
       default: '',
     },
+    projectPath: {
+      from: 'projectPath',
+      default: '',
+    },
   },
   props: {
-    entities: {
-      type: Array,
+    // A SastCiConfiguration GraphQL object
+    sastCiConfiguration: {
+      type: Object,
       required: true,
-      validator: value => value.every(isValidConfigurationEntity),
     },
   },
   data() {
     return {
-      formEntities: cloneDeep(this.entities),
+      globalConfiguration: cloneDeep(this.sastCiConfiguration.global.nodes),
+      pipelineConfiguration: cloneDeep(this.sastCiConfiguration.pipeline.nodes),
       hasSubmissionError: false,
       isSubmitting: false,
     };
@@ -43,16 +48,25 @@ export default {
       this.isSubmitting = true;
       this.hasSubmissionError = false;
 
-      return axios
-        .post(this.createSastMergeRequestPath, this.getFormData())
+      return this.$apollo
+        .mutate({
+          mutation: configureSastMutation,
+          variables: {
+            input: {
+              projectPath: this.projectPath,
+              configuration: this.getMutationConfiguration(),
+            },
+          },
+        })
         .then(({ data }) => {
-          const { filePath } = data;
-          if (!filePath) {
+          const { errors, successPath } = data.configureSast;
+
+          if (errors.length > 0 || !successPath) {
             // eslint-disable-next-line @gitlab/require-i18n-strings
-            throw new Error('SAST merge request creation failed');
+            throw new Error('SAST merge request creation mutation failed');
           }
 
-          redirectTo(filePath);
+          redirectTo(successPath);
         })
         .catch(error => {
           this.isSubmitting = false;
@@ -60,11 +74,11 @@ export default {
           Sentry.captureException(error);
         });
     },
-    getFormData() {
-      return this.formEntities.reduce((acc, { field, value }) => {
-        acc[field] = value;
-        return acc;
-      }, {});
+    getMutationConfiguration() {
+      return {
+        global: this.globalConfiguration.map(toSastCiConfigurationEntityInput),
+        pipeline: this.pipelineConfiguration.map(toSastCiConfigurationEntityInput),
+      };
     },
   },
   i18n: {
@@ -79,7 +93,8 @@ export default {
 
 <template>
   <form @submit.prevent="onSubmit">
-    <dynamic-fields v-model="formEntities" />
+    <dynamic-fields v-model="globalConfiguration" class="gl-m-0" />
+    <dynamic-fields v-model="pipelineConfiguration" class="gl-m-0" />
 
     <hr />
 
