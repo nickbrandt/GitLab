@@ -79,11 +79,31 @@ export const setExpandDiscussions = ({ commit }, { discussionIds, expanded }) =>
   commit(types.SET_EXPAND_DISCUSSIONS, { discussionIds, expanded });
 };
 
-export const fetchDiscussions = ({ commit, dispatch }, { path, filter, persistFilter }) => {
+export const setPrefetchedDiscussions = ({ commit, dispatch }, { path }) => {
+  return gl.startup_calls[path].fetchCall
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      commit(types.SET_INITIAL_DISCUSSIONS, data);
+      commit(types.SET_FETCHING_DISCUSSIONS, false);
+
+      dispatch('updateResolvableDiscussionsCounts');
+    });
+};
+
+export const fetchDiscussions = (
+  { commit, dispatch },
+  { path, filter, persistFilter, useStartupCall = false },
+) => {
   const config =
     filter !== undefined
       ? { params: { notes_filter: filter, persist_filter: persistFilter } }
       : null;
+
+  if (useStartupCall) {
+    return dispatch('setPrefetchedDiscussions', { path });
+  }
 
   return axios.get(path, config).then(({ data }) => {
     commit(types.SET_INITIAL_DISCUSSIONS, data);

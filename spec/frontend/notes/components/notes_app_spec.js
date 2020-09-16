@@ -13,6 +13,7 @@ import '~/behaviors/markdown/render_gfm';
 import * as mockData from '../mock_data';
 import * as urlUtility from '~/lib/utils/url_utility';
 import OrderedLayout from '~/vue_shared/components/ordered_layout.vue';
+import { StartupMock } from '~/lib/utils/startup_mock_util';
 
 jest.mock('~/user_popovers', () => jest.fn());
 
@@ -32,6 +33,12 @@ describe('note_app', () => {
   let mountComponent;
   let wrapper;
   let store;
+  let startupMock;
+
+  const getNotesApp = () => {
+    const { vm } = wrapper.find(NotesApp);
+    return vm;
+  };
 
   const getComponentOrder = () => {
     return wrapper
@@ -82,6 +89,38 @@ describe('note_app', () => {
   afterEach(() => {
     wrapper.destroy();
     axiosMock.restore();
+  });
+
+  describe('set data when startup.js is available', () => {
+    beforeEach(() => {
+      setFixtures('<div class="js-discussions-count"></div>');
+      startupMock = new StartupMock({
+        callPath: mockData.notesDataMock.discussionsPath,
+        responseData: [mockData.discussionMock],
+      });
+
+      wrapper = mountComponent();
+
+      return waitForDiscussionsRequest();
+    });
+
+    afterEach(() => {
+      startupMock.restore();
+    });
+
+    it('should not use axios to fetch discussion data', () => {
+      jest.spyOn(axios, 'get').mockImplementation(() => Promise.resolve({ data: {} }));
+
+      expect(axios.get).not.toHaveBeenCalled();
+    });
+
+    it('should use prefetched data to set discussions', () => {
+      expect(store.state.discussions).toEqual([mockData.discussionMock]);
+    });
+
+    it('should set initialFetch to false', () => {
+      expect(getNotesApp().initialFetch).toBe(false);
+    });
   });
 
   describe('set data', () => {

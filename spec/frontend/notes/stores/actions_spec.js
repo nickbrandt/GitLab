@@ -1113,6 +1113,20 @@ describe('Actions Notes Store', () => {
     });
   });
 
+  describe('fetchDiscussions', () => {
+    const path = 'some-discussion-path';
+
+    beforeEach(() => {
+      dispatch.mockReturnValue(new Promise(() => {}));
+    });
+
+    it('loads prefetched discussions using startup.js call', () => {
+      actions.fetchDiscussions({ dispatch }, { path, useStartupCall: true });
+
+      expect(dispatch.mock.calls).toEqual([['setPrefetchedDiscussions', { path }]]);
+    });
+  });
+
   describe('filterDiscussion', () => {
     const path = 'some-discussion-path';
     const filter = 0;

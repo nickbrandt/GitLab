@@ -59,6 +59,7 @@ export default {
     return {
       isFetching: false,
       currentFilter: null,
+      initialFetch: true,
     };
   },
   computed: {
@@ -191,6 +192,9 @@ export default {
           this.setNotesFetchedState(true);
           eventHub.$emit('fetchedNotesData');
           this.isFetching = false;
+          if (this.initialFetch) {
+            this.initialFetch = false;
+          }
         })
         .then(this.$nextTick)
         .then(this.startTaskList)
@@ -232,6 +236,8 @@ export default {
     },
     getFetchDiscussionsConfig() {
       const defaultConfig = { path: this.getNotesDataByProp('discussionsPath') };
+      defaultConfig.useStartupCall =
+        Boolean(gl.startup_calls?.[defaultConfig.path]) && this.initialFetch;
 
       if (doesHashExistInUrl(constants.NOTE_UNDERSCORE)) {
         return {
