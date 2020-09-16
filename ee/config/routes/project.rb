@@ -16,7 +16,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         namespace :quality do
-          resources :test_cases, only: [:index]
+          resources :test_cases, only: [:index, :new]
         end
 
         resources :autocomplete_sources, only: [] do
