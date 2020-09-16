@@ -100,7 +100,7 @@ Note the following when promoting a secondary:
 
 - If replication was paused on the secondary node, for example as a part of upgrading,
   while you were running a version of GitLab lower than 13.4, you _must_
-  [enable the node via the database](#while-promoting-the-secondary-i-got-an-error-activerecordrecordinvalid)
+  [enable the node via the database](../replication/troubleshooting.md#while-promoting-the-secondary-i-got-an-error-activerecordrecordinvalid)
   before proceeding.
 - A new **secondary** should not be added at this time. If you want to add a new
   **secondary**, do this after you have completed the entire process of promoting
@@ -421,33 +421,4 @@ for another **primary** node. All the old replication settings will be overwritt
 
 ## Troubleshooting
 
-### I followed the disaster recovery instructions and now two-factor auth is broken
-
-The setup instructions for Geo prior to 10.5 failed to replicate the
-`otp_key_base` secret, which is used to encrypt the two-factor authentication
-secrets stored in the database. If it differs between **primary** and **secondary**
-nodes, users with two-factor authentication enabled won't be able to log in
-after a failover.
-
-If you still have access to the old **primary** node, you can follow the
-instructions in the
-[Upgrading to GitLab 10.5](../replication/version_specific_updates.md#updating-to-gitlab-105)
-section to resolve the error. Otherwise, the secret is lost and you'll need to
-[reset two-factor authentication for all users](../../../security/two_factor_authentication.md#disabling-2fa-for-everyone).
-
-### While Promoting the secondary, I got an error `ActiveRecord::RecordInvalid`
-
-If you disabled a secondary node, either with the [replication pause task](../index.md#pausing-and-resuming-replication)
-(13.2) or via the UI (13.1 and earlier), you must first re-enable the
-node before you can continue. This is fixed in 13.4.
-
-From `gitlab-psql`, execute the following, replacing  `<your secondary url>`
-with the URL for your secondary server starting with `http` or `https` and ending with a `/`.
-
-```shell
-SECONDARY_URL="https://<secondary url>/"
-DATABASE_NAME="gitlabhq_production"
-sudo gitlab-psql -d "$DATABASE_NAME" -c "UPDATE geo_nodes SET enabled = true WHERE url = '$SECONDARY_URL';"
-```
-
-This should update 1 row.
+This section was moved to [another location](../replication/troubleshooting.md#fixing-errors-during-a-failover-or-when-promoting-a-secondary-to-a-primary-node).
