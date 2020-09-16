@@ -1,0 +1,5 @@
+---
+title: Ignore Vulnerabilities::Occurrence#uuid column
+merge_request: 35180
+author:
+type: changed
