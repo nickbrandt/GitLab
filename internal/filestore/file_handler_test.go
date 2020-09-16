@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gocloud.dev/blob"
 
@@ -26,7 +25,7 @@ func testDeadline() time.Time {
 	return time.Now().Add(filestore.DefaultObjectStoreTimeout)
 }
 
-func assertFileGetsRemovedAsync(t *testing.T, filePath string) {
+func requireFileGetsRemovedAsync(t *testing.T, filePath string) {
 	var err error
 
 	// Poll because the file removal is async
@@ -38,10 +37,10 @@ func assertFileGetsRemovedAsync(t *testing.T, filePath string) {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	assert.True(t, os.IsNotExist(err), "File hasn't been deleted during cleanup")
+	require.True(t, os.IsNotExist(err), "File hasn't been deleted during cleanup")
 }
 
-func assertObjectStoreDeletedAsync(t *testing.T, expectedDeletes int, osStub *test.ObjectstoreStub) {
+func requireObjectStoreDeletedAsync(t *testing.T, expectedDeletes int, osStub *test.ObjectstoreStub) {
 	// Poll because the object removal is async
 	for i := 0; i < 100; i++ {
 		if osStub.DeletesCnt() == expectedDeletes {
@@ -50,7 +49,7 @@ func assertObjectStoreDeletedAsync(t *testing.T, expectedDeletes int, osStub *te
 		time.Sleep(10 * time.Millisecond)
 	}
 
-	assert.Equal(t, expectedDeletes, osStub.DeletesCnt(), "Object not deleted")
+	require.Equal(t, expectedDeletes, osStub.DeletesCnt(), "Object not deleted")
 }
 
 func TestSaveFileWrongSize(t *testing.T) {
@@ -63,10 +62,10 @@ func TestSaveFileWrongSize(t *testing.T) {
 
 	opts := &filestore.SaveFileOpts{LocalTempPath: tmpFolder, TempFilePrefix: "test-file"}
 	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize+1, opts)
-	assert.Error(t, err)
+	require.Error(t, err)
 	_, isSizeError := err.(filestore.SizeError)
-	assert.True(t, isSizeError, "Should fail with SizeError")
-	assert.Nil(t, fh)
+	require.True(t, isSizeError, "Should fail with SizeError")
+	require.Nil(t, fh)
 }
 
 func TestSaveFileWithKnownSizeExceedLimit(t *testing.T) {
@@ -79,10 +78,10 @@ func TestSaveFileWithKnownSizeExceedLimit(t *testing.T) {
 
 	opts := &filestore.SaveFileOpts{LocalTempPath: tmpFolder, TempFilePrefix: "test-file", MaximumSize: test.ObjectSize - 1}
 	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, opts)
-	assert.Error(t, err)
+	require.Error(t, err)
 	_, isSizeError := err.(filestore.SizeError)
-	assert.True(t, isSizeError, "Should fail with SizeError")
-	assert.Nil(t, fh)
+	require.True(t, isSizeError, "Should fail with SizeError")
+	require.Nil(t, fh)
 }
 
 func TestSaveFileWithUnknownSizeExceedLimit(t *testing.T) {
@@ -95,17 +94,17 @@ func TestSaveFileWithUnknownSizeExceedLimit(t *testing.T) {
 
 	opts := &filestore.SaveFileOpts{LocalTempPath: tmpFolder, TempFilePrefix: "test-file", MaximumSize: test.ObjectSize - 1}
 	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), -1, opts)
-	assert.Equal(t, err, filestore.ErrEntityTooLarge)
-	assert.Nil(t, fh)
+	require.Equal(t, err, filestore.ErrEntityTooLarge)
+	require.Nil(t, fh)
 }
 
 func TestSaveFromDiskNotExistingFile(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	fh, err := filestore.SaveFileFromDisk(ctx, "/I/do/not/exist", &filestore.SaveFileOpts{})
-	assert.Error(t, err, "SaveFileFromDisk should fail")
-	assert.True(t, os.IsNotExist(err), "Provided file should not exists")
-	assert.Nil(t, fh, "On error FileHandler should be nil")
+	require.Error(t, err, "SaveFileFromDisk should fail")
+	require.True(t, os.IsNotExist(err), "Provided file should not exists")
+	require.Nil(t, fh, "On error FileHandler should be nil")
 }
 
 func TestSaveFileWrongETag(t *testing.T) {
@@ -141,13 +140,13 @@ func TestSaveFileWrongETag(t *testing.T) {
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, opts)
-			assert.Nil(t, fh)
-			assert.Error(t, err)
-			assert.Equal(t, 1, osStub.PutsCnt(), "File not uploaded")
+			require.Nil(t, fh)
+			require.Error(t, err)
+			require.Equal(t, 1, osStub.PutsCnt(), "File not uploaded")
 
 			cancel() // this will trigger an async cleanup
-			assertObjectStoreDeletedAsync(t, 1, osStub)
-			assert.False(t, spec.multipart && osStub.IsMultipartUpload(test.ObjectPath), "there must be no multipart upload in progress now")
+			requireObjectStoreDeletedAsync(t, 1, osStub)
+			require.False(t, spec.multipart && osStub.IsMultipartUpload(test.ObjectPath), "there must be no multipart upload in progress now")
 		})
 	}
 }
@@ -169,12 +168,12 @@ func TestSaveFileFromDiskToLocalPath(t *testing.T) {
 
 	opts := &filestore.SaveFileOpts{LocalTempPath: tmpFolder}
 	fh, err := filestore.SaveFileFromDisk(ctx, f.Name(), opts)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	require.NotNil(t, fh)
 
-	assert.NotEmpty(t, fh.LocalPath, "File not persisted on disk")
+	require.NotEmpty(t, fh.LocalPath, "File not persisted on disk")
 	_, err = os.Stat(fh.LocalPath)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSaveFile(t *testing.T) {
@@ -246,24 +245,24 @@ func TestSaveFile(t *testing.T) {
 			defer cancel()
 
 			fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, &opts)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			require.NotNil(t, fh)
 
 			require.Equal(t, opts.RemoteID, fh.RemoteID)
 			require.Equal(t, opts.RemoteURL, fh.RemoteURL)
 
 			if spec.local {
-				assert.NotEmpty(t, fh.LocalPath, "File not persisted on disk")
+				require.NotEmpty(t, fh.LocalPath, "File not persisted on disk")
 				_, err := os.Stat(fh.LocalPath)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				dir := path.Dir(fh.LocalPath)
 				require.Equal(t, opts.LocalTempPath, dir)
 				filename := path.Base(fh.LocalPath)
 				beginsWithPrefix := strings.HasPrefix(filename, opts.TempFilePrefix)
-				assert.True(t, beginsWithPrefix, fmt.Sprintf("LocalPath filename %q do not begin with TempFilePrefix %q", filename, opts.TempFilePrefix))
+				require.True(t, beginsWithPrefix, fmt.Sprintf("LocalPath filename %q do not begin with TempFilePrefix %q", filename, opts.TempFilePrefix))
 			} else {
-				assert.Empty(t, fh.LocalPath, "LocalPath must be empty for non local uploads")
+				require.Empty(t, fh.LocalPath, "LocalPath must be empty for non local uploads")
 			}
 
 			require.Equal(t, test.ObjectSize, fh.Size)
@@ -274,8 +273,8 @@ func TestSaveFile(t *testing.T) {
 			require.Equal(t, 0, osStub.DeletesCnt(), "File deleted too early")
 
 			cancel() // this will trigger an async cleanup
-			assertObjectStoreDeletedAsync(t, expectedDeletes, osStub)
-			assertFileGetsRemovedAsync(t, fh.LocalPath)
+			requireObjectStoreDeletedAsync(t, expectedDeletes, osStub)
+			requireFileGetsRemovedAsync(t, fh.LocalPath)
 
 			// checking generated fields
 			fields, err := fh.GitLabFinalizeFields("file")
@@ -391,9 +390,9 @@ func TestSaveMultipartInBodyFailure(t *testing.T) {
 	defer cancel()
 
 	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, &opts)
-	assert.Nil(t, fh)
+	require.Nil(t, fh)
 	require.Error(t, err)
-	assert.EqualError(t, err, test.MultipartUploadInternalError().Error())
+	require.EqualError(t, err, test.MultipartUploadInternalError().Error())
 }
 
 func checkFileHandlerWithFields(t *testing.T, fh *filestore.FileHandler, fields map[string]string, prefix string, remote bool) {

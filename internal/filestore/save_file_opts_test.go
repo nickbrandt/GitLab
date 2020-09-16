@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
@@ -50,8 +49,8 @@ func TestSaveFileOptsLocalAndRemote(t *testing.T) {
 				PartSize:      test.partSize,
 			}
 
-			assert.Equal(t, test.isLocal, opts.IsLocal(), "IsLocal() mismatch")
-			assert.Equal(t, test.isMultipart, opts.IsMultipart(), "IsMultipart() mismatch")
+			require.Equal(t, test.isLocal, opts.IsLocal(), "IsLocal() mismatch")
+			require.Equal(t, test.isMultipart, opts.IsMultipart(), "IsMultipart() mismatch")
 		})
 	}
 }
@@ -109,30 +108,30 @@ func TestGetOpts(t *testing.T) {
 			opts, err := filestore.GetOpts(apiResponse)
 			require.NoError(t, err)
 
-			assert.Equal(t, apiResponse.TempPath, opts.LocalTempPath)
-			assert.WithinDuration(t, deadline, opts.Deadline, time.Second)
-			assert.Equal(t, apiResponse.RemoteObject.ID, opts.RemoteID)
-			assert.Equal(t, apiResponse.RemoteObject.GetURL, opts.RemoteURL)
-			assert.Equal(t, apiResponse.RemoteObject.StoreURL, opts.PresignedPut)
-			assert.Equal(t, apiResponse.RemoteObject.DeleteURL, opts.PresignedDelete)
+			require.Equal(t, apiResponse.TempPath, opts.LocalTempPath)
+			require.WithinDuration(t, deadline, opts.Deadline, time.Second)
+			require.Equal(t, apiResponse.RemoteObject.ID, opts.RemoteID)
+			require.Equal(t, apiResponse.RemoteObject.GetURL, opts.RemoteURL)
+			require.Equal(t, apiResponse.RemoteObject.StoreURL, opts.PresignedPut)
+			require.Equal(t, apiResponse.RemoteObject.DeleteURL, opts.PresignedDelete)
 			if test.customPutHeaders {
-				assert.Equal(t, opts.PutHeaders, apiResponse.RemoteObject.PutHeaders)
+				require.Equal(t, opts.PutHeaders, apiResponse.RemoteObject.PutHeaders)
 			} else {
-				assert.Equal(t, opts.PutHeaders, map[string]string{"Content-Type": "application/octet-stream"})
+				require.Equal(t, opts.PutHeaders, map[string]string{"Content-Type": "application/octet-stream"})
 			}
 
 			if test.multipart == nil {
-				assert.False(t, opts.IsMultipart())
-				assert.Empty(t, opts.PresignedCompleteMultipart)
-				assert.Empty(t, opts.PresignedAbortMultipart)
-				assert.Zero(t, opts.PartSize)
-				assert.Empty(t, opts.PresignedParts)
+				require.False(t, opts.IsMultipart())
+				require.Empty(t, opts.PresignedCompleteMultipart)
+				require.Empty(t, opts.PresignedAbortMultipart)
+				require.Zero(t, opts.PartSize)
+				require.Empty(t, opts.PresignedParts)
 			} else {
-				assert.True(t, opts.IsMultipart())
-				assert.Equal(t, test.multipart.CompleteURL, opts.PresignedCompleteMultipart)
-				assert.Equal(t, test.multipart.AbortURL, opts.PresignedAbortMultipart)
-				assert.Equal(t, test.multipart.PartSize, opts.PartSize)
-				assert.Equal(t, test.multipart.PartURLs, opts.PresignedParts)
+				require.True(t, opts.IsMultipart())
+				require.Equal(t, test.multipart.CompleteURL, opts.PresignedCompleteMultipart)
+				require.Equal(t, test.multipart.AbortURL, opts.PresignedAbortMultipart)
+				require.Equal(t, test.multipart.PartSize, opts.PartSize)
+				require.Equal(t, test.multipart.PartURLs, opts.PresignedParts)
 			}
 		})
 	}
@@ -166,7 +165,7 @@ func TestGetOptsDefaultTimeout(t *testing.T) {
 	opts, err := filestore.GetOpts(&api.Response{TempPath: "/foo/bar"})
 	require.NoError(t, err)
 
-	assert.WithinDuration(t, deadline, opts.Deadline, time.Minute)
+	require.WithinDuration(t, deadline, opts.Deadline, time.Minute)
 }
 
 func TestUseWorkhorseClientEnabled(t *testing.T) {

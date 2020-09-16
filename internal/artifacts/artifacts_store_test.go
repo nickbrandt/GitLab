@@ -14,7 +14,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
@@ -74,7 +73,7 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 	storeServerCalled := 0
 	storeServerMux := http.NewServeMux()
 	storeServerMux.HandleFunc("/url/put", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "PUT", r.Method)
+		require.Equal(t, "PUT", r.Method)
 
 		receivedData, err := ioutil.ReadAll(r.Body)
 		require.NoError(t, err)
@@ -90,8 +89,8 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 
 	responseProcessorCalled := 0
 	responseProcessor := func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "store-id", r.FormValue("file.remote_id"))
-		assert.NotEmpty(t, r.FormValue("file.remote_url"))
+		require.Equal(t, "store-id", r.FormValue("file.remote_id"))
+		require.NotEmpty(t, r.FormValue("file.remote_url"))
 		w.WriteHeader(200)
 		responseProcessorCalled++
 	}
@@ -127,8 +126,8 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 			response := testUploadArtifacts(t, contentType, ts.URL+Path, &contentBuffer)
 			require.Equal(t, http.StatusOK, response.Code)
 			testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
-			assert.Equal(t, 1, storeServerCalled, "store should be called only once")
-			assert.Equal(t, 1, responseProcessorCalled, "response processor should be called only once")
+			require.Equal(t, 1, storeServerCalled, "store should be called only once")
+			require.Equal(t, 1, responseProcessorCalled, "response processor should be called only once")
 		})
 	}
 }
@@ -191,7 +190,7 @@ func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) 
 	storeServerMux := http.NewServeMux()
 	storeServerMux.HandleFunc("/url/put", func(w http.ResponseWriter, r *http.Request) {
 		putCalledTimes++
-		assert.Equal(t, "PUT", r.Method)
+		require.Equal(t, "PUT", r.Method)
 		w.WriteHeader(510)
 	})
 
@@ -214,7 +213,7 @@ func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) 
 
 	response := testUploadArtifactsFromTestZip(t, ts)
 	require.Equal(t, http.StatusInternalServerError, response.Code)
-	assert.Equal(t, 1, putCalledTimes, "upload should be called only once")
+	require.Equal(t, 1, putCalledTimes, "upload should be called only once")
 }
 
 func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testing.T) {
@@ -223,7 +222,7 @@ func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testin
 	storeServerMux := http.NewServeMux()
 	storeServerMux.HandleFunc("/url/put", func(w http.ResponseWriter, r *http.Request) {
 		putCalledTimes++
-		assert.Equal(t, "PUT", r.Method)
+		require.Equal(t, "PUT", r.Method)
 		time.Sleep(10 * time.Second)
 		w.WriteHeader(510)
 	})
@@ -248,7 +247,7 @@ func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testin
 
 	response := testUploadArtifactsFromTestZip(t, ts)
 	require.Equal(t, http.StatusInternalServerError, response.Code)
-	assert.Equal(t, 1, putCalledTimes, "upload should be called only once")
+	require.Equal(t, 1, putCalledTimes, "upload should be called only once")
 }
 
 func TestUploadHandlerMultipartUploadSizeLimit(t *testing.T) {
@@ -288,8 +287,8 @@ func TestUploadHandlerMultipartUploadSizeLimit(t *testing.T) {
 	for i := 0; os.IsMultipartUpload(test.ObjectPath) && i < 100; i++ {
 		time.Sleep(10 * time.Millisecond)
 	}
-	assert.False(t, os.IsMultipartUpload(test.ObjectPath), "MultipartUpload should not be in progress anymore")
-	assert.Empty(t, os.GetObjectMD5(test.ObjectPath), "upload should have failed, so the object should not exists")
+	require.False(t, os.IsMultipartUpload(test.ObjectPath), "MultipartUpload should not be in progress anymore")
+	require.Empty(t, os.GetObjectMD5(test.ObjectPath), "upload should have failed, so the object should not exists")
 }
 
 func TestUploadHandlerMultipartUploadMaximumSizeFromApi(t *testing.T) {
