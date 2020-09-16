@@ -82,6 +82,19 @@ describe('Group repository analytics app', () => {
         });
       });
 
+      describe('with two or more projects selected without selecting all projects', () => {
+        beforeEach(() => {
+          selectCodeCoverageProjectById(groupProjectsData[0].id);
+          selectCodeCoverageProjectById(groupProjectsData[1].id);
+        });
+
+        it('renders primary action as a link with two project IDs as parameters', () => {
+          const expectedPath = `${groupAnalyticsCoverageReportsPathWithDates}&project_ids=${groupProjectsData[0].id}%2C${groupProjectsData[1].id}`;
+
+          expect(findCodeCoverageDownloadButton().attributes('href')).toBe(expectedPath);
+        });
+      });
+
       describe('with one project selected', () => {
         beforeEach(() => {
           selectCodeCoverageProjectById(groupProjectsData[0].id);
