@@ -18,7 +18,6 @@ module EE
         reset_approvals_for_merge_requests(push.ref, push.newrev)
       end
 
-      # Note: Closed merge requests also need approvals reset.
       def reset_approvals_for_merge_requests(ref, newrev)
         MergeRequestResetApprovalsWorker.perform_async(project.id, current_user.id, ref, newrev)
       end
