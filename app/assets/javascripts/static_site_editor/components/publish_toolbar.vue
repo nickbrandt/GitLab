@@ -41,7 +41,7 @@ export default {
         :disabled="savingChanges"
         @click="$emit('editSettings')"
       >
-        <span>{{ __('Settings') }}</span>
+        {{ __('Settings') }}
       </gl-button>
       <gl-button
         ref="submit"
@@ -50,7 +50,7 @@ export default {
         :loading="savingChanges"
         @click="$emit('submit')"
       >
-        <span>{{ __('Submit changes') }}</span>
+        {{ __('Submit changes') }}
       </gl-button>
     </div>
   </div>

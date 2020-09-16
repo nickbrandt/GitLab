@@ -12,6 +12,7 @@ import UnsavedChangesConfirmDialog from '~/static_site_editor/components/unsaved
 import {
   sourceContentTitle as title,
   sourceContentYAML as content,
+  sourceContentHeaderObjYAML as headerSettings,
   sourceContentBody as body,
   returnUrl,
 } from '../mock_data';
@@ -170,31 +171,46 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
     });
 
     it('closes the edit drawer', () => {
-      buildWrapper({ isDrawerOpen: true });
-
       findEditDrawer().vm.$emit('close');
 
       return wrapper.vm.$nextTick().then(() => {
-        expect(wrapper.vm.isDrawerOpen).toBe(false);
         expect(findEditDrawer().props('isOpen')).toBe(false);
       });
     });
 
-    it('forwards the matter settings', () => {
-      expect(findEditDrawer().props('settings')).toBe(wrapper.vm.editableMatter);
+    it('forwards the matter settings when the drawer is open', () => {
+      findPublishToolbar().vm.$emit('editSettings');
+
+      jest.spyOn(wrapper.vm.parsedSource, 'matter').mockReturnValueOnce(headerSettings);
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findEditDrawer().props('settings')).toEqual(headerSettings);
+      });
     });
 
     it('enables toolbar submit button', () => {
       expect(findPublishToolbar().props('hasSettings')).toBe(true);
     });
 
-    it('syncs matter changes', () => {
+    it('syncs matter changes regardless of edit mode', () => {
       const newSettings = { title: 'test' };
       const spySyncParsedSource = jest.spyOn(wrapper.vm.parsedSource, 'syncMatter');
 
       findEditDrawer().vm.$emit('updateSettings', newSettings);
 
       expect(spySyncParsedSource).toHaveBeenCalledWith(newSettings);
+    });
+
+    it('syncs matter changes to content in markdown mode', () => {
+      wrapper.setData({ editorMode: EDITOR_TYPES.markdown });
+
+      const newSettings = { title: 'test' };
+
+      findEditDrawer().vm.$emit('updateSettings', newSettings);
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(findRichContentEditor().props('content')).toContain('title: test');
+      });
     });
   });
 
@@ -221,6 +237,7 @@ describe('~/static_site_editor/components/edit_area.vue', () => {
       findPublishToolbar().vm.$emit('submit', content);
 
       expect(wrapper.emitted('submit')[0][0].content).toBe(`${content} format-pass format-pass`);
+      expect(wrapper.emitted('submit').length).toBe(1);
     });
   });
 });

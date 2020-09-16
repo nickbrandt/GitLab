@@ -61,7 +61,8 @@ describe('~/static_site_editor/components/edit_drawer.vue', () => {
     ({ event, payload, finderFn }) => {
       finderFn().vm.$emit(event, payload);
 
-      expect(wrapper.emitted()[event][0][0]).toBe(payload);
+      expect(wrapper.emitted(event)[0][0]).toBe(payload);
+      expect(wrapper.emitted(event).length).toBe(1);
     },
   );
 });
