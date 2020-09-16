@@ -61,85 +61,50 @@ describe('NetworkPolicyList component', () => {
     expect(findEnvironmentsPicker().exists()).toBe(true);
   });
 
-  it('does not render the new policy button', () => {
+  it('renders the new policy button', () => {
     const button = wrapper.find('[data-testid="new-policy"]');
-    expect(button.exists()).toBe(false);
+    expect(button.exists()).toBe(true);
   });
 
-  describe('given the networkPolicyEditor feature flag is enabled', () => {
-    beforeEach(() => {
-      factory({
-        provide: {
-          glFeatures: {
-            networkPolicyEditor: true,
-          },
-        },
-      });
-    });
+  it('does not render the new policy drawer', () => {
+    expect(wrapper.find(PolicyDrawer).exists()).toBe(false);
+  });
 
-    it('renders the new policy button', () => {
-      const button = wrapper.find('[data-testid="new-policy"]');
-      expect(button.exists()).toBe(true);
-    });
+  it('does not render edit button', () => {
+    expect(wrapper.find('[data-testid="edit-button"]').exists()).toBe(false);
+  });
 
-    it('does not render the new policy drawer', () => {
-      expect(wrapper.find(PolicyDrawer).exists()).toBe(false);
-    });
-
-    it('does not render edit button', () => {
-      expect(wrapper.find('[data-testid="edit-button"]').exists()).toBe(false);
-    });
-
-    describe('given there is a selected policy', () => {
-      beforeEach(() => {
-        factory({
-          provide: {
-            glFeatures: {
-              networkPolicyEditor: true,
-            },
-          },
-          data: () => ({ selectedPolicyName: 'policy' }),
-        });
-      });
-    });
-
-    describe('given selected policy is a cilium policy', () => {
-      const manifest = `apiVersion: cilium.io/v2
+  describe('given selected policy is a cilium policy', () => {
+    const manifest = `apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: policy
 spec:
   endpointSelector: {}`;
 
-      beforeEach(() => {
-        factory({
-          provide: {
-            glFeatures: {
-              networkPolicyEditor: true,
+    beforeEach(() => {
+      factory({
+        data: () => ({ selectedPolicyName: 'policy' }),
+        state: {
+          policies: [
+            {
+              name: 'policy',
+              creationTimestamp: new Date(),
+              manifest,
             },
-          },
-          data: () => ({ selectedPolicyName: 'policy' }),
-          state: {
-            policies: [
-              {
-                name: 'policy',
-                creationTimestamp: new Date(),
-                manifest,
-              },
-            ],
-          },
-        });
+          ],
+        },
       });
+    });
 
-      it('renders the new policy drawer', () => {
-        expect(wrapper.find(PolicyDrawer).exists()).toBe(true);
-      });
+    it('renders the new policy drawer', () => {
+      expect(wrapper.find(PolicyDrawer).exists()).toBe(true);
+    });
 
-      it('renders edit button', () => {
-        const button = wrapper.find('[data-testid="edit-button"]');
-        expect(button.exists()).toBe(true);
-        expect(button.attributes().href).toBe('/policies/policy/edit?environment_id=-1');
-      });
+    it('renders edit button', () => {
+      const button = wrapper.find('[data-testid="edit-button"]');
+      expect(button.exists()).toBe(true);
+      expect(button.attributes().href).toBe('/policies/policy/edit?environment_id=-1');
     });
   });
 
