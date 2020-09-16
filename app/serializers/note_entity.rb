@@ -77,7 +77,37 @@ class NoteEntity < API::Entities::Note
 
   expose :cached_markdown_version
 
+  expose :discussion_path do |_|
+    discussion_path(discussion)
+  end
+
+  expose :individual_note do |_|
+    discussion.individual_note?
+  end
+
+  # The resolution model needs some more looking at. ResolvableDiscussion uses
+  # information about all notes in the discussion, or last_resolved_discussion,
+  # to make a determination.
+  # expose :resolvable?, as: :resolvable
+  # expose :resolved?, as: :resolved
+  # expose :resolved_by_push?, as: :resolved_by_push
+  # expose :resolved_by, using: NoteUserEntity
+  # expose :resolved_at
+
+  expose :diff_discussion do |_|
+    discussion.diff_discussion?
+  end
+
+  # These were just delegated to the first note in the discussion
+  expose :for_commit?, as: :for_commit
+  expose :commit_id
+  expose :confidential
+
   private
+  
+  def discussion
+    @discussion ||= object.to_discussion(request.noteable)
+  end
 
   def current_user
     request.current_user
