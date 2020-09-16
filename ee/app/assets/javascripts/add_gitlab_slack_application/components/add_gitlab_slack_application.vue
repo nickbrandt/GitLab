@@ -114,7 +114,10 @@ export default {
       {{ __('Add GitLab to Slack') }}
     </gl-button>
 
-    <div class="popup gitlab-slack-popup mx-auto prepend-top-20 text-center js-popup">
+    <div
+      v-if="popupOpen"
+      class="popup gitlab-slack-popup mx-auto prepend-top-20 text-center js-popup"
+    >
       <div v-if="isSignedIn && hasProjects" class="inline">
         <strong>{{ __('Select GitLab project to link with your Slack team') }}</strong>
 
