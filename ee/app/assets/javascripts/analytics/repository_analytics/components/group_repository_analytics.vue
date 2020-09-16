@@ -72,7 +72,7 @@ export default {
       const endDate = pikadayToString(today);
       today.setDate(today.getDate() - this.selectedDateRange.value);
       const startDate = pikadayToString(today);
-      return `${this.groupAnalyticsCoverageReportsPath}&start_date=${startDate}&end_date=${endDate}&${this.selectedProjectIdsParam}`;
+      return `${this.groupAnalyticsCoverageReportsPath}&start_date=${startDate}&end_date=${endDate}${this.selectedProjectIdsParam}`;
     },
     downloadCSVModalButton() {
       return {
@@ -97,9 +97,11 @@ export default {
     },
     selectedProjectIdsParam() {
       if (this.selectAllProjects) {
-        return getProjectIdQueryParams(this.groupProjects);
+        return ''; // not including a project_ids param is the same as selecting all the projects
       }
-      return getProjectIdQueryParams(this.groupProjects.filter(project => project.isSelected));
+      return `&${getProjectIdQueryParams(
+        this.groupProjects.filter(project => project.isSelected),
+      )}`;
     },
   },
   methods: {

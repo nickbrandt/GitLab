@@ -1,0 +1,5 @@
+---
+title: Fix selecting all projects in group code coverage report
+merge_request: 42507
+author:
+type: fixed
