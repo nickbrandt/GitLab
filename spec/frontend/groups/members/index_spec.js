@@ -16,8 +16,9 @@ describe('initGroupMembersApp', () => {
   beforeEach(() => {
     el = document.createElement('div');
     el.setAttribute('data-members', membersJsonString);
-    el.setAttribute('data-current-user-id', '123');
     el.setAttribute('data-group-id', '234');
+
+    window.gon = { current_user_id: 123 };
 
     document.body.appendChild(el);
   });
@@ -36,15 +37,15 @@ describe('initGroupMembersApp', () => {
     expect(wrapper.find(GroupMembersApp).exists()).toBe(true);
   });
 
-  it('parses and sets `currentUserId` in Vuex store', () => {
+  it('sets `currentUserId` in Vuex store', () => {
     setup();
 
     expect(vm.$store.state.currentUserId).toBe(123);
   });
 
-  describe('when `data-current-user-id` is not set (user is not logged in)', () => {
+  describe('when `gon.current_user_id` is not set (user is not logged in)', () => {
     it('sets `currentUserId` as `null` in Vuex store', () => {
-      el.removeAttribute('data-current-user-id');
+      window.gon = {};
       setup();
 
       expect(vm.$store.state.currentUserId).toBeNull();
