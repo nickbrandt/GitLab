@@ -28,6 +28,8 @@ export default {
       pageInfo: {},
       vulnerabilities: [],
       errorLoadingVulnerabilities: false,
+      sortBy: 'severity',
+      sortDirection: 'desc',
     };
   },
   apollo: {
@@ -37,6 +39,7 @@ export default {
         return {
           fullPath: this.groupFullPath,
           first: VULNERABILITIES_PER_PAGE,
+          sort: this.sort,
           ...this.filters,
         };
       },
@@ -56,6 +59,9 @@ export default {
     isLoadingFirstResult() {
       return this.isLoadingQuery && this.vulnerabilities.length === 0;
     },
+    sort() {
+      return `${this.sortBy}_${this.sortDirection}`;
+    },
   },
   methods: {
     onErrorDismiss() {
@@ -73,6 +79,10 @@ export default {
           },
         });
       }
+    },
+    handleSortChange({ sortBy, sortDesc }) {
+      this.sortDirection = sortDesc ? 'desc' : 'asc';
+      this.sortBy = sortBy;
     },
   },
 };
@@ -98,6 +108,7 @@ export default {
       :is-loading="isLoadingFirstResult"
       :vulnerabilities="vulnerabilities"
       should-show-project-namespace
+      @sort-changed="handleSortChange"
     />
     <gl-intersection-observer
       v-if="pageInfo.hasNextPage"
