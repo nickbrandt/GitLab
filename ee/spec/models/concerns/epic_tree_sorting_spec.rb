@@ -14,7 +14,7 @@ RSpec.describe EpicTreeSorting do
 
   describe '#relative_siblings' do
     def siblings(obj)
-      obj.send(:relative_siblings).pluck(:id, :object_type)
+      RelativePositioning.mover.context(obj).relative_siblings.pluck(:id, :object_type)
     end
 
     def polymorphic_ident(obj)
