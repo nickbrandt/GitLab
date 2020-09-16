@@ -91,8 +91,16 @@ export default {
         : '';
     },
   },
+  watch: {
+    currentEnvironmentId(envId) {
+      this.fetchPolicies(envId);
+    },
+  },
+  created() {
+    this.fetchPolicies(this.currentEnvironmentId);
+  },
   methods: {
-    ...mapActions('networkPolicies', ['createPolicy', 'updatePolicy']),
+    ...mapActions('networkPolicies', ['fetchPolicies', 'createPolicy', 'updatePolicy']),
     getTimeAgoString(creationTimestamp) {
       if (!creationTimestamp) return '';
       return getTimeago().format(creationTimestamp);
