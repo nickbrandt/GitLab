@@ -11087,6 +11087,12 @@ msgstr ""
 msgid "Filter by status"
 msgstr ""
 
+msgid "Filter by test cases that are currently archived."
+msgstr ""
+
+msgid "Filter by test cases that are currently opened."
+msgstr ""
+
 msgid "Filter by two-factor authentication"
 msgstr ""
 
@@ -16945,6 +16951,9 @@ msgstr ""
 msgid "New tag"
 msgstr ""
 
+msgid "New test case"
+msgstr ""
+
 msgid "New users set to external"
 msgstr ""
 
@@ -22170,6 +22179,9 @@ msgstr ""
 msgid "Search results…"
 msgstr ""
 
+msgid "Search test cases"
+msgstr ""
+
 msgid "Search users"
 msgstr ""
 
@@ -23246,6 +23258,9 @@ msgstr ""
 msgid "Show all requirements."
 msgstr ""
 
+msgid "Show all test cases."
+msgstr ""
+
 msgid "Show archived projects"
 msgstr ""
 
@@ -23652,6 +23667,9 @@ msgstr ""
 msgid "Something went wrong while fetching comments. Please try again."
 msgstr ""
 
+msgid "Something went wrong while fetching count of test cases."
+msgstr ""
+
 msgid "Something went wrong while fetching description changes. Please try again."
 msgstr ""
 
@@ -23674,6 +23692,9 @@ msgid "Something went wrong while fetching requirements count."
 msgstr ""
 
 msgid "Something went wrong while fetching requirements list."
+msgstr ""
+
+msgid "Something went wrong while fetching test cases list."
 msgstr ""
 
 msgid "Something went wrong while fetching the environments for this merge request. Please try again."
@@ -25423,6 +25444,9 @@ msgstr ""
 msgid "There are no archived requirements"
 msgstr ""
 
+msgid "There are no archived test cases"
+msgstr ""
+
 msgid "There are no changes"
 msgstr ""
 
@@ -25460,6 +25484,9 @@ msgid "There are no open merge requests"
 msgstr ""
 
 msgid "There are no open requirements"
+msgstr ""
+
+msgid "There are no open test cases"
 msgstr ""
 
 msgid "There are no packages yet"
@@ -28769,6 +28796,9 @@ msgstr ""
 msgid "With requirements, you can set criteria to check your products against."
 msgstr ""
 
+msgid "With test cases, you can define conditions for your project to meet in determining quality"
+msgstr ""
+
 msgid "Withdraw Access Request"
 msgstr ""
 
@@ -28950,6 +28980,9 @@ msgid "You can generate an access token scoped to this project for each applicat
 msgstr ""
 
 msgid "You can get started by cloning the repository or start adding files to it with one of the following options."
+msgstr ""
+
+msgid "You can group test cases using labels. To learn about the future direction of this feature, visit %{linkStart}Quality Management direction page%{linkEnd}."
 msgstr ""
 
 msgid "You can invite a new member to %{project_name} or invite another group."
