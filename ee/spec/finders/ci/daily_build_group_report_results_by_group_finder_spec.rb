@@ -99,17 +99,6 @@ RSpec.describe Ci::DailyBuildGroupReportResultsByGroupFinder do
           expect(subject).to match_array([rspec_project_coverage, karma_project_coverage, generic_coverage])
         end
       end
-
-      context 'when accessing projects from the result' do
-        it 'executes the same number of queries regardless of the number of records returned' do
-          control = ActiveRecord::QueryRecorder.new do
-            described_class.new(attributes.merge(limit: 1)).execute.map(&:project)
-          end
-
-          expect { subject.map(&:project) }.not_to exceed_query_limit(control)
-          expect(subject).to match_array([rspec_project_coverage, karma_project_coverage, generic_coverage])
-        end
-      end
     end
 
     context 'without permmissions' do
