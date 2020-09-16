@@ -53,8 +53,7 @@ module Gitlab
           raise InvalidFactory unless defined?(@value)
 
           set_entry_class
-          @metadata[:name] = @attributes[:key]
-
+          
           ##
           # We assume that unspecified entry is undefined.
           # See issue #18775.

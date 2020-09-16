@@ -64,11 +64,14 @@ module Gitlab
         end
 
         def create_node(factory, key, value, parent_node)
-          factory.with(
-            key: key,
-            parent: parent_node,
-            description: factory.description % key.to_s
-          ).value(value).create!
+          factory
+            .with(
+              key: key,
+              parent: parent_node,
+              description: factory.description % key.to_s
+            )
+            .metadata(name: :key.to_s)
+            .value(value).create!
         end
         # rubocop: enable CodeReuse/ActiveRecord
       end
