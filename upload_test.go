@@ -15,7 +15,6 @@ import (
 	"testing"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
@@ -49,10 +48,10 @@ func testArtifactsUpload(t *testing.T, uploadArtifacts uploadArtifactsFunction) 
 	defer ws.Close()
 
 	resp, resource, err := uploadArtifacts(ws.URL, contentType, reqBody)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer resp.Body.Close()
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: expected 200, got %d", resource, resp.StatusCode)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: expected 200, got %d", resource, resp.StatusCode)
 }
 
 func TestArtifactsUpload(t *testing.T) {

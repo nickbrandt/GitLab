@@ -112,7 +112,7 @@ testdata/scratch:
 	mkdir -p testdata/scratch
 
 .PHONY: verify
-verify: lint vet detect-context check-formatting staticcheck
+verify: lint vet detect-context detect-assert check-formatting staticcheck
 
 .PHONY: lint
 lint: $(TARGET_SETUP)
@@ -129,6 +129,11 @@ vet: $(TARGET_SETUP)
 detect-context: $(TARGET_SETUP)
 	$(call message,Verify: $@)
 	_support/detect-context.sh
+
+.PHONY: detect-assert
+detect-assert:
+	$(call message,Verify: $@)
+	_support/detect-assert.sh
 
 .PHONY: check-formatting
 check-formatting: $(TARGET_SETUP) install-goimports

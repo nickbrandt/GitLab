@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gitlab.com/gitlab-org/gitaly/proto/go/gitalypb"
 	"gitlab.com/gitlab-org/labkit/log"
@@ -73,7 +72,7 @@ func TestDeniedClone(t *testing.T) {
 	cloneCmd := exec.Command("git", "clone", fmt.Sprintf("%s/%s", ws.URL, testRepo), checkoutDir)
 	out, err := cloneCmd.CombinedOutput()
 	t.Log(string(out))
-	assert.Error(t, err, "git clone should have failed")
+	require.Error(t, err, "git clone should have failed")
 }
 
 func TestDeniedPush(t *testing.T) {
@@ -88,7 +87,7 @@ func TestDeniedPush(t *testing.T) {
 	pushCmd.Dir = checkoutDir
 	out, err := pushCmd.CombinedOutput()
 	t.Log(string(out))
-	assert.Error(t, err, "git push should have failed")
+	require.Error(t, err, "git push should have failed")
 }
 
 func TestRegularProjectsAPI(t *testing.T) {
@@ -113,9 +112,9 @@ func TestRegularProjectsAPI(t *testing.T) {
 	} {
 		resp, body := httpGet(t, ws.URL+resource, nil)
 
-		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
-		assert.Equal(t, apiResponse, body, "GET %q: response body", resource)
-		assertNginxResponseBuffering(t, "", resp, "GET %q: nginx response buffering", resource)
+		require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+		require.Equal(t, apiResponse, body, "GET %q: response body", resource)
+		requireNginxResponseBuffering(t, "", resp, "GET %q: nginx response buffering", resource)
 	}
 }
 
@@ -152,10 +151,10 @@ func TestAllowedStaticFile(t *testing.T) {
 	} {
 		resp, body := httpGet(t, ws.URL+resource, nil)
 
-		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
-		assert.Equal(t, content, body, "GET %q: response body", resource)
-		assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resource)
-		assert.False(t, proxied, "GET %q: should not have made it to backend", resource)
+		require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+		require.Equal(t, content, body, "GET %q: response body", resource)
+		requireNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resource)
+		require.False(t, proxied, "GET %q: should not have made it to backend", resource)
 	}
 }
 
@@ -173,8 +172,8 @@ func TestStaticFileRelativeURL(t *testing.T) {
 	resource := "/my-relative-url/static.txt"
 	resp, body := httpGet(t, ws.URL+resource, nil)
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
-	assert.Equal(t, content, body, "GET %q: response body", resource)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+	require.Equal(t, content, body, "GET %q: response body", resource)
 }
 
 func TestAllowedPublicUploadsFile(t *testing.T) {
@@ -197,9 +196,9 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 	} {
 		resp, body := httpGet(t, ws.URL+resource, nil)
 
-		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
-		assert.Equal(t, content, body, "GET %q: response body", resource)
-		assert.True(t, proxied, "GET %q: never made it to backend", resource)
+		require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+		require.Equal(t, content, body, "GET %q: response body", resource)
+		require.True(t, proxied, "GET %q: never made it to backend", resource)
 	}
 }
 
@@ -222,9 +221,9 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 	} {
 		resp, body := httpGet(t, ws.URL+resource, nil)
 
-		assert.Equal(t, 404, resp.StatusCode, "GET %q: status code", resource)
-		assert.Equal(t, "", body, "GET %q: response body", resource)
-		assert.True(t, proxied, "GET %q: never made it to backend", resource)
+		require.Equal(t, 404, resp.StatusCode, "GET %q: status code", resource)
+		require.Equal(t, "", body, "GET %q: response body", resource)
+		require.True(t, proxied, "GET %q: never made it to backend", resource)
 	}
 }
 
@@ -253,8 +252,8 @@ This is a static error page for code 499
 	resourcePath := "/error-499"
 	resp, body := httpGet(t, ws.URL+resourcePath, nil)
 
-	assert.Equal(t, 499, resp.StatusCode, "GET %q: status code", resourcePath)
-	assert.Equal(t, string(errorPageBody), body, "GET %q: response body", resourcePath)
+	require.Equal(t, 499, resp.StatusCode, "GET %q: status code", resourcePath)
+	require.Equal(t, string(errorPageBody), body, "GET %q: response body", resourcePath)
 }
 
 func TestGzipAssets(t *testing.T) {
@@ -303,10 +302,10 @@ func TestGzipAssets(t *testing.T) {
 		b, err := ioutil.ReadAll(resp.Body)
 		require.NoError(t, err, desc)
 
-		assert.Equal(t, 200, resp.StatusCode, "%s: status code", desc)
-		assert.Equal(t, tc.content, string(b), "%s: response body", desc)
-		assert.Equal(t, tc.contentEncoding, resp.Header.Get("Content-Encoding"), "%s: response body", desc)
-		assert.False(t, proxied, "%s: should not have made it to backend", desc)
+		require.Equal(t, 200, resp.StatusCode, "%s: status code", desc)
+		require.Equal(t, tc.content, string(b), "%s: response body", desc)
+		require.Equal(t, tc.contentEncoding, resp.Header.Get("Content-Encoding"), "%s: response body", desc)
+		require.False(t, proxied, "%s: should not have made it to backend", desc)
 	}
 }
 
@@ -364,9 +363,9 @@ func TestArtifactsGetSingleFile(t *testing.T) {
 	resp, body, err := doSendDataRequest(resourcePath, "artifacts-entry", jsonParams)
 	require.NoError(t, err)
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resourcePath)
-	assert.Equal(t, fileContents, string(body), "GET %q: response body", resourcePath)
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resourcePath)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resourcePath)
+	require.Equal(t, fileContents, string(body), "GET %q: response body", resourcePath)
+	requireNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resourcePath)
 }
 
 func TestImageResizing(t *testing.T) {
@@ -378,7 +377,7 @@ func TestImageResizing(t *testing.T) {
 
 	resp, body, err := doSendDataRequest(resourcePath, "send-scaled-img", jsonParams)
 	require.NoError(t, err, "send resize request")
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resourcePath)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resourcePath)
 
 	img, err := png.Decode(bytes.NewReader(body))
 	require.NoError(t, err, "decode resized image")
@@ -437,7 +436,7 @@ func TestSendURLForArtifacts(t *testing.T) {
 			require.Equal(t, int64(tc.contentLength), resp.ContentLength, "GET %q: Content-Length", resourcePath)
 			require.Equal(t, tc.transferEncoding, resp.TransferEncoding, "GET %q: Transfer-Encoding", resourcePath)
 			require.Equal(t, expectedBody, string(body), "GET %q: response body", resourcePath)
-			assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resourcePath)
+			requireNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resourcePath)
 		})
 	}
 }
@@ -457,8 +456,8 @@ func TestApiContentTypeBlock(t *testing.T) {
 	resourcePath := "/something"
 	resp, body := httpGet(t, ws.URL+resourcePath, nil)
 
-	assert.Equal(t, 500, resp.StatusCode, "GET %q: status code", resourcePath)
-	assert.NotContains(t, wrongResponse, body, "GET %q: response body", resourcePath)
+	require.Equal(t, 500, resp.StatusCode, "GET %q: status code", resourcePath)
+	require.NotContains(t, wrongResponse, body, "GET %q: response body", resourcePath)
 }
 
 func TestAPIFalsePositivesAreProxied(t *testing.T) {
@@ -490,22 +489,20 @@ func TestAPIFalsePositivesAreProxied(t *testing.T) {
 		{"PUT", "/nested/group/project/blob/master/foo.git/gitlab-lfs/objects/0000000000000000000000000000000000000000000000000000000000000000/0"},
 		{"GET", "/nested/group/project/blob/master/environments/1/terminal.ws"},
 	} {
-		req, err := http.NewRequest(tc.method, ws.URL+tc.path, nil)
-		if !assert.NoError(t, err, "Constructing %s %q", tc.method, tc.path) {
-			continue
-		}
-		resp, err := http.DefaultClient.Do(req)
-		if !assert.NoError(t, err, "%s %q", tc.method, tc.path) {
-			continue
-		}
-		defer resp.Body.Close()
+		t.Run(tc.method+"_"+tc.path, func(t *testing.T) {
+			req, err := http.NewRequest(tc.method, ws.URL+tc.path, nil)
+			require.NoError(t, err, "Constructing %s %q", tc.method, tc.path)
+			resp, err := http.DefaultClient.Do(req)
+			require.NoError(t, err, "%s %q", tc.method, tc.path)
+			defer resp.Body.Close()
 
-		respBody, err := ioutil.ReadAll(resp.Body)
-		assert.NoError(t, err, "%s %q: reading body", tc.method, tc.path)
+			respBody, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err, "%s %q: reading body", tc.method, tc.path)
 
-		assert.Equal(t, 200, resp.StatusCode, "%s %q: status code", tc.method, tc.path)
-		testhelper.RequireResponseHeader(t, resp, "Content-Type", "text/html")
-		assert.Equal(t, string(goodResponse), string(respBody), "%s %q: response body", tc.method, tc.path)
+			require.Equal(t, 200, resp.StatusCode, "%s %q: status code", tc.method, tc.path)
+			testhelper.RequireResponseHeader(t, resp, "Content-Type", "text/html")
+			require.Equal(t, string(goodResponse), string(respBody), "%s %q: response body", tc.method, tc.path)
+		})
 	}
 }
 
@@ -523,9 +520,9 @@ func TestCorrelationIdHeader(t *testing.T) {
 	} {
 		resp, _ := httpGet(t, ws.URL+resource, nil)
 
-		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+		require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
 		requestIds := resp.Header["X-Request-Id"]
-		assert.Equal(t, 1, len(requestIds), "GET %q: One X-Request-Id present", resource)
+		require.Equal(t, 1, len(requestIds), "GET %q: One X-Request-Id present", resource)
 	}
 }
 
@@ -563,13 +560,13 @@ func TestPropagateCorrelationIdHeader(t *testing.T) {
 			resp, _ := httpGet(t, ws.URL+resource, map[string]string{"X-Request-Id": propagatedRequestId})
 			requestIds := resp.Header["X-Request-Id"]
 
-			assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
-			assert.Equal(t, 1, len(requestIds), "GET %q: One X-Request-Id present", resource)
+			require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+			require.Equal(t, 1, len(requestIds), "GET %q: One X-Request-Id present", resource)
 
 			if tc.propagateCorrelationID {
-				assert.Contains(t, requestIds, propagatedRequestId, "GET %q: Has X-Request-Id %s present", resource, propagatedRequestId)
+				require.Contains(t, requestIds, propagatedRequestId, "GET %q: Has X-Request-Id %s present", resource, propagatedRequestId)
 			} else {
-				assert.NotContains(t, requestIds, propagatedRequestId, "GET %q: X-Request-Id not propagated")
+				require.NotContains(t, requestIds, propagatedRequestId, "GET %q: X-Request-Id not propagated")
 			}
 		})
 	}
@@ -712,9 +709,9 @@ func httpPost(t *testing.T, url string, headers map[string]string, reqBody io.Re
 	return resp
 }
 
-func assertNginxResponseBuffering(t *testing.T, expected string, resp *http.Response, msgAndArgs ...interface{}) {
+func requireNginxResponseBuffering(t *testing.T, expected string, resp *http.Response, msgAndArgs ...interface{}) {
 	actual := resp.Header.Get(helper.NginxResponseBufferHeader)
-	assert.Equal(t, expected, actual, msgAndArgs...)
+	require.Equal(t, expected, actual, msgAndArgs...)
 }
 
 // TestHealthChecksNoStaticHTML verifies that health endpoints pass errors through and don't return the static html error pages
@@ -747,9 +744,9 @@ This is a static error page for code 503
 		t.Run(resource, func(t *testing.T) {
 			resp, body := httpGet(t, ws.URL+resource, nil)
 
-			assert.Equal(t, 503, resp.StatusCode, "status code")
-			assert.Equal(t, apiResponse, body, "response body")
-			assertNginxResponseBuffering(t, "", resp, "nginx response buffering")
+			require.Equal(t, 503, resp.StatusCode, "status code")
+			require.Equal(t, apiResponse, body, "response body")
+			requireNginxResponseBuffering(t, "", resp, "nginx response buffering")
 		})
 	}
 }
@@ -773,10 +770,10 @@ func TestHealthChecksUnreachable(t *testing.T) {
 		t.Run(tc.path, func(t *testing.T) {
 			resp, body := httpGet(t, ws.URL+tc.path, nil)
 
-			assert.Equal(t, 502, resp.StatusCode, "status code")
-			assert.Equal(t, tc.responseType, resp.Header.Get("Content-Type"), "content-type")
-			assert.Equal(t, tc.content, body, "response body")
-			assertNginxResponseBuffering(t, "", resp, "nginx response buffering")
+			require.Equal(t, 502, resp.StatusCode, "status code")
+			require.Equal(t, tc.responseType, resp.Header.Get("Content-Type"), "content-type")
+			require.Equal(t, tc.content, body, "response body")
+			requireNginxResponseBuffering(t, "", resp, "nginx response buffering")
 		})
 	}
 }
