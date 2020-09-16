@@ -4179,6 +4179,9 @@ msgstr ""
 msgid "Boards|View scope"
 msgstr ""
 
+msgid "Board|Load more issues"
+msgstr ""
+
 msgid "Both project and dashboard_path are required"
 msgstr ""
 
@@ -13992,9 +13995,6 @@ msgid "Invalid OS"
 msgstr ""
 
 msgid "Invalid URL"
-msgstr ""
-
-msgid "Invalid board"
 msgstr ""
 
 msgid "Invalid container_name"
