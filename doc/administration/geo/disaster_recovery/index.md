@@ -129,28 +129,20 @@ Note the following when promoting a secondary:
    ```
 
 1. Promote the **secondary** node to the **primary** node.
-
-   Before promoting a secondary node to primary, preflight checks should be run. They can be run separately or along with the promotion script.
-
+   
    To promote the secondary node to primary along with preflight checks:
 
    ```shell
    gitlab-ctl promote-to-primary-node
    ```
 
-   If you have already run the [preflight checks](planned_failover.md#preflight-checks) or don't want to run them, you can skip preflight checks with:
+   If you have already run the [preflight checks](planned_failover.md#preflight-checks) separately or don't want to run them, you can skip preflight checks with:
 
    ```shell
    gitlab-ctl promote-to-primary-node --skip-preflight-check
    ```
 
-   You can also run preflight checks separately:
-
-   ```shell
-   gitlab-ctl promotion-preflight-checks
-   ```
-
-   After all the checks are run, you will be asked for a final confirmation before the promotion to primary. To skip this confirmation, run:
+   You can also promote the secondary node to primary **without any further confirmation**, even when preflight checks fail:
 
    ```shell
    gitlab-ctl promote-to-primary-node --force
