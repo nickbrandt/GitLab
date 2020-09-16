@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex';
-import { GlModal } from '@gitlab/ui';
+import { GlModal, GlSafeHtmlDirective } from '@gitlab/ui';
 import { n__, __ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import CommitMessageField from './message_field.vue';
@@ -17,6 +17,9 @@ export default {
     CommitMessageField,
     SuccessMessage,
     GlModal,
+  },
+  directives: {
+    SafeHtml: GlSafeHtmlDirective,
   },
   data() {
     return {
@@ -189,7 +192,7 @@ export default {
           :action-cancel="{ text: __('Cancel') }"
           @ok="forceCreateNewBranch"
         >
-          {{ lastCommitError.message }}
+          <div v-safe-html="lastCommitError.messageHTML"></div>
         </gl-modal>
       </form>
     </transition>

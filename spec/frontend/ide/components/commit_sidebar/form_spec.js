@@ -270,7 +270,7 @@ describe('IDE commit form', () => {
         jest.spyOn(vm.$refs.commitErrorModal, 'show');
 
         const error = createError();
-        vm.$store.state.commit.commitError = error;
+        store.state.commit.commitError = error;
 
         await vm.$nextTick();
 
@@ -279,7 +279,9 @@ describe('IDE commit form', () => {
           actionCancel: { text: 'Cancel' },
           ...props,
         });
-        expect(document.body).toHaveText(error.message);
+        // Because of the legacy 'mountComponent' approach here, the only way to
+        // test the text of the modal is by viewing the content of the modal added to the document.
+        expect(document.body).toHaveText(error.messageHTML);
       });
     });
 
@@ -289,7 +291,7 @@ describe('IDE commit form', () => {
       });
 
       it('updates commit action and commits', async () => {
-        vm.$store.state.commit.commitError = createCodeownersCommitError('test message');
+        store.state.commit.commitError = createCodeownersCommitError('test message');
 
         await vm.$nextTick();
 

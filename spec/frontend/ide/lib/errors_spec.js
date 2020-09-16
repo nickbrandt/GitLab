@@ -5,9 +5,9 @@ import {
   parseCommitError,
 } from '~/ide/lib/errors';
 
-const TEST_MESSAGE = 'Test message';
-const TEST_MESSAGE_WITH_SENTENCE = 'Test message.';
-const TEST_MESSAGE_WITH_SENTENCE_AND_SPACE = 'Test message. ';
+const TEST_SPECIAL = '&special<';
+const TEST_SPECIAL_ESCAPED = '&amp;special&lt;';
+const TEST_MESSAGE = 'Test message.';
 const CODEOWNERS_MESSAGE =
   'Push to protected branches that contain changes to files matching CODEOWNERS is not allowed';
 const CHANGED_MESSAGE = 'Things changed since you started editing';
@@ -25,7 +25,15 @@ describe('~/ide/lib/errors', () => {
     it('uses given message', () => {
       expect(createCodeownersCommitError(TEST_MESSAGE)).toEqual({
         title: 'CODEOWNERS rule violation',
-        message: TEST_MESSAGE,
+        messageHTML: TEST_MESSAGE,
+        canCreateBranch: true,
+      });
+    });
+
+    it('escapes special chars', () => {
+      expect(createCodeownersCommitError(TEST_SPECIAL)).toEqual({
+        title: 'CODEOWNERS rule violation',
+        messageHTML: TEST_SPECIAL_ESCAPED,
         canCreateBranch: true,
       });
     });
@@ -33,14 +41,13 @@ describe('~/ide/lib/errors', () => {
 
   describe('createBranchChangedCommitError', () => {
     it.each`
-      message                                 | expectedMessage
-      ${TEST_MESSAGE}                         | ${`${TEST_MESSAGE}. Would you like to create a new branch?`}
-      ${TEST_MESSAGE_WITH_SENTENCE}           | ${`${TEST_MESSAGE}. Would you like to create a new branch?`}
-      ${TEST_MESSAGE_WITH_SENTENCE_AND_SPACE} | ${`${TEST_MESSAGE}. Would you like to create a new branch?`}
+      message         | expectedMessage
+      ${TEST_MESSAGE} | ${`${TEST_MESSAGE}<br/><br/>Would you like to create a new branch?`}
+      ${TEST_SPECIAL} | ${`${TEST_SPECIAL_ESCAPED}<br/><br/>Would you like to create a new branch?`}
     `('uses given message="$message"', ({ message, expectedMessage }) => {
       expect(createBranchChangedCommitError(message)).toEqual({
         title: 'Branch changed',
-        message: expectedMessage,
+        messageHTML: expectedMessage,
         canCreateBranch: true,
       });
     });

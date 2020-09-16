@@ -399,24 +399,3 @@ export const truncateNamespace = (string = '') => {
  * @returns {Boolean}
  */
 export const hasContent = obj => isString(obj) && obj.trim() !== '';
-
-/**
- * Joins the given sentences by adding periods if necessary.
- *
- * @param  {...string} sentences
- */
-export const joinSentences = (...sentences) =>
-  sentences.reduce((acc, sentence) => {
-    if (!sentence?.trim()) {
-      return acc;
-    } else if (!acc) {
-      return sentence;
-    } else if (/[.!?]\s*$/.test(acc)) {
-      const endsWithSpace = /\s$/.test(acc);
-      const sep = endsWithSpace ? '' : ' ';
-
-      return `${acc}${sep}${sentence}`;
-    }
-
-    return `${acc}. ${sentence}`;
-  }, '');

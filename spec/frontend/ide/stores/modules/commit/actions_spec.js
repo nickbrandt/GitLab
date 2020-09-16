@@ -545,10 +545,10 @@ describe('IDE commit module actions', () => {
         await store.dispatch('commit/commitChanges').catch(() => {});
 
         expect(store.commit.mock.calls).toEqual([
-          expect.arrayContaining(['commit/CLEAR_ERROR']),
-          expect.arrayContaining(['commit/UPDATE_LOADING', true]),
-          expect.arrayContaining(['commit/UPDATE_LOADING', false]),
-          expect.arrayContaining(['commit/SET_ERROR', createUnexpectedCommitError()]),
+          ['commit/CLEAR_ERROR', undefined, undefined],
+          ['commit/UPDATE_LOADING', true, undefined],
+          ['commit/UPDATE_LOADING', false, undefined],
+          ['commit/SET_ERROR', createUnexpectedCommitError(), undefined],
         ]);
       });
     });

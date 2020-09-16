@@ -1,24 +1,24 @@
+import { escape } from 'lodash';
 import { __ } from '~/locale';
-import { joinSentences } from '~/lib/utils/text_utility';
 
 const CODEOWNERS_REGEX = /Push.*protected branches.*CODEOWNERS/;
 const BRANCH_CHANGED_REGEX = /changed.*since.*start.*edit/;
 
 export const createUnexpectedCommitError = () => ({
   title: __('Unexpected error'),
-  message: __('Could not commit. An unexpected error occurred.'),
+  messageHTML: __('Could not commit. An unexpected error occurred.'),
   canCreateBranch: false,
 });
 
 export const createCodeownersCommitError = message => ({
   title: __('CODEOWNERS rule violation'),
-  message,
+  messageHTML: escape(message),
   canCreateBranch: true,
 });
 
 export const createBranchChangedCommitError = message => ({
   title: __('Branch changed'),
-  message: joinSentences(message, __('Would you like to create a new branch?')),
+  messageHTML: `${escape(message)}<br/><br/>${__('Would you like to create a new branch?')}`,
   canCreateBranch: true,
 });
 
