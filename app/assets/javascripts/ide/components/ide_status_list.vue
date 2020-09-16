@@ -18,7 +18,7 @@ export default {
       return getFileEOL(this.activeFile.content);
     },
     activeFileIsText() {
-      return isTextFile(this.activeFile.name, this.activeFile.content);
+      return isTextFile(this.activeFile);
     },
   },
 };

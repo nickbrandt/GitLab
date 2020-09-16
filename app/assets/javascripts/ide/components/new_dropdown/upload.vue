@@ -28,7 +28,7 @@ export default {
       const { name } = file;
       const encodedContent = target.result.split('base64,')[1];
       const rawContent = encodedContent ? atob(encodedContent) : '';
-      const isText = isTextFile(name, rawContent, file.type);
+      const isText = isTextFile({ content: rawContent, mimeType: file.type, name });
 
       const emitCreateEvent = content =>
         this.$emit('create', {

@@ -60,7 +60,7 @@ export default {
     ]),
     ...mapGetters('fileTemplates', ['showFileTemplatesBar']),
     shouldHideEditor() {
-      return this.file && !isTextFile(this.file.name, this.file.content);
+      return this.file && !isTextFile(this.file);
     },
     showContentViewer() {
       return (

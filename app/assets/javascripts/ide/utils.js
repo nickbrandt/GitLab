@@ -42,8 +42,8 @@ const KNOWN_TYPES = [
   },
 ];
 
-export function isTextFile(fileName, content, mimeType = '') {
-  const knownType = KNOWN_TYPES.find(type => type.isMatch(mimeType, fileName));
+export function isTextFile({ name, content, mimeType = '' }) {
+  const knownType = KNOWN_TYPES.find(type => type.isMatch(mimeType, name));
 
   if (knownType) return knownType.isText;
 

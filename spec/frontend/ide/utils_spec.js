@@ -13,78 +13,78 @@ import {
 
 describe('WebIDE utils', () => {
   describe('isTextFile', () => {
-    it('returns false for known binary types', () => {
-      expect(isTextFile('my.png', 'file content', 'image/png')).toBeFalsy();
-      // mime types are case insensitive
-      expect(isTextFile('my.png', 'file content', 'IMAGE/PNG')).toBeFalsy();
+    it.each`
+      mimeType        | name        | type        | result
+      ${'image/png'}  | ${'my.png'} | ${'binary'} | ${false}
+      ${'IMAGE/PNG'}  | ${'my.png'} | ${'binary'} | ${false}
+      ${'text/plain'} | ${'my.txt'} | ${'text'}   | ${true}
+      ${'TEXT/PLAIN'} | ${'my.txt'} | ${'text'}   | ${true}
+    `('returns $result for known $type types', ({ mimeType, name, result }) => {
+      expect(isTextFile({ content: 'file content', mimeType, name })).toBe(result);
     });
 
-    it('returns true for known text types', () => {
-      expect(isTextFile('my.txt', 'file content', 'text/plain')).toBeTruthy();
-      // mime types are case insensitive
-      expect(isTextFile('my.txt', 'file content', 'TEXT/PLAIN')).toBeTruthy();
-    });
-
-    it('returns true for file extensions that Monaco supports syntax highlighting for', () => {
-      // test based on both MIME and extension
-      expect(isTextFile('my.json', '{"éêė":"value"}', 'application/json')).toBeTruthy();
-      expect(isTextFile('.tsconfig', '{"éêė":"value"}', 'application/json')).toBeTruthy();
-      expect(isTextFile('my.sql', 'SELECT "éêė" from tablename', 'application/sql')).toBeTruthy();
-    });
-
-    it('returns true even irrespective of whether the mimes, extensions or file names are lowercase or upper case', () => {
-      expect(isTextFile('MY.JSON', '{"éêė":"value"}', 'application/json')).toBeTruthy();
-      expect(isTextFile('MY.SQL', 'SELECT "éêė" from tablename', 'application/sql')).toBeTruthy();
-      expect(
-        isTextFile('Gruntfile', 'var code = "something"', 'application/javascript'),
-      ).toBeTruthy();
-      expect(
-        isTextFile(
-          'dockerfile',
-          'MAINTAINER Александр "alexander11354322283@me.com"',
-          'application/octet-stream',
-        ),
-      ).toBeTruthy();
-    });
+    it.each`
+      content                                   | mimeType                      | name
+      ${'{"éêė":"value"}'}                      | ${'application/json'}         | ${'my.json'}
+      ${'{"éêė":"value"}'}                      | ${'application/json'}         | ${'.tsconfig'}
+      ${'SELECT "éêė" from tablename'}          | ${'application/sql'}          | ${'my.sql'}
+      ${'{"éêė":"value"}'}                      | ${'application/json'}         | ${'MY.JSON'}
+      ${'SELECT "éêė" from tablename'}          | ${'application/sql'}          | ${'MY.SQL'}
+      ${'var code = "something"'}               | ${'application/javascript'}   | ${'Gruntfile'}
+      ${'MAINTAINER Александр "a21283@me.com"'} | ${'application/octet-stream'} | ${'dockerfile'}
+    `(
+      'returns true for file extensions that Monaco supports syntax highlighting for',
+      ({ content, mimeType, name }) => {
+        expect(isTextFile({ content, mimeType, name })).toBe(true);
+      },
+    );
 
     it('returns false if filename is same as the expected extension', () => {
-      expect(isTextFile('sql', 'SELECT "éêė" from tablename', 'application/sql')).toBeFalsy();
+      expect(
+        isTextFile({
+          name: 'sql',
+          content: 'SELECT "éêė" from tablename',
+          mimeType: 'application/sql',
+        }),
+      ).toBeFalsy();
     });
 
     it('returns true for ASCII only content for unknown types', () => {
-      expect(isTextFile('hello.mytype', 'plain text', 'application/x-new-type')).toBeTruthy();
-    });
-
-    it('returns true for relevant filenames', () => {
       expect(
-        isTextFile(
-          'Dockerfile',
-          'MAINTAINER Александр "alexander11354322283@me.com"',
-          'application/octet-stream',
-        ),
+        isTextFile({
+          name: 'hello.mytype',
+          content: 'plain text',
+          mimeType: 'application/x-new-type',
+        }),
       ).toBeTruthy();
     });
 
     it('returns false for non-ASCII content for unknown types', () => {
-      expect(isTextFile('my.random', '{"éêė":"value"}', 'application/octet-stream')).toBeFalsy();
+      expect(
+        isTextFile({
+          name: 'my.random',
+          content: '{"éêė":"value"}',
+          mimeType: 'application/octet-stream',
+        }),
+      ).toBeFalsy();
     });
 
     it.each`
-      filename        | result
+      name            | result
       ${'myfile.txt'} | ${true}
       ${'Dockerfile'} | ${true}
       ${'img.png'}    | ${false}
       ${'abc.js'}     | ${true}
       ${'abc.random'} | ${false}
       ${'image.jpeg'} | ${false}
-    `('returns $result for $filename', ({ filename, result }) => {
-      expect(isTextFile(filename)).toBe(result);
+    `('returns $result for $filename when no content or mimeType is passed', ({ name, result }) => {
+      expect(isTextFile({ name })).toBe(result);
     });
 
     it('returns true if content is empty string but false if content is not passed', () => {
-      expect(isTextFile('abc.dat')).toBe(false);
-      expect(isTextFile('abc.dat', '')).toBe(true);
-      expect(isTextFile('abc.dat', '  ')).toBe(true);
+      expect(isTextFile({ name: 'abc.dat' })).toBe(false);
+      expect(isTextFile({ name: 'abc.dat', content: '' })).toBe(true);
+      expect(isTextFile({ name: 'abc.dat', content: '  ' })).toBe(true);
     });
   });
 
