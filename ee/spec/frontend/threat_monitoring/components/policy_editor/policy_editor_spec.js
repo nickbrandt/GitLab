@@ -215,6 +215,16 @@ spec:
     it('disables add rule button', () => {
       expect(findAddRuleButton().props('disabled')).toBe(true);
     });
+
+    it('does not update yaml editor value on switch to yaml editor', async () => {
+      findPolicyName().vm.$emit('input', 'test-policy');
+      wrapper.find("[data-testid='editor-mode']").vm.$emit('input', EditorModeYAML);
+      await wrapper.vm.$nextTick();
+
+      const editor = findNetworkPolicyEditor();
+      expect(editor.exists()).toBe(true);
+      expect(editor.props('value')).toEqual('');
+    });
   });
 
   it('creates policy and redirects to a threat monitoring path', async () => {

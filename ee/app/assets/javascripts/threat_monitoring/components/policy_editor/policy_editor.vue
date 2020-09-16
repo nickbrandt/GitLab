@@ -146,7 +146,7 @@ export default {
       }
     },
     changeEditorMode(mode) {
-      if (mode === EditorModeYAML) {
+      if (mode === EditorModeYAML && !this.hasParsingError) {
         this.yamlEditorValue = toYaml(this.policy);
       }
 
