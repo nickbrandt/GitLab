@@ -29,7 +29,7 @@ export default {
     canConfigureFeature() {
       return Boolean(this.glFeatures.sastConfigurationUi && this.feature.configuration_path);
     },
-    // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575
+    // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/241377
     canCreateSASTMergeRequest() {
       return Boolean(this.feature.type === 'sast' && this.createSastMergeRequestPath);
     },
@@ -71,7 +71,7 @@ export default {
     >{{ s__('SecurityConfiguration|Enable') }}</gl-button
   >
 
-  <!-- TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575 -->
+  <!-- TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/241377 -->
   <create-merge-request-button
     v-else-if="canCreateSASTMergeRequest"
     :auto-devops-enabled="autoDevopsEnabled"

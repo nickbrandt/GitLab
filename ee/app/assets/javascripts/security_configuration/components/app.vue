@@ -67,7 +67,7 @@ export default {
       required: false,
       default: false,
     },
-    // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/227575
+    // TODO: Remove as part of https://gitlab.com/gitlab-org/gitlab/-/issues/241377
     createSastMergeRequestPath: {
       type: String,
       required: true,

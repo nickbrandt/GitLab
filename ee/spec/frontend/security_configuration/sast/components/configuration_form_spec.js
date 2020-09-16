@@ -1,38 +1,53 @@
 import * as Sentry from '@sentry/browser';
-import AxiosMockAdapter from 'axios-mock-adapter';
 import { GlAlert } from '@gitlab/ui';
-import waitForPromises from 'helpers/wait_for_promises';
 import { shallowMount } from '@vue/test-utils';
 import ConfigurationForm from 'ee/security_configuration/sast/components/configuration_form.vue';
 import DynamicFields from 'ee/security_configuration/sast/components/dynamic_fields.vue';
+import configureSastMutation from 'ee/security_configuration/sast/graphql/configure_sast.mutation.graphql';
 import { redirectTo } from '~/lib/utils/url_utility';
-import axios from '~/lib/utils/axios_utils';
-import { makeEntities } from './helpers';
+import { makeEntities, makeSastCiConfiguration } from './helpers';
 
 jest.mock('~/lib/utils/url_utility', () => ({
   redirectTo: jest.fn(),
 }));
 
-const createSastMergeRequestPath = '/merge_request/create';
+const projectPath = 'group/project';
 const securityConfigurationPath = '/security/configuration';
 const newMergeRequestPath = '/merge_request/new';
 
 describe('ConfigurationForm component', () => {
   let wrapper;
-  let entities;
-  let axiosMock;
+  let sastCiConfiguration;
 
-  const createComponent = ({ props = {} } = {}) => {
-    entities = makeEntities(3, { value: 'foo' });
+  let pendingPromiseResolvers;
+  const fulfillPendingPromises = () => {
+    pendingPromiseResolvers.forEach(resolve => resolve());
+  };
+
+  const createComponent = ({ mutationResult } = {}) => {
+    sastCiConfiguration = makeSastCiConfiguration();
 
     wrapper = shallowMount(ConfigurationForm, {
       provide: {
-        createSastMergeRequestPath,
+        projectPath,
         securityConfigurationPath,
       },
       propsData: {
-        entities,
-        ...props,
+        sastCiConfiguration,
+      },
+      mocks: {
+        $apollo: {
+          mutate: jest.fn(
+            () =>
+              new Promise(resolve => {
+                pendingPromiseResolvers.push(() =>
+                  resolve({
+                    data: { configureSast: mutationResult },
+                  }),
+                );
+              }),
+          ),
+        },
       },
     });
   };
@@ -41,52 +56,73 @@ describe('ConfigurationForm component', () => {
   const findSubmitButton = () => wrapper.find({ ref: 'submitButton' });
   const findErrorAlert = () => wrapper.find(GlAlert);
   const findCancelButton = () => wrapper.find({ ref: 'cancelButton' });
-  const findDynamicFieldsComponent = () => wrapper.find(DynamicFields);
+  const findDynamicFieldsComponents = () => wrapper.findAll(DynamicFields);
 
   const expectPayloadForEntities = () => {
-    const { post } = axiosMock.history;
+    const expectedPayload = {
+      mutation: configureSastMutation,
+      variables: {
+        input: {
+          projectPath,
+          configuration: {
+            global: [
+              {
+                field: 'field0',
+                defaultValue: 'defaultValue0',
+                value: 'value0',
+              },
+            ],
+            pipeline: [
+              {
+                field: 'field1',
+                defaultValue: 'defaultValue1',
+                value: 'value1',
+              },
+            ],
+          },
+        },
+      },
+    };
 
-    expect(post).toHaveLength(1);
-
-    const postedData = JSON.parse(post[0].data);
-    entities.forEach(entity => {
-      expect(postedData[entity.field]).toBe(entity.value);
-    });
+    expect(wrapper.vm.$apollo.mutate.mock.calls).toEqual([[expectedPayload]]);
   };
 
   beforeEach(() => {
-    axiosMock = new AxiosMockAdapter(axios);
+    pendingPromiseResolvers = [];
   });
 
   afterEach(() => {
     wrapper.destroy();
-    wrapper = null;
-    axiosMock.restore();
   });
 
-  describe('the DynamicFields component', () => {
+  describe.each`
+    type          | expectedPosition
+    ${'global'}   | ${0}
+    ${'pipeline'} | ${1}
+  `('the $type DynamicFields component', ({ type, expectedPosition }) => {
+    let dynamicFields;
+
     beforeEach(() => {
       createComponent();
+      dynamicFields = findDynamicFieldsComponents().at(expectedPosition);
     });
 
     it('renders', () => {
-      expect(findDynamicFieldsComponent().exists()).toBe(true);
+      expect(dynamicFields.exists()).toBe(true);
     });
 
-    it('recieves a copy of the entities prop', () => {
-      const entitiesProp = findDynamicFieldsComponent().props('entities');
+    it(`receives a copy of the ${type} entities`, () => {
+      const entitiesProp = dynamicFields.props('entities');
 
-      expect(entitiesProp).not.toBe(entities);
-      expect(entitiesProp).toEqual(entities);
+      expect(entitiesProp).not.toBe(sastCiConfiguration[type].nodes);
+      expect(entitiesProp).toEqual(sastCiConfiguration[type].nodes);
     });
 
-    describe('when the dynamic fields component emits an input event', () => {
-      let dynamicFields;
+    describe('when it emits an input event', () => {
       let newEntities;
 
       beforeEach(() => {
-        dynamicFields = findDynamicFieldsComponent();
-        newEntities = makeEntities(3, { value: 'foo' });
+        newEntities = makeEntities(1);
         dynamicFields.vm.$emit(DynamicFields.model.event, newEntities);
       });
 
@@ -102,65 +138,68 @@ describe('ConfigurationForm component', () => {
     });
 
     describe.each`
-      context                    | filePath               | statusCode | partialErrorMessage
-      ${'a response error code'} | ${newMergeRequestPath} | ${500}     | ${'500'}
-      ${'no filePath'}           | ${''}                  | ${200}     | ${/merge request.*fail/}
-    `(
-      'given an unsuccessful endpoint response due to $context',
-      ({ filePath, statusCode, partialErrorMessage }) => {
-        beforeEach(() => {
-          axiosMock.onPost(createSastMergeRequestPath).replyOnce(statusCode, { filePath });
-          createComponent();
-
-          findForm().trigger('submit');
+      context             | successPath | errors
+      ${'no successPath'} | ${''}       | ${[]}
+      ${'any errors'}     | ${''}       | ${['an error']}
+    `('given an unsuccessful endpoint response due to $context', ({ successPath, errors }) => {
+      beforeEach(() => {
+        createComponent({
+          mutationResult: {
+            successPath,
+            errors,
+          },
         });
 
-        it('includes the value of each entity in the payload', expectPayloadForEntities);
+        findForm().trigger('submit');
+      });
 
-        it(`sets the submit button's loading prop to true`, () => {
-          expect(findSubmitButton().props('loading')).toBe(true);
+      it('includes the value of each entity in the payload', expectPayloadForEntities);
+
+      it(`sets the submit button's loading prop to true`, () => {
+        expect(findSubmitButton().props('loading')).toBe(true);
+      });
+
+      describe('after async tasks', () => {
+        beforeEach(fulfillPendingPromises);
+
+        it('does not call redirectTo', () => {
+          expect(redirectTo).not.toHaveBeenCalled();
         });
 
-        describe('after async tasks', () => {
-          beforeEach(() => waitForPromises());
+        it('displays an alert message', () => {
+          expect(findErrorAlert().exists()).toBe(true);
+        });
 
-          it('does not call redirectTo', () => {
-            expect(redirectTo).not.toHaveBeenCalled();
+        it('sends the error to Sentry', () => {
+          expect(Sentry.captureException.mock.calls).toMatchObject([
+            [{ message: expect.stringMatching(/merge request.*fail/) }],
+          ]);
+        });
+
+        it(`sets the submit button's loading prop to false`, () => {
+          expect(findSubmitButton().props('loading')).toBe(false);
+        });
+
+        describe('submitting again after a previous error', () => {
+          beforeEach(() => {
+            findForm().trigger('submit');
           });
 
-          it('displays an alert message', () => {
-            expect(findErrorAlert().exists()).toBe(true);
-          });
-
-          it('sends the error to Sentry', () => {
-            expect(Sentry.captureException.mock.calls).toMatchObject([
-              [{ message: expect.stringMatching(partialErrorMessage) }],
-            ]);
-          });
-
-          it(`sets the submit button's loading prop to false`, () => {
-            expect(findSubmitButton().props('loading')).toBe(false);
-          });
-
-          describe('submitting again after a previous error', () => {
-            beforeEach(() => {
-              findForm().trigger('submit');
-            });
-
-            it('hides the alert message', () => {
-              expect(findErrorAlert().exists()).toBe(false);
-            });
+          it('hides the alert message', () => {
+            expect(findErrorAlert().exists()).toBe(false);
           });
         });
-      },
-    );
+      });
+    });
 
     describe('given a successful endpoint response', () => {
       beforeEach(() => {
-        axiosMock
-          .onPost(createSastMergeRequestPath)
-          .replyOnce(200, { filePath: newMergeRequestPath });
-        createComponent();
+        createComponent({
+          mutationResult: {
+            successPath: newMergeRequestPath,
+            errors: [],
+          },
+        });
 
         findForm().trigger('submit');
       });
@@ -172,7 +211,7 @@ describe('ConfigurationForm component', () => {
       });
 
       describe('after async tasks', () => {
-        beforeEach(() => waitForPromises());
+        beforeEach(fulfillPendingPromises);
 
         it('calls redirectTo', () => {
           expect(redirectTo).toHaveBeenCalledWith(newMergeRequestPath);

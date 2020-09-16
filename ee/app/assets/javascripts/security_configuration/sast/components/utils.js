@@ -28,11 +28,14 @@ export const isValidAnalyzerEntity = object => {
   return isString(name) && isString(label) && isString(description) && isBoolean(enabled);
 };
 
-export const extractSastConfigurationEntities = ({ project }) => {
-  if (!project?.sastCiConfiguration) {
-    return [];
-  }
-
-  const { global, pipeline } = project.sastCiConfiguration;
-  return [...global.nodes, ...pipeline.nodes];
-};
+/**
+ * Given a SastCiConfigurationEntity, returns a SastCiConfigurationEntityInput
+ * suitable for use in the configureSast GraphQL mutation.
+ * @param {SastCiConfigurationEntity}
+ * @returns {SastCiConfigurationEntityInput}
+ */
+export const toSastCiConfigurationEntityInput = ({ field, defaultValue, value }) => ({
+  field,
+  defaultValue,
+  value,
+});
