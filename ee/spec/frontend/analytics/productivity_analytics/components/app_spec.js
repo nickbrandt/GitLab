@@ -13,7 +13,7 @@ import {
   GlLoadingIcon,
   GlDeprecatedDropdown,
   GlDeprecatedDropdownItem,
-  GlDeprecatedButton,
+  GlButton,
 } from '@gitlab/ui';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
 import UrlSyncMixin from 'ee/analytics/shared/mixins/url_sync_mixin';
@@ -108,7 +108,7 @@ describe('ProductivityApp component', () => {
   const findScatterplotMetricChart = () => wrapper.find({ ref: 'scatterplot' });
   const findMrTableSortSection = () => wrapper.find('.js-mr-table-sort');
   const findSortFieldDropdown = () => findMrTableSortSection().find(GlDeprecatedDropdown);
-  const findSortOrderToggle = () => findMrTableSortSection().find(GlDeprecatedButton);
+  const findSortOrderToggle = () => findMrTableSortSection().find(GlButton);
   const findMrTableSection = () => wrapper.find('.js-mr-table');
   const findMrTable = () => findMrTableSection().find(MergeRequestTable);
 

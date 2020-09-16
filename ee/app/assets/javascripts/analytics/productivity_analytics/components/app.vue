@@ -5,7 +5,7 @@ import {
   GlLoadingIcon,
   GlDeprecatedDropdown,
   GlDeprecatedDropdownItem,
-  GlDeprecatedButton,
+  GlButton,
   GlTooltipDirective,
   GlIcon,
 } from '@gitlab/ui';
@@ -27,7 +27,7 @@ export default {
     GlDeprecatedDropdown,
     GlDeprecatedDropdownItem,
     GlColumnChart,
-    GlDeprecatedButton,
+    GlButton,
     GlIcon,
     MetricChart,
     Scatterplot,
@@ -182,14 +182,14 @@ export default {
     <template v-if="showAppContent">
       <div class="d-flex justify-content-between">
         <h4>{{ s__('ProductivityAnalytics|Merge Requests') }}</h4>
-        <gl-deprecated-button
+        <gl-button
           v-if="isFilteringByDaysToMerge"
           ref="clearChartFiltersBtn"
           class="btn-link float-right"
           type="button"
           variant="default"
           @click="resetMainChartSelection()"
-          >{{ __('Clear chart filters') }}</gl-deprecated-button
+          >{{ __('Clear chart filters') }}</gl-button
         >
       </div>
       <metric-chart
@@ -324,13 +324,9 @@ export default {
                     </span>
                   </gl-deprecated-dropdown-item>
                 </gl-deprecated-dropdown>
-                <gl-deprecated-button
-                  v-gl-tooltip.hover
-                  :title="sortTooltipTitle"
-                  @click="toggleSortOrder"
-                >
+                <gl-button v-gl-tooltip.hover :title="sortTooltipTitle" @click="toggleSortOrder">
                   <gl-icon :name="sortIcon" />
-                </gl-deprecated-button>
+                </gl-button>
               </div>
             </div>
           </div>
