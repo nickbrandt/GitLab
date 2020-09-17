@@ -1,0 +1,5 @@
+---
+title: Fix Iterations quickaction not showing all iterations
+merge_request: 42528
+author:
+type: fixed
