@@ -15,8 +15,6 @@ RSpec.describe FeatureFlagsFinder do
   before do
     project.add_developer(developer)
     project.add_reporter(reporter)
-
-    stub_licensed_features(feature_flags: true)
   end
 
   describe '#execute' do
