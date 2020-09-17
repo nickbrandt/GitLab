@@ -1,9 +1,10 @@
 <script>
-import { GlDropdown, GlSearchBoxByType, GlIcon } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlSearchBoxByType, GlIcon } from '@gitlab/ui';
 
 export default {
   components: {
     GlDropdown,
+    GlDropdownItem,
     GlSearchBoxByType,
     GlIcon,
   },
@@ -59,9 +60,10 @@ export default {
     <strong class="js-name">{{ filter.name }}</strong>
     <gl-dropdown
       ref="dropdown"
-      class="d-block mt-1"
+      class="gl-display-block gl-mt-2"
       menu-class="dropdown-extended-height"
-      toggle-class="d-flex w-100 justify-content-between align-items-center"
+      :header-text="filter.name"
+      toggle-class="gl-display-flex gl-w-full gl-justify-content-space-between! gl-align-items-center"
     >
       <template slot="button-content">
         <span class="text-truncate" :data-qa-selector="qaSelector">
@@ -73,19 +75,6 @@ export default {
         <i class="fa fa-chevron-down" aria-hidden="true"></i>
       </template>
 
-      <div class="dropdown-title mb-0">
-        {{ filter.name }}
-        <button
-          ref="close"
-          class="btn-blank float-right"
-          type="button"
-          :aria-label="__('Close')"
-          @click="closeDropdown"
-        >
-          <gl-icon name="close" aria-hidden="true" class="vertical-align-middle" />
-        </button>
-      </div>
-
       <gl-search-box-by-type
         v-if="filter.options.length >= 20"
         ref="searchBox"
@@ -93,38 +82,23 @@ export default {
         :placeholder="__('Filter...')"
       />
 
-      <div
+      <gl-dropdown-item
         data-qa-selector="filter_dropdown_content"
-        :class="{ 'dropdown-content': filterId === 'project_id' }"
+        v-for="option in filteredOptions"
+        :key="option.id"
+        :is-check-item="true"
+        :is-checked="isSelected(option)"
+        @click="clickFilter(option)"
       >
-        <button
-          v-for="option in filteredOptions"
-          :key="option.id"
-          role="menuitem"
-          type="button"
-          class="dropdown-item"
-          @click="clickFilter(option)"
-        >
-          <span class="d-flex">
-            <gl-icon
-              v-if="isSelected(option)"
-              class="flex-shrink-0 js-check"
-              name="mobile-issue-close"
-            />
-            <span class="gl-white-space-nowrap gl-ml-2" :class="{ 'gl-pl-5': !isSelected(option) }">
-              {{ option.name }}
-            </span>
-          </span>
-        </button>
-      </div>
+        {{ option.name }}
+      </gl-dropdown-item>
 
-      <button
+      <gl-dropdown-item
         v-if="filteredOptions.length === 0"
-        type="button"
-        class="dropdown-item no-pointer-events text-secondary"
+        class="no-pointer-events"
       >
         {{ __('No matching results') }}
-      </button>
+      </gl-dropdown-item>
     </gl-dropdown>
   </div>
 </template>
