@@ -15385,6 +15385,9 @@ msgstr ""
 msgid "Max seats used"
 msgstr ""
 
+msgid "Max size 15 MB"
+msgstr ""
+
 msgid "Maximum Users:"
 msgstr ""
 
