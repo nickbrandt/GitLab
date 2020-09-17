@@ -75,12 +75,11 @@ export default {
       const queryParams = new URLSearchParams({
         start_date: startDate,
         end_date: endDate,
-        project_ids: this.selectedProjectIdsParam,
       });
 
-      if (this.selectAllProjects) {
-        // not including a project_ids param is the same as selecting all the projects
-        queryParams.delete('project_ids');
+      // not including a project_ids param is the same as selecting all the projects
+      if (!this.selectAllProjects) {
+        queryParams.set('project_ids', this.selectedProjectIdsParam);
       }
 
       return `${this.groupAnalyticsCoverageReportsPath}&${queryParams.toString()}`;
