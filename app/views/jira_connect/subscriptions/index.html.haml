@@ -1,6 +1,12 @@
 %h1
   GitLab for Jira Configuration
 
+- if current_user
+  - user_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: user_path(current_user) }
+  = _('Signed in to GitLab as %{user_link_start}%{username}%{user_link_end}').html_safe % { user_link_start: user_link_start, username: current_user.to_reference, user_link_end: '</a>'.html_safe }
+- else
+  = link_to _('Sign in to GitLab'), new_user_session_path, target: '_blank', rel: 'noopener noreferrer'
+
 %form#add-subscription-form.subscription-form{ action: jira_connect_subscriptions_path }
   .ak-field-group
     %label
