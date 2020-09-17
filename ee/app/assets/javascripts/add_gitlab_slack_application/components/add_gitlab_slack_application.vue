@@ -107,7 +107,7 @@ export default {
 
     <gl-button
       category="primary"
-      variant="info"
+      variant="success"
       class="mx-auto js-popup-button gl-mt-3"
       @click="togglePopup"
     >
@@ -129,7 +129,7 @@ export default {
 
         <gl-button
           category="primary"
-          variant="info"
+          variant="success"
           class="float-right js-add-button"
           @click="addToSlack"
         >
