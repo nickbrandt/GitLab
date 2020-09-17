@@ -2951,6 +2951,9 @@ msgstr ""
 msgid "An error occurred while updating approvers"
 msgstr ""
 
+msgid "An error occurred while updating labels."
+msgstr ""
+
 msgid "An error occurred while updating the comment"
 msgstr ""
 
