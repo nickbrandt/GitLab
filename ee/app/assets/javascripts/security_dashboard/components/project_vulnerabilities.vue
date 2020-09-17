@@ -1,4 +1,5 @@
 <script>
+import produce from 'immer';
 import { GlAlert, GlButton, GlIntersectionObserver } from '@gitlab/ui';
 import { __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -99,12 +100,14 @@ export default {
         this.$apollo.queries.vulnerabilities.fetchMore({
           variables: { after: this.pageInfo.endCursor },
           updateQuery: (previousResult, { fetchMoreResult }) => {
-            const newResult = { ...fetchMoreResult };
-            previousResult.project.vulnerabilities.nodes.push(
-              ...fetchMoreResult.project.vulnerabilities.nodes,
-            );
-            newResult.project.vulnerabilities.nodes = previousResult.project.vulnerabilities.nodes;
-            return newResult;
+            const results = produce(fetchMoreResult, draftData => {
+              // eslint-disable-next-line no-param-reassign
+              draftData.project.vulnerabilities.nodes = [
+                ...previousResult.project.vulnerabilities.nodes,
+                ...draftData.project.vulnerabilities.nodes,
+              ];
+            });
+            return results;
           },
         });
       }
