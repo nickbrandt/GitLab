@@ -280,14 +280,14 @@ func TestSaveFile(t *testing.T) {
 			fields, err := fh.GitLabFinalizeFields("file")
 			require.NoError(t, err)
 
-			checkFileHandlerWithFields(t, fh, fields, "file", spec.remote == notRemote)
+			checkFileHandlerWithFields(t, fh, fields, "file")
 
 			token, jwtErr := jwt.ParseWithClaims(fields["file.gitlab-workhorse-upload"], &testhelper.UploadClaims{}, testhelper.ParseJWT)
 			require.NoError(t, jwtErr)
 
 			uploadFields := token.Claims.(*testhelper.UploadClaims).Upload
 
-			checkFileHandlerWithFields(t, fh, uploadFields, "", spec.remote == notRemote)
+			checkFileHandlerWithFields(t, fh, uploadFields, "")
 		})
 	}
 }
@@ -395,7 +395,7 @@ func TestSaveMultipartInBodyFailure(t *testing.T) {
 	require.EqualError(t, err, test.MultipartUploadInternalError().Error())
 }
 
-func checkFileHandlerWithFields(t *testing.T, fh *filestore.FileHandler, fields map[string]string, prefix string, remote bool) {
+func checkFileHandlerWithFields(t *testing.T, fh *filestore.FileHandler, fields map[string]string, prefix string) {
 	key := func(field string) string {
 		if prefix == "" {
 			return field
@@ -413,9 +413,5 @@ func checkFileHandlerWithFields(t *testing.T, fh *filestore.FileHandler, fields 
 	require.Equal(t, test.ObjectSHA1, fields[key("sha1")])
 	require.Equal(t, test.ObjectSHA256, fields[key("sha256")])
 	require.Equal(t, test.ObjectSHA512, fields[key("sha512")])
-	if remote {
-		require.NotContains(t, fields, key("etag"))
-	} else {
-		require.Contains(t, fields, key("etag"))
-	}
+	require.Contains(t, fields, key("etag"))
 }
