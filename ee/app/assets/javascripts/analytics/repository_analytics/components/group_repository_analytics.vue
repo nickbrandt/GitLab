@@ -10,7 +10,6 @@ import {
 } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import { pikadayToString } from '~/lib/utils/datetime_utility';
-import { getProjectIdQueryParams } from '../utils';
 import getGroupProjects from '../graphql/queries/get_group_projects.query.graphql';
 
 export default {
@@ -72,7 +71,18 @@ export default {
       const endDate = pikadayToString(today);
       today.setDate(today.getDate() - this.selectedDateRange.value);
       const startDate = pikadayToString(today);
-      return `${this.groupAnalyticsCoverageReportsPath}&start_date=${startDate}&end_date=${endDate}&${this.selectedProjectIdsParam}`;
+
+      const queryParams = new URLSearchParams({
+        start_date: startDate,
+        end_date: endDate,
+      });
+
+      // not including a project_ids param is the same as selecting all the projects
+      if (!this.selectAllProjects) {
+        queryParams.set('project_ids', this.selectedProjectIdsParam);
+      }
+
+      return `${this.groupAnalyticsCoverageReportsPath}&${queryParams.toString()}`;
     },
     downloadCSVModalButton() {
       return {
@@ -96,10 +106,7 @@ export default {
       );
     },
     selectedProjectIdsParam() {
-      if (this.selectAllProjects) {
-        return getProjectIdQueryParams(this.groupProjects);
-      }
-      return getProjectIdQueryParams(this.groupProjects.filter(project => project.isSelected));
+      return this.groupProjects.filter(project => project.isSelected).map(project => project.id);
     },
   },
   methods: {

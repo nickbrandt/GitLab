@@ -1,7 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { GlDropdown, GlDropdownItem, GlModal } from '@gitlab/ui';
 import { useFakeDate } from 'helpers/fake_date';
-import { getProjectIdQueryParams } from 'ee/analytics/repository_analytics/utils';
 import GroupRepositoryAnalytics from 'ee/analytics/repository_analytics/components/group_repository_analytics.vue';
 
 const localVue = createLocalVue();
@@ -76,9 +75,21 @@ describe('Group repository analytics app', () => {
           selectAllCodeCoverageProjects();
         });
 
-        it('renders primary action as a link with all project IDs as parameters', () => {
-          const projectIdParams = getProjectIdQueryParams(groupProjectsData);
-          const expectedPath = `${groupAnalyticsCoverageReportsPathWithDates}&${projectIdParams}`;
+        it('renders primary action as a link with no project_ids param', () => {
+          expect(findCodeCoverageDownloadButton().attributes('href')).toBe(
+            groupAnalyticsCoverageReportsPathWithDates,
+          );
+        });
+      });
+
+      describe('with two or more projects selected without selecting all projects', () => {
+        beforeEach(() => {
+          selectCodeCoverageProjectById(groupProjectsData[0].id);
+          selectCodeCoverageProjectById(groupProjectsData[1].id);
+        });
+
+        it('renders primary action as a link with two project IDs as parameters', () => {
+          const expectedPath = `${groupAnalyticsCoverageReportsPathWithDates}&project_ids=${groupProjectsData[0].id}%2C${groupProjectsData[1].id}`;
 
           expect(findCodeCoverageDownloadButton().attributes('href')).toBe(expectedPath);
         });
@@ -111,15 +122,13 @@ describe('Group repository analytics app', () => {
     });
 
     describe('when selecting a date range', () => {
-      const projectIdParams = '&project_ids=1,2';
-
       it.each`
         date  | expected
-        ${7}  | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-06-29&end_date=2020-07-06${projectIdParams}`}
-        ${14} | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-06-22&end_date=2020-07-06${projectIdParams}`}
-        ${30} | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-06-06&end_date=2020-07-06${projectIdParams}`}
-        ${60} | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-05-07&end_date=2020-07-06${projectIdParams}`}
-        ${90} | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-04-07&end_date=2020-07-06${projectIdParams}`}
+        ${7}  | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-06-29&end_date=2020-07-06`}
+        ${14} | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-06-22&end_date=2020-07-06`}
+        ${30} | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-06-06&end_date=2020-07-06`}
+        ${60} | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-05-07&end_date=2020-07-06`}
+        ${90} | ${`${injectedProperties.groupAnalyticsCoverageReportsPath}&start_date=2020-04-07&end_date=2020-07-06`}
       `(
         'updates CSV path to have the start date be $date days before today',
         ({ date, expected }) => {
