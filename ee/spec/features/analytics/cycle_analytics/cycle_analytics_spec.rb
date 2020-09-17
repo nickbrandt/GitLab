@@ -129,11 +129,11 @@ RSpec.describe 'Group Value Stream Analytics', :js do
         to_index: to)
     end
 
-    default_stage_order = %w[Issue Plan Code Test Review Staging Total].freeze
-    default_custom_stage_order = %w[Issue Plan Code Test Review Staging Total Cool\ beans].freeze
-    stages_near_middle_swapped = %w[Issue Plan Test Code Review Staging Total Cool\ beans].freeze
-    stage_dragged_to_top = %w[Review Issue Plan Code Test Staging Total Cool\ beans].freeze
-    stage_dragged_to_bottom = %w[Issue Plan Code Test Staging Total Cool\ beans Review].freeze
+    default_stage_order = %w[Issue Plan Code Test Review Staging].freeze
+    default_custom_stage_order = %w[Issue Plan Code Test Review Staging Cool\ beans].freeze
+    stages_near_middle_swapped = %w[Issue Plan Test Code Review Staging Cool\ beans].freeze
+    stage_dragged_to_top = %w[Review Issue Plan Code Test Staging Cool\ beans].freeze
+    stage_dragged_to_bottom = %w[Issue Plan Code Test Staging Cool\ beans Review].freeze
 
     shared_examples 'manual ordering disabled' do
       it 'does not allow stages to be draggable', :js do

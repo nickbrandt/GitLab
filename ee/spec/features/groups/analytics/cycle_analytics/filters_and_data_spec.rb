@@ -142,7 +142,7 @@ RSpec.describe 'Group value stream analytics filters and data', :js do
       it 'displays the default list of stages' do
         stage_nav = page.find(stage_nav_selector)
 
-        %w[Issue Plan Code Test Review Staging Total].each do |item|
+        %w[Issue Plan Code Test Review Staging].each do |item|
           string_id = "CycleAnalytics|#{item}"
           expect(stage_nav).to have_content(s_(string_id))
         end
@@ -163,7 +163,7 @@ RSpec.describe 'Group value stream analytics filters and data', :js do
       it 'displays the default list of stages' do
         path_nav = page.find(path_nav_selector)
 
-        %w[Issue Plan Code Test Review Staging Overview].each do |item|
+        %w[Issue Plan Code Test Review Staging].each do |item|
           string_id = "CycleAnalytics|#{item}"
           expect(path_nav).to have_content(s_(string_id))
         end
@@ -303,8 +303,7 @@ RSpec.describe 'Group value stream analytics filters and data', :js do
       { title: 'Code', description: 'Time until first merge request', events_count: 1, median: 'about 5 hours' },
       { title: 'Test', description: 'Total test time for all commits/merges', events_count: 0, median: 'Not enough data' },
       { title: 'Review', description: 'Time between merge request creation and merge/close', events_count: 1, median: 'about 1 hour' },
-      { title: 'Staging', description: 'From merge request merge until deploy to production', events_count: 1, median: 'about 1 hour' },
-      { title: 'Total', description: 'From issue creation until deploy to production', events_count: 1, median: '5 days' }
+      { title: 'Staging', description: 'From merge request merge until deploy to production', events_count: 1, median: 'about 1 hour' }
     ]
 
     it 'each stage will have median values', :sidekiq_might_not_need_inline do
