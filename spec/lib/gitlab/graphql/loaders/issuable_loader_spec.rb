@@ -11,33 +11,15 @@ RSpec.describe Gitlab::Graphql::Loaders::IssuableLoader do
   # Dumb finder class, that only implements what we need, and has
   # predictable query counts.
   let(:finder_class) do
-    Class.new do
-      attr_reader :current_user, :params
-      attr_accessor :parent
-
-      def initialize(user, args)
-        @current_user = user
-        @params = HashWithIndifferentAccess.new(args.to_h)
-      end
-
+    Class.new(IssuesFinder) do
       def execute
         params[:project_id].issues.where(iid: params[:iids])
       end
 
-      def parent_param=(obj)
-        @parent = obj
-        params[parent_param] = parent if parent
-      end
+      private
 
-      def parent_param
-        case parent
-        when Project
-          :project_id
-        when Group
-          :group_id
-        else
-          raise "Unexpected parent: #{parent.class}"
-        end
+      def params_class
+        IssuesFinder::Params
       end
     end
   end
