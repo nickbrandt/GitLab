@@ -50,10 +50,6 @@ module Gitlab
         ::Feature.enabled?(:ci_disallow_to_create_merge_request_pipelines_in_target_project, target_project)
       end
 
-      def self.ci_plan_needs_size_limit?(project)
-        ::Feature.enabled?(:ci_plan_needs_size_limit, project, default_enabled: true)
-      end
-
       def self.lint_creates_pipeline_with_dry_run?(project)
         ::Feature.enabled?(:ci_lint_creates_pipeline_with_dry_run, project, default_enabled: true)
       end
