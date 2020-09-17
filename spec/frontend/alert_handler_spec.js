@@ -4,17 +4,19 @@ import initAlertHandler from '~/alert_handler';
 describe('Alert Handler', () => {
   const ALERT_CLASS = 'gl-alert';
   const BANNER_CLASS = 'gl-banner';
-  const CLOSE_LABEL = 'Dismiss';
+  const DISMISS_CLASS = 'gl-alert-dismiss';
+  const DISMISS_LABEL = 'Dismiss';
 
   const generateHtml = parentClass =>
     `<div class="${parentClass}">
-      <button aria-label="${CLOSE_LABEL}">Dismiss</button>
+      <button aria-label="${DISMISS_LABEL}">Dismiss</button>
     </div>`;
 
   const findFirstAlert = () => document.querySelector(`.${ALERT_CLASS}`);
   const findFirstBanner = () => document.querySelector(`.${BANNER_CLASS}`);
   const findAllAlerts = () => document.querySelectorAll(`.${ALERT_CLASS}`);
-  const findFirstCloseButton = () => document.querySelector(`[aria-label="${CLOSE_LABEL}"]`);
+  const findFirstDismissButton = () => document.querySelector(`[aria-label="${DISMISS_LABEL}"]`);
+  const findFirstDismissButtonByClass = () => document.querySelector(`.${DISMISS_CLASS}`);
 
   describe('initAlertHandler', () => {
     describe('with one alert', () => {
@@ -28,7 +30,7 @@ describe('Alert Handler', () => {
       });
 
       it('should dismiss the alert on click', () => {
-        findFirstCloseButton().click();
+        findFirstDismissButton().click();
         expect(findFirstAlert()).not.toExist();
       });
     });
@@ -44,7 +46,7 @@ describe('Alert Handler', () => {
       });
 
       it('should dismiss only one alert on click', () => {
-        findFirstCloseButton().click();
+        findFirstDismissButton().click();
         expect(findAllAlerts()).toHaveLength(1);
       });
     });
@@ -60,8 +62,29 @@ describe('Alert Handler', () => {
       });
 
       it('should dismiss the banner on click', () => {
-        findFirstCloseButton().click();
+        findFirstDismissButton().click();
         expect(findFirstBanner()).not.toExist();
+      });
+    });
+
+    // Dismiss buttons *should* have the correct aria labels, but some of them won't
+    // because legacy code isn't always a11y compliant.
+    // This tests that the fallback for the incorrectly labelled buttons works.
+    describe('with a mislabelled dismiss button', () => {
+      beforeEach(() => {
+        setHTMLFixture(`<div class="${ALERT_CLASS}">
+          <button class="${DISMISS_CLASS}">Dismiss</button>
+        </div>`);
+        initAlertHandler();
+      });
+
+      it('should render the banner', () => {
+        expect(findFirstAlert()).toExist();
+      });
+
+      it('should dismiss the banner on click', () => {
+        findFirstDismissButtonByClass().click();
+        expect(findFirstAlert()).not.toExist();
       });
     });
   });

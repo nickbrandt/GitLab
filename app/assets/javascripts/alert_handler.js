@@ -5,12 +5,14 @@
 
 export default function initAlertHandler() {
   const DISMISSIBLE_SELECTORS = ['.gl-alert', '.gl-banner'];
-  const CLOSE_SELECTOR = '[aria-label="Dismiss"]';
+  const DISMISS_LABEL = '[aria-label="Dismiss"]';
+  const DISMISS_CLASS = '.gl-alert-dismiss';
 
   DISMISSIBLE_SELECTORS.forEach(selector => {
     const elements = document.querySelectorAll(selector);
-    elements.forEach(element =>
-      element.querySelector(CLOSE_SELECTOR).addEventListener('click', () => element.remove()),
-    );
+    elements.forEach(element => {
+      const button = element.querySelector(DISMISS_LABEL) || element.querySelector(DISMISS_CLASS);
+      button.addEventListener('click', () => element.remove());
+    });
   });
 }
