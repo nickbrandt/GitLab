@@ -1,23 +1,22 @@
 # frozen_string_literal: true
 
-class UpdateMergeRequestsWorker # rubocop:disable Scalability/IdempotentWorker
+class MergeRequestResetApprovalsWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
   feature_category :source_code_management
   urgency :high
   worker_resource_boundary :cpu
-  weight 3
-  loggable_arguments 2, 3, 4
+  loggable_arguments 2, 3
 
   # rubocop: disable CodeReuse/ActiveRecord
-  def perform(project_id, user_id, oldrev, newrev, ref)
+  def perform(project_id, user_id, ref, newrev)
     project = Project.find_by(id: project_id)
     return unless project
 
     user = User.find_by(id: user_id)
     return unless user
 
-    MergeRequests::RefreshService.new(project, user).execute(oldrev, newrev, ref)
+    EE::MergeRequests::ResetApprovalsService.new(project, user).execute(ref, newrev)
   end
   # rubocop: enable CodeReuse/ActiveRecord
 end
