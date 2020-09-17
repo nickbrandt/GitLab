@@ -161,7 +161,7 @@ RSpec.describe Backup::Repositories do
         it 'shows the appropriate error' do
           subject.restore
 
-          expect(progress).to have_received(:puts).with("Ignoring error on #{project.full_path} (#{project.disk_path}) - Failed to restore repo")
+          expect(progress).to have_received(:puts).with("[Failed] restoring #{project.full_path} (#{project.disk_path})")
         end
       end
 
@@ -171,7 +171,7 @@ RSpec.describe Backup::Repositories do
         it 'shows the appropriate error' do
           subject.restore
 
-          expect(progress).to have_received(:puts).with("Ignoring error on #{project.full_path} (#{project.disk_path}) - Failed to restore repo")
+          expect(progress).to have_received(:puts).with("[Failed] restoring #{project.full_path} (#{project.disk_path})")
         end
       end
     end

@@ -53,7 +53,7 @@ module Backup
     private
 
     def restore_repository(container, type)
-      BackupRestorer.new(
+      BackupRestore.new(
         progress,
         type.repository_for(container),
         backup_repos_path
@@ -121,7 +121,7 @@ module Backup
     end
 
     def backup_repository(container, type)
-      BackupRestorer.new(
+      BackupRestore.new(
         progress,
         type.repository_for(container),
         backup_repos_path
@@ -140,7 +140,7 @@ module Backup
       end
     end
 
-    class BackupRestorer
+    class BackupRestore
       attr_accessor :progress, :repository, :backup_repos_path
 
       def initialize(progress, repository, backup_repos_path)
@@ -165,7 +165,8 @@ module Backup
         progress.puts " * #{display_repo_path} ... " + "[DONE]".color(:green)
 
       rescue => e
-        progress_warn(e, 'Failed to backup repo')
+        progress.puts "[Failed] backing up #{display_repo_path}".color(:red)
+        progress.puts "Error #{e}".color(:red)
       end
 
       def restore(always_create: false)
@@ -183,7 +184,8 @@ module Backup
         progress.puts " * #{display_repo_path} ... " + "[DONE]".color(:green)
 
       rescue => e
-        progress_warn(e, 'Failed to restore repo')
+        progress.puts "[Failed] restoring #{display_repo_path}".color(:red)
+        progress.puts "Error #{e}".color(:red)
       end
 
       private
@@ -201,19 +203,13 @@ module Backup
       end
 
       def restore_custom_hooks
-        return unless Dir.exist?(repository_backup_path)
-        return if Dir.glob("#{repository_backup_path}/custom_hooks*").none?
+        return unless File.exist?(custom_hooks_tar)
 
         repository.gitaly_repository_client.restore_custom_hooks(custom_hooks_tar)
       end
 
       def custom_hooks_tar
         File.join(repository_backup_path, "custom_hooks.tar")
-      end
-
-      def progress_warn(cmd, output)
-        progress.puts "[WARNING] Executing #{cmd}".color(:orange)
-        progress.puts "Ignoring error on #{display_repo_path} - #{output}".color(:orange)
       end
     end
 
