@@ -16843,6 +16843,9 @@ msgstr ""
 msgid "New Snippet"
 msgstr ""
 
+msgid "New Test Case"
+msgstr ""
+
 msgid "New User"
 msgstr ""
 
@@ -23622,6 +23625,9 @@ msgstr ""
 msgid "Something went wrong while creating a requirement."
 msgstr ""
 
+msgid "Something went wrong while creating a test case."
+msgstr ""
+
 msgid "Something went wrong while deleting description changes. Please try again."
 msgstr ""
 
@@ -24358,6 +24364,9 @@ msgid "Submit review"
 msgstr ""
 
 msgid "Submit search"
+msgstr ""
+
+msgid "Submit test case"
 msgstr ""
 
 msgid "Submit the current review."
