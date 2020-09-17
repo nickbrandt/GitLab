@@ -229,14 +229,14 @@ RSpec.describe Gitlab::Utils::UsageData do
         described_class.track_usage_event(event_name, value)
       end
 
-      it 'does not track event usage ping is not enabled' do
+      it 'does not track event when usage ping is not enabled' do
         stub_application_setting(usage_ping_enabled: false)
         expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
 
         described_class.track_usage_event(event_name, value)
       end
 
-      it 'logs an exception for unknown event' do
+      it 'raise an error for unknown event' do
         stub_application_setting(usage_ping_enabled: true)
 
         expect { described_class.track_usage_event(unknown_event, value) }.to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::UnknownEvent)
