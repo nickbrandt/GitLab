@@ -481,6 +481,8 @@ project:
 - dast_site_profiles
 - dast_scanner_profiles
 - dast_sites
+- dast_site_tokens
+- dast_site_validations
 - operations_feature_flags
 - operations_feature_flags_client
 - operations_feature_flags_user_lists
