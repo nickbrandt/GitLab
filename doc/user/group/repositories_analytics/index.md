@@ -16,9 +16,13 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 CAUTION: **Warning:**
 This feature might not be available to you. Check the **version history** note above for details.
 
-To get a CSV of the code coverage data for all of the projects in your group, go to your group's **Analytics > CI/CD** page, and click **Download historic test coverage data (.csv)**. This report has a maximum of 1000 records. This will open a modal for you to select the any or all projects you want to include in the report. You can also select the time frame for the report from the following options: last week, last 2 weeks, last 30 days, last 60 days, last 90 days.
+You can get a CSV of the code coverage data for all of the projects in your group. This report has a maximum of 1000 records. To get the report:
 
-![Code Coverage Modal](../img/group_code_coverage_csv_v13_4.png)
+1. Go to your group's **Analytics > Repositories** page
+1. Click **Download historic test coverage data (.csv)**,
+1. In the popup, select the projects you want to include in the report.
+1. Select the date range for the report from the preset options.
+1. Click **Download test coverage data (.csv)**.
 
 The projects dropdown shows up to 100 projects from your group. If the project you want to check is not in the dropdown list, you can select **All projects** to download the report for all projects in your group, including any projects that are not listed. There is a plan to improve this behavior in this [related issue](https://gitlab.com/gitlab-org/gitlab/-/issues/250684).
 
