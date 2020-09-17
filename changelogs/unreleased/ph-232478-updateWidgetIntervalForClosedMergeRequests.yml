@@ -1,5 +1,5 @@
 ---
 title: Increase widget polling for closed and merged merge requests
-merge_request:
+merge_request: 42458
 author:
 type: changed
