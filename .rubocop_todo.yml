@@ -1163,7 +1163,6 @@ Rails/SaveBang:
     - 'spec/services/projects/unlink_fork_service_spec.rb'
     - 'spec/services/projects/update_pages_service_spec.rb'
     - 'spec/services/projects/update_service_spec.rb'
-    - 'spec/services/quick_actions/interpret_service_spec.rb'
     - 'spec/services/reset_project_cache_service_spec.rb'
     - 'spec/services/resource_events/change_milestone_service_spec.rb'
     - 'spec/services/system_hooks_service_spec.rb'
