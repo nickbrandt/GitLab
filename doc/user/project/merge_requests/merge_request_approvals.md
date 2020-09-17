@@ -125,7 +125,7 @@ Alternatively, you can **require**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/40491) in [GitLab Starter](https://about.gitlab.com/pricing/) 13.4.
 
-Managers or operators with [Reporter permissions](../permissions.md#project-members-permissions)
+Managers or operators with [Reporter permissions](../../permissions.md#project-members-permissions)
 to a project sometimes need to be required approvers of a merge request,
 before a merge to a protected branch begins. These approvers aren't allowed
 to push or merge code to any branches.
