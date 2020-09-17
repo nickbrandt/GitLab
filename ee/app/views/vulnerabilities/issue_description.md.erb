@@ -42,7 +42,7 @@
 <% end %>
 <% end %>
 
-<% if vulnerability.remediations.present? %>
+<% if vulnerability.remediations.present? && vulnerability.remediations.any? %>
 ### <%= _("Remediations") %>:
 
 <% vulnerability.remediations.each do |remediation| %>
