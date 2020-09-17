@@ -17,6 +17,7 @@ import {
   filterLabels,
   filterUsers,
 } from '../../shared/store/modules/filters/mock_data';
+import { getFilterParams, getFilterValues } from '../../shared/store/modules/filters/test_helper';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -58,18 +59,6 @@ async function shouldMergeUrlParams(wrapper, result) {
     spreadArrays: true,
   });
   expect(commonUtils.historyPushState).toHaveBeenCalled();
-}
-
-function getFilterParams(tokens, options = {}) {
-  const { key = 'value', operator = '=', prop = 'title' } = options;
-  return tokens.map(token => {
-    return { [key]: token[prop], operator };
-  });
-}
-
-function getFilterValues(tokens, options = {}) {
-  const { prop = 'title' } = options;
-  return tokens.map(token => token[prop]);
 }
 
 const selectedBranchParams = getFilterParams(mockBranches, { prop: 'name' });
