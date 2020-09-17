@@ -64,14 +64,16 @@ describe('CollapsedFilesWarning', () => {
     expect(wrapper.find('[data-testid="root"]').exists()).toBe(present);
   });
 
-  it('dismisses the component when the alert "x" is clicked', () => {
+  it('dismisses the component when the alert "x" is clicked', async () => {
     createComponent({}, { full: true });
 
-    expect(wrapper.vm.isDismissed).toBe(false);
+    expect(wrapper.find('[data-testid="root"]').exists()).toBe(true);
 
     getAlertCloseButton().element.click();
 
-    expect(wrapper.vm.isDismissed).toBe(true);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('[data-testid="root"]').exists()).toBe(false);
   });
 
   it('triggers the expandAllFiles action when the alert action button is clicked', () => {
