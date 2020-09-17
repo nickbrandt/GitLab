@@ -28,7 +28,7 @@ RSpec.describe 'a maintainer edits files on a source-branch of an MR from a fork
     wait_for_requests
     within first('.js-file-title') do
       find('[data-testid="edit_file"]').click
-      click_link 'Edit file'
+      click_link 'Edit in single-file editor'
     end
     wait_for_requests
   end

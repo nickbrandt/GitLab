@@ -3,9 +3,12 @@ import { GlDeprecatedDropdown, GlDeprecatedDropdownItem, GlIcon } from '@gitlab/
 import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
 import EditButton from '~/diffs/components/edit_button.vue';
 
+jest.mock('lodash/uniqueId', () => (str = '') => `${str}fake`);
+
+const TOOLTIP_ID = 'edit_button_tooltip_fake';
 const EDIT_ITEM = {
   href: 'test-path',
-  text: 'Edit file',
+  text: 'Edit in single-file editor',
 };
 const IDE_EDIT_ITEM = {
   href: 'ide-test-path',
@@ -66,7 +69,7 @@ describe('EditButton', () => {
     });
 
     it('does not have tooltip', () => {
-      expect(getTooltip()).toBe('');
+      expect(getTooltip()).toEqual({ id: TOOLTIP_ID, title: 'Edit file in...' });
     });
 
     it('shows pencil dropdown', () => {
@@ -74,16 +77,26 @@ describe('EditButton', () => {
       expect(wrapper.find('.gl-dropdown-caret').exists()).toBe(true);
     });
 
-    it.each`
-      event     | expectedEmit
-      ${'show'} | ${'open'}
-      ${'hide'} | ${'close'}
-    `('when dropdown emits $event, emits $expectedEmit', ({ event, expectedEmit }) => {
-      expect(wrapper.emitted(expectedEmit)).toBeUndefined();
+    describe.each`
+      event     | expectedEmit | expectedRootEmit
+      ${'show'} | ${'open'}    | ${[['bv::hide::tooltip', TOOLTIP_ID]]}
+      ${'hide'} | ${'close'}   | ${[]}
+    `('when dropdown emits $event', ({ event, expectedEmit, expectedRootEmit }) => {
+      let rootEmitSpy;
 
-      findDropdown().vm.$emit(event);
+      beforeEach(() => {
+        rootEmitSpy = jest.spyOn(wrapper.vm.$root, '$emit');
 
-      expect(wrapper.emitted(expectedEmit)).toEqual([[]]);
+        findDropdown().vm.$emit(event);
+      });
+
+      it(`emits ${expectedEmit}`, () => {
+        expect(wrapper.emitted(expectedEmit)).toEqual([[]]);
+      });
+
+      it(`emits root = ${JSON.stringify(expectedRootEmit)}`, () => {
+        expect(rootEmitSpy.mock.calls).toEqual(expectedRootEmit);
+      });
     });
   });
 
@@ -118,7 +131,10 @@ describe('EditButton', () => {
     });
 
     it('should have tooltip', () => {
-      expect(getTooltip()).toBe("Can't edit as source branch was deleted");
+      expect(getTooltip()).toEqual({
+        id: TOOLTIP_ID,
+        title: "Can't edit as source branch was deleted",
+      });
     });
   });
 });

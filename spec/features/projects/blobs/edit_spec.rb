@@ -30,7 +30,7 @@ RSpec.describe 'Editing file blob', :js do
     def mr_edit_and_commit(commit_changes: true)
       wait_for_requests
       find('[data-testid="edit_file"]').click
-      click_link 'Edit file'
+      click_link 'Edit in single-file editor'
 
       fill_and_commit(commit_changes)
     end
