@@ -3,9 +3,6 @@
 require 'spec_helper'
 
 RSpec.describe EE::MergeRequests::ResetApprovalsService do
-  include ProjectForksHelper
-  include ProjectHelpers
-
   let(:service) { described_class.new(project, current_user) }
   let(:current_user) { merge_request.author }
   let(:group) { create(:group) }
@@ -34,7 +31,6 @@ RSpec.describe EE::MergeRequests::ResetApprovalsService do
 
   describe "#execute" do
     before do
-      merge_request.approvals.create!(user_id: user.id)
       allow(service).to receive(:execute_hooks)
       allow(NotificationService).to receive(:new) { notification_service }
       project.add_developer(approver)
@@ -42,6 +38,8 @@ RSpec.describe EE::MergeRequests::ResetApprovalsService do
       perform_enqueued_jobs do
         merge_request.update!(approver_ids: [approver].map(&:id).join(','))
       end
+
+      merge_request.approvals.create!(user_id: approver.id)
     end
 
     it 'resets approvals' do

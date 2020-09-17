@@ -6,10 +6,7 @@ class MergeRequestResetApprovalsWorker # rubocop:disable Scalability/IdempotentW
   feature_category :source_code_management
   urgency :high
   worker_resource_boundary :cpu
-  weight 3
   loggable_arguments 2, 3
-
-  LOG_TIME_THRESHOLD = 90 # seconds
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(project_id, user_id, ref, newrev)

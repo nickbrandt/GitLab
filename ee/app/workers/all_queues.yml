@@ -640,7 +640,7 @@
   :has_external_dependencies:
   :urgency: :high
   :resource_boundary: :cpu
-  :weight: 3
+  :weight: 1
   :idempotent:
   :tags: []
 - :name: new_epic

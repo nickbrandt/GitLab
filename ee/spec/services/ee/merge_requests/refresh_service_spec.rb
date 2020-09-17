@@ -343,7 +343,7 @@ RSpec.describe MergeRequests::RefreshService do
         Todo.where(action: Todo::APPROVAL_REQUIRED, target: merge_request)
       end
 
-      context 'push to origin repo source branch' do
+      context 'push to origin repo source branch', :sidekiq_inline do
         let(:notification_service) { spy('notification_service') }
 
         before do
@@ -354,7 +354,6 @@ RSpec.describe MergeRequests::RefreshService do
         it 'resets approvals' do
           service.execute(oldrev, newrev, 'refs/heads/master')
           reload_mrs
-          MergeRequestResetApprovalsWorker.drain
 
           expect(merge_request.approvals).to be_empty
           expect(forked_merge_request.approvals).not_to be_empty
@@ -446,14 +445,13 @@ RSpec.describe MergeRequests::RefreshService do
         end
       end
 
-      context 'resetting approvals if they are enabled' do
+      context 'resetting approvals if they are enabled', :sidekiq_inline do
         context 'when approvals_before_merge is disabled' do
           before do
             project.update(approvals_before_merge: 0)
             allow(service).to receive(:execute_hooks)
             service.execute(oldrev, newrev, 'refs/heads/master')
             reload_mrs
-            MergeRequestResetApprovalsWorker.drain
           end
 
           it 'resets approvals' do
@@ -490,14 +488,13 @@ RSpec.describe MergeRequests::RefreshService do
           end
         end
 
-        context 'when there are approvals' do
+        context 'when there are approvals', :sidekiq_inline do
           context 'closed merge request' do
             before do
               merge_request.close!
               allow(service).to receive(:execute_hooks)
               service.execute(oldrev, newrev, 'refs/heads/master')
               reload_mrs
-              MergeRequestResetApprovalsWorker.drain
             end
 
             it 'resets the approvals' do
@@ -511,7 +508,6 @@ RSpec.describe MergeRequests::RefreshService do
               allow(service).to receive(:execute_hooks)
               service.execute(oldrev, newrev, 'refs/heads/master')
               reload_mrs
-              MergeRequestResetApprovalsWorker.drain
             end
 
             it 'resets the approvals' do
