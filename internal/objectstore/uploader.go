@@ -14,13 +14,6 @@ import (
 	"gitlab.com/gitlab-org/labkit/log"
 )
 
-// Upload represents an upload to an ObjectStorage provider
-type Upload interface {
-	io.WriteCloser
-	CloseWithError(error) error
-	ETag() string
-}
-
 // uploader is an io.WriteCloser that can be used as write end of the uploading pipe.
 type uploader struct {
 	// etag is the object storage provided checksum
