@@ -10231,7 +10231,7 @@ type MergeRequestCreatePayload {
 }
 
 """
-Represents the sync and verification state of a Merge Request diff
+Represents the Geo sync and verification state of a Merge Request diff
 """
 type MergeRequestDiffRegistry {
   """
@@ -11724,7 +11724,7 @@ type PackageEdge {
 }
 
 """
-Represents the sync and verification state of a package file
+Represents the Geo sync and verification state of a package file
 """
 type PackageFileRegistry {
   """
@@ -17086,7 +17086,7 @@ type TaskCompletionStatus {
 }
 
 """
-Represents the sync and verification state of a terraform state
+Represents the Geo sync and verification state of a terraform state
 """
 type TerraformStateRegistry {
   """
