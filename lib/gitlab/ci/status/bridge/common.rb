@@ -10,18 +10,28 @@ module Gitlab
           end
 
           def has_details?
-            can?(user, :read_pipeline, subject.downstream_pipeline)
+            !!details_path
           end
 
           def details_path
-            return unless subject.downstream_pipeline
+            return unless Feature.enabled?(:ci_bridge_pipeline_details, subject.project, default_enabled: true)
+            return unless can?(user, :read_pipeline, downstream_pipeline)
 
-            pipeline = subject.downstream_pipeline
-            project_pipeline_path(pipeline.project, pipeline)
+            project_pipeline_path(downstream_project, downstream_pipeline)
           end
 
           def has_action?
             false
+          end
+
+          private
+
+          def downstream_pipeline
+            subject.downstream_pipeline
+          end
+
+          def downstream_project
+            downstream_pipeline&.project
           end
         end
       end
