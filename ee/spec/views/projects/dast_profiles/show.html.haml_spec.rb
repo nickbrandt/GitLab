@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe "projects/dast_profiles/index", type: :view do
+RSpec.describe "projects/dast_profiles/show", type: :view do
   before do
     @project = create(:project)
     render
