@@ -161,6 +161,7 @@ exports[`PolicyEditorApp component renders the policy editor layout 1`] = `
         class="gl-p-3 gl-rounded-base gl-border-1 gl-border-solid gl-border-gray-100 gl-mb-5"
       >
         <gl-button-stub
+          buttontextclasses=""
           category="primary"
           data-testid="add-rule"
           icon=""
@@ -216,6 +217,7 @@ spec:
       class="col-md-auto"
     >
       <gl-button-stub
+        buttontextclasses=""
         category="primary"
         data-testid="save-policy"
         icon=""
@@ -229,6 +231,7 @@ spec:
       <!---->
        
       <gl-button-stub
+        buttontextclasses=""
         category="secondary"
         href="/threat-monitoring"
         icon=""
