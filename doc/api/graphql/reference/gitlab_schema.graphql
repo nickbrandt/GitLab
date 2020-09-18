@@ -7001,8 +7001,7 @@ type GeoNode {
   ): TerraformStateRegistryConnection
 
   """
-  Find terraform state version registries on this Geo node. Available only when
-  feature flag `geo_terraform_state_version_replication` is enabled
+  Find terraform state version registries on this Geo node
   """
   terraformStateVersionRegistries(
     """
