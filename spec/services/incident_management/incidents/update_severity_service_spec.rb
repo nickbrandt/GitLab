@@ -7,12 +7,19 @@ RSpec.describe IncidentManagement::Incidents::UpdateSeverityService do
 
   describe '#execute' do
     let(:severity) { 'low' }
+    let(:system_note_worker) { ::IncidentManagement::AddSeveritySystemNoteWorker }
 
     subject(:update_severity) { described_class.new(issuable, user, severity).execute }
 
+    before do
+      allow(system_note_worker).to receive(:perform_async)
+    end
+
     shared_examples 'adds a system note' do
-      it do
-        expect { update_severity }.to change { issuable.notes.where(author: user).count }.by(1)
+      it 'calls AddSeveritySystemNoteWorker' do
+        update_severity
+
+        expect(system_note_worker).to have_received(:perform_async).with(issuable.id, user.id)
       end
     end
 
@@ -27,7 +34,9 @@ RSpec.describe IncidentManagement::Incidents::UpdateSeverityService do
         end
 
         it 'does not add a system note' do
-          expect { update_severity }.not_to change { issuable.notes.count }
+          update_severity
+
+          expect(system_note_worker).not_to have_received(:perform_async)
         end
       end
     end

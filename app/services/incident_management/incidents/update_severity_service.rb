@@ -31,7 +31,7 @@ module IncidentManagement
       end
 
       def add_system_note
-        SystemNoteService.change_incident_severity(issuable, current_user)
+        ::IncidentManagement::AddSeveritySystemNoteWorker.perform_async(issuable.id, current_user.id)
       end
     end
   end
