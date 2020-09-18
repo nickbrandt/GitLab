@@ -168,9 +168,7 @@ module Gitlab
 
           # Now split each option by equals to separate
           # each in the format [key, value]
-          options = options.map { |option| option.split "=" }
-
-          options.to_h
+          options.to_h { |option| option.split '=' }
         end
       end
     end
