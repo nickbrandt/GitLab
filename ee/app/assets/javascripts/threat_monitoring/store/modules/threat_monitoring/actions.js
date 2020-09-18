@@ -70,3 +70,8 @@ export const setCurrentTimeWindow = ({ commit, dispatch }, timeWindow) => {
     root: true,
   });
 };
+
+export const setAllEnvironments = ({ commit, dispatch }) => {
+  commit(types.SET_ALL_ENVIRONMENTS);
+  dispatch(`networkPolicies/fetchPolicies`, null, { root: true });
+};
