@@ -10,6 +10,8 @@ module SystemNotes
     #
     # Returns the created Note object
     def change_incident_severity
+      return unless Feature.enabled?(:add_severity_system_note, noteable.project)
+
       severity = noteable.severity
 
       if severity_label = IssuableSeverity::SEVERITY_LABELS[severity.to_sym]
