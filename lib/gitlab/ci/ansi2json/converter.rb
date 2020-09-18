@@ -108,9 +108,9 @@ module Gitlab
 
           section_name = sanitize_section_name(section)
 
-          if action == "start"
+          if action == 'start'
             handle_section_start(scanner, section_name, timestamp, options)
-          elsif action == "end"
+          elsif action == 'end'
             handle_section_end(scanner, section_name, timestamp)
           else
             raise 'unsupported action'
@@ -164,7 +164,7 @@ module Gitlab
 
           # We need to remove the square brackets and split
           # by comma to get a list of the options
-          options = raw_options[1...-1].split ","
+          options = raw_options[1...-1].split ','
 
           # Now split each option by equals to separate
           # each in the format [key, value]
