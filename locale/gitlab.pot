@@ -9228,7 +9228,7 @@ msgstr ""
 msgid "Edit environment"
 msgstr ""
 
-msgid "Edit file"
+msgid "Edit file in..."
 msgstr ""
 
 msgid "Edit files in the editor and commit changes here"
@@ -9241,6 +9241,12 @@ msgid "Edit group: %{group_name}"
 msgstr ""
 
 msgid "Edit identity for %{user_name}"
+msgstr ""
+
+msgid "Edit in Web IDE"
+msgstr ""
+
+msgid "Edit in single-file editor"
 msgstr ""
 
 msgid "Edit issues"
