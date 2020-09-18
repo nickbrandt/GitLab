@@ -28,5 +28,29 @@ RSpec.describe ::SystemNotes::IncidentService do
         end
       end
     end
+
+    context 'when severity is invalid' do
+      let(:invalid_severity) { 'invalid-severity' }
+
+      before do
+        allow(noteable).to receive(:severity).and_return(invalid_severity)
+        allow(Gitlab::AppLogger).to receive(:error).and_call_original
+      end
+
+      it 'does not create system note' do
+        expect { change_severity }.not_to change { noteable.notes.count }
+      end
+
+      it 'writes error to logs' do
+        change_severity
+
+        expect(Gitlab::AppLogger).to have_received(:error).with(
+          message: 'Cannot create a system note for severity change',
+          noteable_class: noteable.class.to_s,
+          noteable_id: noteable.id,
+          severity: invalid_severity
+        )
+      end
+    end
   end
 end
