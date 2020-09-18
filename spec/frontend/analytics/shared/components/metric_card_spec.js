@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { GlDeprecatedSkeletonLoading as GlSkeletonLoading } from '@gitlab/ui';
 import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
-import MetricCard from 'ee/analytics/shared/components/metric_card.vue';
+import MetricCard from '~/analytics/shared/components/metric_card.vue';
 
 const metrics = [
   { key: 'first_metric', value: 10, label: 'First metric', unit: 'days', link: 'some_link' },
