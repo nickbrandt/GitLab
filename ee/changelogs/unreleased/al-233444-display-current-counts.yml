@@ -1,0 +1,5 @@
+---
+title: Return stored seat counts in the subscriptions API endpoint
+merge_request: 42293
+author:
+type: fixed
