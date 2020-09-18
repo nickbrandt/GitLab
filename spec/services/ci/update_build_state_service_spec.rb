@@ -95,6 +95,12 @@ RSpec.describe Ci::UpdateBuildStateService do
         expect(result.status).to eq 200
       end
 
+      it 'does not set a backoff value' do
+        result = subject.execute
+
+        expect(result.backoff).to be_nil
+      end
+
       it 'increments trace finalized operation metric' do
         subject.execute
 
@@ -119,6 +125,12 @@ RSpec.describe Ci::UpdateBuildStateService do
         result = subject.execute
 
         expect(result.status).to eq 202
+      end
+
+      it 'sets a request backoff value' do
+        result = subject.execute
+
+        expect(result.backoff.to_i).to be > 0
       end
 
       it 'schedules live chunks for migration' do
