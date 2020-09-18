@@ -850,3 +850,24 @@ The following is example content of the Usage Ping payload.
   }
 }
 ```
+
+## Exporting Usage Ping SQL queries and definitions
+
+Two Rake tasks exist to export Usage Ping definitions. 
+
+- The Rake tasks export the raw SQL queries for `count`, `distinct_count`, `sum`.
+- The Rake tasks export the Redis counter class or the line of the Redis block for `redis_usage_data`.
+- The Rake tasks calculate the `alt_usage_data` metrics.
+
+In the home directory of your local GitLab installation run the following Rake tasks for the YAML and JSON versions respectively:
+
+```shell
+# for YAML export
+bin/rake gitlab:usage_data:dump_sql_in_yaml
+
+# for JSON export
+bin/rake gitlab:usage_data:dump_sql_in_json
+
+# You may pipe the output into a file
+bin/rake gitlab:usage_data:dump_sql_in_yaml > ~/Desktop/usage-metrics-2020-09-02.yaml
+```
