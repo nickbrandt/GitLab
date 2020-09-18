@@ -61,6 +61,10 @@ module EE
       experiment_enabled?(:onboarding_issues)
     end
 
+    def skip_setup_for_company?
+      current_user.members.any?
+    end
+
     private
 
     def redirect_path

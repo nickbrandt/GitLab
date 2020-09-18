@@ -244,4 +244,23 @@ RSpec.describe EE::RegistrationsHelper do
       end
     end
   end
+
+  describe '#skip_setup_for_company?' do
+    let(:user) { create(:user) }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+    end
+
+    it 'will skip the setup if memberships are found' do
+      member = create(:project_member, :invited)
+      member.accept_invite!(user)
+
+      expect(helper.skip_setup_for_company?).to be true
+    end
+
+    it 'will not skip the setup when a user has no memberships' do
+      expect(helper.skip_setup_for_company?).to be false
+    end
+  end
 end
