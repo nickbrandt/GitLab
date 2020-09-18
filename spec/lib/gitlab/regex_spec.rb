@@ -102,7 +102,6 @@ RSpec.describe Gitlab::Regex do
   describe '.build_trace_section_regex' do
     subject { described_class.build_trace_section_regex }
 
-    
     context 'without options' do
       example = "section_start:1600445393032:NAME\r\033\[0K"
 

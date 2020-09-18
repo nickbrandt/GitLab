@@ -224,7 +224,7 @@ module Gitlab
     def logs_section_prefix_regex
       /section_((?:start)|(?:end)):(\d+):([a-zA-Z0-9_.-]+)/
     end
-    
+
     # The optional section options, e.g. [collapsed=true]
     def logs_section_options_regex
       /(\[(?:\w+=\w+)(?:, ?(?:\w+=\w+))*\])?/
