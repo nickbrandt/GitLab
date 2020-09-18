@@ -176,7 +176,7 @@ export default {
 
     <div class="pt-3 px-3 bg-gray-light">
       <div class="row justify-content-between align-items-center">
-        <environment-picker ref="environmentsPicker" />
+        <environment-picker ref="environmentsPicker" :include-all="true" />
         <div class="col-sm-auto">
           <gl-button
             category="secondary"
