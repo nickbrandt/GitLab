@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const maxScanTokenSize = 1024 * 1024
+
 type Line struct {
 	Type string `json:"label"`
 }
@@ -49,6 +51,8 @@ func NewDocs(config Config) (*Docs, error) {
 
 func (d *Docs) Parse(r io.Reader) error {
 	scanner := bufio.NewScanner(r)
+	buf := make([]byte, 0, bufio.MaxScanTokenSize)
+	scanner.Buffer(buf, maxScanTokenSize)
 
 	for scanner.Scan() {
 		if err := d.process(scanner.Bytes()); err != nil {
