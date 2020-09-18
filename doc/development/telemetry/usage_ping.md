@@ -327,6 +327,20 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    end
    ```
 
+1. Track event using `track_usage_event(event_name, values) in services and graphql
+
+   Increment unique values count using Redis HLL, for given event name.
+
+   Example:
+
+   [Track usage event for incident created in service](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/services/issues/update_service.rb)
+
+   [Track usage event for incident created in graphql](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/graphql/mutations/alert_management/update_alert_status.rb)
+
+   ```ruby
+     track_usage_event(:incident_management_incident_created, current_user.id)
+   ```
+
 1. Track event using `UsageData` API
 
    Increment unique users count using Redis HLL, for given event name.
