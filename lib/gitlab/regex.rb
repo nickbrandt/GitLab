@@ -70,6 +70,16 @@ module Gitlab
         @debian_package_name_regex ||= %r{\A[a-z0-9][-+\.a-z0-9]+\z}.freeze
       end
 
+      def debian_version_regex
+        # See official parser: https://git.dpkg.org/cgit/dpkg/dpkg.git/tree/lib/dpkg/parsehelp.c?id=9e0c88ec09475f4d1addde9cdba1ad7849720356#n205
+        @debian_version_regex ||= %r{
+          \A(?:
+            (?:([0-9]{1,9}):)?    (?# epoch)
+            ([0-9][0-9a-z\.+~-]*)  (?# version)
+            (?:(-[0-0a-z\.+~]+))?  (?# revision)
+            )\z}xi.freeze
+      end
+
       def unbounded_semver_regex
         # See the official regex: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 

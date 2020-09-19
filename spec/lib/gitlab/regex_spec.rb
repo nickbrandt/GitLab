@@ -443,6 +443,57 @@ RSpec.describe Gitlab::Regex do
     it { is_expected.not_to match('a_b') }
   end
 
+  describe '.debian_version_regex' do
+    subject { described_class.debian_version_regex }
+
+    context 'valid versions' do
+      it { is_expected.to match('1.0') }
+      it { is_expected.to match('1.0~alpha1') }
+      it { is_expected.to match('2:4.9.5+dfsg-5+deb10u1') }
+    end
+
+    context 'dpkg errors' do
+      # version string is empty
+      it { is_expected.not_to match('') }
+      # version string has embedded spaces
+      it { is_expected.not_to match('1 0') }
+      # epoch in version is empty
+      it { is_expected.not_to match(':1.0') }
+      # epoch in version is not number
+      it { is_expected.not_to match('a:1.0') }
+      # epoch in version is negative
+      it { is_expected.not_to match('-1:1.0') }
+      # epoch in version is too big
+      it { is_expected.not_to match('9999999999:1.0') }
+      # nothing after colon in version number
+      it { is_expected.not_to match('2:') }
+      # revision number is empty
+      # Note: we are less strict here
+      # it { is_expected.not_to match('1.0-') }
+      # version number is empty
+      it { is_expected.not_to match('-1') }
+      it { is_expected.not_to match('2:-1') }
+    end
+
+    context 'dpkg warnings' do
+      # version number does not start with digit
+      it { is_expected.not_to match('a') }
+      it { is_expected.not_to match('a1.0') }
+      # invalid character in version number
+      it { is_expected.not_to match('1_0') }
+      # invalid character in revision number
+      it { is_expected.not_to match('1.0-1_0') }
+    end
+
+    context 'dpkg accepts' do
+      # dpkg accepts leading or trailing space
+      it { is_expected.not_to match(' 1.0') }
+      it { is_expected.not_to match('1.0 ') }
+      # dpkg accepts multiple colons
+      it { is_expected.not_to match('1:2:3') }
+    end
+  end
+
   describe '.semver_regex' do
     subject { described_class.semver_regex }
 
