@@ -26,10 +26,25 @@ document.addEventListener('DOMContentLoaded', () => {
   memberExpirationDate('.js-access-expiration-date-groups');
   mountRemoveMemberModal();
 
-  initGroupMembersApp(document.querySelector('.js-group-members-list'));
-  initGroupMembersApp(document.querySelector('.js-group-linked-list'));
-  initGroupMembersApp(document.querySelector('.js-group-invited-members-list'));
-  initGroupMembersApp(document.querySelector('.js-group-access-requests-list'));
+  const SHARED_FIELDS = ['account', 'expires', 'maxRole', 'expiration', 'actions'];
+
+  initGroupMembersApp(document.querySelector('.js-group-members-list'), [
+    ...SHARED_FIELDS,
+    'source',
+    'granted',
+  ]);
+  initGroupMembersApp(document.querySelector('.js-group-linked-list'), [
+    ...SHARED_FIELDS,
+    'granted',
+  ]);
+  initGroupMembersApp(document.querySelector('.js-group-invited-members-list'), [
+    ...SHARED_FIELDS,
+    'invited',
+  ]);
+  initGroupMembersApp(document.querySelector('.js-group-access-requests-list'), [
+    ...SHARED_FIELDS,
+    'requested',
+  ]);
 
   new Members(); // eslint-disable-line no-new
   new UsersSelect(); // eslint-disable-line no-new

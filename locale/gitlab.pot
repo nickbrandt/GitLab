@@ -1300,6 +1300,12 @@ msgstr ""
 msgid "Acceptable for use in this project"
 msgstr ""
 
+msgid "Access Expires"
+msgstr ""
+
+msgid "Access Granted"
+msgstr ""
+
 msgid "Access Tokens"
 msgstr ""
 
@@ -15448,6 +15454,9 @@ msgstr ""
 msgid "Max Project Import requests per minute per user"
 msgstr ""
 
+msgid "Max Role"
+msgstr ""
+
 msgid "Max access level"
 msgstr ""
 
@@ -17207,6 +17216,9 @@ msgid "No matching results"
 msgstr ""
 
 msgid "No matching results for \"%{query}\""
+msgstr ""
+
+msgid "No members found"
 msgstr ""
 
 msgid "No merge requests found"
@@ -21538,6 +21550,9 @@ msgid "Request parameter %{param} is missing."
 msgstr ""
 
 msgid "Request to link SAML account must be authorized"
+msgstr ""
+
+msgid "Requested"
 msgstr ""
 
 msgid "Requested %{time_ago}"

@@ -9,7 +9,7 @@ describe('initGroupMembersApp', () => {
   let wrapper;
 
   const setup = () => {
-    vm = initGroupMembersApp(el);
+    vm = initGroupMembersApp(el, ['account']);
     wrapper = createWrapper(vm);
   };
 
@@ -62,5 +62,11 @@ describe('initGroupMembersApp', () => {
     setup();
 
     expect(vm.$store.state.members).toEqual(membersParsed);
+  });
+
+  it('sets `tableFields` in Vuex store', () => {
+    setup();
+
+    expect(vm.$store.state.tableFields).toEqual(['account']);
   });
 });
