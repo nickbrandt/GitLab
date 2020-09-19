@@ -63,7 +63,7 @@ RSpec.describe FeatureFlags::CreateService do
                            'with strategies <strong>[{"name"=>"default", "parameters"=>{}}]</strong>.'
 
         expect { subject }.to change { AuditEvent.count }.by(1)
-        expect(AuditEvent.last.present.action).to eq(expected_message)
+        expect(AuditEvent.last.details[:custom_message]).to eq(expected_message)
       end
 
       context 'when user is reporter' do

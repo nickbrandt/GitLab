@@ -19,7 +19,7 @@ RSpec.describe FeatureFlags::DestroyService do
   describe '#execute' do
     subject { described_class.new(project, user, params).execute(feature_flag) }
 
-    let(:audit_event_message) { AuditEvent.last.present.action }
+    let(:audit_event_message) { AuditEvent.last.details[:custom_message] }
     let(:params) { {} }
 
     it 'returns status success' do
