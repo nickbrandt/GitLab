@@ -9,6 +9,7 @@ RSpec.describe Gitlab::GitAccessProject do
   let(:actor) { user }
   let(:project_path) { project.path }
   let(:namespace_path) { project&.namespace&.path }
+  let(:repository_path) { "#{namespace_path}/#{project_path}" }
   let(:protocol) { 'ssh' }
   let(:authentication_abilities) { %i[read_project download_code push_code] }
   let(:changes) { Gitlab::GitAccess::ANY }
@@ -17,17 +18,17 @@ RSpec.describe Gitlab::GitAccessProject do
   let(:access) do
     described_class.new(actor, container, protocol,
                         authentication_abilities: authentication_abilities,
-                        repository_path: project_path, namespace_path: namespace_path)
+                        repository_path: repository_path)
   end
 
-  describe '#check_namespace!' do
-    context 'when namespace is nil' do
-      let(:namespace_path) { nil }
+  describe '#check_container!' do
+    context 'when repository_path is nil' do
+      let(:repository_path) { nil }
 
       it 'does not allow push and pull access' do
         aggregate_failures do
-          expect { push_access_check }.to raise_namespace_not_found
-          expect { pull_access_check }.to raise_namespace_not_found
+          expect { push_access_check }.to raise_not_found
+          expect { pull_access_check }.to raise_not_found
         end
       end
     end
@@ -101,6 +102,20 @@ RSpec.describe Gitlab::GitAccessProject do
                   .to change { Project.count }.by(1)
                   .and change { Project.where(namespace: user.namespace, name: project_path).count }.by(1)
               end
+            end
+
+            context 'when namespace is blank' do
+              let(:repository_path) { 'project' }
+
+              it_behaves_like 'no project is created' do
+                let(:raise_specific_error) { raise_namespace_not_found }
+              end
+            end
+
+            context 'when namespace does not exist' do
+              let(:namespace_path) { 'unknown' }
+
+              it_behaves_like 'no project is created'
             end
 
             context 'when user cannot create project in namespace' do

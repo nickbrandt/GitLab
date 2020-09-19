@@ -7,6 +7,4 @@ class Projects::WikisController < Projects::ApplicationController
 
   feature_category :wiki
 
-  def git_access
-  end
 end

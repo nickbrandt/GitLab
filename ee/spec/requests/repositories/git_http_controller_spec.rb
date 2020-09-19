@@ -7,7 +7,7 @@ RSpec.describe Repositories::GitHttpController, type: :request do
   include ::EE::GeoHelpers
 
   let_it_be(:user) { create(:user) }
-  let_it_be(:project) { create(:project, :repository, :private) }
+  let_it_be(:project) { create(:project, :repository, :private, :wiki_repo) }
   let(:env) { { user: user.username, password: user.password } }
   let(:path) { "#{project.full_path}.git" }
 
@@ -97,14 +97,38 @@ RSpec.describe Repositories::GitHttpController, type: :request do
         it_behaves_like 'triggers Geo'
       end
 
-      context 'with personal snippet' do
+      context 'with a project wiki' do
+        let(:path) { "#{project.wiki.full_path}.git" }
+
+        it_behaves_like 'triggers Geo'
+      end
+
+      context 'with a group wiki' do
+        include WikiHelpers
+
+        let_it_be(:group) { create(:group, :wiki_repo) }
+        let_it_be(:user) { create(:user) }
+        let(:path) { "#{group.wiki.full_path}.git" }
+
+        before_all do
+          group.add_owner(user)
+        end
+
+        before do
+          stub_group_wikis(true)
+        end
+
+        it_behaves_like 'triggers Geo'
+      end
+
+      context 'with a personal snippet' do
         let_it_be(:snippet) { create(:personal_snippet, :repository, author: user) }
         let(:path) { "snippets/#{snippet.id}.git" }
 
         it_behaves_like 'triggers Geo'
       end
 
-      context 'with project snippet' do
+      context 'with a project snippet' do
         let_it_be(:snippet) { create(:project_snippet, :repository, author: user, project: project) }
         let(:path) { "#{project.full_path}/snippets/#{snippet.id}.git" }
 
