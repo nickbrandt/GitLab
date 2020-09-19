@@ -19,7 +19,7 @@ RSpec.describe FeatureFlags::UpdateService do
 
     let(:params) { { name: 'new_name' } }
     let(:audit_event_message) do
-      AuditEvent.last.present.action
+      AuditEvent.last.details[:custom_message]
     end
 
     it 'returns success status' do
