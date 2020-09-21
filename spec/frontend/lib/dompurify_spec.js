@@ -1,7 +1,7 @@
 import { sanitize } from '~/lib/dompurify';
 
 // GDK
-const localGon = {
+const rootGon = {
   sprite_file_icons: '/assets/icons-123a.svg',
   sprite_icons: '/assets/icons-456b.svg',
 };
@@ -12,24 +12,40 @@ const absoluteGon = {
   sprite_icons: `${window.location.protocol}//${window.location.hostname}/assets/icons-456b.svg`,
 };
 
+const expectedSanitized = '<svg><use></use></svg>';
+
+const safeUrls = {
+  root: Object.values(rootGon).map(url => `${url}#ellipsis_h`),
+  absolute: Object.values(absoluteGon).map(url => `${url}#ellipsis_h`),
+};
+
+const unsafeUrls = [
+  '/an/evil/url',
+  '../../../evil/url',
+  'https://evil.url/assets/icons-123a.svg',
+  'https://evil.url/assets/icons-456b.svg',
+  `https://evil.url/${rootGon.sprite_icons}`,
+  `https://evil.url/${rootGon.sprite_file_icons}`,
+  `https://evil.url/${absoluteGon.sprite_icons}`,
+  `https://evil.url/${absoluteGon.sprite_file_icons}`,
+];
+
 describe('~/lib/dompurify', () => {
   let originalGon;
 
-  describe('uses local configuration', () => {
+  it('uses local configuration when given', () => {
     // As dompurify uses a "Persistent Configuration", it might
     // ignore config, this check verifies we respect
     // https://github.com/cure53/DOMPurify#persistent-configuration
-    it('no allowed tags', () => {
-      expect(sanitize('<br/>', { ALLOWED_TAGS: [] })).toBe('');
-      expect(sanitize('<strong></strong>', { ALLOWED_TAGS: [] })).toBe('');
-    });
+    expect(sanitize('<br>', { ALLOWED_TAGS: [] })).toBe('');
+    expect(sanitize('<strong></strong>', { ALLOWED_TAGS: [] })).toBe('');
   });
 
   describe.each`
     type          | gon
-    ${'local'}    | ${localGon}
+    ${'root'}     | ${rootGon}
     ${'absolute'} | ${absoluteGon}
-  `('when gon contains $type icon urls', ({ gon }) => {
+  `('when gon contains $type icon urls', ({ type, gon }) => {
     beforeAll(() => {
       originalGon = window.gon;
       window.gon = gon;
@@ -39,67 +55,31 @@ describe('~/lib/dompurify', () => {
       window.gon = originalGon;
     });
 
-    it('sanitizes icons allowing safe xlink:href sprite_file_icons', () => {
-      const html = '<svg><use xlink:href="/assets/icons-123a.svg#ellipsis_h"></use></svg>';
-
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe(
-        '<svg><use xlink:href="/assets/icons-123a.svg#ellipsis_h"></use></svg>',
-      );
+    it('allows no href attrs', () => {
+      const htmlHref = `<svg><use></use></svg>`;
+      expect(sanitize(htmlHref)).toBe(htmlHref);
     });
 
-    it('sanitizes icons allowing safe href sprite_file_icons', () => {
-      const html = '<svg><use href="/assets/icons-123a.svg#ellipsis_h"></use></svg>';
+    it.each(safeUrls[type])('allows safe URL %s', url => {
+      const htmlHref = `<svg><use href="${url}"></use></svg>`;
+      expect(sanitize(htmlHref)).toBe(htmlHref);
 
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe(
-        '<svg><use href="/assets/icons-123a.svg#ellipsis_h"></use></svg>',
-      );
+      const htmlXlink = `<svg><use xlink:href="${url}"></use></svg>`;
+      expect(sanitize(htmlXlink)).toBe(htmlXlink);
     });
 
-    it('sanitizes icons allowing safe href sprite_icons', () => {
-      const html = '<svg><use href="/assets/icons-456b.svg#ellipsis_h"></use></svg>';
+    it.each(unsafeUrls)('sanitizes unsafe URL %s', url => {
+      const htmlHref = `<svg><use href="${url}"></use></svg>`;
+      const htmlXlink = `<svg><use xlink:href="${url}"></use></svg>`;
 
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe(
-        '<svg><use href="/assets/icons-456b.svg#ellipsis_h"></use></svg>',
-      );
-    });
-
-    it('sanitizes icons allowing safe xlink:href sprite_icons', () => {
-      const html = '<svg><use xlink:href="/assets/icons-456b.svg#ellipsis_h"></use></svg>';
-
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe(
-        '<svg><use xlink:href="/assets/icons-456b.svg#ellipsis_h"></use></svg>',
-      );
-    });
-
-    it('sanitizes icons disabling unsafe href paths', () => {
-      const html = '<svg><use href="/an/evil/url"></use></svg>';
-
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe('<svg><use></use></svg>');
-    });
-
-    it('sanitizes icons disabling unsafe xlink:href paths', () => {
-      const html = '<svg><use xlink:href="/an/evil/url"></use></svg>';
-
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe('<svg><use></use></svg>');
-    });
-
-    it('sanitizes icons disabling unsafe href hosts', () => {
-      const html = '<svg><use href="https://evil.url/assets/icons-123a.svg"></use></svg>';
-
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe('<svg><use></use></svg>');
-    });
-
-    it('sanitizes icons disabling unsafe xlink:href hosts', () => {
-      const html = '<svg><use xlink:href="https://evil.url/assets/icons-123a.svg"></use></svg>';
-
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe('<svg><use></use></svg>');
+      expect(sanitize(htmlHref)).toBe(expectedSanitized);
+      expect(sanitize(htmlXlink)).toBe(expectedSanitized);
     });
   });
 
   describe('when gon does not contain icon urls', () => {
     beforeAll(() => {
       originalGon = window.gon;
-
       window.gon = {};
     });
 
@@ -107,16 +87,12 @@ describe('~/lib/dompurify', () => {
       window.gon = originalGon;
     });
 
-    it('sanitizes icons disabling all xlink:href values', () => {
-      const html = '<svg><use xlink:href="/assets/icons-123a.svg#ellipsis_h"></use></svg>';
+    it.each([...safeUrls.root, ...safeUrls.absolute, ...unsafeUrls])('sanitizes URL %s', url => {
+      const htmlHref = `<svg><use href="${url}"></use></svg>`;
+      const htmlXlink = `<svg><use xlink:href="${url}"></use></svg>`;
 
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe('<svg><use></use></svg>');
-    });
-
-    it('sanitizes icons disabling all href values', () => {
-      const html = '<svg><use href="/assets/icons-123a.svg#ellipsis_h"></use></svg>';
-
-      expect(sanitize(html, { ADD_TAGS: ['use'] })).toBe('<svg><use></use></svg>');
+      expect(sanitize(htmlHref)).toBe(expectedSanitized);
+      expect(sanitize(htmlXlink)).toBe(expectedSanitized);
     });
   });
 });
