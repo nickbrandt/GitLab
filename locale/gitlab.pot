@@ -22242,9 +22242,6 @@ msgstr ""
 msgid "Search requirements"
 msgstr ""
 
-msgid "Search results…"
-msgstr ""
-
 msgid "Search test cases"
 msgstr ""
 
