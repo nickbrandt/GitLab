@@ -178,7 +178,7 @@ module Projects
       def configuration_path(type)
         {
           sast: project_security_configuration_sast_path(project),
-          dast_profiles: project_profiles_path(project)
+          dast_profiles: project_security_configuration_dast_profiles_path(project)
         }[type]
       end
     end
