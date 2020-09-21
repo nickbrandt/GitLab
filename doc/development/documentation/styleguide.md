@@ -1097,14 +1097,26 @@ document to ensure it links to the most recent version of the file.
 
 ## Navigation
 
-To indicate the steps of navigation through the user interface:
+When documenting navigation through the user interface:
 
-- Use the exact word as shown in the UI, including any capital letters as-is.
+- Use the exact wording as shown in the UI, including any capital letters as-is.
 - Use bold text for navigation items and the char "greater than" (`>`) as a
-  separator (for example, `Navigate to your project's **Settings > CI/CD**` ).
+  separator. For example: `Navigate to your project's **Settings > CI/CD**`.
 - If there are any expandable menus, make sure to mention that the user needs to
-  expand the tab to find the settings you're referring to (for example,
-  `Navigate to your project's **Settings > CI/CD** and expand **General pipelines**`).
+  expand the tab to find the settings you're referring to. For example:
+  `Navigate to your project's **Settings > CI/CD** and expand **General pipelines**`.
+
+### Navigational elements
+
+Use the following terms when referring to the main GitLab user interface
+elements:
+
+- **Top menu**: This is the top menu that spans the width of the user interface.
+  It includes the GitLab logo, search field, counters, and the user's avatar.
+- **Left sidebar**: This is the navigation sidebar on the left of the user
+  interface, specific to the project or group.
+- **Right sidebar**: This is the navigation sidebar on the right of the user
+  interface, specific to the open issue, merge request, or epic.
 
 ## Images
 
