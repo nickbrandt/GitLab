@@ -739,7 +739,7 @@ Here are some common pitfalls and how to overcome them:
 
   Beyond that, check via the [Elasticsearch Search API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html) to see if the data shows up on the Elasticsearch side:
 
-  ```code
+  ```shell
   curl --request GET <elasticsearch_server_ip>:9200/gitlab-production/_search?q=<search_term>
   ```
 
