@@ -743,7 +743,7 @@ Here are some common pitfalls and how to overcome them:
   curl --request GET <elasticsearch_server_ip>:9200/gitlab-production/_search?q=<search_term>
   ```
 
-  It is important to understand at which level the problem is manifesting (UI, Rails code, Elasticsearch side) to be able to [troublehoot further](https://docs.gitlab.com/ee/administration/troubleshooting/elasticsearch.html#search-results-workflow).
+  It is important to understand at which level the problem is manifesting (UI, Rails code, Elasticsearch side) to be able to [troublehoot further](../administration/troubleshooting/elasticsearch.md#search-results-workflow).
 
   NOTE: **Note:**
   The above instructions are not to be used for scenarios that only index a [subset of namespaces](#limiting-namespaces-and-projects).
