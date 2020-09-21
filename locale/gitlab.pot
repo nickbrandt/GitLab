@@ -21061,9 +21061,6 @@ msgstr ""
 msgid "Release|Something went wrong while saving the release details"
 msgstr ""
 
-msgid "Remediated: needs review"
-msgstr ""
-
 msgid "Remediations"
 msgstr ""
 
@@ -28327,6 +28324,9 @@ msgid "VulnerabilityStatusTypes|Resolved"
 msgstr ""
 
 msgid "Vulnerability|%{scannerName} (version %{scannerVersion})"
+msgstr ""
+
+msgid "Vulnerability|Activity"
 msgstr ""
 
 msgid "Vulnerability|Class"
