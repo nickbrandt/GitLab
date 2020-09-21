@@ -1,7 +1,7 @@
 ---
-name: rugged-feature-flag-name
+name: code_navigation
 introduced_by_url: 
 rollout_issue_url: 
 group: 
 type: development
-default_enabled: false
+default_enabled: true
