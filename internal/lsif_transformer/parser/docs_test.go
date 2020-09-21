@@ -3,6 +3,7 @@ package parser
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -39,4 +40,14 @@ func TestParseContainsLine(t *testing.T) {
 	require.NoError(t, d.Parse(bytes.NewReader(line)))
 
 	require.Equal(t, []Id{2, 3}, d.DocRanges[1])
+}
+
+func TestParsingVeryLongLine(t *testing.T) {
+	d, err := NewDocs(Config{})
+	require.NoError(t, err)
+	defer d.Close()
+
+	line := []byte(`{"id": "` + strings.Repeat("a", 64*1024) + `"}`)
+
+	require.NoError(t, d.Parse(bytes.NewReader(line)))
 }
