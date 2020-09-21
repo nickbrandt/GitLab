@@ -1,7 +1,8 @@
 # frozen_string_literal: true
-PRODUCT_ANALYTICS_CHANGED_FILES_MESSAGE = <<~MSG
-For the following files, a review from the [Data team and Product Analytics team](https://gitlab.com/groups/gitlab-org/growth/telemetry/engineers/-/group_members?with_inherited_permissions=exclude) is recommended
-Please check the ~product_analytics [guide](https://docs.gitlab.com/ee/development/telemetry/usage_ping.html) and reach out to @gitlab-org/growth/telemetry/engineers group for a review.
+
+TELEMETRY_CHANGED_FILES_MESSAGE = <<~MSG
+For the following files, a review from the [Data team and Telemetry team](https://gitlab.com/groups/gitlab-org/growth/telemetry/engineers/-/group_members?with_inherited_permissions=exclude) is recommended
+Please check the ~telemetry [guide](https://docs.gitlab.com/ee/development/telemetry/usage_ping.html) and reach out to @gitlab-org/growth/telemetry/engineers group for a review.
 
 %<changed_files>s
 
@@ -27,11 +28,11 @@ snowplow_events_changed_files = git.modified_files & tracking_files
 changed_files = (usage_data_changed_files + snowplow_events_changed_files)
 
 if changed_files.any?
-  warn format(PRODUCT_ANALYTICS_CHANGED_FILES_MESSAGE, changed_files: helper.markdown_list(changed_files))
+  warn format(TELEMETRY_CHANGED_FILES_MESSAGE, changed_files: helper.markdown_list(changed_files))
   warn format(UPDATE_METRICS_DEFINITIONS_MESSAGE) unless helper.changed_files(/usage_ping\.md/).any?
 
-  product_analytics_labels = ['product_analytics']
-  product_analytics_labels << 'product_analytics::review pending' unless helper.mr_has_labels?('product_analytics::reviewed')
+  telemetry_labels = ['telemetry']
+  telemetry_labels << 'telemetry::review pending' unless helper.mr_has_labels?('telemetry::reviewed')
 
-  markdown(helper.prepare_labels_for_mr(product_analytics_labels))
+  markdown(helper.prepare_labels_for_mr(telemetry_labels))
 end
