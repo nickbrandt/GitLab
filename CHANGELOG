@@ -1,5 +1,30 @@
 # Changelog for gitlab-workhorse
 
+## v8.47.0
+
+### Added
+- Add logging for local LSIF ZIP caching
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/579
+- Add project level route for Generic Packages uploads
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/596
+
+### Changed
+- Further simplify remote/local upload code
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/602
+- Experimental: Use strict content checks when resizing images
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/564
+
+### Fixed
+- Increase LSIF scanner buffer
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/609
+- Fix correlation IDs not being propagated in preauth check
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/607
+
+### Other
+- Reflect the actual duration of bootstrapping GitLab
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/605
+  Contributed by Takuya Noguchi
+
 ## v8.46.0
 
 ### Added
