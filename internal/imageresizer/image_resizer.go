@@ -77,7 +77,7 @@ var (
 	imageResizeCompleted = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_image_resize_completed_total",
-			Help: "Amount of image resizing processes sucessfully completed",
+			Help: "Amount of image resizing processes successfully completed",
 		},
 	)
 )
