@@ -310,7 +310,7 @@ module Gitlab
       end
 
       def deleted_params
-        event_params
+        { deleted_model_record_id: model_record.id }
       end
 
       def updated_params

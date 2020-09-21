@@ -92,13 +92,13 @@ module Geo
     def replicate_destroy(event_data)
       ::Geo::FileRegistryRemovalService.new(
         replicable_name,
-        model_record_id,
+        event_data[:deleted_model_record_id],
         event_data[:blob_path]
       ).execute
     end
 
     def deleted_params
-      { model_record_id: model_record.id, blob_path: blob_path }
+      { deleted_model_record_id: model_record.id, blob_path: blob_path }
     end
 
     def schedule_checksum_calculation

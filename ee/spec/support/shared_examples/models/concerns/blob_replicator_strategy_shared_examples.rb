@@ -130,10 +130,14 @@ RSpec.shared_examples 'a blob replicator' do
     end
   end
 
-  describe '#consume_event_deleted' do
+  describe 'deleted event consumption' do
+    before do
+      model_record.save!
+    end
+
     let!(:model_record_id) { replicator.model_record_id }
     let!(:blob_path) { replicator.blob_path }
-    let!(:deleted_params) { { model_record_id: model_record_id, blob_path: blob_path } }
+    let!(:deleted_params) { { deleted_model_record_id: model_record_id, blob_path: blob_path } }
 
     context 'when model_record was deleted from the DB and the replicator only has its ID' do
       before do
@@ -145,7 +149,7 @@ RSpec.shared_examples 'a blob replicator' do
       # replicator does not hold an instance of ActiveRecord::Base, which helps
       # avoid a regression of
       # https://gitlab.com/gitlab-org/gitlab/-/issues/233040
-      let(:secondary_side_replicator) { replicator.class.new(model_record: nil, model_record_id: model_record_id) }
+      let(:secondary_side_replicator) { replicator.class.new }
 
       it 'invokes Geo::FileRegistryRemovalService' do
         service = double(:service)
@@ -154,7 +158,7 @@ RSpec.shared_examples 'a blob replicator' do
         expect(::Geo::FileRegistryRemovalService)
           .to receive(:new).with(secondary_side_replicator.replicable_name, model_record_id, blob_path).and_return(service)
 
-        secondary_side_replicator.consume_event_deleted(deleted_params)
+        secondary_side_replicator.consume(:deleted, deleted_params)
       end
     end
   end
