@@ -108,7 +108,7 @@ export default {
     <gl-button
       category="primary"
       variant="success"
-      class="mx-auto js-popup-button gl-mt-3"
+      class="js-popup-button gl-mt-3"
       @click="togglePopup"
     >
       {{ __('Add GitLab to Slack') }}
