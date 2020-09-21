@@ -4618,6 +4618,15 @@ msgstr ""
 msgid "Change your password or recover your current one"
 msgstr ""
 
+msgid "ChangeReviewer|Reviewer changed from %{old} to %{new}"
+msgstr ""
+
+msgid "ChangeReviewer|Reviewer changed to %{new}"
+msgstr ""
+
+msgid "ChangeReviewer|Unassigned"
+msgstr ""
+
 msgid "ChangeTypeActionLabel|Pick into branch"
 msgstr ""
 
@@ -17405,6 +17414,9 @@ msgid "Notification setting - %{notification_title}"
 msgstr ""
 
 msgid "Notification settings saved"
+msgstr ""
+
+msgid "NotificationEvent|Change reviewer merge request"
 msgstr ""
 
 msgid "NotificationEvent|Close issue"
