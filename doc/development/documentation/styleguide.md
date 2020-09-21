@@ -410,7 +410,7 @@ Use forms of *sign in*, instead of *log in* or *login*. For example:
 Exceptions to this rule include the concept of *single sign-on* and
 references to user interface elements. For example:
 
-- To sign in to product X, enter your credentials, and then click **Log in**.
+- To sign in to product X, enter your credentials, and then select **Log in**.
 
 ### Inclusive language
 
@@ -1251,7 +1251,7 @@ reviewed and approved by a technical writer.
 1. In YouTube, visit the video URL you want to display. Copy the regular URL
    from your browser (`https://www.youtube.com/watch?v=VIDEO-ID`) and replace
    the video title and link in the line under `<div class="video-fallback">`.
-1. In YouTube, click **Share**, and then click **Embed**.
+1. In YouTube, select **Share**, and then select **Embed**.
 1. Copy the `<iframe>` source (`src`) **URL only**
    (`https://www.youtube.com/embed/VIDEO-ID`),
    and paste it, replacing the content of the `src` field in the
@@ -1418,8 +1418,8 @@ interface:
 Use an icon when you find yourself having to describe an interface element. For
 example:
 
-- Do: Click the Admin Area icon ( **{admin}** ).
-- Don't: Click the Admin Area icon (the wrench icon).
+- Do: Select the Admin Area icon ( **{admin}** ).
+- Don't: Select the Admin Area icon (the wrench icon).
 
 ## Alert boxes
 
@@ -1584,12 +1584,11 @@ application:
 The following are recommended verbs for specific uses with user interface
 elements:
 
-| Recommended         | Used for                   | Replaces                   |
-|:--------------------|:---------------------------|:---------------------------|
-| *click*             | buttons, links, menu items | "hit", "press", "select"   |
-| *select* or *clear* | checkboxes                 | "enable", "click", "press" |
-| *select*            | dropdowns                  | "pick"                     |
-| *expand*            | expandable sections        | "open"                     |
+| Recommended         | Used for                              | Replaces                   |
+|:--------------------|:--------------------------------------|:---------------------------|
+| *select*            | buttons, links, menu items, dropdowns | "click, "press," "hit"     |
+| *select* or *clear* | checkboxes                            | "enable", "click", "press" |
+| *expand*            | expandable sections                   | "open"                     |
 
 ### Other Verbs
 
@@ -2160,7 +2159,7 @@ Set up the section with the following:
   ```markdown
   1. Open the GraphiQL explorer tool in the following URL: `https://gitlab.com/-/graphql-explorer`.
   1. Paste the `query` listed above into the left window of your GraphiQL explorer tool.
-  1. Click Play to get the result shown here:
+  1. Select Play to get the result shown here:
   ```
 
 - Include a screenshot of the result in the GraphiQL explorer. Follow the naming
