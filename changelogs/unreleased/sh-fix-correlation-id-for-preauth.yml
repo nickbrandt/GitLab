@@ -1,0 +1,5 @@
+---
+title: Fix correlation IDs not being propagated in preauth check
+merge_request: 607
+author:
+type: fixed

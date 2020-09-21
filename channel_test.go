@@ -42,7 +42,7 @@ func TestChannelHappyPath(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			serverConns, clientURL, close := wireupChannel(test.channelPath, nil, "channel.k8s.io")
+			serverConns, clientURL, close := wireupChannel(t, test.channelPath, nil, "channel.k8s.io")
 			defer close()
 
 			client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
@@ -70,7 +70,7 @@ func TestChannelHappyPath(t *testing.T) {
 }
 
 func TestChannelBadTLS(t *testing.T) {
-	_, clientURL, close := wireupChannel(envTerminalPath, badCA, "channel.k8s.io")
+	_, clientURL, close := wireupChannel(t, envTerminalPath, badCA, "channel.k8s.io")
 	defer close()
 
 	_, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
@@ -78,7 +78,7 @@ func TestChannelBadTLS(t *testing.T) {
 }
 
 func TestChannelSessionTimeout(t *testing.T) {
-	serverConns, clientURL, close := wireupChannel(envTerminalPath, timeout, "channel.k8s.io")
+	serverConns, clientURL, close := wireupChannel(t, envTerminalPath, timeout, "channel.k8s.io")
 	defer close()
 
 	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
@@ -96,7 +96,7 @@ func TestChannelSessionTimeout(t *testing.T) {
 func TestChannelProxyForwardsHeadersFromUpstream(t *testing.T) {
 	hdr := make(http.Header)
 	hdr.Set("Random-Header", "Value")
-	serverConns, clientURL, close := wireupChannel(envTerminalPath, setHeader(hdr), "channel.k8s.io")
+	serverConns, clientURL, close := wireupChannel(t, envTerminalPath, setHeader(hdr), "channel.k8s.io")
 	defer close()
 
 	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
@@ -109,7 +109,7 @@ func TestChannelProxyForwardsHeadersFromUpstream(t *testing.T) {
 }
 
 func TestChannelProxyForwardsXForwardedForFromClient(t *testing.T) {
-	serverConns, clientURL, close := wireupChannel(envTerminalPath, nil, "channel.k8s.io")
+	serverConns, clientURL, close := wireupChannel(t, envTerminalPath, nil, "channel.k8s.io")
 	defer close()
 
 	hdr := make(http.Header)
@@ -127,13 +127,13 @@ func TestChannelProxyForwardsXForwardedForFromClient(t *testing.T) {
 	require.Equal(t, "127.0.0.2, "+clientIP, sc.req.Header.Get("X-Forwarded-For"), "X-Forwarded-For from client not sent to remote")
 }
 
-func wireupChannel(channelPath string, modifier func(*api.Response), subprotocols ...string) (chan connWithReq, string, func()) {
+func wireupChannel(t *testing.T, channelPath string, modifier func(*api.Response), subprotocols ...string) (chan connWithReq, string, func()) {
 	serverConns, remote := startWebsocketServer(subprotocols...)
 	authResponse := channelOkBody(remote, nil, subprotocols...)
 	if modifier != nil {
 		modifier(authResponse)
 	}
-	upstream := testAuthServer(nil, nil, 200, authResponse)
+	upstream := testAuthServer(t, nil, nil, 200, authResponse)
 	workhorse := startWorkhorseServer(upstream.URL)
 
 	return serverConns, websocketURL(workhorse.URL, channelPath), func() {

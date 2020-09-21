@@ -63,7 +63,7 @@ func TestDeniedClone(t *testing.T) {
 	require.NoError(t, os.RemoveAll(scratchDir))
 
 	// Prepare test server and backend
-	ts := testAuthServer(nil, nil, 403, "Access denied")
+	ts := testAuthServer(t, nil, nil, 403, "Access denied")
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -77,7 +77,7 @@ func TestDeniedClone(t *testing.T) {
 
 func TestDeniedPush(t *testing.T) {
 	// Prepare the test server and backend
-	ts := testAuthServer(nil, nil, 403, "Access denied")
+	ts := testAuthServer(t, nil, nil, 403, "Access denied")
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -594,8 +594,10 @@ func newBranch() string {
 	return fmt.Sprintf("branch-%d", time.Now().UnixNano())
 }
 
-func testAuthServer(url *regexp.Regexp, params url.Values, code int, body interface{}) *httptest.Server {
+func testAuthServer(t *testing.T, url *regexp.Regexp, params url.Values, code int, body interface{}) *httptest.Server {
 	return testhelper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
+		require.NotEmpty(t, r.Header.Get("X-Request-Id"))
+
 		w.Header().Set("Content-Type", api.ResponseContentType)
 
 		logEntry := log.WithFields(log.Fields{

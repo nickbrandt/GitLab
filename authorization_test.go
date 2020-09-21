@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"testing"
+
+	"gitlab.com/gitlab-org/labkit/correlation"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/require"
@@ -24,12 +27,13 @@ func okHandler(w http.ResponseWriter, _ *http.Request, _ *api.Response) {
 
 func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, url *regexp.Regexp, apiResponse interface{}, returnCode, expectedCode int) *httptest.ResponseRecorder {
 	if ts == nil {
-		ts = testAuthServer(url, nil, returnCode, apiResponse)
+		ts = testAuthServer(t, url, nil, returnCode, apiResponse)
 		defer ts.Close()
 	}
 
 	// Create http request
-	httpRequest, err := http.NewRequest("GET", "/address", nil)
+	ctx := correlation.ContextWithCorrelation(context.Background(), "12345678")
+	httpRequest, err := http.NewRequestWithContext(ctx, "GET", "/address", nil)
 	require.NoError(t, err)
 	parsedURL := helper.URLMustParse(ts.URL)
 	testhelper.ConfigureSecret()
