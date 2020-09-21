@@ -34,15 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   initGroupMembersApp(
     document.querySelector('.js-group-linked-list'),
-    SHARED_FIELDS.concat(['granted']),
+    SHARED_FIELDS.concat('granted'),
   );
   initGroupMembersApp(
     document.querySelector('.js-group-invited-members-list'),
-    SHARED_FIELDS.concat(['invited']),
+    SHARED_FIELDS.concat('invited'),
   );
   initGroupMembersApp(
     document.querySelector('.js-group-access-requests-list'),
-    SHARED_FIELDS.concat(['requested']),
+    SHARED_FIELDS.concat('requested'),
   );
 
   new Members(); // eslint-disable-line no-new
