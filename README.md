@@ -172,7 +172,7 @@ The same applies to `cableBackend` and `cableSocket`.
 
 ## Installation
 
-To install gitlab-workhorse you need [Go 1.8 or
+To install gitlab-workhorse you need [Go 1.13 or
 newer](https://golang.org/dl) and [GNU
 Make](https://www.gnu.org/software/make/).
 
