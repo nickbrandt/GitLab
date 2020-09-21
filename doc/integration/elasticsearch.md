@@ -725,19 +725,25 @@ Here are some common pitfalls and how to overcome them:
   newer versions of Elasticsearch. When indexing changes are made, it may
   be necessary for you to [reindex](#zero-downtime-reindexing) after updating GitLab.
 
-- **I indexed all the repositories but I can't find anything**
+- **I indexed all the repositories but I can't get any hits for my search term in the UI**
 
   Make sure you indexed all the database data [as stated above](#enabling-elasticsearch).
 
-  Beyond that, check via the [Elasticsearch Search API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html) to see if the data shows up on the Elasticsearch side.
-
-  If it shows up via the [Elasticsearch Search API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html), check that it shows up via the rails console (`sudo gitlab-rails console`):
+  If there aren't any results (hits) in the UI search, check if you are seeing the same results via the rails console (`sudo gitlab-rails console`):
 
   ```ruby
   u = User.find_by_username('your-username')
   s = SearchService.new(u, {:search => 'search_term', :scope => 'blobs'})
   pp s.search_objects.to_a
   ```
+
+  Beyond that, check via the [Elasticsearch Search API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html) to see if the data shows up on the Elasticsearch side:
+
+  ```code
+  curl --request GET <elasticsearch_server_ip>:9200/gitlab-production/_search?q=<search_term>
+  ```
+
+  It is important to understand at which level the problem is manifesting (UI, Rails code, Elasticsearch side) to be able to [troublehoot further](https://docs.gitlab.com/ee/administration/troubleshooting/elasticsearch.html#search-results-workflow).
 
   NOTE: **Note:**
   The above instructions are not to be used for scenarios that only index a [subset of namespaces](#limiting-namespaces-and-projects).
