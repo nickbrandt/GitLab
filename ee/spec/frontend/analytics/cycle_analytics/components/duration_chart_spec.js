@@ -81,7 +81,7 @@ describe('DurationChart', () => {
   });
 
   it('renders the duration chart', () => {
-    expect(wrapper.html()).toMatchSnapshot();
+    expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders the scatter plot', () => {
