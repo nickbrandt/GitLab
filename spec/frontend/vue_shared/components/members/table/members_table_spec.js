@@ -13,12 +13,11 @@ localVue.use(Vuex);
 describe('MemberList', () => {
   let wrapper;
 
-  const defaultState = { members: [], tableFields: [] };
-
   const createStore = (state = {}) => {
     return new Vuex.Store({
       state: {
-        ...defaultState,
+        members: [],
+        tableFields: [],
         ...state,
       },
     });
