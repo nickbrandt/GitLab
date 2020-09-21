@@ -1,3 +1,5 @@
+import { parseBoolean } from '../../lib/utils/common_utils';
+
 /**
  * Adds the line number property
  * @param Object line
@@ -17,7 +19,7 @@ export const parseLine = (line = {}, lineNumber) => ({
  * @param Number lineNumber
  */
 export const parseHeaderLine = (line = {}, lineNumber) => ({
-  isClosed: line.section_options?.collapsed === 'true',
+  isClosed: parseBoolean(line.section_options?.collapsed),
   isHeader: true,
   line: parseLine(line, lineNumber),
   lines: [],
