@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fast_spec_helper'
+require 'json_schemer'
 
 RSpec.describe PagerDuty::WebhookPayloadParser do
   describe '.call' do
@@ -69,11 +70,11 @@ RSpec.describe PagerDuty::WebhookPayloadParser do
       end
     end
 
-    context 'when payload has no incidents' do
+    context 'when payload schema is invalid' do
       let(:payload) { { 'messages' => [{ 'event' => 'incident.trigger' }] } }
 
       it 'returns payload with blank incidents' do
-        is_expected.to eq([{ 'event' => 'incident.trigger', 'incident' => {} }])
+        is_expected.to eq([{}])
       end
     end
   end
