@@ -22254,9 +22254,6 @@ msgstr ""
 msgid "Search requirements"
 msgstr ""
 
-msgid "Search test cases"
-msgstr ""
-
 msgid "Search users"
 msgstr ""
 
@@ -23715,9 +23712,6 @@ msgstr ""
 msgid "Something went wrong while creating a requirement."
 msgstr ""
 
-msgid "Something went wrong while creating a test case."
-msgstr ""
-
 msgid "Something went wrong while deleting description changes. Please try again."
 msgstr ""
 
@@ -23742,9 +23736,6 @@ msgstr ""
 msgid "Something went wrong while fetching comments. Please try again."
 msgstr ""
 
-msgid "Something went wrong while fetching count of test cases."
-msgstr ""
-
 msgid "Something went wrong while fetching description changes. Please try again."
 msgstr ""
 
@@ -23767,9 +23758,6 @@ msgid "Something went wrong while fetching requirements count."
 msgstr ""
 
 msgid "Something went wrong while fetching requirements list."
-msgstr ""
-
-msgid "Something went wrong while fetching test cases list."
 msgstr ""
 
 msgid "Something went wrong while fetching the environments for this merge request. Please try again."
@@ -24462,9 +24450,6 @@ msgstr ""
 msgid "Submit search"
 msgstr ""
 
-msgid "Submit test case"
-msgstr ""
-
 msgid "Submit the current review."
 msgstr ""
 
@@ -25006,6 +24991,27 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Test settings"
+msgstr ""
+
+msgid "TestCases|New Test Case"
+msgstr ""
+
+msgid "TestCases|New test case"
+msgstr ""
+
+msgid "TestCases|Search test cases"
+msgstr ""
+
+msgid "TestCases|Something went wrong while creating a test case."
+msgstr ""
+
+msgid "TestCases|Something went wrong while fetching count of test cases."
+msgstr ""
+
+msgid "TestCases|Something went wrong while fetching test cases list."
+msgstr ""
+
+msgid "TestCases|Submit test case"
 msgstr ""
 
 msgid "TestHooks|Ensure one of your projects has merge requests."
