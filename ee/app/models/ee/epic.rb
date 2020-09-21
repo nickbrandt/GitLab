@@ -144,6 +144,8 @@ module EE
     end
 
     class_methods do
+      extend ::Gitlab::Utils::Override
+
       # We support internal references (&epic_id) and cross-references (group.full_path&epic_id)
       #
       # Escaped versions with `&amp;` will be extracted too
@@ -197,6 +199,18 @@ module EE
         else
           super
         end
+      end
+
+      override :simple_sorts
+      def simple_sorts
+        super.merge(
+          {
+            'start_date_asc' => -> { order_start_date_asc.with_order_id_desc },
+            'start_date_desc' => -> { order_start_date_desc.with_order_id_desc },
+            'end_date_asc' => -> { order_end_date_asc.with_order_id_desc },
+            'end_date_desc' => -> { order_end_date_desc.with_order_id_desc }
+          }
+        )
       end
 
       def parent_class
