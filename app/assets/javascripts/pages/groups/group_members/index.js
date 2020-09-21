@@ -28,23 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const SHARED_FIELDS = ['account', 'expires', 'maxRole', 'expiration', 'actions'];
 
-  initGroupMembersApp(document.querySelector('.js-group-members-list'), [
-    ...SHARED_FIELDS,
-    'source',
-    'granted',
-  ]);
-  initGroupMembersApp(document.querySelector('.js-group-linked-list'), [
-    ...SHARED_FIELDS,
-    'granted',
-  ]);
-  initGroupMembersApp(document.querySelector('.js-group-invited-members-list'), [
-    ...SHARED_FIELDS,
-    'invited',
-  ]);
-  initGroupMembersApp(document.querySelector('.js-group-access-requests-list'), [
-    ...SHARED_FIELDS,
-    'requested',
-  ]);
+  initGroupMembersApp(
+    document.querySelector('.js-group-members-list'),
+    SHARED_FIELDS.concat(['source', 'granted']),
+  );
+  initGroupMembersApp(
+    document.querySelector('.js-group-linked-list'),
+    SHARED_FIELDS.concat(['granted']),
+  );
+  initGroupMembersApp(
+    document.querySelector('.js-group-invited-members-list'),
+    SHARED_FIELDS.concat(['invited']),
+  );
+  initGroupMembersApp(
+    document.querySelector('.js-group-access-requests-list'),
+    SHARED_FIELDS.concat(['requested']),
+  );
 
   new Members(); // eslint-disable-line no-new
   new UsersSelect(); // eslint-disable-line no-new
