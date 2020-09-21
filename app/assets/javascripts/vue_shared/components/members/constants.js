@@ -13,7 +13,7 @@ export const FIELDS = [
   },
   {
     key: 'granted',
-    label: __('Access Granted'),
+    label: __('Access granted'),
     thClass: 'col-meta',
     tdClass: 'col-meta',
   },
@@ -31,13 +31,13 @@ export const FIELDS = [
   },
   {
     key: 'expires',
-    label: __('Access Expires'),
+    label: __('Access expires'),
     thClass: 'col-meta',
     tdClass: 'col-meta',
   },
   {
     key: 'maxRole',
-    label: __('Max Role'),
+    label: __('Max role'),
     thClass: 'col-meta',
     tdClass: 'col-meta',
   },

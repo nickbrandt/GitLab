@@ -47,11 +47,11 @@ describe('MemberList', () => {
     it.each`
       field           | label
       ${'source'}     | ${'Source'}
-      ${'granted'}    | ${'Access Granted'}
+      ${'granted'}    | ${'Access granted'}
       ${'invited'}    | ${'Invited'}
       ${'requested'}  | ${'Requested'}
-      ${'expires'}    | ${'Access Expires'}
-      ${'maxRole'}    | ${'Max Role'}
+      ${'expires'}    | ${'Access expires'}
+      ${'maxRole'}    | ${'Max role'}
       ${'expiration'} | ${'Expiration'}
     `('renders the $label field', ({ field, label }) => {
       createComponent({

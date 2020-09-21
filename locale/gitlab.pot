@@ -1300,12 +1300,6 @@ msgstr ""
 msgid "Acceptable for use in this project"
 msgstr ""
 
-msgid "Access Expires"
-msgstr ""
-
-msgid "Access Granted"
-msgstr ""
-
 msgid "Access Tokens"
 msgstr ""
 
@@ -1318,7 +1312,13 @@ msgstr ""
 msgid "Access expiration date"
 msgstr ""
 
+msgid "Access expires"
+msgstr ""
+
 msgid "Access forbidden. Check your access level."
+msgstr ""
+
+msgid "Access granted"
 msgstr ""
 
 msgid "Access requests"
@@ -15454,10 +15454,10 @@ msgstr ""
 msgid "Max Project Import requests per minute per user"
 msgstr ""
 
-msgid "Max Role"
+msgid "Max access level"
 msgstr ""
 
-msgid "Max access level"
+msgid "Max role"
 msgstr ""
 
 msgid "Max size 15 MB"
