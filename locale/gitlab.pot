@@ -3964,7 +3964,7 @@ msgstr ""
 msgid "BillingPlans|@%{user_name} you are currently using the %{plan_name} plan."
 msgstr ""
 
-msgid "BillingPlans|Congratulations, your new trial is activated"
+msgid "BillingPlans|Congratulations, your free trial is activated."
 msgstr ""
 
 msgid "BillingPlans|If you would like to downgrade your plan please contact %{support_link_start}Customer Support%{support_link_end}."
