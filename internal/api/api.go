@@ -188,6 +188,8 @@ func (api *API) newRequest(r *http.Request, suffix string) (*http.Request, error
 		Header: helper.HeaderClone(r.Header),
 	}
 
+	authReq = authReq.WithContext(r.Context())
+
 	// Clean some headers when issuing a new request without body
 	authReq.Header.Del("Content-Type")
 	authReq.Header.Del("Content-Encoding")
