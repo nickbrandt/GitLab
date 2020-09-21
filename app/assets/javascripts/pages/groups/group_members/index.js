@@ -4,7 +4,7 @@ import memberExpirationDate from '~/member_expiration_date';
 import UsersSelect from '~/users_select';
 import groupsSelect from '~/groups_select';
 import RemoveMemberModal from '~/vue_shared/components/remove_member_modal.vue';
-import initGroupMembersApp from '~/groups/members';
+import { initGroupMembersApp } from '~/groups/members';
 
 function mountRemoveMemberModal() {
   const el = document.querySelector('.js-remove-member-modal');

@@ -1,5 +1,5 @@
 import { createWrapper } from '@vue/test-utils';
-import initGroupMembersApp from '~/groups/members';
+import { initGroupMembersApp } from '~/groups/members';
 import GroupMembersApp from '~/groups/members/components/app.vue';
 import { membersJsonString, membersParsed } from './mock_data';
 

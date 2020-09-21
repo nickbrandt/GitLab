@@ -4,7 +4,7 @@ import App from './components/app.vue';
 import membersModule from '~/vuex_shared/modules/members';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
-export default (el, tableFields) => {
+export const initGroupMembersApp = (el, tableFields) => {
   if (!el) {
     return () => {};
   }
