@@ -19789,8 +19789,6 @@ CREATE INDEX index_cluster_agent_tokens_on_agent_id ON cluster_agent_tokens USIN
 
 CREATE UNIQUE INDEX index_cluster_agent_tokens_on_token_encrypted ON cluster_agent_tokens USING btree (token_encrypted);
 
-CREATE INDEX index_cluster_agents_on_project_id ON cluster_agents USING btree (project_id);
-
 CREATE UNIQUE INDEX index_cluster_agents_on_project_id_and_name ON cluster_agents USING btree (project_id, name);
 
 CREATE UNIQUE INDEX index_cluster_groups_on_cluster_id_and_group_id ON cluster_groups USING btree (cluster_id, group_id);
