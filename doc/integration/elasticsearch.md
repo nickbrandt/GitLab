@@ -157,6 +157,11 @@ PREFIX=/usr sudo -E make install
 
 After installation, be sure to [enable Elasticsearch](#enabling-elasticsearch).
 
+NOTE: **Note:**
+If you see an error such as `Permission denied - /home/git/gitlab-elasticsearch-indexer/` while indexing, you
+may need to set the `production -> elasticsearch -> indexer_path` setting in your `gitlab.yml` file to 
+`/usr/local/bin/gitlab-elasticsearch-indexer`, which is where the binary is installed.
+
 ## Enabling Elasticsearch
 
 NOTE: **Note:**
