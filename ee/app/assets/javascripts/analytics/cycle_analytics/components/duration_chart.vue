@@ -43,7 +43,7 @@ export default {
 
 <template>
   <chart-skeleton-loader v-if="isLoading" size="md" class="gl-my-4 gl-py-4" />
-  <div v-else class="gl-display-flex gl-flex-direction-column">
+  <div v-else class="gl-display-flex gl-flex-direction-column" data-testid="vsa-duration-chart">
     <h4 class="gl-mt-0">{{ s__('CycleAnalytics|Days to completion') }}</h4>
     <stage-dropdown-filter
       v-if="stages.length"
@@ -58,7 +58,7 @@ export default {
       :tooltip-date-format="$options.durationChartTooltipDateFormat"
       :scatter-data="durationChartPlottableData"
     />
-    <div v-else ref="duration-chart-no-data" class="bs-callout bs-callout-info">
+    <div v-else class="bs-callout bs-callout-info">
       {{ error }}
     </div>
   </div>
