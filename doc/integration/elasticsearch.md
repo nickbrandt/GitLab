@@ -743,6 +743,8 @@ Here are some common pitfalls and how to overcome them:
   curl --request GET <elasticsearch_server_ip>:9200/gitlab-production/_search?q=<search_term>
   ```
 
+  More [complex Elasticsearch API calls](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html) are also possible.
+
   It is important to understand at which level the problem is manifesting (UI, Rails code, Elasticsearch side) to be able to [troublehoot further](../administration/troubleshooting/elasticsearch.md#search-results-workflow).
 
   NOTE: **Note:**
