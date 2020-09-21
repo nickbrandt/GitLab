@@ -10,7 +10,7 @@ class Admin::IntegrationsController < Admin::ApplicationController
   end
 
   def integrations_enabled?
-    true
+    !Gitlab.com?
   end
 
   def scoped_edit_integration_path(integration)

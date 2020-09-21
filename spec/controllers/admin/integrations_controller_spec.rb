@@ -20,6 +20,18 @@ RSpec.describe Admin::IntegrationsController do
         end
       end
     end
+
+    context 'when GitLab.com' do
+      before do
+        allow(::Gitlab).to receive(:com?) { true }
+      end
+
+      it 'returns 404' do
+        get :edit, params: { id: Service.available_services_names.sample }
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
   end
 
   describe '#update' do
