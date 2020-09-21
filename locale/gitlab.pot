@@ -26822,6 +26822,9 @@ msgstr ""
 msgid "Total cores (CPUs)"
 msgstr ""
 
+msgid "Total days to completion"
+msgstr ""
+
 msgid "Total issues"
 msgstr ""
 

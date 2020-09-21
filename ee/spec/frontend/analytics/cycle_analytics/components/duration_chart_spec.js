@@ -59,7 +59,7 @@ function createComponent({
 describe('DurationChart', () => {
   let wrapper;
 
-  const findNoDataContainer = _wrapper => _wrapper.find({ ref: 'duration-chart-no-data' });
+  const findContainer = _wrapper => _wrapper.find('[data-testid="vsa-duration-chart"]');
   const findScatterPlot = _wrapper => _wrapper.find(Scatterplot);
   const findStageDropdown = _wrapper => _wrapper.find(StageDropdownFilter);
   const findLoader = _wrapper => _wrapper.find(ChartSkeletonLoader);
@@ -133,7 +133,7 @@ describe('DurationChart', () => {
     });
 
     it('renders the no data available message', () => {
-      expect(findNoDataContainer(wrapper).text()).toEqual(
+      expect(findContainer(wrapper).text()).toContain(
         'There is no data available. Please change your selection.',
       );
     });
