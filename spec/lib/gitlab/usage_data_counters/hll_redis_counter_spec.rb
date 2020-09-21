@@ -238,27 +238,19 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
 
     it 'returns the number of unique events for all known events' do
       results = {
-        counts_weekly: {
-          "category1" => {
-            "event1_slot" => 1,
-            "event2_slot" => 1,
-            "total_unique_counts" => 2
-          },
-          "category2" => {
-            "event3" => 1,
-            "event4" => 1
-          }
+        "category1" => {
+          "event1_slot_weekly" => 1,
+          "event1_slot_monthly" => 1,
+          "event2_slot_weekly" => 1,
+          "event2_slot_monthly" => 2,
+          "category1_total_unique_counts_weekly" => 2,
+          "category1_total_unique_counts_monthly" => 3
         },
-        counts_monthly: {
-          "category1" => {
-            "event1_slot" => 1,
-            "event2_slot" => 2,
-            "total_unique_counts" => 3
-          },
-          "category2" => {
-            "event3" => 1,
-            "event4" => 1
-          }
+        "category2" => {
+          "event3_weekly" => 1,
+          "event3_monthly" => 1,
+          "event4_weekly" => 1,
+          "event4_monthly" => 1
         }
       }
 
