@@ -2,6 +2,8 @@
 
 module Ci
   class UpdateBuildStateService
+    include Gitlab::Utils::StrongMemoize
+
     Result = Struct.new(:status, :backoff, keyword_init: true)
 
     ACCEPT_TIMEOUT = 5.minutes.freeze
@@ -16,11 +18,12 @@ module Ci
 
     def execute
       overwrite_trace! if has_trace?
+      create_pending_state! if accept_available?
 
       if accept_request?
         accept_build_state!
       else
-        check_migration_state
+        validate_build_trace!
         update_build_state!
       end
     end
@@ -28,9 +31,7 @@ module Ci
     private
 
     def accept_build_state!
-      state_created = ensure_pending_state.created_at
-
-      if Time.current - state_created > ACCEPT_TIMEOUT
+      if Time.current - pending_state.created_at > ACCEPT_TIMEOUT
         metrics.increment_trace_operation(operation: :discarded)
 
         return update_build_state!
@@ -42,7 +43,7 @@ module Ci
 
       metrics.increment_trace_operation(operation: :accepted)
 
-      ::Gitlab::Ci::Runner::Backoff.new(state_created).then do |backoff|
+      ::Gitlab::Ci::Runner::Backoff.new(pending_state.created_at).then do |backoff|
         Result.new(status: 202, backoff: backoff.to_seconds)
       end
     end
@@ -53,12 +54,20 @@ module Ci
       build.trace.set(params[:trace]) if Gitlab::Ci::Features.trace_overwrite?
     end
 
-    def check_migration_state
+    def create_pending_state!
+      pending_state.created_at
+    end
+
+    def validate_build_trace!
       return unless accept_available?
 
-      if has_chunks? && !live_chunks_pending?
-        metrics.increment_trace_operation(operation: :finalized)
+      unless ::Gitlab::Ci::Trace::Checksum.new(build).valid?
+        metrics.increment_trace_operation(operation: :invalid)
       end
+
+      return unless chunks_persisted?
+
+      metrics.increment_trace_operation(operation: :finalized)
     end
 
     def update_build_state!
@@ -100,16 +109,20 @@ module Ci
       params.dig(:checksum).present?
     end
 
-    def has_chunks?
-      build.trace_chunks.any?
-    end
-
     def live_chunks_pending?
       build.trace_chunks.live.any?
     end
 
+    def chunks_persisted?
+      build.trace_chunks.any? && !live_chunks_pending?
+    end
+
     def build_running?
       build_state == 'running'
+    end
+
+    def pending_state
+      strong_memoize(:pending_state) { ensure_pending_state }
     end
 
     def ensure_pending_state
