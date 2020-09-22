@@ -35,7 +35,8 @@ class ActiveSession
       session_id = request.session.id.public_id
       client = DeviceDetector.new(request.user_agent)
       timestamp = Time.current
-      namespace_id = request.params[:group_id]
+      namespace_id = request_namespace_id(request)
+      # byebug if namespace_id.blank?
 
       active_user_session = new(
         ip_address: request.remote_ip,
@@ -79,6 +80,20 @@ class ActiveSession
     Gitlab::Redis::SharedState.with do |redis|
       destroy_sessions(redis, user, [session_id])
     end
+  end
+
+  def self.with_namespace_ids(user)
+    list_sessions(user).filter { |s| s.has_key?('namespace_id') }
+  end
+
+  def self.namespace_ids(user)
+    with_namespace_ids(user).map { |s| s['namespace_id'] }
+  end
+
+  def self.destroy_with_namespace_id(user, namespace_id)
+    list_sessions(user)
+      .filter { |session| session['namespace_id'] == namespace_id }
+      .each { |session| destroy(user, session) }
   end
 
   def self.destroy_with_public_id(user, public_id)
@@ -251,5 +266,11 @@ class ActiveSession
     Gitlab::CryptoHelper.aes256_gcm_decrypt(public_id)
   rescue
     nil
+  end
+
+  def self.request_namespace_id(request)
+    group_id = request.params[:group_id]
+    namespace = Namespace.find_by_full_path(group_id, follow_redirects: true)
+    namespace.present? ? "namespace_#{namespace.id}" : nil
   end
 end

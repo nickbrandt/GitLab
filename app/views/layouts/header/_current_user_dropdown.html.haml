@@ -55,3 +55,6 @@
     %li.divider
     %li
       = link_to _("Sign out"), destroy_user_session_path, method: :post, class: "sign-out-link", data: { qa_selector: 'sign_out_link' }
+      - session_namespaces.each do |namespace|
+        = link_to _("Sign out (#{namespace.name})"), group_session_path(namespace), method: :delete, class: "sign-out-link", data: { qa_selector: 'group_sign_out_link' }
+      = "None" if session_namespaces.empty?

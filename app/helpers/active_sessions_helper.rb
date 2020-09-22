@@ -22,4 +22,9 @@ module ActiveSessionsHelper
 
     sprite_icon(icon_name, css_class: 'gl-mt-2')
   end
+
+  def session_namespaces
+    namespace_ids = ActiveSession.with_namespace_ids(current_user).map { |s| s['namespace_id'] }
+    Namespace.where(id: namespace_ids)
+  end
 end

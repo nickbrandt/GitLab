@@ -62,6 +62,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
+    resource :session, only: [:destroy]
+
     resource :ldap, only: [] do
       member do
         put :sync
