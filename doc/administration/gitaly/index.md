@@ -482,6 +482,14 @@ git_data_dirs({
   'storage1' => { 'gitaly_address' => 'tcp://gitlab.internal:8075', 'path' => '/mnt/gitlab/git-data' },
   'storage2' => { 'gitaly_address' => 'tcp://gitaly2.internal:8075' },
 })
+
+# Make Gitaly accept connections on all network interfaces
+gitaly['listen_addr'] = "0.0.0.0:8075"
+
+# Or for TLS
+gitaly['tls_listen_addr'] = "0.0.0.0:9999"
+gitaly['certificate_path'] = "/etc/gitlab/ssl/cert.pem"
+gitaly['key_path'] = "/etc/gitlab/ssl/key.pem"
 ```
 
 `path` can only be included for storage shards on the local Gitaly server.
