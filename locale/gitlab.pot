@@ -8,6 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-18 11:00+1200\n"
+"PO-Revision-Date: 2020-09-18 11:00+1200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -8853,6 +8855,9 @@ msgstr ""
 msgid "DesignManagement|The maximum number of designs allowed to be uploaded is %{upload_limit}. Please try again."
 msgstr ""
 
+msgid "DesignManagement|There was an error moving your designs. Please upload your designs below."
+msgstr ""
+
 msgid "DesignManagement|To upload designs, you'll need to enable LFS and have admin enable hashed storage. %{requirements_link_start}More information%{requirements_link_end}"
 msgstr ""
 
@@ -8863,6 +8868,9 @@ msgid "DesignManagement|Upload designs"
 msgstr ""
 
 msgid "DesignManagement|Upload skipped."
+msgstr ""
+
+msgid "DesignManagement|Your designs are being copied and are on their way… Please refresh to update."
 msgstr ""
 
 msgid "DesignManagement|and %{moreCount} more."
