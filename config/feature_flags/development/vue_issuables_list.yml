@@ -2,6 +2,6 @@
 name: vue_issuables_list
 introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/15091
 rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/208093
-group: group::plan
+group: group::project management
 type: development
 default_enabled: false
