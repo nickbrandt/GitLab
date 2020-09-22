@@ -1,5 +1,11 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlDropdown, GlDropdownItem, GlModal } from '@gitlab/ui';
+import {
+  GlDropdown,
+  GlDropdownItem,
+  GlIntersectionObserver,
+  GlLoadingIcon,
+  GlModal,
+} from '@gitlab/ui';
 import { useFakeDate } from 'helpers/fake_date';
 import GroupRepositoryAnalytics from 'ee/analytics/repository_analytics/components/group_repository_analytics.vue';
 
@@ -24,6 +30,8 @@ describe('Group repository analytics app', () => {
     wrapper
       .find(`[data-testid="group-code-coverage-download-select-project-${id}"]`)
       .trigger('click');
+  const findIntersectionObserver = () => wrapper.find(GlIntersectionObserver);
+  const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
 
   const injectedProperties = {
     groupAnalyticsCoverageReportsPath: '/coverage.csv?ref_path=refs/heads/master',
@@ -31,24 +39,39 @@ describe('Group repository analytics app', () => {
   };
   const groupProjectsData = [{ id: 1, name: '1' }, { id: 2, name: '2' }];
 
-  const createComponent = () => {
+  const createComponent = ({ data = {}, apolloGroupProjects = {} }) => {
     wrapper = shallowMount(GroupRepositoryAnalytics, {
       localVue,
       data() {
         return {
           // Ensure that isSelected is set to false for each project so that every test is reset properly
           groupProjects: groupProjectsData.map(project => ({ ...project, isSelected: false })),
+          projectsPageInfo: {
+            hasNextPage: false,
+            endCursor: null,
+          },
+          ...data,
         };
       },
       provide: {
         ...injectedProperties,
+      },
+      mocks: {
+        $apollo: {
+          queries: {
+            groupProjects: {
+              fetchMore: jest.fn().mockResolvedValue(),
+              ...apolloGroupProjects,
+            },
+          },
+        },
       },
       stubs: { GlDropdown, GlDropdownItem, GlModal },
     });
   };
 
   beforeEach(() => {
-    createComponent();
+    createComponent({});
   });
 
   afterEach(() => {
@@ -119,6 +142,52 @@ describe('Group repository analytics app', () => {
 
         it('renders a disabled primary action button', () => {
           expect(findCodeCoverageDownloadButton().attributes('disabled')).toBe('true');
+        });
+      });
+
+      describe('when there is only one page of projects', () => {
+        it('should not render the intersection observer component', () => {
+          expect(findIntersectionObserver().exists()).toBe(false);
+        });
+      });
+
+      describe('when there is more than a page of projects', () => {
+        beforeEach(() => {
+          createComponent({ data: { projectsPageInfo: { hasNextPage: true } } });
+        });
+
+        it('should render the intersection observer component', () => {
+          expect(findIntersectionObserver().exists()).toBe(true);
+        });
+
+        describe('when the intersection observer component appears in view', () => {
+          beforeEach(() => {
+            jest
+              .spyOn(wrapper.vm.$apollo.queries.groupProjects, 'fetchMore')
+              .mockImplementation(jest.fn());
+
+            findIntersectionObserver().vm.$emit('appear');
+            return wrapper.vm.$nextTick();
+          });
+
+          it('makes a query to fetch more projects', () => {
+            expect(wrapper.vm.$apollo.queries.groupProjects.fetchMore).toHaveBeenCalled();
+          });
+        });
+
+        describe('when a query is loading a new page of projects', () => {
+          beforeEach(() => {
+            createComponent({
+              data: { projectsPageInfo: { hasNextPage: true } },
+              apolloGroupProjects: {
+                loading: true,
+              },
+            });
+          });
+
+          it('should render the loading spinner', () => {
+            expect(findLoadingIcon().exists()).toBe(true);
+          });
         });
       });
     });
