@@ -44,7 +44,13 @@ module Elastic
           memo[field.to_sym] = {}
         end
 
-        { fields: es_fields }
+        # Adding number_of_fragments: 0 to not split results into snippets.  This way controllers can decide how to handle the highlighted data.
+        {
+            fields: es_fields,
+            number_of_fragments: 0,
+            pre_tags: ['<span class="gl-text-black-normal gl-font-weight-bold">'],
+            post_tags: ['</span>']
+        }
       end
 
       def basic_query_hash(fields, query)
