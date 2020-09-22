@@ -47,7 +47,7 @@ export default {
   },
   computed: {
     ...mapState('networkPolicies', ['policies', 'isLoadingPolicies', 'isUpdatingPolicy']),
-    ...mapState('threatMonitoring', ['currentEnvironmentId']),
+    ...mapState('threatMonitoring', ['currentEnvironmentId', 'allEnvironments']),
     ...mapGetters('networkPolicies', ['policiesWithDefaults']),
     documentationFullPath() {
       return setUrlFragment(this.documentationPath, 'container-network-policy');
@@ -90,6 +90,34 @@ export default {
           )
         : '';
     },
+    fields() {
+      const namespace = {
+        key: 'namespace',
+        label: s__('NetworkPolicies|Namespace'),
+        thClass: 'font-weight-bold',
+      };
+      const fields = [
+        {
+          key: 'name',
+          label: s__('NetworkPolicies|Name'),
+          thClass: 'w-50 font-weight-bold',
+        },
+        {
+          key: 'status',
+          label: s__('NetworkPolicies|Status'),
+          thClass: 'font-weight-bold',
+        },
+        {
+          key: 'creationTimestamp',
+          label: s__('NetworkPolicies|Last modified'),
+          thClass: 'font-weight-bold',
+        },
+      ];
+      // Adds column 'namespace' only while 'all environments' option is selected
+      if (this.allEnvironments) fields.splice(1, 0, namespace);
+
+      return fields;
+    },
   },
   methods: {
     ...mapActions('networkPolicies', ['createPolicy', 'updatePolicy']),
@@ -127,23 +155,6 @@ export default {
         });
     },
   },
-  fields: [
-    {
-      key: 'name',
-      label: s__('NetworkPolicies|Name'),
-      thClass: 'w-75 font-weight-bold',
-    },
-    {
-      key: 'status',
-      label: s__('NetworkPolicies|Status'),
-      thClass: 'font-weight-bold',
-    },
-    {
-      key: 'creationTimestamp',
-      label: s__('NetworkPolicies|Last modified'),
-      thClass: 'font-weight-bold',
-    },
-  ],
   emptyStateDescription: s__(
     `NetworkPolicies|Policies are a specification of how groups of pods are allowed to communicate with each other's network endpoints.`,
   ),
@@ -193,7 +204,7 @@ export default {
       ref="policiesTable"
       :busy="isLoadingPolicies"
       :items="policiesWithDefaults"
-      :fields="$options.fields"
+      :fields="fields"
       head-variant="white"
       stacked="md"
       thead-class="gl-text-gray-900 border-bottom"

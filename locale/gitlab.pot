@@ -16748,6 +16748,9 @@ msgstr ""
 msgid "NetworkPolicies|Name"
 msgstr ""
 
+msgid "NetworkPolicies|Namespace"
+msgstr ""
+
 msgid "NetworkPolicies|Network Policy"
 msgstr ""
 
