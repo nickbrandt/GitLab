@@ -8,7 +8,7 @@ Users have different abilities depending on the access level they have in a
 particular group or project. If a user is both in a project's group and the
 project itself, the highest permission level is used.
 
-On public and internal projects the Guest role is not enforced. All users can:
+On public and internal projects, the Guest role is not enforced. All users can:
 
 - Create issues.
 - Leave comments.
