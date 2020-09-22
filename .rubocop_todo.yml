@@ -105,14 +105,6 @@ Lint/StructNewOverride:
     - 'app/serializers/environment_serializer.rb'
     - 'lib/gitlab/ci/pipeline/duration.rb'
 
-# Offense count: 7
-Lint/UriEscapeUnescape:
-  Exclude:
-    - 'app/controllers/application_controller.rb'
-    - 'app/models/project_services/drone_ci_service.rb'
-    - 'spec/lib/google_api/auth_spec.rb'
-    - 'spec/requests/api/files_spec.rb'
-
 # Offense count: 65
 # Cop supports --auto-correct.
 Migration/DepartmentName:
