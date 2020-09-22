@@ -31,7 +31,7 @@ module Projects
           license_scanning: _('Search your project dependencies for their licenses and apply policies.'),
           sast: _('Analyze your source code for known vulnerabilities.'),
           secret_detection: _('Analyze your source code and git history for secrets.'),
-          coverage_fuzzing: _('Find bugs in your code with coverage-guided fuzzing')
+          coverage_fuzzing: _('Find bugs in your code with coverage-guided fuzzing.')
         }.freeze
       end
 

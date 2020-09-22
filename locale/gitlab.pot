@@ -11171,7 +11171,7 @@ msgstr ""
 msgid "Find File"
 msgstr ""
 
-msgid "Find bugs in your code with coverage-guided fuzzing"
+msgid "Find bugs in your code with coverage-guided fuzzing."
 msgstr ""
 
 msgid "Find by path"
@@ -22451,6 +22451,9 @@ msgstr ""
 msgid "SecurityConfiguration|Manage"
 msgstr ""
 
+msgid "SecurityConfiguration|More information"
+msgstr ""
+
 msgid "SecurityConfiguration|Not enabled"
 msgstr ""
 
@@ -22461,9 +22464,6 @@ msgid "SecurityConfiguration|SAST Configuration"
 msgstr ""
 
 msgid "SecurityConfiguration|Security Control"
-msgstr ""
-
-msgid "SecurityConfiguration|See documentation"
 msgstr ""
 
 msgid "SecurityConfiguration|Status"
