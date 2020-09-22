@@ -205,7 +205,7 @@ RSpec.describe API::Helpers do
       end
 
       it 'tracks redis hll event' do
-        expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event).with(value, event_name)
 
         subject.increment_unique_values(event_name, value)
       end

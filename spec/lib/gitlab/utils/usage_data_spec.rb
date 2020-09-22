@@ -226,7 +226,7 @@ RSpec.describe Gitlab::Utils::UsageData do
       end
 
       it 'tracks redis hll event' do
-        expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
+        expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event).with(value, event_name)
 
         described_class.track_usage_event(event_name, value)
       end
