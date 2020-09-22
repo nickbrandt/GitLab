@@ -14271,6 +14271,16 @@ type Query {
     """
     startDate: ISO8601Date!
   ): VulnerabilitiesCountByDayAndSeverityConnection @deprecated(reason: "Use `vulnerabilitiesCountByDay`. Deprecated in 13.3")
+
+  """
+  Find a vulnerability
+  """
+  vulnerability(
+    """
+    The Global ID of the Vulnerability
+    """
+    id: VulnerabilityID!
+  ): Vulnerability
 }
 
 """
