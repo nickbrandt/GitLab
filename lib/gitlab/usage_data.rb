@@ -473,7 +473,7 @@ module Gitlab
       end
 
       def last_28_days_time_period(column: :created_at)
-        { column => 28.days.ago..Time.current }
+        { column => 30.days.ago..2.days.ago }
       end
 
       # Source: https://gitlab.com/gitlab-data/analytics/blob/master/transform/snowflake-dbt/data/ping_metrics_to_stage_mapping_data.csv
