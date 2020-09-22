@@ -112,9 +112,6 @@ export default {
         });
       }
     },
-    refetchVulnerabilities() {
-      this.$apollo.queries.vulnerabilities.refetch();
-    },
     handleSortChange({ sortBy, sortDesc }) {
       this.sortDirection = sortDesc ? 'desc' : 'asc';
       this.sortBy = sortBy;
@@ -144,7 +141,6 @@ export default {
       :filters="filters"
       :vulnerabilities="vulnerabilities"
       :security-scanners="securityScanners"
-      @refetch-vulnerabilities="refetchVulnerabilities"
       @sort-changed="handleSortChange"
     />
     <gl-intersection-observer
