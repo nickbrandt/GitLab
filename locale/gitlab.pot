@@ -1024,6 +1024,11 @@ msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "1 deploy key"
+msgid_plural "%d deploy keys"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "1 group"
 msgid_plural "%d groups"
 msgstr[0] ""
@@ -1322,6 +1327,9 @@ msgid "Access to '%{classification_label}' not allowed"
 msgstr ""
 
 msgid "Access to Pages websites are controlled based on the user's membership to a given project. By checking this box, users will be required to be logged in to have access to all Pages websites in your instance."
+msgstr ""
+
+msgid "AccessDropdown|Deploy Keys"
 msgstr ""
 
 msgid "AccessDropdown|Groups"
@@ -10644,6 +10652,9 @@ msgstr ""
 msgid "Failed to load branches. Please try again."
 msgstr ""
 
+msgid "Failed to load deploy keys."
+msgstr ""
+
 msgid "Failed to load emoji list."
 msgstr ""
 
@@ -10657,6 +10668,9 @@ msgid "Failed to load group activity metrics. Please try again."
 msgstr ""
 
 msgid "Failed to load groups & users."
+msgstr ""
+
+msgid "Failed to load groups, users and deploy keys."
 msgstr ""
 
 msgid "Failed to load labels. Please try again."
@@ -17914,6 +17928,9 @@ msgid "Overview"
 msgstr ""
 
 msgid "Overwrite diverged branches"
+msgstr ""
+
+msgid "Owned by %{image_tag}"
 msgstr ""
 
 msgid "Owned by anyone"
