@@ -22559,9 +22559,6 @@ msgstr ""
 msgid "SecurityReports|Learn more about setting up your dashboard"
 msgstr ""
 
-msgid "SecurityReports|Load more vulnerabilities"
-msgstr ""
-
 msgid "SecurityReports|Monitor vulnerabilities in your code"
 msgstr ""
 
