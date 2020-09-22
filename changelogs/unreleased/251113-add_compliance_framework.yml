@@ -1,0 +1,5 @@
+---
+title: Refactor ComplianceFramework::FRAMEWORKS to ActiveRecord Model
+merge_request: 43000
+author:
+type: changed

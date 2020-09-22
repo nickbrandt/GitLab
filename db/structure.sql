@@ -11063,6 +11063,25 @@ CREATE SEQUENCE commit_user_mentions_id_seq
 
 ALTER SEQUENCE commit_user_mentions_id_seq OWNED BY commit_user_mentions.id;
 
+CREATE TABLE compliance_management_frameworks (
+    id bigint NOT NULL,
+    name text NOT NULL,
+    description text,
+    color text,
+    CONSTRAINT check_08cd34b2c2 CHECK ((char_length(color) <= 7)),
+    CONSTRAINT check_1617e0b87e CHECK ((char_length(description) <= 255)),
+    CONSTRAINT check_ab00bc2193 CHECK ((char_length(name) <= 255))
+);
+
+CREATE SEQUENCE compliance_management_frameworks_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE compliance_management_frameworks_id_seq OWNED BY compliance_management_frameworks.id;
+
 CREATE TABLE container_expiration_policies (
     project_id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -14501,7 +14520,8 @@ ALTER SEQUENCE project_ci_cd_settings_id_seq OWNED BY project_ci_cd_settings.id;
 
 CREATE TABLE project_compliance_framework_settings (
     project_id bigint NOT NULL,
-    framework smallint NOT NULL
+    framework_id smallint,
+    CONSTRAINT check_d348de9e2d CHECK ((framework_id IS NOT NULL))
 );
 
 CREATE SEQUENCE project_compliance_framework_settings_project_id_seq
@@ -17233,6 +17253,8 @@ ALTER TABLE ONLY clusters_kubernetes_namespaces ALTER COLUMN id SET DEFAULT next
 
 ALTER TABLE ONLY commit_user_mentions ALTER COLUMN id SET DEFAULT nextval('commit_user_mentions_id_seq'::regclass);
 
+ALTER TABLE ONLY compliance_management_frameworks ALTER COLUMN id SET DEFAULT nextval('compliance_management_frameworks_id_seq'::regclass);
+
 ALTER TABLE ONLY container_repositories ALTER COLUMN id SET DEFAULT nextval('container_repositories_id_seq'::regclass);
 
 ALTER TABLE ONLY conversational_development_index_metrics ALTER COLUMN id SET DEFAULT nextval('conversational_development_index_metrics_id_seq'::regclass);
@@ -18259,6 +18281,9 @@ ALTER TABLE ONLY clusters
 
 ALTER TABLE ONLY commit_user_mentions
     ADD CONSTRAINT commit_user_mentions_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY compliance_management_frameworks
+    ADD CONSTRAINT compliance_management_frameworks_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY container_expiration_policies
     ADD CONSTRAINT container_expiration_policies_pkey PRIMARY KEY (project_id);
@@ -20779,6 +20804,8 @@ CREATE UNIQUE INDEX index_project_auto_devops_on_project_id ON project_auto_devo
 
 CREATE UNIQUE INDEX index_project_ci_cd_settings_on_project_id ON project_ci_cd_settings USING btree (project_id);
 
+CREATE INDEX index_project_compliance_framework_settings_framework_id ON project_compliance_framework_settings USING btree (framework_id);
+
 CREATE INDEX index_project_compliance_framework_settings_on_project_id ON project_compliance_framework_settings USING btree (project_id);
 
 CREATE INDEX index_project_custom_attributes_on_key_and_value ON project_custom_attributes USING btree (key, value);
@@ -22288,6 +22315,9 @@ ALTER TABLE ONLY gitlab_subscriptions
 
 ALTER TABLE ONLY metrics_users_starred_dashboards
     ADD CONSTRAINT fk_bd6ae32fac FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY project_compliance_framework_settings
+    ADD CONSTRAINT fk_be413374a9 FOREIGN KEY (framework_id) REFERENCES compliance_management_frameworks(id) ON DELETE CASCADE NOT VALID;
 
 ALTER TABLE ONLY snippets
     ADD CONSTRAINT fk_be41fd4bb7 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
