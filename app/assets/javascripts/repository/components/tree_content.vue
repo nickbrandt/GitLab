@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     fetchFiles() {
-      const path = this.path || '/';
+      const originalPath = this.path || '/';
       this.isLoadingFiles = true;
 
       return this.$apollo
@@ -91,7 +91,7 @@ export default {
         })
         .then(({ data }) => {
           if (data.errors) throw data.errors;
-          if (!data?.project?.repository || path !== (this.path || '/')) return;
+          if (!data?.project?.repository || originalPath !== (this.path || '/')) return;
 
           const pageInfo = this.hasNextPage(data.project.repository.tree);
 
