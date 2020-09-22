@@ -16,11 +16,9 @@ In either case, an outcome of the experiment should be posted to the issue with 
 
 ## Code reviews
 
-Since the code of experiments will not be part of the codebase for a long time and we want to iterate fast to retrieve data, the code quality of experiments might sometimes not fulfill our standards but should not negatively impact the availability of GitLab whether the experiment is running or not.
-Initially experiments will only be deployed to a fraction of users but we still want a flawless experience for those users. Therefore, experiments still require tests.
+Since the code of experiments may not be part of the codebase for a long time, and we want to iterate quickly to retrieve data, the quality of the experiments' code might sometimes fail our standards. However, whether or not the experiment is running shouldn't negatively impact the availability of GitLab. Initially, experiments will be deployed to only a fraction of users but, we still want a flawless experience for those users. Therefore, experiments still require tests.
 
-For reviewers and maintainers: if you find code that would usually not make it through the review, but is temporarily acceptable, please mention your concerns but note that it's not necessary to change.
-The author then adds a comment to this piece of code and adds a link to the issue that resolves the experiment. If the experiment is successful and becomes part of the product these follow up issues should be addressed.
+For reviewers and maintainers: if you find code that would usually fail review, but is temporarily acceptable, please mention your concerns with a note that it's not necessary to change. The author can then add a comment to this piece of code and link to the issue that resolves the experiment. If the experiment is successful and becomes part of the product, these follow up issues should be addressed.
 
 ## How to create an A/B test
 
