@@ -711,6 +711,15 @@ Gitaly Go process. Some examples of things that are implemented in `gitaly-ruby`
 - RPCs that deal with wikis.
 - RPCs that create commits on behalf of a user, such as merge commits.
 
+We recommend:
+
+- At least 300MB memory per worker.
+- No more than one worker per core.
+
+NOTE: **Note:**
+`gitaly-ruby` is planned to be eventually removed. To track progress, see the
+[Remove the Gitaly-Ruby sidecar](https://gitlab.com/groups/gitlab-org/-/epics/2862) epic.
+
 ### Configure number of `gitaly-ruby` workers
 
 `gitaly-ruby` has much less capacity than Gitaly implemented in Go. If your Gitaly server has to handle lots of
