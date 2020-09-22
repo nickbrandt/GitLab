@@ -84,7 +84,7 @@ export default {
           variables: {
             projectPath: this.projectPath,
             ref: this.ref,
-            path,
+            path: originalPath,
             nextPageCursor: this.nextPageCursor,
             pageSize: this.pageSize,
           },
