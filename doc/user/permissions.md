@@ -225,7 +225,7 @@ Read through the documentation on [permissions for File Locking](project/file_lo
 
 ### Confidential Issues permissions
 
-Confidential issues can be accessed by reporters and higher permission levels,
+Confidential issues can be accessed by users with reporter and higher permission levels,
 as well as by guest users that create a confidential issue. To learn more,
 read through the documentation on [permissions and access to confidential issues](project/issues/confidential_issues.md#permissions-and-access-to-confidential-issues).
 
