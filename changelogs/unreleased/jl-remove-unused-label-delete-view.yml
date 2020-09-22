@@ -1,0 +1,5 @@
+---
+title: Remove unused group label destroy HAML js
+merge_request: 42643
+author:
+type: fixed
