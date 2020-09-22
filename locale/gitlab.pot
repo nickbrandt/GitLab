@@ -1319,7 +1319,13 @@ msgstr ""
 msgid "Access expiration date"
 msgstr ""
 
+msgid "Access expires"
+msgstr ""
+
 msgid "Access forbidden. Check your access level."
+msgstr ""
+
+msgid "Access granted"
 msgstr ""
 
 msgid "Access requests"
@@ -15476,6 +15482,9 @@ msgstr ""
 msgid "Max access level"
 msgstr ""
 
+msgid "Max role"
+msgstr ""
+
 msgid "Max size 15 MB"
 msgstr ""
 
@@ -17238,6 +17247,9 @@ msgid "No matching results"
 msgstr ""
 
 msgid "No matching results for \"%{query}\""
+msgstr ""
+
+msgid "No members found"
 msgstr ""
 
 msgid "No merge requests found"
@@ -21575,6 +21587,9 @@ msgid "Request parameter %{param} is missing."
 msgstr ""
 
 msgid "Request to link SAML account must be authorized"
+msgstr ""
+
+msgid "Requested"
 msgstr ""
 
 msgid "Requested %{time_ago}"
