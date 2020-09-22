@@ -17687,6 +17687,9 @@ msgstr ""
 msgid "OnDemandScans|Scan mode"
 msgstr ""
 
+msgid "OnDemandScans|Scanner profile"
+msgstr ""
+
 msgid "OnDemandScans|Scanner settings"
 msgstr ""
 
@@ -17694,6 +17697,9 @@ msgid "OnDemandScans|Schedule or run scans immediately against target sites. Cur
 msgstr ""
 
 msgid "OnDemandScans|Select one of the existing profiles"
+msgstr ""
+
+msgid "OnDemandScans|Site profile"
 msgstr ""
 
 msgid "OnDemandScans|Site profiles"
