@@ -340,7 +340,7 @@ The **Internal users** field allows specifying an email address regex pattern to
 identify default internal users. New users whose email address matches the regex
 pattern are set to internal by default rather than an external collaborator.
 
-The regex pattern format is Ruby, but it needs to be convertible to JavaScript,
+The regex pattern format is in Ruby, but it needs to be convertible to JavaScript,
 and the ignore case flag is set (`/regex pattern/i`). Here are some examples:
 
 - Use `\.internal@domain\.com$` to mark email addresses ending with
