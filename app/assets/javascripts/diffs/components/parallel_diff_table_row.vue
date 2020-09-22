@@ -341,6 +341,7 @@ export default {
       <td :class="parallelViewLeftLineType" class="line-coverage left-side"></td>
       <td
         :id="line.left.line_code"
+        :key="line.left.line_code"
         v-safe-html="line.left.rich_text"
         :class="parallelViewLeftLineType"
         class="line_content with-coverage parallel left-side"
@@ -401,6 +402,7 @@ export default {
       ></td>
       <td
         :id="line.right.line_code"
+        :key="line.right.rich_text"
         v-safe-html="line.right.rich_text"
         :class="[
           line.right.type,

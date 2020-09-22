@@ -242,6 +242,7 @@ export default {
       class="line-coverage"
     ></td>
     <td
+      :key="line.line_code"
       v-safe-html="line.rich_text"
       :class="[
         line.type,
