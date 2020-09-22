@@ -1,3 +1,7 @@
+<% if vulnerability.is_a? Vulnerability %>
+Issue created from vulnerability <%= link_to vulnerability.id, Gitlab::UrlBuilder.build(vulnerability) %>
+
+<% end %>
 ### <%= _("Description") %>:
 
 <%= vulnerability.description %>
