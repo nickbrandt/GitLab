@@ -11077,6 +11077,9 @@ msgstr ""
 msgid "Filter by user"
 msgstr ""
 
+msgid "Filter parameters are not valid. Make sure that the end date is after the start date."
+msgstr ""
+
 msgid "Filter pipelines"
 msgstr ""
 
@@ -24105,9 +24108,6 @@ msgid "Start a review"
 msgstr ""
 
 msgid "Start and due date"
-msgstr ""
-
-msgid "Start by choosing a group to see how your team is spending time. You can then drill down to the project level."
 msgstr ""
 
 msgid "Start by choosing a group to start exploring the merge requests in that group. You can then proceed to filter by projects, labels, milestones and authors."

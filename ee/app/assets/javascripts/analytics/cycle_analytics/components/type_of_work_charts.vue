@@ -28,7 +28,7 @@ export default {
         startDate,
         endDate,
         selectedProjectIds,
-        selectedGroup: { name: groupName },
+        currentGroup: { name: groupName },
       } = this.selectedTasksByTypeFilters;
 
       const selectedProjectCount = selectedProjectIds.length;
