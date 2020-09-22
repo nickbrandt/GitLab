@@ -1,6 +1,6 @@
 <script>
 import produce from 'immer';
-import { GlAlert, GlButton, GlIntersectionObserver } from '@gitlab/ui';
+import { GlAlert, GlLoadingIcon, GlIntersectionObserver } from '@gitlab/ui';
 import { __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import VulnerabilityList from './vulnerability_list.vue';
@@ -13,7 +13,7 @@ export default {
   name: 'ProjectVulnerabilitiesApp',
   components: {
     GlAlert,
-    GlButton,
+    GlLoadingIcon,
     GlIntersectionObserver,
     VulnerabilityList,
   },
@@ -152,12 +152,8 @@ export default {
       class="text-center"
       @appear="fetchNextPage"
     >
-      <gl-button
-        :loading="isLoadingVulnerabilities"
-        :disabled="isLoadingVulnerabilities"
-        @click="fetchNextPage"
-        >{{ s__('SecurityReports|Load more vulnerabilities') }}</gl-button
-      >
+      <gl-loading-icon v-if="isLoadingVulnerabilities" size="md" />
+      <span v-else>&nbsp;</span>
     </gl-intersection-observer>
   </div>
 </template>
