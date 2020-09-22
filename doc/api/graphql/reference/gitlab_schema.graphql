@@ -11537,6 +11537,11 @@ enum PackageTypeEnum {
   GENERIC
 
   """
+  Packages from the golang package manager
+  """
+  GOLANG
+
+  """
   Packages from the maven package manager
   """
   MAVEN
