@@ -123,6 +123,19 @@ spec:
     expect(findPoliciesTable().element).toMatchSnapshot();
   });
 
+  describe('with allEnvironments enabled', () => {
+    beforeEach(() => {
+      wrapper.vm.$store.state.threatMonitoring.allEnvironments = true;
+    });
+
+    it('renders policies table', () => {
+      const namespaceHeader = findPoliciesTable()
+        .findAll('[role="columnheader"]')
+        .at(1);
+      expect(namespaceHeader.text()).toBe('Namespace');
+    });
+  });
+
   it('renders closed editor drawer', () => {
     const editorDrawer = findEditorDrawer();
     expect(editorDrawer.exists()).toBe(true);
