@@ -14048,6 +14048,11 @@ type Query {
     Search query for project name, path, or description
     """
     search: String
+
+    """
+    Include namespace in project search
+    """
+    searchNamespaces: Boolean
   ): ProjectConnection
 
   """
