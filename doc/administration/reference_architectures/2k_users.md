@@ -43,7 +43,7 @@ doesn't require you to provision and maintain a node.
 To set up GitLab and its components to accommodate up to 2,000 users:
 
 1. [Configure the external load balancing node](#configure-the-external-load-balancer)
-   to handle the load balancing of the two GitLab application services nodes.
+   to handle the load balancing of the GitLab application services nodes.
 1. [Configure PostgreSQL](#configure-postgresql), the database for GitLab.
 1. [Configure Redis](#configure-redis).
 1. [Configure Gitaly](#configure-gitaly), which provides access to the Git
@@ -55,7 +55,7 @@ To set up GitLab and its components to accommodate up to 2,000 users:
    environment.
 1. [Configure the object storage](#configure-the-object-storage) used for
    shared data objects.
-1. [Configure Advanced Search (optional)](#configure-advanced-search) for faster,
+1. [Configure Advanced Search](#configure-advanced-search) (optional) for faster,
    more advanced code search across your entire GitLab instance.
 1. [Configure NFS](#configure-nfs-optional) (optional, and not recommended)
    to have shared disk storage service as an alternative to Gitaly or object
