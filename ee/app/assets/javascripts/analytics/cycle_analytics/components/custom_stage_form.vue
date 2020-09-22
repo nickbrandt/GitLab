@@ -260,9 +260,6 @@ export default {
       <gl-dropdown
         :text="__('Recover hidden stage')"
         class="js-recover-hidden-stage-dropdown"
-        category="tertiary"
-        variant="default"
-        size="medium"
       >
         <gl-dropdown-section-header>{{ __('Default stages') }}</gl-dropdown-section-header>
         <template v-if="hasHiddenStages">
