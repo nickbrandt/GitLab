@@ -1,5 +1,3 @@
-- return unless @project.feature_available?(:tracing, current_user)
-
 - setting = tracing_setting
 - has_jaeger_url = setting.external_url.present?
 
@@ -11,7 +9,7 @@
       = _('Expand')
     %p
       - if has_jaeger_url
-        - tracing_link = link_to sanitize(@project.tracing_external_url, scrubber: Rails::Html::TextOnlyScrubber.new), target: "_blank", rel: 'noopener noreferrer' do
+        - tracing_link = link_to sanitize(setting.external_url, scrubber: Rails::Html::TextOnlyScrubber.new), target: "_blank", rel: 'noopener noreferrer' do
           %span
             = _('Tracing')
             = sprite_icon('external-link', css_class: 'ml-1 vertical-align-middle')
