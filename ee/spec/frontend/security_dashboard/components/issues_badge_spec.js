@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlIcon, GlPopover } from '@gitlab/ui';
+import { GlIcon, GlPopover, GlBadge } from '@gitlab/ui';
 import IssuesBadge from 'ee/security_dashboard/components/issues_badge.vue';
 import IssueLink from 'ee/vulnerabilities/components/issue_link.vue';
 
@@ -8,11 +8,12 @@ describe('Remediated badge component', () => {
   let wrapper;
 
   const findIcon = () => wrapper.find(GlIcon);
+  const findBadge = () => wrapper.find(GlBadge);
   const findIssueLink = () => wrapper.findAll(IssueLink);
   const findPopover = () => wrapper.find(GlPopover);
 
   const createWrapper = ({ propsData }) => {
-    return shallowMount(IssuesBadge, { propsData, stubs: { GlPopover } });
+    return shallowMount(IssuesBadge, { propsData, stubs: { GlPopover, GlBadge } });
   };
 
   afterEach(() => {
@@ -35,15 +36,15 @@ describe('Remediated badge component', () => {
     });
 
     it('displays the issues', () => {
-      expect(findIssueLink().length).toBe(issues.length);
+      expect(findIssueLink()).toHaveLength(issues.length);
     });
 
     it('displays the correct number of issues in the badge', () => {
-      expect(wrapper.text()).toContain('2');
+      expect(findBadge().text()).toBe('2');
     });
 
     it('displays the correct number of issues in the popover title', () => {
-      expect(findPopover().text()).toContain('2 Issues');
+      expect(findPopover().text()).toBe('2 Issues');
     });
   });
 
@@ -53,11 +54,11 @@ describe('Remediated badge component', () => {
     });
 
     it('displays the correct number of issues in the badge', () => {
-      expect(wrapper.text()).toContain('0');
+      expect(findBadge().text()).toBe('0');
     });
 
     it('displays the correct number of issues in the popover title', () => {
-      expect(findPopover().text()).toContain('0 Issues');
+      expect(findPopover().text()).toBe('0 Issues');
     });
   });
 });

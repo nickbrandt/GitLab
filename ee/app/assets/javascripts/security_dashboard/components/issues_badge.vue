@@ -1,6 +1,7 @@
 <script>
 import { GlIcon, GlPopover, GlBadge } from '@gitlab/ui';
 import IssueLink from 'ee/vulnerabilities/components/issue_link.vue';
+import { n__ } from '~/locale';
 
 export default {
   components: {
@@ -19,6 +20,9 @@ export default {
     numberOfIssues() {
       return this.issues.length;
     },
+    popoverTitle() {
+      return n__('1 Issue', '%d Issues', this.numberOfIssues);
+    },
   },
 };
 </script>
@@ -31,7 +35,7 @@ export default {
     </gl-badge>
     <gl-popover ref="popover" :target="() => $refs.issueBadge.$el" triggers="hover" placement="top">
       <template #title>
-        {{ n__('1 Issue', '%d Issues', numberOfIssues) }}
+        {{ popoverTitle }}
       </template>
       <div v-for="{ issue } in issues" :key="issue.iid">
         <issue-link :issue="issue" />
