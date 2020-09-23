@@ -3,7 +3,6 @@ package objectstore_test
 import (
 	"context"
 	"fmt"
-	"io"
 	"strings"
 	"testing"
 	"time"
@@ -24,19 +23,15 @@ func TestGoCloudObjectUpload(t *testing.T) {
 
 	objectName := "test.png"
 	testURL := "azuretest://azure.example.com/test-container"
-	p := &objectstore.GoCloudObjectParams{Ctx: ctx, Mux: mux, BucketURL: testURL, ObjectName: objectName, Deadline: deadline}
+	p := &objectstore.GoCloudObjectParams{Ctx: ctx, Mux: mux, BucketURL: testURL, ObjectName: objectName}
 	object, err := objectstore.NewGoCloudObject(p)
 	require.NotNil(t, object)
 	require.NoError(t, err)
 
 	// copy data
-	n, err := io.Copy(object, strings.NewReader(test.ObjectContent))
+	n, err := object.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 	require.NoError(t, err)
 	require.Equal(t, test.ObjectSize, n, "Uploaded file mismatch")
-
-	// close HTTP stream
-	err = object.Close()
-	require.NoError(t, err)
 
 	bucket, err := mux.OpenBucket(ctx, testURL)
 	require.NoError(t, err)

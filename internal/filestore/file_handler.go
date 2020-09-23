@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -98,38 +99,28 @@ func (fh *FileHandler) GitLabFinalizeFields(prefix string) (map[string]string, e
 	return data, nil
 }
 
-// Upload represents a destination where we store an upload
-type uploadWriter interface {
-	io.WriteCloser
-	CloseWithError(error) error
-	ETag() string
+type consumer interface {
+	Consume(context.Context, io.Reader, time.Time) (int64, error)
 }
 
 // SaveFileFromReader persists the provided reader content to all the location specified in opts. A cleanup will be performed once ctx is Done
 // Make sure the provided context will not expire before finalizing upload with GitLab Rails.
 func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts *SaveFileOpts) (fh *FileHandler, err error) {
-	var uploadWriter uploadWriter
+	var uploadDestination consumer
 	fh = &FileHandler{
 		Name:      opts.TempFilePrefix,
 		RemoteID:  opts.RemoteID,
 		RemoteURL: opts.RemoteURL,
 	}
 	hashes := newMultiHash()
-	writers := []io.Writer{hashes.Writer}
-	defer func() {
-		for _, w := range writers {
-			if closer, ok := w.(io.WriteCloser); ok {
-				closer.Close()
-			}
-		}
-	}()
+	reader = io.TeeReader(reader, hashes.Writer)
 
 	var clientMode string
 
 	switch {
 	case opts.IsLocal():
 		clientMode = "local"
-		uploadWriter, err = fh.uploadLocalFile(ctx, opts)
+		uploadDestination, err = fh.uploadLocalFile(ctx, opts)
 	case opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsGoCloud():
 		clientMode = fmt.Sprintf("go_cloud:%s", opts.ObjectStorageConfig.Provider)
 		p := &objectstore.GoCloudObjectParams{
@@ -137,38 +128,31 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 			Mux:        opts.ObjectStorageConfig.URLMux,
 			BucketURL:  opts.ObjectStorageConfig.GoCloudConfig.URL,
 			ObjectName: opts.RemoteTempObjectID,
-			Deadline:   opts.Deadline,
 		}
-		uploadWriter, err = objectstore.NewGoCloudObject(p)
+		uploadDestination, err = objectstore.NewGoCloudObject(p)
 	case opts.UseWorkhorseClientEnabled() && opts.ObjectStorageConfig.IsAWS() && opts.ObjectStorageConfig.IsValid():
 		clientMode = "s3"
-		uploadWriter, err = objectstore.NewS3Object(
-			ctx,
+		uploadDestination, err = objectstore.NewS3Object(
 			opts.RemoteTempObjectID,
 			opts.ObjectStorageConfig.S3Credentials,
 			opts.ObjectStorageConfig.S3Config,
-			opts.Deadline,
 		)
 	case opts.IsMultipart():
 		clientMode = "multipart"
-		uploadWriter, err = objectstore.NewMultipart(
-			ctx,
+		uploadDestination, err = objectstore.NewMultipart(
 			opts.PresignedParts,
 			opts.PresignedCompleteMultipart,
 			opts.PresignedAbortMultipart,
 			opts.PresignedDelete,
 			opts.PutHeaders,
-			opts.Deadline,
 			opts.PartSize,
 		)
 	default:
 		clientMode = "http"
-		uploadWriter, err = objectstore.NewObject(
-			ctx,
+		uploadDestination, err = objectstore.NewObject(
 			opts.PresignedPut,
 			opts.PresignedDelete,
 			opts.PutHeaders,
-			opts.Deadline,
 			size,
 		)
 	}
@@ -177,32 +161,20 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 		return nil, err
 	}
 
-	writers = append(writers, uploadWriter)
-
-	defer func() {
-		if err != nil {
-			uploadWriter.CloseWithError(err)
-		}
-	}()
-
 	if opts.MaximumSize > 0 {
 		if size > opts.MaximumSize {
 			return nil, SizeError(fmt.Errorf("the upload size %d is over maximum of %d bytes", size, opts.MaximumSize))
 		}
 
-		// We allow to read an extra byte to check later if we exceed the max size
-		reader = &io.LimitedReader{R: reader, N: opts.MaximumSize + 1}
+		reader = &hardLimitReader{r: reader, n: opts.MaximumSize}
 	}
 
-	multiWriter := io.MultiWriter(writers...)
-	fh.Size, err = io.Copy(multiWriter, reader)
+	fh.Size, err = uploadDestination.Consume(ctx, reader, opts.Deadline)
 	if err != nil {
+		if err == objectstore.ErrNotEnoughParts {
+			err = ErrEntityTooLarge
+		}
 		return nil, err
-	}
-
-	if opts.MaximumSize > 0 && fh.Size > opts.MaximumSize {
-		// An extra byte was read thus exceeding the max size
-		return nil, ErrEntityTooLarge
 	}
 
 	if size != -1 && size != fh.Size {
@@ -226,25 +198,11 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 	}
 
 	logger.Info("saved file")
-
 	fh.hashes = hashes.finish()
-
-	// we need to close the writer in order to get ETag header
-	err = uploadWriter.Close()
-	if err != nil {
-		if err == objectstore.ErrNotEnoughParts {
-			return nil, ErrEntityTooLarge
-		}
-		return nil, err
-	}
-
-	etag := uploadWriter.ETag()
-	fh.hashes["etag"] = etag
-
-	return fh, err
+	return fh, nil
 }
 
-func (fh *FileHandler) uploadLocalFile(ctx context.Context, opts *SaveFileOpts) (uploadWriter, error) {
+func (fh *FileHandler) uploadLocalFile(ctx context.Context, opts *SaveFileOpts) (consumer, error) {
 	// make sure TempFolder exists
 	err := os.MkdirAll(opts.LocalTempPath, 0700)
 	if err != nil {
@@ -262,13 +220,19 @@ func (fh *FileHandler) uploadLocalFile(ctx context.Context, opts *SaveFileOpts) 
 	}()
 
 	fh.LocalPath = file.Name()
-	return &nopUpload{file}, nil
+	return &localUpload{file}, nil
 }
 
-type nopUpload struct{ io.WriteCloser }
+type localUpload struct{ io.WriteCloser }
 
-func (nop *nopUpload) CloseWithError(error) error { return nop.Close() }
-func (nop *nopUpload) ETag() string               { return "" }
+func (loc *localUpload) Consume(_ context.Context, r io.Reader, _ time.Time) (int64, error) {
+	n, err := io.Copy(loc.WriteCloser, r)
+	errClose := loc.Close()
+	if err == nil {
+		err = errClose
+	}
+	return n, err
+}
 
 // SaveFileFromDisk open the local file fileName and calls SaveFileFromReader
 func SaveFileFromDisk(ctx context.Context, fileName string, opts *SaveFileOpts) (fh *FileHandler, err error) {

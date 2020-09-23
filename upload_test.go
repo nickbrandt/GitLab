@@ -79,7 +79,7 @@ func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.
 
 		require.NoError(t, r.ParseMultipartForm(100000))
 
-		const nValues = 11 // file name, path, remote_url, remote_id, size, md5, sha1, sha256, sha512, gitlab-workhorse-upload, etag for just the upload (no metadata because we are not POSTing a valid zip file)
+		const nValues = 10 // file name, path, remote_url, remote_id, size, md5, sha1, sha256, sha512, gitlab-workhorse-upload for just the upload (no metadata because we are not POSTing a valid zip file)
 		require.Len(t, r.MultipartForm.Value, nValues)
 
 		require.Empty(t, r.MultipartForm.File, "multipart form files")

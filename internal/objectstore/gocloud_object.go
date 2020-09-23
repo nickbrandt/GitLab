@@ -15,7 +15,7 @@ type GoCloudObject struct {
 	mux        *blob.URLMux
 	bucketURL  string
 	objectName string
-	uploader
+	*uploader
 }
 
 type GoCloudObjectParams struct {
@@ -23,7 +23,6 @@ type GoCloudObjectParams struct {
 	Mux        *blob.URLMux
 	BucketURL  string
 	ObjectName string
-	Deadline   time.Time
 }
 
 func NewGoCloudObject(p *GoCloudObjectParams) (*GoCloudObject, error) {
@@ -40,8 +39,6 @@ func NewGoCloudObject(p *GoCloudObjectParams) (*GoCloudObject, error) {
 	}
 
 	o.uploader = newUploader(o)
-	o.Execute(p.Ctx, p.Deadline)
-
 	return o, nil
 }
 

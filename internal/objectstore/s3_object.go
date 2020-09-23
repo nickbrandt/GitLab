@@ -19,10 +19,10 @@ type S3Object struct {
 	objectName  string
 	uploaded    bool
 
-	uploader
+	*uploader
 }
 
-func NewS3Object(ctx context.Context, objectName string, s3Credentials config.S3Credentials, s3Config config.S3Config, deadline time.Time) (*S3Object, error) {
+func NewS3Object(objectName string, s3Credentials config.S3Credentials, s3Config config.S3Config) (*S3Object, error) {
 	o := &S3Object{
 		credentials: s3Credentials,
 		config:      s3Config,
@@ -30,8 +30,6 @@ func NewS3Object(ctx context.Context, objectName string, s3Credentials config.S3
 	}
 
 	o.uploader = newUploader(o)
-	o.Execute(ctx, deadline)
-
 	return o, nil
 }
 

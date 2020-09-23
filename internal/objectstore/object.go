@@ -47,17 +47,17 @@ type Object struct {
 	etag       string
 	metrics    bool
 
-	uploader
+	*uploader
 }
 
 type StatusCodeError error
 
 // NewObject opens an HTTP connection to Object Store and returns an Object pointer that can be used for uploading.
-func NewObject(ctx context.Context, putURL, deleteURL string, putHeaders map[string]string, deadline time.Time, size int64) (*Object, error) {
-	return newObject(ctx, putURL, deleteURL, putHeaders, deadline, size, true)
+func NewObject(putURL, deleteURL string, putHeaders map[string]string, size int64) (*Object, error) {
+	return newObject(putURL, deleteURL, putHeaders, size, true)
 }
 
-func newObject(ctx context.Context, putURL, deleteURL string, putHeaders map[string]string, deadline time.Time, size int64, metrics bool) (*Object, error) {
+func newObject(putURL, deleteURL string, putHeaders map[string]string, size int64, metrics bool) (*Object, error) {
 	o := &Object{
 		putURL:     putURL,
 		deleteURL:  deleteURL,
@@ -66,9 +66,7 @@ func newObject(ctx context.Context, putURL, deleteURL string, putHeaders map[str
 		metrics:    metrics,
 	}
 
-	o.uploader = newMD5Uploader(o, metrics)
-	o.Execute(ctx, deadline)
-
+	o.uploader = newETagCheckUploader(o, metrics)
 	return o, nil
 }
 
