@@ -21335,6 +21335,8 @@ CREATE UNIQUE INDEX index_user_interacted_projects_on_project_id_and_user_id ON 
 
 CREATE INDEX index_user_interacted_projects_on_user_id ON user_interacted_projects USING btree (user_id);
 
+CREATE INDEX index_user_preferences_on_gitpod_enabled ON user_preferences USING btree (gitpod_enabled);
+
 CREATE UNIQUE INDEX index_user_preferences_on_user_id ON user_preferences USING btree (user_id);
 
 CREATE INDEX index_user_statuses_on_user_id ON user_statuses USING btree (user_id);
