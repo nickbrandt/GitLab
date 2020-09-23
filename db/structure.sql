@@ -9196,7 +9196,6 @@ CREATE TABLE application_settings (
     throttle_incident_management_notification_enabled boolean DEFAULT false NOT NULL,
     throttle_incident_management_notification_period_in_seconds integer DEFAULT 3600,
     throttle_incident_management_notification_per_period integer DEFAULT 3600,
-    snowplow_iglu_registry_url character varying(255),
     push_event_hooks_limit integer DEFAULT 3 NOT NULL,
     push_event_activities_limit integer DEFAULT 3 NOT NULL,
     custom_http_clone_url_root character varying(511),
