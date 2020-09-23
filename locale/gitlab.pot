@@ -3003,6 +3003,9 @@ msgstr ""
 msgid "An unknown error occurred while loading this graph."
 msgstr ""
 
+msgid "An unknown error occurred."
+msgstr ""
+
 msgid "Analytics"
 msgstr ""
 
@@ -28466,6 +28469,9 @@ msgid "Warning:"
 msgstr ""
 
 msgid "Warning: Displaying this diagram might cause performance issues on this page."
+msgstr ""
+
+msgid "We are currently unable to fetch data for the pipeline header."
 msgstr ""
 
 msgid "We are currently unable to fetch data for this graph."
