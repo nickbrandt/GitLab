@@ -140,11 +140,17 @@ class ApprovalMergeRequestRule < ApplicationRecord
   private
 
   def different_groups?
-    groups.sort != approval_project_rule.groups.sort
+    group_ids = groups.collect(&:id)
+    apr_group_ids = approval_project_rule.groups.pluck(:id)
+
+    group_ids & apr_group_ids == group_ids
   end
 
   def different_users?
-    users.sort != approval_project_rule.users.sort
+    user_ids = users.collect(&:id)
+    apr_user_ids = approval_project_rule.users.pluck(:id)
+
+    user_ids & apr_user_ids == user_ids
   end
 
   def different_name_or_approvals_required?
