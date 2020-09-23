@@ -3,7 +3,6 @@ package objectstore_test
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -44,17 +43,13 @@ func TestS3ObjectUpload(t *testing.T) {
 			objectName := filepath.Join(tmpDir, "s3-test-data")
 			ctx, cancel := context.WithCancel(context.Background())
 
-			object, err := objectstore.NewS3Object(ctx, objectName, creds, config, deadline)
+			object, err := objectstore.NewS3Object(objectName, creds, config)
 			require.NoError(t, err)
 
 			// copy data
-			n, err := io.Copy(object, strings.NewReader(test.ObjectContent))
+			n, err := object.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 			require.NoError(t, err)
 			require.Equal(t, test.ObjectSize, n, "Uploaded file mismatch")
-
-			// close HTTP stream
-			err = object.Close()
-			require.NoError(t, err)
 
 			test.S3ObjectExists(t, sess, config, objectName, test.ObjectContent)
 			test.CheckS3Metadata(t, sess, config, objectName)
@@ -107,16 +102,13 @@ func TestConcurrentS3ObjectUpload(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			object, err := objectstore.NewS3Object(ctx, objectName, creds, config, deadline)
+			object, err := objectstore.NewS3Object(objectName, creds, config)
 			require.NoError(t, err)
 
 			// copy data
-			n, err := io.Copy(object, strings.NewReader(test.ObjectContent))
+			n, err := object.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 			require.NoError(t, err)
 			require.Equal(t, test.ObjectSize, n, "Uploaded file mismatch")
-
-			// close HTTP stream
-			require.NoError(t, object.Close())
 
 			test.S3ObjectExists(t, sess, config, objectName, test.ObjectContent)
 			wg.Done()
@@ -139,7 +131,7 @@ func TestS3ObjectUploadCancel(t *testing.T) {
 
 	objectName := filepath.Join(tmpDir, "s3-test-data")
 
-	object, err := objectstore.NewS3Object(ctx, objectName, creds, config, deadline)
+	object, err := objectstore.NewS3Object(objectName, creds, config)
 
 	require.NoError(t, err)
 
@@ -147,6 +139,6 @@ func TestS3ObjectUploadCancel(t *testing.T) {
 	// we handle this gracefully.
 	cancel()
 
-	_, err = io.Copy(object, strings.NewReader(test.ObjectContent))
+	_, err = object.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 	require.Error(t, err)
 }

@@ -48,19 +48,17 @@ func TestMultipartUploadWithUpcaseETags(t *testing.T) {
 
 	deadline := time.Now().Add(testTimeout)
 
-	m, err := objectstore.NewMultipart(ctx,
+	m, err := objectstore.NewMultipart(
 		[]string{ts.URL},    // a single presigned part URL
 		ts.URL,              // the complete multipart upload URL
 		"",                  // no abort
 		"",                  // no delete
 		map[string]string{}, // no custom headers
-		deadline,
-		test.ObjectSize) // parts size equal to the whole content. Only 1 part
+		test.ObjectSize)     // parts size equal to the whole content. Only 1 part
 	require.NoError(t, err)
 
-	_, err = m.Write([]byte(test.ObjectContent))
+	_, err = m.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 	require.NoError(t, err)
-	require.NoError(t, m.Close())
 	require.Equal(t, 1, putCnt, "1 part expected")
 	require.Equal(t, 1, postCnt, "1 complete multipart upload expected")
 }

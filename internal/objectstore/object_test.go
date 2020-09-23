@@ -35,17 +35,13 @@ func testObjectUploadNoErrors(t *testing.T, startObjectStore osFactory, useDelet
 	defer cancel()
 
 	deadline := time.Now().Add(testTimeout)
-	object, err := objectstore.NewObject(ctx, objectURL, deleteURL, putHeaders, deadline, test.ObjectSize)
+	object, err := objectstore.NewObject(objectURL, deleteURL, putHeaders, test.ObjectSize)
 	require.NoError(t, err)
 
 	// copy data
-	n, err := io.Copy(object, strings.NewReader(test.ObjectContent))
+	n, err := object.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 	require.NoError(t, err)
 	require.Equal(t, test.ObjectSize, n, "Uploaded file mismatch")
-
-	// close HTTP stream
-	err = object.Close()
-	require.NoError(t, err)
 
 	require.Equal(t, contentType, osStub.GetHeader(test.ObjectPath, "Content-Type"))
 
@@ -107,12 +103,10 @@ func TestObjectUpload404(t *testing.T) {
 
 	deadline := time.Now().Add(testTimeout)
 	objectURL := ts.URL + test.ObjectPath
-	object, err := objectstore.NewObject(ctx, objectURL, "", map[string]string{}, deadline, test.ObjectSize)
+	object, err := objectstore.NewObject(objectURL, "", map[string]string{}, test.ObjectSize)
 	require.NoError(t, err)
-	_, err = io.Copy(object, strings.NewReader(test.ObjectContent))
+	_, err = object.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 
-	require.NoError(t, err)
-	err = object.Close()
 	require.Error(t, err)
 	_, isStatusCodeError := err.(objectstore.StatusCodeError)
 	require.True(t, isStatusCodeError, "Should fail with StatusCodeError")
@@ -152,13 +146,10 @@ func TestObjectUploadBrokenConnection(t *testing.T) {
 
 	deadline := time.Now().Add(testTimeout)
 	objectURL := ts.URL + test.ObjectPath
-	object, err := objectstore.NewObject(ctx, objectURL, "", map[string]string{}, deadline, -1)
+	object, err := objectstore.NewObject(objectURL, "", map[string]string{}, -1)
 	require.NoError(t, err)
 
-	_, copyErr := io.Copy(object, &endlessReader{})
+	_, copyErr := object.Consume(ctx, &endlessReader{}, deadline)
 	require.Error(t, copyErr)
 	require.NotEqual(t, io.ErrClosedPipe, copyErr, "We are shadowing the real error")
-
-	closeErr := object.Close()
-	require.Equal(t, copyErr, closeErr)
 }

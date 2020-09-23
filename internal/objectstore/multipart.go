@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"time"
 
 	"gitlab.com/gitlab-org/labkit/log"
 	"gitlab.com/gitlab-org/labkit/mask"
@@ -33,13 +32,13 @@ type Multipart struct {
 	partSize   int64
 	etag       string
 
-	uploader
+	*uploader
 }
 
 // NewMultipart provides Multipart pointer that can be used for uploading. Data written will be split buffered on disk up to size bytes
 // then uploaded with S3 Upload Part. Once Multipart is Closed a final call to CompleteMultipartUpload will be sent.
 // In case of any error a call to AbortMultipartUpload will be made to cleanup all the resources
-func NewMultipart(ctx context.Context, partURLs []string, completeURL, abortURL, deleteURL string, putHeaders map[string]string, deadline time.Time, partSize int64) (*Multipart, error) {
+func NewMultipart(partURLs []string, completeURL, abortURL, deleteURL string, putHeaders map[string]string, partSize int64) (*Multipart, error) {
 	m := &Multipart{
 		PartURLs:    partURLs,
 		CompleteURL: completeURL,
@@ -50,8 +49,6 @@ func NewMultipart(ctx context.Context, partURLs []string, completeURL, abortURL,
 	}
 
 	m.uploader = newUploader(m)
-	m.Execute(ctx, deadline)
-
 	return m, nil
 }
 
@@ -109,7 +106,7 @@ func (m *Multipart) readAndUploadOnePart(ctx context.Context, partURL string, pu
 
 	n, err := io.Copy(file, src)
 	if err != nil {
-		return nil, fmt.Errorf("write part %d to disk: %v", partNumber, err)
+		return nil, err
 	}
 	if n == 0 {
 		return nil, nil
@@ -132,18 +129,15 @@ func (m *Multipart) uploadPart(ctx context.Context, url string, headers map[stri
 		return "", fmt.Errorf("missing deadline")
 	}
 
-	part, err := newObject(ctx, url, "", headers, deadline, size, false)
+	part, err := newObject(url, "", headers, size, false)
 	if err != nil {
 		return "", err
 	}
 
-	_, err = io.CopyN(part, body, size)
-	if err != nil {
-		return "", err
-	}
-
-	err = part.Close()
-	if err != nil {
+	if n, err := part.Consume(ctx, io.LimitReader(body, size), deadline); err != nil || n < size {
+		if err == nil {
+			err = io.ErrUnexpectedEOF
+		}
 		return "", err
 	}
 

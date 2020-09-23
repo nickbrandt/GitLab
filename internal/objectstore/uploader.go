@@ -8,177 +8,89 @@ import (
 	"hash"
 	"io"
 	"strings"
-	"sync"
 	"time"
 
 	"gitlab.com/gitlab-org/labkit/log"
 )
 
-// uploader is an io.WriteCloser that can be used as write end of the uploading pipe.
+// uploader consumes an io.Reader and uploads it using a pluggable uploadStrategy.
 type uploader struct {
-	// etag is the object storage provided checksum
-	etag string
-
-	// md5 is an optional hasher for calculating md5 on the fly
-	md5 hash.Hash
-
-	w io.Writer
-
-	// uploadError is the last error occourred during upload
-	uploadError error
-	// ctx is the internal context bound to the upload request
-	ctx context.Context
-
-	pr       *io.PipeReader
-	pw       *io.PipeWriter
 	strategy uploadStrategy
-	metrics  bool
 
-	// closeOnce is used to prevent multiple calls to pw.Close
-	// which may result to Close overriding the error set by CloseWithError
-	// Bug fixed in v1.14: https://github.com/golang/go/commit/f45eb9ff3c96dfd951c65d112d033ed7b5e02432
-	closeOnce sync.Once
+	// In the case of S3 uploads, we have a multipart upload which
+	// instantiates uploads for the individual parts. We don't want to
+	// increment metrics for the individual parts, so that is why we have
+	// this boolean flag.
+	metrics bool
+
+	// With S3 we compare the MD5 of the data we sent with the ETag returned
+	// by the object storage server.
+	checkETag bool
 }
 
-func newUploader(strategy uploadStrategy) uploader {
-	pr, pw := io.Pipe()
-	return uploader{w: pw, pr: pr, pw: pw, strategy: strategy, metrics: true}
+func newUploader(strategy uploadStrategy) *uploader {
+	return &uploader{strategy: strategy, metrics: true}
 }
 
-func newMD5Uploader(strategy uploadStrategy, metrics bool) uploader {
-	pr, pw := io.Pipe()
-	hasher := md5.New()
-	mw := io.MultiWriter(pw, hasher)
-	return uploader{w: mw, pr: pr, pw: pw, md5: hasher, strategy: strategy, metrics: metrics}
+func newETagCheckUploader(strategy uploadStrategy, metrics bool) *uploader {
+	return &uploader{strategy: strategy, metrics: metrics, checkETag: true}
 }
 
-// Close implements the standard io.Closer interface: it closes the http client request.
-// This method will also wait for the connection to terminate and return any error occurred during the upload
-func (u *uploader) Close() error {
-	var closeError error
-	u.closeOnce.Do(func() {
-		closeError = u.pw.Close()
-	})
-	if closeError != nil {
-		return closeError
-	}
+func hexString(h hash.Hash) string { return hex.EncodeToString(h.Sum(nil)) }
 
-	<-u.ctx.Done()
-
-	if err := u.ctx.Err(); err == context.DeadlineExceeded {
-		return err
-	}
-
-	return u.uploadError
-}
-
-func (u *uploader) CloseWithError(err error) error {
-	u.closeOnce.Do(func() {
-		u.pw.CloseWithError(err)
-	})
-
-	return nil
-}
-
-func (u *uploader) Write(p []byte) (int, error) {
-	return u.w.Write(p)
-}
-
-func (u *uploader) md5Sum() string {
-	if u.md5 == nil {
-		return ""
-	}
-
-	checksum := u.md5.Sum(nil)
-	return hex.EncodeToString(checksum)
-}
-
-// ETag returns the checksum of the uploaded object returned by the ObjectStorage provider via ETag Header.
-// This method will wait until upload context is done before returning.
-func (u *uploader) ETag() string {
-	<-u.ctx.Done()
-
-	return u.etag
-}
-
-func (u *uploader) Execute(ctx context.Context, deadline time.Time) {
+// Consume reads the reader until it reaches EOF or an error. It spawns a
+// goroutine that waits for outerCtx to be done, after which the remote
+// file is deleted. The deadline applies to the upload performed inside
+// Consume, not to outerCtx.
+func (u *uploader) Consume(outerCtx context.Context, reader io.Reader, deadline time.Time) (_ int64, err error) {
 	if u.metrics {
 		objectStorageUploadsOpen.Inc()
-	}
-	uploadCtx, cancelFn := context.WithDeadline(ctx, deadline)
-	u.ctx = uploadCtx
-
-	if u.metrics {
-		go u.trackUploadTime()
-	}
-
-	uploadDone := make(chan struct{})
-	go u.cleanup(ctx, uploadDone)
-	go func() {
-		defer cancelFn()
-		defer close(uploadDone)
-
-		if u.metrics {
-			defer objectStorageUploadsOpen.Dec()
-		}
-		defer func() {
-			// This will be returned as error to the next write operation on the pipe
-			u.pr.CloseWithError(u.uploadError)
-		}()
-
-		err := u.strategy.Upload(uploadCtx, u.pr)
-		if err != nil {
-			u.uploadError = err
-			if u.metrics {
+		defer func(started time.Time) {
+			objectStorageUploadsOpen.Dec()
+			objectStorageUploadTime.Observe(time.Since(started).Seconds())
+			if err != nil {
 				objectStorageUploadRequestsRequestFailed.Inc()
 			}
-			return
-		}
+		}(time.Now())
+	}
 
-		u.etag = u.strategy.ETag()
-
-		if u.md5 != nil {
-			err := compareMD5(u.md5Sum(), u.etag)
-			if err != nil {
-				log.ContextLogger(ctx).WithError(err).Error("error comparing MD5 checksum")
-
-				u.uploadError = err
-				if u.metrics {
-					objectStorageUploadRequestsRequestFailed.Inc()
-				}
-			}
+	defer func() {
+		// We do this mainly to abort S3 multipart uploads: it is not enough to
+		// "delete" them.
+		if err != nil {
+			u.strategy.Abort()
 		}
 	}()
-}
 
-func (u *uploader) trackUploadTime() {
-	started := time.Now()
-	<-u.ctx.Done()
+	go func() {
+		// Once gitlab-rails is done handling the request, we are supposed to
+		// delete the upload from its temporary location.
+		<-outerCtx.Done()
+		u.strategy.Delete()
+	}()
 
-	if u.metrics {
-		objectStorageUploadTime.Observe(time.Since(started).Seconds())
+	uploadCtx, cancelFn := context.WithDeadline(outerCtx, deadline)
+	defer cancelFn()
+
+	var hasher hash.Hash
+	if u.checkETag {
+		hasher = md5.New()
+		reader = io.TeeReader(reader, hasher)
 	}
-}
 
-func (u *uploader) cleanup(ctx context.Context, uploadDone chan struct{}) {
-	// wait for the upload to finish
-	<-u.ctx.Done()
+	cr := &countReader{r: reader}
+	if err := u.strategy.Upload(uploadCtx, cr); err != nil {
+		return cr.n, err
+	}
 
-	<-uploadDone
-	if u.uploadError != nil {
-		if u.metrics {
-			objectStorageUploadRequestsRequestFailed.Inc()
+	if u.checkETag {
+		if err := compareMD5(hexString(hasher), u.strategy.ETag()); err != nil {
+			log.ContextLogger(uploadCtx).WithError(err).Error("error comparing MD5 checksum")
+			return cr.n, err
 		}
-		u.strategy.Abort()
-		return
 	}
 
-	// We have now successfully uploaded the file to object storage. Another
-	// goroutine will hand off the object to gitlab-rails.
-	<-ctx.Done()
-
-	// gitlab-rails is now done with the object so it's time to delete it.
-	u.strategy.Delete()
+	return cr.n, nil
 }
 
 func compareMD5(local, remote string) error {
@@ -187,4 +99,15 @@ func compareMD5(local, remote string) error {
 	}
 
 	return nil
+}
+
+type countReader struct {
+	r io.Reader
+	n int64
+}
+
+func (cr *countReader) Read(p []byte) (int, error) {
+	nRead, err := cr.r.Read(p)
+	cr.n += int64(nRead)
+	return nRead, err
 }

@@ -413,5 +413,4 @@ func checkFileHandlerWithFields(t *testing.T, fh *filestore.FileHandler, fields 
 	require.Equal(t, test.ObjectSHA1, fields[key("sha1")])
 	require.Equal(t, test.ObjectSHA256, fields[key("sha256")])
 	require.Equal(t, test.ObjectSHA512, fields[key("sha512")])
-	require.Contains(t, fields, key("etag"))
 }
