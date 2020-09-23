@@ -2,6 +2,12 @@ import jsYaml from 'js-yaml';
 
 const NEW_LINE = '\n';
 
+const hasMatter = (firstThreeChars, fourthChar) => {
+  const isYamlDelimiter = firstThreeChars === '---';
+  const isFourthCharNewline = fourthChar === NEW_LINE;
+  return isYamlDelimiter && isFourthCharNewline;
+};
+
 export const frontMatterify = source => {
   let index = 3;
   let offset;
@@ -16,7 +22,7 @@ export const frontMatterify = source => {
     type: null,
   };
 
-  if (!type || source.charAt(index) !== NEW_LINE) {
+  if (!hasMatter(delimiter, source.charAt(index))) {
     return NO_FRONTMATTER;
   }
 
