@@ -465,7 +465,6 @@ section_end:1560896353:my_first_section\r\e[0K
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/198413) in GitLab 13.5.
 
-You can make the job log automatically collapse the collapsible sections by adding the `collapsed` option to the section start.
 
 You can make the job log automatically collapse collapsible sections by adding the `collapsed` option to the section start.
 Add `[collapsed=true]` after the section name and before the `\r`. The section end marker
