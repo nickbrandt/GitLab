@@ -494,6 +494,33 @@ RSpec.describe Gitlab::Regex do
     end
   end
 
+  describe '.debian_architecture_regex' do
+    subject { described_class.debian_architecture_regex }
+
+    it { is_expected.to match('amd64') }
+    it { is_expected.to match('kfreebsd-i386') }
+
+    # may not be empty string
+    it { is_expected.not_to match('') }
+    # must start with an alphanumeric
+    it { is_expected.not_to match('-a') }
+    it { is_expected.not_to match('+a') }
+    it { is_expected.not_to match('.a') }
+    it { is_expected.not_to match('_a') }
+    # only letters, digits and characters '-'
+    it { is_expected.not_to match('a+b') }
+    it { is_expected.not_to match('a.b') }
+    it { is_expected.not_to match('a_b') }
+    it { is_expected.not_to match('a~') }
+    it { is_expected.not_to match('aé') }
+
+    # More strict
+    # Enforce lowercase
+    it { is_expected.not_to match('AMD64') }
+    it { is_expected.not_to match('Amd64') }
+    it { is_expected.not_to match('aMD64') }
+  end
+
   describe '.semver_regex' do
     subject { described_class.semver_regex }
 

@@ -81,7 +81,7 @@ module API
 
         params do
           requires :component, type: String, desc: 'The Debian Component'
-          requires :architecture, type: String, desc: 'The Debian Architecture'
+          requires :architecture, type: String, desc: 'The Debian Architecture', regexp: Gitlab::Regex.debian_architecture_regex
         end
 
         namespace ':component/binary-:architecture', requirements: COMPONENT_ARCHITECTURE_REQUIREMENTS do

@@ -80,6 +80,12 @@ module Gitlab
             )\z}xi.freeze
       end
 
+      def debian_architecture_regex
+        # See official parser: https://git.dpkg.org/cgit/dpkg/dpkg.git/tree/lib/dpkg/arch.c?id=9e0c88ec09475f4d1addde9cdba1ad7849720356#n43
+        # But we limit to lower case
+        @debian_architecture_regex ||= %r{\A[a-z0-9][-a-z0-9]*\z}.freeze
+      end
+
       def unbounded_semver_regex
         # See the official regex: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 
