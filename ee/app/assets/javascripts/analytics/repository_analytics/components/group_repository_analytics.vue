@@ -1,5 +1,6 @@
 <script>
 import {
+  GlAlert,
   GlButton,
   GlDropdown,
   GlDropdownSectionHeader,
@@ -19,6 +20,7 @@ import getGroupProjects from '../graphql/queries/get_group_projects.query.graphq
 export default {
   name: 'GroupRepositoryAnalytics',
   components: {
+    GlAlert,
     GlButton,
     GlDropdown,
     GlDropdownSectionHeader,
@@ -57,13 +59,17 @@ export default {
         }));
       },
       result({ data }) {
-        this.projectsPageInfo = data?.group?.projects?.pageInfo;
+        this.projectsPageInfo = data?.group?.projects?.pageInfo || {};
+      },
+      error() {
+        this.hasError = true;
       },
     },
   },
   data() {
     return {
       groupProjects: [],
+      hasError: false,
       projectsPageInfo: {},
       projectSearchTerm: '',
       selectAllProjects: true,
@@ -135,23 +141,30 @@ export default {
     clickDateRange(dateRange) {
       this.selectedDateRange = dateRange;
     },
+    dismissError() {
+      this.hasError = false;
+    },
     loadMoreProjects() {
-      this.$apollo.queries.groupProjects.fetchMore({
-        variables: {
-          groupFullPath: this.groupFullPath,
-          after: this.projectsPageInfo.endCursor,
-        },
-        updateQuery(previousResult, { fetchMoreResult }) {
-          const results = produce(fetchMoreResult, draftData => {
-            // eslint-disable-next-line no-param-reassign
-            draftData.group.projects.nodes = [
-              ...previousResult.group.projects.nodes,
-              ...draftData.group.projects.nodes,
-            ];
-          });
-          return results;
-        },
-      });
+      this.$apollo.queries.groupProjects
+        .fetchMore({
+          variables: {
+            groupFullPath: this.groupFullPath,
+            after: this.projectsPageInfo.endCursor,
+          },
+          updateQuery(previousResult, { fetchMoreResult }) {
+            const results = produce(fetchMoreResult, draftData => {
+              // eslint-disable-next-line no-param-reassign
+              draftData.group.projects.nodes = [
+                ...previousResult.group.projects.nodes,
+                ...draftData.group.projects.nodes,
+              ];
+            });
+            return results;
+          },
+        })
+        .catch(() => {
+          this.hasError = true;
+        });
     },
   },
   text: {
@@ -167,6 +180,7 @@ export default {
     projectDropdownHeader: __('Projects'),
     projectDropdownAllProjects: __('All projects'),
     projectSelectAll: __('Select all'),
+    queryErrorMessage: s__('RepositoriesAnalytics|There was an error fetching the projects.'),
   },
   dateRangeOptions: [
     { value: 7, text: __('Last week') },
@@ -194,6 +208,13 @@ export default {
       :action-primary="downloadCSVModalButton"
       :action-cancel="cancelModalButton"
     >
+      <gl-alert
+        v-if="hasError"
+        variant="danger"
+        data-testid="group-code-coverage-projects-error"
+        @dismiss="dismissError"
+        >{{ $options.text.queryErrorMessage }}</gl-alert
+      >
       <div>{{ $options.text.downloadCSVModalDescription }}</div>
       <div class="gl-my-4">
         <label class="gl-display-block col-form-label-sm col-form-label">

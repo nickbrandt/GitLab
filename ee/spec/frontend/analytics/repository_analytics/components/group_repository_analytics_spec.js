@@ -1,5 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import {
+  GlAlert,
   GlDropdown,
   GlDropdownItem,
   GlIntersectionObserver,
@@ -32,6 +33,7 @@ describe('Group repository analytics app', () => {
       .trigger('click');
   const findIntersectionObserver = () => wrapper.find(GlIntersectionObserver);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
+  const findAlert = () => wrapper.find(GlAlert);
 
   const injectedProperties = {
     groupAnalyticsCoverageReportsPath: '/coverage.csv?ref_path=refs/heads/master',
@@ -46,6 +48,7 @@ describe('Group repository analytics app', () => {
         return {
           // Ensure that isSelected is set to false for each project so that every test is reset properly
           groupProjects: groupProjectsData.map(project => ({ ...project, isSelected: false })),
+          hasError: false,
           projectsPageInfo: {
             hasNextPage: false,
             endCursor: null,
@@ -86,6 +89,16 @@ describe('Group repository analytics app', () => {
   describe('when download code coverage modal is displayed', () => {
     beforeEach(() => {
       openCodeCoverageModal();
+    });
+
+    describe('when there is an error fetching the projects', () => {
+      beforeEach(() => {
+        createComponent({ data: { hasError: true } });
+      });
+
+      it('displays an alert for the failed query', () => {
+        expect(findAlert().exists()).toBe(true);
+      });
     });
 
     describe('when selecting a project', () => {
@@ -164,7 +177,7 @@ describe('Group repository analytics app', () => {
           beforeEach(() => {
             jest
               .spyOn(wrapper.vm.$apollo.queries.groupProjects, 'fetchMore')
-              .mockImplementation(jest.fn());
+              .mockImplementation(jest.fn().mockResolvedValue());
 
             findIntersectionObserver().vm.$emit('appear');
             return wrapper.vm.$nextTick();
@@ -172,6 +185,21 @@ describe('Group repository analytics app', () => {
 
           it('makes a query to fetch more projects', () => {
             expect(wrapper.vm.$apollo.queries.groupProjects.fetchMore).toHaveBeenCalledTimes(1);
+          });
+
+          describe('when the fetchMore query throws an error', () => {
+            beforeEach(() => {
+              jest
+                .spyOn(wrapper.vm.$apollo.queries.groupProjects, 'fetchMore')
+                .mockImplementation(jest.fn().mockRejectedValue());
+
+              findIntersectionObserver().vm.$emit('appear');
+              return wrapper.vm.$nextTick();
+            });
+
+            it('displays an alert for the failed query', () => {
+              expect(findAlert().exists()).toBe(true);
+            });
           });
         });
 
