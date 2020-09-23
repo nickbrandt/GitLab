@@ -30,6 +30,7 @@ describe('Release detail mutations', () => {
         name: '',
         description: '',
         milestones: [],
+        groupMilestones: [],
         assets: {
           links: [],
         },
