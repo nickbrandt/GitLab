@@ -11,7 +11,7 @@ RSpec.describe FeatureFlagsClientSerializer do
     subject { serializer.represent_token(feature_flags_client).to_json }
 
     it 'includes feature flags client token' do
-      expect(subject).to match_schema('feature_flags_client_token', dir: 'ee')
+      expect(subject).to match_schema('feature_flags_client_token')
     end
   end
 end
