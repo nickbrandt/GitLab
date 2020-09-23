@@ -535,6 +535,19 @@ RSpec.describe Gitlab::Regex do
     it { is_expected.not_to match('hé') }
   end
 
+  describe '.debian_component_regex' do
+    subject { described_class.debian_component_regex }
+
+    it { is_expected.to match('main') }
+    it { is_expected.to match('non-free') }
+
+    # Do not allow slash
+    it { is_expected.not_to match('non/free') }
+
+    # Do not allow Unicode
+    it { is_expected.not_to match('hé') }
+  end
+
   describe '.semver_regex' do
     subject { described_class.semver_regex }
 

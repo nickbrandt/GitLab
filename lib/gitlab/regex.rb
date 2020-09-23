@@ -90,6 +90,10 @@ module Gitlab
         @debian_distribution_regex ||= %r{\A[a-z0-9][a-z0-9\.-]*\z}i.freeze
       end
 
+      def debian_component_regex
+        @debian_component_regex ||= %r{#{debian_distribution_regex}}.freeze
+      end
+
       def unbounded_semver_regex
         # See the official regex: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 
