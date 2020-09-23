@@ -461,7 +461,7 @@ this line should be hidden when collapsed
 section_end:1560896353:my_first_section\r\e[0K
 ```
 
-#### Pre-collapsed sections
+#### Pre-collapse sections
 
 You can make the job log automatically collapse the collapsible sections by adding the `collapsed` option to the section start.
 
