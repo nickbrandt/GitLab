@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'json'
 
@@ -15,15 +17,15 @@ RSpec.describe Gitlab::Webpack::Manifest do
   end
 
   shared_examples_for "a valid manifest" do
-    it "should return single entry asset paths from the manifest" do
+    it "returns single entry asset paths from the manifest" do
       expect(Gitlab::Webpack::Manifest.asset_paths("entry2")).to eq(["/public_path/entry2.js"])
     end
 
-    it "should return multiple entry asset paths from the manifest" do
+    it "returns multiple entry asset paths from the manifest" do
       expect(Gitlab::Webpack::Manifest.asset_paths("entry1")).to eq(["/public_path/entry1.js", "/public_path/entry1-a.js"])
     end
 
-    it "should error on a missing entry point" do
+    it "errors on a missing entry point" do
       expect { Gitlab::Webpack::Manifest.asset_paths("herp") }.to raise_error(Gitlab::Webpack::Manifest::AssetMissingError)
     end
   end
@@ -44,10 +46,10 @@ RSpec.describe Gitlab::Webpack::Manifest do
       stub_request(:get, "http://hostname:2000/public_path/my_manifest.json").to_return(body: manifest, status: 200)
     end
 
-    describe :asset_paths do
-      it_should_behave_like "a valid manifest"
+    describe ".asset_paths" do
+      it_behaves_like "a valid manifest"
 
-      it "should error if we can't find the manifest" do
+      it "errors if we can't find the manifest" do
         ::Rails.configuration.webpack.manifest_filename = "broken.json"
         stub_request(:get, "http://hostname:2000/public_path/broken.json").to_raise(SocketError)
 
@@ -56,8 +58,8 @@ RSpec.describe Gitlab::Webpack::Manifest do
 
       describe "webpack errors" do
         context "when webpack has 'Module build failed' errors in its manifest" do
-          it "should error" do
-            error_manifest = JSON.parse(manifest).merge("errors" => [
+          it "errors" do
+            error_manifest = Gitlab::Json.parse(manifest).merge("errors" => [
               "somethingModule build failed something",
               "I am an error"
             ]).to_json
@@ -68,18 +70,18 @@ RSpec.describe Gitlab::Webpack::Manifest do
         end
 
         context "when webpack does not have 'Module build failed' errors in its manifest" do
-          it "should not error" do
-            error_manifest = JSON.parse(manifest).merge("errors" => ["something went wrong"]).to_json
+          it "does not error" do
+            error_manifest = Gitlab::Json.parse(manifest).merge("errors" => ["something went wrong"]).to_json
             stub_request(:get, "http://hostname:2000/public_path/my_manifest.json").to_return(body: error_manifest, status: 200)
 
-            expect { Gitlab::Webpack::Manifest.asset_paths("entry1") }.to_not raise_error
+            expect { Gitlab::Webpack::Manifest.asset_paths("entry1") }.not_to raise_error
           end
         end
 
-        it "should not error if errors is present but empty" do
-          error_manifest = JSON.parse(manifest).merge("errors" => []).to_json
+        it "does not error if errors is present but empty" do
+          error_manifest = Gitlab::Json.parse(manifest).merge("errors" => []).to_json
           stub_request(:get, "http://hostname:2000/public_path/my_manifest.json").to_return(body: error_manifest, status: 200)
-          expect { Gitlab::Webpack::Manifest.asset_paths("entry1") }.to_not raise_error
+          expect { Gitlab::Webpack::Manifest.asset_paths("entry1") }.not_to raise_error
         end
       end
     end
@@ -91,10 +93,10 @@ RSpec.describe Gitlab::Webpack::Manifest do
       allow(File).to receive(:read).with(::Rails.root.join("manifest_output/my_manifest.json")).and_return(manifest)
     end
 
-    describe :asset_paths do
-      it_should_behave_like "a valid manifest"
+    describe ".asset_paths" do
+      it_behaves_like "a valid manifest"
 
-      it "should error if we can't find the manifest" do
+      it "errors if we can't find the manifest" do
         ::Rails.configuration.webpack.manifest_filename = "broken.json"
         allow(File).to receive(:read).with(::Rails.root.join("manifest_output/broken.json")).and_raise(Errno::ENOENT)
         expect { Gitlab::Webpack::Manifest.asset_paths("entry1") }.to raise_error(Gitlab::Webpack::Manifest::ManifestLoadError)
