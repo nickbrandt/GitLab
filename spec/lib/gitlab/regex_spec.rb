@@ -414,6 +414,35 @@ RSpec.describe Gitlab::Regex do
     it { is_expected.not_to match('%2e%2e%2f1.2.3') }
   end
 
+  describe '.debian_package_name_regex' do
+    subject { described_class.debian_package_name_regex }
+
+    it { is_expected.to match('0ad') }
+    it { is_expected.to match('g++') }
+    it { is_expected.to match('lua5.1') }
+    it { is_expected.to match('samba') }
+
+    # may not be empty string
+    it { is_expected.not_to match('') }
+    # must start with an alphanumeric character
+    it { is_expected.not_to match('-a') }
+    it { is_expected.not_to match('+a') }
+    it { is_expected.not_to match('.a') }
+    it { is_expected.not_to match('_a') }
+    # only letters, digits and characters '-+._'
+    it { is_expected.not_to match('a~') }
+    it { is_expected.not_to match('aé') }
+
+    # More strict Lintian regex
+    # at least 2 chars
+    it { is_expected.not_to match('a') }
+    # lowercase only
+    it { is_expected.not_to match('Aa') }
+    it { is_expected.not_to match('aA') }
+    # No underscore
+    it { is_expected.not_to match('a_b') }
+  end
+
   describe '.semver_regex' do
     subject { described_class.semver_regex }
 

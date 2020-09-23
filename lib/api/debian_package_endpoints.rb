@@ -101,7 +101,7 @@ module API
       params do
         requires :component, type: String, desc: 'The Debian Component'
         requires :letter, type: String, desc: 'The Debian Classification (first-letter or lib-first-letter)'
-        requires :source_package, type: String, desc: 'The Debian Source Package Name'
+        requires :source_package, type: String, desc: 'The Debian Source Package Name', regexp: Gitlab::Regex.debian_package_name_regex
       end
 
       namespace 'pool/:component/:letter/:source_package', requirements: COMPONENT_LETTER_SOURCE_PACKAGE_REQUIREMENTS do
