@@ -1584,6 +1584,11 @@ On each node perform the following:
    sudo gitlab-ctl tail gitaly
    ```
 
+1. Save the `/etc/gitlab/gitlab-secrets.json` file from one of the two
+   application nodes and install it on the other application node and the
+   [Gitaly node](#configure-gitaly) and
+   [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+
 1. Verify the GitLab services are running:
 
    ```shell

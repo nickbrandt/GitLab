@@ -666,12 +666,36 @@ On each node perform the following:
    sudo gitlab-ctl tail gitaly
    ```
 
+1. Save the `/etc/gitlab/gitlab-secrets.json` file from one of the two
+   application nodes and install it on the other application node and the
+   [Gitaly node](#configure-gitaly) and
+   [reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
+
 NOTE: **Note:**
 When you specify `https` in the `external_url`, as in the example
 above, GitLab assumes you have SSL certificates in `/etc/gitlab/ssl/`. If
 certificates are not present, NGINX will fail to start. See the
 [NGINX documentation](https://docs.gitlab.com/omnibus/settings/nginx.html#enable-https)
 for more information.
+
+### GitLab Rails post-configuration
+
+1. Designate one application node for running database migrations during
+   installation and updates. Initialize the GitLab database and ensure all
+   migrations ran:
+
+   ```shell
+   sudo gitlab-rake gitlab:db:configure
+   ```
+
+    NOTE: **Note:**
+    If you encounter a `rake aborted!` error stating that PgBouncer is failing to connect to
+    PostgreSQL it may be that your PgBouncer node's IP address is missing from
+    PostgreSQL's `trust_auth_cidr_addresses` in `gitlab.rb` on your database nodes. See
+    [PgBouncer error `ERROR:  pgbouncer cannot connect to server`](troubleshooting.md#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
+    in the Troubleshooting section before proceeding.
+
+1. [Configure fast lookup of authorized SSH keys in the database](../operations/fast_ssh_key_lookup.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">

@@ -1892,18 +1892,22 @@ for more information.
 
 ### GitLab Rails post-configuration
 
-Initialize the GitLab database, by running the following in one of the Rails nodes:
+1. Designate one application node for running database migrations during
+   installation and updates. Initialize the GitLab database and ensure all
+   migrations ran:
 
-```shell
-sudo gitlab-rake gitlab:db:configure
-```
+   ```shell
+   sudo gitlab-rake gitlab:db:configure
+   ```
 
-NOTE: **Note:**
-If you encounter a `rake aborted!` error stating that PgBouncer is failing to connect to
-PostgreSQL it may be that your PgBouncer node's IP address is missing from
-PostgreSQL's `trust_auth_cidr_addresses` in `gitlab.rb` on your database nodes. See
-[PgBouncer error `ERROR:  pgbouncer cannot connect to server`](troubleshooting.md#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
-in the Troubleshooting section before proceeding.
+    NOTE: **Note:**
+    If you encounter a `rake aborted!` error stating that PgBouncer is failing to connect to
+    PostgreSQL it may be that your PgBouncer node's IP address is missing from
+    PostgreSQL's `trust_auth_cidr_addresses` in `gitlab.rb` on your database nodes. See
+    [PgBouncer error `ERROR:  pgbouncer cannot connect to server`](troubleshooting.md#pgbouncer-error-error-pgbouncer-cannot-connect-to-server)
+    in the Troubleshooting section before proceeding.
+
+1. [Configure fast lookup of authorized SSH keys in the database](../operations/fast_ssh_key_lookup.md).
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#setup-components">
