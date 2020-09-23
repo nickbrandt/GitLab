@@ -465,12 +465,14 @@ section_end:1560896353:my_first_section\r\e[0K
 
 You can make the job log automatically collapse the collapsible sections by adding the `collapsed` option to the section start.
 
-You must add the string `[collapsed=true]` after the section name and before the `\r`:
+You can make the job log automatically collapse collapsible sections by adding the `collapsed` option to the section start.
+Add `[collapsed=true]` after the section name and before the `\r`. The section end marker
+remains unchanged:
 
-- Section start marker with options: `section_start:UNIX_TIMESTAMP:SECTION_NAME[collapsed=true]\r\e[0K` + `TEXT_OF_SECTION_HEADER`
-- Section end marker stays untouched: `section_end:UNIX_TIMESTAMP:SECTION_NAME\r\e[0K`
+- Section start marker with `[collapsed=true]`: `section_start:UNIX_TIMESTAMP:SECTION_NAME[collapsed=true]\r\e[0K` + `TEXT_OF_SECTION_HEADER`
+- Section end marker: `section_end:UNIX_TIMESTAMP:SECTION_NAME\r\e[0K`
 
-You must add the updated section start text to the CI configuration. For example,
+Add the updated section start text to the CI configuration. For example,
 using `echo`:
 
 ```yaml
