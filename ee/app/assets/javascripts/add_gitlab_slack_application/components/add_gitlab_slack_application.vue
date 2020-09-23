@@ -88,12 +88,14 @@ export default {
     <h1>{{ __('GitLab for Slack') }}</h1>
     <p>{{ __('Track your GitLab projects with GitLab for Slack.') }}</p>
 
-    <div v-once class="prepend-top-20 append-bottom-20">
+    <div
+      v-once
+      class="prepend-top-20 append-bottom-20 gl-display-flex gl-justify-content-center gl-align-items-center"
+    >
       <img :src="gitlabLogoPath" class="gitlab-slack-logo" />
-      <gl-icon
-        name="double-headed-arrow"
-        class="gitlab-slack-double-headed-arrow inline prepend-left-20 append-right-20"
-      />
+      <div class="gitlab-slack-double-headed-arrow inline prepend-left-20 append-right-20">
+        <gl-icon name="double-headed-arrow" :size="72" />
+      </div>
       <img :src="slackLogoPath" class="gitlab-slack-logo" />
     </div>
 
@@ -151,7 +153,9 @@ export default {
           >/gitlab &lt;project-alias&gt; issue show &lt;id&gt;</code
         >
         <span>
-          <gl-icon name="arrow-right" class="gitlab-slack-right-arrow inline gl-mr-2" />
+          <div class="gitlab-slack-right-arrow inline gl-mr-2">
+            <gl-icon name="arrow-right" />
+          </div>
           Shows the issue with id <strong>&lt;id&gt;</strong>
         </span>
 
