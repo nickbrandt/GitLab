@@ -12,7 +12,7 @@ import {
 Vue.use(Translate);
 
 export default () => {
-  const el = document.getElementById('js-search-filter-by-state');
+  const el = document.getElementById('js-search-filter-by-confidential');
 
   if (!el) return false;
 
