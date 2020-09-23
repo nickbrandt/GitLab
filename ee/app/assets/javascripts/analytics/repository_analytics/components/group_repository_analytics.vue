@@ -136,24 +136,22 @@ export default {
       this.selectedDateRange = dateRange;
     },
     loadMoreProjects() {
-      if (this.projectsPageInfo.hasNextPage) {
-        this.$apollo.queries.groupProjects.fetchMore({
-          variables: {
-            groupFullPath: this.groupFullPath,
-            after: this.projectsPageInfo?.endCursor,
-          },
-          updateQuery(previousResult, { fetchMoreResult }) {
-            const results = produce(fetchMoreResult, draftData => {
-              // eslint-disable-next-line no-param-reassign
-              draftData.group.projects.nodes = [
-                ...previousResult.group.projects.nodes,
-                ...draftData.group.projects.nodes,
-              ];
-            });
-            return results;
-          },
-        });
-      }
+      this.$apollo.queries.groupProjects.fetchMore({
+        variables: {
+          groupFullPath: this.groupFullPath,
+          after: this.projectsPageInfo.endCursor,
+        },
+        updateQuery(previousResult, { fetchMoreResult }) {
+          const results = produce(fetchMoreResult, draftData => {
+            // eslint-disable-next-line no-param-reassign
+            draftData.group.projects.nodes = [
+              ...previousResult.group.projects.nodes,
+              ...draftData.group.projects.nodes,
+            ];
+          });
+          return results;
+        },
+      });
     },
   },
   text: {

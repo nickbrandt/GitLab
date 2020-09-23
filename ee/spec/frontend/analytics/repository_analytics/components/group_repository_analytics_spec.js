@@ -39,7 +39,7 @@ describe('Group repository analytics app', () => {
   };
   const groupProjectsData = [{ id: 1, name: '1' }, { id: 2, name: '2' }];
 
-  const createComponent = ({ data = {}, apolloGroupProjects = {} }) => {
+  const createComponent = ({ data = {}, apolloGroupProjects = {} } = {}) => {
     wrapper = shallowMount(GroupRepositoryAnalytics, {
       localVue,
       data() {
@@ -71,7 +71,7 @@ describe('Group repository analytics app', () => {
   };
 
   beforeEach(() => {
-    createComponent({});
+    createComponent();
   });
 
   afterEach(() => {
@@ -171,7 +171,7 @@ describe('Group repository analytics app', () => {
           });
 
           it('makes a query to fetch more projects', () => {
-            expect(wrapper.vm.$apollo.queries.groupProjects.fetchMore).toHaveBeenCalled();
+            expect(wrapper.vm.$apollo.queries.groupProjects.fetchMore).toHaveBeenCalledTimes(1);
           });
         });
 
