@@ -2,7 +2,8 @@
 
 module Ci
   class UpdateBuildStateService
-    include Gitlab::Utils::StrongMemoize
+    include ::Gitlab::Utils::StrongMemoize
+    include ::Gitlab::ExclusiveLeaseHelpers
 
     Result = Struct.new(:status, :backoff, keyword_init: true)
 
@@ -18,25 +19,45 @@ module Ci
 
     def execute
       overwrite_trace! if has_trace?
-      create_pending_state! if accept_available?
 
-      if accept_request?
-        accept_build_state!
+      unless accept_available?
+        return update_build_state!
+      end
+
+      ensure_pending_state!
+
+      in_build_trace_lock do
+        process_build_state!
+      end
+    end
+
+    private
+
+    def overwrite_trace!
+      metrics.increment_trace_operation(operation: :overwrite)
+
+      build.trace.set(params[:trace]) if Gitlab::Ci::Features.trace_overwrite?
+    end
+
+    def ensure_pending_state!
+      pending_state.created_at
+    end
+
+    def process_build_state!
+      if live_chunks_pending?
+        if pending_state_outdated?
+          discard_build_trace!
+          update_build_state!
+        else
+          accept_build_state!
+        end
       else
         validate_build_trace!
         update_build_state!
       end
     end
 
-    private
-
     def accept_build_state!
-      if Time.current - pending_state.created_at > ACCEPT_TIMEOUT
-        metrics.increment_trace_operation(operation: :discarded)
-
-        return update_build_state!
-      end
-
       build.trace_chunks.live.find_each do |chunk|
         chunk.schedule_to_persist!
       end
@@ -48,26 +69,14 @@ module Ci
       end
     end
 
-    def overwrite_trace!
-      metrics.increment_trace_operation(operation: :overwrite)
-
-      build.trace.set(params[:trace]) if Gitlab::Ci::Features.trace_overwrite?
-    end
-
-    def create_pending_state!
-      pending_state.created_at
-    end
-
     def validate_build_trace!
-      return unless accept_available?
+      if chunks_persisted?
+        metrics.increment_trace_operation(operation: :finalized)
+      end
 
       unless ::Gitlab::Ci::Trace::Checksum.new(build).valid?
         metrics.increment_trace_operation(operation: :invalid)
       end
-
-      return unless chunks_persisted?
-
-      metrics.increment_trace_operation(operation: :finalized)
     end
 
     def update_build_state!
@@ -89,12 +98,24 @@ module Ci
       end
     end
 
+    def discard_build_trace!
+      metrics.increment_trace_operation(operation: :discarded)
+    end
+
     def accept_available?
       !build_running? && has_checksum? && chunks_migration_enabled?
     end
 
-    def accept_request?
-      accept_available? && live_chunks_pending?
+    def live_chunks_pending?
+      build.trace_chunks.live.any?
+    end
+
+    def chunks_persisted?
+      build.trace_chunks.any? && !live_chunks_pending?
+    end
+
+    def pending_state_outdated?
+      Time.current - pending_state.created_at > ACCEPT_TIMEOUT
     end
 
     def build_state
@@ -107,14 +128,6 @@ module Ci
 
     def has_checksum?
       params.dig(:checksum).present?
-    end
-
-    def live_chunks_pending?
-      build.trace_chunks.live.any?
-    end
-
-    def chunks_persisted?
-      build.trace_chunks.any? && !live_chunks_pending?
     end
 
     def build_running?
@@ -136,6 +149,14 @@ module Ci
       metrics.increment_trace_operation(operation: :conflict)
 
       build.pending_state
+    end
+
+    def in_build_trace_lock(&block)
+      build.trace.lock(&block) # rubocop:disable CodeReuse/ActiveRecord
+    rescue FailedToObtainLockError
+      metrics.increment_trace_operation(operation: :locked)
+
+      accept_build_state!
     end
 
     def chunks_migration_enabled?
