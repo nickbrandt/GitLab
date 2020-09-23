@@ -336,7 +336,7 @@ module Gitlab
           logger: Gitlab::BackgroundMigration::Logger
         }.merge(args)
 
-        Gitlab::Database::WithLockRetries.new(merged_args).run(&block)
+        Gitlab::Database::WithLockRetries.new(**merged_args).run(&block)
       end
 
       def true_value
