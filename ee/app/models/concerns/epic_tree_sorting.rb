@@ -5,8 +5,16 @@ module EpicTreeSorting
   include FromUnion
   include RelativePositioning
 
+  IMPLEMENTATIONS_MUTEX = Mutex.new
+
   def self.implementations
-    @impls ||= [].to_set
+    unless defined?(@impls)
+      IMPLEMENTATIONS_MUTEX.synchronize do
+        @impls ||= Set.new
+      end
+    end
+
+    @impls
   end
 
   class_methods do
