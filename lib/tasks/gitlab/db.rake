@@ -183,5 +183,17 @@ namespace :gitlab do
       puts "Rebuilding index #{index}".color(:green)
       Gitlab::Database::Reindexing::ConcurrentReindex.new(index).perform
     end
+
+    desc 'validate the current database schema against the committed structure.sql'
+    task validate_schema: ['db:structure:dump'] do
+      structure_file = 'db/structure.sql'
+      output, exit_code = Gitlab::Popen.popen(%W(#{Gitlab.config.git.bin_path} diff -- #{structure_file}))
+
+      abort "Failed to compare #{structure_file} to expected state".color(:red) unless exit_code == 0
+
+      abort "Differences detected in #{structure_file}:\n\n#{output}".color(:red) unless output.empty?
+
+      puts "No differences detected in #{structure_file}".color(:green)
+    end
   end
 end
