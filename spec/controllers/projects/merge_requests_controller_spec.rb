@@ -246,6 +246,11 @@ RSpec.describe Projects::MergeRequestsController do
 
   describe 'GET index' do
     let(:merge_request) { create(:merge_request_with_diffs, target_project: project, source_project: project) }
+    let(:preload_branches) { false }
+
+    before do
+      stub_feature_flags(preload_branch_names_merge_request: preload_branches)
+    end
 
     def get_merge_requests(page = nil)
       get :index,
@@ -261,6 +266,20 @@ RSpec.describe Projects::MergeRequestsController do
 
     it_behaves_like 'set sort order from user preference' do
       let(:sorting_param) { 'updated_asc' }
+    end
+
+    context 'when we preload the branch names' do
+      let(:preload_branches) { true }
+
+      it 'returns the merge requests and ok response' do
+        expect(MergeRequest).to receive(:preload_branch_names).and_call_original
+        expect(merge_request).to be_persisted
+
+        get_merge_requests
+
+        expect(assigns(:merge_requests)).to include(merge_request)
+        expect(response).to have_gitlab_http_status(:ok)
+      end
     end
 
     context 'when page param' do

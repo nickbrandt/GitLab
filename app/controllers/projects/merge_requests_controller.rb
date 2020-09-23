@@ -62,6 +62,10 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   def index
     @merge_requests = @issuables
 
+    if Feature.enabled?(:preload_branch_names_merge_request, @project)
+      MergeRequest.preload_branch_names(@merge_requests)
+    end
+
     respond_to do |format|
       format.html
       format.json do

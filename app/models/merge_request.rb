@@ -443,6 +443,13 @@ class MergeRequest < ApplicationRecord
     work_in_progress?(title) ? title : "Draft: #{title}"
   end
 
+  def self.preload_branch_names(merge_requests)
+    merge_requests.each do |mr|
+      mr.source_project.repository.branch_names
+      mr.target_project.repository.branch_names
+    end
+  end
+
   def committers
     @committers ||= commits.committers
   end

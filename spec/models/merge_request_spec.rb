@@ -1239,6 +1239,21 @@ RSpec.describe MergeRequest, factory_default: :keep do
     end
   end
 
+  describe '.preload_branch_names' do
+    let(:merge_requests) do
+      [subject]
+    end
+
+    it 'memoizes the branch names for the source and target projects' do
+      expect do
+        described_class.preload_branch_names(merge_requests)
+      end.to change {
+        subject.source_project.repository.strong_memoized?(:branch_names) &&
+        subject.target_project.repository.strong_memoized?(:branch_names)
+      }.from(false).to(true)
+    end
+  end
+
   describe '#can_remove_source_branch?' do
     let_it_be(:user) { create(:user) }
     let_it_be(:merge_request, reload: true) { create(:merge_request, :simple) }

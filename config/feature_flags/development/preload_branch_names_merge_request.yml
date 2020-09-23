@@ -1,0 +1,7 @@
+---
+name: preload_branch_names_merge_request
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/42708
+rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/255918
+type: development
+group: group::source code
+default_enabled: false
