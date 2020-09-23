@@ -44,7 +44,7 @@ module API
       end
 
       params do
-        requires :distribution, type: String, desc: 'The Debian Codename', file_path: true
+        requires :distribution, type: String, desc: 'The Debian Codename', regexp: Gitlab::Regex.debian_distribution_regex
       end
 
       namespace 'dists/*distribution', requirements: DISTRIBUTION_REQUIREMENTS do

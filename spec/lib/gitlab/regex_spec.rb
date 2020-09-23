@@ -521,6 +521,20 @@ RSpec.describe Gitlab::Regex do
     it { is_expected.not_to match('aMD64') }
   end
 
+  describe '.debian_distribution_regex' do
+    subject { described_class.debian_distribution_regex }
+
+    it { is_expected.to match('buster') }
+    it { is_expected.to match('buster-updates') }
+    it { is_expected.to match('Debian10.5') }
+
+    # Do not allow slash, even if this exists in the wild
+    it { is_expected.not_to match('jessie/updates') }
+
+    # Do not allow Unicode
+    it { is_expected.not_to match('hé') }
+  end
+
   describe '.semver_regex' do
     subject { described_class.semver_regex }
 
