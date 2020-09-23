@@ -1,7 +1,7 @@
 export default () => {
   const highlightLineClass = 'hll';
   const contentBody = document.getElementById('content-body');
-  const searchTerm = contentBody.querySelector('.js-search-input').value.toLowerCase();
+  const searchTerm = contentBody.querySelector('.js-search-input').value.toLowerCase().replace(/^"|"$/g, '');
   const blobs = contentBody.querySelectorAll('.blob-result');
 
   blobs.forEach(blob => {
