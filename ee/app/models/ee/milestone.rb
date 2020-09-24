@@ -8,6 +8,7 @@ module EE
       include Elastic::ApplicationVersionedSearch
 
       has_many :boards
+      has_many :releases
     end
 
     def supports_milestone_charts?
