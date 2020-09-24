@@ -9498,7 +9498,7 @@ msgstr ""
 msgid "Enable"
 msgstr ""
 
-msgid "Enable %{gitpod_link} integration to launch a development environment in your browser directly from GitLab."
+msgid "Enable %{link_start}Gitpod%{link_end} integration to launch a development environment in your browser directly from GitLab."
 msgstr ""
 
 msgid "Enable Auto DevOps"
