@@ -43,7 +43,7 @@ RSpec.describe Admin::IntegrationsController do
       end
 
       it 'calls to PropagateIntegrationWorker' do
-        expect(PropagateIntegrationWorker).to have_received(:perform_async).with(integration.id, false)
+        expect(PropagateIntegrationWorker).to have_received(:perform_async).with(integration.id)
       end
     end
 
