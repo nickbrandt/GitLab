@@ -849,10 +849,8 @@ RSpec.describe License do
       described_class.delete_all
     end
 
-    let_it_be(:today) { Date.current }
-
     it 'does not include the undecryptable license' do
-      undecryptable_license = create(:license, created_at: today)
+      undecryptable_license = create(:license)
       allow(undecryptable_license).to receive(:license).and_return(nil)
 
       allow(License).to receive(:all).and_return([undecryptable_license])
@@ -861,6 +859,7 @@ RSpec.describe License do
     end
 
     it 'returns the licenses sorted by created_at, starts_at and expires_at descending' do
+      today = Date.current
       now = Time.current
 
       past_license = create(:license, created_at: now - 1.month, data: build(:gitlab_license, starts_at: today - 1.month, expires_at: today + 11.months).export)
