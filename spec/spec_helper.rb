@@ -140,6 +140,7 @@ RSpec.configure do |config|
   config.include InspectRequests, :js
   config.include LiveDebugger, :js
   config.include MigrationsHelpers, :migration
+  config.include BackgroundMigrationHelpers, type: :background_migration
   config.include RedisHelpers
   config.include Rails.application.routes.url_helpers, type: :routing
   config.include PolicyHelpers, type: :policy
