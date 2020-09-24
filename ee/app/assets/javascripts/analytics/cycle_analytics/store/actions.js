@@ -71,7 +71,7 @@ export const fetchStageData = ({ dispatch, getters }, stageId) => {
     groupId: currentGroupPath,
     valueStreamId: currentValueStreamId,
     stageId,
-    cycleAnalyticsRequestParams,
+    params: cycleAnalyticsRequestParams,
   })
     .then(checkForDataError)
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
@@ -114,7 +114,7 @@ export const fetchStageMedianValues = ({ dispatch, commit, getters }) => {
         groupId: currentGroupPath,
         valueStreamId: currentValueStreamId,
         stageId,
-        cycleAnalyticsRequestParams,
+        params: cycleAnalyticsRequestParams,
       }),
     ),
   )
@@ -193,7 +193,7 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
   return Api.cycleAnalyticsGroupStagesAndEvents({
     groupId,
     valueStreamId,
-    data: {
+    params: {
       start_date: created_after,
       project_ids,
     },
