@@ -3,7 +3,23 @@ import ProfilePreferences from './components/profile_preferences.vue';
 
 export default () => {
   const el = document.querySelector('#js-profile-preferences-app');
-  const shouldParse = ['integrationViews', 'userFields'];
+  const { viewDiffsFileByFile = true, userTimeSettings } = gon?.features;
+  const featureFlags = {
+    viewDiffsFileByFile,
+    userTimeSettings,
+  };
+  const shouldParse = [
+    'dashboardChoices',
+    'firstDayOfWeekChoicesWithDefault',
+    'layoutChoices',
+    'languageChoices',
+    'projectViewChoices',
+    'groupViewChoices',
+    'integrationViews',
+    'themes',
+    'schemes',
+    'userFields',
+  ];
 
   const provide = Object.keys(el.dataset).reduce((memo, key) => {
     let value = el.dataset[key];
@@ -12,7 +28,7 @@ export default () => {
     }
 
     return { ...memo, [key]: value };
-  }, {});
+  }, { featureFlags });
 
   return new Vue({
     el,
