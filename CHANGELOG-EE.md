@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.4.1 (2020-09-24)
+
+### Fixed (1 change)
+
+- This fixes an issue where the request parameters would be missing on the Value Stream Analytics page, so the charts would not reflect the filters applied. !42655
+
+
 ## 13.4.0 (2020-09-22)
 
 ### Security (1 change, 1 of them is from the community)
