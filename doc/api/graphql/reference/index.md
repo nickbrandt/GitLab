@@ -2303,7 +2303,6 @@ Represents a snippet entry.
 | ----- | ---- | ----------- |
 | `author` | User | The owner of the snippet |
 | `blob` **{warning-solid}** | SnippetBlob! | **Deprecated:** Use `blobs`. Deprecated in 13.3 |
-| `blobs` | SnippetBlob! => Array | Snippet blobs |
 | `createdAt` | Time! | Timestamp this snippet was created |
 | `description` | String | Description of the snippet |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
