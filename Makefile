@@ -11,7 +11,7 @@ VERSION_STRING := v$(shell cat VERSION)
 endif
 BUILD_TIME := $(shell date -u +%Y%m%d.%H%M%S)
 GOBUILD := go build -ldflags "-X main.Version=$(VERSION_STRING) -X main.BuildTime=$(BUILD_TIME)"
-EXE_ALL := gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
+EXE_ALL := gitlab-resize-image gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 INSTALL := install
 BUILD_TAGS := tracer_static tracer_static_jaeger continuous_profiler_stackdriver
 
@@ -40,6 +40,10 @@ $(TARGET_SETUP):
 	mkdir -p "$(TARGET_DIR)"
 	touch "$(TARGET_SETUP)"
 
+gitlab-resize-image: $(TARGET_SETUP) $(shell find cmd/gitlab-resize-image/ -name '*.go')
+	$(call message,Building $@)
+	$(GOBUILD) -tags "$(BUILD_TAGS)" -o $(BUILD_DIR)/$@ $(PKG)/cmd/$@
+
 gitlab-zip-cat:	$(TARGET_SETUP) $(shell find cmd/gitlab-zip-cat/ -name '*.go')
 	$(call message,Building $@)
 	$(GOBUILD) -tags "$(BUILD_TAGS)" -o $(BUILD_DIR)/$@ $(PKG)/cmd/$@
@@ -53,7 +57,7 @@ gitlab-workhorse:	$(TARGET_SETUP) $(shell find . -name '*.go' | grep -v '^\./_')
 	$(GOBUILD) -tags "$(BUILD_TAGS)" -o $(BUILD_DIR)/$@ $(PKG)
 
 .PHONY:	install
-install:	gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
+install:	gitlab-workhorse gitlab-resize-image gitlab-zip-cat gitlab-zip-metadata
 	$(call message,$@)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin/
 	cd $(BUILD_DIR) && $(INSTALL) gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata $(DESTDIR)$(PREFIX)/bin/
