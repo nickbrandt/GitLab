@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"syscall"
@@ -40,7 +41,10 @@ type processCounter struct {
 
 var numScalerProcs processCounter
 
-const maxImageScalerProcs = 100
+const (
+	maxImageScalerProcs     = 100
+	maxAllowedFileSizeBytes = 250 * 1000 // 250kB
+)
 
 // Images might be located remotely in object storage, in which case we need to stream
 // it via http(s)
@@ -88,7 +92,7 @@ func init() {
 	prometheus.MustRegister(imageResizeCompleted)
 }
 
-// This Injecter forks into graphicsmagick to resize an image identified by path or URL
+// This Injecter forks into a dedicated scaler process to resize an image identified by path or URL
 // and streams the resized image back to the client
 func (r *resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData string) {
 	start := time.Now()
@@ -101,7 +105,7 @@ func (r *resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 		return
 	}
 
-	sourceImageReader, filesize, err := openSourceImage(params.Location)
+	sourceImageReader, fileSize, err := openSourceImage(params.Location)
 	if err != nil {
 		// This means we cannot even read the input image; fail fast.
 		helper.Fail500(w, req, fmt.Errorf("ImageResizer: Failed opening image data stream: %v", err))
@@ -115,13 +119,13 @@ func (r *resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 			"duration_s":        time.Since(start).Seconds(),
 			"target_width":      params.Width,
 			"content_type":      params.ContentType,
-			"original_filesize": filesize,
+			"original_filesize": fileSize,
 		}
 	}
 
-	// We first attempt to rescale the image; if this should fail for any reason, we
-	// simply fail over to rendering out the original image unchanged.
-	imageReader, resizeCmd, err := tryResizeImage(req, sourceImageReader, logger.Writer(), params)
+	// We first attempt to rescale the image; if this should fail for any reason, imageReader
+	// will point to the original image, i.e. we render it unchanged.
+	imageReader, resizeCmd, err := tryResizeImage(req, sourceImageReader, logger.Writer(), params, fileSize)
 	if err != nil {
 		// something failed, but we can still write out the original image, do don't return early
 		helper.LogErrorWithFields(req, err, *logFields(0))
@@ -130,23 +134,38 @@ func (r *resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 	imageResizeCompleted.Inc()
 
 	w.Header().Del("Content-Length")
-	bytesWritten, err := io.Copy(w, imageReader)
+	bytesWritten, err := serveImage(imageReader, w, resizeCmd)
 	if err != nil {
 		handleFailedCommand(w, req, bytesWritten, err, logFields(bytesWritten))
-	} else if err = resizeCmd.Wait(); err != nil {
-		handleFailedCommand(w, req, bytesWritten, err, logFields(bytesWritten))
-	} else {
-		logger.WithFields(*logFields(bytesWritten)).Printf("ImageResizer: Success")
+		return
 	}
+
+	logger.WithFields(*logFields(bytesWritten)).Printf("ImageResizer: Success")
+}
+
+// Streams image data from the given reader to the given writer and returns the number of bytes written.
+// Errors are either served to the caller or merely logged, depending on whether any image data had
+// already been transmitted or not.
+func serveImage(r io.Reader, w io.Writer, resizeCmd *exec.Cmd) (int64, error) {
+	bytesWritten, err := io.Copy(w, r)
+	if err != nil {
+		return bytesWritten, err
+	}
+
+	if resizeCmd != nil {
+		if err = resizeCmd.Wait(); err != nil {
+			return bytesWritten, err
+		}
+	}
+
+	return bytesWritten, nil
 }
 
 func handleFailedCommand(w http.ResponseWriter, req *http.Request, bytesWritten int64, err error, logFields *log.Fields) {
-	if err != nil {
-		if bytesWritten <= 0 {
-			helper.Fail500(w, req, err)
-		} else {
-			helper.LogErrorWithFields(req, err, *logFields)
-		}
+	if bytesWritten <= 0 {
+		helper.Fail500(w, req, err)
+	} else {
+		helper.LogErrorWithFields(req, err, *logFields)
 	}
 }
 
@@ -161,14 +180,18 @@ func (r *resizer) unpackParameters(paramsData string) (*resizeParams, error) {
 	}
 
 	if params.ContentType == "" {
-		return nil, fmt.Errorf("ImageResizer: Image MIME type must be set")
+		return nil, fmt.Errorf("ImageResizer: ContentType must be set")
 	}
 
 	return &params, nil
 }
 
 // Attempts to rescale the given image data, or in case of errors, falls back to the original image.
-func tryResizeImage(req *http.Request, r io.Reader, errorWriter io.Writer, params *resizeParams) (io.Reader, *exec.Cmd, error) {
+func tryResizeImage(req *http.Request, r io.Reader, errorWriter io.Writer, params *resizeParams, fileSize int64) (io.Reader, *exec.Cmd, error) {
+	if fileSize > maxAllowedFileSizeBytes {
+		return r, nil, fmt.Errorf("ImageResizer: %db exceeds maximum file size of %db", fileSize, maxAllowedFileSizeBytes)
+	}
+
 	if !numScalerProcs.tryIncrement() {
 		return r, nil, fmt.Errorf("ImageResizer: too many running scaler processes")
 	}
@@ -179,35 +202,22 @@ func tryResizeImage(req *http.Request, r io.Reader, errorWriter io.Writer, param
 		numScalerProcs.decrement()
 	}()
 
-	width := params.Width
-	gmFileSpec := determineFilePrefix(params.ContentType)
-	if gmFileSpec == "" {
-		return r, nil, fmt.Errorf("ImageResizer: unexpected MIME type: %s", params.ContentType)
-	}
-
-	resizeCmd, resizedImageReader, err := startResizeImageCommand(ctx, r, errorWriter, width, gmFileSpec)
+	resizeCmd, resizedImageReader, err := startResizeImageCommand(ctx, r, errorWriter, params)
 	if err != nil {
-		return r, nil, fmt.Errorf("ImageResizer: failed forking into graphicsmagick")
+		return r, nil, fmt.Errorf("ImageResizer: failed forking into scaler process: %w", err)
 	}
 	return resizedImageReader, resizeCmd, nil
 }
 
-func determineFilePrefix(contentType string) string {
-	switch contentType {
-	case "image/png":
-		return "png:"
-	case "image/jpeg":
-		return "jpg:"
-	default:
-		return ""
-	}
-}
-
-func startResizeImageCommand(ctx context.Context, imageReader io.Reader, errorWriter io.Writer, width uint, gmFileSpec string) (*exec.Cmd, io.ReadCloser, error) {
-	cmd := exec.CommandContext(ctx, "gm", "convert", "-resize", fmt.Sprintf("%dx", width), gmFileSpec+"-", "-")
+func startResizeImageCommand(ctx context.Context, imageReader io.Reader, errorWriter io.Writer, params *resizeParams) (*exec.Cmd, io.ReadCloser, error) {
+	cmd := exec.CommandContext(ctx, "gitlab-resize-image")
 	cmd.Stdin = imageReader
 	cmd.Stderr = errorWriter
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	cmd.Env = []string{
+		"GL_RESIZE_IMAGE_WIDTH=" + strconv.Itoa(int(params.Width)),
+		"GL_RESIZE_IMAGE_CONTENT_TYPE=" + params.ContentType,
+	}
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -227,13 +237,13 @@ func isURL(location string) bool {
 
 func openSourceImage(location string) (io.ReadCloser, int64, error) {
 	if isURL(location) {
-		return openFromUrl(location)
+		return openFromURL(location)
 	}
 
 	return openFromFile(location)
 }
 
-func openFromUrl(location string) (io.ReadCloser, int64, error) {
+func openFromURL(location string) (io.ReadCloser, int64, error) {
 	res, err := httpClient.Get(location)
 	if err != nil {
 		return nil, 0, err

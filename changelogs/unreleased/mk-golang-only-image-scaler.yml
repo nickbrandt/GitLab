@@ -1,0 +1,5 @@
+---
+title: Switch image scaler to a Go-only solution
+merge_request: 603
+author:
+type: changed

@@ -377,7 +377,7 @@ func TestImageResizing(t *testing.T) {
 
 	resp, body, err := doSendDataRequest(resourcePath, "send-scaled-img", jsonParams)
 	require.NoError(t, err, "send resize request")
-	require.Equal(t, 200, resp.StatusCode, "GET %q: status code", resourcePath)
+	require.Equal(t, 200, resp.StatusCode, "GET %q: body: %s", resourcePath, body)
 
 	img, err := png.Decode(bytes.NewReader(body))
 	require.NoError(t, err, "decode resized image")

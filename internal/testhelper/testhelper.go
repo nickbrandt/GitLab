@@ -74,7 +74,7 @@ func TestServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httpte
 	}))
 }
 
-var workhorseExecutables = []string{"gitlab-workhorse", "gitlab-zip-cat", "gitlab-zip-metadata"}
+var workhorseExecutables = []string{"gitlab-workhorse", "gitlab-zip-cat", "gitlab-zip-metadata", "gitlab-resize-image"}
 
 func BuildExecutables() error {
 	rootDir := RootDir()
