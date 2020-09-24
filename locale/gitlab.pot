@@ -26203,7 +26203,7 @@ msgstr ""
 msgid "This user has previously committed to the %{name} project."
 msgstr ""
 
-msgid "This user is a %{access} of the %{name} project."
+msgid "This user has the %{access} role in the %{name} project."
 msgstr ""
 
 msgid "This user is the author of this %{noteable}."
