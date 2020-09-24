@@ -82,3 +82,5 @@ ee:
           - milestone:
             - events:
               - :push_event_payload
+      - releases:
+        - :links
