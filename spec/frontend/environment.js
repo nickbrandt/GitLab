@@ -1,4 +1,4 @@
-/* eslint-disable import/no-commonjs */
+/* eslint-disable import/no-commonjs, max-classes-per-file */
 
 const path = require('path');
 const { ErrorWithStack } = require('jest-util');
