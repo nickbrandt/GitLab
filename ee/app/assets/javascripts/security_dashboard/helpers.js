@@ -77,12 +77,14 @@ export const scannerFilter = {
   name: s__('Reports|Scanner'),
   id: 'reportType',
   options: [BASE_FILTERS.report_type, ...parseReportTypes(REPORT_TYPES).gitlabFilters],
-  // idSelection is what is used to retain being able to easily add/remove filters, like the
-  // `selection` property in the above filters. Then the below selection property is created
-  // from this property and used for GraphQL queries and the route query, which both take a
-  // specific format
-  idSelection: new Set([ALL]),
-  selection: { reportType: [], scanner: [] },
+  selection: new Set([ALL]),
+  // `selection` is similar to the other filter's `selection` property (i.e. uses the option ids to
+  // easily update which filters are selected and is used in the query), except for this filter
+  // the options' id is NOT what is used to retrieve the vulnerabilities that match the filter; for
+  // this filter we must have a separate property that has that information, which is what the
+  // `selectionDetails` property is for. It contains the details necessary for vulenerability
+  // retrieval.
+  selectionDetails: { reportType: [], scanner: [] },
 };
 
 /**

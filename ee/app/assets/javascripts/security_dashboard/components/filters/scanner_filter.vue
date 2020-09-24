@@ -9,7 +9,7 @@ import {
 } from '@gitlab/ui';
 
 import { ALL } from '../../store/modules/filters/constants';
-import { setFilter, createScannerSelection } from '../../store/modules/filters/utils';
+import { setFilter, createScannerSelectionDetails } from '../../store/modules/filters/utils';
 import { parseSpecificFilters } from '../../utils/filters_utils';
 import { modifyReportTypeFilter } from '../../helpers';
 import projectSpecificScanners from '../../graphql/project_specific_scanners.query.graphql';
@@ -77,7 +77,7 @@ export default {
       return this.filter.id;
     },
     selection() {
-      return this.filter.idSelection;
+      return this.filter.selection;
     },
     firstSelectedOption() {
       return this.filter.options.find(option => this.selection.has(option.id))?.name || '-';
@@ -110,8 +110,11 @@ export default {
         optionId: option.id,
         filterId: this.filter.id,
       });
-      const updatedSelection = createScannerSelection(filter[0].selection, filter[0].options);
-      this.$emit('onFilterChange', [{ ...filter[0], selection: updatedSelection }]);
+      const updatedselectionDetails = createScannerSelectionDetails(
+        filter[0].selection,
+        filter[0].options,
+      );
+      this.$emit('onFilterChange', [{ ...filter[0], selectionDetails: updatedselectionDetails }]);
     },
     isNotVendorAll(vendor) {
       return vendor.name !== ALL;

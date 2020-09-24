@@ -1,4 +1,3 @@
-import { difference } from 'lodash';
 import { isSubset } from '~/lib/utils/set';
 import { ALL } from './constants';
 
@@ -25,7 +24,7 @@ export const hasValidSelection = ({ selection, options }) =>
  *    scanner: ['brakeman', 'geosec', 'gemnasium', 'custom_scanner_sast']
  * }
  */
-export const createScannerSelection = (selection, options) =>
+export const createScannerSelectionDetails = (selection, options) =>
   [...selection].reduce(
     (acc, curr) => {
       if (curr === 'all') {
@@ -53,7 +52,7 @@ export const createScannerSelection = (selection, options) =>
  */
 export const rehydrateScannerSelection = (options, id) => {
   const ids = convertToArray(id);
-  const selection = ids.reduce(
+  const selectionDetails = ids.reduce(
     (acc, curr) => {
       const currOption = options.find(option => option.id === curr);
       acc.reportType.push(currOption.reportType);
@@ -64,8 +63,8 @@ export const rehydrateScannerSelection = (options, id) => {
   );
 
   return {
-    idSelection: new Set(ids),
-    selection,
+    selection: new Set(ids),
+    selectionDetails,
   };
 };
 
