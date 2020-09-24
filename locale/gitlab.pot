@@ -14000,6 +14000,9 @@ msgstr ""
 msgid "Internal users"
 msgstr ""
 
+msgid "Internal users cannot be deactivated"
+msgstr ""
+
 msgid "Interval Pattern"
 msgstr ""
 
