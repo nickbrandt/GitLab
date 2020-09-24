@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { getCLS, getFID, getLCP } from 'web-vitals';
+import { PERFORMANCE_TYPE_MARK, PERFORMANCE_TYPE_MEASURE } from '~/performance_constants';
 
 const initVitalsLog = () => {
   const reportVital = data => {
@@ -22,13 +23,13 @@ const logUserTimingMetrics = () => {
     entries.forEach(entry => {
       const { name, entryType, startTime, duration } = entry;
       const typeMapper = {
-        mark: String.fromCodePoint(0x1f3af),
-        measure: String.fromCodePoint(0x1f4d0),
+        PERFORMANCE_MARK: String.fromCodePoint(0x1f3af),
+        PERFORMANCE_MEASURE: String.fromCodePoint(0x1f4d0),
       };
       console.group(`${typeMapper[entryType]} ${name}`);
-      if (entryType === 'mark') {
+      if (entryType === PERFORMANCE_TYPE_MARK) {
         console.log(`Start time: ${startTime}`);
-      } else if (entryType === 'measure') {
+      } else if (entryType === PERFORMANCE_TYPE_MEASURE) {
         console.log(`Duration: ${duration}`);
       }
       console.log(entry);
@@ -36,7 +37,7 @@ const logUserTimingMetrics = () => {
     });
   };
   const observer = new PerformanceObserver(metricsProcessor);
-  observer.observe({ entryTypes: ['mark', 'measure'] });
+  observer.observe({ entryTypes: [PERFORMANCE_TYPE_MEASURE, PERFORMANCE_TYPE_MARK] });
 };
 
 const initPerformanceBarLog = () => {
