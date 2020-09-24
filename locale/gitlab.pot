@@ -4483,9 +4483,6 @@ msgstr ""
 msgid "Can't create snippet: %{err}"
 msgstr ""
 
-msgid "Can't edit as source branch was deleted"
-msgstr ""
-
 msgid "Can't fetch content for the blob: %{err}"
 msgstr ""
 
@@ -9321,9 +9318,6 @@ msgstr ""
 msgid "Edit environment"
 msgstr ""
 
-msgid "Edit file in..."
-msgstr ""
-
 msgid "Edit files in the editor and commit changes here"
 msgstr ""
 
@@ -12997,6 +12991,9 @@ msgid_plural "Hide charts"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Hide comments on this file"
+msgstr ""
+
 msgid "Hide details"
 msgstr ""
 
@@ -15839,9 +15836,6 @@ msgid "MergeRequests|Thread will be resolved"
 msgstr ""
 
 msgid "MergeRequests|Thread will be unresolved"
-msgstr ""
-
-msgid "MergeRequests|Toggle comments for this file"
 msgstr ""
 
 msgid "MergeRequests|View file @ %{commitId}"
@@ -23418,6 +23412,9 @@ msgid "Show command"
 msgstr ""
 
 msgid "Show comments"
+msgstr ""
+
+msgid "Show comments on this file"
 msgstr ""
 
 msgid "Show comments only"
