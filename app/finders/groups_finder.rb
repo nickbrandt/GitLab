@@ -12,7 +12,7 @@
 #     all_available: boolean (defaults to true)
 #     min_access_level: integer
 #     exclude_group_ids: array of integers
-#     include_descendants: boolean (defaults to false)
+#     include_parent_descendants: boolean (defaults to false)
 #
 # Users with full private access can see all groups. The `owned` and `parent`
 # params can be used to restrict the groups that are returned.
@@ -85,8 +85,9 @@ class GroupsFinder < UnionFinder
   def by_parent(groups)
     return groups unless params[:parent]
 
-    if params[:include_descendants]
-      groups.id_in(hierarchy_for_parent(params[:parent]).descendants.pluck(:id))
+    if include_parent_descendants?
+      descendants = Gitlab::ObjectHierarchy.new(Group.where(id: params[:parent])).descendants
+      groups.id_in(descendants.pluck(:id))
     else
       groups.where(parent: params[:parent])
     end
@@ -105,13 +106,11 @@ class GroupsFinder < UnionFinder
     params.fetch(:all_available, true)
   end
 
+  def include_parent_descendants?
+    params.fetch(:include_parent_descendants, false)
+  end
+
   def min_access_level?
     current_user && params[:min_access_level].present?
   end
-
-  # rubocop: disable CodeReuse/ActiveRecord
-  def hierarchy_for_parent(parent_group_id)
-    @hierarchy ||= Gitlab::ObjectHierarchy.new(Group.where(id: parent_group_id))
-  end
-  # rubocop: enable CodeReuse/ActiveRecord
 end

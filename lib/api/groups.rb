@@ -33,7 +33,7 @@ module API
           :all_available,
           :custom_attributes,
           :owned, :min_access_level,
-          :include_descendants
+          :include_parent_descendants
         )
 
         find_params[:parent] = if params[:top_level_only]
@@ -322,7 +322,7 @@ module API
         use :with_custom_attributes
       end
       get ":id/descendant_groups" do
-        finder_params = declared_params(include_missing: false).merge(include_descendants: true)
+        finder_params = declared_params(include_missing: false).merge(include_parent_descendants: true)
         groups = find_groups(finder_params, params[:id])
         present_groups params, groups
       end
