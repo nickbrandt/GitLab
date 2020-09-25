@@ -84,7 +84,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       result = {
         '_source' => blob,
         'highlight' => {
-          'blob.content' => ["foo\ngitlabelasticsearch→bar←gitlabelasticsearch\nbaz\n"]
+          'blob.content' => ["foo\n#{::Elastic::Latest::GitClassProxy::HIGHLIGHT_START_TAG}bar#{::Elastic::Latest::GitClassProxy::HIGHLIGHT_END_TAG}\nbaz\n"]
         }
       }
 
@@ -120,7 +120,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         bar
         bar
         foo
-        gitlabelasticsearch→bar←gitlabelasticsearch # this is the highlighted bar
+        #{::Elastic::Latest::GitClassProxy::HIGHLIGHT_START_TAG}bar#{::Elastic::Latest::GitClassProxy::HIGHLIGHT_END_TAG} # this is the highlighted bar
         baz
         boo
         bar

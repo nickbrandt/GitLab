@@ -128,7 +128,7 @@ module Gitlab
         found_line_number = 0
 
         highlight_content.each_line.each_with_index do |line, index|
-          if line.include?('gitlabelasticsearch→')
+          if line.include?(::Elastic::Latest::GitClassProxy::HIGHLIGHT_START_TAG)
             found_line_number = index
             break
           end
