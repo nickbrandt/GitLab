@@ -204,6 +204,11 @@ module EE
       update!(blocking_issues_count: blocking_count)
     end
 
+    override :relocation_target
+    def relocation_target
+      super || promoted_to_epic
+    end
+
     private
 
     def blocking_issues_ids
