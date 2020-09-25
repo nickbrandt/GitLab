@@ -6,6 +6,7 @@ RSpec.describe BulkImport, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user).required }
     it { is_expected.to have_one(:configuration) }
+    it { is_expected.to have_many(:entities) }
   end
 
   describe 'validations' do

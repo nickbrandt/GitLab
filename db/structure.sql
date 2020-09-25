@@ -9836,6 +9836,35 @@ CREATE SEQUENCE bulk_import_configurations_id_seq
 
 ALTER SEQUENCE bulk_import_configurations_id_seq OWNED BY bulk_import_configurations.id;
 
+CREATE TABLE bulk_import_entities (
+    id bigint NOT NULL,
+    bulk_import_id bigint NOT NULL,
+    parent_id bigint,
+    namespace_id bigint,
+    project_id bigint,
+    source_type smallint NOT NULL,
+    source_full_path text NOT NULL,
+    destination_name text NOT NULL,
+    destination_namespace text NOT NULL,
+    status smallint NOT NULL,
+    jid text,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT check_13f279f7da CHECK ((char_length(source_full_path) <= 255)),
+    CONSTRAINT check_715d725ea2 CHECK ((char_length(destination_name) <= 255)),
+    CONSTRAINT check_796a4d9cc6 CHECK ((char_length(jid) <= 255)),
+    CONSTRAINT check_b834fff4d9 CHECK ((char_length(destination_namespace) <= 255))
+);
+
+CREATE SEQUENCE bulk_import_entities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE bulk_import_entities_id_seq OWNED BY bulk_import_entities.id;
+
 CREATE TABLE bulk_imports (
     id bigint NOT NULL,
     user_id integer NOT NULL,
@@ -17344,6 +17373,8 @@ ALTER TABLE ONLY broadcast_messages ALTER COLUMN id SET DEFAULT nextval('broadca
 
 ALTER TABLE ONLY bulk_import_configurations ALTER COLUMN id SET DEFAULT nextval('bulk_import_configurations_id_seq'::regclass);
 
+ALTER TABLE ONLY bulk_import_entities ALTER COLUMN id SET DEFAULT nextval('bulk_import_entities_id_seq'::regclass);
+
 ALTER TABLE ONLY bulk_imports ALTER COLUMN id SET DEFAULT nextval('bulk_imports_id_seq'::regclass);
 
 ALTER TABLE ONLY chat_names ALTER COLUMN id SET DEFAULT nextval('chat_names_id_seq'::regclass);
@@ -18324,6 +18355,9 @@ ALTER TABLE ONLY broadcast_messages
 
 ALTER TABLE ONLY bulk_import_configurations
     ADD CONSTRAINT bulk_import_configurations_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY bulk_import_entities
+    ADD CONSTRAINT bulk_import_entities_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY bulk_imports
     ADD CONSTRAINT bulk_imports_pkey PRIMARY KEY (id);
@@ -19834,6 +19868,14 @@ CREATE INDEX index_boards_on_project_id ON boards USING btree (project_id);
 CREATE INDEX index_broadcast_message_on_ends_at_and_broadcast_type_and_id ON broadcast_messages USING btree (ends_at, broadcast_type, id);
 
 CREATE INDEX index_bulk_import_configurations_on_bulk_import_id ON bulk_import_configurations USING btree (bulk_import_id);
+
+CREATE INDEX index_bulk_import_entities_on_bulk_import_id ON bulk_import_entities USING btree (bulk_import_id);
+
+CREATE INDEX index_bulk_import_entities_on_namespace_id ON bulk_import_entities USING btree (namespace_id);
+
+CREATE INDEX index_bulk_import_entities_on_parent_id ON bulk_import_entities USING btree (parent_id);
+
+CREATE INDEX index_bulk_import_entities_on_project_id ON bulk_import_entities USING btree (project_id);
 
 CREATE INDEX index_bulk_imports_on_user_id ON bulk_imports USING btree (user_id);
 
@@ -22467,6 +22509,9 @@ ALTER TABLE ONLY ci_builds
 ALTER TABLE ONLY vulnerabilities
     ADD CONSTRAINT fk_88b4d546ef FOREIGN KEY (start_date_sourcing_milestone_id) REFERENCES milestones(id) ON DELETE SET NULL;
 
+ALTER TABLE ONLY bulk_import_entities
+    ADD CONSTRAINT fk_88c725229f FOREIGN KEY (namespace_id) REFERENCES namespaces(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY issues
     ADD CONSTRAINT fk_899c8f3231 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
@@ -22545,6 +22590,9 @@ ALTER TABLE ONLY ci_builds
 ALTER TABLE ONLY ci_pipelines
     ADD CONSTRAINT fk_a23be95014 FOREIGN KEY (merge_request_id) REFERENCES merge_requests(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY bulk_import_entities
+    ADD CONSTRAINT fk_a44ff95be5 FOREIGN KEY (parent_id) REFERENCES bulk_import_entities(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY users
     ADD CONSTRAINT fk_a4b8fefe3e FOREIGN KEY (managing_group_id) REFERENCES namespaces(id) ON DELETE SET NULL;
 
@@ -22586,6 +22634,9 @@ ALTER TABLE ONLY project_access_tokens
 
 ALTER TABLE ONLY protected_tag_create_access_levels
     ADD CONSTRAINT fk_b4eb82fe3c FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY bulk_import_entities
+    ADD CONSTRAINT fk_b69fa2b2df FOREIGN KEY (bulk_import_id) REFERENCES bulk_imports(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY compliance_management_frameworks
     ADD CONSTRAINT fk_b74c45b71f FOREIGN KEY (namespace_id) REFERENCES namespaces(id) ON DELETE CASCADE;
@@ -22646,6 +22697,9 @@ ALTER TABLE ONLY todos
 
 ALTER TABLE ONLY geo_event_log
     ADD CONSTRAINT fk_cff7185ad2 FOREIGN KEY (reset_checksum_event_id) REFERENCES geo_reset_checksum_events(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY bulk_import_entities
+    ADD CONSTRAINT fk_d06d023c30 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY project_mirror_data
     ADD CONSTRAINT fk_d1aad367d7 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
