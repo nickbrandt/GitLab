@@ -219,13 +219,6 @@ module Gitlab
     config.assets.paths << "#{config.root}/node_modules/xterm/src/"
     config.assets.precompile << "xterm.css"
 
-    # Add EE assets
-    if Gitlab.ee?
-      %w[images javascripts stylesheets].each do |path|
-        config.assets.paths << "#{config.root}/ee/app/assets/#{path}"
-      end
-    end
-
     # Import path for EE specific SCSS entry point
     # In CE it will import a noop file, in EE a functioning file
     # Order is important, so that the ee file takes precedence:
@@ -324,6 +317,20 @@ module Gitlab
     initializer :before_zeitwerk, before: :let_zeitwerk_take_over, after: :prepend_helpers_path do
       Dir[Rails.root.join('config/initializers_before_autoloader/*.rb')].sort.each do |initializer|
         load_config_initializer(initializer)
+      end
+    end
+
+    # Add EE assets. They should take precedence over CE. This means if two files exist, e.g.:
+    #
+    # ee/app/assets/stylesheets/example.scss
+    # app/assets/stylesheets/example.scss
+    #
+    # The ee/ version will be preferred.
+    initializer :prefer_ee_assets, after: :append_assets_path do |app|
+      if Gitlab.ee?
+        %w[images javascripts stylesheets].each do |path|
+          app.config.assets.paths.unshift("#{config.root}/ee/app/assets/#{path}")
+        end
       end
     end
 
