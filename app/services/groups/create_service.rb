@@ -32,7 +32,7 @@ module Groups
         if @group.save
           @group.add_owner(current_user)
           @group.create_namespace_settings
-          create_services_from_active_default_integrations(@group) if Feature.enabled?(:group_level_integrations)
+          Service.create_from_active_default_integrations(@group, :group_id) if Feature.enabled?(:group_level_integrations)
         end
       end
 
@@ -85,25 +85,6 @@ module Groups
       return if visibility_level.present?
 
       params[:visibility_level] = Gitlab::CurrentSettings.current_application_settings.default_group_visibility
-    end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def create_services_from_active_default_integrations(group)
-      group_ids = group.ancestors.select(:id)
-
-      Service.from_union([
-        Service.active.where(instance: true),
-        Service.active.where(group_id: group_ids)
-      ]).order(by_type_group_ids_and_instance(group_ids)).group_by(&:type).each do |type, records|
-        Service.build_from_integration(records.first, group_id: group.id).save!
-      end
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    def by_type_group_ids_and_instance(group_ids)
-      array = group_ids.to_sql.present? ? "array(#{group_ids.to_sql})" : 'ARRAY[]'
-
-      Arel.sql("type ASC, array_position(#{array}::bigint[], services.group_id), instance DESC")
     end
   end
 end

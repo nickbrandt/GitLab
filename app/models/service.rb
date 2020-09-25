@@ -255,6 +255,19 @@ class Service < ApplicationRecord
   end
   private_class_method :instance_level_integration
 
+  def self.create_from_active_default_integrations(scope, association, with_templates: false)
+    group_ids = scope.ancestors.select(:id)
+    array = group_ids.to_sql.present? ? "array(#{group_ids.to_sql})" : 'ARRAY[]'
+
+    from_union([
+      with_templates ? active.where(template: true) : none,
+      active.where(instance: true),
+      active.where(group_id: group_ids)
+    ]).order(Arel.sql("type ASC, array_position(#{array}::bigint[], services.group_id), instance DESC")).group_by(&:type).each do |type, records|
+      build_from_integration(records.first, association => scope.id).save!
+    end
+  end
+
   def activated?
     active
   end
