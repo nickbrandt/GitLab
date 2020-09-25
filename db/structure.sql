@@ -9816,6 +9816,26 @@ CREATE SEQUENCE broadcast_messages_id_seq
 
 ALTER SEQUENCE broadcast_messages_id_seq OWNED BY broadcast_messages.id;
 
+CREATE TABLE bulk_import_configurations (
+    id bigint NOT NULL,
+    bulk_import_id integer NOT NULL,
+    encrypted_url text,
+    encrypted_url_iv text,
+    encrypted_access_token text,
+    encrypted_access_token_iv text,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL
+);
+
+CREATE SEQUENCE bulk_import_configurations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE bulk_import_configurations_id_seq OWNED BY bulk_import_configurations.id;
+
 CREATE TABLE bulk_imports (
     id bigint NOT NULL,
     user_id integer NOT NULL,
@@ -17322,6 +17342,8 @@ ALTER TABLE ONLY boards_epic_user_preferences ALTER COLUMN id SET DEFAULT nextva
 
 ALTER TABLE ONLY broadcast_messages ALTER COLUMN id SET DEFAULT nextval('broadcast_messages_id_seq'::regclass);
 
+ALTER TABLE ONLY bulk_import_configurations ALTER COLUMN id SET DEFAULT nextval('bulk_import_configurations_id_seq'::regclass);
+
 ALTER TABLE ONLY bulk_imports ALTER COLUMN id SET DEFAULT nextval('bulk_imports_id_seq'::regclass);
 
 ALTER TABLE ONLY chat_names ALTER COLUMN id SET DEFAULT nextval('chat_names_id_seq'::regclass);
@@ -18299,6 +18321,9 @@ ALTER TABLE ONLY boards
 
 ALTER TABLE ONLY broadcast_messages
     ADD CONSTRAINT broadcast_messages_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY bulk_import_configurations
+    ADD CONSTRAINT bulk_import_configurations_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY bulk_imports
     ADD CONSTRAINT bulk_imports_pkey PRIMARY KEY (id);
@@ -19807,6 +19832,8 @@ CREATE INDEX index_boards_on_milestone_id ON boards USING btree (milestone_id);
 CREATE INDEX index_boards_on_project_id ON boards USING btree (project_id);
 
 CREATE INDEX index_broadcast_message_on_ends_at_and_broadcast_type_and_id ON broadcast_messages USING btree (ends_at, broadcast_type, id);
+
+CREATE INDEX index_bulk_import_configurations_on_bulk_import_id ON bulk_import_configurations USING btree (bulk_import_id);
 
 CREATE INDEX index_bulk_imports_on_user_id ON bulk_imports USING btree (user_id);
 
@@ -23174,6 +23201,9 @@ ALTER TABLE ONLY status_page_settings
 
 ALTER TABLE ONLY project_repository_storage_moves
     ADD CONSTRAINT fk_rails_5106dbd44a FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY bulk_import_configurations
+    ADD CONSTRAINT fk_rails_536b96bff1 FOREIGN KEY (bulk_import_id) REFERENCES bulk_imports(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY x509_commit_signatures
     ADD CONSTRAINT fk_rails_53fe41188f FOREIGN KEY (x509_certificate_id) REFERENCES x509_certificates(id) ON DELETE CASCADE;

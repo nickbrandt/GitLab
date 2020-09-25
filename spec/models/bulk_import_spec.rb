@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe BulkImport, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user).required }
+    it { is_expected.to have_one(:configuration) }
   end
 
   describe 'validations' do
