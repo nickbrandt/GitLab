@@ -23,6 +23,7 @@ module Gitlab
         def perform
           raise ReindexError, 'UNIQUE indexes are currently not supported' if index.unique?
           raise ReindexError, 'partitioned indexes are currently not supported' if index.partitioned?
+          raise ReindexError, 'indexes serving an exclusion constraint are currently not supported' if index.exclusion?
 
           logger.info "Starting reindex of #{index}"
 

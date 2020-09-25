@@ -14,6 +14,7 @@ class AddPostgresIndexView < ActiveRecord::Migration[6.0]
         pg_index.indisunique as unique,
         pg_index.indisvalid as valid_index,
         pg_class.relispartition as partitioned,
+        pg_index.indisexclusion as exclusion,
         pg_indexes.indexdef as definition,
         pg_relation_size(pg_class.oid) as ondisk_size_bytes
       FROM pg_index

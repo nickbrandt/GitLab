@@ -30,15 +30,17 @@ RSpec.describe Gitlab::Database::PostgresIndex do
     end
   end
 
-  describe '#non_unique' do
+  describe '#regular' do
     it 'only non-unique indexes' do
-      expect(described_class.non_unique).to all(have_attributes(unique: false))
+      expect(described_class.regular).to all(have_attributes(unique: false))
     end
-  end
 
-  describe '#non_partitioned' do
     it 'only non partitioned indexes ' do
-      expect(described_class.non_partitioned).to all(have_attributes(partitioned: false))
+      expect(described_class.regular).to all(have_attributes(partitioned: false))
+    end
+
+    it 'only indexes that dont serve an exclusion constraint' do
+      expect(described_class.regular).to all(have_attributes(exclusion: false))
     end
   end
 

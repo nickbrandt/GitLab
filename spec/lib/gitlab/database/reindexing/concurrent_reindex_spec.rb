@@ -8,7 +8,7 @@ RSpec.describe Gitlab::Database::Reindexing::ConcurrentReindex, '#perform' do
   let(:table_name) { '_test_reindex_table' }
   let(:column_name) { '_test_column' }
   let(:index_name) { '_test_reindex_index' }
-  let(:index) { instance_double(Gitlab::Database::PostgresIndex, indexrelid: 42, name: index_name, schema: 'public', partitioned?: false, unique?: false, definition: 'CREATE INDEX _test_reindex_index ON public._test_reindex_table USING btree (_test_column)') }
+  let(:index) { instance_double(Gitlab::Database::PostgresIndex, indexrelid: 42, name: index_name, schema: 'public', partitioned?: false, unique?: false, exclusion?: false, definition: 'CREATE INDEX _test_reindex_index ON public._test_reindex_table USING btree (_test_column)') }
   let(:logger) { double('logger', debug: nil, info: nil, error: nil ) }
   let(:connection) { ActiveRecord::Base.connection }
 
@@ -43,6 +43,18 @@ RSpec.describe Gitlab::Database::Reindexing::ConcurrentReindex, '#perform' do
       expect do
         subject.perform
       end.to raise_error(described_class::ReindexError, /partitioned indexes are currently not supported/)
+    end
+  end
+
+  context 'when the index serves an exclusion constraint' do
+    before do
+      allow(index).to receive(:exclusion?).and_return(true)
+    end
+
+    it 'raises an error' do
+      expect do
+        subject.perform
+      end.to raise_error(described_class::ReindexError, /indexes serving an exclusion constraint are currently not supported/)
     end
   end
 

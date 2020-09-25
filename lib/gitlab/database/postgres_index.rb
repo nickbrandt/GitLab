@@ -12,8 +12,10 @@ module Gitlab
         find(identifier)
       end
 
-      scope :non_unique, -> { where(unique: false) }
-      scope :non_partitioned, -> { where(partitioned: false) }
+      # A 'regular' index is a non-unique index,
+      # that does not serve an exclusion constraint and
+      # is defined on a table that is not partitioned.
+      scope :regular, -> { where(unique: false, partitioned: false, exclusion: false)}
 
       scope :random_few, ->(how_many) do
         limit(how_many).order(Arel.sql('RANDOM()'))

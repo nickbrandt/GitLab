@@ -177,7 +177,7 @@ namespace :gitlab do
       indexes = if args[:index_name]
                   Gitlab::Database::PostgresIndex.by_identifier(args[:index_name])
                 else
-                  Gitlab::Database::PostgresIndex.non_unique.non_partitioned.random_few(2)
+                  Gitlab::Database::PostgresIndex.regular.random_few(2)
                 end
 
       Gitlab::Database::Reindexing.perform(indexes)
