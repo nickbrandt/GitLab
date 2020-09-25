@@ -8947,6 +8947,9 @@ msgstr ""
 msgid "Diffs|Something went wrong while fetching diff lines."
 msgstr ""
 
+msgid "Direct member"
+msgstr ""
+
 msgid "Direction"
 msgstr ""
 
@@ -13628,6 +13631,9 @@ msgid "Inform users without uploaded SSH keys that they can't push over SSH unti
 msgstr ""
 
 msgid "Information about additional Pages templates and how to install them can be found in our %{pages_getting_started_guide}."
+msgstr ""
+
+msgid "Inherited"
 msgstr ""
 
 msgid "Inherited:"
