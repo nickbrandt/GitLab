@@ -16,6 +16,7 @@ module EE
       include UsageStatistics
       include FromUnion
       include EpicTreeSorting
+      include Presentable
 
       enum state_id: {
         opened: ::Epic.available_states[:opened],
