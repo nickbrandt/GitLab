@@ -215,7 +215,7 @@ class Service < ApplicationRecord
     services_names.map { |service_name| "#{service_name}_service".camelize }
   end
 
-  def self.build_from_integration(id, integration, belongs_to_project = true)
+  def self.build_from_integration(integration, project_id: nil, group_id: nil)
     service = integration.dup
 
     if integration.supports_data_fields?
@@ -223,16 +223,10 @@ class Service < ApplicationRecord
       data_fields.service = service
     end
 
-    if belongs_to_project
-      service.group = nil
-      service.project_id = id
-    else
-      service.project = nil
-      service.group_id = id
-    end
-
     service.template = false
     service.instance = false
+    service.project_id = project_id
+    service.group_id = group_id
     service.inherit_from_id = integration.id if integration.instance? || integration.group
     service.active = false if service.invalid?
     service

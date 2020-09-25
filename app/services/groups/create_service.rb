@@ -95,7 +95,7 @@ module Groups
         Service.active.where(instance: true),
         Service.active.where(group_id: group_ids)
       ]).order(by_type_group_ids_and_instance(group_ids)).group_by(&:type).each do |type, records|
-        Service.build_from_integration(group.id, records.first, false).save!
+        Service.build_from_integration(records.first, group_id: group.id).save!
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord
