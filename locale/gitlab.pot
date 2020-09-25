@@ -5097,6 +5097,9 @@ msgstr ""
 msgid "CiVariables|Protected"
 msgstr ""
 
+msgid "CiVariables|Remove variable"
+msgstr ""
+
 msgid "CiVariables|Remove variable row"
 msgstr ""
 
