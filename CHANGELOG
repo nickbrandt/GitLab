@@ -1,5 +1,15 @@
 # Changelog for gitlab-workhorse
 
+## v8.48.0
+
+### Changed
+- Switch image scaler to a Go-only solution
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/603
+
+### Other
+- Push uploader control flow into objectstore package
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/608
+
 ## v8.47.0
 
 ### Added
