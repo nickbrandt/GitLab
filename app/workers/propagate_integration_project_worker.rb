@@ -5,7 +5,6 @@ class PropagateIntegrationProjectWorker
 
   feature_category :integrations
   idempotent!
-  loggable_arguments 1
 
   # rubocop: disable CodeReuse/ActiveRecord
   def perform(integration_id, min_id, max_id)
