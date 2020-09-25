@@ -1,0 +1,5 @@
+---
+title: Tighten the RBAC for GraphQL in SAST CiConfiguration
+merge_request:
+author:
+type: security
