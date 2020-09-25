@@ -537,11 +537,7 @@ Additionally, the certificate (or its certificate authority) must be installed o
 
 Note the following:
 
-- The certificate must specify the address you use to access the Gitaly server. If you are:
-  - Addressing the Gitaly server by a hostname, you can either use the Common Name field for this,
-    or add it as a Subject Alternative Name.
-  - Addressing the Gitaly server by its IP address, you must add it as a Subject Alternative Name to
-    the certificate. [gRPC does not support using an IP address as Common Name in a certificate](https://github.com/grpc/grpc/issues/2691).
+- The certificate must specify the address you use to access the Gitaly server. You must add the hostname or IP address as a Subject Alternative Name to the certificate.
 - You can configure Gitaly servers with both an unencrypted listening address `listen_addr` and an
   encrypted listening address `tls_listen_addr` at the same time. This allows you to gradually
   transition from unencrypted to encrypted traffic if necessary.
