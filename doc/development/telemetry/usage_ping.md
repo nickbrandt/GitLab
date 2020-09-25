@@ -431,15 +431,6 @@ Recommendations:
 All events added in [`known_events.yml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data_counters/known_events.yml) are automatically added to usage data generation under the `redis_hll_counters` key. This column is stored in [version-app as a JSON](https://gitlab.com/gitlab-services/version-gitlab-com/-/blob/master/db/schema.rb#L209).
 For each event we add metrics for the weekly and monthly time frames, and totals for each where applicable:
 
-- `#{event_name}_weekly` data for 7 days for daily [aggregation](#adding-new-events) events and data for last complete week for weekly [aggregation](#adding-new-events) events.
-- `#{event_name}_monthly` data for 28 days for daily [aggregation](#adding-new-events) events and data for last 4 complete weeks for weekly [aggregation](#adding-new-events) events.
-- `#{category}_total_unique_counts_weekly` total unique counts for events in same category for last 7 days or last complete week, if events are in the same Redis slot and if we have more than one metric.
-- `#{event_name}_weekly` - Data for 7 days for daily [aggregation](#adding-new-events) events and data for the last complete week for weekly [aggregation](#adding-new-events) events.
-- `#{event_name}_monthly` - Data for 28 days for daily [aggregation](#adding-new-events) events and data for the last 4 complete weeks for weekly [aggregation](#adding-new-events) events.
-- `#{category}_total_unique_counts_weekly` - Total unique counts for events in the same category for the last 7 days or the last complete week, if events are in the same Redis slot and we have more than one metric.
-- `#{event_name}_weekly`: Data for 7 days for daily [aggregation](#adding-new-events) events and data for last complete week for weekly [aggregation](#adding-new-events) events.
-- `#{event_name}_monthly`: Data for 28 days for daily [aggregation](#adding-new-events) events and data for last 4 complete weeks for weekly [aggregation](#adding-new-events) events.
-- `#{category}_total_unique_counts_weekly` total unique counts for events in same category for last 7 days or last complete week, if events are in the same Redis slot and if we have more than one metric.
 - `#{event_name}_weekly`: Data for 7 days for daily [aggregation](#adding-new-events) events and data for the last complete week for weekly [aggregation](#adding-new-events) events.
 - `#{event_name}_monthly`: Data for 28 days for daily [aggregation](#adding-new-events) events and data for the last 4 complete weeks for weekly [aggregation](#adding-new-events) events.
 - `#{category}_total_unique_counts_weekly`: Total unique counts for events in the same category for the last 7 days or the last complete week, if events are in the same Redis slot and we have more than one metric.
