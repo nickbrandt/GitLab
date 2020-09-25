@@ -76,7 +76,7 @@ module Git
     def branch_change_hooks
       enqueue_process_commit_messages
       enqueue_jira_connect_sync_messages
-      enqueue_metrics_dashboard_sync if Feature.enabled?(:sync_metrics_dashboards, project)
+      enqueue_metrics_dashboard_sync
     end
 
     def branch_remove_hooks
@@ -84,6 +84,9 @@ module Git
     end
 
     def enqueue_metrics_dashboard_sync
+      return unless Feature.enabled?(:sync_metrics_dashboards, project)
+      return unless default_branch?
+
       ::Metrics::Dashboard::SyncDashboardsWorker.perform_async(project.id)
     end
 

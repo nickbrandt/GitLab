@@ -3,24 +3,23 @@
 require 'spec_helper'
 
 RSpec.describe Metrics::Dashboard::SyncDashboardsWorker do
+  include MetricsDashboardHelpers
   subject(:worker) { described_class.new }
 
-  let(:project) { create(:project) }
-  let(:dashboard_paths) { [".gitlab/dashboards/dashboard1.yml", ".gitlab/dashboards/dashboard2.yml"] }
+  let(:project) { project_with_dashboard(dashboard_path) }
+  let(:dashboard_path) { '.gitlab/dashboards/test.yml' }
 
   describe ".perform" do
-    before do
-      expect(::Gitlab::Metrics::Dashboard::RepoDashboardFinder).to receive(:list_dashboards).with(project)
-        .and_return(dashboard_paths)
+    it 'imports metrics' do
+      expect { worker.perform(project.id) }.to change(PrometheusMetric, :count).by(3)
     end
 
-    it 'calls importer for each dashboard path' do
-      dashboard_paths.each do |dashboard_path|
-        expect(::Gitlab::Metrics::Dashboard::Importer).to receive(:new)
-          .with(dashboard_path, project).and_return(double('importer', execute!: true))
+    it 'is idempotent' do
+      2.times do
+        worker.perform(project.id)
       end
 
-      worker.perform(project.id)
+      expect(PrometheusMetric.count).to eq(3)
     end
   end
 end

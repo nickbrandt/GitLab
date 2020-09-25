@@ -48,7 +48,7 @@ module Gitlab
               affected_metric_ids << prometheus_metric.id
             end
 
-            @affected_environment_ids += find_alerts(affected_metric_ids).pluck(:environment_id)
+            @affected_environment_ids += find_alerts(affected_metric_ids).get_environment_id
           end
           # rubocop: enable CodeReuse/ActiveRecord
 
@@ -60,22 +60,21 @@ module Gitlab
               .for_group(Enums::PrometheusMetric.groups[:custom])
               .not_identifier(identifiers_from_yml)
 
-            return unless stale_metrics.present?
+            return unless stale_metrics.exists?
 
             delete_stale_alerts(stale_metrics)
             stale_metrics.each_batch { |batch| batch.delete_all }
           end
 
-          # rubocop: disable CodeReuse/ActiveRecord
           def delete_stale_alerts(stale_metrics)
             stale_alerts = find_alerts(stale_metrics)
 
-            return unless stale_alerts.present?
+            affected_environment_ids = stale_alerts.get_environment_id
+            return unless affected_environment_ids.present?
 
-            @affected_environment_ids += stale_alerts.pluck(:environment_id)
+            @affected_environment_ids += affected_environment_ids
             stale_alerts.each_batch { |batch| batch.delete_all }
           end
-          # rubocop: enable CodeReuse/ActiveRecord
 
           def find_alerts(metrics)
             Projects::Prometheus::AlertsFinder.new(project: project, metric: metrics).execute
@@ -91,11 +90,10 @@ module Gitlab
             end
           end
 
-          # rubocop: disable CodeReuse/ActiveRecord
           def update_prometheus_environments
-            affected_environments = ::Environment.where(id: @affected_environment_ids.flatten.uniq, project: project)
+            affected_environments = ::Environment.for_id(@affected_environment_ids.flatten.uniq).for_project(project)
 
-            return unless affected_environments.present?
+            return unless affected_environments.exists?
 
             affected_environments.each do |affected_environment|
               ::Clusters::Applications::ScheduleUpdateService.new(
@@ -104,7 +102,6 @@ module Gitlab
               ).execute
             end
           end
-          # rubocop: enable CodeReuse/ActiveRecord
         end
       end
     end

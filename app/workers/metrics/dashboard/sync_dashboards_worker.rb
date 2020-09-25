@@ -13,8 +13,6 @@ module Metrics
         project = Project.find(project_id)
         dashboard_paths = ::Gitlab::Metrics::Dashboard::RepoDashboardFinder.list_dashboards(project)
 
-        return unless dashboard_paths.present?
-
         dashboard_paths.each do |dashboard_path|
           ::Gitlab::Metrics::Dashboard::Importer.new(dashboard_path, project).execute!
         end
