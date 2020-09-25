@@ -17931,6 +17931,9 @@ msgstr ""
 msgid "Origin"
 msgstr ""
 
+msgid "Orphaned member"
+msgstr ""
+
 msgid "Other Labels"
 msgstr ""
 
