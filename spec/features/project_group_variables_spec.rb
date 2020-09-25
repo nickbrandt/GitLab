@@ -49,4 +49,16 @@ RSpec.describe 'Project group variables', :js do
     expect(page).to have_content(subgroup.name)
     expect(page).to have_content(subgroup_nested.name)
   end
+
+  it 'project origin keys link to ancestor groups ci_cd settings' do
+    visit project_path
+
+    find('.group-origin-link').click
+
+    wait_for_requests
+
+    page.within('.ci-variable-table') do
+      expect(find('.js-ci-variable-row:nth-child(1) [data-label="Key"]').text).to eq(key1)
+    end
+  end
 end
