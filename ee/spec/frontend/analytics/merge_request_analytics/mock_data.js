@@ -84,7 +84,7 @@ export const throughputTableData = [
     },
     diffStatsSummary: { additions: 2, deletions: 1 },
     labels: {
-      nodes: [],
+      count: 0,
     },
     pipelines: {
       nodes: [],

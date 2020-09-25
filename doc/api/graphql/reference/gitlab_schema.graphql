@@ -9852,6 +9852,11 @@ The connection type for Label.
 """
 type LabelConnection {
   """
+  Total count of collection
+  """
+  count: Int!
+
+  """
   A list of edges.
   """
   edges: [LabelEdge]
