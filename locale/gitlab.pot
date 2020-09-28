@@ -8,6 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-22 19:32+0200\n"
+"PO-Revision-Date: 2020-09-22 19:32+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -2232,6 +2234,9 @@ msgid "AlertManagement|Display alerts from all your monitoring tools directly wi
 msgstr ""
 
 msgid "AlertManagement|Edit"
+msgstr ""
+
+msgid "AlertManagement|Environment"
 msgstr ""
 
 msgid "AlertManagement|Events"
