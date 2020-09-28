@@ -47,7 +47,7 @@ module MergeRequests
 
     # Is param using special condition: "Any" ?
     #
-    # @return [Boolean] whether special condition "Any"" is being used
+    # @return [Boolean] whether special condition "Any" is being used
     def by_any_approvals?
       includes_special_label?(IssuableFinder::Params::FILTER_ANY)
     end
