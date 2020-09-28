@@ -13770,6 +13770,15 @@ msgstr ""
 msgid "Integrations|Includes commit title and branch"
 msgstr ""
 
+msgid "Integrations|Projects using custom settings will not be impacted unless the project owner chooses to use instance-level defaults."
+msgstr ""
+
+msgid "Integrations|Save settings?"
+msgstr ""
+
+msgid "Integrations|Saving will update the default settings for all projects that are not using custom settings."
+msgstr ""
+
 msgid "Integrations|Standard"
 msgstr ""
 
