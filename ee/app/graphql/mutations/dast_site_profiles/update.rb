@@ -31,6 +31,7 @@ module Mutations
 
       def resolve(full_path:, id:, **service_args)
         # TODO: remove explicit coercion once compatibility layer has been removed
+        # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
         service_args[:id] = ::Types::GlobalIDType[::DastSiteProfile].coerce_isolated_input(id).model_id
         project = authorized_find_project!(full_path: full_path)
 

@@ -23,8 +23,7 @@ module EE
         field :vulnerability,
               ::Types::VulnerabilityType,
               null: true,
-              description: "Find a vulnerability",
-              resolve: -> (_obj, args, _ctx) { ::GitlabSchema.find_by_gid(args[:id]) } do
+              description: "Find a vulnerability" do
           argument :id, ::Types::GlobalIDType[::Vulnerability],
                    required: true,
                    description: 'The Global ID of the Vulnerability'
@@ -54,8 +53,18 @@ module EE
               description: 'Fields related to Instance Security Dashboard'
       end
 
+      def vulnerability(id:)
+        # TODO: remove this line when the compatibility layer is removed
+        # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
+        id = ::Types::GlobalIDType[::Vulnerability].coerce_isolated_input(id)
+        ::GitlabSchema.find_by_gid(id)
+      end
+
       def iteration(id:)
-        ::GitlabSchema.find_by_gid(::Types::GlobalIDType[Iteration].coerce_isolated_input(id))
+        # TODO: remove this line when the compatibility layer is removed
+        # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
+        id = ::Types::GlobalIDType[Iteration].coerce_isolated_input(id)
+        ::GitlabSchema.find_by_gid(id)
       end
     end
   end

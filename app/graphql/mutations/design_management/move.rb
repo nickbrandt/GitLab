@@ -35,7 +35,10 @@ module Mutations
       end
 
       def find_design(id)
-        GitlabSchema.object_from_id(DesignID.coerce_isolated_input(id))
+        # TODO: remove this line when the compatibility layer is removed
+        # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
+        id = DesignID.coerce_isolated_input(id)
+        GitlabSchema.object_from_id(id)
       end
 
       def not_found(gid)
