@@ -20371,6 +20371,24 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "assigneeUsernames",
+                  "description": "Usernames of users assigned to the issue",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "assigneeId",
                   "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
                   "type": {
@@ -38128,6 +38146,24 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "assigneeUsernames",
+                  "description": "Usernames of users assigned to the issue",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "assigneeId",
                   "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
                   "type": {
@@ -38349,6 +38385,24 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "assigneeUsernames",
+                  "description": "Usernames of users assigned to the issue",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "assigneeId",
                   "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
                   "type": {
@@ -38532,6 +38586,24 @@
                     "kind": "SCALAR",
                     "name": "String",
                     "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "assigneeUsernames",
+                  "description": "Usernames of users assigned to the issue",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
                   },
                   "defaultValue": null
                 },
