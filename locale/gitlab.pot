@@ -14624,9 +14624,6 @@ msgid_plural "Last %d days"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "Last %{days} days"
-msgstr ""
-
 msgid "Last 2 weeks"
 msgstr ""
 
@@ -22926,9 +22923,6 @@ msgid "Select the custom project template source group."
 msgstr ""
 
 msgid "Select the environment scope for this feature flag."
-msgstr ""
-
-msgid "Select timeframe"
 msgstr ""
 
 msgid "Select timezone"
