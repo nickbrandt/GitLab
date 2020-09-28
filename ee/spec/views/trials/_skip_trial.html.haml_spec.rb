@@ -8,7 +8,7 @@ RSpec.describe 'trials/_skip_trial.html.haml' do
   let(:source) { nil }
 
   before do
-    params[:glm_source] = source if source
+    params[:glm_source] = source
     render 'trials/skip_trial'
   end
 
