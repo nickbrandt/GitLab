@@ -86,8 +86,10 @@ class GroupsFinder < UnionFinder
     return groups unless params[:parent]
 
     if include_parent_descendants?
-      descendants = Gitlab::ObjectHierarchy.new(Group.where(id: params[:parent])).descendants
-      groups.id_in(descendants.pluck(:id))
+      descendants = Gitlab::ObjectHierarchy
+                      .new(groups.where(id: params[:parent]))
+                      .descendants
+      groups.id_in(descendants)
     else
       groups.where(parent: params[:parent])
     end
