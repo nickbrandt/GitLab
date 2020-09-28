@@ -321,7 +321,7 @@ RSpec.describe Gitlab::UsageData do
       end
 
       expect(described_class.usage_activity_by_stage_create({})).to include(
-        approval_project_rules: 8,
+        approval_project_rules: 10,
         approval_project_rules_with_target_branch: 2,
         approval_project_rules_with_more_approvers_than_required: 2,
         approval_project_rules_with_less_approvers_than_required: 2,
@@ -342,7 +342,7 @@ RSpec.describe Gitlab::UsageData do
         total_number_of_locked_files: 14
       )
       expect(described_class.usage_activity_by_stage_create(described_class.last_28_days_time_period)).to include(
-        approval_project_rules: 8,
+        approval_project_rules: 10,
         approval_project_rules_with_target_branch: 2,
         approval_project_rules_with_more_approvers_than_required: 2,
         approval_project_rules_with_less_approvers_than_required: 2,

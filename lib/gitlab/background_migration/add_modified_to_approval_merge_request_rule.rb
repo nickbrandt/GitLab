@@ -4,33 +4,37 @@ module Gitlab
   module BackgroundMigration
     # Compare all current rules to project rules
     class AddModifiedToApprovalMergeRequestRule
+      # Stubbed class to access the Group table
+      class Group < ActiveRecord::Base
+        self.table_name = 'namespaces'
+        self.inheritance_column = :_type_disabled
+      end
+
       # Stubbed class to access the ApprovalMergeRequestRule table
       class ApprovalMergeRequestRule < ActiveRecord::Base
         self.table_name = 'approval_merge_request_rules'
 
-        has_one :approval_merge_request_rule_source
+        has_one :approval_merge_request_rule_source, class_name: 'AddModifiedToApprovalMergeRequestRule::ApprovalMergeRequestRuleSource'
         has_one :approval_project_rule, through: :approval_merge_request_rule_source
-        has_and_belongs_to_many :users
         has_and_belongs_to_many :groups,
-          class_name: 'Group', join_table: "#{self.table_name}_groups"
+          class_name: 'AddModifiedToApprovalMergeRequestRule::Group', join_table: "#{self.table_name}_groups"
       end
 
       # Stubbed class to access the ApprovalProjectRule table
       class ApprovalProjectRule < ActiveRecord::Base
         self.table_name = 'approval_project_rules'
 
-        has_many :approval_merge_request_rule_sources
-        has_and_belongs_to_many :users
+        has_many :approval_merge_request_rule_sources, class_name: 'AddModifiedToApprovalMergeRequestRule::ApprovalMergeRequestRuleSource'
         has_and_belongs_to_many :groups,
-          class_name: 'Group', join_table: "#{self.table_name}_groups"
+          class_name: 'AddModifiedToApprovalMergeRequestRule::Group', join_table: "#{self.table_name}_groups"
       end
 
       # Stubbed class to access the ApprovalMergeRequestRuleSource table
       class ApprovalMergeRequestRuleSource < ActiveRecord::Base
         self.table_name = 'approval_merge_request_rule_sources'
 
-        belongs_to :approval_merge_request_rule
-        belongs_to :approval_project_rule
+        belongs_to :approval_merge_request_rule, class_name: 'AddModifiedToApprovalMergeRequestRule::ApprovalMergeRequestRule'
+        belongs_to :approval_project_rule, class_name: 'AddModifiedToApprovalMergeRequestRule::ApprovalProjectRule'
       end
 
       def perform(start_id, stop_id)

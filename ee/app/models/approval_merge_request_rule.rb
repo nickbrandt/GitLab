@@ -131,35 +131,10 @@ class ApprovalMergeRequestRule < ApplicationRecord
     refresh_license_scanning_approvals(project_approval_rule) if license_scanning?
   end
 
-  def different_from_project_rule?
-    return unless approval_project_rule
-
-    different_groups? || different_users? || different_name_or_approvals_required? ? true : false
-  end
-
   private
 
-  def different_groups?
-    group_ids = groups.collect(&:id)
-    apr_group_ids = approval_project_rule.groups.pluck(:id)
-
-    group_ids & apr_group_ids == group_ids
-  end
-
-  def different_users?
-    user_ids = users.collect(&:id)
-    apr_user_ids = approval_project_rule.users.pluck(:id)
-
-    user_ids & apr_user_ids == user_ids
-  end
-
-  def different_name_or_approvals_required?
-    true if approvals_required != approval_project_rule.approvals_required || name != approval_project_rule.name
-  end
-
   def compare_with_project_rule
-    self.modified_from_project_rule =
-      different_from_project_rule? ? true : false
+    self.modified_from_project_rule = overridden? ? true : false
   end
 
   def validate_approval_project_rule

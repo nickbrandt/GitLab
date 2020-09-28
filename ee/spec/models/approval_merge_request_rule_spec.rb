@@ -36,32 +36,6 @@ RSpec.describe ApprovalMergeRequestRule do
         it 'is valid' do
           expect(merge_request_rule).to be_valid
         end
-
-        context 'the MR rule shows that its modified from the original' do
-          it 'by having different groups' do
-            first_group = create(:group)
-            second_group = create(:group)
-            third_group = create(:group)
-
-            approval_project_rule.groups = [first_group, second_group]
-            approval_project_rule.save!
-            merge_request_rule.groups = [first_group, third_group]
-
-            expect(merge_request_rule.different_from_project_rule?).to be true
-          end
-
-          it 'by having different users' do
-            first_user = create(:user)
-            second_user = create(:user)
-            third_user = create(:user)
-
-            approval_project_rule.users = [first_user, second_user]
-            approval_project_rule.save!
-            merge_request_rule.users = [first_user, third_user]
-
-            expect(merge_request_rule.different_from_project_rule?).to be true
-          end
-        end
       end
 
       context 'when the project of approval_project_rule and merge request does not match' do
