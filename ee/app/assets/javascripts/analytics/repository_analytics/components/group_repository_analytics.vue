@@ -25,7 +25,7 @@ export default {
 
 <template>
   <div>
-    <h4 class="sub-header" data-testid="test-coverage-header">
+    <h4 data-testid="test-coverage-header">
       {{ $options.text.codeCoverageHeader }}
     </h4>
     <download-test-coverage

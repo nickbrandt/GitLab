@@ -28,13 +28,14 @@ describe('Download test coverage component', () => {
     groupFullPath: 'gitlab-org',
   };
 
-  const createComponent = (data = {}) => {
+  const createComponent = () => {
     wrapper = shallowMount(DownloadTestCoverage, {
       localVue,
       data() {
         return {
           hasError: false,
-          ...data,
+          allProjectsSelected: false,
+          selectedProjectIds: [],
         };
       },
       propsData: {
@@ -63,12 +64,12 @@ describe('Download test coverage component', () => {
     });
 
     describe('when there is an error fetching the projects', () => {
-      beforeEach(() => {
-        createComponent({ hasError: true });
-      });
-
       it('displays an alert for the failed query', () => {
-        expect(findAlert().exists()).toBe(true);
+        wrapper.setData({ hasError: true });
+
+        return wrapper.vm.$nextTick().then(() => {
+          expect(findAlert().exists()).toBe(true);
+        });
       });
     });
 
@@ -78,59 +79,50 @@ describe('Download test coverage component', () => {
       const groupAnalyticsCoverageReportsPathWithDates = `${defaultProps.groupAnalyticsCoverageReportsPath}&start_date=2020-06-06&end_date=2020-07-06`;
 
       describe('with all projects selected', () => {
-        beforeEach(() => {
-          createComponent({ allProjectsSelected: true });
-        });
-
         it('renders primary action as a link with no project_ids param', () => {
-          expect(findCodeCoverageDownloadButton().attributes('href')).toBe(
-            groupAnalyticsCoverageReportsPathWithDates,
-          );
+          wrapper.setData({ allProjectsSelected: true, selectedProjectIds: [] });
+
+          return wrapper.vm.$nextTick().then(() => {
+            expect(findCodeCoverageDownloadButton().attributes('href')).toBe(
+              groupAnalyticsCoverageReportsPathWithDates,
+            );
+          });
         });
       });
 
       describe('with two or more projects selected without selecting all projects', () => {
-        beforeEach(() => {
-          createComponent({ allProjectsSelected: false, selectedProjectIds: [1, 2] });
-        });
-
         it('renders primary action as a link with two project IDs as parameters', () => {
+          wrapper.setData({ allProjectsSelected: false, selectedProjectIds: [1, 2] });
           const projectIdsQueryParam = `project_ids%5B%5D=1&project_ids%5B%5D=2`;
           const expectedPath = `${groupAnalyticsCoverageReportsPathWithDates}&${projectIdsQueryParam}`;
 
-          expect(findCodeCoverageDownloadButton().attributes('href')).toBe(expectedPath);
+          return wrapper.vm.$nextTick().then(() => {
+            expect(findCodeCoverageDownloadButton().attributes('href')).toBe(expectedPath);
+          });
         });
       });
 
       describe('with one project selected', () => {
-        beforeEach(() => {
-          createComponent({ allProjectsSelected: false, selectedProjectIds: [1] });
-        });
-
         it('renders primary action as a link with one project ID as a parameter', () => {
+          wrapper.setData({ allProjectsSelected: false, selectedProjectIds: [1] });
           const projectIdsQueryParam = `project_ids%5B%5D=1`;
           const expectedPath = `${groupAnalyticsCoverageReportsPathWithDates}&${projectIdsQueryParam}`;
 
-          expect(findCodeCoverageDownloadButton().attributes('href')).toBe(expectedPath);
+          return wrapper.vm.$nextTick().then(() => {
+            expect(findCodeCoverageDownloadButton().attributes('href')).toBe(expectedPath);
+          });
         });
       });
 
       describe('with no projects selected', () => {
-        beforeEach(() => {
-          createComponent({ allProjectsSelected: false, selectedProjectIds: [] });
-        });
-
         it('renders a disabled primary action button', () => {
           expect(findCodeCoverageDownloadButton().attributes('disabled')).toBe('true');
         });
       });
 
       describe('when clicking the select all button', () => {
-        beforeEach(() => {
-          createComponent({ allProjectsSelected: false, selectedProjectIds: [] });
-        });
-
         it('selects all projects and removes the disabled attribute from the download button', () => {
+          wrapper.setData({ allProjectsSelected: false, selectedProjectIds: [] });
           clickSelectAllProjectsButton();
 
           return wrapper.vm.$nextTick().then(() => {

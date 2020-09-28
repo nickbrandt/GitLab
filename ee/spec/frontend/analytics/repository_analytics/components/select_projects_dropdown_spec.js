@@ -53,10 +53,6 @@ describe('Select projects dropdown component', () => {
     });
   };
 
-  beforeEach(() => {
-    createComponent();
-  });
-
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
@@ -128,6 +124,8 @@ describe('Select projects dropdown component', () => {
 
   describe('when there is only one page of projects', () => {
     it('should not render the intersection observer component', () => {
+      createComponent();
+
       expect(findIntersectionObserver().exists()).toBe(false);
     });
   });
@@ -142,47 +140,42 @@ describe('Select projects dropdown component', () => {
     });
 
     describe('when the intersection observer component appears in view', () => {
-      beforeEach(() => {
+      it('makes a query to fetch more projects', () => {
         jest
           .spyOn(wrapper.vm.$apollo.queries.groupProjects, 'fetchMore')
           .mockImplementation(jest.fn().mockResolvedValue());
 
         findIntersectionObserver().vm.$emit('appear');
-        return wrapper.vm.$nextTick();
-      });
 
-      it('makes a query to fetch more projects', () => {
-        expect(wrapper.vm.$apollo.queries.groupProjects.fetchMore).toHaveBeenCalledTimes(1);
+        return wrapper.vm.$nextTick().then(() => {
+          expect(wrapper.vm.$apollo.queries.groupProjects.fetchMore).toHaveBeenCalledTimes(1);
+        });
       });
 
       describe('when the fetchMore query throws an error', () => {
-        beforeEach(() => {
+        it('emits an error event', () => {
           jest.spyOn(wrapper.vm, '$emit');
           jest
             .spyOn(wrapper.vm.$apollo.queries.groupProjects, 'fetchMore')
             .mockImplementation(jest.fn().mockRejectedValue());
 
           findIntersectionObserver().vm.$emit('appear');
-          return wrapper.vm.$nextTick();
-        });
-
-        it('emits an error event', () => {
-          expect(wrapper.vm.$emit).toHaveBeenCalledWith('projects-query-error');
+          return wrapper.vm.$nextTick().then(() => {
+            expect(wrapper.vm.$emit).toHaveBeenCalledWith('projects-query-error');
+          });
         });
       });
     });
 
     describe('when a query is loading a new page of projects', () => {
-      beforeEach(() => {
+      it('should render the loading spinner', () => {
         createComponent({
           data: { projectsPageInfo: { hasNextPage: true } },
           apolloGroupProjects: {
             loading: true,
           },
         });
-      });
 
-      it('should render the loading spinner', () => {
         expect(findLoadingIcon().exists()).toBe(true);
       });
     });
