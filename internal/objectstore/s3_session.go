@@ -35,9 +35,7 @@ func (s *s3Session) isExpired() bool {
 }
 
 func newS3SessionCache() *s3SessionCache {
-	cache := &s3SessionCache{sessions: make(map[config.S3Config]*s3Session)}
-
-	return cache
+	return &s3SessionCache{sessions: make(map[config.S3Config]*s3Session)}
 }
 
 var (
@@ -57,13 +55,8 @@ func setupS3Session(s3Credentials config.S3Credentials, s3Config config.S3Config
 	sessionCache.Lock()
 	defer sessionCache.Unlock()
 
-	s, ok := sessionCache.sessions[s3Config]
-
-	if !ok {
-		s = &s3Session{}
-		sessionCache.sessions[s3Config] = s
-	} else if s.session != nil && !s.isExpired() {
-		return s.session.Copy(), nil
+	if s, ok := sessionCache.sessions[s3Config]; ok && !s.isExpired() {
+		return s.session, nil
 	}
 
 	cfg := &aws.Config{
@@ -85,18 +78,17 @@ func setupS3Session(s3Credentials config.S3Credentials, s3Config config.S3Config
 		return nil, err
 	}
 
-	s.expiry = time.Now().Add(sessionExpiration)
-	s.session = sess
+	sessionCache.sessions[s3Config] = &s3Session{
+		expiry:  time.Now().Add(sessionExpiration),
+		session: sess,
+	}
 
-	return sess.Copy(), nil
+	return sess, nil
 }
 
 func ResetS3Session(s3Config config.S3Config) {
 	sessionCache.Lock()
 	defer sessionCache.Unlock()
 
-	s, ok := sessionCache.sessions[s3Config]
-	if ok {
-		s.session = nil
-	}
+	delete(sessionCache.sessions, s3Config)
 }
