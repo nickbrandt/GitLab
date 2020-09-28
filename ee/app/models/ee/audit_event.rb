@@ -16,6 +16,14 @@ module EE
       before_validation :truncate_fields
     end
 
+    # Uses the snapshot of the author name in the author_name/details column
+    # If the user has changed their name since, this is not reflected.
+    #
+    # @return [String]
+    def author_name_snapshot
+      author_snapshot.name
+    end
+
     def entity
       lazy_entity
     end

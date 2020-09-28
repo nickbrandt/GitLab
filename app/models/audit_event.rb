@@ -49,6 +49,11 @@ class AuditEvent < ApplicationRecord
     self.details = {} if details&.nil?
   end
 
+  # Resolves the author name dynamically from User via author_id key
+  # If the user has been deleted, this will fallback to the snapshot information
+  # in the author_name/details column.
+  #
+  # @return [String]
   def author_name
     lazy_author.name
   end
@@ -58,7 +63,7 @@ class AuditEvent < ApplicationRecord
   end
 
   def lazy_author
-    BatchLoader.for(author_id).batch(default_value: default_author_value, replace_methods: false) do |author_ids, loader|
+    BatchLoader.for(author_id).batch(default_value: author_snapshot, replace_methods: false) do |author_ids, loader|
       User.select(:id, :name, :username).where(id: author_ids).find_each do |user|
         loader.call(user.id, user)
       end
@@ -73,7 +78,7 @@ class AuditEvent < ApplicationRecord
 
   private
 
-  def default_author_value
+  def author_snapshot
     ::Gitlab::Audit::NullAuthor.for(author_id, (self[:author_name] || details[:author_name]))
   end
 

@@ -182,6 +182,34 @@ RSpec.describe AuditEvent, type: :model do
     end
   end
 
+  describe '#author_name_snapshot' do
+    context 'when author_name exists in both details hash and author_name column' do
+      subject(:event) do
+        described_class.new(author_name: 'Jane Doe', details: { author_name: 'John Doe' })
+      end
+
+      it 'returns the value from author_name column' do
+        expect(event.author_name_snapshot).to eq('Jane Doe')
+      end
+    end
+
+    context 'when author_name exists in details hash but not in author_name column' do
+      subject(:event) { described_class.new(details: { author_name: 'Jane Doe' }) }
+
+      it 'returns the value from details hash' do
+        expect(event.author_name_snapshot).to eq('Jane Doe')
+      end
+    end
+
+    context 'when authored by an unauthenticated user' do
+      subject(:event) { described_class.new(author_id: -1) }
+
+      it 'returns `An unauthenticated user`' do
+        expect(event.author_name_snapshot).to eq('An unauthenticated user')
+      end
+    end
+  end
+
   describe '#entity' do
     context 'when entity exists' do
       let(:user) { create(:user, name: 'John Doe') }
