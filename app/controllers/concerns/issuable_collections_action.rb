@@ -34,6 +34,7 @@ module IssuableCollectionsAction
 
   def set_not_query_feature_flag(object = nil)
     push_frontend_feature_flag(:not_issuable_queries, object, default_enabled: true)
+    push_frontend_feature_flag(:merge_request_reviewers)
   end
 
   def sorting_field

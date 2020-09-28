@@ -13,6 +13,7 @@ module IssuableActions
     end
     before_action do
       push_frontend_feature_flag(:not_issuable_queries, @project, default_enabled: true)
+      push_frontend_feature_flag(:merge_request_reviewers, @project)
     end
   end
 
