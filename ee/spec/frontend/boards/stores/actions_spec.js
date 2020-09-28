@@ -18,6 +18,7 @@ let mock;
 
 beforeEach(() => {
   mock = new MockAdapter(axios);
+  window.gon = { features: {} };
 });
 
 afterEach(() => {
