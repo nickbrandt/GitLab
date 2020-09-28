@@ -31,7 +31,7 @@ More useful links:
 - The usage data is primarily composed of row counts for different tables in the instance’s database. By comparing these counts month over month (or week over week), we can get a rough sense for how an instance is using the different features within the product. In addition to counts, other facts
     that help us classify and understand GitLab installations are collected.
 - Usage ping is important to GitLab as we use it to calculate our Stage Monthly Active Users (SMAU) which helps us measure the success of our stages and features.
-- Once usage ping is enabled, GitLab will gather data from the other instances and will be able to show usage statistics of your instance to your users.
+- While usage ping is enabled, GitLab will gather data from the other instances and will be able to show usage statistics of your instance to your users.
 
 ### Why should we enable Usage Ping?
 
