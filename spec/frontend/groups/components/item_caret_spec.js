@@ -26,25 +26,23 @@ describe('ItemCaret', () => {
   const findGlIcon = () => wrapper.find(GlIcon);
 
   describe('template', () => {
-    it('should render component template correctly', () => {
+    it('renders component template correctly', () => {
       createComponent();
 
       expect(wrapper.classes()).toContain('folder-caret');
       expect(findAllGlIcons()).toHaveLength(1);
     });
 
-    it('should render caret down icon if `isGroupOpen` prop is `true`', () => {
+    it.each`
+      isGroupOpen | icon
+      ${true}     | ${'angle-down'}
+      ${false}    | ${'angle-right'}
+    `('renders "$icon" icon when `isGroupOpen` is $isGroupOpen', ({ isGroupOpen, icon }) => {
       createComponent({
-        isGroupOpen: true,
+        isGroupOpen,
       });
 
-      expect(findGlIcon().props('name')).toBe('angle-down');
-    });
-
-    it('should render caret right icon if `isGroupOpen` prop is `false`', () => {
-      createComponent();
-
-      expect(findGlIcon().props('name')).toBe('angle-right');
+      expect(findGlIcon().props('name')).toBe(icon);
     });
   });
 });
