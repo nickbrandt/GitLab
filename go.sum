@@ -503,6 +503,8 @@ gitlab.com/gitlab-org/gitaly v1.74.0/go.mod h1:AXxSyIMuGdv25WogKreZJRGSiWGkySYvD
 gitlab.com/gitlab-org/labkit v0.0.0-20190221122536-0c3fc7cdd57c/go.mod h1:rYhLgfrbEcyfinG+R3EvKu6bZSsmwQqcXzLfHWSfUKM=
 gitlab.com/gitlab-org/labkit v0.0.0-20200520155818-96e583c57891 h1:WiCGS5C0B0h+/dh5O7kUJoEZt34O/tbsis9QghNB3gE=
 gitlab.com/gitlab-org/labkit v0.0.0-20200520155818-96e583c57891/go.mod h1:SNfxkfUwVNECgtmluVayv0GWFgEjjBs5AzgsowPQuo0=
+gitlab.com/gitlab-org/labkit v0.0.0-20200908084045-45895e129029 h1:L7b9YLsU3zBfTShAPl4fjhgFdfSvuo9tu4VobJdcKDs=
+gitlab.com/gitlab-org/labkit v0.0.0-20200908084045-45895e129029/go.mod h1:SNfxkfUwVNECgtmluVayv0GWFgEjjBs5AzgsowPQuo0=
 go.opencensus.io v0.15.0/go.mod h1:UffZAU+4sDEINUGP/B7UfBBkq4fqLu9zXAX7ke6CHW0=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
