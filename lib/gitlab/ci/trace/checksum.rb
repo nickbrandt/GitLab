@@ -43,10 +43,8 @@ module Gitlab
           end
         end
 
-        def chunks_count
-          strong_memoize(:chunks_count) do
-            build.trace_chunks.maximum(:chunk_index)
-          end
+        def last_chunk
+          strong_memoize(:last_chunk) { trace_chunks.max }
         end
 
         ##
@@ -62,14 +60,16 @@ module Gitlab
         # metadata on the database level too.
         #
         def trace_chunks
-          build.trace_chunks.persisted
-            .select(::Ci::BuildTraceChunk.metadata_attributes)
+          strong_memoize(:trace_chunks) do
+            build.trace_chunks.persisted
+              .select(::Ci::BuildTraceChunk.metadata_attributes)
+          end
         end
 
         private
 
         def chunk_size(chunk)
-          if chunk.chunk_index == chunks_count
+          if chunk == last_chunk
             chunk.size
           else
             ::Ci::BuildTraceChunk::CHUNK_SIZE

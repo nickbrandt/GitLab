@@ -94,6 +94,25 @@ RSpec.describe Gitlab::Ci::Trace::Checksum do
     end
   end
 
+  describe '#last_chunk' do
+    context 'when there are no chunks' do
+      it 'returns nil' do
+        expect(subject.last_chunk).to be_nil
+      end
+    end
+
+    context 'when there are multiple chunks' do
+      before do
+        create_chunk(index: 1, data: '1234')
+        create_chunk(index: 0, data: 'abcd')
+      end
+
+      it 'returns chunk with the highest index' do
+        expect(subject.last_chunk.chunk_index).to eq 1
+      end
+    end
+  end
+
   def create_chunk(index:, data:)
     create(:ci_build_trace_chunk, :persisted, build: build,
                                               chunk_index: index,

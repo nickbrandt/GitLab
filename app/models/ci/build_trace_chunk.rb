@@ -3,6 +3,7 @@
 module Ci
   class BuildTraceChunk < ApplicationRecord
     extend ::Gitlab::Ci::Model
+    include ::Comparable
     include ::FastDestroyAll
     include ::Checksummable
     include ::Gitlab::ExclusiveLeaseHelpers
@@ -141,6 +142,12 @@ module Ci
     def final?
       build.pending_state.present? &&
         build.trace_chunks.maximum(:chunk_index).to_i == chunk_index
+    end
+
+    def <=>(other)
+      return unless self.build_id == other.build_id
+
+      self.chunk_index <=> other.chunk_index
     end
 
     private
