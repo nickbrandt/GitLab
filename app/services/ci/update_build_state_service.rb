@@ -151,9 +151,27 @@ module Ci
       build.pending_state
     end
 
+    ##
+    # This method is releasing an exclusive lock on a build trace the moment we
+    # conclude that build status has been written and the build state update
+    # has been committed to the database.
+    #
+    # Because a build state machine schedules a bunch of workers to run after
+    # build status transition to complete, we do not want to keep the lease
+    # until all the workers are scheduled because it opens a possibility of
+    # race conditions happening.
+    #
+    # Instead of keeping the lease until the transition is fully done and
+    # workers are scheduled, we immediately release the lock after the database
+    # commit happens.
+    #
     def in_build_trace_lock(&block)
-      build.trace.lock(&block) # rubocop:disable CodeReuse/ActiveRecord
-    rescue FailedToObtainLockError
+      build.trace.lock do |_, lease| # rubocop:disable CodeReuse/ActiveRecord
+        build.run_on_status_commit { lease.cancel }
+
+        yield
+      end
+    rescue ::Gitlab::Ci::Trace::LockedError
       metrics.increment_trace_operation(operation: :locked)
 
       accept_build_state!

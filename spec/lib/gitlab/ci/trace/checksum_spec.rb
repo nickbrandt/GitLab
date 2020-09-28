@@ -7,7 +7,7 @@ RSpec.describe Gitlab::Ci::Trace::Checksum do
 
   subject { described_class.new(build) }
 
-  context 'when build pending state exits' do
+  context 'when build pending state exists' do
     before do
       create(:ci_build_pending_state, build: build, trace_checksum: 'crc32:3564598592')
     end
