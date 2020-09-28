@@ -116,7 +116,7 @@ RSpec.describe Gitlab::Ci::Trace, :clean_gitlab_redis_shared_state do
     it 'acquires an exclusive lease on the trace' do
       trace.lock do
         expect { trace.lock }
-          .to raise_error ::Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError
+          .to raise_error described_class::LockedError
       end
     end
   end

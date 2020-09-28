@@ -16,6 +16,7 @@ module Gitlab
 
       ArchiveError = Class.new(StandardError)
       AlreadyArchivedError = Class.new(StandardError)
+      LockedError = Class.new(StandardError)
 
       attr_reader :job
 
@@ -132,6 +133,8 @@ module Gitlab
 
       def lock(&block)
         in_write_lock(&block)
+      rescue FailedToObtainLockError
+        raise LockedError, "build trace `#{job.id}` is locked"
       end
 
       private
