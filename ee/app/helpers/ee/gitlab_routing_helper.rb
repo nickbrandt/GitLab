@@ -38,6 +38,10 @@ module EE
       project_security_vulnerability_path(entity.project, entity, *args)
     end
 
+    def vulnerability_url(vulnerability)
+      ::Gitlab::UrlBuilder.build(vulnerability)
+    end
+
     def project_vulnerability_path(project, vulnerability, *args)
       project_security_vulnerability_path(project, vulnerability, *args)
     end
