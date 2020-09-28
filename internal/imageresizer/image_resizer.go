@@ -65,24 +65,52 @@ var httpClient = &http.Client{
 	Transport: httpTransport,
 }
 
+const (
+	namespace = "gitlab_workhorse"
+	subsystem = "image_resize"
+)
+
 var (
 	imageResizeConcurrencyLimitExceeds = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_image_resize_concurrency_limit_exceeds_total",
-			Help: "Amount of image resizing requests that exceeded the maximum allowed scaler processes",
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "concurrency_limit_exceeds_total",
+			Help:      "Amount of image resizing requests that exceeded the maximum allowed scaler processes",
 		},
 	)
 	imageResizeProcesses = prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Name: "gitlab_workhorse_image_resize_processes",
-			Help: "Amount of image resizing scaler processes working now",
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "processes",
+			Help:      "Amount of image resizing scaler processes working now",
 		},
 	)
 	imageResizeCompleted = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_image_resize_completed_total",
-			Help: "Amount of image resizing processes successfully completed",
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "completed_total",
+			Help:      "Amount of image resizing processes sucessfully completed",
 		},
+	)
+	imageResizeDurations = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "duration_seconds",
+			Help:      "Total seconds spent serving image resizing requests",
+			Buckets: []float64{
+				0.050, /* 50ms */
+				0.1,   /* 100ms */
+				0.2,   /* 200ms */
+				0.4,   /* 400ms */
+				0.8,   /* 800ms */
+				1.6,   /* 1600ms */
+			},
+		},
+		[]string{"content_type", "width"},
 	)
 )
 
@@ -90,6 +118,7 @@ func init() {
 	prometheus.MustRegister(imageResizeConcurrencyLimitExceeds)
 	prometheus.MustRegister(imageResizeProcesses)
 	prometheus.MustRegister(imageResizeCompleted)
+	prometheus.MustRegister(imageResizeDurations)
 }
 
 // This Injecter forks into a dedicated scaler process to resize an image identified by path or URL
@@ -135,9 +164,15 @@ func (r *resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 
 	w.Header().Del("Content-Length")
 	bytesWritten, err := serveImage(imageReader, w, resizeCmd)
+
 	if err != nil {
 		handleFailedCommand(w, req, bytesWritten, err, logFields(bytesWritten))
 		return
+	}
+
+	if resizeCmd != nil {
+		widthLabelVal := strconv.Itoa(int(params.Width))
+		imageResizeDurations.WithLabelValues(params.ContentType, widthLabelVal).Observe(time.Since(start).Seconds())
 	}
 
 	logger.WithFields(*logFields(bytesWritten)).Printf("ImageResizer: Success")
@@ -153,9 +188,7 @@ func serveImage(r io.Reader, w io.Writer, resizeCmd *exec.Cmd) (int64, error) {
 	}
 
 	if resizeCmd != nil {
-		if err = resizeCmd.Wait(); err != nil {
-			return bytesWritten, err
-		}
+		return bytesWritten, resizeCmd.Wait()
 	}
 
 	return bytesWritten, nil
