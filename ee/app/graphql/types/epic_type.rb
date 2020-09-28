@@ -30,8 +30,7 @@ module Types
           description: 'Indicates if the epic is confidential'
 
     field :group, GroupType, null: false,
-          description: 'Group to which the epic belongs',
-          resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchModelLoader.new(Group, obj.group_id).find }
+          description: 'Group to which the epic belongs'
     field :parent, EpicType, null: true,
           description: 'Parent epic of the epic',
           resolve: -> (obj, _args, _ctx) { Gitlab::Graphql::Loaders::BatchModelLoader.new(Epic, obj.parent_id).find }
