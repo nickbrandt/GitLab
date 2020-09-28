@@ -26,9 +26,9 @@ describe('ItemActions', () => {
     }
   });
 
-  const findEditGroupBtn = () => wrapper.find('[data-testid="editGroupBtn"]');
+  const findEditGroupBtn = () => wrapper.find('[data-testid="edit-group-btn"]');
   const findEditGroupIcon = () => findEditGroupBtn().find(GlIcon);
-  const findLeaveGroupBtn = () => wrapper.find('[data-testid="leaveGroupBtn"]');
+  const findLeaveGroupBtn = () => wrapper.find('[data-testid="leave-group-btn"]');
   const findLeaveGroupIcon = () => findLeaveGroupBtn().find(GlIcon);
 
   describe('template', () => {
