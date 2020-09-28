@@ -8,6 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-22 19:32+0200\n"
+"PO-Revision-Date: 2020-09-22 19:32+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -2237,6 +2239,9 @@ msgstr ""
 msgid "AlertManagement|Edit"
 msgstr ""
 
+msgid "AlertManagement|Environment"
+msgstr ""
+
 msgid "AlertManagement|Events"
 msgstr ""
 
@@ -2676,12 +2681,6 @@ msgid "An error occurred previewing the blob"
 msgstr ""
 
 msgid "An error occurred when toggling the notification subscription"
-msgstr ""
-
-msgid "An error occurred when trying to resolve a comment. Please try again."
-msgstr ""
-
-msgid "An error occurred when trying to resolve a discussion. Please try again."
 msgstr ""
 
 msgid "An error occurred when updating the issue weight"
@@ -13962,6 +13961,42 @@ msgstr ""
 msgid "InviteMembersBanner|We noticed that you haven't invited anyone to this group. Invite your colleagues so you can discuss issues, collaborate on merge requests, and share your knowledge."
 msgstr ""
 
+msgid "InviteMembersModal|%{linkStart}Read more%{linkEnd} about role permissions"
+msgstr ""
+
+msgid "InviteMembersModal|Access expiration date (optional)"
+msgstr ""
+
+msgid "InviteMembersModal|Cancel"
+msgstr ""
+
+msgid "InviteMembersModal|Choose a role permission"
+msgstr ""
+
+msgid "InviteMembersModal|GitLab member or Email address"
+msgstr ""
+
+msgid "InviteMembersModal|Invite"
+msgstr ""
+
+msgid "InviteMembersModal|Invite team members"
+msgstr ""
+
+msgid "InviteMembersModal|Search for members to invite"
+msgstr ""
+
+msgid "InviteMembersModal|User not invited. Feature coming soon!"
+msgstr ""
+
+msgid "InviteMembersModal|Users were succesfully added"
+msgstr ""
+
+msgid "InviteMembersModal|You're inviting members to the %{group_name} group"
+msgstr ""
+
+msgid "InviteMembers|Invite team members"
+msgstr ""
+
 msgid "Invited"
 msgstr ""
 
@@ -14458,9 +14493,6 @@ msgid "Jul"
 msgstr ""
 
 msgid "July"
-msgstr ""
-
-msgid "Jump to first unresolved thread"
 msgstr ""
 
 msgid "Jump to next unresolved thread"
@@ -21772,9 +21804,6 @@ msgstr ""
 msgid "Resolved by %{name}"
 msgstr ""
 
-msgid "Resolved by %{resolvedByName}"
-msgstr ""
-
 msgid "Resolves IP addresses once and uses them to submit requests"
 msgstr ""
 
@@ -27260,9 +27289,6 @@ msgstr ""
 msgid "Unable to load the merge request widget. Try reloading the page."
 msgstr ""
 
-msgid "Unable to resolve"
-msgstr ""
-
 msgid "Unable to save iteration. Please try again"
 msgstr ""
 
@@ -29010,6 +29036,9 @@ msgid "Write your release notes or drag your files here…"
 msgstr ""
 
 msgid "Wrong extern UID provided. Make sure Auth0 is configured correctly."
+msgstr ""
+
+msgid "YYYY-MM-DD"
 msgstr ""
 
 msgid "Yes"

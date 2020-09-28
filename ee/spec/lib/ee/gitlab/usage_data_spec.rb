@@ -478,9 +478,10 @@ RSpec.describe Gitlab::UsageData do
   end
 
   describe 'usage_activity_by_stage_secure' do
-    let_it_be(:user) { create(:user, group_view: :security_dashboard) }
-    let_it_be(:user2) { create(:user, group_view: :security_dashboard) }
-    let_it_be(:user3) { create(:user, group_view: :security_dashboard) }
+    let_it_be(:days_ago_within_monthly_time_period) { 3.days.ago }
+    let_it_be(:user) { create(:user, group_view: :security_dashboard, created_at: days_ago_within_monthly_time_period) }
+    let_it_be(:user2) { create(:user, group_view: :security_dashboard, created_at: days_ago_within_monthly_time_period) }
+    let_it_be(:user3) { create(:user, group_view: :security_dashboard, created_at: days_ago_within_monthly_time_period) }
 
     before do
       for_defined_days_back do
