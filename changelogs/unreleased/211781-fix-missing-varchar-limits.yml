@@ -1,0 +1,5 @@
+---
+title: Convert unbounded varchar columns to text
+merge_request: 43903
+author:
+type: fixed
