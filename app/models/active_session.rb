@@ -229,7 +229,7 @@ class ActiveSession
     sessions = active_session_entries(session_ids, user.id, redis)
     sessions.sort_by! {|session| session.updated_at }.reverse!
     destroyable_sessions = sessions.drop(ALLOWED_NUMBER_OF_ACTIVE_SESSIONS)
-    destroyable_session_ids = destroyable_sessions.map { |session| session.session_id }
+    destroyable_session_ids = destroyable_sessions.flat_map { |session| [session.session_id, session.session_private_id] }.compact
     destroy_sessions(redis, user, destroyable_session_ids) if destroyable_session_ids.any?
   end
 

@@ -551,5 +551,38 @@ RSpec.describe ActiveSession, :clean_gitlab_redis_shared_state do
         end
       end
     end
+
+    context 'cleaning up old sessions stored by Rack::Session::SessionId#private_id' do
+      let(:max_number_of_sessions_plus_one) { ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS + 1 }
+      let(:max_number_of_sessions_plus_two) { ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS + 2 }
+
+      before do
+        Gitlab::Redis::SharedState.with do |redis|
+          (1..max_number_of_sessions_plus_two).each do |number|
+            redis.set(
+              "session:user:gitlab:#{user.id}:#{number}",
+              Marshal.dump(ActiveSession.new(session_private_id: number.to_s, updated_at: number.days.ago))
+            )
+            redis.sadd(
+              "session:lookup:user:gitlab:#{user.id}",
+              "#{number}"
+            )
+          end
+        end
+      end
+
+      it 'removes obsolete active sessions entries' do
+        ActiveSession.cleanup(user)
+
+        Gitlab::Redis::SharedState.with do |redis|
+          sessions = redis.scan_each(match: "session:user:gitlab:#{user.id}:*").to_a
+
+          expect(sessions.count).to eq(ActiveSession::ALLOWED_NUMBER_OF_ACTIVE_SESSIONS)
+          expect(sessions).not_to(
+            include("session:user:gitlab:#{user.id}:#{max_number_of_sessions_plus_one}",
+                    "session:user:gitlab:#{user.id}:#{max_number_of_sessions_plus_two}"))
+        end
+      end
+    end
   end
 end
