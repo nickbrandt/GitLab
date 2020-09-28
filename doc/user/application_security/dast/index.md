@@ -671,6 +671,8 @@ To delete an existing site profile:
 
 ## Scanner profile
 
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/222767) in GitLab 13.4.
+
 A scanner profile defines the scanner settings used to run an on-demand scan:
 
 - **Profile name:** A name you give the scanner profile. For example, "Spider_15".
