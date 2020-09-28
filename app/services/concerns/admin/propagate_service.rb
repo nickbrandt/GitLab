@@ -4,7 +4,7 @@ module Admin
   module PropagateService
     extend ActiveSupport::Concern
 
-    BATCH_SIZE = 100
+    BATCH_SIZE = 10_000
 
     class_methods do
       def propagate(integration)
