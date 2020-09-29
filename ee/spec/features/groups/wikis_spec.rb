@@ -3,11 +3,14 @@
 require "spec_helper"
 
 RSpec.describe 'Group wikis' do
+  include WikiHelpers
+
   let_it_be(:user) { create(:user) }
 
   let(:wiki) { create(:group_wiki, user: user) }
 
   before do
+    stub_group_wikis(true)
     wiki.container.add_owner(user)
   end
 
