@@ -1467,18 +1467,18 @@ guidelines, but for consistency you should try to use these values:
 
 ### Note
 
-Notes indicate additional information that is of special use to the reader. Notes are most
-effective when used _sparingly_.
+Notes indicate additional information that is of special use to the reader.
+Notes are most effective when used _sparingly_.
 
-Try to avoid them. Too many notes can impact the scannability of a topic and create an overly busy page.
+Try to avoid them. Too many notes can impact the scannability of a topic and
+create an overly busy page.
 
 Instead of adding a note, try one of these alternatives:
 
-- Re-write the sentence as part of the most-relevant
-  paragraph.
+- Re-write the sentence as part of the most-relevant paragraph.
 - Put the information into its own standalone paragraph.
-- Put the content under a new subheading that introduces the topic, which makes it more
-  visible.
+- Put the content under a new subheading that introduces the topic, which makes
+  it more visible.
 
 If you must use a note, use the following formatting:
 
