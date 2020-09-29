@@ -371,6 +371,7 @@ module QA
       module Snippet
         autoload :New, 'qa/page/project/snippet/new'
         autoload :Show, 'qa/page/project/snippet/show'
+        autoload :Index, 'qa/page/project/snippet/index'
       end
     end
 
