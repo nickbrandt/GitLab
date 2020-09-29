@@ -1,27 +1,29 @@
+@import 'mixins_and_variables_and_functions';
+
 .runner-state {
   padding: 6px 12px;
   margin-right: 10px;
-  color: $white;
+  color: var(--white, $white);
 
   &.runner-state-shared {
-    background: $green-400;
+    background: var(--white, $green-400);
   }
 
   &.runner-state-specific {
-    background: $blue-400;
+    background: var(--blue-400, $blue-400);
   }
 }
 
 .runner-status-online {
-  color: $green-600;
+  color: var(--green-600, $green-600);
 }
 
 .runner-status-offline {
-  color: $gray-darkest;
+  color: var(--gray-200, $gray-200);
 }
 
 .runner-status-paused {
-  color: $red-500;
+  color: var(--red-500, $red-500);
 }
 
 .runner {
@@ -31,18 +33,6 @@
 
   h4 {
     font-weight: $gl-font-weight-normal;
-  }
-}
-
-.admin-runner-btn-group-cell {
-  min-width: 150px;
-
-  .btn-sm {
-    padding: 4px 9px;
-  }
-
-  .btn-default {
-    color: $gl-text-color-secondary;
   }
 }
 
