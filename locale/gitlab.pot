@@ -84,6 +84,11 @@ msgid_plural "%d Approvals"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d Package"
+msgid_plural "%d Packages"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d Scanned URL"
 msgid_plural "%d Scanned URLs"
 msgstr[0] ""
@@ -18182,10 +18187,16 @@ msgstr ""
 msgid "PackageRegistry|NuGet Command"
 msgstr ""
 
+msgid "PackageRegistry|Package Registry"
+msgstr ""
+
 msgid "PackageRegistry|Pip Command"
 msgstr ""
 
 msgid "PackageRegistry|Pipeline %{link} triggered %{datetime} by %{author}"
+msgstr ""
+
+msgid "PackageRegistry|Publish and share packages for a variety of common package managers. %{docLinkStart}More information%{docLinkEnd}"
 msgstr ""
 
 msgid "PackageRegistry|Published to the %{project} Package Registry %{datetime}"
