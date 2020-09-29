@@ -46,6 +46,8 @@ const (
 	maxAllowedFileSizeBytes = 250 * 1000 // 250kB
 )
 
+var envInjector = tracing.NewEnvInjector()
+
 // Images might be located remotely in object storage, in which case we need to stream
 // it via http(s)
 var httpTransport = tracing.NewRoundTripper(correlation.NewInstrumentedRoundTripper(&http.Transport{
@@ -251,6 +253,7 @@ func startResizeImageCommand(ctx context.Context, imageReader io.Reader, errorWr
 		"GL_RESIZE_IMAGE_WIDTH=" + strconv.Itoa(int(params.Width)),
 		"GL_RESIZE_IMAGE_CONTENT_TYPE=" + params.ContentType,
 	}
+	cmd.Env = envInjector(ctx, cmd.Env)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
