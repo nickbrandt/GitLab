@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 namespace :security do
-  root to: 'dashboard#show'
+  root to: redirect('-/security/dashboard')
 
   resource :dashboard, only: [:show], controller: :dashboard do
     get :settings
