@@ -349,6 +349,15 @@ module ApplicationHelper
     }
   end
 
+  def page_specific_styles
+    (@page_specific_styles || {}).values.join '\n'
+  end
+
+  def add_page_specific_style(path)
+    @page_specific_styles ||= {}
+    @page_specific_styles[path] = stylesheet_link_tag_defer path
+  end
+
   def page_startup_api_calls
     @api_startup_calls
   end
