@@ -3,7 +3,6 @@ import { mapState, mapGetters, mapMutations, mapActions } from 'vuex';
 import EpicsSelect from 'ee/vue_shared/components/sidebar/epics_select/base.vue';
 import { debounceByAnimationFrame } from '~/lib/utils/common_utils';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
-import issueSetEpic from '../../queries/issue_set_epic.mutation.graphql';
 import BoardEditableItem from '~/boards/components/sidebar/board_editable_item.vue';
 import { UPDATE_ISSUE_BY_ID } from '~/boards/stores/mutation_types';
 import { RECEIVE_EPICS_SUCCESS } from '../../stores/mutation_types';
@@ -41,7 +40,7 @@ export default {
       updateIssueById: UPDATE_ISSUE_BY_ID,
       receiveEpicsSuccess: RECEIVE_EPICS_SUCCESS,
     }),
-    ...mapActions(['fetchIssuesForEpic']),
+    ...mapActions(['setActiveIssueEpic']),
     handleEdit(isEditing) {
       if (isEditing) {
         this.$refs.epicSelect.handleEditClick();
@@ -52,30 +51,25 @@ export default {
       this.$refs.sidebarItem.collapse();
 
       const epicId = selectedEpic?.id ? `gid://gitlab/Epic/${selectedEpic.id}` : null;
-      const { data } = await this.$apollo.mutate({
-        mutation: issueSetEpic,
-        variables: {
-          input: {
-            epicId,
-            iid: String(this.issue.iid),
-            projectPath: this.projectPath,
-          },
-        },
-      });
+      const input = {
+        epicId,
+        projectPath: this.projectPath,
+      };
 
-      if (data.issueSetEpic.errors?.length > 0) {
+      try {
+        const epic = await this.setActiveIssueEpic(input);
+
+        if (epic && !this.getEpicById(epic.id)) {
+          this.receiveEpicsSuccess([epic, ...this.epics]);
+        }
+
+        debounceByAnimationFrame(() => {
+          this.updateIssueById({ issueId: this.issue.id, prop: 'epic', value: epic });
+          this.loading = false;
+        })();
+      } catch (e) {
         this.loading = false;
-        return;
       }
-
-      const { epic } = data.issueSetEpic.issue;
-      if (epic && !this.getEpicById(epic.id)) {
-        this.receiveEpicsSuccess([epic, ...this.epics]);
-      }
-      debounceByAnimationFrame(() => {
-        this.updateIssueById({ issueId: this.issue.id, prop: 'epic', value: epic });
-      })();
-      this.loading = false;
     },
   },
 };

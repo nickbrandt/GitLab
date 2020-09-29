@@ -350,3 +350,34 @@ describe('resetEpics', () => {
     return testAction(actions.resetEpics, {}, {}, [{ type: types.RESET_EPICS }], []);
   });
 });
+
+describe('setActiveIssueEpic', () => {
+  const getters = { getActiveIssue: mockIssue };
+  const epicWithData = {
+    id: 'gid://gitlab/Epic/42',
+    iid: 1,
+    title: 'Epic title',
+  };
+  const input = {
+    epicId: epicWithData.id,
+    projectPath: 'h/b',
+  };
+
+  it('should return epic after setting the issue', async () => {
+    jest
+      .spyOn(gqlClient, 'mutate')
+      .mockResolvedValue({ data: { issueSetEpic: { issue: { epic: epicWithData } } } });
+
+    const result = await actions.setActiveIssueEpic({ getters }, input);
+
+    expect(result.id).toEqual(epicWithData.id);
+  });
+
+  it('throws error if fails', async () => {
+    jest
+      .spyOn(gqlClient, 'mutate')
+      .mockResolvedValue({ data: { issueSetEpic: { errors: ['failed mutation'] } } });
+
+    await expect(actions.setActiveIssueEpic({ getters }, input)).rejects.toThrow(Error);
+  });
+});

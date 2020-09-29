@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import BoardSidebarEpicSelect from 'ee/boards/components/sidebar/board_sidebar_epic_select.vue';
-import issueSetEpic from 'ee/boards/queries/issue_set_epic.mutation.graphql';
 import BoardEditableItem from '~/boards/components/sidebar/board_editable_item.vue';
 import { createStore } from '~/boards/stores';
 
@@ -8,8 +7,6 @@ const TEST_GROUP_ID = 7;
 const TEST_EPIC_ID = 8;
 const TEST_EPIC = { id: 'gid://gitlab/Epic/1', title: 'Test epic' };
 const TEST_ISSUE = { id: 'gid://gitlab/Issue/1', iid: 9, epic: null, referencePath: 'h/b#2' };
-const TEST_EPIC_SET = { data: { issueSetEpic: { issue: { ...TEST_ISSUE, epic: TEST_EPIC } } } };
-const TEST_FAILED_EPIC_SET = { data: { issueSetEpic: { errors: ['mutation failed'] } } };
 
 jest.mock('~/lib/utils/common_utils', () => ({ debounceByAnimationFrame: callback => callback }));
 
@@ -23,7 +20,7 @@ describe('ee/boards/components/sidebar/board_sidebar_epic_select.vue', () => {
     wrapper = null;
   });
 
-  const createWrapper = ({ mutationResult = TEST_EPIC_SET } = {}) => {
+  const createWrapper = () => {
     store = createStore();
     jest.spyOn(store, 'dispatch').mockImplementation(() => {});
     wrapper = shallowMount(BoardSidebarEpicSelect, {
@@ -34,11 +31,6 @@ describe('ee/boards/components/sidebar/board_sidebar_epic_select.vue', () => {
       },
       stubs: {
         'board-editable-item': BoardEditableItem,
-      },
-      mocks: {
-        $apollo: {
-          mutate: jest.fn().mockResolvedValue(mutationResult),
-        },
       },
     });
 
@@ -58,6 +50,7 @@ describe('ee/boards/components/sidebar/board_sidebar_epic_select.vue', () => {
   describe('when epic is selected', () => {
     beforeEach(async () => {
       createWrapper();
+      jest.spyOn(wrapper.vm, 'setActiveIssueEpic').mockImplementation(() => TEST_EPIC);
       findEpicSelect().vm.$emit('onEpicSelect', { ...TEST_EPIC, id: TEST_EPIC_ID });
       await wrapper.vm.$nextTick();
     });
@@ -68,15 +61,9 @@ describe('ee/boards/components/sidebar/board_sidebar_epic_select.vue', () => {
     });
 
     it('commits change to the server', () => {
-      expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledWith({
-        mutation: issueSetEpic,
-        variables: {
-          input: {
-            epicId: `gid://gitlab/Epic/${TEST_EPIC_ID}`,
-            iid: String(TEST_ISSUE.iid),
-            projectPath: 'h/b',
-          },
-        },
+      expect(wrapper.vm.setActiveIssueEpic).toHaveBeenCalledWith({
+        epicId: `gid://gitlab/Epic/${TEST_EPIC_ID}`,
+        projectPath: 'h/b',
       });
     });
 
@@ -86,10 +73,9 @@ describe('ee/boards/components/sidebar/board_sidebar_epic_select.vue', () => {
   });
 
   describe('when no epic is selected', () => {
-    const issueWithoutEpic = { data: { issueSetEpic: { issue: { ...TEST_ISSUE } } } };
-
     beforeEach(async () => {
-      createWrapper({ mutationResult: issueWithoutEpic });
+      createWrapper();
+      jest.spyOn(wrapper.vm, 'setActiveIssueEpic').mockImplementation(() => null);
       findEpicSelect().vm.$emit('onEpicSelect', null);
       await wrapper.vm.$nextTick();
     });
@@ -106,12 +92,14 @@ describe('ee/boards/components/sidebar/board_sidebar_epic_select.vue', () => {
 
   describe('when the mutation fails', () => {
     const issueWithEpic = { ...TEST_ISSUE, epic: TEST_EPIC };
-    const faultyEpic = { id: '?', title: 'Faulty epic' };
 
     beforeEach(async () => {
-      createWrapper({ mutationResult: TEST_FAILED_EPIC_SET });
+      createWrapper();
       store.state.issues = { [TEST_ISSUE.id]: { ...issueWithEpic } };
-      findEpicSelect().vm.$emit('onEpicSelect', faultyEpic);
+      jest.spyOn(wrapper.vm, 'setActiveIssueEpic').mockImplementation(() => {
+        throw new Error(['failed mutation']);
+      });
+      findEpicSelect().vm.$emit('onEpicSelect', {});
       await wrapper.vm.$nextTick();
     });
 
