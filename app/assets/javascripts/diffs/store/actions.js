@@ -103,7 +103,7 @@ export const fetchDiffFilesBatch = ({ commit, state, dispatch }) => {
             commit(types.VIEW_DIFF_FILE, state.diffFiles[0].file_hash);
           }
 
-          if (gon.features?.codeNavigation) {
+          if (state.diffFiles?.length) {
             // eslint-disable-next-line promise/catch-or-return,promise/no-nesting
             import('~/code_navigation').then(m =>
               m.default({
