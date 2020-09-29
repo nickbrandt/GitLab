@@ -4071,9 +4071,6 @@ msgstr ""
 msgid "Blog"
 msgstr ""
 
-msgid "Board name"
-msgstr ""
-
 msgid "Board scope"
 msgstr ""
 
@@ -5382,10 +5379,10 @@ msgstr ""
 msgid "ClusterIntegration|All installed applications and related resources"
 msgstr ""
 
-msgid "ClusterIntegration|Allow GitLab to manage namespace and service accounts for this cluster."
+msgid "ClusterIntegration|Allow GitLab to manage namespace and service accounts for this cluster. %{startLink}More information%{endLink}"
 msgstr ""
 
-msgid "ClusterIntegration|Allow GitLab to manage namespace and service accounts for this cluster. %{startLink}More information%{endLink}"
+msgid "ClusterIntegration|Allow GitLab to manage namespaces and service accounts for this cluster."
 msgstr ""
 
 msgid "ClusterIntegration|Alternatively, "
@@ -5566,6 +5563,12 @@ msgid "ClusterIntegration|Crossplane enables declarative provisioning of managed
 msgstr ""
 
 msgid "ClusterIntegration|Deletes all GitLab resources attached to this cluster during removal"
+msgstr ""
+
+msgid "ClusterIntegration|Deploy each environment to its own namespace. Otherwise, environments within a project share a project-wide namespace. Note that anyone who can trigger a deployment of a namespace can read its secrets. If modified, existing environments will use their current namespaces until the cluster cache is cleared."
+msgstr ""
+
+msgid "ClusterIntegration|Deploy each environment to its own namespace. Otherwise, environments within a project share a project-wide namespace. Note that anyone who can trigger a deployment of a namespace can read its secrets. If modified, existing environments will use their current namespaces until the cluster cache is cleared. %{startLink}More information%{endLink}"
 msgstr ""
 
 msgid "ClusterIntegration|Did you know?"
@@ -5827,6 +5830,9 @@ msgid "ClusterIntegration|Make sure your account %{link_to_requirements} to crea
 msgstr ""
 
 msgid "ClusterIntegration|Manage your Kubernetes cluster by visiting %{provider_link}"
+msgstr ""
+
+msgid "ClusterIntegration|Namespace per environment"
 msgstr ""
 
 msgid "ClusterIntegration|No IAM Roles found"
@@ -6684,6 +6690,9 @@ msgid "Configure the %{link} integration."
 msgstr ""
 
 msgid "Configure the way a user creates a new account."
+msgstr ""
+
+msgid "Configure which lists are shown for anyone who visits this board"
 msgstr ""
 
 msgid "Confirm"
@@ -9491,7 +9500,7 @@ msgstr ""
 msgid "Enable"
 msgstr ""
 
-msgid "Enable %{gitpod_link} integration to launch a development environment in your browser directly from GitLab."
+msgid "Enable %{link_start}Gitpod%{link_end} integration to launch a development environment in your browser directly from GitLab."
 msgstr ""
 
 msgid "Enable Auto DevOps"
@@ -15151,6 +15160,9 @@ msgid "List available repositories"
 msgstr ""
 
 msgid "List of all merge commits"
+msgstr ""
+
+msgid "List options"
 msgstr ""
 
 msgid "List settings"
@@ -23522,6 +23534,12 @@ msgid "Show parent pages"
 msgstr ""
 
 msgid "Show parent subgroups"
+msgstr ""
+
+msgid "Show the Closed list"
+msgstr ""
+
+msgid "Show the Open list"
 msgstr ""
 
 msgid "Show whitespace changes"
