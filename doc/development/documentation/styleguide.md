@@ -1447,9 +1447,9 @@ example:
 When you need to call special attention to particular sentences, use the
 following markup to create highlighted alert boxes.
 
-Note that the alert boxes only work for one paragraph only. Multiple paragraphs,
-lists, headers and so on, will not render correctly. For multiple lines, use
-[blockquotes](#blockquotes) instead.
+Alert boxes work for one paragraph only. Multiple paragraphs, lists, and headers
+won't render correctly. For multiple lines, use [blockquotes](#blockquotes)
+instead.
 
 Alert boxes render only on the GitLab documentation site (<https://docs.gitlab.com>).
 Within GitLab itself, they will appear as plain Markdown text (like the examples
