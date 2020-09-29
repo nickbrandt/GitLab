@@ -11,6 +11,7 @@ module Boards
     include BoardsResponses
 
     before_action :authorize_read_parent, only: [:index]
+    feature_category :boards, only: [:index]
 
     def index
       user_ids = user_finder.execute.select(:user_id)
