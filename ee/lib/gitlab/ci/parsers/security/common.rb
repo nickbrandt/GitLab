@@ -65,6 +65,7 @@ module Gitlab
                 severity: parse_severity_level(data['severity']&.downcase),
                 confidence: parse_confidence_level(data['confidence']&.downcase),
                 scanner: scanner,
+                scan: create_scan(data['scan']),
                 identifiers: identifiers,
                 raw_metadata: data.to_json,
                 metadata_version: version))
