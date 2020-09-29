@@ -901,8 +901,8 @@ search engine optimization (SEO), use the imperative, where possible.
 For guidelines on capitalizing headings, see the section on [capitalization](#capitalization).
 
 NOTE: **Note:**
-If you change an existing title, be careful. Any such changes may affect not
-only [links](#anchor-links) within the page, but may also affect links to the
+If you change an existing title, be careful. These changes might affect not
+only [links](#anchor-links) within the page, but might also affect links to the
 GitLab documentation from both the GitLab application and external sites.
 
 ### Anchor links
@@ -1467,18 +1467,17 @@ guidelines, but for consistency you should try to use these values:
 
 ### Note
 
-Notes indicate information that is of special use to the reader, and are most
+Notes indicate additional information that is of special use to the reader. Notes are most
 effective when used _sparingly_.
 
-The goal for notes is to not use them at all. If, however, a note is truly
-required, do not use more than _two_ notes per documentation page.
+Try to avoid them. Too many notes can impact the scannability of a topic and create an overly busy page.
 
-Instead of a note, try one of these alternatives:
+Instead of adding a note, try one of these alternatives:
 
 - Re-write the sentence as part of the most-relevant
   paragraph.
 - Put the information into its own standalone paragraph.
-- Put the content under a new subheading that introduces the topic. This makes it more
+- Put the content under a new subheading that introduces the topic, which makes it more
   visible.
 
 If you must use a note, use the following formatting:
