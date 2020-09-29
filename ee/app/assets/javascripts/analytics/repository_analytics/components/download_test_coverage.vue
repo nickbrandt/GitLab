@@ -28,14 +28,10 @@ export default {
   directives: {
     GlModalDirective,
   },
-  props: {
+  inject: {
     groupAnalyticsCoverageReportsPath: {
       type: String,
-      required: true,
-    },
-    groupFullPath: {
-      type: String,
-      required: true,
+      default: '',
     },
   },
   data() {
@@ -173,7 +169,6 @@ export default {
         <select-projects-dropdown
           ref="projectsDropdown"
           class="gl-w-half"
-          :group-full-path="groupFullPath"
           @projects-query-error="projectsQueryError"
           @select-all-projects="selectAllProjects"
           @select-project="selectProject"

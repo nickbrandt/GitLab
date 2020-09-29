@@ -36,7 +36,7 @@ describe('Select projects dropdown component', () => {
           ...data,
         };
       },
-      propsData: {
+      provide: {
         groupFullPath: 'gitlab-org',
       },
       mocks: {

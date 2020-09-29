@@ -7,16 +7,6 @@ export default {
   components: {
     DownloadTestCoverage,
   },
-  inject: {
-    groupAnalyticsCoverageReportsPath: {
-      type: String,
-      default: '',
-    },
-    groupFullPath: {
-      type: String,
-      default: '',
-    },
-  },
   text: {
     codeCoverageHeader: s__('RepositoriesAnalytics|Test Code Coverage'),
   },
@@ -28,9 +18,6 @@ export default {
     <h4 data-testid="test-coverage-header">
       {{ $options.text.codeCoverageHeader }}
     </h4>
-    <download-test-coverage
-      :group-analytics-coverage-reports-path="groupAnalyticsCoverageReportsPath"
-      :group-full-path="groupFullPath"
-    />
+    <download-test-coverage />
   </div>
 </template>

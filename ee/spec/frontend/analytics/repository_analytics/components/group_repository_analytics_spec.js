@@ -7,18 +7,8 @@ const localVue = createLocalVue();
 describe('Group repository analytics app', () => {
   let wrapper;
 
-  const injectedProperties = {
-    groupAnalyticsCoverageReportsPath: '/coverage.csv?ref_path=refs/heads/master',
-    groupFullPath: 'gitlab-org',
-  };
-
   const createComponent = () => {
-    wrapper = shallowMount(GroupRepositoryAnalytics, {
-      localVue,
-      provide: {
-        ...injectedProperties,
-      },
-    });
+    wrapper = shallowMount(GroupRepositoryAnalytics, { localVue });
   };
 
   beforeEach(() => {

@@ -26,10 +26,10 @@ export default {
   directives: {
     GlModalDirective,
   },
-  props: {
+  inject: {
     groupFullPath: {
       type: String,
-      required: true,
+      default: '',
     },
   },
   apollo: {
