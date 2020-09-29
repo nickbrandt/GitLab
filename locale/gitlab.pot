@@ -8,8 +8,6 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-22 19:32+0200\n"
-"PO-Revision-Date: 2020-09-22 19:32+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -4491,9 +4489,6 @@ msgid "Can't find variable: ZiteReader"
 msgstr ""
 
 msgid "Can't load mermaid module: %{err}"
-msgstr ""
-
-msgid "Can't remove group members without group managed account"
 msgstr ""
 
 msgid "Can't scan the code?"
@@ -12628,9 +12623,6 @@ msgid "GroupSAML|Toggle SAML authentication"
 msgstr ""
 
 msgid "GroupSAML|Valid SAML Response"
-msgstr ""
-
-msgid "GroupSAML|With group managed accounts enabled, all the users without a group managed account will be excluded from the group."
 msgstr ""
 
 msgid "GroupSAML|With prohibit outer forks flag enabled group members will be able to fork project only inside your group."
