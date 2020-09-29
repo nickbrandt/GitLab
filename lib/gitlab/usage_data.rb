@@ -22,6 +22,7 @@ module Gitlab
         end
       end
 
+      # Test change for renamed product analytics labels
       def uncached_data
         clear_memoized
 
