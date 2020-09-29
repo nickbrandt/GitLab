@@ -12,7 +12,8 @@
 #     all_available: boolean (defaults to true)
 #     min_access_level: integer
 #     exclude_group_ids: array of integers
-#     include_parent_descendants: boolean (defaults to false)
+#     include_parent_descendants: boolean (defaults to false) - includes descendant groups when
+#                                 filtering by parent. The parent param must be present.
 #
 # Users with full private access can see all groups. The `owned` and `parent`
 # params can be used to restrict the groups that are returned.
@@ -86,10 +87,7 @@ class GroupsFinder < UnionFinder
     return groups unless params[:parent]
 
     if include_parent_descendants?
-      descendants = Gitlab::ObjectHierarchy
-                      .new(groups.where(id: params[:parent]))
-                      .descendants
-      groups.id_in(descendants)
+      groups.id_in(params[:parent].descendants)
     else
       groups.where(parent: params[:parent])
     end
