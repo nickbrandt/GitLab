@@ -14,14 +14,14 @@ RSpec.describe 'Project navbar' do
   before do
     stub_feature_flags(project_iterations: false)
 
-    insert_package_nav(_('Operations'))
+    insert_package_nav(_('Infrastructure'))
 
     project.add_maintainer(user)
     sign_in(user)
 
     if Gitlab.ee?
       insert_after_sub_nav_item(
-        _('Kubernetes'),
+        _('Logs'),
         within: _('Operations'),
         new_sub_nav_item_name: _('Feature Flags')
       )
@@ -70,7 +70,7 @@ RSpec.describe 'Project navbar' do
     before do
       stub_config(registry: { enabled: true })
 
-      insert_container_nav(_('Operations'))
+      insert_container_nav(_('Infrastructure'))
 
       visit project_path(project)
     end

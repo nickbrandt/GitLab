@@ -69,9 +69,14 @@ RSpec.shared_context 'project navbar structure' do
           _('Environments'),
           _('Error Tracking'),
           _('Product Analytics'),
-          _('Serverless'),
-          _('Logs'),
-          _('Kubernetes')
+          _('Logs')
+        ]
+      },
+      {
+        nav_item: _('Infrastructure'),
+        nav_sub_items: [
+          _('Kubernetes clusters'),
+          _('Serverless platform')
         ]
       },
       analytics_nav_item,
