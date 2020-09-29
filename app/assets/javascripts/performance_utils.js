@@ -1,27 +1,12 @@
-const processMeasures = measures => {
-  measures.forEach(measure => {
-    window.requestAnimationFrame(() =>
-      performance.measure(measure.name, measure.start, measure.end),
-    );
-  });
-};
-
-export const performanceMeasureAfterRendering = ({ marks = [], measures = [] } = {}) => {
+export const performanceMarkAndMeasure = ({ mark, measures = [] } = {}) => {
   window.requestAnimationFrame(() => {
-    if (marks.length) {
-      marks.forEach(mark => {
-        if (!performance.getEntriesByName(mark).length) {
-          performance.mark(mark);
-          processMeasures(measures);
-        }
-      });
-    } else {
-      processMeasures(measures);
+    if (mark && !performance.getEntriesByName(mark).length) {
+      performance.mark(mark);
     }
-  });
-};
-export const performanceMark = mark => {
-  window.requestAnimationFrame(() => {
-    performance.mark(mark);
+    measures.forEach(measure => {
+      window.requestAnimationFrame(() =>
+        performance.measure(measure.name, measure.start, measure.end),
+      );
+    });
   });
 };

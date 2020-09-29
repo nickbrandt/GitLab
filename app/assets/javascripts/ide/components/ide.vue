@@ -11,7 +11,7 @@ import {
   WEBIDE_MEASURE_FILE_FROM_REQUEST,
   WEBIDE_MEASURE_FILE_AFTER_INTERACTION,
 } from '~/performance_constants';
-import { performanceMeasureAfterRendering } from '~/performance_utils';
+import { performanceMarkAndMeasure } from '~/performance_utils';
 import { modalTypes } from '../constants';
 import eventHub from '../eventhub';
 import FindFile from '~/vue_shared/components/file_finder/index.vue';
@@ -26,11 +26,11 @@ import CommitEditorHeader from './commit_sidebar/editor_header.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 const markPerformance = params => {
-  performanceMeasureAfterRendering(params);
+  performanceMarkAndMeasure(params);
 };
 const markTreePerformance = () => {
   markPerformance({
-    marks: [WEBIDE_MARK_TREE_FINISH],
+    mark: WEBIDE_MARK_TREE_FINISH,
     measures: [
       {
         name: WEBIDE_MEASURE_TREE_FROM_REQUEST,
@@ -42,7 +42,7 @@ const markTreePerformance = () => {
 };
 const markEditorLoadPerformance = () => {
   markPerformance({
-    marks: [WEBIDE_MARK_FILE_FINISH],
+    mark: WEBIDE_MARK_FILE_FINISH,
     measures: [
       {
         name: WEBIDE_MEASURE_FILE_FROM_REQUEST,
@@ -54,7 +54,7 @@ const markEditorLoadPerformance = () => {
 };
 const markEditorInteractionPerformance = () => {
   markPerformance({
-    marks: [WEBIDE_MARK_FILE_FINISH],
+    mark: WEBIDE_MARK_FILE_FINISH,
     measures: [
       {
         name: WEBIDE_MEASURE_FILE_AFTER_INTERACTION,

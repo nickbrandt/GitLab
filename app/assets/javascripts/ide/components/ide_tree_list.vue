@@ -7,7 +7,7 @@ import {
   WEBIDE_MEASURE_TREE_FROM_REQUEST,
   WEBIDE_MARK_FILE_CLICKED,
 } from '~/performance_constants';
-import { performanceMark } from '~/performance_utils';
+import { performanceMarkAndMeasure } from '~/performance_utils';
 import eventHub from '../eventhub';
 import IdeFileRow from './ide_file_row.vue';
 import NavDropdown from './nav_dropdown.vue';
@@ -33,7 +33,7 @@ export default {
     },
   },
   beforeCreate() {
-    performanceMark(WEBIDE_MARK_TREE_START);
+    performanceMarkAndMeasure({ mark: WEBIDE_MARK_TREE_START });
   },
   updated() {
     if (this.currentTree?.tree?.length) {
@@ -45,7 +45,7 @@ export default {
   methods: {
     ...mapActions(['toggleTreeOpen']),
     clickedFile() {
-      performanceMark(WEBIDE_MARK_FILE_CLICKED);
+      performanceMarkAndMeasure({ mark: WEBIDE_MARK_FILE_CLICKED });
     },
   },
   IdeFileRow,

@@ -10,7 +10,7 @@ import {
   WEBIDE_MEASURE_FILE_AFTER_INTERACTION,
   WEBIDE_MEASURE_FILE_FROM_REQUEST,
 } from '~/performance_constants';
-import { performanceMark } from '~/performance_utils';
+import { performanceMarkAndMeasure } from '~/performance_utils';
 import eventHub from '../eventhub';
 import {
   leftSidebarViews,
@@ -173,7 +173,7 @@ export default {
     },
   },
   beforeCreate() {
-    performanceMark(WEBIDE_MARK_FILE_START);
+    performanceMarkAndMeasure({ mark: WEBIDE_MARK_FILE_START });
   },
   beforeDestroy() {
     this.editor.dispose();
