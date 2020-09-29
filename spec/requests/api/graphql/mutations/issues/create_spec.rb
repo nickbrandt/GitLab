@@ -2,15 +2,21 @@
 
 require 'spec_helper'
 
-RSpec.describe 'Update of an existing issue' do
+RSpec.describe 'Create an issue' do
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }
-  let_it_be(:project) { create(:project, :public) }
-  let_it_be(:issue) { create(:issue, project: project) }
+  let_it_be(:project) { create(:project) }
+  let_it_be(:assignee1) { create(:user) }
+  let_it_be(:assignee2) { create(:user) }
+  let_it_be(:project_label1) { create(:label, project: project) }
+  let_it_be(:project_label2) { create(:label, project: project) }
+  let_it_be(:milestone) { create(:milestone, project: project) }
+  let_it_be(:new_label1) { FFaker::Lorem.word }
+  let_it_be(:new_label2) { FFaker::Lorem.word }
+
   let(:input) do
     {
-      'iid' => issue.iid.to_s,
       'title' => 'new title',
       'description' => 'new description',
       'confidential' => true,
@@ -18,14 +24,15 @@ RSpec.describe 'Update of an existing issue' do
     }
   end
 
-  let(:mutation) { graphql_mutation(:update_issue, input.merge(project_path: project.full_path, locked: true)) }
-  let(:mutation_response) { graphql_mutation_response(:update_issue) }
+  let(:mutation) { graphql_mutation(:createIssue, input.merge('projectPath' => project.full_path, 'locked' => true)) }
 
-  context 'the user is not allowed to update issue' do
+  let(:mutation_response) { graphql_mutation_response(:create_issue) }
+
+  context 'the user is not allowed to create an issue' do
     it_behaves_like 'a mutation that returns a top-level access error'
   end
 
-  context 'when user has permissions to update issue' do
+  context 'when user has permissions to create an issue' do
     before do
       project.add_developer(current_user)
     end
