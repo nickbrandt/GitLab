@@ -75,7 +75,7 @@ export default {
     commit(types.SET_FILTERS, filterParams);
   },
 
-  fetchEpicsSwimlanes({ state, commit }, withLists = true) {
+  fetchEpicsSwimlanes({ state, commit, dispatch }, { withLists = true, endCursor = null }) {
     const { endpoints, boardType, filterParams } = state;
     const { fullPath, boardId } = endpoints;
 
@@ -86,6 +86,7 @@ export default {
       withLists,
       isGroup: boardType === BoardType.group,
       isProject: boardType === BoardType.project,
+      after: endCursor,
     };
 
     return gqlClient
@@ -95,24 +96,27 @@ export default {
       })
       .then(({ data }) => {
         const { epics, lists } = data[boardType]?.board;
-        const epicsFormatted = epics.nodes.map(e => ({
-          ...e,
-          issues: (e?.issues?.nodes || []).map(i => ({
-            ...i,
-            labels: i.labels?.nodes || [],
-            assignees: i.assignees?.nodes || [],
-          })),
+        const epicsFormatted = epics.edges.map(e => ({
+          ...e.node,
         }));
 
         if (!withLists) {
           commit(types.RECEIVE_EPICS_SUCCESS, epicsFormatted);
         }
 
+        if (epics.pageInfo?.hasNextPage) {
+          dispatch('fetchEpicsSwimlanes', {
+            withLists: false,
+            endCursor: epics.pageInfo.endCursor,
+          });
+        }
+
         return {
           epics: epicsFormatted,
           lists: lists?.nodes,
         };
-      });
+      })
+      .catch(() => commit(types.RECEIVE_SWIMLANES_FAILURE));
   },
 
   setShowLabels({ commit }, val) {
@@ -206,7 +210,7 @@ export default {
     commit(types.TOGGLE_EPICS_SWIMLANES);
 
     if (state.isShowingEpicsSwimlanes) {
-      dispatch('fetchEpicsSwimlanes')
+      dispatch('fetchEpicsSwimlanes', {})
         .then(({ lists, epics }) => {
           if (lists) {
             let boardLists = lists.map(list =>
@@ -225,5 +229,9 @@ export default {
       boardsStore.create();
       eventHub.$emit('initialBoardLoad');
     }
+  },
+
+  resetEpics: ({ commit }) => {
+    commit(types.RESET_EPICS);
   },
 };

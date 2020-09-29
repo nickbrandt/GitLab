@@ -63,6 +63,99 @@ describe('setFilters', () => {
   });
 });
 
+describe('fetchEpicsSwimlanes', () => {
+  const state = {
+    endpoints: {
+      fullPath: 'gitlab-org',
+      boardId: 1,
+    },
+    filterParams: {},
+    boardType: 'group',
+  };
+
+  const queryResponse = {
+    data: {
+      group: {
+        board: {
+          epics: {
+            edges: [{ node: mockEpic }],
+            pageInfo: {},
+          },
+        },
+      },
+    },
+  };
+
+  it('should commit mutation RECEIVE_EPICS_SUCCESS on success without lists', done => {
+    jest.spyOn(gqlClient, 'query').mockResolvedValue(queryResponse);
+
+    testAction(
+      actions.fetchEpicsSwimlanes,
+      { withLists: false },
+      state,
+      [
+        {
+          type: types.RECEIVE_EPICS_SUCCESS,
+          payload: [mockEpic],
+        },
+      ],
+      [],
+      done,
+    );
+  });
+
+  it('should commit mutation RECEIVE_SWIMLANES_FAILURE on failure', done => {
+    jest.spyOn(gqlClient, 'query').mockResolvedValue(Promise.reject());
+
+    testAction(
+      actions.fetchEpicsSwimlanes,
+      {},
+      state,
+      [{ type: types.RECEIVE_SWIMLANES_FAILURE }],
+      [],
+      done,
+    );
+  });
+
+  it('should dispatch fetchEpicsSwimlanes when page info hasNextPage', done => {
+    const queryResponseWithNextPage = {
+      data: {
+        group: {
+          board: {
+            epics: {
+              edges: [{ node: mockEpic }],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'ENDCURSOR',
+              },
+            },
+          },
+        },
+      },
+    };
+    jest.spyOn(gqlClient, 'query').mockResolvedValue(queryResponseWithNextPage);
+
+    testAction(
+      actions.fetchEpicsSwimlanes,
+      { withLists: false },
+      state,
+      [
+        {
+          type: types.RECEIVE_EPICS_SUCCESS,
+          payload: [mockEpic],
+        },
+      ],
+      [
+        {
+          type: 'fetchEpicsSwimlanes',
+          payload: { withLists: false, endCursor: 'ENDCURSOR' },
+        },
+      ],
+      done,
+    );
+  });
+});
+
 describe('setShowLabels', () => {
   it('should commit mutation SET_SHOW_LABELS', done => {
     const state = {
@@ -249,5 +342,11 @@ describe('toggleEpicSwimlanes', () => {
       [{ type: types.TOGGLE_EPICS_SWIMLANES }],
       [],
     );
+  });
+});
+
+describe('resetEpics', () => {
+  it('commits RESET_EPICS mutation', () => {
+    return testAction(actions.resetEpics, {}, {}, [{ type: types.RESET_EPICS }], []);
   });
 });
