@@ -182,13 +182,15 @@ RSpec.describe 'User uses shortcuts', :js do
       expect(page).to have_active_navigation('Operations')
       expect(page).to have_active_sub_navigation('Environments')
     end
+  end
 
+  context 'when navigating to Infrastructure pages' do
     it 'redirects to the Kubernetes page' do
       find('body').native.send_key('g')
       find('body').native.send_key('k')
 
-      expect(page).to have_active_navigation('Operations')
-      expect(page).to have_active_sub_navigation('Kubernetes')
+      expect(page).to have_active_navigation('Infrastructure')
+      expect(page).to have_active_sub_navigation('Kubernetes clusters')
     end
   end
 

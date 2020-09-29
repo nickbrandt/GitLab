@@ -524,13 +524,35 @@ RSpec.describe ProjectsHelper do
 
     subject { helper.send(:can_view_operations_tab?, user, project) }
 
-    [:read_environment, :read_cluster, :metrics_dashboard].each do |ability|
+    [:read_environment, :metrics_dashboard].each do |ability|
       it 'includes operations tab' do
         allow(helper).to receive(:can?).and_return(false)
         allow(helper).to receive(:can?).with(user, ability, project).and_return(true)
 
         is_expected.to be(true)
       end
+    end
+  end
+
+  describe '#can_view_infrastructure_tab?' do
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+    end
+
+    subject { helper.send(:can_view_infrastructure_tab?, user, project) }
+
+    it 'excludes tab when permissions are missing' do
+      allow(helper).to receive(:can?).and_return(false)
+      allow(helper).to receive(:can?).with(user, :read_cluster, project).and_return(false)
+
+      is_expected.to be(false)
+    end
+
+    it 'includes infrastructure tab' do
+      allow(helper).to receive(:can?).and_return(false)
+      allow(helper).to receive(:can?).with(user, :read_cluster, project).and_return(true)
+
+      is_expected.to be(true)
     end
   end
 
