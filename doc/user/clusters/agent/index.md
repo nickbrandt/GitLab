@@ -300,6 +300,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
+  namespace: gitlab-agent  # Can be any namespace managed by you that the agent has access to.
 spec:
   selector:
     matchLabels:
