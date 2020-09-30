@@ -471,6 +471,9 @@ msgstr ""
 msgid "%{group_name} uses group managed accounts. You need to create a new GitLab account which will be managed by %{group_name}."
 msgstr ""
 
+msgid "%{group_name}&%{epic_iid} &middot; opened %{epic_created} by %{author}"
+msgstr ""
+
 msgid "%{host} sign-in from new location"
 msgstr ""
 
@@ -22463,6 +22466,11 @@ msgstr[1] ""
 
 msgid "SearchResults|commit"
 msgid_plural "SearchResults|commits"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "SearchResults|epic"
+msgid_plural "SearchResults|epics"
 msgstr[0] ""
 msgstr[1] ""
 
