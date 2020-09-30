@@ -15,6 +15,7 @@ import eventHub from '~/boards/eventhub';
 
 import createDefaultClient from '~/lib/graphql';
 import epicsSwimlanesQuery from '../queries/epics_swimlanes.query.graphql';
+import issueSetEpic from '../queries/issue_set_epic.mutation.graphql';
 import listsIssuesQuery from '~/boards/queries/lists_issues.query.graphql';
 
 const notImplemented = () => {
@@ -233,5 +234,24 @@ export default {
 
   resetEpics: ({ commit }) => {
     commit(types.RESET_EPICS);
+  },
+
+  setActiveIssueEpic: async ({ getters }, input) => {
+    const { data } = await gqlClient.mutate({
+      mutation: issueSetEpic,
+      variables: {
+        input: {
+          iid: String(getters.getActiveIssue.iid),
+          epicId: input.epicId,
+          projectPath: input.projectPath,
+        },
+      },
+    });
+
+    if (data.issueSetEpic.errors?.length > 0) {
+      throw new Error(data.issueSetEpic.errors);
+    }
+
+    return data.issueSetEpic.issue.epic;
   },
 };
