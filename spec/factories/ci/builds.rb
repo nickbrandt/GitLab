@@ -409,6 +409,28 @@ FactoryBot.define do
       options { {} }
     end
 
+    %i[sast secret_detection].each do |report_type|
+      trait "legacy_#{report_type}".to_sym do
+        success
+        artifacts
+        name { report_type }
+
+        options do
+          {
+            artifacts: {
+              paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[report_type]]
+            }
+          }
+        end
+      end
+
+      trait report_type do
+        after(:build) do |build|
+          build.job_artifacts << build(:ci_job_artifact, report_type, job: build)
+        end
+      end
+    end
+
     # TODO: move Security traits to ee_ci_build
     # https://gitlab.com/gitlab-org/gitlab/-/issues/210486
     trait :dast do
