@@ -4509,9 +4509,6 @@ msgstr ""
 msgid "Can't scan the code?"
 msgstr ""
 
-msgid "Can't update due to restriction on group level"
-msgstr ""
-
 msgid "Can't update snippet: %{err}"
 msgstr ""
 
@@ -4549,6 +4546,9 @@ msgid "Cannot create the abuse report. The user has been deleted."
 msgstr ""
 
 msgid "Cannot create the abuse report. This user has been blocked."
+msgstr ""
+
+msgid "Cannot enable shared runners because parent group does not allow it"
 msgstr ""
 
 msgid "Cannot have multiple Jira imports running at the same time"
