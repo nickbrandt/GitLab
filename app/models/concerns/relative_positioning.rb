@@ -102,22 +102,16 @@ module RelativePositioning
       delta = at_end ? gap : -gap
       indexed = (at_end ? objects : objects.reverse).each_with_index
 
-      # Some classes are polymorphic, and not all siblings are in the same table.
-      by_model = indexed.group_by { |pair| pair.first.model_class }
       lower_bound, upper_bound = at_end ? [position, MAX_POSITION] : [MIN_POSITION, position]
 
-      by_model.each do |model, pairs|
-        model.transaction do
-          pairs.each_slice(100) do |batch|
-            mapping = batch.to_h.transform_values! do |i|
-              desired_pos = position + delta * (i + 1)
-              { relative_position: desired_pos.clamp(lower_bound, upper_bound) }
-            end
-
-            ::Gitlab::Database::SetAll::Setter
-              .new(model, [:relative_position], mapping)
-              .update!
+      representative.model_class.transaction do
+        indexed.each_slice(100) do |batch|
+          mapping = batch.to_h.transform_values! do |i|
+            desired_pos = position + delta * (i + 1)
+            { relative_position: desired_pos.clamp(lower_bound, upper_bound) }
           end
+
+          ::Gitlab::Database::SetAll.set_all([:relative_position], mapping, &:model_class)
         end
       end
 

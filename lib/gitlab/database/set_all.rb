@@ -103,8 +103,8 @@ module Gitlab
         end
       end
 
-      def self.set_all(columns, mapping)
-        mapping.group_by { |k, v| k.class }.each do |model, entries|
+      def self.set_all(columns, mapping, &to_class)
+        mapping.group_by { |k, v| block_given? ? to_class.call(k) : k.class }.each do |model, entries|
           Setter.new(model, columns, entries).update!
         end
       end
