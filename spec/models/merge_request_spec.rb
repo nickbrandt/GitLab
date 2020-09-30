@@ -4313,4 +4313,27 @@ RSpec.describe MergeRequest, factory_default: :keep do
         .from(nil).to(ref)
     end
   end
+
+  describe '#enabled_reports' do
+    where(:report_type, :with_reports) do
+      :sast             | :with_sast_reports
+      :secret_detection | :with_secret_detection_reports
+    end
+
+    with_them do
+      subject { merge_request.enabled_reports[report_type] }
+
+      context "when head pipeline has reports" do
+        let(:merge_request) { create(:merge_request, with_reports, source_project: project) }
+
+        it { is_expected.to be_truthy }
+      end
+
+      context "when head pipeline does not have reports" do
+        let(:merge_request) { create(:merge_request, source_project: project) }
+
+        it { is_expected.to be_falsy }
+      end
+    end
+  end
 end

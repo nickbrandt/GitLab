@@ -147,6 +147,16 @@ FactoryBot.define do
         end
       end
 
+      %i[sast secret_detection].each do |report_type|
+        trait "with_#{report_type}_report".to_sym do
+          status { :success }
+
+          after(:build) do |pipeline, evaluator|
+            pipeline.builds << build(:ci_build, report_type, :success, pipeline: pipeline, project: pipeline.project)
+          end
+        end
+      end
+
       trait :with_job do
         after(:build) do |pipeline, evaluator|
           pipeline.builds << build(:ci_build, pipeline: pipeline, project: pipeline.project)
