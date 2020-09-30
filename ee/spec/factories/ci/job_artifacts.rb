@@ -2,26 +2,6 @@
 
 FactoryBot.define do
   factory :ee_ci_job_artifact, class: '::Ci::JobArtifact', parent: :ci_job_artifact do
-    trait :sast do
-      file_type { :sast }
-      file_format { :raw }
-
-      after(:build) do |artifact, _|
-        artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-sast-report.json'), 'application/json')
-      end
-    end
-
-    trait :secret_detection do
-      file_type { :secret_detection }
-      file_format { :raw }
-
-      after(:build) do |artifact, _|
-        artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/security_reports/master/gl-secret-detection-report.json'), 'application/json')
-      end
-    end
-
     trait :dast do
       file_format { :raw }
       file_type { :dast }
