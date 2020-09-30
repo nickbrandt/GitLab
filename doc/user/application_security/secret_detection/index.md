@@ -9,8 +9,6 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 > [Introduced](https://about.gitlab.com/releases/2019/03/22/gitlab-11-9-released/#detect-secrets-and-credentials-in-the-repository) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.9.
 
-## Overview
-
 A recurring problem when developing applications is that developers may unintentionally commit
 secrets and credentials to their remote repositories. If other people have access to the source,
 or if the project is public, the sensitive information is then exposed and can be leveraged by
