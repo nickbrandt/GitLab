@@ -1,0 +1,5 @@
+---
+title: Migrations to fix integer type differences
+merge_request: 44068
+author:
+type: fixed
