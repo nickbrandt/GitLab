@@ -1,7 +1,16 @@
 import { ALL } from 'ee/security_dashboard/store/modules/filters/constants';
-import { hasValidSelection, setFilter } from 'ee/security_dashboard/store/modules/filters/utils';
+import {
+  createScannerSelectionDetails,
+  hasValidSelection,
+  rehydrateScannerSelection,
+  setFilter,
+} from 'ee/security_dashboard/store/modules/filters/utils';
 
 describe('filters module utils', () => {
+  describe('createScannerSelectionDetails', () => {
+    // TODO
+  });
+
   describe('hasValidSelection', () => {
     describe.each`
       selection         | options           | expected
@@ -26,6 +35,10 @@ describe('filters module utils', () => {
         expect(hasValidSelection(filter)).toBe(expected);
       });
     });
+  });
+
+  describe('rehydrateScannerSelection', () => {
+    // TODO
   });
 
   describe('setFilter', () => {

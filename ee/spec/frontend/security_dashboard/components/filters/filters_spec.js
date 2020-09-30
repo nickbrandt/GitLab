@@ -1,5 +1,5 @@
 import Vuex from 'vuex';
-import Filters from 'ee/security_dashboard/components/filters.vue';
+import Filters from 'ee/security_dashboard/components/filters/filters.vue';
 import createStore from 'ee/security_dashboard/store';
 import { mount, createLocalVue } from '@vue/test-utils';
 

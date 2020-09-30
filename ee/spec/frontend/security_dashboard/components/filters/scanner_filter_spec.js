@@ -1,26 +1,42 @@
-import Filter from 'ee/security_dashboard/components/filter.vue';
+import Filter from 'ee/security_dashboard/components/filters/scanner_filter.vue';
 import { mount } from '@vue/test-utils';
 import stubChildren from 'helpers/stub_children';
 import { trimText } from 'helpers/text_helper';
+import projectSpecificScanners from 'ee/security_dashboard/graphql/project_specific_scanners.query.graphql';
+import groupSpecificScanners from 'ee/security_dashboard/graphql/group_specific_scanners.query.graphql';
+import instanceSpecificScanners from 'ee/security_dashboard/graphql/instance_specific_scanners.query.graphql';
+
+jest.mock('ee/security_dashboard/graphql/project_specific_scanners.query.graphql', () => ({}));
+jest.mock('ee/security_dashboard/graphql/group_specific_scanners.query.graphql', () => ({}));
+jest.mock('ee/security_dashboard/graphql/instance_specific_scanners.query.graphql', () => ({}));
 
 const generateOption = index => ({
   name: `Option ${index}`,
   id: `option-${index}`,
+  reportType: `reportType-${index}`,
+  scanners: [`scanner-${index}`],
 });
 
 const generateOptions = length => {
   return Array.from({ length }).map((_, i) => generateOption(i));
 };
 
-describe('Filter component', () => {
+describe('Scanner Filter component', () => {
   let wrapper;
 
   const createWrapper = propsData => {
     wrapper = mount(Filter, {
+      provide: {
+        dashboardType() {
+          return 'instance';
+        },
+      },
       stubs: {
         ...stubChildren(Filter),
-        GlDeprecatedDropdown: false,
+        GlDropdown: false,
         GlSearchBoxByType: false,
+        GlDropdownDivider: false,
+        GlDropdownSectionHeader: false,
       },
       propsData,
       attachToDocument: true,
@@ -51,8 +67,9 @@ describe('Filter component', () => {
         id: 'severity',
         options,
         selection: new Set([options[0].id, options[1].id, options[2].id]),
+        selectionDetails: { reportType: [], scanners: [] },
       };
-      createWrapper({ filter });
+      createWrapper({ filter, queryPath: 'test' });
     });
 
     it('should display all 8 severity options', () => {
@@ -89,20 +106,25 @@ describe('Filter component', () => {
         });
       });
 
-      it('should keep the menu open after clicking on an item', () => {
+      it('should keep the menu open after clicking on an item', async () => {
         expect(isDropdownOpen()).toBe(true);
-        wrapper.find('.dropdown-item').trigger('click');
-        return wrapper.vm.$nextTick().then(() => {
-          expect(isDropdownOpen()).toBe(true);
-        });
+        wrapper.find('[data-testid=dropdownItem').trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(isDropdownOpen()).toBe(true);
       });
 
-      it('should close the menu when the close button is clicked', () => {
+      it('should emit filter-change when clicked', async () => {
+        expect(isDropdownOpen()).toBe(true);
+        wrapper.find('.dropdown-item').trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.emitted()['filter-change']).toBeDefined();
+      });
+
+      it('should close the menu when the close button is clicked', async () => {
         expect(isDropdownOpen()).toBe(true);
         wrapper.find({ ref: 'close' }).trigger('click');
-        return wrapper.vm.$nextTick().then(() => {
-          expect(isDropdownOpen()).toBe(false);
-        });
+        await wrapper.vm.$nextTick();
+        expect(isDropdownOpen()).toBe(false);
       });
     });
   });
@@ -118,9 +140,10 @@ describe('Filter component', () => {
           id: 'project',
           options,
           selection: new Set([options[0].id]),
+          selectionDetails: { reportType: [], scanners: [] },
         };
 
-        createWrapper({ filter });
+        createWrapper({ filter, queryPath: 'test' });
       });
 
       it('should display a search box', () => {

@@ -1,4 +1,5 @@
 const gl = 'GitLab';
+const defaultScanner = 'NO_SCANNERS_FOUND';
 const createReportTypeScannerId = (reportType, vendor = gl) => `${reportType}-${vendor}`;
 
 /**
@@ -128,6 +129,14 @@ export const createCustomFilters = (reportTypes, specificFilters) =>
  *      "scanners": ["brakeman", "gosec"]
  *      "vendor": "GitLab",
  *   },
+ *   {
+ *      "id": "dast-GitLab",
+ *      "name": "DAST",
+ *      "reportType": "dast"
+ *      "scanners": ["NO_SCANNERS_FOUND"]
+ *      "vendor": "GitLab",
+ *   },
+ *   ...
  * ]
  */
 export const createGitlabFilters = (reportTypes, specificFilters) =>
@@ -137,6 +146,10 @@ export const createGitlabFilters = (reportTypes, specificFilters) =>
 
     if (specificFilters[gl] && specificFilters[gl][reportType.toUpperCase()]) {
       scanners = specificFilters[gl][reportType.toUpperCase()].scanners;
+    } else {
+      // If no scanners are present for this GitLab filter, then add a default scanner so that
+      // the GraphQL request returns no results
+      scanners = [defaultScanner];
     }
 
     const filter = {

@@ -55,8 +55,10 @@ export const rehydrateScannerSelection = (options, id) => {
   const selectionDetails = ids.reduce(
     (acc, curr) => {
       const currOption = options.find(option => option.id === curr);
-      acc.reportType.push(currOption.reportType);
-      acc.scanner.push(...currOption.scanners);
+      if (currOption?.reportType) {
+        acc.reportType.push(currOption.reportType);
+        acc.scanner.push(...currOption.scanners);
+      }
       return acc;
     },
     { reportType: [], scanner: [] },

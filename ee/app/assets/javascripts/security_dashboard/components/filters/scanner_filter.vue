@@ -101,7 +101,7 @@ export default {
   watch: {
     specificFilters(newSpecificFilters) {
       const filter = modifyReportTypeFilter(this.filter, newSpecificFilters);
-      this.$emit('onFilterChange', [{ ...filter }]);
+      this.$emit('filter-change', [{ ...filter }]);
     },
   },
   methods: {
@@ -114,13 +114,10 @@ export default {
         filter[0].selection,
         filter[0].options,
       );
-      this.$emit('onFilterChange', [{ ...filter[0], selectionDetails: updatedselectionDetails }]);
+      this.$emit('filter-change', [{ ...filter[0], selectionDetails: updatedselectionDetails }]);
     },
     isNotVendorAll(vendor) {
       return vendor.name !== ALL;
-    },
-    isDisabled(option) {
-      return option.id !== ALL && !option.scanners?.length;
     },
     isSelected(option) {
       return this.selection.has(option.id);
@@ -187,8 +184,7 @@ export default {
             role="menuitem"
             type="button"
             class="dropdown-item"
-            :class="{ 'gl-pointer-events-all': isDisabled(option) }"
-            :disabled="isDisabled(option)"
+            data-testid="dropdownItem"
             @click="clickFilter(option)"
           >
             <span class="d-flex">
@@ -199,7 +195,7 @@ export default {
               />
               <span
                 class="gl-white-space-nowrap gl-ml-2"
-                :class="{ 'gl-pl-5': !isSelected(option), 'gl-text-gray-300': isDisabled(option) }"
+                :class="{ 'gl-pl-5': !isSelected(option) }"
               >
                 {{ option.name }}
               </span>

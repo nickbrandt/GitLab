@@ -1,4 +1,8 @@
-import { getFormattedSummary, preparePageInfo } from 'ee/security_dashboard/helpers';
+import {
+  getFormattedSummary,
+  modifyReportTypeFilter,
+  preparePageInfo,
+} from 'ee/security_dashboard/helpers';
 
 describe('getFormattedSummary', () => {
   it('returns a properly formatted array given a valid, non-empty summary', () => {
@@ -63,4 +67,8 @@ describe('preparePageInfo', () => {
       });
     });
   });
+});
+
+describe('modifyReportTypeFilter', () => {
+  // TODO
 });
