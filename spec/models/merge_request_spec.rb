@@ -4323,6 +4323,10 @@ RSpec.describe MergeRequest, factory_default: :keep do
     with_them do
       subject { merge_request.enabled_reports[report_type] }
 
+      before do
+        stub_licensed_features({ report_type => true })
+      end
+
       context "when head pipeline has reports" do
         let(:merge_request) { create(:merge_request, with_reports, source_project: project) }
 
