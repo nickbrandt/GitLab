@@ -2485,10 +2485,10 @@ RSpec.describe API::Users, :do_not_mock_admin_mode do
         end
 
         context 'for an internal user' do
-          it 'returns 403' do
-            internal_user = User.alert_bot
+          let(:user) { User.alert_bot }
 
-            post api("/users/#{internal_user.id}/deactivate", admin)
+          it 'returns 403' do
+            subject
 
             expect(response).to have_gitlab_http_status(:forbidden)
             expect(json_response['message']).to eq('403 Forbidden  - An internal user cannot be deactivated by the API')
