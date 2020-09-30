@@ -165,6 +165,11 @@ msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d day until tags are automatically removed"
+msgid_plural "%d days until tags are automatically removed"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d error"
 msgid_plural "%d errors"
 msgstr[0] ""
@@ -297,6 +302,11 @@ msgstr[1] ""
 
 msgid "%d tag"
 msgid_plural "%d tags"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d tag per image name"
+msgid_plural "%d tags per image name"
 msgstr[0] ""
 msgstr[1] ""
 
