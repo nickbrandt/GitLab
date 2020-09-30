@@ -119,8 +119,8 @@ RSpec.describe API::Unleash do
       it 'returns correct active values' do
         subject
 
-        feature_flag_1 = json_response['features'].select { |f| f['name'] == 'feature_flag_1' }.first
-        feature_flag_2 = json_response['features'].select { |f| f['name'] == 'feature_flag_2' }.first
+        feature_flag_1 = json_response['features'].find { |f| f['name'] == 'feature_flag_1' }
+        feature_flag_2 = json_response['features'].find { |f| f['name'] == 'feature_flag_2' }
 
         expect(feature_flag_1['enabled']).to eq(true)
         expect(feature_flag_2['enabled']).to eq(false)
@@ -133,8 +133,8 @@ RSpec.describe API::Unleash do
       it 'returns correct active values' do
         subject
 
-        feature_flag_1 = json_response['features'].select { |f| f['name'] == 'feature_flag_1' }.first
-        feature_flag_2 = json_response['features'].select { |f| f['name'] == 'feature_flag_2' }.first
+        feature_flag_1 = json_response['features'].find { |f| f['name'] == 'feature_flag_1' }
+        feature_flag_2 = json_response['features'].find { |f| f['name'] == 'feature_flag_2' }
 
         expect(feature_flag_1['enabled']).to eq(false)
         expect(feature_flag_2['enabled']).to eq(false)
@@ -147,8 +147,8 @@ RSpec.describe API::Unleash do
       it 'returns correct active values' do
         subject
 
-        feature_flag_1 = json_response['features'].select { |f| f['name'] == 'feature_flag_1' }.first
-        feature_flag_2 = json_response['features'].select { |f| f['name'] == 'feature_flag_2' }.first
+        feature_flag_1 = json_response['features'].find { |f| f['name'] == 'feature_flag_1' }
+        feature_flag_2 = json_response['features'].find { |f| f['name'] == 'feature_flag_2' }
 
         expect(feature_flag_1['enabled']).to eq(true)
         expect(feature_flag_2['enabled']).to eq(false)
@@ -199,7 +199,7 @@ RSpec.describe API::Unleash do
             subject
 
             expect(response).to have_gitlab_http_status(:ok)
-            expect(response).to match_response_schema('unleash/unleash', dir: 'ee')
+            expect(response).to match_response_schema('unleash/unleash')
           end
         end
 
