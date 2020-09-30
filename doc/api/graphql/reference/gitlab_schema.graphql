@@ -7196,6 +7196,11 @@ type GrafanaIntegration {
 
 type Group {
   """
+  Additional storage purchased for the root namespace in bytes
+  """
+  additionalPurchasedStorageSize: Float
+
+  """
   Indicates whether Auto DevOps is enabled for all projects within this group
   """
   autoDevopsEnabled: Boolean
@@ -7244,6 +7249,11 @@ type Group {
     """
     last: Int
   ): BoardConnection
+
+  """
+  Includes at least one project where the repository size exceeds the limit
+  """
+  containsLockedProjects: Boolean!
 
   """
   Description of the namespace
@@ -7697,6 +7707,11 @@ type Group {
   lfsEnabled: Boolean
 
   """
+  Number of projects in the root namespace where the repository size exceeds the limit
+  """
+  lockedProjectCount: Int!
+
+  """
   Indicates if a group is disabled from getting mentioned
   """
   mentionsDisabled: Boolean
@@ -7982,6 +7997,16 @@ type Group {
     """
     startTime: Time
   ): TimelogConnection!
+
+  """
+  Total repository size of all projects in the root namespace in bytes
+  """
+  totalRepositorySize: Float
+
+  """
+  Total excess repository size of all projects in the root namespace in bytes
+  """
+  totalRepositorySizeExcess: Float
 
   """
   Time before two-factor authentication is enforced
@@ -11889,6 +11914,16 @@ enum MutationOperationMode {
 
 type Namespace {
   """
+  Additional storage purchased for the root namespace in bytes
+  """
+  additionalPurchasedStorageSize: Float
+
+  """
+  Includes at least one project where the repository size exceeds the limit
+  """
+  containsLockedProjects: Boolean!
+
+  """
   Description of the namespace
   """
   description: String
@@ -11922,6 +11957,11 @@ type Namespace {
   Indicates if Large File Storage (LFS) is enabled for namespace
   """
   lfsEnabled: Boolean
+
+  """
+  Number of projects in the root namespace where the repository size exceeds the limit
+  """
+  lockedProjectCount: Int!
 
   """
   Name of the namespace
@@ -11997,6 +12037,16 @@ type Namespace {
   Date until the temporary storage increase is active
   """
   temporaryStorageIncreaseEndsOn: Time
+
+  """
+  Total repository size of all projects in the root namespace in bytes
+  """
+  totalRepositorySize: Float
+
+  """
+  Total excess repository size of all projects in the root namespace in bytes
+  """
+  totalRepositorySizeExcess: Float
 
   """
   Visibility of the namespace
@@ -14054,6 +14104,11 @@ type Project {
   Git repository of the project
   """
   repository: Repository
+
+  """
+  Size of repository that exceeds the limit in bytes
+  """
+  repositorySizeExcess: Float
 
   """
   Indicates if users can request member access to the project
