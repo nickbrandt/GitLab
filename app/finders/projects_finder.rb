@@ -49,7 +49,13 @@ class ProjectsFinder < UnionFinder
 
     use_cte = params.delete(:use_cte)
     collection = Project.wrap_with_cte(collection) if use_cte
-    collection = filter_projects(collection)
+
+    collection = if params[:sort] == 'similarity' && params[:search]
+                   by_search(collection).sorted_by_similarity_desc(params[:search])
+                 else
+                   filter_projects(collection)
+                 end
+
     sort(collection)
   end
 
@@ -209,9 +215,7 @@ class ProjectsFinder < UnionFinder
   end
 
   def sort(items)
-    if params[:sort] == 'similarity' && params[:search]
-      items.sorted_by_similarity_desc(params[:search])
-    elsif params[:sort].present?
+    if params[:sort].present?
       items.sort_by_attribute(params[:sort])
     else
       items.projects_order_id_desc
