@@ -4087,18 +4087,6 @@ msgstr ""
 msgid "Board scope affects which issues are displayed for anyone who visits this board"
 msgstr ""
 
-msgid "BoardBlankState|Add default lists"
-msgstr ""
-
-msgid "BoardBlankState|Add the following default lists to your Issue Board with one click:"
-msgstr ""
-
-msgid "BoardBlankState|Nevermind, I'll use my own"
-msgstr ""
-
-msgid "BoardBlankState|Starting out with the default set of lists will get you right on the way to making the most of your board."
-msgstr ""
-
 msgid "Boards"
 msgstr ""
 
@@ -9133,9 +9121,6 @@ msgid "Documentation for popular identity providers"
 msgstr ""
 
 msgid "Documents reindexed: %{processed_documents} (%{percentage}%%)"
-msgstr ""
-
-msgid "Doing"
 msgstr ""
 
 msgid "Domain"
@@ -28780,9 +28765,6 @@ msgid "Welcome to GitLab, %{first_name}!"
 msgstr ""
 
 msgid "Welcome to the guided GitLab tour"
-msgstr ""
-
-msgid "Welcome to your Issue Board!"
 msgstr ""
 
 msgid "Welcome to your issue board!"
