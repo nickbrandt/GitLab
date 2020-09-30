@@ -45,20 +45,49 @@ RSpec.describe Gitlab::Database::SetAll do
       .to eq(['MR a', 'Issue a', 'Issue b'])
   end
 
-  it 'works when not using a query-counter' do
-    create_default(:user)
-    create_default(:project)
+  shared_examples 'basic functionality' do
+    it 'sets multiple values' do
+      create_default(:user)
+      create_default(:project)
 
-    i_a, i_b = create_list(:issue, 2)
+      i_a, i_b = create_list(:issue, 2)
 
-    mapping = {
-      i_a  => { title: 'Issue a' },
-      i_b  => { title: 'Issue b' }
-    }
+      mapping = {
+        i_a  => { title: 'Issue a' },
+        i_b  => { title: 'Issue b' }
+      }
 
-    described_class.set_all(%i[title], mapping)
+      described_class.set_all(%i[title], mapping)
 
-    expect([i_a, i_b].map { |x| x.reset.title })
-      .to eq(['Issue a', 'Issue b'])
+      expect([i_a, i_b].map { |x| x.reset.title })
+        .to eq(['Issue a', 'Issue b'])
+    end
+  end
+
+  include_examples 'basic functionality'
+
+  context 'when prepared statements are configured differently to the normal test environment' do
+    # rubocop: disable RSpec/LeakyConstantDeclaration
+    # This cop is disabled because you cannot call establish_connection on
+    # an anonymous class.
+    class ActiveRecordBasePreparedStatementsInverted < ActiveRecord::Base
+      def self.abstract_class?
+        true # So it gets its own connection
+      end
+    end
+    # rubocop: enable RSpec/LeakyConstantDeclaration
+
+    before_all do
+      c = ActiveRecord::Base.connection.instance_variable_get(:@config)
+      inverted = c.merge(prepared_statements: !ActiveRecord::Base.connection.prepared_statements)
+      ActiveRecordBasePreparedStatementsInverted.establish_connection(inverted)
+    end
+
+    before do
+      allow(ActiveRecord::Base).to receive(:connection_specification_name)
+        .and_return(ActiveRecordBasePreparedStatementsInverted.connection_specification_name)
+    end
+
+    include_examples 'basic functionality'
   end
 end
