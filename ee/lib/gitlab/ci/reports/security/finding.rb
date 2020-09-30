@@ -81,14 +81,14 @@ module Gitlab
             report_type.hash ^ location.fingerprint.hash ^ primary_fingerprint.hash
           end
 
+          def valid?
+            scanner.present? && primary_identifier.present? && location.present?
+          end
+
           protected
 
           def primary_fingerprint
             primary_identifier&.fingerprint
-          end
-
-          def valid?
-            scanner.present? && primary_identifier.present? && location.present?
           end
 
           private
