@@ -1,5 +1,0 @@
----
-title: Pass CORRELATION_ID env variable to resize image subprocesses
-merge_request: 612
-author:
-type: other

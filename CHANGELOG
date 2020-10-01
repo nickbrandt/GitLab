@@ -1,5 +1,21 @@
 # Changelog for gitlab-workhorse
 
+## v8.49.0
+
+### Fixed
+- Fix gitlab-resize-image bin installation
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/618
+
+### Other
+- Add image scaler duration histogram
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/614
+- Pass CORRELATION_ID env variable to resize image subprocesses
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/612
+- Simplify s3 session management code
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/616
+- Bump labkit dependency to get mutex profiling
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
+
 ## v8.48.0
 
 ### Changed
