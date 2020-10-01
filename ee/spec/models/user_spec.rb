@@ -1117,6 +1117,56 @@ RSpec.describe User do
     end
   end
 
+  describe '#authorized_groups' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:private_group) { create(:group) }
+    let_it_be(:child_group) { create(:group, parent: private_group) }
+    let_it_be(:minimal_access_group) { create(:group) }
+
+    let_it_be(:project_group) { create(:group) }
+    let_it_be(:project) { create(:project, group: project_group) }
+
+    before do
+      private_group.add_user(user, Gitlab::Access::MAINTAINER)
+      project.add_maintainer(user)
+      create(:group_member, :minimal_access, user: user, source: minimal_access_group)
+    end
+
+    subject { user.authorized_groups }
+
+    context 'with minimal access role feature unavailable' do
+      it { is_expected.to contain_exactly private_group, project_group }
+    end
+
+    context 'with minimal access feature available' do
+      before do
+        stub_licensed_features(minimal_access_role: true)
+      end
+
+      context 'feature turned on for all groups' do
+        before do
+          allow(Gitlab::CurrentSettings)
+            .to receive(:should_check_namespace_plan?)
+            .and_return(false)
+        end
+
+        it { is_expected.to contain_exactly private_group, project_group, minimal_access_group }
+      end
+
+      context 'feature available for specific groups only' do
+        before do
+          allow(Gitlab::CurrentSettings)
+            .to receive(:should_check_namespace_plan?)
+            .and_return(true)
+          create(:gitlab_subscription, :gold, namespace: minimal_access_group)
+          create(:group_member, :minimal_access, user: user, source: create(:group))
+        end
+
+        it { is_expected.to contain_exactly private_group, project_group, minimal_access_group }
+      end
+    end
+  end
+
   describe '#active_for_authentication?' do
     subject { user.active_for_authentication? }
 

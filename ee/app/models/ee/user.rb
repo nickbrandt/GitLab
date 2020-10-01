@@ -44,6 +44,9 @@ module EE
       has_many :approvals,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :approvers,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
 
+      has_many :minimal_access_group_members, -> { where(access_level: [::Gitlab::Access::MINIMAL_ACCESS]) }, source: 'GroupMember', class_name: 'GroupMember'
+      has_many :minimal_access_groups, through: :minimal_access_group_members, source: :group
+
       has_many :users_ops_dashboard_projects
       has_many :ops_dashboard_projects, through: :users_ops_dashboard_projects, source: :project
       has_many :users_security_dashboard_projects
@@ -364,6 +367,18 @@ module EE
         owns_paid_namespace?(plans: [::Plan::BRONZE, ::Plan::SILVER])
     end
 
+    # Returns the groups a user has access to, either through a membership or a project authorization
+    override :authorized_groups
+    def authorized_groups
+      ::Group.unscoped do
+        ::Group.from_union([
+          groups,
+          available_minimal_access_groups,
+          authorized_projects.joins(:namespace).select('namespaces.*')
+        ])
+      end
+    end
+
     protected
 
     override :password_required?
@@ -393,6 +408,13 @@ module EE
       return true unless License.current.exclude_guests_from_active_count?
 
       highest_role > ::Gitlab::Access::GUEST
+    end
+
+    def available_minimal_access_groups
+      return ::Group.none unless License.feature_available?(:minimal_access_role)
+      return minimal_access_groups unless ::Gitlab::CurrentSettings.should_check_namespace_plan?
+
+      minimal_access_groups.with_feature_available_in_plan(:minimal_access_role)
     end
   end
 end
