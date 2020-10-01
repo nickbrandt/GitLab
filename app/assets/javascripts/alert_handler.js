@@ -12,6 +12,9 @@ export default function initAlertHandler() {
     const elements = document.querySelectorAll(selector);
     elements.forEach(element => {
       const button = element.querySelector(DISMISS_LABEL) || element.querySelector(DISMISS_CLASS);
+      if (!button) {
+        return;
+      }
       button.addEventListener('click', () => element.remove());
     });
   });
