@@ -3,6 +3,8 @@
   stage: notify
   dependencies: []
   cache: {}
+  variables:
+    MERGE_REQUEST_URL: ${CI_MERGE_REQUEST_PROJECT_URL}/-/merge_requests/${CI_MERGE_REQUEST_IID}
   before_script:
     - apk update && apk add git curl bash
 
@@ -16,8 +18,18 @@ notify-update-gitaly:
   variables:
     NOTIFY_CHANNEL: g_create_gitaly
     GITALY_UPDATE_BRANCH: release-tools/update-gitaly
-    MERGE_REQUEST_URL: ${CI_MERGE_REQUEST_PROJECT_URL}/-/merge_requests/${CI_MERGE_REQUEST_IID}
   script:
     - echo "NOTIFY_CHANNEL is ${NOTIFY_CHANNEL}"
     - echo "CI_PIPELINE_URL is ${CI_PIPELINE_URL}"
     - scripts/slack ${NOTIFY_CHANNEL} "☠️ \`${GITALY_UPDATE_BRANCH}\` failed! ☠️ See ${CI_PIPELINE_URL} (triggered from ${MERGE_REQUEST_URL})" ci_failing
+
+notify-security-pipeline:
+  extends:
+    - .notify-slack
+    - .delivery:rules:security-pipeline-merge-result-failure
+  variables:
+    NOTIFY_CHANNEL: security-release-tests
+  script:
+    - echo "NOTIFY_CHANNEL is ${NOTIFY_CHANNEL}"
+    - echo "CI_PIPELINE_URL is ${CI_PIPELINE_URL}"
+    - scripts/slack ${NOTIFY_CHANNEL} "☠️  Pipeline for merged result failed! ☠️ See ${CI_PIPELINE_URL} (triggered from ${MERGE_REQUEST_URL})" ci_failing
