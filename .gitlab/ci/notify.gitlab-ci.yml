@@ -32,4 +32,4 @@ notify-security-pipeline:
   script:
     - echo "NOTIFY_CHANNEL is ${NOTIFY_CHANNEL}"
     - echo "CI_PIPELINE_URL is ${CI_PIPELINE_URL}"
-    - scripts/slack ${NOTIFY_CHANNEL} "☠️  Pipeline for merged result failed! ☠️ See ${CI_PIPELINE_URL} (triggered from ${MERGE_REQUEST_URL})" ci_failing
+    - scripts/slack ${NOTIFY_CHANNEL} "☠️  Pipeline for merged result failed! ☠️ See ${CI_PIPELINE_URL} (triggered from ${MERGE_REQUEST_URL})" ci_failing gitlab-release-tools-bot
