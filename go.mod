@@ -24,7 +24,7 @@ require (
 	github.com/rafaeljusto/redigomock v0.0.0-20190202135759-257e089e14a1
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/shabbyrobe/gocovmerge v0.0.0-20190829150210-3e036491d500 // indirect
-	github.com/sirupsen/logrus v1.3.0
+	github.com/sirupsen/logrus v1.6.0
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/stretchr/testify v1.5.1
 	gitlab.com/gitlab-org/gitaly v1.74.0
@@ -37,3 +37,8 @@ require (
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 	honnef.co/go/tools v0.0.1-2020.1.5
 )
+
+// go get tries to enforce semantic version compatibility via module paths.
+// We can't upgrade to Gitaly v13.x.x from v1.x.x without using a manual override.
+// See https://gitlab.com/gitlab-org/gitaly/-/issues/3177 for more details.
+replace gitlab.com/gitlab-org/gitaly => gitlab.com/gitlab-org/gitaly v1.87.1-0.20201001041716-3f5e218def93
