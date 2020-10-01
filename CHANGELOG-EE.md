@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.4.2 (2020-10-01)
+
+### Security (1 change)
+
+- Do not leak templates with protected features.
+
+
 ## 13.4.1 (2020-09-24)
 
 ### Fixed (1 change)
