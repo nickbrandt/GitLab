@@ -1,8 +1,12 @@
 <script>
 import { GlDaterangePicker } from '@gitlab/ui';
+import { dateAtFirstDayOfMonth } from '~/lib/utils/datetime_utility';
+import { CURRENT_DATE, MAX_DATE_RANGE } from '../constants';
+import DateRangeButtons from './date_range_buttons.vue';
 
 export default {
   components: {
+    DateRangeButtons,
     GlDaterangePicker,
   },
   props: {
@@ -17,21 +21,43 @@ export default {
       default: null,
     },
   },
+  computed: {
+    defaultStartDate() {
+      return this.startDate || dateAtFirstDayOfMonth(CURRENT_DATE);
+    },
+    defaultEndDate() {
+      return this.endDate || CURRENT_DATE;
+    },
+    defaultDateRange() {
+      return { startDate: this.defaultStartDate, endDate: this.defaultEndDate };
+    },
+  },
   methods: {
     onInput(dates) {
       this.$emit('selected', dates);
     },
   },
+  CURRENT_DATE,
+  MAX_DATE_RANGE,
 };
 </script>
 
 <template>
-  <gl-daterange-picker
-    class="d-flex flex-wrap flex-sm-nowrap"
-    :default-start-date="startDate"
-    :default-end-date="endDate"
-    start-picker-class="form-group align-items-lg-center mr-0 mr-sm-1 d-flex flex-column flex-lg-row"
-    end-picker-class="form-group align-items-lg-center mr-0 mr-sm-2 d-flex flex-column flex-lg-row"
-    @input="onInput"
-  />
+  <div
+    class="gl-display-flex gl-align-items-flex-end gl-xs-align-items-baseline gl-xs-flex-direction-column"
+  >
+    <div class="gl-pr-5 gl-mb-5">
+      <date-range-buttons :date-range="defaultDateRange" @input="onInput" />
+    </div>
+    <gl-daterange-picker
+      class="gl-display-flex gl-pl-0 gl-w-full"
+      :default-start-date="defaultStartDate"
+      :default-end-date="defaultEndDate"
+      :default-max-date="$options.CURRENT_DATE"
+      :max-date-range="$options.MAX_DATE_RANGE"
+      start-picker-class="gl-mb-5 gl-pr-5 gl-display-flex gl-flex-direction-column gl-lg-flex-direction-row gl-flex-fill-1"
+      end-picker-class="gl-mb-5 gl-display-flex gl-flex-direction-column gl-lg-flex-direction-row gl-flex-fill-1"
+      @input="onInput"
+    />
+  </div>
 </template>
