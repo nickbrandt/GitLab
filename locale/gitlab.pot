@@ -977,6 +977,9 @@ msgstr ""
 msgid "+ %{numberOfHiddenAssignees} more"
 msgstr ""
 
+msgid "+ %{numberOfHiddenReviewers} more"
+msgstr ""
+
 msgid "+%d more"
 msgid_plural "+%d more"
 msgstr[0] ""
@@ -3664,6 +3667,9 @@ msgid "AuditLogs|Project Events"
 msgstr ""
 
 msgid "AuditLogs|Target"
+msgstr ""
+
+msgid "AuditLogs|This month"
 msgstr ""
 
 msgid "AuditLogs|User Events"
@@ -10218,6 +10224,9 @@ msgid "Error occurred when fetching sidebar data"
 msgstr ""
 
 msgid "Error occurred when saving assignees"
+msgstr ""
+
+msgid "Error occurred when saving reviewers"
 msgstr ""
 
 msgid "Error occurred when toggling the notification subscription"
@@ -21984,6 +21993,11 @@ msgid "ReviewApp|Enable Review App"
 msgstr ""
 
 msgid "Reviewer"
+msgid_plural "%d Reviewers"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Reviewer(s)"
 msgstr ""
 
 msgid "Reviewing"
