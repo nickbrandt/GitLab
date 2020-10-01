@@ -170,6 +170,14 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
 
     subject { finding.eql?(other_finding) }
 
+    context 'when the primary_identifier is nil' do
+      let(:identifier) { nil }
+
+      it 'does not raise an exception' do
+        expect { subject }.not_to raise_error
+      end
+    end
+
     context 'when the other finding has same `report_type`' do
       let(:report_type) { :sast }
 
