@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { MERGE_DISABLED_TEXT_UNAPPROVED } from 'ee/vue_merge_request_widget/mixins/ready_to_merge';
 import MergeImmediatelyConfirmationDialog from 'ee/vue_merge_request_widget/components/merge_immediately_confirmation_dialog.vue';
 import MergeTrainHelperText from 'ee/vue_merge_request_widget/components/merge_train_helper_text.vue';
@@ -58,7 +58,7 @@ describe('ReadyToMerge', () => {
   };
 
   const factory = (mrUpdates = {}) => {
-    wrapper = shallowMount(ReadyToMerge, {
+    wrapper = mount(ReadyToMerge, {
       propsData: {
         mr: { ...mr, ...mrUpdates },
         service,
@@ -385,7 +385,7 @@ describe('ReadyToMerge', () => {
         const button = findMergeButton();
 
         expect(button.exists()).toBe(true);
-        expect(button.attributes('disabled')).toBe('true');
+        expect(button.attributes('disabled')).toBe('disabled');
       });
     });
   });

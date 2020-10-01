@@ -1,6 +1,15 @@
 <script>
 import { isEmpty } from 'lodash';
-import { GlIcon, GlButton, GlButtonGroup, GlDropdown, GlDropdownItem, GlSprintf, GlLink, GlTooltipDirective } from '@gitlab/ui';
+import {
+  GlIcon,
+  GlButton,
+  GlButtonGroup,
+  GlDropdown,
+  GlDropdownItem,
+  GlSprintf,
+  GlLink,
+  GlTooltipDirective,
+} from '@gitlab/ui';
 import readyToMergeMixin from 'ee_else_ce/vue_merge_request_widget/mixins/ready_to_merge';
 import simplePoll from '~/lib/utils/simple_poll';
 import { __ } from '~/locale';
@@ -305,9 +314,8 @@ export default {
               v-gl-tooltip.hover.focus="__('Select merge moment')"
               :disabled="isMergeButtonDisabled"
               variant="info"
-              class="js-merge-moment"
               data-qa-selector="merge_moment_dropdown"
-              toggle-class="btn-icon"
+              toggle-class="btn-icon js-merge-moment"
             >
               <template #button-content>
                 <gl-icon name="chevron-down" class="mr-0" />
@@ -315,7 +323,7 @@ export default {
               </template>
               <gl-dropdown-item
                 icon-name="warning"
-                class="accept-merge-request js-merge-immediately-button"
+                button-class="accept-merge-request js-merge-immediately-button"
                 data-qa-selector="merge_immediately_option"
                 @click="handleMergeImmediatelyButtonClick"
               >
