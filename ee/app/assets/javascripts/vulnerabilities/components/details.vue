@@ -207,7 +207,6 @@ export default {
         <li
           v-for="(link, index) in vulnerability.links"
           :key="`${index}:${link.url}`"
-          style="list-style-position: inside;"
           class="gl-ml-0! gl-list-style-position-inside"
         >
           <gl-link
@@ -229,7 +228,6 @@ export default {
         <li
           v-for="(identifier, index) in vulnerability.identifiers"
           :key="`${index}:${identifier.url}`"
-          style="list-style-position: inside;"
           class="gl-ml-0! gl-list-style-position-inside"
         >
           <gl-link :href="identifier.url" data-testid="identifier" target="_blank">
