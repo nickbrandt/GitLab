@@ -141,11 +141,11 @@ RSpec.describe Settings do
     end
 
     it 'defaults to using the enc_settings_key_base for the key' do
-      expect(Gitlab::EncryptedConfiguration).to receive(:new).with(hash_including(key: Gitlab::Application.secrets.enc_settings_key_base))
+      expect(Gitlab::EncryptedConfiguration).to receive(:new).with(hash_including(base_key: Gitlab::Application.secrets.enc_settings_key_base))
       Settings.encrypted('tmp/tests/test.enc')
     end
 
-    it 'defaults the configpath within the rails root' do
+    it 'defaults the config path within the rails root' do
       expect(Settings.encrypted('tmp/tests/test.enc').content_path.fnmatch?(File.join(Rails.root, '**'))).to be true
     end
 
