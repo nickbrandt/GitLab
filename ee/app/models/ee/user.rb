@@ -179,20 +179,9 @@ module EE
     end
 
     def available_custom_project_templates(search: nil, subgroup_id: nil, project_id: nil)
-      templates = ::Gitlab::CurrentSettings.available_custom_project_templates(subgroup_id)
-
-      params = {}
-
-      if project_id
-        templates = templates.where(id: project_id)
-      else
-        params = { search: search, sort: 'name_asc' }
-      end
-
-      ::ProjectsFinder.new(current_user: self,
-                           project_ids_relation: templates,
-                           params: params)
-                      .execute
+      CustomProjectTemplatesFinder
+        .new(current_user: self, search: search, subgroup_id: subgroup_id, project_id: project_id)
+        .execute
     end
 
     def available_subgroups_with_custom_project_templates(group_id = nil)
