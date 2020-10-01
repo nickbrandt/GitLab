@@ -11232,7 +11232,9 @@ CREATE TABLE dast_site_validations (
     validation_strategy smallint NOT NULL,
     url_base text NOT NULL,
     url_path text NOT NULL,
+    state text DEFAULT 'pending'::text NOT NULL,
     CONSTRAINT check_13b34efe4b CHECK ((char_length(url_path) <= 255)),
+    CONSTRAINT check_283be72e9b CHECK ((char_length(state) <= 255)),
     CONSTRAINT check_cd3b538210 CHECK ((char_length(url_base) <= 255))
 );
 
