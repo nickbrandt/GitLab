@@ -56,3 +56,7 @@ export const AUDIT_FILTER_CONFIGS = [
 ];
 
 export const AVAILABLE_TOKEN_TYPES = AUDIT_FILTER_CONFIGS.map(token => token.type);
+
+export const MAX_DATE_RANGE = 31;
+
+export const CURRENT_DATE = new Date();
