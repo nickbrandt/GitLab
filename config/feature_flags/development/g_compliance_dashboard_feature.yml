@@ -1,7 +1,7 @@
 ---
 name: g_compliance_dashboard_feature
-introduced_by_url: 
-rollout_issue_url: 
-group: 
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/38851
+rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/224109
+group: group::compliance
 type: development
 default_enabled: true
