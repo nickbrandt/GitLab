@@ -46,10 +46,6 @@ module Gitlab
         Feature.enabled?(:project_transactionless_destroy, project, default_enabled: false)
       end
 
-      def self.coverage_report_view?(project)
-        ::Feature.enabled?(:coverage_report_view, project, default_enabled: true)
-      end
-
       def self.child_of_child_pipeline_enabled?(project)
         ::Feature.enabled?(:ci_child_of_child_pipeline, project, default_enabled: true)
       end
