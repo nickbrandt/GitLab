@@ -9425,6 +9425,21 @@ enum IssueState {
 }
 
 """
+Values for issue state events
+"""
+enum IssueStateEvent {
+  """
+  Closes the issue
+  """
+  CLOSE
+
+  """
+  Reopens the issue
+  """
+  REOPEN
+}
+
+"""
 Represents total number of issues for the represented statuses
 """
 type IssueStatusCountsType {
@@ -19006,6 +19021,11 @@ input UpdateIssueInput {
   The IDs of labels to be removed from the issue.
   """
   removeLabelIds: [ID!]
+
+  """
+  Close or reopen an issue.
+  """
+  stateEvent: IssueStateEvent
 
   """
   Title of the issue
