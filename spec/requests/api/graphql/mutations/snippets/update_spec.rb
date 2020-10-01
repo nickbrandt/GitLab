@@ -81,11 +81,11 @@ RSpec.describe 'Updating a Snippet' do
         end
       end
 
-      it_behaves_like 'can raise spam flag' do
+      it_behaves_like 'can raise spam flags' do
         let(:service) { Snippets::UpdateService }
       end
 
-      it_behaves_like 'spam flag is present'
+      it_behaves_like 'spammable fields are present'
 
       context 'when there are ActiveRecord validation errors' do
         let(:updated_title) { '' }
@@ -113,8 +113,8 @@ RSpec.describe 'Updating a Snippet' do
           end
         end
 
-        it_behaves_like 'spam flag is present'
-        it_behaves_like 'can raise spam flag' do
+        it_behaves_like 'spammable fields are present'
+        it_behaves_like 'spammable fields with validation errors' do
           let(:service) { Snippets::UpdateService }
         end
       end

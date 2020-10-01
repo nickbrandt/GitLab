@@ -5016,6 +5016,12 @@ type CreateSnippetPayload {
   errors: [String!]!
 
   """
+  Indicates whether a valid gRecaptchaResponse response to a reCAPTCHA challenge
+  must be included in the request in order for the operation to be completed
+  """
+  needsRecaptcha: Boolean
+
+  """
   The snippet after mutation
   """
   snippet: Snippet
@@ -24915,6 +24921,12 @@ type UpdateSnippetPayload {
   Errors encountered during execution of the mutation.
   """
   errors: [String!]!
+
+  """
+  Indicates whether a valid gRecaptchaResponse response to a reCAPTCHA challenge
+  must be included in the request in order for the operation to be completed
+  """
+  needsRecaptcha: Boolean
 
   """
   The snippet after mutation

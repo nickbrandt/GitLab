@@ -13703,6 +13703,20 @@
               "deprecationReason": null
             },
             {
+              "name": "needsRecaptcha",
+              "description": "Indicates whether a valid gRecaptchaResponse response to a reCAPTCHA challenge must be included in the request in order for the operation to be completed",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "snippet",
               "description": "The snippet after mutation",
               "args": [
@@ -72443,6 +72457,20 @@
                     }
                   }
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "needsRecaptcha",
+              "description": "Indicates whether a valid gRecaptchaResponse response to a reCAPTCHA challenge must be included in the request in order for the operation to be completed",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
