@@ -78,7 +78,7 @@ describe('IssueToken', () => {
     it.each`
       state         | icon              | cssClass
       ${'opened'}   | ${'issue-open-m'} | ${'issue-token-state-icon-open'}
-      ${'reopened'} | ${'issue-close'}  | ${'issue-token-state-icon-closed'}
+      ${'reopened'} | ${'issue-open-m'} | ${'issue-token-state-icon-open'}
       ${'closed'}   | ${'issue-close'}  | ${'issue-token-state-icon-closed'}
     `('shows "$icon" icon when "$state"', ({ state, icon, cssClass }) => {
       createComponent({
