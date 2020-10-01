@@ -87,7 +87,10 @@ module EE
               ::Types::DastSiteProfileType,
               null: true,
               resolve: -> (obj, args, _ctx) do
-                DastSiteProfilesFinder.new(project_id: obj.id, id: args[:id].model_id).execute.first
+                # TODO: remove this coercion when the compatibility layer is removed
+                # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
+                gid = ::Types::GlobalIDType[::DastSiteProfile].coerce_isolated_input(args[:id])
+                DastSiteProfilesFinder.new(project_id: obj.id, id: gid.model_id).execute.first
               end,
               description: 'DAST Site Profile associated with the project' do
                 argument :id, ::Types::GlobalIDType[::DastSiteProfile], required: true, description: 'ID of the site profile'
