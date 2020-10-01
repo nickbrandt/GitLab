@@ -334,6 +334,7 @@ Represents the total number of issues and their weights for a particular day.
 | ----- | ---- | ----------- |
 | `detailedStatus` | DetailedStatus | Detailed status of the job |
 | `name` | String | Name of the job |
+| `scheduledAt` | Time | Schedule for the build |
 
 ### CiStage
 

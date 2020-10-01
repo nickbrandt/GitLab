@@ -2121,6 +2121,11 @@ type CiJob {
     """
     last: Int
   ): CiJobConnection
+
+  """
+  Schedule for the build
+  """
+  scheduledAt: Time
 }
 
 """
