@@ -293,8 +293,10 @@ to the name.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/5656) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.7.
 
-Some vulnerabilities can be fixed by applying the solution that GitLab
-automatically generates. Although the feature name is Automatic Remediation, this feature is also commonly called Auto-Remediation, Auto Remediation, or Suggested Solutions. The following scanners are supported:
+Some vulnerabilities include a suggested solution or merge request with a fix that is automatically
+created by GitLab. Although the feature name is Automatic Remediation, this feature is also commonly
+called Auto-Remediation, Auto Remediation, or Suggested Solutions.
+The following scanners are supported:
 
 - [Dependency Scanning](dependency_scanning/index.md):
   Automatic Patch creation is only available for Node.js projects managed with
@@ -306,6 +308,47 @@ When an automatic solution is available, the button in the header shows **Resolv
 ![Resolve with Merge Request button](img/vulnerability_page_merge_request_button_v13_1.png)
 
 Selecting the button creates a merge request with the solution.
+
+#### Auto-fix merge requests
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216027) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.5.
+> - It's [deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
+> - It's disabled on GitLab.com.
+> - It's not recommended for production use.
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-auto-fix-merge-requests). **(CORE ONLY)**
+
+When the auto-fix feature is enabled, remediation merge requests will be automatically created
+whenever a vulnerability is detected.
+
+This feature is enabled by default but can be opted-out from the project's settings by unchecking
+the **Suggested Solutions** checkbox in **Security & Compliance > Configuration**. If the auto-fix
+setting is disabled, [manually applying the suggested patch](#manually-applying-the-suggested-patch)
+and [creating a merge request](#creating-a-merge-request-from-a-vulnerability) from a vulnerability
+will still apply.
+
+![Suggested Solutions Settings](img/suggested_solutions_settings_v13.5.png)
+
+Auto-fix merge requests are authored by the [**GitLab Security Bot**](./security_bot) user and labeled with the
+`gitlab-vulnerability-auto-fix` label.
+
+##### Enable or disable Auto-fix merge requests **(CORE ONLY)**
+
+Auto-fix merge requests is under development and not ready for production use. It is
+deployed behind a feature flag that is **disabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
+can enable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:security_auto_fix)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:security_auto_fix)
+```
 
 #### Manually applying the suggested patch
 
