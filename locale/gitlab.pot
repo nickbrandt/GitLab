@@ -16858,9 +16858,6 @@ msgstr ""
 msgid "Milestones|Promote %{milestoneTitle} to group milestone?"
 msgstr ""
 
-msgid "Milestones|Promote Milestone"
-msgstr ""
-
 msgid "Milestones|Promote to Group Milestone"
 msgstr ""
 
@@ -20982,6 +20979,9 @@ msgid "Promote confidential issue to a non-confidential epic"
 msgstr ""
 
 msgid "Promote issue to an epic"
+msgstr ""
+
+msgid "Promote milestone"
 msgstr ""
 
 msgid "Promote to group label"
