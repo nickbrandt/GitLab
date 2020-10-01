@@ -6,6 +6,7 @@ import {
   fetchReleasesGraphQl,
   fetchReleasesRest,
   receiveReleasesError,
+  setSorting,
 } from '~/releases/stores/modules/list/actions';
 import createState from '~/releases/stores/modules/list/state';
 import * as types from '~/releases/stores/modules/list/mutation_types';
@@ -114,7 +115,7 @@ describe('Releases State actions', () => {
         it('makes a GraphQl query with a first variable', () => {
           expect(gqClient.query).toHaveBeenCalledWith({
             query: allReleasesQuery,
-            variables: { fullPath: projectPath, first: PAGE_SIZE },
+            variables: { fullPath: projectPath, first: PAGE_SIZE, sort: 'RELEASED_AT_DESC' },
           });
         });
       });
@@ -127,7 +128,7 @@ describe('Releases State actions', () => {
         it('makes a GraphQl query with last and before variables', () => {
           expect(gqClient.query).toHaveBeenCalledWith({
             query: allReleasesQuery,
-            variables: { fullPath: projectPath, last: PAGE_SIZE, before },
+            variables: { fullPath: projectPath, last: PAGE_SIZE, before, sort: 'RELEASED_AT_DESC' },
           });
         });
       });
@@ -140,7 +141,7 @@ describe('Releases State actions', () => {
         it('makes a GraphQl query with first and after variables', () => {
           expect(gqClient.query).toHaveBeenCalledWith({
             query: allReleasesQuery,
-            variables: { fullPath: projectPath, first: PAGE_SIZE, after },
+            variables: { fullPath: projectPath, first: PAGE_SIZE, after, sort: 'RELEASED_AT_DESC' },
           });
         });
       });
@@ -154,6 +155,34 @@ describe('Releases State actions', () => {
           expect(callFetchReleasesGraphQl).toThrowError(
             'Both a `before` and an `after` parameter were provided to fetchReleasesGraphQl. These parameters cannot be used together.',
           );
+        });
+      });
+
+      describe('when the sort parameter is changed', () => {
+        beforeEach(() => {
+          mockedState.sorting.sort = 'asc';
+          fetchReleasesGraphQl(vuexParams, { before: undefined, after: undefined });
+        });
+
+        it('makes a GraphQL query with sort variable for the requested direction', () => {
+          expect(gqClient.query).toHaveBeenCalledWith({
+            query: allReleasesQuery,
+            variables: { fullPath: projectPath, first: PAGE_SIZE, sort: 'RELEASED_AT_ASC' },
+          });
+        });
+      });
+
+      describe('when the orderBy parameter is changed', () => {
+        beforeEach(() => {
+          mockedState.sorting.orderBy = 'created_at';
+          fetchReleasesGraphQl(vuexParams, { before: undefined, after: undefined });
+        });
+
+        it('makes a GraphQl query with sort variable for the requested order', () => {
+          expect(gqClient.query).toHaveBeenCalledWith({
+            query: allReleasesQuery,
+            variables: { fullPath: projectPath, first: PAGE_SIZE, sort: 'CREATED_DESC' },
+          });
         });
       });
     });
@@ -230,7 +259,11 @@ describe('Releases State actions', () => {
         });
 
         it('makes a REST query with a page query parameter', () => {
-          expect(api.releases).toHaveBeenCalledWith(projectId, { page });
+          expect(api.releases).toHaveBeenCalledWith(projectId, {
+            page,
+            order_by: 'released_at',
+            sort: 'desc',
+          });
         });
       });
     });
@@ -298,6 +331,18 @@ describe('Releases State actions', () => {
         null,
         mockedState,
         [{ type: types.RECEIVE_RELEASES_ERROR }],
+        [],
+      );
+    });
+  });
+
+  describe('setSorting', () => {
+    it('should commit SET_SORTING', () => {
+      return testAction(
+        setSorting,
+        { orderBy: 'released_at', sort: 'asc' },
+        null,
+        [{ type: types.SET_SORTING, payload: { orderBy: 'released_at', sort: 'asc' } }],
         [],
       );
     });
