@@ -8,10 +8,11 @@
 CHANNEL=$1
 MSG=$2
 ICON_EMOJI=$3
+USERNAME=${4:-"GitLab QA Bot"}
 
 if [ -z "$CHANNEL" ] || [ -z "$CI_SLACK_WEBHOOK_URL" ] || [ -z "$MSG" ] || [ -z "$ICON_EMOJI" ]; then
-    echo "Missing argument(s) - Use: $0 channel message icon_emoji"
+    echo "Missing argument(s) - Use: $0 channel message icon_emoji [username]"
     echo "and set CI_SLACK_WEBHOOK_URL environment variable."
 else
-    curl -X POST --data-urlencode 'payload={"channel": "#'"$CHANNEL"'", "username": "GitLab QA Bot", "text": "'"$MSG"'", "icon_emoji": "'":$ICON_EMOJI:"'"}' "$CI_SLACK_WEBHOOK_URL"
+    curl -X POST --data-urlencode 'payload={"channel": "#'"$CHANNEL"'", "username": "'"$USERNAME"'", "text": "'"$MSG"'", "icon_emoji": "'":$ICON_EMOJI:"'"}' "$CI_SLACK_WEBHOOK_URL"
 fi
