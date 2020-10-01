@@ -246,7 +246,7 @@ module Gitlab
       end
 
       def labels_list(labels, sep: ', ')
-        labels.map { |label| %Q{~"#{label}"} }.join(sep)
+        labels.map { |label| %Q{~&quot;#{label}&quot;} }.join(sep)
       end
 
       def prepare_labels_for_mr(labels)

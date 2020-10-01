@@ -556,15 +556,15 @@ RSpec.describe Gitlab::Danger::Helper do
   end
 
   describe '#labels_list' do
-    let(:labels) { ['telemetry', 'telemetry::reviewed'] }
+    let(:labels) { ['product analytics', 'product analytics::reviewed'] }
 
     it 'composes the labels string' do
-      expect(helper.labels_list(labels)).to eq('~"telemetry", ~"telemetry::reviewed"')
+      expect(helper.labels_list(labels)).to eq('~&quot;product analytics&quot;, ~&quot;product analytics::reviewed&quot;')
     end
 
     context 'when passing a separator' do
       it 'composes the labels string with the given separator' do
-        expect(helper.labels_list(labels, sep: ' ')).to eq('~"telemetry" ~"telemetry::reviewed"')
+        expect(helper.labels_list(labels, sep: ' ')).to eq('~&quot;product analytics&quot; ~&quot;product analytics::reviewed&quot;')
       end
     end
 
@@ -575,9 +575,9 @@ RSpec.describe Gitlab::Danger::Helper do
 
   describe '#prepare_labels_for_mr' do
     it 'composes the labels string' do
-      mr_labels = ['telemetry', 'telemetry::reviewed']
+      mr_labels = ['product analytics', 'product analytics::reviewed']
 
-      expect(helper.prepare_labels_for_mr(mr_labels)).to eq('/label ~"telemetry" ~"telemetry::reviewed"')
+      expect(helper.prepare_labels_for_mr(mr_labels)).to eq('/label ~&quot;product analytics&quot; ~&quot;product analytics::reviewed&quot;')
     end
 
     it 'returns empty string for empty array' do
