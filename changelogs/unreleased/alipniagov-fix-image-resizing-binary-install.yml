@@ -1,0 +1,5 @@
+---
+title: Fix gitlab-resize-image bin installation
+merge_request: 618
+author:
+type: fixed
