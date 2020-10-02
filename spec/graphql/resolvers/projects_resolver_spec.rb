@@ -27,6 +27,10 @@ RSpec.describe Resolvers::ProjectsResolver do
       private_group.add_developer(user)
     end
 
+    before do
+      stub_feature_flags(project_finder_similarity_sort: false)
+    end
+
     context 'when user is not logged in' do
       let(:current_user) { nil }
 
@@ -118,14 +122,20 @@ RSpec.describe Resolvers::ProjectsResolver do
         end
 
         context 'when sort is similarity' do
-          let_it_be(:named_project1) { create(:project, :public, name: 'projABC', path: 'projABC') }
-          let_it_be(:named_project2) { create(:project, :public, name: 'projA', path: 'projA') }
-          let_it_be(:named_project3) { create(:project, :public, name: 'projAB', path: 'projAB') }
+          let_it_be(:named_project1) { create(:project, :public, name: 'projAB', path: 'projAB') }
+          let_it_be(:named_project2) { create(:project, :public, name: 'projABC', path: 'projABC') }
+          let_it_be(:named_project3) { create(:project, :public, name: 'projA', path: 'projA') }
 
           let(:filters) { { search: 'projA', sort: 'similarity' } }
 
           it 'returns projects in order of similarity to search' do
-            is_expected.to match_array([named_project2, named_project3, named_project1])
+            stub_feature_flags(project_finder_similarity_sort: true)
+
+            is_expected.to eq([named_project3, named_project1, named_project2])
+          end
+
+          it 'returns projects not in order of similarity to search if flag is off' do
+            is_expected.not_to eq([named_project3, named_project1, named_project2])
           end
         end
       end

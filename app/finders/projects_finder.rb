@@ -49,14 +49,13 @@ class ProjectsFinder < UnionFinder
 
     use_cte = params.delete(:use_cte)
     collection = Project.wrap_with_cte(collection) if use_cte
+    collection = filter_projects(collection)
 
-    collection = if params[:sort] == 'similarity' && params[:search]
-                   by_search(collection).sorted_by_similarity_desc(params[:search])
-                 else
-                   filter_projects(collection)
-                 end
-
-    sort(collection)
+    if params[:sort] == 'similarity' && params[:search] && Feature.enabled?(:project_finder_similarity_sort)
+      collection.sorted_by_similarity_desc(params[:search])
+    else
+      sort(collection)
+    end
   end
 
   private

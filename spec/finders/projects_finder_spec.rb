@@ -31,6 +31,10 @@ RSpec.describe ProjectsFinder, :do_not_mock_admin_mode do
     let(:use_cte) { true }
     let(:finder) { described_class.new(params: params.merge(use_cte: use_cte), current_user: current_user, project_ids_relation: project_ids_relation) }
 
+    before do
+      stub_feature_flags(project_finder_similarity_sort: false)
+    end
+
     subject { finder.execute }
 
     shared_examples 'ProjectFinder#execute examples' do
@@ -323,6 +327,10 @@ RSpec.describe ProjectsFinder, :do_not_mock_admin_mode do
 
           let_it_be(:internal_project4) do
             create(:project, :internal, group: group, name: 'projAB', path: 'projAB')
+          end
+
+          before do
+            stub_feature_flags(project_finder_similarity_sort: true)
           end
 
           it { is_expected.to eq([internal_project2, internal_project4, internal_project3]) }
