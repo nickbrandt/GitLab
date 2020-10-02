@@ -15,6 +15,20 @@ module Gitlab
     #
     # The requirements are that the table must have an ID column used to
     # identify the rows to be updated.
+    #
+    # Usage:
+    #
+    #  mapping = {
+    #    issue_a => { title: 'This title', relative_position: 100 },
+    #    issue_b => { title: 'That title', relative_position: 173 }
+    #  }
+    #
+    #  ::Gitlab::Database::SetAll.set_all(%i[title relative_position], mapping)
+    #
+    # Note that this is a very low level tool, and operates on the raw column
+    # values. Enums/state fields must be translated into their underlying
+    # representations, for example, and no hooks will be called.
+    #
     module SetAll
       COMMA = ', '
 
@@ -30,7 +44,7 @@ module Gitlab
 
           @table_name = model.table_name
           @connection = model.connection
-          @columns = ([:id] + columns).map { |c| [c, model.column_for_attribute(c)] }
+          @columns = ([:id] + columns).map { |c| model.column_for_attribute(c) }
           @mapping = mapping
         end
 
@@ -38,7 +52,7 @@ module Gitlab
           mapping.flat_map do |k, v|
             obj_id = k.try(:id) || k
             v = v.merge(id: obj_id)
-            columns.map { |c| query_attribute(c, k, v) }
+            columns.map { |c| query_attribute(c, k, v.with_indifferent_access) }
           end
         end
 
@@ -51,10 +65,9 @@ module Gitlab
         end
 
         def query_attribute(column, key, values)
-          column_name = column.first
-          value = values[column_name]
-          key[column_name] = value if key.try(:id) # optimistic update
-          ActiveRecord::Relation::QueryAttribute.from_user(nil, value, ActiveModel::Type.lookup(column.second.type))
+          value = values[column.name]
+          key[column.name] = value if key.try(:id) # optimistic update
+          ActiveRecord::Relation::QueryAttribute.from_user(nil, value, ActiveModel::Type.lookup(column.type))
         end
 
         def values
@@ -65,7 +78,7 @@ module Gitlab
             binds = columns.map do |c|
               bind = "$#{counter += 1}"
               # PG is not great at inferring types - help it for the first row.
-              bind += "::#{c.second.sql_type}" unless typed
+              bind += "::#{c.sql_type}" unless typed
               bind
             end
             typed = true
@@ -75,7 +88,7 @@ module Gitlab
         end
 
         def sql
-          column_names = columns.map(&:first)
+          column_names = columns.map(&:name)
           cte_columns = column_names.map do |c|
             connection.quote_column_name("cte_#{c}")
           end
@@ -90,7 +103,7 @@ module Gitlab
         end
 
         def update!
-          log_name = "SetAll #{table_name} #{columns.drop(1).map(&:first)}:#{mapping.size}"
+          log_name = "SetAll #{table_name} #{columns.drop(1).map(&:name)}:#{mapping.size}"
           if no_prepared_statement?
             # A workaround for https://github.com/rails/rails/issues/24893
             # When prepared statements are prevented (such as when using the
