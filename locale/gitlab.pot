@@ -3476,12 +3476,6 @@ msgstr ""
 msgid "Artifacts"
 msgstr ""
 
-msgid "As U2F devices are only supported by a few browsers, we require that you set up a two-factor authentication app before a U2F device. That way you'll always be able to log in - even when you're using an unsupported browser."
-msgstr ""
-
-msgid "As WebAuthn devices are only supported by a few browsers, we require that you set up a two-factor authentication app before a WebAuthn device. That way you'll always be able to log in - even when you're using an unsupported browser."
-msgstr ""
-
 msgid "As we continue to build more features for SAST, we'd love your feedback on the SAST configuration feature in %{linkStart}this issue%{linkEnd}."
 msgstr ""
 
@@ -17514,6 +17508,12 @@ msgstr ""
 msgid "Not Implemented"
 msgstr ""
 
+msgid "Not all browsers support U2F devices. Therefore, we require that you set up a two-factor authentication app first. That way you'll always be able to sign in - even when you're using an unsupported browser."
+msgstr ""
+
+msgid "Not all browsers support WebAuthn. Therefore, we require that you set up a two-factor authentication app first. That way you'll always be able to sign in - even from an unsupported browser."
+msgstr ""
+
 msgid "Not all data has been processed yet, the accuracy of the chart for the selected timeframe is limited."
 msgstr ""
 
@@ -23432,6 +23432,9 @@ msgstr ""
 msgid "Set up a %{type} Runner manually"
 msgstr ""
 
+msgid "Set up a hardware device as a second factor to sign in."
+msgstr ""
+
 msgid "Set up assertions/attributes/claims (email, first_name, last_name) and NameID according to %{docsLinkStart}the documentation %{icon}%{docsLinkEnd}"
 msgstr ""
 
@@ -27879,9 +27882,6 @@ msgid "Use %{code_start}::%{code_end} to create a %{link_start}scoped label set%
 msgstr ""
 
 msgid "Use Service Desk to connect with your users (e.g. to offer customer support) through email right inside GitLab"
-msgstr ""
-
-msgid "Use a hardware device to add the second factor of authentication."
 msgstr ""
 
 msgid "Use an one time password authenticator on your mobile device or computer to enable two-factor authentication (2FA)."
