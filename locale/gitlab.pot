@@ -5520,7 +5520,7 @@ msgstr ""
 msgid "ClusterIntegration|Clear cluster cache"
 msgstr ""
 
-msgid "ClusterIntegration|Clear the local cache of namespace and service accounts. This is necessary if your integration has become out of sync. The cache is repopulated during the next CI job that requires namespace and service accounts."
+msgid "ClusterIntegration|Clear the local cache of namespace and service accounts."
 msgstr ""
 
 msgid "ClusterIntegration|Cluster management project (alpha)"
@@ -6217,6 +6217,12 @@ msgid "ClusterIntegration|There was an HTTP error when connecting to your cluste
 msgstr ""
 
 msgid "ClusterIntegration|This account must have permissions to create a Kubernetes cluster in the %{link_to_container_project} specified below"
+msgstr ""
+
+msgid "ClusterIntegration|This is necessary if your integration has become out of sync. The cache is repopulated during the next CI job that requires namespace and service accounts."
+msgstr ""
+
+msgid "ClusterIntegration|This is necessary to clear existing environment-namespace associations from clusters previously managed by GitLab."
 msgstr ""
 
 msgid "ClusterIntegration|This option will allow you to install applications on RBAC clusters."
