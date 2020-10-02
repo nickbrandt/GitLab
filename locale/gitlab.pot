@@ -24540,6 +24540,9 @@ msgstr ""
 msgid "StaticSiteEditor|Branch could not be created."
 msgstr ""
 
+msgid "StaticSiteEditor|Copy update"
+msgstr ""
+
 msgid "StaticSiteEditor|Could not commit the content changes."
 msgstr ""
 
