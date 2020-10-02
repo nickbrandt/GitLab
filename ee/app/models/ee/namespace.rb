@@ -194,6 +194,26 @@ module EE
         RootStorageSize.new(root_ancestor).above_size_limit?
     end
 
+    def total_repository_size_excess
+      strong_memoize(:total_repository_size_excess) do
+        namespace_size_limit = actual_size_limit
+
+        namespace_limit_arel = Arel::Nodes::SqlLiteral.new(namespace_size_limit.to_s.presence || 'NULL')
+        condition = 'projects.repository_size_limit != 0 AND project_statistics.repository_size > projects.repository_size_limit'
+
+        total_excess = total_repository_size_excess_calculation(condition, ::Project.arel_table[:repository_size_limit])
+
+        if namespace_size_limit.to_i > 0
+          condition = 'projects.repository_size_limit IS NULL AND project_statistics.repository_size > :namespace_size_limit'
+          sanitized_condition = self.class.sanitize_sql_array([condition, namespace_size_limit: namespace_size_limit])
+
+          total_excess += total_repository_size_excess_calculation(sanitized_condition, namespace_limit_arel)
+        end
+
+        total_excess
+      end
+    end
+
     def actual_size_limit
       ::Gitlab::CurrentSettings.repository_size_limit
     end
@@ -409,6 +429,16 @@ module EE
 
     def shared_runners_remaining_minutes
       [actual_shared_runners_minutes_limit.to_f - shared_runners_minutes.to_f, 0].max
+    end
+
+    def total_repository_size_excess_calculation(condition, limit)
+      select_sql = Arel::Nodes::NamedFunction.new('SUM', [::ProjectStatistics.arel_table[:repository_size] - limit]).to_sql
+
+      all_projects
+      .joins(:statistics)
+      .where(condition)
+      .pluck(Arel.sql(select_sql)) # rubocop:disable Rails/Pick
+      .first || 0
     end
   end
 end
