@@ -18,8 +18,11 @@ export default () => {
       const breakpointSizes = ['md', 'sm', 'xs'];
 
       if (breakpointSizes.includes(bootstrapBreakpoint)) {
+        const $toggleContainer = $('.js-sidebar-toggle-container');
+        const isExpanded = $toggleContainer.data('is-expanded');
         const $expandIcon = $('.js-sidebar-expand');
-        if ($expandIcon.hasClass('hidden')) {
+
+        if (isExpanded) {
           const $sidebarGutterToggle = $expandIcon.closest('.js-sidebar-toggle');
 
           $sidebarGutterToggle.trigger('click');

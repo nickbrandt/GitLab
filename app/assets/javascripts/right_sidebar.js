@@ -44,11 +44,13 @@ Sidebar.prototype.sidebarToggleClicked = function(e, triggered) {
   const $this = $(this);
   const $collapseIcon = $('.js-sidebar-collapse');
   const $expandIcon = $('.js-sidebar-expand');
-  const isExpanded = $expandIcon.hasClass('hidden');
+  const $toggleContainer = $('.js-sidebar-toggle-container');
+  const isExpanded = $toggleContainer.data('is-expanded');
   const tooltipLabel = isExpanded ? __('Expand sidebar') : __('Collapse sidebar');
   e.preventDefault();
 
   if (isExpanded) {
+    $toggleContainer.data('is-expanded', false);
     $collapseIcon.addClass('hidden');
     $expandIcon.removeClass('hidden');
     $('aside.right-sidebar')
@@ -58,6 +60,7 @@ Sidebar.prototype.sidebarToggleClicked = function(e, triggered) {
       .removeClass('right-sidebar-expanded')
       .addClass('right-sidebar-collapsed');
   } else {
+    $toggleContainer.data('is-expanded', true);
     $expandIcon.addClass('hidden');
     $collapseIcon.removeClass('hidden');
     $('aside.right-sidebar')
