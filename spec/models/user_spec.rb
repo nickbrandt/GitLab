@@ -4899,7 +4899,7 @@ RSpec.describe User do
         user.block
       end
 
-      it { is_expected.to eq User::BLOCKED_MESSAGE }
+      it { is_expected.to eq :blocked }
     end
 
     context 'when user is an internal user' do
@@ -4907,7 +4907,7 @@ RSpec.describe User do
         user.update(user_type: :ghost)
       end
 
-      it { is_expected.to be User::LOGIN_FORBIDDEN }
+      it { is_expected.to be :forbidden }
     end
 
     context 'when user is locked' do
