@@ -1,5 +1,11 @@
 # Changelog for gitlab-workhorse
 
+## v8.50.0
+
+### Added
+- Update Gitaly module dependency
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/619
+
 ## v8.49.0
 
 ### Fixed
