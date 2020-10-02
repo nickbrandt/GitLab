@@ -186,10 +186,10 @@ module SearchHelper
     end
   end
 
-  def recent_merge_requests_autocomplete(term, limit = 5)
+  def recent_merge_requests_autocomplete(term)
     return [] unless current_user
 
-    ::Gitlab::Search::RecentMergeRequests.new(user: current_user).search(term).limit(limit).map do |mr|
+    ::Gitlab::Search::RecentMergeRequests.new(user: current_user).search(term).map do |mr|
       {
         category: "Recent merge requests",
         id: mr.id,
@@ -200,10 +200,10 @@ module SearchHelper
     end
   end
 
-  def recent_issues_autocomplete(term, limit = 5)
+  def recent_issues_autocomplete(term)
     return [] unless current_user
 
-    ::Gitlab::Search::RecentIssues.new(user: current_user).search(term).limit(limit).map do |i|
+    ::Gitlab::Search::RecentIssues.new(user: current_user).search(term).map do |i|
       {
         category: "Recent issues",
         id: i.id,

@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-
 RSpec.shared_examples 'search recent items' do
   let_it_be(:user) { create(:user) }
-  let_it_be(:recent_items) { described_class.new(user: user, items_limit: 5) }
+  let_it_be(:recent_items) { described_class.new(user: user) }
   let(:item) { create_item(content: 'hello world 1', parent: parent) }
   let(:parent) { create(parent_type, :public) }
 
@@ -18,13 +17,15 @@ RSpec.shared_examples 'search recent items' do
     end
 
     it 'removes an item when it exceeds the size items_limit' do
-      (1..6).each do |i|
+      recent_items = described_class.new(user: user, items_limit: 3)
+
+      4.times do |i|
         recent_items.log_view(create_item(content: "item #{i}", parent: parent))
       end
 
       results = recent_items.search('item')
 
-      expect(results.map(&:title)).to contain_exactly('item 6', 'item 5', 'item 4', 'item 3', 'item 2')
+      expect(results.map(&:title)).to contain_exactly('item 3', 'item 2', 'item 1')
     end
 
     it 'expires the items after expires_after' do
@@ -82,6 +83,16 @@ RSpec.shared_examples 'search recent items' do
       private_parent.update!(visibility_level: ::Gitlab::VisibilityLevel::PRIVATE)
 
       expect(recent_items.search('matching')).not_to include(private_item)
+    end
+
+    it "limits results to #{Gitlab::Search::RecentItems::SEARCH_LIMIT} items" do
+      (Gitlab::Search::RecentItems::SEARCH_LIMIT + 1).times do |i|
+        recent_items.log_view(create_item(content: "item #{i}", parent: parent))
+      end
+
+      results = recent_items.search('item')
+
+      expect(results.count).to eq(Gitlab::Search::RecentItems::SEARCH_LIMIT)
     end
   end
 end
