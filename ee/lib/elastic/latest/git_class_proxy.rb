@@ -136,6 +136,7 @@ module Elastic
         }
       end
 
+      # rubocop:disable Metrics/AbcSize
       def search_blob(query, type: 'blob', page: 1, per: 20, options: {})
         page ||= 1
 

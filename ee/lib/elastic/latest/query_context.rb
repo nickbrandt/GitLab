@@ -12,7 +12,7 @@ module Elastic
       def build_name(*args)
         ::Gitlab::Elastic::ExprName
           .new(self)
-          .build(*current, *args)
+          .build(*contexts.last, *args)
       end
 
       def name(*args, &block)
@@ -26,12 +26,6 @@ module Elastic
         ensure
           contexts.pop
         end
-      end
-
-      def current
-        return if contexts.empty?
-
-        contexts.last
       end
 
       private

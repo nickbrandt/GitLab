@@ -32,12 +32,10 @@ RSpec.describe Elastic::Latest::ProjectWikiClassProxy, :elastic do
     end
   end
 
-  it 'names elasticsearch queries' do |example|
-    expect_named_queries(example) do |inspector|
-      subject.elastic_search_as_wiki_page('*')
+  it 'names elasticsearch queries' do
+    subject.elastic_search_as_wiki_page('*')
 
-      expect(inspector).to have_named_query('doc:is_a:wiki_blob')
-      expect(inspector).to have_named_query('blob:match:search_terms')
-    end
+    assert_named_queries('doc:is_a:wiki_blob',
+                         'blob:match:search_terms')
   end
 end

@@ -32,12 +32,10 @@ RSpec.describe Elastic::Latest::GitClassProxy, :elastic do
     end
   end
 
-  it "names elasticsearch queries" do |example|
-    expect_named_queries(example) do |inspector|
-      subject.elastic_search_as_found_blob('*')
+  it "names elasticsearch queries" do
+    subject.elastic_search_as_found_blob('*')
 
-      expect(inspector).to have_named_query('doc:is_a:blob')
-      expect(inspector).to have_named_query('blob:match:search_terms')
-    end
+    assert_named_queries('doc:is_a:blob',
+                         'blob:match:search_terms')
   end
 end

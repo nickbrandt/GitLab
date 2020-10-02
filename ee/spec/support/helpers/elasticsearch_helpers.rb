@@ -1,14 +1,28 @@
 # frozen_string_literal: true
 
 module ElasticsearchHelpers
-  def expect_named_queries(example, &block)
-    query_inspector = example.metadata[:query_inspector]
-    query_inspector.reset!
+  def assert_named_queries(*expected_names)
+    es_host = Gitlab::CurrentSettings.elasticsearch_url.first
+    search_uri =
+      Addressable::Template.new("#{es_host}/{index}/doc/_search{?params*}")
 
-    yield query_inspector
+    ensure_names_present = lambda do |req|
+      payload = Gitlab::Json.parse(req.body)
+      query = payload["query"]
 
-    expect(query_inspector.names).not_to be_empty
-    expect(query_inspector.names).not_to include(be_empty)
+      return false unless query.present?
+
+      inspector = ElasticQueryNameInspector.new
+
+      inspector.inspect(query)
+      inspector.has_named_query?(*expected_names)
+    rescue ::JSON::ParserError
+      false
+    end
+
+    a_named_query = a_request(:get, search_uri).with(&ensure_names_present)
+    message = "Expected a query with the following names: #{expected_names.inspect}"
+    expect(a_named_query).to have_been_made.at_least_once, message
   end
 
   def ensure_elasticsearch_index!
