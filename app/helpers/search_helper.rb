@@ -7,8 +7,7 @@ module SearchHelper
     return unless current_user
 
     resources_results = [
-      recent_merge_requests_autocomplete(term),
-      recent_issues_autocomplete(term),
+      recent_items_autocomplete(term),
       groups_autocomplete(term),
       projects_autocomplete(term)
     ].flatten
@@ -25,6 +24,10 @@ module SearchHelper
     ].flatten.uniq do |item|
       item[:label]
     end
+  end
+
+  def recent_items_autocomplete(term)
+    recent_merge_requests_autocomplete(term) + recent_issues_autocomplete(term)
   end
 
   def search_entries_info(collection, scope, term)

@@ -73,7 +73,7 @@ RSpec.describe SearchHelper do
         expect(result.keys).to match_array(%i[category id label url avatar_url])
       end
 
-      it 'includes the users recent issues' do
+      it 'includes the users recently viewed issues' do
         recent_issues = instance_double(::Gitlab::Search::RecentIssues)
         expect(::Gitlab::Search::RecentIssues).to receive(:new).with(user: user).and_return(recent_issues)
         project1 = create(:project, :with_avatar, namespace: user.namespace)
@@ -104,7 +104,7 @@ RSpec.describe SearchHelper do
         })
       end
 
-      it 'includes the users recent merge requests' do
+      it 'includes the users recently viewed merge requests' do
         recent_merge_requests = instance_double(::Gitlab::Search::RecentMergeRequests)
         expect(::Gitlab::Search::RecentMergeRequests).to receive(:new).with(user: user).and_return(recent_merge_requests)
         project1 = create(:project, :with_avatar, namespace: user.namespace)
