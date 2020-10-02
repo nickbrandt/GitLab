@@ -10490,6 +10490,9 @@ msgstr ""
 msgid "Except policy:"
 msgstr ""
 
+msgid "Excess storage"
+msgstr ""
+
 msgid "Excluding merge commits. Limited to %{limit} commits."
 msgstr ""
 
