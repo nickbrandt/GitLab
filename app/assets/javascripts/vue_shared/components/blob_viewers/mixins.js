@@ -13,8 +13,6 @@ export default {
     },
   },
   mounted() {
-    this.$nextTick(() => {
-      eventHub.$emit(SNIPPET_MEASURE_BLOBS_CONTENT);
-    });
+    eventHub.$emit(SNIPPET_MEASURE_BLOBS_CONTENT);
   },
 };

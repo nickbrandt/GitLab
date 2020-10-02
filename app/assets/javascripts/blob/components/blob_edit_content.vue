@@ -45,9 +45,7 @@ export default {
 
     this.editor.onDidChangeModelContent(debounce(this.onFileChange.bind(this), 250));
 
-    this.$nextTick(() => {
-      eventHub.$emit(SNIPPET_MEASURE_BLOBS_CONTENT);
-    });
+    eventHub.$emit(SNIPPET_MEASURE_BLOBS_CONTENT);
   },
   beforeDestroy() {
     this.editor.dispose();
