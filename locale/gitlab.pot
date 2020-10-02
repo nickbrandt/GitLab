@@ -23168,6 +23168,9 @@ msgstr ""
 msgid "Select required regulatory standard"
 msgstr ""
 
+msgid "Select reviewer(s)"
+msgstr ""
+
 msgid "Select shards to replicate"
 msgstr ""
 
