@@ -104,7 +104,7 @@ describe('fetchEpicsSwimlanes', () => {
       [
         {
           type: types.RECEIVE_EPICS_SUCCESS,
-          payload: [mockEpic],
+          payload: { epics: [mockEpic] },
         },
       ],
       [],
@@ -150,7 +150,7 @@ describe('fetchEpicsSwimlanes', () => {
       [
         {
           type: types.RECEIVE_EPICS_SUCCESS,
-          payload: [mockEpic],
+          payload: { epics: [mockEpic] },
         },
       ],
       [

@@ -50,9 +50,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(['activeId', 'filterParams']),
+    ...mapState(['activeId', 'filterParams', 'canAdminEpic']),
     treeRootWrapper() {
-      return this.canAdminList ? Draggable : 'ul';
+      return this.canAdminList && this.canAdminEpic ? Draggable : 'ul';
     },
     treeRootOptions() {
       const options = {
@@ -169,6 +169,7 @@ export default {
           :index="index"
           :list="list"
           :issue="issue"
+          :disabled="disabled || !canAdminEpic"
           :is-active="isActiveIssue(issue)"
           @show="showIssue(issue)"
         />

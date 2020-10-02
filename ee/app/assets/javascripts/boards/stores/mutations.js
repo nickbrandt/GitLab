@@ -103,8 +103,9 @@ export default {
     state.epicsSwimlanesFetchInProgress = false;
   },
 
-  [mutationTypes.RECEIVE_EPICS_SUCCESS]: (state, epics) => {
+  [mutationTypes.RECEIVE_EPICS_SUCCESS]: (state, { epics, canAdminEpic }) => {
     Vue.set(state, 'epics', union(state.epics || [], epics));
+    state.canAdminEpic = canAdminEpic;
   },
 
   [mutationTypes.RESET_EPICS]: state => {

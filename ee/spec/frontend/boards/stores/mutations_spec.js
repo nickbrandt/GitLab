@@ -213,7 +213,7 @@ describe('RECEIVE_EPICS_SUCCESS', () => {
       epics: {},
     };
 
-    mutations.RECEIVE_EPICS_SUCCESS(state, mockEpics);
+    mutations.RECEIVE_EPICS_SUCCESS(state, { epics: mockEpics });
 
     expect(state.epics).toEqual(mockEpics);
   });

@@ -104,7 +104,7 @@ export default {
         }));
 
         if (!withLists) {
-          commit(types.RECEIVE_EPICS_SUCCESS, epicsFormatted);
+          commit(types.RECEIVE_EPICS_SUCCESS, { epics: epicsFormatted });
         }
 
         if (epics.pageInfo?.hasNextPage) {
@@ -117,6 +117,7 @@ export default {
         return {
           epics: epicsFormatted,
           lists: lists?.nodes,
+          canAdminEpic: epics.edges[0]?.node?.userPermissions?.adminEpic,
         };
       })
       .catch(() => commit(types.RECEIVE_SWIMLANES_FAILURE));
@@ -214,7 +215,7 @@ export default {
 
     if (state.isShowingEpicsSwimlanes) {
       dispatch('fetchEpicsSwimlanes', {})
-        .then(({ lists, epics }) => {
+        .then(({ lists, epics, canAdminEpic }) => {
           if (lists) {
             let boardLists = lists.map(list =>
               boardsStore.updateListPosition({ ...list, doNotFetchIssues: true }),
@@ -224,7 +225,7 @@ export default {
           }
 
           if (epics) {
-            commit(types.RECEIVE_EPICS_SUCCESS, epics);
+            commit(types.RECEIVE_EPICS_SUCCESS, { epics, canAdminEpic });
           }
         })
         .catch(() => commit(types.RECEIVE_SWIMLANES_FAILURE));
