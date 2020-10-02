@@ -17,6 +17,7 @@ import { serializeFormObject, isEmptyValue } from '~/lib/utils/forms';
 import { fetchPolicies } from '~/lib/graphql';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import DastSiteValidation from './dast_site_validation.vue';
+import DastSiteAuth from './dast_site_auth.vue';
 import dastSiteProfileCreateMutation from '../graphql/dast_site_profile_create.mutation.graphql';
 import dastSiteProfileUpdateMutation from '../graphql/dast_site_profile_update.mutation.graphql';
 import dastSiteTokenCreateMutation from '../graphql/dast_site_token_create.mutation.graphql';
@@ -42,6 +43,7 @@ export default {
     GlFormInput,
     GlModal,
     GlToggle,
+    DastSiteAuth,
     DastSiteValidation,
   },
   mixins: [glFeatureFlagsMixin()],
@@ -78,6 +80,7 @@ export default {
       hasAlert: false,
       tokenId: null,
       token: null,
+      isAuthSectionValid: true,
       isSiteValidationActive: false,
       isSiteValidationTouched: false,
       validationStatus: null,
@@ -132,7 +135,8 @@ export default {
         (this.isSiteValidationActive && !this.validationStatusMatches(PASSED)) ||
         this.formHasErrors ||
         this.someFieldEmpty ||
-        this.validationStatusMatches(INPROGRESS)
+        this.validationStatusMatches(INPROGRESS) ||
+        !this.isAuthSectionValid
       );
     },
     showValidationSection() {
@@ -345,6 +349,10 @@ export default {
       this.errors = [];
       this.hasAlert = false;
     },
+    onSiteAuthUpdate({ isValid, form }) {
+      // @TODO: Handle form values
+      this.isAuthSectionValid = isValid;
+    },
   },
   modalId: 'deleteDastProfileModal',
 };
@@ -436,6 +444,8 @@ export default {
     </template>
 
     <hr />
+
+    <dast-site-auth @update="onSiteAuthUpdate" />
 
     <div class="gl-mt-6 gl-pt-6">
       <gl-button
