@@ -3181,7 +3181,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List items within a time frame where items.start_date is between startDate and endDate parameters (endDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.start",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -3191,10 +3191,20 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List items within a time frame where items.end_date is between startDate and endDate parameters (startDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.end",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "timeframe",
+                  "description": "List items overlapping the given timeframe",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "Timeframe",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -16252,7 +16262,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List items within a time frame where items.start_date is between startDate and endDate parameters (endDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.start",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -16262,10 +16272,20 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List items within a time frame where items.end_date is between startDate and endDate parameters (startDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.end",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "timeframe",
+                  "description": "List items overlapping the given timeframe",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "Timeframe",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -20312,7 +20332,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List items within a time frame where items.start_date is between startDate and endDate parameters (endDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.start",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -20322,10 +20342,20 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List items within a time frame where items.end_date is between startDate and endDate parameters (startDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.end",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "timeframe",
+                  "description": "List items overlapping the given timeframe",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "Timeframe",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -20451,7 +20481,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List items within a time frame where items.start_date is between startDate and endDate parameters (endDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.start",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -20461,10 +20491,20 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List items within a time frame where items.end_date is between startDate and endDate parameters (startDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.end",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "timeframe",
+                  "description": "List items overlapping the given timeframe",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "Timeframe",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -21082,7 +21122,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List items within a time frame where items.start_date is between startDate and endDate parameters (endDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.start",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -21092,10 +21132,20 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List items within a time frame where items.end_date is between startDate and endDate parameters (startDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.end",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "timeframe",
+                  "description": "List items overlapping the given timeframe",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "Timeframe",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -21528,7 +21578,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List items within a time frame where items.start_date is between startDate and endDate parameters (endDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.start",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -21538,10 +21588,20 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List items within a time frame where items.end_date is between startDate and endDate parameters (startDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.end",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "timeframe",
+                  "description": "List items overlapping the given timeframe",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "Timeframe",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -21570,6 +21630,36 @@
                   "type": {
                     "kind": "ENUM",
                     "name": "MilestoneStateEnum",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "title",
+                  "description": "The title of the milestone",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "searchTitle",
+                  "description": "A search string for the title",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "containingDate",
+                  "description": "A date that the milestone contains",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Time",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -40099,7 +40189,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List items within a time frame where items.start_date is between startDate and endDate parameters (endDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.start",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -40109,10 +40199,20 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List items within a time frame where items.end_date is between startDate and endDate parameters (startDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.end",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "timeframe",
+                  "description": "List items overlapping the given timeframe",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "Timeframe",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -40671,7 +40771,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List items within a time frame where items.start_date is between startDate and endDate parameters (endDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.start",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -40681,10 +40781,20 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List items within a time frame where items.end_date is between startDate and endDate parameters (startDate parameter must be present)",
+                  "description": "List items overlapping a time frame defined by startDate..endDate (if one date is provided, both must be present). Deprecated in 14.0: Use timeframe.end",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "timeframe",
+                  "description": "List items overlapping the given timeframe",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "Timeframe",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -40713,6 +40823,36 @@
                   "type": {
                     "kind": "ENUM",
                     "name": "MilestoneStateEnum",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "title",
+                  "description": "The title of the milestone",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "searchTitle",
+                  "description": "A search string for the title",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "containingDate",
+                  "description": "A date that the milestone contains",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Time",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -53295,6 +53435,45 @@
               "ofType": null
             }
           ]
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "Timeframe",
+          "description": "A time-frame defined as a closed inclusive range of two points in time",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "start",
+              "description": "The start of the range",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Time",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "end",
+              "description": "The end of the range",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Time",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
         },
         {
           "kind": "OBJECT",

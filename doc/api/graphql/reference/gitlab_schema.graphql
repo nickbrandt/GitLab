@@ -1222,8 +1222,8 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     before: String
 
     """
-    List items within a time frame where items.end_date is between startDate and
-    endDate parameters (startDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
     """
     endDate: Time
 
@@ -1273,8 +1273,9 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     sort: EpicSort
 
     """
-    List items within a time frame where items.start_date is between startDate
-    and endDate parameters (endDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use
+    timeframe.start
     """
     startDate: Time
 
@@ -1282,6 +1283,11 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     Filter epics by state
     """
     state: EpicState
+
+    """
+    List items overlapping the given timeframe
+    """
+    timeframe: Timeframe
   ): EpicConnection
 
   """
@@ -5878,8 +5884,8 @@ type Epic implements CurrentUserTodos & Noteable {
     before: String
 
     """
-    List items within a time frame where items.end_date is between startDate and
-    endDate parameters (startDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
     """
     endDate: Time
 
@@ -5929,8 +5935,9 @@ type Epic implements CurrentUserTodos & Noteable {
     sort: EpicSort
 
     """
-    List items within a time frame where items.start_date is between startDate
-    and endDate parameters (endDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use
+    timeframe.start
     """
     startDate: Time
 
@@ -5938,6 +5945,11 @@ type Epic implements CurrentUserTodos & Noteable {
     Filter epics by state
     """
     state: EpicState
+
+    """
+    List items overlapping the given timeframe
+    """
+    timeframe: Timeframe
   ): EpicConnection
 
   """
@@ -7361,8 +7373,8 @@ type Group {
     authorUsername: String
 
     """
-    List items within a time frame where items.end_date is between startDate and
-    endDate parameters (startDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
     """
     endDate: Time
 
@@ -7402,8 +7414,9 @@ type Group {
     sort: EpicSort
 
     """
-    List items within a time frame where items.start_date is between startDate
-    and endDate parameters (endDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use
+    timeframe.start
     """
     startDate: Time
 
@@ -7411,6 +7424,11 @@ type Group {
     Filter epics by state
     """
     state: EpicState
+
+    """
+    List items overlapping the given timeframe
+    """
+    timeframe: Timeframe
   ): Epic
 
   """
@@ -7433,8 +7451,8 @@ type Group {
     before: String
 
     """
-    List items within a time frame where items.end_date is between startDate and
-    endDate parameters (startDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
     """
     endDate: Time
 
@@ -7484,8 +7502,9 @@ type Group {
     sort: EpicSort
 
     """
-    List items within a time frame where items.start_date is between startDate
-    and endDate parameters (endDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use
+    timeframe.start
     """
     startDate: Time
 
@@ -7493,6 +7512,11 @@ type Group {
     Filter epics by state
     """
     state: EpicState
+
+    """
+    List items overlapping the given timeframe
+    """
+    timeframe: Timeframe
   ): EpicConnection
 
   """
@@ -7695,8 +7719,8 @@ type Group {
     before: String
 
     """
-    List items within a time frame where items.end_date is between startDate and
-    endDate parameters (startDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
     """
     endDate: Time
 
@@ -7726,8 +7750,9 @@ type Group {
     last: Int
 
     """
-    List items within a time frame where items.start_date is between startDate
-    and endDate parameters (endDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use
+    timeframe.start
     """
     startDate: Time
 
@@ -7735,6 +7760,11 @@ type Group {
     Filter iterations by state
     """
     state: IterationState
+
+    """
+    List items overlapping the given timeframe
+    """
+    timeframe: Timeframe
 
     """
     Fuzzy search by title
@@ -7892,8 +7922,13 @@ type Group {
     before: String
 
     """
-    List items within a time frame where items.end_date is between startDate and
-    endDate parameters (startDate parameter must be present)
+    A date that the milestone contains
+    """
+    containingDate: Time
+
+    """
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
     """
     endDate: Time
 
@@ -7918,8 +7953,14 @@ type Group {
     last: Int
 
     """
-    List items within a time frame where items.start_date is between startDate
-    and endDate parameters (endDate parameter must be present)
+    A search string for the title
+    """
+    searchTitle: String
+
+    """
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use
+    timeframe.start
     """
     startDate: Time
 
@@ -7927,6 +7968,16 @@ type Group {
     Filter milestones by state
     """
     state: MilestoneStateEnum
+
+    """
+    List items overlapping the given timeframe
+    """
+    timeframe: Timeframe
+
+    """
+    The title of the milestone
+    """
+    title: String
   ): MilestoneConnection
 
   """
@@ -13730,8 +13781,8 @@ type Project {
     before: String
 
     """
-    List items within a time frame where items.end_date is between startDate and
-    endDate parameters (startDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
     """
     endDate: Time
 
@@ -13761,8 +13812,9 @@ type Project {
     last: Int
 
     """
-    List items within a time frame where items.start_date is between startDate
-    and endDate parameters (endDate parameter must be present)
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use
+    timeframe.start
     """
     startDate: Time
 
@@ -13770,6 +13822,11 @@ type Project {
     Filter iterations by state
     """
     state: IterationState
+
+    """
+    List items overlapping the given timeframe
+    """
+    timeframe: Timeframe
 
     """
     Fuzzy search by title
@@ -13979,8 +14036,13 @@ type Project {
     before: String
 
     """
-    List items within a time frame where items.end_date is between startDate and
-    endDate parameters (startDate parameter must be present)
+    A date that the milestone contains
+    """
+    containingDate: Time
+
+    """
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
     """
     endDate: Time
 
@@ -14005,8 +14067,14 @@ type Project {
     last: Int
 
     """
-    List items within a time frame where items.start_date is between startDate
-    and endDate parameters (endDate parameter must be present)
+    A search string for the title
+    """
+    searchTitle: String
+
+    """
+    List items overlapping a time frame defined by startDate..endDate (if one
+    date is provided, both must be present). Deprecated in 14.0: Use
+    timeframe.start
     """
     startDate: Time
 
@@ -14014,6 +14082,16 @@ type Project {
     Filter milestones by state
     """
     state: MilestoneStateEnum
+
+    """
+    List items overlapping the given timeframe
+    """
+    timeframe: Timeframe
+
+    """
+    The title of the milestone
+    """
+    title: String
   ): MilestoneConnection
 
   """
@@ -18309,6 +18387,21 @@ interface TimeboxBurnupTimeSeriesInterface {
   Daily scope and completed totals for burnup charts
   """
   burnupTimeSeries: [BurnupChartDailyTotals!]
+}
+
+"""
+A time-frame defined as a closed inclusive range of two points in time
+"""
+input Timeframe {
+  """
+  The end of the range
+  """
+  end: Time!
+
+  """
+  The start of the range
+  """
+  start: Time!
 }
 
 type Timelog {
