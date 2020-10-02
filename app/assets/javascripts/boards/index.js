@@ -25,6 +25,7 @@ import { __ } from '~/locale';
 import './models/label';
 import './models/assignee';
 
+import { initTooltips, dispose } from '~/tooltips';
 import toggleFocusMode from '~/boards/toggle_focus';
 import FilteredSearchBoards from '~/boards/filtered_search_boards';
 import eventHub from '~/boards/eventhub';
@@ -330,9 +331,9 @@ export default () => {
 
           this.$nextTick(() => {
             if (this.disabled) {
-              $tooltip.tooltip();
+              initTooltips();
             } else {
-              $tooltip.tooltip('dispose');
+              dispose($tooltip);
             }
           });
         },
@@ -350,6 +351,7 @@ export default () => {
             data-placement="bottom"
             data-track-event="click_button"
             data-track-label="board_add_issues"
+            data-toggle="tooltip"
             ref="addIssuesButton"
             :class="{ 'disabled': disabled }"
             :title="tooltipTitle"
