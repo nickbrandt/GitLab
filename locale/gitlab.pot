@@ -537,7 +537,7 @@ msgstr ""
 msgid "%{labelStart}Namespace:%{labelEnd} %{namespace}"
 msgstr ""
 
-msgid "%{labelStart}Report Type:%{labelEnd} %{reportType}"
+msgid "%{labelStart}Scan Type:%{labelEnd} %{reportType}"
 msgstr ""
 
 msgid "%{labelStart}Scanner:%{labelEnd} %{scanner}"
