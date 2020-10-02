@@ -24,6 +24,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
         raw_metadata: 'I am a stringified json object',
         report_type: :sast,
         scanner: scanner,
+        scan: nil,
         severity: :high,
         uuid: 'cadf8cf0a8228fa92a0f4897a0314083bb38'
       }
