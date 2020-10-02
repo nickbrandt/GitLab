@@ -27,17 +27,14 @@ import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import { measurePerformance } from '../utils';
 
-eventHub.$on(
-  WEBIDE_MEASURE_TREE_FROM_REQUEST,
-  measurePerformance.bind(WEBIDE_MARK_TREE_FINISH, WEBIDE_MEASURE_TREE_FROM_REQUEST),
+eventHub.$on(WEBIDE_MEASURE_TREE_FROM_REQUEST, () =>
+  measurePerformance(WEBIDE_MARK_TREE_FINISH, WEBIDE_MEASURE_TREE_FROM_REQUEST),
 );
-eventHub.$on(
-  WEBIDE_MEASURE_FILE_FROM_REQUEST,
-  measurePerformance.bind(WEBIDE_MARK_FILE_FINISH, WEBIDE_MEASURE_FILE_FROM_REQUEST),
+eventHub.$on(WEBIDE_MEASURE_FILE_FROM_REQUEST, () =>
+  measurePerformance(WEBIDE_MARK_FILE_FINISH, WEBIDE_MEASURE_FILE_FROM_REQUEST),
 );
-eventHub.$on(
-  WEBIDE_MEASURE_FILE_AFTER_INTERACTION,
-  measurePerformance.bind(
+eventHub.$on(WEBIDE_MEASURE_FILE_AFTER_INTERACTION, () =>
+  measurePerformance(
     WEBIDE_MARK_FILE_FINISH,
     WEBIDE_MEASURE_FILE_AFTER_INTERACTION,
     WEBIDE_MARK_FILE_CLICKED,
