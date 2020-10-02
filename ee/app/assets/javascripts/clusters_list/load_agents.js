@@ -1,5 +1,6 @@
 import Agents from './components/agents.vue';
 import createDefaultClient from '~/lib/graphql';
+import getAgentsQuery from './graphql/queries/get_agents.query.graphql';
 
 export default (Vue, VueApollo) => {
   const el = document.querySelector('#js-cluster-agents-list');
@@ -10,7 +11,8 @@ export default (Vue, VueApollo) => {
 
   const defaultClient = createDefaultClient();
 
-  defaultClient.cache.writeData({
+  defaultClient.cache.writeQuery({
+    query: getAgentsQuery,
     /* eslint-disable @gitlab/require-i18n-strings */
     data: {
       project: {
