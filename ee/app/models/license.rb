@@ -116,6 +116,7 @@ class License < ApplicationRecord
     minimal_access_role
     unprotection_restrictions
     ci_project_subscriptions
+    incident_timeline_view
   ]
   EEP_FEATURES.freeze
 
