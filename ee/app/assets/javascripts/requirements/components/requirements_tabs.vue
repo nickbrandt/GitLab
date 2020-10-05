@@ -56,7 +56,9 @@ export default {
       <gl-tab @click="$emit('clickTab', { filterBy: $options.FilterState.archived })">
         <template slot="title">
           <span>Archived</span>
-          <gl-badge size="sm" class="gl-tab-counter-badge">{{ requirementsCount.ARCHIVED }}</gl-badge>
+          <gl-badge size="sm" class="gl-tab-counter-badge">{{
+            requirementsCount.ARCHIVED
+          }}</gl-badge>
         </template>
       </gl-tab>
       <gl-tab @click="$emit('clickTab', { filterBy: $options.FilterState.all })">
