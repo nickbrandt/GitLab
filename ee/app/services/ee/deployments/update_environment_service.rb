@@ -2,7 +2,7 @@
 
 module EE
   module Deployments
-    module AfterCreateService
+    module UpdateEnvironmentService
       extend ::Gitlab::Utils::Override
 
       override :execute
