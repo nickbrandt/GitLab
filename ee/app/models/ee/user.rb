@@ -379,6 +379,11 @@ module EE
       end
     end
 
+    def find_or_init_board_epic_preference(board_id:, epic_id:)
+      boards_epic_user_preferences.find_or_initialize_by(
+        board_id: board_id, epic_id: epic_id)
+    end
+
     protected
 
     override :password_required?

@@ -1446,4 +1446,26 @@ RSpec.describe User do
       expect(subject).to be false
     end
   end
+
+  describe '#find_or_init_board_epic_preference' do
+    let_it_be(:user) { create(:user) }
+    let_it_be(:board) { create(:board) }
+    let_it_be(:epic) { create(:epic) }
+
+    subject(:preference) { user.find_or_init_board_epic_preference(board_id: board.id, epic_id: epic.id) }
+
+    it 'returns new board epic user preference' do
+      expect(preference.persisted?).to be_falsey
+      expect(preference.user).to eq(user)
+    end
+
+    context 'when preference already exists' do
+      let_it_be(:epic_user_preference) { create(:epic_user_preference, board: board, epic: epic, user: user) }
+
+      it 'returns the existing board' do
+        expect(preference.persisted?).to be_truthy
+        expect(preference).to eq(epic_user_preference)
+      end
+    end
+  end
 end
