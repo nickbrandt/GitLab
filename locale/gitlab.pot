@@ -447,6 +447,12 @@ msgstr ""
 msgid "%{description}- Sentry event: %{errorUrl}- First seen: %{firstSeen}- Last seen: %{lastSeen} %{countLabel}: %{count}%{userCountLabel}: %{userCount}"
 msgstr ""
 
+msgid "%{doc_link_start}Advanced search%{doc_link_end} is disabled since %{ref_elem} is not the default branch; %{default_branch_link_start}search on %{default_branch} instead%{default_branch_link_end}."
+msgstr ""
+
+msgid "%{doc_link_start}Advanced search%{doc_link_end} is enabled."
+msgstr ""
+
 msgid "%{due_date} (Past due)"
 msgstr ""
 
@@ -2193,9 +2199,6 @@ msgid "Advanced Settings"
 msgstr ""
 
 msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
-msgstr ""
-
-msgid "Advanced search functionality"
 msgstr ""
 
 msgid "After a successful password update you will be redirected to login screen."
@@ -30572,9 +30575,6 @@ msgid "is an invalid IP address range"
 msgstr ""
 
 msgid "is blocked by"
-msgstr ""
-
-msgid "is enabled."
 msgstr ""
 
 msgid "is invalid because there is downstream lock"
