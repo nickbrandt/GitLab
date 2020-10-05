@@ -20,6 +20,11 @@ export default {
       type: Number,
       required: true,
     },
+    hasLabel: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   computed: {
     hasDropdown() {
@@ -38,13 +43,12 @@ export default {
 
 <template>
   <div>
-    <strong>{{ s__('SecurityReports|Download Report') }}</strong>
+    <strong v-if="hasLabel">{{ s__('SecurityReports|Download Report') }}</strong>
     <gl-dropdown
       v-if="hasDropdown"
       class="d-block mt-1"
       :text="$options.i18n.FUZZING_ARTIFACTS"
       category="secondary"
-      variant="info"
       size="small"
     >
       <gl-deprecated-dropdown-item
@@ -58,7 +62,6 @@ export default {
       v-else
       class="d-block mt-1"
       category="secondary"
-      variant="info"
       size="small"
       :href="artifactDownloadUrl(jobs[0])"
     >
