@@ -512,4 +512,36 @@ RSpec.describe Ci::Pipeline do
 
     it { is_expected.to match_array(expected_builds) }
   end
+
+  describe "#license_scan_completed?" do
+    where(:pipeline_status, :build_types, :expected_status) do
+      [
+        [:blocked, [:container_scanning], false],
+        [:blocked, [:license_scan_v2_1, :container_scanning], true],
+        [:blocked, [:license_scan_v2_1], true],
+        [:blocked, [], false],
+        [:failed, [:container_scanning], false],
+        [:failed, [:license_scan_v2_1, :container_scanning], true],
+        [:failed, [:license_scan_v2_1], true],
+        [:failed, [], false],
+        [:running, [:container_scanning], false],
+        [:running, [:license_scan_v2_1, :container_scanning], true],
+        [:running, [:license_scan_v2_1], true],
+        [:running, [], false],
+        [:success, [:container_scanning], false],
+        [:success, [:license_scan_v2_1, :container_scanning], true],
+        [:success, [:license_scan_v2_1], true],
+        [:success, [], false]
+      ]
+    end
+
+    with_them do
+      subject { pipeline.license_scan_completed? }
+
+      let(:pipeline) { create(:ci_pipeline, pipeline_status, builds: builds) }
+      let(:builds) { build_types.map { |build_type| create(:ee_ci_build, build_type) } }
+
+      specify { expect(subject).to eq(expected_status) }
+    end
+  end
 end

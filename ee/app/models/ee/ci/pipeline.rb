@@ -165,6 +165,10 @@ module EE
                        .select(&:failed?)
       end
 
+      def license_scan_completed?
+        builds.latest.with_reports(::Ci::JobArtifact.license_scanning_reports).exists?
+      end
+
       private
 
       def project_has_subscriptions?
