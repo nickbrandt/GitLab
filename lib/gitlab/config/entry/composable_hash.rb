@@ -1,0 +1,45 @@
+# frozen_string_literal: true
+
+module Gitlab
+  module Config
+    module Entry
+      ##
+      # Entry that represents a composable hash definition
+      # Where each hash key can be any value written by the user
+      #
+      class ComposableHash < ::Gitlab::Config::Entry::Node
+        include ::Gitlab::Config::Entry::Validatable
+
+        validations do
+          validates :config, type: Hash
+        end
+
+        def compose!(deps = nil)
+          super do
+            @config.each do |name, config|
+              entry_class = composable_class(name, config)
+              raise ArgumentError, 'Missing Composable class' unless entry_class
+
+              entry_class_name = entry_class.name.split('::').last.downcase
+
+              factory = ::Gitlab::Config::Entry::Factory.new(entry_class)
+                .value(config || {})
+                .with(key: name, parent: self, description: "#{name} #{entry_class_name} definition") # rubocop:disable CodeReuse/ActiveRecord
+                .metadata(name: name)
+
+              @entries[name] = factory.create!
+            end
+
+            @entries.each_value do |entry|
+              entry.compose!(deps)
+            end
+          end
+        end
+
+        def composable_class(name = nil, config = nil)
+          opt(:composable_class)
+        end
+      end
+    end
+  end
+end
