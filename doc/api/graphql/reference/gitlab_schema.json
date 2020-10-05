@@ -36345,49 +36345,55 @@
           "enumValues": [
             {
               "name": "MAVEN",
-              "description": "Packages from the maven package manager",
+              "description": "Packages from the Maven package manager",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "NPM",
-              "description": "Packages from the npm package manager",
+              "description": "Packages from the Npm package manager",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "CONAN",
-              "description": "Packages from the conan package manager",
+              "description": "Packages from the Conan package manager",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "NUGET",
-              "description": "Packages from the nuget package manager",
+              "description": "Packages from the Nuget package manager",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "PYPI",
-              "description": "Packages from the pypi package manager",
+              "description": "Packages from the Pypi package manager",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "COMPOSER",
-              "description": "Packages from the composer package manager",
+              "description": "Packages from the Composer package manager",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "GENERIC",
-              "description": "Packages from the generic package manager",
+              "description": "Packages from the Generic package manager",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "GOLANG",
-              "description": "Packages from the golang package manager",
+              "description": "Packages from the Golang package manager",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "DEBIAN",
+              "description": "Packages from the Debian package manager",
               "isDeprecated": false,
               "deprecationReason": null
             }
