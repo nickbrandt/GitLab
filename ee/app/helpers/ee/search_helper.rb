@@ -19,6 +19,11 @@ module EE
       options
     end
 
+    override :recent_items_autocomplete
+    def recent_items_autocomplete(term)
+      super + recent_epics_autocomplete(term)
+    end
+
     override :search_blob_title
     def search_blob_title(project, path)
       if @project
@@ -71,6 +76,20 @@ module EE
     end
 
     private
+
+    def recent_epics_autocomplete(term)
+      return [] unless current_user
+
+      ::Gitlab::Search::RecentEpics.new(user: current_user).search(term).map do |e|
+        {
+          category: "Recent epics",
+          id: e.id,
+          label: search_result_sanitize(e.title),
+          url: epic_path(e),
+          avatar_url: e.group.avatar_url || ''
+        }
+      end
+    end
 
     def search_multiple_assignees?(type)
       context = @project.presence || @group.presence || :dashboard
