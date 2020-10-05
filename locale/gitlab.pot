@@ -2551,9 +2551,6 @@ msgstr ""
 msgid "All threads resolved"
 msgstr ""
 
-msgid "All users"
-msgstr ""
-
 msgid "All users must have a name."
 msgstr ""
 
@@ -11137,6 +11134,9 @@ msgstr ""
 msgid "FeatureFlag|Select a user list"
 msgstr ""
 
+msgid "FeatureFlag|Select the environment scope for this feature flag."
+msgstr ""
+
 msgid "FeatureFlag|There are no configured user lists"
 msgstr ""
 
@@ -18626,9 +18626,6 @@ msgstr ""
 msgid "People without permission will never get a notification."
 msgstr ""
 
-msgid "Percent of users"
-msgstr ""
-
 msgid "Percentage"
 msgstr ""
 
@@ -23175,9 +23172,6 @@ msgid "Select the branch you want to set as the default for this project. All me
 msgstr ""
 
 msgid "Select the custom project template source group."
-msgstr ""
-
-msgid "Select the environment scope for this feature flag."
 msgstr ""
 
 msgid "Select timezone"
@@ -28020,12 +28014,6 @@ msgid "User %{current_user_username} has started impersonating %{username}"
 msgstr ""
 
 msgid "User %{username} was successfully removed."
-msgstr ""
-
-msgid "User IDs"
-msgstr ""
-
-msgid "User List"
 msgstr ""
 
 msgid "User OAuth applications"
