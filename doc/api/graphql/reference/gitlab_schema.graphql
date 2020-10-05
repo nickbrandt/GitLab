@@ -18799,6 +18799,16 @@ input UpdateBoardListInput {
   listId: ID!
 
   """
+  Maximum number of issues in the list
+  """
+  maxIssueCount: Int
+
+  """
+  Maximum weight of issues in the list
+  """
+  maxIssueWeight: Int
+
+  """
   Position of list within the board
   """
   position: Int

@@ -54825,6 +54825,26 @@
               "defaultValue": null
             },
             {
+              "name": "maxIssueCount",
+              "description": "Maximum number of issues in the list",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "maxIssueWeight",
+              "description": "Maximum weight of issues in the list",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "clientMutationId",
               "description": "A unique identifier for the client performing the mutation.",
               "type": {

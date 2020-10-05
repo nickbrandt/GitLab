@@ -1,0 +1,5 @@
+---
+title: Update maxIssueCount and maxIssueWeight through GraphQL mutation
+merge_request: 44403
+author:
+type: added
