@@ -17719,11 +17719,6 @@ enum Sort {
 
 type StatusAction {
   """
-  Method for the action, for example: :post
-  """
-  actionMethod: String
-
-  """
   Title for the button, for example: Retry this job
   """
   buttonTitle: String
@@ -17732,6 +17727,11 @@ type StatusAction {
   Icon used in the action button
   """
   icon: String
+
+  """
+  Method for the action, for example: :post
+  """
+  method: String
 
   """
   Path for the action

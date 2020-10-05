@@ -2460,9 +2460,9 @@ Represents how the blob content should be displayed.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `actionMethod` | String | Method for the action, for example: :post |
 | `buttonTitle` | String | Title for the button, for example: Retry this job |
 | `icon` | String | Icon used in the action button |
+| `method` | String | Method for the action, for example: :post |
 | `path` | String | Path for the action |
 | `title` | String | Title for the action, for example: Retry |
 

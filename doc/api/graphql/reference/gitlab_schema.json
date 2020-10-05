@@ -51497,20 +51497,6 @@
           "description": null,
           "fields": [
             {
-              "name": "actionMethod",
-              "description": "Method for the action, for example: :post",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "buttonTitle",
               "description": "Title for the button, for example: Retry this job",
               "args": [
@@ -51527,6 +51513,20 @@
             {
               "name": "icon",
               "description": "Icon used in the action button",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "method",
+              "description": "Method for the action, for example: :post",
               "args": [
 
               ],

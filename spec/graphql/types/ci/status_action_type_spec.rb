@@ -7,10 +7,10 @@ RSpec.describe Types::Ci::StatusActionType do
 
   it 'exposes the expected fields' do
     expected_fields = %i[
-      actionMethod
       buttonTitle
       icon
       path
+      method
       title
     ]
 
