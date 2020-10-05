@@ -71,48 +71,8 @@ describe('Release block', () => {
       expect(wrapper.text()).toContain(timeagoMixin.methods.timeFormatted(release.releasedAt));
     });
 
-    it('renders number of assets provided', () => {
-      expect(wrapper.find('.js-assets-count').text()).toContain(release.assets.count);
-    });
-
-    it('renders dropdown with the sources', () => {
-      expect(wrapper.findAll('.js-sources-dropdown li').length).toEqual(
-        release.assets.sources.length,
-      );
-
-      expect(wrapper.find('.js-sources-dropdown li a').attributes().href).toEqual(
-        release.assets.sources[0].url,
-      );
-
-      expect(wrapper.find('.js-sources-dropdown li a').text()).toContain(
-        release.assets.sources[0].format,
-      );
-    });
-
-    it('renders list with the links provided', () => {
-      expect(wrapper.findAll('.js-assets-list li').length).toEqual(release.assets.links.length);
-
-      expect(wrapper.find('.js-assets-list li a').attributes().href).toEqual(
-        release.assets.links[0].directAssetUrl,
-      );
-
-      expect(wrapper.find('.js-assets-list li a').text()).toContain(release.assets.links[0].name);
-    });
-
     it('renders author avatar', () => {
       expect(wrapper.find('.user-avatar-link').exists()).toBe(true);
-    });
-
-    describe('external label', () => {
-      it('renders external label when link is external', () => {
-        expect(wrapper.find('.js-assets-list li a').text()).toContain('external source');
-      });
-
-      it('does not render external label when link is not external', () => {
-        expect(wrapper.find('.js-assets-list li:nth-child(3) a').text()).not.toContain(
-          'external source',
-        );
-      });
     });
 
     it('renders the footer', () => {

@@ -953,9 +953,6 @@ msgstr ""
 msgid "(deleted)"
 msgstr ""
 
-msgid "(external source)"
-msgstr ""
-
 msgid "(line: %{startLine})"
 msgstr ""
 
@@ -9240,9 +9237,6 @@ msgid "Download as"
 msgstr ""
 
 msgid "Download as CSV"
-msgstr ""
-
-msgid "Download asset"
 msgstr ""
 
 msgid "Download codes"
@@ -24346,9 +24340,6 @@ msgid "Source Branch"
 msgstr ""
 
 msgid "Source branch: %{source_branch_open}%{source_branch}%{source_branch_close}"
-msgstr ""
-
-msgid "Source code"
 msgstr ""
 
 msgid "Source code (%{fileExtension})"
