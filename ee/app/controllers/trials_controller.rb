@@ -38,6 +38,13 @@ class TrialsController < ApplicationController
     end
   end
 
+  protected
+
+  # override the ConfirmEmailWarning method in order to skip
+  def show_confirm_warning?
+    false
+  end
+
   private
 
   def authenticate_user!
