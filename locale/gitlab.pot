@@ -26854,6 +26854,12 @@ msgstr ""
 msgid "Timeago|right now"
 msgstr ""
 
+msgid "Timeline|Turn timeline view off"
+msgstr ""
+
+msgid "Timeline|Turn timeline view on"
+msgstr ""
+
 msgid "Timeout"
 msgstr ""
 
