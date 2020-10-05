@@ -53,11 +53,13 @@ func (r *References) Store(refId Id, references []Item) error {
 		return nil
 	}
 
-	err := r.Items.SetEntry(r.CurrentOffsetId, references)
+	items := append(r.getItems(refId), references...)
+	err := r.Items.SetEntry(r.CurrentOffsetId, items)
 	if err != nil {
 		return err
 	}
 
+	size = len(items)
 	r.Offsets.SetEntry(refId, ReferencesOffset{Id: r.CurrentOffsetId, Len: int32(size)})
 	r.CurrentOffsetId += Id(size)
 
