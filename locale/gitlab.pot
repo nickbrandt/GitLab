@@ -9182,6 +9182,9 @@ msgstr ""
 msgid "Documentation for popular identity providers"
 msgstr ""
 
+msgid "Documentation pages URL"
+msgstr ""
+
 msgid "Documents reindexed: %{processed_documents} (%{percentage}%%)"
 msgstr ""
 
@@ -30611,6 +30614,9 @@ msgid "is read only"
 msgstr ""
 
 msgid "is too long (%{current_value}). The maximum size is %{max_size}."
+msgstr ""
+
+msgid "is too long (maximum is %{count} characters)"
 msgstr ""
 
 msgid "is too long (maximum is 100 entries)"
