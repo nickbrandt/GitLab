@@ -215,7 +215,7 @@ describe('ThroughputTable', () => {
         it('includes an active label icon and count when available', async () => {
           additionalData({
             labels: {
-              nodes: [{ title: 'Brinix' }],
+              count: 1,
             },
           });
 

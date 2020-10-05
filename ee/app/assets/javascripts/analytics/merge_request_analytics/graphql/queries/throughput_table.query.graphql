@@ -54,10 +54,8 @@ query getThroughputTableData(
           additions
           deletions
         }
-        labels {
-          nodes {
-            title
-          }
+        labels(first: 0) {
+          count
         }
         pipelines {
           nodes {
