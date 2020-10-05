@@ -2130,6 +2130,7 @@ Represents a requirement.
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
 | `id` | ID! | ID of the requirement |
 | `iid` | ID! | Internal ID of the requirement |
+| `lastTestReportManuallyCreated` | Boolean | Indicates if latest test report was created by user |
 | `lastTestReportState` | TestReportState | Latest requirement test report state |
 | `project` | Project! | Project to which the requirement belongs |
 | `state` | RequirementState! | State of the requirement |
