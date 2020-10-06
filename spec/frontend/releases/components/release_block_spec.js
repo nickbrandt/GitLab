@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import { mount } from '@vue/test-utils';
-import { GlIcon } from '@gitlab/ui';
 import { getJSONFixture } from 'helpers/fixtures';
 import EvidenceBlock from '~/releases/components/evidence_block.vue';
 import ReleaseBlock from '~/releases/components/release_block.vue';
@@ -23,7 +22,6 @@ describe('Release block', () => {
       },
       provide: {
         glFeatures: {
-          releaseIssueSummary: true,
           ...featureFlags,
         },
       },
@@ -238,53 +236,6 @@ describe('Release block', () => {
 
       return factory(release).then(() => {
         expect(hasTargetBlueBackground()).toBe(false);
-      });
-    });
-  });
-
-  describe('when the releaseIssueSummary feature flag is disabled', () => {
-    describe('with default props', () => {
-      beforeEach(() => factory(release, { releaseIssueSummary: false }));
-
-      it('renders the milestone icon', () => {
-        expect(
-          milestoneListLabel()
-            .find(GlIcon)
-            .exists(),
-        ).toBe(true);
-      });
-
-      it('renders the label as "Milestones" if more than one milestone is passed in', () => {
-        expect(
-          milestoneListLabel()
-            .find('.js-label-text')
-            .text(),
-        ).toEqual('Milestones');
-      });
-
-      it('renders a link to the milestone with a tooltip', () => {
-        const milestone = release.milestones[0];
-        const milestoneLink = wrapper.find('.js-milestone-link');
-
-        expect(milestoneLink.exists()).toBe(true);
-
-        expect(milestoneLink.text()).toBe(milestone.title);
-
-        expect(milestoneLink.attributes('href')).toBe(milestone.webUrl);
-
-        expect(milestoneLink.attributes('title')).toBe(milestone.description);
-      });
-    });
-
-    it('renders the label as "Milestone" if only a single milestone is passed in', () => {
-      release.milestones = release.milestones.slice(0, 1);
-
-      return factory(release, { releaseIssueSummary: false }).then(() => {
-        expect(
-          milestoneListLabel()
-            .find('.js-label-text')
-            .text(),
-        ).toEqual('Milestone');
       });
     });
   });
