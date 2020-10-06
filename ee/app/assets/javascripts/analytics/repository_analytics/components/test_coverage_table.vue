@@ -66,20 +66,18 @@ export default {
     },
     selectProject({ id }) {
       if (this.allProjectsSelected) {
+        // Clear out all the selected projects
         this.allProjectsSelected = false;
-        this.selectedProjectIds = [id];
-        this.getCoverageData();
-        return;
+        this.selectedProjectIds = [];
       }
 
       const index = this.selectedProjectIds.indexOf(id);
       if (index < 0) {
         this.selectedProjectIds.push(id);
-        this.getCoverageData();
-        return;
+      } else {
+        this.selectedProjectIds.splice(index, 1);
       }
 
-      this.selectedProjectIds.splice(index, 1);
       this.getCoverageData();
     },
   },
@@ -90,15 +88,15 @@ export default {
     },
     {
       key: 'coverage',
-      label: __('Coverage'),
+      label: s__('RepositoriesAnalytics|Coverage'),
     },
     {
       key: 'numberOfCoverages',
-      label: __('Number of Coverages'),
+      label: s__('RepositoriesAnalytics|Number of Coverages'),
     },
     {
       key: 'lastUpdate',
-      label: __('Last Update'),
+      label: s__('RepositoriesAnalytics|Last Update'),
     },
   ],
   text: {
@@ -120,7 +118,12 @@ export default {
       />
     </template>
 
-    <gl-skeleton-loader v-if="isLoading" :width="430" :height="55">
+    <gl-skeleton-loader
+      v-if="isLoading"
+      :width="430"
+      :height="55"
+      data-testid="test-coverage-loading-state"
+    >
       <rect width="90" height="10" x="0" y="0" rx="4" />
       <rect width="80" height="10" x="95" y="0" rx="4" />
       <rect width="145" height="10" x="180" y="0" rx="4" />
@@ -144,7 +147,7 @@ export default {
 
     <gl-table
       v-else-if="hasCoverageData"
-      data-testid="coverage-data-table"
+      data-testid="test-coverage-data-table"
       thead-class="thead-white"
       :fields="$options.tableFields"
       :items="coverageData"
@@ -163,16 +166,19 @@ export default {
       </template>
 
       <template #cell(project)="{ item }">
-        <div>{{ item.name }}</div>
+        <div :data-testid="`${item.id}-name`">{{ item.name }}</div>
       </template>
       <template #cell(coverage)="{ item }">
-        <div>{{ item.codeCoverage.average }}%</div>
+        <div :data-testid="`${item.id}-average`">{{ item.codeCoverage.average }}%</div>
       </template>
       <template #cell(numberOfCoverages)="{ item }">
-        <div>{{ item.codeCoverage.count }}</div>
+        <div :data-testid="`${item.id}-count`">{{ item.codeCoverage.count }}</div>
       </template>
       <template #cell(lastUpdate)="{ item }">
-        <time-ago-tooltip :time="item.codeCoverage.lastUpdatedAt" />
+        <time-ago-tooltip
+          :time="item.codeCoverage.lastUpdatedAt"
+          :data-testid="`${item.id}-date`"
+        />
       </template>
     </gl-table>
 
@@ -181,6 +187,7 @@ export default {
       :svg-path="coverageTableEmptyStateSvgPath"
       :title="$options.text.emptyStateTitle"
       :description="$options.text.emptyStateDescription"
+      data-testid="test-coverage-table-empty-state"
     />
   </gl-card>
 </template>
