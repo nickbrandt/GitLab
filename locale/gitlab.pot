@@ -8178,6 +8178,12 @@ msgstr ""
 msgid "DastProfiles|Validation failed, please make sure that you follow the steps above with the choosen method."
 msgstr ""
 
+msgid "DastProfiles|Validation failed. Please try again."
+msgstr ""
+
+msgid "DastProfiles|Validation is in progress..."
+msgstr ""
+
 msgid "DastProfiles|Validation must be turned off to change the target URL"
 msgstr ""
 
