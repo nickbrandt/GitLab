@@ -21096,24 +21096,6 @@
               "deprecationReason": null
             },
             {
-              "name": "lockedProjectCount",
-              "description": "Number of projects in the root namespace where the repository size exceeds the limit",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "mentionsDisabled",
               "description": "Indicates if a group is disabled from getting mentioned",
               "args": [
@@ -21598,6 +21580,24 @@
                 "ofType": {
                   "kind": "OBJECT",
                   "name": "ProjectConnection",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "repositorySizeExcessProjectCount",
+              "description": "Number of projects in the root namespace where the repository size exceeds the limit",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
                   "ofType": null
                 }
               },
@@ -35247,24 +35247,6 @@
               "deprecationReason": null
             },
             {
-              "name": "lockedProjectCount",
-              "description": "Number of projects in the root namespace where the repository size exceeds the limit",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "name",
               "description": "Name of the namespace",
               "args": [
@@ -35391,6 +35373,24 @@
                 "ofType": {
                   "kind": "OBJECT",
                   "name": "ProjectConnection",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "repositorySizeExcessProjectCount",
+              "description": "Number of projects in the root namespace where the repository size exceeds the limit",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
                   "ofType": null
                 }
               },
