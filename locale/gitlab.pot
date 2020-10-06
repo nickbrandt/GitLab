@@ -30091,9 +30091,6 @@ msgstr ""
 msgid "by"
 msgstr ""
 
-msgid "by %{user}"
-msgstr ""
-
 msgid "cannot be a date in the past"
 msgstr ""
 
@@ -31211,9 +31208,6 @@ msgstr ""
 msgid "relates to"
 msgstr ""
 
-msgid "released %{time}"
-msgstr ""
-
 msgid "remaining"
 msgstr ""
 
@@ -31469,9 +31463,6 @@ msgid "was scheduled to merge after pipeline succeeds by"
 msgstr ""
 
 msgid "wiki page"
-msgstr ""
-
-msgid "will be released %{time}"
 msgstr ""
 
 msgid "with %{additions} additions, %{deletions} deletions."
