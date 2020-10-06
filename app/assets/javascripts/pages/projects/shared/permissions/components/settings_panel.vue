@@ -300,7 +300,7 @@ export default {
         :help-path="visibilityHelpPath"
         :label="s__('ProjectSettings|Project visibility')"
       >
-        <div class="project-feature-controls">
+        <div class="project-feature-controls gl-display-flex gl-align-items-center gl-my-3 gl-mx-0">
           <div class="select-wrapper gl-flex-fill-1">
             <select
               v-model="visibilityLevel"
@@ -521,7 +521,7 @@ export default {
           )
         "
       >
-        <div class="project-feature-controls">
+        <div class="project-feature-controls gl-display-flex gl-align-items-center gl-my-3 gl-mx-0">
           <div class="select-wrapper gl-flex-fill-1">
             <select
               v-model="metricsDashboardAccessLevel"

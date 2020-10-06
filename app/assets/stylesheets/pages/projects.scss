@@ -59,6 +59,8 @@
   }
 }
 
+// INFO Scoped to project_feature_setting and settings_panel components in app/assets/javascripts/pages/projects/shared/permissions/components
+// TODO consider moving to component specific stylesheet instead of page specific?
 .project-repo-select {
   transition: background 2s ease-out;
 
@@ -73,10 +75,8 @@
   }
 }
 
+// INFO Scoped to project_feature_setting and settings_panel components in app/assets/javascripts/pages/projects/shared/permissions/components
 .project-feature-controls {
-  display: flex;
-  align-items: center;
-  margin: $gl-padding-8 0;
   max-width: 432px;
 }
 
