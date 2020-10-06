@@ -1,5 +1,0 @@
----
-title: '13.4 Port of Geo: Permanently enable package_file_registries field'
-merge_request: 43434
-author:
-type: fixed
