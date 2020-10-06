@@ -75,7 +75,6 @@ module Gitlab
       def build_op(ref, proxy)
         op = {
           _index: proxy.index_name,
-          _type: proxy.document_type,
           _id: ref.es_id
         }
 
