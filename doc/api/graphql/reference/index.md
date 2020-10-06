@@ -3304,6 +3304,15 @@ State of a GitLab issue.
 | `locked` |  |
 | `opened` |  |
 
+### IssueStateEvent
+
+Values for issue state events.
+
+| Value | Description |
+| ----- | ----------- |
+| `CLOSE` | Closes the issue |
+| `REOPEN` | Reopens the issue |
+
 ### IssueType
 
 Issue type.
