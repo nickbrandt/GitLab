@@ -15,12 +15,6 @@ export default {
     SelectProjectsDropdown,
     TimeAgoTooltip,
   },
-  inject: {
-    coverageTableEmptyStateSvgPath: {
-      type: String,
-      default: '',
-    },
-  },
   data() {
     return {
       coverageData: [],
@@ -184,7 +178,7 @@ export default {
 
     <gl-empty-state
       v-else
-      :svg-path="coverageTableEmptyStateSvgPath"
+      class="gl-mt-3"
       :title="$options.text.emptyStateTitle"
       :description="$options.text.emptyStateDescription"
       data-testid="test-coverage-table-empty-state"

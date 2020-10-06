@@ -11,9 +11,6 @@ describe('Test coverage table component', () => {
   const createComponent = (mountFn = shallowMount, data = {}) => {
     wrapper = mountFn(TestCoverageTable, {
       localVue,
-      provide: {
-        coverageTableEmptyStateSvgPath: '/empty.svg',
-      },
       data() {
         return {
           coverageData: [],

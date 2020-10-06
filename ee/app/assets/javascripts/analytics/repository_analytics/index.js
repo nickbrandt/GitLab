@@ -25,8 +25,7 @@ const apolloProvider = new VueApollo({
 
 export default () => {
   const el = document.querySelector('#js-group-repository-analytics');
-  const { groupAnalyticsCoverageReportsPath, groupFullPath, coverageTableEmptyStateSvgPath } =
-    el?.dataset || {};
+  const { groupAnalyticsCoverageReportsPath, groupFullPath } = el?.dataset || {};
 
   if (el) {
     // eslint-disable-next-line no-new
@@ -37,7 +36,6 @@ export default () => {
       },
       apolloProvider,
       provide: {
-        coverageTableEmptyStateSvgPath,
         groupAnalyticsCoverageReportsPath,
         groupFullPath,
       },
