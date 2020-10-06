@@ -447,6 +447,12 @@ msgstr ""
 msgid "%{description}- Sentry event: %{errorUrl}- First seen: %{firstSeen}- Last seen: %{lastSeen} %{countLabel}: %{count}%{userCountLabel}: %{userCount}"
 msgstr ""
 
+msgid "%{doc_link_start}Advanced search%{doc_link_end} is disabled since %{ref_elem} is not the default branch; %{default_branch_link_start}search on %{default_branch} instead%{default_branch_link_end}."
+msgstr ""
+
+msgid "%{doc_link_start}Advanced search%{doc_link_end} is enabled."
+msgstr ""
+
 msgid "%{due_date} (Past due)"
 msgstr ""
 
@@ -2195,9 +2201,6 @@ msgstr ""
 msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
 msgstr ""
 
-msgid "Advanced search functionality"
-msgstr ""
-
 msgid "After a successful password update you will be redirected to login screen."
 msgstr ""
 
@@ -2548,9 +2551,6 @@ msgstr ""
 msgid "All threads resolved"
 msgstr ""
 
-msgid "All users"
-msgstr ""
-
 msgid "All users must have a name."
 msgstr ""
 
@@ -2681,6 +2681,9 @@ msgid "An email notification was recently sent from the admin panel. Please wait
 msgstr ""
 
 msgid "An empty GitLab User field will add the FogBugz user's full name (e.g. \"By John Smith\") in the description of all issues and comments. It will also associate and/or assign these issues and comments with the project creator."
+msgstr ""
+
+msgid "An empty index will be created if one does not already exist"
 msgstr ""
 
 msgid "An error has occurred"
@@ -2936,6 +2939,9 @@ msgid "An error occurred while rendering preview broadcast message"
 msgstr ""
 
 msgid "An error occurred while rendering the editor"
+msgstr ""
+
+msgid "An error occurred while rendering the linter"
 msgstr ""
 
 msgid "An error occurred while reordering issues."
@@ -6450,9 +6456,6 @@ msgstr ""
 msgid "ComboSearch is not defined"
 msgstr ""
 
-msgid "Coming soon"
-msgstr ""
-
 msgid "Comma-separated, e.g. '1.1.1.1, 2.2.2.0/24'"
 msgstr ""
 
@@ -7257,6 +7260,9 @@ msgid "Copy source branch name"
 msgstr ""
 
 msgid "Copy the code below to implement tracking in your application:"
+msgstr ""
+
+msgid "Copy this value"
 msgstr ""
 
 msgid "Copy to clipboard"
@@ -8592,9 +8598,6 @@ msgstr ""
 msgid "Deploy to..."
 msgstr ""
 
-msgid "DeployBoard|Matching on the %{appLabel} label has been removed for deploy boards. To see all instances on your board, you must update your chart and redeploy."
-msgstr ""
-
 msgid "DeployFreeze|Freeze end"
 msgstr ""
 
@@ -9177,6 +9180,9 @@ msgid "Documentation"
 msgstr ""
 
 msgid "Documentation for popular identity providers"
+msgstr ""
+
+msgid "Documentation pages URL"
 msgstr ""
 
 msgid "Documents reindexed: %{processed_documents} (%{percentage}%%)"
@@ -10490,6 +10496,9 @@ msgstr ""
 msgid "Except policy:"
 msgstr ""
 
+msgid "Excess storage"
+msgstr ""
+
 msgid "Excluding merge commits. Limited to %{limit} commits."
 msgstr ""
 
@@ -11123,6 +11132,9 @@ msgid "FeatureFlag|Percentage"
 msgstr ""
 
 msgid "FeatureFlag|Select a user list"
+msgstr ""
+
+msgid "FeatureFlag|Select the environment scope for this feature flag."
 msgstr ""
 
 msgid "FeatureFlag|There are no configured user lists"
@@ -14070,6 +14082,48 @@ msgid "InviteMembersModal|You're inviting members to the %{group_name} group"
 msgstr ""
 
 msgid "InviteMembers|Invite team members"
+msgstr ""
+
+msgid "InviteReminderEmail|%{inviter} is still waiting for you to join GitLab"
+msgstr ""
+
+msgid "InviteReminderEmail|%{inviter} is waiting for you to join GitLab"
+msgstr ""
+
+msgid "InviteReminderEmail|%{inviter} is waiting for you to join the %{strong_start}%{project_or_group_name}%{strong_end} %{project_or_group} as a %{role}."
+msgstr ""
+
+msgid "InviteReminderEmail|%{inviter}'s invitation to GitLab is pending"
+msgstr ""
+
+msgid "InviteReminderEmail|Accept invitation"
+msgstr ""
+
+msgid "InviteReminderEmail|Accept invitation: %{invite_url}"
+msgstr ""
+
+msgid "InviteReminderEmail|Decline invitation"
+msgstr ""
+
+msgid "InviteReminderEmail|Decline invitation: %{decline_url}"
+msgstr ""
+
+msgid "InviteReminderEmail|Hey there %{wave_emoji}"
+msgstr ""
+
+msgid "InviteReminderEmail|Hey there!"
+msgstr ""
+
+msgid "InviteReminderEmail|In case you missed it..."
+msgstr ""
+
+msgid "InviteReminderEmail|Invitation pending"
+msgstr ""
+
+msgid "InviteReminderEmail|It's been %{invitation_age} days since %{inviter} invited you to join the %{strong_start}%{project_or_group_name}%{strong_end} %{project_or_group} as a %{role}. What would you like to do?"
+msgstr ""
+
+msgid "InviteReminderEmail|This is a friendly reminder that %{inviter} invited you to join the %{strong_start}%{project_or_group_name}%{strong_end} %{project_or_group} as a %{role}."
 msgstr ""
 
 msgid "Invited"
@@ -17838,9 +17892,6 @@ msgstr ""
 msgid "OnDemandScans|Scanner profile"
 msgstr ""
 
-msgid "OnDemandScans|Scanner settings"
-msgstr ""
-
 msgid "OnDemandScans|Schedule or run scans immediately against target sites. Currently available on-demand scan type: DAST. %{helpLinkStart}More information%{helpLinkEnd}"
 msgstr ""
 
@@ -17848,9 +17899,6 @@ msgid "OnDemandScans|Select one of the existing profiles"
 msgstr ""
 
 msgid "OnDemandScans|Site profile"
-msgstr ""
-
-msgid "OnDemandScans|Site profiles"
 msgstr ""
 
 msgid "OnDemandScans|Use existing scanner profile"
@@ -18254,9 +18302,6 @@ msgstr ""
 msgid "PackageRegistry|If you haven't already done so, you will need to add the below to your %{codeStart}pom.xml%{codeEnd} file."
 msgstr ""
 
-msgid "PackageRegistry|Is your favorite package manager missing? We'd love your help in building first-class support for it into GitLab! %{contributionLinkStart}Visit the contribution documentation%{contributionLinkEnd} to learn more about how to build support for new package managers into GitLab. Below is a list of package managers that are on our radar."
-msgstr ""
-
 msgid "PackageRegistry|Learn how to %{noPackagesLinkStart}publish and share your packages%{noPackagesLinkEnd} with GitLab."
 msgstr ""
 
@@ -18276,9 +18321,6 @@ msgid "PackageRegistry|Maven XML"
 msgstr ""
 
 msgid "PackageRegistry|NPM"
-msgstr ""
-
-msgid "PackageRegistry|No upcoming issues"
 msgstr ""
 
 msgid "PackageRegistry|NuGet"
@@ -18302,7 +18344,7 @@ msgstr ""
 msgid "PackageRegistry|Published to the %{project} Package Registry %{datetime}"
 msgstr ""
 
-msgid "PackageRegistry|PyPi"
+msgid "PackageRegistry|PyPI"
 msgstr ""
 
 msgid "PackageRegistry|Recipe: %{recipe}"
@@ -18326,9 +18368,6 @@ msgstr ""
 msgid "PackageRegistry|There are no packages yet"
 msgstr ""
 
-msgid "PackageRegistry|There are no upcoming issues to display."
-msgstr ""
-
 msgid "PackageRegistry|There was a problem fetching the details for this package."
 msgstr ""
 
@@ -18342,9 +18381,6 @@ msgid "PackageRegistry|Unable to fetch package version information."
 msgstr ""
 
 msgid "PackageRegistry|Unable to load package"
-msgstr ""
-
-msgid "PackageRegistry|Upcoming package managers"
 msgstr ""
 
 msgid "PackageRegistry|You are about to delete %{name}, this operation is irreversible, are you sure?"
@@ -18386,7 +18422,7 @@ msgstr ""
 msgid "PackageType|NuGet"
 msgstr ""
 
-msgid "PackageType|PyPi"
+msgid "PackageType|PyPI"
 msgstr ""
 
 msgid "Packages"
@@ -18578,9 +18614,6 @@ msgstr ""
 msgid "People without permission will never get a notification."
 msgstr ""
 
-msgid "Percent of users"
-msgstr ""
-
 msgid "Percentage"
 msgstr ""
 
@@ -18588,9 +18621,6 @@ msgid "Perform advanced options such as changing path, transferring, exporting, 
 msgstr ""
 
 msgid "Perform common operations on GitLab project"
-msgstr ""
-
-msgid "Performance and resource management"
 msgstr ""
 
 msgid "Performance optimization"
@@ -20015,7 +20045,7 @@ msgstr ""
 msgid "ProjectService|Event will be triggered when a confidential issue is created/updated/closed"
 msgstr ""
 
-msgid "ProjectService|Event will be triggered when a deployment finishes"
+msgid "ProjectService|Event will be triggered when a deployment starts or finishes"
 msgstr ""
 
 msgid "ProjectService|Event will be triggered when a merge request is created/updated/merged"
@@ -23132,9 +23162,6 @@ msgstr ""
 msgid "Select the custom project template source group."
 msgstr ""
 
-msgid "Select the environment scope for this feature flag."
-msgstr ""
-
 msgid "Select timezone"
 msgstr ""
 
@@ -25436,6 +25463,9 @@ msgstr ""
 msgid "The URL defined on the primary node that secondary nodes should use to contact it."
 msgstr ""
 
+msgid "The URL defined on the primary node that secondary nodes should use to contact it. %{linkStart}More information%{linkEnd}"
+msgstr ""
+
 msgid "The URL to use for connecting to Elasticsearch. Use a comma-separated list to support clustering (e.g., \"http://localhost:9200, http://localhost:9201\")."
 msgstr ""
 
@@ -26851,6 +26881,12 @@ msgstr ""
 msgid "Timeago|right now"
 msgstr ""
 
+msgid "Timeline|Turn timeline view off"
+msgstr ""
+
+msgid "Timeline|Turn timeline view on"
+msgstr ""
+
 msgid "Timeout"
 msgstr ""
 
@@ -27321,6 +27357,9 @@ msgid "Trying to communicate with your device. Plug it in (if you haven't alread
 msgstr ""
 
 msgid "Tuesday"
+msgstr ""
+
+msgid "Tuning settings"
 msgstr ""
 
 msgid "Turn Off"
@@ -27963,12 +28002,6 @@ msgid "User %{current_user_username} has started impersonating %{username}"
 msgstr ""
 
 msgid "User %{username} was successfully removed."
-msgstr ""
-
-msgid "User IDs"
-msgstr ""
-
-msgid "User List"
 msgstr ""
 
 msgid "User OAuth applications"
@@ -28851,13 +28884,13 @@ msgstr ""
 msgid "Webhooks|Tag push events"
 msgstr ""
 
+msgid "Webhooks|This URL is triggered when a deployment starts, finishes, fails, or is canceled"
+msgstr ""
+
 msgid "Webhooks|This URL will be triggered by a push to the repository"
 msgstr ""
 
 msgid "Webhooks|This URL will be triggered when a confidential issue is created/updated/merged"
-msgstr ""
-
-msgid "Webhooks|This URL will be triggered when a deployment is finished/failed/canceled"
 msgstr ""
 
 msgid "Webhooks|This URL will be triggered when a merge request is created/updated/merged"
@@ -29187,9 +29220,6 @@ msgid "Work in progress (open and unassigned)"
 msgstr ""
 
 msgid "Work in progress Limit"
-msgstr ""
-
-msgid "Workflow Help"
 msgstr ""
 
 msgid "Would you like to create a new branch?"
@@ -30238,9 +30268,6 @@ msgstr ""
 msgid "ciReport|Investigate this vulnerability by creating an issue"
 msgstr ""
 
-msgid "ciReport|Learn more about interacting with security reports"
-msgstr ""
-
 msgid "ciReport|Load performance test metrics: "
 msgstr ""
 
@@ -30562,9 +30589,6 @@ msgstr ""
 msgid "is blocked by"
 msgstr ""
 
-msgid "is enabled."
-msgstr ""
-
 msgid "is invalid because there is downstream lock"
 msgstr ""
 
@@ -30596,6 +30620,9 @@ msgid "is read only"
 msgstr ""
 
 msgid "is too long (%{current_value}). The maximum size is %{max_size}."
+msgstr ""
+
+msgid "is too long (maximum is %{count} characters)"
 msgstr ""
 
 msgid "is too long (maximum is 100 entries)"

@@ -58,7 +58,7 @@ export default {
         const epic = await this.setActiveIssueEpic(input);
 
         if (epic && !this.getEpicById(epic.id)) {
-          this.receiveEpicsSuccess([epic, ...this.epics]);
+          this.receiveEpicsSuccess({ epics: [epic, ...this.epics] });
         }
 
         debounceByAnimationFrame(() => {

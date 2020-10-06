@@ -8830,6 +8830,31 @@ CREATE SEQUENCE alert_management_alerts_id_seq
 
 ALTER SEQUENCE alert_management_alerts_id_seq OWNED BY alert_management_alerts.id;
 
+CREATE TABLE alert_management_http_integrations (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    project_id bigint NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    encrypted_token text NOT NULL,
+    encrypted_token_iv text NOT NULL,
+    endpoint_identifier text NOT NULL,
+    name text NOT NULL,
+    CONSTRAINT check_286943b636 CHECK ((char_length(encrypted_token_iv) <= 255)),
+    CONSTRAINT check_392143ccf4 CHECK ((char_length(name) <= 255)),
+    CONSTRAINT check_e270820180 CHECK ((char_length(endpoint_identifier) <= 255)),
+    CONSTRAINT check_f68577c4af CHECK ((char_length(encrypted_token) <= 255))
+);
+
+CREATE SEQUENCE alert_management_http_integrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE alert_management_http_integrations_id_seq OWNED BY alert_management_http_integrations.id;
+
 CREATE TABLE alerts_service_data (
     id bigint NOT NULL,
     service_id integer NOT NULL,
@@ -9271,8 +9296,10 @@ CREATE TABLE application_settings (
     gitpod_url text DEFAULT 'https://gitpod.io/'::text,
     abuse_notification_email character varying,
     require_admin_approval_after_user_signup boolean DEFAULT false NOT NULL,
+    help_page_documentation_base_url text,
     CONSTRAINT check_2dba05b802 CHECK ((char_length(gitpod_url) <= 255)),
     CONSTRAINT check_51700b31b5 CHECK ((char_length(default_branch_name) <= 255)),
+    CONSTRAINT check_57123c9593 CHECK ((char_length(help_page_documentation_base_url) <= 255)),
     CONSTRAINT check_9c6c447a13 CHECK ((char_length(maintenance_mode_message) <= 255)),
     CONSTRAINT check_d03919528d CHECK ((char_length(container_registry_vendor) <= 255)),
     CONSTRAINT check_d820146492 CHECK ((char_length(spam_check_endpoint_url) <= 255)),
@@ -9313,6 +9340,7 @@ CREATE TABLE approval_merge_request_rules (
     rule_type smallint DEFAULT 1 NOT NULL,
     report_type smallint,
     section text,
+    modified_from_project_rule boolean DEFAULT false NOT NULL,
     CONSTRAINT check_6fca5928b2 CHECK ((char_length(section) <= 255))
 );
 
@@ -11061,6 +11089,26 @@ CREATE SEQUENCE commit_user_mentions_id_seq
 
 ALTER SEQUENCE commit_user_mentions_id_seq OWNED BY commit_user_mentions.id;
 
+CREATE TABLE compliance_management_frameworks (
+    id bigint NOT NULL,
+    group_id bigint NOT NULL,
+    name text NOT NULL,
+    description text NOT NULL,
+    color text NOT NULL,
+    CONSTRAINT check_08cd34b2c2 CHECK ((char_length(color) <= 10)),
+    CONSTRAINT check_1617e0b87e CHECK ((char_length(description) <= 255)),
+    CONSTRAINT check_ab00bc2193 CHECK ((char_length(name) <= 255))
+);
+
+CREATE SEQUENCE compliance_management_frameworks_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE compliance_management_frameworks_id_seq OWNED BY compliance_management_frameworks.id;
+
 CREATE TABLE container_expiration_policies (
     project_id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -11168,6 +11216,9 @@ CREATE TABLE dast_scanner_profiles (
     spider_timeout smallint,
     target_timeout smallint,
     name text NOT NULL,
+    scan_type smallint DEFAULT 1 NOT NULL,
+    use_ajax_spider boolean DEFAULT false NOT NULL,
+    show_debug_messages boolean DEFAULT false NOT NULL,
     CONSTRAINT check_568568fabf CHECK ((char_length(name) <= 255))
 );
 
@@ -11412,7 +11463,8 @@ CREATE TABLE design_management_designs (
     project_id integer NOT NULL,
     issue_id integer,
     filename character varying NOT NULL,
-    relative_position integer
+    relative_position integer,
+    CONSTRAINT check_07155e2715 CHECK ((char_length((filename)::text) <= 255))
 );
 
 CREATE SEQUENCE design_management_designs_id_seq
@@ -13582,7 +13634,9 @@ CREATE TABLE namespace_settings (
     updated_at timestamp with time zone NOT NULL,
     namespace_id integer NOT NULL,
     prevent_forking_outside_group boolean DEFAULT false NOT NULL,
-    allow_mfa_for_subgroups boolean DEFAULT true NOT NULL
+    allow_mfa_for_subgroups boolean DEFAULT true NOT NULL,
+    default_branch_name text,
+    CONSTRAINT check_0ba93c78c7 CHECK ((char_length(default_branch_name) <= 255))
 );
 
 CREATE TABLE namespace_statistics (
@@ -17129,6 +17183,8 @@ ALTER TABLE ONLY alert_management_alert_user_mentions ALTER COLUMN id SET DEFAUL
 
 ALTER TABLE ONLY alert_management_alerts ALTER COLUMN id SET DEFAULT nextval('alert_management_alerts_id_seq'::regclass);
 
+ALTER TABLE ONLY alert_management_http_integrations ALTER COLUMN id SET DEFAULT nextval('alert_management_http_integrations_id_seq'::regclass);
+
 ALTER TABLE ONLY alerts_service_data ALTER COLUMN id SET DEFAULT nextval('alerts_service_data_id_seq'::regclass);
 
 ALTER TABLE ONLY allowed_email_domains ALTER COLUMN id SET DEFAULT nextval('allowed_email_domains_id_seq'::regclass);
@@ -17314,6 +17370,8 @@ ALTER TABLE ONLY clusters_applications_runners ALTER COLUMN id SET DEFAULT nextv
 ALTER TABLE ONLY clusters_kubernetes_namespaces ALTER COLUMN id SET DEFAULT nextval('clusters_kubernetes_namespaces_id_seq'::regclass);
 
 ALTER TABLE ONLY commit_user_mentions ALTER COLUMN id SET DEFAULT nextval('commit_user_mentions_id_seq'::regclass);
+
+ALTER TABLE ONLY compliance_management_frameworks ALTER COLUMN id SET DEFAULT nextval('compliance_management_frameworks_id_seq'::regclass);
 
 ALTER TABLE ONLY container_repositories ALTER COLUMN id SET DEFAULT nextval('container_repositories_id_seq'::regclass);
 
@@ -18048,6 +18106,9 @@ ALTER TABLE ONLY alert_management_alert_user_mentions
 ALTER TABLE ONLY alert_management_alerts
     ADD CONSTRAINT alert_management_alerts_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY alert_management_http_integrations
+    ADD CONSTRAINT alert_management_http_integrations_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY alerts_service_data
     ADD CONSTRAINT alerts_service_data_pkey PRIMARY KEY (id);
 
@@ -18167,9 +18228,6 @@ ALTER TABLE ONLY chat_names
 
 ALTER TABLE ONLY chat_teams
     ADD CONSTRAINT chat_teams_pkey PRIMARY KEY (id);
-
-ALTER TABLE design_management_designs
-    ADD CONSTRAINT check_07155e2715 CHECK ((char_length((filename)::text) <= 255)) NOT VALID;
 
 ALTER TABLE vulnerability_scanners
     ADD CONSTRAINT check_37608c9db5 CHECK ((char_length(vendor) <= 255)) NOT VALID;
@@ -18347,6 +18405,9 @@ ALTER TABLE ONLY clusters
 
 ALTER TABLE ONLY commit_user_mentions
     ADD CONSTRAINT commit_user_mentions_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY compliance_management_frameworks
+    ADD CONSTRAINT compliance_management_frameworks_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY container_expiration_policies
     ADD CONSTRAINT container_expiration_policies_pkey PRIMARY KEY (project_id);
@@ -19416,6 +19477,10 @@ CREATE UNIQUE INDEX idx_jira_connect_subscriptions_on_installation_id_namespace_
 
 CREATE INDEX idx_members_created_at_user_id_invite_token ON members USING btree (created_at) WHERE ((invite_token IS NOT NULL) AND (user_id IS NULL));
 
+CREATE INDEX idx_merge_requests_on_id_and_merge_jid ON merge_requests USING btree (id, merge_jid) WHERE ((merge_jid IS NOT NULL) AND (state_id = 4));
+
+CREATE INDEX idx_merge_requests_on_merged_state ON merge_requests USING btree (id) WHERE (state_id = 3);
+
 CREATE INDEX idx_merge_requests_on_source_project_and_branch_state_opened ON merge_requests USING btree (source_project_id, source_branch) WHERE (state_id = 1);
 
 CREATE INDEX idx_merge_requests_on_state_id_and_merge_status ON merge_requests USING btree (state_id, merge_status) WHERE ((state_id = 1) AND ((merge_status)::text = 'can_be_merged'::text));
@@ -19479,6 +19544,8 @@ CREATE INDEX index_alert_management_alerts_on_issue_id ON alert_management_alert
 CREATE UNIQUE INDEX index_alert_management_alerts_on_project_id_and_iid ON alert_management_alerts USING btree (project_id, iid);
 
 CREATE INDEX index_alert_management_alerts_on_prometheus_alert_id ON alert_management_alerts USING btree (prometheus_alert_id) WHERE (prometheus_alert_id IS NOT NULL);
+
+CREATE INDEX index_alert_management_http_integrations_on_project_id ON alert_management_http_integrations USING btree (project_id);
 
 CREATE UNIQUE INDEX index_alert_user_mentions_on_alert_id ON alert_management_alert_user_mentions USING btree (alert_management_alert_id) WHERE (note_id IS NULL);
 
@@ -19956,6 +20023,8 @@ CREATE INDEX index_clusters_on_user_id ON clusters USING btree (user_id);
 
 CREATE UNIQUE INDEX index_commit_user_mentions_on_note_id ON commit_user_mentions USING btree (note_id);
 
+CREATE UNIQUE INDEX index_compliance_management_frameworks_on_group_id_and_name ON compliance_management_frameworks USING btree (group_id, name);
+
 CREATE INDEX index_container_expiration_policies_on_next_run_at_and_enabled ON container_expiration_policies USING btree (next_run_at, enabled);
 
 CREATE INDEX index_container_repositories_on_project_id ON container_repositories USING btree (project_id);
@@ -20329,6 +20398,8 @@ CREATE UNIQUE INDEX index_group_stages_on_group_id_group_value_stream_id_and_nam
 CREATE UNIQUE INDEX index_group_wiki_repositories_on_disk_path ON group_wiki_repositories USING btree (disk_path);
 
 CREATE INDEX index_group_wiki_repositories_on_shard_id ON group_wiki_repositories USING btree (shard_id);
+
+CREATE UNIQUE INDEX index_http_integrations_on_active_and_project_and_endpoint ON alert_management_http_integrations USING btree (active, project_id, endpoint_identifier) WHERE active;
 
 CREATE INDEX index_identities_on_saml_provider_id ON identities USING btree (saml_provider_id) WHERE (saml_provider_id IS NOT NULL);
 
@@ -21683,6 +21754,12 @@ CREATE INDEX terraform_state_versions_verification_checksum_partial ON terraform
 CREATE INDEX terraform_state_versions_verification_failure_partial ON terraform_state_versions USING btree (verification_failure) WHERE (verification_failure IS NOT NULL);
 
 CREATE INDEX tmp_build_stage_position_index ON ci_builds USING btree (stage_id, stage_idx) WHERE (stage_idx IS NOT NULL);
+
+CREATE INDEX tmp_idx_blocked_by_type_links ON issue_links USING btree (target_id) WHERE (link_type = 2);
+
+CREATE INDEX tmp_idx_blocking_type_links ON issue_links USING btree (source_id) WHERE (link_type = 1);
+
+CREATE INDEX tmp_idx_index_issues_with_outdate_blocking_count ON issues USING btree (id) WHERE ((state_id = 1) AND (blocking_issues_count = 0));
 
 CREATE INDEX tmp_index_for_email_unconfirmation_migration ON emails USING btree (id) WHERE (confirmed_at IS NOT NULL);
 
@@ -23521,6 +23598,9 @@ ALTER TABLE ONLY elasticsearch_indexed_namespaces
 ALTER TABLE ONLY vulnerability_occurrence_identifiers
     ADD CONSTRAINT fk_rails_be2e49e1d0 FOREIGN KEY (identifier_id) REFERENCES vulnerability_identifiers(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY alert_management_http_integrations
+    ADD CONSTRAINT fk_rails_bec49f52cc FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY vulnerability_occurrences
     ADD CONSTRAINT fk_rails_bf5b788ca7 FOREIGN KEY (scanner_id) REFERENCES vulnerability_scanners(id) ON DELETE CASCADE;
 
@@ -23631,6 +23711,9 @@ ALTER TABLE ONLY requirements_management_test_reports
 
 ALTER TABLE ONLY pool_repositories
     ADD CONSTRAINT fk_rails_d2711daad4 FOREIGN KEY (source_project_id) REFERENCES projects(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY compliance_management_frameworks
+    ADD CONSTRAINT fk_rails_d3240d6339 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY group_group_links
     ADD CONSTRAINT fk_rails_d3a0488427 FOREIGN KEY (shared_group_id) REFERENCES namespaces(id) ON DELETE CASCADE;

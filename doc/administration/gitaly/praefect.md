@@ -873,10 +873,10 @@ Particular attention should be shown to:
    gitlab-ctl reconfigure
    ```
 
-1. Verify each `gitlab-shell` on each Gitaly node can reach GitLab. On each Gitaly node run:
+1. Verify on each Gitaly node the Git Hooks can reach GitLab. On each Gitaly node run:
 
    ```shell
-   /opt/gitlab/embedded/service/gitlab-shell/bin/check -config /opt/gitlab/embedded/service/gitlab-shell/config.yml
+   /opt/gitlab/embedded/bin/gitaly-hooks check /var/opt/gitlab/gitaly/config.toml
    ```
 
 1. Verify that GitLab can reach Praefect:
@@ -943,16 +943,17 @@ cluster.
 ## Distributed reads
 
 > - Introduced in GitLab 13.1 in [beta](https://about.gitlab.com/handbook/product/gitlab-the-product/#alpha-beta-ga) with feature flag `gitaly_distributed_reads` set to disabled.
-> - [Made generally available](https://gitlab.com/gitlab-org/gitaly/-/issues/2951) in GitLab 13.3.
+> - [Made generally available and enabled by default](https://gitlab.com/gitlab-org/gitaly/-/issues/2951) in GitLab 13.3.
+> - [Disabled by default](https://gitlab.com/gitlab-org/gitaly/-/issues/3178) in GitLab 13.5.
 
 Praefect supports distribution of read operations across Gitaly nodes that are
 configured for the virtual node.
 
-The feature is enabled by default. To disable distributed reads, the `gitaly_distributed_reads`
-[feature flag](../feature_flags.md) must be disabled in a Ruby console:
+The feature is disabled by default. To enable distributed reads, the `gitaly_distributed_reads`
+[feature flag](../feature_flags.md) must be enabled in a Ruby console:
 
 ```ruby
-Feature.disable(:gitaly_distributed_reads)
+Feature.enable(:gitaly_distributed_reads)
 ```
 
 If enabled, all RPCs marked with `ACCESSOR` option like

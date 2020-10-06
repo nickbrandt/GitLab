@@ -225,6 +225,17 @@ RSpec.describe Gitlab::UsageData do
     end
   end
 
+  describe 'merge requests merged using approval rules' do
+    before do
+      create(:approval_merge_request_rule, merge_request: create(:merge_request, :merged))
+      create(:approval_merge_request_rule, merge_request: create(:merge_request))
+    end
+
+    it 'counts the approval rules for merged merge requests' do
+      expect(described_class.system_usage_data[:counts][:merged_merge_requests_using_approval_rules]).to eq(1)
+    end
+  end
+
   describe '.operations_dashboard_usage' do
     subject { described_class.operations_dashboard_usage }
 
@@ -281,9 +292,13 @@ RSpec.describe Gitlab::UsageData do
         project = create(:project, :repository_private, :github_imported,
                           :test_repo, creator: user)
         merge_request = create(:merge_request, source_project: project)
+        overridden_merge_request = create(:merge_request, source_project: project, target_branch: "override")
         project_rule = create(:approval_project_rule, project: project)
+        overridden_project_rule = create(:approval_project_rule, project: project, approvals_required: 1)
         merge_rule = create(:approval_merge_request_rule, merge_request: merge_request)
+        overridden_mr_rule = create(:approval_merge_request_rule, merge_request: overridden_merge_request, approvals_required: 5)
         create(:approval_merge_request_rule_source, approval_merge_request_rule: merge_rule, approval_project_rule: project_rule)
+        create(:approval_merge_request_rule_source, approval_merge_request_rule: overridden_mr_rule, approval_project_rule: overridden_project_rule)
         create(:project, creator: user)
         create(:project, creator: user, disable_overriding_approvers_per_merge_request: true)
         create(:project, creator: user, disable_overriding_approvers_per_merge_request: false)
@@ -315,7 +330,7 @@ RSpec.describe Gitlab::UsageData do
       end
 
       expect(described_class.usage_activity_by_stage_create({})).to include(
-        approval_project_rules: 8,
+        approval_project_rules: 10,
         approval_project_rules_with_target_branch: 2,
         approval_project_rules_with_more_approvers_than_required: 2,
         approval_project_rules_with_less_approvers_than_required: 2,
@@ -325,6 +340,7 @@ RSpec.describe Gitlab::UsageData do
         merge_requests_with_added_rules: 12,
         merge_requests_with_optional_codeowners: 4,
         merge_requests_with_required_codeowners: 8,
+        merge_requests_with_overridden_project_rules: 4,
         projects_imported_from_github: 2,
         projects_with_repositories_enabled: 26,
         protected_branches: 2,
@@ -335,7 +351,7 @@ RSpec.describe Gitlab::UsageData do
         total_number_of_locked_files: 14
       )
       expect(described_class.usage_activity_by_stage_create(described_class.last_28_days_time_period)).to include(
-        approval_project_rules: 8,
+        approval_project_rules: 10,
         approval_project_rules_with_target_branch: 2,
         approval_project_rules_with_more_approvers_than_required: 2,
         approval_project_rules_with_less_approvers_than_required: 2,
@@ -686,5 +702,23 @@ RSpec.describe Gitlab::UsageData do
         projects_reporting_ci_cd_back_to_github: 1
       )
     end
+  end
+
+  it 'clears memoized values' do
+    values = %i(issue_minimum_id issue_maximum_id
+                project_minimum_id project_maximum_id
+                user_minimum_id user_maximum_id unique_visit_service
+                deployment_minimum_id deployment_maximum_id
+                auth_providers
+                approval_merge_request_rule_minimum_id
+                approval_merge_request_rule_maximum_id
+                merge_request_minimum_id
+                merge_request_maximum_id)
+
+    values.each do |key|
+      expect(described_class).to receive(:clear_memoization).with(key)
+    end
+
+    described_class.uncached_data
   end
 end

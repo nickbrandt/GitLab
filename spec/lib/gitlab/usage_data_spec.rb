@@ -28,9 +28,16 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
                     project_minimum_id project_maximum_id
                     user_minimum_id user_maximum_id unique_visit_service
                     deployment_minimum_id deployment_maximum_id
-                    approval_merge_request_rule_minimum_id
-                    approval_merge_request_rule_maximum_id
                     auth_providers)
+
+        if Gitlab.ee?
+          values << %i(approval_merge_request_rule_minimum_id
+                       approval_merge_request_rule_maximum_id
+                       merge_request_minimum_id
+                       merge_request_maximum_id)
+          values.flatten!
+        end
+
         values.each do |key|
           expect(described_class).to receive(:clear_memoization).with(key)
         end
@@ -1182,9 +1189,9 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     subject { described_class.redis_hll_counters }
 
     let(:categories) { ::Gitlab::UsageDataCounters::HLLRedisCounter.categories }
-    let(:ineligible_total_categories) { ['source_code'] }
+    let(:ineligible_total_categories) { %w[source_code testing] }
 
-    it 'has all know_events' do
+    it 'has all known_events' do
       expect(subject).to have_key(:redis_hll_counters)
 
       expect(subject[:redis_hll_counters].keys).to match_array(categories)
