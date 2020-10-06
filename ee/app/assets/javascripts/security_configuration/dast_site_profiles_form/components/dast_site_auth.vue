@@ -1,5 +1,5 @@
 <script>
-import { GlFormGroup, GlFormInput, GlToggle } from '@gitlab/ui';
+import { GlFormGroup, GlFormTextarea, GlFormInput, GlToggle } from '@gitlab/ui';
 
 const isURLTypeMismatch = el => el.type === 'url' && el.validity.typeMismatch;
 
@@ -23,18 +23,25 @@ const initField = value => ({
 export default {
   components: {
     GlFormGroup,
+    GlFormTextarea,
     GlFormInput,
     GlToggle,
   },
   data() {
     const form = {
       authenticationUrl: initField(),
-      authenticationPassword: initField(),
+      userName: initField(),
+      password: initField(),
+      userNameFormField: initField(),
+      passwordFormField: initField(),
+      excludedURLs: initField(),
+      additionalRequestHeaders: initField(),
     };
 
     return {
       form,
-      isAuthEnabled: false,
+      // @TODO: change to be "false"
+      isAuthEnabled: true,
     };
   },
   computed: {
@@ -68,30 +75,88 @@ export default {
       <gl-toggle v-model="isAuthEnabled" />
     </gl-form-group>
     <div v-if="isAuthEnabled">
-      <gl-form-group
-        :label="s__('DastProfiles|Authentication URL')"
-        :invalid-feedback="form.authenticationUrl.feedback"
-      >
-        <gl-form-input
-          v-model="form.authenticationUrl.value"
-          type="url"
-          required
-          :state="form.authenticationUrl.state"
-          @blur="validate('authenticationUrl', $event)"
-        />
-      </gl-form-group>
-      <gl-form-group
-        :label="s__('DastProfiles|Authentication Password')"
-        :invalid-feedback="form.authenticationPassword.feedback"
-      >
-        <gl-form-input
-          v-model="form.authenticationPassword.value"
-          type="password"
-          required
-          :state="form.authenticationPassword.state"
-          @blur="validate('authenticationPassword', $event)"
-        />
-      </gl-form-group>
+      <div class="row">
+        <gl-form-group
+          :label="s__('DastProfiles|Authentication URL')"
+          :invalid-feedback="form.authenticationUrl.feedback"
+          class="col-md-6"
+        >
+          <gl-form-input
+            v-model="form.authenticationUrl.value"
+            type="url"
+            required
+            :state="form.authenticationUrl.state"
+            @blur="validate('authenticationUrl', $event)"
+          />
+        </gl-form-group>
+      </div>
+      <div class="row">
+        <gl-form-group
+          :label="s__('DastProfiles|User Name')"
+          :invalid-feedback="form.userName.feedback"
+          class="col-md-6"
+        >
+          <gl-form-input
+            v-model="form.userName.value"
+            type="text"
+            required
+            :state="form.userName.state"
+            @blur="validate('userName', $event)"
+          />
+        </gl-form-group>
+        <gl-form-group
+          :label="s__('DastProfiles|Password')"
+          :invalid-feedback="form.password.feedback"
+          class="col-md-6"
+        >
+          <gl-form-input
+            v-model="form.password.value"
+            type="password"
+            required
+            :state="form.password.state"
+            @blur="validate('password', $event)"
+          />
+        </gl-form-group>
+      </div>
+      <div class="row">
+        <gl-form-group
+          :label="s__('DastProfiles|Username form field')"
+          :invalid-feedback="form.userNameFormField.feedback"
+          class="col-md-6"
+        >
+          <gl-form-input
+            v-model="form.userNameFormField.value"
+            type="text"
+            required
+            :state="form.userNameFormField.state"
+            @blur="validate('userNameFormField', $event)"
+          />
+        </gl-form-group>
+        <gl-form-group
+          :label="s__('DastProfiles|Password form field')"
+          :invalid-feedback="form.passwordFormField.feedback"
+          class="col-md-6"
+        >
+          <gl-form-input
+            v-model="form.passwordFormField.value"
+            type="password"
+            required
+            :state="form.passwordFormField.state"
+            @blur="validate('passwordFormField', $event)"
+          />
+        </gl-form-group>
+      </div>
+      <div class="row">
+        <gl-form-group :label="s__('DastProfiles|Excluded URLs (Optional)')" class="col-md-6">
+          <gl-form-textarea v-model="form.excludedURLs.value" />
+        </gl-form-group>
+        <gl-form-group
+          :label="s__('DastProfiles|Additional request headers (Optional)')"
+          class="col-md-6"
+        >
+          <gl-form-textarea v-model="form.additionalRequestHeaders.value" />
+        </gl-form-group>
+      </div>
     </div>
   </section>
 </template>
