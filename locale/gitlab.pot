@@ -30268,9 +30268,6 @@ msgstr ""
 msgid "ciReport|Investigate this vulnerability by creating an issue"
 msgstr ""
 
-msgid "ciReport|Learn more about interacting with security reports"
-msgstr ""
-
 msgid "ciReport|Load performance test metrics: "
 msgstr ""
 
