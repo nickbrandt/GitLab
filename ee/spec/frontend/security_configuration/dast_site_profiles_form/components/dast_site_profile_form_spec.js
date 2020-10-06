@@ -12,17 +12,15 @@ import dastSiteValidationQuery from 'ee/security_configuration/dast_site_profile
 import dastSiteProfileCreateMutation from 'ee/security_configuration/dast_site_profiles_form/graphql/dast_site_profile_create.mutation.graphql';
 import dastSiteProfileUpdateMutation from 'ee/security_configuration/dast_site_profiles_form/graphql/dast_site_profile_update.mutation.graphql';
 import dastSiteTokenCreateMutation from 'ee/security_configuration/dast_site_profiles_form/graphql/dast_site_token_create.mutation.graphql';
+import { siteProfiles } from 'ee_jest/on_demand_scans/mock_data';
 import * as responses from 'ee_jest/security_configuration/dast_site_profiles_form/mock_data/apollo_mock';
-import { redirectTo } from '~/lib/utils/url_utility';
-
-jest.mock('~/lib/utils/url_utility', () => ({
-  isAbsolute: jest.requireActual('~/lib/utils/url_utility').isAbsolute,
-  redirectTo: jest.fn(),
-}));
+import { DAST_SITE_VALIDATION_STATUS } from 'ee/security_configuration/dast_site_profiles_form/constants';
+import * as urlUtility from '~/lib/utils/url_utility';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);
 
+const [siteProfileOne] = siteProfiles;
 const fullPath = 'group/project';
 const profilesLibraryPath = `${TEST_HOST}/${fullPath}/-/security/configuration/dast_profiles`;
 const profileName = 'My DAST site profile';
@@ -52,18 +50,16 @@ describe('DastSiteProfileForm', () => {
   const withinComponent = () => within(wrapper.element);
 
   const findForm = () => wrapper.find(GlForm);
-  const findProfileNameInput = () => wrapper.find('[data-testid="profile-name-input"]');
-  const findTargetUrlInputGroup = () => wrapper.find('[data-testid="target-url-input-group"]');
-  const findTargetUrlInput = () => wrapper.find('[data-testid="target-url-input"]');
-  const findSubmitButton = () =>
-    wrapper.find('[data-testid="dast-site-profile-form-submit-button"]');
-  const findCancelButton = () =>
-    wrapper.find('[data-testid="dast-site-profile-form-cancel-button"]');
+  const findByTestId = testId => wrapper.find(`[data-testid="${testId}"]`);
+  const findProfileNameInput = () => findByTestId('profile-name-input');
+  const findTargetUrlInputGroup = () => findByTestId('target-url-input-group');
+  const findTargetUrlInput = () => findByTestId('target-url-input');
+  const findSubmitButton = () => findByTestId('dast-site-profile-form-submit-button');
+  const findCancelButton = () => findByTestId('dast-site-profile-form-cancel-button');
   const findCancelModal = () => wrapper.find(GlModal);
   const submitForm = () => findForm().vm.$emit('submit', { preventDefault: () => {} });
-  const findAlert = () => wrapper.find('[data-testid="dast-site-profile-form-alert"]');
-  const findSiteValidationToggle = () =>
-    wrapper.find('[data-testid="dast-site-validation-toggle"]');
+  const findAlert = () => findByTestId('dast-site-profile-form-alert');
+  const findSiteValidationToggle = () => findByTestId('dast-site-validation-toggle');
   const findDastSiteValidation = () => wrapper.find(DastSiteValidation);
 
   const mockClientFactory = handlers => {
@@ -95,9 +91,9 @@ describe('DastSiteProfileForm', () => {
     apolloProvider.defaultClient = mockClientFactory(handlers);
   };
 
-  const componentFactory = (mountFn = shallowMount) => options => {
+  const componentFactory = (mountFn = shallowMount) => (options, handlers) => {
     apolloProvider = new VueApollo({
-      defaultClient: mockClientFactory(),
+      defaultClient: mockClientFactory(handlers),
     });
 
     const mountOpts = merge(
@@ -187,7 +183,7 @@ describe('DastSiteProfileForm', () => {
     describe.each`
       title                  | siteProfile
       ${'New site profile'}  | ${null}
-      ${'Edit site profile'} | ${{ id: 1, name: 'foo', targetUrl: 'bar' }}
+      ${'Edit site profile'} | ${siteProfileOne}
     `('$title with feature flag disabled', ({ siteProfile }) => {
       beforeEach(() => {
         createComponent({
@@ -312,9 +308,9 @@ describe('DastSiteProfileForm', () => {
   });
 
   describe.each`
-    title                  | siteProfile                                 | mutationVars | mutationKind
-    ${'New site profile'}  | ${null}                                     | ${{}}        | ${'dastSiteProfileCreate'}
-    ${'Edit site profile'} | ${{ id: 1, name: 'foo', targetUrl: 'bar' }} | ${{ id: 1 }} | ${'dastSiteProfileUpdate'}
+    title                  | siteProfile       | mutationVars                 | mutationKind
+    ${'New site profile'}  | ${null}           | ${{}}                        | ${'dastSiteProfileCreate'}
+    ${'Edit site profile'} | ${siteProfileOne} | ${{ id: siteProfileOne.id }} | ${'dastSiteProfileUpdate'}
   `('$title', ({ siteProfile, title, mutationVars, mutationKind }) => {
     beforeEach(() => {
       createFullComponent({
@@ -322,6 +318,8 @@ describe('DastSiteProfileForm', () => {
           siteProfile,
         },
       });
+
+      jest.spyOn(urlUtility, 'redirectTo').mockImplementation();
     });
 
     it('sets the correct title', () => {
@@ -354,7 +352,7 @@ describe('DastSiteProfileForm', () => {
         });
 
         it('redirects to the profiles library', () => {
-          expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
+          expect(urlUtility.redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
         });
 
         it('does not show an alert', () => {
@@ -418,7 +416,7 @@ describe('DastSiteProfileForm', () => {
       describe('form unchanged', () => {
         it('redirects to the profiles library', () => {
           findCancelButton().vm.$emit('click');
-          expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
+          expect(urlUtility.redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
         });
       });
 
@@ -436,9 +434,89 @@ describe('DastSiteProfileForm', () => {
 
         it('redirects to the profiles library if confirmed', () => {
           findCancelModal().vm.$emit('ok');
-          expect(redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
+          expect(urlUtility.redirectTo).toHaveBeenCalledWith(profilesLibraryPath);
         });
       });
     });
   });
+
+  describe.each`
+    givenValidationStatus                     | expectedDescription                                                                          | shouldShowDefaultDescriptionAfterToggle | shouldHaveSiteValidationActivated | shouldHaveSiteValidationDisabled | shouldPoll
+    ${DAST_SITE_VALIDATION_STATUS.PENDING}    | ${'Site must be validated to run an active scan.'}                                           | ${false}                                | ${false}                          | ${false}                         | ${false}
+    ${DAST_SITE_VALIDATION_STATUS.INPROGRESS} | ${'Validation is in progress...'}                                                            | ${false}                                | ${true}                           | ${true}                          | ${true}
+    ${DAST_SITE_VALIDATION_STATUS.PASSED}     | ${'Validation succeeded. Both active and passive scans can be run against the target site.'} | ${false}                                | ${true}                           | ${false}                         | ${false}
+    ${DAST_SITE_VALIDATION_STATUS.FAILED}     | ${'Validation failed. Please try again.'}                                                    | ${true}                                 | ${false}                          | ${false}                         | ${false}
+  `(
+    'when editing an existing profile and the validation status is "$givenValidationStatus"',
+    ({
+      givenValidationStatus,
+      expectedDescription,
+      shouldHaveSiteValidationActivated,
+      shouldShowDefaultDescriptionAfterToggle,
+      shouldHaveSiteValidationDisabled,
+      shouldPoll,
+    }) => {
+      let dastSiteValidationHandler;
+
+      beforeEach(() => {
+        dastSiteValidationHandler = jest
+          .fn()
+          .mockResolvedValue(responses.dastSiteValidation(givenValidationStatus));
+
+        createFullComponent(
+          {
+            provide: {
+              glFeatures: { securityOnDemandScansSiteValidation: true },
+            },
+            propsData: {
+              siteProfile: siteProfileOne,
+            },
+          },
+          {
+            dastSiteValidation: dastSiteValidationHandler,
+          },
+        );
+
+        return wrapper.vm.$nextTick();
+      });
+
+      it('shows the correct status text', () => {
+        expect(findByTestId('siteValidationStatusDescription').text()).toBe(expectedDescription);
+      });
+
+      it(`shows the correct status text after the validation toggle has been changed`, async () => {
+        const defaultDescription = 'Site must be validated to run an active scan.';
+
+        findSiteValidationToggle().vm.$emit('change', true);
+
+        await wrapper.vm.$nextTick();
+
+        expect(findByTestId('siteValidationStatusDescription').text()).toBe(
+          shouldShowDefaultDescriptionAfterToggle ? defaultDescription : expectedDescription,
+        );
+      });
+
+      it('sets the validation toggle to the correct state', () => {
+        expect(findSiteValidationToggle().props()).toMatchObject({
+          value: shouldHaveSiteValidationActivated,
+          disabled: shouldHaveSiteValidationDisabled,
+        });
+      });
+
+      it(`should ${shouldPoll ? '' : 'not '}poll the validation status`, async () => {
+        jest.useFakeTimers();
+
+        expect(dastSiteValidationHandler).toHaveBeenCalledTimes(1);
+
+        jest.runOnlyPendingTimers();
+        await waitForPromises();
+
+        if (shouldPoll) {
+          expect(dastSiteValidationHandler).toHaveBeenCalledTimes(2);
+        } else {
+          expect(dastSiteValidationHandler).toHaveBeenCalledTimes(1);
+        }
+      });
+    },
+  );
 });
