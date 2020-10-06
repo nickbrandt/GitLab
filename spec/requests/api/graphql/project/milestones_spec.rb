@@ -153,7 +153,7 @@ RSpec.describe 'getting milestone listings nested in a project' do
     it_behaves_like 'a working graphql query' do
       before do
         query = <<~GQL
-          query($path: ID!, $start: Time!, $end: Time!) {
+          query($path: ID!, $start: Date!, $end: Date!) {
             project(fullPath: $path) {
               milestones(timeframe: { start: $start, end: $end }) {
                 nodes { id }
@@ -168,23 +168,24 @@ RSpec.describe 'getting milestone listings nested in a project' do
 
     it 'is invalid to provide timeframe and start_date/end_date' do
       query = <<~GQL
-        query($path: ID!, $start: Time!, $end: Time!) {
+        query($path: ID!, $tstart: Date!, $tend: Date!, $start: Time!, $end: Time!) {
           project(fullPath: $path) {
-            milestones(timeframe: { start: $start, end: $end }, startDate: $start, endDate: $end) {
+            milestones(timeframe: { start: $tstart, end: $tend }, startDate: $start, endDate: $end) {
               nodes { id }
             }
           }
         }
       GQL
 
-      post_graphql(query, current_user: current_user, variables: vars)
+      post_graphql(query, current_user: current_user,
+                          variables: vars.merge(vars.transform_keys { |k| :"t#{k}" }))
 
       expect(graphql_errors).to contain_exactly(a_hash_including('message' => include('deprecated in favor of timeframe')))
     end
 
     it 'is invalid to invert the timeframe arguments' do
       query = <<~GQL
-        query($path: ID!, $start: Time!, $end: Time!) {
+        query($path: ID!, $start: Date!, $end: Date!) {
           project(fullPath: $path) {
             milestones(timeframe: { start: $end, end: $start }) {
               nodes { id }
