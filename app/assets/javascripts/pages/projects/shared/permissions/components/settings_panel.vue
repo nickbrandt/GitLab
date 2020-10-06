@@ -292,7 +292,7 @@ export default {
 
 <template>
   <div>
-    <div class="project-visibility-setting">
+    <div class="project-visibility-setting gl-border-1 gl-border-solid gl-border-gray-100 gl-py-3 gl-px-7 gl-sm-pr-5 gl-sm-pl-5">
       <project-setting-row
         ref="project-visibility-settings"
         :help-path="visibilityHelpPath"
@@ -327,7 +327,7 @@ export default {
           </div>
         </div>
         <span class="form-text text-muted">{{ visibilityLevelDescription }}</span>
-        <label v-if="visibilityLevel !== visibilityOptions.PRIVATE" class="request-access">
+        <label v-if="visibilityLevel !== visibilityOptions.PRIVATE" class="gl-line-height-28">
           <input
             :value="requestAccessEnabled"
             type="hidden"

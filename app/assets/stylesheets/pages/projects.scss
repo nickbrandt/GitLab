@@ -59,7 +59,6 @@
   }
 }
 
-.project-visibility-setting,
 .project-feature-settings {
   border: 1px solid $border-color;
   padding: 10px 32px;
@@ -67,10 +66,6 @@
   @include media-breakpoint-down(xs) {
     padding: 10px 20px;
   }
-}
-
-.project-visibility-setting .request-access {
-  line-height: 2;
 }
 
 .project-feature-settings {
