@@ -38145,6 +38145,20 @@
           "description": null,
           "fields": [
             {
+              "name": "actualSizeLimit",
+              "description": "Size limit for the repository in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "alertManagementAlert",
               "description": "A single Alert Management alert of the project",
               "args": [

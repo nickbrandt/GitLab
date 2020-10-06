@@ -120,6 +120,11 @@ module EE
               null: true,
               description: 'Size of repository that exceeds the limit in bytes'
 
+        field :actual_size_limit,
+              GraphQL::FLOAT_TYPE,
+              null: true,
+              description: 'Size limit for the repository in bytes'
+
         def self.sast_ci_configuration(project)
           ::Security::CiConfiguration::SastParserService.new(project).configuration
         end

@@ -12918,6 +12918,11 @@ enum PipelineStatusEnum {
 
 type Project {
   """
+  Size limit for the repository in bytes
+  """
+  actualSizeLimit: Float
+
+  """
   A single Alert Management alert of the project
   """
   alertManagementAlert(
