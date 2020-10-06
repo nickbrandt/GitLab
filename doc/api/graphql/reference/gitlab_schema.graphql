@@ -2515,6 +2515,26 @@ Identifier of Clusters::Cluster
 """
 scalar ClustersClusterID
 
+"""
+Represents the code coverage summary for a project
+"""
+type CodeCoverageSummary {
+  """
+  Average percentage of the different code coverage results available for the project.
+  """
+  averageCoverage: Float
+
+  """
+  Number of different code coverage results available.
+  """
+  coverageCount: Int
+
+  """
+  Latest date when the code coverage was created for the project.
+  """
+  lastUpdatedAt: Time
+}
+
 type Commit {
   """
   Author of the commit
@@ -13775,6 +13795,12 @@ type Project {
     """
     last: Int
   ): ClusterAgentConnection
+
+  """
+  Code coverages summary associated with the project. Available only when
+  feature flag `group_coverage_data_report` is enabled
+  """
+  codeCoverageSummary: CodeCoverageSummary
 
   """
   Compliance frameworks associated with the project
