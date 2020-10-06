@@ -2,29 +2,29 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::Config::Entry::ComposableHash, :aggregate_failures do  
+RSpec.describe Gitlab::Config::Entry::ComposableHash, :aggregate_failures do
   let(:valid_config) do
     {
       DATABASE_SECRET: 'passw0rd',
-      API_TOKEN: 'passw0rd2',
+      API_TOKEN: 'passw0rd2'
     }
   end
-  
+
   let(:config) { valid_config }
-  
+
   shared_examples 'composes a hash' do
     describe '#valid?' do
       it 'is valid' do
         expect(entry).to be_valid
       end
-      
+
       context 'is invalid' do
         let(:config) { %w[one two] }
-        
+
         it { expect(entry).not_to be_valid }
       end
     end
-    
+
     describe '#value' do
       context 'when config is a hash' do
         it 'returns key value' do
@@ -32,7 +32,7 @@ RSpec.describe Gitlab::Config::Entry::ComposableHash, :aggregate_failures do
         end
       end
     end
-    
+
     describe '#compose!' do
       before do
         entry.compose!
@@ -74,12 +74,12 @@ RSpec.describe Gitlab::Config::Entry::ComposableHash, :aggregate_failures do
     before do
       allow(entry).to receive(:composable_class).and_return(Gitlab::Config::Entry::Node)
     end
-    
+
     it_behaves_like 'composes a hash'
   end
 
   context 'when ComposableHash entry is configured in the parent class' do
-    let(:composable_hash_parent_class) do 
+    let(:composable_hash_parent_class) do
       Class.new(Gitlab::Config::Entry::Node) do
         include ::Gitlab::Config::Entry::Configurable
 
@@ -88,16 +88,16 @@ RSpec.describe Gitlab::Config::Entry::ComposableHash, :aggregate_failures do
           inherit: false,
           default: { hello: :world },
           metadata: { composable_class: Gitlab::Config::Entry::Node }
-      end 
+      end
     end
 
     let(:entry) do
       parent_entry = composable_hash_parent_class.new(secrets: config)
       parent_entry.compose!
-      
+
       parent_entry[:secrets]
     end
-    
+
     it_behaves_like 'composes a hash'
 
     it 'creates entry with configuration from parent class' do
