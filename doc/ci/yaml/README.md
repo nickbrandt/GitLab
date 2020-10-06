@@ -4137,10 +4137,10 @@ globally and per-job.
 
 There are two types of variables.
 
-- [Custom variables](../variables/README.md#gitlab-cicd-environment-variables):
+- [Custom variables](../variables/README.md#custom-environment-variables):
   You can define their values in the `.gitlab-ci.yml` file, in the GitLab UI,
   or by using the API.
-- [Predefined variables](../variables/README.md#custom-environment-variables):
+- [Predefined variables](../variables/predefined_variables.md):
   These values are set by the runner itself.
   One example is `CI_COMMIT_REF_NAME`, which is the branch or tag the project is built for.
 
