@@ -59,21 +59,6 @@
   }
 }
 
-.project-feature-settings {
-  border: 1px solid $border-color;
-  padding: 10px 32px;
-
-  @include media-breakpoint-down(xs) {
-    padding: 10px 20px;
-  }
-}
-
-.project-feature-settings {
-  background: $gray-lighter;
-  border-top: 0;
-  margin-bottom: 16px;
-}
-
 .project-repo-select {
   transition: background 2s ease-out;
 

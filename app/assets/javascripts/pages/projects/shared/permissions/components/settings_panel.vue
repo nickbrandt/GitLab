@@ -338,7 +338,7 @@ export default {
         </label>
       </project-setting-row>
     </div>
-    <div :class="{ 'highlight-changes': highlightChangesClass }" class="project-feature-settings">
+    <div :class="{ 'highlight-changes': highlightChangesClass }" class="gl-border-1 gl-border-solid gl-border-t-none gl-border-gray-100 gl-mb-5 gl-py-3 gl-px-7 gl-sm-pr-5 gl-sm-pl-5 gl-bg-gray-10">
       <project-setting-row
         ref="issues-settings"
         :label="s__('ProjectSettings|Issues')"
