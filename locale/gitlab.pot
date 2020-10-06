@@ -27947,6 +27947,12 @@ msgstr ""
 msgid "UsageQuota|This namespace has no projects which use shared runners"
 msgstr ""
 
+msgid "UsageQuota|This project is at risk of being locked."
+msgstr ""
+
+msgid "UsageQuota|This project is locked."
+msgstr ""
+
 msgid "UsageQuota|Unlimited"
 msgstr ""
 
