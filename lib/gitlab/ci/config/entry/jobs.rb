@@ -11,8 +11,6 @@ module Gitlab
           include ::Gitlab::Config::Entry::Validatable
 
           validations do
-            validates :config, type: Hash
-
             validate do
               each_unmatched_job do |name|
                 errors.add(name, 'config should implement a script: or a trigger: keyword')

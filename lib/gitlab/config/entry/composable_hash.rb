@@ -10,9 +10,13 @@ module Gitlab
       class ComposableHash < ::Gitlab::Config::Entry::Node
         include ::Gitlab::Config::Entry::Validatable
 
-        validations do
-          validates :config, type: Hash
+        def self.parent_validations
+          validations do
+            validates :config, type: Hash
+          end
         end
+
+        parent_validations
 
         def compose!(deps = nil)
           super do
@@ -20,7 +24,7 @@ module Gitlab
               entry_class = composable_class(name, config)
               raise ArgumentError, 'Missing Composable class' unless entry_class
 
-              entry_class_name = entry_class.name.split('::').last.downcase
+              entry_class_name = entry_class.name.demodulize.underscore
 
               factory = ::Gitlab::Config::Entry::Factory.new(entry_class)
                 .value(config || {})
@@ -36,7 +40,7 @@ module Gitlab
           end
         end
 
-        def composable_class(name = nil, config = nil)
+        def composable_class(name, config)
           opt(:composable_class)
         end
       end

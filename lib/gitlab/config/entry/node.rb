@@ -20,6 +20,8 @@ module Gitlab
 
           yield(self) if block_given?
 
+          self.class.parent_validations if self.class.respond_to?(:parent_validations)
+          
           self.class.aspects.to_a.each do |aspect|
             instance_exec(&aspect)
           end

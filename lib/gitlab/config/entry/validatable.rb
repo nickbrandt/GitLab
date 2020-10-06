@@ -39,8 +39,6 @@ module Gitlab
             end
           end
 
-          private
-
           def validations(&block)
             (@validations ||= []).append(block)
           end
