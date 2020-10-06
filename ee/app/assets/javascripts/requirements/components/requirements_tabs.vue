@@ -1,5 +1,5 @@
 <script>
-import { GlBadge, GlButton, GlTabs, GlTab } from '@gitlab/ui';
+import { GlLink, GlBadge, GlButton, GlTabs, GlTab } from '@gitlab/ui';
 
 import { FilterState } from '../constants';
 
