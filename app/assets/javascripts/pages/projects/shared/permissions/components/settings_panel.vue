@@ -299,7 +299,7 @@ export default {
         :label="s__('ProjectSettings|Project visibility')"
       >
         <div class="project-feature-controls">
-          <div class="select-wrapper">
+          <div class="select-wrapper gl-flex-fill-1">
             <select
               v-model="visibilityLevel"
               :disabled="!canChangeVisibilityLevel"
@@ -517,7 +517,7 @@ export default {
         "
       >
         <div class="project-feature-controls">
-          <div class="select-wrapper">
+          <div class="select-wrapper gl-flex-fill-1">
             <select
               v-model="metricsDashboardAccessLevel"
               :disabled="metricsOptionsDropdownEnabled"

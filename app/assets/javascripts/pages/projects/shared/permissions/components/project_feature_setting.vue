@@ -73,11 +73,12 @@ export default {
   <div :data-for="name" class="project-feature-controls">
     <input v-if="name" :name="name" :value="value" type="hidden" />
     <project-feature-toggle
+      class="gl-flex-grow-0 gl-mr-3"
       :value="featureEnabled"
       :disabled-input="disabledInput"
       @change="toggleFeature"
     />
-    <div class="select-wrapper">
+    <div class="select-wrapper gl-flex-fill-1">
       <select
         :disabled="displaySelectInput"
         class="form-control project-repo-select select-control"

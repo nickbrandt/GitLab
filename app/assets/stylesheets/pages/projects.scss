@@ -59,14 +59,6 @@
   }
 }
 
-.toggle-wrapper {
-  margin-top: 5px;
-}
-
-.project-feature-row > .toggle-wrapper {
-  margin: 10px 0;
-}
-
 .project-visibility-setting,
 .project-feature-settings {
   border: 1px solid $border-color;
@@ -106,15 +98,6 @@
   align-items: center;
   margin: $gl-padding-8 0;
   max-width: 432px;
-
-  .toggle-wrapper {
-    flex: 0;
-    margin-right: 10px;
-  }
-
-  .select-wrapper {
-    flex: 1;
-  }
 }
 
 .project-feature-setting-group {
