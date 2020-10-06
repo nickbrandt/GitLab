@@ -3897,6 +3897,9 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
+msgid "Available ID"
+msgstr ""
+
 msgid "Available Runners: %{runners}"
 msgstr ""
 
@@ -4036,6 +4039,9 @@ msgid "BambooService|Bamboo root URL like https://bamboo.example.com"
 msgstr ""
 
 msgid "BambooService|You must set up automatic revision labeling and a repository trigger in Bamboo."
+msgstr ""
+
+msgid "Based on"
 msgstr ""
 
 msgid "Be careful. Changing the project's namespace can have unintended side effects."
@@ -6876,6 +6882,9 @@ msgid "Connection timed out"
 msgstr ""
 
 msgid "Connection timeout"
+msgstr ""
+
+msgid "Consistency guarantee method"
 msgstr ""
 
 msgid "Contact sales to upgrade"
@@ -11023,6 +11032,18 @@ msgid_plural "FeatureFlags|%d users"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "FeatureFlags|%{percent} by available ID"
+msgstr ""
+
+msgid "FeatureFlags|%{percent} by session ID"
+msgstr ""
+
+msgid "FeatureFlags|%{percent} by user ID"
+msgstr ""
+
+msgid "FeatureFlags|%{percent} randomly"
+msgstr ""
+
 msgid "FeatureFlags|* (All Environments)"
 msgstr ""
 
@@ -11051,6 +11072,9 @@ msgid "FeatureFlags|Configure"
 msgstr ""
 
 msgid "FeatureFlags|Configure feature flags"
+msgstr ""
+
+msgid "FeatureFlags|Consider using the more flexible \"Percent rollout\" strategy instead."
 msgstr ""
 
 msgid "FeatureFlags|Create feature flag"
@@ -11170,6 +11194,9 @@ msgstr ""
 msgid "FeatureFlags|Percent of users"
 msgstr ""
 
+msgid "FeatureFlags|Percent rollout"
+msgstr ""
+
 msgid "FeatureFlags|Percent rollout (logged in users)"
 msgstr ""
 
@@ -11233,7 +11260,7 @@ msgstr ""
 msgid "FeatureFlag|Select a user list"
 msgstr ""
 
-msgid "FeatureFlag|Select the environment scope for this feature flag."
+msgid "FeatureFlag|Select the environment scope for this feature flag"
 msgstr ""
 
 msgid "FeatureFlag|There are no configured user lists"
@@ -18752,6 +18779,9 @@ msgstr ""
 msgid "People without permission will never get a notification."
 msgstr ""
 
+msgid "Percent rollout must be a whole number between 0 and 100"
+msgstr ""
+
 msgid "Percentage"
 msgstr ""
 
@@ -21233,6 +21263,9 @@ msgstr ""
 msgid "Rake Tasks Help"
 msgstr ""
 
+msgid "Random"
+msgstr ""
+
 msgid "Raw blob request rate limit per minute"
 msgstr ""
 
@@ -23299,7 +23332,7 @@ msgstr ""
 msgid "Select status"
 msgstr ""
 
-msgid "Select strategy activation method."
+msgid "Select strategy activation method"
 msgstr ""
 
 msgid "Select subscription"
@@ -23519,6 +23552,9 @@ msgid "Service Templates"
 msgstr ""
 
 msgid "Service URL"
+msgstr ""
+
+msgid "Session ID"
 msgstr ""
 
 msgid "Session duration (minutes)"
@@ -28163,6 +28199,9 @@ msgid "User %{current_user_username} has started impersonating %{username}"
 msgstr ""
 
 msgid "User %{username} was successfully removed."
+msgstr ""
+
+msgid "User ID"
 msgstr ""
 
 msgid "User OAuth applications"
