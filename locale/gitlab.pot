@@ -7325,6 +7325,9 @@ msgstr ""
 msgid "Could not delete wiki page"
 msgstr ""
 
+msgid "Could not draw the lines for job relationships"
+msgstr ""
+
 msgid "Could not find design."
 msgstr ""
 
