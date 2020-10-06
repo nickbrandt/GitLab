@@ -292,7 +292,9 @@ export default {
 
 <template>
   <div>
-    <div class="project-visibility-setting gl-border-1 gl-border-solid gl-border-gray-100 gl-py-3 gl-px-7 gl-sm-pr-5 gl-sm-pl-5">
+    <div
+      class="project-visibility-setting gl-border-1 gl-border-solid gl-border-gray-100 gl-py-3 gl-px-7 gl-sm-pr-5 gl-sm-pl-5"
+    >
       <project-setting-row
         ref="project-visibility-settings"
         :help-path="visibilityHelpPath"
@@ -338,7 +340,10 @@ export default {
         </label>
       </project-setting-row>
     </div>
-    <div :class="{ 'highlight-changes': highlightChangesClass }" class="gl-border-1 gl-border-solid gl-border-t-none gl-border-gray-100 gl-mb-5 gl-py-3 gl-px-7 gl-sm-pr-5 gl-sm-pl-5 gl-bg-gray-10">
+    <div
+      :class="{ 'highlight-changes': highlightChangesClass }"
+      class="gl-border-1 gl-border-solid gl-border-t-none gl-border-gray-100 gl-mb-5 gl-py-3 gl-px-7 gl-sm-pr-5 gl-sm-pl-5 gl-bg-gray-10"
+    >
       <project-setting-row
         ref="issues-settings"
         :label="s__('ProjectSettings|Issues')"
