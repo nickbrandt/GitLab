@@ -26,7 +26,7 @@ query getStorageCounter($fullPath: ID!, $withExcessStorageData: Boolean = false)
           webUrl
           name
           repositorySizeExcess @include(if: $withExcessStorageData)
-          actualSizeLimit @include(if: $withExcessStorageData)
+          actualRepositorySizeLimit @include(if: $withExcessStorageData)
           statistics {
             commitCount
             storageSize

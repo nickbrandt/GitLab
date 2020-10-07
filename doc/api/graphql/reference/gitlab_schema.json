@@ -38145,7 +38145,7 @@
           "description": null,
           "fields": [
             {
-              "name": "actualSizeLimit",
+              "name": "actualRepositorySizeLimit",
               "description": "Size limit for the repository in bytes",
               "args": [
 

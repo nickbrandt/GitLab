@@ -12920,7 +12920,7 @@ type Project {
   """
   Size limit for the repository in bytes
   """
-  actualSizeLimit: Float
+  actualRepositorySizeLimit: Float
 
   """
   A single Alert Management alert of the project
