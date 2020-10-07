@@ -9,6 +9,8 @@
 #   order - Orders by field default due date asc.
 #   title - filter by title.
 #   state - filters by state.
+#   start_date & end_date - filters by timeframe (see TimeFrameFilter)
+#   containing_date - filters by point in time (see TimeFrameFilter)
 
 class MilestonesFinder
   include FinderMethods
