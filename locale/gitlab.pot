@@ -8,6 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-10-07 20:01+0000\n"
+"PO-Revision-Date: 2020-10-07 20:01+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -26628,6 +26630,9 @@ msgstr ""
 msgid "This merge request was merged. To apply this suggestion, edit this file directly."
 msgstr ""
 
+msgid "This namespace contains locked projects"
+msgstr ""
+
 msgid "This namespace has already been taken! Please choose another one."
 msgstr ""
 
@@ -30161,6 +30166,9 @@ msgid "Your project limit is %{limit} projects! Please contact your administrato
 msgstr ""
 
 msgid "Your projects"
+msgstr ""
+
+msgid "Your purchased storage is running low. To avoid locked projects, please purchase more storage."
 msgstr ""
 
 msgid "Your request for access could not be processed: %{error_meesage}"
