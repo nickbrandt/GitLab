@@ -1,6 +1,6 @@
-export default () => ({
-  endpoint: null,
-  path: null,
+export default ({ endpoint, path }) => ({
+  endpoint,
+  path,
   isSendingRequest: false,
   error: [],
 });

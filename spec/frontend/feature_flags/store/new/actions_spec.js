@@ -2,8 +2,6 @@ import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 import {
-  setEndpoint,
-  setPath,
   createFeatureFlag,
   requestCreateFeatureFlag,
   receiveCreateFeatureFlagSuccess,
@@ -29,33 +27,7 @@ describe('Feature flags New Module Actions', () => {
   let mockedState;
 
   beforeEach(() => {
-    mockedState = state();
-  });
-
-  describe('setEndpoint', () => {
-    it('should commit SET_ENDPOINT mutation', done => {
-      testAction(
-        setEndpoint,
-        'feature_flags.json',
-        mockedState,
-        [{ type: types.SET_ENDPOINT, payload: 'feature_flags.json' }],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('setPath', () => {
-    it('should commit SET_PATH mutation', done => {
-      testAction(
-        setPath,
-        '/feature_flags',
-        mockedState,
-        [{ type: types.SET_PATH, payload: '/feature_flags' }],
-        [],
-        done,
-      );
-    });
+    mockedState = state({ endpoint: 'feature_flags.json', path: '/feature_flags' });
   });
 
   describe('createFeatureFlag', () => {
