@@ -35,11 +35,12 @@ func TestParseContainsLine(t *testing.T) {
 	require.NoError(t, err)
 	defer d.Close()
 
-	line := []byte(`{"id":"5","label":"contains","outV":"1", "inVs": ["2", "3"]}` + "\n")
+	data := []byte(`{"id":"5","label":"contains","outV":"1", "inVs": ["2", "3"]}` + "\n")
+	data = append(data, []byte(`{"id":"6","label":"contains","outV":"1", "inVs": [4]}`+"\n")...)
 
-	require.NoError(t, d.Parse(bytes.NewReader(line)))
+	require.NoError(t, d.Parse(bytes.NewReader(data)))
 
-	require.Equal(t, []Id{2, 3}, d.DocRanges[1])
+	require.Equal(t, []Id{2, 3, 4}, d.DocRanges[1])
 }
 
 func TestParsingVeryLongLine(t *testing.T) {

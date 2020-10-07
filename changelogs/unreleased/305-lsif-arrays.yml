@@ -1,0 +1,5 @@
+---
+title: Fix processing lsif dump with repeating lines with inVs
+merge_request: 621
+author: Pavel Kuznetsov
+type: fixed

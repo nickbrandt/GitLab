@@ -138,7 +138,7 @@ func (d *Docs) addDocRanges(line []byte) error {
 		return err
 	}
 
-	d.DocRanges[docRange.OutV] = docRange.RangeIds
+	d.DocRanges[docRange.OutV] = append(d.DocRanges[docRange.OutV], docRange.RangeIds...)
 
 	return nil
 }
