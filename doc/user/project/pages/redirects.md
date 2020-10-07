@@ -42,7 +42,7 @@ Supported paths must start with a forward slash `/`.
 
 ## Create redirects
 
-To create redirects after [enabling](#enable-or-disable-redirects) the feature,
+To create redirects,
 create a configuration file named `_redirects` in the `public/` directory of your
 GitLab Pages site.
 
