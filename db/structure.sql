@@ -9911,7 +9911,8 @@ CREATE TABLE ci_build_trace_chunks (
     chunk_index integer NOT NULL,
     data_store integer NOT NULL,
     raw_data bytea,
-    checksum bytea
+    checksum bytea,
+    lock_version integer DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE ci_build_trace_chunks_id_seq
