@@ -1,0 +1,6 @@
+query runnerSetupInstructionsGroup($platform: String!, $architecture: String!, $groupId: ID!) {
+  runnerSetup(platform: $platform, architecture: $architecture, groupId: $groupId) {
+    installInstructions
+    registerInstructions
+  }
+}

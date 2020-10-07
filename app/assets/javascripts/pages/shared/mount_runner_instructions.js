@@ -1,17 +1,29 @@
 import Vue from 'vue';
+import VueApollo from 'vue-apollo';
+import createDefaultClient from '~/lib/graphql';
 import InstallRunnerInstructions from '~/vue_shared/components/runner_instructions/runner_instructions.vue';
-import { createStore } from '~/vue_shared/components/runner_instructions/store';
+
+Vue.use(VueApollo);
 
 export function initInstallRunner() {
   const installRunnerEl = document.getElementById('js-install-runner');
+  const { projectPath, groupPath } = installRunnerEl.dataset || {};
 
   if (installRunnerEl) {
+    const defaultClient = createDefaultClient();
+
+    const apolloProvider = new VueApollo({
+      defaultClient,
+    });
+
     // eslint-disable-next-line no-new
     new Vue({
       el: installRunnerEl,
-      store: createStore({
-        ...installRunnerEl.dataset,
-      }),
+      apolloProvider,
+      provide: {
+        projectPath,
+        groupPath,
+      },
       render(createElement) {
         return createElement(InstallRunnerInstructions);
       },

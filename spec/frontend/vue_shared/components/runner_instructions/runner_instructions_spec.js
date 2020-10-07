@@ -1,20 +1,26 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import { shallowMount } from '@vue/test-utils';
-import statusCodes from '~/lib/utils/http_status';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import VueApollo from 'vue-apollo';
+import createMockApollo from 'jest/helpers/mock_apollo_helper';
 import RunnerInstructions from '~/vue_shared/components/runner_instructions/runner_instructions.vue';
-import { createStore } from '~/vue_shared/components/runner_instructions/store/';
-import * as types from '~/vue_shared/components/runner_instructions/store/mutation_types';
+import getRunnerPlatforms from '~/vue_shared/components/runner_instructions/graphql/queries/get_runner_platforms.query.graphql';
+import getProjectId from '~/vue_shared/components/runner_instructions/graphql/queries/get_project_id.query.graphql';
+import getGroupId from '~/vue_shared/components/runner_instructions/graphql/queries/get_group_id.query.graphql';
+import getRunnerSetupInstructions from '~/vue_shared/components/runner_instructions/graphql/queries/get_runner_setup.query.graphql';
 
-import { mockPlatformsObject, mockInstructions } from './mock_data';
+import {
+  mockGraphqlRunnerPlatforms,
+  mockGraphqlProjectId,
+  mockGraphqlInstructions,
+  mockGraphqlGroupId,
+} from './mock_data';
 
-const instructionsPath = '/instructions';
-const platformsPath = '/platforms';
+const projectPath = 'gitlab-org/gitlab';
+const localVue = createLocalVue();
+localVue.use(VueApollo);
 
 describe('RunnerInstructions component', () => {
   let wrapper;
-  let store;
-  let mock;
+  let fakeApollo;
 
   const findModalButton = () => wrapper.find('[data-testid="show-modal-button"]');
   const findPlatformButtons = () => wrapper.findAll('[data-testid="platform-button"]');
@@ -23,31 +29,23 @@ describe('RunnerInstructions component', () => {
   const findBinaryInstructionsSection = () => wrapper.find('[data-testid="binary-instructions"]');
   const findRunnerInstructionsSection = () => wrapper.find('[data-testid="runner-instructions"]');
 
-  function setupStore() {
-    store.commit(`installRunnerPopup/${types.SET_AVAILABLE_PLATFORMS}`, mockPlatformsObject);
-
-    store.commit(`installRunnerPopup/${types.SET_AVAILABLE_PLATFORM}`, 'linux');
-
-    store.commit(`installRunnerPopup/${types.SET_ARCHITECTURE}`, '386');
-
-    store.commit(`installRunnerPopup/${types.SET_INSTRUCTIONS}`, mockInstructions);
-  }
-
   beforeEach(() => {
-    mock = new MockAdapter(axios);
+    const requestHandlers = [
+      [getRunnerPlatforms, jest.fn().mockResolvedValue(mockGraphqlRunnerPlatforms)],
+      [getRunnerSetupInstructions, jest.fn().mockResolvedValue(mockGraphqlInstructions)],
+      [getProjectId, jest.fn().mockResolvedValue(mockGraphqlProjectId)],
+      [getGroupId, jest.fn().mockResolvedValue(mockGraphqlGroupId)],
+    ];
 
-    mock.onGet(platformsPath).reply(statusCodes.OK, mockPlatformsObject);
+    fakeApollo = createMockApollo(requestHandlers);
 
-    mock.onGet('/instructions?os=linux&arch=386').reply(statusCodes.OK, mockInstructions);
-
-    store = createStore({
-      instructionsPath,
-      platformsPath,
+    wrapper = shallowMount(RunnerInstructions, {
+      provide: {
+        projectPath,
+      },
+      localVue,
+      apolloProvider: fakeApollo,
     });
-
-    wrapper = shallowMount(RunnerInstructions, { store });
-
-    setupStore();
   });
 
   afterEach(() => {
@@ -65,25 +63,35 @@ describe('RunnerInstructions component', () => {
   it('should contain a number of platforms buttons', () => {
     const buttons = findPlatformButtons();
 
-    expect(buttons).toHaveLength(Object.keys(mockPlatformsObject).length);
+    expect(buttons).toHaveLength(mockGraphqlRunnerPlatforms.data.runnerPlatforms.nodes.length);
   });
 
   it('should contain a number of dropdown items for the architecture options', () => {
-    const dropdownItems = findArchitectureDropdownItems();
+    const platformButton = findPlatformButtons().at(0);
+    platformButton.vm.$emit('click');
 
-    expect(dropdownItems).toHaveLength(
-      Object.keys(mockPlatformsObject.linux.download_locations).length,
-    );
+    return wrapper.vm.$nextTick(() => {
+      const dropdownItems = findArchitectureDropdownItems();
+
+      expect(dropdownItems).toHaveLength(
+        mockGraphqlRunnerPlatforms.data.runnerPlatforms.nodes[0].architectures.nodes.length,
+      );
+    });
   });
 
-  it('should display the binary installation instructions for a selected architecture', () => {
+  it('should display the binary installation instructions for a selected architecture', async () => {
+    const platformButton = findPlatformButtons().at(0);
+    platformButton.vm.$emit('click');
+
+    await wrapper.vm.$nextTick();
+
+    const dropdownItem = findArchitectureDropdownItems().at(0);
+    dropdownItem.vm.$emit('click');
+
+    await wrapper.vm.$nextTick();
+
     const runner = findBinaryInstructionsSection();
 
-    expect(runner.text()).toEqual(
-      expect.stringContaining(
-        'sudo curl -L --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-386',
-      ),
-    );
     expect(runner.text()).toEqual(
       expect.stringContaining('sudo chmod +x /usr/local/bin/gitlab-runner'),
     );
@@ -100,9 +108,21 @@ describe('RunnerInstructions component', () => {
     expect(runner.text()).toEqual(expect.stringContaining('sudo gitlab-runner start'));
   });
 
-  it('should display the runner instructions for a selected architecture', () => {
+  it('should display the runner register instructions for a selected architecture', async () => {
+    const platformButton = findPlatformButtons().at(0);
+    platformButton.vm.$emit('click');
+
+    await wrapper.vm.$nextTick();
+
+    const dropdownItem = findArchitectureDropdownItems().at(0);
+    dropdownItem.vm.$emit('click');
+
+    await wrapper.vm.$nextTick();
+
     const runner = findRunnerInstructionsSection();
 
-    expect(runner.text()).toEqual(expect.stringContaining(mockInstructions.register));
+    expect(runner.text()).toEqual(
+      expect.stringContaining(mockGraphqlInstructions.data.runnerSetup.registerInstructions),
+    );
   });
 });
