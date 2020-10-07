@@ -28716,7 +28716,13 @@ msgstr ""
 msgid "Vulnerability|Comments"
 msgstr ""
 
-msgid "Vulnerability|Crash Address"
+msgid "Vulnerability|Crash address"
+msgstr ""
+
+msgid "Vulnerability|Crash state"
+msgstr ""
+
+msgid "Vulnerability|Crash type"
 msgstr ""
 
 msgid "Vulnerability|Description"
