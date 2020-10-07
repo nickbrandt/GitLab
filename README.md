@@ -72,6 +72,12 @@ memory than it costs to have Workhorse look after it.
 For more information see ['A brief history of
 gitlab-workhorse'][brief-history-blog].
 
+## Configuring Workhorse
+
+For historical reasons Workhorse uses both command line flags, a configuration file and environment variables.
+
+All new configuration options that get added to Workhorse should go into the configuration file.
+
 ## Usage
 
 ```
