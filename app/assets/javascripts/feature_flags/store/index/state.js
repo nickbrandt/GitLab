@@ -1,4 +1,4 @@
-import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from '../../../constants';
+import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from '../../constants';
 
 export default ({ endpoint, projectId, unleashApiInstanceId, rotateInstanceIdPath }) => ({
   [FEATURE_FLAG_SCOPE]: [],

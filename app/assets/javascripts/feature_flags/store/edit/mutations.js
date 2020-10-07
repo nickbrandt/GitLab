@@ -1,6 +1,6 @@
 import * as types from './mutation_types';
 import { mapToScopesViewModel, mapStrategiesToViewModel } from '../helpers';
-import { LEGACY_FLAG } from '../../../constants';
+import { LEGACY_FLAG } from '../../constants';
 
 export default {
   [types.REQUEST_FEATURE_FLAG](state) {

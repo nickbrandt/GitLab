@@ -9,7 +9,7 @@ import {
   NEW_FLAG_ALERT,
   ROLLOUT_STRATEGY_ALL_USERS,
 } from '../constants';
-import { createNewEnvironmentScope } from '../store/modules/helpers';
+import { createNewEnvironmentScope } from '../store/helpers';
 
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 

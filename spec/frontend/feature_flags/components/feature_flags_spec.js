@@ -4,7 +4,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { TEST_HOST } from 'spec/test_constants';
 import Api from '~/api';
-import createStore from '~/feature_flags/store/modules/index';
+import createStore from '~/feature_flags/store/index';
 import FeatureFlagsTab from '~/feature_flags/components/feature_flags_tab.vue';
 import FeatureFlagsComponent from '~/feature_flags/components/feature_flags.vue';
 import FeatureFlagsTable from '~/feature_flags/components/feature_flags_table.vue';

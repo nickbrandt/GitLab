@@ -4,7 +4,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { GlAlert } from '@gitlab/ui';
 import { TEST_HOST } from 'spec/test_constants';
 import Form from '~/feature_flags/components/form.vue';
-import createStore from '~/feature_flags/store/modules/new';
+import createStore from '~/feature_flags/store/new';
 import NewFeatureFlag from '~/feature_flags/components/new_feature_flag.vue';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,

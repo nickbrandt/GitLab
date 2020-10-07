@@ -1,7 +1,7 @@
-import state from '~/feature_flags/store/modules/index/state';
-import mutations from '~/feature_flags/store/modules/index/mutations';
-import * as types from '~/feature_flags/store/modules/index/mutation_types';
-import { mapToScopesViewModel } from '~/feature_flags/store/modules/helpers';
+import state from '~/feature_flags/store/index/state';
+import mutations from '~/feature_flags/store/index/mutations';
+import * as types from '~/feature_flags/store/index/mutation_types';
+import { mapToScopesViewModel } from '~/feature_flags/store/helpers';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 import { getRequestData, rotateData, featureFlag, userList } from '../../mock_data';
 

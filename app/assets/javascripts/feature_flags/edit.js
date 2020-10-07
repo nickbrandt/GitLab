@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import createStore from './store/modules/edit';
+import createStore from './store/edit';
 import EditFeatureFlag from './components/edit_feature_flag.vue';
 
 Vue.use(Vuex);

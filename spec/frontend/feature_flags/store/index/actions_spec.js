@@ -23,10 +23,10 @@ import {
   deleteUserList,
   receiveDeleteUserListError,
   clearAlert,
-} from '~/feature_flags/store/modules/index/actions';
-import { mapToScopesViewModel } from '~/feature_flags/store/modules/helpers';
-import state from '~/feature_flags/store/modules/index/state';
-import * as types from '~/feature_flags/store/modules/index/mutation_types';
+} from '~/feature_flags/store/index/actions';
+import { mapToScopesViewModel } from '~/feature_flags/store/helpers';
+import state from '~/feature_flags/store/index/state';
+import * as types from '~/feature_flags/store/index/mutation_types';
 import axios from '~/lib/utils/axios_utils';
 import { getRequestData, rotateData, featureFlag, userList } from '../../mock_data';
 

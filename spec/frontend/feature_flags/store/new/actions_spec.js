@@ -6,19 +6,16 @@ import {
   requestCreateFeatureFlag,
   receiveCreateFeatureFlagSuccess,
   receiveCreateFeatureFlagError,
-} from '~/feature_flags/store/modules/new/actions';
-import state from '~/feature_flags/store/modules/new/state';
-import * as types from '~/feature_flags/store/modules/new/mutation_types';
+} from '~/feature_flags/store/new/actions';
+import state from '~/feature_flags/store/new/state';
+import * as types from '~/feature_flags/store/new/mutation_types';
 import {
   ROLLOUT_STRATEGY_ALL_USERS,
   ROLLOUT_STRATEGY_PERCENT_ROLLOUT,
   LEGACY_FLAG,
   NEW_VERSION_FLAG,
 } from '~/feature_flags/constants';
-import {
-  mapFromScopesViewModel,
-  mapStrategiesToRails,
-} from '~/feature_flags/store/modules/helpers';
+import { mapFromScopesViewModel, mapStrategiesToRails } from '~/feature_flags/store/helpers';
 import axios from '~/lib/utils/axios_utils';
 
 jest.mock('~/lib/utils/url_utility');

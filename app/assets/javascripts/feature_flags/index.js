@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import csrf from '~/lib/utils/csrf';
 import FeatureFlagsComponent from './components/feature_flags.vue';
-import createStore from './store/modules/index';
+import createStore from './store/index';
 
 Vue.use(Vuex);
 

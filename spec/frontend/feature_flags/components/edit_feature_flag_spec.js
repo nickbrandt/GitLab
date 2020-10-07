@@ -6,7 +6,7 @@ import { TEST_HOST } from 'spec/test_constants';
 import { mockTracking } from 'helpers/tracking_helper';
 import { LEGACY_FLAG, NEW_VERSION_FLAG, NEW_FLAG_ALERT } from '~/feature_flags/constants';
 import Form from '~/feature_flags/components/form.vue';
-import createStore from '~/feature_flags/store/modules/edit';
+import createStore from '~/feature_flags/store/edit';
 import EditFeatureFlag from '~/feature_flags/components/edit_feature_flag.vue';
 import axios from '~/lib/utils/axios_utils';
 

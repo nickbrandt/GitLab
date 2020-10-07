@@ -1,4 +1,4 @@
-import { LEGACY_FLAG } from '../../../constants';
+import { LEGACY_FLAG } from '../../constants';
 
 export default ({ path, endpoint }) => ({
   endpoint,

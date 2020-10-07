@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { parseBoolean } from '~/lib/utils/common_utils';
-import createStore from './store/modules/new';
+import createStore from './store/new';
 import NewFeatureFlag from './components/new_feature_flag.vue';
 
 Vue.use(Vuex);
