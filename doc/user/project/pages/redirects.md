@@ -6,9 +6,8 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Create redirects for GitLab Pages
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab-pages/-/issues/24) in GitLab Pages 1.25.0 and GitLab 13.4.
-> - It's [deployed behind a feature flag](#enable-or-disable-redirects), disabled by default.
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-redirects).
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab-pages/-/issues/24) in GitLab Pages 1.25.0 and GitLab 13.4 behind a feature flag.
+> - It's [deployed behind a feature flag](#enable-or-disable-redirects), enabled by default.
 
 CAUTION: **Warning:**
 This feature might not be available to you. Check the **version history** note above for details.
@@ -105,19 +104,19 @@ rule 10: valid
 rule 11: valid
 ```
 
-## Enable or disable redirects
+## Disable redirects
 
 Redirects in GitLab Pages is under development and not ready for production use. It is
-deployed behind a feature flag that is **disabled by default**.
+deployed behind a feature flag that is **enabled by default**.
 
-For [Omnibus installations](../../../administration/pages/index.md), define the
+To disable redirects, for [Omnibus installations](../../../administration/pages/index.md), define the
 `FF_ENABLE_REDIRECTS` environment variable in the
 [global settings](../../../administration/pages/index.md#global-settings).
 Add the following line to `/etc/gitlab/gitlab.rb` and
 [reconfigure the instance](../../../administration/restart_gitlab.md#omnibus-gitlab-reconfigure).
 
 ```ruby
-gitlab_pages['env']['FF_ENABLE_REDIRECTS'] = 'true'
+gitlab_pages['env']['FF_ENABLE_REDIRECTS'] = 'false'
 ```
 
 For [source installations](../../../administration/pages/source.md), define the
@@ -125,6 +124,6 @@ For [source installations](../../../administration/pages/source.md), define the
 [restart GitLab](../../../administration/restart_gitlab.md#installations-from-source):
 
 ```shell
-export FF_ENABLE_REDIRECTS="true"
+export FF_ENABLE_REDIRECTS="false"
 /path/to/pages/bin/gitlab-pages -config gitlab-pages.conf
 ```
