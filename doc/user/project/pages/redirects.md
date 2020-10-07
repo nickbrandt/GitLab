@@ -107,8 +107,8 @@ rule 11: valid
 
 ## Disable redirects
 
-Redirects in GitLab Pages is under development and not ready for production use. It is
-deployed behind a feature flag that is **enabled by default**.
+Redirects in GitLab Pages is under development, and is deployed behind a feature flag
+that is **enabled by default**.
 
 To disable redirects, for [Omnibus installations](../../../administration/pages/index.md), define the
 `FF_ENABLE_REDIRECTS` environment variable in the
