@@ -22,7 +22,9 @@ module Groups
       return false unless valid_path_change_with_npm_packages?
 
       return false unless update_shared_runners
+
       handle_changes
+
       before_assignment_hook(group, params)
 
       handle_namespace_settings
@@ -101,7 +103,7 @@ module Groups
 
       if settings.previous_changes.include?(:allow_mfa_for_subgroups)
         # enque in batches members update
-        Disallow2FAWorker.perform_async(group.id)
+        DisallowTwoFaWorker.perform_async(group.id)
       end
     end
 

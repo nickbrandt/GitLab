@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Disallow2FAForSubgroupsWorker # rubocop:disable Scalability/IdempotentWorker
+class DisallowTwoFaForSubgroupsWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
   include ExceptionBacktrace
 
