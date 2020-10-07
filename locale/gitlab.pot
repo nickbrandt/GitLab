@@ -8,8 +8,6 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-12 08:34+0200\n"
-"PO-Revision-Date: 2020-10-12 08:34+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -7402,6 +7400,9 @@ msgstr ""
 msgid "Could not load instance counts. Please refresh the page to try again."
 msgstr ""
 
+msgid "Could not load the issues and merge requests chart. Please refresh the page to try again."
+msgstr ""
+
 msgid "Could not remove the trigger."
 msgstr ""
 
@@ -14386,6 +14387,9 @@ msgstr ""
 msgid "Issues"
 msgstr ""
 
+msgid "Issues & Merge Requests"
+msgstr ""
+
 msgid "Issues Rate Limits"
 msgstr ""
 
@@ -14456,6 +14460,9 @@ msgid "It seems that there is currently no available data for code coverage"
 msgstr ""
 
 msgid "It's you"
+msgstr ""
+
+msgid "Items"
 msgstr ""
 
 msgid "Iteration"

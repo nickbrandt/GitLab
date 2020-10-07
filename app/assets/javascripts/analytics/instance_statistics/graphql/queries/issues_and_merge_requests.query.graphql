@@ -1,0 +1,25 @@
+#import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
+#import "./count.fragment.graphql"
+
+query issuesAndMergeRequests($first: Int, $afterIssue: String, $afterMergeRequest: String) {
+  issues: instanceStatisticsMeasurements(identifier: ISSUES, first: $first, after: $afterIssue) {
+    nodes {
+      ...Count
+    }
+    pageInfo {
+      ...PageInfo
+    }
+  }
+  mergeRequests: instanceStatisticsMeasurements(
+    identifier: MERGE_REQUESTS
+    first: $first
+    after: $afterMergeRequest
+  ) {
+    nodes {
+      ...Count
+    }
+    pageInfo {
+      ...PageInfo
+    }
+  }
+}
