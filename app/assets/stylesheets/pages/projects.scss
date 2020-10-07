@@ -60,7 +60,6 @@
 }
 
 // INFO Scoped to project_feature_setting and settings_panel components in app/assets/javascripts/pages/projects/shared/permissions/components
-// TODO consider moving to component specific stylesheet instead of page specific?
 .project-repo-select {
   transition: background 2s ease-out;
 
@@ -80,15 +79,10 @@
   max-width: 432px;
 }
 
+// INFO Scoped to settings_panel component in app/assets/javascripts/pages/projects/shared/permissions/components
 .project-feature-setting-group {
-  padding-left: 32px;
-
   .project-feature-controls {
     max-width: 400px;
-  }
-
-  @include media-breakpoint-down(xs) {
-    padding-left: 20px;
   }
 }
 

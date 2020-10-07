@@ -366,7 +366,7 @@ export default {
           name="project[project_feature_attributes][repository_access_level]"
         />
       </project-setting-row>
-      <div class="project-feature-setting-group">
+      <div class="project-feature-setting-group gl-pl-7 gl-sm-pl-5">
         <project-setting-row
           ref="merge-request-settings"
           :label="s__('ProjectSettings|Merge requests')"
