@@ -28,7 +28,7 @@ notify-security-pipeline:
     - .notify-slack
     - .delivery:rules:security-pipeline-merge-result-failure
   variables:
-    NOTIFY_CHANNEL: security-release-tests
+    NOTIFY_CHANNEL: f_upcoming_release
   script:
     - echo "NOTIFY_CHANNEL is ${NOTIFY_CHANNEL}"
     - echo "CI_PIPELINE_URL is ${CI_PIPELINE_URL}"
