@@ -58503,7 +58503,7 @@
             },
             {
               "name": "state",
-              "description": "State of the vulnerability (DETECTED, DISMISSED, RESOLVED, CONFIRMED)",
+              "description": "State of the vulnerability (DETECTED, CONFIRMED, RESOLVED, DISMISSED)",
               "args": [
 
               ],
@@ -60482,6 +60482,18 @@
               "description": "Report Type in ascending order",
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "state_desc",
+              "description": "State in descending order",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "state_asc",
+              "description": "State in ascending order",
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null
@@ -60501,7 +60513,7 @@
               "deprecationReason": null
             },
             {
-              "name": "DISMISSED",
+              "name": "CONFIRMED",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -60513,7 +60525,7 @@
               "deprecationReason": null
             },
             {
-              "name": "CONFIRMED",
+              "name": "DISMISSED",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
