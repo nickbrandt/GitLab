@@ -10,13 +10,11 @@ module Gitlab
       class ComposableHash < ::Gitlab::Config::Entry::Node
         include ::Gitlab::Config::Entry::Validatable
 
-        def self.parent_validations
-          validations do
-            validates :config, type: Hash
-          end
+        # TODO: Refactor Validatable so these validations will not apply to a child class
+        # See: https://gitlab.com/gitlab-org/gitlab/-/issues/263231
+        validations do
+          validates :config, type: Hash
         end
-
-        parent_validations
 
         def compose!(deps = nil)
           super do
