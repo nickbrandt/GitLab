@@ -57,7 +57,8 @@ export default {
 
         <gl-button
           v-if="hasValues"
-          class="btn-sm group js-reveal-variables trigger-variables-btn"
+          class="group js-reveal-variables trigger-variables-btn"
+          size="small"
           @click="toggleValues"
           >{{ getToggleButtonText }}</gl-button
         >
