@@ -3,6 +3,52 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Database::SetAll do
+  describe 'error states' do
+    let(:columns) { %i[title] }
+
+    let_it_be(:mapping) do
+      create_default(:user)
+      create_default(:project)
+
+      i_a, i_b = create_list(:issue, 2)
+
+      {
+        i_a  => { title: 'Issue a' },
+        i_b  => { title: 'Issue b' }
+      }
+    end
+
+    it 'does not raise errors on valid inputs' do
+      expect { described_class.set_all(columns, mapping) }.not_to raise_error
+    end
+
+    it 'expects a non-empty list of column names' do
+      expect { described_class.set_all([], mapping) }.to raise_error(ArgumentError)
+    end
+
+    it 'expects all columns to be symbols' do
+      expect { described_class.set_all([1], mapping) }.to raise_error(ArgumentError)
+    end
+
+    it 'expects all columns to be valid columns on the tables' do
+      expect { described_class.set_all([:foo], mapping) }.to raise_error(ArgumentError)
+    end
+
+    it 'refuses to set ID' do
+      expect { described_class.set_all([:id], mapping) }.to raise_error(ArgumentError)
+    end
+
+    it 'expects a non-empty mapping' do
+      expect { described_class.set_all(columns, []) }.to raise_error(ArgumentError)
+    end
+
+    it 'expects all map values to be Hash instances' do
+      bad_map = mapping.merge(build(:issue) => 2)
+
+      expect { described_class.set_all(columns, bad_map) }.to raise_error(ArgumentError)
+    end
+  end
+
   it 'is possible to update all objects in a single query' do
     users = create_list(:user, 3)
     mapping = users.zip(%w(foo bar baz)).to_h do |u, name|

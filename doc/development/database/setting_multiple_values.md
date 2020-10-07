@@ -94,3 +94,10 @@ mapping = objects.to_h { |obj| [obj, bazzes[obj.id] }
   obj.object_type.constantize
 end
 ```
+
+## Caveats
+
+Note that this is a **very low level** tool, and operates on the raw column
+values. Enumerations and state fields must be translated into their underlying
+representations, for example, and nested associations are not supported. No
+validations or hooks will be called.

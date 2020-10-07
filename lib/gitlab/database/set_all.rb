@@ -30,22 +30,57 @@ module Gitlab
     # representations, for example, and no hooks will be called.
     #
     module SetAll
-      COMMA = ', '
+      LIST_SEPARATOR = ', '
 
       class Setter
         include Gitlab::Utils::StrongMemoize
 
-        attr_reader :table_name, :connection, :columns, :mapping
-
         def initialize(model, columns, mapping)
-          raise ArgumentError if columns.blank? || columns.any? { |c| !c.is_a?(Symbol) }
-          raise ArgumentError if mapping.nil? || mapping.empty?
-          raise ArgumentError if mapping.any? { |_k, v| !v.is_a?(Hash) }
-
           @table_name = model.table_name
           @connection = model.connection
-          @columns = ([:id] + columns).map { |c| model.column_for_attribute(c) }
-          @mapping = mapping
+          @columns = self.class.column_definitions(model, columns)
+          @mapping = self.class.value_mapping(mapping)
+        end
+
+        def update!
+          if without_prepared_statement?
+            # A workaround for https://github.com/rails/rails/issues/24893
+            # When prepared statements are prevented (such as when using the
+            # query counter or in omnibus by default), we cannot call
+            # `exec_update`, since that will discard the bindings.
+            connection.send(:exec_no_cache, sql, log_name, params) # rubocop: disable GitlabSecurity/PublicSend
+          else
+            connection.exec_update(sql, log_name, params)
+          end
+        end
+
+        def self.column_definitions(model, columns)
+          raise ArgumentError, 'invalid columns' if columns.blank? || columns.any? { |c| !c.is_a?(Symbol) }
+          raise ArgumentError, 'cannot set ID' if columns.include?(:id)
+
+          ([:id] | columns).map do |name|
+            definition = model.column_for_attribute(name)
+            raise ArgumentError, "Unknown column: #{name}" unless definition.type
+
+            definition
+          end
+        end
+
+        def self.value_mapping(mapping)
+          raise ArgumentError, 'invalid mapping' if mapping.blank?
+          raise ArgumentError, 'invalid mapping value' if mapping.any? { |_k, v| !v.is_a?(Hash) }
+
+          mapping
+        end
+
+        private
+
+        attr_reader :table_name, :connection, :columns, :mapping
+
+        def log_name
+          strong_memoize(:log_name) do
+            "SetAll #{table_name} #{columns.drop(1).map(&:name)}:#{mapping.size}"
+          end
         end
 
         def params
@@ -58,8 +93,8 @@ module Gitlab
 
         # A workaround for https://github.com/rails/rails/issues/24893
         # We need to detect if prepared statements have been disabled.
-        def no_prepared_statement?
-          strong_memoize(:no_prepared_statement) do
+        def without_prepared_statement?
+          strong_memoize(:without_prepared_statement) do
             connection.send(:without_prepared_statement?, [1]) # rubocop: disable GitlabSecurity/PublicSend
           end
         end
@@ -83,41 +118,46 @@ module Gitlab
             end
             typed = true
 
-            "(#{binds.join(COMMA)})"
+            "(#{list_of(binds)})"
           end
+        end
+
+        def list_of(list)
+          list.join(LIST_SEPARATOR)
         end
 
         def sql
-          column_names = columns.map(&:name)
-          cte_columns = column_names.map do |c|
-            connection.quote_column_name("cte_#{c}")
-          end
-          updates = column_names.zip(cte_columns).drop(1).map do |dest, src|
-            "#{connection.quote_column_name(dest)} = cte.#{src}"
-          end
-
           <<~SQL
-            WITH cte(#{cte_columns.join(COMMA)}) AS (VALUES #{values.join(COMMA)})
-            UPDATE #{table_name} SET #{updates.join(COMMA)} FROM cte WHERE cte_id = id
+            WITH cte(#{list_of(cte_columns)}) AS (VALUES #{list_of(values)})
+            UPDATE #{table_name} SET #{list_of(updates)} FROM cte WHERE cte_id = id
           SQL
         end
 
-        def update!
-          log_name = "SetAll #{table_name} #{columns.drop(1).map(&:name)}:#{mapping.size}"
-          if no_prepared_statement?
-            # A workaround for https://github.com/rails/rails/issues/24893
-            # When prepared statements are prevented (such as when using the
-            # query counter or in omnibus by default), we cannot call
-            # `exec_update`, since that will discard the bindings.
-            connection.send(:exec_no_cache, sql, log_name, params) # rubocop: disable GitlabSecurity/PublicSend
-          else
-            connection.exec_update(sql, log_name, params)
+        def column_names
+          strong_memoize(:column_names) { columns.map(&:name) }
+        end
+
+        def cte_columns
+          strong_memoize(:cte_columns) do
+            column_names.map do |c|
+              connection.quote_column_name("cte_#{c}")
+            end
+          end
+        end
+
+        def updates
+          column_names.zip(cte_columns).drop(1).map do |dest, src|
+            "#{connection.quote_column_name(dest)} = cte.#{src}"
           end
         end
       end
 
       def self.set_all(columns, mapping, &to_class)
-        mapping.group_by { |k, v| block_given? ? to_class.call(k) : k.class }.each do |model, entries|
+        raise ArgumentError if mapping.blank?
+
+        entries_by_class = mapping.group_by { |k, v| block_given? ? to_class.call(k) : k.class }
+
+        entries_by_class.each do |model, entries|
           Setter.new(model, columns, entries).update!
         end
       end
