@@ -9,15 +9,7 @@ describe('Feature flags store Mutations', () => {
   let stateCopy;
 
   beforeEach(() => {
-    stateCopy = state();
-  });
-
-  describe('SET_FEATURE_FLAGS_ENDPOINT', () => {
-    it('should set endpoint', () => {
-      mutations[types.SET_FEATURE_FLAGS_ENDPOINT](stateCopy, 'feature_flags.json');
-
-      expect(stateCopy.endpoint).toEqual('feature_flags.json');
-    });
+    stateCopy = state({});
   });
 
   describe('SET_FEATURE_FLAGS_OPTIONS', () => {
@@ -27,23 +19,6 @@ describe('Feature flags store Mutations', () => {
       expect(stateCopy.options).toEqual({ page: '1', scope: 'all' });
     });
   });
-
-  describe('SET_INSTANCE_ID_ENDPOINT', () => {
-    it('should set provided endpoint', () => {
-      mutations[types.SET_INSTANCE_ID_ENDPOINT](stateCopy, 'rotate_token.json');
-
-      expect(stateCopy.rotateEndpoint).toEqual('rotate_token.json');
-    });
-  });
-
-  describe('SET_INSTANCE_ID', () => {
-    it('should set provided token', () => {
-      mutations[types.SET_INSTANCE_ID](stateCopy, rotateData.token);
-
-      expect(stateCopy.instanceId).toEqual(rotateData.token);
-    });
-  });
-
   describe('REQUEST_FEATURE_FLAGS', () => {
     it('should set isLoading to true', () => {
       mutations[types.REQUEST_FEATURE_FLAGS](stateCopy);

@@ -1,6 +1,6 @@
 import { FEATURE_FLAG_SCOPE, USER_LIST_SCOPE } from '../../../constants';
 
-export default () => ({
+export default ({ endpoint, projectId, unleashApiInstanceId, rotateInstanceIdPath }) => ({
   [FEATURE_FLAG_SCOPE]: [],
   [USER_LIST_SCOPE]: [],
   alerts: [],
@@ -8,11 +8,11 @@ export default () => ({
   pageInfo: { [FEATURE_FLAG_SCOPE]: {}, [USER_LIST_SCOPE]: {} },
   isLoading: true,
   hasError: false,
-  endpoint: null,
-  rotateEndpoint: null,
-  instanceId: '',
+  endpoint,
+  rotateEndpoint: rotateInstanceIdPath,
+  instanceId: unleashApiInstanceId,
   isRotating: false,
   hasRotateError: false,
   options: {},
-  projectId: '',
+  projectId,
 });
