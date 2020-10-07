@@ -181,7 +181,7 @@ module EE
       end
 
       def project_has_subscriptions?
-        project.beta_feature_available?(:ci_project_subscriptions) &&
+        project.feature_available?(:ci_project_subscriptions) &&
           project.downstream_projects.any?
       end
 
