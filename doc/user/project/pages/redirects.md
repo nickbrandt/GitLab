@@ -12,8 +12,9 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 CAUTION: **Warning:**
 This feature might not be available to you. Check the **version history** note above for details.
 
-In GitLab Pages, you can [enable](#enable-or-disable-redirects) the redirects feature to configure rules to forward one URL to another using HTTP redirects. GitLab Pages uses
-[Netlify style redirects](https://docs.netlify.com/routing/redirects/#syntax-for-the-redirects-file).
+In GitLab Pages, you can configure rules to forward one URL to another using
+[Netlify style](https://docs.netlify.com/routing/redirects/#syntax-for-the-redirects-file)
+HTTP redirects.
 
 ## Supported features
 
