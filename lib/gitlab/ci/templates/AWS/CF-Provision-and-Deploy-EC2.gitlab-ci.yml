@@ -1,4 +1,5 @@
 stages:
+  - provision
   - review
   - production
 
@@ -6,4 +7,5 @@ variables:
   AUTO_DEVOPS_PLATFORM_TARGET: EC2
 
 include:
+  - template: Jobs/CF-Provision.gitlab-ci.yml
   - template: Jobs/Deploy/EC2.gitlab-ci.yml
