@@ -16050,7 +16050,7 @@ msgstr ""
 msgid "MergeRequests|Jump to next unresolved thread"
 msgstr ""
 
-msgid "MergeRequests|Reply"
+msgid "MergeRequests|Reply..."
 msgstr ""
 
 msgid "MergeRequests|Resolve this thread in a new issue"
