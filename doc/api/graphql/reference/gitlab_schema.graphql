@@ -7196,6 +7196,11 @@ type GrafanaIntegration {
 
 type Group {
   """
+  Size limit for repositories in the namespace in bytes
+  """
+  actualRepositorySizeLimit: Float
+
+  """
   Additional storage purchased for the root namespace in bytes
   """
   additionalPurchasedStorageSize: Float
@@ -11913,6 +11918,11 @@ enum MutationOperationMode {
 }
 
 type Namespace {
+  """
+  Size limit for repositories in the namespace in bytes
+  """
+  actualRepositorySizeLimit: Float
+
   """
   Additional storage purchased for the root namespace in bytes
   """

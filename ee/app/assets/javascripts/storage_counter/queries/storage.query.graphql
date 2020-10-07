@@ -1,7 +1,9 @@
 query getStorageCounter($fullPath: ID!, $withExcessStorageData: Boolean = false) {
   namespace(fullPath: $fullPath) {
     id
+    name
     storageSizeLimit
+    actualRepositorySizeLimit @include(if: $withExcessStorageData)
     additionalPurchasedStorageSize @include(if: $withExcessStorageData)
     totalRepositorySizeExcess @include(if: $withExcessStorageData)
     totalRepositorySize @include(if: $withExcessStorageData)

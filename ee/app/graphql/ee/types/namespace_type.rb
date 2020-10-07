@@ -32,6 +32,12 @@ module EE
               null: false,
               description: 'Number of projects in the root namespace where the repository size exceeds the limit'
 
+        field :actual_repository_size_limit,
+              GraphQL::FLOAT_TYPE,
+              null: true,
+              description: 'Size limit for repositories in the namespace in bytes',
+              resolve: -> (obj, _args, _ctx) { obj.actual_size_limit }
+
         field :storage_size_limit,
               GraphQL::FLOAT_TYPE,
               null: true,

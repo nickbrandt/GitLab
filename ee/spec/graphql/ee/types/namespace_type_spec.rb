@@ -10,6 +10,7 @@ RSpec.describe GitlabSchema.types['Namespace'] do
       total_repository_size
       contains_locked_projects
       repository_size_excess_project_count
+      actual_repository_size_limit
       storage_size_limit
       is_temporary_storage_increase_enabled
       temporary_storage_increase_ends_on
