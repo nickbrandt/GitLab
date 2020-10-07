@@ -4068,6 +4068,12 @@ msgstr ""
 msgid "BillingPlan|Upgrade"
 msgstr ""
 
+msgid "Bitbucket Cloud"
+msgstr ""
+
+msgid "Bitbucket Server"
+msgstr ""
+
 msgid "Bitbucket Server Import"
 msgstr ""
 
@@ -11374,6 +11380,9 @@ msgstr ""
 msgid "FlowdockService|Flowdock is a collaboration web app for technical teams."
 msgstr ""
 
+msgid "FogBugz"
+msgstr ""
+
 msgid "FogBugz Email"
 msgstr ""
 
@@ -11977,6 +11986,9 @@ msgstr ""
 msgid "Git version"
 msgstr ""
 
+msgid "GitHub"
+msgstr ""
+
 msgid "GitHub API rate limit exceeded. Try again after %{reset_time}"
 msgstr ""
 
@@ -12350,6 +12362,9 @@ msgid "Go to your snippets"
 msgstr ""
 
 msgid "Google Cloud Platform"
+msgstr ""
+
+msgid "Google Code"
 msgstr ""
 
 msgid "Google Code import"
@@ -15532,6 +15547,9 @@ msgid "Managed Account"
 msgstr ""
 
 msgid "Manifest"
+msgstr ""
+
+msgid "Manifest file"
 msgstr ""
 
 msgid "Manifest file import"

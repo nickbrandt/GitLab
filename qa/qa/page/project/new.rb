@@ -24,7 +24,7 @@ module QA
         end
 
         view 'app/views/projects/_import_project_pane.html.haml' do
-          element :import_github, "icon('github', text: 'GitHub')" # rubocop:disable QA/ElementWithPattern
+          element :import_github, "sprite_icon('github'), _('GitHub')" # rubocop:disable QA/ElementWithPattern
         end
 
         view 'app/views/projects/project_templates/_built_in_templates.html.haml' do
