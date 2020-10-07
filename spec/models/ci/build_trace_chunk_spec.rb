@@ -597,6 +597,14 @@ RSpec.describe Ci::BuildTraceChunk, :clean_gitlab_redis_shared_state do
               expect { build_trace_chunk.persist_data! }
                 .to raise_error(described_class::FailedToPersistDataError)
             end
+
+            it 'does not allow flushing unpersisted chunk' do
+              build_trace_chunk.checksum = '12345'
+
+              expect { build_trace_chunk.persist_data! }
+                .to raise_error(described_class::FailedToPersistDataError,
+                                /Modifed build trace chunk detected/)
+            end
           end
         end
       end

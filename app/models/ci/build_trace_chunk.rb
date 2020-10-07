@@ -138,13 +138,15 @@ module Ci
     #
     def persist_data!
       in_lock(*lock_params) do         # exclusive Redis lock is acquired first
+        raise FailedToPersistDataError, 'Modifed build trace chunk detected' if has_changes_to_save?
+
         self.reset.then do |chunk|     # we ensure having latest lock_version
           chunk.unsafe_persist_data!   # we migrate the data and update data store
         end
       end
     rescue ActiveRecord::StaleObjectError
       raise FailedToPersistDataError, <<~MSG
-        data migration race condition detected
+        Data migration race condition detected
 
         store: #{data_store}
         build: #{build.id}
