@@ -58,7 +58,7 @@ RSpec.describe API::FeatureFlagScopes do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag_detailed_scopes', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag_detailed_scopes')
         expect(json_response.second).to include({ 'name' => 'flag_1', 'active' => true })
         expect(json_response.first).to include({ 'name' => 'flag_2', 'active' => true })
       end
@@ -104,7 +104,7 @@ RSpec.describe API::FeatureFlagScopes do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag_scopes', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag_scopes')
         expect(json_response.count).to eq(2)
         expect(json_response.first['environment_scope']).to eq(feature_flag.scopes[0].environment_scope)
         expect(json_response.second['environment_scope']).to eq(feature_flag.scopes[1].environment_scope)
@@ -141,7 +141,7 @@ RSpec.describe API::FeatureFlagScopes do
         subject
 
         expect(response).to have_gitlab_http_status(:created)
-        expect(response).to match_response_schema('public_api/v4/feature_flag_scope', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag_scope')
         expect(json_response['environment_scope']).to eq(params[:environment_scope])
         expect(json_response['active']).to eq(params[:active])
         expect(json_response['strategies']).to eq(Gitlab::Json.parse(params[:strategies]))
@@ -181,7 +181,7 @@ RSpec.describe API::FeatureFlagScopes do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag_scope', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag_scope')
         expect(json_response['id']).to eq(scope.id)
         expect(json_response['active']).to eq(scope.active)
         expect(json_response['environment_scope']).to eq(scope.environment_scope)
@@ -241,7 +241,7 @@ RSpec.describe API::FeatureFlagScopes do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag_scope', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag_scope')
         expect(json_response['id']).to eq(scope.id)
         expect(json_response['active']).to eq(params[:active])
         expect(json_response['strategies']).to eq(Gitlab::Json.parse(params[:strategies]))

@@ -51,7 +51,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flags', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flags')
         expect(json_response.count).to eq(2)
         expect(json_response.first['name']).to eq(feature_flag_1.name)
         expect(json_response.second['name']).to eq(feature_flag_2.name)
@@ -61,7 +61,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flags', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flags')
         expect(json_response.map { |f| f['version'] }).to eq(%w[legacy_flag legacy_flag])
       end
 
@@ -71,7 +71,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flags', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flags')
         expect(json_response.select { |f| f.key?('version') }).to eq([])
       end
 
@@ -81,7 +81,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flags', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flags')
         expect(json_response.select { |f| f.key?('strategies') }).to eq([])
       end
 
@@ -114,7 +114,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flags', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flags')
         expect(json_response).to eq([{
           'name' => 'feature1',
           'description' => nil,
@@ -141,7 +141,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flags', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flags')
         expect(json_response).to eq([])
       end
     end
@@ -156,7 +156,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flags', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flags')
         expect(json_response.map { |f| f['name'] }).to eq(%w[legacy_flag new_version_flag])
       end
 
@@ -170,7 +170,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flags', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flags')
         expect(json_response.map { |f| f['name'] }).to eq(['legacy_flag'])
       end
     end
@@ -186,7 +186,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(json_response['name']).to eq(feature_flag.name)
         expect(json_response['description']).to eq(feature_flag.description)
         expect(json_response['version']).to eq('legacy_flag')
@@ -204,7 +204,7 @@ RSpec.describe API::FeatureFlags do
         get api("/projects/#{project.id}/feature_flags/feature1", user)
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(json_response).to eq({
           'name' => 'feature1',
           'description' => nil,
@@ -263,7 +263,7 @@ RSpec.describe API::FeatureFlags do
       subject
 
       expect(response).to have_gitlab_http_status(:created)
-      expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+      expect(response).to match_response_schema('public_api/v4/feature_flag')
 
       feature_flag = project.operations_feature_flags.last
       expect(feature_flag.name).to eq(params[:name])
@@ -274,7 +274,7 @@ RSpec.describe API::FeatureFlags do
       subject
 
       expect(response).to have_gitlab_http_status(:created)
-      expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+      expect(response).to match_response_schema('public_api/v4/feature_flag')
 
       feature_flag = project.operations_feature_flags.last
       expect(feature_flag.version).to eq('legacy_flag')
@@ -286,7 +286,7 @@ RSpec.describe API::FeatureFlags do
       subject
 
       expect(response).to have_gitlab_http_status(:created)
-      expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+      expect(response).to match_response_schema('public_api/v4/feature_flag')
       expect(json_response['version']).to eq('legacy_flag')
     end
 
@@ -296,7 +296,7 @@ RSpec.describe API::FeatureFlags do
       subject
 
       expect(response).to have_gitlab_http_status(:created)
-      expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+      expect(response).to match_response_schema('public_api/v4/feature_flag')
       expect(json_response.key?('version')).to eq(false)
     end
 
@@ -314,7 +314,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:created)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(json_response['active']).to eq(false)
       end
     end
@@ -390,7 +390,7 @@ RSpec.describe API::FeatureFlags do
         post api("/projects/#{project.id}/feature_flags", user), params: params
 
         expect(response).to have_gitlab_http_status(:created)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(json_response).to match(hash_including({
           'name' => 'new-feature',
           'description' => nil,
@@ -415,7 +415,7 @@ RSpec.describe API::FeatureFlags do
         post api("/projects/#{project.id}/feature_flags", user), params: params
 
         expect(response).to have_gitlab_http_status(:created)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(json_response['active']).to eq(false)
 
         feature_flag = project.operations_feature_flags.last
@@ -435,7 +435,7 @@ RSpec.describe API::FeatureFlags do
         post api("/projects/#{project.id}/feature_flags", user), params: params
 
         expect(response).to have_gitlab_http_status(:created)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
 
         feature_flag = project.operations_feature_flags.last
         expect(feature_flag.name).to eq(params[:name])
@@ -462,7 +462,7 @@ RSpec.describe API::FeatureFlags do
         post api("/projects/#{project.id}/feature_flags", user), params: params
 
         expect(response).to have_gitlab_http_status(:created)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
 
         feature_flag = project.operations_feature_flags.last
         expect(feature_flag.name).to eq(params[:name])
@@ -492,7 +492,7 @@ RSpec.describe API::FeatureFlags do
         post api("/projects/#{project.id}/feature_flags", user), params: params
 
         expect(response).to have_gitlab_http_status(:created)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
 
         feature_flag = project.operations_feature_flags.last
         expect(feature_flag.name).to eq(params[:name])
@@ -554,7 +554,7 @@ RSpec.describe API::FeatureFlags do
         feature_flag = project.operations_feature_flags.last
         scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(feature_flag.name).to eq(params[:name])
         expect(scope.strategies).to eq([Gitlab::Json.parse(params[:strategy])])
         expect(feature_flag.version).to eq('legacy_flag')
@@ -564,7 +564,7 @@ RSpec.describe API::FeatureFlags do
         subject
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(json_response.slice('version', 'strategies')).to eq({
           'version' => 'legacy_flag',
           'strategies' => []
@@ -611,7 +611,7 @@ RSpec.describe API::FeatureFlags do
             subject
 
             scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
-            strategy_count = scope.strategies.select { |strategy| strategy['name'] == 'userWithId' }.count
+            strategy_count = scope.strategies.count { |strategy| strategy['name'] == 'userWithId' }
             expect(response).to have_gitlab_http_status(:ok)
             expect(strategy_count).to eq(1)
           end
@@ -676,7 +676,7 @@ RSpec.describe API::FeatureFlags do
 
           scope = feature_flag.scopes.find_by_environment_scope(params[:environment_scope])
           expect(response).to have_gitlab_http_status(:ok)
-          expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+          expect(response).to match_response_schema('public_api/v4/feature_flag')
           expect(scope.strategies)
             .to eq([{ name: 'userWithId', parameters: { userIds: 'Project:2' } }.deep_stringify_keys])
         end
@@ -685,7 +685,7 @@ RSpec.describe API::FeatureFlags do
           subject
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+          expect(response).to match_response_schema('public_api/v4/feature_flag')
           expect(json_response.slice('version', 'strategies')).to eq({
             'version' => 'legacy_flag',
             'strategies' => []
@@ -849,7 +849,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(feature_flag.reload.description).to eq('new description')
       end
 
@@ -859,7 +859,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(json_response['active']).to eq(false)
         expect(feature_flag.reload.active).to eq(false)
       end
@@ -870,7 +870,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(json_response['name']).to eq('new-name')
         expect(feature_flag.reload.name).to eq('new-name')
       end
@@ -881,7 +881,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(feature_flag.reload.description).to eq('other description')
       end
 
@@ -891,7 +891,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         feature_flag.reload
         expect(json_response).to eq({
           'name' => 'feature1',
@@ -918,7 +918,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         result = feature_flag.reload.strategies.map { |s| s.slice(:id, :name, :parameters).deep_symbolize_keys }
         expect(result).to eq([{
           id: strategy.id,
@@ -940,7 +940,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         result = feature_flag.reload.strategies.map { |s| s.slice(:id, :name, :parameters).deep_symbolize_keys }
         expect(result).to eq([{
           id: strategy.id,
@@ -961,7 +961,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         result = feature_flag.reload.strategies
           .map { |s| s.slice(:id, :name, :parameters).deep_symbolize_keys }
           .sort_by { |s| s[:name] }
@@ -987,7 +987,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         result = feature_flag.reload.strategies
           .map { |s| s.slice(:id, :name, :parameters).deep_symbolize_keys }
           .sort_by { |s| s[:name] }
@@ -1021,7 +1021,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         result = feature_flag.reload.strategies
           .map { |s| s.slice(:id, :name, :parameters).deep_symbolize_keys }
           .sort_by { |s| s[:name] }
@@ -1048,7 +1048,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         result = feature_flag.reload.strategies.first.scopes.map { |s| s.slice(:id, :environment_scope).deep_symbolize_keys }
         expect(result).to eq([{
           id: scope.id,
@@ -1072,7 +1072,7 @@ RSpec.describe API::FeatureFlags do
         put api("/projects/#{project.id}/feature_flags/feature1", user), params: params
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('public_api/v4/feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('public_api/v4/feature_flag')
         expect(feature_flag.reload.strategies.first.scopes.count).to eq(0)
       end
     end

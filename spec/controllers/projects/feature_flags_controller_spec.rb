@@ -90,7 +90,7 @@ RSpec.describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      is_expected.to match_response_schema('feature_flags', dir: 'ee')
+      is_expected.to match_response_schema('feature_flags')
     end
 
     it 'returns false for active when the feature flag is inactive even if it has an active scope' do
@@ -201,7 +201,7 @@ RSpec.describe Projects::FeatureFlagsController do
         recorded = ActiveRecord::QueryRecorder.new { subject }
 
         related_count = recorded.log
-          .select { |query| query.include?('operations_feature_flag') }.count
+          .count { |query| query.include?('operations_feature_flag') }
 
         expect(related_count).to be_within(5).of(2)
       end
@@ -263,7 +263,7 @@ RSpec.describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      is_expected.to match_response_schema('feature_flag', dir: 'ee')
+      is_expected.to match_response_schema('feature_flag')
     end
 
     it 'routes based on iid' do
@@ -439,7 +439,7 @@ RSpec.describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      is_expected.to match_response_schema('feature_flag', dir: 'ee')
+      is_expected.to match_response_schema('feature_flag')
     end
 
     context 'when the same named feature flag has already existed' do
@@ -473,7 +473,7 @@ RSpec.describe Projects::FeatureFlagsController do
         expect { subject }.to change { Operations::FeatureFlag.count }.by(1)
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('feature_flag')
         expect(json_response['active']).to eq(true)
         expect(Operations::FeatureFlag.last.active).to eq(true)
       end
@@ -867,7 +867,7 @@ RSpec.describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      is_expected.to match_response_schema('feature_flag', dir: 'ee')
+      is_expected.to match_response_schema('feature_flag')
     end
 
     context 'when user is reporter' do
@@ -976,7 +976,7 @@ RSpec.describe Projects::FeatureFlagsController do
     end
 
     it 'matches json schema' do
-      is_expected.to match_response_schema('feature_flag', dir: 'ee')
+      is_expected.to match_response_schema('feature_flag')
     end
 
     context 'when updates active' do
@@ -1008,7 +1008,7 @@ RSpec.describe Projects::FeatureFlagsController do
         put_request(feature_flag, { active: true })
 
         expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('feature_flag', dir: 'ee')
+        expect(response).to match_response_schema('feature_flag')
         expect(json_response['active']).to eq(true)
         expect(feature_flag.reload.active).to eq(true)
         expect(feature_flag.default_scope.reload.active).to eq(false)
@@ -1167,9 +1167,9 @@ RSpec.describe Projects::FeatureFlagsController do
         }])
 
         expect(response).to have_gitlab_http_status(:ok)
-        scope_json = json_response['scopes'].select do |s|
+        scope_json = json_response['scopes'].find do |s|
           s['environment_scope'] == 'production'
-        end.first
+        end
         expect(scope_json['strategies']).to eq([{
           "name" => "default",
           "parameters" => {}
@@ -1186,9 +1186,9 @@ RSpec.describe Projects::FeatureFlagsController do
         }])
 
         expect(response).to have_gitlab_http_status(:ok)
-        scope_json = json_response['scopes'].select do |s|
+        scope_json = json_response['scopes'].find do |s|
           s['environment_scope'] == 'production'
-        end.first
+        end
         expect(scope_json['strategies']).to eq([{
           "name" => "gradualRolloutUserId",
           "parameters" => {
@@ -1207,9 +1207,9 @@ RSpec.describe Projects::FeatureFlagsController do
         }])
 
         expect(response).to have_gitlab_http_status(:ok)
-        scope_json = json_response['scopes'].select do |s|
+        scope_json = json_response['scopes'].find do |s|
           s['environment_scope'] == 'production'
-        end.first
+        end
         expect(scope_json['strategies']).to eq([{
           "name" => "userWithId",
           "parameters" => { "userIds" => "sam,fred" }
@@ -1226,9 +1226,9 @@ RSpec.describe Projects::FeatureFlagsController do
         }])
 
         expect(response).to have_gitlab_http_status(:ok)
-        scope_json = json_response['scopes'].select do |s|
+        scope_json = json_response['scopes'].find do |s|
           s['environment_scope'] == 'production'
-        end.first
+        end
         expect(scope_json['strategies']).to eq([{
           "name" => "gradualRolloutUserId",
           "parameters" => {
@@ -1247,9 +1247,9 @@ RSpec.describe Projects::FeatureFlagsController do
         }])
 
         expect(response).to have_gitlab_http_status(:ok)
-        scope_json = json_response['scopes'].select do |s|
+        scope_json = json_response['scopes'].find do |s|
           s['environment_scope'] == 'production'
-        end.first
+        end
         expect(scope_json['strategies']).to eq([])
       end
 
@@ -1265,9 +1265,9 @@ RSpec.describe Projects::FeatureFlagsController do
         }])
 
         expect(response).to have_gitlab_http_status(:ok)
-        scope_json = json_response['scopes'].select do |s|
+        scope_json = json_response['scopes'].find do |s|
           s['environment_scope'] == 'production'
-        end.first
+        end
         expect(scope_json['strategies'].length).to eq(2)
         expect(scope_json['strategies']).to include({
           "name" => "gradualRolloutUserId",
@@ -1285,9 +1285,9 @@ RSpec.describe Projects::FeatureFlagsController do
         put_request(feature_flag, scopes_attributes: [{ id: scope.id }])
 
         expect(response).to have_gitlab_http_status(:ok)
-        scope_json = json_response['scopes'].select do |s|
+        scope_json = json_response['scopes'].find do |s|
           s['environment_scope'] == 'production'
-        end.first
+        end
         expect(scope_json['strategies']).to eq([{
           "name" => "default",
           "parameters" => {}
@@ -1301,9 +1301,9 @@ RSpec.describe Projects::FeatureFlagsController do
         put_request(feature_flag, scopes_attributes: [{ id: scope.id }])
 
         expect(response).to have_gitlab_http_status(:ok)
-        scope_json = json_response['scopes'].select do |s|
+        scope_json = json_response['scopes'].find do |s|
           s['environment_scope'] == 'production'
-        end.first
+        end
         expect(scope_json['strategies']).to eq([{
           "name" => "gradualRolloutUserId",
           "parameters" => { "groupId" => "default", "percentage" => "10" }
