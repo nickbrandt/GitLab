@@ -1299,6 +1299,9 @@ msgstr ""
 msgid "ACTION REQUIRED: Something went wrong while obtaining the Let's Encrypt certificate for GitLab Pages domain '%{domain}'"
 msgstr ""
 
+msgid "API Fuzzing"
+msgstr ""
+
 msgid "API Help"
 msgstr ""
 
@@ -11300,6 +11303,9 @@ msgid "Filter..."
 msgstr ""
 
 msgid "Find File"
+msgstr ""
+
+msgid "Find bugs in your code with API fuzzing."
 msgstr ""
 
 msgid "Find bugs in your code with coverage-guided fuzzing."
