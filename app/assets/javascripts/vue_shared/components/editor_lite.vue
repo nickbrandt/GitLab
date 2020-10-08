@@ -43,7 +43,7 @@ export default {
     editorOptions: {
       type: Object,
       required: false,
-      default: () => {},
+      default: () => ({}),
     },
   },
   data() {
