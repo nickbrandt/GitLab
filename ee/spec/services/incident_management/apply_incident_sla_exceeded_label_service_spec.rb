@@ -20,16 +20,16 @@ RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelService do
     end
 
     it 'does not add a label' do
-      expect { subject }.not_to change{ incident.labels.reload.count }
+      expect { subject }.not_to change { incident.labels.reload.count }
     end
   end
 
   it 'adds a label to the incident' do
-    expect { subject }.to change{ incident.labels.reload.count }
+    expect { subject }.to change { incident.labels.reload.count }
   end
 
   it 'adds a note that the label was added' do
-    expect { subject }.to change{ incident.resource_label_events.reload.count }
+    expect { subject }.to change { incident.resource_label_events.reload.count }
 
     event = incident.resource_label_events.first
     expect(event.action).to eq('add')
