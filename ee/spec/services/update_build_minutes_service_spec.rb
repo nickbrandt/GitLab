@@ -53,8 +53,21 @@ RSpec.describe UpdateBuildMinutesService do
         it 'creates a statistics in root namespace' do
           subject
 
-          expect(root_ancestor.namespace_statistics.reload.shared_runners_seconds)
-            .to eq(build.duration.to_i * 2)
+          expect(root_ancestor.namespace_statistics&.shared_runners_seconds)
+            .to be_nil
+        end
+
+        context 'with disabled feature flag :recursive_approach_for_all_projects in Namespace#all_projects' do
+          before do
+            stub_feature_flags(recursive_approach_for_all_projects: false)
+          end
+
+          it 'creates a statistics in root namespace' do
+            subject
+
+            expect(root_ancestor.namespace_statistics.reload.shared_runners_seconds)
+              .to eq(build.duration.to_i * 2)
+          end
         end
       end
 
