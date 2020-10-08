@@ -41,7 +41,7 @@ RSpec.describe RelativePositioning::Mover do
       [issue, { relative_position: pos }]
     end
 
-    ::Gitlab::Database::SetAll.set_all([:relative_position], mapping)
+    ::Gitlab::Database::BulkUpdate.execute([:relative_position], mapping)
   end
 
   def ids_in_position_order

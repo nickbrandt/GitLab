@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::Database::SetAll do
+RSpec.describe Gitlab::Database::BulkUpdate do
   describe 'error states' do
     let(:columns) { %i[title] }
 
@@ -19,33 +19,33 @@ RSpec.describe Gitlab::Database::SetAll do
     end
 
     it 'does not raise errors on valid inputs' do
-      expect { described_class.set_all(columns, mapping) }.not_to raise_error
+      expect { described_class.execute(columns, mapping) }.not_to raise_error
     end
 
     it 'expects a non-empty list of column names' do
-      expect { described_class.set_all([], mapping) }.to raise_error(ArgumentError)
+      expect { described_class.execute([], mapping) }.to raise_error(ArgumentError)
     end
 
     it 'expects all columns to be symbols' do
-      expect { described_class.set_all([1], mapping) }.to raise_error(ArgumentError)
+      expect { described_class.execute([1], mapping) }.to raise_error(ArgumentError)
     end
 
     it 'expects all columns to be valid columns on the tables' do
-      expect { described_class.set_all([:foo], mapping) }.to raise_error(ArgumentError)
+      expect { described_class.execute([:foo], mapping) }.to raise_error(ArgumentError)
     end
 
     it 'refuses to set ID' do
-      expect { described_class.set_all([:id], mapping) }.to raise_error(ArgumentError)
+      expect { described_class.execute([:id], mapping) }.to raise_error(ArgumentError)
     end
 
     it 'expects a non-empty mapping' do
-      expect { described_class.set_all(columns, []) }.to raise_error(ArgumentError)
+      expect { described_class.execute(columns, []) }.to raise_error(ArgumentError)
     end
 
     it 'expects all map values to be Hash instances' do
       bad_map = mapping.merge(build(:issue) => 2)
 
-      expect { described_class.set_all(columns, bad_map) }.to raise_error(ArgumentError)
+      expect { described_class.execute(columns, bad_map) }.to raise_error(ArgumentError)
     end
   end
 
@@ -56,7 +56,7 @@ RSpec.describe Gitlab::Database::SetAll do
     end
 
     expect do
-      described_class.set_all(%i[username admin], mapping)
+      described_class.execute(%i[username admin], mapping)
     end.not_to exceed_query_limit(1)
 
     # We have optimistically updated the values
@@ -84,7 +84,7 @@ RSpec.describe Gitlab::Database::SetAll do
     }
 
     expect do
-      described_class.set_all(%i[title], mapping)
+      described_class.execute(%i[title], mapping)
     end.not_to exceed_query_limit(2)
 
     expect([mr_a, i_a, i_b].map { |x| x.reset.title })
@@ -103,7 +103,7 @@ RSpec.describe Gitlab::Database::SetAll do
         i_b  => { title: 'Issue b' }
       }
 
-      described_class.set_all(%i[title], mapping)
+      described_class.execute(%i[title], mapping)
 
       expect([i_a, i_b].map { |x| x.reset.title })
         .to eq(['Issue a', 'Issue b'])

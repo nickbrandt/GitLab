@@ -111,7 +111,7 @@ module RelativePositioning
             { relative_position: desired_pos.clamp(lower_bound, upper_bound) }
           end
 
-          ::Gitlab::Database::SetAll.set_all([:relative_position], mapping, &:model_class)
+          ::Gitlab::Database::BulkUpdate.execute([:relative_position], mapping, &:model_class)
         end
       end
 

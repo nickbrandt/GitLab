@@ -33,7 +33,7 @@ down to ARel - the `UpdateManager` just does not support `update from`, so this
 is not expressible.
 
 The good news: We supply an abstraction to help you generate these kinds of
-updates, called `Gitlab::Database::SetAll`. This constructs queries such as the
+updates, called `Gitlab::Database::BulkUpdate`. This constructs queries such as the
 above, and uses binding parameters to avoid SQL injection.
 
 ## Usage
@@ -51,7 +51,7 @@ issue_a = Issue.find(..)
 issue_b = Issue.find(..)
 
 # Issues a single query:
-::Gitlab::Database::SetAll.set_all(%i[title weight], {
+::Gitlab::Database::BulkUpdate.execute(%i[title weight], {
   issue_a => { title: 'Very difficult issue', weight: 8 },
   issue_b => { title: 'Very easy issue', weight: 1 }
 })
@@ -69,7 +69,7 @@ issue_b = Issue.find(..)
 merge_request = MergeRequest.find(..)
 
 # Issues two queries
-::Gitlab::Database::SetAll.set_all(%i[title], {
+::Gitlab::Database::BulkUpdate.execute(%i[title], {
   issue_a => { title: 'A' },
   issue_b => { title: 'B' },
   merge_request => { title: 'B' }
@@ -90,7 +90,7 @@ objects = Foo.from_union([
 mapping = objects.to_h { |obj| [obj, bazzes[obj.id] }
     
 # Issues at most 2 queries
-::Gitlab::Database::SetAll.set_all(%i[baz], mapping) do |obj|
+::Gitlab::Database::BulkUpdate.execute(%i[baz], mapping) do |obj|
   obj.object_type.constantize
 end
 ```

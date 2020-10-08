@@ -23,13 +23,13 @@ module Gitlab
     #    issue_b => { title: 'That title', relative_position: 173 }
     #  }
     #
-    #  ::Gitlab::Database::SetAll.set_all(%i[title relative_position], mapping)
+    #  ::Gitlab::Database::BulkUpdate.execute(%i[title relative_position], mapping)
     #
     # Note that this is a very low level tool, and operates on the raw column
     # values. Enums/state fields must be translated into their underlying
     # representations, for example, and no hooks will be called.
     #
-    module SetAll
+    module BulkUpdate
       LIST_SEPARATOR = ', '
 
       class Setter
@@ -58,12 +58,14 @@ module Gitlab
           raise ArgumentError, 'invalid columns' if columns.blank? || columns.any? { |c| !c.is_a?(Symbol) }
           raise ArgumentError, 'cannot set ID' if columns.include?(:id)
 
-          ([:id] | columns).map do |name|
-            definition = model.column_for_attribute(name)
-            raise ArgumentError, "Unknown column: #{name}" unless definition.type
+          ([:id] | columns).map { |name| column_definition(model, name) }
+        end
 
-            definition
-          end
+        def self.column_definition(model, name)
+          definition = model.column_for_attribute(name)
+          raise ArgumentError, "Unknown column: #{name}" unless definition.type
+
+          definition
         end
 
         def self.value_mapping(mapping)
@@ -79,7 +81,7 @@ module Gitlab
 
         def log_name
           strong_memoize(:log_name) do
-            "SetAll #{table_name} #{columns.drop(1).map(&:name)}:#{mapping.size}"
+            "BulkUpdate #{table_name} #{columns.drop(1).map(&:name)}:#{mapping.size}"
           end
         end
 
@@ -152,7 +154,7 @@ module Gitlab
         end
       end
 
-      def self.set_all(columns, mapping, &to_class)
+      def self.execute(columns, mapping, &to_class)
         raise ArgumentError if mapping.blank?
 
         entries_by_class = mapping.group_by { |k, v| block_given? ? to_class.call(k) : k.class }
