@@ -205,7 +205,32 @@ the `order_due_date_and_labels_priority` method creates a very complex query.
 
 These types of queries are not supported. In these instances, you can use offset pagination.
 
-<!-- ### Offset pagination -->
+### Offset pagination
+
+There are times when the complexity of sorting is more than our keyset pagination can handle.
+
+For example in [`IssuesResolver`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/graphql/resolvers/issues_resolver.rb),
+when sorting by `priority_asc`, we can't use keyset pagination, as the ordering is much
+too complex (see [`issuable.rb`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/models/concerns/issuable.rb)).
+
+In cases like this, we can fallback to using regular offset pagination by returning a 
+`Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection` instead of an `ActiveRecord::Relation`
+
+For example:
+
+```ruby
+    def resolve(parent, finder, **args)
+      issues = apply_lookahead(Gitlab::Graphql::Loaders::IssuableLoader.new(parent, finder).batching_find_all)
+
+      if non_stable_cursor_sort?(args[:sort])
+        # Certain complex sorts are not supported by the stable cursor pagination yet.
+        # In these cases, we use offset pagination, so we return the correct connection.
+        Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection.new(issues)
+      else
+        issues
+      end
+    end
+```
 
 <!-- ### External pagination -->
 
