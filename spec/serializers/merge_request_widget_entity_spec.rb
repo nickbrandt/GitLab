@@ -88,11 +88,13 @@ RSpec.describe MergeRequestWidgetEntity do
   end
 
   describe 'codequality report artifacts', :request_store do
+    let(:merge_base_pipeline) { create(:ci_pipeline, :with_codequality_report, project: project) }
+
     before do
       project.add_developer(user)
 
       allow(resource).to receive_messages(
-        merge_base_pipeline: pipeline,
+        merge_base_pipeline: merge_base_pipeline,
         base_pipeline: pipeline,
         head_pipeline: pipeline
       )
@@ -101,10 +103,29 @@ RSpec.describe MergeRequestWidgetEntity do
     context 'with report artifacts' do
       let(:pipeline) { create(:ci_pipeline, :with_codequality_report, project: project) }
 
-      it 'has entries for 3 reference artifacts' do
-        expect(subject[:codeclimate][:merge_base_path]).to be_present
-        expect(subject[:codeclimate][:base_path]).to be_present
+      it 'has head_path and base_path entries' do
         expect(subject[:codeclimate][:head_path]).to be_present
+        expect(subject[:codeclimate][:base_path]).to be_present
+      end
+
+      context 'on pipelines for merged results' do
+        let(:pipeline) { create(:ci_pipeline, :merged_result_pipeline, :with_codequality_report, project: project) }
+
+        context 'with merge_base_pipelines enabled' do
+          it 'returns URLs from the head_pipeline and merge_base_pipeline' do
+            expect(subject[:codeclimate][:head_path]).not_to eq(subject[:codeclimate][:base_path])
+          end
+        end
+
+        context 'with merge_base_pipelines disabled' do
+          before do
+            stub_feature_flags(merge_base_pipelines: false)
+          end
+
+          it 'returns URLs from the head_pipeline and base_pipeline' do
+            expect(subject[:codeclimate][:head_path]).to eq(subject[:codeclimate][:base_path])
+          end
+        end
       end
     end
 

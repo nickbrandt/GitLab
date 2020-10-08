@@ -1600,7 +1600,7 @@ class MergeRequest < ApplicationRecord
   end
 
   def merge_base_pipeline
-    @merge_target_pipeline ||= project.ci_pipelines
+    @merge_base_pipeline ||= project.ci_pipelines
       .order(id: :desc)
       .find_by(sha: actual_head_pipeline.target_sha, ref: target_branch)
   end

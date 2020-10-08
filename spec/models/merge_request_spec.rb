@@ -3525,15 +3525,17 @@ RSpec.describe MergeRequest, factory_default: :keep do
       create(:merge_request, :with_merge_request_pipeline)
     end
 
-    let(:pre_merge_target_pipeline) do
+    let(:merge_base_pipeline) do
       create(:ci_pipeline, ref: merge_request.target_branch, sha: merge_request.target_branch_sha)
     end
 
-    it 'returns a pipeline pointing to a commit on the target ref' do
-      pre_merge_target_pipeline
+    before do
+      merge_base_pipeline
       merge_request.update_head_pipeline
+    end
 
-      expect(merge_request.merge_base_pipeline).to eq(pre_merge_target_pipeline)
+    it 'returns a pipeline pointing to a commit on the target ref' do
+      expect(merge_request.merge_base_pipeline).to eq(merge_base_pipeline)
     end
   end
 
