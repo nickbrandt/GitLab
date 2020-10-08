@@ -1,6 +1,7 @@
 <script>
 import { debounce } from 'lodash';
 import Editor from '~/editor/editor_lite';
+import { CONTENT_UPDATE_DEBOUNCE } from '~/editor/constants';
 
 function initEditorLite({ el, ...args }) {
   const editor = new Editor({
@@ -67,7 +68,9 @@ export default {
       ...this.editorOptions,
     });
 
-    this.editor.onDidChangeModelContent(debounce(this.onFileChange.bind(this), 250));
+    this.editor.onDidChangeModelContent(
+      debounce(this.onFileChange.bind(this), CONTENT_UPDATE_DEBOUNCE),
+    );
   },
   beforeDestroy() {
     this.editor.dispose();
