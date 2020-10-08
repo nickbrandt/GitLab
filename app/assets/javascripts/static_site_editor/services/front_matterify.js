@@ -1,4 +1,5 @@
 import jsYaml from 'js-yaml';
+import { noop } from 'lodash';
 
 const NEW_LINE = '\n';
 
@@ -39,7 +40,12 @@ export const frontMatterify = source => {
   }
 
   const matterStr = source.slice(index, offset);
-  const matter = jsYaml.safeLoad(matterStr);
+  let matter;
+  try {
+    matter = jsYaml.safeLoad(matterStr);
+  } catch (error) {
+    noop();
+  }
 
   let content = source.slice(offset + delimiter.length);
   let spacing = '';
