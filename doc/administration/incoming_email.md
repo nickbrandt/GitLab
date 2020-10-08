@@ -452,7 +452,7 @@ at the organization level in Office 365. This allows all mailboxes in the organi
 to receive sub-addressed mail:
 
 NOTE: **Note:**
-This seris of commands will enable sub-addressing at the organization
+This series of commands will enable sub-addressing at the organization
 level in Office 365. This will allow all mailboxes in the organization
 to receive sub-addressed mail.
 
