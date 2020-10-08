@@ -51,7 +51,7 @@ export default class Editor {
     const extensionsArray = typeof extensions === 'string' ? extensions.split(',') : extensions;
 
     extensionsArray.forEach(ext => {
-      const prefix = ext.indexOf('/') === -1 ? 'editor/' : '';
+      const prefix = ext.includes('/') ? '' : 'editor/';
       const trimmedExt = ext.replace(/^\//, '').trim();
       Editor.pushToImportsArray(promises, `~/${prefix}${trimmedExt}`);
     });
@@ -111,11 +111,11 @@ export default class Editor {
           });
         }
       })
+      .then(() => {
+        el.dispatchEvent(new Event('editor-ready'));
+      })
       .catch(e => {
         throw e;
-      })
-      .finally(() => {
-        el.dispatchEvent(new Event('editor-ready'));
       });
 
     this.instances.push(instance);
