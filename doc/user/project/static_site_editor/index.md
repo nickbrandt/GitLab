@@ -50,7 +50,7 @@ Middleman sites for now. You have to use a specific site template to start
 using it. The project template is configured to deploy a [Middleman](https://middlemanapp.com/)
 static website with [GitLab Pages](../pages/index.md).
 
-Once your website is up and running, an **Edit this page** displays on
+Once your website is up and running, an **Edit this page** button displays on
 the bottom-left corner of its pages:
 
 ![Edit this page button](img/edit_this_page_button_v12_10.png)
@@ -82,8 +82,8 @@ easily edit your content.
 [Static Site Editor - Middleman](https://gitlab.com/gitlab-org/project-templates/static-site-editor-middleman)
 template. You can either [fork it](../repository/forking_workflow.md#creating-a-fork)
 or [create a new project from a template](../../../gitlab-basics/create-project.md#built-in-templates).
-1. Edit the [`data/config.yml`](#static-site-generator-configuration) file, and replace the `<username>` and `<project-name>` with the proper values for your project's path. See ["Static Site Generator Configuration"](#static-site-generator-configuration) for more details.
-1. (Optional) Edit the [`.gitlab/static-site-editor.yml`](#static-site-editor-configuration-file) file. See ["Static Site Editor Configuration File"](#static-site-generator-configuration) for more details.
+1. Edit the [`data/config.yml`](#static-site-generator-configuration) file, and replace the `<username>` and `<project-name>` with the proper values for your project's path. See ["Static Site Generator configuration"](#static-site-generator-configuration) for more details.
+1. (Optional) Edit the [`.gitlab/static-site-editor.yml`](#static-site-editor-configuration-file) file. See ["Static Site Editor configuration file"](#static-site-editor-configuration-file) for more details.
 1. Committing the edits to these files triggers a CI/CD pipeline to deploy your project with GitLab Pages.
 1. When the pipeline finishes, from your project's left-side menu, go to **Settings > Pages** to find the URL of your new website.
 1. Visit your website and look at the bottom-left corner of the screen to see the new **Edit this page** button.
@@ -116,8 +116,8 @@ You can customize the behavior of a project which uses the Static Site Editor wi
 the following configuration files:
 
 - The `.gitlab/static-site-editor.yml` customizes the behavior of the Static Site Editor.
-- Static Site Generator Configuration files, such as `data/config.yml`, customize
-  the behavior of the project itself. It controls the **Edit this page** link when
+- Static Site Generator configuration files, such as `data/config.yml`, customize
+  the behavior of the project itself. It controls the **Edit this page** button when
   the site is generated.
 
 ### Static Site Editor configuration file
@@ -134,7 +134,7 @@ The following entries are supported in `.gitlab/static-site-editor.yml`:
 NOTE: **Note:**
 Although Middleman is the only Static Site Generator officially supported by the
 Static Site Editor, you can still use others. See
-[Static Site Generator Configuration](#static-site-generator-configuration) for more details.
+[Static Site Generator configuration](#static-site-generator-configuration) for more details.
 
 This indicates which Static Site Generator tool is used to generate the site.
 The only currently supported value is `middleman`.
@@ -214,7 +214,7 @@ mounts:
 
 Middleman uses the `data/config.yml` configuration file in the
 [`layout.erb`](https://gitlab.com/gitlab-org/project-templates/static-site-editor-middleman/-/blob/master/source/layouts/layout.erb)
-to render an **Edit this page** link, which opens the page in the Static Site Editor.
+to render an **Edit this page** button, which opens the page in the Static Site Editor.
 In the default version of the file created by the Static Site Editor Middleman
 project template, you must replace the `<username>` and `<project-name>` with the
 proper values for your project's path.
@@ -228,7 +228,7 @@ Although Middleman is the only Static Site Generator currently officially suppor
 by the Static Site Editor, you can configure your project's build and deployment
 to use a different Static Site Generator. In this case, use the Middleman layout
 as an example, and follow a similar approach to properly render an **Edit this page**
-link in your Static Site Generator's layout.
+button in your Static Site Generator's layout.
 
 ## Limitations
 
