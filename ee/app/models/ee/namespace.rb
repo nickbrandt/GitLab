@@ -30,6 +30,8 @@ module EE
       has_one :gitlab_subscription
       has_one :elasticsearch_indexed_namespace
 
+      has_many :compliance_management_frameworks, class_name: "ComplianceManagement::Framework"
+
       accepts_nested_attributes_for :gitlab_subscription, update_only: true
       accepts_nested_attributes_for :namespace_limit
 
