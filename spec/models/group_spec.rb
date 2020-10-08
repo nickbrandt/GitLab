@@ -235,7 +235,7 @@ RSpec.describe Group do
       end
 
       context 'for a child group' do
-        let_it_be(:sub_group) { create(:group, parent: group) }
+        let(:sub_group) { create(:group, parent: group) }
 
         it 'is valid when parent group allows' do
           sub_group.require_two_factor_authentication = true
@@ -248,7 +248,7 @@ RSpec.describe Group do
           sub_group.require_two_factor_authentication = true
 
           expect(sub_group).to be_invalid
-          expect(sub_group.errors[:require_two_factor_authentication]).to include('require two factor authentication is forbidden by a parent group')
+          expect(sub_group.errors[:require_two_factor_authentication]).to include('is forbidden by a top-level group')
         end
       end
     end

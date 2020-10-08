@@ -591,13 +591,13 @@ class Group < Namespace
   end
 
   def two_factor_authentication_allowed
-    return if parent_id.nil?
+    return unless has_parent?
     return unless require_two_factor_authentication
 
     ancestor_settings = ancestors.find_by(parent_id: nil).namespace_settings
     return if ancestor_settings.allow_mfa_for_subgroups
 
-    errors.add(:require_two_factor_authentication, "require two factor authentication is forbidden by a parent group")
+    errors.add(:require_two_factor_authentication, _('is forbidden by a top-level group'))
   end
 
   def members_from_self_and_ancestor_group_shares

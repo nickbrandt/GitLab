@@ -4,7 +4,7 @@ class NamespaceSetting < ApplicationRecord
   belongs_to :namespace, inverse_of: :namespace_settings
 
   validate :default_branch_name_content
-  validate :allow_mfa_for_group, on: :update, if: :allow_mfa_for_subgroups_changed?
+  validate :allow_mfa_for_group
 
   NAMESPACE_SETTINGS_PARAMS = [:default_branch_name].freeze
 
@@ -19,8 +19,8 @@ class NamespaceSetting < ApplicationRecord
   end
 
   def allow_mfa_for_group
-    if namespace&.parent_id
-      errors.add(:allow_mfa_for_subgroups, "allow MFA setting is not allowed since group is not top-level group.")
+    if namespace&.subgroup? && allow_mfa_for_subgroups == false
+      errors.add(:allow_mfa_for_subgroups, _('is not allowed since the group is not top-level group.'))
     end
   end
 end
