@@ -13,7 +13,7 @@ description: "The static site editor enables users to edit content on static web
 > - Support for adding images through the WYSIWYG editor [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216640) in GitLab 13.1.
 > - Markdown front matter hidden on the WYSIWYG editor [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216834) in GitLab 13.1.
 > - Support for `*.md.erb` files [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/223171) in GitLab 13.2.
-> - Non-Markdown content blocks uneditable on the WYSIWYG mode [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216836) in GitLab 13.3.
+> - Non-Markdown content blocks are not editable on the WYSIWYG mode [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216836) in GitLab 13.3.
 > - Ability to edit page front matter [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/235921) in GitLab 13.4.
 
 DANGER: **Danger:**
@@ -50,7 +50,7 @@ Middleman sites for now. You have to use a specific site template to start
 using it. The project template is configured to deploy a [Middleman](https://middlemanapp.com/)
 static website with [GitLab Pages](../pages/index.md).
 
-Once your website is up and running, you'll see a button **Edit this page** on
+Once your website is up and running, an **Edit this page** displays on
 the bottom-left corner of its pages:
 
 ![Edit this page button](img/edit_this_page_button_v12_10.png)
@@ -83,17 +83,17 @@ easily edit your content.
 template. You can either [fork it](../repository/forking_workflow.md#creating-a-fork)
 or [create a new project from a template](../../../gitlab-basics/create-project.md#built-in-templates).
 1. Edit the [`data/config.yml`](#static-site-generator-configuration) file, and replace the `<username>` and `<project-name>` with the proper values for your project's path. See ["Static Site Generator Configuration"](#static-site-generator-configuration) for more details.
-1. Optionally edit the [`.gitlab/static-site-editor.yml`](#static-site-editor-configuration-file) file. See ["Static Site Editor Configuration File"](#static-site-generator-configuration) for more details.
-1. Commiting the edits to these files will trigger a CI/CD pipeline to deploy your project with GitLab Pages.
+1. (Optional) Edit the [`.gitlab/static-site-editor.yml`](#static-site-editor-configuration-file) file. See ["Static Site Editor Configuration File"](#static-site-generator-configuration) for more details.
+1. Committing the edits to these files triggers a CI/CD pipeline to deploy your project with GitLab Pages.
 1. When the pipeline finishes, from your project's left-side menu, go to **Settings > Pages** to find the URL of your new website.
 1. Visit your website and look at the bottom-left corner of the screen to see the new **Edit this page** button.
 
-Anyone satisfying the [requirements](#requirements) will be able to edit the
+Anyone satisfying the [requirements](#requirements) can edit the
 content of the pages without prior knowledge of Git or of your site's
 codebase.
 
 NOTE: **Note:**
-From GitLab 13.1 onwards, the YAML front matter of Markdown files is hidden on the
+From GitLab 13.1 onward, the YAML front matter of Markdown files is hidden on the
 WYSIWYG editor to avoid unintended changes. To edit it, use the Markdown editing mode, the regular
 GitLab file editor, or the Web IDE.
 
@@ -110,31 +110,38 @@ company and a new feature has been added to the company product.
 1. You edit the file right there and click **Submit changes**.
 1. A new merge request is automatically created and you assign it to your colleague for review.
 
-## Configuration Files
+## Configuration files
 
-There are two types of configuration files used to customize the behavior of a project which uses the Static Site Editor.
+You can customize the behavior of a project which uses the Static Site Editor with
+the following configuration files:
 
-1. The `.gitlab/static-site-editor.yml` is used to customize the behavior of the Static Site Editor.
-1. Static Site Generator Configuration files, such as `data/config.yml`, may be used to customize the behavior of the project itself. For now, it controls the "Edit this page" link when the site is generated. 
+- The `.gitlab/static-site-editor.yml` customizes the behavior of the Static Site Editor.
+- Static Site Generator Configuration files, such as `data/config.yml`, customize
+  the behavior of the project itself. It controls the **Edit this page** link when
+  the site is generated.
 
-### Static Site Editor Configuration File
+### Static Site Editor configuration file
 
-The `.gitlab/static-site-editor.yml` configuration file contains entries which can be used to customize behavior of the Static Site Editor.
-
-If the file does not exist, default values which support a default Middleman project configuration will be used. The [Static Site Editor - Middleman](https://gitlab.com/gitlab-org/project-templates/static-site-editor-middleman) project template generates a file which is pre-populated with these defaults.
+The `.gitlab/static-site-editor.yml` configuration file contains entries you can
+use to customize behavior of the Static Site Editor. If the file does not exist
+default values which support a default Middleman project configuration are used.
+The [Static Site Editor - Middleman](https://gitlab.com/gitlab-org/project-templates/static-site-editor-middleman) project template generates a file pre-populated with these defaults.
 
 The following entries are supported in `.gitlab/static-site-editor.yml`:
 
 #### `static_site_generator`
 
 NOTE: **Note:**
-Although Middleman is the only Static Site Generator currently officially supported by the Static Site Editor, you can still use others. See [Static Site Generator Configuration](#static-site-generator-configuration) for more details.
+Although Middleman is the only Static Site Generator officially supported by the
+Static Site Editor, you can still use others. See
+[Static Site Generator Configuration](#static-site-generator-configuration) for more details.
 
-This indicates which Static Site Generator tool is used to generate the site. The only currently supported value is `middleman`.
+This indicates which Static Site Generator tool is used to generate the site.
+The only currently supported value is `middleman`.
 
-- Type: String.
-- Supported values: `middleman`.
-- Default value: `middleman`.
+- **Type** - String
+- **Supported values** - `middleman`
+- **Default value** - `middleman`
 
 Example:
 
@@ -145,13 +152,15 @@ static_site_generator: middleman
 #### `image_upload_path`
 
 NOTE: **Note:**
-Support for uploading images in the Static Site Editor is still in progress, so this entry currently has no effect. 
+Support for uploading images in the Static Site Editor is still in progress, so this
+entry currently has no effect.
 
-This indicates the path in which newly uploaded image files will be placed.
+This indicates the path in which newly uploaded image files are placed.
 
-- Type: String.
-- Supported values: Any path relative to the root of the project. Leading and trailing slashes should not be included.
-- Default value: `source/images`.
+- **Type** - String.
+- **Supported values** - Any path relative to the root of the project. Don't include
+  leading or trailing slashes.
+- **Default value** - `source/images`
 
 Example:
 
@@ -162,22 +171,30 @@ image_upload_path: source/images
 #### `mounts`
 
 NOTE: **Note:**
-Support for mounts in the Static Site Editor is still in progress, so this entry currently has no effect.
+Support for mounts in the Static Site Editor is still in progress, so this entry
+currently has no effect.
 
-This is an array of `source` + `target` mapping pairs. It allows the mapping of a path relative to the web root to the full repository path, so that images and other files referenced in a page’s source can be properly resolved and rendered in the WYSIWYG editor. This approach is similar to [Route Maps in GitLab](../../../ci/review_apps/#route-maps), and the [`mounts` config for Hugo](https://gohugo.io/hugo-modules/configuration/#module-config-mounts). 
+This is an array of `source` + `target` mapping pairs. It allows the mapping of a
+path relative to the web root to the full repository path, so that images and other
+files referenced in a page’s source can be properly resolved and rendered in the
+WYSIWYG editor. This approach is similar to
+[Route Maps in GitLab](../../../ci/review_apps/#route-maps), and the
+[`mounts` configuration for Hugo](https://gohugo.io/hugo-modules/configuration/#module-config-mounts).
 
 If the `target` is the top level of the web root, the value may be specified as an empty quoted string.
 
-- Type: An array, with entries consisting of `source` + `target` mapping pairs, which are Strings.
-- Supported values:
-  - `source`: The path relative to the repository's project root. Leading and trailing slashes should not be included.
-  - `target`: Where the content relative to the source should considered to be mounted, relative to the web root. Leading and trailing slashes should not be included.
-- Default value:
+- **Type** - An array, with entries consisting of `source` + `target` mapping pairs, which are Strings.
+- **Supported values**
+  - `source` - The path relative to the repository's project root. Don't include
+    leading or trailing slashes.
+  - `target` - Where the content relative to the source should considered to be
+    mounted, relative to the web root. Don't include leading or trailing slashes.
+- **Default value**
 
-    ```yaml
-      - source: source
-        target: ''
-    ```
+  ```yaml
+    - source: source
+      target: ''
+  ```
 
 Example:
 
@@ -191,18 +208,29 @@ mounts:
     target: different
 ```
 
-### Static Site Generator Configuration
+### Static Site Generator configuration
 
 #### `data/config.yml`
 
-The `data/config.yml` configuration file is used by Middleman in the [layout.erb](https://gitlab.com/gitlab-org/project-templates/static-site-editor-middleman/-/blob/master/source/layouts/layout.erb) to render an "Edit this page" link, which will automatically open the page in the Static Site Editor. In the default version of the file which is created by the Static Site Editor Middleman project template, you must replace the `<username>` and `<project-name>` with the proper values for your project's path.
+Middleman uses the `data/config.yml` configuration file in the
+[`layout.erb`](https://gitlab.com/gitlab-org/project-templates/static-site-editor-middleman/-/blob/master/source/layouts/layout.erb)
+to render an **Edit this page** link, which opens the page in the Static Site Editor.
+In the default version of the file created by the Static Site Editor Middleman
+project template, you must replace the `<username>` and `<project-name>` with the
+proper values for your project's path.
 
-Other Static Site Generators used with the Static Site Generator may use different configuration files or approaches.
+Other Static Site Generators used with the Static Site Generator may use different
+configuration files or approaches.
 
 #### Using Other Static Site Generators
 
-Although Middleman is the only Static Site Generator currently officially supported by the Static Site Editor, you still have the option to configure your project's build and deployment to use a different Static Site Generator. In this case, you can use the Middleman layout as an example, and follow a similar approach to properly render an "Edit this page" link in your Static Site Generator's layout.
+Although Middleman is the only Static Site Generator currently officially supported
+by the Static Site Editor, you can configure your project's build and deployment
+to use a different Static Site Generator. In this case, use the Middleman layout
+as an example, and follow a similar approach to properly render an **Edit this page**
+link in your Static Site Generator's layout.
 
 ## Limitations
 
-- The Static Site Editor still cannot be quickly added to existing Middleman sites. Follow this [epic](https://gitlab.com/groups/gitlab-org/-/epics/2784) for updates.
+- The Static Site Editor still cannot be quickly added to existing Middleman sites.
+  Follow this [epic](https://gitlab.com/groups/gitlab-org/-/epics/2784) for updates.
