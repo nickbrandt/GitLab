@@ -163,6 +163,9 @@ Beneath the highlight bar, GitLab displays a summary that includes the following
 - `full_query`
 - Monitoring tool
 
+Comments are displayed in threads, but can be displayed chronologically
+[in a timeline view](#timeline-view).
+
 ### Alert details
 
 Incidents show the details of linked alerts in a separate tab. To populate this
@@ -171,3 +174,13 @@ tab, the incident must have been created with a linked alert. Incidents
 field populated.
 
 ![Incident alert details](./img/incident_alert_details_v13_4.png)
+
+### Timeline view
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/227836) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.5.
+
+To quickly see the latest updates on an incident, click
+**{comments}** **Turn timeline view on** in the comment bar to display comments
+un-threaded and ordered chronologically, newest to oldest:
+
+![Timeline view toggle](./img/timeline_view_toggle_v13_5.png)
