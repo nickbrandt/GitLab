@@ -16252,6 +16252,11 @@ type RootStorageStatistics {
   packagesSize: Float!
 
   """
+  The CI pipeline artifacts size in bytes
+  """
+  pipelineArtifactsSize: Float!
+
+  """
   The Git repository size in bytes
   """
   repositorySize: Float!

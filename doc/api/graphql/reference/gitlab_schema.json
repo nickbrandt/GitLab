@@ -46996,6 +46996,24 @@
               "deprecationReason": null
             },
             {
+              "name": "pipelineArtifactsSize",
+              "description": "The CI pipeline artifacts size in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "repositorySize",
               "description": "The Git repository size in bytes",
               "args": [
