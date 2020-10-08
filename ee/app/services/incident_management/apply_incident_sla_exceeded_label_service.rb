@@ -13,15 +13,24 @@ module IncidentManagement
       return if incident.label_ids.include?(label.id)
 
       incident.labels << label
+      add_resource_event
+
+      label
     end
 
     private
 
     attr_reader :incident, :label
 
+    def add_resource_event
+      ResourceEvents::ChangeLabelsService
+        .new(incident, User.alert_bot)
+        .execute(added_labels: [label])
+    end
+
     def incident_exceeded_label
       ::IncidentManagement::CreateIncidentSlaExceededLabelService
-        .new(project, current_user)
+        .new(project)
         .execute
         .payload[:label]
     end

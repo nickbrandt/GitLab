@@ -3,10 +3,10 @@
 module IncidentManagement
   class CreateIncidentSlaExceededLabelService < BaseService
     LABEL_PROPERTIES = {
-      title: 'SLA exceeded',
-      color: '#7E6AB0',
+      title: 'missed::SLA',
+      color: '#D9534F',
       description: <<~DESCRIPTION.chomp
-        This incident was not closed before the SLA (Service Level Agreement) time exceeded
+        Incidents that have missed the targeted SLA (Service Level Agreement).
       DESCRIPTION
     }.freeze
 
