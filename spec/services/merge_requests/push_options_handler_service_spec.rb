@@ -680,6 +680,68 @@ RSpec.describe MergeRequests::PushOptionsHandlerService do
     end
   end
 
+  describe '`unassign` push option' do
+    let(:push_options) { { assign: { user2.id => 1, user3.id => 1 }, unassign: { user1.id => 1, user3.id => 1 } } }
+
+    context 'with a new branch' do
+      let(:changes) { new_branch_changes }
+
+      it_behaves_like 'a service that does not create a merge request'
+
+      it 'adds an error to the service' do
+        service.execute
+
+        expect(service.errors).to include(error_mr_required)
+      end
+
+      context 'when coupled with the `create` push option' do
+        let(:push_options) { { create: true, assign: { user2.id => 1, user3.id => 1 }, unassign: { user1.id => 1, user3.id => 1 } } }
+
+        it_behaves_like 'a service that can create a merge request'
+        it_behaves_like 'a service that can change one assignee of a merge request'
+      end
+    end
+
+    context 'with an existing branch but no open MR' do
+      let(:changes) { existing_branch_changes }
+
+      it_behaves_like 'a service that does not create a merge request'
+
+      it 'adds an error to the service' do
+        service.execute
+
+        expect(service.errors).to include(error_mr_required)
+      end
+
+      context 'when coupled with the `create` push option' do
+        let(:push_options) { { create: true, assign: { user2.id => 1, user3.id => 1 }, unassign: { user1.id => 1, user3.id => 1 } } }
+
+        it_behaves_like 'a service that can create a merge request'
+        it_behaves_like 'a service that can change one assignee of a merge request'
+      end
+    end
+
+    context 'with an existing branch that has a merge request open' do
+      let(:changes) { existing_branch_changes }
+      let!(:merge_request) { create(:merge_request, source_project: project, source_branch: source_branch)}
+
+      it_behaves_like 'a service that does not create a merge request'
+      it_behaves_like 'a service that can change one assignee of a merge request'
+    end
+
+    context 'with a deleted branch' do
+      let(:changes) { deleted_branch_changes }
+
+      it_behaves_like 'a service that does nothing'
+    end
+
+    context 'with the project default branch' do
+      let(:changes) { default_branch_changes }
+
+      it_behaves_like 'a service that does nothing'
+    end
+  end
+
   describe 'multiple pushed branches' do
     let(:push_options) { { create: true } }
     let(:changes) do
