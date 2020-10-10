@@ -440,6 +440,36 @@ graph LR
 ----
 ```
 
+#### Kroki
+
+Kroki supports more than a dozen diagram libraries.
+To make Kroki available in GitLab, a GitLab administrator needs to enable it first.
+Read more in [Kroki & GitLab](../administration/integration/kroki.md).
+
+Once enabled, you will be able to create a wide variety of diagrams in AsciiDoc and Markdown documents.
+Here's an example using a GraphViz diagram:
+
+**AsciiDoc**
+
+```plaintext
+[graphviz]
+....
+digraph G {
+  Hello->World
+}
+....
+```
+
+**Markdown**
+
+````markdown
+```graphviz
+digraph G {
+  Hello->World
+}
+```
+````
+
 #### PlantUML
 
 To make PlantUML available in GitLab, a GitLab administrator needs to enable it first.
