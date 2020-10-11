@@ -13,7 +13,7 @@ export default {
     totalDuration() {
       return formatPipelineDuration(this.counts.totalDuration);
     },
-    entries() {
+    statistics() {
       return [
         {
           title: s__('PipelineCharts|Total:'),
@@ -42,7 +42,7 @@ export default {
 </script>
 <template>
   <ul>
-    <template v-for="({ title, value }, index) in entries">
+    <template v-for="({ title, value }, index) in statistics">
       <li :key="index">
         <span>{{ title }}</span>
         <strong>{{ value }}</strong>
