@@ -1,10 +1,16 @@
 <script>
 import linkifyHtml from 'linkifyjs/html';
 import LineNumber from './line_number.vue';
+import { sanitize } from '~/lib/dompurify';
 
 const linkifyOptions = {
   className: '',
   defaultProtocol: 'https',
+  validate: {
+    url: function(value) {
+      return /^(http|ftp)s?:\/\//.test(value);
+    },
+  },
 };
 
 export default {
@@ -26,7 +32,7 @@ export default {
       return h('span', {
         class: ['gl-white-space-pre-wrap', content.style],
         domProps: {
-          innerHTML: linkifyHtml(content.text, linkifyOptions),
+          innerHTML: sanitize(linkifyHtml(content.text, linkifyOptions), { ALLOWED_TAGS: ['a'] }),
         },
       });
     });
