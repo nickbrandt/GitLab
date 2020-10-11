@@ -2,6 +2,7 @@ import {
   preparePipelineGraphData,
   createUniqueJobId,
   generateJobNeedsDict,
+  formatPipelineDuration,
 } from '~/pipelines/utils';
 
 describe('utils functions', () => {
@@ -206,6 +207,33 @@ describe('utils functions', () => {
         [uniqueJobName3]: [uniqueJobName1, uniqueJobName2],
         [uniqueJobName4]: [uniqueJobName3, uniqueJobName1, uniqueJobName2],
       });
+    });
+  });
+});
+
+describe('formatPipelineDuration', () => {
+  it('formats durations >= 1 day correctly', () => {
+    const oneDay = 60 * 60 * 24;
+
+    expect(formatPipelineDuration(oneDay)).toBe('24:00:00');
+    expect(formatPipelineDuration(oneDay * 2)).toBe('48:00:00');
+    expect(formatPipelineDuration(oneDay + 60 * 5 + 34)).toBe('24:05:34');
+    expect(formatPipelineDuration(oneDay * 10)).toBe('240:00:00');
+    expect(formatPipelineDuration(oneDay * 100)).toBe('2400:00:00');
+  });
+
+  describe('durations < 1 day', () => {
+    it.each`
+      input    | output
+      ${0}     | ${'00:00:00'}
+      ${10}    | ${'00:00:10'}
+      ${60}    | ${'00:01:00'}
+      ${61}    | ${'00:01:01'}
+      ${3600}  | ${'01:00:00'}
+      ${4660}  | ${'01:17:40'}
+      ${86399} | ${'23:59:59'}
+    `('returns $output for $input', ({ input, output }) => {
+      expect(formatPipelineDuration(input)).toBe(output);
     });
   });
 });
