@@ -80,6 +80,42 @@ func TestRegisterGoCloudURLOpeners(t *testing.T) {
 	require.Equal(t, []string{"azblob"}, cfg.ObjectStorageConfig.URLMux.BucketSchemes())
 }
 
+func TestLoadDefaultConfig(t *testing.T) {
+	config := ``
+
+	tmpFile, cfg := loadTempConfig(t, config)
+	defer os.Remove(tmpFile.Name())
+
+	expected := Config{
+		ImageResizerConfig: &ImageResizerConfig{
+			MaxScalerProcs: DefaultImageResizerMaxScalerProcs,
+			MaxFilesize:    DefaultImageResizerMaxFilesize,
+		},
+	}
+
+	require.Equal(t, expected, *cfg)
+}
+
+func TestLoadImageResizerConfig(t *testing.T) {
+	config := `
+[image_resizer]
+max_scaler_procs = 200
+max_filesize = 350000
+`
+
+	tmpFile, cfg := loadTempConfig(t, config)
+	defer os.Remove(tmpFile.Name())
+
+	require.NotNil(t, cfg.ImageResizerConfig, "Expected image resizer config")
+
+	expected := ImageResizerConfig{
+		MaxScalerProcs: 200,
+		MaxFilesize:    350000,
+	}
+
+	require.Equal(t, expected, *cfg.ImageResizerConfig)
+}
+
 func loadTempConfig(t *testing.T, config string) (f *os.File, cfg *Config) {
 	tmpFile, err := ioutil.TempFile(os.TempDir(), "test-")
 	require.NoError(t, err)
