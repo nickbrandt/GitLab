@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-class DisallowTwoFaWorker # rubocop:disable Scalability/IdempotentWorker
+class DisallowTwoFactorForSubgroupsWorker
   include ApplicationWorker
   include ExceptionBacktrace
 
   INTERVAL = 2.seconds.to_i
 
   feature_category :subgroups
+  idempotent!
 
   def perform(group_id)
     begin
@@ -21,7 +22,7 @@ class DisallowTwoFaWorker # rubocop:disable Scalability/IdempotentWorker
       delay = index * INTERVAL
 
       with_context(namespace: subgroup) do
-        DisallowTwoFaForSubgroupsWorker.perform_in(delay, subgroup.id)
+        DisallowTwoFactorForGroupWorker.perform_in(delay, subgroup.id)
       end
     end
     # rubocop: enable CodeReuse/ActiveRecord

@@ -116,7 +116,7 @@ module EE
 
       override :allowed_settings_params
       def allowed_settings_params
-        @allowed_settings_params ||= ::Groups::UpdateService::SETTINGS_PARAMS + EE_SETTINGS_PARAMS
+        @allowed_settings_params ||= super + EE_SETTINGS_PARAMS
       end
 
       def log_audit_event

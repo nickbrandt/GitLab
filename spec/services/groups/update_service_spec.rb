@@ -321,7 +321,7 @@ RSpec.describe Groups::UpdateService do
     end
 
     it 'enqueues update subgroups and its members' do
-      expect(DisallowTwoFaWorker).to receive(:perform_async).with(group.id)
+      expect(DisallowTwoFactorForSubgroupsWorker).to receive(:perform_async).with(group.id)
 
       subject
     end

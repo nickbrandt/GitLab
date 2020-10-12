@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-class DisallowTwoFaForSubgroupsWorker # rubocop:disable Scalability/IdempotentWorker
+class DisallowTwoFactorForGroupWorker
   include ApplicationWorker
   include ExceptionBacktrace
 
   feature_category :subgroups
+  idempotent!
 
   def perform(group_id)
     begin

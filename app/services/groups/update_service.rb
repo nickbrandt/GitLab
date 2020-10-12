@@ -99,11 +99,12 @@ module Groups
 
     def update_two_factor_requirement_for_subgroups
       settings = group.namespace_settings
-      return if settings.allow_mfa_for_subgroups
 
+      return if settings.allow_mfa_for_subgroups
+      binding.pry
       if settings.previous_changes.include?(:allow_mfa_for_subgroups)
         # enque in batches members update
-        DisallowTwoFaWorker.perform_async(group.id)
+        DisallowTwoFactorForSubgroupsWorker.perform_async(group.id)
       end
     end
 
@@ -129,7 +130,7 @@ module Groups
     end
 
     def allowed_settings_params
-      @allowed_settings_params ||= SETTINGS_PARAMS
+      SETTINGS_PARAMS
     end
 
     def valid_share_with_group_lock_change?

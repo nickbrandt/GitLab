@@ -84,9 +84,9 @@
   - 1
 - - detect_repository_languages
   - 1
-- - disallow_two_fa
+- - disallow_two_factor_for_group
   - 1
-- - disallow_two_fa_for_subgroups
+- - disallow_two_factor_for_subgroups
   - 1
 - - elastic_commit_indexer
   - 1
