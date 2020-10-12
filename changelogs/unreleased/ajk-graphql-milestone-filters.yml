@@ -1,5 +1,5 @@
 ---
-title: Add filters to the milestones resolver
+title: Add filters on Milestone title in the GraphQL API
 merge_request: 44208
 author:
 type: changed

@@ -52,7 +52,7 @@ RSpec.describe 'getting milestone listings nested in a project' do
   end
 
   shared_examples 'searching with parameters' do
-    it 'finds the right mrs' do
+    it 'finds the right milestones' do
       post_graphql(query, current_user: current_user)
 
       expect(results).to match_array(result_list(expected))

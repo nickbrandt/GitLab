@@ -152,10 +152,6 @@ module Timebox
     def predefined?(timebox)
       predefined_id?(timebox&.id)
     end
-
-    def min_chars_for_partial_matching
-      2
-    end
   end
 
   ##
