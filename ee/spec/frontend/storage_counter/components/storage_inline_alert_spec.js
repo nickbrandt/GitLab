@@ -2,10 +2,11 @@ import { shallowMount } from '@vue/test-utils';
 import StorageInlineAlert from 'ee/storage_counter/components/storage_inline_alert.vue';
 import { GlAlert } from '@gitlab/ui';
 
-const THIRTEEN_GB_IN_BYTES = 1.3e10;
-const TEN_GB_IN_BYTES = 1e10;
-const FIVE_GB_IN_BYTES = 5e9;
-const THREE_GB_IN_BYTES = 3e9;
+const GB_IN_BYTES = 1_000_000_000;
+const THIRTEEN_GB_IN_BYTES = 13 * GB_IN_BYTES;
+const TEN_GB_IN_BYTES = 10 * GB_IN_BYTES;
+const FIVE_GB_IN_BYTES = 5 * GB_IN_BYTES;
+const THREE_GB_IN_BYTES = 3 * GB_IN_BYTES;
 
 describe('StorageInlineAlert', () => {
   let wrapper;
@@ -53,10 +54,8 @@ describe('StorageInlineAlert', () => {
     });
 
     it('renders human readable repositoryFreeLimit', () => {
-      // Note how we get a less good looking 9.31 GiB number
-      // Will be fixed in https://gitlab.com/gitlab-org/gitlab/-/issues/263284
       expect(findAlert().text()).toBe(
-        'You have reached the free storage limit of 9.31 GiB on 1 project. To unlock them, please purchase additional storage.',
+        'You have reached the free storage limit of 10GB on 1 project. To unlock them, please purchase additional storage.',
       );
     });
   });
@@ -80,7 +79,7 @@ describe('StorageInlineAlert', () => {
 
     it('renders text explaining storage', () => {
       expect(findAlert().text()).toBe(
-        'When you purchase additional storage, we automatically unlock projects that were locked when you reached the 9.31 GiB limit.',
+        'When you purchase additional storage, we automatically unlock projects that were locked when you reached the 10GB limit.',
       );
     });
   });

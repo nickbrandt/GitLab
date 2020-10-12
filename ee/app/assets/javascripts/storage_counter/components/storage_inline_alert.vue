@@ -1,7 +1,7 @@
 <script>
 import { GlAlert } from '@gitlab/ui';
-import { __ } from '~/locale';
-import { numberToHumanSize } from '~/lib/utils/number_utils';
+import { n__, __ } from '~/locale';
+import { getFormatter, SUPPORTED_FORMATS } from '~/lib/utils/unit_format';
 import { usageRatioToThresholdLevel } from '../usage_thresholds';
 import { ALERT_THRESHOLD, ERROR_THRESHOLD, WARNING_THRESHOLD } from '../constants';
 
@@ -46,7 +46,7 @@ export default {
     },
     alertTitle() {
       if (!this.hasPurchasedStorage() && this.containsLockedProjects) {
-        return __('This namespace contains locked projects');
+        return __('UsageQuota|This namespace contains locked projects');
       }
       return `${this.excessStoragePercentageLeft}% of purchased storage is available`;
     },
@@ -73,10 +73,12 @@ export default {
     projectsLockedText() {
       if (this.repositorySizeExcessProjectCount === 0) {
         return '';
-      } else if (this.repositorySizeExcessProjectCount === 1) {
-        return __(`${this.repositorySizeExcessProjectCount} project`);
       }
-      return __(`${this.repositorySizeExcessProjectCount} projects`);
+      return `${this.repositorySizeExcessProjectCount} ${n__(
+        'project',
+        'projects',
+        this.repositorySizeExcessProjectCount,
+      )}`;
     },
   },
   methods: {
@@ -84,7 +86,8 @@ export default {
       return this.additionalPurchasedStorageSize > 0;
     },
     formatSize(size) {
-      return numberToHumanSize(size);
+      const formatter = getFormatter(SUPPORTED_FORMATS.decimalBytes);
+      return formatter(size);
     },
     hasPurchasedStorageText() {
       if (this.thresholdLevel === ERROR_THRESHOLD) {
