@@ -18350,6 +18350,9 @@ msgstr ""
 msgid "PackageRegistry|Add NuGet Source"
 msgstr ""
 
+msgid "PackageRegistry|Add composer registry"
+msgstr ""
+
 msgid "PackageRegistry|App group: %{group}"
 msgstr ""
 
@@ -18446,6 +18449,9 @@ msgstr ""
 msgid "PackageRegistry|If you haven't already done so, you will need to add the below to your %{codeStart}pom.xml%{codeEnd} file."
 msgstr ""
 
+msgid "PackageRegistry|Install package version"
+msgstr ""
+
 msgid "PackageRegistry|Learn how to %{noPackagesLinkStart}publish and share your packages%{noPackagesLinkEnd} with GitLab."
 msgstr ""
 
@@ -18534,12 +18540,6 @@ msgid "PackageRegistry|You are about to delete version %{version} of %{name}. Ar
 msgstr ""
 
 msgid "PackageRegistry|You may also need to setup authentication using an auth token. %{linkStart}See the documentation%{linkEnd} to find out more."
-msgstr ""
-
-msgid "PackageRegistry|composer.json registry include"
-msgstr ""
-
-msgid "PackageRegistry|composer.json require package include"
 msgstr ""
 
 msgid "PackageRegistry|npm command"
