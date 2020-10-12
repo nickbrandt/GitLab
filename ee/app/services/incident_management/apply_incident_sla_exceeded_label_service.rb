@@ -6,7 +6,7 @@ module IncidentManagement
       super(incident.project)
 
       @incident = incident
-      @label = incident_exceeded_label
+      @label = incident_exceeded_sla_label
     end
 
     def execute
@@ -28,7 +28,7 @@ module IncidentManagement
         .execute(added_labels: [label])
     end
 
-    def incident_exceeded_label
+    def incident_exceeded_sla_label
       ::IncidentManagement::CreateIncidentSlaExceededLabelService
         .new(project)
         .execute

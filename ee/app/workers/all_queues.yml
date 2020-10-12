@@ -201,7 +201,7 @@
   :urgency: :low
   :resource_boundary: :unknown
   :weight: 1
-  :idempotent:
+  :idempotent: true
   :tags: []
 - :name: cronjob:ingress_modsecurity_counter_metrics
   :feature_category: :web_firewall

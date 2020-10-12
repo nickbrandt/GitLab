@@ -6,7 +6,7 @@ module IncidentManagement
       title: 'missed::SLA',
       color: '#D9534F',
       description: <<~DESCRIPTION.chomp
-        Incidents that have missed the targeted SLA (Service Level Agreement).
+        Incidents that have missed the targeted SLA (Service Level Agreement). https://docs.gitlab.com/ee/operations/incident_management/incidents.html#service-level-agreement-countdown-timer
       DESCRIPTION
     }.freeze
 
