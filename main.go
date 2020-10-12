@@ -157,6 +157,7 @@ func main() {
 		APIQueueTimeout:          *apiQueueTimeout,
 		APICILongPollingDuration: *apiCiLongPollingDuration,
 		PropagateCorrelationID:   *propagateCorrelationID,
+		ImageResizerConfig:       config.DefaultImageResizerConfig,
 	}
 
 	if *configFile != "" {
@@ -167,6 +168,7 @@ func main() {
 
 		cfg.Redis = cfgFromFile.Redis
 		cfg.ObjectStorageCredentials = cfgFromFile.ObjectStorageCredentials
+		cfg.ImageResizerConfig = cfgFromFile.ImageResizerConfig
 
 		if cfg.Redis != nil {
 			redis.Configure(cfg.Redis, redis.DefaultDialFunc)

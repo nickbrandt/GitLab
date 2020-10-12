@@ -80,6 +80,11 @@ type RedisConfig struct {
 	MaxActive       *int
 }
 
+type ImageResizerConfig struct {
+	MaxScalerProcs uint32 `toml:"max_scaler_procs"`
+	MaxFilesize    uint64 `toml:"max_filesize"`
+}
+
 type Config struct {
 	Redis                    *RedisConfig              `toml:"redis"`
 	Backend                  *url.URL                  `toml:"-"`
@@ -97,11 +102,23 @@ type Config struct {
 	ObjectStorageConfig      ObjectStorageConfig       `toml:"-"`
 	ObjectStorageCredentials *ObjectStorageCredentials `toml:"object_storage"`
 	PropagateCorrelationID   bool                      `toml:"-"`
+	ImageResizerConfig       *ImageResizerConfig       `toml:"image_resizer"`
+}
+
+const (
+	DefaultImageResizerMaxScalerProcs = 100
+	DefaultImageResizerMaxFilesize    = 250 * 1000 // 250kB
+)
+
+var DefaultImageResizerConfig = &ImageResizerConfig{
+	MaxScalerProcs: DefaultImageResizerMaxScalerProcs,
+	MaxFilesize:    DefaultImageResizerMaxFilesize,
 }
 
 // LoadConfig from a file
 func LoadConfig(filename string) (*Config, error) {
-	cfg := &Config{}
+	cfg := &Config{ImageResizerConfig: DefaultImageResizerConfig}
+
 	if _, err := toml.DecodeFile(filename, cfg); err != nil {
 		return nil, err
 	}

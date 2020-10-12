@@ -11,3 +11,7 @@ URL = "unix:/home/git/gitlab/redis/redis.socket"
 [object_store.azurerm]
   azure_storage_account_name = "YOUR ACCOUNT NAME"
   azure_storage_access_key = "YOUR ACCOUNT KEY"
+
+[image_resizer]
+  max_scaler_procs = 100
+  max_filesize = 250000

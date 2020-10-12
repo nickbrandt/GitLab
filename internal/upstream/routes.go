@@ -142,7 +142,7 @@ func (ro *routeEntry) isMatch(cleanedPath string, req *http.Request) bool {
 	return ok
 }
 
-func buildProxy(backend *url.URL, version string, rt http.RoundTripper) http.Handler {
+func buildProxy(backend *url.URL, version string, rt http.RoundTripper, cfg config.Config) http.Handler {
 	proxier := proxypkg.NewProxy(backend, version, rt)
 
 	return senddata.SendData(
@@ -154,7 +154,7 @@ func buildProxy(backend *url.URL, version string, rt http.RoundTripper) http.Han
 		git.SendSnapshot,
 		artifacts.SendEntry,
 		sendurl.SendURL,
-		imageresizer.SendScaledImage,
+		imageresizer.NewResizer(cfg),
 	)
 }
 
@@ -170,11 +170,11 @@ func (u *upstream) configureRoutes() {
 	)
 
 	static := &staticpages.Static{DocumentRoot: u.DocumentRoot}
-	proxy := buildProxy(u.Backend, u.Version, u.RoundTripper)
+	proxy := buildProxy(u.Backend, u.Version, u.RoundTripper, u.Config)
 	cableProxy := proxypkg.NewProxy(u.CableBackend, u.Version, u.CableRoundTripper)
 
 	signingTripper := secret.NewRoundTripper(u.RoundTripper, u.Version)
-	signingProxy := buildProxy(u.Backend, u.Version, signingTripper)
+	signingProxy := buildProxy(u.Backend, u.Version, signingTripper, u.Config)
 
 	preparers := createUploadPreparers(u.Config)
 	uploadPath := path.Join(u.DocumentRoot, "uploads/tmp")

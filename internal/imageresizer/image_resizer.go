@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
@@ -25,9 +27,10 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
 
-type resizer struct{ senddata.Prefix }
-
-var SendScaledImage = &resizer{"send-scaled-img:"}
+type Resizer struct {
+	config.Config
+	senddata.Prefix
+}
 
 type resizeParams struct {
 	Location    string
@@ -40,11 +43,6 @@ type processCounter struct {
 }
 
 var numScalerProcs processCounter
-
-const (
-	maxImageScalerProcs     = 100
-	maxAllowedFileSizeBytes = 250 * 1000 // 250kB
-)
 
 var envInjector = tracing.NewEnvInjector()
 
@@ -123,9 +121,13 @@ func init() {
 	prometheus.MustRegister(imageResizeDurations)
 }
 
+func NewResizer(cfg config.Config) *Resizer {
+	return &Resizer{cfg, "send-scaled-img:"}
+}
+
 // This Injecter forks into a dedicated scaler process to resize an image identified by path or URL
 // and streams the resized image back to the client
-func (r *resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData string) {
+func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData string) {
 	start := time.Now()
 	logger := log.ContextLogger(req.Context())
 	params, err := r.unpackParameters(paramsData)
@@ -156,7 +158,7 @@ func (r *resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 
 	// We first attempt to rescale the image; if this should fail for any reason, imageReader
 	// will point to the original image, i.e. we render it unchanged.
-	imageReader, resizeCmd, err := tryResizeImage(req, sourceImageReader, logger.Writer(), params, fileSize)
+	imageReader, resizeCmd, err := tryResizeImage(req, sourceImageReader, logger.Writer(), params, fileSize, r.Config.ImageResizerConfig)
 	if err != nil {
 		// something failed, but we can still write out the original image, do don't return early
 		helper.LogErrorWithFields(req, err, *logFields(0))
@@ -204,7 +206,7 @@ func handleFailedCommand(w http.ResponseWriter, req *http.Request, bytesWritten 
 	}
 }
 
-func (r *resizer) unpackParameters(paramsData string) (*resizeParams, error) {
+func (r *Resizer) unpackParameters(paramsData string) (*resizeParams, error) {
 	var params resizeParams
 	if err := r.Unpack(&params, paramsData); err != nil {
 		return nil, err
@@ -222,12 +224,12 @@ func (r *resizer) unpackParameters(paramsData string) (*resizeParams, error) {
 }
 
 // Attempts to rescale the given image data, or in case of errors, falls back to the original image.
-func tryResizeImage(req *http.Request, r io.Reader, errorWriter io.Writer, params *resizeParams, fileSize int64) (io.Reader, *exec.Cmd, error) {
-	if fileSize > maxAllowedFileSizeBytes {
-		return r, nil, fmt.Errorf("ImageResizer: %db exceeds maximum file size of %db", fileSize, maxAllowedFileSizeBytes)
+func tryResizeImage(req *http.Request, r io.Reader, errorWriter io.Writer, params *resizeParams, fileSize int64, cfg *config.ImageResizerConfig) (io.Reader, *exec.Cmd, error) {
+	if fileSize > int64(cfg.MaxFilesize) {
+		return r, nil, fmt.Errorf("ImageResizer: %db exceeds maximum file size of %db", fileSize, cfg.MaxFilesize)
 	}
 
-	if !numScalerProcs.tryIncrement() {
+	if !numScalerProcs.tryIncrement(int32(cfg.MaxScalerProcs)) {
 		return r, nil, fmt.Errorf("ImageResizer: too many running scaler processes")
 	}
 
@@ -312,8 +314,8 @@ func openFromFile(location string) (io.ReadCloser, int64, error) {
 
 // Only allow more scaling requests if we haven't yet reached the maximum
 // allowed number of concurrent scaler processes
-func (c *processCounter) tryIncrement() bool {
-	if p := atomic.AddInt32(&c.n, 1); p > maxImageScalerProcs {
+func (c *processCounter) tryIncrement(maxScalerProcs int32) bool {
+	if p := atomic.AddInt32(&c.n, 1); p > maxScalerProcs {
 		c.decrement()
 		imageResizeConcurrencyLimitExceeds.Inc()
 

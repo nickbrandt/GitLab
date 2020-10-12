@@ -8,6 +8,8 @@ import (
 	"os"
 	"testing"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
+
 	"gitlab.com/gitlab-org/labkit/log"
 
 	"github.com/stretchr/testify/require"
@@ -15,7 +17,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
-var r = resizer{}
+var r = Resizer{}
 
 func TestMain(m *testing.M) {
 	if err := testhelper.BuildExecutables(); err != nil {
@@ -56,7 +58,14 @@ func TestTryResizeImageSuccess(t *testing.T) {
 	req, err := http.NewRequest("GET", "/foo", nil)
 	require.NoError(t, err)
 
-	reader, cmd, err := tryResizeImage(req, inFile, os.Stderr, &inParams, maxAllowedFileSizeBytes)
+	reader, cmd, err := tryResizeImage(
+		req,
+		inFile,
+		os.Stderr,
+		&inParams,
+		int64(config.DefaultImageResizerConfig.MaxFilesize),
+		config.DefaultImageResizerConfig,
+	)
 
 	require.NoError(t, err)
 	require.NotNil(t, cmd)
@@ -70,7 +79,14 @@ func TestTryResizeImageSkipsResizeWhenSourceImageTooLarge(t *testing.T) {
 	req, err := http.NewRequest("GET", "/foo", nil)
 	require.NoError(t, err)
 
-	reader, cmd, err := tryResizeImage(req, inFile, os.Stderr, &inParams, maxAllowedFileSizeBytes+1)
+	reader, cmd, err := tryResizeImage(
+		req,
+		inFile,
+		os.Stderr,
+		&inParams,
+		int64(config.DefaultImageResizerConfig.MaxFilesize)+1,
+		config.DefaultImageResizerConfig,
+	)
 
 	require.Error(t, err)
 	require.Nil(t, cmd)
@@ -83,7 +99,14 @@ func TestTryResizeImageFailsWhenContentTypeNotMatchingFileContents(t *testing.T)
 	req, err := http.NewRequest("GET", "/foo", nil)
 	require.NoError(t, err)
 
-	_, cmd, err := tryResizeImage(req, inFile, os.Stderr, &inParams, maxAllowedFileSizeBytes)
+	_, cmd, err := tryResizeImage(
+		req,
+		inFile,
+		os.Stderr,
+		&inParams,
+		int64(config.DefaultImageResizerConfig.MaxFilesize),
+		config.DefaultImageResizerConfig,
+	)
 
 	require.NoError(t, err)
 	require.Error(t, cmd.Wait(), "Expected to fail due to content-type mismatch")
