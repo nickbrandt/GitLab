@@ -1,14 +1,20 @@
 <script>
 import linkifyHtml from 'linkifyjs/html';
-import LineNumber from './line_number.vue';
 import { sanitize } from '~/lib/dompurify';
+import { isAbsolute } from '~/lib/utils/url_utility';
+import LineNumber from './line_number.vue';
 
 const linkifyOptions = {
-  className: '',
+  attributes: {
+    // eslint-disable-next-line @gitlab/require-i18n-strings
+    rel: 'nofollow noopener',
+  },
+  className: 'gl-reset-color!',
   defaultProtocol: 'https',
   validate: {
-    url: function(value) {
-      return /^(http|ftp)s?:\/\//.test(value);
+    email: false,
+    url(value) {
+      return isAbsolute(value);
     },
   },
 };
@@ -29,10 +35,13 @@ export default {
     const { line, path } = props;
 
     const chars = line.content.map(content => {
+      const linkfied = linkifyHtml(content.text, linkifyOptions);
       return h('span', {
         class: ['gl-white-space-pre-wrap', content.style],
         domProps: {
-          innerHTML: sanitize(linkifyHtml(content.text, linkifyOptions), { ALLOWED_TAGS: ['a'] }),
+          innerHTML: sanitize(linkfied, {
+            ALLOWED_TAGS: ['a'],
+          }),
         },
       });
     });
