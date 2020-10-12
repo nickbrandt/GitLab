@@ -8,6 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-10-12 08:34+0200\n"
+"PO-Revision-Date: 2020-10-12 08:34+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -496,6 +498,12 @@ msgid "%{group_name} uses group managed accounts. You need to create a new GitLa
 msgstr ""
 
 msgid "%{group_name}&%{epic_iid} &middot; opened %{epic_created} by %{author}"
+msgstr ""
+
+msgid "%{hook_type} was deleted"
+msgstr ""
+
+msgid "%{hook_type} was scheduled for deletion"
 msgstr ""
 
 msgid "%{host} sign-in from new location"
@@ -991,6 +999,12 @@ msgstr[1] ""
 msgid "+%{approvers} more approvers"
 msgstr ""
 
+msgid "+%{more_reviewers_count}"
+msgstr ""
+
+msgid "+%{more_reviewers_count} more reviewers"
+msgstr ""
+
 msgid "+%{tags} more"
 msgstr ""
 
@@ -1299,6 +1313,9 @@ msgstr ""
 msgid "ACTION REQUIRED: Something went wrong while obtaining the Let's Encrypt certificate for GitLab Pages domain '%{domain}'"
 msgstr ""
 
+msgid "API Fuzzing"
+msgstr ""
+
 msgid "API Help"
 msgstr ""
 
@@ -1598,6 +1615,9 @@ msgstr ""
 msgid "Add a task list"
 msgstr ""
 
+msgid "Add a to do"
+msgstr ""
+
 msgid "Add additional text to appear in all email communications. %{character_limit} character limit"
 msgstr ""
 
@@ -1751,7 +1771,7 @@ msgstr ""
 msgid "Added %{label_references} %{label_text}."
 msgstr ""
 
-msgid "Added a To Do."
+msgid "Added a to do."
 msgstr ""
 
 msgid "Added an issue to an epic."
@@ -1787,10 +1807,10 @@ msgstr ""
 msgid "Adds %{labels} %{label_text}."
 msgstr ""
 
-msgid "Adds a To Do."
+msgid "Adds a Zoom meeting"
 msgstr ""
 
-msgid "Adds a Zoom meeting"
+msgid "Adds a to do."
 msgstr ""
 
 msgid "Adds an issue to an epic."
@@ -2204,13 +2224,13 @@ msgstr ""
 msgid "After a successful password update, you will be redirected to the login page where you can log in with your new password."
 msgstr ""
 
-msgid "After that, you will not to be able to use merge approvals or code quality as well as many other features."
+msgid "After that, you will not be able to use merge approvals or code quality as well as many other features."
 msgstr ""
 
-msgid "After that, you will not to be able to use merge approvals or epics as well as many other features."
+msgid "After that, you will not be able to use merge approvals or epics as well as many other features."
 msgstr ""
 
-msgid "After that, you will not to be able to use merge approvals or epics as well as many security features."
+msgid "After that, you will not be able to use merge approvals or epics as well as many security features."
 msgstr ""
 
 msgid "Alert"
@@ -2404,10 +2424,10 @@ msgstr ""
 msgid "AlertSettings|Add URL and auth key to your Prometheus config file"
 msgstr ""
 
-msgid "AlertSettings|Alert test payload"
+msgid "AlertSettings|Add new integrations"
 msgstr ""
 
-msgid "AlertSettings|Alerts endpoint successfully activated."
+msgid "AlertSettings|Alert test payload"
 msgstr ""
 
 msgid "AlertSettings|Authorization key"
@@ -2425,10 +2445,10 @@ msgstr ""
 msgid "AlertSettings|External Prometheus"
 msgstr ""
 
-msgid "AlertSettings|Generic"
+msgid "AlertSettings|HTTP Endpoint"
 msgstr ""
 
-msgid "AlertSettings|Integrations"
+msgid "AlertSettings|HTTP endpoint"
 msgstr ""
 
 msgid "AlertSettings|Learn more about our %{linkStart}upcoming integrations%{linkEnd}"
@@ -2473,13 +2493,34 @@ msgstr ""
 msgid "AlertSettings|You must provide this URL and authorization key to authorize an external service to send alerts to GitLab. You can provide this URL and key to multiple services. After configuring an external service, alerts from your service will display on the GitLab %{linkStart}Alerts%{linkEnd} page."
 msgstr ""
 
-msgid "AlertSettings|Your changes were successfully updated."
+msgid "AlertSettings|Your integration was successfully updated."
 msgstr ""
 
 msgid "Alerts"
 msgstr ""
 
 msgid "Alerts endpoint"
+msgstr ""
+
+msgid "AlertsIntegrations|Alerts will be created through this integration"
+msgstr ""
+
+msgid "AlertsIntegrations|Alerts will not be created through this integration"
+msgstr ""
+
+msgid "AlertsIntegrations|Current integrations"
+msgstr ""
+
+msgid "AlertsIntegrations|HTTP endpoint"
+msgstr ""
+
+msgid "AlertsIntegrations|Integration Name"
+msgstr ""
+
+msgid "AlertsIntegrations|No integrations have been added yet"
+msgstr ""
+
+msgid "AlertsIntegrations|Prometheus"
 msgstr ""
 
 msgid "Algorithm"
@@ -2572,6 +2613,9 @@ msgstr ""
 msgid "Allow owners to manually add users outside of LDAP"
 msgstr ""
 
+msgid "Allow projects and subgroups to override the group setting"
+msgstr ""
+
 msgid "Allow projects within this group to use Git LFS"
 msgstr ""
 
@@ -2618,6 +2662,9 @@ msgid "Allowed email domain restriction only permitted for top-level groups"
 msgstr ""
 
 msgid "Allowed to fail"
+msgstr ""
+
+msgid "Allows projects or subgroups in this group to override the global setting."
 msgstr ""
 
 msgid "Allows you to add and manage Kubernetes clusters."
@@ -2981,6 +3028,9 @@ msgid "An error occurred while unsubscribing to notifications."
 msgstr ""
 
 msgid "An error occurred while updating approvers"
+msgstr ""
+
+msgid "An error occurred while updating configuration."
 msgstr ""
 
 msgid "An error occurred while updating labels."
@@ -3807,6 +3857,12 @@ msgstr ""
 msgid "AutoDevOps|The Auto DevOps pipeline has been enabled and will be used if no alternative CI configuration file is found. %{more_information_link}"
 msgstr ""
 
+msgid "AutoRemediation|If you're using dependency and/or container scanning, and auto-fix is enabled, auto-fix automatically creates merge requests with fixes to vulnerabilities."
+msgstr ""
+
+msgid "AutoRemediation|Introducing GitLab auto-fix"
+msgstr ""
+
 msgid "Autocomplete"
 msgstr ""
 
@@ -4149,6 +4205,9 @@ msgstr ""
 msgid "Boards|View scope"
 msgstr ""
 
+msgid "Board|Load more issues"
+msgstr ""
+
 msgid "Both project and dashboard_path are required"
 msgstr ""
 
@@ -4303,6 +4362,9 @@ msgid "Branches|project settings"
 msgstr ""
 
 msgid "Branches|protected"
+msgstr ""
+
+msgid "Brief title about the change"
 msgstr ""
 
 msgid "Broadcast Message was successfully created."
@@ -6891,6 +6953,9 @@ msgstr ""
 msgid "ContainerRegistry|Cleanup policy:"
 msgstr ""
 
+msgid "ContainerRegistry|Cleanup timed out before it could delete all tags"
+msgstr ""
+
 msgid "ContainerRegistry|Configuration digest: %{digest}"
 msgstr ""
 
@@ -8025,6 +8090,15 @@ msgstr ""
 msgid "Dashboard|Unable to add %{invalidProjects}. This dashboard is available for public projects, and private projects in groups with a Silver plan."
 msgstr ""
 
+msgid "DastProfiles|A passive scan monitors all HTTP messages (requests and responses) sent to the target. An active scan attacks the target to find potential vulnerabilities."
+msgstr ""
+
+msgid "DastProfiles|AJAX spider"
+msgstr ""
+
+msgid "DastProfiles|Active"
+msgstr ""
+
 msgid "DastProfiles|Are you sure you want to delete this profile?"
 msgstr ""
 
@@ -8064,6 +8138,9 @@ msgstr ""
 msgid "DastProfiles|Could not update the site profile. Please try again."
 msgstr ""
 
+msgid "DastProfiles|Debug messages"
+msgstr ""
+
 msgid "DastProfiles|Do you want to discard this scanner profile?"
 msgstr ""
 
@@ -8083,6 +8160,12 @@ msgid "DastProfiles|Edit site profile"
 msgstr ""
 
 msgid "DastProfiles|Error Details"
+msgstr ""
+
+msgid "DastProfiles|Hide debug messages"
+msgstr ""
+
+msgid "DastProfiles|Include debug messages in the DAST console output."
 msgstr ""
 
 msgid "DastProfiles|Manage Profiles"
@@ -8121,6 +8204,9 @@ msgstr ""
 msgid "DastProfiles|Profile name"
 msgstr ""
 
+msgid "DastProfiles|Run the AJAX spider, in addition to the traditional spider, to crawl the target site."
+msgstr ""
+
 msgid "DastProfiles|Save commonly used configurations for target sites and scan specifications as profiles. Use these with an on-demand scan."
 msgstr ""
 
@@ -8134,6 +8220,9 @@ msgid "DastProfiles|Scanner Profile"
 msgstr ""
 
 msgid "DastProfiles|Scanner Profiles"
+msgstr ""
+
+msgid "DastProfiles|Show debug messages"
 msgstr ""
 
 msgid "DastProfiles|Site Profile"
@@ -8173,6 +8262,9 @@ msgid "DastProfiles|The maximum number of minutes allowed for the spider to trav
 msgstr ""
 
 msgid "DastProfiles|The maximum number of seconds allowed for the site under test to respond to a request."
+msgstr ""
+
+msgid "DastProfiles|Turn on AJAX spider"
 msgstr ""
 
 msgid "DastProfiles|Validate"
@@ -8356,9 +8448,6 @@ msgid "Delete %{name}"
 msgstr ""
 
 msgid "Delete Comment"
-msgstr ""
-
-msgid "Delete Snippet"
 msgstr ""
 
 msgid "Delete Value Stream"
@@ -9048,7 +9137,7 @@ msgstr ""
 msgid "Disable public access to Pages sites"
 msgstr ""
 
-msgid "Disable shared Runners"
+msgid "Disable shared runners"
 msgstr ""
 
 msgid "Disable two-factor authentication"
@@ -9674,7 +9763,13 @@ msgstr ""
 msgid "Enable reCAPTCHA or Akismet and set IP limits. For reCAPTCHA, we currently only support %{recaptcha_v2_link_start}v2%{recaptcha_v2_link_end}"
 msgstr ""
 
-msgid "Enable shared Runners"
+msgid "Enable shared runners"
+msgstr ""
+
+msgid "Enable shared runners for all projects and subgroups in this group."
+msgstr ""
+
+msgid "Enable shared runners for this group"
 msgstr ""
 
 msgid "Enable snowplow tracking"
@@ -11215,6 +11310,9 @@ msgstr ""
 msgid "File upload error."
 msgstr ""
 
+msgid "Filename"
+msgstr ""
+
 msgid "Files"
 msgstr ""
 
@@ -11308,6 +11406,9 @@ msgstr ""
 msgid "Find File"
 msgstr ""
 
+msgid "Find bugs in your code with API fuzzing."
+msgstr ""
+
 msgid "Find bugs in your code with coverage-guided fuzzing."
 msgstr ""
 
@@ -11341,9 +11442,6 @@ msgstr ""
 msgid "Finished"
 msgstr ""
 
-msgid "First Name is too long (maximum is %{max_length} characters)."
-msgstr ""
-
 msgid "First Seen"
 msgstr ""
 
@@ -11351,6 +11449,9 @@ msgid "First day of the week"
 msgstr ""
 
 msgid "First name"
+msgstr ""
+
+msgid "First name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
 msgid "First seen"
@@ -12022,9 +12123,6 @@ msgstr ""
 msgid "GitLab Service Desk is a simple way to allow people to create issues in your GitLab instance without needing their own user account. It provides a unique email address for end users to create issues in a project, and replies can be sent either through the GitLab interface or by email. End users will only see the thread through email."
 msgstr ""
 
-msgid "GitLab Shared Runners execute code of different projects on the same Runner unless you configure GitLab Runner Autoscale with MaxBuilds 1 (which it is on GitLab.com)."
-msgstr ""
-
 msgid "GitLab Shell"
 msgstr ""
 
@@ -12359,6 +12457,9 @@ msgid "Go to your projects"
 msgstr ""
 
 msgid "Go to your snippets"
+msgstr ""
+
+msgid "Goal of the changes and what reviewers should be aware of"
 msgstr ""
 
 msgid "Google Cloud Platform"
@@ -13455,6 +13556,9 @@ msgstr ""
 msgid "Import project"
 msgstr ""
 
+msgid "Import project from"
+msgstr ""
+
 msgid "Import project members"
 msgstr ""
 
@@ -13938,9 +14042,6 @@ msgid "Invalid OS"
 msgstr ""
 
 msgid "Invalid URL"
-msgstr ""
-
-msgid "Invalid board"
 msgstr ""
 
 msgid "Invalid container_name"
@@ -14687,6 +14788,12 @@ msgstr ""
 msgid "KeyboardKey|Ctrl+"
 msgstr ""
 
+msgid "KeyboardShortcuts|Global Shortcuts"
+msgstr ""
+
+msgid "KeyboardShortcuts|Toggle the Performance Bar"
+msgstr ""
+
 msgid "Keys"
 msgstr ""
 
@@ -14845,9 +14952,6 @@ msgstr ""
 msgid "Last Accessed On"
 msgstr ""
 
-msgid "Last Name is too long (maximum is %{max_length} characters)."
-msgstr ""
-
 msgid "Last Pipeline"
 msgstr ""
 
@@ -14879,6 +14983,9 @@ msgid "Last item before this page loaded in your browser:"
 msgstr ""
 
 msgid "Last name"
+msgstr ""
+
+msgid "Last name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
 msgid "Last reply by"
@@ -15579,9 +15686,6 @@ msgstr ""
 msgid "March"
 msgstr ""
 
-msgid "Mark To Do as done"
-msgstr ""
-
 msgid "Mark as done"
 msgstr ""
 
@@ -15598,6 +15702,9 @@ msgid "Mark this issue as a duplicate of another issue"
 msgstr ""
 
 msgid "Mark this issue as related to another issue"
+msgstr ""
+
+msgid "Mark to do as done"
 msgstr ""
 
 msgid "Markdown"
@@ -15633,9 +15740,6 @@ msgstr ""
 msgid "Marked For Deletion At - %{deletion_time}"
 msgstr ""
 
-msgid "Marked To Do as done."
-msgstr ""
-
 msgid "Marked this %{noun} as Work In Progress."
 msgstr ""
 
@@ -15645,7 +15749,7 @@ msgstr ""
 msgid "Marked this issue as related to %{issue_ref}."
 msgstr ""
 
-msgid "Marks To Do as done."
+msgid "Marked to do as done."
 msgstr ""
 
 msgid "Marks this %{noun} as Work In Progress."
@@ -15655,6 +15759,9 @@ msgid "Marks this issue as a duplicate of %{duplicate_reference}."
 msgstr ""
 
 msgid "Marks this issue as related to %{issue_ref}."
+msgstr ""
+
+msgid "Marks to do as done."
 msgstr ""
 
 msgid "Mask variable"
@@ -15718,6 +15825,9 @@ msgid "Max role"
 msgstr ""
 
 msgid "Max size 15 MB"
+msgstr ""
+
+msgid "MaxBuilds"
 msgstr ""
 
 msgid "Maximum Conan package file size in bytes"
@@ -16059,7 +16169,7 @@ msgstr ""
 msgid "MergeRequests|Jump to next unresolved thread"
 msgstr ""
 
-msgid "MergeRequests|Reply"
+msgid "MergeRequests|Reply..."
 msgstr ""
 
 msgid "MergeRequests|Resolve this thread in a new issue"
@@ -17901,6 +18011,9 @@ msgstr ""
 msgid "Omnibus Protected Paths throttle is active, and takes priority over these settings. From 12.4, Omnibus throttle is deprecated and will be removed in a future release. Please read the %{relative_url_link_start}Migrating Protected Paths documentation%{relative_url_link_end}."
 msgstr ""
 
+msgid "On"
+msgstr ""
+
 msgid "On track"
 msgstr ""
 
@@ -18909,6 +19022,9 @@ msgid "Pipelines|Owner"
 msgstr ""
 
 msgid "Pipelines|Project cache successfully reset."
+msgstr ""
+
+msgid "Pipelines|Retry"
 msgstr ""
 
 msgid "Pipelines|Revoke"
@@ -21230,6 +21346,9 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
+msgid "Refresh the page and try again."
+msgstr ""
+
 msgid "Refreshing in a second to show the updated status..."
 msgid_plural "Refreshing in %d seconds to show the updated status..."
 msgstr[0] ""
@@ -22142,6 +22261,9 @@ msgstr ""
 msgid "Review App|View latest app"
 msgstr ""
 
+msgid "Review requested from %{name}"
+msgstr ""
+
 msgid "Review the process for configuring service providers in your identity provider — in this case, GitLab is the \"service provider\" or \"relying party\"."
 msgstr ""
 
@@ -22772,10 +22894,10 @@ msgstr ""
 msgid "SecurityApprovals|One or more of the security scanners must be enabled. %{linkStart}More information%{linkEnd}"
 msgstr ""
 
-msgid "SecurityApprovals|Requires approval for vulnerabilties of Critical, High, or Unknown severity. %{linkStart}More information%{linkEnd}"
+msgid "SecurityApprovals|Requires approval for Denied licenses. %{linkStart}More information%{linkEnd}"
 msgstr ""
 
-msgid "SecurityApprovals|Requires license policy rules for licenses of Allowed, or Denied. %{linkStart}More information%{linkEnd}"
+msgid "SecurityApprovals|Requires approval for vulnerabilities of Critical, High, or Unknown severity. %{linkStart}More information%{linkEnd}"
 msgstr ""
 
 msgid "SecurityConfiguration|An error occurred while creating the merge request."
@@ -23006,6 +23128,11 @@ msgstr ""
 msgid "SecurityReports|There was an error deleting the comment."
 msgstr ""
 
+msgid "SecurityReports|There was an error dismissing %d vulnerability. Please try again later."
+msgid_plural "SecurityReports|There was an error dismissing %d vulnerabilities. Please try again later."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "SecurityReports|There was an error dismissing the vulnerabilities."
 msgstr ""
 
@@ -23184,6 +23311,9 @@ msgid "Select projects you want to import."
 msgstr ""
 
 msgid "Select required regulatory standard"
+msgstr ""
+
+msgid "Select reviewer(s)"
 msgstr ""
 
 msgid "Select shards to replicate"
@@ -23558,6 +23688,9 @@ msgstr ""
 msgid "Set up pipeline subscriptions for this project."
 msgstr ""
 
+msgid "Set up shared runner availability"
+msgstr ""
+
 msgid "Set up your project to automatically push and/or pull changes to/from another repository. Branches, tags, and commits will be synced automatically."
 msgstr ""
 
@@ -23661,6 +23794,15 @@ msgid "Shared Runners"
 msgstr ""
 
 msgid "Shared projects"
+msgstr ""
+
+msgid "Shared runners"
+msgstr ""
+
+msgid "Shared runners are disabled for the parent group"
+msgstr ""
+
+msgid "Shared runners disabled on group level"
 msgstr ""
 
 msgid "Shared runners help link"
@@ -23862,9 +24004,6 @@ msgstr ""
 msgid "SignUp|Last Name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
-msgid "SignUp|Name is too long (maximum is %{max_length} characters)."
-msgstr ""
-
 msgid "SignUp|Username is too long (maximum is %{max_length} characters)."
 msgstr ""
 
@@ -23985,25 +24124,16 @@ msgstr ""
 msgid "Snippets|Add another file %{num}/%{total}"
 msgstr ""
 
-msgid "Snippets|Authored %{time_ago} by %{author}"
-msgstr ""
-
 msgid "Snippets|Delete file"
 msgstr ""
 
 msgid "Snippets|Description (optional)"
 msgstr ""
 
-msgid "Snippets|File"
-msgstr ""
-
 msgid "Snippets|Files"
 msgstr ""
 
 msgid "Snippets|Give your file a name to add code highlighting, e.g. example.rb for Ruby"
-msgstr ""
-
-msgid "Snippets|Optionally add a description about what your snippet does or how to use it..."
 msgstr ""
 
 msgid "Snippets|Optionally add a description about what your snippet does or how to use it…"
@@ -24810,10 +24940,10 @@ msgstr ""
 msgid "Submit a review"
 msgstr ""
 
-msgid "Submit as spam"
+msgid "Submit changes"
 msgstr ""
 
-msgid "Submit changes"
+msgid "Submit changes..."
 msgstr ""
 
 msgid "Submit feedback"
@@ -24829,6 +24959,9 @@ msgid "Submit search"
 msgstr ""
 
 msgid "Submit the current review."
+msgstr ""
+
+msgid "Submit your changes"
 msgstr ""
 
 msgid "Submitted the current review."
@@ -25805,6 +25938,9 @@ msgid "The review stage shows the time from creating the merge request to mergin
 msgstr ""
 
 msgid "The roadmap shows the progress of your epics along a timeline"
+msgstr ""
+
+msgid "The same shared runner executes code from multiple projects, unless you configure autoscaling with %{link} set to 1 (which it is on GitLab.com)."
 msgstr ""
 
 msgid "The schedule time must be in the future!"
@@ -27971,6 +28107,12 @@ msgstr ""
 msgid "UsageQuota|This namespace has no projects which use shared runners"
 msgstr ""
 
+msgid "UsageQuota|This project is at risk of being locked."
+msgstr ""
+
+msgid "UsageQuota|This project is locked."
+msgstr ""
+
 msgid "UsageQuota|Unlimited"
 msgstr ""
 
@@ -28731,7 +28873,13 @@ msgstr ""
 msgid "Vulnerability|Comments"
 msgstr ""
 
-msgid "Vulnerability|Crash Address"
+msgid "Vulnerability|Crash address"
+msgstr ""
+
+msgid "Vulnerability|Crash state"
+msgstr ""
+
+msgid "Vulnerability|Crash type"
 msgstr ""
 
 msgid "Vulnerability|Description"
@@ -29017,6 +29165,9 @@ msgid "What are you searching for?"
 msgstr ""
 
 msgid "What describes you best?"
+msgstr ""
+
+msgid "What is squashing?"
 msgstr ""
 
 msgid "What's new at GitLab"
@@ -29825,7 +29976,7 @@ msgstr ""
 msgid "Your %{strong}%{plan_name}%{strong_close} subscription for %{strong}%{namespace_name}%{strong_close} will expire on %{strong}%{expires_on}%{strong_close}."
 msgstr ""
 
-msgid "Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not to be able to create issues or merge requests as well as many other features."
+msgid "Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not be able to create issues or merge requests as well as many other features."
 msgstr ""
 
 msgid "Your CSV export has started. It will be emailed to %{email} when complete."

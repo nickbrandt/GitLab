@@ -182,7 +182,7 @@ failure. For greater fault tolerance, the following options are available:
 - For Geo instances, either:
   - Set up a separate [PostgreSQL instance](https://www.postgresql.org/docs/11/high-availability.html).
   - Use a cloud-managed PostgreSQL service. AWS
-     [Relational Database Service](https://aws.amazon.com/rds/)) is recommended.
+     [Relational Database Service](https://aws.amazon.com/rds/) is recommended.
 
 To complete this section you will need:
 
@@ -356,7 +356,7 @@ application server, or a Gitaly node.
    If you want to use a TLS client certificate, the options below can be used:
 
    ```ruby
-   # Connect to PostreSQL using a TLS client certificate
+   # Connect to PostgreSQL using a TLS client certificate
    # praefect['database_sslcert'] = '/path/to/client-cert'
    # praefect['database_sslkey'] = '/path/to/client-key'
 

@@ -4,7 +4,7 @@
 .project-import
   .form-group.import-btn-container.clearfix
     %h5
-      Import project from
+      = _("Import project from")
     .import-buttons
       - if gitlab_project_import_enabled?
         .import_gitlab_project.has-tooltip{ data: { container: 'body' } }
