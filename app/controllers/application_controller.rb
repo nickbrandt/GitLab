@@ -466,7 +466,8 @@ class ApplicationController < ActionController::Base
       user: -> { auth_user if strong_memoized?(:auth_user) },
       project: -> { @project if @project&.persisted? },
       namespace: -> { @group if @group&.persisted? },
-      caller_id: full_action_name) do
+      caller_id: caller_id,
+      feature_category: feature_category) do
       yield
     ensure
       @current_context = Labkit::Context.current.to_h
@@ -548,7 +549,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def full_action_name
+  def caller_id
     "#{self.class.name}##{action_name}"
   end
 
