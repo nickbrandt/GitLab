@@ -329,13 +329,13 @@ export default {
               >
                 {{ __('Merge immediately') }}
               </gl-dropdown-item>
+              <merge-immediately-confirmation-dialog
+                ref="confirmationDialog"
+                :docs-url="mr.mergeImmediatelyDocsPath"
+                @mergeImmediately="onMergeImmediatelyConfirmation"
+              />
             </gl-dropdown>
           </gl-button-group>
-          <merge-immediately-confirmation-dialog
-            ref="confirmationDialog"
-            :docs-url="mr.mergeImmediatelyDocsPath"
-            @mergeImmediately="onMergeImmediatelyConfirmation"
-          />
           <div class="media-body-wrap space-children">
             <template v-if="shouldShowMergeControls">
               <label v-if="mr.canRemoveSourceBranch">
