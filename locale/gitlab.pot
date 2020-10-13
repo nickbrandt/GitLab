@@ -9824,6 +9824,9 @@ msgstr ""
 msgid "Encountered an error while rendering: %{err}"
 msgstr ""
 
+msgid "End Time"
+msgstr ""
+
 msgid "Ends at (UTC)"
 msgstr ""
 
@@ -22600,6 +22603,9 @@ msgstr ""
 msgid "Saving project."
 msgstr ""
 
+msgid "Scanner"
+msgstr ""
+
 msgid "Schedule a new pipeline"
 msgstr ""
 
@@ -24696,6 +24702,9 @@ msgid "Stars"
 msgstr ""
 
 msgid "Start Date"
+msgstr ""
+
+msgid "Start Time"
 msgstr ""
 
 msgid "Start Web Terminal"
