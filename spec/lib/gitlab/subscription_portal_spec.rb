@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-RSpec.describe EE do
+RSpec.describe ::Gitlab::SubscriptionPortal do
   describe '.default_subscriptions_url' do
-    subject { EE.default_subscriptions_url }
+    subject { described_class.default_subscriptions_url }
 
     context 'on non test and non dev environments' do
       before do
