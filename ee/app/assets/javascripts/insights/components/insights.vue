@@ -141,7 +141,6 @@ export default {
         <gl-dropdown-item
           v-for="page in pages"
           :key="page.scope"
-          class="w-100"
           @click="onChangePage(page.scope)"
           >{{ page.name }}</gl-dropdown-item
         >
