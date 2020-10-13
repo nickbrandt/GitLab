@@ -12909,6 +12909,12 @@ msgstr ""
 msgid "GroupRoadmap|To widen your search, change or remove filters; from %{startDate} to %{endDate}."
 msgstr ""
 
+msgid "GroupSAML|Active SAML Group Links (%{count})"
+msgstr ""
+
+msgid "GroupSAML|Are you sure you want to remove the SAML group link?"
+msgstr ""
+
 msgid "GroupSAML|Certificate fingerprint"
 msgstr ""
 
@@ -12916,6 +12922,9 @@ msgid "GroupSAML|Configuration"
 msgstr ""
 
 msgid "GroupSAML|Copy SAML Response XML"
+msgstr ""
+
+msgid "GroupSAML|Could not create SAML group link: %{errors}."
 msgstr ""
 
 msgid "GroupSAML|Default membership role"
@@ -12963,10 +12972,28 @@ msgstr ""
 msgid "GroupSAML|NameID Format"
 msgstr ""
 
+msgid "GroupSAML|New SAML group link saved."
+msgstr ""
+
+msgid "GroupSAML|No active SAML group links"
+msgstr ""
+
 msgid "GroupSAML|Prohibit outer forks"
 msgstr ""
 
 msgid "GroupSAML|Prohibit outer forks for this group."
+msgstr ""
+
+msgid "GroupSAML|Role to assign members of this SAML group."
+msgstr ""
+
+msgid "GroupSAML|SAML Group Links"
+msgstr ""
+
+msgid "GroupSAML|SAML Group Name"
+msgstr ""
+
+msgid "GroupSAML|SAML Group Name: %{saml_group_name}"
 msgstr ""
 
 msgid "GroupSAML|SAML Response Output"
@@ -12981,6 +13008,9 @@ msgstr ""
 msgid "GroupSAML|SAML Single Sign On Settings"
 msgstr ""
 
+msgid "GroupSAML|SAML group link was successfully removed."
+msgstr ""
+
 msgid "GroupSAML|SCIM API endpoint URL"
 msgstr ""
 
@@ -12991,6 +13021,9 @@ msgid "GroupSAML|SHA1 fingerprint of the SAML token signing certificate. Get thi
 msgstr ""
 
 msgid "GroupSAML|The SCIM token is now hidden. To see the value of the token again, you need to "
+msgstr ""
+
+msgid "GroupSAML|The case-sensitive group name that will be sent by the SAML identity provider."
 msgstr ""
 
 msgid "GroupSAML|This will be set as the access level of users added to the group."
@@ -13015,6 +13048,9 @@ msgid "GroupSAML|With prohibit outer forks flag enabled group members will be ab
 msgstr ""
 
 msgid "GroupSAML|Your SCIM token"
+msgstr ""
+
+msgid "GroupSAML|as %{access_level}"
 msgstr ""
 
 msgid "GroupSAML|must match stored NameID of \"%{extern_uid}\" as we use this to identify users. If the NameID changes users will be unable to sign in."
