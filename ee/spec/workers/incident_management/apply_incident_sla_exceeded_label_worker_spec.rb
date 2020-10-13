@@ -29,9 +29,9 @@ RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelWorker do
   it 'adds a label to the incident' do
     expect { perform }.to change { incident.labels.reload.count }.by(1)
 
-    expected_props = IncidentManagement::CreateIncidentSlaExceededLabelService::LABEL_PROPERTIES
+    expected_label = project.labels.find_by!(IncidentManagement::CreateIncidentSlaExceededLabelService::LABEL_PROPERTIES)
 
-    expect(perform).to have_attributes(expected_props)
+    expect(perform).to eq(expected_label)
   end
 
   it 'adds a note that the label was added' do

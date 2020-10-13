@@ -21,25 +21,5 @@ RSpec.describe IncidentManagement::IncidentSlaExceededCheckWorker do
 
       perform
     end
-
-    context 'when error occurs' do
-      before do
-        allow(IncidentManagement::ApplyIncidentSlaExceededLabelWorker)
-          .to receive(:perform_async)
-          .twice
-
-        allow(IncidentManagement::ApplyIncidentSlaExceededLabelWorker)
-          .to receive(:perform_async)
-          .with(incident_sla.issue.id)
-          .and_raise('test')
-          .once
-      end
-
-      it 'logs the error and continues to run the others' do
-        expect(Gitlab::AppLogger).to receive(:error).once
-
-        perform
-      end
-    end
   end
 end

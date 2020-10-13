@@ -11,10 +11,7 @@ module IncidentManagement
     def perform
       IssuableSla.exceeded_for_issues.find_in_batches do |incident_slas|
         incident_slas.each do |incident_sla|
-          ApplyIncidentSlaExceededLabelWorker.perform_async(incident_sla.issue.id)
-
-        rescue StandardError => e
-          Gitlab::AppLogger.error("Error encountered in #{self.class.name}: #{e}")
+          ApplyIncidentSlaExceededLabelWorker.perform_async(incident_sla.issue_id)
         end
       end
     end
