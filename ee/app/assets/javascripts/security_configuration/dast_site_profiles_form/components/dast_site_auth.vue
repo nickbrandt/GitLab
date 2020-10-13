@@ -1,18 +1,6 @@
 <script>
 import { GlFormGroup, GlFormTextarea, GlFormInput, GlToggle } from '@gitlab/ui';
-
-const isURLTypeMismatch = el => el.type === 'url' && el.validity.typeMismatch;
-
-const validateInputElement = el => {
-  const isValid = el.checkValidity();
-  const { validationMessage } = el;
-  const message = isURLTypeMismatch(el) ? 'UUUPs... :( :( ' : validationMessage;
-
-  return {
-    isValid,
-    message,
-  };
-};
+import validate from '~/vue_shared/directives/validate';
 
 const initField = value => ({
   value,
@@ -26,6 +14,9 @@ export default {
     GlFormTextarea,
     GlFormInput,
     GlToggle,
+  },
+  directives: {
+    validate,
   },
   data() {
     const form = {
@@ -59,12 +50,6 @@ export default {
         isValid: this.isFormValid,
       });
     },
-    validate(fieldName, { target }) {
-      const { isValid, message } = validateInputElement(target);
-
-      this.form[fieldName].state = isValid;
-      this.form[fieldName].feedback = message;
-    },
   },
 };
 </script>
@@ -83,10 +68,11 @@ export default {
         >
           <gl-form-input
             v-model="form.authenticationUrl.value"
+            v-validate.blur="form.authenticationUrl"
+            name="authenticationUrl"
             type="url"
             required
             :state="form.authenticationUrl.state"
-            @blur="validate('authenticationUrl', $event)"
           />
         </gl-form-group>
       </div>
@@ -98,10 +84,10 @@ export default {
         >
           <gl-form-input
             v-model="form.userName.value"
+            v-validate.blur="form.userName"
             type="text"
             required
             :state="form.userName.state"
-            @blur="validate('userName', $event)"
           />
         </gl-form-group>
         <gl-form-group
@@ -111,10 +97,10 @@ export default {
         >
           <gl-form-input
             v-model="form.password.value"
+            v-validate.blur="form.password"
             type="password"
             required
             :state="form.password.state"
-            @blur="validate('password', $event)"
           />
         </gl-form-group>
       </div>
@@ -126,10 +112,10 @@ export default {
         >
           <gl-form-input
             v-model="form.userNameFormField.value"
+            v-validate.blur="form.userNameFormField"
             type="text"
             required
             :state="form.userNameFormField.state"
-            @blur="validate('userNameFormField', $event)"
           />
         </gl-form-group>
         <gl-form-group
@@ -139,10 +125,10 @@ export default {
         >
           <gl-form-input
             v-model="form.passwordFormField.value"
+            v-validate.blur="form.passwordFormField"
             type="password"
             required
             :state="form.passwordFormField.state"
-            @blur="validate('passwordFormField', $event)"
           />
         </gl-form-group>
       </div>
