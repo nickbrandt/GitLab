@@ -8,20 +8,18 @@ class CreateSamlGroupLinks < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    unless table_exists?(:saml_group_links)
-      with_lock_retries do
-        create_table :saml_group_links do |t|
-          t.references :group, foreign_key: { to_table: :namespaces, on_delete: :cascade }, null: false
-          t.timestamps_with_timezone
-          t.integer :access_level, null: false
-          t.text :group_name, null: false
+    with_lock_retries do
+      create_table :saml_group_links, if_not_exists: true do |t|
+        t.integer :access_level, null: false, limit: 2
+        t.references :group, index: false, foreign_key: { to_table: :namespaces, on_delete: :cascade }, null: false
+        t.timestamps_with_timezone
+        t.text :saml_group_name, null: false
 
-          t.index [:group_id, :group_name], unique: true
-        end
+        t.index [:group_id, :saml_group_name], unique: true
       end
     end
 
-    add_text_limit :saml_group_links, :group_name, 255
+    add_text_limit :saml_group_links, :saml_group_name, 255
   end
 
   def down

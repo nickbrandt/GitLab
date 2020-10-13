@@ -15754,12 +15754,12 @@ ALTER SEQUENCE routes_id_seq OWNED BY routes.id;
 
 CREATE TABLE saml_group_links (
     id bigint NOT NULL,
+    access_level smallint NOT NULL,
     group_id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    access_level integer NOT NULL,
-    group_name text NOT NULL,
-    CONSTRAINT check_1a5ae2ac07 CHECK ((char_length(group_name) <= 255))
+    saml_group_name text NOT NULL,
+    CONSTRAINT check_1b3fc49d1e CHECK ((char_length(saml_group_name) <= 255))
 );
 
 CREATE SEQUENCE saml_group_links_id_seq
@@ -21478,9 +21478,7 @@ CREATE INDEX index_routes_on_path_trigram ON routes USING gin (path gin_trgm_ops
 
 CREATE UNIQUE INDEX index_routes_on_source_type_and_source_id ON routes USING btree (source_type, source_id);
 
-CREATE INDEX index_saml_group_links_on_group_id ON saml_group_links USING btree (group_id);
-
-CREATE UNIQUE INDEX index_saml_group_links_on_group_id_and_group_name ON saml_group_links USING btree (group_id, group_name);
+CREATE UNIQUE INDEX index_saml_group_links_on_group_id_and_saml_group_name ON saml_group_links USING btree (group_id, saml_group_name);
 
 CREATE INDEX index_saml_providers_on_group_id ON saml_providers USING btree (group_id);
 
