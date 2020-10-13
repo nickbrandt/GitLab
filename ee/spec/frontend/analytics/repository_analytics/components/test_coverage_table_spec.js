@@ -8,16 +8,24 @@ describe('Test coverage table component', () => {
   useFakeDate();
   let wrapper;
 
-  const createComponent = (mountFn = shallowMount, data = {}) => {
+  const findEmptyState = () => wrapper.find('[data-testid="test-coverage-table-empty-state"]');
+  const findLoadingState = () => wrapper.find('[data-testid="test-coverage-loading-state"');
+  const findTable = () => wrapper.find('[data-testid="test-coverage-data-table"');
+  const findProjectNameById = id => wrapper.find(`[data-testid="${id}-name"`);
+  const findProjectAverageById = id => wrapper.find(`[data-testid="${id}-average"`);
+  const findProjectCountById = id => wrapper.find(`[data-testid="${id}-count"`);
+  const findProjectDateById = id => wrapper.find(`[data-testid="${id}-date"`);
+
+  const createComponent = (data = {}, mountFn = shallowMount) => {
     wrapper = mountFn(TestCoverageTable, {
       localVue,
       data() {
         return {
-          coverageData: [],
-          hasError: false,
+          allCoverageData: [],
           allProjectsSelected: false,
-          selectedProjectIds: [],
+          hasError: false,
           isLoading: false,
+          projectIds: {},
           ...data,
         };
       },
@@ -41,18 +49,15 @@ describe('Test coverage table component', () => {
   describe('when code coverage is empty', () => {
     it('renders empty state', () => {
       createComponent();
-      const emptyState = wrapper.find('[data-testid="test-coverage-table-empty-state"]');
-
-      expect(emptyState.exists()).toBe(true);
+      expect(findEmptyState().exists()).toBe(true);
     });
   });
 
   describe('when query is loading', () => {
     it('renders loading state', () => {
-      createComponent(shallowMount, { isLoading: true });
-      const loadingState = wrapper.find('[data-testid="test-coverage-loading-state"');
+      createComponent({ isLoading: true });
 
-      expect(loadingState.exists()).toBe(true);
+      expect(findLoadingState().exists()).toBe(true);
     });
   });
 
@@ -65,30 +70,31 @@ describe('Test coverage table component', () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
 
-      createComponent(mount, {
-        coverageData: [
-          {
-            id,
-            name,
-            codeCoverage: {
-              average,
-              count,
-              lastUpdatedAt: yesterday.toISOString(),
+      createComponent(
+        {
+          allCoverageData: [
+            {
+              id,
+              name,
+              codeCoverage: {
+                average,
+                count,
+                lastUpdatedAt: yesterday.toISOString(),
+              },
             },
+          ],
+          projectIds: {
+            [id]: true,
           },
-        ],
-      });
-      const coverageTable = wrapper.find('[data-testid="test-coverage-data-table"');
-      const expectedName = wrapper.find(`[data-testid="${id}-name"`);
-      const expectedAverage = wrapper.find(`[data-testid="${id}-average"`);
-      const expectedCount = wrapper.find(`[data-testid="${id}-count"`);
-      const expectedDate = wrapper.find(`[data-testid="${id}-date"`);
+        },
+        mount,
+      );
 
-      expect(coverageTable.exists()).toBe(true);
-      expect(expectedName.text()).toBe(name);
-      expect(expectedAverage.text()).toBe(`${average}%`);
-      expect(expectedCount.text()).toBe(count);
-      expect(expectedDate.text()).toBe('1 day ago');
+      expect(findTable().exists()).toBe(true);
+      expect(findProjectNameById(id).text()).toBe(name);
+      expect(findProjectAverageById(id).text()).toBe(`${average}%`);
+      expect(findProjectCountById(id).text()).toBe(count);
+      expect(findProjectDateById(id).text()).toBe('1 day ago');
     });
   });
 });

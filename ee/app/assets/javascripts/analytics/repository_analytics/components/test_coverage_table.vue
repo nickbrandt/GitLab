@@ -1,4 +1,5 @@
 <script>
+import Vue from 'vue';
 import { GlCard, GlEmptyState, GlSkeletonLoader, GlTable } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
@@ -15,64 +16,81 @@ export default {
     SelectProjectsDropdown,
     TimeAgoTooltip,
   },
+  apollo: {
+    coverageData: {
+      query: getProjectsTestCoverage,
+      debounce: 500,
+      variables() {
+        return {
+          projectIds: this.selectedProjectIds,
+        };
+      },
+      result({ data }) {
+        // Keep data from all queries so that we don't
+        // fetch the same data more than once
+        this.allCoverageData = [...this.allCoverageData, ...data.projects.nodes];
+      },
+      error() {
+        this.handleError();
+      },
+      watchLoading(isLoading) {
+        this.isLoading = isLoading;
+      },
+      skip() {
+        return this.skipQuery;
+      },
+    },
+  },
   data() {
     return {
-      coverageData: [],
-      hasError: false,
       allProjectsSelected: false,
-      selectedProjectIds: [],
+      allCoverageData: [],
+      hasError: false,
       isLoading: false,
+      projectIds: {},
     };
   },
   computed: {
     hasCoverageData() {
-      return this.coverageData.length;
+      return Boolean(this.selectedCoverageData.length);
+    },
+    skipQuery() {
+      // Skip if we haven't selected any projects yet
+      return !this.selectedProjectIds.length;
+    },
+    selectedProjectIds() {
+      // Get the IDs of the projects that we haven't requested yet
+      return Object.keys(this.projectIds).filter(
+        id => !this.allCoverageData.some(project => project.id === id),
+      );
+    },
+    selectedCoverageData() {
+      return this.allCoverageData.filter(({ id }) => this.projectIds[id]);
     },
   },
   methods: {
-    getCoverageData() {
-      this.$apollo.addSmartQuery('coverageData', {
-        query: getProjectsTestCoverage,
-        debounce: 500,
-        variables() {
-          return {
-            projectIds: this.selectedProjectIds,
-          };
-        },
-        update(data) {
-          return data.projects.nodes;
-        },
-        error() {
-          this.handleError();
-        },
-        watchLoading(isLoading) {
-          this.isLoading = isLoading;
-        },
-      });
-    },
     handleError() {
       this.hasError = true;
     },
     selectAllProjects(allProjects) {
-      this.selectedProjectIds = allProjects.map(project => project.id);
+      this.projectIds = Object.fromEntries(allProjects.map(({ id }) => [id, true]));
       this.allProjectsSelected = true;
-      this.getCoverageData();
     },
-    selectProject({ id }) {
+    toggleProject({ id }) {
       if (this.allProjectsSelected) {
-        // Clear out all the selected projects
+        // Reset all project selections to false
         this.allProjectsSelected = false;
-        this.selectedProjectIds = [];
+        this.projectIds = Object.fromEntries(
+          Object.entries(this.projectIds).map(([key]) => [key, false]),
+        );
       }
 
-      const index = this.selectedProjectIds.indexOf(id);
-      if (index < 0) {
-        this.selectedProjectIds.push(id);
-      } else {
-        this.selectedProjectIds.splice(index, 1);
+      if (Object.prototype.hasOwnProperty.call(this.projectIds, id)) {
+        Vue.set(this.projectIds, id, !this.projectIds[id]);
+        return;
       }
 
-      this.getCoverageData();
+      Vue.set(this.projectIds, id, true);
     },
   },
   tableFields: [
@@ -99,6 +117,15 @@ export default {
       'RepositoriesAnalytics|Please select a project or multiple projects to display their most recent test coverage data.',
     ),
   },
+  LOADING_STATE: {
+    rows: 4,
+    height: 10,
+    rx: 4,
+    groupXs: [0, 95, 180, 330],
+    widths: [90, 80, 145, 100],
+    totalWidth: 430,
+    totalHeight: 15,
+  },
 };
 </script>
 <template>
@@ -108,43 +135,36 @@ export default {
         class="gl-w-quarter"
         @projects-query-error="handleError"
         @select-all-projects="selectAllProjects"
-        @select-project="selectProject"
+        @select-project="toggleProject"
       />
     </template>
 
-    <gl-skeleton-loader
-      v-if="isLoading"
-      :width="430"
-      :height="55"
-      data-testid="test-coverage-loading-state"
-    >
-      <rect width="90" height="10" x="0" y="0" rx="4" />
-      <rect width="80" height="10" x="95" y="0" rx="4" />
-      <rect width="145" height="10" x="180" y="0" rx="4" />
-      <rect width="100" height="10" x="330" y="0" rx="4" />
-
-      <rect width="90" height="10" x="0" y="15" rx="4" />
-      <rect width="80" height="10" x="95" y="15" rx="4" />
-      <rect width="145" height="10" x="180" y="15" rx="4" />
-      <rect width="100" height="10" x="330" y="15" rx="4" />
-
-      <rect width="90" height="10" x="0" y="30" rx="4" />
-      <rect width="80" height="10" x="95" y="30" rx="4" />
-      <rect width="145" height="10" x="180" y="30" rx="4" />
-      <rect width="100" height="10" x="330" y="30" rx="4" />
-
-      <rect width="90" height="10" x="0" y="45" rx="4" />
-      <rect width="80" height="10" x="95" y="45" rx="4" />
-      <rect width="145" height="10" x="180" y="45" rx="4" />
-      <rect width="100" height="10" x="330" y="45" rx="4" />
-    </gl-skeleton-loader>
+    <template v-if="isLoading">
+      <gl-skeleton-loader
+        v-for="index in $options.LOADING_STATE.rows"
+        :key="index"
+        :width="$options.LOADING_STATE.totalWidth"
+        :height="$options.LOADING_STATE.totalHeight"
+        data-testid="test-coverage-loading-state"
+      >
+        <rect
+          v-for="(x, xIndex) in $options.LOADING_STATE.groupXs"
+          :key="`x-skeleton-${x}`"
+          :width="$options.LOADING_STATE.widths[xIndex]"
+          :height="$options.LOADING_STATE.height"
+          :x="x"
+          :y="0"
+          :rx="$options.LOADING_STATE.rx"
+        />
+      </gl-skeleton-loader>
+    </template>
 
     <gl-table
       v-else-if="hasCoverageData"
       data-testid="test-coverage-data-table"
       thead-class="thead-white"
       :fields="$options.tableFields"
-      :items="coverageData"
+      :items="selectedCoverageData"
     >
       <template #head(project)="data">
         <div>{{ data.label }}</div>
