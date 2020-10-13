@@ -11152,6 +11152,9 @@ msgstr ""
 msgid "FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality."
 msgstr ""
 
+msgid "FeatureFlags|Feature flags limit reached (%{featureFlagsLimit}). Delete one or more feature flags before adding new ones."
+msgstr ""
+
 msgid "FeatureFlags|Flag becomes read only soon"
 msgstr ""
 
