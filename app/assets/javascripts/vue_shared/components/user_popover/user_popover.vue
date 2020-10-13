@@ -12,7 +12,7 @@ import { glEmojiTag } from '../../../emoji';
 const MAX_SKELETON_LINES = 4;
 
 const SECURITY_BOT_USER_DATA = {
-  username: 'security-bot',
+  username: 'GitLab-Security-Bot',
   name: 'GitLab Security Bot',
 };
 
@@ -111,7 +111,7 @@ export default {
           </div>
           <div v-if="isSecurityBot" class="gl-text-blue-500">
             <gl-icon name="question" />
-            <gl-link data-testid="user-popover-security-bot-docs-link" :href="user.websiteUrl">
+            <gl-link data-testid="user-popover-bot-docs-link" :href="user.websiteUrl">
               {{ sprintf(__('Learn more about %{username}'), { username: user.name }) }}
             </gl-link>
           </div>

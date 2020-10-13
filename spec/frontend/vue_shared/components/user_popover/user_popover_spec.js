@@ -205,10 +205,10 @@ describe('User Popover Component', () => {
     const SECURITY_BOT_USER = {
       ...DEFAULT_PROPS.user,
       name: 'GitLab Security Bot',
-      username: 'security-bot',
+      username: 'GitLab-Security-Bot',
       websiteUrl: '/security/bot/docs',
     };
-    const findSecurityBotDocsLink = () => findByTestId('user-popover-security-bot-docs-link');
+    const findSecurityBotDocsLink = () => findByTestId('user-popover-bot-docs-link');
 
     it("shows a link to the bot's documentation", () => {
       createWrapper({ user: SECURITY_BOT_USER });
