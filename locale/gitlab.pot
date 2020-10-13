@@ -9524,6 +9524,9 @@ msgstr ""
 msgid "Edit this release"
 msgstr ""
 
+msgid "Edit title and description"
+msgstr ""
+
 msgid "Edit wiki page"
 msgstr ""
 
