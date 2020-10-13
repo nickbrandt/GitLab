@@ -30861,6 +30861,9 @@ msgstr ""
 msgid "is blocked by"
 msgstr ""
 
+msgid "is forbidden by a top-level group"
+msgstr ""
+
 msgid "is invalid because there is downstream lock"
 msgstr ""
 
@@ -30874,6 +30877,9 @@ msgid "is not a descendant of the Group owning the template"
 msgstr ""
 
 msgid "is not a valid X509 certificate."
+msgstr ""
+
+msgid "is not allowed since the group is not top-level group."
 msgstr ""
 
 msgid "is not allowed. Try again with a different email address, or contact your GitLab admin."
