@@ -133,7 +133,7 @@ export default {
       <gl-dropdown
         class="js-insights-dropdown w-100"
         data-qa-selector="insights_dashboard_dropdown"
-        menu-class="w-100 mw-100"
+        menu-class="gl-w-full"
         toggle-class="dropdown-menu-toggle w-100 gl-field-error-outline"
         :text="__('Select Page')"
         :disabled="pageLoading"
