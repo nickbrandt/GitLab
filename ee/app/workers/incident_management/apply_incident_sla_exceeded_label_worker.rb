@@ -8,7 +8,7 @@ module IncidentManagement
     feature_category :incident_management
 
     def perform(incident_id)
-      @incident = Issue.find_by(id: incident_id)
+      @incident = Issue.find_by_id(incident_id)
       @project = incident&.project
 
       return unless incident && project

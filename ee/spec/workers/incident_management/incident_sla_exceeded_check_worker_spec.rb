@@ -11,34 +11,32 @@ RSpec.describe IncidentManagement::IncidentSlaExceededCheckWorker do
     let_it_be(:incident_sla) { create(:issuable_sla, :exceeded) }
     let_it_be(:other_incident_slas) { create_list(:issuable_sla, 2, :exceeded) }
 
-    let(:label_service_stub) { instance_double(IncidentManagement::ApplyIncidentSlaExceededLabelService, execute: true) }
+    let(:label_service_stub) { instance_double(IncidentManagement::ApplyIncidentSlaExceededLabelWorker) }
 
     it 'calls the apply incident sla label service' do
-      expect(IncidentManagement::ApplyIncidentSlaExceededLabelService)
-        .to receive(:new)
+      expect(IncidentManagement::ApplyIncidentSlaExceededLabelWorker)
+        .to receive(:perform_async)
         .exactly(3)
-        .and_return(label_service_stub)
-
-      expect(label_service_stub).to receive(:execute).exactly(3).times
+        .times
 
       perform
     end
 
     context 'when error occurs' do
       before do
-        allow(IncidentManagement::ApplyIncidentSlaExceededLabelService)
-          .to receive(:new)
-          .and_return(label_service_stub)
+        allow(IncidentManagement::ApplyIncidentSlaExceededLabelWorker)
+          .to receive(:perform_async)
+          .twice
 
-        allow(IncidentManagement::ApplyIncidentSlaExceededLabelService)
-          .to receive(:new)
-          .with(incident_sla.issue)
+        allow(IncidentManagement::ApplyIncidentSlaExceededLabelWorker)
+          .to receive(:perform_async)
+          .with(incident_sla.issue.id)
           .and_raise('test')
+          .once
       end
 
       it 'logs the error and continues to run the others' do
         expect(Gitlab::AppLogger).to receive(:error).once
-        expect(label_service_stub).to receive(:execute).twice
 
         perform
       end
