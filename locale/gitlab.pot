@@ -28123,6 +28123,9 @@ msgstr ""
 msgid "UsageQuota|Storage"
 msgstr ""
 
+msgid "UsageQuota|This namespace contains locked projects"
+msgstr ""
+
 msgid "UsageQuota|This namespace has no projects which use shared runners"
 msgstr ""
 
@@ -30191,6 +30194,9 @@ msgid "Your project limit is %{limit} projects! Please contact your administrato
 msgstr ""
 
 msgid "Your projects"
+msgstr ""
+
+msgid "Your purchased storage is running low. To avoid locked projects, please purchase more storage."
 msgstr ""
 
 msgid "Your request for access could not be processed: %{error_meesage}"
