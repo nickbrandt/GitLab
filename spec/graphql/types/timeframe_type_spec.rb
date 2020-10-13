@@ -24,10 +24,9 @@ RSpec.describe GitlabSchema.types['Timeframe'] do
   end
 
   it 'requires both ends of the range' do
-    input[:start] = nil
+    types = described_class.arguments.slice('start', 'end').values.map(&:type)
 
-    expect { described_class.coerce_isolated_input(input) }
-      .to raise_error(::GraphQL::CoercionError)
+    expect(types).to all(be_non_null)
   end
 
   it 'rejects invalid range' do
