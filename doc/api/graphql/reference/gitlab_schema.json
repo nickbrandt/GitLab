@@ -667,6 +667,20 @@
               "deprecationReason": null
             },
             {
+              "name": "environment",
+              "description": "Environment for the alert",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Environment",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "eventCount",
               "description": "Number of events of this alert",
               "args": [
@@ -15990,7 +16004,7 @@
             },
             {
               "name": "latestOpenedMostSevereAlert",
-              "description": "The most severe open alert for the environment. If multiple alerts have equal severity, the most recent is returned.",
+              "description": "The most severe open alert for the environment. If multiple alerts have equal severity, the most recent is returned",
               "args": [
 
               ],
@@ -16043,6 +16057,20 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "path",
+              "description": "The path to the environment. Will always return null if `expose_environment_path_in_alert_details` feature flag is disabled",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -20073,6 +20101,34 @@
           "description": null,
           "fields": [
             {
+              "name": "actualRepositorySizeLimit",
+              "description": "Size limit for repositories in the namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "additionalPurchasedStorageSize",
+              "description": "Additional storage purchased for the root namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "autoDevopsEnabled",
               "description": "Indicates whether Auto DevOps is enabled for all projects within this group",
               "args": [
@@ -20186,6 +20242,24 @@
                 "kind": "OBJECT",
                 "name": "BoardConnection",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "containsLockedProjects",
+              "description": "Includes at least one project where the repository size exceeds the limit",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -21721,6 +21795,24 @@
               "deprecationReason": null
             },
             {
+              "name": "repositorySizeExcessProjectCount",
+              "description": "Number of projects in the root namespace where the repository size exceeds the limit",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "requestAccessEnabled",
               "description": "Indicates if users can request access to namespace",
               "args": [
@@ -21911,6 +22003,34 @@
                   "name": "TimelogConnection",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "totalRepositorySize",
+              "description": "Total repository size of all projects in the root namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "totalRepositorySizeExcess",
+              "description": "Total excess repository size of all projects in the root namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -35216,6 +35336,52 @@
           "description": null,
           "fields": [
             {
+              "name": "actualRepositorySizeLimit",
+              "description": "Size limit for repositories in the namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "additionalPurchasedStorageSize",
+              "description": "Additional storage purchased for the root namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "containsLockedProjects",
+              "description": "Includes at least one project where the repository size exceeds the limit",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "description",
               "description": "Description of the namespace",
               "args": [
@@ -35463,6 +35629,24 @@
               "deprecationReason": null
             },
             {
+              "name": "repositorySizeExcessProjectCount",
+              "description": "Number of projects in the root namespace where the repository size exceeds the limit",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "requestAccessEnabled",
               "description": "Indicates if users can request access to namespace",
               "args": [
@@ -35513,6 +35697,34 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "Time",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "totalRepositorySize",
+              "description": "Total repository size of all projects in the root namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "totalRepositorySizeExcess",
+              "description": "Total excess repository size of all projects in the root namespace in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -38182,6 +38394,20 @@
           "description": null,
           "fields": [
             {
+              "name": "actualRepositorySizeLimit",
+              "description": "Size limit for the repository in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "alertManagementAlert",
               "description": "A single Alert Management alert of the project",
               "args": [
@@ -38232,6 +38458,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "assigneeUsername",
+                  "description": "Username of a user assigned to the issue",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -38249,6 +38485,16 @@
                 {
                   "name": "search",
                   "description": "Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "assigneeUsername",
+                  "description": "Username of a user assigned to the issue",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -38310,6 +38556,16 @@
                 {
                   "name": "search",
                   "description": "Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "assigneeUsername",
+                  "description": "Username of a user assigned to the issue",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -40987,6 +41243,20 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "Repository",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "repositorySizeExcess",
+              "description": "Size of repository that exceeds the limit in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -46980,6 +47250,24 @@
             {
               "name": "packagesSize",
               "description": "The packages size in bytes",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "pipelineArtifactsSize",
+              "description": "The CI pipeline artifacts size in bytes",
               "args": [
 
               ],
