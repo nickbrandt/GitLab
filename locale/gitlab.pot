@@ -8610,16 +8610,25 @@ msgstr ""
 msgid "Dependencies|Job failed to generate the dependency list"
 msgstr ""
 
+msgid "Dependencies|Learn more about dependency paths"
+msgstr ""
+
 msgid "Dependencies|License"
 msgstr ""
 
 msgid "Dependencies|Location"
 msgstr ""
 
+msgid "Dependencies|Location and dependency path"
+msgstr ""
+
 msgid "Dependencies|Packager"
 msgstr ""
 
 msgid "Dependencies|The %{codeStartTag}dependency_scanning%{codeEndTag} job has failed and cannot generate the list. Please ensure the job is running properly and run the pipeline again."
+msgstr ""
+
+msgid "Dependencies|The component dependency path is based on the lock file. There may be several paths. In these cases, the longest path is displayed."
 msgstr ""
 
 msgid "Dependencies|There may be multiple paths"
