@@ -206,7 +206,7 @@ export default {
       this.trackUploadDesign(res);
     },
     trackUploadDesign(res) {
-      // NOTE: in the future, we can add skipped and deleted design tracking here
+      // NOTE: in the future, we can add "skipped" design tracking here
       res.data.designManagementUpload.designs.forEach(design => {
         if (design.event === 'CREATION') {
           trackDesignCreate();

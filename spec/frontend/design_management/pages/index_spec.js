@@ -4,6 +4,7 @@ import VueDraggable from 'vuedraggable';
 import VueRouter from 'vue-router';
 import { GlEmptyState } from '@gitlab/ui';
 import createMockApollo from 'jest/helpers/mock_apollo_helper';
+import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
 import Index from '~/design_management/pages/index.vue';
 import uploadDesignQuery from '~/design_management/graphql/mutations/upload_design.mutation.graphql';
 import DesignDestroyer from '~/design_management/components/design_destroyer.vue';
@@ -21,6 +22,8 @@ import * as utils from '~/design_management/utils/design_management_utils';
 import { DESIGN_DETAIL_LAYOUT_CLASSLIST } from '~/design_management/constants';
 import {
   designListQueryResponse,
+  designUploadMutationCreatedResponse,
+  designUploadMutationUpdatedResponse,
   permissionsQueryResponse,
   moveDesignMutationResponse,
   reorderedDesigns,
@@ -29,7 +32,7 @@ import {
 import getDesignListQuery from '~/design_management/graphql/queries/get_design_list.query.graphql';
 import permissionsQuery from '~/design_management/graphql/queries/design_permissions.query.graphql';
 import moveDesignMutation from '~/design_management/graphql/mutations/move_design.mutation.graphql';
-import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
+import { DESIGN_TRACKING_PAGE_NAME } from '~/design_management/utils/tracking';
 
 jest.mock('~/flash.js');
 const mockPageEl = {
@@ -489,6 +492,8 @@ describe('Design management index page', () => {
 
       beforeEach(() => {
         trackingSpy = mockTracking('_category_', undefined, jest.spyOn);
+
+        createComponent({ stubs: { GlEmptyState } });
       });
 
       afterEach(() => {
@@ -496,16 +501,17 @@ describe('Design management index page', () => {
       });
 
       it('tracks design creation', () => {
-        createComponent({ stubs: { GlEmptyState } });
+        wrapper.vm.onUploadDesignDone(designUploadMutationCreatedResponse);
 
-        wrapper.vm.onUploadDesign([{ name: 'test' }]);
-        wrapper.vm.onUploadDesignDone();
-        // expect(trackingSpy).toHaveBeenCalledWith(undefined, 'create_design', {});
+        expect(trackingSpy).toHaveBeenCalledTimes(1);
+        expect(trackingSpy).toHaveBeenCalledWith(DESIGN_TRACKING_PAGE_NAME, 'create_design');
       });
 
       it('tracks design modification', () => {
-        wrapper.vm.onUploadDesignDone();
-        // expect(trackingSpy).toHaveBeenCalledWith(undefined, 'update_design', {});
+        wrapper.vm.onUploadDesignDone(designUploadMutationUpdatedResponse);
+
+        expect(trackingSpy).toHaveBeenCalledTimes(1);
+        expect(trackingSpy).toHaveBeenCalledWith(DESIGN_TRACKING_PAGE_NAME, 'update_design');
       });
     });
   });
