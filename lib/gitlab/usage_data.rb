@@ -141,6 +141,7 @@ module Gitlab
             projects_creating_incidents: distinct_count(Issue.incident, :project_id),
             projects_imported_from_github: count(Project.where(import_type: 'github')),
             projects_with_repositories_enabled: count(ProjectFeature.where('repository_access_level > ?', ProjectFeature::DISABLED)),
+            projects_with_tracing_enabled: count(ProjectTracingSetting),
             projects_with_error_tracking_enabled: count(::ErrorTracking::ProjectErrorTrackingSetting.where(enabled: true)),
             projects_with_alerts_service_enabled: count(AlertsService.active),
             projects_with_prometheus_alerts: distinct_count(PrometheusAlert, :project_id),
@@ -200,7 +201,7 @@ module Gitlab
             personal_snippets: count(PersonalSnippet.where(last_28_days_time_period)),
             project_snippets: count(ProjectSnippet.where(last_28_days_time_period))
           }.merge(
-            snowplow_event_counts(time_period: last_28_days_time_period(column: :collector_tstamp))
+            snowplow_event_counts(last_28_days_time_period(column: :collector_tstamp))
           ).tap do |data|
             data[:snippets] = data[:personal_snippets] + data[:project_snippets]
           end
@@ -573,7 +574,8 @@ module Gitlab
           clusters_applications_prometheus: cluster_applications_user_distinct_count(::Clusters::Applications::Prometheus, time_period),
           operations_dashboard_default_dashboard: count(::User.active.with_dashboard('operations').where(time_period),
                                                         start: user_minimum_id,
-                                                        finish: user_maximum_id)
+                                                        finish: user_maximum_id),
+          projects_with_tracing_enabled: distinct_count(::Project.with_tracing_enabled.where(time_period), :creator_id)
         }
       end
       # rubocop: enable CodeReuse/ActiveRecord
@@ -814,8 +816,6 @@ module Gitlab
         clear_memoization(:unique_visit_service)
         clear_memoization(:deployment_minimum_id)
         clear_memoization(:deployment_maximum_id)
-        clear_memoization(:approval_merge_request_rule_minimum_id)
-        clear_memoization(:approval_merge_request_rule_maximum_id)
         clear_memoization(:project_minimum_id)
         clear_memoization(:project_maximum_id)
         clear_memoization(:auth_providers)

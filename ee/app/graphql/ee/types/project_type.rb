@@ -100,7 +100,7 @@ module EE
               ::Types::DastSiteProfileType.connection_type,
               null: true,
               description: 'DAST Site Profiles associated with the project',
-              resolve: -> (obj, _args, _ctx) { obj.dast_site_profiles.with_dast_site }
+              resolve: -> (obj, _args, _ctx) { DastSiteProfilesFinder.new(project_id: obj.id).execute }
 
         field :cluster_agent,
               ::Types::Clusters::AgentType,
@@ -114,6 +114,17 @@ module EE
               null: true,
               description: 'Cluster agents associated with the project',
               resolver: ::Resolvers::Clusters::AgentsResolver
+
+        field :repository_size_excess,
+              GraphQL::FLOAT_TYPE,
+              null: true,
+              description: 'Size of repository that exceeds the limit in bytes'
+
+        field :actual_repository_size_limit,
+              GraphQL::FLOAT_TYPE,
+              null: true,
+              description: 'Size limit for the repository in bytes',
+              resolve: -> (obj, _args, _ctx) { obj.actual_size_limit }
 
         def self.sast_ci_configuration(project)
           ::Security::CiConfiguration::SastParserService.new(project).configuration

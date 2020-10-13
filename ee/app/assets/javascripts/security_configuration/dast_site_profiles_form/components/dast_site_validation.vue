@@ -1,5 +1,4 @@
 <script>
-import * as Sentry from '@sentry/browser';
 import {
   GlAlert,
   GlButton,
@@ -12,12 +11,15 @@ import {
   GlInputGroupText,
   GlLoadingIcon,
 } from '@gitlab/ui';
+import * as Sentry from '~/sentry/wrapper';
 import download from '~/lib/utils/downloader';
 import { cleanLeadingSeparator, joinPaths, stripPathTail } from '~/lib/utils/url_utility';
+import { fetchPolicies } from '~/lib/graphql';
 import {
   DAST_SITE_VALIDATION_METHOD_TEXT_FILE,
   DAST_SITE_VALIDATION_METHODS,
   DAST_SITE_VALIDATION_STATUS,
+  DAST_SITE_VALIDATION_POLL_INTERVAL,
 } from '../constants';
 import dastSiteValidationCreateMutation from '../graphql/dast_site_validation_create.mutation.graphql';
 import dastSiteValidationQuery from '../graphql/dast_site_validation.query.graphql';
@@ -53,14 +55,19 @@ export default {
           },
         },
       }) {
-        if (status === DAST_SITE_VALIDATION_STATUS.VALID) {
+        if (status === DAST_SITE_VALIDATION_STATUS.PASSED) {
           this.onSuccess();
+        }
+
+        if (status === DAST_SITE_VALIDATION_STATUS.FAILED) {
+          this.onError();
         }
       },
       skip() {
         return !(this.isCreatingValidation || this.isValidating);
       },
-      pollInterval: 1000,
+      pollInterval: DAST_SITE_VALIDATION_POLL_INTERVAL,
+      fetchPolicy: fetchPolicies.NETWORK_ONLY,
       error(e) {
         this.onError(e);
       },
@@ -159,7 +166,7 @@ export default {
         });
         if (errors?.length) {
           this.onError();
-        } else if (status === DAST_SITE_VALIDATION_STATUS.VALID) {
+        } else if (status === DAST_SITE_VALIDATION_STATUS.PASSED) {
           this.onSuccess();
         } else {
           this.isCreatingValidation = false;

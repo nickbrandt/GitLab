@@ -333,6 +333,7 @@ setting is used:
 | Artifact limit name                         | Default value |
 |---------------------------------------------|---------------|
 | `ci_max_artifact_size_accessibility`        | 0             |
+| `ci_max_artifact_size_api_fuzzing`          | 0             |
 | `ci_max_artifact_size_archive`              | 0             |
 | `ci_max_artifact_size_browser_performance`  | 0             |
 | `ci_max_artifact_size_cluster_applications` | 0             |
@@ -555,6 +556,9 @@ Plan.default.actual_limits.update!(pypi_max_file_size: 100.megabytes)
 
 # For Debian Packages
 Plan.default.actual_limits.update!(debian_max_file_size: 100.megabytes)
+
+# For Generic Packages
+Plan.default.actual_limits.update!(generic_packages_max_file_size: 100.megabytes)
 ```
 
 Set the limit to `0` to allow any file size.

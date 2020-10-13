@@ -389,8 +389,8 @@ RSpec.describe GroupsController, factory_default: :keep do
   end
 
   describe 'GET #issues', :sidekiq_might_not_need_inline do
-    let(:issue_1) { create(:issue, project: project, title: 'foo') }
-    let(:issue_2) { create(:issue, project: project, title: 'bar') }
+    let_it_be(:issue_1) { create(:issue, project: project, title: 'foo') }
+    let_it_be(:issue_2) { create(:issue, project: project, title: 'bar') }
 
     before do
       create_list(:award_emoji, 3, awardable: issue_2)
@@ -398,6 +398,15 @@ RSpec.describe GroupsController, factory_default: :keep do
       create_list(:award_emoji, 2, :downvote, awardable: issue_2)
 
       sign_in(user)
+    end
+
+    it 'lists only incidents and issues' do
+      incident = create(:incident, project: project)
+      create(:quality_test_case, project: project)
+
+      get :issues, params: { id: group.to_param }
+
+      expect(assigns(:issues)).to match_array([issue_1, issue_2, incident])
     end
 
     context 'sorting by votes' do
@@ -538,6 +547,37 @@ RSpec.describe GroupsController, factory_default: :keep do
 
           expect(response).to have_gitlab_http_status(:found)
           expect(group.reload.default_branch_protection).not_to eq(::Gitlab::Access::PROTECTION_DEV_CAN_MERGE)
+        end
+      end
+    end
+
+    context "updating default_branch_name" do
+      let(:example_branch_name) { "example_branch_name" }
+
+      subject(:update_action) do
+        put :update,
+          params: {
+            id: group.to_param,
+            group: { default_branch_name: example_branch_name }
+          }
+      end
+
+      it "updates the attribute" do
+        expect { subject }
+          .to change { group.namespace_settings.reload.default_branch_name }
+          .from(nil)
+          .to(example_branch_name)
+
+        expect(response).to have_gitlab_http_status(:found)
+      end
+
+      context "to empty string" do
+        let(:example_branch_name) { '' }
+
+        it "does not update the attribute" do
+          subject
+
+          expect(group.namespace_settings.reload.default_branch_name).not_to eq('')
         end
       end
     end
