@@ -18,8 +18,6 @@ module IncidentManagement
 
       incident.labels << label
       add_resource_event
-
-      label
     end
 
     private
