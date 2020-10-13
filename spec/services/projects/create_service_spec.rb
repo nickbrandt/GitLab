@@ -74,10 +74,6 @@ RSpec.describe Projects::CreateService, '#execute' do
   context "admin creates project with other user's namespace_id" do
     it 'sets the correct permissions' do
       admin = create(:admin)
-      opts = {
-        name: 'GitLab',
-        namespace_id: user.namespace.id
-      }
       project = create_project(admin, opts)
 
       expect(project).to be_persisted
