@@ -1,5 +1,4 @@
 <script>
-import * as Sentry from '@sentry/browser';
 import {
   GlAlert,
   GlBadge,
@@ -12,6 +11,7 @@ import {
   GlButton,
   GlSafeHtmlDirective,
 } from '@gitlab/ui';
+import * as Sentry from '~/sentry/wrapper';
 import { s__ } from '~/locale';
 import alertQuery from '../graphql/queries/details.query.graphql';
 import sidebarStatusQuery from '../graphql/queries/sidebar_status.query.graphql';
