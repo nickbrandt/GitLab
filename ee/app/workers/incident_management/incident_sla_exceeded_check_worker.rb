@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module IncidentManagement
-  class IncidentSlaExceededCheckWorker # rubocop:disable Scalability/IdempotentWorker
+  class IncidentSlaExceededCheckWorker
     include ApplicationWorker
     include CronjobQueue # rubocop:disable Scalability/CronWorkerContext
 
@@ -11,7 +11,7 @@ module IncidentManagement
     def perform
       IssuableSla.exceeded_for_issues.find_in_batches do |incident_slas|
         incident_slas.each do |incident_sla|
-          ApplyIncidentSlaExceededLabelService.new(incident_sla.issue).execute
+          ApplyIncidentSlaExceededLabelWorker.perform_async(incident_sla.issue.id)
 
         rescue StandardError => e
           Gitlab::AppLogger.error("Error encountered in #{self.class.name}: #{e}")

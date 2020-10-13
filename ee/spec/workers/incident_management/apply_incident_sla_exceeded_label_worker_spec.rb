@@ -2,7 +2,9 @@
 
 require 'spec_helper'
 
-RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelService do
+RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelWorker do
+  let(:worker) { described_class.new }
+
   let_it_be_with_refind(:incident) { create(:incident) }
   let_it_be(:project) { incident.project }
   let_it_be(:label) do
@@ -12,7 +14,7 @@ RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelService do
       .payload[:label]
   end
 
-  subject(:apply_label) { described_class.new(incident).execute }
+  subject(:perform) { worker.perform(incident.id) }
 
   context 'label exists already' do
     before do
@@ -25,11 +27,11 @@ RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelService do
   end
 
   it 'adds a label to the incident' do
-    expect { apply_label }.to change { incident.labels.reload.count }.by(1)
+    expect { perform }.to change { incident.labels.reload.count }.by(1)
 
     expected_props = IncidentManagement::CreateIncidentSlaExceededLabelService::LABEL_PROPERTIES
 
-    expect(apply_label).to have_attributes(expected_props)
+    expect(perform).to have_attributes(expected_props)
   end
 
   it 'adds a note that the label was added' do

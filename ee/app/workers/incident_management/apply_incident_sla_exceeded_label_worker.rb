@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
 module IncidentManagement
-  class ApplyIncidentSlaExceededLabelService < BaseService
-    def initialize(incident)
-      super(incident.project)
+  class ApplyIncidentSlaExceededLabelWorker
+    include ApplicationWorker
 
-      @incident = incident
+    idempotent!
+    feature_category :incident_management
+
+    def perform(incident_id)
+      @incident = Issue.find_by(id: incident_id)
+      @project = incident&.project
+
+      return unless incident && project
+
       @label = incident_exceeded_sla_label
-    end
-
-    def execute
       return if incident.label_ids.include?(label.id)
 
       incident.labels << label
@@ -20,7 +24,7 @@ module IncidentManagement
 
     private
 
-    attr_reader :incident, :label
+    attr_reader :incident, :project, :label
 
     def add_resource_event
       ResourceEvents::ChangeLabelsService
