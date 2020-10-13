@@ -16,19 +16,22 @@ RSpec.describe IssuableSla do
       subject { described_class.exceeded_for_issues }
 
       let_it_be(:project) { create(:project) }
-      let!(:issuable_sla) { create(:issuable_sla, issue: issue, due_at: due_at) }
-      let(:due_at) { Time.current - 1.hour }
-      let(:issue) { create(:issue, project: project) }
+      let_it_be_with_reload(:issue) { create(:issue, project: project) }
+      let_it_be_with_reload(:issuable_sla) { create(:issuable_sla, issue: issue, due_at: Time.current - 1.hour) }
 
       context 'issue closed' do
-        let(:issue) { create(:issue, :closed, project: project) }
+        before do
+          issue.close!
+        end
 
         it { is_expected.to be_empty }
       end
 
       context 'issue opened' do
         context 'due_at has not passed' do
-          let(:due_at) { Time.current + 1.hour }
+          before do
+            issuable_sla.update!(due_at: Time.current + 1.hour)
+          end
 
           it { is_expected.to be_empty }
         end

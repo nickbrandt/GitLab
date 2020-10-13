@@ -8,9 +8,8 @@ RSpec.describe IncidentManagement::IncidentSlaExceededCheckWorker do
   describe '#perform' do
     subject(:perform) { worker.perform }
 
-    let_it_be(:incident_1) { create(:incident_sla, :exceeded) }
-    let_it_be(:incident_2) { create(:incident_sla, :exceeded) }
-    let_it_be(:incident_3) { create(:incident_sla, :exceeded) }
+    let_it_be(:incident_sla) { create(:issuable_sla, :exceeded) }
+    let_it_be(:other_incident_slas) { create_list(:issuable_sla, 2, :exceeded) }
 
     let(:label_service_stub) { instance_double(IncidentManagement::ApplyIncidentSlaExceededLabelService, execute: true) }
 
@@ -33,13 +32,13 @@ RSpec.describe IncidentManagement::IncidentSlaExceededCheckWorker do
 
         allow(IncidentManagement::ApplyIncidentSlaExceededLabelService)
           .to receive(:new)
-          .with(incident_1.issue)
+          .with(incident_sla.issue)
           .and_raise('test')
       end
 
       it 'logs the error and continues to run the others' do
         expect(Gitlab::AppLogger).to receive(:error).once
-        expect(label_service_stub).to receive(:execute).exactly(2).times
+        expect(label_service_stub).to receive(:execute).twice
 
         perform
       end

@@ -12,7 +12,7 @@ RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelService do
       .payload[:label]
   end
 
-  subject { described_class.new(incident).execute }
+  subject(:apply_label) { described_class.new(incident).execute }
 
   context 'label exists already' do
     before do
@@ -25,7 +25,11 @@ RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelService do
   end
 
   it 'adds a label to the incident' do
-    expect { subject }.to change { incident.labels.reload.count }
+    expect { apply_label }.to change { incident.labels.reload.count }.by(1)
+
+    expected_props = IncidentManagement::CreateIncidentSlaExceededLabelService::LABEL_PROPERTIES
+
+    expect(apply_label).to have_attributes(expected_props)
   end
 
   it 'adds a note that the label was added' do
