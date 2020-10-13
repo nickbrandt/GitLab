@@ -4215,6 +4215,9 @@ msgstr ""
 msgid "Branch %{branch_name} was created. To set up auto deploy, choose a GitLab CI Yaml template and commit your changes. %{link_to_autodeploy_doc}"
 msgstr ""
 
+msgid "Branch already exists"
+msgstr ""
+
 msgid "Branch changed"
 msgstr ""
 
@@ -29474,6 +29477,9 @@ msgid "Work in progress Limit"
 msgstr ""
 
 msgid "Would you like to create a new branch?"
+msgstr ""
+
+msgid "Would you like to try auto-generating a branch name?"
 msgstr ""
 
 msgid "Write"
