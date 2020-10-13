@@ -2042,6 +2042,21 @@ msgstr ""
 msgid "AdminStatistics|Snippets"
 msgstr ""
 
+msgid "AdminUsers|(Admin)"
+msgstr ""
+
+msgid "AdminUsers|(Blocked)"
+msgstr ""
+
+msgid "AdminUsers|(Deactivated)"
+msgstr ""
+
+msgid "AdminUsers|(Internal)"
+msgstr ""
+
+msgid "AdminUsers|(Pending approval)"
+msgstr ""
+
 msgid "AdminUsers|2FA Disabled"
 msgstr ""
 
@@ -2244,6 +2259,9 @@ msgid "AdminUsers|You are about to permanently delete the user %{username}. Issu
 msgstr ""
 
 msgid "AdminUsers|You are about to permanently delete the user %{username}. This will delete all of the issues, merge requests, and groups linked to them. To avoid data loss, consider using the %{strongStart}block user%{strongEnd} feature instead. Once you %{strongStart}Delete user%{strongEnd}, it cannot be undone or recovered."
+msgstr ""
+
+msgid "AdminUsers|You can always unblock their account, their data will remain intact."
 msgstr ""
 
 msgid "AdminUsers|You cannot remove your own admin rights."
