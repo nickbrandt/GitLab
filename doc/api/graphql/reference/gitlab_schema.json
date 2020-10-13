@@ -5344,6 +5344,20 @@
           "description": null,
           "fields": [
             {
+              "name": "detailedStatus",
+              "description": "Detailed status of the group",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DetailedStatus",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "jobs",
               "description": "Jobs in group",
               "args": [
@@ -5550,6 +5564,20 @@
           "description": null,
           "fields": [
             {
+              "name": "detailedStatus",
+              "description": "Detailed status of the job",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DetailedStatus",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "name",
               "description": "Name of the job",
               "args": [
@@ -5751,6 +5779,20 @@
           "name": "CiStage",
           "description": null,
           "fields": [
+            {
+              "name": "detailedStatus",
+              "description": "Detailed status of the stage",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DetailedStatus",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "groups",
               "description": "Group of jobs for the stage",
@@ -14279,25 +14321,21 @@
             },
             {
               "name": "detailsPath",
-              "description": "Path of the details for the pipeline status",
+              "description": "Path of the details for the status",
               "args": [
 
               ],
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "favicon",
-              "description": "Favicon of the pipeline status",
+              "description": "Favicon of the status",
               "args": [
 
               ],
@@ -14315,7 +14353,7 @@
             },
             {
               "name": "group",
-              "description": "Group of the pipeline status",
+              "description": "Group of the status",
               "args": [
 
               ],
@@ -14333,7 +14371,7 @@
             },
             {
               "name": "hasDetails",
-              "description": "Indicates if the pipeline status has further details",
+              "description": "Indicates if the status has further details",
               "args": [
 
               ],
@@ -14351,7 +14389,7 @@
             },
             {
               "name": "icon",
-              "description": "Icon of the pipeline status",
+              "description": "Icon of the status",
               "args": [
 
               ],
@@ -14369,7 +14407,7 @@
             },
             {
               "name": "label",
-              "description": "Label of the pipeline status",
+              "description": "Label of the status",
               "args": [
 
               ],
@@ -14387,7 +14425,7 @@
             },
             {
               "name": "text",
-              "description": "Text of the pipeline status",
+              "description": "Text of the status",
               "args": [
 
               ],
@@ -14405,7 +14443,7 @@
             },
             {
               "name": "tooltip",
-              "description": "Tooltip associated with the pipeline status",
+              "description": "Tooltip associated with the status",
               "args": [
 
               ],
