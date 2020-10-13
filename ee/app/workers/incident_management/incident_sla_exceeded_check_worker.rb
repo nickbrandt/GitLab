@@ -9,10 +9,8 @@ module IncidentManagement
     feature_category :incident_management
 
     def perform
-      IssuableSla.exceeded_for_issues.find_in_batches do |incident_slas|
-        incident_slas.each do |incident_sla|
-          ApplyIncidentSlaExceededLabelWorker.perform_async(incident_sla.issue_id)
-        end
+      IssuableSla.exceeded_for_issues.find_each do |incident_sla|
+        ApplyIncidentSlaExceededLabelWorker.perform_async(incident_sla.issue_id)
       end
     end
   end
