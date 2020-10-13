@@ -58,7 +58,7 @@ module EE
     end
 
     def sla_feature_available?
-      ::Feature.enabled?(:incident_sla_dev, @project) && @project.feature_available?(:incident_sla, current_user)
+      ::IncidentManagement::IncidentSla.available_for?(@project)
     end
 
     def opsgenie_mvc_data
