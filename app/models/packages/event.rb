@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Packages::Event < ApplicationRecord
+  include UsageStatistics
+
   belongs_to :package, optional: true
 
   EVENT_SCOPES = ::Packages::Package.package_types.merge(container: 1000, tag: 1001).freeze
@@ -22,4 +24,7 @@ class Packages::Event < ApplicationRecord
   }
 
   enum originator_type: { user: 0, deploy_token: 1, guest: 2 }
+
+  scope :with_guest, -> { where(originator_type: :guest) }
+  scope :without_guest, -> { where.not(originator_type: :guest) }
 end

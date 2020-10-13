@@ -21190,6 +21190,8 @@ CREATE UNIQUE INDEX index_packages_dependencies_on_name_and_version_pattern ON p
 
 CREATE INDEX index_packages_dependency_links_on_dependency_id ON packages_dependency_links USING btree (dependency_id);
 
+CREATE INDEX index_packages_events_on_created_and_types_and_originator ON packages_events USING btree (originator, originator_type, event_type, created_at);
+
 CREATE INDEX index_packages_events_on_package_id ON packages_events USING btree (package_id);
 
 CREATE INDEX index_packages_maven_metadata_on_package_id_and_path ON packages_maven_metadata USING btree (package_id, path);

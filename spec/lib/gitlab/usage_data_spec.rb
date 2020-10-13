@@ -55,16 +55,34 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
   end
 
   describe 'usage_activity_by_stage_package' do
-    it 'includes accurate usage_activity_by_stage data' do
-      for_defined_days_back do
-        create(:project, packages: [create(:package)] )
-      end
+    let(:all_activity) { described_class.usage_activity_by_stage_package({}) }
+    let(:time_period_activity) { described_class.usage_activity_by_stage_package(described_class.last_28_days_time_period) }
 
-      expect(described_class.usage_activity_by_stage_package({})).to eq(
-        projects_with_packages: 2
+    before do
+      for_defined_days_back do
+        create(:package_usage_data)
+      end
+    end
+
+    it 'includes accurate usage_activity_by_stage data' do
+      expect(all_activity).to include(
+        projects_with_packages: 4
       )
-      expect(described_class.usage_activity_by_stage_package(described_class.last_28_days_time_period)).to eq(
-        projects_with_packages: 1
+
+      expect(all_activity).to have_key(:by_event_type)
+      expect(all_activity[:by_event_type]).to have_key('user').and have_key('deploy_token')
+
+      expect(all_activity[:by_event_type]['user']).to have_key('push_package').and have_key('delete_package')
+      expect(all_activity[:by_event_type]['user']['push_package']).to have_key('npm').and have_key('composer')
+
+      expect(all_activity[:by_event_type]['user']['push_package']['npm']).to eq 4
+      expect(all_activity[:by_event_type]['user']['push_package']['composer']).to eq 4
+
+      expect(all_activity[:by_event_type]['deploy_token']['push_package']['composer']).to eq 2
+      expect(all_activity[:by_event_type]['guest']['push_package']['composer']).to eq 2
+
+      expect(time_period_activity).to include(
+        projects_with_packages: 2
       )
     end
   end

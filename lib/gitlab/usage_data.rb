@@ -625,8 +625,31 @@ module Gitlab
       # rubocop: disable CodeReuse/ActiveRecord
       def usage_activity_by_stage_package(time_period)
         {
+          by_event_type: package_events(time_period),
           projects_with_packages: distinct_count(::Project.with_packages.where(time_period), :creator_id)
         }
+      end
+
+      def package_events(time_period)
+        packages_counts = {}
+
+        counts = distinct_count(Packages::Event.where(time_period).without_guest.group(:originator_type, :event_type, :event_scope), :originator)
+
+        # guest events don't have originator so we cannot do distinct count
+        guest_counts = count(Packages::Event.where(time_period).with_guest.group(:originator_type, :event_type, :event_scope))
+
+        return {} if counts == -1 || guest_counts == -1
+        return counts if counts.is_a?(String) || guest_counts.is_a?(String) # sql output
+
+        counts.each_pair do |scope, count|
+          packages_counts.deep_merge!(scope[0] => { scope[1] => { scope[2] => count } } )
+        end
+
+        guest_counts.each_pair do |scope, count|
+          packages_counts.deep_merge!(scope[0] => { scope[1] => { scope[2] => count } } )
+        end
+
+        packages_counts
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
