@@ -13451,10 +13451,10 @@ msgstr ""
 msgid "Ignored"
 msgstr ""
 
-msgid "Image Details"
+msgid "Image URL"
 msgstr ""
 
-msgid "Image URL"
+msgid "Image details"
 msgstr ""
 
 msgid "ImageDiffViewer|2-up"
@@ -13830,9 +13830,6 @@ msgstr ""
 msgid "Input your repository URL"
 msgstr ""
 
-msgid "Insert"
-msgstr ""
-
 msgid "Insert a code block"
 msgstr ""
 
@@ -13843,6 +13840,9 @@ msgid "Insert an image"
 msgstr ""
 
 msgid "Insert code"
+msgstr ""
+
+msgid "Insert image"
 msgstr ""
 
 msgid "Insert inline code"
