@@ -101,7 +101,7 @@ module Groups
       settings = group.namespace_settings
 
       return if settings.allow_mfa_for_subgroups
-      binding.pry
+
       if settings.previous_changes.include?(:allow_mfa_for_subgroups)
         # enque in batches members update
         DisallowTwoFactorForSubgroupsWorker.perform_async(group.id)
