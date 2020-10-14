@@ -17,7 +17,7 @@ RSpec.describe IssuableSla do
 
       let_it_be(:project) { create(:project) }
       let_it_be_with_reload(:issue) { create(:issue, project: project) }
-      let_it_be_with_reload(:issuable_sla) { create(:issuable_sla, issue: issue, due_at: Time.current - 1.hour) }
+      let_it_be_with_reload(:issuable_sla) { create(:issuable_sla, issue: issue, due_at: 1.hour.ago) }
 
       context 'issue closed' do
         before do
@@ -30,13 +30,15 @@ RSpec.describe IssuableSla do
       context 'issue opened' do
         context 'due_at has not passed' do
           before do
-            issuable_sla.update!(due_at: Time.current + 1.hour)
+            issuable_sla.update!(due_at: 1.hour.from_now)
           end
 
           it { is_expected.to be_empty }
         end
 
-        it { is_expected.to contain_exactly(issuable_sla) }
+        context 'when due date has passed' do
+          it { is_expected.to contain_exactly(issuable_sla) }
+        end
       end
     end
   end
