@@ -104,12 +104,12 @@ The following table lists available parameters for jobs:
 | [`script`](#script)                                | Shell script that is executed by a runner.                                                                                                                                           |
 | [`after_script`](#before_script-and-after_script)  | Override a set of commands that are executed after job.                                                                                                                             |
 | [`allow_failure`](#allow_failure)                  | Allow job to fail. Failed job does not contribute to commit status.                                                                                                                 |
-| [`artifacts`](#artifacts)                          | List of files and directories to attach to a job on success. Also available: `artifacts:paths`, `artifacts:exclude`, `artifacts:expose_as`, `artifacts:name`, `artifacts:untracked`, `artifacts:when`, `artifacts:expire_in`, `artifacts:reports`. |
+| [`artifacts`](#artifacts)                          | List of files and directories to attach to a job on success. Also available: `artifacts:paths`, `artifacts:exclude`, `artifacts:expose_as`, `artifacts:name`, `artifacts:untracked`, `artifacts:when`, `artifacts:expire_in`, and `artifacts:reports`. |
 | [`before_script`](#before_script-and-after_script) | Override a set of commands that are executed before job.                                                                                                                            |
-| [`cache`](#cache)                                  | List of files that should be cached between subsequent runs. Also available: `cache:paths`, `cache:key`, `cache:untracked`, and `cache:policy`.                                     |
+| [`cache`](#cache)                                  | List of files that should be cached between subsequent runs. Also available: `cache:paths`, `cache:key`, `cache:untracked`, `cache:when`, and `cache:policy`.                                     |
 | [`coverage`](#coverage)                            | Code coverage settings for a given job.                                                                                                                                             |
 | [`dependencies`](#dependencies)                    | Restrict which artifacts are passed to a specific job by providing a list of jobs to fetch artifacts from.                                                                          |
-| [`environment`](#environment)                      | Name of an environment to which the job deploys. Also available: `environment:name`, `environment:url`, `environment:on_stop`, `environment:auto_stop_in` and `environment:action`. |
+| [`environment`](#environment)                      | Name of an environment to which the job deploys. Also available: `environment:name`, `environment:url`, `environment:on_stop`, `environment:auto_stop_in`, and `environment:action`. |
 | [`except`](#onlyexcept-basic)                      | Limit when jobs are not created. Also available: [`except:refs`, `except:kubernetes`, `except:variables`, and `except:changes`](#onlyexcept-advanced).                              |
 | [`extends`](#extends)                              | Configuration entries that this job inherits from.                                                                                                                       |
 | [`image`](#image)                                  | Use Docker images. Also available: `image:name` and `image:entrypoint`.                                                                                                             |
@@ -2296,15 +2296,15 @@ failure.
 `when` can be set to one of the following values:
 
 1. `on_success` - execute job only when all jobs from prior stages
-    succeed (or are considered succeeding because they are marked
-    `allow_failure`). This is the default.
+    succeed (or are considered succeeding because they have `allow_failure: true`).
+    This is the default.
 1. `on_failure` - execute job only when at least one job from prior stages
     fails.
 1. `always` - execute job regardless of the status of jobs from prior stages.
 1. `manual` - execute job manually (added in GitLab 8.10). Read about
-    [manual actions](#whenmanual) below.
+    [manual jobs](#whenmanual) below.
 1. `delayed` - execute job after a certain period (added in GitLab 11.14).
-    Read about [delayed actions](#whendelayed) below.
+    Read about [delayed jobs](#whendelayed) below.
 1. `never`:
    - With [`rules`](#rules), don't execute job.
    - With [`workflow:rules`](#workflowrules), don't run pipeline.
@@ -2358,45 +2358,41 @@ The above script:
 #### `when:manual`
 
 > - Introduced in GitLab 8.10.
-> - Blocking manual actions were introduced in GitLab 9.0.
+> - Blocking manual jobs were introduced in GitLab 9.0.
 > - Protected actions were introduced in GitLab 9.2.
 
-Manual actions are a special type of job that are not executed automatically,
-they need to be explicitly started by a user. An example usage of manual actions
-would be a deployment to a production environment. Manual actions can be started
-from the pipeline, job, environment, and deployment views. Read more at the
-[environments documentation](../environments/index.md#configuring-manual-deployments).
+A manual job is a type of job that is not executed automatically and must be explicitly
+started by a user. You might want to use manual jobs for things like deploying to production.
 
-Manual actions can be either optional or blocking. Blocking manual actions
-block the execution of the pipeline at the stage this action is defined in. It's
-possible to resume execution of the pipeline when someone executes a blocking
-manual action by clicking a _play_ button.
+To make a job manual, add `when: manual` to its configuration.
 
-When a pipeline is blocked, it isn't merged if Merge When Pipeline Succeeds
-is set. Blocked pipelines also have a special status, called _manual_.
-When the `when:manual` syntax is used, manual actions are non-blocking by
-default. If you want to make a manual action blocking, add
-`allow_failure: false` to the job's definition in `.gitlab-ci.yml`.
+Manual jobs can be started from the pipeline, job, [environment](../environments/index.md#configuring-manual-deployments),
+and deployment views.
 
-Optional manual actions have `allow_failure: true` set by default and their
-statuses don't contribute to the overall pipeline status. So, if a manual
-action fails, the pipeline eventually succeeds.
+Manual jobs can be either optional or blocking:
 
-NOTE: **Note:**
-When using [`rules:`](#rules), `allow_failure` defaults to `false`, including for manual jobs.
+- **Optional**: Manual jobs have [`allow_failure: true](#allow_failure) set by default
+  and are considered optional. The status of an optional manual job does not contribute
+  to the overall pipeline status. A pipeline can succeed even if all its manual jobs fail.
 
-Manual actions are considered to be write actions, so permissions for
-[protected branches](../../user/project/protected_branches.md) are used when
-a user wants to trigger an action. In other words, to trigger a manual
-action assigned to a branch that the pipeline is running for, the user must
-have the ability to merge to this branch. It's possible to use protected environments
-to more strictly [protect manual deployments](#protecting-manual-jobs) from being
-run by unauthorized users.
+- **Blocking**: To make a blocking manual job, add `allow_failure: false` to its configuration.
+  Blocking manual jobs stop further execution of the pipeline at the stage where the
+  job is defined. To let the pipeline continue running, click **{play}** (play) on
+  the blocking manual job.
 
-NOTE: **Note:**
-Using `when:manual` and `trigger` together results in the error `jobs:#{job-name} when
-should be on_success, on_failure or always`, because `when:manual` prevents triggers
-being used.
+  Merge requests in projects with [merge when pipeline succeeds](../../user/project/merge_requests/merge_when_pipeline_succeeds.md)
+  enabled can't be merged with a blocked pipeline. Blocked pipelines show a status
+  of **blocked**.
+
+When you use [`rules:`](#rules), `allow_failure` defaults to `false`, including for manual jobs.
+
+To trigger a manual job, a user must have permission to merge to the assigned branch.
+You can use [protected branches](../../user/project/protected_branches.md) to more strictly
+[protect manual deployments](#protecting-manual-jobs) from being run by unauthorized users.
+
+In [GitLab 13.5](https://gitlab.com/gitlab-org/gitlab/-/issues/201938) and later, you
+can use `when:manual` in the same job as [`trigger`](#trigger). In GitLab 13.4 and
+earlier, using them together causes the error `jobs:#{job-name} when should be on_success, on_failure or always`.
 
 ##### Protecting manual jobs **(PREMIUM)**
 
@@ -2431,9 +2427,9 @@ To do this, you must:
    this list can trigger this manual job, as well as GitLab administrators
    who are always able to use protected environments.
 
-Additionally, if a manual job is defined as blocking by adding `allow_failure: false`,
-the next stages of the pipeline don't run until the manual job is triggered. This
-can be used to define a list of users allowed to "approve" later pipeline
+Additionally, if you define a manual job as blocking by adding `allow_failure: false`,
+the pipeline's next stages don't run until the manual job is triggered. You can use this
+to define a list of users allowed to "approve" later pipeline
 stages by triggering the blocking manual job.
 
 #### `when:delayed`
@@ -2626,10 +2622,12 @@ The `stop_review_app` job is **required** to have the following keywords defined
 - `environment:action`
 
 Additionally, both jobs should have matching [`rules`](../yaml/README.md#onlyexcept-basic)
-or [`only/except`](../yaml/README.md#onlyexcept-basic) configuration. In the example
-above, if the configuration is not identical, the `stop_review_app` job might not be
-included in all pipelines that include the `review_app` job, and it is not
-possible to trigger the `action: stop` to stop the environment automatically.
+or [`only/except`](../yaml/README.md#onlyexcept-basic) configuration. 
+
+In the example above, if the configuration is not identical:
+
+- The `stop_review_app` job might not be included in all pipelines that include the `review_app` job.
+- It is not possible to trigger the `action: stop` to stop the environment automatically.
 
 #### `environment:auto_stop_in`
 
@@ -2778,17 +2776,17 @@ rspec:
       - binaries/
 ```
 
-Note that since cache is shared between jobs, if you're using different
-paths for different jobs, you should also set a different **cache:key**
-otherwise cache content can be overwritten.
+The cache is shared between jobs, so if you're using different
+paths for different jobs, you should also set a different `cache:key`.
+Otherwise cache content can be overwritten.
 
 #### `cache:key`
 
 > Introduced in GitLab Runner v1.0.0.
 
-Since the cache is shared between jobs, if you're using different
-paths for different jobs, you should also set a different `cache:key`
-otherwise cache content can be overwritten.
+The cache is shared between jobs, so if you're using different
+paths for different jobs, you should also set a different `cache:key`.
+Otherwise cache content can be overwritten.
 
 The `key` parameter defines the affinity of caching between jobs,
 to have a single cache for all jobs, cache per-job, cache per-branch
@@ -2822,6 +2820,8 @@ cache:
   paths:
     - binaries/
 ```
+
+You can specify a [fallback cache key](#fallback-cache-key) to use if the specified `cache:key` is not found.
 
 ##### `cache:key:files`
 
@@ -2914,6 +2914,28 @@ rspec:
       - binaries/
 ```
 
+#### `cache:when`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/18969) in GitLab 13.5 and GitLab Runner v13.5.0.
+
+`cache:when` defines when to save the cache, based on the status of the job. You can
+set `cache:when` to:
+
+- `on_success` - save the cache only when the job succeeds. This is the default.
+- `on_failure` - save the cache only when the job fails.
+- `always` - save the cache regardless of the job status.
+
+For example, to store a cache whether or not the job fails or succeeds:
+
+```yaml
+rspec:
+  script: rspec
+  cache:
+    paths:
+      - rspec/
+    when: 'always'
+```
+
 #### `cache:policy`
 
 > Introduced in GitLab 9.4.
@@ -2953,13 +2975,13 @@ rspec:
     - bundle exec rspec ...
 ```
 
-This helps to speed up job execution and reduce load on the cache server,
-especially when you have a large number of cache-using jobs executing in
+This helps to speed up job execution and reduce load on the cache server.
+It is especially helpful when you have a large number of cache-using jobs executing in
 parallel.
 
-Additionally, if you have a job that unconditionally recreates the cache without
-reference to its previous contents, you can use `policy: push` in that job to
-skip the download step.
+If you have a job that unconditionally recreates the cache without
+referring to its previous contents, you can skip the download step.
+To do so, add `policy: push` to the job.
 
 ### `artifacts`
 
@@ -2972,7 +2994,7 @@ skip the download step.
 `artifacts` is used to specify a list of files and directories that are
 attached to the job when it [succeeds, fails, or always](#artifactswhen).
 
-The artifacts are sent to GitLab after the job finishes and are
+The artifacts are sent to GitLab after the job finishes. They are
 available for download in the GitLab UI if the size is not
 larger than the [maximum artifact size](../../user/gitlab_com/index.md#gitlab-cicd).
 
@@ -3236,7 +3258,7 @@ failure.
 1. `on_failure` - upload artifacts only when the job fails.
 1. `always` - upload artifacts regardless of the job status.
 
-To upload artifacts only when job fails:
+For example, to upload artifacts only when a job fails:
 
 ```yaml
 job:
@@ -3321,19 +3343,22 @@ These are the available report types:
 
 > Introduced in GitLab 8.6 and GitLab Runner v1.1.1.
 
-By default, all [`artifacts`](#artifacts) from all previous [stages](#stages)
-are passed, but you can use the `dependencies` parameter to define a limited
-list of jobs (or no jobs) to fetch artifacts from.
+By default, all [`artifacts`](#artifacts) from previous [stages](#stages)
+are passed to each job. However, you can use the `dependencies` parameter to
+define a limited list of jobs to fetch artifacts from. You can also set a job to download no artifacts at all.
 
 To use this feature, define `dependencies` in context of the job and pass
 a list of all previous jobs the artifacts should be downloaded from.
-You can only define jobs from stages that are executed before the current one.
-An error is shown if you define jobs from the current stage or next ones.
-Defining an empty array skips downloading any artifacts for that job.
-The status of the previous job is not considered when using `dependencies`, so
-if it failed or it's a manual job that was not run, no error occurs.
 
-In the following example, we define two jobs with artifacts, `build:osx` and
+You can define jobs from stages that were executed before the current one.
+An error occurs if you define jobs from the current or an upcoming stage.
+
+To prevent a job from downloading artifacts, define an empty array.
+
+When you use `dependencies`, the status of the previous job is not considered.
+If a job fails or it's a manual job that was not run, no error occurs.
+
+The following example defines two jobs with artifacts: `build:osx` and
 `build:linux`. When the `test:osx` is executed, the artifacts from `build:osx`
 are downloaded and extracted in the context of the build. The same happens
 for `test:linux` and artifacts from `build:linux`.
@@ -3415,14 +3440,14 @@ job1:
 Use `retry` to configure how many times a job is retried in
 case of a failure.
 
-When a job fails and has `retry` configured, the job is processed again,
-up to the amount of times specified by the `retry` keyword.
+When a job fails, the job is processed again,
+until the limit specified by the `retry` keyword is reached.
 
-If `retry` is set to 2, and a job succeeds in a second run (first retry), it is not tried
-again. `retry` value has to be a positive integer, equal to or larger than 0, but
-less than or equal to 2 (two retries maximum, three runs in total).
+If `retry` is set to `2`, and a job succeeds in a second run (first retry), it is not retried.
+The `retry` value must be a positive integer, from `0` to `2`
+(two retries maximum, three runs in total).
 
-A simple example to retry in all failure cases:
+This example retries all failure cases:
 
 ```yaml
 test:
@@ -3564,10 +3589,11 @@ job split into three separate jobs.
 Use `matrix:` to configure different variables for jobs that are running in parallel.
 There can be from 2 to 50 jobs.
 
-In GitLab 13.5 and later, you can have one-dimensional matrices with a single job.
+[In GitLab 13.5](https://gitlab.com/gitlab-org/gitlab/-/issues/26362) and later,
+you can have one-dimensional matrices with a single job.
 The ability to have one-dimensional matrices is [deployed behind a feature flag](../../user/feature_flags.md),
 disabled by default. It's disabled on GitLab.com. To use it in a GitLab self-managed
-instance, ask a GitLab administrator to [enable the `one_dimensional_matrix:` feature flag](../../administration/feature_flags.md). **(CORE-ONLY)**
+instance, ask a GitLab administrator to [enable the `one_dimensional_matrix:` feature flag](../../administration/feature_flags.md). **(CORE ONLY)**
 
 Every job gets the same `CI_NODE_TOTAL` [environment variable](../variables/README.md#predefined-environment-variables) value, and a unique `CI_NODE_INDEX` value.
 
@@ -3619,14 +3645,13 @@ You can use this keyword to create two different types of downstream pipelines:
 - [Multi-project pipelines](../multi_project_pipelines.md#creating-multi-project-pipelines-from-gitlab-ciyml)
 - [Child pipelines](../parent_child_pipelines.md)
 
-[Since GitLab 13.2](https://gitlab.com/gitlab-org/gitlab/-/issues/197140/), you can
-see which job triggered a downstream pipeline by hovering your mouse cursor over
-the downstream pipeline job in the [pipeline graph](../pipelines/index.md#visualize-pipelines).
+[In GitLab 13.2 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/197140/), you can
+view which job triggered a downstream pipeline. In the [pipeline graph](../pipelines/index.md#visualize-pipelines),
+hover over the downstream pipeline job.
 
-NOTE: **Note:**
-Using a `trigger` with `when:manual` together results in the error `jobs:#{job-name}
-when should be on_success, on_failure or always`, because `when:manual` prevents
-triggers being used.
+In [GitLab 13.5](https://gitlab.com/gitlab-org/gitlab/-/issues/201938) and later, you
+can use [`when:manual`](#whenmanual) in the same job as `trigger`. In GitLab 13.4 and
+earlier, using them together causes the error `jobs:#{job-name} when should be on_success, on_failure or always`.
 
 #### Simple `trigger` syntax for multi-project pipelines
 
@@ -3762,7 +3787,7 @@ trigger_job:
 
 This setting can help keep your pipeline execution linear. In the example above, jobs from
 subsequent stages wait for the triggered pipeline to successfully complete before
-starting, at the cost of reduced parallelization.
+starting, which reduces parallelization.
 
 #### Trigger a pipeline by API call
 
@@ -3833,12 +3858,13 @@ Sometimes running multiple jobs or pipelines at the same time in an environment
 can lead to errors during the deployment.
 
 To avoid these errors, the `resource_group` attribute can be used to ensure that
-the runner doesn't run certain jobs simultaneously.
+the runner doesn't run certain jobs simultaneously. Resource groups behave similiar
+to semaphores in other programming languages.
 
 When the `resource_group` key is defined for a job in `.gitlab-ci.yml`,
 job executions are mutually exclusive across different pipelines for the same project.
 If multiple jobs belonging to the same resource group are enqueued simultaneously,
-only one of the jobs is picked by the runner, and the other jobs wait until the
+only one of the jobs is picked by the runner. The other jobs wait until the
 `resource_group` is free.
 
 Here is a simple example:
@@ -3849,9 +3875,7 @@ deploy-to-production:
   resource_group: production
 ```
 
-In this case, if a `deploy-to-production` job is running in a pipeline, and a new
-`deploy-to-production` job is created in a different pipeline, it doesn't run until
-the currently running/pending `deploy-to-production` job finishes. As a result,
+In this case, two `deploy-to-production` jobs in two separate pipelines can never run at the same time. As a result,
 you can ensure that concurrent deployments never happen to the production environment.
 
 There can be multiple `resource_group`s defined per environment. A good use case for this
@@ -4384,6 +4408,32 @@ variables:
 ```
 
 You can set them globally or per-job in the [`variables`](#variables) section.
+
+### Fallback cache key
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/1534) in GitLab Runner 13.4.
+
+You can use the `$CI_COMMIT_REF_SLUG` variable to specify your [`cache:key`](#cachekey).
+For example, if your `$CI_COMMIT_REF_SLUG` is `test` you can set a job
+to download cache that's tagged with `test`.
+
+If a cache with this tag is not found, you can use `CACHE_FALLBACK_KEY` to 
+specify a cache to use when none exists.
+
+For example:
+
+```yaml
+variables:
+  CACHE_FALLBACK_KEY: fallback-key
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - binaries/
+```
+
+In this example, if the `$CI_COMMIT_REF_SLUG` is not found, the job uses the key defined
+by the `CACHE_FALLBACK_KEY` variable.
 
 ### Shallow cloning
 

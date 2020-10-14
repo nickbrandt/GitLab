@@ -30,7 +30,7 @@ module EE
       after_update :remove_mirror_repository_reference,
         if: ->(project) { project.mirror? && project.import_url_updated? }
 
-      belongs_to :mirror_user, foreign_key: 'mirror_user_id', class_name: 'User'
+      belongs_to :mirror_user, class_name: 'User'
       belongs_to :deleting_user, foreign_key: 'marked_for_deletion_by_user_id', class_name: 'User'
 
       has_one :repository_state, class_name: 'ProjectRepositoryState', inverse_of: :project
@@ -204,8 +204,11 @@ module EE
     class_methods do
       extend ::Gitlab::Utils::Override
 
-      def replicables_for_geo_node(node = ::Gitlab::Geo.current_node)
-        node.projects
+      # @param primary_key_in [Range, Project] arg to pass to primary_key_in scope
+      # @param node [GeoNode] defaults to ::Gitlab::Geo.current_node
+      # @return [ActiveRecord::Relation<Project>] everything that should be synced to this node, restricted by primary key
+      def replicables_for_geo_node(primary_key_in, node = ::Gitlab::Geo.current_node)
+        node.projects.primary_key_in(primary_key_in)
       end
 
       def search_by_visibility(level)
@@ -527,6 +530,8 @@ module EE
         ::Gitlab::RepositorySizeChecker.new(
           current_size_proc: -> { statistics.total_repository_size },
           limit: actual_size_limit,
+          total_repository_size_excess: namespace.total_repository_size_excess,
+          additional_purchased_storage: namespace.additional_purchased_storage_size.megabytes,
           enabled: License.feature_available?(:repository_size_limit)
         )
       end
