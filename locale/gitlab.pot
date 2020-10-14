@@ -1000,6 +1000,12 @@ msgstr[1] ""
 msgid "+%{approvers} more approvers"
 msgstr ""
 
+msgid "+%{more_assignees_count}"
+msgstr ""
+
+msgid "+%{more_assignees_count} more assignees"
+msgstr ""
+
 msgid "+%{more_reviewers_count}"
 msgstr ""
 
@@ -3606,6 +3612,9 @@ msgid "Assigned to %{assigneeName}"
 msgstr ""
 
 msgid "Assigned to %{assignee_name}"
+msgstr ""
+
+msgid "Assigned to %{name}"
 msgstr ""
 
 msgid "Assigned to me"
