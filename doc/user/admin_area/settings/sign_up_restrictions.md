@@ -35,18 +35,18 @@ email domains to prevent malicious users from creating accounts.
 
 ## Require admin approval for new sign-ups
 
-> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/4491) in GitLab 13.5
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/4491) in GitLab 13.5.
 
 When this setting is enabled, any user visiting your GitLab domain and signing up for a new account will have to be explicitly [approved](../approving_users.md#approving-a-user) by an administrator before they can start using their account.
 
-![Require admin approval for new signups](img/require_admin_approval_for_signups_v13_5.png)
+![Require admin approval for new signups](img/sign_up_restrictions_v13_5.png)
 
 ## Require email confirmation
 
 You can send confirmation emails during sign-up and require that users confirm
 their email address before they are allowed to sign in.
 
-![Email confirmation](img/email_confirmation_v13_5.png)
+![Email confirmation](img/sign_up_restrictions_v13_5.png)
 
 ## Minimum password length limit
 
