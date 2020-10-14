@@ -3,8 +3,11 @@ import MockAdapter from 'axios-mock-adapter';
 import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import actions, { gqlClient } from 'ee/boards/stores/actions';
 import * as types from 'ee/boards/stores/mutation_types';
+import { GroupByParamType } from 'ee/boards/constants';
 import testAction from 'helpers/vuex_action_helper';
 import * as typesCE from '~/boards/stores/mutation_types';
+import * as commonUtils from '~/lib/utils/common_utils';
+import { setUrlParams, removeParams } from '~/lib/utils/url_utility';
 import { ListType } from '~/boards/constants';
 import { formatListIssues } from '~/boards/boards_util';
 import {
@@ -28,6 +31,7 @@ let mock;
 beforeEach(() => {
   mock = new MockAdapter(axios);
   window.gon = { features: {} };
+  jest.spyOn(commonUtils, 'historyPushState');
 });
 
 afterEach(() => {
@@ -35,7 +39,7 @@ afterEach(() => {
 });
 
 describe('setFilters', () => {
-  it('should commit mutation SET_FILTERS, updates epicId with global id', done => {
+  it('should commit mutation SET_FILTERS, updates epicId with global id', () => {
     const state = {
       filters: {},
     };
@@ -43,17 +47,16 @@ describe('setFilters', () => {
     const filters = { labelName: 'label', epicId: 1 };
     const updatedFilters = { labelName: 'label', epicId: 'gid://gitlab/Epic/1' };
 
-    testAction(
+    return testAction(
       actions.setFilters,
       filters,
       state,
       [{ type: types.SET_FILTERS, payload: updatedFilters }],
       [],
-      done,
     );
   });
 
-  it('should commit mutation SET_FILTERS, updates epicWildcardId', done => {
+  it('should commit mutation SET_FILTERS, updates epicWildcardId', () => {
     const state = {
       filters: {},
     };
@@ -61,13 +64,29 @@ describe('setFilters', () => {
     const filters = { labelName: 'label', epicId: 'None' };
     const updatedFilters = { labelName: 'label', epicWildcardId: 'NONE' };
 
-    testAction(
+    return testAction(
       actions.setFilters,
       filters,
       state,
       [{ type: types.SET_FILTERS, payload: updatedFilters }],
       [],
-      done,
+    );
+  });
+
+  it('should commit mutation SET_FILTERS, dispatches setEpicSwimlanes action if filters contain groupBy epic', () => {
+    const state = {
+      filters: {},
+    };
+
+    const filters = { labelName: 'label', epicId: 1, groupBy: 'epic' };
+    const updatedFilters = { labelName: 'label', epicId: 'gid://gitlab/Epic/1' };
+
+    return testAction(
+      actions.setFilters,
+      filters,
+      state,
+      [{ type: types.SET_FILTERS, payload: updatedFilters }],
+      [{ type: 'setEpicSwimlanes' }],
     );
   });
 });
@@ -391,6 +410,48 @@ describe('toggleEpicSwimlanes', () => {
       state,
       [{ type: types.TOGGLE_EPICS_SWIMLANES }],
       [],
+      () => {
+        expect(commonUtils.historyPushState).toHaveBeenCalledWith(removeParams(['group_by']));
+      },
+    );
+  });
+
+  it('should dispatch fetchEpicsSwimlanes action when isShowingEpicsSwimlanes is true', () => {
+    jest.spyOn(gqlClient, 'query').mockResolvedValue({});
+
+    const state = {
+      isShowingEpicsSwimlanes: true,
+      endpoints: {
+        fullPath: 'gitlab-org',
+        boardId: 1,
+      },
+    };
+
+    return testAction(
+      actions.toggleEpicSwimlanes,
+      null,
+      state,
+      [{ type: types.TOGGLE_EPICS_SWIMLANES }],
+      [{ type: 'fetchEpicsSwimlanes', payload: {} }],
+      () => {
+        expect(commonUtils.historyPushState).toHaveBeenCalledWith(
+          setUrlParams({ group_by: GroupByParamType.epic }, window.location.href),
+        );
+      },
+    );
+  });
+});
+
+describe('setEpicSwimlanes', () => {
+  it('should commit mutation SET_EPICS_SWIMLANES and dispatch fetchEpicsSwimlanes action', () => {
+    jest.spyOn(gqlClient, 'query').mockResolvedValue({});
+
+    return testAction(
+      actions.setEpicSwimlanes,
+      null,
+      {},
+      [{ type: types.SET_EPICS_SWIMLANES }],
+      [{ type: 'fetchEpicsSwimlanes', payload: {} }],
     );
   });
 });
