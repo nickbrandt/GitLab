@@ -22022,6 +22022,9 @@ msgstr ""
 msgid "Repositories Analytics"
 msgstr ""
 
+msgid "RepositoriesAnalytics|Coverage"
+msgstr ""
+
 msgid "RepositoriesAnalytics|Download Historic Test Coverage Data"
 msgstr ""
 
@@ -22032,6 +22035,18 @@ msgid "RepositoriesAnalytics|Download test coverage data (.csv)"
 msgstr ""
 
 msgid "RepositoriesAnalytics|Historic Test Coverage Data is available in raw format (.csv) for further analysis."
+msgstr ""
+
+msgid "RepositoriesAnalytics|Last Update"
+msgstr ""
+
+msgid "RepositoriesAnalytics|Number of Coverages"
+msgstr ""
+
+msgid "RepositoriesAnalytics|Please select a project or multiple projects to display their most recent test coverage data."
+msgstr ""
+
+msgid "RepositoriesAnalytics|Please select projects to display."
 msgstr ""
 
 msgid "RepositoriesAnalytics|Test Code Coverage"
