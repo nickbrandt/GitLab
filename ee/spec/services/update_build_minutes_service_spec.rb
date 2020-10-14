@@ -56,19 +56,6 @@ RSpec.describe UpdateBuildMinutesService do
           expect(root_ancestor.namespace_statistics.reload.shared_runners_seconds)
             .to eq(build.duration.to_i * 2)
         end
-
-        context 'with disabled feature flag :recursive_approach_for_all_projects in Namespace#all_projects' do
-          before do
-            stub_feature_flags(recursive_approach_for_all_projects: false)
-          end
-
-          it 'creates a statistics in root group' do
-            subject
-
-            expect(root_ancestor.namespace_statistics.reload.shared_runners_seconds)
-              .to eq(build.duration.to_i * 2)
-          end
-        end
       end
 
       context 'when cost factor has non-zero fractional part' do
