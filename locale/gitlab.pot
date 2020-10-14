@@ -16053,6 +16053,9 @@ msgstr ""
 msgid "Members|%{time} by %{user}"
 msgstr ""
 
+msgid "Members|An error occurred while updating the member's role, please try again."
+msgstr ""
+
 msgid "Members|Are you sure you want to deny %{usersName}'s request to join \"%{source}\""
 msgstr ""
 
