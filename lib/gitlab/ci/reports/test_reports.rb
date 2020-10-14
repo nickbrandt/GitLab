@@ -52,6 +52,14 @@ module Gitlab
             test_suites.values.sum { |suite| suite.public_send("#{status_type}_count") } # rubocop:disable GitlabSecurity/PublicSend
             # rubocop: enable CodeReuse/ActiveRecord
           end
+
+          define_method("#{status_type}_test_cases") do
+            {}.tap do |hash|
+              test_suites.values.each do |test_suite|
+                hash.merge!(test_suite.public_send(status_type)) # rubocop:disable GitlabSecurity/PublicSend
+              end
+            end
+          end
         end
       end
     end
