@@ -8466,9 +8466,6 @@ msgstr ""
 msgid "Delete label: %{label_name} ?"
 msgstr ""
 
-msgid "Delete list"
-msgstr ""
-
 msgid "Delete pipeline"
 msgstr ""
 
@@ -21571,6 +21568,9 @@ msgid "Remove license"
 msgstr ""
 
 msgid "Remove limit"
+msgstr ""
+
+msgid "Remove list"
 msgstr ""
 
 msgid "Remove member"
