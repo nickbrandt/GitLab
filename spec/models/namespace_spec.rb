@@ -855,13 +855,13 @@ RSpec.describe Namespace do
   end
 
   describe '#all_projects' do
-    shared_examples 'all projects for a namespace' do
-      let_it_be(:group) { create(:group) }
-      let_it_be(:child) { create(:group, parent: group) }
-      let_it_be(:project1) { create(:project_empty_repo, namespace: group) }
-      let_it_be(:project2) { create(:project_empty_repo, namespace: child) }
+    let(:namespace) { create(:namespace) }
+    let(:child) { create(:group, parent: namespace) }
+    let!(:project1) { create(:project_empty_repo, namespace: namespace) }
+    let!(:project2) { create(:project_empty_repo, namespace: child) }
 
-      it { expect(group.all_projects.to_a).to match_array([project2, project1]) }
+    shared_examples 'all projects for a namespace' do
+      it { expect(namespace.all_projects.to_a).to match_array([project2, project1]) }
       it { expect(child.all_projects.to_a).to match_array([project2]) }
     end
 
@@ -871,6 +871,12 @@ RSpec.describe Namespace do
       end
 
       include_examples 'all projects for a namespace'
+
+      context 'when namespace is a group' do
+        let(:namespace) { create(:group) }
+
+        include_examples 'all projects for a namespace'
+      end
     end
 
     context 'with route path wildcard approach' do
@@ -879,6 +885,12 @@ RSpec.describe Namespace do
       end
 
       include_examples 'all projects for a namespace'
+
+      context 'when namespace is a group' do
+        let_it_be(:namespace) { create(:group) }
+
+        include_examples 'all projects for a namespace'
+      end
     end
   end
 
