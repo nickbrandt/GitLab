@@ -1,6 +1,5 @@
 import mutations from 'ee/boards/stores/mutations';
 import {
-  mockLists,
   mockIssue,
   mockIssue2,
   mockEpics,
@@ -18,10 +17,15 @@ const expectNotImplemented = action => {
 
 const epicId = mockEpic.id;
 
+const initialBoardListsState = {
+  'gid://gitlab/List/1': mockListsWithModel[0],
+  'gid://gitlab/List/2': mockListsWithModel[1],
+};
+
 let state = {
   issuesByListId: {},
   issues: {},
-  boardLists: mockListsWithModel,
+  boardLists: initialBoardListsState,
   epicsFlags: {
     [epicId]: { isLoading: true },
   },
@@ -182,10 +186,10 @@ describe('RECEIVE_BOARD_LISTS_SUCCESS', () => {
       boardLists: {},
     };
 
-    mutations.RECEIVE_BOARD_LISTS_SUCCESS(state, mockLists);
+    mutations.RECEIVE_BOARD_LISTS_SUCCESS(state, initialBoardListsState);
 
     expect(state.epicsSwimlanesFetchInProgress).toBe(false);
-    expect(state.boardLists).toEqual(mockLists);
+    expect(state.boardLists).toEqual(initialBoardListsState);
   });
 });
 
@@ -273,7 +277,6 @@ describe('MOVE_ISSUE', () => {
     state = {
       ...state,
       issuesByListId: listIssues,
-      boardLists: mockListsWithModel,
       issues,
     };
   });
