@@ -8606,6 +8606,9 @@ msgstr ""
 msgid "Delete source branch"
 msgstr ""
 
+msgid "Delete subscription"
+msgstr ""
+
 msgid "Delete this attachment"
 msgstr ""
 
