@@ -856,10 +856,10 @@ RSpec.describe Namespace do
 
   describe '#all_projects' do
     shared_examples 'all projects for a namespace' do
-      let(:group) { create(:group) }
-      let(:child) { create(:group, parent: group) }
-      let!(:project1) { create(:project_empty_repo, namespace: group) }
-      let!(:project2) { create(:project_empty_repo, namespace: child) }
+      let_it_be(:group) { create(:group) }
+      let_it_be(:child) { create(:group, parent: group) }
+      let_it_be(:project1) { create(:project_empty_repo, namespace: group) }
+      let_it_be(:project2) { create(:project_empty_repo, namespace: child) }
 
       it { expect(group.all_projects.to_a).to match_array([project2, project1]) }
       it { expect(child.all_projects.to_a).to match_array([project2]) }
