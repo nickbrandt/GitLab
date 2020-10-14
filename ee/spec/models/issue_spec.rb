@@ -132,6 +132,13 @@ RSpec.describe Issue do
         end
       end
 
+      describe '.not_in_epics' do
+        it 'returns only issues not in selected epics' do
+          expect(described_class.count).to eq 3
+          expect(described_class.not_in_epics([epic1])).to match_array([epic_issue2.issue, issue_no_epic])
+        end
+      end
+
       describe '.distinct_epic_ids' do
         it 'returns distinct epic ids' do
           expect(described_class.distinct_epic_ids.map(&:epic_id)).to match_array([epic1.id, epic2.id])
