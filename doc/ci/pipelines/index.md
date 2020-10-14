@@ -10,7 +10,7 @@ type: reference
 
 > Introduced in GitLab 8.8.
 
-NOTE: **Tip:**
+TIP: **Tip:**
 Watch the
 ["Mastering continuous software development"](https://about.gitlab.com/webcast/mastering-ci-cd/)
 webcast to see a comprehensive demo of a GitLab CI/CD pipeline.
@@ -495,7 +495,6 @@ and their statuses.
 Pipeline graphs can be displayed in two different ways, depending on the page you
 access the graph from.
 
-NOTE: **Note:**
 GitLab capitalizes the stages' names in the pipeline graphs.
 
 ### Regular pipeline graphs

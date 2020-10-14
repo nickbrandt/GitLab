@@ -243,7 +243,7 @@ Some variables are listed in the UI so you can choose them more quickly.
 | `AWS_DEFAULT_REGION`    | Any                                                | 12.10         |
 | `AWS_SECRET_ACCESS_KEY` | Any                                                | 12.10         |
 
-NOTE: **Note:**
+CAUTION: **Caution:**
 When you store credentials, there are security implications. If you are using AWS keys,
 for example, follow their [best practices](https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html).
 
@@ -371,9 +371,6 @@ export GITLAB_USER_ID="42"
 
 ## `.gitlab-ci.yml` defined variables
 
-NOTE: **Note:**
-This feature requires GitLab Runner 0.5.0 or higher and GitLab 7.14 or higher.
-
 You can add variables that are set in the build environment to `.gitlab-ci.yml`.
 These variables are saved in the repository, and they
 are meant to store non-sensitive project configuration, like `RAILS_ENV` or
@@ -437,8 +434,7 @@ Once you set them, they are available for all subsequent pipelines. Any group-le
 
 Instance variables are useful for no longer needing to manually enter the same credentials repeatedly for all your projects. Instance-level variables are available to all projects and groups on the instance.
 
-NOTE: **Note:**
-The maximum number of instance-level variables is [planned to be 25](https://gitlab.com/gitlab-org/gitlab/-/issues/216097).
+In GitLab 13.1 and later, the [maximum number of instance-level variables is 25](https://gitlab.com/gitlab-org/gitlab/-/issues/216097).
 
 You can define instance-level variables via the UI or [API](../../api/instance_level_ci_variables.md).
 
