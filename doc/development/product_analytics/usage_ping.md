@@ -330,7 +330,7 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
      include RedisTracking
 
      skip_before_action :authenticate_user!, only: :show
-     track_redis_hll_event :index, :show, name: 'i_analytics_dev_ops_score', feature: :g_compliance_dashboard_feature, feature_default_enabled: true
+     track_redis_hll_event :index, :show, name: 'g_compliance_example_feature_visitors', feature: :compliance_example_feature, feature_default_enabled: true
 
      def index
        render html: 'index'
@@ -619,7 +619,7 @@ Ensure you comply with the [Changelog entries guide](../changelog.md).
 
 ### 8. Ask for a Product Analytics Review
 
-On GitLab.com, we have DangerBot setup to monitor Product Analytics related files and DangerBot will recommend a Product Analytics review. Mention `@gitlab-org/growth/product-analytics/engineers` in your MR for a review.
+On GitLab.com, we have DangerBot setup to monitor Product Analytics related files and DangerBot will recommend a Product Analytics review. Mention `@gitlab-org/growth/product_analytics/engineers` in your MR for a review.
 
 ### 9. Verify your metric
 
