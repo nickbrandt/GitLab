@@ -193,29 +193,13 @@ RSpec.describe UsersHelper do
     subject { helper.can_force_email_confirmation?(user) }
 
     context 'for a user that is already confirmed' do
-      it 'returns false' do
-        is_expected.to eq(false)
-      end
+      it { is_expected.to eq(false) }
     end
 
     context 'for a user that is not confirmed' do
       let(:user) { create(:user, :unconfirmed) }
 
-      context 'user is pending approval' do
-        before do
-          user.block_pending_approval!
-        end
-
-        it 'returns false' do
-          is_expected.to eq(false)
-        end
-      end
-
-      context 'user is not pending approval' do
-        it 'returns true' do
-          is_expected.to eq(true)
-        end
-      end
+      it { is_expected.to eq(true) }
     end
   end
 

@@ -107,7 +107,7 @@ module UsersHelper
   end
 
   def can_force_email_confirmation?(user)
-    !user.confirmed? && !user.blocked_pending_approval?
+    !user.confirmed?
   end
 
   private

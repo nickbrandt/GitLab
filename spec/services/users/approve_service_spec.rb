@@ -51,40 +51,55 @@ RSpec.describe Users::ApproveService do
         expect(user.reload).to be_active
       end
 
-      context 'user is uncofirmed' do
-        let(:user) { create(:user, :blocked_pending_approval, :unconfirmed) }
+      context 'email confirmation status' do
+        context 'user is unconfirmed' do
+          let(:user) { create(:user, :blocked_pending_approval, :unconfirmed) }
 
-        it 'confirms the email of the user' do
-          expect(subject[:status]).to eq(:success)
-          expect(user.reload).to be_confirmed
+          it 'sends confirmation instructions' do
+            expect { subject }
+              .to have_enqueued_mail(DeviseMailer, :confirmation_instructions)
+          end
         end
 
-        context 'when confirmation period has expired' do
-          before do
-            user.update!(confirmation_sent_at: 3.days.ago)
-            allow(User).to receive(:confirm_within).and_return(1.day)
-          end
-
-          it 'confirms the email of the user' do
-            expect(subject[:status]).to eq(:success)
-            expect(user.reload).to be_confirmed
+        context 'user is confirmed' do
+          it 'does not send a confirmation email' do
+            expect { subject }
+              .not_to have_enqueued_mail(DeviseMailer, :confirmation_instructions)
           end
         end
       end
 
-      it 'accepts pending invites of the user' do
-        project_member_invite = create(:project_member, :invited, invite_email: user.email)
-        group_member_invite = create(:group_member, :invited, invite_email: user.email)
+      context 'pending invitiations' do
+        let!(:project_member_invite) { create(:project_member, :invited, invite_email: user.email) }
+        let!(:group_member_invite) { create(:group_member, :invited, invite_email: user.email) }
 
-        expect(subject[:status]).to eq(:success)
+        context 'user is unconfirmed' do
+          let(:user) { create(:user, :blocked_pending_approval, :unconfirmed) }
 
-        group_member_invite.reload
-        project_member_invite.reload
+          it 'does not accept pending invites of the user' do
+            expect(subject[:status]).to eq(:success)
 
-        expect(group_member_invite).not_to be_invite
-        expect(project_member_invite).not_to be_invite
-        expect(group_member_invite.user).to eq(user)
-        expect(project_member_invite.user).to eq(user)
+            group_member_invite.reload
+            project_member_invite.reload
+
+            expect(group_member_invite).to be_invite
+            expect(project_member_invite).to be_invite
+          end
+        end
+
+        context 'user is confirmed' do
+          it 'accepts pending invites of the user' do
+            expect(subject[:status]).to eq(:success)
+
+            group_member_invite.reload
+            project_member_invite.reload
+
+            expect(group_member_invite).not_to be_invite
+            expect(project_member_invite).not_to be_invite
+            expect(group_member_invite.user).to eq(user)
+            expect(project_member_invite.user).to eq(user)
+          end
+        end
       end
     end
   end

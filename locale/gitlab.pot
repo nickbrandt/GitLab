@@ -2072,13 +2072,7 @@ msgstr ""
 msgid "AdminUsers|Access the API"
 msgstr ""
 
-msgid "AdminUsers|Activate their account"
-msgstr ""
-
 msgid "AdminUsers|Active"
-msgstr ""
-
-msgid "AdminUsers|Add them to projects or groups they are currently invited to"
 msgstr ""
 
 msgid "AdminUsers|Admin"
@@ -2097,9 +2091,6 @@ msgid "AdminUsers|Approve user"
 msgstr ""
 
 msgid "AdminUsers|Approved users can:"
-msgstr ""
-
-msgid "AdminUsers|Approving a user will:"
 msgstr ""
 
 msgid "AdminUsers|Are you sure?"
@@ -2130,9 +2121,6 @@ msgid "AdminUsers|Blocking user has the following effects:"
 msgstr ""
 
 msgid "AdminUsers|Cannot unblock LDAP blocked users"
-msgstr ""
-
-msgid "AdminUsers|Confirm their email address"
 msgstr ""
 
 msgid "AdminUsers|Deactivate"

@@ -133,16 +133,6 @@ RSpec.describe Admin::UsersController do
           expect(user).to be_active
           expect(flash[:notice]).to eq('Successfully approved')
         end
-
-        context 'user is unconfirmed' do
-          let(:user) { create(:user, :blocked_pending_approval, :unconfirmed) }
-
-          it 'confirms the email of the user' do
-            subject
-
-            expect(user.reload).to be_confirmed
-          end
-        end
       end
 
       context 'when unsuccessful' do
