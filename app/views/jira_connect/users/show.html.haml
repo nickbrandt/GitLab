@@ -4,8 +4,6 @@
 
   %p= _('You can now close this window and return to the GitLab for Jira application.')
 
-  %p= external_link _('Return to GitLab for Jira'), '#', class: 'btn btn-success'
-
   %p= link_to _('Sign out'), destroy_user_session_path, method: :post
 
 - add_page_specific_style 'page_bundles/jira_connect_users'
