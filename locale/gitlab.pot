@@ -4131,6 +4131,9 @@ msgstr ""
 msgid "BillingPlan|Upgrade"
 msgstr ""
 
+msgid "Billing|An error occurred while loading billable members list"
+msgstr ""
+
 msgid "Bitbucket Server Import"
 msgstr ""
 
