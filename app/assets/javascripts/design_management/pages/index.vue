@@ -204,7 +204,7 @@ export default {
       this.trackUploadDesign(res);
     },
     trackUploadDesign(res) {
-      res.data.designManagementUpload.designs.forEach(design => {
+      (res?.data?.designManagementUpload?.designs || []).forEach(design => {
         if (design.event === 'CREATION') {
           trackDesignCreate();
         } else if (design.event === 'MODIFICATION') {

@@ -374,7 +374,7 @@ describe('Design management index page', () => {
       createComponent({ stubs: { GlEmptyState } });
       wrapper.setData({ filesToBeSaved: [{ name: 'test' }] });
 
-      wrapper.vm.onUploadDesignDone();
+      wrapper.vm.onUploadDesignDone(designUploadMutationCreatedResponse);
       return wrapper.vm.$nextTick().then(() => {
         expect(wrapper.vm.filesToBeSaved).toEqual([]);
         expect(wrapper.vm.isSaving).toBeFalsy();
