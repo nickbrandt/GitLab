@@ -1,5 +1,5 @@
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import { GlLink, GlTooltipDirective } from '@gitlab/ui';
 import TerminalSyncStatusSafe from './terminal_sync/terminal_sync_status_safe.vue';
 import { isTextFile, getFileEOL } from '~/ide/utils';
@@ -13,7 +13,7 @@ export default {
     GlTooltip: GlTooltipDirective,
   },
   computed: {
-    ...mapGetters(['activeFile']),
+    ...mapState(['activeFile']),
     activeFileEOL() {
       return getFileEOL(this.activeFile.content);
     },

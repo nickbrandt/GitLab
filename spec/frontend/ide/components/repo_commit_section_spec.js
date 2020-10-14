@@ -4,7 +4,6 @@ import { createRouter } from '~/ide/ide_router';
 import { keepAlive } from '../../helpers/keep_alive_component_helper';
 import RepoCommitSection from '~/ide/components/repo_commit_section.vue';
 import EmptyState from '~/ide/components/commit_sidebar/empty_state.vue';
-import { stageKeys } from '~/ide/constants';
 import { file } from '../helpers';
 
 const TEST_NO_CHANGES_SVG = 'nochangessvg';
@@ -45,7 +44,6 @@ describe('RepoCommitSection', () => {
     store.state.stagedFiles.forEach(f =>
       Object.assign(f, {
         changed: true,
-        staged: true,
         content: 'testing',
       }),
     );
@@ -130,7 +128,6 @@ describe('RepoCommitSection', () => {
       setupDefaultState();
 
       store.state.openFiles = [...Object.values(store.state.entries)];
-      store.state.openFiles[0].active = true;
       store.state.stagedFiles = [];
 
       createComponent();
@@ -141,7 +138,7 @@ describe('RepoCommitSection', () => {
       expect(store.state.openFiles[0].pending).toBe(true);
 
       expect(store.dispatch).toHaveBeenCalledWith('openPendingTab', {
-        file: store.state.entries[store.getters.activeFile.path],
+        file: store.state.entries[store.state.activeFile.path],
         keyPrefix: stageKeys.unstaged,
       });
     });

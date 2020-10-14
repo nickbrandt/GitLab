@@ -62,7 +62,7 @@ describe('RepoEditor', () => {
     const storeOptions = createStoreOptions();
     store = new Vuex.Store(storeOptions);
 
-    f.active = true;
+    store.state.activeFile = f;
     f.tempFile = true;
 
     store.state.openFiles.push(f);

@@ -1,11 +1,11 @@
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlIcon } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
-
 import FileIcon from '~/vue_shared/components/file_icon.vue';
 import ChangedFileIcon from '~/vue_shared/components/changed_file_icon.vue';
 import FileStatusIcon from './repo_file_status_icon.vue';
+import { leftSidebarViews } from '../constants';
 
 export default {
   components: {
@@ -26,35 +26,29 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getUrlForPath']),
+    ...mapGetters(['getUrlForPath', 'isFileActive', 'isCommitModeActive']),
     closeLabel() {
-      if (this.fileHasChanged) {
+      if (this.isCommitModeActive) {
         return sprintf(__(`%{tabname} changed`), { tabname: this.tab.name });
       }
       return sprintf(__(`Close %{tabname}`, { tabname: this.tab.name }));
     },
     showChangedIcon() {
-      if (this.tab.pending) return true;
+      if (this.isCommitModeActive) return true;
 
       return this.fileHasChanged ? !this.tabMouseOver : false;
     },
     fileHasChanged() {
-      return this.tab.changed || this.tab.tempFile || this.tab.staged || this.tab.deleted;
+      return this.tab.changed || this.tab.tempFile || this.tab.deleted;
     },
   },
 
   methods: {
-    ...mapActions(['closeFile', 'updateDelayViewerUpdated', 'openPendingTab']),
+    ...mapActions(['closeFile', 'openFile']),
     clickFile(tab) {
-      if (tab.active) return;
+      if (this.isFileActive(tab)) return;
 
-      this.updateDelayViewerUpdated(true);
-
-      if (tab.pending) {
-        this.openPendingTab({ file: tab, keyPrefix: tab.staged ? 'staged' : 'unstaged' });
-      } else {
-        this.$router.push(this.getUrlForPath(tab.path));
-      }
+      this.openFile(tab.path);
     },
     mouseOverTab() {
       if (this.fileHasChanged) {
@@ -72,10 +66,7 @@ export default {
 
 <template>
   <li
-    :class="{
-      active: tab.active,
-      disabled: tab.pending,
-    }"
+    :class="{ active: isFileActive(tab) }"
     @click="clickFile(tab)"
     @mouseover="mouseOverTab"
     @mouseout="mouseOutTab"
@@ -87,7 +78,6 @@ export default {
     </div>
     <button
       :aria-label="closeLabel"
-      :disabled="tab.pending"
       type="button"
       class="multi-file-tab-close"
       @click.stop.prevent="closeFile(tab)"

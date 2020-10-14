@@ -7,7 +7,7 @@ export default {
     Dropdown,
   },
   computed: {
-    ...mapGetters(['activeFile']),
+    ...mapState(['activeFile']),
     ...mapGetters('fileTemplates', ['templateTypes']),
     ...mapState('fileTemplates', ['selectedTemplateType', 'updateSuccess']),
     showTemplatesDropdown() {

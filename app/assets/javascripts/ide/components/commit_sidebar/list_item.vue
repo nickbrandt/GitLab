@@ -1,5 +1,5 @@
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import { GlIcon } from '@gitlab/ui';
 import tooltip from '~/vue_shared/directives/tooltip';
 import FileIcon from '~/vue_shared/components/file_icon.vue';
@@ -19,56 +19,29 @@ export default {
       type: Object,
       required: true,
     },
-    keyPrefix: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    stagedList: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    activeFileKey: {
-      type: String,
-      required: false,
-      default: null,
-    },
   },
   computed: {
+    ...mapGetters(['isFileActive']),
     iconName() {
-      // name: '-solid' is a false positive: https://gitlab.com/gitlab-org/frontend/eslint-plugin-i18n/issues/26#possible-false-positives
-      // eslint-disable-next-line @gitlab/require-i18n-strings
-      const suffix = this.stagedList ? '-solid' : '';
-
-      return `${getCommitIconMap(this.file).icon}${suffix}`;
+      return `${getCommitIconMap(this.file).icon}`;
     },
     iconClass() {
       return `${getCommitIconMap(this.file).class} ml-auto mr-auto`;
     },
-    fullKey() {
-      return `${this.keyPrefix}-${this.file.key}`;
-    },
     isActive() {
-      return this.activeFileKey === this.fullKey;
+      return this.isFileActive(this.file);
     },
     tooltipTitle() {
       return this.file.path === this.file.name ? '' : this.file.path;
     },
   },
   methods: {
-    ...mapActions(['discardFileChanges', 'updateViewer', 'openPendingTab']),
+    ...mapActions(['discardFileChanges', 'updateViewer', 'openFile']),
     openFileInEditor() {
-      if (this.file.type === 'tree') return null;
+      if (this.file.type === 'tree') return;
 
-      return this.openPendingTab({
-        file: this.file,
-        keyPrefix: this.keyPrefix,
-      }).then(changeViewer => {
-        if (changeViewer) {
-          this.updateViewer(viewerTypes.diff);
-        }
-      });
+      this.updateViewer(viewerTypes.diff);
+      this.openFile(this.file.path);
     },
   },
 };

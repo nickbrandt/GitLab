@@ -60,11 +60,11 @@ export default {
     ]),
     ...mapGetters([
       'currentMergeRequest',
-      'getStagedFile',
       'isEditModeActive',
       'isCommitModeActive',
       'currentBranch',
       'getJsonSchemaForPath',
+      'isFileActive',
     ]),
     ...mapGetters('fileTemplates', ['showFileTemplatesBar']),
     shouldHideEditor() {
@@ -116,10 +116,6 @@ export default {
   },
   watch: {
     file(newVal, oldVal) {
-      if (oldVal.pending) {
-        this.removePendingTab(oldVal);
-      }
-
       // Compare key to allow for files opened in review mode to be cached differently
       if (oldVal.key !== this.file.key) {
         this.initEditor();
@@ -141,9 +137,7 @@ export default {
       }
     },
     viewer() {
-      if (!this.file.pending) {
-        this.createEditorInstance();
-      }
+      this.createEditorInstance();
     },
     panelResizing() {
       if (!this.panelResizing) {
@@ -198,7 +192,6 @@ export default {
       'setFileLanguage',
       'setEditorPosition',
       'setFileViewMode',
-      'removePendingTab',
       'triggerFilesChange',
       'addTempImage',
     ]),
@@ -258,12 +251,7 @@ export default {
     setupEditor() {
       if (!this.file || !this.editor.instance || this.file.loading) return;
 
-      const head = this.getStagedFile(this.file.path);
-
-      this.model = this.editor.createModel(
-        this.file,
-        this.file.staged && this.file.key.indexOf('unstaged-') === 0 ? head : null,
-      );
+      this.model = this.editor.createModel(this.file, null);
 
       if (this.viewer === viewerTypes.mr && this.file.mrChange) {
         this.editor.attachMergeRequestModel(this.model);
@@ -275,7 +263,7 @@ export default {
 
       this.model.onChange(model => {
         const { file } = model;
-        if (!file.active) return;
+        if (!this.isFileActive(file)) return;
 
         const monacoModel = model.getModel();
         const content = monacoModel.getValue();

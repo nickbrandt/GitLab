@@ -29,19 +29,15 @@ export default {
     };
   },
   computed: {
-    ...mapState(['changedFiles', 'stagedFiles', 'currentActivityView', 'lastCommitMsg']),
+    ...mapState(['changedFiles', 'isCommitModeActive', 'lastCommitMsg']),
     ...mapState('commit', ['commitMessage', 'submitCommitLoading', 'commitError']),
     ...mapGetters(['someUncommittedChanges']),
     ...mapGetters('commit', ['discardDraftButtonDisabled', 'preBuiltCommitMessage']),
     overviewText() {
-      return n__('%d changed file', '%d changed files', this.stagedFiles.length);
+      return n__('%d changed file', '%d changed files', this.changedFiles.length);
     },
     commitButtonText() {
-      return this.stagedFiles.length ? __('Commit') : __('Stage & Commit');
-    },
-
-    currentViewIsCommitView() {
-      return this.currentActivityView === leftSidebarViews.commit.name;
+      return __('Commit');
     },
     commitErrorPrimaryAction() {
       const { primaryAction } = this.lastCommitError || {};
@@ -82,7 +78,7 @@ export default {
       } else {
         this.isCompact =
           !this.someUncommittedChanges ||
-          !this.currentViewIsCommitView ||
+          !this.isCommitModeActive ||
           window.innerHeight < MAX_WINDOW_HEIGHT_COMPACT;
       }
     },

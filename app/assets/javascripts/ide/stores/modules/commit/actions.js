@@ -78,7 +78,7 @@ export const updateFilesAfterCommit = ({ commit, dispatch, rootState, rootGetter
     { root: true },
   );
 
-  rootState.stagedFiles.forEach(file => {
+  rootState.changedFiles.forEach(file => {
     const changedFile = rootState.changedFiles.find(f => f.path === file.path);
 
     commit(
@@ -113,26 +113,20 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
   // During some of the pre and post commit processing
   const { shouldCreateMR, shouldHideNewMrOption, isCreatingNewBranch, branchName } = getters;
   const newBranch = state.commitAction !== consts.COMMIT_TO_CURRENT_BRANCH;
-  const stageFilesPromise = rootState.stagedFiles.length
-    ? Promise.resolve()
-    : dispatch('stageAllChanges', null, { root: true });
 
   commit(types.CLEAR_ERROR);
   commit(types.UPDATE_LOADING, true);
+  const payload = createCommitPayload({
+    branch: branchName,
+    newBranch,
+    getters,
+    state,
+    rootState,
+    rootGetters,
+  });
 
-  return stageFilesPromise
-    .then(() => {
-      const payload = createCommitPayload({
-        branch: branchName,
-        newBranch,
-        getters,
-        state,
-        rootState,
-        rootGetters,
-      });
-
-      return service.commit(rootState.currentProjectId, payload);
-    })
+  return service
+    .commit(rootState.currentProjectId, payload)
     .catch(e => {
       commit(types.UPDATE_LOADING, false);
       commit(types.SET_ERROR, parseCommitError(e));
@@ -165,7 +159,7 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
         branch: branchName,
       })
         .then(() => {
-          commit(rootTypes.CLEAR_STAGED_CHANGES, null, { root: true });
+          commit(rootTypes.REMOVE_ALL_CHANGES_FILES, null, { root: true });
 
           setTimeout(() => {
             commit(rootTypes.SET_LAST_COMMIT_MSG, '', { root: true });
@@ -185,33 +179,15 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
           }
         })
         .then(() => {
-          if (rootGetters.lastOpenedFile) {
-            dispatch(
-              'openPendingTab',
-              {
-                file: rootGetters.lastOpenedFile,
-              },
-              { root: true },
-            )
-              .then(changeViewer => {
-                if (changeViewer) {
-                  dispatch('updateViewer', 'diff', { root: true });
-                }
-              })
-              .catch(e => {
-                throw e;
-              });
-          } else {
-            dispatch('updateActivityBarView', leftSidebarViews.edit.name, { root: true });
-            dispatch('updateViewer', 'editor', { root: true });
+          dispatch('updateActivityBarView', leftSidebarViews.edit.name, { root: true });
+          dispatch('updateViewer', 'editor', { root: true });
 
-            if (rootGetters.activeFile) {
-              dispatch(
-                'router/push',
-                `/project/${rootState.currentProjectId}/blob/${branchName}/-/${rootGetters.activeFile.path}`,
-                { root: true },
-              );
-            }
+          if (rootState.activeFile) {
+            dispatch(
+              'router/push',
+              `/project/${rootState.currentProjectId}/blob/${branchName}/-/${rootGetters.activeFile.path}`,
+              { root: true },
+            );
           }
         })
         .then(() => dispatch('updateCommitAction', consts.COMMIT_TO_CURRENT_BRANCH))

@@ -58,12 +58,6 @@ export default {
     titleTooltip() {
       return sprintf(__('%{title} changes'), { title: this.title });
     },
-    additionIconName() {
-      return this.title.toLowerCase() === 'staged' ? 'file-addition-solid' : 'file-addition';
-    },
-    modifiedIconName() {
-      return this.title.toLowerCase() === 'staged' ? 'file-modified-solid' : 'file-modified';
-    },
   },
 };
 </script>
@@ -86,7 +80,7 @@ export default {
       data-placement="left"
       class="gl-mb-3"
     >
-      <gl-icon :name="additionIconName" :size="18" :class="addedFilesIconClass" />
+      <gl-icon name="file-addition" :size="18" :class="addedFilesIconClass" />
     </div>
     {{ addedFilesLength }}
     <div
@@ -96,7 +90,7 @@ export default {
       data-placement="left"
       class="gl-mt-3 gl-mb-3"
     >
-      <gl-icon :name="modifiedIconName" :size="18" :class="modifiedFilesClass" />
+      <gl-icon name="file-modified" :size="18" :class="modifiedFilesClass" />
     </div>
     {{ modifiedFilesLength }}
   </div>

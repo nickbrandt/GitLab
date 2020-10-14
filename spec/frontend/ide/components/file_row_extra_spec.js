@@ -7,8 +7,6 @@ import { file } from '../helpers';
 describe('IDE extra file row component', () => {
   let Component;
   let vm;
-  let unstagedFilesCount = 0;
-  let stagedFilesCount = 0;
   let changesCount = 0;
 
   beforeAll(() => {
@@ -23,8 +21,6 @@ describe('IDE extra file row component', () => {
       dropdownOpen: false,
     });
 
-    jest.spyOn(vm, 'getUnstagedFilesCountForPath', 'get').mockReturnValue(() => unstagedFilesCount);
-    jest.spyOn(vm, 'getStagedFilesCountForPath', 'get').mockReturnValue(() => stagedFilesCount);
     jest.spyOn(vm, 'getChangesInFolder', 'get').mockReturnValue(() => changesCount);
 
     vm.$mount();

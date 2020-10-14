@@ -3,7 +3,6 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import tooltip from '~/vue_shared/directives/tooltip';
 import CommitFilesList from './commit_sidebar/list.vue';
 import EmptyState from './commit_sidebar/empty_state.vue';
-import { stageKeys } from '../constants';
 
 export default {
   components: {
@@ -14,15 +13,12 @@ export default {
     tooltip,
   },
   computed: {
-    ...mapState(['changedFiles', 'stagedFiles', 'lastCommitMsg']),
+    ...mapState(['changedFiles', 'lastCommitMsg', 'activeFile']),
     ...mapState('commit', ['commitMessage', 'submitCommitLoading']),
-    ...mapGetters(['lastOpenedFile', 'someUncommittedChanges', 'activeFile']),
+    ...mapGetters(['lastOpenedFile', 'someUncommittedChanges']),
     ...mapGetters('commit', ['discardDraftButtonDisabled']),
     showStageUnstageArea() {
       return Boolean(this.someUncommittedChanges || this.lastCommitMsg);
-    },
-    activeFileKey() {
-      return this.activeFile ? this.activeFile.key : null;
     },
   },
   mounted() {
@@ -32,30 +28,20 @@ export default {
     this.initialize();
   },
   methods: {
-    ...mapActions(['openPendingTab', 'updateViewer', 'updateActivityBarView']),
+    ...mapActions(['updateViewer', 'updateActivityBarView', 'openFile', 'setFileActive']),
     initialize() {
       const file =
         this.lastOpenedFile && this.lastOpenedFile.type !== 'tree'
           ? this.lastOpenedFile
           : this.activeFile;
 
-      if (!file) return;
+      if (!file) return null;
 
-      this.openPendingTab({
-        file,
-        keyPrefix: file.staged ? stageKeys.staged : stageKeys.unstaged,
-      })
-        .then(changeViewer => {
-          if (changeViewer) {
-            this.updateViewer('diff');
-          }
-        })
-        .catch(e => {
-          throw e;
-        });
+      return this.openFile(file.path).then(() => {
+        this.updateViewer('diff');
+      });
     },
   },
-  stageKeys,
 };
 </script>
 
@@ -63,9 +49,8 @@ export default {
   <div class="multi-file-commit-panel-section">
     <template v-if="showStageUnstageArea">
       <commit-files-list
-        :key-prefix="$options.stageKeys.staged"
-        :file-list="stagedFiles"
-        :active-file-key="activeFileKey"
+        key-prefix=""
+        :file-list="changedFiles"
         :empty-state-text="__('There are no changes')"
         class="is-first"
         icon-name="unstaged"

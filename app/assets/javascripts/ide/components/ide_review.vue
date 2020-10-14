@@ -10,8 +10,8 @@ export default {
     EditorModeDropdown,
   },
   computed: {
-    ...mapGetters(['currentMergeRequest', 'activeFile', 'getUrlForPath']),
-    ...mapState(['viewer', 'currentMergeRequestId']),
+    ...mapGetters(['currentMergeRequest', 'getUrlForPath']),
+    ...mapState(['viewer', 'currentMergeRequestId', 'activeFile']),
     showLatestChangesText() {
       return !this.currentMergeRequestId || this.viewer === viewerTypes.diff;
     },
@@ -29,19 +29,12 @@ export default {
     this.initialize();
   },
   methods: {
-    ...mapActions(['updateViewer', 'resetOpenFiles']),
+    ...mapActions(['updateViewer', 'resetOpenFiles', 'openFile']),
     initialize() {
-      if (this.activeFile && this.activeFile.pending && !this.activeFile.deleted) {
-        this.$router.push(this.getUrlForPath(this.activeFile.path), () => {
-          this.updateViewer(viewerTypes.edit);
+      if (this.activeFile && !this.activeFile.deleted)
+        this.openFile(this.activeFile.path).then(() => {
+          this.updateViewer(this.currentMergeRequestId ? viewerTypes.mr : viewerTypes.diff);
         });
-      } else if (this.activeFile && this.activeFile.deleted) {
-        this.resetOpenFiles();
-      }
-
-      this.$nextTick(() => {
-        this.updateViewer(this.currentMergeRequestId ? viewerTypes.mr : viewerTypes.diff);
-      });
     },
   },
 };

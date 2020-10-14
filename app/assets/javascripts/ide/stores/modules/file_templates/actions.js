@@ -46,16 +46,16 @@ export const fetchTemplateTypes = ({ dispatch, state, rootState }) => {
   return fetchPages();
 };
 
-export const setSelectedTemplateType = ({ commit, dispatch, rootGetters }, type) => {
+export const setSelectedTemplateType = ({ commit, dispatch, rootState }, type) => {
   commit(types.SET_SELECTED_TEMPLATE_TYPE, type);
 
-  if (rootGetters.activeFile.prevPath === type.name) {
-    dispatch('discardFileChanges', rootGetters.activeFile.path, { root: true });
-  } else if (rootGetters.activeFile.name !== type.name) {
+  if (rootState.activeFile.prevPath === type.name) {
+    dispatch('discardFileChanges', rootState.activeFile.path, { root: true });
+  } else if (rootState.activeFile.name !== type.name) {
     dispatch(
       'renameEntry',
       {
-        path: rootGetters.activeFile.path,
+        path: rootState.activeFile.path,
         name: type.name,
       },
       { root: true },
@@ -95,14 +95,14 @@ export const fetchTemplate = ({ dispatch, state, rootState }, template) => {
     .catch(() => dispatch('receiveTemplateError', template));
 };
 
-export const setFileTemplate = ({ dispatch, commit, rootGetters }, template) => {
+export const setFileTemplate = ({ dispatch, commit, rootState }, template) => {
   dispatch(
     'changeFileContent',
-    { path: rootGetters.activeFile.path, content: template.content },
+    { path: rootState.activeFile.path, content: template.content },
     { root: true },
   );
   commit(types.SET_UPDATE_SUCCESS, true);
-  eventHub.$emit(`editor.update.model.new.content.${rootGetters.activeFile.key}`, template.content);
+  eventHub.$emit(`editor.update.model.new.content.${rootState.activeFile.key}`, template.content);
 };
 
 export const undoFileTemplate = ({ dispatch, commit, rootGetters }) => {

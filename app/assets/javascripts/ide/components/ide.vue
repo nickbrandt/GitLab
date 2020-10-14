@@ -58,6 +58,7 @@ export default {
   mixins: [glFeatureFlagsMixin()],
   computed: {
     ...mapState([
+      'activeFile',
       'openFiles',
       'viewer',
       'fileFindVisible',
@@ -67,7 +68,6 @@ export default {
       'loading',
     ]),
     ...mapGetters([
-      'activeFile',
       'someUncommittedChanges',
       'isCommitModeActive',
       'allBlobs',
@@ -90,7 +90,7 @@ export default {
     performanceMarkAndMeasure({ mark: WEBIDE_MARK_APP_START });
   },
   methods: {
-    ...mapActions(['toggleFileFinder']),
+    ...mapActions(['toggleFileFinder', 'openFile']),
     onBeforeUnload(e = {}) {
       const returnValue = __('Are you sure you want to lose unsaved changes?');
 
@@ -100,9 +100,6 @@ export default {
         returnValue,
       });
       return returnValue;
-    },
-    openFile(file) {
-      this.$router.push(this.getUrlForPath(file.path));
     },
     createNewFile() {
       this.$refs.newModal.open(modalTypes.blob);

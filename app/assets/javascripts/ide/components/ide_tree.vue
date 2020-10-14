@@ -14,8 +14,8 @@ export default {
     NewModal,
   },
   computed: {
-    ...mapState(['currentBranchId']),
-    ...mapGetters(['currentProject', 'currentTree', 'activeFile', 'getUrlForPath']),
+    ...mapState(['currentBranchId', 'activeFile']),
+    ...mapGetters(['currentProject', 'currentTree', 'getUrlForPath']),
   },
   mounted() {
     this.initialize();
@@ -24,7 +24,7 @@ export default {
     this.initialize();
   },
   methods: {
-    ...mapActions(['updateViewer', 'createTempEntry', 'resetOpenFiles']),
+    ...mapActions(['updateViewer', 'createTempEntry', 'openFile', 'setFileActive']),
     createNewFile() {
       this.$refs.newModal.open(modalTypes.blob);
     },
@@ -32,18 +32,10 @@ export default {
       this.$refs.newModal.open(modalTypes.tree);
     },
     initialize() {
-      this.$nextTick(() => {
-        this.updateViewer(viewerTypes.edit);
-      });
-
-      if (!this.activeFile) return;
-
-      if (this.activeFile.pending && !this.activeFile.deleted) {
-        this.$router.push(this.getUrlForPath(this.activeFile.path), () => {
+      if (this.activeFile && !this.activeFile.deleted) {
+        this.openFile(this.activeFile.path).then(() => {
           this.updateViewer(viewerTypes.edit);
         });
-      } else if (this.activeFile.deleted) {
-        this.resetOpenFiles();
       }
     },
   },
