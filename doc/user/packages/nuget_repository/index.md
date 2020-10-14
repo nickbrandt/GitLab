@@ -44,7 +44,7 @@ Available commands:
 ```
 
 NOTE: **Note:**
-GitLab currently only supports NuGet v3. Earlier versions are not supported.
+GitLab currently only supports NuGet's protocol version 3. Earlier versions are not supported.
 
 ### macOS support
 
