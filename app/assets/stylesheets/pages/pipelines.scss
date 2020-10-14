@@ -28,7 +28,10 @@
       height: 14px;
       width: 14px;
       vertical-align: middle;
-      fill: $gl-text-color-secondary;
+
+      &:not(.text-warning) {
+        fill: $gl-text-color-secondary;
+      }
     }
 
     .sprite {
@@ -128,12 +131,6 @@
 
 .pipelines-container .top-area .nav-controls > .btn:last-child {
   float: none;
-}
-
-.test-reports-table {
-  .build-trace {
-    @include build-trace();
-  }
 }
 
 .progress-bar.bg-primary {

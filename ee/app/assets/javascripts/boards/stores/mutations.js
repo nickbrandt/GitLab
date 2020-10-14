@@ -141,8 +141,8 @@ export default {
     state,
     { originalIssue, fromListId, toListId, moveBeforeId, moveAfterId, epicId },
   ) => {
-    const fromList = state.boardLists.find(l => l.id === fromListId);
-    const toList = state.boardLists.find(l => l.id === toListId);
+    const fromList = state.boardLists[fromListId];
+    const toList = state.boardLists[toListId];
 
     const issue = moveIssueListHelper(originalIssue, fromList, toList);
 
