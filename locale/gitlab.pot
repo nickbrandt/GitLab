@@ -2302,10 +2302,10 @@ msgstr ""
 msgid "AlertManagement|High"
 msgstr ""
 
-msgid "AlertManagement|Info"
+msgid "AlertManagement|Incident"
 msgstr ""
 
-msgid "AlertManagement|Issue"
+msgid "AlertManagement|Info"
 msgstr ""
 
 msgid "AlertManagement|Key"
