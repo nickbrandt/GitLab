@@ -1,14 +1,15 @@
 import MockAdapter from 'axios-mock-adapter';
 import testAction from 'helpers/vuex_action_helper';
-
-import state from 'ee/billings/stores/modules/subscription/state';
-import * as types from 'ee/billings/stores/modules/subscription/mutation_types';
-import * as actions from 'ee/billings/stores/modules/subscription/actions';
+import state from 'ee/billings/stores/modules/seats/state';
+import * as types from 'ee/billings/stores/modules/seats/mutation_types';
+import * as actions from 'ee/billings/stores/modules/seats/actions';
 import axios from '~/lib/utils/axios_utils';
+import createFlash from '~/flash';
+import { mockDataSeats } from '../../../mock_data';
 
-import { mockDataSubscription } from '../../../mock_data';
+jest.mock('~/flash');
 
-describe('subscription actions', () => {
+describe('seats actions', () => {
   let mockedState;
   let mock;
 
@@ -19,6 +20,7 @@ describe('subscription actions', () => {
 
   afterEach(() => {
     mock.restore();
+    createFlash.mockClear();
   });
 
   describe('setNamespaceId', () => {
@@ -40,7 +42,7 @@ describe('subscription actions', () => {
     });
   });
 
-  describe('fetchSubscription', () => {
+  describe('fetchBillableMembersList', () => {
     beforeEach(() => {
       gon.api_version = 'v4';
       mockedState.namespaceId = 1;
@@ -49,21 +51,21 @@ describe('subscription actions', () => {
     describe('on success', () => {
       beforeEach(() => {
         mock
-          .onGet(/\/api\/v4\/namespaces\/\d+\/gitlab_subscription(.*)$/)
-          .replyOnce(200, mockDataSubscription.gold);
+          .onGet('/api/v4/groups/1/billable_members')
+          .replyOnce(200, mockDataSeats.data, mockDataSeats.headers);
       });
 
       it('should dispatch the request and success actions', () => {
         testAction(
-          actions.fetchSubscription,
+          actions.fetchBillableMembersList,
           {},
           mockedState,
           [],
           [
-            { type: 'requestSubscription' },
+            { type: 'requestBillableMembersList' },
             {
-              type: 'receiveSubscriptionSuccess',
-              payload: mockDataSubscription.gold,
+              type: 'receiveBillableMembersListSuccess',
+              payload: mockDataSeats,
             },
           ],
         );
@@ -72,43 +74,43 @@ describe('subscription actions', () => {
 
     describe('on error', () => {
       beforeEach(() => {
-        mock.onGet(/\/api\/v4\/namespaces\/\d+\/gitlab_subscription(.*)$/).replyOnce(404, {});
+        mock.onGet('/api/v4/groups/1/billable_members').replyOnce(404, {});
       });
 
       it('should dispatch the request and error actions', () => {
         testAction(
-          actions.fetchSubscription,
+          actions.fetchBillableMembersList,
           {},
           mockedState,
           [],
-          [{ type: 'requestSubscription' }, { type: 'receiveSubscriptionError' }],
+          [{ type: 'requestBillableMembersList' }, { type: 'receiveBillableMembersListError' }],
         );
       });
     });
   });
 
-  describe('requestSubscription', () => {
+  describe('requestBillableMembersList', () => {
     it('should commit the request mutation', () => {
       testAction(
-        actions.requestSubscription,
+        actions.requestBillableMembersList,
         {},
         state,
-        [{ type: types.REQUEST_SUBSCRIPTION }],
+        [{ type: types.REQUEST_BILLABLE_MEMBERS }],
         [],
       );
     });
   });
 
-  describe('receiveSubscriptionSuccess', () => {
+  describe('receiveBillableMembersListSuccess', () => {
     it('should commit the success mutation', () => {
       testAction(
-        actions.receiveSubscriptionSuccess,
-        mockDataSubscription.gold,
+        actions.receiveBillableMembersListSuccess,
+        mockDataSeats,
         mockedState,
         [
           {
-            type: types.RECEIVE_SUBSCRIPTION_SUCCESS,
-            payload: mockDataSubscription.gold,
+            type: types.RECEIVE_BILLABLE_MEMBERS_SUCCESS,
+            payload: mockDataSeats,
           },
         ],
         [],
@@ -116,14 +118,18 @@ describe('subscription actions', () => {
     });
   });
 
-  describe('receiveSubscriptionError', () => {
-    it('should commit the error mutation', () => {
+  describe('receiveBillableMembersListError', () => {
+    it('should commit the error mutation', done => {
       testAction(
-        actions.receiveSubscriptionError,
+        actions.receiveBillableMembersListError,
         {},
         mockedState,
-        [{ type: types.RECEIVE_SUBSCRIPTION_ERROR }],
+        [{ type: types.RECEIVE_BILLABLE_MEMBERS_ERROR }],
         [],
+        () => {
+          expect(createFlash).toHaveBeenCalled();
+          done();
+        },
       );
     });
   });
