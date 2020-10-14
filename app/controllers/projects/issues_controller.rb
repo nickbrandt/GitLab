@@ -323,7 +323,7 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def store_uri
-    if request.get? && !request.xhr?
+    if request.get? && request.format.html?
       store_location_for :user, request.fullpath
     end
   end

@@ -388,15 +388,23 @@ RSpec.describe Projects::IssuesController do
   # Rails router. A controller-style spec matches the wrong route, and
   # session['user_return_to'] becomes incorrect.
   describe 'Redirect after sign in', type: :request do
-    context 'with an AJAX request' do
+    before_all do
+      project.add_developer(user)
+    end
+
+    before do
+      login_as(user)
+    end
+
+    context 'with a JSON request' do
       it 'does not store the visited URL' do
-        get project_issue_path(project, issue), xhr: true
+        get project_issue_path(project, issue, format: :json)
 
         expect(session['user_return_to']).to be_blank
       end
     end
 
-    context 'without an AJAX request' do
+    context 'with an HTML request' do
       it 'stores the visited URL' do
         get project_issue_path(project, issue)
 
