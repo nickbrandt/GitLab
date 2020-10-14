@@ -47,6 +47,7 @@ import { setFaviconOverlay } from '../lib/utils/common_utils';
 import GroupedAccessibilityReportsApp from '../reports/accessibility_report/grouped_accessibility_reports_app.vue';
 import getStateQuery from './queries/get_state.query.graphql';
 import { isExperimentEnabled } from '~/lib/utils/experimentation';
+import { SecurityReportsApp } from '~/vue_shared/security_reports/security_reports_app.vue';
 
 export default {
   el: '#js-vue-mr-widget',
@@ -90,7 +91,7 @@ export default {
     TerraformPlan,
     GroupedAccessibilityReportsApp,
     MrWidgetApprovals,
-    SecurityReportsApp: () => import('~/vue_shared/security_reports/security_reports_app.vue'),
+    SecurityReportsApp
   },
   apollo: {
     state: {
