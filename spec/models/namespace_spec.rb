@@ -855,35 +855,17 @@ RSpec.describe Namespace do
   end
 
   describe '#all_projects' do
-    let(:namespace) { create(:namespace) }
-    let(:child) { create(:group, parent: namespace) }
-    let!(:project1) { create(:project_empty_repo, namespace: namespace) }
-    let!(:project2) { create(:project_empty_repo, namespace: child) }
-
     shared_examples 'all projects for a namespace' do
+      let(:namespace) { create(:namespace) }
+      let(:child) { create(:group, parent: namespace) }
+      let!(:project1) { create(:project_empty_repo, namespace: namespace) }
+      let!(:project2) { create(:project_empty_repo, namespace: child) }
+
       it { expect(namespace.all_projects.to_a).to match_array([project2, project1]) }
       it { expect(child.all_projects.to_a).to match_array([project2]) }
     end
 
-    context 'with recursive approach' do
-      before do
-        stub_feature_flags(recursive_approach_for_all_projects: true)
-      end
-
-      include_examples 'all projects for a namespace'
-
-      context 'when namespace is a group' do
-        let(:namespace) { create(:group) }
-
-        include_examples 'all projects for a namespace'
-      end
-    end
-
-    context 'with route path wildcard approach' do
-      before do
-        stub_feature_flags(recursive_approach_for_all_projects: false)
-      end
-
+    shared_examples 'all project examples' do
       include_examples 'all projects for a namespace'
 
       context 'when namespace is a group' do
@@ -891,6 +873,30 @@ RSpec.describe Namespace do
 
         include_examples 'all projects for a namespace'
       end
+
+      context 'when namespace is a user namespace' do
+        let_it_be(:user) { create(:user) }
+        let_it_be(:user_namespace) { create(:namespace, owner: user) }
+        let_it_be(:project) { create(:project, namespace: user_namespace) }
+
+        it { expect(user_namespace.all_projects.to_a).to match_array([project]) }
+      end
+    end
+
+    context 'with recursive approach' do
+      before do
+        stub_feature_flags(recursive_approach_for_all_projects: true)
+      end
+
+      include_examples 'all project examples'
+    end
+
+    context 'with route path wildcard approach' do
+      before do
+        stub_feature_flags(recursive_approach_for_all_projects: false)
+      end
+
+      include_examples 'all project examples'
     end
   end
 
