@@ -334,6 +334,7 @@ Represents the total number of issues and their weights for a particular day.
 | ----- | ---- | ----------- |
 | `detailedStatus` | DetailedStatus | Detailed status of the job |
 | `name` | String | Name of the job |
+| `scheduledAt` | Time | Schedule for the build |
 
 ### CiStage
 
@@ -1066,6 +1067,7 @@ Relationship between an epic and an issue.
 | `relationPath` | String | URI path of the epic-issue relation |
 | `relativePosition` | Int | Relative position of the issue (used for positioning in epic tree and issue boards) |
 | `severity` | IssuableSeverity | Severity level of the incident |
+| `slaDueAt` | Time | Timestamp of when the issue SLA expires. Returns null if `incident_sla_dev` feature flag is disabled. |
 | `state` | IssueState! | State of the issue |
 | `statusPagePublishedIncident` | Boolean | Indicates whether an issue is published to the status page |
 | `subscribed` | Boolean! | Indicates the currently logged in user is subscribed to the issue |
@@ -1256,6 +1258,7 @@ Represents a recorded measurement (object count) for the Admins.
 | `reference` | String! | Internal reference of the issue. Returned in shortened format by default |
 | `relativePosition` | Int | Relative position of the issue (used for positioning in epic tree and issue boards) |
 | `severity` | IssuableSeverity | Severity level of the incident |
+| `slaDueAt` | Time | Timestamp of when the issue SLA expires. Returns null if `incident_sla_dev` feature flag is disabled. |
 | `state` | IssueState! | State of the issue |
 | `statusPagePublishedIncident` | Boolean | Indicates whether an issue is published to the status page |
 | `subscribed` | Boolean! | Indicates the currently logged in user is subscribed to the issue |
