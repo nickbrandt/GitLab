@@ -91,7 +91,7 @@ export default {
     TerraformPlan,
     GroupedAccessibilityReportsApp,
     MrWidgetApprovals,
-    SecurityReportsApp
+    SecurityReportsApp,
   },
   apollo: {
     state: {
