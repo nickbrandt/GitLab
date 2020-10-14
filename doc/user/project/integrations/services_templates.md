@@ -30,6 +30,14 @@ If you disable the template:
 If you change the template, the revised values are applied to new projects. This feature
 does not provide central administration of integration settings.
 
+## Central administration of project integrations
+
+A new set of features is being introduced in GitLab to provide more control over
+how integrations are configured at the instance, group, and project level.
+
+[Read more about setting up project integration management](../../admin_area/settings/project_integration_management.md)
+(introduced in GitLab 13.3) and [our plans for managing integrations](https://gitlab.com/groups/gitlab-org/-/epics/2137).
+
 ## Enable a service template
 
 Navigate to the **Admin Area > Service Templates** and choose the service
