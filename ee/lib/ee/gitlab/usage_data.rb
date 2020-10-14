@@ -492,7 +492,7 @@ module EE
         def clear_memoized
           super
 
-          EE_MEMOIZED_VALUES.each { |v| clear_memoization(v) } # rubocop:disable UsageData/LargeTable
+          EE_MEMOIZED_VALUES.each { |v| clear_memoization(v) }
         end
       end
     end
