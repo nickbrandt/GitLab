@@ -32,23 +32,16 @@ export default {
 
       return this.filter.allOption.name;
     },
-    extraOptionCount() {
-      return Math.max(0, this.selectedCount - 1);
-    },
     filteredOptions() {
       return this.filter.options.filter(option =>
         option.name.toLowerCase().includes(this.filterTerm.toLowerCase()),
       );
-    },
-    qaSelector() {
-      return `filter_${this.filter.name.toLowerCase().replace(' ', '_')}_dropdown`;
     },
   },
   watch: {
     selectedOptions() {
       const { id } = this.filter;
       const selectedFilters = Object.keys(this.selectedOptions);
-      console.log('emit filter-changed', { [id]: selectedFilters });
       this.$router.push({ query: { [id]: selectedFilters } });
       this.$emit('filter-changed', { [id]: selectedFilters });
     },
@@ -67,7 +60,6 @@ export default {
       return selected;
     },
     toggleFilter(option) {
-      console.log('toggle', option);
       if (this.selectedOptions[option.id]) {
         this.$delete(this.selectedOptions, option.id);
       } else {
@@ -79,9 +71,6 @@ export default {
     },
     isSelected(option) {
       return Boolean(this.selectedOptions[option.id]);
-    },
-    closeDropdown() {
-      this.$refs.dropdown.hide(true);
     },
     updateFilterTerm(newFilterTerm) {
       this.filterTerm = newFilterTerm;
@@ -96,28 +85,24 @@ export default {
     :name="filter.name"
     :selected-options-count="selectedCount"
     :selected-option="firstSelectedOption"
-    :show-search-box="filter.options.length > 20"
+    :show-search-box="filter.options.length >= 4"
     @filter-changed="updateFilterTerm"
   >
-    <template #specialOptions>
-      <filter-option
-        v-if="filter.allOption && !filterTerm.length"
-        :display-name="filter.allOption.name"
-        :is-selected="!selectedCount"
-        @click="deselectAllOptions"
-      />
-    </template>
+    <filter-option
+      v-if="filter.allOption && !filterTerm.length"
+      :display-name="filter.allOption.name"
+      :is-selected="!selectedCount"
+      @click="deselectAllOptions"
+    />
 
-    <template>
-      <filter-option
-        v-for="option in filteredOptions"
-        :key="option.id"
-        type="button"
-        class="dropdown-item"
-        :display-name="option.name"
-        :is-selected="isSelected(option)"
-        @click="toggleFilter(option)"
-      />
-    </template>
+    <filter-option
+      v-for="option in filteredOptions"
+      :key="option.id"
+      type="button"
+      class="dropdown-item"
+      :display-name="option.name"
+      :is-selected="isSelected(option)"
+      @click="toggleFilter(option)"
+    />
   </filter-body>
 </template>

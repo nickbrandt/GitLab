@@ -1,17 +1,9 @@
 <script>
-import {
-  GlDropdown,
-  GlDropdownForm,
-  GlDropdownItem,
-  GlSearchBoxByType,
-  GlIcon,
-  GlTruncate,
-} from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlSearchBoxByType, GlIcon, GlTruncate } from '@gitlab/ui';
 
 export default {
   components: {
     GlDropdown,
-    GlDropdownForm,
     GlDropdownItem,
     GlSearchBoxByType,
     GlIcon,
@@ -49,13 +41,8 @@ export default {
     },
   },
   watch: {
-    filterTerm(filterTerm) {
-      this.$emit('filter-changed', filterTerm);
-    },
-  },
-  methods: {
-    closeDropdown() {
-      this.$refs.dropdown.hide(true);
+    filterTerm() {
+      this.$emit('filter-changed', this.filterTerm);
     },
   },
 };
@@ -71,11 +58,11 @@ export default {
       toggle-class="gl-w-full gl-display-block"
     >
       <template #button-content>
-        <gl-truncate :text="selectedOption" class="gl-min-w-0 gl-flex-fill-1" />
+        <gl-truncate :text="selectedOption" class="gl-min-w-0" />
         <span v-if="extraOptionsCount" class="gl-ml-2">
           {{ n__('+%d more', '+%d more', extraOptionsCount) }}
         </span>
-        <gl-icon name="chevron-down" class="gl-flex-shrink-0" />
+        <gl-icon name="chevron-down" class="gl-flex-shrink-0 gl-ml-auto" />
       </template>
 
       <gl-search-box-by-type
@@ -86,11 +73,9 @@ export default {
         :placeholder="__('Filter...')"
       />
 
-      <slot name="specialOptions"></slot>
-
       <slot>
         <gl-dropdown-item disabled>
-          <span class="gl-text-gray-400">{{ __('No matching results') }}</span>
+          <span class="gl-text-gray-500">{{ __('No matching results') }}</span>
         </gl-dropdown-item>
       </slot>
     </gl-dropdown>
