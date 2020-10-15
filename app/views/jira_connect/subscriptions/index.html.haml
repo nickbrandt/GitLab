@@ -6,7 +6,7 @@
     - user_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: user_path(current_user) }
     = _('Signed in to GitLab as %{user_link_start}%{username}%{user_link_end}').html_safe % { user_link_start: user_link_start, username: current_user.to_reference, user_link_end: '</a>'.html_safe }
   - elsif @subscriptions.present?
-    = link_to _('Sign in to GitLab'), jira_connect_users_path, target: '_blank', rel: 'noopener noreferrer'
+    = link_to _('Sign in to GitLab'), jira_connect_users_path, target: '_blank', rel: 'noopener noreferrer', class: 'js-jira-connect-sign-in'
 
 .jira-connect-app
   %h1
@@ -16,7 +16,7 @@
     %h2.heading-with-border Sign in to GitLab.com to get started.
 
     .gl-mt-5
-      = external_link _('Sign in to GitLab'), jira_connect_users_path, class: 'ak-button ak-button__appearance-primary'
+      = external_link _('Sign in to GitLab'), jira_connect_users_path, class: 'ak-button ak-button__appearance-primary js-jira-connect-sign-in'
 
     .gl-mt-5
       %p Note: this integration only works with accounts on GitLab.com (SaaS).
@@ -24,27 +24,31 @@
     %form#add-subscription-form.subscription-form{ action: jira_connect_subscriptions_path }
       .ak-field-group
         %label
-          Namespace
+          GitLab namespace
 
       .ak-field-group.field-group-input
-        %input#namespace-input.ak-field-text{ type: 'text', required: true }
+        %input#namespace-input.ak-field-text{ type: 'text', required: true, placeholder: 'e.g. "MyCompany" or "MyCompany/GroupName"' }
         %button.ak-button.ak-button__appearance-primary{ type: 'submit' }
           Link namespace to Jira
 
-    %table.subscriptions
-      %thead
-        %tr
-          %th Namespace
-          %th Added
-          %th
-      %tbody
-        - @subscriptions.each do |subscription|
+    - if @subscriptions.present?
+      %table.subscriptions
+        %thead
           %tr
-            %td= subscription.namespace.full_path
-            %td= subscription.created_at
-            %td= link_to 'Remove', jira_connect_subscription_path(subscription), class: 'remove-subscription'
+            %th Namespace
+            %th Added
+            %th
+        %tbody
+          - @subscriptions.each do |subscription|
+            %tr
+              %td= subscription.namespace.full_path
+              %td= subscription.created_at
+              %td= link_to 'Remove', jira_connect_subscription_path(subscription), class: 'remove-subscription'
+    - else
+      %h4.empty-subscriptions
+        No linked namespaces
 
-  %p
+  %p.browser-limitations-notice
     %strong Browser limitations:
     Adding a namespace currently works only in browsers that allow cross site cookies. Please make sure to use
     %a{ href: 'https://www.mozilla.org/en-US/firefox/', target: '_blank', rel: 'noopener noreferrer' } Firefox

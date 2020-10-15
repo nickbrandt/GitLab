@@ -6,5 +6,6 @@ class JiraConnect::UsersController < ApplicationController
   layout 'devise_experimental_onboarding_issues'
 
   def show
+    @jira_app_link = params.delete(:return_to)
   end
 end

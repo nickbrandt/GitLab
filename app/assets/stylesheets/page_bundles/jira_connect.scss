@@ -13,6 +13,7 @@ $atlaskit-border-color: #dfe1e6;
       padding-top: $gl-padding-4;
 
       .ak-button {
+        align-items: center;
         height: auto;
         margin-left: $btn-margin-5;
       }
@@ -65,11 +66,15 @@ $header-height: 40px;
 
 svg {
   fill: currentColor;
+
+  &.s16 {
+    height: 16px;
+    width: 16px;
+  }
 }
 
-.s16 {
-  height: 16px;
-  width: 16px;
+.ak-field-group label {
+  text-align: left;
 }
 
 .ak-button__appearance-primary {
@@ -94,4 +99,12 @@ svg {
       padding: $gl-padding-8;
     }
   }
+}
+
+.empty-subscriptions {
+  color: $gray-900;
+}
+
+.browser-limitations-notice {
+  margin-top: 32px;
 }
