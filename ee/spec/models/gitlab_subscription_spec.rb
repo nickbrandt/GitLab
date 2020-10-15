@@ -200,6 +200,53 @@ RSpec.describe GitlabSubscription do
     end
   end
 
+  describe '#seats_in_use' do
+    let(:group) { create(:group) }
+    let!(:group_member) { create(:group_member, :developer, user: create(:user), group: group) }
+    let(:hosted_plan) { nil }
+    let(:trial) { false }
+
+    let(:gitlab_subscription) do
+      create(:gitlab_subscription, namespace: group, trial: trial, hosted_plan: hosted_plan, seats_in_use: 5)
+    end
+
+    subject { gitlab_subscription.seats_in_use }
+
+    context 'with a paid plan' do
+      let(:hosted_plan) { gold_plan }
+
+      it 'returns the previously calculated seats in use' do
+        expect(subject).to eq(5)
+      end
+    end
+
+    context 'with a trial plan' do
+      let(:hosted_plan) { gold_plan }
+      let(:trial) { true }
+
+      it 'returns the currently seats in use' do
+        expect(subject).to eq(1)
+      end
+    end
+
+    context 'with a free plan' do
+      let(:hosted_plan) { free_plan }
+
+      it 'returns the currently seats in use' do
+        expect(subject).to eq(1)
+      end
+    end
+
+    context 'with a self hosted plan' do
+      let(:group) { nil }
+      let(:group_member) { nil }
+
+      it 'returns the previously calculated seats in use' do
+        expect(subject).to eq(5)
+      end
+    end
+  end
+
   describe '#expired?' do
     let(:gitlab_subscription) { create(:gitlab_subscription, end_date: end_date) }
 

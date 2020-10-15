@@ -107,6 +107,18 @@ RSpec.describe 'Billing plan pages', :feature do
     end
   end
 
+  shared_examples 'currently used seats' do
+    before do
+      visit page_path
+    end
+
+    it 'displays the number of seats', :js do
+      page.within('.js-subscription-table') do
+        expect(page).to have_selector('p.property-value.gl-mt-2.gl-mb-0.number', text: '1')
+      end
+    end
+  end
+
   context 'users profile billing page' do
     let(:page_path) { profile_billings_path }
 
@@ -343,6 +355,13 @@ RSpec.describe 'Billing plan pages', :feature do
 
         it_behaves_like 'can contact sales'
       end
+
+      context 'on free' do
+        let(:plan) { free_plan }
+        let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: plan) }
+
+        it_behaves_like 'currently used seats'
+      end
     end
   end
 
@@ -388,6 +407,7 @@ RSpec.describe 'Billing plan pages', :feature do
 
         it_behaves_like 'downgradable plan'
         it_behaves_like 'non-upgradable plan'
+        it_behaves_like 'currently used seats'
       end
     end
   end
