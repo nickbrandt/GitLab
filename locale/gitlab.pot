@@ -4467,6 +4467,15 @@ msgstr ""
 msgid "Bulk request concurrency"
 msgstr ""
 
+msgid "BulkImport|expected an associated Group but has an associated Project"
+msgstr ""
+
+msgid "BulkImport|expected an associated Project but has an associated Group"
+msgstr ""
+
+msgid "BulkImport|must be a group"
+msgstr ""
+
 msgid "Burndown chart"
 msgstr ""
 
