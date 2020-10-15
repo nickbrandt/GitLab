@@ -319,3 +319,19 @@ describe('MOVE_ISSUE', () => {
     expect(state.issues['437'].epic).toEqual(null);
   });
 });
+
+describe('SET_BOARD_EPIC_USER_PREFERENCES', () => {
+  it('should replace userPreferences on the given epic', () => {
+    state = {
+      ...state,
+      epics: mockEpics,
+    };
+
+    const epic = mockEpics[0];
+    const userPreferences = { collapsed: false };
+
+    mutations.SET_BOARD_EPIC_USER_PREFERENCES(state, { epicId: epic.id, userPreferences });
+
+    expect(state.epics[0].userPreferences).toEqual(userPreferences);
+  });
+});

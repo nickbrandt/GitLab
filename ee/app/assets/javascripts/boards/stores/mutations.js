@@ -155,4 +155,14 @@ export default {
     removeIssueFromList({ state, listId: fromListId, issueId: issue.id });
     addIssueToList({ state, listId: toListId, issueId: issue.id, moveBeforeId, moveAfterId });
   },
+
+  [mutationTypes.SET_BOARD_EPIC_USER_PREFERENCES]: (state, val) => {
+    const { userPreferences, epicId } = val;
+
+    const epic = state.epics.filter(currentEpic => currentEpic.id === epicId)[0];
+
+    if (epic) {
+      Vue.set(epic, 'userPreferences', userPreferences);
+    }
+  },
 };
