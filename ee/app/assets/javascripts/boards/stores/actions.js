@@ -9,6 +9,7 @@ import { BoardType, ListType } from '~/boards/constants';
 import { EpicFilterType } from '../constants';
 import boardsStoreEE from './boards_store_ee';
 import * as types from './mutation_types';
+import * as typesCE from '~/boards/stores/mutation_types';
 import { fullEpicId } from '../boards_util';
 import {
   formatBoardLists,
@@ -22,6 +23,7 @@ import eventHub from '~/boards/eventhub';
 import createGqClient, { fetchPolicies } from '~/lib/graphql';
 import epicsSwimlanesQuery from '../queries/epics_swimlanes.query.graphql';
 import issueSetEpic from '../queries/issue_set_epic.mutation.graphql';
+import issueSetWeight from '../queries/issue_set_weight.mutation.graphql';
 import listsIssuesQuery from '~/boards/queries/lists_issues.query.graphql';
 import issueMoveListMutation from '../queries/issue_move_list.mutation.graphql';
 
@@ -266,6 +268,29 @@ export default {
     }
 
     return data.issueSetEpic.issue.epic;
+  },
+
+  setActiveIssueWeight: async ({ commit, getters }, input) => {
+    const { data } = await gqlClient.mutate({
+      mutation: issueSetWeight,
+      variables: {
+        input: {
+          iid: String(getters.getActiveIssue.iid),
+          weight: input.weight,
+          projectPath: input.projectPath,
+        },
+      },
+    });
+
+    if (!data.issueSetWeight || data.issueSetWeight?.errors?.length > 0) {
+      throw new Error(data.issueSetWeight?.errors);
+    }
+
+    commit(typesCE.UPDATE_ISSUE_BY_ID, {
+      issueId: getters.getActiveIssue.id,
+      prop: 'weight',
+      value: data.issueSetWeight.issue.weight,
+    });
   },
 
   moveIssue: (

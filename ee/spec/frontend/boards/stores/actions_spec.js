@@ -4,6 +4,7 @@ import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import actions, { gqlClient } from 'ee/boards/stores/actions';
 import * as types from 'ee/boards/stores/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
+import * as typesCE from '~/boards/stores/mutation_types';
 import { ListType } from '~/boards/constants';
 import { formatListIssues } from '~/boards/boards_util';
 import {
@@ -387,6 +388,57 @@ describe('setActiveIssueEpic', () => {
       .mockResolvedValue({ data: { issueSetEpic: { errors: ['failed mutation'] } } });
 
     await expect(actions.setActiveIssueEpic({ getters }, input)).rejects.toThrow(Error);
+  });
+});
+
+describe('setActiveIssueWeight', () => {
+  const state = { issues: { [mockIssue.id]: mockIssue } };
+  const getters = { getActiveIssue: mockIssue };
+  const testWeight = mockIssue.weight + 1;
+  const input = {
+    weight: testWeight,
+    projectPath: 'h/b',
+  };
+
+  it('should commit weight after setting the issue', done => {
+    jest.spyOn(gqlClient, 'mutate').mockResolvedValue({
+      data: {
+        issueSetWeight: {
+          issue: {
+            weight: testWeight,
+          },
+          errors: [],
+        },
+      },
+    });
+
+    const payload = {
+      issueId: getters.getActiveIssue.id,
+      prop: 'weight',
+      value: testWeight,
+    };
+
+    testAction(
+      actions.setActiveIssueWeight,
+      input,
+      { ...state, ...getters },
+      [
+        {
+          type: typesCE.UPDATE_ISSUE_BY_ID,
+          payload,
+        },
+      ],
+      [],
+      done,
+    );
+  });
+
+  it('throws error if fails', async () => {
+    jest
+      .spyOn(gqlClient, 'mutate')
+      .mockResolvedValue({ data: { issueSetWeight: { errors: ['failed mutation'] } } });
+
+    await expect(actions.setActiveIssueWeight({ getters }, input)).rejects.toThrow(Error);
   });
 });
 
