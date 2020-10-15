@@ -15252,6 +15252,9 @@ msgstr ""
 msgid "Learn more"
 msgstr ""
 
+msgid "Learn more about %{username}"
+msgstr ""
+
 msgid "Learn more about Auto DevOps"
 msgstr ""
 
@@ -28614,6 +28617,9 @@ msgstr ""
 msgid "UserProfile|Blocked user"
 msgstr ""
 
+msgid "UserProfile|Bot activity"
+msgstr ""
+
 msgid "UserProfile|Contributed projects"
 msgstr ""
 
@@ -31229,6 +31235,9 @@ msgid "metric_id must be unique across a project"
 msgstr ""
 
 msgid "missing"
+msgstr ""
+
+msgid "more information"
 msgstr ""
 
 msgid "most recent deployment"
