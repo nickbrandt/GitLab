@@ -14750,6 +14750,9 @@ msgstr ""
 msgid "Keep divergent refs"
 msgstr ""
 
+msgid "Keep editing"
+msgstr ""
+
 msgid "Kerberos access denied"
 msgstr ""
 
