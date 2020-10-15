@@ -6,8 +6,8 @@ import UsageGraph from './usage_graph.vue';
 import UsageStatistics from './usage_statistics.vue';
 import query from '../queries/storage.query.graphql';
 import TemporaryStorageIncreaseModal from './temporary_storage_increase_modal.vue';
-import { numberToHumanSize } from '~/lib/utils/number_utils';
 import { parseBoolean } from '~/lib/utils/common_utils';
+import { formatUsageSize, parseGetStorageResults } from '../utils';
 
 export default {
   name: 'StorageCounterApp',
@@ -51,23 +51,10 @@ export default {
       variables() {
         return {
           fullPath: this.namespacePath,
+          withExcessStorageData: this.isAdditionalStorageFlagEnabled,
         };
       },
-      /**
-       * `rootStorageStatistics` will be sent as null until an
-       * event happens to trigger the storage count.
-       * For that reason we have to verify if `storageSize` is sent or
-       * if we should render N/A
-       */
-      update: data => ({
-        projects: data.namespace.projects.edges.map(({ node }) => node),
-        totalUsage:
-          data.namespace.rootStorageStatistics && data.namespace.rootStorageStatistics.storageSize
-            ? numberToHumanSize(data.namespace.rootStorageStatistics.storageSize)
-            : 'N/A',
-        rootStorageStatistics: data.namespace.rootStorageStatistics,
-        limit: data.namespace.storageSizeLimit,
-      }),
+      update: parseGetStorageResults,
     },
   },
   data() {
@@ -85,10 +72,19 @@ export default {
     isAdditionalStorageFlagEnabled() {
       return this.glFeatures.additionalRepoStorageByNamespace;
     },
-  },
-  methods: {
-    formatSize(size) {
-      return numberToHumanSize(size);
+    formattedNamespaceLimit() {
+      return formatUsageSize(this.namespace.limit);
+    },
+    storageStatistics() {
+      if (!this.namespace) {
+        return null;
+      }
+
+      return {
+        totalRepositorySize: this.namespace.totalRepositorySize,
+        totalRepositorySizeExcess: this.namespace.totalRepositorySizeExcess,
+        additionalPurchasedStorageSize: this.namespace.additionalPurchasedStorageSize,
+      };
     },
   },
   modalId: 'temporary-increase-storage-modal',
@@ -96,8 +92,8 @@ export default {
 </script>
 <template>
   <div>
-    <div v-if="isAdditionalStorageFlagEnabled && namespace.rootStorageStatistics">
-      <usage-statistics :root-storage-statistics="namespace.rootStorageStatistics" />
+    <div v-if="isAdditionalStorageFlagEnabled && storageStatistics">
+      <usage-statistics :root-storage-statistics="storageStatistics" />
     </div>
     <div v-else class="gl-py-4 gl-px-2 gl-m-0">
       <div class="gl-display-flex gl-align-items-center">
@@ -114,7 +110,7 @@ export default {
                 :message="s__('UsageQuota|out of %{formattedLimit} of your namespace storage')"
               >
                 <template #formattedLimit>
-                  <span class="gl-font-weight-bold">{{ formatSize(namespace.limit) }}</span>
+                  <span class="gl-font-weight-bold">{{ formattedNamespaceLimit }}</span>
                 </template>
               </gl-sprintf>
             </template>
@@ -156,7 +152,7 @@ export default {
     <projects-table :projects="namespaceProjects" />
     <temporary-storage-increase-modal
       v-if="isStorageIncreaseModalVisible"
-      :limit="formatSize(namespace.limit)"
+      :limit="formattedNamespaceLimit"
       :modal-id="$options.modalId"
     />
   </div>

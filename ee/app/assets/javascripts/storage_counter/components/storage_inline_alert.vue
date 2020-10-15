@@ -2,7 +2,7 @@
 import { GlAlert } from '@gitlab/ui';
 import { n__, __ } from '~/locale';
 import { getFormatter, SUPPORTED_FORMATS } from '~/lib/utils/unit_format';
-import { usageRatioToThresholdLevel } from '../usage_thresholds';
+import { usageRatioToThresholdLevel } from '../utils';
 import { ALERT_THRESHOLD, ERROR_THRESHOLD, WARNING_THRESHOLD } from '../constants';
 
 export default {

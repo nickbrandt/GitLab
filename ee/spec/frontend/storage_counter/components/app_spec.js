@@ -4,9 +4,9 @@ import Project from 'ee/storage_counter/components/project.vue';
 import UsageGraph from 'ee/storage_counter/components/usage_graph.vue';
 import UsageStatistics from 'ee/storage_counter/components/usage_statistics.vue';
 import TemporaryStorageIncreaseModal from 'ee/storage_counter/components/temporary_storage_increase_modal.vue';
+import { formatUsageSize } from 'ee/storage_counter/utils';
 import { createMockDirective, getBinding } from 'helpers/vue_mock_directive';
 import { namespaceData, withRootStorageStatistics } from '../mock_data';
-import { numberToHumanSize } from '~/lib/utils/number_utils';
 
 const TEST_LIMIT = 1000;
 
@@ -73,7 +73,7 @@ describe('Storage counter app', () => {
 
       await wrapper.vm.$nextTick();
 
-      expect(wrapper.text()).toContain(numberToHumanSize(namespaceData.limit));
+      expect(wrapper.text()).toContain(formatUsageSize(namespaceData.limit));
     });
 
     it('when limit is 0 it does not render limit information', async () => {
@@ -83,7 +83,7 @@ describe('Storage counter app', () => {
 
       await wrapper.vm.$nextTick();
 
-      expect(wrapper.text()).not.toContain(numberToHumanSize(0));
+      expect(wrapper.text()).not.toContain(formatUsageSize(0));
     });
   });
 
@@ -200,7 +200,7 @@ describe('Storage counter app', () => {
 
       it('renders modal', () => {
         expect(wrapper.find(TemporaryStorageIncreaseModal).props()).toEqual({
-          limit: numberToHumanSize(TEST_LIMIT),
+          limit: formatUsageSize(TEST_LIMIT),
           modalId: StorageApp.modalId,
         });
       });
