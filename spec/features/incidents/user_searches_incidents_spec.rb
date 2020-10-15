@@ -19,12 +19,28 @@ RSpec.describe 'User searches Incident Management incidents', :js do
   end
 
   context 'when a developer displays the incident list they can search for an incident' do
-    it 'shows the incident table with an incident for a valid search filter bar' do
+    it 'shows the incident table with an a valid search filter bar' do
       expect(page).to have_selector('.filtered-search-wrapper')
       expect(page).to have_selector('.gl-table')
       expect(page).to have_selector('.incident-severity')
       expect(all('tbody tr').count).to be(1)
       expect(page).not_to have_selector('.empty-state')
+    end
+
+    it 'shows a incident from a vaild search' do
+      find('.gl-filtered-search-term-input').set('title')
+      page.all('[data-testid="search-icon"]')[1].click
+      wait_for_all_requests
+      expect(all('tbody tr').count).to be(1)
+      expect(page).not_to have_selector('.empty-state')
+    end
+
+    it 'does not show a incident from a invaild search' do
+      find('.gl-filtered-search-term-input').set('invalid search text')
+      page.all('[data-testid="search-icon"]')[1].click
+      wait_for_all_requests
+      expect(all('tbody tr').count).to be(0)
+      expect(page).to have_selector('.empty-state')
     end
   end
 end
