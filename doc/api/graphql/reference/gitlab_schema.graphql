@@ -1223,7 +1223,7 @@ type BoardEpic implements CurrentUserTodos & Noteable {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
+    date is provided, both must be present). Deprecated in 13.5: Use timeframe.end
     """
     endDate: Time
 
@@ -1274,7 +1274,7 @@ type BoardEpic implements CurrentUserTodos & Noteable {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use
+    date is provided, both must be present). Deprecated in 13.5: Use
     timeframe.start
     """
     startDate: Time
@@ -6015,7 +6015,7 @@ type Epic implements CurrentUserTodos & Noteable {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
+    date is provided, both must be present). Deprecated in 13.5: Use timeframe.end
     """
     endDate: Time
 
@@ -6066,7 +6066,7 @@ type Epic implements CurrentUserTodos & Noteable {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use
+    date is provided, both must be present). Deprecated in 13.5: Use
     timeframe.start
     """
     startDate: Time
@@ -7509,7 +7509,7 @@ type Group {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
+    date is provided, both must be present). Deprecated in 13.5: Use timeframe.end
     """
     endDate: Time
 
@@ -7550,7 +7550,7 @@ type Group {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use
+    date is provided, both must be present). Deprecated in 13.5: Use
     timeframe.start
     """
     startDate: Time
@@ -7587,7 +7587,7 @@ type Group {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
+    date is provided, both must be present). Deprecated in 13.5: Use timeframe.end
     """
     endDate: Time
 
@@ -7638,7 +7638,7 @@ type Group {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use
+    date is provided, both must be present). Deprecated in 13.5: Use
     timeframe.start
     """
     startDate: Time
@@ -7855,7 +7855,7 @@ type Group {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
+    date is provided, both must be present). Deprecated in 13.5: Use timeframe.end
     """
     endDate: Time
 
@@ -7886,7 +7886,7 @@ type Group {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use
+    date is provided, both must be present). Deprecated in 13.5: Use
     timeframe.start
     """
     startDate: Time
@@ -8063,7 +8063,7 @@ type Group {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
+    date is provided, both must be present). Deprecated in 13.5: Use timeframe.end
     """
     endDate: Time
 
@@ -8094,7 +8094,7 @@ type Group {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use
+    date is provided, both must be present). Deprecated in 13.5: Use
     timeframe.start
     """
     startDate: Time
@@ -13928,7 +13928,7 @@ type Project {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
+    date is provided, both must be present). Deprecated in 13.5: Use timeframe.end
     """
     endDate: Time
 
@@ -13959,7 +13959,7 @@ type Project {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use
+    date is provided, both must be present). Deprecated in 13.5: Use
     timeframe.start
     """
     startDate: Time
@@ -14188,7 +14188,7 @@ type Project {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use timeframe.end
+    date is provided, both must be present). Deprecated in 13.5: Use timeframe.end
     """
     endDate: Time
 
@@ -14219,7 +14219,7 @@ type Project {
 
     """
     List items overlapping a time frame defined by startDate..endDate (if one
-    date is provided, both must be present). Deprecated in 14.0: Use
+    date is provided, both must be present). Deprecated in 13.5: Use
     timeframe.start
     """
     startDate: Time
