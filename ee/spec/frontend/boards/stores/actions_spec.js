@@ -164,6 +164,47 @@ describe('fetchEpicsSwimlanes', () => {
   });
 });
 
+describe('updateBoardEpicUserPreferences', () => {
+  const state = {
+    endpoints: {
+      boardId: 1,
+    },
+  };
+
+  const queryResponse = (collapsed = false) => ({
+    data: {
+      updateBoardEpicUserPreferences: {
+        errors: [],
+        epicUserPreferences: { collapsed },
+      },
+    },
+  });
+
+  it('should send mutation', done => {
+    const collapsed = true;
+    jest.spyOn(gqlClient, 'mutate').mockResolvedValue(queryResponse(collapsed));
+
+    testAction(
+      actions.updateBoardEpicUserPreferences,
+      { epicId: mockEpic.id, collapsed },
+      state,
+      [
+        {
+          payload: {
+            epicId: mockEpic.id,
+            userPreferences: {
+              collapsed,
+            },
+          },
+          type: types.SET_BOARD_EPIC_USER_PREFERENCES,
+        },
+      ],
+      [],
+      done,
+    );
+  });
+});
+
 describe('setShowLabels', () => {
   it('should commit mutation SET_SHOW_LABELS', done => {
     const state = {

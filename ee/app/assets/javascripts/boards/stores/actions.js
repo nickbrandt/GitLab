@@ -24,6 +24,7 @@ import epicsSwimlanesQuery from '../queries/epics_swimlanes.query.graphql';
 import issueSetEpic from '../queries/issue_set_epic.mutation.graphql';
 import listsIssuesQuery from '~/boards/queries/lists_issues.query.graphql';
 import issueMoveListMutation from '../queries/issue_move_list.mutation.graphql';
+import updateBoardEpicUserPreferencesMutation from '../queries/updateBoardEpicUserPreferences.mutation.graphql';
 
 const notImplemented = () => {
   /* eslint-disable-next-line @gitlab/require-i18n-strings */
@@ -136,6 +137,40 @@ export default {
         }
       })
       .catch(() => commit(types.RECEIVE_SWIMLANES_FAILURE));
+  },
+
+  updateBoardEpicUserPreferences({ commit, state }, { epicId, collapsed }) {
+    const {
+      endpoints: { boardId },
+    } = state;
+
+    const variables = {
+      boardId: fullBoardId(boardId),
+      epicId,
+      collapsed,
+    };
+
+    return gqlClient
+      .mutate({
+        mutation: updateBoardEpicUserPreferencesMutation,
+        variables,
+      })
+      .then(({ data }) => {
+        if (data?.updateBoardEpicUserPreferences?.errors.length) {
+          throw new Error();
+        }
+
+        const { epicUserPreferences: userPreferences } = data?.updateBoardEpicUserPreferences;
+        commit(types.SET_BOARD_EPIC_USER_PREFERENCES, { epicId, userPreferences });
+      })
+      .catch(() => {
+        commit(types.SET_BOARD_EPIC_USER_PREFERENCES, {
+          epicId,
+          userPreferences: {
+            collapsed: !collapsed,
+          },
+        });
+      });
   },
 
   setShowLabels({ commit }, val) {
