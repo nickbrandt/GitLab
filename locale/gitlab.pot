@@ -13734,6 +13734,12 @@ msgstr ""
 msgid "Incident Management Limits"
 msgstr ""
 
+msgid "IncidentManagement|%{hours} hours, %{minutes} minutes remaining"
+msgstr ""
+
+msgid "IncidentManagement|%{minutes} minutes remaining"
+msgstr ""
+
 msgid "IncidentManagement|All"
 msgstr ""
 
@@ -13792,6 +13798,9 @@ msgid "IncidentManagement|There are no closed incidents"
 msgstr ""
 
 msgid "IncidentManagement|There was an error displaying the incidents."
+msgstr ""
+
+msgid "IncidentManagement|Time to SLA"
 msgstr ""
 
 msgid "IncidentManagement|Unassigned"
