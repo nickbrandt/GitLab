@@ -7,7 +7,6 @@ module EE
 
       prepended do
         feature_category :epics, [:epics]
-        feature_category :vulnerability_management, [:vulnerabilities]
       end
 
       def epics
