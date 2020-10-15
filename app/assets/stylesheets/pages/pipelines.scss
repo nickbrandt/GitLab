@@ -81,14 +81,6 @@
   }
 }
 
-[data-page='admin:jobs:index'] {
-  .admin-builds-table {
-    td:last-child {
-      min-width: 120px;
-    }
-  }
-}
-
 .ci-build-text,
 .ci-status-text {
   font-weight: 200;
