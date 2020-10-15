@@ -16193,6 +16193,9 @@ msgstr ""
 msgid "Members|No expiration set"
 msgstr ""
 
+msgid "Members|Role updated successfully."
+msgstr ""
+
 msgid "Members|in %{time}"
 msgstr ""
 
