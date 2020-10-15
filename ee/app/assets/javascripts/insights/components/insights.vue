@@ -128,6 +128,8 @@ export default {
         class="js-insights-dropdown w-100"
         data-qa-selector="insights_dashboard_dropdown"
         menu-class="gl-w-full"
+        class="js-insights-dropdown gl-w-full"
+        data-qa-selector="insights_dashboard_dropdown"
         toggle-class="dropdown-menu-toggle gl-w-full gl-field-error-outline"
         :text="__('Select Page')"
         :disabled="pageLoading"
