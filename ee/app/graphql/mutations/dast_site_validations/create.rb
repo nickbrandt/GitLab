@@ -64,9 +64,7 @@ module Mutations
       end
 
       def success_response(dast_site_validation)
-        status = "#{dast_site_validation.state}_VALIDATION".upcase
-
-        { errors: [], id: dast_site_validation.to_global_id, status: status }
+        { errors: [], id: dast_site_validation.to_global_id, status: dast_site_validation.state }
       end
     end
   end

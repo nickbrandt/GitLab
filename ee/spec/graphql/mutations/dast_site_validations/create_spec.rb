@@ -68,7 +68,7 @@ RSpec.describe Mutations::DastSiteValidations::Create do
         end
 
         it 'returns the dast_site_validation status' do
-          expect(subject[:status]).to eq('PENDING_VALIDATION')
+          expect(subject[:status]).to eq(dast_site_validation.state)
         end
 
         context 'when on demand scan feature is not enabled' do
