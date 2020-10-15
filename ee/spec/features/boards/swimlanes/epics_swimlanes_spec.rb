@@ -22,7 +22,7 @@ RSpec.describe 'epics swimlanes', :js do
   let_it_be(:epic_issue2) { create(:epic_issue, epic: epic2, issue: issue2) }
 
   before do
-    stub_licensed_features(epics: true)
+    stub_licensed_features(epics: true, swimlanes: true)
     sign_in(user)
     visit_board_page
     select_epics
