@@ -217,7 +217,7 @@ RSpec.describe Groups::GroupMembersController do
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
-      context 'when minimal_access_role feture is available' do
+      context 'when minimal_access_role feature is available' do
         before do
           stub_licensed_features(minimal_access_role: true)
         end
