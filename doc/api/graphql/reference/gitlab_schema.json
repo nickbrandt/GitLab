@@ -5106,7 +5106,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "ListID",
                   "ofType": null
                 }
               },
@@ -20666,7 +20666,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "SCALAR",
-                      "name": "ID",
+                      "name": "BoardID",
                       "ofType": null
                     }
                   },
@@ -26103,7 +26103,7 @@
               "description": "The iteration to assign to the issue.\n",
               "type": {
                 "kind": "SCALAR",
-                "name": "ID",
+                "name": "IterationID",
                 "ofType": null
               },
               "defaultValue": null
@@ -31753,7 +31753,7 @@
               "description": "The milestone to assign to the merge request.\n",
               "type": {
                 "kind": "SCALAR",
-                "name": "ID",
+                "name": "MilestoneID",
                 "ofType": null
               },
               "defaultValue": null
@@ -39336,7 +39336,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "SCALAR",
-                      "name": "ID",
+                      "name": "BoardID",
                       "ofType": null
                     }
                   },
@@ -54608,7 +54608,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "TodoID",
                   "ofType": null
                 }
               },
@@ -54714,7 +54714,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "TodoID",
                   "ofType": null
                 }
               },

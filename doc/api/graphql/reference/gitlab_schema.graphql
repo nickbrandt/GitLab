@@ -1945,7 +1945,7 @@ input BoardListUpdateLimitMetricsInput {
   """
   The global ID of the list.
   """
-  listId: ID!
+  listId: ListID!
 
   """
   The new maximum issue count limit.
@@ -7505,7 +7505,7 @@ type Group {
     """
     The board's ID
     """
-    id: ID!
+    id: BoardID!
   ): Board
 
   """
@@ -9559,7 +9559,7 @@ input IssueSetIterationInput {
   """
   The iteration to assign to the issue.
   """
-  iterationId: ID
+  iterationId: IterationID
 
   """
   The project the issue to mutate is in
@@ -11570,7 +11570,7 @@ input MergeRequestSetMilestoneInput {
   """
   The milestone to assign to the merge request.
   """
-  milestoneId: ID
+  milestoneId: MilestoneID
 
   """
   The project the merge request to mutate is in
@@ -13390,7 +13390,7 @@ type Project {
     """
     The board's ID
     """
-    id: ID!
+    id: BoardID!
   ): Board
 
   """
@@ -18790,7 +18790,7 @@ input TodoMarkDoneInput {
   """
   The global id of the todo to mark as done
   """
-  id: ID!
+  id: TodoID!
 }
 
 """
@@ -18825,7 +18825,7 @@ input TodoRestoreInput {
   """
   The global id of the todo to restore
   """
-  id: ID!
+  id: TodoID!
 }
 
 """
