@@ -48,8 +48,8 @@ module Resolvers
 
       def preloads
         {
-          last_test_report_state: [:test_reports],
-          last_test_report_manually_created: [:test_reports]
+          last_test_report_manually_created: [:test_reports],
+          last_test_report_state: [:test_reports, { test_reports: [:build] }]
         }
       end
 
