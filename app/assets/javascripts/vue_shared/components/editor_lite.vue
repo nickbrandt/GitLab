@@ -57,6 +57,9 @@ export default {
     fileName(newVal) {
       this.editor.updateModelLanguage(newVal);
     },
+    value(newVal) {
+      this.editor.setValue(newVal);
+    },
   },
   mounted() {
     this.editor = initEditorLite({
