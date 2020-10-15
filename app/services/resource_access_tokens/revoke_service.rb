@@ -17,7 +17,7 @@ module ResourceAccessTokens
       return error("#{current_user.name} cannot delete #{bot_user.name}") unless can_destroy_bot_member?
       return error("Failed to find bot user") unless find_member
 
-      access_token.revoke!
+      PersonalAccessTokens::RevokeService.new(@current_user, { token: @access_token }).execute
 
       destroy_bot_user
 
