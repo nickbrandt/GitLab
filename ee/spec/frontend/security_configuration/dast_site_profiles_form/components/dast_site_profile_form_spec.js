@@ -124,34 +124,6 @@ describe('DastSiteProfileForm', () => {
     expect(wrapper.html()).not.toBe('');
   });
 
-  describe('submit button', () => {
-    beforeEach(() => {
-      createComponent();
-    });
-
-    describe('is disabled if', () => {
-      it('form contains errors', async () => {
-        findProfileNameInput().vm.$emit('input', profileName);
-        await findTargetUrlInput().vm.$emit('input', 'invalid URL');
-        expect(findSubmitButton().props('disabled')).toBe(true);
-      });
-
-      it('at least one field is empty', async () => {
-        findProfileNameInput().vm.$emit('input', '');
-        await findTargetUrlInput().vm.$emit('input', targetUrl);
-        expect(findSubmitButton().props('disabled')).toBe(true);
-      });
-    });
-
-    describe('is enabled if', () => {
-      it('all fields are filled in and valid', async () => {
-        findProfileNameInput().vm.$emit('input', profileName);
-        await findTargetUrlInput().vm.$emit('input', targetUrl);
-        expect(findSubmitButton().props('disabled')).toBe(false);
-      });
-    });
-  });
-
   describe('target URL input', () => {
     const errorMessage = 'Please enter a valid URL format, ex: http://www.example.com/home';
 
@@ -161,6 +133,7 @@ describe('DastSiteProfileForm', () => {
 
     it.each(['asd', 'example.com'])('is marked as invalid provided an invalid URL', async value => {
       findTargetUrlInput().setValue(value);
+      findTargetUrlInput().trigger('blur');
       await wrapper.vm.$nextTick();
 
       expect(wrapper.text()).toContain(errorMessage);
@@ -176,7 +149,8 @@ describe('DastSiteProfileForm', () => {
 
   describe('validation', () => {
     const enableValidationToggle = async () => {
-      await findTargetUrlInput().vm.$emit('input', targetUrl);
+      await findTargetUrlInput().setValue(targetUrl);
+      await findTargetUrlInput().trigger('blur');
       await findSiteValidationToggle().vm.$emit('change', true);
     };
 
@@ -186,7 +160,7 @@ describe('DastSiteProfileForm', () => {
       ${'Edit site profile'} | ${siteProfileOne}
     `('$title with feature flag disabled', ({ siteProfile }) => {
       beforeEach(() => {
-        createComponent({
+        createFullComponent({
           provide: {
             glFeatures: { securityOnDemandScansSiteValidation: false },
           },
@@ -208,7 +182,7 @@ describe('DastSiteProfileForm', () => {
 
     describe('with feature flag enabled', () => {
       beforeEach(() => {
-        createComponent({
+        createFullComponent({
           provide: {
             glFeatures: { securityOnDemandScansSiteValidation: true },
           },
@@ -223,7 +197,9 @@ describe('DastSiteProfileForm', () => {
       it('toggle is disabled until target URL is valid', async () => {
         expect(findSiteValidationToggle().props('disabled')).toBe(true);
 
-        await findTargetUrlInput().vm.$emit('input', targetUrl);
+        await findTargetUrlInput().setValue(targetUrl);
+        await findTargetUrlInput().trigger('input');
+        await findTargetUrlInput().trigger('blur');
 
         expect(findSiteValidationToggle().props('disabled')).toBe(false);
       });
@@ -238,10 +214,10 @@ describe('DastSiteProfileForm', () => {
         await enableValidationToggle();
         await waitForPromises();
 
-        expect(targetUrlInputGroup.attributes('description')).toBe(
+        expect(targetUrlInputGroup.text()).toContain(
           'Validation must be turned off to change the target URL',
         );
-        expect(targetUrlInput.attributes('disabled')).toBe('true');
+        expect(targetUrlInput.attributes('disabled')).toBe('disabled');
       });
 
       it('checks the target URLs validation status when validation is enabled', async () => {
@@ -331,11 +307,18 @@ describe('DastSiteProfileForm', () => {
     });
 
     describe('submission', () => {
+      const fillAndSubmitForm = async () => {
+        await findProfileNameInput().setValue(profileName);
+        findProfileNameInput().trigger('blur');
+        await findTargetUrlInput().setValue(targetUrl);
+        findTargetUrlInput().trigger('blur');
+
+        submitForm();
+      };
+
       describe('on success', () => {
-        beforeEach(() => {
-          findProfileNameInput().vm.$emit('input', profileName);
-          findTargetUrlInput().vm.$emit('input', targetUrl);
-          submitForm();
+        beforeEach(async () => {
+          await fillAndSubmitForm();
         });
 
         it('sets loading state', () => {
@@ -361,23 +344,22 @@ describe('DastSiteProfileForm', () => {
       });
 
       describe('on top-level error', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
           respondWith({
             [mutationKind]: jest.fn().mockRejectedValue(new Error('GraphQL Network Error')),
           });
 
-          const input = findTargetUrlInput();
-          input.vm.$emit('input', targetUrl);
-          submitForm();
-
-          return waitForPromises();
+          await fillAndSubmitForm();
+          await waitForPromises();
         });
 
         it('resets loading state', () => {
           expect(findSubmitButton().props('loading')).toBe(false);
         });
 
-        it('shows an error alert', () => {
+        it('shows an error alert', async () => {
+          await wrapper.vm.$nextTick();
+
           expect(findAlert().exists()).toBe(true);
         });
       });
@@ -385,16 +367,13 @@ describe('DastSiteProfileForm', () => {
       describe('on errors as data', () => {
         const errors = ['error#1', 'error#2', 'error#3'];
 
-        beforeEach(() => {
+        beforeEach(async () => {
           respondWith({
             [mutationKind]: jest.fn().mockResolvedValue(responses[mutationKind](errors)),
           });
 
-          const input = findTargetUrlInput();
-          input.vm.$emit('input', targetUrl);
-          submitForm();
-
-          return waitForPromises();
+          await fillAndSubmitForm();
+          await waitForPromises();
         });
 
         it('resets loading state', () => {
