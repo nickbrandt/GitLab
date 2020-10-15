@@ -630,9 +630,6 @@ msgstr ""
 msgid "%{name_with_link} has run out of Shared Runner Pipeline minutes so no new jobs or pipelines in its projects will run."
 msgstr ""
 
-msgid "%{namespace_name} is now read-only. You cannot: %{base_message}"
-msgstr ""
-
 msgid "%{name} contained %{resultsString}"
 msgstr ""
 
@@ -13553,9 +13550,6 @@ msgstr ""
 msgid "If you lose your recovery codes you can generate new ones, invalidating all previous codes."
 msgstr ""
 
-msgid "If you reach 100%% storage capacity, you will not be able to: %{base_message}"
-msgstr ""
-
 msgid "If you recently signed in and recognize the IP address, you may disregard this email."
 msgstr ""
 
@@ -17198,6 +17192,30 @@ msgid "Namespace is empty"
 msgstr ""
 
 msgid "Namespace:"
+msgstr ""
+
+msgid "NamespaceStorageSize|%{namespace_name} contains a locked project"
+msgstr ""
+
+msgid "NamespaceStorageSize|%{namespace_name} is now read-only. You cannot: %{base_message}"
+msgstr ""
+
+msgid "NamespaceStorageSize|If you reach 100%% storage capacity, you will not be able to: %{base_message}"
+msgstr ""
+
+msgid "NamespaceStorageSize|Please purchase additional storage to unlock your projects over the free 10GB project limit. You can't %{base_message}"
+msgstr ""
+
+msgid "NamespaceStorageSize|You have consumed all of your additional storage, please purchase more to unlock your projects over the free 10GB limit. You can't %{base_message}"
+msgstr ""
+
+msgid "NamespaceStorageSize|You have reached %{usage_in_percent} of %{namespace_name}'s storage capacity (%{used_storage} of %{storage_limit})"
+msgstr ""
+
+msgid "NamespaceStorageSize|You have reached the free storage limit of 10GB on %{locked_project_count} projects. To unlock them, please purchase additional storage"
+msgstr ""
+
+msgid "NamespaceStorageSize|push to your repository, create pipelines, create issues or add comments. To reduce storage capacity, delete unused repositories, artifacts, wikis, issues, and pipelines."
 msgstr ""
 
 msgid "Namespaces"
@@ -30118,9 +30136,6 @@ msgstr ""
 msgid "You need to upload a Google Takeout archive."
 msgstr ""
 
-msgid "You reached %{usage_in_percent} of %{namespace_name}'s storage capacity (%{used_storage} of %{storage_limit})"
-msgstr ""
-
 msgid "You successfully declined the invitation"
 msgstr ""
 
@@ -31655,9 +31670,6 @@ msgid "project members"
 msgstr ""
 
 msgid "projects"
-msgstr ""
-
-msgid "push to your repository, create pipelines, create issues or add comments. To reduce storage capacity, delete unused repositories, artifacts, wikis, issues, and pipelines."
 msgstr ""
 
 msgid "quick actions"
