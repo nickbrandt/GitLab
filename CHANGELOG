@@ -1,5 +1,20 @@
 # Changelog for gitlab-workhorse
 
+## v8.51.0
+
+### Changed
+- Allow configure image resizing params
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/615
+
+### Fixed
+- Fix processing lsif dump with repeating lines with inVs
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/621
+  Contributed by Pavel Kuznetsov
+
+### Other
+- Add CODEOWNERS with listed maintainers
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/623
+
 ## v8.50.0
 
 ### Added
