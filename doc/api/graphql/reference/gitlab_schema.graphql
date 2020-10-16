@@ -3472,6 +3472,11 @@ input CreateIssueInput {
   epicId: EpicID
 
   """
+  The desired health status
+  """
+  healthStatus: HealthStatus
+
+  """
   The IID (internal ID) of a project issue. Only admins and project owners can modify
   """
   iid: Int
@@ -3510,6 +3515,11 @@ input CreateIssueInput {
   Title of the issue
   """
   title: String!
+
+  """
+  The weight of the issue
+  """
+  weight: Int
 }
 
 """
@@ -19802,6 +19812,11 @@ input UpdateIssueInput {
   epicId: ID
 
   """
+  The desired health status
+  """
+  healthStatus: HealthStatus
+
+  """
   The IID of the issue to mutate
   """
   iid: String!
@@ -19835,6 +19850,11 @@ input UpdateIssueInput {
   Title of the issue
   """
   title: String
+
+  """
+  The weight of the issue
+  """
+  weight: Int
 }
 
 """
