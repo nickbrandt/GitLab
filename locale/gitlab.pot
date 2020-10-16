@@ -24179,7 +24179,7 @@ msgstr ""
 msgid "Signed in"
 msgstr ""
 
-msgid "Signed in to GitLab as %{user_link_start}%{username}%{user_link_end}"
+msgid "Signed in to GitLab as %{user_link}"
 msgstr ""
 
 msgid "Signed in with %{authentication} authentication"
@@ -29734,7 +29734,7 @@ msgstr ""
 msgid "You are receiving this message because you are a GitLab administrator for %{url}."
 msgstr ""
 
-msgid "You are signed into GitLab as %{user_link_start}%{username}%{user_link_end}."
+msgid "You are signed into GitLab as %{user_link}"
 msgstr ""
 
 msgid "You are trying to upload something other than an image. Please upload a .png, .jpg, .jpeg, .gif, .bmp, .tiff or .ico."
