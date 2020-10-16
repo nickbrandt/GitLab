@@ -19,6 +19,7 @@ module EE
         mount ::API::EpicLinks
         mount ::API::Epics
         mount ::API::ElasticsearchIndexedNamespaces
+        mount ::API::Experiments
         mount ::API::Geo
         mount ::API::GeoReplication
         mount ::API::GeoNodes
