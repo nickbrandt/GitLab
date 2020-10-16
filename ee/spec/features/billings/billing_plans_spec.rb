@@ -107,7 +107,7 @@ RSpec.describe 'Billing plan pages', :feature do
     end
   end
 
-  shared_examples 'currently used seats' do
+  shared_examples 'used seats rendering for non paid subscriptions' do
     before do
       visit page_path
     end
@@ -360,7 +360,7 @@ RSpec.describe 'Billing plan pages', :feature do
         let(:plan) { free_plan }
         let!(:subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: plan) }
 
-        it_behaves_like 'currently used seats'
+        it_behaves_like 'used seats rendering for non paid subscriptions'
       end
     end
   end
@@ -407,7 +407,7 @@ RSpec.describe 'Billing plan pages', :feature do
 
         it_behaves_like 'downgradable plan'
         it_behaves_like 'non-upgradable plan'
-        it_behaves_like 'currently used seats'
+        it_behaves_like 'used seats rendering for non paid subscriptions'
       end
     end
   end
