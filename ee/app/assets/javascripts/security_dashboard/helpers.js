@@ -1,5 +1,5 @@
 import isPlainObject from 'lodash/isPlainObject';
-import { ALL, BASE_FILTERS } from 'ee/security_dashboard/store/modules/filters/constants';
+import { BASE_FILTERS } from 'ee/security_dashboard/store/modules/filters/constants';
 import { REPORT_TYPES, SEVERITY_LEVELS } from 'ee/security_dashboard/store/constants';
 import { VULNERABILITY_STATES } from 'ee/vulnerabilities/constants';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
@@ -16,6 +16,7 @@ export const stateFilter = {
   id: 'state',
   allOption: BASE_FILTERS.state,
   options: parseOptions(VULNERABILITY_STATES),
+  defaultOptions: parseOptions([VULNERABILITY_STATES.detected, VULNERABILITY_STATES.confirmed]),
 };
 
 export const severityFilter = {

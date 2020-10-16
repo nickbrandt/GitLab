@@ -25,9 +25,7 @@ export default {
     },
     firstSelectedOption() {
       if (this.selectedCount > 0) {
-        const id = Object.keys(this.selectedOptions)[0];
-        const option = this.filter.options.find(x => x.id === id);
-        return option?.name || '-';
+        return Object.values(this.selectedOptions)[0].name;
       }
 
       return this.filter.allOption.name;
@@ -40,21 +38,23 @@ export default {
   },
   watch: {
     selectedOptions() {
-      const { id } = this.filter;
-      const selectedFilters = Object.keys(this.selectedOptions);
-      this.$router.push({ query: { [id]: selectedFilters } });
-      this.$emit('filter-changed', { [id]: selectedFilters });
+      const filter = { [this.filter.id]: Object.keys(this.selectedOptions) };
+      this.$router.replace({ query: { ...this.$route.query, ...filter } });
+      this.$emit('filter-changed', filter);
     },
   },
   methods: {
     getSelectedOptions() {
-      const values = this.$route.query[this.filter.id];
-      const valueArray = Array.isArray(values) ? values : [values];
-      const definedArray = valueArray.filter(x => x !== undefined);
+      let keys = this.$route.query[this.filter.id];
+      keys = Array.isArray(keys) ? keys : [keys];
       const selected = {};
 
-      definedArray.forEach(x => {
-        selected[x] = true;
+      // Convert the querystring keys to the selected options object.
+      keys.forEach(key => {
+        const option = this.filter.options.find(x => x.id === key);
+        if (option) {
+          selected[option.id] = option;
+        }
       });
 
       return selected;
@@ -63,7 +63,7 @@ export default {
       if (this.selectedOptions[option.id]) {
         this.$delete(this.selectedOptions, option.id);
       } else {
-        this.$set(this.selectedOptions, option.id, true);
+        this.$set(this.selectedOptions, option.id, option);
       }
     },
     deselectAllOptions() {
