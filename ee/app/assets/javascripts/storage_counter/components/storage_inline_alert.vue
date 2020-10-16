@@ -1,8 +1,7 @@
 <script>
 import { GlAlert } from '@gitlab/ui';
 import { n__, __ } from '~/locale';
-import { getFormatter, SUPPORTED_FORMATS } from '~/lib/utils/unit_format';
-import { usageRatioToThresholdLevel } from '../utils';
+import { formatUsageSize, usageRatioToThresholdLevel } from '../utils';
 import { ALERT_THRESHOLD, ERROR_THRESHOLD, WARNING_THRESHOLD } from '../constants';
 
 export default {
@@ -30,7 +29,7 @@ export default {
       type: Number,
       required: true,
     },
-    repositoryFreeSizeLimit: {
+    actualRepositorySizeLimit: {
       type: Number,
       required: true,
     },
@@ -86,14 +85,13 @@ export default {
       return this.additionalPurchasedStorageSize > 0;
     },
     formatSize(size) {
-      const formatter = getFormatter(SUPPORTED_FORMATS.decimalBytes);
-      return formatter(size);
+      return formatUsageSize(size);
     },
     hasPurchasedStorageText() {
       if (this.thresholdLevel === ERROR_THRESHOLD) {
         return __(
           `You have consumed all of your additional storage, please purchase more to unlock your projects over the free ${this.formatSize(
-            this.repositoryFreeSizeLimit,
+            this.actualRepositorySizeLimit,
           )} limit`,
         );
       } else if (
@@ -106,7 +104,7 @@ export default {
       }
       return __(
         `When you purchase additional storage, we automatically unlock projects that were locked when you reached the ${this.formatSize(
-          this.repositoryFreeSizeLimit,
+          this.actualRepositorySizeLimit,
         )} limit.`,
       );
     },
@@ -114,7 +112,7 @@ export default {
       if (this.thresholdLevel === ERROR_THRESHOLD) {
         return __(
           `You have reached the free storage limit of ${this.formatSize(
-            this.repositoryFreeSizeLimit,
+            this.actualRepositorySizeLimit,
           )} on ${this.projectsLockedText}. To unlock them, please purchase additional storage.`,
         );
       }
