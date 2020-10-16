@@ -9377,6 +9377,26 @@
               "defaultValue": null
             },
             {
+              "name": "healthStatus",
+              "description": "The desired health status",
+              "type": {
+                "kind": "ENUM",
+                "name": "HealthStatus",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "weight",
+              "description": "The weight of the issue",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "epicId",
               "description": "The ID of an epic to associate the issue with",
               "type": {
@@ -57091,6 +57111,26 @@
               "type": {
                 "kind": "ENUM",
                 "name": "IssueStateEvent",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "healthStatus",
+              "description": "The desired health status",
+              "type": {
+                "kind": "ENUM",
+                "name": "HealthStatus",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "weight",
+              "description": "The weight of the issue",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               },
               "defaultValue": null
