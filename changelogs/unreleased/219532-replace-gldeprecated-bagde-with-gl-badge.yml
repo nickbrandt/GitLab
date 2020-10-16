@@ -1,0 +1,5 @@
+---
+title: Replaced GlDeprecatedBadge with GlBadge for app/assets/javascripts/feature_flags/components/form.vue
+merge_request: 45387
+author: Jannik Lehmann
+type: changed
