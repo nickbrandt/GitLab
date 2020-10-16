@@ -35,12 +35,12 @@ describe('Ci environments dropdown', () => {
     wrapper = null;
   });
 
-  describe('No enviroments found', () => {
+  describe('No environments found', () => {
     beforeEach(() => {
       createComponent('stable');
     });
 
-    it('renders create button with search term if enviroments do not contain search term', () => {
+    it('renders create button with search term if environments do not contain search term', () => {
       expect(findAllDropdownItems()).toHaveLength(2);
       expect(findDropdownItemByIndex(1).text()).toBe('Create wildcard: stable');
     });
@@ -55,7 +55,7 @@ describe('Ci environments dropdown', () => {
       createComponent('');
     });
 
-    it('renders all enviroments when search term is empty', () => {
+    it('renders all environments when search term is empty', () => {
       expect(findAllDropdownItems()).toHaveLength(3);
       expect(findDropdownItemByIndex(0).text()).toBe('dev');
       expect(findDropdownItemByIndex(1).text()).toBe('prod');
@@ -67,19 +67,19 @@ describe('Ci environments dropdown', () => {
     });
   });
 
-  describe('Enviroments found', () => {
+  describe('Environments found', () => {
     beforeEach(() => {
       createComponent('prod');
     });
 
-    it('renders only the enviroment searched for', () => {
+    it('renders only the environment searched for', () => {
       expect(findAllDropdownItems()).toHaveLength(1);
       expect(findDropdownItemByIndex(0).text()).toBe('prod');
     });
 
     it('should not display create button', () => {
-      const enviroments = findAllDropdownItems().filter(env => env.text().startsWith('Create'));
-      expect(enviroments).toHaveLength(0);
+      const environments = findAllDropdownItems().filter(env => env.text().startsWith('Create'));
+      expect(environments).toHaveLength(0);
       expect(findAllDropdownItems()).toHaveLength(1);
     });
 
