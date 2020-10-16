@@ -251,10 +251,8 @@ module EE
         prevent :update_default_branch_protection
       end
 
-      # TODO: Switch to `feature_enabled?` when we enable the feature flag by default
-      # https://gitlab.com/gitlab-org/gitlab/-/issues/207888
       desc "Group has wiki disabled"
-      condition(:wiki_disabled, score: 32) { !@subject.beta_feature_available?(:group_wikis) }
+      condition(:wiki_disabled, score: 32) { !@subject.feature_available?(:group_wikis) }
 
       rule { wiki_disabled }.policy do
         prevent(*create_read_update_admin_destroy(:wiki))
