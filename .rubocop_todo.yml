@@ -1264,8 +1264,6 @@ Graphql/IDType:
     - 'app/graphql/mutations/issues/update.rb'
     - 'app/graphql/mutations/merge_requests/set_milestone.rb'
     - 'app/graphql/mutations/metrics/dashboard/annotations/delete.rb'
-    - 'app/graphql/mutations/notes/create/note.rb'
-    - 'app/graphql/mutations/notes/update/base.rb'
     - 'app/graphql/mutations/snippets/destroy.rb'
     - 'app/graphql/mutations/snippets/mark_as_spam.rb'
     - 'app/graphql/mutations/snippets/update.rb'

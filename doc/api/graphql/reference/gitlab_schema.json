@@ -9665,7 +9665,7 @@
               "description": "The global id of the discussion this note is in reply to",
               "type": {
                 "kind": "SCALAR",
-                "name": "ID",
+                "name": "DiscussionID",
                 "ofType": null
               },
               "defaultValue": null
@@ -16058,6 +16058,16 @@
           "interfaces": [
 
           ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "DiscussionID",
+          "description": "Identifier of Discussion",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },
@@ -56847,7 +56857,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "NoteID",
                   "ofType": null
                 }
               },
@@ -57357,7 +57367,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "NoteID",
                   "ofType": null
                 }
               },
