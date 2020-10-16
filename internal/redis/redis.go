@@ -100,7 +100,7 @@ func sentinelConn(master string, urls []config.TomlURL) *sentinel.Sentinel {
 				redis.DialWriteTimeout(timeout),
 			}
 
-			if url.Scheme == "redis" || url.Scheme == "redisss" {
+			if url.Scheme == "redis" || url.Scheme == "rediss" {
 				c, err = redis.DialURL(addr, options...)
 			} else {
 				c, err = redis.Dial("tcp", url.Host, options...)
