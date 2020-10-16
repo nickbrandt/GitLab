@@ -20,6 +20,7 @@ describe('Filter component', () => {
       stubs: {
         ...stubChildren(Filter),
         GlDropdown: false,
+        GlDropdownItem: false,
         GlSearchBoxByType: false,
       },
       propsData,
@@ -29,13 +30,7 @@ describe('Filter component', () => {
 
   const findSearchInput = () =>
     wrapper.find({ ref: 'searchBox' }).exists() && wrapper.find({ ref: 'searchBox' }).find('input');
-  const findDropdownToggle = () => wrapper.find('.dropdown-toggle');
-  const dropdownItemsCount = () => wrapper.findAll('.dropdown-item').length;
-
-  function isDropdownOpen() {
-    const toggleButton = findDropdownToggle();
-    return toggleButton.attributes('aria-expanded') === 'true';
-  }
+  const dropdownItemsCount = () => wrapper.findAll('.gl-new-dropdown-item').length;
 
   afterEach(() => {
     wrapper.destroy();
@@ -60,7 +55,11 @@ describe('Filter component', () => {
     });
 
     it('should display a check next to only the selected items', () => {
-      expect(wrapper.findAll('.dropdown-item .js-check')).toHaveLength(3);
+      expect(
+        wrapper.findAll(
+          '.gl-new-dropdown-item .gl-new-dropdown-item-check-icon:not(.gl-visibility-hidden)',
+        ),
+      ).toHaveLength(3);
     });
 
     it('should correctly display the selected text', () => {
@@ -75,35 +74,6 @@ describe('Filter component', () => {
 
     it('should not have a search box', () => {
       expect(findSearchInput()).toBe(false);
-    });
-
-    it('should not be open', () => {
-      expect(isDropdownOpen()).toBe(false);
-    });
-
-    describe('when the dropdown is open', () => {
-      beforeEach(done => {
-        findDropdownToggle().trigger('click');
-        wrapper.vm.$root.$on('bv::dropdown::shown', () => {
-          done();
-        });
-      });
-
-      it('should keep the menu open after clicking on an item', () => {
-        expect(isDropdownOpen()).toBe(true);
-        wrapper.find('.dropdown-item').trigger('click');
-        return wrapper.vm.$nextTick().then(() => {
-          expect(isDropdownOpen()).toBe(true);
-        });
-      });
-
-      it('should close the menu when the close button is clicked', () => {
-        expect(isDropdownOpen()).toBe(true);
-        wrapper.find({ ref: 'close' }).trigger('click');
-        return wrapper.vm.$nextTick().then(() => {
-          expect(isDropdownOpen()).toBe(false);
-        });
-      });
     });
   });
 

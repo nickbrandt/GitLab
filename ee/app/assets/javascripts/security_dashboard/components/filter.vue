@@ -1,12 +1,11 @@
 <script>
-import { GlDropdown, GlDropdownItem, GlSearchBoxByType, GlIcon } from '@gitlab/ui';
+import { GlDropdown, GlDropdownItem, GlSearchBoxByType } from '@gitlab/ui';
 
 export default {
   components: {
     GlDropdown,
     GlDropdownItem,
     GlSearchBoxByType,
-    GlIcon,
   },
   props: {
     filter: {
@@ -83,9 +82,9 @@ export default {
       />
 
       <gl-dropdown-item
-        data-qa-selector="filter_dropdown_content"
         v-for="option in filteredOptions"
         :key="option.id"
+        data-qa-selector="filter_dropdown_content"
         :is-check-item="true"
         :is-checked="isSelected(option)"
         @click="clickFilter(option)"
@@ -93,10 +92,7 @@ export default {
         {{ option.name }}
       </gl-dropdown-item>
 
-      <gl-dropdown-item
-        v-if="filteredOptions.length === 0"
-        class="no-pointer-events"
-      >
+      <gl-dropdown-item v-if="filteredOptions.length === 0" class="no-pointer-events">
         {{ __('No matching results') }}
       </gl-dropdown-item>
     </gl-dropdown>
