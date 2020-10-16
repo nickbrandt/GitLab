@@ -2514,6 +2514,10 @@ class Project < ApplicationRecord
     ci_config_path.presence || Ci::Pipeline::DEFAULT_CONFIG_PATH
   end
 
+  def ci_config_for(sha)
+    repository.gitlab_ci_yml_for(sha, ci_config_path_or_default)
+  end
+
   def enabled_group_deploy_keys
     return GroupDeployKey.none unless group
 
