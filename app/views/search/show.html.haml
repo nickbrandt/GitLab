@@ -1,6 +1,7 @@
 - @hide_top_links = true
 - page_title @search_term
 - @hide_breadcrumbs = true
+- add_page_specific_style 'page_bundles/projects_common'
 
 - if @search_results
   - page_description(_("%{count} %{scope} for term '%{term}'") % { count: @search_results.formatted_count(@scope), scope: @scope, term: @search_term })

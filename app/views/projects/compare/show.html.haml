@@ -1,5 +1,6 @@
 - add_to_breadcrumbs _("Compare Revisions"), project_compare_index_path(@project)
 - page_title "#{params[:from]}...#{params[:to]}"
+- add_page_specific_style 'page_bundles/projects_common'
 
 .sub-header-block.no-bottom-space
   = render "form"

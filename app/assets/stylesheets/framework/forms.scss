@@ -243,3 +243,21 @@ label {
 .input-group-text {
   max-height: $input-height;
 }
+
+.clearable-input {
+  position: relative;
+
+  .clear-icon {
+    display: none;
+    position: absolute;
+    right: 9px;
+    top: 9px;
+  }
+
+  &.has-value {
+    .clear-icon {
+      cursor: pointer;
+      display: block;
+    }
+  }
+}

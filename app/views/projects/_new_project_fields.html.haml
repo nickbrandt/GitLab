@@ -2,6 +2,7 @@
 - ci_cd_only = local_assigns.fetch(:ci_cd_only, false)
 - hide_init_with_readme = local_assigns.fetch(:hide_init_with_readme, false)
 - track_label = local_assigns.fetch(:track_label, 'blank_project')
+- add_page_specific_style 'page_bundles/projects_common'
 
 .row{ id: project_name_id }
   = f.hidden_field :ci_cd_only, value: ci_cd_only

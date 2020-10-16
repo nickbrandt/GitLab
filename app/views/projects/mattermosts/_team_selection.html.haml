@@ -1,7 +1,7 @@
 %p
   This service will be installed on the Mattermost instance at
   %strong= link_to Gitlab.config.mattermost.host, Gitlab.config.mattermost.host
-%hr
+%hr.gl-my-7.gl-mx-0.gl-border-gray-100
 = form_for(:mattermost, method: :post, url: project_mattermost_path(@project), html: { class: 'js-requires-input'} ) do |f|
   %h4 Team
   %p
@@ -21,7 +21,7 @@
       use Mattermost's interface
       = sprite_icon('external-link')
     or ask your Mattermost system administrator.
-  %hr
+  %hr.gl-my-7.gl-mx-0.gl-border-gray-100
   %h4 Command trigger word
   %p Choose the word that will trigger commands
   = f.text_field(:trigger, value: @project.path, class: 'form-control', required: true)
@@ -39,7 +39,7 @@
       = link_to 'https://docs.mattermost.com/help/messaging/executing-commands.html#built-in-commands', target: '__blank' do
         see list of built-in slash commands
         = sprite_icon('external-link')
-  %hr
+  %hr.gl-my-7.gl-mx-0.gl-border-gray-100
   .clearfix
     .float-right
       = link_to 'Cancel', edit_project_service_path(@project, @service), class: 'gl-button btn btn-lg'

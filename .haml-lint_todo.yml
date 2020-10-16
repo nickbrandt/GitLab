@@ -155,7 +155,6 @@ linters:
       - 'app/views/profiles/chat_names/index.html.haml'
       - 'app/views/profiles/chat_names/new.html.haml'
       - 'app/views/projects/_bitbucket_import_modal.html.haml'
-      - 'app/views/projects/_customize_workflow.html.haml'
       - 'app/views/projects/_deletion_failed.html.haml'
       - 'app/views/projects/_fork_suggestion.html.haml'
       - 'app/views/projects/_gitlab_import_modal.html.haml'

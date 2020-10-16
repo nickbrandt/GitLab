@@ -1,0 +1,39 @@
+// INFO Scoped to key component in app/assets/javascripts/deploy_keys/components/key.vue
+.deploy-key {
+  // Ensure that the fingerprint does not overflow on small screens
+  .fingerprint {
+    word-break: break-all;
+    white-space: normal;
+  }
+
+  .deploy-project-label,
+  .key-created-at {
+    svg {
+      vertical-align: text-top;
+    }
+  }
+
+  .btn svg {
+    vertical-align: top;
+  }
+
+  .key-created-at {
+    line-height: unset;
+  }
+}
+
+.deploy-project-list {
+  margin-bottom: -$gl-padding-4;
+
+  a.deploy-project-label {
+    margin-right: $gl-padding-4;
+    margin-bottom: $gl-padding-4;
+    color: $gl-text-color-secondary;
+    background-color: $gray-50;
+    line-height: $gl-btn-line-height;
+
+    &:hover {
+      color: $blue-600;
+    }
+  }
+}

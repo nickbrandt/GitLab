@@ -1,9 +1,9 @@
 - @body_class = 'card-content'
 
-.service-installation
+.service-installation.gl-p-7.gl-my-7.gl-mx-7.gl-rounded-base.gl-bg-white
   .inline.float-right
     = custom_icon('mattermost_logo', size: 48)
-  %h3 Install Mattermost Command
+  %h3.gl-mt-0 Install Mattermost Command
   - if @teams.empty?
     = render 'no_teams'
   - else
