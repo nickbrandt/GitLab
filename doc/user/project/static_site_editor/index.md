@@ -79,6 +79,8 @@ codebase.
 
 ## Edit content
 
+> - Support for modifying the default merge request title and description [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216861) in GitLab 13.5.
+
 After setting up your project, you can start editing content directly from the Static Site Editor.
 
 To edit a file:
@@ -89,7 +91,7 @@ To edit a file:
    wish to edit the raw Markdown instead, you can toggle the **Markdown** mode
    in the bottom-right corner.
 1. When you're done, click **Submit changes...**.
-1. Describe your changes (add a commit message).
+1. (Optional) Adjust the default title and description of the merge request that will be submitted with your changes.
 1. Click **Submit changes**.
 1. A new merge request is automatically created and you can assign a colleague for review.
 
