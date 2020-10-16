@@ -8,7 +8,7 @@ make clean test
 
 ## Coverage / what to test
 
-Each feature in gitlab-workhorse should have an integration test that
+Each feature in GitLab Workhorse should have an integration test that
 verifies that the feature 'kicks in' on the right requests and leaves
 other requests unaffected. It is better to also have package-level tests
 for specific behavior but the high-level integration tests should have

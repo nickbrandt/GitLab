@@ -55,14 +55,14 @@ Options:
 ```
 
 The 'auth backend' refers to the GitLab Rails application. The name is
-a holdover from when gitlab-workhorse only handled Git push/pull over
+a holdover from when GitLab Workhorse only handled Git push/pull over
 HTTP.
 
-Gitlab-workhorse can listen on either a TCP or a Unix domain socket. It
+GitLab Workhorse can listen on either a TCP or a Unix domain socket. It
 can also open a second listening TCP listening socket with the Go
 [net/http/pprof profiler server](http://golang.org/pkg/net/http/pprof/).
 
-Gitlab-workhorse can listen on redis events (currently only builds/register
+GitLab Workhorse can listen on redis events (currently only builds/register
 for runners). This requires you to pass a valid TOML config file via
 `-config` flag.
 For regular setups it only requires the following (replacing the string
@@ -70,7 +70,7 @@ with the actual socket)
 
 ## Redis
 
-Gitlab-workhorse integrates with Redis to do long polling for CI build
+GitLab Workhorse integrates with Redis to do long polling for CI build
 requests. This is configured via two things:
 
 -   Redis settings in the TOML config file

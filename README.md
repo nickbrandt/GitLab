@@ -1,6 +1,6 @@
-# gitlab-workhorse
+# GitLab Workhorse
 
-Gitlab-workhorse is a smart reverse proxy for GitLab. It handles
+GitLab Workhorse is a smart reverse proxy for GitLab. It handles
 "large" HTTP requests such as file downloads, file uploads, Git
 push/pull and Git archive downloads.
 
@@ -9,12 +9,12 @@ GitLab](doc/architecture/gitlab_features.md) that would not work efficiently wit
 
 ## Documentation
 
-Workhorse documentation is available in the [`doc` folder of this repostitory](doc/).
+Workhorse documentation is available in the [`doc` folder of this repository](doc/).
 
 * Architectural overview
   * [GitLab features that rely on Workhorse](doc/architecture/gitlab_features.md)
   * [Websocket channel support](doc/architecture/channel.md)
-* Operating workhorse
+* Operating Workhorse
   * [Source installation](doc/operations/install.md)
   * [Workhorse configuration](doc/operations/configuration.md)
 * [Contributing](CONTRIBUTING.md)
