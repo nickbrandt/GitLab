@@ -19289,6 +19289,9 @@ msgstr ""
 msgid "PipelineCharts|Successful:"
 msgstr ""
 
+msgid "PipelineCharts|Total duration:"
+msgstr ""
+
 msgid "PipelineCharts|Total:"
 msgstr ""
 
