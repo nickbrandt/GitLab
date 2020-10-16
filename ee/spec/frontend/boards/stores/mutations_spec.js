@@ -178,6 +178,21 @@ describe('TOGGLE_EPICS_SWIMLANES', () => {
   });
 });
 
+describe('SET_EPICS_SWIMLANES', () => {
+  it('set isShowingEpicsSwimlanes and epicsSwimlanesFetchInProgress to true', () => {
+    state = {
+      ...state,
+      isShowingEpicsSwimlanes: false,
+      epicsSwimlanesFetchInProgress: false,
+    };
+
+    mutations.SET_EPICS_SWIMLANES(state);
+
+    expect(state.isShowingEpicsSwimlanes).toBe(true);
+    expect(state.epicsSwimlanesFetchInProgress).toBe(true);
+  });
+});
+
 describe('RECEIVE_BOARD_LISTS_SUCCESS', () => {
   it('sets epicsSwimlanesFetchInProgress to false and populates boardLists with payload', () => {
     state = {
