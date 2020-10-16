@@ -14,7 +14,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"gitlab.com/gitlab-org/labkit/correlation"
-	"gitlab.com/gitlab-org/labkit/log"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -36,11 +35,13 @@ type upstream struct {
 	Routes            []routeEntry
 	RoundTripper      http.RoundTripper
 	CableRoundTripper http.RoundTripper
+	accessLogger      *logrus.Logger
 }
 
 func NewUpstream(cfg config.Config, accessLogger *logrus.Logger) http.Handler {
 	up := upstream{
-		Config: cfg,
+		Config:       cfg,
+		accessLogger: accessLogger,
 	}
 	if up.Backend == nil {
 		up.Backend = DefaultBackend
@@ -61,8 +62,7 @@ func NewUpstream(cfg config.Config, accessLogger *logrus.Logger) http.Handler {
 		correlationOpts = append(correlationOpts, correlation.WithPropagation())
 	}
 
-	handler := log.AccessLogger(&up, log.WithAccessLogger(accessLogger))
-	handler = correlation.InjectCorrelationID(handler, correlationOpts...)
+	handler := correlation.InjectCorrelationID(&up, correlationOpts...)
 	return handler
 }
 
