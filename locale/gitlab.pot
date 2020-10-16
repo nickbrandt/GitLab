@@ -4115,6 +4115,9 @@ msgstr ""
 msgid "Based on"
 msgstr ""
 
+msgid "Basic Sample Data template with Issues, Merge Requests and Milestones."
+msgstr ""
+
 msgid "Be careful. Changing the project's namespace can have unintended side effects."
 msgstr ""
 
@@ -20773,6 +20776,9 @@ msgstr ""
 msgid "ProjectTemplates|Android"
 msgstr ""
 
+msgid "ProjectTemplates|Basic"
+msgstr ""
+
 msgid "ProjectTemplates|GitLab Cluster Management"
 msgstr ""
 
@@ -20825,6 +20831,9 @@ msgid "ProjectTemplates|Ruby on Rails"
 msgstr ""
 
 msgid "ProjectTemplates|SalesforceDX"
+msgstr ""
+
+msgid "ProjectTemplates|Serenity Valley"
 msgstr ""
 
 msgid "ProjectTemplates|Serverless Framework/JS"
@@ -22806,6 +22815,9 @@ msgstr ""
 msgid "SSL Verification:"
 msgstr ""
 
+msgid "Sample Data"
+msgstr ""
+
 msgid "Satisfied"
 msgstr ""
 
@@ -23737,6 +23749,9 @@ msgid "Separate topics with commas."
 msgstr ""
 
 msgid "September"
+msgstr ""
+
+msgid "Serenity Valley Sample Data template."
 msgstr ""
 
 msgid "SeriesFinalConjunction|and"
