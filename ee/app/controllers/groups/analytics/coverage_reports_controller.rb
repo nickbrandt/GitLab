@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Groups::Analytics::CoverageReportsController < Groups::Analytics::ApplicationController
-  feature_category :continuous_integration
+  feature_category :code_testing
 
   COVERAGE_PARAM = 'coverage'.freeze
 
