@@ -5870,7 +5870,7 @@ input DiscussionToggleResolveInput {
   """
   The global id of the discussion
   """
-  id: ID!
+  id: DiscussionID!
 
   """
   Will resolve the discussion when true, and unresolve the discussion when false
