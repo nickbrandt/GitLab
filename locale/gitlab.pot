@@ -18472,9 +18472,6 @@ msgstr ""
 msgid "Open issues"
 msgstr ""
 
-msgid "Open projects"
-msgstr ""
-
 msgid "Open raw"
 msgstr ""
 
@@ -22080,6 +22077,9 @@ msgid "Replaces the clone URL root."
 msgstr ""
 
 msgid "Replication"
+msgstr ""
+
+msgid "Replication details"
 msgstr ""
 
 msgid "Replication enabled"
