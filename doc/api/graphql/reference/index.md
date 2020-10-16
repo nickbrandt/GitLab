@@ -15,6 +15,8 @@ fields and methods on a model are available via GraphQL.
 
 CAUTION: **Caution:**
 Fields that are deprecated are marked with **{warning-solid}**.
+Items (fields, enums, etc) that have been removed according to our [deprecation process](../index.md#deprecation-process) can be found
+in [Removed Items](../removed_items.md).
 
 ## Object types
 
