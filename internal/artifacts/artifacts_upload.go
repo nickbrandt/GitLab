@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -18,6 +19,13 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
+)
+
+// Sent by the runner: https://gitlab.com/gitlab-org/gitlab-runner/blob/c24da19ecce8808d9d2950896f70c94f5ea1cc2e/network/gitlab.go#L580
+const (
+	ArtifactFormatKey     = "artifact_format"
+	ArtifactFormatZip     = "zip"
+	ArtifactFormatDefault = ""
 )
 
 var zipSubcommandsErrorsCounter = prometheus.NewCounterVec(
@@ -31,7 +39,8 @@ func init() {
 }
 
 type artifactsUploadProcessor struct {
-	opts *filestore.SaveFileOpts
+	opts   *filestore.SaveFileOpts
+	format string
 
 	upload.SavedFileTracker
 }
@@ -112,26 +121,30 @@ func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName str
 	select {
 	case <-ctx.Done():
 		return fmt.Errorf("ProcessFile: context done")
-
 	default:
-		// TODO: can we rely on disk for shipping metadata? Not if we split workhorse and rails in 2 different PODs
-		metadata, err := a.generateMetadataFromZip(ctx, file)
+	}
+
+	if !strings.EqualFold(a.format, ArtifactFormatZip) && a.format != ArtifactFormatDefault {
+		return nil
+	}
+
+	// TODO: can we rely on disk for shipping metadata? Not if we split workhorse and rails in 2 different PODs
+	metadata, err := a.generateMetadataFromZip(ctx, file)
+	if err != nil {
+		return err
+	}
+
+	if metadata != nil {
+		fields, err := metadata.GitLabFinalizeFields("metadata")
 		if err != nil {
-			return err
+			return fmt.Errorf("finalize metadata field error: %v", err)
 		}
 
-		if metadata != nil {
-			fields, err := metadata.GitLabFinalizeFields("metadata")
-			if err != nil {
-				return fmt.Errorf("finalize metadata field error: %v", err)
-			}
-
-			for k, v := range fields {
-				writer.WriteField(k, v)
-			}
-
-			a.Track("metadata", metadata.LocalPath)
+		for k, v := range fields {
+			writer.WriteField(k, v)
 		}
+
+		a.Track("metadata", metadata.LocalPath)
 	}
 
 	return nil
@@ -149,7 +162,9 @@ func UploadArtifacts(myAPI *api.API, h http.Handler, p upload.Preparer) http.Han
 			return
 		}
 
-		mg := &artifactsUploadProcessor{opts: opts, SavedFileTracker: upload.SavedFileTracker{Request: r}}
+		format := r.URL.Query().Get(ArtifactFormatKey)
+
+		mg := &artifactsUploadProcessor{opts: opts, format: format, SavedFileTracker: upload.SavedFileTracker{Request: r}}
 		upload.HandleFileUploads(w, r, h, a, mg, opts)
 	}, "/authorize")
 }

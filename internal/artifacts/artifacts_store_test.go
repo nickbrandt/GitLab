@@ -98,6 +98,8 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 	storeServer := httptest.NewServer(storeServerMux)
 	defer storeServer.Close()
 
+	qs := fmt.Sprintf("?%s=%s", ArtifactFormatKey, ArtifactFormatZip)
+
 	tests := []struct {
 		name    string
 		preauth api.Response
@@ -106,7 +108,7 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 			name: "ObjectStore Upload",
 			preauth: api.Response{
 				RemoteObject: api.RemoteObject{
-					StoreURL: storeServer.URL + "/url/put",
+					StoreURL: storeServer.URL + "/url/put" + qs,
 					ID:       "store-id",
 					GetURL:   storeServer.URL + "/store-id",
 				},
@@ -123,7 +125,7 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 			defer ts.Close()
 
 			contentBuffer, contentType := createTestMultipartForm(t, archiveData)
-			response := testUploadArtifacts(t, contentType, ts.URL+Path, &contentBuffer)
+			response := testUploadArtifacts(t, contentType, ts.URL+Path+qs, &contentBuffer)
 			require.Equal(t, http.StatusOK, response.Code)
 			testhelper.RequireResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 			require.Equal(t, 1, storeServerCalled, "store should be called only once")
