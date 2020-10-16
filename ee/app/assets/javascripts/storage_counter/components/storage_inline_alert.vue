@@ -10,7 +10,7 @@ export default {
     lockedWithNoPurchasedStorageText: s__(
       'UsageQuota|You have reached the free storage limit of %{actualRepositorySizeLimit} on %{projectsLockedText}. To unlock them, please purchase additional storage.',
     ),
-    storageUsage: s__('UsageQuota|%{percentageLeft} of purchased storage is available'),
+    storageUsageText: s__('UsageQuota|%{percentageLeft} of purchased storage is available'),
     lockedWithPurchaseText: s__(
       'UsageQuota|You have consumed all of your additional storage, please purchase more to unlock your projects over the free %{actualRepositorySizeLimit} limit.',
     ),
@@ -63,7 +63,7 @@ export default {
       if (!this.hasPurchasedStorage() && this.containsLockedProjects) {
         return this.$options.i18n.lockedWithNoPurchasedStorageTitle;
       }
-      return sprintf(this.$options.i18n.storageUsage, {
+      return sprintf(this.$options.i18n.storageUsageText, {
         percentageLeft: `${this.excessStoragePercentageLeft}%`,
       });
     },
