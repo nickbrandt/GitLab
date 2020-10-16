@@ -85,7 +85,7 @@ export default {
         <div class="js-file-title file-title clearfix">
           {{ __('Contents of .gitlab-ci.yml') }}
         </div>
-        <editor-lite v-model="content" file-name="*.yml" data-testid="ci-lint-editor-lite" />
+        <editor-lite v-model="content" file-name="*.yml" />
       </div>
     </div>
 

@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import EditorLite from '~/vue_shared/components/editor_lite.vue';
 import CiLint from '~/ci_lint/components/ci_lint.vue';
 import lintCIMutation from '~/ci_lint/graphql/mutations/lint_ci.mutation.graphql';
 
@@ -28,7 +29,7 @@ describe('CI Lint', () => {
     });
   };
 
-  const findEditor = () => wrapper.find('[data-testid="ci-lint-editor-lite"]');
+  const findEditor = () => wrapper.find(EditorLite);
   const findValidateBtn = () => wrapper.find('[data-testid="ci-lint-validate"]');
   const findClearBtn = () => wrapper.find('[data-testid="ci-lint-clear"]');
 
@@ -67,6 +68,8 @@ describe('CI Lint', () => {
   });
 
   it('content is cleared on clear action', async () => {
+    expect(findEditor().props('value')).toBe(content);
+
     await findClearBtn().vm.$emit('click');
 
     expect(findEditor().props('value')).toBe('');
