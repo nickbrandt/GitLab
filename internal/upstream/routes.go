@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
+	"gitlab.com/gitlab-org/labkit/log"
 	"gitlab.com/gitlab-org/labkit/tracing"
 
 	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
@@ -81,7 +82,22 @@ func withoutTracing() func(*routeOptions) {
 	}
 }
 
-func route(method, regexpStr string, handler http.Handler, opts ...func(*routeOptions)) routeEntry {
+func (u *upstream) observabilityMiddlewares(handler http.Handler, method string, regexpStr string) http.Handler {
+	handler = log.AccessLogger(
+		handler,
+		log.WithAccessLogger(u.accessLogger),
+		log.WithExtraFields(func(r *http.Request) log.Fields {
+			return log.Fields{
+				"route": regexpStr, // This field matches the `route` label in Prometheus metrics
+			}
+		}),
+	)
+
+	handler = instrumentRoute(handler, method, regexpStr) // Add prometheus metrics
+	return handler
+}
+
+func (u *upstream) route(method, regexpStr string, handler http.Handler, opts ...func(*routeOptions)) routeEntry {
 	// Instantiate a route with the defaults
 	options := routeOptions{
 		tracing: true,
@@ -91,8 +107,8 @@ func route(method, regexpStr string, handler http.Handler, opts ...func(*routeOp
 		f(&options)
 	}
 
-	handler = denyWebsocket(handler)                      // Disallow websockets
-	handler = instrumentRoute(handler, method, regexpStr) // Add prometheus metrics
+	handler = u.observabilityMiddlewares(handler, method, regexpStr)
+	handler = denyWebsocket(handler) // Disallow websockets
 	if options.tracing {
 		// Add distributed tracing
 		handler = tracing.Handler(handler)
@@ -106,11 +122,14 @@ func route(method, regexpStr string, handler http.Handler, opts ...func(*routeOp
 	}
 }
 
-func wsRoute(regexpStr string, handler http.Handler, matchers ...matcherFunc) routeEntry {
+func (u *upstream) wsRoute(regexpStr string, handler http.Handler, matchers ...matcherFunc) routeEntry {
+	method := "GET"
+	handler = u.observabilityMiddlewares(handler, method, regexpStr)
+
 	return routeEntry{
-		method:   "GET",
+		method:   method,
 		regex:    compileRegexp(regexpStr),
-		handler:  instrumentRoute(handler, "GET", regexpStr),
+		handler:  handler,
 		matchers: append(matchers, websocket.IsWebSocketUpgrade),
 	}
 }
@@ -193,64 +212,64 @@ func (u *upstream) configureRoutes() {
 
 	u.Routes = []routeEntry{
 		// Git Clone
-		route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefsHandler(api)),
-		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.UploadPack(api)), withMatcher(isContentType("application/x-git-upload-pack-request"))),
-		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.ReceivePack(api)), withMatcher(isContentType("application/x-git-receive-pack-request"))),
-		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, signingProxy, preparers.lfs), withMatcher(isContentType("application/octet-stream"))),
+		u.route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefsHandler(api)),
+		u.route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.UploadPack(api)), withMatcher(isContentType("application/x-git-upload-pack-request"))),
+		u.route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.ReceivePack(api)), withMatcher(isContentType("application/x-git-receive-pack-request"))),
+		u.route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, signingProxy, preparers.lfs), withMatcher(isContentType("application/octet-stream"))),
 
 		// CI Artifacts
-		route("POST", apiPattern+`v4/jobs/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, signingProxy, preparers.artifacts))),
-		route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, signingProxy, preparers.artifacts))),
+		u.route("POST", apiPattern+`v4/jobs/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, signingProxy, preparers.artifacts))),
+		u.route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, signingProxy, preparers.artifacts))),
 
 		// ActionCable websocket
-		wsRoute(`^/-/cable\z`, cableProxy),
+		u.wsRoute(`^/-/cable\z`, cableProxy),
 
 		// Terminal websocket
-		wsRoute(projectPattern+`-/environments/[0-9]+/terminal.ws\z`, channel.Handler(api)),
-		wsRoute(projectPattern+`-/jobs/[0-9]+/terminal.ws\z`, channel.Handler(api)),
+		u.wsRoute(projectPattern+`-/environments/[0-9]+/terminal.ws\z`, channel.Handler(api)),
+		u.wsRoute(projectPattern+`-/jobs/[0-9]+/terminal.ws\z`, channel.Handler(api)),
 
 		// Proxy Job Services
-		wsRoute(projectPattern+`-/jobs/[0-9]+/proxy.ws\z`, channel.Handler(api)),
+		u.wsRoute(projectPattern+`-/jobs/[0-9]+/proxy.ws\z`, channel.Handler(api)),
 
 		// Long poll and limit capacity given to jobs/request and builds/register.json
-		route("", apiPattern+`v4/jobs/request\z`, ciAPILongPolling),
-		route("", ciAPIPattern+`v1/builds/register.json\z`, ciAPILongPolling),
+		u.route("", apiPattern+`v4/jobs/request\z`, ciAPILongPolling),
+		u.route("", ciAPIPattern+`v1/builds/register.json\z`, ciAPILongPolling),
 
 		// Maven Artifact Repository
-		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/maven/`, upload.BodyUploader(api, signingProxy, preparers.packages)),
+		u.route("PUT", apiPattern+`v4/projects/[0-9]+/packages/maven/`, upload.BodyUploader(api, signingProxy, preparers.packages)),
 
 		// Conan Artifact Repository
-		route("PUT", apiPattern+`v4/packages/conan/`, upload.BodyUploader(api, signingProxy, preparers.packages)),
-		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/conan/`, upload.BodyUploader(api, signingProxy, preparers.packages)),
+		u.route("PUT", apiPattern+`v4/packages/conan/`, upload.BodyUploader(api, signingProxy, preparers.packages)),
+		u.route("PUT", apiPattern+`v4/projects/[0-9]+/packages/conan/`, upload.BodyUploader(api, signingProxy, preparers.packages)),
 
 		// Generic Packages Repository
-		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/generic/`, upload.BodyUploader(api, signingProxy, preparers.packages)),
+		u.route("PUT", apiPattern+`v4/projects/[0-9]+/packages/generic/`, upload.BodyUploader(api, signingProxy, preparers.packages)),
 
 		// NuGet Artifact Repository
-		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/nuget/`, upload.Accelerate(api, signingProxy, preparers.packages)),
+		u.route("PUT", apiPattern+`v4/projects/[0-9]+/packages/nuget/`, upload.Accelerate(api, signingProxy, preparers.packages)),
 
 		// PyPI Artifact Repository
-		route("POST", apiPattern+`v4/projects/[0-9]+/packages/pypi`, upload.Accelerate(api, signingProxy, preparers.packages)),
+		u.route("POST", apiPattern+`v4/projects/[0-9]+/packages/pypi`, upload.Accelerate(api, signingProxy, preparers.packages)),
 
 		// We are porting API to disk acceleration
 		// we need to declare each routes until we have fixed all the routes on the rails codebase.
 		// Overall status can be seen at https://gitlab.com/groups/gitlab-org/-/epics/1802#current-status
-		route("POST", apiPattern+`v4/projects/[0-9]+/wikis/attachments\z`, uploadAccelerateProxy),
-		route("POST", apiPattern+`graphql\z`, uploadAccelerateProxy),
-		route("POST", apiPattern+`v4/groups/import`, upload.Accelerate(api, signingProxy, preparers.uploads)),
-		route("POST", apiPattern+`v4/projects/import`, upload.Accelerate(api, signingProxy, preparers.uploads)),
+		u.route("POST", apiPattern+`v4/projects/[0-9]+/wikis/attachments\z`, uploadAccelerateProxy),
+		u.route("POST", apiPattern+`graphql\z`, uploadAccelerateProxy),
+		u.route("POST", apiPattern+`v4/groups/import`, upload.Accelerate(api, signingProxy, preparers.uploads)),
+		u.route("POST", apiPattern+`v4/projects/import`, upload.Accelerate(api, signingProxy, preparers.uploads)),
 
 		// Project Import via UI upload acceleration
-		route("POST", importPattern+`gitlab_project`, upload.Accelerate(api, signingProxy, preparers.uploads)),
+		u.route("POST", importPattern+`gitlab_project`, upload.Accelerate(api, signingProxy, preparers.uploads)),
 		// Group Import via UI upload acceleration
-		route("POST", importPattern+`gitlab_group`, upload.Accelerate(api, signingProxy, preparers.uploads)),
+		u.route("POST", importPattern+`gitlab_group`, upload.Accelerate(api, signingProxy, preparers.uploads)),
 
 		// Explicitly proxy API requests
-		route("", apiPattern, proxy),
-		route("", ciAPIPattern, proxy),
+		u.route("", apiPattern, proxy),
+		u.route("", ciAPIPattern, proxy),
 
 		// Serve assets
-		route(
+		u.route(
 			"", `^/assets/`,
 			static.ServeExisting(
 				u.URLPrefix,
@@ -261,26 +280,26 @@ func (u *upstream) configureRoutes() {
 		),
 
 		// Uploads
-		route("POST", projectPattern+`uploads\z`, upload.Accelerate(api, signingProxy, preparers.uploads)),
-		route("POST", snippetUploadPattern, upload.Accelerate(api, signingProxy, preparers.uploads)),
-		route("POST", userUploadPattern, upload.Accelerate(api, signingProxy, preparers.uploads)),
+		u.route("POST", projectPattern+`uploads\z`, upload.Accelerate(api, signingProxy, preparers.uploads)),
+		u.route("POST", snippetUploadPattern, upload.Accelerate(api, signingProxy, preparers.uploads)),
+		u.route("POST", userUploadPattern, upload.Accelerate(api, signingProxy, preparers.uploads)),
 
 		// For legacy reasons, user uploads are stored under the document root.
 		// To prevent anybody who knows/guesses the URL of a user-uploaded file
 		// from downloading it we make sure requests to /uploads/ do _not_ pass
 		// through static.ServeExisting.
-		route("", `^/uploads/`, static.ErrorPagesUnless(u.DevelopmentMode, staticpages.ErrorFormatHTML, proxy)),
+		u.route("", `^/uploads/`, static.ErrorPagesUnless(u.DevelopmentMode, staticpages.ErrorFormatHTML, proxy)),
 
 		// health checks don't intercept errors and go straight to rails
 		// TODO: We should probably not return a HTML deploy page?
 		//       https://gitlab.com/gitlab-org/gitlab-workhorse/issues/230
-		route("", "^/-/(readiness|liveness)$", static.DeployPage(probeUpstream)),
-		route("", "^/-/health$", static.DeployPage(healthUpstream)),
+		u.route("", "^/-/(readiness|liveness)$", static.DeployPage(probeUpstream)),
+		u.route("", "^/-/health$", static.DeployPage(healthUpstream)),
 
 		// This route lets us filter out health checks from our metrics.
-		route("", "^/-/", defaultUpstream),
+		u.route("", "^/-/", defaultUpstream),
 
-		route("", "", defaultUpstream),
+		u.route("", "", defaultUpstream),
 	}
 }
 
