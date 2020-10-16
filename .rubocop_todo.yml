@@ -1285,4 +1285,3 @@ Graphql/IDType:
     - 'app/graphql/resolvers/error_tracking/sentry_error_stack_trace_resolver.rb'
     - 'app/graphql/resolvers/snippets_resolver.rb'
     - 'app/graphql/resolvers/user_merge_requests_resolver.rb'
-    - 'app/graphql/resolvers/user_resolver.rb'
