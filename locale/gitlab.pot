@@ -22312,6 +22312,9 @@ msgstr ""
 msgid "Requirement %{reference} has been updated"
 msgstr ""
 
+msgid "Requirement title"
+msgstr ""
+
 msgid "Requirement title cannot have more than %{limit} characters."
 msgstr ""
 
