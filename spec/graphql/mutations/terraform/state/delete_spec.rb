@@ -4,8 +4,8 @@ require 'spec_helper'
 
 RSpec.describe Mutations::Terraform::State::Delete do
   let_it_be(:user) { create(:user) }
+  let_it_be(:state) { create(:terraform_state) }
 
-  let(:state) { create(:terraform_state) }
   let(:mutation) do
     described_class.new(
       object: double,

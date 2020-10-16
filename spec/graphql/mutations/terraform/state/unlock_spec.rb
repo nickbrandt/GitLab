@@ -4,8 +4,8 @@ require 'spec_helper'
 
 RSpec.describe Mutations::Terraform::State::Unlock do
   let_it_be(:user) { create(:user) }
+  let_it_be(:state) { create(:terraform_state, :locked) }
 
-  let(:state) { create(:terraform_state, :locked) }
   let(:mutation) do
     described_class.new(
       object: double,
@@ -37,6 +37,15 @@ RSpec.describe Mutations::Terraform::State::Unlock do
       it 'unlocks the state', :aggregate_failures do
         expect(subject).to eq(errors: [])
         expect(state.reload).not_to be_locked
+      end
+
+      context 'state is already unlocked' do
+        let(:state) { create(:terraform_state) }
+
+        it 'does not modify the state' do
+          expect(subject).to eq(errors: [])
+          expect(state.reload).not_to be_locked
+        end
       end
     end
 

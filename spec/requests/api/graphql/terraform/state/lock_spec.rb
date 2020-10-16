@@ -18,7 +18,7 @@ RSpec.describe 'lock a terraform state' do
 
   include_examples 'a working graphql query'
 
-  it 'unlocks the state' do
+  it 'locks the state' do
     expect(state.reload).to be_locked
     expect(state.locked_by_user).to eq(user)
   end

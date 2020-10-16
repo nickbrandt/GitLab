@@ -4,8 +4,8 @@ require 'spec_helper'
 
 RSpec.describe Mutations::Terraform::State::Lock do
   let_it_be(:user) { create(:user) }
+  let_it_be(:state) { create(:terraform_state) }
 
-  let(:state) { create(:terraform_state) }
   let(:mutation) do
     described_class.new(
       object: double,
@@ -41,6 +41,18 @@ RSpec.describe Mutations::Terraform::State::Lock do
         expect(state.locked_by_user).to eq(user)
         expect(state.lock_xid).to be_present
         expect(state.locked_at).to be_present
+      end
+
+      context 'state is already locked' do
+        let(:locked_by_user) { create(:user) }
+        let(:state) { create(:terraform_state, :locked, locked_by_user: locked_by_user) }
+
+        it 'does not modify the existing lock', :aggregate_failures do
+          expect(subject).to eq(errors: ['state is already locked'])
+
+          expect(state.reload).to be_locked
+          expect(state.locked_by_user).to eq(locked_by_user)
+        end
       end
     end
 
