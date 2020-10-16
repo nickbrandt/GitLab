@@ -823,7 +823,7 @@ module Gitlab
       end
 
       def clear_memoized
-        CE_MEMOIZED_VALUES.each { |v| clear_memoization(v) } # rubocop:disable UsageData/LargeTable
+        CE_MEMOIZED_VALUES.each { |v| clear_memoization(v) }
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
