@@ -48,6 +48,7 @@ module EE
         mount ::API::ProtectedEnvironments
         mount ::API::ResourceWeightEvents
         mount ::API::ResourceIterationEvents
+        mount ::API::Iterations
       end
     end
   end
