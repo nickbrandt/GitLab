@@ -1,6 +1,6 @@
 import { trimText } from 'helpers/text_helper';
 import { emojiFixtureMap, initEmojiMock, describeEmojiFields } from 'helpers/emoji';
-import { glEmojiTag, searchEmoji } from '~/emoji';
+import { glEmojiTag, searchEmoji, getEmoji } from '~/emoji';
 import isEmojiUnicodeSupported, {
   isFlagEmoji,
   isRainbowFlagEmoji,
@@ -349,6 +349,14 @@ describe('gl_emoji', () => {
       );
 
       expect(isSupported).toBeFalsy();
+    });
+  });
+
+  describe('getEmoji', () => {
+    describe('when query is undefined', () => {
+      it('should return null', () => {
+        expect(getEmoji()).toBe(null);
+      });
     });
   });
 

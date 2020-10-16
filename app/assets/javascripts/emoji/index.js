@@ -82,6 +82,12 @@ export function getAllEmoji() {
  * @returns {Object} The matching emoji.
  */
 export function getEmoji(query, fallback = false) {
+  // TODO refactor
+  // https://gitlab.com/gitlab-org/gitlab/-/issues/268208
+  if (!query) {
+    return null;
+  }
+
   if (!emojiMap) {
     // eslint-disable-next-line @gitlab/require-i18n-strings
     throw new Error('The emoji map is uninitialized or initialization has not completed');
