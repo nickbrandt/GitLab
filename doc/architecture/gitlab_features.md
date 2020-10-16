@@ -13,7 +13,7 @@ Examples of features that rely on Workhorse:
 
 Git clone, pull and push are slow because they transfer large amounts
 of data and because each is CPU intensive on the GitLab side. Without
-workhorse, HTTP access to Git repositories would compete with regular
+Workhorse, HTTP access to Git repositories would compete with regular
 web access to the application, requiring us to run way more Rails
 application servers.
 
@@ -42,28 +42,28 @@ memory than it costs to have Workhorse look after it.
 
 ## Quick facts (how does Workhorse work)
 
--   Workhorse can handle some requests without involving Rails at all:
-    for example, JavaScript files and CSS files are served straight
-    from disk.
--   Workhorse can modify responses sent by Rails: for example if you use
-    `send_file` in Rails then gitlab-workhorse will open the file on
-    disk and send its contents as the response body to the client.
--   Workhorse can take over requests after asking permission from Rails.
-    Example: handling `git clone`.
--   Workhorse can modify requests before passing them to Rails. Example:
-    when handling a Git LFS upload Workhorse first asks permission from
-    Rails, then it stores the request body in a tempfile, then it sends
-    a modified request containing the tempfile path to Rails.
--   Workhorse can manage long-lived WebSocket connections for Rails.
-    Example: handling the terminal websocket for environments.
--   Workhorse does not connect to Postgres, only to Rails and (optionally) Redis.
--   We assume that all requests that reach Workhorse pass through an
-    upstream proxy such as NGINX or Apache first.
--   Workhorse does not accept HTTPS connections.
--   Workhorse does not clean up idle client connections.
--   We assume that all requests to Rails pass through Workhorse.
+- Workhorse can handle some requests without involving Rails at all:
+  for example, JavaScript files and CSS files are served straight
+  from disk.
+- Workhorse can modify responses sent by Rails: for example if you use
+  `send_file` in Rails then GitLab Workhorse will open the file on
+  disk and send its contents as the response body to the client.
+- Workhorse can take over requests after asking permission from Rails.
+  Example: handling `git clone`.
+- Workhorse can modify requests before passing them to Rails. Example:
+  when handling a Git LFS upload Workhorse first asks permission from
+  Rails, then it stores the request body in a tempfile, then it sends
+  a modified request containing the tempfile path to Rails.
+- Workhorse can manage long-lived WebSocket connections for Rails.
+  Example: handling the terminal websocket for environments.
+- Workhorse does not connect to PostgreSQL, only to Rails and (optionally) Redis.
+- We assume that all requests that reach Workhorse pass through an
+  upstream proxy such as NGINX or Apache first.
+- Workhorse does not accept HTTPS connections.
+- Workhorse does not clean up idle client connections.
+- We assume that all requests to Rails pass through Workhorse.
 
-For more information see ['A brief history of gitlab-workhorse'][brief-history-blog].
+For more information see ['A brief history of GitLab Workhorse'][brief-history-blog].
 
 [thanos]: https://thanos-query.ops.gitlab.net/graph?g0.range_input=1h&g0.max_source_resolution=0s&g0.expr=sum(ruby_process_resident_memory_bytes%7Bapp%3D%22webservice%22%2Cenv%3D%22gprd%22%2Crelease%3D%22gitlab%22%7D)%20%2F%20sum(puma_max_threads%7Bapp%3D%22webservice%22%2Cenv%3D%22gprd%22%2Crelease%3D%22gitlab%22%7D)&g0.tab=1&g1.range_input=1h&g1.max_source_resolution=0s&g1.expr=sum(go_memstats_sys_bytes%7Bapp%3D%22webservice%22%2Cenv%3D%22gprd%22%2Crelease%3D%22gitlab%22%7D)%2Fsum(go_goroutines%7Bapp%3D%22webservice%22%2Cenv%3D%22gprd%22%2Crelease%3D%22gitlab%22%7D)&g1.tab=1
 [brief-history-blog]: https://about.gitlab.com/2016/04/12/a-brief-history-of-gitlab-workhorse/
