@@ -686,8 +686,7 @@ Examples:
 To check if a variable is defined but empty, compare it to:
 
 - An empty string: `$VARIABLE == ''`
-- A non-empty string `$VARIABLE != ""`
-string `$VARIABLE != ""`.
+- A non-empty string: `$VARIABLE != ""`
 
 #### Comparing two variables
 
