@@ -40,7 +40,7 @@ module Gitlab
 
           return unless Gitlab::UsageDataCounters::HLLRedisCounter.known_event?(transformed_action.to_s)
 
-          Gitlab::UsageDataCounters::HLLRedisCounter.track_event(author_id, transformed_action.to_s, time)
+          Gitlab::UsageDataCounters::HLLRedisCounter.track_event(author_id, transformed_action.to_s, time: time)
         end
 
         def count_unique_events(event_action:, date_from:, date_to:)

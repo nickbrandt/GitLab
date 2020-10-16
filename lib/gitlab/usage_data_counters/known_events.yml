@@ -25,7 +25,6 @@
   category: analytics
   redis_slot: analytics
   aggregation: weekly
-  plan_enabled: true
 - name: g_analytics_insights
   category: analytics
   redis_slot: analytics
@@ -74,7 +73,6 @@
   category: analytics
   redis_slot: analytics
   aggregation: weekly
-  plan_enabled: true
 - name: g_analytics_merge_request
   category: analytics
   redis_slot: analytics

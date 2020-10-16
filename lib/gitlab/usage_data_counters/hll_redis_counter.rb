@@ -25,7 +25,7 @@ module Gitlab
       #   category: compliance         # Group events in categories
       #   expiry: 29                   # Optional expiration time in days, default value 29 days for daily and 6.weeks for weekly
       #   aggregation: daily           # Aggregation level, keys are stored daily or weekly
-      #   plan_enabled: false          # Tracking on a given plan level
+      #   group_by_plan: false         # Tracking on a given plan level
       # Usage:
       #
       # * Track event: Gitlab::UsageDataCounters::HLLRedisCounter.track_event(user_id, 'g_compliance_dashboard')
@@ -33,33 +33,38 @@ module Gitlab
       class << self
         include Gitlab::Utils::UsageData
 
-        def track_event(entity_id, event_name, time = Time.zone.now, plan = '')
+        def track_event(entity_id, event_name, plan: '', time: Time.zone.now)
           return unless Gitlab::CurrentSettings.usage_ping_enabled?
 
           event = event_for(event_name)
 
           raise UnknownEvent.new("Unknown event #{event_name}") unless event.present?
-
-          # Increment unique event globaly
-          Gitlab::Redis::HLL.add(key: redis_key(event, time), value: entity_id, expiry: expiry(event))
+          raise "plan: should be present if group_by_plan is enabled" if event['group_by_plan'].present? && plan.blank?
+          raise "group_by_plan: should be enabled if plan is present" if event['group_by_plan'].blank? && plan.present?
 
           # Increment unique event for given plan
           # Track events in plan level if we have more than 1 plan defined and if plan_enabled is true
-          Gitlab::Redis::HLL.add(key: redis_key(event, time, plan), value: entity_id, expiry: expiry(event)) if valid_plan?(plan, event)
+          if valid_plan?(plan, event)
+            Gitlab::Redis::HLL.add(key: redis_key(event, time, plan), value: entity_id, expiry: expiry(event))
+          end
+
+          # Increment unique event globaly
+          Gitlab::Redis::HLL.add(key: redis_key(event, time), value: entity_id, expiry: expiry(event))
         end
 
         # Get the unique events in same category and slot
-        # If plan_enabled: true, the extra data for each plan is added to final results
-        def unique_events(event_names:, start_date:, end_date:)
+        # When plan is given it will get the union of events in the given plan
+        def unique_events(event_names:, start_date:, end_date:, plan: '')
           events = events_for(Array(event_names).map(&:to_s))
 
           raise 'Events should be in same slot' unless events_in_same_slot?(events)
           raise 'Events should be in same category' unless events_in_same_category?(events)
           raise 'Events should have same aggregation level' unless events_same_aggregation?(events)
+          raise 'Unknown plan' if plan.present? && !plan.in?(Plan.all_plans)
 
           aggregation = events.first[:aggregation]
 
-          keys = keys_for_aggregation(aggregation, events: events, start_date: start_date, end_date: end_date)
+          keys = keys_for_aggregation(aggregation, events: events, start_date: start_date, end_date: end_date, plan: plan)
 
           redis_usage_data { Gitlab::Redis::HLL.count(keys: keys) }
         end
@@ -75,7 +80,6 @@ module Gitlab
         end
 
         # Get the unique events data for all known_events
-        # If plan_enabled: true, the extra data for each plan_enabled is added to final results
         def unique_events_data
           categories.each_with_object({}) do |category, category_results|
             events_names = events_for_category(category)
@@ -109,11 +113,11 @@ module Gitlab
           events_in_same_slot?(events) && events_in_same_category?(events) && events_same_aggregation?(events)
         end
 
-        def keys_for_aggregation(aggregation, events:, start_date:, end_date:)
+        def keys_for_aggregation(aggregation, events:, start_date:, end_date:, plan: '')
           if aggregation.to_sym == :daily
-            daily_redis_keys(events: events, start_date: start_date, end_date: end_date)
+            daily_redis_keys(events: events, start_date: start_date, end_date: end_date, plan: plan)
           else
-            weekly_redis_keys(events: events, start_date: start_date, end_date: end_date)
+            weekly_redis_keys(events: events, start_date: start_date, end_date: end_date, plan: plan)
           end
         end
 
@@ -168,12 +172,12 @@ module Gitlab
 
           key = apply_slot(event)
           key = apply_time_aggregation(key, time, event)
-          key = "#{plan}_#{key}" if valid_plan?(plan, event)
+          key = "#{plan}_#{key}" if plan.present?
           key
         end
 
         def valid_plan?(plan, event)
-          plan.present? && event[:plan_enabled] && Plan.all_plans.size > 1 && plan.in?(Plan.all)
+          plan.present? && event[:group_by_plan].present? && Plan.all_plans.size > 1 && plan.in?(Plan.all_plans)
         end
 
         def apply_slot(event)
@@ -195,18 +199,18 @@ module Gitlab
           end
         end
 
-        def daily_redis_keys(events:, start_date:, end_date:)
+        def daily_redis_keys(events:, start_date:, end_date:, plan: '')
           (start_date.to_date..end_date.to_date).map do |date|
-            events.map { |event| redis_key(event, date) }
+            events.map { |event| redis_key(event, date, plan) }
           end.flatten
         end
 
-        def weekly_redis_keys(events:, start_date:, end_date:)
+        def weekly_redis_keys(events:, start_date:, end_date:, plan: '')
           weeks = end_date.to_date.cweek - start_date.to_date.cweek
           weeks = 1 if weeks == 0
 
           (0..(weeks - 1)).map do |week_increment|
-            events.map { |event| redis_key(event, start_date + week_increment * 7.days) }
+            events.map { |event| redis_key(event, start_date + week_increment * 7.days, plan) }
           end.flatten
         end
       end

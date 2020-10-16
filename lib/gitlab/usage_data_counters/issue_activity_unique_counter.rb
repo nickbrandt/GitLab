@@ -168,7 +168,7 @@ module Gitlab
           return unless Feature.enabled?(:track_issue_activity_actions, default_enabled: true)
           return unless author
 
-          Gitlab::UsageDataCounters::HLLRedisCounter.track_event(author.id, action, time)
+          Gitlab::UsageDataCounters::HLLRedisCounter.track_event(author.id, action, time: time)
         end
       end
     end
