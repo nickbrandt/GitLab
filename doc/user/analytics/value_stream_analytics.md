@@ -21,11 +21,11 @@ to uncover, triage, and identify the root cause of slowdowns in the software dev
 
 For information on how to contribute to the development of Value Stream Analytics, see our [contributor documentation](../../development/value_stream_analytics.md).
 
-## Project Level Value Stream Analytics **CORE**
+## Project Level Value Stream Analytics **(CORE)**
 
 Project Level Value Stream Analytics is available via **Project > Analytics > Value Stream**.
 
-## Group Level Value Stream Analytics **PREMIUM**
+## Group Level Value Stream Analytics **(PREMIUM)**
 
 From GitLab 12.9, group level Value Stream Analytics is available via **Group > Analytics > Value Stream**.
 
