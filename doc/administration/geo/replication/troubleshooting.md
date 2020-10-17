@@ -624,7 +624,7 @@ server, using `http` or `https` and ending with a `/`.
 ```shell
 sudo gitlab-rails dbconsole
 
-UPDATE geo_nodes SET enabled = true WHERE url = 'https://<secondary url>/';"
+UPDATE geo_nodes SET enabled = true WHERE url = 'https://<secondary url>/' AND enabled = false;"
 ```
 
 This should update 1 row.
