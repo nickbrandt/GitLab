@@ -14,8 +14,13 @@
   .detail-page-header-body
     .issuable-status-box.status-box{ class: status_box_class(@merge_request) }
       = sprite_icon(state_icon_name, css_class: 'd-block d-sm-none')
-      %span.d-none.d-sm-block
-        = state_human_name
+      - if @merge_request.is_reverted?(current_user)
+        %span.d-none.d-sm-block
+          = _("Merged")
+          = link_to '(reverted)', merge_request_path(@merge_request.reverting_merge_request(current_user))
+      - else
+        %span.d-none.d-sm-block
+          = state_human_name
 
     .issuable-meta
       #js-issuable-header-warnings
