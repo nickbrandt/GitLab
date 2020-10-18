@@ -318,6 +318,7 @@ export default {
       'scrollToFile',
       'toggleShowTreeList',
       'navigateToDiffFileIndex',
+      'toggleActiveFileByHash',
     ]),
     navigateToDiffFileNumber(number) {
       this.navigateToDiffFileIndex(number - 1);
@@ -329,9 +330,27 @@ export default {
       requestIdleCallback(
         () => {
           this.startRenderDiffsQueue();
+          this.diffScrollInit();
         },
         { timeout: 1000 },
       );
+    },
+    diffScrollInit() {
+      if (window.IntersectionObserver) {
+        const observer = new IntersectionObserver(
+          entries => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                this.toggleActiveFileByHash(entry.target.id);
+              }
+            });
+          },
+          { rootMargin: '0px 0px -50px 0px' },
+        );
+        document.querySelectorAll('.diff-file').forEach(diff => {
+          observer.observe(diff);
+        });
+      }
     },
     needsReload() {
       return this.diffFiles.length && isSingleViewStyle(this.diffFiles[0]);
