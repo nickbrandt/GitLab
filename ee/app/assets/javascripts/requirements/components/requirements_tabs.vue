@@ -1,13 +1,10 @@
 <script>
-
-import { GlLink, GlBadge, GlButton, GlTabs, GlTab } from '@gitlab/ui';
-
+import { GlBadge, GlButton, GlTabs, GlTab } from '@gitlab/ui';
 import { FilterState } from '../constants';
 
 export default {
   FilterState,
   components: {
-    GlLink,
     GlBadge,
     GlButton,
     GlTabs,
@@ -50,13 +47,13 @@ export default {
     <gl-tabs>
       <gl-tab @click="$emit('clickTab', { filterBy: $options.FilterState.opened })">
         <template slot="title">
-          <span>Open</span>
+          <span>{{ __('Open') }}</span>
           <gl-badge size="sm" class="gl-tab-counter-badge">{{ requirementsCount.OPENED }}</gl-badge>
         </template>
       </gl-tab>
       <gl-tab @click="$emit('clickTab', { filterBy: $options.FilterState.archived })">
         <template slot="title">
-          <span>Archived</span>
+          <span>{{ __('Archived') }}</span>
           <gl-badge size="sm" class="gl-tab-counter-badge">{{
             requirementsCount.ARCHIVED
           }}</gl-badge>
@@ -64,7 +61,7 @@ export default {
       </gl-tab>
       <gl-tab @click="$emit('clickTab', { filterBy: $options.FilterState.all })">
         <template slot="title">
-          <span>All</span>
+          <span>{{ __('All') }}</span>
           <gl-badge size="sm" class="gl-tab-counter-badge">{{ requirementsCount.ALL }}</gl-badge>
         </template>
       </gl-tab>
@@ -75,7 +72,7 @@ export default {
         variant="success"
         class="js-new-requirement qa-new-requirement-button"
         :disabled="showCreateForm"
-        @click="$emit('clickNewRequirement')"
+        @click="$emit('click-new-requirement')"
         >{{ __('New requirement') }}</gl-button
       >
     </div>
