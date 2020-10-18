@@ -40,7 +40,10 @@
 
     .issuable-meta
       %ul.controls.d-flex.align-items-end
-        - if merge_request.merged?
+        - if merge_request.is_reverted?(current_user)
+          %li.issuable-status.d-none.d-sm-inline-block
+            = _('MERGED (REVERTED)')
+        - elsif merge_request.merged?
           %li.issuable-status.d-none.d-sm-inline-block
             = _('MERGED')
         - elsif merge_request.closed?
