@@ -16,8 +16,7 @@
       = sprite_icon(state_icon_name, css_class: 'd-block d-sm-none')
       - if @merge_request.is_reverted?(current_user)
         %span.d-none.d-sm-block
-          = _("Merged")
-          = link_to '(reverted)', merge_request_path(@merge_request.reverting_merge_request(current_user))
+          = _('Merged (%{reverted})').html_safe % { reverted: link_to('reverted', merge_request_path(@merge_request.reverting_merge_request(current_user)), class: 'gl-text-white! gl-text-decoration-underline') }
       - else
         %span.d-none.d-sm-block
           = state_human_name
