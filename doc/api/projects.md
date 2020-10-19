@@ -1223,7 +1223,7 @@ PUT /projects/:id
 | `build_coverage_regex` | string | no | Test coverage parsing |
 | `ci_config_path` | string | no | The path to CI configuration file |
 | `ci_default_git_depth` | integer | no | Default number of revisions for [shallow cloning](../ci/pipelines/settings.md#git-shallow-clone) |
-| `ci_forward_deployment_enabled` | boolean | no | When a deployment job is successful, skip older deployment jobs that are still pending |
+| `ci_forward_deployment_enabled` | boolean | no | When a new deployment job starts, [skip older deployment jobs](../ci/pipelines/settings.md#skip-outdated-deployment-jobs) that are still pending |
 | `auto_devops_enabled` | boolean | no | Enable Auto DevOps for this project |
 | `auto_devops_deploy_strategy` | string | no | Auto Deploy strategy (`continuous`, `manual` or `timed_incremental`) |
 | `repository_storage` | string | no | Which storage shard the repository is on. Available only to admins |
