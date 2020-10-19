@@ -597,7 +597,7 @@ database encryption. Proceed with caution.
    ```ruby
    pages_external_url "http://<pages_server_URL>"
    gitlab_pages['enable'] = false
-   gitlab_rails['pages_enabled']=false
+   pages_nginx['enable'] = false
    gitlab_rails['pages_path'] = "/mnt/pages"
    ```
 
