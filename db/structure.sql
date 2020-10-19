@@ -14557,9 +14557,9 @@ CREATE TABLE plan_limits (
     nuget_max_file_size bigint DEFAULT 524288000 NOT NULL,
     pypi_max_file_size bigint DEFAULT '3221225472'::bigint NOT NULL,
     generic_packages_max_file_size bigint DEFAULT '5368709120'::bigint NOT NULL,
-    project_feature_flags integer DEFAULT 200 NOT NULL,
     golang_max_file_size bigint DEFAULT 104857600 NOT NULL,
     debian_max_file_size bigint DEFAULT '3221225472'::bigint NOT NULL,
+    project_feature_flags integer DEFAULT 200 NOT NULL,
     ci_max_artifact_size_api_fuzzing integer DEFAULT 0 NOT NULL
 );
 
@@ -17168,6 +17168,7 @@ CREATE TABLE webauthn_registrations (
     credential_xid text NOT NULL,
     name text NOT NULL,
     public_key text NOT NULL,
+    u2f_registration_id integer,
     CONSTRAINT check_242f0cc65c CHECK ((char_length(credential_xid) <= 255)),
     CONSTRAINT check_2f02e74321 CHECK ((char_length(name) <= 255))
 );
@@ -21505,6 +21506,8 @@ CREATE UNIQUE INDEX index_services_on_type_and_instance_partial ON services USIN
 
 CREATE UNIQUE INDEX index_services_on_type_and_template_partial ON services USING btree (type, template) WHERE (template = true);
 
+CREATE INDEX index_services_on_type_id_when_active_and_project_id_not_null ON services USING btree (type, id) WHERE ((active = true) AND (project_id IS NOT NULL));
+
 CREATE INDEX index_services_on_type_id_when_active_not_instance_not_template ON services USING btree (type, id) WHERE ((active = true) AND (instance = false) AND (template = false));
 
 CREATE UNIQUE INDEX index_services_on_unique_group_id_and_type ON services USING btree (group_id, type);
@@ -21761,8 +21764,6 @@ CREATE INDEX index_vulnerabilities_on_milestone_id ON vulnerabilities USING btre
 
 CREATE INDEX index_vulnerabilities_on_project_id ON vulnerabilities USING btree (project_id);
 
-CREATE INDEX index_vulnerabilities_on_project_id_and_id ON vulnerabilities USING btree (project_id, id);
-
 CREATE INDEX index_vulnerabilities_on_resolved_by_id ON vulnerabilities USING btree (resolved_by_id);
 
 CREATE INDEX index_vulnerabilities_on_start_date_sourcing_milestone_id ON vulnerabilities USING btree (start_date_sourcing_milestone_id);
@@ -21840,6 +21841,8 @@ CREATE INDEX index_web_hooks_on_project_id ON web_hooks USING btree (project_id)
 CREATE INDEX index_web_hooks_on_type ON web_hooks USING btree (type);
 
 CREATE UNIQUE INDEX index_webauthn_registrations_on_credential_xid ON webauthn_registrations USING btree (credential_xid);
+
+CREATE INDEX index_webauthn_registrations_on_u2f_registration_id ON webauthn_registrations USING btree (u2f_registration_id) WHERE (u2f_registration_id IS NOT NULL);
 
 CREATE INDEX index_webauthn_registrations_on_user_id ON webauthn_registrations USING btree (user_id);
 
@@ -22241,6 +22244,9 @@ ALTER TABLE ONLY vulnerabilities
 
 ALTER TABLE ONLY vulnerabilities
     ADD CONSTRAINT fk_131d289c65 FOREIGN KEY (milestone_id) REFERENCES milestones(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY webauthn_registrations
+    ADD CONSTRAINT fk_13e04d719a FOREIGN KEY (u2f_registration_id) REFERENCES u2f_registrations(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY protected_branch_push_access_levels
     ADD CONSTRAINT fk_15d2a7a4ae FOREIGN KEY (deploy_key_id) REFERENCES keys(id) ON DELETE CASCADE;

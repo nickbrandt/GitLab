@@ -41,6 +41,8 @@ export default (el, dashboardType) => {
 
   if (dashboardType === DASHBOARD_TYPES.PROJECT) {
     component = FirstClassProjectSecurityDashboard;
+    const { pipelineCreatedAt: createdAt, pipelineId: id, pipelinePath: path } = el.dataset;
+    props.pipeline = { createdAt, id, path };
     props.projectFullPath = el.dataset.projectFullPath;
     provide.autoFixDocumentation = el.dataset.autoFixDocumentation;
     provide.pipelineSecurityBuildsFailedCount = el.dataset.pipelineSecurityBuildsFailedCount;
