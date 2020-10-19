@@ -1,7 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { escape } from 'lodash';
-import { GlLoadingIcon, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
+import { GlLoadingIcon, GlSafeHtmlDirective as SafeHtml, GlIntersectionObserver } from '@gitlab/ui';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { __, sprintf } from '~/locale';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
@@ -16,6 +16,7 @@ export default {
     DiffFileHeader,
     DiffContent,
     GlLoadingIcon,
+    GlIntersectionObserver,
   },
   directives: {
     SafeHtml,
@@ -120,6 +121,7 @@ export default {
       'assignDiscussionsToDiff',
       'setRenderIt',
       'setFileCollapsed',
+      'toggleActiveFileByHash',
     ]),
     handleToggle() {
       if (!this.hasDiff) {
@@ -157,6 +159,9 @@ export default {
     hideForkMessage() {
       this.forkMessageVisible = false;
     },
+    onAppear() {
+      this.toggleActiveFileByHash(this.file.file_hash);
+    },
   },
 };
 </script>
@@ -171,54 +176,59 @@ export default {
     :data-path="file.new_path"
     class="diff-file file-holder"
   >
-    <diff-file-header
-      :can-current-user-fork="canCurrentUserFork"
-      :diff-file="file"
-      :collapsible="true"
-      :expanded="!isCollapsed"
-      :add-merge-request-buttons="true"
-      :view-diffs-file-by-file="viewDiffsFileByFile"
-      class="js-file-title file-title"
-      @toggleFile="handleToggle"
-      @showForkMessage="showForkMessage"
-    />
+    <gl-intersection-observer @appear="onAppear">
+      <diff-file-header
+        :can-current-user-fork="canCurrentUserFork"
+        :diff-file="file"
+        :collapsible="true"
+        :expanded="!isCollapsed"
+        :add-merge-request-buttons="true"
+        :view-diffs-file-by-file="viewDiffsFileByFile"
+        class="js-file-title file-title"
+        @toggleFile="handleToggle"
+        @showForkMessage="showForkMessage"
+      />
 
-    <div v-if="forkMessageVisible" class="js-file-fork-suggestion-section file-fork-suggestion">
-      <span v-safe-html="forkMessage" class="file-fork-suggestion-note"></span>
-      <a
-        :href="file.fork_path"
-        class="js-fork-suggestion-button btn btn-grouped btn-inverted btn-success"
-        >{{ __('Fork') }}</a
-      >
-      <button
-        class="js-cancel-fork-suggestion-button btn btn-grouped"
-        type="button"
-        @click="hideForkMessage"
-      >
-        {{ __('Cancel') }}
-      </button>
-    </div>
-    <gl-loading-icon v-if="showLoadingIcon" class="diff-content loading" />
-    <template v-else>
-      <div :id="`diff-content-${file.file_hash}`">
-        <div v-if="errorMessage" class="diff-viewer">
-          <div v-safe-html="errorMessage" class="nothing-here-block"></div>
-        </div>
-        <template v-else>
-          <div v-show="isCollapsed" class="nothing-here-block diff-collapsed">
-            {{ __('This diff is collapsed.') }}
-            <a class="click-to-expand js-click-to-expand" href="#" @click.prevent="handleToggle">{{
-              __('Click to expand it.')
-            }}</a>
-          </div>
-          <diff-content
-            v-show="!isCollapsed && !isFileTooLarge"
-            :diff-file="file"
-            :help-page-path="helpPagePath"
-          />
-        </template>
+      <div v-if="forkMessageVisible" class="js-file-fork-suggestion-section file-fork-suggestion">
+        <span v-safe-html="forkMessage" class="file-fork-suggestion-note"></span>
+        <a
+          :href="file.fork_path"
+          class="js-fork-suggestion-button btn btn-grouped btn-inverted btn-success"
+          >{{ __('Fork') }}</a
+        >
+        <button
+          class="js-cancel-fork-suggestion-button btn btn-grouped"
+          type="button"
+          @click="hideForkMessage"
+        >
+          {{ __('Cancel') }}
+        </button>
       </div>
-    </template>
+      <gl-loading-icon v-if="showLoadingIcon" class="diff-content loading" />
+      <template v-else>
+        <div :id="`diff-content-${file.file_hash}`">
+          <div v-if="errorMessage" class="diff-viewer">
+            <div v-safe-html="errorMessage" class="nothing-here-block"></div>
+          </div>
+          <template v-else>
+            <div v-show="isCollapsed" class="nothing-here-block diff-collapsed">
+              {{ __('This diff is collapsed.') }}
+              <a
+                class="click-to-expand js-click-to-expand"
+                href="#"
+                @click.prevent="handleToggle"
+                >{{ __('Click to expand it.') }}</a
+              >
+            </div>
+            <diff-content
+              v-show="!isCollapsed && !isFileTooLarge"
+              :diff-file="file"
+              :help-page-path="helpPagePath"
+            />
+          </template>
+        </div>
+      </template>
+    </gl-intersection-observer>
   </div>
 </template>
 
