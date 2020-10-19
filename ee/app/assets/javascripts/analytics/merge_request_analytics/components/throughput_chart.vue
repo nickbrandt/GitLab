@@ -115,14 +115,14 @@ export default {
     <div class="gl-text-gray-500" data-testid="chartDescription">
       {{ $options.strings.chartDescription }}
     </div>
+    <gl-alert v-else :variant="alertDetails.class" :dismissible="false" class="gl-mt-4">{{
+      alertDetails.message
+    }}</gl-alert>
     <chart-skeleton-loader v-if="chartDataLoading" />
     <gl-area-chart
       v-else-if="chartDataAvailable"
       :data="formattedThroughputChartData"
       :option="chartOptions"
     />
-    <gl-alert v-else :variant="alertDetails.class" :dismissible="false" class="gl-mt-4">{{
-      alertDetails.message
-    }}</gl-alert>
   </div>
 </template>

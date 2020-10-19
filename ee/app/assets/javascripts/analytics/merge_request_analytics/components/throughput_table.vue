@@ -253,6 +253,9 @@ export default {
 };
 </script>
 <template>
+  <gl-alert v-else :variant="alertDetails.class" :dismissible="false" class="gl-mt-4">{{
+    alertDetails.message
+  }}</gl-alert>
   <gl-loading-icon v-if="tableDataLoading" size="md" />
   <div v-else-if="tableDataAvailable">
     <gl-table
@@ -376,7 +379,4 @@ export default {
       @input="handlePageChange"
     />
   </div>
-  <gl-alert v-else :variant="alertDetails.class" :dismissible="false" class="gl-mt-4">{{
-    alertDetails.message
-  }}</gl-alert>
 </template>
