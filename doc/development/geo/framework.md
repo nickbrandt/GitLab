@@ -207,6 +207,11 @@ For example, to add support for files referenced by a `Widget` model with a
    end
    ```
 
+   NOTE: **Note:**
+
+   If there is a common constraint for records to be available for replication,
+   make sure to also overwrite the `available_replicables` scope.
+
 1. Create `ee/app/replicators/geo/widget_replicator.rb`. Implement the
    `#carrierwave_uploader` method which should return a `CarrierWave::Uploader`.
    And implement the class method `.model` to return the `Widget` class.
