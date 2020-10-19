@@ -33,6 +33,7 @@ module API
           :all_available,
           :custom_attributes,
           :owned, :min_access_level,
+          :include_parent_descendants,
           :include_parent_descendants
         )
 
@@ -323,6 +324,19 @@ module API
       end
       get ":id/descendant_groups" do
         finder_params = declared_params(include_missing: false).merge(include_parent_descendants: true)
+        groups = find_groups(finder_params, params[:id])
+        present_groups params, groups
+      end
+
+      desc 'Get a list of ancestor groups of this group.' do
+        success Entities::Group
+      end
+      params do
+        use :group_list_params
+        use :with_custom_attributes
+      end
+      get ":id/ancestor_groups" do
+        finder_params = declared_params(include_missing: false).merge(include_parent_ancestors: true)
         groups = find_groups(finder_params, params[:id])
         present_groups params, groups
       end

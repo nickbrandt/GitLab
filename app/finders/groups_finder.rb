@@ -14,7 +14,8 @@
 #     exclude_group_ids: array of integers
 #     include_parent_descendants: boolean (defaults to false) - includes descendant groups when
 #                                 filtering by parent. The parent param must be present.
-#
+#     include_parent_ancestors: boolean (defaults to false) - includes ancestor groups when
+#                                 filtering by parent. The parent param must be present.
 # Users with full private access can see all groups. The `owned` and `parent`
 # params can be used to restrict the groups that are returned.
 #
@@ -88,6 +89,8 @@ class GroupsFinder < UnionFinder
 
     if include_parent_descendants?
       groups.id_in(params[:parent].descendants)
+    elsif include_parent_ancestors?
+      groups.id_in(params[:parent].ancestors)
     else
       groups.where(parent: params[:parent])
     end
@@ -108,6 +111,10 @@ class GroupsFinder < UnionFinder
 
   def include_parent_descendants?
     params.fetch(:include_parent_descendants, false)
+  end
+
+  def include_parent_ancestors?
+    params.fetch(:include_parent_ancestors, false)
   end
 
   def min_access_level?
