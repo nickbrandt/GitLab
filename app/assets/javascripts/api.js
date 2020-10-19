@@ -782,37 +782,44 @@ const Api = {
    *
    * Example:
    *
-   * User provides string from
+   * API: https://docs.gitlab.com/ee/api/job_artifacts.html#download-the-artifacts-archive
    *
-   * expose_path(api_v4_projects_pipelines_jobs_fuzing_artifacts_path(id: project.id, job_ref: ':job_ref'))
+   * User provides string to the frontend from:
+   *
+   * expose_path(api_v4_projects_pipelines_jobs_artifacts_path(id: project.id, ref_name: ':ref_name'))
+   *
+   * Rails route helper generated string:
+   *
+   * https://gitlab.example.com/api/v4/projects/1234/jobs/artifacts/:ref_name/download
    *
    * User calls:
    *
-   *  getApiPath(this.fuzzingArtifactsPath, {
-   *   keys: { ':job_ref': job.ref },
-   *   params: {job: job.name}
+   *  getApiPath(this.artifactsPath, {
+   *   params { ':ref_name': 'master' },
+   *   query: {job: 'job-name'}
    *  }
    *
    * Output is:
    *
-   * https://gitlab.com/api/v4/projects/19413496/jobs/artifacts/refs/merge-requests/5/head/download?job=my_fuzz_target
+   * https://gitlab.example.com/api/v4/projects/1234/jobs/artifacts/master/download?job=job-name
    *
    * @param {String} path The stubbed url
-   * @param {Object} keys The stubbed values to replace
-   * @param {Object} params The url query params
+   * @param {Object} params The stubbed values to replace
+   * @param {Object} query The url query params
    * @returns {String} The dynamically generated URL
    */
-  getApiPath(path = '', { keys, params }) {
+  getApiPath(path = '', { params = {}, query = {} }) {
     if (path) {
       let outputPath = path;
-      Object.entries(keys).forEach(([key, value]) => {
+      const outputQuery = new URLSearchParams(query);
+
+      // Replace the :ruby_symbols
+      Object.entries(params).forEach(([key, value]) => {
         outputPath = outputPath.replace(key, value);
       });
-      return params
-        ? `${outputPath}?${Object.keys(params)
-            .map(key => `${key}=${params[key]}`)
-            .join('&')}`
-        : outputPath;
+
+      // Construct the url query params
+      return Object.keys(query).length ? `${outputPath}?${outputQuery}` : outputPath;
     }
     return path;
   },

@@ -870,7 +870,6 @@ describe('Api', () => {
     });
   });
 
-<<<<<<< HEAD
   describe('Billable members list', () => {
     let expectedUrl;
     let namespaceId;
@@ -887,20 +886,24 @@ describe('Api', () => {
         return Api.fetchBillableGroupMembersList(namespaceId).then(({ data }) => {
           expect(data).toEqual([]);
         });
-=======
+      });
+    });
+  });
+
   describe('getApiPath', () => {
     describe.each`
-      path                           | keys                                   | params                           | expected
+      path                           | params                                 | query                            | expected
       ${undefined}                   | ${{ ':user_id': 4 }}                   | ${{ project_id: 3 }}             | ${''}
       ${'/foo/bar'}                  | ${{ ':user_id': 4 }}                   | ${{ project_id: 3 }}             | ${'/foo/bar?project_id=3'}
       ${'/:user_id/bar'}             | ${{ ':user_id': 4 }}                   | ${{ project_id: 3 }}             | ${'/4/bar?project_id=3'}
       ${'/:wrong_id/bar'}            | ${{ ':user_id': 4 }}                   | ${{ project_id: 3 }}             | ${'/:wrong_id/bar?project_id=3'}
       ${'/:first_id/bar/:second_id'} | ${{ ':first_id': 1, ':second_id': 2 }} | ${{ project_id: 3 }}             | ${'/1/bar/2?project_id=3'}
       ${'/:first_id/bar/:second_id'} | ${{ ':first_id': 1, ':second_id': 2 }} | ${{ project_id: 3, user_id: 7 }} | ${'/1/bar/2?project_id=3&user_id=7'}
-    `('When path: $path, keys: $keys, params: $params', ({ path, keys, params, expected }) => {
+      ${'/:first_id/bar/:second_id'} | ${undefined}                           | ${{ project_id: 3, user_id: 7 }} | ${'/:first_id/bar/:second_id?project_id=3&user_id=7'}
+      ${'/:first_id/bar/:second_id'} | ${{ ':first_id': 1, ':second_id': 2 }} | ${undefined}                     | ${'/1/bar/2'}
+    `('When path: $path, params: $params, query: $query', ({ path, params, query, expected }) => {
       it(`returns ${expected}`, () => {
-        expect(Api.getApiPath(path, { keys, params })).toBe(expected);
->>>>>>> 55722995fad... Add unit tests for api helper
+        expect(Api.getApiPath(path, { params, query })).toBe(expected);
       });
     });
   });

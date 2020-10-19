@@ -317,7 +317,7 @@ export default {
 
     const coverageFuzzingDiffEndpoint = gl?.mrWidgetData?.coverage_fuzzing_comparison_path;
     const pipelineJobsPath = Api.getApiPath(gl?.mrWidgetData?.pipeline_jobs_path, {
-      keys: { ':pipeline_id': gl?.mrWidgetData?.pipeline_id },
+      params: { ':pipeline_id': gl?.mrWidgetData?.pipeline_id },
     });
 
     if (coverageFuzzingDiffEndpoint && this.hasCoverageFuzzingReports) {
@@ -571,7 +571,6 @@ export default {
               v-if="hasFuzzingArtifacts"
               :jobs="fuzzingJobsWithArtifact"
               :project-id="projectId"
-              :has-label="false"
             />
           </summary-row>
 

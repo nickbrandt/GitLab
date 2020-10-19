@@ -20,11 +20,6 @@ export default {
       type: Number,
       required: true,
     },
-    hasLabel: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
   computed: {
     hasDropdown() {
@@ -43,7 +38,7 @@ export default {
 
 <template>
   <div>
-    <strong v-if="hasLabel">{{ s__('SecurityReports|Download Report') }}</strong>
+    <slot name="label"></slot>
     <gl-dropdown
       v-if="hasDropdown"
       class="d-block mt-1"
