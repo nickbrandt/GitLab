@@ -226,6 +226,9 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
   describe 'plan level tracking' do
     let(:bronze_plan) { 'bronze' }
     let(:gold_plan) { 'gold' }
+    let(:free_plan) { 'free' }
+    let(:undefined_plan) { 'undefined' }
+
     let(:known_events) do
       [
         { name: 'event_name_1', redis_slot: 'event', category: 'category1', aggregation: "weekly", group_by_plan: true },
@@ -235,6 +238,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     before do
+      allow(Plan).to receive(:all_plans).and_return([bronze_plan, gold_plan, free_plan])
       allow(described_class).to receive(:known_events).and_return(known_events)
       allow(described_class).to receive(:categories).and_return(%w(category1 category2))
 
@@ -247,9 +251,9 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       it { expect(described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current, plan: bronze_plan)).to eq(2) }
       it { expect(described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current, plan: gold_plan)).to eq(1) }
       it { expect(described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current)).to eq(2) }
-      it { expect { described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current, plan: 'undefined') }.to raise_error('Unknown plan') }
-      it { expect { described_class.unique_events(event_names: ['event_name_2'], start_date: 4.weeks.ago, end_date: Date.current, plan: 'undefined') }.to raise_error('Unknown plan') }
-      it { expect(described_class.unique_events(event_names: ['event_name_2'], start_date: 4.weeks.ago, end_date: Date.current, plan: 'free')).to eq(0) }
+      it { expect { described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current, plan: undefined_plan) }.to raise_error('Unknown plan') }
+      it { expect { described_class.unique_events(event_names: ['event_name_2'], start_date: 4.weeks.ago, end_date: Date.current, plan: undefined_plan) }.to raise_error('Unknown plan') }
+      it { expect(described_class.unique_events(event_names: ['event_name_2'], start_date: 4.weeks.ago, end_date: Date.current, plan: free_plan)).to eq(0) }
       it { expect(described_class.unique_events(event_names: ['event_name_2'], start_date: 4.weeks.ago, end_date: Date.current)).to eq(2) }
     end
   end
