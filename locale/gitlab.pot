@@ -25990,7 +25990,7 @@ msgstr ""
 msgid "Thanks! Don't show me this again"
 msgstr ""
 
-msgid "That's it, well done!%{celebrate}"
+msgid "That's it, well done!"
 msgstr ""
 
 msgid "The \"%{group_path}\" group allows you to sign in with your Single Sign-On Account"
