@@ -107,6 +107,18 @@ describe('Editor Lite component', () => {
       expect(setValue).toHaveBeenCalledWith(newValue);
     });
 
+    it('does not react to the changes in the pased value, if the value is already set in the editor', async () => {
+      const newValue = 'New Value';
+      getValue.mockReturnValueOnce(newValue);
+
+      wrapper.setProps({
+        value: newValue,
+      });
+
+      await nextTick();
+      expect(setValue).not.toHaveBeenCalled();
+    });
+
     it('registers callback with editor onChangeContent', () => {
       expect(onDidChangeModelContent).toHaveBeenCalledWith(expect.any(Function));
     });
