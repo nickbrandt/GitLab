@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { createComponentWithStore } from 'helpers/vue_mount_component_helper';
 import { mockTracking, triggerEvent } from 'helpers/tracking_helper';
+import { useMockIntersectionObserver } from 'helpers/mock_dom_observer';
 import { createStore } from '~/mr_notes/stores';
 import DiffFileComponent from '~/diffs/components/diff_file.vue';
 import { diffViewerModes, diffViewerErrors } from '~/ide/constants';
@@ -10,6 +11,7 @@ import diffFileMockDataUnreadable from '../mock_data/diff_file_unreadable';
 describe('DiffFile', () => {
   let vm;
   let trackingSpy;
+  useMockIntersectionObserver();
 
   beforeEach(() => {
     vm = createComponentWithStore(Vue.extend(DiffFileComponent), createStore(), {
