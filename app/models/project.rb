@@ -31,6 +31,7 @@ class Project < ApplicationRecord
   include FeatureGate
   include OptionallySearch
   include FromUnion
+  include FromExcept
   include IgnorableColumns
   include Integration
   include EachBatch
@@ -560,8 +561,12 @@ class Project < ApplicationRecord
   end
 
   scope :pages_metadata_not_migrated, -> do
-    left_outer_joins(:pages_metadatum)
-      .where(project_pages_metadata: { project_id: nil })
+    # left_outer_joins(:pages_metadatum)
+    #   .where(project_pages_metadata: { project_id: nil })
+    Project.from_except([
+      self,
+      self.joins(:pages_metadatum)
+    ])
   end
 
   scope :with_api_commit_entity_associations, -> {
