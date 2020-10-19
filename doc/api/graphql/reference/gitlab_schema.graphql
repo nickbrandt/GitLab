@@ -9207,7 +9207,7 @@ input IssueMoveInput {
   projectPath: ID!
 
   """
-  The project to move the issue to.
+  The project to move the issue to
   """
   targetProjectPath: ID!
 }

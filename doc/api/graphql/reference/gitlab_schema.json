@@ -25079,7 +25079,7 @@
             },
             {
               "name": "targetProjectPath",
-              "description": "The project to move the issue to.",
+              "description": "The project to move the issue to",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
