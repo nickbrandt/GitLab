@@ -531,7 +531,7 @@ postgresql['sql_replication_password'] = 'POSTGRESQL_REPLICATION_PASSWORD_HASH'
 postgresql['sql_user_password'] = 'POSTGRESQL_PASSWORD_HASH'
 ```
 
-On Patroni instances on a secondary node:
+In `/etc/gitlab/gitlab.rb` on Patroni instances on a secondary node:
 
 ```ruby
 postgresql['md5_auth_cidr_addresses'] = [
