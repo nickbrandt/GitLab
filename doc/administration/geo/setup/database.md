@@ -474,6 +474,72 @@ high-availability configuration with a cluster of nodes supporting a Geo
 **primary** node and another cluster of nodes supporting a Geo **secondary** node. For more
 information, see [High Availability with Omnibus GitLab](../../postgresql/replication_and_failover.md).
 
+## Patroni support
+
+NOTE: **Note:**
+Starting with GitLab 13.5, Patroni is available for **experimental** use for Geo primary and secondary
+nodes. Due to its experimental nature, Patroni support is subject to change without notice.
+
+Patroni support is intended to replace `repmgr` as [High Availability solution](../../postgresql/replication_and_failover.md) 
+on primary node, and can also be used for HA on a secondary node.
+
+In current experimental implementation there are the following limitations:
+
+- Whenever a new Leader is elected, PgBouncer instance needs to be reconfigured to point to the new Leader
+- Whenever a new Leader is elected on the primary node, the Standby Leader on the secondary needs to be reconfigured
+  to point to the new Leader
+- Whenever `gitlab-ctl reconfigure` runs on a patroni Leader instance, there is a chance the node will be demoted its leadership 
+  due to the short-time restart required. To avoid this you can pause auto-failover: `gitlab-ctl patroni pause` (after a reconfigure it automatically unpauses).
+  
+In order to setup Patroni in the primary node, you can follow the information provided in 
+[High Availability with Omnibus GitLab](../../postgresql/replication_and_failover.md#patroni) page.
+
+A production ready and secure setup will require at least 3 patroni instances in primary and similar configuration on
+secondary nodes, use password credentials and other database best-practices. 
+
+Similar to `repmgr`, using Patroni on a secondary node is optional. 
+
+To setup a Secondary node database-replication you need to configure a **permanent replication slot** on Patroni's 
+cluster on the Primary node and ensure password authentication is used.
+
+On Patroni instances on the primary node:
+
+```ruby
+# You need one entry for each secondary, with a unique name following PostgreSQL slot_name constraints:
+#
+# Configuration syntax will be: 'unique_slotname' => { 'type' => 'physical' },
+# We don't support setting a permanent replication slot for logical replication type 
+patroni['replication_slots'] = {
+    'geo_secondary' => { 'type' => 'physical' }
+}
+
+postgresql['md5_auth_cidr_addresses'] = [
+  'PATRONI_PRIMARY1_IP/32', 'PATRONI_PRIMARY2_IP/32', 'PATRONI_PRIMARY3_IP/32', 'PATRONI_PRIMARY_PGBOUNCER/32',
+  'PATRONI_SECONDARY1_IP/32', 'PATRONI_SECONDARY2_IP/32', 'PATRONI_SECONDARY3_IP/32' # we list all secondary instances as they can all become a Standby Leader
+  # any other instance that needs access to the database as per HA documentation 
+]
+
+postgresql['pgbouncer_user_password'] = 'PGBOUNCER_PASSWORD_HASH'
+postgresql['sql_replication_password'] = 'POSTGRESQL_REPLICATION_PASSWORD_HASH'
+postgresql['sql_user_password'] = 'POSTGRESQL_PASSWORD_HASH'
+```
+
+On Patroni instances on a secondary node:
+
+```ruby
+postgresql['md5_auth_cidr_addresses'] = [
+  'PATRONI_SECONDARY1_IP/32', 'PATRONI_SECONDARY2_IP/32', 'PATRONI_SECONDARY3_IP/32', 'PATRONI_SECONDARY_PGBOUNCER/32',
+  # any other instance that needs access to the database as per HA documentation 
+]
+
+patroni['enable'] = true
+patroni['standby_cluster']['enable'] = true
+patroni['standby_cluster']['host'] = 'PATRONI_PRIMARY_LEADER_IP' # this needs to be changed anytime the primary Leader changes
+patroni['standby_cluster']['port'] = 5432
+patroni['standby_cluster']['primary_slot_name'] = 'geo_secondary' # or the unique replication slot name you setup before
+patroni['replication_password'] = 'PLAIN_TEXT_POSTGRESQL_REPLICATION_PASSWORD'
+```
+
 ## Troubleshooting
 
 Read the [troubleshooting document](../replication/troubleshooting.md).
