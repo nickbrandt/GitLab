@@ -70,10 +70,11 @@ module CacheMarkdownField
 
   def refresh_markdown_cache!
     updates = refresh_markdown_cache
-    if save_markdown(updates)
-      # save_markdown updates DB columns directly, so reload to let store_mentions! be able to parse mentions
-      # otherwise we end up in a loop
-      reset.store_mentions! if is_a?(Mentionable) && mentionable_attrs_changed?(updates.keys)
+    if updates.present? && save_markdown(updates)
+      # save_markdown updates DB columns directly, so compute and save mentions
+      # by calling store_mentions! or we end-up with missing mentions although those
+      # would appear in the notes, descriptions, etc in the UI
+      store_mentions! if mentionable_attributes_changed?(updates)
     end
   end
 
@@ -110,14 +111,15 @@ module CacheMarkdownField
     return unless cached_markdown_fields.markdown_fields.include?(markdown_field)
 
     if attribute_invalidated?(cached_markdown_fields.html_field(markdown_field))
-      # * If html is invalid and there is a change in markdown field, then just refresh html for the
-      # corresponding markdown field.
-      # * Else if the the markdown did not changee it means it is freshly loaded from DB
-      # but its corresponding html field is invalid, so we refresh and update it in DB.
-      # * The change in html field will trigger also a mentions parsing as well as an update if needed.
-      if changed_attributes[markdown_field]
+      # Invalidated due to Markdown content change
+      # We should not persist the updated HTML here since this will depend on whether the
+      # Markdown content change will be persisted. Both will be persisted together when the model is saved.
+      if changed_attributes.key?(markdown_field)
         refresh_markdown_cache
       else
+        # Invalidated due to stale HTML cache
+        # This could happen when the Markdown cache version is bumped or when a model is imported and the HTML is empty.
+        # We persist the updated HTML here so that subsequent calls to this method do not have to regenerate the HTML again.
         refresh_markdown_cache!
       end
     end
@@ -154,13 +156,43 @@ module CacheMarkdownField
     nil
   end
 
-  private
+  def store_mentions!
+    refs = all_references(self.author)
 
-  def mentionable_attrs_changed?(updated_fields)
+    references = {}
+    references[:mentioned_users_ids] = refs.mentioned_users&.pluck(:id).presence
+    references[:mentioned_groups_ids] = refs.mentioned_groups&.pluck(:id).presence
+    references[:mentioned_projects_ids] = refs.mentioned_projects&.pluck(:id).presence
+
+    # One retry is enough as next time `model_user_mention` should return the existing mention record,
+    # that threw the `ActiveRecord::RecordNotUnique` exception in first place.
+    self.class.safe_ensure_unique(retries: 1) do
+      user_mention = model_user_mention
+
+      # this may happen due to notes polymorphism, so noteable_id may point to a record
+      # that no longer exists as we cannot have FK on noteable_id
+      break if user_mention.blank?
+
+      user_mention.mentioned_users_ids = references[:mentioned_users_ids]
+      user_mention.mentioned_groups_ids = references[:mentioned_groups_ids]
+      user_mention.mentioned_projects_ids = references[:mentioned_projects_ids]
+
+      if user_mention.has_mentions?
+        user_mention.save!
+      else
+        user_mention.destroy!
+      end
+    end
+
+    true
+  end
+
+  def mentionable_attributes_changed?(changes = saved_changes)
     return false unless is_a?(Mentionable)
 
     self.class.mentionable_attrs.any? do |attr|
-      updated_fields.include?(cached_markdown_fields.html_field(attr.first))
+      changes.key?(cached_markdown_fields.html_field(attr.first)) &&
+        changes.fetch(cached_markdown_fields.html_field(attr.first)).last.present?
     end
   end
 
