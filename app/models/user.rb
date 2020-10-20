@@ -350,6 +350,9 @@ class User < ApplicationRecord
   scope :deactivated, -> { with_state(:deactivated).non_internal }
   scope :without_projects, -> { joins('LEFT JOIN project_authorizations ON users.id = project_authorizations.user_id').where(project_authorizations: { user_id: nil }) }
   scope :by_username, -> (usernames) { iwhere(username: Array(usernames).map(&:to_s)) }
+  scope :by_name, -> (names) { iwhere(name: Array(names)) }
+  scope :by_user_email, -> (emails) { iwhere(email: Array(emails)) }
+  scope :by_emails, -> (emails) { joins(:emails).where(emails: { email: Array(emails).map(&:downcase) }) }
   scope :for_todos, -> (todos) { where(id: todos.select(:user_id)) }
   scope :with_emails, -> { preload(:emails) }
   scope :with_dashboard, -> (dashboard) { where(dashboard: dashboard) }
@@ -509,54 +512,20 @@ class User < ApplicationRecord
       by_any_email(email, confirmed: confirmed).take
     end
 
-    # Returns a relation containing all users with emails for given emails
-    # where non-confirmed emails are included and private commit emails are skiped
-    # or names where username and name is searched for exact match
-    #
-    #
-    # @param emails [String, Array<String>] email addresses to check
-    # @param names [String, Array<String>] names to check in username and name
-    def by_emails_or_names(jira_pairs)
-      sql = <<~SQL
-        WITH jira_users(name, email) AS (VALUES #{jira_pairs})
-          SELECT DISTINCT users.id AS user_id,
-            (CASE
-             WHEN ((jira_users.email = users.email) OR (jira_users.email = emails.email))
-             THEN 3
-             WHEN (jira_users.name = lower(users.username))
-             THEN 2
-             WHEN (jira_users.name = lower(users.name))
-             THEN 1
-            END)
-            AS match_score, jira_users.name as jira_name, jira_users.email as jira_email
-          FROM users
-          LEFT JOIN emails ON (users.id = emails.user_id)
-          JOIN jira_users ON (jira_users.name = lower(users.username))
-            OR (jira_users.name = lower(users.name))
-            OR (jira_users.email = users.email)
-            OR (jira_users.email = emails.email)
-          ORDER BY match_score DESC;
-      SQL
-
-      ActiveRecord::Base.connection.execute(sql)
-    end
-
     # Returns a relation containing all the users for the given email addresses
     #
     # @param emails [String, Array<String>] email addresses to check
     # @param confirmed [Boolean] Only return users where the email is confirmed
     def by_any_email(emails, confirmed: false)
-      emails = Array(emails).map(&:downcase)
-
-      from_users = where(email: emails)
+      from_users = by_user_email(emails)
       from_users = from_users.confirmed if confirmed
 
-      from_emails = joins(:emails).where(emails: { email: emails })
+      from_emails = by_emails(emails)
       from_emails = from_emails.confirmed.merge(Email.confirmed) if confirmed
 
       items = [from_users, from_emails]
 
-      user_ids = Gitlab::PrivateCommitEmail.user_ids_for_emails(emails)
+      user_ids = Gitlab::PrivateCommitEmail.user_ids_for_emails(Array(emails).map(&:downcase))
       items << where(id: user_ids) if user_ids.present?
 
       from_union(items)

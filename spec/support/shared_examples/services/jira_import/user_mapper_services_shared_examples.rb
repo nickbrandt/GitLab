@@ -24,14 +24,14 @@ RSpec.shared_examples 'mapping jira users' do
     let(:mapped_users) do
       [
         { jira_account_id: 'abcd', jira_display_name: 'User-Name1', jira_email: nil, gitlab_id: user_1.id },
-        { jira_account_id: 'efg', jira_display_name: 'username2', jira_email: nil, gitlab_id: user_2.id },
+        { jira_account_id: 'efg', jira_display_name: 'username-2', jira_email: nil, gitlab_id: user_2.id },
         { jira_account_id: 'hij', jira_display_name: nil, jira_email: nil, gitlab_id: nil },
-        { jira_account_id: '123', jira_display_name: 'user4', jira_email: 'user4@example.com', gitlab_id: user_4.id },
-        { jira_account_id: '456', jira_display_name: 'username5foo', jira_email: 'user5@example.com', gitlab_id: nil },
-        { jira_account_id: '789', jira_display_name: 'user6', jira_email: 'user6@example.com', gitlab_id: nil },
-        { jira_account_id: 'xyz', jira_display_name: 'username7', jira_email: 'user7@example.com', gitlab_id: nil },
-        { jira_account_id: 'vhk', jira_display_name: 'user8', jira_email: 'user8_email@example.com', gitlab_id: user_8.id },
-        { jira_account_id: 'uji', jira_display_name: 'user9', jira_email: 'uji@example.com', gitlab_id: user_1.id }
+        { jira_account_id: '123', jira_display_name: 'user-4', jira_email: 'user-4@example.com', gitlab_id: user_4.id },
+        { jira_account_id: '456', jira_display_name: 'username5foo', jira_email: 'user-5@example.com', gitlab_id: nil },
+        { jira_account_id: '789', jira_display_name: 'user-6', jira_email: 'user-6@example.com', gitlab_id: nil },
+        { jira_account_id: 'xyz', jira_display_name: 'username-7', jira_email: 'user-7@example.com', gitlab_id: nil },
+        { jira_account_id: 'vhk', jira_display_name: 'user-8', jira_email: 'user8_email@example.com', gitlab_id: user_8.id },
+        { jira_account_id: 'uji', jira_display_name: 'user-9', jira_email: 'uji@example.com', gitlab_id: user_1.id }
       ]
     end
 

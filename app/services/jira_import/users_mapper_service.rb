@@ -53,33 +53,31 @@ module JiraImport
 
     def matched_users
       strong_memoize(:matched_users) do
-        pairs_to_match = jira_users.map do |user|
-          "('#{jira_user_name(user)&.downcase}', '#{user['emailAddress']&.downcase}')"
-        end.join(',')
+        jira_emails = jira_users.map { |u| u['emailAddress']&.downcase }.compact
+        jira_names = jira_users.map { |u| jira_user_name(u)&.downcase }.compact
 
-        User.by_emails_or_names(pairs_to_match)
+        relations = []
+        relations << User.by_username(jira_names).select("users.id, users.name, users.username, users.email as user_email")
+        relations << User.by_name(jira_names).select("users.id, users.name, users.username, users.email as user_email")
+        relations << User.by_user_email(jira_emails).select("users.id, users.name, users.username, users.email as user_email")
+        relations << User.by_emails(jira_emails).select("users.id, users.name, users.username, emails.email as user_email")
+
+        User.from_union(relations).id_in(project_member_ids).select("users.id as user_id, users.name as name, users.username as username, user_email")
       end
     end
 
     def find_gitlab_id(jira_user)
       user = matched_users.find do |matched_user|
-        matched_user['jira_email'] == jira_user['emailAddress']&.downcase ||
-          matched_user['jira_name'].downcase == jira_user_name(jira_user)&.downcase
+        matched_user.user_email&.downcase == jira_user['emailAddress']&.downcase ||
+          matched_user.name&.downcase == jira_user_name(jira_user)&.downcase ||
+          matched_user.username&.downcase == jira_user_name(jira_user)&.downcase
       end
 
-      return unless user
-
-      user_id = user['user_id']
-
-      return unless project_member_ids.include?(user_id)
-
-      user_id
+      user&.user_id
     end
 
     def project_member_ids
-      # rubocop: disable CodeReuse/ActiveRecord
-      @project_member_ids ||= MembersFinder.new(project, current_user).execute.pluck(:user_id)
-      # rubocop: enable CodeReuse/ActiveRecord
+      @project_member_ids ||= MembersFinder.new(project, current_user).execute.select(:user_id)
     end
   end
 end
