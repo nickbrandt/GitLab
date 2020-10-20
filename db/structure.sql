@@ -21536,8 +21536,6 @@ CREATE UNIQUE INDEX index_services_on_type_and_template_partial ON services USIN
 
 CREATE INDEX index_services_on_type_id_when_active_and_project_id_not_null ON services USING btree (type, id) WHERE ((active = true) AND (project_id IS NOT NULL));
 
-CREATE INDEX index_services_on_type_id_when_active_not_instance_not_template ON services USING btree (type, id) WHERE ((active = true) AND (instance = false) AND (template = false));
-
 CREATE UNIQUE INDEX index_services_on_unique_group_id_and_type ON services USING btree (group_id, type);
 
 CREATE UNIQUE INDEX index_shards_on_name ON shards USING btree (name);
