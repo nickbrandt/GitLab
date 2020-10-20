@@ -1,5 +1,4 @@
 <script>
-import { GlTooltipDirective } from '@gitlab/ui';
 import { mapGetters, mapActions } from 'vuex';
 import Sortable from 'sortablejs';
 import BoardListHeader from 'ee_else_ce/boards/components/board_list_header.vue';
@@ -17,9 +16,6 @@ export default {
     BoardPromotionState: EmptyComponent,
     BoardListHeader,
     BoardList: gon.features?.graphqlBoardLists ? BoardListNew : BoardList,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
   },
   mixins: [glFeatureFlagMixin()],
   props: {
