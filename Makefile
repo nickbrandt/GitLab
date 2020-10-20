@@ -116,7 +116,7 @@ testdata/scratch:
 	mkdir -p testdata/scratch
 
 .PHONY: verify
-verify: lint vet detect-context detect-assert check-formatting staticcheck
+verify: lint vet detect-context detect-assert check-formatting staticcheck deps-check
 
 .PHONY: lint
 lint: $(TARGET_SETUP)
@@ -164,3 +164,14 @@ fmt: $(TARGET_SETUP) install-goimports
 install-goimports:	$(TARGET_SETUP)
 	$(call message,$@)
 	go install golang.org/x/tools/cmd/goimports
+
+.PHONY: deps-check
+deps-check:
+	go mod tidy
+	@if git diff --quiet --exit-code -- go.mod go.sum; then \
+		echo "go.mod and go.sum are ok"; \
+	else \
+		echo ""; \
+		echo "go.mod and go.sum are modified, please commit them";\
+		exit 1; \
+	fi;
