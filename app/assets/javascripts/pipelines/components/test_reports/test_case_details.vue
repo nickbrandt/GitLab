@@ -53,9 +53,13 @@ export default {
       </div>
     </div>
 
-    <div v-if="testCase.system_output" class="gl-display-flex gl-flex-wrap gl-mx-n4 gl-my-3">
+    <div
+      v-if="testCase.system_output"
+      class="gl-display-flex gl-flex-wrap gl-mx-n4 gl-my-3"
+      data-testid="test-case-trace"
+    >
       <strong class="gl-text-right col-sm-3">{{ $options.text.trace }}</strong>
-      <div class="col-sm-9" data-testid="test-case-trace">
+      <div class="col-sm-9">
         <code-block :code="testCase.system_output" />
       </div>
     </div>

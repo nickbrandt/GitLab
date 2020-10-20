@@ -60,7 +60,7 @@ describe('Test case details', () => {
     it('renders the test case system output', () => {
       createComponent();
 
-      expect(findSystemOutput().text()).toBe(defaultTestCase.system_output);
+      expect(findSystemOutput().text()).toContain(defaultTestCase.system_output);
     });
   });
 
