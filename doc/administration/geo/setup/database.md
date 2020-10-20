@@ -477,30 +477,30 @@ information, see [High Availability with Omnibus GitLab](../../postgresql/replic
 ## Patroni support
 
 NOTE: **Note:**
-Starting with GitLab 13.5, Patroni is available for **experimental** use for Geo primary and secondary
+Starting with GitLab 13.5, Patroni is available for **experimental** use with Geo primary and secondary
 nodes. Due to its experimental nature, Patroni support is subject to change without notice.
 
-Patroni support is intended to replace `repmgr` as [High Availability solution](../../postgresql/replication_and_failover.md) 
-on primary node, and can also be used for HA on a secondary node.
+Patroni support is intended to replace `repmgr` as a [High Availability PostgreSQL solution](../../postgresql/replication_and_failover.md) 
+on the primary node, and can also be used for PostgreSQL HA on a secondary node.
 
-In current experimental implementation there are the following limitations:
+In the current experimental implementation there are the following limitations:
 
-- Whenever a new Leader is elected, PgBouncer instance needs to be reconfigured to point to the new Leader
+- Whenever a new Leader is elected, the PgBouncer instance needs to be reconfigured to point to the new Leader.
 - Whenever a new Leader is elected on the primary node, the Standby Leader on the secondary needs to be reconfigured
-  to point to the new Leader
-- Whenever `gitlab-ctl reconfigure` runs on a patroni Leader instance, there is a chance the node will be demoted its leadership 
+  to point to the new Leader.
+- Whenever `gitlab-ctl reconfigure` runs on a Patroni Leader instance, there is a chance the node will be demoted 
   due to the short-time restart required. To avoid this you can pause auto-failover: `gitlab-ctl patroni pause` (after a reconfigure it automatically unpauses).
   
-In order to setup Patroni in the primary node, you can follow the information provided in 
+In order to setup Patroni on the primary node, you can follow the information provided in the 
 [High Availability with Omnibus GitLab](../../postgresql/replication_and_failover.md#patroni) page.
 
-A production ready and secure setup will require at least 3 patroni instances in primary and similar configuration on
-secondary nodes, use password credentials and other database best-practices. 
+A production ready and secure setup will require at least 3 Patroni instances on the primary and a similar configuration on
+secondary nodes. Use password credentials and other database best-practices. 
 
 Similar to `repmgr`, using Patroni on a secondary node is optional. 
 
-To setup a Secondary node database-replication you need to configure a **permanent replication slot** on Patroni's 
-cluster on the Primary node and ensure password authentication is used.
+To setup database replication with Patroni on a Secondary node you need to configure a **permanent replication slot**
+on the Primary node's Patroni cluster and ensure password authentication is used.
 
 On Patroni instances on the primary node:
 
