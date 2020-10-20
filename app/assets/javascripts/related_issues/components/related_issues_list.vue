@@ -1,14 +1,11 @@
 <script>
-import { GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import Sortable from 'sortablejs';
 import sortableConfig from 'ee_else_ce/sortable/sortable_config';
 import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
 
 export default {
   name: 'RelatedIssuesList',
-  directives: {
-    GlTooltip: GlTooltipDirective,
-  },
   components: {
     GlLoadingIcon,
     RelatedIssuableItem,
