@@ -4,6 +4,8 @@
 
 Instance Statistics gives you an overview of how much data your instance contains, and how quickly this volume is changing over time.
 
+To see Instance Statistics, go to **Admin Area > Analytics > Instance Statistics**.
+
 ## Total counts
 
 At the top of the page, Instance Statistics shows total counts for:
