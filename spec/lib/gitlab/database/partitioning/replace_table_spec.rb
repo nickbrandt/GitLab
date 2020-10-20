@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe Gitlab::Database::Partitioning::ReplaceTable, '#perform' do
   include TableSchemaHelpers
 
-  subject { described_class.new(original_table, replacement_table, archived_table, 'id') }
+  subject(:replace_table) { described_class.new(original_table, replacement_table, archived_table, 'id').perform }
 
   let(:original_table) { '_test_original_table' }
   let(:replacement_table) { '_test_replacement_table' }
@@ -36,16 +36,8 @@ RSpec.describe Gitlab::Database::Partitioning::ReplaceTable, '#perform' do
     SQL
   end
 
-  it 'archives the old table and puts the replacement in its place' do
-    expect(table_type(original_table)).to eq('normal')
-    expect(table_type(replacement_table)).to eq('partitioned')
-    expect(table_type(archived_table)).to be_nil
-
-    subject.perform
-
-    expect(table_type(original_table)).to eq('partitioned')
-    expect(table_type(archived_table)).to eq('normal')
-    expect(table_type(replacement_table)).to be_nil
+  it 'replaces the current table, archiving the old' do
+    expect_table_to_be_replaced { replace_table }
   end
 
   it 'transfers the primary key sequence to the replacement table' do
@@ -55,7 +47,7 @@ RSpec.describe Gitlab::Database::Partitioning::ReplaceTable, '#perform' do
     expect(sequence_owned_by(replacement_table, 'id')).to be_nil
     expect(default_expression_for(replacement_table, 'id')).to be_nil
 
-    subject.perform
+    expect_table_to_be_replaced { replace_table }
 
     expect(sequence_owned_by(original_table, 'id')).to eq(original_sequence)
     expect(default_expression_for(original_table, 'id')).to eq("nextval('#{original_sequence}'::regclass)")
@@ -67,13 +59,20 @@ RSpec.describe Gitlab::Database::Partitioning::ReplaceTable, '#perform' do
     expect(primary_key_constraint_name(original_table)).to eq(original_primary_key)
     expect(primary_key_constraint_name(replacement_table)).to eq(replacement_primary_key)
 
-    subject.perform
+    expect_table_to_be_replaced { replace_table }
 
     expect(primary_key_constraint_name(original_table)).to eq(original_primary_key)
     expect(primary_key_constraint_name(archived_table)).to eq(archived_primary_key)
   end
 
-  def connection
-    ActiveRecord::Base.connection
+  def expect_table_to_be_replaced
+    original_id = table_oid(original_table)
+    replacement_id = table_oid(replacement_table)
+
+    yield
+
+    expect(table_oid(original_table)).to eq(replacement_id)
+    expect(table_oid(archived_table)).to eq(original_id)
+    expect(table_oid(replacement_table)).to be_nil
   end
 end

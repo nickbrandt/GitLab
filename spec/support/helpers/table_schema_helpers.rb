@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 
 module TableSchemaHelpers
+  def connection
+    ActiveRecord::Base.connection
+  end
+
+  def table_oid(name)
+    connection.select_value(<<~SQL)
+      SELECT oid
+      FROM pg_catalog.pg_class
+      WHERE relname = '#{name}'
+    SQL
+  end
+
   def table_type(name)
     connection.select_value(<<~SQL)
       SELECT
