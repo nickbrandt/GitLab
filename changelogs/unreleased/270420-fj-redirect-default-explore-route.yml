@@ -1,0 +1,5 @@
+---
+title: Make /explore redirects to /explore/projects
+merge_request: 45682
+author:
+type: changed
