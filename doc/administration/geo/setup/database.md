@@ -476,31 +476,38 @@ information, see [High Availability with Omnibus GitLab](../../postgresql/replic
 
 ## Patroni support
 
-NOTE: **Note:**
-Starting with GitLab 13.5, Patroni is available for **experimental** use with Geo primary and secondary
-nodes. Due to its experimental nature, Patroni support is subject to change without notice.
+Support for Patroni is intended to replace `repmgr` as a
+[highly availabile PostgreSQL solution](../../postgresql/replication_and_failover.md) 
+on the primary node, but it can also be used for PostgreSQL HA on a secondary
+node.
 
-Patroni support is intended to replace `repmgr` as a [High Availability PostgreSQL solution](../../postgresql/replication_and_failover.md) 
-on the primary node, and can also be used for PostgreSQL HA on a secondary node.
+Starting with GitLab 13.5, Patroni is available for _experimental_ use with Geo
+primary and secondary nodes. Due to its experimental nature, Patroni support is
+subject to change without notice.
 
-In the current experimental implementation there are the following limitations:
+This experimental implementation has the following limitations:
 
-- Whenever a new Leader is elected, the PgBouncer instance needs to be reconfigured to point to the new Leader.
-- Whenever a new Leader is elected on the primary node, the Standby Leader on the secondary needs to be reconfigured
+- Whenever a new Leader is elected, the PgBouncer instance must be reconfigured
   to point to the new Leader.
-- Whenever `gitlab-ctl reconfigure` runs on a Patroni Leader instance, there is a chance the node will be demoted 
-  due to the short-time restart required. To avoid this you can pause auto-failover: `gitlab-ctl patroni pause` (after a reconfigure it automatically unpauses).
-  
-In order to setup Patroni on the primary node, you can follow the information provided in the 
-[High Availability with Omnibus GitLab](../../postgresql/replication_and_failover.md#patroni) page.
+- Whenever a new Leader is elected on the primary node, the Standby Leader on
+  the secondary needs to be reconfigured to point to the new Leader.
+- Whenever `gitlab-ctl reconfigure` runs on a Patroni Leader instance, there's a
+  chance the node will be demoted due to the required short-time restart. To
+  avoid this, you can pause auto-failover by running `gitlab-ctl patroni pause`.
+  After a reconfigure, it unpauses on its own.
 
-A production ready and secure setup will require at least 3 Patroni instances on the primary and a similar configuration on
-secondary nodes. Use password credentials and other database best-practices. 
+For instructions about how to set up Patroni on the primary node, see the 
+[PostgreSQL replication and failover with Omnibus GitLab](../../postgresql/replication_and_failover.md#patroni) page.
+
+A production-ready and secure setup requires at least three Patroni instances on
+the primary, and a similar configuration on the secondary nodes. Be sure to use
+password credentials and other database best practices.
 
 Similar to `repmgr`, using Patroni on a secondary node is optional. 
 
-To setup database replication with Patroni on a Secondary node you need to configure a **permanent replication slot**
-on the Primary node's Patroni cluster and ensure password authentication is used.
+To set up database replication with Patroni on a secondary node, configure a
+_permanent replication slot_ on the primary node's Patroni cluster, and ensure
+password authentication is used.
 
 On Patroni instances on the primary node:
 
@@ -516,7 +523,7 @@ patroni['replication_slots'] = {
 postgresql['md5_auth_cidr_addresses'] = [
   'PATRONI_PRIMARY1_IP/32', 'PATRONI_PRIMARY2_IP/32', 'PATRONI_PRIMARY3_IP/32', 'PATRONI_PRIMARY_PGBOUNCER/32',
   'PATRONI_SECONDARY1_IP/32', 'PATRONI_SECONDARY2_IP/32', 'PATRONI_SECONDARY3_IP/32' # we list all secondary instances as they can all become a Standby Leader
-  # any other instance that needs access to the database as per HA documentation 
+  # any other instance that needs access to the database as per documentation 
 ]
 
 postgresql['pgbouncer_user_password'] = 'PGBOUNCER_PASSWORD_HASH'
@@ -529,7 +536,7 @@ On Patroni instances on a secondary node:
 ```ruby
 postgresql['md5_auth_cidr_addresses'] = [
   'PATRONI_SECONDARY1_IP/32', 'PATRONI_SECONDARY2_IP/32', 'PATRONI_SECONDARY3_IP/32', 'PATRONI_SECONDARY_PGBOUNCER/32',
-  # any other instance that needs access to the database as per HA documentation 
+  # any other instance that needs access to the database as per documentation 
 ]
 
 patroni['enable'] = true
