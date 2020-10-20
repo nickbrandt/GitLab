@@ -26,8 +26,7 @@ export default {
   methods: {
     createFile(target, file) {
       const { name } = file;
-      const encodedContent = target.result.split('base64,')[1];
-      const rawContent = encodedContent ? atob(encodedContent) : '';
+      const rawContent = target.result || '';
       const isText = isTextFile({ content: rawContent, mimeType: file.type, name });
 
       const emitCreateEvent = content =>
@@ -51,7 +50,7 @@ export default {
       const reader = new FileReader();
 
       reader.addEventListener('load', e => this.createFile(e.target, file), { once: true });
-      reader.readAsDataURL(file);
+      reader.readAsBinaryString(file);
     },
     openFile() {
       Array.from(this.$refs.fileUpload.files).forEach(file => this.readFile(file));

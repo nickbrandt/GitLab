@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { languages } from 'monaco-editor';
 import { flatten, isString } from 'lodash';
 import { SIDE_LEFT, SIDE_RIGHT } from './constants';
@@ -43,7 +44,9 @@ const KNOWN_TYPES = [
   },
 ];
 
-export function isTextFile({ name, raw, content, mimeType = '' }) {
+export function isTextFile({ name, raw, content, mimeType = '', binary = false }) {
+  if (binary) return false;
+
   const knownType = KNOWN_TYPES.find(type => type.isMatch(mimeType, name));
   if (knownType) return knownType.isText;
 
@@ -134,6 +137,12 @@ export function readFileAsDataURL(file) {
     reader.addEventListener('load', e => resolve(e.target.result), { once: true });
     reader.readAsDataURL(file);
   });
+}
+
+export function blobUrlToDataUrl(url) {
+  return axios({ method: 'get', url, responseType: 'blob' }).then(response =>
+    readFileAsDataURL(response.data),
+  );
 }
 
 export function getFileEOL(content = '') {

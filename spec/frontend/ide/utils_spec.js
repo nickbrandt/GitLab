@@ -11,6 +11,7 @@ import {
   readFileAsDataURL,
   addNumericSuffix,
 } from '~/ide/utils';
+import { file } from './helpers';
 
 describe('WebIDE utils', () => {
   describe('isTextFile', () => {
@@ -86,6 +87,11 @@ describe('WebIDE utils', () => {
       expect(isTextFile({ name: 'abc.dat' })).toBe(false);
       expect(isTextFile({ name: 'abc.dat', content: '' })).toBe(true);
       expect(isTextFile({ name: 'abc.dat', content: '  ' })).toBe(true);
+    });
+
+    it('returns false if the file is explicity marked as binary', () => {
+      const f = { ...file(), binary: true };
+      expect(isTextFile(f)).toBe(false);
     });
   });
 
@@ -285,9 +291,9 @@ describe('WebIDE utils', () => {
 
   describe('readFileAsDataURL', () => {
     it('reads a file and returns its output as a data url', () => {
-      const file = new File(['foo'], 'foo.png', { type: 'image/png' });
+      const f = new File(['foo'], 'foo.png', { type: 'image/png' });
 
-      return readFileAsDataURL(file).then(contents => {
+      return readFileAsDataURL(f).then(contents => {
         expect(contents).toBe('data:image/png;base64,Zm9v');
       });
     });

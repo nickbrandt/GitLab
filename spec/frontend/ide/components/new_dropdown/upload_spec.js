@@ -40,26 +40,26 @@ describe('new dropdown upload', () => {
 
   describe('readFile', () => {
     beforeEach(() => {
-      jest.spyOn(FileReader.prototype, 'readAsDataURL').mockImplementation(() => {});
+      jest.spyOn(FileReader.prototype, 'readAsBinaryString').mockImplementation(() => {});
     });
 
-    it('calls readAsDataURL for all files', () => {
+    it('calls readAsBinaryString for all files', () => {
       const file = {
         type: 'images/png',
       };
 
       vm.readFile(file);
 
-      expect(FileReader.prototype.readAsDataURL).toHaveBeenCalledWith(file);
+      expect(FileReader.prototype.readAsBinaryString).toHaveBeenCalledWith(file);
     });
   });
 
   describe('createFile', () => {
     const textTarget = {
-      result: 'base64,cGxhaW4gdGV4dA==',
+      result: 'plain text',
     };
     const binaryTarget = {
-      result: 'base64,8PDw8A==', // ðððð
+      result: '😺',
     };
 
     const textFile = new File(['plain text'], 'textFile');
@@ -97,7 +97,7 @@ describe('new dropdown upload', () => {
       expect(vm.$emit).toHaveBeenCalledWith('create', {
         name: binaryFile.name,
         type: 'blob',
-        content: 'ðððð',
+        content: '😺',
         rawPath: 'blob:https://gitlab.com/048c7ac1-98de-4a37-ab1b-0206d0ea7e1b',
       });
     });
