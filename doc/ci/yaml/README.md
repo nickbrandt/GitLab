@@ -2381,6 +2381,9 @@ You can use [protected branches](../../user/project/protected_branches.md) to mo
 In [GitLab 13.5](https://gitlab.com/gitlab-org/gitlab/-/issues/201938) and later, you
 can use `when:manual` in the same job as [`trigger`](#trigger). In GitLab 13.4 and
 earlier, using them together causes the error `jobs:#{job-name} when should be on_success, on_failure or always`.
+It is deployed behind the `:ci_manual_bridges` [feature flag](../../user/feature_flags.md), which is **enabled by default**.
+[GitLab administrators with access to the Rails console](../../administration/feature_flags.md)
+can opt to disable it.
 
 ##### Protecting manual jobs **(PREMIUM)**
 
@@ -2610,7 +2613,7 @@ The `stop_review_app` job is **required** to have the following keywords defined
 - `environment:action`
 
 Additionally, both jobs should have matching [`rules`](../yaml/README.md#onlyexcept-basic)
-or [`only/except`](../yaml/README.md#onlyexcept-basic) configuration. 
+or [`only/except`](../yaml/README.md#onlyexcept-basic) configuration.
 
 In the example above, if the configuration is not identical:
 
@@ -3636,6 +3639,9 @@ hover over the downstream pipeline job.
 In [GitLab 13.5](https://gitlab.com/gitlab-org/gitlab/-/issues/201938) and later, you
 can use [`when:manual`](#whenmanual) in the same job as `trigger`. In GitLab 13.4 and
 earlier, using them together causes the error `jobs:#{job-name} when should be on_success, on_failure or always`.
+It is deployed behind the `:ci_manual_bridges` [feature flag](../../user/feature_flags.md), which is **enabled by default**.
+[GitLab administrators with access to the Rails console](../../administration/feature_flags.md)
+can opt to disable it.
 
 #### Simple `trigger` syntax for multi-project pipelines
 
@@ -4403,7 +4409,7 @@ You can use the `$CI_COMMIT_REF_SLUG` variable to specify your [`cache:key`](#ca
 For example, if your `$CI_COMMIT_REF_SLUG` is `test` you can set a job
 to download cache that's tagged with `test`.
 
-If a cache with this tag is not found, you can use `CACHE_FALLBACK_KEY` to 
+If a cache with this tag is not found, you can use `CACHE_FALLBACK_KEY` to
 specify a cache to use when none exists.
 
 For example:
