@@ -81,9 +81,13 @@ func main() {
 		os.Exit(0)
 	}
 
+	log.WithError(run()).Fatal("shutting down")
+}
+
+func run() error {
 	closer, err := startLogging(logConfig)
 	if err != nil {
-		log.WithError(err).Fatal("Unable to configure logger")
+		return err
 	}
 	defer closer.Close()
 
@@ -91,12 +95,12 @@ func main() {
 
 	backendURL, err := parseAuthBackend(*authBackend)
 	if err != nil {
-		log.WithError(err).Fatal("Invalid authBackend")
+		return fmt.Errorf("authBackend: %v", err)
 	}
 
 	cableBackendURL, err := parseAuthBackend(*cableBackend)
 	if err != nil {
-		log.WithError(err).Fatal("Invalid cableBackend")
+		return fmt.Errorf("cableBackend: %v", err)
 	}
 
 	log.WithField("version", Version).WithField("build_time", BuildTime).Print("Starting")
@@ -104,7 +108,7 @@ func main() {
 	// Good housekeeping for Unix sockets: unlink before binding
 	if *listenNetwork == "unix" {
 		if err := os.Remove(*listenAddr); err != nil && !os.IsNotExist(err) {
-			log.WithError(err).Fatal("Failed to remove socket")
+			return err
 		}
 	}
 
@@ -113,32 +117,38 @@ func main() {
 	listener, err := net.Listen(*listenNetwork, *listenAddr)
 	syscall.Umask(oldUmask)
 	if err != nil {
-		log.WithError(err).Fatal("Failed to listen")
+		return fmt.Errorf("main listener: %v", err)
 	}
+
+	finalErrors := make(chan error)
 
 	// The profiler will only be activated by HTTP requests. HTTP
 	// requests can only reach the profiler if we start a listener. So by
 	// having no profiler HTTP listener by default, the profiler is
 	// effectively disabled by default.
 	if *pprofListenAddr != "" {
-		go func() {
-			err := http.ListenAndServe(*pprofListenAddr, nil)
-			if err != nil {
-				log.WithError(err).Error("Failed to start pprof listener")
-			}
-		}()
+		l, err := net.Listen("tcp", *pprofListenAddr)
+		if err != nil {
+			return fmt.Errorf("pprofListenAddr: %v", err)
+		}
+
+		go func() { finalErrors <- http.Serve(l, nil) }()
 	}
 
 	monitoringOpts := []monitoring.Option{monitoring.WithBuildInformation(Version, BuildTime)}
 
 	if *prometheusListenAddr != "" {
-		monitoringOpts = append(monitoringOpts, monitoring.WithListenerAddress(*prometheusListenAddr))
-	}
-
-	go func() {
-		err := monitoring.Start(monitoringOpts...)
+		l, err := net.Listen("tcp", *prometheusListenAddr)
 		if err != nil {
-			log.WithError(err).Error("Failed to start monitoring")
+			return fmt.Errorf("prometheusListenAddr: %v", err)
+		}
+		monitoringOpts = append(monitoringOpts, monitoring.WithListener(l))
+	}
+	go func() {
+		// Unlike http.Serve, which always returns a non-nil error,
+		// monitoring.Start may return nil in which case we should not shut down.
+		if err := monitoring.Start(monitoringOpts...); err != nil {
+			finalErrors <- err
 		}
 	}()
 
@@ -163,7 +173,7 @@ func main() {
 	if *configFile != "" {
 		cfgFromFile, err := config.LoadConfig(*configFile)
 		if err != nil {
-			log.WithField("configFile", *configFile).WithError(err).Fatal("Can not load config file")
+			return fmt.Errorf("configFile: %v", err)
 		}
 
 		cfg.Redis = cfgFromFile.Redis
@@ -177,22 +187,19 @@ func main() {
 
 		err = cfg.RegisterGoCloudURLOpeners()
 		if err != nil {
-			log.WithError(err).Fatal("could not load cloud credentials")
+			return fmt.Errorf("register cloud credentials: %v", err)
 		}
 	}
 
 	accessLogger, accessCloser, err := getAccessLogger(logConfig)
 	if err != nil {
-		log.WithError(err).Fatal("Unable to configure access logger")
+		return fmt.Errorf("configure access logger: %v", err)
 	}
-	if accessCloser != nil {
-		defer accessCloser.Close()
-	}
+	defer accessCloser.Close()
 
 	up := wrapRaven(upstream.NewUpstream(cfg, accessLogger))
 
-	err = http.Serve(listener, up)
-	if err != nil {
-		log.WithError(err).Fatal("Unable to serve")
-	}
+	go func() { finalErrors <- http.Serve(listener, up) }()
+
+	return <-finalErrors
 }

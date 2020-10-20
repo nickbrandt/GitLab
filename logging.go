@@ -59,7 +59,7 @@ func startLogging(config logConfiguration) (io.Closer, error) {
 // In text format, we use a separate logger for access logs
 func getAccessLogger(config logConfiguration) (*log.Logger, io.Closer, error) {
 	if config.logFormat != "text" {
-		return log.StandardLogger(), nil, nil
+		return log.StandardLogger(), ioutil.NopCloser(nil), nil
 	}
 
 	logFile := config.logFile
