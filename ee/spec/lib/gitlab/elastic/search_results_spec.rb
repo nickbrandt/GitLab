@@ -63,12 +63,13 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
 
   describe 'parse_search_result' do
     let(:project) { double(:project) }
+    let(:path) { 'path/file.ext' }
     let(:blob) do
       {
         'blob' => {
           'commit_sha' => 'sha',
           'content' => "foo\nbar\nbaz\n",
-          'path' => 'path/file.ext'
+          'path' => path
         }
       }
     end
@@ -104,6 +105,21 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         project: project,
         data: "bar\n"
       )
+    end
+
+    context 'file path in the blob contains potential backtracking regex attack pattern' do
+      let(:path) { '/group/project/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab.(a+)+$' }
+
+      it 'still parses the basename from the path with reasonable amount of time' do
+        Timeout.timeout(3.seconds) do
+          parsed = described_class.parse_search_result({ '_source' => blob }, project)
+
+          expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
+          expect(parsed).to have_attributes(
+            basename: '/group/project/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab'
+          )
+        end
+      end
     end
   end
 
