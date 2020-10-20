@@ -1,0 +1,5 @@
+---
+title: Restructure error handling in main()
+merge_request: 633
+author:
+type: fixed
