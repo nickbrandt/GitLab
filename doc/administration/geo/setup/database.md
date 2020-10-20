@@ -509,7 +509,7 @@ To set up database replication with Patroni on a secondary node, configure a
 _permanent replication slot_ on the primary node's Patroni cluster, and ensure
 password authentication is used.
 
-On Patroni instances on the primary node:
+In `/etc/gitlab/gitlab.rb` on Patroni instances on the primary node:
 
 ```ruby
 # You need one entry for each secondary, with a unique name following PostgreSQL slot_name constraints:
