@@ -287,5 +287,20 @@ RSpec.describe Gitlab::ErrorTracking do
         expect(sentry_event.dig('extra', 'sidekiq', 'args')).to eq(['[FILTERED]', 1, 2])
       end
     end
+
+    context 'when the error is kind of an `ActiveRecord::StatementInvalid`' do
+      let(:exception) { ActiveRecord::StatementInvalid.new(sql: :foo) }
+
+      before do
+        allow(Raven).to receive(:capture_exception)
+      end
+
+      it 'injects the sql query into extra' do
+        described_class.track_exception(exception)
+
+        expect(Raven).to have_received(:capture_exception)
+          .with(exception, a_hash_including(extra: a_hash_including(sql: :foo)))
+      end
+    end
   end
 end
