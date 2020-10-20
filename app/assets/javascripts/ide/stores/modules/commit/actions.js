@@ -6,9 +6,9 @@ import service from '../../../services';
 import * as types from './mutation_types';
 import consts from './constants';
 import { leftSidebarViews } from '../../../constants';
-import eventHub from '../../../eventhub';
 import { parseCommitError } from '../../../lib/errors';
 import { addNumericSuffix } from '~/ide/utils';
+import ModelManager from '../../../lib/common/model_manager';
 
 export const updateCommitMessage = ({ commit }, message) => {
   commit(types.UPDATE_COMMIT_MESSAGE, message);
@@ -101,7 +101,7 @@ export const updateFilesAfterCommit = ({ commit, dispatch, rootState, rootGetter
 
     dispatch('updateTempFlagForEntry', { file, tempFile: false }, { root: true });
 
-    eventHub.$emit(`editor.update.model.content.${file.key}`, {
+    ModelManager.updateContent(file.id, {
       content: file.content,
       changed: Boolean(changedFile),
     });
@@ -113,26 +113,21 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
   // During some of the pre and post commit processing
   const { shouldCreateMR, shouldHideNewMrOption, isCreatingNewBranch, branchName } = getters;
   const newBranch = state.commitAction !== consts.COMMIT_TO_CURRENT_BRANCH;
-  const stageFilesPromise = rootState.stagedFiles.length
-    ? Promise.resolve()
-    : dispatch('stageAllChanges', null, { root: true });
+
+  const payload = createCommitPayload({
+    branch: branchName,
+    newBranch,
+    getters,
+    state,
+    rootState,
+    rootGetters,
+  });
 
   commit(types.CLEAR_ERROR);
   commit(types.UPDATE_LOADING, true);
 
-  return stageFilesPromise
-    .then(() => {
-      const payload = createCommitPayload({
-        branch: branchName,
-        newBranch,
-        getters,
-        state,
-        rootState,
-        rootGetters,
-      });
-
-      return service.commit(rootState.currentProjectId, payload);
-    })
+  return service
+    .commit(rootState.currentProjectId, payload)
     .catch(e => {
       commit(types.UPDATE_LOADING, false);
       commit(types.SET_ERROR, parseCommitError(e));
@@ -165,7 +160,7 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
         branch: branchName,
       })
         .then(() => {
-          commit(rootTypes.CLEAR_STAGED_CHANGES, null, { root: true });
+          commit(rootTypes.REMOVE_ALL_CHANGES_FILES, null, { root: true });
 
           setTimeout(() => {
             commit(rootTypes.SET_LAST_COMMIT_MSG, '', { root: true });
@@ -186,13 +181,7 @@ export const commitChanges = ({ commit, state, getters, dispatch, rootState, roo
         })
         .then(() => {
           if (rootGetters.lastOpenedFile) {
-            dispatch(
-              'openPendingTab',
-              {
-                file: rootGetters.lastOpenedFile,
-              },
-              { root: true },
-            )
+            dispatch('openFile', rootGetters.lastOpenedFile.path, { root: true })
               .then(changeViewer => {
                 if (changeViewer) {
                   dispatch('updateViewer', 'diff', { root: true });

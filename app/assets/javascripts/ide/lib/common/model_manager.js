@@ -1,11 +1,14 @@
-import eventHub from '../../eventhub';
 import Disposable from './disposable';
 import Model from './model';
 
 export default class ModelManager {
+  static instance;
+
   constructor() {
     this.disposable = new Disposable();
     this.models = new Map();
+
+    ModelManager.instance = this;
   }
 
   hasCachedModel(key) {
@@ -17,31 +20,37 @@ export default class ModelManager {
   }
 
   addModel(file, head = null) {
-    if (this.hasCachedModel(file.key)) {
-      return this.getModel(file.key);
+    if (this.hasCachedModel(file.id)) {
+      return this.getModel(file.id);
     }
 
     const model = new Model(file, head);
     this.models.set(model.path, model);
     this.disposable.add(model);
 
-    eventHub.$on(
-      `editor.update.model.dispose.${file.key}`,
-      this.removeCachedModel.bind(this, file),
-    );
-
     return model;
-  }
-
-  removeCachedModel(file) {
-    this.models.delete(file.key);
-
-    eventHub.$off(`editor.update.model.dispose.${file.key}`, this.removeCachedModel);
   }
 
   dispose() {
     // dispose of all the models
     this.disposable.dispose();
     this.models.clear();
+  }
+
+  static updateContent(id, { content, changed }) {
+    const model = ModelManager.instance.getModel(id);
+    if (model) model.updateContent({ content, changed });
+  }
+
+  static updateNewContent(id, content) {
+    const model = ModelManager.instance.getModel(id);
+    if (model) model.updateNewContent(content);
+  }
+
+  static dispose(id) {
+    const model = ModelManager.instance.getModel(id);
+    if (model) model.dispose();
+
+    ModelManager.instance.models.delete(id);
   }
 }

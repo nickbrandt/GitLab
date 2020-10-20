@@ -8,9 +8,6 @@ import {
 
 export const dataStructure = () => ({
   id: '',
-  // Key will contain a mixture of ID and path
-  // it can also contain a prefix `pending-` for files opened in review mode
-  key: '',
   type: '',
   name: '',
   path: '',
@@ -20,7 +17,6 @@ export const dataStructure = () => ({
   opened: false,
   active: false,
   changed: false,
-  staged: false,
   lastCommitSha: '',
   rawPath: '',
   raw: '',
@@ -91,8 +87,8 @@ export const commitActionForFile = file => {
   return commitActionTypes.update;
 };
 
-export const getCommitFiles = stagedFiles =>
-  stagedFiles.reduce((acc, file) => {
+export const getCommitFiles = files =>
+  files.reduce((acc, file) => {
     if (file.type === 'tree') return acc;
 
     return acc.concat({
@@ -110,7 +106,7 @@ export const createCommitPayload = ({
 }) => ({
   branch,
   commit_message: state.commitMessage || getters.preBuiltCommitMessage,
-  actions: getCommitFiles(rootState.stagedFiles).map(f => {
+  actions: getCommitFiles(rootState.changedFiles).map(f => {
     const isBlob = isBlobUrl(f.rawPath);
     const content = isBlob ? btoa(f.content) : f.content;
 
@@ -182,15 +178,15 @@ export const mergeTrees = (fromTree, toTree) => {
   return toTree;
 };
 
-export const swapInStateArray = (state, arr, key, entryPath) =>
+export const swapInStateArray = (state, arr, id, entryPath) =>
   Object.assign(state, {
-    [arr]: state[arr].map(f => (f.key === key ? state.entries[entryPath] : f)),
+    [arr]: state[arr].map(f => (f.id === id ? state.entries[entryPath] : f)),
   });
 
 export const getEntryOrRoot = (state, path) =>
   path ? state.entries[path] : state.trees[`${state.currentProjectId}/${state.currentBranchId}`];
 
-export const swapInParentTreeWithSorting = (state, oldKey, newPath, parentPath) => {
+export const swapInParentTreeWithSorting = (state, oldId, newPath, parentPath) => {
   if (!newPath) {
     return;
   }
@@ -200,7 +196,7 @@ export const swapInParentTreeWithSorting = (state, oldKey, newPath, parentPath) 
   if (parent) {
     const tree = parent.tree
       // filter out old entry && new entry
-      .filter(({ key, path }) => key !== oldKey && path !== newPath)
+      .filter(({ id, path }) => id !== oldId && path !== newPath)
       // concat new entry
       .concat(state.entries[newPath]);
 
@@ -208,17 +204,17 @@ export const swapInParentTreeWithSorting = (state, oldKey, newPath, parentPath) 
   }
 };
 
-export const removeFromParentTree = (state, oldKey, parentPath) => {
+export const removeFromParentTree = (state, oldId, parentPath) => {
   const parent = getEntryOrRoot(state, parentPath);
 
   if (parent) {
-    parent.tree = sortTree(parent.tree.filter(({ key }) => key !== oldKey));
+    parent.tree = sortTree(parent.tree.filter(({ id }) => id !== oldId));
   }
 };
 
-export const updateFileCollections = (state, key, entryPath) => {
-  ['openFiles', 'changedFiles', 'stagedFiles'].forEach(fileCollection => {
-    swapInStateArray(state, fileCollection, key, entryPath);
+export const updateFileCollections = (state, id, entryPath) => {
+  ['openFiles', 'changedFiles'].forEach(fileCollection => {
+    swapInStateArray(state, fileCollection, id, entryPath);
   });
 };
 

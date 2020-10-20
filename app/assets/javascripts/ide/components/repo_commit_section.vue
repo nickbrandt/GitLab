@@ -3,7 +3,7 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import tooltip from '~/vue_shared/directives/tooltip';
 import CommitFilesList from './commit_sidebar/list.vue';
 import EmptyState from './commit_sidebar/empty_state.vue';
-import { stageKeys } from '../constants';
+import ModelManager from '../lib/common/model_manager';
 
 export default {
   components: {
@@ -14,26 +14,22 @@ export default {
     tooltip,
   },
   computed: {
-    ...mapState(['changedFiles', 'stagedFiles', 'lastCommitMsg']),
+    ...mapState(['openFiles', 'changedFiles', 'lastCommitMsg']),
     ...mapState('commit', ['commitMessage', 'submitCommitLoading']),
     ...mapGetters(['lastOpenedFile', 'someUncommittedChanges', 'activeFile']),
     ...mapGetters('commit', ['discardDraftButtonDisabled']),
-    showStageUnstageArea() {
+    showChangesArea() {
       return Boolean(this.someUncommittedChanges || this.lastCommitMsg);
     },
-    activeFileKey() {
-      return this.activeFile ? this.activeFile.key : null;
-    },
-  },
-  mounted() {
-    this.initialize();
   },
   activated() {
     this.initialize();
   },
   methods: {
-    ...mapActions(['openPendingTab', 'updateViewer', 'updateActivityBarView']),
+    ...mapActions(['openFile', 'updateViewer', 'updateActivityBarView']),
     initialize() {
+      this.openFiles.forEach(f => ModelManager.dispose(f.id));
+
       const file =
         this.lastOpenedFile && this.lastOpenedFile.type !== 'tree'
           ? this.lastOpenedFile
@@ -41,31 +37,21 @@ export default {
 
       if (!file) return;
 
-      this.openPendingTab({
-        file,
-        keyPrefix: file.staged ? stageKeys.staged : stageKeys.unstaged,
-      })
-        .then(changeViewer => {
-          if (changeViewer) {
-            this.updateViewer('diff');
-          }
-        })
+      this.openFile(file.path)
+        .then(() => this.updateViewer('diff'))
         .catch(e => {
           throw e;
         });
     },
   },
-  stageKeys,
 };
 </script>
 
 <template>
   <div class="multi-file-commit-panel-section">
-    <template v-if="showStageUnstageArea">
+    <template v-if="showChangesArea">
       <commit-files-list
-        :key-prefix="$options.stageKeys.staged"
-        :file-list="stagedFiles"
-        :active-file-key="activeFileKey"
+        :file-list="changedFiles"
         :empty-state-text="__('There are no changes')"
         class="is-first"
         icon-name="unstaged"

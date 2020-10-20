@@ -5,9 +5,8 @@ import { visitUrl } from '~/lib/utils/url_utility';
 import { deprecatedCreateFlash as flash } from '~/flash';
 import * as types from './mutation_types';
 import { decorateFiles } from '../lib/files';
-import { stageKeys } from '../constants';
 import service from '../services';
-import eventHub from '../eventhub';
+import ModelManager from '../lib/common/model_manager';
 
 export const redirectToUrl = (self, url) => visitUrl(url);
 
@@ -57,7 +56,7 @@ export const createTempEntry = (
 
   if (type === 'blob') {
     if (openFile) commit(types.TOGGLE_FILE_OPEN, file.path);
-    commit(types.STAGE_CHANGE, { path: file.path, diffInfo: getters.getDiffInfo(file.path) });
+    commit(types.ADD_FILE_TO_CHANGED, file.path);
 
     if (openFile && makeFileActive) dispatch('setFileActive', file.path);
     dispatch('triggerFilesChange');
@@ -92,48 +91,8 @@ export const scrollToTab = () => {
   });
 };
 
-export const stageAllChanges = ({ state, commit, dispatch, getters }) => {
-  const openFile = state.openFiles[0];
-
-  commit(types.SET_LAST_COMMIT_MSG, '');
-
-  state.changedFiles.forEach(file =>
-    commit(types.STAGE_CHANGE, { path: file.path, diffInfo: getters.getDiffInfo(file.path) }),
-  );
-
-  const file = getters.getStagedFile(openFile.path);
-
-  if (file) {
-    dispatch('openPendingTab', {
-      file,
-      keyPrefix: stageKeys.staged,
-    });
-  }
-};
-
-export const unstageAllChanges = ({ state, commit, dispatch, getters }) => {
-  const openFile = state.openFiles[0];
-
-  state.stagedFiles.forEach(file =>
-    commit(types.UNSTAGE_CHANGE, { path: file.path, diffInfo: getters.getDiffInfo(file.path) }),
-  );
-
-  const file = getters.getChangedFile(openFile.path);
-
-  if (file) {
-    dispatch('openPendingTab', {
-      file,
-      keyPrefix: stageKeys.unstaged,
-    });
-  }
-};
-
 export const updateViewer = ({ commit }, viewer) => {
   commit(types.UPDATE_VIEWER, viewer);
-};
-
-export const updateDelayViewerUpdated = ({ commit }, delay) => {
-  commit(types.UPDATE_DELAY_VIEWER_CHANGE, delay);
 };
 
 export const updateActivityBarView = ({ commit }, view) => {
@@ -190,15 +149,8 @@ export const deleteEntry = ({ commit, dispatch, state }, path) => {
 
   commit(types.DELETE_ENTRY, path);
 
-  // Only stage if we're not a directory or a new file
-  if (!isTree && !entry.tempFile) {
-    dispatch('stageChange', path);
-  }
-
   dispatch('triggerFilesChange');
 };
-
-export const resetOpenFiles = ({ commit }) => commit(types.RESET_OPEN_FILES);
 
 export const renameEntry = ({ dispatch, commit, state, getters }, { path, name, parentPath }) => {
   const entry = state.entries[path];
@@ -223,18 +175,16 @@ export const renameEntry = ({ dispatch, commit, state, getters }, { path, name, 
     const newEntry = state.entries[newPath];
     const isRevert = newPath === entry.prevPath;
     const isReset = isRevert && !newEntry.changed && !newEntry.tempFile;
-    const isInChanges = state.changedFiles
-      .concat(state.stagedFiles)
-      .some(({ key }) => key === newEntry.key);
+    const isInChanges = state.changedFiles.some(({ id }) => id === newEntry.id);
 
     if (isReset) {
-      commit(types.REMOVE_FILE_FROM_STAGED_AND_CHANGED, newEntry);
+      commit(types.REMOVE_FILE_FROM_CHANGED, newEntry);
     } else if (!isInChanges) {
-      commit(types.STAGE_CHANGE, { path: newPath, diffInfo: getters.getDiffInfo(newPath) });
+      commit(types.ADD_FILE_TO_CHANGED, newPath);
     }
 
     if (!newEntry.tempFile) {
-      eventHub.$emit(`editor.update.model.dispose.${entry.key}`);
+      ModelManager.dispose(entry.id);
     }
 
     if (newEntry.opened) {

@@ -1,4 +1,3 @@
-import eventHub from '~/ide/eventhub';
 import Model from '~/ide/lib/common/model';
 import { file } from '../../helpers';
 
@@ -6,8 +5,6 @@ describe('Multi-file editor library model', () => {
   let model;
 
   beforeEach(() => {
-    jest.spyOn(eventHub, '$on');
-
     const f = file('path');
     f.mrChange = { diff: 'ABC' };
     f.baseRaw = 'test';
@@ -39,13 +36,6 @@ describe('Multi-file editor library model', () => {
 
     expect(model.head).not.toBeNull();
     expect(model.getOriginalModel().getValue()).toBe('123 testing');
-  });
-
-  it('adds eventHub listener', () => {
-    expect(eventHub.$on).toHaveBeenCalledWith(
-      `editor.update.model.dispose.${model.file.key}`,
-      expect.anything(),
-    );
   });
 
   describe('path', () => {
@@ -111,17 +101,6 @@ describe('Multi-file editor library model', () => {
       model.dispose();
 
       expect(model.events.size).toBe(0);
-    });
-
-    it('removes eventHub listener', () => {
-      jest.spyOn(eventHub, '$off');
-
-      model.dispose();
-
-      expect(eventHub.$off).toHaveBeenCalledWith(
-        `editor.update.model.dispose.${model.file.key}`,
-        expect.anything(),
-      );
     });
 
     it('calls onDispose callback', () => {

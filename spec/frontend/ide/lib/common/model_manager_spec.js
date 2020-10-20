@@ -1,4 +1,3 @@
-import eventHub from '~/ide/eventhub';
 import ModelManager from '~/ide/lib/common/model_manager';
 import { file } from '../../helpers';
 
@@ -43,18 +42,6 @@ describe('Multi-file editor library model manager', () => {
 
       expect(instance.models.get).toHaveBeenCalled();
     });
-
-    it('adds eventHub listener', () => {
-      const f = file();
-      jest.spyOn(eventHub, '$on');
-
-      instance.addModel(f);
-
-      expect(eventHub.$on).toHaveBeenCalledWith(
-        `editor.update.model.dispose.${f.key}`,
-        expect.anything(),
-      );
-    });
   });
 
   describe('hasCachedModel', () => {
@@ -92,17 +79,6 @@ describe('Multi-file editor library model manager', () => {
       instance.removeCachedModel(f);
 
       expect(instance.models.size).toBe(0);
-    });
-
-    it('removes eventHub listener', () => {
-      jest.spyOn(eventHub, '$off');
-
-      instance.removeCachedModel(f);
-
-      expect(eventHub.$off).toHaveBeenCalledWith(
-        `editor.update.model.dispose.${f.key}`,
-        expect.anything(),
-      );
     });
   });
 

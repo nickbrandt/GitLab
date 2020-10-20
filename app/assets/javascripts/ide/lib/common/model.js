@@ -1,6 +1,5 @@
 import { editor as monacoEditor, Uri } from 'monaco-editor';
 import Disposable from './disposable';
-import eventHub from '../../eventhub';
 import { trimTrailingWhitespace, insertFinalNewline } from '../../utils';
 import { defaultModelOptions } from '../editor_options';
 
@@ -35,14 +34,6 @@ export default class Model {
     }
 
     this.events = new Set();
-
-    this.updateContent = this.updateContent.bind(this);
-    this.updateNewContent = this.updateNewContent.bind(this);
-    this.dispose = this.dispose.bind(this);
-
-    eventHub.$on(`editor.update.model.dispose.${this.file.key}`, this.dispose);
-    eventHub.$on(`editor.update.model.content.${this.file.key}`, this.updateContent);
-    eventHub.$on(`editor.update.model.new.content.${this.file.key}`, this.updateNewContent);
   }
 
   get url() {
@@ -54,7 +45,7 @@ export default class Model {
   }
 
   get path() {
-    return this.file.key;
+    return this.file.id;
   }
 
   getModel() {
@@ -125,10 +116,6 @@ export default class Model {
     });
 
     this.events.clear();
-
-    eventHub.$off(`editor.update.model.dispose.${this.file.key}`, this.dispose);
-    eventHub.$off(`editor.update.model.content.${this.file.key}`, this.updateContent);
-    eventHub.$off(`editor.update.model.new.content.${this.file.key}`, this.updateNewContent);
 
     this.disposable.dispose();
   }

@@ -34,27 +34,19 @@ export default {
       return sprintf(__(`Close %{tabname}`, { tabname: this.tab.name }));
     },
     showChangedIcon() {
-      if (this.tab.pending) return true;
-
       return this.fileHasChanged ? !this.tabMouseOver : false;
     },
     fileHasChanged() {
-      return this.tab.changed || this.tab.tempFile || this.tab.staged || this.tab.deleted;
+      return this.tab.changed || this.tab.tempFile || this.tab.deleted;
     },
   },
 
   methods: {
-    ...mapActions(['closeFile', 'updateDelayViewerUpdated', 'openPendingTab']),
+    ...mapActions(['closeFile']),
     clickFile(tab) {
       if (tab.active) return;
 
-      this.updateDelayViewerUpdated(true);
-
-      if (tab.pending) {
-        this.openPendingTab({ file: tab, keyPrefix: tab.staged ? 'staged' : 'unstaged' });
-      } else {
-        this.$router.push(this.getUrlForPath(tab.path));
-      }
+      this.$router.push(this.getUrlForPath(tab.path));
     },
     mouseOverTab() {
       if (this.fileHasChanged) {
@@ -72,10 +64,7 @@ export default {
 
 <template>
   <li
-    :class="{
-      active: tab.active,
-      disabled: tab.pending,
-    }"
+    :class="{ active: tab.active }"
     @click="clickFile(tab)"
     @mouseover="mouseOverTab"
     @mouseout="mouseOutTab"
@@ -87,7 +76,6 @@ export default {
     </div>
     <button
       :aria-label="closeLabel"
-      :disabled="tab.pending"
       type="button"
       class="multi-file-tab-close"
       @click.stop.prevent="closeFile(tab)"

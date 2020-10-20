@@ -38,11 +38,6 @@ export default {
       lastCommitMsg,
     });
   },
-  [types.CLEAR_STAGED_CHANGES](state) {
-    Object.assign(state, {
-      stagedFiles: [],
-    });
-  },
   [types.SET_ENTRIES](state, entries) {
     Object.assign(state, {
       entries,
@@ -131,13 +126,11 @@ export default {
     Object.assign(state.entries[file.path], {
       raw: file.content,
       changed: Boolean(changedFile),
-      staged: false,
       lastCommitSha: lastCommit.commit.id,
 
       prevId: undefined,
       prevPath: undefined,
       prevName: undefined,
-      prevKey: undefined,
       prevParentPath: undefined,
     });
 
@@ -155,9 +148,6 @@ export default {
   },
   [types.CLEAR_PROJECTS](state) {
     Object.assign(state, { projects: {}, trees: {} });
-  },
-  [types.RESET_OPEN_FILES](state) {
-    Object.assign(state, { openFiles: [] });
   },
   [types.SET_ERROR_MESSAGE](state, errorMessage) {
     Object.assign(state, { errorMessage });
@@ -177,12 +167,7 @@ export default {
 
     if (entry.type === 'blob') {
       if (tempFile) {
-        // Since we only support one list of file changes, it's safe to just remove from both
-        // changed and staged. Otherwise, we'd need to somehow evaluate the difference between
-        // changed and HEAD.
-        // https://gitlab.com/gitlab-org/create-stage/-/issues/12669
         state.changedFiles = state.changedFiles.filter(f => f.path !== path);
-        state.stagedFiles = state.stagedFiles.filter(f => f.path !== path);
       } else {
         state.changedFiles = state.changedFiles.concat(entry);
       }
@@ -192,14 +177,12 @@ export default {
     const oldEntry = state.entries[path];
     const newPath = parentPath ? `${parentPath}/${name}` : name;
     const isRevert = newPath === oldEntry.prevPath;
-    const newKey = oldEntry.key.replace(new RegExp(oldEntry.path, 'g'), newPath);
 
     const baseProps = {
       ...oldEntry,
       name,
       id: newPath,
       path: newPath,
-      key: newKey,
       parentPath: parentPath || '',
     };
 
@@ -209,14 +192,12 @@ export default {
             prevId: undefined,
             prevPath: undefined,
             prevName: undefined,
-            prevKey: undefined,
             prevParentPath: undefined,
           }
         : {
             prevId: oldEntry.prevId || oldEntry.id,
             prevPath: oldEntry.prevPath || oldEntry.path,
             prevName: oldEntry.prevName || oldEntry.name,
-            prevKey: oldEntry.prevKey || oldEntry.key,
             prevParentPath: oldEntry.prevParentPath || oldEntry.parentPath,
           };
 
@@ -226,14 +207,14 @@ export default {
     });
 
     if (pathsAreEqual(oldEntry.parentPath, parentPath)) {
-      swapInParentTreeWithSorting(state, oldEntry.key, newPath, parentPath);
+      swapInParentTreeWithSorting(state, oldEntry.id, newPath, parentPath);
     } else {
-      removeFromParentTree(state, oldEntry.key, oldEntry.parentPath);
-      swapInParentTreeWithSorting(state, oldEntry.key, newPath, parentPath);
+      removeFromParentTree(state, oldEntry.id, oldEntry.parentPath);
+      swapInParentTreeWithSorting(state, oldEntry.id, newPath, parentPath);
     }
 
     if (oldEntry.type === 'blob') {
-      updateFileCollections(state, oldEntry.key, newPath);
+      updateFileCollections(state, oldEntry.id, newPath);
     }
 
     Vue.delete(state.entries, oldEntry.path);

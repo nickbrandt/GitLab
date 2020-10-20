@@ -24,15 +24,9 @@ export default {
     ...mapGetters(['getUrlForPath']),
   },
   methods: {
-    ...mapActions(['updateViewer', 'removePendingTab']),
+    ...mapActions(['updateViewer']),
     openFileViewer(viewer) {
       this.updateViewer(viewer);
-
-      if (this.activeFile.pending) {
-        return this.removePendingTab(this.activeFile).then(() => {
-          this.$router.push(this.getUrlForPath(this.activeFile.path));
-        });
-      }
 
       return null;
     },
@@ -43,7 +37,7 @@ export default {
 <template>
   <div class="multi-file-tabs">
     <ul ref="tabsScroller" class="list-unstyled gl-mb-0">
-      <repo-tab v-for="tab in files" :key="tab.key" :tab="tab" />
+      <repo-tab v-for="tab in files" :key="tab.id" :tab="tab" />
     </ul>
   </div>
 </template>

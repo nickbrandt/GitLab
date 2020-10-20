@@ -66,7 +66,7 @@ export default {
         <template v-if="currentTree.tree.length">
           <file-tree
             v-for="file in currentTree.tree"
-            :key="file.key"
+            :key="file.id"
             :file="file"
             :level="0"
             :file-row-component="$options.IdeFileRow"

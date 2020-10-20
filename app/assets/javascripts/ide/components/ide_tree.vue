@@ -17,14 +17,11 @@ export default {
     ...mapState(['currentBranchId']),
     ...mapGetters(['currentProject', 'currentTree', 'activeFile', 'getUrlForPath']),
   },
-  mounted() {
-    this.initialize();
-  },
   activated() {
     this.initialize();
   },
   methods: {
-    ...mapActions(['updateViewer', 'createTempEntry', 'resetOpenFiles']),
+    ...mapActions(['updateViewer', 'createTempEntry']),
     createNewFile() {
       this.$refs.newModal.open(modalTypes.blob);
     },
@@ -35,16 +32,6 @@ export default {
       this.$nextTick(() => {
         this.updateViewer(viewerTypes.edit);
       });
-
-      if (!this.activeFile) return;
-
-      if (this.activeFile.pending && !this.activeFile.deleted) {
-        this.$router.push(this.getUrlForPath(this.activeFile.path), () => {
-          this.updateViewer(viewerTypes.edit);
-        });
-      } else if (this.activeFile.deleted) {
-        this.resetOpenFiles();
-      }
     },
   },
 };

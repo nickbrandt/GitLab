@@ -2,7 +2,7 @@ import Api from '~/api';
 import { __ } from '~/locale';
 import { normalizeHeaders } from '~/lib/utils/common_utils';
 import * as types from './mutation_types';
-import eventHub from '../../../eventhub';
+import ModelManager from '../../../lib/common/model_manager';
 
 export const requestTemplateTypes = ({ commit }) => commit(types.REQUEST_TEMPLATE_TYPES);
 export const receiveTemplateTypesError = ({ commit, dispatch }) => {
@@ -102,7 +102,7 @@ export const setFileTemplate = ({ dispatch, commit, rootGetters }, template) => 
     { root: true },
   );
   commit(types.SET_UPDATE_SUCCESS, true);
-  eventHub.$emit(`editor.update.model.new.content.${rootGetters.activeFile.key}`, template.content);
+  ModelManager.updateNewContent(rootGetters.activeFile.id, template.content);
 };
 
 export const undoFileTemplate = ({ dispatch, commit, rootGetters }) => {
@@ -111,7 +111,7 @@ export const undoFileTemplate = ({ dispatch, commit, rootGetters }) => {
   dispatch('changeFileContent', { path: file.path, content: file.raw }, { root: true });
   commit(types.SET_UPDATE_SUCCESS, false);
 
-  eventHub.$emit(`editor.update.model.new.content.${file.key}`, file.raw);
+  ModelManager.updateNewContent(file.id, file.raw);
 
   if (file.prevPath) {
     dispatch('discardFileChanges', file.path, { root: true });

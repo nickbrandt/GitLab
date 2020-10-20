@@ -79,6 +79,17 @@ export default {
     themeName() {
       return window.gon?.user_color_scheme;
     },
+    showEditor() {
+      if (this.isCommitModeActive)
+        return (
+          this.activeFile &&
+          (this.activeFile.changed ||
+            this.activeFile.tempFile ||
+            this.activeFile.prevPath ||
+            this.activeFile.deleted)
+        );
+      return this.activeFile;
+    },
   },
   mounted() {
     window.onbeforeunload = e => this.onBeforeUnload(e);
@@ -90,7 +101,7 @@ export default {
     performanceMarkAndMeasure({ mark: WEBIDE_MARK_APP_START });
   },
   methods: {
-    ...mapActions(['toggleFileFinder']),
+    ...mapActions(['openFile', 'toggleFileFinder']),
     onBeforeUnload(e = {}) {
       const returnValue = __('Are you sure you want to lose unsaved changes?');
 
@@ -100,9 +111,6 @@ export default {
         returnValue,
       });
       return returnValue;
-    },
-    openFile(file) {
-      this.$router.push(this.getUrlForPath(file.path));
     },
     createNewFile() {
       this.$refs.newModal.open(modalTypes.blob);
@@ -128,7 +136,7 @@ export default {
       />
       <ide-sidebar />
       <div class="multi-file-edit-pane">
-        <template v-if="activeFile">
+        <template v-if="showEditor">
           <commit-editor-header v-if="isCommitModeActive" :active-file="activeFile" />
           <repo-tabs v-else :active-file="activeFile" :files="openFiles" :viewer="viewer" />
           <repo-editor :file="activeFile" class="multi-file-edit-pane-content" />
