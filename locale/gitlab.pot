@@ -10765,6 +10765,9 @@ msgstr ""
 msgid "Excluding merge commits. Limited to 6,000 commits."
 msgstr ""
 
+msgid "Execution time"
+msgstr ""
+
 msgid "Existing branch name, tag, or commit SHA"
 msgstr ""
 
@@ -25705,6 +25708,9 @@ msgstr ""
 msgid "System metrics (Kubernetes)"
 msgstr ""
 
+msgid "System output"
+msgstr ""
+
 msgid "Table of Contents"
 msgstr ""
 
@@ -27829,9 +27835,6 @@ msgid "Total: %{total}"
 msgstr ""
 
 msgid "TotalRefCountIndicator|1000+"
-msgstr ""
-
-msgid "Trace"
 msgstr ""
 
 msgid "Tracing"
