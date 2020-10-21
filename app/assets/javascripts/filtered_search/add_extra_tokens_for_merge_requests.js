@@ -23,6 +23,14 @@ export default (IssuableTokenKeys, disableTargetBranchFilter = false) => {
         value: __('Yes'),
         operator: '=',
       },
+      {
+        url: 'wip=no',
+        // eslint-disable-next-line @gitlab/require-i18n-strings
+        replacementUrl: 'draft=no',
+        tokenKey: 'draft',
+        value: __('No'),
+        operator: '=',
+      },
     ],
   };
 
