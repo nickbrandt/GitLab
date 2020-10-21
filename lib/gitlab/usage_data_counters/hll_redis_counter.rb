@@ -39,12 +39,12 @@ module Gitlab
           event = event_for(event_name)
 
           raise UnknownEvent.new("Unknown event #{event_name}") unless event.present?
-          raise "plan: should be present if group_by_plan is enabled" if event['group_by_plan'].present? && plan.blank?
-          raise "group_by_plan: should be enabled if plan is present" if event['group_by_plan'].blank? && plan.present?
+          return if event['group_by_plan'].present? && plan.blank?
+          return if event['group_by_plan'].blank? && plan.present?
 
           # Increment unique event for given plan
           # Track events in plan level if we have more than 1 plan defined and if plan_enabled is true
-          if valid_plan?(plan, event)
+          if eligible_plan_tracking?(plan, event)
             Gitlab::Redis::HLL.add(key: redis_key(event, time, plan), value: entity_id, expiry: expiry(event))
           end
 
@@ -176,7 +176,7 @@ module Gitlab
           key
         end
 
-        def valid_plan?(plan, event)
+        def eligible_plan_tracking?(plan, event)
           plan.present? && event[:group_by_plan].present? && Plan.all_plans.size > 1 && plan.in?(Plan.all_plans)
         end
 

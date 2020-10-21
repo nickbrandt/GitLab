@@ -8,6 +8,15 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
   let(:entity3) { '34rfjuuy-ce56-sa35-ds34-dfer567dfrf2' }
   let(:entity4) { '8b9a2671-2abf-4bec-a682-22f6a8f7bf31' }
 
+  let(:bronze_plan) { 'bronze' }
+  let(:gold_plan) { 'gold' }
+  let(:free_plan) { 'free' }
+  let(:undefined_plan) { 'undefined' }
+
+  before do
+    allow(Plan).to receive(:all_plans).and_return([bronze_plan, gold_plan, free_plan])
+  end
+
   around do |example|
     # We need to freeze to a reference time
     # because visits are grouped by the week number in the year
@@ -34,11 +43,13 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     let(:no_slot) { 'no_slot' }
     let(:different_aggregation) { 'different_aggregation' }
     let(:custom_daily_event) { 'g_analytics_custom' }
+    let(:plan_event) { 'plan_event' }
 
     let(:global_category) { 'global' }
     let(:compliance_category) {'compliance' }
     let(:productivity_category) {'productivity' }
     let(:analytics_category) { 'analytics' }
+    let(:other_category) { 'other' }
 
     let(:known_events) do
       [
@@ -47,7 +58,8 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
         { name: category_productivity_event, redis_slot: "analytics", category: productivity_category, aggregation: "weekly" },
         { name: compliance_slot_event, redis_slot: "compliance", category: compliance_category, aggregation: "weekly" },
         { name: no_slot, category: global_category, aggregation: "daily" },
-        { name: different_aggregation, category: global_category, aggregation: "monthly" }
+        { name: different_aggregation, category: global_category, aggregation: "monthly" },
+        { name: plan_event, category: other_category, expiry: 29, aggregation: 'weekly', group_by_plan: true }
       ].map(&:with_indifferent_access)
     end
 
@@ -147,6 +159,22 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
           end
         end
       end
+
+      context 'when sending a valid plan' do
+        it 'tracks 2 events' do
+          expect(Gitlab::Redis::HLL).to receive(:add).twice
+
+          described_class.track_event(entity1, plan_event, plan: bronze_plan)
+        end
+      end
+
+      context 'when sending invalid plan' do
+        it 'tracks 1 events' do
+          expect(Gitlab::Redis::HLL).to receive(:add)
+
+          described_class.track_event(entity1, plan_event, plan: 'undefined')
+        end
+      end
     end
 
     describe '.unique_events' do
@@ -224,10 +252,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
   end
 
   describe 'plan level tracking' do
-    let(:bronze_plan) { 'bronze' }
-    let(:gold_plan) { 'gold' }
-    let(:free_plan) { 'free' }
-    let(:undefined_plan) { 'undefined' }
+    using RSpec::Parameterized::TableSyntax
 
     let(:known_events) do
       [
@@ -238,7 +263,6 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     before do
-      allow(Plan).to receive(:all_plans).and_return([bronze_plan, gold_plan, free_plan])
       allow(described_class).to receive(:known_events).and_return(known_events)
       allow(described_class).to receive(:categories).and_return(%w(category1 category2))
 
@@ -247,14 +271,31 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       described_class.track_event([entity1, entity2], 'event_name_2', time: 2.weeks.ago)
     end
 
-    context 'when geting data for plan' do
-      it { expect(described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current, plan: bronze_plan)).to eq(2) }
-      it { expect(described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current, plan: gold_plan)).to eq(1) }
-      it { expect(described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current)).to eq(2) }
-      it { expect { described_class.unique_events(event_names: ['event_name_1'], start_date: 4.weeks.ago, end_date: Date.current, plan: undefined_plan) }.to raise_error('Unknown plan') }
-      it { expect { described_class.unique_events(event_names: ['event_name_2'], start_date: 4.weeks.ago, end_date: Date.current, plan: undefined_plan) }.to raise_error('Unknown plan') }
-      it { expect(described_class.unique_events(event_names: ['event_name_2'], start_date: 4.weeks.ago, end_date: Date.current, plan: free_plan)).to eq(0) }
-      it { expect(described_class.unique_events(event_names: ['event_name_2'], start_date: 4.weeks.ago, end_date: Date.current)).to eq(2) }
+    subject(:unique_events) { described_class.unique_events(event_names: event_names, start_date: 4.weeks.ago, end_date: Date.current, plan: plan) }
+
+    context 'with correct arguments' do
+      where(:event_names, :plan, :value) do
+        ['event_name_1'] | 'bronze' | 2
+        ['event_name_1'] | 'gold' | 1
+        ['event_name_1'] | '' | 2
+        ['event_name_2'] | 'free' | 0
+        ['event_name_2'] | '' | 2
+      end
+
+      with_them do
+        it { is_expected.to eq value }
+      end
+    end
+
+    context 'with incorrect arguments' do
+      where(:event_names, :plan, :error) do
+        ['event_name_1'] | 'undefined' | 'Unknown plan'
+        ['event_name_2'] | 'undefined' | 'Unknown plan'
+      end
+
+      with_them do
+        it { expect { unique_events }.to raise_error(error) }
+      end
     end
   end
 
