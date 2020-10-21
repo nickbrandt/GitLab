@@ -18994,6 +18994,11 @@ type TerraformState {
   id: ID!
 
   """
+  The latest version of the Terraform state
+  """
+  latestVersion: TerraformStateVersion
+
+  """
   Timestamp the Terraform state was locked
   """
   lockedAt: Time
@@ -19147,6 +19152,28 @@ type TerraformStateUnlockPayload {
   Errors encountered during execution of the mutation.
   """
   errors: [String!]!
+}
+
+type TerraformStateVersion {
+  """
+  Timestamp the version was created
+  """
+  createdAt: Time!
+
+  """
+  The user that created this version
+  """
+  createdByUser: User
+
+  """
+  ID of the Terraform state version
+  """
+  id: ID!
+
+  """
+  Timestamp the version was updated
+  """
+  updatedAt: Time!
 }
 
 """
