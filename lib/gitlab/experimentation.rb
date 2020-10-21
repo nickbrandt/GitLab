@@ -6,24 +6,47 @@
 # Experiment options:
 # - environment (optional, defaults to enabled for development and GitLab.com)
 # - tracking_category (optional, used to set the category when tracking an experiment event)
+# - use_percentage_of_time_gate (optional, if set to true, the experiment will make use of the percentage_of_time gate's value, converting it into a pseudo-percentage_of_actors-like value)
+#
+# NOTE: It is recommended that you use the percentage_of_time gate if you are running an experiment on unknown entities,
+# such as users before they register or sign in. This way the full experiment experience will be tied to the
+# cookie-stored uuid value rather than current_user.id.
 #
 # The experiment is controlled by a Feature Flag (https://docs.gitlab.com/ee/development/feature_flags/controls.html),
-# which is named "#{experiment_key}_experiment_percentage" and *must* be set with a percentage and not be used for other purposes.
+# which is named "#{experiment_key}_experiment_percentage" and *must* be set with a percentage and not be used for
+# other purposes.
 #
 # To enable the experiment for 10% of the users:
+#
+# chatops: `/chatops run feature set experiment_key_experiment_percentage 10 --actors`
+# console: `Feature.enable_percentage_of_actors(:experiment_key_experiment_percentage, 10)`
+#
+# Or, in the case of an experiment with use_percentage_of_time_gate set to true:
 #
 # chatops: `/chatops run feature set experiment_key_experiment_percentage 10`
 # console: `Feature.enable_percentage_of_time(:experiment_key_experiment_percentage, 10)`
 #
 # To disable the experiment:
 #
-# chatops: `/chatops run feature delete experiment_key_experiment_percentage`
+# If we're disabling the experiment via chatops, we first disable the feature flag. We do this because this action will
+# get logged in our feature-flag-log project
+# (https://gitlab.com/gitlab-com/gl-infra/feature-flag-log/-/issues?scope=all&utf8=%E2%9C%93&state=closed), whereas a
+# deletion event would not get logged.
+#
+# chatops: `/chatops run feature set experiment_key_experiment_percentage false` # fully disables the feature flag
+# chatops: `/chatops run feature delete experiment_key_experiment_percentage` # removes the feature flag from the DB
+#
+# When disabling via the console, we can just remove it directly (no logging occurs either way):
+#
 # console: `Feature.remove(:experiment_key_experiment_percentage)`
 #
 # To check the current rollout percentage:
 #
 # chatops: `/chatops run feature get experiment_key_experiment_percentage`
-# console: `Feature.get(:experiment_key_experiment_percentage).percentage_of_time_value`
+# console: `Feature.get(:experiment_key_experiment_percentage).percentage_of_actors_value`
+#
+# NOTE: This will show you the percentage per gate. So if you have set the percentage_of_time value and/or the
+# percentage_of_actors value, it will show you both/either.
 #
 
 # TODO: see https://gitlab.com/gitlab-org/gitlab/-/issues/217490
@@ -31,46 +54,60 @@ module Gitlab
   module Experimentation
     EXPERIMENTS = {
       signup_flow: {
-        tracking_category: 'Growth::Acquisition::Experiment::SignUpFlow'
+        tracking_category: 'Growth::Acquisition::Experiment::SignUpFlow',
+        use_percentage_of_time_gate: true
       },
       onboarding_issues: {
-        tracking_category: 'Growth::Conversion::Experiment::OnboardingIssues'
+        tracking_category: 'Growth::Conversion::Experiment::OnboardingIssues',
+        use_percentage_of_time_gate: true
       },
       suggest_pipeline: {
-        tracking_category: 'Growth::Expansion::Experiment::SuggestPipeline'
+        tracking_category: 'Growth::Expansion::Experiment::SuggestPipeline',
+        use_percentage_of_time_gate: true
       },
       ci_notification_dot: {
-        tracking_category: 'Growth::Expansion::Experiment::CiNotificationDot'
+        tracking_category: 'Growth::Expansion::Experiment::CiNotificationDot',
+        use_percentage_of_time_gate: true
       },
       upgrade_link_in_user_menu_a: {
-        tracking_category: 'Growth::Expansion::Experiment::UpgradeLinkInUserMenuA'
+        tracking_category: 'Growth::Expansion::Experiment::UpgradeLinkInUserMenuA',
+        use_percentage_of_time_gate: true
       },
       invite_members_version_a: {
-        tracking_category: 'Growth::Expansion::Experiment::InviteMembersVersionA'
+        tracking_category: 'Growth::Expansion::Experiment::InviteMembersVersionA',
+        use_percentage_of_time_gate: true
       },
       invite_members_version_b: {
-        tracking_category: 'Growth::Expansion::Experiment::InviteMembersVersionB'
+        tracking_category: 'Growth::Expansion::Experiment::InviteMembersVersionB',
+        use_percentage_of_time_gate: true
       },
       new_create_project_ui: {
-        tracking_category: 'Manage::Import::Experiment::NewCreateProjectUi'
+        tracking_category: 'Manage::Import::Experiment::NewCreateProjectUi',
+        use_percentage_of_time_gate: true
       },
       contact_sales_btn_in_app: {
-        tracking_category: 'Growth::Conversion::Experiment::ContactSalesInApp'
+        tracking_category: 'Growth::Conversion::Experiment::ContactSalesInApp',
+        use_percentage_of_time_gate: true
       },
       customize_homepage: {
-        tracking_category: 'Growth::Expansion::Experiment::CustomizeHomepage'
+        tracking_category: 'Growth::Expansion::Experiment::CustomizeHomepage',
+        use_percentage_of_time_gate: true
       },
       invite_email: {
-        tracking_category: 'Growth::Acquisition::Experiment::InviteEmail'
+        tracking_category: 'Growth::Acquisition::Experiment::InviteEmail',
+        use_percentage_of_time_gate: true
       },
       invitation_reminders: {
-        tracking_category: 'Growth::Acquisition::Experiment::InvitationReminders'
+        tracking_category: 'Growth::Acquisition::Experiment::InvitationReminders',
+        use_percentage_of_time_gate: true
       },
       group_only_trials: {
-        tracking_category: 'Growth::Conversion::Experiment::GroupOnlyTrials'
+        tracking_category: 'Growth::Conversion::Experiment::GroupOnlyTrials',
+        use_percentage_of_time_gate: true
       },
       default_to_issues_board: {
-        tracking_category: 'Growth::Conversion::Experiment::DefaultToIssuesBoard'
+        tracking_category: 'Growth::Conversion::Experiment::DefaultToIssuesBoard',
+        use_percentage_of_time_gate: true
       }
     }.freeze
 
@@ -215,7 +252,7 @@ module Gitlab
       end
     end
 
-    Experiment = Struct.new(:key, :environment, :tracking_category, keyword_init: true) do
+    Experiment = Struct.new(:key, :environment, :tracking_category, :use_percentage_of_time_gate, keyword_init: true) do
       def enabled?
         experiment_percentage > 0
       end
@@ -229,7 +266,11 @@ module Gitlab
       def enabled_for_index?(index)
         return false if index.blank?
 
-        index <= experiment_percentage
+        if use_percentage_of_time_gate
+          index <= experiment_percentage
+        else
+          Feature.enabled?(key, index)
+        end
       end
 
       private
