@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module Mutations
-  module Vulnerability
+  module Vulnerabilities
     class CreateMergeRequest < BaseMutation
-      graphql_name 'VulnerabilityCreateMergeRequest'
+      graphql_name 'VulnerabilityCreateMergeRequestFeedback'
 
       authorize :admin_vulnerability
 
-      field :merge_request_feedback, Types::Vulnerability::MergeRequestFeedbackType,
+      field :merge_request_feedback, ::Types::Vulnerability::MergeRequestFeedbackType,
             null: true,
             description: 'The feedback from the created merge request'
 
@@ -78,12 +78,12 @@ module Mutations
         GitlabSchema.find_by_gid(id)
       end
 
-      def find_project(id:)
-        # TODO: remove this line once the compatibility layer is removed.
-        # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
-        id = ::Types::GlobalIDType[::Project].coerce_isolated_input(id)
-        GitlabSchema.find_by_gid(id)
-      end
+      # def find_project(id:)
+      #   # TODO: remove this line once the compatibility layer is removed.
+      #   # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
+      #   id = ::Types::GlobalIDType[::Project].coerce_isolated_input(id)
+      #   GitlabSchema.find_by_gid(id)
+      # end
     end
   end
 end
