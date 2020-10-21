@@ -210,19 +210,21 @@ export default {
     @click.self="handleToggleFile"
   >
     <div class="file-header-content gl-display-flex gl-align-items-center gl-pr-0!">
-      <gl-icon
-        v-if="collapsible"
-        ref="collapseIcon"
-        :name="collapseIcon"
-        :size="16"
-        aria-hidden="true"
-        class="diff-toggle-caret gl-mr-2"
-        @click.stop="handleToggleFile"
-      />
+      <span>
+        <gl-icon
+          v-if="collapsible"
+          ref="collapseIcon"
+          :name="collapseIcon"
+          :size="16"
+          aria-hidden="true"
+          class="diff-toggle-caret gl-mr-2"
+          @click.stop="handleToggleFile"
+        />
+      </span>
       <a
         ref="titleWrapper"
         :v-once="!viewDiffsFileByFile"
-        class="gl-mr-2 gl-text-decoration-none!"
+        class="gl-mr-2 gl-text-decoration-none! gl-text-truncate"
         :href="titleLink"
         @click="handleFileNameClick"
       >
