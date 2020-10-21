@@ -1,5 +1,15 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.3.8 (2020-10-21)
+
+### Fixed (4 changes)
+
+- Geo: Permanently enable package_file_registries field. !43436
+- Geo - Fix wikis with no repository on the primary trying to sync over and over. !43765
+- Handle 500 error for GraphQL configureSast mutation. !43936
+- Geo: Fix "Project repo not able to resync after storage move". !44172
+
+
 ## 13.3.7 (2020-10-01)
 
 ### Security (1 change)
