@@ -8,19 +8,6 @@ const hasMatter = (firstThreeChars, fourthChar) => {
   return isYamlDelimiter && isFourthCharNewline;
 };
 
-const validateMatter = matterStr => {
-  let isMatterValid = true;
-  let matter;
-
-  try {
-    matter = jsYaml.safeLoad(matterStr);
-  } catch (error) {
-    isMatterValid = false;
-  }
-
-  return { matter, isMatterValid };
-};
-
 export const frontMatterify = source => {
   let index = 3;
   let offset;
@@ -30,7 +17,6 @@ export const frontMatterify = source => {
     source,
     matter: null,
     hasMatter: false,
-    isMatterValid: false,
     spacing: null,
     content: source,
     delimiter: null,
@@ -54,7 +40,7 @@ export const frontMatterify = source => {
   }
 
   const matterStr = source.slice(index, offset);
-  const { matter, isMatterValid } = validateMatter(matterStr);
+  const matter = jsYaml.safeLoad(matterStr);
 
   let content = source.slice(offset + delimiter.length);
   let spacing = '';
@@ -69,7 +55,6 @@ export const frontMatterify = source => {
     source,
     matter,
     hasMatter: true,
-    isMatterValid,
     spacing,
     content,
     delimiter,

@@ -84,8 +84,8 @@ export default {
       const { isModified, hasMatter, isMatterValid } = this.parsedSource;
       this.isModified = isModified();
       this.hasMatter = hasMatter();
-      const hasValidatedMatterCondition = this.hasMatter ? isMatterValid() : true;
-      this.isSaveable = this.isModified && hasValidatedMatterCondition;
+      const hasValidMatter = this.hasMatter ? isMatterValid() : true;
+      this.isSaveable = this.isModified && hasValidMatter;
     },
     onDrawerOpen() {
       this.isDrawerOpen = true;
