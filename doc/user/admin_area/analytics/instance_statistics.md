@@ -16,3 +16,12 @@ At the top of the page, Instance Statistics shows total counts for:
 - Pipelines
 
 These figures can be useful for understanding how much data your instance contains in total.
+
+## Past year trend charts
+
+Instance Statistics also displays line charts that show total counts per month, over the past 12 months,
+in the categories shown in [Total counts](#total-counts).
+
+These charts help you visualize how rapidly these records are being created on your instance.
+
+![Instance Activity Pipelines chart](img/instance_activity_pipelines_chart_v13_6.png)
