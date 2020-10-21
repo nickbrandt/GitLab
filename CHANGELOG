@@ -1,5 +1,19 @@
 # Changelog for gitlab-workhorse
 
+## v8.52.0
+
+### Fixed
+- Only generate CI artifact metadata for ZIP files
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/627
+- Fix typo in redis URL scheme
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/631
+- Restructure error handling in main()
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/633
+
+### Other
+- Include route regex identifier in structured logs
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/624
+
 ## v8.51.0
 
 ### Changed

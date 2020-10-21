@@ -1,5 +1,0 @@
----
-title: Only generate CI artifact metadata for ZIP files
-merge_request: 627
-author:
-type: fixed
