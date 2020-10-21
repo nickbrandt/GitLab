@@ -5,6 +5,17 @@ module TableSchemaHelpers
     ActiveRecord::Base.connection
   end
 
+  def expect_table_to_be_replaced(original_table:, replacement_table:, archived_table:)
+    original_oid = table_oid(original_table)
+    replacement_oid = table_oid(replacement_table)
+
+    yield
+
+    expect(table_oid(original_table)).to eq(replacement_oid)
+    expect(table_oid(archived_table)).to eq(original_oid)
+    expect(table_oid(replacement_table)).to be_nil
+  end
+
   def table_oid(name)
     connection.select_value(<<~SQL)
       SELECT oid

@@ -65,14 +65,7 @@ RSpec.describe Gitlab::Database::Partitioning::ReplaceTable, '#perform' do
     expect(primary_key_constraint_name(archived_table)).to eq(archived_primary_key)
   end
 
-  def expect_table_to_be_replaced
-    original_id = table_oid(original_table)
-    replacement_id = table_oid(replacement_table)
-
-    yield
-
-    expect(table_oid(original_table)).to eq(replacement_id)
-    expect(table_oid(archived_table)).to eq(original_id)
-    expect(table_oid(replacement_table)).to be_nil
+  def expect_table_to_be_replaced(&block)
+    super(original_table: original_table, replacement_table: replacement_table, archived_table: archived_table, &block)
   end
 end
