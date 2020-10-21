@@ -14,7 +14,6 @@ export default {
     DeployBoard: () => import('ee_component/environments/components/deploy_board_component.vue'),
     CanaryDeploymentCallout: () =>
       import('ee_component/environments/components/canary_deployment_callout.vue'),
-    EnvironmentAlert: () => import('ee_component/environments/components/environment_alert.vue'),
   },
   props: {
     environments: {
@@ -112,9 +111,6 @@ export default {
     shouldShowCanaryCallout(env) {
       return env.showCanaryCallout && this.showCanaryDeploymentCallout;
     },
-    shouldRenderAlert(env) {
-      return env?.has_opened_alert;
-    },
     sortEnvironments(environments) {
       /*
        * The sorting algorithm should sort in the following priorities:
@@ -144,7 +140,10 @@ export default {
 </script>
 <template>
   <div class="ci-table" role="grid">
-    <div class="gl-responsive-table-row table-row-header" role="row">
+    <div
+      class="gl-responsive-table-row gl-font-base gl-display-none gl-display-md-flex gl-border-b-0!"
+      role="row"
+    >
       <div class="table-section" :class="tableData.name.spacing" role="columnheader">
         {{ tableData.name.title }}
       </div>
@@ -165,8 +164,7 @@ export default {
       </div>
     </div>
     <template v-for="(model, i) in sortedEnvironments" :model="model">
-      <div
-        is="environment-item"
+      <environment-item
         :key="`environment-item-${i}`"
         :model="model"
         :can-read-environment="canReadEnvironment"
@@ -188,11 +186,6 @@ export default {
           />
         </div>
       </div>
-      <environment-alert
-        v-if="shouldRenderAlert(model)"
-        :key="`alert-row-${i}`"
-        :environment="model"
-      />
 
       <template v-if="shouldRenderFolderContent(model)">
         <div v-if="model.isLoadingFolderContent" :key="`loading-item-${i}`">

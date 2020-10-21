@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash';
 import { GlTooltipDirective, GlIcon } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import timeagoMixin from '~/vue_shared/mixins/timeago';
+import timeAgoMixin from '~/vue_shared/mixins/timeago';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
 import CommitComponent from '~/vue_shared/components/commit.vue';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
@@ -38,11 +38,12 @@ export default {
     TerminalButtonComponent,
     TooltipOnTruncate,
     UserAvatarLink,
+    EnvironmentAlert: () => import('ee_component/environments/components/environment_alert.vue'),
   },
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [timeagoMixin],
+  mixins: [timeAgoMixin],
 
   props: {
     canReadEnvironment: {
@@ -66,6 +67,9 @@ export default {
     deployIconName() {
       return this.model.isDeployBoardVisible ? 'chevron-down' : 'chevron-right';
     },
+    hasAlert() {
+      return this.model?.has_opened_alert;
+    },
     /**
      * Verifies if `last_deployment` key exists in the current Environment.
      * This key is required to render most of the html - this method works has
@@ -81,7 +85,7 @@ export default {
     },
 
     /**
-     * Checkes whether the row displayed is a folder.
+     * Checks whether the row displayed is a folder.
      *
      * @returns {Boolean}
      */
@@ -91,7 +95,7 @@ export default {
     },
 
     /**
-     * Checkes whether the environment is protected.
+     * Checks whether the environment is protected.
      * (`is_protected` currently only set in EE)
      *
      * @returns {Boolean}
@@ -412,7 +416,7 @@ export default {
     },
 
     /**
-     * Checkes whether to display no deployment text.
+     * Checks whether to display no deployment text.
      *
      * @returns {Boolean}
      */
@@ -521,7 +525,7 @@ export default {
       'js-child-row environment-child-row': model.isChildren,
       'folder-row': isFolder,
     }"
-    class="gl-responsive-table-row"
+    class="gl-align-items-center gl-border-gray-100 gl-border-solid gl-border-1 gl-display-flex gl-h-11 gl-mb-5 gl-p-5 gl-rounded-base"
     role="row"
   >
     <div
@@ -686,5 +690,7 @@ export default {
         <delete-component v-if="canDeleteEnvironment" :environment="model" />
       </div>
     </div>
+    <!-- NEEDS FIXUP -->
+    <environment-alert v-if="hasAlert" :environment="model" />
   </div>
 </template>
