@@ -7,10 +7,7 @@ class Gitlab::Seeder::ComplianceDashboardMergeRequests
 
   def initialize(project)
     @project = project
-  end
-
-  def admin
-    @admin ||= FactoryBot.create(:user, :admin)
+    @admin = User.admins.first
   end
 
   def seed!
@@ -59,12 +56,14 @@ class Gitlab::Seeder::ComplianceDashboardMergeRequests
     }
 
     Sidekiq::Worker.skipping_transaction_check do
-      merge_request = MergeRequests::CreateService.new(@project, admin, opts).execute
-      merge_request.save!
-      merge_request.approvals.create(approvals)
-      merge_request.state = :merged
+      Sidekiq::Testing.inline! do
+        merge_request = MergeRequests::CreateService.new(@project, @admin, opts).execute
+        merge_request.save!
+        merge_request.approvals.create(approvals)
+        merge_request.state = :merged
 
-      merge_request
+        merge_request
+      end
     end
   end
 
