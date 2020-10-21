@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import { MERGE_DISABLED_TEXT_UNAPPROVED } from 'ee/vue_merge_request_widget/mixins/ready_to_merge';
 import MergeImmediatelyConfirmationDialog from 'ee/vue_merge_request_widget/components/merge_immediately_confirmation_dialog.vue';
 import MergeTrainHelperText from 'ee/vue_merge_request_widget/components/merge_train_helper_text.vue';
@@ -58,6 +58,23 @@ describe('ReadyToMerge', () => {
   };
 
   const factory = (mrUpdates = {}) => {
+    wrapper = shallowMount(ReadyToMerge, {
+      propsData: {
+        mr: { ...mr, ...mrUpdates },
+        service,
+      },
+      stubs: {
+        MergeImmediatelyConfirmationDialog,
+        MergeTrainHelperText,
+        GlSprintf,
+        GlLink,
+      },
+    });
+
+    ({ vm } = wrapper);
+  };
+
+  const mountedFactory = (mrUpdates = {}) => {
     wrapper = mount(ReadyToMerge, {
       propsData: {
         mr: { ...mr, ...mrUpdates },
@@ -337,7 +354,7 @@ describe('ReadyToMerge', () => {
     };
 
     it('should show a warning dialog asking for confirmation if the user is trying to skip the merge train', () => {
-      factory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
+      mountedFactory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
       return clickMergeImmediately().then(() => {
         expect(dialog.vm.show).toHaveBeenCalled();
         expect(vm.handleMergeButtonClick).not.toHaveBeenCalled();
@@ -345,7 +362,7 @@ describe('ReadyToMerge', () => {
     });
 
     it('should perform the merge when the user confirms their intent to merge immediately', () => {
-      factory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
+      mountedFactory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
       return clickMergeImmediately()
         .then(() => {
           dialog.vm.$emit('mergeImmediately');
@@ -357,7 +374,7 @@ describe('ReadyToMerge', () => {
     });
 
     it('should not ask for confirmation in non-merge train scenarios', () => {
-      factory({
+      mountedFactory({
         isPipelineActive: true,
         onlyAllowMergeIfPipelineSucceeds: false,
       });
@@ -385,7 +402,7 @@ describe('ReadyToMerge', () => {
         const button = findMergeButton();
 
         expect(button.exists()).toBe(true);
-        expect(button.attributes('disabled')).toBe('disabled');
+        expect(button.attributes('disabled')).toBe('true');
       });
     });
   });
