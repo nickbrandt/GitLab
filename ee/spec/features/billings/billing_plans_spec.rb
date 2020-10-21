@@ -405,7 +405,6 @@ RSpec.describe 'Billing plan pages', :feature do
           expect(page).to have_selector('.js-subscription-table')
         end
 
-        it_behaves_like 'downgradable plan'
         it_behaves_like 'non-upgradable plan'
         it_behaves_like 'used seats rendering for non paid subscriptions'
       end
