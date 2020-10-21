@@ -132,6 +132,7 @@ POST /groups/:id/epics/:epic_iid/epics
 | `epic_iid`      | integer        | yes      | The internal ID of the (future parent) epic.                                                                                       |
 | `title`         | string         | yes      | The title of a newly created epic. |
 | `confidential`  | boolean        | no       | Whether the epic should be confidential. Will be ignored if `confidential_epics` feature flag is disabled. Defaults to the confidentiality state of the parent epic.  |
+| `subgroup_id`   | integer/string | no      | The ID or [URL-encoded path of a subgroup of the group](README.md#namespaced-path-encoding) owned by the authenticated user      |
 
 ```shell
 curl --request POST --header  "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/1/epics/5/epics?title=Newpic"

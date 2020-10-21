@@ -26,6 +26,12 @@ module API
         }).execute
       end
 
+      def find_group_with_ancestor!(id, ancestor)
+        subgroup = find_group!(id)
+
+        ancestor.descendants.include?(subgroup) ? subgroup : not_found!('Group')
+      end
+
       params :child_epic_id do
         # Unique ID should be used because epics from other groups can be assigned as child.
         requires :child_epic_id, type: Integer, desc: 'The global ID of the epic that will be assigned as child'
@@ -75,15 +81,22 @@ module API
       params do
         requires :title, type: String, desc: 'The title of a child epic'
         optional :confidential, type: Boolean, desc: 'Indicates if the epic is confidential. Will be ignored if `confidential_epics` feature flag is disabled'
+        optional :subgroup_id, type: String, desc: 'The ID of a subgroup of the given group where the epic wil be created'
       end
       post ':id/(-/)epics/:epic_iid/epics' do
         authorize_subepics_feature!
         authorize_can_admin_epic_link!
 
+        group = if params[:subgroup_id].present?
+                  find_group_with_ancestor!(params[:subgroup_id], user_group)
+                else
+                  user_group
+                end
+
         confidential = params[:confidential].nil? ? epic.confidential : params[:confidential]
         create_params = { parent_id: epic.id, title: params[:title], confidential: confidential }
 
-        child_epic = ::Epics::CreateService.new(user_group, current_user, create_params).execute
+        child_epic = ::Epics::CreateService.new(group, current_user, create_params).execute
 
         if child_epic.valid?
           present child_epic, with: EE::API::Entities::LinkedEpic, user: current_user

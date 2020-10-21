@@ -173,6 +173,45 @@ RSpec.describe API::EpicLinks do
           expect(Epic.last).to be_confidential
         end
 
+        context 'when subgroup_id parameter is set' do
+          let(:subgroup) { create(:group, :public, parent: group)}
+
+          before do
+            subgroup.add_developer(user)
+          end
+
+          it 'creates epic in subgroup' do
+            post api(url, user), params: { title: 'child epic', confidential: false, subgroup_id: subgroup.full_path }
+
+            new_epic = Epic.last
+            expect(response).to have_gitlab_http_status(:created)
+            expect(epic.reload.children).to include(new_epic)
+            expect(new_epic.group).to eq(subgroup)
+          end
+
+          context 'when the subgroup is not a descendant of the given group' do
+            let(:subgroup) { create(:group, :public)}
+
+            before do
+              subgroup.add_developer(user)
+            end
+
+            it 'does not create the child epic' do
+              post api(url, user), params: { title: 'child epic', confidential: false, subgroup_id: subgroup.full_path }
+
+              expect(response).to have_gitlab_http_status(:not_found)
+            end
+          end
+
+          context 'when the subgroup_id is not a valid id' do
+            it 'does not create the child epic' do
+              post api(url, user), params: { title: 'child epic', confidential: false, subgroup_id: 'no_id' }
+
+              expect(response).to have_gitlab_http_status(:not_found)
+            end
+          end
+        end
+
         context 'and epic has errors' do
           it 'returns 400 error' do
             child_epic = Epic.new(title: 'with errors')
