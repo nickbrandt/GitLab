@@ -16256,6 +16256,15 @@ msgstr ""
 msgid "Members|%{time} by %{user}"
 msgstr ""
 
+msgid "Members|%{userName} is currently a LDAP user. Editing their permissions will override the settings from the LDAP group sync."
+msgstr ""
+
+msgid "Members|An error occurred while trying to enable LDAP override, please try again."
+msgstr ""
+
+msgid "Members|An error occurred while trying to revert to LDAP group sync settings, please try again."
+msgstr ""
+
 msgid "Members|An error occurred while updating the member's expiration date, please try again."
 msgstr ""
 
@@ -16283,6 +16292,9 @@ msgstr ""
 msgid "Members|Are you sure you want to withdraw your access request for \"%{source}\""
 msgstr ""
 
+msgid "Members|Edit permissions"
+msgstr ""
+
 msgid "Members|Expiration date removed successfully."
 msgstr ""
 
@@ -16290,6 +16302,9 @@ msgid "Members|Expiration date updated successfully."
 msgstr ""
 
 msgid "Members|Expired"
+msgstr ""
+
+msgid "Members|LDAP override enabled."
 msgstr ""
 
 msgid "Members|Leave \"%{source}\""
