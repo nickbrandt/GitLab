@@ -1,5 +1,9 @@
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
+import GetSnippetQuery from 'shared_queries/snippet/snippet.query.graphql';
+import SnippetBlobContent from 'shared_queries/snippet/snippet_blob_content.query.graphql';
+import CanCreatePersonalSnippet from 'shared_queries/snippet/user_permissions.query.graphql';
+import CanCreateProjectSnippet from 'shared_queries/snippet/project_permissions.query.graphql';
 
 import Translate from '~/vue_shared/translate';
 import createDefaultClient from '~/lib/graphql';
@@ -33,15 +37,72 @@ export default function appFactory(el, Component) {
     },
   });
 
-  return new Vue({
-    el,
-    apolloProvider,
-    render(createElement) {
-      return createElement(Component, {
-        props: {
-          ...restDataset,
-        },
-      });
-    },
-  });
+  const initApp = () =>
+    new Vue({
+      el,
+      apolloProvider,
+      render(createElement) {
+        return createElement(Component, {
+          props: {
+            ...restDataset,
+          },
+        });
+      },
+    });
+
+  if (window.gl.startup_graphql_calls) {
+    const names = ['GetSnippetQuery', 'SnippetBlobContent', el.dataset.projectId? 'CanCreateProjectSnippet': 'CanCreatePersonalSnippet'];
+    const queries = [];
+    names.forEach(name => {
+      queries.push(
+        window.gl.startup_graphql_calls.find(call => call.operationName === name).fetchCall,
+      );
+    });
+    if (queries.length) {
+      Promise.all(queries)
+        .then(([snippetRes, contentRes, permissionsRes]) =>
+          Promise.all([snippetRes.json(), contentRes.json(), permissionsRes.json()]),
+        )
+        .then(([snippet, content, permissions]) => {
+          apolloProvider.clients.defaultClient.writeQuery({
+            query: GetSnippetQuery,
+            data: snippet.data,
+            variables: {
+              ids: [el.dataset.snippetGid],
+            },
+          });
+          apolloProvider.clients.defaultClient.writeQuery({
+            query: SnippetBlobContent,
+            data: content.data,
+            variables: {
+              ids: [el.dataset.snippetGid],
+              rich: false,
+              paths: [el.dataset.firstFileName],
+            },
+          });
+          if (el.dataset.projectId) {
+            apolloProvider.clients.defaultClient.writeQuery({
+              query: CanCreateProjectSnippet,
+              data: permissions.data,
+              variables: {
+                fullPath: el.dataset.projectId,
+              },
+            });
+          } else {
+            apolloProvider.clients.defaultClient.writeQuery({
+              query: CanCreatePersonalSnippet,
+              data: permissions.data,
+            });
+          }
+        })
+        .catch(() => {})
+        .finally(() => initApp());
+    } else {
+      initApp();
+    }
+  } else {
+    initApp();
+  }
+
+  return true;
 }
