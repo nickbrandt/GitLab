@@ -4518,7 +4518,7 @@
               "description": "Filter by epic ID. Incompatible with epicWildcardId",
               "type": {
                 "kind": "SCALAR",
-                "name": "ID",
+                "name": "EpicID",
                 "ofType": null
               },
               "defaultValue": null
@@ -18717,6 +18717,34 @@
               "deprecationReason": null
             },
             {
+              "name": "humanTimeEstimate",
+              "description": "Human-readable time estimate of the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "humanTotalTimeSpent",
+              "description": "Human-readable total time reported as spent on the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "id",
               "description": "Global ID of the epic-issue relation",
               "args": [
@@ -19382,6 +19410,24 @@
                 "ofType": {
                   "kind": "OBJECT",
                   "name": "PageInfo",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "weight",
+              "description": "Total weight of issues collection",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
                   "ofType": null
                 }
               },
@@ -23223,6 +23269,16 @@
           "possibleTypes": null
         },
         {
+          "kind": "SCALAR",
+          "name": "GroupID",
+          "description": "Identifier of Group",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "GroupMember",
           "description": "Represents a Group Membership",
@@ -24499,6 +24555,34 @@
               "deprecationReason": null
             },
             {
+              "name": "humanTimeEstimate",
+              "description": "Human-readable time estimate of the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "humanTotalTimeSpent",
+              "description": "Human-readable total time reported as spent on the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "id",
               "description": "ID of the issue",
               "args": [
@@ -25154,6 +25238,24 @@
                 "ofType": {
                   "kind": "OBJECT",
                   "name": "PageInfo",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "weight",
+              "description": "Total weight of issues collection",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
                   "ofType": null
                 }
               },
@@ -36905,7 +37007,7 @@
               "description": "Filter by epic ID. Incompatible with epicWildcardId",
               "type": {
                 "kind": "SCALAR",
-                "name": "ID",
+                "name": "EpicID",
                 "ofType": null
               },
               "defaultValue": null
@@ -45199,6 +45301,67 @@
               "deprecationReason": null
             },
             {
+              "name": "runnerSetup",
+              "description": "Get runner setup instructions",
+              "args": [
+                {
+                  "name": "platform",
+                  "description": "Platform to generate the instructions for",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "architecture",
+                  "description": "Architecture to generate the instructions for",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "projectId",
+                  "description": "Project to register the runner for",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "ProjectID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "groupId",
+                  "description": "Group to register the runner for",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "GroupID",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "RunnerSetup",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "snippets",
               "description": "Find Snippets visible to the current user",
               "args": [
@@ -48806,6 +48969,55 @@
                 "kind": "OBJECT",
                 "name": "RunnerPlatform",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "RunnerSetup",
+          "description": null,
+          "fields": [
+            {
+              "name": "installInstructions",
+              "description": "Instructions for installing the runner on the specified architecture",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "registerInstructions",
+              "description": "Instructions for registering the runner",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null

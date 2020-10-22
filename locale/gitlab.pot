@@ -8147,6 +8147,9 @@ msgstr ""
 msgid "CycleAnalytics|The given date range is larger than 180 days"
 msgstr ""
 
+msgid "CycleAnalytics|The total time spent in the selected stage for the items that were completed on each date. Data limited to the last 500 items."
+msgstr ""
+
 msgid "CycleAnalytics|Total days to completion"
 msgstr ""
 
@@ -8616,6 +8619,9 @@ msgid "Delete snippet?"
 msgstr ""
 
 msgid "Delete source branch"
+msgstr ""
+
+msgid "Delete subscription"
 msgstr ""
 
 msgid "Delete this attachment"
@@ -10760,6 +10766,9 @@ msgid "Excluding merge commits. Limited to %{limit} commits."
 msgstr ""
 
 msgid "Excluding merge commits. Limited to 6,000 commits."
+msgstr ""
+
+msgid "Execution time"
 msgstr ""
 
 msgid "Existing branch name, tag, or commit SHA"
@@ -16256,6 +16265,15 @@ msgstr ""
 msgid "Members|%{time} by %{user}"
 msgstr ""
 
+msgid "Members|%{userName} is currently a LDAP user. Editing their permissions will override the settings from the LDAP group sync."
+msgstr ""
+
+msgid "Members|An error occurred while trying to enable LDAP override, please try again."
+msgstr ""
+
+msgid "Members|An error occurred while trying to revert to LDAP group sync settings, please try again."
+msgstr ""
+
 msgid "Members|An error occurred while updating the member's expiration date, please try again."
 msgstr ""
 
@@ -16283,6 +16301,9 @@ msgstr ""
 msgid "Members|Are you sure you want to withdraw your access request for \"%{source}\""
 msgstr ""
 
+msgid "Members|Edit permissions"
+msgstr ""
+
 msgid "Members|Expiration date removed successfully."
 msgstr ""
 
@@ -16290,6 +16311,9 @@ msgid "Members|Expiration date updated successfully."
 msgstr ""
 
 msgid "Members|Expired"
+msgstr ""
+
+msgid "Members|LDAP override enabled."
 msgstr ""
 
 msgid "Members|Leave \"%{source}\""
@@ -25534,6 +25558,9 @@ msgstr ""
 msgid "Successfully scheduled a pipeline to run. Go to the %{pipelines_link_start}Pipelines page%{pipelines_link_end} for details."
 msgstr ""
 
+msgid "Successfully synced %{synced_timeago}."
+msgstr ""
+
 msgid "Successfully unblocked"
 msgstr ""
 
@@ -25669,10 +25696,16 @@ msgstr ""
 msgid "Sync information"
 msgstr ""
 
+msgid "Sync now"
+msgstr ""
+
 msgid "Synced"
 msgstr ""
 
 msgid "Synchronization disabled"
+msgstr ""
+
+msgid "Syncing…"
 msgstr ""
 
 msgid "System"
@@ -25700,6 +25733,9 @@ msgid "System metrics (Custom)"
 msgstr ""
 
 msgid "System metrics (Kubernetes)"
+msgstr ""
+
+msgid "System output"
 msgstr ""
 
 msgid "Table of Contents"
@@ -27828,9 +27864,6 @@ msgstr ""
 msgid "TotalRefCountIndicator|1000+"
 msgstr ""
 
-msgid "Trace"
-msgstr ""
-
 msgid "Tracing"
 msgstr ""
 
@@ -28384,6 +28417,9 @@ msgid "Update iteration"
 msgstr ""
 
 msgid "Update now"
+msgstr ""
+
+msgid "Update username"
 msgstr ""
 
 msgid "Update variable"
@@ -30060,10 +30096,10 @@ msgstr ""
 msgid "You can also create a project from the command line."
 msgstr ""
 
-msgid "You can also press &#8984;-Enter"
+msgid "You can also press Ctrl-Enter"
 msgstr ""
 
-msgid "You can also press Ctrl-Enter"
+msgid "You can also press ⌘-Enter"
 msgstr ""
 
 msgid "You can also star a label to make it a priority label."
@@ -30277,6 +30313,9 @@ msgid "You have been granted %{member_human_access} access to %{title} %{name}."
 msgstr ""
 
 msgid "You have been invited"
+msgstr ""
+
+msgid "You have been redirected to the only result; see the %{a_start}search results%{a_end} instead."
 msgstr ""
 
 msgid "You have been unsubscribed from this thread."
