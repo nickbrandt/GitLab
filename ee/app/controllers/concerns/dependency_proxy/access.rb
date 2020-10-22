@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module DependencyProxyAccess
+module DependencyProxy::Access
   extend ActiveSupport::Concern
 
   included do
