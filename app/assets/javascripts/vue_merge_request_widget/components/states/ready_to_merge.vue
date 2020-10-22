@@ -1,6 +1,6 @@
 <script>
 import { isEmpty } from 'lodash';
-import { GlIcon, GlButton, GlSprintf, GlLink } from '@gitlab/ui';
+import { GlIcon, GlButton, GlButtonGroup, GlSprintf, GlLink } from '@gitlab/ui';
 import readyToMergeMixin from 'ee_else_ce/vue_merge_request_widget/mixins/ready_to_merge';
 import simplePoll from '~/lib/utils/simple_poll';
 import { __ } from '~/locale';
@@ -36,6 +36,7 @@ export default {
     GlSprintf,
     GlLink,
     GlButton,
+    GlButtonGroup,
     MergeTrainHelperText: () =>
       import('ee_component/vue_merge_request_widget/components/merge_train_helper_text.vue'),
     MergeImmediatelyConfirmationDialog: () =>
@@ -283,28 +284,28 @@ export default {
       <status-icon :status="iconClass" />
       <div class="media-body">
         <div class="mr-widget-body-controls media space-children">
-          <span class="btn-group">
+          <gl-button-group>
             <gl-button
-              size="medium"
               category="primary"
               class="qa-merge-button accept-merge-request"
               :variant="mergeButtonVariant"
               :disabled="isMergeButtonDisabled"
               :loading="isMakingRequest"
               @click="handleMergeButtonClick(isAutoMergeAvailable)"
-              >{{ mergeButtonText }}</gl-button
             >
-            <button
+              {{ mergeButtonText }}
+            </gl-button>
+            <gl-button
               v-if="shouldShowMergeImmediatelyDropdown"
               :disabled="isMergeButtonDisabled"
-              type="button"
               class="btn btn-sm btn-info dropdown-toggle js-merge-moment"
+              category="primary"
+              variant="info"
+              icon="chevron-down"
               data-toggle="dropdown"
               data-qa-selector="merge_moment_dropdown"
               :aria-label="__('Select merge moment')"
-            >
-              <i class="fa fa-chevron-down" aria-hidden="true"></i>
-            </button>
+            />
             <ul
               v-if="shouldShowMergeImmediatelyDropdown"
               class="dropdown-menu dropdown-menu-right"
@@ -341,7 +342,7 @@ export default {
                 </a>
               </li>
             </ul>
-          </span>
+          </gl-button-group>
           <div class="media-body-wrap space-children">
             <template v-if="shouldShowMergeControls">
               <label v-if="mr.canRemoveSourceBranch">
