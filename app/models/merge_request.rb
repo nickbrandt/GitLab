@@ -1576,13 +1576,13 @@ class MergeRequest < ApplicationRecord
     !merge_commit.has_been_reverted?(current_user, notes_association)
   end
 
-  def is_reverted?(current_user)
+  def reverted_by_merge_request?(current_user)
     !!reverting_merge_request(current_user)
   end
 
   def reverting_merge_request(current_user)
-    return nil unless merge_commit
-    return nil unless merged_at
+    return unless merge_commit
+    return unless merged_at
 
     cutoff = merged_at - 1.minute
 
@@ -1590,12 +1590,14 @@ class MergeRequest < ApplicationRecord
 
     reverting_commit = merge_commit.reverting_commit(current_user, notes_association)
 
-    MergeRequestsFinder.new(
-      current_user,
-      project_id: project.id,
-      commit_sha: reverting_commit.sha,
-      state: 'merged'
-    ).execute.first if reverting_commit
+    if reverting_commit
+      MergeRequestsFinder.new(
+        current_user,
+        project_id: project.id,
+        commit_sha: reverting_commit.sha,
+        state: 'merged'
+      ).execute.first
+    end
   end
 
   def merged_at
