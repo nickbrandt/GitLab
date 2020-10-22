@@ -11520,6 +11520,9 @@ msgstr ""
 msgid "Filter by issues that are currently closed."
 msgstr ""
 
+msgid "Filter by issues that are currently opened."
+msgstr ""
+
 msgid "Filter by label"
 msgstr ""
 
@@ -24247,6 +24250,9 @@ msgid "Should you ever lose your phone or access to your one time password secre
 msgstr ""
 
 msgid "Show all activity"
+msgstr ""
+
+msgid "Show all issues."
 msgstr ""
 
 msgid "Show all members"
