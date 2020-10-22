@@ -174,10 +174,14 @@ func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 		return
 	}
 
-	if resizeCmd != nil {
-		widthLabelVal := strconv.Itoa(int(params.Width))
-		imageResizeDurations.WithLabelValues(params.ContentType, widthLabelVal).Observe(time.Since(start).Seconds())
+	if resizeCmd == nil {
+		// This means we served the original image because rescaling failed
+		logger.WithFields(*logFields(bytesWritten)).Printf("ImageResizer: Served original")
+		return
 	}
+
+	widthLabelVal := strconv.Itoa(int(params.Width))
+	imageResizeDurations.WithLabelValues(params.ContentType, widthLabelVal).Observe(time.Since(start).Seconds())
 
 	logger.WithFields(*logFields(bytesWritten)).Printf("ImageResizer: Success")
 }
