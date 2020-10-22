@@ -57,25 +57,9 @@ describe('ReadyToMerge', () => {
     mergeTrainsCount: 0,
   };
 
-  const factory = (mrUpdates = {}) => {
-    wrapper = shallowMount(ReadyToMerge, {
-      propsData: {
-        mr: { ...mr, ...mrUpdates },
-        service,
-      },
-      stubs: {
-        MergeImmediatelyConfirmationDialog,
-        MergeTrainHelperText,
-        GlSprintf,
-        GlLink,
-      },
-    });
-
-    ({ vm } = wrapper);
-  };
-
-  const mountedFactory = (mrUpdates = {}) => {
-    wrapper = mount(ReadyToMerge, {
+  const factory = (mrUpdates = {}, shallow = true) => {
+    const func = shallow ? shallowMount : mount;
+    wrapper = func(ReadyToMerge, {
       propsData: {
         mr: { ...mr, ...mrUpdates },
         service,
@@ -354,7 +338,7 @@ describe('ReadyToMerge', () => {
     };
 
     it('should show a warning dialog asking for confirmation if the user is trying to skip the merge train', () => {
-      mountedFactory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
+      factory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY }, false);
       return clickMergeImmediately().then(() => {
         expect(dialog.vm.show).toHaveBeenCalled();
         expect(vm.handleMergeButtonClick).not.toHaveBeenCalled();
@@ -362,7 +346,7 @@ describe('ReadyToMerge', () => {
     });
 
     it('should perform the merge when the user confirms their intent to merge immediately', () => {
-      mountedFactory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY });
+      factory({ preferredAutoMergeStrategy: MT_MERGE_STRATEGY }, false);
       return clickMergeImmediately()
         .then(() => {
           dialog.vm.$emit('mergeImmediately');
@@ -374,10 +358,13 @@ describe('ReadyToMerge', () => {
     });
 
     it('should not ask for confirmation in non-merge train scenarios', () => {
-      mountedFactory({
-        isPipelineActive: true,
-        onlyAllowMergeIfPipelineSucceeds: false,
-      });
+      factory(
+        {
+          isPipelineActive: true,
+          onlyAllowMergeIfPipelineSucceeds: false,
+        },
+        false,
+      );
       return clickMergeImmediately().then(() => {
         expect(dialog.vm.show).not.toHaveBeenCalled();
         expect(vm.handleMergeButtonClick).toHaveBeenCalled();
