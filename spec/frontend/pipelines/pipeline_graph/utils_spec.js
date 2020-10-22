@@ -212,28 +212,25 @@ describe('utils functions', () => {
 });
 
 describe('formatPipelineDuration', () => {
-  it('formats durations >= 1 day correctly', () => {
-    const oneDay = 60 * 60 * 24;
-
-    expect(formatPipelineDuration(oneDay)).toBe('24:00:00');
-    expect(formatPipelineDuration(oneDay * 2)).toBe('48:00:00');
-    expect(formatPipelineDuration(oneDay + 60 * 5 + 34)).toBe('24:05:34');
-    expect(formatPipelineDuration(oneDay * 10)).toBe('240:00:00');
-    expect(formatPipelineDuration(oneDay * 100)).toBe('2400:00:00');
-  });
-
-  describe('durations < 1 day', () => {
-    it.each`
-      input    | output
-      ${0}     | ${'00:00:00'}
-      ${10}    | ${'00:00:10'}
-      ${60}    | ${'00:01:00'}
-      ${61}    | ${'00:01:01'}
-      ${3600}  | ${'01:00:00'}
-      ${4660}  | ${'01:17:40'}
-      ${86399} | ${'23:59:59'}
-    `('returns $output for $input', ({ input, output }) => {
-      expect(formatPipelineDuration(input)).toBe(output);
-    });
-  });
+  it.each`
+    hours       | minutes | seconds | result
+    ${0}        | ${0}    | ${0}    | ${'00:00:00'}
+    ${0}        | ${0}    | ${10}   | ${'00:00:10'}
+    ${0}        | ${1}    | ${0}    | ${'00:01:00'}
+    ${0}        | ${1}    | ${1}    | ${'00:01:01'}
+    ${1}        | ${0}    | ${0}    | ${'01:00:00'}
+    ${1}        | ${17}   | ${40}   | ${'01:17:40'}
+    ${23}       | ${59}   | ${59}   | ${'23:59:59'}
+    ${1 * 24}   | ${0}    | ${0}    | ${'24:00:00'}
+    ${2 * 24}   | ${0}    | ${0}    | ${'48:00:00'}
+    ${1 * 24}   | ${5}    | ${34}   | ${'24:05:34'}
+    ${10 * 24}  | ${0}    | ${0}    | ${'240:00:00'}
+    ${100 * 24} | ${0}    | ${0}    | ${'2400:00:00'}
+  `(
+    'returns $result for $hours hour(s), $minutes minute(s), $seconds second(s)',
+    ({ hours, minutes, seconds, result }) => {
+      const totalSeconds = 60 * 60 * hours + 60 * minutes + seconds;
+      expect(formatPipelineDuration(totalSeconds)).toBe(result);
+    },
+  );
 });
