@@ -8,7 +8,7 @@ import {
   GlTab,
   GlTabs,
   GlAlert,
-  GlDeprecatedBadge as GlBadge,
+  GlBadge,
 } from '@gitlab/ui';
 import { TEST_HOST } from 'helpers/test_constants';
 import setWindowLocation from 'helpers/set_window_location_helper';
