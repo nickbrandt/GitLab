@@ -114,6 +114,10 @@ To promote a project label to a group label:
 1. Click on the three dots (**{ellipsis_v}**) next to the **Subscribe** button and
    select **Promote to group label**.
 
+NOTE: **Note:**
+As of GitLab 13.6, promoting a project label keeps that label's ID and changes it into a group label.
+Previously, promoting a project label created a new group label with a new ID and deleted the old label.
+
 ### Group labels
 
 To view the group labels list, navigate to the group and click **Issues > Labels**.

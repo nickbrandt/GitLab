@@ -285,6 +285,10 @@ Example response:
 NOTE: **Note:**
 An older endpoint `PUT /projects/:id/labels/promote` with `name` in the parameters is still available, but deprecated.
 
+NOTE: **Note:**
+As of GitLab 13.6, promoting a project label keeps that label's ID and changes it into a group label.
+Previously, promoting a project label created a new group label with a new ID and deleted the old label.
+
 ## Subscribe to a label
 
 Subscribes the authenticated user to a label to receive notifications.
