@@ -928,6 +928,13 @@ type AlertTodoCreatePayload {
 }
 
 """
+User availability status
+"""
+enum AvailabilityEnum {
+  BUSY
+}
+
+"""
 An emoji awarded by a user
 """
 type AwardEmoji {
@@ -21359,6 +21366,11 @@ enum UserState {
 }
 
 type UserStatus {
+  """
+  User availability status
+  """
+  availability: AvailabilityEnum
+
   """
   String representation of emoji
   """
