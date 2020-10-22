@@ -274,7 +274,7 @@ class Service < ApplicationRecord
     end
   end
 
-  def self.inherited_descendant_integrations_for(integration)
+  def self.inherited_descendants_from_self_or_ancestors_from(integration)
     inherit_from_ids =
       where(type: integration.type, group: integration.group.self_and_ancestors)
         .or(where(type: integration.type, instance: true)).select(:id)

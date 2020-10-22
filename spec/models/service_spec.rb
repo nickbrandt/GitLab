@@ -599,7 +599,7 @@ RSpec.describe Service do
     end
   end
 
-  describe '.inherited_descendant_integrations_for' do
+  describe '.inherited_descendants_from_self_or_ancestors_from' do
     let(:subgroup1) { create(:group, parent: group) }
     let(:subgroup2) { create(:group, parent: group) }
     let(:project1) { create(:project, group: subgroup1) }
@@ -611,8 +611,8 @@ RSpec.describe Service do
     let!(:project_integration2) { create(:prometheus_service, group: nil, project: project2, inherit_from_id: subgroup_integration2.id) }
 
     it 'returns the groups and projects inheriting from integration ancestors', :aggregate_failures do
-      expect(described_class.inherited_descendant_integrations_for(group_integration)).to eq([subgroup_integration1, project_integration1])
-      expect(described_class.inherited_descendant_integrations_for(subgroup_integration2)).to eq([project_integration2])
+      expect(described_class.inherited_descendants_from_self_or_ancestors_from(group_integration)).to eq([subgroup_integration1, project_integration1])
+      expect(described_class.inherited_descendants_from_self_or_ancestors_from(subgroup_integration2)).to eq([project_integration2])
     end
   end
 

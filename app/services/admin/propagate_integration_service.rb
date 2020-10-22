@@ -27,7 +27,7 @@ module Admin
     end
 
     def update_inherited_descendant_integrations
-      Service.inherited_descendant_integrations_for(integration).in_batches(of: BATCH_SIZE) do |services|
+      Service.inherited_descendants_from_self_or_ancestors_from(integration).in_batches(of: BATCH_SIZE) do |services|
         min_id, max_id = services.pick("MIN(services.id), MAX(services.id)")
         PropagateIntegrationInheritDescendantWorker.perform_async(integration.id, min_id, max_id)
       end
