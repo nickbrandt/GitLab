@@ -46,7 +46,7 @@ describe('First class Project Security Dashboard component', () => {
   const findCsvExportButton = () => wrapper.find(CsvExportButton);
   const findAutoFixUserCallout = () => wrapper.find(AutoFixUserCallout);
 
-  const createComponent = options => {
+  const createComponent = (options, data = {}) => {
     wrapper = shallowMount(FirstClassProjectSecurityDashboard, {
       propsData: {
         ...props,
@@ -54,6 +54,12 @@ describe('First class Project Security Dashboard component', () => {
       },
       provide,
       stubs: { SecurityDashboardLayout, GlBanner },
+      data() {
+        return {
+          autoFixMrsCount: 0,
+          ...data,
+        };
+      },
       ...options,
     });
   };
@@ -65,10 +71,12 @@ describe('First class Project Security Dashboard component', () => {
 
   describe('on render when there are vulnerabilities', () => {
     beforeEach(() => {
-      createComponent({
-        props: { hasVulnerabilities: true },
-        data: () => ({ filters }),
-      });
+      createComponent(
+        {
+          props: { hasVulnerabilities: true },
+        },
+        { filters },
+      );
     });
 
     it('should render the vulnerabilities', () => {
@@ -165,14 +173,14 @@ describe('First class Project Security Dashboard component', () => {
 
   describe('with filter data', () => {
     beforeEach(() => {
-      createComponent({
-        props: {
-          hasVulnerabilities: true,
+      createComponent(
+        {
+          props: {
+            hasVulnerabilities: true,
+          },
         },
-        data() {
-          return { filters };
-        },
-      });
+        { filters },
+      );
     });
 
     it('should pass the filter data down to the vulnerabilities', () => {
