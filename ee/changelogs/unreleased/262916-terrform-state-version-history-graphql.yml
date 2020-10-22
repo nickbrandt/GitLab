@@ -1,0 +1,5 @@
+---
+title: Add GraphQL endpoint to list version history for a Terraform state
+merge_request: 45851
+author:
+type: added

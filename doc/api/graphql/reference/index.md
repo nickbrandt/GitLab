@@ -3512,6 +3512,7 @@ Completion status of tasks.
 | `lockedByUser` | User | The user currently holding a lock on the Terraform state |
 | `name` | String! | Name of the Terraform state |
 | `updatedAt` | Time! | Timestamp the Terraform state was updated |
+| `versions` | TerraformStateVersionConnection! | Version history of the Terraform state file |
 
 ### TerraformStateDeletePayload
 

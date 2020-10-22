@@ -9,7 +9,7 @@ RSpec.describe GitlabSchema.types['TerraformState'] do
   describe 'fields' do
     let(:fields) { %i[id name locked_by_user locked_at latest_version created_at updated_at] }
 
-    it { expect(described_class).to have_graphql_fields(fields) }
+    it { expect(described_class).to have_graphql_fields(fields).at_least }
 
     it { expect(described_class.fields['id'].type).to be_non_null }
     it { expect(described_class.fields['name'].type).to be_non_null }
