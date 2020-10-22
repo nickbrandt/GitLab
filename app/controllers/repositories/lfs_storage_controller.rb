@@ -59,6 +59,10 @@ module Repositories
       params[:size].to_i
     end
 
+    def uploaded_file
+      params[:file]
+    end
+
     # rubocop: disable CodeReuse/ActiveRecord
     def store_file!(oid, size)
       object = LfsObject.find_by(oid: oid, size: size)
@@ -76,15 +80,12 @@ module Repositories
     # rubocop: enable CodeReuse/ActiveRecord
 
     def create_file!(oid, size)
-      uploaded_file = params[:file]
       return unless uploaded_file.is_a?(UploadedFile)
 
       LfsObject.create!(oid: oid, size: size, file: uploaded_file)
     end
 
     def replace_file!(lfs_object)
-      uploaded_file = params[:file]
-
       raise UploadedFile::InvalidPathError unless uploaded_file.is_a?(UploadedFile)
 
       Gitlab::AppJsonLogger.info(message: "LFS file replaced because it did not exist", oid: oid, size: size)
