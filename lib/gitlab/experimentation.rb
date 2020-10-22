@@ -58,7 +58,8 @@ module Gitlab
         use_backwards_compatible_subject_index: true
       },
       invite_members_empty_group_version_a: {
-        tracking_category: 'Growth::Expansion::Experiment::InviteMembersEmptyGroupVersionA'
+        tracking_category: 'Growth::Expansion::Experiment::InviteMembersEmptyGroupVersionA',
+        use_backwards_compatible_subject_index: true
       },
       new_create_project_ui: {
         tracking_category: 'Manage::Import::Experiment::NewCreateProjectUi',
