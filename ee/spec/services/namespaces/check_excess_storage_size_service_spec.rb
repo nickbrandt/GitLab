@@ -8,11 +8,13 @@ RSpec.describe Namespaces::CheckExcessStorageSizeService, '#execute' do
   let(:service) { described_class.new(namespace, user) }
   let(:total_repository_size_excess) { 150.megabytes }
   let(:additional_purchased_storage_size) { 100 }
+  let(:namespace_storage_limit_enabled) { false }
   let(:storage_allocation_enabled) { true }
 
   subject(:response) { service.execute }
 
   before do
+    stub_feature_flags(namespace_storage_limit: namespace_storage_limit_enabled)
     allow(Gitlab::CurrentSettings).to receive(:automatic_purchased_storage_allocation?) { storage_allocation_enabled }
 
     allow(namespace).to receive(:root_ancestor).and_return(namespace)
@@ -30,6 +32,12 @@ RSpec.describe Namespaces::CheckExcessStorageSizeService, '#execute' do
       before do
         stub_feature_flags(additional_repo_storage_by_namespace: false)
       end
+
+      it { is_expected.to be_success }
+    end
+
+    context 'with feature flag :namespace_storage_limit enabled' do
+      let(:namespace_storage_limit_enabled) { true }
 
       it { is_expected.to be_success }
     end
