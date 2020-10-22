@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 class Groups::DependencyProxyForContainersController < Groups::ApplicationController
-  include DependencyProxyAccess
+  include DependencyProxy::Access
+  include DependencyProxy::Auth
   include SendFileUpload
 
+  prepend_before_action :get_user_from_token!
   before_action :ensure_token_granted!
   before_action :ensure_feature_enabled!
 
   attr_reader :token
 
-  feature_category :package_registry
+  feature_category :dependency_proxy
 
   def manifest
     result = DependencyProxy::PullManifestService.new(image, tag, token).execute
@@ -33,6 +35,14 @@ class Groups::DependencyProxyForContainersController < Groups::ApplicationContro
   end
 
   private
+
+  def get_user_from_token!
+    if Feature.enabled?(:dependency_proxy_for_private_groups, default_enabled: true)
+      return respond_unauthorized! unless request.headers['HTTP_AUTHORIZATION']
+
+      sign_in(user_from_token)
+    end
+  end
 
   def image
     params[:image]
