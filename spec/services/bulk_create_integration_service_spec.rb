@@ -9,9 +9,9 @@ RSpec.describe BulkCreateIntegrationService do
     stub_jira_service_test
   end
 
+  let_it_be(:instance_integration) { create(:jira_service, :instance) }
+  let_it_be(:template_integration) { create(:jira_service, :template) }
   let(:excluded_attributes) { %w[id project_id group_id inherit_from_id instance template created_at updated_at] }
-  let!(:instance_integration) { create(:jira_service, :instance) }
-  let!(:template_integration) { create(:jira_service, :template) }
 
   shared_examples 'creates integration from batch ids' do
     it 'updates the inherited integrations' do
@@ -101,7 +101,7 @@ RSpec.describe BulkCreateIntegrationService do
     end
 
     context 'with a group association' do
-      let!(:group) { create(:group) }
+      let_it_be(:group) { create(:group) }
       let(:created_integration) { Service.find_by(group: group) }
       let(:batch) { Group.all }
       let(:association) { 'group' }
@@ -110,8 +110,8 @@ RSpec.describe BulkCreateIntegrationService do
       it_behaves_like 'updates inherit_from_id'
 
       context 'with a subgroup association' do
-        let!(:group_integration) { create(:jira_service, group: group, project: nil, inherit_from_id: instance_integration.id) }
-        let!(:subgroup) { create(:group, parent: group) }
+        let_it_be(:group_integration) { create(:jira_service, group: group, project: nil, inherit_from_id: instance_integration.id) }
+        let_it_be(:subgroup) { create(:group, parent: group) }
         let(:integration) { group_integration }
         let(:created_integration) { Service.find_by(group: subgroup) }
         let(:batch) { Group.all }
