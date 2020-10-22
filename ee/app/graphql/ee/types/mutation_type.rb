@@ -26,6 +26,7 @@ module EE
         mount_mutation ::Mutations::Vulnerabilities::Resolve
         mount_mutation ::Mutations::Vulnerabilities::Confirm
         mount_mutation ::Mutations::Vulnerabilities::RevertToDetected
+        mount_mutation ::Mutations::Vulnerabilities::CreateMergeRequestFeedback
         mount_mutation ::Mutations::Boards::Update
         mount_mutation ::Mutations::Boards::Lists::UpdateLimitMetrics
         mount_mutation ::Mutations::Boards::UpdateEpicUserPreferences

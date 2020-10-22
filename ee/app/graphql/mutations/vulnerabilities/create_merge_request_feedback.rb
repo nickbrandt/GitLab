@@ -2,7 +2,7 @@
 
 module Mutations
   module Vulnerabilities
-    class CreateMergeRequest < BaseMutation
+    class CreateMergeRequestFeedback < BaseMutation
       graphql_name 'VulnerabilityCreateMergeRequestFeedback'
 
       authorize :admin_vulnerability
@@ -37,7 +37,7 @@ module Mutations
                description: 'Pipeline ID where vulnerability was found'
 
       argument :vulnerability_data,
-               ::Types::VulnerabilityType,
+               GraphQL::STRING_TYPE,#::Types::VulnerabilityType,
                required: true,
                description: 'Vulnerability data'
 
@@ -77,13 +77,6 @@ module Mutations
         id = ::Types::GlobalIDType[::Vulnerability].coerce_isolated_input(id)
         GitlabSchema.find_by_gid(id)
       end
-
-      # def find_project(id:)
-      #   # TODO: remove this line once the compatibility layer is removed.
-      #   # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
-      #   id = ::Types::GlobalIDType[::Project].coerce_isolated_input(id)
-      #   GitlabSchema.find_by_gid(id)
-      # end
     end
   end
 end
