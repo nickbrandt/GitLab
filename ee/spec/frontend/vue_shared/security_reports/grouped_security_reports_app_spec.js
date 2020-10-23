@@ -93,7 +93,8 @@ describe('Grouped security reports app', () => {
   });
 
   afterEach(() => {
-    wrapper.vm.$destroy();
+    wrapper.destroy();
+    wrapper = null;
     mock.restore();
   });
 
@@ -275,8 +276,8 @@ describe('Grouped security reports app', () => {
         expect(wrapper.vm.$el.querySelector('.gl-spinner')).toBeNull();
 
         // Renders the summary text
-        expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected 6 critical and 4 high severity vulnerabilities.',
+        expect(wrapper.vm.$el.querySelector('.js-code-text').textContent.trim()).toContain(
+          'Security scanning detected 10 potential vulnerabilities',
         );
 
         // Renders the expand button
@@ -286,27 +287,25 @@ describe('Grouped security reports app', () => {
 
         // Renders Sast result
         expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'SAST detected 1 critical severity vulnerability',
+          'SAST detected 1 potential vulnerability',
         );
 
         // Renders DSS result
         expect(trimText(wrapper.vm.$el.textContent)).toContain(
-          'Dependency scanning detected 1 critical and 1 high severity vulnerabilities.',
+          'Dependency scanning detected 2 potential vulnerabilities',
         );
 
         // Renders container scanning result
         expect(wrapper.vm.$el.textContent).toContain(
-          'Container scanning detected 1 critical and 1 high severity vulnerabilities.',
+          'Container scanning detected 2 potential vulnerabilities',
         );
 
         // Renders DAST result
-        expect(wrapper.vm.$el.textContent).toContain(
-          'DAST detected 1 critical severity vulnerability.',
-        );
+        expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 potential vulnerability');
 
         // Renders container scanning result
         expect(wrapper.vm.$el.textContent).toContain(
-          'Coverage fuzzing detected 1 critical and 1 high severity vulnerabilities.',
+          'Coverage fuzzing detected 2 potential vulnerabilities',
         );
       });
 
@@ -427,9 +426,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.text()).toContain(
-        'Container scanning detected 1 critical and 1 high severity vulnerabilities.',
-      );
+      expect(wrapper.text()).toContain('Container scanning detected 2 potential vulnerabilities');
     });
   });
 
@@ -458,7 +455,7 @@ describe('Grouped security reports app', () => {
 
     it('should display the correct numbers of vulnerabilities', () => {
       expect(wrapper.vm.$el.textContent).toContain(
-        'Dependency scanning detected 1 critical and 1 high severity vulnerabilities.',
+        'Dependency scanning detected 2 potential vulnerabilities',
       );
     });
   });
@@ -488,9 +485,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.vm.$el.textContent).toContain(
-        'DAST detected 1 critical severity vulnerability',
-      );
+      expect(wrapper.vm.$el.textContent).toContain('DAST detected 1 potential vulnerability');
     });
 
     it('shows the scanned URLs count and opens a modal', async () => {
@@ -570,9 +565,7 @@ describe('Grouped security reports app', () => {
       });
 
       it('should display the correct numbers of vulnerabilities', () => {
-        expect(wrapper.text()).toContain(
-          'Secret scanning detected 1 critical and 1 high severity vulnerabilities.',
-        );
+        expect(wrapper.text()).toContain('Secret scanning detected 2 potential vulnerabilities');
       });
     });
 
@@ -609,9 +602,7 @@ describe('Grouped security reports app', () => {
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
-      expect(wrapper.vm.$el.textContent).toContain(
-        'SAST detected 1 critical severity vulnerability.',
-      );
+      expect(wrapper.vm.$el.textContent).toContain('SAST detected 1 potential vulnerability');
     });
   });
 

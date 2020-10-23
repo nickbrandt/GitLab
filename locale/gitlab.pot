@@ -82,6 +82,11 @@ msgid_plural "%d Approvals"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d Other"
+msgid_plural "%d Others"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d Package"
 msgid_plural "%d Packages"
 msgstr[0] ""
@@ -710,34 +715,13 @@ msgstr[1] ""
 msgid "%{remaining_approvals} left"
 msgstr ""
 
-msgid "%{reportType} %{status} detected %{criticalStart}%{critical} critical%{criticalEnd} and %{highStart}%{high} high%{highEnd} severity vulnerabilities out of %{total}."
+msgid "%{reportType} %{status}"
 msgstr ""
 
-msgid "%{reportType} %{status} detected %{criticalStart}%{critical} critical%{criticalEnd} and %{highStart}%{high} high%{highEnd} severity vulnerabilities."
+msgid "%{reportType} detected %{countStart}%{total}%{countEnd} potential %{vulnMessage} %{criticalStart}%{critical} critical%{criticalEnd} %{highStart}%{high} high%{highEnd} and %{otherStart}%{otherMessage}%{otherEnd}"
 msgstr ""
 
-msgid "%{reportType} %{status} detected %{criticalStart}%{critical} critical%{criticalEnd} severity vulnerabilities out of %{total}."
-msgstr ""
-
-msgid "%{reportType} %{status} detected %{criticalStart}%{critical} critical%{criticalEnd} severity vulnerability."
-msgid_plural "%{reportType} %{status} detected %{criticalStart}%{critical} critical%{criticalEnd} severity vulnerabilities."
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "%{reportType} %{status} detected %{highStart}%{high} high%{highEnd} severity vulnerabilities out of %{total}."
-msgstr ""
-
-msgid "%{reportType} %{status} detected %{highStart}%{high} high%{highEnd} severity vulnerability."
-msgid_plural "%{reportType} %{status} detected %{highStart}%{high} high%{highEnd} severity vulnerabilities."
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "%{reportType} %{status} detected %{other} vulnerability."
-msgid_plural "%{reportType} %{status} detected %{other} vulnerabilities."
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "%{reportType} %{status} detected no vulnerabilities."
+msgid "%{reportType} detected %{countStart}no%{countEnd} vulnerabilities."
 msgstr ""
 
 msgid "%{retryButtonStart}Try again%{retryButtonEnd} or %{newFileButtonStart}attach a new file%{newFileButtonEnd}."
@@ -31539,13 +31523,7 @@ msgstr ""
 msgid "ciReport|%{sameNum} same"
 msgstr ""
 
-msgid "ciReport|(errors when loading results)"
-msgstr ""
-
-msgid "ciReport|(is loading)"
-msgstr ""
-
-msgid "ciReport|(is loading, errors when loading results)"
+msgid "ciReport|: Loading resulted in an error"
 msgstr ""
 
 msgid "ciReport|All projects"
@@ -31710,6 +31688,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "ciReport|View full report"
+msgstr ""
+
+msgid "ciReport|is loading"
+msgstr ""
+
+msgid "ciReport|is loading, errors when loading results"
 msgstr ""
 
 msgid "closed issue"
@@ -32813,6 +32797,11 @@ msgstr ""
 
 msgid "view the source"
 msgstr ""
+
+msgid "vulnerability"
+msgid_plural "vulnerabilities"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "vulnerability|Add a comment"
 msgstr ""

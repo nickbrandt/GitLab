@@ -117,38 +117,44 @@ describe('security reports utils', () => {
 
     it.each`
       vulnerabilities              | message
-      ${undefined}                 | ${' detected no vulnerabilities.'}
-      ${{ critical }}              | ${' detected %{criticalStart}2 critical%{criticalEnd} severity vulnerabilities.'}
-      ${{ high }}                  | ${' detected %{highStart}4 high%{highEnd} severity vulnerabilities.'}
-      ${{ other }}                 | ${' detected 7 vulnerabilities.'}
-      ${{ critical, high }}        | ${' detected %{criticalStart}2 critical%{criticalEnd} and %{highStart}4 high%{highEnd} severity vulnerabilities.'}
-      ${{ critical, other }}       | ${' detected %{criticalStart}2 critical%{criticalEnd} severity vulnerabilities out of 9.'}
-      ${{ high, other }}           | ${' detected %{highStart}4 high%{highEnd} severity vulnerabilities out of 11.'}
-      ${{ critical, high, other }} | ${' detected %{criticalStart}2 critical%{criticalEnd} and %{highStart}4 high%{highEnd} severity vulnerabilities out of 13.'}
+      ${undefined}                 | ${' detected %{countStart}no%{countEnd} vulnerabilities.'}
+      ${{ critical }}              | ${` detected %{countStart}2%{countEnd} potential vulnerabilities %{criticalStart}2 critical%{criticalEnd} %{highStart}0 high%{highEnd} and %{otherStart}0 Others%{otherEnd}`}
+      ${{ high }}                  | ${` detected %{countStart}4%{countEnd} potential vulnerabilities %{criticalStart}0 critical%{criticalEnd} %{highStart}4 high%{highEnd} and %{otherStart}0 Others%{otherEnd}`}
+      ${{ other }}                 | ${` detected %{countStart}7%{countEnd} potential vulnerabilities %{criticalStart}0 critical%{criticalEnd} %{highStart}0 high%{highEnd} and %{otherStart}7 Others%{otherEnd}`}
+      ${{ critical, high }}        | ${` detected %{countStart}6%{countEnd} potential vulnerabilities %{criticalStart}2 critical%{criticalEnd} %{highStart}4 high%{highEnd} and %{otherStart}0 Others%{otherEnd}`}
+      ${{ critical, other }}       | ${` detected %{countStart}9%{countEnd} potential vulnerabilities %{criticalStart}2 critical%{criticalEnd} %{highStart}0 high%{highEnd} and %{otherStart}7 Others%{otherEnd}`}
+      ${{ high, other }}           | ${` detected %{countStart}11%{countEnd} potential vulnerabilities %{criticalStart}0 critical%{criticalEnd} %{highStart}4 high%{highEnd} and %{otherStart}7 Others%{otherEnd}`}
+      ${{ critical, high, other }} | ${` detected %{countStart}13%{countEnd} potential vulnerabilities %{criticalStart}2 critical%{criticalEnd} %{highStart}4 high%{highEnd} and %{otherStart}7 Others%{otherEnd}`}
     `('should build the message as "$message"', ({ vulnerabilities, message }) => {
-      expect(groupedTextBuilder(vulnerabilities)).toEqual(message);
+      expect(groupedTextBuilder(vulnerabilities).message).toEqual(message);
     });
 
     it.each`
       vulnerabilities    | message
-      ${{ critical: 1 }} | ${' detected %{criticalStart}1 critical%{criticalEnd} severity vulnerability.'}
-      ${{ high: 1 }}     | ${' detected %{highStart}1 high%{highEnd} severity vulnerability.'}
-      ${{ other: 1 }}    | ${' detected 1 vulnerability.'}
+      ${{ critical: 1 }} | ${` detected %{countStart}1%{countEnd} potential vulnerability %{criticalStart}1 critical%{criticalEnd} %{highStart}0 high%{highEnd} and %{otherStart}0 Others%{otherEnd}`}
+      ${{ high: 1 }}     | ${` detected %{countStart}1%{countEnd} potential vulnerability %{criticalStart}0 critical%{criticalEnd} %{highStart}1 high%{highEnd} and %{otherStart}0 Others%{otherEnd}`}
+      ${{ other: 1 }}    | ${` detected %{countStart}1%{countEnd} potential vulnerability %{criticalStart}0 critical%{criticalEnd} %{highStart}0 high%{highEnd} and %{otherStart}1 Other%{otherEnd}`}
     `('should handle single vulnerabilities for "$message"', ({ vulnerabilities, message }) => {
-      expect(groupedTextBuilder(vulnerabilities)).toEqual(message);
+      expect(groupedTextBuilder(vulnerabilities).message).toEqual(message);
     });
 
     it('should pass through the report type', () => {
       const reportType = 'HAL';
-      expect(groupedTextBuilder({ reportType })).toEqual('HAL detected no vulnerabilities.');
+      expect(groupedTextBuilder({ reportType }).message).toEqual(
+        'HAL detected %{countStart}no%{countEnd} vulnerabilities.',
+      );
     });
 
     it('should pass through the status', () => {
       const reportType = 'HAL';
-      const status = '(is loading)';
-      expect(groupedTextBuilder({ reportType, status })).toEqual(
-        'HAL (is loading) detected no vulnerabilities.',
-      );
+      const status = 'is loading';
+      expect(groupedTextBuilder({ reportType, status })).toEqual({
+        critical: 0,
+        high: 0,
+        message: 'HAL is loading',
+        other: 0,
+        status: 'is loading',
+      });
     });
   });
 
@@ -202,21 +208,27 @@ describe('security reports utils', () => {
       const report = { ...baseReport, hasError: true };
       const result = groupedReportText(report, reportType, errorMessage, loadingMessage);
 
-      expect(result).toBe(errorMessage);
+      expect(result).toStrictEqual({ message: errorMessage });
     });
 
     it("should return the loading message when it's loading", () => {
       const report = { ...baseReport, isLoading: true };
       const result = groupedReportText(report, reportType, errorMessage, loadingMessage);
 
-      expect(result).toBe(loadingMessage);
+      expect(result).toStrictEqual({ message: loadingMessage });
     });
 
     it("should call groupedTextBuilder if it isn't loading and doesn't have an error", () => {
       const report = { ...baseReport };
       const result = groupedReportText(report, reportType, errorMessage, loadingMessage);
 
-      expect(result).toBe(`${reportType} detected no vulnerabilities.`);
+      expect(result).toStrictEqual({
+        critical: 0,
+        high: 0,
+        message: 'dummyReport detected %{countStart}no%{countEnd} vulnerabilities.',
+        other: 0,
+        status: '',
+      });
     });
   });
 });

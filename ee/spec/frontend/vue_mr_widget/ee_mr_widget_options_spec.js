@@ -140,7 +140,7 @@ describe('ee merge request widget options', () => {
                 `${SAST_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual('SAST detected 1 critical severity vulnerability.');
+          ).toEqual('SAST detected 1 potential vulnerability 1 critical 0 high and 0 Others');
           done();
         });
       });
@@ -235,7 +235,9 @@ describe('ee merge request widget options', () => {
                 `${DEPENDENCY_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual('Dependency scanning detected 1 critical and 1 high severity vulnerabilities.');
+          ).toContain(
+            'Dependency scanning detected 2 potential vulnerabilities 1 critical 1 high and 0 Others',
+          );
           done();
         });
       });
@@ -660,7 +662,9 @@ describe('ee merge request widget options', () => {
                 `${CONTAINER_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual('Container scanning detected 1 critical and 1 high severity vulnerabilities.');
+          ).toEqual(
+            'Container scanning detected 2 potential vulnerabilities 1 critical 1 high and 0 Others',
+          );
           done();
         });
       });
@@ -733,7 +737,7 @@ describe('ee merge request widget options', () => {
             findExtendedSecurityWidget()
               .querySelector(`${DAST_SELECTOR} .report-block-list-issue-description`)
               .textContent.trim(),
-          ).toEqual('DAST detected 1 critical severity vulnerability.');
+          ).toContain('DAST detected 1 potential vulnerability');
           done();
         });
       });
@@ -809,7 +813,7 @@ describe('ee merge request widget options', () => {
             findExtendedSecurityWidget()
               .querySelector(`${COVERAGE_FUZZING_SELECTOR} .report-block-list-issue-description`)
               .textContent.trim(),
-          ).toEqual('Coverage fuzzing detected 1 critical and 1 high severity vulnerabilities.');
+          ).toContain('Coverage fuzzing detected 2 potential vulnerabilities');
           done();
         });
       });
@@ -884,7 +888,9 @@ describe('ee merge request widget options', () => {
                 `${SECRET_SCANNING_SELECTOR} .report-block-list-issue-description`,
               ).textContent,
             ),
-          ).toEqual('Secret scanning detected 1 critical and 1 high severity vulnerabilities.');
+          ).toEqual(
+            'Secret scanning detected 2 potential vulnerabilities 1 critical 1 high and 0 Others',
+          );
           done();
         });
       });
