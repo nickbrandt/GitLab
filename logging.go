@@ -18,26 +18,20 @@ const (
 	noneLogType      = "none"
 )
 
-type logConfiguration struct {
-	logFile   string
-	logFormat string
-}
-
-func startLogging(config logConfiguration) (io.Closer, error) {
+func startLogging(file string, format string) (io.Closer, error) {
 	// Golog always goes to stderr
 	goLog.SetOutput(os.Stderr)
 
-	logFile := config.logFile
-	if logFile == "" {
-		logFile = "stderr"
+	if file == "" {
+		file = "stderr"
 	}
 
-	switch config.logFormat {
+	switch format {
 	case noneLogType:
 		return logkit.Initialize(logkit.WithWriter(ioutil.Discard))
 	case jsonLogFormat:
 		return logkit.Initialize(
-			logkit.WithOutputName(logFile),
+			logkit.WithOutputName(file),
 			logkit.WithFormatter("json"),
 		)
 	case textLogFormat:
@@ -48,23 +42,22 @@ func startLogging(config logConfiguration) (io.Closer, error) {
 		)
 	case structuredFormat:
 		return logkit.Initialize(
-			logkit.WithOutputName(logFile),
+			logkit.WithOutputName(file),
 			logkit.WithFormatter("color"),
 		)
 	}
 
-	return nil, fmt.Errorf("unknown logFormat: %v", config.logFormat)
+	return nil, fmt.Errorf("unknown logFormat: %v", format)
 }
 
 // In text format, we use a separate logger for access logs
-func getAccessLogger(config logConfiguration) (*log.Logger, io.Closer, error) {
-	if config.logFormat != "text" {
+func getAccessLogger(file string, format string) (*log.Logger, io.Closer, error) {
+	if format != "text" {
 		return log.StandardLogger(), ioutil.NopCloser(nil), nil
 	}
 
-	logFile := config.logFile
-	if logFile == "" {
-		logFile = "stderr"
+	if file == "" {
+		file = "stderr"
 	}
 
 	accessLogger := log.New()
@@ -72,7 +65,7 @@ func getAccessLogger(config logConfiguration) (*log.Logger, io.Closer, error) {
 	closer, err := logkit.Initialize(
 		logkit.WithLogger(accessLogger),  // Configure `accessLogger`
 		logkit.WithFormatter("combined"), // Use the combined formatter
-		logkit.WithOutputName(logFile),
+		logkit.WithOutputName(file),
 	)
 
 	return accessLogger, closer, err

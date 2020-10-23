@@ -38,6 +38,9 @@ import (
 const scratchDir = "testdata/scratch"
 const testRepoRoot = "testdata/data"
 const testDocumentRoot = "testdata/public"
+
+var absDocumentRoot string
+
 const testRepo = "group/test.git"
 const testProject = "group/test"
 
@@ -183,7 +186,7 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 	proxied := false
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		proxied = true
-		w.Header().Add("X-Sendfile", *documentRoot+r.URL.Path)
+		w.Header().Add("X-Sendfile", absDocumentRoot+r.URL.Path)
 		w.WriteHeader(200)
 	})
 	defer ts.Close()
@@ -577,11 +580,11 @@ func setupStaticFile(fpath, content string) error {
 	if err != nil {
 		return err
 	}
-	*documentRoot = path.Join(cwd, testDocumentRoot)
-	if err := os.MkdirAll(path.Join(*documentRoot, path.Dir(fpath)), 0755); err != nil {
+	absDocumentRoot = path.Join(cwd, testDocumentRoot)
+	if err := os.MkdirAll(path.Join(absDocumentRoot, path.Dir(fpath)), 0755); err != nil {
 		return err
 	}
-	staticFile := path.Join(*documentRoot, fpath)
+	staticFile := path.Join(absDocumentRoot, fpath)
 	return ioutil.WriteFile(staticFile, []byte(content), 0666)
 }
 

@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"net/url"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,13 +10,12 @@ import (
 )
 
 func TestURLOpeners(t *testing.T) {
-	tmpFile, cfg := loadTempConfig(t, azureConfig)
-	defer os.Remove(tmpFile.Name())
+	cfg, err := LoadConfig(azureConfig)
+	require.NoError(t, err)
 
 	require.NotNil(t, cfg.ObjectStorageCredentials, "Expected object storage credentials")
 
-	err := cfg.RegisterGoCloudURLOpeners()
-	require.NoError(t, err)
+	require.NoError(t, cfg.RegisterGoCloudURLOpeners())
 	require.NotNil(t, cfg.ObjectStorageConfig.URLMux)
 
 	tests := []struct {
