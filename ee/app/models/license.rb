@@ -550,8 +550,8 @@ class License < ApplicationRecord
 
   def prior_historical_max
     @prior_historical_max ||= begin
-      from = starts_at - 1.year
-      to   = starts_at
+      from = (starts_at - 1.year).beginning_of_day
+      to   = starts_at.end_of_day
 
       historical_max(from, to)
     end
@@ -573,8 +573,8 @@ class License < ApplicationRecord
 
   def check_trueup
     trueup_qty          = restrictions[:trueup_quantity]
-    trueup_from         = Date.parse(restrictions[:trueup_from]) rescue (starts_at - 1.year)
-    trueup_to           = Date.parse(restrictions[:trueup_to]) rescue starts_at
+    trueup_from         = Date.parse(restrictions[:trueup_from]).beginning_of_day rescue (starts_at - 1.year).beginning_of_day
+    trueup_to           = Date.parse(restrictions[:trueup_to]).end_of_day rescue starts_at.end_of_day
     max_historical      = historical_max(trueup_from, trueup_to)
     expected_trueup_qty = if previous_user_count
                             max_historical - previous_user_count
