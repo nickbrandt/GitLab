@@ -29,7 +29,7 @@ describe('pipeline jobs module mutations', () => {
   describe('SET_PIPELINE_ID', () => {
     const pipelineId = 123;
 
-    it(`should set the pipelineId  to ${pipelineId}`, () => {
+    it(`should set the pipelineId to ${pipelineId}`, () => {
       mutations[types.SET_PIPELINE_ID](state, pipelineId);
       expect(state.pipelineId).toBe(pipelineId);
     });
