@@ -43,6 +43,15 @@ type processCounter struct {
 	n int32
 }
 
+type resizeStatus = string
+
+const (
+	statusSuccess        = "success"        // a rescaled image was served
+	statusScalingFailure = "scaling-failed" // scaling failed but the original image was served
+	statusRequestFailure = "request-failed" // no image was served
+	statusUnknown        = "unknown"        // indicates an unhandled status case
+)
+
 var envInjector = tracing.NewEnvInjector()
 
 // Images might be located remotely in object storage, in which case we need to stream
@@ -86,13 +95,14 @@ var (
 			Help:      "Amount of image resizing scaler processes working now",
 		},
 	)
-	imageResizeCompleted = prometheus.NewCounter(
+	imageResizeRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
-			Name:      "completed_total",
-			Help:      "Amount of image resizing processes sucessfully completed",
+			Name:      "requests_total",
+			Help:      "Image resizing operations requested",
 		},
+		[]string{"status"},
 	)
 	imageResizeDurations = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
@@ -116,7 +126,7 @@ var (
 func init() {
 	prometheus.MustRegister(imageResizeConcurrencyLimitExceeds)
 	prometheus.MustRegister(imageResizeProcesses)
-	prometheus.MustRegister(imageResizeCompleted)
+	prometheus.MustRegister(imageResizeRequests)
 	prometheus.MustRegister(imageResizeDurations)
 }
 
@@ -127,12 +137,18 @@ func NewResizer(cfg config.Config) *Resizer {
 // This Injecter forks into a dedicated scaler process to resize an image identified by path or URL
 // and streams the resized image back to the client
 func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData string) {
+	var status resizeStatus = statusUnknown
+	defer func() {
+		imageResizeRequests.WithLabelValues(status).Inc()
+	}()
+
 	start := time.Now()
 	logger := log.ContextLogger(req.Context())
 	params, err := r.unpackParameters(paramsData)
 	if err != nil {
 		// This means the response header coming from Rails was malformed; there is no way
 		// to sensibly recover from this other than failing fast
+		status = statusRequestFailure
 		helper.Fail500(w, req, fmt.Errorf("ImageResizer: Failed reading image resize params: %v", err))
 		return
 	}
@@ -140,6 +156,7 @@ func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 	sourceImageReader, fileSize, err := openSourceImage(params.Location)
 	if err != nil {
 		// This means we cannot even read the input image; fail fast.
+		status = statusRequestFailure
 		helper.Fail500(w, req, fmt.Errorf("ImageResizer: Failed opening image data stream: %v", err))
 		return
 	}
@@ -159,22 +176,28 @@ func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 	// will point to the original image, i.e. we render it unchanged.
 	imageReader, resizeCmd, err := r.tryResizeImage(req, sourceImageReader, logger.Writer(), params, fileSize, r.Config.ImageResizerConfig)
 	if err != nil {
-		// something failed, but we can still write out the original image, do don't return early
+		// Something failed, but we can still write out the original image, so don't return early.
 		helper.LogErrorWithFields(req, err, *logFields(0))
 	}
 	defer helper.CleanUpProcessGroup(resizeCmd)
-	imageResizeCompleted.Inc()
 
 	w.Header().Del("Content-Length")
 	bytesWritten, err := serveImage(imageReader, w, resizeCmd)
 
+	// We failed serving image data; this is a hard failure.
 	if err != nil {
-		handleFailedCommand(w, req, bytesWritten, err, logFields(bytesWritten))
+		status = statusRequestFailure
+		if bytesWritten <= 0 {
+			helper.Fail500(w, req, err)
+		} else {
+			helper.LogErrorWithFields(req, err, *logFields(bytesWritten))
+		}
 		return
 	}
 
+	// This means we served the original image because rescaling failed; this is a soft failure
 	if resizeCmd == nil {
-		// This means we served the original image because rescaling failed
+		status = statusScalingFailure
 		logger.WithFields(*logFields(bytesWritten)).Printf("ImageResizer: Served original")
 		return
 	}
@@ -183,6 +206,8 @@ func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 	imageResizeDurations.WithLabelValues(params.ContentType, widthLabelVal).Observe(time.Since(start).Seconds())
 
 	logger.WithFields(*logFields(bytesWritten)).Printf("ImageResizer: Success")
+
+	status = statusSuccess
 }
 
 // Streams image data from the given reader to the given writer and returns the number of bytes written.
@@ -199,14 +224,6 @@ func serveImage(r io.Reader, w io.Writer, resizeCmd *exec.Cmd) (int64, error) {
 	}
 
 	return bytesWritten, nil
-}
-
-func handleFailedCommand(w http.ResponseWriter, req *http.Request, bytesWritten int64, err error, logFields *log.Fields) {
-	if bytesWritten <= 0 {
-		helper.Fail500(w, req, err)
-	} else {
-		helper.LogErrorWithFields(req, err, *logFields)
-	}
 }
 
 func (r *Resizer) unpackParameters(paramsData string) (*resizeParams, error) {
