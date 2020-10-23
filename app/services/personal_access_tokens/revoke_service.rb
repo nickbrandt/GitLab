@@ -2,12 +2,13 @@
 
 module PersonalAccessTokens
   class RevokeService
-    attr_reader :token, :current_user, :group
+    attr_reader :token, :current_user, :group,  :ip_address
 
     def initialize(current_user = nil, params = { token: nil, group: nil })
       @current_user = current_user
       @token = params[:token]
       @group = params[:group]
+      @ip_address = params[:ip_address]
     end
 
     def execute

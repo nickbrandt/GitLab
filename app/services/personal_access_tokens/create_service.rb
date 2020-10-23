@@ -2,7 +2,7 @@
 
 module PersonalAccessTokens
   class CreateService < BaseService
-    attr_reader :token, :target_user
+    attr_reader :token, :target_user, :ip_address
 
     def initialize(current_user:, target_user:, params: {})
       @current_user = current_user

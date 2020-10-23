@@ -13,7 +13,7 @@ RSpec.describe PersonalAccessTokens::CreateService do
     it 'creates audit logs' do
       expect(::AuditEventService)
         .to receive(:new)
-        .with(user, user, action: :custom,  custom_message: /Created personal access token with id \d+/, ip_address: nil)
+        .with(user, user, action: :custom, custom_message: /Created personal access token with id \d+/, ip_address: nil)
         .and_call_original
 
       subject
