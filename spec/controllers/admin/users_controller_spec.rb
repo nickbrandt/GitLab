@@ -107,33 +107,31 @@ RSpec.describe Admin::UsersController do
 
     subject { put :approve, params: { id: user.username } }
 
-    context 'when feature is enabled' do
-      context 'when successful' do
-        it 'activates the user' do
-          subject
+    context 'when successful' do
+      it 'activates the user' do
+        subject
 
-          user.reload
+        user.reload
 
-          expect(user).to be_active
-          expect(flash[:notice]).to eq('Successfully approved')
-        end
+        expect(user).to be_active
+        expect(flash[:notice]).to eq('Successfully approved')
+      end
+    end
+
+    context 'when unsuccessful' do
+      let(:user) { create(:user, :blocked) }
+
+      it 'displays the error' do
+        subject
+
+        expect(flash[:alert]).to eq('The user you are trying to approve is not pending an approval')
       end
 
-      context 'when unsuccessful' do
-        let(:user) { create(:user, :blocked) }
+      it 'does not activate the user' do
+        subject
 
-        it 'displays the error' do
-          subject
-
-          expect(flash[:alert]).to eq('The user you are trying to approve is not pending an approval')
-        end
-
-        it 'does not activate the user' do
-          subject
-
-          user.reload
-          expect(user).not_to be_active
-        end
+        user.reload
+        expect(user).not_to be_active
       end
     end
   end

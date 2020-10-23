@@ -75,14 +75,12 @@ RSpec.describe "Admin::Users" do
       end
 
       context '`Pending approval` tab' do
-        context 'feature is enabled' do
-          before do
-            visit admin_users_path
-          end
+        before do
+          visit admin_users_path
+        end
 
-          it 'shows the `Pending approval` tab' do
-            expect(page).to have_link('Pending approval', href: admin_users_path(filter: 'blocked_pending_approval'))
-          end
+        it 'shows the `Pending approval` tab' do
+          expect(page).to have_link('Pending approval', href: admin_users_path(filter: 'blocked_pending_approval'))
         end
       end
     end

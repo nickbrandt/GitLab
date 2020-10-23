@@ -132,16 +132,14 @@ RSpec.describe 'Admin updates settings', :clean_gitlab_redis_shared_state, :do_n
 
       context 'Change Sign-up restrictions' do
         context 'Require Admin approval for new signup setting' do
-          context 'when feature is enabled' do
-            it 'changes the setting' do
-              page.within('.as-signup') do
-                check 'Require admin approval for new sign-ups'
-                click_button 'Save changes'
-              end
-
-              expect(current_settings.require_admin_approval_after_user_signup).to be_truthy
-              expect(page).to have_content "Application settings saved successfully"
+          it 'changes the setting' do
+            page.within('.as-signup') do
+              check 'Require admin approval for new sign-ups'
+              click_button 'Save changes'
             end
+
+            expect(current_settings.require_admin_approval_after_user_signup).to be_truthy
+            expect(page).to have_content "Application settings saved successfully"
           end
         end
       end
