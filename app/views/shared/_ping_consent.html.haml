@@ -4,8 +4,8 @@
     %button.js-close.gl-alert-dismiss{ type: 'button', 'aria-label' => _('Dismiss') }
       = sprite_icon('close', css_class: 'gl-icon')
     .gl-alert-body
-      - docs_link = link_to _('collect usage information'), help_page_path('user/admin_area/settings/usage_statistics.md'), target: '_blank', class: 'gl-link'
-      - settings_link = link_to _('your settings'), metrics_and_profiling_admin_application_settings_path(anchor: 'js-usage-settings'), target: '_blank', class: 'gl-link'
+      - docs_link = link_to _('collect usage information'), help_page_path('user/admin_area/settings/usage_statistics.md'), class: 'gl-link'
+      - settings_link = link_to _('your settings'), metrics_and_profiling_admin_application_settings_path(anchor: 'js-usage-settings'), class: 'gl-link'
       = s_('To help improve GitLab, we would like to periodically %{docs_link}. This can be changed at any time in %{settings_link}.').html_safe % { docs_link: docs_link, settings_link: settings_link }
     .gl-alert-actions.gl-mt-3
       - send_usage_data_path = admin_application_settings_path(application_setting: { version_check_enabled: 1, usage_ping_enabled: 1 })
