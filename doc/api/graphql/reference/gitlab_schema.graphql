@@ -13585,7 +13585,7 @@ type Project {
     iid: String
 
     """
-    Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.
+    Search query for title, description, service, or monitoring_tool.
     """
     search: String
 
@@ -13610,7 +13610,7 @@ type Project {
     assigneeUsername: String
 
     """
-    Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.
+    Search query for title, description, service, or monitoring_tool.
     """
     search: String
   ): AlertManagementAlertStatusCountsType
@@ -13650,7 +13650,7 @@ type Project {
     last: Int
 
     """
-    Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.
+    Search query for title, description, service, or monitoring_tool.
     """
     search: String
 

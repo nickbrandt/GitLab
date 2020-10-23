@@ -39983,7 +39983,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.",
+                  "description": "Search query for title, description, service, or monitoring_tool.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -40016,7 +40016,7 @@
               "args": [
                 {
                   "name": "search",
-                  "description": "Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.",
+                  "description": "Search query for title, description, service, or monitoring_tool.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -40087,7 +40087,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search criteria for filtering alerts. This will search on title, description, service, monitoring_tool.",
+                  "description": "Search query for title, description, service, or monitoring_tool.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
