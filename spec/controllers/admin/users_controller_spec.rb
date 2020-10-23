@@ -107,23 +107,7 @@ RSpec.describe Admin::UsersController do
 
     subject { put :approve, params: { id: user.username } }
 
-    context 'when feature is disabled' do
-      before do
-        stub_feature_flags(admin_approval_for_new_user_signups: false)
-      end
-
-      it 'responds with access denied' do
-        subject
-
-        expect(response).to have_gitlab_http_status(:not_found)
-      end
-    end
-
     context 'when feature is enabled' do
-      before do
-        stub_feature_flags(admin_approval_for_new_user_signups: true)
-      end
-
       context 'when successful' do
         it 'activates the user' do
           subject

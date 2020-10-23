@@ -47,10 +47,6 @@ RSpec.describe RegistrationsController do
 
     context '`blocked_pending_approval` state' do
       context 'when the feature is enabled' do
-        before do
-          stub_feature_flags(admin_approval_for_new_user_signups: true)
-        end
-
         context 'when the `require_admin_approval_after_user_signup` setting is turned on' do
           before do
             stub_application_setting(require_admin_approval_after_user_signup: true)
@@ -127,10 +123,6 @@ RSpec.describe RegistrationsController do
       end
 
       context 'when the feature is disabled' do
-        before do
-          stub_feature_flags(admin_approval_for_new_user_signups: false)
-        end
-
         context 'when the `require_admin_approval_after_user_signup` setting is turned on' do
           before do
             stub_application_setting(require_admin_approval_after_user_signup: true)
