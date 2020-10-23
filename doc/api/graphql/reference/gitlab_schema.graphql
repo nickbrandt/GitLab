@@ -8725,7 +8725,12 @@ type Group {
   """
   Represents vulnerable project counts for each grade
   """
-  vulnerabilityGrades: [VulnerableProjectsByGrade!]!
+  vulnerabilityGrades(
+    """
+    Include grades belonging to subgroups
+    """
+    includeSubgroups: Boolean = false
+  ): [VulnerableProjectsByGrade!]!
 
   """
   Vulnerability scanners reported on the project vulnerabilties of the group and its subgroups
