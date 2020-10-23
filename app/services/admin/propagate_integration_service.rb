@@ -18,7 +18,6 @@ module Admin
 
     private
 
-    # rubocop: disable Cop/InBatches
     def update_inherited_integrations
       Service.by_type(integration.type).inherit_from_id(integration.id).each_batch(of: BATCH_SIZE) do |services|
         min_id, max_id = services.pick("MIN(services.id), MAX(services.id)")
@@ -27,12 +26,11 @@ module Admin
     end
 
     def update_inherited_descendant_integrations
-      Service.inherited_descendants_from_self_or_ancestors_from(integration).in_batches(of: BATCH_SIZE) do |services|
+      Service.inherited_descendants_from_self_or_ancestors_from(integration).each_batch(of: BATCH_SIZE) do |services|
         min_id, max_id = services.pick("MIN(services.id), MAX(services.id)")
         PropagateIntegrationInheritDescendantWorker.perform_async(integration.id, min_id, max_id)
       end
     end
-    # rubocop: enable Cop/InBatches
 
     def create_integration_for_groups_without_integration
       Group.without_integration(integration).each_batch(of: BATCH_SIZE) do |groups|
