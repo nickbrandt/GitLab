@@ -33,11 +33,15 @@ RSpec.describe HistoricalData do
     end
 
     it "creates a new historical data record" do
-      described_class.track!
+      freeze_time do
+        described_class.track!
 
-      data = described_class.last
-      expect(data.date).to eq(Date.today)
-      expect(data.active_user_count).to eq(5)
+        data = described_class.last
+        # Database time has microsecond precision, while Ruby time has nanosecond precision,
+        # which is why we need the be_within matcher even though we're freezing time.
+        expect(data.date).to be_within(1e-6.seconds).of(Time.current)
+        expect(data.active_user_count).to eq(5)
+      end
     end
   end
 

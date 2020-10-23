@@ -3,15 +3,15 @@
 class HistoricalData < ApplicationRecord
   validates :date, presence: true
 
-  # HistoricalData.during((Date.today - 1.year)..Date.today).average(:active_user_count)
+  # HistoricalData.during((Time.current - 1.year)..Time.current).average(:active_user_count)
   scope :during, ->(range) { where(date: range) }
-  # HistoricalData.up_until(Date.today - 1.month).average(:active_user_count)
+  # HistoricalData.up_until(Time.current - 1.month).average(:active_user_count)
   scope :up_until, ->(date) { where("date <= :date", date: date) }
 
   class << self
     def track!
       create!(
-        date:               Date.today,
+        date:               Time.current,
         active_user_count:  License.load_license&.current_active_users_count
       )
     end
