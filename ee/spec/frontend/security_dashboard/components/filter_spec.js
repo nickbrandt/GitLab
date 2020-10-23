@@ -54,14 +54,6 @@ describe('Filter component', () => {
       expect(dropdownItemsCount()).toEqual(8);
     });
 
-    it('should display a check next to only the selected items', () => {
-      expect(
-        wrapper.findAll(
-          '.gl-new-dropdown-item .gl-new-dropdown-item-check-icon:not(.gl-visibility-hidden)',
-        ),
-      ).toHaveLength(3);
-    });
-
     it('should correctly display the selected text', () => {
       const selectedText = trimText(wrapper.find('.dropdown-toggle').text());
 
