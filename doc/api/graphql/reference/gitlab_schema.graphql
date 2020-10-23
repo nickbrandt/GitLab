@@ -21023,7 +21023,7 @@ input VulnerabilityCreateMergeRequestFeedbackInput {
   """
   Pipeline ID where vulnerability was found
   """
-  pipeliineId: Int!
+  pipelineId: Int!
 
   """
   Fingerprint of project vulnerability was found in

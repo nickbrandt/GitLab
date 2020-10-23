@@ -31,7 +31,7 @@ module Mutations
                required: true,
                description: 'Category (report type) of vulnerability'
 
-      argument :pipeliine_id,
+      argument :pipeline_id,
                GraphQL::INT_TYPE,
                required: true,
                description: 'Pipeline ID where vulnerability was found'

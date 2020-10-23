@@ -60890,7 +60890,7 @@
               "defaultValue": null
             },
             {
-              "name": "pipeliineId",
+              "name": "pipelineId",
               "description": "Pipeline ID where vulnerability was found",
               "type": {
                 "kind": "NON_NULL",
