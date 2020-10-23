@@ -1,10 +1,5 @@
 <script>
-import {
-  GlBadge,
-  GlButton,
-  GlLoadingIcon,
-  GlTooltipDirective,
-} from '@gitlab/ui';
+import { GlBadge, GlButton, GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 
 export default {
