@@ -94,22 +94,3 @@ export const generateJobNeedsDict = ({ jobs }) => {
     return { ...acc, [jobs[value].id]: uniqueValues };
   }, {});
 };
-
-export const formatPipelineDuration = duration => {
-  let ss = duration % 60;
-  let mm = Math.floor(duration / 60) % 60;
-  let hh = Math.floor(duration / 60 / 60);
-
-  // left pad with 0s
-  if (hh < 10) {
-    hh = `0${hh}`;
-  }
-  if (mm < 10) {
-    mm = `0${mm}`;
-  }
-  if (ss < 10) {
-    ss = `0${ss}`;
-  }
-
-  return `${hh}:${mm}:${ss}`;
-};

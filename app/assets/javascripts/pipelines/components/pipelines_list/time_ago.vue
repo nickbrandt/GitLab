@@ -1,8 +1,7 @@
 <script>
 import { GlIcon, GlTooltipDirective } from '@gitlab/ui';
-import '~/lib/utils/datetime_utility';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
-import { formatPipelineDuration } from '~/pipelines/utils';
+import { formatTime } from '~/lib/utils/datetime_utility';
 
 export default {
   directives: {
@@ -28,7 +27,7 @@ export default {
       return this.finishedTime !== '';
     },
     durationFormatted() {
-      return formatPipelineDuration(this.duration);
+      return formatTime(this.duration);
     },
   },
 };

@@ -1,5 +1,5 @@
 <script>
-import { formatPipelineDuration } from '~/pipelines/utils';
+import { formatTime } from '~/lib/utils/datetime_utility';
 import { s__, n__ } from '~/locale';
 
 export default {
@@ -11,7 +11,7 @@ export default {
   },
   computed: {
     totalDuration() {
-      return formatPipelineDuration(this.counts.totalDuration);
+      return formatTime(this.counts.totalDuration);
     },
     statistics() {
       return [
