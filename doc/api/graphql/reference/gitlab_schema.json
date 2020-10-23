@@ -23634,7 +23634,16 @@
               "name": "vulnerabilityGrades",
               "description": "Represents vulnerable project counts for each grade",
               "args": [
-
+                {
+                  "name": "includeSubgroups",
+                  "description": "Include grades belonging to subgroups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "false"
+                }
               ],
               "type": {
                 "kind": "NON_NULL",
