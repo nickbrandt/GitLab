@@ -1,0 +1,19 @@
+---
+# Warning: gitlab.Apostrophes
+#
+# Checks for apostrophes mistakenly used to pluralize a word.
+#
+# For a list of all options, see https://errata-ai.gitbook.io/vale/getting-started/styles
+extends: sequence
+message: Did you mean "%[1]ss" instead of "%[1]s's"?
+level: warning
+tokens:
+  - tag: NN
+  - pattern: "'s"
+  - pattern: "are"
+action:
+  name: edit
+  params:
+    - replace
+    - "'"
+    - ""
