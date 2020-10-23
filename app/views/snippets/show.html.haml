@@ -3,6 +3,12 @@
 - add_to_breadcrumbs _("Snippets"), dashboard_snippets_path
 - breadcrumb_title @snippet.to_reference
 - page_title "#{@snippet.title} (#{@snippet.to_reference})", _("Snippets")
+- add_page_startup_graphql_call('snippet/snippet', { ids: [@snippet.to_global_id.uri] })
+- add_page_startup_graphql_call('snippet/snippet_blob_content', { ids: [@snippet.to_global_id.uri], rich: false, paths: [@snippet.file_name] })
+- if @snippet.project_id?
+  - add_page_startup_graphql_call('snippet/project_permissions', { fullPath: @snippet.project_id })
+- else
+  - add_page_startup_graphql_call('snippet/user_permissions')
 
 #js-snippet-view{ data: {'qa-selector': 'snippet_view', 'snippet-gid': @snippet.to_global_id} }
 

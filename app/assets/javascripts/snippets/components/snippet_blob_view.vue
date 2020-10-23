@@ -2,7 +2,7 @@
 import BlobHeader from '~/blob/components/blob_header.vue';
 import BlobContent from '~/blob/components/blob_content.vue';
 
-import GetBlobContent from '../queries/snippet.blob.content.query.graphql';
+import GetBlobContent from 'shared_queries/snippet/snippet_blob_content.query.graphql';
 
 import {
   SIMPLE_BLOB_VIEWER,
