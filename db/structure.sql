@@ -16157,7 +16157,8 @@ CREATE TABLE snippets (
     description_html text,
     encrypted_secret_token character varying(255),
     encrypted_secret_token_iv character varying(255),
-    secret boolean DEFAULT false NOT NULL
+    secret boolean DEFAULT false NOT NULL,
+    repository_read_only boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE snippets_id_seq
