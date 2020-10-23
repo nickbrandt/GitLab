@@ -471,16 +471,15 @@ that works for this problem. Follow these steps to use the tool in Auto DevOps:
 
 As [announced in the official CNCF blogpost](https://www.cncf.io/blog/2020/10/07/important-reminder-for-all-helm-users-stable-incubator-repos-are-deprecated-and-all-images-are-changing-location/),
 the stable Helm chart repository will be deprecated and removed on November 13th, 2020.
-By this reason, you may encounter this problem after the period.
+You may encounter this error after that date.
 
-Some GitLab features had had a couple of dependencies on the stable chart as well, but
-we've already changed them to use new official repositories (or [stable-archive repository maintained by GitLab]( https://gitlab.com/gitlab-org/cluster-integration/helm-stable-archive))
-to mitigate the impact.
-Here is [an example fix](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image/-/merge_requests/127) in Auto Deploy.
+Some GitLab features had dependencies on the stable chart. To mitigate the impact, we changed them
+to use new official repositories or the [Helm Stable Archive repository maintained by GitLab](https://gitlab.com/gitlab-org/cluster-integration/helm-stable-archive).
+Auto Deploy contains [an example fix](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image/-/merge_requests/127).
 
-In Auto Deploy, `v1.0.6+` of `auto-deploy-image` no longer adds the deprecated stable repository to `helm` command.
-If you use a custom chart and it relies on the deprecated stable repository,
-please specify an older `auto-deploy-image` like the following example.
+In Auto Deploy, `v1.0.6+` of `auto-deploy-image` no longer adds the deprecated stable repository to
+the `helm` command. If you use a custom chart and it relies on the deprecated stable repository,
+specify an older `auto-deploy-image` like this example:
 
 ```yaml
 include:
@@ -490,9 +489,8 @@ include:
   image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:v1.0.5"
 ```
 
-Please keep in mind that this approach will also eventually stop working
-when the stable repository has been removed, so that you would want to fix your custom chart
-sooner or later.
+Keep in mind that this approach will eventually stop working when the stable repository is removed,
+so you must eventually fix your custom chart.
 
 You can find more information in [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/263778).
 
