@@ -931,7 +931,15 @@ type AlertTodoCreatePayload {
 User availability status
 """
 enum AvailabilityEnum {
+  """
+  Busy
+  """
   BUSY
+
+  """
+  Not Set
+  """
+  NOT_SET
 }
 
 """
@@ -21369,7 +21377,7 @@ type UserStatus {
   """
   User availability status
   """
-  availability: AvailabilityEnum
+  availability: AvailabilityEnum!
 
   """
   String representation of emoji

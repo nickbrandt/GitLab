@@ -5,6 +5,8 @@ module Types
     graphql_name 'AvailabilityEnum'
     description 'User availability status'
 
-    value 'BUSY', value: :busy
+    ::UserStatus.availabilities.keys.each do |availability_value|
+      value availability_value.upcase, value: availability_value, description: availability_value.titleize
+    end
   end
 end

@@ -16783,7 +16783,7 @@ CREATE TABLE user_statuses (
     emoji character varying DEFAULT 'speech_balloon'::character varying NOT NULL,
     message character varying(100),
     message_html character varying,
-    availability smallint
+    availability smallint DEFAULT 0 NOT NULL
 );
 
 CREATE SEQUENCE user_statuses_user_id_seq

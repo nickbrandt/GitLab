@@ -9,7 +9,7 @@ class UserStatus < ApplicationRecord
 
   belongs_to :user
 
-  enum availability: { busy: 0 }
+  enum availability: { not_set: 0, busy: 1 }
 
   validates :user, presence: true
   validates :emoji, inclusion: { in: Gitlab::Emoji.emojis_names }

@@ -2400,8 +2400,14 @@
           "interfaces": null,
           "enumValues": [
             {
+              "name": "NOT_SET",
+              "description": "Not Set",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "BUSY",
-              "description": null,
+              "description": "Busy",
               "isDeprecated": false,
               "deprecationReason": null
             }
@@ -61800,9 +61806,13 @@
 
               ],
               "type": {
-                "kind": "ENUM",
-                "name": "AvailabilityEnum",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "AvailabilityEnum",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
