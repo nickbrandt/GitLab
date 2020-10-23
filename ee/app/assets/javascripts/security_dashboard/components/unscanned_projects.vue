@@ -63,10 +63,10 @@ export default {
           <template #title>
             {{ s__('UnscannedProjects|Out of date') }}
             <gl-badge
-              size="sm"
-              class="gl-tab-counter-badge"
               v-if="!isLoading"
               ref="outdatedProjectsCount"
+              size="sm"
+              class="gl-tab-counter-badge"
               pill
               >{{ outdatedProjectsCount }}
             </gl-badge>
@@ -88,10 +88,10 @@ export default {
           <template #title>
             {{ s__('UnscannedProjects|Untested') }}
             <gl-badge
-              size="sm"
-              class="gl-tab-counter-badge"
               v-if="!isLoading"
               ref="untestedProjectsCount"
+              size="sm"
+              class="gl-tab-counter-badge"
               pill
               >{{ untestedProjectsCount }}
             </gl-badge>
