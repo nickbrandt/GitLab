@@ -92,7 +92,7 @@ export default {
         {{ option.name }}
       </gl-dropdown-item>
 
-      <gl-dropdown-item v-if="filteredOptions.length === 0" class="no-pointer-events">
+      <gl-dropdown-item v-if="filteredOptions.length === 0" class="gl-pointer-events-none">
         {{ __('No matching results') }}
       </gl-dropdown-item>
     </gl-dropdown>
