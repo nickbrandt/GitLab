@@ -18,7 +18,6 @@ import { mrStates } from '~/mr_popover/constants';
 import { fetchPolicies } from '~/lib/graphql';
 import securityReportSummaryQuery from './graphql/mr_security_report_summary.graphql';
 import SecuritySummary from './components/security_summary.vue';
-import Api from '~/api';
 
 export default {
   store: createStore(),
@@ -174,6 +173,11 @@ export default {
       required: false,
       default: '',
     },
+    projectId: {
+      type: Number,
+      required: false,
+      default: null,
+    },
     projectFullPath: {
       type: String,
       required: true,
@@ -194,7 +198,6 @@ export default {
       'isDismissingVulnerability',
       'isCreatingMergeRequest',
     ]),
-    ...mapState('pipelineJobs', ['projectId']),
     ...mapGetters([
       'groupedSummaryText',
       'summaryStatus',
@@ -279,7 +282,9 @@ export default {
       this.createVulnerabilityFeedbackMergeRequestPath,
     );
     this.setCreateVulnerabilityFeedbackDismissalPath(this.createVulnerabilityFeedbackDismissalPath);
+    this.setProjectId(this.projectId);
     this.setPipelineId(this.pipelineId);
+    this.setPipelineJobsId(this.pipelineId);
 
     const sastDiffEndpoint = gl?.mrWidgetData?.sast_comparison_path;
 
@@ -316,15 +321,10 @@ export default {
     }
 
     const coverageFuzzingDiffEndpoint = gl?.mrWidgetData?.coverage_fuzzing_comparison_path;
-    const pipelineJobsPath = Api.getApiPath(gl?.mrWidgetData?.pipeline_jobs_path, {
-      params: { ':pipeline_id': gl?.mrWidgetData?.pipeline_id },
-    });
 
     if (coverageFuzzingDiffEndpoint && this.hasCoverageFuzzingReports) {
       this.setCoverageFuzzingDiffEndpoint(coverageFuzzingDiffEndpoint);
       this.fetchCoverageFuzzingDiff();
-      this.setPipelineJobsPath(pipelineJobsPath);
-      this.setProjectId(gl?.mrWidgetData?.project_id);
       this.fetchPipelineJobs();
     }
   },
@@ -368,6 +368,9 @@ export default {
       fetchSastDiff: 'fetchDiff',
     }),
     ...mapActions('pipelineJobs', ['fetchPipelineJobs', 'setPipelineJobsPath', 'setProjectId']),
+    ...mapActions('pipelineJobs', {
+      setPipelineJobsId: 'setPipelineId',
+    }),
   },
   summarySlots: ['success', 'error', 'loading'],
 };

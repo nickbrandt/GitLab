@@ -777,52 +777,6 @@ const Api = {
         return { data, headers };
       });
   },
-  /**
-   * Generates a dynamic route URL based off a server provided stubbed URL
-   *
-   * Example:
-   *
-   * API: https://docs.gitlab.com/ee/api/job_artifacts.html#download-the-artifacts-archive
-   *
-   * User provides string to the frontend from:
-   *
-   * expose_path(api_v4_projects_pipelines_jobs_artifacts_path(id: project.id, ref_name: ':ref_name'))
-   *
-   * Rails route helper generated string:
-   *
-   * https://gitlab.example.com/api/v4/projects/1234/jobs/artifacts/:ref_name/download
-   *
-   * User calls:
-   *
-   *  getApiPath(this.artifactsPath, {
-   *   params { ':ref_name': 'master' },
-   *   query: {job: 'job-name'}
-   *  }
-   *
-   * Output is:
-   *
-   * https://gitlab.example.com/api/v4/projects/1234/jobs/artifacts/master/download?job=job-name
-   *
-   * @param {String} path The stubbed url
-   * @param {Object} params The stubbed values to replace
-   * @param {Object} query The url query params
-   * @returns {String} The dynamically generated URL
-   */
-  getApiPath(path = '', { params = {}, query = {} }) {
-    if (path) {
-      let outputPath = path;
-      const outputQuery = new URLSearchParams(query);
-
-      // Replace the :ruby_symbols
-      Object.entries(params).forEach(([key, value]) => {
-        outputPath = outputPath.replace(key, value);
-      });
-
-      // Construct the url query params
-      return Object.keys(query).length ? `${outputPath}?${outputQuery}` : outputPath;
-    }
-    return path;
-  },
 };
 
 export default Api;

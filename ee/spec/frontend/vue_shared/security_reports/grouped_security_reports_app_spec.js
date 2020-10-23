@@ -51,6 +51,7 @@ describe('Grouped security reports app', () => {
     vulnerabilityFeedbackHelpPath: 'path',
     coverageFuzzingHelpPath: 'path',
     pipelineId: 123,
+    projectId: 321,
     projectFullPath: 'path',
   };
 
@@ -113,7 +114,6 @@ describe('Grouped security reports app', () => {
       gl.mrWidgetData.sast_comparison_path = SAST_DIFF_ENDPOINT;
       gl.mrWidgetData.secret_scanning_comparison_path = SECRET_SCANNING_DIFF_ENDPOINT;
       gl.mrWidgetData.coverage_fuzzing_comparison_path = COVERAGE_FUZZING_DIFF_ENDPOINT;
-      gl.mrWidgetData.pipeline_jobs_path = PIPELINE_JOBS_ENDPOINT;
     });
 
     describe('with error', () => {
