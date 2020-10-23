@@ -1,8 +1,6 @@
 package config
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -20,13 +18,20 @@ azure_storage_access_key = "deadbeef"
 func TestLoadEmptyConfig(t *testing.T) {
 	config := ``
 
-	tmpFile, cfg := loadTempConfig(t, config)
-	defer os.Remove(tmpFile.Name())
+	cfg, err := LoadConfig(config)
+	require.NoError(t, err)
+
+	expected := Config{
+		ImageResizerConfig: &ImageResizerConfig{
+			MaxScalerProcs: DefaultImageResizerMaxScalerProcs,
+			MaxFilesize:    DefaultImageResizerMaxFilesize,
+		},
+	}
+
+	require.Equal(t, expected, *cfg)
 
 	require.Nil(t, cfg.ObjectStorageCredentials)
-
-	err := cfg.RegisterGoCloudURLOpeners()
-	require.NoError(t, err)
+	require.NoError(t, cfg.RegisterGoCloudURLOpeners())
 }
 
 func TestLoadObjectStorageConfig(t *testing.T) {
@@ -39,8 +44,8 @@ aws_access_key_id = "minio"
 aws_secret_access_key = "gdk-minio"
 `
 
-	tmpFile, cfg := loadTempConfig(t, config)
-	defer os.Remove(tmpFile.Name())
+	cfg, err := LoadConfig(config)
+	require.NoError(t, err)
 
 	require.NotNil(t, cfg.ObjectStorageCredentials, "Expected object storage credentials")
 
@@ -56,8 +61,8 @@ aws_secret_access_key = "gdk-minio"
 }
 
 func TestRegisterGoCloudURLOpeners(t *testing.T) {
-	tmpFile, cfg := loadTempConfig(t, azureConfig)
-	defer os.Remove(tmpFile.Name())
+	cfg, err := LoadConfig(azureConfig)
+	require.NoError(t, err)
 
 	require.NotNil(t, cfg.ObjectStorageCredentials, "Expected object storage credentials")
 
@@ -72,28 +77,11 @@ func TestRegisterGoCloudURLOpeners(t *testing.T) {
 	require.Equal(t, expected, *cfg.ObjectStorageCredentials)
 	require.Nil(t, cfg.ObjectStorageConfig.URLMux)
 
-	err := cfg.RegisterGoCloudURLOpeners()
-	require.NoError(t, err)
+	require.NoError(t, cfg.RegisterGoCloudURLOpeners())
 	require.NotNil(t, cfg.ObjectStorageConfig.URLMux)
 
 	require.True(t, cfg.ObjectStorageConfig.URLMux.ValidBucketScheme("azblob"))
 	require.Equal(t, []string{"azblob"}, cfg.ObjectStorageConfig.URLMux.BucketSchemes())
-}
-
-func TestLoadDefaultConfig(t *testing.T) {
-	config := ``
-
-	tmpFile, cfg := loadTempConfig(t, config)
-	defer os.Remove(tmpFile.Name())
-
-	expected := Config{
-		ImageResizerConfig: &ImageResizerConfig{
-			MaxScalerProcs: DefaultImageResizerMaxScalerProcs,
-			MaxFilesize:    DefaultImageResizerMaxFilesize,
-		},
-	}
-
-	require.Equal(t, expected, *cfg)
 }
 
 func TestLoadImageResizerConfig(t *testing.T) {
@@ -103,8 +91,8 @@ max_scaler_procs = 200
 max_filesize = 350000
 `
 
-	tmpFile, cfg := loadTempConfig(t, config)
-	defer os.Remove(tmpFile.Name())
+	cfg, err := LoadConfig(config)
+	require.NoError(t, err)
 
 	require.NotNil(t, cfg.ImageResizerConfig, "Expected image resizer config")
 
@@ -114,17 +102,4 @@ max_filesize = 350000
 	}
 
 	require.Equal(t, expected, *cfg.ImageResizerConfig)
-}
-
-func loadTempConfig(t *testing.T, config string) (f *os.File, cfg *Config) {
-	tmpFile, err := ioutil.TempFile(os.TempDir(), "test-")
-	require.NoError(t, err)
-
-	_, err = tmpFile.Write([]byte(config))
-	require.NoError(t, err)
-
-	cfg, err = LoadConfig(tmpFile.Name())
-	require.NoError(t, err)
-
-	return tmpFile, cfg
 }

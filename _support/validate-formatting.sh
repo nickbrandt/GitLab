@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -eu
-
 IMPORT_RESULT=$(goimports -e -local "gitlab.com/gitlab-org/gitlab-workhorse" -l "$@")
 
 if [ -n "${IMPORT_RESULT}" ]; then
