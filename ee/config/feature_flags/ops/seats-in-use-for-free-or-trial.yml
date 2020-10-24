@@ -1,0 +1,7 @@
+---
+name: seats-in-use-for-free-or-trial
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/44973
+rollout_issue_url: 
+type: ops
+group: group::provision
+default_enabled: true

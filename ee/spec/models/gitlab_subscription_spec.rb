@@ -211,6 +211,18 @@ RSpec.describe GitlabSubscription do
       create(:gitlab_subscription, namespace: group, trial: trial, hosted_plan: hosted_plan, seats_in_use: seats_in_use)
     end
 
+    shared_examples 'a disabled feature' do
+      context 'when feature flag is disabled' do
+        before do
+          stub_feature_flags(seats_in_use_for_free_or_trial: false)
+        end
+
+        it 'returns the previously calculated seats in use' do
+          expect(subject).to eq(5)
+        end
+      end
+    end
+
     subject { gitlab_subscription.seats_in_use }
 
     context 'with a paid hosted plan' do
@@ -236,6 +248,8 @@ RSpec.describe GitlabSubscription do
       it 'returns the current seats in use' do
         expect(subject).to eq(1)
       end
+
+      it_behaves_like 'a disabled feature'
     end
 
     context 'with a free plan' do
@@ -244,6 +258,8 @@ RSpec.describe GitlabSubscription do
       it 'returns the current seats in use' do
         expect(subject).to eq(1)
       end
+
+      it_behaves_like 'a disabled feature'
     end
 
     context 'with a self hosted plan' do
