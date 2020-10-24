@@ -399,6 +399,7 @@ rspec:feature-flags:
     - memory-static
     - memory-on-boot
   script:
+    - run_timed_command "gem install bundler -v 1.17.3"
     - run_timed_command "bundle install --jobs=$(nproc) --path=vendor --retry=3 --quiet --without default development test production puma unicorn kerberos metrics omnibus ed25519"
     - run_timed_command "bundle exec scripts/used-feature-flags"
 # EE/FOSS: default refs (MRs, master, schedules) jobs #
