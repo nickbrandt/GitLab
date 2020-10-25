@@ -373,16 +373,12 @@ describe('Grouped security reports app', () => {
   });
 
   describe('coverage fuzzing reports', () => {
-    describe.each`
-      endpoint      | shouldShowFuzzing | featureEnabled
-      ${'/fuzzing'} | ${true}           | ${true}
-      ${'/fuzzing'} | ${false}          | ${false}
-    `(
-      'given coverage fuzzing comparision endpoint is $endpoint and featureEnabled is $featureEnabled',
-      ({ endpoint, shouldShowFuzzing, featureEnabled }) => {
+    describe.each([true, false])(
+      'given coverage fuzzing comparision endpoint is /fuzzing and featureEnabled is %s',
+      shouldShowFuzzing => {
         beforeEach(() => {
           gl.mrWidgetData = gl.mrWidgetData || {};
-          gl.mrWidgetData.coverage_fuzzing_comparison_path = endpoint;
+          gl.mrWidgetData.coverage_fuzzing_comparison_path = '/fuzzing';
 
           createWrapper(
             {
@@ -393,7 +389,7 @@ describe('Grouped security reports app', () => {
             },
             {},
             {
-              glFeatures: { coverageFuzzingMrWidget: featureEnabled },
+              glFeatures: { coverageFuzzingMrWidget: shouldShowFuzzing },
             },
           );
         });
