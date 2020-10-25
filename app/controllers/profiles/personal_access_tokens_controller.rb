@@ -10,6 +10,7 @@ class Profiles::PersonalAccessTokensController < Profiles::ApplicationController
 
   def create
     @personal_access_token = finder.build
+    
     result = ::PersonalAccessTokens::CreateService.new(
       current_user: current_user, target_user: current_user, params: personal_access_token_params
     ).execute
