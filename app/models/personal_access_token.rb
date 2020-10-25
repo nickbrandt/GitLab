@@ -60,6 +60,7 @@ class PersonalAccessToken < ApplicationRecord
 
   def self.redis_store!(user_id, token)
     encrypted_token = Gitlab::CryptoHelper.aes256_gcm_encrypt(token)
+    encrypted_token = Gitlab::CryptoHelper.aes256_gcm_encrypt(token)
 
     Gitlab::Redis::SharedState.with do |redis|
       redis.set(redis_shared_state_key(user_id), encrypted_token, ex: REDIS_EXPIRY_TIME)
