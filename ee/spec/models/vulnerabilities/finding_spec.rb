@@ -113,11 +113,13 @@ RSpec.describe Vulnerabilities::Finding do
     let!(:vulnerability_secret_detection) { create(:vulnerabilities_finding, report_type: :secret_detection) }
     let!(:vulnerability_dast) { create(:vulnerabilities_finding, report_type: :dast) }
     let!(:vulnerability_depscan) { create(:vulnerabilities_finding, report_type: :dependency_scanning) }
+    let!(:vulnerability_covfuzz) { create(:vulnerabilities_finding, report_type: :coverage_fuzzing) }
+    let!(:vulnerability_apifuzz) { create(:vulnerabilities_finding, report_type: :api_fuzzing) }
 
     subject { described_class.by_report_types(param) }
 
     context 'with one param' do
-      let(:param) { 0 }
+      let(:param) { Vulnerabilities::Finding::REPORT_TYPES['sast'] }
 
       it 'returns found record' do
         is_expected.to contain_exactly(vulnerability_sast)
@@ -125,15 +127,28 @@ RSpec.describe Vulnerabilities::Finding do
     end
 
     context 'with array of params' do
-      let(:param) { [1, 3, 4] }
+      let(:param) do
+        [
+          Vulnerabilities::Finding::REPORT_TYPES['dependency_scanning'],
+          Vulnerabilities::Finding::REPORT_TYPES['dast'],
+          Vulnerabilities::Finding::REPORT_TYPES['secret_detection'],
+          Vulnerabilities::Finding::REPORT_TYPES['coverage_fuzzing'],
+          Vulnerabilities::Finding::REPORT_TYPES['api_fuzzing']
+        ]
+      end
 
       it 'returns found records' do
-        is_expected.to contain_exactly(vulnerability_dast, vulnerability_depscan, vulnerability_secret_detection)
+        is_expected.to contain_exactly(
+          vulnerability_dast,
+          vulnerability_depscan,
+          vulnerability_secret_detection,
+          vulnerability_covfuzz,
+          vulnerability_apifuzz)
       end
     end
 
     context 'without found record' do
-      let(:param) { 2 }
+      let(:param) { Vulnerabilities::Finding::REPORT_TYPES['container_scanning']}
 
       it 'returns empty collection' do
         is_expected.to be_empty
