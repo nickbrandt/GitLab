@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe 'Profile > Personal Access Tokens', :js do
   let(:user) { create(:user) }
+  let(:pat_create_service) { double('PersonalAccessTokens::CreateService', execute: ServiceResponse.error(message: 'error')) }
 
   def active_personal_access_tokens
     find(".table.active-tokens")
@@ -18,7 +19,7 @@ RSpec.describe 'Profile > Personal Access Tokens', :js do
   end
 
   def disallow_personal_access_token_saves!
-    allow_any_instance_of(PersonalAccessToken).to receive(:save).and_return(false)
+    allow(PersonalAccessTokens::CreateService).to receive(:new).and_return(pat_create_service)
 
     errors = ActiveModel::Errors.new(PersonalAccessToken.new).tap { |e| e.add(:name, "cannot be nil") }
     allow_any_instance_of(PersonalAccessToken).to receive(:errors).and_return(errors)
