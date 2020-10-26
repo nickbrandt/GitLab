@@ -111,6 +111,10 @@ RSpec.describe EE::Namespace::RootExcessStorageSize do
       it { is_expected.to eq(false) }
     end
 
+    context 'with feature flags (:namespace_storage_limit & :additional_repo_storage_by_namespace) enabled' do
+      it { is_expected.to eq(false) }
+    end
+
     context 'with feature flag :namespace_storage_limit disabled' do
       before do
         stub_feature_flags(namespace_storage_limit: false)

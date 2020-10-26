@@ -228,9 +228,11 @@ RSpec.describe EE::NamespaceStorageLimitAlertHelper do
       before do
         allow(::Gitlab).to receive(:dev_env_or_com?).and_return(is_dev_or_com)
         stub_application_setting(automatic_purchased_storage_allocation: auto_storage_allocation_enabled)
-        stub_feature_flags(namespace_storage_limit: namespace_storage_limit_enabled)
-        stub_feature_flags(additional_repo_storage_by_namespace: additional_storage_enabled)
-        stub_feature_flags(buy_storage_link: buy_storage_link_enabled)
+        stub_feature_flags(
+          namespace_storage_limit: namespace_storage_limit_enabled,
+          additional_repo_storage_by_namespace: additional_storage_enabled,
+          buy_storage_link: buy_storage_link_enabled
+        )
       end
 
       it { is_expected.to eq(result) }

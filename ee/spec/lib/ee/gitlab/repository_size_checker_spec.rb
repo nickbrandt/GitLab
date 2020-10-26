@@ -23,30 +23,54 @@ RSpec.describe Gitlab::RepositorySizeChecker do
   before do
     allow(Gitlab::CurrentSettings).to receive(:automatic_purchased_storage_allocation?).and_return(gitlab_setting_enabled)
 
-    allow(namespace).to receive(:total_repository_size_excess).and_return(total_repository_size_excess.megabytes)
-  end
-
-  shared_examples 'original logic (without size excess and additional storage)' do
-    include_examples 'checker size above limit'
-    include_examples 'checker size above limit (with additional storage, that would bring it under the limit)'
-    include_examples 'checker size not over limit'
+    allow(namespace).to receive(:total_repository_size_excess).and_return(total_repository_size_excess.megabytes) if namespace
   end
 
   describe '#above_size_limit?' do
-    context 'when enabled is false' do
-      let(:enabled) { false }
+    shared_examples 'original logic (additional storage not considered)' do
+      include_examples 'checker size above limit'
+      include_examples 'checker size not over limit'
 
-      it 'returns false' do
-        expect(subject.above_size_limit?).to eq(false)
+      context 'when over the default limit but would be under the limit if additional storage was enabled' do
+        let(:current_size) { 100 }
+        let(:additional_purchased_storage) { 60 }
+
+        it 'returns true' do
+          expect(subject.above_size_limit?).to eq(true)
+        end
       end
     end
 
-    include_examples 'original logic (without size excess and additional storage)'
+    context 'when enabled is false' do
+      let(:enabled) { false }
+
+      context 'when size is under the limit' do
+        it 'returns false' do
+          expect(subject.above_size_limit?).to eq(false)
+        end
+      end
+
+      context 'when size is above the limit' do
+        let(:current_size) { 100 }
+
+        it 'returns false' do
+          expect(subject.above_size_limit?).to eq(false)
+        end
+      end
+    end
+
+    include_examples 'original logic (additional storage not considered)'
 
     context 'when Gitlab app setting for automatic purchased storage allocation is not enabled' do
       let(:gitlab_setting_enabled) { false }
 
-      include_examples 'original logic (without size excess and additional storage)'
+      include_examples 'original logic (additional storage not considered)'
+    end
+
+    context 'when namespace is nil' do
+      let(:namespace) { nil }
+
+      include_examples 'original logic (additional storage not considered)'
     end
 
     context 'with feature flag :namespace_storage_limit disabled' do
@@ -88,7 +112,7 @@ RSpec.describe Gitlab::RepositorySizeChecker do
         stub_feature_flags(additional_repo_storage_by_namespace: false)
       end
 
-      include_examples 'original logic (without size excess and additional storage)'
+      include_examples 'original logic (additional storage not considered)'
     end
   end
 
@@ -97,6 +121,12 @@ RSpec.describe Gitlab::RepositorySizeChecker do
 
     context 'when Gitlab app setting for automatic purchased storage allocation is not enabled' do
       let(:gitlab_setting_enabled) { false }
+
+      include_examples 'checker size exceeded'
+    end
+
+    context 'when namespace is nil' do
+      let(:namespace) { nil }
 
       include_examples 'checker size exceeded'
     end
