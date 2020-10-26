@@ -641,12 +641,12 @@ module Gitlab
         return {} if counts == -1 || guest_counts == -1
         return counts if counts.is_a?(String) || guest_counts.is_a?(String) # sql output
 
-        counts.each_pair do |scope, count|
-          packages_counts.deep_merge!(scope[0] => { scope[1] => { scope[2] => count } } )
-        end
+        counts.merge(guest_counts).each_pair do |scope, count|
+          originator_type = scope[0]
+          event_type = scope[1]
+          event_scope = scope[2]
 
-        guest_counts.each_pair do |scope, count|
-          packages_counts.deep_merge!(scope[0] => { scope[1] => { scope[2] => count } } )
+          packages_counts.deep_merge!(originator_type => { event_type => { event_scope => count } } )
         end
 
         packages_counts
