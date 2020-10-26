@@ -3,17 +3,19 @@
 require 'spec_helper'
 
 RSpec.describe ProjectsController do
+  let_it_be(:user) { create(:user) }
+  let_it_be(:group) { create(:group) }
+
   let(:project) { create(:project) }
-  let(:user) { create(:user) }
+
+  let_it_be(:public_project) { create(:project, :public, :repository) }
 
   before do
     project.add_maintainer(user)
     sign_in(user)
   end
 
-  describe "GET show" do
-    let(:public_project) { create(:project, :public, :repository) }
-
+  describe 'GET show' do
     render_views
 
     subject { get :show, params: { namespace_id: public_project.namespace.path, id: public_project.path } }
@@ -102,7 +104,6 @@ RSpec.describe ProjectsController do
     end
 
     context 'custom project templates' do
-      let(:group) { create(:group) }
       let(:project_template) { create(:project, :repository, :public, :metrics_dashboard_enabled, namespace: group) }
       let(:templates_params) do
         {
@@ -446,7 +447,6 @@ RSpec.describe ProjectsController do
   end
 
   context 'Archive & Unarchive actions' do
-    let(:group) { create(:group) }
     let(:project) { create(:project, group: group) }
     let(:archived_project) { create(:project, :archived, group: group) }
 
@@ -502,14 +502,12 @@ RSpec.describe ProjectsController do
   end
 
   describe 'DELETE #destroy' do
-    let(:owner) { create(:user) }
-    let(:group) { create(:group) }
-    let(:project) { create(:project, group: group)}
+    let(:project) { create(:project, group: group) }
 
     before do
-      group.add_user(owner, Gitlab::Access::OWNER)
+      group.add_user(user, Gitlab::Access::OWNER)
       controller.instance_variable_set(:@project, project)
-      sign_in(owner)
+      sign_in(user)
     end
 
     shared_examples 'deletes project right away' do
@@ -578,7 +576,7 @@ RSpec.describe ProjectsController do
       end
 
       context 'for projects in user namespace' do
-        let(:project) { create(:project, namespace: owner.namespace)}
+        let(:project) { create(:project, namespace: user.namespace) }
 
         it_behaves_like 'deletes project right away'
       end
@@ -594,12 +592,11 @@ RSpec.describe ProjectsController do
   end
 
   describe 'POST #restore' do
-    let(:owner) { create(:user) }
-    let(:project) { create(:project, namespace: owner.namespace)}
+    let(:project) { create(:project, namespace: user.namespace) }
 
     before do
       controller.instance_variable_set(:@project, project)
-      sign_in(owner)
+      sign_in(user)
     end
 
     it 'restores project deletion' do
