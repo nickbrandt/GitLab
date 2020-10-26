@@ -1,7 +1,7 @@
 ---
 name: coverage-fuzzing-mr-widget
-introduced_by_url:
-rollout_issue_url:
+introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/43545
+rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/257839
 type: development
-group: group::secure
+group: group::fuzz testing
 default_enabled: false

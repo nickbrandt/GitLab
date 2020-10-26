@@ -81,7 +81,7 @@ describe('Grouped security reports app', () => {
       },
       store: appStore(),
       provide: {
-        glFeatures: { coverage_fuzzing_mr_widget: true },
+        glFeatures: { coverageFuzzingMrWidget: true },
         ...provide,
       },
     });
@@ -378,7 +378,7 @@ describe('Grouped security reports app', () => {
       ${'/fuzzing'} | ${true}           | ${true}
       ${'/fuzzing'} | ${false}          | ${false}
     `(
-      'given coverage fuzzing comparision enpoint is $endpoint and featureEnabled is $featureEnabled',
+      'given coverage fuzzing comparision endpoint is $endpoint and featureEnabled is $featureEnabled',
       ({ endpoint, shouldShowFuzzing, featureEnabled }) => {
         beforeEach(() => {
           gl.mrWidgetData = gl.mrWidgetData || {};
@@ -393,7 +393,7 @@ describe('Grouped security reports app', () => {
             },
             {},
             {
-              glFeatures: { coverage_fuzzing_mr_widget: featureEnabled },
+              glFeatures: { coverageFuzzingMrWidget: featureEnabled },
             },
           );
         });
@@ -619,6 +619,7 @@ describe('Grouped security reports app', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('coverage fuzzing reports', () => {
     /*
      * Fixes bug https://gitlab.com/gitlab-org/gitlab/-/issues/255183
@@ -653,6 +654,8 @@ describe('Grouped security reports app', () => {
     );
   });
 
+=======
+>>>>>>> cc711fdc76b... Update integration MR
   describe('Out of date report', () => {
     const createComponent = (extraProp, done) => {
       gl.mrWidgetData = gl.mrWidgetData || {};

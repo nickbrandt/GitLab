@@ -231,14 +231,7 @@ export default {
       return this.enabledReports.dast;
     },
     hasCoverageFuzzingReports() {
-      /*
-       * Fixes bug https://gitlab.com/gitlab-org/gitlab/-/issues/255183
-       * For https://gitlab.com/gitlab-org/gitlab/-/issues/210343 change to:
-       * return this.enabledReports.coverageFuzzing;
-       */
-      return (
-        gl?.mrWidgetData?.coverage_fuzzing_comparison_path && this.enabledReports.coverageFuzzing
-      );
+      return this.enabledReports.coverageFuzzing;
     },
     hasSastReports() {
       return this.enabledReports.sast;
@@ -560,7 +553,7 @@ export default {
         </template>
 
         <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/257839 -->
-        <template v-if="hasCoverageFuzzingReports && glFeatures.coverage_fuzzing_mr_widget">
+        <template v-if="hasCoverageFuzzingReports && glFeatures.coverageFuzzingMrWidget">
           <summary-row
             :summary="groupedCoverageFuzzingText"
             :status-icon="coverageFuzzingStatusIcon"
