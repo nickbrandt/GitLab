@@ -51,7 +51,7 @@ module QA
             metadata[:type] = :feature
           end
 
-          config.append_after(:each) do |example|
+          config.append_after(:example) do |example|
             if example.metadata[:screenshot]
               screenshot = example.metadata[:screenshot][:image] || example.metadata[:screenshot][:html]
               example.metadata[:stdout] = %{[[ATTACHMENT|#{screenshot}]]}

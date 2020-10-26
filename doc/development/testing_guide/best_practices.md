@@ -649,7 +649,7 @@ Global variables should generally not be modified. If absolutely necessary, a
 block like this can be used to ensure the change is rolled back afterwards:
 
 ```ruby
-around(:each) do |example|
+around(:example) do |example|
   old_value = $0
 
   begin
