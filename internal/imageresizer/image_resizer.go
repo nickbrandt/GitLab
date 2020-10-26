@@ -92,7 +92,15 @@ var (
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "processes",
-			Help:      "Amount of image resizing scaler processes working now",
+			Help:      "Amount of image scaler processes working now",
+		},
+	)
+	imageResizeMaxProcesses = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Namespace: namespace,
+			Subsystem: subsystem,
+			Name:      "max_processes",
+			Help:      "The maximum amount of image scaler processes allowed to run concurrently",
 		},
 	)
 	imageResizeRequests = prometheus.NewCounterVec(
@@ -126,11 +134,14 @@ var (
 func init() {
 	prometheus.MustRegister(imageResizeConcurrencyLimitExceeds)
 	prometheus.MustRegister(imageResizeProcesses)
+	prometheus.MustRegister(imageResizeMaxProcesses)
 	prometheus.MustRegister(imageResizeRequests)
 	prometheus.MustRegister(imageResizeDurations)
 }
 
 func NewResizer(cfg config.Config) *Resizer {
+	imageResizeMaxProcesses.Set(float64(cfg.ImageResizerConfig.MaxScalerProcs))
+
 	return &Resizer{Config: cfg, Prefix: "send-scaled-img:"}
 }
 
