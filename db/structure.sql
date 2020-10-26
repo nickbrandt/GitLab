@@ -10132,7 +10132,8 @@ CREATE TABLE ci_daily_build_group_report_results (
     last_pipeline_id bigint NOT NULL,
     ref_path text NOT NULL,
     group_name text NOT NULL,
-    data jsonb NOT NULL
+    data jsonb NOT NULL,
+    default_branch boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE ci_daily_build_group_report_results_id_seq
@@ -20163,6 +20164,8 @@ CREATE INDEX index_ci_builds_project_id_and_status_for_live_jobs_partial2 ON ci_
 CREATE UNIQUE INDEX index_ci_builds_runner_session_on_build_id ON ci_builds_runner_session USING btree (build_id);
 
 CREATE INDEX index_ci_daily_build_group_report_results_on_last_pipeline_id ON ci_daily_build_group_report_results USING btree (last_pipeline_id);
+
+CREATE INDEX index_ci_daily_build_group_report_results_on_project_and_date ON ci_daily_build_group_report_results USING btree (project_id, date DESC) WHERE ((default_branch = true) AND ((data -> 'coverage'::text) IS NOT NULL));
 
 CREATE INDEX index_ci_deleted_objects_on_pick_up_at ON ci_deleted_objects USING btree (pick_up_at);
 
