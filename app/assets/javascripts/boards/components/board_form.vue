@@ -1,7 +1,7 @@
 <script>
 import { __ } from '~/locale';
 import { deprecatedCreateFlash as Flash } from '~/flash';
-import DeprecatedModal from '~/vue_shared/components/deprecated_modal.vue';
+import { GlModal } from '@gitlab/ui';
 import { visitUrl } from '~/lib/utils/url_utility';
 import boardsStore from '~/boards/stores/boards_store';
 
@@ -22,7 +22,7 @@ const boardDefaults = {
 export default {
   components: {
     BoardScope: () => import('ee_component/boards/components/board_scope.vue'),
-    DeprecatedModal,
+    GlModal,
     BoardConfigurationOptions,
   },
   props: {
@@ -82,9 +82,6 @@ export default {
     isEditForm() {
       return this.currentPage === 'edit';
     },
-    isVisible() {
-      return this.currentPage !== '';
-    },
     buttonText() {
       if (this.isNewForm) {
         return __('Create board');
@@ -120,6 +117,17 @@ export default {
     },
     submitDisabled() {
       return this.isLoading || this.board.name.length === 0;
+    },
+    primaryProps() {
+      return {
+        text: this.buttonText,
+        attributes: [{ variant: this.buttonKind, disabled: this.submitDisabled }],
+      };
+    },
+    cancelProps() {
+      return {
+        text: __('Cancel'),
+      };
     },
   },
   mounted() {
@@ -181,16 +189,13 @@ export default {
 </script>
 
 <template>
-  <deprecated-modal
-    v-show="isVisible"
+  <gl-modal
+    modal-id="board-config-modal"
     :hide-footer="readonly"
     :title="title"
-    :primary-button-label="buttonText"
-    :kind="buttonKind"
-    :submit-disabled="submitDisabled"
-    modal-dialog-class="board-config-modal"
-    @cancel="cancel"
-    @submit="submit"
+    :action-primary="primaryProps"
+    :action-cancel="cancelProps"
+    @primary="submit"
   >
     <template #body>
       <p v-if="isDeleteForm">{{ __('Are you sure you want to delete this board?') }}</p>
@@ -229,5 +234,5 @@ export default {
         />
       </form>
     </template>
-  </deprecated-modal>
+  </gl-modal>
 </template>
