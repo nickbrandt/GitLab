@@ -6821,6 +6821,61 @@
         },
         {
           "kind": "OBJECT",
+          "name": "CodeCoverageSummary",
+          "description": "Represents the code coverage summary for a project",
+          "fields": [
+            {
+              "name": "averageCoverage",
+              "description": "Average percentage of the different code coverage results available for the project.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "coverageCount",
+              "description": "Number of different code coverage results available.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "lastUpdatedAt",
+              "description": "Latest date when the code coverage was created for the project.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Time",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "Commit",
           "description": null,
           "fields": [
@@ -40550,6 +40605,20 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "ClusterAgentConnection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "codeCoverageSummary",
+              "description": "Code coverages summary associated with the project. Available only when feature flag `group_coverage_data_report` is enabled",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CodeCoverageSummary",
                 "ofType": null
               },
               "isDeprecated": false,
