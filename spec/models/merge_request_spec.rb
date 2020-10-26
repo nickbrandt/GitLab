@@ -2464,8 +2464,10 @@ RSpec.describe MergeRequest, factory_default: :keep do
           Commits::RevertService.new(project, current_user, params).execute[:result]
         end
 
+        let(:revert_merge_request) { create(:merge_request, merge_commit_sha: revert_commit_id) }
+
         it 'returns nil' do
-          expect(subject.reverting_merge_request(current_user)).to be_nil
+          expect(subject.reverting_merge_request(current_user)).to be(revert_merge_request)
         end
       end
     end
