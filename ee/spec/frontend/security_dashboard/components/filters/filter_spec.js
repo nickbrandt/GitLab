@@ -16,12 +16,21 @@ describe('Filter component', () => {
   let wrapper;
 
   const createWrapper = propsData => {
-    wrapper = mount(Filter, { propsData });
+    wrapper = mount(Filter, {
+      stubs: {
+        ...stubChildren(Filter),
+        GlDropdown: false,
+        GlDropdownItem: false,
+        GlSearchBoxByType: false,
+      },
+      propsData,
+      attachToDocument: true,
+    });
   };
 
-  const findSearchBox = () => wrapper.find(GlSearchBoxByType);
-  const isDropdownOpen = () => wrapper.find(GlDropdown).classes('show');
-  const dropdownItemsCount = () => wrapper.findAll(GlDropdownItem).length;
+  const findSearchInput = () =>
+    wrapper.find({ ref: 'searchBox' }).exists() && wrapper.find({ ref: 'searchBox' }).find('input');
+  const dropdownItemsCount = () => wrapper.findAll('.gl-new-dropdown-item').length;
 
   afterEach(() => {
     wrapper.destroy();
@@ -45,12 +54,6 @@ describe('Filter component', () => {
       expect(dropdownItemsCount()).toEqual(8);
     });
 
-    it('should display a check next to only the selected items', () => {
-      expect(
-        wrapper.findAll(`[data-testid="mobile-issue-close-icon"]:not(.gl-visibility-hidden)`),
-      ).toHaveLength(3);
-    });
-
     it('should correctly display the selected text', () => {
       const selectedText = trimText(wrapper.find('.dropdown-toggle').text());
 
@@ -63,25 +66,6 @@ describe('Filter component', () => {
 
     it('should not have a search box', () => {
       expect(findSearchBox().exists()).toBe(false);
-    });
-
-    it('should not be open', () => {
-      expect(isDropdownOpen()).toBe(false);
-    });
-
-    describe('when the dropdown is open', () => {
-      beforeEach(done => {
-        wrapper.find('.dropdown-toggle').trigger('click');
-        wrapper.vm.$root.$on('bv::dropdown::shown', () => done());
-      });
-
-      it('should keep the menu open after clicking on an item', async () => {
-        expect(isDropdownOpen()).toBe(true);
-        wrapper.find(GlDropdownItem).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(isDropdownOpen()).toBe(true);
-      });
     });
   });
 
