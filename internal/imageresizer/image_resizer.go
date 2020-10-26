@@ -30,6 +30,7 @@ import (
 type Resizer struct {
 	config.Config
 	senddata.Prefix
+	numScalerProcs processCounter
 }
 
 type resizeParams struct {
@@ -41,8 +42,6 @@ type resizeParams struct {
 type processCounter struct {
 	n int32
 }
-
-var numScalerProcs processCounter
 
 var envInjector = tracing.NewEnvInjector()
 
@@ -122,7 +121,7 @@ func init() {
 }
 
 func NewResizer(cfg config.Config) *Resizer {
-	return &Resizer{cfg, "send-scaled-img:"}
+	return &Resizer{Config: cfg, Prefix: "send-scaled-img:"}
 }
 
 // This Injecter forks into a dedicated scaler process to resize an image identified by path or URL
@@ -158,7 +157,7 @@ func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 
 	// We first attempt to rescale the image; if this should fail for any reason, imageReader
 	// will point to the original image, i.e. we render it unchanged.
-	imageReader, resizeCmd, err := tryResizeImage(req, sourceImageReader, logger.Writer(), params, fileSize, r.Config.ImageResizerConfig)
+	imageReader, resizeCmd, err := r.tryResizeImage(req, sourceImageReader, logger.Writer(), params, fileSize, r.Config.ImageResizerConfig)
 	if err != nil {
 		// something failed, but we can still write out the original image, do don't return early
 		helper.LogErrorWithFields(req, err, *logFields(0))
@@ -228,24 +227,24 @@ func (r *Resizer) unpackParameters(paramsData string) (*resizeParams, error) {
 }
 
 // Attempts to rescale the given image data, or in case of errors, falls back to the original image.
-func tryResizeImage(req *http.Request, r io.Reader, errorWriter io.Writer, params *resizeParams, fileSize int64, cfg *config.ImageResizerConfig) (io.Reader, *exec.Cmd, error) {
+func (r *Resizer) tryResizeImage(req *http.Request, reader io.Reader, errorWriter io.Writer, params *resizeParams, fileSize int64, cfg *config.ImageResizerConfig) (io.Reader, *exec.Cmd, error) {
 	if fileSize > int64(cfg.MaxFilesize) {
-		return r, nil, fmt.Errorf("ImageResizer: %db exceeds maximum file size of %db", fileSize, cfg.MaxFilesize)
+		return reader, nil, fmt.Errorf("ImageResizer: %db exceeds maximum file size of %db", fileSize, cfg.MaxFilesize)
 	}
 
-	if !numScalerProcs.tryIncrement(int32(cfg.MaxScalerProcs)) {
-		return r, nil, fmt.Errorf("ImageResizer: too many running scaler processes")
+	if !r.numScalerProcs.tryIncrement(int32(cfg.MaxScalerProcs)) {
+		return reader, nil, fmt.Errorf("ImageResizer: too many running scaler processes (%d / %d)", r.numScalerProcs.n, cfg.MaxScalerProcs)
 	}
 
 	ctx := req.Context()
 	go func() {
 		<-ctx.Done()
-		numScalerProcs.decrement()
+		r.numScalerProcs.decrement()
 	}()
 
-	resizeCmd, resizedImageReader, err := startResizeImageCommand(ctx, r, errorWriter, params)
+	resizeCmd, resizedImageReader, err := startResizeImageCommand(ctx, reader, errorWriter, params)
 	if err != nil {
-		return r, nil, fmt.Errorf("ImageResizer: failed forking into scaler process: %w", err)
+		return reader, nil, fmt.Errorf("ImageResizer: failed forking into scaler process: %w", err)
 	}
 	return resizedImageReader, resizeCmd, nil
 }
