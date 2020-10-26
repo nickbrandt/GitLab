@@ -25,7 +25,7 @@ module Gitlab
 
       def validate_config!(config)
         empty = config.find { |_, actions| actions.empty? }
-        duplicate_actions = config.values.flatten.group_by(&:itself).select { |_, v| v.count > 1 }.keys
+        duplicate_actions = config.values.map(&:uniq).flatten.group_by(&:itself).select { |_, v| v.count > 1 }.keys
 
         if config.length > 1 && empty
           raise ArgumentError, "#{empty.first} is defined for all actions, but other categories are set"

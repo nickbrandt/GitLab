@@ -56,5 +56,14 @@ RSpec.describe Gitlab::WithFeatureCategory do
         end
       end.to raise_error(ArgumentError, "Actions have multiple feature categories: world")
     end
+
+    it "does not raise an error when multiple calls define the same action and feature category" do
+      expect do
+        Class.new(base_controller) do
+          feature_category :hello, [:world]
+          feature_category :hello, ["world"]
+        end
+      end.not_to raise_error
+    end
   end
 end
