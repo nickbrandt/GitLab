@@ -36,6 +36,7 @@ class SearchController < ApplicationController
     return unless search_term_valid?
 
     @search_term = params[:search]
+    @sort = params[:sort] || default_sort
 
     @scope = search_service.scope
     @show_snippets = search_service.show_snippets?
@@ -79,6 +80,11 @@ class SearchController < ApplicationController
 
   def preload_method
     SCOPE_PRELOAD_METHOD[@scope.to_sym]
+  end
+
+  # overridden in EE
+  def default_sort
+    'created_desc'
   end
 
   def search_term_valid?
