@@ -628,15 +628,75 @@ RSpec.describe Vulnerabilities::Finding do
         is_expected.to match a_hash_including(
           summary: evidence['summary'],
           request: {
-            headers: evidence['request']['headers'],
+            headers: [
+              {
+                name: evidence['request']['headers'][0]['name'],
+                value: evidence['request']['headers'][0]['value']
+              }
+            ],
             url: evidence['request']['url'],
-            method: evidence['request']['method']
+            method: evidence['request']['method'],
+            body: evidence['request']['body']
           },
           response: {
-            headers: evidence['response']['headers'],
+            headers: [
+              {
+                name: evidence['response']['headers'][0]['name'],
+                value: evidence['response']['headers'][0]['value']
+              }
+            ],
             reason_phrase: evidence['response']['reason_phrase'],
-            status_code: evidence['response']['status_code']
-          })
+            status_code: evidence['response']['status_code'],
+            body: evidence['request']['body']
+          },
+          source: {
+            id: evidence.dig('source', 'id'),
+            name: evidence.dig('source', 'name'),
+            url: evidence.dig('source', 'url')
+          },
+          supporting_messages: [
+            {
+              name: evidence.dig('supporting_messages')[0].dig('name'),
+              request: {
+                headers: [
+                  {
+                    name: evidence.dig('supporting_messages')[0].dig('request', 'headers')[0].dig('name'),
+                    value: evidence.dig('supporting_messages')[0].dig('request', 'headers')[0].dig('value')
+                  }
+                ],
+                url: evidence.dig('supporting_messages')[0].dig('request', 'url'),
+                method: evidence.dig('supporting_messages')[0].dig('request', 'method'),
+                body: evidence.dig('supporting_messages')[0].dig('request', 'body')
+              },
+              response: evidence.dig('supporting_messages')[0].dig('response')
+            },
+            {
+              name: evidence.dig('supporting_messages')[1].dig('name'),
+              request: {
+                headers: [
+                  {
+                    name: evidence.dig('supporting_messages')[1].dig('request', 'headers')[0].dig('name'),
+                    value: evidence.dig('supporting_messages')[1].dig('request', 'headers')[0].dig('value')
+                  }
+                ],
+                url: evidence.dig('supporting_messages')[1].dig('request', 'url'),
+                method: evidence.dig('supporting_messages')[1].dig('request', 'method'),
+                body: evidence.dig('supporting_messages')[1].dig('request', 'body')
+              },
+              response: {
+                headers: [
+                  {
+                    name: evidence.dig('supporting_messages')[1].dig('response', 'headers')[0].dig('name'),
+                    value: evidence.dig('supporting_messages')[1].dig('response', 'headers')[0].dig('value')
+                  }
+                ],
+                reason_phrase: evidence.dig('supporting_messages')[1].dig('response', 'reason_phrase'),
+                status_code: evidence.dig('supporting_messages')[1].dig('response', 'status_code'),
+                body: evidence.dig('supporting_messages')[1].dig('response', 'body')
+              }
+            }
+          ]
+        )
       end
     end
 
@@ -646,16 +706,10 @@ RSpec.describe Vulnerabilities::Finding do
       it do
         is_expected.to match a_hash_including(
           summary: nil,
-          request: {
-            headers: [],
-            url: nil,
-            method: nil
-          },
-          response: {
-            headers: [],
-            reason_phrase: nil,
-            status_code: nil
-          })
+          source: nil,
+          supporting_messages: [],
+          request: nil,
+          response: nil)
       end
     end
   end
