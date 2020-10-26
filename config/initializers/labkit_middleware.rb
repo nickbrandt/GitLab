@@ -3,7 +3,9 @@
 # partial backport of https://github.com/rails/rails/pull/38169
 # this is in order to be able to re-order rack middlewares.
 
-unless ActionDispatch::MiddlewareStack.method_defined?(:move)
+if ActionDispatch::MiddlewareStack.method_defined?(:move)
+  warn "`move` is now defined in in ActionDispatch itself: https://github.com/rails/rails/pull/38169, please remove this patch from #{__FILE__}"
+else
   module ActionDispatch
     class MiddlewareStack
       def move(target, source)
