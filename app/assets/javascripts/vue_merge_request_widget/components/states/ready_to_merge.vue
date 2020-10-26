@@ -298,7 +298,7 @@ export default {
             <gl-button
               v-if="shouldShowMergeImmediatelyDropdown"
               :disabled="isMergeButtonDisabled"
-              class="btn btn-sm btn-info dropdown-toggle js-merge-moment"
+              class="dropdown-toggle js-merge-moment"
               category="primary"
               variant="info"
               icon="chevron-down"
