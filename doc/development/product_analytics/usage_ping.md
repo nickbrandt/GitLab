@@ -280,7 +280,6 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
      redis_slot: compliance
      expiry: 42  # 6 weeks
      aggregation: weekly
-     group_by_plan: true
    ```
 
    Keys:
@@ -313,7 +312,6 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
    - `aggregation`: aggregation `:daily` or `:weekly`. The argument defines how we build the Redis
      keys for data storage. For `daily` we keep a key for metric per day of the year, for `weekly` we
      keep a key for metric per week of the year.
-   - `group_by_plan`: enable the plan level event tracking in `Gitlab::UsageDataCounters::HLLRedisCounter`. By default set to false. When set to true, `track_event` should take `plan` as argument.
 
 1. Track event in controller using `RedisTracking` module with `track_redis_hll_event(*controller_actions, name:, feature:, feature_default_enabled: false)`.
 
@@ -424,22 +422,23 @@ w
    api.trackRedisHllUserEvent('my_already_defined_event_name'),
    ```
 
-1. Track event using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event(entity_id, event_name, plan: '', time: Time.now)`.
+1. Track event using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event(entity_id, event_name, context: '', time: Time.now)`.
 
    Arguments:
 
    - `entity_id`: value we count. For example: user_id, visitor_id.
    - `event_name`: event name.
-   - `plan:`: plan name. Enabled when `group_by_plan` is set to `true` in [known events](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/usage_data_counters/known_events.yml)
+   - `context:`: context value.
    - `time:`: the time when event is tracked. This is only used for testing purpose. By default we set `Time.now`
 
-1. Get event data using `Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names:, start_date:, end_date)`.
+1. Get event data using `Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names:, start_date:, end_date, context:)`.
 
    Arguments:
 
    - `event_names`: the list of event names.
    - `start_date`: start date of the period for which we want to get event data.
    - `end_date`: end date of the period for which we want to get event data.
+   - `context`: context of the event.
 
 Recommendations:
 

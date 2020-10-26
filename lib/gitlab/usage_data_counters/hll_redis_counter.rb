@@ -25,7 +25,6 @@ module Gitlab
       #   category: compliance         # Group events in categories
       #   expiry: 29                   # Optional expiration time in days, default value 29 days for daily and 6.weeks for weekly
       #   aggregation: daily           # Aggregation level, keys are stored daily or weekly
-      #   group_by_plan: false         # Tracking on a given plan level
       # Usage:
       #
       # * Track event: Gitlab::UsageDataCounters::HLLRedisCounter.track_event(user_id, 'g_compliance_dashboard')
@@ -33,19 +32,17 @@ module Gitlab
       class << self
         include Gitlab::Utils::UsageData
 
-        def track_event(entity_id, event_name, plan: '', time: Time.zone.now)
+        def track_event(entity_id, event_name, context: '', time: Time.zone.now)
           return unless Gitlab::CurrentSettings.usage_ping_enabled?
 
           event = event_for(event_name)
 
           raise UnknownEvent.new("Unknown event #{event_name}") unless event.present?
-          return if event['group_by_plan'].present? && plan.blank?
-          return if event['group_by_plan'].blank? && plan.present?
 
-          # Increment unique event for given plan
-          # Track events in plan level if we have more than 1 plan defined and if plan_enabled is true
-          if eligible_plan_tracking?(plan, event)
-            Gitlab::Redis::HLL.add(key: redis_key(event, time, plan), value: entity_id, expiry: expiry(event))
+          # Increment unique event for given context
+          # Track events in context level
+          if context.present?
+            Gitlab::Redis::HLL.add(key: redis_key(event, time, context), value: entity_id, expiry: expiry(event))
           end
 
           # Increment unique event globaly
@@ -53,18 +50,17 @@ module Gitlab
         end
 
         # Get the unique events in same category and slot
-        # When plan is given it will get the union of events in the given plan
-        def unique_events(event_names:, start_date:, end_date:, plan: '')
+        # When context is given it will get the union of events in the given context
+        def unique_events(event_names:, start_date:, end_date:, context: '')
           events = events_for(Array(event_names).map(&:to_s))
 
           raise 'Events should be in same slot' unless events_in_same_slot?(events)
           raise 'Events should be in same category' unless events_in_same_category?(events)
           raise 'Events should have same aggregation level' unless events_same_aggregation?(events)
-          raise 'Unknown plan' if plan.present? && !plan.in?(Plan.all_plans)
 
           aggregation = events.first[:aggregation]
 
-          keys = keys_for_aggregation(aggregation, events: events, start_date: start_date, end_date: end_date, plan: plan)
+          keys = keys_for_aggregation(aggregation, events: events, start_date: start_date, end_date: end_date, context: context)
 
           redis_usage_data { Gitlab::Redis::HLL.count(keys: keys) }
         end
@@ -113,11 +109,11 @@ module Gitlab
           events_in_same_slot?(events) && events_in_same_category?(events) && events_same_aggregation?(events)
         end
 
-        def keys_for_aggregation(aggregation, events:, start_date:, end_date:, plan: '')
+        def keys_for_aggregation(aggregation, events:, start_date:, end_date:, context: '')
           if aggregation.to_sym == :daily
-            daily_redis_keys(events: events, start_date: start_date, end_date: end_date, plan: plan)
+            daily_redis_keys(events: events, start_date: start_date, end_date: end_date, context: context)
           else
-            weekly_redis_keys(events: events, start_date: start_date, end_date: end_date, plan: plan)
+            weekly_redis_keys(events: events, start_date: start_date, end_date: end_date, context: context)
           end
         end
 
@@ -166,18 +162,14 @@ module Gitlab
         end
 
         # Compose the key in order to store events daily or weekly
-        def redis_key(event, time, plan = '')
+        def redis_key(event, time, context = '')
           raise UnknownEvent.new("Unknown event #{event[:name]}") unless known_events_names.include?(event[:name].to_s)
           raise UnknownAggregation.new("Use :daily or :weekly aggregation") unless ALLOWED_AGGREGATIONS.include?(event[:aggregation].to_sym)
 
           key = apply_slot(event)
           key = apply_time_aggregation(key, time, event)
-          key = "#{plan}_#{key}" if plan.present?
+          key = "#{context}_#{key}" if context.present?
           key
-        end
-
-        def eligible_plan_tracking?(plan, event)
-          plan.present? && event[:group_by_plan].present? && Plan.all_plans.size > 1 && plan.in?(Plan.all_plans)
         end
 
         def apply_slot(event)
@@ -199,18 +191,18 @@ module Gitlab
           end
         end
 
-        def daily_redis_keys(events:, start_date:, end_date:, plan: '')
+        def daily_redis_keys(events:, start_date:, end_date:, context: '')
           (start_date.to_date..end_date.to_date).map do |date|
-            events.map { |event| redis_key(event, date, plan) }
+            events.map { |event| redis_key(event, date, context) }
           end.flatten
         end
 
-        def weekly_redis_keys(events:, start_date:, end_date:, plan: '')
+        def weekly_redis_keys(events:, start_date:, end_date:, context: '')
           weeks = end_date.to_date.cweek - start_date.to_date.cweek
           weeks = 1 if weeks == 0
 
           (0..(weeks - 1)).map do |week_increment|
-            events.map { |event| redis_key(event, start_date + week_increment * 7.days, plan) }
+            events.map { |event| redis_key(event, start_date + week_increment * 7.days, context) }
           end.flatten
         end
       end
