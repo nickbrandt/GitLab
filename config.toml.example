@@ -13,5 +13,5 @@ URL = "unix:/home/git/gitlab/redis/redis.socket"
   azure_storage_access_key = "YOUR ACCOUNT KEY"
 
 [image_resizer]
-  max_scaler_procs = 100
+  max_scaler_procs = 4 # Recommendation: CPUs / 2
   max_filesize = 250000

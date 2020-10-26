@@ -1,7 +1,9 @@
 package config
 
 import (
+	"math"
 	"net/url"
+	"runtime"
 	"strings"
 	"time"
 
@@ -105,14 +107,9 @@ type Config struct {
 	ImageResizerConfig       *ImageResizerConfig       `toml:"image_resizer"`
 }
 
-const (
-	DefaultImageResizerMaxScalerProcs = 100
-	DefaultImageResizerMaxFilesize    = 250 * 1000 // 250kB
-)
-
 var DefaultImageResizerConfig = &ImageResizerConfig{
-	MaxScalerProcs: DefaultImageResizerMaxScalerProcs,
-	MaxFilesize:    DefaultImageResizerMaxFilesize,
+	MaxScalerProcs: uint32(math.Max(2, float64(runtime.NumCPU())/2)),
+	MaxFilesize:    250 * 1000, // 250kB,
 }
 
 func LoadConfig(data string) (*Config, error) {

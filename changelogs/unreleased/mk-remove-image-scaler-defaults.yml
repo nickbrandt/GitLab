@@ -1,0 +1,5 @@
+---
+title: Default MaxScalerProcs to num_cores / 2
+merge_request: 635
+author:
+type: other

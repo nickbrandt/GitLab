@@ -21,14 +21,8 @@ func TestLoadEmptyConfig(t *testing.T) {
 	cfg, err := LoadConfig(config)
 	require.NoError(t, err)
 
-	expected := Config{
-		ImageResizerConfig: &ImageResizerConfig{
-			MaxScalerProcs: DefaultImageResizerMaxScalerProcs,
-			MaxFilesize:    DefaultImageResizerMaxFilesize,
-		},
-	}
-
-	require.Equal(t, expected, *cfg)
+	require.Equal(t, cfg.ImageResizerConfig.MaxFilesize, uint64(250000))
+	require.GreaterOrEqual(t, cfg.ImageResizerConfig.MaxScalerProcs, uint32(2))
 
 	require.Nil(t, cfg.ObjectStorageCredentials)
 	require.NoError(t, cfg.RegisterGoCloudURLOpeners())

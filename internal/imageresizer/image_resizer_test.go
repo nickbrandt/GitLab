@@ -17,8 +17,6 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
-var r = Resizer{}
-
 func TestMain(m *testing.M) {
 	if err := testhelper.BuildExecutables(); err != nil {
 		log.WithError(err).Fatal()
@@ -28,6 +26,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestUnpackParametersReturnsParamsInstanceForValidInput(t *testing.T) {
+	r := Resizer{}
 	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: "image/png"}
 
 	outParams, err := r.unpackParameters(encodeParams(t, &inParams))
@@ -37,6 +36,7 @@ func TestUnpackParametersReturnsParamsInstanceForValidInput(t *testing.T) {
 }
 
 func TestUnpackParametersReturnsErrorWhenLocationBlank(t *testing.T) {
+	r := Resizer{}
 	inParams := resizeParams{Location: "", Width: 64, ContentType: "image/jpg"}
 
 	_, err := r.unpackParameters(encodeParams(t, &inParams))
@@ -45,6 +45,7 @@ func TestUnpackParametersReturnsErrorWhenLocationBlank(t *testing.T) {
 }
 
 func TestUnpackParametersReturnsErrorWhenContentTypeBlank(t *testing.T) {
+	r := Resizer{}
 	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: ""}
 
 	_, err := r.unpackParameters(encodeParams(t, &inParams))
@@ -53,12 +54,13 @@ func TestUnpackParametersReturnsErrorWhenContentTypeBlank(t *testing.T) {
 }
 
 func TestTryResizeImageSuccess(t *testing.T) {
+	r := Resizer{}
 	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: "image/png"}
 	inFile := testImage(t)
 	req, err := http.NewRequest("GET", "/foo", nil)
 	require.NoError(t, err)
 
-	reader, cmd, err := tryResizeImage(
+	reader, cmd, err := r.tryResizeImage(
 		req,
 		inFile,
 		os.Stderr,
@@ -74,12 +76,13 @@ func TestTryResizeImageSuccess(t *testing.T) {
 }
 
 func TestTryResizeImageSkipsResizeWhenSourceImageTooLarge(t *testing.T) {
+	r := Resizer{}
 	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: "image/png"}
 	inFile := testImage(t)
 	req, err := http.NewRequest("GET", "/foo", nil)
 	require.NoError(t, err)
 
-	reader, cmd, err := tryResizeImage(
+	reader, cmd, err := r.tryResizeImage(
 		req,
 		inFile,
 		os.Stderr,
@@ -94,12 +97,13 @@ func TestTryResizeImageSkipsResizeWhenSourceImageTooLarge(t *testing.T) {
 }
 
 func TestTryResizeImageFailsWhenContentTypeNotMatchingFileContents(t *testing.T) {
+	r := Resizer{}
 	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: "image/jpeg"}
 	inFile := testImage(t) // this is a PNG file; the image scaler should fail fast in this case
 	req, err := http.NewRequest("GET", "/foo", nil)
 	require.NoError(t, err)
 
-	_, cmd, err := tryResizeImage(
+	_, cmd, err := r.tryResizeImage(
 		req,
 		inFile,
 		os.Stderr,
