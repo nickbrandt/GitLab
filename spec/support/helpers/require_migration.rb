@@ -14,8 +14,8 @@ class RequireMigration
     end
   end
 
-  FOSS_MIGRATION_FOLDERS = %w(db/migrate db/post_migrate).freeze
-  ALL_MIGRATION_FOLDERS = (FOSS_MIGRATION_FOLDERS + %w(ee/db/geo/migrate ee/db/geo/post_migrate)).freeze
+  FOSS_MIGRATION_FOLDERS = %w[db/migrate db/post_migrate].freeze
+  ALL_MIGRATION_FOLDERS = (FOSS_MIGRATION_FOLDERS + %w[ee/db/geo/migrate ee/db/geo/post_migrate]).freeze
   SPEC_FILE_PATTERN = /.+\/(?<file_name>.+)_spec\.rb/.freeze
 
   class << self
