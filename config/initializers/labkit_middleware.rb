@@ -22,7 +22,7 @@ unless Rails::Configuration::MiddlewareStackProxy.method_defined?(:move)
     module Configuration
       class MiddlewareStackProxy
         def move(*args, &block)
-          @operations << -> middleware { middleware.send(__method__, *args, &block) }
+          @operations << ->(middleware) { middleware.send(__method__, *args, &block) }
         end
         ruby2_keywords(:move) if respond_to?(:ruby2_keywords, true)
       end
