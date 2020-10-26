@@ -10110,7 +10110,7 @@ msgstr ""
 msgid "Enable"
 msgstr ""
 
-msgid "Enable %{link_start}Gitpod%{link_end} integration to launch a development environment in your browser directly from GitLab."
+msgid "Enable %{linkStart}Gitpod%{linkEnd} integration to launch a development environment in your browser directly from GitLab."
 msgstr ""
 
 msgid "Enable Auto DevOps"
@@ -20310,16 +20310,10 @@ msgstr ""
 msgid "Preferences|Choose what content you want to see on your homepage."
 msgstr ""
 
-msgid "Preferences|Customize integrations with third party services."
-msgstr ""
-
 msgid "Preferences|Customize the appearance of the application header and navigation sidebar."
 msgstr ""
 
 msgid "Preferences|Display time in 24-hour format"
-msgstr ""
-
-msgid "Preferences|Enable integrated code intelligence on code views"
 msgstr ""
 
 msgid "Preferences|For example: 30 mins ago."
@@ -20329,9 +20323,6 @@ msgid "Preferences|Homepage content"
 msgstr ""
 
 msgid "Preferences|Instead of all the files changed, show only one file at a time. To switch between files, use the file browser."
-msgstr ""
-
-msgid "Preferences|Integrations"
 msgstr ""
 
 msgid "Preferences|Layout width"
@@ -20353,9 +20344,6 @@ msgid "Preferences|Show one file at a time on merge request's Changes tab"
 msgstr ""
 
 msgid "Preferences|Show whitespace changes in diffs"
-msgstr ""
-
-msgid "Preferences|Sourcegraph"
 msgstr ""
 
 msgid "Preferences|Syntax highlighting theme"
@@ -20542,6 +20530,24 @@ msgid "Profile"
 msgstr ""
 
 msgid "Profile Settings"
+msgstr ""
+
+msgid "ProfilePreferences|Customize integrations with third party services."
+msgstr ""
+
+msgid "ProfilePreferences|Enable Gitpod integration"
+msgstr ""
+
+msgid "ProfilePreferences|Enable integrated code intelligence on code views"
+msgstr ""
+
+msgid "ProfilePreferences|Gitpod"
+msgstr ""
+
+msgid "ProfilePreferences|Integrations"
+msgstr ""
+
+msgid "ProfilePreferences|Sourcegraph"
 msgstr ""
 
 msgid "ProfileSession|on"
@@ -25590,10 +25596,10 @@ msgstr ""
 msgid "SourcegraphPreferences|This feature is experimental."
 msgstr ""
 
-msgid "SourcegraphPreferences|Uses %{link_start}Sourcegraph.com%{link_end}."
+msgid "SourcegraphPreferences|Uses %{linkStart}Sourcegraph.com%{linkEnd}."
 msgstr ""
 
-msgid "SourcegraphPreferences|Uses a custom %{link_start}Sourcegraph instance%{link_end}."
+msgid "SourcegraphPreferences|Uses a custom %{linkStart}Sourcegraph instance%{linkEnd}."
 msgstr ""
 
 msgid "Spam Logs"
