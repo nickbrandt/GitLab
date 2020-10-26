@@ -63,7 +63,7 @@ describe('Grouped security reports app', () => {
 
   const glModalDirective = jest.fn();
 
-  const createWrapper = (propsData, options) => {
+  const createWrapper = (propsData, options, provide) => {
     wrapper = mount(GroupedSecurityReportsApp, {
       propsData,
       data() {
@@ -80,6 +80,10 @@ describe('Grouped security reports app', () => {
         },
       },
       store: appStore(),
+      provide: {
+        glFeatures: { coverage_fuzzing_mr_widget: true },
+        ...provide,
+      },
     });
   };
 
@@ -366,6 +370,41 @@ describe('Grouped security reports app', () => {
       const button = wrapper.find('.report-btn');
       expect(button.exists()).toBe(true);
     });
+  });
+
+  describe('coverage fuzzing reports', () => {
+    describe.each`
+      endpoint      | shouldShowFuzzing | featureEnabled
+      ${'/fuzzing'} | ${true}           | ${true}
+      ${'/fuzzing'} | ${false}          | ${false}
+    `(
+      'given coverage fuzzing comparision enpoint is $endpoint and featureEnabled is $featureEnabled',
+      ({ endpoint, shouldShowFuzzing, featureEnabled }) => {
+        beforeEach(() => {
+          gl.mrWidgetData = gl.mrWidgetData || {};
+          gl.mrWidgetData.coverage_fuzzing_comparison_path = endpoint;
+
+          createWrapper(
+            {
+              ...props,
+              enabledReports: {
+                coverageFuzzing: true,
+              },
+            },
+            {},
+            {
+              glFeatures: { coverage_fuzzing_mr_widget: featureEnabled },
+            },
+          );
+        });
+
+        it(`${shouldShowFuzzing ? 'renders' : 'does not render'}`, () => {
+          expect(wrapper.find('[data-qa-selector="coverage_fuzzing_report"]').exists()).toBe(
+            shouldShowFuzzing,
+          );
+        });
+      },
+    );
   });
 
   describe('container scanning reports', () => {

@@ -559,7 +559,8 @@ export default {
           />
         </template>
 
-        <template v-if="hasCoverageFuzzingReports">
+        <!-- TODO: Remove feature flag in https://gitlab.com/gitlab-org/gitlab/-/issues/257839 -->
+        <template v-if="hasCoverageFuzzingReports && glFeatures.coverage_fuzzing_mr_widget">
           <summary-row
             :summary="groupedCoverageFuzzingText"
             :status-icon="coverageFuzzingStatusIcon"
