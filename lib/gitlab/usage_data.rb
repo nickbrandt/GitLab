@@ -639,8 +639,8 @@ module Gitlab
         guest_counts = count(Packages::Event.where(time_period).with_guest.group(:originator_type, :event_type, :event_scope))
 
         return {} if counts == -1 || guest_counts == -1
-        return counts if counts.is_a?(String) || guest_counts.is_a?(String) # sql output
 
+        # return counts if counts.is_a?(String) || guest_counts.is_a?(String) # sql output
         counts.merge(guest_counts).each_pair do |scope, count|
           originator_type = scope[0]
           event_type = scope[1]
