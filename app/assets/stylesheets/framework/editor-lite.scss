@@ -1,3 +1,10 @@
+[data-editor-loading]::before {
+  content: '';
+  @include spinner(32px, 3px, $orange-400);
+  @include gl-absolute;
+  @include gl-z-index-1;
+}
+
 [id^='editor-lite-'] {
   height: 500px;
 }
