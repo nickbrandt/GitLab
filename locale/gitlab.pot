@@ -25393,6 +25393,9 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+msgid "Status was retried."
+msgstr ""
+
 msgid "Status:"
 msgstr ""
 
