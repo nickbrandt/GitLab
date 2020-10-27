@@ -1263,8 +1263,6 @@ FactoryBot/InlineAssociation:
     - 'ee/spec/factories/geo/event_log.rb'
     - 'ee/spec/factories/groups.rb'
     - 'ee/spec/factories/merge_request_blocks.rb'
-    - 'ee/spec/factories/resource_iteration_event.rb'
-    - 'ee/spec/factories/resource_weight_events.rb'
     - 'ee/spec/factories/vulnerabilities/feedback.rb'
     - 'spec/factories/atlassian_identities.rb'
     - 'spec/factories/design_management/design_at_version.rb'
