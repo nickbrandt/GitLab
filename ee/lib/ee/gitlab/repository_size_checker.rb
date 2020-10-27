@@ -19,7 +19,7 @@ module EE
       def exceeded_size(change_size = 0)
         exceeded_size = super
         exceeded_size -= remaining_additional_purchased_storage if additional_repo_storage_available?
-        [exceeded_size, 0].max
+        exceeded_size
       end
 
       private
