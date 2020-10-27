@@ -14,13 +14,12 @@ module Banzai
       end.join(', ')
 
       def call
-        # QUESTION: should we make Kroki and PlantUML mutually exclusive?
-        # Potentially, Kroki and PlantUML could work side by side.
-        # In fact, if both PlantUML and Kroki are enabled, PlantUML could still render PlantUML diagrams and Kroki could render the other diagrams?
-        # Having said that, since Kroki can render PlantUML diagrams, maybe it will be confusing...
-        #
-        # What about Mermaid? should we keep client side rendering for Mermaid?
-        return doc unless settings.kroki_enabled && doc.at(DIAGRAM_SELECTORS)
+        plantuml_enabled = settings.plantuml_enabled
+        diagram_selectors = ::Gitlab::Kroki::DIAGRAM_TYPES.map do |diagram_type|
+          # if PlantUML is enabled, PlantUML diagrams will be processed by the PlantUML filter.
+          %(pre[lang="#{diagram_type}"] > code) if (plantuml_enabled && diagram_type != 'plantuml') || !plantuml_enabled
+        end.compact.join(', ')
+        return doc unless settings.kroki_enabled && doc.at(diagram_selectors)
 
         diagram_format = "svg"
         doc.css(DIAGRAM_SELECTORS).each do |node|
