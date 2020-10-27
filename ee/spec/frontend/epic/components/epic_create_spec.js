@@ -110,8 +110,7 @@ describe('EpicCreateComponent', () => {
   });
 
   describe('template', () => {
-    it('renders component container element with classes `dropdown` & `epic-create-dropdown`', () => {
-      expect(vm.$el.classList.contains('dropdown')).toBe(true);
+    it('renders component container element with class `epic-create-dropdown`', () => {
       expect(vm.$el.classList.contains('epic-create-dropdown')).toBe(true);
     });
 

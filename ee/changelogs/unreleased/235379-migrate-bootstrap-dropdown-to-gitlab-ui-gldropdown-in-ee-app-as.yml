@@ -1,0 +1,5 @@
+---
+title: Migrate Bootstrap dropdown to GlDropdown in epic_create.vue
+merge_request: 46139
+author:
+type: changed
