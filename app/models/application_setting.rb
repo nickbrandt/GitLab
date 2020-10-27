@@ -525,8 +525,8 @@ class ApplicationSetting < ApplicationRecord
   def validate_url(parsed_url, name, error_message)
     unless parsed_url
       self.errors.add(
-          name,
-          "must be a valid relative or absolute URL. #{error_message}"
+        name,
+        "must be a valid relative or absolute URL. #{error_message}"
       )
     end
   end
