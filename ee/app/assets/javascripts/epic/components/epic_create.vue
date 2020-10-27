@@ -1,7 +1,8 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import {
-  GlForm,
+  GlDropdown,
+  GlDropdownForm,
   GlFormInput,
   GlFormCheckbox,
   GlIcon,
@@ -15,10 +16,11 @@ import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   components: {
+    GlDropdown,
+    GlDropdownForm,
     GlFormCheckbox,
     GlIcon,
     GlButton,
-    GlForm,
     GlFormInput,
   },
   directives: {
@@ -69,18 +71,16 @@ export default {
 </script>
 
 <template>
-  <div class="dropdown epic-create-dropdown">
-    <gl-button
+  <div class="epic-create-dropdown">
+    <gl-dropdown
+      :text="__('New epic')"
+      :right="alignRight"
       category="primary"
       variant="success"
       data-qa-selector="new_epic_button"
       data-toggle="dropdown"
     >
-      {{ __('New epic') }}
-    </gl-button>
-
-    <div :class="{ 'dropdown-menu-right': alignRight }" class="dropdown-menu">
-      <gl-form>
+      <gl-dropdown-form class="gl-p-0 gl-outline-none">
         <gl-form-input
           ref="epicTitleInput"
           v-model="epicTitle"
@@ -94,7 +94,7 @@ export default {
         />
         <gl-form-checkbox
           v-model="epicConfidential"
-          class="mt-3 mb-3 mr-0"
+          class="gl-my-5 gl-mr-0"
           data-qa-selector="confidential_epic_checkbox"
           ><span> {{ __('Make this epic confidential') }} </span>
           <span
@@ -118,12 +118,13 @@ export default {
           :loading="epicCreateInProgress"
           category="primary"
           variant="success"
-          class="gl-mt-3"
+          class="gl-mt-3 gl-w-auto! gl-xs-w-full!"
+          :class="{ 'gl-hover-text-white!': !isEpicCreateDisabled }"
           data-qa-selector="create_epic_button"
           @click.stop="createEpic"
           >{{ buttonLabel }}</gl-button
         >
-      </gl-form>
-    </div>
+      </gl-dropdown-form>
+    </gl-dropdown>
   </div>
 </template>
