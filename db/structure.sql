@@ -14817,7 +14817,8 @@ CREATE TABLE project_ci_cd_settings (
     group_runners_enabled boolean DEFAULT true NOT NULL,
     merge_pipelines_enabled boolean,
     default_git_depth integer,
-    forward_deployment_enabled boolean
+    forward_deployment_enabled boolean,
+    merge_trains_enabled boolean DEFAULT false
 );
 
 CREATE SEQUENCE project_ci_cd_settings_id_seq
