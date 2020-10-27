@@ -30,7 +30,7 @@ describe('Filter component', () => {
 
   const findSearchInput = () =>
     wrapper.find({ ref: 'searchBox' }).exists() && wrapper.find({ ref: 'searchBox' }).find('input');
-  const dropdownItemsCount = () => wrapper.findAll('.gl-new-dropdown-item').length;
+    const dropdownItemsCount = () => wrapper.findAll([data-testid="dropdown-item"]).length;
 
   afterEach(() => {
     wrapper.destroy();
