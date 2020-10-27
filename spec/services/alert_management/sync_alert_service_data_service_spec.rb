@@ -25,7 +25,7 @@ RSpec.describe AlertManagement::SyncAlertServiceDataService do
     end
 
     context 'existing other http integration' do
-      let_it_be(:integration) { create(:alert_management_http_integration,  project: alerts_service.project) }
+      let_it_be(:integration) { create(:alert_management_http_integration, project: alerts_service.project) }
 
       it 'does not update the integration' do
         expect { subject }

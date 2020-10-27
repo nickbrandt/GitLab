@@ -81,7 +81,7 @@ class AlertsService < Service
   end
 
   def update_http_integration
-    return unless type == 'AlertsService'
+    return unless project_id && type == 'AlertsService'
 
     AlertManagement::SyncAlertServiceDataService # rubocop: disable CodeReuse/ServiceClass
       .new(self)

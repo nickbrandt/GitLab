@@ -2,7 +2,6 @@
 
 module AlertManagement
   class SyncAlertServiceDataService
-
     # @param alert_service [AlertsService]
     def initialize(alert_service)
       @alert_service = alert_service
@@ -23,9 +22,9 @@ module AlertManagement
 
     def find_http_integration
       AlertManagement::HttpIntegrationsFinder.new(
-          alert_service.project,
-          endpoint_identifier: ::AlertManagement::HttpIntegration::LEGACY_IDENTIFIER
-        )
+        alert_service.project,
+        endpoint_identifier: ::AlertManagement::HttpIntegration::LEGACY_IDENTIFIER
+      )
       .execute
       .first
     end
