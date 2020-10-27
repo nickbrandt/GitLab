@@ -1,5 +1,5 @@
 import { GlDropdown, GlDropdownItem, GlSearchBoxByType } from '@gitlab/ui';
-import Filter from 'ee/security_dashboard/components/filters/filter.vue';
+import StandardFilter from 'ee/security_dashboard/components/filters/standard_filter.vue';
 import { mount } from '@vue/test-utils';
 import { trimText } from 'helpers/text_helper';
 
@@ -12,11 +12,11 @@ const generateOptions = length => {
   return Array.from({ length }).map((_, i) => generateOption(i));
 };
 
-describe('Filter component', () => {
+describe('Standard Filter component', () => {
   let wrapper;
 
   const createWrapper = propsData => {
-    wrapper = mount(Filter, { propsData });
+    wrapper = mount(StandardFilter, { propsData });
   };
 
   const findSearchBox = () => wrapper.find(GlSearchBoxByType);
@@ -58,7 +58,7 @@ describe('Filter component', () => {
     });
 
     it('should display "Severity" as the option name', () => {
-      expect(wrapper.find('.js-name').text()).toContain('Severity');
+      expect(wrapper.find('[data-testid="name"]').text()).toEqual('Severity');
     });
 
     it('should not have a search box', () => {
