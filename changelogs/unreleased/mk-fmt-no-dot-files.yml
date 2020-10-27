@@ -1,0 +1,5 @@
+---
+title: Exclude dot-files from "make fmt" target
+merge_request: 641
+author:
+type: other

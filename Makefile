@@ -22,7 +22,7 @@ export PATH := $(GOBIN):$(PATH)
 export GOPROXY ?= https://proxy.golang.org
 export GO111MODULE=on
 
-LOCAL_GO_FILES = $(shell find . -type f -name '*.go' | grep -v -e /_ -e /testdata/)
+LOCAL_GO_FILES = $(shell find . -type f -name '*.go' | grep -v -e /_ -e /testdata/ -e '^\./\.')
 
 define message
 	@echo "### $(1)"
