@@ -185,30 +185,5 @@ RSpec.describe Gitlab::Ci::Reports::TestReports do
         end
       end
     end
-
-    describe "##{status_type}_test_cases" do
-      subject { test_reports.public_send("#{status_type}_test_cases") }
-
-      context "when #{status_type} test case exists" do
-        it 'returns the test cases' do
-          rspec_case = public_send("create_test_case_rspec_#{status_type}")
-          java_case = public_send("create_test_case_java_#{status_type}")
-
-          test_reports.get_suite('rspec').add_test_case(rspec_case)
-          test_reports.get_suite('junit').add_test_case(java_case)
-
-          is_expected.to eq(
-            rspec_case.key => rspec_case,
-            java_case.key => java_case
-          )
-        end
-      end
-
-      context "when #{status_type} test case do not exist" do
-        it 'returns nothing' do
-          is_expected.to eq({})
-        end
-      end
-    end
   end
 end

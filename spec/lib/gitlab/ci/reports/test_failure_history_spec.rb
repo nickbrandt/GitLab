@@ -2,21 +2,17 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::Ci::Reports::TestReportFailureHistory, :aggregate_failures do
+RSpec.describe Gitlab::Ci::Reports::TestFailureHistory, :aggregate_failures do
   include TestReportsHelper
 
   describe '#load!' do
     let_it_be(:project) { create(:project) }
-    let(:test_reports) { Gitlab::Ci::Reports::TestReports.new }
     let(:failed_rspec) { create_test_case_rspec_failed }
     let(:failed_java) { create_test_case_java_failed }
 
-    subject(:load_history) { described_class.new(test_reports, project).load! }
+    subject(:load_history) { described_class.new([failed_rspec, failed_java], project).load! }
 
     before do
-      test_reports.get_suite('rspec').add_test_case(failed_rspec)
-      test_reports.get_suite('java').add_test_case(failed_java)
-
       allow(Ci::TestCaseFailure)
         .to receive(:recent_failures_count)
         .with(project: project, test_case_keys: [failed_rspec.key, failed_java.key])

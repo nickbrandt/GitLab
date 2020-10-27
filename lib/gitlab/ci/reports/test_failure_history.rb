@@ -3,11 +3,11 @@
 module Gitlab
   module Ci
     module Reports
-      class TestReportFailureHistory
+      class TestFailureHistory
         include Gitlab::Utils::StrongMemoize
 
-        def initialize(report, project)
-          @report = report
+        def initialize(failed_test_cases, project)
+          @failed_test_cases = build_map(failed_test_cases)
           @project = project
         end
 
@@ -21,7 +21,7 @@ module Gitlab
 
         private
 
-        attr_reader :report, :project
+        attr_reader :report, :project, :failed_test_cases
 
         def recent_failures_count
           ::Ci::TestCaseFailure.recent_failures_count(
@@ -30,9 +30,11 @@ module Gitlab
           )
         end
 
-        def failed_test_cases
-          strong_memoize(:failed_test_cases) do
-            report.failed_test_cases
+        def build_map(test_cases)
+          {}.tap do |hash|
+            test_cases.each do |test_case|
+              hash[test_case.key] = test_case
+            end
           end
         end
       end

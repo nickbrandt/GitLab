@@ -14,15 +14,23 @@ module Ci
       pipeline&.test_reports
     end
 
-    def build_comparer(base_pipeline, head_pipeline)
-      base_report = get_report(base_pipeline)
-      head_report = get_report(head_pipeline)
-
-      # We need to load the test failure history for the head report because we display
+    def build_comparer(base_report, head_report)
+      # We need to load the test failure history on the test comparer because we display
       # this on the MR widget
-      ::Gitlab::Ci::Reports::TestReportFailureHistory.new(head_report, project).load!
+      super.tap do |test_reports_comparer|
+        ::Gitlab::Ci::Reports::TestFailureHistory.new(failed_test_cases(test_reports_comparer), project).load!
+      end
+    end
 
-      comparer_class.new(base_report, head_report)
+    def failed_test_cases(test_reports_comparer)
+      [].tap do |test_cases|
+        test_reports_comparer.suite_comparers.each do |suite_comparer|
+          # We're basing off the limited tests because this is what's presented on the MR widget
+          # and at the same time we only want to query for a limited amount of test failures.
+          limited_tests = suite_comparer.limited_tests
+          test_cases.concat(limited_tests.new_failures + limited_tests.existing_failures)
+        end
+      end
     end
   end
 end

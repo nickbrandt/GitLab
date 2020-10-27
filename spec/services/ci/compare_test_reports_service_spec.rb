@@ -7,15 +7,15 @@ RSpec.describe Ci::CompareTestReportsService do
   let(:project) { create(:project, :repository) }
 
   describe '#execute' do
-    subject { service.execute(base_pipeline, head_pipeline) }
+    subject(:comparison) { service.execute(base_pipeline, head_pipeline) }
 
     context 'when head pipeline has test reports' do
       let!(:base_pipeline) { nil }
       let!(:head_pipeline) { create(:ci_pipeline, :with_test_reports, project: project) }
 
       it 'returns status and data' do
-        expect(subject[:status]).to eq(:parsed)
-        expect(subject[:data]).to match_schema('entities/test_reports_comparer')
+        expect(comparison[:status]).to eq(:parsed)
+        expect(comparison[:data]).to match_schema('entities/test_reports_comparer')
       end
     end
 
@@ -24,8 +24,8 @@ RSpec.describe Ci::CompareTestReportsService do
       let!(:head_pipeline) { create(:ci_pipeline, :with_test_reports, project: project) }
 
       it 'returns status and data' do
-        expect(subject[:status]).to eq(:parsed)
-        expect(subject[:data]).to match_schema('entities/test_reports_comparer')
+        expect(comparison[:status]).to eq(:parsed)
+        expect(comparison[:data]).to match_schema('entities/test_reports_comparer')
       end
     end
 
@@ -39,9 +39,9 @@ RSpec.describe Ci::CompareTestReportsService do
       end
 
       it 'returns a parsed TestReports success status and failure on the individual suite' do
-        expect(subject[:status]).to eq(:parsed)
-        expect(subject.dig(:data, 'status')).to eq('success')
-        expect(subject.dig(:data, 'suites', 0, 'status') ).to eq('error')
+        expect(comparison[:status]).to eq(:parsed)
+        expect(comparison.dig(:data, 'status')).to eq('success')
+        expect(comparison.dig(:data, 'suites', 0, 'status') ).to eq('error')
       end
     end
 
@@ -50,7 +50,7 @@ RSpec.describe Ci::CompareTestReportsService do
       let!(:head_pipeline) { create(:ci_pipeline, :with_test_reports, project: project) }
 
       let(:recent_failures_per_test_case) do
-        subject.dig(:data, 'suites', 0, 'new_failures').map { |f| f['recent_failures'] }
+        comparison.dig(:data, 'suites', 0, 'new_failures').map { |f| f['recent_failures'] }
       end
 
       # Create test case failure records based on the head pipeline build
@@ -64,7 +64,7 @@ RSpec.describe Ci::CompareTestReportsService do
       end
 
       it 'loads on the report', :aggregate_failures do
-        expect(subject[:data]).to match_schema('entities/test_reports_comparer')
+        expect(comparison[:data]).to match_schema('entities/test_reports_comparer')
         expect(recent_failures_per_test_case).to eq([
           { 'count' => 1, 'base_branch' => 'master' },
           { 'count' => 1, 'base_branch' => 'master' }
