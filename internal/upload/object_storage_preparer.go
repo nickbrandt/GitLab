@@ -12,13 +12,7 @@ type ObjectStoragePreparer struct {
 }
 
 func NewObjectStoragePreparer(c config.Config) Preparer {
-	creds := c.ObjectStorageCredentials
-
-	if creds == nil {
-		creds = &config.ObjectStorageCredentials{}
-	}
-
-	return &ObjectStoragePreparer{credentials: *creds, config: c.ObjectStorageConfig}
+	return &ObjectStoragePreparer{credentials: c.ObjectStorageCredentials, config: c.ObjectStorageConfig}
 }
 
 func (p *ObjectStoragePreparer) Prepare(a *api.Response) (*filestore.SaveFileOpts, Verifier, error) {

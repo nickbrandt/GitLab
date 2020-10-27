@@ -88,26 +88,26 @@ type ImageResizerConfig struct {
 }
 
 type Config struct {
-	Redis                    *RedisConfig              `toml:"redis"`
-	Backend                  *url.URL                  `toml:"-"`
-	CableBackend             *url.URL                  `toml:"-"`
-	Version                  string                    `toml:"-"`
-	DocumentRoot             string                    `toml:"-"`
-	DevelopmentMode          bool                      `toml:"-"`
-	Socket                   string                    `toml:"-"`
-	CableSocket              string                    `toml:"-"`
-	ProxyHeadersTimeout      time.Duration             `toml:"-"`
-	APILimit                 uint                      `toml:"-"`
-	APIQueueLimit            uint                      `toml:"-"`
-	APIQueueTimeout          time.Duration             `toml:"-"`
-	APICILongPollingDuration time.Duration             `toml:"-"`
-	ObjectStorageConfig      ObjectStorageConfig       `toml:"-"`
-	ObjectStorageCredentials *ObjectStorageCredentials `toml:"object_storage"`
-	PropagateCorrelationID   bool                      `toml:"-"`
-	ImageResizerConfig       *ImageResizerConfig       `toml:"image_resizer"`
+	Redis                    *RedisConfig             `toml:"redis"`
+	Backend                  *url.URL                 `toml:"-"`
+	CableBackend             *url.URL                 `toml:"-"`
+	Version                  string                   `toml:"-"`
+	DocumentRoot             string                   `toml:"-"`
+	DevelopmentMode          bool                     `toml:"-"`
+	Socket                   string                   `toml:"-"`
+	CableSocket              string                   `toml:"-"`
+	ProxyHeadersTimeout      time.Duration            `toml:"-"`
+	APILimit                 uint                     `toml:"-"`
+	APIQueueLimit            uint                     `toml:"-"`
+	APIQueueTimeout          time.Duration            `toml:"-"`
+	APICILongPollingDuration time.Duration            `toml:"-"`
+	ObjectStorageConfig      ObjectStorageConfig      `toml:"-"`
+	ObjectStorageCredentials ObjectStorageCredentials `toml:"object_storage"`
+	PropagateCorrelationID   bool                     `toml:"-"`
+	ImageResizerConfig       ImageResizerConfig       `toml:"image_resizer"`
 }
 
-var DefaultImageResizerConfig = &ImageResizerConfig{
+var DefaultImageResizerConfig = ImageResizerConfig{
 	MaxScalerProcs: uint32(math.Max(2, float64(runtime.NumCPU())/2)),
 	MaxFilesize:    250 * 1000, // 250kB,
 }
@@ -126,10 +126,6 @@ func (c *Config) RegisterGoCloudURLOpeners() error {
 	c.ObjectStorageConfig.URLMux = new(blob.URLMux)
 
 	creds := c.ObjectStorageCredentials
-	if creds == nil {
-		return nil
-	}
-
 	if strings.EqualFold(creds.Provider, "AzureRM") && creds.AzureCredentials.AccountName != "" && creds.AzureCredentials.AccountKey != "" {
 		accountName := azureblob.AccountName(creds.AzureCredentials.AccountName)
 		accountKey := azureblob.AccountKey(creds.AzureCredentials.AccountKey)
