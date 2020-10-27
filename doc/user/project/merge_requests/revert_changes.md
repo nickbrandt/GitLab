@@ -59,6 +59,13 @@ mainline:
 git revert -m 2 7a39eb0
 ```
 
+## Reverted Indicator
+
+Merge Requests that are reverted by another merge request using one of these
+methods will display a link to the other MR.
+
+![Reverted indicator in the status box](img/mr_reverted_indicator.png)
+
 <!-- ## Troubleshooting
 
 Include any troubleshooting steps that you can foresee. If you know beforehand what issues
