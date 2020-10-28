@@ -138,7 +138,7 @@ class ApplicationSetting < ApplicationRecord
             presence: true,
             if: :kroki_url_absolute?
 
-  validate :validate_kroki_url
+  validate :validate_kroki_url, if: :kroki_enabled
 
   validates :plantuml_url,
             presence: true,
