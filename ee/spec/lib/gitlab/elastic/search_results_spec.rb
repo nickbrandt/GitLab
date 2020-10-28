@@ -102,6 +102,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
       expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
         startline: 1,
+        highlight_line: nil,
         project: project,
         data: "foo\n"
       )
@@ -124,6 +125,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
         basename: 'path/file',
         ref: 'sha',
         startline: 2,
+        highlight_line: 2,
         project: project,
         data: "bar\n"
       )
@@ -177,6 +179,7 @@ RSpec.describe Gitlab::Elastic::SearchResults, :elastic, :sidekiq_might_not_need
           basename: 'path/file',
           ref: 'sha',
           startline: 2,
+          highlight_line: 4,
           project: project,
           data: expected_data
         )
