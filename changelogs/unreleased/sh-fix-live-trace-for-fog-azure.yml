@@ -1,5 +1,0 @@
----
-title: Fix cloud native job logs not finalizing with Azure
-merge_request: 46209
-author:
-type: fixed
