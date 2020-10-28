@@ -47,7 +47,7 @@ module Ci
         @stores ||= {}
 
         # Can't memoize this because the feature flag may alter this
-        return fog_store_class.new if store == :fog
+        return fog_store_class.new if store.to_sym == :fog
 
         @stores[store] ||= "Ci::BuildTraceChunks::#{store.capitalize}".constantize.new
       end
