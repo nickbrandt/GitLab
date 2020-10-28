@@ -14948,7 +14948,8 @@ CREATE TABLE project_features (
     repository_access_level integer DEFAULT 20 NOT NULL,
     pages_access_level integer NOT NULL,
     forking_access_level integer,
-    metrics_dashboard_access_level integer
+    metrics_dashboard_access_level integer,
+    analytics_access_level integer DEFAULT 20 NOT NULL
 );
 
 CREATE SEQUENCE project_features_id_seq
