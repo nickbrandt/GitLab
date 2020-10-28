@@ -169,7 +169,10 @@ export default {
         />
       </div>
     </div>
-    <projects-table :projects="namespaceProjects" />
+    <projects-table
+      :projects="namespaceProjects"
+      :additional-purchased-storage-size="namespace.additionalPurchasedStorageSize || 0"
+    />
     <temporary-storage-increase-modal
       v-if="isStorageIncreaseModalVisible"
       :limit="formattedNamespaceLimit"
