@@ -98,6 +98,7 @@ module Gitlab
           event_for(event_name).present?
         end
 
+        # The aray of valid context on which we allow tracking
         def valid_context
           Plan.all_plans
         end
