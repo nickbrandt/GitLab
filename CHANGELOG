@@ -1,5 +1,28 @@
 # Changelog for gitlab-workhorse
 
+## v8.53.0
+
+### Added
+- Add route for Debian package uploads
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/610
+  Contributed by Mathieu Parent
+
+### Fixed
+- Don't log image scaler fail-overs as successes
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/636
+
+### Other
+- Exclude dot-files from "make fmt" target
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/641
+- Add max_processes Prometheus metric for image scaling
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/640
+- Simplify config handling in main()
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/634
+- Default MaxScalerProcs to num_cores / 2
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/635
+- Add a total requests metric for image scaling
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/638
+
 ## v8.52.0
 
 ### Fixed

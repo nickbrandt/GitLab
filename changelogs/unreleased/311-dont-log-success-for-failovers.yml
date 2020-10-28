@@ -1,5 +1,0 @@
----
-title: Don't log image scaler fail-overs as successes
-merge_request: 636
-author:
-type: fixed

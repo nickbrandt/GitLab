@@ -1,5 +1,0 @@
----
-title: Add max_processes Prometheus metric for image scaling
-merge_request: 640
-author:
-type: other
