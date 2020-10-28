@@ -24,7 +24,7 @@ func TestLoadEmptyConfig(t *testing.T) {
 	require.Equal(t, cfg.ImageResizerConfig.MaxFilesize, uint64(250000))
 	require.GreaterOrEqual(t, cfg.ImageResizerConfig.MaxScalerProcs, uint32(2))
 
-	require.Nil(t, cfg.ObjectStorageCredentials)
+	require.Equal(t, ObjectStorageCredentials{}, cfg.ObjectStorageCredentials)
 	require.NoError(t, cfg.RegisterGoCloudURLOpeners())
 }
 
@@ -51,7 +51,7 @@ aws_secret_access_key = "gdk-minio"
 		},
 	}
 
-	require.Equal(t, expected, *cfg.ObjectStorageCredentials)
+	require.Equal(t, expected, cfg.ObjectStorageCredentials)
 }
 
 func TestRegisterGoCloudURLOpeners(t *testing.T) {
@@ -68,7 +68,7 @@ func TestRegisterGoCloudURLOpeners(t *testing.T) {
 		},
 	}
 
-	require.Equal(t, expected, *cfg.ObjectStorageCredentials)
+	require.Equal(t, expected, cfg.ObjectStorageCredentials)
 	require.Nil(t, cfg.ObjectStorageConfig.URLMux)
 
 	require.NoError(t, cfg.RegisterGoCloudURLOpeners())
@@ -95,5 +95,5 @@ max_filesize = 350000
 		MaxFilesize:    350000,
 	}
 
-	require.Equal(t, expected, *cfg.ImageResizerConfig)
+	require.Equal(t, expected, cfg.ImageResizerConfig)
 }

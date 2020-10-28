@@ -19,7 +19,7 @@ func TestLfsUploadPreparerWithConfig(t *testing.T) {
 	}
 
 	c := config.Config{
-		ObjectStorageCredentials: &config.ObjectStorageCredentials{
+		ObjectStorageCredentials: config.ObjectStorageCredentials{
 			Provider:      "AWS",
 			S3Credentials: creds,
 		},

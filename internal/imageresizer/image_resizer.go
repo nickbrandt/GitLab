@@ -255,7 +255,7 @@ func (r *Resizer) unpackParameters(paramsData string) (*resizeParams, error) {
 }
 
 // Attempts to rescale the given image data, or in case of errors, falls back to the original image.
-func (r *Resizer) tryResizeImage(req *http.Request, reader io.Reader, errorWriter io.Writer, params *resizeParams, fileSize int64, cfg *config.ImageResizerConfig) (io.Reader, *exec.Cmd, error) {
+func (r *Resizer) tryResizeImage(req *http.Request, reader io.Reader, errorWriter io.Writer, params *resizeParams, fileSize int64, cfg config.ImageResizerConfig) (io.Reader, *exec.Cmd, error) {
 	if fileSize > int64(cfg.MaxFilesize) {
 		return reader, nil, fmt.Errorf("ImageResizer: %db exceeds maximum file size of %db", fileSize, cfg.MaxFilesize)
 	}

@@ -85,10 +85,9 @@ func newUpstreamWithCableConfig(authBackend string, cableBackend string) *config
 	}
 
 	return &config.Config{
-		Version:            "123",
-		DocumentRoot:       testDocumentRoot,
-		Backend:            helper.URLMustParse(authBackend),
-		CableBackend:       cableBackendURL,
-		ImageResizerConfig: config.DefaultImageResizerConfig,
+		Version:      "123",
+		DocumentRoot: testDocumentRoot,
+		Backend:      helper.URLMustParse(authBackend),
+		CableBackend: cableBackendURL,
 	}
 }
