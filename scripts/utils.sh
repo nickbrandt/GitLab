@@ -87,24 +87,38 @@ function echosuccess() {
   fi
 }
 
-function get_job_id() {
-  local job_name="${1}"
+function get_pipelines() {
+  local project_id="${1}"
   local query_string="${2:+&${2}}"
+
+  local url="https://gitlab.com/api/v4/projects/${project_id}/pipelines?per_page=100${query_string}"
+  echoinfo "GET ${url}"
+
+  curl --silent --show-error "${url}"
+}
+
+function get_job_id() {
+  local project_id="${1}"
+  local pipeline_id="${2}"
+  local job_name="${3}"
+  local query_string="${4:+&${4}}"
   local api_token="${API_TOKEN-${GITLAB_BOT_MULTI_PROJECT_PIPELINE_POLLING_TOKEN}}"
-  if [ -z "${api_token}" ]; then
-    echoerr "Please provide an API token with \$API_TOKEN or \$GITLAB_BOT_MULTI_PROJECT_PIPELINE_POLLING_TOKEN."
-    return
+  local curl_opts
+  if [ -n "${api_token}" ]; then
+    curl_opts="--header 'PRIVATE-TOKEN: ${api_token}'"
+  else
+    echoinfo "No API token given with \$API_TOKEN or \$GITLAB_BOT_MULTI_PROJECT_PIPELINE_POLLING_TOKEN."
   fi
 
   local max_page=3
   local page=1
 
   while true; do
-    local url="https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}/jobs?per_page=100&page=${page}${query_string}"
+    local url="https://gitlab.com/api/v4/projects/${project_id}/pipelines/${pipeline_id}/jobs?per_page=100&page=${page}${query_string}"
     echoinfo "GET ${url}"
 
     local job_id
-    job_id=$(curl --silent --show-error --header "PRIVATE-TOKEN: ${api_token}" "${url}" | jq "map(select(.name == \"${job_name}\")) | map(.id) | last")
+    job_id=$(curl --silent --show-error ${curl_opts} "${url}" | jq "map(select(.name == \"${job_name}\")) | map(.id) | last")
     [[ "${job_id}" == "null" && "${page}" -lt "$max_page" ]] || break
 
     let "page++"
@@ -118,10 +132,21 @@ function get_job_id() {
   fi
 }
 
+function get_job_artifact() {
+  local project_id="${1}"
+  local job_id="${2}"
+  local artifact_path="${3}"
+
+  local url="https://gitlab.com/api/v4/projects/${project_id}/jobs/${job_id}/artifacts/${artifact_path}"
+  echoinfo "GET ${url}"
+
+  curl --silent --show-error "${url}"
+}
+
 function play_job() {
   local job_name="${1}"
   local job_id
-  job_id=$(get_job_id "${job_name}" "scope=manual");
+  job_id=$(get_job_id "${CI_PROJECT_ID}" "${CI_PIPELINE_ID}" "${job_name}" "scope=manual");
   if [ -z "${job_id}" ]; then return; fi
 
   local api_token="${API_TOKEN-${GITLAB_BOT_MULTI_PROJECT_PIPELINE_POLLING_TOKEN}}"
@@ -140,7 +165,7 @@ function play_job() {
 
 function fail_pipeline_early() {
   local dont_interrupt_me_job_id
-  dont_interrupt_me_job_id=$(get_job_id 'dont-interrupt-me' 'scope=success')
+  dont_interrupt_me_job_id=$(get_job_id "${CI_PROJECT_ID}" "${CI_PIPELINE_ID}" "dont-interrupt-me" "scope=success")
 
   if [[ -n "${dont_interrupt_me_job_id}" ]]; then
     echoinfo "This pipeline cannot be interrupted due to \`dont-interrupt-me\` job ${dont_interrupt_me_job_id}"

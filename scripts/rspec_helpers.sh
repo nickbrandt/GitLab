@@ -1,44 +1,39 @@
 #!/usr/bin/env bash
 
 function retrieve_tests_metadata() {
-  mkdir -p knapsack/ rspec_flaky/ rspec_profiling/
+  mkdir -p crystalball/ knapsack/ rspec_flaky/ rspec_profiling/
+
+  local project_path="gitlab-org%2Fgitlab"
+  local latest_scheduled_master_pipeline_id
+  local job_id
+  latest_scheduled_master_pipeline_id=$(get_pipelines "${project_path}" "status=success&ref=master&username=gitlab-bot" | jq "first | .id")
+  job_id=$(get_job_id "${project_path}" "${latest_scheduled_master_pipeline_id}" "update-tests-metadata" "scope=success")
 
   if [[ ! -f "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}" ]]; then
-    wget -O "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}" "http://${TESTS_METADATA_S3_BUCKET}.s3.amazonaws.com/${KNAPSACK_RSPEC_SUITE_REPORT_PATH}" || echo "{}" > "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}"
+    get_job_artifact "${project_path}" "${job_id}" "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}" > "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}" || echo "{}" > "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}"
   fi
 
   if [[ ! -f "${FLAKY_RSPEC_SUITE_REPORT_PATH}" ]]; then
-    wget -O "${FLAKY_RSPEC_SUITE_REPORT_PATH}" "http://${TESTS_METADATA_S3_BUCKET}.s3.amazonaws.com/${FLAKY_RSPEC_SUITE_REPORT_PATH}" || echo "{}" > "${FLAKY_RSPEC_SUITE_REPORT_PATH}"
+    get_job_artifact "${project_path}" "${job_id}" "${FLAKY_RSPEC_SUITE_REPORT_PATH}" > "${FLAKY_RSPEC_SUITE_REPORT_PATH}" || echo "{}" > "${FLAKY_RSPEC_SUITE_REPORT_PATH}"
   fi
+
+  # Disabled for now
+  # if [[ ! -f "${RSPEC_PACKED_TESTS_MAPPING_PATH}" ]]; then
+  #   (get_job_artifact "${project_path}" "${job_id}" "${RSPEC_PACKED_TESTS_MAPPING_PATH}.gz" > "${RSPEC_PACKED_TESTS_MAPPING_PATH}.gz" && gzip -d "${RSPEC_PACKED_TESTS_MAPPING_PATH}.gz") || echo "{}" > "${RSPEC_PACKED_TESTS_MAPPING_PATH}"
+  # fi
+  #
+  # scripts/unpack-test-mapping "${RSPEC_PACKED_TESTS_MAPPING_PATH}" "${RSPEC_TESTS_MAPPING_PATH}"
 }
 
 function update_tests_metadata() {
   echo "{}" > "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}"
 
   scripts/merge-reports "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}" knapsack/rspec*.json
-  if [[ -n "${TESTS_METADATA_S3_BUCKET}" ]]; then
-    if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]]; then
-      scripts/sync-reports put "${TESTS_METADATA_S3_BUCKET}" "${KNAPSACK_RSPEC_SUITE_REPORT_PATH}"
-    else
-      echo "Not uplaoding report to S3 as the pipeline is not a scheduled one."
-    fi
-  fi
-
   rm -f knapsack/rspec*.json
 
-  scripts/merge-reports "${FLAKY_RSPEC_SUITE_REPORT_PATH}" rspec_flaky/all_*.json
-
   export FLAKY_RSPEC_GENERATE_REPORT="true"
+  scripts/merge-reports "${FLAKY_RSPEC_SUITE_REPORT_PATH}" rspec_flaky/all_*.json
   scripts/flaky_examples/prune-old-flaky-examples "${FLAKY_RSPEC_SUITE_REPORT_PATH}"
-
-  if [[ -n ${TESTS_METADATA_S3_BUCKET} ]]; then
-    if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]]; then
-      scripts/sync-reports put "${TESTS_METADATA_S3_BUCKET}" "${FLAKY_RSPEC_SUITE_REPORT_PATH}"
-    else
-      echo "Not uploading report to S3 as the pipeline is not a scheduled one."
-    fi
-  fi
-
   rm -f rspec_flaky/all_*.json rspec_flaky/new_*.json
 
   if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]]; then
@@ -48,16 +43,6 @@ function update_tests_metadata() {
   fi
 }
 
-function retrieve_tests_mapping() {
-  mkdir -p crystalball/
-
-  if [[ ! -f "${RSPEC_PACKED_TESTS_MAPPING_PATH}" ]]; then
-    (wget -O "${RSPEC_PACKED_TESTS_MAPPING_PATH}.gz" "http://${TESTS_METADATA_S3_BUCKET}.s3.amazonaws.com/${RSPEC_PACKED_TESTS_MAPPING_PATH}.gz" && gzip -d "${RSPEC_PACKED_TESTS_MAPPING_PATH}.gz") || echo "{}" > "${RSPEC_PACKED_TESTS_MAPPING_PATH}"
-  fi
-
-  scripts/unpack-test-mapping "${RSPEC_PACKED_TESTS_MAPPING_PATH}" "${RSPEC_TESTS_MAPPING_PATH}"
-}
-
 function update_tests_mapping() {
   if ! crystalball_rspec_data_exists; then
     echo "No crystalball rspec data found."
@@ -65,19 +50,8 @@ function update_tests_mapping() {
   fi
 
   scripts/generate-test-mapping "${RSPEC_TESTS_MAPPING_PATH}" crystalball/rspec*.yml
-
   scripts/pack-test-mapping "${RSPEC_TESTS_MAPPING_PATH}" "${RSPEC_PACKED_TESTS_MAPPING_PATH}"
-
   gzip "${RSPEC_PACKED_TESTS_MAPPING_PATH}"
-
-  if [[ -n "${TESTS_METADATA_S3_BUCKET}" ]]; then
-    if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]]; then
-      scripts/sync-reports put "${TESTS_METADATA_S3_BUCKET}" "${RSPEC_PACKED_TESTS_MAPPING_PATH}.gz"
-    else
-      echo "Not uploading report to S3 as the pipeline is not a scheduled one."
-    fi
-  fi
-
   rm -f crystalball/rspec*.yml
 }
 
