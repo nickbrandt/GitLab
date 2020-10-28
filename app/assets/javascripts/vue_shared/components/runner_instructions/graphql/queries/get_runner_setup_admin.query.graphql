@@ -1,6 +1,0 @@
-query runnerSetupInstructionsGroup($platform: String!, $architecture: String!) {
-  runnerSetup(platform: $platform, architecture: $architecture) {
-    installInstructions
-    registerInstructions
-  }
-}

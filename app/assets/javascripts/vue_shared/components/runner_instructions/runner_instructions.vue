@@ -12,10 +12,6 @@ import {
 import { __, s__ } from '~/locale';
 import getRunnerPlatforms from './graphql/queries/get_runner_platforms.query.graphql';
 import getRunnerSetupInstructions from './graphql/queries/get_runner_setup.query.graphql';
-import getRunnerSetupInstructionsGroup from './graphql/queries/get_runner_setup_group.query.graphql';
-import getRunnerSetupInstructionsAdmin from './graphql/queries/get_runner_setup_admin.query.graphql';
-import getProjectId from './graphql/queries/get_project_id.query.graphql';
-import getGroupId from './graphql/queries/get_group_id.query.graphql';
 
 export default {
   components: {
@@ -41,36 +37,16 @@ export default {
   apollo: {
     runnerPlatforms: {
       query: getRunnerPlatforms,
-      update(data) {
-        return data?.runnerPlatforms?.nodes;
-      },
-      error() {
-        this.showAlert = true;
-      },
-    },
-    projectId: {
-      query: getProjectId,
       variables() {
         return {
           projectPath: this.projectPath,
-        };
-      },
-      update(data) {
-        return data?.project?.id;
-      },
-      error() {
-        this.showAlert = true;
-      },
-    },
-    groupId: {
-      query: getGroupId,
-      variables() {
-        return {
           groupPath: this.groupPath,
         };
       },
       update(data) {
-        return data?.group?.id;
+        this.groupId = data.group?.id;
+        this.projectId = data.project?.id;
+        return data?.runnerPlatforms?.nodes;
       },
       error() {
         this.showAlert = true;
@@ -90,17 +66,11 @@ export default {
     };
   },
   computed: {
-    closeButton() {
-      return {
-        text: __('Close'),
-        attributes: [{ variant: 'default' }],
-      };
-    },
     isPlatformSelected() {
       return Object.keys(this.selectedPlatform).length > 0;
     },
     instructionsEmpty() {
-      return this.instructions == null || Object.keys(this.instructions).length === 0;
+      return this.instructions && Object.keys(this.instructions).length === 0;
     },
   },
   methods: {
@@ -108,38 +78,21 @@ export default {
       this.selectedPlatform = this.runnerPlatforms.find(platform => platform.name === name);
       this.selectedPlatformArchitectures = this.selectedPlatform?.architectures?.nodes;
       [this.selectedArchitecture] = this.selectedPlatformArchitectures;
-      this.selectArchitecture(this.selectedArchitecture.name);
+      this.selectArchitecture(this.selectedArchitecture);
     },
-    selectArchitecture(name) {
-      this.selectedArchitecture = this.selectedPlatformArchitectures.find(
-        architecture => architecture.name === name,
-      );
+    selectArchitecture(architecture) {
+      this.selectedArchitecture = architecture;
 
       this.$apollo.addSmartQuery('instructions', {
         variables() {
-          const vars = {
+          return {
             platform: this.selectedPlatform.name,
             architecture: this.selectedArchitecture.name,
+            projectId: this.projectId ? this.projectId : '',
+            groupId: this.groupId ? this.groupId : '',
           };
-          if (this.projectId) {
-            vars.projectId = this.projectId;
-          }
-
-          if (this.groupId) {
-            vars.groupId = this.groupId;
-          }
-
-          return vars;
         },
-        query() {
-          if (this.projectId) {
-            return getRunnerSetupInstructions;
-          } else if (this.groupId) {
-            return getRunnerSetupInstructionsGroup;
-          }
-
-          return getRunnerSetupInstructionsAdmin;
-        },
+        query: getRunnerSetupInstructions,
         update(data) {
           return data?.runnerSetup;
         },
@@ -155,13 +108,17 @@ export default {
   modalId: 'installation-instructions-modal',
   i18n: {
     installARunner: __('Install a Runner'),
-    architecture: __('Architecture'),
+    architecture: s__('Runners|Architecture'),
     downloadInstallBinary: s__('Runners|Download and Install Binary'),
     downloadLatestBinary: s__('Runners|Download Latest Binary'),
     registerRunner: s__('Runners|Register Runner'),
     method: __('Method'),
-    genericError: __('An error has occurred'),
+    fetchError: s__('An error has occurred fetching instructions'),
     instructions: __('Show Runner installation instructions'),
+  },
+  closeButton: {
+    text: __('Close'),
+    attributes: [{ variant: 'default' }],
   },
 };
 </script>
@@ -173,10 +130,10 @@ export default {
     <gl-modal
       :modal-id="$options.modalId"
       :title="$options.i18n.installARunner"
-      :action-secondary="closeButton"
+      :action-secondary="$options.closeButton"
     >
       <gl-alert v-if="showAlert" variant="danger" @dismiss="toggleAlert(false)">
-        {{ $options.i18n.genericError }}
+        {{ $options.i18n.fetchError }}
       </gl-alert>
       <h5>{{ __('Environment') }}</h5>
       <gl-button-group class="gl-mb-5">
@@ -198,7 +155,7 @@ export default {
             v-for="architecture in selectedPlatformArchitectures"
             :key="architecture.name"
             data-testid="architecture-dropdown-item"
-            @click="selectArchitecture(architecture.name)"
+            @click="selectArchitecture(architecture)"
           >
             {{ architecture.name }}
           </gl-dropdown-item>

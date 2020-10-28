@@ -5,9 +5,9 @@ import InstallRunnerInstructions from '~/vue_shared/components/runner_instructio
 
 Vue.use(VueApollo);
 
-export function initInstallRunner() {
-  const installRunnerEl = document.getElementById('js-install-runner');
-  const { projectPath, groupPath } = installRunnerEl.dataset || {};
+export function initInstallRunner(componentId = 'js-install-runner') {
+  const installRunnerEl = document.getElementById(componentId);
+  const { projectPath, groupPath } = installRunnerEl?.dataset;
 
   if (installRunnerEl) {
     const defaultClient = createDefaultClient();

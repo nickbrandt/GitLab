@@ -3,16 +3,9 @@ import VueApollo from 'vue-apollo';
 import createMockApollo from 'jest/helpers/mock_apollo_helper';
 import RunnerInstructions from '~/vue_shared/components/runner_instructions/runner_instructions.vue';
 import getRunnerPlatforms from '~/vue_shared/components/runner_instructions/graphql/queries/get_runner_platforms.query.graphql';
-import getProjectId from '~/vue_shared/components/runner_instructions/graphql/queries/get_project_id.query.graphql';
-import getGroupId from '~/vue_shared/components/runner_instructions/graphql/queries/get_group_id.query.graphql';
 import getRunnerSetupInstructions from '~/vue_shared/components/runner_instructions/graphql/queries/get_runner_setup.query.graphql';
 
-import {
-  mockGraphqlRunnerPlatforms,
-  mockGraphqlProjectId,
-  mockGraphqlInstructions,
-  mockGraphqlGroupId,
-} from './mock_data';
+import { mockGraphqlRunnerPlatforms, mockGraphqlInstructions } from './mock_data';
 
 const projectPath = 'gitlab-org/gitlab';
 const localVue = createLocalVue();
@@ -33,8 +26,6 @@ describe('RunnerInstructions component', () => {
     const requestHandlers = [
       [getRunnerPlatforms, jest.fn().mockResolvedValue(mockGraphqlRunnerPlatforms)],
       [getRunnerSetupInstructions, jest.fn().mockResolvedValue(mockGraphqlInstructions)],
-      [getProjectId, jest.fn().mockResolvedValue(mockGraphqlProjectId)],
-      [getGroupId, jest.fn().mockResolvedValue(mockGraphqlGroupId)],
     ];
 
     fakeApollo = createMockApollo(requestHandlers);

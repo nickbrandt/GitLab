@@ -89,6 +89,8 @@ export const mockGraphqlRunnerPlatforms = {
       ],
       __typename: 'RunnerPlatformConnection',
     },
+    project: { id: 'gid://gitlab/Project/1', __typename: 'Project' },
+    group: null,
   },
 };
 
@@ -101,19 +103,5 @@ export const mockGraphqlInstructions = {
         'sudo gitlab-runner register --url http://192.168.1.81:3000/ --registration-token GE5gsjeep_HAtBf9s3Yz',
       __typename: 'RunnerSetup',
     },
-  },
-};
-
-export const mockGraphqlProjectId = {
-  data: {
-    project: {
-      id: 'gid://gitlab/Project/1',
-    },
-  },
-};
-
-export const mockGraphqlGroupId = {
-  data: {
-    group: null,
   },
 };

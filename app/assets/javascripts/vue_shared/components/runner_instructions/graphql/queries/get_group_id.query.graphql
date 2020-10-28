@@ -1,5 +1,0 @@
-query getGroupID($groupPath: ID!) {
-  group(fullPath: $groupPath) {
-    id
-  }
-}

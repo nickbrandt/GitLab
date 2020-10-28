@@ -6,32 +6,30 @@ import initDeployFreeze from '~/deploy_freeze';
 import initSettingsPipelinesTriggers from '~/ci_settings_pipeline_triggers';
 import { initInstallRunner } from '~/pages/shared/mount_runner_instructions';
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize expandable settings panels
-  initSettingsPanels();
+// Initialize expandable settings panels
+initSettingsPanels();
 
-  const runnerToken = document.querySelector('.js-secret-runner-token');
-  if (runnerToken) {
-    const runnerTokenSecretValue = new SecretValues({
-      container: runnerToken,
-    });
-    runnerTokenSecretValue.init();
-  }
-
-  initVariableList();
-
-  // hide extra auto devops settings based checkbox state
-  const autoDevOpsExtraSettings = document.querySelector('.js-extra-settings');
-  const instanceDefaultBadge = document.querySelector('.js-instance-default-badge');
-  document.querySelector('.js-toggle-extra-settings').addEventListener('click', event => {
-    const { target } = event;
-    if (instanceDefaultBadge) instanceDefaultBadge.style.display = 'none';
-    autoDevOpsExtraSettings.classList.toggle('hidden', !target.checked);
+const runnerToken = document.querySelector('.js-secret-runner-token');
+if (runnerToken) {
+  const runnerTokenSecretValue = new SecretValues({
+    container: runnerToken,
   });
+  runnerTokenSecretValue.init();
+}
 
-  registrySettingsApp();
-  initDeployFreeze();
+initVariableList();
 
-  initSettingsPipelinesTriggers();
-  initInstallRunner();
+// hide extra auto devops settings based checkbox state
+const autoDevOpsExtraSettings = document.querySelector('.js-extra-settings');
+const instanceDefaultBadge = document.querySelector('.js-instance-default-badge');
+document.querySelector('.js-toggle-extra-settings').addEventListener('click', event => {
+  const { target } = event;
+  if (instanceDefaultBadge) instanceDefaultBadge.style.display = 'none';
+  autoDevOpsExtraSettings.classList.toggle('hidden', !target.checked);
 });
+
+registrySettingsApp();
+initDeployFreeze();
+
+initSettingsPipelinesTriggers();
+initInstallRunner();

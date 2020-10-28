@@ -1,5 +1,0 @@
-query getProjectId($projectPath: ID!) {
-  project(fullPath: $projectPath) {
-    id
-  }
-}

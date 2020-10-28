@@ -3,12 +3,10 @@ import AdminRunnersFilteredSearchTokenKeys from '~/filtered_search/admin_runners
 import { FILTERED_SEARCH } from '~/pages/constants';
 import { initInstallRunner } from '~/pages/shared/mount_runner_instructions';
 
-document.addEventListener('DOMContentLoaded', () => {
-  initFilteredSearch({
-    page: FILTERED_SEARCH.ADMIN_RUNNERS,
-    filteredSearchTokenKeys: AdminRunnersFilteredSearchTokenKeys,
-    useDefaultState: true,
-  });
-
-  initInstallRunner();
+initFilteredSearch({
+  page: FILTERED_SEARCH.ADMIN_RUNNERS,
+  filteredSearchTokenKeys: AdminRunnersFilteredSearchTokenKeys,
+  useDefaultState: true,
 });
+
+initInstallRunner();

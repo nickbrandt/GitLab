@@ -2810,6 +2810,9 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
+msgid "An error has occurred fetching instructions"
+msgstr ""
+
 msgid "An error occured while making the changes: %{error}"
 msgstr ""
 
@@ -3416,9 +3419,6 @@ msgid "Apr"
 msgstr ""
 
 msgid "April"
-msgstr ""
-
-msgid "Architecture"
 msgstr ""
 
 msgid "Architecture not found for OS"
