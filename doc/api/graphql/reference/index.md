@@ -436,7 +436,7 @@ Represents a ComplianceFramework associated with a Project.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `name` | ProjectSettingEnum! | Name of the compliance framework |
+| `name` | String! | Name of the compliance framework |
 
 ### ConfigureSastPayload
 
@@ -3674,18 +3674,6 @@ Values for sorting projects.
 | `SKIPPED` |  |
 | `SUCCESS` |  |
 | `WAITING_FOR_RESOURCE` |  |
-
-### ProjectSettingEnum
-
-Names of compliance frameworks that can be assigned to a Project.
-
-| Value | Description |
-| ----- | ----------- |
-| `gdpr` |  |
-| `hipaa` |  |
-| `pci_dss` |  |
-| `soc_2` |  |
-| `sox` |  |
 
 ### RegistryState
 

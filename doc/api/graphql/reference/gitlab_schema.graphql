@@ -2803,7 +2803,7 @@ type ComplianceFramework {
   """
   Name of the compliance framework
   """
-  name: ProjectSettingEnum!
+  name: String!
 }
 
 """
@@ -15690,17 +15690,6 @@ type ProjectPermissions {
   Indicates the user can perform `upload_file` on this resource
   """
   uploadFile: Boolean!
-}
-
-"""
-Names of compliance frameworks that can be assigned to a Project
-"""
-enum ProjectSettingEnum {
-  gdpr
-  hipaa
-  pci_dss
-  soc_2
-  sox
 }
 
 type ProjectStatistics {
