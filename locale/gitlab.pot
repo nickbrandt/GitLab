@@ -29704,6 +29704,9 @@ msgstr ""
 msgid "Webhooks|Enable SSL verification"
 msgstr ""
 
+msgid "Webhooks|Feature Flag events"
+msgstr ""
+
 msgid "Webhooks|Issues events"
 msgstr ""
 
@@ -29729,6 +29732,9 @@ msgid "Webhooks|Tag push events"
 msgstr ""
 
 msgid "Webhooks|This URL is triggered when a deployment starts, finishes, fails, or is canceled"
+msgstr ""
+
+msgid "Webhooks|This URL is triggered when a feature flag is turned on or off"
 msgstr ""
 
 msgid "Webhooks|This URL will be triggered by a push to the repository"
