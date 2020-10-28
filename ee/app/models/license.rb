@@ -7,6 +7,8 @@ class License < ApplicationRecord
   PREMIUM_PLAN = 'premium'.freeze
   ULTIMATE_PLAN = 'ultimate'.freeze
 
+  EE_ALL_PLANS = [STARTER_PLAN, PREMIUM_PLAN, ULTIMATE_PLAN].freeze
+
   EES_FEATURES = %i[
     audit_events
     blocked_issues
@@ -250,6 +252,10 @@ class License < ApplicationRecord
       else
         load_license
       end
+    end
+
+    def all_plans
+      EE_ALL_PLANS
     end
 
     delegate :block_changes?, :feature_available?, to: :current, allow_nil: true

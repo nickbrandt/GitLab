@@ -98,6 +98,10 @@ module Gitlab
           event_for(event_name).present?
         end
 
+        def valid_context
+          Plan.all_plans
+        end
+
         private
 
         # Allow to add totals for events that are in the same redis slot, category and have the same aggregation level
@@ -209,3 +213,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::UsageDataCounters::HLLRedisCounter.prepend_if_ee('EE::Gitlab::UsageDataCounters::HLLRedisCounter')
