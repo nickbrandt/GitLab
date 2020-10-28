@@ -60,8 +60,7 @@ import { __ } from '~/locale';
         const DataPromise = axios.get(this.file.content_path);
 
         Promise.all([EditorPromise, DataPromise])
-          .then(([{ default: EditorLite }, { data }]) => {
-            const { content, new_path: path } = data;
+          .then(([{ default: EditorLite }, { data: { content, new_path: path } }]) => {
             const contentEl = this.$el.querySelector('.editor');
 
             this.originalContent = content;
@@ -69,8 +68,8 @@ import { __ } from '~/locale';
 
             this.editor = new EditorLite().createInstance({
               el: contentEl,
-              blobPath: path || '',
-              blobContent: content || '',
+              blobPath: path,
+              blobContent: content,
             });
             this.editor.onDidChangeModelContent(debounce(this.saveDiffResolution.bind(this), 250));
           })
