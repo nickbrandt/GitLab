@@ -97,7 +97,6 @@ If you delete a label, it is permanently deleted. All references to the label ar
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/231472) in GitLab 13.6: promoting a project label keeps that label's ID and changes it into a group label. Previously, promoting a project label created a new group label with a new ID and deleted the old label.
 
-
 If you previously created a project label and now want to make it available for other
 projects within the same group, you can promote it to a group label.
 
