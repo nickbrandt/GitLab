@@ -30,7 +30,7 @@ module AlertManagement
     end
 
     def update_integration_data(http_integration)
-      http_integration.update!(
+      http_integration.update(
         active: alert_service.active,
         encrypted_token: alert_service.data.encrypted_token,
         encrypted_token_iv: alert_service.data.encrypted_token_iv

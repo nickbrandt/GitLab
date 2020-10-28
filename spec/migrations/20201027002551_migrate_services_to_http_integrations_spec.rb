@@ -4,11 +4,10 @@ require 'spec_helper'
 require Rails.root.join('db', 'migrate', '20201027002551_migrate_services_to_http_integrations.rb')
 
 RSpec.describe MigrateServicesToHttpIntegrations do
-  let_it_be(:namespace) { table(:namespaces).create!(name: 'namespace', path: 'namespace') }
-  let_it_be(:project) { table(:projects).create!(id: 1, namespace_id: namespace.id) }
-  let_it_be(:alert_service) { table(:services).create(type: 'AlertsService', project_id: project.id)}
-  let_it_be(:alert_service_data) { table(:alerts_service_data).create(service_id: alert_service.id, encrypted_token: 'test', encrypted_token_iv: 'test')}
-
+  let!(:namespace) { table(:namespaces).create!(name: 'namespace', path: 'namespace') }
+  let!(:project) { table(:projects).create!(id: 1, namespace_id: namespace.id) }
+  let!(:alert_service) { table(:services).create!(type: 'AlertsService', project_id: project.id) }
+  let!(:alert_service_data) { table(:alerts_service_data).create!(service_id: alert_service.id, encrypted_token: 'test', encrypted_token_iv: 'test')}
   let(:http_integrations) { table(:alert_management_http_integrations) }
 
   describe '#up' do
@@ -22,6 +21,22 @@ RSpec.describe MigrateServicesToHttpIntegrations do
       expect(http_integration.active).to eq(alert_service.active)
       expect(http_integration.name).to eq(described_class::SERVICE_NAMES_IDENTIFIER[:name])
       expect(http_integration.endpoint_identifier).to eq(described_class::SERVICE_NAMES_IDENTIFIER[:identifier])
+    end
+  end
+
+  describe '#down' do
+    before do
+      http_integrations.create!(
+        project_id: project.id,
+        name: described_class::SERVICE_NAMES_IDENTIFIER[:name],
+        endpoint_identifier: described_class::SERVICE_NAMES_IDENTIFIER[:identifier],
+        encrypted_token: 'test',
+        encrypted_token_iv: 'test'
+      )
+    end
+
+    it 'removes the existing http integrations' do
+      expect { described_class.new.down }.to change { http_integrations.count }.from(1).to(0)
     end
   end
 end
