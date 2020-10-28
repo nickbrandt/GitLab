@@ -5,6 +5,10 @@ class Projects::Ci::PipelineEditorController < Projects::ApplicationController
 
   feature_category :pipeline_authoring
 
+  def check_can_collaborate!
+    render_404 unless can_collaborate_with_project?(@project)
+  end
+
   def show
     render_404 unless ::Gitlab::Ci::Features.ci_pipeline_editor_page_enabled?(@project)
   end
