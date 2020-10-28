@@ -17,9 +17,9 @@
               = sprite_icon('check', css_class: 'gl-icon gl-color-green-400')
               %strong.gl-ml-3
                 - if issuable_type.eql?('merge_requests')
-                  = _("%{count} %{pluralized_subject} selected") % { count: issuable_count, pluralized_subject: n_('merge request', 'merge requests', issuable_count) }
+                  = n_("%{count} merge request selected", "%{count} merge requests selected", issuable_count) % { count: issuable_count }
                 - else
-                  = _("%{count} %{pluralized_subject} selected") % { count: issuable_count, pluralized_subject: n_('issue', 'issues', issuable_count) }
+                  = n_("%{count} issue selected", "%{count} issues selected", issuable_count) % { count: issuable_count }
           .modal-text
             = html_escape(_('The CSV export will be created in the background. Once finished, it will be sent to %{strong_open}%{email}%{strong_close} in an attachment.')) % { email: @current_user.notification_email, strong_open: '<strong>'.html_safe, strong_close: '</strong>'.html_safe }
         .modal-footer

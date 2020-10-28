@@ -390,9 +390,6 @@ msgstr ""
 msgid "%{cores} cores"
 msgstr ""
 
-msgid "%{count} %{pluralized_subject} selected"
-msgstr ""
-
 msgid "%{count} %{scope} for term '%{term}'"
 msgstr ""
 
@@ -409,6 +406,16 @@ msgstr ""
 
 msgid "%{count} files touched"
 msgstr ""
+
+msgid "%{count} issue selected"
+msgid_plural "%{count} issues selected"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%{count} merge request selected"
+msgid_plural "%{count} merge requests selected"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%{count} more"
 msgstr ""
@@ -31496,9 +31503,7 @@ msgid "is too long (maximum is 1000 entries)"
 msgstr ""
 
 msgid "issue"
-msgid_plural "issues"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 msgid "issues at risk"
 msgstr ""
