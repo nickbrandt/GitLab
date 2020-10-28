@@ -7215,6 +7215,11 @@ type EpicIssue implements CurrentUserTodos & Noteable {
   updatedAt: Time!
 
   """
+  User that last updated the issue
+  """
+  updatedBy: User
+
+  """
   Number of upvotes the issue has received
   """
   upvotes: Int!
@@ -9466,6 +9471,11 @@ type Issue implements CurrentUserTodos & Noteable {
   Timestamp of when the issue was last updated
   """
   updatedAt: Time!
+
+  """
+  User that last updated the issue
+  """
+  updatedBy: User
 
   """
   Number of upvotes the issue has received
