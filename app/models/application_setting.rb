@@ -135,6 +135,7 @@ class ApplicationSetting < ApplicationRecord
             system_hook_url: {
                 blocked_message: "is blocked: %{exception_message}. " + KROKI_URL_ERROR_MESSAGE
             },
+            presence: true,
             if: :kroki_url_absolute?
 
   validate :validate_kroki_url
