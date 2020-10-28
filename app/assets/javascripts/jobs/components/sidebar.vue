@@ -1,3 +1,4 @@
+\
 <script>
 import { isEmpty } from 'lodash';
 import { mapActions, mapGetters, mapState } from 'vuex';
