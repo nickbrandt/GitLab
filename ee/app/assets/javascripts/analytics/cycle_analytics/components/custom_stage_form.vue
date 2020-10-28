@@ -369,7 +369,6 @@ export default {
         :disabled="!isDirty"
         category="primary"
         class="js-save-stage-cancel"
-        type="gl-button"
         @click="handleCancel"
       >
         {{ __('Cancel') }}
@@ -379,7 +378,6 @@ export default {
         variant="success"
         category="primary"
         class="js-save-stage"
-        type="gl-button"
         @click="handleSave"
       >
         <gl-loading-icon v-if="isSavingCustomStage" size="sm" inline />
