@@ -9,6 +9,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     assign(:project, project)
     assign(:repository, project.repository)
     allow(view).to receive(:current_ref).and_return('master')
+    allow(view).to receive(:can_collaborate_with_project?).and_return(true)
   end
 
   describe 'issue boards' do

@@ -11,6 +11,7 @@ RSpec.describe 'layouts/nav/sidebar/_project' do
     allow(view).to receive(:current_ref).and_return('master')
 
     allow(view).to receive(:can?).and_return(true)
+    allow(view).to receive(:can_collaborate_with_project?).and_return(true)
   end
 
   it_behaves_like 'has nav sidebar'
