@@ -1,6 +1,7 @@
 import testAction from 'helpers/vuex_action_helper';
 import * as types from '~/ide/stores/modules/editor/mutation_types';
 import * as actions from '~/ide/stores/modules/editor/actions';
+import { createTriggerRenamePayload } from '../../../helpers';
 
 describe('~/ide/stores/modules/editor/actions', () => {
   describe('updateFileEditor', () => {
@@ -19,6 +20,16 @@ describe('~/ide/stores/modules/editor/actions', () => {
 
       testAction(actions.removeFileEditor, payload, {}, [
         { type: types.REMOVE_FILE_EDITOR, payload },
+      ]);
+    });
+  });
+
+  describe('renameFileEditor', () => {
+    it('commits with payload', () => {
+      const payload = createTriggerRenamePayload('test', 'test123');
+
+      testAction(actions.renameFileEditor, payload, {}, [
+        { type: types.RENAME_FILE_EDITOR, payload },
       ]);
     });
   });

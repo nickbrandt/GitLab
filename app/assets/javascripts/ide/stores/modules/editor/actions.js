@@ -13,3 +13,7 @@ export const updateFileEditor = ({ commit }, payload) => {
 export const removeFileEditor = ({ commit }, path) => {
   commit(types.REMOVE_FILE_EDITOR, path);
 };
+
+export const renameFileEditor = ({ commit }, payload) => {
+  commit(types.RENAME_FILE_EDITOR, payload);
+};

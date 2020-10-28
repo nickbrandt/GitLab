@@ -11,4 +11,15 @@ export default {
   [types.REMOVE_FILE_EDITOR](state, path) {
     Vue.delete(state.fileEditors, path);
   },
+  [types.RENAME_FILE_EDITOR](state, { path, newPath }) {
+    const existing = state.fileEditors[path];
+
+    // Gracefully do nothing if fileEditor isn't found.
+    if (!existing) {
+      return;
+    }
+
+    Vue.delete(state.fileEditors, path);
+    Vue.set(state.fileEditors, newPath, existing);
+  },
 };

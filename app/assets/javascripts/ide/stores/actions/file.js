@@ -269,7 +269,7 @@ export const removePendingTab = ({ commit }, file) => {
   eventHub.$emit(`editor.update.model.dispose.${file.key}`);
 };
 
-export const triggerFilesChange = () => {
+export const triggerFilesChange = (ctx, payload = {}) => {
   // Used in EE for file mirroring
-  eventHub.$emit('ide.files.change');
+  eventHub.$emit('ide.files.change', payload);
 };
