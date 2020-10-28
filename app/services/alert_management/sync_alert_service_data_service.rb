@@ -10,9 +10,12 @@ module AlertManagement
     def execute
       http_integration = find_http_integration
 
-      return ServiceResponse.success(message: 'HTTP Integration not found') unless http_integration
+      result = if http_integration
+                 update_integration_data(http_integration)
+               else
+                 create_integration
+               end
 
-      result = update_integration_data(http_integration)
       result ? ServiceResponse.success : ServiceResponse.error(message: 'Update failed')
     end
 
@@ -27,6 +30,19 @@ module AlertManagement
       )
       .execute
       .first
+    end
+
+    def create_integration
+      new_integration = AlertManagement::HttpIntegration.create(
+        project_id: alert_service.project_id,
+        name: 'HTTP endpoint',
+        endpoint_identifier: AlertManagement::HttpIntegration::LEGACY_IDENTIFIER,
+        active: alert_service.active,
+        encrypted_token: alert_service.data.encrypted_token,
+        encrypted_token_iv: alert_service.data.encrypted_token_iv
+      )
+
+      new_integration.persisted?
     end
 
     def update_integration_data(http_integration)
