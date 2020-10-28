@@ -740,8 +740,7 @@ This is a list of available features:
 
 - Don't add commas (`,`) or semicolons (`;`) to the ends of list items.
 - Only add periods to the end of a list item if the item consists of a complete
-  sentence. The [definition of full sentence](https://www.le.ac.uk/oerresources/ssds/grammarguides/page_02.htm)
-  is: _"a complete sentence always contains a verb, expresses a complete idea, and makes sense standing alone"_.
+  sentence (with a subject and a verb).
 - Be consistent throughout the list: if the majority of the items do not end in
   a period, do not end any of the items in a period, even if they consist of a
   complete sentence. The opposite is also valid: if the majority of the items
