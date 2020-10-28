@@ -95,6 +95,10 @@ If you delete a label, it is permanently deleted. All references to the label ar
 
 #### Promote a project label to a group label
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/231472) in GitLab 13.6: promoting a
+> project label keeps that label's ID and changes it into a group label. Previously, promoting a
+> project label created a new group label with a new ID and deleted the old label.
+
 If you previously created a project label and now want to make it available for other
 projects within the same group, you can promote it to a group label.
 
@@ -105,6 +109,8 @@ also merged.
 All issues, merge requests, issue board lists, issue board filters, and label subscriptions
 with the old labels are assigned to the new group label.
 
+The new group label has the same ID as the previous project label.
+
 CAUTION: **Caution:**
 Promoting a label is a permanent action, and cannot be reversed.
 
@@ -113,10 +119,6 @@ To promote a project label to a group label:
 1. Navigate to **Issues > Labels** in the project.
 1. Click on the three dots (**{ellipsis_v}**) next to the **Subscribe** button and
    select **Promote to group label**.
-
-NOTE: **Note:**
-As of GitLab 13.6, promoting a project label keeps that label's ID and changes it into a group label.
-Previously, promoting a project label created a new group label with a new ID and deleted the old label.
 
 ### Group labels
 
