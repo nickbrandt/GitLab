@@ -14,6 +14,7 @@ import { mapState, mapActions } from 'vuex';
 import { isEmpty } from 'lodash';
 import { visitUrl, setUrlParams } from '~/lib/utils/url_utility';
 import { ANY, GROUP_QUERY_PARAM, PROJECT_QUERY_PARAM } from '../constants';
+import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 
 export default {
   name: 'GroupFilter',
@@ -26,6 +27,7 @@ export default {
     GlLoadingIcon,
     GlIcon,
     GlSkeletonLoader,
+    LocalStorageSync,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -42,18 +44,16 @@ export default {
   data() {
     return {
       groupSearch: '',
+      selectedGroup: isEmpty(this.initialGroup) ? ANY : this.initialGroup,
     };
   },
   computed: {
     ...mapState(['groups', 'fetchingGroups']),
-    selectedGroup: {
-      get() {
-        return isEmpty(this.initialGroup) ? ANY : this.initialGroup;
-      },
-      set(group) {
-        visitUrl(setUrlParams({ [GROUP_QUERY_PARAM]: group.id, [PROJECT_QUERY_PARAM]: null }));
-      },
-    },
+  },
+  watch: {
+    selectedGroup(group) {
+      visitUrl(setUrlParams({ [GROUP_QUERY_PARAM]: group.id, [PROJECT_QUERY_PARAM]: null }));
+    }
   },
   methods: {
     ...mapActions(['fetchGroups']),
@@ -72,66 +72,68 @@ export default {
 </script>
 
 <template>
-  <gl-dropdown
-    ref="groupFilter"
-    class="gl-w-full"
-    menu-class="gl-w-full!"
-    toggle-class="gl-text-truncate"
-    @show="fetchGroups(groupSearch)"
-  >
-    <template #button-content>
-      <span class="dropdown-toggle-text gl-flex-grow-1 gl-text-truncate">
-        {{ selectedGroup.name }}
-      </span>
-      <gl-loading-icon v-if="fetchingGroups" inline class="mr-2" />
-      <gl-icon
-        v-if="selectedGroup.id !== $options.ANY.id"
-        v-gl-tooltip
-        name="clear"
-        :title="__('Clear')"
-        class="gl-text-gray-200! gl-hover-text-blue-800!"
-        @click.stop="handleGroupChange($options.ANY)"
-      />
-      <gl-icon name="chevron-down" />
-    </template>
-    <div
-      class="gl-display-flex gl-align-items-center gl-justify-content-center gl-relative gl-mb-3"
+  <local-storage-sync :value="selectedGroup" storageKey="search/default-group-scope" :asJson="true" :hydrate="false">
+    <gl-dropdown
+      ref="groupFilter"
+      class="gl-w-full"
+      menu-class="gl-w-full!"
+      toggle-class="gl-text-truncate"
+      @show="fetchGroups(groupSearch)"
     >
-      <header class="gl-font-weight-bold">{{ __('Filter results by group') }}</header>
-      <gl-button
-        icon="close"
-        category="tertiary"
-        class="gl-absolute gl-right-1"
-        @click="hideDropdown"
-      />
-    </div>
-    <gl-dropdown-divider />
-    <gl-search-box-by-type v-model="groupSearch" class="m-2" :debounce="500" @input="fetchGroups" />
-    <gl-dropdown-item
-      class="gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-pb-2! gl-mb-2"
-      :is-check-item="true"
-      :is-checked="isGroupSelected($options.ANY)"
-      @click="handleGroupChange($options.ANY)"
-    >
-      {{ $options.ANY.name }}
-    </gl-dropdown-item>
-    <div v-if="!fetchingGroups">
-      <gl-dropdown-item
-        v-for="group in groups"
-        :key="group.id"
-        :is-check-item="true"
-        :is-checked="isGroupSelected(group)"
-        @click="handleGroupChange(group)"
+      <template #button-content>
+        <span class="dropdown-toggle-text gl-flex-grow-1 gl-text-truncate">
+          {{ selectedGroup.name }}
+        </span>
+        <gl-loading-icon v-if="fetchingGroups" inline class="mr-2" />
+        <gl-icon
+          v-if="selectedGroup.id !== $options.ANY.id"
+          v-gl-tooltip
+          name="clear"
+          :title="__('Clear')"
+          class="gl-text-gray-200! gl-hover-text-blue-800!"
+          @click.stop="handleGroupChange($options.ANY)"
+        />
+        <gl-icon name="chevron-down" />
+      </template>
+      <div
+        class="gl-display-flex gl-align-items-center gl-justify-content-center gl-relative gl-mb-3"
       >
-        {{ group.full_name }}
+        <header class="gl-font-weight-bold">{{ __('Filter results by group') }}</header>
+        <gl-button
+          icon="close"
+          category="tertiary"
+          class="gl-absolute gl-right-1"
+          @click="hideDropdown"
+        />
+      </div>
+      <gl-dropdown-divider />
+      <gl-search-box-by-type v-model="groupSearch" class="m-2" :debounce="500" @input="fetchGroups" />
+      <gl-dropdown-item
+        class="gl-border-b-solid gl-border-b-gray-100 gl-border-b-1 gl-pb-2! gl-mb-2"
+        :is-check-item="true"
+        :is-checked="isGroupSelected($options.ANY)"
+        @click="handleGroupChange($options.ANY)"
+      >
+        {{ $options.ANY.name }}
       </gl-dropdown-item>
-    </div>
-    <div v-if="fetchingGroups" class="mx-3 mt-2">
-      <gl-skeleton-loader :height="100">
-        <rect y="0" width="90%" height="20" rx="4" />
-        <rect y="40" width="70%" height="20" rx="4" />
-        <rect y="80" width="80%" height="20" rx="4" />
-      </gl-skeleton-loader>
-    </div>
-  </gl-dropdown>
+      <div v-if="!fetchingGroups">
+        <gl-dropdown-item
+          v-for="group in groups"
+          :key="group.id"
+          :is-check-item="true"
+          :is-checked="isGroupSelected(group)"
+          @click="handleGroupChange(group)"
+        >
+          {{ group.full_name }}
+        </gl-dropdown-item>
+      </div>
+      <div v-if="fetchingGroups" class="mx-3 mt-2">
+        <gl-skeleton-loader :height="100">
+          <rect y="0" width="90%" height="20" rx="4" />
+          <rect y="40" width="70%" height="20" rx="4" />
+          <rect y="80" width="80%" height="20" rx="4" />
+        </gl-skeleton-loader>
+      </div>
+    </gl-dropdown>
+  </local-storage-sync>
 </template>

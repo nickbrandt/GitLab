@@ -12,6 +12,7 @@ import {
   getProjectSlug,
   spriteIcon,
 } from './lib/utils/common_utils';
+import { isEmptyValue } from './lib/utils/forms';
 import Tracking from '~/tracking';
 import initDeprecatedJQueryDropdown from '~/deprecated_jquery_dropdown';
 
@@ -323,10 +324,14 @@ export class SearchAutocomplete {
   }
 
   serializeState() {
+    const defaultGroup = JSON.parse(localStorage.getItem('search/default-group-scope') || '{}');
+
     return {
       // Search Criteria
       search_project_id: this.projectInputEl.val(),
-      group_id: this.groupInputEl.val(),
+      group_id: isEmptyValue(this.groupInputEl.val())
+        ? defaultGroup?.id || ''
+        : this.groupInputEl.val(),
       search_code: this.searchCodeInputEl.val(),
       repository_ref: this.repositoryInputEl.val(),
       scope: this.scopeInputEl.val(),
@@ -460,6 +465,7 @@ export class SearchAutocomplete {
       }
       $el.removeClass('is-active');
       this.disableAutocomplete();
+
       return this.searchInput.val('').focus();
     }
   }

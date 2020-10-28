@@ -17,6 +17,11 @@ export default {
       required: false,
       default: false,
     },
+    hydrate: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     persist: {
       type: Boolean,
       required: false,
@@ -29,6 +34,8 @@ export default {
     },
   },
   mounted() {
+    if (!this.hydrate) return;
+    
     // On mount, trigger update if we actually have a localStorageValue
     const { exists, value } = this.getStorageValue();
 
