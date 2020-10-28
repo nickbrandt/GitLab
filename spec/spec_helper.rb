@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+#  $" is $LOADED_FEATURES, but RuboCop didn't like it
+if $".include?(File.expand_path('fast_spec_helper.rb', __dir__))
+  warn 'Detected fast_spec_helper is loaded first than spec_helper.'
+  warn 'If both are needed spec_helper should be loaded first.'
+  abort 'Aborting...'
+end
+
 require './spec/simplecov_env'
 SimpleCovEnv.start!
 
