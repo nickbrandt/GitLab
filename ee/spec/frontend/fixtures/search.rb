@@ -10,20 +10,14 @@ RSpec.describe SearchController, '(JavaScript fixtures)', type: :controller do
   let_it_be(:user) { create(:admin) }
 
   before(:all) do
-    clean_frontend_fixtures('search/')
+    clean_frontend_fixtures('ee/search/')
   end
 
   before do
     sign_in(user)
   end
 
-  it 'search/show.html' do
-    get :show
-
-    expect(response).to be_successful
-  end
-
-  context 'search within a project' do
+  context 'search within a project', :sidekiq_inline do
     let(:namespace) { create(:namespace, name: 'frontend-fixtures') }
     let(:project) { create(:project, :public, :repository, namespace: namespace, path: 'search-project') }
     let(:blobs) do
@@ -32,49 +26,44 @@ RSpec.describe SearchController, '(JavaScript fixtures)', type: :controller do
           path: 'CHANGELOG',
           basename: 'CHANGELOG',
           ref: 'master',
-          data: "hello\nworld\nfoo\nSend # this is the highligh\nbaz\nboo\nbat",
+          data: "hello\nworld\nfoo\nbar # this is the highlight\nbaz\nboo\nbat",
           project: project,
           project_id: project.id,
-          startline: 2),
+          startline: 2,
+          highlight_line: 4),
         Gitlab::Search::FoundBlob.new(
           path: 'CONTRIBUTING',
           basename: 'CONTRIBUTING',
           ref: 'master',
-          data: "hello\nworld\nfoo\nSend # this is the highligh\nbaz\nboo\nbat",
+          data: "hello\nworld\nfoo\nbar # this is the highlight\nbaz\nboo\nbat",
           project: project,
           project_id: project.id,
-          startline: 2),
+          startline: 2,
+          highlight_line: 4),
         Gitlab::Search::FoundBlob.new(
           path: 'README',
           basename: 'README',
           ref: 'master',
-          data: "foo\nSend # this is the highlight\nbaz\nboo\nbat",
+          data: "foo\nbar # this is the highlight\nbaz\nboo\nbat",
           project: project,
           project_id: project.id,
-          startline: 2),
-        Gitlab::Search::FoundBlob.new(
-          path: 'test',
-          basename: 'test',
-          ref: 'master',
-          data: "foo\nSend # this is the highlight\nbaz\nboo\nbat",
-          project: project,
-          project_id: project.id,
-          startline: 2)
-     ],
-     total_count: 4,
-     limit: 4,
-     offset: 0)
+          startline: 2,
+          highlight_line: 2)
+        ],
+        total_count: 3,
+        limit: 3,
+        offset: 0)
     end
 
-    it 'search/blob_search_result.html' do
+    it 'ee/search/blob_search_result.html' do
       expect_next_instance_of(SearchService) do |search_service|
         expect(search_service).to receive(:search_objects).and_return(blobs)
       end
 
       get :show, params: {
-        search: 'Send',
-        project_id: project.id,
-        scope: :blobs
+          search: 'Send',
+          project_id: project.id,
+          scope: :blobs
       }
 
       expect(response).to be_successful
