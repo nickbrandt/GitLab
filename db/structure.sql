@@ -17264,7 +17264,8 @@ CREATE TABLE web_hooks (
     encrypted_token_iv character varying,
     encrypted_url character varying,
     encrypted_url_iv character varying,
-    deployment_events boolean DEFAULT false NOT NULL
+    deployment_events boolean DEFAULT false NOT NULL,
+    feature_flag_events boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE web_hooks_id_seq
