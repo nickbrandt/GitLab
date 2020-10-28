@@ -55,7 +55,7 @@ export default (el, dashboardType) => {
       securityBuildsFailedCount: Number(securityBuildsFailedCount),
       securityBuildsFailedPath,
     };
-    props.projectFullPath = el.dataset.projectFullPath;
+    provide.projectFullPath = el.dataset.projectFullPath;
     provide.autoFixDocumentation = el.dataset.autoFixDocumentation;
     provide.autoFixMrsPath = el.dataset.autoFixMrsPath;
   } else if (dashboardType === DASHBOARD_TYPES.GROUP) {

@@ -31,8 +31,12 @@ describe('Project Pipeline Status Component', () => {
           {
             propsData: DEFAULT_PROPS,
             provide: {
+              projectFullPath: '/group/project',
               glFeatures: { securityAutoFix: true },
               autoFixMrsPath: '/merge_requests?label_name=GitLab-auto-fix',
+            },
+            data() {
+              return { autoFixMrsCount: 0 };
             },
           },
           options,
@@ -85,8 +89,8 @@ describe('Project Pipeline Status Component', () => {
     describe('when there are auto-fix MRs', () => {
       beforeEach(() => {
         wrapper = createWrapper({
-          propsData: {
-            autoFixMrsCount: 12,
+          data() {
+            return { autoFixMrsCount: 12 };
           },
         });
       });
@@ -103,11 +107,7 @@ describe('Project Pipeline Status Component', () => {
     });
 
     it('does not render the link if there are no open auto-fix MRs', () => {
-      wrapper = createWrapper({
-        propsData: {
-          autoFixMrsCount: 0,
-        },
-      });
+      wrapper = createWrapper();
 
       expect(findAutoFixMrsLink().exists()).toBe(false);
     });

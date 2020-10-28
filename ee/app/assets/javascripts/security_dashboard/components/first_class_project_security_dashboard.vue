@@ -9,7 +9,6 @@ import SecurityDashboardLayout from './security_dashboard_layout.vue';
 import VulnerabilitiesCountList from './vulnerability_count_list.vue';
 import Filters from './first_class_vulnerability_filters.vue';
 import CsvExportButton from './csv_export_button.vue';
-import projectAutoFixMrsCountQuery from '../graphql/project_auto_fix_mrs_count.query.graphql';
 
 export const BANNER_COOKIE_KEY = 'hide_vulnerabilities_introduction_banner';
 
@@ -25,22 +24,6 @@ export default {
     Filters,
   },
   mixins: [glFeatureFlagsMixin()],
-  apollo: {
-    autoFixMrsCount: {
-      query: projectAutoFixMrsCountQuery,
-      variables() {
-        return {
-          fullPath: this.projectFullPath,
-        };
-      },
-      update(data) {
-        return data?.project?.mergeRequests?.count || 0;
-      },
-      skip() {
-        return !this.glFeatures.securityAutoFix;
-      },
-    },
-  },
   props: {
     securityDashboardHelpPath: {
       type: String,
@@ -50,11 +33,6 @@ export default {
       type: Object,
       required: false,
       default: () => ({}),
-    },
-    projectFullPath: {
-      type: String,
-      required: false,
-      default: '',
     },
     hasVulnerabilities: {
       type: Boolean,
@@ -102,15 +80,14 @@ export default {
             <h4 class="flex-grow mt-0 mb-0">{{ __('Vulnerabilities') }}</h4>
             <csv-export-button :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint" />
           </div>
-          <project-pipeline-status :pipeline="pipeline" :auto-fix-mrs-count="autoFixMrsCount" />
-          <vulnerabilities-count-list :project-full-path="projectFullPath" :filters="filters" />
+          <project-pipeline-status :pipeline="pipeline" />
+          <vulnerabilities-count-list :filters="filters" />
         </template>
         <template #sticky>
           <filters @filterChange="handleFilterChange" />
         </template>
         <project-vulnerabilities-app
           :dashboard-documentation="dashboardDocumentation"
-          :project-full-path="projectFullPath"
           :filters="filters"
         />
       </security-dashboard-layout>

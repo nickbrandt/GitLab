@@ -3,6 +3,7 @@ import { GlLink } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 import PipelineStatusBadge from './pipeline_status_badge.vue';
+import projectAutoFixMrsCountQuery from '../graphql/project_auto_fix_mrs_count.query.graphql';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
@@ -12,14 +13,25 @@ export default {
     PipelineStatusBadge,
   },
   mixins: [glFeatureFlagsMixin()],
-  inject: ['autoFixMrsPath'],
+  inject: ['projectFullPath', 'autoFixMrsPath'],
+  apollo: {
+    autoFixMrsCount: {
+      query: projectAutoFixMrsCountQuery,
+      variables() {
+        return {
+          fullPath: this.projectFullPath,
+        };
+      },
+      update(data) {
+        return data?.project?.mergeRequests?.count || 0;
+      },
+      skip() {
+        return !this.glFeatures.securityAutoFix;
+      },
+    },
+  },
   props: {
     pipeline: { type: Object, required: true },
-    autoFixMrsCount: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
   },
   computed: {
     shouldShowPipelineStatus() {

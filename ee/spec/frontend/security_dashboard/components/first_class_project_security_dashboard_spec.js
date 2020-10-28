@@ -19,12 +19,12 @@ const props = {
     id: '214',
     path: '/mixed-vulnerabilities/dependency-list-test-01/-/pipelines/214',
   },
-  projectFullPath: '/group/project',
   securityDashboardHelpPath: '/security/dashboard/help-path',
   vulnerabilitiesExportEndpoint: '/vulnerabilities/exports',
 };
 
 const provide = {
+  projectFullPath: '/group/project',
   dashboardDocumentation: '/help/docs',
   autoFixDocumentation: '/auto/fix/documentation',
   emptyStateSvgPath: '/svgs/empty/svg',
@@ -46,7 +46,7 @@ describe('First class Project Security Dashboard component', () => {
   const findCsvExportButton = () => wrapper.find(CsvExportButton);
   const findAutoFixUserCallout = () => wrapper.find(AutoFixUserCallout);
 
-  const createComponent = (options, data = {}) => {
+  const createComponent = options => {
     wrapper = shallowMount(FirstClassProjectSecurityDashboard, {
       propsData: {
         ...props,
@@ -54,12 +54,6 @@ describe('First class Project Security Dashboard component', () => {
       },
       provide,
       stubs: { SecurityDashboardLayout, GlBanner },
-      data() {
-        return {
-          autoFixMrsCount: 0,
-          ...data,
-        };
-      },
       ...options,
     });
   };
@@ -71,12 +65,10 @@ describe('First class Project Security Dashboard component', () => {
 
   describe('on render when there are vulnerabilities', () => {
     beforeEach(() => {
-      createComponent(
-        {
-          props: { hasVulnerabilities: true },
-        },
-        { filters },
-      );
+      createComponent({
+        props: { hasVulnerabilities: true },
+        data: () => ({ filters }),
+      });
     });
 
     it('should render the vulnerabilities', () => {
@@ -173,14 +165,14 @@ describe('First class Project Security Dashboard component', () => {
 
   describe('with filter data', () => {
     beforeEach(() => {
-      createComponent(
-        {
-          props: {
-            hasVulnerabilities: true,
-          },
+      createComponent({
+        props: {
+          hasVulnerabilities: true,
         },
-        { filters },
-      );
+        data() {
+          return { filters };
+        },
+      });
     });
 
     it('should pass the filter data down to the vulnerabilities', () => {
