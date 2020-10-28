@@ -92,7 +92,7 @@ export default {
       return reportTextBuilder(name, summary);
     },
     hasRecentFailures(summary) {
-      return summary?.recentlyFailed > 0;
+      return this.glFeatures.testFailureHistory && summary?.recentlyFailed > 0;
     },
     getRecentFailuresText(summary) {
       return recentFailuresTextBuilder(summary);

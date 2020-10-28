@@ -2,12 +2,14 @@
 import { mapActions } from 'vuex';
 import { GlBadge } from '@gitlab/ui';
 import { n__ } from '~/locale';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   name: 'TestIssueBody',
   components: {
     GlBadge,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     issue: {
       type: Object,
@@ -22,6 +24,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+  },
+  computed: {
+    shouldShowRecentFailures() {
+      return this.glFeatures.testFailureHistory && this.issue.recent_failures;
     },
   },
   methods: {
@@ -45,7 +52,7 @@ export default {
         @click="openModal({ issue })"
       >
         <gl-badge v-if="isNew" variant="danger" class="gl-mr-2">{{ s__('New') }}</gl-badge>
-        <gl-badge v-if="issue.recent_failures" variant="warning" class="gl-mr-2">
+        <gl-badge v-if="shouldShowRecentFailures" variant="warning" class="gl-mr-2">
           {{ recentFailuresText(issue.recent_failures) }}
         </gl-badge>
         {{ issue.name }}
