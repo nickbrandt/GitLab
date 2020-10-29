@@ -99,9 +99,9 @@ export default {
     // TODO: Use Draggable in ./board_list_new.vue to drag & drop issue
     // https://gitlab.com/gitlab-org/gitlab/-/issues/218164
     const multiSelectOpts = {
-      multiDrag : true,
-      selectedClass : 'js-multi-select',
-      animation : 500,
+      multiDrag: true,
+      selectedClass: 'js-multi-select',
+      animation: 500,
     };
 
     const options = getBoardSortableDefaultOptions({
