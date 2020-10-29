@@ -20926,6 +20926,8 @@ CREATE INDEX index_issues_on_milestone_id ON issues USING btree (milestone_id);
 
 CREATE INDEX index_issues_on_moved_to_id ON issues USING btree (moved_to_id) WHERE (moved_to_id IS NOT NULL);
 
+CREATE INDEX index_issues_on_project_id_and_closed_at ON issues USING btree (project_id, closed_at);
+
 CREATE UNIQUE INDEX index_issues_on_project_id_and_external_key ON issues USING btree (project_id, external_key) WHERE (external_key IS NOT NULL);
 
 CREATE UNIQUE INDEX index_issues_on_project_id_and_iid ON issues USING btree (project_id, iid);
