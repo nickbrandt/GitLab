@@ -1,24 +1,24 @@
 # frozen_string_literal: true
 
 class HistoricalData < ApplicationRecord
-  validates :date, presence: true
+  validates :recorded_at, presence: true
 
   # HistoricalData.during((Time.current - 1.year)..Time.current).average(:active_user_count)
-  scope :during, ->(range) { where(date: range) }
+  scope :during, ->(range) { where(recorded_at: range) }
   # HistoricalData.up_until(Time.current - 1.month).average(:active_user_count)
-  scope :up_until, ->(date) { where("date <= :date", date: date) }
+  scope :up_until, ->(timestamp) { where("recorded_at <= :timestamp", timestamp: timestamp) }
 
   class << self
     def track!
       create!(
-        date:               Time.current,
+        recorded_at:        Time.current,
         active_user_count:  License.load_license&.current_active_users_count
       )
     end
 
     # HistoricalData.at(Date.new(2014, 1, 1)).active_user_count
     def at(date)
-      find_by(date: date.all_day)
+      find_by(recorded_at: date.all_day)
     end
 
     def max_historical_user_count(license: nil, from: nil, to: nil)
