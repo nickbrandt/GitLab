@@ -26951,6 +26951,9 @@ msgstr ""
 msgid "These existing issues have a similar title. It might be better to comment there instead of creating another similar issue."
 msgstr ""
 
+msgid "These paths are protected for POST requests."
+msgstr ""
+
 msgid "These variables are configured in the parent group settings, and will be active in the current project in addition to the project variables."
 msgstr ""
 
