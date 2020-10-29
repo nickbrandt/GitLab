@@ -32,14 +32,19 @@ module Resolvers
         private
 
         def find(ids, filenames)
-          # TODO: remove this line when the compatibility layer is removed
-          # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
-          ids = ids&.map { |id| DesignID.coerce_isolated_input(id) }
-
           ::DesignManagement::DesignsFinder.new(issue, current_user,
-                                                ids: ids&.map(&:model_id),
+                                                ids: design_ids(ids),
                                                 filenames: filenames,
                                                 visible_at_version: version)
+        end
+
+        def design_ids(gids)
+          return if gids.nil?
+
+          # TODO: remove this line when the compatibility layer is removed
+          # See: https://gitlab.com/gitlab-org/gitlab/-/issues/257883
+          gids = gids.map { |id| DesignID.coerce_isolated_input(id) }
+          gids.map(&:model_id)
         end
 
         def issue
