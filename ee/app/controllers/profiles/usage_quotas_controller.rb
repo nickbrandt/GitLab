@@ -13,7 +13,6 @@ class Profiles::UsageQuotasController < Profiles::ApplicationController
   end
 
   def push_additional_repo_storage_by_namespace_feature_flag
-    additional_repo_storage_by_namespace_flag = :additional_repo_storage_by_namespace
-    gon.push({ features: { additional_repo_storage_by_namespace_flag.to_s.camelize(:lower) => current_user.namespace.additional_repo_storage_by_namespace_enabled? } }, true)
+    push_to_gon_features(:additional_repo_storage_by_namespace, current_user.namespace.additional_repo_storage_by_namespace_enabled?)
   end
 end
