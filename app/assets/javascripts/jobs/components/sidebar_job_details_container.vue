@@ -36,7 +36,7 @@ export default {
       return this.job?.tags?.length;
     },
     hasTimeout() {
-      return Boolean(this.job?.metadata?.timeout_human_readable);
+      return this.job?.metadata?.timeout_human_readable ?? false;
     },
     hasAnyDetail() {
       return Boolean(
