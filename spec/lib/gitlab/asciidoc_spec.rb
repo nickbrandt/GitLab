@@ -468,6 +468,7 @@ module Gitlab
           allow_any_instance_of(ApplicationSetting).to receive(:kroki_enabled).and_return(true)
           allow_any_instance_of(ApplicationSetting).to receive(:kroki_url).and_return('https://kroki.io')
         end
+
         it 'converts a graphviz diagram to image' do
           input = <<~ADOC
             [graphviz]
