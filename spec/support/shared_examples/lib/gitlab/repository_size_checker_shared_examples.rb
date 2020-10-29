@@ -21,8 +21,8 @@ RSpec.shared_examples 'checker size exceeded' do
     context 'when current size is below the limit' do
       let(:current_size) { limit - 1 }
 
-      it 'returns a negative number' do
-        expect(subject.exceeded_size).to eq(-1.megabyte)
+      it 'returns zero' do
+        expect(subject.exceeded_size).to eq(0)
       end
     end
 
@@ -67,7 +67,7 @@ RSpec.shared_examples 'checker size exceeded' do
       let(:current_size) { limit - 2 }
 
       it 'returns zero' do
-        expect(subject.exceeded_size(change_size)).to eq(-1.megabyte)
+        expect(subject.exceeded_size(change_size)).to eq(0)
       end
     end
   end

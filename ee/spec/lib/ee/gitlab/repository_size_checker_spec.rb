@@ -144,8 +144,8 @@ RSpec.describe Gitlab::RepositorySizeChecker do
           context 'when current size + total repository size excess is below the limit (additional purchase storage not used)' do
             let(:current_size) { limit - 1 }
 
-            it 'returns a negative number' do
-              expect(subject.exceeded_size).to eq(-1.megabyte)
+            it 'returns zero' do
+              expect(subject.exceeded_size).to eq(0)
             end
           end
 

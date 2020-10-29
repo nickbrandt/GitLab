@@ -17,9 +17,10 @@ module EE
       override :exceeded_size
       # @param change_size [int] in bytes
       def exceeded_size(change_size = 0)
-        exceeded_size = super
-        exceeded_size -= remaining_additional_purchased_storage if additional_repo_storage_available?
-        exceeded_size
+        size = super
+        size -= remaining_additional_purchased_storage if additional_repo_storage_available?
+
+        [size, 0].max
       end
 
       private
