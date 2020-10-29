@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Experiment < ApplicationRecord
-  include ::Gitlab::Experimentation::Shared
+  include ::Gitlab::Experimentation::GroupTypes
 
   has_many :experiment_users
   has_many :users, through: :experiment_users

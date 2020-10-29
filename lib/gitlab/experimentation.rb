@@ -97,7 +97,7 @@ module Gitlab
     # of the experimental group.
     #
     module ControllerConcern
-      include ::Gitlab::Experimentation::Shared
+      include ::Gitlab::Experimentation::GroupTypes
       extend ActiveSupport::Concern
 
       included do

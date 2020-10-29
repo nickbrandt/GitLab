@@ -2,7 +2,7 @@
 
 module Gitlab
   module Experimentation
-    module Shared
+    module GroupTypes
       GROUP_CONTROL = :control
       GROUP_EXPERIMENTAL = :experimental
     end
