@@ -56,6 +56,14 @@ RSpec.describe Gitlab::Badge::Coverage::Report do
       end
     end
 
+    context 'with a blank job name' do
+      let(:job_name) { ' ' }
+
+      it 'returns the pipeline coverage value' do
+        expect(badge.status).to eq(50.00)
+      end
+    end
+
     context 'with an unmatching job name specified' do
       let(:job_name) { 'incorrect name' }
 
