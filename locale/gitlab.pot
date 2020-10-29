@@ -31121,9 +31121,6 @@ msgstr ""
 msgid "ciReport|Coverage Fuzzing"
 msgstr ""
 
-msgid "ciReport|Coverage Fuzzing Title"
-msgstr ""
-
 msgid "ciReport|Coverage fuzzing"
 msgstr ""
 
