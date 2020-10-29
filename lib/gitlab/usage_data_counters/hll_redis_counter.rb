@@ -41,7 +41,9 @@ module Gitlab
 
           # Increment unique event for given context
           # Track events in context level
-          if context.present?
+          return if context.present? && !context.in?(valid_context_list)
+
+          if context.present? && context.in?(valid_context_list)
             Gitlab::Redis::HLL.add(key: redis_key(event, time, context), value: entity_id, expiry: expiry(event))
           end
 
@@ -57,6 +59,7 @@ module Gitlab
           raise 'Events should be in same slot' unless events_in_same_slot?(events)
           raise 'Events should be in same category' unless events_in_same_category?(events)
           raise 'Events should have same aggregation level' unless events_same_aggregation?(events)
+          raise 'Invalid context' if context.present? && !context.in?(valid_context_list)
 
           aggregation = events.first[:aggregation]
 
@@ -99,7 +102,7 @@ module Gitlab
         end
 
         # The aray of valid context on which we allow tracking
-        def valid_context
+        def valid_context_list
           Plan.all_plans
         end
 

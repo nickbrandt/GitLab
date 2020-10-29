@@ -7,8 +7,8 @@ module EE
         class_methods do
           extend ::Gitlab::Utils::Override
 
-          override :valid_context
-          def valid_context
+          override :valid_context_list
+          def valid_context_list
             super + License.all_plans
           end
         end

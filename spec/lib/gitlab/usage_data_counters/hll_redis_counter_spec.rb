@@ -8,10 +8,8 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
   let(:entity3) { '34rfjuuy-ce56-sa35-ds34-dfer567dfrf2' }
   let(:entity4) { '8b9a2671-2abf-4bec-a682-22f6a8f7bf31' }
 
-  let(:bronze_context) { 'bronze' }
-  let(:gold_context) { 'gold' }
-  let(:free_context) { 'free' }
-  let(:custom_context) { 'custom' }
+  let(:default_context) { 'default' }
+  let(:invalid_context) { 'invalid' }
 
   around do |example|
     # We need to freeze to a reference time
@@ -160,7 +158,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
         it 'increases both conext event counter and total event counter' do
           expect(Gitlab::Redis::HLL).to receive(:add).twice
 
-          described_class.track_event(entity1, context_event, context: bronze_context)
+          described_class.track_event(entity1, context_event, context: default_context)
         end
       end
 
@@ -169,6 +167,14 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
           expect(Gitlab::Redis::HLL).to receive(:add)
 
           described_class.track_event(entity1, context_event, context: '')
+        end
+      end
+
+      context 'when sending invalid context' do
+        it 'increases only total event counter' do
+          expect(Gitlab::Redis::HLL).not_to receive(:add)
+
+          described_class.track_event(entity1, context_event, context: invalid_context)
         end
       end
     end
@@ -262,9 +268,9 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       allow(described_class).to receive(:known_events).and_return(known_events)
       allow(described_class).to receive(:categories).and_return(%w(category1 category2))
 
-      described_class.track_event([entity1, entity3], 'event_name_1', context: bronze_context, time: 2.days.ago)
-      described_class.track_event(entity3, 'event_name_1', context: gold_context, time: 2.days.ago)
-      described_class.track_event(entity3, 'event_name_1', context: custom_context, time: 2.days.ago)
+      described_class.track_event([entity1, entity3], 'event_name_1', context: default_context, time: 2.days.ago)
+      described_class.track_event(entity3, 'event_name_1', context: default_context, time: 2.days.ago)
+      described_class.track_event(entity3, 'event_name_1', context: invalid_context, time: 2.days.ago)
       described_class.track_event([entity1, entity2], 'event_name_2', time: 2.weeks.ago)
     end
 
@@ -272,16 +278,19 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
 
     context 'with correct arguments' do
       where(:event_names, :context, :value) do
-        ['event_name_1'] | 'bronze' | 2
-        ['event_name_1'] | 'gold'   | 1
-        ['event_name_1'] | 'custom' | 1
-        ['event_name_1'] | ''       | 2
-        ['event_name_2'] | 'free'   | 0
-        ['event_name_2'] | ''       | 2
+        ['event_name_1'] | 'default' | 2
+        ['event_name_1'] | ''        | 2
+        ['event_name_2'] | ''        | 2
       end
 
       with_them do
         it { is_expected.to eq value }
+      end
+    end
+
+    context 'with empty invalid context' do
+      it 'raise error' do
+        expect { described_class.unique_events(event_names: 'event_name_1', start_date: 4.weeks.ago, end_date: Date.current, context: invalid_context) }.to raise_error('Invalid context')
       end
     end
   end
