@@ -3,9 +3,7 @@
 class Groups::UsageQuotasController < Groups::ApplicationController
   before_action :authorize_admin_group!
   before_action :verify_usage_quotas_enabled!
-  before_action do
-    push_additional_repo_storage_by_namespace_feature_flag
-  end
+  before_action :push_additional_repo_storage_by_namespace_feature_flag
 
   layout 'group_settings'
 

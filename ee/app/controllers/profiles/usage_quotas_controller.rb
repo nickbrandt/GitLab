@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 class Profiles::UsageQuotasController < Profiles::ApplicationController
-  before_action do
-    push_additional_repo_storage_by_namespace_feature_flag
-  end
+  before_action :push_additional_repo_storage_by_namespace_feature_flag
 
   feature_category :purchase
 
