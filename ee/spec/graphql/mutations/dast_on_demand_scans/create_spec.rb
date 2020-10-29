@@ -103,7 +103,7 @@ RSpec.describe Mutations::DastOnDemandScans::Create do
         end
 
         context 'when dast_scanner_profile_id is provided' do
-          let(:dast_scanner_profile) { create(:dast_scanner_profile, project: project, target_timeout: 200, spider_timeout: 5000, use_ajax_spider: true, show_debug_messages: true, scan_type: 'active') }
+          let(:dast_scanner_profile) { create(:dast_scanner_profile, project: project, target_timeout: 200, spider_timeout: 5000, use_ajax_spider: true, show_debug_messages: true, scan_type: 'passive') }
           let(:dast_scanner_profile_id) { dast_scanner_profile.to_global_id }
 
           subject do
@@ -132,6 +132,24 @@ RSpec.describe Mutations::DastOnDemandScans::Create do
             expect_any_instance_of(::Ci::RunDastScanService).to receive(:execute).with(args).and_call_original
 
             subject
+          end
+
+          context 'when scan_type=active' do
+            let(:dast_scanner_profile) { create(:dast_scanner_profile, project: project, scan_type: 'active') }
+
+            context 'when target is not validated' do
+              it 'communicates failure' do
+                expect(subject[:errors]).to include('Cannot run active scan against unvalidated target')
+              end
+            end
+
+            context 'when target is validated' do
+              it 'has no errors' do
+                create(:dast_site_validation, state: :passed, dast_site_token: create(:dast_site_token, project: project, url: dast_site_profile.dast_site.url))
+
+                expect(subject[:errors]).to be_empty
+              end
+            end
           end
         end
 
