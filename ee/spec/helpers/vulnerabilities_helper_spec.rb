@@ -58,7 +58,7 @@ RSpec.describe VulnerabilitiesHelper do
     it 'has expected vulnerability properties' do
       expect(subject).to include(
         timestamp: Time.now.to_i,
-        create_issue_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/create_issue",
+        new_issue_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/new_issue",
         has_mr: anything,
         create_mr_url: "/#{project.full_path}/-/vulnerability_feedback",
         discussions_url: "/#{project.full_path}/-/security/vulnerabilities/#{vulnerability.id}/discussions",
@@ -75,8 +75,8 @@ RSpec.describe VulnerabilitiesHelper do
         allow(project).to receive(:issues_enabled?).and_return(false)
       end
 
-      it 'has `create_issue_url` set as nil' do
-        expect(subject).to include(create_issue_url: nil)
+      it 'has `new_issue_url` set as nil' do
+        expect(subject).to include(new_issue_url: nil)
       end
     end
   end

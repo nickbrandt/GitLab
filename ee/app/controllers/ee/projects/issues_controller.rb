@@ -36,6 +36,21 @@ module EE
       def whitelist_query_limiting_ee
         ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/4794')
       end
+
+      def vulnerability_issue_link(issue)
+        if params[:vulnerability_id]
+          vulnerability ||= project.vulnerabilities.find(params[:vulnerability_id]).present
+
+          if issue.valid?
+            VulnerabilityIssueLinks::CreateService.new(
+              current_user,
+              vulnerability.subject,
+              issue,
+              link_type: Vulnerabilities::IssueLink.link_types[:created]
+            ).execute
+          end
+        end
+      end
     end
   end
 end

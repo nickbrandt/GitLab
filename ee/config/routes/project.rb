@@ -73,7 +73,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           resources :vulnerabilities, only: [:show] do
             member do
               get :discussions, format: :json
-              post :create_issue, format: :json
+              get :new_issue
             end
 
             scope module: :vulnerabilities do

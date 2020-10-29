@@ -60,7 +60,7 @@ export default {
       return Boolean(this.state.relatedIssues.find(i => i.lockIssueRemoval));
     },
     canCreateIssue() {
-      return !this.isIssueAlreadyCreated && !this.isFetching && Boolean(this.createIssueUrl);
+      return !this.isIssueAlreadyCreated && !this.isFetching && Boolean(this.newIssueUrl);
     },
   },
   inject: {
@@ -70,7 +70,7 @@ export default {
     projectFingerprint: {
       default: '',
     },
-    createIssueUrl: {
+    newIssueUrl: {
       default: '',
     },
     reportType: {
@@ -88,18 +88,7 @@ export default {
   },
   methods: {
     createIssue() {
-      this.isProcessingAction = true;
-      this.errorCreatingIssue = false;
-
-      return axios
-        .post(this.createIssueUrl)
-        .then(({ data: { web_url } }) => {
-          redirectTo(web_url);
-        })
-        .catch(() => {
-          this.isProcessingAction = false;
-          this.errorCreatingIssue = true;
-        });
+      redirectTo(this.newIssueUrl, { params: { vulnerability_id: this.vulnerabilityId } });
     },
     toggleFormVisibility() {
       this.isFormVisible = !this.isFormVisible;

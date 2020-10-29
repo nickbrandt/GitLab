@@ -19,22 +19,19 @@ module Projects
         @gfm_form = true
       end
 
-      def create_issue
-        result = ::Issues::CreateFromVulnerabilityService
-          .new(
-            container: vulnerability.project,
-            current_user: current_user,
-            params: {
-              vulnerability: vulnerability,
-              link_type: ::Vulnerabilities::IssueLink.link_types[:created]
-            })
-          .execute
+      def new_issue
+        @project = vulnerability.project
 
-        if result[:status] == :success
-          render json: issue_serializer.represent(result[:issue], only: [:web_url])
-        else
-          render json: result[:message], status: :unprocessable_entity
-        end
+        issue_params = {
+          title: "Investigate vulnerability: #{vulnerability.title}",
+          description: render_description(vulnerability),
+          confidential: true
+        }
+
+        @issue = @notable = ::Issues::BuildService
+          .new(@project, current_user, issue_params).execute
+
+        render '/projects/issues/new'
       end
 
       private
@@ -48,6 +45,13 @@ module Projects
 
       def issue_serializer
         IssueSerializer.new(current_user: current_user)
+      end
+
+      def render_description(vulnerability)
+        ApplicationController.render(
+          template: 'vulnerabilities/issue_description.md.erb',
+          locals: { vulnerability: vulnerability.present }
+        )
       end
     end
   end

@@ -137,6 +137,8 @@ class Projects::IssuesController < Projects::ApplicationController
                        end
     end
 
+    vulnerability_issue_link(issue)
+
     respond_to do |format|
       format.html do
         recaptcha_check_with_fallback { render :new }
@@ -371,6 +373,8 @@ class Projects::IssuesController < Projects::ApplicationController
   def branch_link(branch)
     project_compare_path(project, from: project.default_branch, to: branch[:name])
   end
+
+  def vulnerability_issue_link(issue); end
 
   def create_rate_limit
     key = :issues_create

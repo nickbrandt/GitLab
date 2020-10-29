@@ -74,4 +74,22 @@ RSpec.describe Projects::Security::VulnerabilitiesController do
       expect(json_response.pluck('id')).to eq([discussion_note.discussion_id])
     end
   end
+
+  describe 'GET #new_issue' do
+    let_it_be(:vulnerability) { create(:vulnerability, project: project, author: user) }
+
+    render_views
+
+    def new_issue_from_vulnerability
+      sign_in(user)
+      get :new_issue, params: { namespace_id: project.namespace, project_id: project, id: vulnerability }
+    end
+
+    it 'renders the issue creation form' do
+      new_issue_from_vulnerability
+
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(response.body).to include('vulnerability_id')
+    end
+  end
 end

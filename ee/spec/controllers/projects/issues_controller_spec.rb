@@ -71,6 +71,28 @@ RSpec.describe Projects::IssuesController do
           expect(issue.weight).to eq(new_issue.weight)
           expect(issue.epic).to eq(epic)
         end
+
+        context 'when created from a vulnerability' do
+          let(:vulnerability) { create(:vulnerability, :with_finding, project: project) }
+
+          before do
+            stub_licensed_features(security_dashboard: true)
+          end
+
+          it 'links the issue to the vulnerability' do
+            project.add_developer(user)
+            sign_in(user)
+
+            post :create, params: {
+              namespace_id: project.namespace.to_param,
+              project_id: project,
+              issue: { title: 'Title', description: 'Description' },
+              vulnerability_id: vulnerability.id
+            }
+
+            expect(project.issues.first.vulnerability_links).to be_present
+          end
+        end
       end
     end
 
