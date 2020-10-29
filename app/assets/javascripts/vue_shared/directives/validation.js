@@ -1,15 +1,27 @@
 import { merge } from 'lodash';
 import { s__ } from '~/locale';
 
-export const defaultValidationMessages = {
+/**
+ * Validation messages will take priority based on the property order.
+ * For example:
+ * { valueMissing: {...}, urlTypeMismatch: {...} }
+ *
+ * `valueMissing` will be displayed the user has entered a value
+ *  after that, if the input is not a valid URL then `urlTypeMismatch` will show
+ */
+const defaultFeedbackMap = {
+  valueMissing: {
+    isInvalid: el => el.validity?.valueMissing,
+    message: s__('Please fill out this field.'),
+  },
   urlTypeMismatch: {
-    check: el => el.type === 'url' && el.validity?.typeMismatch,
+    isInvalid: el => el.type === 'url' && el.validity?.typeMismatch,
     message: s__('Please enter a valid URL format, ex: http://www.example.com/home'),
   },
 };
 
-const getCustomValidationMessage = (feedback, el) =>
-  Object.values(feedback).find(f => f.check(el))?.message || '';
+const getFeedbackForElement = (feedbackMap, el) =>
+  Object.values(feedbackMap).find(f => f.isInvalid(el))?.message || el.validationMessage;
 
 const focusFirstInvalidInput = e => {
   const { target: formEl } = e;
@@ -20,23 +32,22 @@ const focusFirstInvalidInput = e => {
   }
 };
 
-const createValidator = (context, validationMessages) => el => {
+const isEveryFieldValid = form => Object.values(form.fields).every(({ state }) => state === true);
+
+const createValidator = (context, feedbackMap) => el => {
   const { form } = context;
   const { name } = el;
-
+  const formField = form.fields[name];
   const isValid = el.checkValidity();
 
-  form.fields[name].state = isValid;
-  form.fields[name].feedback =
-    getCustomValidationMessage(validationMessages, el) || el.validationMessage;
+  formField.state = isValid;
+  formField.feedback = getFeedbackForElement(feedbackMap, el);
 
-  form.state = !Object.values(form.fields).some(field => field.state === false);
-
-  return isValid;
+  form.state = isEveryFieldValid(form);
 };
 
-export default function(customValidationMessages = {}) {
-  const feedback = merge(defaultValidationMessages, customValidationMessages);
+export default function(customFeedbackMap = {}) {
+  const feedbackMap = merge(defaultFeedbackMap, customFeedbackMap);
   const elDataMap = new WeakMap();
 
   return {
@@ -44,12 +55,14 @@ export default function(customValidationMessages = {}) {
       const { arg: showGlobalValidation } = binding;
       const { form: formEl } = el;
 
-      const validate = createValidator(context, feedback);
+      const validate = createValidator(context, feedbackMap);
       const elData = { validate, isTouched: false, isBlurred: false };
+
       elDataMap.set(el, elData);
 
       el.addEventListener('input', function markAsTouched() {
         elData.isTouched = true;
+        // once the element has been marked as touched we can stop listening on the 'input' event
         el.removeEventListener('input', markAsTouched);
       });
 
@@ -57,7 +70,7 @@ export default function(customValidationMessages = {}) {
         if (elData.isTouched) {
           elData.isBlurred = true;
           validate(target);
-          // this event handler can be removed, since the live-feedback now takes over
+          // this event handler can be removed, since the live-feedback in `update` takes over
           el.removeEventListener('blur', markAsBlurred);
         }
       });
