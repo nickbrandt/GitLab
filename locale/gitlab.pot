@@ -10818,6 +10818,9 @@ msgstr ""
 msgid "Error occurred. User was not unlocked"
 msgstr ""
 
+msgid "Error parsing CSV file. Please make sure it has"
+msgstr ""
+
 msgid "Error rendering markdown preview"
 msgstr ""
 
@@ -10894,6 +10897,9 @@ msgid "ErrorTracking|To enable project selection, enter a valid Auth Token"
 msgstr ""
 
 msgid "Errors"
+msgstr ""
+
+msgid "Errors found on line %{line_number}: %{error_lines}. Please check if these lines have a requirement title."
 msgstr ""
 
 msgid "Errors:"
@@ -14129,6 +14135,9 @@ msgid "ImportProjects|The repository could not be created."
 msgstr ""
 
 msgid "ImportProjects|Update of imported projects with realtime changes failed"
+msgstr ""
+
+msgid "Imported requirements"
 msgstr ""
 
 msgid "Improve Issue Boards"
@@ -31167,6 +31176,9 @@ msgstr ""
 msgid "Your CSV export of %{written_count} from project %{project_name} (%{project_url}) has been added to this email as an attachment."
 msgstr ""
 
+msgid "Your CSV import for project"
+msgstr ""
+
 msgid "Your Commit Email will be used for web based operations, such as edits and merges."
 msgstr ""
 
@@ -31921,6 +31933,9 @@ msgid "has already been linked to another vulnerability"
 msgstr ""
 
 msgid "has already been taken"
+msgstr ""
+
+msgid "has been completed."
 msgstr ""
 
 msgid "help"
@@ -32757,6 +32772,9 @@ msgid "tag name"
 msgstr ""
 
 msgid "teammate%{number}@company.com"
+msgstr ""
+
+msgid "the correct format."
 msgstr ""
 
 msgid "the following issue(s)"
