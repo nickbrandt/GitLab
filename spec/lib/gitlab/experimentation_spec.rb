@@ -25,6 +25,7 @@ RSpec.describe Gitlab::Experimentation::EXPERIMENTS do
 
     backwards_compatible_experiment_keys = described_class.filter { |_, v| v[:use_backwards_compatible_subject_index] }.keys
 
+    expect(backwards_compatible_experiment_keys).not_to be_empty, "Oh, hey! Let's clean up that :use_backwards_compatible_subject_index stuff now :D"
     expect(backwards_compatible_experiment_keys).to match(expected_experiment_keys)
   end
 end
