@@ -2392,6 +2392,29 @@
           "possibleTypes": null
         },
         {
+          "kind": "ENUM",
+          "name": "AvailabilityEnum",
+          "description": "User availability status",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "NOT_SET",
+              "description": "Not Set",
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "BUSY",
+              "description": "Busy",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "AwardEmoji",
           "description": "An emoji awarded by a user",
@@ -62028,6 +62051,24 @@
           "name": "UserStatus",
           "description": null,
           "fields": [
+            {
+              "name": "availability",
+              "description": "User availability status",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "AvailabilityEnum",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "emoji",
               "description": "String representation of emoji",
