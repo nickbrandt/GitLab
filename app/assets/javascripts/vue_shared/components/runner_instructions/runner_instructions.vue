@@ -44,9 +44,7 @@ export default {
         };
       },
       update(data) {
-        this.groupId = data.group?.id;
-        this.projectId = data.project?.id;
-        return data?.runnerPlatforms?.nodes;
+        return data;
       },
       error() {
         this.showAlert = true;
@@ -59,9 +57,7 @@ export default {
       selectedPlatformArchitectures: [],
       selectedPlatform: {},
       selectedArchitecture: {},
-      runnerPlatforms: [],
-      projectId: '',
-      groupId: '',
+      runnerPlatforms: {},
       instructions: {},
     };
   },
@@ -72,10 +68,19 @@ export default {
     instructionsEmpty() {
       return this.instructions && Object.keys(this.instructions).length === 0;
     },
+    groupId() {
+      return this.runnerPlatforms?.group?.id ?? '';
+    },
+    projectId() {
+      return this.runnerPlatforms?.project?.id ?? '';
+    },
+    platforms() {
+      return this.runnerPlatforms.runnerPlatforms?.nodes;
+    },
   },
   methods: {
     selectPlatform(name) {
-      this.selectedPlatform = this.runnerPlatforms.find(platform => platform.name === name);
+      this.selectedPlatform = this.platforms.find(platform => platform.name === name);
       this.selectedPlatformArchitectures = this.selectedPlatform?.architectures?.nodes;
       [this.selectedArchitecture] = this.selectedPlatformArchitectures;
       this.selectArchitecture(this.selectedArchitecture);
@@ -88,8 +93,8 @@ export default {
           return {
             platform: this.selectedPlatform.name,
             architecture: this.selectedArchitecture.name,
-            projectId: this.projectId ? this.projectId : '',
-            groupId: this.groupId ? this.groupId : '',
+            projectId: this.projectId,
+            groupId: this.groupId,
           };
         },
         query: getRunnerSetupInstructions,
@@ -138,7 +143,7 @@ export default {
       <h5>{{ __('Environment') }}</h5>
       <gl-button-group class="gl-mb-5">
         <gl-button
-          v-for="platform in runnerPlatforms"
+          v-for="platform in platforms"
           :key="platform.name"
           data-testid="platform-button"
           @click="selectPlatform(platform.name)"
