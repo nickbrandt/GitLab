@@ -784,11 +784,6 @@ module ProjectsHelper
   def project_access_token_available?(project)
     can?(current_user, :admin_resource_access_tokens, project)
   end
-
-  def can_view_pipeline_editor?(project)
-    can_collaborate_with_project?(project) &&
-      ::Gitlab::Ci::Features.ci_pipeline_editor_page_enabled?(project)
-  end
 end
 
 ProjectsHelper.prepend_if_ee('EE::ProjectsHelper')
