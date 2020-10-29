@@ -18,17 +18,26 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
     end
   end
 
+  shared_examples_for 'importer with email notification' do
+    it 'notifies user of import result' do
+      if issuable_type == 'issue'
+        expect(Notify).to receive_message_chain(email_method, :deliver_later)
+
+        subject
+      end
+    end
+  end
+
   describe '#execute' do
     context 'invalid file' do
       let(:file) { fixture_file_upload('spec/fixtures/banana_sample.gif') }
 
       it 'returns invalid file error' do
-        expect(Notify).to receive_message_chain(email_method, :deliver_later)
-
         expect(subject[:success]).to eq(0)
         expect(subject[:parse_error]).to eq(true)
       end
 
+      it_behaves_like 'importer with email notification'
       it_behaves_like 'an issuable importer'
     end
 
@@ -36,8 +45,6 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
       let(:file) { fixture_file_upload('spec/fixtures/csv_gitlab_export.csv') }
 
       it 'imports the CSV without errors' do
-        expect(Notify).to receive_message_chain(email_method, :deliver_later)
-
         expect(subject[:success]).to eq(4)
         expect(subject[:error_lines]).to eq([])
         expect(subject[:parse_error]).to eq(false)
@@ -52,6 +59,7 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
         )
       end
 
+      it_behaves_like 'importer with email notification'
       it_behaves_like 'an issuable importer'
     end
 
@@ -59,8 +67,6 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
       let(:file) { fixture_file_upload('spec/fixtures/csv_comma.csv') }
 
       it 'imports CSV without errors' do
-        expect(Notify).to receive_message_chain(email_method, :deliver_later)
-
         expect(subject[:success]).to eq(3)
         expect(subject[:error_lines]).to eq([])
         expect(subject[:parse_error]).to eq(false)
@@ -75,6 +81,7 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
         )
       end
 
+      it_behaves_like 'importer with email notification'
       it_behaves_like 'an issuable importer'
     end
 
@@ -82,8 +89,6 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
       let(:file) { fixture_file_upload('spec/fixtures/csv_tab.csv') }
 
       it 'imports CSV with some error rows' do
-        expect(Notify).to receive_message_chain(email_method, :deliver_later)
-
         expect(subject[:success]).to eq(2)
         expect(subject[:error_lines]).to eq([3])
         expect(subject[:parse_error]).to eq(false)
@@ -98,6 +103,7 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
         )
       end
 
+      it_behaves_like 'importer with email notification'
       it_behaves_like 'an issuable importer'
     end
 
@@ -105,8 +111,6 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
       let(:file) { fixture_file_upload('spec/fixtures/csv_semicolon.csv') }
 
       it 'imports CSV with a blank row' do
-        expect(Notify).to receive_message_chain(email_method, :deliver_later)
-
         expect(subject[:success]).to eq(3)
         expect(subject[:error_lines]).to eq([4])
         expect(subject[:parse_error]).to eq(false)
@@ -121,6 +125,7 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
         )
       end
 
+      it_behaves_like 'importer with email notification'
       it_behaves_like 'an issuable importer'
     end
   end

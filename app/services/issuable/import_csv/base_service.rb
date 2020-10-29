@@ -60,8 +60,6 @@ module Issuable
         # defined in ImportCsvService
       end
 
-      private
-
       def issuable(attributes)
         create_issuable_class.new(@project, @user, attributes).execute
       end

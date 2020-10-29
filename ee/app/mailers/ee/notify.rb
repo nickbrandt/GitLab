@@ -11,7 +11,6 @@ module EE
     prepended do
       include ::Emails::AdminNotification
       include ::Emails::Epics
-      include ::Emails::Requirements
     end
 
     attr_reader :group
