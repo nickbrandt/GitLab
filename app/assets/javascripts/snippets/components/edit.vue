@@ -46,7 +46,7 @@ export default {
       query: defaultVisibilityQuery,
       manual: true,
       result({ data: { selectedLevel } }) {
-        this.selectedLevelDefault = selectedLevel;
+        this.snippet.visibilityLevel = selectedLevel;
       },
     },
   },
@@ -73,9 +73,12 @@ export default {
   data() {
     return {
       isUpdating: false,
-      newSnippet: false,
       actions: [],
-      selectedLevelDefault: SNIPPET_VISIBILITY_PRIVATE,
+      snippet: {
+        title: '',
+        description: '',
+        visibilityLevel: SNIPPET_VISIBILITY_PRIVATE,
+      },
     };
   },
   computed: {
@@ -112,13 +115,6 @@ export default {
       }
       return this.snippet.webUrl;
     },
-    newSnippetSchema() {
-      return {
-        title: '',
-        description: '',
-        visibilityLevel: this.selectedLevelDefault,
-      };
-    },
   },
   beforeCreate() {
     performanceMarkAndMeasure({ mark: SNIPPET_MARK_EDIT_APP_START });
@@ -144,20 +140,6 @@ export default {
         : SNIPPET_UPDATE_MUTATION_ERROR;
       Flash(sprintf(defaultErrorMsg, { err }));
       this.isUpdating = false;
-    },
-    onNewSnippetFetched() {
-      this.newSnippet = true;
-      this.snippet = this.newSnippetSchema;
-    },
-    onExistingSnippetFetched() {
-      this.newSnippet = false;
-    },
-    onSnippetFetch(snippetRes) {
-      if (snippetRes.data.snippets.nodes.length === 0) {
-        this.onNewSnippetFetched();
-      } else {
-        this.onExistingSnippetFetched();
-      }
     },
     getAttachedFiles() {
       const fileInputs = Array.from(this.$el.querySelectorAll('[name="files[]"]'));
@@ -209,7 +191,7 @@ export default {
 </script>
 <template>
   <form
-    class="snippet-form js-requires-input js-quick-submit common-note-form"
+    class="snippet-form js-quick-submit common-note-form"
     :data-snippet-type="isProjectSnippet ? 'project' : 'personal'"
     data-testid="snippet-edit-form"
     @submit.prevent="handleFormSubmit"
