@@ -23,13 +23,8 @@ module Ci
     end
 
     def failed_test_cases(test_reports_comparer)
-      [].tap do |test_cases|
-        test_reports_comparer.suite_comparers.each do |suite_comparer|
-          # We're basing off the limited tests because this is what's presented on the MR widget
-          # and at the same time we only want to query for a limited amount of test failures.
-          limited_tests = suite_comparer.limited_tests
-          test_cases.concat(limited_tests.new_failures + limited_tests.existing_failures)
-        end
+      test_reports_comparer.suite_comparers.flat_map do |suite_comparer|
+        suite_comparer.limited_tests.new_failures + suite_comparer.limited_tests.existing_failures
       end
     end
   end

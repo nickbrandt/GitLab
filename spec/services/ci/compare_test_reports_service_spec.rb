@@ -47,28 +47,36 @@ RSpec.describe Ci::CompareTestReportsService do
 
     context 'test failure history' do
       let!(:base_pipeline) { nil }
-      let!(:head_pipeline) { create(:ci_pipeline, :with_test_reports, project: project) }
+      let!(:head_pipeline) { create(:ci_pipeline, :with_test_reports_with_three_failures, project: project) }
+
+      let(:new_failures) do
+        comparison.dig(:data, 'suites', 0, 'new_failures')
+      end
 
       let(:recent_failures_per_test_case) do
-        comparison.dig(:data, 'suites', 0, 'new_failures').map { |f| f['recent_failures'] }
+        new_failures.map { |f| f['recent_failures'] }
       end
 
       # Create test case failure records based on the head pipeline build
       before do
+        stub_const("Gitlab::Ci::Reports::TestSuiteComparer::DEFAULT_MAX_TESTS", 2)
+        stub_const("Gitlab::Ci::Reports::TestSuiteComparer::DEFAULT_MIN_TESTS", 1)
+
         build = head_pipeline.builds.last
         build.update_column(:finished_at, 1.day.ago) # Just to be sure we are included in the report window
 
-        # The JUnit fixture for the given build has 2 failures.
+        # The JUnit fixture for the given build has 3 failures.
         # This service will create 1 test case failure record for each.
         Ci::TestCasesService.new.execute(build)
       end
 
-      it 'loads on the report', :aggregate_failures do
+      it 'loads recent failures on limited test cases to avoid building up a huge DB query', :aggregate_failures do
         expect(comparison[:data]).to match_schema('entities/test_reports_comparer')
         expect(recent_failures_per_test_case).to eq([
           { 'count' => 1, 'base_branch' => 'master' },
           { 'count' => 1, 'base_branch' => 'master' }
         ])
+        expect(new_failures.count).to eq(2)
       end
     end
   end
