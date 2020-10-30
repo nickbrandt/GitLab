@@ -3690,6 +3690,7 @@ Values for sorting projects.
 | Value | Description |
 | ----- | ----------- |
 | `SIMILARITY` | Most similar to the search query |
+| `STORAGE` | Sort by storage size |
 
 ### PackageTypeEnum
 
