@@ -4,10 +4,10 @@ group: Package
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
-# Dependency Proxy **(PREMIUM)**
+# Dependency Proxy
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/7934) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.11.
-> - [Support for private groups](https://gitlab.com/gitlab-org/gitlab/-/issues/11582) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.6.
+> - [Support for private groups](https://gitlab.com/gitlab-org/gitlab/-/issues/11582) added in [GitLab Premium](https://about.gitlab.com/pricing/) 13.6.
 > - Anonymous access to images in public groups is no longer available starting in [GitLab Premium](https://about.gitlab.com/pricing/) 13.6.
 
 The GitLab Dependency Proxy is a local proxy you can use for your frequently-accessed
