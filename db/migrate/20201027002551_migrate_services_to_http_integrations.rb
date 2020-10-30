@@ -24,18 +24,25 @@ class MigrateServicesToHttpIntegrations < ActiveRecord::Migration[6.0]
       JOIN alerts_service_data
       ON (services.id = alerts_service_data.service_id)
       WHERE type = '#{ALERT_SERVICE_TYPE}'
+      AND active = TRUE
     SQL
 
-    select_all(sql).each do |alerts_service|
-      HttpIntegration.create!(
+    current_time = Time.current
+
+    values = select_all(sql).map do |alerts_service|
+      {
         project_id: alerts_service['project_id'],
         name: SERVICE_NAMES_IDENTIFIER[:name],
         endpoint_identifier: SERVICE_NAMES_IDENTIFIER[:identifier],
         encrypted_token: alerts_service['encrypted_token'],
         encrypted_token_iv: alerts_service['encrypted_token_iv'],
-        active: alerts_service['active']
-      )
+        active: alerts_service['active'],
+        updated_at: current_time,
+        created_at: current_time
+      }
     end
+
+    HttpIntegration.insert_all(values) if values.present?
   end
 
   def down

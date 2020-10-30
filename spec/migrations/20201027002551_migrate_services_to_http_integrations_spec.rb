@@ -6,7 +6,7 @@ require Rails.root.join('db', 'migrate', '20201027002551_migrate_services_to_htt
 RSpec.describe MigrateServicesToHttpIntegrations do
   let!(:namespace) { table(:namespaces).create!(name: 'namespace', path: 'namespace') }
   let!(:project) { table(:projects).create!(id: 1, namespace_id: namespace.id) }
-  let!(:alert_service) { table(:services).create!(type: 'AlertsService', project_id: project.id) }
+  let!(:alert_service) { table(:services).create!(type: 'AlertsService', project_id: project.id, active: true) }
   let!(:alert_service_data) { table(:alerts_service_data).create!(service_id: alert_service.id, encrypted_token: 'test', encrypted_token_iv: 'test')}
   let(:http_integrations) { table(:alert_management_http_integrations) }
 
