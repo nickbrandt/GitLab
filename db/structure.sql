@@ -11948,7 +11948,8 @@ CREATE TABLE experiment_users (
     user_id bigint NOT NULL,
     group_type smallint DEFAULT 0 NOT NULL,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    converted boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE experiment_users_id_seq
