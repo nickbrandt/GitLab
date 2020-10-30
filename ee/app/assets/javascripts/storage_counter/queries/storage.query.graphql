@@ -19,7 +19,7 @@ query getStorageCounter($fullPath: ID!, $withExcessStorageData: Boolean = false)
       wikiSize
       snippetsSize
     }
-    projects(includeSubgroups: true) {
+    projects(includeSubgroups: true, sort: STORAGE) {
       edges {
         node {
           id

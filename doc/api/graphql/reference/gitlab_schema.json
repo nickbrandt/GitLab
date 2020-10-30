@@ -39133,6 +39133,12 @@
               "description": "Most similar to the search query",
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "STORAGE",
+              "description": "Sort by storage size",
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null

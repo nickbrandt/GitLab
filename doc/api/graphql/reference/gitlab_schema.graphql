@@ -13276,6 +13276,11 @@ enum NamespaceProjectSort {
   Most similar to the search query
   """
   SIMILARITY
+
+  """
+  Sort by storage size
+  """
+  STORAGE
 }
 
 input NegatedBoardIssueInput {
