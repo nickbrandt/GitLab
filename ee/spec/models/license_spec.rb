@@ -28,38 +28,92 @@ RSpec.describe License do
     end
 
     describe '#check_users_limit' do
-      before do
-        create(:group_member, :guest)
-        create(:group_member, :reporter)
-        create(:license, plan: plan)
-      end
-
-      let(:users_count) { nil }
-      let(:new_license) do
-        gl_license = build(:gitlab_license, restrictions: { plan: plan, active_user_count: users_count, previous_user_count: 1 })
-        build(:license, data: gl_license.export)
-      end
-
-      where(:gl_plan, :valid) do
-        ::License::STARTER_PLAN  | false
-        ::License::PREMIUM_PLAN  | false
-        ::License::ULTIMATE_PLAN | true
-      end
-
-      with_them do
-        let(:plan) { gl_plan }
-
-        context 'when license has restricted users' do
-          let(:users_count) { 1 }
-
-          it { expect(new_license.valid?).to eq(valid) }
+      context 'for each plan' do
+        before do
+          create(:group_member, :guest)
+          create(:group_member, :reporter)
+          create(:license, plan: plan)
         end
 
-        context 'when license has unlimited users' do
-          let(:users_count) { nil }
+        let(:users_count) { nil }
+        let(:new_license) do
+          gl_license = build(:gitlab_license, restrictions: { plan: plan, active_user_count: users_count, previous_user_count: 1 })
+          build(:license, data: gl_license.export)
+        end
 
-          it 'is always valid' do
-            expect(new_license.valid?).to eq(true)
+        where(:gl_plan, :valid) do
+          ::License::STARTER_PLAN  | false
+          ::License::PREMIUM_PLAN  | false
+          ::License::ULTIMATE_PLAN | true
+        end
+
+        with_them do
+          let(:plan) { gl_plan }
+
+          context 'when license has restricted users' do
+            let(:users_count) { 1 }
+
+            it { expect(new_license.valid?).to eq(valid) }
+          end
+
+          context 'when license has unlimited users' do
+            let(:users_count) { nil }
+
+            it 'is always valid' do
+              expect(new_license.valid?).to eq(true)
+            end
+          end
+        end
+      end
+
+      context 'threshold for users overage' do
+        let(:current_active_users_count) { 0 }
+        let(:new_license) do
+          gl_license = build(
+            :gitlab_license,
+            starts_at: Date.today,
+            restrictions: { active_user_count: 10, previous_user_count: previous_user_count }
+          )
+
+          build(:license, data: gl_license.export)
+        end
+
+        context 'when current active users count is above the limit set by the license' do
+          before do
+            create_list(:user, current_active_users_count)
+            HistoricalData.track!
+          end
+
+          context 'when license is from a fresh subscription' do
+            let(:previous_user_count) { nil }
+
+            context 'when current active users count is under the threshold' do
+              let(:current_active_users_count) { 11 }
+
+              it 'accepts the license' do
+                expect(new_license).to be_valid
+              end
+            end
+
+            context 'when current active users count is above the threshold' do
+              let(:current_active_users_count) { 12 }
+
+              it 'does not accept the license' do
+                expect(new_license).not_to be_valid
+              end
+            end
+          end
+
+          context 'when license is from a renewal' do
+            let(:previous_user_count) { 1 }
+
+            context 'when current active users count is under the threshold' do
+              let(:current_active_users_count) { 11 }
+
+              it 'does not accept the license' do
+                expect(new_license).not_to be_valid
+              end
+            end
           end
         end
       end
