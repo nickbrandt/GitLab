@@ -1,0 +1,5 @@
+---
+title: Web IDE - Fix template parsing to include AWS templates
+merge_request: 46559
+author:
+type: fixed
