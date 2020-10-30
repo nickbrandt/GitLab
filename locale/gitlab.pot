@@ -17459,7 +17459,13 @@ msgstr ""
 msgid "Multi-project Runners cannot be removed"
 msgstr ""
 
+msgid "Multiple HTTP integrations are not supported for this project"
+msgstr ""
+
 msgid "Multiple IP address ranges are supported."
+msgstr ""
+
+msgid "Multiple Prometheus integrations are not supported"
 msgstr ""
 
 msgid "Multiple domains are supported."
@@ -30550,6 +30556,12 @@ msgid "You have imported from this project %{numberOfPreviousImports} times befo
 msgstr ""
 
 msgid "You have insufficient permissions to create a Todo for this alert"
+msgstr ""
+
+msgid "You have insufficient permissions to create an HTTP integration for this project"
+msgstr ""
+
+msgid "You have insufficient permissions to update this HTTP integration"
 msgstr ""
 
 msgid "You have no permissions"
