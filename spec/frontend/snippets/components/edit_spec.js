@@ -88,8 +88,8 @@ describe('Snippet Edit app', () => {
     props = {},
     loading = false,
     mutationRes = mutationTypes.RESOLVE,
+    selectedLevel = SNIPPET_VISIBILITY_PRIVATE,
     withApollo = false,
-    apolloData = { selectedLevel: SNIPPET_VISIBILITY_PRIVATE },
   } = {}) {
     let componentData = {
       mocks: {
@@ -99,13 +99,6 @@ describe('Snippet Edit app', () => {
           },
           mutate: mutationRes,
         },
-      },
-      data() {
-        return {
-          snippet: {
-            visibilityLevel: SNIPPET_VISIBILITY_PRIVATE,
-          },
-        };
       },
     };
 
@@ -119,11 +112,6 @@ describe('Snippet Edit app', () => {
 
       const requestHandlers = [[GetSnippetQuery, GetSnippetQuerySpy]];
       fakeApollo = createMockApollo(requestHandlers);
-      fakeApollo.clients.defaultClient.cache.writeData({
-        data: {
-          ...apolloData,
-        },
-      });
       componentData = {
         localVue,
         apolloProvider: fakeApollo,
@@ -135,6 +123,9 @@ describe('Snippet Edit app', () => {
       stubs: {
         ApolloMutation,
         FormFooterActions,
+      },
+      provide: {
+        selectedLevel,
       },
       propsData: {
         snippetGid: 'gid://gitlab/PersonalSnippet/42',
@@ -273,14 +264,8 @@ describe('Snippet Edit app', () => {
         async visibility => {
           createComponent({
             props: { snippetGid: '' },
-            withApollo: true,
-            apolloData: {
-              selectedLevel: visibility,
-            },
+            selectedLevel: visibility,
           });
-          jest.runOnlyPendingTimers();
-          await wrapper.vm.$nextTick();
-
           expect(wrapper.vm.snippet.visibilityLevel).toEqual(visibility);
         },
       );

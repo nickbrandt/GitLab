@@ -16,12 +16,7 @@ import { performanceMarkAndMeasure } from '~/performance_utils';
 import UpdateSnippetMutation from '../mutations/updateSnippet.mutation.graphql';
 import CreateSnippetMutation from '../mutations/createSnippet.mutation.graphql';
 import { getSnippetMixin } from '../mixins/snippets';
-import {
-  SNIPPET_CREATE_MUTATION_ERROR,
-  SNIPPET_UPDATE_MUTATION_ERROR,
-  SNIPPET_VISIBILITY_PRIVATE,
-} from '../constants';
-import defaultVisibilityQuery from '../queries/snippet_visibility.query.graphql';
+import { SNIPPET_CREATE_MUTATION_ERROR, SNIPPET_UPDATE_MUTATION_ERROR } from '../constants';
 import { markBlobPerformance } from '../utils/blob';
 
 import SnippetBlobActionsEdit from './snippet_blob_actions_edit.vue';
@@ -41,15 +36,7 @@ export default {
     GlLoadingIcon,
   },
   mixins: [getSnippetMixin],
-  apollo: {
-    defaultVisibility: {
-      query: defaultVisibilityQuery,
-      manual: true,
-      result({ data: { selectedLevel } }) {
-        this.snippet.visibilityLevel = selectedLevel;
-      },
-    },
-  },
+  inject: ['selectedLevel'],
   props: {
     markdownPreviewPath: {
       type: String,
@@ -77,7 +64,7 @@ export default {
       snippet: {
         title: '',
         description: '',
-        visibilityLevel: SNIPPET_VISIBILITY_PRIVATE,
+        visibilityLevel: this.selectedLevel,
       },
     };
   },
