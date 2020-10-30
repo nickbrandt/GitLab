@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Groups::DependencyProxyForContainersController do
   include HttpBasicAuthHelpers
-  include EE::DependencyProxyHelpers
+  include DependencyProxyHelpers
 
   let_it_be(:user) { create(:user) }
   let(:group) { create(:group) }
@@ -50,6 +50,20 @@ RSpec.describe Groups::DependencyProxyForContainersController do
     end
 
     it { is_expected.to have_gitlab_http_status(:not_found) }
+  end
+
+  shared_examples 'not found when disabled' do
+    context 'feature disabled' do
+      before do
+        disable_dependency_proxy
+      end
+
+      it 'returns 404' do
+        subject
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
   end
 
   before do
@@ -126,11 +140,7 @@ RSpec.describe Groups::DependencyProxyForContainersController do
       end
     end
 
-    it 'returns 404 when feature is disabled' do
-      subject
-
-      expect(response).to have_gitlab_http_status(:not_found)
-    end
+    it_behaves_like 'not found when disabled'
   end
 
   describe 'GET #blob' do
@@ -186,15 +196,14 @@ RSpec.describe Groups::DependencyProxyForContainersController do
       end
     end
 
-    it 'returns 404 when feature is disabled' do
-      subject
-
-      expect(response).to have_gitlab_http_status(:not_found)
-    end
+    it_behaves_like 'not found when disabled'
   end
 
   def enable_dependency_proxy
-    stub_licensed_features(dependency_proxy: true)
     group.create_dependency_proxy_setting!(enabled: true)
+  end
+
+  def disable_dependency_proxy
+    group.create_dependency_proxy_setting!(enabled: false)
   end
 end
