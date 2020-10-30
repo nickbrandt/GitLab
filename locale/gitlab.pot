@@ -10884,6 +10884,9 @@ msgstr ""
 msgid "Expand approvers"
 msgstr ""
 
+msgid "Expand file"
+msgstr ""
+
 msgid "Expand milestones"
 msgstr ""
 
@@ -11583,6 +11586,9 @@ msgid "Files"
 msgstr ""
 
 msgid "Files breadcrumb"
+msgstr ""
+
+msgid "Files with large changes are collapsed by default."
 msgstr ""
 
 msgid "Files, directories, and submodules in the path %{path} for commit reference %{ref}"
