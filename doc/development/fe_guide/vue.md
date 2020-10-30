@@ -188,9 +188,12 @@ Check this [page](vuex.md) for more details.
 ## Style guide
 
 Please refer to the Vue section of our [style guide](style/vue.md)
-for best practices while writing your Vue components and templates.
+for best practices while writing and testing your Vue components and templates.
 
 ## Testing Vue Components
+
+Please refer to the [Vue testing style guide](style/vue.md#vue-testing)
+for guidelines and best practices for testing your Vue components.
 
 Each Vue component has a unique output. This output is always present in the render function.
 
