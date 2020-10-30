@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Profiles::UsageQuotasController < Profiles::ApplicationController
-  before_action :push_additional_repo_storage_by_namespace_feature
+  before_action :push_additional_repo_storage_by_namespace_feature, only: :index
 
   feature_category :purchase
 
