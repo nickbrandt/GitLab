@@ -9,47 +9,10 @@ RSpec.describe 'Groups > Usage Quotas' do
   let(:gitlab_dot_com) { true }
 
   before do
-    stub_feature_flags(additional_repo_storage_by_namespace: true, namespace_storage_limit: false)
     allow(Gitlab).to receive(:com?).and_return(gitlab_dot_com)
 
     group.add_owner(user)
     sign_in(user)
-  end
-
-  it 'pushes frontend feature flags' do
-    visit visit_pipeline_quota_page
-
-    expect(page).to have_pushed_frontend_feature_flags(
-      additionalRepoStorageByNamespace: true
-    )
-  end
-
-  context 'when `additional_repo_storage_by_namespace` is disabled for a group' do
-    before do
-      stub_feature_flags(additional_repo_storage_by_namespace: false, thing: group)
-    end
-
-    it 'pushes disabled feature flag to the frontend' do
-      visit visit_pipeline_quota_page
-
-      expect(page).to have_pushed_frontend_feature_flags(
-        additionalRepoStorageByNamespace: false
-      )
-    end
-  end
-
-  context 'when `additional_repo_storage_by_namespace` is overruled by `namespace_storage_limit`' do
-    before do
-      stub_feature_flags(namespace_storage_limit: true, thing: group)
-    end
-
-    it 'pushes disabled feature flag to the frontend' do
-      visit profile_usage_quotas_path
-
-      expect(page).to have_pushed_frontend_feature_flags(
-        additionalRepoStorageByNamespace: false
-      )
-    end
   end
 
   shared_examples 'linked in group settings dropdown' do
