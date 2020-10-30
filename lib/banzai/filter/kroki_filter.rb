@@ -9,20 +9,23 @@ module Banzai
     # HTML that replaces all diagrams supported by Kroki with the corresponding img tags.
     #
     class KrokiFilter < HTML::Pipeline::Filter
-      DIAGRAM_SELECTORS = ::Gitlab::Kroki::DIAGRAM_TYPES.map do |diagram_type|
-        %(pre[lang="#{diagram_type}"] > code)
-      end.join(', ')
+      DIAGRAM_SELECTORS = ::Gitlab::Kroki::DIAGRAM_TYPES.map(&:to_selector).join(', ')
+      DIAGRAM_SELECTORS_WO_PLANTUML = ::Gitlab::Kroki::DIAGRAM_TYPES.select do |diagram_type|
+        diagram_type != 'plantuml'
+      end.map(&:to_selector).join(', ')
 
       def call
         plantuml_enabled = settings.plantuml_enabled
-        diagram_selectors = ::Gitlab::Kroki::DIAGRAM_TYPES.map do |diagram_type|
-          # if PlantUML is enabled, PlantUML diagrams will be processed by the PlantUML filter.
-          %(pre[lang="#{diagram_type}"] > code) if (plantuml_enabled && diagram_type != 'plantuml') || !plantuml_enabled
-        end.compact.join(', ')
+        # if PlantUML is enabled, PlantUML diagrams will be processed by the PlantUML filter.
+        diagram_selectors = if settings.plantuml_enabled
+                              DIAGRAM_SELECTORS_WO_PLANTUML
+                            else
+                              DIAGRAM_SELECTORS
+                            end
         return doc unless settings.kroki_enabled && doc.at(diagram_selectors)
 
         diagram_format = "svg"
-        doc.css(DIAGRAM_SELECTORS).each do |node|
+        doc.css(diagram_selectors).each do |node|
           diagram_type = node.parent['lang']
           img_tag = Nokogiri::HTML::DocumentFragment.parse(%(<img src="#{create_image_src(diagram_type, diagram_format, node.content)}"/>))
           node.parent.replace(img_tag)
@@ -32,6 +35,10 @@ module Banzai
       end
 
       private
+
+      def self.to_selector (diagram_type)
+        %(pre[lang="#{diagram_type}"] > code)
+      end
 
       # QUESTION: should should we use the asciidoctor-kroki gem to delegate this logic?
       def create_image_src(type, format, text)
