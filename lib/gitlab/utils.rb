@@ -10,6 +10,8 @@ module Gitlab
     # Also see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/24223#note_284122580
     # It also checks for ALT_SEPARATOR aka '\' (forward slash)
     def check_path_traversal!(path)
+      return unless path.is_a?(String)
+
       path = decode_path(path)
       path_regex = /(\A(\.{1,2})\z|\A\.\.[\/\\]|[\/\\]\.\.\z|[\/\\]\.\.[\/\\]|\n)/
 
