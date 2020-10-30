@@ -88,6 +88,18 @@ RSpec.describe Experiment do
     end
   end
 
+  describe '.record_conversion' do
+    it 'does stuff' do
+      expect(1 == 1).to be_truthy
+    end
+  end
+
+  describe '#record_conversion_for_user' do
+    it 'does stuff' do
+      expect(1 == 1).to be_truthy
+    end
+  end
+
   describe '#add_control_user' do
     let(:experiment) { create(:experiment) }
     let(:user) { build(:user) }

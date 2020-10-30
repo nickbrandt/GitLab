@@ -19,11 +19,21 @@ class Experiment < ApplicationRecord
     group_type == GROUP_CONTROL ? experiment.add_control_user(user) : experiment.add_experimental_user(user)
   end
 
+  def self.record_conversion(name, user)
+    return unless experiment = find_or_create_by(name: name)
+
+    experiment.record_conversion_for_user(user)
+  end
+
   def add_control_user(user)
     control_group_users << user
   end
 
   def add_experimental_user(user)
     experimental_group_users << user
+  end
+
+  def record_conversion_for_user(user)
+    experiment_user.find_by(user: user)&.update(converted: true)
   end
 end

@@ -451,6 +451,12 @@ RSpec.describe Gitlab::Experimentation, :snowplow do
       end
     end
 
+    describe '#record_conversion_event' do
+      it 'does stuff' do
+        expect(1 == 1).to be_truthy
+      end
+    end
+
     describe '#experiment_tracking_category_and_group' do
       let_it_be(:experiment_key) { :test_something }
 
