@@ -269,7 +269,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     let!(:older_other_pipeline) { create(:ci_pipeline, project: project) }
 
     let!(:upstream_pipeline) { create(:ci_pipeline, project: project) }
-    let!(:child_pipeline) { create(:ci_pipeline, project: project) }
+    let!(:child_pipeline) { create(:ci_pipeline, child_of: upstream_pipeline) }
 
     let!(:other_pipeline) { create(:ci_pipeline, project: project) }
 
@@ -2754,13 +2754,9 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     context 'when pipeline is child' do
-      let(:parent) { create(:ci_pipeline, project: pipeline.project) }
-      let(:sibling) { create(:ci_pipeline, project: pipeline.project) }
-
-      before do
-        create_source_pipeline(parent, pipeline)
-        create_source_pipeline(parent, sibling)
-      end
+      let(:parent) { create(:ci_pipeline, project: project) }
+      let!(:pipeline) { create(:ci_pipeline, child_of: parent) }
+      let!(:sibling) { create(:ci_pipeline, child_of: parent) }
 
       it 'returns parent sibling and self ids' do
         expect(subject).to contain_exactly(parent.id, pipeline.id, sibling.id)
@@ -2768,11 +2764,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     context 'when pipeline is parent' do
-      let(:child) { create(:ci_pipeline, project: pipeline.project) }
-
-      before do
-        create_source_pipeline(pipeline, child)
-      end
+      let!(:child) { create(:ci_pipeline, child_of: pipeline) }
 
       it 'returns self and child ids' do
         expect(subject).to contain_exactly(pipeline.id, child.id)
@@ -2780,17 +2772,11 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     context 'when pipeline is a child of a child pipeline' do
-      let(:ancestor) { create(:ci_pipeline, project: pipeline.project) }
-      let(:parent) { create(:ci_pipeline, project: pipeline.project) }
-      let(:cousin_parent) { create(:ci_pipeline, project: pipeline.project) }
-      let(:cousin) { create(:ci_pipeline, project: pipeline.project) }
-
-      before do
-        create_source_pipeline(ancestor, parent)
-        create_source_pipeline(ancestor, cousin_parent)
-        create_source_pipeline(parent, pipeline)
-        create_source_pipeline(cousin_parent, cousin)
-      end
+      let(:ancestor) { create(:ci_pipeline, project: project) }
+      let!(:parent) { create(:ci_pipeline, child_of: ancestor) }
+      let!(:pipeline) { create(:ci_pipeline, child_of: parent) }
+      let!(:cousin_parent) { create(:ci_pipeline, child_of: ancestor) }
+      let!(:cousin) { create(:ci_pipeline, child_of: cousin_parent) }
 
       it 'returns all family ids' do
         expect(subject).to contain_exactly(
@@ -2800,14 +2786,50 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     context 'when pipeline is a triggered pipeline' do
-      let(:upstream) { create(:ci_pipeline, project: create(:project)) }
-
-      before do
-        create_source_pipeline(upstream, pipeline)
-      end
+      let!(:upstream) { create(:ci_pipeline, project: create(:project), upstream_of: pipeline)}
 
       it 'returns self id' do
         expect(subject).to contain_exactly(pipeline.id)
+      end
+    end
+  end
+
+  describe '#root_ancestor' do
+    subject { pipeline.root_ancestor }
+
+    let_it_be(:pipeline) { create(:ci_pipeline, project: project) }
+
+    context 'when pipeline is child of child pipeline' do
+      let!(:root_ancestor) { create(:ci_pipeline, project: project) }
+      let!(:parent_pipeline) { create(:ci_pipeline, child_of: root_ancestor) }
+      let!(:pipeline) { create(:ci_pipeline, child_of: parent_pipeline) }
+
+      it 'returns the root ancestor' do
+        expect(subject).to eq(root_ancestor)
+      end
+    end
+
+    context 'when pipeline is root ancestor' do
+      let!(:child_pipeline) { create(:ci_pipeline, child_of: pipeline) }
+
+      it 'returns itself' do
+        expect(subject).to eq(pipeline)
+      end
+    end
+
+    context 'when pipeline is standalone' do
+      it 'returns itself' do
+        expect(subject).to eq(pipeline)
+      end
+    end
+
+    context 'when pipeline is multi-project downstream pipeline' do
+      let!(:upstream_pipeline) do
+        create(:ci_pipeline, project: create(:project), upstream_of: pipeline)
+      end
+
+      it 'ignores cross project ancestors' do
+        expect(subject).to eq(pipeline)
       end
     end
   end
@@ -3552,18 +3574,9 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
   describe '#parent_pipeline' do
     let_it_be(:project) { create(:project) }
 
-    let(:pipeline) { create(:ci_pipeline, project: project) }
-
     context 'when pipeline is triggered by a pipeline from the same project' do
-      let(:upstream_pipeline) { create(:ci_pipeline, project: pipeline.project) }
-
-      before do
-        create(:ci_sources_pipeline,
-          source_pipeline: upstream_pipeline,
-          source_project: project,
-          pipeline: pipeline,
-          project: project)
-      end
+      let_it_be(:upstream_pipeline) { create(:ci_pipeline, project: project) }
+      let_it_be(:pipeline) { create(:ci_pipeline, child_of: upstream_pipeline) }
 
       it 'returns the parent pipeline' do
         expect(pipeline.parent_pipeline).to eq(upstream_pipeline)
@@ -3575,15 +3588,8 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     context 'when pipeline is triggered by a pipeline from another project' do
-      let(:upstream_pipeline) { create(:ci_pipeline) }
-
-      before do
-        create(:ci_sources_pipeline,
-          source_pipeline: upstream_pipeline,
-          source_project: upstream_pipeline.project,
-          pipeline: pipeline,
-          project: project)
-      end
+      let(:pipeline) { create(:ci_pipeline, project: project) }
+      let!(:upstream_pipeline) { create(:ci_pipeline, project: create(:project), upstream_of: pipeline) }
 
       it 'returns nil' do
         expect(pipeline.parent_pipeline).to be_nil
@@ -3595,6 +3601,8 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     context 'when pipeline is not triggered by a pipeline' do
+      let_it_be(:pipeline) { create(:ci_pipeline) }
+
       it 'returns nil' do
         expect(pipeline.parent_pipeline).to be_nil
       end
