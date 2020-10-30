@@ -62401,6 +62401,20 @@
               "deprecationReason": null
             },
             {
+              "name": "groupCount",
+              "description": "Group count for the user. Available only when feature flag `user_group_counts` is enabled",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "groupMemberships",
               "description": "Group memberships of the user",
               "args": [
