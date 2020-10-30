@@ -216,9 +216,7 @@ too complex. For more information, read [`issuable.rb`](https://gitlab.com/gitla
 
 In cases like this, we can fall back to regular offset pagination by returning a 
 [`Gitlab::Graphql::Pagination::OffsetActiveRecordRelationConnection`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/graphql/pagination/offset_active_record_relation_connection.rb)
-instead of an `ActiveRecord::Relation`
-
-For example:
+instead of an `ActiveRecord::Relation`:
 
 ```ruby
     def resolve(parent, finder, **args)
