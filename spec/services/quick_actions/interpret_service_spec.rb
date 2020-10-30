@@ -1912,7 +1912,7 @@ RSpec.describe QuickActions::InterpretService do
       it 'includes the new status' do
         _, explanations = service.explain(content, merge_request)
 
-        expect(explanations).to eq(['Marks this merge request as Draft.'])
+        expect(explanations).to eq(['Marks this merge request as a draft.'])
       end
     end
 

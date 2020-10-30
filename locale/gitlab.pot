@@ -16233,7 +16233,7 @@ msgstr ""
 msgid "Marked to do as done."
 msgstr ""
 
-msgid "Marks this %{noun} as Draft."
+msgid "Marks this %{noun} as a draft."
 msgstr ""
 
 msgid "Marks this issue as a duplicate of %{duplicate_reference}."
@@ -28592,7 +28592,7 @@ msgstr ""
 msgid "Unmarked this %{noun} as Draft."
 msgstr ""
 
-msgid "Unmarks this %{noun} as Draft."
+msgid "Unmarks this %{noun} as a draft."
 msgstr ""
 
 msgid "Unreachable"

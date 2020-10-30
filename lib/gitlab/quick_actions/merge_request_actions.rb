@@ -60,9 +60,9 @@ module Gitlab
         explanation do
           noun = quick_action_target.to_ability_name.humanize(capitalize: false)
           if quick_action_target.work_in_progress?
-            _("Unmarks this %{noun} as Draft.")
+            _("Unmarks this %{noun} as a draft.")
           else
-            _("Marks this %{noun} as Draft.")
+            _("Marks this %{noun} as a draft.")
           end % { noun: noun }
         end
         execution_message do
