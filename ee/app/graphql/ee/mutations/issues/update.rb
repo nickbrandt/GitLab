@@ -16,25 +16,8 @@ module EE
         end
 
         def resolve(**args)
-          if args.key?(:epic)
-            args[:epic_id] = epic_id(args.delete(:epic))
-          end
-
-          super(**args)
-        end
-
-        private
-
-        def epic_id(epic)
-          return unless epic
-
-          authorize_epic!(epic)
-          epic.id
-        end
-
-        def authorize_epic!(epic)
-          return if can?(:admin_epic, epic)
-
+          super
+        rescue ::Gitlab::Access::AccessDeniedError
           raise_resource_not_available_error!
         end
       end
