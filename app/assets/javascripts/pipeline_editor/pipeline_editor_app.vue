@@ -56,22 +56,19 @@ export default {
       return this.$apollo.queries.content.loading;
     },
     errorMessage() {
-      const { message, networkError } = this.error ?? {};
+      const { message: generalReason, networkError } = this.error ?? {};
 
-      let reason = message ?? this.$options.i18n.unknownMessage;
+      const { data } = networkError?.response ?? {};
+      // 404 for missing file uses `message`
+      // 400 for a missing ref uses `error`
+      const networkReason = data?.message ?? data?.error;
 
-      if (networkError && networkError.response) {
-        const { data = {} } = networkError.response;
-        // 400 for a missing ref uses `error`
-        // 404 for missing file uses `message`
-        reason = data.message ?? data.error ?? reason;
-      }
-
+      const reason = networkReason ?? generalReason ?? this.$options.i18n.unknownError;
       return sprintf(this.$options.i18n.errorMessageWithReason, { reason });
     },
   },
   i18n: {
-    unknownMessage: __('Unknown Error'),
+    unknownError: __('Unknown Error'),
     errorMessageWithReason: s__('Pipelines|CI file could not be loaded: %{reason}'),
   },
 };
