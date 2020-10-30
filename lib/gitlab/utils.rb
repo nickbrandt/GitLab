@@ -208,5 +208,33 @@ module Gitlab
     def stable_sort_by(list)
       list.sort_by.with_index { |x, idx| [yield(x), idx] }
     end
+
+    # Check for valid brackets (`[` and `]`) in a string using this aspects:
+    # * open brackets count == closed brackets count
+    # * (optionally) reject nested brackets via `allow_nested: false`
+    # * open / close brackets coherence, eg. ][[] -> invalid
+    def valid_brackets?(string = '', allow_nested: true)
+      # remove everything except brackets
+      brackets = string.remove(/[^\[\]]/)
+
+      return true if brackets.empty?
+      # balanced counts check
+      return false if brackets.size.odd?
+
+      unless allow_nested
+        # nested brackets check
+        return false if brackets.include?('[[') || brackets.include?(']]')
+      end
+
+      # open / close brackets coherence check
+      untrimmed = brackets
+      loop do
+        trimmed = untrimmed.gsub('[]', '')
+        return true if trimmed.empty?
+        return false if trimmed == untrimmed
+
+        untrimmed = trimmed
+      end
+    end
   end
 end
