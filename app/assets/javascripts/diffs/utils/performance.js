@@ -1,4 +1,4 @@
-import { performanceMarkAndMeasure } from '~/performance_utils';
+import { performanceMarkAndMeasure } from '~/performance/utils';
 import {
   MR_DIFFS_MARK_FILE_TREE_START,
   MR_DIFFS_MARK_FILE_TREE_END,
@@ -7,7 +7,7 @@ import {
   MR_DIFFS_MARK_DIFF_FILES_END,
   MR_DIFFS_MEASURE_FILE_TREE_DONE,
   MR_DIFFS_MEASURE_DIFF_FILES_DONE,
-} from '../../performance_constants';
+} from '../../performance/constants';
 
 import eventHub from '../event_hub';
 import {
