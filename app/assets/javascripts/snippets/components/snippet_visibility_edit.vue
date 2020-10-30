@@ -30,7 +30,7 @@ export default {
   },
   computed: {
     defaultVisibilityLevels() {
-      return defaultSnippetVisibilityLevels(this.visibilityLevels) || [];
+      return defaultSnippetVisibilityLevels(this.visibilityLevels);
     },
   },
   SNIPPET_LEVELS_DISABLED,
