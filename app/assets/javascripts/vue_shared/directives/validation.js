@@ -34,14 +34,26 @@ const focusFirstInvalidInput = e => {
 
 const isEveryFieldValid = form => Object.values(form.fields).every(({ state }) => state === true);
 
-const createValidator = (context, feedbackMap) => el => {
+const createValidator = (context, feedbackMap) => ({ el, reportValidity = false }) => {
   const { form } = context;
   const { name } = el;
+
+  if (!name) {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[gitlab] the validation directive requires the given input to have "name" attribute',
+      );
+    }
+    return;
+  }
+
   const formField = form.fields[name];
   const isValid = el.checkValidity();
 
-  formField.state = isValid;
-  formField.feedback = getFeedbackForElement(feedbackMap, el);
+  // valid fields can be flagged as such, without triggering any validation feedback (messages, input-styles)
+  formField.state = !reportValidity && !isValid ? null : isValid;
+  formField.feedback = reportValidity ? getFeedbackForElement(feedbackMap, el) : '';
 
   form.state = isEveryFieldValid(form);
 };
@@ -69,7 +81,7 @@ export default function(customFeedbackMap = {}) {
       el.addEventListener('blur', function markAsBlurred({ target }) {
         if (elData.isTouched) {
           elData.isBlurred = true;
-          validate(target);
+          validate({ el: target, reportValidity: true });
           // this event handler can be removed, since the live-feedback in `update` takes over
           el.removeEventListener('blur', markAsBlurred);
         }
@@ -79,18 +91,14 @@ export default function(customFeedbackMap = {}) {
         formEl.addEventListener('submit', focusFirstInvalidInput);
       }
 
-      if (showGlobalValidation) {
-        validate(el);
-      }
+      validate({ el, reportValidity: showGlobalValidation });
     },
     update(el, binding) {
       const { arg: showGlobalValidation } = binding;
       const { validate, isTouched, isBlurred } = elDataMap.get(el);
+      const showValidationFeedback = showGlobalValidation || (isTouched && isBlurred);
 
-      // trigger live-feedback once the element has been touched an clicked way from
-      if (showGlobalValidation || (isTouched && isBlurred)) {
-        validate(el);
-      }
+      validate({ el, reportValidity: showValidationFeedback });
     },
   };
 }

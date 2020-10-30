@@ -63,7 +63,7 @@ describe('validation directive', () => {
       });
 
       it('sets the form validity correctly', () => {
-        expect(getFormData().state).toBe(showValidation ? false : null);
+        expect(getFormData().state).toBe(false);
       });
     },
   );
