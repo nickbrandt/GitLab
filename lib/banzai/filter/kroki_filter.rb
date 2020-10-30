@@ -15,7 +15,6 @@ module Banzai
       end.map(&:to_selector).join(', ')
 
       def call
-        plantuml_enabled = settings.plantuml_enabled
         # if PlantUML is enabled, PlantUML diagrams will be processed by the PlantUML filter.
         diagram_selectors = if settings.plantuml_enabled
                               DIAGRAM_SELECTORS_WO_PLANTUML
