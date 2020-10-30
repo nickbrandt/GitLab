@@ -18,12 +18,13 @@ module Banzai
                                           .join(', ')
 
       def call
-        # if PlantUML is enabled, PlantUML diagrams will be processed by the PlantUML filter.
         diagram_selectors = if settings.plantuml_enabled
+                              # if PlantUML is enabled, PlantUML diagrams will be processed by the PlantUML filter.
                               DIAGRAM_SELECTORS_WO_PLANTUML
                             else
                               DIAGRAM_SELECTORS
                             end
+
         return doc unless settings.kroki_enabled && doc.at(diagram_selectors)
 
         diagram_format = "svg"
