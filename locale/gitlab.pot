@@ -23322,9 +23322,6 @@ msgstr ""
 msgid "Search forks"
 msgstr ""
 
-msgid "Search groups"
-msgstr ""
-
 msgid "Search merge requests"
 msgstr ""
 
