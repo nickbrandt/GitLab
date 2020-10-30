@@ -117,14 +117,14 @@ var (
 			Namespace: namespace,
 			Subsystem: subsystem,
 			Name:      "duration_seconds",
-			Help:      "Total seconds spent serving image resizing requests",
+			Help:      "Breakdown of total time spent serving successful image resizing requests (incl. data transfer)",
 			Buckets: []float64{
+				0.025, /* 25ms */
 				0.050, /* 50ms */
 				0.1,   /* 100ms */
 				0.2,   /* 200ms */
 				0.4,   /* 400ms */
 				0.8,   /* 800ms */
-				1.6,   /* 1600ms */
 			},
 		},
 		[]string{"content_type", "width"},
