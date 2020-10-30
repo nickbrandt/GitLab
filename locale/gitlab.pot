@@ -1062,16 +1062,6 @@ msgstr ""
 msgid "0t1DgySidms"
 msgstr ""
 
-msgid "1 %{type} addition"
-msgid_plural "%{count} %{type} additions"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "1 %{type} modification"
-msgid_plural "%{count} %{type} modifications"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "1 Day"
 msgid_plural "%d Days"
 msgstr[0] ""
