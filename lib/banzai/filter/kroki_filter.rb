@@ -9,10 +9,13 @@ module Banzai
     # HTML that replaces all diagrams supported by Kroki with the corresponding img tags.
     #
     class KrokiFilter < HTML::Pipeline::Filter
-      DIAGRAM_SELECTORS = ::Gitlab::Kroki::DIAGRAM_TYPES.map(&:to_selector).join(', ')
-      DIAGRAM_SELECTORS_WO_PLANTUML = ::Gitlab::Kroki::DIAGRAM_TYPES.select do |diagram_type|
-        diagram_type != 'plantuml'
-      end.map(&:to_selector).join(', ')
+      DIAGRAM_SELECTORS = ::Gitlab::Kroki::DIAGRAM_TYPES
+                              .map { |diagram_type| %(pre[lang="#{diagram_type}"] > code) }
+                              .join(', ')
+      DIAGRAM_SELECTORS_WO_PLANTUML = ::Gitlab::Kroki::DIAGRAM_TYPES
+                                          .select { |diagram_type| diagram_type != 'plantuml' }
+                                          .map { |diagram_type| %(pre[lang="#{diagram_type}"] > code) }
+                                          .join(', ')
 
       def call
         # if PlantUML is enabled, PlantUML diagrams will be processed by the PlantUML filter.
@@ -34,10 +37,6 @@ module Banzai
       end
 
       private
-
-      def self.to_selector (diagram_type)
-        %(pre[lang="#{diagram_type}"] > code)
-      end
 
       # QUESTION: should should we use the asciidoctor-kroki gem to delegate this logic?
       def create_image_src(type, format, text)
