@@ -48369,6 +48369,16 @@
                   "defaultValue": "created_desc"
                 },
                 {
+                  "name": "search",
+                  "description": "Query to search users by name, username, or primary email.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
