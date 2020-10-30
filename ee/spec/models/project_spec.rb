@@ -279,6 +279,17 @@ RSpec.describe Project do
         expect(described_class.not_aimed_for_deletion).to contain_exactly(project)
       end
     end
+
+    describe '.order_by_total_repository_size_excess_desc' do
+      let_it_be(:project_1) { create(:project_statistics, lfs_objects_size: 10, repository_size: 10).project }
+      let_it_be(:project_2) { create(:project_statistics, lfs_objects_size: 5, repository_size: 55).project }
+      let_it_be(:project_3) { create(:project, repository_size_limit: 30, statistics: create(:project_statistics, lfs_objects_size: 8, repository_size: 32)) }
+      let(:limit) { 20 }
+
+      subject { described_class.order_by_total_repository_size_excess_desc(limit) }
+
+      it { is_expected.to eq([project_2, project_3, project_1]) }
+    end
   end
 
   describe 'validations' do
