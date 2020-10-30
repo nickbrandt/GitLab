@@ -21542,6 +21542,11 @@ type User {
   email: String
 
   """
+  Group count for the user. Available only when feature flag `user_group_counts` is enabled
+  """
+  groupCount: Int
+
+  """
   Group memberships of the user
   """
   groupMemberships(
