@@ -52,6 +52,10 @@ RSpec.describe Gitlab::Utils do
       expect(check_path_traversal!('dir/..foo.rb')).to eq('dir/..foo.rb')
       expect(check_path_traversal!('dir/.foo.rb')).to eq('dir/.foo.rb')
     end
+
+    it 'does nothing for a non-string' do
+      expect(check_path_traversal!(nil)).to be_nil
+    end
   end
 
   describe '.allowlisted?' do
