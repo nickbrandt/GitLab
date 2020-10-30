@@ -10,6 +10,8 @@ class Profiles::UsageQuotasController < Profiles::ApplicationController
     @projects = @namespace.projects.with_shared_runners_limit_enabled.page(params[:page])
   end
 
+  private
+
   def push_additional_repo_storage_by_namespace_feature
     push_to_gon_features(:additional_repo_storage_by_namespace, current_user.namespace.additional_repo_storage_by_namespace_enabled?)
   end
