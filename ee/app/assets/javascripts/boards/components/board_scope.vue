@@ -1,4 +1,5 @@
 <script>
+import { GlFormCheckbox } from '@gitlab/ui';
 import { __ } from '~/locale';
 import ListLabel from '~/boards/models/label';
 import BoardLabelsSelect from '~/vue_shared/components/sidebar/labels_select/base.vue';
@@ -12,6 +13,7 @@ export default {
     BoardLabelsSelect,
     BoardMilestoneSelect,
     BoardWeightSelect,
+    GlFormCheckbox,
   },
 
   props: {
@@ -60,6 +62,7 @@ export default {
   data() {
     return {
       expanded: false,
+      scopeToCurrentIteration: false, // TODO: load actual value from board
     };
   },
 
@@ -110,6 +113,20 @@ export default {
         :project-id="projectId"
         :can-edit="canAdminBoard"
       />
+
+      <div class="block milestone">
+        <div class="title gl-mb-3">
+          {{ __('Iteration') }}
+        </div>
+        <gl-form-checkbox
+          :disabled="!canAdminBoard"
+          :checked="board.currentIteration"
+          class="gl-text-gray-500"
+          data-testid="scope-to-current-iteration"
+          @change="board.currentIteration = !board.currentIteration"
+          >{{ __('Scope board to current iteration') }}
+        </gl-form-checkbox>
+      </div>
 
       <board-labels-select
         :context="board"

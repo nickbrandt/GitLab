@@ -231,6 +231,7 @@ This allows you to create unique boards according to your team's need.
 
 ![Create scoped board](img/issue_board_creation.png)
 
+UPDATE DOCS HERE
 You can define the scope of your board when creating it or by clicking the "Edit board" button.
 Once a milestone, assignee or weight is assigned to an issue board, you can no longer
 filter through these in the search bar. In order to do that, you need to remove the desired scope

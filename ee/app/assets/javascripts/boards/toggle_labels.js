@@ -30,6 +30,7 @@ export default () =>
       },
 
       onStorageUpdate(val) {
+        // TODO: this getsd empty string and errors out in console
         this.setShowLabels(JSON.parse(val));
       },
     },
