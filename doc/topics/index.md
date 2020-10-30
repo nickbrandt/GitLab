@@ -22,6 +22,3 @@ tutorials, technical overviews, blog posts) and videos.
 - [GitLab Installation](../install/README.md)
 - [GitLab Pages](../user/project/pages/index.md)
 - [Offline GitLab](offline/index.md)
-
-NOTE: **Note:**
-More topics will be available soon.
