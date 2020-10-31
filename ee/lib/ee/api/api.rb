@@ -8,7 +8,6 @@ module EE
       prepended do
         use ::Gitlab::Middleware::IpRestrictor
 
-        mount ::EE::API::Boards
         mount ::EE::API::GroupBoards
 
         mount ::API::AuditEvents
