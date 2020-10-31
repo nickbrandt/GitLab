@@ -26,7 +26,6 @@ module EE
         mount ::API::Ldap
         mount ::API::LdapGroupLinks
         mount ::API::License
-        mount ::API::PersonalAccessTokens
         mount ::API::ProjectMirror
         mount ::API::ProjectPushRule
         mount ::API::GroupPushRule
