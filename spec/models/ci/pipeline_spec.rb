@@ -745,8 +745,12 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
 
     context 'when pipeline is merge request' do
+      before do
+        stub_feature_flags(ci_mr_diff_variables: false)
+      end
+
       let(:pipeline) do
-        create(:ci_pipeline, merge_request: merge_request)
+        create(:ci_pipeline, :detached_merge_request_pipeline, merge_request: merge_request)
       end
 
       let(:merge_request) do
@@ -774,30 +778,32 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
             'CI_MERGE_REQUEST_PROJECT_PATH' => merge_request.project.full_path,
             'CI_MERGE_REQUEST_PROJECT_URL' => merge_request.project.web_url,
             'CI_MERGE_REQUEST_TARGET_BRANCH_NAME' => merge_request.target_branch.to_s,
-            'CI_MERGE_REQUEST_TARGET_BRANCH_SHA' => pipeline.target_sha.to_s,
+            'CI_MERGE_REQUEST_TARGET_BRANCH_SHA' => '',
             'CI_MERGE_REQUEST_SOURCE_PROJECT_ID' => merge_request.source_project.id.to_s,
             'CI_MERGE_REQUEST_SOURCE_PROJECT_PATH' => merge_request.source_project.full_path,
             'CI_MERGE_REQUEST_SOURCE_PROJECT_URL' => merge_request.source_project.web_url,
             'CI_MERGE_REQUEST_SOURCE_BRANCH_NAME' => merge_request.source_branch.to_s,
-            'CI_MERGE_REQUEST_SOURCE_BRANCH_SHA' => pipeline.source_sha.to_s,
+            'CI_MERGE_REQUEST_SOURCE_BRANCH_SHA' => '',
             'CI_MERGE_REQUEST_TITLE' => merge_request.title,
             'CI_MERGE_REQUEST_ASSIGNEES' => merge_request.assignee_username_list,
             'CI_MERGE_REQUEST_MILESTONE' => milestone.title,
             'CI_MERGE_REQUEST_LABELS' => labels.map(&:title).sort.join(','),
-            'CI_MERGE_REQUEST_EVENT_TYPE' => pipeline.merge_request_event_type.to_s)
+            'CI_MERGE_REQUEST_EVENT_TYPE' => 'detached')
+        expect(subject.to_hash.keys).not_to include(
+          %w[CI_MERGE_REQUEST_DIFF_ID
+             CI_MERGE_REQUEST_DIFF_BASE_SHA])
       end
 
-      context 'when source project does not exist' do
+      context 'when feature flag ci_mr_diff_variables is enabled' do
         before do
-          merge_request.update_column(:source_project_id, nil)
+          stub_feature_flags(ci_mr_diff_variables: true)
         end
 
-        it 'does not expose source project related variables' do
-          expect(subject.to_hash.keys).not_to include(
-            %w[CI_MERGE_REQUEST_SOURCE_PROJECT_ID
-               CI_MERGE_REQUEST_SOURCE_PROJECT_PATH
-               CI_MERGE_REQUEST_SOURCE_PROJECT_URL
-               CI_MERGE_REQUEST_SOURCE_BRANCH_NAME])
+        it 'exposes diff variables' do
+          expect(subject.to_hash)
+            .to include(
+              'CI_MERGE_REQUEST_DIFF_ID' => merge_request.merge_request_diff.id.to_s,
+              'CI_MERGE_REQUEST_DIFF_BASE_SHA' => merge_request.merge_request_diff.base_commit_sha)
         end
       end
 
@@ -822,6 +828,51 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
 
         it 'does not expose labels variable' do
           expect(subject.to_hash.keys).not_to include('CI_MERGE_REQUEST_LABELS')
+        end
+      end
+
+      context 'with merged results' do
+        let(:pipeline) do
+          create(:ci_pipeline, :merged_result_pipeline, merge_request: merge_request)
+        end
+
+        it 'exposes merge request pipeline variables' do
+          expect(subject.to_hash)
+            .to include(
+              'CI_MERGE_REQUEST_ID' => merge_request.id.to_s,
+              'CI_MERGE_REQUEST_IID' => merge_request.iid.to_s,
+              'CI_MERGE_REQUEST_REF_PATH' => merge_request.ref_path.to_s,
+              'CI_MERGE_REQUEST_PROJECT_ID' => merge_request.project.id.to_s,
+              'CI_MERGE_REQUEST_PROJECT_PATH' => merge_request.project.full_path,
+              'CI_MERGE_REQUEST_PROJECT_URL' => merge_request.project.web_url,
+              'CI_MERGE_REQUEST_TARGET_BRANCH_NAME' => merge_request.target_branch.to_s,
+              'CI_MERGE_REQUEST_TARGET_BRANCH_SHA' => merge_request.target_branch_sha,
+              'CI_MERGE_REQUEST_SOURCE_PROJECT_ID' => merge_request.source_project.id.to_s,
+              'CI_MERGE_REQUEST_SOURCE_PROJECT_PATH' => merge_request.source_project.full_path,
+              'CI_MERGE_REQUEST_SOURCE_PROJECT_URL' => merge_request.source_project.web_url,
+              'CI_MERGE_REQUEST_SOURCE_BRANCH_NAME' => merge_request.source_branch.to_s,
+              'CI_MERGE_REQUEST_SOURCE_BRANCH_SHA' => merge_request.source_branch_sha,
+              'CI_MERGE_REQUEST_TITLE' => merge_request.title,
+              'CI_MERGE_REQUEST_ASSIGNEES' => merge_request.assignee_username_list,
+              'CI_MERGE_REQUEST_MILESTONE' => milestone.title,
+              'CI_MERGE_REQUEST_LABELS' => labels.map(&:title).sort.join(','),
+              'CI_MERGE_REQUEST_EVENT_TYPE' => 'merged_result')
+          expect(subject.to_hash.keys).not_to include(
+            %w[CI_MERGE_REQUEST_DIFF_ID
+               CI_MERGE_REQUEST_DIFF_BASE_SHA])
+        end
+
+        context 'when feature flag ci_mr_diff_variables is enabled' do
+          before do
+            stub_feature_flags(ci_mr_diff_variables: true)
+          end
+
+          it 'exposes diff variables' do
+            expect(subject.to_hash)
+              .to include(
+                'CI_MERGE_REQUEST_DIFF_ID' => merge_request.merge_request_diff.id.to_s,
+                'CI_MERGE_REQUEST_DIFF_BASE_SHA' => merge_request.merge_request_diff.base_commit_sha)
+          end
         end
       end
     end

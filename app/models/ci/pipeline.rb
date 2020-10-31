@@ -774,6 +774,15 @@ module Ci
           variables.append(key: 'CI_MERGE_REQUEST_EVENT_TYPE', value: merge_request_event_type.to_s)
           variables.append(key: 'CI_MERGE_REQUEST_SOURCE_BRANCH_SHA', value: source_sha.to_s)
           variables.append(key: 'CI_MERGE_REQUEST_TARGET_BRANCH_SHA', value: target_sha.to_s)
+
+          if Feature.enabled?(:ci_mr_diff_variables, project)
+            diff = self.merge_request_diff
+            if diff.present?
+              variables.append(key: 'CI_MERGE_REQUEST_DIFF_ID', value: diff.id.to_s)
+              variables.append(key: 'CI_MERGE_REQUEST_DIFF_BASE_SHA', value: diff.base_commit_sha)
+            end
+          end
+
           variables.concat(merge_request.predefined_variables)
         end
 
@@ -1129,6 +1138,22 @@ module Ci
 
     def pipeline_data
       Gitlab::DataBuilder::Pipeline.build(self)
+    end
+
+    def merge_request_diff_sha
+      return unless merge_request?
+
+      if merge_request_pipeline?
+        source_sha
+      else
+        sha
+      end
+    end
+
+    def merge_request_diff
+      return unless merge_request?
+
+      merge_request.merge_request_diff_for(merge_request_diff_sha)
     end
 
     def push_details
