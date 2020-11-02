@@ -3,6 +3,7 @@ import { s__ } from '~/locale';
 
 /**
  * Validation messages will take priority based on the property order.
+ *
  * For example:
  * { valueMissing: {...}, urlTypeMismatch: {...} }
  *
@@ -34,7 +35,7 @@ const focusFirstInvalidInput = e => {
 
 const isEveryFieldValid = form => Object.values(form.fields).every(({ state }) => state === true);
 
-const createValidator = (context, feedbackMap) => ({ el, reportValidity = false }) => {
+const createValidator = (context, feedbackMap) => ({ el, reportInvalidInput = false }) => {
   const { form } = context;
   const { name } = el;
 
@@ -51,26 +52,38 @@ const createValidator = (context, feedbackMap) => ({ el, reportValidity = false 
   const formField = form.fields[name];
   const isValid = el.checkValidity();
 
-  // valid fields can be flagged as such, without triggering any validation feedback (messages, input-styles)
-  formField.state = !reportValidity && !isValid ? null : isValid;
-  formField.feedback = reportValidity ? getFeedbackForElement(feedbackMap, el) : '';
+  // This makes sure we always report valid fields - this can be useful for cases where the consuming
+  // component's logic depends on certain fields being in a valid state.
+  // Invalid input, on the other hand, should only be reported once we want to display feedback to the user.
+  // (eg.: After a field has been touched and moved away from, a submit-button has been clicked, ...)
+  formField.state = reportInvalidInput ? isValid : isValid || null;
+  formField.feedback = reportInvalidInput ? getFeedbackForElement(feedbackMap, el) : '';
 
   form.state = isEveryFieldValid(form);
 };
 
 /**
- * Takes an object that allows to add or change custom feedback messages:
+ * Takes an object that allows to add or change custom feedback messages.
  *
+ * The passed in object will be merged with the built-in feedback
+ * so it is possible to override a built-in message.
+ *
+ * @example
+ * validate({
+ *   tooLong: {
+ *     check: el => el.validity.tooLong === true,
+ *     message: 'Your custom feedback'
+ *   }
+ * })
+ *
+ * @example
  *   validate({
- *     tooLong: {
- *       check: el => el.validity.tooLong === true,
- *       message: 'The value you have entered is too long'
+ *     valueMissing: {
+ *       message: 'Your custom feedback'
  *     }
  *   })
  *
- * Note: The passed in object will be merged with the built-in feedback.
- *
- * @param {Object<string, {isValid: function, message: string}>} customFeedbackMap
+ * @param {Object<string, { message: string, isValid: ?function}>} customFeedbackMap
  * @returns {{ inserted: function, update: function }} validateDirective
  */
 export default function(customFeedbackMap = {}) {
@@ -96,7 +109,7 @@ export default function(customFeedbackMap = {}) {
       el.addEventListener('blur', function markAsBlurred({ target }) {
         if (elData.isTouched) {
           elData.isBlurred = true;
-          validate({ el: target, reportValidity: true });
+          validate({ el: target, reportInvalidInput: true });
           // this event handler can be removed, since the live-feedback in `update` takes over
           el.removeEventListener('blur', markAsBlurred);
         }
@@ -106,14 +119,14 @@ export default function(customFeedbackMap = {}) {
         formEl.addEventListener('submit', focusFirstInvalidInput);
       }
 
-      validate({ el, reportValidity: showGlobalValidation });
+      validate({ el, reportInvalidInput: showGlobalValidation });
     },
     update(el, binding) {
       const { arg: showGlobalValidation } = binding;
       const { validate, isTouched, isBlurred } = elDataMap.get(el);
       const showValidationFeedback = showGlobalValidation || (isTouched && isBlurred);
 
-      validate({ el, reportValidity: showValidationFeedback });
+      validate({ el, reportInvalidInput: showValidationFeedback });
     },
   };
 }
