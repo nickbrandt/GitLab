@@ -4,4 +4,4 @@ introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/43545
 rollout_issue_url: https://gitlab.com/gitlab-org/gitlab/-/issues/257839
 type: development
 group: group::fuzz testing
-default_enabled: false
+default_enabled: true
