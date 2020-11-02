@@ -9,7 +9,7 @@ RSpec.describe Issues::ImportCsvService do
     uploader = FileUploader.new(project)
     uploader.store!(file)
 
-    described_class.new(user, project, uploader).execute
+    described_class.new(user, project, uploader)
   end
 
   include_examples 'issuable import csv service', 'issue' do

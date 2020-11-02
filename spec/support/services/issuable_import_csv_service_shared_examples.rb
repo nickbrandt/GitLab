@@ -3,14 +3,14 @@
 require 'spec_helper'
 
 RSpec.shared_examples 'issuable import csv service' do |issuable_type|
-  let(:project) { create(:project) }
-  let(:user) { create(:user) }
+  let_it_be_with_refind(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
 
-  subject { service }
+  subject { service.execute }
 
   shared_examples_for 'an issuable importer' do
-    it 'records the import attempt if resource is an issue' do
-      if issuable_type == 'issue'
+    if issuable_type == 'issue'
+      it 'records the import attempt if resource is an issue' do
         expect { subject }
           .to change { Issues::CsvImport.where(project: project, user: user).count }
           .by 1
@@ -19,8 +19,8 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
   end
 
   shared_examples_for 'importer with email notification' do
-    it 'notifies user of import result' do
-      if issuable_type == 'issue'
+    if issuable_type == 'issue'
+      it 'notifies user of import result' do
         expect(Notify).to receive_message_chain(email_method, :deliver_later)
 
         subject
@@ -31,6 +31,18 @@ RSpec.shared_examples 'issuable import csv service' do |issuable_type|
   describe '#execute' do
     context 'invalid file' do
       let(:file) { fixture_file_upload('spec/fixtures/banana_sample.gif') }
+
+      it 'returns invalid file error' do
+        expect(subject[:success]).to eq(0)
+        expect(subject[:parse_error]).to eq(true)
+      end
+
+      it_behaves_like 'importer with email notification'
+      it_behaves_like 'an issuable importer'
+    end
+
+    context 'file without headers' do
+      let(:file) { fixture_file_upload('spec/fixtures/csv_no_headers.csv') }
 
       it 'returns invalid file error' do
         expect(subject[:success]).to eq(0)

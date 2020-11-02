@@ -20,21 +20,13 @@ module Issuable
       private
 
       def process_csv
-        csv_data = @csv_io.open(&:read).force_encoding(Encoding::UTF_8)
-
-        csv_parsing_params = {
-          col_sep: detect_col_sep(csv_data.lines.first),
-          headers: true,
-          header_converters: :symbol
-        }
-
-        CSV.new(csv_data, csv_parsing_params).each.with_index(2) do |row, line_no|
+        with_csv_lines.each do |row, line_no|
           issuable_attributes = {
             title:       row[:title],
             description: row[:description]
           }
 
-          if issuable(issuable_attributes).persisted?
+          if create_issuable(issuable_attributes).persisted?
             @results[:success] += 1
           else
             @results[:error_lines].push(line_no)
@@ -42,6 +34,26 @@ module Issuable
         end
       rescue ArgumentError, CSV::MalformedCSVError
         @results[:parse_error] = true
+      end
+
+      def with_csv_lines
+        csv_data = @csv_io.open(&:read).force_encoding(Encoding::UTF_8)
+        verify_headers!(csv_data)
+
+        csv_parsing_params = {
+          col_sep: detect_col_sep(csv_data.lines.first),
+          headers: true,
+          header_converters: :symbol
+        }
+
+        CSV.new(csv_data, csv_parsing_params).each.with_index(2)
+      end
+
+      def verify_headers!(data)
+        headers = data.lines.first.downcase
+        return if headers.include?('title') && headers.include?('description')
+
+        raise CSV::MalformedCSVError
       end
 
       def detect_col_sep(header)
@@ -56,12 +68,12 @@ module Issuable
         end
       end
 
-      def email_results_to_user
-        # defined in ImportCsvService
+      def create_issuable(attributes)
+        create_issuable_class.new(@project, @user, attributes).execute
       end
 
-      def issuable(attributes)
-        create_issuable_class.new(@project, @user, attributes).execute
+      def email_results_to_user
+        # defined in ImportCsvService
       end
 
       def create_issuable_class

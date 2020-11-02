@@ -3,19 +3,19 @@
 require 'spec_helper'
 
 RSpec.describe RequirementsManagement::ImportCsvService do
-  let(:project) { create(:project) }
-  let(:user) { create(:user) }
+  let_it_be_with_refind(:project) { create(:project) }
+  let_it_be(:user) { create(:user) }
 
   let(:service) do
     uploader = FileUploader.new(project)
     uploader.store!(file)
 
-    described_class.new(user, project, uploader).execute
+    described_class.new(user, project, uploader)
   end
 
   shared_examples 'resource not available' do
     it 'raises an error' do
-      expect { service }.to raise_error(Gitlab::Access::AccessDeniedError)
+      expect { service.execute }.to raise_error(Gitlab::Access::AccessDeniedError)
     end
   end
 
