@@ -23,20 +23,4 @@ RSpec.describe MigrateServicesToHttpIntegrations do
       expect(http_integration.endpoint_identifier).to eq(described_class::SERVICE_NAMES_IDENTIFIER[:identifier])
     end
   end
-
-  describe '#down' do
-    before do
-      http_integrations.create!(
-        project_id: project.id,
-        name: described_class::SERVICE_NAMES_IDENTIFIER[:name],
-        endpoint_identifier: described_class::SERVICE_NAMES_IDENTIFIER[:identifier],
-        encrypted_token: 'test',
-        encrypted_token_iv: 'test'
-      )
-    end
-
-    it 'removes the existing http integrations' do
-      expect { described_class.new.down }.to change { http_integrations.count }.from(1).to(0)
-    end
-  end
 end

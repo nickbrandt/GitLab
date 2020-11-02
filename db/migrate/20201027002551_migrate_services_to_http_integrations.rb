@@ -46,15 +46,6 @@ class MigrateServicesToHttpIntegrations < ActiveRecord::Migration[6.0]
   end
 
   def down
-    sql = <<~SQL
-      SELECT project_id FROM services
-      WHERE type = '#{ALERT_SERVICE_TYPE}'
-    SQL
-
-    select_values(sql).each do |project_id|
-      HttpIntegration
-        .where(project_id: project_id, endpoint_identifier: SERVICE_NAMES_IDENTIFIER[:identifier])
-        .delete_all
-    end
+    # no-op
   end
 end
