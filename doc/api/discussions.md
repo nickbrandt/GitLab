@@ -787,12 +787,12 @@ Diff comments also contain position:
           "line_range": {
             "start": {
               "line_code": "588440f66559714280628a4f9799f0c4eb880a4a_10_10",
-              "type": "new",
+              "type": "new"
             },
             "end": {
               "line_code": "588440f66559714280628a4f9799f0c4eb880a4a_11_11",
               "type": "old"
-            },
+            }
           }
         },
         "resolved": false,

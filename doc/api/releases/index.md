@@ -482,7 +482,7 @@ Example response:
          }
       ],
       "evidence_file_path":"https://gitlab.example.com/root/awesome-app/-/releases/v0.3/evidence.json"
-   },
+   }
 }
 ```
 
@@ -625,7 +625,7 @@ Example response:
 
       ],
       "evidence_file_path":"https://gitlab.example.com/root/awesome-app/-/releases/v0.1/evidence.json"
-   },
+   }
 }
 ```
 
@@ -709,7 +709,7 @@ Example response:
 
       ],
       "evidence_file_path":"https://gitlab.example.com/root/awesome-app/-/releases/v0.1/evidence.json"
-   },
+   }
 }
 ```
 
