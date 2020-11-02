@@ -23131,6 +23131,9 @@ msgstr ""
 msgid "Search Jira issues"
 msgstr ""
 
+msgid "Search a group"
+msgstr ""
+
 msgid "Search an environment spec"
 msgstr ""
 
