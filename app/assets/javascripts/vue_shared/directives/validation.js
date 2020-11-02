@@ -58,6 +58,21 @@ const createValidator = (context, feedbackMap) => ({ el, reportValidity = false 
   form.state = isEveryFieldValid(form);
 };
 
+/**
+ * Takes an object that allows to add or change custom feedback messages:
+ *
+ *   validate({
+ *     tooLong: {
+ *       check: el => el.validity.tooLong === true,
+ *       message: 'The value you have entered is too long'
+ *     }
+ *   })
+ *
+ * Note: The passed in object will be merged with the built-in feedback.
+ *
+ * @param {Object<string, {isValid: function, message: string}>} customFeedbackMap
+ * @returns {{ inserted: function, update: function }} validateDirective
+ */
 export default function(customFeedbackMap = {}) {
   const feedbackMap = merge(defaultFeedbackMap, customFeedbackMap);
   const elDataMap = new WeakMap();
