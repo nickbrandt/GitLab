@@ -8,6 +8,8 @@ class TruncateSecurityFindingsTable < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
+    return unless Gitlab.dev_env_or_com?
+
     with_lock_retries do
       connection.execute('TRUNCATE security_findings RESTART IDENTITY')
     end
