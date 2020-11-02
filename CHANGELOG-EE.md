@@ -1,5 +1,15 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.4.5 (2020-11-02)
+
+### Security (4 changes)
+
+- Sync code owners rules on MR update. !1003
+- Fix potential regex backtracking attack in path parsing in search result. !1023
+- Transfer missing epics when a project is transferred.
+- Tighten the RBAC for GraphQL in SAST CiConfiguration.
+
+
 ## 13.4.4 (2020-10-15)
 
 ### Fixed (1 change)
