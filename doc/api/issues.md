@@ -657,12 +657,6 @@ Example response:
    },
    "confidential": false,
    "discussion_locked": false,
-   "_links": {
-      "self": "http://example.com/api/v4/projects/1/issues/2",
-      "notes": "http://example.com/api/v4/projects/1/issues/2/notes",
-      "award_emoji": "http://example.com/api/v4/projects/1/issues/2/award_emoji",
-      "project": "http://example.com/api/v4/projects/1"
-   },
    "task_completion_status":{
       "count":0,
       "completed_count":0
@@ -675,12 +669,6 @@ Example response:
     "award_emoji": "http://gitlab.example:3000/api/v4/projects/1/issues/1/award_emoji",
     "project": "http://gitlab.example:3000/api/v4/projects/1"
   },
-  "references": {
-    "short": "#1",
-    "relative": "#1",
-    "full": "gitlab-org/gitlab-test#1"
-  },
-  "subscribed": true,
   "moved_to_id": null,
   "service_desk_reply_to": "service.desk@gitlab.com",
   "epic_iid": null,

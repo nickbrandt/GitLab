@@ -902,7 +902,6 @@ GET /projects/:id
   "merge_method": "merge",
   "auto_devops_enabled": true,
   "auto_devops_deploy_strategy": "continuous",
-  "repository_storage": "default",
   "approvals_before_merge": 0,
   "mirror": false,
   "mirror_user_id": 45,

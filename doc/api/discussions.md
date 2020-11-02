@@ -270,7 +270,7 @@ GET /projects/:id/snippets/:snippet_id/discussions
         "system": false,
         "noteable_id": 3,
         "noteable_type": "Snippet",
-        "noteable_id": null
+        "noteable_iid": null
       },
       {
         "id": 1129,
@@ -290,7 +290,7 @@ GET /projects/:id/snippets/:snippet_id/discussions
         "system": false,
         "noteable_id": 3,
         "noteable_type": "Snippet",
-        "noteable_id": null,
+        "noteable_iid": null,
         "resolvable": false
       }
     ]
@@ -317,7 +317,7 @@ GET /projects/:id/snippets/:snippet_id/discussions
         "system": false,
         "noteable_id": 3,
         "noteable_type": "Snippet",
-        "noteable_id": null,
+        "noteable_iid": null,
         "resolvable": false
       }
     ]
@@ -476,7 +476,7 @@ GET /groups/:id/epics/:epic_id/discussions
         "system": false,
         "noteable_id": 3,
         "noteable_type": "Epic",
-        "noteable_id": null,
+        "noteable_iid": null,
         "resolvable": false
       },
       {
@@ -497,7 +497,7 @@ GET /groups/:id/epics/:epic_id/discussions
         "system": false,
         "noteable_id": 3,
         "noteable_type": "Epic",
-        "noteable_id": null,
+        "noteable_iid": null,
         "resolvable": false
       }
     ]
@@ -524,7 +524,7 @@ GET /groups/:id/epics/:epic_id/discussions
         "system": false,
         "noteable_id": 3,
         "noteable_type": "Epic",
-        "noteable_id": null,
+        "noteable_iid": null,
         "resolvable": false
       }
     ]
