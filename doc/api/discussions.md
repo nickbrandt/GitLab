@@ -757,7 +757,7 @@ Diff comments also contain position:
     "notes": [
       {
         "id": 1128,
-        "type": DiffNote,
+        "type": "DiffNote",
         "body": "diff comment",
         "attachment": null,
         "author": {
@@ -1089,7 +1089,7 @@ Diff comments contain also position:
     "notes": [
       {
         "id": 1128,
-        "type": DiffNote,
+        "type": "DiffNote",
         "body": "diff comment",
         "attachment": null,
         "author": {
