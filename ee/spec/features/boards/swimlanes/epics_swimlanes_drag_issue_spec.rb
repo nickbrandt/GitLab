@@ -61,6 +61,7 @@ RSpec.describe 'epics swimlanes', :js do
 
     it 'from unassigned issues lane to epic' do
       wait_for_board_cards(1, 2)
+      wait_for_board_cards_in_second_epic(1, 1)
       wait_for_board_cards_in_unassigned_lane(0, 1)
 
       drag(list_from_index: 6, list_to_index: 3)
