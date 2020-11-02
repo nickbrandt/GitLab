@@ -1440,6 +1440,11 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     iids: [ID!]
 
     """
+    Include epics from descendant groups
+    """
+    includeDescendantGroups: Boolean = true
+
+    """
     Filter epics by labels
     """
     labelName: [String!]
@@ -6583,6 +6588,11 @@ type Epic implements CurrentUserTodos & Noteable {
     iids: [ID!]
 
     """
+    Include epics from descendant groups
+    """
+    includeDescendantGroups: Boolean = true
+
+    """
     Filter epics by labels
     """
     labelName: [String!]
@@ -8157,6 +8167,11 @@ type Group {
     iids: [ID!]
 
     """
+    Include epics from descendant groups
+    """
+    includeDescendantGroups: Boolean = true
+
+    """
     Filter epics by labels
     """
     labelName: [String!]
@@ -8238,6 +8253,11 @@ type Group {
     List of IIDs of epics, e.g., [1, 2]
     """
     iids: [ID!]
+
+    """
+    Include epics from descendant groups
+    """
+    includeDescendantGroups: Boolean = true
 
     """
     Filter epics by labels
