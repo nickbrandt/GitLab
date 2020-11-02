@@ -1,5 +1,0 @@
----
-title: Fix potential regex backtracking attack in path parsing in search result
-merge_request: 1024
-author:
-type: security
