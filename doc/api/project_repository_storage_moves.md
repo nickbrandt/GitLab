@@ -9,7 +9,7 @@ type: reference
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/31285) in GitLab 13.0.
 
-Project repositories can be moved between storages. This can be useful when
+Project repositories including wiki and design repositories can be moved between storages. This can be useful when
 [migrating to Gitaly Cluster](../administration/gitaly/praefect.md#migrate-existing-repositories-to-gitaly-cluster),
 for example.
 
