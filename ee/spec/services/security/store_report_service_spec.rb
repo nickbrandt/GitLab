@@ -5,12 +5,14 @@ require 'spec_helper'
 UUID_REGEXP = Regexp.new("^([0-9a-f]{8})-([0-9a-f]{4})-([0-9a-f]{4})-" \
                          "([0-9a-f]{2})([0-9a-f]{2})-([0-9a-f]{12})$").freeze
 
-def is_uuid_v5?(uuid_string)
-  raise TypeError unless uuid_string.is_a?(String)
+RSpec::Matchers.define :be_uuid_v5 do
+  match do |string|
+    expect(string).to be_a(String)
 
-  uuid_components = uuid_string.downcase.scan(UUID_REGEXP).first
-  time_hi_and_version = uuid_components[2].to_i(16)
-  (time_hi_and_version >> 12) == 5
+    uuid_components = string.downcase.scan(UUID_REGEXP).first
+    time_hi_and_version = uuid_components[2].to_i(16)
+    (time_hi_and_version >> 12) == 5
+  end
 end
 
 RSpec.describe Security::StoreReportService, '#execute' do
@@ -68,9 +70,9 @@ RSpec.describe Security::StoreReportService, '#execute' do
       end
 
       it 'calculates UUIDv5 for all findings' do
+        subject
         uuids = Vulnerabilities::Finding.pluck(:uuid)
-        expect(uuids).to all(be_a(String))
-        expect(uuids.all? { |uuid| is_uuid_v5?(uuid) }).to be_truthy
+        expect(uuids).to all(be_uuid_v5)
       end
     end
 
