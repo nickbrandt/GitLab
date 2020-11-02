@@ -17,6 +17,9 @@ export default {
     codeCoverageHeader: s__('RepositoriesAnalytics|Test Code Coverage'),
   },
   computed: {
+    shouldShowCoverageSummary() {
+      return this.glFeatures.groupCoverageDataReportGraph;
+    },
     shouldShowCoverageReport() {
       return this.glFeatures.groupCoverageDataReport;
     },
@@ -29,7 +32,7 @@ export default {
     <h4 data-testid="test-coverage-header">
       {{ $options.text.codeCoverageHeader }}
     </h4>
-    <test-coverage-summary />
+    <test-coverage-summary v-if="shouldShowCoverageSummary" />
     <test-coverage-table v-if="shouldShowCoverageReport" class="gl-mb-5" />
     <download-test-coverage />
   </div>
