@@ -10,6 +10,45 @@ RSpec.describe Projects::TemplatesController do
   let!(:file_1) { project.repository.create_file(user, file_path_1, 'issue content', message: 'message', branch_name: 'master') }
   let!(:file_2) { project.repository.create_file(user, file_path_2, 'merge request content', message: 'message', branch_name: 'master') }
 
+  describe '#index' do
+    before do
+      sign_in(user)
+    end
+
+    shared_examples 'templates request' do
+      it 'returns the templates' do
+        get(:index, params: { namespace_id: project.namespace, template_type: template_type, project_id: project }, format: :json)
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response.size).to eq(1)
+        expect(json_response).to eq(expected_templates)
+      end
+
+      it 'fails for user with no access' do
+        other_user = create(:user)
+        sign_in(other_user)
+
+        get(:index, params: { namespace_id: project.namespace, template_type: template_type, project_id: project }, format: :json)
+
+        expect(response).to have_gitlab_http_status(:not_found)
+      end
+    end
+
+    context 'when querying for issue templates' do
+      it_behaves_like 'templates request' do
+        let(:template_type) { 'issue' }
+        let(:expected_templates) { [ { key: "template1", name: "template_1", content: "This is template 1!" } ] }
+      end
+    end
+
+    context 'when querying for merge_request templates' do
+      it_behaves_like 'templates request' do
+        let(:template_type) { 'merge_request' }
+        let(:expected_templates) { [ { key: "template1", name: "template_1", content: "This is template 1!" } ] }
+      end
+    end
+  end
+
   describe '#show' do
     shared_examples 'renders issue templates as json' do
       it do
