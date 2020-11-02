@@ -156,7 +156,13 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
 
       context 'with context' do
         it 'increases both conext event counter and total event counter' do
-          expect(Gitlab::Redis::HLL).to receive(:add).twice
+          expect(Gitlab::Redis::HLL).to receive(:add) do |kwargs|
+            expect(kwargs[:key]).to match(/^#{default_context}\_.*/)
+          end
+
+          expect(Gitlab::Redis::HLL).to receive(:add) do |kwargs|
+            expect(kwargs[:key]).not_to match(/.*#{default_context}.*/)
+          end
 
           described_class.track_event(entity1, context_event, context: default_context)
         end

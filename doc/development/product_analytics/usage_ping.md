@@ -428,7 +428,7 @@ w
 
    - `entity_id`: value we count. For example: user_id, visitor_id.
    - `event_name`: event name.
-   - `context:`: context value. Allowed values are `default`, `free`, `bronze`, `silver`, `gold`, `starter`, `premium`, `ultimate`]
+   - `context`:: context value. Allowed values are `default`, `free`, `bronze`, `silver`, `gold`, `starter`, `premium`, `ultimate`]
    - `time:`: the time when event is tracked. This is only used for testing purpose. By default we set `Time.now`
 
 1. Get event data using `Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names:, start_date:, end_date, context:)`.

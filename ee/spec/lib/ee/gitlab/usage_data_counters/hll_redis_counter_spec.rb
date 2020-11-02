@@ -47,8 +47,14 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       end
 
       with_them do
-        it 'increases both conext event counter and total event counter' do
-          expect(Gitlab::Redis::HLL).to receive(:add).twice
+        it 'increases both context event counter and total event counter' do
+          expect(Gitlab::Redis::HLL).to receive(:add) do |kwargs|
+            expect(kwargs[:key]).to match(/^#{context}\_.*/)
+          end
+
+          expect(Gitlab::Redis::HLL).to receive(:add) do |kwargs|
+            expect(kwargs[:key]).not_to match(/.*#{context}.*/)
+          end
 
           described_class.track_event(entity, event_name, context: context)
         end
@@ -73,14 +79,14 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       described_class.track_event([entity1, entity2], context_event, time: 2.weeks.ago)
     end
 
-    subject(:unique_events) { described_class.unique_events(event_names: event_names, start_date: 4.weeks.ago, end_date: Date.current, context: context) }
-
     context 'with correct arguments' do
+      subject(:unique_events) { described_class.unique_events(event_names: event_names, start_date: 4.weeks.ago, end_date: Date.current, context: context) }
+
       where(:event_names, :context, :value) do
-        'context_event' | 'default'  | 2
-        'context_event' | 'ultimate' | 1
-        'context_event' | 'gold'     | 1
-        'context_event' | ''         | 3
+        context_event | default_context  | 2
+        context_event | ultimate_context | 1
+        context_event | gold_context     | 1
+        context_event | ''               | 3
       end
 
       with_them do
@@ -90,7 +96,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
 
     context 'with empty invalid context' do
       it 'raise error' do
-        expect { described_class.unique_events(event_names: 'context_event', start_date: 4.weeks.ago, end_date: Date.current, context: invalid_context) }.to raise_error('Invalid context')
+        expect { described_class.unique_events(event_names: context_event, start_date: 4.weeks.ago, end_date: Date.current, context: invalid_context) }.to raise_error('Invalid context')
       end
     end
   end
