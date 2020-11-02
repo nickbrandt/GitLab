@@ -48,7 +48,7 @@ module Security
       end
 
       vulnerability_params = finding.to_hash.except(:compare_key, :identifiers, :location, :scanner, :scan, :links)
-      vulnerability_params[:uuid] = calculcate_uuid_v5(finding)
+      vulnerability_params[:uuid] = calculate_uuid_v5(finding)
       vulnerability_finding = create_or_find_vulnerability_finding(finding, vulnerability_params)
 
       update_vulnerability_scanner(finding)
@@ -91,7 +91,7 @@ module Security
       end
     end
 
-    def calculcate_uuid_v5(vulnerability_finding)
+    def calculate_uuid_v5(vulnerability_finding)
       uuid_v5_name_components = {
         report_type: vulnerability_finding.report_type,
         primary_identifier_fingerprint: vulnerability_finding.primary_fingerprint,
