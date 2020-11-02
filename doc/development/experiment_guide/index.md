@@ -113,9 +113,9 @@ addressed.
 
 ### Implement the tracking events
 
-In order to determine whether the experiment is a success or not, we need to implement tracking events
-to acquire data for analyzing. We can send events to Snowplow either via the backend or via the frontend.
-See the [product analytics guide](../product_analytics/index.md) for more details.
+To determine whether the experiment is a success or not, we must implement tracking events
+to acquire data for analyzing. We can send events to Snowplow via either the backend or frontend.
+Read the [product analytics guide](../product_analytics/index.md) for more details.
 
 #### Track backend events
 
