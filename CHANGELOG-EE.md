@@ -513,6 +513,16 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Elasticsearch reindexing: add confirmation popup and change color scheme. !42209
 
 
+## 13.3.9 (2020-11-02)
+
+### Security (4 changes)
+
+- Sync code owners rules on MR update. !1003
+- Fix potential regex backtracking attack in path parsing in search result. !1024
+- Transfer missing epics when a project is transferred.
+- Tighten the RBAC for GraphQL in SAST CiConfiguration.
+
+
 ## 13.3.8 (2020-10-21)
 
 ### Fixed (4 changes)
