@@ -203,6 +203,23 @@ These types of queries are not supported. In these instances, you can use offset
 
 <!-- ### External pagination -->
 
+### External pagination
+
+There may be times where you need to return data through the GitLab API that is stored in
+another system. In these cases you may have to paginate a third-party's API.
+
+An example of this is with our [Error Tracking](../../operations/error_tracking.md) implementation,
+where we proxy [Sentry errors](../../operations/error_tracking.md#sentry-error-tracking) through
+the GitLab API. We do this by calling the Sentry API which enforces its own pagination rules.
+This means we cannot access the collection within GitLab to perform our own custom pagination.
+
+For consistency, we manually set the pagination cursors based on values returned by the external API, using `Gitlab::Graphql::ExternallyPaginatedArray.new(previous_cursor, next_cursor, *items)`.
+
+You can see an example implementation in the following files:
+
+- [`types/error__tracking/sentry_error_collection_type.rb`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/graphql/types/error_tracking/sentry_error_collection_type.rb) which adds an extension to  `field :errors`.
+- [`resolvers/error_tracking/sentry_errors_resolver.rb`](https://gitlab.com/gitlab-org/gitlab/blob/master/app/graphql/resolvers/error_tracking/sentry_errors_resolver.rb) which returns the data from the resolver.
+
 ## Testing
 
 Any GraphQL field that supports pagination and sorting should be tested
