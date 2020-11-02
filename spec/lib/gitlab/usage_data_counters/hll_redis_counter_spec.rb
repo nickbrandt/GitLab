@@ -273,7 +273,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
         }
       }
 
-      expect(subject.unique_events_data).to eq(results)
+      expect(described_class.unique_events_data).to eq(results)
     end
   end
 
@@ -282,7 +282,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       it 'returns empty hash' do
         allow(described_class).to receive(:aggregated_metrics).and_return([])
 
-        expect(subject.aggregated_metrics_data).to eq({})
+        expect(described_class.aggregated_metrics_data).to eq({})
       end
     end
 
@@ -322,7 +322,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
           'gmau_2' => 3
         }
 
-        expect(subject.aggregated_metrics_data).to eq(results)
+        expect(described_class.aggregated_metrics_data).to eq(results)
       end
     end
   end

@@ -2,7 +2,7 @@
 
 module Gitlab
   module UsageDataCounters
-    module HLLRedisCounter
+    class HLLRedisCounter
       DEFAULT_WEEKLY_KEY_EXPIRY_LENGTH = 6.weeks
       DEFAULT_DAILY_KEY_EXPIRY_LENGTH = 29.days
       DEFAULT_REDIS_SLOT = ''
