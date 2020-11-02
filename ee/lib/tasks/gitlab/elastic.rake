@@ -1,6 +1,6 @@
 namespace :gitlab do
   namespace :elastic do
-    desc "GitLab | Elasticsearch | Index eveything at once"
+    desc "GitLab | Elasticsearch | Index everything at once"
     task :index do
       # UPDATE_INDEX=true can cause some projects not to be indexed properly if someone were to push a commit to the
       # project before the rake task could get to it, so we set it to `nil` here to avoid that. It doesn't make sense

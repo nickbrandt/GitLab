@@ -178,6 +178,16 @@ module Gitlab
         client.indices.put_settings(index: index_name || target_index_name, body: settings)
       end
 
+      def add_mapping(index_name: target_index_name, mapping:)
+        client.indices.put_mapping(index: index_name, body: mapping)
+      end
+
+      def get_mappings(index_name: target_index_name)
+        mapping_hash = client.indices.get_mapping(index: index_name)
+
+        mapping_hash[index_name]['mappings']
+      end
+
       def switch_alias(from: target_index_name, to:)
         actions = [
           {
