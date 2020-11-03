@@ -1,10 +1,12 @@
 <script>
-import { GlModal } from '@gitlab/ui';
+import { GlIcon, GlLink, GlModal } from '@gitlab/ui';
 import { JOB_RETRY_FORWARD_DEPLOYMENT_MODAL } from '../constants';
 
 export default {
   name: 'JobRetryForwardDeploymentModal',
   components: {
+    GlIcon,
+    GlLink,
     GlModal,
   },
   i18n: {
@@ -18,6 +20,11 @@ export default {
     href: {
       type: String,
       required: true,
+    },
+  },
+  inject: {
+    retryOutdatedJobDocsUrl: {
+      default: '',
     },
   },
   data() {
@@ -51,6 +58,9 @@ export default {
       :title="$options.i18n.title"
     >
       {{ $options.i18n.body }}
+      <gl-link v-if="retryOutdatedJobDocsUrl" :href="retryOutdatedJobDocsUrl" target="_blank">
+        <gl-icon name="question" />
+      </gl-link>
     </gl-modal>
   </span>
 </template>

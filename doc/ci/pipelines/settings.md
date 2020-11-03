@@ -231,6 +231,16 @@ When enabled, any older deployments job are skipped when a new deployment starts
 
 For more information, see [Deployment safety](../environments/deployment_safety.md).
 
+## Retry outdated jobs
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/211339) in GitLab 13.6.
+
+A deployment job can fail because a newer one has run. In order to prevent that an environment is
+accidentally deployed with an older source code, when clicking on `Retry` a modal will
+warn and ask for confirmation.
+
+For more information, see [Deployment safety](../environments/deployment_safety.md).
+
 ## Pipeline Badges
 
 In the pipelines settings page you can find pipeline status and test coverage
