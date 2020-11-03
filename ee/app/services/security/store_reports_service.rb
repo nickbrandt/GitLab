@@ -11,7 +11,7 @@ module Security
 
     def execute
       store_reports
-      mark_project_as_vulnerable
+      mark_project_as_vulnerable!
 
       errors.any? ? error(full_errors) : success
     end
@@ -29,8 +29,8 @@ module Security
       end
     end
 
-    def mark_project_as_vulnerable
-      project.project_setting.update(has_vulnerabilities: true)
+    def mark_project_as_vulnerable!
+      project.project_setting.update!(has_vulnerabilities: true)
     end
 
     def full_errors
