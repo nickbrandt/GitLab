@@ -5493,6 +5493,9 @@ msgstr ""
 msgid "Close epic"
 msgstr ""
 
+msgid "Close issue"
+msgstr ""
+
 msgid "Close milestone"
 msgstr ""
 
@@ -14771,6 +14774,9 @@ msgstr ""
 msgid "Issue Boards"
 msgstr ""
 
+msgid "Issue actions"
+msgstr ""
+
 msgid "Issue already promoted to epic."
 msgstr ""
 
@@ -22372,6 +22378,9 @@ msgstr ""
 msgid "Reopen epic"
 msgstr ""
 
+msgid "Reopen issue"
+msgstr ""
+
 msgid "Reopen milestone"
 msgstr ""
 
@@ -27290,6 +27299,9 @@ msgid "This is the number of currently active users on your installation, and th
 msgstr ""
 
 msgid "This is your current session"
+msgstr ""
+
+msgid "This issue is currently blocked by the following issues:"
 msgstr ""
 
 msgid "This issue is currently blocked by the following issues: %{issues}."
