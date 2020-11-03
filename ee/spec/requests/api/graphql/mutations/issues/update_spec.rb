@@ -64,6 +64,17 @@ RSpec.describe 'Update of an existing issue' do
         expect(graphql_errors).not_to be_blank
       end
     end
+
+    context 'the epic is not an epic' do
+      let(:epic) { create(:user) }
+
+      it 'does not set the epic' do
+        post_graphql_mutation(mutation, current_user: current_user)
+
+        expect(response).to have_gitlab_http_status(:success)
+        expect(graphql_errors).not_to be_blank
+      end
+    end
   end
 
   context 'removing epic' do
