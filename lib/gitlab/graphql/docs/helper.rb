@@ -85,6 +85,8 @@ module Gitlab
             !object_type[:name]["Connection"] &&
               !object_type[:name]["Edge"] &&
               !object_type[:name]["__"]
+          end.each do |type|
+            type[:fields] += type[:connections]
           end
         end
 
