@@ -2821,6 +2821,9 @@ msgstr ""
 msgid "An administrator changed the password for your GitLab account on %{link_to}."
 msgstr ""
 
+msgid "An alert has been resolved in %{project_path}."
+msgstr ""
+
 msgid "An alert has been triggered in %{project_path}."
 msgstr ""
 
@@ -29433,6 +29436,12 @@ msgid "Version %{versionNumber} (latest)"
 msgstr ""
 
 msgid "View Documentation"
+msgstr ""
+
+msgid "View alert details at"
+msgstr ""
+
+msgid "View alert details."
 msgstr ""
 
 msgid "View all issues"
