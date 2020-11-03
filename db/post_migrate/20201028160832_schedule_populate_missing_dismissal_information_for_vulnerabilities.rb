@@ -5,7 +5,7 @@ class SchedulePopulateMissingDismissalInformationForVulnerabilities < ActiveReco
 
   DOWNTIME = false
   BATCH_SIZE = 1_000
-  DELAY_INTERVAL = 1.minute.to_i
+  DELAY_INTERVAL = 3.minutes.to_i
   MIGRATION_CLASS = 'PopulateMissingVulnerabilityDismissalInformation'
 
   disable_ddl_transaction!

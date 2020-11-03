@@ -30,8 +30,8 @@ RSpec.describe SchedulePopulateMissingDismissalInformationForVulnerabilities do
     migrate!
 
     expect(BackgroundMigrationWorker.jobs.size).to be(3)
-    expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(1.minute, vulnerability_1.id)
-    expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(2.minutes, vulnerability_2.id)
-    expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(3.minutes, vulnerability_3.id)
+    expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(3.minutes, vulnerability_1.id)
+    expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(6.minutes, vulnerability_2.id)
+    expect(described_class::MIGRATION_CLASS).to be_scheduled_delayed_migration(9.minutes, vulnerability_3.id)
   end
 end
