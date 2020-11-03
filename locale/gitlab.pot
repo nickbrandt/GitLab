@@ -2294,6 +2294,9 @@ msgstr ""
 msgid "After a successful password update, you will be redirected to the login page where you can log in with your new password."
 msgstr ""
 
+msgid "After sign-out path"
+msgstr ""
+
 msgid "After that, you will not be able to use merge approvals or code quality as well as many other features."
 msgstr ""
 
@@ -2816,6 +2819,9 @@ msgid "An %{link_start}alert%{link_end} with the same fingerprint is already ope
 msgstr ""
 
 msgid "An administrator changed the password for your GitLab account on %{link_to}."
+msgstr ""
+
+msgid "An alert has been resolved in %{project_path}."
 msgstr ""
 
 msgid "An alert has been triggered in %{project_path}."
@@ -3975,6 +3981,15 @@ msgstr ""
 msgid "AutoRemediation|Introducing GitLab auto-fix"
 msgstr ""
 
+msgid "AutoRollback|Automatic rollbacks start when a critical alert is triggered. If the last successful deployment fails to roll back automatically, it can still be done manually."
+msgstr ""
+
+msgid "AutoRollback|Automatically roll back to the last successful deployment when a critical problem is detected."
+msgstr ""
+
+msgid "AutoRollback|Enable automatic rollbacks"
+msgstr ""
+
 msgid "Autocomplete"
 msgstr ""
 
@@ -3991,6 +4006,9 @@ msgid "Automatic certificate management using %{lets_encrypt_link_start}Let's En
 msgstr ""
 
 msgid "Automatic certificate management using Let's Encrypt"
+msgstr ""
+
+msgid "Automatic deployment rollbacks"
 msgstr ""
 
 msgid "Automatically close incident issues when the associated Prometheus alert resolves."
@@ -5491,6 +5509,9 @@ msgid "Close %{tabname}"
 msgstr ""
 
 msgid "Close epic"
+msgstr ""
+
+msgid "Close issue"
 msgstr ""
 
 msgid "Close milestone"
@@ -8352,9 +8373,6 @@ msgstr ""
 msgid "DastProfiles|Passive"
 msgstr ""
 
-msgid "DastProfiles|Please enter a valid URL format, ex: http://www.example.com/home"
-msgstr ""
-
 msgid "DastProfiles|Please enter a valid timeout value"
 msgstr ""
 
@@ -11153,6 +11171,9 @@ msgstr ""
 msgid "Failed to load stacktrace."
 msgstr ""
 
+msgid "Failed to make repository read-only. %{reason}"
+msgstr ""
+
 msgid "Failed to mark this issue as a duplicate because referenced issue was not found."
 msgstr ""
 
@@ -11476,6 +11497,9 @@ msgstr ""
 msgid "FeatureFlags|Rollout Strategy"
 msgstr ""
 
+msgid "FeatureFlags|Select a user list"
+msgstr ""
+
 msgid "FeatureFlags|Set the Unleash client application name to the name of the environment your application runs in. This value is used to match environment scopes. See the %{linkStart}example client configuration%{linkEnd}."
 msgstr ""
 
@@ -11494,9 +11518,6 @@ msgstr ""
 msgid "FeatureFlags|There was an error fetching the user lists."
 msgstr ""
 
-msgid "FeatureFlags|There was an error retrieving user lists"
-msgstr ""
-
 msgid "FeatureFlags|To prevent accidental actions we ask you to confirm your intention. Please type %{projectName} to proceed or close this modal to cancel."
 msgstr ""
 
@@ -11510,9 +11531,6 @@ msgid "FeatureFlags|User List"
 msgstr ""
 
 msgid "FeatureFlags|User Lists"
-msgstr ""
-
-msgid "FeatureFlag|List"
 msgstr ""
 
 msgid "FeatureFlag|Percentage"
@@ -11531,6 +11549,9 @@ msgid "FeatureFlag|Type"
 msgstr ""
 
 msgid "FeatureFlag|User IDs"
+msgstr ""
+
+msgid "FeatureFlag|User List"
 msgstr ""
 
 msgid "Feb"
@@ -14772,6 +14793,9 @@ msgid "Issue Analytics"
 msgstr ""
 
 msgid "Issue Boards"
+msgstr ""
+
+msgid "Issue actions"
 msgstr ""
 
 msgid "Issue already promoted to epic."
@@ -19665,6 +19689,12 @@ msgstr ""
 msgid "Pipelines|Trigger user has insufficient permissions to project"
 msgstr ""
 
+msgid "Pipelines|Visualize"
+msgstr ""
+
+msgid "Pipelines|Write pipeline configuration"
+msgstr ""
+
 msgid "Pipelines|invalid"
 msgstr ""
 
@@ -19893,6 +19923,9 @@ msgstr ""
 msgid "Please enter a number greater than %{number} (from the project settings)"
 msgstr ""
 
+msgid "Please enter a valid URL format, ex: http://www.example.com/home"
+msgstr ""
+
 msgid "Please enter a valid number"
 msgstr ""
 
@@ -19900,6 +19933,9 @@ msgid "Please enter or upload a license."
 msgstr ""
 
 msgid "Please fill in a descriptive name for your group."
+msgstr ""
+
+msgid "Please fill out this field."
 msgstr ""
 
 msgid "Please follow the %{link_start}Let's Encrypt troubleshooting instructions%{link_end} to re-obtain your Let's Encrypt certificate."
@@ -22016,9 +22052,6 @@ msgstr ""
 msgid "Register device"
 msgstr ""
 
-msgid "Register for GitLab"
-msgstr ""
-
 msgid "Register now"
 msgstr ""
 
@@ -22351,6 +22384,9 @@ msgstr ""
 msgid "Removes time estimate."
 msgstr ""
 
+msgid "Removing integrations is not supported for this project"
+msgstr ""
+
 msgid "Removing this group also removes all child projects, including archived projects, and their resources."
 msgstr ""
 
@@ -22370,6 +22406,9 @@ msgid "Reopen %{display_issuable_type}"
 msgstr ""
 
 msgid "Reopen epic"
+msgstr ""
+
+msgid "Reopen issue"
 msgstr ""
 
 msgid "Reopen milestone"
@@ -24696,6 +24735,9 @@ msgstr ""
 msgid "Sign-in restrictions"
 msgstr ""
 
+msgid "Sign-in text"
+msgstr ""
+
 msgid "Sign-up restrictions"
 msgstr ""
 
@@ -25303,9 +25345,6 @@ msgid "Specify an e-mail address regex pattern to identify default internal user
 msgstr ""
 
 msgid "Specify the following URL during the Runner setup:"
-msgstr ""
-
-msgid "Speed up your DevOps%{br_tag}with GitLab"
 msgstr ""
 
 msgid "Squash commit message"
@@ -27295,6 +27334,9 @@ msgstr ""
 msgid "This is your current session"
 msgstr ""
 
+msgid "This issue is currently blocked by the following issues:"
+msgstr ""
+
 msgid "This issue is currently blocked by the following issues: %{issues}."
 msgstr ""
 
@@ -29246,9 +29288,6 @@ msgstr ""
 msgid "Username is available."
 msgstr ""
 
-msgid "Username is too long (maximum is %{max_length} characters)."
-msgstr ""
-
 msgid "Username or email"
 msgstr ""
 
@@ -29400,6 +29439,12 @@ msgid "Version %{versionNumber} (latest)"
 msgstr ""
 
 msgid "View Documentation"
+msgstr ""
+
+msgid "View alert details at"
+msgstr ""
+
+msgid "View alert details."
 msgstr ""
 
 msgid "View all issues"
@@ -30642,6 +30687,9 @@ msgid "You have insufficient permissions to create a Todo for this alert"
 msgstr ""
 
 msgid "You have insufficient permissions to create an HTTP integration for this project"
+msgstr ""
+
+msgid "You have insufficient permissions to remove this HTTP integration"
 msgstr ""
 
 msgid "You have insufficient permissions to update this HTTP integration"

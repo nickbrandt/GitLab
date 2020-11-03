@@ -20,18 +20,6 @@ RSpec.describe RegistrationsController do
     end
   end
 
-  describe '#welcome' do
-    subject { get :welcome }
-
-    before do
-      sign_in(user)
-    end
-
-    it 'renders the checkout layout' do
-      expect(subject).to render_template(:checkout)
-    end
-  end
-
   describe '#update_registration' do
     let(:setup_for_company) { 'false' }
     let(:email_opted_in) { '0' }
