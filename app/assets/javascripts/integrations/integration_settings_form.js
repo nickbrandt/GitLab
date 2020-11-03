@@ -84,6 +84,7 @@ export default class IntegrationSettingsForm {
         if (data.error) {
           toast(`${data.message} ${data.service_response}`);
         } else {
+          this.vue.$store.dispatch('integrationTestData', data);
           toast(s__('Integrations|Connection successful.'));
         }
       })

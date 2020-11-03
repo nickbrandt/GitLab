@@ -1,3 +1,4 @@
 export const SET_OVERRIDE = 'SET_OVERRIDE';
 export const SET_IS_SAVING = 'SET_IS_SAVING';
 export const SET_IS_TESTING = 'SET_IS_TESTING';
+export const INTEGRATION_TEST_DATA = 'INTEGRATION_TEST_DATA';

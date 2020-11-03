@@ -30,7 +30,7 @@ class JiraService < IssueTrackerService
 
   # TODO: we can probably just delegate as part of
   # https://gitlab.com/gitlab-org/gitlab/issues/29404
-  data_field :username, :password, :url, :api_url, :jira_issue_transition_id, :project_key, :issues_enabled
+  data_field :username, :password, :url, :api_url, :jira_issue_transition_id, :project_key, :issues_enabled, :vulnerabilities_enabled, :issue_key
 
   before_update :reset_password
   after_commit :update_deployment_type, on: [:create, :update], if: :update_deployment_type?
@@ -137,6 +137,18 @@ class JiraService < IssueTrackerService
 
   def new_issue_url
     "#{url}/secure/CreateIssue!default.jspa"
+  end
+
+  def new_issue_url_with_predefined_fields(summary, description)
+    escaped_summary = CGI.escape(summary)
+    escaped_description = CGI.escape(description)
+    "#{url}/secure/CreateIssueDetails!init.jspa?pid=#{project_id}&issuetype=#{issue_key}&summary=#{escaped_summary}&description=#{escaped_description}"
+  end
+
+  def project_id
+    strong_memoize(:project_id) do
+      client_url.present? ? jira_request { client.Project.find(project_key).id } : nil
+    end
   end
 
   alias_method :original_url, :url

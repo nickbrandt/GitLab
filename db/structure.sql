@@ -8977,7 +8977,8 @@ CREATE TABLE analytics_devops_adoption_segments (
     name text NOT NULL,
     last_recorded_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT check_4be7a006fd CHECK ((char_length(name) <= 255))
 );
 
 CREATE SEQUENCE analytics_devops_adoption_segments_id_seq
@@ -9333,14 +9334,14 @@ CREATE TABLE application_settings (
     encrypted_ci_jwt_signing_key text,
     encrypted_ci_jwt_signing_key_iv text,
     container_registry_expiration_policies_worker_capacity integer DEFAULT 0 NOT NULL,
-    elasticsearch_analyzers_smartcn_enabled boolean DEFAULT false NOT NULL,
-    elasticsearch_analyzers_smartcn_search boolean DEFAULT false NOT NULL,
-    elasticsearch_analyzers_kuromoji_enabled boolean DEFAULT false NOT NULL,
-    elasticsearch_analyzers_kuromoji_search boolean DEFAULT false NOT NULL,
     secret_detection_token_revocation_enabled boolean DEFAULT false NOT NULL,
     secret_detection_token_revocation_url text,
     encrypted_secret_detection_token_revocation_token text,
     encrypted_secret_detection_token_revocation_token_iv text,
+    elasticsearch_analyzers_smartcn_enabled boolean DEFAULT false NOT NULL,
+    elasticsearch_analyzers_smartcn_search boolean DEFAULT false NOT NULL,
+    elasticsearch_analyzers_kuromoji_enabled boolean DEFAULT false NOT NULL,
+    elasticsearch_analyzers_kuromoji_search boolean DEFAULT false NOT NULL,
     new_user_signups_cap integer,
     CONSTRAINT app_settings_registry_exp_policies_worker_capacity_positive CHECK ((container_registry_expiration_policies_worker_capacity >= 0)),
     CONSTRAINT check_2dba05b802 CHECK ((char_length(gitpod_url) <= 255)),
@@ -13167,7 +13168,10 @@ CREATE TABLE jira_tracker_data (
     project_key text,
     issues_enabled boolean DEFAULT false NOT NULL,
     deployment_type smallint DEFAULT 0 NOT NULL,
-    CONSTRAINT check_214cf6a48b CHECK ((char_length(project_key) <= 255))
+    issue_key text,
+    vulnerabilities_enabled boolean DEFAULT false NOT NULL,
+    CONSTRAINT check_214cf6a48b CHECK ((char_length(project_key) <= 255)),
+    CONSTRAINT check_3957208a80 CHECK ((char_length(issue_key) <= 255))
 );
 
 CREATE SEQUENCE jira_tracker_data_id_seq
@@ -17102,6 +17106,26 @@ CREATE SEQUENCE vulnerability_feedback_id_seq
 
 ALTER SEQUENCE vulnerability_feedback_id_seq OWNED BY vulnerability_feedback.id;
 
+CREATE TABLE vulnerability_finding_links (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    vulnerability_occurrence_id bigint NOT NULL,
+    name text,
+    url text NOT NULL,
+    CONSTRAINT check_55f0a95439 CHECK ((char_length(name) <= 255)),
+    CONSTRAINT check_b7fe886df6 CHECK ((char_length(url) <= 2048))
+);
+
+CREATE SEQUENCE vulnerability_finding_links_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE vulnerability_finding_links_id_seq OWNED BY vulnerability_finding_links.id;
+
 CREATE TABLE vulnerability_historical_statistics (
     id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -18200,6 +18224,8 @@ ALTER TABLE ONLY vulnerabilities ALTER COLUMN id SET DEFAULT nextval('vulnerabil
 ALTER TABLE ONLY vulnerability_exports ALTER COLUMN id SET DEFAULT nextval('vulnerability_exports_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_feedback ALTER COLUMN id SET DEFAULT nextval('vulnerability_feedback_id_seq'::regclass);
+
+ALTER TABLE ONLY vulnerability_finding_links ALTER COLUMN id SET DEFAULT nextval('vulnerability_finding_links_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_historical_statistics ALTER COLUMN id SET DEFAULT nextval('vulnerability_historical_statistics_id_seq'::regclass);
 
@@ -19644,6 +19670,9 @@ ALTER TABLE ONLY vulnerability_exports
 ALTER TABLE ONLY vulnerability_feedback
     ADD CONSTRAINT vulnerability_feedback_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY vulnerability_finding_links
+    ADD CONSTRAINT vulnerability_finding_links_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY vulnerability_historical_statistics
     ADD CONSTRAINT vulnerability_historical_statistics_pkey PRIMARY KEY (id);
 
@@ -19867,6 +19896,8 @@ CREATE INDEX design_user_mentions_on_design_id_and_note_id_index ON design_user_
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_and_note_id_index ON epic_user_mentions USING btree (epic_id, note_id);
 
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_index ON epic_user_mentions USING btree (epic_id) WHERE (note_id IS NULL);
+
+CREATE INDEX finding_links_on_vulnerability_occurrence_id ON vulnerability_finding_links USING btree (vulnerability_occurrence_id);
 
 CREATE INDEX idx_audit_events_on_entity_id_desc_author_id_created_at ON audit_events USING btree (entity_id, entity_type, id DESC, author_id, created_at);
 
@@ -24188,6 +24219,9 @@ ALTER TABLE ONLY gpg_signatures
 
 ALTER TABLE ONLY board_group_recent_visits
     ADD CONSTRAINT fk_rails_ca04c38720 FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY vulnerability_finding_links
+    ADD CONSTRAINT fk_rails_cbdfde27ce FOREIGN KEY (vulnerability_occurrence_id) REFERENCES vulnerability_occurrences(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY issues_self_managed_prometheus_alert_events
     ADD CONSTRAINT fk_rails_cc5d88bbb0 FOREIGN KEY (issue_id) REFERENCES issues(id) ON DELETE CASCADE;

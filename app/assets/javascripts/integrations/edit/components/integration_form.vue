@@ -31,7 +31,7 @@ export default {
   mixins: [glFeatureFlagsMixin()],
   computed: {
     ...mapGetters(['currentKey', 'propsSource', 'isSavingOrTesting']),
-    ...mapState(['defaultState', 'override', 'isSaving', 'isTesting']),
+    ...mapState(['defaultState', 'override', 'isSaving', 'isTesting', 'integrationData']),
     isEditable() {
       return this.propsSource.editable;
     },
@@ -44,9 +44,12 @@ export default {
     showJiraIssuesFields() {
       return this.isJira && this.glFeatures.jiraIssuesIntegration;
     },
+    issueTypes() {
+      return this.integrationData?.issuetypes || [];
+    }
   },
   methods: {
-    ...mapActions(['setOverride', 'setIsSaving', 'setIsTesting']),
+    ...mapActions(['setOverride', 'setIsSaving', 'setIsTesting', 'integrationTestData']),
     onSaveClick() {
       this.setIsSaving(true);
       eventHub.$emit('saveIntegration');
@@ -88,6 +91,7 @@ export default {
     <jira-issues-fields
       v-if="showJiraIssuesFields"
       :key="`${currentKey}-jira-issues-fields`"
+      :issue-types="issueTypes"
       v-bind="propsSource.jiraIssuesProps"
     />
     <div v-if="isEditable" class="footer-block row-content-block">

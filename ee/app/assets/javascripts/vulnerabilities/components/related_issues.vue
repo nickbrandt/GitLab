@@ -1,6 +1,6 @@
 <script>
 import axios from 'axios';
-import { GlButton, GlAlert, GlSprintf, GlLink } from '@gitlab/ui';
+import { GlButton, GlAlert, GlSprintf, GlLink, GlIcon } from '@gitlab/ui';
 import RelatedIssuesStore from '~/related_issues/stores/related_issues_store';
 import RelatedIssuesBlock from '~/related_issues/components/related_issues_block.vue';
 import { issuableTypesMap, PathIdSeparator } from '~/related_issues/constants';
@@ -18,6 +18,7 @@ export default {
     GlAlert,
     GlSprintf,
     GlLink,
+    GlIcon,
   },
   props: {
     endpoint: {
@@ -62,6 +63,9 @@ export default {
     canCreateIssue() {
       return !this.isIssueAlreadyCreated && !this.isFetching && Boolean(this.createIssueUrl);
     },
+    canCreateJiraIssue() {
+      return Boolean(this.createJiraIssueUrl);
+    },
   },
   inject: {
     vulnerabilityId: {
@@ -71,6 +75,9 @@ export default {
       default: '',
     },
     createIssueUrl: {
+      default: '',
+    },
+    createJiraIssueUrl: {
       default: '',
     },
     reportType: {
@@ -208,6 +215,7 @@ export default {
   i18n: {
     relatedIssues: __('Related issues'),
     createIssue: __('Create issue'),
+    createJiraIssue: __('Create new issue in Jira'),
     createIssueErrorTitle: __('Could not create issue'),
     createIssueErrorBody: s__(
       'SecurityReports|Ensure that %{trackingStart}issue tracking%{trackingEnd} is enabled for this project and you have %{permissionsStart}permission to create new issues%{permissionsEnd}.',
@@ -264,7 +272,20 @@ export default {
       <template #headerText>
         {{ $options.i18n.relatedIssues }}
       </template>
-      <template v-if="canCreateIssue" #headerActions>
+      <template v-if="canCreateJiraIssue" #headerActions>
+        <gl-button
+          ref="createJiraIssue"
+          variant="success"
+          category="secondary"
+          :loading="isProcessingAction"
+          :href="createJiraIssueUrl"
+          target="__blank"
+        >
+          {{ $options.i18n.createJiraIssue }}
+          <gl-icon name="external-link" />
+        </gl-button>
+      </template>
+      <template v-else-if="canCreateIssue" #headerActions>
         <gl-button
           ref="createIssue"
           variant="success"

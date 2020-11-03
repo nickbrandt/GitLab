@@ -7,6 +7,8 @@ import {
   GlLink,
   GlButton,
   GlCard,
+  GlFormRadioGroup,
+  GlFormRadio,
 } from '@gitlab/ui';
 import eventHub from '../event_hub';
 
@@ -20,6 +22,8 @@ export default {
     GlLink,
     GlButton,
     GlCard,
+    GlFormRadioGroup,
+    GlFormRadio,
   },
   props: {
     showJiraIssuesIntegration: {
@@ -32,10 +36,25 @@ export default {
       required: false,
       default: null,
     },
+    initialEnableJiraIssuesFromVulnerabilities: {
+      type: Boolean,
+      required: false,
+      default: null,
+    },
     initialProjectKey: {
       type: String,
       required: false,
       default: null,
+    },
+    initialIssueKey: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    issueTypes: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
     gitlabIssuesEnabled: {
       type: Boolean,
@@ -56,7 +75,9 @@ export default {
   data() {
     return {
       enableJiraIssues: this.initialEnableJiraIssues,
+      enableJiraIssuesFromVulnerabilities: this.initialEnableJiraIssuesFromVulnerabilities,
       projectKey: this.initialProjectKey,
+      issueKey: this.initialIssueKey,
       validated: false,
     };
   },
@@ -105,6 +126,46 @@ export default {
               }}
             </template>
           </gl-form-checkbox>
+          <input name="service[vulnerabilities_enabled]" type="hidden" :value="enableJiraIssuesFromVulnerabilities || false" />
+          <gl-form-checkbox v-model="enableJiraIssuesFromVulnerabilities">
+            {{ s__('JiraService|Enable Jira issue creation from vulnerabilities') }}
+            <template #help>
+              {{
+                s__(
+                  'JiraService|Issues created from vulnerabilities in this project will be Jira issues, even if GitLab issues are enabled.',
+                )
+              }}
+            </template>
+          </gl-form-checkbox>
+          <gl-form-group
+            v-if="enableJiraIssuesFromVulnerabilities"
+            :label="s__('JiraService|Jira issue type')"
+            label-for="service_issue_key"
+          >
+            <p>
+            {{
+              s__(
+                'JiraService|Define the type of Jira issue to create from a vulnerability.',
+              )
+            }}
+            </p>
+            <p v-if="!issueTypes.length">
+            {{
+              s__(
+                'JiraService|Click on Test settings button to load available issue types.',
+              )
+            }}
+            </p>
+            <gl-form-radio-group v-model="issueKey" name="service[issue_key]">
+              <gl-form-radio
+                v-for="issuetype in issueTypes"
+                :key="issuetype.name"
+                :value="issuetype.id"
+              >
+                {{ issuetype.name }}
+              </gl-form-radio>
+            </gl-form-radio-group>
+          </gl-form-group>
         </template>
         <gl-card v-else class="gl-mt-7">
           <strong>{{ __('This is a Premium feature') }}</strong>

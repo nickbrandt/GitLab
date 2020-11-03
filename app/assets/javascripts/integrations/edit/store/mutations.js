@@ -10,4 +10,7 @@ export default {
   [types.SET_IS_TESTING](state, isTesting) {
     state.isTesting = isTesting;
   },
+  [types.INTEGRATION_TEST_DATA](state, integrationData) {
+    state.integrationData = integrationData;
+  },
 };

@@ -11,6 +11,7 @@ function createMainApp() {
     provide: {
       reportType: vulnerability.report_type,
       createIssueUrl: vulnerability.create_issue_url,
+      createJiraIssueUrl: vulnerability.create_jira_issue_url,
       projectFingerprint: vulnerability.project_fingerprint,
       vulnerabilityId: vulnerability.id,
       issueTrackingHelpPath: vulnerability.issueTrackingHelpPath,

@@ -17,6 +17,7 @@ function parseDatasetToProps(data) {
     type,
     commentDetail,
     projectKey,
+    issueKey,
     upgradePlanPath,
     editProjectPath,
     learnMorePath,
@@ -38,6 +39,7 @@ function parseDatasetToProps(data) {
     enableComments,
     showJiraIssuesIntegration,
     enableJiraIssues,
+    enableJiraIssuesFromVulnerabilities,
     gitlabIssuesEnabled,
   } = parseBooleanInData(booleanAttributes);
 
@@ -58,7 +60,9 @@ function parseDatasetToProps(data) {
     jiraIssuesProps: {
       showJiraIssuesIntegration,
       initialEnableJiraIssues: enableJiraIssues,
+      initialEnableJiraIssuesFromVulnerabilities: enableJiraIssuesFromVulnerabilities,
       initialProjectKey: projectKey,
+      initialIssueKey: issueKey,
       gitlabIssuesEnabled,
       upgradePlanPath,
       editProjectPath,
