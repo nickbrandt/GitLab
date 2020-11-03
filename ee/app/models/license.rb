@@ -125,6 +125,7 @@ class License < ApplicationRecord
   EEP_FEATURES.freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
+    auto_rollback
     container_scanning
     coverage_fuzzing
     credentials_inventory
@@ -137,7 +138,6 @@ class License < ApplicationRecord
     insights
     issuable_health_status
     license_scanning
-    personal_access_token_api_management
     personal_access_token_expiration_policy
     enforce_pat_expiration
     group_saml_group_sync
