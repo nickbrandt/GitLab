@@ -16800,6 +16800,11 @@ type Query {
     last: Int
 
     """
+    Query to search users by name, username, or primary email.
+    """
+    search: String
+
+    """
     Sort users by this criteria
     """
     sort: Sort = created_desc
