@@ -4,21 +4,21 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import { GlButton, GlIcon, GlLink } from '@gitlab/ui';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
 import ArtifactsBlock from './artifacts_block.vue';
-import SidebarJobRetryButton from './sidebar_job_retry_button.vue';
+import JobSidebarRetryButton from './job_sidebar_retry_button.vue';
 import JobRetryForwardDeploymentModal from './job_retry_forward_deployment_modal.vue';
 import TriggerBlock from './trigger_block.vue';
 import CommitBlock from './commit_block.vue';
 import StagesDropdown from './stages_dropdown.vue';
 import JobsContainer from './jobs_container.vue';
-import SidebarJobDetailsContainer from './sidebar_job_details_container.vue';
-import { JOBS_SIDEBAR } from '../constants';
+import JobSidebarDetailsContainer from './sidebar_job_details_container.vue';
+import { JOB_SIDEBAR } from '../constants';
 
 export const forwardDeploymentFailureModalId = 'forward-deployment-failure';
 
 export default {
   name: 'JobSidebar',
   i18n: {
-    ...JOBS_SIDEBAR,
+    ...JOB_SIDEBAR,
   },
   forwardDeploymentFailureModalId,
   components: {
@@ -28,9 +28,9 @@ export default {
     GlLink,
     GlIcon,
     JobsContainer,
-    SidebarJobRetryButton,
+    JobSidebarRetryButton,
     JobRetryForwardDeploymentModal,
-    SidebarJobDetailsContainer,
+    JobSidebarDetailsContainer,
     StagesDropdown,
     TooltipOnTruncate,
     TriggerBlock,
@@ -88,7 +88,7 @@ export default {
             </h4>
           </tooltip-on-truncate>
           <div class="flex-grow-1 flex-shrink-0 text-right">
-            <sidebar-job-retry-button
+            <job-sidebar-retry-button
               v-if="job.retry_path"
               :class="retryButtonClass"
               :href="job.retry_path"
@@ -127,14 +127,15 @@ export default {
           <gl-link
             v-if="job.terminal_path"
             :href="job.terminal_path"
-            class="js-terminal-link btn btn-primary btn-inverted visible-md-block visible-lg-block float-left"
+            class="btn btn-primary btn-inverted visible-md-block visible-lg-block float-left"
             target="_blank"
+            data-testid="terminal-link"
           >
             {{ $options.i18n.debug }}
             <gl-icon :size="14" name="external-link" />
           </gl-link>
         </div>
-        <sidebar-job-details-container :runner-help-url="runnerHelpUrl" />
+        <job-sidebar-details-container :runner-help-url="runnerHelpUrl" />
         <artifacts-block v-if="hasArtifact" :artifact="job.artifact" :help-url="artifactHelpUrl" />
         <trigger-block v-if="hasTriggers" :trigger="job.trigger" />
         <commit-block

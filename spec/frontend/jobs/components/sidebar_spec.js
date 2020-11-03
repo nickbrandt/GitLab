@@ -3,7 +3,7 @@ import Sidebar, { forwardDeploymentFailureModalId } from '~/jobs/components/side
 import StagesDropdown from '~/jobs/components/stages_dropdown.vue';
 import JobsContainer from '~/jobs/components/jobs_container.vue';
 import JobRetryForwardDeploymentModal from '~/jobs/components/job_retry_forward_deployment_modal.vue';
-import JobRetryButton from '~/jobs/components/sidebar_job_retry_button.vue';
+import JobRetryButton from '~/jobs/components/job_sidebar_retry_button.vue';
 import createStore from '~/jobs/store';
 import job, { jobsInStage } from '../mock_data';
 import { extendedWrapper } from '../../helpers/vue_test_utils_helper';
@@ -13,7 +13,10 @@ describe('Sidebar details block', () => {
   let wrapper;
 
   const findModal = () => wrapper.find(JobRetryForwardDeploymentModal);
+  const findCancelButton = () => wrapper.findByTestId('cancel-button');
+  const findNewIssueButton = () => wrapper.findByTestId('job-new-issue');
   const findRetryButton = () => wrapper.find(JobRetryButton);
+  const findTerminalLink = () => wrapper.findByTestId('terminal-link');
 
   const createWrapper = ({ props = {} } = {}) => {
     store = createStore();
@@ -47,7 +50,7 @@ describe('Sidebar details block', () => {
       createWrapper();
       await store.dispatch('receiveJobSuccess', job);
 
-      expect(wrapper.find('.js-terminal-link').exists()).toBe(false);
+      expect(findTerminalLink().exists()).toBe(false);
     });
   });
 
@@ -56,7 +59,7 @@ describe('Sidebar details block', () => {
       createWrapper();
       await store.dispatch('receiveJobSuccess', { ...job, terminal_path: 'job/43123/terminal' });
 
-      expect(wrapper.find('.js-terminal-link').exists()).toBe(true);
+      expect(findTerminalLink().exists()).toBe(true);
     });
   });
 
@@ -67,8 +70,8 @@ describe('Sidebar details block', () => {
     });
 
     it('should render link to new issue', () => {
-      expect(wrapper.findByTestId('job-new-issue').attributes('href')).toBe(job.new_issue_path);
-      expect(wrapper.find('[data-testid="job-new-issue"]').text()).toBe('New issue');
+      expect(findNewIssueButton().attributes('href')).toBe(job.new_issue_path);
+      expect(findNewIssueButton().text()).toBe('New issue');
     });
 
     it('should render the retry button', () => {
@@ -76,8 +79,8 @@ describe('Sidebar details block', () => {
     });
 
     it('should render link to cancel job', () => {
-      expect(wrapper.findByTestId('cancel-button').text()).toMatch('Cancel');
-      expect(wrapper.findByTestId('cancel-button').attributes('href')).toBe(job.cancel_path);
+      expect(findCancelButton().text()).toMatch('Cancel');
+      expect(findCancelButton().attributes('href')).toBe(job.cancel_path);
     });
   });
 
@@ -143,8 +146,8 @@ describe('Sidebar details block', () => {
     describe('without jobs for stages', () => {
       beforeEach(() => store.dispatch('receiveJobSuccess', job));
 
-      it('does not render job container', () => {
-        expect(wrapper.find('.js-jobs-container').exists()).toBe(false);
+      it('does not render jobs container', () => {
+        expect(wrapper.find(JobsContainer).exists()).toBe(false);
       });
     });
 

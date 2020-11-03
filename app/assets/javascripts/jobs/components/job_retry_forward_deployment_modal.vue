@@ -1,6 +1,6 @@
 <script>
 import { GlModal } from '@gitlab/ui';
-import { JOBS_RETRY_FORWARD_DEPLOYMENT_MODAL } from '../constants';
+import { JOB_RETRY_FORWARD_DEPLOYMENT_MODAL } from '../constants';
 
 export default {
   name: 'JobRetryForwardDeploymentModal',
@@ -8,7 +8,7 @@ export default {
     GlModal,
   },
   i18n: {
-    ...JOBS_RETRY_FORWARD_DEPLOYMENT_MODAL,
+    ...JOB_RETRY_FORWARD_DEPLOYMENT_MODAL,
   },
   props: {
     modalId: {

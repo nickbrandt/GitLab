@@ -1,10 +1,10 @@
 import { GlButton, GlLink } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import job from '../mock_data';
-import SidebarJobRetryButton from '~/jobs/components/sidebar_job_retry_button.vue';
+import JobsSidebarRetryButton from '~/jobs/components/job_sidebar_retry_button.vue';
 import createStore from '~/jobs/store';
 
-describe('Job Retry Button', () => {
+describe('Job Sidebar Retry Button', () => {
   let store;
   let wrapper;
 
@@ -14,7 +14,7 @@ describe('Job Retry Button', () => {
 
   const createWrapper = ({ props = {} } = {}) => {
     store = createStore();
-    wrapper = shallowMount(SidebarJobRetryButton, {
+    wrapper = shallowMount(JobsSidebarRetryButton, {
       propsData: {
         href: job.retry_path,
         modalId: 'modal-id',
@@ -38,12 +38,10 @@ describe('Job Retry Button', () => {
     ['unmet_prerequisites', false, true],
     [forwardDeploymentFailure, true, false],
   ])(
-    'when error is: %s is, should render button: %s | should render link: %s',
+    'when error is: %s, should render button: %s | should render link: %s',
     async (failureReason, buttonExists, linkExists) => {
-      await store.dispatch('receiveJobSuccess', {
-        ...job,
-        failure_reason: failureReason,
-      });
+      await store.dispatch('receiveJobSuccess', { ...job, failure_reason: failureReason });
+
       expect(findRetryButton().exists()).toBe(buttonExists);
       expect(findRetryLink().exists()).toBe(linkExists);
       expect(wrapper.text()).toMatch('Retry');

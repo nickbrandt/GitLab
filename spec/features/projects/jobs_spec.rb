@@ -1074,7 +1074,7 @@ RSpec.describe 'Jobs', :clean_gitlab_redis_shared_state do
         end
       end
 
-      it 'retry the job' do
+      it 'retries the job' do
         find('[data-testid="retry-button-modal"]').click
 
         within '[data-testid="ci-header-content"]' do

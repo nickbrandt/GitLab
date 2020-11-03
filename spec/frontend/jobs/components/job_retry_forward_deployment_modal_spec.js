@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import { GlModal } from '@gitlab/ui';
 import job from '../mock_data';
 import JobRetryForwardDeploymentModal from '~/jobs/components/job_retry_forward_deployment_modal.vue';
-import { JOBS_RETRY_FORWARD_DEPLOYMENT_MODAL } from '~/jobs/constants';
+import { JOB_RETRY_FORWARD_DEPLOYMENT_MODAL } from '~/jobs/constants';
 import createStore from '~/jobs/store';
 
 describe('Job Retry Forward Deployment Modal', () => {
@@ -36,8 +36,8 @@ describe('Job Retry Forward Deployment Modal', () => {
   describe('Modal configuration', () => {
     it('should display the correct messages', () => {
       const modal = findModal();
-      expect(modal.attributes('title')).toMatch(JOBS_RETRY_FORWARD_DEPLOYMENT_MODAL.title);
-      expect(modal.text()).toMatch(JOBS_RETRY_FORWARD_DEPLOYMENT_MODAL.body);
+      expect(modal.attributes('title')).toMatch(JOB_RETRY_FORWARD_DEPLOYMENT_MODAL.title);
+      expect(modal.text()).toMatch(JOB_RETRY_FORWARD_DEPLOYMENT_MODAL.body);
     });
   });
 

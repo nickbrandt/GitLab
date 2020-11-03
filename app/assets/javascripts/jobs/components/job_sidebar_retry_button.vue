@@ -1,12 +1,12 @@
 <script>
 import { GlButton, GlLink, GlModalDirective } from '@gitlab/ui';
 import { mapGetters } from 'vuex';
-import { JOBS_SIDEBAR } from '../constants';
+import { JOB_SIDEBAR } from '../constants';
 
 export default {
-  name: 'SidebarJobRetryButton',
+  name: 'JobSidebarRetryButton',
   i18n: {
-    retryLabel: JOBS_SIDEBAR.retry,
+    retryLabel: JOB_SIDEBAR.retry,
   },
   components: {
     GlButton,
