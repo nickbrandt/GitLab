@@ -8,8 +8,6 @@ module EE
       has_and_belongs_to_many :approval_project_rules
 
       has_many :required_code_owners_sections, class_name: "ProtectedBranch::RequiredCodeOwnersSection"
-
-      protected_ref_access_levels :unprotect
     end
 
     class_methods do
@@ -24,13 +22,5 @@ module EE
       super && project.code_owner_approval_required_available?
     end
     alias_method :code_owner_approval_required?, :code_owner_approval_required
-
-    def can_unprotect?(user)
-      return true if unprotect_access_levels.empty?
-
-      unprotect_access_levels.any? do |access_level|
-        access_level.check_access(user)
-      end
-    end
   end
 end

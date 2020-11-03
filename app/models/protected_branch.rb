@@ -7,7 +7,7 @@ class ProtectedBranch < ApplicationRecord
   scope :requiring_code_owner_approval,
         -> { where(code_owner_approval_required: true) }
 
-  protected_ref_access_levels :merge, :push
+  protected_ref_access_levels :merge, :push, :unprotect
 
   def self.protected_ref_accessible_to?(ref, user, project:, action:, protected_refs: nil)
     # Maintainers, owners and admins are allowed to create the default branch
@@ -38,7 +38,6 @@ class ProtectedBranch < ApplicationRecord
     project.protected_branches
   end
 
-  # overridden in EE
   def self.branch_requires_code_owner_approval?(project, branch_name)
     false
   end
@@ -47,6 +46,18 @@ class ProtectedBranch < ApplicationRecord
     return none if query.blank?
 
     where(fuzzy_arel_match(:name, query.downcase))
+  end
+
+  def can_unprotect?(user)
+    return true if unprotect_access_levels.empty?
+
+    unprotect_access_levels.any? do |access_level|
+      access_level.check_access(user)
+    end
+  end
+
+  def self.protected_ref_access_levels(*types)
+    EE::ProtectedRef.protected_ref_access_levels(types)
   end
 end
 

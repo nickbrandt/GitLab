@@ -160,21 +160,15 @@ RSpec.describe 'Protected Branches', :js do
     end
 
     describe "access control" do
-      before do
-        stub_licensed_features(protected_refs_for_users: false)
-      end
+      # before do
+      #   stub_licensed_features(protected_refs_for_users: false)
+      # end
 
-      include_examples "protected branches > access control > CE"
+      include_examples "protected branches > access control > EE"
     end
   end
 
-  context 'when the users for protected branches feature is off' do
-    before do
-      stub_licensed_features(protected_refs_for_users: false)
-    end
-
-    include_examples 'when the deploy_keys_on_protected_branches FF is turned on' do
-      let(:all_dropdown_sections) { %w(Roles Deploy\ Keys) }
-    end
+  include_examples 'when the deploy_keys_on_protected_branches FF is turned on' do
+    let(:all_dropdown_sections) { %w(Roles Users Deploy\ Keys) }
   end
 end
