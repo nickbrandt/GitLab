@@ -102,10 +102,6 @@ describe('Snippet Edit app', () => {
       },
     };
 
-    if (wrapper) {
-      throw new Error('wrapper already exists');
-    }
-
     if (withApollo) {
       const localVue = createLocalVue();
       localVue.use(VueApollo);
