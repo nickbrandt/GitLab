@@ -17,22 +17,6 @@ and your own test processes. If you're using [GitLab CI/CD](../../../ci/README.m
 you can run your coverage-guided fuzz tests as part your CI/CD workflow. You can take advantage of
 coverage-guided fuzzing by including the CI job in your existing `.gitlab-ci.yml` file.
 
-![Coverage Fuzzing Security Report](img/coverage_fuzzing_report_v13_6.png)
-
-By clicking on one of the detected vulnerabilities, you can
-see the details.
-
-![Coverage Fuzzing Vulnerability Modal](img/coverage_fuzzing_vuln_modal_v13_6.png)
-
-## Security Dashboard
-
-The [Security Dashboard](../security_dashboard/index.md) shows you an overview of all
-the security vulnerabilities in your groups, projects and pipelines.
-
-## Interacting with the vulnerabilities
-
-After a vulnerability is found, you can [interact with it](../index.md#interacting-with-the-vulnerabilities).
-
 ## Supported fuzzing engines and languages
 
 GitLab supports these languages through the fuzzing engine listed for each. We currently provide a
@@ -238,6 +222,26 @@ This essentially creates two steps:
 
 The `covfuzz-ci.yml` is the same as that in the [original synchronous example](https://gitlab.com/gitlab-org/security-products/demos/coverage-fuzzing/go-fuzzing-example#running-go-fuzz-from-ci).
 
+## Interacting with the vulnerabilities
+
+After a vulnerability is found, you can [interact with it](../index.md#interacting-with-the-vulnerabilities).
+
+![Coverage Fuzzing Security Report](img/coverage_fuzzing_report_v13_6.png)
+
+By clicking on one of the detected vulnerabilities, you can
+see the details. You can also view the vulnerability from the [Security Dashboard](../security_dashboard/index.md),
+which shows you an overview of all the security vulnerabilities in your groups, projects and pipelines.
+
+Clicking the vulnerability opens a modal which provides additional information about the vulnerability.
+
+- Status: 
+- Project: 
+- Crash state:
+- Stacktrace snippet:
+- Identifiers: 
+- Severity:
+- Scanner:
+- Scanner Provider:
 
 ### Glossary
 
