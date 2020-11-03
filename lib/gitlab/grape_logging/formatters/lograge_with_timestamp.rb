@@ -42,7 +42,7 @@ module Gitlab
           when String
             encode_utf8(data)
           when Integer
-            utf8_encode_values(data.to_s)
+            data
           end
         end
       end

@@ -46,7 +46,7 @@ RSpec.describe Gitlab::GrapeLogging::Formatters::LogrageWithTimestamp do
     expect(params).to eq([
       { 'key' => 'description', 'value' => '[FILTERED]' },
       { 'key' => 'name', 'value' => 'gitlab test' },
-      { 'key' => 'int', 'value' => '42' }
+      { 'key' => 'int', 'value' => 42 }
     ])
   end
 end
