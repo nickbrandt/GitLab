@@ -7,7 +7,7 @@ import noteForm from '../../notes/components/note_form.vue';
 import MultilineCommentForm from '../../notes/components/multiline_comment_form.vue';
 import autosave from '../../notes/mixins/autosave';
 import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
-import { DIFF_NOTE_TYPE } from '../constants';
+import { DIFF_NOTE_TYPE, PARALLEL_DIFF_VIEW_TYPE } from '../constants';
 import {
   commentLineOptions,
   formatLineRange,
@@ -60,7 +60,7 @@ export default {
       diffViewType: state => state.diffs.diffViewType,
     }),
     ...mapState('diffs', ['showSuggestPopover']),
-    ...mapGetters('diffs', ['getDiffFileByHash']),
+    ...mapGetters('diffs', ['getDiffFileByHash', 'diffLines']),
     ...mapGetters([
       'isLoggedIn',
       'noteableType',
@@ -94,10 +94,18 @@ export default {
         if (right && right.type !== 'match') acc.push(right);
         return acc;
       };
+      const getDiffLines = () => {
+        if (this.diffViewType === PARALLEL_DIFF_VIEW_TYPE) {
+          return (this.glFeatures.unifiedDiffLines
+            ? this.diffLines(this.diffFile)
+            : this.diffFile.parallel_diff_lines
+          ).reduce(combineSides, []);
+        }
+
+        return this.diffFile.highlighted_diff_lines;
+      };
       const side = this.line.type === 'new' ? 'right' : 'left';
-      const lines = this.diffFile.highlighted_diff_lines.length
-        ? this.diffFile.highlighted_diff_lines
-        : this.diffFile.parallel_diff_lines.reduce(combineSides, []);
+      const lines = getDiffLines();
       return commentLineOptions(lines, this.line, this.line.line_code, side);
     },
   },
