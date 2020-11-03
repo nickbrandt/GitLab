@@ -93,14 +93,14 @@ describe('validation directive', () => {
           setValueAndTriggerValidation(validValue);
         });
 
-        it('leaves the field to be valid', () => {
+        it('sets the field to be valid', () => {
           expect(getFormData().fields.exampleField).toEqual({
             state: true,
             feedback: '',
           });
         });
 
-        it('leaves the form to be valid', () => {
+        it('sets the form to be valid', () => {
           expect(getFormData().state).toBe(true);
         });
       });

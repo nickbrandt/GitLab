@@ -62,6 +62,11 @@ describe('DastSiteProfileForm', () => {
   const findSiteValidationToggle = () => findByTestId('dast-site-validation-toggle');
   const findDastSiteValidation = () => wrapper.find(DastSiteValidation);
 
+  const setFieldValue = async (field, value) => {
+    await field.setValue(value);
+    field.trigger('blur');
+  };
+
   const mockClientFactory = handlers => {
     const mockClient = createMockClient();
 
@@ -132,16 +137,13 @@ describe('DastSiteProfileForm', () => {
     });
 
     it.each(['asd', 'example.com'])('is marked as invalid provided an invalid URL', async value => {
-      findTargetUrlInput().setValue(value);
-      findTargetUrlInput().trigger('blur');
-      await wrapper.vm.$nextTick();
+      await setFieldValue(findTargetUrlInput(), value);
 
       expect(wrapper.text()).toContain(errorMessage);
     });
 
     it('is marked as valid provided a valid URL', async () => {
-      findTargetUrlInput().setValue(targetUrl);
-      await wrapper.vm.$nextTick();
+      await setFieldValue(findTargetUrlInput(), targetUrl);
 
       expect(wrapper.text()).not.toContain(errorMessage);
     });
@@ -149,8 +151,7 @@ describe('DastSiteProfileForm', () => {
 
   describe('validation', () => {
     const enableValidationToggle = async () => {
-      await findTargetUrlInput().setValue(targetUrl);
-      await findTargetUrlInput().trigger('blur');
+      await setFieldValue(findTargetUrlInput(), targetUrl);
       await findSiteValidationToggle().vm.$emit('change', true);
     };
 
@@ -197,9 +198,7 @@ describe('DastSiteProfileForm', () => {
       it('toggle is disabled until target URL is valid', async () => {
         expect(findSiteValidationToggle().props('disabled')).toBe(true);
 
-        await findTargetUrlInput().setValue(targetUrl);
-        await findTargetUrlInput().trigger('input');
-        await findTargetUrlInput().trigger('blur');
+        await setFieldValue(findTargetUrlInput(), targetUrl);
 
         expect(findSiteValidationToggle().props('disabled')).toBe(false);
       });
@@ -308,11 +307,8 @@ describe('DastSiteProfileForm', () => {
 
     describe('submission', () => {
       const fillAndSubmitForm = async () => {
-        await findProfileNameInput().setValue(profileName);
-        findProfileNameInput().trigger('blur');
-        await findTargetUrlInput().setValue(targetUrl);
-        findTargetUrlInput().trigger('blur');
-
+        await setFieldValue(findProfileNameInput(), profileName);
+        await setFieldValue(findTargetUrlInput(), targetUrl);
         submitForm();
       };
 
