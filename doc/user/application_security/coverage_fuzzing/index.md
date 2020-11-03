@@ -228,20 +228,26 @@ After a vulnerability is found, you can [interact with it](../index.md#interacti
 
 ![Coverage Fuzzing Security Report](img/coverage_fuzzing_report_v13_6.png)
 
-By clicking on one of the detected vulnerabilities, you can
-see the details. You can also view the vulnerability from the [Security Dashboard](../security_dashboard/index.md),
-which shows you an overview of all the security vulnerabilities in your groups, projects and pipelines.
+By clicking on one of the detected vulnerabilities, you can see the details. You can also view the
+vulnerability from the [Security Dashboard](../security_dashboard/index.md),
+which shows you an overview of all the security vulnerabilities in your groups, projects, and
+pipelines.
 
-Clicking the vulnerability opens a modal which provides additional information about the vulnerability.
+Clicking the vulnerability opens a modal that provides additional information about the
+vulnerability:
 
-- Status: 
-- Project: 
+- Status: The vulnerability's status. As with any type of vulnerability, a coverage fuzzing
+  vulnerability can be Detected, Confirmed, Dismissed, or Resolved.
+- Project: The project in which the vulnerability exists.
+- Crash type: The type of crash or weakness in the code. This typically maps to a [CWE](https://cwe.mitre.org/).
 - Crash state:
-- Stacktrace snippet:
-- Identifiers: 
-- Severity:
-- Scanner:
-- Scanner Provider:
+- Stacktrace snippet: The last few lines of the stacktrace, which shows details about the crash.
+- Identifier: The vulnerability's identifier. This maps to either a [CVE](https://cve.mitre.org/)
+  or [CWE](https://cwe.mitre.org/).
+- Severity: The vulnerability's severity. This can be Critical, High, Medium, Low, Info, or Unknown.
+- Scanner: The scanner that detected the vulnerability (for example, Coverage Fuzzing).
+- Scanner Provider: The engine that did the scan. For Coverage Fuzzing, this can be any of the
+  engines listed in [Supported fuzzing engines and languages](#supported-fuzzing-engines-and-languages).
 
 ### Glossary
 
