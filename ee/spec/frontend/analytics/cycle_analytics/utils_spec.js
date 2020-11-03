@@ -41,7 +41,7 @@ import {
 
 const labelEventIds = labelEvents.map(ev => ev.identifier);
 
-describe('Cycle analytics utils', () => {
+describe('Value Stream Analytics utils', () => {
   describe('isStartEvent', () => {
     it('will return true for a valid start event', () => {
       expect(isStartEvent(startEvents[0])).toEqual(true);
