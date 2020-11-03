@@ -23495,9 +23495,6 @@ msgstr ""
 msgid "SearchResults|Showing %{from} - %{to} of %{count} %{scope} for%{term_element} in your personal and project snippets"
 msgstr ""
 
-msgid "SearchResults|We couldn't find any %{scope} matching %{term}"
-msgstr ""
-
 msgid "SearchResults|code result"
 msgid_plural "SearchResults|code results"
 msgstr[0] ""
@@ -29839,6 +29836,15 @@ msgid "We could not determine the path to remove the epic"
 msgstr ""
 
 msgid "We could not determine the path to remove the issue"
+msgstr ""
+
+msgid "We couldn't find any %{scope} matching %{term}"
+msgstr ""
+
+msgid "We couldn't find any %{scope} matching %{term} in group %{group}"
+msgstr ""
+
+msgid "We couldn't find any %{scope} matching %{term} in project %{project}"
 msgstr ""
 
 msgid "We couldn't reach the Prometheus server. Either the server no longer exists or the configuration details need updating."
