@@ -11165,6 +11165,9 @@ msgstr ""
 msgid "Failed to load stacktrace."
 msgstr ""
 
+msgid "Failed to make repository read-only. %{reason}"
+msgstr ""
+
 msgid "Failed to mark this issue as a duplicate because referenced issue was not found."
 msgstr ""
 
