@@ -40,7 +40,8 @@ describe('Job Retry Forward Deployment Modal', () => {
     it('should display the correct messages', () => {
       const modal = findModal();
       expect(modal.attributes('title')).toMatch(JOB_RETRY_FORWARD_DEPLOYMENT_MODAL.title);
-      expect(modal.text()).toMatch(JOB_RETRY_FORWARD_DEPLOYMENT_MODAL.body);
+      expect(modal.text()).toMatch(JOB_RETRY_FORWARD_DEPLOYMENT_MODAL.info);
+      expect(modal.text()).toMatch(JOB_RETRY_FORWARD_DEPLOYMENT_MODAL.areYouSure);
     });
   });
 
@@ -52,13 +53,10 @@ describe('Job Retry Forward Deployment Modal', () => {
     });
 
     it('should display an info link when one is provided', () => {
-      createWrapper({
-        provide: {
-          retryOutdatedJobDocsUrl,
-        },
-      });
+      createWrapper({ provide: { retryOutdatedJobDocsUrl } });
 
       expect(findLink().attributes('href')).toBe(retryOutdatedJobDocsUrl);
+      expect(findLink().text()).toMatch(JOB_RETRY_FORWARD_DEPLOYMENT_MODAL.moreInfo);
     });
   });
 

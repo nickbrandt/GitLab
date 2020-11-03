@@ -15108,10 +15108,13 @@ msgstr ""
 msgid "Jobs"
 msgstr ""
 
+msgid "Jobs|Are you sure you want to proceed?"
+msgstr ""
+
 msgid "Jobs|Are you sure you want to retry this job?"
 msgstr ""
 
-msgid "Jobs|You're about to retry a job that failed because it attempted to deploy code that is older than the latest deployment. Retrying this job could result in overwriting the environment with the older source code. Are you sure you want to proceed?"
+msgid "Jobs|You're about to retry a job that failed because it attempted to deploy code that is older than the latest deployment. Retrying this job could result in overwriting the environment with the older source code."
 msgstr ""
 
 msgid "Job|Browse"

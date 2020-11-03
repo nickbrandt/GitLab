@@ -1,6 +1,7 @@
 import { __, s__ } from '~/locale';
 
 const cancel = __('Cancel');
+const moreInfo = __('More information');
 
 export const JOB_SIDEBAR = {
   cancel,
@@ -12,9 +13,12 @@ export const JOB_SIDEBAR = {
 
 export const JOB_RETRY_FORWARD_DEPLOYMENT_MODAL = {
   cancel,
-  body: s__(
-    `Jobs|You're about to retry a job that failed because it attempted to deploy code that is older than the latest deployment. Retrying this job could result in overwriting the environment with the older source code. Are you sure you want to proceed?`,
+  info: s__(
+    `Jobs|You're about to retry a job that failed because it attempted to deploy code that is older than the latest deployment.
+    Retrying this job could result in overwriting the environment with the older source code.`,
   ),
+  areYouSure: s__('Jobs|Are you sure you want to proceed?'),
+  moreInfo,
   primaryText: __('Retry job'),
   title: s__('Jobs|Are you sure you want to retry this job?'),
 };
