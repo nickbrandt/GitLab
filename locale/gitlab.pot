@@ -22384,6 +22384,9 @@ msgstr ""
 msgid "Removes time estimate."
 msgstr ""
 
+msgid "Removing integrations is not supported for this project"
+msgstr ""
+
 msgid "Removing this group also removes all child projects, including archived projects, and their resources."
 msgstr ""
 
@@ -30690,6 +30693,9 @@ msgid "You have insufficient permissions to create a Todo for this alert"
 msgstr ""
 
 msgid "You have insufficient permissions to create an HTTP integration for this project"
+msgstr ""
+
+msgid "You have insufficient permissions to remove this HTTP integration"
 msgstr ""
 
 msgid "You have insufficient permissions to update this HTTP integration"
