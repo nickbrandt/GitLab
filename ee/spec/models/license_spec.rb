@@ -122,7 +122,7 @@ RSpec.describe License do
     describe "Historical active user count" do
       let(:active_user_count) { described_class.current_active_users.count + 10 }
       let(:date)              { described_class.current.starts_at }
-      let!(:historical_data)  { HistoricalData.create!(date: date, active_user_count: active_user_count) }
+      let!(:historical_data)  { HistoricalData.create!(recorded_at: date, active_user_count: active_user_count) }
 
       context "when there is no active user count restriction" do
         it "is valid" do
@@ -303,7 +303,7 @@ RSpec.describe License do
     describe 'downgrade' do
       context 'when more users were added in previous period' do
         before do
-          HistoricalData.create!(date: described_class.current.starts_at - 6.months, active_user_count: 15)
+          HistoricalData.create!(recorded_at: described_class.current.starts_at - 6.months, active_user_count: 15)
 
           set_restrictions(restricted_user_count: 5, previous_user_count: 10)
         end
@@ -315,7 +315,7 @@ RSpec.describe License do
 
       context 'when no users were added in the previous period' do
         before do
-          HistoricalData.create!(date: 6.months.ago, active_user_count: 15)
+          HistoricalData.create!(recorded_at: 6.months.ago, active_user_count: 15)
 
           set_restrictions(restricted_user_count: 10, previous_user_count: 15)
         end
