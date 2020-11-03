@@ -322,7 +322,7 @@ RSpec.describe QuickActions::InterpretService do
       it 'returns the wip message' do
         _, _, message = service.execute(content, issuable)
 
-        expect(message).to eq("Marked this #{issuable.to_ability_name.humanize(capitalize: false)} as Draft.")
+        expect(message).to eq("Marked this #{issuable.to_ability_name.humanize(capitalize: false)} as a draft.")
       end
     end
 
@@ -338,7 +338,7 @@ RSpec.describe QuickActions::InterpretService do
         issuable.update!(title: issuable.wip_title)
         _, _, message = service.execute(content, issuable)
 
-        expect(message).to eq("Unmarked this #{issuable.to_ability_name.humanize(capitalize: false)} as Draft.")
+        expect(message).to eq("Unmarked this #{issuable.to_ability_name.humanize(capitalize: false)} as a draft.")
       end
     end
 

@@ -16221,7 +16221,7 @@ msgstr ""
 msgid "Marked For Deletion At - %{deletion_time}"
 msgstr ""
 
-msgid "Marked this %{noun} as Draft."
+msgid "Marked this %{noun} as a draft."
 msgstr ""
 
 msgid "Marked this issue as a duplicate of %{duplicate_param}."
@@ -28589,7 +28589,7 @@ msgstr ""
 msgid "Unlocks the discussion."
 msgstr ""
 
-msgid "Unmarked this %{noun} as Draft."
+msgid "Unmarked this %{noun} as a draft."
 msgstr ""
 
 msgid "Unmarks this %{noun} as a draft."

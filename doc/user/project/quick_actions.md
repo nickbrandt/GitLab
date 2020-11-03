@@ -83,7 +83,7 @@ The following quick actions are applicable to descriptions, discussions and thre
 | `/unlock`                             | ✓     | ✓             |      | Unlock the discussions.                                                                                                              |
 | `/unsubscribe`                        | ✓     | ✓             | ✓    | Unsubscribe from notifications.                                                                                                |
 | `/weight <value>`                     | ✓     |               |      | Set weight. Valid options for `<value>` include `0`, `1`, `2`, and so on. **(STARTER)**                                         |
-| `/wip`                                |       | ✓             |      | Toggle the Draft status.                                                                                              |
+| `/wip`                                |       | ✓             |      | Toggle the draft status.                                                                                              |
 | `/zoom <Zoom URL>`                    | ✓     |               |      | Add Zoom meeting to this issue ([introduced in GitLab 12.4](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/16609)).      |
 
 ## Autocomplete characters
