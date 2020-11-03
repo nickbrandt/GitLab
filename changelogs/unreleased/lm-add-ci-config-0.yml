@@ -1,0 +1,5 @@
+---
+title: 'GraphQL: Adds ciConfig field and corresponding response fields'
+merge_request: 46912
+author:
+type: added
