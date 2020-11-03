@@ -18,8 +18,8 @@ Workhorse documentation is available in the [`doc` folder of this repository](do
   * [Source installation](doc/operations/install.md)
   * [Workhorse configuration](doc/operations/configuration.md)
 * [Contributing](CONTRIBUTING.md)
+  * [Adding new features](doc/development/new_features.md)
   * [Testing your code](doc/development/tests.md)
-
 
 ## License
 
