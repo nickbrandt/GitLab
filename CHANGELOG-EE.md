@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.4.6 (2020-11-03)
+
+### Fixed (1 change)
+
+- Handle 500 error for GraphQL mutation. !43936
+
+
 ## 13.4.5 (2020-11-02)
 
 ### Security (4 changes)
