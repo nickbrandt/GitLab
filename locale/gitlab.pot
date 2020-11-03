@@ -947,6 +947,9 @@ msgstr ""
 msgid "(%{value}) has already been taken"
 msgstr ""
 
+msgid "(+%{count}&nbsp;rules)"
+msgstr ""
+
 msgid "(No changes)"
 msgstr ""
 
