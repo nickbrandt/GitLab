@@ -253,13 +253,13 @@ RSpec.describe PushRule do
   describe '#available?' do
     shared_examples 'an unavailable push_rule' do
       it 'is not available' do
-        expect(push_rule.available?(:reject_unsigned_commits)).to eq(false)
+        expect(push_rule.available?(:reject_unsigned_commits, object: group)).to eq(false)
       end
     end
 
     shared_examples 'an available push_rule' do
       it 'is available' do
-        expect(push_rule.available?(:reject_unsigned_commits)).to eq(true)
+        expect(push_rule.available?(:reject_unsigned_commits, object: group)).to eq(true)
       end
     end
 
@@ -281,11 +281,11 @@ RSpec.describe PushRule do
       end
 
       context 'with GL.com plans' do
-        let(:group) { create(:group) }
+        let(:push_rule) { create(:push_rule) }
+        let(:group) { create(:group, push_rule: push_rule) }
         let(:plan) { :free }
         let!(:gitlab_subscription) { create(:gitlab_subscription, plan, namespace: group) }
-        let(:project) { create(:project, namespace: group) }
-        let(:push_rule) { create(:push_rule, project: project) }
+
 
         before do
           create(:license, plan: License::PREMIUM_PLAN)
