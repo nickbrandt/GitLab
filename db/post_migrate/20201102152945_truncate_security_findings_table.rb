@@ -5,8 +5,6 @@ class TruncateSecurityFindingsTable < ActiveRecord::Migration[6.0]
 
   DOWNTIME = false
 
-  disable_ddl_transaction!
-
   def up
     return unless Gitlab.dev_env_or_com?
 
