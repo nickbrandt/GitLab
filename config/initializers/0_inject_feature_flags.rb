@@ -17,7 +17,6 @@ if Gitlab.ee? && Gitlab.dev_or_test_env?
     feature_flags_related_issues
     group_wikis
     swimlanes
-    minimal_access_role
   ].to_set
 
   # First, we validate a list of overrides to ensure that these overrides
