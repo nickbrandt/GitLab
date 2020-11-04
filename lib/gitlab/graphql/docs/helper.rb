@@ -81,11 +81,13 @@ module Gitlab
         # We are ignoring connections and built in types for now,
         # they should be added when queries are generated.
         def objects
-          graphql_object_types.select do |object_type|
+          object_types = graphql_object_types.select do |object_type|
             !object_type[:name]["Connection"] &&
               !object_type[:name]["Edge"] &&
               !object_type[:name]["__"]
-          end.each do |type|
+          end
+
+          object_types.each do |type|
             type[:fields] += type[:connections]
           end
         end
