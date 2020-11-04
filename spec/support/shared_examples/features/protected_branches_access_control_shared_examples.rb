@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples "protected branches > access control > EE" do
+RSpec.shared_examples "protected branches > access control" do
   %w[merge push].each do |git_operation|
     # Need to set a default for the `git_operation` access level that _isn't_ being tested
     other_git_operation = git_operation == 'merge' ? 'push' : 'merge'
     roles_except_noone = ProtectedRefAccess::HUMAN_ACCESS_LEVELS.except(0)
 
-    let(:users) { create_list(:user, 5) }
-    let(:groups) { create_list(:group, 5) }
+    let_it_be(:project) { create(:project, :repository) }
+    let_it_be(:users) { create_list(:user, 5) }
+    let_it_be(:groups) { create_list(:group, 5) }
 
-    before do
+    before_all do
       users.each { |user| project.add_developer(user) }
-      groups.each { |group| project.project_group_links.create(group: group, group_access: Gitlab::Access::DEVELOPER) }
+      groups.each { |group| project.project_group_links.create!(group: group, group_access: Gitlab::Access::DEVELOPER) }
     end
 
     def last_access_levels(git_operation)

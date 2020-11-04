@@ -99,6 +99,6 @@ RSpec.describe 'Protected Tags', :js do
     #   stub_licensed_features(protected_refs_for_users: false)
     # end
 
-    include_examples "protected tags > access control > CE"
+    include_examples "protected tags > access control"
   end
 end

@@ -164,7 +164,7 @@ RSpec.describe 'Protected Branches', :js do
       #   stub_licensed_features(protected_refs_for_users: false)
       # end
 
-      include_examples "protected branches > access control > EE"
+      include_examples "protected branches > access control"
     end
   end
 
