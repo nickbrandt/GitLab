@@ -1856,7 +1856,13 @@ msgstr ""
 msgid "Admin notes"
 msgstr ""
 
+msgid "AdminArea|%{billable_users_link_start}Learn more%{billable_users_link_end} about what defines a billable user"
+msgstr ""
+
 msgid "AdminArea|Active users"
+msgstr ""
+
+msgid "AdminArea|All users created in the instance, including users who are not %{billable_users_link_start}billable users%{billable_users_link_end}."
 msgstr ""
 
 msgid "AdminArea|Billable users"
@@ -4951,6 +4957,9 @@ msgid "Changes"
 msgstr ""
 
 msgid "Changes affect new repositories only. If not specified, Git's default name %{branch_name_default} will be used."
+msgstr ""
+
+msgid "Changes affect new repositories only. If not specified, either the configured application-wide default or Git's default name %{branch_name_default} will be used."
 msgstr ""
 
 msgid "Changes are shown as if the %{b_open}source%{b_close} revision was being merged into the %{b_open}target%{b_close} revision."
@@ -27349,7 +27358,7 @@ msgstr ""
 msgid "This is the highest peak of users on your installation since the license started."
 msgstr ""
 
-msgid "This is the number of currently active users on your installation, and this is the minimum number you need to purchase when you renew your license."
+msgid "This is the number of %{billable_users_link_start}billable users%{link_end} on your installation, and this is the minimum number you need to purchase when you renew your license."
 msgstr ""
 
 msgid "This is your current session"
