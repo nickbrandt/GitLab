@@ -50,11 +50,8 @@ export default {
   computed: {
     ...mapGetters(['hasForwardDeploymentFailure']),
     ...mapState(['job', 'stages', 'jobs', 'selectedStage']),
-    retryButtonClass() {
-      let className = 'btn btn-retry';
-      className +=
-        this.job.status && this.job.recoverable ? ' btn-primary' : ' btn-inverted-secondary';
-      return className;
+    retryButtonCategory() {
+      return this.job.status && this.job.recoverable ? 'primary' : 'secondary';
     },
     hasArtifact() {
       return !isEmpty(this.job.artifact);
@@ -90,7 +87,7 @@ export default {
           <div class="flex-grow-1 flex-shrink-0 text-right">
             <job-sidebar-retry-button
               v-if="job.retry_path"
-              :class="retryButtonClass"
+              :category="retryButtonCategory"
               :href="job.retry_path"
               :modal-id="$options.forwardDeploymentFailureModalId"
               data-qa-selector="retry_button"

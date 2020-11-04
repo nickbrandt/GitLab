@@ -1,5 +1,5 @@
 <script>
-import { GlButton, GlLink, GlModalDirective } from '@gitlab/ui';
+import { GlButton, GlModalDirective } from '@gitlab/ui';
 import { mapGetters } from 'vuex';
 import { JOB_SIDEBAR } from '../constants';
 
@@ -10,12 +10,15 @@ export default {
   },
   components: {
     GlButton,
-    GlLink,
   },
   directives: {
     GlModal: GlModalDirective,
   },
   props: {
+    category: {
+      type: String,
+      required: true,
+    },
     modalId: {
       type: String,
       required: true,
@@ -23,6 +26,11 @@ export default {
     href: {
       type: String,
       required: true,
+    },
+    variant: {
+      type: String,
+      required: false,
+      default: 'info',
     },
   },
   computed: {
@@ -39,7 +47,13 @@ export default {
     variant="info"
     >{{ $options.i18n.retryLabel }}</gl-button
   >
-  <gl-link v-else :href="href" data-method="post" rel="nofollow"
+  <gl-button
+    v-else
+    :href="href"
+    :category="category"
+    :variant="variant"
+    data-method="post"
+    rel="nofollow"
     >{{ $options.i18n.retryLabel }}
-  </gl-link>
+  </gl-button>
 </template>

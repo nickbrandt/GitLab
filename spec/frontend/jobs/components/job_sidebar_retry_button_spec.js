@@ -1,4 +1,4 @@
-import { GlButton, GlLink } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import job from '../mock_data';
 import JobsSidebarRetryButton from '~/jobs/components/job_sidebar_retry_button.vue';
@@ -9,8 +9,7 @@ describe('Job Sidebar Retry Button', () => {
   let wrapper;
 
   const forwardDeploymentFailure = 'forward_deployment_failure';
-  const findRetryButton = () => wrapper.find(GlButton);
-  const findRetryLink = () => wrapper.find(GlLink);
+  const findButton = () => wrapper.find(GlButton);
 
   const createWrapper = ({ props = {} } = {}) => {
     store = createStore();
@@ -18,6 +17,7 @@ describe('Job Sidebar Retry Button', () => {
       propsData: {
         href: job.retry_path,
         modalId: 'modal-id',
+        category: 'primary',
         ...props,
       },
       store,
@@ -34,16 +34,16 @@ describe('Job Sidebar Retry Button', () => {
   beforeEach(createWrapper);
 
   it.each([
-    [null, false, true],
-    ['unmet_prerequisites', false, true],
-    [forwardDeploymentFailure, true, false],
+    [null, job.retry_path, undefined],
+    ['unmet_prerequisites', job.retry_path, undefined],
+    [forwardDeploymentFailure, undefined, 'button'],
   ])(
-    'when error is: %s, should render button: %s | should render link: %s',
-    async (failureReason, buttonExists, linkExists) => {
+    'when error is: %s, should render with href: %s || should render with role: %s',
+    async (failureReason, href, role) => {
       await store.dispatch('receiveJobSuccess', { ...job, failure_reason: failureReason });
 
-      expect(findRetryButton().exists()).toBe(buttonExists);
-      expect(findRetryLink().exists()).toBe(linkExists);
+      expect(findButton().attributes('href')).toBe(href);
+      expect(findButton().attributes('role')).toBe(role);
       expect(wrapper.text()).toMatch('Retry');
     },
   );
@@ -52,15 +52,15 @@ describe('Job Sidebar Retry Button', () => {
     it('should have the correct configuration', async () => {
       await store.dispatch('receiveJobSuccess', { failure_reason: forwardDeploymentFailure });
 
-      expect(findRetryButton().attributes('category')).toBe('primary');
-      expect(findRetryButton().attributes('variant')).toBe('info');
+      expect(findButton().attributes('category')).toBe('primary');
+      expect(findButton().attributes('variant')).toBe('info');
     });
   });
 
   describe('Link', () => {
     it('should have the correct configuration', () => {
-      expect(findRetryLink().attributes('data-method')).toBe('post');
-      expect(findRetryLink().attributes('href')).toBe(job.retry_path);
+      expect(findButton().attributes('data-method')).toBe('post');
+      expect(findButton().attributes('href')).toBe(job.retry_path);
     });
   });
 });
