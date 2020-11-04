@@ -14866,7 +14866,8 @@ CREATE TABLE project_ci_cd_settings (
     merge_pipelines_enabled boolean,
     default_git_depth integer,
     forward_deployment_enabled boolean,
-    merge_trains_enabled boolean DEFAULT false
+    merge_trains_enabled boolean DEFAULT false,
+    auto_rollback_enabled boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE project_ci_cd_settings_id_seq
@@ -15190,6 +15191,7 @@ CREATE TABLE project_settings (
     allow_merge_on_skipped_pipeline boolean,
     squash_option smallint DEFAULT 3,
     has_confluence boolean DEFAULT false NOT NULL,
+    has_vulnerabilities boolean DEFAULT false NOT NULL,
     CONSTRAINT check_bde223416c CHECK ((show_default_award_emojis IS NOT NULL))
 );
 
@@ -21460,6 +21462,8 @@ CREATE UNIQUE INDEX index_project_repository_states_on_project_id ON project_rep
 
 CREATE INDEX index_project_repository_storage_moves_on_project_id ON project_repository_storage_moves USING btree (project_id);
 
+CREATE INDEX index_project_settings_on_project_id_partially ON project_settings USING btree (project_id) WHERE (has_vulnerabilities IS TRUE);
+
 CREATE UNIQUE INDEX index_project_settings_on_push_rule_id ON project_settings USING btree (push_rule_id);
 
 CREATE INDEX index_project_statistics_on_namespace_id ON project_statistics USING btree (namespace_id);
@@ -22195,6 +22199,8 @@ CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_and_note_id_index ON sni
 CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_index ON snippet_user_mentions USING btree (snippet_id) WHERE (note_id IS NULL);
 
 CREATE UNIQUE INDEX taggings_idx ON taggings USING btree (tag_id, taggable_id, taggable_type, context, tagger_id, tagger_type);
+
+CREATE INDEX temporary_index_vulnerabilities_on_id ON vulnerabilities USING btree (id) WHERE ((state = 2) AND ((dismissed_at IS NULL) OR (dismissed_by_id IS NULL)));
 
 CREATE UNIQUE INDEX term_agreements_unique_index ON term_agreements USING btree (user_id, term_id);
 
