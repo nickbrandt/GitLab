@@ -2294,6 +2294,9 @@ msgstr ""
 msgid "After a successful password update, you will be redirected to the login page where you can log in with your new password."
 msgstr ""
 
+msgid "After sign-out path"
+msgstr ""
+
 msgid "After that, you will not be able to use merge approvals or code quality as well as many other features."
 msgstr ""
 
@@ -2491,6 +2494,12 @@ msgstr ""
 msgid "AlertSettings|2. Name integration"
 msgstr ""
 
+msgid "AlertSettings|3. Set up webhook"
+msgstr ""
+
+msgid "AlertSettings|4. Test integration(optional)"
+msgstr ""
+
 msgid "AlertSettings|5. Map fields (optional)"
 msgstr ""
 
@@ -2545,6 +2554,15 @@ msgstr ""
 msgid "AlertSettings|Opsgenie"
 msgstr ""
 
+msgid "AlertSettings|Prometheus API base URL"
+msgstr ""
+
+msgid "AlertSettings|Provide an example payload from the monitoring tool you intend to integrate with to send a test alert to the %{linkStart}alerts page%{linkEnd}. This payload can be used to test the integration using the \"save and test payload\" button."
+msgstr ""
+
+msgid "AlertSettings|Reset Key"
+msgstr ""
+
 msgid "AlertSettings|Reset key"
 msgstr ""
 
@@ -2552,6 +2570,9 @@ msgid "AlertSettings|Resetting the authorization key for this project will requi
 msgstr ""
 
 msgid "AlertSettings|Review your external service's documentation to learn where to provide this information to your external service, and the %{linkStart}GitLab documentation%{linkEnd} to learn more about configuring your endpoint."
+msgstr ""
+
+msgid "AlertSettings|Save and test payload"
 msgstr ""
 
 msgid "AlertSettings|Save integration"
@@ -2579,6 +2600,9 @@ msgid "AlertSettings|There was an error while trying to reset the key. Please re
 msgstr ""
 
 msgid "AlertSettings|URL cannot be blank and must start with http or https"
+msgstr ""
+
+msgid "AlertSettings|Utilize the URL and authorization key below to authorize an external service to send Alerts to GitLab. Review your chosen services documentation to learn where to add these details, and the %{linkStart}GitLab documentation%{linkEnd} to learn more about configuring your endpoint."
 msgstr ""
 
 msgid "AlertSettings|Webhook URL"
@@ -2618,6 +2642,9 @@ msgid "AlertsIntegrations|No integrations have been added yet"
 msgstr ""
 
 msgid "AlertsIntegrations|Prometheus"
+msgstr ""
+
+msgid "AlertsIntegrations|The integration has been successfully saved. Alerts from this new integration should now appear on your alerts list."
 msgstr ""
 
 msgid "Algorithm"
@@ -2816,6 +2843,9 @@ msgid "An %{link_start}alert%{link_end} with the same fingerprint is already ope
 msgstr ""
 
 msgid "An administrator changed the password for your GitLab account on %{link_to}."
+msgstr ""
+
+msgid "An alert has been resolved in %{project_path}."
 msgstr ""
 
 msgid "An alert has been triggered in %{project_path}."
@@ -7208,6 +7238,9 @@ msgstr ""
 msgid "ContainerRegistry|Something went wrong while fetching the cleanup policy."
 msgstr ""
 
+msgid "ContainerRegistry|Something went wrong while fetching the image details."
+msgstr ""
+
 msgid "ContainerRegistry|Something went wrong while fetching the repository list."
 msgstr ""
 
@@ -11165,6 +11198,9 @@ msgstr ""
 msgid "Failed to load stacktrace."
 msgstr ""
 
+msgid "Failed to make repository read-only. %{reason}"
+msgstr ""
+
 msgid "Failed to mark this issue as a duplicate because referenced issue was not found."
 msgstr ""
 
@@ -11464,6 +11500,9 @@ msgstr ""
 msgid "FeatureFlags|New user list"
 msgstr ""
 
+msgid "FeatureFlags|No user list selected"
+msgstr ""
+
 msgid "FeatureFlags|Percent of users"
 msgstr ""
 
@@ -11486,9 +11525,6 @@ msgid "FeatureFlags|Rollout Percentage"
 msgstr ""
 
 msgid "FeatureFlags|Rollout Strategy"
-msgstr ""
-
-msgid "FeatureFlags|Select a user list"
 msgstr ""
 
 msgid "FeatureFlags|Set the Unleash client application name to the name of the environment your application runs in. This value is used to match environment scopes. See the %{linkStart}example client configuration%{linkEnd}."
@@ -22375,6 +22411,9 @@ msgstr ""
 msgid "Removes time estimate."
 msgstr ""
 
+msgid "Removing integrations is not supported for this project"
+msgstr ""
+
 msgid "Removing this group also removes all child projects, including archived projects, and their resources."
 msgstr ""
 
@@ -23237,9 +23276,6 @@ msgstr ""
 msgid "Save Push Rules"
 msgstr ""
 
-msgid "Save and test payload"
-msgstr ""
-
 msgid "Save anyway"
 msgstr ""
 
@@ -23484,9 +23520,6 @@ msgid "SearchResults|Showing %{from} - %{to} of %{count} %{scope} for%{term_elem
 msgstr ""
 
 msgid "SearchResults|Showing %{from} - %{to} of %{count} %{scope} for%{term_element} in your personal and project snippets"
-msgstr ""
-
-msgid "SearchResults|We couldn't find any %{scope} matching %{term}"
 msgstr ""
 
 msgid "SearchResults|code result"
@@ -24721,6 +24754,9 @@ msgid "Sign up was successful! Please confirm your email to sign in."
 msgstr ""
 
 msgid "Sign-in restrictions"
+msgstr ""
+
+msgid "Sign-in text"
 msgstr ""
 
 msgid "Sign-up restrictions"
@@ -29426,6 +29462,12 @@ msgstr ""
 msgid "View Documentation"
 msgstr ""
 
+msgid "View alert details at"
+msgstr ""
+
+msgid "View alert details."
+msgstr ""
+
 msgid "View all issues"
 msgstr ""
 
@@ -29821,6 +29863,15 @@ msgid "We could not determine the path to remove the epic"
 msgstr ""
 
 msgid "We could not determine the path to remove the issue"
+msgstr ""
+
+msgid "We couldn't find any %{scope} matching %{term}"
+msgstr ""
+
+msgid "We couldn't find any %{scope} matching %{term} in group %{group}"
+msgstr ""
+
+msgid "We couldn't find any %{scope} matching %{term} in project %{project}"
 msgstr ""
 
 msgid "We couldn't reach the Prometheus server. Either the server no longer exists or the configuration details need updating."
@@ -30666,6 +30717,9 @@ msgid "You have insufficient permissions to create a Todo for this alert"
 msgstr ""
 
 msgid "You have insufficient permissions to create an HTTP integration for this project"
+msgstr ""
+
+msgid "You have insufficient permissions to remove this HTTP integration"
 msgstr ""
 
 msgid "You have insufficient permissions to update this HTTP integration"
