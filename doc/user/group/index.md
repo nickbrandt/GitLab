@@ -130,7 +130,7 @@ give a user access to all projects in the group with one action.
 
 Add members to a group by navigating to the group's dashboard and clicking **Members**.
 
-![add members to group](img/add_new_members.png)
+![add members to group](img/add_new_members_v13_6.png)
 
 Select the [permission level](../permissions.md#permissions), and add the new member. You can also set the expiring date for that user; this is the date on which they will no longer have access to your group.
 
@@ -375,9 +375,9 @@ In GitLab [8.15](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/822) and 
 
 1. Go to your group's **Members** page.
 1. Select the pencil icon in the row for the user you are editing.
-1. Select the orange `Change permissions` button.
+1. Select the brown `Edit permissions` button in the modal.
 
-![Setting manual permissions](img/manual_permissions_v13_1.png)
+![Setting manual permissions](img/manual_permissions_v13_6.png)
 
 Now you will be able to edit the user's permissions from the **Members** page.
 
@@ -547,7 +547,10 @@ To remove a group and its contents:
 This action either:
 
 - Removes the group, and also queues a background job to delete all projects in that group.
-- Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/premium/) or higher tiers, marks a group for deletion. The deletion will happen 7 days later by default, but this can be changed in the [instance settings](../admin_area/settings/visibility_and_access_controls.md#default-deletion-delay).
+- Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/premium/) or higher tiers, this action adds a background job to mark a group for deletion. By default, the job schedules the deletion 7 days in the future. You can modify this waiting period through the [instance settings](../admin_area/settings/visibility_and_access_controls.md#default-deletion-delay).
+
+Since [GitLab 13.6](https://gitlab.com/gitlab-org/gitlab/-/issues/39504), if the user who sets up the deletion leaves or is otherwise removed from the group before the
+actual deletion happens, the job is cancelled, and the group is no longer scheduled for deletion.
 
 ### Restore a group **(PREMIUM)**
 
