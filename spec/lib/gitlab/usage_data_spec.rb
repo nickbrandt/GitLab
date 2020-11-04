@@ -223,6 +223,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
             gitlab: 2
           },
           projects_imported: {
+            total: 20,
             gitlab_project: 2,
             gitlab: 2,
             github: 2,
@@ -246,6 +247,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
             gitlab: 1
           },
           projects_imported: {
+            total: 10,
             gitlab_project: 1,
             gitlab: 1,
             github: 1,
@@ -1218,7 +1220,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     subject { described_class.redis_hll_counters }
 
     let(:categories) { ::Gitlab::UsageDataCounters::HLLRedisCounter.categories }
-    let(:ineligible_total_categories) { %w[source_code testing] }
+    let(:ineligible_total_categories) { %w[source_code testing ci_secrets_management] }
 
     it 'has all known_events' do
       expect(subject).to have_key(:redis_hll_counters)
