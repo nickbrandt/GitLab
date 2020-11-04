@@ -2,19 +2,13 @@
 
 require 'spec_helper'
 
-RSpec.describe Profiles::UsageQuotasController do
+RSpec.describe Groups::UsageQuotasController do
+  let_it_be(:group) { create(:group, :private) }
   let_it_be(:user) { create(:user) }
 
   before do
     sign_in(user)
-  end
-
-  describe 'GET index' do
-    it 'renders usage quota page' do
-      get :index
-
-      expect(subject).to render_template(:index)
-    end
+    group.add_owner(user)
   end
 
   describe 'Pushing the `additionalRepoStorageByNamespace` feature flag to the frontend' do
@@ -24,7 +18,7 @@ RSpec.describe Profiles::UsageQuotasController do
       end
 
       it 'is disabled' do
-        get :index
+        get :index, params: { group_id: group }
 
         expect(Gon.features).to include('additionalRepoStorageByNamespace' => false)
       end
@@ -36,7 +30,7 @@ RSpec.describe Profiles::UsageQuotasController do
       end
 
       it 'is enabled' do
-        get :index
+        get :index, params: { group_id: group }
 
         expect(Gon.features).to include('additionalRepoStorageByNamespace' => true)
       end
@@ -48,7 +42,7 @@ RSpec.describe Profiles::UsageQuotasController do
       end
 
       it 'is disabled' do
-        get :index
+        get :index, params: { group_id: group }
 
         expect(Gon.features).to include('additionalRepoStorageByNamespace' => false)
       end
