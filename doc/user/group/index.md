@@ -518,6 +518,23 @@ If you want to retain ownership over the original namespace and
 protect the URL redirects, then instead of changing a group's path or renaming a
 username, you can create a new group and transfer projects to it.
 
+### Group repository settings
+
+You can change settings that are specific to repositories in your group.
+
+#### Custom initial branch name **(CORE ONLY)**
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/43290) in GitLab 13.6.
+
+By default, when you create a new project in GitLab, the initial branch is called `master`.
+For groups, a group administrator can customize the initial branch name to something
+else. This way, every new project created under that group from then on will start from the custom branch name rather than `master`. To do so:
+
+1. Go to the **Group page > Settings > Repository** and expand **Default initial
+   branch name**.
+1. Change the default initial branch to a custom name of your choice.
+1. **Save Changes**.
+
 ### Remove a group
 
 To remove a group and its contents:
@@ -530,7 +547,10 @@ To remove a group and its contents:
 This action either:
 
 - Removes the group, and also queues a background job to delete all projects in that group.
-- Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/premium/) or higher tiers, marks a group for deletion. The deletion will happen 7 days later by default, but this can be changed in the [instance settings](../admin_area/settings/visibility_and_access_controls.md#default-deletion-delay).
+- Since [GitLab 12.8](https://gitlab.com/gitlab-org/gitlab/-/issues/33257), on [Premium or Silver](https://about.gitlab.com/pricing/premium/) or higher tiers, this action adds a background job to mark a group for deletion. By default, the job schedules the deletion 7 days in the future. You can modify this waiting period through the [instance settings](../admin_area/settings/visibility_and_access_controls.md#default-deletion-delay).
+
+Since [GitLab 13.6](https://gitlab.com/gitlab-org/gitlab/-/issues/39504), if the user who sets up the deletion leaves or is otherwise removed from the group before the
+actual deletion happens, the job is cancelled, and the group is no longer scheduled for deletion.
 
 ### Restore a group **(PREMIUM)**
 
