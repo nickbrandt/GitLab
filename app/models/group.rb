@@ -109,6 +109,8 @@ class Group < Namespace
       .where("project_authorizations.user_id IN (?)", user_ids)
   end
 
+  delegate :default_branch_name, to: :namespace_settings
+
   class << self
     def sort_by_attribute(method)
       if method == 'storage_size_desc'

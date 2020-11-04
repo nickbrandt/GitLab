@@ -4929,6 +4929,9 @@ msgstr ""
 msgid "Changes affect new repositories only. If not specified, Git's default name %{branch_name_default} will be used."
 msgstr ""
 
+msgid "Changes affect new repositories only. If not specified, either the configured application-wide default or Git's default name %{branch_name_default} will be used."
+msgstr ""
+
 msgid "Changes are shown as if the %{b_open}source%{b_close} revision was being merged into the %{b_open}target%{b_close} revision."
 msgstr ""
 
