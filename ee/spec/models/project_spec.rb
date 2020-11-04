@@ -353,7 +353,7 @@ RSpec.describe Project do
       it 'creates import_state and sets next_execution_timestamp to now' do
         project = build(:project, :mirror, creator: create(:user))
 
-        Timecop.freeze do
+        freeze_time do
           expect do
             project.save!
           end.to change { ProjectImportState.count }.by(1)
@@ -368,7 +368,7 @@ RSpec.describe Project do
         it 'creates import_state and sets next_execution_timestamp to now' do
           project = create(:project)
 
-          Timecop.freeze do
+          freeze_time do
             expect do
               project.update(mirror: true, mirror_user_id: project.creator.id, import_url: generate(:url))
             end.to change { ProjectImportState.count }.by(1)
@@ -382,7 +382,7 @@ RSpec.describe Project do
         it 'sets current import_state next_execution_timestamp to now' do
           project = create(:project, import_url: generate(:url))
 
-          Timecop.freeze do
+          freeze_time do
             expect do
               project.update(mirror: true, mirror_user_id: project.creator.id)
             end.not_to change { ProjectImportState.count }
