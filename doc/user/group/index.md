@@ -518,6 +518,23 @@ If you want to retain ownership over the original namespace and
 protect the URL redirects, then instead of changing a group's path or renaming a
 username, you can create a new group and transfer projects to it.
 
+### Group repository settings
+
+You can change settings that are specific to repositories in your group.
+
+#### Custom initial branch name **(CORE ONLY)**
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/43290) in GitLab 13.6.
+
+By default, when you create a new project in GitLab, the initial branch is called `master`.
+For groups, a group administrator can customize the initial branch name to something
+else. This way, every new project created under that group from then on will start from the custom branch name rather than `master`. To do so:
+
+1. Go to the **Group page > Settings > Repository** and expand **Default initial
+   branch name**.
+1. Change the default initial branch to a custom name of your choice.
+1. **Save Changes**.
+
 ### Remove a group
 
 To remove a group and its contents:
@@ -616,6 +633,8 @@ To enable this feature:
 1. Expand the **Permissions, LFS, 2FA** section, and enter IP address ranges into **Allow access to the following IP addresses** field.
 1. Click **Save changes**.
 
+![Domain restriction by IP address](img/restrict-by-ip.gif)
+
 #### Allowed domain restriction **(PREMIUM)**
 
 >- [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/7297) in [GitLab Premium and Silver](https://about.gitlab.com/pricing/) 12.2.
@@ -643,6 +662,8 @@ To enable this feature:
 1. Navigate to the group's **Settings > General** page.
 1. Expand the **Permissions, LFS, 2FA** section, and enter the domain names into **Restrict membership by email** field.
 1. Click **Save changes**.
+
+![Domain restriction by email](img/restrict-by-email.gif)
 
 This will enable the domain-checking for all new users added to the group from this moment on.
 
