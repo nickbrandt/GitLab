@@ -11473,6 +11473,9 @@ msgstr ""
 msgid "FeatureFlags|New user list"
 msgstr ""
 
+msgid "FeatureFlags|No user list selected"
+msgstr ""
+
 msgid "FeatureFlags|Percent of users"
 msgstr ""
 
@@ -11495,9 +11498,6 @@ msgid "FeatureFlags|Rollout Percentage"
 msgstr ""
 
 msgid "FeatureFlags|Rollout Strategy"
-msgstr ""
-
-msgid "FeatureFlags|Select a user list"
 msgstr ""
 
 msgid "FeatureFlags|Set the Unleash client application name to the name of the environment your application runs in. This value is used to match environment scopes. See the %{linkStart}example client configuration%{linkEnd}."
