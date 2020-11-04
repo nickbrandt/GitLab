@@ -27,7 +27,6 @@ import {
   scrollToLineIfNeededInline,
   scrollToLineIfNeededParallel,
   loadCollapsedDiff,
-  expandAllFiles,
   toggleFileDiscussions,
   saveDiffDiscussion,
   setHighlightedRow,
@@ -658,23 +657,6 @@ describe('DiffsStoreActions', () => {
     });
   });
 
-  describe('expandAllFiles', () => {
-    it('should change the collapsed prop from the diffFiles', done => {
-      testAction(
-        expandAllFiles,
-        null,
-        {},
-        [
-          {
-            type: types.EXPAND_ALL_FILES,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('toggleFileDiscussions', () => {
     it('should dispatch collapseDiscussion when all discussions are expanded', () => {
       const getters = {
@@ -1167,7 +1149,11 @@ describe('DiffsStoreActions', () => {
       file_hash: 'testhash',
       alternate_viewer: { name: updatedViewerName },
     };
-    const updatedViewer = { name: updatedViewerName, automaticallyCollapsed: false };
+    const updatedViewer = {
+      name: updatedViewerName,
+      automaticallyCollapsed: false,
+      manuallyCollapsed: false,
+    };
     const testData = [{ rich_text: 'test' }, { rich_text: 'file2' }];
     let renamedFile;
     let mock;

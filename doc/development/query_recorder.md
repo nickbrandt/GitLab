@@ -1,3 +1,9 @@
+---
+stage: none
+group: unassigned
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # QueryRecorder
 
 QueryRecorder is a tool for detecting the [N+1 queries problem](https://guides.rubyonrails.org/active_record_querying.html#eager-loading-associations) from tests.
@@ -20,7 +26,6 @@ end
 
 As an example you might create 5 issues in between counts, which would cause the query count to increase by 5 if an N+1 problem exists.
 
-NOTE: **Note:**
 In some cases the query count might change slightly between runs for unrelated reasons. In this case you might need to test `exceed_query_limit(control_count + acceptable_change)`, but this should be avoided if possible.
 
 ## Cached queries

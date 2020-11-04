@@ -176,17 +176,6 @@ export default {
     Object.assign(selectedFile, { ...newFileData });
   },
 
-  [types.EXPAND_ALL_FILES](state) {
-    state.diffFiles.forEach(file => {
-      Object.assign(file, {
-        viewer: Object.assign(file.viewer, {
-          automaticallyCollapsed: false,
-          manuallyCollapsed: false,
-        }),
-      });
-    });
-  },
-
   [types.SET_LINE_DISCUSSIONS_FOR_FILE](state, { discussion, diffPositionByLineCode, hash }) {
     const { latestDiff } = state;
 
@@ -389,8 +378,13 @@ export default {
   },
   [types.SET_CURRENT_VIEW_DIFF_FILE_LINES](state, { filePath, lines }) {
     const file = state.diffFiles.find(f => f.file_path === filePath);
-    const currentDiffLinesKey =
-      state.diffViewType === 'inline' ? 'highlighted_diff_lines' : 'parallel_diff_lines';
+    let currentDiffLinesKey;
+
+    if (window.gon?.features?.unifiedDiffLines || state.diffViewType === 'inline') {
+      currentDiffLinesKey = 'highlighted_diff_lines';
+    } else {
+      currentDiffLinesKey = 'parallel_diff_lines';
+    }
 
     file[currentDiffLinesKey] = lines;
   },
