@@ -8977,7 +8977,8 @@ CREATE TABLE analytics_devops_adoption_segments (
     name text NOT NULL,
     last_recorded_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT check_4be7a006fd CHECK ((char_length(name) <= 255))
 );
 
 CREATE SEQUENCE analytics_devops_adoption_segments_id_seq
@@ -9293,7 +9294,6 @@ CREATE TABLE application_settings (
     email_restrictions_enabled boolean DEFAULT false NOT NULL,
     email_restrictions text,
     npm_package_requests_forwarding boolean DEFAULT true NOT NULL,
-    namespace_storage_size_limit bigint DEFAULT 0 NOT NULL,
     seat_link_enabled boolean DEFAULT true NOT NULL,
     container_expiration_policies_enable_historic_entries boolean DEFAULT false NOT NULL,
     issues_create_limit integer DEFAULT 0 NOT NULL,
@@ -14866,7 +14866,8 @@ CREATE TABLE project_ci_cd_settings (
     merge_pipelines_enabled boolean,
     default_git_depth integer,
     forward_deployment_enabled boolean,
-    merge_trains_enabled boolean DEFAULT false
+    merge_trains_enabled boolean DEFAULT false,
+    auto_rollback_enabled boolean DEFAULT false NOT NULL
 );
 
 CREATE SEQUENCE project_ci_cd_settings_id_seq
@@ -15190,6 +15191,7 @@ CREATE TABLE project_settings (
     allow_merge_on_skipped_pipeline boolean,
     squash_option smallint DEFAULT 3,
     has_confluence boolean DEFAULT false NOT NULL,
+    has_vulnerabilities boolean DEFAULT false NOT NULL,
     CONSTRAINT check_bde223416c CHECK ((show_default_award_emojis IS NOT NULL))
 );
 
@@ -17102,6 +17104,26 @@ CREATE SEQUENCE vulnerability_feedback_id_seq
 
 ALTER SEQUENCE vulnerability_feedback_id_seq OWNED BY vulnerability_feedback.id;
 
+CREATE TABLE vulnerability_finding_links (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    vulnerability_occurrence_id bigint NOT NULL,
+    name text,
+    url text NOT NULL,
+    CONSTRAINT check_55f0a95439 CHECK ((char_length(name) <= 255)),
+    CONSTRAINT check_b7fe886df6 CHECK ((char_length(url) <= 2048))
+);
+
+CREATE SEQUENCE vulnerability_finding_links_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE vulnerability_finding_links_id_seq OWNED BY vulnerability_finding_links.id;
+
 CREATE TABLE vulnerability_historical_statistics (
     id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -18200,6 +18222,8 @@ ALTER TABLE ONLY vulnerabilities ALTER COLUMN id SET DEFAULT nextval('vulnerabil
 ALTER TABLE ONLY vulnerability_exports ALTER COLUMN id SET DEFAULT nextval('vulnerability_exports_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_feedback ALTER COLUMN id SET DEFAULT nextval('vulnerability_feedback_id_seq'::regclass);
+
+ALTER TABLE ONLY vulnerability_finding_links ALTER COLUMN id SET DEFAULT nextval('vulnerability_finding_links_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_historical_statistics ALTER COLUMN id SET DEFAULT nextval('vulnerability_historical_statistics_id_seq'::regclass);
 
@@ -19644,6 +19668,9 @@ ALTER TABLE ONLY vulnerability_exports
 ALTER TABLE ONLY vulnerability_feedback
     ADD CONSTRAINT vulnerability_feedback_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY vulnerability_finding_links
+    ADD CONSTRAINT vulnerability_finding_links_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY vulnerability_historical_statistics
     ADD CONSTRAINT vulnerability_historical_statistics_pkey PRIMARY KEY (id);
 
@@ -19867,6 +19894,8 @@ CREATE INDEX design_user_mentions_on_design_id_and_note_id_index ON design_user_
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_and_note_id_index ON epic_user_mentions USING btree (epic_id, note_id);
 
 CREATE UNIQUE INDEX epic_user_mentions_on_epic_id_index ON epic_user_mentions USING btree (epic_id) WHERE (note_id IS NULL);
+
+CREATE INDEX finding_links_on_vulnerability_occurrence_id ON vulnerability_finding_links USING btree (vulnerability_occurrence_id);
 
 CREATE INDEX idx_audit_events_on_entity_id_desc_author_id_created_at ON audit_events USING btree (entity_id, entity_type, id DESC, author_id, created_at);
 
@@ -21460,6 +21489,8 @@ CREATE UNIQUE INDEX index_project_repository_states_on_project_id ON project_rep
 
 CREATE INDEX index_project_repository_storage_moves_on_project_id ON project_repository_storage_moves USING btree (project_id);
 
+CREATE INDEX index_project_settings_on_project_id_partially ON project_settings USING btree (project_id) WHERE (has_vulnerabilities IS TRUE);
+
 CREATE UNIQUE INDEX index_project_settings_on_push_rule_id ON project_settings USING btree (push_rule_id);
 
 CREATE INDEX index_project_statistics_on_namespace_id ON project_statistics USING btree (namespace_id);
@@ -22195,6 +22226,8 @@ CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_and_note_id_index ON sni
 CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_index ON snippet_user_mentions USING btree (snippet_id) WHERE (note_id IS NULL);
 
 CREATE UNIQUE INDEX taggings_idx ON taggings USING btree (tag_id, taggable_id, taggable_type, context, tagger_id, tagger_type);
+
+CREATE INDEX temporary_index_vulnerabilities_on_id ON vulnerabilities USING btree (id) WHERE ((state = 2) AND ((dismissed_at IS NULL) OR (dismissed_by_id IS NULL)));
 
 CREATE UNIQUE INDEX term_agreements_unique_index ON term_agreements USING btree (user_id, term_id);
 
@@ -24188,6 +24221,9 @@ ALTER TABLE ONLY gpg_signatures
 
 ALTER TABLE ONLY board_group_recent_visits
     ADD CONSTRAINT fk_rails_ca04c38720 FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY vulnerability_finding_links
+    ADD CONSTRAINT fk_rails_cbdfde27ce FOREIGN KEY (vulnerability_occurrence_id) REFERENCES vulnerability_occurrences(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY issues_self_managed_prometheus_alert_events
     ADD CONSTRAINT fk_rails_cc5d88bbb0 FOREIGN KEY (issue_id) REFERENCES issues(id) ON DELETE CASCADE;

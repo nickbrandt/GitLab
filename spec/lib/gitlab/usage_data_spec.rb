@@ -32,6 +32,8 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
         .not_to include(:merge_requests_users)
       expect(subject[:usage_activity_by_stage_monthly][:create])
         .to include(:merge_requests_users)
+      expect(subject[:counts_weekly]).to include(:aggregated_metrics)
+      expect(subject[:counts_monthly]).to include(:aggregated_metrics)
     end
 
     it 'clears memoized values' do
@@ -221,6 +223,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
             gitlab: 2
           },
           projects_imported: {
+            total: 20,
             gitlab_project: 2,
             gitlab: 2,
             github: 2,
@@ -244,6 +247,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
             gitlab: 1
           },
           projects_imported: {
+            total: 10,
             gitlab_project: 1,
             gitlab: 1,
             github: 1,
@@ -294,20 +298,23 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
         create(:project, creator: user)
         create(:clusters_applications_prometheus, :installed, cluster: cluster)
         create(:project_tracing_setting)
+        create(:project_error_tracking_setting)
       end
 
       expect(described_class.usage_activity_by_stage_monitor({})).to include(
         clusters: 2,
         clusters_applications_prometheus: 2,
         operations_dashboard_default_dashboard: 2,
-        projects_with_tracing_enabled: 2
+        projects_with_tracing_enabled: 2,
+        projects_with_error_tracking_enabled: 2
       )
 
       expect(described_class.usage_activity_by_stage_monitor(described_class.last_28_days_time_period)).to include(
         clusters: 1,
         clusters_applications_prometheus: 1,
         operations_dashboard_default_dashboard: 1,
-        projects_with_tracing_enabled: 1
+        projects_with_tracing_enabled: 1,
+        projects_with_error_tracking_enabled: 1
       )
     end
   end
@@ -1217,7 +1224,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     subject { described_class.redis_hll_counters }
 
     let(:categories) { ::Gitlab::UsageDataCounters::HLLRedisCounter.categories }
-    let(:ineligible_total_categories) { %w[source_code testing] }
+    let(:ineligible_total_categories) { %w[source_code testing ci_secrets_management] }
 
     it 'has all known_events' do
       expect(subject).to have_key(:redis_hll_counters)
@@ -1239,28 +1246,44 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
   end
 
   describe 'aggregated_metrics' do
-    subject(:aggregated_metrics) { described_class.aggregated_metrics }
+    shared_examples 'aggregated_metrics_for_time_range' do
+      context 'with product_analytics_aggregated_metrics feature flag on' do
+        before do
+          stub_feature_flags(product_analytics_aggregated_metrics: true)
+        end
 
-    context 'with product_analytics_aggregated_metrics feature flag on' do
-      before do
-        stub_feature_flags(product_analytics_aggregated_metrics: true)
+        it 'uses ::Gitlab::UsageDataCounters::HLLRedisCounter#aggregated_metrics_data', :aggregate_failures do
+          expect(::Gitlab::UsageDataCounters::HLLRedisCounter).to receive(aggregated_metrics_data_method).and_return(global_search_gmau: 123)
+          expect(aggregated_metrics_payload).to eq(aggregated_metrics: { global_search_gmau: 123 })
+        end
       end
 
-      it 'uses ::Gitlab::UsageDataCounters::HLLRedisCounter#aggregated_metrics_data', :aggregate_failures do
-        expect(::Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:aggregated_metrics_data).and_return(global_search_gmau: 123)
-        expect(aggregated_metrics).to eq(aggregated_metrics: { global_search_gmau: 123 })
+      context 'with product_analytics_aggregated_metrics feature flag off' do
+        before do
+          stub_feature_flags(product_analytics_aggregated_metrics: false)
+        end
+
+        it 'returns empty hash', :aggregate_failures do
+          expect(::Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(aggregated_metrics_data_method)
+          expect(aggregated_metrics_payload).to be {}
+        end
       end
     end
 
-    context 'with product_analytics_aggregated_metrics feature flag off' do
-      before do
-        stub_feature_flags(product_analytics_aggregated_metrics: false)
-      end
+    describe '.aggregated_metrics_weekly' do
+      subject(:aggregated_metrics_payload) { described_class.aggregated_metrics_weekly }
 
-      it 'returns empty hash', :aggregate_failures do
-        expect(::Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:aggregated_metrics_data)
-        expect(aggregated_metrics).to be {}
-      end
+      let(:aggregated_metrics_data_method) { :aggregated_metrics_weekly_data }
+
+      it_behaves_like 'aggregated_metrics_for_time_range'
+    end
+
+    describe '.aggregated_metrics_monthly' do
+      subject(:aggregated_metrics_payload) { described_class.aggregated_metrics_monthly }
+
+      let(:aggregated_metrics_data_method) { :aggregated_metrics_monthly_data }
+
+      it_behaves_like 'aggregated_metrics_for_time_range'
     end
   end
 
