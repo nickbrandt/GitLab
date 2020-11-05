@@ -164,11 +164,11 @@ RSpec.describe 'Protected Branches', :js do
       #   stub_licensed_features(protected_refs_for_users: false)
       # end
 
-      include_examples "protected branches > access control"
+      include_examples "protected branches > access control > CE"
     end
   end
 
   include_examples 'when the deploy_keys_on_protected_branches FF is turned on' do
-    let(:all_dropdown_sections) { %w(Roles Users Deploy\ Keys) }
+    let(:all_dropdown_sections) { %w(Roles Deploy\ Keys) }
   end
 end
