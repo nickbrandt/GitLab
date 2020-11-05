@@ -112,11 +112,11 @@ module Gitlab
           if categories.any?
             categories.keys.map do |category|
               files = self.by_category(category, project)
-              [category, files.map { |t| { key: t.key, name: t.name, content: t.content} }]
+              [category, files.map { |t| { key: t.key, name: t.name, content: t.content } }]
             end.to_h
           else
             files = self.all(project)
-            files.map { |t| { key: t.key, name: t.name, content: t.content} }
+            files.map { |t| { key: t.key, name: t.name, content: t.content } }
           end
         end
       end
