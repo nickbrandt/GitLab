@@ -16,6 +16,7 @@ RSpec.describe Vulnerabilities::Finding do
     it { is_expected.to have_many(:finding_pipelines).class_name('Vulnerabilities::FindingPipeline').with_foreign_key('occurrence_id') }
     it { is_expected.to have_many(:identifiers).class_name('Vulnerabilities::Identifier') }
     it { is_expected.to have_many(:finding_identifiers).class_name('Vulnerabilities::FindingIdentifier').with_foreign_key('occurrence_id') }
+    it { is_expected.to have_many(:finding_links).class_name('Vulnerabilities::FindingLink').with_foreign_key('vulnerability_occurrence_id') }
   end
 
   describe 'validations' do
@@ -113,11 +114,13 @@ RSpec.describe Vulnerabilities::Finding do
     let!(:vulnerability_secret_detection) { create(:vulnerabilities_finding, report_type: :secret_detection) }
     let!(:vulnerability_dast) { create(:vulnerabilities_finding, report_type: :dast) }
     let!(:vulnerability_depscan) { create(:vulnerabilities_finding, report_type: :dependency_scanning) }
+    let!(:vulnerability_covfuzz) { create(:vulnerabilities_finding, report_type: :coverage_fuzzing) }
+    let!(:vulnerability_apifuzz) { create(:vulnerabilities_finding, report_type: :api_fuzzing) }
 
     subject { described_class.by_report_types(param) }
 
     context 'with one param' do
-      let(:param) { 0 }
+      let(:param) { Vulnerabilities::Finding::REPORT_TYPES['sast'] }
 
       it 'returns found record' do
         is_expected.to contain_exactly(vulnerability_sast)
@@ -125,15 +128,28 @@ RSpec.describe Vulnerabilities::Finding do
     end
 
     context 'with array of params' do
-      let(:param) { [1, 3, 4] }
+      let(:param) do
+        [
+          Vulnerabilities::Finding::REPORT_TYPES['dependency_scanning'],
+          Vulnerabilities::Finding::REPORT_TYPES['dast'],
+          Vulnerabilities::Finding::REPORT_TYPES['secret_detection'],
+          Vulnerabilities::Finding::REPORT_TYPES['coverage_fuzzing'],
+          Vulnerabilities::Finding::REPORT_TYPES['api_fuzzing']
+        ]
+      end
 
       it 'returns found records' do
-        is_expected.to contain_exactly(vulnerability_dast, vulnerability_depscan, vulnerability_secret_detection)
+        is_expected.to contain_exactly(
+          vulnerability_dast,
+          vulnerability_depscan,
+          vulnerability_secret_detection,
+          vulnerability_covfuzz,
+          vulnerability_apifuzz)
       end
     end
 
     context 'without found record' do
-      let(:param) { 2 }
+      let(:param) { Vulnerabilities::Finding::REPORT_TYPES['container_scanning']}
 
       it 'returns empty collection' do
         is_expected.to be_empty
@@ -387,6 +403,33 @@ RSpec.describe Vulnerabilities::Finding do
       expect(project1_high_count).to be(0)
       expect(project2_critical_count).to be(0)
       expect(project2_high_count).to be(1)
+    end
+  end
+
+  describe '#links' do
+    let_it_be(:finding, reload: true) do
+      create(
+        :vulnerabilities_finding,
+        raw_metadata: {
+          links: [{ url: 'https://raw.gitlab.com', name: 'raw_metadata_link' }]
+        }.to_json
+      )
+    end
+
+    subject(:links) { finding.links }
+
+    context 'when there are no finding links' do
+      it 'returns links from raw_metadata' do
+        expect(links).to eq([{ 'url' => 'https://raw.gitlab.com', 'name' => 'raw_metadata_link' }])
+      end
+    end
+
+    context 'when there are finding links assigned to given finding' do
+      let_it_be(:finding_link) { create(:finding_link, name: 'finding_link', url: 'https://link.gitlab.com', finding: finding) }
+
+      it 'returns links from finding link' do
+        expect(links).to eq([{ 'url' => 'https://link.gitlab.com', 'name' => 'finding_link' }])
+      end
     end
   end
 

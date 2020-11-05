@@ -27,6 +27,7 @@ export const sourceContentTitle = 'Handbook';
 
 export const username = 'gitlabuser';
 export const projectId = '123456';
+export const project = 'user1/project1';
 export const returnUrl = 'https://www.gitlab.com';
 export const sourcePath = 'foobar.md.html';
 export const mergeRequestMeta = {
@@ -47,6 +48,10 @@ export const savedContentMeta = {
     url: 'foobar/-/merge_requests/123',
   },
 };
+export const mergeRequestTemplates = [
+  { key: 'Template1', name: 'Template 1', content: 'This is template 1!' },
+  { key: 'Template2', name: 'Template 2', content: 'This is template 2!' },
+];
 
 export const submitChangesError = 'Could not save changes';
 export const commitBranchResponse = {
@@ -67,3 +72,10 @@ export const images = new Map([
   ['path/to/image1.png', 'image1-content'],
   ['path/to/image2.png', 'image2-content'],
 ]);
+
+export const mounts = [
+  {
+    source: 'some/source/',
+    target: '',
+  },
+];

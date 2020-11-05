@@ -1,6 +1,6 @@
 ---
 stage: Manage
-group: Analytics
+group: Value Stream Management
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 ---
 
@@ -26,6 +26,7 @@ The following analytics features are available at the group level:
 - [Insights](../group/insights/index.md). **(ULTIMATE)**
 - [Issue](../group/issues_analytics/index.md). **(PREMIUM)**
 - [Productivity](productivity_analytics.md) **(PREMIUM)**
+- [Repositories](../group/repositories_analytics/index.md) **(PREMIUM)**
 - [Value Stream](value_stream_analytics.md). **(PREMIUM)**
 
 ## Project-level analytics

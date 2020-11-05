@@ -1,9 +1,12 @@
 ---
+stage: none
+group: unassigned
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
 comments: false
 description: 'Learn how to use and administer GitLab, the most scalable Git-based fully integrated platform for software development.'
 ---
 
-<div class="display-none">
+<div class="d-none">
   <em>Visit <a href="https://docs.gitlab.com/ee/">docs.gitlab.com</a> for optimized
   navigation, discoverability, and readability.</em>
 </div>
@@ -449,7 +452,7 @@ Learn more about using Git, and using Git with GitLab:
 
 ## Coming to GitLab from another platform
 
-If you are coming to GitLab from another platform, you'll find the following information useful:
+If you are coming to GitLab from another platform, the following information is useful:
 
 | Topic                                                          | Description                                                                            |
 |:---------------------------------------------------------------|:---------------------------------------------------------------------------------------|

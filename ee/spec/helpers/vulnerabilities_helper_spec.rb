@@ -6,7 +6,7 @@ RSpec.describe VulnerabilitiesHelper do
   let_it_be(:user) { create(:user) }
   let(:project) { create(:project, :repository, :public) }
   let(:pipeline) { create(:ci_pipeline, :success, project: project) }
-  let(:finding) { create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project, severity: :high) }
+  let(:finding) { create(:vulnerabilities_finding, pipelines: [pipeline], project: project, severity: :high) }
   let(:vulnerability) { create(:vulnerability, title: "My vulnerability", project: project, findings: [finding]) }
 
   before do
@@ -52,7 +52,7 @@ RSpec.describe VulnerabilitiesHelper do
     end
 
     around do |example|
-      Timecop.freeze { example.run }
+      freeze_time { example.run }
     end
 
     it 'has expected vulnerability properties' do

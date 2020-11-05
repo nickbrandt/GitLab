@@ -5,6 +5,8 @@ import VueRouter from 'vue-router';
 import { GlEmptyState } from '@gitlab/ui';
 import createMockApollo from 'jest/helpers/mock_apollo_helper';
 import { mockTracking, unmockTracking } from 'helpers/tracking_helper';
+import getDesignListQuery from 'shared_queries/design_management/get_design_list.query.graphql';
+import permissionsQuery from 'shared_queries/design_management/design_permissions.query.graphql';
 import Index from '~/design_management/pages/index.vue';
 import uploadDesignQuery from '~/design_management/graphql/mutations/upload_design.mutation.graphql';
 import DesignDestroyer from '~/design_management/components/design_destroyer.vue';
@@ -16,7 +18,7 @@ import {
   EXISTING_DESIGN_DROP_MANY_FILES_MESSAGE,
   EXISTING_DESIGN_DROP_INVALID_FILENAME_MESSAGE,
 } from '~/design_management/utils/error_messages';
-import { deprecatedCreateFlash as createFlash } from '~/flash';
+import createFlash from '~/flash';
 import createRouter from '~/design_management/router';
 import * as utils from '~/design_management/utils/design_management_utils';
 import {
@@ -28,8 +30,6 @@ import {
   reorderedDesigns,
   moveDesignMutationResponseWithErrors,
 } from '../mock_data/apollo_mock';
-import getDesignListQuery from '~/design_management/graphql/queries/get_design_list.query.graphql';
-import permissionsQuery from '~/design_management/graphql/queries/design_permissions.query.graphql';
 import moveDesignMutation from '~/design_management/graphql/mutations/move_design.mutation.graphql';
 import { DESIGN_TRACKING_PAGE_NAME } from '~/design_management/utils/tracking';
 
@@ -443,10 +443,10 @@ describe('Design management index page', () => {
 
       return uploadDesign.then(() => {
         expect(createFlash).toHaveBeenCalledTimes(1);
-        expect(createFlash).toHaveBeenCalledWith(
-          'Upload skipped. test.jpg did not change.',
-          'warning',
-        );
+        expect(createFlash).toHaveBeenCalledWith({
+          message: 'Upload skipped. test.jpg did not change.',
+          types: 'warning',
+        });
       });
     });
 
@@ -482,7 +482,7 @@ describe('Design management index page', () => {
         designDropzone.vm.$emit('change', eventPayload);
 
         expect(createFlash).toHaveBeenCalledTimes(1);
-        expect(createFlash).toHaveBeenCalledWith(message);
+        expect(createFlash).toHaveBeenCalledWith({ message });
       });
     });
 
@@ -747,7 +747,7 @@ describe('Design management index page', () => {
 
       await wrapper.vm.$nextTick();
 
-      expect(createFlash).toHaveBeenCalledWith('Houston, we have a problem');
+      expect(createFlash).toHaveBeenCalledWith({ message: 'Houston, we have a problem' });
     });
 
     it('displays flash if mutation had a non-recoverable error', async () => {
@@ -761,9 +761,9 @@ describe('Design management index page', () => {
       await jest.runOnlyPendingTimers(); // kick off the mocked GQL stuff (promises)
       await wrapper.vm.$nextTick(); // kick off the DOM update for flash
 
-      expect(createFlash).toHaveBeenCalledWith(
-        'Something went wrong when reordering designs. Please try again',
-      );
+      expect(createFlash).toHaveBeenCalledWith({
+        message: 'Something went wrong when reordering designs. Please try again',
+      });
     });
   });
 });

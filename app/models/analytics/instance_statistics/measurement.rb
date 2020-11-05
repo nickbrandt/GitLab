@@ -36,13 +36,11 @@ module Analytics
 
       scope :order_by_latest, -> { order(recorded_at: :desc) }
       scope :with_identifier, -> (identifier) { where(identifier: identifier) }
+      scope :recorded_after, -> (date) { where(self.model.arel_table[:recorded_at].gteq(date)) if date.present? }
+      scope :recorded_before, -> (date) { where(self.model.arel_table[:recorded_at].lteq(date)) if date.present? }
 
       def self.measurement_identifier_values
-        if Feature.enabled?(:store_ci_pipeline_counts_by_status, default_enabled: true)
-          identifiers.values
-        else
-          identifiers.values - EXPERIMENTAL_IDENTIFIERS.map { |identifier| identifiers[identifier] }
-        end
+        identifiers.values
       end
     end
   end

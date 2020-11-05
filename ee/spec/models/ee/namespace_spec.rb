@@ -401,7 +401,6 @@ RSpec.describe Namespace do
 
       before do
         create(:gitlab_subscription, :active_trial, namespace: group, hosted_plan: hosted_plan)
-        stub_licensed_features(feature => true)
         stub_ee_application_setting(should_check_namespace_plan: true)
       end
 
@@ -1753,7 +1752,7 @@ RSpec.describe Namespace do
     it 'sets a date' do
       namespace = build(:namespace)
 
-      Timecop.freeze do
+      freeze_time do
         namespace.enable_temporary_storage_increase!
 
         expect(namespace.temporary_storage_increase_ends_on).to eq(30.days.from_now.to_date)
