@@ -97,8 +97,6 @@ module Gitlab
             end
           end
 
-          protected
-
           def primary_fingerprint
             primary_identifier&.fingerprint
           end
