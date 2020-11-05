@@ -49,18 +49,20 @@ RSpec.shared_examples 'a verifiable replicator' do
   end
 
   describe '#calculate_checksum!' do
-    it 'calculates the checksum' do
+    before do
       model_record.save!
+    end
+
+    it 'calculates the checksum' do
+      expect(model_record).to receive(:calculate_checksum!).and_return('abc123')
 
       replicator.calculate_checksum!
 
-      expect(model_record.reload.verification_checksum).not_to be_nil
-      expect(model_record.reload.verified_at).not_to be_nil
+      expect(model_record.reload.verification_checksum).to eq('abc123')
+      expect(model_record.verified_at).not_to be_nil
     end
 
     it 'saves the error message and increments retry counter' do
-      model_record.save!
-
       allow(model_record).to receive(:calculate_checksum!) do
         raise StandardError.new('Failure to calculate checksum')
       end
