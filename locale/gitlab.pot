@@ -14504,7 +14504,7 @@ msgstr ""
 msgid "Integrations|Issues created in Jira are shown here once you have created the issues in project setup in Jira."
 msgstr ""
 
-msgid "Integrations|Projects using custom settings will not be impacted unless the project owner chooses to use instance-level defaults."
+msgid "Integrations|Projects using custom settings will not be impacted unless the project owner chooses to use parent level defaults."
 msgstr ""
 
 msgid "Integrations|Return to GitLab for Jira"
