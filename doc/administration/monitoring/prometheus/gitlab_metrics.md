@@ -13,7 +13,6 @@ To enable the GitLab Prometheus metrics:
 1. Find the **Metrics - Prometheus** section, and click **Enable Prometheus Metrics**.
 1. [Restart GitLab](../../restart_gitlab.md#omnibus-gitlab-restart) for the changes to take effect.
 
-NOTE: **Note:**
 For installations from source you must configure it yourself.
 
 ## Collecting the metrics
@@ -124,8 +123,6 @@ The following metrics can be controlled by feature flags:
 |:---------------------------------------------------------------|:-------------------------------------------------------------------|
 | `gitlab_method_call_duration_seconds`                          | `prometheus_metrics_method_instrumentation`                        |
 | `gitlab_view_rendering_duration_seconds`                       | `prometheus_metrics_view_instrumentation`                          |
-| `gitlab_issuable_fast_count_by_state_total`                    | `soft_fail_count_by_state` |
-| `gitlab_issuable_fast_count_by_state_failures_total`           | `soft_fail_count_by_state` |
 
 ## Sidekiq metrics
 
