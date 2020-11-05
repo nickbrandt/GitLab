@@ -9916,6 +9916,26 @@ CREATE SEQUENCE bulk_import_entities_id_seq
 
 ALTER SEQUENCE bulk_import_entities_id_seq OWNED BY bulk_import_entities.id;
 
+CREATE TABLE bulk_import_trackers (
+    id bigint NOT NULL,
+    bulk_import_entity_id bigint NOT NULL,
+    relation text NOT NULL,
+    next_page text,
+    has_next_page boolean DEFAULT false NOT NULL,
+    CONSTRAINT check_2d45cae629 CHECK ((char_length(relation) <= 255)),
+    CONSTRAINT check_40aeaa600b CHECK ((char_length(next_page) <= 255)),
+    CONSTRAINT check_next_page_requirement CHECK (((has_next_page IS FALSE) OR (next_page IS NOT NULL)))
+);
+
+CREATE SEQUENCE bulk_import_trackers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE bulk_import_trackers_id_seq OWNED BY bulk_import_trackers.id;
+
 CREATE TABLE bulk_imports (
     id bigint NOT NULL,
     user_id integer NOT NULL,
@@ -17602,6 +17622,8 @@ ALTER TABLE ONLY bulk_import_configurations ALTER COLUMN id SET DEFAULT nextval(
 
 ALTER TABLE ONLY bulk_import_entities ALTER COLUMN id SET DEFAULT nextval('bulk_import_entities_id_seq'::regclass);
 
+ALTER TABLE ONLY bulk_import_trackers ALTER COLUMN id SET DEFAULT nextval('bulk_import_trackers_id_seq'::regclass);
+
 ALTER TABLE ONLY bulk_imports ALTER COLUMN id SET DEFAULT nextval('bulk_imports_id_seq'::regclass);
 
 ALTER TABLE ONLY chat_names ALTER COLUMN id SET DEFAULT nextval('chat_names_id_seq'::regclass);
@@ -18609,6 +18631,9 @@ ALTER TABLE ONLY bulk_import_configurations
 
 ALTER TABLE ONLY bulk_import_entities
     ADD CONSTRAINT bulk_import_entities_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY bulk_import_trackers
+    ADD CONSTRAINT bulk_import_trackers_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY bulk_imports
     ADD CONSTRAINT bulk_imports_pkey PRIMARY KEY (id);
@@ -19887,6 +19912,8 @@ CREATE INDEX backup_labels_template_idx ON backup_labels USING btree (template) 
 CREATE INDEX backup_labels_title_idx ON backup_labels USING btree (title);
 
 CREATE INDEX backup_labels_type_project_id_idx ON backup_labels USING btree (type, project_id);
+
+CREATE UNIQUE INDEX bulk_import_trackers_uniq_relation_by_entity ON bulk_import_trackers USING btree (bulk_import_entity_id, relation);
 
 CREATE INDEX ci_builds_gitlab_monitor_metrics ON ci_builds USING btree (status, created_at, project_id) WHERE ((type)::text = 'Ci::Build'::text);
 
@@ -24088,6 +24115,9 @@ ALTER TABLE ONLY analytics_cycle_analytics_group_stages
 
 ALTER TABLE ONLY metrics_dashboard_annotations
     ADD CONSTRAINT fk_rails_aeb11a7643 FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY bulk_import_trackers
+    ADD CONSTRAINT fk_rails_aed566d3f3 FOREIGN KEY (bulk_import_entity_id) REFERENCES bulk_import_entities(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY pool_repositories
     ADD CONSTRAINT fk_rails_af3f8c5d62 FOREIGN KEY (shard_id) REFERENCES shards(id) ON DELETE RESTRICT;
