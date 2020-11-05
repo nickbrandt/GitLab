@@ -44,6 +44,12 @@ type processCounter struct {
 
 type resizeStatus = string
 
+type imageFile struct {
+	reader        io.ReadCloser
+	contentLength int64
+	lastModified  time.Time
+}
+
 const (
 	statusSuccess        = "success"        // a rescaled image was served
 	statusScalingFailure = "scaling-failed" // scaling failed but the original image was served
@@ -150,7 +156,7 @@ func NewResizer(cfg config.Config) *Resizer {
 	return &Resizer{Config: cfg, Prefix: "send-scaled-img:"}
 }
 
-// This Injecter forks into a dedicated scaler process to resize an image identified by path or URL
+// Inject forks into a dedicated scaler process to resize an image identified by path or URL
 // and streams the resized image back to the client
 func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData string) {
 	var status resizeStatus = statusUnknown
@@ -169,14 +175,14 @@ func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 		return
 	}
 
-	sourceImageReader, fileSize, err := openSourceImage(params.Location)
+	imageFile, err := openSourceImage(params.Location)
 	if err != nil {
 		// This means we cannot even read the input image; fail fast.
 		status = statusRequestFailure
 		helper.Fail500(w, req, fmt.Errorf("ImageResizer: Failed opening image data stream: %v", err))
 		return
 	}
-	defer sourceImageReader.Close()
+	defer imageFile.reader.Close()
 
 	logFields := func(bytesWritten int64) *log.Fields {
 		return &log.Fields{
@@ -184,13 +190,21 @@ func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 			"duration_s":        time.Since(start).Seconds(),
 			"target_width":      params.Width,
 			"content_type":      params.ContentType,
-			"original_filesize": fileSize,
+			"original_filesize": imageFile.contentLength,
 		}
+	}
+
+	setLastModified(w, imageFile.lastModified)
+	// If the original file has not changed, then any cached resized versions have not changed either.
+	if checkNotModified(req, imageFile.lastModified) {
+		logger.WithFields(*logFields(0)).Printf("ImageResizer: Use cached image")
+		writeNotModified(w)
+		return
 	}
 
 	// We first attempt to rescale the image; if this should fail for any reason, imageReader
 	// will point to the original image, i.e. we render it unchanged.
-	imageReader, resizeCmd, err := r.tryResizeImage(req, sourceImageReader, logger.Writer(), params, fileSize, r.Config.ImageResizerConfig)
+	imageReader, resizeCmd, err := r.tryResizeImage(req, imageFile, logger.Writer(), params, r.Config.ImageResizerConfig)
 	if err != nil {
 		// Something failed, but we can still write out the original image, so don't return early.
 		helper.LogErrorWithFields(req, err, *logFields(0))
@@ -260,13 +274,13 @@ func (r *Resizer) unpackParameters(paramsData string) (*resizeParams, error) {
 }
 
 // Attempts to rescale the given image data, or in case of errors, falls back to the original image.
-func (r *Resizer) tryResizeImage(req *http.Request, reader io.Reader, errorWriter io.Writer, params *resizeParams, fileSize int64, cfg config.ImageResizerConfig) (io.Reader, *exec.Cmd, error) {
-	if fileSize > int64(cfg.MaxFilesize) {
-		return reader, nil, fmt.Errorf("ImageResizer: %db exceeds maximum file size of %db", fileSize, cfg.MaxFilesize)
+func (r *Resizer) tryResizeImage(req *http.Request, f *imageFile, errorWriter io.Writer, params *resizeParams, cfg config.ImageResizerConfig) (io.Reader, *exec.Cmd, error) {
+	if f.contentLength > int64(cfg.MaxFilesize) {
+		return f.reader, nil, fmt.Errorf("ImageResizer: %db exceeds maximum file size of %db", f.contentLength, cfg.MaxFilesize)
 	}
 
 	if !r.numScalerProcs.tryIncrement(int32(cfg.MaxScalerProcs)) {
-		return reader, nil, fmt.Errorf("ImageResizer: too many running scaler processes (%d / %d)", r.numScalerProcs.n, cfg.MaxScalerProcs)
+		return f.reader, nil, fmt.Errorf("ImageResizer: too many running scaler processes (%d / %d)", r.numScalerProcs.n, cfg.MaxScalerProcs)
 	}
 
 	ctx := req.Context()
@@ -276,8 +290,8 @@ func (r *Resizer) tryResizeImage(req *http.Request, reader io.Reader, errorWrite
 	}()
 
 	// Prevents EOF if the file is smaller than 8 bytes
-	bufferSize := int(math.Min(maxMagicLen, float64(fileSize)))
-	buffered := bufio.NewReaderSize(reader, bufferSize)
+	bufferSize := int(math.Min(maxMagicLen, float64(f.contentLength)))
+	buffered := bufio.NewReaderSize(f.reader, bufferSize)
 
 	data, err := buffered.Peek(bufferSize)
 	if err != nil {
@@ -321,7 +335,7 @@ func isURL(location string) bool {
 	return strings.HasPrefix(location, "http://") || strings.HasPrefix(location, "https://")
 }
 
-func openSourceImage(location string) (io.ReadCloser, int64, error) {
+func openSourceImage(location string) (*imageFile, error) {
 	if isURL(location) {
 		return openFromURL(location)
 	}
@@ -329,35 +343,41 @@ func openSourceImage(location string) (io.ReadCloser, int64, error) {
 	return openFromFile(location)
 }
 
-func openFromURL(location string) (io.ReadCloser, int64, error) {
+func openFromURL(location string) (*imageFile, error) {
 	res, err := httpClient.Get(location)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	if res.StatusCode != http.StatusOK {
+	switch res.StatusCode {
+	case http.StatusOK, http.StatusNotModified:
+		// Extract headers for conditional GETs from response.
+		lastModified, err := http.ParseTime(res.Header.Get("Last-Modified"))
+		if err != nil {
+			// This is unlikely to happen, coming from an object storage provider.
+			lastModified = time.Now().UTC()
+		}
+		return &imageFile{res.Body, res.ContentLength, lastModified}, nil
+	default:
 		res.Body.Close()
-
-		return nil, 0, fmt.Errorf("ImageResizer: cannot read data from %q: %d %s",
+		return nil, fmt.Errorf("unexpected upstream response for %q: %d %s",
 			location, res.StatusCode, res.Status)
 	}
-
-	return res.Body, res.ContentLength, nil
 }
 
-func openFromFile(location string) (io.ReadCloser, int64, error) {
+func openFromFile(location string) (*imageFile, error) {
 	file, err := os.Open(location)
-
 	if err != nil {
-		return file, 0, err
+		return nil, err
 	}
 
 	fi, err := file.Stat()
 	if err != nil {
-		return file, 0, err
+		file.Close()
+		return nil, err
 	}
 
-	return file, fi.Size(), nil
+	return &imageFile{file, fi.Size(), fi.ModTime()}, nil
 }
 
 // Only allow more scaling requests if we haven't yet reached the maximum

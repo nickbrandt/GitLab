@@ -1,0 +1,5 @@
+---
+title: Add support for conditional GETs for rescaled images
+merge_request: 647
+author:
+type: performance
