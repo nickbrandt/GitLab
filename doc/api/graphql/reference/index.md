@@ -1234,7 +1234,7 @@ Relationship between an epic and an issue.
 | `slaDueAt` | Time | Timestamp of when the issue SLA expires. |
 | `state` | IssueState! | State of the issue |
 | `statusPagePublishedIncident` | Boolean | Indicates whether an issue is published to the status page |
-| `subscribeDisabledDescription` | String! | The message to display when a project has emails notifications disabled |
+| `subscribeDisabledDescription` | String! | Message to display when the project has email notifications disabled |
 | `subscribed` | Boolean! | Indicates the currently logged in user is subscribed to the issue |
 | `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
 | `timeEstimate` | Int! | Time estimate of the issue |
@@ -1500,7 +1500,7 @@ Represents a recorded measurement (object count) for the Admins.
 | `slaDueAt` | Time | Timestamp of when the issue SLA expires. |
 | `state` | IssueState! | State of the issue |
 | `statusPagePublishedIncident` | Boolean | Indicates whether an issue is published to the status page |
-| `subscribeDisabledDescription` | String! | The message to display when a project has emails notifications disabled |
+| `subscribeDisabledDescription` | String! | Message to display when the project has email notifications disabled |
 | `subscribed` | Boolean! | Indicates the currently logged in user is subscribed to the issue |
 | `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
 | `timeEstimate` | Int! | Time estimate of the issue |

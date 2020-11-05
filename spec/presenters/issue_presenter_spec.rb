@@ -35,7 +35,7 @@ RSpec.describe IssuePresenter do
     end
   end
 
-  describe '#project_emails_disabled' do
+  describe '#project_emails_disabled?' do
     subject { presenter.project_emails_disabled? }
 
     it 'returns false when emails notifications is enabled for project' do
@@ -47,9 +47,7 @@ RSpec.describe IssuePresenter do
         allow(project).to receive(:emails_disabled?).and_return(true)
       end
 
-      it 'returns true' do
-        is_expected.to be(true)
-      end
+      it { is_expected.to be(true) }
     end
   end
 

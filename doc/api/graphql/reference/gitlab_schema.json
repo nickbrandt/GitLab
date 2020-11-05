@@ -20748,7 +20748,7 @@
             },
             {
               "name": "subscribeDisabledDescription",
-              "description": "The message to display when a project has emails notifications disabled",
+              "description": "Message to display when the project has email notifications disabled",
               "args": [
 
               ],
@@ -27395,7 +27395,7 @@
             },
             {
               "name": "subscribeDisabledDescription",
-              "description": "The message to display when a project has emails notifications disabled",
+              "description": "Message to display when the project has email notifications disabled",
               "args": [
 
               ],
