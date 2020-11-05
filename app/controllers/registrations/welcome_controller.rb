@@ -3,7 +3,7 @@
 module Registrations
   class WelcomeController < ApplicationController
     layout 'welcome'
-    skip_before_action :authenticate_user!, :required_signup_info, :check_two_factor_requirement
+    skip_before_action :authenticate_user!, :required_signup_info, :check_two_factor_requirement, only: [:show, :update]
     before_action :require_current_user
 
     feature_category :authentication_and_authorization
@@ -16,10 +16,7 @@ module Registrations
       result = ::Users::SignupService.new(current_user, update_params).execute
 
       if result[:status] == :success
-        if ::Gitlab.com? && show_onboarding_issues_experiment?
-          track_experiment_event(:onboarding_issues, 'signed_up')
-          record_experiment_user(:onboarding_issues)
-        end
+        process_gitlab_com_tracking
 
         return redirect_to new_users_sign_up_group_path if experiment_enabled?(:onboarding_issues) && show_onboarding_issues_experiment?
 
@@ -39,6 +36,14 @@ module Registrations
       current_user.role.present? && !current_user.setup_for_company.nil?
     end
 
+    def process_gitlab_com_tracking
+      return false unless ::Gitlab.com?
+      return false unless show_onboarding_issues_experiment?
+
+      track_experiment_event(:onboarding_issues, 'signed_up')
+      record_experiment_user(:onboarding_issues)
+    end
+
     def update_params
       params.require(:user).permit(:role, :setup_for_company)
     end
@@ -52,11 +57,9 @@ module Registrations
     end
 
     def path_for_signed_in_user(user)
-      if requires_confirmation?(user)
-        users_almost_there_path
-      else
-        stored_location_for(user) || dashboard_projects_path
-      end
+      return users_almost_there_path if requires_confirmation?(user)
+
+      stored_location_for(user) || dashboard_projects_path
     end
 
     def show_onboarding_issues_experiment?
