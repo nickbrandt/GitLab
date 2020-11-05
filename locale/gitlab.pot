@@ -8313,6 +8313,12 @@ msgstr ""
 msgid "DastProfiles|Are you sure you want to delete this profile?"
 msgstr ""
 
+msgid "DastProfiles|Authentication"
+msgstr ""
+
+msgid "DastProfiles|Authentication URL"
+msgstr ""
+
 msgid "DastProfiles|Could not create site validation token. Please refresh the page, or try again later."
 msgstr ""
 
@@ -8373,6 +8379,9 @@ msgstr ""
 msgid "DastProfiles|Edit site profile"
 msgstr ""
 
+msgid "DastProfiles|Enable Authentication"
+msgstr ""
+
 msgid "DastProfiles|Error Details"
 msgstr ""
 
@@ -8407,6 +8416,12 @@ msgid "DastProfiles|No profiles created yet"
 msgstr ""
 
 msgid "DastProfiles|Passive"
+msgstr ""
+
+msgid "DastProfiles|Password"
+msgstr ""
+
+msgid "DastProfiles|Password form field"
 msgstr ""
 
 msgid "DastProfiles|Please enter a valid timeout value"
@@ -8476,6 +8491,12 @@ msgid "DastProfiles|The maximum number of seconds allowed for the site under tes
 msgstr ""
 
 msgid "DastProfiles|Turn on AJAX spider"
+msgstr ""
+
+msgid "DastProfiles|Username"
+msgstr ""
+
+msgid "DastProfiles|Username form field"
 msgstr ""
 
 msgid "DastProfiles|Validate"
@@ -9843,6 +9864,9 @@ msgid "Email %{number}"
 msgstr ""
 
 msgid "Email Notification"
+msgstr ""
+
+msgid "Email cannot be blank"
 msgstr ""
 
 msgid "Email could not be sent"
@@ -16284,7 +16308,7 @@ msgstr ""
 msgid "Marked For Deletion At - %{deletion_time}"
 msgstr ""
 
-msgid "Marked this %{noun} as Work In Progress."
+msgid "Marked this %{noun} as a draft."
 msgstr ""
 
 msgid "Marked this issue as a duplicate of %{duplicate_param}."
@@ -16296,7 +16320,7 @@ msgstr ""
 msgid "Marked to do as done."
 msgstr ""
 
-msgid "Marks this %{noun} as Work In Progress."
+msgid "Marks this %{noun} as a draft."
 msgstr ""
 
 msgid "Marks this issue as a duplicate of %{duplicate_reference}."
@@ -16527,7 +16551,7 @@ msgstr ""
 msgid "Members|%{time} by %{user}"
 msgstr ""
 
-msgid "Members|%{userName} is currently a LDAP user. Editing their permissions will override the settings from the LDAP group sync."
+msgid "Members|%{userName} is currently an LDAP user. Editing their permissions will override the settings from the LDAP group sync."
 msgstr ""
 
 msgid "Members|An error occurred while trying to enable LDAP override, please try again."
@@ -18490,6 +18514,9 @@ msgstr ""
 msgid "Notes|This comment has changed since you started editing, please review the %{open_link}updated comment%{close_link} to ensure information is not lost"
 msgstr ""
 
+msgid "Notes|You're only seeing %{boldStart}other activity%{boldEnd} in the feed. To add a comment, switch to one of the following options."
+msgstr ""
+
 msgid "Nothing found…"
 msgstr ""
 
@@ -19258,9 +19285,6 @@ msgid "Page not found"
 msgstr ""
 
 msgid "Page settings"
-msgstr ""
-
-msgid "Page was successfully deleted"
 msgstr ""
 
 msgid "PagerDutySettings|Active"
@@ -21109,6 +21133,12 @@ msgid "ProjectSettings|Repository"
 msgstr ""
 
 msgid "ProjectSettings|Require"
+msgstr ""
+
+msgid "ProjectSettings|Requirements"
+msgstr ""
+
+msgid "ProjectSettings|Requirements management system for this project"
 msgstr ""
 
 msgid "ProjectSettings|Set the default behavior and availability of this option in merge requests. Changes made are also applied to existing merge requests."
@@ -27487,7 +27517,7 @@ msgstr ""
 msgid "This merge request is locked."
 msgstr ""
 
-msgid "This merge request is still a work in progress."
+msgid "This merge request is still a draft."
 msgstr ""
 
 msgid "This merge request was merged. To apply this suggestion, edit this file directly."
@@ -28184,6 +28214,9 @@ msgstr ""
 msgid "Too many projects enabled. You will need to manage them via the console or the API."
 msgstr ""
 
+msgid "Too many users specified (limit is %{user_limit})"
+msgstr ""
+
 msgid "Too much data"
 msgstr ""
 
@@ -28664,10 +28697,10 @@ msgstr ""
 msgid "Unlocks the discussion."
 msgstr ""
 
-msgid "Unmarked this %{noun} as Work In Progress."
+msgid "Unmarked this %{noun} as a draft."
 msgstr ""
 
-msgid "Unmarks this %{noun} as Work In Progress."
+msgid "Unmarks this %{noun} as a draft."
 msgstr ""
 
 msgid "Unreachable"
@@ -30158,7 +30191,13 @@ msgstr ""
 msgid "Wiki"
 msgstr ""
 
-msgid "Wiki was successfully updated."
+msgid "Wiki page was successfully created."
+msgstr ""
+
+msgid "Wiki page was successfully deleted."
+msgstr ""
+
+msgid "Wiki page was successfully updated."
 msgstr ""
 
 msgid "WikiClone|Clone your wiki"
@@ -30894,9 +30933,6 @@ msgid "You're not allowed to make changes to this project directly. A fork of th
 msgstr ""
 
 msgid "You're not allowed to make changes to this project directly. A fork of this project is being created that you can make changes in, so you can submit a merge request."
-msgstr ""
-
-msgid "You're only seeing %{startTag}other activity%{endTag} in the feed. To add a comment, switch to one of the following options."
 msgstr ""
 
 msgid "You're receiving this email because of your account on %{host}."
