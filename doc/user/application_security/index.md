@@ -21,7 +21,7 @@ For an overview of application security with GitLab, see
 ## Quick start
 
 Get started quickly with Dependency Scanning, License Scanning, Static Application Security
-Testing (SAST), and Secret Detection by adding the following to your `.gitlab-ci.yml`:
+Testing (SAST), and Secret Detection by adding the following to your [`.gitlab-ci.yml`](../../ci/yaml/README.md):
 
 ```yaml
 include:
@@ -70,11 +70,25 @@ GitLab uses the following tools to scan and report known vulnerabilities found i
 | [Dependency List](dependency_list/index.md) **(ULTIMATE)**                   | View your project's dependencies and their known vulnerabilities.      |
 | [Dependency Scanning](dependency_scanning/index.md) **(ULTIMATE)**           | Analyze your dependencies for known vulnerabilities.                   |
 | [Dynamic Application Security Testing (DAST)](dast/index.md) **(ULTIMATE)**  | Analyze running web applications for known vulnerabilities.            |
-| [API fuzzing](api_fuzzing/index.md) **(ULTIMATE)**                 | Find unknown bugs and vulnerabilities in web APIs with fuzzing.    |
+| [API fuzzing](api_fuzzing/index.md) **(ULTIMATE)**                           | Find unknown bugs and vulnerabilities in web APIs with fuzzing.        |
 | [Secret Detection](secret_detection/index.md) **(ULTIMATE)**                 | Analyze Git history for leaked secrets.                                |
 | [Security Dashboard](security_dashboard/index.md) **(ULTIMATE)**             | View vulnerabilities in all your projects and groups.                  |
 | [Static Application Security Testing (SAST)](sast/index.md)                  | Analyze source code for known vulnerabilities.                         |
 | [Coverage fuzzing](coverage_fuzzing/index.md) **(ULTIMATE)**                 | Find unknown bugs and vulnerabilities with coverage-guided fuzzing.    |
+
+### Use security scanning tools with Pipelines for Merge Requests
+
+The security scanning tools can all be added to pipelines with [templates](https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Security).
+See each tool for details on how to use include each template in your CI/CD configuration.
+
+By default, the application security jobs are configured to run for branch pipelines only.
+To use them with [pipelines for merge requests](../../ci/merge_request_pipelines/index.md),
+you may need to override the default `rules:` configuration to add:
+
+```yaml
+rules:
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+```
 
 ## Security Scanning with Auto DevOps
 
@@ -144,21 +158,21 @@ To view details of DAST vulnerabilities:
 
 1. Click on the vulnerability's description. The following details are provided:
 
-   | Field            | Description                                                                                                                                                                   |
-|:-----------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Description      | Description of the vulnerability.                                                                                                                                             |
-| Project          | Namespace and project in which the vulnerability was detected.                                                                                                                |
-| Method           | HTTP method used to detect the vulnerability.                                                                                                                                 |
-| URL              | URL at which the vulnerability was detected.                                                                                                                                  |
-| Request Headers  | Headers of the request.                                                                                                                                                       |
-| Response Status  | Response status received from the application.                                                                                                                                |
-| Response Headers | Headers of the response received from the application.                                                                                                                        |
+| Field            | Description                                                        |
+|:-----------------|:------------------------------------------------------------------ |
+| Description      | Description of the vulnerability.                                  |
+| Project          | Namespace and project in which the vulnerability was detected.     |
+| Method           | HTTP method used to detect the vulnerability.                      |
+| URL              | URL at which the vulnerability was detected.                       |
+| Request Headers  | Headers of the request.                                            |
+| Response Status  | Response status received from the application.                     |
+| Response Headers | Headers of the response received from the application.             |
 | Evidence         | Evidence of the data found that verified the vulnerability. Often a snippet of the request or response, this can be used to help verify that the finding is a vulnerability. |
-| Identifiers      | Identifiers of the vulnerability.                                                                                                                                             |
-| Severity         | Severity of the vulnerability.                                                                                                                                                |
-| Scanner Type     | Type of vulnerability report.                                                                                                                                                 |
-| Links            | Links to further details of the detected vulnerability.                                                                                                                       |
-| Solution         | Details of a recommended solution to the vulnerability (optional).                                                                                                            |
+| Identifiers      | Identifiers of the vulnerability.                                  |
+| Severity         | Severity of the vulnerability.                                     |
+| Scanner Type     | Type of vulnerability report.                                      |
+| Links            | Links to further details of the detected vulnerability.            |
+| Solution         | Details of a recommended solution to the vulnerability (optional). |
 
 #### Hide sensitive information in headers
 
