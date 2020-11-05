@@ -280,7 +280,10 @@ describe('Vulnerability related issues component', () => {
   });
 
   describe('when linked issue is not yet created', () => {
+    let clickSpy;
+
     beforeEach(async () => {
+      clickSpy = jest.spyOn(urlUtility, 'redirectTo').mockImplementation(() => {});
       mockAxios.onGet(propsData.endpoint).replyOnce(httpStatusCodes.OK, [issue1, issue2]);
       createWrapper({ stubs: { RelatedIssuesBlock } });
       await axios.waitForAll();
@@ -290,12 +293,11 @@ describe('Vulnerability related issues component', () => {
       expect(findCreateIssueButton().exists()).toBe(true);
     });
 
-    it('calls new issue endpoint on click ', async () => {
-      const issueUrl = `/group/project/-/security/vulnerabilities/${vulnerabilityId}/new_issue`;
-
+    it('calls new issue endpoint on click ', () => {
       findCreateIssueButton().vm.$emit('click');
-
-      expect(urlUtility.redirectTo).toHaveBeenCalledWith(issueUrl);
+      expect(clickSpy).toHaveBeenCalledWith(newIssueUrl, {
+        params: { vulnerability_id: vulnerabilityId },
+      });
     });
   });
 
