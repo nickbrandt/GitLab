@@ -21108,6 +21108,12 @@ msgstr ""
 msgid "ProjectSettings|Require"
 msgstr ""
 
+msgid "ProjectSettings|Requirements"
+msgstr ""
+
+msgid "ProjectSettings|Requirements management system for this project"
+msgstr ""
+
 msgid "ProjectSettings|Set the default behavior and availability of this option in merge requests. Changes made are also applied to existing merge requests."
 msgstr ""
 
