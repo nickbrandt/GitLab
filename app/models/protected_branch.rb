@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ProtectedBranch < ApplicationRecord
-  include ProtectedRef
+  include ProtectedRefForBranch
   include Gitlab::SQL::Pattern
 
   scope :requiring_code_owner_approval,
@@ -38,6 +38,7 @@ class ProtectedBranch < ApplicationRecord
     project.protected_branches
   end
 
+  # overridden in EE
   def self.branch_requires_code_owner_approval?(project, branch_name)
     false
   end
@@ -56,9 +57,9 @@ class ProtectedBranch < ApplicationRecord
     end
   end
 
-  def self.protected_ref_access_levels(*types)
-    EE::ProtectedRef.protected_ref_access_levels(types)
-  end
+  # def self.protected_ref_access_levels(*types)
+  #   EE::ProtectedRef.protected_ref_access_levels(types)
+  # end
 end
 
 ProtectedBranch.prepend_if_ee('EE::ProtectedBranch')

@@ -29,32 +29,7 @@ module ProtectedRef
         # to fail.
         has_many :"#{type}_access_levels", inverse_of: self.model_name.singular
 
-        # needs to allow more access levels in the relation:
-        # - 1 for each user/group
-        # - 1 with the `access_level` (Maintainer, Developer)
-        validates :"#{type}_access_levels", length: { is: 1 }, if: -> { false }
-
-        accepts_nested_attributes_for :"#{type}_access_levels", allow_destroy: true
-
-        # Returns access levels that grant the specified access type to the given user / group.
-        access_level_class = const_get("#{type}_access_level".classify, false)
-        protected_type = self.model_name.singular
-        scope(
-          :"#{type}_access_by_user",
-          -> (user) do
-            access_level_class.joins(protected_type.to_sym)
-              .where("#{protected_type}_id" => self.ids)
-              .merge(access_level_class.by_user(user))
-          end
-        )
-        scope(
-          :"#{type}_access_by_group",
-          -> (group) do
-            access_level_class.joins(protected_type.to_sym)
-              .where("#{protected_type}_id" => self.ids)
-              .merge(access_level_class.by_group(group))
-          end
-        )
+        validates :"#{type}_access_levels", length: { is: 1, message: "are restricted to a single instance per #{self.model_name.human}." }
 
         accepts_nested_attributes_for :"#{type}_access_levels", allow_destroy: true
       end
@@ -94,3 +69,9 @@ module ProtectedRef
     @ref_matcher ||= RefMatcher.new(self.name)
   end
 end
+
+# Prepending a module into a concern doesn't work very well for class methods,
+# since these are defined in a ClassMethods constant. As such, we prepend the
+# module directly into ProtectedRef::ClassMethods, instead of prepending it into
+# ProtectedRef.
+ProtectedRef::ClassMethods.prepend_if_ee('EE::ProtectedRef')
