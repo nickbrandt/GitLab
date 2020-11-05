@@ -3868,6 +3868,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "includeDescendantGroups",
+                  "description": "Include epics from descendant groups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "true"
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
@@ -18289,6 +18299,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "includeDescendantGroups",
+                  "description": "Include epics from descendant groups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "true"
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
@@ -20663,6 +20683,24 @@
               "deprecationReason": null
             },
             {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "userNotesCount",
               "description": "Number of user notes of the issue",
               "args": [
@@ -22575,6 +22613,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "includeDescendantGroups",
+                  "description": "Include epics from descendant groups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "true"
                 }
               ],
               "type": {
@@ -22724,6 +22772,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "includeDescendantGroups",
+                  "description": "Include epics from descendant groups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "true"
                 },
                 {
                   "name": "after",
@@ -23037,7 +23095,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -23164,6 +23222,16 @@
                       "name": "ID",
                       "ofType": null
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
@@ -27098,6 +27166,24 @@
             {
               "name": "upvotes",
               "description": "Number of upvotes the issue has received",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the issue",
               "args": [
 
               ],
@@ -32794,6 +32880,20 @@
                   "name": "Int",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the merge request",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -43119,7 +43219,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43248,6 +43348,16 @@
                     }
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -43358,7 +43468,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43563,7 +43673,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43690,6 +43800,16 @@
                       "name": "ID",
                       "ofType": null
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
@@ -50139,34 +50259,6 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
-            },
-            {
-              "name": "issuesUrl",
-              "description": "HTTP URL of the issues page filtered by this release. Deprecated in 13.6: Use `openedIssuesUrl`",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `openedIssuesUrl`. Deprecated in 13.6"
-            },
-            {
-              "name": "mergeRequestsUrl",
-              "description": "HTTP URL of the merge request page filtered by this release. Deprecated in 13.6: Use `openedMergeRequestsUrl`",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `openedMergeRequestsUrl`. Deprecated in 13.6"
             },
             {
               "name": "mergedMergeRequestsUrl",
