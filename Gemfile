@@ -98,6 +98,7 @@ gem 'graphql', '~> 1.11.4'
 gem 'graphiql-rails', '~> 1.4.10'
 gem 'apollo_upload_server', '~> 2.0.2'
 gem 'graphql-docs', '~> 1.6.0', group: [:development, :test]
+gem 'graphlient', '~> 0.4.0' # Used by BulkImport feature (group::import)
 
 gem 'hashie'
 # Disable strong_params so that Mash does not respond to :permitted?
@@ -118,7 +119,7 @@ gem 'fog-aws', '~> 3.5'
 # Locked until fog-google resolves https://github.com/fog/fog-google/issues/421.
 # Also see config/initializers/fog_core_patch.rb.
 gem 'fog-core', '= 2.1.0'
-gem 'fog-google', '~> 1.10'
+gem 'fog-google', '~> 1.11'
 gem 'fog-local', '~> 0.6'
 gem 'fog-openstack', '~> 1.0'
 gem 'fog-rackspace', '~> 0.1.1'
@@ -271,9 +272,6 @@ gem 'loofah', '~> 2.2'
 # Working with license
 gem 'licensee', '~> 8.9'
 
-# Ace editor
-gem 'ace-rails-ap', '~> 4.1.0'
-
 # Detect and convert string character encoding
 gem 'charlock_holmes', '~> 0.7.7'
 
@@ -307,13 +305,16 @@ gem 'rack-attack', '~> 6.3.0'
 # Sentry integration
 gem 'sentry-raven', '~> 3.0'
 
+# PostgreSQL query parsing
+gem 'gitlab-pg_query', '~> 1.3', require: 'pg_query'
+
 gem 'premailer-rails', '~> 1.10.3'
 
 # LabKit: Tracing and Correlation
-gem 'gitlab-labkit', '0.12.2'
+gem 'gitlab-labkit', '0.13.1'
 
 # I18n
-gem 'ruby_parser', '~> 3.8', require: false
+gem 'ruby_parser', '~> 3.15', require: false
 gem 'rails-i18n', '~> 6.0'
 gem 'gettext_i18n_rails', '~> 1.8.0'
 gem 'gettext_i18n_rails_js', '~> 1.3'
@@ -376,12 +377,13 @@ group :development, :test do
   gem 'rubocop-rspec', '~> 1.37.0'
 
   gem 'scss_lint', '~> 0.56.0', require: false
-  gem 'haml_lint', '~> 0.34.0', require: false
+  gem 'haml_lint', '~> 0.36.0', require: false
   gem 'bundler-audit', '~> 0.6.1', require: false
 
   gem 'benchmark-ips', '~> 2.3.0', require: false
 
   gem 'knapsack', '~> 1.17'
+  gem 'crystalball', '~> 0.7.0', require: false
 
   gem 'simple_po_parser', '~> 1.1.2', require: false
 
@@ -407,7 +409,7 @@ end
 group :test do
   gem 'fuubar', '~> 2.2.0'
   gem 'rspec-retry', '~> 0.6.1'
-  gem 'rspec_profiling', '~> 0.0.5'
+  gem 'rspec_profiling', '~> 0.0.6'
   gem 'rspec-parameterized', require: false
 
   gem 'capybara', '~> 3.33.0'

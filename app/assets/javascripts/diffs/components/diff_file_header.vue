@@ -18,6 +18,7 @@ import { __, s__, sprintf } from '~/locale';
 import { diffViewerModes } from '~/ide/constants';
 import DiffStats from './diff_stats.vue';
 import { scrollToElement } from '~/lib/utils/common_utils';
+import { isCollapsed } from '../diff_file';
 import { DIFF_FILE_HEADER } from '../i18n';
 
 export default {
@@ -125,6 +126,9 @@ export default {
     isUsingLfs() {
       return this.diffFile.stored_externally && this.diffFile.external_storage === 'lfs';
     },
+    isCollapsed() {
+      return isCollapsed(this.diffFile, { fileByFile: this.viewDiffsFileByFile });
+    },
     collapseIcon() {
       return this.expanded ? 'chevron-down' : 'chevron-right';
     },
@@ -222,11 +226,17 @@ export default {
       <a
         ref="titleWrapper"
         :v-once="!viewDiffsFileByFile"
-        class="gl-mr-2 gl-text-decoration-none!"
+        class="gl-mr-2 gl-text-decoration-none! gl-text-truncate"
         :href="titleLink"
         @click="handleFileNameClick"
       >
-        <file-icon :file-name="filePath" :size="18" aria-hidden="true" css-classes="gl-mr-2" />
+        <file-icon
+          :file-name="filePath"
+          :size="18"
+          aria-hidden="true"
+          css-classes="gl-mr-2"
+          :submodule="diffFile.submodule"
+        />
         <span v-if="isFileRenamed">
           <strong
             v-gl-tooltip
@@ -334,7 +344,7 @@ export default {
             </gl-dropdown-item>
           </template>
 
-          <template v-if="!diffFile.viewer.automaticallyCollapsed">
+          <template v-if="!isCollapsed">
             <gl-dropdown-divider
               v-if="!diffFile.is_fully_expanded || diffHasDiscussions(diffFile)"
             />

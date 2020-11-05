@@ -12,30 +12,10 @@ RSpec.describe RegistrationsController do
   describe '#new' do
     subject { get :new }
 
-    context 'with the experimental signup flow enabled and the user is part of the experimental group' do
-      before do
-        stub_experiment(signup_flow: true)
-        stub_experiment_for_user(signup_flow: true)
-      end
-
-      it 'renders new template and sets the resource variable' do
-        expect(subject).to render_template(:new)
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(assigns(:resource)).to be_a(User)
-      end
-    end
-
-    context 'with the experimental signup flow enabled and the user is part of the control group' do
-      before do
-        stub_experiment(signup_flow: true)
-        stub_experiment_for_user(signup_flow: false)
-      end
-
-      it 'renders new template and sets the resource variable' do
-        subject
-        expect(response).to have_gitlab_http_status(:found)
-        expect(response).to redirect_to(new_user_session_path(anchor: 'register-pane'))
-      end
+    it 'renders new template and sets the resource variable' do
+      expect(subject).to render_template(:new)
+      expect(response).to have_gitlab_http_status(:ok)
+      expect(assigns(:resource)).to be_a(User)
     end
   end
 
@@ -46,102 +26,76 @@ RSpec.describe RegistrationsController do
     subject { post(:create, params: user_params) }
 
     context '`blocked_pending_approval` state' do
-      context 'when the feature is enabled' do
+      context 'when the `require_admin_approval_after_user_signup` setting is turned on' do
         before do
-          stub_feature_flags(admin_approval_for_new_user_signups: true)
+          stub_application_setting(require_admin_approval_after_user_signup: true)
         end
 
-        context 'when the `require_admin_approval_after_user_signup` setting is turned on' do
-          before do
-            stub_application_setting(require_admin_approval_after_user_signup: true)
-          end
+        it 'signs up the user in `blocked_pending_approval` state' do
+          subject
+          created_user = User.find_by(email: 'new@user.com')
 
-          it 'signs up the user in `blocked_pending_approval` state' do
-            subject
-            created_user = User.find_by(email: 'new@user.com')
+          expect(created_user).to be_present
+          expect(created_user.blocked_pending_approval?).to eq(true)
+        end
 
-            expect(created_user).to be_present
-            expect(created_user.blocked_pending_approval?).to eq(true)
-          end
+        it 'does not log in the user after sign up' do
+          subject
 
-          it 'does not log in the user after sign up' do
-            subject
+          expect(controller.current_user).to be_nil
+        end
 
-            expect(controller.current_user).to be_nil
-          end
+        it 'shows flash message after signing up' do
+          subject
 
-          it 'shows flash message after signing up' do
-            subject
+          expect(response).to redirect_to(new_user_session_path(anchor: 'login-pane'))
+          expect(flash[:notice])
+            .to eq('You have signed up successfully. However, we could not sign you in because your account is awaiting approval from your GitLab administrator.')
+        end
 
-            expect(response).to redirect_to(new_user_session_path(anchor: 'login-pane'))
-            expect(flash[:notice])
-              .to eq('You have signed up successfully. However, we could not sign you in because your account is awaiting approval from your GitLab administrator.')
-          end
-
-          context 'email confirmation' do
-            context 'when `send_user_confirmation_email` is true' do
-              before do
-                stub_application_setting(send_user_confirmation_email: true)
-              end
-
-              it 'does not send a confirmation email' do
-                expect { subject }
-                  .not_to have_enqueued_mail(DeviseMailer, :confirmation_instructions)
-              end
+        context 'email confirmation' do
+          context 'when `send_user_confirmation_email` is true' do
+            before do
+              stub_application_setting(send_user_confirmation_email: true)
             end
-          end
-        end
 
-        context 'when the `require_admin_approval_after_user_signup` setting is turned off' do
-          before do
-            stub_application_setting(require_admin_approval_after_user_signup: false)
-          end
-
-          it 'signs up the user in `active` state' do
-            subject
-            created_user = User.find_by(email: 'new@user.com')
-
-            expect(created_user).to be_present
-            expect(created_user.active?).to eq(true)
-          end
-
-          it 'does not show any flash message after signing up' do
-            subject
-
-            expect(flash[:notice]).to be_nil
-          end
-
-          context 'email confirmation' do
-            context 'when `send_user_confirmation_email` is true' do
-              before do
-                stub_application_setting(send_user_confirmation_email: true)
-              end
-
-              it 'sends a confirmation email' do
-                expect { subject }
-                  .to have_enqueued_mail(DeviseMailer, :confirmation_instructions)
-              end
+            it 'does not send a confirmation email' do
+              expect { subject }
+                .not_to have_enqueued_mail(DeviseMailer, :confirmation_instructions)
             end
           end
         end
       end
 
-      context 'when the feature is disabled' do
+      context 'when the `require_admin_approval_after_user_signup` setting is turned off' do
         before do
-          stub_feature_flags(admin_approval_for_new_user_signups: false)
+          stub_application_setting(require_admin_approval_after_user_signup: false)
         end
 
-        context 'when the `require_admin_approval_after_user_signup` setting is turned on' do
-          before do
-            stub_application_setting(require_admin_approval_after_user_signup: true)
-          end
+        it 'signs up the user in `active` state' do
+          subject
+          created_user = User.find_by(email: 'new@user.com')
 
-          it 'signs up the user in `active` state' do
-            subject
+          expect(created_user).to be_present
+          expect(created_user.active?).to eq(true)
+        end
 
-            created_user = User.find_by(email: 'new@user.com')
-            expect(created_user).to be_present
-            expect(created_user.active?).to eq(true)
+        it 'does not show any flash message after signing up' do
+          subject
+
+          expect(flash[:notice]).to be_nil
+        end
+
+        context 'email confirmation' do
+          context 'when `send_user_confirmation_email` is true' do
+            before do
+              stub_application_setting(send_user_confirmation_email: true)
+            end
+
+            it 'sends a confirmation email' do
+              expect { subject }
+                .to have_enqueued_mail(DeviseMailer, :confirmation_instructions)
+            end
           end
         end
       end
@@ -452,12 +406,10 @@ RSpec.describe RegistrationsController do
   describe '#welcome' do
     subject { get :welcome }
 
-    it 'renders the devise_experimental_separate_sign_up_flow layout' do
+    it 'renders the welcome layout' do
       sign_in(create(:user))
 
-      expected_layout = Gitlab.ee? ? :checkout : :devise_experimental_separate_sign_up_flow
-
-      expect(subject).to render_template(expected_layout)
+      expect(subject).to render_template(:welcome)
     end
 
     context '2FA is required from group' do

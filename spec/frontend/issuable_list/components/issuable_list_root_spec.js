@@ -1,5 +1,7 @@
 import { mount } from '@vue/test-utils';
-import { GlLoadingIcon, GlPagination } from '@gitlab/ui';
+import { GlSkeletonLoading, GlPagination } from '@gitlab/ui';
+
+import { TEST_HOST } from 'helpers/test_constants';
 
 import IssuableListRoot from '~/issuable_list/components/issuable_list_root.vue';
 import IssuableTabs from '~/issuable_list/components/issuable_tabs.vue';
@@ -30,6 +32,54 @@ describe('IssuableListRoot', () => {
 
   afterEach(() => {
     wrapper.destroy();
+  });
+
+  describe('computed', () => {
+    describe('skeletonItemCount', () => {
+      it.each`
+        totalItems | defaultPageSize | currentPage | returnValue
+        ${100}     | ${20}           | ${1}        | ${20}
+        ${105}     | ${20}           | ${6}        | ${5}
+        ${7}       | ${20}           | ${1}        | ${7}
+        ${0}       | ${20}           | ${1}        | ${5}
+      `(
+        'returns $returnValue when totalItems is $totalItems, defaultPageSize is $defaultPageSize and currentPage is $currentPage',
+        async ({ totalItems, defaultPageSize, currentPage, returnValue }) => {
+          wrapper.setProps({
+            totalItems,
+            defaultPageSize,
+            currentPage,
+          });
+
+          await wrapper.vm.$nextTick();
+
+          expect(wrapper.vm.skeletonItemCount).toBe(returnValue);
+        },
+      );
+    });
+  });
+
+  describe('watch', () => {
+    describe('urlParams', () => {
+      it('updates window URL reflecting props within `urlParams`', async () => {
+        const urlParams = {
+          state: 'closed',
+          sort: 'updated_asc',
+          page: 1,
+          search: 'foo',
+        };
+
+        wrapper.setProps({
+          urlParams,
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(global.window.location.href).toBe(
+          `${TEST_HOST}/?state=${urlParams.state}&sort=${urlParams.sort}&page=${urlParams.page}&search=${urlParams.search}`,
+        );
+      });
+    });
   });
 
   describe('template', () => {
@@ -86,7 +136,7 @@ describe('IssuableListRoot', () => {
 
       await wrapper.vm.$nextTick();
 
-      expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
+      expect(wrapper.findAll(GlSkeletonLoading)).toHaveLength(wrapper.vm.skeletonItemCount);
     });
 
     it('renders issuable-item component for each item within `issuables` array', () => {
@@ -114,6 +164,7 @@ describe('IssuableListRoot', () => {
     it('renders gl-pagination when `showPaginationControls` prop is true', async () => {
       wrapper.setProps({
         showPaginationControls: true,
+        totalItems: 10,
       });
 
       await wrapper.vm.$nextTick();
@@ -125,6 +176,7 @@ describe('IssuableListRoot', () => {
         value: 1,
         prevPage: 0,
         nextPage: 2,
+        totalItems: 10,
         align: 'center',
       });
     });

@@ -56,6 +56,10 @@ FactoryBot.define do
     trait :inactive do
       active { false }
     end
+
+    before(:create) do |service|
+      service.data = build(:alerts_service_data, service: service)
+    end
   end
 
   factory :drone_ci_service do
@@ -137,6 +141,13 @@ FactoryBot.define do
         )
       end
     end
+  end
+
+  factory :external_wiki_service do
+    project
+    type { ExternalWikiService }
+    active { true }
+    external_wiki_url { 'http://external-wiki-url.com' }
   end
 
   factory :open_project_service do

@@ -314,6 +314,10 @@ External users:
 - Can only access public projects and projects to which they are explicitly granted access,
   thus hiding all other internal or private ones from them (like being
   logged out).
+- Can only access public groups and groups to which they are explicitly granted access,
+  thus hiding all other internal or private ones from them (like being
+  logged out).
+- Can only access public snippets.
 
 Access can be granted by adding the user as member to the project or group.
 Like usual users, they receive a role in the project or group with all
@@ -391,7 +395,7 @@ with the permissions described on the documentation on [auditor users permission
 
 [Read more about Auditor users.](../administration/auditor_users.md)
 
-## Users with minimal access **(PREMIUM ONLY)**
+## Users with minimal access **(PREMIUM)**
 
 >[Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/40942) in [GitLab Premium](https://about.gitlab.com/pricing/) 13.4.
 
@@ -432,7 +436,7 @@ instance and project. In addition, all admins can use the admin interface under
 |---------------------------------------|-----------------|-------------|----------|--------|
 | See commits and jobs                  | ✓               | ✓           | ✓        | ✓      |
 | Retry or cancel job                   |                 | ✓           | ✓        | ✓      |
-| Erase job artifacts and trace         |                 | ✓ (*1*)     | ✓        | ✓      |
+| Erase job artifacts and job logs      |                 | ✓ (*1*)     | ✓        | ✓      |
 | Delete project                        |                 |             | ✓        | ✓      |
 | Create project                        |                 |             | ✓        | ✓      |
 | Change project configuration          |                 |             | ✓        | ✓      |

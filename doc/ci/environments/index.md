@@ -34,8 +34,7 @@ currently being deployed or has been deployed on your servers.
 It's important to know that:
 
 - Environments are like tags for your CI jobs, describing where code gets deployed.
-- Deployments are created when [jobs](../yaml/README.md#introduction) deploy versions of code to environments,
-  so every environment can have one or more deployments.
+- Deployments are created when [GitLab CI/CD](../yaml/README.md) is used to deploy versions of code to environments.
 
 GitLab:
 
@@ -933,11 +932,10 @@ the [Kubernetes integration](../../user/project/clusters/index.md)), GitLab can 
 a terminal session to your environment.
 
 This is a powerful feature that allows you to debug issues without leaving the comfort
-of your web browser. To enable it, just follow the instructions given in the service integration
+of your web browser. To enable it, follow the instructions given in the service integration
 documentation.
 
-NOTE: **Note:**
-Container-based deployments often lack basic tools (like an editor), and may
+Note that container-based deployments often lack basic tools (like an editor), and may
 be stopped or restarted at any time. If this happens, you will lose all your
 changes. Treat this as a debugging tool, not a comprehensive online IDE.
 

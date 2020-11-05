@@ -741,8 +741,8 @@ describe('Some component with Apollo mock', () => {
 })
 ```
 
-NOTE: **Note:**
-When mocking resolved values, make sure the structure of the response is the same as actual API response: i.e. root property should be `data` for example
+When mocking resolved values, ensure the structure of the response is the same
+as the actual API response. For example, root property should be `data`.
 
 When testing queries, please keep in mind they are promises, so they need to be _resolved_ to render a result. Without resolving, we can check the `loading` state of the query:
 
@@ -910,3 +910,99 @@ const defaultClient = createDefaultClient(
   },
 );
 ```
+
+## Making initial queries early with GraphQL startup calls
+
+To improve performance, sometimes we want to make initial GraphQL queries early. In order to do this, we can add them to **startup calls** with the following steps:
+
+- Move all the queries you need initially in your application to `app/graphql/queries`;
+- Add `__typename` property to every nested query level:
+
+  ```javascript
+  query getPermissions($projectPath: ID!) {
+    project(fullPath: $projectPath) {
+      __typename
+      userPermissions {
+        __typename
+        pushCode
+        forkProject
+        createMergeRequestIn
+      }
+    }
+  }
+  ```
+
+- If queries contain fragments, you need to move fragments to the query file directly instead of importing them:
+
+  ```javascript
+  fragment PageInfo on PageInfo {
+    __typename
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+  }
+
+  query getFiles(
+    $projectPath: ID!
+    $path: String
+    $ref: String!
+  ) {
+    project(fullPath: $projectPath) {
+      __typename
+      repository {
+        __typename
+        tree(path: $path, ref: $ref) {
+          __typename
+            pageInfo {
+              ...PageInfo
+            }
+          }
+        }
+      }
+    }
+  }
+  ```
+
+- If the fragment is used only once, we can also remove the fragment altogether:
+
+  ```javascript
+  query getFiles(
+    $projectPath: ID!
+    $path: String
+    $ref: String!
+  ) {
+    project(fullPath: $projectPath) {
+      __typename
+      repository {
+        __typename
+        tree(path: $path, ref: $ref) {
+          __typename
+            pageInfo {
+              __typename
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+            }
+          }
+        }
+      }
+    }
+  }
+  ```
+
+- Add startup call(s) with correct variables to the HAML file that serves as a view
+for your application. To add GraphQL startup calls, we use
+`add_page_startup_graphql_call` helper where the first parameter is a path to the
+query, the second one is an object containing query variables. Path to the query is
+relative to `app/graphql/queries` folder: for example, if we need a
+`app/graphql/queries/repository/files.query.graphql` query, the path will be
+`repository/files`.
+
+  ```yaml
+  - current_route_path = request.fullpath.match(/-\/tree\/[^\/]+\/(.+$)/).to_a[1]
+  - add_page_startup_graphql_call('repository/path_last_commit', { projectPath: @project.full_path, ref: current_ref, path: current_route_path || "" })
+  - add_page_startup_graphql_call('repository/permissions', { projectPath: @project.full_path })
+  - add_page_startup_graphql_call('repository/files', { nextPageCursor: "", pageSize: 100, projectPath: @project.full_path, ref: current_ref, path: current_route_path || "/"})
+  ```

@@ -1,14 +1,17 @@
 <script>
-import { GlLoadingIcon, GlPagination } from '@gitlab/ui';
+import { GlSkeletonLoading, GlPagination } from '@gitlab/ui';
 
+import { updateHistory, setUrlParams } from '~/lib/utils/url_utility';
 import FilteredSearchBar from '~/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue';
 
 import IssuableTabs from './issuable_tabs.vue';
 import IssuableItem from './issuable_item.vue';
 
+import { DEFAULT_SKELETON_COUNT } from '../constants';
+
 export default {
   components: {
-    GlLoadingIcon,
+    GlSkeletonLoading,
     IssuableTabs,
     FilteredSearchBar,
     IssuableItem,
@@ -35,6 +38,11 @@ export default {
       type: Array,
       required: true,
     },
+    urlParams: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
     initialFilterValue: {
       type: Array,
       required: false,
@@ -55,7 +63,8 @@ export default {
     },
     tabCounts: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
     currentTab: {
       type: String,
@@ -81,6 +90,11 @@ export default {
       required: false,
       default: 20,
     },
+    totalItems: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
     currentPage: {
       type: Number,
       required: false,
@@ -95,6 +109,39 @@ export default {
       type: Number,
       required: false,
       default: 2,
+    },
+    enableLabelPermalinks: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  computed: {
+    skeletonItemCount() {
+      const { totalItems, defaultPageSize, currentPage } = this;
+      const totalPages = Math.ceil(totalItems / defaultPageSize);
+
+      if (totalPages) {
+        return currentPage < totalPages
+          ? defaultPageSize
+          : totalItems % defaultPageSize || defaultPageSize;
+      }
+      return DEFAULT_SKELETON_COUNT;
+    },
+  },
+  watch: {
+    urlParams: {
+      deep: true,
+      immediate: true,
+      handler(params) {
+        if (Object.keys(params).length) {
+          updateHistory({
+            url: setUrlParams(params, window.location.href, true),
+            title: document.title,
+            replace: true,
+          });
+        }
+      },
     },
   },
 };
@@ -125,7 +172,11 @@ export default {
       @onSort="$emit('sort', $event)"
     />
     <div class="issuables-holder">
-      <gl-loading-icon v-if="issuablesLoading" size="md" class="gl-mt-5" />
+      <ul v-if="issuablesLoading" class="content-list">
+        <li v-for="n in skeletonItemCount" :key="n" class="issue gl-px-5! gl-py-5!">
+          <gl-skeleton-loading />
+        </li>
+      </ul>
       <ul
         v-if="!issuablesLoading && issuables.length"
         class="content-list issuable-list issues-list"
@@ -135,12 +186,24 @@ export default {
           :key="issuable.id"
           :issuable-symbol="issuableSymbol"
           :issuable="issuable"
-        />
+          :enable-label-permalinks="enableLabelPermalinks"
+        >
+          <template #reference>
+            <slot name="reference" :issuable="issuable"></slot>
+          </template>
+          <template #author>
+            <slot name="author" :author="issuable.author"></slot>
+          </template>
+          <template #status>
+            <slot name="status" :issuable="issuable"></slot>
+          </template>
+        </issuable-item>
       </ul>
       <slot v-if="!issuablesLoading && !issuables.length" name="empty-state"></slot>
       <gl-pagination
         v-if="showPaginationControls"
         :per-page="defaultPageSize"
+        :total-items="totalItems"
         :value="currentPage"
         :prev-page="previousPage"
         :next-page="nextPage"

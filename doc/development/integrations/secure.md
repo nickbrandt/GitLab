@@ -1,7 +1,13 @@
+---
+stage: none
+group: unassigned
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#designated-technical-writers
+---
+
 # Security scanner integration
 
 Integrating a security scanner into GitLab consists of providing end users
-with a [CI job definition](../../ci/yaml/README.md#introduction)
+with a [CI job definition](../../ci/yaml/README.md)
 they can add to their CI configuration files to scan their GitLab projects.
 This CI job should then output its results in a GitLab-specified format. These results are then
 automatically presented in various places in GitLab, such as the Pipeline view, Merge Request
@@ -247,6 +253,11 @@ values are as follows, listed from highest to lowest:
 It is recommended to use the `debug` level for verbose logging that could be
 useful when debugging. The default value for `SECURE_LOG_LEVEL` should be set
 to `info`.
+
+When executing command lines, scanners should use the `debug` level to log the command line and its output.
+For instance, the [bundler-audit](https://gitlab.com/gitlab-org/security-products/analyzers/bundler-audit) scanner
+uses the `debug` level to log the command line `bundle audit check --quiet`,
+and what `bundle audit` writes to the standard output.
 
 #### common logutil package
 
@@ -532,7 +543,7 @@ of the available SAST Analyzers and what data is currently available.
 
 The `remediations` field of the report is an array of remediation objects.
 Each remediation describes a patch that can be applied to
-[automatically fix](../../user/application_security/#solutions-for-vulnerabilities-auto-remediation)
+[automatically fix](../../user/application_security/#automatic-remediation-for-vulnerabilities)
 a set of vulnerabilities.
 
 Here is an example of a report that contains remediations.

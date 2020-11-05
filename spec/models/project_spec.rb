@@ -3668,7 +3668,7 @@ RSpec.describe Project, factory_default: :keep do
     let(:project) { create(:project) }
 
     before do
-      project.namespace_id = 7
+      project.namespace_id = project.namespace_id + 1
     end
 
     it { expect(project.parent_changed?).to be_truthy }
@@ -4218,6 +4218,27 @@ RSpec.describe Project, factory_default: :keep do
       expect(project).to receive(:remove_pages).and_call_original
 
       expect { project.destroy }.not_to raise_error
+    end
+
+    context 'when there is an old pages deployment' do
+      let!(:old_deployment_from_another_project) { create(:pages_deployment) }
+      let!(:old_deployment) { create(:pages_deployment, project: project) }
+
+      it 'schedules a destruction of pages deployments' do
+        expect(DestroyPagesDeploymentsWorker).to(
+          receive(:perform_async).with(project.id)
+        )
+
+        project.remove_pages
+      end
+
+      it 'removes pages deployments', :sidekiq_inline do
+        expect do
+          project.remove_pages
+        end.to change { PagesDeployment.count }.by(-1)
+
+        expect(PagesDeployment.find_by_id(old_deployment.id)).to be_nil
+      end
     end
   end
 
@@ -5903,6 +5924,26 @@ RSpec.describe Project, factory_default: :keep do
         project.mark_pages_as_not_deployed
       end.to change { pages_metadatum.reload.deployed }.from(true).to(false)
                .and change { pages_metadatum.reload.artifacts_archive }.from(artifacts_archive).to(nil)
+    end
+  end
+
+  describe '#update_pages_deployment!' do
+    let(:project) { create(:project) }
+    let(:deployment) { create(:pages_deployment, project: project) }
+
+    it "creates new metadata record if none exists yet and sets deployment" do
+      project.pages_metadatum.destroy!
+      project.reload
+
+      project.update_pages_deployment!(deployment)
+
+      expect(project.pages_metadatum.pages_deployment).to eq(deployment)
+    end
+
+    it "updates the existing metadara record with deployment" do
+      expect do
+        project.update_pages_deployment!(deployment)
+      end.to change { project.pages_metadatum.reload.pages_deployment }.from(nil).to(deployment)
     end
   end
 

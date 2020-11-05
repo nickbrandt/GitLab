@@ -281,3 +281,37 @@ When running your project pipeline at this point:
 - Your built application is pushed to your S3 bucket then and deployed to your EC2 instance, based
   on the related JSON object's content. The deployment job finishes whenever the deployment to EC2
   is done or has failed.
+
+#### Custom build job for Auto DevOps
+
+To leverage [Auto DevOps](../../topics/autodevops/index.md) for your project when deploying to
+AWS EC2, you must specify a job for the `build` stage.
+
+To do so, you must reference the `Auto-DevOps.gitlab-ci.yml` template and include a job named
+`build_artifact` in your `.gitlab-ci.yml` file. For example:
+
+```yaml
+# .gitlab-ci.yml
+
+include:
+  - template: Auto-DevOps.gitlab-ci.yml
+
+variables:
+  - AUTO_DEVOPS_PLATFORM_TARGET: EC2
+
+build_artifact:
+  stage: build
+  script:
+    - <your build script goes here>
+  artifacts:
+    paths:
+      - <built artifact>
+```
+
+### Deploy to Amazon EKS 
+
+- [How to deploy your application to a GitLab-managed Amazon EKS cluster with Auto DevOps](https://about.gitlab.com/blog/2020/05/05/deploying-application-eks/)
+
+## Deploy to Google Cloud
+
+- [Deploying with GitLab on Google Cloud](https://about.gitlab.com/solutions/google-cloud-platform/)

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 import 'ee_else_ce/boards/models/issue';
 import 'ee_else_ce/boards/models/list';
@@ -90,6 +90,7 @@ export default () => {
       labelsFetchPath: $boardApp.dataset.labelsFetchPath,
       labelsManagePath: $boardApp.dataset.labelsManagePath,
       labelsFilterBasePath: $boardApp.dataset.labelsFilterBasePath,
+      timeTrackingLimitToHours: parseBoolean($boardApp.dataset.timeTrackingLimitToHours),
     },
     store,
     apolloProvider,
@@ -108,6 +109,7 @@ export default () => {
     },
     computed: {
       ...mapState(['isShowingEpicsSwimlanes']),
+      ...mapGetters(['shouldUseGraphQL']),
       detailIssueVisible() {
         return Object.keys(this.detailIssue.issue).length;
       },
@@ -153,7 +155,7 @@ export default () => {
 
       boardsStore.disabled = this.disabled;
 
-      if (!gon.features.graphqlBoardLists) {
+      if (!this.shouldUseGraphQL) {
         this.initialBoardLoad();
       }
     },

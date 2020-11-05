@@ -17,8 +17,6 @@ module EE
             null: true,
             description: 'The DAST scanner profiles associated with the project',
             resolve: -> (project, _args, _ctx) do
-              return DastScannerProfile.none unless ::Feature.enabled?(:security_on_demand_scans_feature_flag, project, default_enabled: true)
-
               DastScannerProfilesFinder.new(project_ids: [project.id]).execute
             end
 
@@ -26,6 +24,8 @@ module EE
           calls_gitaly: true,
           description: 'SAST CI configuration for the project',
           resolve: -> (project, args, ctx) do
+            return unless Ability.allowed?(ctx[:current_user], :download_code, project)
+
             sast_ci_configuration(project)
           end
 
@@ -103,6 +103,21 @@ module EE
               description: 'DAST Site Profiles associated with the project',
               resolve: -> (obj, _args, _ctx) { DastSiteProfilesFinder.new(project_id: obj.id).execute }
 
+        field :dast_site_validation,
+              ::Types::DastSiteValidationType,
+              null: true,
+              resolve: -> (project, args, _ctx) do
+                unless ::Feature.enabled?(:security_on_demand_scans_site_validation, project)
+                  raise ::Gitlab::Graphql::Errors::ResourceNotAvailable, 'Feature disabled'
+                end
+
+                url_base = DastSiteValidation.get_normalized_url_base(args.target_url)
+                DastSiteValidationsFinder.new(project_id: project.id, url_base: url_base).execute.first
+              end,
+              description: 'DAST Site Validation associated with the project' do
+                argument :target_url, GraphQL::STRING_TYPE, required: true, description: 'target URL of the DAST Site Validation'
+              end
+
         field :cluster_agent,
               ::Types::Clusters::AgentType,
               null: true,
@@ -126,6 +141,13 @@ module EE
               null: true,
               description: 'Size limit for the repository in bytes',
               resolve: -> (obj, _args, _ctx) { obj.actual_size_limit }
+
+        field :code_coverage_summary,
+              ::Types::Ci::CodeCoverageSummaryType,
+              null: true,
+              description: 'Code coverages summary associated with the project',
+              resolver: ::Resolvers::Ci::CodeCoverageSummaryResolver,
+              feature_flag: :group_coverage_data_report
 
         def self.sast_ci_configuration(project)
           ::Security::CiConfiguration::SastParserService.new(project).configuration
