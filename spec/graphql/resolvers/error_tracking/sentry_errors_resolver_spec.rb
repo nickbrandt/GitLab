@@ -55,6 +55,7 @@ RSpec.describe Resolvers::ErrorTracking::SentryErrorsResolver do
               issues: nil
             )
         end
+
         it 'returns nil' do
           expect(resolve_errors).to eq nil
         end

@@ -144,6 +144,7 @@ RSpec.describe ::EE::Gitlab::Scim::ProvisioningService do
       before do
         create(:email, user: user, email: 'work@example.com')
       end
+
       let(:user) { create(:user) }
 
       context 'when user is not a group member' do

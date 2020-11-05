@@ -35,6 +35,7 @@ RSpec.describe SearchController, type: :request do
       before do
         stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
       end
+
       let(:creation_traits) { [] }
 
       context 'for issues scope' do

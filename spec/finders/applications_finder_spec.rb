@@ -12,6 +12,7 @@ RSpec.describe ApplicationsFinder do
 
       expect(found).to match_array([application1, application2])
     end
+
     it 'returns the application by id' do
       params = { id: application1.id }
       found = described_class.new(params).execute

@@ -33,6 +33,7 @@ RSpec.describe Users::BuildService do
           before do
             params.merge!(scim_identity_params)
           end
+
           let_it_be(:scim_identity_params) { { extern_uid: 'uid', provider: 'group_scim', group_id: 1 } }
 
           it 'passes allowed attributes to both scim and saml identity' do

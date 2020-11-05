@@ -147,6 +147,7 @@ RSpec.describe Projects::OverwriteProjectService do
           expect(project_to.fork_network.fork_network_members.map(&:project)).not_to include project_from
         end
       end
+
       context 'when moving a intermediate forked project' do
         let(:project_to) { create(:project, namespace: lvl1_forked_project_1.namespace) }
 

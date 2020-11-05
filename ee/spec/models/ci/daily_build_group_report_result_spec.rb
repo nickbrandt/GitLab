@@ -27,6 +27,7 @@ RSpec.describe Ci::DailyBuildGroupReportResult do
         let_it_be(:new_build_group_report_result) do
           create(:ci_daily_build_group_report_result, project: project, group_name: 'cobertura', coverage: 66.0)
         end
+
         let_it_be(:build_group_report_result_2) do
           create(:ci_daily_build_group_report_result, project: project_2, group_name: 'rspec', coverage: 78.0)
         end

@@ -23,6 +23,7 @@ RSpec.describe RuboCop::Cop::Migration::UpdateColumnInBatches, type: :rubocop do
   before do
     allow(cop).to receive(:rails_root).and_return(tmp_rails_root)
   end
+
   after do
     FileUtils.rm_rf(tmp_rails_root)
   end
@@ -42,6 +43,7 @@ RSpec.describe RuboCop::Cop::Migration::UpdateColumnInBatches, type: :rubocop do
       FileUtils.mkdir_p(File.dirname(migration_filepath))
       @migration_file = File.new(migration_filepath, 'w+')
     end
+
     after do
       @migration_file.close
     end
@@ -71,6 +73,7 @@ RSpec.describe RuboCop::Cop::Migration::UpdateColumnInBatches, type: :rubocop do
       FileUtils.mkdir_p(File.dirname(spec_filepath))
       @spec_file = File.new(spec_filepath, 'w+')
     end
+
     after do
       @spec_file.close
     end

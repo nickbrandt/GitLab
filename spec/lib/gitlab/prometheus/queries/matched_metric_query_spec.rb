@@ -65,6 +65,7 @@ RSpec.describe Gitlab::Prometheus::Queries::MatchedMetricQuery do
       before do
         allow(client).to receive(:series).and_return(partially_empty_series_info)
       end
+
       it 'responds with one active and one missing metric' do
         expect(subject.query).to eq([{ group: 'name', priority: 1, active_metrics: 1, metrics_missing_requirements: 1 }])
       end

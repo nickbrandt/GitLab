@@ -309,6 +309,7 @@ RSpec.describe 'project routing' do
   #  new_project_snippet GET    /:project_id/snippets/new(.:format)      snippets#new
   # edit_project_snippet GET    /:project_id/snippets/:id/edit(.:format) snippets#edit
   #      project_snippet GET    /:project_id/snippets/:id(.:format)      snippets#show
+
   describe SnippetsController, 'routing' do
     it 'to #raw' do
       expect(get('/gitlab/gitlabhq/-/snippets/1/raw')).to route_to('projects/snippets#raw', namespace_id: 'gitlab', project_id: 'gitlabhq', id: '1')

@@ -67,6 +67,7 @@ module QA
             settings.click_save_name_visibility_settings_button
           end
         end
+
         it_behaves_like 'audit event', ['Changed repository size limit']
       end
 

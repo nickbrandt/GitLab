@@ -75,6 +75,7 @@ RSpec.describe 'User searches for code' do
       it 'shows ref switcher in code result summary' do
         expect(find('.js-project-refs-dropdown')).to have_text(ref_name)
       end
+
       it 'persists branch name across search' do
         find('.btn-search').click
         expect(find('.js-project-refs-dropdown')).to have_text(ref_name)

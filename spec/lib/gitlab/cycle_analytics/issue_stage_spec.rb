@@ -47,6 +47,7 @@ RSpec.describe Gitlab::CycleAnalytics::IssueStage do
       expect(result.map { |event| event[:title] }).to contain_exactly(issue_1.title, issue_2.title, issue_3.title)
     end
   end
+
   context 'when group is given' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }

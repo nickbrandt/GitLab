@@ -846,6 +846,7 @@ RSpec.describe NotificationService, :mailer do
            noteable: design,
            note: "Hello #{dev.to_reference}, G'day #{stranger.to_reference}")
       end
+
       let(:mailer) { double(deliver_later: true) }
 
       context 'design management is enabled' do

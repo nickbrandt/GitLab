@@ -32,6 +32,7 @@ module QA
             project.initialize_with_readme = true
           end.visit!
         end
+
         it_behaves_like 'audit event', ["Added project"]
       end
 

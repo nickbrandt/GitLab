@@ -54,11 +54,13 @@ RSpec.describe API::Issues do
   let_it_be(:label) do
     create(:label, title: 'label', color: '#FFAABB', project: project)
   end
+
   let!(:label_link) { create(:label_link, label: label, target: issue) }
   let(:milestone) { create(:milestone, title: '1.0.0', project: project) }
   let_it_be(:empty_milestone) do
     create(:milestone, title: '2.0.0', project: project)
   end
+
   let!(:note) { create(:note_on_issue, author: user, project: project, noteable: issue) }
 
   let(:no_milestone_title) { 'None' }
@@ -495,6 +497,7 @@ RSpec.describe API::Issues do
             create(:label_link, label: label_b, target: issue)
             create(:label_link, label: label_c, target: issue)
           end
+
           it 'tests N+1' do
             control = ActiveRecord::QueryRecorder.new do
               get api('/issues', user), params: { labels: [label.title, label_b.title, label_c.title] }

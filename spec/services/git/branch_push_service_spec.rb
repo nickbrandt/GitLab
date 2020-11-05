@@ -488,6 +488,7 @@ RSpec.describe Git::BranchPushService, services: true do
               project.issues_enabled = false
               project.save!
             end
+
             let(:message) { "this is some work.\n\ncloses #1" }
 
             it "does not initiates one api call to jira server to close the issue" do

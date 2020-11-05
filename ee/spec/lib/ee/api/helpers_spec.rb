@@ -114,6 +114,7 @@ RSpec.describe EE::API::Helpers do
       before do
         allow(subject).to receive(:authorize!).and_raise(Exception.new("Forbidden"))
       end
+
       it 'throws exception if unauthorized param is present' do
         expect { subject.authorize_change_param(project, :change_commit_committer_check) }.to raise_error
       end

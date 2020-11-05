@@ -189,9 +189,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }
@@ -327,9 +329,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }
@@ -440,9 +444,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }
@@ -513,9 +519,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { post_create_aws }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { post_create_aws }.to be_denied_for(:admin)
       end
+
       it { expect { post_create_aws }.to be_allowed_for(:owner).of(project) }
       it { expect { post_create_aws }.to be_allowed_for(:maintainer).of(project) }
       it { expect { post_create_aws }.to be_denied_for(:developer).of(project) }
@@ -576,9 +584,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }
@@ -613,9 +623,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }
@@ -658,9 +670,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }
@@ -696,9 +710,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }
@@ -806,9 +822,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }
@@ -880,9 +898,11 @@ RSpec.describe Projects::ClustersController do
       it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
         expect { go }.to be_allowed_for(:admin)
       end
+
       it 'is disabled for admin when admin mode disabled' do
         expect { go }.to be_denied_for(:admin)
       end
+
       it { expect { go }.to be_allowed_for(:owner).of(project) }
       it { expect { go }.to be_allowed_for(:maintainer).of(project) }
       it { expect { go }.to be_denied_for(:developer).of(project) }

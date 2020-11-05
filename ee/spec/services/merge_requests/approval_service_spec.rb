@@ -136,6 +136,7 @@ RSpec.describe MergeRequests::ApprovalService do
         project.update!(require_password_to_approve: true)
         user.update!(password: 'password')
       end
+
       context 'when password not specified' do
         it 'does not update the approvals' do
           expect { service.execute(merge_request) }.not_to change { merge_request.approvals.size }

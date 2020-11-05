@@ -112,6 +112,7 @@ RSpec.shared_examples "redis_shared_examples" do
     before do
       clear_pool
     end
+
     after do
       clear_pool
     end

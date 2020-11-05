@@ -42,6 +42,7 @@ RSpec.describe Profiles::KeysController do
 
         expect(response.body).to eq("")
       end
+
       it "responds with text/plain content type" do
         get :get_keys, params: { username: user.username }
         expect(response.content_type).to eq("text/plain")

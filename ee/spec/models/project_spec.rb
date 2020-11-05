@@ -769,6 +769,7 @@ RSpec.describe Project do
         before do
           stub_licensed_features(group_webhooks: true)
         end
+
         let(:fake_service) { double }
 
         shared_examples 'triggering group webhook' do

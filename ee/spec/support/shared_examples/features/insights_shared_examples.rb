@@ -81,6 +81,7 @@ RSpec.shared_examples 'Insights page' do
         before do
           stub_feature_flags(embed_analytics_report: false)
         end
+
         it 'returns enabled feature flag for enabled entity' do
           stub_feature_flags(embed_analytics_report: entity)
           visit route

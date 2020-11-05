@@ -146,6 +146,7 @@ RSpec.describe GroupsController do
         end
       end
     end
+
     describe 'GET #details' do
       subject { get :details, params: { id: group.to_param } }
 

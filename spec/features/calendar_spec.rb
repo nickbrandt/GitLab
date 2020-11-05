@@ -184,6 +184,7 @@ RSpec.describe 'Contributions Calendar', :js do
           Issues::CreateService.new(contributed_project, user, issue_params).execute
         end
       end
+
       include_context 'visit user page'
 
       it 'displays calendar activity squares for both days', :sidekiq_might_not_need_inline do

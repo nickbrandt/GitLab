@@ -165,6 +165,7 @@ RSpec.describe Gitlab::GitalyClient do
       expect(described_class.stub_certs).to be_a(String)
     end
   end
+
   describe '.stub_creds' do
     it 'returns :this_channel_is_insecure if unix' do
       address = 'unix:/tmp/gitaly.sock'

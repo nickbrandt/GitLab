@@ -32,6 +32,7 @@ RSpec.describe Gitlab::DataBuilder::Build do
             email: user.email
             })
     }
+
     it { expect(data[:commit][:id]).to eq(build.pipeline.id) }
     it { expect(data[:runner][:id]).to eq(build.runner.id) }
     it { expect(data[:runner][:description]).to eq(build.runner.description) }

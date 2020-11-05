@@ -98,6 +98,7 @@ RSpec.describe Gitlab::Git::Repository, :seed_helper do
 
       it { is_expected.to eq("v1.2.1") }
     end
+
     it { is_expected.to include("v1.0.0") }
     it { is_expected.not_to include("v5.0.0") }
 

@@ -13,9 +13,11 @@ RSpec.describe Projects::Clusters::ApplicationsController do
     it 'is allowed for admin when admin mode enabled', :enable_admin_mode do
       expect { subject }.to be_allowed_for(:admin)
     end
+
     it 'is denied for admin when admin mode disabled' do
       expect { subject }.to be_denied_for(:admin)
     end
+
     it { expect { subject }.to be_allowed_for(:owner).of(project) }
     it { expect { subject }.to be_allowed_for(:maintainer).of(project) }
     it { expect { subject }.to be_denied_for(:developer).of(project) }

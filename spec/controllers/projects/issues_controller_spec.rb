@@ -1159,6 +1159,7 @@ RSpec.describe Projects::IssuesController do
         before do
           post_issue({ title: 'Hello' }, other_params: { discussion_to_resolve: discussion.id })
         end
+
         it 'resolves a single discussion' do
           discussion.first_note.reload
 

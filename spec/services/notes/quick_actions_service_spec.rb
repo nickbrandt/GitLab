@@ -69,6 +69,7 @@ RSpec.describe Notes::QuickActionsService do
           note.noteable.close!
           expect(note.noteable).to be_closed
         end
+
         let(:note_text) { '/reopen' }
 
         it 'opens the noteable, and leave no note' do
@@ -128,6 +129,7 @@ RSpec.describe Notes::QuickActionsService do
           note.noteable.close
           expect(note.noteable).to be_closed
         end
+
         let(:note_text) { "HELLO\n/reopen\nWORLD" }
 
         it 'opens the noteable' do

@@ -48,6 +48,7 @@ RSpec.describe Mutations::Metrics::Dashboard::Annotations::Delete do
           allow(delete_service).to receive(:execute).and_return(service_response)
         end
       end
+
       it 'returns the error' do
         post_graphql_mutation(mutation, current_user: current_user)
 

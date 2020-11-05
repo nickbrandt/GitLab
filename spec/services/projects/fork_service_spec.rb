@@ -40,6 +40,7 @@ RSpec.describe Projects::ForkService do
             @guest = create(:user)
             @from_project.add_user(@guest, :guest)
           end
+
           subject { fork_project(@from_project, @guest, using_service: true) }
 
           it { is_expected.not_to be_persisted }

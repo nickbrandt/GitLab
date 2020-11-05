@@ -10,6 +10,7 @@ RSpec.describe Gitlab::Proxy do
       before do
         allow(described_class).to receive(:env).and_return({})
       end
+
       it 'returns an empty array' do
         expect(subject).to be_empty
       end

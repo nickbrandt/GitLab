@@ -188,6 +188,7 @@ RSpec.describe EpicIssues::CreateService do
 
               expect(created_link2.relative_position).to be < created_link1.relative_position
             end
+
             it 'orders the epic issues to the first place and moves the existing ones down' do
               existing_link = create(:epic_issue, epic: epic, issue: issue3)
 

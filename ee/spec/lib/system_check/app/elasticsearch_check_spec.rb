@@ -18,6 +18,7 @@ RSpec.describe SystemCheck::App::ElasticsearchCheck do
       before do
         allow(Gitlab::CurrentSettings.current_application_settings).to receive(:elasticsearch_indexing?).and_return(true)
       end
+
       it 'returns false' do
         expect(described_class.new.skip?).to eq(false)
       end
