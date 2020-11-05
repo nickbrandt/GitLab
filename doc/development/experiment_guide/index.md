@@ -115,7 +115,7 @@ addressed.
 
 To determine whether the experiment is a success or not, we must implement tracking events
 to acquire data for analyzing. We can send events to Snowplow via either the backend or frontend.
-Read the [product analytics guide](../product_analytics/index.md) for more details.
+Read the [product analytics guide](https://about.gitlab.com/handbook/product/product-analytics-guide/) for more details.
 
 #### Track backend events
 
@@ -142,7 +142,7 @@ context 'when the experiment is active and the user is in the experimental group
     expect_snowplow_event(
       category: 'Growth::Activation::Experiment::SignUpFlow',
       action: 'action',
-      label: 'value',
+      value: 'value',
       label: 'experimentation_subject_id',
       property: 'experimental_group'
     )
@@ -254,7 +254,7 @@ For visibility, please also share any commands run against production in the `#s
 
 #### RSpec
 
-Use the folowing in RSpec to mock the experiment:
+Use the following in RSpec to mock the experiment:
 
 ```ruby
 context 'when the experiment is active' do
