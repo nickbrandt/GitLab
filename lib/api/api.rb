@@ -186,6 +186,7 @@ module API
       mount ::API::ImportBitbucketServer
       mount ::API::ImportGithub
       mount ::API::IssueLinks
+      mount ::API::Invitations
       mount ::API::Issues
       mount ::API::JobArtifacts
       mount ::API::Jobs
@@ -282,7 +283,7 @@ module API
       end
     end
 
-    route :any, '*path' do
+    route :any, '*path', feature_category: :not_owned do
       error!('404 Not Found', 404)
     end
   end

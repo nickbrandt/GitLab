@@ -571,6 +571,7 @@ class Project < ApplicationRecord
 
   scope :imported_from, -> (type) { where(import_type: type) }
   scope :with_tracing_enabled, -> { joins(:tracing_setting) }
+  scope :with_enabled_error_tracking, -> { joins(:error_tracking_setting).where(project_error_tracking_settings: { enabled: true }) }
 
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
 
@@ -1194,7 +1195,6 @@ class Project < ApplicationRecord
   end
 
   def changing_shared_runners_enabled_is_allowed
-    return unless Feature.enabled?(:disable_shared_runners_on_group, default_enabled: true)
     return unless new_record? || changes.has_key?(:shared_runners_enabled)
 
     if shared_runners_enabled && group && group.shared_runners_setting == 'disabled_and_unoverridable'

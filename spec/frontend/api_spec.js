@@ -118,6 +118,24 @@ describe('Api', () => {
     });
   });
 
+  describe('container registry', () => {
+    describe('containerRegistryDetails', () => {
+      it('fetch container registry  details', async () => {
+        const expectedUrl = `foo`;
+        const apiResponse = {};
+
+        jest.spyOn(axios, 'get');
+        jest.spyOn(Api, 'buildUrl').mockReturnValueOnce(expectedUrl);
+        mock.onGet(expectedUrl).replyOnce(httpStatus.OK, apiResponse);
+
+        const { data } = await Api.containerRegistryDetails(1);
+
+        expect(data).toEqual(apiResponse);
+        expect(axios.get).toHaveBeenCalledWith(expectedUrl, {});
+      });
+    });
+  });
+
   describe('group', () => {
     it('fetches a group', done => {
       const groupId = '123456';
@@ -1228,6 +1246,93 @@ describe('Api', () => {
         return Api.trackRedisHllUserEvent(event).then(({ data }) => {
           expect(data).toEqual(true);
           expect(axios.post).toHaveBeenCalledWith(expectedUrl, postData, { headers });
+        });
+      });
+    });
+  });
+
+  describe('Feature Flag User List', () => {
+    let expectedUrl;
+    let projectId;
+    let mockUserList;
+
+    beforeEach(() => {
+      projectId = 1000;
+      expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/projects/${projectId}/feature_flags_user_lists`;
+      mockUserList = {
+        name: 'mock_user_list',
+        user_xids: '1,2,3,4',
+        project_id: 1,
+        id: 1,
+        iid: 1,
+      };
+    });
+
+    describe('fetchFeatureFlagUserLists', () => {
+      it('GETs the right url', () => {
+        mock.onGet(expectedUrl).replyOnce(httpStatus.OK, []);
+
+        return Api.fetchFeatureFlagUserLists(projectId).then(({ data }) => {
+          expect(data).toEqual([]);
+        });
+      });
+    });
+
+    describe('searchFeatureFlagUserLists', () => {
+      it('GETs the right url', () => {
+        mock.onGet(expectedUrl, { params: { search: 'test' } }).replyOnce(httpStatus.OK, []);
+
+        return Api.searchFeatureFlagUserLists(projectId, 'test').then(({ data }) => {
+          expect(data).toEqual([]);
+        });
+      });
+    });
+
+    describe('createFeatureFlagUserList', () => {
+      it('POSTs data to the right url', () => {
+        const mockUserListData = {
+          name: 'mock_user_list',
+          user_xids: '1,2,3,4',
+        };
+        mock.onPost(expectedUrl, mockUserListData).replyOnce(httpStatus.OK, mockUserList);
+
+        return Api.createFeatureFlagUserList(projectId, mockUserListData).then(({ data }) => {
+          expect(data).toEqual(mockUserList);
+        });
+      });
+    });
+
+    describe('fetchFeatureFlagUserList', () => {
+      it('GETs the right url', () => {
+        mock.onGet(`${expectedUrl}/1`).replyOnce(httpStatus.OK, mockUserList);
+
+        return Api.fetchFeatureFlagUserList(projectId, 1).then(({ data }) => {
+          expect(data).toEqual(mockUserList);
+        });
+      });
+    });
+
+    describe('updateFeatureFlagUserList', () => {
+      it('PUTs the right url', () => {
+        mock
+          .onPut(`${expectedUrl}/1`)
+          .replyOnce(httpStatus.OK, { ...mockUserList, user_xids: '5' });
+
+        return Api.updateFeatureFlagUserList(projectId, {
+          ...mockUserList,
+          user_xids: '5',
+        }).then(({ data }) => {
+          expect(data).toEqual({ ...mockUserList, user_xids: '5' });
+        });
+      });
+    });
+
+    describe('deleteFeatureFlagUserList', () => {
+      it('DELETEs the right url', () => {
+        mock.onDelete(`${expectedUrl}/1`).replyOnce(httpStatus.OK, 'deleted');
+
+        return Api.deleteFeatureFlagUserList(projectId, 1).then(({ data }) => {
+          expect(data).toBe('deleted');
         });
       });
     });
