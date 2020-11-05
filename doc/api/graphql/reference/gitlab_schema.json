@@ -3868,6 +3868,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "includeDescendantGroups",
+                  "description": "Include epics from descendant groups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "true"
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
@@ -7580,14 +7590,14 @@
               "deprecationReason": null
             },
             {
-              "name": "lastUpdatedAt",
+              "name": "lastUpdatedOn",
               "description": "Latest date when the code coverage was created for the project.",
               "args": [
 
               ],
               "type": {
                 "kind": "SCALAR",
-                "name": "Time",
+                "name": "Date",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -13948,7 +13958,7 @@
                   "description": "The Global ID of the most recent acceptable version",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "DesignManagementVersionID",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -14397,7 +14407,7 @@
                   "description": "Find a design by its ID",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "DesignManagementDesignID",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -14433,7 +14443,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "SCALAR",
-                      "name": "ID",
+                      "name": "DesignManagementDesignAtVersionID",
                       "ofType": null
                     }
                   },
@@ -14463,7 +14473,7 @@
                       "name": null,
                       "ofType": {
                         "kind": "SCALAR",
-                        "name": "ID",
+                        "name": "DesignManagementDesignID",
                         "ofType": null
                       }
                     }
@@ -14493,7 +14503,7 @@
                   "description": "Filters designs to only those that existed at the version. If argument is omitted or nil then all designs will reflect the latest version",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "DesignManagementVersionID",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -14606,7 +14616,7 @@
                   "description": "The Global ID of the version",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "DesignManagementVersionID",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -14639,7 +14649,7 @@
                   "description": "The Global ID of the most recent acceptable version",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "DesignManagementVersionID",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -15061,7 +15071,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "SCALAR",
-                      "name": "ID",
+                      "name": "DesignManagementDesignAtVersionID",
                       "ofType": null
                     }
                   },
@@ -15088,7 +15098,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "SCALAR",
-                      "name": "ID",
+                      "name": "DesignManagementVersionID",
                       "ofType": null
                     }
                   },
@@ -15246,6 +15256,16 @@
           "interfaces": [
 
           ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "DesignManagementDesignAtVersionID",
+          "description": "Identifier of DesignManagement::DesignAtVersion",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },
@@ -15558,6 +15578,16 @@
           "possibleTypes": null
         },
         {
+          "kind": "SCALAR",
+          "name": "DesignManagementVersionID",
+          "description": "Identifier of DesignManagement::Version",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "DesignVersion",
           "description": "A specific version in which designs were added, modified or deleted",
@@ -15571,7 +15601,7 @@
                   "description": "The ID of the DesignAtVersion",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "DesignManagementDesignAtVersionID",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -15581,7 +15611,7 @@
                   "description": "The ID of a specific design",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "ID",
+                    "name": "DesignManagementDesignID",
                     "ofType": null
                   },
                   "defaultValue": null
@@ -15681,7 +15711,7 @@
                       "name": null,
                       "ofType": {
                         "kind": "SCALAR",
-                        "name": "ID",
+                        "name": "DesignManagementDesignID",
                         "ofType": null
                       }
                     }
@@ -18269,6 +18299,16 @@
                   "defaultValue": null
                 },
                 {
+                  "name": "includeDescendantGroups",
+                  "description": "Include epics from descendant groups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "true"
+                },
+                {
                   "name": "after",
                   "description": "Returns the elements in the list that come after the specified cursor.",
                   "type": {
@@ -20643,6 +20683,24 @@
               "deprecationReason": null
             },
             {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "userNotesCount",
               "description": "Number of user notes of the issue",
               "args": [
@@ -22555,6 +22613,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "includeDescendantGroups",
+                  "description": "Include epics from descendant groups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "true"
                 }
               ],
               "type": {
@@ -22704,6 +22772,16 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "includeDescendantGroups",
+                  "description": "Include epics from descendant groups",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": "true"
                 },
                 {
                   "name": "after",
@@ -23017,7 +23095,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -23144,6 +23222,16 @@
                       "name": "ID",
                       "ofType": null
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
@@ -27078,6 +27166,24 @@
             {
               "name": "upvotes",
               "description": "Number of upvotes the issue has received",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the issue",
               "args": [
 
               ],
@@ -32774,6 +32880,20 @@
                   "name": "Int",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the merge request",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -43099,7 +43219,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43228,6 +43348,16 @@
                     }
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -43338,7 +43468,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43543,7 +43673,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43670,6 +43800,16 @@
                       "name": "ID",
                       "ofType": null
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
@@ -50119,34 +50259,6 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
-            },
-            {
-              "name": "issuesUrl",
-              "description": "HTTP URL of the issues page filtered by this release. Deprecated in 13.6: Use `openedIssuesUrl`",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `openedIssuesUrl`. Deprecated in 13.6"
-            },
-            {
-              "name": "mergeRequestsUrl",
-              "description": "HTTP URL of the merge request page filtered by this release. Deprecated in 13.6: Use `openedMergeRequestsUrl`",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `openedMergeRequestsUrl`. Deprecated in 13.6"
             },
             {
               "name": "mergedMergeRequestsUrl",
