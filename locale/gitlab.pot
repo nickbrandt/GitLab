@@ -8313,6 +8313,12 @@ msgstr ""
 msgid "DastProfiles|Are you sure you want to delete this profile?"
 msgstr ""
 
+msgid "DastProfiles|Authentication"
+msgstr ""
+
+msgid "DastProfiles|Authentication URL"
+msgstr ""
+
 msgid "DastProfiles|Could not create site validation token. Please refresh the page, or try again later."
 msgstr ""
 
@@ -8373,6 +8379,9 @@ msgstr ""
 msgid "DastProfiles|Edit site profile"
 msgstr ""
 
+msgid "DastProfiles|Enable Authentication"
+msgstr ""
+
 msgid "DastProfiles|Error Details"
 msgstr ""
 
@@ -8407,6 +8416,12 @@ msgid "DastProfiles|No profiles created yet"
 msgstr ""
 
 msgid "DastProfiles|Passive"
+msgstr ""
+
+msgid "DastProfiles|Password"
+msgstr ""
+
+msgid "DastProfiles|Password form field"
 msgstr ""
 
 msgid "DastProfiles|Please enter a valid timeout value"
@@ -8476,6 +8491,12 @@ msgid "DastProfiles|The maximum number of seconds allowed for the site under tes
 msgstr ""
 
 msgid "DastProfiles|Turn on AJAX spider"
+msgstr ""
+
+msgid "DastProfiles|Username"
+msgstr ""
+
+msgid "DastProfiles|Username form field"
 msgstr ""
 
 msgid "DastProfiles|Validate"
@@ -9843,6 +9864,9 @@ msgid "Email %{number}"
 msgstr ""
 
 msgid "Email Notification"
+msgstr ""
+
+msgid "Email cannot be blank"
 msgstr ""
 
 msgid "Email could not be sent"
@@ -16524,7 +16548,7 @@ msgstr ""
 msgid "Members|%{time} by %{user}"
 msgstr ""
 
-msgid "Members|%{userName} is currently a LDAP user. Editing their permissions will override the settings from the LDAP group sync."
+msgid "Members|%{userName} is currently an LDAP user. Editing their permissions will override the settings from the LDAP group sync."
 msgstr ""
 
 msgid "Members|An error occurred while trying to enable LDAP override, please try again."
@@ -18485,6 +18509,9 @@ msgid "Notes|Show history only"
 msgstr ""
 
 msgid "Notes|This comment has changed since you started editing, please review the %{open_link}updated comment%{close_link} to ensure information is not lost"
+msgstr ""
+
+msgid "Notes|You're only seeing %{boldStart}other activity%{boldEnd} in the feed. To add a comment, switch to one of the following options."
 msgstr ""
 
 msgid "Nothing found…"
@@ -28187,6 +28214,9 @@ msgstr ""
 msgid "Too many projects enabled. You will need to manage them via the console or the API."
 msgstr ""
 
+msgid "Too many users specified (limit is %{user_limit})"
+msgstr ""
+
 msgid "Too much data"
 msgstr ""
 
@@ -30897,9 +30927,6 @@ msgid "You're not allowed to make changes to this project directly. A fork of th
 msgstr ""
 
 msgid "You're not allowed to make changes to this project directly. A fork of this project is being created that you can make changes in, so you can submit a merge request."
-msgstr ""
-
-msgid "You're only seeing %{startTag}other activity%{endTag} in the feed. To add a comment, switch to one of the following options."
 msgstr ""
 
 msgid "You're receiving this email because of your account on %{host}."
