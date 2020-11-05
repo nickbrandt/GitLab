@@ -1214,6 +1214,7 @@ Relationship between an epic and an issue.
 | `discussions` | DiscussionConnection! | All discussions on this noteable |
 | `downvotes` | Int! | Number of downvotes the issue has received |
 | `dueDate` | Time | Due date of the issue |
+| `emailsDisabled` | Boolean! | Indicates if a project has email notifications disabled |
 | `epic` | Epic | Epic to which this issue belongs |
 | `epicIssueId` | ID! | ID of the epic-issue relation |
 | `healthStatus` | HealthStatus | Current health status. Returns null if `save_issuable_health_status` feature flag is disabled. |
@@ -1233,6 +1234,7 @@ Relationship between an epic and an issue.
 | `slaDueAt` | Time | Timestamp of when the issue SLA expires. |
 | `state` | IssueState! | State of the issue |
 | `statusPagePublishedIncident` | Boolean | Indicates whether an issue is published to the status page |
+| `subscribeDisabledDescription` | String! | The message to display when a project has emails notifications disabled |
 | `subscribed` | Boolean! | Indicates the currently logged in user is subscribed to the issue |
 | `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
 | `timeEstimate` | Int! | Time estimate of the issue |
@@ -1480,6 +1482,7 @@ Represents a recorded measurement (object count) for the Admins.
 | `discussions` | DiscussionConnection! | All discussions on this noteable |
 | `downvotes` | Int! | Number of downvotes the issue has received |
 | `dueDate` | Time | Due date of the issue |
+| `emailsDisabled` | Boolean! | Indicates if a project has email notifications disabled |
 | `epic` | Epic | Epic to which this issue belongs |
 | `healthStatus` | HealthStatus | Current health status. Returns null if `save_issuable_health_status` feature flag is disabled. |
 | `humanTimeEstimate` | String | Human-readable time estimate of the issue |
@@ -1497,6 +1500,7 @@ Represents a recorded measurement (object count) for the Admins.
 | `slaDueAt` | Time | Timestamp of when the issue SLA expires. |
 | `state` | IssueState! | State of the issue |
 | `statusPagePublishedIncident` | Boolean | Indicates whether an issue is published to the status page |
+| `subscribeDisabledDescription` | String! | The message to display when a project has emails notifications disabled |
 | `subscribed` | Boolean! | Indicates the currently logged in user is subscribed to the issue |
 | `taskCompletionStatus` | TaskCompletionStatus! | Task completion status of the issue |
 | `timeEstimate` | Int! | Time estimate of the issue |

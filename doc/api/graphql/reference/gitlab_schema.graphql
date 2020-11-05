@@ -7361,6 +7361,11 @@ type EpicIssue implements CurrentUserTodos & Noteable {
   dueDate: Time
 
   """
+  Indicates if a project has email notifications disabled
+  """
+  emailsDisabled: Boolean!
+
+  """
   Epic to which this issue belongs
   """
   epic: Epic
@@ -7519,6 +7524,11 @@ type EpicIssue implements CurrentUserTodos & Noteable {
   Indicates whether an issue is published to the status page
   """
   statusPagePublishedIncident: Boolean
+
+  """
+  The message to display when a project has emails notifications disabled
+  """
+  subscribeDisabledDescription: String!
 
   """
   Indicates the currently logged in user is subscribed to the issue
@@ -9880,6 +9890,11 @@ type Issue implements CurrentUserTodos & Noteable {
   dueDate: Time
 
   """
+  Indicates if a project has email notifications disabled
+  """
+  emailsDisabled: Boolean!
+
+  """
   Epic to which this issue belongs
   """
   epic: Epic
@@ -10028,6 +10043,11 @@ type Issue implements CurrentUserTodos & Noteable {
   Indicates whether an issue is published to the status page
   """
   statusPagePublishedIncident: Boolean
+
+  """
+  The message to display when a project has emails notifications disabled
+  """
+  subscribeDisabledDescription: String!
 
   """
   Indicates the currently logged in user is subscribed to the issue

@@ -1,0 +1,5 @@
+---
+title: Add emailsDisabled and subscribeDisabledescription fields for issue type
+merge_request: 46947
+author:
+type: changed
