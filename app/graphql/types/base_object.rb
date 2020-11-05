@@ -23,12 +23,12 @@ module Types
       context[:current_user]
     end
 
-    def self.resolve_type(object, context)
+    def self.assignable?(object)
       assignable = accepts
 
-      return self if assignable.blank?
+      return true if assignable.blank?
 
-      self if assignable.any? { |cls| object.is_a?(cls) }
+      assignable.any? { |cls| object.is_a?(cls) }
     end
   end
 end
