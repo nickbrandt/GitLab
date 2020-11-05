@@ -7496,6 +7496,11 @@ type EpicIssue implements CurrentUserTodos & Noteable {
   upvotes: Int!
 
   """
+  Number of user discussions in the issue
+  """
+  userDiscussionsCount: Int!
+
+  """
   Number of user notes of the issue
   """
   userNotesCount: Int!
@@ -8382,7 +8387,7 @@ type Group {
     after: String
 
     """
-    ID of a user assigned to the issues, "none" and "any" values supported
+    ID of a user assigned to the issues, "none" and "any" values are supported
     """
     assigneeId: String
 
@@ -8425,6 +8430,11 @@ type Group {
     Issues created before this date
     """
     createdBefore: Time
+
+    """
+    ID of an epic associated with the issues, "none" and "any" values are supported
+    """
+    epicId: String
 
     """
     Returns the first _n_ elements from the list.
@@ -9960,6 +9970,11 @@ type Issue implements CurrentUserTodos & Noteable {
   upvotes: Int!
 
   """
+  Number of user discussions in the issue
+  """
+  userDiscussionsCount: Int!
+
+  """
   Number of user notes of the issue
   """
   userNotesCount: Int!
@@ -10803,7 +10818,7 @@ enum IssueType {
 """
 Represents an iteration object
 """
-type Iteration implements TimeboxBurnupTimeSeriesInterface {
+type Iteration implements TimeboxReportInterface {
   """
   Daily scope and completed totals for burnup charts
   """
@@ -10838,6 +10853,11 @@ type Iteration implements TimeboxBurnupTimeSeriesInterface {
   Internal ID of the iteration
   """
   iid: ID!
+
+  """
+  Historically accurate report about the timebox
+  """
+  report: TimeboxReport
 
   """
   Web path of the iteration, scoped to the query parent. Only valid for Project parents. Returns null in other contexts
@@ -12001,6 +12021,11 @@ type MergeRequest implements CurrentUserTodos & Noteable {
   upvotes: Int!
 
   """
+  Number of user discussions in the merge request
+  """
+  userDiscussionsCount: Int
+
+  """
   User notes count of the merge request
   """
   userNotesCount: Int
@@ -12811,7 +12836,7 @@ type MetricsDashboardAnnotationEdge {
 """
 Represents a milestone
 """
-type Milestone implements TimeboxBurnupTimeSeriesInterface {
+type Milestone implements TimeboxReportInterface {
   """
   Daily scope and completed totals for burnup charts
   """
@@ -12846,6 +12871,11 @@ type Milestone implements TimeboxBurnupTimeSeriesInterface {
   Indicates if milestone is at project level
   """
   projectMilestone: Boolean!
+
+  """
+  Historically accurate report about the timebox
+  """
+  report: TimeboxReport
 
   """
   Timestamp of the milestone start date
@@ -14680,7 +14710,7 @@ type Project {
   """
   issue(
     """
-    ID of a user assigned to the issues, "none" and "any" values supported
+    ID of a user assigned to the issues, "none" and "any" values are supported
     """
     assigneeId: String
 
@@ -14718,6 +14748,11 @@ type Project {
     Issues created before this date
     """
     createdBefore: Time
+
+    """
+    ID of an epic associated with the issues, "none" and "any" values are supported
+    """
+    epicId: String
 
     """
     IID of the issue. For example, "1"
@@ -14780,7 +14815,7 @@ type Project {
   """
   issueStatusCounts(
     """
-    ID of a user assigned to the issues, "none" and "any" values supported
+    ID of a user assigned to the issues, "none" and "any" values are supported
     """
     assigneeId: String
 
@@ -14870,7 +14905,7 @@ type Project {
     after: String
 
     """
-    ID of a user assigned to the issues, "none" and "any" values supported
+    ID of a user assigned to the issues, "none" and "any" values are supported
     """
     assigneeId: String
 
@@ -14913,6 +14948,11 @@ type Project {
     Issues created before this date
     """
     createdBefore: Time
+
+    """
+    ID of an epic associated with the issues, "none" and "any" values are supported
+    """
+    epicId: String
 
     """
     Returns the first _n_ elements from the list.
@@ -17403,16 +17443,6 @@ type ReleaseLinks {
   HTTP URL of the release's edit page
   """
   editUrl: String
-
-  """
-  HTTP URL of the issues page filtered by this release. Deprecated in 13.6: Use `openedIssuesUrl`
-  """
-  issuesUrl: String @deprecated(reason: "Use `openedIssuesUrl`. Deprecated in 13.6")
-
-  """
-  HTTP URL of the merge request page filtered by this release. Deprecated in 13.6: Use `openedMergeRequestsUrl`
-  """
-  mergeRequestsUrl: String @deprecated(reason: "Use `openedMergeRequestsUrl`. Deprecated in 13.6")
 
   """
   HTTP URL of the merge request page , filtered by this release and `state=merged`
@@ -20135,11 +20165,26 @@ Time represented in ISO 8601
 """
 scalar Time
 
-interface TimeboxBurnupTimeSeriesInterface {
+"""
+Represents a historically accurate report about the timebox
+"""
+type TimeboxReport {
   """
   Daily scope and completed totals for burnup charts
   """
   burnupTimeSeries: [BurnupChartDailyTotals!]
+}
+
+interface TimeboxReportInterface {
+  """
+  Daily scope and completed totals for burnup charts
+  """
+  burnupTimeSeries: [BurnupChartDailyTotals!]
+
+  """
+  Historically accurate report about the timebox
+  """
+  report: TimeboxReport
 }
 
 """

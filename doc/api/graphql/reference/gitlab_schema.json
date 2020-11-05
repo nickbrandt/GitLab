@@ -20683,6 +20683,24 @@
               "deprecationReason": null
             },
             {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "userNotesCount",
               "description": "Number of user notes of the issue",
               "args": [
@@ -23077,7 +23095,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -23204,6 +23222,16 @@
                       "name": "ID",
                       "ofType": null
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
@@ -27154,6 +27182,24 @@
               "deprecationReason": null
             },
             {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the issue",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "userNotesCount",
               "description": "Number of user notes of the issue",
               "args": [
@@ -29488,6 +29534,20 @@
               "deprecationReason": null
             },
             {
+              "name": "report",
+              "description": "Historically accurate report about the timebox",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TimeboxReport",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "scopedPath",
               "description": "Web path of the iteration, scoped to the query parent. Only valid for Project parents. Returns null in other contexts",
               "args": [
@@ -29624,7 +29684,7 @@
           "interfaces": [
             {
               "kind": "INTERFACE",
-              "name": "TimeboxBurnupTimeSeriesInterface",
+              "name": "TimeboxReportInterface",
               "ofType": null
             }
           ],
@@ -32839,6 +32899,20 @@
               "deprecationReason": null
             },
             {
+              "name": "userDiscussionsCount",
+              "description": "Number of user discussions in the merge request",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "userNotesCount",
               "description": "User notes count of the merge request",
               "args": [
@@ -35259,6 +35333,20 @@
               "deprecationReason": null
             },
             {
+              "name": "report",
+              "description": "Historically accurate report about the timebox",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TimeboxReport",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "startDate",
               "description": "Timestamp of the milestone start date",
               "args": [
@@ -35381,7 +35469,7 @@
           "interfaces": [
             {
               "kind": "INTERFACE",
-              "name": "TimeboxBurnupTimeSeriesInterface",
+              "name": "TimeboxReportInterface",
               "ofType": null
             }
           ],
@@ -43159,7 +43247,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43288,6 +43376,16 @@
                     }
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -43398,7 +43496,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43603,7 +43701,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -43730,6 +43828,16 @@
                       "name": "ID",
                       "ofType": null
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "epicId",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
@@ -50179,34 +50287,6 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
-            },
-            {
-              "name": "issuesUrl",
-              "description": "HTTP URL of the issues page filtered by this release. Deprecated in 13.6: Use `openedIssuesUrl`",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `openedIssuesUrl`. Deprecated in 13.6"
-            },
-            {
-              "name": "mergeRequestsUrl",
-              "description": "HTTP URL of the merge request page filtered by this release. Deprecated in 13.6: Use `openedMergeRequestsUrl`",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": true,
-              "deprecationReason": "Use `openedMergeRequestsUrl`. Deprecated in 13.6"
             },
             {
               "name": "mergedMergeRequestsUrl",
@@ -58452,8 +58532,43 @@
           "possibleTypes": null
         },
         {
+          "kind": "OBJECT",
+          "name": "TimeboxReport",
+          "description": "Represents a historically accurate report about the timebox",
+          "fields": [
+            {
+              "name": "burnupTimeSeries",
+              "description": "Daily scope and completed totals for burnup charts",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "BurnupChartDailyTotals",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "INTERFACE",
-          "name": "TimeboxBurnupTimeSeriesInterface",
+          "name": "TimeboxReportInterface",
           "description": null,
           "fields": [
             {
@@ -58474,6 +58589,20 @@
                     "ofType": null
                   }
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "report",
+              "description": "Historically accurate report about the timebox",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "TimeboxReport",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
