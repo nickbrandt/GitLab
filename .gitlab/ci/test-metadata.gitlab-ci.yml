@@ -16,7 +16,7 @@ retrieve-tests-metadata:
     - .test-metadata:rules:retrieve-tests-metadata
   stage: prepare
   script:
-    - install_api_client_dependencies_with_apt
+    - install_gitlab_gem
     - source ./scripts/rspec_helpers.sh
     - retrieve_tests_metadata
 
