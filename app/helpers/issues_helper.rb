@@ -170,6 +170,11 @@ module IssuesHelper
       submit_as_spam_path: mark_as_spam_project_issue_path(project, issuable)
     }
   end
+
+  # Overridden in EE
+  def scoped_labels_available?(project)
+    false
+  end
 end
 
 IssuesHelper.prepend_if_ee('EE::IssuesHelper')

@@ -89,4 +89,24 @@ RSpec.describe EE::IssuesHelper do
       end
     end
   end
+
+  describe '#scoped_labels_available?' do
+    subject { helper.scoped_labels_available?(project) }
+
+    context 'without license' do
+      before do
+        stub_licensed_features(scoped_labels: false)
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'with license' do
+      before do
+        stub_licensed_features(scoped_labels: true)
+      end
+
+      it { is_expected.to be_truthy }
+    end
+  end
 end

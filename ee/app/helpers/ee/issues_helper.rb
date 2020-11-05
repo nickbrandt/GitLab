@@ -54,5 +54,9 @@ module EE
     def show_timeline_view_toggle?(issue)
       issue.incident? && issue.project.feature_available?(:incident_timeline_view)
     end
+
+    def scoped_labels_available?(project)
+      project.feature_available?(:scoped_labels)
+    end
   end
 end
