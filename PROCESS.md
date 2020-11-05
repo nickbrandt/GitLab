@@ -39,6 +39,9 @@ maintainers. The release process is:
 -   run `make tag VERSION=x.y.z"` or `make signed_tag VERSION=x.y.z` on the release branch. This will
     compile the changelog, bump the VERSION file, and make a tag matching it.
 -   push the branch and the tag to gitlab.com
+-   the new version will only be deployed to `gitlab.com` if [`GITLAB_WORKHORSE_VERSION`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/GITLAB_WORKHORSE_VERSION) is updated accordingly;
+    if applicable, please remind the person who originally asked for a new release to make this change
+    (the MR should include a link back to the [version tag](https://gitlab.com/gitlab-org/gitlab-workhorse/-/tags) and a copy of the changelog)
 
 ## Security releases
 
