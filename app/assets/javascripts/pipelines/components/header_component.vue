@@ -5,9 +5,13 @@ import axios from '~/lib/utils/axios_utils';
 import ciHeader from '~/vue_shared/components/header_ci_component.vue';
 import { setUrlFragment, redirectTo } from '~/lib/utils/url_utility';
 import getPipelineQuery from '../graphql/queries/get_pipeline_header_data.query.graphql';
+import deletePipelineMutation from '../graphql/mutations/delete_pipeline.mutation.graphql';
+import retryPipelineMutation from '../graphql/mutations/retry_pipeline.mutation.graphql';
+import cancelPipelineMutation from '../graphql/mutations/cancel_pipeline.mutation.graphql';
 import { LOAD_FAILURE, POST_FAILURE, DELETE_FAILURE, DEFAULT } from '../constants';
 
 const DELETE_MODAL_ID = 'pipeline-delete-modal';
+const POLL_INTERVAL = 10000;
 
 export default {
   name: 'PipelineHeaderSection',
@@ -52,7 +56,7 @@ export default {
       error() {
         this.reportFailure(LOAD_FAILURE);
       },
-      pollInterval: 10000,
+      pollInterval: POLL_INTERVAL,
       watchLoading(isLoading) {
         if (!isLoading) {
           // To ensure apollo has updated the cache,
@@ -144,9 +148,17 @@ export default {
 
       try {
         const { request } = await axios.delete(this.paths.delete);
+
+        // const data = await this.$apollo.mutate({
+        //   mutation: deletePipelineMutation,
+        //   variables: {
+        //     id: this.pipelineId,
+        //   },
+        // });
+
         redirectTo(setUrlFragment(request.responseURL, 'delete_success'));
       } catch {
-        this.$apollo.queries.pipeline.startPolling();
+        this.$apollo.queries.pipeline.startPolling(POLL_INTERVAL);
         this.reportFailure(DELETE_FAILURE);
         this.isDeleting = false;
       }
