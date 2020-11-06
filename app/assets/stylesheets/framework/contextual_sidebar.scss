@@ -117,8 +117,7 @@
   top: $header-height;
   bottom: 0;
   left: 0;
-  background-color: $gray-light;
-  box-shadow: inset -1px 0 0 $border-color;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 0px 1px rgba(0, 0, 0, 0.24);;
   transform: translate3d(0, 0, 0);
 
   &:not(.sidebar-collapsed-desktop) {
@@ -278,12 +277,12 @@
         @include media-breakpoint-up(sm) {
           position: fixed;
           top: 0;
-          left: 0;
+          left: 1px;
           min-width: 150px;
           margin-top: -1px;
           padding: 4px 1px;
           background-color: $white;
-          box-shadow: 2px 1px 3px $dropdown-shadow-color;
+          box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 0px 1px rgba(0, 0, 0, 0.24);
           border: 1px solid $gray-darker;
           border-left: 0;
           border-radius: 0 3px 3px 0;
@@ -368,14 +367,13 @@
   transition: width $sidebar-transition-duration;
   height: $toggle-sidebar-height;
   padding: 0 $gl-padding;
-  background-color: $gray-light;
   border: 0;
   color: $gl-text-color-secondary;
   display: flex;
   align-items: center;
 
   &:hover {
-    background-color: $border-color;
+    background-color: $link-hover-background;
     color: $gl-text-color;
   }
 }

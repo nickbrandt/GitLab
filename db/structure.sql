@@ -9337,11 +9337,11 @@ CREATE TABLE application_settings (
     elasticsearch_analyzers_smartcn_search boolean DEFAULT false NOT NULL,
     elasticsearch_analyzers_kuromoji_enabled boolean DEFAULT false NOT NULL,
     elasticsearch_analyzers_kuromoji_search boolean DEFAULT false NOT NULL,
+    new_user_signups_cap integer,
     secret_detection_token_revocation_enabled boolean DEFAULT false NOT NULL,
     secret_detection_token_revocation_url text,
     encrypted_secret_detection_token_revocation_token text,
     encrypted_secret_detection_token_revocation_token_iv text,
-    new_user_signups_cap integer,
     CONSTRAINT app_settings_registry_exp_policies_worker_capacity_positive CHECK ((container_registry_expiration_policies_worker_capacity >= 0)),
     CONSTRAINT check_2dba05b802 CHECK ((char_length(gitpod_url) <= 255)),
     CONSTRAINT check_51700b31b5 CHECK ((char_length(default_branch_name) <= 255)),
@@ -22513,7 +22513,7 @@ ALTER INDEX product_analytics_events_experimental_pkey ATTACH PARTITION gitlab_p
 
 ALTER INDEX product_analytics_events_experimental_pkey ATTACH PARTITION gitlab_partitions_static.product_analytics_events_experimental_63_pkey;
 
-CREATE TRIGGER table_sync_trigger_ee39a25f9d AFTER INSERT OR DELETE OR UPDATE ON audit_events FOR EACH ROW EXECUTE PROCEDURE table_sync_function_2be879775d();
+CREATE TRIGGER table_sync_trigger_ee39a25f9d AFTER INSERT OR DELETE OR UPDATE ON audit_events FOR EACH ROW EXECUTE FUNCTION table_sync_function_2be879775d();
 
 ALTER TABLE ONLY chat_names
     ADD CONSTRAINT fk_00797a2bf9 FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE;
