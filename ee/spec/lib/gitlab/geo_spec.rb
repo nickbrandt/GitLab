@@ -366,4 +366,33 @@ RSpec.describe Gitlab::Geo, :geo, :request_store do
       end
     end
   end
+
+  describe '.verification_enabled_replicator_classes' do
+    it 'returns an Array of replicator classes' do
+      result = described_class.verification_enabled_replicator_classes
+
+      expect(result).to be_an(Array)
+      expect(result).to include(Geo::PackageFileReplicator)
+    end
+
+    context 'when replication is disabled' do
+      before do
+        stub_feature_flags(geo_package_file_replication: false)
+      end
+
+      it 'does not return the replicator class' do
+        expect(described_class.verification_enabled_replicator_classes).not_to include(Geo::PackageFileReplicator)
+      end
+    end
+
+    context 'when verification is disabled' do
+      before do
+        stub_feature_flags(geo_package_file_verification: false)
+      end
+
+      it 'does not return the replicator class' do
+        expect(described_class.verification_enabled_replicator_classes).not_to include(Geo::PackageFileReplicator)
+      end
+    end
+  end
 end

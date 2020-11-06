@@ -171,5 +171,9 @@ module Gitlab
     def self.enabled_replicator_classes
       REPLICATOR_CLASSES.select(&:enabled?)
     end
+
+    def self.verification_enabled_replicator_classes
+      REPLICATOR_CLASSES.select(&:verification_enabled?)
+    end
   end
 end

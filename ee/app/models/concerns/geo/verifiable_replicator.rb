@@ -7,7 +7,10 @@ module Geo
     include Delay
 
     class_methods do
+      extend Gitlab::Utils::Override
+
       # If replication is disabled, then so is verification.
+      override :verification_enabled?
       def verification_enabled?
         enabled? && verification_feature_flag_enabled?
       end
@@ -23,6 +26,13 @@ module Geo
       # See https://gitlab.com/gitlab-org/gitlab/-/merge_requests/46998 for more
       def verification_feature_flag_enabled?
         Feature.enabled?(:geo_framework_verification)
+      end
+
+      # Called every minute by VerificationCronWorker
+      def trigger_background_verification
+        return false unless verification_enabled?
+
+        # TODO: ::Geo::VerificationBatchWorker.perform_with_capacity(self)
       end
 
       def checksummed_count
