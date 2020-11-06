@@ -6,7 +6,7 @@ class Analytics::DevopsAdoption::Segment < ApplicationRecord
   has_many :segment_selections
 
   validates :name, presence: true, uniqueness: true, length: { maximum: 255 }
-  validate :validate_segment_count
+  validate :validate_segment_count, on: :create
 
   private
 
