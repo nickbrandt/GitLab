@@ -240,7 +240,8 @@ vulnerability:
   vulnerability can be Detected, Confirmed, Dismissed, or Resolved.
 - Project: The project in which the vulnerability exists.
 - Crash type: The type of crash or weakness in the code. This typically maps to a [CWE](https://cwe.mitre.org/).
-- Crash state:
+- Crash state: A normalized version of the stacktrace, containing the last three functions of the
+  crash (without random addresses).
 - Stacktrace snippet: The last few lines of the stacktrace, which shows details about the crash.
 - Identifier: The vulnerability's identifier. This maps to either a [CVE](https://cve.mitre.org/)
   or [CWE](https://cwe.mitre.org/).
