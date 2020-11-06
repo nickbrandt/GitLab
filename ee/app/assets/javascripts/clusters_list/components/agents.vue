@@ -14,12 +14,7 @@ export default {
           projectPath: this.projectPath,
         };
       },
-      update: data => {
-        return {
-          list: data?.project?.clusterAgents?.nodes,
-          folders: data?.project?.repository?.tree?.trees?.nodes,
-        };
-      },
+      update: data => data
     },
   },
   components: {
@@ -48,8 +43,8 @@ export default {
       return this.$apollo.queries.agents.loading;
     },
     agentList() {
-      let list = this.agents?.list;
-      const configFolders = this.agents?.folders;
+      let list = this.agents?.project?.clusterAgents?.nodes;
+      const configFolders = this.agents?.project?.repository?.tree?.trees?.nodes;
 
       if (list && configFolders) {
         list = list.map(agent => {
@@ -60,6 +55,9 @@ export default {
 
       return list;
     },
+    agentPageInfo() {
+      return this.agents?.project?.clusterAgents?.pageInfo;
+    }
   },
 };
 </script>
