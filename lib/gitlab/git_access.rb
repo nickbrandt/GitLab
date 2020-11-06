@@ -27,8 +27,7 @@ module Gitlab
       upload_pack_disabled_over_http: 'Pulling over HTTP is not allowed.',
       receive_pack_disabled_over_http: 'Pushing over HTTP is not allowed.',
       read_only: 'The repository is temporarily read-only. Please try again later.',
-      cannot_push_to_read_only: "You can't push code to a read-only GitLab instance.",
-      push_code: 'You are not allowed to push code to this project.'
+      cannot_push_to_read_only: "You can't push code to a read-only GitLab instance."
     }.freeze
 
     INTERNAL_TIMEOUT = 50.seconds.freeze

@@ -13,14 +13,6 @@ RSpec.describe Gitlab::Checks::ChangeAccess do
         expect { subject.validate! }.not_to raise_error
       end
 
-      it 'calls pushes checks' do
-        expect_next_instance_of(Gitlab::Checks::PushCheck) do |instance|
-          expect(instance).to receive(:validate!)
-        end
-
-        subject.validate!
-      end
-
       it 'calls branches checks' do
         expect_next_instance_of(Gitlab::Checks::BranchCheck) do |instance|
           expect(instance).to receive(:validate!)

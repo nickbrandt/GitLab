@@ -41,7 +41,6 @@ module Gitlab
       protected
 
       def ref_level_checks
-        Gitlab::Checks::PushCheck.new(self).validate!
         Gitlab::Checks::BranchCheck.new(self).validate!
         Gitlab::Checks::TagCheck.new(self).validate!
         Gitlab::Checks::LfsCheck.new(self).validate!

@@ -4,6 +4,7 @@ module Gitlab
   module Checks
     class BranchCheck < BaseChecker
       ERROR_MESSAGES = {
+        push_code: 'You are not allowed to push code to this project.',
         delete_default_branch: 'The default branch of a project cannot be deleted.',
         force_push_protected_branch: 'You are not allowed to force push code to a protected branch on this project.',
         non_master_delete_protected_branch: 'You are not allowed to delete protected branches from this project. Only a project maintainer or owner can delete a protected branch.',
@@ -17,6 +18,7 @@ module Gitlab
       }.freeze
 
       LOG_MESSAGES = {
+        push_branch_check: "Checking if you are allowed to push...",
         delete_default_branch_check: "Checking if default branch is being deleted...",
         protected_branch_checks: "Checking if you are force pushing to a protected branch...",
         protected_branch_push_checks: "Checking if you are allowed to push to the protected branch...",
@@ -27,17 +29,29 @@ module Gitlab
       def validate!
         return unless branch_name
 
-        logger.log_timed(LOG_MESSAGES[:delete_default_branch_check]) do
-          if deletion? && branch_name == project.default_branch
-            raise GitAccess::ForbiddenError, ERROR_MESSAGES[:delete_default_branch]
-          end
-        end
-
+        push_branch_checks
+        delete_branch_checks
         prohibited_branch_checks
         protected_branch_checks
       end
 
       private
+
+      def push_branch_checks
+        logger.log_timed(LOG_MESSAGES[:push_branch_check]) do
+          unless can_push?
+            raise GitAccess::ForbiddenError, ERROR_MESSAGES[:push_code]
+          end
+        end
+      end
+
+      def delete_branch_checks
+        logger.log_timed(LOG_MESSAGES[:delete_default_branch_check]) do
+          if deletion? && branch_name == project.default_branch
+            raise GitAccess::ForbiddenError, ERROR_MESSAGES[:delete_default_branch]
+          end
+        end
+      end
 
       def prohibited_branch_checks
         return unless Feature.enabled?(:prohibit_hexadecimal_branch_names, project, default_enabled: true)
@@ -144,6 +158,11 @@ module Gitlab
 
       def safe_commit_for_new_protected_branch?
         ProtectedBranch.any_protected?(project, project.repository.branch_names_contains_sha(newrev))
+      end
+
+      def can_push?
+        user_access.can_do_action?(:push_code) ||
+          project.branch_allows_collaboration?(user_access.user, branch_name)
       end
     end
   end
