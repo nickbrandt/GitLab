@@ -26424,6 +26424,9 @@ msgstr ""
 msgid "TestHooks|Ensure the project has notes."
 msgstr ""
 
+msgid "TestHooks|Ensure the project has releases."
+msgstr ""
+
 msgid "TestHooks|Ensure the wiki is enabled and has pages."
 msgstr ""
 
@@ -30054,6 +30057,9 @@ msgstr ""
 msgid "Webhooks|Push events"
 msgstr ""
 
+msgid "Webhooks|Releases events"
+msgstr ""
+
 msgid "Webhooks|SSL verification"
 msgstr ""
 
@@ -30067,6 +30073,9 @@ msgid "Webhooks|This URL is triggered when a deployment starts, finishes, fails,
 msgstr ""
 
 msgid "Webhooks|This URL is triggered when a feature flag is turned on or off"
+msgstr ""
+
+msgid "Webhooks|This URL is triggered when a release is created/updated"
 msgstr ""
 
 msgid "Webhooks|This URL will be triggered by a push to the repository"
