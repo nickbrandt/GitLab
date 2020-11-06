@@ -126,6 +126,7 @@
   bottom: 0;
   right: 0;
   transition: width $sidebar-transition-duration;
+  background-color: $white;
   z-index: 200;
   overflow: hidden;
 

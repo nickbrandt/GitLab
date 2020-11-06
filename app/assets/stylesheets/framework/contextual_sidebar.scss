@@ -117,6 +117,7 @@
   top: $header-height;
   bottom: 0;
   left: 0;
+  background-color: $white;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 0px 0px 1px rgba(0, 0, 0, 0.24);;
   transform: translate3d(0, 0, 0);
 
@@ -367,6 +368,7 @@
   transition: width $sidebar-transition-duration;
   height: $toggle-sidebar-height;
   padding: 0 $gl-padding;
+  background-color: $white;
   border: 0;
   color: $gl-text-color-secondary;
   display: flex;
