@@ -2,6 +2,7 @@
 
 require 'asciidoctor'
 require 'asciidoctor-plantuml'
+require 'asciidoctor/extensions/asciidoctor_kroki/extension'
 require 'asciidoctor/extensions'
 require 'gitlab/asciidoc/html5_converter'
 require 'gitlab/asciidoc/mermaid_block_processor'
@@ -23,7 +24,14 @@ module Gitlab
         'source-highlighter' => 'gitlab-html-pipeline',
         'icons' => 'font',
         'outfilesuffix' => '.adoc',
-        'max-include-depth' => MAX_INCLUDE_DEPTH
+        'max-include-depth' => MAX_INCLUDE_DEPTH,
+        # This feature is disabled because it relies on File#read to read the file.
+        # If we want to enable this feature we will need to provide a "GitLab compatible" implementation.
+        # This attribute is typically used to share common config (skinparam...) across all PlantUML diagrams.
+        # The value can be a path or a URL.
+        'kroki-plantuml-include!' => '',
+        # This feature is disabled because it relies on the local file system to save diagrams retrieved from the Kroki server.
+        'kroki-fetch-diagram!' => ''
     }.freeze
 
     def self.path_attrs(path)
@@ -50,8 +58,8 @@ module Gitlab
         block ::Gitlab::Asciidoc::MermaidBlockProcessor
 
         if Gitlab::CurrentSettings.kroki_enabled
-          ::Gitlab::Kroki::DIAGRAM_TYPES.each do |name|
-            block ::Gitlab::Asciidoc::KrokiBlockProcessor, name
+          ::AsciidoctorExtensions::Kroki::SUPPORTED_DIAGRAM_NAMES.each do |name|
+            block ::AsciidoctorExtensions::KrokiBlockProcessor, name
           end
         end
       end
@@ -59,7 +67,13 @@ module Gitlab
       extra_attrs = path_attrs(context[:requested_path])
       asciidoc_opts = { safe: :secure,
                         backend: :gitlab_html5,
-                        attributes: DEFAULT_ADOC_ATTRS.merge(extra_attrs),
+                        attributes: DEFAULT_ADOC_ATTRS
+                                        .merge(extra_attrs)
+                                        .merge({
+                                                   # Define the Kroki server URL from the settings.
+                                                   # This attribute cannot be overridden from the AsciiDoc document.
+                                                   'kroki-server-url' => Gitlab::CurrentSettings.kroki_url
+                                               }),
                         extensions: extensions }
 
       context[:pipeline] = :ascii_doc

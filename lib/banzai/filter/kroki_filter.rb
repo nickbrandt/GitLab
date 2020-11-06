@@ -1,18 +1,17 @@
 # frozen_string_literal: true
 
 require "nokogiri"
-require "zlib"
-require "base64"
+require "asciidoctor/extensions/asciidoctor_kroki/extension"
 
 module Banzai
   module Filter
     # HTML that replaces all diagrams supported by Kroki with the corresponding img tags.
     #
     class KrokiFilter < HTML::Pipeline::Filter
-      DIAGRAM_SELECTORS = ::Gitlab::Kroki::DIAGRAM_TYPES
+      DIAGRAM_SELECTORS = ::AsciidoctorExtensions::Kroki::SUPPORTED_DIAGRAM_NAMES
                               .map { |diagram_type| %(pre[lang="#{diagram_type}"] > code) }
                               .join(', ')
-      DIAGRAM_SELECTORS_WO_PLANTUML = ::Gitlab::Kroki::DIAGRAM_TYPES
+      DIAGRAM_SELECTORS_WO_PLANTUML = ::AsciidoctorExtensions::Kroki::SUPPORTED_DIAGRAM_NAMES
                                           .select { |diagram_type| diagram_type != 'plantuml' }
                                           .map { |diagram_type| %(pre[lang="#{diagram_type}"] > code) }
                                           .join(', ')
@@ -39,10 +38,9 @@ module Banzai
 
       private
 
-      # QUESTION: should should we use the asciidoctor-kroki gem to delegate this logic?
       def create_image_src(type, format, text)
-        data = Base64.urlsafe_encode64(Zlib::Deflate.deflate(text, 9))
-        "#{settings.kroki_url}/#{type}/#{format}/#{data}"
+        ::AsciidoctorExtensions::KrokiDiagram.new(type, format, text)
+            .get_diagram_uri(settings.kroki_url)
       end
 
       def settings
