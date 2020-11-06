@@ -197,5 +197,7 @@ RSpec.configure do |config|
 
   config.before(:context, :minio) do
     TestEnv.setup_minio
+
+    TestEnv.start_minio
   end
 end

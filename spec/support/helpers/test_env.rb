@@ -302,8 +302,25 @@ module TestEnv
     )
   end
 
+  def start_minio
+    data_dir = Dir.mktmpdir(%w[minio data])
+
+    minio_pid = spawn(
+      { 'MINIO_ACCESS_KEY' => 'minio', 'MINIO_SECRET_KEY' => 'minio-secret' },
+      File.join(minio_dir, 'minio'),
+      'server',
+      data_dir
+    )
+
+    Kernel.at_exit do
+      Process.kill('TERM', minio_pid)
+      Process.wait(minio_pid)
+      FileUtils.remove_entry(data_dir)
+    end
+  end
+
   def minio_dir
-    @minio_path ||= File.join('tmp', 'tests', 'minio')
+    @minio_dir ||= File.join('tmp', 'tests', 'minio')
   end
 
   def setup_factory_repo
