@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rouge/plugins/common_mark'
+require "asciidoctor/extensions/asciidoctor_kroki/extension"
 
 # Generated HTML is transformed back to GFM by app/assets/javascripts/behaviors/markdown/nodes/code_block.js
 module Banzai
@@ -86,7 +87,7 @@ module Banzai
       end
 
       def use_rouge?(language)
-        (%w(math suggestion) + ::Gitlab::Kroki::DIAGRAM_TYPES).exclude?(language)
+        (%w(math suggestion) + ::AsciidoctorExtensions::Kroki::SUPPORTED_DIAGRAM_NAMES).exclude?(language)
       end
     end
   end
