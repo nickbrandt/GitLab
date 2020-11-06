@@ -1,8 +1,6 @@
 query getAgents($defaultBranchName: String!, $projectPath: ID!, $before: String, $after: String) {
   project(fullPath: $projectPath) {
     clusterAgents(first: 3, before: $before, after: $after) {
-      count
-
       nodes {
         id
         name

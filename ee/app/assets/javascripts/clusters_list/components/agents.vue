@@ -12,6 +12,8 @@ export default {
         return {
           defaultBranchName: this.defaultBranchName,
           projectPath: this.projectPath,
+          after: this.cursor.after,
+          before: this.cursor.before,
         };
       },
       update: data => data
@@ -39,6 +41,14 @@ export default {
       type: String,
     },
   },
+  data() {
+    return {
+      cursor: {
+        before: null,
+        after: null
+      }
+    }
+  },
   computed: {
     isLoading() {
       return this.$apollo.queries.agents.loading;
@@ -62,7 +72,17 @@ export default {
   },
   methods: {
     updatePagination(item) {
-      console.log(item)
+      if (item == this.agentPageInfo.endCursor) {
+        this.cursor = {
+          after: item,
+          before: null
+        }
+      } else {
+        this.cursor = {
+          after: null,
+          before: item
+        }
+      }
     }
   }
 };
@@ -75,11 +95,13 @@ export default {
     <div v-if="agentList.length">
       <AgentTable :agents="agentList" />
 
-      <gl-keyset-pagination
-        v-bind="agentPageInfo"
-        @prev="updatePagination"
-        @next="updatePagination"
-      />
+      <div class="gl-display-flex gl-justify-content-center gl-mt-5">
+        <gl-keyset-pagination
+          v-bind="agentPageInfo"
+          @prev="updatePagination"
+          @next="updatePagination"
+        />
+      </div>
     </div>
 
     <AgentEmptyState v-else :image="emptyStateImage" />
