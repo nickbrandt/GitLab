@@ -225,13 +225,13 @@ The `covfuzz-ci.yml` is the same as that in the [original synchronous example](h
 ## Interacting with the vulnerabilities
 
 After a vulnerability is found, you can [interact with it](../index.md#interacting-with-the-vulnerabilities).
+The merge request widget lists the vulnerability and contains a button for downloading the fuzzing
+artifacts. By clicking one of the detected vulnerabilities, you can see its details.
 
 ![Coverage Fuzzing Security Report](img/coverage_fuzzing_report_v13_6.png)
 
-By clicking on one of the detected vulnerabilities, you can see the details. You can also view the
-vulnerability from the [Security Dashboard](../security_dashboard/index.md),
-which shows you an overview of all the security vulnerabilities in your groups, projects, and
-pipelines.
+You can also view the vulnerability from the [Security Dashboard](../security_dashboard/index.md),
+which shows an overview of all the security vulnerabilities in your groups, projects, and pipelines.
 
 Clicking the vulnerability opens a modal that provides additional information about the
 vulnerability:
