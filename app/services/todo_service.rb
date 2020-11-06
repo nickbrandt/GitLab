@@ -174,10 +174,10 @@ class TodoService
   end
 
   # Resolves all todos related to target
-  def resolve_todos_for_target(target, current_user)
+  def resolve_todos_for_target(target, current_user, resolved_by_action: :system_done)
     attributes = attributes_for_target(target)
 
-    resolve_todos(pending_todos(current_user, attributes), current_user)
+    resolve_todos(pending_todos(current_user, attributes), current_user, resolved_by_action: resolved_by_action)
   end
 
   def resolve_todos(todos, current_user, resolution: :done, resolved_by_action: :system_done)
@@ -216,7 +216,7 @@ class TodoService
 
   def create_todos(users, attributes)
     Array(users).map do |user|
-      next if pending_todos(user, attributes).exists?
+      next if pending_todos(user, attributes).exists? && Feature.disabled?(:multiple_todos, user)
 
       issue_type = attributes.delete(:issue_type)
       track_todo_creation(user, issue_type)
@@ -278,7 +278,7 @@ class TodoService
     create_todos(directly_addressed_users, attributes)
 
     # Create Todos for mentioned users
-    mentioned_users = filter_mentioned_users(parent, note || target, author, skip_users)
+    mentioned_users = filter_mentioned_users(parent, note || target, author, skip_users + directly_addressed_users)
     attributes = attributes_for_todo(parent, target, author, Todo::MENTIONED, note)
     create_todos(mentioned_users, attributes)
   end

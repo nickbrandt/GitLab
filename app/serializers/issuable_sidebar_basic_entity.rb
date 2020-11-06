@@ -71,7 +71,7 @@ class IssuableSidebarBasicEntity < Grape::Entity
     end
   end
 
-  expose :create_todo_path do |issuable|
+  expose :todo_path do |issuable|
     project_todos_path(issuable.project)
   end
 

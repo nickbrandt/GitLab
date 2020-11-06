@@ -4,6 +4,7 @@ import $ from 'jquery';
 import Cookies from 'js-cookie';
 import { deprecatedCreateFlash as flash } from './flash';
 import axios from './lib/utils/axios_utils';
+import { objectToQuery } from '~/lib/utils/url_utility';
 import { sprintf, s__, __ } from './locale';
 import { fixTitle, hide } from '~/tooltips';
 
@@ -81,8 +82,9 @@ Sidebar.prototype.sidebarToggleClicked = function(e, triggered) {
 
 Sidebar.prototype.toggleTodo = function(e) {
   const $this = $(e.currentTarget);
-  const ajaxType = $this.data('deletePath') ? 'delete' : 'post';
-  const url = String($this.data('deletePath') || $this.data('createPath'));
+  const ajaxType = $this.data('exists') ? 'delete' : 'post';
+  const params = { issuable_type: $this.data('issuableType'), issuable_id: $this.data('issuableId') }
+  const url = `${$this.data('todoPath')}?${objectToQuery(params)}}`;
 
   hide($this);
 
@@ -90,10 +92,7 @@ Sidebar.prototype.toggleTodo = function(e) {
     .disable()
     .addClass('is-loading');
 
-  axios[ajaxType](url, {
-    issuable_id: $this.data('issuableId'),
-    issuable_type: $this.data('issuableType'),
-  })
+  axios[ajaxType](url)
     .then(({ data }) => {
       this.todoUpdateDone(data);
     })
@@ -123,7 +122,7 @@ Sidebar.prototype.todoUpdateDone = function(data) {
       .enable()
       .attr('aria-label', $el.data(`${attrPrefix}Text`))
       .attr('title', $el.data(`${attrPrefix}Text`))
-      .data('deletePath', deletePath);
+      .data('exists', Boolean(deletePath));
 
     if ($el.hasClass('has-tooltip')) {
       fixTitle($el);

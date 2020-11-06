@@ -435,14 +435,14 @@ module IssuablesHelper
 
   def issuable_todo_button_data(issuable, is_collapsed)
     {
+      exists: issuable.dig(:current_user, :todo, :id).present?.to_json,
       todo_text: _('Add a to do'),
       mark_text: _('Mark as done'),
       todo_icon: sprite_icon('todo-add'),
       mark_icon: sprite_icon('todo-done', css_class: 'todo-undone'),
       issuable_id: issuable[:id],
       issuable_type: issuable[:type],
-      create_path: issuable[:create_todo_path],
-      delete_path: issuable.dig(:current_user, :todo, :delete_path),
+      todo_path: issuable[:todo_path],
       placement: is_collapsed ? 'left' : nil,
       container: is_collapsed ? 'body' : nil,
       boundary: 'viewport',

@@ -485,7 +485,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       get 'noteable/:target_type/:target_id/notes' => 'notes#index', as: 'noteable_notes' # rubocop:todo Cop/PutProjectRoutesUnderScope
 
-      resources :todos, only: [:create] # rubocop: disable Cop/PutProjectRoutesUnderScope
+      resource :todos, only: [:create, :destroy] # rubocop: disable Cop/PutProjectRoutesUnderScope
 
       resources :uploads, only: [:create] do # rubocop: disable Cop/PutProjectRoutesUnderScope
         collection do

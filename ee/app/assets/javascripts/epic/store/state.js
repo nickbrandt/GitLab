@@ -8,7 +8,6 @@ export default () => ({
   markdownPreviewPath: '',
   labelsPath: '',
   todoPath: '',
-  todoDeletePath: '',
 
   // URLs to use with links
   epicsWebUrl: '',

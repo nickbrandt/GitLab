@@ -29,8 +29,7 @@ export default {
   [types.REQUEST_EPIC_TODO_TOGGLE](state) {
     state.epicTodoToggleInProgress = true;
   },
-  [types.REQUEST_EPIC_TODO_TOGGLE_SUCCESS](state, { todoDeletePath }) {
-    state.todoDeletePath = todoDeletePath;
+  [types.REQUEST_EPIC_TODO_TOGGLE_SUCCESS](state) {
     state.todoExists = !state.todoExists;
     state.epicTodoToggleInProgress = false;
   },

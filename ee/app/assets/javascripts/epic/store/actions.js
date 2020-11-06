@@ -2,7 +2,7 @@ import { deprecatedCreateFlash as flash } from '~/flash';
 import { __, s__, sprintf } from '~/locale';
 
 import axios from '~/lib/utils/axios_utils';
-import { visitUrl } from '~/lib/utils/url_utility';
+import { visitUrl, objectToQuery } from '~/lib/utils/url_utility';
 
 import epicUtils from '../utils/epic_utils';
 import { statusType, statusEvent, dateTypes } from '../constants';
@@ -99,8 +99,7 @@ export const toggleSidebar = ({ dispatch }, { sidebarCollapsed }) => {
  * Methods to handle toggling Todo from sidebar
  */
 export const requestEpicTodoToggle = ({ commit }) => commit(types.REQUEST_EPIC_TODO_TOGGLE);
-export const requestEpicTodoToggleSuccess = ({ commit }, data) =>
-  commit(types.REQUEST_EPIC_TODO_TOGGLE_SUCCESS, data);
+export const requestEpicTodoToggleSuccess = ({ commit }) => commit(types.REQUEST_EPIC_TODO_TOGGLE_SUCCESS);
 export const requestEpicTodoToggleFailure = ({ commit, state }, data) => {
   commit(types.REQUEST_EPIC_TODO_TOGGLE_FAILURE, data);
 
@@ -118,19 +117,21 @@ export const toggleTodo = ({ state, dispatch }) => {
 
   dispatch('requestEpicTodoToggle');
 
+  const params = {
+    issuable_id: state.epicId,
+    issuable_type: 'epic',
+  };
+
   if (!state.todoExists) {
-    reqPromise = axios.post(state.todoPath, {
-      issuable_id: state.epicId,
-      issuable_type: 'epic',
-    });
+    reqPromise = axios.post(state.todoPath, params);
   } else {
-    reqPromise = axios.delete(state.todoDeletePath);
+    reqPromise = axios.delete(`${state.todoPath}?${objectToQuery(params)}`);
   }
 
   reqPromise
     .then(({ data }) => {
       dispatch('triggerTodoToggleEvent', { count: data.count });
-      dispatch('requestEpicTodoToggleSuccess', { todoDeletePath: data.delete_path });
+      dispatch('requestEpicTodoToggleSuccess');
     })
     .catch(() => {
       dispatch('requestEpicTodoToggleFailure');

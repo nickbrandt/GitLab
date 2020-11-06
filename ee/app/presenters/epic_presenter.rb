@@ -73,7 +73,7 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
   end
 
   def endpoints
-    paths = {
+    {
       namespace: group.path,
       labels_path: group_labels_path(group, format: :json, only_group_labels: true, include_ancestor_groups: true),
       toggle_subscription_path: toggle_subscription_group_epic_path(group, epic),
@@ -81,10 +81,6 @@ class EpicPresenter < Gitlab::View::Presenter::Delegated
       epics_web_url: group_epics_path(group),
       new_epic_web_url: new_group_epic_path(group)
     }
-
-    paths[:todo_delete_path] = dashboard_todo_path(epic_pending_todo) if epic_pending_todo.present?
-
-    paths
   end
 
   # todo:

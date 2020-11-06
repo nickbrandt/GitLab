@@ -127,7 +127,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       end
     end
 
-    resources :todos, only: [:create]
+    resource :todos, only: [:create, :destroy]
     resources :boards, only: [:create, :update, :destroy] do
       collection do
         get :recent
