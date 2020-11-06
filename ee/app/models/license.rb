@@ -132,6 +132,7 @@ class License < ApplicationRecord
     credentials_inventory
     dast
     dependency_scanning
+    devops_adoption
     enterprise_templates
     api_fuzzing
     group_level_compliance_dashboard
