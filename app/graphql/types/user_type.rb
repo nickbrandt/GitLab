@@ -19,7 +19,8 @@ module Types
     field :state, Types::UserStateEnum, null: false,
           description: 'State of the user'
     field :email, GraphQL::STRING_TYPE, null: true,
-          description: 'User email'
+          description: 'User email', method: :public_email,
+          deprecated: { reason: 'Use public_email', milestone: '13.7' }
     field :public_email, GraphQL::STRING_TYPE, null: true,
           description: "User's public email"
     field :avatar_url, GraphQL::STRING_TYPE, null: true,
