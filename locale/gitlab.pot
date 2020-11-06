@@ -6897,6 +6897,9 @@ msgstr ""
 msgid "Commit Message"
 msgstr ""
 
+msgid "Commit changes"
+msgstr ""
+
 msgid "Commit deleted"
 msgstr ""
 
@@ -19936,6 +19939,9 @@ msgid "Pipelines|CI Lint"
 msgstr ""
 
 msgid "Pipelines|CI file could not be loaded: %{reason}"
+msgstr ""
+
+msgid "Pipelines|CI file could not be saved: %{reason}"
 msgstr ""
 
 msgid "Pipelines|Child pipeline"
