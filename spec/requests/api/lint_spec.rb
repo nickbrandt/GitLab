@@ -26,6 +26,19 @@ RSpec.describe API::Lint do
       end
     end
 
+    context 'with valid .gitlab-ci.yaml but with warnings' do
+      let(:yaml_content) { { job: { script: 'ls',  rules: [{ when: 'always' }] } }.to_yaml }
+
+      it 'passes validation but raises a warning' do
+        post api('/ci/lint'), params: { content: yaml_content }
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['warnings']).not_to be_empty
+        expect(json_response['status']).to eq('valid')
+        expect(json_response['errors']).to eq([])
+      end
+    end
+
     context 'with an invalid .gitlab_ci.yml' do
       context 'with invalid syntax' do
         let(:yaml_content) { 'invalid content' }
@@ -81,6 +94,17 @@ RSpec.describe API::Lint do
 
     let(:project) { create(:project, :repository) }
     let(:dry_run) { nil }
+
+    RSpec.shared_examples 'valid config with warnings' do
+      it 'passes validation with warnings' do
+        ci_lint
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['valid']).to eq(true)
+        expect(json_response['errors']).to eq([])
+        expect(json_response['warnings']).not_to be_empty
+      end
+    end
 
     RSpec.shared_examples 'valid config' do
       it 'passes validation' do
@@ -249,6 +273,12 @@ RSpec.describe API::Lint do
           let(:dry_run) { false }
 
           it_behaves_like 'valid config'
+        end
+
+        context 'With warnings' do
+          let(:yaml_content) { { job: { script: 'ls', rules: [{ when: 'always' }] } }.to_yaml }
+
+          it_behaves_like 'valid config with warnings'
         end
       end
 
