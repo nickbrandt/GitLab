@@ -55,8 +55,9 @@ module EE
       issue.incident? && issue.project.feature_available?(:incident_timeline_view)
     end
 
-    def scoped_labels_available?(project)
-      project.feature_available?(:scoped_labels)
+    override :scoped_labels_available?
+    def scoped_labels_available?(parent)
+      parent.feature_available?(:scoped_labels)
     end
   end
 end

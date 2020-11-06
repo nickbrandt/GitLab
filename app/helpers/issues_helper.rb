@@ -172,7 +172,7 @@ module IssuesHelper
   end
 
   # Overridden in EE
-  def scoped_labels_available?(project)
+  def scoped_labels_available?(parent)
     false
   end
 end
