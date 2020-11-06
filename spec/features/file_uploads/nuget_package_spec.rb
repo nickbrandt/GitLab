@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe 'Upload a nuget package', :api, :js do
+RSpec.describe 'Upload a nuget package', :minio, :api, :js do
   include_context 'file upload requests helpers'
 
   let_it_be(:project) { create(:project) }

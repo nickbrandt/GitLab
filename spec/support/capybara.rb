@@ -194,4 +194,8 @@ RSpec.configure do |config|
     Capybara.reset_sessions! unless example.exception
     block_and_wait_for_requests_complete
   end
+
+  config.before(:context, :minio) do
+    TestEnv.setup_minio
+  end
 end

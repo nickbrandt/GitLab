@@ -293,6 +293,19 @@ module TestEnv
     ENV.fetch('GITLAB_WORKHORSE_URL', nil)
   end
 
+  def setup_minio
+    component_timed_setup(
+      'Minio',
+      install_dir: minio_dir,
+      version: Gitlab::Workhorse.version,
+      task: "minio:install:release_version[#{minio_dir}]"
+    )
+  end
+
+  def minio_dir
+    @minio_path ||= File.join('tmp', 'tests', 'minio')
+  end
+
   def setup_factory_repo
     setup_repo(factory_repo_path, factory_repo_path_bare, factory_repo_name, BRANCH_SHA)
   end
