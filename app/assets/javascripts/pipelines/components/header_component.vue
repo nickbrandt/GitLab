@@ -1,7 +1,6 @@
 <script>
 import { GlAlert, GlButton, GlLoadingIcon, GlModal, GlModalDirective } from '@gitlab/ui';
 import { __ } from '~/locale';
-import axios from '~/lib/utils/axios_utils';
 import ciHeader from '~/vue_shared/components/header_ci_component.vue';
 import { setUrlFragment, redirectTo } from '~/lib/utils/url_utility';
 import getPipelineQuery from '../graphql/queries/get_pipeline_header_data.query.graphql';
@@ -32,7 +31,7 @@ export default {
     [DEFAULT]: __('An unknown error occurred.'),
   },
   inject: {
-    // Receive `cancel`, `delete`, `fullProject` and `retry`
+    // Receive `fullProject` and `pipelinesPath`
     paths: {
       default: {},
     },
@@ -126,37 +125,47 @@ export default {
     reportFailure(errorType) {
       this.failureType = errorType;
     },
-    async postAction(path) {
+    async cancelPipeline() {
+      this.isCanceling = true;
+
       try {
-        await axios.post(path);
+        await this.$apollo.mutate({
+          mutation: cancelPipelineMutation,
+          variables: { id: this.pipeline.id },
+        });
+
         this.$apollo.queries.pipeline.refetch();
       } catch {
         this.reportFailure(POST_FAILURE);
       }
     },
-    async cancelPipeline() {
-      this.isCanceling = true;
-      this.postAction(this.paths.cancel);
-    },
     async retryPipeline() {
       this.isRetrying = true;
-      this.postAction(this.paths.retry);
+
+      try {
+        await this.$apollo.mutate({
+          mutation: retryPipelineMutation,
+          variables: { id: this.pipeline.id },
+        });
+
+        this.$apollo.queries.pipeline.refetch();
+      } catch {
+        this.reportFailure(POST_FAILURE);
+      }
     },
     async deletePipeline() {
       this.isDeleting = true;
       this.$apollo.queries.pipeline.stopPolling();
 
       try {
-        const { request } = await axios.delete(this.paths.delete);
+        await this.$apollo.mutate({
+          mutation: deletePipelineMutation,
+          variables: {
+            id: this.pipeline.id,
+          },
+        });
 
-        // const data = await this.$apollo.mutate({
-        //   mutation: deletePipelineMutation,
-        //   variables: {
-        //     id: this.pipelineId,
-        //   },
-        // });
-
-        redirectTo(setUrlFragment(request.responseURL, 'delete_success'));
+        redirectTo(setUrlFragment(this.paths.pipelinesPath, 'delete_success'));
       } catch {
         this.$apollo.queries.pipeline.startPolling(POLL_INTERVAL);
         this.reportFailure(DELETE_FAILURE);
