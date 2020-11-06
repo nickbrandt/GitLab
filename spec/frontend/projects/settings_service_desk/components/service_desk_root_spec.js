@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import waitForPromises from 'helpers/wait_for_promises';
 import ServiceDeskRoot from '~/projects/settings_service_desk/components/service_desk_root.vue';
+import ServiceDeskSetting from '~/projects/settings_service_desk/components/service_desk_setting.vue';
 import axios from '~/lib/utils/axios_utils';
 import httpStatusCodes from '~/lib/utils/http_status';
 
@@ -161,5 +162,19 @@ describe('ServiceDeskRoot', () => {
       .then(() => {
         expect(wrapper.html()).toContain('An error occured while making the changes:');
       });
+  });
+
+  it('passes customEmail through updatedCustomEmail correctly', () => {
+    const customEmail = 'foo';
+
+    wrapper = mount(ServiceDeskRoot, {
+      propsData: {
+        initialIsEnabled: true,
+        endpoint,
+        customEmail,
+      },
+    });
+
+    expect(wrapper.find(ServiceDeskSetting).props('customEmail')).toEqual(customEmail);
   });
 });

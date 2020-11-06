@@ -85,6 +85,45 @@ describe('ServiceDeskSetting', () => {
       });
     });
 
+    describe('with customEmail', () => {
+      describe('customEmail is different than incomingEmail', () => {
+        const incomingEmail = 'foo@bar.com';
+        const customEmail = 'custom@bar.com';
+
+        beforeEach(() => {
+          wrapper = mount(ServiceDeskSetting, {
+            propsData: {
+              isEnabled: true,
+              incomingEmail,
+              customEmail,
+            },
+          });
+        });
+
+        it('should see custom email', () => {
+          expect(wrapper.find('.incoming-email').element.value).toEqual(customEmail);
+        });
+      });
+
+      describe('customEmail is the same as incomingEmail', () => {
+        const customEmail = 'foo@bar.com';
+
+        beforeEach(() => {
+          wrapper = mount(ServiceDeskSetting, {
+            propsData: {
+              isEnabled: true,
+              incomingEmail: customEmail,
+              customEmail,
+            },
+          });
+        });
+
+        it('should see custom email', () => {
+          expect(wrapper.find('.incoming-email').element.value).toEqual(customEmail);
+        });
+      });
+    });
+
     describe('templates dropdown', () => {
       it('renders a dropdown to choose a template', () => {
         wrapper = shallowMount(ServiceDeskSetting, {
