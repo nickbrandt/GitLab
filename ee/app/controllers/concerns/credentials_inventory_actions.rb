@@ -55,8 +55,6 @@ module CredentialsInventoryActions
   end
 
   def notify_deleted_or_revoked_credential(credential)
-    return unless Feature.enabled?(:credentials_inventory_revocation_emails, credential.user)
-
     if credential.is_a?(Key)
       CredentialsInventoryMailer.ssh_key_deleted_email(
         params: {
