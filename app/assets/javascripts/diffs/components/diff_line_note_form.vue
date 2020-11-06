@@ -88,7 +88,7 @@ export default {
     commentLineOptions() {
       const combineSides = (acc, { left, right }) => {
         // ignore null values match lines
-        if (left && left.type !== 'match') acc.push(left);
+        if (left) acc.push(left);
         // if the line_codes are identically, return to avoid duplicates
         if (left?.line_code === right?.line_code) return acc;
         if (right && right.type !== 'match') acc.push(right);
