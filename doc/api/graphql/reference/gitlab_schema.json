@@ -20747,24 +20747,6 @@
               "deprecationReason": null
             },
             {
-              "name": "subscribeDisabledDescription",
-              "description": "Message to display when the project has email notifications disabled",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "subscribed",
               "description": "Indicates the currently logged in user is subscribed to the issue",
               "args": [
@@ -27389,24 +27371,6 @@
                 "kind": "SCALAR",
                 "name": "Boolean",
                 "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "subscribeDisabledDescription",
-              "description": "Message to display when the project has email notifications disabled",
-              "args": [
-
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
               },
               "isDeprecated": false,
               "deprecationReason": null

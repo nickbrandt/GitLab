@@ -73,12 +73,9 @@ module Types
 
     field :participants, Types::UserType.connection_type, null: true, complexity: 5,
           description: 'List of participants in the issue'
-    field :emails_disabled, GraphQL::BOOLEAN_TYPE, null: false, complexity: 5,
+    field :emails_disabled, GraphQL::BOOLEAN_TYPE, null: false,
           method: :project_emails_disabled?,
           description: 'Indicates if a project has email notifications disabled'
-    field :subscribe_disabled_description, GraphQL::STRING_TYPE, null: false,
-          method: :subscribe_disabled_description,
-          description: 'Message to display when the project has email notifications disabled'
     field :subscribed, GraphQL::BOOLEAN_TYPE, method: :subscribed?, null: false, complexity: 5,
           description: 'Indicates the currently logged in user is subscribed to the issue'
     field :time_estimate, GraphQL::INT_TYPE, null: false,

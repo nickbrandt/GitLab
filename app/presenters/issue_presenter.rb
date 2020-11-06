@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class IssuePresenter < Gitlab::View::Presenter::Delegated
-  include NotificationsHelper
-
   presents :issue
 
   def issue_path
@@ -15,10 +13,6 @@ class IssuePresenter < Gitlab::View::Presenter::Delegated
 
   def project_emails_disabled?
     issue.project.emails_disabled?
-  end
-
-  def subscribe_disabled_description
-    notification_description(:owner_disabled)
   end
 end
 

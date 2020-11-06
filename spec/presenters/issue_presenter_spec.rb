@@ -35,6 +35,12 @@ RSpec.describe IssuePresenter do
     end
   end
 
+  describe '#issue_path' do
+    it 'returns correct path' do
+      expect(presenter.issue_path).to eq("/#{group.name}/#{project.name}/-/issues/#{issue.iid}")
+    end
+  end
+
   describe '#project_emails_disabled?' do
     subject { presenter.project_emails_disabled? }
 
@@ -48,19 +54,6 @@ RSpec.describe IssuePresenter do
       end
 
       it { is_expected.to be(true) }
-    end
-  end
-
-  describe '#subscribe_disabled_description' do
-    subject { presenter.subscribe_disabled_description }
-
-    it 'returns correct message' do
-      is_expected.to equal('Notifications have been disabled by the project or group owner')
-    end
-  end
-  describe '#issue_path' do
-    it 'returns correct path' do
-      expect(presenter.issue_path).to eq("/#{group.name}/#{project.name}/-/issues/#{issue.iid}")
     end
   end
 end

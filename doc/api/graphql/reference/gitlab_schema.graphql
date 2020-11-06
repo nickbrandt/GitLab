@@ -7526,11 +7526,6 @@ type EpicIssue implements CurrentUserTodos & Noteable {
   statusPagePublishedIncident: Boolean
 
   """
-  Message to display when the project has email notifications disabled
-  """
-  subscribeDisabledDescription: String!
-
-  """
   Indicates the currently logged in user is subscribed to the issue
   """
   subscribed: Boolean!
@@ -10043,11 +10038,6 @@ type Issue implements CurrentUserTodos & Noteable {
   Indicates whether an issue is published to the status page
   """
   statusPagePublishedIncident: Boolean
-
-  """
-  Message to display when the project has email notifications disabled
-  """
-  subscribeDisabledDescription: String!
 
   """
   Indicates the currently logged in user is subscribed to the issue
