@@ -20,7 +20,7 @@ module Gitlab
         expected_asciidoc_opts = {
             safe: :secure,
             backend: :gitlab_html5,
-            attributes: described_class::DEFAULT_ADOC_ATTRS,
+            attributes: described_class::DEFAULT_ADOC_ATTRS.merge({ "kroki-server-url" => nil }),
             extensions: be_a(Proc)
         }
 
@@ -35,7 +35,7 @@ module Gitlab
           expected_asciidoc_opts = {
               safe: :secure,
               backend: :gitlab_html5,
-              attributes: described_class::DEFAULT_ADOC_ATTRS,
+              attributes: described_class::DEFAULT_ADOC_ATTRS.merge({ "kroki-server-url" => nil }),
               extensions: be_a(Proc)
           }
 
@@ -480,7 +480,11 @@ module Gitlab
           ADOC
 
           output = <<~HTML
-            <div><a class="no-attachment-icon" href="https://kroki.io/graphviz/svg/eNpLyUwvSizIUHBXqOZSUPBIzcnJ17ULzy_KSeGqBQCEzQka" target="_blank" rel="noopener noreferrer"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class="lazy" data-src="https://kroki.io/graphviz/svg/eNpLyUwvSizIUHBXqOZSUPBIzcnJ17ULzy_KSeGqBQCEzQka"></a></div>
+            <div>
+            <div>
+            <a class="no-attachment-icon" href="https://kroki.io/graphviz/svg/eNpLyUwvSizIUHBXqOZSUPBIzcnJ17ULzy_KSeGqBQCEzQka" target="_blank" rel="noopener noreferrer"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Diagram" class="lazy" data-src="https://kroki.io/graphviz/svg/eNpLyUwvSizIUHBXqOZSUPBIzcnJ17ULzy_KSeGqBQCEzQka"></a>
+            </div>
+            </div>
           HTML
 
           expect(render(input, context)).to include(output.strip)
