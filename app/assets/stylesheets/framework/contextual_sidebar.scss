@@ -118,7 +118,7 @@
   bottom: 0;
   left: 0;
   background-color: $white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.24);
+  box-shadow: inset -1px 0 0 $border-color;
   transform: translate3d(0, 0, 0);
 
   &:not(.sidebar-collapsed-desktop) {
@@ -278,12 +278,12 @@
         @include media-breakpoint-up(sm) {
           position: fixed;
           top: 0;
-          left: 1px;
+          left: 0;
           min-width: 150px;
           margin-top: -1px;
           padding: 4px 1px;
           background-color: $white;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.24);
+          box-shadow: 2px 1px 3px $dropdown-shadow-color;
           border: 1px solid $gray-darker;
           border-left: 0;
           border-radius: 0 3px 3px 0;
