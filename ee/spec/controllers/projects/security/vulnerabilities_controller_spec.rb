@@ -76,7 +76,7 @@ RSpec.describe Projects::Security::VulnerabilitiesController do
   end
 
   describe 'GET #new_issue' do
-    let_it_be(:vulnerability) { create(:vulnerability, project: project, author: user) }
+    let_it_be(:vulnerability) { create(:vulnerability, :with_finding, project: project, author: user) }
 
     render_views
 

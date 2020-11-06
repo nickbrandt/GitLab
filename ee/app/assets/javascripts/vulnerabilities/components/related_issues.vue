@@ -1,6 +1,6 @@
 <script>
 import axios from 'axios';
-import { GlButton, GlAlert, GlSprintf, GlLink } from '@gitlab/ui';
+import { GlButton } from '@gitlab/ui';
 import RelatedIssuesStore from '~/related_issues/stores/related_issues_store';
 import RelatedIssuesBlock from '~/related_issues/components/related_issues_block.vue';
 import { issuableTypesMap, PathIdSeparator } from '~/related_issues/constants';
@@ -15,9 +15,6 @@ export default {
   components: {
     RelatedIssuesBlock,
     GlButton,
-    GlAlert,
-    GlSprintf,
-    GlLink,
   },
   props: {
     endpoint: {
@@ -88,6 +85,8 @@ export default {
   },
   methods: {
     createIssue() {
+      this.isProcessingAction = true;
+
       redirectTo(this.newIssueUrl, { params: { vulnerability_id: this.vulnerabilityId } });
     },
     toggleFormVisibility() {
@@ -207,28 +206,6 @@ export default {
 
 <template>
   <div>
-    <gl-alert
-      v-if="errorCreatingIssue"
-      variant="danger"
-      class="gl-mt-5"
-      @dismiss="errorCreatingIssue = false"
-    >
-      <p class="gl-font-weight-bold gl-mb-2">{{ $options.i18n.createIssueErrorTitle }}</p>
-      <p class="gl-mb-0">
-        <gl-sprintf :message="$options.i18n.createIssueErrorBody">
-          <template #tracking="{ content }">
-            <gl-link class="gl-display-inline-block" :href="issueTrackingHelpPath" target="_blank">
-              {{ content }}
-            </gl-link>
-          </template>
-          <template #permissions="{ content }">
-            <gl-link class="gl-display-inline-block" :href="permissionsHelpPath" target="_blank">
-              {{ content }}
-            </gl-link>
-          </template>
-        </gl-sprintf>
-      </p>
-    </gl-alert>
     <related-issues-block
       :help-path="helpPath"
       :is-fetching="isFetching"

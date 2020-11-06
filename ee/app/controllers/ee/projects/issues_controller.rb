@@ -37,19 +37,19 @@ module EE
         ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/4794')
       end
 
-      def vulnerability_issue_link(issue)
-        if params[:vulnerability_id]
-          vulnerability ||= project.vulnerabilities.find(params[:vulnerability_id]).present
+      def create_vulnerability_issue_link(issue)
+        return unless params[:vulnerability_id]
 
-          if issue.valid?
-            VulnerabilityIssueLinks::CreateService.new(
-              current_user,
-              vulnerability.subject,
-              issue,
-              link_type: Vulnerabilities::IssueLink.link_types[:created]
-            ).execute
-          end
-        end
+        vulnerability = project.vulnerabilities.find(params[:vulnerability_id])
+
+        result = VulnerabilityIssueLinks::CreateService.new(
+          current_user,
+          vulnerability,
+          issue,
+          link_type: Vulnerabilities::IssueLink.link_types[:created]
+        ).execute
+
+        flash[:notice] = _('Unable to create link to vulnerability') if result.status == :error
       end
     end
   end

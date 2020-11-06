@@ -74,15 +74,13 @@ RSpec.describe Projects::IssuesController do
 
         context 'when created from a vulnerability' do
           let(:vulnerability) { create(:vulnerability, :with_finding, project: project) }
+          let(:vulnerability_issue_link) { create(:vulnerabilities_issue_link, :created) }
 
           before do
             stub_licensed_features(security_dashboard: true)
           end
 
           it 'links the issue to the vulnerability' do
-            project.add_developer(user)
-            sign_in(user)
-
             post :create, params: {
               namespace_id: project.namespace.to_param,
               project_id: project,
@@ -90,7 +88,22 @@ RSpec.describe Projects::IssuesController do
               vulnerability_id: vulnerability.id
             }
 
-            expect(project.issues.first.vulnerability_links).to be_present
+            expect(project.issues.last.vulnerability_links.first.vulnerability).to eq(vulnerability)
+          end
+
+          it 'shows an error message when the issue link creation fails' do
+            vulnerability_from_link = vulnerability_issue_link.vulnerability
+            vulnerability_from_link.project.add_developer(user)
+            sign_in(user)
+
+            post :create, params: {
+              namespace_id: vulnerability_from_link.project.namespace.to_param,
+              project_id: vulnerability_from_link.project,
+              issue: { title: 'Title', description: 'Description' },
+              vulnerability_id: vulnerability_issue_link.vulnerability.id
+            }
+
+            expect(flash[:notice]).to eq 'Unable to create link to vulnerability'
           end
         end
       end

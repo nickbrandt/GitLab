@@ -28580,6 +28580,9 @@ msgstr ""
 msgid "Unable to convert Kubernetes logs encoding to UTF-8"
 msgstr ""
 
+msgid "Unable to create link to vulnerability"
+msgstr ""
+
 msgid "Unable to fetch unscanned projects"
 msgstr ""
 

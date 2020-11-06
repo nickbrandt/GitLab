@@ -129,6 +129,8 @@ class Projects::IssuesController < Projects::ApplicationController
     service = ::Issues::CreateService.new(project, current_user, create_params)
     @issue = service.execute
 
+    create_vulnerability_issue_link(issue)
+
     if service.discussions_to_resolve.count(&:resolved?) > 0
       flash[:notice] = if service.discussion_to_resolve_id
                          _("Resolved 1 discussion.")
@@ -136,8 +138,6 @@ class Projects::IssuesController < Projects::ApplicationController
                          _("Resolved all discussions.")
                        end
     end
-
-    vulnerability_issue_link(issue)
 
     respond_to do |format|
       format.html do
@@ -374,7 +374,7 @@ class Projects::IssuesController < Projects::ApplicationController
     project_compare_path(project, from: project.default_branch, to: branch[:name])
   end
 
-  def vulnerability_issue_link(issue); end
+  def create_vulnerability_issue_link(issue); end
 
   def create_rate_limit
     key = :issues_create
