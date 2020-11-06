@@ -6,8 +6,12 @@ module Geo
 
     include Delay
 
+    DEFAULT_VERIFICATION_BATCH_SIZE = 10
+
     class_methods do
       extend Gitlab::Utils::Override
+
+      delegate :verification_pending_batch, :verification_failed_batch, :needs_verification_count, to: :verification_query_class
 
       # If replication is disabled, then so is verification.
       override :verification_enabled?
@@ -32,7 +36,59 @@ module Geo
       def trigger_background_verification
         return false unless verification_enabled?
 
-        # TODO: ::Geo::VerificationBatchWorker.perform_with_capacity(self)
+        ::Geo::VerificationBatchWorker.perform_with_capacity(replicable_name)
+      end
+
+      # Called by VerificationBatchWorker.
+      #
+      # - Gets next batch of records that need to be verified
+      # - Verifies them
+      #
+      def verify_batch
+        self.replicator_batch_to_verify.each(&:verify)
+      end
+
+      # Called by VerificationBatchWorker.
+      #
+      # - Asks the DB how many things still need to be verified (with a limit)
+      # - Converts that to a number of batches
+      #
+      # @return [Integer] number of batches of verification work remaining, up to the given maximum
+      def remaining_verification_batch_count(max_batch_count:)
+        needs_verification_count(limit: max_batch_count * verification_batch_size)
+          .fdiv(verification_batch_size)
+          .ceil
+      end
+
+      # @return [Array<Gitlab::Geo::Replicator>] batch of replicators which need to be verified
+      def replicator_batch_to_verify
+        model_record_id_batch_to_verify.map do |id|
+          self.new(model_record_id: id)
+        end
+      end
+
+      # @return [Array<Integer>] list of IDs for this replicator's model which need to be verified
+      def model_record_id_batch_to_verify
+        ids = verification_pending_batch(batch_size: verification_batch_size)
+
+        remaining_batch_size = verification_batch_size - ids.size
+
+        if remaining_batch_size > 0
+          ids += verification_failed_batch(batch_size: remaining_batch_size)
+        end
+
+        ids
+      end
+
+      # If primary, query the model table.
+      # If secondary, query the registry table.
+      def verification_query_class
+        Gitlab::Geo.secondary? ? registry_class : model
+      end
+
+      # @return [Integer] number of records to verify per batch job
+      def verification_batch_size
+        DEFAULT_VERIFICATION_BATCH_SIZE
       end
 
       def checksummed_count
