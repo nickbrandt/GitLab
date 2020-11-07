@@ -46,22 +46,20 @@ describe('~/releases/components/releases_sort.vue', () => {
 
   beforeEach(() => {
     createComponent();
-    sorting = findReleasesSorting();
-    sortingItems = findSortingItems();
   });
 
   it('has all the sortable items', () => {
-    expect(sortingItems).toHaveLength(wrapper.vm.sortOptions.length);
+    expect(findSortingItems()).toHaveLength(wrapper.vm.sortOptions.length);
   });
 
   it('on sort change set sorting in vuex and emit event', () => {
-    sorting.vm.$emit('sortDirectionChange');
+    findReleasesSorting().vm.$emit('sortDirectionChange');
     expect(store.dispatch).toHaveBeenCalledWith('list/setSorting', { sort: 'asc' });
     expect(wrapper.emitted('sort:changed')).toBeTruthy();
   });
 
   it('on sort item click set sorting and emit event', () => {
-    const item = sortingItems.at(0);
+    const item = findSortingItems().at(0);
     const { orderBy } = wrapper.vm.sortOptions[0];
     item.vm.$emit('click');
     expect(store.dispatch).toHaveBeenCalledWith('list/setSorting', { orderBy });
