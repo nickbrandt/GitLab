@@ -17,9 +17,11 @@ export default {
     group: {
       query: getGroupTestCoverage,
       variables() {
+        const ONE_WEEK = 7 * 24 * 60 * 60 * 1000; // milliseconds
+
         return {
           groupFullPath: this.groupFullPath,
-          startDate: new Date(Date.now() - 604800000), // one week ago
+          startDate: new Date(Date.now() - ONE_WEEK),
         };
       },
       result(res) {
