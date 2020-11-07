@@ -53,25 +53,43 @@ export default {
         properties: {},
       };
     },
+    getConstructedRequest() {
+      const { body, method, url, headers = [] } = this.vulnerability.request;
+      const headerLines = this.getHeadersAsCodeBlockLines(headers);
+
+      return [`${method} ${url}\n`, headerLines, '\n\n', body].join('');
+    },
+    getConstructedResponse() {
+      const {
+        body,
+        status_code: statusCode,
+        reason_phrase: reasonPhrase,
+        headers = [],
+      } = this.vulnerability.response;
+      const headerLines = this.getHeadersAsCodeBlockLines(headers);
+
+      return [`${reasonPhrase} ${statusCode}\n`, headerLines, '\n\n', body].join('');
+    },
+    getConstructedRecordedResponse() {
+      const {
+        body,
+        status_code: statusCode,
+        reason_phrase: reasonPhrase,
+        headers = [],
+      } = this.vulnerability.supporting_messages[1].response;
+      const headerLines = this.getHeadersAsCodeBlockLines(headers);
+
+      return [`${reasonPhrase} ${statusCode}\n`, headerLines, '\n\n', body].join('');
+    },
     requestData() {
       if (!this.vulnerability.request) {
         return [];
       }
 
-      const { method, url, headers = [] } = this.vulnerability.request;
-
       return [
         {
-          label: __('%{labelStart}Method:%{labelEnd} %{method}'),
-          content: method,
-        },
-        {
-          label: __('%{labelStart}URL:%{labelEnd} %{url}'),
-          content: url,
-        },
-        {
-          label: __('%{labelStart}Headers:%{labelEnd} %{headers}'),
-          content: this.getHeadersAsCodeBlockLines(headers),
+          label: __('%{labelStart}Sent request:%{labelEnd} %{headers}'),
+          content: this.getConstructedRequest,
           isCode: true,
         },
       ].filter(x => x.content);
@@ -81,20 +99,23 @@ export default {
         return [];
       }
 
-      const {
-        status_code: statusCode,
-        reason_phrase: reasonPhrase,
-        headers = [],
-      } = this.vulnerability.response;
+      return [
+        {
+          label: __('%{labelStart}Actual response:%{labelEnd} %{headers}'),
+          content: this.getConstructedResponse,
+          isCode: true,
+        },
+      ].filter(x => x.content);
+    },
+    recordedResponseData() {
+      if (!this.vulnerability.supporting_messages[1].response) {
+        return [];
+      }
 
       return [
         {
-          label: __('%{labelStart}Status:%{labelEnd} %{status}'),
-          content: statusCode && reasonPhrase ? `${statusCode} ${reasonPhrase}` : '',
-        },
-        {
-          label: __('%{labelStart}Headers:%{labelEnd} %{headers}'),
-          content: this.getHeadersAsCodeBlockLines(headers),
+          label: __('%{labelStart}Unmodified Response%{labelEnd} %{headers}'),
+          content: this.getConstructedRecordedResponse,
           isCode: true,
         },
       ].filter(x => x.content);
@@ -248,7 +269,7 @@ export default {
     </template>
 
     <section v-if="requestData.length" data-testid="request">
-      <h3>{{ s__('Vulnerability|Request') }}</h3>
+      <h3>{{ s__('Vulnerability|Request/Response') }}</h3>
       <ul>
         <detail-item
           v-for="({ label, isCode, content }, index) in requestData"
@@ -263,20 +284,44 @@ export default {
       </ul>
     </section>
 
-    <section v-if="responseData.length" data-testid="response">
-      <h3>{{ s__('Vulnerability|Response') }}</h3>
-      <ul>
-        <detail-item
-          v-for="({ label, isCode, content }, index) in responseData"
-          :key="`${index}:${label}`"
-          :sprintf-message="label"
-        >
-          <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
-          <template v-else>
-            {{ content }}
-          </template>
-        </detail-item>
-      </ul>
-    </section>
+    <div v-if="responseData.length || recordedResponseData.length" class="row">
+      <section
+        v-if="responseData.length"
+        :class="recordedResponseData.length ? 'col-6' : 'col'"
+        data-testid="response"
+      >
+        <ul>
+          <detail-item
+            v-for="({ label, isCode, content }, index) in responseData"
+            :key="`${index}:${label}`"
+            :sprintf-message="label"
+          >
+            <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
+            <template v-else>
+              {{ content }}
+            </template>
+          </detail-item>
+        </ul>
+      </section>
+
+      <section
+        v-if="recordedResponseData.length"
+        :class="responseData.length ? 'col-6' : 'col'"
+        data-testid="response"
+      >
+        <ul>
+          <detail-item
+            v-for="({ label, isCode, content }, index) in recordedResponseData"
+            :key="`${index}:${label}`"
+            :sprintf-message="label"
+          >
+            <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
+            <template v-else>
+              {{ content }}
+            </template>
+          </detail-item>
+        </ul>
+      </section>
+    </div>
   </div>
 </template>
