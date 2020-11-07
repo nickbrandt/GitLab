@@ -158,32 +158,27 @@ describe('Releases State actions', () => {
         });
       });
 
-      describe('when the sort parameter is changed', () => {
-        beforeEach(() => {
-          mockedState.sorting.sort = 'asc';
-          fetchReleasesGraphQl(vuexParams, { before: undefined, after: undefined });
-        });
+      describe('when the sort parameters are provided', () => {
+        it.each`
+          sort      | orderBy          | ReleaseSort
+          ${'asc'}  | ${'released_at'} | ${'RELEASED_AT_ASC'}
+          ${'desc'} | ${'released_at'} | ${'RELEASED_AT_DESC'}
+          ${'asc'}  | ${'created_at'}  | ${'CREATED_ASC'}
+          ${'desc'} | ${'created_at'}  | ${'CREATED_DESC'}
+        `(
+          'correctly sets $ReleaseSort based on $sort and $orderBy',
+          ({ sort, orderBy, ReleaseSort }) => {
+            mockedState.sorting.sort = sort;
+            mockedState.sorting.orderBy = orderBy;
 
-        it('makes a GraphQL query with sort variable for the requested direction', () => {
-          expect(gqClient.query).toHaveBeenCalledWith({
-            query: allReleasesQuery,
-            variables: { fullPath: projectPath, first: PAGE_SIZE, sort: 'RELEASED_AT_ASC' },
-          });
-        });
-      });
+            fetchReleasesGraphQl(vuexParams, { before: undefined, after: undefined });
 
-      describe('when the orderBy parameter is changed', () => {
-        beforeEach(() => {
-          mockedState.sorting.orderBy = 'created_at';
-          fetchReleasesGraphQl(vuexParams, { before: undefined, after: undefined });
-        });
-
-        it('makes a GraphQl query with sort variable for the requested order', () => {
-          expect(gqClient.query).toHaveBeenCalledWith({
-            query: allReleasesQuery,
-            variables: { fullPath: projectPath, first: PAGE_SIZE, sort: 'CREATED_DESC' },
-          });
-        });
+            expect(gqClient.query).toHaveBeenCalledWith({
+              query: allReleasesQuery,
+              variables: { fullPath: projectPath, first: PAGE_SIZE, sort: ReleaseSort },
+            });
+          },
+        );
       });
     });
 
