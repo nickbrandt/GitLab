@@ -37,8 +37,7 @@ export default {
       this.$emit('sort:changed');
     },
     isActiveSortItem(item) {
-      const [itemOrderBy] = item.split(' ');
-      return this.orderBy === itemOrderBy;
+      return this.orderBy === item;
     },
   },
 };
