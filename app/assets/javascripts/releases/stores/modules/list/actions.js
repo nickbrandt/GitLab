@@ -44,7 +44,7 @@ export const fetchReleasesGraphQl = (
 
   const { sort, orderBy } = state.sorting;
   const orderByParam = orderBy === 'created_at' ? 'created' : orderBy;
-  const sortParams = `${orderByParam.toUpperCase()}_${sort.toUpperCase()}`;
+  const sortParams = `${orderByParam}_${sort}`.toUpperCase();
 
   let paginationParams;
   if (!before && !after) {
