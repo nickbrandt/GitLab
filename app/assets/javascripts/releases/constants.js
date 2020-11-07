@@ -17,14 +17,16 @@ export const PAGE_SIZE = 20;
 
 export const ASCENDING_ODER = 'asc';
 export const DESCENDING_ORDER = 'desc';
+export const RELEASED_AT = 'released_at';
+export const CREATED_AT = 'created_at';
 
 export const SORT_OPTIONS = [
   {
-    orderBy: 'released_at',
+    orderBy: RELEASED_AT,
     label: __('Released date'),
   },
   {
-    orderBy: 'created_at',
+    orderBy: CREATED_AT,
     label: __('Created date'),
   },
 ];

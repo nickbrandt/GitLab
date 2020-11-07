@@ -1,3 +1,5 @@
+import { DESCENDING_ORDER, RELEASED_AT } from '../../../constants';
+
 export default ({
   projectId,
   projectPath,
@@ -17,7 +19,7 @@ export default ({
   restPageInfo: {},
   graphQlPageInfo: {},
   sorting: {
-    sort: 'desc',
-    orderBy: 'released_at',
+    sort: DESCENDING_ORDER,
+    orderBy: RELEASED_AT,
   },
 });
