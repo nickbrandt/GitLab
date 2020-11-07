@@ -1,7 +1,6 @@
 import Vuex from 'vuex';
 import { GlSorting, GlSortingItem } from '@gitlab/ui';
-import { mount, createLocalVue } from '@vue/test-utils';
-import stubChildren from 'helpers/stub_children';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ReleasesSort from '~/releases/components/releases_sort.vue';
 import createStore from '~/releases/stores';
 import createListModule from '~/releases/stores/modules/list';
@@ -28,10 +27,9 @@ describe('~/releases/components/releases_sort.vue', () => {
 
     store.dispatch = jest.fn();
 
-    wrapper = mount(ReleasesSort, {
+    wrapper = shallowMount(ReleasesSort, {
       store,
       stubs: {
-        ...stubChildren(ReleasesSort),
         GlSortingItem,
       },
       localVue,
