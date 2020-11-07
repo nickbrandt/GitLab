@@ -11,9 +11,7 @@ localVue.use(Vuex);
 describe('~/releases/components/releases_sort.vue', () => {
   let wrapper;
   let store;
-  let sorting;
   let listModule;
-  let sortingItems;
   const projectId = 8;
 
   const createComponent = () => {
