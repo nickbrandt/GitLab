@@ -53,6 +53,9 @@ export default {
         properties: {},
       };
     },
+    assert() {
+      return this.vulnerability.evidence_source?.name;
+    },
     getConstructedRequest() {
       const { body, method, url, headers = [] } = this.vulnerability.request;
       const headerLines = this.getHeadersAsCodeBlockLines(headers);
@@ -323,5 +326,14 @@ export default {
         </ul>
       </section>
     </div>
+
+    <template v-if="assert">
+      <h3>{{ __('Additional Info') }}</h3>
+      <ul>
+        <detail-item :sprintf-message="__('%{labelStart}Assert:%{labelEnd} %{assert}')"
+          >{{ assert }}
+        </detail-item>
+      </ul>
+    </template>
   </div>
 </template>
