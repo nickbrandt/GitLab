@@ -1,5 +1,5 @@
 <script>
-import { GlLink, GlSprintf } from '@gitlab/ui';
+import { GlLink, GlSprintf, GlTooltipDirective, GlIcon } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import CodeBlock from '~/vue_shared/components/code_block.vue';
 import { __ } from '~/locale';
@@ -7,7 +7,10 @@ import DetailItem from './detail_item.vue';
 
 export default {
   name: 'VulnerabilityDetails',
-  components: { CodeBlock, GlLink, SeverityBadge, DetailItem, GlSprintf },
+  components: { CodeBlock, GlLink, SeverityBadge, DetailItem, GlSprintf, GlIcon },
+  directives: {
+    GlTooltip: GlTooltipDirective,
+  },
   props: {
     vulnerability: {
       type: Object,
@@ -289,25 +292,6 @@ export default {
 
     <div v-if="responseData.length || recordedResponseData.length" class="row">
       <section
-        v-if="responseData.length"
-        :class="recordedResponseData.length ? 'col-6' : 'col'"
-        data-testid="response"
-      >
-        <ul>
-          <detail-item
-            v-for="({ label, isCode, content }, index) in responseData"
-            :key="`${index}:${label}`"
-            :sprintf-message="label"
-          >
-            <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
-            <template v-else>
-              {{ content }}
-            </template>
-          </detail-item>
-        </ul>
-      </section>
-
-      <section
         v-if="recordedResponseData.length"
         :class="responseData.length ? 'col-6' : 'col'"
         data-testid="response"
@@ -318,6 +302,46 @@ export default {
             :key="`${index}:${label}`"
             :sprintf-message="label"
           >
+            <gl-icon
+              v-gl-tooltip
+              name="information-o"
+              class="gl-hover-cursor-pointer gl-mr-3"
+              :title="
+                s__(
+                  'Vulnerability|The unmodified response is the original response that had no mutations done to the request',
+                )
+              "
+            />
+            <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
+            <template v-else>
+              {{ content }}
+            </template>
+          </detail-item>
+        </ul>
+      </section>
+
+      <section
+        v-if="responseData.length"
+        :class="recordedResponseData.length ? 'col-6' : 'col'"
+        data-testid="response"
+      >
+        <ul>
+          <detail-item
+            v-for="({ label, isCode, content }, index) in responseData"
+            :key="`${index}:${label}`"
+            :sprintf-message="label"
+          >
+            <gl-icon
+              v-gl-tooltip
+              name="information-o"
+              :size="16"
+              class="gl-hover-cursor-pointer gl-mr-3"
+              :title="
+                s__(
+                  'Vulnerability|Actual received response is the one received when this fault was detected',
+                )
+              "
+            />
             <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
             <template v-else>
               {{ content }}
