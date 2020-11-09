@@ -422,11 +422,11 @@ w
    api.trackRedisHllUserEvent('my_already_defined_event_name'),
    ```
 
-1. Track event using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event(entity_id, event_name)`.
+1. Track event using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event(values, event_name)`.
 
    Arguments:
 
-   - `entity_id`: value we count. For example: user_id, visitor_id.
+   - `values`: One value or array of values we count. For example: user_id, visitor_id, user_ids.
    - `event_name`: event name.
 
 1. Get event data using `Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names:, start_date:, end_date)`.
