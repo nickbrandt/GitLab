@@ -532,6 +532,12 @@ msgstr ""
 msgid "%{issuesSize} with a limit of %{maxIssueCount}"
 msgstr ""
 
+msgid "%{labelStart}Actual response:%{labelEnd} %{headers}"
+msgstr ""
+
+msgid "%{labelStart}Assert:%{labelEnd} %{assert}"
+msgstr ""
+
 msgid "%{labelStart}Class:%{labelEnd} %{class}"
 msgstr ""
 
@@ -545,9 +551,6 @@ msgid "%{labelStart}Evidence:%{labelEnd} %{evidence}"
 msgstr ""
 
 msgid "%{labelStart}File:%{labelEnd} %{file}"
-msgstr ""
-
-msgid "%{labelStart}Headers:%{labelEnd} %{headers}"
 msgstr ""
 
 msgid "%{labelStart}Image:%{labelEnd} %{image}"
@@ -565,13 +568,13 @@ msgstr ""
 msgid "%{labelStart}Scanner:%{labelEnd} %{scanner}"
 msgstr ""
 
+msgid "%{labelStart}Sent request:%{labelEnd} %{headers}"
+msgstr ""
+
 msgid "%{labelStart}Severity:%{labelEnd} %{severity}"
 msgstr ""
 
-msgid "%{labelStart}Status:%{labelEnd} %{status}"
-msgstr ""
-
-msgid "%{labelStart}URL:%{labelEnd} %{url}"
+msgid "%{labelStart}Unmodified response:%{labelEnd} %{headers}"
 msgstr ""
 
 msgid "%{label_for_message} unavailable"
@@ -1797,6 +1800,9 @@ msgid "Added in this version"
 msgstr ""
 
 msgid "Adding new applications is disabled in your GitLab instance. Please contact your GitLab administrator to get the permission"
+msgstr ""
+
+msgid "Additional Info"
 msgstr ""
 
 msgid "Additional Metadata"
@@ -29694,6 +29700,9 @@ msgstr ""
 msgid "Vulnerability|Activity"
 msgstr ""
 
+msgid "Vulnerability|Actual received response is the one received when this fault was detected"
+msgstr ""
+
 msgid "Vulnerability|Class"
 msgstr ""
 
@@ -29742,10 +29751,7 @@ msgstr ""
 msgid "Vulnerability|Project"
 msgstr ""
 
-msgid "Vulnerability|Request"
-msgstr ""
-
-msgid "Vulnerability|Response"
+msgid "Vulnerability|Request/Response"
 msgstr ""
 
 msgid "Vulnerability|Scanner"
@@ -29758,6 +29764,9 @@ msgid "Vulnerability|Severity"
 msgstr ""
 
 msgid "Vulnerability|Status"
+msgstr ""
+
+msgid "Vulnerability|The unmodified response is the original response that had no mutations done to the request"
 msgstr ""
 
 msgid "Wait for the file to load to copy its contents"
@@ -31238,6 +31247,9 @@ msgid "ciReport|(is loading)"
 msgstr ""
 
 msgid "ciReport|(is loading, errors when loading results)"
+msgstr ""
+
+msgid "ciReport|API Fuzzing"
 msgstr ""
 
 msgid "ciReport|All projects"

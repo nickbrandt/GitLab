@@ -1,4 +1,4 @@
-import { s__ } from '~/locale';
+import { s__, __ } from '~/locale';
 
 export const VULNERABILITY_STATE_OBJECTS = {
   detected: {
@@ -64,4 +64,8 @@ export const RELATED_ISSUES_ERRORS = {
 export const REGEXES = {
   ISSUE_FORMAT: /^#?(\d+)$/, // Matches '123' and '#123'.
   LINK_FORMAT: /\/(.+\/.+)\/-\/issues\/(\d+)/, // Matches '/username/project/-/issues/123'.
+};
+
+export const SUPPORTING_MESSAGE_TYPES = {
+  RECORDED: __('Recorded'),
 };

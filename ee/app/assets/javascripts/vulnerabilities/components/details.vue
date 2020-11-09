@@ -1,5 +1,6 @@
 <script>
 import { GlLink, GlSprintf, GlTooltipDirective, GlIcon } from '@gitlab/ui';
+import { SUPPORTING_MESSAGE_TYPES } from 'ee/vulnerabilities/constants';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import CodeBlock from '~/vue_shared/components/code_block.vue';
 import { __ } from '~/locale';
@@ -63,7 +64,9 @@ export default {
       const { body, method, url, headers = [] } = this.vulnerability.request;
       const headerLines = this.getHeadersAsCodeBlockLines(headers);
 
-      return [`${method} ${url}\n`, headerLines, '\n\n', body].join('');
+      return method && url && headerLines
+        ? [`${method} ${url}\n`, headerLines, '\n\n', body].join('')
+        : '';
     },
     getConstructedResponse() {
       const {
@@ -74,7 +77,9 @@ export default {
       } = this.vulnerability.response;
       const headerLines = this.getHeadersAsCodeBlockLines(headers);
 
-      return [`${reasonPhrase} ${statusCode}\n`, headerLines, '\n\n', body].join('');
+      return statusCode && reasonPhrase && headerLines
+        ? [`${reasonPhrase} ${statusCode}\n`, headerLines, '\n\n', body].join('')
+        : '';
     },
     getConstructedRecordedResponse() {
       const {
@@ -82,10 +87,12 @@ export default {
         status_code: statusCode,
         reason_phrase: reasonPhrase,
         headers = [],
-      } = this.vulnerability.supporting_messages[1].response;
+      } = this.vulnerability?.supporting_messages[1].response;
       const headerLines = this.getHeadersAsCodeBlockLines(headers);
 
-      return [`${reasonPhrase} ${statusCode}\n`, headerLines, '\n\n', body].join('');
+      return statusCode && reasonPhrase && headerLines
+        ? [`${reasonPhrase} ${statusCode}\n`, headerLines, '\n\n', body].join('')
+        : '';
     },
     requestData() {
       if (!this.vulnerability.request) {
@@ -114,13 +121,18 @@ export default {
       ].filter(x => x.content);
     },
     recordedResponseData() {
-      if (!this.vulnerability.supporting_messages[1].response) {
+      if (
+        !(
+          this.vulnerability?.supporting_messages &&
+          this.vulnerability.supporting_messages[1]?.name === SUPPORTING_MESSAGE_TYPES.RECORDED
+        )
+      ) {
         return [];
       }
 
       return [
         {
-          label: __('%{labelStart}Unmodified Response%{labelEnd} %{headers}'),
+          label: __('%{labelStart}Unmodified response:%{labelEnd} %{headers}'),
           content: this.getConstructedRecordedResponse,
           isCode: true,
         },
@@ -294,7 +306,7 @@ export default {
       <section
         v-if="recordedResponseData.length"
         :class="responseData.length ? 'col-6' : 'col'"
-        data-testid="response"
+        data-testid="recorded-response"
       >
         <ul>
           <detail-item
