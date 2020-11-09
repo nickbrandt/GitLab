@@ -15,7 +15,7 @@ RSpec.describe Gitlab::BackgroundMigration::UpdateExistingUsersThatRequireTwoFac
   describe '#perform' do
     context 'with group members' do
       let(:user_1) { users_table.create!(email: 'user@example.com', projects_limit: 10, require_two_factor_authentication_from_group: true) }
-      let!(:member) { members_table.create!(user_id: user_1.id, source_id: group_with_2fa_parent.id, access_level: GroupMember::MAINTAINER, source_type: "Namespace", type: "GroupMember",  notification_level: 3) }
+      let!(:member) { members_table.create!(user_id: user_1.id, source_id: group_with_2fa_parent.id, access_level: GroupMember::MAINTAINER, source_type: "Namespace", type: "GroupMember", notification_level: 3) }
       let!(:user_without_group) { users_table.create!(email: 'user_without@example.com', projects_limit: 10, require_two_factor_authentication_from_group: true) }
       let(:user_other) { users_table.create!(email: 'user_other@example.com', projects_limit: 10, require_two_factor_authentication_from_group: true) }
       let!(:member_other) { members_table.create!(user_id: user_other.id, source_id: group_with_2fa_parent.id, access_level: GroupMember::MAINTAINER, source_type: "Namespace", type: "GroupMember", notification_level: 3) }
@@ -27,8 +27,8 @@ RSpec.describe Gitlab::BackgroundMigration::UpdateExistingUsersThatRequireTwoFac
       end
 
       it 'does not update user when user should be required to establish two factor authentication' do
-        group =  create_namespace('other', Gitlab::VisibilityLevel::PRIVATE, require_two_factor_authentication: true)
-        members_table.create!(user_id: user_1.id, source_id: group.id, access_level: GroupMember::MAINTAINER, source_type: "Namespace", type: "GroupMember",  notification_level: 3)
+        group = create_namespace('other', Gitlab::VisibilityLevel::PRIVATE, require_two_factor_authentication: true)
+        members_table.create!(user_id: user_1.id, source_id: group.id, access_level: GroupMember::MAINTAINER, source_type: "Namespace", type: "GroupMember", notification_level: 3)
 
         subject.perform(user_1.id, user_without_group.id)
 
