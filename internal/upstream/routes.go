@@ -111,7 +111,7 @@ func (u *upstream) route(method, regexpStr string, handler http.Handler, opts ..
 	handler = denyWebsocket(handler) // Disallow websockets
 	if options.tracing {
 		// Add distributed tracing
-		handler = tracing.Handler(handler)
+		handler = tracing.Handler(handler, tracing.WithRouteIdentifier(regexpStr))
 	}
 
 	return routeEntry{
