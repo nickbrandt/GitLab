@@ -84,7 +84,7 @@ export default {
               {{ job.name }}
             </h4>
           </tooltip-on-truncate>
-          <div class="flex-grow-1 flex-shrink-0 text-right">
+          <div class="gl-flex-grow-1 gl-flex-shrink-0 gl-text-right">
             <job-sidebar-retry-button
               v-if="job.retry_path"
               :category="retryButtonCategory"
@@ -96,7 +96,7 @@ export default {
             <gl-link
               v-if="job.cancel_path"
               :href="job.cancel_path"
-              class="btn btn-default"
+              class="gl-button btn btn-default"
               data-method="post"
               data-testid="cancel-button"
               rel="nofollow"
@@ -113,18 +113,18 @@ export default {
           />
         </div>
 
-        <div v-if="job.terminal_path || job.new_issue_path" class="block retry-link">
+        <div v-if="job.terminal_path || job.new_issue_path" class="block">
           <gl-link
             v-if="job.new_issue_path"
             :href="job.new_issue_path"
-            class="btn btn-success btn-inverted float-left mr-2"
+            class="gl-button btn btn-success btn-inverted float-left gl-mr-3"
             data-testid="job-new-issue"
             >{{ $options.i18n.newIssue }}
           </gl-link>
           <gl-link
             v-if="job.terminal_path"
             :href="job.terminal_path"
-            class="btn btn-primary btn-inverted visible-md-block visible-lg-block float-left"
+            class="gl-button btn btn-primary btn-inverted float-left"
             target="_blank"
             data-testid="terminal-link"
           >

@@ -95,8 +95,10 @@ export default {
     <detail-row v-if="job.coverage" :value="coverage" title="Coverage" />
 
     <p v-if="hasTags" class="build-detail-row" data-testid="job-tags">
-      <span class="font-weight-bold">{{ __('Tags:') }}</span>
-      <span v-for="(tag, i) in job.tags" :key="i" class="badge badge-primary mr-1">{{ tag }}</span>
+      <span class="gl-font-weight-bold">{{ __('Tags:') }}</span>
+      <span v-for="(tag, i) in job.tags" :key="i" class="badge badge-primary gl-mr-2">{{
+        tag
+      }}</span>
     </p>
   </div>
 </template>
