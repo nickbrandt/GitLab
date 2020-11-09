@@ -14,6 +14,8 @@ const POLL_INTERVAL = 10000;
 
 export default {
   name: 'PipelineHeaderSection',
+  pipelineCancel: 'pipelineCancel',
+  pipelineRetry: 'pipelineRetry',
   components: {
     ciHeader,
     GlAlert,
@@ -125,16 +127,14 @@ export default {
     reportFailure(errorType) {
       this.failureType = errorType;
     },
-    async cancelPipeline() {
-      this.isCanceling = true;
-
+    async postPipelineAction(name, mutation) {
       try {
         const {
           data: {
-            pipelineCancel: { errors },
+            [name]: { errors },
           },
         } = await this.$apollo.mutate({
-          mutation: cancelPipelineMutation,
+          mutation,
           variables: { id: this.pipeline.id },
         });
 
@@ -147,27 +147,13 @@ export default {
         this.reportFailure(POST_FAILURE);
       }
     },
-    async retryPipeline() {
+    cancelPipeline() {
+      this.isCanceling = true;
+      this.postPipelineAction(this.$options.pipelineCancel, cancelPipelineMutation);
+    },
+    retryPipeline() {
       this.isRetrying = true;
-
-      try {
-        const {
-          data: {
-            pipelineRetry: { errors },
-          },
-        } = await this.$apollo.mutate({
-          mutation: retryPipelineMutation,
-          variables: { id: this.pipeline.id },
-        });
-
-        if (errors.length > 0) {
-          this.reportFailure(POST_FAILURE);
-        } else {
-          this.$apollo.queries.pipeline.refetch();
-        }
-      } catch {
-        this.reportFailure(POST_FAILURE);
-      }
+      this.postPipelineAction(this.$options.pipelineRetry, retryPipelineMutation);
     },
     async deletePipeline() {
       this.isDeleting = true;
