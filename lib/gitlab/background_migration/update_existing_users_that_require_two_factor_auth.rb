@@ -9,12 +9,12 @@ module Gitlab
       end
 
       def perform(start_id, stop_id)
-        user_ids = User.where(id: start_id..stop_id).where(require_two_factor_authentication_from_group: true).select(:id)
+        user_ids = User.where(id: start_id..stop_id).where(require_two_factor_authentication_from_group: true).pluck(:id)
 
         ActiveRecord::Base.connection.execute <<~SQL
           UPDATE users
           SET require_two_factor_authentication_from_group = FALSE
-          WHERE users.id IN #{user_ids}
+          WHERE users.id IN (#{user_ids.join(',')})
           AND users.require_two_factor_authentication_from_group = TRUE
           AND users.id NOT IN (
           SELECT users_groups_query.user_id FROM (SELECT users.id as user_id, members.source_id as group_ids FROM users
@@ -22,7 +22,7 @@ module Gitlab
           AND members.requested_at IS NULL AND members.user_id = users.id
           AND members.type = 'GroupMember'
           WHERE users.require_two_factor_authentication_from_group = TRUE
-          AND users.id IN #{user_ids}
+          AND users.id IN (#{user_ids.join(',')})
           ) AS users_groups_query
           INNER JOIN LATERAL (
           WITH RECURSIVE "base_and_ancestors" AS ((SELECT "namespaces".* FROM "namespaces" WHERE "namespaces"."type" = 'Group' AND "namespaces"."id" = users_groups_query.group_ids)
