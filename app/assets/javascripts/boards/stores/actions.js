@@ -324,7 +324,7 @@ export default {
   },
 
   setActiveIssueLabels: async ({ commit, getters }, input) => {
-    const activeIssue = getters.getActiveIssue;
+    const { activeIssue } = getters;
     const { data } = await gqlClient.mutate({
       mutation: issueSetLabels,
       variables: {
@@ -349,7 +349,7 @@ export default {
   },
 
   setActiveIssueDueDate: async ({ commit, getters }, input) => {
-    const activeIssue = getters.getActiveIssue;
+    const { activeIssue } = getters;
     const { data } = await gqlClient.mutate({
       mutation: issueSetDueDate,
       variables: {
