@@ -129,12 +129,20 @@ export default {
       this.isCanceling = true;
 
       try {
-        await this.$apollo.mutate({
+        const {
+          data: {
+            pipelineCancel: { errors },
+          },
+        } = await this.$apollo.mutate({
           mutation: cancelPipelineMutation,
           variables: { id: this.pipeline.id },
         });
 
-        this.$apollo.queries.pipeline.refetch();
+        if (errors.length > 0) {
+          this.reportFailure(POST_FAILURE);
+        } else {
+          this.$apollo.queries.pipeline.refetch();
+        }
       } catch {
         this.reportFailure(POST_FAILURE);
       }
@@ -143,12 +151,20 @@ export default {
       this.isRetrying = true;
 
       try {
-        await this.$apollo.mutate({
+        const {
+          data: {
+            pipelineRetry: { errors },
+          },
+        } = await this.$apollo.mutate({
           mutation: retryPipelineMutation,
           variables: { id: this.pipeline.id },
         });
 
-        this.$apollo.queries.pipeline.refetch();
+        if (errors.length > 0) {
+          this.reportFailure(POST_FAILURE);
+        } else {
+          this.$apollo.queries.pipeline.refetch();
+        }
       } catch {
         this.reportFailure(POST_FAILURE);
       }
@@ -158,14 +174,23 @@ export default {
       this.$apollo.queries.pipeline.stopPolling();
 
       try {
-        await this.$apollo.mutate({
+        const {
+          data: {
+            pipelineDestroy: { errors },
+          },
+        } = await this.$apollo.mutate({
           mutation: deletePipelineMutation,
           variables: {
             id: this.pipeline.id,
           },
         });
 
-        redirectTo(setUrlFragment(this.paths.pipelinesPath, 'delete_success'));
+        if (errors.length > 0) {
+          this.reportFailure(DELETE_FAILURE);
+          this.isDeleting = false;
+        } else {
+          redirectTo(setUrlFragment(this.paths.pipelinesPath, 'delete_success'));
+        }
       } catch {
         this.$apollo.queries.pipeline.startPolling(POLL_INTERVAL);
         this.reportFailure(DELETE_FAILURE);
