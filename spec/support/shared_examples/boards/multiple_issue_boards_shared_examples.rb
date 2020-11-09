@@ -56,7 +56,7 @@ RSpec.shared_examples 'multiple issue boards' do
       expect(page).to have_content('Are you sure you want to delete this board?')
       click_button 'Delete'
 
-      wait_for_requests
+      wait_for_all_requests
 
       in_boards_switcher_dropdown do
         expect(page).not_to have_content(board.name)
