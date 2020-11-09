@@ -43,7 +43,6 @@ To view a list of releases:
   - On private projects, this number is visible to users with Reporter
     [permissions](../../permissions.md#project-members-permissions) or higher.
 
-
 ### Sort Releases
 
 On the top right of the **Releases** page, you can use the sorting button to order releases by their "Released date" or "Created date" and sort releases in ascending or descending order.
