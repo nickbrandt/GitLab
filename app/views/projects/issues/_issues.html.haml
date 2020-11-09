@@ -12,7 +12,7 @@
     'can-bulk-edit': @can_bulk_update.to_json,
     'sort-key': @sort,
     type: type,
-    'scoped-labels': scoped_labels_available?(@project).to_json } }
+    'scoped-labels-available': scoped_labels_available?(@project).to_json } }
 - else
   - empty_state_path = local_assigns.fetch(:empty_state_path, 'shared/empty_states/issues')
   %ul.content-list.issues-list.issuable-list{ class: ("manual-ordering" if @sort == 'relative_position') }

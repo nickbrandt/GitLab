@@ -37,7 +37,7 @@ export default {
     openedAgoJira: __('opened %{timeAgoString} by %{user} in Jira'),
   },
   inject: {
-    scopedLabels: ['scopedLabels'],
+    scopedLabelsAvailable: ['scopedLabelsAvailable'],
   },
   components: {
     IssueAssignees,
@@ -219,7 +219,7 @@ export default {
       return mergeUrlParams(params, this.baseUrl);
     },
     isScoped({ name }) {
-      return isScopedLabel({ title: name }) && this.scopedLabels;
+      return isScopedLabel({ title: name }) && this.scopedLabelsAvailable;
     },
     labelHref({ name }) {
       if (this.isJiraIssue) {
