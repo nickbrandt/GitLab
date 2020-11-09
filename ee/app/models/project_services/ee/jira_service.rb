@@ -6,7 +6,7 @@ module EE
 
     prepended do
       validates :project_key, presence: true, if: :issues_enabled
-      validates :issue_key, presence: true, if: :vulnerabilities_enabled
+      validates :vulnerabilities_issuetype, presence: true, if: :vulnerabilities_enabled
     end
 
     def issuetypes

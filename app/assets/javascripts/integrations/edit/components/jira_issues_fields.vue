@@ -140,7 +140,7 @@ export default {
           <gl-form-group
             v-if="enableJiraIssuesFromVulnerabilities"
             :label="s__('JiraService|Jira issue type')"
-            label-for="service_issue_key"
+            label-for="service_vulnerabilities_issuetype"
           >
             <p>
             {{
@@ -156,7 +156,7 @@ export default {
               )
             }}
             </p>
-            <gl-form-radio-group v-model="issueKey" name="service[issue_key]">
+            <gl-form-radio-group v-model="issueKey" name="service[vulnerabilities_issuetype]">
               <gl-form-radio
                 v-for="issuetype in issueTypes"
                 :key="issuetype.name"

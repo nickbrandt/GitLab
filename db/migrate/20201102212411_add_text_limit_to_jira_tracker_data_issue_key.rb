@@ -8,10 +8,10 @@ class AddTextLimitToJiraTrackerDataIssueKey < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_text_limit :jira_tracker_data, :issue_key, 255
+    add_text_limit :jira_tracker_data, :vulnerabilities_issuetype, 255
   end
 
   def down
-    remove_text_limit :jira_tracker_data, :issue_key
+    remove_text_limit :jira_tracker_data, :vulnerabilities_issuetype
   end
 end

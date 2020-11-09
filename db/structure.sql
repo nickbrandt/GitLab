@@ -13168,10 +13168,10 @@ CREATE TABLE jira_tracker_data (
     project_key text,
     issues_enabled boolean DEFAULT false NOT NULL,
     deployment_type smallint DEFAULT 0 NOT NULL,
-    issue_key text,
+    vulnerabilities_issuetype text,
     vulnerabilities_enabled boolean DEFAULT false NOT NULL,
     CONSTRAINT check_214cf6a48b CHECK ((char_length(project_key) <= 255)),
-    CONSTRAINT check_3957208a80 CHECK ((char_length(issue_key) <= 255))
+    CONSTRAINT check_3957208a80 CHECK ((char_length(vulnerabilities_issuetype) <= 255))
 );
 
 CREATE SEQUENCE jira_tracker_data_id_seq
