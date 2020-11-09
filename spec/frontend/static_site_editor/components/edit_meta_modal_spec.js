@@ -36,8 +36,9 @@ describe('~/static_site_editor/components/edit_meta_modal.vue', () => {
 
   const buildMockAxios = () => {
     mockAxios = new MockAdapter(axios);
+    const templatesMergeRequestsPath = `templates/merge_request`;
     mockAxios
-      .onGet(`${namespace}/${project}/templates/merge_request`)
+      .onGet(`${namespace}/${project}/${templatesMergeRequestsPath}`)
       .reply(200, mergeRequestTemplates);
   };
 

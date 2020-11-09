@@ -461,11 +461,12 @@ const Api = {
   },
 
   issueTemplate(namespacePath, projectPath, key, type, callback) {
-    const url = Api.buildUrl(Api.issuableTemplatePath)
-      .replace(':key', encodeURIComponent(key))
-      .replace(':type', type)
-      .replace(':project_path', projectPath)
-      .replace(':namespace_path', namespacePath);
+    const url = this.buildIssueTemplateUrl(
+      Api.issuableTemplatePath,
+      type,
+      projectPath,
+      namespacePath,
+    ).replace(':key', encodeURIComponent(key));
     return axios
       .get(url)
       .then(({ data }) => callback(null, data))
@@ -473,14 +474,23 @@ const Api = {
   },
 
   issueTemplates(namespacePath, projectPath, type, callback) {
-    const url = Api.buildUrl(Api.issuableTemplatesPath)
-      .replace(':type', type)
-      .replace(':project_path', projectPath)
-      .replace(':namespace_path', namespacePath);
+    const url = this.buildIssueTemplateUrl(
+      Api.issuableTemplatesPath,
+      type,
+      projectPath,
+      namespacePath,
+    );
     return axios
       .get(url)
       .then(({ data }) => callback(null, data))
       .catch(callback);
+  },
+
+  buildIssueTemplateUrl(path, type, projectPath, namespacePath) {
+    return Api.buildUrl(path)
+      .replace(':type', type)
+      .replace(':project_path', projectPath)
+      .replace(':namespace_path', namespacePath);
   },
 
   users(query, options) {

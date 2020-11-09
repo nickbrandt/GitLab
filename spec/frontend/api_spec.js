@@ -553,14 +553,15 @@ describe('Api', () => {
   });
 
   describe('issueTemplate', () => {
+    const namespace = 'some namespace';
+    const project = 'some project';
+    const templateKey = ' template #%?.key ';
+    const templateType = 'template type';
+    const expectedUrl = `${dummyUrlRoot}/${namespace}/${project}/templates/${templateType}/${encodeURIComponent(
+      templateKey,
+    )}`;
+
     it('fetches an issue template', done => {
-      const namespace = 'some namespace';
-      const project = 'some project';
-      const templateKey = ' template #%?.key ';
-      const templateType = 'template type';
-      const expectedUrl = `${dummyUrlRoot}/${namespace}/${project}/templates/${templateType}/${encodeURIComponent(
-        templateKey,
-      )}`;
       mock.onGet(expectedUrl).reply(httpStatus.OK, 'test');
 
       Api.issueTemplate(namespace, project, templateKey, templateType, (error, response) => {
@@ -568,14 +569,25 @@ describe('Api', () => {
         done();
       });
     });
+
+    describe('when an error occurs while fetching an issue template', () => {
+      it('rejects the Promise', () => {
+        mock.onGet(expectedUrl).replyOnce(httpStatus.INTERNAL_SERVER_ERROR);
+
+        Api.issueTemplate(namespace, project, templateKey, templateType, () => {
+          expect(mock.history.get).toHaveLength(1);
+        });
+      });
+    });
   });
 
   describe('issueTemplates', () => {
+    const namespace = 'some namespace';
+    const project = 'some project';
+    const templateType = 'template type';
+    const expectedUrl = `${dummyUrlRoot}/${namespace}/${project}/templates/${templateType}`;
+
     it('fetches all templates by type', done => {
-      const namespace = 'some namespace';
-      const project = 'some project';
-      const templateType = 'template type';
-      const expectedUrl = `${dummyUrlRoot}/${namespace}/${project}/templates/${templateType}`;
       const expectedData = [
         { key: 'Template1', name: 'Template 1', content: 'This is template 1!' },
       ];
@@ -588,6 +600,16 @@ describe('Api', () => {
         expect(name).toBe('Template 1');
         expect(content).toBe('This is template 1!');
         done();
+      });
+    });
+
+    describe('when an error occurs while fetching issue templates', () => {
+      it('rejects the Promise', () => {
+        mock.onGet(expectedUrl).replyOnce(httpStatus.INTERNAL_SERVER_ERROR);
+
+        Api.issueTemplates(namespace, project, templateType, () => {
+          expect(mock.history.get).toHaveLength(1);
+        });
       });
     });
   });

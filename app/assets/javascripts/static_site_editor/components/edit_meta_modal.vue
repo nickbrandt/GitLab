@@ -66,7 +66,8 @@ export default {
       this.$refs.modal.hide();
     },
     initTemplates() {
-      Api.issueTemplates(this.namespace, this.project, ISSUABLE_TYPE, (err, templates) => {
+      const { namespace, project } = this;
+      Api.issueTemplates(namespace, project, ISSUABLE_TYPE, (err, templates) => {
         if (err) return; // Error handled by global AJAX error handler
         this.mergeRequestTemplates = templates;
       });
