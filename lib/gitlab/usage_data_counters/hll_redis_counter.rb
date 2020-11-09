@@ -49,7 +49,7 @@ module Gitlab
 
         def track_event_in_context(value, event_name, context, time = Time.zone.now)
           return if context.blank?
-          return if context.present? && !context.in?(valid_context_list)
+          return unless context.in?(valid_context_list)
 
           track(value, event_name, context: context, time: time)
         end

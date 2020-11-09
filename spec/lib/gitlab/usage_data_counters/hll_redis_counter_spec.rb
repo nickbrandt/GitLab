@@ -319,7 +319,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
       end
     end
 
-    context 'with empty invalid context' do
+    context 'with invalid context' do
       it 'raise error' do
         expect { described_class.unique_events(event_names: 'event_name_1', start_date: 4.weeks.ago, end_date: Date.current, context: invalid_context) }.to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::InvalidContext)
       end
