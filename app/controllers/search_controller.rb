@@ -23,10 +23,6 @@ class SearchController < ApplicationController
     search_term_present && !params[:project_id].present?
   end
 
-  before_action do
-    push_frontend_feature_flag(:search_facets)
-  end
-
   layout 'search'
 
   feature_category :global_search
