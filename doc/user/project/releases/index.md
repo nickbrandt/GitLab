@@ -45,7 +45,8 @@ To view a list of releases:
 
 ### Sort Releases
 
-On the top right of the **Releases** page, you can use the sorting button to order releases by their "Released date" or "Created date" and sort releases in ascending or descending order.
+On the top right of the **Releases** page, you can use the sorting button to order releases by
+**Released date** or **Created date**. You can sort releases in ascending or descending order.
 
 ![Sort Releases dropdown button](img/releases_sort_v13_6.png)
 
