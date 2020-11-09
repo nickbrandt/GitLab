@@ -46,7 +46,7 @@ export default {
       required: false,
       default: null,
     },
-    initialIssueKey: {
+    initialVulnerabilitiesIssuetype: {
       type: String,
       required: false,
       default: null,
@@ -77,7 +77,7 @@ export default {
       enableJiraIssues: this.initialEnableJiraIssues,
       enableJiraIssuesFromVulnerabilities: this.initialEnableJiraIssuesFromVulnerabilities,
       projectKey: this.initialProjectKey,
-      issueKey: this.initialIssueKey,
+      vulnerabilitiesIssuetype: this.initialVulnerabilitiesIssuetype,
       validated: false,
     };
   },
@@ -156,7 +156,7 @@ export default {
               )
             }}
             </p>
-            <gl-form-radio-group v-model="issueKey" name="service[vulnerabilities_issuetype]">
+            <gl-form-radio-group v-model="vulnerabilitiesIssuetype" name="service[vulnerabilities_issuetype]">
               <gl-form-radio
                 v-for="issuetype in issueTypes"
                 :key="issuetype.name"
