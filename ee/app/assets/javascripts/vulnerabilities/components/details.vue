@@ -87,7 +87,9 @@ export default {
         status_code: statusCode,
         reason_phrase: reasonPhrase,
         headers = [],
-      } = this.vulnerability?.supporting_messages[1].response;
+      } = this.vulnerability?.supporting_messages?.find(
+        msg => msg.name === SUPPORTING_MESSAGE_TYPES.RECORDED,
+      ).response;
       const headerLines = this.getHeadersAsCodeBlockLines(headers);
 
       return statusCode && reasonPhrase && headerLines
@@ -122,9 +124,8 @@ export default {
     },
     recordedResponseData() {
       if (
-        !(
-          this.vulnerability?.supporting_messages &&
-          this.vulnerability.supporting_messages[1]?.name === SUPPORTING_MESSAGE_TYPES.RECORDED
+        !this.vulnerability?.supporting_messages?.find(
+          msg => msg.name === SUPPORTING_MESSAGE_TYPES.RECORDED,
         )
       ) {
         return [];
