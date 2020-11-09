@@ -22148,6 +22148,9 @@ msgstr ""
 msgid "Redirect to SAML provider to test configuration"
 msgstr ""
 
+msgid "Redis"
+msgstr ""
+
 msgid "Reduce project visibility"
 msgstr ""
 
