@@ -49,7 +49,7 @@ module EE
           link_type: Vulnerabilities::IssueLink.link_types[:created]
         ).execute
 
-        flash[:notice] = _('Unable to create link to vulnerability') if result.status == :error
+        flash[:alert] = _('Unable to create link to vulnerability') if result.status == :error
       end
     end
   end
