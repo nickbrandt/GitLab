@@ -16,19 +16,7 @@ module MergeRequests
       merge_request.source_project = find_source_project
       merge_request.target_project = find_target_project
 
-      # Force remove the source branch?
-      merge_request.merge_params['force_remove_source_branch'] = force_remove_source_branch
-
-      # Only assign merge requests params that are allowed
-      self.params = assign_allowed_merge_params(merge_request, params)
-
-      # Filter out params that are either not allowed or invalid
-      filter_params(merge_request)
-
-      # Filter out the following from params:
-      #  - :add_label_ids and :remove_label_ids
-      #  - :add_assignee_ids and :remove_assignee_ids
-      filter_id_params
+      process_params
 
       merge_request.compare_commits = []
       set_merge_request_target_branch
@@ -89,6 +77,22 @@ module MergeRequests
       params[:assignee_ids] = process_assignee_ids(params, extra_assignee_ids: merge_request.assignee_ids.to_a)
 
       merge_request.assign_attributes(params.to_h.compact)
+    end
+
+    def process_params
+      # Force remove the source branch?
+      merge_request.merge_params['force_remove_source_branch'] = force_remove_source_branch
+
+      # Only assign merge requests params that are allowed
+      self.params = assign_allowed_merge_params(merge_request, params)
+
+      # Filter out params that are either not allowed or invalid
+      filter_params(merge_request)
+
+      # Filter out the following from params:
+      #  - :add_label_ids and :remove_label_ids
+      #  - :add_assignee_ids and :remove_assignee_ids
+      filter_id_params
     end
 
     def find_source_project
