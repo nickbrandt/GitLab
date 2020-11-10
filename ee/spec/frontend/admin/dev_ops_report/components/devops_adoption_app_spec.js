@@ -2,7 +2,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
 import DevopsAdoptionApp from 'ee/admin/dev_ops_report/components/devops_adoption_app.vue';
 import DevopsAdoptionEmptyState from 'ee/admin/dev_ops_report/components/devops_adoption_empty_state.vue';
-import { DEVOPS_ADOPTION_STRINGS } from 'ee/admin/dev_ops_report//constants';
+import { DEVOPS_ADOPTION_STRINGS } from 'ee/admin/dev_ops_report/constants';
 import * as Sentry from '~/sentry/wrapper';
 import { groupNodes, groupPageInfo } from '../mock_data';
 

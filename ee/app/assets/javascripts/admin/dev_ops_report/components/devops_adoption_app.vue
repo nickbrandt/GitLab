@@ -65,7 +65,7 @@ export default {
 };
 </script>
 <template>
-  <gl-loading-icon v-if="isLoading" size="md" class="my-3" />
+  <gl-loading-icon v-if="isLoading" size="md" class="gl-my-5" />
   <gl-alert v-else-if="loadingError" variant="danger" :dismissible="false" class="gl-mt-3">
     {{ $options.i18n.groupsError }}
   </gl-alert>
