@@ -88,6 +88,8 @@ RSpec.describe API::ProjectClusters do
         expect(json_response['environment_scope']).to eq('*')
         expect(json_response['cluster_type']).to eq('project_type')
         expect(json_response['domain']).to eq('example.com')
+        expect(json_response['enabled']).to eq('true')
+        expect(json_response['managed']).to eq('true')
       end
 
       it 'returns project information' do
