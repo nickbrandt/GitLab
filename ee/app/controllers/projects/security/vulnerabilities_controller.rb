@@ -19,18 +19,10 @@ module Projects
         @gfm_form = true
       end
 
-      def new_issue
-        @project = vulnerability.project
-
-        @issue = ::Issues::BuildFromVulnerabilityService.new(@project, current_user, { vulnerability: @vulnerability }).execute
-
-        render '/projects/issues/new'
-      end
-
       private
 
       def vulnerability
-        @issuable = @noteable = @vulnerability ||= vulnerable.vulnerabilities.find(params[:id])
+        @noteable = @issueable = @vulnerability ||= vulnerable.vulnerabilities.find(params[:id])
       end
 
       alias_method :issuable, :vulnerability

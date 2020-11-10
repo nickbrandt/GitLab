@@ -91,5 +91,5 @@
 
 = form.hidden_field :lock_version
 
-- if @vulnerability
-  = hidden_field_tag 'vulnerability_id', @vulnerability.id
+- if @vulnerability_id
+  = hidden_field_tag 'vulnerability_id', @vulnerability_id

@@ -37,6 +37,14 @@ module EE
         ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab/issues/4794')
       end
 
+      def build_from_vulnerability
+        return unless params[:vulnerability_id]
+
+        vulnerability = project.vulnerabilities.find(params[:vulnerability_id])
+
+        ::Issues::BuildFromVulnerabilityService.new(project, current_user, { vulnerability: vulnerability })
+      end
+
       def create_vulnerability_issue_link(issue)
         return unless params[:vulnerability_id]
 

@@ -5,4 +5,8 @@ resources :issues, only: [], constraints: { id: /\d+/ } do
     get '/descriptions/:version_id/diff', action: :description_diff, as: :description_diff
     delete '/descriptions/:version_id', action: :delete_description_version, as: :delete_description_version
   end
+
+  collection do
+    get :new_from_vulnerability
+  end
 end

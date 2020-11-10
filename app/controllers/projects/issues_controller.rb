@@ -106,7 +106,14 @@ class Projects::IssuesController < Projects::ApplicationController
       discussion_to_resolve: params[:discussion_to_resolve],
       confidential: !!Gitlab::Utils.to_boolean(params[:issue][:confidential])
     )
-    service = ::Issues::BuildService.new(project, current_user, build_params)
+
+    @vulnerability_id = params[:vulnerability_id]
+
+    service = if (@vulnerability_id)
+      build_from_vulnerability
+    else
+      ::Issues::BuildService.new(project, current_user, build_params)
+    end
 
     @issue = @noteable = service.execute
 
@@ -393,6 +400,8 @@ class Projects::IssuesController < Projects::ApplicationController
   def service_desk?
     action_name == 'service_desk'
   end
+
+  def build_from_vulnerability; end
 end
 
 Projects::IssuesController.prepend_if_ee('EE::Projects::IssuesController')

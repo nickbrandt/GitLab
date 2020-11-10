@@ -29,7 +29,7 @@ module VulnerabilitiesHelper
   def new_issue_url_for(vulnerability)
     return unless vulnerability.project.issues_enabled?
 
-    new_issue_project_security_vulnerability_path(vulnerability.project, vulnerability)
+    new_project_issue_path(vulnerability.project, { vulnerability_id: vulnerability.id })
   end
 
   def vulnerability_pipeline_data(pipeline)
