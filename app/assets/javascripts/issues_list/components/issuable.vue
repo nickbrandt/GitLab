@@ -36,9 +36,7 @@ export default {
     openedAgo: __('opened %{timeAgoString} by %{user}'),
     openedAgoJira: __('opened %{timeAgoString} by %{user} in Jira'),
   },
-  inject: {
-    scopedLabelsAvailable: ['scopedLabelsAvailable'],
-  },
+  inject: ['scopedLabelsAvailable'],
   components: {
     IssueAssignees,
     GlLink,
