@@ -3,15 +3,12 @@
 module Gitlab
   module Diff
     class Highlight
-      include Gitlab::Utils::StrongMemoize
-
-      attr_reader :diff_file, :diff_lines, :raw_lines, :repository, :conflicts
+      attr_reader :diff_file, :diff_lines, :raw_lines, :repository
 
       delegate :old_path, :new_path, :old_sha, :new_sha, to: :diff_file, prefix: :diff
 
-      def initialize(diff_lines, repository: nil, conflicts: nil)
+      def initialize(diff_lines, repository: nil)
         @repository = repository
-        @conflicts = conflicts
 
         if diff_lines.is_a?(Gitlab::Diff::File)
           @diff_file = diff_lines
@@ -44,22 +41,11 @@ module Gitlab
 
           diff_line.rich_text = rich_line
 
-          diff_line_type = conflicts_parser&.diff_line_type(diff_line.text)
-          diff_line.type = diff_line_type if diff_line_type
-
           diff_line
         end
       end
 
       private
-
-      def conflicts_parser
-        strong_memoize(:conflicts_parser) do
-          next unless conflicts && diff_file
-
-          Gitlab::Git::Conflict::LineParser.new(diff_file.new_path, conflicts)
-        end
-      end
 
       def highlight_line(diff_line)
         return unless diff_file && diff_file.diff_refs

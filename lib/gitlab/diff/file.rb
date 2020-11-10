@@ -195,9 +195,9 @@ module Gitlab
         @highlighted_diff_lines.present?
       end
 
-      def highlighted_diff_lines(conflicts: nil)
+      def highlighted_diff_lines
         @highlighted_diff_lines ||=
-          Gitlab::Diff::Highlight.new(self, repository: self.repository, conflicts: conflicts).highlight
+          Gitlab::Diff::Highlight.new(self, repository: self.repository).highlight
       end
 
       # Array[<Hash>] with right/left keys that contains Gitlab::Diff::Line objects which text is hightlighted
@@ -336,9 +336,9 @@ module Gitlab
 
       # This adds the bottom match line to the array if needed. It contains
       # the data to load more context lines.
-      def diff_lines_for_serializer(conflicts: nil)
+      def diff_lines_for_serializer
         strong_memoize(:diff_lines_for_serializer) do
-          lines = highlighted_diff_lines(conflicts: conflicts)
+          lines = highlighted_diff_lines
 
           next if lines.empty?
           next if blob.nil?

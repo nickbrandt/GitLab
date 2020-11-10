@@ -88,10 +88,6 @@ class DiffsEntity < Grape::Entity
 
   private
 
-  def code_navigation_path(diffs)
-    Gitlab::CodeNavigationPath.new(merge_request.project, diffs.diff_refs&.head_sha)
-  end
-
   def commit_ids
     @commit_ids ||= merge_request.recent_commits.map(&:id)
   end
@@ -115,11 +111,5 @@ class DiffsEntity < Grape::Entity
       prev_commit_id: prev_commit_id,
       next_commit_id: next_commit_id
     )
-  end
-
-  def conflicts
-    return unless merge_request&.highlight_diff_conflicts?
-
-    MergeRequests::Conflicts::ListService.new(merge_request).conflicts # rubocop:disable CodeReuse/ServiceClass
   end
 end

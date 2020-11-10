@@ -8,9 +8,12 @@ RSpec.describe DiffsEntity do
   let(:request) { EntityRequest.new(project: project, current_user: user) }
   let(:merge_request) { create(:merge_request_with_diffs, target_project: project, source_project: project) }
   let(:merge_request_diffs) { merge_request.merge_request_diffs }
+  let(:options) do
+    { request: request, merge_request: merge_request, merge_request_diffs: merge_request_diffs }
+  end
 
   let(:entity) do
-    described_class.new(merge_request_diffs.first.diffs, request: request, merge_request: merge_request, merge_request_diffs: merge_request_diffs)
+    described_class.new(merge_request_diffs.first.diffs, options)
   end
 
   context 'as json' do
@@ -70,29 +73,44 @@ RSpec.describe DiffsEntity do
     end
 
     context 'when there are conflicts' do
-      let(:conflicts) { double(files: []) }
+      let(:diff_files) { merge_request_diffs.first.diffs.diff_files }
+      let(:diff_file_with_conflict) { diff_files.to_a.last }
+      let(:diff_file_without_conflict) { diff_files.to_a[-2] }
+
+      let(:resolvable_conflicts) { true }
+      let(:conflict_file) { double(our_path: diff_file_with_conflict.new_path) }
+      let(:conflicts) { double(conflicts: double(files: [conflict_file]), can_be_resolved_in_ui?: resolvable_conflicts) }
+
+      let(:merge_ref_head_diff) { true }
+      let(:options) { super().merge(merge_ref_head_diff: merge_ref_head_diff) }
 
       before do
-        allow_next_instance_of(MergeRequests::Conflicts::ListService) do |instance|
-          allow(instance).to receive(:conflicts).and_return(conflicts)
-        end
+        allow(MergeRequests::Conflicts::ListService).to receive(:new).and_return(conflicts)
       end
 
-      it 'lines are parsed with passed conflicts' do
-        expect(Gitlab::Git::Conflict::LineParser).to(
-          receive(:new).exactly(17).times.with(anything, conflicts).and_call_original
-        )
+      it 'conflicts are highlighted' do
+        expect(conflict_file).to receive(:diff_lines_for_serializer)
+        expect(diff_file_with_conflict).not_to receive(:diff_lines_for_serializer)
+        expect(diff_file_without_conflict).to receive(:diff_lines_for_serializer).twice # for highlighted_diff_lines and is_fully_expanded
 
         subject
       end
 
-      context 'when diff lines should not be highlighted' do
-        before do
-          allow(merge_request).to receive(:highlight_diff_conflicts?).and_return(false)
-        end
+      context 'merge ref head diff is not chosen to be displayed' do
+        let(:merge_ref_head_diff) { false }
 
-        it 'conflicts has no impact on line parsing' do
-          expect(Gitlab::Git::Conflict::LineParser).not_to receive(:new)
+        it 'conflicts are not calculated' do
+          expect(MergeRequests::Conflicts::ListService).not_to receive(:new)
+        end
+      end
+
+      context 'when conflicts cannot be resolved' do
+        let(:resolvable_conflicts) { false }
+
+        it 'conflicts are not highlighted' do
+          expect(conflict_file).not_to receive(:diff_lines_for_serializer)
+          expect(diff_file_with_conflict).to receive(:diff_lines_for_serializer).twice  # for highlighted_diff_lines and is_fully_expanded
+          expect(diff_file_without_conflict).to receive(:diff_lines_for_serializer).twice # for highlighted_diff_lines and is_fully_expanded
 
           subject
         end

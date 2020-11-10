@@ -60,14 +60,12 @@ RSpec.describe Gitlab::Diff::File do
 
   describe '#highlighted_diff_lines' do
     it 'highlights the diff and memoises the result' do
-      conflicts = double(files: [])
-
       expect(Gitlab::Diff::Highlight).to receive(:new)
-                                           .with(diff_file, repository: project.repository, conflicts: conflicts)
+                                           .with(diff_file, repository: project.repository)
                                            .once
                                            .and_call_original
 
-      diff_file.highlighted_diff_lines(conflicts: conflicts)
+      diff_file.highlighted_diff_lines
     end
   end
 
