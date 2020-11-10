@@ -19,8 +19,10 @@ describe('Test coverage table component', () => {
   const findTotalCoverages = () => wrapper.find('.js-metric-card-item:nth-child(3) h3');
   const findLoadingState = () => wrapper.find(GlSkeletonLoading);
 
-  const createComponent = ({ data = {} } = {}) => {
-    wrapper = mount(TestCoverageSummary, {
+  const createComponent = ({ data = {} } = {}, withApollo = false) => {
+    fakeApollo = createMockApollo([[getGroupTestCoverage, jest.fn().mockResolvedValue()]]);
+
+    const props = {
       localVue,
       data() {
         return {
@@ -32,7 +34,12 @@ describe('Test coverage table component', () => {
           ...data,
         };
       },
-      mocks: {
+    };
+    if (withApollo) {
+      localVue.use(VueApollo);
+      props.apolloProvider = fakeApollo;
+    } else {
+      props.mocks = {
         $apollo: {
           queries: {
             group: {
@@ -40,28 +47,10 @@ describe('Test coverage table component', () => {
             },
           },
         },
-      },
-    });
-  };
+      };
+    }
 
-  const createComponentWithApollo = ({ data = {} } = {}) => {
-    localVue.use(VueApollo);
-    fakeApollo = createMockApollo([[getGroupTestCoverage, jest.fn().mockResolvedValue()]]);
-
-    wrapper = mount(TestCoverageSummary, {
-      localVue,
-      data() {
-        return {
-          projectCount: null,
-          averageCoverage: null,
-          coverageCount: null,
-          hasError: false,
-          isLoading: false,
-          ...data,
-        };
-      },
-      apolloProvider: fakeApollo,
-    });
+    wrapper = mount(TestCoverageSummary, props);
   };
 
   afterEach(() => {
@@ -109,7 +98,8 @@ describe('Test coverage table component', () => {
 
   describe('when group has no coverage', () => {
     it('renders empty metrics', async () => {
-      createComponentWithApollo({
+      createComponent({
+        withApollo: true,
         data: {},
         queryData: {
           data: {
