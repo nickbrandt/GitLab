@@ -17370,6 +17370,9 @@ msgstr ""
 msgid "MilestoneCombobox|An error occurred while searching for milestones"
 msgstr ""
 
+msgid "MilestoneCombobox|Group milestones"
+msgstr ""
+
 msgid "MilestoneCombobox|Milestone"
 msgstr ""
 
