@@ -526,6 +526,9 @@ msgstr ""
 msgid "%{issuableType} will be removed! Are you sure?"
 msgstr ""
 
+msgid "%{issueType} actions"
+msgstr ""
+
 msgid "%{issuesCount} issues with a limit of %{maxIssueCount}"
 msgstr ""
 
@@ -5585,13 +5588,13 @@ msgstr ""
 msgid "Close %{display_issuable_type}"
 msgstr ""
 
+msgid "Close %{issueType}"
+msgstr ""
+
 msgid "Close %{tabname}"
 msgstr ""
 
 msgid "Close epic"
-msgstr ""
-
-msgid "Close issue"
 msgstr ""
 
 msgid "Close milestone"
@@ -14947,9 +14950,6 @@ msgstr ""
 msgid "Issue Boards"
 msgstr ""
 
-msgid "Issue actions"
-msgstr ""
-
 msgid "Issue already promoted to epic."
 msgstr ""
 
@@ -18053,6 +18053,9 @@ msgid "New"
 msgstr ""
 
 msgid "New %{display_issuable_type}"
+msgstr ""
+
+msgid "New %{issueType}"
 msgstr ""
 
 msgid "New Application"
@@ -22563,10 +22566,10 @@ msgstr ""
 msgid "Reopen %{display_issuable_type}"
 msgstr ""
 
-msgid "Reopen epic"
+msgid "Reopen %{issueType}"
 msgstr ""
 
-msgid "Reopen issue"
+msgid "Reopen epic"
 msgstr ""
 
 msgid "Reopen milestone"
