@@ -88,7 +88,7 @@ module Security
     end
 
     def loaded_report_types
-      security_findings.map(&:scan).flat_map(&:scan_type).uniq
+      security_findings.map(&:scan_type).uniq
     end
 
     def loaded_project_fingerprints

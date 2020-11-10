@@ -15,6 +15,10 @@ RSpec.describe Security::Finding do
     it { is_expected.to validate_length_of(:project_fingerprint).is_at_most(40) }
   end
 
+  describe 'delegations' do
+    it { is_expected.to delegate_method(:scan_type).to(:scan).allow_nil }
+  end
+
   describe '.by_position' do
     let!(:finding_1) { create(:security_finding, position: 0) }
     let!(:finding_2) { create(:security_finding, position: 1) }

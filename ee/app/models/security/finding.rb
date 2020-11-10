@@ -38,5 +38,7 @@ module Security
     scope :with_scan, -> { includes(:scan) }
     scope :with_scanner, -> { includes(:scanner) }
     scope :deduplicated, -> { where(deduplicated: true) }
+
+    delegate :scan_type, to: :scan, allow_nil: true
   end
 end
