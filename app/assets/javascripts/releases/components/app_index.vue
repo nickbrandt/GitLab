@@ -64,7 +64,7 @@ export default {
 </script>
 <template>
   <div class="flex flex-column mt-2">
-    <div class="align-self-end mb-2">
+    <div class="gl-align-self-end gl-mb-3">
       <releases-sort class="gl-mr-2" @sort:changed="fetchReleases" />
 
       <gl-button
