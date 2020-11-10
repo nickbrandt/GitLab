@@ -100,22 +100,22 @@ RSpec.describe 'User views releases', :js do
 
         shared_examples 'releases sort order' do
           it "sorts the releases #{description}" do
-            card_titles = page.all('.release-block .card-title', minimum: expected_order.count)
+            card_titles = page.all('.release-block .card-title', minimum: expected_releases.count)
 
             card_titles.each_with_index do |title, index|
-              expect(title).to have_content(expected_order[index].name)
+              expect(title).to have_content(expected_releases[index].name)
             end
           end
         end
 
         context "when the page is sorted by the default sort order" do
-          let(:expected_order) { [release_v3, release_v2, release_v1] }
+          let(:expected_releases) { [release_v3, release_v2, release_v1] }
 
           it_behaves_like 'releases sort order'
         end
 
         context "when the page is sorted by created_at ascending " do
-          let(:expected_order) { [release_v2, release_v1, release_v3] }
+          let(:expected_releases) { [release_v2, release_v1, release_v3] }
 
           before do
             sort_page by: 'Created date', direction: :ascending
