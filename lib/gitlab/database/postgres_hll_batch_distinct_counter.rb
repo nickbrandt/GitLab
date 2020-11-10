@@ -2,16 +2,31 @@
 
 module Gitlab
   module Database
-    module PostgresHllBatchDistinctCount
-      def batch_distinct_count(relation, column = nil, batch_size: nil, start: nil, finish: nil)
-        PostgresHllBatchDistinctCounter.new(relation, column: column).count(batch_size: batch_size, start: start, finish: finish)
-      end
-
-      class << self
-        include PostgresHllBatchDistinctCount
-      end
-    end
-
+    # For large tables, PostgreSQL can take a long time to count rows due to MVCC.
+    # Implements a distinct batch counter based on HyperLogLog algorithm
+    # Needs indexes on the column below to calculate max, min and range queries
+    # For larger tables just set higher batch_size with index optimization
+    #
+    # In order to not use a possible complex time consuming query when calculating min and max values,
+    # the start and finish can be sent specifically, start and finish should contain max and min values for PRIMARY KEY of
+    # relation (most cases `id` column) rather than counted attribute eg:
+    # estimate_distinct_count(start: ::Project.with_active_services.minimum(:id), finish: ::Project.with_active_services.maximum(:id))
+    #
+    # Grouped relations are NOT supported yet.
+    #
+    # @example Usage
+    #  ::Gitlab::Database::PostgresHllBatchDistinctCount.new(::Project, :creator_id).estimate_distinct_count
+    #  ::Gitlab::Database::PostgresHllBatchDistinctCount.new(::Project.with_active_services.service_desk_enabled.where(time_period))
+    #    .estimate_distinct_count(
+    #      batch_size: 1_000,
+    #      start: ::Project.with_active_services.service_desk_enabled.where(time_period).minimum(:id),
+    #      finish: ::Project.with_active_services.service_desk_enabled.where(time_period).maximum(:id)
+    #    )
+    #
+    # @note HyperLogLog is an PROBABILISTIC algorithm that ESTIMATES distinct count of given attribute value for supplied relation
+    #  Like all probabilistic algorithm is has ERROR RATE margin, that can affect values,
+    #  for given implementation no higher value was reported (https://gitlab.com/gitlab-org/gitlab/-/merge_requests/45673#accuracy-estimation) than 5.3%
+    #  for the most of a cases this value is lower. However, if the exact value is necessary other tools has to be used.
     class PostgresHllBatchDistinctCounter
       FALLBACK = -1
       MIN_REQUIRED_BATCH_SIZE = 1_250
@@ -23,11 +38,11 @@ module Gitlab
 
       BIT_31_MASK = "B'0#{'1' * 31}'"
       BIT_9_MASK = "B'#{'0' * 23}#{'1' * 9}'"
-
-      # source_query:
-      # SELECT CAST(('X' || md5(CAST(%{column} as text))) as bit(32)) attr_hash_32_bits
-      # FROM %{relation}
-      # WHERE %{pkey} >= %{batch_start} AND %{pkey} < %{batch_end}
+      # @example source_query
+      #   SELECT CAST(('X' || md5(CAST(%{column} as text))) as bit(32)) attr_hash_32_bits
+      #   FROM %{relation}
+      #   WHERE %{pkey} >= %{batch_start}
+      #   AND %{pkey} < %{batch_end}
       #   AND %{column} IS NOT NULL
       BUCKETED_DATA_SQL = <<~SQL
         WITH hashed_attributes AS (%{source_query})
@@ -37,10 +52,11 @@ module Gitlab
         GROUP BY 1 ORDER BY 1
       SQL
 
-      def initialize(relation, column: nil, operation_args: nil)
+      TOTAL_BUCKETS_NUMBER = 512
+
+      def initialize(relation, column = nil)
         @relation = relation
         @column = column || relation.primary_key
-        @operation_args = operation_args
       end
 
       def unwanted_configuration?(finish, batch_size, start)
@@ -49,7 +65,7 @@ module Gitlab
           start > finish
       end
 
-      def count(batch_size: nil, start: nil, finish: nil)
+      def estimate_distinct_count(batch_size: nil, start: nil, finish: nil)
         raise 'BatchCount can not be run inside a transaction' if ActiveRecord::Base.connection.transaction_open?
 
         batch_size ||= DEFAULT_BATCH_SIZE
@@ -67,13 +83,6 @@ module Gitlab
           begin
             hll_blob.merge!(hll_blob_for_batch(batch_start, batch_start + batch_size)) {|_key, old, new| new > old ? new : old }
             batch_start += batch_size
-          rescue ActiveRecord::QueryCanceled
-            # retry with a safe batch size & warmer cache
-            if batch_size >= 2 * MIN_REQUIRED_BATCH_SIZE
-              batch_size /= 2
-            else
-              return FALLBACK
-            end
           end
           sleep(SLEEP_TIME_IN_SECONDS)
         end
@@ -83,17 +92,21 @@ module Gitlab
 
       private
 
+      # arbitrary values that are present in #estimate_cardinality
+      # are sourced from https://www.sisense.com/blog/hyperloglog-in-pure-sql/
+      # article, they are not representing any entity and serves as tune value
+      # for the whole equation
       def estimate_cardinality(hll_blob)
-        num_zero_buckets = 512 - hll_blob.size
+        num_zero_buckets = TOTAL_BUCKETS_NUMBER - hll_blob.size
 
         num_uniques = (
-          ((512**2) * (0.7213 / (1 + 1.079 / 512))) /
+          ((TOTAL_BUCKETS_NUMBER**2) * (0.7213 / (1 + 1.079 / TOTAL_BUCKETS_NUMBER))) /
             (num_zero_buckets + hll_blob.values.sum { |bucket_hash, _| 2**(-1 * bucket_hash)} )
         ).to_i
 
-        if num_zero_buckets > 0 && num_uniques < 2.5 * 512
-          ((0.7213 / (1 + 1.079 / 512)) * (512 *
-            Math.log2(512.0 / num_zero_buckets)))
+        if num_zero_buckets > 0 && num_uniques < 2.5 * TOTAL_BUCKETS_NUMBER
+          ((0.7213 / (1 + 1.079 / TOTAL_BUCKETS_NUMBER)) * (TOTAL_BUCKETS_NUMBER *
+            Math.log2(TOTAL_BUCKETS_NUMBER.to_f / num_zero_buckets)))
         else
           num_uniques
         end
@@ -107,10 +120,17 @@ module Gitlab
           .to_h
       end
 
-      # SELECT CAST(('X' || md5(CAST(%{column} as text))) as bit(32)) attr_hash_32_bits
-      # FROM %{relation}
-      # WHERE %{pkey} >= %{batch_start} AND %{pkey} < %{batch_end}
+      # Generate the source query SQL snippet for the provided id range
+      #
+      # @example SQL query template
+      #   SELECT CAST(('X' || md5(CAST(%{column} as text))) as bit(32)) attr_hash_32_bits
+      #   FROM %{relation}
+      #   WHERE %{pkey} >= %{batch_start} AND %{pkey} < %{batch_end}
       #   AND %{column} IS NOT NULL
+      #
+      # @param start initial id range
+      # @param finish final id range
+      # @return [String] SQL query fragment
       def source_query(start, finish)
         col_as_arel = @column.is_a?(Arel::Attributes::Attribute) ? @column : Arel.sql(@column.to_s)
         col_as_text = Arel::Nodes::NamedFunction.new('CAST', [col_as_arel.as('text')])
