@@ -1,10 +1,12 @@
 package imageresizer
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"image"
+	"image/png"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -17,6 +19,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
+const imagePath = "../../testdata/image.png"
+
 func TestMain(m *testing.M) {
 	if err := testhelper.BuildExecutables(); err != nil {
 		log.WithError(err).Fatal()
@@ -25,9 +29,58 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+func requestScaledImage(t *testing.T, httpHeaders http.Header, params resizeParams, cfg config.ImageResizerConfig) *http.Response {
+	httpRequest := httptest.NewRequest("GET", "/image", nil)
+	responseWriter := httptest.NewRecorder()
+	paramsJSON := encodeParams(t, &params)
+
+	NewResizer(config.Config{ImageResizerConfig: cfg}).Inject(responseWriter, httpRequest, paramsJSON)
+
+	return responseWriter.Result()
+}
+
+func TestRequestScaledImageFromPath(t *testing.T) {
+	cfg := config.DefaultImageResizerConfig
+	params := resizeParams{Location: imagePath, ContentType: "image/png", Width: 64}
+
+	resp := requestScaledImage(t, nil, params, cfg)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	bounds := imageFromResponse(t, resp).Bounds()
+	require.Equal(t, int(params.Width), bounds.Size().X, "wrong width after resizing")
+}
+
+func TestServeOriginalImageWhenSourceImageTooLarge(t *testing.T) {
+	originalImage := testImage(t)
+	cfg := config.ImageResizerConfig{MaxScalerProcs: 1, MaxFilesize: 1}
+	params := resizeParams{Location: imagePath, ContentType: "image/png", Width: 64}
+
+	resp := requestScaledImage(t, nil, params, cfg)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	img := imageFromResponse(t, resp)
+	require.Equal(t, originalImage.Bounds(), img.Bounds(), "expected original image size")
+}
+
+func TestFailFastOnOpenStreamFailure(t *testing.T) {
+	cfg := config.DefaultImageResizerConfig
+	params := resizeParams{Location: "does_not_exist.png", ContentType: "image/png", Width: 64}
+	resp := requestScaledImage(t, nil, params, cfg)
+
+	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+}
+
+func TestFailFastOnContentTypeMismatch(t *testing.T) {
+	cfg := config.DefaultImageResizerConfig
+	params := resizeParams{Location: imagePath, ContentType: "image/jpeg", Width: 64}
+	resp := requestScaledImage(t, nil, params, cfg)
+
+	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+}
+
 func TestUnpackParametersReturnsParamsInstanceForValidInput(t *testing.T) {
 	r := Resizer{}
-	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: "image/png"}
+	inParams := resizeParams{Location: imagePath, Width: 64, ContentType: "image/png"}
 
 	outParams, err := r.unpackParameters(encodeParams(t, &inParams))
 
@@ -46,85 +99,11 @@ func TestUnpackParametersReturnsErrorWhenLocationBlank(t *testing.T) {
 
 func TestUnpackParametersReturnsErrorWhenContentTypeBlank(t *testing.T) {
 	r := Resizer{}
-	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: ""}
+	inParams := resizeParams{Location: imagePath, Width: 64, ContentType: ""}
 
 	_, err := r.unpackParameters(encodeParams(t, &inParams))
 
 	require.Error(t, err, "expected error when ContentType is blank")
-}
-
-func TestTryResizeImageSuccess(t *testing.T) {
-	r := Resizer{}
-	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: "image/png"}
-	inFile := testImage(t)
-	req, err := http.NewRequest("GET", "/foo", nil)
-	require.NoError(t, err)
-
-	reader, cmd, err := r.tryResizeImage(
-		req,
-		inFile,
-		os.Stderr,
-		&inParams,
-		int64(config.DefaultImageResizerConfig.MaxFilesize),
-		config.DefaultImageResizerConfig,
-	)
-
-	require.NoError(t, err)
-	require.NotNil(t, cmd)
-	require.NotNil(t, reader)
-	require.NotEqual(t, inFile, reader)
-}
-
-func TestTryResizeImageSkipsResizeWhenSourceImageTooLarge(t *testing.T) {
-	r := Resizer{}
-	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: "image/png"}
-	inFile := testImage(t)
-	req, err := http.NewRequest("GET", "/foo", nil)
-	require.NoError(t, err)
-
-	reader, cmd, err := r.tryResizeImage(
-		req,
-		inFile,
-		os.Stderr,
-		&inParams,
-		int64(config.DefaultImageResizerConfig.MaxFilesize)+1,
-		config.DefaultImageResizerConfig,
-	)
-
-	require.Error(t, err)
-	require.Nil(t, cmd)
-	require.Equal(t, inFile, reader, "Expected output streams to match")
-}
-
-func TestTryResizeImageFailsWhenContentTypeNotMatchingFileContents(t *testing.T) {
-	r := Resizer{}
-	inParams := resizeParams{Location: "/path/to/img", Width: 64, ContentType: "image/jpeg"}
-	inFile := testImage(t) // this is a PNG file; the image scaler should fail fast in this case
-	req, err := http.NewRequest("GET", "/foo", nil)
-	require.NoError(t, err)
-
-	_, cmd, err := r.tryResizeImage(
-		req,
-		inFile,
-		os.Stderr,
-		&inParams,
-		int64(config.DefaultImageResizerConfig.MaxFilesize),
-		config.DefaultImageResizerConfig,
-	)
-
-	require.NoError(t, err)
-	require.Error(t, cmd.Wait(), "Expected to fail due to content-type mismatch")
-}
-
-func TestServeImage(t *testing.T) {
-	inFile := testImage(t)
-	var writer bytes.Buffer
-
-	bytesWritten, err := serveImage(inFile, &writer, nil)
-
-	require.NoError(t, err)
-	require.Greater(t, bytesWritten, int64(0))
-	require.Equal(t, int64(len(writer.Bytes())), bytesWritten)
 }
 
 // The Rails applications sends a Base64 encoded JSON string carrying
@@ -137,8 +116,18 @@ func encodeParams(t *testing.T, p *resizeParams) string {
 	return base64.StdEncoding.EncodeToString(json)
 }
 
-func testImage(t *testing.T) *os.File {
-	f, err := os.Open("../../testdata/image.png")
+func testImage(t *testing.T) image.Image {
+	f, err := os.Open(imagePath)
 	require.NoError(t, err)
-	return f
+
+	image, err := png.Decode(f)
+	require.NoError(t, err, "decode original image")
+
+	return image
+}
+
+func imageFromResponse(t *testing.T, resp *http.Response) image.Image {
+	img, err := png.Decode(resp.Body)
+	require.NoError(t, err, "decode resized image")
+	return img
 }

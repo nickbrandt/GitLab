@@ -386,7 +386,7 @@ func TestImageResizing(t *testing.T) {
 	require.NoError(t, err, "decode resized image")
 
 	bounds := img.Bounds()
-	require.Equal(t, requestedWidth, bounds.Max.X-bounds.Min.X, "width after resizing")
+	require.Equal(t, requestedWidth, bounds.Size().X, "wrong width after resizing")
 }
 
 func TestSendURLForArtifacts(t *testing.T) {
