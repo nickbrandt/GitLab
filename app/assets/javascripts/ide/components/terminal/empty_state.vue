@@ -1,6 +1,6 @@
 <script>
 /* eslint-disable vue/no-v-html */
-import { GlLoadingIcon, GlButton, GlAlert, } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlAlert } from '@gitlab/ui';
 
 export default {
   components: {
@@ -60,7 +60,7 @@ export default {
           {{ __('Start Web Terminal') }}
         </gl-button>
       </p>
-      <gl-alert v-if="!isValid && message" variant="tip" :dismissable="false" v-html="message"></gl-alert>
+      <gl-alert v-if="!isValid && message" variant="tip" :dismissable="false" v-html="message" />
       <p v-else>
         <a
           v-if="helpPath"
