@@ -110,13 +110,13 @@ module Projects
       end
 
       def define_runners_variables
-        @project_runners = @project.runners.ordered.page(params[:page]).per(NUMBER_OF_RUNNERS_PER_PAGE).with_tags
+        @project_runners = @project.runners.ordered.page(params[:project_page]).per(NUMBER_OF_RUNNERS_PER_PAGE).with_tags
 
         @assignable_runners = current_user
           .ci_owned_runners
           .assignable_for(project)
           .ordered
-          .page(params[:page]).per(NUMBER_OF_RUNNERS_PER_PAGE)
+          .page(params[:specific_page]).per(NUMBER_OF_RUNNERS_PER_PAGE)
 
         @shared_runners = ::Ci::Runner.instance_type.active
 
