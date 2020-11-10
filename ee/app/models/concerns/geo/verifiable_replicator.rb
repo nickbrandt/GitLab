@@ -30,7 +30,7 @@ module Geo
         # Bonus: This causes the progress bar to be hidden.
         return unless verification_enabled?
 
-        model.available_replicables.checksummed.count
+        model.available_replicables.verification_succeeded.count
       end
 
       def checksum_failed_count
@@ -38,7 +38,7 @@ module Geo
         # Bonus: This causes the progress bar to be hidden.
         return unless verification_enabled?
 
-        model.available_replicables.checksum_failed.count
+        model.available_replicables.verification_failed.count
       end
     end
 

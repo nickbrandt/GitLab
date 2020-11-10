@@ -39,6 +39,80 @@ RSpec.shared_examples 'a verifiable replicator' do
     end
   end
 
+  describe '.checksummed_count' do
+    context 'when verification is enabled' do
+      before do
+        allow(described_class).to receive(:verification_enabled?).and_return(true)
+      end
+
+      it 'returns the number of available replicables where verification succeeded' do
+        model_record.verification_started!
+        model_record.verification_succeeded_with_checksum!('some checksum', Time.current)
+
+        expect(described_class.checksummed_count).to eq(1)
+      end
+
+      it 'excludes other verification states' do
+        model_record.verification_started!
+
+        expect(described_class.checksummed_count).to eq(0)
+
+        model_record.verification_failed_with_message!('some error message')
+
+        expect(described_class.checksummed_count).to eq(0)
+
+        model_record.verification_pending!
+
+        expect(described_class.checksummed_count).to eq(0)
+      end
+    end
+
+    context 'when verification is disabled' do
+      it 'returns nil' do
+        allow(described_class).to receive(:verification_enabled?).and_return(false)
+
+        expect(described_class.checksummed_count).to be_nil
+      end
+    end
+  end
+
+  describe '.checksum_failed_count' do
+    context 'when verification is enabled' do
+      before do
+        allow(described_class).to receive(:verification_enabled?).and_return(true)
+      end
+
+      it 'returns the number of available replicables where verification failed' do
+        model_record.verification_started!
+        model_record.verification_failed_with_message!('some error message')
+
+        expect(described_class.checksum_failed_count).to eq(1)
+      end
+
+      it 'excludes other verification states' do
+        model_record.verification_started!
+
+        expect(described_class.checksum_failed_count).to eq(0)
+
+        model_record.verification_succeeded_with_checksum!('foo', Time.current)
+
+        expect(described_class.checksum_failed_count).to eq(0)
+
+        model_record.verification_pending!
+
+        expect(described_class.checksum_failed_count).to eq(0)
+      end
+    end
+
+    context 'when verification is disabled' do
+      it 'returns nil' do
+        allow(described_class).to receive(:verification_enabled?).and_return(false)
+
+        expect(described_class.checksum_failed_count).to be_nil
+      end
+    end
+  end
+
   describe '#after_verifiable_update' do
     it 'calls verify_async if needed' do
       expect(replicator).to receive(:verify_async)
