@@ -6,6 +6,11 @@ import { s__, sprintf } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import toast from '~/vue_shared/plugins/global_toast';
 import { fetchDiffData } from '~/vue_shared/security_reports/store/utils';
+import {
+  FEEDBACK_TYPE_DISMISSAL,
+  FEEDBACK_TYPE_ISSUE,
+  FEEDBACK_TYPE_MERGE_REQUEST,
+} from '~/vue_shared/security_reports/constants';
 import * as types from './mutation_types';
 
 /**
@@ -199,7 +204,7 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
       vulnerability_feedback: {
         category: state.modal.vulnerability.category,
         comment,
-        feedback_type: 'dismissal',
+        feedback_type: FEEDBACK_TYPE_DISMISSAL,
         pipeline_id: state.pipelineId,
         project_fingerprint: state.modal.vulnerability.project_fingerprint,
         vulnerability_data: state.modal.vulnerability,
@@ -362,7 +367,7 @@ export const createNewIssue = ({ state, dispatch }) => {
   axios
     .post(state.createVulnerabilityFeedbackIssuePath, {
       vulnerability_feedback: {
-        feedback_type: 'issue',
+        feedback_type: FEEDBACK_TYPE_ISSUE,
         category: state.modal.vulnerability.category,
         project_fingerprint: state.modal.vulnerability.project_fingerprint,
         pipeline_id: state.pipelineId,
@@ -393,7 +398,7 @@ export const createMergeRequest = ({ state, dispatch }) => {
   axios
     .post(state.createVulnerabilityFeedbackMergeRequestPath, {
       vulnerability_feedback: {
-        feedback_type: 'merge_request',
+        feedback_type: FEEDBACK_TYPE_MERGE_REQUEST,
         category,
         project_fingerprint,
         vulnerability_data: vulnerability,
