@@ -52,16 +52,22 @@ export const recentFailuresTextBuilder = (summary = {}) => {
   const { failed, recentlyFailed } = summary;
   if (!failed || !recentlyFailed) return '';
 
-  const failedString = n__('%d failed test', '%d failed tests', failed);
-  const recentOutOfFailedString = n__(
-    sprintf('%d out of %{failedString} has failed', { failedString }),
-    sprintf('%d out of %{failedString} have failed', { failedString }),
-    recentlyFailed,
+  if (failed < 2) {
+    return sprintf(
+      __(
+        '%{recentlyFailed} out of %{failed} failed test has failed more than once in the last 14 days',
+      ),
+      { recentlyFailed, failed },
+    );
+  }
+  return sprintf(
+    n__(
+      '%{recentlyFailed} out of %{failed} failed tests has failed more than once in the last 14 days',
+      '%{recentlyFailed} out of %{failed} failed tests have failed more than once in the last 14 days',
+      recentlyFailed,
+    ),
+    { recentlyFailed, failed },
   );
-
-  return sprintf(s__(`Reports|%{recentOutOfFailedString} more than once in the last 14 days`), {
-    recentOutOfFailedString,
-  });
 };
 
 export const countRecentlyFailedTests = subject => {

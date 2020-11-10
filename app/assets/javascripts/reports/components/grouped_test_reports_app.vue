@@ -94,7 +94,7 @@ export default {
     hasRecentFailures(summary) {
       return this.glFeatures.testFailureHistory && summary?.recentlyFailed > 0;
     },
-    getRecentFailuresText(summary) {
+    recentFailuresText(summary) {
       return recentFailuresTextBuilder(summary);
     },
     getReportIcon(report) {
@@ -146,7 +146,7 @@ export default {
       </gl-button>
     </template>
     <template v-if="hasRecentFailures(summary)" #subHeading>
-      {{ getRecentFailuresText(summary) }}
+      {{ recentFailuresText(summary) }}
     </template>
     <template #body>
       <div class="mr-widget-grouped-section report-block">
@@ -156,7 +156,7 @@ export default {
               <div class="gl-display-inline-flex gl-flex-direction-column">
                 <div>{{ reportText(report) }}</div>
                 <div v-if="hasRecentFailures(report.summary)">
-                  {{ getRecentFailuresText(report.summary) }}
+                  {{ recentFailuresText(report.summary) }}
                 </div>
               </div>
             </template>

@@ -27,7 +27,7 @@ export default {
     },
   },
   computed: {
-    shouldShowRecentFailures() {
+    showRecentFailures() {
       return this.glFeatures.testFailureHistory && this.issue.recent_failures;
     },
   },
@@ -52,7 +52,7 @@ export default {
         @click="openModal({ issue })"
       >
         <gl-badge v-if="isNew" variant="danger" class="gl-mr-2">{{ s__('New') }}</gl-badge>
-        <gl-badge v-if="shouldShowRecentFailures" variant="warning" class="gl-mr-2">
+        <gl-badge v-if="showRecentFailures" variant="warning" class="gl-mr-2">
           {{ recentFailuresText(issue.recent_failures) }}
         </gl-badge>
         {{ issue.name }}
