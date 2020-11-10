@@ -2668,6 +2668,9 @@ msgstr ""
 msgid "AlertsIntegrations|Integration Name"
 msgstr ""
 
+msgid "AlertsIntegrations|Integration payload is invalid. You can still save your changes."
+msgstr ""
+
 msgid "AlertsIntegrations|No integrations have been added yet"
 msgstr ""
 
