@@ -450,6 +450,9 @@ msgstr ""
 msgid "%{count} total weight"
 msgstr ""
 
+msgid "%{criticalStart}%{critical} Critical%{criticalEnd} %{highStart}%{high} High%{highEnd} and %{otherStart}%{otherMessage}%{otherEnd}"
+msgstr ""
+
 msgid "%{dashboard_path} could not be found."
 msgstr ""
 
@@ -718,10 +721,10 @@ msgstr ""
 msgid "%{reportType} %{status}"
 msgstr ""
 
-msgid "%{reportType} detected %{countStart}%{total}%{countEnd} potential %{vulnMessage} %{criticalStart}%{critical} critical%{criticalEnd} %{highStart}%{high} high%{highEnd} and %{otherStart}%{otherMessage}%{otherEnd}"
+msgid "%{reportType} detected %{totalStart}%{total}%{totalEnd} potential %{vulnMessage}"
 msgstr ""
 
-msgid "%{reportType} detected %{countStart}no%{countEnd} vulnerabilities."
+msgid "%{reportType} detected %{totalStart}no%{totalEnd} vulnerabilities."
 msgstr ""
 
 msgid "%{retryButtonStart}Try again%{retryButtonEnd} or %{newFileButtonStart}attach a new file%{newFileButtonEnd}."

@@ -30,11 +30,13 @@ describe('groupedSastText', () => {
     const result = getters.groupedSastText(sast);
 
     expect(result).toStrictEqual({
+      countMessage: '',
       critical: 0,
       high: 0,
-      message: 'SAST detected %{countStart}no%{countEnd} vulnerabilities.',
+      message: 'SAST detected %{totalStart}no%{totalEnd} vulnerabilities.',
       other: 0,
       status: '',
+      total: 0,
     });
   });
 });

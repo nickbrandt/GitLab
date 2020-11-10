@@ -555,7 +555,6 @@ export default {
 
         <template v-if="hasCoverageFuzzingReports">
           <summary-row
-            :summary="groupedCoverageFuzzingText.message"
             :status-icon="coverageFuzzingStatusIcon"
             :popover-options="coverageFuzzingPopover"
             class="js-coverage-fuzzing-widget"

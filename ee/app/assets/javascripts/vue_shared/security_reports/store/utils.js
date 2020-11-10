@@ -9,6 +9,29 @@ import { __, n__, sprintf } from '~/locale';
 export const findIssueIndex = (issues, issue) =>
   issues.findIndex(el => el.project_fingerprint === issue.project_fingerprint);
 
+const createCountMessage = ({ critical, high, other, total }) => {
+  const otherMessage = n__('%d Other', '%d Others', other);
+  const countMessage = __(
+    '%{criticalStart}%{critical} Critical%{criticalEnd} %{highStart}%{high} High%{highEnd} and %{otherStart}%{otherMessage}%{otherEnd}',
+  );
+  return total ? sprintf(countMessage, { critical, high, otherMessage }) : '';
+};
+
+const createStatusMessage = ({ reportType, status, total }) => {
+  const vulnMessage = n__('vulnerability', 'vulnerabilities', total);
+  let message;
+  if (status) {
+    message = __('%{reportType} %{status}');
+  } else if (!total) {
+    message = __('%{reportType} detected %{totalStart}no%{totalEnd} vulnerabilities.');
+  } else {
+    message = __(
+      '%{reportType} detected %{totalStart}%{total}%{totalEnd} potential %{vulnMessage}',
+    );
+  }
+  return sprintf(message, { reportType, status, total, vulnMessage });
+};
+
 /**
  * Takes an object of options and returns the object with an externalized string representing
  * the critical, high, and other severity vulnerabilities for a given report.
@@ -27,35 +50,15 @@ export const groupedTextBuilder = ({
   other = 0,
 } = {}) => {
   const total = critical + high + other;
-  const vulnMessage = n__('vulnerability', 'vulnerabilities', total);
-  const otherMessage = n__('%d Other', '%d Others', other);
-
-  let message;
-
-  if (status) {
-    message = __('%{reportType} %{status}');
-  } else if (!total) {
-    message = __('%{reportType} detected %{countStart}no%{countEnd} vulnerabilities.');
-  } else {
-    message = __(
-      '%{reportType} detected %{countStart}%{total}%{countEnd} potential %{vulnMessage} %{criticalStart}%{critical} critical%{criticalEnd} %{highStart}%{high} high%{highEnd} and %{otherStart}%{otherMessage}%{otherEnd}',
-    );
-  }
 
   return {
-    message: sprintf(message, {
-      critical,
-      high,
-      otherMessage,
-      reportType,
-      status,
-      total,
-      vulnMessage,
-    }).replace(/\s\s+/g, ' '),
+    countMessage: createCountMessage({ critical, high, other, total }),
+    message: createStatusMessage({ reportType, status, total }),
     critical,
     high,
     other,
     status,
+    total,
   };
 };
 

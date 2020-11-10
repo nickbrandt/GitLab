@@ -1,106 +1,144 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Severity Summary given the message {"critical": 0, "high": 1, "message": "Security scanning detected %{countStart}1%{countEnd} potential vulnerability %{criticalStart}0 critical%{criticalEnd} %{highStart}1 high%{highEnd} and %{otherStart}0 Others%{otherEnd}", "other": 0, "status": ""} interpolates correctly 1`] = `
+exports[`Severity Summary given the message {"countMessage": "%{criticalStart}0 Critical%{criticalEnd} %{highStart}1 High%{highEnd} and %{otherStart}0 Others%{otherEnd}", "critical": 0, "high": 1, "message": "Security scanning detected %{totalStart}1%{totalEnd} potential vulnerability", "other": 0, "status": "", "total": 1} interpolates correctly 1`] = `
 <span>
   Security scanning detected 
   <strong>
     1
   </strong>
    potential vulnerability 
-  <span>
+  <span
+    class="gl-font-sm"
+  >
     <span>
-      0 critical
-    </span>
-  </span>
-   
-  <span>
-    <strong
-      class="text-danger-600"
-    >
-      
-          1 high
+      <span
+        class="gl-pl-4"
+      >
         
-    </strong>
-  </span>
-   and 
-  <span>
+            0 Critical
+          
+      </span>
+    </span>
+     
     <span>
-      0 Others
+      <strong
+        class="text-danger-600 gl-px-2"
+      >
+        
+            1 High
+          
+      </strong>
+    </span>
+     and 
+    <span>
+      <span
+        class="gl-px-2"
+      >
+        
+            0 Others
+          
+      </span>
     </span>
   </span>
 </span>
 `;
 
-exports[`Severity Summary given the message {"critical": 1, "high": 0, "message": "Security scanning detected %{countStart}1%{countEnd} potential vulnerability %{criticalStart}1 critical%{criticalEnd} %{highStart}0 high%{highEnd} and %{otherStart}0 Others%{otherEnd}", "other": 0, "status": ""} interpolates correctly 1`] = `
+exports[`Severity Summary given the message {"countMessage": "%{criticalStart}1 Critical%{criticalEnd} %{highStart}0 High%{highEnd} and %{otherStart}0 Others%{otherEnd}", "critical": 1, "high": 0, "message": "Security scanning detected %{totalStart}1%{totalEnd} potential vulnerability", "other": 0, "status": "", "total": 1} interpolates correctly 1`] = `
 <span>
   Security scanning detected 
   <strong>
     1
   </strong>
    potential vulnerability 
-  <span>
-    <strong
-      class="text-danger-800"
-    >
-      
-          1 critical
+  <span
+    class="gl-font-sm"
+  >
+    <span>
+      <strong
+        class="text-danger-800 gl-pl-4"
+      >
         
-    </strong>
-  </span>
-   
-  <span>
-    <span>
-      0 high
+            1 Critical
+          
+      </strong>
     </span>
-  </span>
-   and 
-  <span>
+     
     <span>
-      0 Others
+      <span
+        class="gl-px-2"
+      >
+        
+            0 High
+          
+      </span>
+    </span>
+     and 
+    <span>
+      <span
+        class="gl-px-2"
+      >
+        
+            0 Others
+          
+      </span>
     </span>
   </span>
 </span>
 `;
 
-exports[`Severity Summary given the message {"critical": 1, "high": 2, "message": "Security scanning detected %{countStart}3%{countEnd} potential vulnerabilities %{criticalStart}1 critical%{criticalEnd} %{highStart}2 high%{highEnd} and %{otherStart}0 Others%{otherEnd}", "other": 0, "status": ""} interpolates correctly 1`] = `
+exports[`Severity Summary given the message {"countMessage": "%{criticalStart}1 Critical%{criticalEnd} %{highStart}2 High%{highEnd} and %{otherStart}0 Others%{otherEnd}", "critical": 1, "high": 2, "message": "Security scanning detected %{totalStart}3%{totalEnd} potential vulnerabilities", "other": 0, "status": "", "total": 3} interpolates correctly 1`] = `
 <span>
   Security scanning detected 
   <strong>
     3
   </strong>
    potential vulnerabilities 
-  <span>
-    <strong
-      class="text-danger-800"
-    >
-      
-          1 critical
-        
-    </strong>
-  </span>
-   
-  <span>
-    <strong
-      class="text-danger-600"
-    >
-      
-          2 high
-        
-    </strong>
-  </span>
-   and 
-  <span>
+  <span
+    class="gl-font-sm"
+  >
     <span>
-      0 Others
+      <strong
+        class="text-danger-800 gl-pl-4"
+      >
+        
+            1 Critical
+          
+      </strong>
+    </span>
+     
+    <span>
+      <strong
+        class="text-danger-600 gl-px-2"
+      >
+        
+            2 High
+          
+      </strong>
+    </span>
+     and 
+    <span>
+      <span
+        class="gl-px-2"
+      >
+        
+            0 Others
+          
+      </span>
     </span>
   </span>
 </span>
 `;
 
-exports[`Severity Summary given the message {"message": ""} interpolates correctly 1`] = `<span />`;
+exports[`Severity Summary given the message {"message": ""} interpolates correctly 1`] = `
+<span>
+   
+  <!---->
+</span>
+`;
 
 exports[`Severity Summary given the message {"message": "foo"} interpolates correctly 1`] = `
 <span>
-  foo
+  foo 
+  <!---->
 </span>
 `;
