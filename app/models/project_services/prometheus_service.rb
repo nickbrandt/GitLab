@@ -28,6 +28,7 @@ class PrometheusService < MonitoringService
 
   after_create_commit :create_default_alerts
 
+  scope :active_with_project, -> { active.where.not(project_id: nil) }
   scope :preload_project, -> { preload(:project) }
   scope :with_clusters_with_cilium, -> { joins(project: [:clusters]).merge(Clusters::Cluster.with_available_cilium) }
 
