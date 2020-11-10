@@ -44,9 +44,7 @@ module Security
     end
 
     def findings
-      security_findings.map do |security_finding|
-        build_vulnerability_finding(security_finding)
-      end
+      security_findings.map(&method(:build_vulnerability_finding))
     end
 
     def build_vulnerability_finding(security_finding)
