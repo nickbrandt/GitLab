@@ -69,7 +69,6 @@ RSpec.describe ReleasesHelper do
                   markdown_preview_path
                   markdown_docs_path
                   releases_page_path
-                  update_release_api_docs_path
                   release_assets_docs_path
                   manage_milestones_path
                   new_milestone_path)
@@ -85,7 +84,6 @@ RSpec.describe ReleasesHelper do
                   releases_page_path
                   markdown_preview_path
                   markdown_docs_path
-                  update_release_api_docs_path
                   release_assets_docs_path
                   manage_milestones_path
                   new_milestone_path

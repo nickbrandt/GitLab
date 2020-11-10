@@ -5027,9 +5027,6 @@ msgstr ""
 msgid "Changes won't take place until the index is %{link_start}recreated%{link_end}."
 msgstr ""
 
-msgid "Changing a Release tag is only supported via Releases API. %{linkStart}More information%{linkEnd}"
-msgstr ""
-
 msgid "Changing group URL can have unintended side effects."
 msgstr ""
 
@@ -26947,6 +26944,9 @@ msgid "The staging stage shows the time between merging the MR and deploying cod
 msgstr ""
 
 msgid "The status of the table below only applies to the default branch and is based on the %{linkStart}latest pipeline%{linkEnd}. Once you've enabled a scan for the default branch, any subsequent feature branch you create will include the scan."
+msgstr ""
+
+msgid "The tag name can't be changed for an existing release."
 msgstr ""
 
 msgid "The testing stage shows the time GitLab CI takes to run every pipeline for the related merge request. The data will automatically be added after your first pipeline finishes running."
