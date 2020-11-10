@@ -1,5 +1,5 @@
 <script>
-import { s__ } from '~/locale';
+import { __, s__ } from '~/locale';
 import MetricCard from '~/analytics/shared/components/metric_card.vue';
 import getGroupTestCoverage from '../graphql/queries/get_group_test_coverage.query.graphql';
 
@@ -52,6 +52,9 @@ export default {
       isLoading: false,
     };
   },
+  i18n: {
+    cardTitle: __('Overall Activity'),
+  },
   computed: {
     metrics() {
       return [
@@ -77,5 +80,5 @@ export default {
 };
 </script>
 <template>
-  <metric-card :title="__('Overall Activity')" :metrics="metrics" :is-loading="isLoading" />
+  <metric-card :title="$options.i18n.cardTitle" :metrics="metrics" :is-loading="isLoading" />
 </template>
