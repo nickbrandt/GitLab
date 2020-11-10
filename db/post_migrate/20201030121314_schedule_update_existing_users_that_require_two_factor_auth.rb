@@ -1,6 +1,6 @@
 # # frozen_string_literal: true
 
-class ScheduleUpdateExistingUsersThatRequireTwoFactorAuth < ActiveRecord::Migration[5.2]
+class ScheduleUpdateExistingUsersThatRequireTwoFactorAuth < ActiveRecord::Migration[6.0]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
