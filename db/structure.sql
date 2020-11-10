@@ -14722,6 +14722,8 @@ CREATE VIEW postgres_indexes AS
     pg_index.indisvalid AS valid_index,
     pg_class.relispartition AS partitioned,
     pg_index.indisexclusion AS exclusion,
+    (pg_index.indexprs IS NOT NULL) AS expression,
+    (pg_index.indpred IS NOT NULL) AS partial,
     pg_indexes.indexdef AS definition,
     pg_relation_size((pg_class.oid)::regclass) AS ondisk_size_bytes
    FROM (((pg_index
