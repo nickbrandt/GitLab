@@ -57,7 +57,9 @@ module Resolvers
         else
           queries = keys.map { |key| query_for(key) }
 
-          by_id = model_class.from_union(tag(queries)).group_by { |r| r[primary_key] }
+          by_id = model_class
+            .from_union(tag(queries), remove_duplicates: false)
+            .group_by { |r| r[primary_key] }
 
           by_id.values.each do |item_group|
             item = item_group.first
