@@ -1,5 +1,4 @@
 <script>
-/* eslint-disable vue/no-v-html */
 import { GlLoadingIcon, GlButton, GlAlert } from '@gitlab/ui';
 
 export default {
@@ -60,7 +59,9 @@ export default {
           {{ __('Start Web Terminal') }}
         </gl-button>
       </p>
-      <gl-alert v-if="!isValid && message" variant="tip" :dismissable="false" v-html="message" />
+      <gl-alert v-if="!isValid && message" variant="tip" :dismissable="false"> 
+        {{ __('Configure a .gitlab-webide.yml file in the .gitlab directory to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}')}}
+      </gl-alert>
       <p v-else>
         <a
           v-if="helpPath"
