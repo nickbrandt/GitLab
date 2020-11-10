@@ -2326,6 +2326,11 @@ type CiJob {
   ): CiJobConnection
 
   """
+  Pipeline the job belongs to
+  """
+  pipeline: Pipeline!
+
+  """
   Schedule for the build
   """
   scheduledAt: Time
