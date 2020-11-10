@@ -5684,6 +5684,9 @@ msgstr ""
 msgid "ClusterIntegration|%{appList} was successfully installed on your Kubernetes cluster"
 msgstr ""
 
+msgid "ClusterIntegration|%{boldStart}Note:%{boldEnd} Requires Ingress to be installed."
+msgstr ""
+
 msgid "ClusterIntegration|%{externalIp}.nip.io"
 msgstr ""
 
