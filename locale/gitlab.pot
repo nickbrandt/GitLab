@@ -18264,9 +18264,6 @@ msgstr ""
 msgid "No containers available"
 msgstr ""
 
-msgid "No content to show"
-msgstr ""
-
 msgid "No contributions"
 msgstr ""
 
@@ -26932,6 +26929,9 @@ msgid "The value lying at the midpoint of a series of observed values. E.g., bet
 msgstr ""
 
 msgid "The value of the provided variable exceeds the %{count} character limit"
+msgstr ""
+
+msgid "The visualization will appear in this tab when the CI/CD configuration file is populated with valid syntax."
 msgstr ""
 
 msgid "The vulnerability is no longer detected. Verify the vulnerability has been fixed or removed before changing its status."
