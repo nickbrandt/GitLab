@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe 'User views releases', :js do
-  let_it_be(:today) { Time.now }
+  let_it_be(:today) { Time.zone.now }
   let_it_be(:yesterday) { today - 1.day }
   let_it_be(:tomorrow) { today + 1.day }
 
