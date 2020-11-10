@@ -118,9 +118,9 @@ module Security
               .ordered
               .page(page)
               .per(per_page)
-              .then { |relation| by_confidence_levels(relation) }
-              .then { |relation| by_report_types(relation) }
-              .then { |relation| by_severity_levels(relation) }
+              .then(&method(:by_confidence_levels))
+              .then(&method(:by_report_types))
+              .then(&method(:by_severity_levels))
     end
 
     def per_page
