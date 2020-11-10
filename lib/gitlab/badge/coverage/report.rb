@@ -40,16 +40,31 @@ module Gitlab
 
         private
 
-        def pipeline
-          @pipeline ||= @project.ci_pipelines.latest_successful_for_ref(@ref)
+        def successful_pipeline
+          @successful_pipeline ||= @project.ci_pipelines.latest_successful_for_ref(@ref)
+        end
+
+        def failed_pipeline
+          @failed_pipeline ||= @project.ci_pipelines.latest_failed_for_ref(@ref)
+        end
+
+        def running_pipeline
+          @running_pipeline ||= @project.ci_pipelines.latest_running_for_ref(@ref)
         end
 
         def raw_coverage
           latest =
             if @job.present?
-              @project.builds.latest.success.for_ref(@ref).by_name(@job).order_id_desc.first
+              builds = ::Ci::Build
+                .in_pipelines([successful_pipeline, running_pipeline, failed_pipeline])
+                .latest
+                .success
+                .for_ref(@ref)
+                .by_name(@job)
+
+              builds.max_by(&:created_at)
             else
-              @project.ci_pipelines.latest_successful_for_ref(@ref)
+              successful_pipeline
             end
 
           latest&.coverage
