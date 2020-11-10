@@ -308,6 +308,8 @@ module TestEnv
     minio_pid = spawn(
       { 'MINIO_ACCESS_KEY' => 'minio', 'MINIO_SECRET_KEY' => 'minio-secret' },
       File.join(minio_dir, 'minio'),
+      '--quiet',
+      '--anonymous',
       'server',
       data_dir
     )
