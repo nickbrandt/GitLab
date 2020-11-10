@@ -53,7 +53,9 @@ class AutocompleteController < ApplicationController
   end
 
   def deploy_keys_with_owners
-    render json: DeployKeySerializer.new.represent(DeployKey.with_write_access_for_project(project), { with_owner: true, user: current_user })
+    deploy_keys = DeployKey.with_write_access_for_project(project)
+
+    render json: DeployKeySerializer.new.represent(deploy_keys, { with_owner: true, user: current_user })
   end
 
   private

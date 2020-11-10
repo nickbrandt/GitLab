@@ -8,7 +8,7 @@ class DeployKey < Key
   has_many :projects, through: :deploy_keys_projects
 
   scope :in_projects, ->(projects) { joins(:deploy_keys_projects).where(deploy_keys_projects: { project_id: projects }) }
-  scope :with_write_access, -> { joins(:deploy_keys_projects).where(deploy_keys_projects: { can_push: true }) }
+  scope :with_write_access, -> { joins(:deploy_keys_projects).merge(DeployKeysProject.with_write_access) }
   scope :are_public, -> { where(public: true) }
   scope :with_projects, -> { includes(deploy_keys_projects: { project: [:route, namespace: :route] }) }
 
@@ -57,8 +57,8 @@ class DeployKey < Key
   end
 
   def self.with_write_access_for_project(project, deploy_key: nil)
-    query = in_projects(project&.id).with_write_access
-    query = query.where(id: deploy_key.id) if deploy_key
+    query = in_projects(project).with_write_access
+    query = query.where(id: deploy_key) if deploy_key
 
     query
   end

@@ -59,14 +59,14 @@ RSpec.describe DeployKey, :mailer do
       it 'only returns deploy keys with write access' do
         create(:deploy_keys_project, project: project)
 
-        expect(subject).to contain_exactly(deploy_key)
+        is_expected.to contain_exactly(deploy_key)
       end
 
       it 'returns deploy keys only for this project' do
         other_project = create(:project)
         create(:deploy_keys_project, :write_access, project: other_project)
 
-        expect(subject).to contain_exactly(deploy_key)
+        is_expected.to contain_exactly(deploy_key)
       end
 
       context 'and a specific deploy key is passed in' do
