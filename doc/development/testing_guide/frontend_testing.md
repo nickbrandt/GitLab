@@ -898,6 +898,7 @@ it.each([
  }
 );
 ```
+
 **Note**: only use template literal block if pretty print is **not** needed for spec output. For example, empty strings, nested objects etc.
 
 ```javascript
