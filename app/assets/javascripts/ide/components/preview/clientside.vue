@@ -1,12 +1,13 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { isEmpty } from 'lodash';
+import { isEmpty, isString, debounce } from 'lodash';
 import { Manager } from 'smooshpack';
 import { listen } from 'codesandbox-api';
 import { GlLoadingIcon } from '@gitlab/ui';
 import Navigator from './navigator.vue';
 import { packageJsonPath } from '../../constants';
 import { createPathWithExt } from '../../utils';
+import eventHub from '../../eventhub';
 
 export default {
   components: {
@@ -61,13 +62,10 @@ export default {
       };
     },
   },
-  watch: {
-    entries: {
-      deep: true,
-      handler: 'update',
-    },
-  },
   mounted() {
+    this.onFilesChangeCallback = debounce(() => this.update(), 500);
+    eventHub.$on('ide.files.change', this.onFilesChangeCallback);
+
     this.loading = true;
 
     return this.loadFileContent(packageJsonPath)
@@ -78,6 +76,8 @@ export default {
       .then(() => this.initPreview());
   },
   beforeDestroy() {
+    eventHub.$off('ide.files.change', this.onFilesChangeCallback);
+
     if (!isEmpty(this.manager)) {
       this.manager.listener();
     }
@@ -95,7 +95,7 @@ export default {
     ...mapActions('clientside', ['pingUsage']),
     loadFileContent(path) {
       return this.getFileData({ path, makeFileActive: false }).then(() =>
-        this.getRawFileData({ path }),
+        this.getRawFileData({ path, onlyCacheOnce: true }),
       );
     },
     initPreview() {
@@ -139,13 +139,29 @@ export default {
 
       const settings = {
         fileResolver: {
-          isFile: p => Promise.resolve(Boolean(this.entries[createPathWithExt(p)])),
-          readFile: p => this.loadFileContent(createPathWithExt(p)).then(content => content),
+          isFile: p => {
+            console.log('[clientside.vue] isFile', p, createPathWithExt(p));
+
+            return Promise.resolve(Boolean(this.entries[createPathWithExt(p)]));
+          },
+          readFile: p => this.resolveFileContent(p),
         },
         ...(bundlerURL ? { bundlerURL } : {}),
       };
 
       this.manager = new Manager('#ide-preview', this.sandboxOpts, settings);
+    },
+    resolveFileContent(path) {
+      return this.loadFileContent(createPathWithExt(path)).then(contentParam => {
+        console.log(contentParam);
+
+        const isBase64 = isString(contentParam);
+        const content = isBase64
+          ? Uint8Array.from(atob(contentParam), c => c.charCodeAt(0))
+          : contentParam;
+
+        return content;
+      });
     },
   },
 };
