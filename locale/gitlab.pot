@@ -22986,9 +22986,6 @@ msgstr ""
 msgid "Reset authorization key?"
 msgstr ""
 
-msgid "Reset filters"
-msgstr ""
-
 msgid "Reset health check access token"
 msgstr ""
 
