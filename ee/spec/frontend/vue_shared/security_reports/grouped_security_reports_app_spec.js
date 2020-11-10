@@ -4,6 +4,7 @@ import GroupedSecurityReportsApp from 'ee/vue_shared/security_reports/grouped_se
 import appStore from 'ee/vue_shared/security_reports/store';
 import * as types from 'ee/vue_shared/security_reports/store/mutation_types';
 import * as sastTypes from 'ee/vue_shared/security_reports/store/modules/sast/mutation_types';
+import * as secretScanningTypes from 'ee/vue_shared/security_reports/store/modules/secret_detection/mutation_types';
 import { mount } from '@vue/test-utils';
 import { waitForMutation } from 'helpers/vue_test_utils_helper';
 import { trimText } from 'helpers/text_helper';
@@ -137,7 +138,10 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_ERROR),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR),
-          waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_ERROR),
+          waitForMutation(
+            wrapper.vm.$store,
+            `secretScanning/${secretScanningTypes.RECEIVE_SECRET_SCANNING_DIFF_ERROR}`,
+          ),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_ERROR),
         ]);
       });
@@ -222,7 +226,10 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
-          waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS),
+          waitForMutation(
+            wrapper.vm.$store,
+            `secretScanning/${secretScanningTypes.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS}`,
+          ),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_SUCCESS),
         ]);
       });
@@ -272,7 +279,10 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DAST_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_CONTAINER_SCANNING_DIFF_SUCCESS),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
-          waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS),
+          waitForMutation(
+            wrapper.vm.$store,
+            `secretScanning/${secretScanningTypes.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS}`,
+          ),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_SUCCESS),
         ]);
       });
@@ -564,7 +574,10 @@ describe('Grouped security reports app', () => {
         },
       });
 
-      return waitForMutation(wrapper.vm.$store, types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS);
+      return waitForMutation(
+        wrapper.vm.$store,
+        `secretScanning/${secretScanningTypes.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS}`,
+      );
     };
 
     describe('enabled', () => {

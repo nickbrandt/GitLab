@@ -173,36 +173,6 @@ export const fetchCoverageFuzzingDiff = ({ state, dispatch }) => {
 export const updateCoverageFuzzingIssue = ({ commit }, issue) =>
   commit(types.UPDATE_COVERAGE_FUZZING_ISSUE, issue);
 
-/**
- * SECRET SCANNING
- */
-
-export const setSecretScanningDiffEndpoint = ({ commit }, path) =>
-  commit(types.SET_SECRET_SCANNING_DIFF_ENDPOINT, path);
-
-export const requestSecretScanningDiff = ({ commit }) => commit(types.REQUEST_SECRET_SCANNING_DIFF);
-
-export const receiveSecretScanningDiffSuccess = ({ commit }, response) =>
-  commit(types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS, response);
-
-export const receiveSecretScanningDiffError = ({ commit }) =>
-  commit(types.RECEIVE_SECRET_SCANNING_DIFF_ERROR);
-
-export const fetchSecretScanningDiff = ({ state, dispatch }) => {
-  dispatch('requestSecretScanningDiff');
-
-  return fetchDiffData(state, state.secretScanning.paths.diffEndpoint, 'secret_detection')
-    .then(data => {
-      dispatch('receiveSecretScanningDiffSuccess', data);
-    })
-    .catch(() => {
-      dispatch('receiveSecretScanningDiffError');
-    });
-};
-
-export const updateSecretScanningIssue = ({ commit }, issue) =>
-  commit(types.UPDATE_SECRET_SCANNING_ISSUE, issue);
-
 export const openModal = ({ dispatch }, payload) => {
   dispatch('setModalData', payload);
 

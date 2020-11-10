@@ -204,12 +204,10 @@ export default {
       'groupedContainerScanningText',
       'groupedDastText',
       'groupedDependencyText',
-      'groupedSecretScanningText',
       'groupedCoverageFuzzingText',
       'containerScanningStatusIcon',
       'dastStatusIcon',
       'dependencyScanningStatusIcon',
-      'secretScanningStatusIcon',
       'coverageFuzzingStatusIcon',
       'isBaseSecurityReportOutOfDate',
       'canCreateIssue',
@@ -217,6 +215,7 @@ export default {
       'canDismissVulnerability',
     ]),
     ...mapGetters('sast', ['groupedSastText', 'sastStatusIcon']),
+    ...mapGetters('secretScanning', ['groupedSecretScanningText', 'secretScanningStatusIcon']),
     ...mapGetters('pipelineJobs', ['hasFuzzingArtifacts', 'fuzzingJobsWithArtifact']),
     securityTab() {
       return `${this.pipelinePath}/security`;
@@ -237,7 +236,7 @@ export default {
     hasSastReports() {
       return this.enabledReports.sast;
     },
-    hasSecretScanningReports() {
+    hasSecretDetectionReports() {
       return this.enabledReports.secretDetection;
     },
     isMRActive() {
@@ -352,14 +351,16 @@ export default {
       'setDependencyScanningDiffEndpoint',
       'fetchDastDiff',
       'setDastDiffEndpoint',
-      'fetchSecretScanningDiff',
-      'setSecretScanningDiffEndpoint',
       'fetchCoverageFuzzingDiff',
       'setCoverageFuzzingDiffEndpoint',
     ]),
     ...mapActions('sast', {
       setSastDiffEndpoint: 'setDiffEndpoint',
       fetchSastDiff: 'fetchDiff',
+    }),
+    ...mapActions('secretScanning', {
+      setSecretScanningDiffEndpoint: 'setSecretScanningDiffEndpoint',
+      fetchSecretScanningDiff: 'fetchSecretScanningDiff',
     }),
     ...mapActions('pipelineJobs', ['fetchPipelineJobs', 'setPipelineJobsPath', 'setProjectId']),
     ...mapActions('pipelineJobs', {

@@ -11,14 +11,6 @@ export const groupedContainerScanningText = ({ containerScanning }) =>
     messages.CONTAINER_SCANNING_IS_LOADING,
   );
 
-export const groupedSecretScanningText = ({ secretScanning }) =>
-  groupedReportText(
-    secretScanning,
-    messages.SECRET_SCANNING,
-    messages.SECRET_SCANNING_HAS_ERROR,
-    messages.SECRET_SCANNING_IS_LOADING,
-  );
-
 export const groupedDastText = ({ dast }) =>
   groupedReportText(dast, messages.DAST, messages.DAST_HAS_ERROR, messages.DAST_IS_LOADING);
 
@@ -113,9 +105,6 @@ export const dependencyScanningStatusIcon = ({ dependencyScanning }) =>
     dependencyScanning.hasError,
     dependencyScanning.newIssues.length,
   );
-
-export const secretScanningStatusIcon = ({ secretScanning }) =>
-  statusIcon(secretScanning.isLoading, secretScanning.hasError, secretScanning.newIssues.length);
 
 export const coverageFuzzingStatusIcon = ({ coverageFuzzing }) =>
   statusIcon(coverageFuzzing.isLoading, coverageFuzzing.hasError, coverageFuzzing.newIssues.length);
