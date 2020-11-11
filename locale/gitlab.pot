@@ -26429,6 +26429,9 @@ msgid_plural "Terraform|%{number} Terraform reports were generated in your pipel
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Terraform|%{user} updated %{timeAgo}"
+msgstr ""
+
 msgid "Terraform|A Terraform report failed to generate."
 msgstr ""
 
@@ -26450,6 +26453,9 @@ msgstr ""
 msgid "Terraform|Locked"
 msgstr ""
 
+msgid "Terraform|Locked by %{user} %{timeAgo}"
+msgstr ""
+
 msgid "Terraform|Reported Resource Changes: %{addNum} to add, %{changeNum} to change, %{deleteNum} to delete"
 msgstr ""
 
@@ -26460,9 +26466,6 @@ msgid "Terraform|The Terraform report %{name} failed to generate."
 msgstr ""
 
 msgid "Terraform|The Terraform report %{name} was generated in your pipelines."
-msgstr ""
-
-msgid "Terraform|updated %{timeStart}time%{timeEnd}"
 msgstr ""
 
 msgid "Test"
