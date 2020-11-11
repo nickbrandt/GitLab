@@ -182,13 +182,13 @@ describe('Vulnerability Details', () => {
 
     const EXPECT_RESPONSE = {
       label: 'Actual response:',
-      content: 'INTERNAL SERVER ERROR 500\nName1: Value1\nName2: Value2\n\n[{"user_id":1,}]',
+      content: '500 INTERNAL SERVER ERROR\nName1: Value1\nName2: Value2\n\n[{"user_id":1,}]',
       isCode: true,
     };
 
     const EXPECT_RECORDED_RESPONSE = {
       label: 'Unmodified response:',
-      content: 'OK 200\nName1: Value1\nName2: Value2\n\n[{"user_id":1,}]',
+      content: '200 OK\nName1: Value1\nName2: Value2\n\n[{"user_id":1,}]',
       isCode: true,
     };
 

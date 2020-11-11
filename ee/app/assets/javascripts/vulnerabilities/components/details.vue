@@ -57,8 +57,13 @@ export default {
         properties: {},
       };
     },
-    assert() {
+    assertion() {
       return this.vulnerability.evidence_source?.name;
+    },
+    recordedMessage() {
+      return this.vulnerability?.supporting_messages?.find(
+        msg => msg.name === SUPPORTING_MESSAGE_TYPES.RECORDED,
+      )?.response;
     },
     getConstructedRequest() {
       const { body, method, url, headers = [] } = this.vulnerability.request;
@@ -78,7 +83,7 @@ export default {
       const headerLines = this.getHeadersAsCodeBlockLines(headers);
 
       return statusCode && reasonPhrase && headerLines
-        ? [`${reasonPhrase} ${statusCode}\n`, headerLines, '\n\n', body].join('')
+        ? [`${statusCode} ${reasonPhrase}\n`, headerLines, '\n\n', body].join('')
         : '';
     },
     getConstructedRecordedResponse() {
@@ -87,13 +92,11 @@ export default {
         status_code: statusCode,
         reason_phrase: reasonPhrase,
         headers = [],
-      } = this.vulnerability?.supporting_messages?.find(
-        msg => msg.name === SUPPORTING_MESSAGE_TYPES.RECORDED,
-      ).response;
+      } = this.recordedMessage;
       const headerLines = this.getHeadersAsCodeBlockLines(headers);
 
       return statusCode && reasonPhrase && headerLines
-        ? [`${reasonPhrase} ${statusCode}\n`, headerLines, '\n\n', body].join('')
+        ? [`${statusCode} ${reasonPhrase}\n`, headerLines, '\n\n', body].join('')
         : '';
     },
     requestData() {
@@ -123,11 +126,7 @@ export default {
       ].filter(x => x.content);
     },
     recordedResponseData() {
-      if (
-        !this.vulnerability?.supporting_messages?.find(
-          msg => msg.name === SUPPORTING_MESSAGE_TYPES.RECORDED,
-        )
-      ) {
+      if (!this.recordedMessage) {
         return [];
       }
 
@@ -148,6 +147,18 @@ export default {
         this.location.image ||
         this.location.operating_system
       );
+    },
+    hasRequest() {
+      return Boolean(this.requestData.length);
+    },
+    hasResponse() {
+      return Boolean(this.responseData.length);
+    },
+    hasRecordedResponse() {
+      return Boolean(this.recordedResponseData.length);
+    },
+    hasResponses() {
+      return Boolean(this.hasResponse || this.hasRecordedResponse);
     },
   },
   methods: {
@@ -287,7 +298,7 @@ export default {
       </ul>
     </template>
 
-    <section v-if="requestData.length" data-testid="request">
+    <section v-if="hasRequest" data-testid="request">
       <h3>{{ s__('Vulnerability|Request/Response') }}</h3>
       <ul>
         <detail-item
@@ -303,10 +314,10 @@ export default {
       </ul>
     </section>
 
-    <div v-if="responseData.length || recordedResponseData.length" class="row">
+    <div v-if="hasResponses" class="row">
       <section
-        v-if="recordedResponseData.length"
-        :class="responseData.length ? 'col-6' : 'col'"
+        v-if="hasRecordedResponse"
+        :class="hasResponse ? 'col-6' : 'col'"
         data-testid="recorded-response"
       >
         <ul>
@@ -334,8 +345,8 @@ export default {
       </section>
 
       <section
-        v-if="responseData.length"
-        :class="recordedResponseData.length ? 'col-6' : 'col'"
+        v-if="hasResponse"
+        :class="hasRecordedResponse ? 'col-6' : 'col'"
         data-testid="response"
       >
         <ul>
@@ -347,7 +358,6 @@ export default {
             <gl-icon
               v-gl-tooltip
               name="information-o"
-              :size="16"
               class="gl-hover-cursor-pointer gl-mr-3"
               :title="
                 s__(
@@ -364,11 +374,11 @@ export default {
       </section>
     </div>
 
-    <template v-if="assert">
-      <h3>{{ __('Additional Info') }}</h3>
+    <template v-if="assertion">
+      <h3>{{ s__('Vulnerability|Additional Info') }}</h3>
       <ul>
-        <detail-item :sprintf-message="__('%{labelStart}Assert:%{labelEnd} %{assert}')"
-          >{{ assert }}
+        <detail-item :sprintf-message="__('%{labelStart}Assert:%{labelEnd} %{assertion}')"
+          >{{ assertion }}
         </detail-item>
       </ul>
     </template>

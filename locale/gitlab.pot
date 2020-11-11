@@ -535,7 +535,7 @@ msgstr ""
 msgid "%{labelStart}Actual response:%{labelEnd} %{headers}"
 msgstr ""
 
-msgid "%{labelStart}Assert:%{labelEnd} %{assert}"
+msgid "%{labelStart}Assert:%{labelEnd} %{assertion}"
 msgstr ""
 
 msgid "%{labelStart}Class:%{labelEnd} %{class}"
@@ -1800,9 +1800,6 @@ msgid "Added in this version"
 msgstr ""
 
 msgid "Adding new applications is disabled in your GitLab instance. Please contact your GitLab administrator to get the permission"
-msgstr ""
-
-msgid "Additional Info"
 msgstr ""
 
 msgid "Additional Metadata"
@@ -21948,6 +21945,9 @@ msgstr ""
 msgid "Reconfigure"
 msgstr ""
 
+msgid "Recorded"
+msgstr ""
+
 msgid "Recover hidden stage"
 msgstr ""
 
@@ -29701,6 +29701,9 @@ msgid "Vulnerability|Activity"
 msgstr ""
 
 msgid "Vulnerability|Actual received response is the one received when this fault was detected"
+msgstr ""
+
+msgid "Vulnerability|Additional Info"
 msgstr ""
 
 msgid "Vulnerability|Class"
