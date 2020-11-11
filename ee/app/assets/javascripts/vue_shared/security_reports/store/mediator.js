@@ -5,7 +5,7 @@ export const updateIssueActionsMap = {
   dependency_scanning: 'updateDependencyScanningIssue',
   container_scanning: 'updateContainerScanningIssue',
   dast: 'updateDastIssue',
-  secret_scanning: 'secretScanning/updateSecretScanningIssue',
+  secret_detection: 'secretScanning/updateSecretScanningIssue',
   coverage_fuzzing: 'updateCoverageFuzzingIssue',
 };
 
