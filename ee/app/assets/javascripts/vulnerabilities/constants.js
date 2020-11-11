@@ -1,4 +1,4 @@
-import { s__, __ } from '~/locale';
+import { s__ } from '~/locale';
 
 export const VULNERABILITY_STATE_OBJECTS = {
   detected: {
@@ -67,5 +67,5 @@ export const REGEXES = {
 };
 
 export const SUPPORTING_MESSAGE_TYPES = {
-  RECORDED: __('Recorded'),
+  RECORDED: s__('VulnerabilityManagement|Recorded'),
 };

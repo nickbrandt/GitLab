@@ -21945,9 +21945,6 @@ msgstr ""
 msgid "Reconfigure"
 msgstr ""
 
-msgid "Recorded"
-msgstr ""
-
 msgid "Recover hidden stage"
 msgstr ""
 
@@ -29647,6 +29644,9 @@ msgid "VulnerabilityManagement|Detected"
 msgstr ""
 
 msgid "VulnerabilityManagement|Needs triage"
+msgstr ""
+
+msgid "VulnerabilityManagement|Recorded"
 msgstr ""
 
 msgid "VulnerabilityManagement|Something went wrong while trying to delete the comment. Please try again later."

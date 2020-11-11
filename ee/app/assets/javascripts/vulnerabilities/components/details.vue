@@ -66,38 +66,13 @@ export default {
       )?.response;
     },
     getConstructedRequest() {
-      const { body, method, url, headers = [] } = this.vulnerability.request;
-      const headerLines = this.getHeadersAsCodeBlockLines(headers);
-
-      return method && url && headerLines
-        ? [`${method} ${url}\n`, headerLines, '\n\n', body].join('')
-        : '';
+      return this.constructRequest(this.vulnerability.request);
     },
     getConstructedResponse() {
-      const {
-        body,
-        status_code: statusCode,
-        reason_phrase: reasonPhrase,
-        headers = [],
-      } = this.vulnerability.response;
-      const headerLines = this.getHeadersAsCodeBlockLines(headers);
-
-      return statusCode && reasonPhrase && headerLines
-        ? [`${statusCode} ${reasonPhrase}\n`, headerLines, '\n\n', body].join('')
-        : '';
+      return this.constructResponse(this.vulnerability.response);
     },
     getConstructedRecordedResponse() {
-      const {
-        body,
-        status_code: statusCode,
-        reason_phrase: reasonPhrase,
-        headers = [],
-      } = this.recordedMessage;
-      const headerLines = this.getHeadersAsCodeBlockLines(headers);
-
-      return statusCode && reasonPhrase && headerLines
-        ? [`${statusCode} ${reasonPhrase}\n`, headerLines, '\n\n', body].join('')
-        : '';
+      return this.constructResponse(this.recordedMessage);
     },
     requestData() {
       if (!this.vulnerability.request) {
@@ -165,6 +140,22 @@ export default {
     getHeadersAsCodeBlockLines(headers) {
       return Array.isArray(headers)
         ? headers.map(({ name, value }) => `${name}: ${value}`).join('\n')
+        : '';
+    },
+    constructResponse(response) {
+      const { body, status_code: statusCode, reason_phrase: reasonPhrase, headers = [] } = response;
+      const headerLines = this.getHeadersAsCodeBlockLines(headers);
+
+      return statusCode && reasonPhrase && headerLines
+        ? [`${statusCode} ${reasonPhrase}\n`, headerLines, '\n\n', body].join('')
+        : '';
+    },
+    constructRequest(request) {
+      const { body, method, url, headers = [] } = request;
+      const headerLines = this.getHeadersAsCodeBlockLines(headers);
+
+      return method && url && headerLines
+        ? [`${method} ${url}\n`, headerLines, '\n\n', body].join('')
         : '';
     },
   },
