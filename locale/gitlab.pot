@@ -9709,9 +9709,6 @@ msgstr ""
 msgid "Download as"
 msgstr ""
 
-msgid "Download as CSV"
-msgstr ""
-
 msgid "Download codes"
 msgstr ""
 
@@ -28270,7 +28267,7 @@ msgstr ""
 msgid "To use Gitpod you must first enable the feature in the integrations section of your %{user_prefs}."
 msgstr ""
 
-msgid "To view all %{scannedResourcesCount} scanned URLs, please download the CSV file"
+msgid "To view all %{scannedResourcesCount} scanned URLs, %{linkStart}please download the CSV file%{linkEnd}"
 msgstr ""
 
 msgid "To view instance-level analytics, ask an admin to turn on %{docLinkStart}usage ping%{docLinkEnd}."
