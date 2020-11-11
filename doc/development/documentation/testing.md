@@ -183,9 +183,8 @@ You can use Vale:
 
 - [On the command line](https://errata-ai.gitbook.io/vale/getting-started/usage).
 - [Within a code editor](#configure-editors).
-- [In a `pre-commit` hook](#configure-pre-push-hooks). Vale only reports errors in the
-  `pre-commit` hook (the same configuration as the CI/CD pipelines), and does not report suggestions
-  or warnings.
+- [In a Git hook](#configure-pre-push-hooks). Vale only reports errors in the Git hook (the same
+  configuration as the CI/CD pipelines), and does not report suggestions or warnings.
 
 ### Install linters
 
