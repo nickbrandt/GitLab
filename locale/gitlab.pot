@@ -3546,6 +3546,9 @@ msgstr ""
 msgid "Archived"
 msgstr ""
 
+msgid "Archived (%{movedToStart}moved%{movedToEnd})"
+msgstr ""
+
 msgid "Archived in this version"
 msgstr ""
 
@@ -17691,6 +17694,9 @@ msgstr ""
 msgid "Move selection up"
 msgstr ""
 
+msgid "Move test case"
+msgstr ""
+
 msgid "Move this issue to another project."
 msgstr ""
 
@@ -26495,6 +26501,12 @@ msgstr[1] ""
 msgid "Test settings"
 msgstr ""
 
+msgid "TestCases|Move test case"
+msgstr ""
+
+msgid "TestCases|Moving test case"
+msgstr ""
+
 msgid "TestCases|New Test Case"
 msgstr ""
 
@@ -26520,6 +26532,9 @@ msgid "TestCases|Something went wrong while fetching test cases list."
 msgstr ""
 
 msgid "TestCases|Something went wrong while marking test case todo as done."
+msgstr ""
+
+msgid "TestCases|Something went wrong while moving test case."
 msgstr ""
 
 msgid "TestCases|Something went wrong while updating the test case labels."
