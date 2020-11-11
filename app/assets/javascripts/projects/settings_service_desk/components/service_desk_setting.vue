@@ -116,7 +116,7 @@ export default {
             <input
               ref="service-desk-incoming-email"
               type="text"
-              class="form-control"
+              class="form-control qa-incoming-email"
               data-testid="incoming-email"
               :placeholder="__('Incoming email')"
               :aria-label="__('Incoming email')"
