@@ -9,12 +9,12 @@ class ChangeIndexMrMetricsTargetProjectId < ActiveRecord::Migration[6.0]
   NULLS_LAST_INDEX_NAME = 'index_mr_metrics_on_target_project_id_merged_at_nulls_last'
 
   def up
-    add_concurrent_index :merge_request_metrics, [:target_project_id, :merged_at], order: { merged_at: 'DESC NULLS LAST' }, name: NULLS_LAST_INDEX_NAME
+    add_concurrent_index :merge_request_metrics, [:target_project_id, :merged_at, :id], order: { merged_at: 'DESC NULLS LAST', id: 'DESC' }, name: NULLS_LAST_INDEX_NAME
     remove_concurrent_index_by_name(:merge_request_metrics, INDEX_NAME)
   end
 
   def down
-    add_concurrent_index :merge_request_metrics, [:target_project_id, :created_at, :merged_at], name: INDEX_NAME
+    add_concurrent_index :merge_request_metrics, [:target_project_id, :merged_at], name: INDEX_NAME
     remove_concurrent_index_by_name(:merge_request_metrics, NULLS_LAST_INDEX_NAME)
   end
 end
