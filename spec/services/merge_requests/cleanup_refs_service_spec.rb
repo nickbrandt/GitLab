@@ -91,6 +91,23 @@ RSpec.describe MergeRequests::CleanupRefsService do
         it_behaves_like 'service that does not clean up merge request refs'
       end
 
+      context 'when cleanup schedule fails to update' do
+        before do
+          allow(merge_request.cleanup_schedule).to receive(:update).and_return(false)
+        end
+
+        it 'creates keep around ref and deletes merge request refs' do
+          old_ref_head = ref_head
+
+          aggregate_failures do
+            expect(result[:status]).to eq(:error)
+            expect(kept_around?(old_ref_head)).to be_truthy
+            expect(ref_head).to be_nil
+            expect(merge_request.cleanup_schedule.completed_at).not_to be_present
+          end
+        end
+      end
+
       context 'when merge request is not scheduled to be cleaned up yet' do
         before do
           merge_request.cleanup_schedule.update!(scheduled_at: 1.day.from_now)

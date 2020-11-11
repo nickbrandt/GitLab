@@ -20,16 +20,20 @@ RSpec.describe ScheduleMergeRequestCleanupRefsWorker do
       worker.perform
     end
 
-    it 'schedules MergeRequestCleanupRefsWorker to be performed by batch' do
-      expect(MergeRequestCleanupRefsWorker)
-        .to receive(:bulk_perform_in)
-        .with(
-          described_class::DELAY,
-          [[1], [2], [3], [4]],
-          batch_size: described_class::BATCH_SIZE
-        )
+    include_examples 'an idempotent worker' do
+      it 'schedules MergeRequestCleanupRefsWorker to be performed by batch' do
+        expect(MergeRequestCleanupRefsWorker)
+          .to receive(:bulk_perform_in)
+          .with(
+            described_class::DELAY,
+            [[1], [2], [3], [4]],
+            batch_size: described_class::BATCH_SIZE
+          )
 
-      worker.perform
+        expect(worker).to receive(:log_extra_metadata_on_done).with(:merge_requests_count, 4)
+
+        worker.perform
+      end
     end
   end
 end

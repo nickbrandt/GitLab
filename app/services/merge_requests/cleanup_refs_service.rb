@@ -32,7 +32,10 @@ module MergeRequests
       return error('Failed to cache merge ref sha.') unless cache_merge_ref_sha
 
       delete_refs
-      success if update_schedule
+
+      return error('Failed to update schedule.') unless update_schedule
+
+      success
     end
 
     private
