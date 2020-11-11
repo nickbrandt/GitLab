@@ -35,7 +35,7 @@ export const summaryCounts = ({
   dast,
   dependencyScanning,
   sast,
-  secretScanning,
+  secretDetection,
   coverageFuzzing,
 } = {}) => {
   const allNewVulns = [
@@ -43,7 +43,7 @@ export const summaryCounts = ({
     ...dast.newIssues,
     ...dependencyScanning.newIssues,
     ...sast.newIssues,
-    ...secretScanning.newIssues,
+    ...secretDetection.newIssues,
     ...coverageFuzzing.newIssues,
   ];
 
@@ -114,7 +114,7 @@ export const areReportsLoading = state =>
   state.dast.isLoading ||
   state.containerScanning.isLoading ||
   state.dependencyScanning.isLoading ||
-  state.secretScanning.isLoading ||
+  state.secretDetection.isLoading ||
   state.coverageFuzzing.isLoading;
 
 export const areAllReportsLoading = state =>
@@ -122,7 +122,7 @@ export const areAllReportsLoading = state =>
   state.dast.isLoading &&
   state.containerScanning.isLoading &&
   state.dependencyScanning.isLoading &&
-  state.secretScanning.isLoading &&
+  state.secretDetection.isLoading &&
   state.coverageFuzzing.isLoading;
 
 export const allReportsHaveError = state =>
@@ -130,7 +130,7 @@ export const allReportsHaveError = state =>
   state.dast.hasError &&
   state.containerScanning.hasError &&
   state.dependencyScanning.hasError &&
-  state.secretScanning.hasError &&
+  state.secretDetection.hasError &&
   state.coverageFuzzing.hasError;
 
 export const anyReportHasError = state =>
@@ -138,7 +138,7 @@ export const anyReportHasError = state =>
   state.dast.hasError ||
   state.containerScanning.hasError ||
   state.dependencyScanning.hasError ||
-  state.secretScanning.hasError ||
+  state.secretDetection.hasError ||
   state.coverageFuzzing.hasError;
 
 export const noBaseInAllReports = state =>
@@ -146,7 +146,7 @@ export const noBaseInAllReports = state =>
   !state.dast.hasBaseReport &&
   !state.containerScanning.hasBaseReport &&
   !state.dependencyScanning.hasBaseReport &&
-  !state.secretScanning.hasBaseReport &&
+  !state.secretDetection.hasBaseReport &&
   !state.coverageFuzzing.hasBaseReport;
 
 export const anyReportHasIssues = state =>
@@ -154,7 +154,7 @@ export const anyReportHasIssues = state =>
   state.dast.newIssues.length > 0 ||
   state.containerScanning.newIssues.length > 0 ||
   state.dependencyScanning.newIssues.length > 0 ||
-  state.secretScanning.newIssues.length > 0 ||
+  state.secretDetection.newIssues.length > 0 ||
   state.coverageFuzzing.newIssues.length > 0;
 
 export const isBaseSecurityReportOutOfDate = state =>
@@ -162,7 +162,7 @@ export const isBaseSecurityReportOutOfDate = state =>
   state.dast.baseReportOutofDate ||
   state.containerScanning.baseReportOutofDate ||
   state.dependencyScanning.baseReportOutofDate ||
-  state.secretScanning.baseReportOutofDate ||
+  state.secretDetection.baseReportOutofDate ||
   state.coverageFuzzing.baseReportOutofDate;
 
 export const canCreateIssue = state => Boolean(state.createVulnerabilityFeedbackIssuePath);

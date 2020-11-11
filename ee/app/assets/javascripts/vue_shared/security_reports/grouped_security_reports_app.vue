@@ -191,7 +191,7 @@ export default {
       'dast',
       'coverageFuzzing',
       'dependencyScanning',
-      'secretScanning',
+      'secretDetection',
       'summaryCounts',
       'modal',
       'isCreatingIssue',
@@ -215,7 +215,7 @@ export default {
       'canDismissVulnerability',
     ]),
     ...mapGetters('sast', ['groupedSastText', 'sastStatusIcon']),
-    ...mapGetters('secretScanning', ['groupedSecretScanningText', 'secretScanningStatusIcon']),
+    ...mapGetters('secretDetection', ['groupedSecretDetectionText', 'secretDetectionStatusIcon']),
     ...mapGetters('pipelineJobs', ['hasFuzzingArtifacts', 'fuzzingJobsWithArtifact']),
     securityTab() {
       return `${this.pipelinePath}/security`;
@@ -307,9 +307,9 @@ export default {
       this.fetchDependencyScanningDiff();
     }
 
-    const secretScanningDiffEndpoint = gl?.mrWidgetData?.secret_scanning_comparison_path;
-    if (secretScanningDiffEndpoint && this.hasSecretScanningReports) {
-      this.setSecretDetectionDiffEndpoint(secretScanningDiffEndpoint);
+    const secretDetectionDiffEndpoint = gl?.mrWidgetData?.secret_scanning_comparison_path;
+    if (secretDetectionDiffEndpoint && this.hasSecretDetectionReports) {
+      this.setSecretDetectionDiffEndpoint(secretDetectionDiffEndpoint);
       this.fetchSecretDetectionDiff();
     }
 
@@ -358,7 +358,7 @@ export default {
       setSastDiffEndpoint: 'setDiffEndpoint',
       fetchSastDiff: 'fetchDiff',
     }),
-    ...mapActions('secretScanning', {
+    ...mapActions('secretDetection', {
       setSecretDetectionDiffEndpoint: 'setDiffEndpoint',
       fetchSecretDetectionDiff: 'fetchDiff',
     }),
@@ -532,22 +532,22 @@ export default {
           />
         </template>
 
-        <template v-if="hasSecretScanningReports">
+        <template v-if="hasSecretDetectionReports">
           <summary-row
-            :status-icon="secretScanningStatusIcon"
+            :status-icon="secretDetectionStatusIcon"
             :popover-options="secretScanningPopover"
             class="js-secret-scanning"
             data-qa-selector="secret_scan_report"
           >
             <template #summary>
-              <security-summary :message="groupedSecretScanningText" />
+              <security-summary :message="groupedSecretDetectionText" />
             </template>
           </summary-row>
 
           <grouped-issues-list
-            v-if="secretScanning.newIssues.length || secretScanning.resolvedIssues.length"
-            :unresolved-issues="secretScanning.newIssues"
-            :resolved-issues="secretScanning.resolvedIssues"
+            v-if="secretDetection.newIssues.length || secretDetection.resolvedIssues.length"
+            :unresolved-issues="secretDetection.newIssues"
+            :resolved-issues="secretDetection.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
             class="report-block-group-list"
             data-testid="secret-scanning-issues-list"

@@ -38,7 +38,7 @@ describe('Security reports getters', () => {
   beforeEach(() => {
     state = createState();
     state.sast = createSastState();
-    state.secretScanning = createSecretScanningState();
+    state.secretDetection = createSecretScanningState();
   });
 
   describe.each`
@@ -220,7 +220,7 @@ describe('Security reports getters', () => {
       state.dast.hasError = true;
       state.containerScanning.hasError = true;
       state.dependencyScanning.hasError = true;
-      state.secretScanning.hasError = true;
+      state.secretDetection.hasError = true;
       state.coverageFuzzing.hasError = true;
 
       expect(allReportsHaveError(state)).toEqual(true);
@@ -234,7 +234,7 @@ describe('Security reports getters', () => {
       state.dast.hasError = false;
       state.containerScanning.hasError = true;
       state.dependencyScanning.hasError = true;
-      state.secretScanning.hasError = true;
+      state.secretDetection.hasError = true;
 
       expect(allReportsHaveError(state)).toEqual(false);
     });
