@@ -22328,6 +22328,9 @@ msgstr ""
 msgid "ReleaseAssetLinkType|Runbooks"
 msgstr ""
 
+msgid "Released date"
+msgstr ""
+
 msgid "Releases"
 msgstr ""
 
