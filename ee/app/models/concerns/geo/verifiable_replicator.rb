@@ -11,7 +11,7 @@ module Geo
     class_methods do
       extend Gitlab::Utils::Override
 
-      delegate :verification_pending_batch, :verification_failed_batch, :needs_verification_count, to: :verification_query_class
+      delegate :verification_pending_batch, :verification_failed_batch, :needs_verification_count, :fail_verification_timeouts, to: :verification_query_class
 
       # If replication is disabled, then so is verification.
       override :verification_enabled?
@@ -37,6 +37,8 @@ module Geo
         return false unless verification_enabled?
 
         ::Geo::VerificationBatchWorker.perform_with_capacity(replicable_name)
+
+        ::Geo::VerificationTimeoutWorker.perform_async(replicable_name)
       end
 
       # Called by VerificationBatchWorker.
