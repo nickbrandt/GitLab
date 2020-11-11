@@ -12801,7 +12801,7 @@ msgstr ""
 msgid "Go back (while searching for files)"
 msgstr ""
 
-msgid "Go back to %{startTag}Open issues%{endTag} and select some issues to add to your board."
+msgid "Go back to %{tagStart}Open issues%{tagEnd} and select some issues to add to your board."
 msgstr ""
 
 msgid "Go full screen"
