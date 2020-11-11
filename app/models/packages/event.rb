@@ -29,8 +29,8 @@ class Packages::Event < ApplicationRecord
     "i_package_#{event_scope}_#{originator}_#{event_type.gsub(/_packages?/, "")}"
   end
 
-  # remove some of the events for now so we dont hammer redis too hard
-  # TODO: probably remove this very soon
+  # Remove some of the events, for now, so we don't hammer Redis too hard.
+  # See: https://gitlab.com/gitlab-org/gitlab/-/issues/280770
   def self.event_allowed?(event_scope, event_type, originator)
     return false if originator.to_sym == :guest
     return true if UNIQUE_EVENTS_ALLOWED.include?(event_type.to_sym)
