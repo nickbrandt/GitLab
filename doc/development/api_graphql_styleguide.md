@@ -865,6 +865,18 @@ These include:
 - extras
 - description
 
+Example:
+
+```ruby
+module Resolvers
+  MyResolver < BaseResolver
+    type Types::MyType, null: true
+    extras [:lookahead]
+    description 'Retrieve a single MyType'
+  end
+end
+```
+
 ### Re-using resolvers
 
 You should never re-use resolvers. Resolvers have a complex life-cycle, with
