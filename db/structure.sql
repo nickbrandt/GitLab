@@ -22234,6 +22234,8 @@ CREATE UNIQUE INDEX merge_request_user_mentions_on_mr_id_and_note_id_index ON me
 
 CREATE UNIQUE INDEX merge_request_user_mentions_on_mr_id_index ON merge_request_user_mentions USING btree (merge_request_id) WHERE (note_id IS NULL);
 
+CREATE INDEX merge_requests_state_id_temp_index ON merge_requests USING btree (id) WHERE (state_id = ANY (ARRAY[2, 3]));
+
 CREATE INDEX note_mentions_temp_index ON notes USING btree (id, noteable_type) WHERE (note ~~ '%@%'::text);
 
 CREATE UNIQUE INDEX one_canonical_wiki_page_slug_per_metadata ON wiki_page_slugs USING btree (wiki_page_meta_id) WHERE (canonical = true);
