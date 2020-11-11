@@ -102,37 +102,6 @@
 # rspec job base specs
 ######################
 
-############################
-# rspec job parallel configs
-.rspec-migration-parallel:
-  parallel: 5
-
-.rspec-ee-migration-parallel:
-  parallel: 2
-
-.rspec-unit-parallel:
-  parallel: 20
-
-.rspec-ee-unit-parallel:
-  parallel: 10
-
-.rspec-ee-unit-geo-parallel:
-  parallel: 2
-
-.rspec-integration-parallel:
-  parallel: 8
-
-.rspec-ee-integration-parallel:
-  parallel: 4
-
-.rspec-system-parallel:
-  parallel: 24
-
-.rspec-ee-system-parallel:
-  parallel: 6
-# rspec job parallel configs
-############################
-
 #######################################################
 # EE/FOSS: default refs (MRs, master, schedules) jobs #
 setup-test-env:
@@ -234,30 +203,6 @@ downtime_check:
   script:
     - bundle exec rake downtime_check
 
-rspec migration pg11:
-  extends:
-    - .rspec-base-pg11
-    - .rspec-base-migration
-    - .rspec-migration-parallel
-
-rspec unit pg11:
-  extends:
-    - .rspec-base-pg11
-    - .rails:rules:ee-and-foss-unit
-    - .rspec-unit-parallel
-
-rspec integration pg11:
-  extends:
-    - .rspec-base-pg11
-    - .rails:rules:ee-and-foss-integration
-    - .rspec-integration-parallel
-
-rspec system pg11:
-  extends:
-    - .rspec-base-pg11
-    - .rails:rules:ee-and-foss-system
-    - .rspec-system-parallel
-
 rspec fast_spec_helper:
   extends:
     - .rspec-base-pg11
@@ -347,24 +292,14 @@ rspec:coverage:
     - .coverage-base
     - .rails:rules:rspec-coverage
   stage: post-test
-  # We cannot use needs since it would mean needing 84 jobs (since most are parallelized)
-  # so we use `dependencies` here.
-  dependencies:
+  needs:
+    - rspec-child-pipeline
     - setup-test-env
-    - rspec migration pg11
-    - rspec unit pg11
-    - rspec integration pg11
-    - rspec system pg11
-    - rspec-ee migration pg11
-    - rspec-ee unit pg11
-    - rspec-ee integration pg11
-    - rspec-ee system pg11
-    - rspec-ee unit pg11 geo
-    - rspec-ee integration pg11 geo
-    - rspec-ee system pg11 geo
     - memory-static
     - memory-on-boot
   script:
+    - install_gitlab_gem
+    - download_artifacts_from_downstream_job rspec-child-pipeline rspec-gather-artifacts
     - run_timed_command "bundle install --jobs=$(nproc) --path=vendor --retry=3 --quiet --without default development test production puma unicorn kerberos metrics omnibus ed25519"
     - run_timed_command "bundle exec scripts/merge-simplecov"
     - run_timed_command "bundle exec scripts/gather-test-memory-data"
@@ -384,24 +319,14 @@ rspec:feature-flags:
     - .coverage-base
     - .rails:rules:rspec-feature-flags
   stage: post-test
-  # We cannot use needs since it would mean needing 84 jobs (since most are parallelized)
-  # so we use `dependencies` here.
-  dependencies:
+  needs:
+    - rspec-child-pipeline
     - setup-test-env
-    - rspec migration pg11
-    - rspec unit pg11
-    - rspec integration pg11
-    - rspec system pg11
-    - rspec-ee migration pg11
-    - rspec-ee unit pg11
-    - rspec-ee integration pg11
-    - rspec-ee system pg11
-    - rspec-ee unit pg11 geo
-    - rspec-ee integration pg11 geo
-    - rspec-ee system pg11 geo
     - memory-static
     - memory-on-boot
   script:
+    - install_gitlab_gem
+    - download_artifacts_from_downstream_job rspec-child-pipeline rspec-gather-artifacts
     - run_timed_command "bundle install --jobs=$(nproc) --path=vendor --retry=3 --quiet --without default development test production puma unicorn kerberos metrics omnibus ed25519"
     - run_timed_command "bundle exec scripts/used-feature-flags"
 # EE/FOSS: default refs (MRs, master, schedules) jobs #
@@ -409,72 +334,6 @@ rspec:feature-flags:
 
 ##################################################
 # EE: default refs (MRs, master, schedules) jobs #
-rspec migration pg11-as-if-foss:
-  extends:
-    - .rspec-base-pg11-as-if-foss
-    - .rspec-base-migration
-    - .rails:rules:as-if-foss-migration
-    - .rspec-migration-parallel
-
-rspec unit pg11-as-if-foss:
-  extends:
-    - .rspec-base-pg11-as-if-foss
-    - .rails:rules:as-if-foss-unit
-    - .rspec-unit-parallel
-
-rspec integration pg11-as-if-foss:
-  extends:
-    - .rspec-base-pg11-as-if-foss
-    - .rails:rules:as-if-foss-integration
-    - .rspec-integration-parallel
-
-rspec system pg11-as-if-foss:
-  extends:
-    - .rspec-base-pg11-as-if-foss
-    - .rails:rules:as-if-foss-system
-    - .rspec-system-parallel
-
-rspec-ee migration pg11:
-  extends:
-    - .rspec-ee-base-pg11
-    - .rspec-base-migration
-    - .rails:rules:ee-only-migration
-    - .rspec-ee-migration-parallel
-
-rspec-ee unit pg11:
-  extends:
-    - .rspec-ee-base-pg11
-    - .rails:rules:ee-only-unit
-    - .rspec-ee-unit-parallel
-
-rspec-ee integration pg11:
-  extends:
-    - .rspec-ee-base-pg11
-    - .rails:rules:ee-only-integration
-    - .rspec-ee-integration-parallel
-
-rspec-ee system pg11:
-  extends:
-    - .rspec-ee-base-pg11
-    - .rails:rules:ee-only-system
-    - .rspec-ee-system-parallel
-
-rspec-ee unit pg11 geo:
-  extends:
-    - .rspec-ee-base-geo-pg11
-    - .rails:rules:ee-only-unit
-    - .rspec-ee-unit-geo-parallel
-
-rspec-ee integration pg11 geo:
-  extends:
-    - .rspec-ee-base-geo-pg11
-    - .rails:rules:ee-only-integration
-
-rspec-ee system pg11 geo:
-  extends:
-    - .rspec-ee-base-geo-pg11
-    - .rails:rules:ee-only-system
-
 db:rollback geo:
   extends:
     - db:rollback
@@ -484,80 +343,6 @@ db:rollback geo:
     - bundle exec rake geo:db:migrate
 # EE: default refs (MRs, master, schedules) jobs #
 ##################################################
-
-##########################################
-# EE/FOSS: master nightly scheduled jobs #
-rspec migration pg12:
-  extends:
-    - .rspec-base-pg12
-    - .rspec-base-migration
-    - .rails:rules:master-schedule-nightly--code-backstage
-    - .rspec-migration-parallel
-
-rspec unit pg12:
-  extends:
-    - .rspec-base-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage
-    - .rspec-unit-parallel
-
-rspec integration pg12:
-  extends:
-    - .rspec-base-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage
-    - .rspec-integration-parallel
-
-rspec system pg12:
-  extends:
-    - .rspec-base-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage
-    - .rspec-system-parallel
-# EE/FOSS: master nightly scheduled jobs #
-##########################################
-
-#####################################
-# EE: master nightly scheduled jobs #
-rspec-ee migration pg12:
-  extends:
-    - .rspec-ee-base-pg12
-    - .rspec-base-migration
-    - .rails:rules:master-schedule-nightly--code-backstage-ee-only
-    - .rspec-ee-migration-parallel
-
-rspec-ee unit pg12:
-  extends:
-    - .rspec-ee-base-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage-ee-only
-    - .rspec-ee-unit-parallel
-
-rspec-ee integration pg12:
-  extends:
-    - .rspec-ee-base-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage-ee-only
-    - .rspec-ee-integration-parallel
-
-rspec-ee system pg12:
-  extends:
-    - .rspec-ee-base-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage-ee-only
-    - .rspec-ee-system-parallel
-
-rspec-ee unit pg12 geo:
-  extends:
-    - .rspec-ee-base-geo-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage-ee-only
-    - .rspec-ee-unit-geo-parallel
-
-rspec-ee integration pg12 geo:
-  extends:
-    - .rspec-ee-base-geo-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage-ee-only
-
-rspec-ee system pg12 geo:
-  extends:
-    - .rspec-ee-base-geo-pg12
-    - .rails:rules:master-schedule-nightly--code-backstage-ee-only
-# EE: master nightly scheduled jobs #
-#####################################
 
 ##################################################
 # EE: Canonical MR pipelines
@@ -604,3 +389,40 @@ fail-pipeline-early:
     - fail_pipeline_early
 # EE: Canonical MR pipelines
 ##################################################
+
+######################
+# RSpec child pipeline
+create-rspec-child-pipeline-yml:
+  stage: pre-rspec
+  needs:
+    - retrieve-tests-metadata
+  variables:
+    RSPEC_TARGET_MINUTES_PER_JOB: 10
+    RSPEC_PIPELINE_YAML: rspec_pipeline.yml
+  script:
+    - tooling/bin/create_rspec_pipeline ${RSPEC_PIPELINE_YAML}
+  artifacts:
+    paths:
+      - ${RSPEC_PIPELINE_YAML}
+
+rspec-child-pipeline:
+  stage: test
+  needs:
+    - create-rspec-child-pipeline-yml
+    - setup-test-env
+    - retrieve-tests-metadata
+    - compile-test-assets
+    - compile-test-assets as-if-foss
+  variables:
+    # Workaround to ensure child pipeline uses $GIT_CLONE_PATH from the parent pipeline's project configuration.
+    # instead of YAML defined $GIT_CLONE_PATH.
+    # https://gitlab.com/gitlab-org/gitlab/-/issues/282475#workarounds
+    GIT_CLONE_PATH: $GIT_CLONE_PATH
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  trigger:
+    include:
+      - artifact: rspec_pipeline.yml
+        job: create-rspec-child-pipeline-yml
+    strategy: depend
+# RSpec child pipeline
+######################
