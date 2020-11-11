@@ -1234,6 +1234,8 @@ Relationship between an epic and an issue.
 | `iteration` | Iteration | Iteration of the issue |
 | `labels` | LabelConnection | Labels of the issue |
 | `milestone` | Milestone | Milestone of the issue |
+| `moved` | Boolean | Indicates if issue got moved from other project |
+| `movedTo` | Issue | Updated Issue after it got moved to another project |
 | `notes` | NoteConnection! | All notes on this noteable |
 | `participants` | UserConnection | List of participants in the issue |
 | `reference` | String! | Internal reference of the issue. Returned in shortened format by default |
@@ -1500,6 +1502,8 @@ Represents a recorded measurement (object count) for the Admins.
 | `iteration` | Iteration | Iteration of the issue |
 | `labels` | LabelConnection | Labels of the issue |
 | `milestone` | Milestone | Milestone of the issue |
+| `moved` | Boolean | Indicates if issue got moved from other project |
+| `movedTo` | Issue | Updated Issue after it got moved to another project |
 | `notes` | NoteConnection! | All notes on this noteable |
 | `participants` | UserConnection | List of participants in the issue |
 | `reference` | String! | Internal reference of the issue. Returned in shortened format by default |
