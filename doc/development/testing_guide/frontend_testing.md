@@ -901,6 +901,30 @@ it.each([
 
 **Note**: only use template literal block if pretty print is **not** needed for spec output. For example, empty strings, nested objects etc.
 
+For example, if we were testing the difference between an empty search string and a non-empty search string we would want to use the array block syntax with the pretty print option so we can see the difference between the `''` and `'search string'` in the spec output. Where, with the template literal block, the empty string would output as a space, which would lead to a confusing developer experience.
+
+```javascript
+// bad
+it.each`
+    searchTerm | expected
+    ${''} | ${{ issue: { users: { nodes: [] } } }}
+    ${'search term'} | ${{ issue: { other: { nested: [] } } }}
+`('when search term is $searchTerm, it returns $expected', ({ searchTerm, expected }) => {
+  expect(search(searchTerm)).toEqual(expected)
+});
+
+// good
+it.each([
+    ['', { issue: { users: { nodes: [] } } }],
+    ['search term', { issue: { other: { nested: [] } } }],
+])('when search term is %p, expect to return %p',
+ (searchTerm, expected) => {
+    expect(search(searchTerm)).toEqual(expected)
+ }
+);
+
+```
+
 ```javascript
 // test suite with tagged template literal block
 describe.each`
