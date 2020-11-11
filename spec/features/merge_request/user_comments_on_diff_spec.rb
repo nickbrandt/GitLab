@@ -129,10 +129,11 @@ RSpec.describe 'User comments on a diff', :js do
         visit(diffs_project_merge_request_path(project, merge_request, view: 'parallel'))
       end
 
-      it 'allows comments to start above hidden lines and end below' do
-        # click +28, select 21 add and verify comment
-        click_diff_line(find('div[data-path="files/ruby/popen.rb"] .new_line a[data-linenumber="28"]').find(:xpath, '../..'), 'right')
-        add_comment('21', '+28')
+      # In `files/ruby/popen.rb`
+      it 'allows comments for changes involving both sides' do
+        # click +15, select -13 add and verify comment
+        click_diff_line(find('div[data-path="files/ruby/popen.rb"] .new_line a[data-linenumber="15"]').find(:xpath, '../..'), 'right')
+        add_comment('-13', '+15')
       end
 
       it 'allows comments on previously hidden lines at the top of a file' do
@@ -159,7 +160,7 @@ RSpec.describe 'User comments on a diff', :js do
           all('.js-unfold-down')[1].click
         end
         click_diff_line(find('div[data-path="files/ruby/popen.rb"] .old_line a[data-linenumber="30"]').find(:xpath, '../..'), 'left')
-        add_comment('-9', '30')
+        add_comment('+28', '37')
       end
     end
 
