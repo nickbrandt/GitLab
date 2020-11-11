@@ -309,8 +309,8 @@ export default {
 
     const secretScanningDiffEndpoint = gl?.mrWidgetData?.secret_scanning_comparison_path;
     if (secretScanningDiffEndpoint && this.hasSecretScanningReports) {
-      this.setSecretScanningDiffEndpoint(secretScanningDiffEndpoint);
-      this.fetchSecretScanningDiff();
+      this.setSecretDetectionDiffEndpoint(secretScanningDiffEndpoint);
+      this.fetchSecretDetectionDiff();
     }
 
     const coverageFuzzingDiffEndpoint = gl?.mrWidgetData?.coverage_fuzzing_comparison_path;
@@ -359,8 +359,8 @@ export default {
       fetchSastDiff: 'fetchDiff',
     }),
     ...mapActions('secretScanning', {
-      setSecretScanningDiffEndpoint: 'setSecretScanningDiffEndpoint',
-      fetchSecretScanningDiff: 'fetchSecretScanningDiff',
+      setSecretDetectionDiffEndpoint: 'setDiffEndpoint',
+      fetchSecretDetectionDiff: 'fetchDiff',
     }),
     ...mapActions('pipelineJobs', ['fetchPipelineJobs', 'setPipelineJobsPath', 'setProjectId']),
     ...mapActions('pipelineJobs', {

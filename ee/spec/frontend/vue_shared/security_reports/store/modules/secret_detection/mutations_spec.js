@@ -13,7 +13,7 @@ describe('EE secret detection module mutations', () => {
     state = createState();
   });
 
-  describe(types.UPDATE_SECRET_SCANNING_ISSUE, () => {
+  describe(types.UPDATE_VULNERABILITY, () => {
     let newIssue;
     let resolvedIssue;
     let allIssue;
@@ -30,7 +30,7 @@ describe('EE secret detection module mutations', () => {
 
     describe('with a `new` issue', () => {
       beforeEach(() => {
-        mutations[types.UPDATE_SECRET_SCANNING_ISSUE](state, { ...newIssue, changed: true });
+        mutations[types.UPDATE_VULNERABILITY](state, { ...newIssue, changed: true });
       });
 
       it('should update the correct issue', () => {
@@ -40,7 +40,7 @@ describe('EE secret detection module mutations', () => {
 
     describe('with a `resolved` issue', () => {
       beforeEach(() => {
-        mutations[types.UPDATE_SECRET_SCANNING_ISSUE](state, { ...resolvedIssue, changed: true });
+        mutations[types.UPDATE_VULNERABILITY](state, { ...resolvedIssue, changed: true });
       });
 
       it('should update the correct issue', () => {
@@ -50,7 +50,7 @@ describe('EE secret detection module mutations', () => {
 
     describe('with an `all` issue', () => {
       beforeEach(() => {
-        mutations[types.UPDATE_SECRET_SCANNING_ISSUE](state, { ...allIssue, changed: true });
+        mutations[types.UPDATE_VULNERABILITY](state, { ...allIssue, changed: true });
       });
 
       it('should update the correct issue', () => {
@@ -60,7 +60,7 @@ describe('EE secret detection module mutations', () => {
 
     describe('with an invalid issue', () => {
       beforeEach(() => {
-        mutations[types.UPDATE_SECRET_SCANNING_ISSUE](
+        mutations[types.UPDATE_VULNERABILITY](
           state,
           createIssue({ project_fingerprint: 'invalid', changed: true }),
         );

@@ -12,23 +12,23 @@ describe('secret detection module mutations', () => {
     state = createState();
   });
 
-  describe(types.SET_SECRET_SCANNING_DIFF_ENDPOINT, () => {
+  describe(types.SET_DIFF_ENDPOINT, () => {
     it('should set the secret detection diff endpoint', () => {
-      mutations[types.SET_SECRET_SCANNING_DIFF_ENDPOINT](state, path);
+      mutations[types.SET_DIFF_ENDPOINT](state, path);
 
       expect(state.paths.diffEndpoint).toBe(path);
     });
   });
 
-  describe(types.REQUEST_SECRET_SCANNING_DIFF, () => {
+  describe(types.REQUEST_DIFF, () => {
     it('should set the `isLoading` status to `true`', () => {
-      mutations[types.REQUEST_SECRET_SCANNING_DIFF](state);
+      mutations[types.REQUEST_DIFF](state);
 
       expect(state.isLoading).toBe(true);
     });
   });
 
-  describe(types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS, () => {
+  describe(types.RECEIVE_DIFF_SUCCESS, () => {
     beforeEach(() => {
       const reports = {
         diff: {
@@ -43,7 +43,7 @@ describe('secret detection module mutations', () => {
         },
       };
       state.isLoading = true;
-      mutations[types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS](state, reports);
+      mutations[types.RECEIVE_DIFF_SUCCESS](state, reports);
     });
 
     it('should set the `isLoading` status to `false`', () => {
@@ -67,10 +67,10 @@ describe('secret detection module mutations', () => {
     });
   });
 
-  describe(types.RECEIVE_SECRET_SCANNING_DIFF_ERROR, () => {
+  describe(types.RECEIVE_DIFF_ERROR, () => {
     beforeEach(() => {
       state.isLoading = true;
-      mutations[types.RECEIVE_SECRET_SCANNING_DIFF_ERROR](state);
+      mutations[types.RECEIVE_DIFF_ERROR](state);
     });
 
     it('should set the `isLoading` status to `false`', () => {

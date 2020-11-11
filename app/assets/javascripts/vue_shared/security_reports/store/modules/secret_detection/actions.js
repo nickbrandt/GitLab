@@ -1,25 +1,24 @@
 import { fetchDiffData } from '../../utils';
 import * as types from './mutation_types';
 
-export const setSecretScanningDiffEndpoint = ({ commit }, path) =>
-  commit(types.SET_SECRET_SCANNING_DIFF_ENDPOINT, path);
+export const setDiffEndpoint = ({ commit }, path) => commit(types.SET_DIFF_ENDPOINT, path);
 
-export const requestSecretScanningDiff = ({ commit }) => commit(types.REQUEST_SECRET_SCANNING_DIFF);
+export const requestDiff = ({ commit }) => commit(types.REQUEST_DIFF);
 
-export const receiveSecretScanningDiffSuccess = ({ commit }, response) =>
-  commit(types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS, response);
+export const receiveDiffSuccess = ({ commit }, response) =>
+  commit(types.RECEIVE_DIFF_SUCCESS, response);
 
-export const receiveSecretScanningDiffError = ({ commit }, error) =>
-  commit(types.RECEIVE_SECRET_SCANNING_DIFF_ERROR, error);
+export const receiveDiffError = ({ commit }, response) =>
+  commit(types.RECEIVE_DIFF_ERROR, response);
 
-export const fetchSecretScanningDiff = ({ state, rootState, dispatch }) => {
-  dispatch('requestSecretScanningDiff');
+export const fetchDiff = ({ state, rootState, dispatch }) => {
+  dispatch('requestDiff');
 
   return fetchDiffData(rootState, state.paths.diffEndpoint, 'secret_detection')
     .then(data => {
-      dispatch('receiveSecretScanningDiffSuccess', data);
+      dispatch('receiveDiffSuccess', data);
     })
     .catch(() => {
-      dispatch('receiveSecretScanningDiffError');
+      dispatch('receiveDiffError');
     });
 };

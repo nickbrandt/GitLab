@@ -140,7 +140,7 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_ERROR),
           waitForMutation(
             wrapper.vm.$store,
-            `secretScanning/${secretScanningTypes.RECEIVE_SECRET_SCANNING_DIFF_ERROR}`,
+            `secretScanning/${secretScanningTypes.RECEIVE_DIFF_ERROR}`,
           ),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_ERROR),
         ]);
@@ -228,7 +228,7 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
           waitForMutation(
             wrapper.vm.$store,
-            `secretScanning/${secretScanningTypes.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS}`,
+            `secretScanning/${secretScanningTypes.RECEIVE_DIFF_SUCCESS}`,
           ),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_SUCCESS),
         ]);
@@ -281,7 +281,7 @@ describe('Grouped security reports app', () => {
           waitForMutation(wrapper.vm.$store, types.RECEIVE_DEPENDENCY_SCANNING_DIFF_SUCCESS),
           waitForMutation(
             wrapper.vm.$store,
-            `secretScanning/${secretScanningTypes.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS}`,
+            `secretScanning/${secretScanningTypes.RECEIVE_DIFF_SUCCESS}`,
           ),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_SUCCESS),
         ]);
@@ -576,7 +576,7 @@ describe('Grouped security reports app', () => {
 
       return waitForMutation(
         wrapper.vm.$store,
-        `secretScanning/${secretScanningTypes.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS}`,
+        `secretScanning/${secretScanningTypes.RECEIVE_DIFF_SUCCESS}`,
       );
     };
 
@@ -589,7 +589,7 @@ describe('Grouped security reports app', () => {
         expect(wrapper.find('[data-qa-selector="secret_scan_report"]').exists()).toBe(true);
       });
 
-      it('should set setSecretScanningDiffEndpoint', () => {
+      it('should set setDiffEndpoint', () => {
         expect(wrapper.vm.secretScanning.paths.diffEndpoint).toEqual(SECRET_SCANNING_DIFF_ENDPOINT);
       });
 

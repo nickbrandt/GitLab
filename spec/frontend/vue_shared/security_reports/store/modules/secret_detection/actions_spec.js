@@ -25,15 +25,15 @@ describe('secret detection report actions', () => {
     state = createState();
   });
 
-  describe('setSecretScanningDiffEndpoint', () => {
-    it(`should commit ${types.SET_SECRET_SCANNING_DIFF_ENDPOINT} with the correct path`, done => {
+  describe('setDiffEndpoint', () => {
+    it(`should commit ${types.SET_DIFF_ENDPOINT} with the correct path`, done => {
       testAction(
-        actions.setSecretScanningDiffEndpoint,
+        actions.setDiffEndpoint,
         diffEndpoint,
         state,
         [
           {
-            type: types.SET_SECRET_SCANNING_DIFF_ENDPOINT,
+            type: types.SET_DIFF_ENDPOINT,
             payload: diffEndpoint,
           },
         ],
@@ -43,28 +43,21 @@ describe('secret detection report actions', () => {
     });
   });
 
-  describe('requestSecretScanningDiff', () => {
-    it(`should commit ${types.REQUEST_SECRET_SCANNING_DIFF}`, done => {
-      testAction(
-        actions.requestSecretScanningDiff,
-        {},
-        state,
-        [{ type: types.REQUEST_SECRET_SCANNING_DIFF }],
-        [],
-        done,
-      );
+  describe('requestDiff', () => {
+    it(`should commit ${types.REQUEST_DIFF}`, done => {
+      testAction(actions.requestDiff, {}, state, [{ type: types.REQUEST_DIFF }], [], done);
     });
   });
 
-  describe('receiveSecretScanningDiffSuccess', () => {
-    it(`should commit ${types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS} with the correct response`, done => {
+  describe('receiveDiffSuccess', () => {
+    it(`should commit ${types.RECEIVE_DIFF_SUCCESS} with the correct response`, done => {
       testAction(
-        actions.receiveSecretScanningDiffSuccess,
+        actions.receiveDiffSuccess,
         reports,
         state,
         [
           {
-            type: types.RECEIVE_SECRET_SCANNING_DIFF_SUCCESS,
+            type: types.RECEIVE_DIFF_SUCCESS,
             payload: reports,
           },
         ],
@@ -74,15 +67,15 @@ describe('secret detection report actions', () => {
     });
   });
 
-  describe('receiveSecretScanningDiffError', () => {
-    it(`should commit ${types.RECEIVE_SECRET_SCANNING_DIFF_ERROR} with the correct response`, done => {
+  describe('receiveDiffError', () => {
+    it(`should commit ${types.RECEIVE_DIFF_ERROR} with the correct response`, done => {
       testAction(
-        actions.receiveSecretScanningDiffError,
+        actions.receiveDiffError,
         error,
         state,
         [
           {
-            type: types.RECEIVE_SECRET_SCANNING_DIFF_ERROR,
+            type: types.RECEIVE_DIFF_ERROR,
             payload: error,
           },
         ],
@@ -92,7 +85,7 @@ describe('secret detection report actions', () => {
     });
   });
 
-  describe('fetchSecretScanningDiff', () => {
+  describe('fetchDiff', () => {
     let mock;
 
     beforeEach(() => {
@@ -117,14 +110,14 @@ describe('secret detection report actions', () => {
       it('should dispatch the `receiveDiffSuccess` action', done => {
         const { diff, enrichData } = reports;
         testAction(
-          actions.fetchSecretScanningDiff,
+          actions.fetchDiff,
           {},
           { ...rootState, ...state },
           [],
           [
-            { type: 'requestSecretScanningDiff' },
+            { type: 'requestDiff' },
             {
-              type: 'receiveSecretScanningDiffSuccess',
+              type: 'receiveDiffSuccess',
               payload: {
                 diff,
                 enrichData,
@@ -142,18 +135,18 @@ describe('secret detection report actions', () => {
         mock.onGet(diffEndpoint).replyOnce(200, reports.diff);
       });
 
-      it('should dispatch the `receiveSecretScanningDiffSuccess` action with empty enrich data', done => {
+      it('should dispatch the `receiveDiffSuccess` action with empty enrich data', done => {
         const { diff } = reports;
         const enrichData = [];
         testAction(
-          actions.fetchSecretScanningDiff,
+          actions.fetchDiff,
           {},
           { ...rootState, ...state },
           [],
           [
-            { type: 'requestSecretScanningDiff' },
+            { type: 'requestDiff' },
             {
-              type: 'receiveSecretScanningDiffSuccess',
+              type: 'receiveDiffSuccess',
               payload: {
                 diff,
                 enrichData,
@@ -174,13 +167,13 @@ describe('secret detection report actions', () => {
           .replyOnce(404);
       });
 
-      it('should dispatch the `receiveSecretScanningDiffError` action', done => {
+      it('should dispatch the `receiveDiffError` action', done => {
         testAction(
-          actions.fetchSecretScanningDiff,
+          actions.fetchDiff,
           {},
           { ...rootState, ...state },
           [],
-          [{ type: 'requestSecretScanningDiff' }, { type: 'receiveSecretScanningDiffError' }],
+          [{ type: 'requestDiff' }, { type: 'receiveDiffError' }],
           done,
         );
       });
@@ -195,13 +188,13 @@ describe('secret detection report actions', () => {
           .replyOnce(200, reports.enrichData);
       });
 
-      it('should dispatch the `receiveSecretScanningDiffError` action', done => {
+      it('should dispatch the `receiveDiffError` action', done => {
         testAction(
-          actions.fetchSecretScanningDiff,
+          actions.fetchDiff,
           {},
           { ...rootState, ...state },
           [],
-          [{ type: 'requestSecretScanningDiff' }, { type: 'receiveSecretScanningDiffError' }],
+          [{ type: 'requestDiff' }, { type: 'receiveDiffError' }],
           done,
         );
       });

@@ -13,15 +13,15 @@ describe('EE secret detection report actions', () => {
     state = createState();
   });
 
-  describe('updateSecretScanningIssue', () => {
-    it(`should commit ${types.UPDATE_SECRET_SCANNING_ISSUE} with the correct response`, done => {
+  describe('updateVulnerability', () => {
+    it(`should commit ${types.UPDATE_VULNERABILITY} with the correct response`, done => {
       testAction(
-        actions.updateSecretScanningIssue,
+        actions.updateVulnerability,
         issue,
         state,
         [
           {
-            type: types.UPDATE_SECRET_SCANNING_ISSUE,
+            type: types.UPDATE_VULNERABILITY,
             payload: issue,
           },
         ],
