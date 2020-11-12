@@ -257,8 +257,23 @@ export default {
     dastDownloadLink() {
       return this.dastSummary?.scannedResourcesCsvPath || '';
     },
-    coverageFuzzingShowIssues() {
-      return this.coverageFuzzing.newIssues || this.coverageFuzzing.resolvedIssues;
+    hasCoverageFuzzingIssues() {
+      return this.hasIssuesForReportType('coverageFuzzing');
+    },
+    hasSastIssues() {
+      return this.hasIssuesForReportType('sast');
+    },
+    hasDependencyScanningIssues() {
+      return this.hasIssuesForReportType('dependencyScanning');
+    },
+    hasContainerScanningIssues() {
+      return this.hasIssuesForReportType('containerScanning');
+    },
+    hasDastIssues() {
+      return this.hasIssuesForReportType('dast');
+    },
+    hasSecretDetectionIssues() {
+      return this.hasIssuesForReportType('secretDetection');
     },
   },
 
@@ -366,6 +381,9 @@ export default {
     ...mapActions('pipelineJobs', {
       setPipelineJobsId: 'setPipelineId',
     }),
+    hasIssuesForReportType(reportType) {
+      return Boolean(this[reportType]?.newIssues.length || this[reportType]?.resolvedIssues.length);
+    },
   },
   summarySlots: ['success', 'error', 'loading'],
 };
@@ -444,7 +462,7 @@ export default {
           </summary-row>
 
           <grouped-issues-list
-            v-if="sast.newIssues.length || sast.resolvedIssues.length"
+            v-if="hasSastIssues"
             :unresolved-issues="sast.newIssues"
             :resolved-issues="sast.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -465,7 +483,7 @@ export default {
           </summary-row>
 
           <grouped-issues-list
-            v-if="dependencyScanning.newIssues.length || dependencyScanning.resolvedIssues.length"
+            v-if="hasDependencyScanningIssues"
             :unresolved-issues="dependencyScanning.newIssues"
             :resolved-issues="dependencyScanning.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -486,7 +504,7 @@ export default {
           </summary-row>
 
           <grouped-issues-list
-            v-if="containerScanning.newIssues.length || containerScanning.resolvedIssues.length"
+            v-if="hasContainerScanningIssues"
             :unresolved-issues="containerScanning.newIssues"
             :resolved-issues="containerScanning.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -520,7 +538,7 @@ export default {
             </template>
           </summary-row>
           <grouped-issues-list
-            v-if="dast.newIssues.length || dast.resolvedIssues.length"
+            v-if="hasDastIssues"
             :unresolved-issues="dast.newIssues"
             :resolved-issues="dast.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -541,7 +559,7 @@ export default {
           </summary-row>
 
           <grouped-issues-list
-            v-if="secretDetection.newIssues.length || secretDetection.resolvedIssues.length"
+            v-if="hasSecretDetectionIssues"
             :unresolved-issues="secretDetection.newIssues"
             :resolved-issues="secretDetection.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
@@ -567,7 +585,7 @@ export default {
           </summary-row>
 
           <grouped-issues-list
-            v-if="coverageFuzzingShowIssues"
+            v-if="hasCoverageFuzzingIssues"
             :unresolved-issues="coverageFuzzing.newIssues"
             :resolved-issues="coverageFuzzing.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
