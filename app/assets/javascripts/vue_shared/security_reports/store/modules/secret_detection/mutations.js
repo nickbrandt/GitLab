@@ -1,10 +1,9 @@
-import Vue from 'vue';
 import { parseDiff } from '~/vue_shared/security_reports/store/utils';
 import * as types from './mutation_types';
 
 export default {
   [types.SET_DIFF_ENDPOINT](state, path) {
-    Vue.set(state.paths, 'diffEndpoint', path);
+    state.paths.diffEndpoint = path;
   },
 
   [types.REQUEST_DIFF](state) {
