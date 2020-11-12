@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"image"
-	"mime"
 	"os"
 	"strconv"
 
@@ -23,23 +22,16 @@ func _main() error {
 	if err != nil {
 		return fmt.Errorf("GL_RESIZE_IMAGE_WIDTH: %w", err)
 	}
-	contentType := os.Getenv("GL_RESIZE_IMAGE_CONTENT_TYPE")
-	if contentType == "" {
-		return fmt.Errorf("GL_RESIZE_IMAGE_CONTENT_TYPE is empty")
-	}
 
-	src, extension, err := image.Decode(os.Stdin)
+	src, formatName, err := image.Decode(os.Stdin)
 	if err != nil {
 		return fmt.Errorf("decode: %w", err)
 	}
-	if detectedType := mime.TypeByExtension("." + extension); detectedType != contentType {
-		return fmt.Errorf("MIME types do not match; requested: %s; actual: %s", contentType, detectedType)
-	}
-	format, err := imaging.FormatFromExtension(extension)
+	imagingFormat, err := imaging.FormatFromExtension(formatName)
 	if err != nil {
 		return fmt.Errorf("find imaging format: %w", err)
 	}
 
 	image := imaging.Resize(src, requestedWidth, 0, imaging.Lanczos)
-	return imaging.Encode(os.Stdout, image, format)
+	return imaging.Encode(os.Stdout, image, imagingFormat)
 }

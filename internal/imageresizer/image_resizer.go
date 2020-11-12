@@ -1,9 +1,11 @@
 package imageresizer
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -14,15 +16,12 @@ import (
 	"syscall"
 	"time"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
-
 	"github.com/prometheus/client_golang/prometheus"
-
 	"gitlab.com/gitlab-org/labkit/correlation"
 	"gitlab.com/gitlab-org/labkit/log"
-
 	"gitlab.com/gitlab-org/labkit/tracing"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
@@ -129,6 +128,12 @@ var (
 		},
 		[]string{"content_type", "width"},
 	)
+)
+
+const (
+	jpegMagic   = "\xff\xd8"          // 2 bytes
+	pngMagic    = "\x89PNG\r\n\x1a\n" // 8 bytes
+	maxMagicLen = 8                   // 8 first bytes is enough to detect PNG or JPEG
 )
 
 func init() {
@@ -270,9 +275,22 @@ func (r *Resizer) tryResizeImage(req *http.Request, reader io.Reader, errorWrite
 		r.numScalerProcs.decrement()
 	}()
 
-	resizeCmd, resizedImageReader, err := startResizeImageCommand(ctx, reader, errorWriter, params)
+	// Prevents EOF if the file is smaller than 8 bytes
+	bufferSize := int(math.Min(maxMagicLen, float64(fileSize)))
+	buffered := bufio.NewReaderSize(reader, bufferSize)
+
+	data, err := buffered.Peek(bufferSize)
 	if err != nil {
-		return reader, nil, fmt.Errorf("ImageResizer: failed forking into scaler process: %w", err)
+		return buffered, nil, fmt.Errorf("ImageResizer: failed to peek into data: %v", err)
+	}
+
+	if string(data) != pngMagic && string(data[0:2]) != jpegMagic {
+		return buffered, nil, fmt.Errorf("ImageResizer: format is prohibited")
+	}
+
+	resizeCmd, resizedImageReader, err := startResizeImageCommand(ctx, buffered, errorWriter, params)
+	if err != nil {
+		return buffered, nil, fmt.Errorf("ImageResizer: failed forking into scaler process: %w", err)
 	}
 	return resizedImageReader, resizeCmd, nil
 }
@@ -284,7 +302,6 @@ func startResizeImageCommand(ctx context.Context, imageReader io.Reader, errorWr
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Env = []string{
 		"GL_RESIZE_IMAGE_WIDTH=" + strconv.Itoa(int(params.Width)),
-		"GL_RESIZE_IMAGE_CONTENT_TYPE=" + params.ContentType,
 	}
 	cmd.Env = envInjector(ctx, cmd.Env)
 

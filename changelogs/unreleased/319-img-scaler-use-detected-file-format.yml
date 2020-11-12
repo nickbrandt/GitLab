@@ -1,0 +1,5 @@
+---
+title: Don't reject image scaling requests based on file extension/format mismatch
+merge_request: 651
+author:
+type: changed

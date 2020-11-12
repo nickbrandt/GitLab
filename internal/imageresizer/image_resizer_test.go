@@ -5,18 +5,19 @@ import (
 	"encoding/json"
 	"image"
 	"image/png"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
-
+	"github.com/stretchr/testify/require"
 	"gitlab.com/gitlab-org/labkit/log"
 
-	"github.com/stretchr/testify/require"
-
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+
+	_ "image/jpeg" // need this for image.Decode with JPEG
 )
 
 const imagePath = "../../testdata/image.png"
@@ -41,13 +42,40 @@ func requestScaledImage(t *testing.T, httpHeaders http.Header, params resizePara
 
 func TestRequestScaledImageFromPath(t *testing.T) {
 	cfg := config.DefaultImageResizerConfig
-	params := resizeParams{Location: imagePath, ContentType: "image/png", Width: 64}
 
-	resp := requestScaledImage(t, nil, params, cfg)
-	require.Equal(t, http.StatusOK, resp.StatusCode)
+	testCases := []struct {
+		desc        string
+		imagePath   string
+		contentType string
+	}{
+		{
+			desc:        "PNG",
+			imagePath:   imagePath,
+			contentType: "image/png",
+		},
+		{
+			desc:        "JPEG",
+			imagePath:   "../../testdata/image.jpg",
+			contentType: "image/jpeg",
+		},
+		{
+			desc:        "JPEG < 1kb",
+			imagePath:   "../../testdata/image_single_pixel.jpg",
+			contentType: "image/jpeg",
+		},
+	}
 
-	bounds := imageFromResponse(t, resp).Bounds()
-	require.Equal(t, int(params.Width), bounds.Size().X, "wrong width after resizing")
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			params := resizeParams{Location: tc.imagePath, ContentType: tc.contentType, Width: 64}
+
+			resp := requestScaledImage(t, nil, params, cfg)
+			require.Equal(t, http.StatusOK, resp.StatusCode)
+
+			bounds := imageFromResponse(t, resp).Bounds()
+			require.Equal(t, int(params.Width), bounds.Size().X, "wrong width after resizing")
+		})
+	}
 }
 
 func TestServeOriginalImageWhenSourceImageTooLarge(t *testing.T) {
@@ -70,12 +98,14 @@ func TestFailFastOnOpenStreamFailure(t *testing.T) {
 	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 }
 
-func TestFailFastOnContentTypeMismatch(t *testing.T) {
+func TestIgnoreContentTypeMismatchIfImageFormatIsAllowed(t *testing.T) {
 	cfg := config.DefaultImageResizerConfig
 	params := resizeParams{Location: imagePath, ContentType: "image/jpeg", Width: 64}
 	resp := requestScaledImage(t, nil, params, cfg)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	bounds := imageFromResponse(t, resp).Bounds()
+	require.Equal(t, int(params.Width), bounds.Size().X, "wrong width after resizing")
 }
 
 func TestUnpackParametersReturnsParamsInstanceForValidInput(t *testing.T) {
@@ -106,6 +136,24 @@ func TestUnpackParametersReturnsErrorWhenContentTypeBlank(t *testing.T) {
 	require.Error(t, err, "expected error when ContentType is blank")
 }
 
+func TestServeOriginalImageWhenSourceImageFormatIsNotAllowed(t *testing.T) {
+	cfg := config.DefaultImageResizerConfig
+	// SVG images are not allowed to be resized
+	svgImagePath := "../../testdata/image.svg"
+	svgImage, err := ioutil.ReadFile(svgImagePath)
+	require.NoError(t, err)
+	// ContentType is no longer used to perform the format validation.
+	// To make the test more strict, we'll use allowed, but incorrect ContentType.
+	params := resizeParams{Location: svgImagePath, ContentType: "image/png", Width: 64}
+
+	resp := requestScaledImage(t, nil, params, cfg)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	responseData, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+	require.Equal(t, svgImage, responseData, "expected original image")
+}
+
 // The Rails applications sends a Base64 encoded JSON string carrying
 // these parameters in an HTTP response header
 func encodeParams(t *testing.T, p *resizeParams) string {
@@ -127,7 +175,7 @@ func testImage(t *testing.T) image.Image {
 }
 
 func imageFromResponse(t *testing.T, resp *http.Response) image.Image {
-	img, err := png.Decode(resp.Body)
+	img, _, err := image.Decode(resp.Body)
 	require.NoError(t, err, "decode resized image")
 	return img
 }
