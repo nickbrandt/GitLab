@@ -3,6 +3,7 @@ import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
 import * as Sentry from '~/sentry/wrapper';
 import getGroupsQuery from '../graphql/queries/get_groups.query.graphql';
 import DevopsAdoptionEmptyState from './devops_adoption_empty_state.vue';
+import DevopsAdoptionSegmentsModal from './devops_adoption_segments_modal.vue';
 import { DEVOPS_ADOPTION_STRINGS } from '../constants';
 
 export default {
@@ -11,6 +12,7 @@ export default {
     GlAlert,
     GlLoadingIcon,
     DevopsAdoptionEmptyState,
+    DevopsAdoptionSegmentsModal,
   },
   i18n: {
     ...DEVOPS_ADOPTION_STRINGS.app,
@@ -70,4 +72,5 @@ export default {
     {{ $options.i18n.groupsError }}
   </gl-alert>
   <devops-adoption-empty-state v-else-if="isEmpty" />
+  <devops-adoption-segments-modal v-else :groups="groups.nodes" />
 </template>

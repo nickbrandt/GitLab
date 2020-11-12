@@ -11,4 +11,10 @@ export const DEVOPS_ADOPTION_STRINGS = {
     ),
     button: s__('DevopsAdoption|Add new segment'),
   },
+  modal: {
+    createSegmentButton: s__('DevopsAdoption|Add new segment'),
+    title: s__('DevopsAdoption|New segment'),
+    button: s__('DevopsAdoption|Create new segment'),
+    namePlaceholder: s__('DevopsAdoption|My segment'),
+  },
 };

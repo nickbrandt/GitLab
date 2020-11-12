@@ -1,0 +1,16 @@
+mutation($name: String!, $groupIds: [String!] = []) {
+  createSegment(input: { name: $name, groupIds: $groupIds }) {
+    segment {
+      id
+      name
+      groups {
+        nodes {
+          name
+          id
+          webUrl
+        }
+      }
+    }
+    errors
+  }
+}
