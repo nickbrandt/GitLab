@@ -1704,7 +1704,6 @@ Represents an iteration object.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `burnupTimeSeries` | BurnupChartDailyTotals! => Array | Daily scope and completed totals for burnup charts |
 | `createdAt` | Time! | Timestamp of iteration creation |
 | `description` | String | Description of the iteration |
 | `descriptionHtml` | String | The GitLab Flavored Markdown rendering of `description` |
@@ -2027,7 +2026,6 @@ Represents a milestone.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `burnupTimeSeries` | BurnupChartDailyTotals! => Array | Daily scope and completed totals for burnup charts |
 | `createdAt` | Time! | Timestamp of milestone creation |
 | `description` | String | Description of the milestone |
 | `dueDate` | Time | Timestamp of the milestone due date |
