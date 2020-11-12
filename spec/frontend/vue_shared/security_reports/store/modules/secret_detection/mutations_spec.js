@@ -50,7 +50,7 @@ describe('secret detection module mutations', () => {
       expect(state.isLoading).toBe(false);
     });
 
-    it('should set the `baseReportOutofDate` status to `false`', () => {
+    it('should set the `baseReportOutofDate` status to `true`', () => {
       expect(state.baseReportOutofDate).toBe(true);
     });
 
