@@ -1,0 +1,13 @@
+name: deployments
+description: Total deployments last recent month
+default_generation: generation_1
+full_path:
+  generation_1: counts_monthly.deployments
+milestone:
+introduced_by_url:
+group: group::ops release
+time_frame: counts_28d
+distribution: [ee, ce]
+tier: ['free', 'starter', 'premium', 'ultimate', 'bronze', 'silver', 'gold']
+type: count
+data_source: postgresql
