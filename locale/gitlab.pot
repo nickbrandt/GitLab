@@ -31202,6 +31202,9 @@ msgstr ""
 msgid "Your GPG keys (%{count})"
 msgstr ""
 
+msgid "Your GitLab account request has been approved!"
+msgstr ""
+
 msgid "Your GitLab group"
 msgstr ""
 
@@ -31400,6 +31403,9 @@ msgstr ""
 msgid "Your search didn't match any commits. Try a different query."
 msgstr ""
 
+msgid "Your sign-in page is %{url}."
+msgstr ""
+
 msgid "Your subscription expired!"
 msgstr ""
 
@@ -31407,6 +31413,9 @@ msgid "Your subscription has been downgraded."
 msgstr ""
 
 msgid "Your subscription will expire in %{remaining_days}."
+msgstr ""
+
+msgid "Your username is %{username}."
 msgstr ""
 
 msgid "Zoom meeting added"
