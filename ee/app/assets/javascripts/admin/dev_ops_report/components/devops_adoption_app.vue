@@ -24,7 +24,8 @@ export default {
     groups: {
       query: getGroupsQuery,
       loadingKey: 'loading',
-      result() {
+      result(data) {
+        console.log('result:', data);
         if (this.groups?.pageInfo?.nextPage) {
           this.fetchNextPage();
         }
@@ -36,6 +37,7 @@ export default {
   },
   computed: {
     isLoading() {
+      console.log('loading:', this.$apollo.queries.groups.loading);
       return this.$apollo.queries.groups.loading;
     },
     isEmpty() {
@@ -44,6 +46,7 @@ export default {
   },
   methods: {
     handleError(error) {
+      console.log('error:', error);
       this.loadingError = true;
       Sentry.captureException(error);
     },
