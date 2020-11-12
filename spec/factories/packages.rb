@@ -129,7 +129,7 @@ FactoryBot.define do
       end
 
       trait(:without_loaded_metadatum) do
-        conan_metadatum { association(:conan_metadatum, package: nil) }
+        conan_metadatum { build(:conan_metadatum, package: nil) } # rubocop:disable FactoryBot/InlineAssociation
       end
     end
 
