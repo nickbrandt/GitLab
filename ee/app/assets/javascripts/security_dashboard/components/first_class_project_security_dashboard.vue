@@ -48,7 +48,7 @@ export default {
       shoudShowAutoFixUserCallout,
     };
   },
-  inject: ['dashboardDocumentation', 'autoFixDocumentation'],
+  inject: ['dashboardDocumentation', 'autoFixDocumentation', 'projectFullPath'],
   methods: {
     handleFilterChange(filters) {
       this.filters = filters;
@@ -76,7 +76,12 @@ export default {
             <csv-export-button :vulnerabilities-export-endpoint="vulnerabilitiesExportEndpoint" />
           </div>
           <project-pipeline-status :pipeline="pipeline" />
-          <vulnerabilities-count-list :filters="filters" />
+          <vulnerabilities-count-list
+            class="mt-4"
+            scope="project"
+            :full-path="projectFullPath"
+            :filters="filters"
+          />
         </template>
         <template #sticky>
           <filters @filterChange="handleFilterChange" />
