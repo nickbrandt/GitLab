@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { GlLoadingIcon, GlButton, GlAlert, GlSafeHtmlDirective } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlAlert } from '@gitlab/ui';
 import { TEST_HOST } from 'spec/test_constants';
 import TerminalEmptyState from '~/ide/components/terminal/empty_state.vue';
 
