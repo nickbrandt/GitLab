@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Resolvers::CachingArrayResolver do
+RSpec.describe ::CachingArrayResolver do
   include GraphqlHelpers
 
   let_it_be(:non_admins) { create_list(:user, 4, admin: false) }
@@ -11,7 +11,11 @@ RSpec.describe Resolvers::CachingArrayResolver do
   let(:schema) { double('Schema', default_max_page_size: 3) }
 
   let_it_be(:caching_resolver) do
-    Class.new(described_class) do
+    mod = described_class
+
+    Class.new(::Resolvers::BaseResolver) do
+      include mod
+
       def query_input(is_admin:)
         is_admin
       end
