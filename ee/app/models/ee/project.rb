@@ -657,7 +657,7 @@ module EE
     end
 
     override :lfs_http_url_to_repo
-    def lfs_http_url_to_repo(operation)
+    def lfs_http_url_to_repo(operation = nil)
       return super unless ::Gitlab::Geo.secondary_with_primary?
       return super if operation == GIT_LFS_DOWNLOAD_OPERATION # download always comes from secondary
 
