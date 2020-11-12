@@ -1,0 +1,5 @@
+---
+title: Disallow editing of project-level MR approval settings when enabled at the instance level
+merge_request: 47483
+author:
+type: changed

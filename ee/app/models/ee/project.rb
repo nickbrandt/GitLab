@@ -256,12 +256,6 @@ module EE
       end
     end
 
-    def has_regulated_settings?
-      strong_memoize(:has_regulated_settings) do
-        compliance_framework_setting&.compliance_management_framework&.merge_request_approval_rules_enforced?
-      end
-    end
-
     def can_store_security_reports?
       namespace.store_security_reports_available? || public?
     end
@@ -685,9 +679,8 @@ module EE
     def disable_overriding_approvers_per_merge_request
       strong_memoize(:disable_overriding_approvers_per_merge_request) do
         next super unless License.feature_available?(:admin_merge_request_approvers_rules)
-        next super unless has_regulated_settings?
 
-        ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request?
+        ::Gitlab::CurrentSettings.disable_overriding_approvers_per_merge_request? || super
       end
     end
     alias_method :disable_overriding_approvers_per_merge_request?, :disable_overriding_approvers_per_merge_request
@@ -695,9 +688,9 @@ module EE
     def merge_requests_author_approval
       strong_memoize(:merge_requests_author_approval) do
         next super unless License.feature_available?(:admin_merge_request_approvers_rules)
-        next super unless has_regulated_settings?
+        next false if ::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
 
-        !::Gitlab::CurrentSettings.prevent_merge_requests_author_approval?
+        super
       end
     end
     alias_method :merge_requests_author_approval?, :merge_requests_author_approval
@@ -705,9 +698,8 @@ module EE
     def merge_requests_disable_committers_approval
       strong_memoize(:merge_requests_disable_committers_approval) do
         next super unless License.feature_available?(:admin_merge_request_approvers_rules)
-        next super unless has_regulated_settings?
 
-        ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval?
+        ::Gitlab::CurrentSettings.prevent_merge_requests_committers_approval? || super
       end
     end
     alias_method :merge_requests_disable_committers_approval?, :merge_requests_disable_committers_approval
