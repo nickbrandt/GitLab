@@ -884,7 +884,7 @@ class JobsResolver < BaseResolver
   end
 ```
 
-And then we can use these resolver on fields:
+Then we can use these resolver on fields:
 
 ```ruby
 # In PipelineType
