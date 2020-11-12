@@ -3511,6 +3511,9 @@ msgid_plural "ApprovalRuleSummary|%{count} approvals required from %{membersCoun
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "ApprovalRule|Approval rules"
+msgstr ""
+
 msgid "ApprovalRule|Approvers"
 msgstr ""
 
