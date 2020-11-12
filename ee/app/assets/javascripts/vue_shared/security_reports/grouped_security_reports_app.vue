@@ -448,7 +448,6 @@ export default {
             :unresolved-issues="sast.newIssues"
             :resolved-issues="sast.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
-            class="report-block-group-list"
             data-testid="sast-issues-list"
           />
         </template>
@@ -470,7 +469,6 @@ export default {
             :unresolved-issues="dependencyScanning.newIssues"
             :resolved-issues="dependencyScanning.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
-            class="report-block-group-list"
             data-testid="dependency-scanning-issues-list"
           />
         </template>
@@ -492,7 +490,6 @@ export default {
             :unresolved-issues="containerScanning.newIssues"
             :resolved-issues="containerScanning.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
-            class="report-block-group-list"
             data-testid="container-scanning-issues-list"
           />
         </template>
@@ -527,7 +524,6 @@ export default {
             :unresolved-issues="dast.newIssues"
             :resolved-issues="dast.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
-            class="report-block-group-list"
             data-testid="dast-issues-list"
           />
         </template>
@@ -549,7 +545,6 @@ export default {
             :unresolved-issues="secretDetection.newIssues"
             :resolved-issues="secretDetection.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
-            class="report-block-group-list"
             data-testid="secret-scanning-issues-list"
           />
         </template>
@@ -576,7 +571,6 @@ export default {
             :unresolved-issues="coverageFuzzing.newIssues"
             :resolved-issues="coverageFuzzing.resolvedIssues"
             :component="$options.componentNames.SecurityIssueBody"
-            class="report-block-group-list"
             data-testid="coverage-fuzzing-issues-list"
           />
         </template>
