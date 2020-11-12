@@ -901,7 +901,7 @@ it.each([
 
 **Note**: only use template literal block if pretty print is **not** needed for spec output. For example, empty strings, nested objects etc.
 
-For example, if we were testing the difference between an empty search string and a non-empty search string we would want to use the array block syntax with the pretty print option so we can see the difference between the `''` and `'search string'` in the spec output. Where, with the template literal block, the empty string would output as a space, which would lead to a confusing developer experience.
+For example, when testing the difference between an empty search string and a non-empty search string, the use of the array block syntax with the pretty print option would be preferred. That way the differences between an empty string e.g. `''` and a non-empty string e.g. `'search string'` would be visible in the spec output. Whereas with a template literal block, the empty string would be shown as a space, which could lead to a confusing developer experience
 
 ```javascript
 // bad
