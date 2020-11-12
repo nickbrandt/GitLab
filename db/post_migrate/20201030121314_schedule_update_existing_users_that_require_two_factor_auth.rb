@@ -7,6 +7,7 @@ class ScheduleUpdateExistingUsersThatRequireTwoFactorAuth < ActiveRecord::Migrat
   MIGRATION = 'UpdateExistingUsersThatRequireTwoFactorAuth'
   DELAY_INTERVAL = 2.minutes
   BATCH_SIZE = 1000
+  INDEX_NAME = 'index_users_on_require_two_factor_authentication_from_group'
 
   disable_ddl_transaction!
 
@@ -17,6 +18,11 @@ class ScheduleUpdateExistingUsersThatRequireTwoFactorAuth < ActiveRecord::Migrat
   end
 
   def up
+    add_concurrent_index :users,
+                         :require_two_factor_authentication_from_group,
+                         where: 'require_two_factor_authentication_from_group = TRUE',
+                         name: INDEX_NAME
+
     relation = User.where(require_two_factor_authentication_from_group: true)
 
     queue_background_migration_jobs_by_range_at_intervals(
@@ -24,6 +30,6 @@ class ScheduleUpdateExistingUsersThatRequireTwoFactorAuth < ActiveRecord::Migrat
   end
 
   def down
-    # no-op
+    remove_concurrent_index :users, INDEX_NAME
   end
 end
