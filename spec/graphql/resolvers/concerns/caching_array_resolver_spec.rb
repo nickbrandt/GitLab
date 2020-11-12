@@ -8,6 +8,7 @@ RSpec.describe ::CachingArrayResolver do
   let_it_be(:non_admins) { create_list(:user, 4, admin: false) }
   let(:query_context) { {} }
   let(:max_page_size) { 10 }
+  let(:field) { double('Field', max_page_size: max_page_size) }
   let(:schema) { double('Schema', default_max_page_size: 3) }
 
   let_it_be(:caching_resolver) do
@@ -35,6 +36,49 @@ RSpec.describe ::CachingArrayResolver do
   end
 
   describe '#resolve' do
+    context 'there are more than MAX_UNION_SIZE queries' do
+      let_it_be(:max_union) { 3 }
+      let_it_be(:resolver) do
+        mod = described_class
+        max = max_union
+
+        Class.new(::Resolvers::BaseResolver) do
+          include mod
+
+          def query_input(username:)
+            username
+          end
+
+          def query_for(username)
+            if username.nil?
+              model_class.all
+            else
+              model_class.where(username: username)
+            end
+          end
+
+          def model_class
+            User # Happens to include FromUnion, and is cheap-ish to create
+          end
+
+          define_method :max_union_size do
+            max
+          end
+        end
+      end
+
+      it 'executes the queries in multiple batches' do
+        users = create_list(:user, (max_union * 2) + 1)
+        expect(User).to receive(:from_union).twice.and_call_original
+
+        results = users.in_groups_of(2, false).map do |users|
+          resolve(resolver, args: { username: users.map(&:username) }, field: field, schema: schema)
+        end
+
+        expect(results.flat_map(&method(:force))).to match_array(users)
+      end
+    end
+
     context 'all queries return results' do
       let_it_be(:admins) { create_list(:admin, 3) }
 
@@ -154,7 +198,6 @@ RSpec.describe ::CachingArrayResolver do
   end
 
   def resolve_users(is_admin, resolver = caching_resolver)
-    field = double('Field', max_page_size: max_page_size)
     args = { is_admin: is_admin }
     resolve(resolver, args: args, field: field, ctx: query_context, schema: schema)
   end

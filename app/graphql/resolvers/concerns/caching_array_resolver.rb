@@ -44,7 +44,10 @@
 #
 # Classes may implement:
 # - #item_found(A, R) (return value is ignored)
+# - max_union_size Integer (the maximum number of queries to run in any one union)
 module CachingArrayResolver
+  MAX_UNION_SIZE = 50
+
   def resolve(**args)
     key = query_input(**args)
 
@@ -56,14 +59,16 @@ module CachingArrayResolver
       else
         queries = keys.map { |key| query_for(key) }
 
-        by_id = model_class
-          .from_union(tag(queries), remove_duplicates: false)
-          .group_by { |r| r[primary_key] }
+        queries.in_groups_of(max_union_size, false).each do |group|
+          by_id = model_class
+            .from_union(tag(group), remove_duplicates: false)
+            .group_by { |r| r[primary_key] }
 
-        by_id.values.each do |item_group|
-          item = item_group.first
-          item_group.map(&:union_member_idx).each do |i|
-            found(loader, keys[i], item)
+          by_id.values.each do |item_group|
+            item = item_group.first
+            item_group.map(&:union_member_idx).each do |i|
+              found(loader, keys[i], item)
+            end
           end
         end
       end
@@ -72,6 +77,10 @@ module CachingArrayResolver
 
   # Override this to intercept the items once they are found
   def item_found(query_input, item)
+  end
+
+  def max_union_size
+    MAX_UNION_SIZE
   end
 
   private
