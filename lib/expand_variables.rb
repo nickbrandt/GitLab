@@ -5,27 +5,35 @@ module ExpandVariables
 
   class << self
     def expand(value, variables)
-      variables_hash = nil
-
-      value.gsub(VARIABLES_REGEXP) do
-        variables_hash ||= transform_variables(variables)
-        variables_hash[Regexp.last_match(1) || Regexp.last_match(2)]
+      replace_with(value, variables) do |vars_hash, last_match|
+        match_or_blank_value(vars_hash, last_match)
       end
     end
 
     def expand_existing(value, variables)
-      variables_hash = nil
-
-      value.gsub(VARIABLES_REGEXP) do
-        variables_hash ||= transform_variables(variables)
-        variables_hash.fetch(
-          Regexp.last_match(1) || Regexp.last_match(2),
-          Regexp.last_match(0)
-        )
+      replace_with(value, variables) do |vars_hash, last_match|
+        match_or_original_value(vars_hash, last_match)
       end
     end
 
     private
+
+    def replace_with(value, variables)
+      variables_hash = nil
+
+      value.gsub(VARIABLES_REGEXP) do
+        variables_hash ||= transform_variables(variables)
+        yield(variables_hash, Regexp.last_match)
+      end
+    end
+
+    def match_or_blank_value(variables, last_match)
+      variables[last_match[1] || last_match[2]]
+    end
+
+    def match_or_original_value(variables, last_match)
+      match_or_blank_value(variables, last_match) || last_match[0]
+    end
 
     def transform_variables(variables)
       # Lazily initialise variables

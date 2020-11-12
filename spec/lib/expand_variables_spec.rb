@@ -113,6 +113,13 @@ RSpec.describe ExpandVariables do
               variables: [
                 { key: 'variable', value: 'value' }
               ]
+            },
+            "complex expansions with missing variable for Windows": {
+              value: 'key%variable%%variable2%',
+              result: 'keyvalue',
+              variables: [
+                { key: 'variable', value: 'value' }
+              ]
             }
           }
         end
