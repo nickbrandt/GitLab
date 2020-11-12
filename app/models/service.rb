@@ -17,8 +17,9 @@ class Service < ApplicationRecord
     pivotaltracker prometheus pushover redmine slack slack_slash_commands teamcity unify_circuit webex_teams youtrack
   ].freeze
 
+  # Fake services to help with local development.
   DEV_SERVICE_NAMES = %w[
-    gitlab_slack_application mock_ci mock_deployment mock_monitoring
+    mock_ci mock_deployment mock_monitoring
   ].freeze
 
   serialize :properties, JSON # rubocop:disable Cop/ActiveRecordSerialize
