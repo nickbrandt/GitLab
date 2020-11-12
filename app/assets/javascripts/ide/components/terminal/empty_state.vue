@@ -1,11 +1,14 @@
 <script>
-import { GlLoadingIcon, GlButton, GlAlert } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton, GlAlert, GlSafeHtmlDirective } from '@gitlab/ui';
 
 export default {
   components: {
     GlLoadingIcon,
     GlButton,
     GlAlert,
+  },
+  directives: {
+    SafeHtml: GlSafeHtmlDirective,
   },
   props: {
     isLoading: {
@@ -59,9 +62,12 @@ export default {
           {{ __('Start Web Terminal') }}
         </gl-button>
       </p>
-      <gl-alert v-if="!isValid && message" variant="tip" :dismissable="false"> 
-        {{ __('Configure a .gitlab-webide.yml file in the .gitlab directory to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}')}}
-      </gl-alert>
+      <gl-alert
+        v-if="!isValid && message"
+        v-safe-html="message"
+        variant="tip"
+        :dismissable="false"
+      />
       <p v-else>
         <a
           v-if="helpPath"
