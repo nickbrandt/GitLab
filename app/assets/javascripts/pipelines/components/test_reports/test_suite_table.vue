@@ -3,11 +3,13 @@ import { mapGetters } from 'vuex';
 import { GlModalDirective, GlTooltipDirective, GlFriendlyWrap, GlIcon, GlButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 import TestCaseDetails from './test_case_details.vue';
+import SmartVirtualList from '~/vue_shared/components/smart_virtual_list.vue';
 
 export default {
   name: 'TestsSuiteTable',
   components: {
     GlIcon,
+    SmartVirtualList,
     GlFriendlyWrap,
     GlButton,
     TestCaseDetails,
@@ -29,6 +31,8 @@ export default {
       return this.getSuiteTests.length > 0;
     },
   },
+  maxShownRows: 30,
+  typicalRowHeight: 75,
   wrapSymbols: ['::', '#', '.', '_', '-', '/', '\\'],
 };
 </script>
@@ -63,72 +67,78 @@ export default {
         </div>
       </div>
 
-      <div
-        v-for="(testCase, index) in getSuiteTests"
-        :key="index"
-        class="gl-responsive-table-row rounded align-items-md-start mt-xs-3 js-case-row"
+      <smart-virtual-list
+        :length="getSuiteTests.length"
+        :remain="$options.maxShownRows"
+        :size="$options.typicalRowHeight"
       >
-        <div class="table-section section-20 section-wrap">
-          <div role="rowheader" class="table-mobile-header">{{ __('Suite') }}</div>
-          <div class="table-mobile-content gl-md-pr-2 gl-overflow-wrap-break">
-            <gl-friendly-wrap :symbols="$options.wrapSymbols" :text="testCase.classname" />
+        <div
+          v-for="(testCase, index) in getSuiteTests"
+          :key="index"
+          class="gl-responsive-table-row rounded align-items-md-start mt-xs-3 js-case-row"
+        >
+          <div class="table-section section-20 section-wrap">
+            <div role="rowheader" class="table-mobile-header">{{ __('Suite') }}</div>
+            <div class="table-mobile-content gl-md-pr-2 gl-overflow-wrap-break">
+              <gl-friendly-wrap :symbols="$options.wrapSymbols" :text="testCase.classname" />
+            </div>
           </div>
-        </div>
 
-        <div class="table-section section-40 section-wrap">
-          <div role="rowheader" class="table-mobile-header">{{ __('Name') }}</div>
-          <div class="table-mobile-content gl-md-pr-2 gl-overflow-wrap-break">
-            <gl-friendly-wrap :symbols="$options.wrapSymbols" :text="testCase.name" />
+          <div class="table-section section-40 section-wrap">
+            <div role="rowheader" class="table-mobile-header">{{ __('Name') }}</div>
+            <div class="table-mobile-content gl-md-pr-2 gl-overflow-wrap-break">
+              <gl-friendly-wrap :symbols="$options.wrapSymbols" :text="testCase.name" />
+            </div>
           </div>
-        </div>
 
-        <div class="table-section section-10 section-wrap">
-          <div role="rowheader" class="table-mobile-header">{{ __('Filename') }}</div>
-          <div class="table-mobile-content gl-md-pr-2 gl-overflow-wrap-break">
-            <gl-friendly-wrap :symbols="$options.wrapSymbols" :text="testCase.file" />
-            <gl-button
-              v-gl-tooltip
-              size="small"
-              category="tertiary"
-              icon="copy-to-clipboard"
-              :title="__('Copy to clipboard')"
-              :data-clipboard-text="testCase.file"
-              :aria-label="__('Copy to clipboard')"
-            />
+          <div class="table-section section-10 section-wrap">
+            <div role="rowheader" class="table-mobile-header">{{ __('Filename') }}</div>
+            <div class="table-mobile-content gl-md-pr-2 gl-overflow-wrap-break">
+              <gl-friendly-wrap :symbols="$options.wrapSymbols" :text="testCase.file" />
+              <gl-button
+                v-gl-tooltip
+                size="small"
+                category="tertiary"
+                icon="copy-to-clipboard"
+                :title="__('Copy to clipboard')"
+                :data-clipboard-text="testCase.file"
+                :aria-label="__('Copy to clipboard')"
+              />
+            </div>
           </div>
-        </div>
 
-        <div class="table-section section-10 section-wrap">
-          <div role="rowheader" class="table-mobile-header">{{ __('Status') }}</div>
-          <div class="table-mobile-content text-center">
-            <div
-              class="add-border ci-status-icon d-flex align-items-center justify-content-end justify-content-md-center"
-              :class="`ci-status-icon-${testCase.status}`"
-            >
-              <gl-icon :size="24" :name="testCase.icon" />
+          <div class="table-section section-10 section-wrap">
+            <div role="rowheader" class="table-mobile-header">{{ __('Status') }}</div>
+            <div class="table-mobile-content text-center">
+              <div
+                class="add-border ci-status-icon d-flex align-items-center justify-content-end justify-content-md-center"
+                :class="`ci-status-icon-${testCase.status}`"
+              >
+                <gl-icon :size="24" :name="testCase.icon" />
+              </div>
+            </div>
+          </div>
+
+          <div class="table-section section-10 section-wrap">
+            <div role="rowheader" class="table-mobile-header">
+              {{ __('Duration') }}
+            </div>
+            <div class="table-mobile-content pr-sm-1">
+              {{ testCase.formattedTime }}
+            </div>
+          </div>
+
+          <div class="table-section section-10 section-wrap">
+            <div role="rowheader" class="table-mobile-header">{{ __('Details'), }}</div>
+            <div class="table-mobile-content">
+              <gl-button v-gl-modal-directive="`test-case-details-${index}`">{{
+                __('View details')
+              }}</gl-button>
+              <test-case-details :modal-id="`test-case-details-${index}`" :test-case="testCase" />
             </div>
           </div>
         </div>
-
-        <div class="table-section section-10 section-wrap">
-          <div role="rowheader" class="table-mobile-header">
-            {{ __('Duration') }}
-          </div>
-          <div class="table-mobile-content pr-sm-1">
-            {{ testCase.formattedTime }}
-          </div>
-        </div>
-
-        <div class="table-section section-10 section-wrap">
-          <div role="rowheader" class="table-mobile-header">{{ __('Details'), }}</div>
-          <div class="table-mobile-content">
-            <gl-button v-gl-modal-directive="`test-case-details-${index}`">{{
-              __('View details')
-            }}</gl-button>
-            <test-case-details :modal-id="`test-case-details-${index}`" :test-case="testCase" />
-          </div>
-        </div>
-      </div>
+      </smart-virtual-list>
     </div>
 
     <div v-else>
