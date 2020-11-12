@@ -16,6 +16,7 @@ module Users
         user.resend_confirmation_instructions
         user.accept_pending_invitations! if user.active_for_authentication?
 
+        after_approve_hook(user)
         success
       else
         error(user.errors.full_messages.uniq.join('. '))
@@ -26,6 +27,10 @@ module Users
 
     attr_reader :current_user
 
+    def after_approve_hook(user)
+      # overridden by EE module
+    end
+
     def allowed?
       can?(current_user, :approve_user)
     end
@@ -35,3 +40,5 @@ module Users
     end
   end
 end
+
+Users::ApproveService.prepend_if_ee('EE::Users::ApproveService')
