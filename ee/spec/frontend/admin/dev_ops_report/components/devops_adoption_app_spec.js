@@ -3,7 +3,7 @@ import { GlAlert, GlLoadingIcon } from '@gitlab/ui';
 import MockAdapter from 'axios-mock-adapter';
 import createMockApollo from 'jest/helpers/mock_apollo_helper';
 import Api from 'ee/api';
-import { resolvers as devOpsResolvers } from 'ee/admin/dev_ops_report/graphql';
+import apolloProvider from 'ee/admin/dev_ops_report/graphql';
 import DevopsAdoptionApp from 'ee/admin/dev_ops_report/components/devops_adoption_app.vue';
 import DevopsAdoptionEmptyState from 'ee/admin/dev_ops_report/components/devops_adoption_empty_state.vue';
 import { DEVOPS_ADOPTION_STRINGS } from 'ee/admin/dev_ops_report/constants';
@@ -21,8 +21,7 @@ describe('DevopsAdoptionApp', () => {
   let mockAdapter;
 
   const createComponent = (options = {}) => {
-    const { resolvers = devOpsResolvers } = options;
-    const fakeApollo = createMockApollo([], resolvers);
+    const { fakeApollo } = options;
     return shallowMount(DevopsAdoptionApp, {
       localVue,
       apolloProvider: fakeApollo,
@@ -49,7 +48,8 @@ describe('DevopsAdoptionApp', () => {
           },
         },
       };
-      wrapper = createComponent({ resolvers });
+      const fakeApollo = createMockApollo([], resolvers);
+      wrapper = createComponent({ fakeApollo });
     });
 
     it('does not display the empty state', () => {
@@ -64,7 +64,7 @@ describe('DevopsAdoptionApp', () => {
   describe('when no data is present', () => {
     beforeEach(() => {
       mockAdapter.onGet(groupsUrl).reply(httpStatus.OK, []);
-      wrapper = createComponent();
+      wrapper = createComponent({ fakeApollo: apolloProvider });
     });
 
     it('displays the empty state', () => {
@@ -79,7 +79,7 @@ describe('DevopsAdoptionApp', () => {
   describe('when data is present', () => {
     beforeEach(() => {
       mockAdapter.onGet(groupsUrl).reply(httpStatus.OK, groupData, pageData);
-      wrapper = createComponent();
+      wrapper = createComponent({ fakeApollo: apolloProvider });
     });
 
     it('does not display the empty state', () => {
@@ -105,7 +105,7 @@ describe('DevopsAdoptionApp', () => {
     beforeEach(() => {
       mockAdapter.onGet(groupsUrl).reply(httpStatus.FORBIDDEN);
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponent();
+      wrapper = createComponent({ fakeApollo: apolloProvider });
     });
 
     it('does not display the empty state', () => {
