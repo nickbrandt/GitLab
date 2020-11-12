@@ -707,14 +707,6 @@ msgstr ""
 msgid "%{primary} (%{secondary})"
 msgstr ""
 
-msgid "%{recentlyFailed} out of %{failed} failed test has failed more than once in the last 14 days"
-msgstr ""
-
-msgid "%{recentlyFailed} out of %{failed} failed tests has failed more than once in the last 14 days"
-msgid_plural "%{recentlyFailed} out of %{failed} failed tests have failed more than once in the last 14 days"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "%{ref} cannot be added: %{error}"
 msgstr ""
 
@@ -22699,6 +22691,15 @@ msgid "Reporting"
 msgstr ""
 
 msgid "Reports|%{combinedString} and %{resolvedString}"
+msgstr ""
+
+msgid "Reports|%{recentlyFailed} out of %{failed} failed test has failed more than once in the last 14 days"
+msgstr ""
+
+msgid "Reports|%{recentlyFailed} out of %{failed} failed tests has failed more than once in the last 14 days"
+msgstr ""
+
+msgid "Reports|%{recentlyFailed} out of %{failed} failed tests have failed more than once in the last 14 days"
 msgstr ""
 
 msgid "Reports|Accessibility scanning detected %d issue for the source branch only"

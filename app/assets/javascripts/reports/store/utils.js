@@ -54,16 +54,20 @@ export const recentFailuresTextBuilder = (summary = {}) => {
 
   if (failed < 2) {
     return sprintf(
-      __(
-        '%{recentlyFailed} out of %{failed} failed test has failed more than once in the last 14 days',
+      s__(
+        'Reports|%{recentlyFailed} out of %{failed} failed test has failed more than once in the last 14 days',
       ),
       { recentlyFailed, failed },
     );
   }
   return sprintf(
     n__(
-      '%{recentlyFailed} out of %{failed} failed tests has failed more than once in the last 14 days',
-      '%{recentlyFailed} out of %{failed} failed tests have failed more than once in the last 14 days',
+      s__(
+        'Reports|%{recentlyFailed} out of %{failed} failed tests has failed more than once in the last 14 days',
+      ),
+      s__(
+        'Reports|%{recentlyFailed} out of %{failed} failed tests have failed more than once in the last 14 days',
+      ),
       recentlyFailed,
     ),
     { recentlyFailed, failed },
