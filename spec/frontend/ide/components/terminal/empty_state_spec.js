@@ -101,6 +101,6 @@ describe('IDE TerminalEmptyState', () => {
     });
 
     expect(wrapper.find(GlButton).props('disabled')).toBe(true);
-    expect(wrapper.find(GlAlert).element.innerHTML).toBe(TEST_HTML_MESSAGE);
+    expect(wrapper.find(GlAlert).html()).toContain(TEST_HTML_MESSAGE);
   });
 });
