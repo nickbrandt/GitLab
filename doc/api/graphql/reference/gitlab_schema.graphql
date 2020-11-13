@@ -1905,6 +1905,16 @@ input BoardIssueInput {
   epicWildcardId: EpicWildcardId
 
   """
+  Filter by iteration title
+  """
+  iterationTitle: String
+
+  """
+  Filter by iteration ID wildcard
+  """
+  iterationWildcardId: IterationWildcardId
+
+  """
   Filter by label name
   """
   labelName: [String]
@@ -11372,6 +11382,21 @@ enum IterationState {
 }
 
 """
+Iteration ID wildcard values
+"""
+enum IterationWildcardId {
+  """
+  An iteration is assigned
+  """
+  ANY
+
+  """
+  No iteration is assigned
+  """
+  NONE
+}
+
+"""
 Represents untyped JSON
 """
 scalar JSON
@@ -13882,6 +13907,11 @@ input NegatedBoardIssueInput {
   Filter by epic ID. Incompatible with epicWildcardId
   """
   epicId: EpicID
+
+  """
+  Filter by iteration title
+  """
+  iterationTitle: String
 
   """
   Filter by label name

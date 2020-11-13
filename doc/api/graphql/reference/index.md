@@ -3994,6 +3994,15 @@ State of a GitLab iteration.
 | `started` |  |
 | `upcoming` |  |
 
+### IterationWildcardId
+
+Iteration ID wildcard values.
+
+| Value | Description |
+| ----- | ----------- |
+| `ANY` | An iteration is assigned |
+| `NONE` | No iteration is assigned |
+
 ### ListLimitMetric
 
 List limit metric setting.
