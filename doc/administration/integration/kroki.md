@@ -1,9 +1,9 @@
-# Kroki & GitLab
+# Kroki diagrams
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/44851) in GitLab x.y.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/241744) in GitLab x.y.
 
 When [Kroki](https://kroki.io) integration is enabled and configured in
-GitLab we are able to create diagrams in AsciiDoc and Markdown documents.
+GitLab you can use it to create diagrams in AsciiDoc and Markdown documents.
 
 ## Kroki Server
 
@@ -14,15 +14,15 @@ Once you've installed Kroki, make sure to update the server URL to point to your
 
 ### Docker
 
-With Docker, you can just run a container like this:
+With Docker, run a container like this:
 
 ```shell
 docker run -d --name kroki -p 8080:8000 yuzutech/kroki
 ```
 
-The **Kroki URL** will be the hostname of the server running the container.
+The **Kroki URL** is the hostname of the server running the container.
 
-[`yuzutech/kroki`](https://hub.docker.com/r/yuzutech/kroki) image contains the following diagrams libraries out-of-the-box:
+The [`yuzutech/kroki`](https://hub.docker.com/r/yuzutech/kroki) image contains the following diagrams libraries out-of-the-box:
 
 - [Bytefield](https://bytefield-svg.deepsymmetry.org/)
 - [Ditaa](http://ditaa.sourceforge.net)
@@ -40,20 +40,21 @@ The **Kroki URL** will be the hostname of the server running the container.
 If you want to use additional diagram libraries,
 read the [Kroki installation](https://docs.kroki.io/kroki/setup/install/#_images) to learn how to start Kroki companion containers. 
 
-## GitLab
+## Enable Kroki in GitLab **(CORE ONLY)**
 
 You need to enable Kroki integration from Settings under Admin Area.
-To do that, login with an Admin account and do following:
+To do that, log in with an Admin account and follow these steps:
 
-- In GitLab, go to **Admin Area > Settings > General**.
-- Expand the **Kroki** section.
-- Check **Enable Kroki** checkbox.
-- Configure the **Kroki URL**.
+1. Select the Admin Area (**{admin}**) icon.
+1. Navigate to **Settings > General**.
+1. Expand the **Kroki** section.
+1. Select **Enable Kroki** checkbox.
+1. Enter the **Kroki URL**.
 
-## Creating Diagrams
+## Create diagrams
 
-With Kroki integration enabled and configured, we can start adding diagrams to
-our AsciiDoc or Markdown documentation using delimited blocks:
+With Kroki integration enabled and configured, you can start adding diagrams to
+your AsciiDoc or Markdown documentation using delimited blocks:
 
 - **Markdown**
 
@@ -74,13 +75,13 @@ our AsciiDoc or Markdown documentation using delimited blocks:
   ....
   ```
 
-The above blocks will be converted to an HTML image tag with source pointing to the
+The above blocks are converted to an HTML image tag with source pointing to the
 Kroki instance. If the Kroki server is correctly configured, this should
 render a nice diagram instead of the block:
 
 <img src="https://kroki.io/plantuml/svg/eNpzyk9S0LVTcMzJTE5VsFLISM3JyeeC8IDCTkBZoGAmANl1Cxw="/>
 
-Kroki supports more than a dozen diagram libraries, here's a few examples:
+Kroki supports more than a dozen diagram libraries. Here's a few examples:
 
 **GraphViz**
 
