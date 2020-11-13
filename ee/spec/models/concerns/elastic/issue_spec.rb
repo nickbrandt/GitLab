@@ -56,7 +56,7 @@ RSpec.describe Issue, :elastic do
     end
   end
 
-  it "searches issues" do
+  it "searches issues", :aggregate_failures do
     Sidekiq::Testing.inline! do
       create :issue, title: 'bla-bla term1', project: project
       create :issue, description: 'bla-bla term2', project: project
