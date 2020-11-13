@@ -103,6 +103,14 @@ exports[`WebIDE runs 1`] = `
                 <h4>
                   Make and review changes in the browser with the Web IDE
                 </h4>
+                <div
+                  class="gl-spinner-container"
+                >
+                  <span
+                    aria-label="Loading"
+                    class="align-text-bottom gl-spinner gl-spinner-dark gl-spinner-md"
+                  />
+                </div>
               </div>
             </div>
           </div>
