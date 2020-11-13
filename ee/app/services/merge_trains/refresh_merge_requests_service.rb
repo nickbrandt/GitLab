@@ -42,7 +42,7 @@ module MergeTrains
 
     attr_reader :merge_request
 
-    # NOTE:
+    # TODO:
     # As we changed the process flow to refresh merge requests from the begnning always,
     # we don't use the `items` argument anymore.
     # We should refactor the current logic to make this class more readable.
