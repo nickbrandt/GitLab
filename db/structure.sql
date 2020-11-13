@@ -22038,6 +22038,8 @@ CREATE INDEX index_users_on_name_trigram ON users USING gin (name gin_trgm_ops);
 
 CREATE INDEX index_users_on_public_email ON users USING btree (public_email) WHERE ((public_email)::text <> ''::text);
 
+CREATE INDEX index_users_on_require_two_factor_authentication_from_group ON users USING btree (require_two_factor_authentication_from_group);
+
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON users USING btree (reset_password_token);
 
 CREATE INDEX index_users_on_state ON users USING btree (state);
@@ -22227,8 +22229,6 @@ CREATE INDEX partial_index_deployments_for_project_id_and_tag ON deployments USI
 CREATE INDEX snippet_repositories_verification_checksum_partial ON snippet_repositories USING btree (verification_checksum) WHERE (verification_checksum IS NOT NULL);
 
 CREATE INDEX snippet_repositories_verification_failure_partial ON snippet_repositories USING btree (verification_failure) WHERE (verification_failure IS NOT NULL);
-
-CREATE INDEX index_users_on_require_two_factor_authentication_from_group ON users USING btree (require_two_factor_authentication_from_group);
 
 CREATE UNIQUE INDEX snippet_user_mentions_on_snippet_id_and_note_id_index ON snippet_user_mentions USING btree (snippet_id, note_id);
 

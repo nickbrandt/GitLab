@@ -30,6 +30,6 @@ class ScheduleUpdateExistingUsersThatRequireTwoFactorAuth < ActiveRecord::Migrat
   end
 
   def down
-    remove_concurrent_index :users, INDEX_NAME
+    remove_concurrent_index_by_name :users, INDEX_NAME
   end
 end
