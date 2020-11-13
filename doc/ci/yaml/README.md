@@ -4301,7 +4301,7 @@ job_name:
     - *some-script-before
   script:
     - *some-script
-  before_script:
+  after_script:
     - *some-script-after
 ```
 
