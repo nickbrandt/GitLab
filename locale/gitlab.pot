@@ -4696,9 +4696,6 @@ msgstr ""
 msgid "By %{user_name}"
 msgstr ""
 
-msgid "By URL"
-msgstr ""
-
 msgid "By clicking Register, I agree that I have read and accepted the %{company_name} %{linkStart}Terms of Use and Privacy Policy%{linkEnd}"
 msgstr ""
 
@@ -16144,6 +16141,9 @@ msgid "Link title"
 msgstr ""
 
 msgid "Link title is required"
+msgstr ""
+
+msgid "Link to an image"
 msgstr ""
 
 msgid "Link to go to GitLab pipeline documentation"
@@ -29172,6 +29172,9 @@ msgid "Upload a certificate for your domain with all intermediates"
 msgstr ""
 
 msgid "Upload a private key for your certificate"
+msgstr ""
+
+msgid "Upload an image"
 msgstr ""
 
 msgid "Upload file"
