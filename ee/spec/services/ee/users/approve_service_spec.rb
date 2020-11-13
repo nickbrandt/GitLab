@@ -46,9 +46,7 @@ RSpec.describe Users::ApproveService do
       context 'when not licensed' do
         before do
           stub_licensed_features(
-            admin_audit_log: false,
-            audit_events: false,
-            extended_audit_events: false
+            admin_audit_log: false
           )
         end
 
