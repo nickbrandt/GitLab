@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"gitlab.com/gitlab-org/labkit/log"
@@ -32,6 +33,9 @@ func TestMain(m *testing.M) {
 
 func requestScaledImage(t *testing.T, httpHeaders http.Header, params resizeParams, cfg config.ImageResizerConfig) *http.Response {
 	httpRequest := httptest.NewRequest("GET", "/image", nil)
+	if httpHeaders != nil {
+		httpRequest.Header = httpHeaders
+	}
 	responseWriter := httptest.NewRecorder()
 	paramsJSON := encodeParams(t, &params)
 
@@ -76,6 +80,46 @@ func TestRequestScaledImageFromPath(t *testing.T) {
 			require.Equal(t, int(params.Width), bounds.Size().X, "wrong width after resizing")
 		})
 	}
+}
+
+func TestRequestScaledImageWithConditionalGetAndImageNotChanged(t *testing.T) {
+	cfg := config.DefaultImageResizerConfig
+	params := resizeParams{Location: imagePath, ContentType: "image/png", Width: 64}
+
+	clientTime := testImageLastModified(t)
+	header := http.Header{}
+	header.Set("If-Modified-Since", httpTimeStr(clientTime))
+
+	resp := requestScaledImage(t, header, params, cfg)
+	require.Equal(t, http.StatusNotModified, resp.StatusCode)
+	require.Equal(t, httpTimeStr(testImageLastModified(t)), resp.Header.Get("Last-Modified"))
+	require.Empty(t, resp.Header.Get("Content-Type"))
+	require.Empty(t, resp.Header.Get("Content-Length"))
+}
+
+func TestRequestScaledImageWithConditionalGetAndImageChanged(t *testing.T) {
+	cfg := config.DefaultImageResizerConfig
+	params := resizeParams{Location: imagePath, ContentType: "image/png", Width: 64}
+
+	clientTime := testImageLastModified(t).Add(-1 * time.Second)
+	header := http.Header{}
+	header.Set("If-Modified-Since", httpTimeStr(clientTime))
+
+	resp := requestScaledImage(t, header, params, cfg)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+	require.Equal(t, httpTimeStr(testImageLastModified(t)), resp.Header.Get("Last-Modified"))
+}
+
+func TestRequestScaledImageWithConditionalGetAndInvalidClientTime(t *testing.T) {
+	cfg := config.DefaultImageResizerConfig
+	params := resizeParams{Location: imagePath, ContentType: "image/png", Width: 64}
+
+	header := http.Header{}
+	header.Set("If-Modified-Since", "0")
+
+	resp := requestScaledImage(t, header, params, cfg)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+	require.Equal(t, httpTimeStr(testImageLastModified(t)), resp.Header.Get("Last-Modified"))
 }
 
 func TestServeOriginalImageWhenSourceImageTooLarge(t *testing.T) {
@@ -174,8 +218,19 @@ func testImage(t *testing.T) image.Image {
 	return image
 }
 
+func testImageLastModified(t *testing.T) time.Time {
+	fi, err := os.Stat(imagePath)
+	require.NoError(t, err)
+
+	return fi.ModTime()
+}
+
 func imageFromResponse(t *testing.T, resp *http.Response) image.Image {
 	img, _, err := image.Decode(resp.Body)
 	require.NoError(t, err, "decode resized image")
 	return img
+}
+
+func httpTimeStr(time time.Time) string {
+	return time.UTC().Format(http.TimeFormat)
 }
