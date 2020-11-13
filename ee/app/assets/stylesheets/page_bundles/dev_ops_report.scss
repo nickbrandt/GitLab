@@ -12,3 +12,12 @@
     background-color: var(--indigo-600, $indigo-600);
   }
 }
+
+@include media-breakpoint-down(sm) {
+  .actions-cell {
+    div {
+      width: 100% !important;
+      text-align: center !important;
+    }
+  }
+}
