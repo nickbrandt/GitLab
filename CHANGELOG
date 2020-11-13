@@ -1,5 +1,25 @@
 # Changelog for gitlab-workhorse
 
+## v8.54.0
+
+### Changed
+- Don't reject image scaling requests based on file extension/format mismatch
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/651
+
+### Other
+- Rework image scaler test suite
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
+- Adjust image scaling latency buckets
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/643
+- Update raven-go and gocertifi packages
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/644
+- jaeger: limit operation cardinality by using route regex
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/648
+
+### Performance
+- Add support for conditional GETs for rescaled images
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/647
+
 ## v8.53.0
 
 ### Added

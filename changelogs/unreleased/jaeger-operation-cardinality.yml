@@ -1,5 +1,0 @@
----
-title: 'jaeger: limit operation cardinality by using route regex'
-merge_request: 648
-author:
-type: other
