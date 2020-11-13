@@ -14,18 +14,15 @@ module Gitlab
             include ::Gitlab::Config::Entry::Attributable
 
             ALLOWED_KEYS = %i[links].freeze
+
             attributes ALLOWED_KEYS
 
             entry :links, Entry::Release::Assets::Links, description: 'Release assets:links.'
 
             validations do
+              validates :config, type: Hash
               validates :config, allowed_keys: ALLOWED_KEYS
               validates :links, array_of_hashes: true, presence: true
-            end
-
-            def value
-              @config[:links] = links_value if @config.key?(:links)
-              @config
             end
           end
         end

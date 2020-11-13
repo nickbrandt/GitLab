@@ -38,12 +38,16 @@ RSpec.describe Gitlab::Ci::Config::Entry::Release do
         {
           tag_name: 'v0.06',
           description: "./release_changelog.txt",
-          assets: [
-            {
-              name: "cool-app.zip",
-              url: "http://my.awesome.download.site/1.0-$CI_COMMIT_SHORT_SHA.zip"
-            }
-          ]
+          assets: {
+            links: [
+              {
+                name: 'Mock binary',
+                url: 'https://gitlab.example.com/registry/mock-bin.dmg',
+                file: 'bin/mock-bin.dmg',
+                filepath: 'pretty_link_name'
+              }
+            ]
+          }
         }
       end
 
@@ -230,6 +234,44 @@ RSpec.describe Gitlab::Ci::Config::Entry::Release do
           let(:config) { { milestones: [1, 2, 3] } }
 
           it_behaves_like 'reports error', 'release milestones should be an array of strings or a string'
+        end
+
+        context 'assets' do
+          let(:config) do
+            {
+              tag_name: 'v0.06',
+              description: "./release_changelog.txt",
+              assets: {
+                links: [ assets ]
+              }
+            }
+          end
+          context 'when `name` is missing' do
+            let(:assets) {
+              {
+                url: 'https://gitlab.example.com/registry/mock-bin.dmg',
+                file: 'bin/mock-bin.dmg',
+                filepath: 'pretty_link_name'
+              }
+            }
+
+            it_behaves_like 'reports error', "release assets links name can't be blank"
+          end
+
+          context 'when `url` is missing' do
+            let(:assets) {
+              {
+                name: 'Mock binary',
+                file: 'bin/mock-bin.dmg',
+                filepath: 'pretty_link_name'
+              }
+            }
+
+            it_behaves_like 'reports error', "release assets links name can't be blank"
+          end
+
+          context 'when `filepath` is invalid' do
+          end
         end
       end
     end

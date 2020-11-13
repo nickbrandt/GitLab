@@ -111,7 +111,7 @@ module Gitlab
 
           entry :release, Entry::Release,
             description: 'This job will produce a release.',
-            inherit: false
+            inherit: true
 
           entry :parallel, Entry::Product::Parallel,
             description: 'Parallel configuration for this job.',
@@ -119,7 +119,7 @@ module Gitlab
 
           attributes :script, :tags, :when, :dependencies,
                      :needs, :retry, :parallel, :start_in,
-                     :interruptible, :timeout, :resource_group, :release
+                     :interruptible, :timeout, :resource_group
 
           def self.matching?(name, config)
             !name.to_s.start_with?('.') &&

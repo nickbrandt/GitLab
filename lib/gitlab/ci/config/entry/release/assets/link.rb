@@ -13,7 +13,7 @@ module Gitlab
               include ::Gitlab::Config::Entry::Validatable
               include ::Gitlab::Config::Entry::Attributable
 
-              ALLOWED_KEYS = %i[name url].freeze
+              ALLOWED_KEYS = %i[name url file filepath].freeze
 
               attributes ALLOWED_KEYS
 
@@ -21,7 +21,9 @@ module Gitlab
                 validates :config, allowed_keys: ALLOWED_KEYS
 
                 validates :name, type: String, presence: true
-                validates :url, presence: true, addressable_url: true
+                validates :url, addressable_url: true, presence: true
+                validates :file, type: String, allow_blank: true
+                validates :filepath, format: { with: ::Releases::Link::FILEPATH_REGEX }, length: { maximum: 128 }, allow_blank: true
               end
             end
           end
