@@ -201,13 +201,31 @@ $line-removed-dark: $red-200;
 // Misc component overrides that should live elsewhere
 .gl-label {
   filter: brightness(0.9) contrast(1.1);
+
+  // This applies to the gl-label markups
+  // rendered and cached in the backend (labels_helper.rb)
+  &.gl-label-scoped {
+    .gl-label-text-scoped,
+    .gl-label-close {
+      color: $gray-950;
+    }
+  }
 }
 
 // white-ish text for light labels
 // and for scoped label value (the right section)
 .gl-label-text-light.gl-label-text-light,
 .gl-label-text-dark + .gl-label-text-dark {
-  color: $gray-900;
+  color: $gray-950;
+}
+
+// This applies to "gl-labels" from "gitlab-ui"
+.gl-label.gl-label-scoped.gl-label-text-dark,
+.gl-label.gl-label-scoped.gl-label-text-light {
+  .gl-label-text-scoped,
+  .gl-label-close {
+    color: $gray-950;
+  }
 }
 
 // duplicated class as the original .atwho-view style is added later
