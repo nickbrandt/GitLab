@@ -62,7 +62,7 @@ export default {
           {{ __('Start Web Terminal') }}
         </gl-button>
       </p>
-      <gl-alert v-if="!isValid && message" variant="tip" :dismissable="false">
+      <gl-alert v-if="!isValid && message" variant="tip" :dismissible="false">
         <span v-safe-html="message"></span>
       </gl-alert>
       <p v-else>
