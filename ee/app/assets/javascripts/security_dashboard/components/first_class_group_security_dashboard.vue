@@ -81,7 +81,7 @@ export default {
       <template #sticky>
         <filters :projects="projects" @filterChange="handleFilterChange" />
       </template>
-      <vulnerabilities-count-list scope="group" :full-path="groupFullPath" />
+      <vulnerabilities-count-list scope="group" :full-path="groupFullPath" :filters="filters" />
       <group-security-vulnerabilities :group-full-path="groupFullPath" :filters="filters" />
     </security-dashboard-layout>
   </div>

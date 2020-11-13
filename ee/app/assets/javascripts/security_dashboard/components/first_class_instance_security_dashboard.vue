@@ -77,7 +77,7 @@ export default {
     <template #sticky>
       <filters v-if="shouldShowDashboard" :projects="projects" @filterChange="handleFilterChange" />
     </template>
-    <vulnerabilities-count-list scope="instance" />
+    <vulnerabilities-count-list scope="instance" :filters="filters" />
     <instance-security-vulnerabilities
       v-if="shouldShowDashboard"
       :projects="projects"
