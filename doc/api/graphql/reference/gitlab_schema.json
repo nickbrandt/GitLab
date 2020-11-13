@@ -43989,7 +43989,7 @@
             },
             {
               "name": "codeCoverageSummary",
-              "description": "Code coverages summary associated with the project",
+              "description": "Code coverage summary associated with the project",
               "args": [
 
               ],
