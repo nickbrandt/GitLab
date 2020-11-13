@@ -1,6 +1,6 @@
-# Kroki diagrams
+# Kroki diagrams **(CORE)**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/241744) in GitLab x.y.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/241744) in GitLab 13.7.
 
 When [Kroki](https://kroki.io) integration is enabled and configured in
 GitLab you can use it to create diagrams in AsciiDoc and Markdown documents.
