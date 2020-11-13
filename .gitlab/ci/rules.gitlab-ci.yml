@@ -178,76 +178,17 @@
   - "qa/**/*"
 
 .code-backstage-patterns: &code-backstage-patterns
-  - "{package.json,yarn.lock}"
-  - "babel.config.js"
-  - "jest.config.{base,integration,unit}.js"
-  - ".csscomb.json"
-  - "Dockerfile.assets"
-  - "vendor/assets/**/*"
-  - ".gitlab/ci/**/*"
-  - ".{eslintignore,gitattributes,nvmrc,prettierrc,stylelintrc,yamllint}"
-  - ".{codeclimate,eslintrc,gitlab-ci,haml-lint,haml-lint_todo,rubocop,rubocop_todo,scss-lint}.yml"
-  - "*_VERSION"
-  - "Gemfile{,.lock}"
-  - "Rakefile"
-  - "tests.yml"
-  - "config.ru"
-  - "{,ee/}{app,bin,config,db,haml_lint,lib,locale,public,scripts,symbol,vendor}/**/*"
-  - "doc/api/graphql/reference/*"  # Files in this folder are auto-generated
-  # Backstage changes
-  - "Dangerfile"
-  - "danger/**/*"
-  - "{,ee/}fixtures/**/*"
-  - "{,ee/}rubocop/**/*"
-  - "{,ee/}spec/**/*"
+  - *code-patterns
+  - *backstage-patterns
 
 .code-qa-patterns: &code-qa-patterns
-  - "{package.json,yarn.lock}"
-  - "babel.config.js"
-  - "jest.config.{base,integration,unit}.js"
-  - ".csscomb.json"
-  - "Dockerfile.assets"
-  - "vendor/assets/**/*"
-  - ".gitlab/ci/**/*"
-  - ".{eslintignore,gitattributes,nvmrc,prettierrc,stylelintrc,yamllint}"
-  - ".{codeclimate,eslintrc,gitlab-ci,haml-lint,haml-lint_todo,rubocop,rubocop_todo,scss-lint}.yml"
-  - "*_VERSION"
-  - "Gemfile{,.lock}"
-  - "Rakefile"
-  - "tests.yml"
-  - "config.ru"
-  - "{,ee/}{app,bin,config,db,haml_lint,lib,locale,public,scripts,symbol,vendor}/**/*"
-  - "doc/api/graphql/reference/*"  # Files in this folder are auto-generated
-  # QA changes
-  - ".dockerignore"
-  - "qa/**/*"
+  - *code-patterns
+  - *qa-patterns
 
 .code-backstage-qa-patterns: &code-backstage-qa-patterns
-  - "{package.json,yarn.lock}"
-  - "babel.config.js"
-  - "jest.config.{base,integration,unit}.js"
-  - ".csscomb.json"
-  - "Dockerfile.assets"
-  - "vendor/assets/**/*"
-  - ".gitlab/ci/**/*"
-  - ".{eslintignore,gitattributes,nvmrc,prettierrc,stylelintrc,yamllint}"
-  - ".{codeclimate,eslintrc,gitlab-ci,haml-lint,haml-lint_todo,rubocop,rubocop_todo,scss-lint}.yml"
-  - "*_VERSION"
-  - "Gemfile{,.lock}"
-  - "Rakefile"
-  - "tests.yml"
-  - "config.ru"
-  - "{,ee/}{app,bin,config,db,haml_lint,lib,locale,public,scripts,symbol,vendor}/**/*"
-  - "doc/api/graphql/reference/*"  # Files in this folder are auto-generated
-  # Backstage changes
-  - "Dangerfile"
-  - "danger/**/*"
-  - "{,ee/}fixtures/**/*"
-  - "{,ee/}rubocop/**/*"
-  - "{,ee/}spec/**/*"
-  # QA changes
-  - ".dockerignore"
-  - "qa/**/*"
+  - *code-patterns
+  - *backstage-patterns
+  - *qa-patterns
 
 ################
 # Shared rules #
