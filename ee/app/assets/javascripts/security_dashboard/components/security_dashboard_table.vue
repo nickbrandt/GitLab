@@ -110,7 +110,7 @@ export default {
         @openModal="openModal({ vulnerability })"
       />
 
-      <slot v-if="showEmptyState" name="emptyState">
+      <slot v-if="showEmptyState" name="empty-state">
         <gl-empty-state
           :title="s__(`We've found no vulnerabilities`)"
           :description="
