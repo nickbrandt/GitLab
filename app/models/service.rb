@@ -169,13 +169,13 @@ class Service < ApplicationRecord
   end
   private_class_method :create_nonexistent_templates
 
-  def self.find_or_initialize_integration(name, instance: false, group_id: nil)
+  def self.find_or_initialize_non_project_specific_integration(name, instance: false, group_id: nil)
     if name.in?(available_services_names(include_project_specific: false))
       "#{name}_service".camelize.constantize.find_or_initialize_by(instance: instance, group_id: group_id)
     end
   end
 
-  def self.find_or_initialize_all(scope)
+  def self.find_or_initialize_all_non_project_specific(scope)
     scope + build_nonexistent_services_for(scope)
   end
 

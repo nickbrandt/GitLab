@@ -208,27 +208,27 @@ RSpec.describe Service do
     end
   end
 
-  describe '.find_or_initialize_integration' do
+  describe '.find_or_initialize_non_project_specific_integration' do
     let!(:service1) { create(:jira_service, project_id: nil, group_id: group.id) }
     let!(:service2) { create(:jira_service) }
 
     it 'returns the right service' do
-      expect(Service.find_or_initialize_integration('jira', group_id: group)).to eq(service1)
+      expect(Service.find_or_initialize_non_project_specific_integration('jira', group_id: group)).to eq(service1)
     end
 
     it 'does not create a new service' do
-      expect { Service.find_or_initialize_integration('redmine', group_id: group) }.not_to change { Service.count }
+      expect { Service.find_or_initialize_non_project_specific_integration('redmine', group_id: group) }.not_to change { Service.count }
     end
   end
 
-  describe '.find_or_initialize_all' do
+  describe '.find_or_initialize_all_non_project_specific' do
     shared_examples 'service instances' do
       it 'returns the available service instances' do
-        expect(Service.find_or_initialize_all(Service.for_instance).pluck(:type)).to match_array(Service.available_services_types(include_project_specific: false))
+        expect(Service.find_or_initialize_all_non_project_specific(Service.for_instance).pluck(:type)).to match_array(Service.available_services_types(include_project_specific: false))
       end
 
       it 'does not create service instances' do
-        expect { Service.find_or_initialize_all(Service.for_instance) }.not_to change { Service.count }
+        expect { Service.find_or_initialize_all_non_project_specific(Service.for_instance) }.not_to change { Service.count }
       end
     end
 
