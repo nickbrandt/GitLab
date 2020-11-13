@@ -11250,11 +11250,6 @@ Represents an iteration object
 """
 type Iteration implements TimeboxReportInterface {
   """
-  Daily scope and completed totals for burnup charts
-  """
-  burnupTimeSeries: [BurnupChartDailyTotals!]
-
-  """
   Timestamp of iteration creation
   """
   createdAt: Time!
@@ -13339,11 +13334,6 @@ type MetricsDashboardAnnotationEdge {
 Represents a milestone
 """
 type Milestone implements TimeboxReportInterface {
-  """
-  Daily scope and completed totals for burnup charts
-  """
-  burnupTimeSeries: [BurnupChartDailyTotals!]
-
   """
   Timestamp of milestone creation
   """
@@ -20978,11 +20968,6 @@ type TimeboxReport {
 }
 
 interface TimeboxReportInterface {
-  """
-  Daily scope and completed totals for burnup charts
-  """
-  burnupTimeSeries: [BurnupChartDailyTotals!]
-
   """
   Historically accurate report about the timebox
   """
