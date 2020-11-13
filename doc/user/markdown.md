@@ -235,7 +235,7 @@ To make PlantUML available in GitLab, a GitLab administrator needs to enable it 
 #### Kroki
 
 To make Kroki available in GitLab, a GitLab administrator needs to enable it first.
-Read more in [Kroki & GitLab](../administration/integration/kroki.md).
+Read more in the [Kroki integration](../administration/integration/kroki.md) page.
 
 ### Emoji
 
