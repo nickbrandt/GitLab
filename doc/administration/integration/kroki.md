@@ -79,7 +79,7 @@ The above blocks are converted to an HTML image tag with source pointing to the
 Kroki instance. If the Kroki server is correctly configured, this should
 render a nice diagram instead of the block:
 
-<img src="https://kroki.io/plantuml/svg/eNpzyk9S0LVTcMzJTE5VsFLISM3JyeeC8IDCTkBZoGAmANl1Cxw="/>
+![PlantUML diagram](../img/kroki_plantuml_diagram.png)
 
 Kroki supports more than a dozen diagram libraries. Here's a few examples:
 
@@ -110,7 +110,7 @@ digraph finite_state_machine {
 ....
 ```
 
-<img src="https://kroki.io/graphviz/svg/eNqFzr0OgjAUBeCZPsUNccDBRH6EJgQTnZlgJIYUWqURCwGcjO8uGAwUVJYzffecS_mlImUGZy54w-K6IW3eSJpxweCBlIqIK-WV5wcuUkRBGUR1RkoGHtDinuQs5VWas5MLfhBvuzC7sLrAs5MPRspbb_YdMyCCnCQsb4EahtpxrcKE6BMSDkTviSkRbcUEHZDRI3vSk8zJbkLInFjy1GEQu144skjmQp4Zr9hffx132IsdTi_wzw5nsQMv_oH_djzRC38unS8="/>
+![GraphViz diagram](../img/kroki_graphviz_diagram.png)
 
 **C4 (based on PlantUML)**
 
@@ -136,7 +136,7 @@ Rel(banking_system, mainframe, "Uses")
 ....
 ```
 
-<img src="https://kroki.io/c4plantuml/svg/eNp9UkFuwjAQvOcVW05Uopz6AErEgQMVKvQcGbNJLBwbeTeC_r4b40AQtLd4PDszO86MWAVuG5u9GKdtu0fI34vcO8YzT4_dRcaGLcLmhxgbSFewN6oKqoHSB1gKFBwyzJU7GFclbpatMZB3Y90S-wbDBEY9I0_QSLAP6AngS-AaYSesCZwM13CMEspGDJTWvnVM09FrdjEZ7y6KBcWjyP2RJjpZ6090tSNgD7pGfehcTbiTT_rF4szjRhl7M1i8dWegq-xWIpvoKjlXRgdPvmRYnHWtXIWAw4Fb9F7alVIkis6q_34SfcM-IIGyti9JCwBpe7GXh2gUG-9i-C-0g9ofOvomJKEJq5grfRhQ71fdoNtTyt-1lWY-0VT1zoeH8v-ZjkustuuLxLPJaw8p3UzG5Qf8BSot7V4="/>
+![C4 PlantUML diagram](../img/kroki_c4_diagram.png)
 
 **Nomnoml**
 
@@ -159,4 +159,4 @@ Rel(banking_system, mainframe, "Uses")
 ....
 ```
 
-<img src="https://kroki.io/nomnoml/svg/eNpdjzELgzAQhff8ioxaSOlWsJKlU4dC95Dh1Kgp0cjlQhH88VWs1BZueLz73j1OPSwCmcmM5upjTxm_9TQh2CpJL4N1DhqTpBPjXBUGsNJCqAEQPemdl0lV--h45yO1mmnGVA5FIISS5B0QYmVQ59kcXvs024Tgp-PxrDobytaael48vXNjb0LQQn7xHxdj928F2zfz7A5LfljAiSCQXbD1t_CyTZLuuV12U_mn5A2ROWWs"/>
+![Nomnoml diagram](../img/kroki_nomnoml_diagram.png)
