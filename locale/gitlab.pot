@@ -11915,9 +11915,6 @@ msgstr ""
 msgid "First name"
 msgstr ""
 
-msgid "First name is too long (maximum is %{max_length} characters)."
-msgstr ""
-
 msgid "First seen"
 msgstr ""
 
@@ -15653,9 +15650,6 @@ msgstr ""
 msgid "Last name"
 msgstr ""
 
-msgid "Last name is too long (maximum is %{max_length} characters)."
-msgstr ""
-
 msgid "Last reply by"
 msgstr ""
 
@@ -17526,12 +17520,6 @@ msgid "Minimum capacity to be available before we schedule more mirrors preempti
 msgstr ""
 
 msgid "Minimum interval in days"
-msgstr ""
-
-msgid "Minimum length is %{minimum_password_length} characters"
-msgstr ""
-
-msgid "Minimum length is %{minimum_password_length} characters."
 msgstr ""
 
 msgid "Minimum password length (number of characters)"
@@ -22367,9 +22355,6 @@ msgstr ""
 msgid "Remediations"
 msgstr ""
 
-msgid "Remember me"
-msgstr ""
-
 msgid "Remind later"
 msgstr ""
 
@@ -24931,10 +24916,13 @@ msgstr ""
 msgid "Sign-up restrictions"
 msgstr ""
 
-msgid "SignUp|First Name is too long (maximum is %{max_length} characters)."
+msgid "SignUp|First name is too long (maximum is %{max_length} characters)."
 msgstr ""
 
-msgid "SignUp|Last Name is too long (maximum is %{max_length} characters)."
+msgid "SignUp|Last name is too long (maximum is %{max_length} characters)."
+msgstr ""
+
+msgid "SignUp|Minimum length is %{minimum_password_length} characters."
 msgstr ""
 
 msgid "SignUp|Username is too long (maximum is %{max_length} characters)."
