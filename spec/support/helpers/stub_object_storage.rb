@@ -15,12 +15,12 @@ module StubObjectStorage
 
   def stub_object_storage_uploader(
     config:,
-        uploader:,
-        remote_directory:,
-        enabled: true,
-        proxy_download: false,
-        background_upload: false,
-        direct_upload: false
+    uploader:,
+    remote_directory:,
+    enabled: true,
+    proxy_download: false,
+    background_upload: false,
+    direct_upload: false
   )
     new_config = config.to_h.deep_symbolize_keys.merge({
       enabled: enabled,

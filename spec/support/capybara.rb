@@ -195,9 +195,35 @@ RSpec.configure do |config|
     block_and_wait_for_requests_complete
   end
 
-  config.before(:context, :minio) do
-    TestEnv.setup_minio
+  config.before(:context, :object_storage) do
+    next if $minio_already_started
 
+    TestEnv.setup_minio
     TestEnv.start_minio
+
+    $minio_already_started = true
+  end
+
+  config.before(:example, :object_storage) do
+    def stub_object_uploader_for_minio(klass)
+      # stub uploader methods to have object storage enabled
+      allow(klass).to receive(:object_store_enabled?).and_return(true)
+      allow(klass).to receive(:direct_upload_enabled?).and_return(true)
+
+      # stub .object_sore_options to inject the inline minio connection params
+      original_method = klass.method(:object_store_options)
+      allow(klass).to receive(:object_store_options) do
+        h = original_method.call.to_hash
+        h['connection'] = ::Gitlab::Minio.object_store_connection
+        ::Settings.new(h) # the return object is ::Settings, make sure we return one too.
+      end
+    end
+
+    # Stub all uploaders class methods to setup object storage and the related
+    # connection
+    # Problem: the class methods are defined in a concern and we can't rspec allow(concern)
+    # Solution: get all the classes that includes the concern, loop on them and
+    # stub the proper methods each time.
+    ::Gitlab::Minio.uploader_classes.map(&method(:stub_object_uploader_for_minio))
   end
 end

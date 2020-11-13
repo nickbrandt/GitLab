@@ -294,23 +294,35 @@ module TestEnv
   end
 
   def setup_minio
+    branch_name = 'release'
+
     component_timed_setup(
       'Minio',
       install_dir: minio_dir,
-      version: Gitlab::Workhorse.version,
+      version: branch_name,
       task: "minio:install:release_version[#{minio_dir}]"
-    )
+    ) do
+      File.write(File.join(minio_dir, 'VERSION'), branch_name)
+    end
   end
 
   def start_minio
     data_dir = Dir.mktmpdir(%w[minio data])
 
+    env_vars = {
+      'MINIO_ACCESS_KEY' => Gitlab::Minio.access_key,
+      'MINIO_SECRET_KEY' => Gitlab::Minio.secret_key,
+      'MINIO_REGION_NAME' => Gitlab::Minio.region,
+      'MINIO_BROWSER' => 'off'
+    }
+
     minio_pid = spawn(
-      { 'MINIO_ACCESS_KEY' => 'minio', 'MINIO_SECRET_KEY' => 'minio-secret' },
+      env_vars,
       File.join(minio_dir, 'minio'),
+      'server',
       '--quiet',
       '--anonymous',
-      'server',
+      '--address', ":#{Gitlab::Minio.port}",
       data_dir
     )
 
@@ -319,6 +331,27 @@ module TestEnv
       Process.wait(minio_pid)
       FileUtils.remove_entry(data_dir)
     end
+
+    3.times do
+      sleep(1)
+
+      response = Faraday.get(Gitlab::Minio.live_url)
+      break if response.status == 200
+
+      sleep(1)
+    end
+
+    prepare_minio_buckets
+  end
+
+  def prepare_minio_buckets
+    buckets = ::Gitlab::Minio.uploader_classes
+                             .map(&:remote_store_path)
+                             .uniq
+                             .compact
+
+    storage = ::Fog::Storage.new(::Gitlab::Minio.object_store_connection)
+    buckets.each { |bucket| storage.directories.create(key: bucket) } # rubocop:disable Rails/SaveBang
   end
 
   def minio_dir
@@ -460,6 +493,7 @@ module TestEnv
       gitlab-test-fork_bare
       gitlab-workhorse
       gitlab_workhorse_secret
+      minio
     ]
   end
 
