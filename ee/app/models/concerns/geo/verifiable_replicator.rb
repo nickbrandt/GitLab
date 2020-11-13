@@ -25,10 +25,6 @@ module Geo
         Feature.enabled?(:geo_framework_verification)
       end
 
-      def checksummed
-        model.available_replicables.checksummed
-      end
-
       def checksummed_count
         # When verification is disabled, this returns nil.
         # Bonus: This causes the progress bar to be hidden.
