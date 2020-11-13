@@ -98,7 +98,7 @@ describe('Pipeline Security Dashboard component', () => {
     beforeEach(() => {
       factory({
         stubs: {
-          'security-dashboard': { template: '<div><slot name="emptyState"></slot></div>' },
+          'security-dashboard': { template: '<div><slot name="empty-state"></slot></div>' },
         },
       });
     });

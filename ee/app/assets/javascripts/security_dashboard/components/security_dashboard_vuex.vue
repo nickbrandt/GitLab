@@ -129,7 +129,7 @@ export default {
         </template>
 
         <security-dashboard-table>
-          <template #emptyState>
+          <template #empty-state>
             <slot name="empty-state"></slot>
           </template>
         </security-dashboard-table>

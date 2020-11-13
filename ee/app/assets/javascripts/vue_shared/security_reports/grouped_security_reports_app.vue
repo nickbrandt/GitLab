@@ -401,7 +401,7 @@ export default {
       <security-summary :key="slot" :message="groupedSummaryText" />
     </template>
 
-    <template v-if="pipelinePath" #actionButtons>
+    <template v-if="pipelinePath" #action-buttons>
       <gl-button
         :href="securityTab"
         target="_blank"
@@ -412,7 +412,7 @@ export default {
       </gl-button>
     </template>
 
-    <template v-if="isMRActive && isBaseSecurityReportOutOfDate" #subHeading>
+    <template v-if="isMRActive && isBaseSecurityReportOutOfDate" #sub-heading>
       <div class="text-secondary-700 text-1">
         <gl-sprintf
           v-if="isMRBranchOutdated"
