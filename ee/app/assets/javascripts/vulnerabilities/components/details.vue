@@ -65,13 +65,13 @@ export default {
         msg => msg.name === SUPPORTING_MESSAGE_TYPES.RECORDED,
       )?.response;
     },
-    getConstructedRequest() {
+    constructedRequest() {
       return this.constructRequest(this.vulnerability.request);
     },
-    getConstructedResponse() {
+    constructedResponse() {
       return this.constructResponse(this.vulnerability.response);
     },
-    getConstructedRecordedResponse() {
+    constructedRecordedResponse() {
       return this.constructResponse(this.recordedMessage);
     },
     requestData() {
@@ -82,7 +82,7 @@ export default {
       return [
         {
           label: __('%{labelStart}Sent request:%{labelEnd} %{headers}'),
-          content: this.getConstructedRequest,
+          content: this.constructedRequest,
           isCode: true,
         },
       ].filter(x => x.content);
@@ -95,7 +95,7 @@ export default {
       return [
         {
           label: __('%{labelStart}Actual response:%{labelEnd} %{headers}'),
-          content: this.getConstructedResponse,
+          content: this.constructedResponse,
           isCode: true,
         },
       ].filter(x => x.content);
@@ -108,7 +108,7 @@ export default {
       return [
         {
           label: __('%{labelStart}Unmodified response:%{labelEnd} %{headers}'),
-          content: this.getConstructedRecordedResponse,
+          content: this.constructedRecordedResponse,
           isCode: true,
         },
       ].filter(x => x.content);
@@ -297,7 +297,7 @@ export default {
           :key="`${index}:${label}`"
           :sprintf-message="label"
         >
-          <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
+          <code-block v-if="isCode" class="gl-mt-2" :code="content" max-height="225px" />
           <template v-else>
             {{ content }}
           </template>
@@ -327,7 +327,7 @@ export default {
                 )
               "
             />
-            <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
+            <code-block v-if="isCode" class="gl-mt-2" :code="content" max-height="225px" />
             <template v-else>
               {{ content }}
             </template>
@@ -356,7 +356,7 @@ export default {
                 )
               "
             />
-            <code-block v-if="isCode" class="mt-1" :code="content" max-height="225px" />
+            <code-block v-if="isCode" class="gl-mt-2" :code="content" max-height="225px" />
             <template v-else>
               {{ content }}
             </template>
@@ -368,8 +368,8 @@ export default {
     <template v-if="assertion">
       <h3>{{ s__('Vulnerability|Additional Info') }}</h3>
       <ul>
-        <detail-item :sprintf-message="__('%{labelStart}Assert:%{labelEnd} %{assertion}')"
-          >{{ assertion }}
+        <detail-item :sprintf-message="__('%{labelStart}Assert:%{labelEnd} %{assertion}')">
+          {{ assertion }}
         </detail-item>
       </ul>
     </template>

@@ -67,5 +67,6 @@ export const REGEXES = {
 };
 
 export const SUPPORTING_MESSAGE_TYPES = {
-  RECORDED: s__('VulnerabilityManagement|Recorded'),
+  // eslint-disable-next-line @gitlab/require-i18n-strings
+  RECORDED: 'Recorded',
 };

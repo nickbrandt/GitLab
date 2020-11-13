@@ -29646,9 +29646,6 @@ msgstr ""
 msgid "VulnerabilityManagement|Needs triage"
 msgstr ""
 
-msgid "VulnerabilityManagement|Recorded"
-msgstr ""
-
 msgid "VulnerabilityManagement|Something went wrong while trying to delete the comment. Please try again later."
 msgstr ""
 
