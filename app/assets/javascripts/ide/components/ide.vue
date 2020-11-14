@@ -10,17 +10,13 @@ import {
   WEBIDE_MEASURE_BEFORE_VUE,
 } from '~/performance/constants';
 import { performanceMarkAndMeasure } from '~/performance/utils';
-import FindFile from '~/vue_shared/components/file_finder/index.vue';
 import { modalTypes } from '../constants';
 import eventHub from '../eventhub';
 import IdeSidebar from './ide_side_bar.vue';
-import RepoEditor from './repo_editor.vue';
 import ErrorMessage from './error_message.vue';
 import CommitEditorHeader from './commit_sidebar/editor_header.vue';
 import RepoTabs from './repo_tabs.vue';
 import IdeStatusBar from './ide_status_bar.vue';
-import RightPane from './panes/right.vue';
-import NewModal from './new_dropdown/modal.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import { measurePerformance } from '../utils';
@@ -36,16 +32,17 @@ eventHub.$on(WEBIDE_MEASURE_FILE_AFTER_INTERACTION, () =>
 export default {
   components: {
     IdeSidebar,
-    RepoEditor,
     ErrorMessage,
     GlButton,
     GlLoadingIcon,
     CommitEditorHeader,
     RepoTabs,
     IdeStatusBar,
-    FindFile,
-    RightPane,
-    NewModal,
+    RepoEditor: () => import(/* webpackChunkName: 'ide_runtime' */ './repo_editor.vue'),
+    FindFile: () =>
+      import(/* webpackChunkName: 'ide_runtime' */ '~/vue_shared/components/file_finder/index.vue'),
+    RightPane: () => import(/* webpackChunkName: 'ide_runtime' */ './panes/right.vue'),
+    NewModal: () => import(/* webpackChunkName: 'ide_runtime' */ './new_dropdown/modal.vue'),
   },
   mixins: [glFeatureFlagsMixin()],
   data() {
