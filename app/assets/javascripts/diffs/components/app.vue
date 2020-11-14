@@ -10,7 +10,8 @@ import PanelResizer from '~/vue_shared/components/panel_resizer.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { isSingleViewStyle } from '~/helpers/diffs_helper';
 import { updateHistory } from '~/lib/utils/url_utility';
-import eventHub from '../../notes/event_hub';
+
+import notesEventHub from '../../notes/event_hub';
 import CompareVersions from './compare_versions.vue';
 import DiffFile from './diff_file.vue';
 import NoChanges from './no_changes.vue';
@@ -280,8 +281,8 @@ export default {
   created() {
     this.adjustView();
 
-    eventHub.$once('fetchDiffData', this.fetchData);
-    eventHub.$on('refetchDiffData', this.refetchDiffData);
+    notesEventHub.$once('fetchDiffData', this.fetchData);
+    notesEventHub.$on('refetchDiffData', this.refetchDiffData);
     this.CENTERED_LIMITED_CONTAINER_CLASSES = CENTERED_LIMITED_CONTAINER_CLASSES;
 
     this.unwatchDiscussions = this.$watch(
@@ -302,8 +303,9 @@ export default {
   beforeDestroy() {
     diffsApp.deinstrument();
 
-    eventHub.$off('fetchDiffData', this.fetchData);
-    eventHub.$off('refetchDiffData', this.refetchDiffData);
+    notesEventHub.$off('refetchDiffData', this.refetchDiffData);
+    notesEventHub.$off('fetchDiffData', this.fetchData);
+
     this.removeEventListeners();
   },
   methods: {
@@ -373,7 +375,7 @@ export default {
       }
 
       if (!this.isNotesFetched) {
-        eventHub.$emit('fetchNotesData');
+        notesEventHub.$emit('fetchNotesData');
       }
     },
     setDiscussions() {
