@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"gitlab.com/gitlab-org/labkit/log"
@@ -63,7 +64,8 @@ func (s *S3Object) Upload(ctx context.Context, r io.Reader) error {
 	_, err = uploader.UploadWithContext(ctx, input)
 	if err != nil {
 		log.WithError(err).Error("error uploading S3 session")
-		return err
+		// Get the root cause, such as ErrEntityTooLarge, so we can return the proper HTTP status code
+		return unwrapAWSError(err)
 	}
 
 	s.uploaded = true
@@ -105,4 +107,13 @@ func (s *S3Object) Delete() {
 	if err != nil {
 		log.WithError(err).Error("error deleting S3 object", err)
 	}
+}
+
+// This is needed until https://github.com/aws/aws-sdk-go/issues/2820 is closed.
+func unwrapAWSError(e error) error {
+	if awsErr, ok := e.(awserr.Error); ok {
+		return unwrapAWSError(awsErr.OrigErr())
+	}
+
+	return e
 }

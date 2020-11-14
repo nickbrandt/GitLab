@@ -141,4 +141,5 @@ func TestS3ObjectUploadCancel(t *testing.T) {
 
 	_, err = object.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 	require.Error(t, err)
+	require.Equal(t, "context canceled", err.Error())
 }
