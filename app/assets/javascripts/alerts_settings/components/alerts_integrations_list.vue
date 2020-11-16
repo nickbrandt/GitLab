@@ -11,8 +11,10 @@ import {
   GlSprintf,
 } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import Tracking from '~/tracking';
 import { trackAlertIntegrationsViewsOptions, integrationToDeleteDefault } from '../constants';
+import getCurrentIntegrationQuery from '../graphql/queries/get_current_integration.query.graphql';
 
 export const i18n = {
   title: s__('AlertsIntegrations|Current integrations'),
@@ -47,6 +49,7 @@ export default {
     GlTooltip: GlTooltipDirective,
     GlModal: GlModalDirective,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     integrations: {
       type: Array,
@@ -57,11 +60,6 @@ export default {
       type: Boolean,
       required: false,
       default: false,
-    },
-    currentIntegration: {
-      type: Object,
-      required: false,
-      default: null,
     },
   },
   fields: [
@@ -82,9 +80,15 @@ export default {
       label: __('Actions'),
     },
   ],
+  apollo: {
+    currentIntegration: {
+      query: getCurrentIntegrationQuery,
+    },
+  },
   data() {
     return {
       integrationToDelete: integrationToDeleteDefault,
+      currentIntegration: null,
     };
   },
   mounted() {
@@ -94,18 +98,18 @@ export default {
     tbodyTrClass(item) {
       return {
         [bodyTrClass]: this.integrations.length,
-        'gl-bg-blue-50': item?.id === this.currentIntegration?.id,
+        'gl-bg-blue-50': (item !== null && item.id) === this.currentIntegration?.id,
       };
     },
     trackPageViews() {
       const { category, action } = trackAlertIntegrationsViewsOptions;
       Tracking.event(category, action);
     },
-    intergrationToDelete({ name, id }) {
+    setIntegrationToDelete({ name, id }) {
       this.integrationToDelete.id = id;
       this.integrationToDelete.name = name;
     },
-    deleteIntergration() {
+    deleteIntegration() {
       this.$emit('delete-integration', { id: this.integrationToDelete.id });
       this.integrationToDelete = { ...integrationToDeleteDefault };
     },
@@ -148,12 +152,12 @@ export default {
       </template>
 
       <template #cell(actions)="{ item }">
-        <gl-button-group>
+        <gl-button-group v-if="glFeatures.httpIntegrationsList">
           <gl-button icon="pencil" @click="$emit('edit-integration', { id: item.id })" />
           <gl-button
             v-gl-modal.deleteIntegration
             icon="remove"
-            @click="intergrationToDelete(item)"
+            @click="setIntegrationToDelete(item)"
           />
         </gl-button-group>
       </template>
@@ -175,7 +179,7 @@ export default {
       :title="__('Are you sure?')"
       :ok-title="s__('AlertSettings|Delete integration')"
       ok-variant="danger"
-      @ok="deleteIntergration"
+      @ok="deleteIntegration"
     >
       <gl-sprintf
         :message="
