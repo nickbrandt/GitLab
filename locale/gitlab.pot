@@ -19872,12 +19872,6 @@ msgstr ""
 msgid "Pipelines|CI Lint"
 msgstr ""
 
-msgid "Pipelines|CI file could not be loaded: %{reason}"
-msgstr ""
-
-msgid "Pipelines|CI file could not be saved: %{reason}"
-msgstr ""
-
 msgid "Pipelines|Child pipeline"
 msgstr ""
 
@@ -19923,6 +19917,9 @@ msgstr ""
 msgid "Pipelines|More Information"
 msgstr ""
 
+msgid "Pipelines|No CI file found in this repository, please add one."
+msgstr ""
+
 msgid "Pipelines|No triggers have been created yet. Add one using the form above."
 msgstr ""
 
@@ -19935,6 +19932,9 @@ msgstr ""
 msgid "Pipelines|Project cache successfully reset."
 msgstr ""
 
+msgid "Pipelines|Repository does not have a default branch, please set one."
+msgstr ""
+
 msgid "Pipelines|Revoke"
 msgstr ""
 
@@ -19942,6 +19942,12 @@ msgid "Pipelines|Run Pipeline"
 msgstr ""
 
 msgid "Pipelines|Something went wrong while cleaning runners cache."
+msgstr ""
+
+msgid "Pipelines|The CI configuration was not loaded, please try again."
+msgstr ""
+
+msgid "Pipelines|The GitLab CI configuration could not be updated."
 msgstr ""
 
 msgid "Pipelines|There are currently no finished pipelines."

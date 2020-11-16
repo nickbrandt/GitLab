@@ -1,29 +1,30 @@
 <script>
 import {
+  GlButton,
   GlForm,
-  GlFormGroup,
-  GlFormTextarea,
   GlFormCheckbox,
   GlFormInput,
-  GlButton,
+  GlFormGroup,
+  GlFormTextarea,
   GlSprintf,
 } from '@gitlab/ui';
 import { __ } from '~/locale';
 
 export default {
   components: {
+    GlButton,
     GlForm,
-    GlFormGroup,
-    GlFormTextarea,
     GlFormCheckbox,
     GlFormInput,
-    GlButton,
+    GlFormGroup,
+    GlFormTextarea,
     GlSprintf,
   },
   props: {
     defaultBranch: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
     defaultMessage: {
       type: String,
@@ -44,8 +45,11 @@ export default {
     };
   },
   computed: {
+    isDefaultBranch() {
+      return this.branch === this.defaultBranch;
+    },
     submitDisabled() {
-      return !this.message || !this.branch;
+      return !(this.message && this.branch);
     },
   },
   methods: {
@@ -101,8 +105,9 @@ export default {
           required
         />
         <gl-form-checkbox
-          v-if="branch !== defaultBranch"
+          v-if="!isDefaultBranch"
           v-model="openMergeRequest"
+          data-testid="new-mr-checkbox"
           class="gl-mt-3"
         >
           <gl-sprintf :message="$options.i18n.startMergeRequest">
