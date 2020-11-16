@@ -87,6 +87,7 @@ module UsageDataHelpers
       projects_asana_active
       projects_jenkins_active
       projects_jira_active
+      projects_jira_active_users
       projects_jira_server_active
       projects_jira_cloud_active
       projects_jira_dvcs_cloud_active

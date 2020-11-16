@@ -23,6 +23,8 @@ module Gitlab
         deployment_minimum_id
         deployment_maximum_id
         auth_providers
+        project_authorizations_minimum_id
+        project_authorizations_maximum_id
       ).freeze
 
     class << self
@@ -409,9 +411,12 @@ module Gitlab
         results
       end
 
+      # rubocop: disable UsageData/LargeTable
+      # rubocop: disable UsageData/DistinctCountByLargeForeignKey
+      # rubocop: disable Metrics/AbcSize
       def services_usage
-        # rubocop: disable UsageData/LargeTable:
         Service.available_services_names.each_with_object({}) do |service_name, response|
+          response["projects_#{service_name}_active_users".to_sym] = distinct_count(users_per_service_type(type: "#{service_name}_service".camelize), :user_id, batch_size: 5_000, start: project_authorizations_minimum_id, finish: project_authorizations_maximum_id)
           response["projects_#{service_name}_active".to_sym] = count(Service.active.where.not(project: nil).where(type: "#{service_name}_service".camelize))
           response["groups_#{service_name}_active".to_sym] = count(Service.active.where.not(group: nil).where(type: "#{service_name}_service".camelize))
           response["templates_#{service_name}_active".to_sym] = count(Service.active.where(template: true, type: "#{service_name}_service".camelize))
@@ -419,7 +424,31 @@ module Gitlab
           response["projects_inheriting_#{service_name}_active".to_sym] = count(Service.active.where.not(project: nil).where.not(inherit_from_id: nil).where(type: "#{service_name}_service".camelize))
           response["groups_inheriting_#{service_name}_active".to_sym] = count(Service.active.where.not(group: nil).where.not(inherit_from_id: nil).where(type: "#{service_name}_service".camelize))
         end.merge(jira_usage, jira_import_usage)
-        # rubocop: enable UsageData/LargeTable:
+      end
+      # rubocop: enable UsageData/DistinctCountByLargeForeignKey
+      # rubocop: enable Metrics/AbcSize
+
+      def users_per_service_type(type:)
+        ProjectAuthorization
+          .joins('INNER JOIN projects ON projects.id = project_authorizations.project_id')
+          .joins('INNER JOIN services ON services.project_id = projects.id')
+          .where('services.active = TRUE')
+          .where('services.type = ?', type)
+          .where('projects.pending_delete = FALSE')
+          .where('projects.archived = FALSE')
+      end
+      # rubocop: enable UsageData/LargeTable
+
+      def project_authorizations_minimum_id
+        strong_memoize(:project_authorizations_minimum_id) do
+          ::ProjectAuthorization.minimum(:user_id)
+        end
+      end
+
+      def project_authorizations_maximum_id
+        strong_memoize(:project_authorizations_maximum_id) do
+          ::ProjectAuthorization.maximum(:user_id)
+        end
       end
 
       def jira_usage
