@@ -14621,6 +14621,9 @@ msgstr ""
 msgid "Integrations|All details"
 msgstr ""
 
+msgid "Integrations|All projects inheriting these settings will also be reset."
+msgstr ""
+
 msgid "Integrations|Comment detail:"
 msgstr ""
 
@@ -14654,7 +14657,16 @@ msgstr ""
 msgid "Integrations|Issues created in Jira are shown here once you have created the issues in project setup in Jira."
 msgstr ""
 
+msgid "Integrations|Projects using custom settings will not be affected."
+msgstr ""
+
 msgid "Integrations|Projects using custom settings will not be impacted unless the project owner chooses to use parent level defaults."
+msgstr ""
+
+msgid "Integrations|Reset integration?"
+msgstr ""
+
+msgid "Integrations|Resetting this integration will clear the settings and deactivate this integration."
 msgstr ""
 
 msgid "Integrations|Return to GitLab for Jira"
@@ -23060,6 +23072,9 @@ msgid "Resend invite"
 msgstr ""
 
 msgid "Resend it"
+msgstr ""
+
+msgid "Reset"
 msgstr ""
 
 msgid "Reset authorization key"
