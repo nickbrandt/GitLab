@@ -1,15 +1,7 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { createStore } from '~/ide/stores';
 import ErrorMessage from '~/ide/components/error_message.vue';
-import FindFile from '~/vue_shared/components/file_finder/index.vue';
-import CommitEditorHeader from '~/ide/components/commit_sidebar/editor_header.vue';
-import RepoTabs from '~/ide/components/repo_tabs.vue';
-import IdeStatusBar from '~/ide/components/ide_status_bar.vue';
-import RightPane from '~/ide/components/panes/right.vue';
-import NewModal from '~/ide/components/new_dropdown/modal.vue';
-
 import ide from '~/ide/components/ide.vue';
 import { file } from '../helpers';
 import { projectData } from '../mock_data';
@@ -22,7 +14,7 @@ describe('WebIDE', () => {
 
   let wrapper;
 
-  function createComponent({ projData = emptyProjData, state = {} } = {}) {
+  function createComponent({ projData = emptyProjData, state = {}, mockStubs = {} } = {}) {
     const store = createStore();
 
     store.state.currentProjectId = 'abcproject';
@@ -39,17 +31,7 @@ describe('WebIDE', () => {
     return shallowMount(ide, {
       store,
       localVue,
-      stubs: {
-        ErrorMessage,
-        GlButton,
-        GlLoadingIcon,
-        CommitEditorHeader,
-        RepoTabs,
-        IdeStatusBar,
-        FindFile,
-        RightPane,
-        NewModal,
-      },
+      stubs: mockStubs,
     });
   }
 
@@ -79,6 +61,9 @@ describe('WebIDE', () => {
           state: {
             errorMessage: null,
           },
+          mockStubs: {
+            ErrorMessage,
+          },
         });
 
         expect(wrapper.find(ErrorMessage).exists()).toBe(false);
@@ -90,6 +75,9 @@ describe('WebIDE', () => {
             errorMessage: {
               text: 'error',
             },
+          },
+          mockStubs: {
+            ErrorMessage,
           },
         });
 
