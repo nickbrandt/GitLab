@@ -32,9 +32,9 @@ RSpec.describe 'Import/Export - project import integration test', :js do
       it 'user imports an exported project successfully', :sidekiq_might_not_need_inline do
         visit new_project_path
 
-        fill_in :project_name, with: project_name, visible: true
         click_import_project_tab
         click_link 'GitLab export'
+        fill_in :name, with: project_name, visible: true
 
         expect(page).to have_content('Import an exported GitLab project')
         expect(URI.parse(current_url).query).to eq("namespace_id=#{namespace.id}&name=#{ERB::Util.url_encode(project_name)}&path=#{project_path}")
@@ -70,22 +70,22 @@ RSpec.describe 'Import/Export - project import integration test', :js do
         expect(project).not_to be_nil
         expect(page).to have_content("Project 'test-project-path' is being imported")
       end
-    end
-  end
 
-  it 'invalid project' do
-    project = create(:project, namespace: user.namespace)
+      it 'invalid project' do
+        project = create(:project, namespace: user.namespace)
 
-    visit new_project_path
+        visit new_project_path
 
-    fill_in :project_name, with: project.name, visible: true
-    click_import_project_tab
-    click_link 'GitLab export'
-    attach_file('file', file)
-    click_on 'Import project'
+        click_import_project_tab
+        click_link 'GitLab export'
+        fill_in :name, with: project.name, visible: true
+        attach_file('file', file)
+        click_on 'Import project'
 
-    page.within('.flash-container') do
-      expect(page).to have_content('Project could not be imported')
+        page.within('.flash-container') do
+          expect(page).to have_content('Project could not be imported')
+        end
+      end
     end
   end
 
@@ -95,6 +95,6 @@ RSpec.describe 'Import/Export - project import integration test', :js do
   end
 
   def click_import_project_tab
-    find('#import-project-tab').click
+    find('[data-qa-selector="import_project_link"]').click
   end
 end
