@@ -179,13 +179,29 @@ module Gitlab
       end
 
       def add_mapping(index_name: target_index_name, mapping:)
-        client.indices.put_mapping(index: index_name, body: mapping)
+        put_mapping_options = {
+          index: index_name,
+          body: mapping
+        }
+
+        put_mapping_options[:type] = 'doc' if elasticsearch_version?(6)
+        client.indices.put_mapping(put_mapping_options)
       end
 
       def get_mappings(index_name: target_index_name)
         mapping_hash = client.indices.get_mapping(index: index_name)
 
         mapping_hash[index_name]['mappings']
+      end
+
+      def get_properties(index_name: target_index_name)
+        current_mappings = get_mappings(index_name: index_name)
+
+        if elasticsearch_version?(7)
+          current_mappings['properties']
+        else
+          current_mappings['doc']['properties']
+        end
       end
 
       def switch_alias(from: target_index_name, to:)
@@ -221,8 +237,12 @@ module Gitlab
           # for more information. We also can't set this for any versions before
           # 6.8 as this parameter was not supported. Since it defaults to true in
           # all 6.x it's safe to only set it for 7.x.
-          options[:include_type_name] = true if Gitlab::VersionInfo.parse(client.info['version']['number']).major == 7
+          options[:include_type_name] = true if elasticsearch_version?(7)
         end
+      end
+
+      def elasticsearch_version?(version)
+        Gitlab::VersionInfo.parse(client.info['version']['number']).major == version
       end
     end
   end

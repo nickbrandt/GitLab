@@ -33,16 +33,5 @@ module Elastic
     def logger
       @logger ||= ::Gitlab::Elasticsearch::Logger.build
     end
-
-    def current_properties
-      current_mappings = helper.get_mappings
-
-      # ES7 and ES6 have different mappings responses
-      if Gitlab::VersionInfo.parse(client.info['version']['number']).major == 7
-        current_mappings['properties']
-      else
-        current_mappings['doc']['properties']
-      end
-    end
   end
 end

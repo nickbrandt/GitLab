@@ -21,6 +21,6 @@ class AddGitlabMigrationVersionToIndexMapping < Elastic::Migration
   end
 
   def completed?
-    current_properties.key?('gitlab_migration_version')
+    helper.get_properties.key?('gitlab_migration_version')
   end
 end
