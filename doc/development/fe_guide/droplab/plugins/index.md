@@ -5,11 +5,10 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 description: A list of DropLab plugins.
 ---
 
-# A list of DropLab plugins
+# DropLab plugins
 
-A list of [DropLab](../droplab.md) plugins follows:
+The following plugins are available for use with [DropLab](../droplab.md):
 
-- [Ajax plugin](plugins/ajax.md)
-- [Filter plugin](plugins/filter.md)
-- [InputSetter plugin](plugins/input_setter.md)
-
+- [Ajax plugin](ajax.md)
+- [Filter plugin](filter.md)
+- [InputSetter plugin](input_setter.md)
