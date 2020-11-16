@@ -22,6 +22,7 @@ import MergeConflictWarning from './merge_conflict_warning.vue';
 import CollapsedFilesWarning from './collapsed_files_warning.vue';
 
 import { diffsApp } from '../utils/performance';
+import { fileByFile } from '../utils/preferences';
 
 import {
   TREE_LIST_WIDTH_STORAGE_KEY,
@@ -114,7 +115,7 @@ export default {
       required: false,
       default: false,
     },
-    viewDiffsFileByFile: {
+    fileByFileUserPreference: {
       type: Boolean,
       required: false,
       default: false,
@@ -154,6 +155,7 @@ export default {
       'conflictResolutionPath',
       'canMerge',
       'hasConflicts',
+      'viewDiffsFileByFile',
     ]),
     ...mapGetters('diffs', ['whichCollapsedTypes', 'isParallelView', 'currentDiffIndex']),
     ...mapGetters(['isNotesFetched', 'getNoteableData']),
@@ -254,7 +256,7 @@ export default {
       projectPath: this.projectPath,
       dismissEndpoint: this.dismissEndpoint,
       showSuggestPopover: this.showSuggestPopover,
-      viewDiffsFileByFile: this.viewDiffsFileByFile,
+      viewDiffsFileByFile: fileByFile(this.fileByFileUserPreference),
     });
 
     if (this.shouldShow) {
