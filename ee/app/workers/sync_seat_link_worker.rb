@@ -16,7 +16,7 @@ class SyncSeatLinkWorker # rubocop:disable Scalability/IdempotentWorker
     return unless should_sync_seats?
 
     SyncSeatLinkRequestWorker.perform_async(
-      seat_link_data.date.iso8601,
+      seat_link_data.timestamp.iso8601,
       seat_link_data.key,
       seat_link_data.max_users,
       seat_link_data.active_users
@@ -37,6 +37,6 @@ class SyncSeatLinkWorker # rubocop:disable Scalability/IdempotentWorker
       !License.current.trial? &&
       License.current.expires_at && # Skip sync if license has no expiration
       seat_link_data.historical_data_exists? && # Skip sync if there is no historical data
-      seat_link_data.date.between?(License.current.starts_at.beginning_of_day, License.current.expires_at.end_of_day + 14.days)
+      seat_link_data.timestamp.between?(License.current.starts_at.beginning_of_day, License.current.expires_at.end_of_day + 14.days)
   end
 end

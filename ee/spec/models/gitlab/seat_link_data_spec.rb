@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe Gitlab::SeatLinkData do
   subject do
     described_class.new(
-      date: timestamp,
+      timestamp: timestamp,
       key: key,
       max_users: max_users,
       active_users: active_users
@@ -42,7 +42,7 @@ RSpec.describe Gitlab::SeatLinkData do
 
       it 'returns object with default attributes set' do
         expect(subject).to have_attributes(
-          date: eq(utc_time),
+          timestamp: eq(utc_time),
           key: eq(current_license.data),
           max_users: eq(today_active_count),
           active_users: eq(today_active_count)
@@ -53,7 +53,7 @@ RSpec.describe Gitlab::SeatLinkData do
     context 'when passing params' do
       it 'returns object with given attributes set' do
         expect(subject).to have_attributes(
-          date: eq(timestamp),
+          timestamp: eq(timestamp),
           key: eq(key),
           max_users: eq(max_users),
           active_users: eq(active_users)
@@ -61,11 +61,11 @@ RSpec.describe Gitlab::SeatLinkData do
       end
 
       context 'when passing date param only' do
-        subject { described_class.new(date: utc_time - 1.day) }
+        subject { described_class.new(timestamp: utc_time - 1.day) }
 
         it 'returns object with attributes set using given date' do
           expect(subject).to have_attributes(
-            date: eq(utc_time - 1.day),
+            timestamp: eq(utc_time - 1.day),
             key: eq(current_license.data),
             max_users: eq(max_before_today),
             active_users: eq(yesterday_active_count)
@@ -102,13 +102,13 @@ RSpec.describe Gitlab::SeatLinkData do
       create(:historical_data, recorded_at: Time.current - 8.days)
       create(:historical_data, recorded_at: Time.current)
 
-      expect(described_class.new(date: Time.current - 1.day).historical_data_exists?).to be(false)
+      expect(described_class.new(timestamp: Time.current - 1.day).historical_data_exists?).to be(false)
     end
 
     it 'returns true if historical data exists within [license start date, seat_link_data.date]' do
       create(:historical_data, recorded_at: Time.current - 2.days)
 
-      expect(described_class.new(date: Time.current - 1.day).historical_data_exists?).to be(true)
+      expect(described_class.new(timestamp: Time.current - 1.day).historical_data_exists?).to be(true)
     end
   end
 end
