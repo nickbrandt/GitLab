@@ -13188,7 +13188,8 @@ type MergeRequest implements CurrentUserTodos & Noteable {
   ): UserConnection
 
   """
-  Pipelines for the merge request
+  Pipelines for the merge request. Note: for performance reasons, no more than
+  the most recent 500 pipelines will be returned.
   """
   pipelines(
     """
