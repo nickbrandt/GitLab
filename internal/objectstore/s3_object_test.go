@@ -3,6 +3,7 @@ package objectstore_test
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/stretchr/testify/require"
@@ -20,6 +22,15 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
+
+type failedReader struct {
+	io.Reader
+}
+
+func (r *failedReader) Read(p []byte) (int, error) {
+	origErr := fmt.Errorf("entity is too large")
+	return 0, awserr.New("Read", "read failed", origErr)
+}
 
 func TestS3ObjectUpload(t *testing.T) {
 	testCases := []struct {
@@ -142,4 +153,22 @@ func TestS3ObjectUploadCancel(t *testing.T) {
 	_, err = object.Consume(ctx, strings.NewReader(test.ObjectContent), deadline)
 	require.Error(t, err)
 	require.Equal(t, "context canceled", err.Error())
+}
+
+func TestS3ObjectUploadLimitReached(t *testing.T) {
+	creds, config, _, ts := test.SetupS3(t, "")
+	defer ts.Close()
+
+	deadline := time.Now().Add(testTimeout)
+	tmpDir, err := ioutil.TempDir("", "workhorse-test-")
+	require.NoError(t, err)
+	defer os.Remove(tmpDir)
+
+	objectName := filepath.Join(tmpDir, "s3-test-data")
+	object, err := objectstore.NewS3Object(objectName, creds, config)
+	require.NoError(t, err)
+
+	_, err = object.Consume(context.Background(), &failedReader{}, deadline)
+	require.Error(t, err)
+	require.Equal(t, "entity is too large", err.Error())
 }
