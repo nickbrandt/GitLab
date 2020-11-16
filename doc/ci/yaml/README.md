@@ -445,10 +445,10 @@ or template includes.
 ##### Multiple files from a project
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/26793) in GitLab 13.6.
-> - It's [deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
-> - It's disabled on GitLab.com.
-> - It's not recommended for production use.
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to enable it. **(CORE ONLY)**
+> - It's [deployed behind a feature flag](../../user/feature_flags.md), enabled by default.
+> - It's enabled on GitLab.com.
+> - It's recommended for production use.
+> - For GitLab self-managed instances, GitLab administrators can opt to disable it. **(CORE ONLY)**
 
 You can include multiple files from the same project:
 
@@ -461,10 +461,10 @@ include:
       - '/templates/.tests.yml'
 ```
 
-Including multiple files from the same project is under development and not ready for production use. It is
-deployed behind a feature flag that is **disabled by default**.
+Including multiple files from the same project is under development but ready for production use. It is
+deployed behind a feature flag that is **enabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
-can enable it.
+can opt to disable it.
 
 To enable it:
 
