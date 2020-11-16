@@ -356,6 +356,9 @@ msgstr ""
 msgid "%{address} is an invalid IP address range"
 msgstr ""
 
+msgid "%{anchorOpen}Learn more%{anchorClose} about how you can customize / disable registration on your instance."
+msgstr ""
+
 msgid "%{author_link} wrote:"
 msgstr ""
 
@@ -19068,6 +19071,9 @@ msgstr ""
 msgid "Open raw"
 msgstr ""
 
+msgid "Open registration is enabled on your instance."
+msgstr ""
+
 msgid "Open sidebar"
 msgstr ""
 
@@ -29893,6 +29899,9 @@ msgid "View project labels"
 msgstr ""
 
 msgid "View replaced file @ "
+msgstr ""
+
+msgid "View setting"
 msgstr ""
 
 msgid "View supported languages and frameworks"
