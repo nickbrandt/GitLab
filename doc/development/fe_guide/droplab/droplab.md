@@ -257,7 +257,8 @@ droplab.init(trigger, list, [droplabAjax], {
 
 ### Documentation
 
-A list of DropLab plugins is [available](./plugins/index.md).
+Refer to the list of available [DropLab plugins](plugins/index.md) for
+information about their use.
 
 ### Development
 
