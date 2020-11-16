@@ -29,7 +29,7 @@ RSpec.describe 'sentry errors requests' do
 
     let(:error_data) { graphql_data.dig('project', 'sentryErrors', 'detailedError') }
 
-    it_behaves_like 'a working graphql query' do
+    it_behaves_like 'a working graphql query', :quarantine do
       before do
         post_graphql(query, current_user: current_user)
       end
