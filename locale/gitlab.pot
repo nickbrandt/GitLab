@@ -15101,6 +15101,9 @@ msgstr ""
 msgid "IssueAnalytics|Weight"
 msgstr ""
 
+msgid "IssueBoards|An error occurred while setting notifications status."
+msgstr ""
+
 msgid "IssueBoards|Board"
 msgstr ""
 
