@@ -16,11 +16,15 @@ module EE
             'admin/geo/uploads' => %w{destroy}
           }.freeze
 
+          ALLOWLISTED_GIT_WRITE_ROUTES = {
+            'repositories/git_http' => %w{git_receive_pack}
+          }.freeze
+
           private
 
           override :allowlisted_routes
           def allowlisted_routes
-            super || geo_node_update_route? || geo_proxy_git_ssh_route? || geo_api_route?
+            super || geo_node_update_route? || geo_proxy_git_ssh_route? || geo_api_route? || geo_proxy_git_http_route?
           end
 
           def geo_node_update_route?
@@ -41,6 +45,12 @@ module EE
             ::Gitlab::Middleware::ReadOnly::API_VERSIONS.any? do |version|
               request.path.start_with?("/api/v#{version}/geo/proxy_git_ssh")
             end
+          end
+
+          def geo_proxy_git_http_route?
+            return unless request.path.end_with?('.git/git-receive-pack')
+
+            ALLOWLISTED_GIT_WRITE_ROUTES[route_hash[:controller]]&.include?(route_hash[:action])
           end
 
           def geo_api_route?
