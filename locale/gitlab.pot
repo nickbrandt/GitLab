@@ -11172,6 +11172,9 @@ msgstr ""
 msgid "Export as CSV"
 msgstr ""
 
+msgid "Export commit custody report"
+msgstr ""
+
 msgid "Export group"
 msgstr ""
 
@@ -14768,6 +14771,9 @@ msgstr ""
 msgid "Invalid file."
 msgstr ""
 
+msgid "Invalid hash"
+msgstr ""
+
 msgid "Invalid import params"
 msgstr ""
 
@@ -16840,6 +16846,9 @@ msgid "Merge Requests merged"
 msgstr ""
 
 msgid "Merge automatically (%{strategy})"
+msgstr ""
+
+msgid "Merge commit SHA"
 msgstr ""
 
 msgid "Merge commit message"
