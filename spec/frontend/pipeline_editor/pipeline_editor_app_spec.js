@@ -1,17 +1,19 @@
 import { nextTick } from 'vue';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlAlert, GlLoadingIcon, GlTabs, GlTab } from '@gitlab/ui';
+import { GlButton, GlAlert, GlLoadingIcon, GlTabs, GlTab } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
+import VueApollo from 'vue-apollo';
+import createMockApollo from 'jest/helpers/mock_apollo_helper';
 
 import { redirectTo, refreshCurrentPage, objectToQuery } from '~/lib/utils/url_utility';
 import {
-  mockProjectPath,
-  mockDefaultBranch,
   mockCiConfigPath,
-  mockCommitId,
   mockCiYml,
-  mockNewMergeRequestPath,
+  mockCommitId,
   mockCommitMessage,
+  mockDefaultBranch,
+  mockProjectPath,
+  mockNewMergeRequestPath,
 } from './mock_data';
 
 import TextEditor from '~/pipeline_editor/components/text_editor.vue';
@@ -21,6 +23,7 @@ import PipelineEditorApp from '~/pipeline_editor/pipeline_editor_app.vue';
 import CommitForm from '~/pipeline_editor/components/commit/commit_form.vue';
 
 const localVue = createLocalVue();
+localVue.use(VueApollo);
 
 jest.mock('~/lib/utils/url_utility', () => ({
   redirectTo: jest.fn(),
@@ -29,15 +32,17 @@ jest.mock('~/lib/utils/url_utility', () => ({
   mergeUrlParams: jest.requireActual('~/lib/utils/url_utility').mergeUrlParams,
 }));
 
-jest.mock('~/api', () => ({
-  getRawFile: () => Promise.resolve(mockCiYml),
-}));
-
 describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   let wrapper;
-  let mockMutate;
 
-  const createComponent = ({ props = {}, loading = false } = {}, mountFn = shallowMount) => {
+  let mockMutate;
+  let mockApollo;
+  let mockBlobContentData;
+
+  const createComponent = (
+    { props = {}, loading = false, options = {} } = {},
+    mountFn = shallowMount,
+  ) => {
     mockMutate = jest.fn().mockResolvedValue({
       data: {
         commitCreate: {
@@ -48,17 +53,17 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     });
 
     wrapper = mountFn(PipelineEditorApp, {
-      localVue,
       propsData: {
-        projectPath: mockProjectPath,
-        defaultBranch: mockDefaultBranch,
         ciConfigPath: mockCiConfigPath,
-        newMergeRequestPath: mockNewMergeRequestPath,
         commitId: mockCommitId,
+        defaultBranch: mockDefaultBranch,
+        projectPath: mockProjectPath,
+        newMergeRequestPath: mockNewMergeRequestPath,
         ...props,
       },
       stubs: {
         GlTabs,
+        GlButton,
         TextEditor,
         CommitForm,
       },
@@ -72,7 +77,29 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
           mutate: mockMutate,
         },
       },
+      ...options,
     });
+  };
+
+  const createComponentWithApollo = ({ props = {} } = {}, mountFn = shallowMount) => {
+    mockApollo = createMockApollo([], {
+      Query: {
+        blobContent() {
+          return {
+            __typename: 'BlobContent',
+            rawData: mockBlobContentData(),
+          };
+        },
+      },
+    });
+
+    const options = {
+      localVue,
+      mocks: {},
+      apolloProvider: mockApollo,
+    };
+
+    createComponent({ props, options }, mountFn);
   };
 
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
@@ -80,14 +107,14 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   const findTabAt = i => wrapper.findAll(GlTab).at(i);
   const findEditorLite = () => wrapper.find(EditorLite);
   const findCommitForm = () => wrapper.find(CommitForm);
+  const findCommitBtnLoadingIcon = () => wrapper.find('[type="submit"]').find(GlLoadingIcon);
 
-  beforeEach(async () => {
-    createComponent();
-
-    // await waitForPromises();
+  beforeEach(() => {
+    mockBlobContentData = jest.fn();
   });
 
   afterEach(() => {
+    mockBlobContentData.mockReset();
     refreshCurrentPage.mockReset();
     redirectTo.mockReset();
     mockMutate.mockReset();
@@ -103,48 +130,11 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     expect(findEditorLite().exists()).toBe(false);
   });
 
-  describe('handle apollo query errors', () => {
-    class MockError extends Error {
-      constructor(message, data) {
-        super(message);
-        if (data) {
-          this.networkError = {
-            response: { data },
-          };
-        }
-      }
-    }
-
-    it('sets a general error message', async () => {
-      wrapper.vm.handleBlobContentError(new MockError('An error'));
-      await nextTick();
-
-      expect(findAlert().text()).toMatch('CI file could not be loaded: An error');
-    });
-
-    it('sets a 404 error message', async () => {
-      wrapper.vm.handleBlobContentError(new MockError('Error!', { message: 'file not found' }));
-      await nextTick();
-
-      expect(findAlert().text()).toMatch('CI file could not be loaded: file not found');
-    });
-
-    it('sets a 400 error message', async () => {
-      wrapper.vm.handleBlobContentError(new MockError('Error!', { error: 'ref is missing' }));
-      await nextTick();
-
-      expect(findAlert().text()).toMatch('CI file could not be loaded: ref is missing');
-    });
-
-    it('sets a unkown error error message', async () => {
-      wrapper.vm.handleBlobContentError({ message: null });
-      await nextTick();
-
-      expect(findAlert().text()).toMatch('CI file could not be loaded: Unknown Error');
-    });
-  });
-
   describe('tabs', () => {
+    beforeEach(() => {
+      createComponent();
+    });
+
     it('displays tabs and their content', async () => {
       expect(
         findTabAt(0)
@@ -170,28 +160,30 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   });
 
   describe('when data is set', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      createComponent();
+
       wrapper.setData({
         content: mockCiYml,
         contentModel: mockCiYml,
       });
+
+      await nextTick();
     });
 
-    it('displays content after the query loads', async () => {
-      await nextTick();
-
+    it('displays content after the query loads', () => {
       expect(findLoadingIcon().exists()).toBe(false);
       expect(findEditorLite().props('value')).toBe(mockCiYml);
     });
 
     describe('commit form', () => {
       const mockVariables = {
-        projectPath: mockProjectPath,
-        filePath: mockCiConfigPath,
         content: mockCiYml,
-        startBranch: mockDefaultBranch,
+        filePath: mockCiConfigPath,
         lastCommitId: mockCommitId,
         message: mockCommitMessage,
+        projectPath: mockProjectPath,
+        startBranch: mockDefaultBranch,
       };
 
       const emitSubmit = event => {
@@ -224,7 +216,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         });
 
         it('shows no saving state', () => {
-          expect(wrapper.find('[type="submit"]').props('loading')).toBe(false);
+          expect(findCommitBtnLoadingIcon().exists()).toBe(false);
         });
       });
 
@@ -275,7 +267,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
       describe('when the commit is ocurring', () => {
         it('shows a saving state', async () => {
           await mockMutate.mockImplementationOnce(() => {
-            expect(findCommitForm().props('saving')).toBe(true);
+            expect(findCommitBtnLoadingIcon().exists()).toBe(true);
             return Promise.resolve();
           });
 
@@ -295,7 +287,9 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
 
           await waitForPromises();
 
-          expect(findAlert().text()).toBe('CI file could not be saved: commit failed');
+          expect(findAlert().text()).toMatchInterpolatedText(
+            'The GitLab CI configuration could not be updated. commit failed',
+          );
         });
 
         it('shows an unkown error', async () => {
@@ -305,11 +299,13 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
 
           await waitForPromises();
 
-          expect(findAlert().text()).toBe('CI file could not be saved: Unknown Error');
+          expect(findAlert().text()).toMatchInterpolatedText(
+            'The GitLab CI configuration could not be updated.',
+          );
         });
       });
 
-      describe('when the commit is cancelled', () => {
+      describe('when the commit form is cancelled', () => {
         const otherContent = 'other content';
 
         beforeEach(async () => {
@@ -325,6 +321,54 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
           expect(findEditorLite().props('value')).toBe(mockCiYml);
         });
       });
+    });
+  });
+
+  describe('displays fetch content errors', () => {
+    it('no error is show when data is set', async () => {
+      mockBlobContentData.mockResolvedValue(mockCiYml);
+      createComponentWithApollo();
+
+      await waitForPromises();
+
+      expect(findAlert().exists()).toBe(false);
+      expect(findEditorLite().props('value')).toBe(mockCiYml);
+    });
+
+    it('shows a 404 error message', async () => {
+      mockBlobContentData.mockRejectedValueOnce({
+        response: {
+          status: 404,
+        },
+      });
+      createComponentWithApollo();
+
+      await waitForPromises();
+
+      expect(findAlert().text()).toMatch('No CI file found in this repository, please add one.');
+    });
+
+    it('shows a 400 error message', async () => {
+      mockBlobContentData.mockRejectedValueOnce({
+        response: {
+          status: 400,
+        },
+      });
+      createComponentWithApollo();
+
+      await waitForPromises();
+
+      expect(findAlert().text()).toMatch(
+        'Repository does not have a default branch, please set one.',
+      );
+    });
+
+    it('shows a unkown error message', async () => {
+      mockBlobContentData.mockRejectedValueOnce(new Error('My error!'));
+      createComponentWithApollo();
+      await waitForPromises();
+
+      expect(findAlert().text()).toMatch('The CI configuration was not loaded, please try again.');
     });
   });
 });

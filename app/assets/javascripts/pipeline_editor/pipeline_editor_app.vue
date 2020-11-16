@@ -1,27 +1,33 @@
 <script>
-import { GlLoadingIcon, GlAlert, GlTabs, GlTab } from '@gitlab/ui';
+import { GlAlert, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
 import { __, s__, sprintf } from '~/locale';
 import { redirectTo, mergeUrlParams, refreshCurrentPage } from '~/lib/utils/url_utility';
 
-import TextEditor from './components/text_editor.vue';
-import CommitForm from './components/commit/commit_form.vue';
 import PipelineGraph from '~/pipelines/components/pipeline_graph/pipeline_graph.vue';
-import commitCIFileMutation from './graphql/mutations/commit_ci_file.mutation.graphql';
+import CommitForm from './components/commit/commit_form.vue';
+import TextEditor from './components/text_editor.vue';
+import commitCiFileMutation from './graphql/mutations/commit_ci_file.mutation.graphql';
 
 import getBlobContent from './graphql/queries/blob_content.graphql';
 
 const MR_SOURCE_BRANCH = 'merge_request[source_branch]';
 const MR_TARGET_BRANCH = 'merge_request[target_branch]';
 
+const LOAD_FAILURE_NO_REF = 'LOAD_FAILURE_NO_REF';
+const LOAD_FAILURE_NO_FILE = 'LOAD_FAILURE_NO_FILE';
+const LOAD_FAILURE_UNKNOWN = 'LOAD_FAILURE_UNKNOWN';
+const COMMIT_FAILURE = 'COMMIT_FAILURE';
+const DEFAULT_FAILURE = 'DEFAULT_FAILURE';
+
 export default {
   components: {
-    GlLoadingIcon,
     GlAlert,
-    GlTabs,
+    GlLoadingIcon,
     GlTab,
-    TextEditor,
-    CommitForm,
+    GlTabs,
     PipelineGraph,
+    CommitForm,
+    TextEditor,
   },
   props: {
     projectPath: {
@@ -49,7 +55,10 @@ export default {
   },
   data() {
     return {
-      errorMessage: null,
+      showFailureAlert: false,
+      failureType: null,
+      failureReasons: [],
+
       isSaving: false,
       editorIsReady: false,
       content: '',
@@ -78,7 +87,7 @@ export default {
     },
   },
   computed: {
-    loading() {
+    isLoading() {
       return this.$apollo.queries.content.loading;
     },
     defaultCommitMessage() {
@@ -88,27 +97,71 @@ export default {
       // Note data will loaded as part of https://gitlab.com/gitlab-org/gitlab/-/issues/263141
       return {};
     },
+    failure() {
+      switch (this.failureType) {
+        case LOAD_FAILURE_NO_REF:
+          return {
+            text: this.$options.errorTexts[LOAD_FAILURE_NO_REF],
+            variant: 'danger',
+          };
+        case LOAD_FAILURE_NO_FILE:
+          return {
+            text: this.$options.errorTexts[LOAD_FAILURE_NO_FILE],
+            variant: 'danger',
+          };
+        case LOAD_FAILURE_UNKNOWN:
+          return {
+            text: this.$options.errorTexts[LOAD_FAILURE_UNKNOWN],
+            variant: 'danger',
+          };
+        case COMMIT_FAILURE:
+          return {
+            text: this.$options.errorTexts[COMMIT_FAILURE],
+            variant: 'danger',
+          };
+        default:
+          return {
+            text: this.$options.errorTexts[DEFAULT_FAILURE],
+            variant: 'danger',
+          };
+      }
+    },
   },
   i18n: {
     defaultCommitMessage: __('Update %{sourcePath} file'),
     tabEdit: s__('Pipelines|Write pipeline configuration'),
     tabGraph: s__('Pipelines|Visualize'),
-
-    unknownError: __('Unknown Error'),
-    fetchErrorMsg: s__('Pipelines|CI file could not be loaded: %{reason}'),
-    commitErrorMsg: s__('Pipelines|CI file could not be saved: %{reason}'),
+  },
+  errorTexts: {
+    [LOAD_FAILURE_NO_REF]: s__(
+      'Pipelines|Repository does not have a default branch, please set one.',
+    ),
+    [LOAD_FAILURE_NO_FILE]: s__('Pipelines|No CI file found in this repository, please add one.'),
+    [LOAD_FAILURE_UNKNOWN]: s__('Pipelines|The CI configuration was not loaded, please try again.'),
+    [COMMIT_FAILURE]: s__('Pipelines|The GitLab CI configuration could not be updated.'),
   },
   methods: {
-    handleBlobContentError(error) {
-      const { message: generalReason, networkError } = error;
+    handleBlobContentError(error = {}) {
+      const { networkError } = error;
 
-      const { data } = networkError?.response ?? {};
-      // 404 for missing file uses `message`
-      // 400 for a missing ref uses `error`
-      const networkReason = data?.message ?? data?.error;
-
-      const reason = networkReason ?? generalReason ?? this.$options.i18n.unknownError;
-      this.errorMessage = sprintf(this.$options.i18n.fetchErrorMsg, { reason });
+      const { response } = networkError;
+      if (response?.status === 404) {
+        // 404 for missing CI file
+        this.reportFailure(LOAD_FAILURE_NO_FILE);
+      } else if (response?.status === 400) {
+        // 400 for a missing ref when no default branch is set
+        this.reportFailure(LOAD_FAILURE_NO_REF);
+      } else {
+        this.reportFailure(LOAD_FAILURE_UNKNOWN);
+      }
+    },
+    dismissFailure() {
+      this.showFailureAlert = false;
+    },
+    reportFailure(type, reasons = []) {
+      this.showFailureAlert = true;
+      this.failureType = type;
+      this.failureReasons = reasons;
     },
     redirectToNewMergeRequest(sourceBranch) {
       const url = mergeUrlParams(
@@ -130,7 +183,7 @@ export default {
             commitCreate: { errors },
           },
         } = await this.$apollo.mutate({
-          mutation: commitCIFileMutation,
+          mutation: commitCiFileMutation,
           variables: {
             projectPath: this.projectPath,
             branch,
@@ -143,7 +196,8 @@ export default {
         });
 
         if (errors?.length) {
-          throw new Error(errors[0]);
+          this.reportFailure(COMMIT_FAILURE, errors);
+          return;
         }
 
         if (openMergeRequest) {
@@ -153,8 +207,7 @@ export default {
           refreshCurrentPage();
         }
       } catch (error) {
-        const reason = error?.message || this.$options.i18n.unknownError;
-        this.errorMessage = sprintf(this.$options.i18n.commitErrorMsg, { reason });
+        this.reportFailure(COMMIT_FAILURE, [error?.message]);
       } finally {
         this.isSaving = false;
       }
@@ -162,20 +215,25 @@ export default {
     onCommitCancel() {
       this.contentModel = this.content;
     },
-    onErrorDismiss() {
-      this.errorMessage = null;
-    },
   },
 };
 </script>
 
 <template>
   <div class="gl-mt-4">
-    <gl-alert v-if="errorMessage" variant="danger" :dismissible="true" @dismiss="onErrorDismiss">
-      {{ errorMessage }}
+    <gl-alert
+      v-if="showFailureAlert"
+      :variant="failure.variant"
+      :dismissible="true"
+      @dismiss="dismissFailure()"
+    >
+      {{ failure.text }}
+      <ul v-if="failureReasons && failureReasons.length" class="gl-mb-0">
+        <li v-for="(reason, i) in failureReasons" :key="i">{{ reason }}</li>
+      </ul>
     </gl-alert>
     <div class="gl-mt-4">
-      <gl-loading-icon v-if="loading" size="lg" class="gl-m-3" />
+      <gl-loading-icon v-if="isLoading" size="lg" class="gl-m-3" />
       <div v-else class="file-editor gl-mb-3">
         <gl-tabs>
           <!-- editor should be mounted when its tab is visible, so the container has a size -->
