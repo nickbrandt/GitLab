@@ -3,8 +3,17 @@
 module RuboCop
   module Cop
     module Lint
+      # This cop only works if there are files from deprecation_toolkit. You can
+      # generate these files by:
+      #
+      # 1. Running specs with RECORD_DEPRECATIONS=1
+      # 1. Downloading the complete set of deprecations/ files from a CI
+      # pipeline (see https://gitlab.com/gitlab-org/gitlab/-/merge_requests/47720)
       class LastKeywordArgument < Cop
         MSG = 'Using the last argument as keyword parameters is deprecated'.freeze
+
+        DEPRECATIONS_GLOB = File.expand_path('../../../deprecations/**/*.yml', __dir__)
+        KEYWORD_DEPRECATION_STR = 'maybe ** should be added to the call'
 
         def on_send(node)
           arg = node.arguments.last
@@ -48,13 +57,11 @@ module RuboCop
         end
 
         def self.keywords_list
-          return [] unless File.exist?(keywords_file_path)
+          hash = Dir.glob(DEPRECATIONS_GLOB).each_with_object({}) do |file, hash|
+            hash.merge!(YAML.safe_load(File.read(file)))
+          end
 
-          File.read(keywords_file_path).split("----\n")
-        end
-
-        def self.keywords_file_path
-          File.expand_path('../../../tmp/keyword_warn.txt', __dir__)
+          hash.values.flatten.select { |str| str.include?(KEYWORD_DEPRECATION_STR) }.uniq
         end
       end
     end
