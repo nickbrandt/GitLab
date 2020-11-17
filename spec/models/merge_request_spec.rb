@@ -2474,7 +2474,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
             description: "This reverts merge request !#{subject.id}")
         end
 
-        it 'returns nil' do
+        it 'returns the reverting merge request' do
           ProcessCommitWorker.new.perform(project.id,
                                           current_user.id,
                                           project.commit(revert_commit_id).to_hash,
