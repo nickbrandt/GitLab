@@ -1,0 +1,5 @@
+---
+title: 'Image scaler: add success-client-cache status label'
+merge_request: 656
+author:
+type: fixed

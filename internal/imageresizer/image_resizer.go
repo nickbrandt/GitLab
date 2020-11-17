@@ -51,10 +51,11 @@ type imageFile struct {
 }
 
 const (
-	statusSuccess        = "success"        // a rescaled image was served
-	statusScalingFailure = "scaling-failed" // scaling failed but the original image was served
-	statusRequestFailure = "request-failed" // no image was served
-	statusUnknown        = "unknown"        // indicates an unhandled status case
+	statusSuccess        = "success"              // a rescaled image was served
+	statusClientCache    = "success-client-cache" // scaling was skipped because client cache was fresh
+	statusScalingFailure = "scaling-failed"       // scaling failed but the original image was served
+	statusRequestFailure = "request-failed"       // no image was served
+	statusUnknown        = "unknown"              // indicates an unhandled status case
 )
 
 var envInjector = tracing.NewEnvInjector()
@@ -197,6 +198,7 @@ func (r *Resizer) Inject(w http.ResponseWriter, req *http.Request, paramsData st
 	setLastModified(w, imageFile.lastModified)
 	// If the original file has not changed, then any cached resized versions have not changed either.
 	if checkNotModified(req, imageFile.lastModified) {
+		status = statusClientCache
 		logger.WithFields(*logFields(0)).Printf("ImageResizer: Use cached image")
 		writeNotModified(w)
 		return
