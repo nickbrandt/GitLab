@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe SyncSeatLinkRequestWorker, type: :worker do
   describe '#perform' do
     subject do
-      described_class.new.perform('2020-01-01T01:20:12+02:00', '123', 5, 4)
+      described_class.new.perform('2020-01-01T01:20:12+02:00', '123', 5, 4, created_at: '2020-01-03T12:00:12+02:00')
     end
 
     let(:seat_link_url) { [EE::SUBSCRIPTIONS_URL, '/api/v1/seat_links'].join }
@@ -42,6 +42,29 @@ RSpec.describe SyncSeatLinkRequestWorker, type: :worker do
           body: {
             timestamp: '2020-01-01T00:00:00Z',
             date: '2020-01-01',
+            license_key: '123',
+            max_historical_user_count: 5,
+            active_users: 4
+          }.to_json
+        )
+      end
+    end
+
+    context 'without params' do
+      subject do
+        described_class.new.perform('2019-12-31T23:20:12Z', '123', 5, 4)
+      end
+
+      it 'makes an HTTP POST request with passed params' do
+        stub_request(:post, seat_link_url).to_return(status: 200)
+
+        subject
+
+        expect(WebMock).to have_requested(:post, seat_link_url).with(
+          headers: { 'Content-Type' => 'application/json' },
+          body: {
+            timestamp: '2019-12-31T23:20:12Z',
+            date: '2019-12-31',
             license_key: '123',
             max_historical_user_count: 5,
             active_users: 4

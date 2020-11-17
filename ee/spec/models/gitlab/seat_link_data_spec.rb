@@ -8,11 +8,13 @@ RSpec.describe Gitlab::SeatLinkData do
       timestamp: timestamp,
       key: key,
       max_users: max_users,
-      active_users: active_users
+      active_users: active_users,
+      created_at: created_at
     )
   end
 
   let_it_be(:timestamp) { Time.iso8601('2020-03-22T06:09:18Z') }
+  let_it_be(:created_at) { Time.iso8601('2020-03-24T12:00:00Z') }
   let_it_be(:key) { 'key' }
   let_it_be(:max_users) { 11 }
   let_it_be(:active_users) { 5 }
@@ -34,7 +36,7 @@ RSpec.describe Gitlab::SeatLinkData do
     end
 
     around do |example|
-      travel_to(utc_time) { example.run }
+      travel_to(utc_time + 5.hours) { example.run }
     end
 
     context 'when passing no params' do
@@ -45,7 +47,8 @@ RSpec.describe Gitlab::SeatLinkData do
           timestamp: eq(utc_time),
           key: eq(current_license.data),
           max_users: eq(today_active_count),
-          active_users: eq(today_active_count)
+          active_users: eq(today_active_count),
+          created_at: eq(utc_time + 5.hours)
         )
       end
     end
@@ -56,7 +59,8 @@ RSpec.describe Gitlab::SeatLinkData do
           timestamp: eq(timestamp),
           key: eq(key),
           max_users: eq(max_users),
-          active_users: eq(active_users)
+          active_users: eq(active_users),
+          created_at: eq(created_at)
         )
       end
 
@@ -68,7 +72,8 @@ RSpec.describe Gitlab::SeatLinkData do
             timestamp: eq(utc_time - 1.day),
             key: eq(current_license.data),
             max_users: eq(max_before_today),
-            active_users: eq(yesterday_active_count)
+            active_users: eq(yesterday_active_count),
+            created_at: eq(utc_time + 5.hours)
           )
         end
       end
