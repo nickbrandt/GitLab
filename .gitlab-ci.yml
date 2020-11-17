@@ -1,5 +1,5 @@
 workflow:
-  rules:
+  rules: &workflow_rules
     # For merge requests, create a pipeline.
     - if: '$CI_MERGE_REQUEST_IID'
     # For `master` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
@@ -64,6 +64,13 @@ gosec-sast:
   before_script:
     - apk add make
     - make install
+  rules: *workflow_rules
+
+dependency_scanning:
+  rules: *workflow_rules
+
+secret_detection:
+  rules: *workflow_rules
 
 code_navigation:
   image: golang:latest
