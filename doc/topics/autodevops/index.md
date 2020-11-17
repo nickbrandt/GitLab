@@ -524,7 +524,8 @@ You can find more information in
 
 ### Error: release .... failed: timed out waiting for the condition
 
-When getting started with Auto Devops, you might encounter this error when first deploying your application:
+When getting started with Auto DevOps, you may encounter this error when first
+deploying your application:
 
 ```plaintext
 INSTALL FAILED
@@ -532,9 +533,14 @@ PURGING CHART
 Error: release staging failed: timed out waiting for the condition
 ```
 
-This is most likely caused by a failed liveness/readiness probe that is automatically attempted during the deployment process. By default, these probes are run against the root page of the deployed application on port 5000. If your application isn't configured to serve anything at the root page, or is configured to run on a specific port OTHER than 5000, this check will fail. 
+This is most likely caused by a failed liveness (or readiness) probe attempted
+during the deployment process. By default, these probes are run against the root
+page of the deployed application on port 5000. If your application isn't configured
+to serve anything at the root page, or is configured to run on a specific port
+*other* than 5000, this check fails.
 
-If this is the case, you should see these failures within the events for the relevant Kubernetes namespace. These events would look similar to the following:
+If it fails, you should see these failures within the events for the relevant
+Kubernetes namespace. These events look like the following example:
 
 ```plaintext
 LAST SEEN   TYPE      REASON                   OBJECT                                            MESSAGE
@@ -542,20 +548,29 @@ LAST SEEN   TYPE      REASON                   OBJECT                           
 3m32s       Warning   Unhealthy                pod/staging-85db88dcb6-rxd6g                      Liveness probe failed: Get http://10.192.0.6:5000/: dial tcp 10.192.0.6:5000: connect: connection refused
 ```
 
-To change the port used for the liveness/readiness checks, we'll need to pass [custom values to the Helm chart](customize.md#customize-values-for-helm-chart) used by Auto Devops:
+To change the port used for the liveness checks, pass
+[custom values to the Helm chart](customize.md#customize-values-for-helm-chart)
+used by Auto DevOps:
 
-1. Create a directory & file at the root of your repository named `.gitlab/auto-deploy-values.yaml`.
+1. Create a directory and file at the root of your repository named `.gitlab/auto-deploy-values.yaml`.
 
-1. Populate the file with the following content, replacing the port values with the actual port number your application is configured to use:
+1. Populate the file with the following content, replacing the port values with
+   the actual port number your application is configured to use:
 
    ```yaml
    service:
      internalPort: <port_value>
      externalPort: <port_value>
    ```
+
 1. Commit your changes.
 
-After commiting your changes, subsequent probes should use the newly defined ports. The page that's probed can also be changed, simply override the `livenessProbe.path` and `readinessProbe.path` values (shown in the [default values.yaml](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image/-/blob/master/assets/auto-deploy-app/values.yaml)) in the same fashion.
+After committing your changes, subsequent probes should use the newly-defined ports.
+The page that's probed can also be changed by overriding the `livenessProbe.path`
+and `readinessProbe.path` values (shown in the
+[default `values.yaml`](https://gitlab.com/gitlab-org/cluster-integration/auto-deploy-image/-/blob/master/assets/auto-deploy-app/values.yaml)
+file) in the same fashion.
+
 ## Development guides
 
 [Development guide for Auto DevOps](../../development/auto_devops.md)
