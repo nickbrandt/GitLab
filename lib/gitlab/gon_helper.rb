@@ -33,6 +33,7 @@ module Gitlab
       gon.disable_animations     = Gitlab.config.gitlab['disable_animations']
       gon.suggested_label_colors = LabelsHelper.suggested_colors
       gon.first_day_of_week      = current_user&.first_day_of_week || Gitlab::CurrentSettings.first_day_of_week
+      gon.roadmap_epics_limit    = 1000
       gon.ee                     = Gitlab.ee?
 
       if current_user
