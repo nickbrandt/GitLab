@@ -9,7 +9,7 @@ RSpec.describe API::Lint do
         File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml'))
       end
 
-      it 'passes validation without warnings' do
+      it 'passes validation without warnings or errors' do
         post api('/ci/lint'), params: { content: yaml_content }
 
         expect(response).to have_gitlab_http_status(:ok)
@@ -30,10 +30,11 @@ RSpec.describe API::Lint do
     context 'with valid .gitlab-ci.yaml with warnings' do
       let(:yaml_content) { { job: { script: 'ls', rules: [{ when: 'always' }] } }.to_yaml }
 
-      it 'passes validation but raises a warning' do
+      it 'passes validation but returns warnings' do
         post api('/ci/lint'), params: { content: yaml_content }
 
         expect(response).to have_gitlab_http_status(:ok)
+        expect(json_response['status']).to eq('valid')
         expect(json_response['warnings']).not_to be_empty
         expect(json_response['status']).to eq('valid')
         expect(json_response['errors']).to eq([])
