@@ -4142,6 +4142,7 @@ Iteration ID wildcard values.
 | Value | Description |
 | ----- | ----------- |
 | `ANY` | An iteration is assigned |
+| `CURRENT` | Current iteration based on current date UTC |
 | `NONE` | No iteration is assigned |
 
 ### ListLimitMetric

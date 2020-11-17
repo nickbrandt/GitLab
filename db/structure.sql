@@ -9821,7 +9821,8 @@ CREATE TABLE boards (
     group_id integer,
     weight integer,
     hide_backlog_list boolean DEFAULT false NOT NULL,
-    hide_closed_list boolean DEFAULT false NOT NULL
+    hide_closed_list boolean DEFAULT false NOT NULL,
+    iteration_id bigint
 );
 
 CREATE TABLE boards_epic_user_preferences (
@@ -20409,6 +20410,8 @@ CREATE INDEX index_boards_epic_user_preferences_on_user_id ON boards_epic_user_p
 
 CREATE INDEX index_boards_on_group_id ON boards USING btree (group_id);
 
+CREATE INDEX index_boards_on_iteration_id ON boards USING btree (iteration_id);
+
 CREATE INDEX index_boards_on_milestone_id ON boards USING btree (milestone_id);
 
 CREATE INDEX index_boards_on_project_id ON boards USING btree (project_id);
@@ -23180,6 +23183,9 @@ ALTER TABLE ONLY protected_branch_merge_access_levels
 
 ALTER TABLE ONLY notes
     ADD CONSTRAINT fk_99e097b079 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY boards
+    ADD CONSTRAINT fk_9a2d4a2cad FOREIGN KEY (iteration_id) REFERENCES sprints(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY geo_event_log
     ADD CONSTRAINT fk_9b9afb1916 FOREIGN KEY (repository_created_event_id) REFERENCES geo_repository_created_events(id) ON DELETE CASCADE;

@@ -32124,6 +32124,12 @@
               "description": "An iteration is assigned",
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "CURRENT",
+              "description": "Current iteration based on current date UTC",
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null
