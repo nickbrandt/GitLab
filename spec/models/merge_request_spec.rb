@@ -2451,8 +2451,8 @@ RSpec.describe MergeRequest, factory_default: :keep do
 
       context 'when there is a revert commit by MR' do
         let(:current_user) { subject.author }
-        let(:branch) { subject.target_branch }
-        let(:project) { subject.target_project }
+        let(:branch) { subject.source_branch }
+        let(:project) { subject.source_project }
 
         let(:revert_commit_id) do
           params = {
@@ -2464,10 +2464,29 @@ RSpec.describe MergeRequest, factory_default: :keep do
           Commits::RevertService.new(project, current_user, params).execute[:result]
         end
 
-        let(:revert_merge_request) { create(:merge_request, merge_commit_sha: revert_commit_id) }
+        let(:revert_merge_request) do
+          create(
+            :merge_request,
+            author: subject.author,
+            target_project: subject.target_project,
+            source_project: subject.source_project,
+            merge_commit_sha: revert_commit_id,
+            description: "This reverts merge request !#{subject.id}")
+        end
 
         it 'returns nil' do
-          expect(subject.reverting_merge_request(current_user)).to be(revert_merge_request)
+          ProcessCommitWorker.new.perform(project.id,
+                                          current_user.id,
+                                          project.commit(revert_commit_id).to_hash,
+                                          project.default_branch == branch)
+
+          MergeRequests::MergeService.new(
+            subject.target_project,
+            subject.author,
+            { sha: revert_merge_request.diff_head_sha }
+          ).execute(revert_merge_request)
+
+          expect(subject.reverting_merge_request(current_user)).to eq(revert_merge_request)
         end
       end
     end
