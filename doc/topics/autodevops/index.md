@@ -542,7 +542,7 @@ LAST SEEN   TYPE      REASON                   OBJECT                           
 3m32s       Warning   Unhealthy                pod/staging-85db88dcb6-rxd6g                      Liveness probe failed: Get http://10.192.0.6:5000/: dial tcp 10.192.0.6:5000: connect: connection refused
 ```
 
-To change the port used for the liveness/readiness checks, we'll need to pass [custom values to the Helm chart](https://docs.gitlab.com/ee/topics/autodevops/customize.html#customize-values-for-helm-chart) used by Auto Devops:
+To change the port used for the liveness/readiness checks, we'll need to pass [custom values to the Helm chart](customize.md#customize-values-for-helm-chart) used by Auto Devops:
 
 1. Create a directory & file at the root of your repository named `.gitlab/auto-deploy-values.yaml`.
 
