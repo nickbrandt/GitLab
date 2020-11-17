@@ -12235,6 +12235,9 @@ msgstr ""
 msgid "Found errors in your .gitlab-ci.yml:"
 msgstr ""
 
+msgid "Framework successfully deleted"
+msgstr ""
+
 msgid "Free Trial"
 msgstr ""
 
@@ -18794,6 +18797,9 @@ msgid "Not enough data"
 msgstr ""
 
 msgid "Not found."
+msgstr ""
+
+msgid "Not permitted to destroy framework"
 msgstr ""
 
 msgid "Not ready yet. Try again later."
