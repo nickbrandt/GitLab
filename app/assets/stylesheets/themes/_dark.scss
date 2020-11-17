@@ -207,7 +207,7 @@ $line-removed-dark: $red-200;
   &.gl-label-scoped {
     .gl-label-text-scoped,
     .gl-label-close {
-      color: $gray-950;
+      color: $gray-900;
     }
   }
 }
@@ -216,7 +216,7 @@ $line-removed-dark: $red-200;
 // and for scoped label value (the right section)
 .gl-label-text-light.gl-label-text-light,
 .gl-label-text-dark + .gl-label-text-dark {
-  color: $gray-950;
+  color: $gray-900;
 }
 
 // This applies to "gl-labels" from "gitlab-ui"
@@ -224,7 +224,7 @@ $line-removed-dark: $red-200;
 .gl-label.gl-label-scoped.gl-label-text-light {
   .gl-label-text-scoped,
   .gl-label-close {
-    color: $gray-950;
+    color: $gray-900;
   }
 }
 
