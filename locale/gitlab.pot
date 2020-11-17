@@ -28419,6 +28419,9 @@ msgstr ""
 msgid "Tip:"
 msgstr ""
 
+msgid "Tip: add a"
+msgstr ""
+
 msgid "Title"
 msgstr ""
 
@@ -33081,6 +33084,9 @@ msgid "this document"
 msgstr ""
 
 msgid "time summary"
+msgstr ""
+
+msgid "to automatically add approvers based on file paths and file types."
 msgstr ""
 
 msgid "to help your contributors communicate effectively!"
