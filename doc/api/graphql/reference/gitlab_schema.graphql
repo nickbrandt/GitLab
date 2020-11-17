@@ -11881,6 +11881,11 @@ enum IterationWildcardId {
   ANY
 
   """
+  Current iteration
+  """
+  CURRENT
+
+  """
   No iteration is assigned
   """
   NONE

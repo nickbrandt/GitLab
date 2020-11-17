@@ -32580,6 +32580,12 @@
               "description": "An iteration is assigned",
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "CURRENT",
+              "description": "Current iteration",
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null
