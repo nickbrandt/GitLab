@@ -136,6 +136,19 @@ RSpec.describe Projects::ArtifactsController do
       get :download, params: params
     end
 
+    context 'when artifact_id is supplied' do
+      it 'downloads artifact by artifact id' do
+        artifact = job.job_artifacts_archives.last
+
+        expect(controller).to receive(:send_file)
+          .with(
+            artifact.file.path,
+            hash_including(disposition: 'attachment', filename: artifact.filename)).and_call_original
+
+        download_artifact(artifact_id: artifact.id)
+      end
+    end
+
     context 'when no file type is supplied' do
       let(:filename) { job.artifacts_file.filename }
 

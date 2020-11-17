@@ -5,7 +5,7 @@ module Gitlab
     class Config
       module Entry
         ##
-        # Entry that represents a configuration of job artifacts.
+        # Entry that represents a configuration of job artifact reports.
         #
         class Reports < ::Gitlab::Config::Entry::Node
           include ::Gitlab::Config::Entry::Validatable

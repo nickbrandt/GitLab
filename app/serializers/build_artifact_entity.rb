@@ -7,7 +7,17 @@ class BuildArtifactEntity < Grape::Entity
   alias_method :artifact, :object
 
   expose :name do |artifact|
-    "#{artifact.job.name}:#{artifact.file_type}"
+    if artifact.file_type == 'archive'
+      file_name = artifact.file_in_database
+      file_info = "#{artifact.file_type}"
+      # To differentiate multiple archives the file name from the database is used or the artifact id
+      # file_name  corresponds to `artifact:archives:name` in gitlab-ci.yml
+      file_info += file_name ? ":#{file_name.split('.').first}" : ":artifact #{artifact.id}"
+    else
+      file_info = "#{artifact.file_type}"
+    end
+
+    "#{artifact.job.name}:#{file_info}"
   end
 
   expose :expire_at
@@ -17,7 +27,7 @@ class BuildArtifactEntity < Grape::Entity
     fast_download_project_job_artifacts_path(
       artifact.project,
       artifact.job,
-      file_type: artifact.file_type
+      artifact_id: artifact.id
     )
   end
 

@@ -46,12 +46,22 @@ module Ci
     has_many :job_artifacts, class_name: 'Ci::JobArtifact', foreign_key: :job_id, dependent: :destroy, inverse_of: :job # rubocop:disable Cop/ActiveRecordDependent
     has_many :job_variables, class_name: 'Ci::JobVariable', foreign_key: :job_id
     has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_job_id
-
     has_many :pages_deployments, inverse_of: :ci_build
 
-    Ci::JobArtifact.file_types.each do |key, value|
+    Ci::JobArtifact.file_types.except('archive').each do |key, value|
       has_one :"job_artifacts_#{key}", -> { where(file_type: value) }, class_name: 'Ci::JobArtifact', inverse_of: :job, foreign_key: :job_id
     end
+    has_many :job_artifacts_archives,
+      -> { where(file_type: Ci::JobArtifact.file_types['archive']) },
+      class_name: 'Ci::JobArtifact',
+      inverse_of: :job,
+      foreign_key: :job_id
+    # TODO: deprecate once all locations that show artifacts support multiple
+    has_one :job_artifacts_archive,
+      -> { where(file_type: Ci::JobArtifact.file_types['archive']).order(created_at: :asc) },
+      class_name: 'Ci::JobArtifact',
+      inverse_of: :job,
+      foreign_key: :job_id
 
     has_one :runner_session, class_name: 'Ci::BuildRunnerSession', validate: true, inverse_of: :build
 
@@ -221,7 +231,7 @@ module Ci
       end
 
       def with_preloads
-        preload(:job_artifacts_archive, :job_artifacts, project: [:namespace])
+        preload(:job_artifacts_archives, :job_artifacts, project: [:namespace])
       end
     end
 
@@ -787,8 +797,13 @@ module Ci
       self.job_artifacts.update_all(expire_at: nil)
     end
 
-    def artifacts_file_for_type(type)
-      job_artifacts.find_by(file_type: Ci::JobArtifact.file_types[type])&.file
+    def job_artifact_by_file_type(file_type)
+      if file_type == 'archive'
+        # Since there can be multiple archives ensure the first created archive is used
+        job_artifacts_archive
+      else
+        job_artifacts.find_by(file_type: Ci::JobArtifact.file_types[file_type])
+      end
     end
 
     def coverage_regex

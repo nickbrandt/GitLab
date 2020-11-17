@@ -20363,7 +20363,7 @@ CREATE INDEX index_ci_job_artifacts_on_expire_at_and_job_id ON ci_job_artifacts 
 
 CREATE INDEX index_ci_job_artifacts_on_file_store ON ci_job_artifacts USING btree (file_store);
 
-CREATE UNIQUE INDEX index_ci_job_artifacts_on_job_id_and_file_type ON ci_job_artifacts USING btree (job_id, file_type);
+CREATE INDEX index_ci_job_artifacts_on_job_id ON ci_job_artifacts USING btree (job_id);
 
 CREATE INDEX index_ci_job_artifacts_on_project_id ON ci_job_artifacts USING btree (project_id);
 

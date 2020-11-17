@@ -40,7 +40,7 @@ RSpec.describe Ci::BuildRunnerPresenter do
       end
 
       context 'when artifacts exclude is defined' do
-        let(:build) do
+        let_it_be(:build) do
           create(:ci_build, options: { artifacts: { paths: %w[abc], exclude: %w[cde] } })
         end
 
@@ -77,6 +77,65 @@ RSpec.describe Ci::BuildRunnerPresenter do
 
         it 'does not include an empty list of excluded paths' do
           expect(presenter.artifacts.first).not_to have_key(:exclude)
+        end
+      end
+
+      context 'when artifacts contains archives key' do
+        let(:build_options) { { artifacts: { archives: archives } } }
+        let(:build) { create(:ci_build, options: build_options) }
+        let(:artifacts) { presenter.artifacts }
+
+        context 'with minimal completion' do
+          let(:archives) { [{ paths: %w[abc] }] }
+
+          it 'presents artifact with defaults' do
+            expect(artifacts.first[:artifact_type]).to eq(:archive)
+            expect(artifacts.first[:artifact_format]).to eq(:zip)
+            expect(artifacts.first[:untracked]).to be(nil)
+            expect(artifacts.first[:name]).to eq(nil)
+            expect(artifacts.first[:paths]).to eq(['abc'])
+            expect(artifacts.first[:when]).to eq(nil)
+            expect(artifacts.first[:expire_in]).to eq(nil)
+          end
+        end
+
+        context 'with full completion' do
+          let(:archives) do
+            [
+              { name: 'success', paths: %w[abc], when: 'on_success', expire_in: '41 seconds', untracked: true }
+            ]
+          end
+
+          it 'presents artifact' do
+            expect(artifacts.first[:artifact_type]).to eq(:archive)
+            expect(artifacts.first[:artifact_format]).to eq(:zip)
+            expect(artifacts.first[:untracked]).to be(true)
+            expect(artifacts.first[:name]).to eq('success')
+            expect(artifacts.first[:paths]).to eq(['abc'])
+            expect(artifacts.first[:when]).to eq('on_success')
+            expect(artifacts.first[:expire_in]).to eq('41 seconds')
+          end
+        end
+
+        context 'with multiple archives' do
+          let(:archives) do
+            [
+              { name: 'success', paths: %w[abc] },
+              { name: 'failure', paths: %w[failure-1 failure-2] }
+            ]
+          end
+
+          it 'presents both artifact archives' do
+            success_artifact = artifacts.find { |artifact| artifact[:name] == 'success' }
+            expect(success_artifact[:name]).to eq('success')
+            expect(success_artifact[:paths]).to eq(['abc'])
+            expect(success_artifact[:artifact_type]).to eq(:archive)
+
+            failure_artifact = artifacts.find { |artifact| artifact[:name] == 'failure' }
+            expect(failure_artifact[:name]).to eq('failure')
+            expect(failure_artifact[:paths]).to eq(%w[failure-1 failure-2])
+            expect(failure_artifact[:artifact_type]).to eq(:archive)
+          end
         end
       end
     end
@@ -184,7 +243,7 @@ RSpec.describe Ci::BuildRunnerPresenter do
   describe '#refspecs' do
     subject { presenter.refspecs }
 
-    let(:build) { create(:ci_build) }
+    let_it_be(:build) { create(:ci_build) }
     let(:pipeline) { build.pipeline }
 
     it 'returns the correct refspecs' do

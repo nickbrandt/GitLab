@@ -4,175 +4,65 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::Ci::Config::Entry::Artifacts do
   let(:entry) { described_class.new(config) }
+  let(:class_name) { described_class.name.demodulize.underscore }
 
-  describe 'validation' do
-    context 'when entry config value is correct' do
-      let(:config) { { paths: %w[public/] } }
+  describe 'validations' do
+    it_behaves_like 'archivable validations'
 
-      describe '#value' do
-        it 'returns artifacts configuration' do
+    context 'when valid' do
+      context "with 'archives' keyword" do
+        let(:config) { { paths: %w[public/], archives: [{ name: 'hello', path: 'path/file.txt' }] } }
+
+        it 'returns valid entry' do
           expect(entry.value).to eq config
-        end
-      end
-
-      describe '#valid?' do
-        it 'is valid' do
           expect(entry).to be_valid
         end
       end
 
-      context "when value includes 'reports' keyword" do
+      context "with 'reports' keyword" do
         let(:config) { { paths: %w[public/], reports: { junit: 'junit.xml' } } }
 
-        it 'returns general artifact and report-type artifacts configuration' do
+        it 'returns valid entry' do
           expect(entry.value).to eq config
-        end
-      end
-
-      context "when value includes 'expose_as' keyword" do
-        let(:config) { { paths: %w[results.txt], expose_as: "Test results" } }
-
-        it 'returns general artifact and report-type artifacts configuration' do
-          expect(entry.value).to eq config
+          expect(entry).to be_valid
         end
       end
     end
 
-    context 'when entry value is not correct' do
-      describe '#errors' do
-        context 'when value of attribute is invalid' do
-          let(:config) { { name: 10 } }
+    context 'when invalid' do
+      context "with 'archives' keyword" do
+        let(:config) { { paths: %w[public/], archives: { name: 'hello', path: 'path/file.txt' } } }
 
-          it 'reports error' do
-            expect(entry.errors)
-              .to include 'artifacts name should be a string'
-          end
+        it 'reports error' do
+          expect(entry.errors)
+            .to include 'artifacts archives should be a array'
         end
+      end
 
-        context 'when there is an unknown key present' do
-          let(:config) { { test: 100 } }
+      context "with 'reports' keyword" do
+        let(:config) { { paths: %w[public/], reports: 'junit' } }
 
-          it 'reports error' do
-            expect(entry.errors)
-              .to include 'artifacts config contains unknown keys: test'
-          end
-        end
-
-        context "when 'reports' keyword is not hash" do
-          let(:config) { { paths: %w[public/], reports: 'junit.xml' } }
-
-          it 'reports error' do
-            expect(entry.errors)
-              .to include 'artifacts reports should be a hash'
-          end
-        end
-
-        context "when 'expose_as' is not a string" do
-          let(:config) { { paths: %w[results.txt], expose_as: 1 } }
-
-          it 'reports error' do
-            expect(entry.errors)
-              .to include 'artifacts expose as should be a string'
-          end
-        end
-
-        context "when 'expose_as' is too long" do
-          let(:config) { { paths: %w[results.txt], expose_as: 'A' * 101 } }
-
-          it 'reports error' do
-            expect(entry.errors)
-              .to include 'artifacts expose as is too long (maximum is 100 characters)'
-          end
-        end
-
-        context "when 'expose_as' is an empty string" do
-          let(:config) { { paths: %w[results.txt], expose_as: '' } }
-
-          it 'reports error' do
-            expect(entry.errors)
-              .to include 'artifacts expose as ' + Gitlab::Ci::Config::Entry::Artifacts::EXPOSE_AS_ERROR_MESSAGE
-          end
-        end
-
-        context "when 'expose_as' contains invalid characters" do
-          let(:config) do
-            { paths: %w[results.txt], expose_as: '<script>alert("xss");</script>' }
-          end
-
-          it 'reports error' do
-            expect(entry.errors)
-              .to include 'artifacts expose as ' + Gitlab::Ci::Config::Entry::Artifacts::EXPOSE_AS_ERROR_MESSAGE
-          end
-        end
-
-        context "when 'expose_as' is used without 'paths'" do
-          let(:config) { { expose_as: 'Test results' } }
-
-          it 'reports error' do
-            expect(entry.errors)
-              .to include "artifacts paths can't be blank"
-          end
-        end
-
-        context "when 'paths' includes '*' and 'expose_as' is defined" do
-          let(:config) { { expose_as: 'Test results', paths: ['test.txt', 'test*.txt'] } }
-
-          it 'reports error' do
-            expect(entry.errors)
-              .to include "artifacts paths can't contain '*' when used with 'expose_as'"
-          end
+        it 'reports error' do
+          expect(entry.errors)
+            .to include 'artifacts reports should be a hash'
         end
       end
     end
+  end
 
-    describe 'excluded artifacts' do
-      context 'when configuration is valid and the feature is enabled' do
-        before do
-          stub_feature_flags(ci_artifacts_exclude: true)
-        end
+  describe '#compose!' do
+    let(:config) { { reports: {}, paths: %w[public/], archives: [{ name: 'hello', path: 'path/file.txt' }] } }
 
-        context 'when configuration is valid' do
-          let(:config) { { untracked: true, exclude: ['some/directory/'] } }
+    it 'composes archives' do
+      entry.compose!
 
-          it 'correctly parses the configuration' do
-            expect(entry).to be_valid
-            expect(entry.value).to eq config
-          end
-        end
+      expect(entry[:archives]).to be_a(Gitlab::Config::Entry::ComposableArray)
+    end
 
-        context 'when configuration is not valid' do
-          let(:config) { { untracked: true, exclude: 1234 } }
+    it 'composes reports' do
+      entry.compose!
 
-          it 'returns an error' do
-            expect(entry).not_to be_valid
-            expect(entry.errors)
-              .to include 'artifacts exclude should be an array of strings'
-          end
-        end
-      end
-
-      context 'when artifacts/exclude feature is disabled' do
-        before do
-          stub_feature_flags(ci_artifacts_exclude: false)
-        end
-
-        context 'when configuration has been provided' do
-          let(:config) { { untracked: true, exclude: ['some/directory/'] } }
-
-          it 'returns an error' do
-            expect(entry).not_to be_valid
-            expect(entry.errors).to include 'artifacts exclude feature is disabled'
-          end
-        end
-
-        context 'when configuration is not present' do
-          let(:config) { { untracked: true } }
-
-          it 'is a valid configuration' do
-            expect(entry).to be_valid
-          end
-        end
-      end
+      expect(entry[:reports]).to be_a(Gitlab::Ci::Config::Entry::Reports)
     end
   end
 end

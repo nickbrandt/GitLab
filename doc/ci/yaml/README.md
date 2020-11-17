@@ -3256,6 +3256,47 @@ the expiry time. [Introduced in](https://gitlab.com/gitlab-org/gitlab/-/issues/1
 GitLab 13.0 behind a disabled feature flag, and [made the default behavior](https://gitlab.com/gitlab-org/gitlab/-/issues/229936)
 in GitLab 13.4.
 
+#### `artifacts:archives`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/18744) in GitLab 13.7.
+
+`artifacts:archives` is used to create multiple artifact archives per job. All of the `artifacts:`
+syntax can be used with `artifacts:archives`, one time per archive, except for
+`archives:` or `reports:`. Each artifact is a single list (array) item under `artifacts:archives`.
+`name:` and `path:` are mandatory keywords, the rest are optional.
+
+For example, use the example below to create the following multiple artifacts:
+
+- An archive named `coverage` that uploads `/coverage/path-1.txt` and `/coverage/path-2.txt`
+  only on success.
+- An archive named `failures` that uploads `/failure/file-1.txt` only on failure.
+- Two `artifacts:reports`, for `junit: rspec.xml` and `terraform: tfplan.json`
+
+```yaml
+artifacts:
+  archives:
+    - name: coverage
+      untracked: false
+      paths: 
+        - /coverage/file-1.txt
+        - /coverage/file-2.txt
+      expose_as: test_coverage
+      when: on_success
+    - name: failures
+      paths: 
+        - /failure/file-1.txt
+      when: on_failure
+  reports:
+    junit: rspec.xml
+    terraform: tfplan.json
+```
+
+##### Limitations
+
+In 13.7 artifacts specified in this way are only avalible for download via the artifacts dropdown in 
+the project pipeline index at `<path-to-project>/-/pipelines`. Only the first archive specified by a given job
+will be passed to the next stages by default or when a job is specified as a dependency using `dependencies`.
+
 #### `artifacts:reports`
 
 The [`artifacts:reports` keyword](../pipelines/job_artifacts.md#artifactsreports)

@@ -147,7 +147,11 @@ class Projects::ArtifactsController < Projects::ApplicationController
   end
 
   def artifacts_file
-    @artifacts_file ||= build&.artifacts_file_for_type(params[:file_type] || :archive)
+    @artifacts_file ||= if params[:artifact_id]
+                          project.job_artifacts.find(params[:artifact_id])&.file
+                        else
+                          build&.job_artifact_by_file_type(params[:file_type] || 'archive')&.file
+                        end
   end
 
   def zip_artifact?

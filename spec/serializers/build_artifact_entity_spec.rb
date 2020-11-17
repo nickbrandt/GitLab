@@ -13,7 +13,7 @@ RSpec.describe BuildArtifactEntity do
   describe '#as_json' do
     subject { entity.as_json }
 
-    it 'contains job name' do
+    it 'name contains job name and file type name' do
       expect(subject[:name]).to eq "test:codequality"
     end
 
@@ -23,13 +23,29 @@ RSpec.describe BuildArtifactEntity do
 
     it 'contains paths to the artifacts' do
       expect(subject[:path])
-        .to include "jobs/#{job.id}/artifacts/download?file_type=codequality"
+        .to include "jobs/#{job.id}/artifacts/download?artifact_id=#{artifact.id}"
 
       expect(subject[:keep_path])
         .to include "jobs/#{job.id}/artifacts/keep"
 
       expect(subject[:browse_path])
         .to include "jobs/#{job.id}/artifacts/browse"
+    end
+
+    context 'when archive' do
+      let(:artifact) { create(:ci_job_artifact) }
+
+      it 'name contains job name, file type name, and file name' do
+        expect(subject[:name]).to eq "test:archive:artifact #{artifact.id}"
+      end
+
+      context 'with file_in_database not null' do
+        let(:artifact) { create(:ci_job_artifact, :archive) }
+
+        it 'name contains job name, file type name, and file name' do
+          expect(subject[:name]).to eq "test:archive:ci_build_artifacts"
+        end
+      end
     end
   end
 end

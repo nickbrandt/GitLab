@@ -52,6 +52,13 @@ class BuildDetailsEntity < JobEntity
     end
   end
 
+  expose :artifacts do |pipeline, options|
+    # should we expose report artifacts here?
+    artifacts = build.job_artifacts
+
+    BuildArtifactEntity.represent(artifacts, options)
+  end
+
   expose :report_artifacts,
     as: :reports,
     using: JobArtifactReportEntity,

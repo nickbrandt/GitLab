@@ -1893,16 +1893,49 @@ RSpec.describe Ci::Build do
     end
   end
 
-  describe '#artifacts_file_for_type' do
-    let(:build) { create(:ci_build, :artifacts) }
-    let(:file_type) { :archive }
+  context 'with multiple archives' do
+    let_it_be(:build) { create(:ci_build) }
+    let_it_be(:file_type) { :archive }
 
-    subject { build.artifacts_file_for_type(file_type) }
+    let_it_be(:first_archive) { create(:ci_job_artifact, :archive, job: build, expire_at: build.artifacts_expire_at) }
+    let_it_be(:second_archive) { create(:ci_job_artifact, :archive, job: build, expire_at: build.artifacts_expire_at) }
 
-    it 'queries artifacts for type' do
-      expect(build).to receive_message_chain(:job_artifacts, :find_by).with(file_type: Ci::JobArtifact.file_types[file_type])
+    describe '#job_artifacts_archive' do
+      subject(:result) { build.job_artifacts_archive }
 
-      subject
+      it 'finds the first created_at of a file type' do
+        expect(result).to eq(first_archive)
+      end
+    end
+
+    describe '#job_artifacts_archives' do
+      subject(:result) { build.job_artifacts_archives }
+
+      it 'finds a list of archives' do
+        expect(result.to_a).to contain_exactly(first_archive, second_archive)
+      end
+    end
+
+    describe '#job_artifact_by_file_type' do
+      subject(:result) { build.job_artifact_by_file_type(file_type) }
+
+      context 'when requesting an archive' do
+        let(:file_type) { 'archive' }
+
+        it 'finds the first created_at of a file type' do
+          expect(result).to eq(first_archive)
+        end
+      end
+
+      context 'when requesting other files by type' do
+        let_it_be(:metadata_artifact) { create(:ci_job_artifact, :metadata, job: build, expire_at: build.artifacts_expire_at) }
+
+        let(:file_type) { 'metadata' }
+
+        it 'finds the first created_at of a file type' do
+          expect(result).to eq(metadata_artifact)
+        end
+      end
     end
   end
 

@@ -35,7 +35,7 @@ RSpec.describe Ci::RetryBuildService do
     %i[id status user token token_encrypted coverage trace runner
        artifacts_expire_at
        created_at updated_at started_at finished_at queued_at erased_by
-       erased_at auto_canceled_by job_artifacts job_artifacts_archive
+       erased_at auto_canceled_by job_artifacts job_artifacts_archive job_artifacts_archives
        job_artifacts_metadata job_artifacts_trace job_artifacts_junit
        job_artifacts_sast job_artifacts_secret_detection job_artifacts_dependency_scanning
        job_artifacts_container_scanning job_artifacts_dast
