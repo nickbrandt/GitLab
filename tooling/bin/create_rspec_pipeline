@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'erb'
+require 'json'
+require_relative '../lib/tooling/rspec_parallel_calculator'
+
+output_file = ARGV.shift
+
+json = File.read(ENV['KNAPSACK_RSPEC_SUITE_REPORT_PATH'])
+knapsack_report = JSON.parse(json) # rubocop:disable Gitlab/Json
+
+calculator = Tooling::RSpecParallelCalculator.new(knapsack_report, target_minutes: ENV['RSPEC_TARGET_MINUTES_PER_JOB'])
+
+yaml = ERB.new(File.read(".gitlab/ci/templates/rspec.yml.erb")).result_with_hash(calculator: calculator)
+File.write(output_file, yaml)
