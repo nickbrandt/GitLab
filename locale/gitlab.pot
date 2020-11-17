@@ -21225,7 +21225,10 @@ msgstr ""
 msgid "ProjectSettings|Enable 'Delete source branch' option by default"
 msgstr ""
 
-msgid "ProjectSettings|Enable merge trains and pipelines for merged results"
+msgid "ProjectSettings|Enable merge trains."
+msgstr ""
+
+msgid "ProjectSettings|Enable merged results pipelines."
 msgstr ""
 
 msgid "ProjectSettings|Encourage"
@@ -21265,6 +21268,9 @@ msgid "ProjectSettings|Git Large File Storage (LFS)"
 msgstr ""
 
 msgid "ProjectSettings|Global"
+msgstr ""
+
+msgid "ProjectSettings|If pipelines for merge requests are enabled in the CI/CD configuration file, pipelines validate the combined results of the source and target branches."
 msgstr ""
 
 msgid "ProjectSettings|Internal"
@@ -21325,9 +21331,6 @@ msgid "ProjectSettings|Pages for project documentation"
 msgstr ""
 
 msgid "ProjectSettings|Pipelines"
-msgstr ""
-
-msgid "ProjectSettings|Pipelines for merge requests must be enabled in the CI/CD configuration file, or pipelines could be unresolvable or dropped"
 msgstr ""
 
 msgid "ProjectSettings|Pipelines must succeed"
@@ -21424,6 +21427,9 @@ msgid "ProjectSettings|View and edit files in this project"
 msgstr ""
 
 msgid "ProjectSettings|View and edit files in this project. Non-project members will only have read access"
+msgstr ""
+
+msgid "ProjectSettings|When approved for merge, merge requests are queued and pipelines validate the combined results of the source and target branches before merge."
 msgstr ""
 
 msgid "ProjectSettings|When conflicts arise the user is given the option to rebase"
