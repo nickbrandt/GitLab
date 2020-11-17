@@ -556,7 +556,6 @@ database encryption. Proceed with caution.
 1. On the **GitLab server**, to enable Pages, add the following to `/etc/gitlab/gitlab.rb`:
 
    ```ruby
-   gitlab_pages['enable'] = true
    pages_external_url "http://<pages_server_URL>"
    ```
 
@@ -587,18 +586,11 @@ database encryption. Proceed with caution.
    to include:
 
    ```ruby
-   external_url 'http://<gitlab_server_IP_or_URL>'
+   roles ['pages_role']
+
    pages_external_url "http://<pages_server_URL>"
-   postgresql['enable'] = false
-   redis['enable'] = false
-   prometheus['enable'] = false
-   puma['enable'] = false
-   sidekiq['enable'] = false
-   gitlab_workhorse['enable'] = false
-   gitaly['enable'] = false
-   alertmanager['enable'] = false
-   node_exporter['enable'] = false
-   gitlab_rails['auto_migrate'] = false
+
+   gitlab_pages['gitlab_server'] = 'http://<gitlab_server_IP_or_URL>'
    ```
 
 1. Create a backup of the secrets file on the **Pages server**:
