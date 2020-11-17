@@ -67,13 +67,24 @@ export default {
         };
       },
       update(data) {
+        console.log('update(data) is being called!', data);
         return data?.blobContent?.rawData;
       },
-      result({ data }) {
+      result(result) {
+        console.log('result({ data }) is being called!', result);
+        const { data } = result;
         this.contentModel = data?.blobContent?.rawData ?? '';
       },
-      error(error) {
-        this.handleBlobContentError(error);
+      error({ graphQLErrors, networkError }, vm, key, type, options) {
+        console.log(
+          'Error is being called!',
+          { graphQLErrors, networkError },
+          vm,
+          key,
+          type,
+          options,
+        );
+        this.handleBlobContentError({ graphQLErrors, networkError });
       },
     },
   },
