@@ -96,7 +96,7 @@ export default {
             type="submit"
             variant="success"
             data-test-id="merge-commit-submit-button"
-            class="gl-hover-text-white!"
+            class="disable-hover"
             >{{ $options.strings.mergeCommitButtonText }}</gl-button
           >
         </gl-form>
