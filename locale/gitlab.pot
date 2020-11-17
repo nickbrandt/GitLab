@@ -15946,9 +15946,6 @@ msgstr ""
 msgid "LicenseCompliance|Learn more about %{linkStart}License Approvals%{linkEnd}"
 msgstr ""
 
-msgid "LicenseCompliance|License"
-msgstr ""
-
 msgid "LicenseCompliance|License Approvals"
 msgstr ""
 
@@ -15988,16 +15985,7 @@ msgstr ""
 msgid "LicenseCompliance|License Compliance detected no new licenses"
 msgstr ""
 
-msgid "LicenseCompliance|License details"
-msgstr ""
-
 msgid "LicenseCompliance|License name"
-msgstr ""
-
-msgid "LicenseCompliance|License review"
-msgstr ""
-
-msgid "LicenseCompliance|Packages"
 msgstr ""
 
 msgid "LicenseCompliance|Remove license"
@@ -16013,9 +16001,6 @@ msgid "LicenseCompliance|There are currently no policies that match in this proj
 msgstr ""
 
 msgid "LicenseCompliance|This license already exists in this project."
-msgstr ""
-
-msgid "LicenseCompliance|URL"
 msgstr ""
 
 msgid "LicenseCompliance|You are about to remove the license, %{name}, from this project."
