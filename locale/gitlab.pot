@@ -9235,6 +9235,9 @@ msgstr ""
 msgid "Deployment|running"
 msgstr ""
 
+msgid "Deployment|skipped"
+msgstr ""
+
 msgid "Deployment|success"
 msgstr ""
 
@@ -25105,6 +25108,9 @@ msgid "Skip outdated deployment jobs"
 msgstr ""
 
 msgid "Skipped"
+msgstr ""
+
+msgid "Skipped deployment to"
 msgstr ""
 
 msgid "Slack application"
