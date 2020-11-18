@@ -10,6 +10,8 @@ import VulnerabilitiesCountList from './vulnerability_count_list.vue';
 import Filters from './first_class_vulnerability_filters.vue';
 import CsvExportButton from './csv_export_button.vue';
 
+export const BANNER_COOKIE_KEY = 'hide_vulnerabilities_introduction_banner';
+
 export default {
   components: {
     AutoFixUserCallout,
@@ -39,21 +41,21 @@ export default {
     },
   },
   data() {
-    const shouldShowAutoFixUserCallout =
+    const shoudShowAutoFixUserCallout =
       this.glFeatures.securityAutoFix && !Cookies.get('auto_fix_user_callout_dismissed');
     return {
       filters: {},
-      shouldShowAutoFixUserCallout,
+      shoudShowAutoFixUserCallout,
     };
   },
-  inject: ['dashboardDocumentation', 'autoFixDocumentation', 'projectFullPath'],
+  inject: ['dashboardDocumentation', 'autoFixDocumentation'],
   methods: {
     handleFilterChange(filters) {
       this.filters = filters;
     },
     handleAutoFixUserCalloutClose() {
       Cookies.set('auto_fix_user_callout_dismissed', 'true');
-      this.shouldShowAutoFixUserCallout = false;
+      this.shoudShowAutoFixUserCallout = false;
     },
   },
 };
@@ -63,7 +65,7 @@ export default {
   <div>
     <template v-if="pipeline.id">
       <auto-fix-user-callout
-        v-if="shouldShowAutoFixUserCallout"
+        v-if="shoudShowAutoFixUserCallout"
         :help-page-path="autoFixDocumentation"
         @close="handleAutoFixUserCalloutClose"
       />
@@ -77,7 +79,7 @@ export default {
           <vulnerabilities-count-list :filters="filters" />
         </template>
         <template #sticky>
-          <filters :full-path="projectFullPath" @filterChange="handleFilterChange" />
+          <filters @filterChange="handleFilterChange" />
         </template>
         <project-vulnerabilities-app
           :dashboard-documentation="dashboardDocumentation"
