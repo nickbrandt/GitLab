@@ -9918,6 +9918,9 @@ msgstr ""
 msgid "Edit in single-file editor"
 msgstr ""
 
+msgid "Edit inline"
+msgstr ""
+
 msgid "Edit issues"
 msgstr ""
 
@@ -14718,6 +14721,9 @@ msgid "Integrations|When a Jira issue is mentioned in a commit or merge request 
 msgstr ""
 
 msgid "Integrations|You can now close this window and return to the GitLab for Jira application."
+msgstr ""
+
+msgid "Interactive mode"
 msgstr ""
 
 msgid "Interested parties can even contribute by pushing commits if they want to."
@@ -24964,6 +24970,9 @@ msgid_plural "Showing %d events"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Showing %{conflict_start}%{conflicts_text}%{strong_end} between %{ref_start}%{source_branch}%{strong_end} and %{ref_start}%{target_branch}%{strong_end}"
+msgstr ""
+
 msgid "Showing %{count} of %{total} projects"
 msgstr ""
 
@@ -29890,6 +29899,9 @@ msgid "View file @ "
 msgstr ""
 
 msgid "View file @ %{commitSha}"
+msgstr ""
+
+msgid "View file @%{commit_sha}"
 msgstr ""
 
 msgid "View full dashboard"
