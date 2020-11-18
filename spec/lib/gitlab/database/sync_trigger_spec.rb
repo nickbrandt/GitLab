@@ -4,8 +4,10 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::Database::SyncTrigger do
   include TriggerHelpers
+  include SchemaCommentHelpers
 
   let(:source_table_name) { :_test_source_table }
+  let(:destination_table_name) { :_test_destination_table }
   let(:function_name) { '_test_sync_function' }
   let(:trigger_name) { '_test_sync_trigger' }
   let(:logger) { double('logger') }
@@ -21,7 +23,7 @@ RSpec.describe Gitlab::Database::SyncTrigger do
         created_at timestamptz NOT NULL,
         updated_at timestamptz NOT NULL);
 
-      CREATE TABLE _test_destination_table (LIKE _test_source_table);
+      CREATE TABLE #{destination_table_name} (LIKE _test_source_table);
     SQL
 
     allow(sync_trigger).to receive(:function_name).and_return(function_name)
@@ -36,21 +38,22 @@ RSpec.describe Gitlab::Database::SyncTrigger do
 
       before do
         source_model.table_name = source_table_name
-        destination_model.table_name = '_test_destination_table'
+        destination_model.table_name = destination_table_name
       end
 
       it 'creates the function trigger to fire on all writes' do
         expect_function_not_to_exist(function_name)
         expect_trigger_not_to_exist(source_table_name, trigger_name)
 
-        sync_trigger.create(:_test_destination_table, :id)
+        sync_trigger.create(destination_table_name, :id)
 
         expect_function_to_exist(function_name)
+        expect_function_to_have_comment(function_name, "Test: table sync for #{source_table_name} table")
         expect_valid_function_trigger(source_table_name, trigger_name, function_name, after: %w[delete insert update])
       end
 
       it 'creates a valid function that copies all values' do
-        sync_trigger.create(:_test_destination_table, :id)
+        sync_trigger.create(destination_table_name, :id)
 
         expect(destination_model.count).to eq(0)
 
@@ -88,14 +91,14 @@ RSpec.describe Gitlab::Database::SyncTrigger do
       it 'logs a warning' do
         expect(logger).to receive(:warn).with(/Test sync function not created/)
 
-        sync_trigger.create(:_test_destination_table, :id)
+        sync_trigger.create(destination_table_name, :id)
       end
 
       it 'creates the trigger to call the function' do
         expect_function_to_exist(function_name)
         expect_trigger_not_to_exist(source_table_name, trigger_name)
 
-        sync_trigger.create(:_test_destination_table, :id)
+        sync_trigger.create(destination_table_name, :id)
 
         expect_function_to_exist(function_name)
         expect_valid_function_trigger(source_table_name, trigger_name, function_name, after: %w[delete insert update])
@@ -125,14 +128,14 @@ RSpec.describe Gitlab::Database::SyncTrigger do
       it 'logs a warning' do
         expect(logger).to receive(:warn).with(/Test sync trigger not created/)
 
-        sync_trigger.create(:_test_destination_table, :id)
+        sync_trigger.create(destination_table_name, :id)
       end
 
       it 'leaves the existing trigger in place' do
         expect_function_to_exist(function_name)
         expect_valid_function_trigger(source_table_name, trigger_name, function_name, after: %w[delete insert update])
 
-        sync_trigger.create(:_test_destination_table, :id)
+        sync_trigger.create(destination_table_name, :id)
 
         expect_function_to_exist(function_name)
         expect_valid_function_trigger(source_table_name, trigger_name, function_name, after: %w[delete insert update])

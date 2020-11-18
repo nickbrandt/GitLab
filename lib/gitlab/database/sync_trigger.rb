@@ -25,14 +25,6 @@ module Gitlab
         drop_sync_function
       end
 
-      def trigger_name
-        @trigger_name ||= object_name(source_table_name, 'table_sync_trigger')
-      end
-
-      def function_name
-        @function_name ||= object_name(source_table_name, 'table_sync_function')
-      end
-
       private
 
       attr_reader :message_context, :logger
@@ -41,6 +33,14 @@ module Gitlab
         @source_table_name = source_table_name
         @message_context = message_context
         @logger = logger
+      end
+
+      def trigger_name
+        @trigger_name ||= object_name(source_table_name, 'table_sync_trigger')
+      end
+
+      def function_name
+        @function_name ||= object_name(source_table_name, 'table_sync_function')
       end
 
       def create_sync_function(destination_table_name, key_column_name)
