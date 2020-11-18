@@ -67,24 +67,13 @@ export default {
         };
       },
       update(data) {
-        console.log('update(data) is being called!', data);
         return data?.blobContent?.rawData;
       },
-      result(result) {
-        console.log('result({ data }) is being called!', result);
-        const { data } = result;
+      result({ data }) {
         this.contentModel = data?.blobContent?.rawData ?? '';
       },
-      error({ graphQLErrors, networkError }, vm, key, type, options) {
-        console.log(
-          'Error is being called!',
-          { graphQLErrors, networkError },
-          vm,
-          key,
-          type,
-          options,
-        );
-        this.handleBlobContentError({ graphQLErrors, networkError });
+      error(error) {
+        this.handleBlobContentError(error);
       },
     },
   },
@@ -110,7 +99,7 @@ export default {
     commitErrorMsg: s__('Pipelines|CI file could not be saved: %{reason}'),
   },
   methods: {
-    handleBlobContentError(error) {
+    handleBlobContentError(error = {}) {
       const { message: generalReason, networkError } = error;
 
       const { data } = networkError?.response ?? {};
@@ -118,7 +107,7 @@ export default {
       // 400 for a missing ref uses `error`
       const networkReason = data?.message ?? data?.error;
 
-      const reason = networkReason ?? generalReason ?? this.$options.i18n.unknownError;
+      const reason = networkReason || generalReason || this.$options.i18n.unknownError;
       this.errorMessage = sprintf(this.$options.i18n.fetchErrorMsg, { reason });
     },
     redirectToNewMergeRequest(sourceBranch) {

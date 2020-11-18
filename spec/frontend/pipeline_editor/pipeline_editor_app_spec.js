@@ -21,7 +21,6 @@ import EditorLite from '~/vue_shared/components/editor_lite.vue';
 import PipelineGraph from '~/pipelines/components/pipeline_graph/pipeline_graph.vue';
 import PipelineEditorApp from '~/pipeline_editor/pipeline_editor_app.vue';
 import CommitForm from '~/pipeline_editor/components/commit/commit_form.vue';
-import getBlobContent from '~/pipeline_editor/graphql/queries/blob_content.graphql';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);
@@ -33,57 +32,17 @@ jest.mock('~/lib/utils/url_utility', () => ({
   mergeUrlParams: jest.requireActual('~/lib/utils/url_utility').mergeUrlParams,
 }));
 
-jest.mock('~/api', () => ({
-  getRawFile: () => Promise.resolve(mockCiYml),
-}));
-
 describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   let wrapper;
+
   let mockMutate;
-  let fakeApollo;
+  let mockApollo;
+  let mockBlobContentData;
 
-  const createComponentWithApollo = ({ props = {} } = {}, mountFn = shallowMount) => {
-    fakeApollo = createMockApollo([], {}); // only local resolvers
-
-    // setup local resolver with writeQuery
-
-    console.log(fakeApollo.clients.defaultClient.cache.data);
-
-    fakeApollo.clients.defaultClient.cache.writeQuery({
-      query: getBlobContent,
-      data: {
-        blobContent: {
-          __typename: 'BlobContent',
-          rawData: mockCiYml,
-        },
-        // QUESTION: Would adding errors work anywhere in writeQuery?
-        // errors: ['my error'],
-      },
-    });
-
-    console.log(fakeApollo.clients.defaultClient.cache.data);
-
-    wrapper = mountFn(PipelineEditorApp, {
-      localVue,
-      propsData: {
-        projectPath: mockProjectPath,
-        defaultBranch: mockDefaultBranch,
-        ciConfigPath: mockCiConfigPath,
-        newMergeRequestPath: mockNewMergeRequestPath,
-        commitId: mockCommitId,
-        ...props,
-      },
-      stubs: {
-        GlTabs,
-        GlButton,
-        TextEditor,
-        CommitForm,
-      },
-      apolloProvider: fakeApollo,
-    });
-  };
-
-  const createComponent = ({ props = {}, loading = false } = {}, mountFn = shallowMount) => {
+  const createComponent = (
+    { props = {}, loading = false, options = {} } = {},
+    mountFn = shallowMount,
+  ) => {
     mockMutate = jest.fn().mockResolvedValue({
       data: {
         commitCreate: {
@@ -94,7 +53,6 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     });
 
     wrapper = mountFn(PipelineEditorApp, {
-      // localVue,
       propsData: {
         projectPath: mockProjectPath,
         defaultBranch: mockDefaultBranch,
@@ -119,7 +77,29 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
           mutate: mockMutate,
         },
       },
+      ...options,
     });
+  };
+
+  const createComponentWithApollo = ({ props = {} } = {}, mountFn = shallowMount) => {
+    mockApollo = createMockApollo([], {
+      Query: {
+        blobContent() {
+          return {
+            __typename: 'BlobContent',
+            rawData: mockBlobContentData(),
+          };
+        },
+      },
+    });
+
+    const options = {
+      localVue,
+      mocks: {},
+      apolloProvider: mockApollo,
+    };
+
+    createComponent({ props, options }, mountFn);
   };
 
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
@@ -130,10 +110,11 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   const findCommitBtnLoadingIcon = () => wrapper.find('[type="submit"]').find(GlLoadingIcon);
 
   beforeEach(() => {
-    createComponent();
+    mockBlobContentData = jest.fn();
   });
 
   afterEach(() => {
+    mockBlobContentData.mockReset();
     refreshCurrentPage.mockReset();
     redirectTo.mockReset();
     mockMutate.mockReset();
@@ -149,73 +130,11 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     expect(findEditorLite().exists()).toBe(false);
   });
 
-  describe('handle apollo query errors', () => {
-    class MockError extends Error {
-      constructor(message, data) {
-        super(message);
-        if (data) {
-          this.networkError = {
-            response: { data },
-          };
-        }
-      }
-    }
-
-    it.only('sets a general error message', async () => {
-      // TODO Setup error conditions to run content -> error(error)
-      // Simulating 3 possible error states:
-      // - unknown error
-      // - ref is missing
-      // - file not found
-
-      createComponentWithApollo();
-
-      await waitForPromises();
-
-      // QUESTION: I am also try updating the cache after the component is created
-      fakeApollo.clients.defaultClient.cache.writeQuery({
-        query: getBlobContent,
-        data: {
-          blobContent: {
-            __typename: 'BlobContent',
-            rawData: mockCiYml + 'aaaa',
-          },
-          errors: ['my error'],
-        },
-      });
-
-      await waitForPromises();
-
-      console.log(wrapper.vm.contentModel);
-      console.log(wrapper.vm.content); // should be updated
-      console.log(wrapper.vm.errorMessage); // should be updated
-
-      expect(findAlert().text()).toMatch('CI file could not be loaded: An error');
-    });
-
-    it('sets a 404 error message', async () => {
-      wrapper.vm.handleBlobContentError(new MockError('Error!', { message: 'file not found' }));
-      await nextTick();
-
-      expect(findAlert().text()).toMatch('CI file could not be loaded: file not found');
-    });
-
-    it('sets a 400 error message', async () => {
-      wrapper.vm.handleBlobContentError(new MockError('Error!', { error: 'ref is missing' }));
-      await nextTick();
-
-      expect(findAlert().text()).toMatch('CI file could not be loaded: ref is missing');
-    });
-
-    it('sets a unkown error error message', async () => {
-      wrapper.vm.handleBlobContentError({ message: null });
-      await nextTick();
-
-      expect(findAlert().text()).toMatch('CI file could not be loaded: Unknown Error');
-    });
-  });
-
   describe('tabs', () => {
+    beforeEach(() => {
+      createComponent();
+    });
+
     it('displays tabs and their content', async () => {
       expect(
         findTabAt(0)
@@ -241,16 +160,18 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   });
 
   describe('when data is set', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      createComponent();
+
       wrapper.setData({
         content: mockCiYml,
         contentModel: mockCiYml,
       });
+
+      await nextTick();
     });
 
-    it('displays content after the query loads', async () => {
-      await nextTick();
-
+    it('displays content after the query loads', () => {
       expect(findLoadingIcon().exists()).toBe(false);
       expect(findEditorLite().props('value')).toBe(mockCiYml);
     });
@@ -295,7 +216,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         });
 
         it('shows no saving state', () => {
-          expect(findCommitBtnLoadingIcon().exists()).toBe(true);
+          expect(findCommitBtnLoadingIcon().exists()).toBe(false);
         });
       });
 
@@ -380,7 +301,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         });
       });
 
-      describe('when the commit is cancelled', () => {
+      describe('when the commit form is cancelled', () => {
         const otherContent = 'other content';
 
         beforeEach(async () => {
@@ -396,6 +317,56 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
           expect(findEditorLite().props('value')).toBe(mockCiYml);
         });
       });
+    });
+  });
+
+  describe('displays fetch content errors', () => {
+    it('no error is show when data is set', async () => {
+      mockBlobContentData.mockResolvedValue(mockCiYml);
+      createComponentWithApollo();
+
+      await waitForPromises();
+
+      expect(findAlert().exists()).toBe(false);
+      expect(findEditorLite().props('value')).toBe(mockCiYml);
+    });
+
+    it('shows a 404 error message', async () => {
+      mockBlobContentData.mockRejectedValueOnce({
+        response: {
+          data: {
+            message: 'missing file!',
+          },
+        },
+      });
+      createComponentWithApollo();
+
+      await waitForPromises();
+
+      expect(findAlert().text()).toMatch('CI file could not be loaded: missing file!');
+    });
+
+    it('shows a 400 error message', async () => {
+      mockBlobContentData.mockRejectedValueOnce({
+        response: {
+          data: {
+            error: 'ref is missing',
+          },
+        },
+      });
+      createComponentWithApollo();
+
+      await waitForPromises();
+
+      expect(findAlert().text()).toMatch('CI file could not be loaded: ref is missing');
+    });
+
+    it('shows a unkown error message', async () => {
+      mockBlobContentData.mockRejectedValueOnce('');
+      createComponentWithApollo();
+      await waitForPromises();
+
+      expect(findAlert().text()).toMatch('CI file could not be loaded: Unknown Error');
     });
   });
 });
