@@ -229,19 +229,19 @@ PUT /groups/:id/clusters/:cluster_id
 
 Parameters:
 
-| Attribute                                 | Type           | Required | Description                                                                                         |
-| ----------------------------------------- | -------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `id`                                      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding)                       |
-| `cluster_id`                              | integer        | yes      | The ID of the cluster                                                                               |
-| `name`                                    | string         | no       | The name of the cluster                                                                             |
-| `domain`                                  | string         | no       | The [base domain](../user/group/clusters/index.md#base-domain) of the cluster                       |
-| `management_project_id`                   | integer        | no       | The ID of the [management project](../user/clusters/management_project.md) for the cluster          |
-| `enabled`                                 | boolean        | no       | Determines if cluster is active or not, defaults to true                                            |
-| `managed`                                 | boolean        | no       | Determines if GitLab will manage namespaces and service accounts for this cluster, defaults to true |
-| `platform_kubernetes_attributes[api_url]` | string         | no       | The URL to access the Kubernetes API                                                                |
-| `platform_kubernetes_attributes[token]`   | string         | no       | The token to authenticate against Kubernetes                                                        |
-| `platform_kubernetes_attributes[ca_cert]` | string         | no       | TLS certificate. Required if API is using a self-signed TLS certificate.                            |
-| `environment_scope`                       | string         | no       | The associated environment to the cluster **(PREMIUM)**                                             |
+| Attribute                                 | Type           | Required | Description                                                                                |
+| ----------------------------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `id`                                      | integer/string | yes      | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding)              |
+| `cluster_id`                              | integer        | yes      | The ID of the cluster                                                                      |
+| `name`                                    | string         | no       | The name of the cluster                                                                    |
+| `domain`                                  | string         | no       | The [base domain](../user/group/clusters/index.md#base-domain) of the cluster              |
+| `management_project_id`                   | integer        | no       | The ID of the [management project](../user/clusters/management_project.md) for the cluster |
+| `enabled`                                 | boolean        | no       | Determines if cluster is active or not                                                     |
+| `managed`                                 | boolean        | no       | Determines if GitLab will manage namespaces and service accounts for this cluster          |
+| `platform_kubernetes_attributes[api_url]` | string         | no       | The URL to access the Kubernetes API                                                       |
+| `platform_kubernetes_attributes[token]`   | string         | no       | The token to authenticate against Kubernetes                                               |
+| `platform_kubernetes_attributes[ca_cert]` | string         | no       | TLS certificate. Required if API is using a self-signed TLS certificate.                   |
+| `environment_scope`                       | string         | no       | The associated environment to the cluster **(PREMIUM)**                                    |
 
 NOTE: **Note:**
 `name`, `api_url`, `ca_cert` and `token` can only be updated if the cluster was added
