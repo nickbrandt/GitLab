@@ -20,6 +20,17 @@ RSpec.describe "Issues > User edits issue", :js do
       sign_in(user)
     end
 
+    context 'with multiple_issue_assignees feature flag off' do
+      before do
+        stub_feature_flags(multiple_issue_assignees: false)
+      end
+
+      it 'displays singular Assignee title' do
+        visit edit_project_issue_path(project, issue)
+        expect(page).to have_content "Assignee"
+      end
+    end
+
     context "from edit page" do
       before do
         visit edit_project_issue_path(project, issue)
@@ -38,8 +49,7 @@ RSpec.describe "Issues > User edits issue", :js do
 
       it 'allows user to select unassigned' do
         visit edit_project_issue_path(project, issue)
-
-        expect(page).to have_content "Assignee #{user.name}"
+        expect(page).to have_content "Assignees #{user.name}"
 
         first('.js-user-search').click
         click_link 'Unassigned'
