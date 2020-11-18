@@ -106,10 +106,21 @@ RSpec.describe 'Rack Attack global throttles' do
         let(:request_jobs_url) { '/api/v4/jobs/request' }
         let(:runner) { create(:ci_runner) }
 
-        it 'does not cont as unauthenticated' do
+        it 'does not count as unauthenticated' do
           (1 + requests_per_period).times do
             post request_jobs_url, params: { token: runner.token }
             expect(response).to have_gitlab_http_status(:no_content)
+          end
+        end
+      end
+
+      context 'when the request is to a health endpoint' do
+        let(:health_endpoint) { '/-/metrics' }
+
+        it 'does not throttle the requests' do
+          (1 + requests_per_period).times do
+            get health_endpoint
+            expect(response).to have_gitlab_http_status(:ok)
           end
         end
       end

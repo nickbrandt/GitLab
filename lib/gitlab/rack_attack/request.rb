@@ -24,7 +24,7 @@ module Gitlab
       end
 
       def health_check_request?
-        path =~ %r{^/-/(health|liveness|readiness)}
+        path =~ %r{^/-/(health|liveness|readiness|metrics)}
       end
 
       def product_analytics_collector_request?
