@@ -17190,6 +17190,23 @@ CREATE SEQUENCE vulnerability_finding_links_id_seq
 
 ALTER SEQUENCE vulnerability_finding_links_id_seq OWNED BY vulnerability_finding_links.id;
 
+CREATE TABLE vulnerability_findings_remediations (
+    id bigint NOT NULL,
+    vulnerability_occurrence_id bigint,
+    vulnerability_remediation_id bigint,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL
+);
+
+CREATE SEQUENCE vulnerability_findings_remediations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE vulnerability_findings_remediations_id_seq OWNED BY vulnerability_findings_remediations.id;
+
 CREATE TABLE vulnerability_historical_statistics (
     id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -17315,6 +17332,26 @@ CREATE SEQUENCE vulnerability_occurrences_id_seq
     CACHE 1;
 
 ALTER SEQUENCE vulnerability_occurrences_id_seq OWNED BY vulnerability_occurrences.id;
+
+CREATE TABLE vulnerability_remediations (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    file_store smallint,
+    summary text NOT NULL,
+    file text NOT NULL,
+    CONSTRAINT check_ac0ccabff3 CHECK ((char_length(summary) <= 200)),
+    CONSTRAINT check_fe3325e3ba CHECK ((char_length(file) <= 255))
+);
+
+CREATE SEQUENCE vulnerability_remediations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE vulnerability_remediations_id_seq OWNED BY vulnerability_remediations.id;
 
 CREATE TABLE vulnerability_scanners (
     id bigint NOT NULL,
@@ -18298,6 +18335,8 @@ ALTER TABLE ONLY vulnerability_feedback ALTER COLUMN id SET DEFAULT nextval('vul
 
 ALTER TABLE ONLY vulnerability_finding_links ALTER COLUMN id SET DEFAULT nextval('vulnerability_finding_links_id_seq'::regclass);
 
+ALTER TABLE ONLY vulnerability_findings_remediations ALTER COLUMN id SET DEFAULT nextval('vulnerability_findings_remediations_id_seq'::regclass);
+
 ALTER TABLE ONLY vulnerability_historical_statistics ALTER COLUMN id SET DEFAULT nextval('vulnerability_historical_statistics_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_identifiers ALTER COLUMN id SET DEFAULT nextval('vulnerability_identifiers_id_seq'::regclass);
@@ -18309,6 +18348,8 @@ ALTER TABLE ONLY vulnerability_occurrence_identifiers ALTER COLUMN id SET DEFAUL
 ALTER TABLE ONLY vulnerability_occurrence_pipelines ALTER COLUMN id SET DEFAULT nextval('vulnerability_occurrence_pipelines_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_occurrences ALTER COLUMN id SET DEFAULT nextval('vulnerability_occurrences_id_seq'::regclass);
+
+ALTER TABLE ONLY vulnerability_remediations ALTER COLUMN id SET DEFAULT nextval('vulnerability_remediations_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_scanners ALTER COLUMN id SET DEFAULT nextval('vulnerability_scanners_id_seq'::regclass);
 
@@ -19753,6 +19794,9 @@ ALTER TABLE ONLY vulnerability_feedback
 ALTER TABLE ONLY vulnerability_finding_links
     ADD CONSTRAINT vulnerability_finding_links_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY vulnerability_findings_remediations
+    ADD CONSTRAINT vulnerability_findings_remediations_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY vulnerability_historical_statistics
     ADD CONSTRAINT vulnerability_historical_statistics_pkey PRIMARY KEY (id);
 
@@ -19770,6 +19814,9 @@ ALTER TABLE ONLY vulnerability_occurrence_pipelines
 
 ALTER TABLE ONLY vulnerability_occurrences
     ADD CONSTRAINT vulnerability_occurrences_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY vulnerability_remediations
+    ADD CONSTRAINT vulnerability_remediations_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY vulnerability_scanners
     ADD CONSTRAINT vulnerability_scanners_pkey PRIMARY KEY (id);
@@ -22229,6 +22276,10 @@ CREATE INDEX index_vulnerability_feedback_on_merge_request_id ON vulnerability_f
 
 CREATE INDEX index_vulnerability_feedback_on_pipeline_id ON vulnerability_feedback USING btree (pipeline_id);
 
+CREATE INDEX index_vulnerability_findings_remediations_on_remediation_id ON vulnerability_findings_remediations USING btree (vulnerability_remediation_id);
+
+CREATE UNIQUE INDEX index_vulnerability_findings_remediations_on_unique_keys ON vulnerability_findings_remediations USING btree (vulnerability_occurrence_id, vulnerability_remediation_id);
+
 CREATE INDEX index_vulnerability_historical_statistics_on_date_and_id ON vulnerability_historical_statistics USING btree (date, id);
 
 CREATE UNIQUE INDEX index_vulnerability_identifiers_on_project_id_and_fingerprint ON vulnerability_identifiers USING btree (project_id, fingerprint);
@@ -23508,6 +23559,9 @@ ALTER TABLE ONLY project_alerting_settings
 ALTER TABLE ONLY dast_site_validations
     ADD CONSTRAINT fk_rails_285c617324 FOREIGN KEY (dast_site_token_id) REFERENCES dast_site_tokens(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY vulnerability_findings_remediations
+    ADD CONSTRAINT fk_rails_28a8d0cf93 FOREIGN KEY (vulnerability_occurrence_id) REFERENCES vulnerability_occurrences(id) ON DELETE CASCADE;
+
 ALTER TABLE ONLY resource_state_events
     ADD CONSTRAINT fk_rails_29af06892a FOREIGN KEY (issue_id) REFERENCES issues(id) ON DELETE CASCADE;
 
@@ -23867,6 +23921,9 @@ ALTER TABLE ONLY web_hook_logs
 
 ALTER TABLE ONLY jira_imports
     ADD CONSTRAINT fk_rails_675d38c03b FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY vulnerability_findings_remediations
+    ADD CONSTRAINT fk_rails_681c85ae0f FOREIGN KEY (vulnerability_remediation_id) REFERENCES vulnerability_remediations(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY resource_iteration_events
     ADD CONSTRAINT fk_rails_6830c13ac1 FOREIGN KEY (merge_request_id) REFERENCES merge_requests(id) ON DELETE CASCADE;
