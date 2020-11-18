@@ -88,16 +88,17 @@ const createComponent = ({
 
 describe('Board list component', () => {
   let wrapper;
+  const findByTestId = testId => wrapper.find(`[data-testid="${testId}"]`);
   useFakeRequestAnimationFrame();
+
+  afterEach(() => {
+    wrapper.destroy();
+    wrapper = null;
+  });
 
   describe('When Expanded', () => {
     beforeEach(() => {
       wrapper = createComponent();
-    });
-
-    afterEach(() => {
-      wrapper.destroy();
-      wrapper = null;
     });
 
     it('renders component', () => {
@@ -109,7 +110,7 @@ describe('Board list component', () => {
         state: { listsFlags: { 'gid://gitlab/List/1': { isLoading: true } } },
       });
 
-      expect(wrapper.find('[data-testid="board_list_loading"').exists()).toBe(true);
+      expect(findByTestId('board_list_loading').exists()).toBe(true);
     });
 
     it('renders issues', () => {
@@ -173,11 +174,6 @@ describe('Board list component', () => {
       });
     });
 
-    afterEach(() => {
-      wrapper.destroy();
-      wrapper = null;
-    });
-
     it('loads more issues after scrolling', () => {
       wrapper.vm.listRef.dispatchEvent(new Event('scroll'));
 
@@ -205,11 +201,6 @@ describe('Board list component', () => {
       wrapper = createComponent({
         listProps: { issuesSize: 50 },
       });
-    });
-
-    afterEach(() => {
-      wrapper.destroy();
-      wrapper = null;
     });
 
     describe('when issue count exceeds max issue count', () => {
@@ -243,16 +234,11 @@ describe('Board list component', () => {
       wrapper = createComponent();
     });
 
-    afterEach(() => {
-      wrapper.destroy();
-      wrapper = null;
-    });
-
     describe('handleDragOnStart', () => {
       it('adds a class `is-dragging` to document body', () => {
         expect(document.body.classList.contains('is-dragging')).toBe(false);
 
-        wrapper.find(`[data-testid="tree-root-wrapper"]`).vm.$emit('start');
+        findByTestId('tree-root-wrapper').vm.$emit('start');
 
         expect(document.body.classList.contains('is-dragging')).toBe(true);
       });
@@ -263,7 +249,7 @@ describe('Board list component', () => {
         jest.spyOn(wrapper.vm, 'moveIssue').mockImplementation(() => {});
         document.body.classList.add('is-dragging');
 
-        wrapper.find(`[data-testid="tree-root-wrapper"]`).vm.$emit('end', {
+        findByTestId('tree-root-wrapper').vm.$emit('end', {
           oldIndex: 1,
           newIndex: 0,
           item: {

@@ -3,6 +3,7 @@ import Draggable from 'vuedraggable';
 import { mapActions, mapState } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import defaultSortableConfig from '~/sortable/sortable_config';
+import { sortableStart, sortableEnd } from '~/boards/mixins/sortable_default_options';
 import BoardNewIssue from './board_new_issue_new.vue';
 import BoardCard from './board_card.vue';
 import eventHub from '../eventhub';
@@ -146,24 +147,26 @@ export default {
       });
     },
     handleDragOnStart() {
-      document.body.classList.add('is-dragging');
+      sortableStart();
     },
     handleDragOnEnd(params) {
-      document.body.classList.remove('is-dragging');
+      sortableEnd();
       const { newIndex, oldIndex, from, to, item } = params;
       const { issueId, issueIid, issuePath } = item.dataset;
       const { children } = to;
       let moveBeforeId;
       let moveAfterId;
 
+      const getIssueId = el => Number(el.dataset.issueId);
+
       // If issue is being moved within the same list
       if (from === to) {
         if (newIndex > oldIndex && children.length > 1) {
           // If issue is being moved down we look for the issue that ends up before
-          moveBeforeId = Number(children[newIndex].dataset.issueId);
+          moveBeforeId = getIssueId(children[newIndex]);
         } else if (newIndex < oldIndex && children.length > 1) {
           // If issue is being moved up we look for the issue that ends up after
-          moveAfterId = Number(children[newIndex].dataset.issueId);
+          moveAfterId = getIssueId(children[newIndex]);
         } else {
           // If issue remains in the same list at the same position we do nothing
           return;
@@ -171,11 +174,11 @@ export default {
       } else {
         // We look for the issue that ends up before the moved issue if it exists
         if (children[newIndex - 1]) {
-          moveBeforeId = Number(children[newIndex - 1].dataset.issueId);
+          moveBeforeId = getIssueId(children[newIndex - 1]);
         }
         // We look for the issue that ends up after the moved issue if it exists
         if (children[newIndex]) {
-          moveAfterId = Number(children[newIndex].dataset.issueId);
+          moveAfterId = getIssueId(children[newIndex]);
         }
       }
 
