@@ -1,5 +1,6 @@
 import { s__ } from '~/locale';
 
+export const MAX_REQUEST_COUNT = 10;
 export const DEVOPS_ADOPTION_STRINGS = {
   app: {
     groupsError: s__('DevopsAdoption|There was an error fetching Groups'),
