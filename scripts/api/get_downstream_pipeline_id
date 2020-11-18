@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'optparse'
+require 'cgi'
+require 'json'
+require 'net/http'
+require 'uri'
+
+class BridgeFinder
+  DEFAULT_OPTIONS = {
+    project: ENV['CI_PROJECT_ID'],
+    pipeline_id: ENV['CI_PIPELINE_ID'],
+    api_token: ENV['GITLAB_BOT_MULTI_PROJECT_PIPELINE_POLLING_TOKEN']
+  }.freeze
+
+  def initialize(options)
+    @project = options.delete(:project)
+    @pipeline_id = options.delete(:pipeline_id)
+    @bridge_name = options.delete(:bridge_name)
+  end
+
+  def execute
+    find_bridge_in_pipeline
+  end
+
+  private
+
+  def find_bridge_in_pipeline
+    return unless pipeline_id && bridge_name
+
+    url = "https://gitlab.com/api/v4/projects/#{CGI.escape(project)}/pipelines/#{pipeline_id}/bridges"
+
+    fetch_bridges(url).each do |bridge|
+      return bridge if bridge[:name] == bridge_name
+    end
+  end
+
+  def fetch_bridges(uri_str)
+    uri = URI(uri_str)
+    request = Net::HTTP::Get.new(uri)
+    request['Private-Token'] = api_token if api_token
+
+    Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+      http.request(request) do |response|
+        case response
+        when Net::HTTPSuccess then
+          return JSON.parse(response.body, symbolize_names: true) # rubocop:disable Cop/AvoidReturnFromBlocks
+        else
+          raise "Unexpected response: #{response.value}"
+        end
+      end
+    end
+  end
+
+  attr_reader :project, :pipeline_id, :bridge_name, :api_token
+end
+
+if $0 == __FILE__
+  options = BridgeFinder::DEFAULT_OPTIONS.dup
+
+  OptionParser.new do |opts|
+    opts.on("-p", "--project PROJECT", String, "Project where to find the job (defaults to $CI_PROJECT_ID)") do |value|
+      options[:project] = value
+    end
+
+    opts.on("-i", "--pipeline-id pipeline_id", String, "A pipeline ID (defaults to $CI_PIPELINE_ID)") do |value|
+      options[:pipeline_id] = value
+    end
+
+    opts.on("-b", "--bridge-name bridge_name", String, "A bridge job name that needs to exist in the pipeline") do |value|
+      options[:bridge_name] = value
+    end
+
+    opts.on("-t", "--api-token API_TOKEN", String, "A value API token with the `read_api` scope") do |value|
+      options[:api_token] = value
+    end
+
+    opts.on("-h", "--help", "Prints this help") do
+      puts opts
+      exit
+    end
+  end.parse!
+
+  bridge = BridgeFinder.new(options).execute
+
+  return if bridge.nil?
+
+  puts bridge[:downstream_pipeline][:id]
+end

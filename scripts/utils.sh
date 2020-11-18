@@ -87,6 +87,36 @@ function echosuccess() {
   fi
 }
 
+function download_artifacts_from_upstream_job() {
+  local upstream_pipeline_id="${1}"
+  local job_name="${2}"
+
+  local upstream_job_id
+
+  upstream_job_id=$(scripts/api/get_job_id --pipeline-id "${upstream_pipeline_id}" --job-name "${job_name}")
+
+  scripts/api/download_job_artifact --job-id "${upstream_job_id}"
+
+  unzip -oq artifacts.zip
+  rm artifacts.zip
+}
+
+function download_artifacts_from_downstream_job() {
+  local bridge_name="${1}"
+  local job_name="${2}"
+
+  local downstream_pipeline_id
+  local downstream_job_id
+
+  downstream_pipeline_id=$(scripts/api/get_downstream_pipeline_id --bridge-name "${bridge_name}")
+  downstream_job_id=$(scripts/api/get_job_id --pipeline-id "${downstream_pipeline_id}" --job-name "${job_name}")
+
+  scripts/api/download_job_artifact --job-id "${downstream_job_id}"
+
+  unzip -oq artifacts.zip
+  rm artifacts.zip
+}
+
 function fail_pipeline_early() {
   local dont_interrupt_me_job_id
   dont_interrupt_me_job_id=$(scripts/api/get_job_id --job-query "scope=success" --job-name "dont-interrupt-me")
