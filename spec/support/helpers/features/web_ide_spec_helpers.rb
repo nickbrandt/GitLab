@@ -22,8 +22,6 @@ module WebIdeSpecHelpers
     click_link('Web IDE')
 
     wait_for_requests
-
-    save_monaco_editor_reference
   end
 
   def ide_tree_body
@@ -130,10 +128,6 @@ module WebIdeSpecHelpers
     execute_script("monaco.editor.getModel('#{uri}').setValue('#{escape_javascript(value)}')")
   end
 
-  def ide_set_editor_position(line, col)
-    execute_script("TEST_EDITOR.setPosition(#{{ lineNumber: line, column: col }.to_json})")
-  end
-
   def ide_editor_value
     editor = find('.monaco-editor')
     uri = editor['data-uri']
@@ -179,9 +173,5 @@ module WebIdeSpecHelpers
 
       wait_for_requests
     end
-  end
-
-  def save_monaco_editor_reference
-    evaluate_script("monaco.editor.onDidCreateEditor(editor => { window.TEST_EDITOR = editor; })")
   end
 end
