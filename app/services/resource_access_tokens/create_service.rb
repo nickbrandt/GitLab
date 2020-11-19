@@ -24,6 +24,7 @@ module ResourceAccessTokens
       end
 
       token_response = create_personal_access_token(user)
+      log_event(token_response)
 
       if token_response.success?
         success(token_response.payload[:personal_access_token])
@@ -105,6 +106,11 @@ module ResourceAccessTokens
       resource.add_user(user, :maintainer, expires_at: params[:expires_at])
     end
 
+    def log_event(project_access_token)
+      token = project_access_token.payload[:personal_access_token]
+      log_info("PROJECT ACCESS TOKEN CREATION: created_by: '#{current_user.username}', created_for: '#{token.user.username}', token_id: '#{token.id}'")
+    end
+
     def error(message)
       ServiceResponse.error(message: message)
     end
@@ -114,3 +120,5 @@ module ResourceAccessTokens
     end
   end
 end
+
+ResourceAccessTokens::CreateService.prepend_if_ee('EE::ResourceAccessTokens::CreateService')
