@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module EE
-  module PersonalAccessTokens
+  module ResourceAccessTokens
     module RevokeService
       include ::Gitlab::Allowable
       extend ::Gitlab::Utils::Override
 
       def execute
         super.tap do |response|
-          log_audit_event(token, response)
+          log_audit_event(access_token, response)
         end
       end
 
@@ -21,30 +21,30 @@ module EE
       end
 
       def managed_user_revocation_allowed?
-        return unless token.present?
+        return unless access_token.present?
         return unless ::Feature.enabled?(:revoke_managed_users_token, group)
 
-        token.user&.group_managed_account? &&
-          token.user&.managing_group == group &&
+        access_token.user&.group_managed_account? &&
+          access_token.user&.managing_group == group &&
           can?(current_user, :admin_group_credentials_inventory, group)
       end
 
-      def log_audit_event(token, response)
-        return unless token.present?
+      def log_audit_event(access_token, response)
+        return unless access_token.present?
 
-        audit_event_service(token, response).for_user(full_path: token.user.username, entity_id: token.user.id).security_event
+        audit_event_service(access_token, response).for_user(full_path: access_token.user.username, entity_id: access_token.user.id).security_event
       end
 
-      def audit_event_service(token, response)
+      def audit_event_service(access_token, response)
         message = if response.success?
-                    "Revoked personal access token with id #{token.id}"
+                    "Revoked project access token with id #{access_token.id}"
                   else
-                    "Attempted to revoke personal access token with id #{token.id} but failed with message: #{response.message}"
+                    "Attempted to revoke project access token with id #{access_token.id} but failed with message: #{response.message}"
                   end
 
         ::AuditEventService.new(
           current_user,
-          token.user,
+          access_token.user,
           action: :custom,
           custom_message: message
         )
