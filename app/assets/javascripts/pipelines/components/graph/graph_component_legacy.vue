@@ -191,7 +191,7 @@ export default {
       >
         <gl-loading-icon v-if="isLoading" class="m-auto" size="lg" />
 
-        <pipeline-graph
+        <pipeline-graph-legacy
           v-if="pipelineTypeUpstream"
           :type="$options.upstream"
           class="d-inline-block upstream-pipeline"
@@ -251,7 +251,7 @@ export default {
           @pipelineExpandToggle="setPipelineExpanded"
         />
 
-        <pipeline-graph
+        <pipeline-graph-legacy
           v-if="pipelineTypeDownstream"
           :type="$options.downstream"
           class="d-inline-block"
