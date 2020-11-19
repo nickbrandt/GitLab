@@ -5,7 +5,10 @@ import { CancelToken } from 'axios';
 import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 import axios from '~/lib/utils/axios_utils';
 import download from '~/lib/utils/downloader';
-import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
+import {
+  convertObjectPropsToSnakeCase,
+  convertObjectPropsToCamelCase,
+} from '~/lib/utils/common_utils';
 import { redirectTo } from '~/lib/utils/url_utility';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import { s__ } from '~/locale';
@@ -134,7 +137,7 @@ export default {
 
       Api.changeVulnerabilityState(this.vulnerability.id, newState)
         .then(({ data }) => {
-          Object.assign(this.vulnerability, data);
+          Object.assign(this.vulnerability, convertObjectPropsToCamelCase(data));
           this.$emit('vulnerability-state-change');
         })
         .catch(() => {
