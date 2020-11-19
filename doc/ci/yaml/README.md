@@ -1987,6 +1987,64 @@ This example creates four paths of execution:
   finish; in this case: `linux:build`, `linux:rspec`, `linux:rubocop`,
   `mac:build`, `mac:rspec`, `mac:rubocop`.
 
+#### Referring a stage
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/220758) in GitLab 12.0.
+> - It's [deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
+> - It's disabled on GitLab.com.
+> - It's not recommended for production use.
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#anchor-to-section). **(CORE ONLY)**
+
+CAUTION: **Warning:**
+This feature might not be available to you. Check the **version history** note above for details.
+
+TODO: ...
+
+In the example below, the `test` job waits for `build1` and `build2`.
+The `deploy` job waits for `build1`, `build2` and `test` jobs.
+
+```yaml
+build1:
+  stage: build
+  script: sleep 3
+
+build2:
+  stage: build
+  script: sleep 8
+
+test:
+  stage: test
+  script: sleep 1
+  needs:
+    - stage: build
+
+deploy:
+  stage: deploy
+  script: sleep 1
+  needs:
+    - stage: build
+    - stage: test
+```
+
+##### Enable or disable referring a stage **(CORE ONLY)**
+
+Referring a stage is under development and not ready for production use. It is
+deployed behind a feature flag that is **disabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
+can enable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:ci_dag_needs_stage)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:ci_dag_needs_stage)
+```
+
 #### Requirements and limitations
 
 - If `needs:` is set to point to a job that is not instantiated
