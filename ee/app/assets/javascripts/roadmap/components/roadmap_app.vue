@@ -2,6 +2,7 @@
 import Cookies from 'js-cookie';
 import { GlLoadingIcon, GlAlert } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
+import { __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import EpicsListEmpty from './epics_list_empty.vue';
@@ -12,6 +13,13 @@ import eventHub from '../event_hub';
 import { EXTEND_AS, EPICS_LIMIT_DISMISSED_COOKIE_NAME } from '../constants';
 
 export default {
+  i18n: {
+    warningTitle: __('Some of your epics may not be visible'),
+    warningBody: __(
+      'Roadmaps are limited to 1,000 epics. These will display in your selected sort order.',
+    ),
+    warningButtonLabel: __('Learn more'),
+  },
   components: {
     EpicsListEmpty,
     GlAlert,
@@ -149,16 +157,13 @@ export default {
     <gl-alert
       v-if="isWarningVisible"
       variant="warning"
-      :secondary-button-text="__('Learn more')"
-      secondary-button-link="https://docs.gitlab.com/ee/user/group/roadmap/"
+      :title="$options.i18n.warningTitle"
+      :primary-button-text="$options.i18n.warningButtonLabel"
+      primary-button-link="https://docs.gitlab.com/ee/user/group/roadmap/"
       data-testid="epics_limit_callout"
       @dismiss="dismissTooManyEpicsWarning"
     >
-      {{
-        s__(
-          'Some of your epics may not be visible. A roadmap is limited to the first 1,000 epics, in your selected sort order.',
-        )
-      }}
+      {{ $options.i18n.warningBody }}
     </gl-alert>
     <div :class="{ 'overflow-reset': epicsFetchResultEmpty }" class="roadmap-container">
       <gl-loading-icon v-if="epicsFetchInProgress" class="gl-mt-5" size="md" />

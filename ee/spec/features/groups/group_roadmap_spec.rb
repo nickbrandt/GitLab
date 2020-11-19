@@ -161,14 +161,14 @@ RSpec.describe 'group epic roadmap', :js do
       create_list(:epic, 2, group: group, start_date: 10.days.ago, end_date: 1.day.ago)
       visit group_roadmap_path(group)
       wait_for_requests
-      execute_script("gon.roadmap_epics_limit = 1 ;")
+      execute_script("gon.roadmap_epics_limit = 1;")
     end
 
     describe 'roadmap page' do
       it 'renders warning callout banner' do
         page.within('.content-wrapper .content') do
           expect(page).to have_selector('[data-testid="epics_limit_callout"]', count: 1)
-          expect(find('[data-testid="epics_limit_callout"]')).to have_content 'Some of your epics may not be visible. A roadmap is limited to the first 1,000 epics, in your selected sort order.'
+          expect(find('[data-testid="epics_limit_callout"]')).to have_content 'Some of your epics may not be visible Roadmaps are limited to 1,000 epics. These will display in your selected sort order.'
         end
 
         page.within('[data-testid="epics_limit_callout"]') do

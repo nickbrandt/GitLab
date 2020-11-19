@@ -23357,6 +23357,9 @@ msgstr ""
 msgid "Roadmap"
 msgstr ""
 
+msgid "Roadmaps are limited to 1,000 epics. These will display in your selected sort order."
+msgstr ""
+
 msgid "Role"
 msgstr ""
 
@@ -25248,7 +25251,7 @@ msgstr ""
 msgid "Some of the designs you tried uploading did not change:"
 msgstr ""
 
-msgid "Some of your epics may not be visible. A roadmap is limited to the first 1,000 epics, in your selected sort order."
+msgid "Some of your epics may not be visible"
 msgstr ""
 
 msgid "Someone edited the issue at the same time you did. Please check out %{linkStart}the issue%{linkEnd} and make sure your changes will not unintentionally remove theirs."
