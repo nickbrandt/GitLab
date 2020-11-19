@@ -31,6 +31,7 @@ const DAST_DIFF_ENDPOINT = 'dast.json';
 const SAST_DIFF_ENDPOINT = 'sast.json';
 const PIPELINE_JOBS_ENDPOINT = 'jobs.json';
 const SECRET_DETECTION_DIFF_ENDPOINT = 'secret_detection.json';
+const API_FUZZING_DIFF_ENDPOINT = 'api_fuzzing.json';
 const COVERAGE_FUZZING_DIFF_ENDPOINT = 'coverage_fuzzing.json';
 
 describe('Grouped security reports app', () => {
@@ -53,6 +54,7 @@ describe('Grouped security reports app', () => {
     pipelineId: 123,
     projectId: 321,
     projectFullPath: 'path',
+    apiFuzzingComparisonPath: API_FUZZING_DIFF_ENDPOINT,
     containerScanningComparisonPath: CONTAINER_SCANNING_DIFF_ENDPOINT,
     coverageFuzzingComparisonPath: COVERAGE_FUZZING_DIFF_ENDPOINT,
     dastComparisonPath: DAST_DIFF_ENDPOINT,
