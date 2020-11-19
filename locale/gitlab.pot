@@ -23366,9 +23366,6 @@ msgstr ""
 msgid "Request Access"
 msgstr ""
 
-msgid "Request Headers"
-msgstr ""
-
 msgid "Request details"
 msgstr ""
 
@@ -23545,12 +23542,6 @@ msgid "Resolves IP addresses once and uses them to submit requests"
 msgstr ""
 
 msgid "Response"
-msgstr ""
-
-msgid "Response Headers"
-msgstr ""
-
-msgid "Response Status"
 msgstr ""
 
 msgid "Response didn't include `service_desk_address`"
@@ -30620,6 +30611,9 @@ msgstr ""
 msgid "Vulnerability|Activity"
 msgstr ""
 
+msgid "Vulnerability|Actual Response"
+msgstr ""
+
 msgid "Vulnerability|Actual received response is the one received when this fault was detected"
 msgstr ""
 
@@ -30674,6 +30668,9 @@ msgstr ""
 msgid "Vulnerability|Project"
 msgstr ""
 
+msgid "Vulnerability|Request"
+msgstr ""
+
 msgid "Vulnerability|Request/Response"
 msgstr ""
 
@@ -30690,6 +30687,9 @@ msgid "Vulnerability|Status"
 msgstr ""
 
 msgid "Vulnerability|The unmodified response is the original response that had no mutations done to the request"
+msgstr ""
+
+msgid "Vulnerability|Unmodified Response"
 msgstr ""
 
 msgid "Wait for the file to load to copy its contents"
@@ -32205,6 +32205,9 @@ msgstr ""
 msgid "ciReport|%{improvedNum} improved"
 msgstr ""
 
+msgid "ciReport|%{linkStartTag}Learn more about API Fuzzing%{linkEndTag}"
+msgstr ""
+
 msgid "ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}"
 msgstr ""
 
@@ -32242,6 +32245,9 @@ msgid "ciReport|: Loading resulted in an error"
 msgstr ""
 
 msgid "ciReport|API Fuzzing"
+msgstr ""
+
+msgid "ciReport|API fuzzing"
 msgstr ""
 
 msgid "ciReport|All projects"
