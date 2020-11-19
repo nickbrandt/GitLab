@@ -1,7 +1,10 @@
+import { setTestTimeout } from 'helpers/timeout';
 import initUserPopovers from '~/user_popovers';
 import UsersCache from '~/lib/utils/users_cache';
 
 describe('User Popovers', () => {
+  setTestTimeout(2000);
+
   const fixtureTemplate = 'merge_requests/merge_request_with_mentions.html';
   preloadFixtures(fixtureTemplate);
 
@@ -22,7 +25,7 @@ describe('User Popovers', () => {
     el.dispatchEvent(event);
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     loadFixtures(fixtureTemplate);
 
     const usersCacheSpy = () => Promise.resolve(dummyUser);
@@ -33,10 +36,10 @@ describe('User Popovers', () => {
       .spyOn(UsersCache, 'retrieveStatusById')
       .mockImplementation(userId => userStatusCacheSpy(userId));
 
-    popovers = initUserPopovers(document.querySelectorAll(selector));
+    popovers = await initUserPopovers(document.querySelectorAll(selector));
   });
 
-  it('initializes a popover for each user link with a user id', () => {
+  it('initializes a popover for each user link with a user id', async () => {
     const linksWithUsers = Array.from(document.querySelectorAll(selector)).filter(
       ({ dataset }) => dataset.user || dataset.userId,
     );
@@ -44,8 +47,8 @@ describe('User Popovers', () => {
     expect(linksWithUsers.length).toBe(popovers.length);
   });
 
-  it('does not initialize the user popovers twice for the same element', () => {
-    const newPopovers = initUserPopovers(document.querySelectorAll(selector));
+  it('does not initialize the user popovers twice for the same element', async () => {
+    const newPopovers = await initUserPopovers(document.querySelectorAll(selector));
     const samePopovers = popovers.every((popover, index) => newPopovers[index] === popover);
 
     expect(samePopovers).toBe(true);
