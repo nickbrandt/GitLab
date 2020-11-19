@@ -28141,6 +28141,9 @@ msgstr ""
 msgid "Threat Monitoring"
 msgstr ""
 
+msgid "ThreatMonitoring|Alerts"
+msgstr ""
+
 msgid "ThreatMonitoring|All Environments"
 msgstr ""
 
