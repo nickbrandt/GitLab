@@ -733,6 +733,14 @@
   :weight: 1
   :idempotent:
   :tags: []
+- :name: project_template_export
+  :feature_category: :templates
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent:
+  :tags: []
 - :name: refresh_license_compliance_checks
   :feature_category: :license_compliance
   :has_external_dependencies:
