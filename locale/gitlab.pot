@@ -2272,6 +2272,15 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
+msgid "Admin|Additional users must be reviewed and approved by a system administrator. Learn more about %{help_link_start}usage caps%{help_link_end}."
+msgstr ""
+
+msgid "Admin|View pending user approvals"
+msgstr ""
+
+msgid "Admin|Your instance has reached its user cap"
+msgstr ""
+
 msgid "Advanced"
 msgstr ""
 
