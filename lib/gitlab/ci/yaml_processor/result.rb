@@ -33,8 +33,7 @@ module Gitlab
         end
 
         def stage_builds_attributes(stage)
-          jobs.values
-            .select { |job| job[:stage] == stage }
+          jobs_of_stage(stage)
             .map { |job| build_attributes(job[:name]) }
         end
 
@@ -65,7 +64,7 @@ module Gitlab
             environment: job[:environment_name],
             coverage_regex: job[:coverage],
             yaml_variables: transform_to_yaml_variables(job[:variables]),
-            needs_attributes: job.dig(:needs, :job),
+            needs_attributes: needs_attributes(job),
             interruptible: job[:interruptible],
             only: job[:only],
             except: job[:except],
@@ -121,6 +120,25 @@ module Gitlab
           variables.to_h.map do |key, value|
             { key: key.to_s, value: value, public: true }
           end
+        end
+
+        def needs_attributes(job)
+          job_needs = job.dig(:needs, :job)
+          stage_needs = job.dig(:needs, :stage)
+
+          return job_needs unless stage_needs
+
+          stage_job_needs = stage_needs.flat_map do |stage_need|
+            jobs_of_stage(stage_need[:name]).map do |job|
+              { name: job[:name].to_s, artifacts: stage_need[:artifacts] }
+            end
+          end
+
+          Array(job_needs) + stage_job_needs
+        end
+
+        def jobs_of_stage(stage)
+          jobs.values.select { |job| job[:stage] == stage }
         end
       end
     end

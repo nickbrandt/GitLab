@@ -58,6 +58,7 @@ module Gitlab
         validate_job_stage!(name, job)
         validate_job_dependencies!(name, job)
         validate_job_needs!(name, job)
+        validate_stage_needs!(name, job)
         validate_dynamic_child_pipeline_dependencies!(name, job)
         validate_job_environment!(name, job)
       end
@@ -94,6 +95,27 @@ module Gitlab
 
         needs.each do |need|
           validate_job_dependency!(name, need[:name], 'need')
+        end
+      end
+
+      def validate_stage_needs!(name, job)
+        return unless needs = job.dig(:needs, :stage)
+
+        needs.each do |need|
+          validate_stage_dependency!(name, need[:name])
+        end
+      end
+
+      def validate_stage_dependency!(name, dependency)
+        unless @stages.include?(dependency)
+          error!("#{name} job: undefined need: #{dependency}")
+        end
+
+        job_stage_index = stage_index(name)
+        dependency_stage_index = @stages.index(dependency)
+
+        unless dependency_stage_index < job_stage_index
+          error!("#{name} job: need #{dependency} is not a prior stage")
         end
       end
 

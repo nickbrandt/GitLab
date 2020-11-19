@@ -165,6 +165,26 @@ RSpec.describe ::Gitlab::Ci::Config::Entry::Need do
     end
   end
 
+  context 'with stage' do
+    let(:config) { { stage: 'stage_name', artifacts: true } }
+
+    describe '#valid?' do
+      it { is_expected.to be_valid }
+    end
+
+    describe '#value' do
+      it 'returns stage needs configuration' do
+        expect(need.value).to eq(name: 'stage_name', artifacts: true)
+      end
+    end
+
+    describe '#type' do
+      subject(:need_type) { need.type }
+
+      it { is_expected.to eq(:stage) }
+    end
+  end
+
   context 'when need config is not a string or a hash' do
     let(:config) { :job_name }
 

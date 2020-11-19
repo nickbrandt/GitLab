@@ -1858,7 +1858,7 @@ module Gitlab
             parallel: { stage: 'build', script: 'test', parallel: 2 },
             test1: { stage: 'test', script: 'test', needs: needs, dependencies: dependencies },
             test2: { stage: 'test', script: 'test' },
-            deploy: { stage: 'test', script: 'test' }
+            deploy: { stage: 'deploy', script: 'deploy' }
           }
         end
 
@@ -2053,6 +2053,86 @@ module Gitlab
           let(:dependencies) { 'deploy' }
 
           it_behaves_like 'returns errors', 'jobs:test1 dependencies should be an array of strings'
+        end
+
+        context 'when it needs a stage' do
+          context 'when the needed stage exists' do
+            let(:needs) do
+              [{ stage: 'build' }]
+            end
+
+            it 'creates jobs with valid specification' do
+              expect(subject.builds.size).to eq(7)
+              expect(subject.builds[4]).to eq(
+                stage: "test",
+                stage_idx: 2,
+                name: "test1",
+                only: { refs: %w[branches tags] },
+                options: { script: ["test"] },
+                needs_attributes: [
+                  { name: "build1", artifacts: true },
+                  { name: "build2", artifacts: true },
+                  { name: "parallel 1/2", artifacts: true },
+                  { name: "parallel 2/2", artifacts: true }
+                ],
+                when: "on_success",
+                allow_failure: false,
+                yaml_variables: [],
+                scheduling_type: :dag
+              )
+            end
+          end
+
+          context 'when the needed stage is undefined' do
+            let(:needs) do
+              [{ stage: 'undefined' }]
+            end
+
+            it_behaves_like 'returns errors', 'test1 job: undefined need: undefined'
+          end
+
+          context 'when the needed stage is not a prior stage' do
+            let(:needs) do
+              [{ stage: 'deploy' }]
+            end
+
+            it_behaves_like 'returns errors', 'test1 job: need deploy is not a prior stage'
+          end
+
+          context 'when the needs does not include a job in dependencies' do
+            let(:config) do
+              {
+                build1: { stage: 'build', script: 'test' },
+                test1: { stage: 'test', script: 'test' },
+                deploy: { stage: 'deploy', script: 'deploy', needs: needs, dependencies: dependencies }
+              }
+            end
+
+            let(:needs) do
+              [{ stage: 'build' }]
+            end
+
+            let(:dependencies) { %w(test1) }
+
+            # TODO: we need to have this:
+            # it_behaves_like 'returns errors', 'jobs:deploy dependencies the test1 should be part of needs'
+
+            it 'creates jobs with valid specification' do
+              expect(subject.builds.size).to eq(3)
+              expect(subject.builds[2]).to eq(
+                stage: "deploy",
+                stage_idx: 3,
+                name: "deploy",
+                only: { refs: %w[branches tags] },
+                options: { dependencies: ["test1"], script: ["deploy"] },
+                needs_attributes: [{ name: "build1", artifacts: true }],
+                when: "on_success",
+                allow_failure: false,
+                yaml_variables: [],
+                scheduling_type: :dag
+              )
+            end
+          end
         end
       end
 

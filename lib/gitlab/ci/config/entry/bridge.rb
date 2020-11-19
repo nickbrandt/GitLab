@@ -45,7 +45,7 @@ module Gitlab
           entry :needs, ::Gitlab::Ci::Config::Entry::Needs,
             description: 'CI/CD Bridge needs dependency definition.',
             inherit: false,
-            metadata: { allowed_needs: %i[job bridge] }
+            metadata: { allowed_needs: %i[job stage bridge] }
 
           attributes :when
 

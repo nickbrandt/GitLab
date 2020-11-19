@@ -38,7 +38,7 @@ module Gitlab
 
             validate on: :composed do
               next unless dependencies.present?
-              next unless needs_value.present?
+              next unless needs_value.present? && needs_value[:job]
 
               missing_needs = dependencies - needs_value[:job].pluck(:name) # rubocop:disable CodeReuse/ActiveRecord (Array#pluck)
 
@@ -98,7 +98,7 @@ module Gitlab
 
           entry :needs, Entry::Needs,
             description: 'Needs configuration for this job.',
-            metadata: { allowed_needs: %i[job cross_dependency] },
+            metadata: { allowed_needs: %i[job stage cross_dependency] },
             inherit: false
 
           entry :environment, Entry::Environment,

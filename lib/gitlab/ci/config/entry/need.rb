@@ -10,6 +10,9 @@ module Gitlab
           strategy :JobHash,
             if: -> (config) { config.is_a?(Hash) && config.key?(:job) && !(config.key?(:project) || config.key?(:ref)) }
 
+          strategy :StageHash,
+            if: -> (config) { config.is_a?(Hash) && config.key?(:stage) && !(config.key?(:project) || config.key?(:ref)) }
+
           class JobString < ::Gitlab::Config::Entry::Node
             include ::Gitlab::Config::Entry::Validatable
 
@@ -47,6 +50,29 @@ module Gitlab
 
             def value
               { name: job, artifacts: artifacts || artifacts.nil? }
+            end
+          end
+
+          class StageHash < ::Gitlab::Config::Entry::Node
+            include ::Gitlab::Config::Entry::Validatable
+            include ::Gitlab::Config::Entry::Attributable
+
+            ALLOWED_KEYS = %i[stage artifacts].freeze
+            attributes :stage, :artifacts
+
+            validations do
+              validates :config, presence: true
+              validates :config, allowed_keys: ALLOWED_KEYS
+              validates :stage, type: String, presence: true
+              validates :artifacts, boolean: true, allow_nil: true
+            end
+
+            def type
+              :stage
+            end
+
+            def value
+              { name: stage, artifacts: artifacts || artifacts.nil? }
             end
           end
 
