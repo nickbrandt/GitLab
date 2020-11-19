@@ -17,7 +17,9 @@ module ResourceAccessTokens
       return error("#{current_user.name} cannot delete #{bot_user.name}") unless can_destroy_bot_member?
       return error("Failed to find bot user") unless find_member
 
-      access_token.revoke!
+      if access_token.revoke!
+        log_event
+      end
 
       destroy_bot_user
 
@@ -57,6 +59,10 @@ module ResourceAccessTokens
       end
     end
 
+    def log_event
+      Gitlab::AppLogger.info("Project Access Token REVOCATION: revoked_by: '#{current_user.username}', revoked_for: '#{access_token.user.username}', token_id: '#{access_token.id}'")
+    end
+
     def error(message)
       ServiceResponse.error(message: message)
     end
@@ -66,3 +72,5 @@ module ResourceAccessTokens
     end
   end
 end
+
+ResourceAccessTokens::RevokeService.prepend_if_ee('EE::ResourceAccessTokens::RevokeService')

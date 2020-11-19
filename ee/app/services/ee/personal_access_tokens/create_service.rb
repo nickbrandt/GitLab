@@ -16,10 +16,18 @@ module EE
       end
 
       def audit_event_service(token, response)
-        message = if response.success?
-                    "Created personal access token with id #{token.id}"
+        message = if token.user.project_bot?
+                    if response.success?
+                      "Created project access token with id #{token.id}"
+                    else
+                      "Attempted to create project access token but failed with message: #{response.message}"
+                    end
                   else
-                    "Attempted to create personal access token but failed with message: #{response.message}"
+                    if response.success?
+                      "Created personal access token with id #{token.id}"
+                    else
+                      "Attempted to create personal access token but failed with message: #{response.message}"
+                    end
                   end
 
         ::AuditEventService.new(
