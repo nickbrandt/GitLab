@@ -318,6 +318,8 @@ export default {
         :pipeline-id="mr.pipeline.id"
         :project-id="mr.targetProjectId"
         :security-reports-docs-path="mr.securityReportsDocsPath"
+        :sast-comparison-path="mr.sastComparisonPath"
+        :secret-scanning-comparison-path="mr.secretScanningComparisonPath"
       />
       <grouped-security-reports-app
         v-else-if="shouldRenderExtendedSecurityReport"

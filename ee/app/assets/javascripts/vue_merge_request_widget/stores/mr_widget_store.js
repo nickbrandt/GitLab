@@ -59,8 +59,6 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.coverageFuzzingComparisonPath = data.coverage_fuzzing_comparison_path;
     this.dastComparisonPath = data.dast_comparison_path;
     this.dependencyScanningComparisonPath = data.dependency_scanning_comparison_path;
-    this.sastComparisonPath = data.sast_comparison_path;
-    this.secretScanningComparisonPath = data.secret_scanning_comparison_path;
   }
 
   initGeo(data) {
