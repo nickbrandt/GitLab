@@ -124,6 +124,8 @@ module Gitlab
 
         def needs_attributes(job)
           job_needs = job.dig(:needs, :job)
+          return job_needs unless ::Gitlab::Ci::Features.dag_needs_stage_enabled?
+
           stage_needs = job.dig(:needs, :stage)
 
           return job_needs unless stage_needs

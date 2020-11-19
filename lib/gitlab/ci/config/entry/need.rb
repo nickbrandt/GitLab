@@ -11,7 +11,8 @@ module Gitlab
             if: -> (config) { config.is_a?(Hash) && config.key?(:job) && !(config.key?(:project) || config.key?(:ref)) }
 
           strategy :StageHash,
-            if: -> (config) { config.is_a?(Hash) && config.key?(:stage) && !(config.key?(:project) || config.key?(:ref)) }
+            if: -> (config) { ::Gitlab::Ci::Features.dag_needs_stage_enabled? &&
+                                config.is_a?(Hash) && config.key?(:stage) && !(config.key?(:project) || config.key?(:ref)) }
 
           class JobString < ::Gitlab::Config::Entry::Node
             include ::Gitlab::Config::Entry::Validatable

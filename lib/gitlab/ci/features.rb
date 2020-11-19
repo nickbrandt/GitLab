@@ -70,6 +70,10 @@ module Gitlab
       def self.ci_pipeline_editor_page_enabled?(project)
         ::Feature.enabled?(:ci_pipeline_editor_page, project, default_enabled: false)
       end
+
+      def self.dag_needs_stage_enabled?
+        ::Feature.enabled?(:ci_dag_needs_stage, default_enabled: false)
+      end
     end
   end
 end

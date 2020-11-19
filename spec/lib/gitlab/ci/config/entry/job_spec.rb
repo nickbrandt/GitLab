@@ -141,6 +141,33 @@ RSpec.describe Gitlab::Ci::Config::Entry::Job do
           expect(entry.value[:scheduling_type]).to eq(:dag)
         end
 
+        context 'when needs a stage' do
+          let(:config) do
+            {
+              stage: 'test',
+              script: 'echo',
+              needs: [{ stage: 'build' }]
+            }
+          end
+
+          it { expect(entry).to be_valid }
+
+          context 'when FF ci_dag_needs_stage is disabled' do
+            let(:new_entry) { described_class.new(config, name: :rspec) }
+
+            before do
+              stub_feature_flags(ci_dag_needs_stage: false)
+              new_entry.compose!
+            end
+
+            it { expect(new_entry).not_to be_valid }
+
+            it 'returns unknown strategy error' do
+              expect(new_entry.errors).to include('needs:need has an unsupported type')
+            end
+          end
+        end
+
         context 'when has dependencies' do
           let(:config) do
             {
@@ -432,6 +459,20 @@ RSpec.describe Gitlab::Ci::Config::Entry::Job do
           it 'returns error about invalid data' do
             expect(entry).not_to be_valid
             expect(entry.errors).to include 'job dependencies the another-job should be part of needs'
+          end
+
+          context 'when needs a stage' do
+            let(:config) do
+              {
+                stage: 'deploy',
+                script: 'echo',
+                dependencies: ['build'],
+                needs: [{ stage: 'test' }]
+              }
+            end
+
+            # TODO: This should not be valid
+            it { expect(entry).to be_valid }
           end
         end
 

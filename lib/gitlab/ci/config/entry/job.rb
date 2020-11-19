@@ -38,7 +38,11 @@ module Gitlab
 
             validate on: :composed do
               next unless dependencies.present?
-              next unless needs_value.present? && needs_value[:job]
+              if ::Gitlab::Ci::Features.dag_needs_stage_enabled?
+                next unless needs_value.present? && needs_value[:job]
+              else
+                next unless needs_value.present?
+              end
 
               missing_needs = dependencies - needs_value[:job].pluck(:name) # rubocop:disable CodeReuse/ActiveRecord (Array#pluck)
 

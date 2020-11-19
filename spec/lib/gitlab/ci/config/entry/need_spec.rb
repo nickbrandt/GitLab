@@ -170,6 +170,18 @@ RSpec.describe ::Gitlab::Ci::Config::Entry::Need do
 
     describe '#valid?' do
       it { is_expected.to be_valid }
+
+      context 'when FF ci_dag_needs_stage is disabled' do
+        before do
+          stub_feature_flags(ci_dag_needs_stage: false)
+        end
+
+        it { is_expected.not_to be_valid }
+
+        it 'returns unknown strategy error' do
+          expect(need.errors).to include('unknown strategy has an unsupported type')
+        end
+      end
     end
 
     describe '#value' do

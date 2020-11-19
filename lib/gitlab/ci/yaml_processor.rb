@@ -99,6 +99,8 @@ module Gitlab
       end
 
       def validate_stage_needs!(name, job)
+        return unless ::Gitlab::Ci::Features.dag_needs_stage_enabled?
+
         return unless needs = job.dig(:needs, :stage)
 
         needs.each do |need|

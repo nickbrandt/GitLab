@@ -13,7 +13,7 @@ module EE
               # needs:pipeline: other/project
               strategy :BridgeHash,
                 class: EE::Gitlab::Ci::Config::Entry::Need::BridgeHash,
-                if: -> (config) { config.is_a?(Hash) && !config.key?(:job) && !config.key?(:project) }
+                if: -> (config) { config.is_a?(Hash) && !config.key?(:job) && !config.key?(:stage) && !config.key?(:project) }
 
               # When defining DAG dependency across project/ref
               strategy :CrossDependency,
