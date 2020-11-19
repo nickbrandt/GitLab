@@ -1,5 +1,15 @@
 # Changelog for gitlab-workhorse
 
+## v8.55.0
+
+### Added
+- Add direct upload acceleration for metric images
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/653
+
+### Fixed
+- Image scaler: add success-client-cache status label
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/656
+
 ## v8.54.0
 
 ### Changed
