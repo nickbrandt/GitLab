@@ -3,8 +3,6 @@
 module Elastic
   module Latest
     class IssueInstanceProxy < ApplicationInstanceProxy
-      GITLAB_MIGRATION_VERSION = '6b7304e6-c85e-44b4-b92c-fd5978c876cc'.freeze
-
       def as_indexed_json(options = {})
         data = {}
 
