@@ -1,13 +1,15 @@
 <script>
-import { GlAlert, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
+import { GlAlert, GlButton, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
 import { __, s__, sprintf } from '~/locale';
 import { redirectTo, mergeUrlParams, refreshCurrentPage } from '~/lib/utils/url_utility';
 
 import PipelineGraph from '~/pipelines/components/pipeline_graph/pipeline_graph.vue';
 import CommitForm from './components/commit/commit_form.vue';
 import TextEditor from './components/text_editor.vue';
-import commitCiFileMutation from './graphql/mutations/commit_ci_file.mutation.graphql';
+import CiLintResults from '~/ci_lint/components/ci_lint_results.vue';
 
+import lintCIMutation from '~/ci_lint/graphql/mutations/lint_ci.mutation.graphql';
+import commitCiFileMutation from './graphql/mutations/commit_ci_file.mutation.graphql';
 import getBlobContent from './graphql/queries/blob_content.graphql';
 
 const MR_SOURCE_BRANCH = 'merge_request[source_branch]';
@@ -22,9 +24,11 @@ const DEFAULT_FAILURE = 'DEFAULT_FAILURE';
 export default {
   components: {
     GlAlert,
+    GlButton,
     GlLoadingIcon,
     GlTab,
     GlTabs,
+    CiLintResults,
     PipelineGraph,
     CommitForm,
     TextEditor,
@@ -48,6 +52,10 @@ export default {
       type: String,
       required: true,
     },
+    ciLintEndpoint: {
+      type: String,
+      required: true,
+    },
     newMergeRequestPath: {
       type: String,
       required: true,
@@ -63,6 +71,12 @@ export default {
       editorIsReady: false,
       content: '',
       contentModel: '',
+
+      showingResults: false,
+      valid: false,
+      errors: null,
+      warnings: null,
+      jobs: [],
     };
   },
   apollo: {
@@ -173,6 +187,33 @@ export default {
       );
       redirectTo(url);
     },
+    // TODO Copy pasted!! trololol
+    async lint() {
+      // this.loading = true;
+      try {
+        const {
+          data: {
+            lintCI: { valid, errors, warnings, jobs },
+          },
+        } = await this.$apollo.mutate({
+          mutation: lintCIMutation,
+          // TODO contentModel?
+          // TODO dryRun is harcoded to false
+          variables: { endpoint: this.ciLintEndpoint, content: this.contentModel, dry: false },
+        });
+
+        this.showingResults = true;
+        this.valid = valid;
+        this.errors = errors;
+        this.warnings = warnings;
+        this.jobs = jobs;
+      } catch (error) {
+        // this.apiError = error;
+        // this.isErrorDismissed = false;
+      } finally {
+        // this.loading = false;
+      }
+    },
     async onCommitSubmit(event) {
       this.isSaving = true;
       const { message, branch, openMergeRequest } = event;
@@ -247,6 +288,18 @@ export default {
           </gl-tab>
         </gl-tabs>
       </div>
+
+      <gl-button @click="lint()">Lint this!</gl-button>
+
+      <ci-lint-results
+        v-if="showingResults"
+        :valid="valid"
+        :jobs="jobs"
+        :errors="errors"
+        :warnings="warnings"
+        :dry-run="false"
+        :lint-help-page-path="'/'"
+      />
       <commit-form
         :default-branch="defaultBranch"
         :default-message="defaultCommitMessage"

@@ -1,4 +1,7 @@
 import Api from '~/api';
+import ciLintResolvers from '~/ci_lint/graphql/resolvers';
+
+const { Mutation } = ciLintResolvers;
 
 export const resolvers = {
   Query: {
@@ -10,6 +13,9 @@ export const resolvers = {
         }),
       };
     },
+  },
+  Mutation: {
+    ...Mutation, // lintCI
   },
 };
 
