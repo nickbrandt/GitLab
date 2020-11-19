@@ -349,6 +349,12 @@ export default {
         :mr-state="mr.state"
         :target-branch-tree-path="mr.targetBranchTreePath"
         :new-pipeline-path="mr.newPipelinePath"
+        :container-scanning-comparison-path="mr.containerScanningComparisonPath"
+        :coverage-fuzzing-comparison-path="mr.coverageFuzzingComparisonPath"
+        :dast-comparison-path="mr.dastComparisonPath"
+        :dependency-scanning-comparison-path="mr.dependencyScanningComparisonPath"
+        :sast-comparison-path="mr.sastComparisonPath"
+        :secret-scanning-comparison-path="mr.secretScanningComparisonPath"
         class="js-security-widget"
       />
       <mr-widget-licenses

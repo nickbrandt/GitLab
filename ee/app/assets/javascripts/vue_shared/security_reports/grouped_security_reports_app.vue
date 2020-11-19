@@ -190,6 +190,36 @@ export default {
       type: String,
       required: true,
     },
+    containerScanningComparisonPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    coverageFuzzingComparisonPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    dastComparisonPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    dependencyScanningComparisonPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    sastComparisonPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    secretScanningComparisonPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   componentNames,
   computed: {
@@ -305,44 +335,33 @@ export default {
     this.setPipelineId(this.pipelineId);
     this.setPipelineJobsId(this.pipelineId);
 
-    const sastDiffEndpoint = gl?.mrWidgetData?.sast_comparison_path;
-
-    if (sastDiffEndpoint && this.hasSastReports) {
-      this.setSastDiffEndpoint(sastDiffEndpoint);
+    if (this.sastComparisonPath && this.hasSastReports) {
+      this.setSastDiffEndpoint(this.sastComparisonPath);
       this.fetchSastDiff();
     }
 
-    const containerScanningDiffEndpoint = gl?.mrWidgetData?.container_scanning_comparison_path;
-
-    if (containerScanningDiffEndpoint && this.hasContainerScanningReports) {
-      this.setContainerScanningDiffEndpoint(containerScanningDiffEndpoint);
+    if (this.containerScanningComparisonPath && this.hasContainerScanningReports) {
+      this.setContainerScanningDiffEndpoint(this.containerScanningComparisonPath);
       this.fetchContainerScanningDiff();
     }
 
-    const dastDiffEndpoint = gl?.mrWidgetData?.dast_comparison_path;
-
-    if (dastDiffEndpoint && this.hasDastReports) {
-      this.setDastDiffEndpoint(dastDiffEndpoint);
+    if (this.dastComparisonPath && this.hasDastReports) {
+      this.setDastDiffEndpoint(this.dastComparisonPath);
       this.fetchDastDiff();
     }
 
-    const dependencyScanningDiffEndpoint = gl?.mrWidgetData?.dependency_scanning_comparison_path;
-
-    if (dependencyScanningDiffEndpoint && this.hasDependencyScanningReports) {
-      this.setDependencyScanningDiffEndpoint(dependencyScanningDiffEndpoint);
+    if (this.dependencyScanningComparisonPath && this.hasDependencyScanningReports) {
+      this.setDependencyScanningDiffEndpoint(this.dependencyScanningComparisonPath);
       this.fetchDependencyScanningDiff();
     }
 
-    const secretDetectionDiffEndpoint = gl?.mrWidgetData?.secret_scanning_comparison_path;
-    if (secretDetectionDiffEndpoint && this.hasSecretDetectionReports) {
-      this.setSecretDetectionDiffEndpoint(secretDetectionDiffEndpoint);
+    if (this.secretScanningComparisonPath && this.hasSecretDetectionReports) {
+      this.setSecretDetectionDiffEndpoint(this.secretScanningComparisonPath);
       this.fetchSecretDetectionDiff();
     }
 
-    const coverageFuzzingDiffEndpoint = gl?.mrWidgetData?.coverage_fuzzing_comparison_path;
-
-    if (coverageFuzzingDiffEndpoint && this.hasCoverageFuzzingReports) {
-      this.setCoverageFuzzingDiffEndpoint(coverageFuzzingDiffEndpoint);
+    if (this.coverageFuzzingComparisonPath && this.hasCoverageFuzzingReports) {
+      this.setCoverageFuzzingDiffEndpoint(this.coverageFuzzingComparisonPath);
       this.fetchCoverageFuzzingDiff();
       this.fetchPipelineJobs();
     }
