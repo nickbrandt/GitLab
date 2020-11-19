@@ -18913,9 +18913,6 @@ msgstr ""
 msgid "OnDemandScans|Create a new site profile"
 msgstr ""
 
-msgid "OnDemandScans|Create new DAST scan"
-msgstr ""
-
 msgid "OnDemandScans|Manage profiles"
 msgstr ""
 
@@ -18938,9 +18935,6 @@ msgid "OnDemandScans|Run scan"
 msgstr ""
 
 msgid "OnDemandScans|Scanner profile"
-msgstr ""
-
-msgid "OnDemandScans|Schedule or run scans immediately against target sites. Currently available on-demand scan type: DAST. %{helpLinkStart}More information%{helpLinkEnd}"
 msgstr ""
 
 msgid "OnDemandScans|Select one of the existing profiles"
