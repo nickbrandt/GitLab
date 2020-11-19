@@ -368,12 +368,8 @@
     position: relative;
     padding: 2px 0;
 
-    &:not(:last-child) {
-      padding-right: 20px;
-
-      &:not(.dropdown) {
-        overflow: hidden;
-      }
+    &:not(:last-child):not(.dropdown) {
+      overflow: hidden;
     }
 
     > a {
@@ -384,10 +380,6 @@
       text-overflow: ellipsis;
       flex: 0 1 auto;
     }
-
-    &:last-of-type > .breadcrumbs-list-angle {
-      display: none;
-    }
   }
 }
 
@@ -397,14 +389,6 @@
   @include media-breakpoint-down(xs) {
     @include str-truncated(128px);
   }
-}
-
-.breadcrumbs-list-angle {
-  position: absolute;
-  right: 7px;
-  top: 50%;
-  color: $gl-text-color-tertiary;
-  transform: translateY(-50%);
 }
 
 .breadcrumbs-extra {

@@ -37,8 +37,10 @@ RSpec.describe 'User browses commits' do
   it 'renders breadcrumbs on specific commit path' do
     visit project_commits_path(project, project.repository.root_ref + '/files/ruby/regex.rb', limit: 5)
 
-    expect(page).to have_selector('ul.breadcrumb')
-      .and have_selector('ul.breadcrumb a', count: 4)
+    # Now have 2 breadcrumbs: global one and directory-based one
+    expect(page).to have_selector('ul.breadcrumb', count: 2)
+    expect(page).to have_selector('.tree-holder ul.breadcrumb')
+      .and have_selector('.tree-holder ul.breadcrumb a', count: 4)
   end
 
   it 'renders diff links to both the previous and current image', :js do
