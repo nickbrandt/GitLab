@@ -1,4 +1,8 @@
 const unwrapPipelineData = (mainPipelineId, data) => {
+  if (!data.project?.pipeline) {
+    return;
+  }
+
   const {
     id,
     upstream,

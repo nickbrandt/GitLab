@@ -43,9 +43,8 @@ export default {
       update(data) {
         return unwrapPipelineData(this.pipelineIid, data);
       },
-      error(err){
-        console.log(err);
-        reportFailure(LOAD_FAILURE);
+      error(){
+        this.reportFailure(LOAD_FAILURE);
       }
     }
   },
@@ -80,7 +79,7 @@ export default {
   <gl-alert v-if="showAlert" :variant="alert.variant" @dismiss="hideAlert">
     {{ alert.text }}
   </gl-alert>
-  <gl-loading-icon v-else-if="$apollo.queries.pipeline.loading" class="m-auto" size="lg" />
+  <gl-loading-icon v-else-if="$apollo.queries.pipeline.loading" class="gl-mx-auto gl-my-4" size="lg" />
   <pipeline-graph
     v-else
     :pipeline="pipeline"
