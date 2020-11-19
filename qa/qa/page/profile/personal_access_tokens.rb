@@ -27,7 +27,11 @@ module QA
         end
 
         def fill_token_name(name)
-          fill_element(:access_token_name_field, name)
+          retry_until(reload: true, sleep_interval: 0.5) do
+            fill_element(:access_token_name_field, name)
+            element = find_element(:access_token_name_field)
+            break true if element.value == name
+          end
         end
 
         def check_api
