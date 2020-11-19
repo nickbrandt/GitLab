@@ -11438,6 +11438,9 @@ msgstr ""
 msgid "Failed to reset key. Please try again."
 msgstr ""
 
+msgid "Failed to retrieve page"
+msgstr ""
+
 msgid "Failed to save merge conflicts resolutions. Please try again!"
 msgstr ""
 
@@ -27031,6 +27034,9 @@ msgstr ""
 msgid "The number of times an upload record could not find its file"
 msgstr ""
 
+msgid "The page could not be displayed because it timed out."
+msgstr ""
+
 msgid "The parent epic is confidential and can only contain confidential epics and issues"
 msgstr ""
 
@@ -30710,6 +30716,9 @@ msgstr ""
 msgid "Wiki|Pages"
 msgstr ""
 
+msgid "Wiki|The sidebar failed to load. You can reload the page to try again."
+msgstr ""
+
 msgid "Wiki|Title"
 msgstr ""
 
@@ -31008,6 +31017,9 @@ msgid "You can specify notification level per group or per project."
 msgstr ""
 
 msgid "You can test your .gitlab-ci.yml in %{linkStart}CI Lint%{linkEnd}."
+msgstr ""
+
+msgid "You can view the source or %{linkStart}%{cloneIcon} clone the repository%{linkEnd}"
 msgstr ""
 
 msgid "You cannot access the raw file. Please wait a minute."
