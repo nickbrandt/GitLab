@@ -1,0 +1,5 @@
+---
+title: Return 413 HTTP status for S3 uploads if max upload limit is reached
+merge_request: 655
+author:
+type: fixed
