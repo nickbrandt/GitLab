@@ -9436,6 +9436,12 @@ msgstr ""
 msgid "DevopsAdoptionSegment|The maximum number of segments has been reached"
 msgstr ""
 
+msgid "DevopsAdoption|%{selectedCount} group selected (20 max)"
+msgstr ""
+
+msgid "DevopsAdoption|%{selectedCount} groups selected (20 max)"
+msgstr ""
+
 msgid "DevopsAdoption|Add a segment to get started"
 msgstr ""
 
@@ -9443,6 +9449,9 @@ msgid "DevopsAdoption|Add new segment"
 msgstr ""
 
 msgid "DevopsAdoption|Approvals"
+msgstr ""
+
+msgid "DevopsAdoption|Create new segment"
 msgstr ""
 
 msgid "DevopsAdoption|Deploys"
@@ -9455,6 +9464,15 @@ msgid "DevopsAdoption|Issues"
 msgstr ""
 
 msgid "DevopsAdoption|MRs"
+msgstr ""
+
+msgid "DevopsAdoption|My segment"
+msgstr ""
+
+msgid "DevopsAdoption|Name"
+msgstr ""
+
+msgid "DevopsAdoption|New segment"
 msgstr ""
 
 msgid "DevopsAdoption|Pipelines"
