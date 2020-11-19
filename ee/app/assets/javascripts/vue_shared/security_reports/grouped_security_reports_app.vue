@@ -9,6 +9,7 @@ import ReportSection from '~/reports/components/report_section.vue';
 import SummaryRow from '~/reports/components/summary_row.vue';
 import Tracking from '~/tracking';
 import GroupedIssuesList from '~/reports/components/grouped_issues_list.vue';
+import SecuritySummary from '~/vue_shared/security_reports/components/security_summary.vue';
 import IssueModal from './components/modal.vue';
 import DastModal from './components/dast_modal.vue';
 import securityReportsMixin from './mixins/security_report_mixin';
@@ -16,7 +17,6 @@ import createStore from './store';
 import { mrStates } from '~/mr_popover/constants';
 import { fetchPolicies } from '~/lib/graphql';
 import securityReportSummaryQuery from './graphql/mr_security_report_summary.graphql';
-import SecuritySummary from './components/security_summary.vue';
 import {
   MODULE_CONTAINER_SCANNING,
   MODULE_COVERAGE_FUZZING,
