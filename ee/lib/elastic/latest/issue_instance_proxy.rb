@@ -16,8 +16,6 @@ module Elastic
 
         data['assignee_id'] = safely_read_attribute_for_elasticsearch(:assignee_ids)
         data['issues_access_level'] = target.project.project_feature.issues_access_level
-        # TODO - check if migration has been run before sending
-        data['gitlab_migration_version'] = GITLAB_MIGRATION_VERSION
 
         data.merge(generic_attributes)
       end
