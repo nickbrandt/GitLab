@@ -906,9 +906,6 @@ msgstr ""
 msgid "&lt;no scopes selected&gt;"
 msgstr ""
 
-msgid "&lt;project name&gt;"
-msgstr ""
-
 msgid "'%{data}' at %{location} does not match format: %{format}"
 msgstr ""
 
@@ -32757,6 +32754,9 @@ msgid "project is read-only"
 msgstr ""
 
 msgid "project members"
+msgstr ""
+
+msgid "project name"
 msgstr ""
 
 msgid "projects"
