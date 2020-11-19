@@ -59,12 +59,9 @@ mainline:
 git revert -m 2 7a39eb0
 ```
 
-## Reverted Indicator
-
-Merge Requests that are reverted by another merge request using one of these
-methods will display a link to the other MR.
-
-![Reverted indicator in the status box](img/mr_reverted_indicator.png)
+From [GitLab 13.7 onwards](https://gitlab.com/gitlab-org/gitlab/-/issues/35824), merge requests
+reverted by another merge request through one of the methods described in this document
+will display a link to the reverted merge request at the top-left corner within the **Merged** badge.
 
 <!-- ## Troubleshooting
 

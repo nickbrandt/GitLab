@@ -17479,6 +17479,9 @@ msgstr ""
 msgid "MergeRequest|Search files (%{modifier_key}P)"
 msgstr ""
 
+msgid "MergeRequest|reverted"
+msgstr ""
+
 msgid "Merged"
 msgstr ""
 

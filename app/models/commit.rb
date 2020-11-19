@@ -428,7 +428,7 @@ class Commit
   end
 
   def has_been_reverted?(current_user, notes_association = nil)
-    !!reverting_commit(current_user, notes_association)
+    reverting_commit(current_user, notes_association).present?
   end
 
   def reverting_commit(current_user, notes_association = nil)
