@@ -38,6 +38,7 @@ module Gitlab
 
             validate on: :composed do
               next unless dependencies.present?
+
               if ::Gitlab::Ci::Features.dag_needs_stage_enabled?
                 next unless needs_value.present? && needs_value[:job]
               else
