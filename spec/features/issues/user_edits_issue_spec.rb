@@ -20,17 +20,6 @@ RSpec.describe "Issues > User edits issue", :js do
       sign_in(user)
     end
 
-    # context 'with multiple_issue_assignees license feature on' do
-    #   before do
-    #     stub_licensed_features(multiple_issue_assignees: true)
-    #   end
-
-    #   it 'displays plural Assignees title' do
-    #     visit edit_project_issue_path(project, issue)
-    #     expect(page).to have_content "Assignees"
-    #   end
-    # end
-
     context "from edit page" do
       before do
         stub_licensed_features(multiple_issue_assignees: false)
