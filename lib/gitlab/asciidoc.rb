@@ -56,11 +56,8 @@ module Gitlab
       extensions = proc do
         include_processor ::Gitlab::Asciidoc::IncludeProcessor.new(context)
         block ::Gitlab::Asciidoc::MermaidBlockProcessor
-
-        if Gitlab::CurrentSettings.kroki_enabled
-          ::AsciidoctorExtensions::Kroki::SUPPORTED_DIAGRAM_NAMES.each do |name|
-            block ::AsciidoctorExtensions::KrokiBlockProcessor, name
-          end
+        ::Gitlab::Kroki.formats(Gitlab::CurrentSettings).each do |name|
+          block ::AsciidoctorExtensions::KrokiBlockProcessor, name
         end
       end
 

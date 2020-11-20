@@ -180,11 +180,6 @@ msgid_plural "%d errors"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%d error found:"
-msgid_plural "%d errors found:"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "%d exporter"
 msgid_plural "%d exporters"
 msgstr[0] ""
@@ -20332,6 +20327,9 @@ msgid "Please migrate all existing projects to hashed storage to avoid security 
 msgstr ""
 
 msgid "Please note that this application is not provided by GitLab and you should verify its authenticity before allowing access."
+msgstr ""
+
+msgid "Please note that using additional formats requires to start companion containers. Make sure that all %{kroki_images} are running."
 msgstr ""
 
 msgid "Please only enable search after installing the plugin, enabling indexing and recreating the index"
