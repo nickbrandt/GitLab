@@ -13,7 +13,7 @@ module Elastic
         end
 
         data['assignee_id'] = safely_read_attribute_for_elasticsearch(:assignee_ids)
-        data['issues_access_level'] = target.project.project_feature.issues_access_level
+        data['issues_access_level'] = target.project.project_feature&.issues_access_level
 
         data.merge(generic_attributes)
       end
