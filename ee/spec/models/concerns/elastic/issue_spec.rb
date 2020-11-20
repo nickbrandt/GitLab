@@ -134,6 +134,15 @@ RSpec.describe Issue, :elastic do
     expect(issue.__elasticsearch__.as_indexed_json).to eq(expected_hash)
   end
 
+  it 'handles a project missing project_feature' do
+    issue = create :issue, project: project
+    allow(issue.project).to receive(:project_feature).and_return(nil)
+
+    expect(Gitlab::ErrorTracking).to receive(:track_exception)
+
+    expect(issue.__elasticsearch__.as_indexed_json['issues_access_level']).to eq(ProjectFeature::PRIVATE)
+  end
+
   context 'field length limits' do
     context 'when there is an elasticsearch_indexed_field_length limit' do
       it 'truncates to the default plan limit' do
