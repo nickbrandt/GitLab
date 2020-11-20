@@ -165,13 +165,14 @@ module EE
       scope :without_repository_size_limit, -> { where(repository_size_limit: nil) }
 
       scope :order_by_total_repository_size_excess_desc, -> (limit) do
-        excess = ::ProjectStatistics.arel_table[:repository_size] +
+        excess_arel = ::ProjectStatistics.arel_table[:repository_size] +
                    ::ProjectStatistics.arel_table[:lfs_objects_size] -
-                   ::Project.arel_table.coalesce(::Project.arel_table[:repository_size_limit], limit, 0)
+                   arel_table.coalesce(arel_table[:repository_size_limit], limit, 0)
+        alias_node = Arel::Nodes::SqlLiteral.new('excess_storage')
 
-        joins(:statistics).order(
-          Arel.sql(Arel::Nodes::Descending.new(excess).to_sql)
-        )
+        select(*arel.projections, excess_arel.as(alias_node))
+          .joins(:statistics)
+          .order(excess_arel.desc)
       end
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
