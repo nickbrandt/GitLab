@@ -5652,9 +5652,6 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-msgid "Close %{display_issuable_type}"
-msgstr ""
-
 msgid "Close %{issueType}"
 msgstr ""
 
@@ -18227,9 +18224,6 @@ msgstr ""
 msgid "New"
 msgstr ""
 
-msgid "New %{display_issuable_type}"
-msgstr ""
-
 msgid "New %{issueType}"
 msgstr ""
 
@@ -22802,9 +22796,6 @@ msgid "Rename/Move"
 msgstr ""
 
 msgid "Reopen"
-msgstr ""
-
-msgid "Reopen %{display_issuable_type}"
 msgstr ""
 
 msgid "Reopen %{issueType}"
