@@ -28,63 +28,35 @@ RSpec.describe 'Import/Export - project import integration test', :js do
     let(:project_name) { 'Test Project Name' + randomHex }
     let(:project_path) { 'test-project-name' + randomHex }
 
-    context 'prefilled the path' do
-      it 'user imports an exported project successfully', :sidekiq_might_not_need_inline do
-        visit new_project_path
+    it 'user imports an exported project successfully', :sidekiq_might_not_need_inline do
+      visit new_project_path
+      click_import_project_tab
+      click_link 'GitLab export'
 
-        click_import_project_tab
-        click_link 'GitLab export'
-        fill_in :name, with: project_name, visible: true
+      fill_in :name, with: 'Test Project Name', visible: true
+      fill_in :path, with: 'test-project-path', visible: true
+      attach_file('file', file)
 
-        expect(page).to have_content('Import an exported GitLab project')
-        expect(URI.parse(current_url).query).to eq("namespace_id=#{namespace.id}&name=#{ERB::Util.url_encode(project_name)}&path=#{project_path}")
+      expect { click_on 'Import project' }.to change { Project.count }.by(1)
 
-        attach_file('file', file)
-        click_on 'Import project'
-
-        expect(Project.count).to eq(1)
-
-        project = Project.last
-        expect(project).not_to be_nil
-        expect(project.description).to eq("Foo Bar")
-        expect(project.issues).not_to be_empty
-        expect(project.merge_requests).not_to be_empty
-        expect(wiki_exists?(project)).to be true
-        expect(project.import_state.status).to eq('finished')
-      end
+      project = Project.last
+      expect(project).not_to be_nil
+      expect(page).to have_content("Project 'test-project-path' is being imported")
     end
 
-    context 'path is not prefilled' do
-      it 'user imports an exported project successfully', :sidekiq_might_not_need_inline do
-        visit new_project_path
-        click_import_project_tab
-        click_link 'GitLab export'
+    it 'invalid project' do
+      project = create(:project, namespace: user.namespace)
 
-        fill_in :name, with: 'Test Project Name', visible: true
-        fill_in :path, with: 'test-project-path', visible: true
-        attach_file('file', file)
+      visit new_project_path
 
-        expect { click_on 'Import project' }.to change { Project.count }.by(1)
+      click_import_project_tab
+      click_link 'GitLab export'
+      fill_in :name, with: project.name, visible: true
+      attach_file('file', file)
+      click_on 'Import project'
 
-        project = Project.last
-        expect(project).not_to be_nil
-        expect(page).to have_content("Project 'test-project-path' is being imported")
-      end
-
-      it 'invalid project' do
-        project = create(:project, namespace: user.namespace)
-
-        visit new_project_path
-
-        click_import_project_tab
-        click_link 'GitLab export'
-        fill_in :name, with: project.name, visible: true
-        attach_file('file', file)
-        click_on 'Import project'
-
-        page.within('.flash-container') do
-          expect(page).to have_content('Project could not be imported')
-        end
+      page.within('.flash-container') do
+        expect(page).to have_content('Project could not be imported')
       end
     end
   end
