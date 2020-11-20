@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
 	"gitlab.com/gitlab-org/labkit/log"
@@ -96,7 +97,7 @@ const (
 )
 
 var (
-	imageResizeConcurrencyLimitExceeds = prometheus.NewCounter(
+	imageResizeConcurrencyLimitExceeds = promauto.NewCounter(
 		prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
@@ -104,7 +105,7 @@ var (
 			Help:      "Amount of image resizing requests that exceeded the maximum allowed scaler processes",
 		},
 	)
-	imageResizeProcesses = prometheus.NewGauge(
+	imageResizeProcesses = promauto.NewGauge(
 		prometheus.GaugeOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
@@ -112,7 +113,7 @@ var (
 			Help:      "Amount of image scaler processes working now",
 		},
 	)
-	imageResizeMaxProcesses = prometheus.NewGauge(
+	imageResizeMaxProcesses = promauto.NewGauge(
 		prometheus.GaugeOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
@@ -120,7 +121,7 @@ var (
 			Help:      "The maximum amount of image scaler processes allowed to run concurrently",
 		},
 	)
-	imageResizeRequests = prometheus.NewCounterVec(
+	imageResizeRequests = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
@@ -129,7 +130,7 @@ var (
 		},
 		[]string{"status"},
 	)
-	imageResizeDurations = prometheus.NewHistogramVec(
+	imageResizeDurations = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Namespace: namespace,
 			Subsystem: subsystem,
@@ -153,14 +154,6 @@ const (
 	pngMagic    = "\x89PNG\r\n\x1a\n" // 8 bytes
 	maxMagicLen = 8                   // 8 first bytes is enough to detect PNG or JPEG
 )
-
-func init() {
-	prometheus.MustRegister(imageResizeConcurrencyLimitExceeds)
-	prometheus.MustRegister(imageResizeProcesses)
-	prometheus.MustRegister(imageResizeMaxProcesses)
-	prometheus.MustRegister(imageResizeRequests)
-	prometheus.MustRegister(imageResizeDurations)
-}
 
 func NewResizer(cfg config.Config) *Resizer {
 	imageResizeMaxProcesses.Set(float64(cfg.ImageResizerConfig.MaxScalerProcs))
