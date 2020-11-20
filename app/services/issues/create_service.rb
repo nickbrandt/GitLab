@@ -26,7 +26,6 @@ module Issues
     end
 
     def after_create(issue)
-      add_incident_label(issue)
       todo_service.new_issue(issue, current_user)
       user_agent_detail_service.create
       resolve_discussions_with_issue(issue)
