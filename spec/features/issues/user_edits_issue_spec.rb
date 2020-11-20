@@ -20,9 +20,9 @@ RSpec.describe "Issues > User edits issue", :js do
       sign_in(user)
     end
 
-    context 'with multiple_issue_assignees feature flag off' do
+    context 'with multiple_issue_assignees license feature off' do
       before do
-        stub_feature_flags(multiple_issue_assignees: false)
+        stub_licensed_features(multiple_issue_assignees: false)
       end
 
       it 'displays singular Assignee title' do
