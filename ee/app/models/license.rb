@@ -91,6 +91,7 @@ class License < ApplicationRecord
     group_project_templates
     group_repository_analytics
     group_saml
+    group_saml_group_sync
     group_wikis
     incident_sla
     ide_schema_config
@@ -145,7 +146,6 @@ class License < ApplicationRecord
     license_scanning
     personal_access_token_expiration_policy
     enforce_pat_expiration
-    group_saml_group_sync
     prometheus_alerts
     pseudonymizer
     release_evidence_test_artifacts
