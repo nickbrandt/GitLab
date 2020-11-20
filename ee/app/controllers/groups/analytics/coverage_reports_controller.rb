@@ -32,7 +32,7 @@ class Groups::Analytics::CoverageReportsController < Groups::Analytics::Applicat
   end
 
   def report_results
-    Ci::DailyBuildGroupReportResultsByGroupFinder.new(finder_params).execute
+    Ci::DailyBuildGroupReportResultsByGroupFinder.new(**finder_params).execute
   end
 
   def finder_params
