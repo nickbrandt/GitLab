@@ -13,7 +13,7 @@ module Ci
       list = []
       list << create_archive(options[:artifacts])
       list << create_reports(options[:artifacts][:reports], expire_in: options[:artifacts][:expire_in])
-      (options[:artifacts][:archives] || {}).each { |archive| list << create_archive(archive) }
+      list << options.dig(:artifacts, :archives).to_a.map(&method(:create_archive))
       list.flatten.compact
     end
 

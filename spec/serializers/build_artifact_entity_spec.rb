@@ -5,9 +5,10 @@ require 'spec_helper'
 RSpec.describe BuildArtifactEntity do
   let(:job) { create(:ci_build) }
   let(:artifact) { create(:ci_job_artifact, :codequality, expire_at: 1.hour.from_now, job: job) }
+  let(:presenter) { Ci::BuildArtifactPresenter.new(artifact, display_index: 1) }
 
   let(:entity) do
-    described_class.new(artifact, request: double)
+    described_class.new(presenter, request: double)
   end
 
   describe '#as_json' do
@@ -35,16 +36,8 @@ RSpec.describe BuildArtifactEntity do
     context 'when archive' do
       let(:artifact) { create(:ci_job_artifact) }
 
-      it 'name contains job name, file type name, and file name' do
-        expect(subject[:name]).to eq "test:archive:artifact #{artifact.id}"
-      end
-
-      context 'with file_in_database not null' do
-        let(:artifact) { create(:ci_job_artifact, :archive) }
-
-        it 'name contains job name, file type name, and file name' do
-          expect(subject[:name]).to eq "test:archive:ci_build_artifacts"
-        end
+      it 'serializes the name' do
+        expect(subject[:name]).to eq "test:artifact1:archive"
       end
     end
   end

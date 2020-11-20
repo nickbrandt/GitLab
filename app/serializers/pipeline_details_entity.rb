@@ -9,9 +9,11 @@ class PipelineDetailsEntity < PipelineEntity
 
   expose :details do
     expose :artifacts do |pipeline, options|
-      rel = pipeline.downloadable_artifacts
+      artifacts = pipeline.downloadable_artifacts.map.with_index do |artifact, index|
+        ::Ci::BuildArtifactPresenter.new(artifact, display_index: index + 1)  # rubocop:disable CodeReuse/Presenter
+      end
 
-      BuildArtifactEntity.represent(rel, options)
+      BuildArtifactEntity.represent(artifacts, options)
     end
     expose :manual_actions, using: BuildActionEntity
     expose :scheduled_actions, using: BuildActionEntity

@@ -28,7 +28,7 @@ The following table lists available keywords for jobs:
 | [`script`](#script)                                | Shell script that is executed by a runner.                                                                                                                                           |
 | [`after_script`](#after_script)                    | Override a set of commands that are executed after job.                                                                                                                             |
 | [`allow_failure`](#allow_failure)                  | Allow job to fail. Failed job does not contribute to commit status.                                                                                                                 |
-| [`artifacts`](#artifacts)                          | List of files and directories to attach to a job on success. Also available: `artifacts:paths`, `artifacts:exclude`, `artifacts:expose_as`, `artifacts:name`, `artifacts:untracked`, `artifacts:when`, `artifacts:expire_in`, and `artifacts:reports`. |
+| [`artifacts`](#artifacts)                          | List of files and directories to attach to a job on success. Also available: `artifacts:paths`, `artifacts:exclude`, `artifacts:expose_as`, `artifacts:name`, `artifacts:untracked`, `artifacts:when`, `artifacts:expire_in`, `artifact:archives` and `artifacts:reports`. |
 | [`before_script`](#before_script)                  | Override a set of commands that are executed before job.                                                                                                                            |
 | [`cache`](#cache)                                  | List of files that should be cached between subsequent runs. Also available: `cache:paths`, `cache:key`, `cache:untracked`, `cache:when`, and `cache:policy`.                                     |
 | [`coverage`](#coverage)                            | Code coverage settings for a given job.                                                                                                                                             |
@@ -3295,7 +3295,9 @@ artifacts:
 
 In 13.7 artifacts specified in this way are only avalible for download via the artifacts dropdown in 
 the project pipeline index at `<path-to-project>/-/pipelines`. Only the first archive specified by a given job
-will be passed to the next stages by default or when a job is specified as a dependency using `dependencies`.
+will be passed to the next stages by default or when a job is specified as a dependency using `dependencies`. 
+However, the [Keep button](#artifactsexpire_in) on the job page will act on all job archives.
+
 
 #### `artifacts:reports`
 

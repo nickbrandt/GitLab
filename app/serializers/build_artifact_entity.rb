@@ -7,17 +7,7 @@ class BuildArtifactEntity < Grape::Entity
   alias_method :artifact, :object
 
   expose :name do |artifact|
-    if artifact.file_type == 'archive'
-      file_name = artifact.file_in_database
-      file_info = "#{artifact.file_type}"
-      # To differentiate multiple archives the file name from the database is used or the artifact id
-      # file_name  corresponds to `artifact:archives:name` in gitlab-ci.yml
-      file_info += file_name ? ":#{file_name.split('.').first}" : ":artifact #{artifact.id}"
-    else
-      file_info = "#{artifact.file_type}"
-    end
-
-    "#{artifact.job.name}:#{file_info}"
+    artifact.name
   end
 
   expose :expire_at

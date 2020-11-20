@@ -56,7 +56,7 @@ module Ci
       class_name: 'Ci::JobArtifact',
       inverse_of: :job,
       foreign_key: :job_id
-    # TODO: deprecate once all locations that show artifacts support multiple
+    # Deterministic ordering so that places that only show one artifact currently always show the first
     has_one :job_artifacts_archive,
       -> { where(file_type: Ci::JobArtifact.file_types['archive']).order(created_at: :asc) },
       class_name: 'Ci::JobArtifact',
@@ -799,7 +799,7 @@ module Ci
 
     def job_artifact_by_file_type(file_type)
       if file_type == 'archive'
-        # Since there can be multiple archives ensure the first created archive is used
+        # Multiple are allowed ensure the first created archive is used
         job_artifacts_archive
       else
         job_artifacts.find_by(file_type: Ci::JobArtifact.file_types[file_type])
