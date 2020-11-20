@@ -33,6 +33,7 @@ RSpec.describe "Issues > User edits issue", :js do
 
     context "from edit page" do
       before do
+        stub_licensed_features(multiple_issue_assignees: true)
         visit edit_project_issue_path(project, issue)
       end
 
