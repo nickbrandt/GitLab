@@ -61,11 +61,6 @@ RSpec.describe 'Import/Export - project import integration test', :js do
     end
   end
 
-  def wiki_exists?(project)
-    wiki = ProjectWiki.new(project)
-    wiki.repository.exists? && !wiki.repository.empty?
-  end
-
   def click_import_project_tab
     find('[data-qa-selector="import_project_link"]').click
   end
