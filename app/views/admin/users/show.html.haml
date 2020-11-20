@@ -172,13 +172,7 @@
       - if @user.blocked?
         - if @user.blocked_pending_approval?
           = render 'admin/users/approve_user', user: @user
-          .card.border-danger
-            .card-header.bg-danger.gl-text-white
-              = s_('AdminUsers|This user has requested access')
-            .card-body
-              = render partial: 'admin/users/user_reject_effects'
-              %br
-              = link_to 'Reject request', admin_user_path(@user, hard_delete: true), method: :delete, class: "btn gl-button delete-user-button btn-danger", data: { confirm: s_('AdminUsers|Are you sure?') }
+          = render 'admin/users/reject_pending_user', user: @user
         - else
           .card.border-info
             .card-header.gl-bg-blue-500.gl-text-white
