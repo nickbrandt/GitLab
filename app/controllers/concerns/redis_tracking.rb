@@ -37,7 +37,7 @@ module RedisTracking
   end
 
   def trackable_request?
-    request.format.html? && request.headers['DNT'] != '1'
+    request.headers['DNT'] != '1'
   end
 
   def metric_feature_enabled?(feature, default_enabled)

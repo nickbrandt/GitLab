@@ -519,6 +519,8 @@ Example of `redis_hll_counters` data:
      "g_edit_by_web_ide_monthly"=>0,
      "g_edit_by_sfe_weekly"=>0,
      "g_edit_by_sfe_monthly"=>0,
+     "g_edit_by_sse_weekly"=>0,
+     "g_edit_by_sse_monthly"=>0,
      "ide_edit_total_unique_counts_weekly"=>0,
      "ide_edit_total_unique_counts_monthly"=>0},
    "search"=>

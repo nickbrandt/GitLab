@@ -30,14 +30,14 @@ RSpec.describe Projects::UsagePingController do
     end
   end
 
-  shared_examples 'counter is increased' do |counter|
+  shared_examples 'counter is increased' do |event|
     context 'when the authenticated user has access to the project' do
       let(:user) { project.owner }
 
       it 'increments the usage counter' do
         expect do
           subject
-        end.to change { Gitlab::UsageDataCounters::WebIdeCounter.total_count(counter) }.by(1)
+        end.to change { counter_klass.read(event) }.by(1)
       end
     end
   end
@@ -51,7 +51,9 @@ RSpec.describe Projects::UsagePingController do
       end
 
       it_behaves_like 'counter is not increased'
-      it_behaves_like 'counter is increased', 'WEB_IDE_PREVIEWS_COUNT'
+      it_behaves_like 'counter is increased', :previews do
+        let(:counter_klass) { Gitlab::UsageDataCounters::WebIdeCounter }
+      end
     end
 
     context 'when web ide clientside preview is not enabled' do
@@ -73,6 +75,37 @@ RSpec.describe Projects::UsagePingController do
     subject { post :web_ide_pipelines_count, params: { namespace_id: project.namespace, project_id: project } }
 
     it_behaves_like 'counter is not increased'
-    it_behaves_like 'counter is increased', 'WEB_IDE_PIPELINES_COUNT'
+    it_behaves_like 'counter is increased', :pipelines do
+      let(:counter_klass) { Gitlab::UsageDataCounters::WebIdeCounter }
+    end
+  end
+
+  describe 'POST #sse_commits_count' do
+    subject { post :sse_commits_count, params: { namespace_id: project.namespace, project_id: project } }
+
+    it_behaves_like 'counter is not increased'
+    it_behaves_like 'counter is increased', :commits do
+      let(:counter_klass) { Gitlab::UsageDataCounters::StaticSiteEditorCounter }
+    end
+
+    it_behaves_like 'tracking unique hll events', :track_editor_edit_actions do
+      let(:user) { project.owner }
+
+      subject(:request) { post :sse_commits_count, params: { namespace_id: project.namespace, project_id: project } }
+
+      let(:target_id) { 'g_edit_by_sse' }
+      let(:expected_type) { instance_of(String) }
+    end
+
+    context 'when request is in js format' do
+      it_behaves_like 'tracking unique hll events', :track_editor_edit_actions do
+        let(:user) { project.owner }
+
+        subject(:request) { post :sse_commits_count, params: { namespace_id: project.namespace, project_id: project }, format: :js }
+
+        let(:target_id) { 'g_edit_by_sse' }
+        let(:expected_type) { instance_of(String) }
+      end
+    end
   end
 end

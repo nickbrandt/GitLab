@@ -10,6 +10,10 @@ module Gitlab
         def increment_views_count
           count(:views)
         end
+
+        def increment_commits_count
+          count(:commits)
+        end
       end
     end
   end
