@@ -3968,6 +3968,12 @@ msgstr ""
 msgid "Authenticate with GitHub"
 msgstr ""
 
+msgid "Authenticated API request rate limit"
+msgstr ""
+
+msgid "Authenticated web request rate limit"
+msgstr ""
+
 msgid "Authenticating"
 msgstr ""
 
@@ -28965,6 +28971,9 @@ msgid "Unassign from commenting user"
 msgstr ""
 
 msgid "Unassigned"
+msgstr ""
+
+msgid "Unauthenticated request rate limit"
 msgstr ""
 
 msgid "Undo"
