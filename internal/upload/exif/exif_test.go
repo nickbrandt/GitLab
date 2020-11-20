@@ -75,3 +75,21 @@ func TestNewCleanerWithInvalidFile(t *testing.T) {
 	require.Error(t, err, "Expected error when reading output")
 	require.Equal(t, int64(0), size, "Size of invalid image should be 0")
 }
+
+func TestNewCleanerReadingAfterEOF(t *testing.T) {
+	input, err := os.Open("testdata/sample_exif.jpg")
+	require.NoError(t, err)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	cleaner, err := NewCleaner(ctx, input)
+	require.NoError(t, err, "Expected no error when creating cleaner command")
+
+	_, err = io.Copy(ioutil.Discard, cleaner)
+	require.NoError(t, err, "Expected no error when reading output")
+
+	buf := make([]byte, 1)
+	size, err := cleaner.Read(buf)
+	require.Equal(t, 0, size, "The output was already consumed by previous reads")
+	require.Equal(t, io.EOF, err, "We return EOF")
+}
