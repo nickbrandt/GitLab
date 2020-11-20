@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"regexp"
 
@@ -37,24 +38,30 @@ func NewCleaner(ctx context.Context, stdin io.Reader) (io.Reader, error) {
 }
 
 func (c *cleaner) Read(p []byte) (int, error) {
-	select {
-	case <-c.waitDone:
-		return 0, io.EOF
-	default:
-		n, err := c.stdout.Read(p)
-		if err == io.EOF {
-			if waitErr := c.wait(); waitErr != nil {
-				log.WithContextFields(c.ctx, log.Fields{
-					"command": c.cmd.Args,
-					"stderr":  c.stderr.String(),
-					"error":   waitErr.Error(),
-				}).Print("exiftool command failed")
-				return n, ErrRemovingExif
-			}
+	n, err := c.stdout.Read(p)
+	if err == io.EOF {
+		if waitErr := c.wait(); waitErr != nil {
+			log.WithContextFields(c.ctx, log.Fields{
+				"command": c.cmd.Args,
+				"stderr":  c.stderr.String(),
+				"error":   waitErr.Error(),
+			}).Print("exiftool command failed")
+			return n, ErrRemovingExif
 		}
-
-		return n, err
 	}
+
+	// Calling c.cmd.Wait() will close the stdout pipe, any attempt to read from it will fail with an os.PathError.
+	// see: https://gitlab.com/gitlab-org/gitlab-workhorse/-/issues/233
+	if _, ok := err.(*os.PathError); ok {
+		select {
+		case <-c.waitDone:
+			return n, io.EOF
+		default:
+			return n, err
+		}
+	}
+
+	return n, err
 }
 
 func (c *cleaner) startProcessing(stdin io.Reader) error {
