@@ -156,7 +156,7 @@ RSpec.describe 'group epic roadmap', :js do
     end
   end
 
-  context 'when over 1000 epics exist for the group' do
+  context 'when over 1000 epics match roadmap filters' do
     before do
       create_list(:epic, 2, group: group, start_date: 10.days.ago, end_date: 1.day.ago)
       visit group_roadmap_path(group)
@@ -168,7 +168,7 @@ RSpec.describe 'group epic roadmap', :js do
       it 'renders warning callout banner' do
         page.within('.content-wrapper .content') do
           expect(page).to have_selector('[data-testid="epics_limit_callout"]', count: 1)
-          expect(find('[data-testid="epics_limit_callout"]')).to have_content 'Some of your epics may not be visible Roadmaps are limited to 1,000 epics. These will display in your selected sort order.'
+          expect(find('[data-testid="epics_limit_callout"]')).to have_content 'Some of your epics might not be visible Roadmaps can display up to 1,000 epics. These appear in your selected sort order.'
         end
 
         page.within('[data-testid="epics_limit_callout"]') do

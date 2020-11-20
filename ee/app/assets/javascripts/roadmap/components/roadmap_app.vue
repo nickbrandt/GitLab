@@ -2,7 +2,7 @@
 import Cookies from 'js-cookie';
 import { GlLoadingIcon, GlAlert } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
-import { __ } from '~/locale';
+import { __, s__ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import EpicsListEmpty from './epics_list_empty.vue';
@@ -10,13 +10,17 @@ import RoadmapFilters from './roadmap_filters.vue';
 import RoadmapShell from './roadmap_shell.vue';
 
 import eventHub from '../event_hub';
-import { EXTEND_AS, EPICS_LIMIT_DISMISSED_COOKIE_NAME } from '../constants';
+import {
+  EXTEND_AS,
+  EPICS_LIMIT_DISMISSED_COOKIE_NAME,
+  EPICS_LIMIT_DISMISSED_COOKIE_TIMEOUT,
+} from '../constants';
 
 export default {
   i18n: {
-    warningTitle: __('Some of your epics may not be visible'),
-    warningBody: __(
-      'Roadmaps are limited to 1,000 epics. These will display in your selected sort order.',
+    warningTitle: s__('GroupRoadmap|Some of your epics might not be visible'),
+    warningBody: s__(
+      'GroupRoadmap|Roadmaps can display up to 1,000 epics. These appear in your selected sort order.',
     ),
     warningButtonLabel: __('Learn more'),
   },
@@ -144,7 +148,9 @@ export default {
       });
     },
     dismissTooManyEpicsWarning() {
-      Cookies.set(EPICS_LIMIT_DISMISSED_COOKIE_NAME, 'true', { expires: 365 });
+      Cookies.set(EPICS_LIMIT_DISMISSED_COOKIE_NAME, 'true', {
+        expires: EPICS_LIMIT_DISMISSED_COOKIE_TIMEOUT,
+      });
       this.isWarningDismissed = true;
     },
   },

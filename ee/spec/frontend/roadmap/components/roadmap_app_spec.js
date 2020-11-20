@@ -245,16 +245,14 @@ describe('RoadmapApp', () => {
   describe('roadmap epics limit warning', () => {
     beforeEach(() => {
       wrapper = createComponent();
-      Cookies.set('epics_limit_warning_dismissed', false);
       store.commit(types.RECEIVE_EPICS_SUCCESS, [mockFormattedEpic, mockFormattedChildEpic2]);
       window.gon.roadmap_epics_limit = 1;
     });
 
     it('displays warning when epics limit is reached', () => {
-      expect(Cookies.get('epics_limit_warning_dismissed')).toBe('false');
       expect(wrapper.find(GlAlert).exists()).toBe(true);
       expect(wrapper.find(GlAlert).text()).toContain(
-        'Roadmaps are limited to 1,000 epics. These will display in your selected sort order.',
+        'Roadmaps can display up to 1,000 epics. These appear in your selected sort order.',
       );
     });
 
