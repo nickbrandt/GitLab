@@ -2024,12 +2024,10 @@ RSpec.describe User do
   end
 
   describe '.search' do
-    let_it_be(:user) { create(:user, name: 'user', username: 'usern', email: 'email@gmail.com') }
-    let_it_be(:user2) { create(:user, name: 'user name', username: 'username', email: 'someemail@gmail.com') }
-    let_it_be(:user3) { create(:user, name: 'us', username: 'se', email: 'foo@gmail.com') }
-    let_it_be(:email) do
-      create(:email, user: user, email: 'alias@example.com')
-    end
+    let_it_be(:user) { create(:user, name: 'user', username: 'usern', email: 'email@example.com') }
+    let_it_be(:user2) { create(:user, name: 'user name', username: 'username', email: 'someemail@example.com') }
+    let_it_be(:user3) { create(:user, name: 'us', username: 'se', email: 'foo@example.com') }
+    let_it_be(:email) { create(:email, user: user, email: 'alias@example.com') }
 
     describe 'name matching' do
       it 'returns users with a matching name with exact match first' do
@@ -2059,7 +2057,7 @@ RSpec.describe User do
       end
 
       it 'does not return users with a partially matching Email' do
-        expect(described_class.search(user.email[0..2])).not_to include(user, user2)
+        expect(described_class.search(user.email[1...-1])).to be_empty
       end
 
       it 'returns users with a matching Email regardless of the casing' do
@@ -2074,7 +2072,7 @@ RSpec.describe User do
         end
 
         it 'does not return users with a matching part of secondary email' do
-          expect(described_class.search(email.email[1..4])).not_to include(email.user)
+          expect(described_class.search(email.email[1...-1])).to be_empty
         end
 
         it 'returns users with a matching secondary email regardless of the casing' do
@@ -2092,7 +2090,7 @@ RSpec.describe User do
         end
 
         it 'does not return users with a matching part of secondary email' do
-          expect(described_class.search(email.email[1..4])).not_to include(email.user)
+          expect(described_class.search(email.email[1...-1])).to be_empty
         end
       end
     end
@@ -2139,9 +2137,7 @@ RSpec.describe User do
   describe '.search_without_secondary_emails' do
     let_it_be(:user) { create(:user, name: 'John Doe', username: 'john.doe', email: 'someone.1@example.com' ) }
     let_it_be(:another_user) { create(:user, name: 'Albert Smith', username: 'albert.smith', email: 'another.2@example.com' ) }
-    let_it_be(:email) do
-      create(:email, user: another_user, email: 'alias@example.com')
-    end
+    let_it_be(:email) { create(:email, user: another_user, email: 'alias@example.com') }
 
     it 'returns users with a matching name' do
       expect(described_class.search_without_secondary_emails(user.name)).to eq([user])
@@ -2160,7 +2156,7 @@ RSpec.describe User do
     end
 
     it 'does not return users with a partially matching email' do
-      expect(described_class.search_without_secondary_emails(user.email[0..2])).not_to include(user)
+      expect(described_class.search_without_secondary_emails(user.email[1...-1])).to be_empty
     end
 
     it 'returns users with a matching email regardless of the casing' do
@@ -2184,7 +2180,7 @@ RSpec.describe User do
     end
 
     it 'does not return users with a matching part of secondary email' do
-      expect(described_class.search_without_secondary_emails(email.email[1..4])).not_to include(email.user)
+      expect(described_class.search_without_secondary_emails(email.email[1...-1])).to be_empty
     end
 
     it 'returns no matches for an empty string' do
@@ -2199,9 +2195,7 @@ RSpec.describe User do
   describe '.search_with_secondary_emails' do
     let_it_be(:user) { create(:user, name: 'John Doe', username: 'john.doe', email: 'someone.1@example.com' ) }
     let_it_be(:another_user) { create(:user, name: 'Albert Smith', username: 'albert.smith', email: 'another.2@example.com' ) }
-    let_it_be(:email) do
-      create(:email, user: another_user, email: 'alias@example.com')
-    end
+    let_it_be(:email) { create(:email, user: another_user, email: 'alias@example.com') }
 
     it 'returns users with a matching name' do
       expect(described_class.search_with_secondary_emails(user.name)).to eq([user])
@@ -2220,7 +2214,7 @@ RSpec.describe User do
     end
 
     it 'does not return users with a partially matching email' do
-      expect(described_class.search_with_secondary_emails(user.email[0..2])).not_to include(user)
+      expect(described_class.search_with_secondary_emails(user.email[1...-1])).to be_empty
     end
 
     it 'returns users with a matching email regardless of the casing' do
@@ -2244,7 +2238,7 @@ RSpec.describe User do
     end
 
     it 'does not return users with a matching part of secondary email' do
-      expect(described_class.search_with_secondary_emails(email.email[1..4])).not_to include(email.user)
+      expect(described_class.search_with_secondary_emails(email.email[1...-1])).to be_empty
     end
 
     it 'returns no matches for an empty string' do
