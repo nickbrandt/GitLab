@@ -1,9 +1,8 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 
-import { listObj } from 'jest/boards/mock_data';
+import { mockList2 } from 'jest/boards/mock_data';
 import BoardListHeader from '~/boards/components/board_list_header_new.vue';
-import List from '~/boards/models/list';
 import { ListType } from '~/boards/constants';
 
 const localVue = createLocalVue();
@@ -32,21 +31,19 @@ describe('Board List Header Component', () => {
     const boardId = '1';
 
     const listMock = {
-      ...listObj,
-      list_type: listType,
+      ...mockList2,
+      listType,
       collapsed,
     };
 
     if (listType === ListType.assignee) {
       delete listMock.label;
-      listMock.user = {};
+      listMock.assignee = {};
     }
-
-    const list = new List({ ...listMock, doNotFetchIssues: true });
 
     if (withLocalStorage) {
       localStorage.setItem(
-        `boards.${boardId}.${list.type}.${list.id}.expanded`,
+        `boards.${boardId}.${listMock.listType}.${listMock.id}.expanded`,
         (!collapsed).toString(),
       );
     }
@@ -62,7 +59,7 @@ describe('Board List Header Component', () => {
       localVue,
       propsData: {
         disabled: false,
-        list,
+        list: listMock,
       },
       provide: {
         boardId,
@@ -72,8 +69,8 @@ describe('Board List Header Component', () => {
     });
   };
 
-  const isExpanded = () => wrapper.vm.list.isExpanded;
-  const isCollapsed = () => !isExpanded();
+  const isCollapsed = () => wrapper.vm.list.collapsed;
+  const isExpanded = () => !isCollapsed;
 
   const findAddIssueButton = () => wrapper.find({ ref: 'newIssueBtn' });
   const findCaret = () => wrapper.find('.board-title-caret');
@@ -125,7 +122,7 @@ describe('Board List Header Component', () => {
     it('collapses expanded Column when clicking the collapse icon', async () => {
       createComponent();
 
-      expect(isExpanded()).toBe(true);
+      expect(isCollapsed()).toBe(false);
 
       findCaret().vm.$emit('click');
 
