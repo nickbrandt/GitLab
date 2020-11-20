@@ -24178,7 +24178,13 @@ msgstr ""
 msgid "SecurityReports|Dismissed '%{vulnerabilityName}'. Turn off the hide dismissed toggle to view."
 msgstr ""
 
+msgid "SecurityReports|Download %{artifactName}"
+msgstr ""
+
 msgid "SecurityReports|Download Report"
+msgstr ""
+
+msgid "SecurityReports|Download results"
 msgstr ""
 
 msgid "SecurityReports|Either you don't have permission to view this dashboard or the dashboard has not been setup. Please check your permission settings with your administrator or check your dashboard configurations to proceed."
@@ -24263,6 +24269,9 @@ msgid "SecurityReports|Security reports can only be accessed by authorized users
 msgstr ""
 
 msgid "SecurityReports|Security reports help page link"
+msgstr ""
+
+msgid "SecurityReports|Security scans have run"
 msgstr ""
 
 msgid "SecurityReports|Security scans have run. Go to the %{linkStart}pipelines tab%{linkEnd} to download the security reports"
