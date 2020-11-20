@@ -8,5 +8,6 @@ RSpec.describe Vulnerabilities::Remediation do
 
   it { is_expected.to validate_presence_of(:summary) }
   it { is_expected.to validate_presence_of(:file) }
+  it { is_expected.to validate_presence_of(:checksum) }
   it { is_expected.to validate_length_of(:summary).is_at_most(200) }
 end
