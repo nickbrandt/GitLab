@@ -369,15 +369,15 @@ The third approach is to bind-mount `/var/run/docker.sock` into the
 container so that Docker is available in the context of that image.
 
 NOTE: **Note:**
-If you bind the Docker socket [when using GitLab Runner 11.11 or
-newer](https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/1261),
-you can no longer use `docker:19.03.12-dind` as a service because volume bindings
+If you bind the Docker socket and you are
+[using GitLab Runner 11.11 or later](https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/1261),
+you can no longer use `docker:19.03.12-dind` as a service. Volume bindings
 are done to the services as well, making these incompatible.
 
-In order to do that, follow the steps:
+To make Docker available in the context of the image:
 
 1. Install [GitLab Runner](https://docs.gitlab.com/runner/install/).
-1. Register GitLab Runner from the command line to use `docker` and share `/var/run/docker.sock`:
+1. From the command line, register a runner with the `docker` executor and share `/var/run/docker.sock`:
 
    ```shell
    sudo gitlab-runner register -n \
@@ -389,13 +389,13 @@ In order to do that, follow the steps:
      --docker-volumes /var/run/docker.sock:/var/run/docker.sock
    ```
 
-   The above command registers a new runner to use the special
-   `docker:19.03.12` image which is provided by Docker. **Notice that it's using
-   the Docker daemon of the runner itself, and any containers spawned by Docker
+   This command registers a new runner to use the special
+   `docker:19.03.12` image, which is provided by Docker. **The command uses
+   the Docker daemon of the runner itself. Any containers spawned by Docker
    commands are siblings of the runner rather than children of the runner.**
    This may have complications and limitations that are unsuitable for your workflow.
 
-   The above command creates a `config.toml` entry similar to this:
+   Your `config.toml` file should not have an entry like this:
 
    ```toml
    [[runners]]
@@ -412,9 +412,9 @@ In order to do that, follow the steps:
        Insecure = false
    ```
 
-1. You can now use `docker` in the build script (note that you don't need to
-   include the `docker:19.03.12-dind` service as when using the Docker in Docker
-   executor):
+1. Use `docker` in the build script. You don't need to
+   include the `docker:19.03.12-dind` service, like you do when you're using
+   the Docker-in-Docker executor:
 
    ```yaml
    image: docker:19.03.12
@@ -429,18 +429,18 @@ In order to do that, follow the steps:
        - docker run my-docker-image /script/to/run/tests
    ```
 
-While the above method avoids using Docker in privileged mode, you should be
-aware of the following implications:
+This method avoids using Docker in privileged mode. However,
+the implications of this method are:
 
 - By sharing the Docker daemon, you are effectively disabling all
   the security mechanisms of containers and exposing your host to privilege
-  escalation which can lead to container breakout. For example, if a project
+  escalation, which can lead to container breakout. For example, if a project
   ran `docker rm -f $(docker ps -a -q)` it would remove the GitLab Runner
   containers.
 - Concurrent jobs may not work; if your tests
   create containers with specific names, they may conflict with each other.
 - Sharing files and directories from the source repository into containers may not
-  work as expected since volume mounting is done in the context of the host
+  work as expected. Volume mounting is done in the context of the host
   machine, not the build container. For example:
 
    ```shell
