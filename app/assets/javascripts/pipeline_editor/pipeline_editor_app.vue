@@ -225,11 +225,11 @@ export default {
       v-if="showFailureAlert"
       :variant="failure.variant"
       :dismissible="true"
-      @dismiss="dismissFailure()"
+      @dismiss="dismissFailure"
     >
       {{ failure.text }}
-      <ul v-if="failureReasons && failureReasons.length" class="gl-mb-0">
-        <li v-for="(reason, i) in failureReasons" :key="i">{{ reason }}</li>
+      <ul v-if="failureReasons.length" class="gl-mb-0">
+        <li v-for="reason in failureReasons" :key="reason">{{ reason }}</li>
       </ul>
     </gl-alert>
     <div class="gl-mt-4">

@@ -79,7 +79,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     });
   });
 
-  describe('when users inputs values', () => {
+  describe('when user inputs values', () => {
     const anotherMessage = 'Another commit message';
     const anotherBranch = 'my-branch';
 

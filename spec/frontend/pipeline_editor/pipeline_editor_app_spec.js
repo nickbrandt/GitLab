@@ -1,6 +1,14 @@
 import { nextTick } from 'vue';
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlButton, GlAlert, GlLoadingIcon, GlTabs, GlTab } from '@gitlab/ui';
+import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
+import {
+  GlAlert,
+  GlButton,
+  GlFormInput,
+  GlFormTextarea,
+  GlLoadingIcon,
+  GlTabs,
+  GlTab,
+} from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
 import VueApollo from 'vue-apollo';
 import createMockApollo from 'jest/helpers/mock_apollo_helper';
@@ -17,7 +25,6 @@ import {
 } from './mock_data';
 
 import TextEditor from '~/pipeline_editor/components/text_editor.vue';
-import EditorLite from '~/vue_shared/components/editor_lite.vue';
 import PipelineGraph from '~/pipelines/components/pipeline_graph/pipeline_graph.vue';
 import PipelineEditorApp from '~/pipeline_editor/pipeline_editor_app.vue';
 import CommitForm from '~/pipeline_editor/components/commit/commit_form.vue';
@@ -39,10 +46,12 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   let mockApollo;
   let mockBlobContentData;
 
-  const createComponent = (
-    { props = {}, loading = false, options = {} } = {},
+  const createComponent = ({
+    props = {},
+    loading = false,
+    options = {},
     mountFn = shallowMount,
-  ) => {
+  } = {}) => {
     mockMutate = jest.fn().mockResolvedValue({
       data: {
         commitCreate: {
@@ -64,8 +73,11 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
       stubs: {
         GlTabs,
         GlButton,
-        TextEditor,
         CommitForm,
+        EditorLite: {
+          template: '<div/>',
+        },
+        TextEditor,
       },
       mocks: {
         $apollo: {
@@ -77,11 +89,13 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
           mutate: mockMutate,
         },
       },
+      // attachToDocument is required for input/submit events
+      attachToDocument: mountFn === mount,
       ...options,
     });
   };
 
-  const createComponentWithApollo = ({ props = {} } = {}, mountFn = shallowMount) => {
+  const createComponentWithApollo = ({ props = {}, mountFn = shallowMount } = {}) => {
     mockApollo = createMockApollo([], {
       Query: {
         blobContent() {
@@ -105,7 +119,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findAlert = () => wrapper.find(GlAlert);
   const findTabAt = i => wrapper.findAll(GlTab).at(i);
-  const findEditorLite = () => wrapper.find(EditorLite);
+  const findTextEditor = () => wrapper.find(TextEditor);
   const findCommitForm = () => wrapper.find(CommitForm);
   const findCommitBtnLoadingIcon = () => wrapper.find('[type="submit"]').find(GlLoadingIcon);
 
@@ -127,7 +141,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     createComponent({ loading: true });
 
     expect(findLoadingIcon().exists()).toBe(true);
-    expect(findEditorLite().exists()).toBe(false);
+    expect(findTextEditor().exists()).toBe(false);
   });
 
   describe('tabs', () => {
@@ -138,7 +152,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     it('displays tabs and their content', async () => {
       expect(
         findTabAt(0)
-          .find(EditorLite)
+          .find(TextEditor)
           .exists(),
       ).toBe(true);
       expect(
@@ -151,7 +165,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     it('displays editor tab lazily, until editor is ready', async () => {
       expect(findTabAt(0).attributes('lazy')).toBe('true');
 
-      findEditorLite().vm.$emit('editor-ready');
+      findTextEditor().vm.$emit('editor-ready');
 
       await nextTick();
 
@@ -161,7 +175,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
 
   describe('when data is set', () => {
     beforeEach(async () => {
-      createComponent();
+      createComponent({ mountFn: mount });
 
       wrapper.setData({
         content: mockCiYml,
@@ -173,7 +187,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
 
     it('displays content after the query loads', () => {
       expect(findLoadingIcon().exists()).toBe(false);
-      expect(findEditorLite().props('value')).toBe(mockCiYml);
+      expect(findTextEditor().attributes('value')).toBe(mockCiYml);
     });
 
     describe('commit form', () => {
@@ -186,19 +200,29 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         startBranch: mockDefaultBranch,
       };
 
-      const emitSubmit = event => {
-        findCommitForm().vm.$emit('submit', {
-          message: mockCommitMessage,
-          branch: mockDefaultBranch,
-          openMergeRequest: false,
-          ...event,
-        });
+      const findInForm = selector => findCommitForm().find(selector);
+
+      const submitCommit = async ({
+        message = mockCommitMessage,
+        branch = mockDefaultBranch,
+        openMergeRequest = false,
+      } = {}) => {
+        await findInForm(GlFormTextarea).setValue(message);
+        await findInForm(GlFormInput).setValue(branch);
+        if (openMergeRequest) {
+          await findInForm('[data-testid="new-mr-checkbox"]').setChecked(openMergeRequest);
+        }
+        await findInForm('[type="submit"]').trigger('click');
+      };
+
+      const cancelCommitForm = async () => {
+        const findCancelBtn = () => wrapper.find('[type="reset"]');
+        await findCancelBtn().trigger('click');
       };
 
       describe('when the user commits changes to the current branch', () => {
         beforeEach(async () => {
-          emitSubmit();
-          await nextTick();
+          await submitCommit();
         });
 
         it('calls the mutation with the default branch', () => {
@@ -212,7 +236,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         });
 
         it('refreshes the page', () => {
-          expect(refreshCurrentPage).toHaveBeenCalledWith();
+          expect(refreshCurrentPage).toHaveBeenCalled();
         });
 
         it('shows no saving state', () => {
@@ -223,8 +247,8 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
       describe('when the user commits changes to a new branch', () => {
         const newBranch = 'new-branch';
 
-        beforeEach(() => {
-          emitSubmit({
+        beforeEach(async () => {
+          await submitCommit({
             branch: newBranch,
           });
         });
@@ -247,8 +271,8 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
       describe('when the user commits changes to open a new merge request', () => {
         const newBranch = 'new-branch';
 
-        beforeEach(() => {
-          emitSubmit({
+        beforeEach(async () => {
+          await submitCommit({
             branch: newBranch,
             openMergeRequest: true,
           });
@@ -271,7 +295,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
             return Promise.resolve();
           });
 
-          findCommitForm().vm.$emit('submit', {
+          await submitCommit({
             message: mockCommitMessage,
             branch: mockDefaultBranch,
             openMergeRequest: false,
@@ -283,7 +307,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         it('shows a the error message', async () => {
           mockMutate.mockRejectedValueOnce(new Error('commit failed'));
 
-          emitSubmit();
+          await submitCommit();
 
           await waitForPromises();
 
@@ -295,7 +319,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         it('shows an unkown error', async () => {
           mockMutate.mockRejectedValueOnce();
 
-          emitSubmit();
+          await submitCommit();
 
           await waitForPromises();
 
@@ -309,16 +333,14 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         const otherContent = 'other content';
 
         beforeEach(async () => {
-          findEditorLite().vm.$emit('input', otherContent);
+          findTextEditor().vm.$emit('input', otherContent);
           await nextTick();
         });
 
         it('content is restored after cancel is called', async () => {
-          findCommitForm().vm.$emit('cancel');
+          await cancelCommitForm();
 
-          await nextTick();
-
-          expect(findEditorLite().props('value')).toBe(mockCiYml);
+          expect(findTextEditor().attributes('value')).toBe(mockCiYml);
         });
       });
     });
@@ -332,7 +354,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
       await waitForPromises();
 
       expect(findAlert().exists()).toBe(false);
-      expect(findEditorLite().props('value')).toBe(mockCiYml);
+      expect(findTextEditor().attributes('value')).toBe(mockCiYml);
     });
 
     it('shows a 404 error message', async () => {
