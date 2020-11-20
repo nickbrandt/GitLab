@@ -29839,6 +29839,9 @@ msgstr ""
 msgid "UserProfile|This user is blocked"
 msgstr ""
 
+msgid "UserProfile|Unconfirmed user"
+msgstr ""
+
 msgid "UserProfile|View all"
 msgstr ""
 
