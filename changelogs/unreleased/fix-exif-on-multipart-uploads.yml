@@ -1,0 +1,5 @@
+---
+title: Fix EXIF cleaning for S3 compatible Object Storage
+merge_request:
+author:
+type: fixed

@@ -37,19 +37,24 @@ func NewCleaner(ctx context.Context, stdin io.Reader) (io.Reader, error) {
 }
 
 func (c *cleaner) Read(p []byte) (int, error) {
-	n, err := c.stdout.Read(p)
-	if err == io.EOF {
-		if waitErr := c.wait(); waitErr != nil {
-			log.WithContextFields(c.ctx, log.Fields{
-				"command": c.cmd.Args,
-				"stderr":  c.stderr.String(),
-				"error":   waitErr.Error(),
-			}).Print("exiftool command failed")
-			return n, ErrRemovingExif
+	select {
+	case <-c.waitDone:
+		return 0, io.EOF
+	default:
+		n, err := c.stdout.Read(p)
+		if err == io.EOF {
+			if waitErr := c.wait(); waitErr != nil {
+				log.WithContextFields(c.ctx, log.Fields{
+					"command": c.cmd.Args,
+					"stderr":  c.stderr.String(),
+					"error":   waitErr.Error(),
+				}).Print("exiftool command failed")
+				return n, ErrRemovingExif
+			}
 		}
-	}
 
-	return n, err
+		return n, err
+	}
 }
 
 func (c *cleaner) startProcessing(stdin io.Reader) error {
