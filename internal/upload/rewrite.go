@@ -174,12 +174,12 @@ func handleExifUpload(ctx context.Context, r io.Reader, filename string) (io.Rea
 		"filename": filename,
 	}).Print("running exiftool to remove any metadata")
 
-	r, err := exif.NewCleaner(ctx, r)
+	cleaner, err := exif.NewCleaner(ctx, r)
 	if err != nil {
 		return nil, err
 	}
 
-	return ioutil.NopCloser(r), nil
+	return cleaner, nil
 }
 
 func handleLsifUpload(ctx context.Context, reader io.Reader, tempPath, filename string, preauth *api.Response) (io.ReadCloser, error) {
