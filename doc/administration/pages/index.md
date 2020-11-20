@@ -253,6 +253,10 @@ support custom domains with and without TLS certificates. The easiest setup is
 that without TLS certificates. In either case, you'll need a **secondary IP**. If
 you have IPv6 as well as IPv4 addresses, you can use them both.
 
+NOTE: **Note:**
+If your [Pages are served separateley](#running-gitlab-pages-on-a-separate-server)
+the following configurations need to be applied to your Pages server's `gitlab.rb`.
+
 ### Custom domains
 
 **Requirements:**
