@@ -6,7 +6,7 @@ RSpec.describe IncidentManagement::OncallSchedules::UpdateService do
   let_it_be(:user_with_permissions) { create(:user) }
   let_it_be(:user_without_permissions) { create(:user) }
   let_it_be_with_refind(:project) { create(:project) }
-  let!(:oncall_schedule) { create(:incident_management_oncall_schedule, project: project) }
+  let_it_be_with_reload(:oncall_schedule) { create(:incident_management_oncall_schedule, project: project) }
 
   let(:current_user) { user_with_permissions }
   let(:params) { { name: 'Updated name', description: 'Updated description', timezone: 'America/New_York' } }
