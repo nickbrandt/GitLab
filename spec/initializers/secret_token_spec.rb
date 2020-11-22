@@ -220,7 +220,7 @@ RSpec.describe 'create_tokens' do
           secrets.enc_settings_key_base = 'enc_settings_key_base'
         end
 
-        it 'does not warns about the missing secrets' do
+        it 'does not warn about the missing secrets' do
           expect(self).not_to receive(:warn_missing_secret).with('rotated_enc_settings_key_base')
 
           create_tokens
