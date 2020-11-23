@@ -18,6 +18,7 @@ describe('Linked pipeline', () => {
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findPipelineLink = () => wrapper.find('[data-testid="pipelineLink"]');
   const findExpandButton = () => wrapper.find('[data-testid="expandPipelineButton"]');
+  const findDownstreamSource = () => wrapper.find('[data-testid="downstream-source-job"]');
 
   const createWrapper = (propsData, data = []) => {
     wrapper = mount(LinkedPipelineComponent, {
@@ -74,6 +75,10 @@ describe('Linked pipeline', () => {
 
     it('should render the pipeline id', () => {
       expect(wrapper.text()).toContain(`#${props.pipeline.id}`);
+    });
+
+    it('should render the trigger job name', () => {
+      expect(findDownstreamSource().text()).toBe(props.pipeline.source_job.name);
     });
 
     it('should correctly compute the tooltip text', () => {

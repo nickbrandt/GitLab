@@ -38,10 +38,6 @@ export default {
     };
   },
   computed: {
-    tooltipText() {
-      return `${this.downstreamTitle} #${this.pipeline.id} - ${this.pipelineStatus.label}
-      ${this.sourceJobInfo}`;
-    },
     buttonId() {
       return `js-linked-pipeline-${this.pipeline.id}`;
     },
@@ -77,10 +73,17 @@ export default {
     isSameProject() {
       return this.projectId === this.pipeline.project.id;
     },
+    triggerJobName() {
+      return this.pipeline?.source_job?.name ?? '';
+    },
     sourceJobInfo() {
       return this.isDownstream
-        ? sprintf(__('Created by %{job}'), { job: this.pipeline.source_job.name })
+        ? sprintf(__('Created by %{job}'), { job: this.triggerJobName })
         : '';
+    },
+    tooltipText() {
+      return `${this.downstreamTitle} #${this.pipeline.id} - ${this.pipelineStatus.label}
+      ${this.sourceJobInfo}`;
     },
     expandedIcon() {
       if (this.isUpstream) {
@@ -143,6 +146,15 @@ export default {
               >#{{ pipeline.id }}</gl-link
             >
           </div>
+          <p class="gl-font-sm gl-mt-2 gl-mb-0">
+            {{ __('Created by -') }}
+          </p>
+          <p
+            class="gl-font-sm gl-text-truncate gl-overflow-hidden gl-mt-0"
+            data-testid="downstream-source-job"
+          >
+            {{ triggerJobName }}
+          </p>
         </div>
       </div>
       <div class="gl-pt-2">
