@@ -1,0 +1,5 @@
+---
+title: Redirect /help requests to docs.gitlab.com by default
+merge_request: 48354
+author:
+type: added
