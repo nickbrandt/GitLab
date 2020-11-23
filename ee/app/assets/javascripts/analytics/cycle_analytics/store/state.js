@@ -10,7 +10,6 @@ export default () => ({
 
   currentGroup: null,
   selectedProjects: [],
-  selectedStage: null,
   selectedValueStream: null,
 
   isLoadingValueStreams: false,
@@ -21,7 +20,6 @@ export default () => ({
   deleteValueStreamError: null,
 
   stages: [],
-  selectedStageError: '',
   summary: [],
   valueStreams: [],
 });

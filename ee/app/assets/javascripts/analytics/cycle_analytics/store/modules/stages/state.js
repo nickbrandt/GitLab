@@ -4,6 +4,7 @@ export default () => ({
   isSavingStageOrder: false, // TODO: can we remove?
   errorSavingStageOrder: false,
 
+  selectedStage: null,
   currentStageEvents: [],
   medians: {},
 });

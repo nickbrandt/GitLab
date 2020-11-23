@@ -294,44 +294,7 @@ describe('Value Stream Analytics actions', () => {
             payload: { ...customizableStagesAndEvents.stages },
           },
         ],
-        [{ type: 'setDefaultSelectedStage' }],
-      );
-    });
-  });
-
-  describe('setDefaultSelectedStage', () => {
-    it("dispatches the 'fetchStageData' action", () => {
-      return testAction(
-        actions.setDefaultSelectedStage,
-        null,
-        state,
-        [],
-        [
-          { type: 'stages/setSelectedStage', payload: selectedStage },
-          { type: 'stages/fetchStageData', payload: selectedStageSlug },
-        ],
-      );
-    });
-
-    it.each`
-      data
-      ${[]}
-      ${null}
-    `('with $data will flash an error', ({ data }) => {
-      actions.setDefaultSelectedStage({ getters: { activeStages: data }, dispatch: () => {} }, {});
-      shouldFlashAMessage(flashErrorMessage);
-    });
-
-    it('will select the first active stage', () => {
-      return testAction(
-        actions.setDefaultSelectedStage,
-        null,
-        state,
-        [],
-        [
-          { type: 'stages/setSelectedStage', payload: stages[1] },
-          { type: 'stages/fetchStageData', payload: stages[1].slug },
-        ],
+        [{ type: 'stages/setDefaultSelectedStage' }],
       );
     });
   });

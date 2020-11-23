@@ -88,6 +88,43 @@ describe('Value Stream Analytics stages actions', () => {
     );
   });
 
+  describe('setDefaultSelectedStage', () => {
+    it("dispatches the 'fetchStageData' action", () => {
+      return testAction(
+        actions.setDefaultSelectedStage,
+        null,
+        state,
+        [],
+        [
+          { type: 'setSelectedStage', payload: selectedStage },
+          { type: 'fetchStageData', payload: selectedStageSlug },
+        ],
+      );
+    });
+
+    it.each`
+      data
+      ${[]}
+      ${null}
+    `('with $data will flash an error', ({ data }) => {
+      actions.setDefaultSelectedStage({ getters: { activeStages: data }, dispatch: () => {} }, {});
+      shouldFlashAMessage(flashErrorMessage);
+    });
+
+    it('will select the first active stage', () => {
+      return testAction(
+        actions.setDefaultSelectedStage,
+        null,
+        state,
+        [],
+        [
+          { type: 'setSelectedStage', payload: stages[1] },
+          { type: 'fetchStageData', payload: stages[1].slug },
+        ],
+      );
+    });
+  });
+
   describe('fetchStageMedianValues', () => {
     let mockDispatch = jest.fn();
     const fetchMedianResponse = activeStages.map(({ slug: id }) => ({ events: [], id }));

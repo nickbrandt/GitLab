@@ -6,6 +6,19 @@ import * as types from './mutation_types';
 import { checkForDataError, flashErrorIfStatusNotOk, isStageNameExistsError } from '../../../utils';
 
 export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
+export const setDefaultSelectedStage = ({ dispatch, getters }) => {
+  const { activeStages = [] } = getters;
+  if (activeStages?.length) {
+    const [firstActiveStage] = activeStages;
+    return Promise.all([
+      dispatch('setSelectedStage', firstActiveStage),
+      dispatch('fetchStageData', firstActiveStage.slug),
+    ]);
+  }
+
+  createFlash(__('There was an error while fetching value stream analytics data.'));
+  return Promise.resolve();
+};
 
 export const requestStageMedianValues = ({ commit }) => commit(types.REQUEST_STAGE_MEDIANS);
 

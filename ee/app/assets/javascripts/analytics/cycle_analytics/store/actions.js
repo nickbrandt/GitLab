@@ -71,23 +71,9 @@ export const receiveGroupStagesError = ({ commit }, error) => {
   createFlash(__('There was an error fetching value stream analytics stages.'));
 };
 
-export const setDefaultSelectedStage = ({ dispatch, getters }) => {
-  const { activeStages = [] } = getters;
-  if (activeStages?.length) {
-    const [firstActiveStage] = activeStages;
-    return Promise.all([
-      dispatch('stages/setSelectedStage', firstActiveStage),
-      dispatch('stages/fetchStageData', firstActiveStage.slug),
-    ]);
-  }
-
-  createFlash(__('There was an error while fetching value stream analytics data.'));
-  return Promise.resolve();
-};
-
 export const receiveGroupStagesSuccess = ({ commit, dispatch }, stages) => {
   commit(types.RECEIVE_GROUP_STAGES_SUCCESS, stages);
-  return dispatch('setDefaultSelectedStage');
+  return dispatch('stages/setDefaultSelectedStage');
 };
 
 export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
