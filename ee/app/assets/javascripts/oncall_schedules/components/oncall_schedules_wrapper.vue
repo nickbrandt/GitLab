@@ -2,16 +2,14 @@
 import { GlEmptyState, GlButton } from '@gitlab/ui';
 import { s__ } from '~/locale';
 
-export const i18n = {
-  emptyState: {
-    title: s__('OnCallSchedules|Create on-call schedules  in GitLab'),
-    description: s__('OnCallSchedules|Route alerts directly to specific members of your team'),
-    button: s__('OnCallSchedules|Add a schedule'),
-  },
-};
-
 export default {
-  i18n,
+  i18n: {
+    emptyState: {
+      title: s__('OnCallSchedules|Create on-call schedules  in GitLab'),
+      description: s__('OnCallSchedules|Route alerts directly to specific members of your team'),
+      button: s__('OnCallSchedules|Add a schedule'),
+    },
+  },
   inject: ['emptyOncallSchedulesSvgPath'],
   components: {
     GlEmptyState,
