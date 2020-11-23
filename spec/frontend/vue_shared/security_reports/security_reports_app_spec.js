@@ -9,7 +9,7 @@ import {
   secretScanningDiffSuccessMock,
 } from 'jest/vue_shared/security_reports/mock_data';
 import Api from '~/api';
-import Flash from '~/flash';
+import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import {
   REPORT_TYPE_SAST,
@@ -199,8 +199,8 @@ describe('Security reports app', () => {
           expect(wrapper.html()).toBe('');
         });
 
-        it('calls Flash correctly', () => {
-          expect(Flash.mock.calls).toEqual([
+        it('calls createFlash correctly', () => {
+          expect(createFlash.mock.calls).toEqual([
             [
               {
                 message: SecurityReportsApp.i18n.apiError,

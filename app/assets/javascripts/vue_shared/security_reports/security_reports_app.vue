@@ -6,7 +6,7 @@ import ReportSection from '~/reports/components/report_section.vue';
 import { LOADING, ERROR, SLOT_SUCCESS, SLOT_LOADING, SLOT_ERROR } from '~/reports/constants';
 import { s__ } from '~/locale';
 import { normalizeHeaders, parseIntPagination } from '~/lib/utils/common_utils';
-import Flash from '~/flash';
+import createFlash from '~/flash';
 import Api from '~/api';
 import SecuritySummary from './components/security_summary.vue';
 import store from './store';
@@ -82,7 +82,7 @@ export default {
         this.fetchCounts();
       })
       .catch(error => {
-        Flash({
+        createFlash({
           message: this.$options.i18n.apiError,
           captureError: true,
           error,
