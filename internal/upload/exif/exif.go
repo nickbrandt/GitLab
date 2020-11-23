@@ -15,19 +15,15 @@ import (
 var ErrRemovingExif = errors.New("error while removing EXIF")
 
 type cleaner struct {
-	ctx      context.Context
-	cmd      *exec.Cmd
-	stdout   io.Reader
-	stderr   bytes.Buffer
-	waitDone chan struct{}
-	waitErr  error
+	ctx    context.Context
+	cmd    *exec.Cmd
+	stdout io.Reader
+	stderr bytes.Buffer
+	eof    bool
 }
 
-func NewCleaner(ctx context.Context, stdin io.Reader) (io.Reader, error) {
-	c := &cleaner{
-		ctx:      ctx,
-		waitDone: make(chan struct{}),
-	}
+func NewCleaner(ctx context.Context, stdin io.Reader) (io.ReadCloser, error) {
+	c := &cleaner{ctx: ctx}
 
 	if err := c.startProcessing(stdin); err != nil {
 		return nil, err
@@ -36,17 +32,32 @@ func NewCleaner(ctx context.Context, stdin io.Reader) (io.Reader, error) {
 	return c, nil
 }
 
+func (c *cleaner) Close() error {
+	if c.cmd == nil {
+		return nil
+	}
+
+	return c.cmd.Wait()
+}
+
 func (c *cleaner) Read(p []byte) (int, error) {
+	if c.eof {
+		return 0, io.EOF
+	}
+
 	n, err := c.stdout.Read(p)
 	if err == io.EOF {
-		if waitErr := c.wait(); waitErr != nil {
+		if waitErr := c.cmd.Wait(); waitErr != nil {
 			log.WithContextFields(c.ctx, log.Fields{
 				"command": c.cmd.Args,
 				"stderr":  c.stderr.String(),
 				"error":   waitErr.Error(),
 			}).Print("exiftool command failed")
+
 			return n, ErrRemovingExif
 		}
+
+		c.eof = true
 	}
 
 	return n, err
@@ -85,17 +96,8 @@ func (c *cleaner) startProcessing(stdin io.Reader) error {
 	if err = c.cmd.Start(); err != nil {
 		return fmt.Errorf("start %v: %v", c.cmd.Args, err)
 	}
-	go func() {
-		c.waitErr = c.cmd.Wait()
-		close(c.waitDone)
-	}()
 
 	return nil
-}
-
-func (c *cleaner) wait() error {
-	<-c.waitDone
-	return c.waitErr
 }
 
 func IsExifFile(filename string) bool {
