@@ -4,6 +4,8 @@ import { __ } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 
+export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
+
 export const requestReorderStage = ({ commit }) => commit(types.REQUEST_REORDER_STAGE);
 
 export const receiveReorderStageSuccess = ({ commit }) =>

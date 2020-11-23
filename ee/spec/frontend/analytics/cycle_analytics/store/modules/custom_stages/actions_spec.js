@@ -254,7 +254,10 @@ describe('Custom stage actions', () => {
           { type: types.SET_FORM_INITIAL_DATA, payload: rawCustomStage },
           { type: types.SHOW_EDIT_FORM },
         ],
-        [{ type: 'setSelectedStage', payload: rawCustomStage }, { type: 'clearSavingCustomStage' }],
+        [
+          { type: 'stages/setSelectedStage', payload: rawCustomStage },
+          { type: 'clearSavingCustomStage' },
+        ],
       );
     });
   });

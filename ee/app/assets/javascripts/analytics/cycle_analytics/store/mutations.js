@@ -9,9 +9,6 @@ export default {
   [types.SET_SELECTED_PROJECTS](state, projects) {
     state.selectedProjects = projects;
   },
-  [types.SET_SELECTED_STAGE](state, rawData) {
-    state.selectedStage = convertObjectPropsToCamelCase(rawData);
-  },
   [types.SET_DATE_RANGE](state, { startDate, endDate }) {
     state.startDate = startDate;
     state.endDate = endDate;

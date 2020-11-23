@@ -75,7 +75,6 @@ describe('Value Stream Analytics actions', () => {
     action                   | type                       | stateKey                | payload
     ${'setFeatureFlags'}     | ${'SET_FEATURE_FLAGS'}     | ${'featureFlags'}       | ${{ hasDurationChart: true }}
     ${'setSelectedProjects'} | ${'SET_SELECTED_PROJECTS'} | ${'selectedProjectIds'} | ${[10, 20, 30, 40]}
-    ${'setSelectedStage'}    | ${'SET_SELECTED_STAGE'}    | ${'selectedStage'}      | ${{ id: 'someStageId' }}
   `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
     return testAction(
       actions[action],
@@ -392,7 +391,7 @@ describe('Value Stream Analytics actions', () => {
         state,
         [],
         [
-          { type: 'setSelectedStage', payload: selectedStage },
+          { type: 'stages/setSelectedStage', payload: selectedStage },
           { type: 'fetchStageData', payload: selectedStageSlug },
         ],
       );
@@ -414,7 +413,7 @@ describe('Value Stream Analytics actions', () => {
         state,
         [],
         [
-          { type: 'setSelectedStage', payload: stages[1] },
+          { type: 'stages/setSelectedStage', payload: stages[1] },
           { type: 'fetchStageData', payload: stages[1].slug },
         ],
       );

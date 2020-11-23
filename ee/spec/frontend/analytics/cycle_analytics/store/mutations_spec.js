@@ -65,7 +65,6 @@ describe('Value Stream Analytics mutations', () => {
     ${types.SET_FEATURE_FLAGS}                   | ${{ hasDurationChart: true }}            | ${{ featureFlags: { hasDurationChart: true } }}
     ${types.SET_SELECTED_PROJECTS}               | ${selectedProjects}                      | ${{ selectedProjects }}
     ${types.SET_DATE_RANGE}                      | ${{ startDate, endDate }}                | ${{ startDate, endDate }}
-    ${types.SET_SELECTED_STAGE}                  | ${{ id: 'first-stage' }}                 | ${{ selectedStage: { id: 'first-stage' } }}
     ${types.RECEIVE_CREATE_VALUE_STREAM_ERROR}   | ${{ errors: { name: ['is required'] } }} | ${{ createValueStreamErrors: { name: ['is required'] }, isCreatingValueStream: false }}
     ${types.RECEIVE_DELETE_VALUE_STREAM_ERROR}   | ${'Some error occurred'}                 | ${{ deleteValueStreamError: 'Some error occurred' }}
     ${types.RECEIVE_VALUE_STREAMS_SUCCESS}       | ${valueStreams}                          | ${{ valueStreams, isLoadingValueStreams: false }}

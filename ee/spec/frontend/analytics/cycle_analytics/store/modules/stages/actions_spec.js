@@ -69,6 +69,24 @@ describe('Value Stream Analytics actions', () => {
     state = { ...state, currentGroup: null };
   });
 
+  it.each`
+    action                | type                    | stateKey           | payload
+    ${'setSelectedStage'} | ${'SET_SELECTED_STAGE'} | ${'selectedStage'} | ${{ id: 'someStageId' }}
+  `('$action should set $stateKey with $payload and type $type', ({ action, type, payload }) => {
+    return testAction(
+      actions[action],
+      payload,
+      state,
+      [
+        {
+          type,
+          payload,
+        },
+      ],
+      [],
+    );
+  });
+
   describe('reorderStage', () => {
     const stageId = 'cool-stage';
     const payload = { id: stageId, move_after_id: '2', move_before_id: '8' };

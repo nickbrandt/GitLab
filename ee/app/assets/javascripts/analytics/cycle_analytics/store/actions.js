@@ -30,8 +30,6 @@ export const setFeatureFlags = ({ commit }, featureFlags) =>
 export const setSelectedProjects = ({ commit }, projects) =>
   commit(types.SET_SELECTED_PROJECTS, projects);
 
-export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
-
 export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDate, endDate }) => {
   commit(types.SET_DATE_RANGE, { startDate, endDate });
 
@@ -157,7 +155,7 @@ export const setDefaultSelectedStage = ({ dispatch, getters }) => {
   if (activeStages?.length) {
     const [firstActiveStage] = activeStages;
     return Promise.all([
-      dispatch('setSelectedStage', firstActiveStage),
+      dispatch('stages/setSelectedStage', firstActiveStage),
       dispatch('fetchStageData', firstActiveStage.slug),
     ]);
   }
@@ -306,7 +304,6 @@ export const initializeCycleAnalytics = ({ dispatch, commit }, initialData = {})
 
   return dispatch('initializeCycleAnalyticsSuccess');
 };
-
 
 export const receiveCreateValueStreamSuccess = ({ commit, dispatch }, valueStream = {}) => {
   commit(types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS, valueStream);

@@ -25,4 +25,17 @@ describe('Value Stream Analytics mutations', () => {
 
     expect(state[stateKey]).toEqual(value);
   });
+
+  it.each`
+    mutation                    | payload                  | expectedState
+    ${types.SET_SELECTED_STAGE} | ${{ id: 'first-stage' }} | ${{ selectedStage: { id: 'first-stage' } }}
+  `(
+    '$mutation with payload $payload will update state with $expectedState',
+    ({ mutation, payload, expectedState }) => {
+      state = { selectedGroup: { fullPath: 'rad-stage' } };
+      mutations[mutation](state, payload);
+
+      expect(state).toMatchObject(expectedState);
+    },
+  );
 });
