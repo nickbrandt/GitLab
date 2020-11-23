@@ -4,13 +4,7 @@ import { __, sprintf } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { FETCH_VALUE_STREAM_DATA } from '../constants';
-import {
-  removeFlash,
-  throwIfUserForbidden,
-  isStageNameExistsError,
-  checkForDataError,
-  flashErrorIfStatusNotOk,
-} from '../utils';
+import { removeFlash, throwIfUserForbidden, isStageNameExistsError } from '../utils';
 
 const appendExtension = path => (path.indexOf('.') > -1 ? path : `${path}.json`);
 
@@ -36,35 +30,6 @@ export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDat
   if (skipFetch) return false;
 
   return dispatch('fetchCycleAnalyticsData');
-};
-
-export const requestStageData = ({ commit }) => commit(types.REQUEST_STAGE_DATA);
-export const receiveStageDataSuccess = ({ commit }, data) => {
-  commit(types.RECEIVE_STAGE_DATA_SUCCESS, data);
-};
-
-export const receiveStageDataError = ({ commit }, error) => {
-  const { message = '' } = error;
-  flashErrorIfStatusNotOk({
-    error,
-    message: __('There was an error fetching data for the selected stage'),
-  });
-  commit(types.RECEIVE_STAGE_DATA_ERROR, message);
-};
-
-export const fetchStageData = ({ dispatch, getters }, stageId) => {
-  const { cycleAnalyticsRequestParams = {}, currentValueStreamId, currentGroupPath } = getters;
-  dispatch('requestStageData');
-
-  return Api.cycleAnalyticsStageEvents({
-    groupId: currentGroupPath,
-    valueStreamId: currentValueStreamId,
-    stageId,
-    params: cycleAnalyticsRequestParams,
-  })
-    .then(checkForDataError)
-    .then(({ data }) => dispatch('receiveStageDataSuccess', data))
-    .catch(error => dispatch('receiveStageDataError', error));
 };
 
 export const requestStageMedianValues = ({ commit }) => commit(types.REQUEST_STAGE_MEDIANS);
@@ -156,7 +121,7 @@ export const setDefaultSelectedStage = ({ dispatch, getters }) => {
     const [firstActiveStage] = activeStages;
     return Promise.all([
       dispatch('stages/setSelectedStage', firstActiveStage),
-      dispatch('fetchStageData', firstActiveStage.slug),
+      dispatch('stages/fetchStageData', firstActiveStage.slug),
     ]);
   }
 

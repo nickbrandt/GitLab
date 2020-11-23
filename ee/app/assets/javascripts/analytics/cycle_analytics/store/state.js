@@ -5,9 +5,7 @@ export default () => ({
   endDate: null,
 
   isLoading: false,
-  isLoadingStage: false,
 
-  isEmptyStage: false,
   errorCode: null,
 
   currentGroup: null,

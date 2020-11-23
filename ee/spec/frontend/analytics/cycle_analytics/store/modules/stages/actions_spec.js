@@ -12,6 +12,7 @@ import {
   startDate,
   endDate,
   valueStreams,
+  endpoints,
 } from '../../../mock_data';
 
 const group = { fullPath: 'fake_group_full_path' };
@@ -85,6 +86,91 @@ describe('Value Stream Analytics actions', () => {
       ],
       [],
     );
+  });
+
+  describe('fetchStageData', () => {
+    beforeEach(() => {
+      state = { ...state, currentGroup };
+      mock = new MockAdapter(axios);
+      mock.onGet(endpoints.stageData).reply(httpStatusCodes.OK, { events: [] });
+    });
+
+    it('dispatches receiveStageDataSuccess with received data on success', () => {
+      return testAction(
+        actions.fetchStageData,
+        selectedStageSlug,
+        state,
+        [],
+        [
+          { type: 'requestStageData' },
+          {
+            type: 'receiveStageDataSuccess',
+            payload: { events: [] },
+          },
+        ],
+      );
+    });
+
+    describe('with a failing request', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        mock.onGet(endpoints.stageData).replyOnce(httpStatusCodes.NOT_FOUND, { error });
+      });
+
+      it('dispatches receiveStageDataError on error', () => {
+        return testAction(
+          actions.fetchStageData,
+          selectedStage,
+          state,
+          [],
+          [
+            {
+              type: 'requestStageData',
+            },
+            {
+              type: 'receiveStageDataError',
+              payload: error,
+            },
+          ],
+        );
+      });
+    });
+
+    describe('receiveStageDataSuccess', () => {
+      it(`commits the ${types.RECEIVE_STAGE_DATA_SUCCESS} mutation`, () => {
+        return testAction(
+          actions.receiveStageDataSuccess,
+          { ...stageData },
+          state,
+          [{ type: types.RECEIVE_STAGE_DATA_SUCCESS, payload: { events: [] } }],
+          [],
+        );
+      });
+    });
+  });
+
+  describe('receiveStageDataError', () => {
+    const message = 'fake error';
+
+    it(`commits the ${types.RECEIVE_STAGE_DATA_ERROR} mutation`, () => {
+      return testAction(
+        actions.receiveStageDataError,
+        { message },
+        state,
+        [
+          {
+            type: types.RECEIVE_STAGE_DATA_ERROR,
+            payload: message,
+          },
+        ],
+        [],
+      );
+    });
+
+    it('will flash an error message', () => {
+      actions.receiveStageDataError({ commit: () => {} }, {});
+      shouldFlashAMessage('There was an error fetching data for the selected stage');
+    });
   });
 
   describe('reorderStage', () => {

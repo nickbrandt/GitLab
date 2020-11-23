@@ -24,24 +24,6 @@ export default {
     state.errorCode = errCode;
     state.isLoading = false;
   },
-  [types.REQUEST_STAGE_DATA](state) {
-    state.isLoadingStage = true;
-    state.isEmptyStage = false;
-    state.selectedStageError = '';
-  },
-  [types.RECEIVE_STAGE_DATA_SUCCESS](state, events = []) {
-    state.currentStageEvents = events.map(fields =>
-      convertObjectPropsToCamelCase(fields, { deep: true }),
-    );
-    state.isEmptyStage = !events.length;
-    state.isLoadingStage = false;
-    state.selectedStageError = '';
-  },
-  [types.RECEIVE_STAGE_DATA_ERROR](state, message) {
-    state.isEmptyStage = true;
-    state.isLoadingStage = false;
-    state.selectedStageError = message;
-  },
   [types.REQUEST_STAGE_MEDIANS](state) {
     state.medians = {};
   },

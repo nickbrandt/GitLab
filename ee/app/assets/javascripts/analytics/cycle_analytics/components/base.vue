@@ -127,13 +127,12 @@ export default {
   methods: {
     ...mapActions([
       'fetchCycleAnalyticsData',
-      'fetchStageData',
       'setSelectedProjects',
       'setDateRange',
       'removeStage',
       'updateStage',
     ]),
-    ...mapActions('stages', ['setSelectedStage', 'reorderStage']),
+    ...mapActions('stages', ['setSelectedStage', 'fetchStageData','reorderStage']),
     ...mapActions('customStages', ['hideForm', 'showCreateForm', 'showEditForm', 'createStage']),
     onProjectsSelect(projects) {
       this.setSelectedProjects(projects);
