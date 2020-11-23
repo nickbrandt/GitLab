@@ -6,6 +6,8 @@ module Projects
       before_action :ensure_oncall_schedules_available!
       before_action :authorize_read_incident_management_oncall_schedule!
 
+      feature_category :incident_management
+
       def index
       end
 
