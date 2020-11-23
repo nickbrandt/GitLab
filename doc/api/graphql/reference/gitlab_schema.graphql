@@ -9059,6 +9059,11 @@ type Group {
     last: Int
 
     """
+    Filter members by the given member relations
+    """
+    relations: [GroupMemberRelation!] = [DIRECT, INHERITED]
+
+    """
     Search query
     """
     search: String
@@ -9995,6 +10000,26 @@ type GroupMemberEdge {
   The item at the end of the edge.
   """
   node: GroupMember
+}
+
+"""
+Group member relation
+"""
+enum GroupMemberRelation {
+  """
+  Descendants members
+  """
+  DESCENDANTS
+
+  """
+  Direct members
+  """
+  DIRECT
+
+  """
+  Inherited members
+  """
+  INHERITED
 }
 
 type GroupPermissions {
@@ -16569,6 +16594,11 @@ type Project {
     last: Int
 
     """
+    Filter members by the given member relations
+    """
+    relations: [ProjectMemberRelation!] = [DIRECT, INHERITED]
+
+    """
     Search query
     """
     search: String
@@ -17203,6 +17233,31 @@ type ProjectMemberEdge {
   The item at the end of the edge.
   """
   node: ProjectMember
+}
+
+"""
+Project member relation
+"""
+enum ProjectMemberRelation {
+  """
+  Descendants members
+  """
+  DESCENDANTS
+
+  """
+  Direct members
+  """
+  DIRECT
+
+  """
+  Inherited members
+  """
+  INHERITED
+
+  """
+  Invited Groups members
+  """
+  INVITED_GROUPS
 }
 
 type ProjectPermissions {

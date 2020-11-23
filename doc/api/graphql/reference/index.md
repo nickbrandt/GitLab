@@ -4038,6 +4038,16 @@ Epic ID wildcard values.
 | `ANY` | Any epic is assigned |
 | `NONE` | No epic is assigned |
 
+### GroupMemberRelation
+
+Group member relation.
+
+| Value | Description |
+| ----- | ----------- |
+| `DESCENDANTS` | Descendants members |
+| `DIRECT` | Direct members |
+| `INHERITED` | Inherited members |
+
 ### HealthStatus
 
 Health status of an issue or epic.
@@ -4325,6 +4335,17 @@ Values for sorting projects.
 | `SKIPPED` |  |
 | `SUCCESS` |  |
 | `WAITING_FOR_RESOURCE` |  |
+
+### ProjectMemberRelation
+
+Project member relation.
+
+| Value | Description |
+| ----- | ----------- |
+| `DESCENDANTS` | Descendants members |
+| `DIRECT` | Direct members |
+| `INHERITED` | Inherited members |
+| `INVITED_GROUPS` | Invited Groups members |
 
 ### RegistryState
 
