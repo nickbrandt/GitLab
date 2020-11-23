@@ -1,7 +1,7 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
-import * as stageActions from 'ee/analytics/cycle_analytics/store/modules/stages/actions';
+import * as valueStreamStages from 'ee/analytics/cycle_analytics/store/modules/value_stream_stages/actions';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
@@ -182,11 +182,13 @@ describe('Value Stream Analytics actions', () => {
 
     it(`displays an error if fetchStageMedianValues fails`, () => {
       const { mockDispatchContext } = mockFetchCycleAnalyticsAction({
-        fetchStageMedianValues: stageActions.fetchStageMedianValues({
+        fetchStageMedianValues: valueStreamStages.fetchStageMedianValues({
           dispatch: jest
             .fn()
             .mockResolvedValueOnce()
-            .mockImplementation(stageActions.receiveStageMedianValuesError({ commit: () => {} })),
+            .mockImplementation(
+              valueStreamStages.receiveStageMedianValuesError({ commit: () => {} }),
+            ),
           commit: () => {},
           state: { ...state },
           getters: {
@@ -294,7 +296,7 @@ describe('Value Stream Analytics actions', () => {
             payload: { ...customizableStagesAndEvents.stages },
           },
         ],
-        [{ type: 'stages/setDefaultSelectedStage' }],
+        [{ type: 'valueStreamStages/setDefaultSelectedStage' }],
       );
     });
   });
@@ -617,7 +619,7 @@ describe('Value Stream Analytics actions', () => {
         [],
         [
           { type: 'fetchGroupStagesAndEvents' },
-          { type: 'stages/fetchStageMedianValues' },
+          { type: 'valueStreamStages/fetchStageMedianValues' },
           { type: 'durationChart/fetchDurationData' },
         ],
       );

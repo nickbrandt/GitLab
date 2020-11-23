@@ -24,7 +24,7 @@ export const showCreateForm = ({ commit }) => {
 export const showEditForm = ({ commit, dispatch }, selectedStage = {}) => {
   commit(types.SET_LOADING);
   commit(types.SET_FORM_INITIAL_DATA, selectedStage);
-  dispatch('stages/setSelectedStage', selectedStage, { root: true });
+  dispatch('valueStreamStages/setSelectedStage', selectedStage, { root: true });
   dispatch('clearSavingCustomStage');
   commit(types.SHOW_EDIT_FORM);
   removeFlash();

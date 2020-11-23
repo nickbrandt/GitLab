@@ -68,7 +68,7 @@ export default {
     // NOTE: formEvents are fetched in the same request as the list of stages (fetchGroupStagesAndEvents)
     // so i think its ok to bind formEvents here even though its only used as a prop to the custom-stage-form
     ...mapState('customStages', ['isCreatingCustomStage', 'formEvents']),
-    ...mapState('stages', ['selectedStage', 'currentStageEvents']),
+    ...mapState('valueStreamStages', ['selectedStage', 'currentStageEvents']),
     ...mapGetters([
       'hasNoAccessError',
       'currentGroupPath',
@@ -125,7 +125,7 @@ export default {
 
   methods: {
     ...mapActions(['fetchCycleAnalyticsData', 'setSelectedProjects', 'setDateRange']),
-    ...mapActions('stages', [
+    ...mapActions('valueStreamStages', [
       'setSelectedStage',
       'fetchStageData',
       'reorderStage',

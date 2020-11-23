@@ -255,7 +255,7 @@ describe('Custom stage actions', () => {
           { type: types.SHOW_EDIT_FORM },
         ],
         [
-          { type: 'stages/setSelectedStage', payload: rawCustomStage },
+          { type: 'valueStreamStages/setSelectedStage', payload: rawCustomStage },
           { type: 'clearSavingCustomStage' },
         ],
       );

@@ -73,7 +73,7 @@ export const receiveGroupStagesError = ({ commit }, error) => {
 
 export const receiveGroupStagesSuccess = ({ commit, dispatch }, stages) => {
   commit(types.RECEIVE_GROUP_STAGES_SUCCESS, stages);
-  return dispatch('stages/setDefaultSelectedStage');
+  return dispatch('valueStreamStages/setDefaultSelectedStage');
 };
 
 export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
@@ -84,7 +84,7 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
   } = getters;
 
   dispatch('requestGroupStages');
-  dispatch('customStages/setStageEvents', []);
+  dispatch('customvalueStreamStages/setStageEvents', []);
 
   return Api.cycleAnalyticsGroupStagesAndEvents({
     groupId,
@@ -96,7 +96,7 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
   })
     .then(({ data: { stages = [], events = [] } }) => {
       dispatch('receiveGroupStagesSuccess', stages);
-      dispatch('customStages/setStageEvents', events);
+      dispatch('customvalueStreamStages/setStageEvents', events);
     })
     .catch(error => {
       throwIfUserForbidden(error);
@@ -174,7 +174,7 @@ export const deleteValueStream = ({ commit, dispatch, getters }, valueStreamId) 
 export const fetchValueStreamData = ({ dispatch }) =>
   Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))
-    .then(() => dispatch('stages/fetchStageMedianValues'))
+    .then(() => dispatch('valueStreamStages/fetchStageMedianValues'))
     .then(() => dispatch('durationChart/fetchDurationData'));
 
 export const setSelectedValueStream = ({ commit, dispatch }, valueStream) => {
