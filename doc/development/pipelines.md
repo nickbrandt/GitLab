@@ -141,7 +141,7 @@ graph RL;
     click 2_4-1 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=6914305&udv=0"
   end
 
-  2_5-1["rspec & db jobs (12-22 minutes)"];
+  2_5-1["rspec-child-pipeline & db jobs (12-22 minutes)"];
   subgraph "Needs `compile-test-assets`, `setup-test-env`, & `retrieve-tests-metadata`";
     2_5-1 --> 1-3 & 1-6 & 1-14;
     class 2_5-1 criticalPath;
@@ -158,7 +158,7 @@ graph RL;
   end
 
   3_2-1["rspec:coverage (7.5 minutes)"];
-  subgraph "Depends on `rspec` jobs";
+  subgraph "Depends on `rspec-child-pipeline` job";
     3_2-1 -.->|"(don't use needs because of limitations)"| 2_5-1;
     click 3_2-1 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=7248745&udv=0"
   end
@@ -247,7 +247,7 @@ graph RL;
     click 2_4-1 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=6914305&udv=0"
   end
 
-  2_5-1["rspec & db jobs (12-22 minutes)"];
+  2_5-1["rspec-child-pipeline & db jobs (12-22 minutes)"];
   subgraph "Needs `compile-test-assets`, `setup-test-env, & `retrieve-tests-metadata`";
     2_5-1 --> 1-3 & 1-6 & 1-14;
     class 2_5-1 criticalPath;
@@ -271,7 +271,7 @@ graph RL;
   end
 
   3_2-1["rspec:coverage (7.5 minutes)"];
-  subgraph "Depends on `rspec` jobs";
+  subgraph "Depends on `rspec-child-pipeline` jobs";
     3_2-1 -.->|"(don't use needs because of limitations)"| 2_5-1;
     click 3_2-1 "https://app.periscopedata.com/app/gitlab/652085/Engineering-Productivity---Pipeline-Build-Durations?widget=7248745&udv=0"
   end
@@ -361,6 +361,18 @@ graph RL;
   end
 ```
 
+### Test jobs
+
+All RSpec jobs are performed in a child pipeline, linked to the main pipeline through the bridge job `rspec-child-pipeline`.
+
+Consult [GitLab tests in the Continuous Integration (CI) context](testing_guide/ci.md)
+for more information.
+
+We have dedicated jobs for each [testing level](testing_guide/testing_levels.md) and each job runs depending on the
+changes made in your merge request.
+If you want to force all the RSpec jobs to run regardless of your changes, you can include `RUN ALL RSPEC` in your merge
+request title.
+
 ### Fail-fast pipeline in Merge Requests
 
 To provide faster feedback when a Merge Request breaks existing tests, we are experimenting with a
@@ -386,10 +398,7 @@ graph LR
 
     subgraph "test stage";
         B["jest"];
-        C["rspec migration"];
-        D["rspec unit"];
-        E["rspec integration"];
-        F["rspec system"];
+        C["rspec-child-pipeline"];
         G["rspec fail-fast"];
     end
 
@@ -440,16 +449,6 @@ We follow the [PostgreSQL versions shipped with Omnibus GitLab](https://docs.git
 | PG11   | MRs/`master`/`2-hour`/`nightly` | MRs/`master`/`2-hour`/`nightly` | MRs/`master`/`2-hour`/`nightly` | MRs/`master`/`2-hour`/`nightly` | MRs/`master`/`2-hour`/`nightly` | `nightly` | - |
 | PG12   | - | - | `nightly` | `2-hour`/`nightly` | `2-hour`/`nightly` | MRs/`2-hour`/`nightly` | `2-hour`/`nightly`     |
 | PG13   | - | - | -         | -                  | -                  | -                      | MRs/`2-hour`/`nightly` |
-
-### Test jobs
-
-Consult [GitLab tests in the Continuous Integration (CI) context](testing_guide/ci.md)
-for more information.
-
-We have dedicated jobs for each [testing level](testing_guide/testing_levels.md) and each job runs depending on the
-changes made in your merge request.
-If you want to force all the RSpec jobs to run regardless of your changes, you can include `RUN ALL RSPEC` in your merge
-request title.
 
 ### Review app jobs
 

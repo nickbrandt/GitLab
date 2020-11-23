@@ -6,6 +6,14 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # GitLab tests in the Continuous Integration (CI) context
 
+## RSpec jobs in a child pipeline
+
+All RSpec jobs are performed in a child pipeline, linked to the main pipeline through the bridge job `rspec-child-pipeline`.
+
+The RSpec child pipeline contains the `rspec unit`, `rspec integration`, `rspec system`, `rspec migration` jobs,
+along with the `ee`, `as-if-foss`, `geo` and `pg` variations. The pipeline is configured dynamically by the job `create-rspec-pipeline`.
+which determines the parallelization needed for each level of RSpec tests.
+
 ## Test suite parallelization on the CI
 
 Our current CI parallelization setup is as follows:
