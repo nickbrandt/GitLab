@@ -3243,6 +3243,9 @@ msgstr ""
 msgid "An error occurred while updating the comment"
 msgstr ""
 
+msgid "An error occurred while updating the milestone."
+msgstr ""
+
 msgid "An error occurred while validating group path"
 msgstr ""
 
@@ -17597,6 +17600,9 @@ msgid "Milestones|Group Milestone"
 msgstr ""
 
 msgid "Milestones|Milestone %{milestoneTitle} was not found"
+msgstr ""
+
+msgid "Milestones|No milestones found"
 msgstr ""
 
 msgid "Milestones|Ongoing Issues (open and assigned)"
