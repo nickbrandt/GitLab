@@ -1,7 +1,7 @@
 import { GlSprintf } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
-import SecuritySummary from 'ee/vue_shared/security_reports/components/security_summary.vue';
-import { groupedTextBuilder } from 'ee/vue_shared/security_reports/store/utils';
+import SecuritySummary from '~/vue_shared/security_reports/components/security_summary.vue';
+import { groupedTextBuilder } from '~/vue_shared/security_reports/store/utils';
 
 describe('Severity Summary', () => {
   let wrapper;
