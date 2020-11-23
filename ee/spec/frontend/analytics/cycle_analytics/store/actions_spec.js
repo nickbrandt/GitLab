@@ -21,13 +21,10 @@ const group = { fullPath: 'fake_group_full_path' };
 const milestonesPath = 'fake_milestones_path';
 const labelsPath = 'fake_labels_path';
 
-const stageData = { events: [] };
-const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
 const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
 
 stages[0].hidden = true;
 const activeStages = stages.filter(({ hidden }) => !hidden);
-const hiddenStage = stages[0];
 
 const [selectedStage] = activeStages;
 const selectedStageSlug = selectedStage.slug;
@@ -37,9 +34,6 @@ const mockGetters = {
   currentGroupPath: () => currentGroup.fullPath,
   currentValueStreamId: () => selectedValueStream.id,
 };
-
-const stageEndpoint = ({ stageId }) =>
-  `/groups/${currentGroup.fullPath}/-/analytics/value_stream_analytics/value_streams/${selectedValueStream.id}/stages/${stageId}`;
 
 jest.mock('~/flash');
 

@@ -15,10 +15,6 @@ import {
   endpoints,
 } from '../../../mock_data';
 
-const group = { fullPath: 'fake_group_full_path' };
-const milestonesPath = 'fake_milestones_path';
-const labelsPath = 'fake_labels_path';
-
 const stageData = { events: [] };
 const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
 const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
@@ -406,7 +402,7 @@ describe('Value Stream Analytics stages actions', () => {
         [],
         [
           { type: 'requestUpdateStage' },
-          { type: 'customStages/setSavingCustomStage' },
+          { type: 'customStages/setSavingCustomStage', payload: null },
           {
             type: 'receiveUpdateStageSuccess',
             payload,
@@ -434,7 +430,7 @@ describe('Value Stream Analytics stages actions', () => {
           [],
           [
             { type: 'requestUpdateStage' },
-            { type: 'customStages/setSavingCustomStage' },
+            { type: 'customStages/setSavingCustomStage', payload: null },
             {
               type: 'receiveUpdateStageError',
               payload: {
@@ -497,7 +493,7 @@ describe('Value Stream Analytics stages actions', () => {
           state,
           [{ type: types.RECEIVE_UPDATE_STAGE_SUCCESS }],
           [
-            { type: 'fetchGroupStagesAndEvents' },
+            { type: 'fetchGroupStagesAndEvents', payload: null },
             { type: 'customStages/showEditForm', payload: response },
           ],
         ));
@@ -598,7 +594,7 @@ describe('Value Stream Analytics stages actions', () => {
         stageId,
         state,
         [{ type: 'RECEIVE_REMOVE_STAGE_RESPONSE' }],
-        [{ type: 'fetchCycleAnalyticsData' }],
+        [{ type: 'fetchCycleAnalyticsData', payload: null }],
       );
     });
 

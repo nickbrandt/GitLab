@@ -126,8 +126,8 @@ export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => 
   commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
   createFlash(__('Stage data updated'), 'notice');
   return Promise.resolve()
-    .then(() => dispatch('fetchGroupStagesAndEvents'))
-    .then(() => dispatch('customStages/showEditForm', updatedData))
+    .then(() => dispatch('fetchGroupStagesAndEvents', null, { root: true }))
+    .then(() => dispatch('customStages/showEditForm', updatedData, { root: true }))
     .catch(() => {
       createFlash(__('There was a problem refreshing the data, please try again'));
     });
@@ -146,14 +146,14 @@ export const receiveUpdateStageError = (
       : __('There was a problem saving your custom stage, please try again');
 
   createFlash(__(message));
-  return dispatch('customStages/setStageFormErrors', errors);
+  return dispatch('customStages/setStageFormErrors', errors, { root: true });
 };
 
 export const updateStage = ({ dispatch, rootGetters }, { id, ...params }) => {
   const { currentGroupPath, currentValueStreamId } = rootGetters;
 
   dispatch('requestUpdateStage');
-  dispatch('customStages/setSavingCustomStage');
+  dispatch('customStages/setSavingCustomStage', null, { root: true });
 
   return Api.cycleAnalyticsUpdateStage({
     groupId: currentGroupPath,
@@ -171,7 +171,7 @@ export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_ST
 export const receiveRemoveStageSuccess = ({ commit, dispatch }) => {
   commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
   createFlash(__('Stage removed'), 'notice');
-  return dispatch('fetchCycleAnalyticsData');
+  return dispatch('fetchCycleAnalyticsData', null, { root: true });
 };
 
 export const receiveRemoveStageError = ({ commit }) => {
