@@ -79,7 +79,7 @@ RSpec.describe Gitlab::EncryptedConfiguration do
         expect(config.foo[:bar]).to be true
       end
 
-      it 'throws a custom error when deferencing an invalid key map config' do
+      it 'throws a custom error when referencing an invalid key map config' do
         config = described_class.new(content_path: credentials_config_path, base_key: credentials_key)
 
         config.write("stringcontent")

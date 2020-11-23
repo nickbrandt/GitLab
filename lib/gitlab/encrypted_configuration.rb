@@ -41,7 +41,7 @@ module Gitlab
 
     def read
       if active?
-        decrypt content_path.binread
+        decrypt(content_path.binread)
       else
         ""
       end
@@ -55,7 +55,7 @@ module Gitlab
       File.open(temp_file.path, 'wb') do |file|
         file.write(encrypt(contents))
       end
-      FileUtils.mv temp_file.path, content_path
+      FileUtils.mv(temp_file.path, content_path)
     ensure
       temp_file&.unlink
     end
@@ -71,7 +71,7 @@ module Gitlab
     end
 
     def change(&block)
-      writing read, &block
+      writing(read, &block)
     end
 
     private
@@ -84,12 +84,12 @@ module Gitlab
 
     def encrypt(contents)
       handle_missing_key!
-      encryptor.encrypt_and_sign contents
+      encryptor.encrypt_and_sign(contents)
     end
 
     def decrypt(contents)
       handle_missing_key!
-      encryptor.decrypt_and_verify contents
+      encryptor.decrypt_and_verify(contents)
     end
 
     def encryptor
