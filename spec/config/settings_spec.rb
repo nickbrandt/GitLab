@@ -145,10 +145,6 @@ RSpec.describe Settings do
       Settings.encrypted('tmp/tests/test.enc')
     end
 
-    it 'defaults the config path within the rails root' do
-      expect(Settings.encrypted('tmp/tests/test.enc').content_path.fnmatch?(File.join(Rails.root, '**'))).to be true
-    end
-
     it 'returns empty encrypted config when a key has not been set' do
       allow(Gitlab::Application.secrets).to receive(:encrypted_settings_key_base).and_return(nil)
       expect(Settings.encrypted('tmp/tests/test.enc').read).to be_empty

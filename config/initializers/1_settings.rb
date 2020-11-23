@@ -7,7 +7,8 @@ Settings['shared'] ||= Settingslogic.new({})
 Settings.shared['path'] = Settings.absolute(Settings.shared['path'] || "shared")
 
 Settings['encrypted_settings'] ||= Settingslogic.new({})
-Settings.encrypted_settings['path'] = Settings.absolute(Settings.encrypted_settings['path'] || File.join(Settings.shared['path'], "encrypted_settings"))
+Settings.encrypted_settings['path'] ||= File.join(Settings.shared['path'], "encrypted_settings")
+Settings.encrypted_settings['path'] = Settings.absolute(Settings.encrypted_settings['path'])
 
 Settings['ldap'] ||= Settingslogic.new({})
 Settings.ldap['enabled'] = false if Settings.ldap['enabled'].nil?
