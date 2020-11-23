@@ -2626,4 +2626,15 @@ RSpec.describe Project do
       project.mark_primary_write_location
     end
   end
+
+  describe '#add_template_export_job' do
+    it 'starts project template export job' do
+      user = create(:user)
+      project = build(:project)
+
+      expect(ProjectTemplateExportWorker).to receive(:perform_async).with(user.id, project.id, nil, {})
+
+      project.add_template_export_job(current_user: user)
+    end
+  end
 end
