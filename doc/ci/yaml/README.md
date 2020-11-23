@@ -1989,7 +1989,7 @@ This example creates four paths of execution:
 
 #### Referring a stage
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/220758) in GitLab 12.0.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/220758) in GitLab 13.7.
 > - It's [deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
 > - It's disabled on GitLab.com.
 > - It's not recommended for production use.
