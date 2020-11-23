@@ -77,20 +77,29 @@ RSpec.describe Vulnerabilities::HistoricalStatistic do
   end
 
   describe '.aggregated_by_date' do
-    let_it_be(:date_1) { Date.new(2020, 8, 10) }
-    let_it_be(:date_2) { Date.new(2020, 8, 11) }
-
-    let_it_be(:historical_statistic_1) { create(:vulnerability_historical_statistic, date: date_1, total: 21, info: 1, unknown: 2, low: 3, medium: 4, high: 5, critical: 6) }
-    let_it_be(:historical_statistic_2) { create(:vulnerability_historical_statistic, date: date_1, total: 21, info: 1, unknown: 2, low: 3, medium: 4, high: 5, critical: 6) }
-    let_it_be(:historical_statistic_3) { create(:vulnerability_historical_statistic, date: date_2, total: 57, info: 7, unknown: 8, low: 9, medium: 10, high: 11, critical: 12) }
+    let(:expected_collection) do
+      [
+        { 'id' => nil, 'date' => '2020-08-10', 'info' => 1, 'unknown' => 3, 'low' => 6, 'medium' => 10, 'high' => 14, 'critical' => 18, 'total' => 52 },
+        { 'id' => nil, 'date' => '2020-08-11', 'info' => 1, 'unknown' => 4, 'low' => 6, 'medium' => 10, 'high' => 14, 'critical' => 28, 'total' => 53 },
+        { 'id' => nil, 'date' => '2020-08-12', 'info' => 2, 'unknown' => 5, 'low' => 6, 'medium' => 10, 'high' => 14, 'critical' => 19, 'total' => 56 }
+      ]
+    end
 
     subject { described_class.grouped_by_date(:asc).aggregated_by_date.as_json }
 
-    let(:expected_collection) do
-      [
-        { 'id' => nil, 'date' => '2020-08-10', 'info' => 2, 'unknown' => 4, 'low' => 6, 'medium' => 8, 'high' => 10, 'critical' => 12, 'total' => 42 },
-        { 'id' => nil, 'date' => '2020-08-11', 'info' => 7, 'unknown' => 8, 'low' => 9, 'medium' => 10, 'high' => 11, 'critical' => 12, 'total' => 57 }
-      ]
+    before(:all) do
+      date_1 = Date.new(2020, 8, 10)
+      date_2 = Date.new(2020, 8, 11)
+      date_3 = Date.new(2020, 8, 12)
+
+      project_1 = create(:project)
+      project_2 = create(:project)
+
+      create(:vulnerability_historical_statistic, date: date_1, project: project_1, total: 22, info: 1, unknown: 1, low: 2, medium: 4, high: 6, critical: 8)
+      create(:vulnerability_historical_statistic, date: date_1, project: project_2, total: 30, info: 0, unknown: 2, low: 4, medium: 6, high: 8, critical: 10)
+      create(:vulnerability_historical_statistic, date: date_2, project: project_1, total: 23, info: 1, unknown: 2, low: 2, medium: 4, high: 6, critical: 8)
+      create(:vulnerability_historical_statistic, date: date_3, project: project_1, total: 24, info: 1, unknown: 3, low: 2, medium: 4, high: 6, critical: 8)
+      create(:vulnerability_historical_statistic, date: date_3, project: project_2, total: 32, info: 1, unknown: 2, low: 4, medium: 6, high: 8, critical: 11)
     end
 
     it { is_expected.to match_array(expected_collection) }
