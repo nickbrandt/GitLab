@@ -58,7 +58,6 @@ export default {
       'selectedProjects',
       'selectedStage',
       'stages',
-      'currentStageEvents',
       'errorCode',
       'startDate',
       'endDate',
@@ -70,6 +69,7 @@ export default {
     // NOTE: formEvents are fetched in the same request as the list of stages (fetchGroupStagesAndEvents)
     // so i think its ok to bind formEvents here even though its only used as a prop to the custom-stage-form
     ...mapState('customStages', ['isCreatingCustomStage', 'formEvents']),
+    ...mapState('stages', ['currentStageEvents']),
     ...mapGetters([
       'hasNoAccessError',
       'currentGroupPath',

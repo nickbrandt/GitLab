@@ -7,32 +7,48 @@ import { checkForDataError, flashErrorIfStatusNotOk, isStageNameExistsError } fr
 
 export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
 
-export const requestReorderStage = ({ commit }) => commit(types.REQUEST_REORDER_STAGE);
-export const receiveReorderStageSuccess = ({ commit }) =>
-  commit(types.RECEIVE_REORDER_STAGE_SUCCESS);
+export const requestStageMedianValues = ({ commit }) => commit(types.REQUEST_STAGE_MEDIANS);
 
-export const receiveReorderStageError = ({ commit }) => {
-  commit(types.RECEIVE_REORDER_STAGE_ERROR);
-  createFlash(__('There was an error updating the stage order. Please try reloading the page.'));
+export const receiveStageMedianValuesError = ({ commit }, error) => {
+  commit(types.RECEIVE_STAGE_MEDIANS_ERROR, error);
+  createFlash(__('There was an error fetching median data for stages'));
 };
 
-export const reorderStage = ({ dispatch, rootGetters }, initialData) => {
-  dispatch('requestReorderStage');
-  const { currentGroupPath, currentValueStreamId } = rootGetters;
-  const { id, moveAfterId, moveBeforeId } = initialData;
+const fetchStageMedian = ({ groupId, valueStreamId, stageId, params }) =>
+  Api.cycleAnalyticsStageMedian({ groupId, valueStreamId, stageId, params }).then(({ data }) => {
+    return {
+      id: stageId,
+      ...(data?.error
+        ? {
+            error: data.error,
+            value: null,
+          }
+        : data),
+    };
+  });
 
-  const params = moveAfterId ? { move_after_id: moveAfterId } : { move_before_id: moveBeforeId };
+export const fetchStageMedianValues = ({ dispatch, commit, getters }) => {
+  const {
+    currentGroupPath,
+    cycleAnalyticsRequestParams,
+    activeStages,
+    currentValueStreamId,
+  } = getters;
+  const stageIds = activeStages.map(s => s.slug);
 
-  return Api.cycleAnalyticsUpdateStage({
-    groupId: currentGroupPath,
-    valueStreamId: currentValueStreamId,
-    stageId: id,
-    data: params,
-  })
-    .then(({ data }) => dispatch('receiveReorderStageSuccess', data))
-    .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
-      dispatch('receiveReorderStageError', { status, responseData }),
-    );
+  dispatch('requestStageMedianValues');
+  return Promise.all(
+    stageIds.map(stageId =>
+      fetchStageMedian({
+        groupId: currentGroupPath,
+        valueStreamId: currentValueStreamId,
+        stageId,
+        params: cycleAnalyticsRequestParams,
+      }),
+    ),
+  )
+    .then(data => commit(types.RECEIVE_STAGE_MEDIANS_SUCCESS, data))
+    .catch(error => dispatch('receiveStageMedianValuesError', error));
 };
 
 export const requestStageData = ({ commit }) => commit(types.REQUEST_STAGE_DATA);
@@ -62,6 +78,34 @@ export const fetchStageData = ({ dispatch, getters }, stageId) => {
     .then(checkForDataError)
     .then(({ data }) => dispatch('receiveStageDataSuccess', data))
     .catch(error => dispatch('receiveStageDataError', error));
+};
+
+export const requestReorderStage = ({ commit }) => commit(types.REQUEST_REORDER_STAGE);
+export const receiveReorderStageSuccess = ({ commit }) =>
+  commit(types.RECEIVE_REORDER_STAGE_SUCCESS);
+
+export const receiveReorderStageError = ({ commit }) => {
+  commit(types.RECEIVE_REORDER_STAGE_ERROR);
+  createFlash(__('There was an error updating the stage order. Please try reloading the page.'));
+};
+
+export const reorderStage = ({ dispatch, rootGetters }, initialData) => {
+  dispatch('requestReorderStage');
+  const { currentGroupPath, currentValueStreamId } = rootGetters;
+  const { id, moveAfterId, moveBeforeId } = initialData;
+
+  const params = moveAfterId ? { move_after_id: moveAfterId } : { move_before_id: moveBeforeId };
+
+  return Api.cycleAnalyticsUpdateStage({
+    groupId: currentGroupPath,
+    valueStreamId: currentValueStreamId,
+    stageId: id,
+    data: params,
+  })
+    .then(({ data }) => dispatch('receiveReorderStageSuccess', data))
+    .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
+      dispatch('receiveReorderStageError', { status, responseData }),
+    );
 };
 
 export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);

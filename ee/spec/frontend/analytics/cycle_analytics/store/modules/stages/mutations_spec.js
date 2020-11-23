@@ -13,10 +13,10 @@ describe('Value Stream Analytics mutations', () => {
     state = null;
   });
 
-  // ${types.RECEIVE_STAGE_DATA_SUCCESS}    | ${'isEmptyStage'}          | ${true}
-  // ${types.RECEIVE_STAGE_DATA_ERROR}      | ${'selectedStageError'}    | ${}
   it.each`
     mutation                               | stateKey                   | value
+    ${types.REQUEST_STAGE_MEDIANS}         | ${'medians'}               | ${{}}
+    ${types.RECEIVE_STAGE_MEDIANS_ERROR}   | ${'medians'}               | ${{}}
     ${types.REQUEST_STAGE_DATA}            | ${'isLoadingStage'}        | ${true}
     ${types.REQUEST_STAGE_DATA}            | ${'isEmptyStage'}          | ${false}
     ${types.REQUEST_STAGE_DATA}            | ${'selectedStageError'}    | ${''}
@@ -55,4 +55,22 @@ describe('Value Stream Analytics mutations', () => {
       expect(state).toMatchObject(expectedState);
     },
   );
+
+  describe(`${types.RECEIVE_STAGE_MEDIANS_SUCCESS}`, () => {
+    it('sets each id as a key in the median object with the corresponding value and error', () => {
+      const stateWithData = {
+        medians: {},
+      };
+
+      mutations[types.RECEIVE_STAGE_MEDIANS_SUCCESS](stateWithData, [
+        { id: 1, value: 20 },
+        { id: 2, value: 10 },
+      ]);
+
+      expect(stateWithData.medians).toEqual({
+        '1': { value: 20, error: null },
+        '2': { value: 10, error: null },
+      });
+    });
+  });
 });

@@ -41,7 +41,7 @@ const stageEndpoint = ({ stageId }) =>
 
 jest.mock('~/flash');
 
-describe('Value Stream Analytics actions', () => {
+describe('Value Stream Analytics stages actions', () => {
   let state;
   let mock;
 
@@ -86,6 +86,106 @@ describe('Value Stream Analytics actions', () => {
       ],
       [],
     );
+  });
+
+  describe('fetchStageMedianValues', () => {
+    let mockDispatch = jest.fn();
+    const fetchMedianResponse = activeStages.map(({ slug: id }) => ({ events: [], id }));
+
+    beforeEach(() => {
+      state = { ...state, stages, currentGroup };
+      mock = new MockAdapter(axios);
+      mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.OK, { events: [] });
+      mockDispatch = jest.fn();
+    });
+
+    it('dispatches receiveStageMedianValuesSuccess with received data on success', () => {
+      return testAction(
+        actions.fetchStageMedianValues,
+        null,
+        state,
+        [{ type: types.RECEIVE_STAGE_MEDIANS_SUCCESS, payload: fetchMedianResponse }],
+        [{ type: 'requestStageMedianValues' }],
+      );
+    });
+
+    it('does not request hidden stages', () => {
+      return actions
+        .fetchStageMedianValues({
+          state,
+          getters: {
+            ...rootGetters,
+            activeStages,
+          },
+          commit: () => {},
+          dispatch: mockDispatch,
+        })
+        .then(() => {
+          expect(mockDispatch).not.toHaveBeenCalledWith('receiveStageMedianValuesSuccess', {
+            events: [],
+            id: hiddenStage.id,
+          });
+        });
+    });
+
+    describe(`Status ${httpStatusCodes.OK} and error message in response`, () => {
+      const dataError = 'Too much data';
+      const payload = activeStages.map(({ slug: id }) => ({ value: null, id, error: dataError }));
+
+      beforeEach(() => {
+        mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.OK, { error: dataError });
+      });
+
+      it(`dispatches the 'RECEIVE_STAGE_MEDIANS_SUCCESS' with ${dataError}`, () => {
+        return testAction(
+          actions.fetchStageMedianValues,
+          null,
+          state,
+          [{ type: types.RECEIVE_STAGE_MEDIANS_SUCCESS, payload }],
+          [{ type: 'requestStageMedianValues' }],
+        );
+      });
+    });
+
+    describe('with a failing request', () => {
+      beforeEach(() => {
+        mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.NOT_FOUND, { error });
+      });
+
+      it('will dispatch receiveStageMedianValuesError', () => {
+        return testAction(
+          actions.fetchStageMedianValues,
+          null,
+          state,
+          [],
+          [
+            { type: 'requestStageMedianValues' },
+            { type: 'receiveStageMedianValuesError', payload: error },
+          ],
+        );
+      });
+    });
+  });
+
+  describe('receiveStageMedianValuesError', () => {
+    it(`commits the ${types.RECEIVE_STAGE_MEDIANS_ERROR} mutation`, () =>
+      testAction(
+        actions.receiveStageMedianValuesError,
+        {},
+        state,
+        [
+          {
+            type: types.RECEIVE_STAGE_MEDIANS_ERROR,
+            payload: {},
+          },
+        ],
+        [],
+      ));
+
+    it('will flash an error message', () => {
+      actions.receiveStageMedianValuesError({ commit: () => {} });
+      shouldFlashAMessage('There was an error fetching median data for stages');
+    });
   });
 
   describe('fetchStageData', () => {

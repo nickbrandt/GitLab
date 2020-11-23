@@ -13,8 +13,6 @@ export default () => ({
   selectedStage: null,
   selectedValueStream: null,
 
-  currentStageEvents: [],
-
   isLoadingValueStreams: false,
   isCreatingValueStream: false,
   isDeletingValueStream: false,
@@ -25,6 +23,5 @@ export default () => ({
   stages: [],
   selectedStageError: '',
   summary: [],
-  medians: {},
   valueStreams: [],
 });

@@ -24,21 +24,6 @@ export default {
     state.errorCode = errCode;
     state.isLoading = false;
   },
-  [types.REQUEST_STAGE_MEDIANS](state) {
-    state.medians = {};
-  },
-  [types.RECEIVE_STAGE_MEDIANS_SUCCESS](state, medians = []) {
-    state.medians = medians.reduce(
-      (acc, { id, value, error = null }) => ({
-        ...acc,
-        [id]: { value, error },
-      }),
-      {},
-    );
-  },
-  [types.RECEIVE_STAGE_MEDIANS_ERROR](state) {
-    state.medians = {};
-  },
   [types.REQUEST_GROUP_STAGES](state) {
     state.stages = [];
   },

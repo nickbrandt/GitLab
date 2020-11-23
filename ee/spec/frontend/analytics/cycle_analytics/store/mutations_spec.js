@@ -34,8 +34,6 @@ describe('Value Stream Analytics mutations', () => {
     ${types.REQUEST_CYCLE_ANALYTICS_DATA}        | ${'isLoading'}               | ${true}
     ${types.RECEIVE_GROUP_STAGES_ERROR}          | ${'stages'}                  | ${[]}
     ${types.REQUEST_GROUP_STAGES}                | ${'stages'}                  | ${[]}
-    ${types.REQUEST_STAGE_MEDIANS}               | ${'medians'}                 | ${{}}
-    ${types.RECEIVE_STAGE_MEDIANS_ERROR}         | ${'medians'}                 | ${{}}
     ${types.REQUEST_CREATE_VALUE_STREAM}         | ${'isCreatingValueStream'}   | ${true}
     ${types.RECEIVE_CREATE_VALUE_STREAM_SUCCESS} | ${'isCreatingValueStream'}   | ${false}
     ${types.REQUEST_CREATE_VALUE_STREAM}         | ${'createValueStreamErrors'} | ${{}}
@@ -136,24 +134,6 @@ describe('Value Stream Analytics mutations', () => {
 
       expect(state.isLoading).toBe(false);
       expect(state.errorCode).toBe(errorCode);
-    });
-  });
-
-  describe(`${types.RECEIVE_STAGE_MEDIANS_SUCCESS}`, () => {
-    it('sets each id as a key in the median object with the corresponding value and error', () => {
-      const stateWithData = {
-        medians: {},
-      };
-
-      mutations[types.RECEIVE_STAGE_MEDIANS_SUCCESS](stateWithData, [
-        { id: 1, value: 20 },
-        { id: 2, value: 10 },
-      ]);
-
-      expect(stateWithData.medians).toEqual({
-        '1': { value: 20, error: null },
-        '2': { value: 10, error: null },
-      });
     });
   });
 

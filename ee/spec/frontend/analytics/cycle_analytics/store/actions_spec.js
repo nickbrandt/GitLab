@@ -1,6 +1,7 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as actions from 'ee/analytics/cycle_analytics/store/actions';
+import * as stageActions from 'ee/analytics/cycle_analytics/store/modules/stages/actions';
 import * as getters from 'ee/analytics/cycle_analytics/store/getters';
 import * as types from 'ee/analytics/cycle_analytics/store/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
@@ -181,11 +182,11 @@ describe('Value Stream Analytics actions', () => {
 
     it(`displays an error if fetchStageMedianValues fails`, () => {
       const { mockDispatchContext } = mockFetchCycleAnalyticsAction({
-        fetchStageMedianValues: actions.fetchStageMedianValues({
+        fetchStageMedianValues: stageActions.fetchStageMedianValues({
           dispatch: jest
             .fn()
             .mockResolvedValueOnce()
-            .mockImplementation(actions.receiveStageMedianValuesError({ commit: () => {} })),
+            .mockImplementation(stageActions.receiveStageMedianValuesError({ commit: () => {} })),
           commit: () => {},
           state: { ...state },
           getters: {
@@ -332,106 +333,6 @@ describe('Value Stream Analytics actions', () => {
           { type: 'stages/fetchStageData', payload: stages[1].slug },
         ],
       );
-    });
-  });
-
-  describe('fetchStageMedianValues', () => {
-    let mockDispatch = jest.fn();
-    const fetchMedianResponse = activeStages.map(({ slug: id }) => ({ events: [], id }));
-
-    beforeEach(() => {
-      state = { ...state, stages, currentGroup };
-      mock = new MockAdapter(axios);
-      mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.OK, { events: [] });
-      mockDispatch = jest.fn();
-    });
-
-    it('dispatches receiveStageMedianValuesSuccess with received data on success', () => {
-      return testAction(
-        actions.fetchStageMedianValues,
-        null,
-        state,
-        [{ type: types.RECEIVE_STAGE_MEDIANS_SUCCESS, payload: fetchMedianResponse }],
-        [{ type: 'requestStageMedianValues' }],
-      );
-    });
-
-    it('does not request hidden stages', () => {
-      return actions
-        .fetchStageMedianValues({
-          state,
-          getters: {
-            ...getters,
-            activeStages,
-          },
-          commit: () => {},
-          dispatch: mockDispatch,
-        })
-        .then(() => {
-          expect(mockDispatch).not.toHaveBeenCalledWith('receiveStageMedianValuesSuccess', {
-            events: [],
-            id: hiddenStage.id,
-          });
-        });
-    });
-
-    describe(`Status ${httpStatusCodes.OK} and error message in response`, () => {
-      const dataError = 'Too much data';
-      const payload = activeStages.map(({ slug: id }) => ({ value: null, id, error: dataError }));
-
-      beforeEach(() => {
-        mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.OK, { error: dataError });
-      });
-
-      it(`dispatches the 'RECEIVE_STAGE_MEDIANS_SUCCESS' with ${dataError}`, () => {
-        return testAction(
-          actions.fetchStageMedianValues,
-          null,
-          state,
-          [{ type: types.RECEIVE_STAGE_MEDIANS_SUCCESS, payload }],
-          [{ type: 'requestStageMedianValues' }],
-        );
-      });
-    });
-
-    describe('with a failing request', () => {
-      beforeEach(() => {
-        mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.NOT_FOUND, { error });
-      });
-
-      it('will dispatch receiveStageMedianValuesError', () => {
-        return testAction(
-          actions.fetchStageMedianValues,
-          null,
-          state,
-          [],
-          [
-            { type: 'requestStageMedianValues' },
-            { type: 'receiveStageMedianValuesError', payload: error },
-          ],
-        );
-      });
-    });
-  });
-
-  describe('receiveStageMedianValuesError', () => {
-    it(`commits the ${types.RECEIVE_STAGE_MEDIANS_ERROR} mutation`, () =>
-      testAction(
-        actions.receiveStageMedianValuesError,
-        {},
-        state,
-        [
-          {
-            type: types.RECEIVE_STAGE_MEDIANS_ERROR,
-            payload: {},
-          },
-        ],
-        [],
-      ));
-
-    it('will flash an error message', () => {
-      actions.receiveStageMedianValuesError({ commit: () => {} });
-      shouldFlashAMessage('There was an error fetching median data for stages');
     });
   });
 
@@ -753,7 +654,7 @@ describe('Value Stream Analytics actions', () => {
         [],
         [
           { type: 'fetchGroupStagesAndEvents' },
-          { type: 'fetchStageMedianValues' },
+          { type: 'stages/fetchStageMedianValues' },
           { type: 'durationChart/fetchDurationData' },
         ],
       );

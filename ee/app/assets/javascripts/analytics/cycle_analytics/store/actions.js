@@ -32,50 +32,6 @@ export const setDateRange = ({ commit, dispatch }, { skipFetch = false, startDat
   return dispatch('fetchCycleAnalyticsData');
 };
 
-export const requestStageMedianValues = ({ commit }) => commit(types.REQUEST_STAGE_MEDIANS);
-
-export const receiveStageMedianValuesError = ({ commit }, error) => {
-  commit(types.RECEIVE_STAGE_MEDIANS_ERROR, error);
-  createFlash(__('There was an error fetching median data for stages'));
-};
-
-const fetchStageMedian = ({ groupId, valueStreamId, stageId, params }) =>
-  Api.cycleAnalyticsStageMedian({ groupId, valueStreamId, stageId, params }).then(({ data }) => {
-    return {
-      id: stageId,
-      ...(data?.error
-        ? {
-            error: data.error,
-            value: null,
-          }
-        : data),
-    };
-  });
-
-export const fetchStageMedianValues = ({ dispatch, commit, getters }) => {
-  const {
-    currentGroupPath,
-    cycleAnalyticsRequestParams,
-    activeStages,
-    currentValueStreamId,
-  } = getters;
-  const stageIds = activeStages.map(s => s.slug);
-
-  dispatch('requestStageMedianValues');
-  return Promise.all(
-    stageIds.map(stageId =>
-      fetchStageMedian({
-        groupId: currentGroupPath,
-        valueStreamId: currentValueStreamId,
-        stageId,
-        params: cycleAnalyticsRequestParams,
-      }),
-    ),
-  )
-    .then(data => commit(types.RECEIVE_STAGE_MEDIANS_SUCCESS, data))
-    .catch(error => dispatch('receiveStageMedianValuesError', error));
-};
-
 export const requestCycleAnalyticsData = ({ commit }) => commit(types.REQUEST_CYCLE_ANALYTICS_DATA);
 
 export const receiveCycleAnalyticsDataSuccess = ({ commit, dispatch }) => {
@@ -232,7 +188,7 @@ export const deleteValueStream = ({ commit, dispatch, getters }, valueStreamId) 
 export const fetchValueStreamData = ({ dispatch }) =>
   Promise.resolve()
     .then(() => dispatch('fetchGroupStagesAndEvents'))
-    .then(() => dispatch('fetchStageMedianValues'))
+    .then(() => dispatch('stages/fetchStageMedianValues'))
     .then(() => dispatch('durationChart/fetchDurationData'));
 
 export const setSelectedValueStream = ({ commit, dispatch }, valueStream) => {
