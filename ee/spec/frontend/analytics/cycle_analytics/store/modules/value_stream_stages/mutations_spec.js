@@ -1,5 +1,5 @@
-import * as types from 'ee/analytics/cycle_analytics/store/modules/stages/mutation_types';
-import mutations from 'ee/analytics/cycle_analytics/store/modules/stages/mutations';
+import * as types from 'ee/analytics/cycle_analytics/store/modules/value_stream_stages/mutation_types';
+import mutations from 'ee/analytics/cycle_analytics/store/modules/value_stream_stages/mutations';
 import { issueEvents } from '../../../mock_data';
 
 let state = null;

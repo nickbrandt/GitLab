@@ -191,7 +191,7 @@ describe('Value Stream Analytics actions', () => {
             ),
           commit: () => {},
           state: { ...state },
-          getters: {
+          rootGetters: {
             ...getters,
             activeStages,
           },

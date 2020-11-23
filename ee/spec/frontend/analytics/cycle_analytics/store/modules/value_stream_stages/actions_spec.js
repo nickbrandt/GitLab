@@ -1,8 +1,8 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as rootGetters from 'ee/analytics/cycle_analytics/store/getters';
-import * as actions from 'ee/analytics/cycle_analytics/store/modules/stages/actions';
-import * as types from 'ee/analytics/cycle_analytics/store/modules/stages/mutation_types';
+import * as actions from 'ee/analytics/cycle_analytics/store/modules/value_stream_stages/actions';
+import * as types from 'ee/analytics/cycle_analytics/store/modules/value_stream_stages/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import httpStatusCodes from '~/lib/utils/http_status';
@@ -58,8 +58,8 @@ describe('Value Stream Analytics stages actions', () => {
       featureFlags: {
         hasDurationChart: true,
       },
-      activeStages,
       selectedValueStream,
+      activeStages,
       ...mockGetters,
     };
     mock = new MockAdapter(axios);
@@ -107,7 +107,10 @@ describe('Value Stream Analytics stages actions', () => {
       ${[]}
       ${null}
     `('with $data will flash an error', ({ data }) => {
-      actions.setDefaultSelectedStage({ getters: { activeStages: data }, dispatch: () => {} }, {});
+      actions.setDefaultSelectedStage(
+        { rootGetters: { activeStages: data }, dispatch: () => {} },
+        {},
+      );
       shouldFlashAMessage(flashErrorMessage);
     });
 
@@ -130,7 +133,7 @@ describe('Value Stream Analytics stages actions', () => {
     const fetchMedianResponse = activeStages.map(({ slug: id }) => ({ events: [], id }));
 
     beforeEach(() => {
-      state = { ...state, stages, currentGroup };
+      state = { ...state, stages, ...mockGetters };
       mock = new MockAdapter(axios);
       mock.onGet(endpoints.stageMedian).reply(httpStatusCodes.OK, { events: [] });
       mockDispatch = jest.fn();
@@ -150,7 +153,7 @@ describe('Value Stream Analytics stages actions', () => {
       return actions
         .fetchStageMedianValues({
           state,
-          getters: {
+          rootGetters: {
             ...rootGetters,
             activeStages,
           },

@@ -84,7 +84,7 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
   } = getters;
 
   dispatch('requestGroupStages');
-  dispatch('customvalueStreamStages/setStageEvents', []);
+  dispatch('customStages/setStageEvents', []);
 
   return Api.cycleAnalyticsGroupStagesAndEvents({
     groupId,
@@ -96,7 +96,7 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
   })
     .then(({ data: { stages = [], events = [] } }) => {
       dispatch('receiveGroupStagesSuccess', stages);
-      dispatch('customvalueStreamStages/setStageEvents', events);
+      dispatch('customStages/setStageEvents', events);
     })
     .catch(error => {
       throwIfUserForbidden(error);

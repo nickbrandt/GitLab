@@ -62,7 +62,11 @@ export const customStageFormActive = ({ isCreatingCustomStage, isEditingCustomSt
  *
  * https://gitlab.com/gitlab-org/gitlab/-/issues/216227
  */
-export const pathNavigationData = ({ stages, medians, selectedStage }) =>
+export const pathNavigationData = (
+  { stages },
+  _,
+  { valueStreamStages: { medians, selectedStage } },
+) =>
   transformStagesForPathNavigation({
     stages: filterStagesByHiddenStatus(stages, false),
     medians,

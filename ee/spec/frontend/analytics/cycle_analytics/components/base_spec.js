@@ -146,7 +146,7 @@ describe('Cycle Analytics component', () => {
     if (withStageSelected) {
       await Promise.all([
         store.dispatch('receiveGroupStagesSuccess', mockData.customizableStagesAndEvents.stages),
-        store.dispatch('receiveStageDataSuccess', mockData.issueEvents),
+        store.dispatch('valueStreamStages/receiveStageDataSuccess', mockData.issueEvents),
       ]);
     }
     return comp;

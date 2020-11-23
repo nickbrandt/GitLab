@@ -52,23 +52,26 @@ export default {
     ...mapState([
       'featureFlags',
       'isLoading',
-      'isLoadingStage',
-      'isEmptyStage',
       'currentGroup',
       'selectedProjects',
       'stages',
       'errorCode',
       'startDate',
       'endDate',
-      'medians',
       'isLoadingValueStreams',
-      'selectedStageError',
       'selectedValueStream',
     ]),
     // NOTE: formEvents are fetched in the same request as the list of stages (fetchGroupStagesAndEvents)
     // so i think its ok to bind formEvents here even though its only used as a prop to the custom-stage-form
     ...mapState('customStages', ['isCreatingCustomStage', 'formEvents']),
-    ...mapState('valueStreamStages', ['selectedStage', 'currentStageEvents']),
+    ...mapState('valueStreamStages', [
+      'isEmptyStage',
+      'isLoadingStage',
+      'medians',
+      'selectedStage',
+      'selectedStageError',
+      'currentStageEvents',
+    ]),
     ...mapGetters([
       'hasNoAccessError',
       'currentGroupPath',

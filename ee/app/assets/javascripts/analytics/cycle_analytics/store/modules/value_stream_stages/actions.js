@@ -6,8 +6,8 @@ import * as types from './mutation_types';
 import { checkForDataError, flashErrorIfStatusNotOk, isStageNameExistsError } from '../../../utils';
 
 export const setSelectedStage = ({ commit }, stage) => commit(types.SET_SELECTED_STAGE, stage);
-export const setDefaultSelectedStage = ({ dispatch, getters }) => {
-  const { activeStages = [] } = getters;
+export const setDefaultSelectedStage = ({ dispatch, rootGetters }) => {
+  const { activeStages = [] } = rootGetters;
   if (activeStages?.length) {
     const [firstActiveStage] = activeStages;
     return Promise.all([
@@ -40,13 +40,13 @@ const fetchStageMedian = ({ groupId, valueStreamId, stageId, params }) =>
     };
   });
 
-export const fetchStageMedianValues = ({ dispatch, commit, getters }) => {
+export const fetchStageMedianValues = ({ dispatch, commit, rootGetters }) => {
   const {
     currentGroupPath,
     cycleAnalyticsRequestParams,
     activeStages,
     currentValueStreamId,
-  } = getters;
+  } = rootGetters;
   const stageIds = activeStages.map(s => s.slug);
 
   dispatch('requestStageMedianValues');
@@ -78,8 +78,8 @@ export const receiveStageDataError = ({ commit }, error) => {
   commit(types.RECEIVE_STAGE_DATA_ERROR, message);
 };
 
-export const fetchStageData = ({ dispatch, getters }, stageId) => {
-  const { cycleAnalyticsRequestParams = {}, currentValueStreamId, currentGroupPath } = getters;
+export const fetchStageData = ({ dispatch, rootGetters }, stageId) => {
+  const { cycleAnalyticsRequestParams = {}, currentValueStreamId, currentGroupPath } = rootGetters;
   dispatch('requestStageData');
 
   return Api.cycleAnalyticsStageEvents({
@@ -149,8 +149,8 @@ export const receiveUpdateStageError = (
   return dispatch('customStages/setStageFormErrors', errors);
 };
 
-export const updateStage = ({ dispatch, getters }, { id, ...params }) => {
-  const { currentGroupPath, currentValueStreamId } = getters;
+export const updateStage = ({ dispatch, rootGetters }, { id, ...params }) => {
+  const { currentGroupPath, currentValueStreamId } = rootGetters;
 
   dispatch('requestUpdateStage');
   dispatch('customStages/setSavingCustomStage');
@@ -179,8 +179,8 @@ export const receiveRemoveStageError = ({ commit }) => {
   createFlash(__('There was an error removing your custom stage, please try again'));
 };
 
-export const removeStage = ({ dispatch, getters }, stageId) => {
-  const { currentGroupPath, currentValueStreamId } = getters;
+export const removeStage = ({ dispatch, rootGetters }, stageId) => {
+  const { currentGroupPath, currentValueStreamId } = rootGetters;
   dispatch('requestRemoveStage');
 
   return Api.cycleAnalyticsRemoveStage({

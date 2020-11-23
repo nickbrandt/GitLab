@@ -19,6 +19,7 @@ import {
 } from '../mock_data';
 
 let state = null;
+let rootState = null;
 
 const selectedMilestoneParams = getFilterParams(filterMilestones);
 const selectedLabelParams = getFilterParams(filterLabels);
@@ -211,11 +212,13 @@ describe('Value Stream Analytics getters', () => {
     it('returns the transformed data', () => {
       state = {
         stages: allowedStages,
-        medians: stageMedians,
-        selectedStage: issueStage,
       };
 
-      expect(getters.pathNavigationData(state)).toEqual(transformedStagePathData);
+      rootState = {
+        valueStreamStages: { medians: stageMedians, selectedStage: issueStage },
+      };
+
+      expect(getters.pathNavigationData(state, null, rootState)).toEqual(transformedStagePathData);
     });
   });
 });
