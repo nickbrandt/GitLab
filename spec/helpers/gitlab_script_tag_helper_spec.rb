@@ -2,9 +2,9 @@
 
 require 'spec_helper'
 
-RSpec.describe DeferScriptTagHelper do
+RSpec.describe GitlabScriptTagHelper do
   before do
-    allow_any_instance_of(DeferScriptTagHelper).to receive(:content_security_policy_nonce).and_return('noncevalue')
+    allow_any_instance_of(GitlabScriptTagHelper).to receive(:content_security_policy_nonce).and_return('noncevalue')
   end
 
   describe 'external script tag' do
