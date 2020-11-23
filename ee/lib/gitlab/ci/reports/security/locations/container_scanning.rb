@@ -25,7 +25,7 @@ module Gitlab
             end
 
             def docker_image_name_without_tag
-              base_name, version = image.split(':')
+              base_name, version = image.to_s.split(':')
 
               return image if version_semver_like?(version)
 

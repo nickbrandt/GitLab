@@ -23,6 +23,11 @@ RSpec.describe Gitlab::Ci::Reports::Security::Locations::ContainerScanning do
     subject { described_class.new(**params) }
 
     specify do
+      params[:image] = nil
+      expect(subject.fingerprint).to eq(sha1_of.call(':glibc'))
+    end
+
+    specify do
       params[:image] = 'alpine:3.7.3'
       expect(subject.fingerprint).to eq(sha1_of.call('alpine:3.7.3:glibc'))
     end
