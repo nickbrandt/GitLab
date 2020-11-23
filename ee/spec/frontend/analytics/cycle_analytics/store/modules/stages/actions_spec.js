@@ -392,4 +392,87 @@ describe('Value Stream Analytics actions', () => {
       });
     });
   });
+
+  describe('removeStage', () => {
+    const stageId = 'cool-stage';
+
+    beforeEach(() => {
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
+    });
+
+    it('dispatches receiveRemoveStageSuccess with put request response data', () => {
+      return testAction(
+        actions.removeStage,
+        stageId,
+        state,
+        [],
+        [
+          { type: 'requestRemoveStage' },
+          {
+            type: 'receiveRemoveStageSuccess',
+          },
+        ],
+      );
+    });
+
+    describe('with a failed request', () => {
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.NOT_FOUND);
+      });
+
+      it('dispatches receiveRemoveStageError', () => {
+        return testAction(
+          actions.removeStage,
+          stageId,
+          state,
+          [],
+          [
+            { type: 'requestRemoveStage' },
+            {
+              type: 'receiveRemoveStageError',
+              payload: error,
+            },
+          ],
+        );
+      });
+
+      it('flashes an error message', () => {
+        actions.receiveRemoveStageError({ commit: () => {}, state }, {});
+        shouldFlashAMessage('There was an error removing your custom stage, please try again');
+      });
+    });
+  });
+
+  describe('receiveRemoveStageSuccess', () => {
+    const stageId = 'cool-stage';
+
+    beforeEach(() => {
+      mock.onDelete(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
+      state = { currentGroup };
+    });
+
+    it('dispatches fetchCycleAnalyticsData', () => {
+      return testAction(
+        actions.receiveRemoveStageSuccess,
+        stageId,
+        state,
+        [{ type: 'RECEIVE_REMOVE_STAGE_RESPONSE' }],
+        [{ type: 'fetchCycleAnalyticsData' }],
+      );
+    });
+
+    it('flashes a success message', () => {
+      return actions
+        .receiveRemoveStageSuccess(
+          {
+            dispatch: () => Promise.resolve(),
+            commit: () => {},
+            state,
+          },
+          {},
+        )
+        .then(() => shouldFlashAMessage('Stage removed', 'notice'));
+    });
+  });
 });

@@ -33,6 +33,8 @@ describe('Value Stream Analytics mutations', () => {
     ${types.REQUEST_UPDATE_STAGE}          | ${'isLoading'}             | ${true}
     ${types.RECEIVE_UPDATE_STAGE_SUCCESS}  | ${'isLoading'}             | ${false}
     ${types.RECEIVE_UPDATE_STAGE_ERROR}    | ${'isLoading'}             | ${false}
+    ${types.REQUEST_REMOVE_STAGE}          | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_REMOVE_STAGE_RESPONSE} | ${'isLoading'}             | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 

@@ -44,4 +44,10 @@ export default {
   [types.RECEIVE_UPDATE_STAGE_ERROR](state) {
     state.isLoading = false;
   },
+  [types.REQUEST_REMOVE_STAGE](state) {
+    state.isLoading = true;
+  },
+  [types.RECEIVE_REMOVE_STAGE_RESPONSE](state) {
+    state.isLoading = false;
+  },
 };

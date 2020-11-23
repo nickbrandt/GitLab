@@ -48,12 +48,6 @@ export default {
   [types.RECEIVE_GROUP_STAGES_SUCCESS](state, stages) {
     state.stages = transformRawStages(stages);
   },
-  [types.REQUEST_REMOVE_STAGE](state) {
-    state.isLoading = true;
-  },
-  [types.RECEIVE_REMOVE_STAGE_RESPONSE](state) {
-    state.isLoading = false;
-  },
   [types.INITIALIZE_CYCLE_ANALYTICS](
     state,
     {

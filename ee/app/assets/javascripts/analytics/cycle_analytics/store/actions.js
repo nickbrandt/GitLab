@@ -162,31 +162,6 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
     });
 };
 
-export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_STAGE);
-export const receiveRemoveStageSuccess = ({ commit, dispatch }) => {
-  commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
-  createFlash(__('Stage removed'), 'notice');
-  return dispatch('fetchCycleAnalyticsData');
-};
-
-export const receiveRemoveStageError = ({ commit }) => {
-  commit(types.RECEIVE_REMOVE_STAGE_RESPONSE);
-  createFlash(__('There was an error removing your custom stage, please try again'));
-};
-
-export const removeStage = ({ dispatch, getters }, stageId) => {
-  const { currentGroupPath, currentValueStreamId } = getters;
-  dispatch('requestRemoveStage');
-
-  return Api.cycleAnalyticsRemoveStage({
-    groupId: currentGroupPath,
-    valueStreamId: currentValueStreamId,
-    stageId,
-  })
-    .then(() => dispatch('receiveRemoveStageSuccess'))
-    .catch(error => dispatch('receiveRemoveStageError', error));
-};
-
 export const initializeCycleAnalyticsSuccess = ({ commit }) =>
   commit(types.INITIALIZE_CYCLE_ANALYTICS_SUCCESS);
 
