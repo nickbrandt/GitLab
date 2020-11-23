@@ -359,6 +359,12 @@ msgstr ""
 msgid "%{anchorOpen}Learn more%{anchorClose} about how you can customize / disable registration on your instance."
 msgstr ""
 
+msgid "%{author_link} cloned %{original_issue} to %{new_issue}."
+msgstr ""
+
+msgid "%{author_link} cloned %{original_issue}. You don't have access to the new project."
+msgstr ""
+
 msgid "%{author_link} wrote:"
 msgstr ""
 
