@@ -22,13 +22,18 @@ module Gitlab
         encrypted = Gitlab::Auth::Ldap::Config.encrypted_secrets
         return unless validate_config(encrypted)
 
-        editor = ENV['EDITOR'] || 'editor'
+        if ENV["EDITOR"].to_s.empty?
+          puts 'No $EDITOR specified to open file. Please provide one when running the command:'
+          puts 'gitlab:ldap:secret:edit EDITOR=vim'
+          return
+        end
+
         temp_file = Tempfile.new(File.basename(encrypted.content_path), File.dirname(encrypted.content_path))
 
         encrypted.change do |contents|
           contents = encrypted_file_template unless File.exist?(encrypted.content_path)
           File.write(temp_file.path, contents)
-          system(editor, temp_file.path)
+          system(ENV['EDITOR'], temp_file.path)
           changes = File.read(temp_file.path)
           validate_contents(changes)
           changes
@@ -63,7 +68,7 @@ module Gitlab
         end
 
         if encrypted.key.nil?
-          puts "Missing encryption key enc_settings_key_base."
+          puts "Missing encryption key encrypted_settings_key_base."
           return false
         end
 

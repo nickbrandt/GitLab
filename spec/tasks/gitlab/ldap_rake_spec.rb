@@ -23,7 +23,7 @@ RSpec.describe 'gitlab:ldap:secret rake tasks' do
     stub_warn_user_is_not_gitlab
     FileUtils.mkdir_p('tmp/tests/ldapenc/')
     allow(Gitlab.config.ldap).to receive(:secret_file).and_return(ldap_secret_file)
-    allow(Gitlab::Application.secrets).to receive(:enc_settings_key_base).and_return(SecureRandom.hex(64))
+    allow(Gitlab::Application.secrets).to receive(:encrypted_settings_key_base).and_return(SecureRandom.hex(64))
   end
 
   after do
@@ -37,13 +37,13 @@ RSpec.describe 'gitlab:ldap:secret rake tasks' do
 
     it 'displays error when key does not exist' do
       Settings.encrypted(ldap_secret_file).write('somevalue')
-      allow(Gitlab::Application.secrets).to receive(:enc_settings_key_base).and_return(nil)
-      expect { run_rake_task('gitlab:ldap:secret:show') }.to output(/Missing encryption key enc_settings_key_base./).to_stdout
+      allow(Gitlab::Application.secrets).to receive(:encrypted_settings_key_base).and_return(nil)
+      expect { run_rake_task('gitlab:ldap:secret:show') }.to output(/Missing encryption key encrypted_settings_key_base./).to_stdout
     end
 
     it 'displays error when key is changed' do
       Settings.encrypted(ldap_secret_file).write('somevalue')
-      allow(Gitlab::Application.secrets).to receive(:enc_settings_key_base).and_return(SecureRandom.hex(64))
+      allow(Gitlab::Application.secrets).to receive(:encrypted_settings_key_base).and_return(SecureRandom.hex(64))
       expect { run_rake_task('gitlab:ldap:secret:show') }.to output(/Couldn't decrypt .* Perhaps you passed the wrong key?/).to_stdout
     end
 
@@ -63,13 +63,13 @@ RSpec.describe 'gitlab:ldap:secret rake tasks' do
     end
 
     it 'displays error when key does not exist' do
-      allow(Gitlab::Application.secrets).to receive(:enc_settings_key_base).and_return(nil)
-      expect { run_rake_task('gitlab:ldap:secret:edit') }.to output(/Missing encryption key enc_settings_key_base./).to_stdout
+      allow(Gitlab::Application.secrets).to receive(:encrypted_settings_key_base).and_return(nil)
+      expect { run_rake_task('gitlab:ldap:secret:edit') }.to output(/Missing encryption key encrypted_settings_key_base./).to_stdout
     end
 
     it 'displays error when key is changed' do
       Settings.encrypted(ldap_secret_file).write('somevalue')
-      allow(Gitlab::Application.secrets).to receive(:enc_settings_key_base).and_return(SecureRandom.hex(64))
+      allow(Gitlab::Application.secrets).to receive(:encrypted_settings_key_base).and_return(SecureRandom.hex(64))
       expect { run_rake_task('gitlab:ldap:secret:edit') }.to output(/Couldn't decrypt .* Perhaps you passed the wrong key?/).to_stdout
     end
 
@@ -83,6 +83,11 @@ RSpec.describe 'gitlab:ldap:secret rake tasks' do
       expect { run_rake_task('gitlab:ldap:secret:edit') }.to output(/WARNING: Content was not a valid LDAP secret yml file/).to_stdout
       value = Settings.encrypted(ldap_secret_file)
       expect(value.read).to match(/somevalue/)
+    end
+
+    it 'displays error when $EDITOR is not set' do
+      stub_env('EDITOR', nil)
+      expect { run_rake_task('gitlab:ldap:secret:edit') }.to output(/No \$EDITOR specified to open file. Please provide one when running the command/).to_stdout
     end
   end
 
@@ -100,8 +105,8 @@ RSpec.describe 'gitlab:ldap:secret rake tasks' do
     end
 
     it 'displays error when key does not exist' do
-      allow(Gitlab::Application.secrets).to receive(:enc_settings_key_base).and_return(nil)
-      expect { run_rake_task('gitlab:ldap:secret:write') }.to output(/Missing encryption key enc_settings_key_base./).to_stdout
+      allow(Gitlab::Application.secrets).to receive(:encrypted_settings_key_base).and_return(nil)
+      expect { run_rake_task('gitlab:ldap:secret:write') }.to output(/Missing encryption key encrypted_settings_key_base./).to_stdout
     end
 
     it 'displays error when write directory does not exist' do
