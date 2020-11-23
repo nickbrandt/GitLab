@@ -10,7 +10,7 @@ RSpec.describe GraphqlHelpers do
     query.tr("\n", ' ').gsub(/\s+/, ' ').strip
   end
 
-  describe ::GraphqlHelpers::Var do
+  describe 'var' do
     it 'allocates a fresh name for each var' do
       a = var('Int')
       b = var('Int')
