@@ -155,8 +155,8 @@ class Settings < Settingslogic
     def encrypted(path)
       Gitlab::EncryptedConfiguration.new(
         content_path: Settings.absolute(path),
-        base_key: Gitlab::Application.secrets.enc_settings_key_base,
-        previous_keys: Gitlab::Application.secrets.rotated_enc_settings_key_base || []
+        base_key: Gitlab::Application.secrets.encrypted_settings_key_base,
+        previous_keys: Gitlab::Application.secrets.rotated_encrypted_settings_key_base || []
       )
     end
 

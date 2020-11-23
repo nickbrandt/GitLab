@@ -24,7 +24,7 @@ RSpec.describe 'create_tokens' do
 
   describe 'ensure acknowledged secrets in any installations' do
     let(:acknowledged_secrets) do
-      %w[secret_key_base otp_key_base db_key_base openid_connect_signing_key enc_settings_key_base rotated_enc_settings_key_base]
+      %w[secret_key_base otp_key_base db_key_base openid_connect_signing_key encrypted_settings_key_base rotated_encrypted_settings_key_base]
     end
 
     it 'does not allow to add a new secret without a proper handling' do
@@ -90,7 +90,7 @@ RSpec.describe 'create_tokens' do
           expect(new_secrets['otp_key_base']).to eq(secrets.otp_key_base)
           expect(new_secrets['db_key_base']).to eq(secrets.db_key_base)
           expect(new_secrets['openid_connect_signing_key']).to eq(secrets.openid_connect_signing_key)
-          expect(new_secrets['enc_settings_key_base']).to eq(secrets.enc_settings_key_base)
+          expect(new_secrets['encrypted_settings_key_base']).to eq(secrets.encrypted_settings_key_base)
         end
 
         create_tokens
@@ -107,7 +107,7 @@ RSpec.describe 'create_tokens' do
       before do
         secrets.db_key_base = 'db_key_base'
         secrets.openid_connect_signing_key = 'openid_connect_signing_key'
-        secrets.enc_settings_key_base = 'enc_settings_key_base'
+        secrets.encrypted_settings_key_base = 'encrypted_settings_key_base'
 
         allow(File).to receive(:exist?).with('.secret').and_return(true)
         stub_file_read('.secret', content: 'file_key')
@@ -160,7 +160,7 @@ RSpec.describe 'create_tokens' do
           expect(secrets.otp_key_base).to eq('otp_key_base')
           expect(secrets.db_key_base).to eq('db_key_base')
           expect(secrets.openid_connect_signing_key).to eq('openid_connect_signing_key')
-          expect(secrets.enc_settings_key_base).to eq('enc_settings_key_base')
+          expect(secrets.encrypted_settings_key_base).to eq('encrypted_settings_key_base')
         end
 
         it 'deletes the .secret file' do
@@ -212,16 +212,16 @@ RSpec.describe 'create_tokens' do
         end
       end
 
-      context 'when rotated_enc_settings_key_base does not exist' do
+      context 'when rotated_encrypted_settings_key_base does not exist' do
         before do
           secrets.secret_key_base = 'secret_key_base'
           secrets.otp_key_base = 'otp_key_base'
           secrets.openid_connect_signing_key = 'openid_connect_signing_key'
-          secrets.enc_settings_key_base = 'enc_settings_key_base'
+          secrets.encrypted_settings_key_base = 'encrypted_settings_key_base'
         end
 
         it 'does not warn about the missing secrets' do
-          expect(self).not_to receive(:warn_missing_secret).with('rotated_enc_settings_key_base')
+          expect(self).not_to receive(:warn_missing_secret).with('rotated_encrypted_settings_key_base')
 
           create_tokens
         end
@@ -238,7 +238,7 @@ RSpec.describe 'create_tokens' do
       before do
         secrets.otp_key_base = 'otp_key_base'
         secrets.secret_key_base = 'secret_key_base'
-        secrets.enc_settings_key_base = 'enc_settings_key_base'
+        secrets.encrypted_settings_key_base = 'encrypted_settings_key_base'
         yaml_secrets = secrets.to_h.stringify_keys.merge('db_key_base' => '<%= an_erb_expression %>')
 
         allow(File).to receive(:exist?).with('.secret').and_return(false)

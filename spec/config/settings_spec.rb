@@ -137,11 +137,11 @@ RSpec.describe Settings do
 
   describe '.encrypted' do
     before do
-      allow(Gitlab::Application.secrets).to receive(:enc_settings_key_base).and_return(SecureRandom.hex(64))
+      allow(Gitlab::Application.secrets).to receive(:encryped_settings_key_base).and_return(SecureRandom.hex(64))
     end
 
-    it 'defaults to using the enc_settings_key_base for the key' do
-      expect(Gitlab::EncryptedConfiguration).to receive(:new).with(hash_including(base_key: Gitlab::Application.secrets.enc_settings_key_base))
+    it 'defaults to using the encrypted_settings_key_base for the key' do
+      expect(Gitlab::EncryptedConfiguration).to receive(:new).with(hash_including(base_key: Gitlab::Application.secrets.encrypted_settings_key_base))
       Settings.encrypted('tmp/tests/test.enc')
     end
 
@@ -150,7 +150,7 @@ RSpec.describe Settings do
     end
 
     it 'returns empty encrypted config when a key has not been set' do
-      allow(Gitlab::Application.secrets).to receive(:enc_settings_key_base).and_return(nil)
+      allow(Gitlab::Application.secrets).to receive(:encrypted_settings_key_base).and_return(nil)
       expect(Settings.encrypted('tmp/tests/test.enc').read).to be_empty
     end
   end
