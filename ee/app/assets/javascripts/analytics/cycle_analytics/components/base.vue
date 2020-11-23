@@ -130,9 +130,8 @@ export default {
       'setSelectedProjects',
       'setDateRange',
       'removeStage',
-      'updateStage',
     ]),
-    ...mapActions('stages', ['setSelectedStage', 'fetchStageData','reorderStage']),
+    ...mapActions('stages', ['setSelectedStage', 'fetchStageData', 'reorderStage', 'updateStage']),
     ...mapActions('customStages', ['hideForm', 'showCreateForm', 'showEditForm', 'createStage']),
     onProjectsSelect(projects) {
       this.setSelectedProjects(projects);

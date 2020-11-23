@@ -1,10 +1,10 @@
 import Api from 'ee/api';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
-import { __, sprintf } from '~/locale';
+import { __ } from '~/locale';
 import httpStatus from '~/lib/utils/http_status';
 import * as types from './mutation_types';
 import { FETCH_VALUE_STREAM_DATA } from '../constants';
-import { removeFlash, throwIfUserForbidden, isStageNameExistsError } from '../utils';
+import { removeFlash, throwIfUserForbidden } from '../utils';
 
 const appendExtension = path => (path.indexOf('.') > -1 ? path : `${path}.json`);
 
@@ -160,52 +160,6 @@ export const fetchGroupStagesAndEvents = ({ dispatch, getters }) => {
       throwIfUserForbidden(error);
       return dispatch('receiveGroupStagesError', error);
     });
-};
-
-export const requestUpdateStage = ({ commit }) => commit(types.REQUEST_UPDATE_STAGE);
-export const receiveUpdateStageSuccess = ({ commit, dispatch }, updatedData) => {
-  commit(types.RECEIVE_UPDATE_STAGE_SUCCESS);
-  createFlash(__('Stage data updated'), 'notice');
-  return Promise.resolve()
-    .then(() => dispatch('fetchGroupStagesAndEvents'))
-    .then(() => dispatch('customStages/showEditForm', updatedData))
-    .catch(() => {
-      createFlash(__('There was a problem refreshing the data, please try again'));
-    });
-};
-
-export const receiveUpdateStageError = (
-  { commit, dispatch },
-  { status, responseData: { errors = null } = {}, data = {} },
-) => {
-  commit(types.RECEIVE_UPDATE_STAGE_ERROR, { errors, data });
-
-  const { name = null } = data;
-  const message =
-    name && isStageNameExistsError({ status, errors })
-      ? sprintf(__(`'%{name}' stage already exists`), { name })
-      : __('There was a problem saving your custom stage, please try again');
-
-  createFlash(__(message));
-  return dispatch('customStages/setStageFormErrors', errors);
-};
-
-export const updateStage = ({ dispatch, getters }, { id, ...params }) => {
-  const { currentGroupPath, currentValueStreamId } = getters;
-
-  dispatch('requestUpdateStage');
-  dispatch('customStages/setSavingCustomStage');
-
-  return Api.cycleAnalyticsUpdateStage({
-    groupId: currentGroupPath,
-    valueStreamId: currentValueStreamId,
-    stageId: id,
-    data: params,
-  })
-    .then(({ data }) => dispatch('receiveUpdateStageSuccess', data))
-    .catch(({ response: { status = httpStatus.BAD_REQUEST, data: responseData } = {} }) =>
-      dispatch('receiveUpdateStageError', { status, responseData, data: { id, ...params } }),
-    );
 };
 
 export const requestRemoveStage = ({ commit }) => commit(types.REQUEST_REMOVE_STAGE);

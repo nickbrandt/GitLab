@@ -30,6 +30,9 @@ describe('Value Stream Analytics mutations', () => {
     ${types.REQUEST_REORDER_STAGE}         | ${'errorSavingStageOrder'} | ${false}
     ${types.RECEIVE_REORDER_STAGE_SUCCESS} | ${'errorSavingStageOrder'} | ${false}
     ${types.RECEIVE_REORDER_STAGE_ERROR}   | ${'errorSavingStageOrder'} | ${true}
+    ${types.REQUEST_UPDATE_STAGE}          | ${'isLoading'}             | ${true}
+    ${types.RECEIVE_UPDATE_STAGE_SUCCESS}  | ${'isLoading'}             | ${false}
+    ${types.RECEIVE_UPDATE_STAGE_ERROR}    | ${'isLoading'}             | ${false}
   `('$mutation will set $stateKey=$value', ({ mutation, stateKey, value }) => {
     mutations[mutation](state);
 

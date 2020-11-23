@@ -35,4 +35,13 @@ export default {
     state.isLoadingStage = false;
     state.selectedStageError = message;
   },
+  [types.REQUEST_UPDATE_STAGE](state) {
+    state.isLoading = true;
+  },
+  [types.RECEIVE_UPDATE_STAGE_SUCCESS](state) {
+    state.isLoading = false;
+  },
+  [types.RECEIVE_UPDATE_STAGE_ERROR](state) {
+    state.isLoading = false;
+  },
 };
