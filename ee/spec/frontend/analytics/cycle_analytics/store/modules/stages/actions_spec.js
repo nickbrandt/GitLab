@@ -1,0 +1,145 @@
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import * as rootGetters from 'ee/analytics/cycle_analytics/store/getters';
+import * as actions from 'ee/analytics/cycle_analytics/store/modules/stages/actions';
+import * as types from 'ee/analytics/cycle_analytics/store/modules/stages/mutation_types';
+import testAction from 'helpers/vuex_action_helper';
+import { deprecatedCreateFlash as createFlash } from '~/flash';
+import httpStatusCodes from '~/lib/utils/http_status';
+import {
+  currentGroup,
+  allowedStages as stages,
+  startDate,
+  endDate,
+  valueStreams,
+} from '../../../mock_data';
+
+const group = { fullPath: 'fake_group_full_path' };
+const milestonesPath = 'fake_milestones_path';
+const labelsPath = 'fake_labels_path';
+
+const stageData = { events: [] };
+const error = new Error(`Request failed with status code ${httpStatusCodes.NOT_FOUND}`);
+const flashErrorMessage = 'There was an error while fetching value stream analytics data.';
+
+stages[0].hidden = true;
+const activeStages = stages.filter(({ hidden }) => !hidden);
+const hiddenStage = stages[0];
+
+const [selectedStage] = activeStages;
+const selectedStageSlug = selectedStage.slug;
+const [selectedValueStream] = valueStreams;
+
+const mockGetters = {
+  currentGroupPath: () => currentGroup.fullPath,
+  currentValueStreamId: () => selectedValueStream.id,
+};
+
+const stageEndpoint = ({ stageId }) =>
+  `/groups/${currentGroup.fullPath}/-/analytics/value_stream_analytics/value_streams/${selectedValueStream.id}/stages/${stageId}`;
+
+jest.mock('~/flash');
+
+describe('Value Stream Analytics actions', () => {
+  let state;
+  let mock;
+
+  const shouldFlashAMessage = (msg, type = null) => {
+    const args = type ? [msg, type] : [msg];
+    expect(createFlash).toHaveBeenCalledWith(...args);
+  };
+
+  beforeEach(() => {
+    state = {
+      startDate,
+      endDate,
+      stages: [],
+      featureFlags: {
+        hasDurationChart: true,
+      },
+      activeStages,
+      selectedValueStream,
+      ...mockGetters,
+    };
+    mock = new MockAdapter(axios);
+  });
+
+  afterEach(() => {
+    mock.restore();
+    state = { ...state, currentGroup: null };
+  });
+
+  describe('reorderStage', () => {
+    const stageId = 'cool-stage';
+    const payload = { id: stageId, move_after_id: '2', move_before_id: '8' };
+
+    describe('with no errors', () => {
+      beforeEach(() => {
+        mock.onPut(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.OK);
+      });
+
+      it(`dispatches the ${types.REQUEST_REORDER_STAGE} and ${types.RECEIVE_REORDER_STAGE_SUCCESS} actions`, () => {
+        return testAction(
+          actions.reorderStage,
+          payload,
+          state,
+          [],
+          [{ type: 'requestReorderStage' }, { type: 'receiveReorderStageSuccess' }],
+        );
+      });
+    });
+
+    describe('with errors', () => {
+      beforeEach(() => {
+        mock.onPut(stageEndpoint({ stageId })).replyOnce(httpStatusCodes.NOT_FOUND);
+      });
+
+      it(`dispatches the ${types.REQUEST_REORDER_STAGE} and ${types.RECEIVE_REORDER_STAGE_ERROR} actions `, () => {
+        return testAction(
+          actions.reorderStage,
+          payload,
+          state,
+          [],
+          [
+            { type: 'requestReorderStage' },
+            { type: 'receiveReorderStageError', payload: { status: httpStatusCodes.NOT_FOUND } },
+          ],
+        );
+      });
+    });
+  });
+
+  describe('receiveReorderStageError', () => {
+    beforeEach(() => {});
+
+    it(`commits the ${types.RECEIVE_REORDER_STAGE_ERROR} mutation and flashes an error`, () => {
+      return testAction(
+        actions.receiveReorderStageError,
+        null,
+        state,
+        [
+          {
+            type: types.RECEIVE_REORDER_STAGE_ERROR,
+          },
+        ],
+        [],
+      ).then(() => {
+        shouldFlashAMessage(
+          'There was an error updating the stage order. Please try reloading the page.',
+        );
+      });
+    });
+  });
+
+  describe('receiveReorderStageSuccess', () => {
+    it(`commits the ${types.RECEIVE_REORDER_STAGE_SUCCESS} mutation`, () => {
+      return testAction(
+        actions.receiveReorderStageSuccess,
+        null,
+        state,
+        [{ type: types.RECEIVE_REORDER_STAGE_SUCCESS }],
+        [],
+      );
+    });
+  });
+});

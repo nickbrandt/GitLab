@@ -1,8 +1,8 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as rootGetters from 'ee/analytics/cycle_analytics/store/getters';
-import * as actions from 'ee/analytics/cycle_analytics/store/modules/duration_chart/actions';
 import * as getters from 'ee/analytics/cycle_analytics/store/modules/duration_chart/getters';
+import * as actions from 'ee/analytics/cycle_analytics/store/modules/duration_chart/actions';
 import * as types from 'ee/analytics/cycle_analytics/store/modules/duration_chart/mutation_types';
 import testAction from 'helpers/vuex_action_helper';
 import httpStatusCodes from '~/lib/utils/http_status';

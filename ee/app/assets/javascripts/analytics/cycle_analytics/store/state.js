@@ -10,9 +10,6 @@ export default () => ({
   isEmptyStage: false,
   errorCode: null,
 
-  isSavingStageOrder: false,
-  errorSavingStageOrder: false,
-
   currentGroup: null,
   selectedProjects: [],
   selectedStage: null,

@@ -133,8 +133,8 @@ export default {
       'setDateRange',
       'removeStage',
       'updateStage',
-      'reorderStage',
     ]),
+    ...mapActions('stages', ['reorderStage']),
     ...mapActions('customStages', ['hideForm', 'showCreateForm', 'showEditForm', 'createStage']),
     onProjectsSelect(projects) {
       this.setSelectedProjects(projects);
