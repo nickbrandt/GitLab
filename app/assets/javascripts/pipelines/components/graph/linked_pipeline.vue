@@ -1,5 +1,5 @@
 <script>
-import { GlTooltipDirective, GlButton, GlLink, GlLoadingIcon } from '@gitlab/ui';
+import { GlTooltipDirective, GlButton, GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
 import CiStatus from '~/vue_shared/components/ci_icon.vue';
 import { __, sprintf } from '~/locale';
 import { UPSTREAM, DOWNSTREAM } from './constants';
@@ -13,6 +13,7 @@ export default {
     GlButton,
     GlLink,
     GlLoadingIcon,
+    GlSprintf,
   },
   props: {
     columnTitle: {
@@ -74,7 +75,7 @@ export default {
       return this.projectId === this.pipeline.project.id;
     },
     triggerJobName() {
-      return this.pipeline?.source_job?.name ?? '';
+      return this.pipeline.source_job.name;
     },
     sourceJobInfo() {
       return this.isDownstream
@@ -146,14 +147,22 @@ export default {
               >#{{ pipeline.id }}</gl-link
             >
           </div>
+          <!-- 
+            Once the new graph component is used, we will want to remove this
+            This structure with two <p> and instead put them both inline.
+            https://gitlab.com/gitlab-org/gitlab/-/issues/276949
+           -->
           <p class="gl-font-sm gl-mt-2 gl-mb-0">
-            {{ __('Created by -') }}
-          </p>
-          <p
-            class="gl-font-sm gl-text-truncate gl-overflow-hidden gl-mt-0"
-            data-testid="downstream-source-job"
-          >
-            {{ triggerJobName }}
+            <gl-sprintf :message="__('Created by: %{jobName}')">
+              <template #jobName>
+                <p
+                  class="gl-font-sm gl-text-truncate gl-overflow-hidden gl-mt-0"
+                  data-testid="downstream-source-job"
+                >
+                  {{ triggerJobName }}
+                </p>
+              </template>
+            </gl-sprintf>
           </p>
         </div>
       </div>

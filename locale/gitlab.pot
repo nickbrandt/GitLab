@@ -7967,13 +7967,13 @@ msgstr ""
 msgid "Created by %{job}"
 msgstr ""
 
-msgid "Created by -"
-msgstr ""
-
 msgid "Created by me"
 msgstr ""
 
 msgid "Created by:"
+msgstr ""
+
+msgid "Created by: %{jobName}"
 msgstr ""
 
 msgid "Created date"
