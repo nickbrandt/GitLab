@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.6.1 (2020-11-23)
+
+- No changes.
+
 ## 13.6.0 (2020-11-22)
 
 ### Fixed (35 changes)
