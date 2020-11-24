@@ -26682,9 +26682,6 @@ msgstr ""
 msgid "Telephone number"
 msgstr ""
 
-msgid "Telephone number (Optional)"
-msgstr ""
-
 msgid "Template"
 msgstr ""
 
