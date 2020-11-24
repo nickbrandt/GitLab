@@ -1,4 +1,4 @@
-import { GlTable, GlIcon, GlButton } from '@gitlab/ui';
+import { GlModal, GlTable, GlIcon, GlButton } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import { useMockIntersectionObserver } from 'helpers/mock_dom_observer';
 import Tracking from '~/tracking';
@@ -43,10 +43,8 @@ describe('AlertIntegrationsList', () => {
   }
 
   afterEach(() => {
-    if (wrapper) {
-      wrapper.destroy();
-      wrapper = null;
-    }
+    wrapper.destroy();
+    wrapper = null;
   });
 
   beforeEach(() => {
@@ -56,6 +54,7 @@ describe('AlertIntegrationsList', () => {
   const findTableComponent = () => wrapper.find(GlTable);
   const findTableComponentRows = () => wrapper.find(GlTable).findAll('table tbody tr');
   const finsStatusCell = () => wrapper.findAll('[data-testid="integration-activated-status"]');
+  const findDeleteModal = () => wrapper.find(GlModal);
 
   it('renders a table', () => {
     expect(findTableComponent().exists()).toBe(true);
@@ -68,6 +67,15 @@ describe('AlertIntegrationsList', () => {
 
   it('renders an an edit and delete button for each integration', () => {
     expect(findTableComponent().findAll(GlButton).length).toBe(4);
+  });
+
+  it('renders a delete modal when delete is selected', async () => {
+    await findTableComponent()
+      .findAll(GlButton)
+      .at(2)
+      .trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(findDeleteModal().exists()).toBe(true);
   });
 
   it('renders an highlighted row when a current integration is selected to edit', () => {

@@ -127,12 +127,13 @@ export default {
     deleteIntegration() {
       this.$emit('delete-integration', { id: this.integrationToDelete.id });
       this.integrationToDelete = { ...integrationToDeleteDefault };
+      this.closeDeleteModal();
     },
     focusDeleteButton() {
       this.$refs.deleteButton.$el.focus();
     },
     closeDeleteModal() {
-      this.$refs.modal.hide();
+      this.$refs.deleteIntegrationModal.hide();
     },
   },
 };
@@ -198,6 +199,7 @@ export default {
       </template>
     </gl-table>
     <gl-modal
+      ref="deleteIntegrationModal"
       modal-id="deleteIntegration"
       :title="s__('AlertSettings|Delete integration')"
       @shown="focusDeleteButton"
