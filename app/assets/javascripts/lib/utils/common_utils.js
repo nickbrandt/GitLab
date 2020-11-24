@@ -223,10 +223,11 @@ export const contentTop = () => {
     () => $('#js-peek').outerHeight(),
     () => $('.navbar-gitlab').outerHeight(),
     ({ desktop }) => {
+      const container = document.querySelector('.line-resolve-all-container');
       let size = 0;
 
-      if (!desktop) {
-        size = document.querySelector('.line-resolve-all-container').offsetHeight;
+      if (!desktop && container) {
+        size = container.offsetHeight;
       }
 
       return size;
