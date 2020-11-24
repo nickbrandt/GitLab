@@ -128,6 +128,12 @@ export default {
       this.$emit('delete-integration', { id: this.integrationToDelete.id });
       this.integrationToDelete = { ...integrationToDeleteDefault };
     },
+    focusDeleteButton() {
+      this.$refs.deleteButton.$el.focus();
+    },
+    closeDeleteModal() {
+      this.$refs.modal.hide();
+    },
   },
 };
 </script>
@@ -194,9 +200,7 @@ export default {
     <gl-modal
       modal-id="deleteIntegration"
       :title="s__('AlertSettings|Delete integration')"
-      :ok-title="s__('AlertSettings|Delete integration')"
-      ok-variant="danger"
-      @ok="deleteIntegration"
+      @shown="focusDeleteButton"
     >
       <gl-sprintf
         :message="
@@ -207,6 +211,12 @@ export default {
       >
         <template #integrationName>{{ integrationToDelete.name }}</template>
       </gl-sprintf>
+      <template #modal-footer>
+        <gl-button @click="closeDeleteModal">{{ __('Cancel') }}</gl-button>
+        <gl-button ref="deleteButton" variant="danger" @click="deleteIntegration">{{
+          s__('AlertSettings|Delete integration')
+        }}</gl-button>
+      </template>
     </gl-modal>
   </div>
 </template>
