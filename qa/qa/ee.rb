@@ -192,6 +192,7 @@ module QA
 
         module Epic
           autoload :Index, 'qa/ee/page/group/epic/index'
+          autoload :New, 'qa/ee/page/group/epic/new'
           autoload :Show, 'qa/ee/page/group/epic/show'
         end
 
