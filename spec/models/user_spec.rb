@@ -2966,17 +2966,19 @@ RSpec.describe User do
   end
 
   describe '#solo_owned_groups' do
-    subject { create(:user) }
+    let_it_be_with_refind(:user) { create(:user) }
+
+    subject(:solo_owned_groups) { user.solo_owned_groups }
 
     context 'no owned groups' do
-      it { expect(subject.solo_owned_groups).to be_empty }
+      it { is_expected.to be_empty }
     end
 
     context 'has owned groups' do
       let_it_be(:group) { create(:group) }
 
       before do
-        group.add_owner(subject)
+        group.add_owner(user)
       end
 
       context 'not solo owner' do
@@ -2986,23 +2988,21 @@ RSpec.describe User do
           group.add_owner(user2)
         end
 
-        it { expect(subject.solo_owned_groups).to be_empty }
+        it { is_expected.to be_empty }
       end
 
       context 'solo owner' do
-        it { expect(subject.solo_owned_groups).to include(group) }
+        it { is_expected.to include(group) }
 
         it 'avoids N+1 queries' do
-          instance1 = User.find(subject.id)
-          instance2 = User.find(subject.id)
-
+          fresh_user = User.find(user.id)
           control_count = ActiveRecord::QueryRecorder.new do
-            instance1.solo_owned_groups
+            fresh_user.solo_owned_groups
           end.count
 
-          create(:group).add_owner(subject)
+          create(:group).add_owner(user)
 
-          expect { instance2.solo_owned_groups }.not_to exceed_query_limit(control_count)
+          expect { solo_owned_groups }.not_to exceed_query_limit(control_count)
         end
       end
     end
