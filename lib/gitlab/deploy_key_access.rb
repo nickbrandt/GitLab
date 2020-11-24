@@ -2,11 +2,10 @@
 
 module Gitlab
   class DeployKeyAccess < UserAccess
-    def initialize(deploy_key, container: nil, push_ability: :push_code)
+    def initialize(deploy_key, container: nil)
       @deploy_key = deploy_key
       @user = deploy_key.user
       @container = container
-      @push_ability = push_ability
     end
 
     private
@@ -16,10 +15,12 @@ module Gitlab
     def protected_tag_accessible_to?(ref, action:)
       assert_project!
 
+      # a deploy key can always push a protected tag
+      # (which is not always the case when pushing to a protected branch)
       true
     end
 
-    def can_collaborate?(ref)
+    def can_collaborate?(_ref)
       assert_project!
 
       project_has_active_user_keys?
