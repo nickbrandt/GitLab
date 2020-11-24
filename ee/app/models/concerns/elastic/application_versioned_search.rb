@@ -50,10 +50,21 @@ module Elastic
 
     def maintain_elasticsearch_update
       ::Elastic::ProcessBookkeepingService.track!(self)
+
+      associations_to_update = associations_needing_elasticsearch_update
+      unless associations_to_update.blank?
+        ElasticAssociationIndexerWorker.perform_async(self.class.name, id, associations_to_update)
+      end
     end
 
     def maintain_elasticsearch_destroy
       ::Elastic::ProcessBookkeepingService.track!(self)
+    end
+
+    # Override in child object if there are associations that need to be
+    # updated when specific fields are updated
+    def associations_needing_elasticsearch_update
+      []
     end
 
     class_methods do

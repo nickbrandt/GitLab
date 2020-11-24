@@ -627,6 +627,15 @@ module EE
       ElasticCommitIndexerWorker.perform_async(id, nil, nil, true) if use_elasticsearch? && !forked?
     end
 
+    override :associations_needing_elasticsearch_update
+    def associations_needing_elasticsearch_update
+      if previous_changes.include?(:visibility_level)
+        ['issues']
+      else
+        []
+      end
+    end
+
     def log_geo_updated_events
       repository.log_geo_updated_event
       wiki.repository.log_geo_updated_event
