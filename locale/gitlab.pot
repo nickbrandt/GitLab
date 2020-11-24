@@ -19878,6 +19878,9 @@ msgstr ""
 msgid "Pipeline minutes quota"
 msgstr ""
 
+msgid "Pipeline ran in fork of project"
+msgstr ""
+
 msgid "Pipeline subscriptions"
 msgstr ""
 
@@ -32257,6 +32260,9 @@ msgid "for %{ref}"
 msgstr ""
 
 msgid "for this project"
+msgstr ""
+
+msgid "fork"
 msgstr ""
 
 msgid "fork this project"
