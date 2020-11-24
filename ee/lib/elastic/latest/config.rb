@@ -160,12 +160,6 @@ module Elastic
         indexes :note, type: :text,
           index_options: 'positions'
 
-        indexes :issue do
-          indexes :assignee_id, type: :integer
-          indexes :author_id, type: :integer
-          indexes :confidential, type: :boolean
-        end
-
         # ES6 gets rid of "index: :not_analyzed" option, but a keyword type behaves the same
         # as it is not analyzed and is only searchable by its exact value.
         indexes :noteable_type, type: :keyword
