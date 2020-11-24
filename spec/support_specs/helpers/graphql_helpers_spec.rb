@@ -10,6 +10,41 @@ RSpec.describe GraphqlHelpers do
     query.tr("\n", ' ').gsub(/\s+/, ' ').strip
   end
 
+  describe 'graphql_dig_at' do
+    it 'transforms symbol keys to graphql field names' do
+      data = { 'camelCased' => 'names' }
+
+      expect(graphql_dig_at(data, :camel_cased)).to eq('names')
+    end
+
+    it 'supports integer indexing' do
+      data = { 'array' => [:boom, { 'id' => :hooray! }, :boom] }
+
+      expect(graphql_dig_at(data, :array, 1, :id)).to eq(:hooray!)
+    end
+
+    it 'gracefully degrades to nil' do
+      data = { 'project' => { 'mergeRequest' => nil } }
+
+      expect(graphql_dig_at(data, :project, :merge_request, :id)).to be_nil
+    end
+
+    it 'supports implicitly flat-mapping traversals' do
+      data = {
+        'foo' => {
+          'nodes' => [
+            { 'bar' => { 'nodes' => [{ 'id' => 1 }, { 'id' => 2 }] } },
+            { 'bar' => { 'nodes' => [{ 'id' => 3 }, { 'id' => 4 }] } },
+            { 'bar' => nil }
+          ]
+        },
+        'irrelevant' => 'the field is a red-herring'
+      }
+
+      expect(graphql_dig_at(data, :foo, :nodes, :bar, :nodes, :id)).to eq([1, 2, 3, 4])
+    end
+  end
+
   describe 'var' do
     it 'allocates a fresh name for each var' do
       a = var('Int')
