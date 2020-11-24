@@ -15,7 +15,7 @@ RSpec.describe Gitlab::Cleanup::ProjectUploads do
   describe '#run!' do
     shared_examples_for 'moves the file' do
       shared_examples_for 'a real run' do
-        let(:args) { [dry_run: false] }
+        let(:args) { { dry_run: false } }
 
         it 'moves the file to its proper location' do
           subject.run!(**args)
@@ -49,25 +49,25 @@ RSpec.describe Gitlab::Cleanup::ProjectUploads do
       end
 
       context 'when dry_run is false' do
-        let(:args) { [dry_run: false] }
+        let(:args) { { dry_run: false } }
 
         it_behaves_like 'a real run'
       end
 
       context 'when dry_run is nil' do
-        let(:args) { [dry_run: nil] }
+        let(:args) { { dry_run: nil } }
 
         it_behaves_like 'a real run'
       end
 
       context 'when dry_run is true' do
-        let(:args) { [dry_run: true] }
+        let(:args) { { dry_run: true } }
 
         it_behaves_like 'a dry run'
       end
 
       context 'with dry_run not specified' do
-        let(:args) { [] }
+        let(:args) { {} }
 
         it_behaves_like 'a dry run'
       end

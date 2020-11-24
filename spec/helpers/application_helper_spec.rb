@@ -116,7 +116,7 @@ RSpec.describe ApplicationHelper do
       Time.use_zone('UTC') { example.run }
     end
 
-    def element(*arguments)
+    def element(**arguments)
       @time = Time.zone.parse('2015-07-02 08:23')
       element = helper.time_ago_with_tooltip(@time, **arguments)
 
