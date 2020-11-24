@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 RSpec.describe EE::API::Helpers::MembersHelpers do
-  subject(:members_helpers) { Class.new.include(described_class).new }
+  let(:members_helpers) { Class.new.include(described_class).new }
 
   before do
     allow(members_helpers).to receive(:current_user).and_return(create(:user))
@@ -21,6 +21,8 @@ RSpec.describe EE::API::Helpers::MembersHelpers do
   end
 
   describe '#log_audit_event' do
+    subject { members_helpers }
+
     it_behaves_like 'creates security_event', 'group' do
       let(:source) { create(:group) }
       let(:member) { create(:group_member, :owner, group: source, user: create(:user)) }
@@ -62,6 +64,43 @@ RSpec.describe EE::API::Helpers::MembersHelpers do
 
         expect(results.size).to eq(1)
         expect(results.map { |result| result.id }).to contain_exactly(user_ids.last)
+      end
+    end
+  end
+
+  describe '#group_billed_user_ids_for' do
+    let_it_be(:group) { create(:group) }
+    let_it_be(:gm_1) { create(:group_member, group: group, user: create(:user, name: 'Maria Gomez')) }
+    let_it_be(:gm_2) { create(:group_member, group: group, user: create(:user, name: 'John Smith')) }
+    let_it_be(:gm_3) { create(:group_member, group: group, user: create(:user, name: 'John Doe')) }
+    let_it_be(:gm_4) { create(:group_member, group: group, user: create(:user, name: 'Sophie Dupont')) }
+    let(:params) { {} }
+
+    subject { members_helpers.group_billed_user_ids_for(group, params).to_a }
+
+    context 'when a search parameter is present' do
+      let(:params) { { search: 'John', sort: sort } }
+
+      context 'when a sorting parameter is provided (eg name descending)' do
+        let(:sort) { 'name_desc' }
+
+        it 'sorts results accordingly' do
+          expect(subject).to eq([gm_2, gm_3].map(&:user_id))
+        end
+      end
+
+      context 'when a sorting parameter is not provided' do
+        let(:sort) { nil }
+
+        it 'sorts results by name ascending' do
+          expect(subject).to eq([gm_3, gm_2].map(&:user_id))
+        end
+      end
+    end
+
+    context 'when a search parameter is not present' do
+      it 'returns the expected group member user ids' do
+        expect(subject).to eq([gm_1, gm_2, gm_3, gm_4].map(&:user_id))
       end
     end
   end

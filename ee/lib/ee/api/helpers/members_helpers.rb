@@ -6,6 +6,7 @@ module EE
       module MembersHelpers
         extend ActiveSupport::Concern
         extend ::Gitlab::Utils::Override
+        include ::SortingHelper
 
         prepended do
           params :optional_filter_params_ee do
@@ -76,14 +77,31 @@ module EE
           ).for_member(member).security_event
         end
 
-        def paginate_billable_from_user_ids(user_ids)
-          paginated = paginate(::Kaminari.paginate_array(user_ids.sort))
+        def paginate_billable_from_user_ids(user_ids, params = {})
+          sorted_ids = params[:search].present? ? user_ids : user_ids.sort
+
+          paginated = paginate(::Kaminari.paginate_array(sorted_ids))
 
           users_as_hash = ::User.id_in(paginated).index_by(&:id)
 
           # map! ensures same paginatable array is manipulated
           # instead of creating a new non-paginatable array
           paginated.map! { |user_id| users_as_hash[user_id] }
+        end
+
+        def group_billed_user_ids_for(group, params)
+          if params[:search].present?
+            sorting = params[:sort] || sort_value_name
+
+            ::GroupMember
+              .with_user(group.billed_user_ids)
+              .search(params[:search])
+              .sort_by_attribute(sorting)
+              .map(&:user_id)
+              .uniq
+          else
+            group.billed_user_ids
+          end
         end
       end
     end

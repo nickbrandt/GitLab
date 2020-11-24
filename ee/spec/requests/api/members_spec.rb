@@ -339,7 +339,7 @@ RSpec.describe API::Members do
       end
     end
 
-    let_it_be(:nested_user) { create(:user) }
+    let_it_be(:nested_user) { create(:user, name: 'Scott Anderson') }
     let_it_be(:nested_group) do
       create(:group, parent: group) do |nested_group|
         nested_group.add_developer(nested_user)
@@ -347,9 +347,10 @@ RSpec.describe API::Members do
     end
 
     let(:url) { "/groups/#{group.id}/billable_members" }
+    let(:params) { {} }
 
     subject do
-      get api(url, owner)
+      get api(url, owner), params: params
       json_response
     end
 
@@ -361,7 +362,7 @@ RSpec.describe API::Members do
         end
       end
 
-      let!(:linked_group_user) { create(:user) }
+      let!(:linked_group_user) { create(:user, name: 'Scott McNeil') }
       let!(:linked_group) do
         create(:group) do |linked_group|
           linked_group.add_developer(linked_group_user)
@@ -374,6 +375,26 @@ RSpec.describe API::Members do
         subject
 
         expect_paginated_array_response(*[owner, maintainer, nested_user, project_user, linked_group_user].map(&:id))
+      end
+
+      context 'with seach params provided' do
+        let(:params) { { search: nested_user.name } }
+
+        it 'returns the relevant billable users' do
+          subject
+
+          expect_paginated_array_response([nested_user.id])
+        end
+      end
+
+      context 'with search and sort params provided' do
+        let(:params) { { search: 'Scott', sort: 'name_desc' } }
+
+        it 'returns the relevant billable users' do
+          subject
+
+          expect_paginated_array_response(*[linked_group_user, nested_user].map(&:id))
+        end
       end
     end
 
