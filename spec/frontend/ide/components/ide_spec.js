@@ -1,5 +1,6 @@
 import Vuex from 'vuex';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
+import waitForPromises from 'helpers/wait_for_promises';
 import { createStore } from '~/ide/stores';
 import ErrorMessage from '~/ide/components/error_message.vue';
 import ide from '~/ide/components/ide.vue';
@@ -55,27 +56,24 @@ describe('WebIDE', () => {
 
   describe('ide component, non-empty repo', () => {
     describe('error message', () => {
-      it('does not show error message when it is not set', () => {
-        wrapper = createComponent({
-          state: {
-            errorMessage: null,
-          },
-        });
-
-        expect(wrapper.find(ErrorMessage).exists()).toBe(false);
-      });
-
-      it('shows error message when set', () => {
-        wrapper = createComponent({
-          state: {
-            errorMessage: {
-              text: 'error',
+      it.each`
+        errorMessage         | exists
+        ${null}              | ${false}
+        ${{ text: 'error' }} | ${true}
+      `(
+        'should error message exists=$exists when errorMessage=$errorMessage',
+        async ({ errorMessage, exists }) => {
+          wrapper = createComponent({
+            state: {
+              errorMessage,
             },
-          },
-        });
+          });
 
-        expect(wrapper.find(ErrorMessage).exists()).toBe(true);
-      });
+          await waitForPromises();
+
+          expect(wrapper.find(ErrorMessage).exists()).toBe(exists);
+        },
+      );
     });
 
     describe('onBeforeUnload', () => {
