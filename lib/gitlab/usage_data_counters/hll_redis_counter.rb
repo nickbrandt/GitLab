@@ -7,16 +7,13 @@ module Gitlab
       DEFAULT_DAILY_KEY_EXPIRY_LENGTH = 29.days
       DEFAULT_REDIS_SLOT = ''
 
-      EventError = Class.new(StandardError)
-      UnknownEvent = Class.new(EventError)
-      UnknownAggregation = Class.new(EventError)
-      AggregationMismatch = Class.new(EventError)
-      SlotMismatch = Class.new(EventError)
-      CategoryMismatch = Class.new(EventError)
-      UnknownAggregationOperator = Class.new(EventError)
-      InvalidContext = Class.new(EventError)
+      UnknownAggregation = Class.new(Gitlab::UsageData::Event::EventError)
+      AggregationMismatch = Class.new(Gitlab::UsageData::Event::EventError)
+      SlotMismatch = Class.new(Gitlab::UsageData::Event::EventError)
+      CategoryMismatch = Class.new(Gitlab::UsageData::Event::EventError)
+      UnknownAggregationOperator = Class.new(Gitlab::UsageData::Event::EventError)
+      InvalidContext = Class.new(Gitlab::UsageData::Event::EventError)
 
-      KNOWN_EVENTS_PATH = File.expand_path('known_events/*.yml', __dir__)
       ALLOWED_AGGREGATIONS = %i(daily weekly).freeze
       UNION_OF_AGGREGATED_METRICS = 'OR'
       INTERSECTION_OF_AGGREGATED_METRICS = 'AND'
@@ -64,19 +61,9 @@ module Gitlab
           end
         end
 
-        def categories
-          @categories ||= known_events.map { |event| event[:category] }.uniq
-        end
-
-        # @param category [String] the category name
-        # @return [Array<String>] list of event names for given category
-        def events_for_category(category)
-          known_events.select { |event| event[:category] == category.to_s }.map { |event| event[:name] }
-        end
-
         def unique_events_data
           categories.each_with_object({}) do |category, category_results|
-            events_names = events_for_category(category)
+            events_names = ::Gitlab::UsageData::Event.events_for_category(category)
 
             event_results = events_names.each_with_object({}) do |event, hash|
               hash["#{event}_weekly"] = unique_events(event_names: [event], start_date: 7.days.ago.to_date, end_date: Date.current)
@@ -92,20 +79,12 @@ module Gitlab
           end
         end
 
-        def known_event?(event_name)
-          event_for(event_name).present?
-        end
-
         def aggregated_metrics_monthly_data
           aggregated_metrics_data(4.weeks.ago.to_date)
         end
 
         def aggregated_metrics_weekly_data
           aggregated_metrics_data(7.days.ago.to_date)
-        end
-
-        def known_events
-          @known_events ||= load_events(KNOWN_EVENTS_PATH)
         end
 
         def aggregated_metrics
@@ -117,7 +96,7 @@ module Gitlab
         def track(value, event_name, context: '', time: Time.zone.now)
           return unless Gitlab::CurrentSettings.usage_ping_enabled?
 
-          event = event_for(event_name)
+          event = ::Gitlab::UsageData::Event.event_for(event_name)
           raise UnknownEvent, "Unknown event #{event_name}" unless event.present?
 
           Gitlab::Redis::HLL.add(key: redis_key(event, time, context), value: value, expiry: expiry(event))
@@ -216,7 +195,7 @@ module Gitlab
         end
 
         def count_unique_events(event_names:, start_date:, end_date:, context: '')
-          events = events_for(Array(event_names).map(&:to_s))
+          events = ::Gitlab::UsageData::Event.events_for(Array(event_names).map(&:to_s))
 
           yield events if block_given?
 
@@ -231,7 +210,7 @@ module Gitlab
         def eligible_for_totals?(events_names)
           return false if events_names.size <= 1
 
-          events = events_for(events_names)
+          events = ::Gitlab::UsageData::Event.events_for(events_names)
           events_in_same_slot?(events) && events_in_same_category?(events) && events_same_aggregation?(events)
         end
 
@@ -251,10 +230,6 @@ module Gitlab
 
         def load_yaml_from_path(path)
           YAML.safe_load(File.read(path))&.map(&:with_indifferent_access)
-        end
-
-        def known_events_names
-          known_events.map { |event| event[:name] }
         end
 
         def events_in_same_slot?(events)
@@ -281,21 +256,13 @@ module Gitlab
           event[:aggregation].to_sym == :daily ? DEFAULT_DAILY_KEY_EXPIRY_LENGTH : DEFAULT_WEEKLY_KEY_EXPIRY_LENGTH
         end
 
-        def event_for(event_name)
-          known_events.find { |event| event[:name] == event_name.to_s }
-        end
-
-        def events_for(event_names)
-          known_events.select { |event| event_names.include?(event[:name]) }
-        end
-
         def redis_slot(event)
           event[:redis_slot] || DEFAULT_REDIS_SLOT
         end
 
         # Compose the key in order to store events daily or weekly
         def redis_key(event, time, context = '')
-          raise UnknownEvent.new("Unknown event #{event[:name]}") unless known_events_names.include?(event[:name].to_s)
+          raise UnknownEvent.new("Unknown event #{event[:name]}") unless  ::Gitlab::UsageData::Event.known?(event[:name].to_s)
           raise UnknownAggregation.new("Use :daily or :weekly aggregation") unless ALLOWED_AGGREGATIONS.include?(event[:aggregation].to_sym)
 
           key = apply_slot(event)

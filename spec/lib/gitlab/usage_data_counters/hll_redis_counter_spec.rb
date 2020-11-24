@@ -79,7 +79,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     before do
-      allow(described_class).to receive(:known_events).and_return(known_events)
+      allow(::Gitlab::UsageData::Event).to receive(:all).and_return(known_events)
     end
 
     describe '.events_for_category' do
@@ -296,8 +296,8 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     before do
-      allow(described_class).to receive(:known_events).and_return(known_events)
-      allow(described_class).to receive(:categories).and_return(%w(category1 category2))
+      allow(::Gitlab::UsageData::Event).to receive(:all).and_return(known_events)
+      allow(::Gitlab::UsageData::Event).to receive(:categories).and_return(%w(category1 category2))
 
       described_class.track_event_in_context([entity1, entity3], 'event_name_1', default_context, 2.days.ago)
       described_class.track_event_in_context(entity3, 'event_name_1', default_context, 2.days.ago)
@@ -337,7 +337,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     before do
-      allow(described_class).to receive(:known_events).and_return(known_events)
+      allow(::Gitlab::UsageData::Event).to receive(:all).and_return(known_events)
       allow(described_class).to receive(:categories).and_return(%w(category1 category2))
 
       described_class.track_event(entity1, 'event1_slot', 2.days.ago)
@@ -383,7 +383,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
     end
 
     before do
-      allow(described_class).to receive(:known_events).and_return(known_events)
+      allow(::Gitlab::UsageData::Event).to receive(:all).and_return(known_events)
     end
 
     shared_examples 'aggregated_metrics_data' do
@@ -534,7 +534,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
         end
 
         it 'caches intermediate operations' do
-          allow(described_class).to receive(:known_events).and_return(known_events)
+          allow(::Gitlab::UsageData::Event).to receive(:all).and_return(known_events)
           allow(described_class).to receive(:aggregated_metrics).and_return(aggregated_metrics)
 
           4.downto(1) do |subset_size|
