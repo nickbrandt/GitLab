@@ -1987,13 +1987,13 @@ This example creates four paths of execution:
   finish; in this case: `linux:build`, `linux:rspec`, `linux:rubocop`,
   `mac:build`, `mac:rspec`, `mac:rubocop`.
 
-#### Referring a stage
+#### `needs: stage`
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/220758) in GitLab 13.7.
 > - It's [deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
 > - It's disabled on GitLab.com.
 > - It's not recommended for production use.
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-referring-a-stage). **(CORE ONLY)**
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-needs-stage). **(CORE ONLY)**
 
 CAUTION: **Warning:**
 This feature might not be available to you. Check the **version history** note above for details.
@@ -2026,7 +2026,7 @@ deploy:
     - stage: test
 ```
 
-##### Enable or disable referring a stage **(CORE ONLY)**
+##### Enable or disable `needs: stage` **(CORE ONLY)**
 
 Referring a stage is under development and not ready for production use. It is
 deployed behind a feature flag that is **disabled by default**.
