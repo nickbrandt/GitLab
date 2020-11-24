@@ -4,14 +4,14 @@ require 'spec_helper'
 
 RSpec.describe GitlabScriptTagHelper do
   before do
-    allow_any_instance_of(GitlabScriptTagHelper).to receive(:content_security_policy_nonce).and_return('noncevalue')
+    allow(helper).to receive(:content_security_policy_nonce).and_return('noncevalue')
   end
 
   describe 'external script tag' do
     let(:script_url) { 'test.js' }
 
     it 'returns a script tag with defer=true and a nonce' do
-      expect(javascript_include_tag(script_url).to_s)
+      expect(helper.javascript_include_tag(script_url).to_s)
         .to eq "<script src=\"/javascripts/#{script_url}\" defer=\"defer\" nonce=\"noncevalue\"></script>"
     end
   end
@@ -21,24 +21,24 @@ RSpec.describe GitlabScriptTagHelper do
     let(:tag_with_nonce_and_type) {"<script type=\"application/javascript\" nonce=\"noncevalue\">\n//<![CDATA[\nalert(1)\n//]]>\n</script>"}
 
     it 'returns a script tag with a nonce using block syntax' do
-      expect(javascript_tag { 'alert(1)' }.to_s).to eq tag_with_nonce
+      expect(helper.javascript_tag { 'alert(1)' }.to_s).to eq tag_with_nonce
     end
 
     it 'returns a script tag with a nonce using block syntax with options' do
-      expect(javascript_tag(type: 'application/javascript') { 'alert(1)' }.to_s).to eq tag_with_nonce_and_type
+      expect(helper.javascript_tag(type: 'application/javascript') { 'alert(1)' }.to_s).to eq tag_with_nonce_and_type
     end
 
     it 'returns a script tag with a nonce using argument syntax' do
-      expect(javascript_tag('alert(1)').to_s).to eq tag_with_nonce
+      expect(helper.javascript_tag('alert(1)').to_s).to eq tag_with_nonce
     end
 
     it 'returns a script tag with a nonce using argument syntax with options' do
-      expect(javascript_tag( 'alert(1)', type: 'application/javascript').to_s).to eq tag_with_nonce_and_type
+      expect(helper.javascript_tag( 'alert(1)', type: 'application/javascript').to_s).to eq tag_with_nonce_and_type
     end
 
     # This scenario does not really make sense, but it's supported so we test it
     it 'returns a script tag with a nonce using argument and block syntax with options' do
-      expect(javascript_tag( '// ignored', type: 'application/javascript') { 'alert(1)' }.to_s).to eq tag_with_nonce_and_type
+      expect(helper.javascript_tag( '// ignored', type: 'application/javascript') { 'alert(1)' }.to_s).to eq tag_with_nonce_and_type
     end
   end
 end
