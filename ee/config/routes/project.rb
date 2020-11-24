@@ -117,7 +117,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
 
         namespace :incident_management, path: '' do
-          resources :oncall_schedules, only: [:index], path: 'oncall-schedules'
+          resources :oncall_schedules, only: [:index], path: 'oncall_schedules'
         end
       end
       # End of the /-/ scope.

@@ -2,10 +2,9 @@
 
 module IncidentManagement
   module OncallScheduleHelper
-    def oncall_schedule_data(project)
+    def oncall_schedule_data
       {
-        'project-path' => project.full_path,
-        'empty-oncall-schedule-svg-path' => image_path('illustrations/empty-state/empty-on-call.svg')
+        'empty-oncall-schedules-svg-path' => image_path('illustrations/empty-state/empty-on-call.svg')
       }
     end
   end
