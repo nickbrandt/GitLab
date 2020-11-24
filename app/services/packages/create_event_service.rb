@@ -3,13 +3,14 @@
 module Packages
   class CreateEventService < BaseService
     def execute
-      if Feature.enabled?(:collect_package_events_redis) && redis_event_name
+      if redis_event_name
         if guest?
           ::Gitlab::UsageDataCounters::GuestPackageEventCounter.count(redis_event_name)
         else
           ::Gitlab::UsageDataCounters::HLLRedisCounter.track_event(current_user.id, redis_event_name)
         end
       end
+
 
       if Feature.enabled?(:collect_package_events) && Gitlab::Database.read_write?
         ::Packages::Event.create!(
