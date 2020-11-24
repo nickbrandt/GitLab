@@ -4,6 +4,7 @@ module GraphqlHelpers
   MutationDefinition = Struct.new(:query, :variables)
 
   NoData = Class.new(StandardError)
+  UnauthorizedObject = Class.new(StandardError)
 
   # makes an underscored string look like a fieldname
   # "merge_request" => "mergeRequest"
@@ -127,14 +128,11 @@ module GraphqlHelpers
   end
 
   def serialize_variables(variables)
+    return unless variables
     return variables if variables.is_a?(String)
 
-    variables = variables.is_a?(Array) ? variables.map(&:to_h).reduce { |a, b| a.merge(b) } : variables.try(:to_h)
-
-    variables.to_json
+    ::Gitlab::Utils::MergeHash.merge(Array.wrap(variables).map(&:to_h)).to_json
   end
-
-  UnauthorizedObject = Class.new(StandardError)
 
   def resolve_field(name, object, args = {}, current_user: nil)
     q = GraphQL::Query.new(GitlabSchema)
