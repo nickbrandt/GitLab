@@ -147,4 +147,24 @@ RSpec.describe BillingPlansHelper do
       end
     end
   end
+
+  describe "#plan_purchase_or_upgrade_url" do
+    let(:plan) { double('Plan') }
+
+    it 'is upgradable' do
+      group = double('Group', upgradable?: true)
+
+      expect(helper).to receive(:plan_upgrade_url)
+
+      helper.plan_purchase_or_upgrade_url(group, plan)
+    end
+
+    it 'is purchasable' do
+      group = double('Group', upgradable?: false)
+
+      expect(helper).to receive(:plan_purchase_url)
+
+      helper.plan_purchase_or_upgrade_url(group, plan)
+    end
+  end
 end
