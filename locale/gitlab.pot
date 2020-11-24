@@ -13351,6 +13351,12 @@ msgstr ""
 msgid "GroupRoadmap|No start date – %{dateWord}"
 msgstr ""
 
+msgid "GroupRoadmap|Roadmaps can display up to 1,000 epics. These appear in your selected sort order."
+msgstr ""
+
+msgid "GroupRoadmap|Some of your epics might not be visible"
+msgstr ""
+
 msgid "GroupRoadmap|Something went wrong while fetching epics"
 msgstr ""
 
@@ -25366,9 +25372,6 @@ msgid "Some email servers do not support overriding the email sender name. Enabl
 msgstr ""
 
 msgid "Some of the designs you tried uploading did not change:"
-msgstr ""
-
-msgid "Some of your epics may not be visible. A roadmap is limited to the first 1,000 epics, in your selected sort order."
 msgstr ""
 
 msgid "Someone edited the issue at the same time you did. Please check out %{linkStart}the issue%{linkEnd} and make sure your changes will not unintentionally remove theirs."
