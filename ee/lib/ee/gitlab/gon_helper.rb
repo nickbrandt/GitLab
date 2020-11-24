@@ -20,7 +20,7 @@ module EE
       override :push_licensed_feature
       def push_licensed_feature(name, obj = nil)
         enabled = if obj
-                  obj.feature_available?(name)
+                    obj.feature_available?(name)
                   else
                     ::License.feature_available?(name)
                   end
