@@ -87,6 +87,8 @@ module Projects
         # Move uploads
         move_project_uploads(project)
 
+        update_integrations
+
         project.old_path_with_namespace = @old_path
 
         update_repository_configuration(@new_path)
@@ -213,6 +215,11 @@ module Projects
       if project.group && project.group.shared_runners_setting == 'disabled_and_unoverridable'
         project.shared_runners_enabled = false
       end
+    end
+
+    def update_integrations
+      project.services.inherit.delete_all
+      Service.create_from_active_default_integrations(project, :project_id)
     end
   end
 end

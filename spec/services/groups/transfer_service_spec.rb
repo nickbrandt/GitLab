@@ -238,8 +238,13 @@ RSpec.describe Groups::TransferService do
       end
 
       context 'when the group is allowed to be transferred' do
+        let_it_be(:new_parent_group_integration) { create(:slack_service, group: new_parent_group, project: nil, webhook: 'http://new-group.slack.com') }
+
         before do
+          allow(PropagateIntegrationWorker).to receive(:perform_async)
+
           create(:group_member, :owner, group: new_parent_group, user: user)
+
           transfer_service.execute(new_parent_group)
         end
 
@@ -262,6 +267,30 @@ RSpec.describe Groups::TransferService do
             group.reload
             expect(group.private?).to be_truthy
             expect(group.visibility_level).to eq(new_parent_group.visibility_level)
+          end
+        end
+
+        context 'with a group integration' do
+          let_it_be(:instance_integration) { create(:slack_service, :instance, webhook: 'http://project.slack.com') }
+          let(:new_created_integration) { Service.find_by(group: group) }
+
+          context 'with an inherited integration' do
+            let_it_be(:group_integration) { create(:slack_service, group: group, project: nil, webhook: 'http://group.slack.com', inherit_from_id: instance_integration.id) }
+
+            it 'replaces inherited integrations', :aggregate_failures do
+              expect(new_created_integration.webhook).to eq(new_parent_group_integration.webhook)
+              expect(PropagateIntegrationWorker).to have_received(:perform_async).with(new_created_integration.id)
+              expect(Service.count).to eq(3)
+            end
+          end
+
+          context 'with a custom integration' do
+            let_it_be(:group_integration) { create(:slack_service, group: group, project: nil, webhook: 'http://group.slack.com') }
+
+            it 'does not updates the integrations', :aggregate_failures do
+              expect { transfer_service.execute(new_parent_group) }.not_to change { group_integration.webhook }
+              expect(PropagateIntegrationWorker).not_to have_received(:perform_async)
+            end
           end
         end
 
