@@ -58,7 +58,7 @@ export default {
         : sprintf(s__('Edit %{name}'), { name: this.name });
     },
     deprecated() {
-      return this.hasNewVersionFlags && this.version === LEGACY_FLAG;
+      return this.version === LEGACY_FLAG;
     },
     deprecatedAndEditable() {
       return this.deprecated && !this.hasLegacyReadOnlyFlags;
@@ -66,17 +66,11 @@ export default {
     deprecatedAndReadOnly() {
       return this.deprecated && this.hasLegacyReadOnlyFlags;
     },
-    hasNewVersionFlags() {
-      return this.glFeatures.featureFlagsNewVersion;
-    },
     hasLegacyReadOnlyFlags() {
       return (
         this.glFeatures.featureFlagsLegacyReadOnly &&
         !this.glFeatures.featureFlagsLegacyReadOnlyOverride
       );
-    },
-    shouldShowNewFlagAlert() {
-      return !this.hasNewVersionFlags && this.userShouldSeeNewFlagAlert;
     },
   },
   created() {
@@ -95,14 +89,6 @@ export default {
 </script>
 <template>
   <div>
-    <gl-alert
-      v-if="shouldShowNewFlagAlert"
-      variant="warning"
-      class="gl-my-5"
-      @dismiss="dismissNewVersionFlagAlert"
-    >
-      {{ $options.translations.newFlagAlert }}
-    </gl-alert>
     <gl-loading-icon v-if="isLoading" size="xl" class="gl-mt-7" />
 
     <template v-else-if="!isLoading && !hasError">
