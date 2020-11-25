@@ -1026,7 +1026,7 @@ Open the rails console (`gitlab rails c`) and run the following command to see a
 ApplicationSetting.last.attributes
 ```
 
-Among other attributes, in the output you'll notice all the settings available in the [Elasticsearch Integration page](https://docs.gitlab.com/ee/integration/elasticsearch.html), like: `elasticsearch_indexing`, `elasticsearch_url`, `elasticsearch_replicas`, `elasticsearch_pause_indexing`, etc.
+Among other attributes, in the output you'll notice all the settings available in the [Elasticsearch Integration page](../../integration/elasticsearch.md), like: `elasticsearch_indexing`, `elasticsearch_url`, `elasticsearch_replicas`, `elasticsearch_pause_indexing`, etc.
 
 #### Setting attributes
 
@@ -1042,7 +1042,7 @@ ApplicationSetting.last.update_attributes(elasticsearch_indexing: false)
 
 #### Getting attributes
 
-You can then check if the the settings have been set in the [Elasticsearch Integration page](https://docs.gitlab.com/ee/integration/elasticsearch.html) or in the rails console by issuing:
+You can then check if the settings have been set in the [Elasticsearch Integration page](../../integration/elasticsearch.md) or in the rails console by issuing:
 
 ```ruby
 Gitlab::CurrentSettings.elasticsearch_url
