@@ -4,7 +4,7 @@ import FilteredSearchContainer from '../filtered_search/container';
 import boardsStore from './stores/boards_store';
 
 export default class FilteredSearchBoards extends FilteredSearchManager {
-  constructor(store, updateUrl = false, cantEdit = [], vuexstore = {}) {
+  constructor(store, vuexstore, updateUrl = false, cantEdit = []) {
     super({
       page: 'boards',
       isGroupDecendent: true,
