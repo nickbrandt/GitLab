@@ -28,13 +28,13 @@ verification methods:
 | Database | Application data in PostgreSQL                  | Native                                | Native                 |
 | Database | Redis                                           | _N/A_ (*1*)                           | _N/A_                  |
 | Database | Elasticsearch                                   | Native                                | Native                 |
-| Database | Personal snippets                               | PostgreSQL Replication                | PostgreSQL Replication |
-| Database | Project snippets                                | PostgreSQL Replication                | PostgreSQL Replication |
 | Database | SSH public keys                                 | PostgreSQL Replication                | PostgreSQL Replication |
 | Git      | Project repository                              | Geo with Gitaly                       | Gitaly Checksum        |
 | Git      | Project wiki repository                         | Geo with Gitaly                       | Gitaly Checksum        |
 | Git      | Project designs repository                      | Geo with Gitaly                       | Gitaly Checksum        |
 | Git      | Object pools for forked project deduplication   | Geo with Gitaly                       | _Not implemented_      |
+| Git      | Project Snippets                                | Geo with Gitaly                       | _Not implemented_      |
+| Git      | Personal Snippets                               | Geo with Gitaly                       | _Not implemented_      |
 | Blobs    | User uploads _(filesystem)_                     | Geo with API                          | _Not implemented_      |
 | Blobs    | User uploads _(object storage)_                 | Geo with API/Managed (*2*)            | _Not implemented_      |
 | Blobs    | LFS objects _(filesystem)_                      | Geo with API                          | _Not implemented_      |
@@ -80,6 +80,9 @@ Each project can have at most 3 different repositories:
 
 They all live in the same shard and share the same base name with a `-wiki` and `-design` suffix
 for Wiki and Design Repository cases.
+
+Besides that, there are snippet repositories. They can be connected to a project or to some specific user.
+Both types will be synced to a secondary node.
 
 ### Blobs
 
