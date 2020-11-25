@@ -39,6 +39,8 @@ class BoardsStoreEE {
           dataset: {
             boardMilestoneId,
             boardMilestoneTitle,
+            boardIterationTitle,
+            boardIterationId,
             boardAssigneeUsername,
             labels,
             boardWeight,
@@ -53,6 +55,8 @@ class BoardsStoreEE {
           // iterationTitle: iterationTitle || '',
           // board.iterationTitle === currentIterationTitle
           currentIteration: parseBoolean(currentIteration),
+          iterationId: parseInt(boardIterationId, 10),
+          iterationTitle: boardIterationTitle || '',
           assigneeUsername: boardAssigneeUsername,
           labels: JSON.parse(labels || []),
           weight: parseInt(boardWeight, 10),
@@ -113,6 +117,19 @@ class BoardsStoreEE {
     if (milestoneTitle) {
       updateFilterPath('milestone_title', milestoneTitle);
       this.store.cantEdit.push('milestone');
+    }
+
+    let { iterationTitle } = this.store.boardConfig;
+    if (this.store.boardConfig.iterationId === 0) {
+      /* eslint-disable-next-line @gitlab/require-i18n-strings */
+      iterationTitle = 'No+Iteration';
+    } else {
+      iterationTitle = encodeURIComponent(iterationTitle);
+    }
+
+    if (iterationTitle) {
+      updateFilterPath('iteration_id', iterationTitle);
+      this.store.cantEdit.push('iteration');
     }
 
     let { weight } = this.store.boardConfig;

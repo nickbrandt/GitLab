@@ -11800,6 +11800,11 @@ enum IterationWildcardId {
   ANY
 
   """
+  Current iteration based on current date UTC
+  """
+  CURRENT
+
+  """
   No iteration is assigned
   """
   NONE

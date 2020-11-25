@@ -9,6 +9,7 @@ RSpec.describe Board do
 
   describe 'relationships' do
     it { is_expected.to belong_to(:milestone) }
+    it { is_expected.to belong_to(:iteration) }
     it { is_expected.to have_one(:board_assignee) }
     it { is_expected.to have_one(:assignee).through(:board_assignee) }
     it { is_expected.to have_many(:board_labels) }
