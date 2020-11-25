@@ -154,9 +154,9 @@ export default () => {
     mounted() {
       this.filterManager = new FilteredSearchBoards(
         boardsStore.filter,
+        store,
         true,
         boardsStore.cantEdit,
-        store,
       );
       this.filterManager.setup();
 
@@ -200,7 +200,7 @@ export default () => {
           this.resetEpics();
           this.resetIssues();
           this.fetchEpicsSwimlanes({});
-        } else if (gon.features.graphqlBoardLists && !this.isSwimlanesOn) {
+        } else if (gon.features.graphqlBoardLists) {
           this.fetchLists();
           this.resetIssues();
         }

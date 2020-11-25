@@ -4,11 +4,7 @@ export default {
   ...gettersCE,
 
   isSwimlanesOn: state => {
-    if (!gon?.features?.swimlanes) {
-      return false;
-    }
-
-    return state.isShowingEpicsSwimlanes;
+    return Boolean(gon?.features?.swimlanes && state.isShowingEpicsSwimlanes);
   },
   getIssuesByEpic: (state, getters) => (listId, epicId) => {
     return getters.getIssuesByList(listId).filter(issue => issue.epic && issue.epic.id === epicId);
