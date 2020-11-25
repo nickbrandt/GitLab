@@ -37,8 +37,17 @@ func CaptureAndFail(w http.ResponseWriter, r *http.Request, err error, msg strin
 	LogError(r, err)
 }
 
+func CaptureAndFailWithFields(w http.ResponseWriter, r *http.Request, err error, msg string, code int, fields log.Fields) {
+	http.Error(w, msg, code)
+	LogErrorWithFields(r, err, fields)
+}
+
 func Fail500(w http.ResponseWriter, r *http.Request, err error) {
 	CaptureAndFail(w, r, err, "Internal server error", http.StatusInternalServerError)
+}
+
+func Fail500WithFields(w http.ResponseWriter, r *http.Request, err error, fields log.Fields) {
+	CaptureAndFailWithFields(w, r, err, "Internal server error", http.StatusInternalServerError, fields)
 }
 
 func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
