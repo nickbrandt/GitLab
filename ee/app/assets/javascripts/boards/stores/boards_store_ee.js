@@ -44,11 +44,15 @@ class BoardsStoreEE {
             boardWeight,
             weightFeatureAvailable,
             scopedLabels,
+            currentIteration,
           },
         } = this.$boardApp;
         this.store.boardConfig = {
           milestoneId: parseInt(boardMilestoneId, 10),
           milestoneTitle: boardMilestoneTitle || '',
+          // iterationTitle: iterationTitle || '',
+          // board.iterationTitle === currentIterationTitle
+          currentIteration: parseBoolean(currentIteration),
           assigneeUsername: boardAssigneeUsername,
           labels: JSON.parse(labels || []),
           weight: parseInt(boardWeight, 10),

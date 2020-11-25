@@ -244,6 +244,7 @@ This allows you to create unique boards according to your team's need.
 
 You can define the scope of your board when creating it or by clicking the **Edit board** button.
 After a milestone, assignee or weight is assigned to an issue board, you can no longer
+UPDATE DOCS HERE
 filter through these in the search bar. In order to do that, you need to remove the desired scope
 (for example, milestone, assignee, or weight) from the issue board.
 
