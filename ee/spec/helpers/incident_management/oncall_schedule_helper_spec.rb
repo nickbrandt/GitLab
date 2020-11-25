@@ -10,7 +10,7 @@ RSpec.describe IncidentManagement::OncallScheduleHelper do
 
     it 'returns on-call schedule data' do
       is_expected.to eq(
-        'empty-oncall-schedule-svg-path' => helper.image_path('illustrations/empty-state/empty-on-call.svg')
+        'empty-oncall-schedules-svg-path' => helper.image_path('illustrations/empty-state/empty-on-call.svg')
       )
     end
   end
