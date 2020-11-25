@@ -132,11 +132,7 @@ class ApplicationSetting < ApplicationRecord
             if: :unique_ips_limit_enabled
 
   validates :kroki_url,
-            system_hook_url: {
-                blocked_message: "is blocked: %{exception_message}. " + KROKI_URL_ERROR_MESSAGE
-            },
-            presence: true,
-            if: :kroki_url_absolute?
+            presence: { if: :kroki_enabled }
 
   validate :validate_kroki_url, if: :kroki_enabled
 
@@ -520,7 +516,12 @@ class ApplicationSetting < ApplicationRecord
   end
 
   def parsed_kroki_url
-    @parsed_kroki_url ||= Gitlab::Utils.parse_url(kroki_url)
+    @parsed_kroki_url ||= Gitlab::UrlBlocker.validate!(kroki_url, schemes: %w(http https), enforce_sanitization: true)[0]
+  rescue Gitlab::UrlBlocker::BlockedUrlError => error
+    self.errors.add(
+      :kroki_url,
+      "is not valid. #{error}"
+    )
   end
 
   def validate_url(parsed_url, name, error_message)
