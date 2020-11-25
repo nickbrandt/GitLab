@@ -41,7 +41,7 @@ stateDiagram-v2
     ApplicationServer --> BackgroundJobs
     ApplicationServer --> Gitaly
     ApplicationServer --> Redis_Cache
-    ApplicationServer --> Redis_Shared_State
+    ApplicationServer --> Redis_Queues
     ApplicationServer --> PgBouncer
     PgBouncer --> Database
     ApplicationServer --> ObjectStorage
@@ -57,7 +57,7 @@ stateDiagram-v2
     Consul --> Database
     Consul --> PgBouncer
     Redis_Cache --> Consul
-    Redis_Shared_State --> Consul
+    Redis_Queues --> Consul
     BackgroundJobs --> Consul
 
     state Consul {
@@ -75,10 +75,10 @@ stateDiagram-v2
       "R_Cache_Sentinel_1..3"
     }
 
-    state Redis_Shared_State {
-      "R_Shared_State_Primary_Node"
-      "R_Shared_State_Replica_Node_1..2"
-      "R_Shared_State_Sentinel_1..3"
+    state Redis_Queues {
+      "R_Queues_Primary_Node"
+      "R_Queues_Replica_Node_1..2"
+      "R_Queues_Sentinel_1..3"
     }
 
     state Gitaly {
