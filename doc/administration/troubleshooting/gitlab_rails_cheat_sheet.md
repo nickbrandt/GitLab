@@ -1051,4 +1051,3 @@ Gitlab::CurrentSettings.elasticsearch_url
 
 Gitlab::CurrentSettings.elasticsearch_indexing
 ```
-
