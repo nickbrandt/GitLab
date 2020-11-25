@@ -4,9 +4,7 @@ import { inactiveId } from '../constants';
 export default {
   labelToggleState: state => (state.isShowingLabels ? 'on' : 'off'),
   isSidebarOpen: state => state.activeId !== inactiveId,
-  isSwimlanesOn: () => {
-    return false;
-  },
+  isSwimlanesOn: () => false,
   getIssueById: state => id => {
     return state.issues[id] || {};
   },
