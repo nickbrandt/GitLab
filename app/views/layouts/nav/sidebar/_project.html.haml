@@ -262,7 +262,11 @@
                   %span
                     = _('Incidents')
 
-            = render_if_exists 'projects/sidebar/oncall_schedules'
+            - if project_nav_tab?(:oncall_schedules)
+              = nav_link(controller: :oncall_schedules) do
+                = link_to project_incident_management_oncall_schedules_path(@project), title: _('On-call Schedules'), data: { qa_selector: 'operations_incidents_link' } do
+                  %span
+                    = _('On-call Schedules')
 
             - if project_nav_tab? :serverless
               = nav_link(controller: :functions) do

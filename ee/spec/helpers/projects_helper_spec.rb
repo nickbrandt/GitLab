@@ -353,4 +353,41 @@ RSpec.describe ProjectsHelper do
       it { expect(helper.scheduled_for_deletion?(archived_project)).to be true }
     end
   end
+
+  describe '#can_view_oncall_schedules?' do
+    using RSpec::Parameterized::TableSyntax
+
+    subject { helper.send(:can_view_oncall_schedules?, user, project) }
+
+    let_it_be(:user) { create(:user) }
+
+    where(:feature_flag, :license_flag, :has_permission, :is_available) do
+      false | false | false | false
+      false | false | true  | false
+      false | true  | false | false
+      false | true  | true  | false
+      true  | false | false | false
+      true  | false | true  | false
+      true  | true  | false | false
+      true  | true  | true  | true
+    end
+
+    with_them do
+      before do
+        allow(helper).to receive(:current_user).and_return(user)
+
+        stub_feature_flags(oncall_schedules_mvc: feature_flag)
+
+        allow(project).to receive(:feature_available?).and_return(false)
+        allow(project).to receive(:feature_available?).with(:oncall_schedules).and_return(license_flag)
+
+        allow(helper).to receive(:can?).and_return(false)
+        allow(helper).to receive(:can?).with(user, :read_incident_management_oncall_schedule, project).and_return(has_permission)
+      end
+
+      it 'includes oncall_schedules' do
+        is_expected.to be(is_available)
+      end
+    end
+  end
 end

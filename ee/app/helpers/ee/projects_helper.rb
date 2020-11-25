@@ -43,6 +43,10 @@ module EE
         nav_tabs << :requirements
       end
 
+      if can_view_oncall_schedules?(current_user, project)
+        nav_tabs << :oncall_schedules
+      end
+
       nav_tabs
     end
 
@@ -337,6 +341,12 @@ module EE
           }
         }
       }
+    end
+
+    def can_view_oncall_schedules?(current_user, project)
+      ::Feature.enabled?(:oncall_schedules_mvc, project) &&
+          project.feature_available?(:oncall_schedules) &&
+          can?(current_user, :read_incident_management_oncall_schedule, project)
     end
   end
 end
