@@ -1,4 +1,5 @@
 import Api from 'ee/api';
+import epicChildren from 'shared_queries/epic/epic_children.query.graphql';
 import { deprecatedCreateFlash as flash } from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
@@ -13,7 +14,6 @@ import {
 
 import { ChildType, ChildState, idProp, relativePositions } from '../constants';
 
-import epicChildren from '../queries/epicChildren.query.graphql';
 import epicChildReorder from '../queries/epicChildReorder.mutation.graphql';
 import { processQueryResponse, formatChildItem, gqClient } from '../utils/epic_utils';
 
