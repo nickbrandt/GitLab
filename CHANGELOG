@@ -1,5 +1,19 @@
 # Changelog for gitlab-workhorse
 
+## v8.56.0
+
+### Fixed
+- Return 413 HTTP status for S3 uploads if max upload limit is reached
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/655
+- Fix EXIF cleaning for S3 compatible Object Storage
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
+
+### Other
+- Improve logging for image scaler
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/652
+- Update LabKit to v1.0.0
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/659
+
 ## v8.55.0
 
 ### Added
