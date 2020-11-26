@@ -18,6 +18,10 @@ RSpec.describe Gitlab::Diff::FileCollection::MergeRequestDiffBatch do
 
   let(:diff_files) { subject.diff_files }
 
+  before do
+    stub_feature_flags(diffs_gradual_load: false)
+  end
+
   describe 'initialize' do
     it 'memoizes pagination_data' do
       expect(subject.pagination_data).to eq(current_page: 1, next_page: 2, total_pages: 2)
