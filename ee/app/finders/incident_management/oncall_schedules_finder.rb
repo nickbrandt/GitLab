@@ -19,7 +19,7 @@ module IncidentManagement
 
     private
 
-    attr_reader :current_user, :project, :params
+    attr_reader :current_user, :project, :params, :schedules
 
     def available?
       Feature.enabled?(:oncall_schedules_mvc, project) &&
