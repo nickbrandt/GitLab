@@ -152,7 +152,7 @@ export default {
             This structure with two <p> and instead put them both inline.
             https://gitlab.com/gitlab-org/gitlab/-/issues/276949
            -->
-          <p class="gl-font-sm gl-mt-2 gl-mb-0">
+          <p v-if="isDownstream" class="gl-font-sm gl-mt-2 gl-mb-0">
             <gl-sprintf :message="__('Created by: %{jobName}')">
               <template #jobName>
                 <p

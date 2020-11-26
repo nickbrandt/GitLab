@@ -133,6 +133,10 @@ describe('Linked pipeline', () => {
       expect(findPipelineLabel().exists()).toBe(true);
     });
 
+    it('should not render the trigger job name', () => {
+      expect(findDownstreamSource().exists()).toBe(false);
+    });
+
     it('downstream pipeline should contain the correct link', () => {
       createWrapper(downstreamProps);
       expect(findPipelineLink().attributes('href')).toBe(mockData.triggered_by.path);
