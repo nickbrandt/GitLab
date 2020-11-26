@@ -110,7 +110,7 @@ module EE
 
     def get_current_iteration
       strong_memoize(:current_iteration) do
-        return unless params.project || params.group
+        next unless params.project || params.group
 
         IterationsFinder.new(current_user, iterations_finder_params).execute.first
       end
