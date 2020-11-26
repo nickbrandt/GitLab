@@ -11,7 +11,7 @@ module WikiPages
 
     def execute(slug, page, action, event_fingerprint)
       event = Event.transaction do
-        wiki_page_meta = WikiPage::Meta.find_or_create(slug, page)
+        wiki_page_meta = find_or_create_wiki_page_meta(slug, page)
 
         ::EventCreateService.new.wiki_event(wiki_page_meta, author, action, event_fingerprint)
       end
@@ -24,5 +24,11 @@ module WikiPages
     private
 
     attr_reader :author
+
+    def find_or_create_wiki_page_meta(slug, page)
+      WikiPage::Meta.find_or_create(slug, page)
+    end
   end
 end
+
+::WikiPages::EventCreateService.prepend_if_ee('EE::WikiPages::EventCreateService')

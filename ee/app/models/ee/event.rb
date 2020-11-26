@@ -25,5 +25,10 @@ module EE
     def epic?
       target_type == 'Epic'
     end
+
+    override :wiki_page?
+    def wiki_page?
+      target_type == 'GroupWikiPage::Meta' || super
+    end
   end
 end

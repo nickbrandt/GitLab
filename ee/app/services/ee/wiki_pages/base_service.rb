@@ -16,13 +16,6 @@ module EE
         process_wiki_repository_update
       end
 
-      def create_wiki_event(_page)
-        # TODO: group hooks https://gitlab.com/gitlab-org/gitlab/-/issues/216904
-        return if container.is_a?(Group)
-
-        super
-      end
-
       def process_wiki_repository_update
         # TODO: Geo support for group wiki
         # https://gitlab.com/gitlab-org/gitlab/-/issues/208147

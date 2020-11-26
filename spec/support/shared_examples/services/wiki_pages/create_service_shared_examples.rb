@@ -41,9 +41,6 @@ RSpec.shared_examples 'WikiPages::CreateService#execute' do |container_type|
 
   shared_examples 'correct event created' do
     it 'creates appropriate events' do
-      # TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/216904
-      pending('group wiki support') if container_type == :group
-
       expect { service.execute }.to change { Event.count }.by 1
 
       expect(Event.recent.first).to have_attributes(

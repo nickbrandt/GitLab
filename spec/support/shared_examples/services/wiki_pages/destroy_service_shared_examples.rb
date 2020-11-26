@@ -21,9 +21,6 @@ RSpec.shared_examples 'WikiPages::DestroyService#execute' do |container_type|
   end
 
   it 'creates a new wiki page deletion event' do
-    # TODO: https://gitlab.com/gitlab-org/gitlab/-/issues/216904
-    pending('group wiki support') if container_type == :group
-
     expect { service.execute(page) }.to change { Event.count }.by 1
 
     expect(Event.recent.first).to have_attributes(
