@@ -9,11 +9,13 @@ module Banzai
     #
     class KrokiFilter < HTML::Pipeline::Filter
       def call
+        return doc unless settings.kroki_enabled
+
         diagram_selectors = ::Gitlab::Kroki.formats(settings)
                                 .map { |diagram_type| %(pre[lang="#{diagram_type}"] > code) }
                                 .join(', ')
 
-        return doc unless settings.kroki_enabled && doc.at(diagram_selectors)
+        return doc unless doc.at(diagram_selectors)
 
         diagram_format = "svg"
         doc.css(diagram_selectors).each do |node|
