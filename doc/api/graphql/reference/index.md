@@ -371,16 +371,16 @@ Represents the total number of issues and their weights for a particular day.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `errors` | String | Linting errors |
+| `errors` | String! => Array | Linting errors |
 | `mergedYaml` | String | Merged CI config YAML |
-| `stages` | CiConfigStage! => Array | Stages of the pipeline |
+| `stages` | CiConfigStageConnection | Stages of the pipeline |
 | `status` | CiConfigStatus | Status of linting, can be either valid or invalid |
 
 ### CiConfigGroup
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `jobs` | CiConfigJob! => Array | Jobs in group |
+| `jobs` | CiConfigJobConnection | Jobs in group |
 | `name` | String | Name of the job group |
 | `size` | Int | Size of the job group |
 
@@ -388,20 +388,22 @@ Represents the total number of issues and their weights for a particular day.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
+| `groupName` | String | Name of the job group |
 | `name` | String | Name of the job |
-| `needs` | CiConfigNeed! => Array | Builds that must complete before the jobs run |
+| `needs` | CiConfigNeedConnection | Builds that must complete before the jobs run |
+| `stage` | String | Name of the job stage |
 
 ### CiConfigNeed
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `name` | String | Name of the job |
+| `name` | String | Name of the need |
 
 ### CiConfigStage
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `groups` | CiConfigGroup! => Array | Groups of jobs for the stage |
+| `groups` | CiConfigGroupConnection | Groups of jobs for the stage |
 | `name` | String | Name of the stage |
 
 ### CiGroup
