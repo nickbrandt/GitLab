@@ -5,7 +5,7 @@ module IncidentManagement
     def oncall_schedule_data(project)
       {
         'project-path' => project.full_path,
-        'empty-oncall-scheduleі-svg-path' => image_path('illustrations/empty-state/empty-on-call.svg'),
+        'empty-oncall-schedules-svg-path' => image_path('illustrations/empty-state/empty-on-call.svg'),
         'timezones' => timezone_data.to_json
       }
     end
