@@ -92,8 +92,9 @@ module Types
       resolver: Resolvers::Ci::RunnerSetupResolver
 
     field :ci_config, Types::Ci::Config::ConfigType, null: true,
-          description: 'Contents of gitlab-ci.yml file',
-          resolver: Resolvers::Ci::ConfigResolver
+      description: 'Get linted and processed contents of a CI config. Should not be requested more than once per request.',
+      resolver: Resolvers::Ci::ConfigResolver,
+      complexity: 126 # AUTHENTICATED_COMPLEXITY / 2 + 1
 
     def design_management
       DesignManagementObject.new(nil)

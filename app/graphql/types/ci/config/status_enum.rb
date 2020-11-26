@@ -7,8 +7,8 @@ module Types
         graphql_name 'CiConfigStatus'
         description 'Values for YAML processor result'
 
-        value 'VALID', 'Valid `gitlab-ci.yml`'
-        value 'INVALID', 'Invalid `gitlab-ci.yml`'
+        value 'VALID', 'The configuration file is valid', value: :valid
+        value 'INVALID', 'The configuration file is not valid', value: :invalid
       end
     end
   end

@@ -9,71 +9,51 @@ module Resolvers
                required: true,
                description: 'Contents of .gitlab-ci.yml'
 
-      argument :include_merged_yaml, GraphQL::BOOLEAN_TYPE,
-                required: false,
-                description: 'Whether or not to include merged CI yaml in the response'
+      def resolve(content:)
+        result = ::Gitlab::Ci::YamlProcessor.new(content).execute
 
-      def resolve(content:, include_merged_yaml: false)
-        result = Gitlab::Ci::YamlProcessor.new(content).execute
-
-        if result.errors.empty?
-          stages = stages(result.stages)
-          jobs = jobs(result.jobs)
-          groups = groups(jobs)
-          stages = stage_groups(stages, groups)
-
-          response = {
-                        status: 'valid',
-                        errors: [],
-                        stages: stages.select { |stage| !stage[:groups].empty? }
+        response = if result.errors.empty?
+                     {
+                       status: :valid,
+                       errors: [],
+                       stages: make_stages(result.jobs)
                      }
-        else
-          response = {
-                        status: 'invalid',
-                        errors: [result.errors.first]
+                   else
+                     {
+                       status: :invalid,
+                       errors: result.errors
                      }
-        end
+                   end
 
-        response.tap do |response|
-          response[:merged_yaml] = result.merged_yaml if include_merged_yaml
-        end
+        response.merge(merged_yaml: result.merged_yaml)
       end
 
       private
 
-      def stages(config_stages)
-        config_stages.map { |stage| { name: stage, groups: [] } }
-      end
-
-      def jobs(config_jobs)
+      def make_jobs(config_jobs)
         config_jobs.map do |job_name, job|
           {
             name: job_name,
             stage: job[:stage],
             group_name: CommitStatus.new(name: job_name).group_name,
-            needs: needs(job) || []
+            needs: job.dig(:needs, :job) || []
           }
         end
       end
 
-      def needs(job)
-        job.dig(:needs, :job)&.map do |job_need|
-          { name: job_need[:name], artifacts: job_need[:artifacts] }
+      def make_groups(job_data)
+        jobs = make_jobs(job_data)
+
+        jobs_by_group = jobs.group_by { |job| job[:group_name] }
+        jobs_by_group.map do |name, jobs|
+          { jobs: jobs, name: name, stage: jobs.first[:stage], size: jobs.size }
         end
       end
 
-      def groups(jobs)
-        group_names = jobs.map { |job| job[:group_name] }.uniq
-        group_names.map do |group|
-          group_jobs = jobs.select { |job| job[:group_name] == group }
-          { jobs: group_jobs, name: group, stage: group_jobs.first[:stage], size: group_jobs.count }
-        end
-      end
-
-      def stage_groups(stage_data, groups)
-        stage_data.each do |stage|
-          stage[:groups] = groups.select { |group| group[:stage] == stage[:name] }
-        end
+      def make_stages(jobs)
+        make_groups(jobs)
+          .group_by { |group| group[:stage] }
+          .map { |name, groups| { name: name, groups: groups } }
       end
     end
   end

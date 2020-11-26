@@ -6012,9 +6012,17 @@
 
               ],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -6146,6 +6154,20 @@
           "description": null,
           "fields": [
             {
+              "name": "groupName",
+              "description": "Name of the job group",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "name",
               "description": "Name of the job",
               "args": [
@@ -6180,6 +6202,20 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "stage",
+              "description": "Name of the job stage",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -6196,7 +6232,7 @@
           "fields": [
             {
               "name": "name",
-              "description": "Name of the job",
+              "description": "Name of the need",
               "args": [
 
               ],
@@ -6275,13 +6311,13 @@
           "enumValues": [
             {
               "name": "VALID",
-              "description": "Valid `gitlab-ci.yml`",
+              "description": "The configuration file is valid",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "INVALID",
-              "description": "Invalid `gitlab-ci.yml`",
+              "description": "The configuration file is not valid",
               "isDeprecated": false,
               "deprecationReason": null
             }
@@ -52431,7 +52467,7 @@
           "fields": [
             {
               "name": "ciConfig",
-              "description": "Contents of gitlab-ci.yml file",
+              "description": "Get linted and processed contents of a CI config. Should not be requested more than once per request.",
               "args": [
                 {
                   "name": "content",
@@ -52444,16 +52480,6 @@
                       "name": "String",
                       "ofType": null
                     }
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "includeMergedYaml",
-                  "description": "Whether or not to include merged CI yaml in the response",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Boolean",
-                    "ofType": null
                   },
                   "defaultValue": null
                 }

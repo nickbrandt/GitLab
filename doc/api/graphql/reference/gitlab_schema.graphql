@@ -2241,7 +2241,7 @@ type CiConfig {
   """
   Linting errors
   """
-  errors: String
+  errors: [String!]
 
   """
   Merged CI config YAML
@@ -2278,6 +2278,11 @@ type CiConfigGroup {
 
 type CiConfigJob {
   """
+  Name of the job group
+  """
+  groupName: String
+
+  """
   Name of the job
   """
   name: String
@@ -2286,11 +2291,16 @@ type CiConfigJob {
   Builds that must complete before the jobs run
   """
   needs: [CiConfigNeed!]
+
+  """
+  Name of the job stage
+  """
+  stage: String
 }
 
 type CiConfigNeed {
   """
-  Name of the job
+  Name of the need
   """
   name: String
 }
@@ -2312,12 +2322,12 @@ Values for YAML processor result
 """
 enum CiConfigStatus {
   """
-  Invalid `gitlab-ci.yml`
+  The configuration file is not valid
   """
   INVALID
 
   """
-  Valid `gitlab-ci.yml`
+  The configuration file is valid
   """
   VALID
 }
@@ -17935,18 +17945,13 @@ type PromoteToEpicPayload {
 
 type Query {
   """
-  Contents of gitlab-ci.yml file
+  Get linted and processed contents of a CI config. Should not be requested more than once per request.
   """
   ciConfig(
     """
     Contents of .gitlab-ci.yml
     """
     content: String!
-
-    """
-    Whether or not to include merged CI yaml in the response
-    """
-    includeMergedYaml: Boolean
   ): CiConfig
 
   """

@@ -9,6 +9,10 @@ module Types
 
         field :name, GraphQL::STRING_TYPE, null: true,
               description: 'Name of the job'
+        field :group_name, GraphQL::STRING_TYPE, null: true,
+              description: 'Name of the job group'
+        field :stage, GraphQL::STRING_TYPE, null: true,
+              description: 'Name of the job stage'
         field :needs, [Types::Ci::Config::NeedType], null: true,
               description: 'Builds that must complete before the jobs run'
       end

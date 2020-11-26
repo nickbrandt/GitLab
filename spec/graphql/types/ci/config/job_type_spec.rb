@@ -8,6 +8,8 @@ RSpec.describe Types::Ci::Config::JobType do
   it 'exposes the expected fields' do
     expected_fields = %i[
       name
+      group_name
+      stage
       needs
     ]
 
