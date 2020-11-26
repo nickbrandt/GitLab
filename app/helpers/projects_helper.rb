@@ -486,7 +486,7 @@ module ProjectsHelper
 
   def can_view_product_analytics?(current_user, project)
     Feature.enabled?(:product_analytics, project) &&
-        can?(current_user, :read_product_analytics, project)
+      can?(current_user, :read_product_analytics, project)
   end
 
   def search_tab_ability_map
