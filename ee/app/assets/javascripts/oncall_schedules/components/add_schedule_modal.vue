@@ -11,7 +11,7 @@ import {
   GlAlert,
 } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
-import CreateOncallScheduleMutation from '../graphql/create_oncall_schedule.mutation.graphql';
+import createOncallScheduleMutation from '../graphql/create_oncall_schedule.mutation.graphql';
 
 export const i18n = {
   selectTimezone: s__('OnCallSchedules|Select timezone'),
@@ -90,11 +90,11 @@ export default {
     },
     filteredTimezones() {
       const lowerCaseTzSearchTerm = this.tzSearchTerm.toLowerCase();
-      return this.timezones.filter(tz => {
-        return this.getFormattedTimezone(tz)
+      return this.timezones.filter(tz =>
+        this.getFormattedTimezone(tz)
           .toLowerCase()
-          .includes(lowerCaseTzSearchTerm);
-      });
+          .includes(lowerCaseTzSearchTerm),
+      );
     },
     noResults() {
       return !this.filteredTimezones.length;
@@ -115,14 +115,12 @@ export default {
     },
   },
   methods: {
-    createSchedule(bvModalEvt) {
-      bvModalEvt.preventDefault();
-
+    createSchedule() {
       this.loading = true;
 
       this.$apollo
         .mutate({
-          mutation: CreateOncallScheduleMutation,
+          mutation: createOncallScheduleMutation,
           variables: {
             oncallScheduleCreateInput: {
               projectPath: this.projectPath,
@@ -154,42 +152,39 @@ export default {
     isTimezoneSelected(tz) {
       return isEqual(tz, this.form.timezone);
     },
+    hideErrorAlert() {
+      this.showErrorAlert = false;
+    },
   },
 };
 </script>
 
 <template>
   <gl-modal
-    id="modalId"
     ref="createScheduleModal"
     :modal-id="modalId"
     size="sm"
     :title="$options.i18n.addSchedule"
     :action-primary="actionsProps.primary"
     :action-cancel="actionsProps.cancel"
-    @primary="createSchedule"
+    @primary.prevent="createSchedule"
   >
     <gl-alert
       v-if="showErrorAlert"
       variant="danger"
       class="gl-mt-n3 gl-mb-3"
-      @dismiss="showErrorAlert = false"
+      @dismiss="hideErrorAlert"
     >
       {{ error || $options.i18n.errorMsg }}
     </gl-alert>
-    <gl-form @submit="createSchedule">
+    <gl-form @submit.prevent="createSchedule">
       <gl-form-group
         :label="$options.i18n.fields.name.title"
+        :invalid-feedback="$options.i18n.fields.name.validation.empty"
         label-size="sm"
         label-for="schedule-name"
       >
         <gl-form-input id="schedule-name" v-model="form.name" :state="!isNameInvalid" />
-        <span
-          v-if="isNameInvalid"
-          class="gl-text-red-500 gl-display-inline-block gl-mt-2"
-          data-testid="name-validation-error"
-          >{{ $options.i18n.fields.name.validation.empty }}</span
-        >
       </gl-form-group>
 
       <gl-form-group
@@ -203,8 +198,10 @@ export default {
       <gl-form-group
         :label="$options.i18n.fields.timezone.title"
         label-size="sm"
-        :description="$options.i18n.fields.timezone.description"
         label-for="schedule-timezone"
+        :description="$options.i18n.fields.timezone.description"
+        :state="!isTimezoneInvalid"
+        :invalid-feedback="$options.i18n.fields.timezone.validation.empty"
       >
         <gl-dropdown
           id="schedule-timezone"
@@ -227,12 +224,6 @@ export default {
             {{ $options.i18n.noResults }}
           </gl-dropdown-item>
         </gl-dropdown>
-        <span
-          v-if="isTimezoneInvalid"
-          class="gl-text-red-500 gl-display-inline-block gl-mt-2"
-          data-testid="timezone-validation-error"
-          >{{ $options.i18n.fields.timezone.validation.empty }}</span
-        >
       </gl-form-group>
     </gl-form>
   </gl-modal>

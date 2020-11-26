@@ -24,6 +24,10 @@ describe('AddScheduleModal', () => {
           mutate,
         },
       },
+
+      stubs: {
+        GlFormGroup: false,
+      },
     });
 
     wrapper.vm.$refs.createScheduleModal.hide = mockHideModal;
@@ -34,20 +38,15 @@ describe('AddScheduleModal', () => {
   });
 
   afterEach(() => {
-    if (wrapper) {
-      wrapper.destroy();
-      wrapper = null;
-    }
+    wrapper.destroy();
+    wrapper = null;
   });
 
   const findModal = () => wrapper.find(GlModal);
+  const findAlert = () => wrapper.find(GlAlert);
+  const findTimezoneDropdown = () => wrapper.find(GlDropdown);
   const findDropdownOptions = () => wrapper.findAll(GlDropdownItem);
   const findTimezoneSearchBox = () => wrapper.find(GlSearchBoxByType);
-  const findAlert = () => wrapper.find(GlAlert);
-  const findNameInput = () => wrapper.find('[id="schedule-name"]');
-  const findNameValidationErr = () => wrapper.find('[data-testid="name-validation-error"]');
-  const findTimezoneDropdown = () => wrapper.find(GlDropdown);
-  const findTimezoneValidationErr = () => wrapper.find('[data-testid="timezone-validation-error"]');
 
   it('renders modal layout', () => {
     expect(wrapper.element).toMatchSnapshot();
@@ -71,24 +70,18 @@ describe('AddScheduleModal', () => {
         const searchTerm = 'Hawaii';
         findTimezoneSearchBox().vm.$emit('input', searchTerm);
         await wrapper.vm.$nextTick();
-        expect(findDropdownOptions().length).toBe(1);
-        expect(
-          findDropdownOptions()
-            .at(0)
-            .text(),
-        ).toContain(searchTerm);
+        const options = findDropdownOptions();
+        expect(options.length).toBe(1);
+        expect(options.at(0).text()).toContain(searchTerm);
       });
 
       it('should display no results item when there are no filter matches', async () => {
         const searchTerm = 'someUnexistentTZ';
         findTimezoneSearchBox().vm.$emit('input', searchTerm);
         await wrapper.vm.$nextTick();
-        expect(findDropdownOptions().length).toBe(1);
-        expect(
-          findDropdownOptions()
-            .at(0)
-            .text(),
-        ).toContain(i18n.noResults);
+        const options = findDropdownOptions();
+        expect(options.length).toBe(1);
+        expect(options.at(0).text()).toContain(i18n.noResults);
       });
     });
 
@@ -122,38 +115,25 @@ describe('AddScheduleModal', () => {
       mutate.mockResolvedValueOnce({ data: { oncallScheduleCreate: { errors: [error] } } });
       findModal().vm.$emit('primary', { preventDefault: jest.fn() });
       await waitForPromises();
+      const alert = findAlert();
       expect(mockHideModal).not.toHaveBeenCalled();
-      expect(findAlert().exists()).toBe(true);
-      expect(findAlert().text()).toContain(error);
+      expect(alert.exists()).toBe(true);
+      expect(alert.text()).toContain(error);
     });
   });
 
   describe('Form validation', () => {
-    describe('Schedule name', () => {
-      it('shows error message under the name field when it is empty', async () => {
-        const input = findNameInput();
-        input.vm.$emit('input', '');
-
-        await wrapper.vm.$nextTick();
-        expect(findNameValidationErr().text()).toBe(i18n.fields.name.validation.empty);
-      });
-    });
-
     describe('Timezone select', () => {
-      it('shows error message under the timezone field and adds red border when timezone is NOT selected', () => {
-        const dropdown = findTimezoneDropdown();
-        expect(dropdown.classes()).toContain('invalid-dropdown');
-        expect(findTimezoneValidationErr().text()).toBe(i18n.fields.timezone.validation.empty);
+      it('has red border when nothing selected', () => {
+        expect(findTimezoneDropdown().classes()).toContain('invalid-dropdown');
       });
 
-      it("doesn't show error message and doesn't add red border when timezone is selected", async () => {
-        const dropdown = findTimezoneDropdown();
+      it("doesn't have a red border when there is selected opeion", async () => {
         findDropdownOptions()
           .at(1)
           .vm.$emit('click');
         await wrapper.vm.$nextTick();
-        expect(dropdown.classes()).not.toContain('invalid-dropdown');
-        expect(findTimezoneValidationErr().exists()).toBe(false);
+        expect(findTimezoneDropdown().classes()).not.toContain('invalid-dropdown');
       });
     });
   });
