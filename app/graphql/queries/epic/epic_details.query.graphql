@@ -1,9 +1,14 @@
 query epicDetails($fullPath: ID!, $iid: ID!) {
   group(fullPath: $fullPath) {
+    __typename
     epic(iid: $iid) {
+      __typename
       participants {
+        __typename
         edges {
+          __typename
           node {
+            __typename
             name
             avatarUrl
             webUrl
