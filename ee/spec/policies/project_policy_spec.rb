@@ -527,6 +527,69 @@ RSpec.describe ProjectPolicy do
     end
   end
 
+  describe 'permissions for security bot' do
+    let_it_be(:current_user) { create(:user, :security_bot) }
+    let(:project) { private_project }
+
+    let(:permissions) do
+      %i(
+        reporter_access
+        push_code
+        create_merge_request_from
+        create_merge_request_in
+        create_vulnerability_feedback
+        read_project
+      )
+    end
+
+    context 'when auto_fix feature is enabled' do
+      context 'when licensed feature is enabled' do
+        before do
+          stub_licensed_features(vulnerability_auto_fix: true)
+        end
+
+        it { is_expected.to be_allowed(*permissions) }
+
+        context 'when feature flag is disabled' do
+          before do
+            stub_feature_flags(security_auto_fix: false)
+          end
+
+          it { is_expected.to be_disallowed(*permissions) }
+        end
+      end
+
+      context 'when licensed feature is disabled' do
+        before do
+          stub_licensed_features(vulnerability_auto_fix: false)
+        end
+
+        it { is_expected.to be_disallowed(*permissions) }
+      end
+    end
+
+    context 'when auto_fix feature is disabled' do
+      before do
+        stub_licensed_features(vulnerability_auto_fix: true)
+        project.security_setting.update!(auto_fix_dependency_scanning: false, auto_fix_container_scanning: false)
+      end
+
+      it { is_expected.to be_disallowed(*permissions) }
+    end
+
+    context 'when project does not have a security_setting' do
+      before do
+        stub_licensed_features(vulnerability_auto_fix: true)
+        project.security_setting.delete
+        project.reload
+      end
+
+      it do
+        is_expected.to be_disallowed(*permissions)
+      end
+    end
+  end
+
   describe 'read_threat_monitoring' do
     context 'when threat monitoring feature is available' do
       before do
