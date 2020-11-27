@@ -22,7 +22,7 @@ class ProjectSecuritySetting < ApplicationRecord
 
   def auto_fix_enabled_types
     AVAILABLE_AUTO_FIX_TYPES.filter_map do |type|
-      type if public_send("auto_fix_#{type}")
+      type if public_send("auto_fix_#{type}") # rubocop:disable GitlabSecurity/PublicSend
     end
   end
 end
