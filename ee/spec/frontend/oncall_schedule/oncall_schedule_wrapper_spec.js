@@ -7,6 +7,8 @@ import OnCallSchedule from 'ee/oncall_schedules/components/oncall_schedule.vue';
 
 describe('On-call schedule wrapper', () => {
   let wrapper;
+  let fakeApollo;
+  let destroyScheduleHandler;
   const emptyOncallSchedulesSvgPath = 'illustration/path.svg';
   const projectPath = 'group/project';
 
@@ -19,17 +21,69 @@ describe('On-call schedule wrapper', () => {
       },
     };
 
-    wrapper = shallowMount(OnCallScheduleWrapper, {
+  const findSchedules = () => wrapper.find(OncallSchedule);
+  const findEmptyState = () => wrapper.find(GlEmptyState);
+
+  async function destroySchedule(localWrapper) {
+    await jest.runOnlyPendingTimers();
+    await localWrapper.vm.$nextTick();
+
+    localWrapper.find(OncallSchedule).vm.$emit('delete-schedule', { id: scheduleToDestroy.id });
+  }
+
+  async function awaitApolloDomMock() {
+    await wrapper.vm.$nextTick(); // kick off the DOM update
+    await jest.runOnlyPendingTimers(); // kick off the mocked GQL stuff (promises)
+    await wrapper.vm.$nextTick(); // kick off the DOM update for flash
+  }
+
+  function mountComponent({ data = {}, provide = {}, loading = false } = {}) {
+    wrapper = mount(OnCallScheduleWrapper, {
       data() {
-        return {
-          schedule,
-        };
+        return { ...data };
       },
       provide: {
         emptyOncallSchedulesSvgPath,
         projectPath,
+        timezones,
+        ...provide,
+      },
+      mocks: {
+        $apollo: {
+          mutate: jest.fn(),
+          query: jest.fn(),
+          queries: {
+            schedule: {
+              loading,
+            },
+          },
+        },
       },
       mocks: { $apollo },
+    });
+  }
+
+  function createComponentWithApollo({
+    destroyHandler = jest.fn().mockResolvedValue(destroyScheduleResponse),
+  } = {}) {
+    localVue.use(VueApollo);
+    destroyScheduleHandler = destroyHandler;
+
+    const requestHandlers = [
+      [getOncallSchedulesQuery, jest.fn().mockResolvedValue(getOncallSchedulesQueryResponse)],
+      [destroyOncallScheduleMutation, destroyScheduleHandler],
+    ];
+
+    fakeApollo = createMockApollo(requestHandlers);
+
+    wrapper = mount(OnCallScheduleWrapper, {
+      localVue,
+      apolloProvider: fakeApollo,
+      provide: {
+        emptyOncallSchedulesSvgPath,
+        projectPath,
+        timezones,
+      },
     });
   }
 
@@ -38,24 +92,67 @@ describe('On-call schedule wrapper', () => {
     wrapper = null;
   });
 
-  const findLoader = () => wrapper.find(GlLoadingIcon);
-  const findEmptyState = () => wrapper.find(GlEmptyState);
-  const findSchedule = () => wrapper.find(OnCallSchedule);
+  describe('Empty state', () => {
+    it('shows empty state and passed correct attributes to it', () => {
+      mountComponent({
+        data: { schedule: null },
+      });
 
-  it('shows a loader while data is requested', () => {
-    mountComponent({ loading: true });
-    expect(findLoader().exists()).toBe(true);
+      expect(findEmptyState().exists()).toBe(true);
+      expect(findEmptyState().props('title')).toBe(i18n.emptyState.title);
+      expect(findEmptyState().props('description')).toBe(i18n.emptyState.description);
+      expect(
+        findEmptyState()
+          .find('img')
+          .attributes('src'),
+      ).toBe(emptyOncallSchedulesSvgPath);
+    });
   });
 
-  it('shows empty state and passed correct attributes to it when not loading and no schedule', () => {
-    mountComponent({ loading: false, schedule: null });
-    const emptyState = findEmptyState();
+  describe('with mocked Apollo client', () => {
+    it('has a selection of schedules loaded via the getOncallSchedulesQuery', async () => {
+      createComponentWithApollo();
 
-    expect(emptyState.exists()).toBe(true);
-    expect(emptyState.attributes()).toEqual({
-      title: i18n.emptyState.title,
-      svgpath: emptyOncallSchedulesSvgPath,
-      description: i18n.emptyState.description,
+      await jest.runOnlyPendingTimers();
+      await wrapper.vm.$nextTick();
+
+      expect(findSchedules()).toHaveLength(1);
+    });
+
+    it('calls a mutation with correct parameters and destroys a schedule', async () => {
+      createComponentWithApollo();
+
+      await destroySchedule(wrapper);
+
+      expect(destroyScheduleHandler).toHaveBeenCalled();
+
+      await wrapper.vm.$nextTick();
+
+      expect(findSchedules()).toHaveLength(0);
+    });
+
+    it('displays flash if mutation had a recoverable error', async () => {
+      createComponentWithApollo({
+        destroyHandler: jest.fn().mockResolvedValue(destroyScheduleResponseWithErrors),
+      });
+
+      await destroySchedule(wrapper);
+      await awaitApolloDomMock();
+
+      expect(createFlash).toHaveBeenCalledWith({ message: 'Houston, we have a problem' });
+    });
+
+    it('displays flash if mutation had a non-recoverable error', async () => {
+      createComponentWithApollo({
+        destroyHandler: jest.fn().mockRejectedValue('Error'),
+      });
+
+      await destroySchedule(wrapper);
+      await awaitApolloDomMock();
+
+      expect(createFlash).toHaveBeenCalledWith({
+        message: DELETE_SCHEDULE_ERROR,
+      });
     });
   });
 
