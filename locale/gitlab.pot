@@ -4099,6 +4099,9 @@ msgstr ""
 msgid "AutoRemediation|%{mrsCount} ready for review"
 msgstr ""
 
+msgid "AutoRemediation|Auto-fix solution available"
+msgstr ""
+
 msgid "AutoRemediation|Auto-fix solutions"
 msgstr ""
 
