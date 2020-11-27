@@ -5,6 +5,10 @@ require 'spec_helper'
 RSpec.describe Projects::MergeRequests::DiffsController do
   include ProjectForksHelper
 
+  before do
+    stub_feature_flags(diffs_gradual_load: false)
+  end
+
   shared_examples '404 for unexistent diffable' do
     context 'when diffable does not exists' do
       it 'returns 404' do
