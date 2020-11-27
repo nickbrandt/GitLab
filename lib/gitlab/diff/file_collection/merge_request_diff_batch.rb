@@ -11,7 +11,7 @@ module Gitlab
       #
       class MergeRequestDiffBatch < MergeRequestDiffBase
         DEFAULT_BATCH_PAGE = 1
-        DEFAULT_BATCH_SIZE = 20
+        DEFAULT_BATCH_SIZE = 30
 
         attr_reader :pagination_data
 
@@ -64,7 +64,7 @@ module Gitlab
 
         def load_paginated_collection(batch_page, batch_size, diff_options)
           batch_page ||= DEFAULT_BATCH_PAGE
-          batch_size ||= DEFAULT_BATCH_SIZE
+          batch_size = [batch_size.to_i, DEFAULT_BATCH_SIZE].min
 
           paths = diff_options&.fetch(:paths, nil)
 
