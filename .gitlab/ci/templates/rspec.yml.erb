@@ -15,18 +15,6 @@ include:
     - .default-before_script
     - .rails-cache
 
-.download-artifacts: &download-artifacts
-  - install_gitlab_gem
-  - download_artifacts_from_upstream_job ${CI_PARENT_PIPELINE_ID} setup-test-env
-  - download_artifacts_from_upstream_job ${CI_PARENT_PIPELINE_ID} retrieve-tests-metadata
-  - download_artifacts_from_upstream_job ${CI_PARENT_PIPELINE_ID} compile-test-assets
-
-.download-artifacts-as-if-foss: &download-artifacts-as-if-foss
-  - install_gitlab_gem
-  - download_artifacts_from_upstream_job ${CI_PARENT_PIPELINE_ID} setup-test-env
-  - download_artifacts_from_upstream_job ${CI_PARENT_PIPELINE_ID} retrieve-tests-metadata
-  - download_artifacts_from_upstream_job ${CI_PARENT_PIPELINE_ID} 'compile-test-assets as-if-foss'
-
 .base-script: &base-script
   # Only install knapsack after bundle install! Otherwise oddly some native
   # gems could not be found under some circumstance. No idea why, hours wasted.
@@ -35,15 +23,46 @@ include:
   - run_timed_command "scripts/gitaly-test-spawn"
   - source ./scripts/rspec_helpers.sh
 
+.needs-test-artifacts:
+  needs:
+    - project: $CI_PROJECT_PATH
+      job: setup-test-env
+      ref: $CI_COMMIT_SHA
+      artifacts: true
+    - project: $retrieve-tests-metadata
+      job: setup-test-env
+      ref: $CI_COMMIT_SHA
+      artifacts: true
+    - project: $CI_PROJECT_PATH
+      job: compile-test-assets
+      ref: $CI_COMMIT_SHA
+      artifacts: true
+
+.needs-test-artifacts-as-if-foss:
+  needs:
+    - project: $CI_PROJECT_PATH
+      job: setup-test-env
+      ref: $CI_COMMIT_SHA
+      artifacts: true
+    - project: $CI_PROJECT_PATH
+      job: retrieve-tests-metadata
+      ref: $CI_COMMIT_SHA
+      artifacts: true
+    - project: $CI_PROJECT_PATH
+      job: compile-test-assets as-if-foss
+      ref: $CI_COMMIT_SHA
+      artifacts: true
+
 .rspec-base:
-  extends: .rails-job-base
+  extends:
+    - .rails-job-base
+    - .needs-test-artifacts
   stage: test
   variables:
     RUBY_GC_MALLOC_LIMIT: 67108864
     RUBY_GC_MALLOC_LIMIT_MAX: 134217728
     CRYSTALBALL: "true"
   script:
-    - *download-artifacts
     - *base-script
     - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag ~level:migration"
   artifacts:
@@ -65,14 +84,14 @@ include:
 .rspec-base-migration:
   extends: .rails:rules:ee-and-foss-migration
   script:
-    - *download-artifacts
     - *base-script
     - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag level:migration"
 
 .rspec-base-migration-as-if-foss:
-  extends: .rails:rules:ee-and-foss-migration
+  extends:
+    - .rails:rules:ee-and-foss-migration
+    - .needs-test-artifacts-as-if-foss
   script:
-    - *download-artifacts-as-if-foss
     - *base-script
     - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag level:migration"
 
@@ -92,7 +111,6 @@ include:
     - .as-if-foss
     - .use-pg11
   script:
-    - *download-artifacts-as-if-foss
     - *base-script
     - rspec_paralellized_job "--tag ~quarantine --tag ~geo --tag ~level:migration"
 
@@ -109,7 +127,6 @@ include:
 .rspec-ee-base-geo:
   extends: .rspec-base
   script:
-    - *download-artifacts
     - *base-script
     - rspec_paralellized_job "--tag ~quarantine --tag geo"
 
