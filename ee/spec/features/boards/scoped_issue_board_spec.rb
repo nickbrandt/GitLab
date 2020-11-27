@@ -297,6 +297,9 @@ RSpec.describe 'Scoped issue boards', :js do
           visit project_boards_path(project)
 
           update_board_label(label_title)
+
+          wait_for_all_requests
+
           update_board_label(label_2_title)
 
           expect(page).to have_css('.js-visual-token')
@@ -455,7 +458,7 @@ RSpec.describe 'Scoped issue boards', :js do
     it "doesn't show the input when creating a board" do
       click_on_create_new_board
 
-      page.within '.js-boards-selector' do
+      page.within '.js-board-config-modal' do
         # To make sure the form is shown
         expect(page).to have_field('board-new-name')
 
@@ -469,14 +472,14 @@ RSpec.describe 'Scoped issue boards', :js do
   end
 
   def expect_dot_highlight(button_title)
-    button = first('.filter-dropdown-container .btn.btn-inverted')
+    button = first('.filter-dropdown-container .btn.gl-button')
     expect(button.text).to include(button_title)
     expect(button[:class]).to include('dot-highlight')
     expect(button['title']).to include('This board\'s scope is reduced')
   end
 
   def expect_no_dot_highlight(button_title)
-    button = first('.filter-dropdown-container .btn.btn-inverted')
+    button = first('.filter-dropdown-container .btn.gl-button')
     expect(button.text).to include(button_title)
     expect(button[:class]).not_to include('dot-highlight')
     expect(button['title']).not_to include('This board\'s scope is reduced')
