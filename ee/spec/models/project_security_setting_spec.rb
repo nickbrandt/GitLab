@@ -49,7 +49,7 @@ RSpec.describe ProjectSecuritySetting do
       end
     end
 
-    context 'when a auto_fix setting is turned for available features' do
+    context 'when a auto_fix setting is disabled for available features' do
       before do
         setting.auto_fix_container_scanning = false
         setting.auto_fix_dependency_scanning = false
