@@ -31,7 +31,7 @@ module Banzai
 
       def create_image_src(type, format, text)
         ::AsciidoctorExtensions::KrokiDiagram.new(type, format, text)
-            .get_diagram_uri(settings.kroki_url)
+          .get_diagram_uri(settings.kroki_url)
       end
 
       def settings
