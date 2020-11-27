@@ -293,13 +293,15 @@ rspec:coverage:
     - .rails:rules:rspec-coverage
   stage: post-test
   needs:
-    - rspec-child-pipeline
+    - project: $CI_PROJECT_PATH
+      job: rspec-gather-artifacts
+      ref: $CI_COMMIT_SHA
+      artifacts: true
     - setup-test-env
     - memory-static
     - memory-on-boot
   script:
     - install_gitlab_gem
-    - download_artifacts_from_downstream_job rspec-child-pipeline rspec-gather-artifacts
     - run_timed_command "bundle install --jobs=$(nproc) --path=vendor --retry=3 --quiet --without default development test production puma unicorn kerberos metrics omnibus ed25519"
     - run_timed_command "bundle exec scripts/merge-simplecov"
     - run_timed_command "bundle exec scripts/gather-test-memory-data"
@@ -320,13 +322,15 @@ rspec:feature-flags:
     - .rails:rules:rspec-feature-flags
   stage: post-test
   needs:
-    - rspec-child-pipeline
+    - project: $CI_PROJECT_PATH
+      job: rspec-gather-artifacts
+      ref: $CI_COMMIT_SHA
+      artifacts: true
     - setup-test-env
     - memory-static
     - memory-on-boot
   script:
     - install_gitlab_gem
-    - download_artifacts_from_downstream_job rspec-child-pipeline rspec-gather-artifacts
     - run_timed_command "bundle install --jobs=$(nproc) --path=vendor --retry=3 --quiet --without default development test production puma unicorn kerberos metrics omnibus ed25519"
     - run_timed_command "bundle exec scripts/used-feature-flags"
 # EE/FOSS: default refs (MRs, master, schedules) jobs #
