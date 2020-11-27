@@ -8,6 +8,7 @@ RSpec.describe 'issue header', :js do
   let_it_be(:issue) { create(:issue, project: project) }
   let_it_be(:closed_issue) { create(:issue, :closed, project: project) }
   let_it_be(:closed_locked_issue) { create(:issue, :closed, :locked, project: project) }
+  let_it_be(:authored_issue) { create(:issue, project: project, author: user) }
 
   context 'when user has permission to update' do
     before do
@@ -23,15 +24,9 @@ RSpec.describe 'issue header', :js do
         click_button 'Issue actions'
       end
 
-      it 'has "New issue" item' do
+      it 'only shows the "New issue" and "Report abuse" items', :aggregate_failures do
         expect(page).to have_link 'New issue'
-      end
-
-      it 'has "Report abuse" item' do
         expect(page).to have_link 'Report abuse'
-      end
-
-      it 'does not have "Submit as spam" item' do
         expect(page).not_to have_link 'Submit as spam'
       end
     end
@@ -67,11 +62,7 @@ RSpec.describe 'issue header', :js do
     end
 
     context 'when the current user is the issue author' do
-      let(:authored_issue) { create(:issue, project: project) }
-
       before do
-        authored_issue.update!(author: user)
-
         visit project_issue_path(project, authored_issue)
       end
 
@@ -121,15 +112,9 @@ RSpec.describe 'issue header', :js do
         click_button 'Issue actions'
       end
 
-      it 'has "New issue" item' do
+      it 'only shows the "New issue" and "Report abuse" items', :aggregate_failures do
         expect(page).to have_link 'New issue'
-      end
-
-      it 'has "Report abuse" item' do
         expect(page).to have_link 'Report abuse'
-      end
-
-      it 'does not have "Submit as spam" item' do
         expect(page).not_to have_link 'Submit as spam'
       end
     end
@@ -165,11 +150,7 @@ RSpec.describe 'issue header', :js do
     end
 
     context 'when the current user is the issue author' do
-      let(:authored_issue) { create(:issue, project: project) }
-
       before do
-        authored_issue.update!(author: user)
-
         visit project_issue_path(project, authored_issue)
       end
 
