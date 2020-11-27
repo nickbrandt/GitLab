@@ -469,6 +469,8 @@ module ProjectsHelper
   end
 
   def can_view_operations_tab?(current_user, project)
+    return false unless project.feature_available?(:operations, current_user)
+
     [
       :metrics_dashboard,
       :read_alert_management_alert,
@@ -624,6 +626,7 @@ module ProjectsHelper
       lfsEnabled: !!project.lfs_enabled,
       emailsDisabled: project.emails_disabled?,
       metricsDashboardAccessLevel: feature.metrics_dashboard_access_level,
+      operationsAccessLevel: feature.operations_access_level,
       showDefaultAwardEmojis: project.show_default_award_emojis?
     }
   end
