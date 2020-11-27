@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe JiraConnect::SyncProjectWorker, factory_default: :keep do
   describe '#perform' do
-    let_it_be(:project) { create_default(:project) }
+    let_it_be(:project) { create_default(:project, :repository) }
     let!(:mr_with_jira_title) { create(:merge_request, :unique_branches, title: 'TEST-123') }
     let!(:mr_with_jira_description) { create(:merge_request, :unique_branches, description: 'TEST-323') }
     let!(:mr_with_other_title) { create(:merge_request, :unique_branches) }
@@ -13,12 +13,16 @@ RSpec.describe JiraConnect::SyncProjectWorker, factory_default: :keep do
     let(:jira_connect_sync_service) { JiraConnect::SyncService.new(project) }
     let(:job_args) { [project.id, update_sequence_id] }
     let(:update_sequence_id) { 1 }
+    let(:jira_referencing_branch_name) { 'TEST-123_my-feature-branch' }
 
     before do
       stub_request(:post, 'https://sample.atlassian.net/rest/devinfo/0.10/bulk').to_return(status: 200, body: '', headers: {})
 
       jira_connect_sync_service
       allow(JiraConnect::SyncService).to receive(:new) { jira_connect_sync_service }
+
+      project.repository.create_branch('my-feature-branch')
+      project.repository.create_branch(jira_referencing_branch_name)
     end
 
     context 'when the project is not found' do
@@ -43,6 +47,7 @@ RSpec.describe JiraConnect::SyncProjectWorker, factory_default: :keep do
             Atlassian::JiraConnect::Serializers::RepositoryEntity.represent(
               project,
               merge_requests: [mr_with_jira_description, mr_with_jira_title],
+              branches: [project.repository.find_branch(jira_referencing_branch_name)],
               update_sequence_id: update_sequence_id
             )
           ]
@@ -61,13 +66,15 @@ RSpec.describe JiraConnect::SyncProjectWorker, factory_default: :keep do
         let!(:most_recent_merge_request) { create(:merge_request, :unique_branches, description: 'TEST-323', title: 'TEST-123') }
 
         before do
-          stub_const("#{described_class}::MERGE_REQUEST_LIMIT", 1)
+          stub_const("#{described_class}::MAX_RECORDS_LIMIT", 1)
+
+          project.repository.create_branch('TEST-321_new-branch')
         end
 
-        it 'syncs only the most recent merge requests within the limit' do
+        it 'syncs only the most recent merge requests within the limit and limits the number of branches' do
           expect(jira_connect_sync_service).to receive(:execute)
             .exactly(IdempotentWorkerHelper::WORKER_EXEC_TIMES).times
-            .with(merge_requests: [most_recent_merge_request], update_sequence_id: update_sequence_id)
+            .with(merge_requests: [most_recent_merge_request], branches: [kind_of(Gitlab::Git::Branch)], update_sequence_id: update_sequence_id)
 
           subject
         end
