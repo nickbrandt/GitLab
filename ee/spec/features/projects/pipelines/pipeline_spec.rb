@@ -63,11 +63,9 @@ RSpec.describe 'Pipeline', :js do
       it 'renders downstream pipeline' do
         subject
 
-        within '[data-qa-selector="child_pipeline"]:nth-child(1)' do
-          expect(page).to have_content(downstream_pipeline.id)
-          expect(page).to have_content(downstream_pipeline.project.name)
-          expect(page).to have_content(downstream_pipeline.source_job.name)
-        end
+        expect(page).to have_content(downstream_pipeline.id)
+        expect(page).to have_content(downstream_pipeline.project.name)
+        expect(page).to have_content(downstream_pipeline.source_job.name)
       end
 
       context 'expands the downstream pipeline on click' do
