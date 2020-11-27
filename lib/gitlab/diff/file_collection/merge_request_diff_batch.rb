@@ -65,12 +65,12 @@ module Gitlab
         # rubocop: disable CodeReuse/ActiveRecord
         def load_paginated_collection(batch_page, batch_size, diff_options)
           batch_page ||= DEFAULT_BATCH_PAGE
-          batch_size = [batch_size.to_i, DEFAULT_BATCH_SIZE].min
+          batch_size ||= DEFAULT_BATCH_SIZE
 
           paths = diff_options&.fetch(:paths, nil)
 
           paginated_collection = if batch_gradual_load?
-                                   relation.offset(batch_page).limit(batch_size)
+                                   relation.offset(batch_page).limit([batch_size.to_i, DEFAULT_BATCH_SIZE].min)
                                  else
                                    relation.page(batch_page).per(batch_size)
                                  end
