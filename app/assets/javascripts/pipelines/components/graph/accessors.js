@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import { REST, GRAPHQL } from './constants';
-
-export const accessors = {
-  [REST]: {
-    groupId: 'id',
-  },
-  [GRAPHQL]: {
-    groupId: 'name',
-  },
-};
-=======
 import { get } from 'lodash';
 import { REST, GRAPHQL } from './constants';
 
@@ -35,4 +23,3 @@ const accessValue = (dataMethod, prop, item) => {
 };
 
 export { accessors, accessValue };
->>>>>>> 5a4bf1b75d7 (Changes for accessors)
