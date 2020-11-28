@@ -1,0 +1,5 @@
+---
+title: Move dynamic pipeline counts on MR page to db columns
+merge_request: 48280
+author:
+type: performance
