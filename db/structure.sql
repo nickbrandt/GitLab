@@ -13830,6 +13830,9 @@ CREATE TABLE merge_requests (
     squash_commit_sha bytea,
     sprint_id bigint,
     merge_ref_sha bytea,
+    total_pipelines_count integer,
+    source_project_pipelines_count integer,
+    target_project_pipelines_count integer,
     CONSTRAINT check_970d272570 CHECK ((lock_version IS NOT NULL))
 );
 
