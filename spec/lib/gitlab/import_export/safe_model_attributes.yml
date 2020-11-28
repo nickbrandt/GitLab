@@ -207,6 +207,8 @@ MergeRequest:
 - discussion_locked
 - allow_maintainer_to_push
 - merge_ref_sha
+- source_project_pipelines_count
+- target_project_pipelines_count
 MergeRequestDiff:
 - id
 - state
