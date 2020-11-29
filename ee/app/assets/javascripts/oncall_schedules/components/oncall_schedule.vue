@@ -1,14 +1,15 @@
 <script>
-import { GlSprintf, GlCard, GlButtonGroup, GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
+import { GlSprintf, GlCard, GlButtonGroup, GlButton, GlModalDirective } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
 import ScheduleShell from './schedule/components/schedul_shell.vue';
+import deleteScheduleModal from './delete_schedule_modal.vue';
+import editScheduleModal from './edit_schedule_modal.vue';
 import { getTimeframeForPreset } from './schedule/utils/roadmap_utils';
 import { PRESET_TYPES } from '../../roadmap/constants';
 
 export const i18n = {
   title: s__('OnCallSchedules|On-call schedule'),
   scheduleForTz: s__('OnCallSchedules|On-call schedule for the %{tzShort}'),
-  deleteSchedule: s__('OnCallSchedules|Delete schedule'),
 };
 
 export default {
@@ -20,7 +21,8 @@ export default {
     GlCard,
     GlButtonGroup,
     GlButton,
-    GlModal,
+    editScheduleModal,
+    deleteScheduleModal,
     ScheduleShell,
   },
   directives: {
@@ -44,24 +46,10 @@ export default {
         // TODO $refs is never defined here: window.innerWidth - this.$refs.scheduleContainer.offsetLeft,
       );
     },
-    primaryProps() {
-      return {
-        text: this.$options.i18n.deleteSchedule,
-        attributes: [{ category: 'primary' }, { variant: 'danger' }],
-      };
-    },
-    cancelProps() {
-      return {
-        text: __('Cancel'),
-      };
-    },
   },
   methods: {
     getFormattedTimezone(tz) {
       return __(`(UTC${tz.formatted_offset}) ${tz.abbr} ${tz.name}`);
-    },
-    deleteSchedule() {
-      this.$emit('delete-schedule', { id: this.schedule.id });
     },
   },
 };
@@ -75,8 +63,8 @@ export default {
         <div class="gl-display-flex gl-justify-content-space-between">
           <span class="gl-font-weight-bold gl-font-lg">{{ schedule.name }}</span>
           <gl-button-group>
-            <gl-button icon="pencil" />
-            <gl-button v-gl-modal.deleteSchedule icon="remove" />
+            <gl-button v-gl-modal.editScheduleModal icon="pencil" />
+            <gl-button v-gl-modal.deleteScheduleModal icon="remove" />
           </gl-button-group>
         </div>
       </template>
@@ -94,22 +82,7 @@ export default {
         <schedule-shell :preset-type="$options.presetType" :timeframe="timeframe" :epics="[]" />
       </div>
     </gl-card>
-    <gl-modal
-      modal-id="deleteSchedule"
-      :title="$options.i18n.deleteSchedule"
-      :action-primary="primaryProps"
-      :action-cancel="cancelProps"
-      @primary="deleteSchedule"
-    >
-      <gl-sprintf
-        :message="
-          s__(
-            'OnCallSchedules|Are you sure you want to delete the %{deleteSchedule} schedule. This action cannot be undone.',
-          )
-        "
-      >
-        <template #deleteSchedule>{{ schedule.name }}</template>
-      </gl-sprintf>
-    </gl-modal>
+    <delete-schedule-modal :schedule="schedule" />
+    <edit-schedule-modal :schedule="schedule" />
   </div>
 </template>

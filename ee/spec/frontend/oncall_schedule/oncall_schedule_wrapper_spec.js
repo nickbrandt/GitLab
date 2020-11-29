@@ -6,18 +6,18 @@ import OnCallScheduleWrapper, {
   i18n,
 } from 'ee/oncall_schedules/components/oncall_schedules_wrapper.vue';
 import OncallSchedule from 'ee/oncall_schedules/components/oncall_schedule.vue';
-import getOncallSchedulesQuery from 'ee/oncall_schedules/graphql/get_oncall_schedules.query.graphql';
+import getOncallSchedulesQuery from 'ee/oncall_schedules/graphql/queries/get_oncall_schedules.query.graphql';
 import destroyOncallScheduleMutation from 'ee/oncall_schedules/graphql/mutations/destroy_oncall_schedule.mutation.graphql';
 import { DELETE_SCHEDULE_ERROR } from 'ee/oncall_schedules/utils/error_messages';
 import createFlash from '~/flash';
 import {
-  timezones,
   projectPath,
   getOncallSchedulesQueryResponse,
   destroyScheduleResponse,
   scheduleToDestroy,
   destroyScheduleResponseWithErrors,
 } from './mocks/apollo_mock';
+import mockTimezones from './mocks/mockTimezones.json';
 
 jest.mock('~/flash');
 
@@ -29,7 +29,7 @@ describe('OnCallScheduleWrapper', () => {
   let destroyScheduleHandler;
   const emptyOncallSchedulesSvgPath = 'illustration/path.svg';
 
-  const findSchedules = () => wrapper.find(OncallSchedule);
+  const findSchedules = () => wrapper.find(OncallSchedule).findAll('.gl-card');
   const findEmptyState = () => wrapper.find(GlEmptyState);
 
   async function destroySchedule(localWrapper) {
@@ -53,7 +53,7 @@ describe('OnCallScheduleWrapper', () => {
       provide: {
         emptyOncallSchedulesSvgPath,
         projectPath,
-        timezones,
+        timezones: mockTimezones,
         ...provide,
       },
       mocks: {
@@ -89,7 +89,7 @@ describe('OnCallScheduleWrapper', () => {
       provide: {
         emptyOncallSchedulesSvgPath,
         projectPath,
-        timezones,
+        timezones: mockTimezones,
       },
     });
   }
