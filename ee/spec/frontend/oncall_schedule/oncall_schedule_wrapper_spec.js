@@ -3,9 +3,25 @@ import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import OnCallScheduleWrapper, {
   i18n,
 } from 'ee/oncall_schedules/components/oncall_schedules_wrapper.vue';
-import OnCallSchedule from 'ee/oncall_schedules/components/oncall_schedule.vue';
+import OncallSchedule from 'ee/oncall_schedules/components/oncall_schedule.vue';
+import getOncallSchedulesQuery from 'ee/oncall_schedules/graphql/get_oncall_schedules.query.graphql';
+import destroyOncallScheduleMutation from 'ee/oncall_schedules/graphql/mutations/destroy_oncall_schedule.mutation.graphql';
+import { DELETE_SCHEDULE_ERROR } from 'ee/oncall_schedules/utils/error_messages';
+import createFlash from '~/flash';
+import {
+  projectPath,
+  getOncallSchedulesQueryResponse,
+  destroyScheduleResponse,
+  scheduleToDestroy,
+  destroyScheduleResponseWithErrors,
+} from './mocks/apollo_mock';
+import mockTimezones from './mocks/mockTimezones.json';
 
-describe('On-call schedule wrapper', () => {
+jest.mock('~/flash');
+
+const localVue = createLocalVue();
+
+describe('OnCallScheduleWrapper', () => {
   let wrapper;
   let fakeApollo;
   let destroyScheduleHandler;
@@ -21,7 +37,7 @@ describe('On-call schedule wrapper', () => {
       },
     };
 
-  const findSchedules = () => wrapper.find(OncallSchedule);
+  const findSchedules = () => wrapper.find(OncallSchedule).findAll('.gl-card');
   const findEmptyState = () => wrapper.find(GlEmptyState);
 
   async function destroySchedule(localWrapper) {
@@ -45,7 +61,7 @@ describe('On-call schedule wrapper', () => {
       provide: {
         emptyOncallSchedulesSvgPath,
         projectPath,
-        timezones,
+        timezones: mockTimezones,
         ...provide,
       },
       mocks: {
@@ -82,7 +98,7 @@ describe('On-call schedule wrapper', () => {
       provide: {
         emptyOncallSchedulesSvgPath,
         projectPath,
-        timezones,
+        timezones: mockTimezones,
       },
     });
   }
