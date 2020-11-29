@@ -79,6 +79,22 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
     end
   end
 
+  describe 'callbacks' do
+    context 'after_create' do
+      let(:merge_request) { create(:merge_request) }
+      let!(:original_pipeline) { create(:ci_pipeline, merge_request: merge_request) }
+      let(:fresh_pipeline) { create(:ci_pipeline, merge_request: merge_request) }
+
+      describe '#increment_pipeline_count' do
+        it 'increments the source and target counts for the pipeline\'s merge request' do
+          expect { fresh_pipeline }
+            .to change { merge_request.reload.target_project_pipelines_count.to_i }.by(1)
+            .and change { merge_request.reload.source_project_pipelines_count.to_i }.by(1)
+        end
+      end
+    end
+  end
+
   describe '#set_status' do
     where(:from_status, :to_status) do
       from_status_names = described_class.state_machines[:status].states.map(&:name)
