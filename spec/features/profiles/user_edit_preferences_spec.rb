@@ -10,26 +10,6 @@ RSpec.describe 'User edit preferences profile', :js do
     visit(profile_preferences_path)
   end
 
-  it 'allows the user to toggle their time format preference' do
-    field = page.find_field("user[time_format_in_24h]")
-
-    expect(field).not_to be_checked
-
-    field.click
-
-    expect(field).to be_checked
-  end
-
-  it 'allows the user to toggle their time display preference' do
-    field = page.find_field("user[time_display_relative]")
-
-    expect(field).to be_checked
-
-    field.click
-
-    expect(field).not_to be_checked
-  end
-
   describe 'User changes tab width to acceptable value' do
     it 'shows success message' do
       fill_in 'Tab width', with: 9
@@ -61,19 +41,6 @@ RSpec.describe 'User edit preferences profile', :js do
       page.execute_script("document.querySelector('#user_tab_width').setAttribute('min', '-1')")
       click_button 'Save changes'
       expect(page).to have_content('Failed to save preferences.')
-    end
-  end
-
-  describe 'User language' do
-    let(:user) { create(:user, preferred_language: :es) }
-
-    it 'shows the user preferred language by default' do
-      expect(page).to have_select(
-        'user[preferred_language]',
-        selected: 'Spanish - español',
-        options: Gitlab::I18n.selectable_locales.values,
-        visible: :all
-      )
     end
   end
 end

@@ -1,10 +1,11 @@
 <script>
-import { GlFormText, GlIcon, GlLink } from '@gitlab/ui';
+import { GlFormGroup, GlFormText, GlIcon, GlLink } from '@gitlab/ui';
 import IntegrationHelpText from '~/vue_shared/components/integrations_help_text.vue';
 
 export default {
   name: 'IntegrationView',
   components: {
+    GlFormGroup,
     GlFormText,
     GlIcon,
     GlLink,
@@ -53,7 +54,7 @@ export default {
     <gl-link class="has-tooltip" title="More information" :href="helpLink">
       <gl-icon name="question-o" class="vertical-align-middle" />
     </gl-link>
-    <div class="form-group form-check" data-testid="profile-preferences-integration-form-group">
+    <gl-form-group class="form-check" data-testid="profile-preferences-integration-form-group">
       <!-- Necessary for Rails to receive the value when not checked -->
       <input
         :name="formName"
@@ -76,6 +77,6 @@ export default {
       <gl-form-text tag="div">
         <integration-help-text :message="message" :message-url="messageUrl" />
       </gl-form-text>
-    </div>
+    </gl-form-group>
   </div>
 </template>

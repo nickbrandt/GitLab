@@ -1,3 +1,14 @@
+export const firstDayOfWeekChoicesWithDefault = [
+  ['Monday', '1'],
+  ['Sunday', '7'],
+];
+
+export const languageChoices = [
+  ['English', 'en'],
+  ['Danish', 'da'],
+  ['Swedish', 'swe'],
+];
+
 export const integrationViews = [
   {
     name: 'sourcegraph',
@@ -15,6 +26,12 @@ export const integrationViews = [
 
 export const userFields = {
   foo_enabled: true,
+  preferred_language: 'en',
+  first_day_of_week: 1,
+};
+
+export const glFeatures = {
+  userTimeSettings: true,
 };
 
 export const bodyClasses = 'ui-light-indigo ui-light gl-dark';

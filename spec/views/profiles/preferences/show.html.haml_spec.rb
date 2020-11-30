@@ -58,14 +58,4 @@ RSpec.describe 'profiles/preferences/show' do
       expect(rendered).to have_content('Choose what content you want to see on your homepage.')
     end
   end
-
-  context 'localization' do
-    before do
-      render
-    end
-
-    it 'has an id for anchoring' do
-      expect(rendered).to have_css('#localization')
-    end
-  end
 end
