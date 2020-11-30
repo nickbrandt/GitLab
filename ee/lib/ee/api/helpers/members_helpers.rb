@@ -76,19 +76,6 @@ module EE
           ).for_member(member).security_event
         end
 
-        def paginate_billable_from_user_ids(user_ids, params = {})
-          paginated = paginate(::Kaminari.paginate_array(user_ids))
-
-          users_as_hash = ::User
-            .id_in(paginated)
-            .sort_by_attribute(::GroupMember.sorting_for(params[:sort]))
-            .index_by(&:id)
-
-          # map! ensures same paginatable array is manipulated
-          # instead of creating a new non-paginatable array
-          paginated.map! { |user_id| users_as_hash[user_id] }
-        end
-
         class << self
           include ::SortingHelper
 

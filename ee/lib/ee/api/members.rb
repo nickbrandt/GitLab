@@ -58,7 +58,7 @@ module EE
             bad_request!(nil) if group.subgroup?
             bad_request!(nil) unless ::Ability.allowed?(current_user, :admin_group_member, group)
 
-            users = paginate_billable_from_user_ids(group.billed_user_ids_for(params[:search], params[:sort]), params)
+            users = paginate(group.billed_users_for(params[:search], params[:sort]))
 
             present users, with: ::API::Entities::UserBasic, current_user: current_user
           end
