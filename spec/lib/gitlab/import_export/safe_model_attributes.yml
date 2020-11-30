@@ -207,6 +207,7 @@ MergeRequest:
 - discussion_locked
 - allow_maintainer_to_push
 - merge_ref_sha
+- total_pipelines_count
 - source_project_pipelines_count
 - target_project_pipelines_count
 MergeRequestDiff:
