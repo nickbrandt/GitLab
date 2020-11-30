@@ -52,9 +52,11 @@ class Projects::MergeRequests::ApplicationController < Projects::ApplicationCont
   end
 
   def set_pipeline_variables
-    @pipelines = Ci::PipelinesForMergeRequestFinder
-      .new(@merge_request, current_user)
-      .execute
+    @pipelines = pipeline_finder.execute
+  end
+
+  def pipeline_finder
+    Ci::PipelinesForMergeRequestFinder.new(@merge_request, current_user)
   end
 
   def close_merge_request_if_no_source_project
