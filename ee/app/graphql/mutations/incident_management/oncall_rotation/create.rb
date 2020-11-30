@@ -29,7 +29,7 @@ module Mutations
                  description: 'The rotation length of the on-call rotation'
 
         argument :participant_usernames,
-                 [GraphQL::STRING_TYPE],
+                 [Types::IncidentManagement::OncallUserInputType],
                  required: true,
                  description: 'The usernames to participate in the on-call rotation.'
 
@@ -46,7 +46,8 @@ module Mutations
             schedule,
             project,
             current_user,
-            params
+            params,
+            find_participants(args[:participant_usernames])
           ).execute
 
           errors = result.error? ? [result.message] : []
@@ -60,7 +61,6 @@ module Mutations
         private
 
         def prepare_params(args, schedule)
-          participants = find_participants(args[:participant_usernames])
           rotation_length = args[:rotation_length][:length]
           rotation_length_unit = args[:rotation_length][:unit]
           starts_at = parse_start_time(schedule, args)
@@ -68,8 +68,7 @@ module Mutations
           args.slice(:name).merge(
             rotation_length: rotation_length,
             rotation_length_unit: rotation_length_unit,
-            starts_at: starts_at,
-            participants: participants
+            starts_at: starts_at
           )
         end
 
@@ -81,8 +80,17 @@ module Mutations
           resolve_project(full_path: full_path)
         end
 
-        def find_participants(usernames)
-          UsersFinder.new(current_user, username: usernames).execute
+        def find_participants(user_array)
+          usernames = user_array.map(&:username)
+
+          matched_users = UsersFinder.new(current_user, username: usernames).execute
+
+          user_array.map do |user|
+            matched_user = matched_users.find { |u| u.username == user[:username] }
+            next unless matched_user.present?
+
+            user.to_h.merge(user: matched_user)
+          end.compact
         end
       end
     end

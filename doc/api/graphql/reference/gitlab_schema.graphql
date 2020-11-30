@@ -10277,7 +10277,7 @@ type IncidentManagementOncallRotation {
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): UserConnection
+  ): OncallUserTypeConnection
 
   """
   Time zone of the on-call schedule
@@ -14744,7 +14744,7 @@ input OncallRotationCreateInput {
   """
   The usernames to participate in the on-call rotation.
   """
-  participantUsernames: [String!]!
+  participantUsernames: [OncallUserInputType!]!
 
   """
   The project to create the on-call schedule in
@@ -14925,6 +14925,81 @@ type OncallScheduleDestroyPayload {
   The on-call schedule
   """
   oncallSchedule: IncidentManagementOncallSchedule
+}
+
+"""
+The rotation user and color palette
+"""
+input OncallUserInputType {
+  """
+  The color palette for the user
+  """
+  colorPalette: String
+
+  """
+  The color weight for the user
+  """
+  colorWeight: String
+
+  """
+  The username of the user to participate in the on-call rotation
+  """
+  username: String!
+}
+
+"""
+The rotation user and color palette
+"""
+type OncallUserType {
+  """
+  The color palette for the user
+  """
+  colorPalette: String
+
+  """
+  The color weight for the user
+  """
+  colorWeight: String
+
+  """
+  The user who is participating
+  """
+  user: User!
+}
+
+"""
+The connection type for OncallUserType.
+"""
+type OncallUserTypeConnection {
+  """
+  A list of edges.
+  """
+  edges: [OncallUserTypeEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [OncallUserType]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type OncallUserTypeEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: OncallUserType
 }
 
 """

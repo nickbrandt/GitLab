@@ -7,11 +7,13 @@ module IncidentManagement
       # @param project [Project]
       # @param user [User]
       # @param params [Hash]
-      def initialize(schedule, project, user, params)
+      # @participants participants [Array[Hash]]
+      def initialize(schedule, project, user, params, participants)
         @schedule = schedule
         @project = project
         @user = user
         @params = params
+        @participants = participants
       end
 
       def execute
@@ -21,6 +23,15 @@ module IncidentManagement
         oncall_rotation = schedule.oncall_rotations.create(params)
 
         return error_in_create(oncall_rotation) unless oncall_rotation.persisted?
+
+        participants.each do |participant|
+          OncallParticipant.create(
+            oncall_rotation: oncall_rotation,
+            participant: participant[:user],
+            color_palette:  participant[:color_palette],
+            color_weight: participant[:color_weight]
+          )
+        end
 
         success(oncall_rotation)
       end

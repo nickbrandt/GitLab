@@ -9,5 +9,7 @@ module IncidentManagement
 
     validates :oncall_rotation, presence: true
     validates :participant, presence: true, uniqueness: { scope: :oncall_rotation_id }
+
+    alias_attribute :user, :participant
   end
 end

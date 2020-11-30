@@ -12935,7 +12935,11 @@ ALTER SEQUENCE import_failures_id_seq OWNED BY import_failures.id;
 CREATE TABLE incident_management_oncall_participants (
     id bigint NOT NULL,
     oncall_rotation_id bigint NOT NULL,
-    user_id bigint NOT NULL
+    user_id bigint NOT NULL,
+    color_palette text,
+    color_weight text,
+    CONSTRAINT check_48e3872c49 CHECK ((char_length(color_weight) <= 4)),
+    CONSTRAINT check_961cd02646 CHECK ((char_length(color_palette) <= 10))
 );
 
 CREATE SEQUENCE incident_management_oncall_participants_id_seq
