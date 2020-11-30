@@ -52,15 +52,15 @@ export default {
 
       <div class="gl-text-gray-500 gl-mb-5">
         <gl-sprintf :message="$options.i18n.scheduleForTz">
-          <template #tzShort
-            ><span>{{ schedule.timezone }}</span></template
-          >
+          <template #tzShort>
+            <span>{{ schedule.timezone }}</span>
+          </template>
         </gl-sprintf>
         | <span>{{ tzLong }}</span>
       </div>
 
-      <div ref="scheduleContainer" class="gl-w-full">
-        <schedule-shell :preset-type="$options.presetType" :timeframe="timeframe" :epics="[]" />
+      <div class="gl-w-full">
+        <schedule-shell :preset-type="$options.presetType" :timeframe="timeframe" />
       </div>
     </gl-card>
   </div>

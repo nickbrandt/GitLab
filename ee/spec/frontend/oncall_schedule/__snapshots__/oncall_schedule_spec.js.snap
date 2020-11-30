@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`On-call schedule shows schedule title 1`] = `
+<div>
+  <h2>
+    On-call schedule
+  </h2>
+   
+  <div
+    class="gl-card"
+  >
+    <div
+      class="gl-card-header"
+    >
+      <span
+        class="gl-font-weight-bold gl-font-lg"
+      >
+        monitor schedule
+      </span>
+    </div>
+     
+    <div
+      class="gl-card-body"
+    >
+       
+      <div
+        class="gl-text-gray-500 gl-mb-5"
+      >
+        On-call schedule for the 
+        <span>
+          Pacific/Honolulu
+        </span>
+        
+      | 
+        <span>
+          (UTC-10:00) HST Hawaii
+        </span>
+      </div>
+       
+      <div
+        class="gl-w-full"
+      >
+        <schedule-shell-stub
+          presettype="WEEKS"
+          timeframe="31 Dec 2020,7 Jan 2021,14 Jan 2021"
+        />
+      </div>
+    </div>
+     
+    <!---->
+  </div>
+</div>
+`;
