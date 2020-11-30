@@ -17254,6 +17254,29 @@ CREATE SEQUENCE vulnerability_exports_id_seq
 
 ALTER SEQUENCE vulnerability_exports_id_seq OWNED BY vulnerability_exports.id;
 
+CREATE TABLE vulnerability_external_issue_links (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    author_id bigint NOT NULL,
+    vulnerability_id bigint NOT NULL,
+    link_type smallint DEFAULT 1 NOT NULL,
+    external_type smallint DEFAULT 1 NOT NULL,
+    external_project_key text NOT NULL,
+    external_issue_key text NOT NULL,
+    CONSTRAINT check_3200604f5e CHECK ((char_length(external_issue_key) <= 255)),
+    CONSTRAINT check_68cffd19b0 CHECK ((char_length(external_project_key) <= 255))
+);
+
+CREATE SEQUENCE vulnerability_external_issue_links_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE vulnerability_external_issue_links_id_seq OWNED BY vulnerability_external_issue_links.id;
+
 CREATE TABLE vulnerability_feedback (
     id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -18453,6 +18476,8 @@ ALTER TABLE ONLY users_statistics ALTER COLUMN id SET DEFAULT nextval('users_sta
 ALTER TABLE ONLY vulnerabilities ALTER COLUMN id SET DEFAULT nextval('vulnerabilities_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_exports ALTER COLUMN id SET DEFAULT nextval('vulnerability_exports_id_seq'::regclass);
+
+ALTER TABLE ONLY vulnerability_external_issue_links ALTER COLUMN id SET DEFAULT nextval('vulnerability_external_issue_links_id_seq'::regclass);
 
 ALTER TABLE ONLY vulnerability_feedback ALTER COLUMN id SET DEFAULT nextval('vulnerability_feedback_id_seq'::regclass);
 
@@ -19926,6 +19951,9 @@ ALTER TABLE ONLY vulnerabilities
 ALTER TABLE ONLY vulnerability_exports
     ADD CONSTRAINT vulnerability_exports_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY vulnerability_external_issue_links
+    ADD CONSTRAINT vulnerability_external_issue_links_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY vulnerability_feedback
     ADD CONSTRAINT vulnerability_feedback_pkey PRIMARY KEY (id);
 
@@ -20257,6 +20285,10 @@ CREATE UNIQUE INDEX idx_security_scans_on_build_and_scan_type ON security_scans 
 CREATE INDEX idx_security_scans_on_scan_type ON security_scans USING btree (scan_type);
 
 CREATE UNIQUE INDEX idx_serverless_domain_cluster_on_clusters_applications_knative ON serverless_domain_cluster USING btree (clusters_applications_knative_id);
+
+CREATE UNIQUE INDEX idx_vulnerability_ext_issue_links_on_vulne_id_and_ext_issue ON vulnerability_external_issue_links USING btree (vulnerability_id, external_type, external_project_key, external_issue_key);
+
+CREATE UNIQUE INDEX idx_vulnerability_ext_issue_links_on_vulne_id_and_link_type ON vulnerability_external_issue_links USING btree (vulnerability_id, link_type) WHERE (link_type = 1);
 
 CREATE UNIQUE INDEX idx_vulnerability_issue_links_on_vulnerability_id_and_issue_id ON vulnerability_issue_links USING btree (vulnerability_id, issue_id);
 
@@ -22428,6 +22460,10 @@ CREATE INDEX index_vulnerability_exports_on_group_id_not_null ON vulnerability_e
 
 CREATE INDEX index_vulnerability_exports_on_project_id_not_null ON vulnerability_exports USING btree (project_id) WHERE (project_id IS NOT NULL);
 
+CREATE INDEX index_vulnerability_external_issue_links_on_author_id ON vulnerability_external_issue_links USING btree (author_id);
+
+CREATE INDEX index_vulnerability_external_issue_links_on_vulnerability_id ON vulnerability_external_issue_links USING btree (vulnerability_id);
+
 CREATE INDEX index_vulnerability_feedback_on_author_id ON vulnerability_feedback USING btree (author_id);
 
 CREATE INDEX index_vulnerability_feedback_on_comment_author_id ON vulnerability_feedback USING btree (comment_author_id);
@@ -23457,6 +23493,9 @@ ALTER TABLE ONLY emails
 
 ALTER TABLE ONLY clusters
     ADD CONSTRAINT fk_f05c5e5a42 FOREIGN KEY (management_project_id) REFERENCES projects(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY vulnerability_external_issue_links
+    ADD CONSTRAINT fk_f07bb8233d FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY epics
     ADD CONSTRAINT fk_f081aa4489 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
@@ -24678,6 +24717,9 @@ ALTER TABLE ONLY vulnerability_occurrence_identifiers
 
 ALTER TABLE ONLY serverless_domain_cluster
     ADD CONSTRAINT fk_rails_e59e868733 FOREIGN KEY (clusters_applications_knative_id) REFERENCES clusters_applications_knative(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY vulnerability_external_issue_links
+    ADD CONSTRAINT fk_rails_e5ba7f7b13 FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY approval_merge_request_rule_sources
     ADD CONSTRAINT fk_rails_e605a04f76 FOREIGN KEY (approval_merge_request_rule_id) REFERENCES approval_merge_request_rules(id) ON DELETE CASCADE;
