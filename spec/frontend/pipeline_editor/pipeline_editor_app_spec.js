@@ -17,6 +17,7 @@ import { redirectTo, refreshCurrentPage, objectToQuery } from '~/lib/utils/url_u
 import {
   mockCiConfigPath,
   mockCiYml,
+  mockCiConfigQueryResponse,
   mockCommitId,
   mockCommitMessage,
   mockDefaultBranch,
@@ -28,6 +29,8 @@ import TextEditor from '~/pipeline_editor/components/text_editor.vue';
 import PipelineGraph from '~/pipelines/components/pipeline_graph/pipeline_graph.vue';
 import PipelineEditorApp from '~/pipeline_editor/pipeline_editor_app.vue';
 import CommitForm from '~/pipeline_editor/components/commit/commit_form.vue';
+
+import getCiConfig from '~/pipeline_editor/graphql/queries/ci_config.graphql';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);
@@ -45,6 +48,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   let mockMutate;
   let mockApollo;
   let mockBlobContentData;
+  let mockCiConfigData;
 
   const createComponent = ({
     props = {},
@@ -96,7 +100,8 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   };
 
   const createComponentWithApollo = ({ props = {}, mountFn = shallowMount } = {}) => {
-    mockApollo = createMockApollo([], {
+    const handlers = [[getCiConfig, mockCiConfigData]];
+    const resolvers = {
       Query: {
         blobContent() {
           return {
@@ -105,7 +110,9 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
           };
         },
       },
-    });
+    };
+
+    mockApollo = createMockApollo(handlers, resolvers);
 
     const options = {
       localVue,
@@ -125,10 +132,12 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
 
   beforeEach(() => {
     mockBlobContentData = jest.fn();
+    mockCiConfigData = jest.fn().mockResolvedValue(mockCiConfigQueryResponse);
   });
 
   afterEach(() => {
     mockBlobContentData.mockReset();
+    mockCiConfigData.mockReset();
     refreshCurrentPage.mockReset();
     redirectTo.mockReset();
     mockMutate.mockReset();
@@ -182,7 +191,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         contentModel: mockCiYml,
       });
 
-      await nextTick();
+      await waitForPromises();
     });
 
     it('displays content after the query loads', () => {
