@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe EpicBoardPosition do
+RSpec.describe Boards::EpicBoardPosition do
   let_it_be(:epic) { create(:epic) }
   let_it_be(:group) { create(:group) }
   let_it_be(:board) { create(:board, group: group) }
