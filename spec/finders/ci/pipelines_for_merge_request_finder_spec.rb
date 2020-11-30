@@ -3,23 +3,23 @@
 require 'spec_helper'
 
 RSpec.describe Ci::PipelinesForMergeRequestFinder do
+  include ProjectForksHelper
+
+  let_it_be(:developer_in_parent) { create(:user) }
+  let_it_be(:developer_in_fork) { create(:user) }
+  let_it_be(:developer_in_both) { create(:user) }
+  let_it_be(:reporter_in_parent_and_developer_in_fork) { create(:user) }
+  let_it_be(:external_user) { create(:user) }
+  let_it_be(:parent_project) { create(:project, :repository, :private) }
+  let_it_be(:forked_project) { fork_project(parent_project, nil, repository: true, target_project: create(:project, :private, :repository)) }
+
+  let(:merge_request) do
+    create(:merge_request, source_project: forked_project, source_branch: 'feature',
+                           target_project: parent_project, target_branch: 'master')
+  end
+
   describe '#execute' do
-    include ProjectForksHelper
-
     subject { finder.execute }
-
-    let_it_be(:developer_in_parent) { create(:user) }
-    let_it_be(:developer_in_fork) { create(:user) }
-    let_it_be(:developer_in_both) { create(:user) }
-    let_it_be(:reporter_in_parent_and_developer_in_fork) { create(:user) }
-    let_it_be(:external_user) { create(:user) }
-    let_it_be(:parent_project) { create(:project, :repository, :private) }
-    let_it_be(:forked_project) { fork_project(parent_project, nil, repository: true, target_project: create(:project, :private, :repository)) }
-
-    let(:merge_request) do
-      create(:merge_request, source_project: forked_project, source_branch: 'feature',
-                             target_project: parent_project, target_branch: 'master')
-    end
 
     let!(:pipeline_in_parent) do
       create(:ci_pipeline, :merged_result_pipeline, merge_request: merge_request, project: parent_project)
@@ -240,6 +240,68 @@ RSpec.describe Ci::PipelinesForMergeRequestFinder do
         it 'includes the detached merge request pipeline even though the ref is custom path' do
           expect(merge_request.all_pipelines).to include(detached_merge_request_pipeline)
         end
+      end
+    end
+  end
+
+  describe '#pipeline_count' do
+    let!(:pipeline_in_parent) do
+      create(:ci_pipeline,
+        :merged_result_pipeline,
+        merge_request: merge_request,
+        project: parent_project
+      )
+    end
+
+    let!(:pipeline_in_fork) do
+      create(:ci_pipeline,
+        :merged_result_pipeline,
+        merge_request: merge_request,
+        project: forked_project
+      )
+    end
+
+    let(:target_count) { merge_request.target_project_pipelines_count }
+    let(:source_count) { merge_request.source_project_pipelines_count }
+
+    shared_examples "reports the expected number of pipelines" do
+      it "returns the correct count" do
+        expect(finder.pipeline_count).to eq(expected_count)
+        expect(finder.pipeline_count).to eq(finder.execute.size)
+      end
+    end
+
+    context "user has read access to both target and source projects" do
+      before do
+        parent_project.add_developer(developer_in_both)
+        forked_project.add_developer(developer_in_both)
+      end
+
+      it_behaves_like "reports the expected number of pipelines" do
+        let(:finder) { described_class.new(merge_request, developer_in_both) }
+        let(:expected_count) { target_count + source_count }
+      end
+    end
+
+    context "user has read access to only target (parent) project" do
+      before do
+        parent_project.add_developer(developer_in_parent)
+      end
+
+      it_behaves_like "reports the expected number of pipelines" do
+        let(:finder) { described_class.new(merge_request, developer_in_parent) }
+        let(:expected_count) { target_count }
+      end
+    end
+
+    context "user has read access to only source (fork) project" do
+      before do
+        forked_project.add_developer(developer_in_fork)
+      end
+
+      it_behaves_like "reports the expected number of pipelines" do
+        let(:finder) { described_class.new(merge_request, developer_in_fork) }
+        let(:expected_count) { source_count }
       end
     end
   end
