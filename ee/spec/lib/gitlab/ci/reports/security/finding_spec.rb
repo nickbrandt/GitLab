@@ -8,12 +8,12 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
   describe '#initialize' do
     subject { described_class.new(**params) }
 
-    let(:primary_identifier) { create(:ci_reports_security_identifier) }
-    let(:other_identifier) { create(:ci_reports_security_identifier) }
-    let(:link) { create(:ci_reports_security_link) }
-    let(:scanner) { create(:ci_reports_security_scanner) }
-    let(:location) { create(:ci_reports_security_locations_sast) }
-    let(:remediation) { create(:ci_reports_security_remediation) }
+    let_it_be(:primary_identifier) { build(:ci_reports_security_identifier) }
+    let_it_be(:other_identifier) { build(:ci_reports_security_identifier) }
+    let_it_be(:link) { build(:ci_reports_security_link) }
+    let_it_be(:scanner) { build(:ci_reports_security_scanner) }
+    let_it_be(:location) { build(:ci_reports_security_locations_sast) }
+    let_it_be(:remediation) { build(:ci_reports_security_remediation) }
 
     let(:params) do
       {
