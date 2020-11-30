@@ -136,7 +136,7 @@ export default {
     :description="$options.emptyStateDescription"
     :svg-path="emptyStateSvgPath"
     :primary-button-link="documentationPath"
-    :primary-button-text="__('More information')"
+    :primary-button-text="__('Learn more about threat monitoring')"
   />
 
   <section v-else>

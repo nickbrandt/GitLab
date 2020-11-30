@@ -25,6 +25,6 @@ export default {
     :svg-path="emptyStateSvgPath"
     :description="$options.DESCRIPTION"
     :primary-button-link="helpPath"
-    :primary-button-text="__('Learn more')"
+    :primary-button-text="__('Learn more about the security dashboard')"
   />
 </template>
