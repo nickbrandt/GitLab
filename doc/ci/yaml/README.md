@@ -1497,6 +1497,10 @@ In addition, `only` and `except` can use special keywords:
 | `triggers`               | For pipelines created by using a [trigger token](../triggers/README.md#trigger-token).                                                                                                                                           |
 | `web`                    | For pipelines created by using **Run pipeline** button in the GitLab UI, from the project's **CI/CD > Pipelines** section.                                                                                                       |
 
+Scheduled pipelines run on specific branches, so jobs configured with `only: branches`
+run on scheduled pipelines too. Add `except: schedules` to prevent jobs with `only: branches`
+from running on scheduled pipelines.
+
 In the example below, `job` runs only for refs that start with `issue-`,
 whereas all branches are skipped:
 
