@@ -1212,18 +1212,13 @@ module Ci
     def increment_pipeline_count
       return unless merge_request?
 
-      update_merge_request_pipeline_count(:target_project)
-      update_merge_request_pipeline_count(:source_project)
-    end
+      target_count = pipeline_finder.all.for_project(merge_request.target_project).count
+      source_count = pipeline_finder.all.for_project(merge_request.source_project).count
 
-    def update_merge_request_pipeline_count(target)
-      return unless [:target_project, :source_project].include?(target)
-
-      merge_request
-        .update_attribute(
-          "#{target}_pipelines_count".to_sym,
-          pipeline_finder.all.for_project(merge_request.send(target)).count # rubocop:disable GitlabSecurity/PublicSend
-        )
+      merge_request.update(
+        target_project_pipelines_count: target_count,
+        source_project_pipelines_count: source_count
+      )
     end
 
     def pipeline_finder
