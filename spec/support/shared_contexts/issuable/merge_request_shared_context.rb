@@ -17,7 +17,7 @@ RSpec.shared_context 'open merge request show action' do
     assign(:note, note)
     assign(:noteable, open_merge_request)
     assign(:notes, [])
-    assign(:pipelines, Ci::Pipeline.none)
+    assign(:pipelines_count, 0)
     assign(:issuable_sidebar, serialize_issuable_sidebar(user, project, open_merge_request))
 
     preload_view_requirements(open_merge_request, note)
@@ -51,7 +51,7 @@ RSpec.shared_context 'closed merge request show action' do
     assign(:note, note)
     assign(:noteable, closed_merge_request)
     assign(:notes, [])
-    assign(:pipelines, Ci::Pipeline.none)
+    assign(:pipelines_count, 0)
     assign(:issuable_sidebar, serialize_issuable_sidebar(user, project, closed_merge_request))
 
     preload_view_requirements(closed_merge_request, note)
