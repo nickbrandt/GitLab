@@ -33,8 +33,7 @@ module IncidentManagement
       end
 
       def available?
-        Feature.enabled?(:oncall_schedules_mvc, project) &&
-          project.feature_available?(:oncall_schedules)
+        ::Gitlab::IncidentManagement.oncall_schedules_available?(project)
       end
 
       def error(message)
