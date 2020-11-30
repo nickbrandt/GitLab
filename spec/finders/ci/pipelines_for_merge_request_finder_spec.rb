@@ -244,7 +244,7 @@ RSpec.describe Ci::PipelinesForMergeRequestFinder do
     end
   end
 
-  describe '#pipeline_count' do
+  describe '#pipelines_count' do
     let!(:pipeline_in_parent) do
       create(:ci_pipeline,
         :merged_result_pipeline,
@@ -266,8 +266,8 @@ RSpec.describe Ci::PipelinesForMergeRequestFinder do
 
     shared_examples "reports the expected number of pipelines" do
       it "returns the correct count" do
-        expect(finder.pipeline_count).to eq(expected_count)
-        expect(finder.pipeline_count).to eq(finder.execute.size)
+        expect(finder.pipelines_count).to eq(expected_count)
+        expect(finder.pipelines_count).to eq(finder.execute.size)
       end
     end
 

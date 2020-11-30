@@ -47,12 +47,13 @@ module Ci
 
     # Return count of pipelines that the user can read
     #
-    def pipeline_count
+    def pipelines_count
+      total_count = merge_request.total_pipelines_count
       target_count = merge_request.target_project_pipelines_count
       source_count = merge_request.source_project_pipelines_count
 
       if can_read_pipeline_in_target_project? && can_read_pipeline_in_source_project?
-        target_count + source_count
+        total_count
       elsif can_read_pipeline_in_source_project?
         source_count
       elsif can_read_pipeline_in_target_project?
