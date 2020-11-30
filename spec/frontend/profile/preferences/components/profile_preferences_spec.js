@@ -2,9 +2,13 @@ import { shallowMount } from '@vue/test-utils';
 
 import ProfilePreferences from '~/profile/preferences/components/profile_preferences.vue';
 import IntegrationView from '~/profile/preferences/components/integration_view.vue';
+import GroupOverviewSelector from '~/profile/preferences/components/group_overview_selector.vue';
 import {
-  languageChoices,
   firstDayOfWeekChoicesWithDefault,
+  dashboardChoices,
+  layoutChoices,
+  languageChoices,
+  projectViewChoices,
   integrationViews,
   userFields,
   featureFlags,
@@ -13,8 +17,11 @@ import {
 describe('ProfilePreferences component', () => {
   let wrapper;
   const defaultProvide = {
-    languageChoices,
     firstDayOfWeekChoicesWithDefault,
+    dashboardChoices,
+    layoutChoices,
+    languageChoices,
+    projectViewChoices,
     integrationViews: [],
     userFields,
     featureFlags: {},
@@ -34,6 +41,15 @@ describe('ProfilePreferences component', () => {
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
+  });
+
+  describe('Group view section', () => {
+    it('should render the empty component', () => {
+      wrapper = createComponent();
+      const groupOverviewSelector = wrapper.find(GroupOverviewSelector);
+      // exists() returns false on an empty wrapper: https://vue-test-utils.vuejs.org/api/wrapper/#exists
+      expect(groupOverviewSelector.exists()).toBe(false);
+    });
   });
 
   describe('Integrations section', () => {
@@ -57,6 +73,22 @@ describe('ProfilePreferences component', () => {
       expect(divider.exists()).toBe(true);
       expect(heading.exists()).toBe(true);
       expect(views).toHaveLength(integrationViews.length);
+    });
+  });
+
+  describe('with `viewDiffsFileByFile` feature flag enabled', () => {
+    it('should render diffs by file settings', () => {
+      wrapper = createComponent({ provide: { featureFlags } });
+      const diffsByFile = wrapper.find('[data-testid="view-diffs-file-by-file"]');
+      expect(diffsByFile.exists()).toBe(true);
+    });
+  });
+
+  describe('with `viewDiffsFileByFile` feature flag disabled', () => {
+    it('should not render diffs by file settings', () => {
+      wrapper = createComponent();
+      const diffsByFile = wrapper.find('[data-testid="view-diffs-file-by-file"]');
+      expect(diffsByFile.exists()).toBe(false);
     });
   });
 

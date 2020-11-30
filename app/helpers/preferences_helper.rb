@@ -45,6 +45,10 @@ module PreferencesHelper
     ]
   end
 
+  def group_view_choices
+    []
+  end
+
   def first_day_of_week_choices
     [
       [_('Sunday'), 0],

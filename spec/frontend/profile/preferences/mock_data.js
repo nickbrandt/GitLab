@@ -1,6 +1,15 @@
 export const firstDayOfWeekChoicesWithDefault = [['Monday', 1], ['Sunday', 7]];
 
+export const dashboardChoices = [
+  ['Your projects (default)', 'your_projects'],
+  ['Starred projects', 'starred'],
+];
+
+export const layoutChoices = [['Fixed', 'fixed'], ['Fluid', 'fluid']];
+
 export const languageChoices = [['English', 'en'], ['Danish', 'da'], ['Swedish', 'swe']];
+
+export const projectViewChoices = [['Files and Readme', 'files'], ['Activity', 'activity']];
 
 export const integrationViews = [
   {
@@ -22,5 +31,6 @@ export const userFields = {
 };
 
 export const featureFlags = {
+  viewDiffsFileByFile: true,
   userTimeSettings: true,
 };

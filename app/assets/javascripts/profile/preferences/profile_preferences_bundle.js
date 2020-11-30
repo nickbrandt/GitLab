@@ -3,11 +3,16 @@ import ProfilePreferences from './components/profile_preferences.vue';
 
 export default () => {
   const el = document.querySelector('#js-profile-preferences-app');
-  const { userTimeSettings } = gon?.features;
+  const { viewDiffsFileByFile = true, userTimeSettings } = gon?.features;
   const featureFlags = {
+    viewDiffsFileByFile,
     userTimeSettings,
   };
   const shouldParse = [
+    'layoutChoices',
+    'dashboardChoices',
+    'groupViewChoices',
+    'projectViewChoices',
     'languageChoices',
     'firstDayOfWeekChoicesWithDefault',
     'integrationViews',
