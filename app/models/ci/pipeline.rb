@@ -1212,20 +1212,7 @@ module Ci
     def increment_pipeline_count
       return unless merge_request?
 
-      target_count = pipeline_finder.all.for_project(merge_request.target_project).count
-      source_count = pipeline_finder.all.for_project(merge_request.source_project).count
-
-      merge_request.update(
-        target_project_pipelines_count: target_count,
-        source_project_pipelines_count: source_count
-      )
-    end
-
-    def pipeline_finder
-      @pipeline_finder ||= Ci::PipelinesForMergeRequestFinder.new(
-        merge_request,
-        defined?(current_user) ? current_user : nil
-      )
+      merge_request.update_pipelines_count
     end
   end
 end

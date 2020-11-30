@@ -1741,15 +1741,53 @@ class MergeRequest < ApplicationRecord
     false
   end
 
+  def total_pipelines_count
+    if self[:total_pipelines_count].nil?
+      update_pipelines_count
+      @total_count
+    else
+      self[:total_pipelines_count]
+    end
+  end
+
   def target_project_pipelines_count
-    self[:target_project_pipelines_count].to_i
+    if self[:target_project_pipelines_count].nil?
+      update_pipelines_count
+      @target_count
+    else
+      self[:target_project_pipelines_count]
+    end
   end
 
   def source_project_pipelines_count
-    self[:source_project_pipelines_count].to_i
+    if self[:source_project_pipelines_count].nil?
+      update_pipelines_count
+      @source_count
+    else
+      self[:source_project_pipelines_count]
+    end
+  end
+
+  def update_pipelines_count
+    @total_count = pipeline_finder.all.count
+    @target_count = pipeline_finder.all.for_project(target_project).count
+    @source_count = pipeline_finder.all.for_project(source_project).count
+
+    update(
+      total_pipelines_count: @total_count,
+      target_project_pipelines_count: @target_count,
+      source_project_pipelines_count: @source_count
+    )
   end
 
   private
+
+  def pipeline_finder
+    @pipeline_finder ||= Ci::PipelinesForMergeRequestFinder.new(
+      self,
+      defined?(current_user) ? current_user : nil
+    )
+  end
 
   def with_rebase_lock
     if Feature.enabled?(:merge_request_rebase_nowait_lock, default_enabled: true)
