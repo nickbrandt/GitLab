@@ -1858,6 +1858,32 @@ RSpec.describe MergeRequest, factory_default: :keep do
     end
   end
 
+  describe '#has_codequality_reports?' do
+    subject { merge_request.has_codequality_reports? }
+
+    let(:project) { create(:project, :repository) }
+
+    context 'when head pipeline has a codequality report' do
+      let(:merge_request) { create(:merge_request, :with_codequality_reports, source_project: project) }
+
+      it { is_expected.to be_truthy }
+
+      context 'when feature flag is disabled' do
+        before do
+          stub_feature_flags(codequality_mr_diff: false)
+        end
+
+        it { is_expected.to be_falsey }
+      end
+    end
+
+    context 'when head pipeline does not have a codequality report' do
+      let(:merge_request) { create(:merge_request, source_project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
   describe '#has_terraform_reports?' do
     context 'when head pipeline has terraform reports' do
       it 'returns true' do
@@ -2122,6 +2148,62 @@ RSpec.describe MergeRequest, factory_default: :keep do
         context 'when cached result is not latest' do
           before do
             allow_next_instance_of(Ci::CompareAccessibilityReportsService) do |service|
+              allow(service).to receive(:latest?).and_return(false)
+            end
+          end
+
+          it 'raises an InvalidateReactiveCache error' do
+            expect { subject }.to raise_error(ReactiveCaching::InvalidateReactiveCache)
+          end
+        end
+      end
+    end
+  end
+
+  describe '#compare_codequality_reports' do
+    let_it_be(:project) { create(:project, :repository) }
+    let_it_be(:merge_request, reload: true) { create(:merge_request, :with_codequality_reports, source_project: project) }
+    let_it_be(:pipeline) { merge_request.head_pipeline }
+
+    subject { merge_request.compare_codequality_reports }
+
+    context 'when head pipeline has codequality report' do
+      let(:job) do
+        create(:ci_build, options: { artifacts: { reports: { codeclimate: ['codequality.json'] } } }, pipeline: pipeline)
+      end
+
+      let(:artifacts_metadata) { create(:ci_job_artifact, :metadata, job: job) }
+
+      context 'when reactive cache worker is parsing results asynchronously' do
+        it 'returns parsing status' do
+          expect(subject[:status]).to eq(:parsing)
+        end
+      end
+
+      context 'when reactive cache worker is inline' do
+        before do
+          synchronous_reactive_cache(merge_request)
+        end
+
+        it 'returns parsed status' do
+          expect(subject[:status]).to eq(:parsed)
+          expect(subject[:data]).to be_present
+        end
+
+        context 'when an error occurrs' do
+          before do
+            merge_request.update!(head_pipeline: nil)
+          end
+
+          it 'returns an error status' do
+            expect(subject[:status]).to eq(:error)
+            expect(subject[:status_reason]).to eq("This merge request does not have codequality reports")
+          end
+        end
+
+        context 'when cached result is not latest' do
+          before do
+            allow_next_instance_of(Ci::CompareCodequalityReportsService) do |service|
               allow(service).to receive(:latest?).and_return(false)
             end
           end
