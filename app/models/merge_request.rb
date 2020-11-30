@@ -1741,6 +1741,14 @@ class MergeRequest < ApplicationRecord
     false
   end
 
+  def target_project_pipelines_count
+    self[:target_project_pipelines_count].to_i
+  end
+
+  def source_project_pipelines_count
+    self[:source_project_pipelines_count].to_i
+  end
+
   private
 
   def with_rebase_lock
