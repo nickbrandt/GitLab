@@ -96,7 +96,7 @@ export default {
         >{{ streamName }}</gl-dropdown-item
       >
       <gl-dropdown-divider />
-      <gl-dropdown-item v-gl-modal-directive="'create-value-stream-modal'">{{
+      <gl-dropdown-item v-gl-modal-directive="'value-stream-form-modal'">{{
         __('Create new Value Stream')
       }}</gl-dropdown-item>
       <gl-dropdown-item
@@ -107,7 +107,7 @@ export default {
         >{{ deleteSelectedText }}</gl-dropdown-item
       >
     </gl-dropdown>
-    <gl-button v-else v-gl-modal-directive="'create-value-stream-modal'">{{
+    <gl-button v-else v-gl-modal-directive="'value-stream-form-modal'">{{
       __('Create new Value Stream')
     }}</gl-button>
     <value-stream-form />

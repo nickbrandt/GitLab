@@ -38,8 +38,9 @@ export default {
   },
   data() {
     return {
-      name: '',
       errors: {},
+      name: '',
+      ...this.initialData,
     };
   },
   computed: {
@@ -96,8 +97,8 @@ export default {
 </script>
 <template>
   <gl-modal
-    data-testid="create-value-stream-modal"
-    modal-id="create-value-stream-modal"
+    data-testid="value-stream-form-modal"
+    modal-id="value-stream-form-modal"
     :title="__('Value Stream Name')"
     :action-primary="{
       text: __('Create Value Stream'),
