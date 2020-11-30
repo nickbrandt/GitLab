@@ -6,7 +6,6 @@
 - page_description @merge_request.description_html
 - page_card_attributes @merge_request.card_attributes
 - suggest_changes_help_path = help_page_path('user/discussions/index.md', anchor: 'suggest-changes')
-- number_of_pipelines = @pipelines.size
 - mr_action = j(params[:tab].presence || 'show')
 - add_page_specific_style 'page_bundles/merge_requests'
 - add_page_specific_style 'page_bundles/pipelines'
@@ -30,11 +29,11 @@
               = tab_link_for @merge_request, :commits do
                 = _("Commits")
                 %span.badge.badge-pill= @commits_count
-          - if number_of_pipelines.nonzero?
+          - if @pipelines_count.nonzero?
             = render "projects/merge_requests/tabs/tab", name: "pipelines", class: "pipelines-tab" do
               = tab_link_for @merge_request, :pipelines do
                 = _("Pipelines")
-                %span.badge.badge-pill.js-pipelines-mr-count= number_of_pipelines
+                %span.badge.badge-pill.js-pipelines-mr-count= @pipelines_count
           = render "projects/merge_requests/tabs/tab", name: "diffs", class: "diffs-tab qa-diffs-tab", id: "diffs-tab" do
             = tab_link_for @merge_request, :diffs do
               = _("Changes")
@@ -68,7 +67,7 @@
       = render "projects/merge_requests/tabs/pane", name: "commits", id: "commits", class: "commits" do
         -# This tab is always loaded via AJAX
       = render "projects/merge_requests/tabs/pane", name: "pipelines", id: "pipelines", class: "pipelines" do
-        - if number_of_pipelines.nonzero?
+        - if @pipelines_count.nonzero?
           = render 'projects/commit/pipelines_list', disable_initialization: true, endpoint: pipelines_project_merge_request_path(@project, @merge_request)
       - if mr_action === "diffs"
         - add_page_startup_api_call @endpoint_metadata_url
