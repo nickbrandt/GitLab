@@ -3,12 +3,16 @@ import { GlButton, GlIcon, GlTooltipDirective } from '@gitlab/ui';
 import {
   DAST_SITE_VALIDATION_STATUS,
   DAST_SITE_VALIDATION_STATUS_PROPS,
+  DAST_SITE_VALIDATION_POLLING_INTERVAL,
 } from 'ee/security_configuration/dast_site_validation/constants';
 import DastSiteValidationModal from 'ee/security_configuration/dast_site_validation/components/dast_site_validation_modal.vue';
+import dastSiteValidationsQuery from 'ee/security_configuration/dast_site_validation/graphql/dast_site_validations.query.graphql';
+import { updateSiteProfilesStatuses } from '../graphql/cache_utils';
 import ProfilesList from './dast_profiles_list.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { fetchPolicies } from '~/lib/graphql';
 
-const { PENDING, FAILED } = DAST_SITE_VALIDATION_STATUS;
+const { PENDING, INPROGRESS, FAILED, PASSED } = DAST_SITE_VALIDATION_STATUS;
 
 export default {
   components: {
@@ -16,6 +20,44 @@ export default {
     GlIcon,
     DastSiteValidationModal,
     ProfilesList,
+  },
+  apollo: {
+    validations: {
+      query: dastSiteValidationsQuery,
+      fetchPolicy: fetchPolicies.NO_CACHE,
+      manual: true,
+      variables() {
+        return {
+          fullPath: this.fullPath,
+          urls: this.urlsPendingValidation,
+        };
+      },
+      pollInterval: DAST_SITE_VALIDATION_POLLING_INTERVAL,
+      skip() {
+        return !this.urlsPendingValidation.length;
+      },
+      result(response) {
+        const {
+          data: {
+            validations: { nodes = [] },
+          },
+        } = response;
+        const store = this.$apolloProvider.defaultClient;
+        nodes.forEach(({ normalizedTargetUrl, status }) => {
+          updateSiteProfilesStatuses({
+            fullPath: this.fullPath,
+            normalizedTargetUrl,
+            status,
+            store,
+          });
+          if ([PASSED, FAILED].includes(status)) {
+            this.urlsPendingValidation = this.urlsPendingValidation.filter(
+              url => url !== normalizedTargetUrl,
+            );
+          }
+        });
+      },
+    },
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -26,13 +68,37 @@ export default {
       type: String,
       required: true,
     },
+    profiles: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
       validatingProfile: null,
+      urlsPendingValidation: [],
     };
   },
   statuses: DAST_SITE_VALIDATION_STATUS_PROPS,
+  watch: {
+    profiles: {
+      immediate: true,
+      deep: true,
+      handler(profiles = []) {
+        if (!this.glFeatures.securityOnDemandScansSiteValidation) {
+          return;
+        }
+        profiles.forEach(({ validationStatus, normalizedTargetUrl }) => {
+          if (
+            [PENDING, INPROGRESS].includes(validationStatus) &&
+            !this.urlsPendingValidation.includes(normalizedTargetUrl)
+          ) {
+            this.urlsPendingValidation.push(normalizedTargetUrl);
+          }
+        });
+      },
+    },
+  },
   methods: {
     shouldShowValidationBtn(status) {
       return (
@@ -52,11 +118,19 @@ export default {
         this.showValidationModal();
       });
     },
+    startValidatingProfile({ normalizedTargetUrl }) {
+      updateSiteProfilesStatuses({
+        fullPath: this.fullPath,
+        normalizedTargetUrl,
+        status: PENDING,
+        store: this.$apolloProvider.defaultClient,
+      });
+    },
   },
 };
 </script>
 <template>
-  <profiles-list :full-path="fullPath" v-bind="$attrs" v-on="$listeners">
+  <profiles-list :full-path="fullPath" :profiles="profiles" v-bind="$attrs" v-on="$listeners">
     <template #cell(validationStatus)="{ value }">
       <template v-if="shouldShowValidationStatus(value)">
         <span :class="$options.statuses[value].cssClass">
@@ -87,6 +161,7 @@ export default {
       ref="dast-site-validation-modal"
       :full-path="fullPath"
       :target-url="validatingProfile.targetUrl"
+      @primary="startValidatingProfile(validatingProfile)"
     />
   </profiles-list>
 </template>
