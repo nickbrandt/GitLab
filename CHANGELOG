@@ -1,5 +1,11 @@
 # Changelog for gitlab-workhorse
 
+## v8.57.0
+
+### Added
+- Add direct upload acceleration for requirements import
+  https://gitlab.com/gitlab-org/gitlab-workhorse/-/merge_requests/
+
 ## v8.56.0
 
 ### Fixed
