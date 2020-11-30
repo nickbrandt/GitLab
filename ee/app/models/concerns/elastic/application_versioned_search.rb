@@ -52,7 +52,7 @@ module Elastic
       ::Elastic::ProcessBookkeepingService.track!(self)
 
       associations_to_update = associations_needing_elasticsearch_update
-      unless associations_to_update.blank?
+      if associations_to_update.present?
         ElasticAssociationIndexerWorker.perform_async(self.class.name, id, associations_to_update)
       end
     end
@@ -64,12 +64,42 @@ module Elastic
     # Override in child object if there are associations that need to be
     # updated when specific fields are updated
     def associations_needing_elasticsearch_update
-      []
+      self.class.elastic_index_dependants.map do |dependant|
+        association_name = dependant[:association_name]
+        on_change = dependant[:on_change]
+
+        next nil unless previous_changes.include?(on_change)
+
+        association_name.to_s
+      end.compact.uniq
     end
 
     class_methods do
       def __elasticsearch__
         @__elasticsearch__ ||= ::Elastic::MultiVersionClassProxy.new(self)
+      end
+
+      # Mark a dependant association as needing to be updated when a specific
+      # field in this object changes. For example if you want to update
+      # project.issues in the index when project.visibility_level is changed
+      # then you can declare that as:
+      #
+      # elastic_index_dependant_association :issues, on_change: :visibility_level
+      #
+      def elastic_index_dependant_association(association_name, on_change:)
+        # This class is used for non ActiveRecord models but this method is not
+        # applicable for that so we raise.
+        raise "elastic_index_dependant_association is not applicable as this class is not an ActiveRecord model." unless self < ActiveRecord::Base
+
+        # Validate these are actually correct associations before sending to
+        # Sidekiq to avoid errors occuring when the job is picked up.
+        raise "Invalid association to index. \"#{association_name}\" is either not a collection or not an association. Hint: You must declare the has_many before declaring elastic_index_dependant_association." unless reflect_on_association(association_name)&.collection?
+
+        elastic_index_dependants << { association_name: association_name, on_change: on_change }
+      end
+
+      def elastic_index_dependants
+        @elastic_index_dependants ||= []
       end
     end
   end
