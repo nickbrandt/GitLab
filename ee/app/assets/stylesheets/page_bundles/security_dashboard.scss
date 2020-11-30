@@ -1,3 +1,5 @@
+@import 'page_bundles/mixins_and_variables_and_functions';
+
 $security-filter-height: 90px;
 $selection-summary-height: 68px;
 
@@ -38,9 +40,60 @@ $selection-summary-height: 68px;
   @include sticky-top-positioning();
 }
 
-// Due to position: sticky not being supported on Chrome (https://caniuse.com/#feat=css-sticky),
-// the property is assigned to the th element as a workaround
+.security-dashboard-accordion > ul {
+  @include gl-display-flex;
+  @include gl-flex-fill-1;
+}
+
+.security-charts > section {
+  flex: 1 1 40%;
+  margin: 1rem;
+}
+
 .vulnerability-list {
+  @media (min-width: $breakpoint-sm) {
+    .checkbox {
+      padding-left: $gl-spacing-scale-4;
+      padding-right: 0;
+      width: 1px;
+
+      + td,
+      + th {
+        padding-left: $gl-spacing-scale-4;
+      }
+    }
+
+    .detected {
+      width: 9%;
+    }
+
+    .status {
+      width: 8%;
+    }
+
+    .severity {
+      width: 10%;
+    }
+
+    .description {
+      max-width: 0;
+    }
+
+    .identifier {
+      width: 16%;
+    }
+
+    .scanner {
+      width: 10%;
+    }
+
+    .activity {
+      width: 5%;
+    }
+  }
+
+  // Due to position: sticky not being supported on Chrome (https://caniuse.com/#feat=css-sticky),
+  // the property is assigned to the th element as a workaround
   .card,
   thead th {
     position: -webkit-sticky;
@@ -56,14 +109,4 @@ $selection-summary-height: 68px;
   thead.below-selection-summary th {
     @include sticky-top-positioning($security-filter-height + $selection-summary-height);
   }
-}
-
-.security-dashboard-accordion > ul {
-  @include gl-display-flex;
-  @include gl-flex-fill-1;
-}
-
-.security-charts > section {
-  flex: 1 1 40%;
-  margin: 1rem;
 }
