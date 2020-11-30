@@ -241,6 +241,9 @@ Unlike other API endpoints, billable members is updated once per day at 12:00 UT
 
 This function takes [pagination](README.md#pagination) parameters `page` and `per_page` to restrict the list of users.
 
+[Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/262875) in GitLab 13.7, the `search` and `sort`
+parameters allows to search for billable group members by their name as well as specifying result sorting.
+
 ```plaintext
 GET /groups/:id/billable_members
 ```
@@ -248,6 +251,8 @@ GET /groups/:id/billable_members
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `id`      | integer/string | yes | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user |
+| `search`  | string         | no  | A query string to search for group members by their name |
+| `sort`    | string         | no  | A query string specifying the sorting attribute and order |
 
 ```shell
 curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/groups/:id/billable_members"

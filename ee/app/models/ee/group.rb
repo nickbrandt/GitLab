@@ -448,6 +448,19 @@ module EE
       )
     end
 
+    def billed_user_ids_for(search_term, order_by)
+      if search_term.present?
+        ::GroupMember
+          .with_user(billed_user_ids)
+          .search(search_term)
+          .sort_by_attribute(::GroupMember.sorting_for(order_by))
+          .get_user_id
+          .uniq
+      else
+        billed_user_ids.sort
+      end
+    end
+
     private
 
     def custom_project_templates_group_allowed

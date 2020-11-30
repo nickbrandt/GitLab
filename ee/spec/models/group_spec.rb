@@ -1223,4 +1223,49 @@ RSpec.describe Group do
       end
     end
   end
+
+  describe '#billed_user_ids_for' do
+    let_it_be(:group) { create(:group) }
+    let_it_be(:gm_1) { create(:group_member, group: group, user: create(:user, name: 'Maria Gomez')) }
+    let_it_be(:gm_2) { create(:group_member, group: group, user: create(:user, name: 'John Smith')) }
+    let_it_be(:gm_3) { create(:group_member, group: group, user: create(:user, name: 'John Doe')) }
+    let_it_be(:gm_4) { create(:group_member, group: group, user: create(:user, name: 'Sophie Dupont')) }
+    let(:search_term) { nil }
+    let(:order_by) { nil }
+
+    subject { group.billed_user_ids_for(search_term, order_by) }
+
+    context 'when a search parameter is present' do
+      let(:search_term) { 'John' }
+      let(:order_by) { sort }
+
+      context 'when a sorting parameter is provided (eg name descending)' do
+        let(:sort) { 'name_desc' }
+
+        it 'sorts results accordingly' do
+          expect(subject).to eq([gm_2, gm_3].map(&:user_id))
+        end
+      end
+
+      context 'when a sorting parameter is not provided' do
+        let(:sort) { nil }
+
+        it 'sorts results by name ascending' do
+          expect(subject).to eq([gm_3, gm_2].map(&:user_id))
+        end
+      end
+    end
+
+    context 'when a search parameter is not present' do
+      it 'returns the expected group member user ids' do
+        expect(subject).to eq([gm_1, gm_2, gm_3, gm_4].map(&:user_id))
+      end
+
+      it 'returns user array in asc order' do
+        allow(group).to receive(:billed_user_ids).and_return([gm_3, gm_2, gm_4, gm_1].map(&:user_id))
+
+        expect(subject).to eq([gm_1, gm_2, gm_3, gm_4].map(&:user_id))
+      end
+    end
+  end
 end
