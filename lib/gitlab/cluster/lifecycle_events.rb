@@ -116,6 +116,15 @@ module Gitlab
 
         def do_before_fork
           call(@before_fork_hooks)
+
+          if Gitlab::Utils.to_boolean(ENV['PUMA_COMPACT_WORKERS'].to_s)
+            elapsed = Benchmark.ms { GC.compact }
+            Gitlab::AppJsonLogger.info(
+              message: "Heap compaction finished",
+              duration_ms: elapsed,
+              pid: Process.pid
+            )
+          end
         end
 
         def do_before_graceful_shutdown
