@@ -13,6 +13,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
     let(:link) { create(:ci_reports_security_link) }
     let(:scanner) { create(:ci_reports_security_scanner) }
     let(:location) { create(:ci_reports_security_locations_sast) }
+    let(:remediation) { create(:ci_reports_security_remediation) }
 
     let(:params) do
       {
@@ -20,6 +21,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
         confidence: :medium,
         identifiers: [primary_identifier, other_identifier],
         links: [link],
+        remediations: [remediation],
         location: location,
         metadata_version: 'sast:1.0',
         name: 'Cipher with no integrity',
@@ -42,6 +44,7 @@ RSpec.describe Gitlab::Ci::Reports::Security::Finding do
           project_fingerprint: '9a73f32d58d87d94e3dc61c4c1a94803f6014258',
           identifiers: [primary_identifier, other_identifier],
           links: [link],
+          remediations: [remediation],
           location: location,
           metadata_version: 'sast:1.0',
           name: 'Cipher with no integrity',
