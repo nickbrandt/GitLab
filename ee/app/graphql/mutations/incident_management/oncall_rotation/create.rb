@@ -28,7 +28,7 @@ module Mutations
                  required: true,
                  description: 'The rotation length of the on-call rotation'
 
-        argument :participant_usernames,
+        argument :participants,
                  [Types::IncidentManagement::OncallUserInputType],
                  required: true,
                  description: 'The usernames to participate in the on-call rotation.'
@@ -46,8 +46,8 @@ module Mutations
             schedule,
             project,
             current_user,
-            params,
-            find_participants(args[:participant_usernames])
+            params.except(:participants),
+            find_participants(args[:participants])
           ).execute
 
           errors = result.error? ? [result.message] : []
@@ -81,7 +81,7 @@ module Mutations
         end
 
         def find_participants(user_array)
-          usernames = user_array.map(&:username)
+          usernames = user_array.map {|h| h[:username] }
 
           matched_users = UsersFinder.new(current_user, username: usernames).execute
 

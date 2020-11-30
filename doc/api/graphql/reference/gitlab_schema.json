@@ -43908,7 +43908,7 @@
               "defaultValue": null
             },
             {
-              "name": "participantUsernames",
+              "name": "participants",
               "description": "The usernames to participate in the on-call rotation.",
               "type": {
                 "kind": "NON_NULL",

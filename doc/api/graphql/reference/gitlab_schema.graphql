@@ -14744,7 +14744,7 @@ input OncallRotationCreateInput {
   """
   The usernames to participate in the on-call rotation.
   """
-  participantUsernames: [OncallUserInputType!]!
+  participants: [OncallUserInputType!]!
 
   """
   The project to create the on-call schedule in
