@@ -7,6 +7,239 @@ exports[`ProfilePreferences component should render ProfilePreferences properly 
   <div
     class="col-sm-12"
   >
+    <hr />
+  </div>
+   
+  <div
+    class="col-lg-4 profile-settings-sidebar"
+  >
+    <h4
+      class="gl-mt-0"
+    >
+      
+      Localization
+    
+    </h4>
+     
+    <p>
+      
+      Customize language and region related settings.
+      
+      <a
+        href="/help/user/profile/preferences#localization"
+        target="_blank"
+      >
+        
+        Learn more 
+      </a>
+      .
+    
+    </p>
+  </div>
+   
+  <div
+    class="col-lg-8"
+  >
+    <div
+      class="form-group"
+    >
+      <label
+        class="label-bold"
+        for="user_preferred_language"
+      >
+        
+        Language
+      
+      </label>
+       
+      <div
+        class="select-wrapper"
+      >
+        <select
+          class="form-control select-control"
+          id="user_preferred_language"
+          name="user[preferred_language]"
+          tabindex="-1"
+          title="Language"
+        >
+          <option
+            value="en"
+          >
+            
+            English
+          
+          </option>
+          <option
+            value="da"
+          >
+            
+            Danish
+          
+          </option>
+          <option
+            value="swe"
+          >
+            
+            Swedish
+          
+          </option>
+        </select>
+         
+        <i
+          aria-hidden="true"
+          class="fa fa-chevron-down"
+        />
+      </div>
+       
+      <div
+        class="form-text text-muted"
+      >
+        
+        This feature is experimental and translations are not complete yet
+      
+      </div>
+    </div>
+     
+    <div
+      class="form-group"
+    >
+      <label
+        class="label-bold"
+        for="user_first_day_of_week"
+      >
+        
+        First day of the week
+      
+      </label>
+       
+      <div
+        class="select-wrapper"
+      >
+        <select
+          class="form-control select-control"
+          id="user_first_day_of_week"
+          name="user[first_day_of_week]"
+          tabindex="-1"
+          title="First day of the week"
+        >
+          <option
+            value="1"
+          >
+            
+            Monday
+          
+          </option>
+          <option
+            value="7"
+          >
+            
+            Sunday
+          
+          </option>
+        </select>
+         
+        <i
+          aria-hidden="true"
+          class="fa fa-chevron-down"
+        />
+      </div>
+    </div>
+  </div>
+   
+  <div
+    class="col-sm-12"
+    data-testid="user-time-settings-rule"
+  >
+    <hr />
+  </div>
+   
+  <div
+    class="col-lg-4 profile-settings-sidebar"
+    data-testid="user-time-settings-heading"
+  >
+    <h4
+      class="gl-mt-0"
+    >
+      
+      Time preferences
+    
+    </h4>
+     
+    <p>
+      
+      These settings will update how dates and times are displayed for you.
+    
+    </p>
+  </div>
+   
+  <div
+    class="col-lg-8"
+    data-testid="user-time-settings-option"
+  >
+    <h5>
+      
+      Time format
+    
+    </h5>
+     
+    <div
+      class="form-group form-check"
+    >
+      <input
+        name="user[time_format_in_24h]"
+        type="hidden"
+        value="0"
+      />
+       
+      <input
+        class="form-check-input"
+        id="user_time_format_in_24h"
+        name="user[time_format_in_24h]"
+        type="checkbox"
+        value="1"
+      />
+       
+      <label
+        class="form-check-label"
+        for="user_time_format_in_24h"
+      >
+        
+        Display time in 24-hour format
+      
+      </label>
+    </div>
+     
+    <div
+      class="form-group form-check"
+    >
+      <input
+        name="user[time_display_relative]"
+        type="hidden"
+        value="0"
+      />
+       
+      <input
+        class="form-check-input"
+        id="user_time_display_relative"
+        name="user[time_display_relative]"
+        type="checkbox"
+        value="1"
+      />
+       
+      <label
+        class="form-check-label"
+        for="user_time_display_relative"
+      >
+        
+        For example: 30 mins ago.
+      
+      </label>
+    </div>
+  </div>
+   
+  <div
+    class="col-sm-12"
+  >
     <hr
       data-testid="profile-preferences-integrations-rule"
     />

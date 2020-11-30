@@ -64,28 +64,6 @@ RSpec.describe 'User visits the profile preferences page' do
     end
   end
 
-  describe 'User changes their language', :js do
-    it 'creates a flash message', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/31404' do
-      select2('en', from: '#user_preferred_language')
-      click_button 'Save'
-
-      wait_for_requests
-
-      expect_preferences_saved_message
-    end
-
-    it 'updates their preference' do
-      wait_for_requests
-      select2('pt_BR', from: '#user_preferred_language')
-      click_button 'Save'
-
-      wait_for_requests
-      refresh
-
-      expect(page).to have_css('html[lang="pt-BR"]')
-    end
-  end
-
   describe 'User changes whitespace in code' do
     it 'updates their preference' do
       expect(user.render_whitespace_in_code).to be(false)
