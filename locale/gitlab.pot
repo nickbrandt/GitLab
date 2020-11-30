@@ -26188,6 +26188,9 @@ msgstr ""
 msgid "SubscriptionTable|Next invoice"
 msgstr ""
 
+msgid "SubscriptionTable|Renew"
+msgstr ""
+
 msgid "SubscriptionTable|Seats currently in use"
 msgstr ""
 
