@@ -16491,6 +16491,9 @@ msgstr ""
 msgid "ManualOrdering|Couldn't save the order of the issues"
 msgstr ""
 
+msgid "Manually link this issue by adding it to the linked issue section of the %{originating_vulnerability}."
+msgstr ""
+
 msgid "Map a FogBugz account ID to a GitLab user"
 msgstr ""
 
@@ -28977,6 +28980,9 @@ msgstr ""
 msgid "Unable to convert Kubernetes logs encoding to UTF-8"
 msgstr ""
 
+msgid "Unable to create link to vulnerability"
+msgstr ""
+
 msgid "Unable to fetch unscanned projects"
 msgstr ""
 
@@ -32813,6 +32819,9 @@ msgid "opened %{timeAgo}"
 msgstr ""
 
 msgid "or"
+msgstr ""
+
+msgid "originating vulnerability"
 msgstr ""
 
 msgid "out of %d total test"
