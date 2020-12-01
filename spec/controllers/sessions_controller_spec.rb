@@ -82,58 +82,82 @@ RSpec.describe SessionsController do
       let(:post_action) { post(:create, params: { user: { login: user.username, password: user.password } }) }
 
       context 'invalid password' do
-        it 'does not authenticate user' do
+        before do
           post(:create, params: { user: { login: 'invalid', password: 'invalid' } })
+        end
 
+        it 'does not authenticate user' do
           expect(response)
             .to set_flash.now[:alert].to(/Invalid Login or password/)
         end
+
+        it_behaves_like 'failed multi user login'
       end
 
       context 'a blocked user' do
-        it 'does not authenticate the user' do
+        before do
           user.block!
           post_action
+        end
 
+        it 'does not authenticate the user' do
           expect(@request.env['warden']).not_to be_authenticated
           expect(flash[:alert]).to include('Your account has been blocked')
         end
+
+        it_behaves_like 'failed multi user login'
       end
 
       context 'a `blocked pending approval` user' do
-        it 'does not authenticate the user' do
+        before do
           user.block_pending_approval!
           post_action
+        end
 
+        it 'does not authenticate the user' do
           expect(@request.env['warden']).not_to be_authenticated
           expect(flash[:alert]).to include('Your account is pending approval from your GitLab administrator and hence blocked')
         end
+
+        it_behaves_like 'failed multi user login'
       end
 
       context 'an internal user' do
-        it 'does not authenticate the user' do
+        before do
           user.ghost!
           post_action
+        end
 
+        it 'does not authenticate the user' do
           expect(@request.env['warden']).not_to be_authenticated
           expect(flash[:alert]).to include('Your account does not have the required permission to login')
         end
+
+        it_behaves_like 'failed multi user login'
       end
 
       context 'when using valid password', :clean_gitlab_redis_shared_state do
         let(:user) { create(:user) }
         let(:user_params) { { login: user.username, password: user.password } }
+        let(:post_action) { post(:create, params: { user: user_params }) }
 
         it 'authenticates user correctly' do
-          post(:create, params: { user: user_params })
+          post_action
 
           expect(subject.current_user).to eq user
+        end
+
+        it_behaves_like 'successful multi user login' do
+          before do
+            post_action
+          end
         end
 
         context 'a deactivated user' do
           before do
             user.deactivate!
-            post(:create, params: { user: user_params })
+
+            post_action
           end
 
           it 'is allowed to login' do
@@ -147,34 +171,36 @@ RSpec.describe SessionsController do
           it 'shows reactivation flash message after logging in' do
             expect(flash[:notice]).to eq('Welcome back! Your account had been deactivated due to inactivity but is now reactivated.')
           end
+
+          it_behaves_like 'successful multi user login'
         end
 
         context 'with password authentication disabled' do
           before do
             stub_application_setting(password_authentication_enabled_for_web: false)
+
+            post_action
           end
 
           it 'does not sign in the user' do
-            post(:create, params: { user: user_params })
-
             expect(@request.env['warden']).not_to be_authenticated
             expect(subject.current_user).to be_nil
           end
 
           it 'returns status 403' do
-            post(:create, params: { user: user_params })
-
             expect(response).to have_gitlab_http_status(:forbidden)
           end
+
+          it_behaves_like 'failed multi user login'
         end
 
         it 'creates an audit log record' do
-          expect { post(:create, params: { user: user_params }) }.to change { AuditEvent.count }.by(1)
+          expect { post_action }.to change { AuditEvent.count }.by(1)
           expect(AuditEvent.last.details[:with]).to eq('standard')
         end
 
         it 'creates an authentication event record' do
-          expect { post(:create, params: { user: user_params }) }.to change { AuthenticationEvent.count }.by(1)
+          expect { post_action }.to change { AuthenticationEvent.count }.by(1)
           expect(AuthenticationEvent.last.provider).to eq('standard')
         end
 
@@ -188,7 +214,7 @@ RSpec.describe SessionsController do
 
         it 'updates the user activity' do
           expect do
-            post(:create, params: { user: user_params })
+            post_action
           end.to change { user.reload.last_activity_on }.to(Date.today)
         end
       end
@@ -230,20 +256,28 @@ RSpec.describe SessionsController do
             request.headers[described_class::CAPTCHA_HEADER] = '1'
           end
 
-          it 'displays an error when the reCAPTCHA is not solved' do
-            # Without this, `verify_recaptcha` arbitrarily returns true in test env
+          context 'and not solved successfully' do
+            before do
+              unsuccesful_login(user_params)
+            end
 
-            unsuccesful_login(user_params)
+            it 'displays an error' do
+              expect(response).to render_template(:new)
+              expect(flash[:alert]).to include 'There was an error with the reCAPTCHA. Please solve the reCAPTCHA again.'
+              expect(subject.current_user).to be_nil
+            end
 
-            expect(response).to render_template(:new)
-            expect(flash[:alert]).to include 'There was an error with the reCAPTCHA. Please solve the reCAPTCHA again.'
-            expect(subject.current_user).to be_nil
+            it_behaves_like 'failed multi user login'
           end
 
-          it 'successfully logs in a user when reCAPTCHA is solved' do
-            succesful_login(user_params)
+          context 'reCAPTCHA solved successfull' do
+            before do
+              succesful_login(user_params)
+            end
 
-            expect(subject.current_user).to eq user
+            it { expect(subject.current_user).to eq user }
+
+            it_behaves_like 'successful multi user login'
           end
         end
 
@@ -256,18 +290,30 @@ RSpec.describe SessionsController do
           end
 
           context 'when user tried to login 5 times' do
-            it 'displays an error when the reCAPTCHA is not solved' do
-              unsuccesful_login(user_params, sesion_params: { failed_login_attempts: 6 })
+            context 'with unsuccessful reCAPTCHA attempt' do
+              before do
+                unsuccesful_login(user_params, sesion_params: { failed_login_attempts: 6 })
+              end
 
-              expect(response).to render_template(:new)
-              expect(flash[:alert]).to include 'There was an error with the reCAPTCHA. Please solve the reCAPTCHA again.'
-              expect(subject.current_user).to be_nil
+              it 'displays an error' do
+                expect(response).to render_template(:new)
+                expect(flash[:alert]).to include 'There was an error with the reCAPTCHA. Please solve the reCAPTCHA again.'
+                expect(subject.current_user).to be_nil
+              end
+
+              it_behaves_like 'failed multi user login'
             end
 
-            it 'successfully logs in a user when reCAPTCHA is solved' do
-              succesful_login(user_params, sesion_params: { failed_login_attempts: 6 })
+            context 'with successful reCAPTCHA attempt' do
+              before do
+                succesful_login(user_params, sesion_params: { failed_login_attempts: 6 })
+              end
 
-              expect(subject.current_user).to eq user
+              it 'successfully logs in a user' do
+                expect(subject.current_user).to eq user
+              end
+
+              it_behaves_like 'successful multi user login'
             end
           end
 
@@ -276,20 +322,32 @@ RSpec.describe SessionsController do
               allow(Gitlab::AnonymousSession).to receive_message_chain(:new, :session_count).and_return(6)
             end
 
-            it 'displays an error when the reCAPTCHA is not solved' do
-              unsuccesful_login(user_params)
+            context 'with unsuccessful reCAPTCHA attempt' do
+              before do
+                unsuccesful_login(user_params)
+              end
 
-              expect(response).to render_template(:new)
-              expect(flash[:alert]).to include 'There was an error with the reCAPTCHA. Please solve the reCAPTCHA again.'
-              expect(subject.current_user).to be_nil
+              it 'displays an error when the reCAPTCHA is not solved' do
+                expect(response).to render_template(:new)
+                expect(flash[:alert]).to include 'There was an error with the reCAPTCHA. Please solve the reCAPTCHA again.'
+                expect(subject.current_user).to be_nil
+              end
+
+              it_behaves_like 'failed multi user login'
             end
 
-            it 'successfully logs in a user when reCAPTCHA is solved' do
-              expect(Gitlab::AnonymousSession).to receive_message_chain(:new, :cleanup_session_per_ip_count)
+            context 'with successful reCAPTCHA attempt' do
+              before do
+                expect(Gitlab::AnonymousSession).to receive_message_chain(:new, :cleanup_session_per_ip_count)
 
-              succesful_login(user_params)
+                succesful_login(user_params)
+              end
 
-              expect(subject.current_user).to eq user
+              it 'successfully logs in a user' do
+                expect(subject.current_user).to eq user
+              end
+
+              it_behaves_like 'successful multi user login'
             end
           end
         end
@@ -304,23 +362,30 @@ RSpec.describe SessionsController do
       end
 
       context 'remember_me field' do
-        it 'sets a remember_user_token cookie when enabled' do
-          allow(controller).to receive(:find_user).and_return(user)
-          expect(controller)
-            .to receive(:remember_me).with(user).and_call_original
+        context 'when enabled' do
+          before do
+            allow(controller).to receive(:find_user).and_return(user)
+            expect(controller)
+              .to receive(:remember_me).with(user).and_call_original
+            authenticate_2fa(remember_me: '1', otp_attempt: user.current_otp)
+          end
 
-          authenticate_2fa(remember_me: '1', otp_attempt: user.current_otp)
-
-          expect(response.cookies['remember_user_token']).to be_present
+          it 'sets a remember_user_token cookie when enabled' do
+            expect(response.cookies['remember_user_token']).to be_present
+          end
         end
 
-        it 'does nothing when disabled' do
-          allow(controller).to receive(:find_user).and_return(user)
-          expect(controller).not_to receive(:remember_me)
+        context 'when disabled' do
+          before do
+            allow(controller).to receive(:find_user).and_return(user)
+            expect(controller).not_to receive(:remember_me)
 
-          authenticate_2fa(remember_me: '0', otp_attempt: user.current_otp)
+            authenticate_2fa(remember_me: '0', otp_attempt: user.current_otp)
+          end
 
-          expect(response.cookies['remember_user_token']).to be_nil
+          it 'does nothing when disabled' do
+            expect(response.cookies['remember_user_token']).to be_nil
+          end
         end
       end
 
@@ -451,6 +516,13 @@ RSpec.describe SessionsController do
         expect { authenticate_2fa(login: user.username, otp_attempt: user.current_otp) }.to change { AuthenticationEvent.count }.by(1)
         expect(AuthenticationEvent.last.provider).to eq("two-factor")
       end
+
+      it_behaves_like 'successful multi user login' do
+        before do
+          post(:create, params: { user: { login: user.username, password: user.password } })
+          authenticate_2fa(login: user.username, otp_attempt: user.current_otp)
+        end
+      end
     end
 
     context 'when using two-factor authentication via U2F device' do
@@ -465,25 +537,33 @@ RSpec.describe SessionsController do
       end
 
       context 'remember_me field' do
-        it 'sets a remember_user_token cookie when enabled' do
-          allow(U2fRegistration).to receive(:authenticate).and_return(true)
-          allow(controller).to receive(:find_user).and_return(user)
-          expect(controller)
-            .to receive(:remember_me).with(user).and_call_original
+        context 'when enabled' do
+          before do
+            allow(U2fRegistration).to receive(:authenticate).and_return(true)
+            allow(controller).to receive(:find_user).and_return(user)
+            expect(controller)
+              .to receive(:remember_me).with(user).and_call_original
 
-          authenticate_2fa_u2f(remember_me: '1', login: user.username, device_response: "{}")
+            authenticate_2fa_u2f(remember_me: '1', login: user.username, device_response: "{}")
+          end
 
-          expect(response.cookies['remember_user_token']).to be_present
+          it 'sets a remember_user_token cookie' do
+            expect(response.cookies['remember_user_token']).to be_present
+          end
         end
 
-        it 'does nothing when disabled' do
-          allow(U2fRegistration).to receive(:authenticate).and_return(true)
-          allow(controller).to receive(:find_user).and_return(user)
-          expect(controller).not_to receive(:remember_me)
+        context 'when disabled' do
+          before do
+            allow(U2fRegistration).to receive(:authenticate).and_return(true)
+            allow(controller).to receive(:find_user).and_return(user)
+            expect(controller).not_to receive(:remember_me)
 
-          authenticate_2fa_u2f(remember_me: '0', login: user.username, device_response: "{}")
+            authenticate_2fa_u2f(remember_me: '0', login: user.username, device_response: "{}")
+          end
 
-          expect(response.cookies['remember_user_token']).to be_nil
+          it 'does nothing when disabled' do
+            expect(response.cookies['remember_user_token']).to be_nil
+          end
         end
       end
 
@@ -499,6 +579,15 @@ RSpec.describe SessionsController do
         expect { authenticate_2fa_u2f(login: user.username, device_response: "{}") }.to change { AuthenticationEvent.count }.by(1)
         expect(AuthenticationEvent.last.provider).to eq("two-factor-via-u2f-device")
       end
+
+      it_behaves_like 'successful multi user login' do
+        before do
+          allow(U2fRegistration).to receive(:authenticate).and_return(true)
+          post(:create, params: { user: { login: user.username, password: user.password } })
+
+          authenticate_2fa_u2f(login: user.username, device_response: "{}")
+        end
+      end
     end
   end
 
@@ -512,6 +601,8 @@ RSpec.describe SessionsController do
 
       expect(session[:failed_login_attempts]).to eq(1)
     end
+
+    it_behaves_like 'failed multi user login'
   end
 
   describe '#set_current_context' do
@@ -572,19 +663,25 @@ RSpec.describe SessionsController do
   end
 
   describe '#destroy' do
+    let(:user) { create(:user) }
+
     before do
       sign_in(user)
+
+      delete :destroy
     end
+
+    it_behaves_like 'multi user logout session'
 
     context 'for a user whose password has expired' do
       let(:user) { create(:user, password_expires_at: 2.days.ago) }
 
       it 'allows to sign out successfully' do
-        delete :destroy
-
         expect(response).to redirect_to(new_user_session_path)
         expect(controller.current_user).to be_nil
       end
+
+      it_behaves_like 'multi user logout session'
     end
   end
 end

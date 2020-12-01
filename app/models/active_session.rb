@@ -2,6 +2,7 @@
 
 class ActiveSession
   include ActiveModel::Model
+  include MultiUserSession
 
   SESSION_BATCH_SIZE = 200
   ALLOWED_NUMBER_OF_ACTIVE_SESSIONS = 100

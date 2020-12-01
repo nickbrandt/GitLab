@@ -26,6 +26,7 @@ devise_for :users, controllers: { omniauth_callbacks: :omniauth_callbacks,
 
 devise_scope :user do
   get '/users/almost_there' => 'confirmations#almost_there'
+  post '/users/:user_id/swap_session' => 'sessions#swap', as: 'swap_session'
 end
 
 scope '-/users', module: :users do

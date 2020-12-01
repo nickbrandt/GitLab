@@ -12,26 +12,26 @@ class SessionsController < Devise::SessionsController
 
   skip_before_action :check_two_factor_requirement, only: [:destroy]
   skip_before_action :check_password_expiration, only: [:destroy]
-
-  # replaced with :require_no_authentication_without_flash
-  skip_before_action :require_no_authentication, only: [:new, :create]
+  skip_before_action :require_no_authentication
 
   prepend_before_action :check_initial_setup, only: [:new]
   prepend_before_action :authenticate_with_two_factor,
     if: -> { action_name == 'create' && two_factor_enabled? }
   prepend_before_action :check_captcha, only: [:create]
   prepend_before_action :store_redirect_uri, only: [:new]
-  prepend_before_action :require_no_authentication_without_flash, only: [:new, :create]
   prepend_before_action :ensure_password_authentication_enabled!, if: -> { action_name == 'create' && password_based_login? }
 
   before_action :auto_sign_in_with_provider, only: [:new]
   before_action :store_unauthenticated_sessions, only: [:new]
   before_action :save_failed_login, if: :action_new_and_failed_login?
-  before_action :load_recaptcha
+  before_action :load_recaptcha, except: [:swap]
   before_action :set_invite_params, only: [:new]
   before_action do
     push_frontend_feature_flag(:webauthn)
   end
+
+  multi_user_login only: :create
+  multi_user_logout only: :destroy
 
   after_action :log_failed_login, if: :action_new_and_failed_login?
   after_action :verify_known_sign_in, only: [:create]
@@ -78,6 +78,16 @@ class SessionsController < Devise::SessionsController
 
       log_audit_event(current_user, resource, with: authentication_method)
       log_user_activity(current_user)
+    end
+  end
+
+  # Activate an authenticated session.
+  def swap
+    user_id = params[:user_id]
+    if Gitlab::WardenSession.user_authorized?(user_id)
+      sign_out(current_user)
+      bypass_sign_in(User.find(user_id))
+      redirect_to root_url
     end
   end
 
