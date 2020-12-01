@@ -16,32 +16,40 @@
 #
 # Example:
 #   describe 'sorting and pagination' do
-#     let(:sort_project) { create(:project, :public) }
+#     let_it_be(:sort_project) { create(:project, :public) }
 #     let(:data_path)    { [:project, :issues] }
 #
-#     def pagination_query(params, page_info)
-#       graphql_query_for(
-#         'project',
-#         { 'fullPath' => sort_project.full_path },
-#         query_graphql_field('issues', params, "#{page_info} edges { node { id } }")
+#     def pagination_query(arguments)
+#       graphql_query_for(:project, { full_path: sort_project.full_path },
+#         query_nodes(:issues, :iid, include_pagination_info: true, args: arguments)
 #       )
 #     end
 #
-#     def pagination_results_data(data)
-#       data.map { |issue| issue.dig('node', 'iid').to_i }
+#     # A method transforming nodes to data to match against
+#     # default: the identity function
+#     def pagination_results_data(issues)
+#       issues.map { |issue| issue['iid].to_i }
 #     end
 #
 #     context 'when sorting by weight' do
-#       ...
+#       let_it_be(:issues) { make_some_issues_with_weights }
+#
 #       context 'when ascending' do
+#         let(:ordered_issues) { issues.sort_by(&:weight) }
+#
 #         it_behaves_like 'sorted paginated query' do
-#           let(:sort_param)       { 'WEIGHT_ASC' }
+#           let(:sort_param)       { :WEIGHT_ASC }
 #           let(:first_param)      { 2 }
-#           let(:expected_results) { [weight_issue3.iid, weight_issue5.iid, weight_issue1.iid, weight_issue4.iid, weight_issue2.iid] }
+#           let(:expected_results) { ordered_issues.map(&:iid) }
 #         end
 #       end
 #
 RSpec.shared_examples 'sorted paginated query' do
+  # Provided as a convenience when constructing queries using string concatenation
+  let(:page_info) { 'pageInfo { startCursor endCursor }' }
+  # Convenience for using default implementation of pagination_results_data
+  let(:node_path) { ['id'] }
+
   it_behaves_like 'requires variables' do
     let(:required_variables) { [:sort_param, :first_param, :expected_results, :data_path, :current_user] }
   end
@@ -49,30 +57,43 @@ RSpec.shared_examples 'sorted paginated query' do
   describe do
     let(:sort_argument)  { graphql_args(sort: sort_param) }
     let(:params)         { sort_argument }
-    let(:page_info)      { "pageInfo { startCursor endCursor }" }
 
-    def pagination_query(params, page_info)
-      raise('pagination_query(params, page_info) must be defined in the test, see example in comment') unless defined?(super)
+    # Convenience helper for the large number of queries defined as a projection
+    # from some root value indexed by full_path to a collection of objects with IID
+    def nested_internal_id_query(root_field, parent, field, args, selection: :iid)
+      graphql_query_for(root_field, { full_path: parent.full_path },
+        query_nodes(field, selection, args: args, include_pagination_info: true)
+      )
+    end
+
+    def pagination_query(params)
+      raise('pagination_query(params) must be defined in the test, see example in comment') unless defined?(super)
 
       super
     end
 
-    def pagination_results_data(data)
-      raise('pagination_results_data(data) must be defined in the test, see example in comment') unless defined?(super)
-
-      super(data)
+    def pagination_results_data(nodes)
+      if defined?(super)
+        super(nodes)
+      else
+        nodes.map { |n| n.dig(*node_path) }
+      end
     end
 
     def results
-      edges = graphql_dig_at(graphql_data(fresh_response_data), *data_path, :edges)
-      pagination_results_data(edges)
+      nodes = graphql_dig_at(graphql_data(fresh_response_data), *data_path, :nodes)
+      pagination_results_data(nodes)
     end
 
     def end_cursor
       graphql_dig_at(graphql_data(fresh_response_data), *data_path, :page_info, :end_cursor)
     end
 
-    let(:query) { pagination_query(params, page_info) }
+    def start_cursor
+      graphql_dig_at(graphql_data(fresh_response_data), *data_path, :page_info, :start_cursor)
+    end
+
+    let(:query) { pagination_query(params) }
 
     before do
       post_graphql(query, current_user: current_user)
@@ -91,58 +112,15 @@ RSpec.shared_examples 'sorted paginated query' do
         it 'paginates correctly' do
           expect(results).to eq first_page
 
-          cursored_query = pagination_query(sort_argument.merge(after: end_cursor), page_info)
-          post_graphql(cursored_query, current_user: current_user)
+          fwds = pagination_query(sort_argument.merge(after: end_cursor))
+          post_graphql(fwds, current_user: current_user)
 
           expect(results).to eq rest
-        end
-      end
-    end
-  end
-end
 
-RSpec.shared_examples 'sorted pagable query' do
-  let(:sort_argument)  { graphql_args(sort: sort_value) }
-  let(:page_info)      { "pageInfo { startCursor endCursor }" }
+          bwds = pagination_query(sort_argument.merge(before: start_cursor))
+          post_graphql(bwds, current_user: current_user)
 
-  def paging_query(params)
-    raise('paging_query(params) must be defined in the test, see example in comment') unless defined?(super)
-
-    super
-  end
-
-  def nodes
-    graphql_dig_at(graphql_data(fresh_response_data), *data_path, :nodes)
-  end
-
-  def end_cursor
-    graphql_dig_at(graphql_data(fresh_response_data), *data_path, :page_info, :end_cursor)
-  end
-
-  context 'when sorting' do
-    it 'sorts correctly' do
-      post_graphql(paging_query(sort_argument), current_user: current_user)
-
-      expect(nodes).to eq all_results
-    end
-
-    it 'has at least 5 items' do
-      # We need to page a few times - this makes sure we can page at least twice
-      expect(all_results.size).to be >= 5
-    end
-
-    context 'when paginating' do
-      let(:page_size) { 2 }
-
-      it 'paginates correctly' do
-        all_results.in_groups_of(page_size, false).reduce(nil) do |cursor, group|
-          q = paging_query(sort_argument.merge(first: page_size, after: cursor))
-
-          post_graphql(q, current_user: current_user)
-
-          expect(nodes).to eq(group)
-
-          end_cursor
+          expect(results).to eq first_page
         end
       end
     end

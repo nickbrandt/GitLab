@@ -59,16 +59,12 @@ RSpec.describe 'Users' do
   describe 'sorting and pagination' do
     let_it_be(:data_path) { [:users] }
 
-    def pagination_query(params, page_info)
-      graphql_query_for("users", params, "#{page_info} edges { node { id } }")
-    end
-
-    def pagination_results_data(data)
-      data.map { |user| user.dig('node', 'id') }
+    def pagination_query(params)
+      graphql_query_for(:users, params, "#{page_info} nodes { id }")
     end
 
     context 'when sorting by created_at' do
-      let_it_be(:ascending_users) { [user3, user2, user1, current_user].map(&:to_global_id).map(&:to_s) }
+      let_it_be(:ascending_users) { [user3, user2, user1, current_user].map { |u| global_id_of(u) } }
 
       context 'when ascending' do
         it_behaves_like 'sorted paginated query' do

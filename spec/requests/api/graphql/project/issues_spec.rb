@@ -142,16 +142,14 @@ RSpec.describe 'getting an issue list for a project' do
   describe 'sorting and pagination' do
     let_it_be(:data_path) { [:project, :issues] }
 
-    def pagination_query(params, page_info)
-      graphql_query_for(
-        'project',
-        { 'fullPath' => sort_project.full_path },
-        query_graphql_field('issues', params, "#{page_info} edges { node { iid dueDate} }")
+    def pagination_query(params)
+      graphql_query_for(:project, { full_path: sort_project.full_path },
+        query_graphql_field(:issues, params, "#{page_info} nodes { iid }")
       )
     end
 
     def pagination_results_data(data)
-      data.map { |issue| issue.dig('node', 'iid').to_i }
+      data.map { |issue| issue.dig('iid').to_i }
     end
 
     context 'when sorting by due date' do

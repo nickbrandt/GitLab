@@ -96,20 +96,17 @@ RSpec.describe 'getting projects' do
       ns.add_owner(current_user)
     end
 
-    def pagination_query(params, page_info)
+    def pagination_query(params)
       arguments = params.merge(include_subgroups: include_subgroups, search: search)
       graphql_query_for(:namespace, ns_args, query_graphql_field(:projects, arguments, <<~GQL))
         #{page_info}
-        edges { node { name } }
+        nodes { name }
       GQL
-    end
-
-    def pagination_results_data(data)
-      data.map { |project| project.dig('node', 'name') }
     end
 
     context 'when sorting by similarity' do
       it_behaves_like 'sorted paginated query' do
+        let(:node_path)        { %w[name] }
         let(:sort_param)       { :SIMILARITY }
         let(:first_param)      { 2 }
         let(:expected_results) { [project_3.name, project_2.name, project_4.name] }

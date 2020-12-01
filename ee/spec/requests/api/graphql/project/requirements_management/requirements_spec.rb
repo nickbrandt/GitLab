@@ -161,16 +161,12 @@ RSpec.describe 'getting a requirement list for a project' do
     describe 'sorting and pagination' do
       let_it_be(:data_path) { [:project, :requirements] }
 
-      def pagination_query(params, page_info)
-        graphql_query_for(
-          'project',
-          { 'fullPath' => sort_project.full_path },
-          query_graphql_field('requirements', params, "#{page_info} edges { node { iid createdAt} }")
-        )
+      def pagination_query(params)
+        nested_internal_id_query(:project, sort_project, :requirements, params)
       end
 
       def pagination_results_data(data)
-        data.map { |issue| issue.dig('node', 'iid').to_i }
+        data.map { |issue| issue.dig('iid').to_i }
       end
 
       context 'when sorting by created_at' do
