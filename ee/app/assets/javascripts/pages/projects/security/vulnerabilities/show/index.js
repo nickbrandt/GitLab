@@ -20,7 +20,7 @@ import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
       permissionsHelpPath: vulnerability.permissionsHelpPath,
     },
 
-    render: h =>
+    render: (h) =>
       h(MainApp, {
         props: { vulnerability },
       }),
