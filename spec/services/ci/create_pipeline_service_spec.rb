@@ -1418,6 +1418,13 @@ RSpec.describe Ci::CreatePipelineService do
               pipeline
             end
 
+            it 'schedules updating the pipeline counts for the merge request' do
+              expect(UpdatePipelineCountsForMergeRequestWorker)
+                .to receive(:perform_async).with(merge_request.id)
+
+              pipeline
+            end
+
             context 'when target sha is specified' do
               let(:target_sha) { merge_request.target_branch_sha }
 

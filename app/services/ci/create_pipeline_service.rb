@@ -81,7 +81,10 @@ module Ci
         .new(pipeline, command, SEQUENCE)
         .build!
 
-      schedule_head_pipeline_update if pipeline.persisted?
+      if pipeline.persisted?
+        schedule_head_pipeline_update
+        schedule_merge_request_pipeline_count_update
+      end
 
       # If pipeline is not persisted, try to recover IID
       pipeline.reset_project_iid unless pipeline.persisted?
@@ -111,6 +114,12 @@ module Ci
     def schedule_head_pipeline_update
       pipeline.all_merge_requests.opened.each do |merge_request|
         UpdateHeadPipelineForMergeRequestWorker.perform_async(merge_request.id)
+      end
+    end
+
+    def schedule_merge_request_pipeline_count_update
+      pipeline.all_merge_requests.opened.each do |merge_request|
+        UpdatePipelineCountsForMergeRequestWorker.perform_async(merge_request.id)
       end
     end
 
