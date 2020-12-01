@@ -5395,7 +5395,7 @@ input DeleteAnnotationInput {
   clientMutationId: String
 
   """
-  The global ID of the annotation to delete
+  Global ID of the annotation to delete
   """
   id: MetricsDashboardAnnotationID!
 }
