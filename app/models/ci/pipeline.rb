@@ -120,7 +120,6 @@ module Ci
     validates :source, exclusion: { in: %w(unknown), unless: :importing? }, on: :create
 
     after_create :keep_around_commits, unless: :importing?
-    after_create :increment_pipeline_count
 
     # We use `Enums::Ci::Pipeline.sources` here so that EE can more easily extend
     # this `Hash` with new values.
@@ -1207,12 +1206,6 @@ module Ci
       return unless project
 
       project.repository.keep_around(self.sha, self.before_sha)
-    end
-
-    def increment_pipeline_count
-      return unless merge_request?
-
-      merge_request.update_pipelines_count
     end
   end
 end
