@@ -58,7 +58,7 @@ module Security
 
     def deduplicate_findings!
       @findings, * = @findings.each_with_object([[], Set.new]) do |finding, (deduplicated, seen_identifiers)|
-        next if finding.keys.any? { |key| seen_identifiers.member?(key) }
+        next if seen_identifiers.intersect?(finding.keys.to_set)
 
         seen_identifiers.merge(finding.keys)
         deduplicated << finding

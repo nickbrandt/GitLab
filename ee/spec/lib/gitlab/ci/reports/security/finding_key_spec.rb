@@ -11,6 +11,9 @@ RSpec.describe Gitlab::Ci::Reports::Security::FindingKey do
       'location fp' | nil                     | 'identifier fp' | 'different identifier fp' | false
       'location fp' | 'different location fp' | nil             | 'different identifier fp' | false
       'location fp' | 'different location fp' | 'identifier fp' | nil                       | false
+      nil           | nil                     | 'identifier fp' | 'identifier fp'           | false
+      'location fp' | 'location fp'           | nil             | nil                       | false
+      nil           | nil                     | nil             | nil                       | false
       'location fp' | 'different location fp' | 'identifier fp' | 'different identifier fp' | false
       'location fp' | 'different location fp' | 'identifier fp' | 'identifier fp'           | false
       'location fp' | 'location fp'           | 'identifier fp' | 'different identifier fp' | false

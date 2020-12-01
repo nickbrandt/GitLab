@@ -57,7 +57,7 @@ module Security
     end
 
     def register_keys(keys)
-      return false if keys.any? { |key| known_keys.member?(key) }
+      return false if known_keys.intersect?(keys.to_set)
 
       known_keys.merge(keys)
     end
