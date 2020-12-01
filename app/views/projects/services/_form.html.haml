@@ -1,13 +1,13 @@
 - if lookup_context.template_exists?('top', "projects/services/#{@service.to_param}", true)
   = render "projects/services/#{@service.to_param}/top"
 
-.row.gl-mt-3.gl-mb-3
-  .col-lg-4
-    %h3.page-title.gl-mt-0
-      = @service.title
-      - if @service.operating?
-        = sprite_icon('check', css_class: 'gl-text-green-500')
+%h3.page-title.gl-mt-3
+  = @service.title
+  - if @service.operating?
+    = sprite_icon('check', css_class: 'gl-text-green-500')
 
+.row.gl-mb-3
+  .col-lg-4
     - if @service.respond_to?(:detailed_description)
       %p= @service.detailed_description
   .col-lg-8
