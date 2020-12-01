@@ -4324,11 +4324,12 @@ into templates.
 
 ## Skip Pipeline
 
-If your commit message contains `[ci skip]` or `[skip ci]`, using any
-capitalization, the commit is created but the pipeline is skipped.
+To push a commit without triggering a pipeline, add `[ci skip]` or `[skip ci]`, using any
+capitalization, to your commit message.
 
-Alternatively, one can pass the `ci.skip` [Git push option](../../user/project/push_options.md#push-options-for-gitlab-cicd)
-if using Git 2.10 or newer.
+Alternatively, if you are using Git 2.10 or later, use the `ci.skip` [Git push option](../../user/project/push_options.md#push-options-for-gitlab-cicd).
+The `ci.skip` push option does not skip merge request
+pipelines.
 
 ## Processing Git pushes
 
