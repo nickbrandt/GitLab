@@ -1769,9 +1769,9 @@ class MergeRequest < ApplicationRecord
   end
 
   def update_pipelines_count
-    @total_count = pipeline_finder.all.count
-    @target_count = pipeline_finder.all.for_project(target_project).count
-    @source_count = pipeline_finder.all.for_project(source_project).count
+    @total_count = all_pipelines.count
+    @target_count = all_pipelines.for_project(target_project).count
+    @source_count = all_pipelines.for_project(source_project).count
 
     update(
       total_pipelines_count: @total_count,
@@ -1781,13 +1781,6 @@ class MergeRequest < ApplicationRecord
   end
 
   private
-
-  def pipeline_finder
-    @pipeline_finder ||= Ci::PipelinesForMergeRequestFinder.new(
-      self,
-      defined?(current_user) ? current_user : nil
-    )
-  end
 
   def with_rebase_lock
     if Feature.enabled?(:merge_request_rebase_nowait_lock, default_enabled: true)
