@@ -101,6 +101,18 @@ RSpec.describe Gitlab::Diff::FileCollection::MergeRequestDiffBatch do
         expect(collection.diff_files.map(&:new_path)).to eq(expected_batch_files)
       end
     end
+
+    context 'with diffs gradual load feature flag enabled' do
+      let(:batch_page) { 0 }
+
+      before do
+        stub_feature_flags(diffs_gradual_load: true)
+      end
+
+      it 'returns correct diff files' do
+        expect(subject.diffs.map(&:new_path)).to eq(diff_files_relation.page(1).per(batch_size).map(&:new_path))
+      end
+    end
   end
 
   it_behaves_like 'unfoldable diff' do
