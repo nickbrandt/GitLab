@@ -197,8 +197,8 @@ module Gitlab
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
-        def build_new_user
-          user_params = user_attributes.merge(skip_confirmation: true)
+        def build_new_user(skip_confirmation: true)
+          user_params = user_attributes.merge(skip_confirmation: skip_confirmation)
           Users::BuildService.new(nil, user_params).execute(skip_authorization: true)
         end
 
