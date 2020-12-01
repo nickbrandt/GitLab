@@ -9,7 +9,7 @@ module Types
       authorize :read_incident_management_oncall_schedule
 
       field :id,
-            GraphQL::ID_TYPE,
+            Types::GlobalIDType[::IncidentManagement::OncallRotation],
             null: false,
             description: 'ID of the on-call rotation'
 
@@ -29,7 +29,7 @@ module Types
             description: 'Time zone of the on-call schedule'
 
       field :rotation_length_unit,
-            GraphQL::STRING_TYPE,
+            Types::IncidentManagement::OncallRotationLengthUnitEnum,
             null: true,
             description: 'Unit of the on-call rotation length'
 

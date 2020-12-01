@@ -10247,7 +10247,7 @@ type IncidentManagementOncallRotation {
   """
   ID of the on-call rotation
   """
-  id: ID!
+  id: IncidentManagementOncallRotationID!
 
   """
   Name of the on-call rotation
@@ -10287,13 +10287,18 @@ type IncidentManagementOncallRotation {
   """
   Unit of the on-call rotation length
   """
-  rotationLengthUnit: String
+  rotationLengthUnit: OncallRotationUnitEnum
 
   """
   Start date of the on-call rotation
   """
   startsAt: Time
 }
+
+"""
+Identifier of IncidentManagement::OncallRotation
+"""
+scalar IncidentManagementOncallRotationID
 
 """
 Describes an incident management on-call schedule
@@ -14822,17 +14827,17 @@ Rotation length unit of an on-call rotation
 """
 enum OncallRotationUnitEnum {
   """
-  Days unit
+  One Days
   """
   DAYS
 
   """
-  Hours unit
+  One Hours
   """
   HOURS
 
   """
-  Weeks unit
+  One Weeks
   """
   WEEKS
 }
@@ -14932,17 +14937,17 @@ The rotation user and color palette
 """
 input OncallUserInputType {
   """
-  The color palette for the user
+  The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI.
   """
   colorPalette: String
 
   """
-  The color weight for the user
+  The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI.
   """
   colorWeight: String
 
   """
-  The username of the user to participate in the on-call rotation
+  The username of the user to participate in the on-call rotation. i.e user_one
   """
   username: String!
 }
@@ -14952,12 +14957,12 @@ The rotation user and color palette
 """
 type OncallUserType {
   """
-  The color palette for the user
+  The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI.
   """
   colorPalette: String
 
   """
-  The color weight for the user
+  The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI.
   """
   colorWeight: String
 

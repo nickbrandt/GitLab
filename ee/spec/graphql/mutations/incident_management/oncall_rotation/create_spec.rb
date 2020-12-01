@@ -32,7 +32,7 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
   specify { expect(described_class).to require_graphql_authorizations(:admin_incident_management_oncall_schedule) }
 
   describe '#resolve' do
-    subject(:resolve) { mutation_for(project, current_user).resolve(args) }
+    subject(:resolve) { mutation_for(project, current_user).resolve(iid: schedule.iid, project_path: project.full_path, participants: args[:participants], **args) }
 
     context 'user has access to project' do
       before do
@@ -42,9 +42,9 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
 
       context 'when OncallRotation::CreateService responds with success' do
         it 'returns the on-call rotation with no errors' do
-          expect(resolve).to eq(
+          expect(resolve).to match(
             oncall_rotation: ::IncidentManagement::OncallRotation.last!,
-            errors: []
+            errors: be_empty
           )
         end
       end
@@ -61,6 +61,49 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
             oncall_rotation: nil,
             errors: ['An on-call rotation already exists']
           )
+        end
+      end
+
+      describe 'error cases' do
+        context 'time is invalid' do
+          before do
+            args.merge!(starts_at: { date: 'Not a date' })
+          end
+
+          it 'returns the on-call rotation with errors' do
+            expect(resolve).to eq(
+              oncall_rotation: nil,
+              errors: ["Starts at can't be blank"]
+            )
+          end
+        end
+
+        context 'user cannot be found' do
+          before do
+            args.merge!(participants: [username: 'unknown'])
+          end
+
+          it 'raises an error' do
+            expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'A username that was provided could not be matched to a user')
+          end
+        end
+
+        context 'schedule does not exist' do
+          let(:schedule) { double(iid: 999, timezone: 'UTC') }
+
+          it 'raises an error' do
+            expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'The schedule could not be found')
+          end
+        end
+
+        context 'too many users' do
+          before do
+            stub_const('Mutations::IncidentManagement::OncallRotation::Create::MAXIMUM_PARTICIPANTS', 0)
+          end
+
+          it 'raises an error' do
+            expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, "A maximum of #{described_class::MAXIMUM_PARTICIPANTS} participants can be added")
+          end
         end
       end
     end

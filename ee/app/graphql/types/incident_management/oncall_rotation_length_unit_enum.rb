@@ -7,7 +7,7 @@ module Types
       description 'Rotation length unit of an on-call rotation'
 
       ::IncidentManagement::OncallRotation.rotation_length_units.keys.each do |unit|
-        value unit.upcase, value: unit, description: "#{unit.titleize} unit"
+        value unit.upcase, value: unit, description: "One #{unit.titleize}"
       end
     end
   end

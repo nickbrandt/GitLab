@@ -12956,10 +12956,10 @@ CREATE TABLE incident_management_oncall_rotations (
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
     oncall_schedule_id bigint NOT NULL,
-    name text NOT NULL,
     rotation_length integer NOT NULL,
     rotation_length_unit smallint NOT NULL,
     starts_at timestamp with time zone NOT NULL,
+    name text NOT NULL,
     CONSTRAINT check_5209fb5d02 CHECK ((char_length(name) <= 200))
 );
 

@@ -11,7 +11,7 @@ module IncidentManagement
       def initialize(schedule, project, user, params, participants)
         @schedule = schedule
         @project = project
-        @user = user
+        @current_user = user
         @params = params
         @participants = participants
       end
@@ -24,8 +24,8 @@ module IncidentManagement
 
         return error_in_create(oncall_rotation) unless oncall_rotation.persisted?
 
-        participants.each do |participant|
-          OncallParticipant.create(
+        new_participants = participants.map do |participant|
+          OncallParticipant.new(
             oncall_rotation: oncall_rotation,
             participant: participant[:user],
             color_palette:  participant[:color_palette],
@@ -33,15 +33,17 @@ module IncidentManagement
           )
         end
 
+        OncallParticipant.bulk_insert!(new_participants)
+
         success(oncall_rotation)
       end
 
       private
 
-      attr_reader :schedule, :project, :user, :params, :participants
+      attr_reader :schedule, :project, :current_user, :params, :participants
 
       def allowed?
-        user&.can?(:admin_incident_management_oncall_schedule, project)
+        current_user&.can?(:admin_incident_management_oncall_schedule, project)
       end
 
       def available?
@@ -58,11 +60,11 @@ module IncidentManagement
       end
 
       def error_no_permissions
-        error(_('You have insufficient permissions to create an on-call rotation for this project'))
+        error('You have insufficient permissions to create an on-call rotation for this project')
       end
 
       def error_no_license
-        error(_('Your license does not support on-call rotations'))
+        error('Your license does not support on-call rotations')
       end
 
       def error_in_create(oncall_rotation)

@@ -2,7 +2,7 @@
 
 module IncidentManagement
   class OncallSchedulesFinder
-    def initialize(current_user, project, params = {})
+    def initialize(current_user, project, **params)
       @current_user = current_user
       @project = project
       @params = params

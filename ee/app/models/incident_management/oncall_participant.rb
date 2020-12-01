@@ -2,6 +2,8 @@
 
 module IncidentManagement
   class OncallParticipant < ApplicationRecord
+    include BulkInsertSafe
+
     self.table_name = 'incident_management_oncall_participants'
 
     belongs_to :oncall_rotation, foreign_key: :oncall_rotation_id

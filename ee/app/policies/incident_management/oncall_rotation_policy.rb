@@ -2,6 +2,6 @@
 
 module IncidentManagement
   class OncallRotationPolicy < ::BasePolicy
-    delegate { @subject.project }
+    delegate :project
   end
 end

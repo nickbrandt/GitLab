@@ -1596,11 +1596,11 @@ Describes an incident management on-call rotation.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `id` | ID! | ID of the on-call rotation |
+| `id` | IncidentManagementOncallRotationID! | ID of the on-call rotation |
 | `name` | String! | Name of the on-call rotation |
 | `participants` | OncallUserTypeConnection | Participants of the on-call rotation |
 | `rotationLength` | Int | Time zone of the on-call schedule |
-| `rotationLengthUnit` | String | Unit of the on-call rotation length |
+| `rotationLengthUnit` | OncallRotationUnitEnum | Unit of the on-call rotation length |
 | `startsAt` | Time | Start date of the on-call rotation |
 
 ### IncidentManagementOncallSchedule
@@ -2295,8 +2295,8 @@ The rotation user and color palette.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `colorPalette` | String | The color palette for the user |
-| `colorWeight` | String | The color weight for the user |
+| `colorPalette` | String | The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI. |
+| `colorWeight` | String | The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI. |
 | `user` | User! | The user who is participating |
 
 ### Package
@@ -4372,9 +4372,9 @@ Rotation length unit of an on-call rotation.
 
 | Value | Description |
 | ----- | ----------- |
-| `DAYS` | Days unit |
-| `HOURS` | Hours unit |
-| `WEEKS` | Weeks unit |
+| `DAYS` | One Days |
+| `HOURS` | One Hours |
+| `WEEKS` | One Weeks |
 
 ### PackageTypeEnum
 

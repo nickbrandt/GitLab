@@ -71,10 +71,10 @@ RSpec.describe 'Creating a new on-call schedule' do
     expect(response).to have_gitlab_http_status(:success)
 
     expect(oncall_rotation_response.slice(*%w[id name rotationLength rotationLengthUnit])).to eq(
-      'id' => "gid://gitlab/IncidentManagement::OncallRotation/#{new_oncall_rotation.id}",
+      'id' => global_id_of(new_oncall_rotation),
       'name' => args[:name],
       'rotationLength' => 1,
-      'rotationLengthUnit' => 'days'
+      'rotationLengthUnit' => 'DAYS'
     )
 
     start_time = "#{args[:starts_at][:date]} #{args[:starts_at][:time]}".in_time_zone(schedule.timezone)
@@ -83,7 +83,7 @@ RSpec.describe 'Creating a new on-call schedule' do
     expect(oncall_rotation_response.dig('participants', 'nodes')).to contain_exactly(
       {
         'user' => {
-          'id' => "gid://gitlab/User/#{current_user.id}",
+          'id' => global_id_of(current_user),
           'username' => current_user.username
         }
       }

@@ -14,7 +14,8 @@ module Mutations
 
         argument :schedule_iid, GraphQL::STRING_TYPE,
                  required: true,
-                 description: 'The iid of the on-call schedule to create the on-call rotation in'
+                 description: 'The iid of the on-call schedule to create the on-call rotation in',
+                 as: :iid
 
         argument :name, GraphQL::STRING_TYPE,
                  required: true,
@@ -33,12 +34,16 @@ module Mutations
                  required: true,
                  description: 'The usernames to participate in the on-call rotation.'
 
-        def resolve(args)
-          project = authorized_find!(full_path: args[:project_path])
+        MAXIMUM_PARTICIPANTS = 100
 
-          schedule = ::IncidentManagement::OncallSchedulesFinder.new(current_user, project, { iids: args[:schedule_iid] })
+        def resolve(iid:, project_path:, participants:, **args)
+          project = authorized_find!(full_path: project_path)
+
+          schedule = ::IncidentManagement::OncallSchedulesFinder.new(current_user, project, iids: iid)
                                                                 .execute
                                                                 .first
+
+          raise_schedule_not_found unless schedule
 
           params = prepare_params(args, schedule)
 
@@ -46,16 +51,13 @@ module Mutations
             schedule,
             project,
             current_user,
-            params.except(:participants),
-            find_participants(args[:participants])
+            params,
+            find_participants(participants)
           ).execute
 
           errors = result.error? ? [result.message] : []
 
-          {
-            oncall_rotation: result.payload[:oncall_rotation],
-            errors: errors
-          }
+          response(result, errors)
         end
 
         private
@@ -81,16 +83,28 @@ module Mutations
         end
 
         def find_participants(user_array)
+          raise_too_many_users_error if user_array.size > MAXIMUM_PARTICIPANTS
+
           usernames = user_array.map {|h| h[:username] }
+          matched_users = UsersFinder.new(current_user, username: usernames).execute.order_by(:username)
 
-          matched_users = UsersFinder.new(current_user, username: usernames).execute
+          raise_user_not_found if matched_users.size != user_array.size
 
-          user_array.map do |user|
-            matched_user = matched_users.find { |u| u.username == user[:username] }
-            next unless matched_user.present?
+          user_array = user_array.sort_by! { |h| h[:username] }
 
-            user.to_h.merge(user: matched_user)
-          end.compact
+          user_array.map.with_index { |param, i| param.to_h.merge(user: matched_users[i]) }
+        end
+
+        def raise_schedule_not_found
+          raise Gitlab::Graphql::Errors::ArgumentError, 'The schedule could not be found'
+        end
+
+        def raise_too_many_users_error
+          raise Gitlab::Graphql::Errors::ArgumentError, "A maximum of #{MAXIMUM_PARTICIPANTS} participants can be added"
+        end
+
+        def raise_user_not_found
+          raise Gitlab::Graphql::Errors::ArgumentError, 'A username that was provided could not be matched to a user'
         end
       end
     end

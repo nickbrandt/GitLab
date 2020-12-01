@@ -28091,7 +28091,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "IncidentManagementOncallRotationID",
                   "ofType": null
                 }
               },
@@ -28190,8 +28190,8 @@
 
               ],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
+                "kind": "ENUM",
+                "name": "OncallRotationUnitEnum",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -28216,6 +28216,16 @@
           "interfaces": [
 
           ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "IncidentManagementOncallRotationID",
+          "description": "Identifier of IncidentManagement::OncallRotation",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
           "enumValues": null,
           "possibleTypes": null
         },
@@ -44099,19 +44109,19 @@
           "enumValues": [
             {
               "name": "HOURS",
-              "description": "Hours unit",
+              "description": "One Hours",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "DAYS",
-              "description": "Days unit",
+              "description": "One Days",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "WEEKS",
-              "description": "Weeks unit",
+              "description": "One Weeks",
               "isDeprecated": false,
               "deprecationReason": null
             }
@@ -44382,7 +44392,7 @@
           "inputFields": [
             {
               "name": "username",
-              "description": "The username of the user to participate in the on-call rotation",
+              "description": "The username of the user to participate in the on-call rotation. i.e user_one",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -44396,7 +44406,7 @@
             },
             {
               "name": "colorPalette",
-              "description": "The color palette for the user",
+              "description": "The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI.",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -44406,7 +44416,7 @@
             },
             {
               "name": "colorWeight",
-              "description": "The color weight for the user",
+              "description": "The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI.",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -44426,7 +44436,7 @@
           "fields": [
             {
               "name": "colorPalette",
-              "description": "The color palette for the user",
+              "description": "The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI.",
               "args": [
 
               ],
@@ -44440,7 +44450,7 @@
             },
             {
               "name": "colorWeight",
-              "description": "The color weight for the user",
+              "description": "The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI.",
               "args": [
 
               ],
