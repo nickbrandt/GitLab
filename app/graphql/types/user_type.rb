@@ -33,8 +33,7 @@ module Types
           resolver: Resolvers::TodoResolver,
           description: 'Todos of the user'
     field :group_memberships, Types::GroupMemberType.connection_type, null: true,
-          description: 'Group memberships of the user',
-          method: :group_members
+          description: 'Group memberships of the user'
     field :group_count, GraphQL::INT_TYPE, null: true,
           resolver: Resolvers::Users::GroupCountResolver,
           description: 'Group count for the user',
@@ -44,8 +43,7 @@ module Types
     field :location, ::GraphQL::STRING_TYPE, null: true,
           description: 'The location of the user.'
     field :project_memberships, Types::ProjectMemberType.connection_type, null: true,
-          description: 'Project memberships of the user',
-          method: :project_members
+          description: 'Project memberships of the user'
     field :starred_projects, Types::ProjectType.connection_type, null: true,
           description: 'Projects starred by the user',
           resolver: Resolvers::UserStarredProjectsResolver
