@@ -63,17 +63,6 @@ module WebIdeSpecHelpers
     ide_set_editor_value(content)
   end
 
-  def ide_rename_file(path, new_path)
-    container = ide_traverse_to_file(path)
-
-    click_file_action(container, 'Rename/Move')
-
-    within '#ide-new-entry' do
-      find('input').fill_in(with: new_path)
-      click_button('Rename file')
-    end
-  end
-
   # Deletes a file by traversing to `path`
   # then clicking the 'Delete' action.
   #
@@ -99,20 +88,6 @@ module WebIdeSpecHelpers
     end
 
     container
-  end
-
-  def ide_close_file(name)
-    within page.find('.multi-file-tabs') do
-      click_button("Close #{name}")
-    end
-  end
-
-  def ide_open_file(path)
-    row = ide_traverse_to_file(path)
-
-    ide_open_file_row(row)
-
-    wait_for_requests
   end
 
   def ide_open_file_row(row)
