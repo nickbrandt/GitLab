@@ -14507,7 +14507,7 @@
           "fields": [
             {
               "name": "id",
-              "description": "ID of the site validation",
+              "description": "Global ID of the site validation",
               "args": [
 
               ],
@@ -14525,7 +14525,7 @@
             },
             {
               "name": "status",
-              "description": "The status of the validation",
+              "description": "Status of the site validation",
               "args": [
 
               ],
@@ -21660,7 +21660,7 @@
             },
             {
               "name": "blocked",
-              "description": "Indicates the issue is blocked",
+              "description": "Indicates the issue is blocked.",
               "args": [
 
               ],
@@ -21678,7 +21678,7 @@
             },
             {
               "name": "blockedByCount",
-              "description": "Count of issues blocking this issue",
+              "description": "Count of issues blocking this issue.",
               "args": [
 
               ],
@@ -21976,7 +21976,7 @@
             },
             {
               "name": "epic",
-              "description": "Epic to which this issue belongs",
+              "description": "Epic to which this issue belongs.",
               "args": [
 
               ],
@@ -22082,7 +22082,7 @@
             },
             {
               "name": "iteration",
-              "description": "Iteration of the issue",
+              "description": "Iteration of the issue.",
               "args": [
 
               ],
@@ -22424,7 +22424,7 @@
             },
             {
               "name": "statusPagePublishedIncident",
-              "description": "Indicates whether an issue is published to the status page",
+              "description": "Indicates whether an issue is published to the status page.",
               "args": [
 
               ],
@@ -22696,7 +22696,7 @@
             },
             {
               "name": "weight",
-              "description": "Weight of the issue",
+              "description": "Weight of the issue.",
               "args": [
 
               ],
@@ -28744,7 +28744,7 @@
             },
             {
               "name": "blocked",
-              "description": "Indicates the issue is blocked",
+              "description": "Indicates the issue is blocked.",
               "args": [
 
               ],
@@ -28762,7 +28762,7 @@
             },
             {
               "name": "blockedByCount",
-              "description": "Count of issues blocking this issue",
+              "description": "Count of issues blocking this issue.",
               "args": [
 
               ],
@@ -29060,7 +29060,7 @@
             },
             {
               "name": "epic",
-              "description": "Epic to which this issue belongs",
+              "description": "Epic to which this issue belongs.",
               "args": [
 
               ],
@@ -29152,7 +29152,7 @@
             },
             {
               "name": "iteration",
-              "description": "Iteration of the issue",
+              "description": "Iteration of the issue.",
               "args": [
 
               ],
@@ -29480,7 +29480,7 @@
             },
             {
               "name": "statusPagePublishedIncident",
-              "description": "Indicates whether an issue is published to the status page",
+              "description": "Indicates whether an issue is published to the status page.",
               "args": [
 
               ],
@@ -29752,7 +29752,7 @@
             },
             {
               "name": "weight",
-              "description": "Weight of the issue",
+              "description": "Weight of the issue.",
               "args": [
 
               ],

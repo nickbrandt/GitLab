@@ -7,16 +7,17 @@ module EE
 
       prepended do
         field :security_scanners, ::Types::SecurityScanners, null: true,
-          description: 'Information about security analyzers used in the project'
+              description: 'Information about security analyzers used in the project',
+              method: :itself
 
         field :dast_scanner_profiles,
-            ::Types::DastScannerProfileType.connection_type,
-            null: true,
-            description: 'The DAST scanner profiles associated with the project'
+              ::Types::DastScannerProfileType.connection_type,
+              null: true,
+              description: 'The DAST scanner profiles associated with the project'
 
         field :sast_ci_configuration, ::Types::CiConfiguration::Sast::Type, null: true,
-          calls_gitaly: true,
-          description: 'SAST CI configuration for the project'
+              calls_gitaly: true,
+              description: 'SAST CI configuration for the project'
 
         field :vulnerabilities,
               ::Types::VulnerabilityType.connection_type,
@@ -37,8 +38,8 @@ module EE
               resolver: ::Resolvers::VulnerabilitiesCountPerDayResolver
 
         field :vulnerability_severities_count, ::Types::VulnerabilitySeveritiesCountType, null: true,
-               description: 'Counts for each vulnerability severity in the project',
-               resolver: ::Resolvers::VulnerabilitySeveritiesCountResolver
+              description: 'Counts for each vulnerability severity in the project',
+              resolver: ::Resolvers::VulnerabilitySeveritiesCountResolver
 
         field :requirement, ::Types::RequirementsManagement::RequirementType, null: true,
               description: 'Find a single requirement',
@@ -106,7 +107,8 @@ module EE
         field :actual_repository_size_limit,
               GraphQL::FLOAT_TYPE,
               null: true,
-              description: 'Size limit for the repository in bytes'
+              description: 'Size limit for the repository in bytes',
+              method: :actual_size_limit
 
         field :code_coverage_summary,
               ::Types::Ci::CodeCoverageSummaryType,
@@ -119,10 +121,6 @@ module EE
               null: true,
               description: 'Incident Management On-call schedules of the project',
               resolver: ::Resolvers::IncidentManagement::OncallScheduleResolver
-
-        def actual_repository_size_limit
-          object.actual_size_limit
-        end
 
         def dast_scanner_profiles
           DastScannerProfilesFinder.new(project_ids: [object.id]).execute
@@ -142,10 +140,6 @@ module EE
 
         def security_dashboard_path
           Rails.application.routes.url_helpers.project_security_dashboard_index_path(object)
-        end
-
-        def security_scanners
-          object
         end
       end
     end
