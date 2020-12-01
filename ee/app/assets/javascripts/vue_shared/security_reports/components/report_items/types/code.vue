@@ -13,7 +13,7 @@ export default {
     },
     maxHeight: {
       type: String,
-      default: '225px',
+      default: '300px',
       required: false,
     },
   },
@@ -29,8 +29,12 @@ export default {
       return isScrollable ? scrollableStyles : null;
     },
   },
+  userColorScheme: window.gon.user_color_scheme,
 };
 </script>
 <template>
-  <code-block :code="value" />
+  <pre
+    class="code d-block m-0"
+    :class="$options.userColorScheme"
+  ><code :style="styleObject">{{value}}</code></pre>
 </template>
