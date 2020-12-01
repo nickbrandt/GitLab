@@ -31,14 +31,12 @@ export default {
 </script>
 
 <template>
-  <tr>
-    <td class="report-item-label-td">
-      <label class="font-weight-bold">
-        <gl-friendly-wrap :text="nameText" />
-      </label>
-      <span v-if="description.length > 0" :title="descriptionText">
-        <gl-icon name="question" :size="12" class="gl-text-gray-500" />
-      </span>
-    </td>
-  </tr>
+  <div>
+    <label class="font-weight-bold">
+      <gl-friendly-wrap :text="nameText" />
+    </label>
+    <span v-if="description.length > 0" :title="descriptionText">
+      <gl-icon name="question" :size="12" class="gl-text-gray-500" />
+    </span>
+  </div>
 </template>

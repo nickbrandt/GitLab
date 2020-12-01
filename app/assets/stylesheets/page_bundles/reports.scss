@@ -95,18 +95,18 @@
 
 .report-details-container {
   table.report-item-table {
-    margin-top: -5px;
+    margin-top: -10px;
     margin-bottom: 0;
 
     label {
       margin-bottom: 0;
     }
 
-    .report-item-table-tr > td {
-        border: none;
-    }
     .report-item-table-tr:not(:first-child) > td {
         border-top: 1px solid #dbdbdb;
+    }
+    .report-item-table-tr > td:first-child {
+      padding-top: 5px;
     }
 
     .report-item-label-td {
@@ -114,12 +114,9 @@
     }
 
     .report-item-table-td {
+      border: none;
       width: 100%;
-      padding: 5px 10px !important;
-
-      table.report-item-table {
-        margin-top: 0;
-      }
+      padding: 10px 10px !important;
     }
     .report-item-table-td:first-child {
       vertical-align: top;
@@ -134,6 +131,7 @@
   /* A condensed table of data to be displayed */
   table.report-item-data-table {
     margin: 0;
+    margin-top: -4px;
     display: table;
     width: 100%;
 
@@ -144,12 +142,18 @@
     }
 
     .report-item-data-table-th {
+      background-color: $gray-light;
       padding: 3px 10px;
     }
 
     .report-item-data-table-td {
       padding: 3px 10px;
     }
+  }
+
+  .report-item-diff-header {
+    background-color: $gray-light;
+    padding: 8px 16px;
   }
 
   .report-item-diff-buttons {
