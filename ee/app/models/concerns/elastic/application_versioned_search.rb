@@ -48,10 +48,11 @@ module Elastic
       ::Elastic::ProcessBookkeepingService.track!(self)
     end
 
-    def maintain_elasticsearch_update
+    def maintain_elasticsearch_update(updated_attributes: previous_changes.keys)
+      updated_attributes = updated_attributes.map(&:to_s) # Allow caller to provide symbols but keep consistent to using strings
       ::Elastic::ProcessBookkeepingService.track!(self)
 
-      associations_to_update = associations_needing_elasticsearch_update
+      associations_to_update = associations_needing_elasticsearch_update(updated_attributes)
       if associations_to_update.present?
         ElasticAssociationIndexerWorker.perform_async(self.class.name, id, associations_to_update)
       end
@@ -63,12 +64,12 @@ module Elastic
 
     # Override in child object if there are associations that need to be
     # updated when specific fields are updated
-    def associations_needing_elasticsearch_update
+    def associations_needing_elasticsearch_update(updated_attributes)
       self.class.elastic_index_dependants.map do |dependant|
         association_name = dependant[:association_name]
         on_change = dependant[:on_change]
 
-        next nil unless previous_changes.include?(on_change)
+        next nil unless updated_attributes.include?(on_change.to_s)
 
         association_name.to_s
       end.compact.uniq
