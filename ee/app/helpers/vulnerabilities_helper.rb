@@ -79,7 +79,8 @@ module VulnerabilitiesHelper
       :response,
       :evidence_source,
       :supporting_messages,
-      :assets
+      :assets,
+      :details
     )
 
     if data[:location]['file']

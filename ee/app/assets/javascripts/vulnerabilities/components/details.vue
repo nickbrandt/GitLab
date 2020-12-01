@@ -2,13 +2,14 @@
 import { GlLink, GlSprintf, GlTooltipDirective, GlIcon } from '@gitlab/ui';
 import { SUPPORTING_MESSAGE_TYPES } from 'ee/vulnerabilities/constants';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
+import ReportDetails from 'ee/vue_shared/security_reports/components/report_items/details.vue';
 import CodeBlock from '~/vue_shared/components/code_block.vue';
 import { __ } from '~/locale';
 import DetailItem from './detail_item.vue';
 
 export default {
   name: 'VulnerabilityDetails',
-  components: { CodeBlock, GlLink, SeverityBadge, DetailItem, GlSprintf, GlIcon },
+  components: { CodeBlock, GlLink, SeverityBadge, DetailItem, GlSprintf, GlIcon, ReportDetails },
   directives: {
     GlTooltip: GlTooltipDirective,
   },
@@ -62,7 +63,7 @@ export default {
     },
     recordedMessage() {
       return this.vulnerability?.supportingMessages?.find(
-        msg => msg.name === SUPPORTING_MESSAGE_TYPES.RECORDED,
+        (msg) => msg.name === SUPPORTING_MESSAGE_TYPES.RECORDED,
       )?.response;
     },
     constructedRequest() {
@@ -85,7 +86,7 @@ export default {
           content: this.constructedRequest,
           isCode: true,
         },
-      ].filter(x => x.content);
+      ].filter((x) => x.content);
     },
     responseData() {
       if (!this.vulnerability.response) {
@@ -98,7 +99,7 @@ export default {
           content: this.constructedResponse,
           isCode: true,
         },
-      ].filter(x => x.content);
+      ].filter((x) => x.content);
     },
     recordedResponseData() {
       if (!this.recordedMessage) {
@@ -111,7 +112,7 @@ export default {
           content: this.constructedRecordedResponse,
           isCode: true,
         },
-      ].filter(x => x.content);
+      ].filter((x) => x.content);
     },
     shouldShowLocation() {
       return (
@@ -134,6 +135,9 @@ export default {
     },
     hasResponses() {
       return Boolean(this.hasResponse || this.hasRecordedResponse);
+    },
+    details() {
+      return this.vulnerability.details;
     },
   },
   methods: {
@@ -373,5 +377,10 @@ export default {
         </detail-item>
       </ul>
     </template>
+
+    <div v-if="details">
+      <h3>{{ s__('Vulnerability|Details') }}</h3>
+      <report-details v-if="details" :vulnerability="vulnerability" />
+    </div>
   </div>
 </template>

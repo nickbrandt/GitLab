@@ -245,6 +245,10 @@ module Vulnerabilities
       end
     end
 
+    def details
+      metadata['details']
+    end
+
     def description
       metadata.dig('description')
     end

@@ -92,3 +92,63 @@
     display: none;
   }
 }
+
+.report-details-container {
+  table.report-item-table {
+    margin-top: -5px;
+    margin-bottom: 0;
+
+    label {
+      margin-bottom: 0;
+    }
+
+    .report-item-table-tr > td {
+        border: none;
+    }
+    .report-item-table-tr:not(:first-child) > td {
+        border-top: 1px solid #dbdbdb;
+    }
+
+    .report-item-label-td {
+      border: none;
+    }
+
+    .report-item-table-td {
+      width: 100%;
+      padding: 5px 10px !important;
+
+      table.report-item-table {
+        margin-top: 0;
+      }
+    }
+    .report-item-table-td:first-child {
+      vertical-align: top;
+      width: auto;
+      min-width: 10%;
+      white-space: nowrap;
+      overflow-x: auto;
+      text-align: right;
+    }
+  }
+
+  /* A condensed table of data to be displayed */
+  table.report-item-data-table {
+    margin: 0;
+    display: table;
+    width: 100%;
+
+    td,
+    th {
+      border-left: 0;
+      border-right: 0;
+    }
+
+    .report-item-data-table-th {
+      padding: 3px 10px;
+    }
+
+    .report-item-data-table-td {
+      padding: 3px 10px;
+    }
+  }
+}
