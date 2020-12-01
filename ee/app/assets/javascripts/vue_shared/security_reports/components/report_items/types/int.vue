@@ -5,8 +5,6 @@ const VALID_FORMATS = [ FORMAT_DEFAULT, FORMAT_HEX ];
 
 export default {
   name: 'ReportItemInt',
-  components: {
-  },
   props: {
     value: {
       type: Number,
@@ -22,10 +20,11 @@ export default {
   computed: {
     displayVal() {
       switch(this.format) {
-        case FORMAT_DEFAULT:
-          return this.value;
         case FORMAT_HEX:
           return this.hexVal();
+        case FORMAT_DEFAULT:
+        default:
+          return this.value;
       }
     }
   },

@@ -1,5 +1,5 @@
 import Jed from 'jed';
-import { languageCode } from "~/locale";
+import { languageCode } from '~/locale';
 
 /**
  * Create a new Jed instance from an object of the form:
@@ -39,7 +39,7 @@ function createLocale(messages) {
         };
         localeData[item.lang] = langItem;
       }
-      langItem[key] = [ item.value ];
+      langItem[key] = [item.value];
     });
   });
 
@@ -60,7 +60,7 @@ export function dynI8n(messages) {
   const locale = createLocale(tmpData);
   try {
     return locale.translate(defaultValue).fetch();
-  } catch(e) {
+  } catch (e) {
     return defaultValue;
   }
 }

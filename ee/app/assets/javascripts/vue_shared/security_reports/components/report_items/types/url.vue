@@ -1,6 +1,6 @@
 <script>
 import { GlFriendlyWrap, GlLink } from '@gitlab/ui';
-import { dynI8n } from "./dynamic_i8n";
+import { dynI8n } from "../dynamic_i8n";
 
 export default {
   name: 'ReportItemUrl',
