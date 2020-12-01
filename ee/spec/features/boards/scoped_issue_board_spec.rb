@@ -543,7 +543,7 @@ RSpec.describe 'Scoped issue boards', :js do
 
     click_on_board_modal
 
-    click_button 'Create'
+    click_button 'Create board'
 
     wait_for_requests
 
@@ -572,7 +572,7 @@ RSpec.describe 'Scoped issue boards', :js do
 
     click_on_board_modal
 
-    click_button 'Save'
+    click_button 'Save changes'
 
     wait_for_requests
 
@@ -582,6 +582,6 @@ RSpec.describe 'Scoped issue boards', :js do
   # Click on modal to make sure the dropdown is closed (e.g. label scenario)
   #
   def click_on_board_modal
-    find('.board-config-modal').click
+    find('.board-config-modal .modal-content').click
   end
 end

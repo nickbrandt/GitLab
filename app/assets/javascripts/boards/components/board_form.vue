@@ -19,15 +19,16 @@ const boardDefaults = {
   hide_closed_list: false,
 };
 
+const newFormType = 'new';
+const deleteFormType = 'delete';
+const editFormType = 'edit';
+
 export default {
   i18n: {
-    createBoardButtonText: __('Create board'),
-    deleteBoardButtonText: __('Delete'),
-    saveButtonText: __('Save changes'),
-    createModalTitle: __('Create new board'),
-    deleteModalTitle: __('Delete board'),
+    [newFormType]: { title: __('Create new board'), btnText: __('Create board') },
+    [deleteFormType]: { title: __('Delete board'), btnText: __('Delete') },
+    [editFormType]: { title: __('Edit board'), btnText: __('Save changes') },
     scopeModalTitle: __('Board scope'),
-    editModalTitle: __('Edit board'),
     cancelButtonText: __('Cancel'),
     deleteErrorMessage: __('Failed to delete board. Please try again.'),
     saveErrorMessage: __('Unable to save your changes. Please try again.'),
@@ -89,22 +90,16 @@ export default {
   },
   computed: {
     isNewForm() {
-      return this.currentPage === 'new';
+      return this.currentPage === newFormType;
     },
     isDeleteForm() {
-      return this.currentPage === 'delete';
+      return this.currentPage === deleteFormType;
     },
     isEditForm() {
-      return this.currentPage === 'edit';
+      return this.currentPage === editFormType;
     },
     buttonText() {
-      if (this.isNewForm) {
-        return this.$options.i18n.createBoardButtonText;
-      }
-      if (this.isDeleteForm) {
-        return this.$options.i18n.deleteBoardButtonText;
-      }
-      return this.$options.i18n.saveButtonText;
+      return this.$options.i18n[this.currentPage].btnText;
     },
     buttonKind() {
       if (this.isNewForm) {
@@ -116,16 +111,11 @@ export default {
       return 'info';
     },
     title() {
-      if (this.isNewForm) {
-        return this.$options.i18n.createModalTitle;
-      }
-      if (this.isDeleteForm) {
-        return this.$options.i18n.deleteModalTitle;
-      }
       if (this.readonly) {
         return this.$options.i18n.scopeModalTitle;
       }
-      return this.$options.i18n.editModalTitle;
+
+      return this.$options.i18n[this.currentPage].title;
     },
     readonly() {
       return !this.canAdminBoard;
@@ -136,7 +126,13 @@ export default {
     primaryProps() {
       return {
         text: this.buttonText,
-        attributes: [{ variant: this.buttonKind, disabled: this.submitDisabled }],
+        attributes: [
+          {
+            variant: this.buttonKind,
+            disabled: this.submitDisabled,
+            'data-qa-selector': 'save_changes_button',
+          },
+        ],
       };
     },
     cancelProps() {
@@ -207,6 +203,7 @@ export default {
   <gl-modal
     modal-id="board-config-modal"
     modal-class="board-config-modal"
+    content-class="gl-absolute gl-top-7"
     visible
     :hide-footer="readonly"
     :title="title"
@@ -215,6 +212,7 @@ export default {
     @primary="submit"
     @cancel="cancel"
     @close="cancel"
+    @hide.prevent
   >
     <p v-if="isDeleteForm">{{ $options.i18n.deleteConfirmationMessage }}</p>
     <form v-else class="js-board-config-modal" @submit.prevent>
