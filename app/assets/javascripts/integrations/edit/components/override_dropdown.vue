@@ -24,10 +24,6 @@ export default {
     GlLink,
   },
   props: {
-    inheritFromId: {
-      type: Number,
-      required: true,
-    },
     learnMorePath: {
       type: String,
       required: false,
@@ -72,7 +68,6 @@ export default {
         __('Learn more')
       }}</gl-link>
     </span>
-    <input name="service[inherit_from_id]" :value="override ? '' : inheritFromId" type="hidden" />
     <gl-dropdown :text="selected.text">
       <gl-dropdown-item
         v-for="option in $options.dropdownOptions"
