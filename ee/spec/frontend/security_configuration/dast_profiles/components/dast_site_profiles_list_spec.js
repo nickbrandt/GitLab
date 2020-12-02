@@ -7,6 +7,7 @@ import dastSiteValidationsQuery from 'ee/security_configuration/dast_site_valida
 import Component from 'ee/security_configuration/dast_profiles/components/dast_site_profiles_list.vue';
 import ProfilesList from 'ee/security_configuration/dast_profiles/components/dast_profiles_list.vue';
 import { updateSiteProfilesStatuses } from 'ee/security_configuration/dast_profiles/graphql/cache_utils';
+import { DAST_SITE_VALIDATION_STATUS } from 'ee/security_configuration/dast_site_validation/constants';
 import { siteProfiles } from '../mocks/mock_data';
 import * as responses from '../mocks/apollo_mock';
 
@@ -121,11 +122,11 @@ describe('EE - DastSiteProfileList', () => {
             responses.dastSiteValidations([
               {
                 normalizedTargetUrl: pendingValidation.normalizedTargetUrl,
-                status: 'FAILED_VALIDATION',
+                status: DAST_SITE_VALIDATION_STATUS.FAILED,
               },
               {
                 normalizedTargetUrl: inProgressValidation.normalizedTargetUrl,
-                status: 'PASSED_VALIDATION',
+                status: DAST_SITE_VALIDATION_STATUS.PASSED,
               },
             ]),
           ),
@@ -134,11 +135,11 @@ describe('EE - DastSiteProfileList', () => {
     });
 
     describe.each`
-      status           | statusEnum                 | label                  | hasValidateButton
-      ${'pending'}     | ${'PENDING_VALIDATION'}    | ${''}                  | ${true}
-      ${'in-progress'} | ${'INPROGRESS_VALIDATION'} | ${'Validating...'}     | ${false}
-      ${'passed'}      | ${'PASSED_VALIDATION'}     | ${'Validated'}         | ${false}
-      ${'failed'}      | ${'FAILED_VALIDATION'}     | ${'Validation failed'} | ${true}
+      status           | statusEnum                                | label                  | hasValidateButton
+      ${'pending'}     | ${DAST_SITE_VALIDATION_STATUS.PENDING}    | ${''}                  | ${true}
+      ${'in-progress'} | ${DAST_SITE_VALIDATION_STATUS.INPROGRESS} | ${'Validating...'}     | ${false}
+      ${'passed'}      | ${DAST_SITE_VALIDATION_STATUS.PASSED}     | ${'Validated'}         | ${false}
+      ${'failed'}      | ${DAST_SITE_VALIDATION_STATUS.FAILED}     | ${'Validation failed'} | ${true}
     `('profile with validation $status', ({ statusEnum, label, hasValidateButton }) => {
       const profile = siteProfiles.find(({ validationStatus }) => validationStatus === statusEnum);
 
@@ -171,8 +172,8 @@ describe('EE - DastSiteProfileList', () => {
 
     it.each`
       nthCall | normalizedTargetUrl                         | status
-      ${1}    | ${pendingValidation.normalizedTargetUrl}    | ${'FAILED_VALIDATION'}
-      ${2}    | ${inProgressValidation.normalizedTargetUrl} | ${'PASSED_VALIDATION'}
+      ${1}    | ${pendingValidation.normalizedTargetUrl}    | ${DAST_SITE_VALIDATION_STATUS.FAILED}
+      ${2}    | ${inProgressValidation.normalizedTargetUrl} | ${DAST_SITE_VALIDATION_STATUS.PASSED}
     `(
       'in the local cache, profile with normalized URL $normalizedTargetUrl has its status set to $status',
       ({ nthCall, normalizedTargetUrl, status }) => {
