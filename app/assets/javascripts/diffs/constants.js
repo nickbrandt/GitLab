@@ -77,6 +77,9 @@ export const ALERT_COLLAPSED_FILES = 'collapsed';
 export const DIFF_FILE_AUTOMATIC_COLLAPSE = 'automatic';
 export const DIFF_FILE_MANUAL_COLLAPSE = 'manual';
 
+// Diff view single file mode
+export const DIFF_FILE_BY_FILE_COOKIE_NAME = 'fileViewMode';
+export const DIFF_VIEW_FILE_BY_FILE = 'single';
 // State machine states
 export const STATE_IDLING = 'idle';
 export const STATE_LOADING = 'loading';
