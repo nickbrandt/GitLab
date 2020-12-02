@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :epic_board_position, class: 'Boards::EpicBoardPosition' do
     epic
-    board
+    epic_board
     relative_position { RelativePositioning::START_POSITION }
   end
 end
