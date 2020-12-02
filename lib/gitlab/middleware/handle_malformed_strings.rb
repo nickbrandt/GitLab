@@ -61,7 +61,7 @@ module Gitlab
 
         return false unless credentials
 
-        string_malformed?(credentials)
+        credentials_string_malformed?(credentials)
       end
 
       def param_has_null_byte?(value, depth = 0)
@@ -94,6 +94,13 @@ module Gitlab
         # so for certain characters in the string, those chars are probably incomplete
         # multibyte characters.
         string.encode(Encoding::UTF_8).match?(NULL_BYTE_REGEX)
+      rescue ArgumentError, Encoding::UndefinedConversionError
+        # If we're here, we caught a malformed string. Return true
+        true
+      end
+
+      def credentials_string_malformed?(string)
+        string.force_encoding('UTF-8').match?(NULL_BYTE_REGEX)
       rescue ArgumentError, Encoding::UndefinedConversionError
         # If we're here, we caught a malformed string. Return true
         true
