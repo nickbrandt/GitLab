@@ -25107,6 +25107,9 @@ msgstr ""
 msgid "Show me the basics"
 msgstr ""
 
+msgid "Show one file at a time"
+msgstr ""
+
 msgid "Show only direct members"
 msgstr ""
 
