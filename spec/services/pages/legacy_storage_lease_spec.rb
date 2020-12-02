@@ -30,9 +30,9 @@ RSpec.describe ::Pages::LegacyStorageLease do
   let(:service) { implementation.new(project) }
 
   it 'allows method to be executed' do
-    expect(service).to receive :execute_unsafe
+    expect(service).to receive(:execute_unsafe).and_call_original
 
-    service.execute
+    expect(service.execute).to eq(true)
   end
 
   context 'when another service holds the lease for the same project' do
@@ -46,6 +46,14 @@ RSpec.describe ::Pages::LegacyStorageLease do
       expect(service).not_to receive(:execute_unsafe)
 
       expect(service.execute).to eq(nil)
+    end
+
+    it 'runs guarded method if feature flag is disabled' do
+      stub_feature_flags(pages_use_legacy_storage_lease: false)
+
+      expect(service).to receive(:execute_unsafe).and_call_original
+
+      expect(service.execute).to eq(true)
     end
   end
 
