@@ -162,7 +162,7 @@ describe('EE - DastSiteProfileList', () => {
       });
     });
 
-    it('fetches validation statuses for all profiles that are being validated and updates the cache', async () => {
+    it('fetches validation statuses for all profiles that are being validated and updates the cache', () => {
       expect(requestHandlers.dastSiteValidations).toHaveBeenCalledWith({
         fullPath: defaultProps.fullPath,
         urls: urlsPendingValidation,
