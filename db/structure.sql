@@ -16178,6 +16178,7 @@ CREATE TABLE security_findings (
     project_fingerprint text NOT NULL,
     deduplicated boolean DEFAULT false NOT NULL,
     "position" integer,
+    uuid uuid,
     CONSTRAINT check_b9508c6df8 CHECK ((char_length(project_fingerprint) <= 40))
 );
 
@@ -22179,6 +22180,8 @@ CREATE UNIQUE INDEX index_security_findings_on_scan_id_and_position ON security_
 CREATE INDEX index_security_findings_on_scanner_id ON security_findings USING btree (scanner_id);
 
 CREATE INDEX index_security_findings_on_severity ON security_findings USING btree (severity);
+
+CREATE UNIQUE INDEX index_security_findings_on_uuid ON security_findings USING btree (uuid);
 
 CREATE INDEX index_self_managed_prometheus_alert_events_on_environment_id ON self_managed_prometheus_alert_events USING btree (environment_id);
 
