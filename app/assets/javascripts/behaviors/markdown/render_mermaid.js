@@ -46,6 +46,12 @@ function importMermaidModule() {
           useMaxWidth: true,
           htmlLabels: false,
         },
+        state: {
+          useMaxWidth: true,
+        },
+        class: {
+          useMaxWidth: true,
+        },
         securityLevel: 'strict',
       });
 
