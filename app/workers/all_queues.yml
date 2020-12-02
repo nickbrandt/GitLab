@@ -1272,6 +1272,14 @@
   :weight: 5
   :idempotent: true
   :tags: []
+- :name: pipeline_processing:update_pipeline_counts_for_merge_request
+  :feature_category: :continuous_integration
+  :has_external_dependencies:
+  :urgency: :high
+  :resource_boundary: :unknown
+  :weight: 5
+  :idempotent: true
+  :tags: []
 - :name: repository_check:repository_check_batch
   :feature_category: :source_code_management
   :has_external_dependencies:
