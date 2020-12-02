@@ -80,6 +80,8 @@ export const DIFF_FILE_MANUAL_COLLAPSE = 'manual';
 // Diff view single file mode
 export const DIFF_FILE_BY_FILE_COOKIE_NAME = 'fileViewMode';
 export const DIFF_VIEW_FILE_BY_FILE = 'single';
+export const DIFF_VIEW_ALL_FILES = 'all';
+
 // State machine states
 export const STATE_IDLING = 'idle';
 export const STATE_LOADING = 'loading';
