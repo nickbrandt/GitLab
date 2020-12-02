@@ -1,0 +1,13 @@
+name: uuid
+description: Instance uuid
+default_generation: generation_1
+full_path:
+  generation_1: uuid
+  generation_2: license.uuid
+milestone:
+introduced_by_url:
+group: group::product analytics
+time_frame:
+type: license
+distribution: [ee, ce]
+tier: ['free', 'starter', 'premium', 'ultimate', 'bronze', 'silver', 'gold']

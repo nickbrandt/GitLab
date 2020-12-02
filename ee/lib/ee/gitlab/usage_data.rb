@@ -84,24 +84,24 @@ module EE
           license = ::License.current
           usage_data[:edition] =
             if license
-              license.edition
+              alt_usage_data(full_path: 'edition') { license.edition }
             else
-              'EE Free'
+              alt_usage_data(full_path: 'edition') { 'EE Free' }
             end
 
           if license
-            usage_data[:license_md5] = license.md5
-            usage_data[:license_id] = license.license_id
+            usage_data[:license_md5] = alt_usage_data(full_path: 'license_md5') { license.md5 }
+            usage_data[:license_id] =  alt_usage_data(full_path: 'license_id') { license.license_id }
             # rubocop: disable UsageData/LargeTable
-            usage_data[:historical_max_users] = ::HistoricalData.max_historical_user_count
+            usage_data[:historical_max_users] = alt_usage_data(full_path: 'historical_max_users') { ::HistoricalData.max_historical_user_count }
             # rubocop: enable UsageData/LargeTable
-            usage_data[:licensee] = license.licensee
-            usage_data[:license_user_count] = license.restricted_user_count
-            usage_data[:license_starts_at] = license.starts_at
-            usage_data[:license_expires_at] = license.expires_at
-            usage_data[:license_plan] = license.plan
-            usage_data[:license_add_ons] = license.add_ons
-            usage_data[:license_trial] = license.trial?
+            usage_data[:licensee] = alt_usage_data(full_path: 'licensee') { license.licensee }
+            usage_data[:license_user_count] = alt_usage_data(full_path: 'license_user_count') { license.restricted_user_count }
+            usage_data[:license_starts_at] = alt_usage_data(full_path: 'license_starts_at') { license.starts_at }
+            usage_data[:license_expires_at] = alt_usage_data(full_path: 'license_expires_at') { license.expires_at }
+            usage_data[:license_plan] = alt_usage_data(full_path: 'license_plan') { license.plan }
+            usage_data[:license_add_ons] = alt_usage_data(full_path: 'license_add_ons') { license.add_ons }
+            usage_data[:license_trial] = alt_usage_data(full_path: 'license_trial') { license.trial? }
           end
 
           usage_data

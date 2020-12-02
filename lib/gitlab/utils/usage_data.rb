@@ -39,7 +39,7 @@ module Gitlab
 
       FALLBACK = -1
 
-      def count(relation, column = nil, batch: true, batch_size: nil, start: nil, finish: nil)
+      def count(relation, column = nil, batch: true, batch_size: nil, start: nil, finish: nil, full_path: '')
         if batch
           Gitlab::Database::BatchCount.batch_count(relation, column, batch_size: batch_size, start: start, finish: finish)
         else
@@ -65,7 +65,7 @@ module Gitlab
         FALLBACK
       end
 
-      def alt_usage_data(value = nil, fallback: FALLBACK, &block)
+      def alt_usage_data(value = nil, fallback: FALLBACK, full_path: '', &block)
         if block_given?
           yield
         else

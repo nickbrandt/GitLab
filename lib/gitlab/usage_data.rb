@@ -65,13 +65,13 @@ module Gitlab
 
       def license_usage_data
         {
-          recorded_at: recorded_at,
-          uuid: alt_usage_data { Gitlab::CurrentSettings.uuid },
-          hostname: alt_usage_data { Gitlab.config.gitlab.host },
-          version: alt_usage_data { Gitlab::VERSION },
-          installation_type: alt_usage_data { installation_type },
-          active_user_count: count(User.active),
-          edition: 'CE'
+          recorded_at: alt_usage_data(full_path: 'recorded_at') { recorded_at },
+          uuid: alt_usage_data(full_path: 'uuid') { Gitlab::CurrentSettings.uuid },
+          hostname: alt_usage_data(full_path: 'hostname') { Gitlab.config.gitlab.host },
+          version: alt_usage_data(full_path: 'version') { Gitlab::VERSION },
+          installation_type: alt_usage_data(full_path: 'installation_type') { installation_type },
+          active_user_count: count(User.active, full_path: 'active_user_count'),
+          edition: alt_usage_data(full_path: 'edition') { 'CE' }
         }
       end
 
