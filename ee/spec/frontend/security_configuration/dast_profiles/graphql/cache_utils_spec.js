@@ -106,10 +106,12 @@ describe('EE - DastProfiles GraphQL CacheUtils', () => {
         fragment: gql`
           fragment profile on DastSiteProfile {
             validationStatus
+            __typename
           }
         `,
         data: {
           validationStatus: status,
+          __typename: 'DastSiteProfile',
         },
       });
     });
