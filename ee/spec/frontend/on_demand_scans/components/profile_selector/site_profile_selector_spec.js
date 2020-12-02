@@ -34,8 +34,8 @@ describe('OnDemandScansSiteProfileSelector', () => {
             newSiteProfilePath: TEST_NEW_PATH,
             glFeatures: { securityOnDemandScansSiteValidation: true },
           },
-          scopedSlots: {
-            summary: '<div slot-scope="{ profile }">{{ profile.profileName }}\'s summary</div>',
+          slots: {
+            summary: `<div>${profiles[0].profileName}'s summary</div>`,
           },
         },
         options,
@@ -53,7 +53,7 @@ describe('OnDemandScansSiteProfileSelector', () => {
 
   it('renders properly with profiles', () => {
     createFullComponent({
-      propsData: { profiles, value: profiles[0] },
+      propsData: { profiles, value: profiles[0].id },
     });
 
     expect(wrapper.element).toMatchSnapshot();

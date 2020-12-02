@@ -52,8 +52,8 @@ describe('OnDemandScansForm', () => {
   const findSubmitButton = () => findByTestId('on-demand-scan-submit-button');
 
   const setValidFormData = () => {
-    subject.find(ScannerProfileSelector).vm.$emit('input', passiveScannerProfile);
-    subject.find(SiteProfileSelector).vm.$emit('input', nonValidatedSiteProfile);
+    subject.find(ScannerProfileSelector).vm.$emit('input', passiveScannerProfile.id);
+    subject.find(SiteProfileSelector).vm.$emit('input', nonValidatedSiteProfile.id);
     return subject.vm.$nextTick();
   };
   const submitForm = () => findForm().vm.$emit('submit', { preventDefault: () => {} });
@@ -243,8 +243,8 @@ describe('OnDemandScansForm', () => {
     'profiles conflict prevention',
     ({ description, selectedScannerProfile, selectedSiteProfile, hasConflict }) => {
       const setFormData = () => {
-        subject.find(ScannerProfileSelector).vm.$emit('input', selectedScannerProfile);
-        subject.find(SiteProfileSelector).vm.$emit('input', selectedSiteProfile);
+        subject.find(ScannerProfileSelector).vm.$emit('input', selectedScannerProfile.id);
+        subject.find(SiteProfileSelector).vm.$emit('input', selectedSiteProfile.id);
         return subject.vm.$nextTick();
       };
 
@@ -253,7 +253,12 @@ describe('OnDemandScansForm', () => {
           ? `warns about conflicting profiles when user selects ${description}`
           : `does not report any conflict when user selects ${description}`,
         async () => {
-          mountShallowSubject();
+          mountShallowSubject({
+            data: {
+              scannerProfiles,
+              siteProfiles,
+            },
+          });
           await setFormData();
 
           expect(findProfilesConflictAlert().exists()).toBe(hasConflict);
@@ -268,6 +273,10 @@ describe('OnDemandScansForm', () => {
               glFeatures: {
                 securityOnDemandScansSiteValidation: false,
               },
+            },
+            data: {
+              scannerProfiles,
+              siteProfiles,
             },
           });
           return setFormData();
