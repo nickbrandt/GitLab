@@ -6,25 +6,31 @@ module IncidentManagement
       # @param schedule [IncidentManagement::OncallSchedule]
       # @param project [Project]
       # @param user [User]
-      # @param params [Hash]
-      # @participants participants [Array[Hash]]
-      def initialize(schedule, project, user, params, participants)
+      # @param params [Hash<Symbol,Any>]
+      # @param params - name [String] The name of the on-call rotation.
+      # @param params - rotation_length [Integer] The length of the rotation.
+      # @param params - rotation_length_unit [String] The unit of the rotation length. (One of 'hours', days', 'weeks')
+      # @param params - starts_at [DateTime] The datetime the rotation starts on.
+      # @param params - participants [Array<hash>] An array of hashes defining participants of the on-call rotations.
+      #                 - participant [User] The user who is part of the rotation
+      #                 - color_palette [String] The color palette to assign to the on-call user, for example: "blue".
+      #                 - color_weight [String] The color weight to assign to for the on-call user, for example "500". Max 4 chars.
+      def initialize(schedule, project, user, params)
         @schedule = schedule
         @project = project
         @current_user = user
         @params = params
-        @participants = participants
       end
 
       def execute
         return error_no_license unless available?
         return error_no_permissions unless allowed?
 
-        oncall_rotation = schedule.oncall_rotations.create(params)
+        oncall_rotation = schedule.oncall_rotations.create(params.except(:participants))
 
         return error_in_create(oncall_rotation) unless oncall_rotation.persisted?
 
-        new_participants = participants.map do |participant|
+        new_participants = params[:participants].map do |participant|
           OncallParticipant.new(
             oncall_rotation: oncall_rotation,
             participant: participant[:user],
@@ -43,7 +49,7 @@ module IncidentManagement
       attr_reader :schedule, :project, :current_user, :params, :participants
 
       def allowed?
-        current_user&.can?(:admin_incident_management_oncall_schedule, project)
+        Ability.allowed?(current_user, :admin_incident_management_oncall_schedule, project)
       end
 
       def available?

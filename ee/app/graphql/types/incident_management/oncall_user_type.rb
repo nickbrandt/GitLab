@@ -13,11 +13,11 @@ module Types
 
       field :color_palette, GraphQL::STRING_TYPE,
                 null: true,
-                description: 'The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI.'
+                description: 'The color palette to assign to the on-call user. For example "blue".'
 
       field :color_weight, GraphQL::STRING_TYPE,
                 null: true,
-                description: 'The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI.'
+                description: 'The color weight to assign to for the on-call user, for example "500". Max 4 chars. For easy identification of the user.'
     end
     # rubocop: enable Graphql/AuthorizeTypes
   end

@@ -14747,7 +14747,7 @@ input OncallRotationCreateInput {
   name: String!
 
   """
-  The usernames to participate in the on-call rotation.
+  The usernames of users participating in the on-call rotation
   """
   participants: [OncallUserInputType!]!
 
@@ -14937,12 +14937,12 @@ The rotation user and color palette
 """
 input OncallUserInputType {
   """
-  The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI.
+  The color palette to assign to the on-call user, for example: "blue".
   """
   colorPalette: String
 
   """
-  The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI.
+  The color weight to assign to for the on-call user, for example "500". Max 4 chars. For easy identification of the user.
   """
   colorWeight: String
 
@@ -14957,12 +14957,12 @@ The rotation user and color palette
 """
 type OncallUserType {
   """
-  The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI.
+  The color palette to assign to the on-call user. For example "blue".
   """
   colorPalette: String
 
   """
-  The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI.
+  The color weight to assign to for the on-call user, for example "500". Max 4 chars. For easy identification of the user.
   """
   colorWeight: String
 

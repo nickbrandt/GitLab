@@ -11,13 +11,10 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
       project_path: project.full_path,
       name: 'On-call rotation',
       schedule_iid: schedule.iid,
-      starts_at: {
-        date: "2020-09-19",
-        time: "09:00"
-      },
+      starts_at: "2020-01-10 09:00".in_time_zone(schedule.timezone),
       rotation_length: {
         length: 1,
-        unit: 1 # days
+        unit: ::IncidentManagement::OncallRotation.rotation_length_units[:days]
       },
       participants: [
         {
@@ -65,19 +62,6 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
       end
 
       describe 'error cases' do
-        context 'time is invalid' do
-          before do
-            args.merge!(starts_at: { date: 'Not a date' })
-          end
-
-          it 'returns the on-call rotation with errors' do
-            expect(resolve).to eq(
-              oncall_rotation: nil,
-              errors: ["Starts at can't be blank"]
-            )
-          end
-        end
-
         context 'user cannot be found' do
           before do
             args.merge!(participants: [username: 'unknown'])
@@ -88,8 +72,27 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
           end
         end
 
+        context 'user does not have access to the project' do
+          before do
+            other_user = create(:user)
+            args.merge!(
+              participants: [
+                {
+                  username: other_user.username,
+                  color_weight: "500",
+                  color_palette: "black"
+                }
+              ]
+            )
+          end
+
+          it 'raises an error' do
+            expect { resolve }.to raise_error(ActiveRecord::RecordInvalid, /participant does not have access to the project/)
+          end
+        end
+
         context 'schedule does not exist' do
-          let(:schedule) { double(iid: 999, timezone: 'UTC') }
+          let(:schedule) { double(iid: non_existing_record_iid, timezone: 'UTC') }
 
           it 'raises an error' do
             expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'The schedule could not be found')

@@ -32,7 +32,7 @@ module Mutations
         argument :participants,
                  [Types::IncidentManagement::OncallUserInputType],
                  required: true,
-                 description: 'The usernames to participate in the on-call rotation.'
+                 description: 'The usernames of users participating in the on-call rotation'
 
         MAXIMUM_PARTICIPANTS = 100
 
@@ -45,14 +45,11 @@ module Mutations
 
           raise_schedule_not_found unless schedule
 
-          params = prepare_params(args, schedule)
-
           result = ::IncidentManagement::OncallRotations::CreateService.new(
             schedule,
             project,
             current_user,
-            params,
-            find_participants(participants)
+            prepare_params(schedule, participants, args)
           ).execute
 
           errors = result.error? ? [result.message] : []
@@ -62,7 +59,7 @@ module Mutations
 
         private
 
-        def prepare_params(args, schedule)
+        def prepare_params(schedule, participants, args)
           rotation_length = args[:rotation_length][:length]
           rotation_length_unit = args[:rotation_length][:unit]
           starts_at = parse_start_time(schedule, args)
@@ -70,12 +67,13 @@ module Mutations
           args.slice(:name).merge(
             rotation_length: rotation_length,
             rotation_length_unit: rotation_length_unit,
-            starts_at: starts_at
+            starts_at: starts_at,
+            participants: find_participants(participants)
           )
         end
 
         def parse_start_time(schedule, args)
-          "#{args[:starts_at][:date]} #{args[:starts_at][:time]}".in_time_zone(schedule.timezone)
+          args[:starts_at].asctime.in_time_zone(schedule.timezone)
         end
 
         def find_object(full_path:)

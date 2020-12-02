@@ -62,7 +62,7 @@ RSpec.describe 'Creating a new on-call schedule' do
     project.add_maintainer(current_user)
   end
 
-  it 'create a new on-call rotation', :aggregate_failures do
+  it 'creates a new on-call rotation', :aggregate_failures do
     post_graphql_mutation(mutation, current_user: current_user)
 
     new_oncall_rotation = ::IncidentManagement::OncallRotation.last!
@@ -97,6 +97,34 @@ RSpec.describe 'Creating a new on-call schedule' do
       end
 
       it_behaves_like 'an invalid argument to the mutation', argument_name: argument
+    end
+  end
+
+  context 'time is invalid' do
+    before do
+      args[:starts_at][:time] = '999:999'
+    end
+
+    it 'returns the on-call rotation with errors' do
+      post_graphql_mutation(mutation, current_user: current_user)
+
+      expect(graphql_errors).not_to be_empty
+      error = graphql_errors.first.dig('extensions', 'problems', 0, 'explanation')
+      expect(error).to match('Time given is invalid')
+    end
+  end
+
+  context 'date is invalid' do
+    before do
+      args[:starts_at][:date] = 'incorrect date'
+    end
+
+    it 'returns the on-call rotation with errors' do
+      post_graphql_mutation(mutation, current_user: current_user)
+
+      expect(graphql_errors).not_to be_empty
+      error = graphql_errors.first.dig('extensions', 'problems', 0, 'explanation')
+      expect(error).to match('Date given is invalid')
     end
   end
 end

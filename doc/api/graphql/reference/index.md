@@ -2295,8 +2295,8 @@ The rotation user and color palette.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `colorPalette` | String | The color palette to assign to the on-call user. i.e blue. For easy identification of the user when displaying in a UI. |
-| `colorWeight` | String | The color weight to assign to for the on-call user. i.e 500. For easy identification of the user when displaying in a UI. |
+| `colorPalette` | String | The color palette to assign to the on-call user. For example "blue". |
+| `colorWeight` | String | The color weight to assign to for the on-call user, for example "500". Max 4 chars. For easy identification of the user. |
 | `user` | User! | The user who is participating |
 
 ### Package
