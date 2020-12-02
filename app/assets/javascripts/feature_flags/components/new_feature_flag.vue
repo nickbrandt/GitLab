@@ -26,9 +26,6 @@ export default {
       userShouldSeeNewFlagAlert: this.showUserCallout,
     };
   },
-  translations: {
-    newFlagAlert: NEW_FLAG_ALERT,
-  },
   computed: {
     ...mapState(['error', 'path']),
     scopes() {

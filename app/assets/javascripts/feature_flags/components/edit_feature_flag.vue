@@ -36,7 +36,6 @@ export default {
     legacyReadOnlyFlagAlert: s__(
       'FeatureFlags|GitLab is moving to a new way of managing feature flags. This feature flag is read-only, and it will be removed in 14.0. Please create a new feature flag.',
     ),
-    newFlagAlert: NEW_FLAG_ALERT,
   },
   computed: {
     ...mapState([

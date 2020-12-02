@@ -141,7 +141,7 @@ module API
         end
 
         desc 'Update a feature flag' do
-          detail 'This feature will was introduced in GitLab 13.2'
+          detail 'This feature was introduced in GitLab 13.2'
           success ::API::Entities::FeatureFlag
         end
         params do
