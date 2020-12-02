@@ -1,33 +1,10 @@
 import { GlIntersectionObserver, GlSkeletonLoading } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import AlertsList from 'ee/threat_monitoring/components/alerts/alerts_list.vue';
+import AlertStatus from 'ee/threat_monitoring/components/alerts/alert_status.vue';
+import { mockAlerts } from '../../mock_data';
 
-const alerts = [
-  {
-    iid: '01',
-    title: 'Issue 01',
-    status: 'TRIGGERED',
-    startedAt: '2020-11-19T18:36:23Z',
-  },
-  {
-    iid: '02',
-    title: 'Issue 02',
-    status: 'ACKNOWLEDGED',
-    startedAt: '2020-11-16T21:59:28Z',
-  },
-  {
-    iid: '03',
-    title: 'Issue 03',
-    status: 'RESOLVED',
-    startedAt: '2020-11-13T20:03:04Z',
-  },
-  {
-    iid: '04',
-    title: 'Issue 04',
-    status: 'IGNORED',
-    startedAt: '2020-10-29T13:37:55Z',
-  },
-];
+const alerts = mockAlerts;
 
 const pageInfo = {
   endCursor: 'eyJpZCI6IjIwIiwic3RhcnRlZF9hdCI6IjIwMjAtMTItMDMgMjM6MTI6NDkuODM3Mjc1MDAwIFVUQyJ9',
@@ -38,11 +15,13 @@ const pageInfo = {
 
 describe('AlertsList component', () => {
   let wrapper;
+  const refetchSpy = jest.fn();
   const apolloMock = {
     queries: {
       alerts: {
         fetchMore: jest.fn().mockResolvedValue(),
         loading: false,
+        refetch: refetchSpy,
       },
     },
   };
@@ -53,13 +32,13 @@ describe('AlertsList component', () => {
   const findStartedAtColumnHeader = () =>
     wrapper.find("[data-testid='threat-alerts-started-at-header']");
   const findIdColumn = () => wrapper.find("[data-testid='threat-alerts-id']");
-  const findStatusColumn = () => wrapper.find("[data-testid='threat-alerts-status']");
+  const findStatusColumn = () => wrapper.find(AlertStatus);
   const findStatusColumnHeader = () => wrapper.find("[data-testid='threat-alerts-status-header']");
   const findEmptyState = () => wrapper.find("[data-testid='threat-alerts-empty-state']");
   const findGlIntersectionObserver = () => wrapper.find(GlIntersectionObserver);
   const findGlSkeletonLoading = () => wrapper.find(GlSkeletonLoading);
 
-  const createWrapper = ({ $apollo = apolloMock, data = {} } = {}) => {
+  const createWrapper = ({ $apollo = apolloMock, data = {}, stubs = {} } = {}) => {
     wrapper = mount(AlertsList, {
       mocks: {
         $apollo,
@@ -69,9 +48,11 @@ describe('AlertsList component', () => {
         projectPath: '#',
       },
       stubs: {
+        AlertStatus: true,
         GlAlert: true,
         GlLoadingIcon: true,
         GlIntersectionObserver: true,
+        ...stubs,
       },
       data() {
         return data;
@@ -204,6 +185,31 @@ describe('AlertsList component', () => {
       findGlIntersectionObserver().vm.$emit('appear');
       await wrapper.vm.$nextTick();
       expect(wrapper.vm.$apollo.queries.alerts.fetchMore).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('changing alert status', () => {
+    beforeEach(() => {
+      createWrapper();
+      wrapper.setData({
+        alerts,
+      });
+    });
+
+    it('does refetch the alerts when an alert status has changed', async () => {
+      expect(refetchSpy).toHaveBeenCalledTimes(0);
+      findStatusColumn().vm.$emit('alert-update');
+      await wrapper.vm.$nextTick();
+      expect(refetchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does show an error if changing an alert status fails', async () => {
+      const error = 'Error.';
+      expect(findErrorAlert().exists()).toBe(false);
+      findStatusColumn().vm.$emit('alert-error', error);
+      await wrapper.vm.$nextTick();
+      expect(findErrorAlert().exists()).toBe(true);
+      expect(findErrorAlert().text()).toBe(error);
     });
   });
 });
