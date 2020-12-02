@@ -1,4 +1,4 @@
-
+# rubocop:disable Style/FrozenStringLiteralComment
 require 'spec_helper'
 require "rack/test"
 
