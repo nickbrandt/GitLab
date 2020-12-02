@@ -21309,8 +21309,6 @@ CREATE INDEX index_identities_on_user_id ON identities USING btree (user_id);
 
 CREATE UNIQUE INDEX index_im_oncall_schedules_on_project_id_and_iid ON incident_management_oncall_schedules USING btree (project_id, iid);
 
-CREATE UNIQUE INDEX index_im_oncall_schedules_on_schedule_id_and_id ON incident_management_oncall_rotations USING btree (oncall_schedule_id, id);
-
 CREATE UNIQUE INDEX index_import_export_uploads_on_group_id ON import_export_uploads USING btree (group_id) WHERE (group_id IS NOT NULL);
 
 CREATE INDEX index_import_export_uploads_on_project_id ON import_export_uploads USING btree (project_id);
@@ -21326,6 +21324,14 @@ CREATE INDEX index_import_failures_on_project_id_and_correlation_id_value ON imp
 CREATE INDEX index_import_failures_on_project_id_not_null ON import_failures USING btree (project_id) WHERE (project_id IS NOT NULL);
 
 CREATE INDEX index_imported_projects_on_import_type_creator_id_created_at ON projects USING btree (import_type, creator_id, created_at) WHERE (import_type IS NOT NULL);
+
+CREATE INDEX index_inc_mngmnt_oncall_particpants_on_oncall_rotation_id ON incident_management_oncall_participants USING btree (oncall_rotation_id);
+
+CREATE INDEX index_inc_mngmnt_oncall_particpants_on_oncall_user_id ON incident_management_oncall_participants USING btree (user_id);
+
+CREATE UNIQUE INDEX index_inc_mngmnt_oncall_particpants_on_user_id_and_rotation_id ON incident_management_oncall_participants USING btree (user_id, oncall_rotation_id);
+
+CREATE UNIQUE INDEX index_inc_mngmnt_oncall_rotations_on_oncall_schedule_id_and_id ON incident_management_oncall_rotations USING btree (oncall_schedule_id, id);
 
 CREATE INDEX index_incident_management_oncall_schedules_on_project_id ON incident_management_oncall_schedules USING btree (project_id);
 
@@ -21750,10 +21756,6 @@ CREATE INDEX index_on_users_lower_email ON users USING btree (lower((email)::tex
 CREATE INDEX index_on_users_lower_username ON users USING btree (lower((username)::text));
 
 CREATE INDEX index_on_users_name_lower ON users USING btree (lower((name)::text));
-
-CREATE INDEX index_oncall_particpants_on_oncall_rotation_id ON incident_management_oncall_participants USING btree (oncall_rotation_id);
-
-CREATE UNIQUE INDEX index_oncall_particpants_on_user_id_and_rotation_id ON incident_management_oncall_participants USING btree (user_id, oncall_rotation_id);
 
 CREATE INDEX index_open_project_tracker_data_on_service_id ON open_project_tracker_data USING btree (service_id);
 

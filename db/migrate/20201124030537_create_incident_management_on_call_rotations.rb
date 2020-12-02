@@ -8,8 +8,8 @@ class CreateIncidentManagementOnCallRotations < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    with_lock_retries do
-      unless table_exists?(:incident_management_oncall_rotations)
+    unless table_exists?(:incident_management_oncall_rotations)
+      with_lock_retries do
         create_table :incident_management_oncall_rotations do |t|
           t.timestamps_with_timezone
           t.references :oncall_schedule, index: false, null: false, foreign_key: { to_table: :incident_management_oncall_schedules, on_delete: :cascade }
@@ -18,7 +18,7 @@ class CreateIncidentManagementOnCallRotations < ActiveRecord::Migration[6.0]
           t.datetime_with_timezone :starts_at, null: false
           t.text :name, null: false
 
-          t.index %w(oncall_schedule_id id), name: 'index_im_oncall_schedules_on_schedule_id_and_id', unique: true, using: :btree
+          t.index %w(oncall_schedule_id id), name: 'index_inc_mngmnt_oncall_rotations_on_oncall_schedule_id_and_id', unique: true, using: :btree
         end
       end
     end
