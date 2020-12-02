@@ -14,9 +14,10 @@ module Packages
       if Feature.enabled?(:collect_package_events) && Gitlab::Database.read_write?
         ::Packages::Event.create!(
           event_type: event_name,
-          originator: current_user&.id,
+          originator: current_user.try(:id),
           originator_type: originator_type,
-          event_scope: event_scope
+          event_scope: event_scope,
+          container_repository_id: container_repository_id
         )
       end
     end
@@ -39,12 +40,18 @@ module Packages
       params[:event_name]
     end
 
+    def container_repository_id
+      params[:container_repository_id]
+    end
+
     def originator_type
       case current_user
       when User
         :user
       when DeployToken
         :deploy_token
+      when :worker
+        :worker
       else
         :guest
       end
@@ -52,6 +59,10 @@ module Packages
 
     def guest?
       originator_type == :guest
+    end
+
+    def worker?
+      originator_type == :worker
     end
   end
 end

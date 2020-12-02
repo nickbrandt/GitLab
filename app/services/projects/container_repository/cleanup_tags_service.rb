@@ -19,16 +19,19 @@ module Projects
       private
 
       def delete_tags(container_repository, tags)
-        return success(deleted: []) unless tags.any?
+        with_tracking(container_repository) do
+          next success(deleted: []) unless tags.any?
 
-        tag_names = tags.map(&:name)
+          tag_names = tags.map(&:name)
 
-        Projects::ContainerRepository::DeleteTagsService
-          .new(container_repository.project,
-               current_user,
-               tags: tag_names,
-               container_expiration_policy: params['container_expiration_policy'])
-          .execute(container_repository)
+          service = Projects::ContainerRepository::DeleteTagsService.new(
+            container_repository.project,
+            current_user,
+            tags: tag_names,
+            container_expiration_policy: run_by_container_expiration_policy?
+          )
+          service.execute(container_repository)
+        end
       end
 
       def without_latest(tags)
@@ -68,9 +71,26 @@ module Projects
       end
 
       def can_destroy?
-        return true if params['container_expiration_policy']
+        return true if run_by_container_expiration_policy?
 
         can?(current_user, :destroy_container_image, project)
+      end
+
+      def with_tracking(container_repository)
+        return yield unless run_by_container_expiration_policy?
+
+        tracking_service = ::ContainerExpirationPolicies::TrackingService.new(container_repository)
+
+        tracking_service.execute(:start)
+
+        yield.tap do |result|
+          success = result[:status] == :success
+          tracking_service.execute(success ? :end : :stop)
+        end
+      end
+
+      def run_by_container_expiration_policy?
+        !!params['container_expiration_policy']
       end
 
       def valid_regex?

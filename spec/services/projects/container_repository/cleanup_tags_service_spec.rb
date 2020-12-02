@@ -50,6 +50,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
       shared_examples 'removes all matches' do
         it 'does remove all tags except latest' do
           expect_delete(%w(A Ba Bb C D E))
+          expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
           is_expected.to include(status: :success, deleted: %w(A Ba Bb C D E))
         end
@@ -75,6 +76,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
         it 'keeps all tags' do
           expect(Projects::ContainerRepository::DeleteTagsService)
             .not_to receive(:new)
+          expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
           subject
         end
 
@@ -118,6 +120,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
       it 'does remove C and D' do
         expect_delete(%w(C D))
+        expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
         is_expected.to include(status: :success, deleted: %w(C D))
       end
@@ -130,6 +133,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
         it 'does not remove C' do
           expect_delete(%w(D))
+          expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
           is_expected.to include(status: :success, deleted: %w(D))
         end
@@ -143,6 +147,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
         it 'does not remove C' do
           expect_delete(%w(D))
+          expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
           is_expected.to include(status: :success, deleted: %w(D))
         end
@@ -157,6 +162,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
       it 'does not remove B*' do
         expect_delete(%w(A C D E))
+        expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
         is_expected.to include(status: :success, deleted: %w(A C D E))
       end
@@ -170,6 +176,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
       it 'sorts tags by date' do
         expect_delete(%w(Bb Ba C))
+        expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
         expect(service).to receive(:order_by_date).and_call_original
 
@@ -184,6 +191,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
       it 'does not sort tags by date' do
         expect_delete(%w(A Ba Bb C))
+        expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
         expect(service).not_to receive(:order_by_date)
 
@@ -199,6 +207,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
       it 'does remove B* and C as they are the oldest' do
         expect_delete(%w(Bb Ba C))
+        expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
         is_expected.to include(status: :success, deleted: %w(Bb Ba C))
       end
@@ -212,6 +221,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
       it 'does remove B* and C as they are older than 1 day' do
         expect_delete(%w(Ba Bb C))
+        expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
         is_expected.to include(status: :success, deleted: %w(Ba Bb C))
       end
@@ -226,6 +236,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
       it 'does remove B* and C' do
         expect_delete(%w(Bb Ba C))
+        expect(::ContainerExpirationPolicies::TrackingService).not_to receive(:new)
 
         is_expected.to include(status: :success, deleted: %w(Bb Ba C))
       end
@@ -233,6 +244,10 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
 
     context 'when running a container_expiration_policy' do
       let(:user) { nil }
+
+      before do
+        repository.cleanup_scheduled!
+      end
 
       context 'with valid container_expiration_policy param' do
         let(:params) do
@@ -246,6 +261,51 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
           expect_delete(%w(Bb Ba C), container_expiration_policy: true)
 
           is_expected.to include(status: :success, deleted: %w(Bb Ba C))
+        end
+
+        context 'matching no tags' do
+          let(:params) do
+            { 'name_regex_delete' => 'no_match',
+              'keep_n' => 1,
+              'older_than' => '1 day',
+              'container_expiration_policy' => true }
+          end
+
+          it 'does not delete any tags' do
+            expect(Projects::ContainerRepository::DeleteTagsService)
+              .not_to receive(:new)
+
+            expect { subject }
+              .to change { repository.reload.expiration_policy_cleanup_status }.from('cleanup_scheduled').to('cleanup_unscheduled')
+          end
+        end
+
+        context 'tracking' do
+          it 'tracks successful deletes' do
+            expect_delete(%w(Bb Ba C), container_expiration_policy: true)
+            expect_next_instance_of(::ContainerExpirationPolicies::TrackingService) do |service|
+              expect(service).to receive(:execute).with(:start).and_call_original
+              expect(service).to receive(:execute).with(:end).and_call_original
+            end
+
+            expect { subject }
+              .to change { repository.expiration_policy_cleanup_status }.from('cleanup_scheduled').to('cleanup_unscheduled')
+              .and change { ::Packages::Event.count }.from(0).to(2)
+          end
+
+          it 'tracks faulty deletes' do
+            expect_any_instance_of(Projects::ContainerRepository::DeleteTagsService)
+              .to receive(:execute)
+              .with(repository) { { status: :error } }
+            expect_next_instance_of(::ContainerExpirationPolicies::TrackingService) do |service|
+              expect(service).to receive(:execute).with(:start).and_call_original
+              expect(service).to receive(:execute).with(:stop).and_call_original
+            end
+
+            expect { subject }
+              .to change { repository.expiration_policy_cleanup_status }.from('cleanup_scheduled').to('cleanup_unfinished')
+              .and change { ::Packages::Event.count }.from(0).to(2)
+          end
         end
       end
 
@@ -285,7 +345,7 @@ RSpec.describe Projects::ContainerRepository::CleanupTagsService do
     end
   end
 
-  def expect_delete(tags, container_expiration_policy: nil)
+  def expect_delete(tags, container_expiration_policy: false)
     expect(Projects::ContainerRepository::DeleteTagsService)
       .to receive(:new)
       .with(repository.project, user, tags: tags, container_expiration_policy: container_expiration_policy)
