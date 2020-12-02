@@ -646,7 +646,6 @@ export default {
 
         <template v-if="hasApiFuzzingReports">
           <summary-row
-            :summary="groupedApiFuzzingText"
             :status-icon="apiFuzzingStatusIcon"
             :popover-options="apiFuzzingPopover"
             class="js-api-fuzzing-widget"
