@@ -12,6 +12,8 @@ import { isSingleViewStyle } from '~/helpers/diffs_helper';
 import { updateHistory } from '~/lib/utils/url_utility';
 
 import notesEventHub from '../../notes/event_hub';
+import eventHub from '../event_hub';
+
 import CompareVersions from './compare_versions.vue';
 import DiffFile from './diff_file.vue';
 import NoChanges from './no_changes.vue';
@@ -36,6 +38,7 @@ import {
   ALERT_OVERFLOW_HIDDEN,
   ALERT_MERGE_CONFLICT,
   ALERT_COLLAPSED_FILES,
+  EVT_VIEW_FILE_BY_FILE,
 } from '../constants';
 
 export default {
@@ -283,6 +286,8 @@ export default {
 
     notesEventHub.$once('fetchDiffData', this.fetchData);
     notesEventHub.$on('refetchDiffData', this.refetchDiffData);
+    eventHub.$on(EVT_VIEW_FILE_BY_FILE, this.fileByFileListener);
+
     this.CENTERED_LIMITED_CONTAINER_CLASSES = CENTERED_LIMITED_CONTAINER_CLASSES;
 
     this.unwatchDiscussions = this.$watch(
@@ -303,6 +308,7 @@ export default {
   beforeDestroy() {
     diffsApp.deinstrument();
 
+    eventHub.$off(EVT_VIEW_FILE_BY_FILE, this.fileByFileListener);
     notesEventHub.$off('refetchDiffData', this.refetchDiffData);
     notesEventHub.$off('fetchDiffData', this.fetchData);
 
@@ -323,7 +329,11 @@ export default {
       'scrollToFile',
       'setShowTreeList',
       'navigateToDiffFileIndex',
+      'setFileByFile',
     ]),
+    fileByFileListener({ setting } = {}) {
+      this.setFileByFile({ fileByFile: setting });
+    },
     navigateToDiffFileNumber(number) {
       this.navigateToDiffFileIndex(number - 1);
     },

@@ -17,6 +17,10 @@ import axios from '~/lib/utils/axios_utils';
 import * as urlUtils from '~/lib/utils/url_utility';
 import diffsMockData from '../mock_data/merge_request_diffs';
 
+import { EVT_VIEW_FILE_BY_FILE } from '~/diffs/constants';
+
+import eventHub from '~/diffs/event_hub';
+
 const mergeRequestDiff = { version_index: 1 };
 const TEST_ENDPOINT = `${TEST_HOST}/diff/endpoint`;
 const COMMIT_URL = `${TEST_HOST}/COMMIT/OLD`;
@@ -770,6 +774,25 @@ describe('diffs/components/app', () => {
           await wrapper.vm.$nextTick();
 
           expect(wrapper.vm.navigateToDiffFileIndex).toHaveBeenCalledWith(targetFile - 1);
+        },
+      );
+    });
+
+    describe('control via event stream', () => {
+      it.each`
+        setting
+        ${true}
+        ${false}
+      `(
+        'triggers the action with the new fileByFile setting - $setting - when the event with that setting is received',
+        async ({ setting }) => {
+          createComponent();
+          await wrapper.vm.$nextTick();
+
+          eventHub.$emit(EVT_VIEW_FILE_BY_FILE, { setting });
+          await wrapper.vm.$nextTick();
+
+          expect(store.state.diffs.viewDiffsFileByFile).toBe(setting);
         },
       );
     });
