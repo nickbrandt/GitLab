@@ -48,7 +48,7 @@ module EE
           params do
             use :pagination
             optional :search, type: String, desc: 'The exact name of the subscribed member'
-            optional :sort, type: String, desc: 'The sorting option', values: Helpers::MembersHelpers.member_sort_options, default: 'name_asc'
+            optional :sort, type: String, desc: 'The sorting option', values: Helpers::MembersHelpers.member_sort_options
           end
           get ":id/billable_members" do
             group = find_group!(params[:id])
@@ -58,7 +58,8 @@ module EE
             bad_request!(nil) if group.subgroup?
             bad_request!(nil) unless ::Ability.allowed?(current_user, :admin_group_member, group)
 
-            users = paginate(group.billed_users_for(params[:search], params[:sort]))
+            sorting = params[:sort] || 'id_asc'
+            users = paginate(group.billed_users_for(params[:search], sorting))
 
             present users, with: ::API::Entities::UserBasic, current_user: current_user
           end

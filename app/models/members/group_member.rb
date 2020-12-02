@@ -3,7 +3,6 @@
 class GroupMember < Member
   include FromUnion
   include CreatedAtFilterable
-  include GroupMemberSorting
 
   SOURCE_TYPE = 'Namespace'
 
