@@ -2,7 +2,7 @@
 import { mapState, mapActions } from 'vuex';
 import axios from '~/lib/utils/axios_utils';
 import FeatureFlagForm from './form.vue';
-import { NEW_VERSION_FLAG, NEW_FLAG_ALERT, ROLLOUT_STRATEGY_ALL_USERS } from '../constants';
+import { NEW_VERSION_FLAG, ROLLOUT_STRATEGY_ALL_USERS } from '../constants';
 import { createNewEnvironmentScope } from '../store/helpers';
 
 import featureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';

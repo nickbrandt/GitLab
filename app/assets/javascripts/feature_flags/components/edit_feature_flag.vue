@@ -4,7 +4,7 @@ import { mapState, mapActions } from 'vuex';
 import axios from '~/lib/utils/axios_utils';
 import { sprintf, s__ } from '~/locale';
 import glFeatureFlagMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { LEGACY_FLAG, NEW_FLAG_ALERT } from '../constants';
+import { LEGACY_FLAG } from '../constants';
 import FeatureFlagForm from './form.vue';
 
 export default {
