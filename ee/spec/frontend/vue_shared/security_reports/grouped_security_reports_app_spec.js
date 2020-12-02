@@ -133,7 +133,6 @@ describe('Grouped security reports app', () => {
         mock.onGet(COVERAGE_FUZZING_DIFF_ENDPOINT).reply(500);
         mock.onGet(API_FUZZING_DIFF_ENDPOINT).reply(500);
 
-        debugger;
         createWrapper(allReportProps);
 
         return Promise.all([
@@ -151,7 +150,6 @@ describe('Grouped security reports app', () => {
       });
 
       it('renders error state', () => {
-        debugger;
         expect(wrapper.vm.$el.querySelector('.gl-spinner')).toBeNull();
         expect(
           wrapper.vm.$el
@@ -239,10 +237,7 @@ describe('Grouped security reports app', () => {
             `secretDetection/${secretDetectionTypes.RECEIVE_DIFF_SUCCESS}`,
           ),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_SUCCESS),
-          waitForMutation(
-            wrapper.vm.$store,
-            `apiFuzzing/${apiFuzzingTypes.RECEIVE_DIFF_SUCCESS}`,
-          ),
+          waitForMutation(wrapper.vm.$store, `apiFuzzing/${apiFuzzingTypes.RECEIVE_DIFF_SUCCESS}`),
         ]);
       });
 
@@ -274,10 +269,12 @@ describe('Grouped security reports app', () => {
         expect(wrapper.vm.$el.textContent).toContain('DAST detected no vulnerabilities.');
 
         // Renders Coverage Fuzzing result
-        expect(wrapper.vm.$el.textContent).toContain('Coverage fuzzing detected no vulnerabilities.');
+        expect(wrapper.vm.$el.textContent).toContain(
+          'Coverage fuzzing detected no vulnerabilities.',
+        );
 
         // Renders API Fuzzing result
-        expect(wrapper.vm.$el.textContent).toContain('API fuzzing detected no vulnerabilities.');        
+        expect(wrapper.vm.$el.textContent).toContain('API fuzzing detected no vulnerabilities.');
       });
     });
 
@@ -303,10 +300,7 @@ describe('Grouped security reports app', () => {
             `secretDetection/${secretDetectionTypes.RECEIVE_DIFF_SUCCESS}`,
           ),
           waitForMutation(wrapper.vm.$store, types.RECEIVE_COVERAGE_FUZZING_DIFF_SUCCESS),
-          waitForMutation(
-            wrapper.vm.$store,
-            `apiFuzzing/${apiFuzzingTypes.RECEIVE_DIFF_SUCCESS}`,
-          ),
+          waitForMutation(wrapper.vm.$store, `apiFuzzing/${apiFuzzingTypes.RECEIVE_DIFF_SUCCESS}`),
         ]);
       });
 
@@ -356,7 +350,7 @@ describe('Grouped security reports app', () => {
         // Renders api fuzzing scanning result
         expect(trimText(wrapper.vm.$el.textContent)).toContain(
           'API fuzzing detected 2 potential vulnerabilities 1 Critical 1 High and 0 Others',
-        );      
+        );
       });
 
       it('opens modal with more information', () => {
@@ -458,13 +452,14 @@ describe('Grouped security reports app', () => {
         },
       });
 
-      return waitForMutation(wrapper.vm.$store, `apiFuzzing/${apiFuzzingTypes.RECEIVE_DIFF_SUCCESS}`)   
+      return waitForMutation(
+        wrapper.vm.$store,
+        `apiFuzzing/${apiFuzzingTypes.RECEIVE_DIFF_SUCCESS}`,
+      );
     });
 
     it('should set setApiFuzzingDiffEndpoint', () => {
-      expect(wrapper.vm.apiFuzzing.paths.diffEndpoint).toEqual(
-        API_FUZZING_DIFF_ENDPOINT,
-      );
+      expect(wrapper.vm.apiFuzzing.paths.diffEndpoint).toEqual(API_FUZZING_DIFF_ENDPOINT);
     });
 
     it('should display the correct numbers of vulnerabilities', () => {
@@ -473,7 +468,7 @@ describe('Grouped security reports app', () => {
       );
     });
   });
- 
+
   describe('container scanning reports', () => {
     beforeEach(() => {
       mock.onGet(CONTAINER_SCANNING_DIFF_ENDPOINT).reply(200, containerScanningDiffSuccessMock);
