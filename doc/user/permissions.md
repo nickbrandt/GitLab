@@ -407,6 +407,11 @@ automatically have access to projects and subgroups underneath. To support such 
 Users with minimal access can list the group in the UI and through the API. However, they cannot see
 details such as projects or subgroups. They do not have access to the group's page or list any of its subgroups or projects.
 
+### Minimal access users take license seats
+
+Users with even a "minimal access" role are counted against your number of license seats. This
+requirement does not apply for [GitLab Gold/Ultimate](https://about.gitlab.com/pricing/) subscriptions.
+
 ## Project features
 
 Project features like wiki and issues can be hidden from users depending on
