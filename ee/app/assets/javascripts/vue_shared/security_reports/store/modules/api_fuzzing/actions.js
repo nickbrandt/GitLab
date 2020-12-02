@@ -8,7 +8,8 @@ export const requestDiff = ({ commit }) => commit(types.REQUEST_DIFF);
 export const receiveDiffSuccess = ({ commit }, response) =>
   commit(types.RECEIVE_DIFF_SUCCESS, response);
 
-export const receiveDiffError = ({ commit }) => commit(types.RECEIVE_DIFF_ERROR);
+export const receiveDiffError = ({ commit }, response) =>
+  commit(types.RECEIVE_DIFF_ERROR, response);
 
 export const fetchDiff = ({ state, rootState, dispatch }) => {
   dispatch('requestDiff');
