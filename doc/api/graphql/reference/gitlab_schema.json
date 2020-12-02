@@ -105,7 +105,7 @@
           "inputFields": [
             {
               "name": "awardableId",
-              "description": "The global id of the awardable resource",
+              "description": "The global ID of the awardable resource",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -2103,7 +2103,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the alert to mutate",
+              "description": "The IID of the alert to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -2279,7 +2279,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the alert to mutate",
+              "description": "The IID of the alert to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -2563,7 +2563,7 @@
           "inputFields": [
             {
               "name": "awardableId",
-              "description": "The global id of the awardable resource",
+              "description": "The global ID of the awardable resource",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -2679,7 +2679,7 @@
           "inputFields": [
             {
               "name": "awardableId",
-              "description": "The global id of the awardable resource",
+              "description": "The global ID of the awardable resource",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -2795,7 +2795,7 @@
           "inputFields": [
             {
               "name": "awardableId",
-              "description": "The global id of the awardable resource",
+              "description": "The global ID of the awardable resource",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -3869,7 +3869,7 @@
                 },
                 {
                   "name": "iidStartsWith",
-                  "description": "Filter epics by iid for autocomplete",
+                  "description": "Filter epics by IID for autocomplete",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -7113,7 +7113,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "Global id of the cluster agent that will be deleted",
+              "description": "Global ID of the cluster agent that will be deleted",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -10019,7 +10019,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the alert to mutate",
+              "description": "The IID of the alert to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -10149,7 +10149,7 @@
           "inputFields": [
             {
               "name": "environmentId",
-              "description": "The global id of the environment to add an annotation to",
+              "description": "The global ID of the environment to add an annotation to",
               "type": {
                 "kind": "SCALAR",
                 "name": "EnvironmentID",
@@ -10159,7 +10159,7 @@
             },
             {
               "name": "clusterId",
-              "description": "The global id of the cluster to add an annotation to",
+              "description": "The global ID of the cluster to add an annotation to",
               "type": {
                 "kind": "SCALAR",
                 "name": "ClustersClusterID",
@@ -10971,7 +10971,7 @@
           "inputFields": [
             {
               "name": "noteableId",
-              "description": "The global id of the resource to add a note to",
+              "description": "The global ID of the resource to add a note to",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -11319,7 +11319,7 @@
           "inputFields": [
             {
               "name": "noteableId",
-              "description": "The global id of the resource to add a note to",
+              "description": "The global ID of the resource to add a note to",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -11897,7 +11897,7 @@
           "inputFields": [
             {
               "name": "noteableId",
-              "description": "The global id of the resource to add a note to",
+              "description": "The global ID of the resource to add a note to",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -11935,7 +11935,7 @@
             },
             {
               "name": "discussionId",
-              "description": "The global id of the discussion this note is in reply to",
+              "description": "The global ID of the discussion this note is in reply to",
               "type": {
                 "kind": "SCALAR",
                 "name": "DiscussionID",
@@ -16543,7 +16543,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the issue to modify designs for",
+              "description": "The IID of the issue to modify designs for",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -16823,7 +16823,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the issue to modify designs for",
+              "description": "The IID of the issue to modify designs for",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -17698,7 +17698,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the note to destroy",
+              "description": "The global ID of the note to destroy",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -17800,7 +17800,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the snippet to destroy",
+              "description": "The global ID of the snippet to destroy",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -19409,7 +19409,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the discussion",
+              "description": "The global ID of the discussion",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -20298,7 +20298,7 @@
                 },
                 {
                   "name": "iidStartsWith",
-                  "description": "Filter epics by iid for autocomplete",
+                  "description": "Filter epics by IID for autocomplete",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -21307,7 +21307,7 @@
           "inputFields": [
             {
               "name": "iid",
-              "description": "The iid of the epic to mutate",
+              "description": "The IID of the epic to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -21349,7 +21349,7 @@
             },
             {
               "name": "issueIid",
-              "description": "The iid of the issue to be added",
+              "description": "The IID of the issue to be added",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -23214,7 +23214,7 @@
           "inputFields": [
             {
               "name": "iid",
-              "description": "The iid of the epic to mutate",
+              "description": "The IID of the epic to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -23431,7 +23431,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the epic_issue or epic that is being moved",
+              "description": "The ID of the epic_issue or epic that is being moved",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -23445,7 +23445,7 @@
             },
             {
               "name": "adjacentReferenceId",
-              "description": "The id of the epic_issue or issue that the actual epic or issue is switched with",
+              "description": "The ID of the epic_issue or issue that the actual epic or issue is switched with",
               "type": {
                 "kind": "SCALAR",
                 "name": "EpicTreeSortingID",
@@ -23486,7 +23486,7 @@
           "inputFields": [
             {
               "name": "baseEpicId",
-              "description": "The id of the base epic of the tree",
+              "description": "The ID of the base epic of the tree",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -24838,7 +24838,7 @@
                 },
                 {
                   "name": "iidStartsWith",
-                  "description": "Filter epics by iid for autocomplete",
+                  "description": "Filter epics by IID for autocomplete",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -24997,7 +24997,7 @@
                 },
                 {
                   "name": "iidStartsWith",
-                  "description": "Filter epics by iid for autocomplete",
+                  "description": "Filter epics by IID for autocomplete",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -27737,7 +27737,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the integration to remove",
+              "description": "The ID of the integration to remove",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -27839,7 +27839,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the integration to mutate",
+              "description": "The ID of the integration to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -27941,7 +27941,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the integration to mutate",
+              "description": "The ID of the integration to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -33372,7 +33372,7 @@
           "inputFields": [
             {
               "name": "jiraAccountId",
-              "description": "Jira account id of the user",
+              "description": "Jira account ID of the user",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -34014,7 +34014,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the snippet to update",
+              "description": "The global ID of the snippet to update",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -36675,7 +36675,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the merge request to mutate",
+              "description": "The IID of the merge request to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -36823,7 +36823,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the merge request to mutate",
+              "description": "The IID of the merge request to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -36971,7 +36971,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the merge request to mutate",
+              "description": "The IID of the merge request to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -37101,7 +37101,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the merge request to mutate",
+              "description": "The IID of the merge request to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -37227,7 +37227,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the merge request to mutate",
+              "description": "The IID of the merge request to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -37357,7 +37357,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the merge request to mutate",
+              "description": "The IID of the merge request to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -37635,7 +37635,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the merge request to mutate",
+              "description": "The IID of the merge request to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -42719,7 +42719,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the namespace to mutate",
+              "description": "The global ID of the namespace to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -45092,7 +45092,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the pipeline to mutate",
+              "description": "The ID of the pipeline to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -45324,7 +45324,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the pipeline to mutate",
+              "description": "The ID of the pipeline to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -45524,7 +45524,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the pipeline to mutate",
+              "description": "The ID of the pipeline to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -51582,7 +51582,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the integration to mutate",
+              "description": "The ID of the integration to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -51684,7 +51684,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The id of the integration to mutate",
+              "description": "The ID of the integration to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -55131,7 +55131,7 @@
           "inputFields": [
             {
               "name": "awardableId",
-              "description": "The global id of the awardable resource",
+              "description": "The global ID of the awardable resource",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -55335,7 +55335,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the DiffNote to update",
+              "description": "The global ID of the DiffNote to update",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -64402,7 +64402,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the todo to mark as done",
+              "description": "The global ID of the todo to mark as done",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -64508,7 +64508,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the todo to restore",
+              "description": "The global ID of the todo to restore",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -64543,7 +64543,7 @@
           "inputFields": [
             {
               "name": "ids",
-              "description": "The global ids of the todos to restore (a maximum of 50 is supported at once)",
+              "description": "The global IDs of the todos to restore (a maximum of 50 is supported at once)",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -64651,7 +64651,7 @@
             },
             {
               "name": "updatedIds",
-              "description": "The ids of the updated todo items. Deprecated in 13.2: Use todos",
+              "description": "The IDs of the updated todo items. Deprecated in 13.2: Use todos",
               "args": [
 
               ],
@@ -64968,7 +64968,7 @@
           "inputFields": [
             {
               "name": "awardableId",
-              "description": "The global id of the awardable resource",
+              "description": "The global ID of the awardable resource",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -65612,7 +65612,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the alert to mutate",
+              "description": "The IID of the alert to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -65930,7 +65930,7 @@
             },
             {
               "name": "assigneeId",
-              "description": "The id of user to be assigned to the board",
+              "description": "The ID of user to be assigned to the board",
               "type": {
                 "kind": "SCALAR",
                 "name": "UserID",
@@ -65940,7 +65940,7 @@
             },
             {
               "name": "milestoneId",
-              "description": "The id of milestone to be assigned to the board",
+              "description": "The ID of milestone to be assigned to the board",
               "type": {
                 "kind": "SCALAR",
                 "name": "MilestoneID",
@@ -66553,7 +66553,7 @@
           "inputFields": [
             {
               "name": "iid",
-              "description": "The iid of the epic to mutate",
+              "description": "The IID of the epic to mutate",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -66785,7 +66785,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the note to update",
+              "description": "The global ID of the note to update",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -67315,7 +67315,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the note to update",
+              "description": "The global ID of the note to update",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -67481,7 +67481,7 @@
             },
             {
               "name": "iid",
-              "description": "The iid of the requirement to update",
+              "description": "The IID of the requirement to update",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -67593,7 +67593,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global id of the snippet to update",
+              "description": "The global ID of the snippet to update",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
