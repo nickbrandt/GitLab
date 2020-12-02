@@ -12,6 +12,7 @@ query DastSiteProfiles($fullPath: ID!, $after: String, $before: String, $first: 
         node {
           id
           profileName
+          normalizedTargetUrl
           targetUrl
           editPath
           validationStatus
