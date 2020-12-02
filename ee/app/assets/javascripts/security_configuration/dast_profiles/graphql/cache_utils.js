@@ -78,10 +78,12 @@ export const updateSiteProfilesStatuses = ({ fullPath, normalizedTargetUrl, stat
       fragment: gql`
         fragment profile on DastSiteProfile {
           validationStatus
+          __typename
         }
       `,
       data: {
         validationStatus: status,
+        __typename: 'DastSiteProfile',
       },
     });
   });
