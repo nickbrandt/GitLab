@@ -504,6 +504,10 @@ request, be sure to start the `dont-interrupt-me` job before pushing.
    - `update-yarn-cache`, defined in [`.gitlab/ci/frontend.gitlab-ci.yml`](https://gitlab.com/gitlab-org/gitlab/blob/master/.gitlab/ci/frontend.gitlab-ci.yml).
 1. These jobs run in merge requests whose title include `UPDATE CACHE`.
 
+### Artifacts strategy
+
+We limit the artifacts that are saved and retrieved by jobs to the minimum in order to reduce the upload/download time and costs, as well as the artifacts storage.
+
 ### Pre-clone step
 
 The `gitlab-org/gitlab` project on GitLab.com uses a [pre-clone step](https://gitlab.com/gitlab-org/gitlab/-/issues/39134)
