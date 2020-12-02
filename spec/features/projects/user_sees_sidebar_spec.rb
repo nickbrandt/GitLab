@@ -44,13 +44,11 @@ RSpec.describe 'Projects > User sees sidebar' do
 
     shared_examples 'has a mobile nav-sidebar' do
       it 'has a hidden nav-sidebar on load' do
-        expect(page).not_to have_content('.mobile-nav-open')
         expect(page).not_to have_selector('.sidebar-expanded-mobile')
       end
 
       it 'can expand the nav-sidebar' do
         page.find('.toggle-mobile-nav').click
-        expect(page).to have_selector('.mobile-nav-open')
         expect(page).to have_selector('.sidebar-expanded-mobile')
       end
     end
