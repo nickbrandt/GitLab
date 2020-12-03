@@ -20,20 +20,22 @@ RSpec.describe PersonalAccessTokens::CreateService do
 
         subject
       end
+
+      context 'failure' do
+        let(:other_user) { create(:user) }
+
+        it 'creates propersona;lject access token audit logs' do
+          expect(::AuditEventService)
+            .to receive(:new)
+            .with(user, other_user, action: :custom, custom_message: 'Attempted to create personal access token but failed with message: Not permitted to create', ip_address: nil)
+            .and_call_original
+
+          PersonalAccessTokens::CreateService.new(current_user: user, target_user: other_user, params: params).execute
+        end
+      end
     end
 
-    context 'project access tokens' do
-      let_it_be(:user) { create(:user, :project_bot) }
-      let_it_be(:project_access_token) { create(:personal_access_token, user: user) }
 
-      it 'creates project access token audit logs' do
-        expect(::AuditEventService)
-          .to receive(:new)
-          .with(user, user, action: :custom, custom_message: /Created project access token with id \d+/, ip_address: nil)
-          .and_call_original
-
-        subject
-      end
     end
   end
 end

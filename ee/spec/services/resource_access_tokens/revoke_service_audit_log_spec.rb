@@ -6,17 +6,44 @@ RSpec.describe ResourceAccessTokens::RevokeService do
   describe '#execute' do
     subject { service.execute }
 
-    let(:user) { create(:user, :project_bot) }
-    let(:token) { create(:personal_access_token, user: user) }
-    let(:service) { described_class.new(user, token: token) }
+    let_it_be(:admin) { create(:user, :admin) }
+    let(:service) { described_class.new(admin, resource, access_token) }
 
-    it 'creates audit logs' do
-      expect(::AuditEventService)
-        .to receive(:new)
-        .with(user, user, action: :custom, custom_message: "Revoked project access token with id #{token.id}")
-        .and_call_original
+    context 'project access tokens' do
+      let(:resource) { create(:project) }
+      let(:project_bot_user) { create(:user, :project_bot) }
+      let(:access_token) { create(:personal_access_token, user: project_bot_user) }
 
-      subject
+      context 'when successfully revoked' do
+        before do
+          resource.add_maintainer(admin)
+          resource.add_maintainer(project_bot_user)
+        end
+
+        it 'creates audit log success message' do
+          expect(::AuditEventService)
+            .to receive(:new)
+            .with(admin, project_bot_user, action: :custom, custom_message: "Revoked project access token with id #{access_token.id}")
+            .and_call_original
+
+          subject
+        end
+      end
+
+      context 'when revocation fails' do
+         before do
+          resource.add_maintainer(admin)
+        end
+
+        it 'creates audit log failure message' do
+          expect(::AuditEventService)
+            .to receive(:new)
+            .with(admin, project_bot_user, action: :custom, custom_message: "Attempted to revoke project access token with id #{access_token.id} but failed with message: Failed to find bot user")
+            .and_call_original
+
+          subject
+        end
+      end
     end
   end
 end
