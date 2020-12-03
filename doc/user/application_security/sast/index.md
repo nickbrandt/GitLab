@@ -614,6 +614,7 @@ registry.gitlab.com/gitlab-org/security-products/analyzers/eslint:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/flawfinder:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/gosec:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/kubesec:2
+registry.gitlab.com/gitlab-org/security-products/analyzers/mobsf:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/nodejs-scan:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/phpcs-security-audit:2
 registry.gitlab.com/gitlab-org/security-products/analyzers/pmd-apex:2
@@ -643,6 +644,7 @@ Support for custom certificate authorities was introduced in the following versi
 | `flawfinder` | [v2.3.0](https://gitlab.com/gitlab-org/security-products/analyzers/flawfinder/-/releases/v2.3.0) |
 | `gosec` | [v2.5.0](https://gitlab.com/gitlab-org/security-products/analyzers/gosec/-/releases/v2.5.0) |
 | `kubesec` | [v2.1.0](https://gitlab.com/gitlab-org/security-products/analyzers/kubesec/-/releases/v2.1.0) |
+| `mobsf` | [v2.0.0](https://gitlab.com/gitlab-org/security-products/analyzers/mobsf/-/releases/v2.0.0) |
 | `nodejs-scan` | [v2.9.5](https://gitlab.com/gitlab-org/security-products/analyzers/nodejs-scan/-/releases/v2.9.5) |
 | `phpcs-security-audit` | [v2.8.2](https://gitlab.com/gitlab-org/security-products/analyzers/phpcs-security-audit/-/releases/v2.8.2) |
 | `pmd-apex` | [v2.1.0](https://gitlab.com/gitlab-org/security-products/analyzers/pmd-apex/-/releases/v2.1.0) |
