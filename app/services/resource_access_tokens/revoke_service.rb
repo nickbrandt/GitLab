@@ -17,10 +17,9 @@ module ResourceAccessTokens
       return error("#{current_user.name} cannot delete #{bot_user.name}") unless can_destroy_bot_member?
       return error("Failed to find bot user") unless find_member
 
-      if access_token.revoke!
-        log_event
-      end
+      access_token.revoke!
 
+      log_event
       destroy_bot_user
 
       success("Access token #{access_token.name} has been revoked and the bot user has been scheduled for deletion.")
