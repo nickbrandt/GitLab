@@ -103,7 +103,7 @@ export default {
       return {
         title: s__('ciReport|API Fuzzing'),
         content: sprintf(
-          s__('ciReport|%{linkStartTag}Learn more about API Fuzzing %{linkEndTag}'),
+          s__('ciReport|%{linkStartTag}Learn more about API Fuzzing%{linkEndTag}'),
           {
             linkStartTag: getLinkStartTag(this.apiFuzzingHelpPath),
             linkEndTag,

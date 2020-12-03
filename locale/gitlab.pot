@@ -1514,9 +1514,6 @@ msgstr ""
 msgid "Activity"
 msgstr ""
 
-msgid "Actual Response"
-msgstr ""
-
 msgid "Add"
 msgstr ""
 
@@ -23288,9 +23285,6 @@ msgstr ""
 msgid "RepositorySettingsAccessLevel|Select"
 msgstr ""
 
-msgid "Request"
-msgstr ""
-
 msgid "Request Access"
 msgstr ""
 
@@ -29350,9 +29344,6 @@ msgstr ""
 msgid "Unmarks this %{noun} as a draft."
 msgstr ""
 
-msgid "Unmodified Response"
-msgstr ""
-
 msgid "Unreachable"
 msgstr ""
 
@@ -30491,6 +30482,9 @@ msgstr ""
 msgid "Vulnerability|Activity"
 msgstr ""
 
+msgid "Vulnerability|Actual Response"
+msgstr ""
+
 msgid "Vulnerability|Actual received response is the one received when this fault was detected"
 msgstr ""
 
@@ -30545,6 +30539,9 @@ msgstr ""
 msgid "Vulnerability|Project"
 msgstr ""
 
+msgid "Vulnerability|Request"
+msgstr ""
+
 msgid "Vulnerability|Request/Response"
 msgstr ""
 
@@ -30561,6 +30558,9 @@ msgid "Vulnerability|Status"
 msgstr ""
 
 msgid "Vulnerability|The unmodified response is the original response that had no mutations done to the request"
+msgstr ""
+
+msgid "Vulnerability|Unmodified Response"
 msgstr ""
 
 msgid "Wait for the file to load to copy its contents"
@@ -32073,7 +32073,7 @@ msgstr ""
 msgid "ciReport|%{improvedNum} improved"
 msgstr ""
 
-msgid "ciReport|%{linkStartTag}Learn more about API Fuzzing %{linkEndTag}"
+msgid "ciReport|%{linkStartTag}Learn more about API Fuzzing%{linkEndTag}"
 msgstr ""
 
 msgid "ciReport|%{linkStartTag}Learn more about Container Scanning %{linkEndTag}"
