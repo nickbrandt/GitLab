@@ -4,9 +4,11 @@ import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 (function createMainApp() {
   const el = document.getElementById('js-vulnerability-main');
-  const vulnerability = convertObjectPropsToCamelCase(JSON.parse(el.dataset.vulnerability), {
+  let orig_vulnerability = JSON.parse(el.dataset.vulnerability);
+  let vulnerability = convertObjectPropsToCamelCase(JSON.parse(el.dataset.vulnerability), {
     deep: true,
   });
+  vulnerability.details = orig_vulnerability.details;
 
   return new Vue({
     el,
