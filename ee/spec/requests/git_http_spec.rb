@@ -3,26 +3,9 @@
 require 'spec_helper'
 
 RSpec.describe 'Git HTTP requests' do
-  include GitHttpHelpers
   include WorkhorseHelpers
 
-  shared_examples_for 'pulls are allowed' do
-    specify do
-      download(path, **env) do |response|
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
-      end
-    end
-  end
-
-  shared_examples_for 'pushes are allowed' do
-    specify do
-      upload(path, **env) do |response|
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response.media_type).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
-      end
-    end
-  end
+  include_examples 'Git HTTP requests'
 
   describe "User with no identities" do
     let(:user) { create(:user) }

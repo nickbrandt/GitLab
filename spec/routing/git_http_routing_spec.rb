@@ -2,10 +2,12 @@
 
 require 'spec_helper'
 
-RSpec.describe 'git_http routing' do
+RSpec.describe 'git_http routing', :aggregate_failures do
+  let_it_be(:project) { create(:project, :public, :empty_repo) }
+
   describe 'code repositories' do
     it_behaves_like 'git repository routes' do
-      let(:path) { '/gitlab-org/gitlab-test.git' }
+      let_it_be(:container) { project }
     end
 
     it_behaves_like 'git repository routes with fallback for git-upload-pack' do
@@ -13,71 +15,21 @@ RSpec.describe 'git_http routing' do
     end
   end
 
-  describe 'wiki repositories' do
-    context 'in project' do
-      let(:path) { '/gitlab-org/gitlab-test.wiki.git' }
-
-      it_behaves_like 'git repository routes'
-      it_behaves_like 'git repository routes with fallback for git-upload-pack'
-
-      describe 'redirects', type: :request do
-        let(:web_path) { '/gitlab-org/gitlab-test/-/wikis' }
-
-        it 'redirects namespace/project.wiki.git to the project wiki' do
-          expect(get(path)).to redirect_to(web_path)
-        end
-
-        it 'preserves query parameters' do
-          expect(get("#{path}?foo=bar&baz=qux")).to redirect_to("#{web_path}?foo=bar&baz=qux")
-        end
-
-        it 'only redirects when the format is .git' do
-          expect(get(path.delete_suffix('.git'))).not_to redirect_to(web_path)
-          expect(get(path.delete_suffix('.git') + '.json')).not_to redirect_to(web_path)
-        end
-      end
-    end
-
-    context 'in toplevel group' do
-      it_behaves_like 'git repository routes' do
-        let(:path) { '/gitlab-org.wiki.git' }
-      end
-
-      it_behaves_like 'git repository routes with fallback for git-upload-pack' do
-        let(:path) { '/gitlab-org.wiki.git' }
-      end
-    end
-
-    context 'in child group' do
-      it_behaves_like 'git repository routes' do
-        let(:path) { '/gitlab-org/child.wiki.git' }
-      end
-
-      it_behaves_like 'git repository routes with fallback for git-upload-pack' do
-        let(:path) { '/gitlab-org/child.wiki.git' }
-      end
+  describe 'project wiki repositories' do
+    it_behaves_like 'git repository routes' do
+      let_it_be(:container) { create(:project_wiki, :empty_repo, project: project) }
     end
   end
 
-  describe 'snippet repositories' do
-    context 'personal snippet' do
-      it_behaves_like 'git repository routes' do
-        let(:path) { '/snippets/123.git' }
-      end
-
-      it_behaves_like 'git repository routes without fallback' do
-        let(:path) { '/snippets/123.git' }
-      end
+  describe 'personal snippet repositories' do
+    it_behaves_like 'git repository routes' do
+      let_it_be(:container) { create(:personal_snippet, :public, :empty_repo) }
     end
+  end
 
-    context 'project snippet' do
-      it_behaves_like 'git repository routes' do
-        let(:path) { '/gitlab-org/gitlab-test/snippets/123.git' }
-      end
-
-      it_behaves_like 'git repository routes with fallback' do
-        let(:path) { '/gitlab-org/gitlab-test/snippets/123.git' }
-      end
+  describe 'project snippet repositories' do
+    it_behaves_like 'git repository routes' do
+      let_it_be(:container) { create(:project_snippet, :public, :empty_repo, project: project) }
     end
   end
 end
