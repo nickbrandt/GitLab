@@ -1020,7 +1020,7 @@ Gitlab::UsageData.to_json(force_refresh: true)
 
 ### Configuration attributes
 
-Open the rails console (`gitlab rails c`) and run the following command to see all the attributes available:
+Open the rails console (`gitlab rails c`) and run the following command to see all the available attributes:
 
 ```ruby
 ApplicationSetting.last.attributes
