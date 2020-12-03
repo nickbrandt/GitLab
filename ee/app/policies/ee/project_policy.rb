@@ -155,8 +155,7 @@ module EE
 
       with_scope :subject
       condition(:oncall_schedules_available) do
-        ::Feature.enabled?(:oncall_schedules_mvc, @subject) &&
-          @subject.feature_available?(:oncall_schedules)
+        ::Gitlab::IncidentManagement.oncall_schedules_available?(@subject)
       end
 
       rule { visual_review_bot }.policy do
