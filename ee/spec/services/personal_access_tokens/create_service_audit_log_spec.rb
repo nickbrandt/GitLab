@@ -43,6 +43,29 @@ RSpec.describe PersonalAccessTokens::CreateService do
         end
       end
     end
+
+    context 'project access tokens' do
+      let_it_be(:user) { create(:user, :project_bot) }
+
+      let(:admin) { create(:user, :admin) }
+      let(:project) { create(:project) }
+
+      let_it_be(:project_access_token) { create(:personal_access_token, user: user) }
+      let(:params) { { name: 'token', scopes: [:api], expires_at: Date.today + 1.month } }
+
+      context 'with valid params' do
+        let(:user) { create(:user, :project_bot) }
+
+        it 'creates audit logs with success message' do
+          expect(::AuditEventService)
+            .to receive(:new)
+            .with(user, user, action: :custom, custom_message: /Created project access token with id \d+/, ip_address: nil)
+            .and_call_original
+
+         subject
+        end
+      end
+    end
   end
 
   def expect_to_log(current_user, target_user, message)
