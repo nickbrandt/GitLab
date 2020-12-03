@@ -25,8 +25,8 @@ module EE
         ::AuditEventService.new(
           current_user,
           action: :custom,
-          custom_message: message,
-          ip_address: ip_address
+          custom_message: message
+         # ip_address: ip_address
         )
       end
     end
