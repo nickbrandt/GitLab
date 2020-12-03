@@ -148,7 +148,7 @@ RSpec.describe TrialsController do
     context 'when the group-only trials experiment is active' do
       before do
         stub_experiment(group_only_trials: true)
-        stub_experiment_for_user(group_only_trials: user_is_in_experiment?)
+        stub_experiment_for_subject(group_only_trials: user_is_in_experiment?)
       end
 
       def expected_group_type
