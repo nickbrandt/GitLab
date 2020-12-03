@@ -7,7 +7,8 @@ class NamespaceOnboardingAction < ApplicationRecord
 
   ACTIONS = {
     subscription_created: 1,
-    git_write: 2
+    git_write: 2,
+    git_read: 4
   }.freeze
 
   enum action: ACTIONS
