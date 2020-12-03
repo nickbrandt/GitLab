@@ -236,16 +236,16 @@ Represents a project or group board.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `assignee` | User | The board assignee. |
-| `epics` | BoardEpicConnection | Epics associated with board issues. |
-| `hideBacklogList` | Boolean | Whether or not backlog list is hidden. |
-| `hideClosedList` | Boolean | Whether or not closed list is hidden. |
+| `assignee` | User | The board assignee |
+| `epics` | BoardEpicConnection | Epics associated with board issues |
+| `hideBacklogList` | Boolean | Whether or not backlog list is hidden |
+| `hideClosedList` | Boolean | Whether or not closed list is hidden |
 | `id` | ID! | ID (global ID) of the board |
 | `labels` | LabelConnection | Labels of the board |
 | `lists` | BoardListConnection | Lists of the board |
-| `milestone` | Milestone | The board milestone. |
+| `milestone` | Milestone | The board milestone |
 | `name` | String | Name of the board |
-| `weight` | Int | Weight of the board. |
+| `weight` | Int | Weight of the board |
 
 ### BoardEpic
 
