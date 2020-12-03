@@ -1,4 +1,4 @@
-#import "ee_else_ce/boards/queries/issue.fragment.graphql"
+#import "ee_else_ce/boards/graphql/issue.fragment.graphql"
 
 mutation IssueMoveList(
   $projectPath: ID!
@@ -8,6 +8,7 @@ mutation IssueMoveList(
   $toListId: ID
   $moveBeforeId: ID
   $moveAfterId: ID
+  $epicId: EpicID
 ) {
   issueMoveList(
     input: {
@@ -18,6 +19,7 @@ mutation IssueMoveList(
       toListId: $toListId
       moveBeforeId: $moveBeforeId
       moveAfterId: $moveAfterId
+      epicId: $epicId
     }
   ) {
     issue {
