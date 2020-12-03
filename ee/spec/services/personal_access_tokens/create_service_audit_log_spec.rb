@@ -34,8 +34,5 @@ RSpec.describe PersonalAccessTokens::CreateService do
         end
       end
     end
-
-
-    end
   end
 end

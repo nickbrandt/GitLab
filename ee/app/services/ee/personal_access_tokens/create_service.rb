@@ -30,7 +30,6 @@ module EE
                     end
                   end
 
-
         ::AuditEventService.new(
           current_user,
           target_user,
