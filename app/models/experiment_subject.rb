@@ -10,15 +10,19 @@ class ExperimentSubject < ApplicationRecord
 
   validates :experiment, presence: true
   validates :variant, presence: true
-  validate :must_have_at_least_one_subject
+  validate :must_have_one_subject_present
 
   enum variant: { GROUP_CONTROL => 0, GROUP_EXPERIMENTAL => 1 }
 
   private
 
-  def must_have_at_least_one_subject
-    if [user, group, project].all?(&:blank?)
-      errors.add(:base, s_("ExperimentSubject|Must have at least one of User, Group, or Project."))
+  def must_have_one_subject_present
+    if non_nil_subjects.length != 1
+      errors.add(:base, s_("ExperimentSubject|Must have exactly one of User, Group, or Project."))
     end
+  end
+
+  def non_nil_subjects
+    @non_nil_subjects ||= [user, group, project].reject(&:blank?)
   end
 end

@@ -12147,7 +12147,7 @@ CREATE TABLE experiment_subjects (
     variant smallint DEFAULT 0 NOT NULL,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL,
-    CONSTRAINT chk_at_least_one_subject CHECK ((NOT (ROW(user_id, group_id, project_id) IS NULL)))
+    CONSTRAINT chk_has_one_subject CHECK ((num_nonnulls(user_id, group_id, project_id) = 1))
 );
 
 CREATE SEQUENCE experiment_subjects_id_seq
