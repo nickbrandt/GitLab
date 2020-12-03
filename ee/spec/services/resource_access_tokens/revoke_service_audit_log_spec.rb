@@ -31,7 +31,7 @@ RSpec.describe ResourceAccessTokens::RevokeService do
       end
 
       context 'when revocation fails' do
-         before do
+        before do
           resource.add_maintainer(admin)
         end
 
