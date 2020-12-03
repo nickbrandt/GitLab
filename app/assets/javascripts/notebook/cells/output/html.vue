@@ -38,6 +38,6 @@ export default {
 <template>
   <div class="output">
     <prompt type="Out" :count="count" :show-output="showOutput" />
-    <div class="gl-overflow-auto" v-safe-html="sanitizedOutput"></div>
+    <div v-safe-html="sanitizedOutput" class="gl-overflow-auto"></div>
   </div>
 </template>
