@@ -107,7 +107,7 @@ module ResourceAccessTokens
     end
 
     def log_event(token)
-      log_info("PROJECT ACCESS TOKEN CREATION: created_by: '#{current_user.username}', created_for: '#{token.user.username}', token_id: '#{token.id}'")
+      Gitlab::AppLogger.info("PROJECT ACCESS TOKEN CREATION: created_by: '#{current_user.username}', created_for: '#{token.user.username}', token_id: '#{token.id}'")
     end
 
     def error(message)

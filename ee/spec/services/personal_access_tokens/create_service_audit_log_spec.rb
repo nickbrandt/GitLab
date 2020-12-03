@@ -45,24 +45,33 @@ RSpec.describe PersonalAccessTokens::CreateService do
     end
 
     context 'project access tokens' do
-      let_it_be(:user) { create(:user, :project_bot) }
-
-      let(:admin) { create(:user, :admin) }
       let(:project) { create(:project) }
+      let(:admin) { create(:user, :admin) }
+      let(:user) { create(:user, :project_bot) }
 
-      let_it_be(:project_access_token) { create(:personal_access_token, user: user) }
-      let(:params) { { name: 'token', scopes: [:api], expires_at: Date.today + 1.month } }
-
-      context 'with valid params' do
-        let(:user) { create(:user, :project_bot) }
+      context 'with valid params', :enable_admin_mode do
+        before do
+          project.add_maintainer(admin)
+        end
 
         it 'creates audit logs with success message' do
           expect(::AuditEventService)
+          .to receive(:new)
+          .with(admin, user, action: :custom, custom_message: /Created project access token with id \d+/, ip_address: nil)
+          .and_call_original
+
+          PersonalAccessTokens::CreateService.new(current_user: admin, target_user: user, params: params).execute
+        end
+      end
+
+      context 'with invalid permission' do
+        it 'creates audit logs with failure message' do
+          expect(::AuditEventService)
             .to receive(:new)
-            .with(user, user, action: :custom, custom_message: /Created project access token with id \d+/, ip_address: nil)
+            .with(user, admin, action: :custom, custom_message: 'Attempted to create personal access token but failed with message: Not permitted to create', ip_address: nil)
             .and_call_original
 
-         subject
+          PersonalAccessTokens::CreateService.new(current_user: user, target_user: admin, params: params).execute
         end
       end
     end
