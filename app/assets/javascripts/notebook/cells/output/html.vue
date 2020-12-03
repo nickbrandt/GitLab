@@ -1,11 +1,14 @@
 <script>
-/* eslint-disable vue/no-v-html */
+import { GlSafeHtmlDirective } from '@gitlab/ui';
 import { sanitize } from '~/lib/dompurify';
 import Prompt from '../prompt.vue';
 
 export default {
   components: {
     Prompt,
+  },
+  directives: {
+    SafeHtml: GlSafeHtmlDirective,
   },
   props: {
     count: {
@@ -19,11 +22,6 @@ export default {
     index: {
       type: Number,
       required: true,
-    },
-    codeCssClass: {
-      type: String,
-      required: false,
-      default: '',
     },
   },
   computed: {
@@ -40,7 +38,6 @@ export default {
 <template>
   <div class="output">
     <prompt type="Out" :count="count" :show-output="showOutput" />
-    <div v-if="sanitizedOutput.length" class="gl-overflow-auto" v-html="sanitizedOutput"></div>
-    <pre v-else ref="code" :class="codeCssClass" class="language-python" v-text="rawCode"></pre>
+    <div class="gl-overflow-auto" v-safe-html="sanitizedOutput"></div>
   </div>
 </template>
