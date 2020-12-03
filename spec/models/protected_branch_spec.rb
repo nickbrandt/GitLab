@@ -12,6 +12,23 @@ RSpec.describe ProtectedBranch do
   describe 'Validation' do
     it { is_expected.to validate_presence_of(:project) }
     it { is_expected.to validate_presence_of(:name) }
+
+    describe "#merge_access_levels" do
+      before do
+        stub_licensed_features(protected_refs_for_users: false)
+      end
+
+      it 'is valid when there is only one merge_access_levels' do
+        protected_branch = create(:protected_branch, :developers_can_merge)
+
+        expect(protected_branch).to be_valid
+
+        second_merge_level = protected_branch.merge_access_levels.new(access_level: Gitlab::Access::MAINTAINER)
+
+        expect(protected_branch).not_to be_valid
+        expect(second_merge_level).not_to be_valid
+      end
+    end
   end
 
   describe "#matches?" do

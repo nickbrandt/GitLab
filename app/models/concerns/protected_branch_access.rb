@@ -6,6 +6,7 @@ module ProtectedBranchAccess
 
   included do
     belongs_to :protected_branch
+    validates_associated :protected_branch
 
     delegate :project, to: :protected_branch
   end
