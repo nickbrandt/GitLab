@@ -1,20 +1,17 @@
 <script>
-import { GlCard, GlIcon } from '@gitlab/ui';
 import { __ } from '~/locale';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
-import query from '../queries/iteration_issues_summary.query.graphql';
+import IterationReportSummaryCards from './iteration_report_summary_cards.vue';
+import summaryStatsQuery from '../queries/iteration_issues_summary.query.graphql';
 import { Namespace } from '../constants';
 
 export default {
-  cardBodyClass: 'gl-text-center gl-py-3',
-  cardClass: 'gl-bg-gray-10 gl-border-0',
   components: {
-    GlCard,
-    GlIcon,
+    IterationReportSummaryCards,
   },
   apollo: {
     issues: {
-      query,
+      query: summaryStatsQuery,
       variables() {
         return this.queryVariables;
       },
@@ -48,7 +45,11 @@ export default {
   },
   data() {
     return {
-      issues: {},
+      issues: {
+        assigned: 0,
+        open: 0,
+        closed: 0,
+      },
     };
   },
   computed: {
@@ -67,44 +68,38 @@ export default {
       }
       return ((closed / (open + closed)) * 100).toFixed(0);
     },
-    showCards() {
-      return !this.$apollo.queries.issues.loading && Object.values(this.issues).every(a => a >= 0);
-    },
     columns() {
       return [
         {
-          title: __('Complete'),
-          value: `${this.completedPercent}%`,
-        },
-        {
-          title: __('Open'),
-          value: this.issues.open,
-          icon: true,
-        },
-        {
-          title: __('In progress'),
-          value: this.issues.assigned,
-          icon: true,
-        },
-        {
           title: __('Completed'),
           value: this.issues.closed,
-          icon: true,
+        },
+        {
+          title: __('Incomplete'),
+          value: this.issues.assigned,
+        },
+        {
+          title: __('Unstarted'),
+          value: this.issues.open,
         },
       ];
     },
+    total() {
+      return this.issues.open + this.issues.assigned + this.issues.closed;
+    },
+  },
+  methods: {
+    percent(val) {
+      if (!this.total) return 0;
+      return ((val / this.total) * 100).toFixed(0);
+    },
+  },
+  render() {
+    return this.$scopedSlots.default({
+      columns: this.columns,
+      loading: this.$apollo.queries.issues.loading,
+      total: this.total,
+    });
   },
 };
 </script>
-
-<template>
-  <div v-if="showCards" class="row gl-mt-6">
-    <div v-for="(column, index) in columns" :key="index" class="col-sm-3">
-      <gl-card :class="$options.cardClass" :body-class="$options.cardBodyClass" class="gl-mb-5">
-        <span>{{ column.title }}</span>
-        <span class="gl-font-size-h2 gl-font-weight-bold">{{ column.value }}</span>
-        <gl-icon v-if="column.icon" name="issues" :size="12" class="gl-text-gray-500" />
-      </gl-card>
-    </div>
-  </div>
-</template>
