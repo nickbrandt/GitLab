@@ -25646,9 +25646,6 @@ msgstr ""
 msgid "Something went wrong, unable to search projects"
 msgstr ""
 
-msgid "Something went wrong."
-msgstr ""
-
 msgid "Something went wrong. Please try again."
 msgstr ""
 
@@ -31430,6 +31427,9 @@ msgid "You have insufficient permissions to remove an on-call schedule from this
 msgstr ""
 
 msgid "You have insufficient permissions to remove this HTTP integration"
+msgstr ""
+
+msgid "You have insufficient permissions to update an on-call schedule for this project"
 msgstr ""
 
 msgid "You have insufficient permissions to update this HTTP integration"
