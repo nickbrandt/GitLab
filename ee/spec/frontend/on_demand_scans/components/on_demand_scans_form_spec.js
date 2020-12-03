@@ -1,12 +1,17 @@
 import { GlForm, GlSkeletonLoader } from '@gitlab/ui';
-import { shallowMount, mount } from '@vue/test-utils';
+import { shallowMount, mount, createLocalVue } from '@vue/test-utils';
 import { merge } from 'lodash';
+import VueApollo from 'vue-apollo';
+import createApolloProvider from 'helpers/mock_apollo_helper';
 import OnDemandScansForm from 'ee/on_demand_scans/components/on_demand_scans_form.vue';
 import ScannerProfileSelector from 'ee/on_demand_scans/components/profile_selector/scanner_profile_selector.vue';
 import SiteProfileSelector from 'ee/on_demand_scans/components/profile_selector/site_profile_selector.vue';
 import dastOnDemandScanCreate from 'ee/on_demand_scans/graphql/dast_on_demand_scan_create.mutation.graphql';
+import dastScannerProfilesQuery from 'ee/security_configuration/dast_profiles/graphql/dast_scanner_profiles.query.graphql';
+import dastSiteProfilesQuery from 'ee/security_configuration/dast_profiles/graphql/dast_site_profiles.query.graphql';
+import * as responses from '../mocks/apollo_mocks';
+import { scannerProfiles, siteProfiles } from '../mocks/mock_data';
 import { redirectTo } from '~/lib/utils/url_utility';
-import { scannerProfiles, siteProfiles } from '../mock_data';
 
 const helpPagePath = '/application_security/dast/index#on-demand-scans';
 const projectPath = 'group/project';
@@ -22,17 +27,6 @@ const defaultProps = {
   defaultBranch,
 };
 
-const defaultMocks = {
-  $apollo: {
-    mutate: jest.fn(),
-    queries: {
-      scannerProfiles: {},
-      siteProfiles: {},
-    },
-    addSmartQuery: jest.fn(),
-  },
-};
-
 const pipelineUrl = `/${projectPath}/pipelines/123`;
 const [passiveScannerProfile, activeScannerProfile] = scannerProfiles;
 const [nonValidatedSiteProfile, validatedSiteProfile] = siteProfiles;
@@ -43,7 +37,9 @@ jest.mock('~/lib/utils/url_utility', () => ({
 }));
 
 describe('OnDemandScansForm', () => {
+  let localVue;
   let subject;
+  let requestHandlers;
 
   const findForm = () => subject.find(GlForm);
   const findByTestId = testId => subject.find(`[data-testid="${testId}"]`);
@@ -58,7 +54,38 @@ describe('OnDemandScansForm', () => {
   };
   const submitForm = () => findForm().vm.$emit('submit', { preventDefault: () => {} });
 
-  const subjectMounterFactory = (mountFn = shallowMount) => (options = {}) => {
+  const createMockApolloProvider = handlers => {
+    localVue.use(VueApollo);
+
+    requestHandlers = {
+      dastScannerProfiles: jest.fn().mockResolvedValue(responses.dastScannerProfiles()),
+      dastSiteProfiles: jest.fn().mockResolvedValue(responses.dastSiteProfiles()),
+      ...handlers,
+    };
+
+    return createApolloProvider([
+      [dastScannerProfilesQuery, requestHandlers.dastScannerProfiles],
+      [dastSiteProfilesQuery, requestHandlers.dastSiteProfiles],
+    ]);
+  };
+
+  const subjectMounterFactory = (mountFn = shallowMount) => (options = {}, withHandlers) => {
+    localVue = createLocalVue();
+    let defaultMocks = {
+      $apollo: {
+        mutate: jest.fn(),
+        queries: {
+          scannerProfiles: {},
+          siteProfiles: {},
+        },
+        addSmartQuery: jest.fn(),
+      },
+    };
+    let apolloProvider;
+    if (withHandlers) {
+      apolloProvider = createMockApolloProvider(withHandlers);
+      defaultMocks = {};
+    }
     subject = mountFn(
       OnDemandScansForm,
       merge(
@@ -76,7 +103,7 @@ describe('OnDemandScansForm', () => {
             },
           },
         },
-        options,
+        { ...options, localVue, apolloProvider },
         {
           data() {
             return { ...options.data };
@@ -289,4 +316,25 @@ describe('OnDemandScansForm', () => {
       });
     },
   );
+
+  describe.each`
+    profileType  | query                    | field                         | profiles
+    ${'scanner'} | ${'dastScannerProfiles'} | ${'selectedScannerProfileId'} | ${scannerProfiles}
+    ${'site'}    | ${'dastSiteProfiles'}    | ${'selectedSiteProfileId'}    | ${siteProfiles}
+  `('when there is a single $profileType profile', ({ query, field, profiles }) => {
+    const [profile] = profiles;
+
+    beforeEach(() => {
+      mountShallowSubject(
+        {},
+        {
+          [query]: jest.fn().mockResolvedValue(responses[query]([profile])),
+        },
+      );
+    });
+
+    it('automatically selects the only available profile', () => {
+      expect(subject.vm[field]).toBe(profile.id);
+    });
+  });
 });
