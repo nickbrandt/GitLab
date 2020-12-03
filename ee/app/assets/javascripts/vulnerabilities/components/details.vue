@@ -124,13 +124,13 @@ export default {
       );
     },
     hasRequest() {
-      return Boolean(this.requestData?.length);
+      return Boolean(this.requestData.length);
     },
     hasResponse() {
-      return Boolean(this.responseData?.length);
+      return Boolean(this.responseData.length);
     },
     hasRecordedResponse() {
-      return Boolean(this.recordedResponseData?.length);
+      return Boolean(this.recordedResponseData.length);
     },
     hasResponses() {
       return Boolean(this.hasResponse || this.hasRecordedResponse);
