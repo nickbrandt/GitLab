@@ -43,9 +43,6 @@ RSpec.describe PersonalAccessTokens::CreateService do
         end
       end
     end
-
-
-    end
   end
 
   def expect_to_log(current_user, target_user, message)

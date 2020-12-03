@@ -7,7 +7,6 @@ module ResourceAccessTokens
       @resource = resource
       @current_user = current_user
       @params = params.dup
-
     end
 
     def execute

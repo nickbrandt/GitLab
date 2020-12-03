@@ -60,7 +60,7 @@ module ResourceAccessTokens
     end
 
     def log_event
-      Gitlab::AppLogger.info("Project access token revocation: revoked_by: '#{current_user.username}', revoked_for: '#{access_token.user.username}', token_id: '#{access_token.id}'")
+      Gitlab::AppLogger.info("PROJECT ACCESS TOKEN REVOCATION: revoked_by: '#{current_user.username}', revoked_for: '#{access_token.user.username}', token_id: '#{access_token.id}'")
     end
 
     def error(message)

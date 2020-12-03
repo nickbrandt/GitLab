@@ -14,21 +14,6 @@ module EE
 
       private
 
-      override :revocation_permitted?
-
-      def revocation_permitted?
-        super || managed_user_revocation_allowed?
-      end
-
-      def managed_user_revocation_allowed?
-        return unless access_token.present?
-        return unless ::Feature.enabled?(:revoke_managed_users_token, group)
-
-        access_token.user&.group_managed_account? &&
-          access_token.user&.managing_group == group &&
-          can?(current_user, :admin_group_credentials_inventory, group)
-      end
-
       def log_audit_event(access_token, response)
         return unless access_token.present?
 
