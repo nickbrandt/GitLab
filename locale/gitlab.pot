@@ -25646,9 +25646,6 @@ msgstr ""
 msgid "Something went wrong, unable to search projects"
 msgstr ""
 
-msgid "Something went wrong."
-msgstr ""
-
 msgid "Something went wrong. Please try again."
 msgstr ""
 
