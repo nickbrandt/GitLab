@@ -11759,9 +11759,6 @@ msgstr ""
 msgid "FeatureFlags|Feature Flags"
 msgstr ""
 
-msgid "FeatureFlags|Feature Flags will look different in the next milestone. No action is needed, but you may notice the functionality was changed to improve the workflow."
-msgstr ""
-
 msgid "FeatureFlags|Feature flag %{name} will be removed. Are you sure?"
 msgstr ""
 
