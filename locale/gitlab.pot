@@ -2619,6 +2619,9 @@ msgstr ""
 msgid "AlertSettings|Proceed with editing"
 msgstr ""
 
+msgid "AlertSettings|Prometheus"
+msgstr ""
+
 msgid "AlertSettings|Prometheus API base URL"
 msgstr ""
 
