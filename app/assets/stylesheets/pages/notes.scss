@@ -161,8 +161,6 @@ $note-form-margin-left: 72px;
 
     .timeline-discussion-body {
       margin-top: -$gl-padding-8;
-      overflow-x: auto;
-      overflow-y: hidden;
 
       .note-body {
         margin-top: $gl-padding-8;
@@ -231,9 +229,6 @@ $note-form-margin-left: 72px;
     }
 
     .note-body {
-      overflow-x: auto;
-      overflow-y: hidden;
-
       .note-text {
         word-wrap: break-word;
       }
