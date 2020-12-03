@@ -23,11 +23,7 @@ module EE
                       "Created personal access token with id #{token.id}"
                     end
                   else
-                    if token&.user&.project_bot?
-                      "Attempted to create project access token but failed with message: #{response.message}"
-                    else
-                      "Attempted to create personal access token but failed with message: #{response.message}"
-                    end
+                    "Attempted to create personal access token but failed with message: #{response.message}"
                   end
 
         ::AuditEventService.new(
