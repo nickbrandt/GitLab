@@ -11679,6 +11679,9 @@ msgstr ""
 msgid "Failed to update environment!"
 msgstr ""
 
+msgid "Failed to update framework"
+msgstr ""
+
 msgid "Failed to update issue status"
 msgstr ""
 
