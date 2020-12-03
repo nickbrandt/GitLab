@@ -430,7 +430,7 @@ RSpec.describe Projects::UpdateMirrorService do
   end
 
   def stub_fetch_mirror(project, repository: project.repository)
-    allow(project).to receive(:fetch_mirror) { fetch_mirror(repository) }
+    allow(project).to receive(:fetch_mirror) { |&blk| fetch_mirror(repository, branch_prefix: branch_prefix, &blk) }
   end
 
   def fetch_mirror(repository)
@@ -457,6 +457,15 @@ RSpec.describe Projects::UpdateMirrorService do
 
     # New tag that point to a blob
     rugged.references.create('refs/tags/new-tag-on-blob', 'c74175afd117781cbc983664339a0f599b5bb34e')
+
+    # Imitate the behaviour of the FetchRemoteWithStatus call
+    update_kls = Gitaly::FetchRemoteWithStatusResponse::Update
+    if Feature.enabled?(:fetch_remote_with_status)
+      yield update_kls.new(update_type: :FETCHED, summary: '[new tag]', from_ref: 'new-tag', to_ref: 'new-tag')
+      # FIXME: check that this is how git fetch reports such a beast
+      yield update_kls.new(update_type: :FETCHED, summary: '[new tag]', from_ref: 'new-tag-on-blob', to_ref: 'new-tag-on-blob')
+      # TODO: we're missing a test for the tag update case. Add one to ensure coverage
+    end
   end
 
   def modify_tag(repository, tag_name)

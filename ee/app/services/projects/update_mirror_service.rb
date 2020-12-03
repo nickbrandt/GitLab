@@ -33,7 +33,7 @@ module Projects
       checksum_before = project.repository.checksum
 
       update_tags do
-        project.fetch_mirror(forced: true)
+        fetch_mirror_with_tag_status
       end
 
       update_branches
@@ -93,6 +93,23 @@ module Projects
       unless errors.empty?
         raise UpdateError, errors.join("\n\n")
       end
+    end
+
+    def fetch_mirror_with_tag_status
+      return project.fetch_mirror(forced: true) unless Feature.enabled?(:fetch_remote_with_status, project)
+
+      # Watch the stream from gitaly to see if any of the updated refsare tags.
+      # There isn't enough  information to construct the full update without
+      # further queries, but this lets us skip cache invalidation in the common
+      # case where no tags have been changed.
+      tags_updated = false
+
+      fetch_result = project.fetch_mirror(forced: true, with_status: true) do |status|
+        tags_updated = true if status.update_type == :FETCHED && status.summary = '[new tag]'
+        tags_updated = true if status.update_type = :TAG_UPDATE
+      end
+
+      fetch_result && tags_updated
     end
 
     def update_tags(&block)

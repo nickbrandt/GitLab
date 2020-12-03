@@ -33,9 +33,10 @@ module EE
       expire_content_cache
     end
 
-    def fetch_upstream(url, forced: false)
+    def fetch_upstream(url, forced: false, with_status: false)
       add_remote(MIRROR_REMOTE, url)
-      fetch_remote(MIRROR_REMOTE, ssh_auth: project&.import_data, forced: forced)
+
+      fetch_remote(MIRROR_REMOTE, ssh_auth: project&.import_data, forced: forced, with_status: with_status)
     end
 
     def upstream_branches

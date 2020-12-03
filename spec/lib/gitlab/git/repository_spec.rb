@@ -520,7 +520,8 @@ RSpec.describe Gitlab::Git::Repository, :seed_helper do
         forced: true,
         no_tags: true,
         timeout: described_class::GITLAB_PROJECTS_TIMEOUT,
-        prune: false
+        prune: false,
+        with_status: false
       }
 
       expect(repository.gitaly_repository_client).to receive(:fetch_remote).with('remote-name', expected_opts)
