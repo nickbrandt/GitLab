@@ -7,7 +7,7 @@ module ResourceAccessTokens
       @resource = resource
       @current_user = current_user
       @params = params.dup
-      
+
     end
 
     def execute
@@ -120,5 +120,3 @@ module ResourceAccessTokens
     end
   end
 end
-
-ResourceAccessTokens::CreateService.prepend_if_ee('EE::ResourceAccessTokens::CreateService')
