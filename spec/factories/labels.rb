@@ -19,7 +19,7 @@ FactoryBot.define do
   end
 
   trait :incident do
-    properties = IncidentManagement::CreateIncidentLabelService::LABEL_PROPERTIES
+    properties = ::IncidentManagement::INCIDENT_LABEL_PROPERTIES
     title { properties.fetch(:title) }
     description { properties.fetch(:description) }
     color { properties.fetch(:color) }

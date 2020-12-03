@@ -11,16 +11,8 @@
 #
 #   include_examples 'incident issue'
 RSpec.shared_examples 'incident issue' do
-  let(:label_properties) { attributes_for(:label, :incident) }
-
   it 'has incident as issue type' do
     expect(issue.issue_type).to eq('incident')
-  end
-
-  it 'has exactly one incident label' do
-    expect(issue.labels).to be_one do |label|
-      label.slice(*label_properties.keys).symbolize_keys == label_properties
-    end
   end
 end
 
@@ -49,7 +41,6 @@ end
 # This shared example is to test the execution of incident management label services
 # For example:
 # - IncidentManagement::CreateIncidentSlaExceededLabelService
-# - IncidentManagement::CreateIncidentLabelService
 
 # It doesn't require any defined variables
 

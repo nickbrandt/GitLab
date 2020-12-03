@@ -67,7 +67,7 @@ RSpec.describe AddIncidentSettingsToAllExistingProjects, :migration do
     context 'when project has incident labels' do
       before do
         issue = issues.create!(project_id: project.id)
-        incident_label_attrs = IncidentManagement::CreateIncidentLabelService::LABEL_PROPERTIES
+        incident_label_attrs = IncidentManagement::INCIDENT_LABEL_PROPERTIES
         incident_label = labels.create!(project_id: project.id, **incident_label_attrs)
         label_links.create!(target_id: issue.id, label_id: incident_label.id, target_type: 'Issue')
       end

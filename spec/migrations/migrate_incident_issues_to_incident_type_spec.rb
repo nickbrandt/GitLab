@@ -11,7 +11,7 @@ RSpec.describe MigrateIncidentIssuesToIncidentType do
   let(:labels) { table(:labels) }
   let(:issues) { table(:issues) }
   let(:label_links) { table(:label_links) }
-  let(:label_props) { IncidentManagement::CreateIncidentLabelService::LABEL_PROPERTIES }
+  let(:label_props) { IncidentManagement::INCIDENT_LABEL_PROPERTIES }
 
   let(:namespace) { namespaces.create!(name: 'foo', path: 'foo') }
   let!(:project) { projects.create!(namespace_id: namespace.id) }

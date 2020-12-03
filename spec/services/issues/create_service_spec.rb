@@ -58,27 +58,11 @@ RSpec.describe Issues::CreateService do
         end
 
         let(:current_user) { user }
-        let(:incident_label_attributes) { attributes_for(:label, :incident) }
 
         subject { issue }
 
         it_behaves_like 'incident issue'
         it_behaves_like 'an incident management tracked event', :incident_management_incident_created
-
-        it 'does create an incident label' do
-          expect { subject }
-            .to change { Label.where(incident_label_attributes).count }.by(1)
-        end
-
-        context 'when invalid' do
-          before do
-            opts.merge!(title: '')
-          end
-
-          it 'does not create an incident label prematurely' do
-            expect { subject }.not_to change(Label, :count)
-          end
-        end
       end
 
       it 'refreshes the number of open issues', :use_clean_rails_memory_store_caching do
