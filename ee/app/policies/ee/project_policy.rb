@@ -7,9 +7,6 @@ module EE
 
     prepended do
       with_scope :subject
-      condition(:auto_fix_enabled) { @subject.security_setting&.auto_fix_enabled? }
-
-      with_scope :subject
       condition(:repository_mirrors_enabled) { @subject.feature_available?(:repository_mirrors) }
 
       with_scope :subject
@@ -228,12 +225,6 @@ module EE
         enable :admin_vulnerability_issue_link
       end
 
-      rule { security_bot && auto_fix_enabled }.policy do
-        enable :push_code
-        enable :create_merge_request_from
-        enable :create_vulnerability_feedback
-      end
-
       rule { issues_disabled & merge_requests_disabled }.policy do
         prevent(*create_read_update_admin_destroy(:iteration))
       end
@@ -382,7 +373,6 @@ module EE
     def lookup_access_level!
       return ::Gitlab::Access::NO_ACCESS if needs_new_sso_session?
       return ::Gitlab::Access::NO_ACCESS if visual_review_bot?
-      return ::Gitlab::Access::REPORTER if security_bot? && auto_fix_enabled?
 
       super
     end
