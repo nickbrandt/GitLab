@@ -25,7 +25,6 @@ RSpec.describe PersonalAccessTokens::CreateService do
           described_class.new(current_user: user, target_user: other_user, params: params).execute
         end
       end
-    end
 
     context 'when admin' do
       let(:admin) { create(:user, :admin) }
@@ -43,6 +42,9 @@ RSpec.describe PersonalAccessTokens::CreateService do
           described_class.new(current_user: admin, target_user: user, params: params).execute
         end
       end
+    end
+
+
     end
   end
 

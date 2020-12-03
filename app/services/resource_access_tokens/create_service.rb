@@ -7,6 +7,7 @@ module ResourceAccessTokens
       @resource = resource
       @current_user = current_user
       @params = params.dup
+      @ip_address = @params.delete(:ip_address)
     end
 
     def execute
@@ -26,6 +27,7 @@ module ResourceAccessTokens
       token_response = create_personal_access_token(user)
 
       if token_response.success?
+        log_event(token_response.payload[:personal_access_token])
         success(token_response.payload[:personal_access_token])
       else
         delete_failed_user(user)
@@ -35,7 +37,7 @@ module ResourceAccessTokens
 
     private
 
-    attr_reader :resource_type, :resource
+    attr_reader :resource_type, :resource, :ip_address
 
     def has_permission_to_create?
       %w(project group).include?(resource_type) && can?(current_user, :admin_resource_access_tokens, resource)
@@ -105,6 +107,10 @@ module ResourceAccessTokens
       resource.add_user(user, :maintainer, expires_at: params[:expires_at])
     end
 
+    def log_event(token)
+      log_info("PROJECT ACCESS TOKEN CREATION: created_by: '#{current_user.username}', created_for: '#{token.user.username}', token_id: '#{token.id}'")
+    end
+
     def error(message)
       ServiceResponse.error(message: message)
     end
@@ -114,3 +120,5 @@ module ResourceAccessTokens
     end
   end
 end
+
+ResourceAccessTokens::CreateService.prepend_if_ee('EE::ResourceAccessTokens::CreateService')

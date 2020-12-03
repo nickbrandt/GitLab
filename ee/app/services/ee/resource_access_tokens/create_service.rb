@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EE
-  module PersonalAccessTokens
+  module ResourceAccessTokens
     module CreateService
       def execute
         super.tap do |response|
@@ -12,19 +12,18 @@ module EE
       private
 
       def log_audit_event(token, response)
-        audit_event_service(token, response).for_user(full_path: target_user.username, entity_id: target_user.id).security_event
+        audit_event_service(token, response).for_user(full_path: current_user.username, entity_id: current_user.id).security_event
       end
 
       def audit_event_service(token, response)
         message = if response.success?
-                    "Created personal access token with id #{token.id}"
+                    "Created project access token with id #{token.id}"
                   else
-                    "Attempted to create personal access token but failed with message: #{response.message}"
+                    "Attempted to create project access token but failed with message: #{response.message}"
                   end
 
         ::AuditEventService.new(
           current_user,
-          target_user,
           action: :custom,
           custom_message: message,
           ip_address: ip_address
