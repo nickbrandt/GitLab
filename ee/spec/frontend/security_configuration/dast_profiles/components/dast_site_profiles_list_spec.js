@@ -11,9 +11,7 @@ import { DAST_SITE_VALIDATION_STATUS } from 'ee/security_configuration/dast_site
 import { siteProfiles } from '../mocks/mock_data';
 import * as responses from '../mocks/apollo_mock';
 
-jest.mock('ee/security_configuration/dast_profiles/graphql/cache_utils');
-
-updateSiteProfilesStatuses.mockImplementation(() => ({
+jest.mock('ee/security_configuration/dast_profiles/graphql/cache_utils', () => ({
   updateSiteProfilesStatuses: jest.fn(),
 }));
 
