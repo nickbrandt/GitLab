@@ -432,6 +432,12 @@ module EE
       super
     end
 
+    def applicable_approval_rules_for_user(user_id, target_branch = nil)
+      visible_approval_rules(target_branch: target_branch).select do |rule|
+        rule.approvers.pluck(:id).include?(user_id)
+      end
+    end
+
     def visible_approval_rules(target_branch: nil)
       rules = strong_memoize(:visible_approval_rules) do
         Hash.new do |h, key|
