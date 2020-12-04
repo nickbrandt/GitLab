@@ -75,56 +75,21 @@ RSpec.describe 'Getting issues for an epic' do
       end
 
       context 'pagination' do
-        def epic_fields(after)
-          <<~NODE
-            edges {
-              node {
-                iid
-                issues(#{attributes_to_graphql(first: 1, after: after)}) {
-                  pageInfo {
-                    hasNextPage
-                    hasPreviousPage
-                    startCursor
-                    endCursor
-                  },
-                  edges {
-                    node {
-                      id
-                    }
-                  }
-                }
-              }
-            }
-          NODE
+        let(:data_path) { %i[group epics nodes] + [0] + %i[issues] }
+
+        def pagination_query(args)
+          epic_query({ iid: epic.iid }, epic_fields(args))
         end
 
-        let(:params) { { iid: epic.iid } }
-
-        def get_page(after)
-          query = epic_query(params, epic_fields(after))
-          post_graphql(query, current_user: user)
-
-          expect(response).to have_gitlab_http_status(:success)
-
-          data = ::Gitlab::Json.parse(response.body)
-          expect(data['errors']).to be_blank
-          epics = data.dig('data', 'group', 'epics', 'edges')
-          issues = issue_ids(epics)[epic.iid]
-          page = epics.dig(0, 'node', 'issues', 'pageInfo')
-
-          [issues, page]
+        def epic_fields(args)
+          query_graphql_field(:nodes, query_nodes(:issues, :id, args: args, include_pagination_info: true))
         end
 
-        it 'paginates correctly' do
-          issues, page_1 = get_page(nil)
-
-          expect(issues).to contain_exactly(global_id_of(issue))
-          expect(page_1).to include("hasNextPage" => true, "hasPreviousPage" => false)
-
-          next_issues, page_2 = get_page(page_1['endCursor'])
-
-          expect(next_issues).to contain_exactly(global_id_of(confidential_issue))
-          expect(page_2).to include("hasNextPage" => false, "hasPreviousPage" => true)
+        it_behaves_like 'sorted paginated query' do
+          let(:current_user) { user }
+          let(:sort_param) { }
+          let(:first_param) { 1 }
+          let(:expected_results) { [issue, confidential_issue].map { |i| global_id_of(i) } }
         end
       end
     end
