@@ -941,6 +941,9 @@ msgstr ""
 msgid "(No changes)"
 msgstr ""
 
+msgid "(UTC%{offset}) %{timezone}"
+msgstr ""
+
 msgid "(check progress)"
 msgstr ""
 
@@ -19110,6 +19113,12 @@ msgid "OnCallSchedules|Failed to add rotation"
 msgstr ""
 
 msgid "OnCallSchedules|Failed to add schedule"
+msgstr ""
+
+msgid "OnCallSchedules|On-call schedule"
+msgstr ""
+
+msgid "OnCallSchedules|On-call schedule for the %{tzShort}"
 msgstr ""
 
 msgid "OnCallSchedules|Rotation length"
