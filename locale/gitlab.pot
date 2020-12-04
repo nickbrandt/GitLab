@@ -3677,9 +3677,6 @@ msgstr ""
 msgid "Are you sure you want to delete this SSH key?"
 msgstr ""
 
-msgid "Are you sure you want to delete this board?"
-msgstr ""
-
 msgid "Are you sure you want to delete this device? This action cannot be undone."
 msgstr ""
 
@@ -4480,9 +4477,6 @@ msgstr ""
 msgid "Blog"
 msgstr ""
 
-msgid "Board scope"
-msgstr ""
-
 msgid "Board scope affects which issues are displayed for anyone who visits this board"
 msgstr ""
 
@@ -4535,6 +4529,30 @@ msgid "Boards|Expand"
 msgstr ""
 
 msgid "Boards|View scope"
+msgstr ""
+
+msgid "Board|Are you sure you want to delete this board?"
+msgstr ""
+
+msgid "Board|Board scope"
+msgstr ""
+
+msgid "Board|Create board"
+msgstr ""
+
+msgid "Board|Create new board"
+msgstr ""
+
+msgid "Board|Delete board"
+msgstr ""
+
+msgid "Board|Edit board"
+msgstr ""
+
+msgid "Board|Enter board name"
+msgstr ""
+
+msgid "Board|Failed to delete board. Please try again."
 msgstr ""
 
 msgid "Board|Load more issues"
@@ -7937,9 +7955,6 @@ msgstr ""
 msgid "Create and provide your GitHub %{link_start}Personal Access Token%{link_end}. You will need to select the %{code_open}repo%{code_close} scope, so we can display a list of your public and private repositories which are available to import."
 msgstr ""
 
-msgid "Create board"
-msgstr ""
-
 msgid "Create branch"
 msgstr ""
 
@@ -7995,9 +8010,6 @@ msgid "Create new"
 msgstr ""
 
 msgid "Create new Value Stream"
-msgstr ""
-
-msgid "Create new board"
 msgstr ""
 
 msgid "Create new branch"
@@ -8918,9 +8930,6 @@ msgid "Delete artifacts"
 msgstr ""
 
 msgid "Delete badge"
-msgstr ""
-
-msgid "Delete board"
 msgstr ""
 
 msgid "Delete comment"
@@ -10056,9 +10065,6 @@ msgstr ""
 msgid "Edit application"
 msgstr ""
 
-msgid "Edit board"
-msgstr ""
-
 msgid "Edit comment"
 msgstr ""
 
@@ -10471,9 +10477,6 @@ msgid "Enter an integer number number between 0 and 100"
 msgstr ""
 
 msgid "Enter at least three characters to search"
-msgstr ""
-
-msgid "Enter board name"
 msgstr ""
 
 msgid "Enter domain"
@@ -11482,9 +11485,6 @@ msgid "Failed to create resources"
 msgstr ""
 
 msgid "Failed to create wiki"
-msgstr ""
-
-msgid "Failed to delete board. Please try again."
 msgstr ""
 
 msgid "Failed to deploy to"

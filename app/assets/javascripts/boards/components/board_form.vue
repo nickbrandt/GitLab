@@ -1,6 +1,6 @@
 <script>
 import { GlModal } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { __, s__ } from '~/locale';
 import { deprecatedCreateFlash as Flash } from '~/flash';
 import { visitUrl } from '~/lib/utils/url_utility';
 import boardsStore from '~/boards/stores/boards_store';
@@ -19,22 +19,24 @@ const boardDefaults = {
   hide_closed_list: false,
 };
 
-const newFormType = 'new';
-const deleteFormType = 'delete';
-const editFormType = 'edit';
+const formType = {
+  new: 'new',
+  delete: 'delete',
+  edit: 'edit',
+};
 
 export default {
   i18n: {
-    [newFormType]: { title: __('Create new board'), btnText: __('Create board') },
-    [deleteFormType]: { title: __('Delete board'), btnText: __('Delete') },
-    [editFormType]: { title: __('Edit board'), btnText: __('Save changes') },
-    scopeModalTitle: __('Board scope'),
+    [formType.new]: { title: s__('Board|Create new board'), btnText: s__('Board|Create board') },
+    [formType.delete]: { title: s__('Board|Delete board'), btnText: __('Delete') },
+    [formType.edit]: { title: s__('Board|Edit board'), btnText: __('Save changes') },
+    scopeModalTitle: s__('Board|Board scope'),
     cancelButtonText: __('Cancel'),
-    deleteErrorMessage: __('Failed to delete board. Please try again.'),
+    deleteErrorMessage: s__('Board|Failed to delete board. Please try again.'),
     saveErrorMessage: __('Unable to save your changes. Please try again.'),
-    deleteConfirmationMessage: __('Are you sure you want to delete this board?'),
+    deleteConfirmationMessage: s__('Board|Are you sure you want to delete this board?'),
     titleFieldLabel: __('Title'),
-    titleFieldPlaceholder: __('Enter board name'),
+    titleFieldPlaceholder: s__('Board|Enter board name'),
   },
   components: {
     BoardScope: () => import('ee_component/boards/components/board_scope.vue'),
@@ -90,13 +92,13 @@ export default {
   },
   computed: {
     isNewForm() {
-      return this.currentPage === newFormType;
+      return this.currentPage === formType.new;
     },
     isDeleteForm() {
-      return this.currentPage === deleteFormType;
+      return this.currentPage === formType.delete;
     },
     isEditForm() {
-      return this.currentPage === editFormType;
+      return this.currentPage === formType.edit;
     },
     buttonText() {
       return this.$options.i18n[this.currentPage].btnText;
@@ -130,6 +132,7 @@ export default {
           {
             variant: this.buttonKind,
             disabled: this.submitDisabled,
+            loading: this.isLoading,
             'data-qa-selector': 'save_changes_button',
           },
         ],
@@ -155,6 +158,7 @@ export default {
         boardsStore
           .deleteBoard(this.currentBoard)
           .then(() => {
+            this.isLoading = false;
             visitUrl(boardsStore.rootPath);
           })
           .catch(() => {
@@ -176,6 +180,7 @@ export default {
             return resp.data ? resp.data : resp;
           })
           .then(data => {
+            this.isLoading = false;
             visitUrl(data.board_path);
           })
           .catch(() => {
