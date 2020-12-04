@@ -1702,3 +1702,19 @@ For guidance, see the [GraphQL API](documentation/graphql_styleguide.md) page.
 ## Include a changelog entry
 
 All client-facing changes **must** include a [changelog entry](changelog.md).
+
+## Laziness
+
+One important technique for managing performance that is unique to GraphQL is
+using **lazy** values. These are values that represent the promise of a result,
+allowing their action to be run later. This enables batching of queries in
+different parts of the query tree. The main example of this in our code is
+the [GraphQL BatchLoader](graphql_guide/batchloader.md).
+
+If you need to manage lazy values directly, then please see
+`Gitlab::Graphql::Lazy`, and in particular `Gitlab::Graphql::Laziness`, which
+contains `#force` and `#delay` which help implement the basic operations of
+creation and elimination of laziness, where needed.
+
+For dealing with lazy values without forcing them, use
+`Gitlab::Graphql::Lazy.with_value`.
