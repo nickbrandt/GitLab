@@ -43,7 +43,7 @@ export default {
           validations: { nodes = [] },
         },
       }) {
-        const store = this.$apolloProvider.defaultClient;
+        const store = this.$apollo.getClient();
         nodes.forEach(({ normalizedTargetUrl, status }) => {
           updateSiteProfilesStatuses({
             fullPath: this.fullPath,
@@ -112,7 +112,7 @@ export default {
         fullPath: this.fullPath,
         normalizedTargetUrl,
         status: PENDING,
-        store: this.$apolloProvider.defaultClient,
+        store: this.$apollo.getClient(),
       });
     },
   },

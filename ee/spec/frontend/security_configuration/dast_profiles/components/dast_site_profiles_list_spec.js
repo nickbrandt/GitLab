@@ -181,7 +181,7 @@ describe('EE - DastSiteProfileList', () => {
           fullPath: defaultProps.fullPath,
           normalizedTargetUrl,
           status,
-          store: wrapper.vm.$apolloProvider.defaultClient,
+          store: wrapper.vm.$apollo.getClient(),
         });
       },
     );
