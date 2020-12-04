@@ -291,7 +291,7 @@ deploy:
     - master
 ```
 
-NOTE: **Note:**
+NOTE:
 This example explicitly calls `docker pull`. If you prefer to implicitly pull the
 built image using `image:`, and use either the [Docker](https://docs.gitlab.com/runner/executors/docker.html)
 or [Kubernetes](https://docs.gitlab.com/runner/executors/kubernetes.html) executor,
@@ -336,7 +336,7 @@ WARNING:
 Deleting images is a destructive action and can't be undone. To restore
 a deleted image, you must rebuild and re-upload it.
 
-NOTE: **Note:**
+NOTE:
 Administrators should review how to
 [garbage collect](../../../administration/packages/container_registry.md#container-registry-garbage-collection)
 the deleted images.
@@ -531,7 +531,7 @@ To create a cleanup policy in the UI:
 
 Depending on the interval you chose, the policy is scheduled to run.
 
-NOTE: **Note:**
+NOTE:
 If you edit the policy and click **Save** again, the interval is reset.
 
 ### Regex pattern examples

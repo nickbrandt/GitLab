@@ -348,7 +348,7 @@ in the GitLab UI to do this:
 It's possible to download the latest artifacts of a job via a well known URL
 so you can use it for scripting purposes.
 
-NOTE: **Note:**
+NOTE:
 The latest artifacts are created by jobs in the **most recent** successful pipeline
 for the specific ref. If you run two types of pipelines for the same ref, timing determines the latest
 artifact. For example, if a merge request creates a branch pipeline at the same time as a scheduled pipeline, the pipeline that completed most recently creates the latest artifact.

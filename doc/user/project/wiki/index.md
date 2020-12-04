@@ -34,7 +34,7 @@ message.
 
 ## Creating a new wiki page
 
-NOTE: **Note:**
+NOTE:
 Requires Developer [permissions](../../permissions.md).
 
 Create a new page by clicking the **New page** button that can be found

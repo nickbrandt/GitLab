@@ -15,7 +15,7 @@ website uses an extended Kramdown gem, [GitLab Kramdown](https://gitlab.com/gitl
 Consult the [GitLab Kramdown Guide](https://about.gitlab.com/handbook/markdown-guide/)
 for a complete Kramdown reference.
 
-NOTE: **Note:**
+NOTE:
 We encourage you to view this document as [rendered by GitLab itself](https://gitlab.com/gitlab-org/gitlab/blob/master/doc/user/markdown.md).
 
 ## GitLab Flavored Markdown (GFM)
@@ -1267,7 +1267,7 @@ Do not change to reference style links.
 
 Some text to show that the reference links can follow later.
 
-NOTE: **Note:**
+NOTE:
 Relative links do not allow the referencing of project files in a wiki
 page, or a wiki page in a project file. The reason for this is that a wiki is always
 in a separate Git repository in GitLab. For example, `[I'm a reference-style link](style)`

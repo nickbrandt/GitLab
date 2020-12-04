@@ -169,7 +169,5 @@ It may take a little while to respond.
 {"idle_in_transaction_session_timeout"=>"1min"}
 ```
 
-NOTE: **Note:**
-These are Omnibus GitLab settings. If an external database, such as a
-customer's PostgreSQL installation or Amazon RDS is being used, these values
-don't get set, and would have to be set externally.
+NOTE:
+These are Omnibus GitLab settings. If an external database, such as a customer's PostgreSQL installation or Amazon RDS is being used, these values don't get set, and would have to be set externally.
