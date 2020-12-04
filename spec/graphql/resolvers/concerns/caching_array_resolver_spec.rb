@@ -92,15 +92,15 @@ RSpec.describe ::CachingArrayResolver do
 
       it 'batches the queries' do
         expect do
-          [resolve_users(true), resolve_users(false)].each(&method(:force))
-        end.to issue_same_number_of_queries_as { force(resolve_users(nil)) }
+          [resolve_users(admin: true), resolve_users(admin: false)].each(&method(:force))
+        end.to issue_same_number_of_queries_as { force(resolve_users(admin: nil)) }
       end
 
       it 'finds the correct values' do
-        found_admins = resolve_users(true)
-        found_others = resolve_users(false)
-        admins_again = resolve_users(true)
-        found_all = resolve_users(nil)
+        found_admins = resolve_users(admin: true)
+        found_others = resolve_users(admin: false)
+        admins_again = resolve_users(admin: true)
+        found_all = resolve_users(admin: nil)
 
         expect(force(found_admins)).to match_array(admins)
         expect(force(found_others)).to match_array(non_admins)
@@ -112,14 +112,14 @@ RSpec.describe ::CachingArrayResolver do
     it 'does not perform a union of a query with itself' do
       expect(User).to receive(:where).once.and_call_original
 
-      [resolve_users(false), resolve_users(false)].each(&method(:force))
+      [resolve_users(admin: false), resolve_users(admin: false)].each(&method(:force))
     end
 
     context 'one of the queries returns no results' do
       it 'finds the correct values' do
-        found_admins = resolve_users(true)
-        found_others = resolve_users(false)
-        found_all = resolve_users(nil)
+        found_admins = resolve_users(admin: true)
+        found_others = resolve_users(admin: false)
+        found_all = resolve_users(admin: nil)
 
         expect(force(found_admins)).to match_array(admins)
         expect(force(found_others)).to be_empty
@@ -129,12 +129,12 @@ RSpec.describe ::CachingArrayResolver do
 
     context 'one of the queries has already been cached' do
       before do
-        force(resolve_users(nil))
+        force(resolve_users(admin: nil))
       end
 
       it 'avoids further queries' do
         expect do
-          repeated_find = resolve_users(nil)
+          repeated_find = resolve_users(admin: nil)
 
           expect(force(repeated_find)).to match_array(admins)
         end.not_to exceed_query_limit(0)
@@ -158,8 +158,8 @@ RSpec.describe ::CachingArrayResolver do
       end
 
       it 'receives item_found for each key the item mapped to' do
-        found_admins = resolve_users(true, with_item_found)
-        found_all = resolve_users(nil, with_item_found)
+        found_admins = resolve_users(admin: true, resolver: with_item_found)
+        found_all = resolve_users(admin: nil, resolver: with_item_found)
 
         [found_admins, found_all].each(&method(:force))
 
@@ -175,8 +175,8 @@ RSpec.describe ::CachingArrayResolver do
       let(:max_page_size) { 2 }
 
       it 'respects the max_page_size, on a per subset basis' do
-        found_all = resolve_users(nil)
-        found_admins = resolve_users(true)
+        found_all = resolve_users(admin: nil)
+        found_admins = resolve_users(admin: true)
 
         expect(force(found_all).size).to eq(2)
         expect(force(found_admins).size).to eq(2)
@@ -187,8 +187,8 @@ RSpec.describe ::CachingArrayResolver do
       let(:max_page_size) { nil }
 
       it 'takes the page size from schema.default_max_page_size' do
-        found_all = resolve_users(nil)
-        found_admins = resolve_users(true)
+        found_all = resolve_users(admin: nil)
+        found_admins = resolve_users(admin: true)
 
         expect(force(found_all).size).to eq(schema.default_max_page_size)
         expect(force(found_admins).size).to eq(schema.default_max_page_size)
@@ -205,8 +205,8 @@ RSpec.describe ::CachingArrayResolver do
     end
   end
 
-  def resolve_users(is_admin, resolver = caching_resolver)
-    args = { is_admin: is_admin }
+  def resolve_users(admin:, resolver: caching_resolver)
+    args = { is_admin: admin }
     opts = resolver.field_options
     allow(resolver).to receive(:field_options).and_return(opts.merge(max_page_size: max_page_size))
     resolve(resolver, args: args, ctx: query_context, schema: schema, field: field)
