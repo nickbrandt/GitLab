@@ -7300,13 +7300,16 @@ msgstr[1] ""
 msgid "ContainerRegistry|%{imageName} tags"
 msgstr ""
 
+msgid "ContainerRegistry|%{strongStart}Disabled%{strongEnd} - Tags will not be automatically deleted."
+msgstr ""
+
+msgid "ContainerRegistry|%{strongStart}Enabled%{strongEnd} - Tags that match the rules on this page are automatically scheduled for deletion."
+msgstr ""
+
 msgid "ContainerRegistry|%{title} was successfully scheduled for deletion"
 msgstr ""
 
 msgid "ContainerRegistry|%{toggleStatus} - Tags matching the patterns defined below will be scheduled for deletion"
-msgstr ""
-
-msgid "ContainerRegistry|%{toggleStatus} - Tags that match the rules on this page are automatically scheduled for deletion."
 msgstr ""
 
 msgid "ContainerRegistry|Build an image"
