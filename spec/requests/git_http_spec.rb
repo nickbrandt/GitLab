@@ -280,6 +280,16 @@ RSpec.describe 'Git HTTP requests' do
               project.add_developer(user)
             end
 
+            context 'when user is using password with special characters' do
+              it 'allows clones' do
+                user.update!(password: 'RçKszEwéC5kFnû∆f243fycGu§Gh9ftDj!U')
+
+                download(path, user: user.username, password: user.password) do |response|
+                  expect(response).to have_gitlab_http_status(:ok)
+                end
+              end
+            end
+
             context 'but the repo is disabled' do
               let(:project) { create(:project, :wiki_repo, :private, :repository_disabled, :wiki_enabled) }
 
