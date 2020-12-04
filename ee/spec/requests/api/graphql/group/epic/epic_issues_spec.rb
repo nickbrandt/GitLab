@@ -126,11 +126,8 @@ RSpec.describe 'Getting issues for an epic' do
         expect(result[epic2.iid]).to eq [issue2.to_global_id.to_s]
       end
 
-      # TODO remove the pending state of this spec when
-      # we have an efficient way of preloading data on GraphQL.
-      # For more information check: https://gitlab.com/gitlab-org/gitlab/-/issues/207898
       it 'avoids N+1 queries' do
-        pending 'https://gitlab.com/gitlab-org/gitlab/-/issues/207898'
+        pending 'https://gitlab.com/gitlab-org/gitlab/-/issues/291089'
         control_count = ActiveRecord::QueryRecorder.new do
           post_graphql(epic_query(iid: epic.iid), current_user: user)
         end.count
