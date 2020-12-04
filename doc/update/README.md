@@ -266,7 +266,7 @@ Below you can find some guides to help you change GitLab editions.
 
 ### Community to Enterprise Edition
 
-NOTE: **Note:**
+NOTE:
 The following guides are for subscribers of the Enterprise Edition only.
 
 If you wish to upgrade your GitLab installation from Community to Enterprise
@@ -310,7 +310,7 @@ installation-specific upgrade instructions, based on how you installed GitLab:
 - [Linux packages (Omnibus GitLab)](https://docs.gitlab.com/omnibus/update/README.html#version-specific-changes)
 - [Helm charts](https://docs.gitlab.com/charts/installation/upgrade.html)
 
-NOTE: **Note:**
+NOTE:
 Specific information that follow related to Ruby and Git versions do not apply to [Omnibus installations](https://docs.gitlab.com/omnibus/)
 and [Helm Chart deployments](https://docs.gitlab.com/charts/). They come with appropriate Ruby and Git versions and are not using system binaries for Ruby and Git. There is no need to install Ruby or Git when utilizing these two approaches.
 

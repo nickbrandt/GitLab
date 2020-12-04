@@ -16,7 +16,7 @@ description: 'Learn how to administer GitLab Pages.'
 GitLab Pages allows for hosting of static sites. It must be configured by an
 administrator. Separate [user documentation](../../user/project/pages/index.md) is available.
 
-NOTE: **Note:**
+NOTE:
 This guide is for Omnibus GitLab installations. If you have installed
 GitLab from source, see
 [GitLab Pages administration for source installations](source.md).
@@ -68,7 +68,7 @@ Before proceeding with the Pages configuration, you will need to:
    so that your users don't have to bring their own.
 1. (Only for custom domains) Have a **secondary IP**.
 
-NOTE: **Note:**
+NOTE:
 If your GitLab instance and the Pages daemon are deployed in a private network or behind a firewall, your GitLab Pages websites will only be accessible to devices/users that have access to the private network.
 
 ### Add the domain to the Public Suffix List
@@ -101,7 +101,7 @@ where `example.io` is the domain under which GitLab Pages will be served
 and `192.0.2.1` is the IPv4 address of your GitLab instance and `2001::1` is the
 IPv6 address. If you don't have IPv6, you can omit the AAAA record.
 
-NOTE: **Note:**
+NOTE:
 You should not use the GitLab domain to serve user pages. For more information see the [security section](#security).
 
 ## Configuration
@@ -181,7 +181,7 @@ behavior:
 
 1. [Reconfigure GitLab](../restart_gitlab.md#omnibus-gitlab-reconfigure).
 
-NOTE: **Note:**
+NOTE:
 `inplace_chroot` option might not work with the other features, such as [Pages Access Control](#access-control).
 The [GitLab Pages README](https://gitlab.com/gitlab-org/gitlab-pages#caveats) has more information about caveats and workarounds.
 
