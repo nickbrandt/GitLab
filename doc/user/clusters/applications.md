@@ -1017,7 +1017,7 @@ of all affected pods in all namespaces to ensure that they are
 [managed](https://docs.cilium.io/en/v1.8/operations/troubleshooting/#ensure-managed-pod)
 by the correct networking plugin.
 
-NOTE: **Note:**
+NOTE:
 Major upgrades might require additional setup steps. For more information, see
 the official [upgrade guide](https://docs.cilium.io/en/v1.8/operations/upgrade/).
 
@@ -1363,7 +1363,7 @@ management project. Refer to the
 [chart](https://gitlab.com/gitlab-org/charts/elastic-stack) for all
 available configuration options.
 
-NOTE: **Note:**
+NOTE:
 In this alpha implementation of installing Elastic Stack through CI, reading the
 environment logs through Elasticsearch is unsupported. This is supported if
 [installed with the UI](#elastic-stack).

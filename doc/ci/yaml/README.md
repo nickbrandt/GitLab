@@ -1456,7 +1456,7 @@ rules that use both `||` and `&&` may evaluate with an unexpected order of opera
 
 ### `only`/`except` (basic)
 
-NOTE: **Note:**
+NOTE:
 The [`rules`](#rules) syntax is an improved, more powerful solution for defining
 when jobs should run or not. Consider using `rules` instead of `only/except` to get
 the most out of your pipelines.
@@ -2545,7 +2545,7 @@ environment, using the `production`
 For more information, see
 [Available settings for `kubernetes`](../environments/index.md#configuring-kubernetes-deployments).
 
-NOTE: **Note:**
+NOTE:
 Kubernetes configuration is not supported for Kubernetes clusters
 that are [managed by GitLab](../../user/project/clusters/index.md#gitlab-managed-clusters).
 To follow progress on support for GitLab-managed clusters, see the
@@ -3881,7 +3881,7 @@ tags. These options cannot be used together, so choose one:
 - To create a release automatically when commits are pushed or merged to the default branch,
   using a new Git tag that is defined with variables:
 
-  NOTE: **Note:**
+  NOTE:
   Environment variables set in `before_script` or `script` are not available for expanding
   in the same job. Read more about
   [potentially making variables available for expanding](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/6400).

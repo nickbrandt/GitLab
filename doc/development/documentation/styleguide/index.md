@@ -1037,7 +1037,7 @@ We include guidance for links in the following categories:
 
 ### Links to internal documentation
 
-NOTE: **Note:**
+NOTE:
 _Internal_ refers to documentation in the same project. When linking to
 documentation in separate projects (for example, linking to Omnibus documentation
 from GitLab documentation), you must use absolute URLs.
@@ -1087,7 +1087,7 @@ To link to internal documentation:
   - `../../issues/tags.md`
   - `../../issues/tags.md#stages`
 
-NOTE: **Note:**
+NOTE:
 Using the Markdown extension is necessary for the [`/help`](../index.md#gitlab-help)
 section of GitLab.
 
@@ -1128,7 +1128,7 @@ While many of these sources to avoid can help you learn skills and or features,
 they can become obsolete quickly. Nobody is obliged to maintain any of these
 sites. Therefore, we should avoid using them as reference literature.
 
-NOTE: **Note:**
+NOTE:
 Non-authoritative sources are acceptable only if there is no equivalent
 authoritative source. Even then, focus on non-authoritative sources that are
 extensively cited or peer-reviewed.
