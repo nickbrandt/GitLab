@@ -23995,6 +23995,9 @@ msgstr ""
 msgid "SearchAutocomplete|Merge requests assigned to me"
 msgstr ""
 
+msgid "SearchAutocomplete|Merge requests that I'm a reviewer"
+msgstr ""
+
 msgid "SearchAutocomplete|in all GitLab"
 msgstr ""
 
