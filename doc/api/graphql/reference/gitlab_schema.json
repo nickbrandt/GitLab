@@ -14822,7 +14822,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The global ID of the annotation to delete",
+              "description": "Global ID of the annotation to delete",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
