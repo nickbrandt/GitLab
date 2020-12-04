@@ -32,9 +32,21 @@ module JiraConnect
     # rubocop: enable CodeReuse/ActiveRecord
 
     def branches_to_sync(project)
-      project.repository.branch_names.map do |branch_name|
-        project.repository.find_branch(branch_name) if branch_name.match(Gitlab::Regex.jira_issue_key_regex)
-      end.compact[0..MAX_RECORDS_LIMIT]
+      branches = project.repository.branches.reject do |branch|
+        !branch.name.match(Gitlab::Regex.jira_issue_key_regex)
+      end.compact[0..MAX_RECORDS_LIMIT - 1]
+
+      dereferenced_targets = batch_load_dereferenced_targets(project, branches)
+
+      branches.map do |branch|
+        Gitlab::Git::Branch.new(project.repository, branch.name, branch.target, dereferenced_targets[branch.dereferenced_target.id])
+      end
+    end
+
+    def batch_load_dereferenced_targets(project, branches)
+      target_ids = branches.map { |branch| branch.dereferenced_target.id }
+
+      project.repository.commits_by(oids: target_ids).index_by(&:id)
     end
   end
 end

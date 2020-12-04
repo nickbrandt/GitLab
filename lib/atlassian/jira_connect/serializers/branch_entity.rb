@@ -12,7 +12,11 @@ module Atlassian
         end
         expose :name
         expose :lastCommit, using: JiraConnect::Serializers::CommitEntity do |branch, options|
-          options[:project].commit(branch.dereferenced_target)
+          if branch.dereferenced_target.is_a?(Gitlab::Git::Commit)
+            Commit.new(branch.dereferenced_target, options[:project])
+          else
+            branch.dereferenced_target
+          end
         end
 
         expose :url do |branch, options|

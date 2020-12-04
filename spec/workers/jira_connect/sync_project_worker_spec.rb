@@ -39,6 +39,27 @@ RSpec.describe JiraConnect::SyncProjectWorker, factory_default: :keep do
       expect { described_class.new.perform(project.id, update_sequence_id) }.not_to exceed_query_limit(control_count)
     end
 
+    context 'with multiple branches to sync' do
+      after do
+        project.repository.rm_branch(project.owner, 'TEST-2_my-feature-branch')
+        project.repository.rm_branch(project.owner, 'TEST-3_my-feature-branch')
+      end
+
+      it 'avoids N+1 Gitaly requests', :request_store do
+        initial_request_count = Gitlab::GitalyClient.get_request_count
+
+        described_class.new.perform(project.id, update_sequence_id)
+
+        control_count = Gitlab::GitalyClient.get_request_count - initial_request_count
+
+        project.repository.create_branch('TEST-2_my-feature-branch')
+        project.repository.create_branch('TEST-3_my-feature-branch')
+
+        expect { described_class.new.perform(project.id, update_sequence_id) }
+          .to change { Gitlab::GitalyClient.get_request_count }.by_at_most(control_count)
+      end
+    end
+
     it_behaves_like 'an idempotent worker' do
       let(:request_url) { 'https://sample.atlassian.net/rest/devinfo/0.10/bulk' }
       let(:request_body) do

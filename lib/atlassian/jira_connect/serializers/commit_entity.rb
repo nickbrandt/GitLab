@@ -37,7 +37,7 @@ module Atlassian
         private
 
         def author
-          object.author || CommitAuthor.new(object.author_name, object.author_email)
+          object.try(:author) || CommitAuthor.new(object.author_name, object.author_email)
         end
       end
     end
