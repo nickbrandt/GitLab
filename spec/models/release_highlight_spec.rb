@@ -4,11 +4,9 @@ require 'spec_helper'
 
 RSpec.describe ReleaseHighlight do
   let(:fixture_dir_glob) { Dir.glob(File.join('spec', 'fixtures', 'whats_new', '*.yml')) }
-  let(:cache_mock) { double(:cache_mock) }
 
   before do
     allow(Dir).to receive(:glob).with(Rails.root.join('data', 'whats_new', '*.yml')).and_return(fixture_dir_glob)
-    allow(cache_mock).to receive(:fetch).with('release_highlight:file_paths', expires_in: 1.hour).and_yield
   end
 
   after do
@@ -40,15 +38,10 @@ RSpec.describe ReleaseHighlight do
 
     before do
       allow(Gitlab).to receive(:com?).and_return(dot_com)
-      expect(Rails).to receive(:cache).twice.and_return(cache_mock)
     end
 
     context 'with page param' do
       subject { ReleaseHighlight.paginated(page: page) }
-
-      before do
-        allow(cache_mock).to receive(:fetch).and_yield
-      end
 
       context 'when there is another page of results' do
         let(:page) { 2 }
@@ -80,11 +73,14 @@ RSpec.describe ReleaseHighlight do
     context 'with no page param' do
       subject { ReleaseHighlight.paginated }
 
-      before do
-        expect(cache_mock).to receive(:fetch).with('release_highlight:items:file-20201225_01_05:page-1', expires_in: 1.hour).and_yield
+      it 'uses multiple levels of cache' do
+        expect(Rails.cache).to receive(:fetch).with("release_highlight:items:page-1:#{Gitlab.revision}", { expires_in: described_class::CACHE_DURATION }).and_call_original
+        expect(Rails.cache).to receive(:fetch).with("release_highlight:file_paths:#{Gitlab.revision}", { expires_in: described_class::CACHE_DURATION }).and_call_original
+
+        subject
       end
 
-      it 'returns platform specific items and uses a cache key' do
+      it 'returns platform specific items' do
         expect(subject[:items].count).to eq(1)
         expect(subject[:items].first['title']).to eq("bright and sunshinin' day")
         expect(subject[:next_page]).to eq(2)
@@ -116,6 +112,12 @@ RSpec.describe ReleaseHighlight do
   describe '.most_recent_item_count' do
     subject { ReleaseHighlight.most_recent_item_count }
 
+    it 'uses process memory cache' do
+      expect(Gitlab::ProcessMemoryCache.cache_backend).to receive(:fetch).with("release_highlight:recent_item_count:#{Gitlab.revision}", expires_in: described_class::CACHE_DURATION)
+
+      subject
+    end
+
     context 'when recent release items exist' do
       it 'returns the count from the most recent file' do
         allow(ReleaseHighlight).to receive(:paginated).and_return(double(:paginated, items: [double(:item)]))
@@ -134,8 +136,16 @@ RSpec.describe ReleaseHighlight do
   end
 
   describe '.versions' do
+    subject { described_class.versions }
+
+    it 'uses process memory cache' do
+      expect(Gitlab::ProcessMemoryCache.cache_backend).to receive(:fetch).with("release_highlight:versions:#{Gitlab.revision}", { expires_in: described_class::CACHE_DURATION })
+
+      subject
+    end
+
     it 'returns versions from the file paths' do
-      expect(ReleaseHighlight.versions).to eq(['1.5', '1.2', '1.1'])
+      expect(subject).to eq(['1.5', '1.2', '1.1'])
     end
 
     context 'when there are more than 12 versions' do
@@ -146,7 +156,7 @@ RSpec.describe ReleaseHighlight do
 
       it 'limits to 12 versions' do
         allow(ReleaseHighlight).to receive(:file_paths).and_return(file_paths)
-        expect(ReleaseHighlight.versions.count).to eq(12)
+        expect(subject.count).to eq(12)
       end
     end
   end

@@ -16,7 +16,9 @@ class ReleaseHighlight
   end
 
   def self.paginated(page: 1)
-    Rails.cache.fetch(cache_key(page), expires_in: CACHE_DURATION) do
+    key = self.cache_key("items:page-#{page}")
+
+    Rails.cache.fetch(key, expires_in: CACHE_DURATION) do
       items = self.load_items(page: page)
 
       next if items.nil?
@@ -44,14 +46,13 @@ class ReleaseHighlight
   end
 
   def self.file_paths
-    @file_paths ||= Rails.cache.fetch('release_highlight:file_paths', expires_in: CACHE_DURATION) do
+    @file_paths ||= Rails.cache.fetch(self.cache_key('file_paths'), expires_in: CACHE_DURATION) do
       Dir.glob(FILES_PATH).sort.reverse
     end
   end
 
-  def self.cache_key(page)
-    filename = /\d*\_\d*\_\d*/.match(self.file_paths&.first)
-    "release_highlight:items:file-#{filename}:page-#{page}"
+  def self.cache_key(key)
+    ['release_highlight', key, Gitlab.revision].join(':')
   end
 
   def self.next_page(current_page: 1)
@@ -62,13 +63,17 @@ class ReleaseHighlight
   end
 
   def self.most_recent_item_count
-    Gitlab::ProcessMemoryCache.cache_backend.fetch('release_highlight:recent_item_count', expires_in: CACHE_DURATION) do
+    key = self.cache_key('recent_item_count')
+
+    Gitlab::ProcessMemoryCache.cache_backend.fetch(key, expires_in: CACHE_DURATION) do
       self.paginated&.items&.count
     end
   end
 
   def self.versions
-    Gitlab::ProcessMemoryCache.cache_backend.fetch('release_highlight:versions', expires_in: CACHE_DURATION) do
+    key = self.cache_key('versions')
+
+    Gitlab::ProcessMemoryCache.cache_backend.fetch(key, expires_in: CACHE_DURATION) do
       versions = self.file_paths.first(RELEASE_VERSIONS_IN_A_YEAR).map do |path|
         /\d*\_(\d*\_\d*)\.yml$/.match(path).captures[0].gsub(/0(?=\d)/, "").tr("_", ".")
       end
