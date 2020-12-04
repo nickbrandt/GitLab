@@ -8,7 +8,6 @@ module EE
   module Group
     extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
-    include ::SortingHelper
 
     prepended do
       include TokenAuthenticatable
@@ -303,16 +302,16 @@ module EE
       if [actual_plan_name, requested_hosted_plan].include?(::Plan::GOLD)
         strong_memoize(:gold_billed_user_ids) do
           (billed_group_members.non_guests.distinct.pluck(:user_id) +
-           billed_project_members.non_guests.distinct.pluck(:user_id) +
-           billed_shared_non_guests_group_members.non_guests.distinct.pluck(:user_id) +
-           billed_invited_non_guests_group_to_project_members.non_guests.distinct.pluck(:user_id)).to_set
+          billed_project_members.non_guests.distinct.pluck(:user_id) +
+          billed_shared_non_guests_group_members.non_guests.distinct.pluck(:user_id) +
+          billed_invited_non_guests_group_to_project_members.non_guests.distinct.pluck(:user_id)).to_set
         end
       else
         strong_memoize(:non_gold_billed_user_ids) do
           (billed_group_members.distinct.pluck(:user_id) +
-           billed_project_members.distinct.pluck(:user_id) +
-           billed_shared_group_members.distinct.pluck(:user_id) +
-           billed_invited_group_to_project_members.distinct.pluck(:user_id)).to_set
+          billed_project_members.distinct.pluck(:user_id) +
+          billed_shared_group_members.distinct.pluck(:user_id) +
+          billed_invited_group_to_project_members.distinct.pluck(:user_id)).to_set
         end
       end
     end
@@ -447,13 +446,6 @@ module EE
         ::Project.select(calculate_sql)
         .where(namespace_id: self_and_descendants.select(:id)).to_sql
       )
-    end
-
-    def billed_users_for(search_term, order_by)
-      users = ::User.id_in(billed_user_ids)
-      users = users.search(search_term) if search_term
-
-      users.sort_by_attribute(order_by || sort_value_name)
     end
 
     private

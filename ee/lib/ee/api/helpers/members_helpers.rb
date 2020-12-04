@@ -7,6 +7,14 @@ module EE
         extend ActiveSupport::Concern
         extend ::Gitlab::Utils::Override
 
+        class << self
+          include ::SortingHelper
+
+          def member_sort_options
+            member_sort_options_hash.keys
+          end
+        end
+
         prepended do
           params :optional_filter_params_ee do
             optional :with_saml_identity, type: Grape::API::Boolean, desc: "List only members with linked SAML identity"
@@ -76,12 +84,11 @@ module EE
           ).for_member(member).security_event
         end
 
-        class << self
-          include ::SortingHelper
+        def billed_users_for(group, search_term, order_by)
+          users = ::User.id_in(group.billed_user_ids)
+          users = users.search(search_term) if search_term
 
-          def member_sort_options
-            member_sort_options_hash.keys
-          end
+          users.sort_by_attribute(order_by || 'name_asc')
         end
       end
     end
