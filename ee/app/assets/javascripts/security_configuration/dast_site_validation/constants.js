@@ -51,4 +51,4 @@ export const DAST_SITE_VALIDATION_HTTP_HEADER_KEY = 'Gitlab-On-Demand-DAST';
 
 export const DAST_SITE_VALIDATION_MODAL_ID = 'dast-site-validation-modal';
 
-export const DAST_SITE_VALIDATION_POLLING_INTERVAL = 1000;
+export const DAST_SITE_VALIDATION_POLLING_INTERVAL = 3000;
