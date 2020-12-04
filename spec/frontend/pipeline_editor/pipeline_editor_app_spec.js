@@ -34,6 +34,10 @@ import TextEditor from '~/pipeline_editor/components/text_editor.vue';
 const localVue = createLocalVue();
 localVue.use(VueApollo);
 
+const MockEditorLite = {
+  template: '<div/>',
+};
+
 jest.mock('~/lib/utils/url_utility', () => ({
   redirectTo: jest.fn(),
   refreshCurrentPage: jest.fn(),
@@ -77,9 +81,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         GlTabs,
         GlButton,
         CommitForm,
-        EditorLite: {
-          template: '<div/>',
-        },
+        EditorLite: MockEditorLite,
         TextEditor,
       },
       mocks: {
@@ -125,7 +127,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
   const findAlert = () => wrapper.find(GlAlert);
   const findTabAt = i => wrapper.findAll(GlTab).at(i);
-  const findTextEditor = () => wrapper.find(TextEditor);
+  const findTextEditor = () => wrapper.find(MockEditorLite);
   const findCommitForm = () => wrapper.find(CommitForm);
   const findCommitBtnLoadingIcon = () => wrapper.find('[type="submit"]').find(GlLoadingIcon);
 
@@ -173,7 +175,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     it('displays editor tab lazily, until editor is ready', async () => {
       expect(findTabAt(0).attributes('lazy')).toBe('true');
 
-      findTextEditor().vm.$emit('editor-ready');
+      findTextEditor().vm.$emit('editor-ready', { use: jest.fn(), registerCiSchema: jest.fn() });
 
       await nextTick();
 
@@ -192,8 +194,23 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     });
 
     it('displays content after the query loads', () => {
+      const mockRegisterCiSchema = jest.fn();
+
+      findTextEditor().vm.$emit('editor-ready', {
+        use: jest.fn(),
+        registerCiSchema: mockRegisterCiSchema,
+      });
+
       expect(findLoadingIcon().exists()).toBe(false);
+
+      expect(findTextEditor().attributes('file-name')).toBe(mockCiConfigPath);
       expect(findTextEditor().attributes('value')).toBe(mockCiYml);
+
+      expect(mockRegisterCiSchema).toHaveBeenCalledWith({
+        fileName: mockCiConfigPath,
+        projectPath: mockProjectPath,
+        ref: mockCommitId,
+      });
     });
 
     describe('commit form', () => {

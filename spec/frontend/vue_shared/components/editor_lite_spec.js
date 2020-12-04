@@ -108,13 +108,22 @@ describe('Editor Lite component', () => {
       expect(wrapper.emitted().input).toEqual([[value]]);
     });
 
-    it('emits editor-ready event when the Editor Lite is ready', async () => {
+    it('emits editor-ready event with the editor instance when the Editor Lite is ready', async () => {
       const el = wrapper.find({ ref: 'editor' }).element;
       expect(wrapper.emitted()['editor-ready']).toBeUndefined();
 
       await el.dispatchEvent(new Event('editor-ready'));
 
-      expect(wrapper.emitted()['editor-ready']).toBeDefined();
+      expect(wrapper.emitted()['editor-ready']).toHaveLength(1);
+      expect(wrapper.emitted()['editor-ready'][0]).toEqual([
+        expect.objectContaining({
+          onDidChangeModelContent: expect.any(Function),
+          updateModelLanguage: expect.any(Function),
+          getValue: expect.any(Function),
+          setValue: expect.any(Function),
+          dispose: expect.any(Function),
+        }),
+      ]);
     });
 
     describe('reaction to the value update', () => {
