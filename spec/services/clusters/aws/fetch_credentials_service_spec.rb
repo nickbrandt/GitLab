@@ -81,5 +81,40 @@ RSpec.describe Clusters::Aws::FetchCredentialsService do
         expect { subject }.to raise_error(described_class::MissingRoleError, 'AWS provisioning role not configured')
       end
     end
+
+    context 'with an instance profile attached to an IAM role' do
+      let(:sts_client) { Aws::STS::Client.new(region: region, stub_responses: true) }
+      let(:provision_role) { create(:aws_role, user: user, region: 'custom-region') }
+
+      before do
+        stub_application_setting(eks_access_key_id: nil)
+        stub_application_setting(eks_secret_access_key: nil)
+
+        expect(Aws::STS::Client).to receive(:new)
+          .with(region: region)
+          .and_return(sts_client)
+
+        expect(Aws::AssumeRoleCredentials).to receive(:new)
+          .with(
+            client: sts_client,
+            role_arn: provision_role.role_arn,
+            role_session_name: session_name,
+            external_id: provision_role.role_external_id,
+            policy: session_policy
+          ).and_call_original
+      end
+
+      context 'provider is specified' do
+        let(:region) { provider.region }
+        let(:session_name) { "gitlab-eks-cluster-#{provider.cluster_id}-user-#{user.id}" }
+        let(:session_policy) { nil }
+
+        it 'returns credentials' do
+          expect(subject.access_key_id).to be_present
+          expect(subject.secret_access_key).to be_present
+          expect(subject.session_token).to be_present
+        end
+      end
+    end
   end
 end
