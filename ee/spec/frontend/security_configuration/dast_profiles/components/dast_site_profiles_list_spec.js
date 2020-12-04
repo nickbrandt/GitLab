@@ -34,12 +34,7 @@ describe('EE - DastSiteProfileList', () => {
 
   const createMockApolloProvider = handlers => {
     localVue.use(VueApollo);
-
-    requestHandlers = {
-      dastSiteValidations: jest.fn().mockResolvedValue(responses.dastSiteValidations()),
-      ...handlers,
-    };
-
+    requestHandlers = handlers;
     return createApolloProvider([[dastSiteValidationsQuery, requestHandlers.dastSiteValidations]]);
   };
 
