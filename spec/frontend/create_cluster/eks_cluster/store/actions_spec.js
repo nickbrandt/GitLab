@@ -195,7 +195,38 @@ describe('EKS Cluster Store Actions', () => {
           payload,
           state,
           [],
-          [{ type: 'requestCreateRole' }, { type: 'createRoleError', payload: { error } }],
+          [
+            { type: 'requestCreateRole' },
+            { type: 'createRoleError', payload: { error: 'Request failed with status code 400' } },
+          ],
+        ));
+    });
+
+    describe('when request fails with a message', () => {
+      let error;
+
+      beforeEach(() => {
+        const errResp = { message: 'Something failed' };
+
+        mock
+          .onPost(state.createRolePath, {
+            role_arn: payload.roleArn,
+            role_external_id: payload.externalId,
+            region: DEFAULT_REGION,
+          })
+          .reply(4, errResp);
+      });
+
+      it('dispatches createRoleError action', () =>
+        testAction(
+          actions.createRole,
+          payload,
+          state,
+          [],
+          [
+            { type: 'requestCreateRole' },
+            { type: 'createRoleError', payload: { error: 'Something failed' } },
+          ],
         ));
     });
   });
