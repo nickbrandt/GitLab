@@ -12,7 +12,7 @@ import ProfilesList from './dast_profiles_list.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { fetchPolicies } from '~/lib/graphql';
 
-const { PENDING, INPROGRESS, FAILED, PASSED } = DAST_SITE_VALIDATION_STATUS;
+const { PENDING, INPROGRESS, FAILED } = DAST_SITE_VALIDATION_STATUS;
 
 export default {
   components: {
@@ -34,14 +34,15 @@ export default {
       },
       pollInterval: DAST_SITE_VALIDATION_POLLING_INTERVAL,
       skip() {
-        return !this.urlsPendingValidation.length;
+        return (
+          !this.glFeatures.securityOnDemandScansSiteValidation || !this.urlsPendingValidation.length
+        );
       },
-      result(response) {
-        const {
-          data: {
-            validations: { nodes = [] },
-          },
-        } = response;
+      result({
+        data: {
+          validations: { nodes = [] },
+        },
+      }) {
         const store = this.$apolloProvider.defaultClient;
         nodes.forEach(({ normalizedTargetUrl, status }) => {
           updateSiteProfilesStatuses({
@@ -50,11 +51,6 @@ export default {
             status,
             store,
           });
-          if ([PASSED, FAILED].includes(status)) {
-            this.urlsPendingValidation = this.urlsPendingValidation.filter(
-              url => url !== normalizedTargetUrl,
-            );
-          }
         });
       },
     },
@@ -76,26 +72,20 @@ export default {
   data() {
     return {
       validatingProfile: null,
-      urlsPendingValidation: [],
     };
   },
   statuses: DAST_SITE_VALIDATION_STATUS_PROPS,
-  watch: {
-    profiles: {
-      immediate: true,
-      handler(profiles = []) {
-        if (!this.glFeatures.securityOnDemandScansSiteValidation) {
-          return;
+  computed: {
+    urlsPendingValidation() {
+      return this.profiles.reduce((acc, { validationStatus, normalizedTargetUrl }) => {
+        if (
+          [PENDING, INPROGRESS].includes(validationStatus) &&
+          !acc.includes(normalizedTargetUrl)
+        ) {
+          return [...acc, normalizedTargetUrl];
         }
-        profiles.forEach(({ validationStatus, normalizedTargetUrl }) => {
-          if (
-            [PENDING, INPROGRESS].includes(validationStatus) &&
-            !this.urlsPendingValidation.includes(normalizedTargetUrl)
-          ) {
-            this.urlsPendingValidation.push(normalizedTargetUrl);
-          }
-        });
-      },
+        return acc;
+      }, []);
     },
   },
   methods: {
