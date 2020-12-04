@@ -19,6 +19,7 @@ describe('EE - DastSiteProfileList', () => {
   let localVue;
   let wrapper;
   let requestHandlers;
+  let apolloProvider;
 
   const defaultProps = {
     profiles: [],
@@ -40,7 +41,7 @@ describe('EE - DastSiteProfileList', () => {
 
   const wrapperFactory = (mountFn = shallowMount) => (options = {}, handlers) => {
     localVue = createLocalVue();
-    const apolloProvider = handlers && createMockApolloProvider(handlers);
+    apolloProvider = handlers && createMockApolloProvider(handlers);
     wrapper = mountFn(
       Component,
       merge(
@@ -72,6 +73,7 @@ describe('EE - DastSiteProfileList', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    apolloProvider = null;
   });
 
   it('renders profile list properly', () => {
@@ -174,7 +176,7 @@ describe('EE - DastSiteProfileList', () => {
           fullPath: defaultProps.fullPath,
           normalizedTargetUrl,
           status,
-          store: wrapper.vm.$apollo.getClient(),
+          store: apolloProvider.defaultClient,
         });
       },
     );
