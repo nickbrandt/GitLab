@@ -51,10 +51,20 @@ module Clusters
       def response_details(exception)
         message =
           case exception
+          when ::Aws::STS::Errors::AccessDenied
+            _("Access denied: %{error}") % { error: exception.message }
+          when ::Aws::STS::Errors::ServiceError
+            _("AWS service error: %{error}") % { error: exception.message }
+          when ActiveRecord::RecordNotFound
+            _("Error: Unable to find AWS role for current user")
           when ActiveRecord::RecordInvalid
             exception.message
-          when ::Aws::STS::Errors::AccessDenied
-            "Access denied: #{exception.message}"
+          when Clusters::Aws::FetchCredentialsService::MissingRoleError
+            _("Error: No AWS provision role found for user")
+          when ::Aws::Errors::MissingCredentialsError
+            _("Error: No AWS credentials were supplied")
+          else
+            _('An error occurred while authorizing your role')
           end
 
         { message: message }.compact

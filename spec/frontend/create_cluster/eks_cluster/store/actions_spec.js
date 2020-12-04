@@ -186,7 +186,7 @@ describe('EKS Cluster Store Actions', () => {
             role_external_id: payload.externalId,
             region: DEFAULT_REGION,
           })
-          .reply(400, error);
+          .reply(400, null);
       });
 
       it('dispatches createRoleError action', () =>
@@ -195,16 +195,11 @@ describe('EKS Cluster Store Actions', () => {
           payload,
           state,
           [],
-          [
-            { type: 'requestCreateRole' },
-            { type: 'createRoleError', payload: { error: 'Request failed with status code 400' } },
-          ],
+          [{ type: 'requestCreateRole' }, { type: 'createRoleError', payload: { error } }],
         ));
     });
 
     describe('when request fails with a message', () => {
-      let error;
-
       beforeEach(() => {
         const errResp = { message: 'Something failed' };
 

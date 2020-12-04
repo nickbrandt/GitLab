@@ -44,7 +44,7 @@ export const createRole = ({ dispatch, state: { createRolePath } }, payload) => 
     })
     .catch(error => {
       let message = error;
-      if (error.response && error.response.data && error.response.data.message) {
+      if (error?.response?.data?.message) {
         message = error.response.data.message;
       }
       dispatch('createRoleError', { error: message });
