@@ -122,7 +122,7 @@ of GitLab more efficient.
 
 - If the answer to a question exists in documentation, share the link to the
   documentation instead of rephrasing the information.
-- When you encounter new information not available in GitLab’s documentation (for
+- When you encounter new information not available in GitLab documentation (for
   example, when working on a support case or testing a feature), your first step
   should be to create a merge request (MR) to add this information to the
   documentation. You can then share the MR to communicate this information.
@@ -964,7 +964,7 @@ search engine optimization (SEO), use the imperative, where possible.
 | Do                                    | Don't                                                       |
 |:--------------------------------------|:------------------------------------------------------------|
 | Configure GDK                         | Configuring GDK                                             |
-| GitLab Release and Maintenance Policy | This section covers GitLab's Release and Maintenance Policy |
+| GitLab Release and Maintenance Policy | This section covers the GitLab Release and Maintenance Policy |
 | Backport to older releases            | Backporting to older releases                               |
 | GitLab Pages examples                 | Examples                                                    |
 
@@ -1895,28 +1895,24 @@ If the document resides outside of the GitLab CE/EE
 
 ### Installation guide
 
-**Ruby:**
 In [step 2 of the installation guide](../../../install/installation.md#2-ruby),
-we install Ruby from source. When a version update is needed,
-remember to change it throughout the code block and also replace
-the sha256sum. You can find the sha256sum on the
-[downloads page](https://www.ruby-lang.org/en/downloads/) of the Ruby website.
+we install Ruby from source. To update the guide for a new Ruby version:
+
+- Change the version throughout the code block.
+- Replace the sha256sum. It's available on the
+  [downloads page](https://www.ruby-lang.org/en/downloads/) of the Ruby website.
 
 ### Configuration documentation for source and Omnibus installations
 
-GitLab officially supports two installation methods: installations
-from source and Omnibus packages installations.
-
-Whenever there's a setting that's configurable for both installation methods,
-the preference is to document it in the CE documentation to avoid duplication.
-
-Configuration settings include:
+GitLab supports two installation methods: installations from source, and Omnibus
+packages. Possible configuration settings include:
 
 - Settings that touch configuration files in `config/`.
-- NGINX settings and settings in `lib/support/` in general.
+- NGINX settings.
+- Other settings in `lib/support/`.
 
-When you document a list of steps, it may entail editing the configuration file
-and reconfiguring or restarting GitLab. In that case, use these styles:
+Configuration procedures can require users to edit configuration files, reconfigure
+GitLab, or restart GitLab. Use these styles to document these steps:
 
 <!-- vale off -->
 
@@ -1951,13 +1947,11 @@ and reconfiguring or restarting GitLab. In that case, use these styles:
 
 In this case:
 
-- Before each step list the installation method is declared in bold.
-- Three dashes (`---`) are used to create a horizontal line and separate the two
-  methods.
-- The code blocks are indented one or more spaces under the list item to render
-  correctly.
-- Different highlighting languages are used for each configuration in the code block.
-- The [GitLab Restart](#gitlab-restart) section is used to explain a required
+- Bold the installation method's name.
+- Separate the methods with three dashes (`---`) to create a horizontal line.
+- Indent the code blocks to line up with the list item they belong to..
+- Use the appropriate syntax highlighting for each code block.
+- Use the [GitLab Restart](#gitlab-restart) section to explain any required
   restart or reconfigure of GitLab.
 
 ### Troubleshooting
