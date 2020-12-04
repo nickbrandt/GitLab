@@ -83,7 +83,6 @@ export default {
   watch: {
     profiles: {
       immediate: true,
-      deep: true,
       handler(profiles = []) {
         if (!this.glFeatures.securityOnDemandScansSiteValidation) {
           return;
