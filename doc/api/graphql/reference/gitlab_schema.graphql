@@ -3511,6 +3511,11 @@ type ContainerRepository {
   path: String!
 
   """
+  Project of the container registry
+  """
+  project: Project!
+
+  """
   Status of the container repository.
   """
   status: ContainerRepositoryStatus
@@ -3614,6 +3619,11 @@ type ContainerRepositoryDetails {
   Path of the container repository.
   """
   path: String!
+
+  """
+  Project of the container registry
+  """
+  project: Project!
 
   """
   Status of the container repository.
