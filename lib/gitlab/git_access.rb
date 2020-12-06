@@ -319,8 +319,10 @@ module Gitlab
     end
 
     def check_change_access!
+      return if deploy_key? && !deploy_keys_on_protected_branches_enabled?
+
       if changes == ANY
-        can_push = deploy_key? ||
+        can_push = (deploy_key? && deploy_keys_on_protected_branches_enabled?) ||
                    user_can_push? ||
           project&.any_branch_allows_collaboration?(user_access.user)
 
@@ -447,7 +449,7 @@ module Gitlab
                          CiAccess.new
                        elsif user && request_from_ci_build?
                          BuildAccess.new(user, container: container)
-                       elsif deploy_key?
+                       elsif deploy_key? && deploy_keys_on_protected_branches_enabled?
                          DeployKeyAccess.new(deploy_key, container: container)
                        else
                          UserAccess.new(user, container: container)
@@ -525,6 +527,10 @@ module Gitlab
 
     def size_checker
       container.repository_size_checker
+    end
+
+    def deploy_keys_on_protected_branches_enabled?
+      Feature.enabled?(:deploy_keys_on_protected_branches, project)
     end
   end
 end
