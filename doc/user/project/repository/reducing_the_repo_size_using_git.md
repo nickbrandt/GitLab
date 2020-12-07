@@ -18,12 +18,12 @@ We **recommend [`git filter-repo`](https://github.com/newren/git-filter-repo/blo
 over [`git filter-branch`](https://git-scm.com/docs/git-filter-branch) and
 [BFG](https://rtyley.github.io/bfg-repo-cleaner/).
 
-DANGER: **Warning:**
+WARNING:
 Rewriting repository history is a destructive operation. Make sure to back up your repository before
 you begin. The best way back up a repository is to
 [export the project](../settings/import_export.md#exporting-a-project-and-its-data).
 
-NOTE: **Note:**
+NOTE:
 Git LFS files can only be removed by an Administrator using a
 [Rake task](../../../raketasks/cleanup.md). Removal of this limitation
 [is planned](https://gitlab.com/gitlab-org/gitlab/-/issues/223621).
