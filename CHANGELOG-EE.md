@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.5.5 (2020-12-07)
+
+### Security (1 change)
+
+- Cleanup todos for confidential epics that are no longer accessible by the user.
+
+
 ## 13.5.4 (2020-11-13)
 
 ### Fixed (1 change)
