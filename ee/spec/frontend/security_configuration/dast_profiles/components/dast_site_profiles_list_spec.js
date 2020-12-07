@@ -131,7 +131,8 @@ describe('EE - DastSiteProfileList', () => {
 
     describe.each`
       status           | statusEnum                                | label                  | hasValidateButton
-      ${'pending'}     | ${DAST_SITE_VALIDATION_STATUS.PENDING}    | ${''}                  | ${true}
+      ${'no'}          | ${DAST_SITE_VALIDATION_STATUS.NONE}       | ${''}                  | ${true}
+      ${'pending'}     | ${DAST_SITE_VALIDATION_STATUS.PENDING}    | ${'Validating...'}     | ${false}
       ${'in-progress'} | ${DAST_SITE_VALIDATION_STATUS.INPROGRESS} | ${'Validating...'}     | ${false}
       ${'passed'}      | ${DAST_SITE_VALIDATION_STATUS.PASSED}     | ${'Validated'}         | ${false}
       ${'failed'}      | ${DAST_SITE_VALIDATION_STATUS.FAILED}     | ${'Validation failed'} | ${true}
