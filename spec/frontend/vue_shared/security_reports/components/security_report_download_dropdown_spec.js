@@ -17,6 +17,7 @@ describe('SecurityReportDownloadDropdown component', () => {
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('given report artifacts', () => {
@@ -36,7 +37,6 @@ describe('SecurityReportDownloadDropdown component', () => {
     });
 
     it('renders a dropdown', () => {
-      expect(findDropdown().exists()).toBe(true);
       expect(findDropdown().props('loading')).toBe(false);
     });
 
@@ -58,7 +58,6 @@ describe('SecurityReportDownloadDropdown component', () => {
     });
 
     it('renders a loading dropdown', () => {
-      expect(findDropdown().exists()).toBe(true);
       expect(findDropdown().props('loading')).toBe(true);
     });
   });
