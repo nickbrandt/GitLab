@@ -26,6 +26,17 @@ module EE
       end
     end
 
+    override :current_plan
+    def current_plan
+      if current_namespace.present?
+        if ::Gitlab::CurrentSettings.should_check_namespace_plan?
+          current_namespace.actual_plan_name
+        else
+          License.current.plan
+        end
+      end
+    end
+
     private
 
     override :log_impersonation_event

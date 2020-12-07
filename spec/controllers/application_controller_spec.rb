@@ -926,6 +926,135 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe '#current_namespace' do
+    controller(described_class) do
+      def index
+        Labkit::Context.with_context do |context|
+          render json: context.to_h
+        end
+      end
+    end
+
+    let_it_be(:user) { create(:user) }
+
+    before do
+      sign_in(user)
+    end
+
+    subject { controller.send(:current_namespace) }
+
+    context 'when only namespace is set' do
+      it 'has the set namespace' do
+        namespace = build_stubbed(:namespace)
+        controller.instance_variable_set(:@namespace, namespace)
+
+        get :index, format: :json
+
+        expect(subject).to be_a(Namespace)
+        expect(subject).to eq(namespace)
+      end
+    end
+
+    context 'when project and namespace are set' do
+      it 'has the set namespace' do
+        namespace = build_stubbed(:namespace)
+        project = build_stubbed(:project)
+
+        controller.instance_variable_set(:@namespace, namespace)
+        controller.instance_variable_set(:@project, project)
+
+        get :index, format: :json
+
+        expect(subject).to be_a(Namespace)
+        expect(subject).to eq(namespace)
+      end
+    end
+
+    context 'when only project is set' do
+      it 'has namespace of the project' do
+        project = build_stubbed(:project)
+        controller.instance_variable_set(:@project, project)
+
+        get :index, format: :json
+
+        expect(subject).to be_a(Namespace)
+        expect(subject).to eq(project.namespace)
+      end
+    end
+
+    context 'when no project or namespace are set' do
+      it 'has current namespace nil' do
+        get :index, format: :json
+
+        expect(subject).to eq(nil)
+      end
+    end
+  end
+
+  describe '#current_plan' do
+    controller(described_class) do
+      def index
+        Labkit::Context.with_context do |context|
+          render json: context.to_h
+        end
+      end
+    end
+
+    let_it_be(:user) { create(:user) }
+
+    before do
+      sign_in(user)
+    end
+
+    subject { controller.send(:current_plan) }
+
+    context 'when only namespace is set' do
+      it 'has the namespace plan' do
+        namespace = build_stubbed(:namespace)
+        controller.instance_variable_set(:@namespace, namespace)
+
+        get :index, format: :json
+
+        expect(subject).to be_a(String)
+      end
+    end
+
+    context 'when project and namespace are set' do
+      it 'has the namespace plan' do
+        namespace = build_stubbed(:namespace)
+        project = build_stubbed(:project)
+
+        controller.instance_variable_set(:@namespace, namespace)
+        controller.instance_variable_set(:@project, project)
+
+        get :index, format: :json
+
+        expect(subject).to be_a(String)
+      end
+    end
+
+    context 'when only project is set' do
+      it 'has project namespace plan' do
+        project = build_stubbed(:project)
+        controller.instance_variable_set(:@project, project)
+
+        get :index, format: :json
+
+        expect(subject).to be_a(String)
+      end
+    end
+
+    context 'when no project or namespace are set' do
+      it 'has current plan nil' do
+        controller.instance_variable_set(:@namespace, nil)
+        controller.instance_variable_set(:@project, nil)
+        get :index, format: :json
+
+        expect(subject).to eq(nil)
+      end
+    end
+  end
+
   describe '#current_user' do
     controller(described_class) do
       def index; end

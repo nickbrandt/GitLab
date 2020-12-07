@@ -76,7 +76,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
         { name: compliance_slot_event, redis_slot: "compliance", category: compliance_category, aggregation: "weekly" },
         { name: no_slot, category: global_category, aggregation: "daily" },
         { name: different_aggregation, category: global_category, aggregation: "monthly" },
-        { name: context_event, category: other_category, expiry: 6, aggregation: 'weekly' }
+        { name: context_event, category: other_category, expiry: 6, aggregation: 'weekly', plans: ['default'] }
       ].map(&:with_indifferent_access)
     end
 
@@ -180,7 +180,7 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
 
     describe '.track_event_in_context' do
       context 'with valid contex' do
-        it 'increments conext event counte' do
+        it 'increments context event counter' do
           expect(Gitlab::Redis::HLL).to receive(:add) do |kwargs|
             expect(kwargs[:key]).to match(/^#{default_context}\_.*/)
           end
@@ -291,9 +291,9 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
 
     let(:known_events) do
       [
-        { name: 'event_name_1', redis_slot: 'event', category: 'category1', aggregation: "weekly" },
-        { name: 'event_name_2', redis_slot: 'event', category: 'category1', aggregation: "weekly" },
-        { name: 'event_name_3', redis_slot: 'event', category: 'category1', aggregation: "weekly" }
+        { name: 'event_name_1', redis_slot: 'event', category: 'category1', aggregation: "weekly", plans: ['default'] },
+        { name: 'event_name_2', redis_slot: 'event', category: 'category1', aggregation: "weekly", plans: ['default'] },
+        { name: 'event_name_3', redis_slot: 'event', category: 'category1', aggregation: "weekly", plans: ['default'] }
       ].map(&:with_indifferent_access)
     end
 
@@ -309,21 +309,44 @@ RSpec.describe Gitlab::UsageDataCounters::HLLRedisCounter, :clean_gitlab_redis_s
 
     subject(:unique_events) { described_class.unique_events(event_names: event_names, start_date: 4.weeks.ago, end_date: Date.current, context: context) }
 
-    context 'with correct arguments' do
-      where(:event_names, :context, :value) do
-        ['event_name_1'] | 'default' | 2
-        ['event_name_1'] | ''        | 0
-        ['event_name_2'] | ''        | 0
+    context 'with redis_hll_plan_level_tracking feature enabled' do
+      before do
+        stub_feature_flags(redis_hll_plan_level_tracking: true)
       end
 
-      with_them do
-        it { is_expected.to eq value }
+      context 'with correct arguments' do
+        where(:event_names, :context, :value) do
+          ['event_name_1'] | 'default' | 2
+          ['event_name_1'] | ''        | 0
+          ['event_name_2'] | ''        | 0
+        end
+
+        with_them do
+          it { is_expected.to eq value }
+        end
+      end
+
+      context 'with invalid context' do
+        it 'raise error' do
+          expect { described_class.unique_events(event_names: 'event_name_1', start_date: 4.weeks.ago, end_date: Date.current, context: invalid_context) }.to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::InvalidContext)
+        end
       end
     end
 
-    context 'with invalid context' do
-      it 'raise error' do
-        expect { described_class.unique_events(event_names: 'event_name_1', start_date: 4.weeks.ago, end_date: Date.current, context: invalid_context) }.to raise_error(Gitlab::UsageDataCounters::HLLRedisCounter::InvalidContext)
+    context 'with redis_hll_plan_level_tracking feature disabled' do
+      context 'when tracking' do
+        before do
+          stub_feature_flags(redis_hll_plan_level_tracking: false)
+        end
+        where(:event_names, :context) do
+          ['event_name_1'] | 'default'
+          ['event_name_1'] | ''
+          ['event_name_2'] | ''
+        end
+
+        with_them do
+          it { is_expected.to eq nil }
+        end
       end
     end
   end

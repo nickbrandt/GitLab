@@ -475,6 +475,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def current_namespace
+    @namespace || @project&.namespace
+  end
+
+  def current_plan
+    current_namespace&.actual_plan_name
+  end
+
   def set_locale(&block)
     Gitlab::I18n.with_user_locale(current_user, &block)
   end

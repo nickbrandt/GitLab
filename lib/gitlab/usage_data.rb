@@ -220,7 +220,8 @@ module Gitlab
             projects_with_alerts_created: distinct_count(::AlertManagement::Alert.where(last_28_days_time_period), :project_id)
           }.merge(
             snowplow_event_counts(last_28_days_time_period(column: :collector_tstamp)),
-            aggregated_metrics_monthly
+            aggregated_metrics_monthly,
+            monthly_plan_level_unique_events
           ).tap do |data|
             data[:snippets] = data[:personal_snippets] + data[:project_snippets]
           end
@@ -684,6 +685,10 @@ module Gitlab
 
       def redis_hll_counters
         { redis_hll_counters: ::Gitlab::UsageDataCounters::HLLRedisCounter.unique_events_data }
+      end
+
+      def monthly_plan_level_unique_events
+        ::Gitlab::UsageDataCounters::HLLRedisCounter.monthly_plan_level_unique_events
       end
 
       def aggregated_metrics_monthly

@@ -1247,6 +1247,35 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     end
   end
 
+  describe 'monthly_plan_level_unique_events' do
+    subject { described_class.monthly_plan_level_unique_events }
+
+    context 'when redis_hll_plan_level_tracking feature enabled' do
+      before do
+        stub_feature_flags(redis_hll_plan_level_tracking: true)
+      end
+
+      it 'has metrics on plan level' do
+        events = ::Gitlab::UsageDataCounters::HLLRedisCounter.known_events_with_plans
+        metrics = events.map do |event|
+          event[:plans].map { |plan| "#{event[:name]}_#{plan}".to_sym }
+        end.flatten
+
+        expect(subject.keys).to match_array(metrics)
+      end
+    end
+
+    context 'when redis_hll_plan_level_tracking feature disabled' do
+      before do
+        stub_feature_flags(redis_hll_plan_level_tracking: false)
+      end
+
+      it 'has no metrics on plan level' do
+        expect(subject).to be_blank
+      end
+    end
+  end
+
   describe 'aggregated_metrics' do
     shared_examples 'aggregated_metrics_for_time_range' do
       context 'with product_analytics_aggregated_metrics feature flag on' do

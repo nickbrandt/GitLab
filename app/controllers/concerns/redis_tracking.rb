@@ -33,6 +33,10 @@ module RedisTracking
     return unless metric_feature_enabled?(feature, feature_default_enabled)
     return unless visitor_id
 
+    if current_plan.present? && Feature.enabled?(:redis_hll_plan_level_tracking)
+      Gitlab::UsageDataCounters::HLLRedisCounter.track_event_in_context(visitor_id, event_name, current_plan)
+    end
+
     Gitlab::UsageDataCounters::HLLRedisCounter.track_event(visitor_id, event_name)
   end
 

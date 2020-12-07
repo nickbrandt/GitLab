@@ -49,8 +49,7 @@ module Gitlab
         end
 
         def track_event_in_context(value, event_name, context, time = Time.zone.now)
-          return if context.blank?
-          return unless context.in?(valid_context_list)
+          return unless valid_for_plan_tracking?(event_name, context)
 
           track(value, event_name, context: context, time: time)
         end
@@ -72,6 +71,20 @@ module Gitlab
         # @return [Array<String>] list of event names for given category
         def events_for_category(category)
           known_events.select { |event| event[:category] == category.to_s }.map { |event| event[:name] }
+        end
+
+        def monthly_plan_level_unique_events
+          # Get unique events data only for events having any plans defined
+          # This should be merged to counts_monthly top level key in usage ping
+          return unless Feature.enabled?(:redis_hll_plan_level_tracking)
+
+          results = known_events_with_plans.each_with_object({}) do |event, hash|
+            event[:plans].each do |plan|
+              # Collect data for the plans defined for the event
+              hash["#{event[:name]}_#{plan}".to_sym] = unique_events(event_names: event[:name], start_date: 4.weeks.ago.to_date, end_date: Date.current, context: plan)
+            end
+          end
+          results
         end
 
         def unique_events_data
@@ -112,6 +125,10 @@ module Gitlab
           @aggregated_metrics ||= load_events(AGGREGATED_METRICS_PATH)
         end
 
+        def known_events_with_plans
+          known_events.select { |event| event[:plans].present? }
+        end
+
         private
 
         def track(value, event_name, context: '', time: Time.zone.now)
@@ -121,6 +138,12 @@ module Gitlab
           raise UnknownEvent, "Unknown event #{event_name}" unless event.present?
 
           Gitlab::Redis::HLL.add(key: redis_key(event, time, context), value: value, expiry: expiry(event))
+        end
+
+        def valid_for_plan_tracking?(event_name, plan)
+          event = event_for(event_name)
+
+          plan.present? && plan.in?(valid_context_list) && Feature.enabled?(:redis_hll_plan_level_tracking) && event[:plans].present?
         end
 
         # The aray of valid context on which we allow tracking

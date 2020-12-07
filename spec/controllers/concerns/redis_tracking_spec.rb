@@ -5,6 +5,7 @@ require "spec_helper"
 RSpec.describe RedisTracking do
   let(:feature) { 'approval_rule' }
   let(:user) { create(:user) }
+  let(:event_name) { 'g_compliance_dashboard' }
 
   before do
     skip_feature_flags_yaml_validation
@@ -14,7 +15,7 @@ RSpec.describe RedisTracking do
     include RedisTracking
 
     skip_before_action :authenticate_user!, only: :show
-    track_redis_hll_event :index, :show, name: 'g_compliance_approval_rules', feature: :approval_rule, feature_default_enabled: true,
+    track_redis_hll_event :index, :show, name: 'g_compliance_dashboard', feature: :approval_rule, feature_default_enabled: true,
       if: [:custom_condition_one?, :custom_condition_two?]
 
     def index
@@ -42,11 +43,20 @@ RSpec.describe RedisTracking do
 
   def expect_tracking
     expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event)
-      .with(instance_of(String), 'g_compliance_approval_rules')
+      .with(instance_of(String), event_name)
   end
 
   def expect_no_tracking
     expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event)
+  end
+
+  def expect_tracking_with_context
+    expect(Gitlab::UsageDataCounters::HLLRedisCounter).to receive(:track_event_in_context)
+      .with(instance_of(String), event_name, instance_of(String))
+  end
+
+  def expect_no_tracking_with_context
+    expect(Gitlab::UsageDataCounters::HLLRedisCounter).not_to receive(:track_event_in_context)
   end
 
   context 'with feature disabled' do
@@ -115,6 +125,52 @@ RSpec.describe RedisTracking do
         expect_no_tracking
 
         get :new
+      end
+    end
+
+    context 'with context tracking' do
+      let(:namespace) { create(:namespace) }
+
+      before do
+        stub_feature_flags(feature => true)
+        sign_in(user)
+      end
+
+      context 'with redis_hll_plan_level_tracking feature enabled' do
+        before do
+          stub_feature_flags(redis_hll_plan_level_tracking: true)
+        end
+
+        it 'tracks the event for plan when there is a current_plan' do
+          expect(controller).to receive(:current_plan).at_least(:once).and_return('plan')
+
+          expect_tracking
+          expect_tracking_with_context
+
+          get :index
+        end
+
+        it 'does not track' do
+          expect(controller).to receive(:current_plan).at_least(:once).and_return(nil)
+
+          expect_tracking
+          expect_no_tracking_with_context
+
+          get :index
+        end
+      end
+
+      context 'with redis_hll_plan_level_tracking feature disabled' do
+        before do
+          stub_feature_flags(redis_hll_plan_level_tracking: false)
+        end
+
+        it 'does not track the event for plan' do
+          expect_tracking
+          expect_no_tracking_with_context
+
+          get :index
+        end
       end
     end
 

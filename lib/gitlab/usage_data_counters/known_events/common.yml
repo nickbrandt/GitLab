@@ -425,3 +425,4 @@
   redis_slot: snippets
   aggregation: weekly
   feature_flag: usage_data_i_snippets_show
+  plans: ["default", "free", "bronze", "silver", "gold", "starter", "premium", "ultimate"]
