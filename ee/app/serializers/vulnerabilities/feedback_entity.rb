@@ -47,6 +47,7 @@ class Vulnerabilities::FeedbackEntity < Grape::Entity
     feedback&.pipeline&.ref
   end
   expose :project_fingerprint
+  expose :finding_uuid
 
   alias_method :feedback, :object
 

@@ -46,6 +46,7 @@ module Vulnerabilities
 
     def self.find_or_init_for(feedback_params)
       validate_enums(feedback_params)
+      validate_finding_uuid(feedback_params[:finding_uuid]) if feedback_params[:finding_uuid]
 
       record = find_or_initialize_by(feedback_params.slice(:category, :feedback_type, :project_fingerprint))
       record.assign_attributes(feedback_params)
@@ -63,6 +64,10 @@ module Vulnerabilities
       unless categories.include?(feedback_params[:category])
         raise ArgumentError.new("'#{feedback_params[:category]}' is not a valid category")
       end
+    end
+
+    def self.validate_finding_uuid(finding_uuid)
+      raise ArgumentError.new("No finding with the UUID '#{finding_uuid}'") if Vulnerabilities::Finding.where(uuid: finding_uuid).blank?
     end
 
     def self.with_category(category)

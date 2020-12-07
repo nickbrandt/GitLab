@@ -277,6 +277,20 @@ RSpec.describe Vulnerabilities::Feedback do
         expect(existing_feedback).to eq(feedback)
       end
 
+      context 'when a finding_uuid is provided' do
+        let(:finding) { create(:vulnerabilities_finding) }
+        let(:feedback_params_with_finding) { feedback_params.merge(finding_uuid: finding.uuid) }
+
+        subject(:feedback) { described_class.find_or_init_for(feedback_params_with_finding) }
+
+        it 'validates and sets finding_uuid' do
+          feedback_params[:finding_uuid] = finding.uuid
+          feedback.save!
+
+          expect(feedback.finding_uuid).to eq(finding.uuid)
+        end
+      end
+
       context 'when attempting to save duplicate' do
         it 'raises ActiveRecord::RecordInvalid' do
           duplicate = described_class.find_or_init_for(feedback_params)
@@ -300,6 +314,13 @@ RSpec.describe Vulnerabilities::Feedback do
         feedback_params[:category] = 'foo'
 
         expect { described_class.find_or_init_for(feedback_params) }.to raise_error(ArgumentError, /category/)
+      end
+
+      it 'raises ArgumentError when given a bad finding UUID' do
+        create(:vulnerabilities_finding, uuid: 'bar')
+        feedback_params[:finding_uuid] = 'foo'
+
+        expect { described_class.find_or_init_for(feedback_params) }.to raise_error(ArgumentError, /finding with the UUID/)
       end
     end
   end
