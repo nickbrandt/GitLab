@@ -1,5 +1,14 @@
 import Vue from 'vue';
+import VueApollo from 'vue-apollo';
+import createDefaultClient from '~/lib/graphql';
+import ProjectPipelinesChartsLegacy from './components/app_legacy.vue';
 import ProjectPipelinesCharts from './components/app.vue';
+
+Vue.use(VueApollo);
+
+const apolloProvider = new VueApollo({
+  defaultClient: createDefaultClient(),
+});
 
 export default () => {
   const el = document.querySelector('#js-project-pipelines-charts-app');
@@ -20,6 +29,7 @@ export default () => {
     lastYearChartLabels,
     lastYearChartTotals,
     lastYearChartSuccess,
+    projectPath,
   } = el.dataset;
 
   const parseAreaChartData = (labels, totals, success) => ({
@@ -28,14 +38,29 @@ export default () => {
     success: JSON.parse(success),
   });
 
+  if (gon.features.graphqlPipelineAnalytics) {
+    return new Vue({
+      el,
+      name: 'ProjectPipelinesChartsApp',
+      components: {
+        ProjectPipelinesCharts,
+      },
+      apolloProvider,
+      provide: {
+        projectPath,
+      },
+      render: createElement => createElement(ProjectPipelinesCharts, {}),
+    });
+  }
+
   return new Vue({
     el,
     name: 'ProjectPipelinesChartsApp',
     components: {
-      ProjectPipelinesCharts,
+      ProjectPipelinesChartsLegacy,
     },
     render: createElement =>
-      createElement(ProjectPipelinesCharts, {
+      createElement(ProjectPipelinesChartsLegacy, {
         props: {
           counts: {
             failed: countsFailed,

@@ -20113,6 +20113,12 @@ msgstr ""
 msgid "Pipeline: %{status}"
 msgstr ""
 
+msgid "PipelineCharts|An error has ocurred when retrieving the analytics data"
+msgstr ""
+
+msgid "PipelineCharts|An error has ocurred when retrieving the pipeline data"
+msgstr ""
+
 msgid "PipelineCharts|CI / CD Analytics"
 msgstr ""
 

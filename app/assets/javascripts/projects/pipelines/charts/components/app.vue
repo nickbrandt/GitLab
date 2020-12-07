@@ -1,59 +1,129 @@
 <script>
 import dateFormat from 'dateformat';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
-import { __, sprintf } from '~/locale';
+import { __, s__, sprintf } from '~/locale';
+import createFlash, { FLASH_TYPES } from '~/flash';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
+import getPipelineCountByStatus from '../graphql/queries/get_pipeline_count_by_status.query.graphql';
+import getProjectPipelineStatistics from '../graphql/queries/get_project_pipeline_statistics.query.graphql';
 import StatisticsList from './statistics_list.vue';
 import PipelinesAreaChart from './pipelines_area_chart.vue';
 import {
   CHART_CONTAINER_HEIGHT,
-  INNER_CHART_HEIGHT,
-  X_AXIS_LABEL_ROTATION,
-  X_AXIS_TITLE_OFFSET,
   CHART_DATE_FORMAT,
+  INNER_CHART_HEIGHT,
   ONE_WEEK_AGO_DAYS,
   ONE_MONTH_AGO_DAYS,
+  X_AXIS_LABEL_ROTATION,
+  X_AXIS_TITLE_OFFSET,
 } from '../constants';
+
+const defaultCountValues = {
+  totalPipelines: {
+    count: 0,
+  },
+  successfulPipelines: {
+    count: 0,
+  },
+};
+
+const defaultAnalyticsValues = {
+  weekPipelinesTotals: [],
+  weekPipelinesLabels: [],
+  weekPipelinesSuccessful: [],
+  monthPipelinesLabels: [],
+  monthPipelinesTotals: [],
+  monthPipelinesSuccessful: [],
+  yearPipelinesLabels: [],
+  yearPipelinesTotals: [],
+  yearPipelinesSuccessful: [],
+  pipelineTimesLabels: [],
+  pipelineTimesValues: [],
+};
 
 export default {
   components: {
-    StatisticsList,
     GlColumnChart,
+    StatisticsList,
     PipelinesAreaChart,
   },
-  props: {
-    counts: {
-      type: Object,
-      required: true,
-    },
-    timesChartData: {
-      type: Object,
-      required: true,
-    },
-    lastWeekChartData: {
-      type: Object,
-      required: true,
-    },
-    lastMonthChartData: {
-      type: Object,
-      required: true,
-    },
-    lastYearChartData: {
-      type: Object,
-      required: true,
+  inject: {
+    projectPath: {
+      type: String,
+      default: '',
     },
   },
   data() {
     return {
-      timesChartTransformedData: [
-        {
-          name: 'full',
-          data: this.mergeLabelsAndValues(this.timesChartData.labels, this.timesChartData.values),
-        },
-      ],
+      counts: {
+        ...defaultCountValues,
+      },
+      analytics: {
+        ...defaultAnalyticsValues,
+      },
     };
   },
+  apollo: {
+    counts: {
+      query: getPipelineCountByStatus,
+      variables() {
+        return {
+          projectPath: this.projectPath,
+        };
+      },
+      update(res) {
+        return res.project;
+      },
+      error() {
+        createFlash({
+          message: s__('PipelineCharts|An error has ocurred when retrieving the pipeline data'),
+          type: FLASH_TYPES.ALERT,
+        });
+      },
+    },
+    analytics: {
+      query: getProjectPipelineStatistics,
+      variables() {
+        return {
+          projectPath: this.projectPath,
+        };
+      },
+      update(res) {
+        return res.project.pipelineAnalytics;
+      },
+      error() {
+        createFlash({
+          message: s__('PipelineCharts|An error has ocurred when retrieving the analytics data'),
+          type: FLASH_TYPES.ALERT,
+        });
+      },
+    },
+  },
   computed: {
+    successRatio() {
+      const { successfulPipelines, failedPipelines } = this.counts;
+      const successfulCount = successfulPipelines?.count;
+      const failedCount = failedPipelines?.count;
+      const ratio = (successfulCount / (successfulCount + failedCount)) * 100;
+
+      return failedCount === 0 ? 100 : ratio;
+    },
+    formattedCounts() {
+      const {
+        totalPipelines,
+        successfulPipelines,
+        failedPipelines,
+        totalPipelineDuration,
+      } = this.counts;
+
+      return {
+        total: totalPipelines?.count,
+        success: successfulPipelines?.count,
+        failed: failedPipelines?.count,
+        successRatio: this.successRatio,
+        totalDuration: totalPipelineDuration,
+      };
+    },
     areaCharts() {
       const { lastWeek, lastMonth, lastYear } = this.$options.chartTitles;
 
@@ -61,6 +131,38 @@ export default {
         this.buildAreaChartData(lastWeek, this.lastWeekChartData),
         this.buildAreaChartData(lastMonth, this.lastMonthChartData),
         this.buildAreaChartData(lastYear, this.lastYearChartData),
+      ];
+    },
+    lastWeekChartData() {
+      return {
+        labels: this.analytics.weekPipelinesLabels,
+        totals: this.analytics.weekPipelinesTotals,
+        success: this.analytics.weekPipelinesSuccessful,
+      };
+    },
+    lastMonthChartData() {
+      return {
+        labels: this.analytics.monthPipelinesLabels,
+        totals: this.analytics.monthPipelinesTotals,
+        success: this.analytics.monthPipelinesSuccessful,
+      };
+    },
+    lastYearChartData() {
+      return {
+        labels: this.analytics.yearPipelinesLabels,
+        totals: this.analytics.yearPipelinesTotals,
+        success: this.analytics.yearPipelinesSuccessful,
+      };
+    },
+    timesChartTransformedData() {
+      return [
+        {
+          name: 'full',
+          data: this.mergeLabelsAndValues(
+            this.analytics.pipelineTimesLabels,
+            this.analytics.pipelineTimesValues,
+          ),
+        },
       ];
     },
   },
@@ -116,13 +218,13 @@ export default {
 </script>
 <template>
   <div>
-    <div class="mb-3">
+    <div class="gl-mb-3">
       <h3>{{ s__('PipelineCharts|CI / CD Analytics') }}</h3>
     </div>
-    <h4 class="my-4">{{ s__('PipelineCharts|Overall statistics') }}</h4>
+    <h4 class="gl-my-4">{{ s__('PipelineCharts|Overall statistics') }}</h4>
     <div class="row">
       <div class="col-md-6">
-        <statistics-list :counts="counts" />
+        <statistics-list :counts="formattedCounts" />
       </div>
       <div class="col-md-6">
         <strong>
@@ -139,7 +241,7 @@ export default {
       </div>
     </div>
     <hr />
-    <h4 class="my-4">{{ __('Pipelines charts') }}</h4>
+    <h4 class="gl-my-4">{{ __('Pipelines charts') }}</h4>
     <pipelines-area-chart
       v-for="(chart, index) in areaCharts"
       :key="index"
