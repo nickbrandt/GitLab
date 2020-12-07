@@ -1139,7 +1139,7 @@ and a simple solution would be to enable relative URLs in the Registry.
 
 You can use the Container Registry debug server to diagnose problems. The debug endpoint can monitor metrics and health, as well as do profiling.
 
-CAUTION: **Warning:**
+WARNING:
 Sensitive information may be available from the debug endpoint.
 Access to the debug endpoint must be locked down in a production environment.
 
