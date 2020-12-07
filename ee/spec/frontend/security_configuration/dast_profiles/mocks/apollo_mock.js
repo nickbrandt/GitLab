@@ -1,7 +1,9 @@
 export const dastSiteValidations = (nodes = []) => ({
   data: {
-    validations: {
-      nodes,
+    project: {
+      validations: {
+        nodes,
+      },
     },
   },
 });

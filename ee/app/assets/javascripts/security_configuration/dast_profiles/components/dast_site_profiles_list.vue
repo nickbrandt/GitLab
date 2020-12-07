@@ -40,7 +40,9 @@ export default {
       },
       result({
         data: {
-          validations: { nodes = [] },
+          project: {
+            validations: { nodes = [] },
+          },
         },
       }) {
         const store = this.$apollo.getClient();
