@@ -318,10 +318,10 @@ describe('OnDemandScansForm', () => {
   );
 
   describe.each`
-    profileType  | query                    | field                         | profiles
-    ${'scanner'} | ${'dastScannerProfiles'} | ${'selectedScannerProfileId'} | ${scannerProfiles}
-    ${'site'}    | ${'dastSiteProfiles'}    | ${'selectedSiteProfileId'}    | ${siteProfiles}
-  `('when there is a single $profileType profile', ({ query, field, profiles }) => {
+    profileType  | query                    | selector                  | profiles
+    ${'scanner'} | ${'dastScannerProfiles'} | ${ScannerProfileSelector} | ${scannerProfiles}
+    ${'site'}    | ${'dastSiteProfiles'}    | ${SiteProfileSelector}    | ${siteProfiles}
+  `('when there is a single $profileType profile', ({ query, selector, profiles }) => {
     const [profile] = profiles;
 
     beforeEach(() => {
@@ -334,7 +334,7 @@ describe('OnDemandScansForm', () => {
     });
 
     it('automatically selects the only available profile', () => {
-      expect(subject.vm[field]).toBe(profile.id);
+      expect(subject.find(selector).attributes('value')).toBe(profile.id);
     });
   });
 });
