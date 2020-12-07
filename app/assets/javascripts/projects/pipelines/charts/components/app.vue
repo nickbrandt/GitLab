@@ -1,8 +1,8 @@
 <script>
 import dateFormat from 'dateformat';
 import { GlColumnChart } from '@gitlab/ui/dist/charts';
+import { GlAlert } from '@gitlab/ui';
 import { __, s__, sprintf } from '~/locale';
-import createFlash, { FLASH_TYPES } from '~/flash';
 import { getDateInPast } from '~/lib/utils/datetime_utility';
 import getPipelineCountByStatus from '../graphql/queries/get_pipeline_count_by_status.query.graphql';
 import getProjectPipelineStatistics from '../graphql/queries/get_project_pipeline_statistics.query.graphql';
@@ -11,9 +11,14 @@ import PipelinesAreaChart from './pipelines_area_chart.vue';
 import {
   CHART_CONTAINER_HEIGHT,
   CHART_DATE_FORMAT,
+  DEFAULT,
   INNER_CHART_HEIGHT,
+  LOAD_ANALYTICS_FAILURE,
+  LOAD_PIPELINES_FAILURE,
   ONE_WEEK_AGO_DAYS,
   ONE_MONTH_AGO_DAYS,
+  PARSE_FAILURE,
+  UNSUPPORTED_DATA,
   X_AXIS_LABEL_ROTATION,
   X_AXIS_TITLE_OFFSET,
 } from '../constants';
@@ -43,6 +48,7 @@ const defaultAnalyticsValues = {
 
 export default {
   components: {
+    GlAlert,
     GlColumnChart,
     StatisticsList,
     PipelinesAreaChart,
@@ -61,6 +67,8 @@ export default {
       analytics: {
         ...defaultAnalyticsValues,
       },
+      showFailureAlert: false,
+      failureType: null,
     };
   },
   apollo: {
@@ -71,14 +79,11 @@ export default {
           projectPath: this.projectPath,
         };
       },
-      update(res) {
-        return res.project;
+      update(data) {
+        return data?.project;
       },
       error() {
-        createFlash({
-          message: s__('PipelineCharts|An error has ocurred when retrieving the pipeline data'),
-          type: FLASH_TYPES.ALERT,
-        });
+        this.reportFailure(LOAD_PIPELINES_FAILURE);
       },
     },
     analytics: {
@@ -88,18 +93,39 @@ export default {
           projectPath: this.projectPath,
         };
       },
-      update(res) {
-        return res.project.pipelineAnalytics;
+      update(data) {
+        return data?.project?.pipelineAnalytics;
       },
       error() {
-        createFlash({
-          message: s__('PipelineCharts|An error has ocurred when retrieving the analytics data'),
-          type: FLASH_TYPES.ALERT,
-        });
+        this.reportFailure(LOAD_ANALYTICS_FAILURE);
       },
     },
   },
   computed: {
+    failure() {
+      switch (this.failureType) {
+        case LOAD_ANALYTICS_FAILURE:
+          return {
+            text: this.$options.errorTexts[LOAD_ANALYTICS_FAILURE],
+            variant: 'danger',
+          };
+        case PARSE_FAILURE:
+          return {
+            text: this.$options.errorTexts[PARSE_FAILURE],
+            variant: 'danger',
+          };
+        case UNSUPPORTED_DATA:
+          return {
+            text: this.$options.errorTexts[UNSUPPORTED_DATA],
+            variant: 'info',
+          };
+        default:
+          return {
+            text: this.$options.errorTexts[DEFAULT],
+            variant: 'danger',
+          };
+      }
+    },
     successRatio() {
       const { successfulPipelines, failedPipelines } = this.counts;
       const successfulCount = successfulPipelines?.count;
@@ -126,12 +152,20 @@ export default {
     },
     areaCharts() {
       const { lastWeek, lastMonth, lastYear } = this.$options.chartTitles;
+      let areaChartsData = [];
 
-      return [
-        this.buildAreaChartData(lastWeek, this.lastWeekChartData),
-        this.buildAreaChartData(lastMonth, this.lastMonthChartData),
-        this.buildAreaChartData(lastYear, this.lastYearChartData),
-      ];
+      try {
+        areaChartsData = [
+          this.buildAreaChartData(lastWeek, this.lastWeekChartData),
+          this.buildAreaChartData(lastMonth, this.lastMonthChartData),
+          this.buildAreaChartData(lastYear, this.lastYearChartData),
+        ];
+      } catch {
+        areaChartsData = [];
+        this.reportFailure(PARSE_FAILURE);
+      }
+
+      return areaChartsData;
     },
     lastWeekChartData() {
       return {
@@ -187,6 +221,13 @@ export default {
         ],
       };
     },
+    hideAlert() {
+      this.showFailureAlert = false;
+    },
+    reportFailure(type) {
+      this.showFailureAlert = true;
+      this.failureType = type;
+    },
   },
   chartContainerHeight: CHART_CONTAINER_HEIGHT,
   timesChartOptions: {
@@ -197,6 +238,16 @@ export default {
       },
       nameGap: X_AXIS_TITLE_OFFSET,
     },
+  },
+  errorTexts: {
+    [LOAD_ANALYTICS_FAILURE]: s__(
+      'PipelineCharts|An error has ocurred when retrieving the analytics data',
+    ),
+    [LOAD_PIPELINES_FAILURE]: s__(
+      'PipelineCharts|An error has ocurred when retrieving the pipelines data',
+    ),
+    [PARSE_FAILURE]: s__('PipelineCharts|There was an error parsing the data for the charts.'),
+    [DEFAULT]: s__('PipelineCharts|An unknown error occurred while processing CI/CD analytics.'),
   },
   get chartTitles() {
     const today = dateFormat(new Date(), CHART_DATE_FORMAT);
@@ -218,6 +269,9 @@ export default {
 </script>
 <template>
   <div>
+    <gl-alert v-if="showFailureAlert" :variant="failure.variant" @dismiss="hideAlert">
+      {{ failure.text }}
+    </gl-alert>
     <div class="gl-mb-3">
       <h3>{{ s__('PipelineCharts|CI / CD Analytics') }}</h3>
     </div>

@@ -15,23 +15,31 @@ localVue.use(VueApollo);
 
 describe('ProjectsPipelinesChartsApp', () => {
   let wrapper;
-  let fakeApollo;
 
-  beforeEach(() => {
+  function createMockApolloProvider() {
     const requestHandlers = [
       [getPipelineCountByStatus, jest.fn().mockResolvedValue(mockPipelineCount)],
       [getProjectPipelineStatistics, jest.fn().mockResolvedValue(mockPipelineStatistics)],
     ];
 
-    fakeApollo = createMockApollo(requestHandlers);
+    return createMockApollo(requestHandlers);
+  }
 
-    wrapper = shallowMount(Component, {
+  function createComponent(options = {}) {
+    const { fakeApollo } = options;
+
+    return shallowMount(Component, {
       provide: {
         projectPath,
       },
       localVue,
       apolloProvider: fakeApollo,
     });
+  }
+
+  beforeEach(() => {
+    const fakeApollo = createMockApolloProvider();
+    wrapper = createComponent({ fakeApollo });
   });
 
   afterEach(() => {
@@ -77,6 +85,8 @@ describe('ProjectsPipelinesChartsApp', () => {
           const chart = charts.at(i);
 
           expect(chart.exists()).toBe(true);
+          // TODO: Refactor this to use the mocked data instead of the vm data
+          // https://gitlab.com/gitlab-org/gitlab/-/issues/292085
           expect(chart.props('chartData')).toBe(wrapper.vm.areaCharts[i].data);
           expect(chart.text()).toBe(wrapper.vm.areaCharts[i].title);
         }

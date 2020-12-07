@@ -10,8 +10,11 @@ const apolloProvider = new VueApollo({
   defaultClient: createDefaultClient(),
 });
 
-export default () => {
-  const el = document.querySelector('#js-project-pipelines-charts-app');
+const mountPipelineChartsApp = el => {
+  // Not all of the values will be defined since some them will be
+  // empty depending on the value of the graphql_pipeline_analytics
+  // feature flag, once the rollout of the feature flag is completed
+  // the undefined values will be deleted
   const {
     countsFailed,
     countsSuccess,
@@ -32,13 +35,23 @@ export default () => {
     projectPath,
   } = el.dataset;
 
-  const parseAreaChartData = (labels, totals, success) => ({
-    labels: JSON.parse(labels),
-    totals: JSON.parse(totals),
-    success: JSON.parse(success),
-  });
+  const parseAreaChartData = (labels, totals, success) => {
+    let parsedData = {};
 
-  if (gon.features.graphqlPipelineAnalytics) {
+    try {
+      parsedData = {
+        labels: JSON.parse(labels),
+        totals: JSON.parse(totals),
+        success: JSON.parse(success),
+      };
+    } catch {
+      parsedData = {};
+    }
+
+    return parsedData;
+  };
+
+  if (gon?.features?.graphqlPipelineAnalytics) {
     return new Vue({
       el,
       name: 'ProjectPipelinesChartsApp',
@@ -55,7 +68,7 @@ export default () => {
 
   return new Vue({
     el,
-    name: 'ProjectPipelinesChartsApp',
+    name: 'ProjectPipelinesChartsAppLegacy',
     components: {
       ProjectPipelinesChartsLegacy,
     },
@@ -91,4 +104,9 @@ export default () => {
         },
       }),
   });
+};
+
+export default () => {
+  const el = document.querySelector('#js-project-pipelines-charts-app');
+  return !el ? {} : mountPipelineChartsApp(el);
 };
