@@ -30,7 +30,7 @@ import ProfileSelectorSummaryCell from './profile_selector/summary_cell.vue';
 import ScannerProfileSelector from './profile_selector/scanner_profile_selector.vue';
 import SiteProfileSelector from './profile_selector/site_profile_selector.vue';
 
-const createProfilesApolloOptions = (name, field, { fetchQuery, fetchError }) => ({
+const createProfilesApolloOptions = (name, { fetchQuery, fetchError }) => ({
   query: fetchQuery,
   variables() {
     return {
@@ -39,9 +39,6 @@ const createProfilesApolloOptions = (name, field, { fetchQuery, fetchError }) =>
   },
   update(data) {
     const edges = data?.project?.[name]?.edges ?? [];
-    if (edges.length === 1) {
-      this[field] = edges[0].node.id;
-    }
     return edges.map(({ node }) => node);
   },
   error(e) {
@@ -69,16 +66,8 @@ export default {
   },
   mixins: [glFeatureFlagsMixin()],
   apollo: {
-    scannerProfiles: createProfilesApolloOptions(
-      'scannerProfiles',
-      'selectedScannerProfileId',
-      SCANNER_PROFILES_QUERY,
-    ),
-    siteProfiles: createProfilesApolloOptions(
-      'siteProfiles',
-      'selectedSiteProfileId',
-      SITE_PROFILES_QUERY,
-    ),
+    scannerProfiles: createProfilesApolloOptions('scannerProfiles', SCANNER_PROFILES_QUERY),
+    siteProfiles: createProfilesApolloOptions('siteProfiles', SITE_PROFILES_QUERY),
   },
   props: {
     helpPagePath: {
@@ -115,8 +104,8 @@ export default {
     return {
       scannerProfiles: [],
       siteProfiles: [],
-      selectedScannerProfileId: null,
-      selectedSiteProfileId: null,
+      selectedScannerProfile: null,
+      selectedSiteProfile: null,
       loading: false,
       errorType: null,
       errors: [],
@@ -124,16 +113,6 @@ export default {
     };
   },
   computed: {
-    selectedScannerProfile() {
-      return this.selectedScannerProfileId
-        ? this.scannerProfiles.find(({ id }) => id === this.selectedScannerProfileId)
-        : null;
-    },
-    selectedSiteProfile() {
-      return this.selectedSiteProfileId
-        ? this.siteProfiles.find(({ id }) => id === this.selectedSiteProfileId)
-        : null;
-    },
     errorMessage() {
       return ERROR_MESSAGES[this.errorType] || null;
     },
@@ -259,37 +238,37 @@ export default {
     </template>
     <template v-else-if="!failedToLoadProfiles">
       <scanner-profile-selector
-        v-model="selectedScannerProfileId"
+        v-model="selectedScannerProfile"
         class="gl-mb-5"
         :profiles="scannerProfiles"
       >
-        <template v-if="selectedScannerProfile" #summary>
+        <template #summary="{ profile }">
           <div class="row">
             <profile-selector-summary-cell
               :class="{ 'gl-text-red-500': hasProfilesConflict }"
               :label="s__('DastProfiles|Scan mode')"
-              :value="$options.SCAN_TYPE_LABEL[selectedScannerProfile.scanType]"
+              :value="$options.SCAN_TYPE_LABEL[profile.scanType]"
             />
           </div>
           <div class="row">
             <profile-selector-summary-cell
               :label="s__('DastProfiles|Spider timeout')"
-              :value="n__('%d minute', '%d minutes', selectedScannerProfile.spiderTimeout)"
+              :value="n__('%d minute', '%d minutes', profile.spiderTimeout)"
             />
             <profile-selector-summary-cell
               :label="s__('DastProfiles|Target timeout')"
-              :value="n__('%d second', '%d seconds', selectedScannerProfile.targetTimeout)"
+              :value="n__('%d second', '%d seconds', profile.targetTimeout)"
             />
           </div>
           <div class="row">
             <profile-selector-summary-cell
               :label="s__('DastProfiles|AJAX spider')"
-              :value="selectedScannerProfile.useAjaxSpider ? __('On') : __('Off')"
+              :value="profile.useAjaxSpider ? __('On') : __('Off')"
             />
             <profile-selector-summary-cell
               :label="s__('DastProfiles|Debug messages')"
               :value="
-                selectedScannerProfile.showDebugMessages
+                profile.showDebugMessages
                   ? s__('DastProfiles|Show debug messages')
                   : s__('DastProfiles|Hide debug messages')
               "
@@ -297,17 +276,13 @@ export default {
           </div>
         </template>
       </scanner-profile-selector>
-      <site-profile-selector
-        v-model="selectedSiteProfileId"
-        class="gl-mb-5"
-        :profiles="siteProfiles"
-      >
-        <template v-if="selectedSiteProfile" #summary>
+      <site-profile-selector v-model="selectedSiteProfile" class="gl-mb-5" :profiles="siteProfiles">
+        <template #summary="{ profile }">
           <div class="row">
             <profile-selector-summary-cell
               :class="{ 'gl-text-red-500': hasProfilesConflict }"
               :label="s__('DastProfiles|Target URL')"
-              :value="selectedSiteProfile.targetUrl"
+              :value="profile.targetUrl"
             />
           </div>
         </template>

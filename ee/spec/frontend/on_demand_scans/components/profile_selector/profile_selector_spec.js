@@ -2,7 +2,7 @@ import { GlDropdownItem } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import { merge } from 'lodash';
 import OnDemandScansProfileSelector from 'ee/on_demand_scans/components/profile_selector/profile_selector.vue';
-import { scannerProfiles } from '../../mocks/mock_data';
+import { scannerProfiles } from '../../mock_data';
 
 describe('OnDemandScansProfileSelector', () => {
   let wrapper;
@@ -41,9 +41,11 @@ describe('OnDemandScansProfileSelector', () => {
           slots: {
             title: 'Section title',
             label: 'Use existing scanner profile',
-            summary: `<div>Profile's summary</div>`,
             'no-profiles': 'No profile yet',
             'new-profile': 'Create a new profile',
+          },
+          scopedSlots: {
+            summary: "<div>{{ props.profile.profileName }}'s summary</div>",
           },
         },
         options,
@@ -103,7 +105,7 @@ describe('OnDemandScansProfileSelector', () => {
     it('when a profile is selected, input event is emitted', async () => {
       await selectFirstProfile();
 
-      expect(wrapper.emitted('input')).toEqual([[scannerProfiles[0].id]]);
+      expect(wrapper.emitted('input')).toEqual([[scannerProfiles[0]]]);
     });
 
     it('shows dropdown items for each profile', () => {
@@ -128,7 +130,7 @@ describe('OnDemandScansProfileSelector', () => {
       createFullComponent({
         propsData: {
           profiles: scannerProfiles,
-          value: selectedProfile.id,
+          value: selectedProfile,
         },
       });
     });
@@ -137,7 +139,7 @@ describe('OnDemandScansProfileSelector', () => {
       const summary = findSelectedProfileSummary();
 
       expect(summary.exists()).toBe(true);
-      expect(summary.text()).toContain(`Profile's summary`);
+      expect(summary.text()).toContain(`${scannerProfiles[0].profileName}'s summary`);
     });
 
     it('displays item as checked', () => {
