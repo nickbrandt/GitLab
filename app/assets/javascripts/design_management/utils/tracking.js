@@ -1,5 +1,5 @@
 import Tracking from '~/tracking';
-import api from '~/api';
+import Api from '~/api';
 
 // Snowplow tracking constants
 const DESIGN_TRACKING_CONTEXT_SCHEMAS = {
@@ -55,5 +55,5 @@ export function trackDesignUpdate() {
  * Track "design detail" view via usage ping
  */
 export function usagePingDesignDetailView() {
-  api.trackRedisHllUserEvent(DESIGN_USAGE_PING_EVENT_TYPES.DESIGN_ACTION);
+  Api.trackRedisHllUserEvent(DESIGN_USAGE_PING_EVENT_TYPES.DESIGN_ACTION);
 }
