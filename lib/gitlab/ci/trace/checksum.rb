@@ -65,7 +65,9 @@ module Gitlab
         end
 
         def state_bytesize
-          strong_memoize(:state_crc32) { build.pending_state&.trace_bytesize }
+          strong_memoize(:state_bytesize) do
+            build.pending_state&.trace_bytesize
+          end
         end
 
         def trace_size
@@ -77,13 +79,18 @@ module Gitlab
         end
 
         def corrupted?
-          return false if valid? || state_bytesize.nil?
+          return false unless has_bytesize?
+          return false if valid?
 
           state_bytesize.to_i != trace_size.to_i
         end
 
         def chunks_count
           trace_chunks.to_a.size
+        end
+
+        def has_bytesize?
+          state_bytesize.present?
         end
 
         private
