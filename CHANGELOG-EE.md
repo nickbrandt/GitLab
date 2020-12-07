@@ -443,6 +443,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove bootstrap class in licensed user count. !45443
 
 
+## 13.4.7 (2020-12-07)
+
+### Security (1 change)
+
+- Cleanup todos for confidential epics that are no longer accessible by the user.
+
+
 ## 13.4.6 (2020-11-03)
 
 ### Fixed (1 change)
