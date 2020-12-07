@@ -15,17 +15,21 @@ that share a theme across projects and milestones.
 
 An epic's page contains the following tabs:
 
-- **Epics and Issues**: epics and issues added to this epic. [Multi-level epics](#multi-level-child-epics), and their issues, are shown in a tree view.
-  - Click the chevron (**>**) next to a parent epic to reveal the child epics and issues.
-  - Hover over the total counts to see a breakdown of open and closed items.
+- **Issues**: issues added to this epic.
+
+- **Epics and Issues**: epics and issues added to this epic.
+  Appears instead of the **Issues** tab if you have access to [multi-level epics](#multi-level-child-epics).
+  Child epics and their issues are shown in a tree view.
+
+  - To reveal the child epics and issues, select the chevron (**>**) next to a parent epic.
+  - To see a breakdown of open and closed items, hover over the total counts.
 
   NOTE:
-  The number provided here includes all epics associated with this project. The number includes epics for which users may not yet have permission.
+  The number provided here includes all epics associated with this project. The number includes
+  epics for which users may not yet have permission.
 
 - [**Roadmap**](#roadmap-in-epics): a roadmap view of child epics which have start and due dates.
-
-  NOTE:
-  Multi-level epics and Roadmap are available in GitLab Ultimate and GitLab.com Gold.
+  Appears if you have access to [multi-level epics](#multi-level-child-epics).
 
 ![epic view](img/epic_view_v13.0.png)
 
@@ -145,7 +149,7 @@ Because the epic's dates can inherit dates from its children, the start date and
 If the start date of a child epic on the lowest level changes, that becomes the earliest possible start date for its parent epic.
 The parent epic's start date then reflects this change and propagates upwards to the top epic.
 
-## Roadmap in epics
+## Roadmap in epics **(ULTIMATE)**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/7327) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.10.
 
