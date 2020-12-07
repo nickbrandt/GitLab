@@ -15,15 +15,17 @@ that share a theme across projects and milestones.
 
 An epic's page contains the following tabs:
 
-- **Epics and Issues**: epics and issues added to this epic. Child epics, and their issues, are
-  shown in a tree view.
+- **Epics and Issues**: epics and issues added to this epic. [Multi-level epics](#multi-level-child-epics), and their issues, are shown in a tree view.
   - Click the chevron (**>**) next to a parent epic to reveal the child epics and issues.
   - Hover over the total counts to see a breakdown of open and closed items.
 
   NOTE:
   The number provided here includes all epics associated with this project. The number includes epics for which users may not yet have permission.
 
-- **Roadmap**: a roadmap view of child epics which have start and due dates.
+- [**Roadmap**](#roadmap-in-epics): a roadmap view of child epics which have start and due dates.
+
+  NOTE:
+  Multi-level epics and Roadmap are available in GitLab Ultimate and GitLab.com Gold.
 
 ![epic view](img/epic_view_v13.0.png)
 
