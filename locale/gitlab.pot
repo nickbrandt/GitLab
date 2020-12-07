@@ -1253,6 +1253,9 @@ msgstr ""
 msgid "A merge request approval is required when the license compliance report contains a denied license."
 msgstr ""
 
+msgid "A merge request hasn't yet been merged"
+msgstr ""
+
 msgid "A new Auto DevOps pipeline has been created, go to %{pipelines_link_start}Pipelines page%{pipelines_link_end} for details"
 msgstr ""
 
@@ -27119,6 +27122,9 @@ msgid "The Advanced Search in GitLab is a powerful search service that saves you
 msgstr ""
 
 msgid "The CSV export will be created in the background. Once finished, it will be sent to %{strong_open}%{email}%{strong_close} in an attachment."
+msgstr ""
+
+msgid "The Compliance Dashboard gives you the ability to see a group's merge request activity by providing a high-level view for all projects in the group."
 msgstr ""
 
 msgid "The GitLab user to which the Jira user %{jiraDisplayName} will be mapped"
