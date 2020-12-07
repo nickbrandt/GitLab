@@ -187,6 +187,14 @@
   :weight: 1
   :idempotent:
   :tags: []
+- :name: cronjob:geo_verification_cron
+  :feature_category: :geo_replication
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: cronjob:historical_data
   :feature_category: :provision
   :has_external_dependencies:
@@ -508,6 +516,14 @@
   :idempotent:
   :tags: []
 - :name: geo:geo_verification
+  :feature_category: :geo_replication
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
+- :name: geo:geo_verification_batch
   :feature_category: :geo_replication
   :has_external_dependencies:
   :urgency: :low
