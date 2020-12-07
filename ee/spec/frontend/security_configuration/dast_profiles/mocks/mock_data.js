@@ -1,6 +1,6 @@
 export const siteProfiles = [
   {
-    id: 1,
+    id: 'gid://gitlab/DastSiteProfile/1',
     profileName: 'Profile 1',
     targetUrl: 'http://example-1.com',
     normalizedTargetUrl: 'http://example-1.com',
@@ -8,7 +8,7 @@ export const siteProfiles = [
     validationStatus: 'PENDING_VALIDATION',
   },
   {
-    id: 2,
+    id: 'gid://gitlab/DastSiteProfile/2',
     profileName: 'Profile 2',
     targetUrl: 'http://example-2.com',
     normalizedTargetUrl: 'http://example-2.com',
@@ -16,7 +16,7 @@ export const siteProfiles = [
     validationStatus: 'INPROGRESS_VALIDATION',
   },
   {
-    id: 3,
+    id: 'gid://gitlab/DastSiteProfile/3',
     profileName: 'Profile 3',
     targetUrl: 'http://example-2.com',
     normalizedTargetUrl: 'http://example-2.com',
@@ -24,12 +24,20 @@ export const siteProfiles = [
     validationStatus: 'PASSED_VALIDATION',
   },
   {
-    id: 4,
+    id: 'gid://gitlab/DastSiteProfile/4',
     profileName: 'Profile 4',
     targetUrl: 'http://example-3.com',
     normalizedTargetUrl: 'http://example-3.com',
     editPath: '/3/edit',
     validationStatus: 'FAILED_VALIDATION',
+  },
+  {
+    id: 'gid://gitlab/DastSiteProfile/5',
+    profileName: 'Profile 5',
+    targetUrl: 'http://example-5.com',
+    normalizedTargetUrl: 'http://example-5.com',
+    editPath: '/5/edit',
+    validationStatus: 'NONE',
   },
 ];
 
