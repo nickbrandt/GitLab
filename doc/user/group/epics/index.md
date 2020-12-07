@@ -16,7 +16,6 @@ that share a theme across projects and milestones.
 An epic's page contains the following tabs:
 
 - **Issues**: issues added to this epic.
-
 - **Epics and Issues**: epics and issues added to this epic.
   Appears instead of the **Issues** tab if you have access to [multi-level epics](#multi-level-child-epics).
   Child epics and their issues are shown in a tree view.
