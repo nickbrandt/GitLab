@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex';
-import { GlButton, GlModalDirective } from '@gitlab/ui';
+import { GlButton, GlModalDirective, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import eventHub from '../event_hub';
 import { integrationLevels } from '../constants';
@@ -28,9 +28,17 @@ export default {
     GlButton,
   },
   directives: {
-    'gl-modal': GlModalDirective,
+    GlModal: GlModalDirective,
+    SafeHtml,
   },
   mixins: [glFeatureFlagsMixin()],
+  props: {
+    helpHtml: {
+      type: String,
+      required: false,
+      default: '',
+    },
+  },
   computed: {
     ...mapGetters(['currentKey', 'propsSource', 'isDisabled']),
     ...mapState([
@@ -80,6 +88,9 @@ export default {
       this.fetchResetIntegration();
     },
   },
+  helpHtmlConfig: {
+    ADD_TAGS: ['use'], // to support icon SVGs
+  },
 };
 </script>
 
@@ -92,6 +103,10 @@ export default {
       :learn-more-path="propsSource.learnMorePath"
       @change="setOverride"
     />
+
+    <!-- helpHtml is trusted input -->
+    <div v-if="helpHtml" v-safe-html:[$options.helpHtmlConfig]="helpHtml"></div>
+
     <active-checkbox v-if="propsSource.showActive" :key="`${currentKey}-active-checkbox`" />
     <jira-trigger-fields
       v-if="isJira"
