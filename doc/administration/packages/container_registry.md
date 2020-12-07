@@ -468,7 +468,7 @@ you can pull from the Container Registry, but you cannot push.
    sudo aws --endpoint-url https://your-object-storage-backend.com s3 sync registry s3://mybucket
    ```
 
-   TIP: **Tip:**
+   NOTE:
    If you have a lot of data, you may be able to improve performance by
    [running parallel sync operations](https://aws.amazon.com/premiumsupport/knowledge-center/s3-improve-transfer-sync-command/).
 
