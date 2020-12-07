@@ -431,7 +431,7 @@ For Omnibus, this is fixed by [installing a custom CA in Omnibus GitLab](https:/
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-pages/-/merge_requests/392) in GitLab 13.7.
 
-DANGER: **Warning:**
+WARNING:
 These are advanced settings. The recommended default values are set inside GitLab Pages. You should
 change these settings only if absolutely necessary. Use extreme caution.
 
@@ -575,7 +575,7 @@ your main application server.
 
 To configure GitLab Pages on a separate server:
 
-DANGER: **Warning:**
+WARNING:
 The following procedure includes steps to back up and edit the
 `gitlab-secrets.json` file. This file contains secrets that control
 database encryption. Proceed with caution.
