@@ -1,5 +1,0 @@
----
-title: Fix uploader not returning 413 when artifact too large
-merge_request: 663
-author:
-type: fixed
