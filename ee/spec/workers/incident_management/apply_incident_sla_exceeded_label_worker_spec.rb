@@ -39,4 +39,15 @@ RSpec.describe IncidentManagement::ApplyIncidentSlaExceededLabelWorker do
     expect(event.action).to eq('add')
     expect(event.label).to eq(label)
   end
+
+  context 'for plain issues' do
+    before_all do
+      incident.update!(issue_type: 'issue')
+    end
+
+    it 'does not add a label', :aggregate_failures do
+      expect { subject }.not_to change { incident.labels.reload.count }
+      expect(incident.labels.reload).to be_empty
+    end
+  end
 end
