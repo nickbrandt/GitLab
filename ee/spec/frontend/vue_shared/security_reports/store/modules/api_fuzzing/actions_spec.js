@@ -19,8 +19,6 @@ const rootState = { vulnerabilityFeedbackPath, blobPath };
 const issue = {};
 let state;
 
-// See also the corresponding CE specs in
-// spec/frontend/vue_shared/security_reports/store/modules/sast/actions_spec.js
 describe('EE api fuzzing report actions', () => {
   beforeEach(() => {
     state = createState();

@@ -13,4 +13,5 @@ export default () => ({
   allIssues: [],
   baseReportOutofDate: false,
   hasBaseReport: false,
+  scans: [],
 });

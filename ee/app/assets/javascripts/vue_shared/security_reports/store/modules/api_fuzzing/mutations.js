@@ -5,11 +5,11 @@ import * as types from './mutation_types';
 
 export default {
   [types.SET_DIFF_ENDPOINT](state, path) {
-    Vue.set(state.paths, 'diffEndpoint', path);
+    state.paths.diffEndpoint = path;
   },
 
   [types.REQUEST_DIFF](state) {
-    Vue.set(state, 'isLoading', true);
+    state.isLoading = true;
   },
 
   [types.RECEIVE_DIFF_SUCCESS](state, { diff, enrichData }) {
@@ -18,13 +18,13 @@ export default {
     const scans = diff.scans || [];
     const hasBaseReport = Boolean(diff.base_report_created_at);
 
-    Vue.set(state, 'isLoading', false);
-    Vue.set(state, 'newIssues', added);
-    Vue.set(state, 'resolvedIssues', fixed);
-    Vue.set(state, 'allIssues', existing);
-    Vue.set(state, 'baseReportOutofDate', baseReportOutofDate);
-    Vue.set(state, 'hasBaseReport', hasBaseReport);
-    Vue.set(state, 'scans', scans);
+    state.isLoading = false;
+    state.newIssues = added;
+    state.resolvedIssues = fixed;
+    state.allIssues = existing;
+    state.baseReportOutofDate = baseReportOutofDate;
+    state.hasBaseReport = hasBaseReport;
+    state.scans = scans;
   },
 
   [types.RECEIVE_DIFF_ERROR](state) {

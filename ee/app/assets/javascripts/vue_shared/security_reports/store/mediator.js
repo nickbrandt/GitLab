@@ -8,7 +8,7 @@ export const updateIssueActionsMap = {
   dast: 'updateDastIssue',
   secret_detection: `${MODULE_SECRET_DETECTION}/updateVulnerability`,
   coverage_fuzzing: 'updateCoverageFuzzingIssue',
-  api_fuzzing: `${MODULE_API_FUZZING}/updateApiFuzzingIssue`,
+  api_fuzzing: `${MODULE_API_FUZZING}/updateVulnerability`,
 };
 
 export default function configureMediator(store) {
