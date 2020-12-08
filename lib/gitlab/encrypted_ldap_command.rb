@@ -85,7 +85,7 @@ module Gitlab
         <<~YAML
           # main:
           #   password: '123'
-          #   user_bn: 'gitlab-adm'
+          #   user_dn: 'gitlab-adm'
         YAML
       end
     end
