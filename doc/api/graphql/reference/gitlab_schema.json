@@ -30365,7 +30365,7 @@
               "deprecationReason": null
             },
             {
-              "name": "oncallRotations",
+              "name": "rotations",
               "description": "On-call rotations for the on-call schedule",
               "args": [
                 {
