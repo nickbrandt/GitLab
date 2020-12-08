@@ -7,16 +7,12 @@ class ScheduleSecuritySettingCreation < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   class Project < ActiveRecord::Base
-    self.table_name = 'projects'
-
     has_one :security_setting, class_name: 'ProjectSecuritySetting'
 
     scope :without_security_settings, -> { left_joins(:security_setting).where(project_security_settings: { project_id: nil }) }
   end
 
   class ProjectSecuritySetting < ActiveRecord::Base
-    self.table_name = 'project_security_settings'
-
     belongs_to :project, inverse_of: :security_setting
   end
 
@@ -29,8 +25,9 @@ class ScheduleSecuritySettingCreation < ActiveRecord::Migration[6.0]
       BackgroundMigrationWorker.perform_async([MIGRATION, project_ids])
     end
   end
+
+  # We're adding data so no need for rollback
+  def down
+  end
 end
 
-# We're adding data so no need for rollback
-def down
-end

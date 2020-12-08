@@ -22,11 +22,9 @@ module EE
 
         override :perform
         def perform(project_ids)
-          projects = Project.find(project_ids)
+          projects = Project.where(id: project_ids)
 
-          projects.each do |project|
-            project.security_setting || project.create_security_setting
-          end
+          projects.each(&:create_security_setting)
         end
       end
     end
