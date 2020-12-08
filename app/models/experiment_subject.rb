@@ -3,7 +3,7 @@
 class ExperimentSubject < ApplicationRecord
   include ::Gitlab::Experimentation::GroupTypes
 
-  belongs_to :experiment
+  belongs_to :experiment, inverse_of: :experiment_subjects
   belongs_to :user
   belongs_to :group
   belongs_to :project
