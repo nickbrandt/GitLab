@@ -3452,7 +3452,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
     end
   end
 
-  describe "#closed_without_fork?" do
+  describe "#closed_or_merged_without_fork?" do
     let(:project) { create(:project) }
     let(:forked_project) { fork_project(project) }
     let(:user) { create(:user) }
@@ -3466,14 +3466,33 @@ RSpec.describe MergeRequest, factory_default: :keep do
       end
 
       it "returns false if the fork exist" do
-        expect(closed_merge_request.closed_without_fork?).to be_falsey
+        expect(closed_merge_request.closed_or_merged_without_fork?).to be_falsey
       end
 
       it "returns true if the fork does not exist" do
         unlink_project.execute
         closed_merge_request.reload
 
-        expect(closed_merge_request.closed_without_fork?).to be_truthy
+        expect(closed_merge_request.closed_or_merged_without_fork?).to be_truthy
+      end
+    end
+
+    context "when the merge request was merged" do
+      let(:merged_merge_request) do
+        create(:merged_merge_request,
+          source_project: forked_project,
+          target_project: project)
+      end
+
+      it "returns false if the fork exist" do
+        expect(merged_merge_request.closed_or_merged_without_fork?).to be_falsey
+      end
+
+      it "returns true if the fork does not exist" do
+        unlink_project.execute
+        merged_merge_request.reload
+
+        expect(merged_merge_request.closed_or_merged_without_fork?).to be_truthy
       end
     end
 
@@ -3485,7 +3504,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
       end
 
       it "returns false" do
-        expect(open_merge_request.closed_without_fork?).to be_falsey
+        expect(open_merge_request.closed_or_merged_without_fork?).to be_falsey
       end
     end
   end
