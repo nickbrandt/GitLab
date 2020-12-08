@@ -466,6 +466,8 @@ export default {
         :pipeline-id="mr.pipeline.id"
         :project-id="mr.targetProjectId"
         :security-reports-docs-path="mr.securityReportsDocsPath"
+        :target-project-full-path="mr.targetProjectFullPath"
+        :mr-iid="mr.iid"
       />
 
       <grouped-test-reports-app
