@@ -79,15 +79,14 @@ You can authenticate using:
 
 #### Authenticate within CI/CD
 
-To work with the Dependency Proxy in [GitLab CI/CD](../../../ci/README.md), you can use
-`CI_REGISTRY_USER` and `CI_REGISTRY_PASSWORD`.
+To work with the Dependency Proxy in [GitLab CI/CD](../../../ci/README.md), you can use:
 
-```shell
-docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" gitlab.example.com
-```
+- `CI_DEPENDENCY_PROXY_USER`: A CI user for logging in to the Dependency Proxy.
+- `CI_DEPENDENCY_PROXY_PASSWORD`: A CI password for logging in to the Dependency Proxy.
+- `CI_DEPENDENCY_PROXY_SERVER`: The server for logging in to the Dependency Proxy.
+- `CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX`: The image prefix for pulling images through the Dependency Proxy.
 
-You can use other [predefined variables](../../../ci/variables/predefined_variables.md)
-to further generalize your CI script. For example:
+This script shows how to use these variables to log in and pull an image from the Dependency Proxy:
 
 ```yaml
 # .gitlab-ci.yml
@@ -99,9 +98,9 @@ dependency-proxy-pull-master:
   services:
     - docker:dind
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_SERVER_HOST":"$CI_SERVER_PORT"
+    - docker login -u "$CI_DEPENDENCY_PROXY_USER" -p "$CI_DEPENDENCY_PROXY_PASSWORD" "$CI_DEPENDENCY_PROXY_SERVER"
   script:
-    - docker pull "$CI_SERVER_HOST":"$CI_SERVER_PORT"/groupname/dependency_proxy/containers/alpine:latest
+    - docker pull "$CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX"/alpine:latest
 ```
 
 You can also use [custom environment variables](../../../ci/variables/README.md#custom-environment-variables) to store and access your personal access token or other valid credentials.
