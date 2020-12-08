@@ -355,7 +355,7 @@ applications.
 | `ROLLOUT_STATUS_DISABLED`               | From GitLab 12.0, used to disable rollout status check because it does not support all resource types, for example, `cronjob`. |
 | `STAGING_ENABLED`                       | From GitLab 10.8, used to define a [deploy policy for staging and production environments](#deploy-policy-for-staging-and-production-environments). |
 
-TIP: **Tip:**
+NOTE:
 After you set up your replica variables using a
 [project variable](../../ci/variables/README.md#gitlab-cicd-environment-variables),
 you can scale your application by redeploying it.
@@ -538,7 +538,7 @@ service:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ci-yml/-/merge_requests/160) in GitLab 10.8.
 
-TIP: **Tip:**
+NOTE:
 You can also set this inside your [project's settings](index.md#deployment-strategy).
 
 The normal behavior of Auto DevOps is to use continuous deployment, pushing
@@ -567,7 +567,7 @@ If you define `CANARY_ENABLED` with a non-empty value, then two manual jobs are 
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/5415) in GitLab 10.8.
 
-TIP: **Tip:**
+NOTE:
 You can also set this inside your [project's settings](index.md#deployment-strategy).
 
 When you're ready to deploy a new version of your app to production, you may want
@@ -624,7 +624,7 @@ removed in the future.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/7545) in GitLab 11.4.
 
-TIP: **Tip:**
+NOTE:
 You can also set this inside your [project's settings](index.md#deployment-strategy).
 
 This configuration is based on
