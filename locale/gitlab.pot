@@ -7725,6 +7725,9 @@ msgstr ""
 msgid "Copy branch name"
 msgstr ""
 
+msgid "Copy codes"
+msgstr ""
+
 msgid "Copy command"
 msgstr ""
 
@@ -20470,6 +20473,9 @@ msgstr ""
 msgid "Please convert %{linkStart}them to Git%{linkEnd}, and go through the %{linkToImportFlow} again."
 msgstr ""
 
+msgid "Please copy, download, or print your recovery codes before proceeding."
+msgstr ""
+
 msgid "Please create a password for your new account."
 msgstr ""
 
@@ -20753,6 +20759,9 @@ msgid "Previous unresolved discussion"
 msgstr ""
 
 msgid "Primary"
+msgstr ""
+
+msgid "Print codes"
 msgstr ""
 
 msgid "Prioritize"
@@ -25181,6 +25190,9 @@ msgid "Sherlock Transactions"
 msgstr ""
 
 msgid "Should you ever lose your phone or access to your one time password secret, each of these recovery codes can be used one time each to regain access to your account. Please save them in a safe place, or you %{b_start}will%{b_end} lose access to your account."
+msgstr ""
+
+msgid "Should you ever lose your phone or access to your one time password secret, each of these recovery codes can be used one time each to regain access to your account. Please save them in a safe place, or you %{boldStart}will%{boldEnd} lose access to your account."
 msgstr ""
 
 msgid "Show all activity"
