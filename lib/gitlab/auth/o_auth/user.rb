@@ -9,6 +9,16 @@ module Gitlab
   module Auth
     module OAuth
       class User
+        class << self
+          # rubocop: disable CodeReuse/ActiveRecord
+          def find_by_uid_and_provider(uid, provider)
+            identity = ::Identity.with_extern_uid(provider, uid).take
+
+            identity && identity.user
+          end
+          # rubocop: enable CodeReuse/ActiveRecord
+        end
+
         SignupDisabledError = Class.new(StandardError)
         SigninDisabledForProviderError = Class.new(StandardError)
 
@@ -190,12 +200,9 @@ module Gitlab
           @auth_hash = AuthHash.new(auth_hash)
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def find_by_uid_and_provider
-          identity = Identity.with_extern_uid(auth_hash.provider, auth_hash.uid).take
-          identity&.user
+          self.class.find_by_uid_and_provider(auth_hash.uid, auth_hash.provider)
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         def build_new_user
           user_params = user_attributes.merge(skip_confirmation: true)
