@@ -39,7 +39,7 @@ describe('WeeksPresetMixin', () => {
           timeframeItem: mockTimeframeWeeks[1],
         });
 
-        expect(wrapper.vm.hasStartDateForWeek()).toBe(true);
+        expect(wrapper.vm.hasStartDateForWeek(mockTimeframeWeeks[1])).toBe(true);
       });
 
       it('returns false when Epic.startDate does not fall within timeframeItem', () => {
@@ -48,7 +48,7 @@ describe('WeeksPresetMixin', () => {
           timeframeItem: mockTimeframeWeeks[1],
         });
 
-        expect(wrapper.vm.hasStartDateForWeek()).toBe(false);
+        expect(wrapper.vm.hasStartDateForWeek(mockTimeframeWeeks[1])).toBe(false);
       });
     });
 

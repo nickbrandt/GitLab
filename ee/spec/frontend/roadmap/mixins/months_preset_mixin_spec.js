@@ -39,7 +39,7 @@ describe('MonthsPresetMixin', () => {
           timeframeItem: mockTimeframeMonths[1],
         });
 
-        expect(wrapper.vm.hasStartDateForMonth()).toBe(true);
+        expect(wrapper.vm.hasStartDateForMonth(mockTimeframeMonths[1])).toBe(true);
       });
 
       it('returns false when Epic.startDate does not fall within timeframeItem', () => {
@@ -48,7 +48,7 @@ describe('MonthsPresetMixin', () => {
           timeframeItem: mockTimeframeMonths[1],
         });
 
-        expect(wrapper.vm.hasStartDateForMonth()).toBe(false);
+        expect(wrapper.vm.hasStartDateForMonth(mockTimeframeMonths[1])).toBe(false);
       });
     });
 

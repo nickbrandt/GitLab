@@ -39,7 +39,7 @@ describe('QuartersPresetMixin', () => {
           timeframeItem: mockTimeframeQuarters[1],
         });
 
-        expect(wrapper.vm.hasStartDateForQuarter()).toBe(true);
+        expect(wrapper.vm.hasStartDateForQuarter(mockTimeframeQuarters[1])).toBe(true);
       });
 
       it('returns false when Epic.startDate does not fall within timeframeItem', () => {
@@ -48,7 +48,7 @@ describe('QuartersPresetMixin', () => {
           timeframeItem: mockTimeframeQuarters[1],
         });
 
-        expect(wrapper.vm.hasStartDateForQuarter()).toBe(false);
+        expect(wrapper.vm.hasStartDateForQuarter(mockTimeframeQuarters[1])).toBe(false);
       });
     });
 
