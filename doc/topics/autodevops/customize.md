@@ -615,7 +615,7 @@ With `INCREMENTAL_ROLLOUT_MODE` set to `manual` and with `STAGING_ENABLED`
 
 ![Rollout and staging enabled](img/rollout_staging_enabled.png)
 
-WARNING: **Deprecation:**
+WARNING:
 Before GitLab 11.4, the presence of the `INCREMENTAL_ROLLOUT_ENABLED` environment
 variable enabled this feature. This configuration is deprecated, and is scheduled to be
 removed in the future.
