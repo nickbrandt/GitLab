@@ -10848,9 +10848,6 @@ msgstr ""
 msgid "Epics|Leave empty to inherit from milestone dates"
 msgstr ""
 
-msgid "Epics|More information"
-msgstr ""
-
 msgid "Epics|Remove epic"
 msgstr ""
 
@@ -30597,6 +30594,9 @@ msgid "Waiting for performance data"
 msgstr ""
 
 msgid "Want to see the data? Please ask an administrator for access."
+msgstr ""
+
+msgid "Warning"
 msgstr ""
 
 msgid "Warning:"
