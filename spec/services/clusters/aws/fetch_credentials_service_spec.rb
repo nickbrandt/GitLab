@@ -109,7 +109,26 @@ RSpec.describe Clusters::Aws::FetchCredentialsService do
         let(:session_name) { "gitlab-eks-cluster-#{provider.cluster_id}-user-#{user.id}" }
         let(:session_policy) { nil }
 
-        it 'returns credentials' do
+        it 'returns credentials', :aggregate_failures do
+          expect(subject.access_key_id).to be_present
+          expect(subject.secret_access_key).to be_present
+          expect(subject.session_token).to be_present
+        end
+      end
+
+      context 'provider is not specifed' do
+        let(:provider) { nil }
+        let(:region) { provision_role.region }
+        let(:session_name) { "gitlab-eks-autofill-user-#{user.id}" }
+        let(:session_policy) { 'policy-document' }
+
+        before do
+          stub_file_read(Rails.root.join('vendor', 'aws', 'iam', 'eks_cluster_read_only_policy.json'), content: session_policy)
+        end
+
+        subject { described_class.new(provision_role, provider: provider).execute }
+
+        it 'returns credentials', :aggregate_failures do
           expect(subject.access_key_id).to be_present
           expect(subject.secret_access_key).to be_present
           expect(subject.session_token).to be_present
