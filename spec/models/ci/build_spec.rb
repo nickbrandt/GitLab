@@ -4823,4 +4823,59 @@ RSpec.describe Ci::Build do
       it { is_expected.to eq false }
     end
   end
+
+  describe '#conditionally_allow_failure!' do
+    let_it_be_with_refind(:job) do
+      create(:ci_build, pipeline: pipeline)
+    end
+
+    subject(:conditionally_allow_failure) do
+      job.conditionally_allow_failure!(1)
+    end
+
+    context 'when exit_codes are not defined' do
+      it 'does not change allow_failure' do
+        expect { conditionally_allow_failure }
+          .not_to change { job.reload.allow_failure }
+      end
+    end
+
+    context 'when exit_codes are defined but do not match' do
+      before do
+        job.options[:allow_failure_criteria] = { exit_codes: [2, 3, 4] }
+        job.save!
+      end
+
+      it 'does not change allow_failure' do
+        expect { conditionally_allow_failure }
+          .not_to change { job.reload.allow_failure }
+      end
+    end
+
+    context 'when exit_codes are defined and match' do
+      before do
+        job.options[:allow_failure_criteria] = { exit_codes: [1, 2, 3] }
+        job.save!
+      end
+
+      it 'does change allow_failure' do
+        expect { conditionally_allow_failure }
+          .to change { job.reload.allow_failure }
+      end
+    end
+
+    context 'when ci_allow_failure_with_exit_codes is disabled' do
+      before do
+        stub_feature_flags(ci_allow_failure_with_exit_codes: false)
+
+        job.options[:allow_failure_criteria] = { exit_codes: [1, 2, 3] }
+        job.save!
+      end
+
+      it 'does not change allow_failure' do
+        expect { conditionally_allow_failure }
+          .not_to change { job.reload.allow_failure }
+      end
+    end
+  end
 end
