@@ -118,7 +118,7 @@ class User < ApplicationRecord
 
   # Groups
   has_many :members
-  has_many :group_members, -> { where(requested_at: nil).where("access_level >= ?", Gitlab::Access::GUEST) }, source: 'GroupMember'
+  has_many :group_members, -> { where(requested_at: nil).minimum_access_level_of(Gitlab::Access::GUEST) }, source: 'GroupMember'
   has_many :groups, through: :group_members
   has_many :owned_groups, -> { where(members: { access_level: Gitlab::Access::OWNER }) }, through: :group_members, source: :group
   has_many :maintainers_groups, -> { where(members: { access_level: Gitlab::Access::MAINTAINER }) }, through: :group_members, source: :group
@@ -1261,6 +1261,13 @@ class User < ApplicationRecord
     @solo_owned_groups ||= owned_groups.includes(:owners).select do |group|
       group.owners == [self]
     end
+  end
+
+  def member_of?(group, min_access_level: ::Gitlab::Access::GUEST)
+    group_members
+      .where(group: group)
+      .minimum_access_level_of(min_access_level)
+      .any?
   end
 
   def with_defaults

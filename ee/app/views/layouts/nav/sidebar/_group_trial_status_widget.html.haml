@@ -1,0 +1,18 @@
+- return unless should_show_trial_status_widget?(group)
+- record_trial_status_widget_experiment_participant(group)
+
+= nav_link(path: 'somewhere') do
+  = link_to group_billings_path(group), title: _('Upgrade your trial') do
+    .gl-display-flex.gl-flex-direction-column.gl-align-items-stretch
+      %span.gl-display-flex.gl-align-items-center
+        %span.nav-icon-container.svg-container
+          = image_tag 'illustrations/golden_tanuki.svg', class: 'svg', size: 16
+        %span.nav-item-name
+          -# Need to inject the correct number of days remaining on their trial
+          = _('Gold trial – 20 days left')
+      %span.gl-display-flex.gl-align-items-stretch.gl-mt-4
+        -# Need to put the correct percentage value for how many days are left vs. how long their trial is
+        -# E.g. all instances of `33.33` below need to be changed
+        -# (20 days left on a 30 day trial means we're one-third of the way through)
+        .progress.gl-flex-grow-1{ value: 33.33 }
+          .progress-bar{ role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': 33.33, style: 'width: 33.33%' }

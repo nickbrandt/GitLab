@@ -14,7 +14,21 @@ class ExperimentSubject < ApplicationRecord
 
   enum variant: { GROUP_CONTROL => 0, GROUP_EXPERIMENTAL => 1 }
 
+  class << self
+    def find_by_subject(subject)
+      find_by(parameterize_subject(subject))
+    end
+
+    def find_or_initialize_by_subject(subject)
+      find_or_initialize_by(parameterize_subject(subject))
+    end
+  end
+
   private
+
+  def self.parameterize_subject(subject)
+    { subject.class.model_name.param_key => subject }
+  end
 
   def must_have_one_subject_present
     if non_nil_subjects.length != 1

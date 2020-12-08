@@ -239,6 +239,24 @@ module EE
     end
 
     # Returns true if the user is a Reporter or higher on any namespace
+    # currently on a paid plan which is not currently in a trial
+    # NOTE: this query is currently 5x slower than those for `any_namespace_without_trial?` and `has_paid_namespace?`. Adding an index for `namespaces.trial_ends_on` speeds it up by 35% (from 5.3ms => 3.4ms).
+    def has_non_trial_paid_namespace?
+      scope = ::Namespace
+        .from("(#{namespace_union_for_reporter_developer_maintainer_owned}) #{::Namespace.table_name}")
+        .include_gitlab_subscription
+        .where(gitlab_subscriptions: { hosted_plan: ::Plan.where(name: ::Plan::PAID_HOSTED_PLANS) })
+      scope = scope
+        .merge(
+          scope.where(gitlab_subscriptions: { trial_ends_on: nil })
+          .or(
+            scope.where(::GitlabSubscription.arel_table[:trial_ends_on].lt(Time.current))
+          )
+        )
+      scope.any?
+    end
+
+    # Returns true if the user is a Reporter or higher on any namespace
     # currently on a paid plan
     def has_paid_namespace?
       ::Namespace

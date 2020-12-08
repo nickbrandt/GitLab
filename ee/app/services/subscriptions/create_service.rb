@@ -24,7 +24,12 @@ module Subscriptions
 
       response = client.create_subscription(create_subscription_params, billing_email, token)
 
-      NamespaceOnboardingAction.create_action(@group, :subscription_created) if response[:success]
+      if response[:success]
+        NamespaceOnboardingAction.create_action(@group, :subscription_created)
+
+        # TODO: Add a hook here to record a conversion event for the experiment
+        # ALSO: If they convert to paid via the CustomersDot app directly, those must get synced into this app at some point. Find that place and add an experiment conversion event there as well.
+      end
 
       response
     end

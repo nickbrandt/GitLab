@@ -85,16 +85,18 @@ class Member < ApplicationRecord
   scope :not_expired, -> (today = Date.current) { where(arel_table[:expires_at].gt(today).or(arel_table[:expires_at].eq(nil))) }
   scope :last_ten_days_excluding_today, -> (today = Date.current) { where(created_at: (today - 10).beginning_of_day..(today - 1).end_of_day) }
 
-  scope :has_access, -> { active.where('access_level > 0') }
+  scope :has_access, -> { active.access_level_greater_than(0) }
 
   scope :guests, -> { active.where(access_level: GUEST) }
   scope :reporters, -> { active.where(access_level: REPORTER) }
   scope :developers, -> { active.where(access_level: DEVELOPER) }
   scope :maintainers, -> { active.where(access_level: MAINTAINER) }
-  scope :non_guests, -> { where('members.access_level > ?', GUEST) }
-  scope :non_minimal_access, -> { where('members.access_level > ?', MINIMAL_ACCESS) }
   scope :owners, -> { active.where(access_level: OWNER) }
   scope :owners_and_maintainers, -> { active.where(access_level: [OWNER, MAINTAINER]) }
+  scope :non_guests, -> { access_level_greater_than(GUEST) }
+  scope :non_minimal_access, -> { access_level_greater_than(MINIMAL_ACCESS) }
+  scope :access_level_greater_than, -> (access_level) { unscope(where: :access_level).where(arel_table[:access_level].gt(access_level)) }
+  scope :minimum_access_level_of, -> (access_level) { unscope(where: :access_level).where(arel_table[:access_level].gteq(access_level)) }
   scope :with_user, -> (user) { where(user: user) }
   scope :with_user_by_email, -> (email) { left_join_users.where(users: { email: email } ) }
 
