@@ -204,8 +204,8 @@ module Gitlab
           self.class.find_by_uid_and_provider(auth_hash.uid, auth_hash.provider)
         end
 
-        def build_new_user
-          user_params = user_attributes.merge(skip_confirmation: true)
+        def build_new_user(skip_confirmation: true)
+          user_params = user_attributes.merge(skip_confirmation: skip_confirmation)
           Users::BuildService.new(nil, user_params).execute(skip_authorization: true)
         end
 
