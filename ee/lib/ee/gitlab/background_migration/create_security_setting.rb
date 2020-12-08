@@ -22,7 +22,6 @@ module EE
 
         override :perform
         def perform(project_ids)
-          projects = Project.left_joins(:security_setting).where(project_security_settings: { project_id: nil })
           projects = Project.find(project_ids)
 
           projects.each do |project|
