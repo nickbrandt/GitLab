@@ -10524,6 +10524,9 @@ msgstr ""
 msgid "End Time"
 msgstr ""
 
+msgid "Ends at %{endsAt}"
+msgstr ""
+
 msgid "Ends at (UTC)"
 msgstr ""
 
@@ -19241,7 +19244,13 @@ msgstr ""
 msgid "OnCallSchedules|Create on-call schedules  in GitLab"
 msgstr ""
 
+msgid "OnCallSchedules|Delete rotation"
+msgstr ""
+
 msgid "OnCallSchedules|Delete schedule"
+msgstr ""
+
+msgid "OnCallSchedules|Edit rotation"
 msgstr ""
 
 msgid "OnCallSchedules|Edit schedule"
@@ -26268,6 +26277,9 @@ msgid "Starting..."
 msgstr ""
 
 msgid "Starts %{startsIn}"
+msgstr ""
+
+msgid "Starts at %{startsAt}"
 msgstr ""
 
 msgid "Starts at (UTC)"
