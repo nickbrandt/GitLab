@@ -17,7 +17,6 @@ module EE
       #
       # name - The name of the licensed feature
       # obj  - the object to check the licensed feature on (project, namespace)
-      override :push_licensed_feature
       def push_licensed_feature(name, obj = nil)
         enabled = if obj
                     obj.feature_available?(name)
