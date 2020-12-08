@@ -1,8 +1,11 @@
+import { omit } from 'lodash';
+import { createWrapper } from '@vue/test-utils';
 import initVulnerabilityReport from 'ee/security_dashboard/first_class_init';
+import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import { TEST_HOST } from 'helpers/test_constants';
 
-const EMPTY_DIV = document.createElement('div');
+const isEmptyDiv = el => !el.children.length && el.matches('div');
 
 const TEST_DATASET = {
   dashboardDocumentation: '/test/dashboard_page',
@@ -19,8 +22,15 @@ const TEST_DATASET = {
   vulnerabilitiesExportEndpoint: '/test/export-vulnerabilities',
 };
 
+const PROJECT_LEVEL_TEST_DATASET = {
+  autoFixDocumentation: '/test/auto_fix_page',
+  pipelineSecurityBuildsFailedCount: 1,
+  pipelineSecurityBuildsFailedPath: '/test/faild_pipeline_02',
+  projectFullPath: '/test/project',
+};
+
 describe('Vulnerability Report', () => {
-  let vm;
+  let wrapper;
   let root;
 
   beforeEach(() => {
@@ -33,10 +43,10 @@ describe('Vulnerability Report', () => {
   });
 
   afterEach(() => {
-    if (vm) {
-      vm.$destroy();
+    if (wrapper) {
+      wrapper.vm.$destroy();
     }
-    vm = null;
+    wrapper = null;
     root.remove();
   });
 
@@ -44,34 +54,40 @@ describe('Vulnerability Report', () => {
     const el = document.createElement('div');
     Object.assign(el.dataset, { ...TEST_DATASET, ...data });
     root.appendChild(el);
-    vm = initVulnerabilityReport(el, type);
-  };
-
-  const createEmptyComponent = () => {
-    vm = initVulnerabilityReport(null, null);
+    wrapper = createWrapper(initVulnerabilityReport(el, type));
   };
 
   describe('default states', () => {
-    it('sets up project-level', () => {
-      createComponent({
-        data: {
-          autoFixDocumentation: '/test/auto_fix_page',
-          pipelineSecurityBuildsFailedCount: 1,
-          pipelineSecurityBuildsFailedPath: '/test/faild_pipeline_02',
-          projectFullPath: '/test/project',
-        },
-        type: DASHBOARD_TYPES.PROJECT,
-      });
+    describe('project-level', () => {
+      describe('without a pipeline-id', () => {
+        beforeEach(() => {
+          const dataWithoutPipelineId = omit(PROJECT_LEVEL_TEST_DATASET, 'pipelineId');
+          createComponent({
+            data: dataWithoutPipelineId,
+            type: DASHBOARD_TYPES.PROJECT,
+          });
+        });
 
-      // These assertions will be expanded in issue #220290
-      expect(root).not.toStrictEqual(EMPTY_DIV);
+        it('matches snapshot', () => {
+          expect(root).toMatchSnapshot();
+        });
+
+        it('shows that reports are not configured and provides a link to the help page', () => {
+          const reportsNotConfigured = wrapper.find(ReportsNotConfigured);
+
+          expect(reportsNotConfigured.exists()).toBe(true);
+          expect(reportsNotConfigured.props()).toMatchObject({
+            helpPath: TEST_DATASET.securityDashboardHelpPath,
+          });
+        });
+      });
     });
 
     it('sets up group-level', () => {
       createComponent({ data: { groupFullPath: '/test/' }, type: DASHBOARD_TYPES.GROUP });
 
       // These assertions will be expanded in issue #220290
-      expect(root).not.toStrictEqual(EMPTY_DIV);
+      expect(isEmptyDiv(root)).toBe(false);
     });
 
     it('sets up instance-level', () => {
@@ -81,15 +97,16 @@ describe('Vulnerability Report', () => {
       });
 
       // These assertions will be expanded in issue #220290
-      expect(root).not.toStrictEqual(EMPTY_DIV);
+      expect(isEmptyDiv(root)).toBe(false);
     });
   });
 
   describe('error states', () => {
     it('does not have an element', () => {
-      createEmptyComponent();
+      const vm = initVulnerabilityReport(null, null);
 
-      expect(root).toStrictEqual(EMPTY_DIV);
+      expect(isEmptyDiv(root)).toBe(true);
+      expect(vm).toBe(null);
     });
 
     it('has unavailable pages', () => {
