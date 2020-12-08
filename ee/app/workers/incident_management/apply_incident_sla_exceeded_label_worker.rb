@@ -9,7 +9,7 @@ module IncidentManagement
 
     def perform(incident_id)
       @incident = Issue.find_by_id(incident_id)
-      return unless incident&.supports_severity?
+      return unless incident&.sla_available?
 
       @project = incident&.project
       return unless project
