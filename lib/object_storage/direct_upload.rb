@@ -206,11 +206,7 @@ module ObjectStorage
     end
 
     def requires_multipart_upload?
-      config.aws? && !has_length && can_use_multipart_upload? && !use_workhorse_s3_client?
-    end
-
-    def can_use_multipart_upload?
-      (maximum_size == 0) || (maximum_size > MINIMUM_MULTIPART_SIZE)
+      config.aws? && !has_length && !use_workhorse_s3_client?
     end
 
     def upload_id

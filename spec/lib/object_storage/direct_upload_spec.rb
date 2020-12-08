@@ -359,8 +359,12 @@ RSpec.describe ObjectStorage::DirectUpload do
           context 'when maximum upload size is < 5 MB' do
             let(:maximum_size) { 1024 }
 
-            it 'does not include multipart URLs' do
-              expect(subject).not_to include(:MultipartUpload)
+            it 'returns only 1 part' do
+              expect(subject[:MultipartUpload][:PartURLs].length).to eq(1)
+            end
+
+            it 'part size is minimum, 5MB' do
+              expect(subject[:MultipartUpload][:PartSize]).to eq(5.megabyte)
             end
           end
 
