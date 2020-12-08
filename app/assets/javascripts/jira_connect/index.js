@@ -7,7 +7,7 @@ const store = {
     error: '',
   },
   setErrorMessage(errorMessage) {
-    store.state.error = errorMessage;
+    this.state.error = errorMessage;
   },
 };
 
@@ -23,7 +23,6 @@ const initJiraFormHandlers = () => {
     const { responseJSON: { error = fallbackErrorMessage } = {} } = res || {};
 
     store.setErrorMessage(error);
-
     // eslint-disable-next-line no-alert
     alert(error);
   };
