@@ -5443,6 +5443,11 @@ type DastSiteValidation {
   id: DastSiteValidationID!
 
   """
+  Normalized URL of the target to be validated
+  """
+  normalizedTargetUrl: String
+
+  """
   Status of the site validation
   """
   status: DastSiteProfileValidationStatusEnum!
