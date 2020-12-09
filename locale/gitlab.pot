@@ -26234,6 +26234,9 @@ msgstr ""
 msgid "StaticSiteEditor|An error occurred while submitting your changes."
 msgstr ""
 
+msgid "StaticSiteEditor|Automatic formatting changes"
+msgstr ""
+
 msgid "StaticSiteEditor|Branch could not be created."
 msgstr ""
 
@@ -26250,6 +26253,9 @@ msgid "StaticSiteEditor|Creating your merge request"
 msgstr ""
 
 msgid "StaticSiteEditor|Incompatible file content"
+msgstr ""
+
+msgid "StaticSiteEditor|Markdown formatting preferences introduced by the Static Site Editor"
 msgstr ""
 
 msgid "StaticSiteEditor|Return to site"
