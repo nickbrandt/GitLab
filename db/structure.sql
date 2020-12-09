@@ -22275,6 +22275,8 @@ CREATE INDEX index_projects_on_creator_id_and_created_at_and_id ON projects USIN
 
 CREATE INDEX index_projects_on_creator_id_and_id ON projects USING btree (creator_id, id);
 
+CREATE INDEX index_projects_on_creator_id_import_type_and_created_at_partial ON projects USING btree (creator_id, import_type, created_at) WHERE (import_type IS NOT NULL);
+
 CREATE INDEX index_projects_on_description_trigram ON projects USING gin (description gin_trgm_ops);
 
 CREATE INDEX index_projects_on_id_and_archived_and_pending_delete ON projects USING btree (id) WHERE ((archived = false) AND (pending_delete = false));
