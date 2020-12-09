@@ -36,8 +36,10 @@ export const DEVOPS_ADOPTION_STRINGS = {
     button: s__('DevopsAdoption|Add new segment'),
   },
   modal: {
-    title: s__('DevopsAdoption|New segment'),
-    button: s__('DevopsAdoption|Create new segment'),
+    addingTitle: s__('DevopsAdoption|New segment'),
+    editingTitle: s__('DevopsAdoption|Edit segment'),
+    addingButton: s__('DevopsAdoption|Create new segment'),
+    editingButton: s__('DevopsAdoption|Save changes'),
     cancel: __('Cancel'),
     namePlaceholder: s__('DevopsAdoption|My segment'),
     nameLabel: s__('DevopsAdoption|Name'),
@@ -46,6 +48,7 @@ export const DEVOPS_ADOPTION_STRINGS = {
     error: s__('DevopsAdoption|An error occured while saving the segment. Please try again.'),
   },
   table: {
+    editButton: s__('DevopsAdoption|Edit segment'),
     deleteButton: s__('DevopsAdoption|Delete segment'),
   },
   deleteModal: {
