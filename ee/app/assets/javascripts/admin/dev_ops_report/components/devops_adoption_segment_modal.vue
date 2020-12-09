@@ -7,9 +7,10 @@ import {
   GlSprintf,
   GlAlert,
 } from '@gitlab/ui';
-import { convertToGraphQLIds, TYPE_GROUP } from '~/graphql_shared/utils';
+import { getIdFromGraphQLId, convertToGraphQLIds, TYPE_GROUP } from '~/graphql_shared/utils';
 import * as Sentry from '~/sentry/wrapper';
 import createDevopsAdoptionSegmentMutation from '../graphql/mutations/create_devops_adoption_segment.mutation.graphql';
+import updateDevopsAdoptionSegmentMutation from '../graphql/mutations/update_devops_adoption_segment.mutation.graphql';
 import { DEVOPS_ADOPTION_STRINGS, DEVOPS_ADOPTION_SEGMENT_MODAL_ID } from '../constants';
 import { addSegmentToCache } from '../utils/cache_updates';
 
@@ -24,8 +25,8 @@ export default {
     GlAlert,
   },
   props: {
-    segmentId: {
-      type: String,
+    segment: {
+      type: Object,
       required: false,
       default: null,
     },
@@ -37,8 +38,8 @@ export default {
   i18n: DEVOPS_ADOPTION_STRINGS.modal,
   data() {
     return {
-      name: '',
-      checkboxValues: [],
+      name: this.segment?.name || '',
+      checkboxValues: this.segment ? this.checkboxValuesFromSegment() : [],
       loading: false,
       errors: [],
     };
@@ -55,14 +56,17 @@ export default {
     },
     primaryOptions() {
       return {
-        text: this.$options.i18n.button,
-        attributes: [
-          {
-            variant: 'info',
-            loading: this.loading,
-            disabled: !this.canSubmit,
-          },
-        ],
+        button: {
+          text: this.segment ? this.$options.i18n.editingButton : this.$options.i18n.addingButton,
+          attributes: [
+            {
+              variant: 'info',
+              loading: this.loading,
+              disabled: !this.canSubmit,
+            },
+          ],
+        },
+        callback: this.segment ? this.updateSegment : this.createSegment,
       };
     },
     canSubmit() {
@@ -70,6 +74,9 @@ export default {
     },
     displayError() {
       return this.errors[0];
+    },
+    modalTitle() {
+      return this.segment ? this.$options.i18n.editingTitle : this.$options.i18n.addingTitle;
     },
   },
   methods: {
@@ -98,10 +105,35 @@ export default {
         if (errors.length) {
           this.errors = errors;
         } else {
-          this.name = '';
-          this.checkboxValues = [];
+          this.closeModal();
+        }
+      } catch (error) {
+        this.errors.push(this.$options.i18n.error);
+        Sentry.captureException(error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateSegment() {
+      try {
+        this.loading = true;
+        const {
+          data: {
+            updateDevopsAdoptionSegment: { errors },
+          },
+        } = await this.$apollo.mutate({
+          mutation: updateDevopsAdoptionSegmentMutation,
+          variables: {
+            id: this.segment.id,
+            name: this.name,
+            groupIds: convertToGraphQLIds(TYPE_GROUP, this.checkboxValues),
+          },
+        });
 
-          this.$refs.modal.hide();
+        if (errors.length) {
+          this.errors = errors;
+        } else {
+          this.closeModal();
         }
       } catch (error) {
         this.errors.push(this.$options.i18n.error);
@@ -113,6 +145,12 @@ export default {
     clearErrors() {
       this.errors = [];
     },
+    closeModal() {
+      this.$refs.modal.hide();
+    },
+    checkboxValuesFromSegment() {
+      return this.segment.groups.map(({ id }) => getIdFromGraphQLId(id));
+    },
   },
   devopsSegmentModalId: DEVOPS_ADOPTION_SEGMENT_MODAL_ID,
 };
@@ -121,12 +159,12 @@ export default {
   <gl-modal
     ref="modal"
     :modal-id="$options.devopsSegmentModalId"
-    :title="$options.i18n.title"
+    :title="modalTitle"
     size="sm"
     scrollable
-    :action-primary="primaryOptions"
+    :action-primary="primaryOptions.button"
     :action-cancel="cancelOptions"
-    @primary.prevent="createSegment"
+    @primary.prevent="primaryOptions.callback"
   >
     <gl-alert v-if="errors.length" variant="danger" class="gl-mb-3" @dismiss="clearErrors">
       {{ displayError }}
