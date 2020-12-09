@@ -24,11 +24,14 @@ export default {
    * and the name of the file that is edited.
    *
    * @param {Object} opts
-   * @param {String} opts.projectPath
-   * @param {String} opts.ref
-   * @param {String} opts.fileName - CI config file name, should match the "file-name" used in the editor.
+   * @param {String} opts.projectPath - Namespace and project in the form `namespace/project`
+   * @param {String?} opts.ref
    */
-  registerCiSchema({ projectPath, ref = 'master', fileName = '.gitlab-ci.yml' }) {
+  registerCiSchema({ projectPath, ref = 'master' }) {
+    // TODO Check syntax
+    const fileName = this.getModel()
+      .uri.path.split('/')
+      .pop();
     registerSchema({
       uri: getCiSchemaUri({ projectPath, ref }),
       fileMatch: [fileName],

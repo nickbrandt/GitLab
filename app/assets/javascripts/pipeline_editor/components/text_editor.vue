@@ -22,10 +22,10 @@ export default {
     },
   },
   methods: {
-    onEditorReady(editorInstance) {
+    onEditorReady() {
+      const editorInstance = this.$refs.editor.getEditor();
       editorInstance.use(EditorCiSchemaExtension);
       editorInstance.registerCiSchema({
-        fileName: this.ciConfigPath,
         projectPath: this.projectPath,
         ref: this.commitId,
       });
@@ -36,6 +36,7 @@ export default {
 <template>
   <div class="gl-border-solid gl-border-gray-100 gl-border-1">
     <editor-lite
+      ref="editor"
       :file-name="ciConfigPath"
       v-bind="$attrs"
       v-on="$listeners"

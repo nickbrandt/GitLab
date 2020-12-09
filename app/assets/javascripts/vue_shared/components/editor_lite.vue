@@ -84,6 +84,9 @@ export default {
     onFileChange() {
       this.$emit('input', this.editor.getValue());
     },
+    getEditor() {
+      return this.editor;
+    },
   },
 };
 </script>
@@ -92,7 +95,7 @@ export default {
     :id="`editor-lite-${fileGlobalId}`"
     ref="editor"
     data-editor-loading
-    @editor-ready="$emit('editor-ready', editor)"
+    @editor-ready="$emit('editor-ready')"
   >
     <pre class="editor-loading-content">{{ value }}</pre>
   </div>

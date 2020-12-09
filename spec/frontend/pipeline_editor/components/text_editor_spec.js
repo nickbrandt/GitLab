@@ -1,24 +1,22 @@
-import { shallowMount } from '@vue/test-utils';
+import { nextTick } from 'vue';
+import { shallowMount, mount } from '@vue/test-utils';
 import EditorLite from '~/vue_shared/components/editor_lite.vue';
 import EditorCiSchemaExtension from '~/editor/editor_ci_schema_ext';
 import TextEditor from '~/pipeline_editor/components/text_editor.vue';
 
-import { mockCiYml, mockCiConfigPath, mockProjectPath } from '../mock_data';
+import { mockCiYml, mockCiConfigPath, mockProjectPath, mockCommitId } from '../mock_data';
+
+jest.mock('~/editor/editor_ci_schema_ext');
 
 describe('~/pipeline_editor/components/text_editor.vue', () => {
   let wrapper;
-  let editorInstance;
   const editorReadyListener = jest.fn();
 
   const createComponent = ({ props = {}, attrs = {} } = {}, mountFn = shallowMount) => {
-    editorInstance = {
-      use: jest.fn(),
-      registerCiSchema: jest.fn(),
-    };
-
     wrapper = mountFn(TextEditor, {
       propsData: {
         ciConfigPath: mockCiConfigPath,
+        commitId: mockCommitId,
         projectPath: mockProjectPath,
         ...props,
       },
@@ -41,43 +39,36 @@ describe('~/pipeline_editor/components/text_editor.vue', () => {
     wrapper = null;
   });
 
-  const findEditor = () => wrapper.find(EditorLite);
+  const findEditorLite = () => wrapper.find(EditorLite);
 
   it('contains an editor', () => {
-    expect(findEditor().exists()).toBe(true);
+    expect(findEditorLite().exists()).toBe(true);
   });
 
   it('editor contains the value provided', () => {
-    expect(findEditor().props('value')).toBe(mockCiYml);
+    expect(findEditorLite().props('value')).toBe(mockCiYml);
   });
 
   it('editor is configured for .yml', () => {
-    expect(findEditor().props('fileName')).toBe(mockCiConfigPath);
+    expect(findEditorLite().props('fileName')).toBe(mockCiConfigPath);
   });
 
-  it('bubbles up events', () => {
-    findEditor().vm.$emit('editor-ready', editorInstance);
+  it('bubbles up editor-ready event', () => {
+    createComponent({}, mount);
+
+    findEditorLite().vm.$emit('editor-ready');
 
     expect(editorReadyListener).toHaveBeenCalled();
   });
 
-  it('registers ci schema extension', () => {
-    const mockRef = 'master';
+  it('registers ci schema extension', async () => {
+    createComponent({}, mount);
 
-    createComponent({
-      props: {
-        commitId: mockRef,
-      },
-    });
+    await nextTick();
 
-    findEditor().vm.$emit('editor-ready', editorInstance);
-
-    expect(editorInstance.use).toHaveBeenCalledWith(EditorCiSchemaExtension);
-
-    expect(editorInstance.registerCiSchema).toHaveBeenCalledWith({
-      fileName: mockCiConfigPath,
+    expect(EditorCiSchemaExtension.registerCiSchema).toHaveBeenCalledWith({
       projectPath: mockProjectPath,
-      ref: mockRef,
+      ref: mockCommitId,
     });
   });
 });

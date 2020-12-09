@@ -1,14 +1,6 @@
 import { nextTick } from 'vue';
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
-import {
-  GlAlert,
-  GlButton,
-  GlFormInput,
-  GlFormTextarea,
-  GlLoadingIcon,
-  GlTabs,
-  GlTab,
-} from '@gitlab/ui';
+import { GlAlert, GlFormInput, GlFormTextarea, GlLoadingIcon, GlTabs, GlTab } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
 import VueApollo from 'vue-apollo';
 import createMockApollo from 'jest/helpers/mock_apollo_helper';
@@ -36,6 +28,14 @@ localVue.use(VueApollo);
 
 const MockEditorLite = {
   template: '<div/>',
+  methods: {
+    getEditor() {
+      return {
+        use: jest.fn(),
+        registerCiSchema: jest.fn(),
+      };
+    },
+  },
 };
 
 jest.mock('~/lib/utils/url_utility', () => ({
@@ -79,7 +79,6 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
       },
       stubs: {
         GlTabs,
-        GlButton,
         CommitForm,
         EditorLite: MockEditorLite,
         TextEditor,
@@ -175,7 +174,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     it('displays editor tab lazily, until editor is ready', async () => {
       expect(findTabAt(0).attributes('lazy')).toBe('true');
 
-      findTextEditor().vm.$emit('editor-ready', { use: jest.fn(), registerCiSchema: jest.fn() });
+      findTextEditor().vm.$emit('editor-ready');
 
       await nextTick();
 
@@ -185,32 +184,24 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
 
   describe('when data is set', () => {
     beforeEach(async () => {
-      createComponent({ mountFn: mount });
-
-      await wrapper.setData({
-        content: mockCiYml,
-        contentModel: mockCiYml,
+      createComponent({
+        options: {
+          data() {
+            return {
+              content: mockCiYml,
+              contentModel: mockCiYml,
+            };
+          },
+        },
+        mountFn: mount,
       });
     });
 
     it('displays content after the query loads', () => {
-      const mockRegisterCiSchema = jest.fn();
-
-      findTextEditor().vm.$emit('editor-ready', {
-        use: jest.fn(),
-        registerCiSchema: mockRegisterCiSchema,
-      });
-
       expect(findLoadingIcon().exists()).toBe(false);
 
       expect(findTextEditor().attributes('file-name')).toBe(mockCiConfigPath);
       expect(findTextEditor().attributes('value')).toBe(mockCiYml);
-
-      expect(mockRegisterCiSchema).toHaveBeenCalledWith({
-        fileName: mockCiConfigPath,
-        projectPath: mockProjectPath,
-        ref: mockCommitId,
-      });
     });
 
     describe('commit form', () => {
