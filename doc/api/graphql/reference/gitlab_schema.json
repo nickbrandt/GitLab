@@ -14978,6 +14978,20 @@
               "deprecationReason": null
             },
             {
+              "name": "normalizedTargetUrl",
+              "description": "Normalized URL of the target to be validated",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "status",
               "description": "Status of the site validation",
               "args": [

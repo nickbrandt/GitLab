@@ -939,6 +939,7 @@ Represents a DAST Site Validation.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `id` | DastSiteValidationID! | Global ID of the site validation |
+| `normalizedTargetUrl` | String | Normalized URL of the target to be validated |
 | `status` | DastSiteProfileValidationStatusEnum! | Status of the site validation |
 
 ### DastSiteValidationCreatePayload
