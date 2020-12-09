@@ -60,7 +60,7 @@ the `filename` of a `class` element contains the full path relative to the proje
 ### JavaScript example
 
 The following [`gitlab-ci.yml`](../../../ci/yaml/README.md) example uses [Mocha](https://mochajs.org/)
-JavaScript testing and [NYC](https://github.com/istanbuljs/nyc) coverage-tooling to
+JavaScript testing and [nyc](https://github.com/istanbuljs/nyc) coverage-tooling to
 generate the coverage artifact:
 
 ```yaml
