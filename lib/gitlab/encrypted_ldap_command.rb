@@ -24,7 +24,7 @@ module Gitlab
 
         if ENV["EDITOR"].to_s.empty?
           puts 'No $EDITOR specified to open file. Please provide one when running the command:'
-          puts 'gitlab:ldap:secret:edit EDITOR=vim'
+          puts 'gitlab-rake gitlab:ldap:secret:edit EDITOR=vim'
           return
         end
 
@@ -52,7 +52,7 @@ module Gitlab
         encrypted = Gitlab::Auth::Ldap::Config.encrypted_secrets
         return unless validate_config(encrypted)
 
-        puts encrypted.read.presence || "File '#{encrypted.content_path}' does not exist. Use `rake gitlab:ldap:secret:edit` to change that."
+        puts encrypted.read.presence || "File '#{encrypted.content_path}' does not exist. Use `gitlab-rake gitlab:ldap:secret:edit` to change that."
       rescue ActiveSupport::MessageEncryptor::InvalidMessage
         puts "Couldn't decrypt #{encrypted.content_path}. Perhaps you passed the wrong key?"
       end
