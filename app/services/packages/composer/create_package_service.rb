@@ -17,6 +17,8 @@ module Packages
           })
         end
 
+        ::Gitlab::Composer::Cache.new.update(created_package)
+
         created_package
       end
 
