@@ -1328,13 +1328,13 @@ msgstr ""
 msgid "AWS Access Key"
 msgstr ""
 
-msgid "AWS Access Key.  Only required if not using role instance credentials"
+msgid "AWS Access Key. Only required if not using role instance credentials"
 msgstr ""
 
 msgid "AWS Secret Access Key"
 msgstr ""
 
-msgid "AWS Secret Access Key.  Only required if not using role instance credentials"
+msgid "AWS Secret Access Key. Only required if not using role instance credentials"
 msgstr ""
 
 msgid "AWS service error: %{error}"
