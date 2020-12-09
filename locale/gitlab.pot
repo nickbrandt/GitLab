@@ -14802,6 +14802,9 @@ msgstr ""
 msgid "InstanceStatistics|Users"
 msgstr ""
 
+msgid "Insufficient permissions"
+msgstr ""
+
 msgid "Integration"
 msgstr ""
 

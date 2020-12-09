@@ -8,4 +8,8 @@ class MergeRequestApprovalSetting < ApplicationRecord
   validates :namespace, presence: true
   validates :namespace_id, uniqueness: true, allow_nil: true
   validates :allow_author_approval, inclusion: { in: [true, false], message: 'must be a boolean value' }
+
+  scope :find_or_initialize_by_namespace, ->(namespace) {
+    find_or_initialize_by(namespace: namespace)
+  }
 end
