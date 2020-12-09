@@ -1,6 +1,6 @@
 import { ApolloMutation } from 'vue-apollo';
 import { shallowMount } from '@vue/test-utils';
-import { GlModal, GlFormInput, GlSprintf, GlAlert } from '@gitlab/ui';
+import { GlModal, GlFormInput, GlSprintf, GlAlert, GlIcon } from '@gitlab/ui';
 import { getByText } from '@testing-library/dom';
 import { nextTick } from 'vue';
 import waitForPromises from 'helpers/wait_for_promises';
@@ -15,6 +15,7 @@ import {
   genericErrorMessage,
   dataErrorMessage,
   devopsAdoptionSegmentsData,
+  groupNodeLabelValues,
 } from '../mock_data';
 
 const mockEvent = { preventDefault: jest.fn() };
@@ -130,6 +131,64 @@ describe('DevopsAdoptionSegmentModal', () => {
         await nextTick();
 
         assertHelperText('2 groups selected (20 max)');
+      });
+    });
+
+    describe('filtering', () => {
+      describe('filter input field', () => {
+        it('contains the filter input', () => {
+          const filter = findByTestId('filter');
+
+          expect(filter.exists()).toBe(true);
+          expect(filter.find(GlFormInput).exists()).toBe(true);
+        });
+
+        it('contains the filter icon', () => {
+          const icon = findByTestId('filter').find(GlIcon);
+
+          expect(icon.exists()).toBe(true);
+          expect(icon.props('name')).toBe('search');
+        });
+      });
+
+      it.each`
+        filter  | results
+        ${''}   | ${groupNodeLabelValues}
+        ${'fo'} | ${[groupNodeLabelValues[0]]}
+        ${'ar'} | ${[groupNodeLabelValues[1]]}
+      `(
+        'displays the correct results when filtering for value "$filter"',
+        async ({ filter, results }) => {
+          wrapper.setData({ filter });
+
+          await nextTick();
+
+          const checkboxes = findByTestId('groups');
+
+          expect(checkboxes.props('options')).toStrictEqual(results);
+        },
+      );
+
+      describe('when there are no filter results', () => {
+        beforeEach(async () => {
+          wrapper.setData({ filter: 'lalalala' });
+
+          await nextTick();
+        });
+
+        it('displays a warning message when there are no results', async () => {
+          const warning = findByTestId('filter-warning');
+
+          expect(warning.exists()).toBe(true);
+          expect(warning.text()).toBe('No filter results.');
+          expect(warning.props('variant')).toBe('info');
+        });
+
+        it('hides the checkboxes', () => {
+          const checkboxes = findByTestId('groups');
+
+          expect(checkboxes.exists()).toBe(false);
+        });
       });
     });
 

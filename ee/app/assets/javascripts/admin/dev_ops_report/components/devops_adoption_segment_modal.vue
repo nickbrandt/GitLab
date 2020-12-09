@@ -6,6 +6,7 @@ import {
   GlModal,
   GlSprintf,
   GlAlert,
+  GlIcon,
 } from '@gitlab/ui';
 import { getIdFromGraphQLId, convertToGraphQLIds, TYPE_GROUP } from '~/graphql_shared/utils';
 import * as Sentry from '~/sentry/wrapper';
@@ -23,6 +24,7 @@ export default {
     GlFormCheckboxTree,
     GlSprintf,
     GlAlert,
+    GlIcon,
   },
   props: {
     segment: {
@@ -40,6 +42,7 @@ export default {
     return {
       name: this.segment?.name || '',
       checkboxValues: this.segment ? this.checkboxValuesFromSegment() : [],
+      filter: '',
       loading: false,
       errors: [],
     };
@@ -77,6 +80,13 @@ export default {
     },
     modalTitle() {
       return this.segment ? this.$options.i18n.editingTitle : this.$options.i18n.addingTitle;
+    },
+    filteredOptions() {
+      return this.filter
+        ? this.checkboxOptions.filter(option =>
+            option.label.toLowerCase().includes(this.filter.toLowerCase()),
+          )
+        : this.checkboxOptions;
     },
   },
   methods: {
@@ -180,15 +190,30 @@ export default {
         :disabled="loading"
       />
     </gl-form-group>
+    <gl-form-group class="gl-mb-3" data-testid="filter">
+      <gl-icon name="search" :size="18" class="gl-text-gray-300 gl-absolute gl-mt-3 gl-ml-3" />
+      <gl-form-input
+        v-model="filter"
+        class="gl-pl-7!"
+        type="text"
+        :placeholder="$options.i18n.filterPlaceholder"
+        :disabled="loading"
+      />
+    </gl-form-group>
     <gl-form-group class="gl-mb-0">
       <gl-form-checkbox-tree
+        v-if="filteredOptions.length"
+        :key="filteredOptions.length"
         v-model="checkboxValues"
         data-testid="groups"
-        :options="checkboxOptions"
+        :options="filteredOptions"
         :hide-toggle-all="true"
         :disabled="loading"
         class="gl-p-3 gl-pb-0 gl-mb-2 gl-border-1 gl-border-solid gl-border-gray-100 gl-rounded-base"
       />
+      <gl-alert v-else variant="info" :dismissible="false" data-testid="filter-warning">
+        {{ $options.i18n.noResults }}
+      </gl-alert>
       <div class="gl-text-gray-400" data-testid="groupsHelperText">
         <gl-sprintf
           :message="

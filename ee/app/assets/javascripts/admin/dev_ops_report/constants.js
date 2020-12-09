@@ -42,10 +42,12 @@ export const DEVOPS_ADOPTION_STRINGS = {
     editingButton: s__('DevopsAdoption|Save changes'),
     cancel: __('Cancel'),
     namePlaceholder: s__('DevopsAdoption|My segment'),
+    filterPlaceholder: s__('DevopsAdoption|Filter by name'),
     nameLabel: s__('DevopsAdoption|Name'),
     selectedGroupsTextSingular: s__('DevopsAdoption|%{selectedCount} group selected (20 max)'),
     selectedGroupsTextPlural: s__('DevopsAdoption|%{selectedCount} groups selected (20 max)'),
     error: s__('DevopsAdoption|An error occured while saving the segment. Please try again.'),
+    noResults: s__('DevopsAdoption|No filter results.'),
   },
   table: {
     editButton: s__('DevopsAdoption|Edit segment'),

@@ -17,6 +17,8 @@ export const groupNodes = [
   },
 ];
 
+export const groupNodeLabelValues = [{ label: 'Foo', value: '1' }, { label: 'Bar', value: '2' }];
+
 export const groupIds = ['1', '2'];
 
 export const groupGids = ['gid://gitlab/Group/1', 'gid://gitlab/Group/2'];
