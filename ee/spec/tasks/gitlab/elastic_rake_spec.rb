@@ -12,6 +12,7 @@ RSpec.describe 'gitlab:elastic namespace rake tasks', :elastic do
 
     before do
       es_helper.delete_index
+      es_helper.delete_index(index_name: es_helper.migrations_index_name)
     end
 
     it 'creates an index' do

@@ -2646,12 +2646,25 @@ RSpec.describe Project do
 
     context 'on update' do
       let(:project) { create(:project, :public) }
+      let!(:issue) { create(:issue, project: project) }
 
       context 'when updating the visibility_level' do
         it 'triggers ElasticAssociationIndexerWorker to update issues' do
           expect(ElasticAssociationIndexerWorker).to receive(:perform_async).with('Project', project.id, ['issues'])
 
           project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+        end
+
+        it 'ensures all visibility_level updates are correctly applied in issue searches', :sidekiq_inline do
+          ensure_elasticsearch_index!
+          results = Issue.elastic_search('*', options: { public_and_internal_projects: true })
+          expect(results.count).to eq(1)
+
+          project.update!(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+          ensure_elasticsearch_index!
+
+          results = Issue.elastic_search('*', options: { public_and_internal_projects: true })
+          expect(results.count).to eq(0)
         end
       end
 
