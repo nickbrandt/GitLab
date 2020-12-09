@@ -1,6 +1,6 @@
-import * as types from 'ee/vue_shared/security_reports/store/modules/sast/mutation_types';
-import mutations from 'ee/vue_shared/security_reports/store/modules/sast/mutations';
-import createState from 'ee/vue_shared/security_reports/store/modules/sast/state';
+import * as types from 'ee/vue_shared/security_reports/store/modules/api_fuzzing/mutation_types';
+import mutations from 'ee/vue_shared/security_reports/store/modules/api_fuzzing/mutations';
+import createState from 'ee/vue_shared/security_reports/store/modules/api_fuzzing/state';
 
 const createIssue = ({ ...config }) => ({ changed: false, ...config });
 
@@ -90,6 +90,17 @@ describe('EE api fuzzing module mutations', () => {
   });
 
   describe(types.RECEIVE_DIFF_SUCCESS, () => {
+    const scans = [
+      {
+        scanned_resources_count: 123,
+        job_path: '/group/project/-/jobs/123546789',
+      },
+      {
+        scanned_resources_count: 321,
+        job_path: '/group/project/-/jobs/987654321',
+      },
+    ];
+
     beforeEach(() => {
       const reports = {
         diff: {
@@ -101,6 +112,7 @@ describe('EE api fuzzing module mutations', () => {
           fixed: [createIssue({ cve: 'CVE-4' }), createIssue({ cve: 'CVE-5' })],
           existing: [createIssue({ cve: 'CVE-6' })],
           base_report_out_of_date: true,
+          scans,
         },
       };
       state.isLoading = true;
@@ -125,6 +137,10 @@ describe('EE api fuzzing module mutations', () => {
 
     it('should have the relevant `all` issues', () => {
       expect(state.allIssues).toHaveLength(1);
+    });
+
+    it('should set scans', () => {
+      expect(state.scans).toEqual(scans);
     });
   });
 
