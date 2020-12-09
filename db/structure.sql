@@ -13863,7 +13863,8 @@ CREATE TABLE merge_request_context_commits (
     committer_name text,
     committer_email text,
     message text,
-    merge_request_id bigint
+    merge_request_id bigint,
+    trailers jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 CREATE SEQUENCE merge_request_context_commits_id_seq
@@ -13885,7 +13886,8 @@ CREATE TABLE merge_request_diff_commits (
     author_email text,
     committer_name text,
     committer_email text,
-    message text
+    message text,
+    trailers jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 CREATE TABLE merge_request_diff_details (
