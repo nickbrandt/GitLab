@@ -10686,6 +10686,9 @@ msgstr ""
 msgid "Environments|Deployment"
 msgstr ""
 
+msgid "Environments|Deployment %{status}"
+msgstr ""
+
 msgid "Environments|Enable review app"
 msgstr ""
 
@@ -10801,6 +10804,12 @@ msgid "Environments|This action will run the job defined by %{environment_name} 
 msgstr ""
 
 msgid "Environments|This action will run the job defined by %{name} for commit %{linkStart}%{commitId}%{linkEnd} putting the environment in a previous version. You can revert it by re-deploying the latest version of your application. Are you sure you want to continue?"
+msgstr ""
+
+msgid "Environments|Upcoming"
+msgstr ""
+
+msgid "Environments|Upcoming deployment"
 msgstr ""
 
 msgid "Environments|Updated"
