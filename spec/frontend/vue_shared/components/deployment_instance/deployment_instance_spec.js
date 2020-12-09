@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import DeployBoardInstance from 'ee/vue_shared/components/deployment_instance.vue';
+import DeployBoardInstance from '~/vue_shared/components/deployment_instance.vue';
 import { folder } from './mock_data';
 
 describe('Deploy Board Instance', () => {

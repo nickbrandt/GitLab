@@ -18,7 +18,8 @@ import {
   GlTooltipDirective,
   GlSafeHtmlDirective as SafeHtml,
 } from '@gitlab/ui';
-import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
+import deployBoardSvg from 'empty_states/icons/_deploy_board.svg';
+import instanceComponent from '~/vue_shared/components/deployment_instance.vue';
 import { n__ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { STATUS_MAP, CANARY_STATUS } from '../constants';
@@ -26,7 +27,7 @@ import CanaryIngress from './canary_ingress.vue';
 
 export default {
   components: {
-    instanceComponent: () => import('ee_component/vue_shared/components/deployment_instance.vue'),
+    instanceComponent,
     CanaryIngress,
     GlIcon,
     GlLoadingIcon,

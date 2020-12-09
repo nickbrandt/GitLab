@@ -21,7 +21,7 @@
     "rollout_status": {
       "oneOf": [
         { "type": "null" },
-        { "$ref": "../rollout_status.json" }
+        { "$ref": "../../../../../../spec/fixtures/api/schemas/rollout_status.json" }
       ]
     },
     "logs_path": { "type": "string" },
