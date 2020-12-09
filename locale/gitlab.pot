@@ -9640,6 +9640,9 @@ msgstr ""
 msgid "DevopsAdoption|Feature adoption is based on usage in the last calendar month. Last updated: %{timestamp}."
 msgstr ""
 
+msgid "DevopsAdoption|Filter by name"
+msgstr ""
+
 msgid "DevopsAdoption|Issues"
 msgstr ""
 
@@ -9653,6 +9656,9 @@ msgid "DevopsAdoption|Name"
 msgstr ""
 
 msgid "DevopsAdoption|New segment"
+msgstr ""
+
+msgid "DevopsAdoption|No filter results."
 msgstr ""
 
 msgid "DevopsAdoption|Pipelines"
