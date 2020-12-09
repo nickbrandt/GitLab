@@ -212,6 +212,7 @@ JavaScript
 Jenkins
 Jenkinsfile
 Jira
+jq
 jQuery
 jsdom
 JupyterHub
