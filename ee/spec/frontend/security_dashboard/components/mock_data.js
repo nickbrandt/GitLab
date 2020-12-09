@@ -103,7 +103,7 @@ export const generateVulnerabilities = () => [
     severity: 'high',
     state: 'DETECTED',
     location: {
-      path: '/v1/trees'
+      path: '/v1/trees',
     },
     project: {
       nameWithNamespace: 'Administrator / Security reports',
