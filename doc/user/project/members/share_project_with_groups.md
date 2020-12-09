@@ -44,7 +44,7 @@ Note that you can only share a project with:
 - groups for which you have an explicitly defined membership
 - groups that contain a nested subgroup or project for which you have an explicitly defined role
 
-Admins are able to share projects with any group in the system.
+Administrators are able to share projects with any group in the system.
 
 ## Maximum access level
 
