@@ -4,7 +4,7 @@ import { __ } from '~/locale';
 
 const DEFAULT_TH_CLASSES =
   'gl-bg-transparent! gl-border-b-solid! gl-border-b-gray-100! gl-p-5! gl-border-b-1!';
-const thWidthClass = width => `mw-${width} ${DEFAULT_TH_CLASSES}`;
+const thWidthClass = width => `gl-w-${width}p ${DEFAULT_TH_CLASSES}`;
 
 export default {
   components: {
@@ -24,7 +24,7 @@ export default {
     {
       key: 'name',
       label: __('Name'),
-      thClass: thWidthClass(20),
+      thClass: thWidthClass(40),
     },
     {
       key: 'projectsCount',
