@@ -3309,9 +3309,6 @@ msgstr ""
 msgid "An error occurred while retrieving projects."
 msgstr ""
 
-msgid "An error occurred while saving LDAP override status. Please try again."
-msgstr ""
-
 msgid "An error occurred while saving assignees"
 msgstr ""
 
@@ -32003,9 +32000,6 @@ msgid "You do not have permission to update the environment."
 msgstr ""
 
 msgid "You do not have permissions to run the import."
-msgstr ""
-
-msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
 msgstr ""
 
 msgid "You don't have any U2F devices registered yet."
