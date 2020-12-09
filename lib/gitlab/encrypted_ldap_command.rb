@@ -22,23 +22,26 @@ module Gitlab
         encrypted = Gitlab::Auth::Ldap::Config.encrypted_secrets
         return unless validate_config(encrypted)
 
-        if ENV["EDITOR"].to_s.empty?
+        if ENV["EDITOR"].blank?
           puts 'No $EDITOR specified to open file. Please provide one when running the command:'
           puts 'gitlab-rake gitlab:ldap:secret:edit EDITOR=vim'
           return
         end
 
         temp_file = Tempfile.new(File.basename(encrypted.content_path), File.dirname(encrypted.content_path))
+        contents_changed = false
 
         encrypted.change do |contents|
           contents = encrypted_file_template unless File.exist?(encrypted.content_path)
           File.write(temp_file.path, contents)
           system(ENV['EDITOR'], temp_file.path)
           changes = File.read(temp_file.path)
+          contents_changed = contents != changes
           validate_contents(changes)
           changes
         end
 
+        puts "Contents were unchanged." unless contents_changed
         puts "File encrypted and saved."
       rescue Interrupt
         puts "Aborted changing file: nothing saved."

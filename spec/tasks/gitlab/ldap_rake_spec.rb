@@ -32,7 +32,7 @@ RSpec.describe 'gitlab:ldap:secret rake tasks' do
 
   describe ':show' do
     it 'displays error when file does not exist' do
-      expect { run_rake_task('gitlab:ldap:secret:show') }.to output(/File .* does not exist. Use `rake gitlab:ldap:secret:edit` to change that./).to_stdout
+      expect { run_rake_task('gitlab:ldap:secret:show') }.to output(/File .* does not exist. Use `gitlab-rake gitlab:ldap:secret:edit` to change that./).to_stdout
     end
 
     it 'displays error when key does not exist' do
