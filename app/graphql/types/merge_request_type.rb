@@ -115,7 +115,7 @@ module Types
           description: 'The pipeline running on the branch HEAD of the merge request'
     field :pipelines,
           null: true,
-          description: 'Pipelines for the merge request',
+          description: 'Pipelines for the merge request. Note: for performance reasons, no more than the most recent 500 pipelines will be returned.',
           resolver: Resolvers::MergeRequestPipelinesResolver
 
     field :milestone, Types::MilestoneType, null: true,

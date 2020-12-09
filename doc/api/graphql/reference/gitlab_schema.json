@@ -36406,7 +36406,7 @@
             },
             {
               "name": "pipelines",
-              "description": "Pipelines for the merge request",
+              "description": "Pipelines for the merge request. Note: for performance reasons, no more than the most recent 500 pipelines will be returned.",
               "args": [
                 {
                   "name": "status",

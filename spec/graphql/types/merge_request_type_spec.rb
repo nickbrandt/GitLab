@@ -39,6 +39,12 @@ RSpec.describe GitlabSchema.types['MergeRequest'] do
     expect(described_class).to have_graphql_fields(*expected_fields)
   end
 
+  describe '#pipelines' do
+    subject { described_class.fields['pipelines'] }
+
+    it { is_expected.to have_attributes(max_page_size: 500) }
+  end
+
   describe '#diff_stats_summary' do
     subject { GitlabSchema.execute(query, context: { current_user: current_user }).as_json }
 
