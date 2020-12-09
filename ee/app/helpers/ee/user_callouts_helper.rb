@@ -138,7 +138,8 @@ module EE
     end
 
     def show_gold_trial_suitable_env?
-      ::Gitlab.com? && !::Gitlab::Database.read_only?
+      ::Gitlab::CurrentSettings.should_check_namespace_plan? &&
+        !::Gitlab::Database.read_only?
     end
 
     def token_expiration_enforced?
