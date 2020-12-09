@@ -119,7 +119,7 @@ The following items will be exported:
 - Pipelines history
 - Push Rules
 
-The following items will NOT be exported:
+The following items will **not** be exported:
 
 - Build traces and artifacts
 - Container registry images
