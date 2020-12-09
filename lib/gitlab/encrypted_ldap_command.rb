@@ -76,8 +76,15 @@ module Gitlab
       end
 
       def validate_contents(contents)
-        config = YAML.safe_load(contents, permitted_classes: [Symbol])
-        puts "WARNING: Content was not a valid LDAP secret yml file." if config.nil? || !config.is_a?(Hash)
+        begin
+          config = YAML.safe_load(contents, permitted_classes: [Symbol])
+          error_contents = "Did not include any key-value pairs" unless config.is_a?(Hash)
+        rescue Psych::Exception => e
+          error_contents = e.message
+        end
+
+        puts "WARNING: Content was not a valid LDAP secret yml file. #{error_contents}" if error_contents
+
         contents
       end
 
