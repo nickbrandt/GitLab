@@ -1,5 +1,6 @@
 <script>
 import { GlButton, GlIcon, GlLink, GlFormInput } from '@gitlab/ui';
+import { joinPaths } from '~/lib/utils/url_utility';
 import Select2Select from '~/vue_shared/components/select2_select.vue';
 import ImportStatus from '../../components/import_status.vue';
 import { STATUSES } from '../../constants';
@@ -47,7 +48,7 @@ export default {
     },
 
     getFullPath(group) {
-      return `${gon.relative_url_root || ''}/${this.getPath(group)}`;
+      return joinPaths(gon.relative_url_root || '/', this.getPath(group));
     },
   },
 };

@@ -56,12 +56,11 @@ describe('Bulk import resolvers', () => {
       });
 
       it('mirrors REST endpoint response fields', () => {
-        const MIRRORED_FIELDS = ['id', 'full_path'];
-        expect(
-          results.every((r, idx) =>
-            MIRRORED_FIELDS.every(field => r[field] === availableNamespacesFixture[idx][field]),
-          ),
-        ).toBe(true);
+        const extractRelevantFields = obj => ({ id: obj.id, full_path: obj.full_path });
+
+        expect(results.map(extractRelevantFields)).toStrictEqual(
+          availableNamespacesFixture.map(extractRelevantFields),
+        );
       });
     });
 

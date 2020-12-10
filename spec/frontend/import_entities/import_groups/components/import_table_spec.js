@@ -72,7 +72,7 @@ describe('import table', () => {
     });
     await waitForPromises();
 
-    expect(wrapper.findAll(ImportTableRow).length).toBe(FAKE_GROUPS.length);
+    expect(wrapper.findAll(ImportTableRow)).toHaveLength(FAKE_GROUPS.length);
   });
 
   describe('converts row events to mutation invocations', () => {
