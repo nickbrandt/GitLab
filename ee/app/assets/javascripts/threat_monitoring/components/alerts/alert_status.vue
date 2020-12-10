@@ -87,7 +87,7 @@ export default {
           v-for="(label, field) in $options.statuses"
           :key="field"
           :active="field === status"
-          :active-class="'is-active'"
+          active-class="'is-active'"
           @click="updateAlertStatus(field)"
         >
           {{ label }}

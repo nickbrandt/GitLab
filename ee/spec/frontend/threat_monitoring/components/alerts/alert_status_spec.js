@@ -39,10 +39,8 @@ describe('AlertStatus', () => {
   });
 
   afterEach(() => {
-    if (wrapper) {
-      wrapper.destroy();
-      wrapper = null;
-    }
+    wrapper.destroy();
+    wrapper = null;
   });
 
   describe('a successful request', () => {
@@ -100,7 +98,6 @@ describe('AlertStatus', () => {
       await selectFirstStatusOption();
       await wrapper.vm.$nextTick();
       await selectFirstStatusOption();
-      // Should emit two errors [0,1]
       expect(wrapper.emitted('alert-error').length > 1).toBe(true);
     });
 
