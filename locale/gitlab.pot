@@ -14698,6 +14698,9 @@ msgstr ""
 msgid "Imported requirements"
 msgstr ""
 
+msgid "Importing..."
+msgstr ""
+
 msgid "Improve Merge Requests and customer support with GitLab Enterprise Edition."
 msgstr ""
 

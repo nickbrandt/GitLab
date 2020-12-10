@@ -142,6 +142,21 @@ describe('ImportProjectsTable', () => {
     },
   );
 
+  it('sets the button text to "Importing..." when importing repos', () => {
+    createComponent({
+      state: {
+        providerRepos: [providerRepo],
+      },
+      getters: {
+        hasIncompatibleRepos: () => false,
+        importAllCount: () => 10,
+        isImportingAnyRepo: () => true,
+      },
+    });
+
+    expect(findImportAllButton().text()).toBe('Importing...');
+  });
+
   it('renders an empty state if there are no repositories available', () => {
     createComponent({ state: { repositories: [] } });
 

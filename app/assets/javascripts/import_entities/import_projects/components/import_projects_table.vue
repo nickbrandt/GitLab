@@ -60,13 +60,17 @@ export default {
     },
 
     importAllButtonText() {
-      return this.hasIncompatibleRepos
-        ? n__(
-            'Import %d compatible repository',
-            'Import %d compatible repositories',
-            this.importAllCount,
-          )
-        : n__('Import %d repository', 'Import %d repositories', this.importAllCount);
+      if (this.isImportingAnyRepo) {
+        return __('Importing...');
+      }
+
+      if (this.hasIncompatibleRepos)
+        return n__(
+          'Import %d compatible repository',
+          'Import %d compatible repositories',
+          this.importAllCount,
+        );
+      return n__('Import %d repository', 'Import %d repositories', this.importAllCount);
     },
 
     emptyStateText() {
