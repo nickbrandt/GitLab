@@ -33,23 +33,26 @@ function collapsed(file) {
   };
 }
 
-export function identifier({ file }) {
+function identifier(file) {
   return uuids({
     seeds: [file.file_identifier_hash, file.content_sha],
   })[0];
 }
 
-export function prepareRawDiffFile({ file, allFiles }) {
-  Object.assign(file, {
-    id: identifier({ file }),
+export function prepareRawDiffFile({ file, allFiles, meta = false }) {
+  const additionalProperties = {
     brokenSymlink: fileSymlinkInformation(file, allFiles),
     viewer: {
       ...file.viewer,
       ...collapsed(file),
     },
-  });
+  };
 
-  return file;
+  if (!meta) {
+    additionalProperties.id = identifier(file);
+  }
+
+  return Object.assign(file, additionalProperties);
 }
 
 export function collapsedType(file) {

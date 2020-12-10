@@ -2,24 +2,44 @@ import { prepareRawDiffFile } from '~/diffs/utils/diff_file';
 
 const DIFF_FILES = [
   {
+    blob: {
+      id: 'abc',
+      mode: '100644',
+    },
     file_hash: 'ABC', // This file is just a normal file
   },
   {
+    blob: {
+      id: 'bcd',
+      mode: '100644',
+    },
     file_hash: 'DEF', // This file replaces a symlink
     a_mode: '0',
     b_mode: '0755',
   },
   {
+    blob: {
+      id: 'cde',
+      mode: '100644',
+    },
     file_hash: 'DEF', // This symlink is replaced by a file
     a_mode: '120000',
     b_mode: '0',
   },
   {
+    blob: {
+      id: 'def',
+      mode: '100644',
+    },
     file_hash: 'GHI', // This symlink replaces a file
     a_mode: '0',
     b_mode: '120000',
   },
   {
+    blob: {
+      id: 'efg',
+      mode: '100644',
+    },
     file_hash: 'GHI', // This file is replaced by a symlink
     a_mode: '0755',
     b_mode: '0',
