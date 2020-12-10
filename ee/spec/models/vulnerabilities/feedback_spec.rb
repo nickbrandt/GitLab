@@ -283,11 +283,23 @@ RSpec.describe Vulnerabilities::Feedback do
 
         subject(:feedback) { described_class.find_or_init_for(feedback_params_with_finding) }
 
-        it 'validates and sets finding_uuid' do
-          feedback_params[:finding_uuid] = finding.uuid
+        it 'sets finding_uuid' do
           feedback.save!
 
           expect(feedback.finding_uuid).to eq(finding.uuid)
+        end
+      end
+
+      context 'when the finding_uuid provided is nil' do
+        let(:finding) { create(:vulnerabilities_finding) }
+        let(:feedback_params_with_finding) { feedback_params.merge(finding_uuid: nil) }
+
+        subject(:feedback) { described_class.find_or_init_for(feedback_params_with_finding) }
+
+        it 'sets finding_uuid as nil' do
+          feedback.save!
+
+          expect(feedback.finding_uuid).to be_nil
         end
       end
 
@@ -314,13 +326,6 @@ RSpec.describe Vulnerabilities::Feedback do
         feedback_params[:category] = 'foo'
 
         expect { described_class.find_or_init_for(feedback_params) }.to raise_error(ArgumentError, /category/)
-      end
-
-      it 'raises ArgumentError when given a bad finding UUID' do
-        create(:vulnerabilities_finding, uuid: 'bar')
-        feedback_params[:finding_uuid] = 'foo'
-
-        expect { described_class.find_or_init_for(feedback_params) }.to raise_error(ArgumentError, /finding with the UUID/)
       end
     end
   end
