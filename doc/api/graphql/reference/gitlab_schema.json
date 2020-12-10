@@ -71716,6 +71716,20 @@
           "description": "Represents a vulnerability",
           "fields": [
             {
+              "name": "confirmedAt",
+              "description": "Timestamp of when the vulnerability state was changed to confirmed",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Time",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "description",
               "description": "Description of the vulnerability",
               "args": [
