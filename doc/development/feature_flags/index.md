@@ -6,6 +6,22 @@ info: "See the Technical Writers assigned to Development Guidelines: https://abo
 
 # Feature flags in development of GitLab
 
+## Following Feature Flag Policy
+
+We should follow our [Configuration Principles](https://about.gitlab.com/handbook/product/product-principles/#configuration-principles)
+which encourages working by default, on by default, and setup by default.  If you can avoid using a feature flag for your code
+to support that principle, that's better.  
+
+A majority of new code should be able to be developed without using feature flags.  However, under certain conditions it makes a lot of 
+sense to have feature flags.  Conditions of when to use feature flags are:
+
+- major risk of data loss
+- degradation in system performance for users
+- user confusion which would affect our usuability
+- regression of existing features
+
+## How to use Feature Flags
+
 Feature flags can be used to gradually deploy changes, regardless of whether
 they are new features or performance improvements. By using feature flags,
 you can determine the impact of GitLab-directed changes, while still being able
