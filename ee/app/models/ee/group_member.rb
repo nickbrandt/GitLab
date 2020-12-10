@@ -109,9 +109,17 @@ module EE
       end
     end
 
+    override :post_create_hook
     def post_create_hook
-      add_group_member_data = Gitlab::HookData::GroupMemberBuilder
-      self.source.execute_hooks(add_group_member_data, :member_hooks)
+      super
+
+      return unless self.source.feature_available?(:group_webhooks)
+      return unless GroupHook.where(group_id: self.source.self_and_ancestors).exists?
+
+      run_after_commit do
+        data = ::Gitlab::HookData::GroupMemberBuilder.new(self).build(:create)
+        self.source.execute_hooks(data, :member_hooks)
+      end
     end
   end
 end

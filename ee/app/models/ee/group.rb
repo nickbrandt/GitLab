@@ -448,6 +448,16 @@ module EE
       )
     end
 
+    override :execute_hooks
+    def execute_hooks(data, hooks_scope)
+      super
+
+      self_and_ancestor_hooks = GroupHook.where(group_id: self.self_and_ancestors)
+      self_and_ancestor_hooks.hooks_for(hooks_scope).each do |hook|
+        hook.async_execute(data, hooks_scope.to_s)
+      end
+    end
+
     private
 
     def custom_project_templates_group_allowed
@@ -509,15 +519,6 @@ module EE
 
     def invited_or_shared_group_members(groups)
       ::GroupMember.active_without_invites_and_requests.where(source_id: ::Gitlab::ObjectHierarchy.new(groups).base_and_ancestors)
-    end
-
-    def execute_hooks(data, hooks_scope)
-      return unless feature_available?(:group_webhooks)
-
-      self_and_ancestor_hooks  = GroupHook.where(group_id: self.self_and_ancestors)
-      self_and_ancestor_hooks.hooks_for(hooks_scope).each do |hook|
-        hook.async_execute(data, hooks_scope.to_s)
-      end
     end
   end
 end
