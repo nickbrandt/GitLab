@@ -4774,6 +4774,12 @@ msgstr ""
 msgid "Bulk request concurrency"
 msgstr ""
 
+msgid "BulkImport|From source group"
+msgstr ""
+
+msgid "BulkImport|To new group"
+msgstr ""
+
 msgid "BulkImport|expected an associated Group but has an associated Project"
 msgstr ""
 
