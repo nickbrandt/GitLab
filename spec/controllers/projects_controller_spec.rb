@@ -277,11 +277,16 @@ RSpec.describe ProjectsController do
 
       render_views
 
+      def get_show
+        get :show, params: { namespace_id: public_project.namespace, id: public_project }
+      end
+
       it "renders the activity view" do
         allow(controller).to receive(:current_user).and_return(user)
         allow(user).to receive(:project_view).and_return('activity')
 
-        get :show, params: { namespace_id: public_project.namespace, id: public_project }
+        get_show
+
         expect(response).to render_template('_activity')
       end
 
@@ -289,7 +294,8 @@ RSpec.describe ProjectsController do
         allow(controller).to receive(:current_user).and_return(user)
         allow(user).to receive(:project_view).and_return('files')
 
-        get :show, params: { namespace_id: public_project.namespace, id: public_project }
+        get_show
+
         expect(response).to render_template('_files')
       end
 
@@ -297,8 +303,17 @@ RSpec.describe ProjectsController do
         allow(controller).to receive(:current_user).and_return(user)
         allow(user).to receive(:project_view).and_return('readme')
 
-        get :show, params: { namespace_id: public_project.namespace, id: public_project }
+        get_show
+
         expect(response).to render_template('_readme')
+      end
+
+      it 'does not make Gitaly requests', :request_store, :clean_gitlab_redis_cache do
+        # Warm up to populate repository cache
+        get_show
+        RequestStore.clear!
+
+        expect { get_show }.not_to change { Gitlab::GitalyClient.get_request_count }
       end
     end
 
