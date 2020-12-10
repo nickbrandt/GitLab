@@ -54,10 +54,7 @@ export default {
         this.loading = true;
         const additionalAttrs = {};
 
-        if (
-          (this.list.type && this.list.type !== ListType.backlog) ||
-          (this.list.listType && this.list.listType !== ListType.backlog)
-        ) {
+        if ((this.list.type || this.list.listType) !== ListType.backlog) {
           additionalAttrs.min_access_level = featureAccessLevel.EVERYONE;
         }
 

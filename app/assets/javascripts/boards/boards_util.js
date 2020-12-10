@@ -13,11 +13,10 @@ export function updateListPosition(listObj) {
   if (listType === ListType.closed) {
     position = Infinity;
   } else if (listType === ListType.backlog) {
-    position = -1;
+    position = -Infinity;
   }
 
-  const list = { ...listObj, position };
-  return list;
+  return { ...listObj, position };
 }
 
 export function formatBoardLists(lists) {

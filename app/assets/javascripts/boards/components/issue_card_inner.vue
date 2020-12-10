@@ -126,7 +126,7 @@ export default {
       return (
         label.id &&
         !(
-          (this.list.type === ListType.label || this.list.listType === ListType.label) &&
+          (this.list.type || this.list.listType) === ListType.label &&
           this.list.title === label.title
         )
       );

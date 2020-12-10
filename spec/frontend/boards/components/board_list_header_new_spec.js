@@ -73,6 +73,7 @@ describe('Board List Header Component', () => {
   const isExpanded = () => !isCollapsed;
 
   const findAddIssueButton = () => wrapper.find({ ref: 'newIssueBtn' });
+  const findTitle = () => wrapper.find('.board-title');
   const findCaret = () => wrapper.find('.board-title-caret');
 
   describe('Add issue button', () => {
@@ -161,6 +162,26 @@ describe('Board List Header Component', () => {
 
       expect(updateListSpy).not.toHaveBeenCalled();
       expect(localStorage.getItem(`${wrapper.vm.uniqueKey}.expanded`)).toBe(String(isExpanded()));
+    });
+  });
+
+  describe('user can drag', () => {
+    const cannotDragList = [ListType.backlog, ListType.closed];
+    const canDragList = [ListType.label, ListType.milestone, ListType.assignee];
+
+    it.each(cannotDragList)(
+      'does not have user-can-drag-class so user cannot drag list',
+      listType => {
+        createComponent({ listType });
+
+        expect(findTitle().classes()).not.toContain('user-can-drag');
+      },
+    );
+
+    it.each(canDragList)('has user-can-drag-class so user can drag list', listType => {
+      createComponent({ listType });
+
+      expect(findTitle().classes()).toContain('user-can-drag');
     });
   });
 });
