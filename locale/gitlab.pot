@@ -5452,7 +5452,13 @@ msgstr ""
 msgid "Choose a type..."
 msgstr ""
 
+msgid "Choose any color"
+msgstr ""
+
 msgid "Choose any color."
+msgstr ""
+
+msgid "Choose any color. Or you can choose one of the suggested colors below"
 msgstr ""
 
 msgid "Choose between %{code_open}clone%{code_close} or %{code_open}fetch%{code_close} to get the recent application code"
@@ -20588,6 +20594,9 @@ msgid "Please enter a number greater than %{number} (from the project settings)"
 msgstr ""
 
 msgid "Please enter a valid URL format, ex: http://www.example.com/home"
+msgstr ""
+
+msgid "Please enter a valid hex (#RRGGBB or #RGB) color value"
 msgstr ""
 
 msgid "Please enter a valid number"
