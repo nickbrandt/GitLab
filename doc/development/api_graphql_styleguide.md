@@ -785,7 +785,7 @@ end
 
 You should never re-use resolvers directly. Resolvers have a complex life-cycle, with
 authorization, readiness and resolution orchestrated by the framework, and at
-each stage lazy values can be returned to take advantage of batching
+each stage [lazy values](#laziness) can be returned to take advantage of batching
 opportunities. Never instantiate a resolver or a mutation in application code.
 
 Instead, the units of code reuse are much the same as in the rest of the
@@ -1736,3 +1736,19 @@ For guidance, see the [GraphQL API](documentation/graphql_styleguide.md) page.
 ## Include a changelog entry
 
 All client-facing changes **must** include a [changelog entry](changelog.md).
+
+## Laziness
+
+One important technique unique to GraphQL for managing performance is
+using **lazy** values. Lazy values represent the promise of a result,
+allowing their action to be run later, which enables batching of queries in
+different parts of the query tree. The main example of lazy values in our code is
+the [GraphQL BatchLoader](graphql_guide/batchloader.md).
+
+To manage lazy values directly, read `Gitlab::Graphql::Lazy`, and in
+particular `Gitlab::Graphql::Laziness`. This contains `#force` and
+`#delay`, which help implement the basic operations of creation and
+elimination of laziness, where needed.
+
+For dealing with lazy values without forcing them, use
+`Gitlab::Graphql::Lazy.with_value`.
