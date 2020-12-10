@@ -56,9 +56,9 @@ export default {
 <template>
   <tr class="gl-border-gray-200 gl-border-0 gl-border-b-1">
     <td class="gl-p-4">
-      <a :href="group.web_url" rel="noreferrer noopener" target="_blank">
+      <gl-link :href="group.web_url" target="_blank">
         {{ group.full_path }} <gl-icon name="external-link" />
-      </a>
+      </gl-link>
     </td>
     <td class="gl-p-4">
       <gl-link v-if="isFinished" :href="getFullPath(group)">{{ getPath(group) }}</gl-link>
