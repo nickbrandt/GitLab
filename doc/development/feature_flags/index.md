@@ -16,7 +16,7 @@ A majority of new code should be able to be developed without using feature flag
 sense to have feature flags.  Conditions of when to use feature flags are:
 
 - major risk of data loss
-- degradation in system performance for users
+- degradation in system performance
 - user confusion which would affect our usuability
 - regression of existing features
 
