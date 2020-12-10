@@ -32,7 +32,7 @@ RSpec.describe 'getting project information' do
   end
 
   context 'when the user has access to the project', :use_clean_rails_memory_store_caching, :request_store do
-    before do
+    before_all do
       project.add_developer(current_user)
     end
 

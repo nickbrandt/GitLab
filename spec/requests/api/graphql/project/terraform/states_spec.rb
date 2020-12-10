@@ -71,12 +71,12 @@ RSpec.describe 'query terraform states' do
       'updatedAt'     => terraform_state.updated_at.iso8601,
       'lockedByUser'  => { 'id' => global_id_of(terraform_state.locked_by_user) },
       'latestVersion' => {
-        'id'            => eq(latest_version.to_global_id.to_s),
+        'id'            => eq(global_id_of(latest_version)),
         'serial'        => eq(latest_version.version),
         'downloadPath'  => eq(download_path),
         'createdAt'     => eq(latest_version.created_at.iso8601),
         'updatedAt'     => eq(latest_version.updated_at.iso8601),
-        'createdByUser' => { 'id' => eq(latest_version.created_by_user.to_global_id.to_s) },
+        'createdByUser' => { 'id' => eq(global_id_of(latest_version.created_by_user)) },
         'job'           => { 'name' => eq(latest_version.build.name) }
       }
     })

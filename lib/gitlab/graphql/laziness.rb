@@ -8,21 +8,30 @@ module Gitlab
     # example:
     #
     #  class MyAwesomeClass
-    #    def sum_frobbocities(ids)
-    #      ids.map { |n| get_the_thing(n) }.map(&method(:force).sum
+    #    include ::Gitlab::Graphql::Laziness
+    #
+    #    # takes a list of id and list of factors, and computes
+    #    # sum of [SomeObject[i]#value * factor[i]]
+    #    def resolve(ids:, factors:)
+    #      ids.zip(factors)
+    #        .map { |id, factor| promise_an_int(id, factor) }
+    #        .map(&method(:force))
+    #        .sum
     #    end
     #
-    #    def get_the_thing(id)
-    #      thunk = SomeBatchLoader.load(id)
-    #      defer { force(thunk).frobbocity * 2 }
+    #    # returns a promise for an Integer
+    #    def (id, factor)
+    #      thunk = SomeObject.lazy_find(id)
+    #      defer { force(thunk).value * factor }
     #    end
     #  end
     #
     # In the example above, we use defer to delay forcing the batch-loaded
     # item until we need it, and then we use `force` to consume the lazy values
     #
-    # If `SomeBatchLoader.load(id)` batches correctly, calling
-    # `sum_frobbocities` will only perform one batched load.
+    # If `SomeObject.lazy_find(id)` batches correctly, calling
+    # `resolve` will only perform one batched load for all objects, rather than
+    # loading them individually before combining the results.
     #
     module Laziness
       def defer(&block)

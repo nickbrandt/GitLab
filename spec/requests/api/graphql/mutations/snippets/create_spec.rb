@@ -163,9 +163,9 @@ RSpec.describe 'Creating a Snippet' do
     context 'when there are uploaded files' do
       shared_examples 'expected files argument' do |file_value, expected_value|
         let(:uploaded_files) { file_value }
-        let(:ham) { build(:snippet) }
+        let(:snippet) { build(:snippet) }
         let(:creation_response) do
-          ::ServiceResponse.error(message: 'urk', payload: { snippet: ham })
+          ::ServiceResponse.error(message: 'urk', payload: { snippet: snippet })
         end
 
         it do

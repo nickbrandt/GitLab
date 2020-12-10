@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe ::CachingArrayResolver do
   include GraphqlHelpers
+  include Gitlab::Graphql::Laziness
 
   let_it_be(:admins) { create_list(:user, 4, admin: true) }
   let(:query_context) { { current_user: admins.first } }
@@ -210,9 +211,5 @@ RSpec.describe ::CachingArrayResolver do
     opts = resolver.field_options
     allow(resolver).to receive(:field_options).and_return(opts.merge(max_page_size: max_page_size))
     resolve(resolver, args: args, ctx: query_context, schema: schema, field: field)
-  end
-
-  def force(lazy)
-    ::Gitlab::Graphql::Lazy.force(lazy)
   end
 end
