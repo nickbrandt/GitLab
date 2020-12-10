@@ -25082,7 +25082,7 @@
             },
             {
               "name": "snippetRepositoryRegistries",
-              "description": "Find snippet repository registries on this Geo node. Available only when feature flag `geo_snippet_repository_replication` is enabled",
+              "description": "Find snippet repository registries on this Geo node",
               "args": [
                 {
                   "name": "ids",
