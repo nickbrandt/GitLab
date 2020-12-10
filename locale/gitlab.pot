@@ -27328,6 +27328,9 @@ msgstr ""
 msgid "The current issue"
 msgstr ""
 
+msgid "The current user is not authorized to access the job log."
+msgstr ""
+
 msgid "The data source is connected, but there is no data to display. %{documentationLink}"
 msgstr ""
 
@@ -31703,6 +31706,9 @@ msgid "You must be logged in to search across all of GitLab"
 msgstr ""
 
 msgid "You must disassociate %{domain} from all clusters it is attached to before deletion."
+msgstr ""
+
+msgid "You must have developer or higher permissions in the associated project to view job logs when debug trace is enabled. To disable debug trace, set the 'CI_DEBUG_TRACE' variable to 'false' in your pipeline configuration or CI/CD settings. If you need to view this job log, a project maintainer must add you to the project with developer permissions or higher."
 msgstr ""
 
 msgid "You must have maintainer access to force delete a lock"
