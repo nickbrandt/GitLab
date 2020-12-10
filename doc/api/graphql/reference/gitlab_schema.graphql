@@ -24959,6 +24959,11 @@ type Vulnerability implements Noteable {
   reportType: VulnerabilityReportType
 
   """
+  Timestamp of when the vulnerability state was changed to resolved
+  """
+  resolvedAt: Time
+
+  """
   Indicates whether the vulnerability is fixed on the default branch or not
   """
   resolvedOnDefaultBranch: Boolean!

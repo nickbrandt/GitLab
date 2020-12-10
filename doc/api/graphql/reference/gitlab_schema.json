@@ -72625,6 +72625,20 @@
               "deprecationReason": null
             },
             {
+              "name": "resolvedAt",
+              "description": "Timestamp of when the vulnerability state was changed to resolved",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Time",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "resolvedOnDefaultBranch",
               "description": "Indicates whether the vulnerability is fixed on the default branch or not",
               "args": [
