@@ -9607,6 +9607,9 @@ msgstr ""
 msgid "DevopsAdoption|Add new segment"
 msgstr ""
 
+msgid "DevopsAdoption|Adopted"
+msgstr ""
+
 msgid "DevopsAdoption|An error occured while deleting the segment. Please try again."
 msgstr ""
 
@@ -9677,6 +9680,9 @@ msgid "DevopsAdoption|New segment"
 msgstr ""
 
 msgid "DevopsAdoption|No filter results."
+msgstr ""
+
+msgid "DevopsAdoption|Not adopted"
 msgstr ""
 
 msgid "DevopsAdoption|Pipelines"

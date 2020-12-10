@@ -93,6 +93,10 @@ export const DEVOPS_ADOPTION_STRINGS = {
     confirm: s__('DevopsAdoption|Delete segment'),
     error: s__('DevopsAdoption|An error occured while deleting the segment. Please try again.'),
   },
+  tableCell: {
+    trueText: s__('DevopsAdoption|Adopted'),
+    falseText: s__('DevopsAdoption|Not adopted'),
+  },
 };
 
 export const DEVOPS_ADOPTION_TABLE_TEST_IDS = {
