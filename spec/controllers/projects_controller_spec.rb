@@ -692,6 +692,39 @@ RSpec.describe ProjectsController do
         end
       end
     end
+
+    context 'when updating boolean values on project_settings' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:boolean_value, :result) do
+        '1'   | true
+        '0'   | false
+        1     | true
+        0     | false
+        true  | true
+        false | false
+      end
+
+      with_them do
+        it 'updates project settings attributes accordingly' do
+          put :update, params: {
+            namespace_id: project.namespace,
+            id: project.path,
+            project: {
+              project_setting_attributes: {
+                show_default_award_emojis: boolean_value,
+                allow_editing_commit_messages: boolean_value
+              }
+            }
+          }
+
+          project.reload
+
+          expect(project.show_default_award_emojis?).to eq(result)
+          expect(project.allow_editing_commit_messages?).to eq(result)
+        end
+      end
+    end
   end
 
   describe '#transfer', :enable_admin_mode do

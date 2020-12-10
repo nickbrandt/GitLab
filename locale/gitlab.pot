@@ -21589,6 +21589,9 @@ msgstr ""
 msgid "ProjectSettings|Allow"
 msgstr ""
 
+msgid "ProjectSettings|Allow editing commit messages"
+msgstr ""
+
 msgid "ProjectSettings|Allow users to make copies of your repository to a new project"
 msgstr ""
 
@@ -21842,6 +21845,9 @@ msgid "ProjectSettings|When approved for merge, merge requests are queued and pi
 msgstr ""
 
 msgid "ProjectSettings|When conflicts arise the user is given the option to rebase"
+msgstr ""
+
+msgid "ProjectSettings|When enabled, commit authors will be able to edit commit messages on unprotected branches."
 msgstr ""
 
 msgid "ProjectSettings|When enabled, issues, merge requests, and snippets will always show thumbs-up and thumbs-down award emoji buttons."
