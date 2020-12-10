@@ -4777,7 +4777,19 @@ msgstr ""
 msgid "BulkImport|From source group"
 msgstr ""
 
+msgid "BulkImport|Import groups from GitLab"
+msgstr ""
+
+msgid "BulkImport|Importing groups from %{link}"
+msgstr ""
+
+msgid "BulkImport|Importing the group failed"
+msgstr ""
+
 msgid "BulkImport|To new group"
+msgstr ""
+
+msgid "BulkImport|Update of import statuses with realtime changes failed"
 msgstr ""
 
 msgid "BulkImport|expected an associated Group but has an associated Project"
@@ -14474,12 +14486,6 @@ msgid "Import/Export illustration"
 msgstr ""
 
 msgid "ImportButtons|Connect repositories from"
-msgstr ""
-
-msgid "ImportGroups|Import groups from GitLab"
-msgstr ""
-
-msgid "ImportGroups|Importing groups from %{link}"
 msgstr ""
 
 msgid "ImportProjects|%{provider} rate limit exceeded. Try again later"
