@@ -116,6 +116,7 @@ export default {
         />
       </span>
       <div class="commit-detail flex-list">
+        <!-- SAM: this is slow! -->
         <div class="commit-content qa-commit-content">
           <gl-link
             :href="commit.webPath"
