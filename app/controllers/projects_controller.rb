@@ -34,6 +34,7 @@ class ProjectsController < Projects::ApplicationController
 
   before_action only: [:edit] do
     push_frontend_feature_flag(:approval_suggestions, @project, default_enabled: true)
+    push_frontend_feature_flag(:allow_editing_commit_messages, @project)
   end
 
   layout :determine_layout
@@ -425,6 +426,7 @@ class ProjectsController < Projects::ApplicationController
       project_setting_attributes: %i[
         show_default_award_emojis
         squash_option
+        allow_editing_commit_messages
       ]
     ] + [project_feature_attributes: project_feature_attributes]
   end
