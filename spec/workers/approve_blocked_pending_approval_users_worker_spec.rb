@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe ApproveBlockedUsersWorker, type: :worker do
+RSpec.describe ApproveBlockedPendingApprovalUsersWorker, type: :worker do
   let_it_be(:admin) { create(:admin) }
   let_it_be(:active_user) { create(:user) }
   let_it_be(:blocked_user) { create(:user, state: 'blocked_pending_approval') }
