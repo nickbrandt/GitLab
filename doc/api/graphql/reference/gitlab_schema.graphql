@@ -24607,6 +24607,11 @@ Represents a vulnerability
 """
 type Vulnerability implements Noteable {
   """
+  Timestamp of when the vulnerability state was changed to confirmed
+  """
+  confirmedAt: Time
+
+  """
   Description of the vulnerability
   """
   description: String
