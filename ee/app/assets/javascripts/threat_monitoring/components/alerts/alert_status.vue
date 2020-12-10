@@ -40,34 +40,31 @@ export default {
     handleError() {
       this.$emit('alert-error', this.$options.i18n.updateError);
     },
-    updateAlertStatus(status) {
+    async updateAlertStatus(status) {
       this.isUpdating = true;
       this.status = status;
-      this.$apollo
-        .mutate({
+      try {
+        const { data } = await this.$apollo.mutate({
           mutation: updateAlertStatusMutation,
           variables: {
             iid: this.alert.iid,
             status: status.toUpperCase(),
             projectPath: this.projectPath,
           },
-        })
-        .then(resp => {
-          const errors = resp.data?.updateAlertStatus?.errors || [];
-
-          if (errors[0]) {
-            this.handleError();
-          }
-
-          this.$emit('alert-update');
-        })
-        .catch(() => {
-          this.status = this.alert.status;
-          this.handleError();
-        })
-        .finally(() => {
-          this.isUpdating = false;
         });
+
+        const errors = data?.updateAlertStatus?.errors || [];
+        if (errors[0]) {
+          this.handleError();
+        }
+
+        this.$emit('alert-update');
+      } catch {
+        this.status = this.alert.status;
+        this.handleError();
+      } finally {
+        this.isUpdating = false;
+      }
     },
   },
 };

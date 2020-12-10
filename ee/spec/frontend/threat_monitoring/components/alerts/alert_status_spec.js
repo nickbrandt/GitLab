@@ -77,7 +77,7 @@ describe('AlertStatus', () => {
     it('emits to the list to refetch alerts on a successful alert status change', async () => {
       expect(wrapper.emitted('alert-update')).toBeUndefined();
       await selectFirstStatusOption();
-      expect(wrapper.emitted('alert-update').length).toBe(1);
+      expect(wrapper.emitted('alert-update')).toHaveLength(1);
     });
   });
 
@@ -98,7 +98,7 @@ describe('AlertStatus', () => {
       await selectFirstStatusOption();
       await wrapper.vm.$nextTick();
       await selectFirstStatusOption();
-      expect(wrapper.emitted('alert-error').length > 1).toBe(true);
+      expect(wrapper.emitted('alert-error').length).toBeGreaterThan(1);
     });
 
     it('reverts the status of an alert on failure', async () => {
