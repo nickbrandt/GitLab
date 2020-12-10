@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ApproveBlockedUsersWorker
+class ApproveBlockedPendingApprovalUsersWorker
   include ApplicationWorker
 
   idempotent!
