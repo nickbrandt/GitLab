@@ -1,4 +1,6 @@
-import { s__, __ } from '~/locale';
+import { s__, __, sprintf } from '~/locale';
+
+export const MAX_SEGMENTS = 30;
 
 export const MAX_REQUEST_COUNT = 10;
 
@@ -26,6 +28,9 @@ export const DEVOPS_ADOPTION_STRINGS = {
         'DevopsAdoption|Feature adoption is based on usage in the last calendar month. Last updated: %{timestamp}.',
       ),
       button: s__('DevopsAdoption|Add new segment'),
+      buttonTooltip: sprintf(s__('DevopsAdoption|Maximum %{maxSegments} segments allowed'), {
+        maxSegments: MAX_SEGMENTS,
+      }),
     },
   },
   emptyState: {
