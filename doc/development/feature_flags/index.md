@@ -10,7 +10,7 @@ info: "See the Technical Writers assigned to Development Guidelines: https://abo
 
 We should follow our [Configuration Principles](https://about.gitlab.com/handbook/product/product-principles/#configuration-principles)
 which encourages working by default, on by default, and setup by default.  If you can avoid using a feature flag for your code
-to support that principle, that's better.  
+to support those principles, that's better.  
 
 A majority of new code should be able to be developed without using feature flags.  However, under certain conditions it makes a lot of 
 sense to have feature flags.  Conditions of when to use feature flags are:
