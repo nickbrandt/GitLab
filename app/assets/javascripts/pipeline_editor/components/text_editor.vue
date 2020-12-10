@@ -6,6 +6,7 @@ export default {
   components: {
     EditorLite,
   },
+  inheritAttrs: false,
   props: {
     ciConfigPath: {
       type: String,
