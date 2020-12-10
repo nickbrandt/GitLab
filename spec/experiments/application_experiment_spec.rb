@@ -31,10 +31,6 @@ RSpec.describe ApplicationExperiment do
   end
 
   describe "tracking events", :snowplow do
-    before do
-      allow(Gitlab::Tracking).to receive(:event)
-    end
-
     it "doesn't track if excluded" do
       subject.exclude { true }
 
@@ -80,6 +76,52 @@ RSpec.describe ApplicationExperiment do
 
         expect(subject.variant.name).to eq('variant1')
       end
+    end
+  end
+
+  context "when caching" do
+    let(:cache) { ApplicationExperiment::Cache.new }
+
+    before do
+      cache.clear(key: subject.name)
+
+      subject.use { } # setup the control
+      subject.try { } # setup the candidate
+
+      allow(Gitlab::Experiment::Configuration).to receive(:cache).and_return(cache)
+    end
+
+    it "caches the variant determined by the variant resolver" do
+      expect(subject.variant.name).to eq('candidate') # we should be in the experiment
+
+      subject.run
+
+      expect(cache.read(subject.cache_key)).to eq('candidate')
+    end
+
+    it "doesn't cache a variant if we don't explicitly provide one" do
+      # by not caching "empty" variants, we effectively create a mostly
+      # optimal combination of caching and rollout flexibility. If we cached
+      # every control variant assigned, we'd inflate the cache size and
+      # wouldn't be able to roll out to subjects that we'd already assigned to
+      # the control.
+      stub_feature_flags(stub: false) # simulate being not rolled out
+
+      expect(subject.variant.name).to eq('control') # if we ask, it should be control
+
+      subject.run
+
+      expect(cache.read(subject.cache_key)).to be_nil
+    end
+
+    it "caches a control variant if we assign it specifically" do
+      # by specifically assigning the control variant here, we're guaranteeing
+      # that this context will always get the control variant unless we delete
+      # the field from the cache (or clear the entire experiment cache) -- or
+      # write code that would specify a different variant.
+      subject.run(:control)
+
+      expect(cache.read(subject.cache_key)).to eq('control')
     end
   end
 end
