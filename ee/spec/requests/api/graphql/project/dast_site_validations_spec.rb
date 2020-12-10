@@ -6,11 +6,14 @@ RSpec.describe 'Query.project(fullPath).dastSiteValidations' do
   include GraphqlHelpers
 
   let_it_be(:project) { create(:project) }
-  let_it_be(:dast_site_token) { create(:dast_site_token, project: project, url: generate(:url)) }
-  let_it_be(:dast_site_validation1) { create(:dast_site_validation, dast_site_token: dast_site_token) }
-  let_it_be(:dast_site_validation2) { create(:dast_site_validation, dast_site_token: dast_site_token) }
-  let_it_be(:dast_site_validation3) { create(:dast_site_validation, dast_site_token: dast_site_token) }
-  let_it_be(:dast_site_validation4) { create(:dast_site_validation, dast_site_token: dast_site_token) }
+  let_it_be(:dast_site_token1) { create(:dast_site_token, project: project, url: generate(:url)) }
+  let_it_be(:dast_site_token2) { create(:dast_site_token, project: project, url: generate(:url)) }
+  let_it_be(:dast_site_token3) { create(:dast_site_token, project: project, url: generate(:url)) }
+  let_it_be(:dast_site_token4) { create(:dast_site_token, project: project, url: generate(:url)) }
+  let_it_be(:dast_site_validation1) { create(:dast_site_validation, dast_site_token: dast_site_token1) }
+  let_it_be(:dast_site_validation2) { create(:dast_site_validation, dast_site_token: dast_site_token2) }
+  let_it_be(:dast_site_validation3) { create(:dast_site_validation, dast_site_token: dast_site_token3) }
+  let_it_be(:dast_site_validation4) { create(:dast_site_validation, dast_site_token: dast_site_token4) }
   let_it_be(:current_user) { create(:user) }
 
   subject do
