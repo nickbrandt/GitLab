@@ -17,10 +17,10 @@ import getAlerts from '~/alert_management/graphql/queries/get_alerts.query.graph
 import { FIELDS, MESSAGES, PAGE_SIZE, STATUSES } from './constants';
 
 export default {
+  PAGE_SIZE,
   i18n: {
     FIELDS,
     MESSAGES,
-    PAGE_SIZE,
     STATUSES,
   },
   components: {
@@ -42,7 +42,7 @@ export default {
       query: getAlerts,
       variables() {
         return {
-          firstPageSize: this.$options.i18n.PAGE_SIZE,
+          firstPageSize: this.$options.PAGE_SIZE,
           projectPath: this.projectPath,
           sort: this.sort,
         };
@@ -176,7 +176,7 @@ export default {
 
       <template #table-busy>
         <gl-skeleton-loading
-          v-for="n in $options.i18n.PAGE_SIZE"
+          v-for="n in $options.PAGE_SIZE"
           :key="n"
           class="gl-m-3 js-skeleton-loader"
           :lines="1"
