@@ -57,18 +57,24 @@ export default {
     sandboxOpts() {
       return {
         files: { ...this.normalizedEntries },
-        entry: `/${this.mainEntry}`,
         showOpenInCodeSandbox: this.showOpenInCodeSandbox,
       };
     },
   },
   mounted() {
-    this.onFilesChangeCallback = debounce(() => this.update(), 500);
+    this.onFilesChangeCallback = debounce(() => this.update(), 2000);
     eventHub.$on('ide.files.change', this.onFilesChangeCallback);
 
     this.loading = true;
 
     return this.loadFileContent(packageJsonPath)
+      .then(() => {
+        if (this.entries['sandbox.config.json']) {
+          return this.loadFileContent('sandbox.config.json');
+        }
+
+        return null;
+      })
       .then(() => {
         this.loading = false;
       })
@@ -140,11 +146,17 @@ export default {
       const settings = {
         fileResolver: {
           isFile: p => {
-            console.log('[clientside.vue] isFile', p, createPathWithExt(p));
-
             return Promise.resolve(Boolean(this.entries[createPathWithExt(p)]));
           },
-          readFile: p => this.resolveFileContent(p),
+          readFile: p => {
+            console.log('[clientside] readFile', p);
+
+            return this.resolveFileContent(createPathWithExt(p));
+          },
+          readFileInfo: p => {
+            console.log('[clientside] readFileInfo', p);
+            return this.resolveFileContentInfo(createPathWithExt(p));
+          },
         },
         ...(bundlerURL ? { bundlerURL } : {}),
       };
@@ -152,15 +164,23 @@ export default {
       this.manager = new Manager('#ide-preview', this.sandboxOpts, settings);
     },
     resolveFileContent(path) {
-      return this.loadFileContent(createPathWithExt(path)).then(contentParam => {
-        console.log(contentParam);
-
+      return this.loadFileContent(path).then(contentParam => {
         const isBase64 = isString(contentParam);
         const content = isBase64
           ? Uint8Array.from(atob(contentParam), c => c.charCodeAt(0))
           : contentParam;
 
         return content;
+      });
+    },
+    resolveFileContentInfo(path) {
+      return this.resolveFileContent(path).then(content => {
+        const contentType = this.entries[path].mime_type;
+
+        return {
+          content,
+          contentType,
+        };
       });
     },
   },

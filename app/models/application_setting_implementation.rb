@@ -394,7 +394,7 @@ module ApplicationSettingImplementation
   # This will eventually be configurable
   # https://gitlab.com/gitlab-org/gitlab/issues/208161
   def web_ide_clientside_preview_bundler_url
-    'https://sandbox-prod.gitlab-static.net'
+    'https://sandpack.local:8044'
   end
 
   private

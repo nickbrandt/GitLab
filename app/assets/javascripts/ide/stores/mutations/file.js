@@ -42,6 +42,8 @@ export default {
     const openFile = state.openFiles.find(f => f.path === file.path);
     const changedFile = state.changedFiles.find(f => f.path === file.path);
 
+    console.log('SET_FILE_DATA', data, file);
+
     [stateEntry, stagedFile, openFile, changedFile].forEach(f => {
       if (f) {
         Object.assign(
