@@ -1,41 +1,50 @@
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlIntersectionObserver, GlSkeletonLoading } from '@gitlab/ui';
 import { mount } from '@vue/test-utils';
 import AlertsList from 'ee/threat_monitoring/components/alerts/alerts_list.vue';
 
-const alerts = {
-  list: [
-    {
-      iid: '01',
-      title: 'Issue 01',
-      status: 'TRIGGERED',
-      startedAt: '2020-11-19T18:36:23Z',
-    },
-    {
-      iid: '02',
-      title: 'Issue 02',
-      status: 'ACKNOWLEDGED',
-      startedAt: '2020-11-16T21:59:28Z',
-    },
-    {
-      iid: '03',
-      title: 'Issue 03',
-      status: 'RESOLVED',
-      startedAt: '2020-11-13T20:03:04Z',
-    },
-    {
-      iid: '04',
-      title: 'Issue 04',
-      status: 'IGNORED',
-      startedAt: '2020-10-29T13:37:55Z',
-    },
-  ],
-  pageInfo: {},
+const alerts = [
+  {
+    iid: '01',
+    title: 'Issue 01',
+    status: 'TRIGGERED',
+    startedAt: '2020-11-19T18:36:23Z',
+  },
+  {
+    iid: '02',
+    title: 'Issue 02',
+    status: 'ACKNOWLEDGED',
+    startedAt: '2020-11-16T21:59:28Z',
+  },
+  {
+    iid: '03',
+    title: 'Issue 03',
+    status: 'RESOLVED',
+    startedAt: '2020-11-13T20:03:04Z',
+  },
+  {
+    iid: '04',
+    title: 'Issue 04',
+    status: 'IGNORED',
+    startedAt: '2020-10-29T13:37:55Z',
+  },
+];
+
+const pageInfo = {
+  endCursor: 'eyJpZCI6IjIwIiwic3RhcnRlZF9hdCI6IjIwMjAtMTItMDMgMjM6MTI6NDkuODM3Mjc1MDAwIFVUQyJ9',
+  hasNextPage: true,
+  hasPreviousPage: false,
+  startCursor: 'eyJpZCI6IjM5Iiwic3RhcnRlZF9hdCI6IjIwMjAtMTItMDQgMTg6MDE6MDcuNzY1ODgyMDAwIFVUQyJ9',
 };
 
 describe('AlertsList component', () => {
   let wrapper;
   const apolloMock = {
-    queries: { alerts: { loading: false } },
+    queries: {
+      alerts: {
+        fetchMore: jest.fn().mockResolvedValue(),
+        loading: false,
+      },
+    },
   };
 
   const findUnconfiguredAlert = () => wrapper.find("[data-testid='threat-alerts-unconfigured']");
@@ -47,7 +56,8 @@ describe('AlertsList component', () => {
   const findStatusColumn = () => wrapper.find("[data-testid='threat-alerts-status']");
   const findStatusColumnHeader = () => wrapper.find("[data-testid='threat-alerts-status-header']");
   const findEmptyState = () => wrapper.find("[data-testid='threat-alerts-empty-state']");
-  const findGlLoadingIcon = () => wrapper.find(GlLoadingIcon);
+  const findGlIntersectionObserver = () => wrapper.find(GlIntersectionObserver);
+  const findGlSkeletonLoading = () => wrapper.find(GlSkeletonLoading);
 
   const createWrapper = ({ $apollo = apolloMock, data = {} } = {}) => {
     wrapper = mount(AlertsList, {
@@ -61,6 +71,7 @@ describe('AlertsList component', () => {
       stubs: {
         GlAlert: true,
         GlLoadingIcon: true,
+        GlIntersectionObserver: true,
       },
       data() {
         return data;
@@ -75,7 +86,7 @@ describe('AlertsList component', () => {
 
   describe('default state', () => {
     beforeEach(() => {
-      createWrapper({ data: { alerts } });
+      createWrapper({ data: { alerts, pageInfo } });
     });
 
     it('does show all columns', () => {
@@ -96,7 +107,11 @@ describe('AlertsList component', () => {
       expect(findErrorAlert().exists()).toBe(false);
     });
 
-    it('is initially sorted by started at, descending', () => {
+    it('does show the observer component', () => {
+      expect(findGlIntersectionObserver().exists()).toBe(true);
+    });
+
+    it('does initially sort by started at, descending', () => {
       expect(wrapper.vm.sort).toBe('STARTED_AT_DESC');
       expect(findStartedAtColumnHeader().attributes('aria-sort')).toBe('descending');
     });
@@ -120,7 +135,7 @@ describe('AlertsList component', () => {
 
   describe('empty state', () => {
     beforeEach(() => {
-      createWrapper({ data: { alerts: { list: [] } } });
+      createWrapper({ data: { alerts: [] } });
     });
 
     it('does show the empty state', () => {
@@ -141,7 +156,7 @@ describe('AlertsList component', () => {
     });
 
     it('does show the loading state', () => {
-      expect(findGlLoadingIcon().exists()).toBe(true);
+      expect(findGlSkeletonLoading().exists()).toBe(true);
     });
 
     it('does not show all columns', () => {
@@ -175,6 +190,20 @@ describe('AlertsList component', () => {
       });
       await wrapper.vm.$nextTick();
       expect(findUnconfiguredAlert().exists()).toBe(false);
+    });
+  });
+
+  describe('loading more alerts', () => {
+    it('does request more data', async () => {
+      createWrapper({
+        data: {
+          alerts,
+          pageInfo,
+        },
+      });
+      findGlIntersectionObserver().vm.$emit('appear');
+      await wrapper.vm.$nextTick();
+      expect(wrapper.vm.$apollo.queries.alerts.fetchMore).toHaveBeenCalledTimes(1);
     });
   });
 });
