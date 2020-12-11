@@ -156,7 +156,7 @@ describe('Bulk import status poller', () => {
       const [[doc]] = clientMock.query.mock.calls;
       const { selections } = doc.query.definitions[0].selectionSet;
       expect(selections.every(field => field.name.value === 'group')).toBeTruthy();
-      expect(selections.length).toBe(2);
+      expect(selections).toHaveLength(2);
       expect(selections.map(sel => sel.arguments[0].value.value)).toStrictEqual([
         `${TARGET_NAMESPACE}/${STARTED_GROUP_1.import_target.new_name}`,
         `${TARGET_NAMESPACE}/${STARTED_GROUP_2.import_target.new_name}`,
