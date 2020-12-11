@@ -48,21 +48,20 @@ RSpec.describe 'query terraform states' do
 
   let(:current_user) { project.creator }
   let(:data) { graphql_data.dig('project', 'terraformStates') }
-  let(:download_path) do
-    expose_path(
-      api_v4_projects_terraform_state_versions_path(
-        id: project.id,
-        name: terraform_state.name,
-        serial: latest_version.version
-      )
-    )
-  end
 
   before do
     post_graphql(query, current_user: current_user)
   end
 
   it 'returns terraform state data' do
+    download_path = expose_path(
+      api_v4_projects_terraform_state_versions_path(
+        id: project.id,
+        name: terraform_state.name,
+        serial: latest_version.version
+      )
+    )
+
     expect(data['nodes']).to contain_exactly({
       'id'            => global_id_of(terraform_state),
       'name'          => terraform_state.name,

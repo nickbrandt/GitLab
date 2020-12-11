@@ -83,6 +83,7 @@ RSpec.describe Resolvers::BoardGroupings::EpicsResolver do
 
       it 'accepts negated issue params' do
         filters = { label_name: ['foo'], not: { label_name: %w(foo bar) } }
+
         expect(Boards::Issues::ListService).to receive(:new).with(
           group_board.resource_parent,
           current_user,
