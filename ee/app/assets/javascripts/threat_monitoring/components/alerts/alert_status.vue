@@ -1,20 +1,12 @@
 <script>
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
-import { s__ } from '~/locale';
 // TODO once backend is settled, update by either abstracting this out to app/assets/javascripts/graphql_shared or create new, modified query in #287757
 import updateAlertStatusMutation from '~/alert_management/graphql/mutations/update_alert_status.mutation.graphql';
+import { MESSAGES, STATUSES } from './constants';
 
 export default {
   i18n: {
-    updateError: s__(
-      'ThreatMonitoring|There was an error while updating the status of the alert. Please try again.',
-    ),
-  },
-  statuses: {
-    TRIGGERED: s__('ThreatMonitoring|Unreviewed'),
-    ACKNOWLEDGED: s__('ThreatMonitoring|In review'),
-    RESOLVED: s__('ThreatMonitoring|Resolved'),
-    IGNORED: s__('ThreatMonitoring|Dismissed'),
+    STATUSES,
   },
   components: {
     GlDropdown,
@@ -33,16 +25,14 @@ export default {
   data() {
     return {
       isUpdating: false,
-      status: this.alert.status,
     };
   },
   methods: {
     handleError() {
-      this.$emit('alert-error', this.$options.i18n.updateError);
+      this.$emit('alert-error', MESSAGES.UPDATE_STATUS_ERROR);
     },
     async updateAlertStatus(status) {
       this.isUpdating = true;
-      this.status = status;
       try {
         const { data } = await this.$apollo.mutate({
           mutation: updateAlertStatusMutation,
@@ -60,7 +50,6 @@ export default {
 
         this.$emit('alert-update');
       } catch {
-        this.status = this.alert.status;
         this.handleError();
       } finally {
         this.isUpdating = false;
@@ -75,16 +64,16 @@ export default {
     <gl-dropdown
       :loading="isUpdating"
       right
-      :text="$options.statuses[status]"
+      :text="$options.i18n.STATUSES[alert.status]"
       class="gl-w-full"
       toggle-class="dropdown-menu-toggle"
     >
       <div class="dropdown-content dropdown-body">
         <gl-dropdown-item
-          v-for="(label, field) in $options.statuses"
+          v-for="(label, field) in $options.i18n.STATUSES"
           :key="field"
-          :active="field === status"
-          active-class="'is-active'"
+          :active="field === alert.status"
+          active-class="is-active"
           @click="updateAlertStatus(field)"
         >
           {{ label }}
