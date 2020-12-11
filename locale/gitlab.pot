@@ -3312,6 +3312,9 @@ msgstr ""
 msgid "An error occurred while updating the comment"
 msgstr ""
 
+msgid "An error occurred while updating the configuration."
+msgstr ""
+
 msgid "An error occurred while updating the milestone."
 msgstr ""
 
@@ -10447,6 +10450,9 @@ msgid "Enable shared runners for all projects and subgroups in this group."
 msgstr ""
 
 msgid "Enable shared runners for this group"
+msgstr ""
+
+msgid "Enable shared runners for this project"
 msgstr ""
 
 msgid "Enable smartcn custom analyzer: Indexing"
@@ -25253,6 +25259,9 @@ msgid "Shared runners"
 msgstr ""
 
 msgid "Shared runners are disabled for the parent group"
+msgstr ""
+
+msgid "Shared runners are disabled on group level"
 msgstr ""
 
 msgid "Shared runners disabled on group level"
