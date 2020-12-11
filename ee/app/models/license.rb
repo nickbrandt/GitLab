@@ -163,6 +163,7 @@ class License < ApplicationRecord
     status_page
     subepics
     threat_monitoring
+    vulnerability_auto_fix
     quality_management
   ]
   EEU_FEATURES.freeze
