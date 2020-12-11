@@ -24,6 +24,12 @@ RSpec.describe EE::MergeRequests::ResetApprovalsService do
   let(:newrev) { commits.first.id }
   let(:approver) { create(:user) }
   let(:notification_service) { spy('notification_service') }
+  let(:approval_project_rule) do
+    create(:approval_project_rule,
+      project: merge_request.project,
+      users: [approver]
+    )
+  end
 
   def approval_todos(merge_request)
     Todo.where(action: Todo::APPROVAL_REQUIRED, target: merge_request)
@@ -40,6 +46,8 @@ RSpec.describe EE::MergeRequests::ResetApprovalsService do
       end
 
       merge_request.approvals.create!(user_id: approver.id)
+
+      merge_request.approval_rules.first.approval_project_rule = approval_project_rule
     end
 
     it 'resets approvals' do
