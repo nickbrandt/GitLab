@@ -1,6 +1,6 @@
 import { nextTick } from 'vue';
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
-import { GlAlert, GlFormInput, GlFormTextarea, GlLoadingIcon, GlTabs, GlTab } from '@gitlab/ui';
+import { GlAlert, GlFormInput, GlFormTextarea, GlLoadingIcon, GlTab } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
 import VueApollo from 'vue-apollo';
 import createMockApollo from 'jest/helpers/mock_apollo_helper';
@@ -78,7 +78,6 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         ...props,
       },
       stubs: {
-        GlTabs,
         CommitForm,
         EditorLite: MockEditorLite,
         TextEditor,
@@ -153,37 +152,51 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     expect(findTextEditor().exists()).toBe(false);
   });
 
-  describe('tabs', () => {
-    beforeEach(() => {
-      createComponent();
-    });
+  describe('lazy tabs', () => {
+    it('displays editor tab, until editor is ready', async () => {
+      createComponent({ mountFn: mount });
 
-    it('displays tabs and their content', async () => {
+      expect(
+        findTabAt(0)
+          .find(TextEditor)
+          .exists(),
+      ).toBe(false);
+
+      await nextTick();
+
       expect(
         findTabAt(0)
           .find(TextEditor)
           .exists(),
       ).toBe(true);
+    });
+
+    it('displays pipeline tab lazily, when tab is selected', async () => {
+      createComponent({ mountFn: mount });
+
+      expect(
+        findTabAt(1)
+          .find(PipelineGraph)
+          .exists(),
+      ).toBe(false);
+
+      await nextTick();
+
+      // select graph tab
+      wrapper.find('[data-testid="graph-tab-btn"]').trigger('click');
+
+      await nextTick();
+
       expect(
         findTabAt(1)
           .find(PipelineGraph)
           .exists(),
       ).toBe(true);
     });
-
-    it('displays editor tab lazily, until editor is ready', async () => {
-      expect(findTabAt(0).attributes('lazy')).toBe('true');
-
-      findTextEditor().vm.$emit('editor-ready');
-
-      await nextTick();
-
-      expect(findTabAt(0).attributes('lazy')).toBe(undefined);
-    });
   });
 
   describe('when data is set', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       createComponent({
         options: {
           data() {

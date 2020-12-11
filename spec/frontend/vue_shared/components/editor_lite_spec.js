@@ -110,7 +110,7 @@ describe('Editor Lite component', () => {
       expect(wrapper.emitted().input).toEqual([[value]]);
     });
 
-    it('emits editor-ready event with the editor instance when the Editor Lite is ready', async () => {
+    it('emits editor-ready event when the Editor Lite is ready', async () => {
       const el = wrapper.find({ ref: 'editor' }).element;
       expect(wrapper.emitted()['editor-ready']).toBeUndefined();
 

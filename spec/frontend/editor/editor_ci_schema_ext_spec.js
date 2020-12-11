@@ -30,7 +30,7 @@ describe('~/editor/editor_ci_config_ext', () => {
       jest.spyOn(languages.yaml.yamlDefaults, 'setDiagnosticsOptions');
     });
 
-    describe('register validations options with monaco for both json and yaml', () => {
+    describe('register validations options with monaco for yaml language', () => {
       it('with expected basic validation configuration', () => {
         instance.registerCiSchema({ projectPath: 'namespace/my-project' });
 

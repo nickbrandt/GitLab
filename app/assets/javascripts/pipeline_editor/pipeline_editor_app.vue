@@ -267,7 +267,12 @@ export default {
             />
           </gl-tab>
 
-          <gl-tab :title="$options.i18n.tabGraph" :lazy="!isVisualizeTabActive">
+          <gl-tab
+            :title="$options.i18n.tabGraph"
+            :lazy="!isVisualizeTabActive"
+            :title-link-attributes="{ 'data-testid': 'graph-tab-btn' }"
+            data-testid="graph-tab"
+          >
             <pipeline-graph :pipeline-data="ciConfigData" />
           </gl-tab>
         </gl-tabs>
