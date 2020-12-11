@@ -2,17 +2,24 @@
 import Tribute from 'tributejs';
 import {
   GfmAutocompleteType,
+  gqlClient,
   tributeConfig,
 } from 'ee_else_ce/vue_shared/components/gfm_autocomplete/utils';
 import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
 import SidebarMediator from '~/sidebar/sidebar_mediator';
+import iterationTitleSearchQuery from './queries/iteration_title_search.query.graphql';
 
 export default {
   errorMessage: __(
     'An error occurred while getting autocomplete data. Please refresh the page and try again.',
   ),
+  inject: {
+    groupPath: {
+      default: '',
+    },
+  },
   props: {
     autocompleteTypes: {
       type: Array,
@@ -70,19 +77,34 @@ export default {
     },
     getValues(type) {
       return (inputText, processValues) => {
+        if (type === GfmAutocompleteType.Iterations && this.groupPath) {
+          return gqlClient
+            .query({
+              query: iterationTitleSearchQuery,
+              variables: {
+                title: inputText,
+                groupPath: this.groupPath,
+              },
+            })
+            .then(({ data }) => processValues(data.group?.iterations?.nodes || []))
+            .catch(() => createFlash({ message: this.$options.errorMessage }));
+        }
+
         if (this.cache[type]) {
-          processValues(this.filterValues(type));
-        } else if (this.dataSources[type]) {
-          axios
+          return processValues(this.filterValues(type));
+        }
+
+        if (this.dataSources[type]) {
+          return axios
             .get(this.dataSources[type])
-            .then(response => {
-              this.cache[type] = response.data;
+            .then(({ data }) => {
+              this.cache[type] = data;
               processValues(this.filterValues(type));
             })
             .catch(() => createFlash({ message: this.$options.errorMessage }));
-        } else {
-          processValues([]);
         }
+
+        return processValues([]);
       };
     },
   },

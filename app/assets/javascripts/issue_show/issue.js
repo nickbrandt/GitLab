@@ -10,6 +10,9 @@ export function initIssuableApp(issuableData, store) {
   return new Vue({
     el: document.getElementById('js-issuable-app'),
     store,
+    provide: {
+      groupPath: issuableData.groupPath,
+    },
     computed: {
       ...mapGetters(['getNoteableData']),
     },

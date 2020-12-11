@@ -1,5 +1,6 @@
 import { escape, last } from 'lodash';
 import { spriteIcon } from '~/lib/utils/common_utils';
+import createGqClient, { fetchPolicies } from '~/lib/graphql';
 
 const groupType = 'Group'; // eslint-disable-line @gitlab/require-i18n-strings
 
@@ -140,3 +141,10 @@ export const tributeConfig = {
     },
   },
 };
+
+export const gqlClient = createGqClient(
+  {},
+  {
+    fetchPolicy: fetchPolicies.NO_CACHE,
+  },
+);
