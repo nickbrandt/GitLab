@@ -15,6 +15,7 @@ import { convertToSnakeCase } from '~/lib/utils/text_utility';
 // TODO once backend is settled, update by either abstracting this out to app/assets/javascripts/graphql_shared or create new, modified query in #287757
 import getAlerts from '~/alert_management/graphql/queries/get_alerts.query.graphql';
 import { FIELDS, MESSAGES, PAGE_SIZE, STATUSES } from './constants';
+import AlertStatus from './alert_status.vue';
 
 export default {
   PAGE_SIZE,
@@ -24,6 +25,7 @@ export default {
     STATUSES,
   },
   components: {
+    AlertStatus,
     GlAlert,
     GlIntersectionObserver,
     GlLink,
@@ -60,6 +62,7 @@ export default {
     return {
       alerts: [],
       errored: false,
+      errorMsg: '',
       isErrorAlertDismissed: false,
       pageInfo: {},
       sort: 'STARTED_AT_DESC',
@@ -85,6 +88,7 @@ export default {
   methods: {
     errorAlertDismissed() {
       this.errored = false;
+      this.errorMsg = '';
       this.isErrorAlertDismissed = true;
     },
     fetchNextPage() {
@@ -110,6 +114,13 @@ export default {
 
       this.sort = `${sortingColumn}_${sortingDirection}`;
     },
+    handleAlertError(msg) {
+      this.errored = true;
+      this.errorMsg = msg;
+    },
+    handleStatusUpdate() {
+      this.$apollo.queries.alerts.refetch();
+    },
   },
 };
 </script>
@@ -131,7 +142,7 @@ export default {
       data-testid="threat-alerts-error"
       @dismiss="errorAlertDismissed"
     >
-      {{ $options.i18n.MESSAGES.ERROR }}
+      {{ errorMsg || $options.i18n.MESSAGES.ERROR }}
     </gl-alert>
 
     <gl-table
@@ -169,9 +180,12 @@ export default {
       </template>
 
       <template #cell(status)="{ item }">
-        <div data-testid="threat-alerts-status">
-          {{ $options.i18n.STATUSES[item.status] }}
-        </div>
+        <alert-status
+          :alert="item"
+          :project-path="projectPath"
+          @alert-error="handleAlertError"
+          @alert-update="handleStatusUpdate"
+        />
       </template>
 
       <template #table-busy>

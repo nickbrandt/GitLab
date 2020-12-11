@@ -8,6 +8,9 @@ export const MESSAGES = {
     "ThreatMonitoring|There was an error displaying the alerts. Confirm your endpoint's configuration details to ensure alerts appear.",
   ),
   NO_ALERTS: s__('ThreatMonitoring|No alerts to display.'),
+  UPDATE_STATUS_ERROR: s__(
+    'ThreatMonitoring|There was an error while updating the status of the alert. Please try again.',
+  ),
 };
 
 export const STATUSES = {
