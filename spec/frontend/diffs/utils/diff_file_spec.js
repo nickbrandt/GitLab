@@ -99,5 +99,18 @@ describe('diff_file utilities', () => {
 
       expect(preppedFile).not.toHaveProp('id');
     });
+
+    it('does not set the id property if the file is missing a `content_sha`', () => {
+      const fileMissingContentSha = { ...files[0] };
+
+      delete fileMissingContentSha.content_sha;
+
+      const preppedFile = prepareRawDiffFile({
+        file: fileMissingContentSha,
+        allFiles: files,
+      });
+
+      expect(preppedFile).not.toHaveProp('id');
+    });
   });
 });

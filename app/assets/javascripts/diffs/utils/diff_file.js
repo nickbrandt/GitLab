@@ -48,7 +48,10 @@ export function prepareRawDiffFile({ file, allFiles, meta = false }) {
     },
   };
 
-  if (!meta) {
+  // It's possible, but not confirmed, that `content_sha` isn't available sometimes
+  // See: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/49506#note_464692057
+  // We don't want duplicate IDs if that's the case, so we just don't assign an ID
+  if (!meta && file.content_sha) {
     additionalProperties.id = identifier(file);
   }
 
