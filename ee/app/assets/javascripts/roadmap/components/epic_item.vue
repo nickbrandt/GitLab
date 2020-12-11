@@ -1,19 +1,21 @@
 <script>
 import { delay } from 'lodash';
 
+import RoadmapItem from './roadmap_item.vue';
 import EpicItemDetails from './epic_item_details.vue';
+import RoadmapTimelineGrid from './roadmap_timeline_grid.vue';
 import EpicItemTimeline from './epic_item_timeline.vue';
 
-import CommonMixin from '../mixins/common_mixin';
-
-import { EPIC_HIGHLIGHT_REMOVE_AFTER } from '../constants';
+import { EPIC_ITEM_HEIGHT, EPIC_HIGHLIGHT_REMOVE_AFTER } from '../constants';
 
 export default {
+  epicItemHeight: EPIC_ITEM_HEIGHT,
   components: {
+    RoadmapItem,
     EpicItemDetails,
+    RoadmapTimelineGrid,
     EpicItemTimeline,
   },
-  mixins: [CommonMixin],
   props: {
     presetType: {
       type: String,
@@ -54,27 +56,6 @@ export default {
     },
   },
   computed: {
-    /**
-     * In case Epic start date is out of range
-     * we need to use original date instead of proxy date
-     */
-    startDate() {
-      if (this.epic.startDateOutOfRange) {
-        return this.epic.originalStartDate;
-      }
-
-      return this.epic.startDate;
-    },
-    /**
-     * In case Epic end date is out of range
-     * we need to use original date instead of proxy date
-     */
-    endDate() {
-      if (this.epic.endDateOutOfRange) {
-        return this.epic.originalEndDate;
-      }
-      return this.epic.endDate;
-    },
     isChildrenEmpty() {
       return this.childrenEpics[this.epic.id] && this.childrenEpics[this.epic.id].length === 0;
     },
@@ -112,26 +93,41 @@ export default {
 
 <template>
   <div class="epic-item-container">
-    <div :class="{ 'newly-added-epic': epic.newEpic }" class="epics-list-item clearfix">
-      <epic-item-details
-        :epic="epic"
-        :current-group-id="currentGroupId"
-        :timeframe-string="timeframeString(epic)"
-        :child-level="childLevel"
-        :children-flags="childrenFlags"
-        :has-filters-applied="hasFiltersApplied"
-        :is-children-empty="isChildrenEmpty"
-      />
-      <epic-item-timeline
-        v-for="(timeframeItem, index) in timeframe"
-        :key="index"
-        :preset-type="presetType"
-        :timeframe="timeframe"
-        :timeframe-item="timeframeItem"
-        :epic="epic"
-        :client-width="clientWidth"
-      />
-    </div>
+    <roadmap-item
+      :preset-type="presetType"
+      :item="epic"
+      :timeframe="timeframe"
+      :class="{ 'newly-added-epic': epic.newEpic }"
+      class="epics-list-item gl-relative clearfix"
+    >
+      <template #item-details="{timeframeString}">
+        <epic-item-details
+          :epic="epic"
+          :current-group-id="currentGroupId"
+          :timeframe-string="timeframeString"
+          :child-level="childLevel"
+          :children-flags="childrenFlags"
+          :has-filters-applied="hasFiltersApplied"
+          :is-children-empty="isChildrenEmpty"
+        />
+      </template>
+      <template>
+        <roadmap-timeline-grid
+          :preset-type="presetType"
+          :timeframe="timeframe"
+          :height="$options.epicItemHeight"
+        />
+      </template>
+      <template #timeline-bar="{timeframeString, timelineBarStyle}">
+        <epic-item-timeline
+          :epic="epic"
+          :timeframe-string="timeframeString"
+          :timeline-bar-style="timelineBarStyle"
+          :client-width="clientWidth"
+        />
+      </template>
+    </roadmap-item>
+
     <epic-item-container
       v-if="hasChildrenToShow"
       :preset-type="presetType"

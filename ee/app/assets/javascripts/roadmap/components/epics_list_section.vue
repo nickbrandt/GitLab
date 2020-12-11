@@ -9,7 +9,7 @@ import { generateKey } from '../utils/epic_utils';
 import { EPIC_DETAILS_CELL_WIDTH, TIMELINE_CELL_MIN_WIDTH, EPIC_ITEM_HEIGHT } from '../constants';
 
 import EpicItem from './epic_item.vue';
-import CurrentDayIndicator from './current_day_indicator.vue';
+import RoadmapTimelineGrid from './roadmap_timeline_grid.vue';
 
 export default {
   EpicItem,
@@ -17,7 +17,7 @@ export default {
   components: {
     VirtualList,
     EpicItem,
-    CurrentDayIndicator,
+    RoadmapTimelineGrid,
   },
   mixins: [glFeatureFlagsMixin()],
   props: {
@@ -47,6 +47,7 @@ export default {
       clientWidth: 0,
       offsetLeft: 0,
       emptyRowContainerStyles: {},
+      emptyRowContainerHeight: 0,
       showBottomShadow: false,
       roadmapShellEl: null,
     };
@@ -111,7 +112,9 @@ export default {
         });
 
         if (!Object.keys(this.emptyRowContainerStyles).length) {
-          this.emptyRowContainerStyles = this.getEmptyRowContainerStyles();
+          const height = this.getEmptyRowContainerHeight();
+          this.emptyRowContainerHeight = height;
+          this.emptyRowContainerStyles = this.getEmptyRowContainerStyles(height);
         }
       });
 
@@ -120,14 +123,18 @@ export default {
     syncClientWidth() {
       this.clientWidth = this.$root.$el?.clientWidth || 0;
     },
-    getEmptyRowContainerStyles() {
+    getEmptyRowContainerHeight() {
       if (this.$refs.epicItems && this.$refs.epicItems.length) {
-        return {
-          height: `${this.$el.clientHeight -
-            this.displayedEpics.length * this.$refs.epicItems[0].$el.clientHeight}px`,
-        };
+        return (
+          this.$el.clientHeight -
+          this.displayedEpics.length * this.$refs.epicItems[0].$el.clientHeight
+        );
       }
-      return {};
+
+      return NaN;
+    },
+    getEmptyRowContainerStyles(height) {
+      return Number.isNaN(height) ? {} : { height: `${height}px` };
     },
     /**
      * Scroll timeframe to the right of the timeline
@@ -199,8 +206,12 @@ export default {
       class="epics-list-item epics-list-item-empty clearfix"
     >
       <span class="epic-details-cell"></span>
-      <span v-for="(timeframeItem, index) in timeframe" :key="index" class="epic-timeline-cell">
-        <current-day-indicator :preset-type="presetType" :timeframe-item="timeframeItem" />
+      <span class="epic-timeline-cell">
+        <roadmap-timeline-grid
+          :preset-type="presetType"
+          :timeframe="timeframe"
+          :height="emptyRowContainerHeight"
+        />
       </span>
     </div>
     <div

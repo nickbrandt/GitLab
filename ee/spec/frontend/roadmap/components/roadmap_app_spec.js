@@ -42,6 +42,9 @@ describe('RoadmapApp', () => {
   const createComponent = (mountFunction = shallowMount) => {
     return mountFunction(RoadmapApp, {
       localVue,
+      stubs: {
+        'roadmap-timeline-grid': '<canvas></canvas>',
+      },
       propsData: {
         emptyStateIllustrationPath,
         newEpicEndpoint,

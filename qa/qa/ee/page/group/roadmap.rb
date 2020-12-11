@@ -10,7 +10,7 @@ module QA
           end
 
           view 'ee/app/assets/javascripts/roadmap/components/epic_item_timeline.vue' do
-            element :epic_timeline_cell
+            element :epic_timeline_bar
           end
 
           view 'ee/app/assets/javascripts/roadmap/components/roadmap_shell.vue' do
@@ -24,7 +24,7 @@ module QA
 
             within_element(:roadmap_shell) do
               find("[data-qa-selector='epic_details_cell'] #{epic_href_selector}") &&
-              find("[data-qa-selector='epic_timeline_cell'] #{epic_href_selector}")
+              find("[data-qa-selector='epic_timeline_bar'] #{epic_href_selector}")
             end
           end
         end

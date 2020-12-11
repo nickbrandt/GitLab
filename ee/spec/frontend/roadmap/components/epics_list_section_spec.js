@@ -195,19 +195,29 @@ describe('EpicsListSectionComponent', () => {
       });
     });
 
-    describe('getEmptyRowContainerStyles', () => {
-      it('returns empty object when there are no epics available to render', () => {
+    describe('getEmptyRowContainerHeight', () => {
+      it('returns NaN when there are no epics available to render', () => {
         wrapper.setProps({
           epics: [],
         });
 
         return wrapper.vm.$nextTick(() => {
-          expect(wrapper.vm.getEmptyRowContainerStyles()).toEqual({});
+          expect(wrapper.vm.getEmptyRowContainerHeight()).toBeNaN();
         });
       });
 
-      it('returns object containing `height` when there epics available to render', () => {
-        expect(wrapper.vm.getEmptyRowContainerStyles()).toEqual(
+      it('returns 0 when there epics available to render', () => {
+        expect(wrapper.vm.getEmptyRowContainerHeight()).toBe(0);
+      });
+    });
+
+    describe('getEmptyRowContainerStyles', () => {
+      it('returns empty object when given NaN', () => {
+        expect(wrapper.vm.getEmptyRowContainerStyles(NaN)).toEqual({});
+      });
+
+      it('returns object containing `height` when given a Number value', () => {
+        expect(wrapper.vm.getEmptyRowContainerStyles(0)).toEqual(
           expect.objectContaining({
             height: '0px',
           }),

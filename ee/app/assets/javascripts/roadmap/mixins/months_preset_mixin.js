@@ -40,7 +40,7 @@ export default {
      * 3. A "triangle" shape is shown at the beginning of timeline bar
      *    when startDate is out of range.
      */
-    getTimelineBarStartOffsetForMonths(roadmapItem) {
+    getTimelineBarStartOffsetForMonths(roadmapItem, returnNumber = false) {
       const daysInMonth = totalDaysInMonth(roadmapItem.startDate);
       const startDate = this.startDateValues.date;
 
@@ -52,19 +52,19 @@ export default {
         // OR
         // Epic startDate is undefined AND Epic endDate is out of timeframe range
         // no offset is needed.
-        return '';
+        return returnNumber ? NaN : '';
       } else if (startDate === 1) {
         // If Epic startDate is first day of the month
         // Set offset to 0.
         /* eslint-disable-next-line @gitlab/require-i18n-strings */
-        return 'left: 0;';
+        return returnNumber ? 0 : 'left: 0;';
       }
 
       // Calculate proportional offset based on startDate and total days in
       // current month.
       const leftOffsetPercentage = Math.floor((startDate / daysInMonth) * 100);
       /* eslint-disable-next-line @gitlab/require-i18n-strings */
-      return `left: ${leftOffsetPercentage}%;`;
+      return returnNumber ? leftOffsetPercentage : `left: ${leftOffsetPercentage}%;`;
     },
     /**
      * This method is externally only called when current timeframe cell has timeline

@@ -176,7 +176,7 @@ export const fetchEpicsForTimeframe = ({ state, commit, dispatch }, { timeframe 
 };
 
 /**
- * Adds more EpicItemTimeline cells to the start or end of the roadmap.
+ * Extends the range of the timeframe from the start or end of the roadmap.
  *
  * @param extendAs An EXTEND_AS enum value
  */

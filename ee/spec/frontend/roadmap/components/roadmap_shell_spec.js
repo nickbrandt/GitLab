@@ -44,6 +44,9 @@ describe('RoadmapShell', () => {
     wrapper = mount(RoadmapShell, {
       localVue,
       store,
+      stubs: {
+        'roadmap-timeline-grid': '<canvas></canvas>',
+      },
       attachTo: el,
       propsData: {
         presetType: PRESET_TYPES.MONTHS,

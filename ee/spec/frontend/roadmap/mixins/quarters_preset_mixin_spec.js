@@ -1,4 +1,4 @@
-import EpicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
+import RoadmapItem from 'ee/roadmap/components/roadmap_item.vue';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 import { getTimeframeForQuartersView } from 'ee/roadmap/utils/roadmap_utils';
 
@@ -13,15 +13,13 @@ describe('QuartersPresetMixin', () => {
   const createComponent = ({
     presetType = PRESET_TYPES.QUARTERS,
     timeframe = mockTimeframeQuarters,
-    timeframeItem = mockTimeframeQuarters[0],
     epic = mockEpic,
   } = {}) => {
-    return shallowMount(EpicItemTimelineComponent, {
+    return shallowMount(RoadmapItem, {
       propsData: {
         presetType,
         timeframe,
-        timeframeItem,
-        epic,
+        item: epic,
       },
     });
   };
@@ -36,7 +34,6 @@ describe('QuartersPresetMixin', () => {
       it('returns true when Epic.startDate falls within timeframeItem', () => {
         wrapper = createComponent({
           epic: { ...mockEpic, startDate: mockTimeframeQuarters[1].range[0] },
-          timeframeItem: mockTimeframeQuarters[1],
         });
 
         expect(wrapper.vm.hasStartDateForQuarter(mockTimeframeQuarters[1])).toBe(true);
@@ -45,7 +42,6 @@ describe('QuartersPresetMixin', () => {
       it('returns false when Epic.startDate does not fall within timeframeItem', () => {
         wrapper = createComponent({
           epic: { ...mockEpic, startDate: mockTimeframeQuarters[0].range[0] },
-          timeframeItem: mockTimeframeQuarters[1],
         });
 
         expect(wrapper.vm.hasStartDateForQuarter(mockTimeframeQuarters[1])).toBe(false);
@@ -96,7 +92,7 @@ describe('QuartersPresetMixin', () => {
           epic: { ...mockEpic, startDateOutOfRange: true },
         });
 
-        expect(wrapper.vm.getTimelineBarStartOffsetForQuarters(wrapper.vm.epic)).toBe('');
+        expect(wrapper.vm.getTimelineBarStartOffsetForQuarters(wrapper.vm.item)).toBe('');
       });
 
       it('returns empty string when Epic startDate is undefined and endDate is out of range', () => {
@@ -104,7 +100,7 @@ describe('QuartersPresetMixin', () => {
           epic: { ...mockEpic, startDateUndefined: true, endDateOutOfRange: true },
         });
 
-        expect(wrapper.vm.getTimelineBarStartOffsetForQuarters(wrapper.vm.epic)).toBe('');
+        expect(wrapper.vm.getTimelineBarStartOffsetForQuarters(wrapper.vm.item)).toBe('');
       });
 
       it('return `left: 0;` when Epic startDate is first day of the quarter', () => {
@@ -112,7 +108,7 @@ describe('QuartersPresetMixin', () => {
           epic: { ...mockEpic, startDate: mockTimeframeQuarters[0].range[0] },
         });
 
-        expect(wrapper.vm.getTimelineBarStartOffsetForQuarters(wrapper.vm.epic)).toBe('left: 0;');
+        expect(wrapper.vm.getTimelineBarStartOffsetForQuarters(wrapper.vm.item)).toBe('left: 0;');
       });
 
       it('returns proportional `left` value based on Epic startDate and days in the quarter', () => {
@@ -120,7 +116,7 @@ describe('QuartersPresetMixin', () => {
           epic: { ...mockEpic, startDate: mockTimeframeQuarters[0].range[1] },
         });
 
-        expect(wrapper.vm.getTimelineBarStartOffsetForQuarters(wrapper.vm.epic)).toContain(
+        expect(wrapper.vm.getTimelineBarStartOffsetForQuarters(wrapper.vm.item)).toContain(
           'left: 34',
         );
       });
@@ -129,7 +125,6 @@ describe('QuartersPresetMixin', () => {
     describe('getTimelineBarWidthForQuarters', () => {
       it('returns calculated width value based on Epic.startDate and Epic.endDate', () => {
         wrapper = createComponent({
-          timeframeItem: mockTimeframeQuarters[0],
           epic: {
             ...mockEpic,
             startDate: mockTimeframeQuarters[0].range[1],
@@ -137,7 +132,7 @@ describe('QuartersPresetMixin', () => {
           },
         });
 
-        expect(Math.floor(wrapper.vm.getTimelineBarWidthForQuarters(wrapper.vm.epic))).toBe(180);
+        expect(Math.floor(wrapper.vm.getTimelineBarWidthForQuarters(wrapper.vm.item))).toBe(180);
       });
     });
   });

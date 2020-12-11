@@ -16,6 +16,8 @@ import {
   mockFormattedChildEpic1,
 } from 'ee_jest/roadmap/mock_data';
 
+import { timelineBarTestCases } from 'ee_jest/roadmap/roadmap_item_test_cases';
+
 jest.mock('lodash/delay', () =>
   jest.fn(func => {
     // eslint-disable-next-line no-param-reassign
@@ -41,6 +43,7 @@ const createComponent = ({
   return mount(EpicItemComponent, {
     store,
     stubs: {
+      'roadmap-timeline-grid': '<div></div>',
       'epic-item-container': EpicItemContainer,
       'epic-item': EpicItemComponent,
     },
@@ -60,6 +63,8 @@ const createComponent = ({
 describe('EpicItemComponent', () => {
   let wrapper;
 
+  const findEpicBar = () => wrapper.find('[data-testid="epic-bar"]');
+
   beforeEach(() => {
     store = createStore();
     wrapper = createComponent({});
@@ -67,68 +72,7 @@ describe('EpicItemComponent', () => {
 
   afterEach(() => {
     wrapper.destroy();
-  });
-
-  describe('startDate', () => {
-    it('returns Epic.startDate when start date is within range', () => {
-      expect(wrapper.vm.startDate).toBe(mockEpic.startDate);
-    });
-
-    it('returns Epic.originalStartDate when start date is out of range', () => {
-      const mockStartDate = new Date(2018, 0, 1);
-      const epic = { ...mockEpic, startDateOutOfRange: true, originalStartDate: mockStartDate };
-      wrapper = createComponent({ epic });
-
-      expect(wrapper.vm.startDate).toBe(mockStartDate);
-    });
-  });
-
-  describe('endDate', () => {
-    it('returns Epic.endDate when end date is within range', () => {
-      expect(wrapper.vm.endDate).toBe(mockEpic.endDate);
-    });
-
-    it('returns Epic.originalEndDate when end date is out of range', () => {
-      const mockEndDate = new Date(2018, 0, 1);
-      const epic = { ...mockEpic, endDateOutOfRange: true, originalEndDate: mockEndDate };
-      wrapper = createComponent({ epic });
-
-      expect(wrapper.vm.endDate).toBe(mockEndDate);
-    });
-  });
-
-  describe('timeframeString', () => {
-    it('returns timeframe string correctly when both start and end dates are defined', () => {
-      expect(wrapper.vm.timeframeString(mockEpic)).toBe('Nov 10, 2017 – Jun 2, 2018');
-    });
-
-    it('returns timeframe string correctly when no dates are defined', () => {
-      const epic = { ...mockEpic, endDateUndefined: true, startDateUndefined: true };
-      wrapper = createComponent({ epic });
-
-      expect(wrapper.vm.timeframeString(epic)).toBe('No start and end date');
-    });
-
-    it('returns timeframe string correctly when only start date is defined', () => {
-      const epic = { ...mockEpic, endDateUndefined: true };
-      wrapper = createComponent({ epic });
-
-      expect(wrapper.vm.timeframeString(epic)).toBe('Nov 10, 2017 – No end date');
-    });
-
-    it('returns timeframe string correctly when only end date is defined', () => {
-      const epic = { ...mockEpic, startDateUndefined: true };
-      wrapper = createComponent({ epic });
-
-      expect(wrapper.vm.timeframeString(epic)).toBe('No start date – Jun 2, 2018');
-    });
-
-    it('returns timeframe string with hidden year for start date when both start and end dates are from same year', () => {
-      const epic = { ...mockEpic, startDate: new Date(2018, 0, 1), endDate: new Date(2018, 3, 1) };
-      wrapper = createComponent({ epic });
-
-      expect(wrapper.vm.timeframeString(epic)).toBe('Jan 1 – Apr 1, 2018');
-    });
+    wrapper = null;
   });
 
   describe('methods', () => {
@@ -159,8 +103,35 @@ describe('EpicItemComponent', () => {
       expect(wrapper.find('.epic-details-cell').exists()).toBe(true);
     });
 
-    it('renders Epic timeline element with class `epic-timeline-cell`', () => {
-      expect(wrapper.find('.epic-timeline-cell').exists()).toBe(true);
+    describe('Epic item timeline bar', () => {
+      it('is rendered', () => {
+        expect(wrapper.find('[data-testid="epic-timeline-bar"]').exists()).toBe(true);
+      });
+
+      describe.each(timelineBarTestCases)('style', ({ when, propsData, expected }) => {
+        describe(`when ${when}`, () => {
+          beforeEach(() => {
+            const { presetType, item: epic, timeframe } = propsData;
+            wrapper = createComponent({
+              presetType,
+              epic: { ...epic, id: 'gid://gitlab/Epic/41' },
+              timeframe,
+              childLevel: 0,
+              childrenEpics: {},
+              childrenFlags: { 'gid://gitlab/Epic/41': { itemExpanded: false } },
+              hasFiltersApplied: false,
+            });
+          });
+
+          it('is rendered with correct width and left offset', () => {
+            const epicBar = findEpicBar();
+            const { width, left } = epicBar.element.style;
+
+            expect(width).toBe(expected.width);
+            expect(left).toBe(expected.left);
+          });
+        });
+      });
     });
 
     it('does not render Epic item container element with class `epic-list-item-container` if epic is not expanded', () => {

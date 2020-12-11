@@ -53,7 +53,7 @@ export default {
      * Implementation of this method is identical to
      * MonthsPresetMixin#getTimelineBarStartOffsetForMonths
      */
-    getTimelineBarStartOffsetForWeeks(roadmapItem) {
+    getTimelineBarStartOffsetForWeeks(roadmapItem, returnRawNumber = false) {
       const daysInWeek = 7;
       const dayWidth = this.$options.cellWidth / daysInWeek;
       const startDate = this.startDateValues.day + 1;
@@ -63,14 +63,15 @@ export default {
         roadmapItem.startDateOutOfRange ||
         (roadmapItem.startDateUndefined && roadmapItem.endDateOutOfRange)
       ) {
-        return '';
+        return returnRawNumber ? NaN : '';
       } else if (startDate === firstDayOfWeek) {
         /* eslint-disable-next-line @gitlab/require-i18n-strings */
-        return 'left: 0;';
+        return returnRawNumber ? 0 : 'left: 0;';
       }
 
+      const offset = startDate * dayWidth - dayWidth / 2;
       /* eslint-disable-next-line @gitlab/require-i18n-strings */
-      return `left: ${startDate * dayWidth - dayWidth / 2}px;`;
+      return returnRawNumber ? offset : `left: ${offset}px;`;
     },
     /**
      * This method is externally only called when current timeframe cell has timeline

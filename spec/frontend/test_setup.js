@@ -3,6 +3,7 @@ import 'jquery';
 
 import * as jqueryMatchers from 'custom-jquery-matchers';
 import { config as testUtilsConfig } from '@vue/test-utils';
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import Translate from '~/vue_shared/translate';
 import { initializeTestTimeout } from './helpers/timeout';
 import { getJSONFixture, loadHTMLFixture, setHTMLFixture } from './helpers/fixtures';
@@ -57,6 +58,8 @@ Object.entries(jqueryMatchers).forEach(([matcherName, matcherFactory]) => {
 });
 
 expect.extend(customMatchers);
+
+expect.extend({ toMatchImageSnapshot });
 
 // Tech debt issue TBD
 testUtilsConfig.logModifiedComponents = false;

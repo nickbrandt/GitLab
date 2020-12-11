@@ -1,3 +1,11 @@
+import {
+  getTimeframeForWeeksView,
+  getTimeframeForMonthsView,
+  getTimeframeForQuartersView,
+} from 'ee/roadmap/utils/roadmap_utils';
+
+import { MONTH } from 'ee/roadmap/constants';
+
 export const mockScrollBarSize = 15;
 
 export const mockGroupId = 2;
@@ -93,6 +101,81 @@ export const mockTimeframeWeeksAppend = [
   new Date(2018, 1, 25),
   new Date(2018, 2, 4),
 ];
+
+const DEC_1_2020 = new Date(2020, MONTH.DEC, 1);
+export const mockMonthly = {
+  currentDate: DEC_1_2020,
+  timeframe: getTimeframeForMonthsView(DEC_1_2020),
+  // timeframe = [ Oct 2020, Nov 2020, Dec 2020, <- current month == index 2
+  //               Jan 2021, Feb 2021, Mar 2021,
+  //               Apr 2021, May 2021 ]
+  currentIndex: 2,
+};
+
+const OCT_11_2020 = new Date(2020, MONTH.OCT, 11);
+export const mockWeekly = {
+  currentDate: OCT_11_2020,
+  timeframe: getTimeframeForWeeksView(OCT_11_2020),
+  // timeframe = [ 2020-09-27, 2020-10-04, 2020-10-11, <- current week or currentIndex == 2
+  //               2020-10-18, 2020-10-25, 2020-11-01,
+  //               2020-11-08 ]
+  currentIndex: 2,
+};
+
+const DEC_25_2020 = new Date(2020, MONTH.DEC, 25);
+export const mockQuarterly = {
+  currentDate: DEC_25_2020,
+  timeframe: getTimeframeForQuartersView(DEC_25_2020),
+  // The format of quarterly timeframes differs from that of the monthly and weekly ones.
+  // For monthly and weekly, each timeframe is represented by a Date object.
+  // For quarterly, each timeframe is of the form { quarterSequence: number, range: array<Dates>, year: number }
+  // timeframe = [ { 2020 Q2 }, { 2020 Q3 }, { 2020 Q4 }, <- current quarter == index 2
+  //               { 2021 Q1 }, { 2021 Q2 }, { 2021 Q3 }, 2021 Q4 } ]
+  currentIndex: 2,
+};
+
+/*
+  Notice: before working with mockEpicBase or any of mockMonthly, mockWeekly or mockQuarterly,
+  Please take a look at the comment included in 'ee/.../spec/roadmap/mock_helper.js'.
+*/
+
+export const mockEpicBase = {
+  id: 'gid://gitlab/Epic/5',
+  iid: '5',
+  webUrl: 'http://gdk.test:3000/groups/gitlab-org/-/epics/5',
+  /* --- */
+  group: {
+    name: 'Gitlab Org',
+    fullName: 'Gitlab Org',
+    fullPath: 'gitlab-org',
+    __typename: 'Group',
+  },
+  groupName: 'Gitlab Org',
+  groupFullName: 'Gitlab Org',
+  /* --- */
+  title: 'Quod itaque excepturi voluptates ducimus ad repudiandae fugit vero.',
+  description:
+    'Suscipit minus ut adipisci quia. Nobis soluta eius saepe expedita inventore. Animi provident ullam commodi nihil accusantium aut.\n\nAd quis cupiditate tempora aspernatur quia tempore temporibus sed. Tempora odio possimus eius id. Voluptatem corporis ab debitis eveniet nihil qui.\n\nDoloribus omnis accusamus similique quam repellat. Autem corrupti repellendus quos iure fuga velit. Quod quibusdam et magni quia praesentium aliquam vitae laboriosam. Accusantium voluptatem sunt ut sint omnis earum ea. Sit ad asperiores mollitia eos ducimus numquam cum.',
+  state: 'opened',
+  /* --- */
+  startDateOutOfRange: false,
+  endDateOutOfRange: false,
+  /* --- */
+  parent: null,
+  hasChildren: false,
+  hasParent: false,
+  isChildEpic: false,
+  descendantWeightSum: {
+    closedIssues: 3,
+    openedIssues: 2,
+    __typename: 'EpicDescendantWeights',
+  },
+  descendantCounts: {
+    openedEpics: 3,
+    closedEpics: 2,
+    __typename: 'EpicDescendantCount',
+  },
+};
 
 export const mockEpic = {
   id: 1,

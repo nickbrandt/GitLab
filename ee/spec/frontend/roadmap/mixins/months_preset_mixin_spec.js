@@ -1,4 +1,4 @@
-import EpicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
+import RoadmapItem from 'ee/roadmap/components/roadmap_item.vue';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
@@ -13,15 +13,13 @@ describe('MonthsPresetMixin', () => {
   const createComponent = ({
     presetType = PRESET_TYPES.MONTHS,
     timeframe = mockTimeframeMonths,
-    timeframeItem = mockTimeframeMonths[0],
     epic = mockEpic,
   } = {}) => {
-    return shallowMount(EpicItemTimelineComponent, {
+    return shallowMount(RoadmapItem, {
       propsData: {
         presetType,
         timeframe,
-        timeframeItem,
-        epic,
+        item: epic,
       },
     });
   };
@@ -36,7 +34,6 @@ describe('MonthsPresetMixin', () => {
       it('returns true when Epic.startDate falls within timeframeItem', () => {
         wrapper = createComponent({
           epic: { ...mockEpic, startDate: mockTimeframeMonths[1] },
-          timeframeItem: mockTimeframeMonths[1],
         });
 
         expect(wrapper.vm.hasStartDateForMonth(mockTimeframeMonths[1])).toBe(true);
@@ -45,7 +42,6 @@ describe('MonthsPresetMixin', () => {
       it('returns false when Epic.startDate does not fall within timeframeItem', () => {
         wrapper = createComponent({
           epic: { ...mockEpic, startDate: mockTimeframeMonths[0] },
-          timeframeItem: mockTimeframeMonths[1],
         });
 
         expect(wrapper.vm.hasStartDateForMonth(mockTimeframeMonths[1])).toBe(false);
@@ -92,7 +88,7 @@ describe('MonthsPresetMixin', () => {
           epic: { ...mockEpic, startDateOutOfRange: true },
         });
 
-        expect(wrapper.vm.getTimelineBarStartOffsetForMonths(wrapper.vm.epic)).toBe('');
+        expect(wrapper.vm.getTimelineBarStartOffsetForMonths(wrapper.vm.item)).toBe('');
       });
 
       it('returns empty string when Epic startDate is undefined and endDate is out of range', () => {
@@ -100,7 +96,7 @@ describe('MonthsPresetMixin', () => {
           epic: { ...mockEpic, startDateUndefined: true, endDateOutOfRange: true },
         });
 
-        expect(wrapper.vm.getTimelineBarStartOffsetForMonths(wrapper.vm.epic)).toBe('');
+        expect(wrapper.vm.getTimelineBarStartOffsetForMonths(wrapper.vm.item)).toBe('');
       });
 
       it('return `left: 0;` when Epic startDate is first day of the month', () => {
@@ -108,7 +104,7 @@ describe('MonthsPresetMixin', () => {
           epic: { ...mockEpic, startDate: new Date(2018, 0, 1) },
         });
 
-        expect(wrapper.vm.getTimelineBarStartOffsetForMonths(wrapper.vm.epic)).toBe('left: 0;');
+        expect(wrapper.vm.getTimelineBarStartOffsetForMonths(wrapper.vm.item)).toBe('left: 0;');
       });
 
       it('returns proportional `left` value based on Epic startDate and days in the month', () => {
@@ -119,7 +115,7 @@ describe('MonthsPresetMixin', () => {
         const startDateValue = 15;
         const totalDaysInJanuary = 31;
         const expectedLeftOffset = Math.floor((startDateValue / totalDaysInJanuary) * 100); // Approx. 48%
-        expect(wrapper.vm.getTimelineBarStartOffsetForMonths(wrapper.vm.epic)).toContain(
+        expect(wrapper.vm.getTimelineBarStartOffsetForMonths(wrapper.vm.item)).toContain(
           `left: ${expectedLeftOffset}%`,
         );
       });

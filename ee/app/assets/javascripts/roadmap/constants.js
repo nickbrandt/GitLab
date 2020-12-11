@@ -10,6 +10,9 @@ export const EPIC_DETAILS_CELL_WIDTH = 320;
 // Counterpart: $item-height in roadmap.scss
 export const EPIC_ITEM_HEIGHT = 50;
 
+// Counterpart: $timeline-cell-height in roadmap.scss
+export const MILESTONE_ITEM_HEIGHT = 32;
+
 // Counterpart: $timeline-cell-width in roadmap.scss
 export const TIMELINE_CELL_MIN_WIDTH = 180;
 
@@ -74,3 +77,22 @@ export const EPIC_LEVEL_MARGIN = {
 export const EPICS_LIMIT_DISMISSED_COOKIE_NAME = 'epics_limit_warning_dismissed';
 
 export const EPICS_LIMIT_DISMISSED_COOKIE_TIMEOUT = 365;
+
+export const GRID_COLOR = '#DBDBDB'; // equivalent to gl-gray-100
+
+export const CURRENT_DAY_INDICATOR_COLOR = '#DD2B0E';
+
+export const MONTH = {
+  JAN: 0,
+  FEB: 1,
+  MAR: 2,
+  APR: 3,
+  MAY: 4,
+  JUN: 5,
+  JUL: 6,
+  AUG: 7,
+  SEP: 8,
+  OCT: 9,
+  NOV: 10,
+  DEC: 11,
+};
