@@ -29,5 +29,5 @@ RSpec.describe 'Upload a user avatar', :js do
     end
   end
 
-  it_behaves_like 'handling file uploads', 'for a user avatar'
+  it_behaves_like 'handling file uploads', 'for a user avatar', supports_authorize: false
 end

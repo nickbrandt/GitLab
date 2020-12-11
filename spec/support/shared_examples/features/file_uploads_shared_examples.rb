@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples 'handling file uploads' do |shared_examples_name|
+RSpec.shared_examples 'handling file uploads' do |shared_examples_name, supports_authorize: true|
   context 'with object storage disabled' do
     before do
       expect_next_instance_of(::UploadedFile) do |uploaded_file|
@@ -37,8 +37,13 @@ RSpec.shared_examples 'handling file uploads' do |shared_examples_name|
   context 'with object storage enabled', :object_storage do
     before do
       expect_next_instance_of(::UploadedFile) do |uploaded_file|
-        expect(uploaded_file.tempfile).to be nil
-        expect(uploaded_file.remote_id).not_to be nil
+        if supports_authorize
+          expect(uploaded_file.tempfile).to be nil
+          expect(uploaded_file.remote_id).not_to be nil
+        else
+          expect(uploaded_file.tempfile).not_to be nil
+          expect(uploaded_file.remote_id).to eq ''
+        end
       end
     end
 

@@ -214,6 +214,7 @@ RSpec.configure do |config|
       original_method = klass.method(:object_store_options)
       allow(klass).to receive(:object_store_options) do
         h = original_method.call.to_hash
+        h['enabled'] = true
         h['connection'] = ::Gitlab::Minio.object_store_connection
         ::Settings.new(h) # the return object is ::Settings, make sure we return one too.
       end
