@@ -17,7 +17,7 @@ sense to have feature flags.  Conditions of when to use feature flags are:
 
 - major risk of data loss
 - degradation in system performance
-- user confusion which would affect our usuability
+- user confusion which would affect our usability
 - regression of existing features
 
 ## How to use Feature Flags
