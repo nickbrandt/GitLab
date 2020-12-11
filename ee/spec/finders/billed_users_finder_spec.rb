@@ -33,6 +33,14 @@ RSpec.describe BilledUsersFinder do
           expect(subject.execute).to eq([john_smith, john_doe].map(&:user))
         end
       end
+
+      context 'when a sorting parameter is not provided' do
+        subject { described_class.new(group, search_term: search_term) }
+
+        it 'sorts expected results in name_asc order' do
+          expect(subject.execute).to eq([john_doe, john_smith].map(&:user))
+        end
+      end
     end
 
     context 'when a search parameter is not present' do

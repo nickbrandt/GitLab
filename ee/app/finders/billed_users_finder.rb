@@ -8,7 +8,7 @@ class BilledUsersFinder
   end
 
   def execute
-    return [] unless group_billed_user_ids.any?
+    return User.none unless group_billed_user_ids.any?
 
     users = ::User.id_in(group_billed_user_ids)
     users = users.search(search_term) if search_term
