@@ -7131,6 +7131,24 @@ msgstr ""
 msgid "ComplianceDashboard|created by:"
 msgstr ""
 
+msgid "ComplianceFrameworks|Add framework"
+msgstr ""
+
+msgid "ComplianceFrameworks|All"
+msgstr ""
+
+msgid "ComplianceFrameworks|Error fetching compliance frameworks data. Please refresh the page"
+msgstr ""
+
+msgid "ComplianceFrameworks|Once you have created a compliance framework it will appear here."
+msgstr ""
+
+msgid "ComplianceFrameworks|Regulated"
+msgstr ""
+
+msgid "ComplianceFrameworks|There are no compliance frameworks set up yet"
+msgstr ""
+
 msgid "ComplianceFramework|GDPR"
 msgstr ""
 
@@ -13674,6 +13692,12 @@ msgid "GroupSettings|Change group URL"
 msgstr ""
 
 msgid "GroupSettings|Changing group URL can have unintended side effects."
+msgstr ""
+
+msgid "GroupSettings|Compliance frameworks"
+msgstr ""
+
+msgid "GroupSettings|Configure frameworks to apply enforceable rules to projects."
 msgstr ""
 
 msgid "GroupSettings|Custom project templates"
