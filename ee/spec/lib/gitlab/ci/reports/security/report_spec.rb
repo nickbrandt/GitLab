@@ -6,12 +6,9 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
   let_it_be(:pipeline) { create(:ci_pipeline) }
 
   let(:created_at) { 2.weeks.ago }
-
-  subject(:report) { described_class.new('sast', pipeline, created_at) }
+  let(:report) { described_class.new('sast', pipeline, created_at) }
 
   it { expect(report.type).to eq('sast') }
-  it { is_expected.to delegate_method(:project).to(:pipeline) }
-  it { is_expected.to delegate_method(:id).to(:project).with_prefix }
 
   describe '#add_scanner' do
     let(:scanner) { create(:ci_reports_security_scanner, external_id: 'find_sec_bugs') }
@@ -139,5 +136,11 @@ RSpec.describe Gitlab::Ci::Reports::Security::Report do
     end
 
     it { is_expected.to eq(scanner_1) }
+  end
+
+  describe '#project_id' do
+    subject { report.project_id }
+
+    it { is_expected.to eq(pipeline.project_id) }
   end
 end

@@ -8,9 +8,6 @@ module Gitlab
           attr_reader :created_at, :type, :pipeline, :findings, :scanners, :identifiers
           attr_accessor :scan, :scanned_resources, :error
 
-          delegate :project, to: :pipeline
-          delegate :id, to: :project, prefix: true
-
           def initialize(type, pipeline, created_at)
             @type = type
             @pipeline = pipeline
@@ -57,6 +54,15 @@ module Gitlab
 
           def primary_scanner
             scanners.first&.second
+          end
+
+          # It's important to read the `project_id` attribute instead of calling
+          # `project_id` on pipeline. Because the `Ci::Pipeline` delegates the `project_id`
+          # call to the `project` relation even though it already has the attribute called
+          # `project_id`. By reading attribute directly from the entity, we are preventing
+          # an extra database query to load the project.
+          def project_id
+            pipeline&.read_attribute(:project_id)
           end
         end
       end

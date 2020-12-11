@@ -7,6 +7,11 @@ RSpec.describe Gitlab::Vulnerabilities::CalculateFindingUUID do
 
   subject { described_class.call(value) }
 
+  before do
+    # This is necessary to clear memoization for testing different environments
+    described_class.instance_variable_set(:@namespace_id, nil)
+  end
+
   context 'in development' do
     let_it_be(:development_proper_uuid) { "5b593e54-90f5-504b-8805-5394a4d14b94" }
 

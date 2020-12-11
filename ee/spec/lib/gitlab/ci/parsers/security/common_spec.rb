@@ -163,5 +163,20 @@ RSpec.describe Gitlab::Ci::Parsers::Security::Common do
         expect(links.first).to be_a(::Gitlab::Ci::Reports::Security::Link)
       end
     end
+
+    describe 'setting the uuid' do
+      let(:finding_uuids) { report.findings.map(&:uuid) }
+      let(:expected_uuids) do
+        [
+          Gitlab::Vulnerabilities::CalculateFindingUUID.call("dependency_scanning--33dc9f32c77dde16d39c69d3f78f27ca3114a7c5-#{pipeline.project_id}"),
+          Gitlab::Vulnerabilities::CalculateFindingUUID.call("dependency_scanning--33dc9f32c77dde16d39c69d3f78f27ca3114a7c5-#{pipeline.project_id}"),
+          Gitlab::Vulnerabilities::CalculateFindingUUID.call("dependency_scanning--33dc9f32c77dde16d39c69d3f78f27ca3114a7c5-#{pipeline.project_id}")
+        ]
+      end
+
+      it 'sets the UUIDv5 for findings' do
+        expect(finding_uuids).to match_array(expected_uuids)
+      end
+    end
   end
 end
