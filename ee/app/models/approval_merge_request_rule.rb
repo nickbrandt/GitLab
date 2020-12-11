@@ -131,7 +131,57 @@ class ApprovalMergeRequestRule < ApplicationRecord
     refresh_license_scanning_approvals(project_approval_rule) if license_scanning?
   end
 
+  # Custom getters
+  #
+  # Since the ApprovalProjectRule (APR) that this rule is templated from might have
+  #   changed, rather than attempt to update every rule related to the APR, we
+  #   do a quick check of the APR to see if it and this rule have diverged, and
+  #   if so, update the rule to match IF a user hasn't already modified it.
+  #
+
+  # Since we're also redefining these associations, move them to the side so we
+  #   still can access the original AR association when we need to.
+  #
+  alias_method :raw_users, :users
+  alias_method :raw_groups, :groups
+
+  %i(name approvals_required users groups).each do |method_name|
+    define_method(method_name) do
+      if source_rule
+        # If there is a difference between this rule and its APR, but this rule is
+        #   not marked as modified, resync it with the the APR.
+        #
+        if overridden? && !modified_from_project_rule
+          sync_with_project_rule
+        end
+
+        source_rule.send(method_name) # rubocop:disable GitlabSecurity/PublicSend
+      else
+        retrieve_value_from_record(method_name)
+      end
+    end
+  end
+
   private
+
+  def sync_with_project_rule
+    params = {
+      name:               source_rule.name,
+      approvals_required: source_rule.approvals_required,
+      user_ids:           source_rule.users.pluck(:id),
+      group_ids:          source_rule.groups.pluck(:id)
+    }
+
+    ::ApprovalRules::UpdateService.new(self, nil, params).execute # rubocop: disable CodeReuse/ServiceClass
+  end
+
+  def retrieve_value_from_record(method_name)
+    if attributes.key?(method_name.to_s)
+      read_attribute(method_name)
+    else
+      self.send("raw_#{method_name}".to_sym) # rubocop:disable GitlabSecurity/PublicSend
+    end
+  end
 
   def compare_with_project_rule
     self.modified_from_project_rule = overridden? ? true : false

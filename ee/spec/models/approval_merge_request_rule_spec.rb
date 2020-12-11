@@ -5,7 +5,11 @@ require 'spec_helper'
 RSpec.describe ApprovalMergeRequestRule do
   let(:merge_request) { create(:merge_request) }
 
-  subject { create(:approval_merge_request_rule, merge_request: merge_request) }
+  subject(:amrr) do
+    create(:approval_merge_request_rule,
+      merge_request: merge_request
+    )
+  end
 
   describe 'associations' do
     subject { build_stubbed(:approval_merge_request_rule) }
@@ -105,6 +109,77 @@ RSpec.describe ApprovalMergeRequestRule do
       expect(described_class.regular_or_any_approver).to(
         contain_exactly(any_approver_rule, regular_rule)
       )
+    end
+  end
+
+  shared_examples_for "does not resync with the approval_project_rule" do
+    it "as expected" do
+      expect(amrr).not_to receive(:sync_with_project_rule)
+      expect(amrr.approval_project_rule)
+        .to receive(method_to_test)
+        .at_least(:once)
+        .and_call_original
+
+      amrr.send(method_to_test)
+    end
+  end
+
+  shared_examples_for "resyncs with the approval_project_rule" do
+    it "as expected" do
+      expect(amrr).to receive(:sync_with_project_rule).once
+      expect(amrr.approval_project_rule)
+        .to receive(method_to_test)
+        .at_least(:once)
+        .and_call_original
+
+      amrr.send(method_to_test)
+    end
+  end
+
+  describe "custom getters" do
+    let(:approval_project_rule) do
+      create(:approval_project_rule, project: merge_request.project)
+    end
+
+    let(:amrr) do
+      create(:approval_merge_request_rule,
+        merge_request: merge_request,
+        approval_project_rule: approval_project_rule
+      )
+    end
+
+    %i(name approvals_required users groups).each do |method_name|
+      context "when approval_project_rule has diverged" do
+        before do
+          expect(amrr).to receive(:overridden?).and_return(true)
+        end
+
+        context "the rule has not been modified" do
+          it_behaves_like "resyncs with the approval_project_rule" do
+            let(:method_to_test) { method_name }
+          end
+        end
+
+        context "the rule has been modified" do
+          before do
+            amrr.modified_from_project_rule = true
+          end
+
+          it_behaves_like "does not resync with the approval_project_rule" do
+            let(:method_to_test) { method_name }
+          end
+        end
+      end
+    end
+
+    context "when approval_project_rule has not diverged" do
+      before do
+        expect(amrr).to receive(:overridden?).and_return(false)
+      end
+
+      it_behaves_like "does not resync with the approval_project_rule" do
+        let(:method_to_test) { :name }
+      end
     end
   end
 
