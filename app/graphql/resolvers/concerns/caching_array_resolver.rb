@@ -62,6 +62,7 @@ module CachingArrayResolver
         queries.in_groups_of(max_union_size, false).each do |group|
           by_id = model_class
             .from_union(tag(group), remove_duplicates: false)
+            .preload(preload) # rubocop: disable CodeReuse/ActiveRecord
             .group_by { |r| r[primary_key] }
 
           by_id.values.each do |item_group|
@@ -73,6 +74,10 @@ module CachingArrayResolver
         end
       end
     end
+  end
+
+  def preload
+    nil
   end
 
   # Override this to intercept the items once they are found

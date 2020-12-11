@@ -113,11 +113,8 @@ RSpec.describe 'Getting issues for an epic' do
       let_it_be(:epic_issue3) { create(:epic_issue, epic: epic2, issue: issue2, relative_position: 3) }
       let(:params) { { iids: [epic.iid, epic2.iid] } }
 
-      before do
-        project.add_developer(user)
-      end
-
       it 'returns issues for each epic' do
+        project.add_developer(user)
         post_graphql(epic_query(params), current_user: user)
 
         expect(response).to have_gitlab_http_status(:success)
@@ -127,14 +124,16 @@ RSpec.describe 'Getting issues for an epic' do
       end
 
       it 'avoids N+1 queries' do
-        pending 'https://gitlab.com/gitlab-org/gitlab/-/issues/291089'
-        control_count = ActiveRecord::QueryRecorder.new do
-          post_graphql(epic_query(iid: epic.iid), current_user: user)
-        end.count
+        user_1 = create(:user, developer_projects: [project])
+        user_2 = create(:user, developer_projects: [project])
+
+        control_count = ActiveRecord::QueryRecorder.new(query_recorder_debug: true) do
+          post_graphql(epic_query(iid: epic.iid), current_user: user_1)
+        end
 
         expect do
-          post_graphql(epic_query(params), current_user: user)
-        end.not_to exceed_query_limit(control_count)
+          post_graphql(epic_query(params), current_user: user_2)
+        end.not_to exceed_query_limit(control_count).ignoring(/FROM "namespaces"/)
 
         expect(graphql_errors).to be_nil
       end

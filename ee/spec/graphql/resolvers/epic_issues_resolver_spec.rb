@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Resolvers::EpicIssuesResolver do
+  include ::Gitlab::Graphql::Laziness
   include GraphqlHelpers
 
   let_it_be(:current_user) { create(:user) }
@@ -38,17 +39,9 @@ RSpec.describe Resolvers::EpicIssuesResolver do
 
       expect(result).to eq [[issue2, issue1], [issue3, issue4]]
     end
-
-    it 'finds only epic issues that user can read' do
-      guest = create(:user)
-
-      result = epics.map { |e| resolve_epic_issues(e, user: guest).to_a }
-
-      expect(result).to eq [[issue1], []]
-    end
   end
 
   def resolve_epic_issues(object, user: current_user)
-    resolve(described_class, obj: object, ctx: { current_user: user })
+    force(resolve(described_class, obj: object, ctx: { current_user: user }))
   end
 end
