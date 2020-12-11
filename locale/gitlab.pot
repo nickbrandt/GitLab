@@ -12938,6 +12938,9 @@ msgstr ""
 msgid "GitLab is obtaining a Let's Encrypt SSL certificate for this domain. This process can take some time. Please try again later."
 msgstr ""
 
+msgid "GitLab is undergoing maintenance and is operating in a read-only mode."
+msgstr ""
+
 msgid "GitLab member or Email address"
 msgstr ""
 
@@ -27898,6 +27901,9 @@ msgid "There was an error trying to validate your query"
 msgstr ""
 
 msgid "There was an error updating the Geo Settings"
+msgstr ""
+
+msgid "There was an error updating the Maintenance Mode Settings"
 msgstr ""
 
 msgid "There was an error updating the dashboard, branch name is invalid."
