@@ -131,12 +131,12 @@ class ApprovalMergeRequestRule < ApplicationRecord
     refresh_license_scanning_approvals(project_approval_rule) if license_scanning?
   end
 
-  # Custom getters
-  #
-  # Since the ApprovalProjectRule (APR) that this rule is templated from might have
-  #   changed, rather than attempt to update every rule related to the APR, we
-  #   do a quick check of the APR to see if it and this rule have diverged, and
-  #   if so, update the rule to match IF a user hasn't already modified it.
+  # Since the ApprovalProjectRule (APR) that this rule is templated from might
+  #   have changed, rather than attempt to update every rule related to the APR,
+  #   we do a quick check of the APR to see if it and this rule have diverged.
+  #   If so, we attempt to pull the value from the templating APR, falling back
+  #   to the AMRR itself if the APR (as `source_rule`) is for some reason
+  #   missing.
   #
 
   # Since we're also redefining these associations, move them to the side so we
@@ -148,14 +148,11 @@ class ApprovalMergeRequestRule < ApplicationRecord
   %i(name approvals_required users groups).each do |method_name|
     define_method(method_name) do
       if source_rule
-        # If there is a difference between this rule and its APR, but this rule is
-        #   not marked as modified, resync it with the the APR.
-        #
-        if overridden? && !modified_from_project_rule
-          sync_with_project_rule
+        if modified_from_project_rule
+          retrieve_value_from_record(method_name)
+        else
+          source_rule.send(method_name) # rubocop:disable GitlabSecurity/PublicSend
         end
-
-        source_rule.send(method_name) # rubocop:disable GitlabSecurity/PublicSend
       else
         retrieve_value_from_record(method_name)
       end

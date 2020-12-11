@@ -112,27 +112,14 @@ RSpec.describe ApprovalMergeRequestRule do
     end
   end
 
-  shared_examples_for "does not resync with the approval_project_rule" do
+  shared_examples_for "attempts to read the value from the AMRR record itself" do
     it "as expected" do
-      expect(amrr).not_to receive(:sync_with_project_rule)
-      expect(amrr.approval_project_rule)
-        .to receive(method_to_test)
+      expect(amrr)
+        .to receive(:retrieve_value_from_record)
         .at_least(:once)
         .and_call_original
 
-      amrr.send(method_to_test)
-    end
-  end
-
-  shared_examples_for "resyncs with the approval_project_rule" do
-    it "as expected" do
-      expect(amrr).to receive(:sync_with_project_rule).once
-      expect(amrr.approval_project_rule)
-        .to receive(method_to_test)
-        .at_least(:once)
-        .and_call_original
-
-      amrr.send(method_to_test)
+      amrr.send(method_name)
     end
   end
 
@@ -149,36 +136,39 @@ RSpec.describe ApprovalMergeRequestRule do
     end
 
     %i(name approvals_required users groups).each do |method_name|
-      context "when approval_project_rule has diverged" do
-        before do
-          expect(amrr).to receive(:overridden?).and_return(true)
-        end
+      let(:method_name) { method_name }
 
-        context "the rule has not been modified" do
-          it_behaves_like "resyncs with the approval_project_rule" do
-            let(:method_to_test) { method_name }
-          end
-        end
-
-        context "the rule has been modified" do
+      context "when source_rule is present" do
+        context "the AMRR rule has been modified" do
           before do
             amrr.modified_from_project_rule = true
           end
 
-          it_behaves_like "does not resync with the approval_project_rule" do
-            let(:method_to_test) { method_name }
+          it_behaves_like "attempts to read the value from the AMRR record itself"
+        end
+
+        context "the AMRR rule has not been modified" do
+          before do
+            amrr.modified_from_project_rule = false
+          end
+
+          it "attempts to read the value from the source rule (ApprovalProjectRule)" do
+            expect(amrr.approval_project_rule)
+              .to receive(method_name)
+              .at_least(:once)
+              .and_call_original
+
+            amrr.send(method_name)
           end
         end
       end
-    end
 
-    context "when approval_project_rule has not diverged" do
-      before do
-        expect(amrr).to receive(:overridden?).and_return(false)
-      end
+      context "when source_rule is missing" do
+        before do
+          allow(amrr).to receive(:source_rule).and_return(nil)
+        end
 
-      it_behaves_like "does not resync with the approval_project_rule" do
-        let(:method_to_test) { :name }
+        it_behaves_like "attempts to read the value from the AMRR record itself"
       end
     end
   end
