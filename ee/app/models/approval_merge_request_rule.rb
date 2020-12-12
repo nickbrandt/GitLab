@@ -41,6 +41,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   alias_method :source_rule, :approval_project_rule
 
   before_update :compare_with_project_rule
+  after_create :check_for_modification_from_project_rule
 
   validate :validate_approval_project_rule
 
@@ -182,6 +183,16 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   def compare_with_project_rule
     self.modified_from_project_rule = overridden? ? true : false
+  end
+
+  def check_for_modification_from_project_rule
+    reset
+
+    if source_rule
+      compare_with_project_rule
+
+      save! if changed?
+    end
   end
 
   def validate_approval_project_rule
