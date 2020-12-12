@@ -312,26 +312,49 @@ RSpec.describe ProjectsHelper do
     subject { helper.top_level_link(project) }
 
     before do
-      allow(project).to receive(:feature_available?).and_return(false)
       allow(helper).to receive(:can?).and_return(false)
       allow(helper).to receive(:current_user).and_return(user)
     end
 
-    it 'shows security/dashboard path' do
-      allow(helper).to receive(:can?).with(user, :read_project_security_dashboard, project).and_return(true)
+    context 'when user can read project security dashboard and audit events' do
+      before do
+        allow(helper).to receive(:can?).with(user, :read_project_security_dashboard, project).and_return(true)
+        allow(helper).to receive(:can?).with(user, :read_project_audit_events, project).and_return(true)
+      end
 
-      is_expected.to eq("/#{project.full_path}/-/security/dashboard")
+      it { is_expected.to eq("/#{project.full_path}/-/security/dashboard") }
     end
 
-    it 'shows audit_events path' do
-      allow(helper).to receive(:can?).with(user, :read_project_audit_events, project).and_return(true)
-      allow(project).to receive(:feature_available?).with(:audit_events).and_return(true)
+    context 'when user can read audit events' do
+      before do
+        allow(helper).to receive(:can?).with(user, :read_project_security_dashboard, project).and_return(false)
+        allow(helper).to receive(:can?).with(user, :read_project_audit_events, project).and_return(true)
+      end
 
-      is_expected.to eq("/#{project.full_path}/-/audit_events")
+      context 'when the feature is enabled' do
+        before do
+          stub_licensed_features(audit_events: true)
+        end
+
+        it { is_expected.to eq("/#{project.full_path}/-/audit_events") }
+      end
+
+      context 'when the feature is disabled' do
+        before do
+          stub_licensed_features(audit_events: false)
+        end
+
+        it { is_expected.to eq("/#{project.full_path}/-/dependencies") }
+      end
     end
 
-    it 'shows dependencies path' do
-      is_expected.to eq("/#{project.full_path}/-/dependencies")
+    context "when user can't read both project security dashboard and audit events" do
+      before do
+        allow(helper).to receive(:can?).with(user, :read_project_security_dashboard, project).and_return(false)
+        allow(helper).to receive(:can?).with(user, :read_project_audit_events, project).and_return(false)
+      end
+
+      it { is_expected.to eq("/#{project.full_path}/-/dependencies") }
     end
   end
 
@@ -341,26 +364,49 @@ RSpec.describe ProjectsHelper do
     subject { helper.top_level_qa_selector(project) }
 
     before do
-      allow(project).to receive(:feature_available?).and_return(false)
       allow(helper).to receive(:can?).and_return(false)
       allow(helper).to receive(:current_user).and_return(user)
     end
 
-    it 'shows security dashboard selector' do
-      allow(helper).to receive(:can?).with(user, :read_project_security_dashboard, project).and_return(true)
+    context 'when user can read project security dashboard and audit events' do
+      before do
+        allow(helper).to receive(:can?).with(user, :read_project_security_dashboard, project).and_return(true)
+        allow(helper).to receive(:can?).with(user, :read_project_audit_events, project).and_return(true)
+      end
 
-      is_expected.to eq('security_dashboard_link')
+      it { is_expected.to eq('security_dashboard_link') }
     end
 
-    it 'shows audit events selector' do
-      allow(helper).to receive(:can?).with(user, :read_project_audit_events, project).and_return(true)
-      allow(project).to receive(:feature_available?).with(:audit_events).and_return(true)
+    context 'when user can read audit events' do
+      before do
+        allow(helper).to receive(:can?).with(user, :read_project_security_dashboard, project).and_return(false)
+        allow(helper).to receive(:can?).with(user, :read_project_audit_events, project).and_return(true)
+      end
 
-      is_expected.to eq('audit_events_settings_link')
+      context 'when the feature is enabled' do
+        before do
+          stub_licensed_features(audit_events: true)
+        end
+
+        it { is_expected.to eq('audit_events_settings_link') }
+      end
+
+      context 'when the feature is disabled' do
+        before do
+          stub_licensed_features(audit_events: false)
+        end
+
+        it { is_expected.to eq('dependency_list_link') }
+      end
     end
 
-    it 'shows dependencies selector' do
-      is_expected.to eq('dependency_list_link')
+    context "when user can't read both project security dashboard and audit events" do
+      before do
+        allow(helper).to receive(:can?).with(user, :read_project_security_dashboard, project).and_return(false)
+        allow(helper).to receive(:can?).with(user, :read_project_audit_events, project).and_return(false)
+      end
+
+      it { is_expected.to eq('dependency_list_link') }
     end
   end
 
