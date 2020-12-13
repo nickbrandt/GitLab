@@ -175,7 +175,7 @@ export default {
     },
     resolveFileContentInfo(path) {
       return this.resolveFileContent(path).then(content => {
-        const contentType = this.entries[path].mime_type;
+        const contentType = this.entries[path].mimeType;
 
         return {
           content,
