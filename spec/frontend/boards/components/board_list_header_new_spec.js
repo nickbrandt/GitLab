@@ -1,7 +1,7 @@
 import Vuex from 'vuex';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 
-import { mockList2 } from 'jest/boards/mock_data';
+import { mockLabelList } from 'jest/boards/mock_data';
 import BoardListHeader from '~/boards/components/board_list_header_new.vue';
 import { ListType } from '~/boards/constants';
 
@@ -31,7 +31,7 @@ describe('Board List Header Component', () => {
     const boardId = '1';
 
     const listMock = {
-      ...mockList2,
+      ...mockLabelList,
       listType,
       collapsed,
     };

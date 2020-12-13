@@ -9,7 +9,7 @@ import {
   GlSprintf,
   GlTooltipDirective,
 } from '@gitlab/ui';
-import { n__, s__ } from '~/locale';
+import { n__, s__, __ } from '~/locale';
 import AccessorUtilities from '../../lib/utils/accessor';
 import IssueCount from './issue_count.vue';
 import eventHub from '../eventhub';
@@ -19,6 +19,12 @@ import { isScopedLabel } from '~/lib/utils/common_utils';
 import { isListDraggable } from '~/boards/boards_util';
 
 export default {
+  i18n: {
+    newIssue: __('New issue'),
+    listSettings: __('List settings'),
+    expand: s__('Boards|Expand'),
+    collapse: s__('Boards|Collapse'),
+  },
   components: {
     GlButtonGroup,
     GlButton,
@@ -97,7 +103,7 @@ export default {
       return n__(`%d issue`, `%d issues`, this.issuesCount);
     },
     chevronTooltip() {
-      return this.list.collapsed ? s__('Boards|Expand') : s__('Boards|Collapse');
+      return this.list.collapsed ? this.$options.i18n.expand : this.$options.i18n.collapse;
     },
     chevronIcon() {
       return this.list.collapsed ? 'chevron-down' : 'chevron-right';
@@ -329,8 +335,8 @@ export default {
           v-show="!list.collapsed"
           ref="newIssueBtn"
           v-gl-tooltip.hover
-          :aria-label="__('New issue')"
-          :title="__('New issue')"
+          :aria-label="$options.i18n.newIssue"
+          :title="$options.i18n.newIssue"
           class="issue-count-badge-add-button no-drag"
           icon="plus"
           @click="showNewIssueForm"
@@ -340,13 +346,13 @@ export default {
           v-if="isSettingsShown"
           ref="settingsBtn"
           v-gl-tooltip.hover
-          :aria-label="__('List settings')"
+          :aria-label="$options.i18n.listSettings"
           class="no-drag js-board-settings-button"
-          :title="__('List settings')"
+          :title="$options.i18n.listSettings"
           icon="settings"
           @click="openSidebarSettings"
         />
-        <gl-tooltip :target="() => $refs.settingsBtn">{{ __('List settings') }}</gl-tooltip>
+        <gl-tooltip :target="() => $refs.settingsBtn">{{ $options.i18n.listSettings }}</gl-tooltip>
       </gl-button-group>
     </h3>
   </header>

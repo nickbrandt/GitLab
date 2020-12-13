@@ -12,6 +12,11 @@ import { sprintf, __ } from '~/locale';
 
 export default {
   name: 'BoardList',
+  i18n: {
+    loadingIssues: __('Loading issues'),
+    loadingMoreissues: __('Loading more issues'),
+    showingAllIssues: __('Showing all issues'),
+  },
   components: {
     BoardCard,
     BoardNewIssue,
@@ -67,6 +72,9 @@ export default {
     listRef() {
       // When  list is draggable, the reference to the list needs to be accessed differently
       return this.canAdminList ? this.$refs.list.$el : this.$refs.list;
+    },
+    showingAllIssues() {
+      return this.issues.length === this.list.issuesCount;
     },
     treeRootWrapper() {
       return this.canAdminList ? Draggable : 'ul';
@@ -201,7 +209,7 @@ export default {
     <div
       v-if="loading"
       class="gl-mt-4 gl-text-center"
-      :aria-label="__('Loading issues')"
+      :aria-label="$options.i18n.loadingIssues"
       data-testid="board_list_loading"
     >
       <gl-loading-icon />
@@ -230,8 +238,8 @@ export default {
         :disabled="disabled"
       />
       <li v-if="showCount" class="board-list-count gl-text-center" data-issue-id="-1">
-        <gl-loading-icon v-if="loadingMore" label="Loading more issues" />
-        <span v-if="issues.length === list.issuesCount">{{ __('Showing all issues') }}</span>
+        <gl-loading-icon v-if="loadingMore" :label="$options.i18n.loadingMoreissues" />
+        <span v-if="showingAllIssues">{{ $options.i18n.showingAllIssues }}</span>
         <span v-else>{{ paginatedIssueText }}</span>
       </li>
     </component>

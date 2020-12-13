@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 
 import BoardListHeader from 'ee/boards/components/board_list_header_new.vue';
 import getters from 'ee/boards/stores/getters';
-import { mockList2 } from 'jest/boards/mock_data';
+import { mockLabelList } from 'jest/boards/mock_data';
 import { ListType, inactiveId } from '~/boards/constants';
 import sidebarEventHub from '~/sidebar/event_hub';
 
@@ -37,7 +37,7 @@ describe('Board List Header Component', () => {
     const boardId = '1';
 
     const listMock = {
-      ...mockList2,
+      ...mockLabelList,
       listType,
       collapsed,
     };
@@ -109,7 +109,7 @@ describe('Board List Header Component', () => {
       });
 
       it('does not emit event when there is an active List', () => {
-        store.state.activeId = mockList2.id;
+        store.state.activeId = mockLabelList.id;
         createComponent({ listType: hasSettings[0] });
         wrapper.vm.openSidebarSettings();
 

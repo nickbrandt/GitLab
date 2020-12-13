@@ -295,7 +295,7 @@ export const mockList = {
   issuesCount: 1,
 };
 
-export const mockList2 = {
+export const mockLabelList = {
   id: 'gid://gitlab/List/2',
   title: 'To Do',
   position: 0,
@@ -314,7 +314,7 @@ export const mockList2 = {
   issuesCount: 0,
 };
 
-export const mockLists = [mockList, mockList2];
+export const mockLists = [mockList, mockLabelList];
 
 export const mockListsById = keyBy(mockLists, 'id');
 
