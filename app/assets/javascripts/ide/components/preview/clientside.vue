@@ -6,8 +6,17 @@ import { listen } from 'codesandbox-api';
 import { GlLoadingIcon } from '@gitlab/ui';
 import Navigator from './navigator.vue';
 import { packageJsonPath } from '../../constants';
-import { createPathWithExt } from '../../utils';
+import { createPathWithExt, isTextFile } from '../../utils';
 import eventHub from '../../eventhub';
+
+function str2ab(str) {
+  const buf = new ArrayBuffer(str.length); // 2 bytes for each char
+  const bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = str.length; i < strLen; i += 1) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return buf;
+}
 
 export default {
   components: {
@@ -165,12 +174,11 @@ export default {
     },
     resolveFileContent(path) {
       return this.loadFileContent(path).then(contentParam => {
-        const isBase64 = isString(contentParam);
-        const content = isBase64
-          ? Uint8Array.from(atob(contentParam), c => c.charCodeAt(0))
-          : contentParam;
+        const entry = this.entries[path];
 
-        return content;
+        const needsArrayBuffer = !isTextFile(entry) && isString(contentParam);
+
+        return needsArrayBuffer ? str2ab(contentParam) : contentParam;
       });
     },
     resolveFileContentInfo(path) {

@@ -36,6 +36,7 @@ export default {
           type: 'blob',
           content,
           rawPath: !isText ? URL.createObjectURL(file) : '',
+          mimeType: file.type,
         });
 
       if (isText) {
