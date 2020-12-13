@@ -12,6 +12,10 @@ module Resolvers
       ::Issue
     end
 
+    def allowed?(issue)
+      DeclarativePolicy.user_scope { issue.visible_to_user?(current_user) }
+    end
+
     def query_input(**args)
       epic.id
     end

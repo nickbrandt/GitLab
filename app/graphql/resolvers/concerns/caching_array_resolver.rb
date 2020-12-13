@@ -43,8 +43,10 @@
 # (i.e. `resolve(**args).sync == query_for(query_input(**args)).to_a`).
 #
 # Classes may implement:
-# - #item_found(A, R) (return value is ignored)
 # - max_union_size Integer (the maximum number of queries to run in any one union)
+# - preload -> Preloads|NilClass (a set of preloads to apply to each query)
+# - #item_found(A, R) (return value is ignored)
+# - allowed?(R) -> Boolean (if this method returns false, the value is not resolved)
 module CachingArrayResolver
   MAX_UNION_SIZE = 50
 
@@ -76,6 +78,12 @@ module CachingArrayResolver
     end
   end
 
+  # Override to apply filters on a per-item basis
+  def allowed?(item)
+    true
+  end
+
+  # Override to specify preloads for each query
   def preload
     nil
   end
@@ -99,6 +107,8 @@ module CachingArrayResolver
   end
 
   def found(loader, key, value)
+    return unless allowed?(value)
+
     loader.call(key) do |vs|
       item_found(key, value)
       vs << value

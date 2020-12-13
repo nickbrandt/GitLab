@@ -39,6 +39,18 @@ RSpec.describe Resolvers::EpicIssuesResolver do
 
       expect(result).to eq [[issue2, issue1], [issue3, issue4]]
     end
+
+    it 'finds only epic issues that user can read' do
+      guest = create(:user)
+
+      result =
+        [
+          resolve_epic_issues(epic1, user: guest).to_a,
+          resolve_epic_issues(epic2, user: guest).to_a
+        ]
+
+      expect(result).to eq([[issue1], []])
+    end
   end
 
   def resolve_epic_issues(object, user: current_user)
