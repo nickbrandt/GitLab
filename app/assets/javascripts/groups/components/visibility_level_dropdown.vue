@@ -34,7 +34,12 @@ export default {
 <template>
   <div>
     <input type="hidden" name="group[visibility_level]" :value="selectedOption.level" />
-    <gl-dropdown :text="selectedOption.label" class="gl-w-full" menu-class="gl-w-full! gl-mb-0">
+    <gl-dropdown
+      :text="selectedOption.label"
+      class="gl-w-full"
+      menu-class="gl-w-full! gl-mb-0"
+      data-testid="visibility-level"
+    >
       <gl-dropdown-item
         v-for="option in visibilityLevelOptions"
         :key="option.level"

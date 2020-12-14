@@ -30527,9 +30527,6 @@ msgstr ""
 msgid "View supported languages and frameworks"
 msgstr ""
 
-msgid "View the documentation"
-msgstr ""
-
 msgid "View the latest successful deployment to this environment"
 msgstr ""
 
@@ -31115,9 +31112,6 @@ msgid "Who can be an approver?"
 msgstr ""
 
 msgid "Who can see this group?"
-msgstr ""
-
-msgid "Who will be able to see this group?"
 msgstr ""
 
 msgid "Who will be using GitLab?"

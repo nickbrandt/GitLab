@@ -21,11 +21,18 @@ RSpec.describe 'Group' do
     end
 
     describe 'as a non-admin' do
-      it 'creates a group and persists visibility radio selection', :js do
+      it 'creates a group and persists visibility selection', :js do
         stub_application_setting(default_group_visibility: :private)
 
         fill_in 'Group name', with: 'test-group'
-        find("input[name='group[visibility_level]'][value='#{Gitlab::VisibilityLevel::PUBLIC}']").click
+
+        within '[data-testid="visibility-level"]' do
+          expect(page).to have_content 'Private'
+
+          find('.gl-dropdown-toggle').click
+          click_button 'Public'
+        end
+
         click_button 'Create group'
 
         group = Group.find_by(name: 'test-group')
@@ -37,10 +44,10 @@ RSpec.describe 'Group' do
     end
 
     describe 'with expected fields' do
-      it 'renders from as expected', :aggregate_failures do
+      it 'renders form as expected', :aggregate_failures do
         expect(page).to have_field('name')
         expect(page).to have_field('group_path')
-        expect(page).to have_field('group_visibility_level_0')
+        expect(page).to have_content('Visibility level')
         expect(page).not_to have_field('description')
       end
     end
