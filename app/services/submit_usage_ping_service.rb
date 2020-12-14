@@ -17,9 +17,6 @@ class SubmitUsagePingService
   SubmissionError = Class.new(StandardError)
 
   def execute
-    # Disable usage ping for GitLab.com
-    # See https://gitlab.com/gitlab-org/gitlab/-/issues/292929 for details
-    return if Gitlab.com?
     return unless Gitlab::CurrentSettings.usage_ping_enabled?
     return if User.single_user&.requires_usage_stats_consent?
 
