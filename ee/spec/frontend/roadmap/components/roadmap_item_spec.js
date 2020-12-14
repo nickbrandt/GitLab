@@ -2,7 +2,9 @@ import { shallowMount } from '@vue/test-utils';
 
 import RoadmapItem from 'ee/roadmap/components/roadmap_item.vue';
 
-import { PRESET_TYPES, MONTH } from 'ee/roadmap/constants';
+import dateFormat from 'dateformat';
+
+import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import { mockMonthly } from 'ee_jest/roadmap/mock_data';
 
@@ -41,8 +43,8 @@ describe('RoadmapItem component', () => {
 
   beforeEach(() => {
     defaultTimeframe = mockMonthly.timeframe;
-    defaultInitialStartDate = new Date(2020, MONTH.NOV, 10);
-    defaultInitialEndDate = new Date(2021, MONTH.FEB, 28);
+    defaultInitialStartDate = new Date(dateFormat('Nov 10 2020'));
+    defaultInitialEndDate = new Date(dateFormat('Feb 28 2021'));
     defaultMockItem = createMockEpic({
       startDate: defaultInitialStartDate,
       endDate: defaultInitialEndDate,
@@ -83,7 +85,7 @@ describe('RoadmapItem component', () => {
         "startDate" computed prop always returns the true, unmodified start date "Feb 1, 2020"
       */
       it('returns item.startDate when start date is within range', () => {
-        const item = createMockEpic({ startDate: new Date(2020, MONTH.OCT, 1) });
+        const item = createMockEpic({ startDate: new Date(dateFormat('Oct 1 2020')) });
         createWrapper({ item });
 
         expect(wrapper.vm.startDate).toEqual(item.startDate);
@@ -92,7 +94,7 @@ describe('RoadmapItem component', () => {
       it('returns item.originalStartDate when start date is out of range', () => {
         // mockMonthlyTimeframe ranges from Oct 2020 to May 2021 (inclusive).
         // Set startDate to Feb 2020 to test the scenario.
-        const item = createMockEpic({ startDate: new Date(2020, MONTH.FEB, 1) });
+        const item = createMockEpic({ startDate: new Date(dateFormat('Feb 1 2020')) });
         createWrapper({ item });
 
         expect(wrapper.vm.startDate).toEqual(item.originalStartDate);
@@ -101,7 +103,7 @@ describe('RoadmapItem component', () => {
 
     describe('endDate', () => {
       it('returns item.endDate when end date is within range', () => {
-        const item = createMockEpic({ endDate: new Date(2020, MONTH.DEC, 31) });
+        const item = createMockEpic({ endDate: new Date(dateFormat('Dec 31 2020')) });
         createWrapper({ item });
 
         expect(wrapper.vm.endDate).toEqual(item.endDate);
@@ -110,7 +112,7 @@ describe('RoadmapItem component', () => {
       it('returns item.originalEndDate when end date is out of range', () => {
         // mockMonthlyTimeframe ranges from Oct 2020 to May 2021 (inclusive).
         // Set endDate to Jun 2020 to test the scenario.
-        const item = createMockEpic({ endDate: new Date(2021, MONTH.JUN, 1) });
+        const item = createMockEpic({ endDate: new Date(dateFormat('Jun 1 2021')) });
         createWrapper({ item });
 
         expect(wrapper.vm.endDate).toEqual(item.originalEndDate);

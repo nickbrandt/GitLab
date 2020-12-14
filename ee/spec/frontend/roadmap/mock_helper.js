@@ -25,7 +25,7 @@ import { pikadayToString } from '~/lib/utils/datetime_utility';
   The recommendations are:
 
   1. Use mockEpicBase and compose a complete mock item on a case-by-case basis like this:
-  mockItem = { ...mockEpicBase, startDate: new Date(2020, MONTH.SEP, 1), endDate: new Date(2021, MONTH.JAN, 10) }
+  mockItem = { ...mockEpicBase, startDate: new Date(2020, 8, 1), endDate: new Date(2021, 0, 10) }
 
   or
 

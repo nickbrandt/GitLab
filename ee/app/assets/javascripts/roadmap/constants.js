@@ -78,21 +78,7 @@ export const EPICS_LIMIT_DISMISSED_COOKIE_NAME = 'epics_limit_warning_dismissed'
 
 export const EPICS_LIMIT_DISMISSED_COOKIE_TIMEOUT = 365;
 
-export const GRID_COLOR = '#DBDBDB'; // equivalent to gl-gray-100
+export const GRID_COLOR =
+  getComputedStyle(document.documentElement).getPropertyValue('--gray-100') || '#dbdbdb';
 
 export const CURRENT_DAY_INDICATOR_COLOR = '#DD2B0E';
-
-export const MONTH = {
-  JAN: 0,
-  FEB: 1,
-  MAR: 2,
-  APR: 3,
-  MAY: 4,
-  JUN: 5,
-  JUL: 6,
-  AUG: 7,
-  SEP: 8,
-  OCT: 9,
-  NOV: 10,
-  DEC: 11,
-};

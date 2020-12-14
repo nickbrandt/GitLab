@@ -1,13 +1,15 @@
-import { PRESET_TYPES, TIMELINE_CELL_MIN_WIDTH, MONTH } from 'ee/roadmap/constants';
+import dateFormat from 'dateformat';
+
+import { PRESET_TYPES, TIMELINE_CELL_MIN_WIDTH } from 'ee/roadmap/constants';
 
 import { mockMonthly, mockWeekly, mockQuarterly } from 'ee_jest/roadmap/mock_data';
 
 import { createMockEpic } from 'ee_jest/roadmap/mock_helper';
 
-const NOV_10_2020 = new Date(2020, MONTH.NOV, 10);
-const JAN_1_2021 = new Date(2021, MONTH.JAN, 1);
-const JUN_2_2021 = new Date(2021, MONTH.JUN, 2);
-const DEC_31_2021 = new Date(2021, MONTH.DEC, 31);
+const NOV_10_2020 = new Date(dateFormat('Nov 10 2020'));
+const JAN_1_2021 = new Date(dateFormat('Jan 1 2021'));
+const JUN_2_2021 = new Date(dateFormat('Jun 2 2021'));
+const DEC_31_2021 = new Date(dateFormat('Dec 31 2021'));
 
 export const presetTypeTestCases = [
   ['presetTypeQuarters', PRESET_TYPES.QUARTERS, mockQuarterly.timeframe],
@@ -132,8 +134,8 @@ const testCaseForTimelineBar1 = (() => {
   */
 
   const item = createMockEpic({
-    startDate: new Date(2020, MONTH.DEC, 1),
-    endDate: new Date(2020, MONTH.DEC, 31),
+    startDate: new Date(dateFormat('Dec 1 2020')),
+    endDate: new Date(dateFormat('Dec 31 2020')),
     timeframe: mockMonthly.timeframe,
   });
   const timeframeItemIndex = 2;
@@ -175,7 +177,7 @@ const testCaseForTimelineBar2 = (() => {
                           timeframeItemIndex == 1
 
   */
-  const startDate = new Date(2020, MONTH.OCT, 8);
+  const startDate = new Date(dateFormat('Oct 8 2020'));
   const item = createMockEpic({ startDate, endDate: undefined, timeframe: mockWeekly.timeframe });
 
   // There are seven days in a week and each timeframe is TIMELINE_CELL_MIN_WIDTH px long.
@@ -223,7 +225,7 @@ const testCaseForTimelineBar3 = (() => {
     */
   const item = createMockEpic({
     startDate: undefined,
-    endDate: new Date(2021, MONTH.MAR, 31),
+    endDate: new Date(dateFormat('Mar 31 2021')),
     timeframe: mockQuarterly.timeframe,
     useQuarterlyTimeframe: true,
   });

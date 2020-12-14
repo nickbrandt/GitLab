@@ -4,7 +4,7 @@ import {
   getTimeframeForQuartersView,
 } from 'ee/roadmap/utils/roadmap_utils';
 
-import { MONTH } from 'ee/roadmap/constants';
+import dateFormat from 'dateformat';
 
 export const mockScrollBarSize = 15;
 
@@ -102,7 +102,7 @@ export const mockTimeframeWeeksAppend = [
   new Date(2018, 2, 4),
 ];
 
-const DEC_1_2020 = new Date(2020, MONTH.DEC, 1);
+const DEC_1_2020 = new Date(dateFormat('Dec 1 2020'));
 export const mockMonthly = {
   currentDate: DEC_1_2020,
   timeframe: getTimeframeForMonthsView(DEC_1_2020),
@@ -112,7 +112,7 @@ export const mockMonthly = {
   currentIndex: 2,
 };
 
-const OCT_11_2020 = new Date(2020, MONTH.OCT, 11);
+const OCT_11_2020 = new Date(dateFormat('Oct 11 2020'));
 export const mockWeekly = {
   currentDate: OCT_11_2020,
   timeframe: getTimeframeForWeeksView(OCT_11_2020),
@@ -122,7 +122,7 @@ export const mockWeekly = {
   currentIndex: 2,
 };
 
-const DEC_25_2020 = new Date(2020, MONTH.DEC, 25);
+const DEC_25_2020 = new Date(dateFormat('Dec 25 2020'));
 export const mockQuarterly = {
   currentDate: DEC_25_2020,
   timeframe: getTimeframeForQuartersView(DEC_25_2020),
