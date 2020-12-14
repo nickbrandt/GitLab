@@ -209,6 +209,9 @@ module EE
         def handle_merge_request
           if rule = sync_rule
             rule.approval_project_rule = target.target_project.approval_rules.regular.first
+
+            rule.modified_from_project_rule = rule.overridden? ? true : false
+            rule.save! if rule.changed?
           end
 
           target.sync_code_owners_with_approvers if @sync_code_owner_rule
