@@ -44,7 +44,7 @@
       "type": "boolean"
     },
     "rollout_status": {
-      "$ref": "../../../../../spec/fixtures/api/schemas/rollout_status.json"
+      "$ref": "rollout_status.json"
     },
     "environment_path": {
       "type": "string"
