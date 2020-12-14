@@ -10,11 +10,11 @@ module Gitlab
       end
 
       def json
-        { 'packages' => { @packages.first.name => package_versions_map(@packages) } }
+        @json ||= { 'packages' => { @packages.first.name => package_versions_map(@packages) } }
       end
 
       def sha
-        Digest::SHA256.hexdigest(json.to_json)
+        @sha ||= Digest::SHA256.hexdigest(json.to_json)
       end
 
       private
