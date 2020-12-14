@@ -12,7 +12,7 @@ description: "Autocomplete characters in Markdown fields."
 > - Iterations autocomplete is deployed behind a feature flag, disabled by default.
 > - Iterations autocomplete is disabled for GitLab.com.
 > - Iterations autocomplete is not recommended for production use.
-> - To use Iterations autocomplete in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-iterations-autocomplete-starter-only). **(STARTER ONLY)**
+> - To use Iterations autocomplete in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-iterations-autocomplete). **(STARTER ONLY)**
 
 The autocomplete characters provide a quick way of entering field values into
 Markdown fields. When you start typing a word in a Markdown field with one of
