@@ -176,7 +176,7 @@ module Gitlab
 
             name = uuid_v5_name_components.values.join('-')
 
-            Gitlab::Vulnerabilities::CalculateFindingUUID.call(name)
+            Gitlab::UUID.v5(name)
           end
         end
       end
