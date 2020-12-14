@@ -4,7 +4,6 @@ module Mutations
   module Snippets
     class Create < BaseMutation
       include SpammableMutationFields
-      include ResolvesProject
 
       authorize :create_snippet
 
