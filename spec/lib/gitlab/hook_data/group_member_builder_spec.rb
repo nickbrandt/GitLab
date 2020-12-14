@@ -11,7 +11,7 @@ RSpec.describe Gitlab::HookData::GroupMemberBuilder do
     let(:event_name) { data[:event_name] }
     let(:attributes) do
       [
-        :event_name, :created_at, :updated_at, :group_name, :group_path,
+        :event_name, :created_at, :updated_at, :expires_at, :group_name, :group_path,
         :group_id, :user_id, :user_username, :user_name, :user_email, :group_access
       ]
     end
@@ -31,6 +31,7 @@ RSpec.describe Gitlab::HookData::GroupMemberBuilder do
           expect(data[:group_access]).to eq('Developer')
           expect(data[:created_at]).to eq(group_member.created_at&.xmlschema)
           expect(data[:updated_at]).to eq(group_member.updated_at&.xmlschema)
+          expect(data[:expires_at]).to eq(group_member.expires_at&.xmlschema)
         end
       end
 
