@@ -9415,9 +9415,6 @@ msgstr ""
 msgid "Describe the goal of the changes and what reviewers should be aware of."
 msgstr ""
 
-msgid "Describe the requirement here"
-msgstr ""
-
 msgid "Description"
 msgstr ""
 
@@ -23559,9 +23556,6 @@ msgid "Requirement %{reference} has been reopened"
 msgstr ""
 
 msgid "Requirement %{reference} has been updated"
-msgstr ""
-
-msgid "Requirement title"
 msgstr ""
 
 msgid "Requirement title cannot have more than %{limit} characters."
