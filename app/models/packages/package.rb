@@ -102,6 +102,7 @@ class Packages::Package < ApplicationRecord
   # Sorting
   scope :order_created, -> { reorder('created_at ASC') }
   scope :order_created_desc, -> { reorder('created_at DESC') }
+  scope :order_updated_desc, -> { reorder('updated_at DESC') }
   scope :order_name, -> { reorder('name ASC') }
   scope :order_name_desc, -> { reorder('name DESC') }
   scope :order_version, -> { reorder('version ASC') }

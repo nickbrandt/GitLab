@@ -19,25 +19,13 @@ module Packages
         { 'providers' => providers_map }
       end
 
-      def package_versions(packages = @packages)
-        package_versions_json(packages).json
-      end
-
-      def package_versions_sha(packages = @packages)
-        package_versions_json(packages).sha
-      end
-
       private
-
-      def package_versions_json(packages)
-        ::Gitlab::Composer::VersionJson.new(packages)
-      end
 
       def providers_map
         map = {}
 
         @packages.group_by(&:name).each_pair do |package_name, packages|
-          map[package_name] = { 'sha256' => package_versions_sha(packages) }
+          map[package_name] = { 'sha256' => packages.max_by(&:updated_at).composer_metadatum.version_cache_sha }
         end
 
         map

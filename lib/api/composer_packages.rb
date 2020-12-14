@@ -40,7 +40,7 @@ module API
           if params[:package_name].present?
             params[:package_name], params[:sha] = params[:package_name].split('$')
 
-            packages = packages.with_name(params[:package_name])
+            packages = packages.with_name(params[:package_name]).order_updated_desc
           end
 
           packages
@@ -97,7 +97,21 @@ module API
         not_found! if packages.empty?
         not_found! if params[:sha].blank?
 
-        presenter.package_versions
+        index = ::Gitlab::Composer::VersionJson.new(packages)
+
+        Rails.logger.info("====> index: #{index.sha} cache: #{packages.first.composer_metadatum.version_cache_sha} param: #{params[:sha]} packages: #{packages.size}")
+
+        # if the cached SHA and the current SHA differ, we need to update the CACHE
+        if index.sha != packages.first.composer_metadatum.version_cache_sha
+          ::Gitlab::Composer::Cache.new.update(packages.first)
+          not_found!
+        # if the requested SHA doesn't match it means we're requesting an "OLD" index,
+        # so just return 404.
+        elsif index.sha != params[:sha]
+          not_found!
+        end
+
+        index.json
       end
     end
 

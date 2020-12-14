@@ -167,8 +167,8 @@ RSpec.describe API::ComposerPackages do
 
   describe 'GET /api/v4/group/:id/-/packages/composer/*package_name.json' do
     let(:package_name) { 'foobar' }
-    let(:sha) { '$1234' }
-    let(:url) { "/group/#{group.id}/-/packages/composer/#{package_name}#{sha}.json" }
+    let(:sha) { '1234' }
+    let(:url) { "/group/#{group.id}/-/packages/composer/#{package_name}$#{sha}.json" }
 
     subject { get api(url), headers: headers }
 
@@ -180,6 +180,11 @@ RSpec.describe API::ComposerPackages do
 
     context 'with valid project' do
       let!(:package) { create(:composer_package, :with_metadatum, name: package_name, project: project) }
+      let(:sha) { ::Gitlab::Composer::VersionJson.new([package]).sha }
+
+      before do
+        ::Gitlab::Composer::Cache.new.update(package)
+      end
 
       where(:project_visibility_level, :user_role, :member, :user_token, :shared_examples_name, :expected_status) do
         'PUBLIC'  | :developer  | true  | true  | 'Composer package api request' | :success
@@ -214,6 +219,26 @@ RSpec.describe API::ComposerPackages do
         include_context 'Composer api group access', 'PRIVATE', :developer, true do
           include_context 'Composer user type', :developer, true do
             it_behaves_like 'process Composer api request', :developer, :not_found, true
+          end
+        end
+      end
+
+      context 'when the checksum does not match' do
+        context 'when the cached SHA and the current SHA differ' do
+          before do
+            package.composer_metadatum.update(version_cache_sha: 'abc')
+          end
+
+          include_context 'Composer api group access', 'PRIVATE', :developer, true do
+            include_context 'Composer user type', :developer, true do
+              it 'returns 404 and update the cache' do
+                subject
+
+                expect(response).to have_gitlab_http_status(:not_found)
+
+                expect(package.composer_metadatum.reload.version_cache_sha).to eq sha
+              end
+            end
           end
         end
       end

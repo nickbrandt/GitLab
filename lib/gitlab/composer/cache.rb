@@ -14,7 +14,7 @@ module Gitlab
       end
 
       def sibling_packages(package)
-        package.project.packages.with_name(package.name)
+        package.project.packages.with_name(package.name).order_updated_desc
       end
     end
   end
