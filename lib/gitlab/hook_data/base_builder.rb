@@ -24,7 +24,8 @@ module Gitlab
       def timestamps_data
         {
           created_at: object.created_at&.xmlschema,
-          updated_at: object.updated_at&.xmlschema
+          updated_at: object.updated_at&.xmlschema,
+          expires_at: object.expires_at&.xmlschema
         }
       end
 
