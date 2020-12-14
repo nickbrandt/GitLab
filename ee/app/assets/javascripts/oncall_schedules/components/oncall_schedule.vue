@@ -75,7 +75,7 @@ export default {
     scheduleRange() {
       const range = { start: [this.timeframe[0]], end: [...this.timeframe].pop() };
 
-      return `${formatDate(range.start, 'mmmm d')} - ${formatDate(range.end, 'mmmm d')}`;
+      return `${formatDate(range.start, 'mmmm d')} - ${formatDate(range.end, 'mmmm d, yyyy')}`;
     },
   },
 };
@@ -108,7 +108,7 @@ export default {
           </gl-button-group>
         </div>
       </template>
-      <p class="gl-text-gray-500 gl-mb-5" data-testid="scheduleBody">
+      <p class="gl-text-gray-500 gl-mb-3" data-testid="scheduleBody">
         <gl-sprintf :message="$options.i18n.scheduleForTz">
           <template #tzShort>{{ schedule.timezone }}</template>
         </gl-sprintf>

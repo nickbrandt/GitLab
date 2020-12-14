@@ -48,7 +48,7 @@ export default {
         class="details-cell gl-display-flex gl-justify-content-space-between gl-align-items-center gl-pl-3"
       >
         <span class="gl-str-truncated">{{ rotation.name }}</span>
-        <gl-button-group>
+        <gl-button-group class="gl-px-2">
           <gl-button
             v-gl-tooltip
             category="tertiary"
