@@ -24912,6 +24912,11 @@ type Vulnerability implements Noteable {
   ): VulnerabilityExternalIssueLinkConnection!
 
   """
+  Indicates whether there is a solution available for this vulnerability.
+  """
+  hasSolutions: Boolean
+
+  """
   GraphQL ID of the vulnerability
   """
   id: ID!

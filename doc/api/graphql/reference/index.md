@@ -3748,6 +3748,7 @@ Represents a vulnerability.
 | `discussions` | DiscussionConnection! | All discussions on this noteable |
 | `dismissedAt` | Time | Timestamp of when the vulnerability state was changed to dismissed |
 | `externalIssueLinks` | VulnerabilityExternalIssueLinkConnection! | List of external issue links related to the vulnerability |
+| `hasSolutions` | Boolean | Indicates whether there is a solution available for this vulnerability. |
 | `id` | ID! | GraphQL ID of the vulnerability |
 | `identifiers` | VulnerabilityIdentifier! => Array | Identifiers of the vulnerability. |
 | `issueLinks` | VulnerabilityIssueLinkConnection! | List of issue links related to the vulnerability |
