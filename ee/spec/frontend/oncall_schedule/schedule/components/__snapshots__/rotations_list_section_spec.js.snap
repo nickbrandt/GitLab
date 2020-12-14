@@ -16,7 +16,9 @@ exports[`RotationsListSectionComponent renders component layout 1`] = `
         Rotation 242
       </span>
        
-      <gl-button-group-stub>
+      <gl-button-group-stub
+        class="gl-px-2"
+      >
         <gl-button-stub
           aria-label="Edit rotation"
           buttontextclasses=""
