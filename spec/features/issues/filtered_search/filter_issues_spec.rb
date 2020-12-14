@@ -157,7 +157,7 @@ RSpec.describe 'Filter issues', :js do
     it 'does not allow filtering by reviewer' do
       find('.filtered-search').click
 
-      expect(page).to_not have_button('Reviewer')
+      expect(page).not_to have_button('Reviewer')
     end
   end
 
