@@ -218,7 +218,7 @@ RSpec.describe Projects::Prometheus::Alerts::NotifyService do
         it 'processes Prometheus alerts' do
           expect(AlertManagement::ProcessPrometheusAlertService)
             .to receive(:new)
-            .with(project, nil, kind_of(Hash))
+            .with(project, kind_of(Hash))
             .exactly(3).times
             .and_return(process_service)
           expect(process_service).to receive(:execute).exactly(3).times

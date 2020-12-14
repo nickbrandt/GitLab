@@ -121,7 +121,7 @@ module Projects
         def process_prometheus_alerts
           alerts.each do |alert|
             AlertManagement::ProcessPrometheusAlertService
-              .new(project, nil, alert.to_h)
+              .new(project, alert.to_h)
               .execute
           end
         end
