@@ -30050,7 +30050,7 @@
           "fields": [
             {
               "name": "id",
-              "description": "ID of the on-call rotation",
+              "description": "ID of the on-call rotation.",
               "args": [
 
               ],
@@ -30068,7 +30068,7 @@
             },
             {
               "name": "length",
-              "description": "Time zone of the on-call schedule",
+              "description": "Length of the on-call schedule, in the units specified by lengthUnit.",
               "args": [
 
               ],
@@ -30082,7 +30082,7 @@
             },
             {
               "name": "lengthUnit",
-              "description": "Unit of the on-call rotation length",
+              "description": "Unit of the on-call rotation length.",
               "args": [
 
               ],
@@ -30096,7 +30096,7 @@
             },
             {
               "name": "name",
-              "description": "Name of the on-call rotation",
+              "description": "Name of the on-call rotation.",
               "args": [
 
               ],
@@ -30114,7 +30114,7 @@
             },
             {
               "name": "participants",
-              "description": "Participants of the on-call rotation",
+              "description": "Participants of the on-call rotation.",
               "args": [
                 {
                   "name": "after",
@@ -30167,7 +30167,7 @@
             },
             {
               "name": "startsAt",
-              "description": "Start date of the on-call rotation",
+              "description": "Start date of the on-call rotation.",
               "args": [
 
               ],
@@ -46650,7 +46650,7 @@
             },
             {
               "name": "startsAt",
-              "description": "The start date and time of the on-call rotation",
+              "description": "The start date and time of the on-call rotation, in the timezone of the on-call schedule",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -46868,19 +46868,19 @@
           "enumValues": [
             {
               "name": "HOURS",
-              "description": "One Hours",
+              "description": "Hours",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "DAYS",
-              "description": "One Days",
+              "description": "Days",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "WEEKS",
-              "description": "One Weeks",
+              "description": "Weeks",
               "isDeprecated": false,
               "deprecationReason": null
             }
@@ -47311,7 +47311,7 @@
             },
             {
               "name": "colorPalette",
-              "description": "The color palette to assign to the on-call user, for example: \"blue\".",
+              "description": "A value of DataVisualizationColorEnum. The color from the palette to assign to the on-call user.",
               "type": {
                 "kind": "ENUM",
                 "name": "DataVisualizationColorEnum",
@@ -47321,7 +47321,7 @@
             },
             {
               "name": "colorWeight",
-              "description": "The color weight to assign to for the on-call user, for example \"500\". Max 4 chars. For easy identification of the user.",
+              "description": "A value of DataVisualizationWeightEnum. The color weight to assign to for the on-call user, for example \"500\". Max 4 chars.",
               "type": {
                 "kind": "ENUM",
                 "name": "DataVisualizationWeightEnum",
