@@ -1,5 +1,5 @@
 <script>
-import { GlToken, GlAvatarLabeled, GlTooltipDirective, GlPopover } from '@gitlab/ui';
+import { GlToken, GlAvatarLabeled, GlPopover } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import { assigneeScheduleDateStart } from '../../../utils/common_utils';
 
@@ -8,9 +8,6 @@ export default {
     GlToken,
     GlAvatarLabeled,
     GlPopover,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
   },
   props: {
     assigneeIndex: {
@@ -50,7 +47,7 @@ export default {
 </script>
 
 <template>
-  <div class="gl-f-full gl-mt-3 gl-px-3">
+  <div class="gl-w-full gl-mt-3 gl-px-3">
     <gl-token
       :id="assignee.user.id"
       :category-palette="assignee.colorPalette"
@@ -58,8 +55,6 @@ export default {
       class="gl-w-full gl-align-items-center"
     >
       <gl-avatar-labeled
-        v-gl-tooltip="{ placement: 'bottom' }"
-        class="gl-text-white"
         shape="circle"
         :size="16"
         :src="assignee.user.avatarUrl"

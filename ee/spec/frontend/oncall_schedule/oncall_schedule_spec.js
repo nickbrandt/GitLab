@@ -63,11 +63,11 @@ describe('On-call schedule', () => {
   });
 
   it('shows timezone info', () => {
-    const shortTz = i18n.scheduleForTz.replace('%{tzShort}', lastTz.identifier);
-    const longTz = `(UTC ${lastTz.formatted_offset})`;
+    const timezone = i18n.scheduleForTz.replace('%{timezone}', lastTz.identifier);
+    const offset = `(UTC ${lastTz.formatted_offset})`;
     const description = findSchedule().text();
-    expect(description).toContain(shortTz);
-    expect(description).toContain(longTz);
+    expect(description).toContain(timezone);
+    expect(description).toContain(offset);
   });
 
   it('renders rotations header', () => {

@@ -19268,7 +19268,7 @@ msgstr ""
 msgid "OnCallSchedules|On-call schedule"
 msgstr ""
 
-msgid "OnCallSchedules|On-call schedule for the %{tzShort}"
+msgid "OnCallSchedules|On-call schedule for the %{timezone}"
 msgstr ""
 
 msgid "OnCallSchedules|Rotation length"

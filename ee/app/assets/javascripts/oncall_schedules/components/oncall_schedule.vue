@@ -8,7 +8,7 @@ import {
   GlTooltipDirective,
 } from '@gitlab/ui';
 import { formatDate } from '~/lib/utils/datetime_utility';
-import { s__ } from '~/locale';
+import { s__, __ } from '~/locale';
 import ScheduleTimelineSection from './schedule/components/schedule_timeline_section.vue';
 import DeleteScheduleModal from './delete_schedule_modal.vue';
 import EditScheduleModal from './edit_schedule_modal.vue';
@@ -19,7 +19,7 @@ import { PRESET_TYPES } from '../constants';
 import RotationsListSection from './schedule/components/rotations_list_section.vue';
 
 export const i18n = {
-  scheduleForTz: s__('OnCallSchedules|On-call schedule for the %{tzShort}'),
+  scheduleForTz: s__('OnCallSchedules|On-call schedule for the %{timezone}'),
   editScheduleLabel: s__('OnCallSchedules|Edit schedule'),
   deleteScheduleLabel: s__('OnCallSchedules|Delete schedule'),
   rotationTitle: s__('OnCallSchedules|Rotations'),
@@ -64,16 +64,15 @@ export default {
     },
   },
   computed: {
-    tzLong() {
+    offset() {
       const selectedTz = this.timezones.find(tz => tz.identifier === this.schedule.timezone);
-      // eslint-disable-next-line @gitlab/require-i18n-strings
-      return `(UTC ${selectedTz.formatted_offset})`;
+      return __(`(UTC ${selectedTz.formatted_offset})`);
     },
     timeframe() {
       return getTimeframeForWeeksView();
     },
     scheduleRange() {
-      const range = { start: [this.timeframe[0]], end: [...this.timeframe].pop() };
+      const range = { start: this.timeframe[0], end: this.timeframe[this.timeframe.length - 1] };
 
       return `${formatDate(range.start, 'mmmm d')} - ${formatDate(range.end, 'mmmm d, yyyy')}`;
     },
@@ -110,9 +109,9 @@ export default {
       </template>
       <p class="gl-text-gray-500 gl-mb-3" data-testid="scheduleBody">
         <gl-sprintf :message="$options.i18n.scheduleForTz">
-          <template #tzShort>{{ schedule.timezone }}</template>
+          <template #timezone>{{ schedule.timezone }}</template>
         </gl-sprintf>
-        | {{ tzLong }}
+        | {{ offset }}
       </p>
       <div class="gl-w-full gl-display-flex gl-align-items-center gl-pb-3">
         <gl-button-group>

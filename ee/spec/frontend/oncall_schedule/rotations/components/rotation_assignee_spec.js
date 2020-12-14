@@ -46,8 +46,9 @@ describe('RotationAssignee', () => {
     });
 
     it('should render an assignee color based on the chevron skipping color pallette', () => {
-      expect(findToken().attributes('categorypalette')).toBe(assignee.colorPalette);
-      expect(findToken().attributes('categoryweight')).toBe(assignee.colorWeight);
+      const token = findToken();
+      expect(token.attributes('categorypalette')).toBe(assignee.colorPalette);
+      expect(token.attributes('categoryweight')).toBe(assignee.colorWeight);
     });
 
     it('should render an assignee schedule and rotation information in a popover', () => {
