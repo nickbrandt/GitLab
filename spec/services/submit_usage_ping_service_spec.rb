@@ -80,6 +80,14 @@ RSpec.describe SubmitUsagePingService do
     end
   end
 
+  context 'when GitLab.com' do
+    before do
+      allow(Gitlab).to receive(:com?).and_return(true)
+    end
+
+    it_behaves_like 'does not run'
+  end
+
   context 'when usage ping is disabled' do
     before do
       stub_application_setting(usage_ping_enabled: false)
