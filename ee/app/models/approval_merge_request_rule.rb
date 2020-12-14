@@ -162,17 +162,6 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   private
 
-  def sync_with_project_rule
-    params = {
-      name:               source_rule.name,
-      approvals_required: source_rule.approvals_required,
-      user_ids:           source_rule.users.pluck(:id),
-      group_ids:          source_rule.groups.pluck(:id)
-    }
-
-    ::ApprovalRules::UpdateService.new(self, nil, params).execute # rubocop: disable CodeReuse/ServiceClass
-  end
-
   def retrieve_value_from_record(method_name)
     if attributes.key?(method_name.to_s)
       read_attribute(method_name)
