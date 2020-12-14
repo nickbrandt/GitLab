@@ -2,6 +2,7 @@
 import { editor as monacoEditor, languages as monacoLanguages, Uri } from 'monaco-editor';
 import waitForPromises from 'helpers/wait_for_promises';
 import Editor from '~/editor/editor_lite';
+import { EditorLiteExtension } from '~/editor/editor_lite_extension_base';
 import { DEFAULT_THEME, themes } from '~/ide/lib/themes';
 import { EDITOR_LITE_INSTANCE_ERROR_NO_EL, URI_PREFIX } from '~/editor/constants';
 
@@ -260,6 +261,25 @@ describe('Base editor', () => {
         return this?.nonExistentProp || betaRes;
       }
     }
+    class WithStaticMethod {
+      constructor({ instance: inst, ...options } = {}) {
+        Object.assign(inst, options);
+      }
+      static computeBoo(a) {
+        return a + 1;
+      }
+      boo() {
+        return WithStaticMethod.computeBoo(this.base);
+      }
+    }
+    class WithStaticMethodExtended extends EditorLiteExtension {
+      static computeBoo(a) {
+        return a + 1;
+      }
+      boo() {
+        return WithStaticMethodExtended.computeBoo(this.base);
+      }
+    }
     const AlphaExt = new AlphaClass();
     const BetaExt = new BetaClass();
     const FooObjExt = {
@@ -319,15 +339,46 @@ describe('Base editor', () => {
         });
       });
 
+      it('does not extend instance with private data of an extension', () => {
+        const ext = new WithStaticMethod({ instance });
+        ext.staticMethod = () => {
+          return 'foo';
+        };
+        ext.staticProp = 'bar';
+
+        expect(instance.boo).toBeUndefined();
+        expect(instance.staticMethod).toBeUndefined();
+        expect(instance.staticProp).toBeUndefined();
+
+        instance.use(ext);
+
+        expect(instance.boo).toBeDefined();
+        expect(instance.staticMethod).toBeUndefined();
+        expect(instance.staticProp).toBeUndefined();
+      });
+
+      it.each([WithStaticMethod, WithStaticMethodExtended])(
+        'properly resolves data for an extension with private data',
+        ExtClass => {
+          const base = 1;
+          expect(instance.base).toBeUndefined();
+          expect(instance.boo).toBeUndefined();
+
+          const ext = new ExtClass({ instance, base });
+
+          instance.use(ext);
+          expect(instance.base).toBe(1);
+          expect(instance.boo()).toBe(2);
+        },
+      );
+
       it('uses the last definition of a method in case of an overlap', () => {
         const FooObjExt2 = { foo: 'foo2' };
         instance.use([FooObjExt, BarObjExt, FooObjExt2]);
-        expect(instance).toEqual(
-          expect.objectContaining({
-            foo: 'foo2',
-            ...BarObjExt,
-          }),
-        );
+        expect(instance).toMatchObject({
+          foo: 'foo2',
+          ...BarObjExt,
+        });
       });
 
       it('correctly resolves references withing extensions', () => {
