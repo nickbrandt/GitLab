@@ -16504,6 +16504,9 @@ msgstr ""
 msgid "Loading issues"
 msgstr ""
 
+msgid "Loading more issues"
+msgstr ""
+
 msgid "Loading snippet"
 msgstr ""
 

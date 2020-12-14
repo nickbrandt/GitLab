@@ -212,7 +212,7 @@ export default {
             const list = data.boardListUpdateLimitMetrics?.list;
             commit(types.UPDATE_LIST_SUCCESS, {
               listId,
-              list: boardsStore.updateListPosition({ ...list, doNotFetchIssues: true }),
+              list,
             });
           }
         })

@@ -10,14 +10,7 @@ import { formatListIssues } from '~/boards/boards_util';
 import * as typesCE from '~/boards/stores/mutation_types';
 import * as commonUtils from '~/lib/utils/common_utils';
 import { mergeUrlParams, removeParams } from '~/lib/utils/url_utility';
-import {
-  mockLists,
-  mockIssue,
-  mockIssue2,
-  mockEpic,
-  rawIssue,
-  mockListsWithModel,
-} from '../mock_data';
+import { mockLists, mockIssue, mockIssue2, mockEpic, rawIssue } from '../mock_data';
 
 const expectNotImplemented = action => {
   it('is not implemented', () => {
@@ -605,7 +598,7 @@ describe('moveIssue', () => {
     endpoints: { fullPath: 'gitlab-org', boardId: '1' },
     boardType: 'group',
     disabled: false,
-    boardLists: mockListsWithModel,
+    boardLists: mockLists,
     issuesByListId: listIssues,
     issues,
   };
