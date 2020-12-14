@@ -341,15 +341,10 @@ RSpec.describe ApprovalMergeRequestRule do
         expect(subject.approvers).to be_empty
       end
 
-      context 'when the rules users have already been loaded' do
+      context 'when the rule\'s users have already been loaded' do
         before do
           subject.users
           subject.group_users
-        end
-
-        it 'does not perform any new queries when all users are loaded already' do
-          # single query is triggered for license check
-          expect { subject.approvers }.not_to exceed_query_limit(1)
         end
 
         it 'does not contain the author' do
