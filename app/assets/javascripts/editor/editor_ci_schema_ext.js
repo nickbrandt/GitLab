@@ -1,14 +1,15 @@
 import { registerSchema } from '~/ide/utils';
 import Api from '~/api';
 
+// For CI config schemas the filename must match
+// '*.gitlab-ci.yml' regardless of project configuration.
+// https://gitlab.com/gitlab-org/gitlab/-/issues/293641
+import { SCHEMA_FILE_NAME_MATCH } from './constants';
+
 /**
  * Gets the URI of CI config JSON schema file
  */
 const getCiSchemaUri = ({ projectPath, ref }) => {
-  // Note: This `:filename` is hardcoded regardless
-  // project configuration, see more:
-  // - app/services/ide/schemas_config_service.rb
-  const SCHEMA_FILE_NAME_MATCH = '.gitlab-ci.yml';
   const [namespace, project] = projectPath.split('/');
 
   return Api.buildUrl(Api.projectFileSchemaPath)
