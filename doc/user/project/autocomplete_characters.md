@@ -19,18 +19,18 @@ Markdown fields. When you start typing a word in a Markdown field with one of
 the following characters, GitLab progressively autocompletes against a set of
 matching values. The string matching is not case sensitive.
 
-| Character | Autocompletes |
-| :-------- | :------------ |
-| `~`       | Labels |
-| `%`       | Milestones |
-| `@`       | Users and groups |
-| `#`       | Issues |
-| `!`       | Merge requests |
-| `&`       | Epics |
-| `$`       | Snippets |
-| `:`       | Emoji |
-| `/`       | Quick Actions |
-| `*iteration:` | Iterations |
+| Character     | Autocompletes |
+| :------------ | :------------ |
+| `~`           | [Labels](labels.md) |
+| `%`           | [Milestones](milestones/index.md) |
+| `@`           | Users and groups |
+| `#`           | [Issues](issues/index.md) |
+| `!`           | [Merge requests](merge_requests/index.md) |
+| `&`           | [Epics](../group/epics/index.md) |
+| `$`           | [Snippets](../snippets.md) |
+| `:`           | [Emoji](../markdown.md#emoji) |
+| `/`           | [Quick Actions](quick_actions.md) |
+| `*iteration:` | [Iterations](../group/iterations/index.md) **(STARTER)** |
 
 Up to 5 of the most relevant matches are displayed in a popup list. When you
 select an item from the list, the value is entered in the field. The more
