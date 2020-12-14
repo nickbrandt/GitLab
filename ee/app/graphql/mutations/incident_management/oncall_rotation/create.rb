@@ -45,19 +45,17 @@ module Mutations
 
           raise_schedule_not_found unless schedule
 
-          begin
-            result = ::IncidentManagement::OncallRotations::CreateService.new(
-              schedule,
-              project,
-              current_user,
-              create_service_params(schedule, participants, args)
-            ).execute
-
-          rescue ActiveRecord::RecordInvalid => e
-            raise Gitlab::Graphql::Errors::ArgumentError, e.message
-          end
+          result = ::IncidentManagement::OncallRotations::CreateService.new(
+            schedule,
+            project,
+            current_user,
+            create_service_params(schedule, participants, args)
+          ).execute
 
           response(result)
+
+        rescue ActiveRecord::RecordInvalid => e
+          raise Gitlab::Graphql::Errors::ArgumentError, e.message
         end
 
         private
