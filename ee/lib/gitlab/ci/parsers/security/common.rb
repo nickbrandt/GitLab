@@ -171,6 +171,7 @@ module Gitlab
 
             if uuid_v5_name_components.values.any?(&:nil?)
               Gitlab::AppLogger.warn(message: "One or more UUID name components are nil", components: uuid_v5_name_components)
+              return
             end
 
             name = uuid_v5_name_components.values.join('-')
