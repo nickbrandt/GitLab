@@ -31,16 +31,12 @@ export default {
     TextEditor,
   },
   props: {
-    projectPath: {
-      type: String,
-      required: true,
-    },
-    defaultBranch: {
+    commitId: {
       type: String,
       required: false,
       default: null,
     },
-    commitId: {
+    defaultBranch: {
       type: String,
       required: false,
       default: null,
@@ -54,6 +50,7 @@ export default {
       required: true,
     },
   },
+  inject: ['projectFullPath'],
   data() {
     return {
       ciConfigData: {},
@@ -72,7 +69,7 @@ export default {
       query: getBlobContent,
       variables() {
         return {
-          projectPath: this.projectPath,
+          projectPath: this.projectFullPath,
           path: this.ciConfigPath,
           ref: this.defaultBranch,
         };
@@ -204,7 +201,7 @@ export default {
         } = await this.$apollo.mutate({
           mutation: commitCiFileMutation,
           variables: {
-            projectPath: this.projectPath,
+            projectPath: this.projectFullPath,
             branch,
             startBranch: this.defaultBranch,
             message,
@@ -262,7 +259,6 @@ export default {
               v-model="contentModel"
               :ci-config-path="ciConfigPath"
               :commit-id="commitId"
-              :project-path="projectPath"
               @editor-ready="editorIsReady = true"
             />
           </gl-tab>

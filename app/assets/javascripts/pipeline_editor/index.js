@@ -14,7 +14,15 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
     return null;
   }
 
-  const { ciConfigPath, commitId, defaultBranch, newMergeRequestPath, projectPath } = el?.dataset;
+  const {
+    ciConfigPath,
+    commitId,
+    defaultBranch,
+    projectFullPath,
+    projectPath,
+    projectNamespace,
+    newMergeRequestPath,
+  } = el?.dataset;
 
   Vue.use(VueApollo);
 
@@ -25,6 +33,11 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
   return new Vue({
     el,
     apolloProvider,
+    provide: {
+      projectFullPath,
+      projectPath,
+      projectNamespace,
+    },
     render(h) {
       return h(PipelineEditorApp, {
         props: {
@@ -32,7 +45,6 @@ export const initPipelineEditor = (selector = '#js-pipeline-editor') => {
           commitId,
           defaultBranch,
           newMergeRequestPath,
-          projectPath,
         },
       });
     },

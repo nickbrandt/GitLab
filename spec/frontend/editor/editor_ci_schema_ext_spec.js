@@ -32,7 +32,7 @@ describe('~/editor/editor_ci_config_ext', () => {
 
     describe('register validations options with monaco for yaml language', () => {
       it('with expected basic validation configuration', () => {
-        instance.registerCiSchema({ projectPath: 'namespace/my-project' });
+        instance.registerCiSchema({ projectNamespace: 'namespace1', projectPath: 'project1' });
 
         const expectedOptions = {
           validate: true,
@@ -47,13 +47,14 @@ describe('~/editor/editor_ci_config_ext', () => {
       });
 
       it.each`
-        opts                                           | expectedUri
-        ${{}}                                          | ${'/namespace/my-project/-/schema/master/.gitlab-ci.yml'}
-        ${{ ref: 'REF' }}                              | ${'/namespace/my-project/-/schema/REF/.gitlab-ci.yml'}
-        ${{ projectPath: 'namespace2/other-project' }} | ${'/namespace2/other-project/-/schema/master/.gitlab-ci.yml'}
+        opts                                                                | expectedUri
+        ${{}}                                                               | ${'/namespace1/project1/-/schema/master/.gitlab-ci.yml'}
+        ${{ ref: 'REF' }}                                                   | ${'/namespace1/project1/-/schema/REF/.gitlab-ci.yml'}
+        ${{ projectNamespace: 'namespace2', projectPath: 'other-project' }} | ${'/namespace2/other-project/-/schema/master/.gitlab-ci.yml'}
       `('with the expected schema for options "$opts"', ({ opts, expectedUri }) => {
         instance.registerCiSchema({
-          projectPath: 'namespace/my-project',
+          projectNamespace: 'namespace1',
+          projectPath: 'project1',
           ...opts,
         });
 

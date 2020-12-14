@@ -17,17 +17,15 @@ export default {
       required: false,
       default: null,
     },
-    projectPath: {
-      type: String,
-      required: true,
-    },
   },
+  inject: ['projectPath', 'projectNamespace'],
   methods: {
     onEditorReady() {
       const editorInstance = this.$refs.editor.getEditor();
       editorInstance.use(EditorCiSchemaExtension);
       editorInstance.registerCiSchema({
         projectPath: this.projectPath,
+        projectNamespace: this.projectNamespace,
         ref: this.commitId,
       });
     },

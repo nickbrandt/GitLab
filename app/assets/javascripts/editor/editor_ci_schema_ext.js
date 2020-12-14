@@ -6,35 +6,29 @@ import Api from '~/api';
 // https://gitlab.com/gitlab-org/gitlab/-/issues/293641
 import { SCHEMA_FILE_NAME_MATCH } from './constants';
 
-/**
- * Gets the URI of CI config JSON schema file
- */
-const getCiSchemaUri = ({ projectPath, ref }) => {
-  const [namespace, project] = projectPath.split('/');
-
-  return Api.buildUrl(Api.projectFileSchemaPath)
-    .replace(':namespace_path', namespace)
-    .replace(':project_path', project)
+const getCiSchemaUri = ({ projectNamespace, projectPath, ref }) =>
+  Api.buildUrl(Api.projectFileSchemaPath)
+    .replace(':namespace_path', projectNamespace)
+    .replace(':project_path', projectPath)
     .replace(':ref', ref)
     .replace(':filename', SCHEMA_FILE_NAME_MATCH);
-};
 
 export default {
   /**
    * Registers a schema in a model based on project properties
-   * and the name of the file that is edited.
+   * and the name of the file that is currently edited.
    *
    * @param {Object} opts
-   * @param {String} opts.projectPath - Namespace and project in the form `namespace/project`
+   * @param {String} opts.projectNamespace
+   * @param {String} opts.projectPath
    * @param {String?} opts.ref
    */
-  registerCiSchema({ projectPath, ref = 'master' }) {
-    // TODO Check syntax
+  registerCiSchema({ projectNamespace, projectPath, ref = 'master' } = {}) {
     const fileName = this.getModel()
       .uri.path.split('/')
       .pop();
     registerSchema({
-      uri: getCiSchemaUri({ projectPath, ref }),
+      uri: getCiSchemaUri({ projectNamespace, projectPath, ref }),
       fileMatch: [fileName],
     });
   },

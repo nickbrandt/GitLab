@@ -4,7 +4,13 @@ import EditorLite from '~/vue_shared/components/editor_lite.vue';
 import EditorCiSchemaExtension from '~/editor/editor_ci_schema_ext';
 import TextEditor from '~/pipeline_editor/components/text_editor.vue';
 
-import { mockCiYml, mockCiConfigPath, mockProjectPath, mockCommitId } from '../mock_data';
+import {
+  mockCiYml,
+  mockCiConfigPath,
+  mockProjectPath,
+  mockProjectNamespace,
+  mockCommitId,
+} from '../mock_data';
 
 jest.mock('~/editor/editor_ci_schema_ext');
 
@@ -14,10 +20,13 @@ describe('~/pipeline_editor/components/text_editor.vue', () => {
 
   const createComponent = ({ props = {}, attrs = {} } = {}, mountFn = shallowMount) => {
     wrapper = mountFn(TextEditor, {
+      provide: {
+        projectPath: mockProjectPath,
+        projectNamespace: mockProjectNamespace,
+      },
       propsData: {
         ciConfigPath: mockCiConfigPath,
         commitId: mockCommitId,
-        projectPath: mockProjectPath,
         ...props,
       },
       attrs: {
@@ -68,6 +77,7 @@ describe('~/pipeline_editor/components/text_editor.vue', () => {
 
     expect(EditorCiSchemaExtension.registerCiSchema).toHaveBeenCalledWith({
       projectPath: mockProjectPath,
+      projectNamespace: mockProjectNamespace,
       ref: mockCommitId,
     });
   });

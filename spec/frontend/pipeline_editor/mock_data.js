@@ -1,4 +1,7 @@
-export const mockProjectPath = 'user1/project1';
+export const mockProjectFullPath = 'user1/project1';
+export const mockProjectPath = 'project1';
+export const mockProjectNamespace = 'user1';
+
 export const mockDefaultBranch = 'master';
 export const mockNewMergeRequestPath = '/-/merge_requests/new';
 export const mockCommitId = 'aabbccdd';

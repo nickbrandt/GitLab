@@ -13,7 +13,9 @@ import {
   mockCommitId,
   mockCommitMessage,
   mockDefaultBranch,
+  mockProjectFullPath,
   mockProjectPath,
+  mockProjectNamespace,
   mockNewMergeRequestPath,
 } from './mock_data';
 
@@ -69,11 +71,15 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
     });
 
     wrapper = mountFn(PipelineEditorApp, {
+      provide: {
+        projectFullPath: mockProjectFullPath,
+        projectPath: mockProjectPath,
+        projectNamespace: mockProjectNamespace,
+      },
       propsData: {
         ciConfigPath: mockCiConfigPath,
         commitId: mockCommitId,
         defaultBranch: mockDefaultBranch,
-        projectPath: mockProjectPath,
         newMergeRequestPath: mockNewMergeRequestPath,
         ...props,
       },
@@ -223,7 +229,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         filePath: mockCiConfigPath,
         lastCommitId: mockCommitId,
         message: mockCommitMessage,
-        projectPath: mockProjectPath,
+        projectPath: mockProjectFullPath,
         startBranch: mockDefaultBranch,
       };
 
