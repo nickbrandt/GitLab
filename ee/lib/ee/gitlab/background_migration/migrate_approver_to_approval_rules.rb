@@ -51,6 +51,17 @@ module EE
             merge_request.target_project
           end
 
+          # This code borrowed from ApprovalRuleLike
+          #
+          def overridden?
+            return false unless approval_project_rule.present?
+
+            approval_project_rule.name != self[:name] ||
+              approval_project_rule.approvals_required != self[:approvals_required] ||
+              approval_project_rule.user_ids.to_set != user_ids.to_set ||
+              approval_project_rule.group_ids.to_set != group_ids.to_set
+          end
+
           def self.find_or_create_code_owner_rule(merge_request, entry)
             merge_request.approval_rules.safe_find_or_create_by(
               rule_type: :code_owner,
