@@ -3,15 +3,16 @@ stage: Create
 group: Source Code
 info: "To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments"
 type: reference
-description: "Autocomplete chars in Markdown fields."
+description: "Autocomplete characters in Markdown fields."
 ---
 
-# Autocomplete characters
+# Autocomplete characters **(CORE)**
 
-> - Iterations autocomplete [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/232601) in [GitLab Starter](https://about.gitlab.com/pricing/) 13.7.
-> - It's deployed behind a feature flag, disabled by default.
-> - It's disabled for GitLab.com.
-> - It's not recommended for production use.
+> - Iterations autocomplete [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/232601) in GitLab 13.7.
+> - Iterations autocomplete is deployed behind a feature flag, disabled by default.
+> - Iterations autocomplete is disabled for GitLab.com.
+> - Iterations autocomplete is not recommended for production use.
+> - To use Iterations autocomplete in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-iterations-autocomplete-starter-only). **(STARTER ONLY)**
 
 The autocomplete characters provide a quick way of entering field values into
 Markdown fields. When you start typing a word in a Markdown field with one of
@@ -64,3 +65,22 @@ popup now only includes users where `le` appears in their username, or a word in
 their name.
 
 ![Popup list which includes users whose username or name contains the string `le`](img/autocomplete_characters_example2_v12_0.png)
+
+## Enable or disable Iterations autocomplete **(STARTER ONLY)**
+
+Iterations autocomplete is under development and not ready for production use. It is
+deployed behind a feature flag that is **disabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
+can enable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:tribute_autocomplete)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:tribute_autocomplete)
+```

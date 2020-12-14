@@ -88,6 +88,11 @@ similar to how they appear when viewing a [milestone](../../project/milestones/i
 Burndown charts help track completion progress of total scope, and burnup charts track the daily
 total count and weight of issues added to and completed in a given timebox.
 
+## Autocomplete iterations in Markdown fields **(STARTER ONLY)**
+
+When you edit a Markdown field in GitLab, you can use autocomplete suggestions to refer to an iteration.
+For the syntax, visit [Autocomplete characters](../../project/autocomplete_characters.md).
+
 ## Disable iterations **(STARTER ONLY)**
 
 GitLab Iterations feature is deployed with a feature flag that is **enabled by default**.
