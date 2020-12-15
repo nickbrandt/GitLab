@@ -69,7 +69,7 @@ RSpec.describe ApplicationExperiment do
       expect(subject.variant.name).to eq('control')
     end
 
-    context "when the rollout out to 100%" do
+    context "when rolled out to 100%" do
       it "returns the first variant name" do
         subject.try(:variant1) {}
         subject.try(:variant2) {}

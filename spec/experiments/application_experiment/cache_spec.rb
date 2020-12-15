@@ -14,7 +14,7 @@ RSpec.describe ApplicationExperiment::Cache do
     shared_state.with { |r| r.del(key_name) }
   end
 
-  it "allows reading, writing and deleting" do
+  it "allows reading, writing and deleting", :aggregate_failures do
     # we test them all together because they are largely interdependent
 
     expect(subject.read(key_field)).to be_nil

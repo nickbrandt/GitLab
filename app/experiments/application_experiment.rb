@@ -43,12 +43,12 @@ class ApplicationExperiment < Gitlab::Experiment
     # Clears the entire cache for a given experiment. Be careful with this
     # since it would reset all resolved variants for the entire experiment.
     def clear(key:)
+      key = hkey(key)[0] # extract only the first part of the key
       pool do |redis|
-        unless %w[hash none].include?(redis.type(hkey(key)[0]))
-          raise ArgumentError, 'invalid call to clear a non-hash cache key'
+        case redis.type(key)
+        when 'hash', 'none' then redis.del(key)
+        else raise ArgumentError, 'invalid call to clear a non-hash cache key'
         end
-
-        redis.del(hkey(key)[0])
       end
     end
 
