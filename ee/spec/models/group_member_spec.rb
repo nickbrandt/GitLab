@@ -241,7 +241,7 @@ RSpec.describe GroupMember do
   context 'group member webhooks', :sidekiq_inline do
     let_it_be(:group) { create(:group_with_plan, plan: :gold_plan) }
     let_it_be(:group_hook) { create(:group_hook, group: group, member_events: true) }
-    let_it_be(:user) { create(:user) }
+    let(:user) { create(:user) }
 
     context 'fires the webhook when a member is added' do
       before do
@@ -265,6 +265,7 @@ RSpec.describe GroupMember do
             user_id: user.id,
             group_access: 'Guest',
             group_plan: 'gold',
+            expires_at: member.expires_at&.xmlschema,
             event_name: 'user_add_to_group'
           }.to_json
         )
