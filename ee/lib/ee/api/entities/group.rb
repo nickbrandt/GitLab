@@ -19,7 +19,13 @@ module EE
                        Ability.allowed?(options[:current_user], :read_project, group.checked_file_template_project)
                      }
 
-          expose :marked_for_deletion_on, if: ->(group, _) { group.feature_available?(:adjourned_deletion_for_projects_and_groups) }
+          expose :marked_for_deletion_on, if: ->(group, _) {
+            group.feature_available?(:adjourned_deletion_for_projects_and_groups)
+          }
+
+          expose :allow_merge_request_author_approval, if: ->(group, options) {
+            Ability.allowed?(options[:current_user], :admin_merge_request_approval_settings, group)
+          }
         end
       end
     end
