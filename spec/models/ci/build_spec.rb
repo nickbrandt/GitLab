@@ -4825,42 +4825,31 @@ RSpec.describe Ci::Build do
   end
 
   describe '#conditionally_allow_failure!' do
-    let_it_be_with_refind(:job) do
-      create(:ci_build, pipeline: pipeline)
-    end
-
     subject(:conditionally_allow_failure) do
-      job.conditionally_allow_failure!(1)
+      build.conditionally_allow_failure!(1)
     end
 
-    context 'when exit_codes are not defined' do
-      it 'does not change allow_failure' do
-        expect { conditionally_allow_failure }
-          .not_to change { job.reload.allow_failure }
-      end
-    end
-
-    context 'when exit_codes are defined but do not match' do
+    context 'when exit_codes do not match' do
       before do
-        job.options[:allow_failure_criteria] = { exit_codes: [2, 3, 4] }
-        job.save!
+        build.options[:allow_failure_criteria] = { exit_codes: [2, 3, 4] }
+        build.save!
       end
 
       it 'does not change allow_failure' do
         expect { conditionally_allow_failure }
-          .not_to change { job.reload.allow_failure }
+          .not_to change { build.reload.allow_failure }
       end
     end
 
-    context 'when exit_codes are defined and match' do
+    context 'when exit_codes match' do
       before do
-        job.options[:allow_failure_criteria] = { exit_codes: [1, 2, 3] }
-        job.save!
+        build.options[:allow_failure_criteria] = { exit_codes: [1, 2, 3] }
+        build.save!
       end
 
       it 'does change allow_failure' do
         expect { conditionally_allow_failure }
-          .to change { job.reload.allow_failure }
+          .to change { build.reload.allow_failure }
       end
     end
 
@@ -4868,14 +4857,92 @@ RSpec.describe Ci::Build do
       before do
         stub_feature_flags(ci_allow_failure_with_exit_codes: false)
 
-        job.options[:allow_failure_criteria] = { exit_codes: [1, 2, 3] }
-        job.save!
+        build.options[:allow_failure_criteria] = { exit_codes: [1, 2, 3] }
+        build.save!
       end
 
       it 'does not change allow_failure' do
         expect { conditionally_allow_failure }
-          .not_to change { job.reload.allow_failure }
+          .not_to change { build.reload.allow_failure }
       end
+    end
+  end
+
+  describe '#allowed_to_fail_with_code?' do
+    let(:options) { {} }
+
+    before do
+      build.options.merge!(options)
+    end
+
+    subject(:allowed_to_fail_with_code?) do
+      build.allowed_to_fail_with_code?(1)
+    end
+
+    context 'when exit_codes are not defined' do
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when allow_failure_criteria is nil' do
+      let(:options) { { allow_failure_criteria: nil } }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when exit_codes is nil' do
+      let(:options) do
+        {
+          allow_failure_criteria: {
+            exit_codes: nil
+          }
+        }
+      end
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when exit_codes do not match' do
+      let(:options) do
+        {
+          allow_failure_criteria: {
+            exit_codes: [2, 3, 4]
+          }
+        }
+      end
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when exit_codes match' do
+      let(:options) do
+        {
+          allow_failure_criteria: {
+            exit_codes: [1, 2, 3]
+          }
+        }
+      end
+
+      it { is_expected.to be_truthy }
+    end
+  end
+
+  describe '#drop_with_exit_code!' do
+    before do
+      build.options[:allow_failure_criteria] = { exit_codes: [1, 2, 3] }
+      build.save!
+    end
+
+    it 'is executed inside a transaction' do
+      expect(build).to receive(:drop!)
+        .with(:unknown_failure)
+        .and_raise(ActiveRecord::Rollback)
+
+      expect(build).to receive(:conditionally_allow_failure!)
+        .with(1)
+        .and_call_original
+
+      expect { build.drop_with_exit_code!(:unknown_failure, 1) }
+        .not_to change { build.reload.allow_failure }
     end
   end
 end

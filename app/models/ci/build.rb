@@ -1034,8 +1034,22 @@ module Ci
     def conditionally_allow_failure!(exit_code)
       return unless ::Gitlab::Ci::Features.allow_failure_with_exit_codes_enabled?
 
-      if options.dig(:allow_failure_criteria, :exit_codes).to_a.include?(exit_code)
+      if allowed_to_fail_with_code?(exit_code)
         update_columns(allow_failure: true)
+      end
+    end
+
+    def allowed_to_fail_with_code?(exit_code)
+      options
+        .dig(:allow_failure_criteria, :exit_codes)
+        .to_a
+        .include?(exit_code)
+    end
+
+    def drop_with_exit_code!(failure_reason, exit_code)
+      transaction do
+        conditionally_allow_failure!(exit_code)
+        drop!(failure_reason)
       end
     end
 

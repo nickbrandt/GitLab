@@ -81,7 +81,7 @@ RSpec.describe API::Ci::Runner, :clean_gitlab_redis_shared_state do
         context 'when an exit_code is provided' do
           context 'when the exit_codes are acceptable' do
             before do
-              job.options[:allow_failure] = { exit_codes: [1] }
+              job.options[:allow_failure_criteria] = { exit_codes: [1] }
               job.save!
             end
 
