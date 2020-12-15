@@ -211,7 +211,7 @@ RSpec.describe Ci::UpdateBuildStateService do
         end
       end
 
-      context 'when trace checksum is invalid but the log is seems fine' do
+      context 'when trace checksum is invalid but the log seems fine' do
         let(:params) do
           { output: { checksum: 'crc32:12345678', bytesize: 4 }, state: 'success' }
         end

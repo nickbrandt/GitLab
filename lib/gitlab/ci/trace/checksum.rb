@@ -72,9 +72,7 @@ module Gitlab
 
         def trace_size
           strong_memoize(:trace_size) do
-            trace_chunks.reduce(0) do |total, chunk|
-              total + chunk_size(chunk)
-            end
+            trace_chunks.sum { |chunk| chunk_size(chunk) }
           end
         end
 
