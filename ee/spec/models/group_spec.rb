@@ -898,6 +898,37 @@ RSpec.describe Group do
     end
   end
 
+  describe "#execute_hooks" do
+    context "group_webhooks", :sidekiq_inline do
+      let(:group) { create(:group) }
+      let(:group_hook) { create(:group_hook, group: group, member_events: true) }
+      let(:data) { { some: 'info' } }
+
+      context 'when group_webhooks feature is enabled' do
+        before do
+          stub_licensed_features(group_webhooks: true)
+        end
+        let(:service) { double }
+
+        it 'executes the hook' do
+          expect(service).to receive(:async_execute).once
+
+          expect(WebHookService).to receive(:new)
+
+          group.execute_hooks(data, :member_hooks)
+        end
+      end
+
+      it 'does not execute the hook when the feature is disabled' do
+        stub_licensed_features(group_webhooks: false)
+
+        expect(WebHookService).not_to receive(:new)
+
+        group.execute_hooks(data, :member_hooks)
+      end
+    end
+  end
+
   describe '#self_or_ancestor_marked_for_deletion' do
     context 'delayed deletion feature is not available' do
       before do

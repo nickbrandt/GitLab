@@ -249,13 +249,13 @@ RSpec.describe GroupMember do
       end
 
       it 'execute webhooks' do
-        group.add_guest(user)
+        member = group.add_guest(user)
 
         expect(WebMock).to have_requested(:post, group_hook.url).with(
           headers: { 'Content-Type' => 'application/json', 'User-Agent' => "GitLab/#{Gitlab::VERSION}", 'X-Gitlab-Event' => 'Member Hook' },
           body: {
-            created_at: user.created_at&.xmlschema,
-            updated_at: user.updated_at&.xmlschema,
+            created_at: member.created_at&.xmlschema,
+            updated_at: member.updated_at&.xmlschema,
             group_name: group.name,
             group_path: group.path,
             group_id: group.id,
