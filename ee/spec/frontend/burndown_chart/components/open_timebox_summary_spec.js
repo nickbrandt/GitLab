@@ -1,4 +1,4 @@
-import IterationReportSummaryClosed from 'ee/iterations/components/iteration_report_summary_closed.vue';
+import OpenTimeboxSummary from 'ee/burndown_chart/components/open_timebox_summary.vue';
 import { shallowMount } from '@vue/test-utils';
 
 describe('Iterations report summary', () => {
@@ -7,13 +7,14 @@ describe('Iterations report summary', () => {
 
   const id = 3;
   const defaultProps = {
+    fullPath: 'gitlab-org',
     iterationId: `gid://gitlab/Iteration/${id}`,
   };
 
   const mountComponent = ({ props = defaultProps, loading = false, data = {} } = {}) => {
     slotSpy = jest.fn();
 
-    wrapper = shallowMount(IterationReportSummaryClosed, {
+    wrapper = shallowMount(OpenTimeboxSummary, {
       propsData: props,
       data() {
         return data;
@@ -39,15 +40,15 @@ describe('Iterations report summary', () => {
       mountComponent({
         data: {
           issues: {
-            complete: 10,
-            incomplete: 3,
-            total: 13,
+            closed: 10,
+            assigned: 3,
+            open: 5,
           },
         },
       });
     });
 
-    it('renders cards for each issue type', () => {
+    it('passes data to cards component', () => {
       expect(slotSpy).toHaveBeenCalledWith({
         loading: false,
         columns: [
@@ -59,8 +60,12 @@ describe('Iterations report summary', () => {
             title: 'Incomplete',
             value: 3,
           },
+          {
+            title: 'Unstarted',
+            value: 5,
+          },
         ],
-        total: 13,
+        total: 18,
       });
     });
   });
