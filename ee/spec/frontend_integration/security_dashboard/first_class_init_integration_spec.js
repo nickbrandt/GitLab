@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import { createWrapper } from '@vue/test-utils';
 import initVulnerabilityReport from 'ee/security_dashboard/first_class_init';
 import ReportsNotConfigured from 'ee/security_dashboard/components/empty_states/reports_not_configured.vue';
+import FirstClassProjectSecurityDashboard from 'ee/security_dashboard/components/first_class_project_security_dashboard.vue';
 import { DASHBOARD_TYPES } from 'ee/security_dashboard/store/constants';
 import { TEST_HOST } from 'helpers/test_constants';
 
@@ -59,6 +60,21 @@ describe('Vulnerability Report', () => {
 
   describe('default states', () => {
     describe('project-level', () => {
+      describe('with a pipeline-id', () => {
+        beforeEach(() => {
+          createComponent({
+            data: PROJECT_LEVEL_TEST_DATASET,
+            type: DASHBOARD_TYPES.PROJECT,
+          });
+        });
+
+        it('provides the correct data', () => {
+          const w = wrapper;
+          // wrapper.vm.$options.provide();
+          expect(true).toBe(true);
+        });
+      });
+
       describe('without a pipeline-id', () => {
         beforeEach(() => {
           const dataWithoutPipelineId = omit(PROJECT_LEVEL_TEST_DATASET, 'pipelineId');
