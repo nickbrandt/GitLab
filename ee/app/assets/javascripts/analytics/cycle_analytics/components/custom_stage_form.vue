@@ -9,7 +9,6 @@ import {
   GlSprintf,
   GlButton,
 } from '@gitlab/ui';
-import { s__ } from '~/locale';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import CustomStageFormFields from './create_value_stream_form/custom_stage_fields.vue';
 import { validateFields, initializeFormData } from './create_value_stream_form/utils';
