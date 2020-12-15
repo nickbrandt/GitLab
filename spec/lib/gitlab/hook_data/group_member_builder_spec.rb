@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Gitlab::HookData::GroupMemberBuilder do
   let_it_be(:group) { create(:group) }
-  let_it_be(:group_member) { create(:group_member, :developer, group: group) }
+  let_it_be(:group_member) { create(:group_member, :developer, group: group, expires_at: 1.day.from_now) }
 
   describe '#build' do
     let(:data) { described_class.new(group_member).build(event) }
