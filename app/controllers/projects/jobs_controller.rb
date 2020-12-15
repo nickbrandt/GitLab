@@ -40,7 +40,9 @@ class Projects::JobsController < Projects::ApplicationController
       format.json do
         Gitlab::PollingInterval.set_header(response, interval: 10_000)
 
-        render json: build_details
+        render json: BuildSerializer
+          .new(project: @project, current_user: @current_user)
+          .represent(@build, {}, BuildDetailsEntity)
       end
     end
   end
@@ -57,7 +59,7 @@ class Projects::JobsController < Projects::ApplicationController
             stream: stream,
             state: params[:state])
 
-          if build_details[:has_trace]
+          if @build.has_trace?
             render json: BuildTraceSerializer
               .new(project: @project, current_user: @current_user)
               .represent(build_trace)
@@ -256,11 +258,5 @@ class Projects::JobsController < Projects::ApplicationController
     service[:url] = ::Gitlab::UrlHelpers.as_wss(service[:url])
 
     ::Gitlab::Workhorse.channel_websocket(service)
-  end
-
-  def build_details
-    BuildSerializer
-      .new(project: @project, current_user: @current_user)
-      .represent(@build, {}, BuildDetailsEntity)
   end
 end
