@@ -4,7 +4,6 @@ module EE
   module Gitlab
     module GonHelper
       extend ::Gitlab::Utils::Override
-      extend ::Gitlab::Utils::Override
 
       override :add_gon_variables
       def add_gon_variables
