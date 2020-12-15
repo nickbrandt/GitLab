@@ -831,7 +831,7 @@ UsersSelect.prototype.renderRowAvatar = function(issuableType, user, img) {
 };
 
 UsersSelect.prototype.renderApprovalRules = function(elsClassName, approvalRules = []) {
-  if (!elsClassName?.includes('reviewer')) {
+  if (!gon.features?.reviewerApprovalRules || !elsClassName?.includes('reviewer')) {
     return '';
   }
   const count = approvalRules.length;
