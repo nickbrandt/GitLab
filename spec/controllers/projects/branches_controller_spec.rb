@@ -639,6 +639,34 @@ RSpec.describe Projects::BranchesController do
         expect(response).to redirect_to project_branches_filtered_path(project, state: 'all')
       end
     end
+
+    context 'fetching branches for overview' do
+      before do
+        get :index, format: :html, params: {
+          namespace_id: project.namespace, project_id: project, state: 'overview'
+        }
+      end
+
+      it 'sets active and stale branches' do
+        expect(assigns[:active_branches]).to eq([])
+        expect(assigns[:stale_branches].map(&:name)).to eq(
+          ["feature", "improve/awesome", "merge-test", "markdown", "feature_conflict", "'test'"]
+        )
+      end
+
+      context 'branch_list_keyset_pagination is disabled' do
+        before do
+          stub_feature_flags(branch_list_keyset_pagination: false)
+        end
+
+        it 'sets active and stale branches' do
+          expect(assigns[:active_branches]).to eq([])
+          expect(assigns[:stale_branches].map(&:name)).to eq(
+            ["feature", "improve/awesome", "merge-test", "markdown", "feature_conflict", "'test'"]
+          )
+        end
+      end
+    end
   end
 
   describe 'GET diverging_commit_counts' do
