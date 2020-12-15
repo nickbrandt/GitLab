@@ -9,11 +9,11 @@ module Types
 
       argument :date, GraphQL::STRING_TYPE,
                 required: true,
-                description: 'The date component of the date in YYYY-MM-DD format'
+                description: 'The date component of the date in YYYY-MM-DD format.'
 
       argument :time, GraphQL::STRING_TYPE,
                 required: true,
-                description: 'The time component of the date in 24hr HH:MM format'
+                description: 'The time component of the date in 24hr HH:MM format.'
 
       DATE_FORMAT = %r[\d{4}-[0123]\d-\d{2}].freeze
       TIME_FORMAT = %r[[012]\d:\d{2}].freeze

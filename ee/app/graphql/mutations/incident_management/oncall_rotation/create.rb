@@ -10,29 +10,29 @@ module Mutations
 
         argument :project_path, GraphQL::ID_TYPE,
                  required: true,
-                 description: 'The project to create the on-call schedule in'
+                 description: 'The project to create the on-call schedule in.'
 
         argument :schedule_iid, GraphQL::STRING_TYPE,
                  required: true,
-                 description: 'The iid of the on-call schedule to create the on-call rotation in',
+                 description: 'The iid of the on-call schedule to create the on-call rotation in.',
                  as: :iid
 
         argument :name, GraphQL::STRING_TYPE,
                  required: true,
-                 description: 'The name of the on-call rotation'
+                 description: 'The name of the on-call rotation.'
 
         argument :starts_at, Types::IncidentManagement::OncallRotationDateInputType,
                  required: true,
-                 description: 'The start date and time of the on-call rotation, in the timezone of the on-call schedule'
+                 description: 'The start date and time of the on-call rotation, in the timezone of the on-call schedule.'
 
         argument :rotation_length, Types::IncidentManagement::OncallRotationLengthInputType,
                  required: true,
-                 description: 'The rotation length of the on-call rotation'
+                 description: 'The rotation length of the on-call rotation.'
 
         argument :participants,
                  [Types::IncidentManagement::OncallUserInputType],
                  required: true,
-                 description: 'The usernames of users participating in the on-call rotation'
+                 description: 'The usernames of users participating in the on-call rotation.'
 
         MAXIMUM_PARTICIPANTS = 100
 

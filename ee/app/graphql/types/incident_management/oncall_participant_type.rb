@@ -10,11 +10,11 @@ module Types
       field :id,
             Types::GlobalIDType[::IncidentManagement::OncallParticipant],
             null: false,
-            description: 'ID of the on-call participant'
+            description: 'ID of the on-call participant.'
 
       field :user, Types::UserType,
                 null: false,
-                description: 'The user who is participating'
+                description: 'The user who is participating.'
 
       field :color_palette, GraphQL::STRING_TYPE,
                 null: true,

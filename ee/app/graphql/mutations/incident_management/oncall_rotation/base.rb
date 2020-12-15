@@ -7,7 +7,7 @@ module Mutations
         field :oncall_rotation,
               ::Types::IncidentManagement::OncallRotationType,
               null: true,
-              description: 'The on-call rotation'
+              description: 'The on-call rotation.'
 
         authorize :admin_incident_management_oncall_schedule
 

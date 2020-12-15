@@ -15635,12 +15635,12 @@ type OncallParticipantType {
   colorWeight: String
 
   """
-  ID of the on-call participant
+  ID of the on-call participant.
   """
   id: IncidentManagementOncallParticipantID!
 
   """
-  The user who is participating
+  The user who is participating.
   """
   user: User!
 }
@@ -15690,32 +15690,32 @@ input OncallRotationCreateInput {
   clientMutationId: String
 
   """
-  The name of the on-call rotation
+  The name of the on-call rotation.
   """
   name: String!
 
   """
-  The usernames of users participating in the on-call rotation
+  The usernames of users participating in the on-call rotation.
   """
   participants: [OncallUserInputType!]!
 
   """
-  The project to create the on-call schedule in
+  The project to create the on-call schedule in.
   """
   projectPath: ID!
 
   """
-  The rotation length of the on-call rotation
+  The rotation length of the on-call rotation.
   """
   rotationLength: OncallRotationLengthInputType!
 
   """
-  The iid of the on-call schedule to create the on-call rotation in
+  The iid of the on-call schedule to create the on-call rotation in.
   """
   scheduleIid: String!
 
   """
-  The start date and time of the on-call rotation, in the timezone of the on-call schedule
+  The start date and time of the on-call rotation, in the timezone of the on-call schedule.
   """
   startsAt: OncallRotationDateInputType!
 }
@@ -15735,7 +15735,7 @@ type OncallRotationCreatePayload {
   errors: [String!]!
 
   """
-  The on-call rotation
+  The on-call rotation.
   """
   oncallRotation: IncidentManagementOncallRotation
 }
@@ -15745,12 +15745,12 @@ Date input type for on-call rotation
 """
 input OncallRotationDateInputType {
   """
-  The date component of the date in YYYY-MM-DD format
+  The date component of the date in YYYY-MM-DD format.
   """
   date: String!
 
   """
-  The time component of the date in 24hr HH:MM format
+  The time component of the date in 24hr HH:MM format.
   """
   time: String!
 }
@@ -15760,12 +15760,12 @@ The rotation length of the on-call rotation
 """
 input OncallRotationLengthInputType {
   """
-  The rotation length of the on-call rotation
+  The rotation length of the on-call rotation.
   """
   length: Int!
 
   """
-  The unit of the rotation length of the on-call rotation
+  The unit of the rotation length of the on-call rotation.
   """
   unit: OncallRotationUnitEnum!
 }
@@ -15950,7 +15950,7 @@ input OncallUserInputType {
   colorWeight: DataVisualizationWeightEnum
 
   """
-  The username of the user to participate in the on-call rotation. i.e user_one
+  The username of the user to participate in the on-call rotation. i.e user_one.
   """
   username: String!
 }
