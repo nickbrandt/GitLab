@@ -3,6 +3,7 @@ import { shallowMount, mount } from '@vue/test-utils';
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import { stubTransition } from 'helpers/stub_transition';
 import LicenseComplianceApp from 'ee/license_compliance/components/app.vue';
 import DetectedLicensesTable from 'ee/license_compliance/components/detected_licenses_table.vue';
 import PipelineInfo from 'ee/license_compliance/components/pipeline_info.vue';
@@ -30,13 +31,6 @@ const emptyStateSvgPath = '/';
 const documentationPath = '/';
 
 const noop = () => {};
-
-const transitionStub = () => ({
-  render() {
-    // eslint-disable-next-line no-underscore-dangle
-    return this.$options._renderChildren;
-  },
-});
 
 const createComponent = ({ state, props, options }) => {
   const fakeStore = new Vuex.Store({
@@ -85,7 +79,7 @@ const createComponent = ({ state, props, options }) => {
     },
     ...options,
     store: fakeStore,
-    stubs: { transition: transitionStub() },
+    stubs: { transition: stubTransition() },
   });
 };
 
