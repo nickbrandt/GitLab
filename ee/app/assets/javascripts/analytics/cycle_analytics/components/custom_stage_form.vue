@@ -13,7 +13,7 @@ import { s__ } from '~/locale';
 import { convertObjectPropsToSnakeCase } from '~/lib/utils/common_utils';
 import CustomStageFormFields from './create_value_stream_form/custom_stage_fields.vue';
 import { validateFields, initializeFormData } from './create_value_stream_form/utils';
-import { defaultFields, ERRORS } from './create_value_stream_form/constants';
+import { defaultFields, ERRORS, I18N } from './create_value_stream_form/constants';
 import { STAGE_ACTIONS } from '../constants';
 import { getAllowedEndEvents, getLabelEventsIdentifiers, isLabelEvent } from '../utils';
 
@@ -99,14 +99,10 @@ export default {
       return !endEvents.length || !endEvents.includes(endEventIdentifier);
     },
     saveStageText() {
-      return this.isEditingCustomStage
-        ? s__('CustomCycleAnalytics|Update stage')
-        : s__('CustomCycleAnalytics|Add stage');
+      return this.isEditingCustomStage ? I18N.BTN_UPDATE_STAGE : I18N.BTN_ADD_STAGE;
     },
     formTitle() {
-      return this.isEditingCustomStage
-        ? s__('CustomCycleAnalytics|Editing stage')
-        : s__('CustomCycleAnalytics|New stage');
+      return this.isEditingCustomStage ? I18N.TITLE_EDIT_STAGE : I18N.TITLE_ADD_STAGE;
     },
     hasHiddenStages() {
       return this.hiddenStages.length;
@@ -170,6 +166,7 @@ export default {
       this.errors = { ...this.errors, ...newErrors };
     },
   },
+  I18N,
 };
 </script>
 <template>
@@ -180,11 +177,13 @@ export default {
     <div class="gl-mb-1 gl-display-flex gl-justify-content-space-between gl-align-items-center">
       <h4>{{ formTitle }}</h4>
       <gl-dropdown
-        :text="__('Recover hidden stage')"
+        :text="$options.I18N.RECOVER_HIDDEN_STAGE"
         data-testid="recover-hidden-stage-dropdown"
         right
       >
-        <gl-dropdown-section-header>{{ __('Default stages') }}</gl-dropdown-section-header>
+        <gl-dropdown-section-header>{{
+          $options.I18N.RECOVER_STAGE_TITLE
+        }}</gl-dropdown-section-header>
         <template v-if="hasHiddenStages">
           <gl-dropdown-item
             v-for="stage in hiddenStages"
@@ -193,7 +192,7 @@ export default {
             >{{ stage.title }}</gl-dropdown-item
           >
         </template>
-        <p v-else class="mx-3 my-2">{{ __('All default stages are currently visible') }}</p>
+        <p v-else class="mx-3 my-2">{{ $options.I18N.RECOVER_STAGES_VISIBLE }}</p>
       </gl-dropdown>
     </div>
     <custom-stage-form-fields
@@ -210,7 +209,7 @@ export default {
         data-testid="cancel-custom-stage"
         @click="handleCancel"
       >
-        {{ __('Cancel') }}
+        {{ $options.I18N.BTN_CANCEL }}
       </gl-button>
       <gl-button
         :disabled="!isComplete || !isDirty"

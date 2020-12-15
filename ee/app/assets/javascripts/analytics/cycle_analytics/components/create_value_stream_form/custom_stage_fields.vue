@@ -1,15 +1,9 @@
 <script>
 import { GlFormGroup, GlFormInput, GlFormSelect } from '@gitlab/ui';
-import { s__ } from '~/locale';
 import LabelsSelector from '../labels_selector.vue';
+import { I18N } from './constants';
 import { startEventOptions, endEventOptions } from './utils';
-import {
-  isStartEvent,
-  isLabelEvent,
-  getAllowedEndEvents,
-  eventToOption,
-  eventsByIdentifier,
-} from '../../utils';
+import { isLabelEvent } from '../../utils';
 
 export default {
   name: 'CustomStageFormFields',
@@ -56,8 +50,11 @@ export default {
     },
   },
   methods: {
+    eventFieldClasses(condition) {
+      return condition ? 'w-50 mr-1' : 'w-100';
+    },
     hasFieldErrors(key) {
-      return this.errors[key]?.length > 0;
+      return this.errors[key]?.length < 1;
     },
     fieldErrorMessage(key) {
       return this.errors[key]?.join('\n');
@@ -66,14 +63,15 @@ export default {
       this.$emit('update', field, value);
     },
   },
+  I18N,
 };
 </script>
 <template>
   <div>
     <gl-form-group
-      :label="s__('CustomCycleAnalytics|Name')"
+      :label="$options.I18N.FORM_FIELD_NAME"
       label-for="custom-stage-name"
-      :state="!hasFieldErrors('name')"
+      :state="hasFieldErrors('name')"
       :invalid-feedback="fieldErrorMessage('name')"
       data-testid="custom-stage-name"
     >
@@ -82,18 +80,18 @@ export default {
         class="form-control"
         type="text"
         name="custom-stage-name"
-        :placeholder="s__('CustomCycleAnalytics|Enter a name for the stage')"
+        :placeholder="$options.I18N.FORM_FIELD_NAME_PLACEHOLDER"
         required
         @input="handleUpdateField('name', $event)"
       />
     </gl-form-group>
     <div class="d-flex" :class="{ 'justify-content-between': startEventRequiresLabel }">
-      <div :class="[startEventRequiresLabel ? 'w-50 mr-1' : 'w-100']">
+      <div :class="eventFieldClasses(startEventRequiresLabel)">
         <gl-form-group
           data-testid="custom-stage-start-event"
-          :label="s__('CustomCycleAnalytics|Start event')"
+          :label="$options.I18N.FORM_FIELD_START_EVENT"
           label-for="custom-stage-start-event"
-          :state="!hasFieldErrors('startEventIdentifier')"
+          :state="hasFieldErrors('startEventIdentifier')"
           :invalid-feedback="fieldErrorMessage('startEventIdentifier')"
         >
           <gl-form-select
@@ -108,9 +106,9 @@ export default {
       <div v-if="startEventRequiresLabel" class="w-50 ml-1">
         <gl-form-group
           data-testid="custom-stage-start-event-label"
-          :label="s__('CustomCycleAnalytics|Start event label')"
+          :label="$options.I18N.FORM_FIELD_START_EVENT_LABEL"
           label-for="custom-stage-start-event-label"
-          :state="!hasFieldErrors('startEventLabelId')"
+          :state="hasFieldErrors('startEventLabelId')"
           :invalid-feedback="fieldErrorMessage('startEventLabelId')"
         >
           <labels-selector
@@ -122,12 +120,12 @@ export default {
       </div>
     </div>
     <div class="d-flex" :class="{ 'justify-content-between': endEventRequiresLabel }">
-      <div :class="[endEventRequiresLabel ? 'w-50 mr-1' : 'w-100']">
+      <div :class="eventFieldClasses(endEventRequiresLabel)">
         <gl-form-group
           data-testid="custom-stage-end-event"
-          :label="s__('CustomCycleAnalytics|End event')"
+          :label="$options.I18N.FORM_FIELD_END_EVENT"
           label-for="custom-stage-end-event"
-          :state="!hasFieldErrors('endEventIdentifier')"
+          :state="hasFieldErrors('endEventIdentifier')"
           :invalid-feedback="fieldErrorMessage('endEventIdentifier')"
         >
           <gl-form-select
@@ -143,9 +141,9 @@ export default {
       <div v-if="endEventRequiresLabel" class="w-50 ml-1">
         <gl-form-group
           data-testid="custom-stage-end-event-label"
-          :label="s__('CustomCycleAnalytics|End event label')"
+          :label="$options.I18N.FORM_FIELD_END_EVENT_LABEL"
           label-for="custom-stage-end-event-label"
-          :state="!hasFieldErrors('endEventLabelId')"
+          :state="hasFieldErrors('endEventLabelId')"
           :invalid-feedback="fieldErrorMessage('endEventLabelId')"
         >
           <labels-selector
