@@ -6,19 +6,28 @@ info: "See the Technical Writers assigned to Development Guidelines: https://abo
 
 # Feature flags in development of GitLab
 
-## Following Feature Flag Policy
+## When to use feature flags
 
-We should follow our [Configuration Principles](https://about.gitlab.com/handbook/product/product-principles/#configuration-principles)
-which encourages working by default, on by default, and setup by default.  If you can avoid using a feature flag for your code
-to support those principles, that's better.  
+Starting with GitLab 11.4, developers are required to use feature flags for
+non-trivial changes. Such changes include:
 
-A majority of new code should be able to be developed without using feature flags.  However, under certain conditions it makes a lot of 
-sense to have feature flags.  Conditions of when to use feature flags are:
+- New features (e.g. a new merge request widget, epics, etc).
+- Complex performance improvements that may require additional testing in
+  production, such as rewriting complex queries.
+- Invasive changes to the user interface, such as a new navigation bar or the
+  removal of a sidebar.
+- Adding support for importing projects from a third-party service.
+- Risk of data loss
 
-- major risk of data loss
-- degradation in system performance
-- user confusion which would affect our usability
-- regression of existing features
+In all cases, those working on the changes can best decide if a feature flag is
+necessary. For example, changing the color of a button doesn't need a feature
+flag, while changing the navigation bar definitely needs one. In case you are
+uncertain if a feature flag is necessary, simply ask about this in the merge
+request, and those reviewing the changes will likely provide you with an answer.
+
+When using a feature flag for UI elements, make sure to _also_ use a feature
+flag for the underlying backend code, if there is any. This ensures there is
+absolutely no way to use the feature until it is enabled.
 
 ## How to use Feature Flags
 
