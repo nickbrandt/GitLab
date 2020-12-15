@@ -122,7 +122,6 @@ RSpec.describe API::Members do
           get api("/groups/#{group.id}/members/#{minimal_access_member.user_id}", owner)
 
           expect(response).to have_gitlab_http_status(:ok)
-          puts json_response
           expect(json_response['id']).to eq(minimal_access_member.user_id)
         end
       end
