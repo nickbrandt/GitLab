@@ -32535,6 +32535,9 @@ msgstr ""
 msgid "ciReport|There was an error reverting the dismissal. Please try again."
 msgstr ""
 
+msgid "ciReport|This report contains all Code Quality issues in the source branch."
+msgstr ""
+
 msgid "ciReport|Used by %{packagesString}"
 msgid_plural "ciReport|Used by %{packagesString}, and %{lastPackage}"
 msgstr[0] ""
