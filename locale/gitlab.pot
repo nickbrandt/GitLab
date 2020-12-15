@@ -11034,9 +11034,6 @@ msgstr ""
 msgid "Error fetching payload data."
 msgstr ""
 
-msgid "Error fetching projects"
-msgstr ""
-
 msgid "Error fetching refs"
 msgstr ""
 
@@ -27877,6 +27874,9 @@ msgid "There was an error fetching label data for the selected group"
 msgstr ""
 
 msgid "There was an error fetching median data for stages"
+msgstr ""
+
+msgid "There was an error fetching projects"
 msgstr ""
 
 msgid "There was an error fetching the %{replicableType}"
