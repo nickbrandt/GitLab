@@ -1,14 +1,10 @@
 <script>
 import { __ } from '~/locale';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
-import IterationReportSummaryCards from './iteration_report_summary_cards.vue';
-import summaryStatsQuery from '../queries/iteration_issues_summary.query.graphql';
-import { Namespace } from '../constants';
+import summaryStatsQuery from '../graphql/iteration_issues_summary.query.graphql';
+import { Namespace, Unit } from '../constants';
 
 export default {
-  components: {
-    IterationReportSummaryCards,
-  },
   apollo: {
     issues: {
       query: summaryStatsQuery,
@@ -17,9 +13,9 @@ export default {
       },
       update(data) {
         return {
-          open: data[this.namespaceType]?.openIssues?.count || 0,
-          assigned: data[this.namespaceType]?.assignedIssues?.count || 0,
-          closed: data[this.namespaceType]?.closedIssues?.count || 0,
+          open: data[this.namespaceType]?.openIssues?.[this.displayValue] || 0,
+          assigned: data[this.namespaceType]?.assignedIssues?.[this.displayValue] || 0,
+          closed: data[this.namespaceType]?.closedIssues?.[this.displayValue] || 0,
         };
       },
       error() {
@@ -42,6 +38,12 @@ export default {
       default: Namespace.Group,
       validator: value => Object.values(Namespace).includes(value),
     },
+    displayValue: {
+      type: String,
+      required: false,
+      default: Unit.count,
+      validator: val => Unit[val],
+    },
   },
   data() {
     return {
@@ -58,15 +60,8 @@ export default {
         fullPath: this.fullPath,
         id: getIdFromGraphQLId(this.iterationId),
         isGroup: this.namespaceType === Namespace.Group,
+        weight: this.displayValue === Unit.weight,
       };
-    },
-    completedPercent() {
-      const open = this.issues.open + this.issues.assigned;
-      const { closed } = this.issues;
-      if (closed <= 0) {
-        return 0;
-      }
-      return ((closed / (open + closed)) * 100).toFixed(0);
     },
     columns() {
       return [
