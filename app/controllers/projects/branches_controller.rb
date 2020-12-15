@@ -18,8 +18,8 @@ class Projects::BranchesController < Projects::ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @sort = params[:sort].presence || sort_value_recently_updated
         @mode = params[:state].presence || 'overview'
+        @sort = sort_value_for_mode
         @overview_max_branches = 5
 
         # Fetch branches for the specified mode
@@ -124,6 +124,12 @@ class Projects::BranchesController < Projects::ApplicationController
   end
 
   private
+
+  def sort_value_for_mode
+    return params[:sort] if params[:sort].present?
+
+    'stale' == @mode ? sort_value_oldest_updated : sort_value_recently_updated
+  end
 
   # It can be expensive to calculate the diverging counts for each
   # branch. Normally the frontend should be specifying a set of branch
