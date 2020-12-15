@@ -91,7 +91,7 @@ RSpec.describe Security::FindingsFinder do
         end
 
         it 'does not cause N+1 queries' do
-          expect { finder_result }.not_to exceed_query_limit(8)
+          expect { finder_result }.not_to exceed_query_limit(9)
         end
 
         describe '#current_page' do
