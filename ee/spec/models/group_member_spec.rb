@@ -241,7 +241,7 @@ RSpec.describe GroupMember do
   context 'group member webhooks', :sidekiq_inline do
     let_it_be(:group) { create(:group_with_plan, plan: :gold_plan) }
     let_it_be(:group_hook) { create(:group_hook, group: group, member_events: true) }
-    let_it_be(:user) { create(:user) }
+    let(:user) { create(:user) }
 
     context 'fires the webhook when a member is added' do
       before do
@@ -271,8 +271,8 @@ RSpec.describe GroupMember do
       end
 
       context 'ancestor groups' do
-        let_it_be(:subgroup) { create(:group, parent: group) }
-        let_it_be(:subgroup_hook) { create(:group_hook, group: subgroup, member_events: true) }
+        let(:subgroup) { create(:group, parent: group) }
+        let(:subgroup_hook) { create(:group_hook, group: subgroup, member_events: true) }
 
         it 'fires webhook twice when parent group has member_events webhook enabled' do
           WebMock.stub_request(:post, subgroup_hook.url)
