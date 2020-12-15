@@ -29,7 +29,7 @@ module QA
         def fill_token_name(name)
           retry_until(reload: true, sleep_interval: 0.5) do
             fill_element(:access_token_name_field, name)
-            break true if find_element(:access_token_name_field).value == name
+            find_element(:access_token_name_field).value == name
           end
         end
 
