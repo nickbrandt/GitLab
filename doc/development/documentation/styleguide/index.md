@@ -548,6 +548,7 @@ You can use the following fake tokens as examples:
 | slashes               | Instead of **and/or**, use **or** or another sensible construction. This rule also applies to other slashes, like **follow/unfollow**. Some exceptions (like **CI/CD**) are allowed. |
 | that                  | Do not use. Example: `the file that you save` can be `the file you save`. |
 | useful                | Do not use. If the user doesn't find the process to be these things, we lose their trust. |
+| utilize               | Do not use. Use **use** instead. It's more succinct and easier for non-native English speakers to understand. |
 | via                   | Do not use Latin abbreviations. Use **with**, **through**, or **by using** instead. ([Vale](../testing.md#vale) rule: [`LatinTerms.yml`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/.vale/gitlab/LatinTerms.yml)) |
 
 <!-- vale on -->
