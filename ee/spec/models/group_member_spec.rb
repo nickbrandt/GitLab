@@ -264,8 +264,8 @@ RSpec.describe GroupMember do
             user_email: user.email,
             user_id: user.id,
             group_access: 'Guest',
-            group_plan: 'gold',
             expires_at: member.expires_at&.xmlschema,
+            group_plan: 'gold',
             event_name: 'user_add_to_group'
           }.to_json
         )
