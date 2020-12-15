@@ -64,11 +64,6 @@ RSpec.describe Projects::IssuesController do
       end
 
       describe 'the null hypothesis experiment', :snowplow do
-        before do
-          # disable experiment caching
-          allow(Gitlab::Experiment::Configuration).to receive(:cache).and_return(nil)
-        end
-
         it 'defines the expected before actions' do
           expect(controller).to use_before_action(:run_null_hypothesis_experiment)
         end
