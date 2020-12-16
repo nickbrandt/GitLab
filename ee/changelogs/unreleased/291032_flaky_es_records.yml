@@ -1,0 +1,5 @@
+---
+title: Use the monkey patched method to sort the db records by ES returned order
+merge_request: 50134
+author:
+type: fixed
