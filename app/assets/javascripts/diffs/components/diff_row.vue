@@ -8,6 +8,7 @@ import {
   CONFLICT_MARKER_THEIR,
   CONFLICT_OUR,
   CONFLICT_THEIR,
+  CONFLICT_MARKER,
 } from '../constants';
 import DiffGutterAvatars from './diff_gutter_avatars.vue';
 import * as utils from './diff_row_utils';
@@ -79,10 +80,10 @@ export default {
       return utils.addCommentTooltip(this.line.right);
     },
     emptyCellRightClassMap() {
-      return { conflict_their: this.line.left?.type === 'conflict_our' };
+      return { conflict_their: this.line.left?.type === CONFLICT_OUR };
     },
     emptyCellLeftClassMap() {
-      return { conflict_our: this.line.right?.type === 'conflict_their' };
+      return { conflict_our: this.line.right?.type === CONFLICT_THEIR };
     },
     shouldRenderCommentButton() {
       return (
@@ -131,6 +132,7 @@ export default {
   },
   OUR_CHANGES: 'HEAD//our changes',
   THEIR_CHANGES: 'origin//their changes',
+  CONFLICT_MARKER,
   CONFLICT_MARKER_THEIR,
   CONFLICT_OUR,
   CONFLICT_THEIR,
@@ -140,7 +142,7 @@ export default {
 <template>
   <div :class="classNameMap" class="diff-grid-row diff-tr line_holder">
     <div class="diff-grid-left left-side">
-      <template v-if="line.left && line.left.type !== 'conflict_marker'">
+      <template v-if="line.left && line.left.type !== $options.CONFLICT_MARKER">
         <div
           :class="classNameMapCellLeft"
           data-testid="leftLineNumber"
@@ -207,7 +209,7 @@ export default {
           <span v-else v-safe-html="line.left.rich_text"></span>
         </div>
       </template>
-      <template v-else-if="!inline || (line.left && line.left.type === 'conflict_marker')">
+      <template v-else-if="!inline || (line.left && line.left.type === $options.CONFLICT_MARKER)">
         <div
           data-testid="leftEmptyCell"
           class="diff-td diff-line-num old_line empty-cell"
