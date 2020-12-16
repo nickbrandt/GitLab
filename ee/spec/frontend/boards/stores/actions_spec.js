@@ -100,6 +100,41 @@ describe('setFilters', () => {
   });
 });
 
+describe('performSearch', () => {
+  it('should dispatch setFilters action', done => {
+    testAction(actions.performSearch, {}, {}, [], [{ type: 'setFilters', payload: {} }], done);
+  });
+
+  it('should dispatch setFilters, fetchLists and resetIssues action when graphqlBoardLists FF is on', async () => {
+    window.gon = { features: { graphqlBoardLists: true } };
+    const getters = { isSwimlanesOn: false };
+
+    await testAction({
+      action: actions.performSearch,
+      state: { ...getters },
+      expectedActions: [
+        { type: 'setFilters', payload: {} },
+        { type: 'fetchLists' },
+        { type: 'resetIssues' },
+      ],
+    });
+  });
+
+  it('should dispatch setFilters, resetEpics, fetchEpicsSwimlanes and resetIssues action when isSwimlanesOn', async () => {
+    const getters = { isSwimlanesOn: true };
+    await testAction({
+      action: actions.performSearch,
+      state: { isShowingEpicsSwimlanes: true, ...getters },
+      expectedActions: [
+        { type: 'setFilters', payload: {} },
+        { type: 'resetEpics' },
+        { type: 'resetIssues' },
+        { type: 'fetchEpicsSwimlanes', payload: {} },
+      ],
+    });
+  });
+});
+
 describe('fetchEpicsSwimlanes', () => {
   const state = {
     endpoints: {
@@ -421,8 +456,9 @@ describe('fetchIssuesForEpic', () => {
 
 describe('toggleEpicSwimlanes', () => {
   it('should commit mutation TOGGLE_EPICS_SWIMLANES', () => {
+    const startURl = `${TEST_HOST}/groups/gitlab-org/-/boards/1?group_by=epic`;
     global.jsdom.reconfigure({
-      url: `${TEST_HOST}/groups/gitlab-org/-/boards/1?group_by=epic`,
+      url: startURl,
     });
 
     const state = {
@@ -440,7 +476,11 @@ describe('toggleEpicSwimlanes', () => {
       [{ type: types.TOGGLE_EPICS_SWIMLANES }],
       [],
       () => {
-        expect(commonUtils.historyPushState).toHaveBeenCalledWith(removeParams(['group_by']));
+        expect(commonUtils.historyPushState).toHaveBeenCalledWith(
+          removeParams(['group_by']),
+          startURl,
+          true,
+        );
         expect(global.window.location.href).toBe(`${TEST_HOST}/groups/gitlab-org/-/boards/1`);
       },
     );
