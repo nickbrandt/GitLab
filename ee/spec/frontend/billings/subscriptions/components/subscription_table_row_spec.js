@@ -150,6 +150,21 @@ describe('subscription table row', () => {
     });
   });
 
+  describe('with free plan', () => {
+    const dateColumn = {
+      id: 'a',
+      label: 'Column A',
+      value: 0,
+      colClass: 'number',
+    };
+
+    it('renders a dash when the value is zero', () => {
+      createComponent({ props: { columns: [dateColumn] } });
+
+      expect(wrapper.find('[data-testid="property-value"]').text()).toBe('-');
+    });
+  });
+
   describe('date column', () => {
     const dateColumn = {
       id: 'c',
@@ -169,7 +184,6 @@ describe('subscription table row', () => {
       const outputDate = dateInWords(new Date(d[0], d[1] - 1, d[2]));
 
       expect(currentCol.find('[data-testid="property-label"]').text()).toMatch(dateColumn.label);
-
       expect(currentCol.find('[data-testid="property-value"]').text()).toMatch(outputDate);
     });
   });
