@@ -57,8 +57,6 @@ You can use GitLab as a source for your Docker images.
 Prerequisites:
 
 - Your images must be stored on [Docker Hub](https://hub.docker.com/).
-- Docker Hub must be available. Follow [this issue](https://gitlab.com/gitlab-org/gitlab/-/issues/241639)
-  for progress on accessing images when Docker Hub is down.
 
 ### Authenticate with the Dependency Proxy
 
