@@ -23190,19 +23190,7 @@ msgstr ""
 msgid "Rejected (closed)"
 msgstr ""
 
-msgid "Related Deployed Jobs"
-msgstr ""
-
 msgid "Related Issues"
-msgstr ""
-
-msgid "Related Jobs"
-msgstr ""
-
-msgid "Related Merge Requests"
-msgstr ""
-
-msgid "Related Merged Requests"
 msgstr ""
 
 msgid "Related issues"
