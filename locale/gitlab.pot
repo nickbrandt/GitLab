@@ -12182,12 +12182,6 @@ msgstr ""
 msgid "Filter by name"
 msgstr ""
 
-msgid "Filter by requirements that are currently archived."
-msgstr ""
-
-msgid "Filter by requirements that are currently opened."
-msgstr ""
-
 msgid "Filter by status"
 msgstr ""
 
@@ -25403,9 +25397,6 @@ msgid "Show all issues."
 msgstr ""
 
 msgid "Show all members"
-msgstr ""
-
-msgid "Show all requirements."
 msgstr ""
 
 msgid "Show all test cases."
