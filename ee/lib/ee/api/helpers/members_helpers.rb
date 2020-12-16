@@ -8,10 +8,8 @@ module EE
         extend ::Gitlab::Utils::Override
 
         class << self
-          include ::MemberSortOptionsHelper
-
           def member_sort_options
-            member_sort_options_hash.keys
+            %w(access_level_asc access_level_desc last_joined name_asc name_desc oldest_joined oldest_sign_in recent_sign_in)
           end
         end
 

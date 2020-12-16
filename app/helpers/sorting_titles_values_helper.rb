@@ -335,3 +335,5 @@ module SortingTitlesValuesHelper
     'relevant'
   end
 end
+
+SortingHelper.include_if_ee('::EE::SortingTitlesValuesHelper')

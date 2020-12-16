@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 RSpec.describe EE::API::Helpers::MembersHelpers do
+  include SortingHelper
+
   let(:members_helpers) { Class.new.include(described_class).new }
 
   before do
@@ -31,6 +33,12 @@ RSpec.describe EE::API::Helpers::MembersHelpers do
     it_behaves_like 'creates security_event', 'project' do
       let(:source) { create(:project) }
       let(:member) { create(:project_member, project: source, user: create(:user)) }
+    end
+  end
+
+  describe '.member_sort_options' do
+    it 'lists all keys available in group member view' do
+      expect(described_class.member_sort_options).to match_array(member_sort_options_hash.keys)
     end
   end
 end
