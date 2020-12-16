@@ -200,6 +200,36 @@ RSpec.describe GroupPolicy do
     it { is_expected.not_to be_allowed(:read_group_activity_analytics) }
   end
 
+  context 'group CI / CD analytics' do
+    context 'when group CI / CD analytics is available' do
+      before do
+        stub_licensed_features(group_ci_cd_analytics: true)
+      end
+
+      context 'when the user has at least reporter permissions' do
+        let(:current_user) { reporter }
+
+        it { is_expected.to be_allowed(:view_group_ci_cd_analytics) }
+      end
+
+      context 'when the user has less than reporter permissions' do
+        let(:current_user) { guest }
+
+        it { is_expected.not_to be_allowed(:view_group_ci_cd_analytics) }
+      end
+    end
+
+    context 'when group CI / CD analytics is not available' do
+      let(:current_user) { reporter }
+
+      before do
+        stub_licensed_features(group_ci_cd_analytics: false)
+      end
+
+      it { is_expected.not_to be_allowed(:view_group_ci_cd_analytics) }
+    end
+  end
+
   context 'when group repository analytics is available' do
     before do
       stub_licensed_features(group_repository_analytics: true)
