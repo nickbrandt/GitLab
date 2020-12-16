@@ -69,8 +69,10 @@ To edit a requirement:
 
 ## Archive a requirement
 
-You can archive an open requirement (if you have the necessary privileges) while
+You can archive an open requirement while
 you're in the **Open** tab.
+
+Users with Reporter or higher [permissions](../../permissions.md) can archive requirements.
 
 To archive a requirement, select **Archive** (**{archive}**).
 
