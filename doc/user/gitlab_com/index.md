@@ -536,7 +536,7 @@ The [`Retry-After`
 header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
 indicates when the client should retry.
 
-Rate limits applied by HAProxy (instead of CloudFlare or the
+Rate limits applied by HAProxy (instead of Cloudflare or the
 GitLab application) have `RateLimit-Reset` and `RateLimit-ResetTime`
 headers.
 
