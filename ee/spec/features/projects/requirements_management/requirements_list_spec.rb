@@ -44,18 +44,15 @@ RSpec.describe 'Requirements list', :js do
     end
 
     it 'shows requirements tabs for each status type' do
-      page.within('.requirements-state-filters') do
-        expect(page).to have_selector('li > a#state-opened')
-        expect(find('li > a#state-opened')[:title]).to eq('Filter by requirements that are currently opened.')
-        expect(find('li > a#state-opened .badge')).to have_content('3')
+      page.within('.gl-tabs') do
+        expect(page).to have_selector('li > a[data-testid="state-opened"]')
+        expect(find('li > a[data-testid="state-opened"] .badge')).to have_content('3')
 
-        expect(page).to have_selector('li > a#state-archived')
-        expect(find('li > a#state-archived')[:title]).to eq('Filter by requirements that are currently archived.')
-        expect(find('li > a#state-archived .badge')).to have_content('1')
+        expect(page).to have_selector('li > a[data-testid="state-archived"]')
+        expect(find('li > a[data-testid="state-archived"] .badge')).to have_content('1')
 
-        expect(page).to have_selector('li > a#state-all')
-        expect(find('li > a#state-all')[:title]).to eq('Show all requirements.')
-        expect(find('li > a#state-all .badge')).to have_content('4')
+        expect(page).to have_selector('li > a[data-testid="state-all"]')
+        expect(find('li > a[data-testid="state-all"] .badge')).to have_content('4')
       end
     end
 
@@ -91,16 +88,16 @@ RSpec.describe 'Requirements list', :js do
       end
 
       it 'updates requirements count in nav sidebar and opened and all tab badges' do
-        page.within('.requirements-state-filters') do
-          expect(find('li > a#state-opened .badge')).to have_content('3')
-          expect(find('li > a#state-all .badge')).to have_content('4')
+        page.within('.gl-tabs') do
+          expect(find('li > a[data-testid="state-opened"] .badge')).to have_content('3')
+          expect(find('li > a[data-testid="state-all"] .badge')).to have_content('4')
         end
 
         create_requirement('Foobar')
 
-        page.within('.requirements-state-filters') do
-          expect(find('li > a#state-opened .badge')).to have_content('4')
-          expect(find('li > a#state-all .badge')).to have_content('5')
+        page.within('.gl-tabs') do
+          expect(find('li > a[data-testid="state-opened"] .badge')).to have_content('4')
+          expect(find('li > a[data-testid="state-all"] .badge')).to have_content('5')
         end
       end
     end
@@ -187,16 +184,16 @@ RSpec.describe 'Requirements list', :js do
         end
 
         expect(page.find('.requirements-list-container')).to have_selector('li.requirement', count: 2)
-        page.within('.requirements-state-filters') do
-          expect(find('li > a#state-opened .badge')).to have_content('2')
-          expect(find('li > a#state-archived .badge')).to have_content('2')
+        page.within('.gl-tabs') do
+          expect(find('li > a[data-testid="state-opened"] .badge')).to have_content('2')
+          expect(find('li > a[data-testid="state-archived"] .badge')).to have_content('2')
         end
       end
     end
 
     context 'archived tab' do
       before do
-        find('li > a#state-archived').click
+        find('li > a[data-testid="state-archived"]').click
 
         wait_for_requests
       end
@@ -230,16 +227,16 @@ RSpec.describe 'Requirements list', :js do
         end
 
         expect(page.find('.requirements-list-container')).to have_selector('li.requirement', count: 0)
-        page.within('.requirements-state-filters') do
-          expect(find('li > a#state-opened .badge')).to have_content('4')
-          expect(find('li > a#state-archived .badge')).to have_content('0')
+        page.within('.gl-tabs') do
+          expect(find('li > a[data-testid="state-opened"] .badge')).to have_content('4')
+          expect(find('li > a[data-testid="state-archived"] .badge')).to have_content('0')
         end
       end
     end
 
     context 'all tab' do
       before do
-        find('li > a#state-all').click
+        find('li > a[data-testid="state-all"]').click
 
         wait_for_requests
       end
