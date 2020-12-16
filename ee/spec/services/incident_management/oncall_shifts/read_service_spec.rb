@@ -61,6 +61,7 @@ RSpec.describe ::IncidentManagement::OncallShifts::ReadService do
     context 'with valid params' do
       it 'successfully returns a sorted collection of IncidentManagement::OncallShifts' do
         expect(execute).to be_success
+
         shifts = execute.payload[:shifts]
 
         expect(shifts).to all( be_a(::IncidentManagement::OncallShift) )

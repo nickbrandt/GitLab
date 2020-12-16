@@ -32483,6 +32483,9 @@ msgstr ""
 msgid "You have insufficient permissions to update this HTTP integration"
 msgstr ""
 
+msgid "You have insufficient permissions to view shifts for this rotation"
+msgstr ""
+
 msgid "You have no permissions"
 msgstr ""
 
