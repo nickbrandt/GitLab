@@ -128,6 +128,7 @@ class License < ApplicationRecord
     ci_project_subscriptions
     incident_timeline_view
     oncall_schedules
+    export_user_permissions
   ]
   EEP_FEATURES.freeze
 
