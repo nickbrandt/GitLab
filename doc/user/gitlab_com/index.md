@@ -514,8 +514,8 @@ code. The client should wait before attempting the request again. There
 are also informational headers with this response detailed in [rate
 limiting responses](#rate-limiting-responses).
 
-GitLab.com's rate limits are changing in January 2021. The table below
-contains the limits that apply before and after this change.
+The following table describes the rate limits for GitLab.com, both before and
+after the limits change in January, 2021:
 
 | Rate limit                                                                | Before 2021-01-18           | From 2021-01-18               |
 |:--------------------------------------------------------------------------|:----------------------------|:------------------------------|
@@ -534,7 +534,7 @@ endpoints](../../user/admin_area/settings/rate_limits_on_raw_endpoints.md).
 
 The [`Retry-After`
 header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)
-will indicate when the client should retry.
+indicates when the client should retry.
 
 In the case that a rate limit is applied by HAProxy, rather than
 Cloudflare or the GitLab application, there will instead be
@@ -558,12 +558,12 @@ See [Protected Paths](../admin_area/settings/protected_paths.md) for more detail
 
 ### IP blocks
 
-IP blocks usually happen when GitLab.com receives unusual traffic from a single
-IP address that the system views as potentially malicious based on rate limit
+IP blocks can occur when GitLab.com receives unusual traffic from a single
+IP address that the system views as potentially malicious, based on rate limit
 settings. After the unusual traffic ceases, the IP address is automatically
-released depending on the type of block, as described below.
+released depending on the type of block, as described in a following section.
 
-If you receive a `403 Forbidden` error for all requests to GitLab.com, please
+If you receive a `403 Forbidden` error for all requests to GitLab.com,
 check for any automated processes that may be triggering a block. For
 assistance, contact [GitLab Support](https://support.gitlab.com/hc/en-us)
 with details, such as the affected IP address.
