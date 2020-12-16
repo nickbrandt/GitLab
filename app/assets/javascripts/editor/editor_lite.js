@@ -6,7 +6,7 @@ import { registerLanguages } from '~/ide/utils';
 import { joinPaths } from '~/lib/utils/url_utility';
 import { uuids } from '~/diffs/utils/uuids';
 import { clearDomElement } from './utils';
-import { EDITOR_LITE_INSTANCE_ERROR_NO_EL, URI_PREFIX, EDITOR_READY_EVENT } from './constants';
+import { EDITOR_LITE_INSTANCE_ERROR_NO_EL, URI_PREFIX, EDITOR_READY_EVENT, EDITOR_TYPE_DIFF } from './constants';
 
 export default class EditorLite {
   constructor(options = {}) {
@@ -102,17 +102,28 @@ export default class EditorLite {
       });
   }
 
-  static createEditorModel({ blobPath, blobContent, blobGlobalId, instance } = {}) {
-    let model = null;
+  static createEditorModel({
+    blobPath = '',
+    blobContent = '',
+    originalBlobContent = null,
+    blobGlobalId = uuids()[0],
+    instance = null,
+  } = {}) {
     if (!instance) {
       return null;
     }
     const uriFilePath = joinPaths(URI_PREFIX, blobGlobalId, blobPath);
-    const uri = Uri.file(uriFilePath);
-    const existingModel = monacoEditor.getModel(uri);
-    model = existingModel || monacoEditor.createModel(blobContent, undefined, uri);
-    instance.setModel(model);
-    return model;
+    const existingModel = monacoEditor.getModel(uriFilePath);
+    const model =
+      existingModel || monacoEditor.createModel(blobContent, undefined, Uri.file(uriFilePath));
+    if (originalBlobContent === null) {
+      instance.setModel(model);
+    } else {
+      instance.setModel({
+        original: monacoEditor.createModel(originalBlobContent, undefined, Uri.file(uriFilePath)),
+        modified: model,
+      });
+    }
   }
 
   /**
@@ -128,31 +139,74 @@ export default class EditorLite {
     el = undefined,
     blobPath = '',
     blobContent = '',
+    originalBlobContent = '',
     blobGlobalId = uuids()[0],
     extensions = [],
+    diff = false,
     ...instanceOptions
   } = {}) {
     EditorLite.prepareInstance(el);
 
-    const instance = monacoEditor.create(el, {
-      ...this.options,
-      ...instanceOptions,
-    });
+    let instance;
 
-    const model = EditorLite.createEditorModel({ blobGlobalId, blobPath, blobContent, instance });
+    if (!diff) {
+      instance = monacoEditor.create(el, {
+        ...this.options,
+        ...instanceOptions,
+      });
+      if (instanceOptions.model !== null) {
+        EditorLite.createEditorModel({ blobGlobalId, blobPath, blobContent, instance });
+      }
+    } else {
+      instance = monacoEditor.createDiffEditor(el, {
+        ...this.options,
+        ...instanceOptions,
+      });
+      if (instanceOptions.model !== null) {
+        EditorLite.createEditorModel({
+          blobGlobalId,
+          originalBlobContent,
+          blobPath,
+          blobContent,
+          instance,
+        });
+      }
+    }
+
+    Object.assign(instance, {
+      updateModelLanguage: (path) => EditorLite.updateModelLanguage(path, instance),
+      use: (args) => this.use(args, instance),
+    });
 
     instance.onDidDispose(() => {
       const index = this.instances.findIndex((inst) => inst === instance);
       this.instances.splice(index, 1);
-      model.dispose();
+      const instanceModel = instance.getModel();
+      if (instanceModel) {
+        if (instance.getEditorType() === EDITOR_TYPE_DIFF) {
+          const { original, modified } = instanceModel;
+          if (original) {
+            original.dispose();
+          }
+          if (modified) {
+            modified.dispose();
+          }
+        } else {
+          instanceModel.dispose();
+        }
+      }
     });
-    instance.updateModelLanguage = (path) => EditorLite.updateModelLanguage(path, instance);
-    instance.use = (args) => this.use(args, instance);
-
     EditorLite.manageDefaultExtensions(instance, el, extensions);
 
     this.instances.push(instance);
     return instance;
+  }
+
+  createDiffInstance(args) {
+    this.createInstance({
+      ...args,
+      diff: true,
+    });
   }
 
   dispose() {
@@ -168,10 +222,11 @@ export default class EditorLite {
     };
     if (instance) {
       initExtensions(instance);
-    } else {
-      this.instances.forEach((inst) => {
-        initExtensions(inst);
-      });
+      return instance;
     }
+    this.instances.forEach((inst) => {
+      initExtensions(inst);
+    });
+    return this;
   }
 }
