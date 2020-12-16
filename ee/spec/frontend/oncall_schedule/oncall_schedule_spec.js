@@ -5,7 +5,7 @@ import ScheduleTimelineSection from 'ee/oncall_schedules/components/schedule/com
 import RotationsListSection from 'ee/oncall_schedules/components/schedule/components/rotations_list_section.vue';
 import * as utils from 'ee/oncall_schedules/components/schedule/utils';
 import * as commonUtils from 'ee/oncall_schedules/utils/common_utils';
-import { PRESET_TYPES } from 'ee/oncall_schedules/components/schedule/constants';
+import { PRESET_TYPES } from 'ee/oncall_schedules/constants';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import mockTimezones from './mocks/mockTimezones.json';
 
@@ -63,11 +63,11 @@ describe('On-call schedule', () => {
   });
 
   it('shows timezone info', () => {
-    const shortTz = i18n.scheduleForTz.replace('%{tzShort}', lastTz.identifier);
-    const longTz = formattedTimezone;
+    const timezone = i18n.scheduleForTz.replace('%{timezone}', lastTz.identifier);
+    const offset = `(UTC ${lastTz.formatted_offset})`;
     const description = findSchedule().text();
-    expect(description).toContain(shortTz);
-    expect(description).toContain(longTz);
+    expect(description).toContain(timezone);
+    expect(description).toContain(offset);
   });
 
   it('renders rotations header', () => {

@@ -10581,6 +10581,9 @@ msgstr ""
 msgid "End Time"
 msgstr ""
 
+msgid "Ends at %{endsAt}"
+msgstr ""
+
 msgid "Ends at (UTC)"
 msgstr ""
 
@@ -19349,7 +19352,13 @@ msgstr ""
 msgid "OnCallSchedules|Create on-call schedules  in GitLab"
 msgstr ""
 
+msgid "OnCallSchedules|Delete rotation"
+msgstr ""
+
 msgid "OnCallSchedules|Delete schedule"
+msgstr ""
+
+msgid "OnCallSchedules|Edit rotation"
 msgstr ""
 
 msgid "OnCallSchedules|Edit schedule"
@@ -19367,7 +19376,7 @@ msgstr ""
 msgid "OnCallSchedules|On-call schedule"
 msgstr ""
 
-msgid "OnCallSchedules|On-call schedule for the %{tzShort}"
+msgid "OnCallSchedules|On-call schedule for the %{timezone}"
 msgstr ""
 
 msgid "OnCallSchedules|Rotation length"
@@ -19718,9 +19727,6 @@ msgid "Owned by:"
 msgstr ""
 
 msgid "Owner"
-msgstr ""
-
-msgid "PST"
 msgstr ""
 
 msgid "Package Registry"
@@ -26397,6 +26403,9 @@ msgid "Starting..."
 msgstr ""
 
 msgid "Starts %{startsIn}"
+msgstr ""
+
+msgid "Starts at %{startsAt}"
 msgstr ""
 
 msgid "Starts at (UTC)"
