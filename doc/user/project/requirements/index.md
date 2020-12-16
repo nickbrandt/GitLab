@@ -82,6 +82,8 @@ As soon as a requirement is archived, it no longer appears in the **Open** tab.
 
 You can view the list of archived requirements in the **Archived** tab.
 
+Users with Reporter or higher [permissions](../../permissions.md) can reopen archived requirements.
+
 ![archived requirements list](img/requirements_archived_list_view_v13_1.png)
 
 To reopen an archived requirement, select **Reopen**.
