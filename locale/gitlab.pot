@@ -8683,6 +8683,9 @@ msgstr ""
 msgid "DastProfiles|Error Details"
 msgstr ""
 
+msgid "DastProfiles|Excluded URLs"
+msgstr ""
+
 msgid "DastProfiles|Hide debug messages"
 msgstr ""
 
@@ -8729,6 +8732,9 @@ msgid "DastProfiles|Please enter a valid timeout value"
 msgstr ""
 
 msgid "DastProfiles|Profile name"
+msgstr ""
+
+msgid "DastProfiles|Request headers"
 msgstr ""
 
 msgid "DastProfiles|Run the AJAX spider, in addition to the traditional spider, to crawl the target site."
