@@ -441,8 +441,8 @@ GFM recognizes the following:
 | multi-word milestone by name    | `%"release candidate"`     | `namespace/project%"release candidate"` | `project%"release candidate"`  |
 | specific commit                 | `9ba12248`                 | `namespace/project@9ba12248`            | `project@9ba12248`             |
 | commit range comparison         | `9ba12248...b19a04f5`      | `namespace/project@9ba12248...b19a04f5` | `project@9ba12248...b19a04f5`  |
-| repository file references      | `[README](doc/README)`     |                                         |                                |
-| repository file line references | `[README](doc/README#L13)` |                                         |                                |
+| repository file references      | `[README](doc/README.md)`  |                                         |                                |
+| repository file line references | `[README](doc/README.md#L13)` |                                      |                                |
 | [alert](../operations/incident_management/alerts.md) | `^alert#123` | `namespace/project^alert#123`    | `project^alert#123`            |
 
 1. [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/222483) in GitLab 13.7.
