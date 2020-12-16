@@ -754,16 +754,17 @@ UsersSelect.prototype.users = function(query, options, callback) {
     ...getAjaxUsersSelectParams(options, AJAX_USERS_SELECT_PARAMS_MAP),
   };
 
-  if (
-    options.issuableType === 'merge_request' ||
-    (!options.issuableType && (options.iid || options.targetBranch))
-  ) {
+  const isMergeRequest = options.issuableType === 'merge_request';
+  const isEditMergeRequest = !options.issuableType && (options.iid && options.targetBranch);
+  const isNewMergeRequest = !options.issuableType && (!options.iid && options.targetBranch);
+
+  if (isMergeRequest || isEditMergeRequest || isNewMergeRequest) {
     params.merge_request_iid = options.iid || null;
     params.approval_rules = true;
+  }
 
-    if (!options.iid) {
-      params.target_branch = options.targetBranch || null;
-    }
+  if (isNewMergeRequest) {
+    params.target_branch = options.targetBranch || null;
   }
 
   return axios.get(url, { params }).then(({ data }) => {
@@ -804,7 +805,7 @@ UsersSelect.prototype.renderRow = function(
           </strong>
           ${
             username
-              ? `<span class="dropdown-menu-user-username text gl-text-gray-400">${username}</span>`
+              ? `<span class="dropdown-menu-user-username gl-text-gray-400">${username}</span>`
               : ''
           }
           ${this.renderApprovalRules(elsClassName, user.applicable_approval_rules)}
@@ -834,6 +835,7 @@ UsersSelect.prototype.renderApprovalRules = function(elsClassName, approvalRules
   if (!gon.features?.reviewerApprovalRules || !elsClassName?.includes('reviewer')) {
     return '';
   }
+
   const count = approvalRules.length;
   const [rule] = approvalRules;
   const countText = sprintf(__('(+%{count}&nbsp;rules)'), { count });
