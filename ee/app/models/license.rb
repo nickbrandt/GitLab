@@ -144,6 +144,7 @@ class License < ApplicationRecord
     enforce_pat_expiration
     enterprise_templates
     environment_alerts
+    group_ci_cd_analytics
     group_level_compliance_dashboard
     incident_management
     insights
