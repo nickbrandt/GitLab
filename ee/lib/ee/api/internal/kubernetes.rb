@@ -25,7 +25,7 @@ module EE
 
                   forbidden! unless project.feature_available?(:cilium_alerts)
 
-                  result = ::AlertManagement::NetworkAlertService.new(agent.project, nil, params[:alert]).execute
+                  result = ::AlertManagement::NetworkAlertService.new(agent.project, params[:alert]).execute
 
                   status result.http_status
                 end
