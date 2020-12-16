@@ -32062,6 +32062,9 @@ msgstr ""
 msgid "Your %{strong}%{plan_name}%{strong_close} subscription will expire on %{strong}%{expires_on}%{strong_close}. After that, you will not be able to create issues or merge requests as well as many other features."
 msgstr ""
 
+msgid "Your CI configuration file is invalid."
+msgstr ""
+
 msgid "Your CSV export has started. It will be emailed to %{email} when complete."
 msgstr ""
 
