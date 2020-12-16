@@ -6910,6 +6910,9 @@ msgstr ""
 msgid "Code Coverage|Couldn't fetch the code coverage data"
 msgstr ""
 
+msgid "Code Owner"
+msgstr ""
+
 msgid "Code Owners"
 msgstr ""
 
