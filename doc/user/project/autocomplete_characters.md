@@ -76,7 +76,7 @@ in GitLab 13.7. You can type `*iteration:` and GitLab prompts you with relevant 
 
 ### Enable or disable autocomplete for Iterations **(STARTER ONLY)**
 
-Iterations autocomplete is under development and not ready for production use. It is
+Autocomplete for Iterations is under development and not ready for production use. It is
 deployed behind a feature flag that is **disabled by default**.
 [GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
 can enable it.
