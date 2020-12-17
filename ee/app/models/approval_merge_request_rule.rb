@@ -148,15 +148,9 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   %i(name approvals_required users groups).each do |method_name|
     define_method(method_name) do
-      if source_rule
-        if modified_from_project_rule
-          retrieve_value_from_record(method_name)
-        else
-          source_rule.send(method_name) # rubocop:disable GitlabSecurity/PublicSend
-        end
-      else
-        retrieve_value_from_record(method_name)
-      end
+      return source_rule.send(method_name) if source_rule && !modified_from_project_rule # rubocop:disable GitlabSecurity/PublicSend
+
+      retrieve_value_from_record(method_name)
     end
   end
 
