@@ -4,6 +4,7 @@ import { __, sprintf } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
 import Api from '~/api';
 import createFlash, { FLASH_TYPES } from '~/flash';
+import Tracking from '~/tracking';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import { updateHistory, setUrlParams } from '~/lib/utils/url_utility';
 
@@ -45,7 +46,7 @@ export default {
     RequirementEditForm: RequirementForm,
     ImportRequirementsModal,
   },
-  mixins: [glFeatureFlagsMixin()],
+  mixins: [glFeatureFlagsMixin(), Tracking.mixin()],
   props: {
     projectPath: {
       type: String,
@@ -559,6 +560,12 @@ export default {
       this.prevPageCursor = '';
       this.nextPageCursor = '';
 
+      if (textSearch || authors.length) {
+        this.track('filter', {
+          property: JSON.stringify(filters),
+        });
+      }
+
       this.updateUrl();
     },
     handleSortRequirements(sortBy) {
@@ -571,14 +578,17 @@ export default {
     },
     handlePageChange(page) {
       const { startCursor, endCursor } = this.requirements.pageInfo;
+      const toNext = page > this.currentPage;
 
-      if (page > this.currentPage) {
+      if (toNext) {
         this.prevPageCursor = '';
         this.nextPageCursor = endCursor;
       } else {
         this.prevPageCursor = startCursor;
         this.nextPageCursor = '';
       }
+
+      this.track('click_navigation', { label: toNext ? 'next' : 'prev' });
 
       this.currentPage = page;
 
