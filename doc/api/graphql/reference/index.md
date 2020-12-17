@@ -1481,6 +1481,7 @@ Represents an epic board list.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
+| `epics` | EpicConnection | List epics. |
 | `id` | BoardsEpicListID! | Global ID of the board list. |
 | `label` | Label | Label of the list. |
 | `listType` | String! | Type of the list. |
