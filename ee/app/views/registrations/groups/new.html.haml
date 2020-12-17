@@ -40,7 +40,10 @@
         .row
           .form-group.col-sm-12
             = render partial: 'shared/groups/visibility_level', locals: { f: f }
-        = render partial: 'shared/groups/invite_members'
+        - if experiment_enabled?(:trial_during_signup)
+          = render partial: 'shared/groups/trial_form'
+        - else
+          = render partial: 'shared/groups/invite_members'
         .row
           .form-group.col-sm-12.mb-0
             = button_tag class: %w[btn btn-success w-100] do

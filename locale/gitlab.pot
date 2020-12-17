@@ -7326,6 +7326,9 @@ msgstr ""
 msgid "Congratulations! You have enabled Two-factor Authentication!"
 msgstr ""
 
+msgid "Congratulations, your free trial is activated."
+msgstr ""
+
 msgid "Connect"
 msgstr ""
 
@@ -12980,6 +12983,9 @@ msgstr ""
 msgid "GitLab Billing Team."
 msgstr ""
 
+msgid "GitLab Gold trial (optional)"
+msgstr ""
+
 msgid "GitLab Group Runners can execute code for all the projects in this group."
 msgstr ""
 
@@ -14224,6 +14230,9 @@ msgid "How it works"
 msgstr ""
 
 msgid "How many days need to pass between marking entity for deletion and actual removing it."
+msgstr ""
+
+msgid "How many employees will use Gitlab?"
 msgstr ""
 
 msgid "How many replicas each Elasticsearch shard has."
@@ -29422,6 +29431,12 @@ msgstr ""
 msgid "Trials|You won't get a free trial right now but you can always resume this process by clicking on your avatar and choosing 'Start a free trial'"
 msgstr ""
 
+msgid "Trial|Dismiss"
+msgstr ""
+
+msgid "Trial|Successful trial activation image"
+msgstr ""
+
 msgid "Trigger"
 msgstr ""
 
@@ -31056,6 +31071,9 @@ msgid "We tried to automatically renew your subscription for %{strong}%{namespac
 msgstr ""
 
 msgid "We want to be sure it is you, please confirm you are not a robot."
+msgstr ""
+
+msgid "We will activate your trial on your group once you complete this step. After 30 days, you can upgrade to any plan"
 msgstr ""
 
 msgid "We will notify %{inviter} that you declined their invitation to join GitLab. You will stop receiving reminders."
