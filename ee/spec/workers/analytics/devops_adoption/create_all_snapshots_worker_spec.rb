@@ -11,8 +11,9 @@ RSpec.describe Analytics::DevopsAdoption::CreateAllSnapshotsWorker do
 
     it 'schedules workers for each individual segment' do
       freeze_time do
-        expect(Analytics::DevopsAdoption::CreateSnapshotWorker).to receive(:perform_in).with(0, segment1.id, Time.zone.now)
-        expect(Analytics::DevopsAdoption::CreateSnapshotWorker).to receive(:perform_in).with(5, segment2.id, Time.zone.now)
+        end_time = 1.month.ago.end_of_month
+        expect(Analytics::DevopsAdoption::CreateSnapshotWorker).to receive(:perform_in).with(0, segment1.id, end_time)
+        expect(Analytics::DevopsAdoption::CreateSnapshotWorker).to receive(:perform_in).with(5, segment2.id, end_time)
 
         worker.perform
       end

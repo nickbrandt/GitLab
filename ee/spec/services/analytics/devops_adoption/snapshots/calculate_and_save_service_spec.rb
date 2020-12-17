@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe Analytics::DevopsAdoption::Snapshots::CalculateAndSaveService do
   let(:segment_mock) { instance_double('Analytics::DevopsAdoption::Segment') }
 
-  subject { described_class.new(segment: segment_mock) }
+  subject { described_class.new(segment: segment_mock, range_end: Time.zone.now.end_of_month) }
 
   it 'creates a snapshot with whatever snapshot calculator returns' do
     allow_next_instance_of(Analytics::DevopsAdoption::SnapshotCalculator) do |calc|
