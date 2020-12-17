@@ -1,0 +1,5 @@
+---
+title: Update form_helper to use gitlab-ui alert styles
+merge_request: 50311
+author:
+type: other

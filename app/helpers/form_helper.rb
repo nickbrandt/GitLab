@@ -7,9 +7,11 @@ module FormHelper
     headline = n_('The %{type} contains the following error:', 'The %{type} contains the following errors:', model.errors.count) % { type: type }
     truncate = Array.wrap(truncate)
 
-    content_tag(:div, class: 'alert alert-danger', id: 'error_explanation') do
-      content_tag(:h4, headline) <<
-        content_tag(:ul) do
+    content_tag(:div, class: 'gl-alert gl-alert-danger gl-mb-5', id: 'error_explanation') do
+      sprite_icon('information-o', css_class: 'gl-icon gl-alert-icon') <<
+      content_tag(:h4, headline, class: 'gl-alert-title') <<
+      content_tag(:div, class: 'gl-alert-body') do
+        content_tag(:ul, class: 'gl-pl-5 gl-mb-0') do
           messages = model.errors.map do |attribute, message|
             message = html_escape_once(model.errors.full_message(attribute, message)).html_safe
             message = content_tag(:span, message, class: 'str-truncated-100') if truncate.include?(attribute)
@@ -19,6 +21,7 @@ module FormHelper
 
           messages.join.html_safe
         end
+      end
     end
   end
 
