@@ -174,7 +174,7 @@ export default {
           variables: {
             input: {
               fullPath: projectFullPath,
-              profileId,
+              id: profileId,
             },
           },
           update(store, { data = {} }) {
