@@ -646,26 +646,6 @@ RSpec.describe Namespace do
     end
   end
 
-  describe '#root?' do
-    subject { namespace.root? }
-
-    context 'when is subgroup' do
-      before do
-        namespace.parent = build(:group)
-      end
-
-      it 'returns false' do
-        is_expected.to eq(false)
-      end
-    end
-
-    context 'when is root' do
-      it 'returns true' do
-        is_expected.to eq(true)
-      end
-    end
-  end
-
   describe '#shared_runners_minutes_limit_enabled?' do
     subject { namespace.shared_runners_minutes_limit_enabled? }
 
