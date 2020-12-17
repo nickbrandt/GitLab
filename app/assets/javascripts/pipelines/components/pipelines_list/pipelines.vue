@@ -1,6 +1,10 @@
 <script>
 import { isEqual } from 'lodash';
-import { GlIcon } from '@gitlab/ui';
+import {
+  GlIcon,
+  GlTabs,
+  GlTab
+  } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
 import PipelinesService from '../../services/pipelines_service';
@@ -21,6 +25,8 @@ export default {
     NavigationControls,
     PipelinesFilteredSearch,
     GlIcon,
+    GlTabs,
+    GlTab,
   },
   mixins: [pipelinesMixin, CIPaginationMixin],
   props: {
