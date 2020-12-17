@@ -11,7 +11,7 @@ import { formatDate } from '~/lib/utils/datetime_utility';
 import { s__, __ } from '~/locale';
 import ScheduleTimelineSection from './schedule/components/schedule_timeline_section.vue';
 import DeleteScheduleModal from './delete_schedule_modal.vue';
-import EditScheduleModal from './edit_schedule_modal.vue';
+import EditScheduleModal from './add_edit_schedule_modal.vue';
 import AddRotationModal from './rotations/components/add_rotation_modal.vue';
 
 import { getTimeframeForWeeksView } from './schedule/utils';
@@ -146,6 +146,11 @@ export default {
     </gl-card>
     <delete-schedule-modal :schedule="schedule" :modal-id="$options.deleteScheduleModalId" />
     <edit-schedule-modal :schedule="schedule" :modal-id="$options.editScheduleModalId" />
+    <edit-schedule-modal
+      :schedule="schedule"
+      :modal-id="$options.editScheduleModalId"
+      is-edit-mode
+    />
     <add-rotation-modal :schedule="schedule" :modal-id="$options.addRotationModalId" />
   </div>
 </template>
