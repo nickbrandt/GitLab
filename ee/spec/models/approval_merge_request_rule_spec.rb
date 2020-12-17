@@ -164,9 +164,7 @@ RSpec.describe ApprovalMergeRequestRule do
       end
 
       context 'when source_rule is missing' do
-        before do
-          allow(amrr).to receive(:source_rule).and_return(nil)
-        end
+        let(:approval_project_rule) { nil }
 
         it_behaves_like 'attempts to read the value from the AMRR record itself'
       end
