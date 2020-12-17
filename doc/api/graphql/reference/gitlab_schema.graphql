@@ -10390,7 +10390,7 @@ type Group {
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by scanner
+    Filter vulnerabilities by VulnerabilityScanner.externalId
     """
     scanner: [String!]
 
@@ -17968,7 +17968,7 @@ type Project {
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by scanner
+    Filter vulnerabilities by VulnerabilityScanner.externalId
     """
     scanner: [String!]
 
@@ -19156,7 +19156,7 @@ type Query {
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by scanner
+    Filter vulnerabilities by VulnerabilityScanner.externalId
     """
     scanner: [String!]
 

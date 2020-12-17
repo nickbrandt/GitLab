@@ -28531,7 +28531,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52550,7 +52550,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -55923,7 +55923,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
                   "type": {
                     "kind": "LIST",
                     "name": null,
