@@ -66,7 +66,7 @@ their name.
 
 ![Popup list which includes users whose username or name contains the string `le`](img/autocomplete_characters_example2_v12_0.png)
 
-## Enable or disable Iterations autocomplete **(STARTER ONLY)**
+## Enable or disable autocomplete for Iterations **(STARTER ONLY)**
 
 Iterations autocomplete is under development and not ready for production use. It is
 deployed behind a feature flag that is **disabled by default**.
