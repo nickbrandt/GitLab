@@ -2,6 +2,8 @@
 
 module Pages
   class ZipDirectoryService
+    include Gitlab::Utils::StrongMemoize
+
     InvalidArchiveError = Class.new(RuntimeError)
     InvalidEntryError = Class.new(RuntimeError)
 
@@ -14,8 +16,7 @@ module Pages
     def execute
       raise InvalidArchiveError unless valid_work_directory?
 
-      @input_dir = File.realpath(@input_dir)
-      output_file = File.join(@input_dir, "@migrated.zip") # '@' to avoid any name collision with groups or projects
+      output_file = File.join(real_dir, "@migrated.zip") # '@' to avoid any name collision with groups or projects
 
       FileUtils.rm_f(output_file)
 
@@ -34,7 +35,7 @@ module Pages
     private
 
     def write_entry(zipfile, zipfile_path)
-      disk_file_path = File.join(@input_dir, zipfile_path)
+      disk_file_path = File.join(real_dir, zipfile_path)
 
       unless valid_path?(disk_file_path)
         # archive without public directory is completelly unusable
@@ -78,21 +79,27 @@ module Pages
     def valid_path?(disk_file_path)
       realpath = File.realpath(disk_file_path)
 
-      realpath == File.join(@input_dir, PUBLIC_DIR) ||
-        realpath.start_with?(File.join(@input_dir, PUBLIC_DIR + "/"))
+      realpath == File.join(real_dir, PUBLIC_DIR) ||
+        realpath.start_with?(File.join(real_dir, PUBLIC_DIR + "/"))
     # happens if target of symlink isn't there
     rescue => e
-      Gitlab::ErrorTracking.track_exception(e, input_dir: @input_dir, disk_file_path: disk_file_path)
+      Gitlab::ErrorTracking.track_exception(e, input_dir: real_dir, disk_file_path: disk_file_path)
 
       false
     end
 
     def valid_work_directory?
-      Dir.exist?(@input_dir)
+      Dir.exist?(real_dir)
     rescue => e
       Gitlab::ErrorTracking.track_exception(e, input_dir: @input_dir)
 
       false
+    end
+
+    def real_dir
+      strong_memoize(:real_dir) do
+        File.realpath(@input_dir) rescue nil
+      end
     end
   end
 end
