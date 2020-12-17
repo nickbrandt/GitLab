@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     eventFieldClasses(condition) {
-      return condition ? 'w-50 mr-1' : 'w-100';
+      return condition ? 'gl-w-half gl-mr-2' : 'gl-w-full';
     },
     hasFieldErrors(key) {
       return this.errors[key]?.length < 1;
@@ -85,7 +85,7 @@ export default {
         @input="handleUpdateField('name', $event)"
       />
     </gl-form-group>
-    <div class="d-flex" :class="{ 'justify-content-between': startEventRequiresLabel }">
+    <div class="d-flex" :class="{ 'gl-justify-content-between': startEventRequiresLabel }">
       <div :class="eventFieldClasses(startEventRequiresLabel)">
         <gl-form-group
           data-testid="custom-stage-start-event"
@@ -103,7 +103,7 @@ export default {
           />
         </gl-form-group>
       </div>
-      <div v-if="startEventRequiresLabel" class="w-50 ml-1">
+      <div v-if="startEventRequiresLabel" class="gl-w-half gl-ml-2">
         <gl-form-group
           data-testid="custom-stage-start-event-label"
           :label="$options.I18N.FORM_FIELD_START_EVENT_LABEL"
@@ -119,7 +119,7 @@ export default {
         </gl-form-group>
       </div>
     </div>
-    <div class="d-flex" :class="{ 'justify-content-between': endEventRequiresLabel }">
+    <div class="d-flex" :class="{ 'gl-justify-content-between': endEventRequiresLabel }">
       <div :class="eventFieldClasses(endEventRequiresLabel)">
         <gl-form-group
           data-testid="custom-stage-end-event"
