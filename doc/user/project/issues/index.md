@@ -94,10 +94,10 @@ must be set.
 While you can view and manage details of an issue on the [issue page](#issue-page),
 you can also work with multiple issues at a time using:
 
-- [Issues List](#issues-list)
-- [Issue Boards](#issue-boards)
-- Issue references
-- [Epics](#epics)**(PREMIUM)**.
+- [Issues List](#issues-list).
+- [Issue Boards](#issue-boards).
+- Issue references.
+- [Epics](#epics) **(PREMIUM)**.
 
 Key actions for issues include:
 
@@ -127,8 +127,8 @@ To enable, you need to enable [ActionCable in-app mode](https://docs.gitlab.com/
 
 On the Issues List, you can:
 
-- view all issues in a project when opening the Issues List from a project context
-- view all issues in a groups's projects when opening the Issues List from a group context
+- View all issues in a project when opening the Issues List from a project context.
+- View all issues in a groups's projects when opening the Issues List from a group context.
 
 You can filter the Issues List with a [search query](../../search/index.md#filtering-issue-and-merge-request-lists),
 including specific metadata, such as labels, assignees, status, and more. From this
@@ -161,7 +161,7 @@ collaboration with your team.
 ### Epics **(PREMIUM)**
 
 [Epics](../../group/epics/index.md) let you manage your portfolio of projects more
-efficiently and with less effort. Epics work by tracking groups of issues that share a theme, across
+efficiently and with less effort. Epics track groups of issues that share a theme, across
 projects and milestones.
 
 ### Related issues
@@ -189,7 +189,7 @@ when new issues are being created.
 As you type in the title field of the **New Issue** page, GitLab searches titles and descriptions
 across all issues to in the current project. Only issues you have access to are returned.
 Up to five similar issues, sorted by most recently updated, are displayed below the title box.
-Note that this feature requires [GraphQL](../../../api/graphql/index.md) to be enabled.
+[GraphQL](../../../api/graphql/index.md) must be enabled to use this feature.
 
 ![Similar issues](img/similar_issues.png)
 
