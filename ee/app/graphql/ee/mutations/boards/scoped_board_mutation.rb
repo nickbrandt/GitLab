@@ -4,12 +4,9 @@ module EE
   module Mutations
     module Boards
       module ScopedBoardMutation
-        extend ActiveSupport::Concern
+        extend ::Gitlab::Utils::Override
 
-        prepended do
-          include ScopedBoardArguments
-        end
-
+        override :resolve
         def resolve(**args)
           parsed_params = parse_arguments(args)
 
