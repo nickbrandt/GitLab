@@ -17263,9 +17263,6 @@ msgstr ""
 msgid "Merge"
 msgstr ""
 
-msgid "Merge (when the pipeline succeeds)"
-msgstr ""
-
 msgid "Merge Conflicts"
 msgstr ""
 
@@ -17504,9 +17501,6 @@ msgid "Merged: %{merged}"
 msgstr ""
 
 msgid "Merges this merge request immediately."
-msgstr ""
-
-msgid "Merges this merge request when the pipeline succeeds."
 msgstr ""
 
 msgid "Merging immediately isn't recommended as it may negatively impact the existing merge train. Read the %{docsLinkStart}documentation%{docsLinkEnd} for more information."
@@ -24209,9 +24203,6 @@ msgid "Scheduled Deletion At - %{permanent_deletion_time}"
 msgstr ""
 
 msgid "Scheduled to merge this merge request (%{strategy})."
-msgstr ""
-
-msgid "Scheduled to merge this merge request when the pipeline succeeds."
 msgstr ""
 
 msgid "Schedules"
