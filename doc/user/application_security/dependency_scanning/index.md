@@ -115,7 +115,7 @@ include:
   - template: Dependency-Scanning.gitlab-ci.yml
 
 variables:
-  DS_PYTHON_VERSION: 2
+  SECURE_LOG_LEVEL: error
 ```
 
 Because template is [evaluated before](../../../ci/yaml/README.md#include) the pipeline
