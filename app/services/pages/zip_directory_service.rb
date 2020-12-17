@@ -26,6 +26,9 @@ module Pages
       end
 
       [output_file, count]
+    rescue => e
+      FileUtils.rm_f(output_file) if output_file
+      raise e
     end
 
     private

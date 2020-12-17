@@ -24,8 +24,10 @@ RSpec.describe Pages::ZipDirectoryService do
     let(:archive) { result.first }
     let(:entries_count) { result.second }
 
-    it 'raises error if there is no public directory' do
+    it 'raises error if there is no public directory and does not leave archive' do
       expect { archive }.to raise_error(described_class::InvalidArchiveError)
+
+      expect(File.exist?(File.join(@work_dir, '@migrated.zip'))).to eq(false)
     end
 
     it 'raises error if public directory is a symlink' do
