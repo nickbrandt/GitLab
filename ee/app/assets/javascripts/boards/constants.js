@@ -14,6 +14,7 @@ export const IterationFilterType = {
 
 export const IterationIDs = {
   NONE: 0,
+  CURRENT: -4,
 };
 
 export const MilestoneFilterType = {
