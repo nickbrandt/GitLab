@@ -28713,6 +28713,9 @@ msgstr ""
 msgid "ThreatMonitoring|Environment"
 msgstr ""
 
+msgid "ThreatMonitoring|Hide dismissed alerts"
+msgstr ""
+
 msgid "ThreatMonitoring|In review"
 msgstr ""
 
