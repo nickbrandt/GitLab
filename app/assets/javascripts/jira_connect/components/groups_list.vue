@@ -1,5 +1,5 @@
 <script>
-import { GlTabs, GlTab, GlLoadingIcon, GlSearchBoxByType } from '@gitlab/ui';
+import { GlTabs, GlTab, GlLoadingIcon } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
@@ -10,7 +10,6 @@ export default {
     GlTabs,
     GlTab,
     GlLoadingIcon,
-    GlSearchBoxByType,
     GroupsListItem,
   },
   props: {
@@ -45,10 +44,6 @@ export default {
         .catch(() => createFlash(__('There was a problem fetching groups.')));
     },
   },
-
-  i18n: {
-    searchPlaceholder: __('Search by name'),
-  },
 };
 </script>
 <template>
@@ -63,9 +58,6 @@ export default {
           </p>
         </div>
       </template>
-      <!-- <div v-else-if="filteredNamespaces.length === 0" class="gl-text-center gl-mt-3">
-        {{ s__('GroupsTree|No groups matched your search') }}
-      </div> -->
       <ul v-else class="groups-list group-list-tree gl-list-style-none gl-pl-0">
         <groups-list-item
           v-for="namespace in filteredNamespaces"
@@ -74,14 +66,5 @@ export default {
         />
       </ul>
     </gl-tab>
-    <!-- <template #tabs-end>
-      <gl-search-box-by-type
-        v-if="namespaces && namespaces.length"
-        v-model="filter"
-        :placeholder="$options.i18n.searchPlaceholder"
-        class="gl-align-self-center gl-ml-auto fork-filtered-search"
-        data-qa-selector="fork_groups_list_search_field"
-      />
-    </template> -->
   </gl-tabs>
 </template>
