@@ -112,8 +112,8 @@ RSpec.describe ApprovalMergeRequestRule do
     end
   end
 
-  shared_examples_for "attempts to read the value from the AMRR record itself" do
-    it "as expected" do
+  shared_examples_for 'attempts to read the value from the AMRR record itself' do
+    it 'as expected' do
       expect(amrr)
         .to receive(:retrieve_value_from_record)
         .at_least(:once)
@@ -123,7 +123,7 @@ RSpec.describe ApprovalMergeRequestRule do
     end
   end
 
-  describe "custom getters" do
+  describe 'custom getters' do
     let(:approval_project_rule) do
       create(:approval_project_rule, project: merge_request.project)
     end
@@ -138,21 +138,21 @@ RSpec.describe ApprovalMergeRequestRule do
     %i(name approvals_required users groups).each do |method_name|
       let(:method_name) { method_name }
 
-      context "when source_rule is present" do
-        context "the AMRR rule has been modified" do
+      context 'when source_rule is present' do
+        context 'the AMRR rule has been modified' do
           before do
             amrr.modified_from_project_rule = true
           end
 
-          it_behaves_like "attempts to read the value from the AMRR record itself"
+          it_behaves_like 'attempts to read the value from the AMRR record itself'
         end
 
-        context "the AMRR rule has not been modified" do
+        context 'the AMRR rule has not been modified' do
           before do
             amrr.modified_from_project_rule = false
           end
 
-          it "attempts to read the value from the source rule (ApprovalProjectRule)" do
+          it 'attempts to read the value from the source rule (ApprovalProjectRule)' do
             expect(amrr.approval_project_rule)
               .to receive(method_name)
               .at_least(:once)
@@ -163,12 +163,12 @@ RSpec.describe ApprovalMergeRequestRule do
         end
       end
 
-      context "when source_rule is missing" do
+      context 'when source_rule is missing' do
         before do
           allow(amrr).to receive(:source_rule).and_return(nil)
         end
 
-        it_behaves_like "attempts to read the value from the AMRR record itself"
+        it_behaves_like 'attempts to read the value from the AMRR record itself'
       end
     end
   end
