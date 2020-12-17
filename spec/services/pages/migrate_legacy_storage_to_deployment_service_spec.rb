@@ -4,7 +4,6 @@ require 'spec_helper'
 
 RSpec.describe Pages::MigrateLegacyStorageToDeploymentService do
   let(:project) { create(:project, :repository) }
-
   let(:service) { described_class.new(project) }
 
   it 'marks pages as not deployed if public directory is absent' do
