@@ -11,8 +11,16 @@ export const splitParent = path => {
 
 /**
  * Create file objects from a list of file paths.
+ *
+ * @param options.blobData Values to initialize each blob with
  */
-export const decorateFiles = ({ data, tempFile = false, content = '', rawPath = '' }) => {
+export const decorateFiles = ({
+  data,
+  tempFile = false,
+  content = '',
+  rawPath = '',
+  blobData = {},
+}) => {
   const treeList = [];
   const entries = {};
 
@@ -73,6 +81,7 @@ export const decorateFiles = ({ data, tempFile = false, content = '', rawPath = 
         content,
         rawPath,
         parentPath,
+        ...blobData,
       });
 
       Object.assign(entries, {
