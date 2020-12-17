@@ -21,7 +21,7 @@ RSpec.describe BillingPlansHelper do
         expect(helper.subscription_plan_data_attributes(group, plan))
           .to eq(namespace_id: group.id,
                  namespace_name: group.name,
-                 is_group: true,
+                 is_group: "true",
                  add_seats_href: add_seats_href,
                  plan_upgrade_href: upgrade_href,
                  plan_renew_href: renew_href,
@@ -49,7 +49,7 @@ RSpec.describe BillingPlansHelper do
         expect(helper.subscription_plan_data_attributes(group, plan))
           .to eq(namespace_id: group.id,
                  namespace_name: group.name,
-                 is_group: true,
+                 is_group: "true",
                  customer_portal_url: customer_portal_url,
                  billable_seats_href: billable_seats_href,
                  add_seats_href: add_seats_href,
@@ -64,7 +64,7 @@ RSpec.describe BillingPlansHelper do
 
         result = helper.subscription_plan_data_attributes(namespace, plan)
 
-        expect(result).to include(is_group: false)
+        expect(result).to include(is_group: "false")
       end
     end
   end
