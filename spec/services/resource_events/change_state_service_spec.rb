@@ -32,14 +32,12 @@ RSpec.describe ResourceEvents::ChangeStateService do
       end
 
       it "sets the created_at timestamp from the system_note_timestamp" do
-        freeze_time do
-          resource.system_note_timestamp = Time.at(43).utc
+        resource.system_note_timestamp = Time.at(43).utc
 
-          described_class.new(user: user, resource: resource).execute(status: state, mentionable_source: source)
-          event = resource.resource_state_events.last
+        described_class.new(user: user, resource: resource).execute(status: state, mentionable_source: source)
+        event = resource.resource_state_events.last
 
-          expect(event.created_at).to eq(Time.at(43).utc)
-        end
+        expect(event.created_at).to eq(Time.at(43).utc)
       end
     end
   end
