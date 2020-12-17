@@ -24,7 +24,7 @@ matching values. The string matching is not case sensitive.
 | `$`           | [Snippets](../snippets.md) |
 | `:`           | [Emoji](../markdown.md#emoji) |
 | `/`           | [Quick Actions](quick_actions.md) |
-| `*iteration:` | [Iterations.](../group/iterations/index.md) To learn how to enable it, go to [Autocomplete for Iterations](#autocomplete-for-iterations-starter). **(STARTER)** |
+| `*iteration:` | [Iterations.](../group/iterations/index.md) To learn how to enable it, go to [Autocomplete for Iterations](#autocomplete-for-iterations). **(STARTER)** |
 
 Up to 5 of the most relevant matches are displayed in a popup list. When you
 select an item from the list, the value is entered in the field. The more
