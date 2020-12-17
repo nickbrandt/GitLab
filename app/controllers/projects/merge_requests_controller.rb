@@ -43,7 +43,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     push_frontend_feature_flag(:core_security_mr_widget_downloads, @project, default_enabled: true)
     push_frontend_feature_flag(:remove_resolve_note, @project, default_enabled: true)
     push_frontend_feature_flag(:test_failure_history, @project)
-    push_frontend_feature_flag(:diffs_gradual_load, @project)
+    push_frontend_feature_flag(:diffs_gradual_load, @project, default_enabled: true)
 
     record_experiment_user(:invite_members_version_a)
     record_experiment_user(:invite_members_version_b)
@@ -51,8 +51,9 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   before_action do
     push_frontend_feature_flag(:vue_issuable_sidebar, @project.group)
-    push_frontend_feature_flag(:merge_request_reviewers, @project)
+    push_frontend_feature_flag(:merge_request_reviewers, @project, default_enabled: true)
     push_frontend_feature_flag(:mr_collapsed_approval_rules, @project)
+    push_frontend_feature_flag(:reviewer_approval_rules, @project)
   end
 
   around_action :allow_gitaly_ref_name_caching, only: [:index, :show, :discussions]

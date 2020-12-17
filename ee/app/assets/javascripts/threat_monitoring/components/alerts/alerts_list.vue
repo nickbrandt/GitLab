@@ -14,7 +14,9 @@ import TimeAgo from '~/vue_shared/components/time_ago_tooltip.vue';
 import { convertToSnakeCase } from '~/lib/utils/text_utility';
 // TODO once backend is settled, update by either abstracting this out to app/assets/javascripts/graphql_shared or create new, modified query in #287757
 import getAlerts from '~/alert_management/graphql/queries/get_alerts.query.graphql';
-import { FIELDS, MESSAGES, PAGE_SIZE, STATUSES } from './constants';
+import { DEFAULT_FILTERS, FIELDS, MESSAGES, PAGE_SIZE, STATUSES } from './constants';
+import AlertFilters from './alert_filters.vue';
+import AlertStatus from './alert_status.vue';
 
 export default {
   PAGE_SIZE,
@@ -24,6 +26,8 @@ export default {
     STATUSES,
   },
   components: {
+    AlertStatus,
+    AlertFilters,
     GlAlert,
     GlIntersectionObserver,
     GlLink,
@@ -45,6 +49,7 @@ export default {
           firstPageSize: this.$options.PAGE_SIZE,
           projectPath: this.projectPath,
           sort: this.sort,
+          ...this.filters,
         };
       },
       update: ({ project }) => project?.alertManagementAlerts.nodes || [],
@@ -60,6 +65,8 @@ export default {
     return {
       alerts: [],
       errored: false,
+      errorMsg: '',
+      filters: DEFAULT_FILTERS,
       isErrorAlertDismissed: false,
       pageInfo: {},
       sort: 'STARTED_AT_DESC',
@@ -85,6 +92,7 @@ export default {
   methods: {
     errorAlertDismissed() {
       this.errored = false;
+      this.errorMsg = '';
       this.isErrorAlertDismissed = true;
     },
     fetchNextPage() {
@@ -110,11 +118,22 @@ export default {
 
       this.sort = `${sortingColumn}_${sortingDirection}`;
     },
+    handleAlertError(msg) {
+      this.errored = true;
+      this.errorMsg = msg;
+    },
+    handleFilterChange(newFilters) {
+      this.filters = newFilters;
+    },
+    handleStatusUpdate() {
+      this.$apollo.queries.alerts.refetch();
+    },
   },
 };
 </script>
 <template>
   <div>
+    <alert-filters @filter-change="handleFilterChange" />
     <gl-alert v-if="showNoAlertsMsg" data-testid="threat-alerts-unconfigured" :dismissible="false">
       <gl-sprintf :message="$options.i18n.MESSAGES.CONFIGURE">
         <template #link="{ content }">
@@ -131,7 +150,7 @@ export default {
       data-testid="threat-alerts-error"
       @dismiss="errorAlertDismissed"
     >
-      {{ $options.i18n.MESSAGES.ERROR }}
+      {{ errorMsg || $options.i18n.MESSAGES.ERROR }}
     </gl-alert>
 
     <gl-table
@@ -169,9 +188,12 @@ export default {
       </template>
 
       <template #cell(status)="{ item }">
-        <div data-testid="threat-alerts-status">
-          {{ $options.i18n.STATUSES[item.status] }}
-        </div>
+        <alert-status
+          :alert="item"
+          :project-path="projectPath"
+          @alert-error="handleAlertError"
+          @alert-update="handleStatusUpdate"
+        />
       </template>
 
       <template #table-busy>

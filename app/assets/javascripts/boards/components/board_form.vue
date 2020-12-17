@@ -15,6 +15,7 @@ const boardDefaults = {
   name: '',
   labels: [],
   milestone_id: undefined,
+  iteration_id: undefined,
   assignee: {},
   assignee_id: undefined,
   weight: null,
@@ -171,6 +172,9 @@ export default {
     }
   },
   methods: {
+    setIteration(iterationId) {
+      this.board.iteration_id = iterationId;
+    },
     callBoardMutation(id) {
       return this.$apollo.mutate({
         mutation: createBoardMutation,
@@ -192,7 +196,7 @@ export default {
     async createBoard() {
       // TODO: change this to use `createBoard` mutation https://gitlab.com/gitlab-org/gitlab/-/issues/292466 is resolved
       const boardData = await getBoardsPath(this.endpoints.boardsEndpoint, this.boardPayload);
-      await this.callBoardMutation(fullBoardId(boardData.data.id));
+      this.callBoardMutation(fullBoardId(boardData.data.id));
 
       return boardData.data || boardData;
     },
@@ -289,6 +293,7 @@ export default {
         :project-id="projectId"
         :group-id="groupId"
         :weights="weights"
+        @set-iteration="setIteration"
       />
     </form>
   </gl-modal>

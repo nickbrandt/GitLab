@@ -1763,12 +1763,6 @@ You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_proces
 
 This section describes how to configure the GitLab application (Rails) component.
 
-In our architecture, we run each GitLab Rails node using the Puma webserver, and
-have its number of workers set to 90% of available CPUs, with four threads. For
-nodes running Rails with other components, the worker value should be reduced
-accordingly. We've determined that a worker value of 50% achieves a good balance,
-but this is dependent on workload.
-
 The following IPs will be used as an example:
 
 - `10.6.0.111`: GitLab application 1
@@ -2072,7 +2066,7 @@ on what features you intend to use:
 
 |Object storage type|Supported by consolidated configuration?|
 |-------------------|----------------------------------------|
-| [Backups](../../raketasks/backup_restore.md#uploading-backups-to-a-remote-cloud-storage)|No|
+| [Backups](../../raketasks/backup_restore.md#uploading-backups-to-a-remote-cloud-storage) | No |
 | [Job artifacts](../job_artifacts.md#using-object-storage) including archived job logs | Yes |
 | [LFS objects](../lfs/index.md#storing-lfs-objects-in-remote-object-storage) | Yes |
 | [Uploads](../uploads.md#using-object-storage) | Yes |

@@ -178,6 +178,29 @@ if Feature.disabled?(:my_feature_flag, project, default_enabled: true)
 end
 ```
 
+If not specified, `default_enabled` is `false`.
+
+To force reading the `default_enabled` value from the relative YAML definition file, use
+`default_enabled: :yaml`:
+
+```ruby
+if Feature.enabled?(:feature_flag, project, default_enabled: :yaml)
+  # execute code if feature flag is enabled
+end
+```
+
+```ruby
+if Feature.disabled?(:feature_flag, project, default_enabled: :yaml)
+  # execute code if feature flag is disabled
+end
+```
+
+This allows to use the same feature flag check across various parts of the codebase and
+maintain the status of `default_enabled` in the YAML definition file which is the SSOT.
+
+If `default_enabled: :yaml` is used, a YAML definition is expected or an error is raised
+in development or test environment, while returning `false` on production.
+
 If not specified, the default feature flag type for `Feature.enabled?` and `Feature.disabled?`
 is `type: development`. For all other feature flag types, you must specify the `type:`:
 
@@ -353,6 +376,18 @@ You can also enable a feature flag for a given gate:
 
 ```ruby
 Feature.enable(:feature_flag_name, Project.find_by_full_path("root/my-project"))
+```
+
+### Removing a feature flag locally (in development)
+
+When manually enabling or disabling a feature flag from the Rails console, its default value gets overwritten. 
+This can cause confusion when changing the flag's `default_enabled` attribute.
+
+To reset the feature flag to the default status, you can remove it in the rails console (`rails c`) 
+as follows:
+
+```ruby
+Feature.remove(:feature_flag_name)
 ```
 
 ## Feature flags in tests

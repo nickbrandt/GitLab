@@ -19,9 +19,9 @@ import {
   SEARCH_PLACEHOLDER_TEXT,
 } from '~/registry/explorer/constants';
 
-import getProjectContainerRepositories from '~/registry/explorer/graphql/queries/get_project_container_repositories.graphql';
-import getGroupContainerRepositories from '~/registry/explorer/graphql/queries/get_group_container_repositories.graphql';
-import deleteContainerRepository from '~/registry/explorer/graphql/mutations/delete_container_repository.graphql';
+import getProjectContainerRepositoriesQuery from '~/registry/explorer/graphql/queries/get_project_container_repositories.query.graphql';
+import getGroupContainerRepositoriesQuery from '~/registry/explorer/graphql/queries/get_group_container_repositories.query.graphql';
+import deleteContainerRepositoryMutation from '~/registry/explorer/graphql/mutations/delete_container_repository.mutation.graphql';
 
 import {
   graphQLImageListMock,
@@ -72,9 +72,9 @@ describe('List Page', () => {
     localVue.use(VueApollo);
 
     const requestHandlers = [
-      [getProjectContainerRepositories, resolver],
-      [getGroupContainerRepositories, groupResolver],
-      [deleteContainerRepository, mutationResolver],
+      [getProjectContainerRepositoriesQuery, resolver],
+      [getGroupContainerRepositoriesQuery, groupResolver],
+      [deleteContainerRepositoryMutation, mutationResolver],
     ];
 
     apolloProvider = createMockApollo(requestHandlers);
@@ -135,13 +135,13 @@ describe('List Page', () => {
     it('empty state should have an svg-path', () => {
       mountComponent({ config });
 
-      expect(findEmptyState().attributes('svg-path')).toBe(config.containersErrorImage);
+      expect(findEmptyState().props('svgPath')).toBe(config.containersErrorImage);
     });
 
     it('empty state should have a description', () => {
       mountComponent({ config });
 
-      expect(findEmptyState().html()).toContain('connection error');
+      expect(findEmptyState().props('title')).toContain('connection error');
     });
 
     it('should not show the loading or default state', () => {

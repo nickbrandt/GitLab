@@ -200,9 +200,11 @@ describe('OnDemandScansForm', () => {
         expect(subject.vm.$apollo.mutate).toHaveBeenCalledWith({
           mutation: dastOnDemandScanCreate,
           variables: {
-            dastScannerProfileId: passiveScannerProfile.id,
-            dastSiteProfileId: nonValidatedSiteProfile.id,
-            fullPath: projectPath,
+            input: {
+              dastScannerProfileId: passiveScannerProfile.id,
+              dastSiteProfileId: nonValidatedSiteProfile.id,
+              fullPath: projectPath,
+            },
           },
         });
       });
@@ -335,6 +337,41 @@ describe('OnDemandScansForm', () => {
 
     it('automatically selects the only available profile', () => {
       expect(subject.find(selector).attributes('value')).toBe(profile.id);
+    });
+  });
+
+  describe('site profile summary', () => {
+    const [authEnabledProfile] = siteProfiles;
+
+    const selectSiteProfile = profile => {
+      subject.find(SiteProfileSelector).vm.$emit('input', profile.id);
+      return subject.vm.$nextTick();
+    };
+
+    beforeEach(() => {
+      mountSubject({
+        provide: {
+          glFeatures: {
+            securityDastSiteProfilesAdditionalFields: true,
+          },
+        },
+        data: {
+          siteProfiles,
+        },
+      });
+    });
+
+    it('renders all fields correctly', async () => {
+      await selectSiteProfile(authEnabledProfile);
+      const summary = subject.find(SiteProfileSelector).text();
+
+      expect(summary).toMatch(authEnabledProfile.targetUrl);
+      expect(summary).toMatch(authEnabledProfile.excludedUrls);
+      expect(summary).toMatch(authEnabledProfile.requestHeaders);
+      expect(summary).toMatch(authEnabledProfile.auth.url);
+      expect(summary).toMatch(authEnabledProfile.auth.username);
+      expect(summary).toMatch(authEnabledProfile.auth.usernameField);
+      expect(summary).toMatch(authEnabledProfile.auth.passwordField);
     });
   });
 });

@@ -7,12 +7,6 @@ import CollapsedCalendarIcon from '~/vue_shared/components/sidebar/collapsed_cal
 import ToggleSidebar from '~/vue_shared/components/sidebar/toggle_sidebar.vue';
 import { mockDatePickerProps } from '../../mock_data';
 
-const mockPopoverBind = jest.fn();
-
-jest.mock('~/vue_shared/directives/popover', () => ({
-  bind: (...args) => mockPopoverBind(...args),
-}));
-
 describe('SidebarDatePicker', () => {
   let originalGon;
   beforeAll(() => {

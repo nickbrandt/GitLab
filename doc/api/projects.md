@@ -1045,6 +1045,7 @@ POST /projects
 | Attribute                                                   | Type    | Required               | Description |
 |-------------------------------------------------------------|---------|------------------------|-------------|
 | `allow_merge_on_skipped_pipeline`                           | boolean | **{dotted-circle}** No | Set whether or not merge requests can be merged with skipped jobs. |
+| `analytics_access_level`                                    | string  | no                     | One of `disabled`, `private` or `enabled` |
 | `approvals_before_merge` **(STARTER)**                      | integer | **{dotted-circle}** No | How many approvers should approve merge requests by default. |
 | `auto_cancel_pending_pipelines`                             | string  | **{dotted-circle}** No | Auto-cancel pending pipelines. This isn't a boolean, but enabled/disabled. |
 | `auto_devops_deploy_strategy`                               | string  | **{dotted-circle}** No | Auto Deploy strategy (`continuous`, `manual` or `timed_incremental`). |
@@ -1056,7 +1057,7 @@ POST /projects
 | `build_timeout`                                             | integer | **{dotted-circle}** No | The maximum amount of time in minutes that a job is able run (in seconds). |
 | `builds_access_level`                                       | string  | **{dotted-circle}** No | One of `disabled`, `private`, or `enabled`. |
 | `ci_config_path`                                            | string  | **{dotted-circle}** No | The path to CI configuration file. |
-| `container_expiration_policy_attributes`                    | hash    | **{dotted-circle}** No | Update the image cleanup policy for this project. Accepts: `cadence` (string), `keep_n` (string), `older_than` (string), `name_regex` (string), `name_regex_delete` (string), `name_regex_keep` (string), `enabled` (boolean). |
+| `container_expiration_policy_attributes`                    | hash    | **{dotted-circle}** No | Update the image cleanup policy for this project. Accepts: `cadence` (string), `keep_n` (integer), `older_than` (string), `name_regex` (string), `name_regex_delete` (string), `name_regex_keep` (string), `enabled` (boolean). |
 | `container_registry_enabled`                                | boolean | **{dotted-circle}** No | Enable container registry for this project. |
 | `default_branch`                                            | string  | **{dotted-circle}** No | `master` by default. |
 | `description`                                               | string  | **{dotted-circle}** No | Short project description. |
@@ -1077,6 +1078,7 @@ POST /projects
 | `mirror` **(STARTER)**                                      | boolean | **{dotted-circle}** No | Enables pull mirroring in a project. |
 | `name`                                                      | string  | **{check-circle}** Yes (if path isn't provided) | The name of the new project. Equals path if not provided. |
 | `namespace_id`                                              | integer | **{dotted-circle}** No | Namespace for the new project (defaults to the current user's namespace). |
+| `operations_access_level`                                   | string  | **{dotted-circle}** No | One of `disabled`, `private`, or `enabled`. |
 | `only_allow_merge_if_all_discussions_are_resolved`          | boolean | **{dotted-circle}** No | Set whether merge requests can only be merged when all the discussions are resolved. |
 | `only_allow_merge_if_pipeline_succeeds`                     | boolean | **{dotted-circle}** No | Set whether merge requests can only be merged with successful jobs. |
 | `packages_enabled`                                          | boolean | **{dotted-circle}** No | Enable or disable packages repository feature. |
@@ -1117,6 +1119,7 @@ POST /projects/user/:user_id
 | Attribute                                                   | Type    | Required               | Description |
 |-------------------------------------------------------------|---------|------------------------|-------------|
 | `allow_merge_on_skipped_pipeline`                           | boolean | **{dotted-circle}** No | Set whether or not merge requests can be merged with skipped jobs. |
+| `analytics_access_level`                                    | string  | no                     | One of `disabled`, `private` or `enabled` |
 | `approvals_before_merge` **(STARTER)**                      | integer | **{dotted-circle}** No | How many approvers should approve merge requests by default. |
 | `auto_cancel_pending_pipelines`                             | string  | **{dotted-circle}** No | Auto-cancel pending pipelines. This isn't a boolean, but enabled/disabled. |
 | `auto_devops_deploy_strategy`                               | string  | **{dotted-circle}** No | Auto Deploy strategy (`continuous`, `manual` or `timed_incremental`). |
@@ -1147,6 +1150,7 @@ POST /projects/user/:user_id
 | `mirror` **(STARTER)**                                      | boolean | **{dotted-circle}** No | Enables pull mirroring in a project. |
 | `name`                                                      | string  | **{check-circle}** Yes | The name of the new project. |
 | `namespace_id`                                              | integer | **{dotted-circle}** No | Namespace for the new project (defaults to the current user's namespace). |
+| `operations_access_level`                                   | string  | **{dotted-circle}** No | One of `disabled`, `private`, or `enabled`. |
 | `only_allow_merge_if_all_discussions_are_resolved`          | boolean | **{dotted-circle}** No | Set whether merge requests can only be merged when all the discussions are resolved. |
 | `only_allow_merge_if_pipeline_succeeds`                     | boolean | **{dotted-circle}** No | Set whether merge requests can only be merged with successful jobs. |
 | `packages_enabled`                                          | boolean | **{dotted-circle}** No | Enable or disable packages repository feature. |
@@ -1188,6 +1192,7 @@ PUT /projects/:id
 | Attribute                                                   | Type           | Required               | Description |
 |-------------------------------------------------------------|----------------|------------------------|-------------|
 | `allow_merge_on_skipped_pipeline`                           | boolean        | **{dotted-circle}** No | Set whether or not merge requests can be merged with skipped jobs. |
+| `analytics_access_level`                                    | string         | no                     | One of `disabled`, `private` or `enabled` |
 | `approvals_before_merge` **(STARTER)**                      | integer        | **{dotted-circle}** No | How many approvers should approve merge request by default. |
 | `auto_cancel_pending_pipelines`                             | string         | **{dotted-circle}** No | Auto-cancel pending pipelines. This isn't a boolean, but enabled/disabled. |
 | `auto_devops_deploy_strategy`                               | string         | **{dotted-circle}** No | Auto Deploy strategy (`continuous`, `manual`, or `timed_incremental`). |
@@ -1201,7 +1206,7 @@ PUT /projects/:id
 | `ci_config_path`                                            | string         | **{dotted-circle}** No | The path to CI configuration file. |
 | `ci_default_git_depth`                                      | integer        | **{dotted-circle}** No | Default number of revisions for [shallow cloning](../ci/pipelines/settings.md#git-shallow-clone). |
 | `ci_forward_deployment_enabled`                             | boolean        | **{dotted-circle}** No | When a new deployment job starts, [skip older deployment jobs](../ci/pipelines/settings.md#skip-outdated-deployment-jobs) that are still pending |
-| `container_expiration_policy_attributes`                    | hash           | **{dotted-circle}** No | Update the image cleanup policy for this project. Accepts: `cadence` (string), `keep_n` (string), `older_than` (string), `name_regex` (string), `name_regex_delete` (string), `name_regex_keep` (string), `enabled` (boolean). |
+| `container_expiration_policy_attributes`                    | hash           | **{dotted-circle}** No | Update the image cleanup policy for this project. Accepts: `cadence` (string), `keep_n` (integer), `older_than` (string), `name_regex` (string), `name_regex_delete` (string), `name_regex_keep` (string), `enabled` (boolean). |
 | `container_registry_enabled`                                | boolean        | **{dotted-circle}** No | Enable container registry for this project. |
 | `default_branch`                                            | string         | **{dotted-circle}** No | `master` by default. |
 | `description`                                               | string         | **{dotted-circle}** No | Short project description. |
@@ -1222,6 +1227,7 @@ PUT /projects/:id
 | `mirror_user_id` **(STARTER)**                              | integer        | **{dotted-circle}** No | User responsible for all the activity surrounding a pull mirror event. _(admins only)_ |
 | `mirror` **(STARTER)**                                      | boolean        | **{dotted-circle}** No | Enables pull mirroring in a project. |
 | `name`                                                      | string         | **{dotted-circle}** No | The name of the project. |
+| `operations_access_level`                                   | string         | **{dotted-circle}** No | One of `disabled`, `private`, or `enabled`. |
 | `only_allow_merge_if_all_discussions_are_resolved`          | boolean        | **{dotted-circle}** No | Set whether merge requests can only be merged when all the discussions are resolved. |
 | `only_allow_merge_if_pipeline_succeeds`                     | boolean        | **{dotted-circle}** No | Set whether merge requests can only be merged with successful jobs. |
 | `only_mirror_protected_branches` **(STARTER)**              | boolean        | **{dotted-circle}** No | Only mirror protected branches. |
@@ -2371,6 +2377,7 @@ Example response:
   "repository_access_level": "enabled",
   "merge_requests_access_level": "enabled",
   "forking_access_level": "enabled",
+  "analytics_access_level": "enabled",
   "wiki_access_level": "enabled",
   "builds_access_level": "enabled",
   "snippets_access_level": "enabled",

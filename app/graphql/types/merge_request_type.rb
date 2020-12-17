@@ -69,9 +69,11 @@ module Types
     field :merge_commit_sha, GraphQL::STRING_TYPE, null: true,
           description: 'SHA of the merge request commit (set once merged)'
     field :user_notes_count, GraphQL::INT_TYPE, null: true,
-          description: 'User notes count of the merge request'
+          description: 'User notes count of the merge request',
+          resolver: Resolvers::UserNotesCountResolver
     field :user_discussions_count, GraphQL::INT_TYPE, null: true,
-          description: 'Number of user discussions in the merge request'
+          description: 'Number of user discussions in the merge request',
+          resolver: Resolvers::UserDiscussionsCountResolver
     field :should_remove_source_branch, GraphQL::BOOLEAN_TYPE, method: :should_remove_source_branch?, null: true,
           description: 'Indicates if the source branch of the merge request will be deleted after merge'
     field :force_remove_source_branch, GraphQL::BOOLEAN_TYPE, method: :force_remove_source_branch?, null: true,
@@ -165,6 +167,8 @@ module Types
           description: 'Indicates if the merge request is mergeable'
     field :commits_without_merge_commits, Types::CommitType.connection_type, null: true,
           calls_gitaly: true, description: 'Merge request commits excluding merge commits'
+    field :security_auto_fix, GraphQL::BOOLEAN_TYPE, null: true,
+          description: 'Indicates if the merge request is created by @GitLab-Security-Bot.'
 
     def approved_by
       object.approved_by_users
@@ -226,6 +230,10 @@ module Types
 
     def commits_without_merge_commits
       object.recent_commits.without_merge_commits
+    end
+
+    def security_auto_fix
+      object.author == User.security_bot
     end
   end
 end

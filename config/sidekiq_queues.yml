@@ -122,6 +122,8 @@
   - 2
 - - error_tracking_issue_link
   - 1
+- - experiments_record_conversion_event
+  - 1
 - - expire_build_instance_artifacts
   - 1
 - - export_csv
@@ -197,6 +199,8 @@
 - - migrate_external_diffs
   - 1
 - - namespaceless_project_destroy
+  - 1
+- - namespaces_onboarding_user_added
   - 1
 - - new_epic
   - 2
@@ -303,6 +307,8 @@
 - - requirements_management_import_requirements_csv
   - 1
 - - requirements_management_process_requirements_reports
+  - 1
+- - security_auto_fix
   - 1
 - - security_scans
   - 2

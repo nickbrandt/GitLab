@@ -1,9 +1,10 @@
 <script>
-import Tribute from 'tributejs';
+import Tribute from '@gitlab/tributejs';
 import {
   GfmAutocompleteType,
   tributeConfig,
 } from 'ee_else_ce/vue_shared/components/gfm_autocomplete/utils';
+import * as Emoji from '~/emoji';
 import createFlash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
 import { __ } from '~/locale';
@@ -29,6 +30,10 @@ export default {
     config() {
       return this.autocompleteTypes.map(type => ({
         ...tributeConfig[type].config,
+        loadingItemTemplate: `<span class="gl-spinner gl-vertical-align-text-bottom gl-ml-3 gl-mr-2"></span>${__(
+          'Loading',
+        )}`,
+        requireLeadingSpace: true,
         values: this.getValues(type),
       }));
     },
@@ -72,6 +77,14 @@ export default {
       return (inputText, processValues) => {
         if (this.cache[type]) {
           processValues(this.filterValues(type));
+        } else if (type === GfmAutocompleteType.Emojis) {
+          Emoji.initEmojiMap()
+            .then(() => {
+              const emojis = Emoji.getValidEmojiNames();
+              this.cache[type] = emojis;
+              processValues(emojis);
+            })
+            .catch(() => createFlash({ message: this.$options.errorMessage }));
         } else if (this.dataSources[type]) {
           axios
             .get(this.dataSources[type])

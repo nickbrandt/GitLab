@@ -1,5 +1,5 @@
 import mutations from 'ee/boards/stores/mutations';
-import { mockIssue, mockIssue2, mockEpics, mockEpic, mockListsWithModel } from '../mock_data';
+import { mockIssue, mockIssue2, mockEpics, mockEpic, mockLists } from '../mock_data';
 
 const expectNotImplemented = action => {
   it('is not implemented', () => {
@@ -10,8 +10,8 @@ const expectNotImplemented = action => {
 const epicId = mockEpic.id;
 
 const initialBoardListsState = {
-  'gid://gitlab/List/1': mockListsWithModel[0],
-  'gid://gitlab/List/2': mockListsWithModel[1],
+  'gid://gitlab/List/1': mockLists[0],
+  'gid://gitlab/List/2': mockLists[1],
 };
 
 let state = {

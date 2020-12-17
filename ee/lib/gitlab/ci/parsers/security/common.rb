@@ -61,7 +61,7 @@ module Gitlab
 
             report.add_finding(
               ::Gitlab::Ci::Reports::Security::Finding.new(
-                uuid: SecureRandom.uuid,
+                uuid: calculate_uuid_v5(report, location, identifiers.first),
                 report_type: report.type,
                 name: finding_name(data, identifiers, location),
                 compare_key: data['cve'] || '',
@@ -136,13 +136,13 @@ module Gitlab
           end
 
           def parse_severity_level(input)
-            return input if ::Vulnerabilities::Finding::SEVERITY_LEVELS.key?(input)
+            return input if ::Enums::Vulnerability.severity_levels.key?(input)
 
             'unknown'
           end
 
           def parse_confidence_level(input)
-            return input if ::Vulnerabilities::Finding::CONFIDENCE_LEVELS.key?(input)
+            return input if ::Enums::Vulnerability.confidence_levels.key?(input)
 
             'unknown'
           end
@@ -159,6 +159,24 @@ module Gitlab
 
             identifier = identifiers.find(&:cve?) || identifiers.find(&:cwe?) || identifiers.first
             "#{identifier.name} in #{location&.fingerprint_path}"
+          end
+
+          def calculate_uuid_v5(report, location, primary_identifier)
+            uuid_v5_name_components = {
+              report_type: report.type,
+              primary_identifier_fingerprint: primary_identifier&.fingerprint,
+              location_fingerprint: location&.fingerprint,
+              project_id: report.project_id
+            }
+
+            if uuid_v5_name_components.values.any?(&:nil?)
+              Gitlab::AppLogger.warn(message: "One or more UUID name components are nil", components: uuid_v5_name_components)
+              return
+            end
+
+            name = uuid_v5_name_components.values.join('-')
+
+            Gitlab::UUID.v5(name)
           end
         end
       end

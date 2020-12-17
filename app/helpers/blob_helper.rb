@@ -217,6 +217,10 @@ module BlobHelper
     @gitlab_ci_ymls ||= template_dropdown_names(TemplateFinder.build(:gitlab_ci_ymls, project).execute)
   end
 
+  def gitlab_ci_syntax_ymls(project)
+    @gitlab_ci_syntax_ymls ||= template_dropdown_names(TemplateFinder.build(:gitlab_ci_syntax_ymls, project).execute)
+  end
+
   def metrics_dashboard_ymls(project)
     @metrics_dashboard_ymls ||= template_dropdown_names(TemplateFinder.build(:metrics_dashboard_ymls, project).execute)
   end
@@ -242,7 +246,7 @@ module BlobHelper
   def copy_blob_source_button(blob)
     return unless blob.rendered_as_text?(ignore_errors: false)
 
-    clipboard_button(target: ".blob-content[data-blob-id='#{blob.id}']", class: "btn btn-sm js-copy-blob-source-btn", title: _("Copy file contents"))
+    clipboard_button(target: ".blob-content[data-blob-id='#{blob.id}'] > pre", class: "btn btn-sm js-copy-blob-source-btn", title: _("Copy file contents"))
   end
 
   def open_raw_blob_button(blob)

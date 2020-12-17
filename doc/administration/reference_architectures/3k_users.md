@@ -17,6 +17,8 @@ highly-available GitLab deployment. If you do not have the expertise or need to
 maintain a highly-available environment, you can have a simpler and less
 costly-to-operate environment by using the
 [2,000-user reference architecture](2k_users.md).
+If you have fewer than 3,000 users and still want a highly-available GitLab deployment,
+you should still use this reference architecture but scale down the node sizes.
 
 > - **Supported users (approximate):** 3,000
 > - **High Availability:** Yes
@@ -1479,12 +1481,6 @@ You can also run [multiple Sidekiq processes](../operations/extra_sidekiq_proces
 
 This section describes how to configure the GitLab application (Rails) component.
 
-In our architecture, we run each GitLab Rails node using the Puma webserver, and
-have its number of workers set to 90% of available CPUs, with four threads. For
-nodes running Rails with other components, the worker value should be reduced
-accordingly. We've determined that a worker value of 50% achieves a good balance,
-but this is dependent on workload.
-
 On each node perform the following:
 
 1. If you're [using NFS](#configure-nfs-optional):
@@ -1788,7 +1784,7 @@ on what features you intend to use:
 
 |Object storage type|Supported by consolidated configuration?|
 |-------------------|----------------------------------------|
-| [Backups](../../raketasks/backup_restore.md#uploading-backups-to-a-remote-cloud-storage)|No|
+| [Backups](../../raketasks/backup_restore.md#uploading-backups-to-a-remote-cloud-storage) | No |
 | [Job artifacts](../job_artifacts.md#using-object-storage) including archived job logs | Yes |
 | [LFS objects](../lfs/index.md#storing-lfs-objects-in-remote-object-storage) | Yes |
 | [Uploads](../uploads.md#using-object-storage) | Yes |

@@ -3450,6 +3450,20 @@
               "deprecationReason": null
             },
             {
+              "name": "iteration",
+              "description": "The board iteration.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Iteration",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "labels",
               "description": "Labels of the board",
               "args": [
@@ -5597,6 +5611,16 @@
               "defaultValue": null
             },
             {
+              "name": "iterationId",
+              "description": "Global ID of an existing iteration",
+              "type": {
+                "kind": "SCALAR",
+                "name": "IterationID",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "assigneeId",
               "description": "Global ID of an existing user",
               "type": {
@@ -5869,6 +5893,16 @@
           "kind": "SCALAR",
           "name": "BoardsEpicBoardID",
           "description": "Identifier of Boards::EpicBoard",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "SCALAR",
+          "name": "BoardsEpicListID",
+          "description": "Identifier of Boards::EpicList",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -6723,13 +6757,9 @@
 
               ],
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "Pipeline",
-                  "ofType": null
-                }
+                "kind": "OBJECT",
+                "name": "Pipeline",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -10925,18 +10955,38 @@
               "defaultValue": null
             },
             {
-              "name": "assigneeId",
-              "description": "The ID of the user to be assigned to the board.",
+              "name": "hideBacklogList",
+              "description": "Whether or not backlog list is hidden",
               "type": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "hideClosedList",
+              "description": "Whether or not closed list is hidden",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "assigneeId",
+              "description": "The ID of user to be assigned to the board.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "UserID",
                 "ofType": null
               },
               "defaultValue": null
             },
             {
               "name": "milestoneId",
-              "description": "The ID of the milestone to be assigned to the board.",
+              "description": "The ID of milestone to be assigned to the board.",
               "type": {
                 "kind": "SCALAR",
                 "name": "MilestoneID",
@@ -10945,12 +10995,40 @@
               "defaultValue": null
             },
             {
-              "name": "weight",
-              "description": "The weight of the board.",
+              "name": "iterationId",
+              "description": "The ID of iteration to be assigned to the board.",
               "type": {
                 "kind": "SCALAR",
-                "name": "Boolean",
+                "name": "IterationID",
                 "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "weight",
+              "description": "The weight value to be assigned to the board.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "labels",
+              "description": "Labels of the issue",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
               },
               "defaultValue": null
             },
@@ -11288,6 +11366,150 @@
                     }
                   }
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "CreateComplianceFrameworkInput",
+          "description": "Autogenerated input type of CreateComplianceFramework",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "namespacePath",
+              "description": "Full path of the namespace to add the compliance framework to.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Name of the compliance framework.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "description",
+              "description": "Description of the compliance framework.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "color",
+              "description": "Color to represent the compliance framework as a hexadecimal value. e.g. #ABC123.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "CreateComplianceFrameworkPayload",
+          "description": "Autogenerated return type of CreateComplianceFramework",
+          "fields": [
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "Errors encountered during execution of the mutation.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "framework",
+              "description": "The created compliance framework.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ComplianceFramework",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -22421,7 +22643,7 @@
           "fields": [
             {
               "name": "id",
-              "description": "Global ID of the board",
+              "description": "Global ID of the board.",
               "args": [
 
               ],
@@ -22438,8 +22660,61 @@
               "deprecationReason": null
             },
             {
+              "name": "lists",
+              "description": "Epic board lists.",
+              "args": [
+                {
+                  "name": "after",
+                  "description": "Returns the elements in the list that come after the specified cursor.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "before",
+                  "description": "Returns the elements in the list that come before the specified cursor.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "first",
+                  "description": "Returns the first _n_ elements from the list.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "last",
+                  "description": "Returns the last _n_ elements from the list.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EpicListConnection",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "name",
-              "description": "Name of the board",
+              "description": "Name of the board.",
               "args": [
 
               ],
@@ -23298,7 +23573,7 @@
             },
             {
               "name": "healthStatus",
-              "description": "Current health status. Returns null if `save_issuable_health_status` feature flag is disabled.",
+              "description": "Current health status.",
               "args": [
 
               ],
@@ -24150,6 +24425,213 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "EpicIssue",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "EpicList",
+          "description": "Represents an epic board list",
+          "fields": [
+            {
+              "name": "id",
+              "description": "Global ID of the board list.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BoardsEpicListID",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "label",
+              "description": "Label of the list.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Label",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "listType",
+              "description": "Type of the list.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "position",
+              "description": "Position of the list within the board.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "title",
+              "description": "Title of the list.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "EpicListConnection",
+          "description": "The connection type for EpicList.",
+          "fields": [
+            {
+              "name": "edges",
+              "description": "A list of edges.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "EpicListEdge",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "nodes",
+              "description": "A list of nodes.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "EpicList",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "pageInfo",
+              "description": "Information to aid in pagination.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "PageInfo",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "EpicListEdge",
+          "description": "An edge in a connection.",
+          "fields": [
+            {
+              "name": "cursor",
+              "description": "A cursor for use in pagination.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "node",
+              "description": "The item at the end of the edge.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EpicList",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -28049,7 +28531,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -30561,7 +31043,7 @@
             },
             {
               "name": "healthStatus",
-              "description": "Current health status. Returns null if `save_issuable_health_status` feature flag is disabled.",
+              "description": "Current health status.",
               "args": [
 
               ],
@@ -36986,6 +37468,20 @@
               "deprecationReason": null
             },
             {
+              "name": "securityAutoFix",
+              "description": "Indicates if the merge request is created by @GitLab-Security-Bot.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "shouldBeRebased",
               "description": "Indicates if the merge request will be rebased",
               "args": [
@@ -40777,6 +41273,33 @@
               "deprecationReason": null
             },
             {
+              "name": "createComplianceFramework",
+              "description": null,
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "CreateComplianceFrameworkInput",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreateComplianceFrameworkPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "createCustomEmoji",
               "description": " Available only when feature flag `custom_emoji` is enabled.",
               "args": [
@@ -43714,6 +44237,60 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "VulnerabilityDismissPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "vulnerabilityExternalIssueLinkCreate",
+              "description": null,
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "VulnerabilityExternalIssueLinkCreateInput",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "VulnerabilityExternalIssueLinkCreatePayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "vulnerabilityExternalIssueLinkDestroy",
+              "description": null,
+              "args": [
+                {
+                  "name": "input",
+                  "description": null,
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "VulnerabilityExternalIssueLinkDestroyInput",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "VulnerabilityExternalIssueLinkDestroyPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -48272,6 +48849,20 @@
               "deprecationReason": null
             },
             {
+              "name": "ciCdSettings",
+              "description": "CI/CD settings for the project",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ProjectCiCdSetting",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "clusterAgent",
               "description": "Find a single cluster agent by name",
               "args": [
@@ -51959,7 +52550,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52314,6 +52905,61 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ProjectCiCdSetting",
+          "description": null,
+          "fields": [
+            {
+              "name": "mergePipelinesEnabled",
+              "description": "Whether merge pipelines are enabled.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "mergeTrainsEnabled",
+              "description": "Whether merge trains are enabled.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "project",
+              "description": "Project the CI/CD settings belong to.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Project",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -55277,7 +55923,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -68228,22 +68874,8 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "id",
-              "description": "The board global ID",
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "BoardID",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            },
-            {
               "name": "name",
-              "description": "Name of the board",
+              "description": "The board name.",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -68272,8 +68904,22 @@
               "defaultValue": null
             },
             {
+              "name": "id",
+              "description": "The board global ID.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "BoardID",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
               "name": "assigneeId",
-              "description": "The ID of user to be assigned to the board",
+              "description": "The ID of user to be assigned to the board.",
               "type": {
                 "kind": "SCALAR",
                 "name": "UserID",
@@ -68283,7 +68929,7 @@
             },
             {
               "name": "milestoneId",
-              "description": "The ID of milestone to be assigned to the board",
+              "description": "The ID of milestone to be assigned to the board.",
               "type": {
                 "kind": "SCALAR",
                 "name": "MilestoneID",
@@ -68292,8 +68938,18 @@
               "defaultValue": null
             },
             {
+              "name": "iterationId",
+              "description": "The ID of iteration to be assigned to the board.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "IterationID",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "weight",
-              "description": "The weight value to be assigned to the board",
+              "description": "The weight value to be assigned to the board.",
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
@@ -68321,7 +68977,7 @@
             },
             {
               "name": "labelIds",
-              "description": "The IDs of labels to be added to the board",
+              "description": "The IDs of labels to be added to the board.",
               "type": {
                 "kind": "LIST",
                 "name": null,
@@ -68481,7 +69137,7 @@
           "fields": [
             {
               "name": "board",
-              "description": "The board after mutation",
+              "description": "The board after mutation.",
               "args": [
 
               ],
@@ -72466,6 +73122,20 @@
               "deprecationReason": null
             },
             {
+              "name": "hasSolutions",
+              "description": "Indicates whether there is a solution available for this vulnerability.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "id",
               "description": "GraphQL ID of the vulnerability",
               "args": [
@@ -72585,6 +73255,20 @@
               "type": {
                 "kind": "UNION",
                 "name": "VulnerabilityLocation",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "mergeRequest",
+              "description": "Merge request that fixes the vulnerability.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "MergeRequest",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -73296,6 +73980,224 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "VulnerabilityExternalIssueLinkCreateInput",
+          "description": "Autogenerated input type of VulnerabilityExternalIssueLinkCreate",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the vulnerability.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "VulnerabilityID",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "linkType",
+              "description": "Type of the external issue link.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "VulnerabilityExternalIssueLinkType",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "externalTracker",
+              "description": "External tracker type of the external issue link.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "VulnerabilityExternalIssueLinkExternalTracker",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "VulnerabilityExternalIssueLinkCreatePayload",
+          "description": "Autogenerated return type of VulnerabilityExternalIssueLinkCreate",
+          "fields": [
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "Errors encountered during execution of the mutation.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "externalIssueLink",
+              "description": "The created external issue link.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "VulnerabilityExternalIssueLink",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "VulnerabilityExternalIssueLinkDestroyInput",
+          "description": "Autogenerated input type of VulnerabilityExternalIssueLinkDestroy",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "The global ID of the vulnerability external issue link.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "VulnerabilitiesExternalIssueLinkID",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "VulnerabilityExternalIssueLinkDestroyPayload",
+          "description": "Autogenerated return type of VulnerabilityExternalIssueLinkDestroy",
+          "fields": [
+            {
+              "name": "clientMutationId",
+              "description": "A unique identifier for the client performing the mutation.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "Errors encountered during execution of the mutation.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "VulnerabilityExternalIssueLinkEdge",
           "description": "An edge in a connection.",
@@ -73338,6 +74240,23 @@
 
           ],
           "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "VulnerabilityExternalIssueLinkExternalTracker",
+          "description": "The external tracker of the external issue link related to a vulnerability",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "JIRA",
+              "description": "Jira external tracker",
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
           "possibleTypes": null
         },
         {

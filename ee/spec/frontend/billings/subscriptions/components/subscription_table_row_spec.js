@@ -39,7 +39,11 @@ describe('subscription table row', () => {
 
   const defaultProps = { header: HEADER, columns: COLUMNS };
 
-  const createComponent = ({ props = {}, billableSeatsHref = BILLABLE_SEATS_URL } = {}) => {
+  const createComponent = ({
+    props = {},
+    billableSeatsHref = BILLABLE_SEATS_URL,
+    isGroup = true,
+  } = {}) => {
     if (wrapper) {
       throw new Error('wrapper already exists!');
     }
@@ -51,6 +55,7 @@ describe('subscription table row', () => {
       },
       provide: {
         billableSeatsHref,
+        isGroup,
       },
       store,
       localVue,
@@ -86,13 +91,21 @@ describe('subscription table row', () => {
       .at(0)
       .find('[data-testid="seats-usage-button"]');
 
+  describe('dispatched actions', () => {
+    it('dispatches action when created if namespace is group', () => {
+      createComponent();
+      expect(store.dispatch).toHaveBeenCalledWith('fetchHasBillableGroupMembers');
+    });
+
+    it('does not dispatch action when created if namespace is not group', () => {
+      createComponent({ isGroup: false });
+      expect(store.dispatch).not.toHaveBeenCalledWith('fetchHasBillableGroupMembers');
+    });
+  });
+
   describe('default', () => {
     beforeEach(() => {
       createComponent();
-    });
-
-    it('dispatches correct actions when created', () => {
-      expect(store.dispatch).toHaveBeenCalledWith('fetchHasBillableGroupMembers');
     });
 
     it(`should render one header cell and ${COLUMNS.length} visible columns in total`, () => {
@@ -137,6 +150,21 @@ describe('subscription table row', () => {
     });
   });
 
+  describe('with free plan', () => {
+    const dateColumn = {
+      id: 'a',
+      label: 'Column A',
+      value: 0,
+      colClass: 'number',
+    };
+
+    it('renders a dash when the value is zero', () => {
+      createComponent({ props: { columns: [dateColumn] } });
+
+      expect(wrapper.find('[data-testid="property-value"]').text()).toBe('-');
+    });
+  });
+
   describe('date column', () => {
     const dateColumn = {
       id: 'c',
@@ -156,7 +184,6 @@ describe('subscription table row', () => {
       const outputDate = dateInWords(new Date(d[0], d[1] - 1, d[2]));
 
       expect(currentCol.find('[data-testid="property-label"]').text()).toMatch(dateColumn.label);
-
       expect(currentCol.find('[data-testid="property-value"]').text()).toMatch(outputDate);
     });
   });

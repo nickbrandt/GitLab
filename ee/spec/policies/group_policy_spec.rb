@@ -5,7 +5,10 @@ require 'spec_helper'
 RSpec.describe GroupPolicy do
   include_context 'GroupPolicy context'
 
-  let(:epic_rules) { %i(read_epic create_epic admin_epic destroy_epic read_confidential_epic destroy_epic_link read_epic_board) }
+  let(:epic_rules) do
+    %i(read_epic create_epic admin_epic destroy_epic read_confidential_epic
+       destroy_epic_link read_epic_board read_epic_list)
+  end
 
   context 'when epics feature is disabled' do
     let(:current_user) { owner }
@@ -55,7 +58,7 @@ RSpec.describe GroupPolicy do
       let(:current_user) { guest }
 
       it { is_expected.to be_allowed(:read_epic, :read_epic_board) }
-      it { is_expected.to be_disallowed(*(epic_rules - [:read_epic, :read_epic_board])) }
+      it { is_expected.to be_disallowed(*(epic_rules - [:read_epic, :read_epic_board, :read_epic_list])) }
     end
 
     context 'when user is not member' do
@@ -198,6 +201,36 @@ RSpec.describe GroupPolicy do
     end
 
     it { is_expected.not_to be_allowed(:read_group_activity_analytics) }
+  end
+
+  context 'group CI / CD analytics' do
+    context 'when group CI / CD analytics is available' do
+      before do
+        stub_licensed_features(group_ci_cd_analytics: true)
+      end
+
+      context 'when the user has at least reporter permissions' do
+        let(:current_user) { reporter }
+
+        it { is_expected.to be_allowed(:view_group_ci_cd_analytics) }
+      end
+
+      context 'when the user has less than reporter permissions' do
+        let(:current_user) { guest }
+
+        it { is_expected.not_to be_allowed(:view_group_ci_cd_analytics) }
+      end
+    end
+
+    context 'when group CI / CD analytics is not available' do
+      let(:current_user) { reporter }
+
+      before do
+        stub_licensed_features(group_ci_cd_analytics: false)
+      end
+
+      it { is_expected.not_to be_allowed(:view_group_ci_cd_analytics) }
+    end
   end
 
   context 'when group repository analytics is available' do

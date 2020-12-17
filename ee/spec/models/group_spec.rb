@@ -898,6 +898,44 @@ RSpec.describe Group do
     end
   end
 
+  describe "#execute_hooks" do
+    context "group_webhooks", :request_store do
+      let_it_be(:group) { create(:group) }
+      let_it_be(:group_hook) { create(:group_hook, group: group, member_events: true) }
+      let(:data) { { some: 'info' } }
+
+      before do
+        group.clear_memoization(:feature_available)
+      end
+
+      context 'when group_webhooks feature is enabled' do
+        before do
+          stub_licensed_features(group_webhooks: true)
+        end
+
+        it 'executes the hook' do
+          expect_next_instance_of(WebHookService) do |service|
+            expect(service).to receive(:async_execute).once
+          end
+
+          group.execute_hooks(data, :member_hooks)
+        end
+      end
+
+      context 'when group_webhooks feature is disabled' do
+        before do
+          stub_licensed_features(group_webhooks: false)
+        end
+
+        it 'does not execute the hook' do
+          expect(WebHookService).not_to receive(:new)
+
+          group.execute_hooks(data, :member_hooks)
+        end
+      end
+    end
+  end
+
   describe '#self_or_ancestor_marked_for_deletion' do
     context 'delayed deletion feature is not available' do
       before do

@@ -2,6 +2,7 @@
 import { GlAlert, GlLoadingIcon, GlTab, GlTabs } from '@gitlab/ui';
 import { __, s__, sprintf } from '~/locale';
 import { mergeUrlParams, redirectTo, refreshCurrentPage } from '~/lib/utils/url_utility';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 import PipelineGraph from '~/pipelines/components/pipeline_graph/pipeline_graph.vue';
 import CommitForm from './components/commit/commit_form.vue';
@@ -10,6 +11,7 @@ import TextEditor from './components/text_editor.vue';
 import commitCiFileMutation from './graphql/mutations/commit_ci_file.mutation.graphql';
 import getBlobContent from './graphql/queries/blob_content.graphql';
 import getCiConfigData from './graphql/queries/ci_config.graphql';
+import { unwrapStagesWithNeeds } from '~/pipelines/components/unwrapping_utils';
 
 const MR_SOURCE_BRANCH = 'merge_request[source_branch]';
 const MR_TARGET_BRANCH = 'merge_request[target_branch]';
@@ -30,6 +32,7 @@ export default {
     PipelineGraph,
     TextEditor,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     projectPath: {
       type: String,
@@ -99,7 +102,11 @@ export default {
         };
       },
       update(data) {
-        return data?.ciConfig ?? {};
+        const { ciConfig } = data || {};
+        const stageNodes = ciConfig?.stages?.nodes || [];
+        const stages = unwrapStagesWithNeeds(stageNodes);
+
+        return { ...ciConfig, stages };
       },
       error() {
         this.reportFailure(LOAD_FAILURE_UNKNOWN);
@@ -109,6 +116,9 @@ export default {
   computed: {
     isBlobContentLoading() {
       return this.$apollo.queries.content.loading;
+    },
+    isVisualizationTabLoading() {
+      return this.$apollo.queries.ciConfigData.loading;
     },
     isVisualizeTabActive() {
       return this.currentTabIndex === 1;
@@ -261,8 +271,14 @@ export default {
             <text-editor v-model="contentModel" @editor-ready="editorIsReady = true" />
           </gl-tab>
 
-          <gl-tab :title="$options.i18n.tabGraph" :lazy="!isVisualizeTabActive">
-            <pipeline-graph :pipeline-data="ciConfigData" />
+          <gl-tab
+            v-if="glFeatures.ciConfigVisualizationTab"
+            :title="$options.i18n.tabGraph"
+            :lazy="!isVisualizeTabActive"
+            data-testid="visualization-tab"
+          >
+            <gl-loading-icon v-if="isVisualizationTabLoading" size="lg" class="gl-m-3" />
+            <pipeline-graph v-else :pipeline-data="ciConfigData" />
           </gl-tab>
         </gl-tabs>
       </div>

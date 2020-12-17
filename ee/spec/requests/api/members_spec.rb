@@ -114,6 +114,26 @@ RSpec.describe API::Members do
         end
       end
     end
+
+    describe 'GET /groups/:id/members/:user_id' do
+      context 'when minimal access role is available' do
+        it 'shows the member' do
+          stub_licensed_features(minimal_access_role: true)
+          get api("/groups/#{group.id}/members/#{minimal_access_member.user_id}", owner)
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(json_response['id']).to eq(minimal_access_member.user_id)
+        end
+      end
+
+      context 'when minimal access role is not available' do
+        it 'does not show the member' do
+          get api("/groups/#{group.id}/members/#{minimal_access_member.id}", owner)
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
+      end
+    end
   end
 
   context 'group members endpoint for group managed accounts' do
@@ -377,6 +397,16 @@ RSpec.describe API::Members do
         subject
 
         expect_paginated_array_response(*[owner, maintainer, nested_user, project_user, linked_group_user].map(&:id))
+      end
+
+      context 'when the current user does not have the :admin_group_member ability' do
+        it 'is a bad request' do
+          not_an_owner = create(:user)
+
+          get api(url, not_an_owner), params: params
+
+          expect(response).to have_gitlab_http_status(:bad_request)
+        end
       end
 
       context 'with seach params provided' do

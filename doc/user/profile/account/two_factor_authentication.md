@@ -307,6 +307,9 @@ your account. We suggest copying and printing them, or downloading them using
 the **Download codes** button for storage in a safe place. If you choose to
 download them, the file is called `gitlab-recovery-codes.txt`.
 
+The UI now includes **Copy codes** and **Print codes** buttons, for your convenience.
+[Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/267730) in GitLab 13.7.
+
 If you lose the recovery codes or just want to generate new ones, you can do so
 from the [two-factor authentication account settings page](#regenerate-2fa-recovery-codes) or
 [using SSH](#generate-new-recovery-codes-using-ssh).
@@ -355,7 +358,10 @@ applications and U2F / WebAuthn devices.
 
 ## Personal access tokens
 
-Please refer to the [Personal Access Tokens documentation](../personal_access_tokens.md).
+When 2FA is enabled, you can no longer use your normal account password to
+authenticate with Git over HTTPS on the command line or when using
+the [GitLab API](../../../api/README.md). You must use a
+[personal access token](../personal_access_tokens.md) instead.
 
 ## Recovery options
 
