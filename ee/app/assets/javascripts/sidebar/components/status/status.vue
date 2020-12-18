@@ -1,7 +1,7 @@
 <script>
 import {
   GlIcon,
-  GlDeprecatedButton as GlButton,
+  GlButton,
   GlLoadingIcon,
   GlTooltipDirective as GlTooltip,
   GlDropdownItem,
@@ -151,7 +151,7 @@ export default {
           <gl-button
             ref="editButton"
             variant="link"
-            class="edit-link btn-link-hover"
+            class="edit-link btn-link-hover gl-text-black-normal!"
             :disabled="!isEditable"
             @click.stop="toggleFormDropdown"
             @keydown.esc="hideDropdown"
@@ -188,7 +188,7 @@ export default {
             <gl-dropdown-item @click="handleDropdownClick(null)">
               <gl-button
                 variant="link"
-                class="dropdown-item health-dropdown-item"
+                class="dropdown-item health-dropdown-item gl-px-8!"
                 :class="{ 'is-active': isSelected(null) }"
               >
                 {{ s__('Sidebar|No status') }}
@@ -204,7 +204,7 @@ export default {
             >
               <gl-button
                 variant="link"
-                class="dropdown-item health-dropdown-item"
+                class="dropdown-item health-dropdown-item gl-px-8!"
                 :class="{ 'is-active': isSelected(option.key) }"
               >
                 {{ option.value }}
