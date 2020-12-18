@@ -11,11 +11,13 @@ module Gitlab
         @key = key
         @tracking_category = params[:tracking_category]
         @use_backwards_compatible_subject_index = params[:use_backwards_compatible_subject_index]
-
-        @experiment_percentage = Feature.get(:"#{key}#{FEATURE_FLAG_SUFFIX}").percentage_of_time_value # rubocop:disable Gitlab/AvoidFeatureGet
       end
 
       def active?
+        # TODO: just touch a feature flag
+        # Temporary change, we will change `experiment_percentage` in future to `Feature.enabled?
+        Feature.enabled?(feature_flag_name, type: :experiment, default_enabled: :yaml)
+
         ::Gitlab.dev_env_or_com? && experiment_percentage > 0
       end
 
@@ -27,7 +29,17 @@ module Gitlab
 
       private
 
-      attr_reader :experiment_percentage
+      def experiment_percentage
+        feature_flag.percentage_of_time_value
+      end
+
+      def feature_flag
+        Feature.get(feature_flag_name) # rubocop:disable Gitlab/AvoidFeatureGet
+      end
+
+      def feature_flag_name
+        :"#{key}#{FEATURE_FLAG_SUFFIX}"
+      end
     end
   end
 end
