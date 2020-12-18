@@ -493,7 +493,7 @@ An alternative is the open source community-maintained tool [BFG](https://rtyley
 Keep in mind that these tools are faster because they do not provide the same
 feature set as `git filter-branch` does, but focus on specific use cases.
 
-Refer [Reduce repository size](https://docs.gitlab.com/ee/user/project/repository/reducing_the_repo_size_using_git.html) document to know more details on purging files from repository history & Gitlab storage.
+Refer [Reduce repository size](../../../user/project/repository/reducing_the_repo_size_using_git.md) document to know more details on purging files from repository history & Gitlab storage.
 
 ## Conclusion
 
