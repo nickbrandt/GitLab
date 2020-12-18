@@ -461,7 +461,7 @@ RSpec.describe Vulnerabilities::Finding do
 
     context 'when the finding has associated remediation records' do
       let!(:persisted_remediation) { create(:vulnerabilities_remediation, findings: [finding]) }
-      let(:remediation_hash) { persisted_remediation.as_json(only: [:summary, :diff]) }
+      let(:remediation_hash) { { 'summary' => persisted_remediation.summary, 'diff' => persisted_remediation.diff } }
 
       it { is_expected.to eq([remediation_hash]) }
     end

@@ -241,7 +241,7 @@ module Vulnerabilities
     def remediations
       return metadata.dig('remediations') unless super.present?
 
-      super.as_json(only: [:summary, :diff])
+      super.as_json(only: [:summary], methods: [:diff])
     end
 
     def build_evidence_request(data)
