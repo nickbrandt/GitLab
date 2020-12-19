@@ -700,10 +700,22 @@ RSpec.describe Projects::JobsController, :clean_gitlab_redis_shared_state do
         expect(json_response['lines']).to eq [{ 'content' => [{ 'text' => 'BUILD TRACE' }], 'offset' => 0 }]
       end
 
-      it 'sets being-watched flag for the job' do
-        expect(response).to have_gitlab_http_status(:ok)
+      context 'when job is running' do
+        let(:job) { create(:ci_build, :trace_live, :running, pipeline: pipeline) }
 
-        expect(job.trace.being_watched?).to be(true)
+        it 'sets being-watched flag for the job' do
+          expect(response).to have_gitlab_http_status(:ok)
+
+          expect(job.trace.being_watched?).to be(true)
+        end
+      end
+
+      context 'when job is not running' do
+        it 'does not set being-watched flag for the job' do
+          expect(response).to have_gitlab_http_status(:ok)
+
+          expect(job.trace.being_watched?).to be(false)
+        end
       end
     end
 
