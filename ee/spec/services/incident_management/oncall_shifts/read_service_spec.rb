@@ -9,7 +9,7 @@ RSpec.describe ::IncidentManagement::OncallShifts::ReadService do
   let_it_be(:user_without_permissions) { create(:user) }
   let_it_be(:current_user) { user_with_permissions }
 
-  let(:params) { { starts_at: rotation.starts_at + 15.minutes, ends_at: rotation.starts_at + 3.weeks } }
+  let(:params) { { starts_at: 15.minutes.since(rotation.starts_at), ends_at: 3.weeks.since(rotation.starts_at) } }
   let(:service) { described_class.new(rotation, current_user, params) }
 
   before_all do
@@ -64,8 +64,8 @@ RSpec.describe ::IncidentManagement::OncallShifts::ReadService do
 
         shifts = execute.payload[:shifts]
 
-        expect(shifts).to all( be_a(::IncidentManagement::OncallShift) )
-        expect(shifts).to all( be_valid )
+        expect(shifts).to all(be_a(::IncidentManagement::OncallShift))
+        expect(shifts).to all(be_valid)
         expect(shifts.sort_by(&:starts_at)).to eq(shifts)
         expect(shifts.first.starts_at).to be <= params[:starts_at]
         expect(shifts.last.ends_at).to be >= params[:ends_at]
