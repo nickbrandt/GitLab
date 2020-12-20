@@ -66,7 +66,7 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
           end
 
           it 'raises an error' do
-            expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'A username that was provided could not be matched to a user')
+            expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, "A provided username couldn't be matched to a user")
           end
         end
 

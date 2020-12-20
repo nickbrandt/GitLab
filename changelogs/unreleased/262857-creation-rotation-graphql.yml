@@ -1,5 +1,5 @@
 ---
-title: Add create On-call rotations GraphQL mutation
+title: Add GraphQL mutation to create on-call rotations
 merge_request: 49206
 author:
 type: added

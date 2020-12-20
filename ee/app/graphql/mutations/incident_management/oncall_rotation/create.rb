@@ -14,7 +14,7 @@ module Mutations
 
         argument :schedule_iid, GraphQL::STRING_TYPE,
                  required: true,
-                 description: 'The iid of the on-call schedule to create the on-call rotation in.',
+                 description: 'The IID of the on-call schedule to create the on-call rotation in.',
                  as: :iid
 
         argument :name, GraphQL::STRING_TYPE,
@@ -104,7 +104,7 @@ module Mutations
         end
 
         def raise_user_not_found
-          raise Gitlab::Graphql::Errors::ArgumentError, 'A username that was provided could not be matched to a user'
+          raise Gitlab::Graphql::Errors::ArgumentError, "A provided username couldn't be matched to a user"
         end
       end
     end

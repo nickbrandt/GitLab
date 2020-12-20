@@ -15710,7 +15710,7 @@ input OncallRotationCreateInput {
   rotationLength: OncallRotationLengthInputType!
 
   """
-  The iid of the on-call schedule to create the on-call rotation in.
+  The IID of the on-call schedule to create the on-call rotation in.
   """
   scheduleIid: String!
 
@@ -15950,7 +15950,7 @@ input OncallUserInputType {
   colorWeight: DataVisualizationWeightEnum
 
   """
-  The username of the user to participate in the on-call rotation. i.e user_one.
+  The username of the user to participate in the on-call rotation, such as `user_one`.
   """
   username: String!
 }

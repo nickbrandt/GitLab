@@ -9,7 +9,7 @@ module Types
 
       argument :username, GraphQL::STRING_TYPE,
                 required: true,
-                description: 'The username of the user to participate in the on-call rotation. i.e user_one.'
+                description: 'The username of the user to participate in the on-call rotation, such as `user_one`.'
 
       argument :color_palette, ::Types::DataVisualizationPalette::ColorEnum,
                 required: false,

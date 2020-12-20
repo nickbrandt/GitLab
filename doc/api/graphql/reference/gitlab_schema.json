@@ -46622,7 +46622,7 @@
             },
             {
               "name": "scheduleIid",
-              "description": "The iid of the on-call schedule to create the on-call rotation in.",
+              "description": "The IID of the on-call schedule to create the on-call rotation in.",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -47297,7 +47297,7 @@
           "inputFields": [
             {
               "name": "username",
-              "description": "The username of the user to participate in the on-call rotation. i.e user_one.",
+              "description": "The username of the user to participate in the on-call rotation, such as `user_one`.",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
