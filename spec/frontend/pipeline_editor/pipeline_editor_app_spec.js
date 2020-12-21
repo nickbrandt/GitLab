@@ -284,12 +284,28 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
           });
         });
 
-        it('refreshes the page', () => {
-          expect(refreshCurrentPage).toHaveBeenCalled();
+        it('displays an alert to indicate success', () => {
+          expect(findAlert().text()).toMatchInterpolatedText(
+            'Your changes have been successfully committed.',
+          );
         });
 
         it('shows no saving state', () => {
           expect(findCommitBtnLoadingIcon().exists()).toBe(false);
+        });
+
+        it('a second commit submits the latest sha, keeping the form updated', async () => {
+          await submitCommit();
+
+          expect(mockMutate).toHaveBeenCalledTimes(2);
+          expect(mockMutate).toHaveBeenLastCalledWith({
+            mutation: expect.any(Object),
+            variables: {
+              ...mockVariables,
+              lastCommitId: mockCommitNextSha,
+              branch: mockDefaultBranch,
+            },
+          });
         });
       });
 
@@ -310,10 +326,6 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
               branch: newBranch,
             },
           });
-        });
-
-        it('refreshes the page', () => {
-          expect(refreshCurrentPage).toHaveBeenCalledWith();
         });
       });
 
