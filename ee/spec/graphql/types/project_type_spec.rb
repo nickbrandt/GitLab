@@ -370,7 +370,7 @@ RSpec.describe GitlabSchema.types['Project'] do
           resolve_field(:compliance_frameworks, p)
         end
       end
-      frameworks = results.flat_map(&:items)
+      frameworks = results.flat_map(&:to_a)
 
       expect(frameworks).to match_array(projects.flat_map(&:compliance_management_frameworks))
     end
