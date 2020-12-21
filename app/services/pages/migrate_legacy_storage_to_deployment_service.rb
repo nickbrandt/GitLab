@@ -40,7 +40,10 @@ module Pages
     rescue ::Pages::ZipDirectoryService::InvalidArchiveError => e
       Gitlab::ErrorTracking.track_exception(e, project_id: project.id)
 
-      project.mark_pages_as_not_deployed if Feature.enabled?(:pages_migration_mark_as_not_deployed, project)
+      if !project.pages_metadatum&.reload&.pages_deployment &&
+         Feature.enabled?(:pages_migration_mark_as_not_deployed, project)
+        project.mark_pages_as_not_deployed
+      end
     end
   end
 end

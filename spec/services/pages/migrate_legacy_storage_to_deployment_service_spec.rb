@@ -14,6 +14,16 @@ RSpec.describe Pages::MigrateLegacyStorageToDeploymentService do
     end.to change { project.pages_metadatum.reload.deployed }.from(true).to(false)
   end
 
+  it 'does not mark pages as not deployed if public directory is absent but pages_deployment exists' do
+    deployment = create(:pages_deployment, project: project)
+    project.update_pages_deployment!(deployment)
+    project.mark_pages_as_deployed
+
+    expect do
+      service.execute
+    end.not_to change { project.pages_metadatum.reload.deployed }.from(true)
+  end
+
   it 'does not mark pages as not deployed if public directory is absent but feature is disabled' do
     stub_feature_flags(pages_migration_mark_as_not_deployed: false)
 
