@@ -92,6 +92,8 @@ describe('EE - DastProfiles', () => {
     });
 
     it(`shows a "Scanner Profile" dropdown item that links to ${TEST_NEW_DAST_SCANNER_PROFILE_PATH}`, () => {
+      createComponent();
+
       expect(getSiteProfilesDropdownItem('Scanner Profile').getAttribute('href')).toBe(
         TEST_NEW_DAST_SCANNER_PROFILE_PATH,
       );
