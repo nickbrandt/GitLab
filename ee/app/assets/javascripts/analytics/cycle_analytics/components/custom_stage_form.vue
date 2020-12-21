@@ -172,7 +172,7 @@ export default {
   <div v-if="isLoading">
     <gl-loading-icon class="mt-4" size="md" />
   </div>
-  <form v-else class="custom-stage-form m-4 mt-0">
+  <form v-else class="custom-stage-form m-4 gl-mt-0">
     <div class="gl-mb-1 gl-display-flex gl-justify-content-space-between gl-align-items-center">
       <h4>{{ formTitle }}</h4>
       <gl-dropdown
@@ -191,7 +191,7 @@ export default {
             >{{ stage.title }}</gl-dropdown-item
           >
         </template>
-        <p v-else class="mx-3 my-2">{{ $options.I18N.RECOVER_STAGES_VISIBLE }}</p>
+        <p v-else class="gl-mx-5 gl-my-3">{{ $options.I18N.RECOVER_STAGES_VISIBLE }}</p>
       </gl-dropdown>
     </div>
     <custom-stage-form-fields
@@ -201,7 +201,7 @@ export default {
       :events="events"
       @update="handleUpdateFields"
     />
-    <div class="custom-stage-form-actions">
+    <div>
       <gl-button
         :disabled="!isDirty"
         category="primary"
@@ -221,7 +221,7 @@ export default {
         {{ saveStageText }}
       </gl-button>
     </div>
-    <div class="mt-2">
+    <div class="gl-mt-3">
       <gl-sprintf
         :message="
           __(

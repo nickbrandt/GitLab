@@ -91,7 +91,7 @@ describe('CustomStageFields', () => {
 
   describe.each([
     ['Start event label', findStartEventLabel],
-    ['End event label', findStartEventLabel],
+    ['End event label', findEndEventLabel],
   ])('Default state', (field, finder) => {
     it(`field '${field}' is hidden by default`, () => {
       expect(finder(wrapper).exists()).toBe(false);
@@ -172,7 +172,7 @@ describe('CustomStageFields', () => {
         });
       });
 
-      it('will display the start event label field if a label event is selected', () => {
+      it('will display the end event label field if a label event is selected', () => {
         expect(findEndEventLabel(wrapper).exists()).toEqual(true);
       });
 

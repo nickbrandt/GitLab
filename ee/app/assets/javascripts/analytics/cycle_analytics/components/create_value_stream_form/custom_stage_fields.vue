@@ -138,7 +138,7 @@ export default {
           />
         </gl-form-group>
       </div>
-      <div v-if="endEventRequiresLabel" class="w-50 ml-1">
+      <div v-if="endEventRequiresLabel" class="gl-w-half gl-ml-2">
         <gl-form-group
           data-testid="custom-stage-end-event-label"
           :label="$options.I18N.FORM_FIELD_END_EVENT_LABEL"
