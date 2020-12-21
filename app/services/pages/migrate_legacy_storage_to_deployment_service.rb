@@ -44,6 +44,7 @@ module Pages
          Feature.enabled?(:pages_migration_mark_as_not_deployed, project)
         project.mark_pages_as_not_deployed
       end
+
     ensure
       FileUtils.rm_f(archive_path) if archive_path
     end
