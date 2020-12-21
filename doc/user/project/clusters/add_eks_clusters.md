@@ -104,6 +104,7 @@ To create and add a new Kubernetes cluster to your project, group, or instance:
                       "iam:CreateInstanceProfile",
                       "iam:CreateServiceLinkedRole",
                       "iam:GetRole",
+                      "iam:listAttachedRolePolicies",
                       "iam:ListRoles",
                       "iam:PassRole",
                       "ssm:GetParameters"
