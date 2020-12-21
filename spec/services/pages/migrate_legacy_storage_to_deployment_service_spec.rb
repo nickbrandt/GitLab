@@ -34,6 +34,23 @@ RSpec.describe Pages::MigrateLegacyStorageToDeploymentService do
     end.not_to change { project.pages_metadatum.reload.deployed }.from(true)
   end
 
+  it 'removes pages archive when can not save deployment' do
+    archive = fixture_file_upload("spec/fixtures/pages.zip")
+    expect_next_instance_of(::Pages::ZipDirectoryService) do |zip_service|
+      expect(zip_service).to receive(:execute).and_return([archive.path, 3])
+    end
+
+    expect_next_instance_of(PagesDeployment) do |deployment|
+      expect(deployment).to receive(:save!).and_raise("Something")
+    end
+
+    expect do
+      service.execute
+    end.to raise_error("Something")
+
+    expect(File.exist?(archive.path)).to eq(false)
+  end
+
   context 'when pages site is deployed to legacy storage' do
     before do
       FileUtils.mkdir_p File.join(project.pages_path, "public")
@@ -56,6 +73,12 @@ RSpec.describe Pages::MigrateLegacyStorageToDeploymentService do
 
       expect(deployment.file_count).to eq(2)
       expect(deployment.file_sha256).to eq(Digest::SHA256.file(deployment.file.path).hexdigest)
+    end
+
+    it 'removes tmp pages archive' do
+      described_class.new(project).execute
+
+      expect(File.exist?(File.join(project.pages_path, '@migrated.zip'))).to eq(false)
     end
 
     it 'does not change pages deployment if it is set' do
