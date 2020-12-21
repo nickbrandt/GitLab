@@ -94,7 +94,9 @@ navigation's **Issues** menu.
 
 ### Using customized email templates
 
- > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/2460) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.7.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/2460) in [GitLab Premium](https://about.gitlab.com/pricing/) 12.7.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/214839) to [GitLab Starter](https://about.gitlab.com/pricing/) in 13.0.
+> - [Moved](https://gitlab.com/gitlab-org/gitlab/-/issues/215364) to [GitLab Core](https://about.gitlab.com/pricing/) in 13.2.
 
 An email is sent to the author when:
 
