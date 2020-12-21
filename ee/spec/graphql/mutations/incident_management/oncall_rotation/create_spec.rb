@@ -46,9 +46,10 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
 
       context 'when OncallRotations::CreateService responds with an error' do
         before do
-          allow_any_instance_of(::IncidentManagement::OncallRotations::CreateService)
-            .to receive(:execute)
-            .and_return(ServiceResponse.error(payload: { oncall_rotation: nil }, message: 'An on-call rotation already exists'))
+          allow_next_instance_of(::IncidentManagement::OncallRotations::CreateService) do |service|
+            allow(service).to receive(:execute)
+              .and_return(ServiceResponse.error(payload: { oncall_rotation: nil }, message: 'An on-call rotation already exists'))
+          end
         end
 
         it 'returns errors' do
