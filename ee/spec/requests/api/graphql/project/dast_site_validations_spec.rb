@@ -13,21 +13,15 @@ RSpec.describe 'Query.project(fullPath).dastSiteValidations' do
   let_it_be(:dast_site_validation4) { create(:dast_site_validation, dast_site_token: dast_site_token) }
   let_it_be(:current_user) { create(:user) }
 
-  let(:query) do
+  subject do
     fields = all_graphql_fields_for('DastSiteValidation')
 
-    graphql_query_for(
-      'project',
-      { 'fullPath' => project.full_path },
-      query_graphql_field('dastSiteValidations', 'first: 3', "edges { node { #{fields} } }")
+    query = graphql_query_for(
+      :project,
+      { full_path: project.full_path },
+      query_nodes(:dast_site_validations, fields)
     )
-  end
 
-  let(:project_response) { subject['project'] }
-  let(:dast_site_validations_response) { project_response&.[]('dastSiteValidations') }
-  let(:edges) { dast_site_validations_response&.[]('edges') }
-
-  subject do
     post_graphql(
       query,
       current_user: current_user,
@@ -35,7 +29,6 @@ RSpec.describe 'Query.project(fullPath).dastSiteValidations' do
         fullPath: project.full_path
       }
     )
-    graphql_data
   end
 
   before do
@@ -44,15 +37,19 @@ RSpec.describe 'Query.project(fullPath).dastSiteValidations' do
 
   context 'when a user does not have access to the project' do
     it 'returns a null project' do
-      expect(project_response).to be_nil
+      subject
+
+      expect(graphql_data_at(:project)).to be_nil
     end
   end
 
   context 'when a user does not have access to dast_site_validations' do
-    it 'returns an empty edges array' do
+    it 'returns an empty nodes array' do
       project.add_guest(current_user)
 
-      expect(edges).to be_empty
+      subject
+
+      expect(graphql_data_at(:project, :dast_site_validations, :nodes)).to be_empty
     end
   end
 
@@ -61,18 +58,32 @@ RSpec.describe 'Query.project(fullPath).dastSiteValidations' do
       project.add_developer(current_user)
     end
 
-    let(:expected_results) do
-      [
-        dast_site_validation4,
-        dast_site_validation3,
-        dast_site_validation2
-      ].map { |validation| global_id_of(validation)}
+    let(:data_path) { [:project, :dast_site_validations] }
+
+    def pagination_results_data(dast_site_validations)
+      dast_site_validations.map { |dast_site_validation| dast_site_validation['id'] }
     end
 
-    it 'returns a populated edges array containing the correct dast_site_validations' do
-      results = edges.map { |edge| edge['node']['id'] }
+    it_behaves_like 'sorted paginated query' do
+      let(:sort_param) { nil }
+      let(:first_param) { 3 }
 
-      expect(results).to eq(expected_results)
+      let(:expected_results) do
+        [
+          dast_site_validation4,
+          dast_site_validation3,
+          dast_site_validation2,
+          dast_site_validation1
+        ].map { |validation| global_id_of(validation)}
+      end
     end
+  end
+
+  def pagination_query(arguments)
+    graphql_query_for(
+      :project,
+      { full_path: project.full_path },
+      query_nodes(:dast_site_validations, 'id', include_pagination_info: true, args: arguments)
+    )
   end
 end
