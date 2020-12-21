@@ -152,7 +152,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
       let!(:existing_vulnerability) { create(:vulnerability, report_type: report_type, project: project) }
 
       it 'marks the vulnerability as resolved on default branch' do
-        expect { subject }.to change { existing_vulnerability.reload[:resolved_on_default_branch] }.from(false).to(true)
+        expect { subject }.to change { existing_vulnerability.reload.resolved_on_default_branch }.from(false).to(true)
       end
     end
 
@@ -162,7 +162,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
       end
 
       it 'marks the vulnerability as not resolved on default branch' do
-        expect { subject }.to change { vulnerability.reload[:resolved_on_default_branch] }.from(true).to(false)
+        expect { subject }.to change { vulnerability.reload.resolved_on_default_branch }.from(true).to(false)
       end
     end
 
