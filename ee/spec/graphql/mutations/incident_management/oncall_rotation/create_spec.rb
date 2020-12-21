@@ -90,6 +90,16 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
           end
         end
 
+        context 'project path incorrect' do
+          before do
+            args[:project_path] = "something/incorrect"
+          end
+
+          it 'raises an error' do
+            expect { resolve }.to raise_error(Gitlab::Graphql::Errors::ArgumentError, 'The project could not be found')
+          end
+        end
+
         context 'duplicate participants' do
           before do
             args[:participants] << args[:participants].first

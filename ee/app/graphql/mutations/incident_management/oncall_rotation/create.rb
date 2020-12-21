@@ -39,6 +39,8 @@ module Mutations
         def resolve(iid:, project_path:, participants:, **args)
           project = Project.find_by_full_path(project_path)
 
+          raise_project_not_found unless project
+
           schedule = ::IncidentManagement::OncallSchedulesFinder.new(current_user, project, iid: iid)
                                                                 .execute
                                                                 .first
@@ -89,6 +91,10 @@ module Mutations
           user_array = user_array.sort_by! { |h| h[:username] }
 
           user_array.map.with_index { |param, i| param.to_h.merge(user: matched_users[i]) }
+        end
+
+        def raise_project_not_found
+          raise Gitlab::Graphql::Errors::ArgumentError, 'The project could not be found'
         end
 
         def raise_schedule_not_found
