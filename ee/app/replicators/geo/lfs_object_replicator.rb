@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class LfsObjectReplicator < Gitlab::Geo::Replicator
     include ::Geo::BlobReplicatorStrategy
