@@ -13,27 +13,24 @@ module Gitlab
           end
 
           def valid?
-            return @valid unless @valid.nil?
-
-            @valid = check_errors.nil?
+            strong_memoize(:valid) do
+              errors.nil?
+            end
           end
 
-          # check_errors sorts an array of variables, ignoring unknown variable references,
+          # errors sorts an array of variables, ignoring unknown variable references,
           # and returning an error string if a circular variable reference is found
-          def check_errors
+          def errors
             return if Feature.disabled?(:variable_inside_variable)
 
-            message = nil
-
-            # Check for cyclic dependencies and build error message in that case
-            each_strongly_connected_component do |component|
-              if component.size > 1
-                message = "circular variable reference detected: #{component.map { |v| v[:key] }.inspect}"
-                break
+            strong_memoize(:errors) do
+              # Check for cyclic dependencies and build error message in that case
+              errors = each_strongly_connected_component.filter_map do |component|
+                "#{component.map { |v| v[:key] }.inspect}" if component.size > 1
               end
-            end
 
-            message
+              "circular variable reference detected: #{errors.join(', ')}" if errors.any?
+            end
           end
 
           # sort sorts an array of variables, ignoring unknown variable references.
@@ -41,14 +38,16 @@ module Gitlab
           def sort
             return @variables if Feature.disabled?(:variable_inside_variable)
 
+            clear_memoization(:valid)
             begin
               # Perform a topological sort
               variables = tsort
-              @valid = true
+              valid = true
             rescue TSort::Cyclic
               variables = @variables
-              @valid = false
+              valid = false
             end
+            strong_memoize(:valid) { valid }
 
             variables
           end
@@ -64,7 +63,7 @@ module Gitlab
           end
 
           def input_vars
-            strong_memoize(:inclusion) do
+            strong_memoize(:input_vars) do
               @variables.index_by { |env| env.fetch(:key) }
             end
           end

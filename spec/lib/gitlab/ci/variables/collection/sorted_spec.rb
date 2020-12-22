@@ -9,7 +9,7 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Sorted do
     stub_feature_flags(variable_inside_variable: variable_inside_variable_enabled)
   end
 
-  describe '#check_errors' do
+  describe '#errors' do
     context 'when FF :variable_inside_variable is disabled' do
       let(:variable_inside_variable_enabled) { false }
 
@@ -60,7 +60,7 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Sorted do
           subject { Gitlab::Ci::Variables::Collection::Sorted.new(variables) }
 
           it 'does not report error' do
-            expect(subject.check_errors).to eq(nil)
+            expect(subject.errors).to eq(nil)
           end
 
           it 'valid? reports true' do
@@ -104,8 +104,8 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Sorted do
         with_them do
           subject { Gitlab::Ci::Variables::Collection::Sorted.new(variables) }
 
-          it 'check_errors matches expected validation result' do
-            expect(subject.check_errors).to eq(validation_result)
+          it 'errors matches expected validation result' do
+            expect(subject.errors).to eq(validation_result)
           end
 
           it 'valid? matches expected validation result' do
