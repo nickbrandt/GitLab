@@ -2,4 +2,4 @@
 title: Add dismissedBy field to vulnerability object in GraphQL
 merge_request: 50285
 author:
-type: changed
+type: added
