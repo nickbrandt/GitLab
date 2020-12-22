@@ -14,6 +14,6 @@ class AddVerificationFailureLimitToLfsObjects < ActiveRecord::Migration[6.0]
   end
 
   def down
-    remove_child_epic command(:lfs_objects, CONSTRAINT_NAME)
+    remove_check_constraint(:lfs_objects, CONSTRAINT_NAME)
   end
 end
