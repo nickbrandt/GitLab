@@ -28,22 +28,37 @@ RSpec.describe GroupMemberPolicy do
     permissions.each { |p| is_expected.not_to be_allowed(p) }
   end
 
-  context 'with guest user' do
-    let(:current_user) { guest }
+  context 'with anonymous user' do
+    let(:group) { create(:group, :public) }
+    let(:current_user) { nil }
+    let(:membership) { guest.members.first }
 
     it do
-      expect_disallowed(:member_related_permissions)
+      expect_disallowed(*member_related_permissions)
+      expect_allowed(:read_group)
     end
+  end
+
+  context 'with guest user, for own membership' do
+    let(:current_user) { guest }
+
+    specify { expect_disallowed(:update_group_member) }
+    specify { expect_allowed(:read_group, :destroy_group_member) }
+  end
+
+  context 'with guest user, for other membership' do
+    let(:current_user) { guest }
+    let(:membership) { owner.members.first }
+
+    specify { expect_disallowed(:destroy_group_member, :update_group_member) }
+    specify { expect_allowed(:read_group) }
   end
 
   context 'with one owner' do
     let(:current_user) { owner }
 
-    it do
-      expect_disallowed(:destroy_group_member)
-      expect_disallowed(:update_group_member)
-      expect_allowed(:read_group)
-    end
+    specify { expect_disallowed(*member_related_permissions) }
+    specify { expect_allowed(:read_group) }
   end
 
   context 'with more than one owner' do
@@ -53,10 +68,7 @@ RSpec.describe GroupMemberPolicy do
       group.add_owner(create(:user))
     end
 
-    it do
-      expect_allowed(:destroy_group_member)
-      expect_allowed(:update_group_member)
-    end
+    specify { expect_allowed(*member_related_permissions) }
   end
 
   context 'with the group parent' do
