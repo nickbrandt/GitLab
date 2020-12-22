@@ -137,10 +137,8 @@ describe('performSearch', () => {
 
 describe('fetchEpicsSwimlanes', () => {
   const state = {
-    endpoints: {
-      fullPath: 'gitlab-org',
-      boardId: 1,
-    },
+    fullPath: 'gitlab-org',
+    boardId: 1,
     filterParams: {},
     boardType: 'group',
   };
@@ -230,9 +228,7 @@ describe('fetchEpicsSwimlanes', () => {
 
 describe('updateBoardEpicUserPreferences', () => {
   const state = {
-    endpoints: {
-      boardId: 1,
-    },
+    boardId: 1,
   };
 
   const queryResponse = (collapsed = false) => ({
@@ -392,10 +388,8 @@ describe('fetchIssuesForEpic', () => {
   const epicId = mockEpic.id;
 
   const state = {
-    endpoints: {
-      fullPath: 'gitlab-org',
-      boardId: 1,
-    },
+    fullPath: 'gitlab-org',
+    boardId: 1,
     filterParams: {},
     boardType: 'group',
   };
@@ -463,10 +457,8 @@ describe('toggleEpicSwimlanes', () => {
 
     const state = {
       isShowingEpicsSwimlanes: false,
-      endpoints: {
-        fullPath: 'gitlab-org',
-        boardId: 1,
-      },
+      fullPath: 'gitlab-org',
+      boardId: 1,
     };
 
     return testAction(
@@ -495,10 +487,8 @@ describe('toggleEpicSwimlanes', () => {
 
     const state = {
       isShowingEpicsSwimlanes: true,
-      endpoints: {
-        fullPath: 'gitlab-org',
-        boardId: 1,
-      },
+      fullPath: 'gitlab-org',
+      boardId: 1,
     };
 
     return testAction(
@@ -635,7 +625,8 @@ describe('moveIssue', () => {
   };
 
   const state = {
-    endpoints: { fullPath: 'gitlab-org', boardId: '1' },
+    fullPath: 'gitlab-org',
+    boardId: 1,
     boardType: 'group',
     disabled: false,
     boardLists: mockLists,
