@@ -25748,7 +25748,7 @@ type Vulnerability implements Noteable {
   dismissedAt: Time
 
   """
-  The user that dismissed the vulnerability
+  The user that dismissed the vulnerability.
   """
   dismissedBy: User
 

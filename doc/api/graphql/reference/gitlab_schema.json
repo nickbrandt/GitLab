@@ -74718,7 +74718,7 @@
             },
             {
               "name": "dismissedBy",
-              "description": "The user that dismissed the vulnerability",
+              "description": "The user that dismissed the vulnerability.",
               "args": [
 
               ],
