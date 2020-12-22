@@ -1,9 +1,7 @@
 import { GlLabel } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
-import ListIssueEE from 'ee/boards/models/issue';
 import IssueCardInner from '~/boards/components/issue_card_inner.vue';
-import ListLabel from '~/boards/models/label';
 import defaultStore from '~/boards/stores';
 
 describe('Issue card component', () => {
@@ -22,6 +20,7 @@ describe('Issue card component', () => {
       provide: {
         groupId: null,
         rootPath: '/',
+        scopedLabelsAvailable: false,
       },
     });
   };
@@ -31,7 +30,7 @@ describe('Issue card component', () => {
       id: 300,
       position: 0,
       title: 'Test',
-      list_type: 'label',
+      listType: 'label',
       label: {
         id: 5000,
         title: 'Testing',
@@ -41,19 +40,19 @@ describe('Issue card component', () => {
       },
     };
 
-    issue = new ListIssueEE({
+    issue = {
       title: 'Testing',
       id: 1,
       iid: 1,
       confidential: false,
       labels: [list.label],
       assignees: [],
-      reference_path: '#1',
-      real_path: '/test/1',
+      referencePath: '#1',
+      webUrl: '/test/1',
       weight: 1,
       blocked: true,
       blockedByCount: 2,
-    });
+    };
   });
 
   afterEach(() => {
@@ -63,15 +62,15 @@ describe('Issue card component', () => {
 
   describe('labels', () => {
     beforeEach(() => {
-      const label1 = new ListLabel({
+      const label1 = {
         id: 3,
         title: 'testing 123',
         color: '#000cff',
-        text_color: 'white',
+        textColor: 'white',
         description: 'test',
-      });
+      };
 
-      issue.addLabel(label1);
+      issue.labels = [...issue.labels, label1];
     });
 
     it.each`
@@ -79,14 +78,15 @@ describe('Issue card component', () => {
       ${'GroupLabel'}   | ${'Group label'}   | ${'shows group labels on group boards'}
       ${'ProjectLabel'} | ${'Project label'} | ${'shows project labels on group boards'}
     `('$desc', ({ type, title }) => {
-      issue.addLabel(
-        new ListLabel({
+      issue.labels = [
+        ...issue.labels,
+        {
           id: 9001,
           type,
           title,
           color: '#000000',
-        }),
-      );
+        },
+      ];
 
       createComponent({ groupId: 1 });
 
