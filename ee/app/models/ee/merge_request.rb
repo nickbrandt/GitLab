@@ -275,7 +275,7 @@ module EE
     end
 
     def applicable_approval_rules_for_user(user_id)
-      approval_rules.applicable_to_branch(target_branch).select do |rule|
+      wrapped_approval_rules.select do |rule|
         rule.approvers.pluck(:id).include?(user_id)
       end
     end
