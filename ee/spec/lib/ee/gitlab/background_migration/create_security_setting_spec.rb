@@ -14,6 +14,6 @@ RSpec.describe Gitlab::BackgroundMigration::CreateSecuritySetting, schema: 20201
     projects.create!(id: 14, namespace_id: namespace.id, name: 'my_gitlab', path: 'my_gitlab')
     settings.create(project_id: 13)
 
-    expect { described_class.new.perform([12, 13, 14]) }.to change { ProjectSecuritySetting.count }.from(1).to(3)
+    expect { described_class.new.perform([12, 13, 14]) }.to change { settings.count }.from(1).to(3)
   end
 end
