@@ -98,8 +98,8 @@ RSpec.describe Ci::UpdateBuildStateService do
 
       it 'updates the allow_failure flag' do
         expect(build)
-          .to receive(:conditionally_allow_failure!)
-          .with(42)
+          .to receive(:drop_with_exit_code!)
+          .with('script_failure', 42)
           .and_call_original
 
         subject.execute
@@ -127,8 +127,8 @@ RSpec.describe Ci::UpdateBuildStateService do
 
       it 'updates the allow_failure flag' do
         expect(build)
-          .to receive(:conditionally_allow_failure!)
-          .with(42)
+          .to receive(:drop_with_exit_code!)
+          .with('script_failure', 42)
           .and_call_original
 
         subject.execute
