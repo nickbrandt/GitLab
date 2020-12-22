@@ -21862,6 +21862,9 @@ msgstr ""
 msgid "ProjectSettings|Encourage"
 msgstr ""
 
+msgid "ProjectSettings|Environments, logs, cluster management, and more"
+msgstr ""
+
 msgid "ProjectSettings|Every merge creates a merge commit"
 msgstr ""
 
@@ -21944,6 +21947,9 @@ msgid "ProjectSettings|Note: the container registry is always visible when a pro
 msgstr ""
 
 msgid "ProjectSettings|Only signed commits can be pushed to this repository."
+msgstr ""
+
+msgid "ProjectSettings|Operations"
 msgstr ""
 
 msgid "ProjectSettings|Packages"
