@@ -19118,6 +19118,9 @@ msgstr ""
 msgid "Not started"
 msgstr ""
 
+msgid "Not supported"
+msgstr ""
+
 msgid "Note"
 msgstr ""
 
@@ -20315,6 +20318,9 @@ msgid "Pipeline Schedules"
 msgstr ""
 
 msgid "Pipeline minutes quota"
+msgstr ""
+
+msgid "Pipeline minutes quota:"
 msgstr ""
 
 msgid "Pipeline ran in fork of project"
