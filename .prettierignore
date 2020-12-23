@@ -1531,37 +1531,6 @@ ee/spec/frontend/roadmap/components/epic_item_timeline_spec.js
 ee/spec/frontend/roadmap/components/epics_list_empty_spec.js
 ee/spec/frontend/roadmap/components/milestones_list_section_spec.js
 
-## interesting-galileo
-ee/spec/frontend/vue_shared/license_compliance/license_management_spec.js
-ee/spec/frontend/vue_shared/license_compliance/mock_data.js
-ee/spec/frontend/vue_shared/license_compliance/mr_widget_license_report_spec.js
-ee/spec/frontend/vue_shared/license_compliance/store/actions_spec.js
-ee/spec/frontend/vue_shared/license_compliance/store/getters_spec.js
-ee/spec/frontend/vue_shared/security_reports/components/dast_modal_spec.js
-ee/spec/frontend/vue_shared/security_reports/components/dismiss_button_spec.js
-ee/spec/frontend/vue_shared/security_reports/components/modal_footer_spec.js
-ee/spec/frontend/vue_shared/security_reports/components/modal_spec.js
-ee/spec/frontend/vue_shared/security_reports/components/security_issue_body_spec.js
-ee/spec/frontend/vue_shared/security_reports/components/split_button_spec.js
-ee/spec/frontend/vue_shared/security_reports/components/vulnerability_details_spec.js
-ee/spec/frontend/vue_shared/security_reports/grouped_security_reports_app_spec.js
-ee/spec/frontend/vue_shared/security_reports/store/actions_spec.js
-ee/spec/frontend/vue_shared/security_reports/store/getters_spec.js
-ee/spec/frontend/vue_shared/security_reports/store/mediator_spec.js
-ee/spec/frontend/vue_shared/security_reports/store/modules/api_fuzzing/actions_spec.js
-ee/spec/frontend/vue_shared/security_reports/store/modules/sast/actions_spec.js
-ee/spec/frontend/vue_shared/security_reports/store/modules/secret_detection/actions_spec.js
-ee/spec/frontend/vulnerabilities/details_spec.js
-ee/spec/frontend/vulnerabilities/header_spec.js
-ee/spec/frontend/vulnerabilities/helpers_spec.js
-ee/spec/frontend/vulnerabilities/history_comment_editor_spec.js
-ee/spec/frontend/vulnerabilities/history_comment_spec.js
-ee/spec/frontend/vulnerabilities/history_entry_spec.js
-ee/spec/frontend/vulnerabilities/issue_link_spec.js
-ee/spec/frontend/vulnerabilities/related_issues_spec.js
-ee/spec/frontend/vulnerabilities/status_description_spec.js
-ee/spec/frontend/vulnerabilities/vulnerability_state_dropdown_spec.js
-
 ## relaxed-goldwasser
 spec/frontend/__mocks__/@gitlab/ui.js
 spec/frontend/__mocks__/lodash/debounce.js
