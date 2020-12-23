@@ -10326,6 +10326,9 @@ msgstr ""
 msgid "Edit public deploy key"
 msgstr ""
 
+msgid "Edit sidebar"
+msgstr ""
+
 msgid "Edit stage"
 msgstr ""
 
