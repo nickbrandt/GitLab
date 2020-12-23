@@ -27,12 +27,12 @@ export default {
   },
   computed: {
     formattedProfiles() {
-      return this.profiles.map(profile => {
+      return this.profiles.map((profile) => {
         const isValidated = profile.validationStatus === DAST_SITE_VALIDATION_STATUS.PASSED;
         const suffix = isValidated
           ? s__('DastProfiles|Validated')
           : s__('DastProfiles|Not Validated');
-        const addSuffix = str =>
+        const addSuffix = (str) =>
           this.glFeatures.securityOnDemandScansSiteValidation ? `${str} (${suffix})` : str;
         return {
           ...profile,

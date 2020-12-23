@@ -1020,39 +1020,6 @@ ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/duration_chart
 ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/type_of_work/actions.js
 ee/app/assets/javascripts/analytics/cycle_analytics/store/mutations.js
 
-## pedantic-noether
-ee/app/assets/javascripts/insights/stores/modules/insights/actions.js
-ee/app/assets/javascripts/insights/stores/modules/insights/helpers.js
-ee/app/assets/javascripts/insights/stores/modules/insights/mutations.js
-ee/app/assets/javascripts/integrations/jira/issues_list/components/jira_issues_list_root.vue
-ee/app/assets/javascripts/integrations/jira/issues_list/jira_issues_list_bundle.js
-ee/app/assets/javascripts/issues_analytics/components/issues_analytics.vue
-ee/app/assets/javascripts/issues_analytics/filtered_search_issues_analytics.js
-ee/app/assets/javascripts/issues_analytics/stores/modules/issue_analytics/actions.js
-ee/app/assets/javascripts/issues_analytics/stores/modules/issue_analytics/getters.js
-ee/app/assets/javascripts/iterations/components/iteration_report.vue
-ee/app/assets/javascripts/iterations/components/iteration_report_tabs.vue
-ee/app/assets/javascripts/iterations/components/iterations.vue
-ee/app/assets/javascripts/iterations/components/iterations_list.vue
-ee/app/assets/javascripts/ldap_groups_select.js
-ee/app/assets/javascripts/license_compliance/store/modules/list/actions.js
-ee/app/assets/javascripts/license_compliance/store/modules/list/getters.js
-ee/app/assets/javascripts/license_compliance/store/plugins/mediator.js
-ee/app/assets/javascripts/license_compliance/utils/mappers.js
-ee/app/assets/javascripts/maintenance_mode_settings/store/index.js
-ee/app/assets/javascripts/members.js
-ee/app/assets/javascripts/members/components/table/members_table_cell.vue
-ee/app/assets/javascripts/members/store/state.js
-ee/app/assets/javascripts/members/utils.js
-ee/app/assets/javascripts/on_demand_scans/components/on_demand_scans_form.vue
-ee/app/assets/javascripts/on_demand_scans/components/profile_selector/scanner_profile_selector.vue
-ee/app/assets/javascripts/on_demand_scans/components/profile_selector/site_profile_selector.vue
-ee/app/assets/javascripts/oncall_schedules/components/add_edit_schedule_form.vue
-ee/app/assets/javascripts/oncall_schedules/components/add_edit_schedule_modal.vue
-ee/app/assets/javascripts/oncall_schedules/components/delete_schedule_modal.vue
-ee/app/assets/javascripts/oncall_schedules/components/oncall_schedule.vue
-ee/app/assets/javascripts/oncall_schedules/components/rotations/components/add_rotation_modal.vue
-
 ## gifted-dewdney
 ee/app/assets/javascripts/oncall_schedules/utils/cache_updates.js
 ee/app/assets/javascripts/oncall_schedules/utils/common_utils.js

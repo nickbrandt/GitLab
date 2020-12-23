@@ -26,7 +26,7 @@ export default function initLDAPGroupsSelect() {
               minimumInputLength: 1,
               query(query) {
                 const provider = $('#ldap_group_link_provider').val();
-                return Api.ldapGroups(query.term, provider, groups => {
+                return Api.ldapGroups(query.term, provider, (groups) => {
                   const data = {
                     results: groups,
                   };

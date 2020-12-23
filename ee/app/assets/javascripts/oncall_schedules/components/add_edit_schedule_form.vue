@@ -74,7 +74,7 @@ export default {
   computed: {
     filteredTimezones() {
       const lowerCaseTzSearchTerm = this.tzSearchTerm.toLowerCase();
-      return this.timezones.filter(tz =>
+      return this.timezones.filter((tz) =>
         this.getFormattedTimezone(tz).toLowerCase().includes(lowerCaseTzSearchTerm),
       );
     },
