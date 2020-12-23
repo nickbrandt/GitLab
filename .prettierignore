@@ -1706,39 +1706,6 @@ spec/frontend/behaviors/markdown/paste_markdown_table_spec.js
 spec/frontend/behaviors/quick_submit_spec.js
 spec/frontend/behaviors/secret_values_spec.js
 
-## exciting-driscoll
-spec/frontend/droplab/drop_down_spec.js
-spec/frontend/droplab/plugins/ajax_filter_spec.js
-spec/frontend/editor/editor_lite_extension_base_spec.js
-spec/frontend/editor/editor_lite_spec.js
-spec/frontend/editor/editor_markdown_ext_spec.js
-spec/frontend/emoji/emoji_spec.js
-spec/frontend/environment.js
-spec/frontend/environments/environment_actions_spec.js
-spec/frontend/environments/environment_table_spec.js
-spec/frontend/environments/environment_terminal_button_spec.js
-spec/frontend/environments/folder/environments_folder_view_spec.js
-spec/frontend/error_tracking/components/error_details_spec.js
-spec/frontend/error_tracking/components/error_tracking_list_spec.js
-spec/frontend/error_tracking/store/actions_spec.js
-spec/frontend/error_tracking/store/details/actions_spec.js
-spec/frontend/error_tracking/store/list/actions_spec.js
-spec/frontend/error_tracking_settings/store/actions_spec.js
-spec/frontend/feature_flags/components/configure_feature_flags_modal_spec.js
-spec/frontend/feature_flags/components/edit_feature_flag_spec.js
-spec/frontend/feature_flags/components/environments_dropdown_spec.js
-spec/frontend/feature_flags/components/feature_flags_spec.js
-spec/frontend/feature_flags/components/form_spec.js
-spec/frontend/feature_flags/components/new_environments_dropdown_spec.js
-spec/frontend/feature_flags/components/strategies/gitlab_user_list_spec.js
-spec/frontend/feature_flags/components/user_lists_table_spec.js
-spec/frontend/feature_flags/store/edit/actions_spec.js
-spec/frontend/feature_flags/store/index/actions_spec.js
-spec/frontend/feature_flags/store/index/mutations_spec.js
-spec/frontend/feature_flags/store/new/actions_spec.js
-spec/frontend/feature_highlight/feature_highlight_helper_spec.js
-spec/frontend/filtered_search/components/recent_searches_dropdown_content_spec.js
-
 ## determined-blackburn
 spec/frontend/filtered_search/filtered_search_manager_spec.js
 spec/frontend/filtered_search/filtered_search_token_keys_spec.js
