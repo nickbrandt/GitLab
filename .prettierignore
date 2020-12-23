@@ -1531,39 +1531,6 @@ ee/spec/frontend/roadmap/components/epic_item_timeline_spec.js
 ee/spec/frontend/roadmap/components/epics_list_empty_spec.js
 ee/spec/frontend/roadmap/components/milestones_list_section_spec.js
 
-## modest-kilby
-ee/spec/frontend/threat_monitoring/components/statistics_summary_spec.js
-ee/spec/frontend/threat_monitoring/components/threat_monitoring_filters_spec.js
-ee/spec/frontend/threat_monitoring/store/modules/threat_monitoring/actions_spec.js
-ee/spec/frontend/threat_monitoring/store/modules/threat_monitoring_statistics/getters_spec.js
-ee/spec/frontend/threat_monitoring/store/modules/threat_monitoring_statistics/mutations_spec.js
-ee/spec/frontend/trial_registrations/username_suggester_spec.js
-ee/spec/frontend/vue_mr_widget/components/approvals/approvals_auth_spec.js
-ee/spec/frontend/vue_mr_widget/components/approvals/approvals_footer_spec.js
-ee/spec/frontend/vue_mr_widget/components/approvals/approvals_list_spec.js
-ee/spec/frontend/vue_mr_widget/components/approvals/approvals_spec.js
-ee/spec/frontend/vue_mr_widget/components/blocking_merge_requests/blocking_merge_requests_report_spec.js
-ee/spec/frontend/vue_mr_widget/components/merge_train_helper_text_spec.js
-ee/spec/frontend/vue_mr_widget/components/merge_train_position_indicator_spec.js
-ee/spec/frontend/vue_mr_widget/components/mr_widget_pipeline_container_spec.js
-ee/spec/frontend/vue_mr_widget/ee_mr_widget_options_spec.js
-ee/spec/frontend/vue_mr_widget/stores/mr_widget_store_spec.js
-ee/spec/frontend/vue_shared/components/accordion/accordion_item_spec.js
-ee/spec/frontend/vue_shared/components/deployment_instance/deployment_instance_spec.js
-ee/spec/frontend/vue_shared/components/notes/system_note_spec.js
-ee/spec/frontend/vue_shared/components/security_reports/severity_badge_spec.js
-ee/spec/frontend/vue_shared/components/sidebar/epics_select/base_spec.js
-ee/spec/frontend/vue_shared/components/sidebar/epics_select/dropdown_contents_spec.js
-ee/spec/frontend/vue_shared/components/sidebar/epics_select/store/actions_spec.js
-ee/spec/frontend/vue_shared/components/sidebar/epics_select/store/getters_spec.js
-ee/spec/frontend/vue_shared/dashboards/store/actions_spec.js
-ee/spec/frontend/vue_shared/dashboards/store/mutations_spec.js
-ee/spec/frontend/vue_shared/discover/card_security_discover_app_spec.js
-ee/spec/frontend/vue_shared/license_compliance/components/add_license_form_dropdown_spec.js
-ee/spec/frontend/vue_shared/license_compliance/components/admin_license_management_row_spec.js
-ee/spec/frontend/vue_shared/license_compliance/components/delete_confirmation_modal_spec.js
-ee/spec/frontend/vue_shared/license_compliance/components/license_packages_spec.js
-
 ## interesting-galileo
 ee/spec/frontend/vue_shared/license_compliance/license_management_spec.js
 ee/spec/frontend/vue_shared/license_compliance/mock_data.js
