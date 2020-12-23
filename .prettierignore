@@ -1531,41 +1531,6 @@ ee/spec/frontend/roadmap/components/epic_item_timeline_spec.js
 ee/spec/frontend/roadmap/components/epics_list_empty_spec.js
 ee/spec/frontend/roadmap/components/milestones_list_section_spec.js
 
-## relaxed-goldwasser
-spec/frontend/__mocks__/@gitlab/ui.js
-spec/frontend/__mocks__/lodash/debounce.js
-spec/frontend/__mocks__/lodash/throttle.js
-spec/frontend/activities_spec.js
-spec/frontend/add_context_commits_modal/store/actions_spec.js
-spec/frontend/admin/statistics_panel/components/app_spec.js
-spec/frontend/admin/statistics_panel/store/actions_spec.js
-spec/frontend/alert_handler_spec.js
-spec/frontend/alerts_service_settings/components/alerts_service_form_spec.js
-spec/frontend/alerts_settings/alert_mapping_builder_spec.js
-spec/frontend/alerts_settings/alerts_settings_wrapper_spec.js
-spec/frontend/analytics/instance_statistics/components/app_spec.js
-spec/frontend/api_spec.js
-spec/frontend/authentication/two_factor_auth/components/recovery_codes_spec.js
-spec/frontend/authentication/u2f/authenticate_spec.js
-spec/frontend/authentication/u2f/register_spec.js
-spec/frontend/awards_handler_spec.js
-spec/frontend/badges/components/badge_form_spec.js
-spec/frontend/badges/components/badge_list_row_spec.js
-spec/frontend/badges/components/badge_list_spec.js
-spec/frontend/badges/components/badge_spec.js
-spec/frontend/badges/store/actions_spec.js
-spec/frontend/batch_comments/components/draft_note_spec.js
-spec/frontend/batch_comments/components/drafts_count_spec.js
-spec/frontend/batch_comments/components/preview_item_spec.js
-spec/frontend/batch_comments/components/publish_button_spec.js
-spec/frontend/batch_comments/stores/modules/batch_comments/actions_spec.js
-spec/frontend/behaviors/autosize_spec.js
-spec/frontend/behaviors/copy_as_gfm_spec.js
-spec/frontend/behaviors/load_startup_css_spec.js
-spec/frontend/behaviors/markdown/paste_markdown_table_spec.js
-spec/frontend/behaviors/quick_submit_spec.js
-spec/frontend/behaviors/secret_values_spec.js
-
 ## eager-lamport
 spec/frontend/behaviors/shortcuts/keybindings_spec.js
 spec/frontend/behaviors/shortcuts/shortcuts_issuable_spec.js
