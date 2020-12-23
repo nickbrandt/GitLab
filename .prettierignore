@@ -1369,39 +1369,6 @@ ee/app/assets/javascripts/vulnerabilities/components/resolution_alert.vue
 ee/app/assets/javascripts/vulnerabilities/helpers.js
 ee/app/assets/javascripts/vulnerabilities/vulnerabilities_init.js
 
-## inspiring-banach
-ee/spec/frontend/analytics/productivity_analytics/components/app_spec.js
-ee/spec/frontend/analytics/productivity_analytics/helpers.js
-ee/spec/frontend/analytics/productivity_analytics/store/actions_spec.js
-ee/spec/frontend/analytics/productivity_analytics/store/modules/charts/actions_spec.js
-ee/spec/frontend/analytics/productivity_analytics/store/modules/charts/getters_spec.js
-ee/spec/frontend/analytics/productivity_analytics/store/modules/filters/actions_spec.js
-ee/spec/frontend/analytics/productivity_analytics/store/modules/table/actions_spec.js
-ee/spec/frontend/analytics/repository_analytics/components/select_projects_dropdown_spec.js
-ee/spec/frontend/analytics/repository_analytics/components/test_coverage_table_spec.js
-ee/spec/frontend/analytics/shared/utils_spec.js
-ee/spec/frontend/api_spec.js
-ee/spec/frontend/approvals/components/approval_check_popover_spec.js
-ee/spec/frontend/approvals/components/approval_check_rule_popover_spec.js
-ee/spec/frontend/approvals/components/approvers_select_spec.js
-ee/spec/frontend/approvals/components/branches_select_spec.js
-ee/spec/frontend/approvals/components/license_compliance/index_spec.js
-ee/spec/frontend/approvals/components/license_compliance/modal_spec.js
-ee/spec/frontend/approvals/components/mr_edit/mr_rules_hidden_inputs_spec.js
-ee/spec/frontend/approvals/components/mr_edit/mr_rules_spec.js
-ee/spec/frontend/approvals/components/project_settings/project_rules_spec.js
-ee/spec/frontend/approvals/components/rule_form_spec.js
-ee/spec/frontend/approvals/stores/modules/mr_edit/actions_spec.js
-ee/spec/frontend/approvals/stores/modules/project_settings/actions_spec.js
-ee/spec/frontend/audit_events/components/audit_events_app_spec.js
-ee/spec/frontend/audit_events/components/sorting_field_spec.js
-ee/spec/frontend/audit_events/components/tokens/audit_filter_token_spec.js
-ee/spec/frontend/billings/helpers.js
-ee/spec/frontend/billings/seat_usage/components/subscription_seats_spec.js
-ee/spec/frontend/billings/seat_usage/store/actions_spec.js
-ee/spec/frontend/billings/subscriptions/components/subscription_table_row_spec.js
-ee/spec/frontend/billings/subscriptions/store/mutations_spec.js
-
 ## keen-napier
 ee/spec/frontend/boards/components/assignee_select_spec.js
 ee/spec/frontend/boards/components/board_list_header_new_spec.js
