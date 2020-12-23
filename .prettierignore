@@ -1020,40 +1020,6 @@ ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/duration_chart
 ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/type_of_work/actions.js
 ee/app/assets/javascripts/analytics/cycle_analytics/store/mutations.js
 
-## stoic-einstein
-ee/app/assets/javascripts/epic/store/actions.js
-ee/app/assets/javascripts/epic/store/mutations.js
-ee/app/assets/javascripts/epic/utils/epic_utils.js
-ee/app/assets/javascripts/event_tracking/navbar.js
-ee/app/assets/javascripts/filtered_search/dropdown_weight.js
-ee/app/assets/javascripts/filtered_search/filtered_search_manager.js
-ee/app/assets/javascripts/filtered_search/issuable_filtered_search_token_keys.js
-ee/app/assets/javascripts/geo_node_form/components/geo_node_form_capacities.vue
-ee/app/assets/javascripts/geo_node_form/components/geo_node_form_namespaces.vue
-ee/app/assets/javascripts/geo_node_form/components/geo_node_form_shards.vue
-ee/app/assets/javascripts/geo_node_form/store/actions.js
-ee/app/assets/javascripts/geo_node_form/store/getters.js
-ee/app/assets/javascripts/geo_node_form/validations.js
-ee/app/assets/javascripts/geo_nodes/components/app.vue
-ee/app/assets/javascripts/geo_nodes/components/node_detail_sections/node_details_section_main.vue
-ee/app/assets/javascripts/geo_nodes/store/geo_nodes_store.js
-ee/app/assets/javascripts/geo_replicable/graphql/replicable_type_query_builder.js
-ee/app/assets/javascripts/geo_replicable/store/actions.js
-ee/app/assets/javascripts/geo_replicable/store/getters.js
-ee/app/assets/javascripts/geo_replicable/store/index.js
-ee/app/assets/javascripts/geo_settings/store/getters.js
-ee/app/assets/javascripts/geo_settings/store/state.js
-ee/app/assets/javascripts/geo_settings/validations.js
-ee/app/assets/javascripts/gfm_auto_complete.js
-ee/app/assets/javascripts/group_member_contributions/store/group_member_store.js
-ee/app/assets/javascripts/groups/members/utils.js
-ee/app/assets/javascripts/groups/settings/access_restriction_field/validate_ip_address.js
-ee/app/assets/javascripts/groups/settings/compliance_frameworks/components/list.vue
-ee/app/assets/javascripts/groups/settings/compliance_frameworks/init_list.js
-ee/app/assets/javascripts/groups/settings/components/comma_separated_list_token_selector.vue
-ee/app/assets/javascripts/insights/components/insights.vue
-ee/app/assets/javascripts/insights/components/insights_chart.vue
-
 ## pedantic-noether
 ee/app/assets/javascripts/insights/stores/modules/insights/actions.js
 ee/app/assets/javascripts/insights/stores/modules/insights/helpers.js
