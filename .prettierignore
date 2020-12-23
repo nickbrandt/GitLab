@@ -1887,39 +1887,6 @@ spec/frontend/helpers/vuex_action_helper_spec.js
 spec/frontend/helpers/wait_for_promises.js
 spec/frontend/helpers/wait_using_real_timer.js
 
-## jovial-mirzakhani
-spec/frontend/ide/components/repo_commit_section_spec.js
-spec/frontend/ide/components/repo_editor_spec.js
-spec/frontend/ide/components/repo_tabs_spec.js
-spec/frontend/ide/components/resizable_panel_spec.js
-spec/frontend/ide/components/shared/tokened_input_spec.js
-spec/frontend/ide/components/terminal/session_spec.js
-spec/frontend/ide/components/terminal/terminal_controls_spec.js
-spec/frontend/ide/components/terminal/terminal_spec.js
-spec/frontend/ide/components/terminal_sync/terminal_sync_status_spec.js
-spec/frontend/ide/file_helpers.js
-spec/frontend/ide/helpers.js
-spec/frontend/ide/ide_router_extension_spec.js
-spec/frontend/ide/ide_router_spec.js
-spec/frontend/ide/lib/common/model_spec.js
-spec/frontend/ide/lib/create_diff_spec.js
-spec/frontend/ide/lib/create_file_diff_spec.js
-spec/frontend/ide/lib/diff/controller_spec.js
-spec/frontend/ide/lib/editor_spec.js
-spec/frontend/ide/lib/editorconfig/parser_spec.js
-spec/frontend/ide/lib/errors_spec.js
-spec/frontend/ide/lib/files_spec.js
-spec/frontend/ide/lib/mirror_spec.js
-spec/frontend/ide/services/index_spec.js
-spec/frontend/ide/stores/actions/file_spec.js
-spec/frontend/ide/stores/actions/merge_request_spec.js
-spec/frontend/ide/stores/actions/project_spec.js
-spec/frontend/ide/stores/actions/tree_spec.js
-spec/frontend/ide/stores/actions_spec.js
-spec/frontend/ide/stores/extend_spec.js
-spec/frontend/ide/stores/getters_spec.js
-spec/frontend/ide/stores/integration_spec.js
-
 ## angry-bhabha
 spec/frontend/ide/stores/modules/branches/actions_spec.js
 spec/frontend/ide/stores/modules/branches/mutations_spec.js
