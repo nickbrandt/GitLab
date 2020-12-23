@@ -2256,39 +2256,6 @@ spec/frontend/shared/popover_spec.js
 spec/frontend/shortcuts_spec.js
 spec/frontend/sidebar/assignee_title_spec.js
 
-## wizardly-agnesi
-spec/frontend/vue_shared/components/rich_content_editor/editor_service_spec.js
-spec/frontend/vue_shared/components/rich_content_editor/modals/add_image/upload_image_tab_spec.js
-spec/frontend/vue_shared/components/rich_content_editor/modals/insert_video_modal_spec.js
-spec/frontend/vue_shared/components/rich_content_editor/services/build_html_to_markdown_renderer_spec.js
-spec/frontend/vue_shared/components/rich_content_editor/services/renderers/mock_data.js
-spec/frontend/vue_shared/components/rich_content_editor/services/renderers/render_identifier_instance_text_spec.js
-spec/frontend/vue_shared/components/rich_content_editor/services/renderers/render_identifier_paragraph_spec.js
-spec/frontend/vue_shared/components/rich_content_editor/toolbar_item_spec.js
-spec/frontend/vue_shared/components/security_reports/help_icon_spec.js
-spec/frontend/vue_shared/components/security_reports/security_summary_spec.js
-spec/frontend/vue_shared/components/sidebar/collapsed_grouped_date_picker_spec.js
-spec/frontend/vue_shared/components/sidebar/labels_select/base_spec.js
-spec/frontend/vue_shared/components/sidebar/labels_select/dropdown_create_label_spec.js
-spec/frontend/vue_shared/components/sidebar/labels_select/dropdown_value_collapsed_spec.js
-spec/frontend/vue_shared/components/sidebar/labels_select_vue/dropdown_contents_create_view_spec.js
-spec/frontend/vue_shared/components/sidebar/labels_select_vue/store/actions_spec.js
-spec/frontend/vue_shared/components/sidebar/labels_select_vue/store/mutations_spec.js
-spec/frontend/vue_shared/components/slot_switch_spec.js
-spec/frontend/vue_shared/components/split_button_spec.js
-spec/frontend/vue_shared/components/table_pagination_spec.js
-spec/frontend/vue_shared/components/tabs/tab_spec.js
-spec/frontend/vue_shared/components/tooltip_on_truncate_spec.js
-spec/frontend/vue_shared/components/user_avatar/user_avatar_link_spec.js
-spec/frontend/vue_shared/components/user_avatar/user_avatar_list_spec.js
-spec/frontend/vue_shared/components/user_popover/user_popover_spec.js
-spec/frontend/vue_shared/directives/validation_spec.js
-spec/frontend/vue_shared/security_reports/components/security_report_download_dropdown_spec.js
-spec/frontend/vue_shared/security_reports/security_reports_app_spec.js
-spec/frontend/vue_shared/security_reports/store/getters_spec.js
-spec/frontend/vue_shared/security_reports/store/modules/sast/actions_spec.js
-spec/frontend/vue_shared/security_reports/store/modules/secret_detection/actions_spec.js
-
 ## upbeat-elion
 spec/frontend/vuex_shared/modules/modal/actions_spec.js
 spec/frontend/whats_new/components/app_spec.js
