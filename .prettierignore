@@ -1887,41 +1887,6 @@ spec/frontend/helpers/vuex_action_helper_spec.js
 spec/frontend/helpers/wait_for_promises.js
 spec/frontend/helpers/wait_using_real_timer.js
 
-## angry-bhabha
-spec/frontend/ide/stores/modules/branches/actions_spec.js
-spec/frontend/ide/stores/modules/branches/mutations_spec.js
-spec/frontend/ide/stores/modules/clientside/actions_spec.js
-spec/frontend/ide/stores/modules/commit/actions_spec.js
-spec/frontend/ide/stores/modules/commit/getters_spec.js
-spec/frontend/ide/stores/modules/file_templates/actions_spec.js
-spec/frontend/ide/stores/modules/merge_requests/actions_spec.js
-spec/frontend/ide/stores/modules/pane/actions_spec.js
-spec/frontend/ide/stores/modules/pipelines/actions_spec.js
-spec/frontend/ide/stores/modules/pipelines/mutations_spec.js
-spec/frontend/ide/stores/modules/terminal/actions/checks_spec.js
-spec/frontend/ide/stores/modules/terminal/actions/session_controls_spec.js
-spec/frontend/ide/stores/modules/terminal/actions/session_status_spec.js
-spec/frontend/ide/stores/modules/terminal_sync/actions_spec.js
-spec/frontend/ide/stores/mutations/file_spec.js
-spec/frontend/ide/sync_router_and_store_spec.js
-spec/frontend/ide/utils_spec.js
-spec/frontend/image_diff/init_discussion_tab_spec.js
-spec/frontend/image_diff/replaced_image_diff_spec.js
-spec/frontend/import_entities/import_groups/components/import_table_row_spec.js
-spec/frontend/import_entities/import_groups/graphql/client_factory_spec.js
-spec/frontend/import_entities/import_projects/components/import_projects_table_spec.js
-spec/frontend/import_entities/import_projects/components/provider_repo_table_row_spec.js
-spec/frontend/import_entities/import_projects/store/actions_spec.js
-spec/frontend/incidents_settings/components/incidents_settings_tabs_spec.js
-spec/frontend/integrations/edit/components/jira_issues_fields_spec.js
-spec/frontend/integrations/edit/components/jira_trigger_fields_spec.js
-spec/frontend/integrations/edit/components/trigger_fields_spec.js
-spec/frontend/issuable/related_issues/components/related_issues_block_spec.js
-spec/frontend/issuable_show/components/issuable_body_spec.js
-spec/frontend/issuable_show/components/issuable_edit_form_spec.js
-spec/frontend/issuable_show/components/issuable_header_spec.js
-spec/frontend/issuable_show/components/issuable_show_root_spec.js
-
 ## practical-murdock
 spec/frontend/issuable_spec.js
 spec/frontend/issue_show/components/app_spec.js
