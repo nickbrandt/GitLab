@@ -517,39 +517,6 @@ app/assets/javascripts/lib/utils/text_markdown.js
 app/assets/javascripts/lib/utils/text_utility.js
 app/assets/javascripts/lib/utils/type_utility.js
 
-## inspiring-lovelace
-app/assets/javascripts/mini_pipeline_graph_dropdown.js
-app/assets/javascripts/mirrors/mirror_repos.js
-app/assets/javascripts/mirrors/ssh_mirror.js
-app/assets/javascripts/monitoring/components/alert_widget.vue
-app/assets/javascripts/monitoring/components/alert_widget_form.vue
-app/assets/javascripts/monitoring/components/charts/annotations.js
-app/assets/javascripts/monitoring/components/charts/anomaly.vue
-app/assets/javascripts/monitoring/components/charts/bar.vue
-app/assets/javascripts/monitoring/components/charts/column.vue
-app/assets/javascripts/monitoring/components/charts/heatmap.vue
-app/assets/javascripts/monitoring/components/charts/options.js
-app/assets/javascripts/monitoring/components/charts/stacked_column.vue
-app/assets/javascripts/monitoring/components/charts/time_series.vue
-app/assets/javascripts/monitoring/components/dashboard_panel.vue
-app/assets/javascripts/monitoring/components/duplicate_dashboard_form.vue
-app/assets/javascripts/monitoring/components/duplicate_dashboard_modal.vue
-app/assets/javascripts/monitoring/components/embeds/embed_group.vue
-app/assets/javascripts/monitoring/components/embeds/metric_embed.vue
-app/assets/javascripts/monitoring/components/empty_state.vue
-app/assets/javascripts/monitoring/components/variables/dropdown_field.vue
-app/assets/javascripts/monitoring/csv_export.js
-app/assets/javascripts/monitoring/requests/index.js
-app/assets/javascripts/monitoring/services/alerts_service.js
-app/assets/javascripts/monitoring/stores/embed_group/getters.js
-app/assets/javascripts/monitoring/stores/mutations.js
-app/assets/javascripts/monitoring/stores/utils.js
-app/assets/javascripts/monitoring/stores/variable_mapping.js
-app/assets/javascripts/monitoring/utils.js
-app/assets/javascripts/monitoring/validators.js
-app/assets/javascripts/mr_notes/init_notes.js
-app/assets/javascripts/mr_notes/stores/getters.js
-
 ## cool-dirac
 app/assets/javascripts/mr_popover/components/mr_popover.vue
 app/assets/javascripts/mr_popover/index.js
