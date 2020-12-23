@@ -1531,39 +1531,6 @@ ee/spec/frontend/roadmap/components/epic_item_timeline_spec.js
 ee/spec/frontend/roadmap/components/epics_list_empty_spec.js
 ee/spec/frontend/roadmap/components/milestones_list_section_spec.js
 
-## jovial-haslett
-ee/spec/frontend/security_dashboard/helpers.js
-ee/spec/frontend/security_dashboard/helpers_spec.js
-ee/spec/frontend/security_dashboard/store/modules/filters/mutations_spec.js
-ee/spec/frontend/security_dashboard/store/modules/pipeline_jobs/actions_spec.js
-ee/spec/frontend/security_dashboard/store/modules/project_selector/actions_spec.js
-ee/spec/frontend/security_dashboard/store/modules/project_selector/utils/add_page_info_spec.js
-ee/spec/frontend/security_dashboard/store/modules/projects/actions_spec.js
-ee/spec/frontend/security_dashboard/store/modules/unscanned_projects/getters_spec.js
-ee/spec/frontend/security_dashboard/store/modules/unscanned_projects/utils_spec.js
-ee/spec/frontend/security_dashboard/store/modules/vulnerabilities/actions_spec.js
-ee/spec/frontend/security_dashboard/store/modules/vulnerabilities/utils_spec.js
-ee/spec/frontend/security_dashboard/store/modules/vulnerable_projects/mock_data.js
-ee/spec/frontend/security_dashboard/store/modules/vulnerable_projects/utils_spec.js
-ee/spec/frontend/sidebar/components/iteration_select_spec.js
-ee/spec/frontend/sidebar/components/status/sidebar_status_spec.js
-ee/spec/frontend/status_page_settings/store/actions_spec.js
-ee/spec/frontend/storage_counter/components/usage_graph_spec.js
-ee/spec/frontend/storage_counter/components/usage_statistics_spec.js
-ee/spec/frontend/storage_counter/mock_data.js
-ee/spec/frontend/storage_counter/utils_spec.js
-ee/spec/frontend/subscriptions/new/components/checkout/progress_bar_spec.js
-ee/spec/frontend/subscriptions/new/components/checkout/step_spec.js
-ee/spec/frontend/subscriptions/new/components/checkout/subscription_details_spec.js
-ee/spec/frontend/subscriptions/new/store/actions_spec.js
-ee/spec/frontend/test_case_create/components/test_case_create_root_spec.js
-ee/spec/frontend/threat_monitoring/components/app_spec.js
-ee/spec/frontend/threat_monitoring/components/environment_picker_spec.js
-ee/spec/frontend/threat_monitoring/components/network_policy_list_spec.js
-ee/spec/frontend/threat_monitoring/components/policy_editor/lib/rules_spec.js
-ee/spec/frontend/threat_monitoring/components/policy_editor/policy_rule_builder_spec.js
-ee/spec/frontend/threat_monitoring/components/policy_editor/policy_rule_entity_spec.js
-
 ## modest-kilby
 ee/spec/frontend/threat_monitoring/components/statistics_summary_spec.js
 ee/spec/frontend/threat_monitoring/components/threat_monitoring_filters_spec.js
