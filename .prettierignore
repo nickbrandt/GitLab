@@ -162,39 +162,6 @@ app/assets/javascripts/ci_variable_list/ci_variable_list.js
 app/assets/javascripts/ci_variable_list/components/ci_environments_dropdown.vue
 app/assets/javascripts/ci_variable_list/components/ci_variable_table.vue
 
-## loving-feistel
-app/assets/javascripts/design_management/components/toolbar/design_navigation.vue
-app/assets/javascripts/design_management/components/toolbar/index.vue
-app/assets/javascripts/design_management/components/upload/design_version_dropdown.vue
-app/assets/javascripts/design_management/graphql.js
-app/assets/javascripts/design_management/mixins/all_designs.js
-app/assets/javascripts/design_management/mixins/all_versions.js
-app/assets/javascripts/design_management/pages/design/index.vue
-app/assets/javascripts/design_management/pages/index.vue
-app/assets/javascripts/design_management/utils/cache_update.js
-app/assets/javascripts/design_management/utils/design_management_utils.js
-app/assets/javascripts/design_management/utils/error_messages.js
-app/assets/javascripts/diff.js
-app/assets/javascripts/diffs/components/app.vue
-app/assets/javascripts/diffs/components/compare_dropdown_layout.vue
-app/assets/javascripts/diffs/components/diff_content.vue
-app/assets/javascripts/diffs/components/diff_expansion_cell.vue
-app/assets/javascripts/diffs/components/diff_file.vue
-app/assets/javascripts/diffs/components/diff_gutter_avatars.vue
-app/assets/javascripts/diffs/components/diff_line_note_form.vue
-app/assets/javascripts/diffs/components/diff_row_utils.js
-app/assets/javascripts/diffs/components/parallel_diff_table_row.vue
-app/assets/javascripts/diffs/components/tree_list.vue
-app/assets/javascripts/diffs/index.js
-app/assets/javascripts/diffs/store/actions.js
-app/assets/javascripts/diffs/store/getters_versions_dropdowns.js
-app/assets/javascripts/diffs/store/mutations.js
-app/assets/javascripts/diffs/store/utils.js
-app/assets/javascripts/diffs/utils/diff_file.js
-app/assets/javascripts/diffs/workers/tree_worker.js
-app/assets/javascripts/dirty_submit/dirty_submit_collection.js
-app/assets/javascripts/dirty_submit/dirty_submit_form.js
-
 ## distracted-nash
 app/assets/javascripts/droplab/drop_down.js
 app/assets/javascripts/droplab/drop_lab.js
