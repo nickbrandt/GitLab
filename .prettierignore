@@ -10,41 +10,6 @@ doc/api/graphql/reference/gitlab_schema.graphql
 *.scss
 *.md
 
-## reverent-lovelace
-app/assets/javascripts/authentication/webauthn/authenticate.js
-app/assets/javascripts/authentication/webauthn/register.js
-app/assets/javascripts/awards_handler.js
-app/assets/javascripts/badges/components/badge_form.vue
-app/assets/javascripts/badges/components/badge_settings.vue
-app/assets/javascripts/badges/store/actions.js
-app/assets/javascripts/badges/store/mutations.js
-app/assets/javascripts/batch_comments/components/preview_item.vue
-app/assets/javascripts/batch_comments/stores/modules/batch_comments/actions.js
-app/assets/javascripts/batch_comments/stores/modules/batch_comments/getters.js
-app/assets/javascripts/batch_comments/stores/modules/batch_comments/mutations.js
-app/assets/javascripts/batch_comments/utils.js
-app/assets/javascripts/behaviors/autosize.js
-app/assets/javascripts/behaviors/bind_in_out.js
-app/assets/javascripts/behaviors/copy_to_clipboard.js
-app/assets/javascripts/behaviors/gl_emoji.js
-app/assets/javascripts/behaviors/load_startup_css.js
-app/assets/javascripts/behaviors/markdown/copy_as_gfm.js
-app/assets/javascripts/behaviors/markdown/highlight_current_user.js
-app/assets/javascripts/behaviors/markdown/marks/inline_diff.js
-app/assets/javascripts/behaviors/markdown/marks/inline_html.js
-app/assets/javascripts/behaviors/markdown/nodes/code_block.js
-app/assets/javascripts/behaviors/markdown/nodes/emoji.js
-app/assets/javascripts/behaviors/markdown/nodes/image.js
-app/assets/javascripts/behaviors/markdown/nodes/playable.js
-app/assets/javascripts/behaviors/markdown/nodes/reference.js
-app/assets/javascripts/behaviors/markdown/nodes/table_cell.js
-app/assets/javascripts/behaviors/markdown/nodes/task_list_item.js
-app/assets/javascripts/behaviors/markdown/render_math.js
-app/assets/javascripts/behaviors/markdown/render_mermaid.js
-app/assets/javascripts/behaviors/markdown/render_metrics.js
-app/assets/javascripts/behaviors/markdown/schema.js
-app/assets/javascripts/behaviors/markdown/serializer.js
-
 ## nice-swanson
 app/assets/javascripts/behaviors/preview_markdown.js
 app/assets/javascripts/behaviors/quick_submit.js
