@@ -1,5 +1,6 @@
 <script>
 import { GlBadge, GlPopover, GlIcon } from '@gitlab/ui';
+import { s__ } from '~/locale';
 
 const ICONCOLOR = {
   opened: 'gl-text-green-500',
@@ -14,6 +15,9 @@ const ICON = {
 };
 
 export default {
+  i18n: {
+    AUTO_FIX: s__('AutoRemediation|Auto-fix'),
+  },
   components: {
     GlBadge,
     GlIcon,
@@ -37,6 +41,7 @@ export default {
 </script>
 
 <template>
+  <!-- eslint-disable @gitlab/vue-require-i18n-strings -->
   <div ref="popover" data-testid="vulnerability-solutions-bulb">
     <gl-badge ref="badge" variant="neutral" icon="merge-request" />
     <gl-popover
@@ -66,9 +71,9 @@ export default {
               }}<span
                 v-if="mergeRequest.securityAutoFix"
                 data-testid="vulnerability-solutions-popover-link-autofix"
-                >{{ s__('AutoRemediation|: Auto-fix') }}</span
-              ></span
-            >
+                >{{ `: ${$options.i18n.AUTO_FIX}` }}</span
+              >
+            </span>
           </a>
         </li>
       </ul>
