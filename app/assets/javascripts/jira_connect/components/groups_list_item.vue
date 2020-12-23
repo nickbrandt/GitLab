@@ -31,10 +31,11 @@ export default {
       };
     },
     isGroupPendingRemoval() {
-      return this.group.marked_for_deletion;
+      return this.group.marked_for_deletion_on;
     },
-    hasForkedProject() {
-      return Boolean(this.group.forked_project_path);
+    isLinked() {
+      // TODO: Pass groups that are linked from the backend and cross-check that list here
+      return false;
     },
     visibilityIcon() {
       return VISIBILITY_TYPE_ICON[this.group.visibility];
@@ -42,15 +43,12 @@ export default {
     visibilityTooltip() {
       return GROUP_VISIBILITY_TYPE[this.group.visibility];
     },
-    isSelectButtonDisabled() {
-      return !this.group.can_create_project;
-    },
   },
 
   methods: {
     onClick() {
       this.isLoading = true;
-      this.$refs.form.submit();
+      // TODO: Update with action to send axios request
     },
   },
 
@@ -72,7 +70,7 @@ export default {
             <span class="gl-mr-3 gl-text-gray-900! gl-font-weight-bold">{{ group.full_name }}</span>
             <gl-icon
               v-gl-tooltip.hover.bottom
-              class="gl-mr-0 gl-inline-flex gl-text-gray-900"
+              class="gl-mr-1 gl-inline-flex gl-text-gray-900"
               :name="visibilityIcon"
               :title="visibilityTooltip"
             />
@@ -90,28 +88,16 @@ export default {
             <p class="gl-mt-2! gl-mb-0 gl-text-gray-600" v-text="group.description"></p>
           </div>
         </div>
-        <div class="gl-display-flex gl-flex-shrink-0">
-          <gl-button
-            v-if="hasForkedProject"
-            class="gl-h-7 gl-text-decoration-none!"
-            :href="group.forked_project_path"
-            >{{ __('Go to fork') }}</gl-button
-          >
-          <template v-else>
-            <form ref="form" method="POST" :action="group.fork_path">
-              <input type="hidden" name="authenticity_token" :value="$options.csrf.token" />
-              <gl-button
-                type="submit"
-                class="gl-h-7"
-                category="secondary"
-                variant="success"
-                :loading="isLoading"
-                @click="onClick"
-                >{{ __('Link') }}</gl-button
-              >
-            </form>
-          </template>
-        </div>
+
+        <gl-button v-if="isLinked" disabled>{{ __('Linked') }}</gl-button>
+        <gl-button
+          v-else
+          category="secondary"
+          variant="success"
+          :loading="isLoading"
+          @click="onClick"
+          >{{ __('Link') }}</gl-button
+        >
       </div>
     </div>
   </li>
