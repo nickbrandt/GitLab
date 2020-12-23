@@ -69,7 +69,7 @@ export default {
 <template>
   <div>
     <gl-form-group
-      :label="$options.I18N.FORM_FIELD_NAME"
+      :label="$options.I18N.FORM_FIELD_NAME_LABEL"
       label-for="custom-stage-name"
       :state="hasFieldErrors('name')"
       :invalid-feedback="fieldErrorMessage('name')"
