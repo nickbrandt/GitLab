@@ -7,7 +7,7 @@ export const fetchBillableMembersList = ({ dispatch, state }, page) => {
   dispatch('requestBillableMembersList');
 
   return Api.fetchBillableGroupMembersList(state.namespaceId, { page })
-    .then(data => dispatch('receiveBillableMembersListSuccess', data))
+    .then((data) => dispatch('receiveBillableMembersListSuccess', data))
     .catch(() => dispatch('receiveBillableMembersListError'));
 };
 

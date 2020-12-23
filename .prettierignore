@@ -1020,39 +1020,6 @@ ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/duration_chart
 ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/type_of_work/actions.js
 ee/app/assets/javascripts/analytics/cycle_analytics/store/mutations.js
 
-## strange-shirley
-ee/app/assets/javascripts/approvals/components/project_settings/project_rules.vue
-ee/app/assets/javascripts/approvals/components/rule_form.vue
-ee/app/assets/javascripts/approvals/components/security_configuration/unconfigured_security_rules.vue
-ee/app/assets/javascripts/approvals/mappers.js
-ee/app/assets/javascripts/approvals/stores/modules/base/getters.js
-ee/app/assets/javascripts/approvals/stores/modules/license_compliance/actions.js
-ee/app/assets/javascripts/approvals/stores/modules/mr_edit/actions.js
-ee/app/assets/javascripts/approvals/stores/modules/mr_edit/mutations.js
-ee/app/assets/javascripts/approvals/stores/modules/project_settings/actions.js
-ee/app/assets/javascripts/audit_events/components/audit_events_filter.vue
-ee/app/assets/javascripts/audit_events/components/sorting_field.vue
-ee/app/assets/javascripts/audit_events/components/tokens/member_token.vue
-ee/app/assets/javascripts/audit_events/components/tokens/project_token.vue
-ee/app/assets/javascripts/audit_events/components/tokens/shared/audit_filter_token.vue
-ee/app/assets/javascripts/audit_events/components/tokens/user_token.vue
-ee/app/assets/javascripts/audit_events/constants.js
-ee/app/assets/javascripts/audit_events/init_audit_events.js
-ee/app/assets/javascripts/audit_events/store/getters.js
-ee/app/assets/javascripts/audit_events/utils.js
-ee/app/assets/javascripts/audit_events/validators.js
-ee/app/assets/javascripts/billings/seat_usage/store/actions.js
-ee/app/assets/javascripts/billings/seat_usage/store/getters.js
-ee/app/assets/javascripts/billings/subscriptions/store/actions.js
-ee/app/assets/javascripts/billings/subscriptions/store/getters.js
-ee/app/assets/javascripts/billings/subscriptions/store/mutations.js
-ee/app/assets/javascripts/boards/boards_util.js
-ee/app/assets/javascripts/boards/components/board_scope.vue
-ee/app/assets/javascripts/boards/components/boards_list_selector/index.js
-ee/app/assets/javascripts/boards/components/boards_list_selector/list_container.vue
-ee/app/assets/javascripts/boards/components/epics_swimlanes.vue
-ee/app/assets/javascripts/boards/components/new_list_dropdown.js
-
 ## great-keldysh
 ee/app/assets/javascripts/boards/components/sidebar/remove_issue.js
 ee/app/assets/javascripts/boards/config_toggle.js

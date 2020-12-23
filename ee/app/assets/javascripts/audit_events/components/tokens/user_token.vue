@@ -9,10 +9,10 @@ export default {
   inheritAttrs: false,
   tokenMethods: {
     fetchItem(id) {
-      return Api.user(id).then(res => res.data);
+      return Api.user(id).then((res) => res.data);
     },
     fetchSuggestions(term) {
-      return Api.users(term).then(res => res.data);
+      return Api.users(term).then((res) => res.data);
     },
     getItemName({ name }) {
       return name;

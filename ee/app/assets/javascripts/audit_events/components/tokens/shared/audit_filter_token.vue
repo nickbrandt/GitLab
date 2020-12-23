@@ -105,12 +105,12 @@ export default {
       createFlash(sprintf(message, { type }));
     },
     selectActiveItem(id) {
-      this.activeItem = this.suggestions.find(u => u.id === id);
+      this.activeItem = this.suggestions.find((u) => u.id === id);
     },
     loadView(id) {
       this.viewLoading = true;
       return this.fetchItem(id)
-        .then(data => {
+        .then((data) => {
           this.activeItem = data;
         })
         .catch(this.onApiError)
@@ -121,7 +121,7 @@ export default {
     loadSuggestions(term) {
       this.suggestionsLoading = true;
       return this.fetchSuggestions(term)
-        .then(data => {
+        .then((data) => {
           this.suggestions = data;
         })
         .catch(this.onApiError)
