@@ -1706,41 +1706,6 @@ spec/frontend/behaviors/markdown/paste_markdown_table_spec.js
 spec/frontend/behaviors/quick_submit_spec.js
 spec/frontend/behaviors/secret_values_spec.js
 
-## eager-lamport
-spec/frontend/behaviors/shortcuts/keybindings_spec.js
-spec/frontend/behaviors/shortcuts/shortcuts_issuable_spec.js
-spec/frontend/blob/components/blob_content_error_spec.js
-spec/frontend/blob/components/blob_edit_content_spec.js
-spec/frontend/blob/components/blob_edit_header_spec.js
-spec/frontend/blob/components/blob_header_spec.js
-spec/frontend/blob/sketch/index_spec.js
-spec/frontend/blob/utils_spec.js
-spec/frontend/blob/viewer/index_spec.js
-spec/frontend/blob_edit/edit_blob_spec.js
-spec/frontend/boards/board_list_new_spec.js
-spec/frontend/boards/board_list_spec.js
-spec/frontend/boards/boards_store_spec.js
-spec/frontend/boards/components/board_assignee_dropdown_spec.js
-spec/frontend/boards/components/board_card_layout_spec.js
-spec/frontend/boards/components/board_card_spec.js
-spec/frontend/boards/components/board_configuration_options_spec.js
-spec/frontend/boards/components/board_list_header_new_spec.js
-spec/frontend/boards/components/board_list_header_spec.js
-spec/frontend/boards/components/boards_selector_spec.js
-spec/frontend/boards/components/issue_count_spec.js
-spec/frontend/boards/components/issue_due_date_spec.js
-spec/frontend/boards/components/issue_time_estimate_deprecated_spec.js
-spec/frontend/boards/components/issue_time_estimate_spec.js
-spec/frontend/boards/components/sidebar/board_sidebar_subscription_spec.js
-spec/frontend/boards/components/sidebar/remove_issue_spec.js
-spec/frontend/boards/issue_card_deprecated_spec.js
-spec/frontend/boards/issue_card_inner_spec.js
-spec/frontend/boards/list_spec.js
-spec/frontend/boards/mock_data.js
-spec/frontend/boards/stores/actions_spec.js
-spec/frontend/boards/stores/getters_spec.js
-spec/frontend/boards/stores/mutations_spec.js
-
 ## busy-mayer
 spec/frontend/branches/branches_delete_modal_spec.js
 spec/frontend/ci_settings_pipeline_triggers/components/triggers_list_spec.js
