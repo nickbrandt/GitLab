@@ -1,0 +1,5 @@
+---
+title: Reject unknown http methods
+merge_request:
+author:
+type: security
