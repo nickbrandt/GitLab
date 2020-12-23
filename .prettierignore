@@ -2256,43 +2256,6 @@ spec/frontend/shared/popover_spec.js
 spec/frontend/shortcuts_spec.js
 spec/frontend/sidebar/assignee_title_spec.js
 
-## priceless-margulis
-spec/frontend/user_popovers_spec.js
-spec/frontend/vue_alerts_spec.js
-spec/frontend/vue_mr_widget/components/approvals/approvals_spec.js
-spec/frontend/vue_mr_widget/components/approvals/approvals_summary_spec.js
-spec/frontend/vue_mr_widget/components/artifacts_list_spec.js
-spec/frontend/vue_mr_widget/components/mr_collapsible_extension_spec.js
-spec/frontend/vue_mr_widget/components/mr_widget_alert_message_spec.js
-spec/frontend/vue_mr_widget/components/mr_widget_header_spec.js
-spec/frontend/vue_mr_widget/components/mr_widget_memory_usage_spec.js
-spec/frontend/vue_mr_widget/components/mr_widget_pipeline_container_spec.js
-spec/frontend/vue_mr_widget/components/mr_widget_pipeline_spec.js
-spec/frontend/vue_mr_widget/components/mr_widget_rebase_spec.js
-spec/frontend/vue_mr_widget/components/mr_widget_related_links_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_auto_merge_enabled_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_commits_header_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_conflicts_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_failed_to_merge_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_merged_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_missing_branch_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_ready_to_merge_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_squash_before_merge_spec.js
-spec/frontend/vue_mr_widget/components/states/mr_widget_wip_spec.js
-spec/frontend/vue_mr_widget/components/terraform/mr_widget_terraform_container_spec.js
-spec/frontend/vue_mr_widget/components/terraform/terraform_plan_spec.js
-spec/frontend/vue_mr_widget/deployment/deployment_spec.js
-spec/frontend/vue_mr_widget/deployment/deployment_view_button_spec.js
-spec/frontend/vue_mr_widget/mr_widget_options_spec.js
-spec/frontend/vue_mr_widget/stores/artifacts_list/actions_spec.js
-spec/frontend/vue_mr_widget/stores/mr_widget_store_spec.js
-spec/frontend/vue_shared/components/actions_button_spec.js
-spec/frontend/vue_shared/components/alert_details_table_spec.js
-spec/frontend/vue_shared/components/awards_list_spec.js
-spec/frontend/vue_shared/components/ci_badge_link_spec.js
-spec/frontend/vue_shared/components/commit_spec.js
-spec/frontend/vue_shared/components/confirm_modal_spec.js
-
 ## trusting-antonelli
 spec/frontend/vue_shared/components/content_viewer/viewers/markdown_viewer_spec.js
 spec/frontend/vue_shared/components/date_time_picker/date_time_picker_lib_spec.js
