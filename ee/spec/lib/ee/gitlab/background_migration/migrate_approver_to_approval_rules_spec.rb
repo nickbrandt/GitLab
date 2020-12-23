@@ -134,14 +134,24 @@ RSpec.describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
       context 'when project rule is present' do
         let!(:project_rule) { create(:approval_project_rule, project: target.target_project) }
 
-        it "sets MR rule's source to project rule without duplication" do
+        before do
           user = create(:user)
           create_member_in(user, :old_schema)
           create_member_in(user, :old_schema)
+        end
 
+        it "sets MR rule's source to project rule without duplication" do
           described_class.new.perform(target_type, target.id)
 
           expect(target.approval_rules.regular.first.approval_project_rule).to eq(project_rule)
+        end
+
+        context "when modified from the project rule" do
+          it "updates the modified_from_project_rule attribute" do
+            described_class.new.perform(target_type, target.id)
+
+            expect(target.approval_rules.regular.first.modified_from_project_rule).to be_truthy
+          end
         end
       end
 
