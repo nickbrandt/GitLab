@@ -517,39 +517,6 @@ app/assets/javascripts/lib/utils/text_markdown.js
 app/assets/javascripts/lib/utils/text_utility.js
 app/assets/javascripts/lib/utils/type_utility.js
 
-## zen-robinson
-app/assets/javascripts/lib/utils/unit_format/formatter_factory.js
-app/assets/javascripts/lib/utils/url_utility.js
-app/assets/javascripts/line_highlighter.js
-app/assets/javascripts/locale/ensure_single_line.js
-app/assets/javascripts/locale/index.js
-app/assets/javascripts/locale/sprintf.js
-app/assets/javascripts/logs/components/log_advanced_filters.vue
-app/assets/javascripts/logs/logs_tracking_helper.js
-app/assets/javascripts/logs/stores/actions.js
-app/assets/javascripts/logs/stores/getters.js
-app/assets/javascripts/logs/utils.js
-app/assets/javascripts/main.js
-app/assets/javascripts/manual_ordering.js
-app/assets/javascripts/member_expiration_date.js
-app/assets/javascripts/members.js
-app/assets/javascripts/members/components/avatars/user_avatar.vue
-app/assets/javascripts/members/components/filter_sort/members_filtered_search_bar.vue
-app/assets/javascripts/members/components/filter_sort/sort_dropdown.vue
-app/assets/javascripts/members/store/index.js
-app/assets/javascripts/members/utils.js
-app/assets/javascripts/merge_conflicts/components/diff_file_editor.js
-app/assets/javascripts/merge_conflicts/components/inline_conflict_lines.js
-app/assets/javascripts/merge_conflicts/components/parallel_conflict_lines.js
-app/assets/javascripts/merge_conflicts/merge_conflict_store.js
-app/assets/javascripts/merge_request.js
-app/assets/javascripts/merge_request_tabs.js
-app/assets/javascripts/milestone.js
-app/assets/javascripts/milestone_select.js
-app/assets/javascripts/milestones/components/milestone_combobox.vue
-app/assets/javascripts/milestones/stores/actions.js
-app/assets/javascripts/milestones/stores/mutations.js
-
 ## inspiring-lovelace
 app/assets/javascripts/mini_pipeline_graph_dropdown.js
 app/assets/javascripts/mirrors/mirror_repos.js
