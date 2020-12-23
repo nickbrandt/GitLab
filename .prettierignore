@@ -848,40 +848,6 @@ app/assets/javascripts/snippets/components/snippet_blob_view.vue
 app/assets/javascripts/snippets/components/snippet_header.vue
 app/assets/javascripts/snippets/mixins/snippets.js
 
-## nostalgic-morse
-app/assets/javascripts/user_lists/store/show/actions.js
-app/assets/javascripts/user_lists/store/show/index.js
-app/assets/javascripts/user_lists/store/show/mutations.js
-app/assets/javascripts/user_popovers.js
-app/assets/javascripts/users_select/index.js
-app/assets/javascripts/vue_alerts.js
-app/assets/javascripts/vue_merge_request_widget/components/approvals/approvals.vue
-app/assets/javascripts/vue_merge_request_widget/components/deployment/deployment_actions.vue
-app/assets/javascripts/vue_merge_request_widget/components/deployment/deployment_view_button.vue
-app/assets/javascripts/vue_merge_request_widget/components/deployment/memory_usage.vue
-app/assets/javascripts/vue_merge_request_widget/components/extensions/base.vue
-app/assets/javascripts/vue_merge_request_widget/components/extensions/container.js
-app/assets/javascripts/vue_merge_request_widget/components/extensions/index.js
-app/assets/javascripts/vue_merge_request_widget/components/mr_widget_alert_message.vue
-app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_auto_merge_enabled.vue
-app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_conflicts.vue
-app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_merged.vue
-app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_missing_branch.vue
-app/assets/javascripts/vue_merge_request_widget/components/states/mr_widget_rebase.vue
-app/assets/javascripts/vue_merge_request_widget/components/states/ready_to_merge.vue
-app/assets/javascripts/vue_merge_request_widget/components/states/squash_before_merge.vue
-app/assets/javascripts/vue_merge_request_widget/components/states/work_in_progress.vue
-app/assets/javascripts/vue_merge_request_widget/components/terraform/mr_widget_terraform_container.vue
-app/assets/javascripts/vue_merge_request_widget/extensions/issues.js
-app/assets/javascripts/vue_merge_request_widget/mixins/approvals.js
-app/assets/javascripts/vue_merge_request_widget/mr_widget_options.vue
-app/assets/javascripts/vue_merge_request_widget/services/mr_widget_service.js
-app/assets/javascripts/vue_merge_request_widget/stores/artifacts_list/getters.js
-app/assets/javascripts/vue_shared/components/actions_button.vue
-app/assets/javascripts/vue_shared/components/awards_list.vue
-app/assets/javascripts/vue_shared/components/commit.vue
-app/assets/javascripts/vue_shared/components/confirm_modal.vue
-
 ## thirsty-mccarthy
 app/assets/javascripts/vue_shared/components/date_time_picker/date_time_picker.vue
 app/assets/javascripts/vue_shared/components/date_time_picker/date_time_picker_input.vue
