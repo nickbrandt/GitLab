@@ -303,7 +303,7 @@ module EE
     def trial_active?
       return false unless ::Gitlab::CurrentSettings.should_check_namespace_plan?
 
-      trial? && trial_ends_on.present? && trial_ends_on >= Date.today
+      !!trial? && trial_ends_on.present? && trial_ends_on >= Date.today
     end
 
     def never_had_trial?
