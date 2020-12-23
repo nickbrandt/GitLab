@@ -50,13 +50,25 @@ RSpec.describe DastSiteValidation, type: :model do
 
     describe 'by_url_base' do
       let(:more_dast_site_validations) do
-        create_list(:dast_site_validation, 5, dast_site_token: subject.dast_site_token).prepend(subject)
+        create_list(:dast_site_validation, 5, dast_site_token: subject.dast_site_token)
       end
 
       it 'includes the correct records' do
         result = described_class.by_url_base(subject.url_base)
 
         expect(result).not_to include(another_dast_site_validation)
+      end
+    end
+
+    describe 'by_most_recent' do
+      let(:more_dast_site_validations) do
+        create_list(:dast_site_validation, 5, dast_site_token: subject.dast_site_token)
+      end
+
+      it 'includes the correct records' do
+        result = described_class.by_most_recent
+
+        expect(result).to contain_exactly(another_dast_site_validation, more_dast_site_validations.last)
       end
     end
   end
