@@ -10,39 +10,6 @@ doc/api/graphql/reference/gitlab_schema.graphql
 *.scss
 *.md
 
-## interesting-kepler
-app/assets/javascripts/add_context_commits_modal/utils.js
-app/assets/javascripts/admin/application_settings/setup_metrics_and_profiling.js
-app/assets/javascripts/admin/statistics_panel/store/actions.js
-app/assets/javascripts/admin/statistics_panel/store/getters.js
-app/assets/javascripts/admin/users/components/users_table.vue
-app/assets/javascripts/admin/users/index.js
-app/assets/javascripts/alert_handler.js
-app/assets/javascripts/alert_management/components/alert_details.vue
-app/assets/javascripts/alert_management/components/alert_management_table.vue
-app/assets/javascripts/alert_management/components/alert_metrics.vue
-app/assets/javascripts/alert_management/components/alert_status.vue
-app/assets/javascripts/alert_management/components/sidebar/sidebar_assignees.vue
-app/assets/javascripts/alert_management/components/sidebar/sidebar_todo.vue
-app/assets/javascripts/alert_management/details.js
-app/assets/javascripts/alert_management/list.js
-app/assets/javascripts/alerts_service_settings/components/alerts_service_form.vue
-app/assets/javascripts/alerts_service_settings/index.js
-app/assets/javascripts/alerts_settings/components/alert_mapping_builder.vue
-app/assets/javascripts/alerts_settings/components/alerts_integrations_list.vue
-app/assets/javascripts/alerts_settings/components/alerts_settings_form.vue
-app/assets/javascripts/alerts_settings/graphql.js
-app/assets/javascripts/alerts_settings/index.js
-app/assets/javascripts/alerts_settings/utils/cache_updates.js
-app/assets/javascripts/analytics/instance_statistics/components/instance_statistics_count_chart.vue
-app/assets/javascripts/analytics/instance_statistics/components/projects_and_groups_chart.vue
-app/assets/javascripts/analytics/instance_statistics/components/users_chart.vue
-app/assets/javascripts/analytics/instance_statistics/utils.js
-app/assets/javascripts/analytics/product_analytics/activity_charts_bundle.js
-app/assets/javascripts/api.js
-app/assets/javascripts/authentication/u2f/authenticate.js
-app/assets/javascripts/authentication/u2f/register.js
-
 ## reverent-lovelace
 app/assets/javascripts/authentication/webauthn/authenticate.js
 app/assets/javascripts/authentication/webauthn/register.js
