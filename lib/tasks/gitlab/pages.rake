@@ -9,8 +9,6 @@ namespace :gitlab do
       migrated_projects = 0
 
       ProjectPagesMetadatum.only_on_legacy_storage.each_batch(of: 10) do |batch|
-        # count will actually be changed after migration, so increment before
-
         batch.preload(project: [:namespace, :route, pages_metadatum: :pages_deployment]).each do |metadatum|
           project = metadatum.project
           time = Benchmark.realtime do
