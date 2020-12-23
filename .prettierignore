@@ -517,39 +517,6 @@ app/assets/javascripts/lib/utils/text_markdown.js
 app/assets/javascripts/lib/utils/text_utility.js
 app/assets/javascripts/lib/utils/type_utility.js
 
-## vigorous-wiles
-app/assets/javascripts/pages/projects/issues/show.js
-app/assets/javascripts/pages/projects/jobs/index/index.js
-app/assets/javascripts/pages/projects/labels/components/promote_label_modal.vue
-app/assets/javascripts/pages/projects/labels/index/index.js
-app/assets/javascripts/pages/projects/merge_requests/creations/new/compare.js
-app/assets/javascripts/pages/projects/new/index.js
-app/assets/javascripts/pages/projects/pages_domains/form.js
-app/assets/javascripts/pages/projects/pipeline_schedules/shared/components/target_branch_dropdown.js
-app/assets/javascripts/pages/projects/pipeline_schedules/shared/components/timezone_dropdown.js
-app/assets/javascripts/pages/projects/pipelines/init_pipelines.js
-app/assets/javascripts/pages/projects/project.js
-app/assets/javascripts/pages/projects/settings/ci_cd/show/index.js
-app/assets/javascripts/pages/projects/shared/permissions/external.js
-app/assets/javascripts/pages/projects/shared/permissions/index.js
-app/assets/javascripts/pages/projects/tags/index/index.js
-app/assets/javascripts/pages/search/show/refresh_counts.js
-app/assets/javascripts/pages/sessions/new/length_validator.js
-app/assets/javascripts/pages/sessions/new/preserve_url_fragment.js
-app/assets/javascripts/pages/sessions/new/signin_tabs_memoizer.js
-app/assets/javascripts/pages/sessions/new/username_validator.js
-app/assets/javascripts/pages/shared/mount_badge_settings.js
-app/assets/javascripts/pages/shared/wikis/wikis.js
-app/assets/javascripts/pages/users/activity_calendar.js
-app/assets/javascripts/pages/users/index.js
-app/assets/javascripts/pdf/index.vue
-app/assets/javascripts/pdf/page/index.vue
-app/assets/javascripts/performance/utils.js
-app/assets/javascripts/performance_bar/components/detailed_metric.vue
-app/assets/javascripts/performance_bar/components/request_selector.vue
-app/assets/javascripts/performance_bar/index.js
-app/assets/javascripts/performance_bar/performance_bar_log.js
-
 ## musing-khayyam
 app/assets/javascripts/performance_bar/services/performance_bar_service.js
 app/assets/javascripts/performance_bar/stores/performance_bar_store.js
