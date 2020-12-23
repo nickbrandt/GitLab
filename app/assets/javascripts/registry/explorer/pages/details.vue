@@ -25,6 +25,7 @@ import {
 } from '../constants/index';
 
 export default {
+  name: 'RegistryDetailsPage',
   components: {
     DeleteAlert,
     PartialCleanupAlert,
