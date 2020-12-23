@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Projects
-  # Tries to schedule a move for every project with repositories on the source shard
+module Snippets
+  # Tries to schedule a move for every snippet with repositories on the source shard
   class ScheduleBulkRepositoryShardMovesService
     include ScheduleBulkRepositoryShardMovesMethods
     extend ::Gitlab::Utils::Override
@@ -10,22 +10,22 @@ module Projects
 
     override :repository_klass
     def repository_klass
-      ProjectRepository
+      SnippetRepository
     end
 
     override :container_klass
     def container_klass
-      Project
+      Snippet
     end
 
     override :container_column
     def container_column
-      :project_id
+      :snippet_id
     end
 
     override :schedule_bulk_worker_klass
     def self.schedule_bulk_worker_klass
-      ::ProjectScheduleBulkRepositoryShardMovesWorker
+      ::SnippetScheduleBulkRepositoryShardMovesWorker
     end
   end
 end
