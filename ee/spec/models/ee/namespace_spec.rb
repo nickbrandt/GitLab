@@ -191,11 +191,33 @@ RSpec.describe Namespace do
         ]
       end
 
-      it 'is consistent to trial_active? method' do
-        namespaces.each do |ns|
-          consistent = described_class.in_active_trial.include?(ns) == !!ns.trial_active?
+      subject(:in_active_trial) { described_class.in_active_trial }
 
-          expect(consistent).to be true
+      context 'when the check_namespace_plan application setting is off' do
+        it 'finds none' do
+          is_expected.to be_empty
+        end
+
+        it 'is consistent with trial_active? method', :aggregate_failures do
+          namespaces.each do |ns|
+            expect(in_active_trial.include?(ns)).to eq(ns.trial_active?)
+          end
+        end
+      end
+
+      context 'when the check_naespace_plan application setting is on' do
+        before do
+          stub_application_setting(check_namespace_plan: true)
+        end
+
+        it 'finds some' do
+          is_expected.not_to be_empty
+        end
+
+        it 'is consistent with trial_active? method', :aggregate_failures do
+          namespaces.each do |ns|
+            expect(in_active_trial.include?(ns)).to eq(ns.trial_active?)
+          end
         end
       end
     end

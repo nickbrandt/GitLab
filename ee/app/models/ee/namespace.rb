@@ -42,6 +42,8 @@ module EE
       scope :top_most, -> { where(parent_id: nil) }
 
       scope :in_active_trial, -> do
+        return none unless ::Gitlab::CurrentSettings.should_check_namespace_plan?
+
         left_joins(gitlab_subscription: :hosted_plan)
           .where(gitlab_subscriptions: { trial: true, trial_ends_on: Date.today.. })
       end
@@ -56,6 +58,8 @@ module EE
       end
 
       scope :eligible_for_trial, -> do
+        return none unless ::Gitlab::CurrentSettings.should_check_namespace_plan?
+
         left_joins(gitlab_subscription: :hosted_plan)
           .where(
             parent_id: nil,
