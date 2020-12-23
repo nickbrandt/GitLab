@@ -85,11 +85,12 @@ describe('Reset pipeline minutes button', () => {
 
       return axios.waitForAll().then(() => {
         expect(axiosSpy).toHaveBeenCalled();
-        expect(
-          $toast.show,
-        ).toHaveBeenCalledWith('There was an error resetting user pipeline minutes.', {
-          type: 'error',
-        });
+        expect($toast.show).toHaveBeenCalledWith(
+          'There was an error resetting user pipeline minutes.',
+          {
+            type: 'error',
+          },
+        );
       });
     });
   });
