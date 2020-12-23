@@ -848,39 +848,6 @@ app/assets/javascripts/snippets/components/snippet_blob_view.vue
 app/assets/javascripts/snippets/components/snippet_header.vue
 app/assets/javascripts/snippets/mixins/snippets.js
 
-## practical-wozniak
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/sanitize_html.js
-app/assets/javascripts/vue_shared/components/select2_select.vue
-app/assets/javascripts/vue_shared/components/sidebar/labels_select/dropdown_create_label.vue
-app/assets/javascripts/vue_shared/components/sidebar/labels_select/dropdown_value_collapsed.vue
-app/assets/javascripts/vue_shared/components/sidebar/labels_select_vue/dropdown_contents_create_view.vue
-app/assets/javascripts/vue_shared/components/sidebar/labels_select_vue/labels_select_root.vue
-app/assets/javascripts/vue_shared/components/sidebar/labels_select_vue/store/getters.js
-app/assets/javascripts/vue_shared/components/sidebar/labels_select_vue/store/mutations.js
-app/assets/javascripts/vue_shared/components/split_button.vue
-app/assets/javascripts/vue_shared/components/tabs/tabs.js
-app/assets/javascripts/vue_shared/components/timezone_dropdown.vue
-app/assets/javascripts/vue_shared/components/web_ide_link.vue
-app/assets/javascripts/vue_shared/directives/autofocusonshow.js
-app/assets/javascripts/vue_shared/directives/validation.js
-app/assets/javascripts/vue_shared/gl_feature_flags_plugin.js
-app/assets/javascripts/vue_shared/mixins/ci_pagination_api_mixin.js
-app/assets/javascripts/vue_shared/security_reports/security_reports_app.vue
-app/assets/javascripts/vue_shared/security_reports/store/getters.js
-app/assets/javascripts/vue_shared/security_reports/store/modules/sast/actions.js
-app/assets/javascripts/vue_shared/security_reports/store/modules/secret_detection/actions.js
-app/assets/javascripts/vue_shared/security_reports/store/utils.js
-app/assets/javascripts/vue_shared/translate.js
-app/assets/javascripts/vuex_shared/bindings.js
-app/assets/javascripts/whats_new/components/app.vue
-app/assets/javascripts/whats_new/index.js
-app/assets/javascripts/whats_new/utils/get_drawer_body_height.js
-app/assets/javascripts/whats_new/utils/notification.js
-app/assets/javascripts/zen_mode.js
-config/helpers/is_eslint.js
-config/helpers/vendor_dll_hash.js
-config/karma.config.js
-
 ## frosty-kare
 config/plugins/monaco_webpack.js
 config/webpack.config.js
