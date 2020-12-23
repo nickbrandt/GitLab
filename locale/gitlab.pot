@@ -4478,7 +4478,7 @@ msgstr ""
 msgid "BillingPlan|Upgrade"
 msgstr ""
 
-msgid "Billing|An email address is only visible for users managed through Group Managed Accounts."
+msgid "Billing|An email address is only visible for users with public emails."
 msgstr ""
 
 msgid "Billing|An error occurred while loading billable members list"

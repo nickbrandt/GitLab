@@ -67,7 +67,7 @@ export default {
   },
   avatarSize: AVATAR_SIZE,
   emailNotVisibleTooltipText: s__(
-    'Billing|An email address is only visible for users managed through Group Managed Accounts.',
+    'Billing|An email address is only visible for users with public emails.',
   ),
 };
 </script>
