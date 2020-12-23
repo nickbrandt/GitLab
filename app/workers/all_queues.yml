@@ -1795,6 +1795,14 @@
   :weight: 1
   :idempotent:
   :tags: []
+- :name: namespaces_onboarding_pipeline_created
+  :feature_category: :subgroups
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :unknown
+  :weight: 1
+  :idempotent: true
+  :tags: []
 - :name: namespaces_onboarding_user_added
   :feature_category: :users
   :has_external_dependencies:
