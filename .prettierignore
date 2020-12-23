@@ -1020,40 +1020,6 @@ ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/duration_chart
 ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/type_of_work/actions.js
 ee/app/assets/javascripts/analytics/cycle_analytics/store/mutations.js
 
-## frosty-sammet
-ee/app/assets/javascripts/analytics/group_ci_cd_analytics/index.js
-ee/app/assets/javascripts/analytics/merge_request_analytics/components/filter_bar.vue
-ee/app/assets/javascripts/analytics/merge_request_analytics/components/throughput_chart.vue
-ee/app/assets/javascripts/analytics/merge_request_analytics/components/throughput_table.vue
-ee/app/assets/javascripts/analytics/merge_request_analytics/graphql/throughput_chart_query_builder.js
-ee/app/assets/javascripts/analytics/merge_request_analytics/index.js
-ee/app/assets/javascripts/analytics/merge_request_analytics/utils.js
-ee/app/assets/javascripts/analytics/productivity_analytics/components/app.vue
-ee/app/assets/javascripts/analytics/productivity_analytics/components/metric_chart.vue
-ee/app/assets/javascripts/analytics/productivity_analytics/components/mr_table.vue
-ee/app/assets/javascripts/analytics/productivity_analytics/filtered_search_productivity_analytics.js
-ee/app/assets/javascripts/analytics/productivity_analytics/store/getters.js
-ee/app/assets/javascripts/analytics/productivity_analytics/store/modules/charts/actions.js
-ee/app/assets/javascripts/analytics/productivity_analytics/store/modules/charts/getters.js
-ee/app/assets/javascripts/analytics/productivity_analytics/store/modules/filters/getters.js
-ee/app/assets/javascripts/analytics/productivity_analytics/store/modules/table/actions.js
-ee/app/assets/javascripts/analytics/productivity_analytics/store/modules/table/getters.js
-ee/app/assets/javascripts/analytics/productivity_analytics/utils.js
-ee/app/assets/javascripts/analytics/repository_analytics/components/download_test_coverage.vue
-ee/app/assets/javascripts/analytics/repository_analytics/components/test_coverage_table.vue
-ee/app/assets/javascripts/analytics/shared/components/groups_dropdown_filter.vue
-ee/app/assets/javascripts/analytics/shared/components/projects_dropdown_filter.vue
-ee/app/assets/javascripts/analytics/shared/components/scatterplot.vue
-ee/app/assets/javascripts/analytics/shared/utils.js
-ee/app/assets/javascripts/approvals/components/app.vue
-ee/app/assets/javascripts/approvals/components/approvers_select.vue
-ee/app/assets/javascripts/approvals/components/branches_select.vue
-ee/app/assets/javascripts/approvals/components/license_compliance/index.vue
-ee/app/assets/javascripts/approvals/components/mr_edit/app.vue
-ee/app/assets/javascripts/approvals/components/mr_edit/mr_rules.vue
-ee/app/assets/javascripts/approvals/components/mr_edit/mr_rules_hidden_inputs.vue
-ee/app/assets/javascripts/approvals/components/mr_edit/rule_input.vue
-
 ## strange-shirley
 ee/app/assets/javascripts/approvals/components/project_settings/project_rules.vue
 ee/app/assets/javascripts/approvals/components/rule_form.vue
