@@ -2256,39 +2256,6 @@ spec/frontend/shared/popover_spec.js
 spec/frontend/shortcuts_spec.js
 spec/frontend/sidebar/assignee_title_spec.js
 
-## exciting-buck
-spec/frontend/sidebar/components/assignees/collapsed_assignee_list_spec.js
-spec/frontend/sidebar/components/severity/severity_spec.js
-spec/frontend/sidebar/components/severity/sidebar_severity_spec.js
-spec/frontend/sidebar/components/time_tracking/time_tracker_spec.js
-spec/frontend/sidebar/confidential/edit_form_spec.js
-spec/frontend/sidebar/lock/edit_form_buttons_spec.js
-spec/frontend/sidebar/lock/edit_form_spec.js
-spec/frontend/sidebar/lock/issuable_lock_form_spec.js
-spec/frontend/sidebar/participants_spec.js
-spec/frontend/sidebar/reviewer_title_spec.js
-spec/frontend/sidebar/sidebar_mediator_spec.js
-spec/frontend/sidebar/sidebar_move_issue_spec.js
-spec/frontend/sidebar/subscriptions_spec.js
-spec/frontend/snippet/collapsible_input_spec.js
-spec/frontend/snippets/components/embed_dropdown_spec.js
-spec/frontend/snippets/components/snippet_blob_actions_edit_spec.js
-spec/frontend/snippets/components/snippet_visibility_edit_spec.js
-spec/frontend/snippets/utils/blob_spec.js
-spec/frontend/static_site_editor/components/edit_area_spec.js
-spec/frontend/static_site_editor/components/edit_meta_controls_spec.js
-spec/frontend/static_site_editor/graphql/resolvers/file_spec.js
-spec/frontend/static_site_editor/services/load_source_content_spec.js
-spec/frontend/static_site_editor/services/submit_content_changes_spec.js
-spec/frontend/syntax_highlight_spec.js
-spec/frontend/task_list_spec.js
-spec/frontend/tooltips/components/tooltips_spec.js
-spec/frontend/tooltips/index_spec.js
-spec/frontend/user_lists/components/add_user_modal_spec.js
-spec/frontend/user_lists/components/edit_user_list_spec.js
-spec/frontend/user_lists/components/new_user_list_spec.js
-spec/frontend/user_lists/components/user_list_spec.js
-
 ## priceless-margulis
 spec/frontend/user_popovers_spec.js
 spec/frontend/vue_alerts_spec.js
