@@ -1,30 +1,50 @@
-import { __, s__ } from '~/locale';
+import { __, s__, sprintf } from '~/locale';
+import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
+
+export const NAME_MAX_LENGTH = 100;
 
 export const I18N = {
-  RECOVER_HIDDEN_STAGE: s__('CustomCycleAnalytics|Recover hidden stage'),
-  RECOVER_STAGE_TITLE: s__('CustomCycleAnalytics|Default stages'),
-  RECOVER_STAGES_VISIBLE: s__('CustomCycleAnalytics|All default stages are currently visible'),
-  SELECT_START_EVENT: s__('CustomCycleAnalytics|Select start event'),
-  SELECT_END_EVENT: s__('CustomCycleAnalytics|Select end event'),
-  FORM_FIELD_NAME: s__('CustomCycleAnalytics|Name'),
-  FORM_FIELD_NAME_PLACEHOLDER: s__('CustomCycleAnalytics|Enter a name for the stage'),
-  FORM_FIELD_START_EVENT: s__('CustomCycleAnalytics|Start event'),
-  FORM_FIELD_START_EVENT_LABEL: s__('CustomCycleAnalytics|Start event label'),
-  FORM_FIELD_END_EVENT: s__('CustomCycleAnalytics|End event'),
-  FORM_FIELD_END_EVENT_LABEL: s__('CustomCycleAnalytics|End event label'),
-  BTN_UPDATE_STAGE: s__('CustomCycleAnalytics|Update stage'),
-  BTN_ADD_STAGE: s__('CustomCycleAnalytics|Add stage'),
-  TITLE_EDIT_STAGE: s__('CustomCycleAnalytics|Editing stage'),
-  TITLE_ADD_STAGE: s__('CustomCycleAnalytics|New stage'),
+  FORM_TITLE: __('Create Value Stream'),
+  FORM_CREATED: __("'%{name}' Value Stream created"),
+  RECOVER_HIDDEN_STAGE: s__('CreateValueStreamForm|Recover hidden stage'),
+  RESTORE_HIDDEN_STAGE: s__('CreateValueStreamForm|Restore stage'),
+  RECOVER_STAGE_TITLE: s__('CreateValueStreamForm|Default stages'),
+  RECOVER_STAGES_VISIBLE: s__('CreateValueStreamForm|All default stages are currently visible'),
+  SELECT_START_EVENT: s__('CreateValueStreamForm|Select start event'),
+  SELECT_END_EVENT: s__('CreateValueStreamForm|Select end event'),
+  FORM_FIELD_NAME_LABEL: s__('CreateValueStreamForm|Name'),
+  FORM_FIELD_NAME_PLACEHOLDER: s__('CreateValueStreamForm|Enter a name for the stage'),
+  FIELD_STAGE_NAME_PLACEHOLDER: s__('CreateValueStreamForm|Enter stage name'),
+  FORM_FIELD_START_EVENT: s__('CreateValueStreamForm|Start event'),
+  FORM_FIELD_START_EVENT_LABEL: s__('CreateValueStreamForm|Start event label'),
+  FORM_FIELD_END_EVENT: s__('CreateValueStreamForm|End event'),
+  FORM_FIELD_END_EVENT_LABEL: s__('CreateValueStreamForm|End event label'),
+  DEFAULT_FIELD_START_EVENT_LABEL: s__('CreateValueStreamForm|Start event: '),
+  DEFAULT_FIELD_END_EVENT_LABEL: s__('CreateValueStreamForm|End event: '),
+  BTN_UPDATE_STAGE: s__('CreateValueStreamForm|Update stage'),
+  BTN_ADD_STAGE: s__('CreateValueStreamForm|Add stage'),
+  TITLE_EDIT_STAGE: s__('CreateValueStreamForm|Editing stage'),
+  TITLE_ADD_STAGE: s__('CreateValueStreamForm|New stage'),
   BTN_CANCEL: __('Cancel'),
+  STAGE_INDEX: s__('CreateValueStreamForm|Stage %{index}'),
+  HIDDEN_DEFAULT_STAGE: s__('CreateValueStreamForm|%{name} (default)'),
 };
 
 export const ERRORS = {
-  START_EVENT_REQUIRED: s__('CustomCycleAnalytics|Please select a start event first'),
-  STAGE_NAME_EXISTS: s__('CustomCycleAnalytics|Stage name already exists'),
+  MIN_LENGTH: s__('CreateValueStreamForm|Name is required'),
+  MAX_LENGTH: sprintf(s__('CreateValueStreamForm|Maximum length %{maxLength} characters'), {
+    maxLength: NAME_MAX_LENGTH,
+  }),
+  START_EVENT_REQUIRED: s__('CreateValueStreamForm|Please select a start event first'),
+  STAGE_NAME_EXISTS: s__('CreateValueStreamForm|Stage name already exists'),
   INVALID_EVENT_PAIRS: s__(
-    'CustomCycleAnalytics|Start event changed, please select a valid end event',
+    'CreateValueStreamForm|Start event changed, please select a valid end event',
   ),
+};
+
+export const STAGE_SORT_DIRECTION = {
+  UP: 'UP',
+  DOWN: 'DOWN',
 };
 
 export const defaultErrors = {
@@ -44,3 +64,16 @@ export const defaultFields = {
   endEventIdentifier: null,
   endEventLabelId: null,
 };
+
+export const DEFAULT_STAGE_CONFIG = ['issue', 'plan', 'code', 'test', 'review', 'staging'].map(
+  id => ({
+    id,
+    name: capitalizeFirstCharacter(id),
+    startEventIdentifier: null,
+    endEventIdentifier: null,
+    startEventLabel: null,
+    endEventLabel: null,
+    custom: false,
+    hidden: false,
+  }),
+);
