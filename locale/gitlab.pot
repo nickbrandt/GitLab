@@ -4525,6 +4525,18 @@ msgstr ""
 msgid "Board scope affects which issues are displayed for anyone who visits this board"
 msgstr ""
 
+msgid "BoardNewIssue|No matching results"
+msgstr ""
+
+msgid "BoardNewIssue|Projects"
+msgstr ""
+
+msgid "BoardNewIssue|Search projects"
+msgstr ""
+
+msgid "BoardNewIssue|Select a project"
+msgstr ""
+
 msgid "Boards"
 msgstr ""
 
