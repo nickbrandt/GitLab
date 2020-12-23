@@ -1,5 +1,14 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.7.1 (2020-12-23)
+
+### Fixed (3 changes)
+
+- Fix DAST profiles deletion. !50271
+- Geo: Fix LFS for location-aware Git URL. !50415
+- Fix StoreReportService related to autofix. !50490
+
+
 ## 13.7.0 (2020-12-22)
 
 ### Removed (1 change)
