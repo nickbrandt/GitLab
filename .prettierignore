@@ -848,40 +848,6 @@ app/assets/javascripts/snippets/components/snippet_blob_view.vue
 app/assets/javascripts/snippets/components/snippet_header.vue
 app/assets/javascripts/snippets/mixins/snippets.js
 
-## lucid-lalande
-app/assets/javascripts/snippets/utils/blob.js
-app/assets/javascripts/static_site_editor/graphql/index.js
-app/assets/javascripts/static_site_editor/graphql/resolvers/file.js
-app/assets/javascripts/static_site_editor/graphql/resolvers/has_submitted_changes.js
-app/assets/javascripts/static_site_editor/graphql/resolvers/submit_content_changes.js
-app/assets/javascripts/static_site_editor/image_repository.js
-app/assets/javascripts/static_site_editor/index.js
-app/assets/javascripts/static_site_editor/pages/home.vue
-app/assets/javascripts/static_site_editor/services/formatter.js
-app/assets/javascripts/static_site_editor/services/front_matterify.js
-app/assets/javascripts/static_site_editor/services/image_service.js
-app/assets/javascripts/static_site_editor/services/load_source_content.js
-app/assets/javascripts/static_site_editor/services/parse_source_file.js
-app/assets/javascripts/static_site_editor/services/renderers/render_image.js
-app/assets/javascripts/static_site_editor/services/submit_content_changes.js
-app/assets/javascripts/static_site_editor/services/templater.js
-app/assets/javascripts/task_list.js
-app/assets/javascripts/terminal/terminal.js
-app/assets/javascripts/terraform/components/terraform_list.vue
-app/assets/javascripts/test_utils/simulate_input.js
-app/assets/javascripts/toggle_buttons.js
-app/assets/javascripts/tooltips/components/tooltips.vue
-app/assets/javascripts/tooltips/index.js
-app/assets/javascripts/tracking.js
-app/assets/javascripts/tree.js
-app/assets/javascripts/ui_development_kit.js
-app/assets/javascripts/usage_ping_consent.js
-app/assets/javascripts/user_callout.js
-app/assets/javascripts/user_lists/store/edit/actions.js
-app/assets/javascripts/user_lists/store/edit/index.js
-app/assets/javascripts/user_lists/store/new/actions.js
-app/assets/javascripts/user_lists/store/new/index.js
-
 ## nostalgic-morse
 app/assets/javascripts/user_lists/store/show/actions.js
 app/assets/javascripts/user_lists/store/show/index.js
