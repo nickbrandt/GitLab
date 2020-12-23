@@ -1369,39 +1369,6 @@ ee/app/assets/javascripts/vulnerabilities/components/resolution_alert.vue
 ee/app/assets/javascripts/vulnerabilities/helpers.js
 ee/app/assets/javascripts/vulnerabilities/vulnerabilities_init.js
 
-## gallant-ride
-ee/spec/frontend/diffs/components/diff_line_note_form_spec.js
-ee/spec/frontend/environments/canary_ingress_spec.js
-ee/spec/frontend/environments/deploy_board_component_spec.js
-ee/spec/frontend/environments/environments_app_spec.js
-ee/spec/frontend/environments/environments_table_spec.js
-ee/spec/frontend/environments/mock_data.js
-ee/spec/frontend/environments_dashboard/components/project_header_spec.js
-ee/spec/frontend/epic/components/sidebar_items/sidebar_date_picker_spec.js
-ee/spec/frontend/epic/components/sidebar_items/sidebar_header_spec.js
-ee/spec/frontend/epic/components/sidebar_items/sidebar_todo_spec.js
-ee/spec/frontend/epic/store/actions_spec.js
-ee/spec/frontend/filtered_search/issues_filtered_search_token_keys_spec.js
-ee/spec/frontend/geo_node_form/components/geo_node_form_namespaces_spec.js
-ee/spec/frontend/geo_nodes/components/app_spec.js
-ee/spec/frontend/geo_nodes/components/geo_node_header_spec.js
-ee/spec/frontend/geo_nodes/components/geo_node_sync_progress_spec.js
-ee/spec/frontend/geo_nodes/components/node_detail_sections/node_details_section_main_spec.js
-ee/spec/frontend/geo_nodes/components/node_detail_sections/node_details_section_other_spec.js
-ee/spec/frontend/geo_nodes/store/geo_nodes_store_spec.js
-ee/spec/frontend/geo_replicable/components/app_spec.js
-ee/spec/frontend/geo_replicable/components/geo_replicable_filter_bar_spec.js
-ee/spec/frontend/geo_replicable/components/geo_replicable_spec.js
-ee/spec/frontend/geo_replicable/store/actions_spec.js
-ee/spec/frontend/group_member_contributions/components/table_header_spec.js
-ee/spec/frontend/group_member_contributions/store/group_member_store_spec.js
-ee/spec/frontend/groups/components/invite_members_spec.js
-ee/spec/frontend/groups/components/registration_trial_toggle_spec.js
-ee/spec/frontend/groups/settings/compliance_frameworks/components/list_spec.js
-ee/spec/frontend/groups/settings/components/comma_separated_list_token_selector_spec.js
-ee/spec/frontend/insights/components/insights_chart_spec.js
-ee/spec/frontend/issue_show/components/incidents/incident_sla_spec.js
-
 ## boring-brattain
 ee/spec/frontend/issues_analytics/components/issues_analytics_spec.js
 ee/spec/frontend/issues_analytics/components/issues_analytics_table_spec.js
