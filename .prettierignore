@@ -162,43 +162,6 @@ app/assets/javascripts/ci_variable_list/ci_variable_list.js
 app/assets/javascripts/ci_variable_list/components/ci_environments_dropdown.vue
 app/assets/javascripts/ci_variable_list/components/ci_variable_table.vue
 
-## modest-mayer
-app/assets/javascripts/experimental_flags.js
-app/assets/javascripts/feature_flags/components/edit_feature_flag.vue
-app/assets/javascripts/feature_flags/components/feature_flags.vue
-app/assets/javascripts/feature_flags/components/feature_flags_table.vue
-app/assets/javascripts/feature_flags/components/form.vue
-app/assets/javascripts/feature_flags/components/new_feature_flag.vue
-app/assets/javascripts/feature_flags/store/edit/actions.js
-app/assets/javascripts/feature_flags/store/edit/index.js
-app/assets/javascripts/feature_flags/store/gitlab_user_list/actions.js
-app/assets/javascripts/feature_flags/store/gitlab_user_list/index.js
-app/assets/javascripts/feature_flags/store/helpers.js
-app/assets/javascripts/feature_flags/store/index/actions.js
-app/assets/javascripts/feature_flags/store/index/index.js
-app/assets/javascripts/feature_flags/store/index/mutations.js
-app/assets/javascripts/feature_flags/store/new/actions.js
-app/assets/javascripts/feature_flags/store/new/index.js
-app/assets/javascripts/feature_flags/utils.js
-app/assets/javascripts/feature_highlight/feature_highlight.js
-app/assets/javascripts/feature_highlight/feature_highlight_helper.js
-app/assets/javascripts/file_pickers.js
-app/assets/javascripts/files_comment_button.js
-app/assets/javascripts/filterable_list.js
-app/assets/javascripts/filtered_search/available_dropdown_mappings.js
-app/assets/javascripts/filtered_search/components/recent_searches_dropdown_content.vue
-app/assets/javascripts/filtered_search/dropdown_ajax_filter.js
-app/assets/javascripts/filtered_search/dropdown_emoji.js
-app/assets/javascripts/filtered_search/dropdown_hint.js
-app/assets/javascripts/filtered_search/dropdown_non_user.js
-app/assets/javascripts/filtered_search/dropdown_utils.js
-app/assets/javascripts/filtered_search/filtered_search_dropdown.js
-app/assets/javascripts/filtered_search/filtered_search_dropdown_manager.js
-app/assets/javascripts/filtered_search/filtered_search_manager.js
-app/assets/javascripts/filtered_search/filtered_search_token_keys.js
-app/assets/javascripts/filtered_search/filtered_search_visual_tokens.js
-app/assets/javascripts/filtered_search/issuable_filtered_search_token_keys.js
-
 ## stoic-merkle
 app/assets/javascripts/filtered_search/stores/recent_searches_store.js
 app/assets/javascripts/filtered_search/visual_token_value.js
