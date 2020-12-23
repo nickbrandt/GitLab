@@ -848,44 +848,6 @@ app/assets/javascripts/snippets/components/snippet_blob_view.vue
 app/assets/javascripts/snippets/components/snippet_header.vue
 app/assets/javascripts/snippets/mixins/snippets.js
 
-## thirsty-mccarthy
-app/assets/javascripts/vue_shared/components/date_time_picker/date_time_picker.vue
-app/assets/javascripts/vue_shared/components/date_time_picker/date_time_picker_input.vue
-app/assets/javascripts/vue_shared/components/date_time_picker/date_time_picker_lib.js
-app/assets/javascripts/vue_shared/components/deprecated_modal_2.vue
-app/assets/javascripts/vue_shared/components/dismissible_container.vue
-app/assets/javascripts/vue_shared/components/file_finder/index.vue
-app/assets/javascripts/vue_shared/components/filtered_search_bar/filtered_search_bar_root.vue
-app/assets/javascripts/vue_shared/components/filtered_search_bar/filtered_search_utils.js
-app/assets/javascripts/vue_shared/components/filtered_search_bar/store/modules/filters/actions.js
-app/assets/javascripts/vue_shared/components/filtered_search_bar/tokens/author_token.vue
-app/assets/javascripts/vue_shared/components/filtered_search_bar/tokens/branch_token.vue
-app/assets/javascripts/vue_shared/components/filtered_search_bar/tokens/label_token.vue
-app/assets/javascripts/vue_shared/components/filtered_search_bar/tokens/milestone_token.vue
-app/assets/javascripts/vue_shared/components/gfm_autocomplete/gfm_autocomplete.vue
-app/assets/javascripts/vue_shared/components/gfm_autocomplete/utils.js
-app/assets/javascripts/vue_shared/components/lib/utils/diff_utils.js
-app/assets/javascripts/vue_shared/components/markdown/field.vue
-app/assets/javascripts/vue_shared/components/markdown/header.vue
-app/assets/javascripts/vue_shared/components/markdown/suggestions.vue
-app/assets/javascripts/vue_shared/components/modal_copy_button.vue
-app/assets/javascripts/vue_shared/components/ordered_layout.vue
-app/assets/javascripts/vue_shared/components/paginated_table_with_search_and_tabs/paginated_table_with_search_and_tabs.vue
-app/assets/javascripts/vue_shared/components/paginated_table_with_search_and_tabs/utils.js
-app/assets/javascripts/vue_shared/components/project_selector/project_list_item.vue
-app/assets/javascripts/vue_shared/components/registry/list_item.vue
-app/assets/javascripts/vue_shared/components/registry/title_area.vue
-app/assets/javascripts/vue_shared/components/rich_content_editor/rich_content_editor.vue
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/build_custom_renderer.js
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/build_html_to_markdown_renderer.js
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/editor_service.js
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/renderers/build_uneditable_token.js
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/renderers/render_html_block.js
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/renderers/render_identifier_instance_text.js
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/renderers/render_identifier_paragraph.js
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/renderers/render_softbreak.js
-app/assets/javascripts/vue_shared/components/rich_content_editor/services/renderers/render_utils.js
-
 ## practical-wozniak
 app/assets/javascripts/vue_shared/components/rich_content_editor/services/sanitize_html.js
 app/assets/javascripts/vue_shared/components/select2_select.vue
