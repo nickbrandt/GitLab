@@ -1369,39 +1369,6 @@ ee/app/assets/javascripts/vulnerabilities/components/resolution_alert.vue
 ee/app/assets/javascripts/vulnerabilities/helpers.js
 ee/app/assets/javascripts/vulnerabilities/vulnerabilities_init.js
 
-## boring-brattain
-ee/spec/frontend/issues_analytics/components/issues_analytics_spec.js
-ee/spec/frontend/issues_analytics/components/issues_analytics_table_spec.js
-ee/spec/frontend/issues_analytics/mock_data.js
-ee/spec/frontend/iterations/components/iteration_report_tabs_spec.js
-ee/spec/frontend/iterations/components/iterations_spec.js
-ee/spec/frontend/license_compliance/components/app_spec.js
-ee/spec/frontend/license_compliance/components/license_component_links_spec.js
-ee/spec/frontend/license_compliance/components/licenses_table_spec.js
-ee/spec/frontend/maintenance_mode_settings/components/app_spec.js
-ee/spec/frontend/members/components/ldap/ldap_override_confirmation_modal_spec.js
-ee/spec/frontend/members/components/table/members_table_spec.js
-ee/spec/frontend/members/utils_spec.js
-ee/spec/frontend/notes/components/note_header_spec.js
-ee/spec/frontend/on_demand_scans/components/on_demand_scans_app_spec.js
-ee/spec/frontend/on_demand_scans/components/on_demand_scans_form_spec.js
-ee/spec/frontend/on_demand_scans/components/profile_selector/profile_selector_spec.js
-ee/spec/frontend/on_demand_scans/components/profile_selector/scanner_profile_selector_spec.js
-ee/spec/frontend/on_demand_scans/components/profile_selector/site_profile_selector_spec.js
-ee/spec/frontend/on_demand_scans/mocks/apollo_mocks.js
-ee/spec/frontend/oncall_schedule/schedule/components/preset_weeks/weeks_header_sub_item_spec.js
-ee/spec/frontend/pages/groups/saml_providers/saml_members/store/actions_spec.js
-ee/spec/frontend/projects/merge_requests/blocking_mr_input_root_spec.js
-ee/spec/frontend/related_items_tree/components/create_issue_form_spec.js
-ee/spec/frontend/related_items_tree/store/actions_spec.js
-ee/spec/frontend/related_items_tree/store/mutations_spec.js
-ee/spec/frontend/requirements/components/requirement_status_badge_spec.js
-ee/spec/frontend/roadmap/components/epic_item_details_spec.js
-ee/spec/frontend/roadmap/components/epic_item_spec.js
-ee/spec/frontend/roadmap/components/epic_item_timeline_spec.js
-ee/spec/frontend/roadmap/components/epics_list_empty_spec.js
-ee/spec/frontend/roadmap/components/milestones_list_section_spec.js
-
 ## compassionate-aryabhata
 ee/spec/frontend/roadmap/components/preset_months/months_header_sub_item_spec.js
 ee/spec/frontend/roadmap/components/preset_quarters/quarters_header_item_spec.js
