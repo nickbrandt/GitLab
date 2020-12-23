@@ -162,39 +162,6 @@ app/assets/javascripts/ci_variable_list/ci_variable_list.js
 app/assets/javascripts/ci_variable_list/components/ci_environments_dropdown.vue
 app/assets/javascripts/ci_variable_list/components/ci_variable_table.vue
 
-## relaxed-kilby
-app/assets/javascripts/ci_variable_list/store/actions.js
-app/assets/javascripts/ci_variable_list/store/getters.js
-app/assets/javascripts/ci_variable_list/store/utils.js
-app/assets/javascripts/clone_panel.js
-app/assets/javascripts/clusters/clusters_bundle.js
-app/assets/javascripts/clusters/components/fluentd_output_settings.vue
-app/assets/javascripts/clusters/forms/stores/index.js
-app/assets/javascripts/clusters/stores/clusters_store.js
-app/assets/javascripts/clusters/stores/new_cluster/index.js
-app/assets/javascripts/clusters_list/components/clusters.vue
-app/assets/javascripts/clusters_list/load_clusters.js
-app/assets/javascripts/clusters_list/store/actions.js
-app/assets/javascripts/clusters_list/store/index.js
-app/assets/javascripts/code_navigation/index.js
-app/assets/javascripts/code_navigation/store/actions.js
-app/assets/javascripts/code_navigation/utils/index.js
-app/assets/javascripts/commit/image_file.js
-app/assets/javascripts/commit/pipelines/pipelines_bundle.js
-app/assets/javascripts/commit_merge_requests.js
-app/assets/javascripts/commons/nav/user_merge_requests.js
-app/assets/javascripts/compare_autocomplete.js
-app/assets/javascripts/confidential_merge_request/components/project_form_group.vue
-app/assets/javascripts/confirm_danger_modal.js
-app/assets/javascripts/confirm_modal.js
-app/assets/javascripts/contributors/components/contributors.vue
-app/assets/javascripts/contributors/stores/actions.js
-app/assets/javascripts/contributors/stores/getters.js
-app/assets/javascripts/contributors/utils.js
-app/assets/javascripts/create_cluster/components/cluster_form_dropdown.vue
-app/assets/javascripts/create_cluster/eks_cluster/index.js
-app/assets/javascripts/create_cluster/eks_cluster/services/aws_services_facade.js
-
 ## lucid-lederberg
 app/assets/javascripts/create_cluster/eks_cluster/store/actions.js
 app/assets/javascripts/create_cluster/eks_cluster/store/state.js
