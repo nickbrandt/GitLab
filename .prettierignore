@@ -162,41 +162,6 @@ app/assets/javascripts/ci_variable_list/ci_variable_list.js
 app/assets/javascripts/ci_variable_list/components/ci_environments_dropdown.vue
 app/assets/javascripts/ci_variable_list/components/ci_variable_table.vue
 
-## lucid-lederberg
-app/assets/javascripts/create_cluster/eks_cluster/store/actions.js
-app/assets/javascripts/create_cluster/eks_cluster/store/state.js
-app/assets/javascripts/create_cluster/gke_cluster/components/gke_dropdown_mixin.js
-app/assets/javascripts/create_cluster/gke_cluster/components/gke_project_id_dropdown.vue
-app/assets/javascripts/create_cluster/gke_cluster/index.js
-app/assets/javascripts/create_cluster/gke_cluster/store/actions.js
-app/assets/javascripts/create_cluster/gke_cluster/store/getters.js
-app/assets/javascripts/create_cluster/gke_cluster_namespace/index.js
-app/assets/javascripts/create_cluster/init_create_cluster.js
-app/assets/javascripts/create_cluster/store/cluster_dropdown/actions.js
-app/assets/javascripts/create_item_dropdown.js
-app/assets/javascripts/create_label.js
-app/assets/javascripts/create_merge_request_dropdown.js
-app/assets/javascripts/custom_metrics/components/custom_metrics_form_fields.vue
-app/assets/javascripts/custom_metrics/constants.js
-app/assets/javascripts/cycle_analytics/cycle_analytics_bundle.js
-app/assets/javascripts/cycle_analytics/cycle_analytics_service.js
-app/assets/javascripts/cycle_analytics/cycle_analytics_store.js
-app/assets/javascripts/deploy_freeze/store/actions.js
-app/assets/javascripts/deploy_freeze/store/index.js
-app/assets/javascripts/deploy_freeze/store/mutations.js
-app/assets/javascripts/deploy_keys/components/app.vue
-app/assets/javascripts/deploy_keys/components/key.vue
-app/assets/javascripts/deploy_keys/service/index.js
-app/assets/javascripts/deploy_keys/store/index.js
-app/assets/javascripts/deprecated_jquery_dropdown/gl_dropdown.js
-app/assets/javascripts/deprecated_jquery_dropdown/gl_dropdown_filter.js
-app/assets/javascripts/deprecated_jquery_dropdown/gl_dropdown_input.js
-app/assets/javascripts/deprecated_jquery_dropdown/gl_dropdown_remote.js
-app/assets/javascripts/design_management/components/design_notes/design_discussion.vue
-app/assets/javascripts/design_management/components/design_presentation.vue
-app/assets/javascripts/design_management/components/design_sidebar.vue
-app/assets/javascripts/design_management/components/design_todo_button.vue
-
 ## loving-feistel
 app/assets/javascripts/design_management/components/toolbar/design_navigation.vue
 app/assets/javascripts/design_management/components/toolbar/index.vue
