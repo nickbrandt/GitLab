@@ -10,39 +10,6 @@ doc/api/graphql/reference/gitlab_schema.graphql
 *.scss
 *.md
 
-## nice-swanson
-app/assets/javascripts/behaviors/preview_markdown.js
-app/assets/javascripts/behaviors/quick_submit.js
-app/assets/javascripts/behaviors/requires_input.js
-app/assets/javascripts/behaviors/secret_values.js
-app/assets/javascripts/behaviors/shortcuts/keybindings.js
-app/assets/javascripts/behaviors/shortcuts/shortcuts.js
-app/assets/javascripts/behaviors/shortcuts/shortcuts_blob.js
-app/assets/javascripts/behaviors/shortcuts/shortcuts_issuable.js
-app/assets/javascripts/blob/3d_viewer/index.js
-app/assets/javascripts/blob/balsamiq/balsamiq_viewer.js
-app/assets/javascripts/blob/blob_file_dropzone.js
-app/assets/javascripts/blob/blob_line_permalink_updater.js
-app/assets/javascripts/blob/components/blob_content_error.vue
-app/assets/javascripts/blob/file_template_mediator.js
-app/assets/javascripts/blob/notebook/notebook_viewer.vue
-app/assets/javascripts/blob/openapi/index.js
-app/assets/javascripts/blob/sketch/index.js
-app/assets/javascripts/blob/stl_viewer.js
-app/assets/javascripts/blob/suggest_gitlab_ci_yml/index.js
-app/assets/javascripts/blob/template_selector.js
-app/assets/javascripts/blob/template_selectors/ci_syntax_yaml_selector.js
-app/assets/javascripts/blob/template_selectors/ci_yaml_selector.js
-app/assets/javascripts/blob/template_selectors/dockerfile_selector.js
-app/assets/javascripts/blob/template_selectors/gitignore_selector.js
-app/assets/javascripts/blob/template_selectors/license_selector.js
-app/assets/javascripts/blob/template_selectors/metrics_dashboard_selector.js
-app/assets/javascripts/blob/template_selectors/type_selector.js
-app/assets/javascripts/blob/viewer/index.js
-app/assets/javascripts/blob_edit/blob_bundle.js
-app/assets/javascripts/blob_edit/edit_blob.js
-app/assets/javascripts/boards/boards_util.js
-
 ## keen-chatelet
 app/assets/javascripts/boards/components/board_assignee_dropdown.vue
 app/assets/javascripts/boards/components/board_card_layout.vue
