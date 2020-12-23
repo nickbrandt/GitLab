@@ -848,39 +848,6 @@ app/assets/javascripts/snippets/components/snippet_blob_view.vue
 app/assets/javascripts/snippets/components/snippet_header.vue
 app/assets/javascripts/snippets/mixins/snippets.js
 
-## frosty-kare
-config/plugins/monaco_webpack.js
-config/webpack.config.js
-ee/app/assets/javascripts/add_gitlab_slack_application/components/add_gitlab_slack_application.vue
-ee/app/assets/javascripts/admin/dev_ops_report/components/devops_adoption_app.vue
-ee/app/assets/javascripts/admin/dev_ops_report/components/devops_adoption_segment_modal.vue
-ee/app/assets/javascripts/admin/dev_ops_report/components/devops_adoption_table.vue
-ee/app/assets/javascripts/admin/dev_ops_report/graphql.js
-ee/app/assets/javascripts/admin/dev_ops_report/utils/cache_updates.js
-ee/app/assets/javascripts/analytics/code_review_analytics/components/app.vue
-ee/app/assets/javascripts/analytics/code_review_analytics/components/filter_bar.vue
-ee/app/assets/javascripts/analytics/code_review_analytics/filtered_search_code_review_analytics.js
-ee/app/assets/javascripts/analytics/code_review_analytics/store/modules/merge_requests/actions.js
-ee/app/assets/javascripts/analytics/code_review_analytics/utils.js
-ee/app/assets/javascripts/analytics/contribution_analytics/components/column_chart.vue
-ee/app/assets/javascripts/analytics/contribution_analytics/contribution_analytics_bundle.js
-ee/app/assets/javascripts/analytics/cycle_analytics/components/create_value_stream_form/utils.js
-ee/app/assets/javascripts/analytics/cycle_analytics/components/custom_stage_form.vue
-ee/app/assets/javascripts/analytics/cycle_analytics/components/filter_bar.vue
-ee/app/assets/javascripts/analytics/cycle_analytics/components/stage_dropdown_filter.vue
-ee/app/assets/javascripts/analytics/cycle_analytics/components/stage_table_nav.vue
-ee/app/assets/javascripts/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_filters.vue
-ee/app/assets/javascripts/analytics/cycle_analytics/components/time_metrics_card.vue
-ee/app/assets/javascripts/analytics/cycle_analytics/index.js
-ee/app/assets/javascripts/analytics/cycle_analytics/store/actions.js
-ee/app/assets/javascripts/analytics/cycle_analytics/store/getters.js
-ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/custom_stages/actions.js
-ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/custom_stages/mutations.js
-ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/duration_chart/actions.js
-ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/duration_chart/getters.js
-ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/type_of_work/actions.js
-ee/app/assets/javascripts/analytics/cycle_analytics/store/mutations.js
-
 ## frosty-sammet
 ee/app/assets/javascripts/analytics/group_ci_cd_analytics/index.js
 ee/app/assets/javascripts/analytics/merge_request_analytics/components/filter_bar.vue
