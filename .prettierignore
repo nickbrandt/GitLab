@@ -2256,40 +2256,6 @@ spec/frontend/shared/popover_spec.js
 spec/frontend/shortcuts_spec.js
 spec/frontend/sidebar/assignee_title_spec.js
 
-## trusting-antonelli
-spec/frontend/vue_shared/components/content_viewer/viewers/markdown_viewer_spec.js
-spec/frontend/vue_shared/components/date_time_picker/date_time_picker_lib_spec.js
-spec/frontend/vue_shared/components/date_time_picker/date_time_picker_spec.js
-spec/frontend/vue_shared/components/deprecated_modal_2_spec.js
-spec/frontend/vue_shared/components/diff_viewer/diff_viewer_spec.js
-spec/frontend/vue_shared/components/diff_viewer/viewers/image_diff_viewer_spec.js
-spec/frontend/vue_shared/components/dismissible_container_spec.js
-spec/frontend/vue_shared/components/editor_lite_spec.js
-spec/frontend/vue_shared/components/expand_button_spec.js
-spec/frontend/vue_shared/components/file_finder/index_spec.js
-spec/frontend/vue_shared/components/file_finder/item_spec.js
-spec/frontend/vue_shared/components/file_tree_spec.js
-spec/frontend/vue_shared/components/filtered_search_bar/filtered_search_bar_root_spec.js
-spec/frontend/vue_shared/components/filtered_search_bar/store/modules/filters/test_helper.js
-spec/frontend/vue_shared/components/gl_countdown_spec.js
-spec/frontend/vue_shared/components/gl_modal_vuex_spec.js
-spec/frontend/vue_shared/components/issuable/issuable_header_warnings_spec.js
-spec/frontend/vue_shared/components/issue/issue_assignees_spec.js
-spec/frontend/vue_shared/components/issue/issue_milestone_spec.js
-spec/frontend/vue_shared/components/local_storage_sync_spec.js
-spec/frontend/vue_shared/components/markdown/apply_suggestion_spec.js
-spec/frontend/vue_shared/components/markdown/header_spec.js
-spec/frontend/vue_shared/components/markdown/suggestions_spec.js
-spec/frontend/vue_shared/components/markdown/toolbar_button_spec.js
-spec/frontend/vue_shared/components/notes/noteable_warning_spec.js
-spec/frontend/vue_shared/components/ordered_layout_spec.js
-spec/frontend/vue_shared/components/pagination_links_spec.js
-spec/frontend/vue_shared/components/project_avatar/default_spec.js
-spec/frontend/vue_shared/components/registry/details_row_spec.js
-spec/frontend/vue_shared/components/registry/list_item_spec.js
-spec/frontend/vue_shared/components/registry/metadata_item_spec.js
-spec/frontend/vue_shared/components/registry/title_area_spec.js
-
 ## wizardly-agnesi
 spec/frontend/vue_shared/components/rich_content_editor/editor_service_spec.js
 spec/frontend/vue_shared/components/rich_content_editor/modals/add_image/upload_image_tab_spec.js
