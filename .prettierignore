@@ -10,23 +10,6 @@ doc/api/graphql/reference/gitlab_schema.graphql
 *.scss
 *.md
 
-## boring-bohr
-jest.config.base.js
-jest.config.js
-scripts/frontend/block_dependencies.js
-scripts/frontend/check_page_bundle_mixins_css_for_sideeffects.js
-scripts/frontend/extract_gettext_all.js
-scripts/frontend/file_test_coverage.js
-scripts/frontend/frontend_script_utils.js
-scripts/frontend/merge_coverage_frontend.js
-scripts/frontend/prettier.js
-scripts/frontend/stylelint/stylelint-utility-map.js
-scripts/frontend/stylelint/stylelint-utils.js
-app/assets/javascripts/access_tokens/index.js
-app/assets/javascripts/activities.js
-app/assets/javascripts/add_context_commits_modal/components/add_context_commits_modal_wrapper.vue
-app/assets/javascripts/add_context_commits_modal/store/actions.js
-
 ## interesting-kepler
 app/assets/javascripts/add_context_commits_modal/utils.js
 app/assets/javascripts/admin/application_settings/setup_metrics_and_profiling.js
