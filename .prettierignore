@@ -1706,40 +1706,6 @@ spec/frontend/behaviors/markdown/paste_markdown_table_spec.js
 spec/frontend/behaviors/quick_submit_spec.js
 spec/frontend/behaviors/secret_values_spec.js
 
-## eloquent-black
-spec/frontend/cycle_analytics/limit_warning_component_spec.js
-spec/frontend/deploy_freeze/components/timezone_dropdown_spec.js
-spec/frontend/deploy_keys/components/key_spec.js
-spec/frontend/deploy_keys/components/keys_panel_spec.js
-spec/frontend/deprecated_jquery_dropdown_spec.js
-spec/frontend/design_management/components/design_notes/design_discussion_spec.js
-spec/frontend/design_management/components/design_overlay_spec.js
-spec/frontend/design_management/components/design_scaler_spec.js
-spec/frontend/design_management/components/upload/design_version_dropdown_spec.js
-spec/frontend/design_management/pages/index_spec.js
-spec/frontend/design_management/router_spec.js
-spec/frontend/design_management/utils/error_messages_spec.js
-spec/frontend/diffs/components/app_spec.js
-spec/frontend/diffs/components/compare_dropdown_layout_spec.js
-spec/frontend/diffs/components/compare_versions_spec.js
-spec/frontend/diffs/components/diff_content_spec.js
-spec/frontend/diffs/components/diff_discussions_spec.js
-spec/frontend/diffs/components/diff_expansion_cell_spec.js
-spec/frontend/diffs/components/diff_file_spec.js
-spec/frontend/diffs/components/diff_line_note_form_spec.js
-spec/frontend/diffs/components/diff_stats_spec.js
-spec/frontend/diffs/components/diff_view_spec.js
-spec/frontend/diffs/components/image_diff_overlay_spec.js
-spec/frontend/diffs/components/no_changes_spec.js
-spec/frontend/diffs/components/parallel_diff_table_row_spec.js
-spec/frontend/diffs/components/settings_dropdown_spec.js
-spec/frontend/diffs/store/actions_spec.js
-spec/frontend/diffs/store/getters_versions_dropdowns_spec.js
-spec/frontend/diffs/store/utils_spec.js
-spec/frontend/diffs/utils/uuids_spec.js
-spec/frontend/dirty_submit/dirty_submit_collection_spec.js
-spec/frontend/dirty_submit/dirty_submit_form_spec.js
-
 ## exciting-driscoll
 spec/frontend/droplab/drop_down_spec.js
 spec/frontend/droplab/plugins/ajax_filter_spec.js
