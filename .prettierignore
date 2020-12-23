@@ -10,40 +10,6 @@ doc/api/graphql/reference/gitlab_schema.graphql
 *.scss
 *.md
 
-## keen-chatelet
-app/assets/javascripts/boards/components/board_assignee_dropdown.vue
-app/assets/javascripts/boards/components/board_card_layout.vue
-app/assets/javascripts/boards/components/board_form.vue
-app/assets/javascripts/boards/components/board_list.vue
-app/assets/javascripts/boards/components/board_list_new.vue
-app/assets/javascripts/boards/components/board_new_issue_new.vue
-app/assets/javascripts/boards/components/board_sidebar.js
-app/assets/javascripts/boards/components/boards_selector.vue
-app/assets/javascripts/boards/components/modal/footer.vue
-app/assets/javascripts/boards/components/modal/index.vue
-app/assets/javascripts/boards/components/project_select.vue
-app/assets/javascripts/boards/components/sidebar/board_sidebar_labels_select.vue
-app/assets/javascripts/boards/components/sidebar/board_sidebar_milestone_select.vue
-app/assets/javascripts/boards/filtered_search_boards.js
-app/assets/javascripts/boards/filters/due_date_filters.js
-app/assets/javascripts/boards/index.js
-app/assets/javascripts/boards/mixins/sortable_default_options.js
-app/assets/javascripts/boards/models/issue.js
-app/assets/javascripts/boards/models/list.js
-app/assets/javascripts/boards/stores/actions.js
-app/assets/javascripts/boards/stores/boards_store.js
-app/assets/javascripts/boards/stores/getters.js
-app/assets/javascripts/boards/stores/modal_store.js
-app/assets/javascripts/boards/stores/mutations.js
-app/assets/javascripts/branches/divergence_graph.js
-app/assets/javascripts/breadcrumb.js
-app/assets/javascripts/broadcast_notification.js
-app/assets/javascripts/build_artifacts.js
-app/assets/javascripts/ci_settings_pipeline_triggers/index.js
-app/assets/javascripts/ci_variable_list/ci_variable_list.js
-app/assets/javascripts/ci_variable_list/components/ci_environments_dropdown.vue
-app/assets/javascripts/ci_variable_list/components/ci_variable_table.vue
-
 ## relaxed-kilby
 app/assets/javascripts/ci_variable_list/store/actions.js
 app/assets/javascripts/ci_variable_list/store/getters.js
