@@ -415,7 +415,7 @@ RSpec.describe License do
       end
     end
 
-    describe '.current' do
+    describe '.current', :request_store, :use_clean_rails_memory_store_caching do
       context 'when licenses table does not exist' do
         it 'returns nil' do
           allow(described_class).to receive(:table_exists?).and_return(false)
@@ -442,11 +442,27 @@ RSpec.describe License do
       end
 
       context 'when the license is valid' do
+        let!(:current_license) { create_list(:license, 2).last }
+
         it 'returns the license' do
-          current_license = create_list(:license, 2).last
           create(:license, data: create(:gitlab_license, starts_at: Date.current + 1.month).export)
 
           expect(described_class.current).to eq(current_license)
+        end
+
+        it 'caches the license' do
+          described_class.reset_current
+
+          expect(described_class).to receive(:load_license).once.and_call_original
+
+          2.times do
+            expect(described_class.current).to eq(current_license)
+          end
+
+          travel_to(61.seconds.from_now) do
+            expect(described_class).to receive(:load_license).once.and_call_original
+            expect(described_class.current).to eq(current_license)
+          end
         end
       end
     end
