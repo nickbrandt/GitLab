@@ -10,13 +10,13 @@ export default {
   inheritAttrs: false,
   tokenMethods: {
     fetchItem(id) {
-      return Api.user(id).then(res => res.data);
+      return Api.user(id).then((res) => res.data);
     },
     fetchSuggestions(term) {
       const { groupId, projectPath } = this.config;
 
       if (groupId) {
-        return Api.groupMembers(groupId, { search: term }).then(res => res.data);
+        return Api.groupMembers(groupId, { search: term }).then((res) => res.data);
       }
 
       if (projectPath) {

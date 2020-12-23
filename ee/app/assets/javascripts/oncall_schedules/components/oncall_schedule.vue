@@ -65,7 +65,7 @@ export default {
   },
   computed: {
     offset() {
-      const selectedTz = this.timezones.find(tz => tz.identifier === this.schedule.timezone);
+      const selectedTz = this.timezones.find((tz) => tz.identifier === this.schedule.timezone);
       return __(`(UTC ${selectedTz.formatted_offset})`);
     },
     timeframe() {

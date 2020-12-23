@@ -128,7 +128,7 @@ export default {
             this.$emit('scheduleCreated');
           },
         )
-        .catch(error => {
+        .catch((error) => {
           this.error = error;
         })
         .finally(() => {
@@ -161,7 +161,7 @@ export default {
             this.$refs.addUpdateScheduleModal.hide();
           },
         )
-        .catch(error => {
+        .catch((error) => {
           this.error = error;
         })
         .finally(() => {

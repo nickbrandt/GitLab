@@ -24,7 +24,7 @@ export default class EnvironmentsStore extends CeEnvironmentsStore {
   toggleDeployBoard(environmentID) {
     const environments = this.state.environments.slice();
 
-    this.state.environments = environments.map(env => {
+    this.state.environments = environments.map((env) => {
       let updated = { ...env };
 
       if (env.id === environmentID) {

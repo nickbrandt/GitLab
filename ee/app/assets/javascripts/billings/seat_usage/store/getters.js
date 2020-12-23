@@ -1,4 +1,4 @@
-export const tableItems = state => {
+export const tableItems = (state) => {
   if (state.members.length) {
     return state.members.map(({ name, username, avatar_url, web_url, email }) => {
       const formattedUserName = `@${username}`;

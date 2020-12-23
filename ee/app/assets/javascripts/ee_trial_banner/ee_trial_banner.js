@@ -14,7 +14,7 @@ export default class EETrialBanner {
   init() {
     // Wait for navbars to render before querying
     this.setCookies();
-    this.$trialBanner.on('close.bs.alert', e => this.handleTrialBannerDismiss(e));
+    this.$trialBanner.on('close.bs.alert', (e) => this.handleTrialBannerDismiss(e));
   }
 
   /**

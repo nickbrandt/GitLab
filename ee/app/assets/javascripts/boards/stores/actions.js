@@ -144,7 +144,7 @@ export default {
       })
       .then(({ data }) => {
         const { epics, lists } = data[boardType]?.board;
-        const epicsFormatted = epics.edges.map(e => ({
+        const epicsFormatted = epics.edges.map((e) => ({
           ...e.node,
         }));
 

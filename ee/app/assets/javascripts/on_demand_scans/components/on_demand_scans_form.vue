@@ -144,7 +144,7 @@ export default {
       return ERROR_MESSAGES[this.errorType] || null;
     },
     isLoadingProfiles() {
-      return ['scannerProfiles', 'siteProfiles'].some(name => this.$apollo.queries[name].loading);
+      return ['scannerProfiles', 'siteProfiles'].some((name) => this.$apollo.queries[name].loading);
     },
     failedToLoadProfiles() {
       return [ERROR_FETCH_SCANNER_PROFILES, ERROR_FETCH_SITE_PROFILES].includes(this.errorType);
@@ -201,7 +201,7 @@ export default {
             }
           },
         )
-        .catch(e => {
+        .catch((e) => {
           Sentry.captureException(e);
           this.showErrors(ERROR_RUN_SCAN);
           this.loading = false;

@@ -70,7 +70,7 @@ export default class MembersEE extends Members {
         $toggle.enable();
         $dateInput.enable();
       })
-      .catch(xhr => {
+      .catch((xhr) => {
         $btn.enable();
 
         if (xhr.status === 403) {
