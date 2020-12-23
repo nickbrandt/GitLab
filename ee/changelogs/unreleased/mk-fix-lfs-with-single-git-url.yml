@@ -1,5 +1,0 @@
----
-title: 'Geo: Fix LFS for location-aware Git URL'
-merge_request: 50415
-author:
-type: fixed
