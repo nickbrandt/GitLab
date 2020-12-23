@@ -1706,39 +1706,6 @@ spec/frontend/behaviors/markdown/paste_markdown_table_spec.js
 spec/frontend/behaviors/quick_submit_spec.js
 spec/frontend/behaviors/secret_values_spec.js
 
-## busy-mayer
-spec/frontend/branches/branches_delete_modal_spec.js
-spec/frontend/ci_settings_pipeline_triggers/components/triggers_list_spec.js
-spec/frontend/ci_variable_list/components/ci_environments_dropdown_spec.js
-spec/frontend/ci_variable_list/components/ci_variable_modal_spec.js
-spec/frontend/ci_variable_list/components/ci_variable_settings_spec.js
-spec/frontend/ci_variable_list/store/actions_spec.js
-spec/frontend/clusters/clusters_bundle_spec.js
-spec/frontend/clusters/components/application_row_spec.js
-spec/frontend/clusters/components/applications_spec.js
-spec/frontend/clusters/components/fluentd_output_settings_spec.js
-spec/frontend/clusters/services/application_state_machine_spec.js
-spec/frontend/clusters_list/components/node_error_help_text_spec.js
-spec/frontend/clusters_list/store/actions_spec.js
-spec/frontend/code_navigation/store/actions_spec.js
-spec/frontend/collapsed_sidebar_todo_spec.js
-spec/frontend/commit/commit_pipeline_status_component_spec.js
-spec/frontend/commit/pipelines/pipelines_spec.js
-spec/frontend/commits_spec.js
-spec/frontend/confirm_modal_spec.js
-spec/frontend/contributors/store/actions_spec.js
-spec/frontend/create_cluster/eks_cluster/components/eks_cluster_configuration_form_spec.js
-spec/frontend/create_cluster/eks_cluster/store/actions_spec.js
-spec/frontend/create_cluster/eks_cluster/store/getters_spec.js
-spec/frontend/create_cluster/eks_cluster/store/mutations_spec.js
-spec/frontend/create_cluster/gke_cluster/helpers.js
-spec/frontend/create_cluster/gke_cluster/stores/actions_spec.js
-spec/frontend/create_cluster/gke_cluster_namespace/gke_cluster_namespace_spec.js
-spec/frontend/create_cluster/store/cluster_dropdown/mutations_spec.js
-spec/frontend/create_item_dropdown_spec.js
-spec/frontend/create_merge_request_dropdown_spec.js
-spec/frontend/custom_metrics/components/custom_metrics_form_fields_spec.js
-
 ## eloquent-black
 spec/frontend/cycle_analytics/limit_warning_component_spec.js
 spec/frontend/deploy_freeze/components/timezone_dropdown_spec.js
