@@ -517,39 +517,6 @@ app/assets/javascripts/lib/utils/text_markdown.js
 app/assets/javascripts/lib/utils/text_utility.js
 app/assets/javascripts/lib/utils/type_utility.js
 
-## cool-dirac
-app/assets/javascripts/mr_popover/components/mr_popover.vue
-app/assets/javascripts/mr_popover/index.js
-app/assets/javascripts/namespace_select.js
-app/assets/javascripts/network/branch_graph.js
-app/assets/javascripts/new_branch_form.js
-app/assets/javascripts/notebook/cells/markdown.vue
-app/assets/javascripts/notes.js
-app/assets/javascripts/notes/components/diff_with_note.vue
-app/assets/javascripts/notes/components/discussion_actions.vue
-app/assets/javascripts/notes/components/discussion_counter.vue
-app/assets/javascripts/notes/components/discussion_filter.vue
-app/assets/javascripts/notes/components/multiline_comment_utils.js
-app/assets/javascripts/notes/components/note_actions.vue
-app/assets/javascripts/notes/components/note_body.vue
-app/assets/javascripts/notes/components/note_form.vue
-app/assets/javascripts/notes/components/noteable_discussion.vue
-app/assets/javascripts/notes/components/noteable_note.vue
-app/assets/javascripts/notes/components/notes_app.vue
-app/assets/javascripts/notes/components/toggle_replies_widget.vue
-app/assets/javascripts/notes/discussion_filters.js
-app/assets/javascripts/notes/mixins/diff_line_note_form.js
-app/assets/javascripts/notes/mixins/discussion_navigation.js
-app/assets/javascripts/notes/mixins/resolvable.js
-app/assets/javascripts/notes/sort_discussions.js
-app/assets/javascripts/notes/stores/actions.js
-app/assets/javascripts/notes/stores/collapse_utils.js
-app/assets/javascripts/notes/stores/getters.js
-app/assets/javascripts/notes/stores/mutations.js
-app/assets/javascripts/notes/stores/utils.js
-app/assets/javascripts/notes/utils.js
-app/assets/javascripts/notifications_dropdown.js
-
 ## practical-cohen
 app/assets/javascripts/onboarding_issues/index.js
 app/assets/javascripts/operation_settings/store/actions.js
