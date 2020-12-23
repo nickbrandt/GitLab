@@ -1887,45 +1887,6 @@ spec/frontend/helpers/vuex_action_helper_spec.js
 spec/frontend/helpers/wait_for_promises.js
 spec/frontend/helpers/wait_using_real_timer.js
 
-## determined-shamir
-spec/frontend/logs/components/environment_logs_spec.js
-spec/frontend/logs/components/log_advanced_filters_spec.js
-spec/frontend/logs/components/log_control_buttons_spec.js
-spec/frontend/logs/components/log_simple_filters_spec.js
-spec/frontend/logs/stores/actions_spec.js
-spec/frontend/logs/stores/mutations_spec.js
-spec/frontend/matchers.js
-spec/frontend/matchers_spec.js
-spec/frontend/members/components/avatars/user_avatar_spec.js
-spec/frontend/members/components/filter_sort/filter_sort_container_spec.js
-spec/frontend/members/components/filter_sort/members_filtered_search_bar_spec.js
-spec/frontend/members/components/filter_sort/sort_dropdown_spec.js
-spec/frontend/members/components/modals/remove_group_link_modal_spec.js
-spec/frontend/members/components/table/created_at_spec.js
-spec/frontend/members/components/table/expiration_datepicker_spec.js
-spec/frontend/members/components/table/expires_at_spec.js
-spec/frontend/members/components/table/member_avatar_spec.js
-spec/frontend/members/components/table/member_source_spec.js
-spec/frontend/members/components/table/members_table_spec.js
-spec/frontend/members/components/table/role_dropdown_spec.js
-spec/frontend/members/utils_spec.js
-spec/frontend/merge_request_spec.js
-spec/frontend/merge_request_tabs_spec.js
-spec/frontend/milestones/milestone_combobox_spec.js
-spec/frontend/mini_pipeline_graph_dropdown_spec.js
-spec/frontend/mocks/ce/lib/utils/axios_utils.js
-spec/frontend/mocks/mocks_helper.js
-spec/frontend/mocks/mocks_helper_spec.js
-spec/frontend/monitoring/alert_widget_spec.js
-spec/frontend/monitoring/components/charts/annotations_spec.js
-spec/frontend/monitoring/components/charts/anomaly_spec.js
-spec/frontend/monitoring/components/charts/bar_spec.js
-spec/frontend/monitoring/components/charts/column_spec.js
-spec/frontend/monitoring/components/charts/gauge_spec.js
-spec/frontend/monitoring/components/charts/options_spec.js
-spec/frontend/monitoring/components/charts/stacked_column_spec.js
-spec/frontend/monitoring/components/charts/time_series_spec.js
-
 ## beautiful-benz
 spec/frontend/monitoring/components/dashboard_actions_menu_spec.js
 spec/frontend/monitoring/components/dashboard_header_spec.js
