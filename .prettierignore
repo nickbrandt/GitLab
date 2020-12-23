@@ -1368,35 +1368,6 @@ ee/app/assets/javascripts/vulnerabilities/components/resolution_alert.vue
 ## wonderful-proskuriakova
 ee/app/assets/javascripts/vulnerabilities/helpers.js
 ee/app/assets/javascripts/vulnerabilities/vulnerabilities_init.js
-ee/spec/frontend/admin/dev_ops_report/components/devops_adoption_segment_modal_spec.js
-ee/spec/frontend/admin/dev_ops_report/components/devops_adoption_table_cell_flag_spec.js
-ee/spec/frontend/admin/dev_ops_report/components/devops_adoption_table_spec.js
-ee/spec/frontend/analytics/code_review_analytics/components/app_spec.js
-ee/spec/frontend/analytics/code_review_analytics/components/filter_bar_spec.js
-ee/spec/frontend/analytics/code_review_analytics/components/merge_request_table_spec.js
-ee/spec/frontend/analytics/code_review_analytics/store/modules/merge_requests/actions_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/base_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/create_value_stream_form/custom_stage_fields_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/custom_stage_form_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/duration_chart_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/filter_bar_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/labels_selector_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/metrics_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/path_navigation_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/stage_dropdown_filter_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/stage_event_list_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/stage_nav_item_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/stage_table_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/tasks_by_type/tasks_by_type_filters_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/type_of_work_charts_spec.js
-ee/spec/frontend/analytics/cycle_analytics/components/value_stream_select_spec.js
-ee/spec/frontend/analytics/cycle_analytics/helpers.js
-ee/spec/frontend/analytics/cycle_analytics/mock_data.js
-ee/spec/frontend/analytics/cycle_analytics/store/getters_spec.js
-ee/spec/frontend/analytics/cycle_analytics/store/mutations_spec.js
-ee/spec/frontend/analytics/cycle_analytics/utils_spec.js
-ee/spec/frontend/analytics/merge_request_analytics/components/filter_bar_spec.js
-ee/spec/frontend/analytics/merge_request_analytics/components/throughput_table_spec.js
 
 ## inspiring-banach
 ee/spec/frontend/analytics/productivity_analytics/components/app_spec.js
