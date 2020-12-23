@@ -1887,40 +1887,6 @@ spec/frontend/helpers/vuex_action_helper_spec.js
 spec/frontend/helpers/wait_for_promises.js
 spec/frontend/helpers/wait_using_real_timer.js
 
-## condescending-haslett
-spec/frontend/ide/components/activity_bar_spec.js
-spec/frontend/ide/components/branches/search_list_spec.js
-spec/frontend/ide/components/commit_sidebar/actions_spec.js
-spec/frontend/ide/components/commit_sidebar/list_item_spec.js
-spec/frontend/ide/components/commit_sidebar/list_spec.js
-spec/frontend/ide/components/commit_sidebar/message_field_spec.js
-spec/frontend/ide/components/commit_sidebar/new_merge_request_option_spec.js
-spec/frontend/ide/components/commit_sidebar/radio_group_spec.js
-spec/frontend/ide/components/commit_sidebar/success_message_spec.js
-spec/frontend/ide/components/error_message_spec.js
-spec/frontend/ide/components/file_row_extra_spec.js
-spec/frontend/ide/components/file_templates/bar_spec.js
-spec/frontend/ide/components/file_templates/dropdown_spec.js
-spec/frontend/ide/components/ide_sidebar_nav_spec.js
-spec/frontend/ide/components/ide_spec.js
-spec/frontend/ide/components/ide_status_bar_spec.js
-spec/frontend/ide/components/ide_status_mr_spec.js
-spec/frontend/ide/components/ide_tree_list_spec.js
-spec/frontend/ide/components/jobs/detail/scroll_button_spec.js
-spec/frontend/ide/components/jobs/detail_spec.js
-spec/frontend/ide/components/jobs/item_spec.js
-spec/frontend/ide/components/jobs/list_spec.js
-spec/frontend/ide/components/jobs/stage_spec.js
-spec/frontend/ide/components/merge_requests/list_spec.js
-spec/frontend/ide/components/nav_dropdown_button_spec.js
-spec/frontend/ide/components/nav_dropdown_spec.js
-spec/frontend/ide/components/new_dropdown/button_spec.js
-spec/frontend/ide/components/new_dropdown/index_spec.js
-spec/frontend/ide/components/new_dropdown/modal_spec.js
-spec/frontend/ide/components/new_dropdown/upload_spec.js
-spec/frontend/ide/components/panes/collapsible_sidebar_spec.js
-spec/frontend/ide/components/panes/right_spec.js
-
 ## jovial-mirzakhani
 spec/frontend/ide/components/repo_commit_section_spec.js
 spec/frontend/ide/components/repo_editor_spec.js
