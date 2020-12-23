@@ -23,7 +23,7 @@ const createComponent = (propsData = {}) => {
 
 const findTableRow = () => wrapper.find('[data-testid="projectTableRow"]');
 const findWarningIcon = () =>
-  wrapper.findAll(GlIcon).wrappers.find(w => w.props('name') === 'status_warning');
+  wrapper.findAll(GlIcon).wrappers.find((w) => w.props('name') === 'status_warning');
 const findProjectLink = () => wrapper.find(GlLink);
 const getWarningIconTooltipText = () => getBinding(findWarningIcon().element, 'gl-tooltip').value;
 

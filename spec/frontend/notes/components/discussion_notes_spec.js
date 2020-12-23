@@ -126,7 +126,7 @@ describe('DiscussionNotes', () => {
         const noteComponents = [NoteableNote, SystemNote, PlaceholderNote, PlaceholderSystemNote];
         return wrapper
           .findAll('.notes *')
-          .filter(w => noteComponents.some(Component => w.is(Component)))
+          .filter((w) => noteComponents.some((Component) => w.is(Component)))
           .at(index);
       };
 
