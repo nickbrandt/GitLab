@@ -42,6 +42,10 @@ jest.mock('~/lib/utils/url_utility', () => ({
   mergeUrlParams: jest.requireActual('~/lib/utils/url_utility').mergeUrlParams,
 }));
 
+const MockEditorLite = {
+  template: '<div/>',
+};
+
 describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   let wrapper;
 
@@ -87,9 +91,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         GlTabs,
         GlButton,
         CommitForm,
-        EditorLite: {
-          template: '<div/>',
-        },
+        EditorLite: MockEditorLite,
         TextEditor,
       },
       mocks: {
@@ -140,6 +142,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
   const findTabAt = i => wrapper.findAll(GlTab).at(i);
   const findVisualizationTab = () => wrapper.find('[data-testid="visualization-tab"]');
   const findTextEditor = () => wrapper.find(TextEditor);
+  const findEditorLite = () => wrapper.find(MockEditorLite);
   const findCommitForm = () => wrapper.find(CommitForm);
   const findPipelineGraph = () => wrapper.find(PipelineGraph);
   const findCommitBtnLoadingIcon = () => wrapper.find('[type="submit"]').find(GlLoadingIcon);
@@ -236,7 +239,14 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
 
     it('displays content after the query loads', () => {
       expect(findLoadingIcon().exists()).toBe(false);
-      expect(findTextEditor().attributes('value')).toBe(mockCiYml);
+
+      expect(findEditorLite().attributes('value')).toBe(mockCiYml);
+      expect(findEditorLite().attributes('file-name')).toBe(mockCiConfigPath);
+    });
+
+    it('configures text editor', () => {
+      expect(findTextEditor().props('commitSha')).toBe(mockCommitSha);
+      expect(findTextEditor().props('projectPath')).toBe(mockProjectPath);
     });
 
     describe('commit form', () => {
@@ -401,7 +411,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
         it('content is restored after cancel is called', async () => {
           await cancelCommitForm();
 
-          expect(findTextEditor().attributes('value')).toBe(mockCiYml);
+          expect(findEditorLite().attributes('value')).toBe(mockCiYml);
         });
       });
     });
@@ -415,7 +425,7 @@ describe('~/pipeline_editor/pipeline_editor_app.vue', () => {
       await waitForPromises();
 
       expect(findAlert().exists()).toBe(false);
-      expect(findTextEditor().attributes('value')).toBe(mockCiYml);
+      expect(findEditorLite().attributes('value')).toBe(mockCiYml);
     });
 
     it('shows a 404 error message', async () => {
