@@ -2255,22 +2255,3 @@ spec/frontend/set_status_modal/set_status_modal_wrapper_spec.js
 spec/frontend/shared/popover_spec.js
 spec/frontend/shortcuts_spec.js
 spec/frontend/sidebar/assignee_title_spec.js
-
-## upbeat-elion
-spec/frontend/vuex_shared/modules/modal/actions_spec.js
-spec/frontend/whats_new/components/app_spec.js
-spec/frontend/wikis_spec.js
-spec/frontend_integration/ide/ide_integration_spec.js
-spec/frontend_integration/test_helpers/fixtures.js
-spec/frontend_integration/test_helpers/mock_server/index.js
-spec/frontend_integration/test_helpers/mock_server/routes/404.js
-spec/frontend_integration/test_helpers/mock_server/routes/ci.js
-spec/frontend_integration/test_helpers/mock_server/routes/graphql.js
-spec/frontend_integration/test_helpers/mock_server/routes/index.js
-spec/frontend_integration/test_helpers/mock_server/routes/projects.js
-spec/frontend_integration/test_helpers/mock_server/routes/repository.js
-spec/frontend_integration/test_helpers/snapshot_serializer.js
-spec/javascripts/fly_out_nav_browser_spec.js
-spec/javascripts/lib/utils/browser_spec.js
-spec/javascripts/matchers.js
-spec/javascripts/test_bundle.js
