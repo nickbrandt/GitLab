@@ -1020,39 +1020,6 @@ ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/duration_chart
 ee/app/assets/javascripts/analytics/cycle_analytics/store/modules/type_of_work/actions.js
 ee/app/assets/javascripts/analytics/cycle_analytics/store/mutations.js
 
-## great-keldysh
-ee/app/assets/javascripts/boards/components/sidebar/remove_issue.js
-ee/app/assets/javascripts/boards/config_toggle.js
-ee/app/assets/javascripts/boards/ee_functions.js
-ee/app/assets/javascripts/boards/mixins/modal_footer.js
-ee/app/assets/javascripts/boards/models/list.js
-ee/app/assets/javascripts/boards/stores/actions.js
-ee/app/assets/javascripts/boards/stores/boards_store_ee.js
-ee/app/assets/javascripts/boards/stores/mutations.js
-ee/app/assets/javascripts/boards/toggle_labels.js
-ee/app/assets/javascripts/burndown_chart/burn_chart_data.js
-ee/app/assets/javascripts/burndown_chart/components/burn_charts.vue
-ee/app/assets/javascripts/burndown_chart/components/burnup_chart.vue
-ee/app/assets/javascripts/burndown_chart/components/open_timebox_summary.vue
-ee/app/assets/javascripts/clusters/components/environments.vue
-ee/app/assets/javascripts/clusters/mixins/track_uninstall_button_click.js
-ee/app/assets/javascripts/clusters_list/components/agents.vue
-ee/app/assets/javascripts/codequality_report/store/actions.js
-ee/app/assets/javascripts/codequality_report/store/getters.js
-ee/app/assets/javascripts/compliance_dashboard/compliance_dashboard_bundle.js
-ee/app/assets/javascripts/dependencies/components/dependencies_actions.vue
-ee/app/assets/javascripts/dependencies/components/paginated_dependencies_table.vue
-ee/app/assets/javascripts/dependencies/store/getters.js
-ee/app/assets/javascripts/dependencies/store/modules/list/actions.js
-ee/app/assets/javascripts/diffs/mixins/image_diff.js
-ee/app/assets/javascripts/droplab/plugins/custom_number.js
-ee/app/assets/javascripts/ee_trial_banner/ee_trial_banner.js
-ee/app/assets/javascripts/environments/stores/environments_store.js
-ee/app/assets/javascripts/epic/components/epic_form.vue
-ee/app/assets/javascripts/epic/components/sidebar_items/sidebar_labels.vue
-ee/app/assets/javascripts/epic/epic_bundle.js
-ee/app/assets/javascripts/epic/epic_tabs.js
-
 ## stoic-einstein
 ee/app/assets/javascripts/epic/store/actions.js
 ee/app/assets/javascripts/epic/store/mutations.js
