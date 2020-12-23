@@ -12,6 +12,7 @@ RSpec.describe 'Trial Sign Up' do
   describe 'on GitLab.com' do
     before do
       allow(Gitlab).to receive(:com?).and_return(true).at_least(:once)
+      stub_application_setting(check_namespace_plan: true)
     end
 
     context 'with the unavailable username' do

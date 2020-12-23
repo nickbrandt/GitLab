@@ -252,6 +252,10 @@ RSpec.describe Namespace do
       let_it_be(:namespace) { create :namespace }
       let_it_be(:sub_namespace) { create(:namespace, parent: namespace) }
 
+      before do
+        stub_application_setting(check_namespace_plan: true)
+      end
+
       subject { described_class.eligible_for_subscription.ids }
 
       context 'when there is no subscription' do
@@ -319,6 +323,10 @@ RSpec.describe Namespace do
 
     describe '.eligible_for_trial' do
       let_it_be(:namespace) { create :namespace }
+
+      before do
+        stub_application_setting(check_namespace_plan: true)
+      end
 
       subject { described_class.eligible_for_trial.first }
 
@@ -1227,7 +1235,7 @@ RSpec.describe Namespace do
     subject { namespace.eligible_for_trial? }
 
     where(
-      on_dot_com: [true, false],
+      check_namespace_plan: [true, false],
       has_parent: [true, false],
       never_had_trial: [true, false],
       plan_eligible_for_trial: [true, false]
@@ -1235,17 +1243,17 @@ RSpec.describe Namespace do
 
     with_them do
       before do
-        allow(Gitlab).to receive(:com?).and_return(on_dot_com)
+        stub_application_setting(check_namespace_plan: check_namespace_plan)
         allow(namespace).to receive(:has_parent?).and_return(has_parent)
         allow(namespace).to receive(:never_had_trial?).and_return(never_had_trial)
         allow(namespace).to receive(:plan_eligible_for_trial?).and_return(plan_eligible_for_trial)
       end
 
-      context "when#{' not' unless params[:on_dot_com]} on .com" do
+      context "when check_namespace_plan application setting is #{params[:check_namespace_plan] ? 'on' : 'off'}" do
         context "and the namespace #{params[:has_parent] ? 'has' : 'is'} a parent namespace" do
           context "and the namespace has#{' not yet' if params[:never_had_trial]} been trialed" do
             context "and the namespace is#{' not' unless params[:plan_eligible_for_trial]} eligible for a trial" do
-              it { is_expected.to eq(on_dot_com && !has_parent && never_had_trial && plan_eligible_for_trial) }
+              it { is_expected.to eq(check_namespace_plan && !has_parent && never_had_trial && plan_eligible_for_trial) }
             end
           end
         end

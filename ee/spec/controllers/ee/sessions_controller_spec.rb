@@ -68,7 +68,7 @@ RSpec.describe SessionsController, :geo do
 
   describe '#create' do
     before do
-      allow(::Gitlab).to receive(:com?).and_return(true)
+      stub_application_setting(check_namespace_plan: true)
     end
 
     context 'with wrong credentials' do
