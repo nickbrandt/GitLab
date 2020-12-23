@@ -162,39 +162,6 @@ app/assets/javascripts/ci_variable_list/ci_variable_list.js
 app/assets/javascripts/ci_variable_list/components/ci_environments_dropdown.vue
 app/assets/javascripts/ci_variable_list/components/ci_variable_table.vue
 
-## distracted-nash
-app/assets/javascripts/droplab/drop_down.js
-app/assets/javascripts/droplab/drop_lab.js
-app/assets/javascripts/droplab/hook_button.js
-app/assets/javascripts/droplab/hook_input.js
-app/assets/javascripts/droplab/plugins/ajax.js
-app/assets/javascripts/droplab/plugins/ajax_filter.js
-app/assets/javascripts/droplab/plugins/input_setter.js
-app/assets/javascripts/due_date_select.js
-app/assets/javascripts/editor/editor_lite.js
-app/assets/javascripts/editor/editor_markdown_ext.js
-app/assets/javascripts/editor/utils.js
-app/assets/javascripts/emoji/index.js
-app/assets/javascripts/emoji/no_emoji_validator.js
-app/assets/javascripts/emoji/support/is_emoji_unicode_supported.js
-app/assets/javascripts/emoji/support/unicode_support_map.js
-app/assets/javascripts/environments/components/environment_item.vue
-app/assets/javascripts/environments/components/environment_rollback.vue
-app/assets/javascripts/environments/components/environments_app.vue
-app/assets/javascripts/environments/components/environments_table.vue
-app/assets/javascripts/environments/mixins/environments_mixin.js
-app/assets/javascripts/environments/stores/environments_store.js
-app/assets/javascripts/error_tracking/components/error_details.vue
-app/assets/javascripts/error_tracking/store/actions.js
-app/assets/javascripts/error_tracking/store/details/actions.js
-app/assets/javascripts/error_tracking/store/details/getters.js
-app/assets/javascripts/error_tracking/store/list/mutations.js
-app/assets/javascripts/error_tracking/utils.js
-app/assets/javascripts/error_tracking_settings/store/actions.js
-app/assets/javascripts/error_tracking_settings/store/getters.js
-app/assets/javascripts/error_tracking_settings/store/mutations.js
-app/assets/javascripts/error_tracking_settings/utils.js
-
 ## modest-mayer
 app/assets/javascripts/experimental_flags.js
 app/assets/javascripts/feature_flags/components/edit_feature_flag.vue
