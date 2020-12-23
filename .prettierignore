@@ -1369,40 +1369,6 @@ ee/app/assets/javascripts/vulnerabilities/components/resolution_alert.vue
 ee/app/assets/javascripts/vulnerabilities/helpers.js
 ee/app/assets/javascripts/vulnerabilities/vulnerabilities_init.js
 
-## keen-napier
-ee/spec/frontend/boards/components/assignee_select_spec.js
-ee/spec/frontend/boards/components/board_list_header_new_spec.js
-ee/spec/frontend/boards/components/board_list_header_spec.js
-ee/spec/frontend/boards/components/board_list_selector/board_list_selector_spec.js
-ee/spec/frontend/boards/components/board_list_spec.js
-ee/spec/frontend/boards/components/board_setting_list_types_spec.js
-ee/spec/frontend/boards/components/board_settings_wip_limit_spec.js
-ee/spec/frontend/boards/components/epic_lane_spec.js
-ee/spec/frontend/boards/components/sidebar/board_sidebar_epic_select_spec.js
-ee/spec/frontend/boards/components/sidebar/board_sidebar_time_tracker_spec.js
-ee/spec/frontend/boards/components/weight_select_spec.js
-ee/spec/frontend/boards/milestone_select_spec.js
-ee/spec/frontend/boards/mock_data.js
-ee/spec/frontend/boards/stores/actions_spec.js
-ee/spec/frontend/boards/stores/boards_store_ee_spec.js
-ee/spec/frontend/boards/stores/mutations_spec.js
-ee/spec/frontend/burndown_chart/components/burn_charts_spec.js
-ee/spec/frontend/codequality_report/store/actions_spec.js
-ee/spec/frontend/compliance_dashboard/components/empty_state_spec.js
-ee/spec/frontend/compliance_dashboard/components/merge_requests/branch_details_spec.js
-ee/spec/frontend/compliance_dashboard/components/merge_requests/grid_spec.js
-ee/spec/frontend/compliance_dashboard/components/merge_requests/merge_request_spec.js
-ee/spec/frontend/compliance_dashboard/components/merge_requests/status_spec.js
-ee/spec/frontend/compliance_dashboard/components/merge_requests/statuses/approval_spec.js
-ee/spec/frontend/compliance_dashboard/components/merge_requests/statuses/pipeline_spec.js
-ee/spec/frontend/compliance_dashboard/components/shared/grid_column_heading_spec.js
-ee/spec/frontend/compliance_dashboard/components/shared/pagination_spec.js
-ee/spec/frontend/compliance_dashboard/mock_data.js
-ee/spec/frontend/dependencies/components/app_spec.js
-ee/spec/frontend/dependencies/components/dependencies_actions_spec.js
-ee/spec/frontend/dependencies/components/dependency_license_links_spec.js
-ee/spec/frontend/dependencies/components/dependency_list_job_failed_alert_spec.js
-
 ## gallant-ride
 ee/spec/frontend/diffs/components/diff_line_note_form_spec.js
 ee/spec/frontend/environments/canary_ingress_spec.js
