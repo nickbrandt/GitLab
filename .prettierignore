@@ -517,39 +517,6 @@ app/assets/javascripts/lib/utils/text_markdown.js
 app/assets/javascripts/lib/utils/text_utility.js
 app/assets/javascripts/lib/utils/type_utility.js
 
-## practical-cohen
-app/assets/javascripts/onboarding_issues/index.js
-app/assets/javascripts/operation_settings/store/actions.js
-app/assets/javascripts/operation_settings/store/index.js
-app/assets/javascripts/packages/details/components/package_files.vue
-app/assets/javascripts/packages/list/components/packages_list.vue
-app/assets/javascripts/packages/list/components/packages_list_app.vue
-app/assets/javascripts/packages/list/components/packages_sort.vue
-app/assets/javascripts/packages/list/stores/getters.js
-app/assets/javascripts/packages/shared/components/package_tags.vue
-app/assets/javascripts/packages/shared/utils.js
-app/assets/javascripts/pages/admin/admin.js
-app/assets/javascripts/pages/admin/application_settings/payload_previewer.js
-app/assets/javascripts/pages/admin/broadcast_messages/broadcast_message.js
-app/assets/javascripts/pages/admin/jobs/index/components/stop_jobs_modal.vue
-app/assets/javascripts/pages/admin/projects/index.js
-app/assets/javascripts/pages/admin/projects/index/index.js
-app/assets/javascripts/pages/admin/users/index.js
-app/assets/javascripts/pages/admin/users/new/index.js
-app/assets/javascripts/pages/dashboard/projects/index/components/customize_homepage_banner.vue
-app/assets/javascripts/pages/dashboard/projects/index/init_customize_homepage_banner.js
-app/assets/javascripts/pages/groups/new/group_path_validator.js
-app/assets/javascripts/pages/groups/shared/group_tabs.js
-app/assets/javascripts/pages/milestones/shared/components/delete_milestone_modal.vue
-app/assets/javascripts/pages/milestones/shared/components/promote_milestone_modal.vue
-app/assets/javascripts/pages/milestones/shared/delete_milestone_modal_init.js
-app/assets/javascripts/pages/milestones/shared/promote_milestone_modal_init.js
-app/assets/javascripts/pages/profiles/show/index.js
-app/assets/javascripts/pages/projects/blob/show/index.js
-app/assets/javascripts/pages/projects/graphs/charts/index.js
-app/assets/javascripts/pages/projects/graphs/components/code_coverage.vue
-app/assets/javascripts/pages/projects/issues/service_desk/filtered_search.js
-
 ## vigorous-wiles
 app/assets/javascripts/pages/projects/issues/show.js
 app/assets/javascripts/pages/projects/jobs/index/index.js
