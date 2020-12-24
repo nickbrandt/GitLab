@@ -97,7 +97,7 @@ describe('Pipelines', () => {
     jest.spyOn(Api, 'branches').mockResolvedValue({ data: branches });
   });
 
-  afterEach(async () => {
+  afterEach(() => {
     wrapper.destroy();
     mock.restore();
   });
