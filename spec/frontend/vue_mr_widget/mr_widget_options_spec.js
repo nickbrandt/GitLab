@@ -15,7 +15,7 @@ import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/consta
 
 jest.mock('~/smart_interval');
 
-jest.mock('~/lib/utils/favicon')
+jest.mock('~/lib/utils/favicon');
 
 const returnPromise = (data) =>
   new Promise((resolve) => {
@@ -427,11 +427,9 @@ describe('mrWidgetOptions', () => {
         it('should call setFavicon method', async () => {
           vm.mr.ciStatusFaviconPath = overlayDataUrl;
 
-          await vm.setFaviconHelper()
+          await vm.setFaviconHelper();
 
-              expect(setFaviconOverlay).toHaveBeenCalledWith(
-                overlayDataUrl
-              );
+          expect(setFaviconOverlay).toHaveBeenCalledWith(overlayDataUrl);
         });
 
         it('should not call setFavicon when there is no ciStatusFaviconPath', (done) => {
