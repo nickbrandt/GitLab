@@ -14,7 +14,8 @@ module Analytics
 
       # rubocop: disable CodeReuse/ActiveRecord
       def perform
-        range_end = Time.zone.now
+        range_end = 1.month.ago.end_of_month
+
         ::Analytics::DevopsAdoption::Segment.all.pluck(:id).each.with_index do |segment_id, i|
           CreateSnapshotWorker.perform_in(i * WORKERS_GAP, segment_id, range_end)
         end

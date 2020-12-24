@@ -6,7 +6,7 @@ module Analytics
       class CalculateAndSaveService
         attr_reader :segment, :range_end
 
-        def initialize(segment:, range_end: Time.zone.now)
+        def initialize(segment:, range_end:)
           @segment = segment
           @range_end = range_end
         end

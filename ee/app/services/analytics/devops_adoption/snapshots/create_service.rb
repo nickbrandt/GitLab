@@ -7,6 +7,7 @@ module Analytics
         ALLOWED_ATTRIBUTES = [
           :segment,
           :segment_id,
+          :end_time,
           :recorded_at,
           :issue_opened,
           :merge_request_opened,

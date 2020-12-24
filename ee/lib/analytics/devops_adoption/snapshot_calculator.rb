@@ -7,14 +7,14 @@ module Analytics
 
       ADOPTION_FLAGS = %i[issue_opened merge_request_opened merge_request_approved runner_configured pipeline_succeeded deploy_succeeded security_scan_succeeded].freeze
 
-      def initialize(segment:, range_end: Time.zone.now)
+      def initialize(segment:, range_end:)
         @segment = segment
         @range_end = range_end
-        @range_start = Analytics::DevopsAdoption::Snapshot.new(recorded_at: range_end).start_time
+        @range_start = Snapshot.new(end_time: range_end).start_time
       end
 
       def calculate
-        params = { recorded_at: range_end, segment: segment }
+        params = { recorded_at: Time.zone.now, end_time: range_end, segment: segment }
 
         ADOPTION_FLAGS.each do |flag|
           params[flag] = send(flag) # rubocop:disable GitlabSecurity/PublicSend
