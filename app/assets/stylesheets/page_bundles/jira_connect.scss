@@ -14,10 +14,15 @@
 @import '@gitlab/ui/src/components/base/link/link';
 @import '@gitlab/ui/src/components/base/loading_icon/loading_icon';
 @import '@gitlab/ui/src/components/base/modal/modal';
+@import '@gitlab/ui/src/components/base/pagination/pagination';
 @import '@gitlab/ui/src/components/base/tabs/tabs/tabs';
 @import '@gitlab/ui/src/components/base/tooltip/tooltip';
 
 $atlaskit-border-color: #dfe1e6;
+
+html {
+  font-size: 14px;
+}
 
 .ac-content {
   margin: 20px;
