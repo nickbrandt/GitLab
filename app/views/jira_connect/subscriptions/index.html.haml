@@ -21,7 +21,7 @@
     .gl-mt-5
       %p Note: this integration only works with accounts on GitLab.com (SaaS).
   - else
-    .js-jira-connect-app{ data: { namespaces_endpoint: api_v4_groups_path(params: { min_access_level: 40 }) } }
+    .js-jira-connect-app{ data: { subscription_path: jira_connect_subscriptions_path, namespaces_endpoint: api_v4_groups_path(params: { min_access_level: 40 }) } }
 
     %form#add-subscription-form.subscription-form{ action: jira_connect_subscriptions_path }
       .ak-field-group

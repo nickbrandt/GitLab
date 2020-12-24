@@ -86,7 +86,7 @@ function initJiraConnect() {
     return null;
   }
 
-  const { namespacesEndpoint } = el.dataset;
+  const { subscriptionPath, namespacesEndpoint } = el.dataset;
 
   return new Vue({
     el,
@@ -97,6 +97,9 @@ function initJiraConnect() {
       return createElement(App, {
         props: {
           namespacesEndpoint,
+        },
+        provide: {
+          subscriptionPath,
         },
       });
     },

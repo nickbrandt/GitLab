@@ -1,6 +1,7 @@
 <script>
 import { GlButton, GlIcon, GlAvatar, GlTooltipDirective, GlBadge } from '@gitlab/ui';
 import { VISIBILITY_TYPE_ICON, GROUP_VISIBILITY_TYPE } from '~/groups/constants';
+import { addSubscription } from '~/jira_connect/api';
 import csrf from '~/lib/utils/csrf';
 
 export default {
@@ -19,8 +20,17 @@ export default {
       required: true,
     },
   },
+  inject: {
+    subscriptionPath: {
+      default: '',
+    },
+  },
   data() {
-    return { namespaces: null, isLoading: false };
+    return {
+      namespaces: null,
+      isLoading: false,
+      isLinked: false, // TODO: Pass groups that are linked from the backend and cross-check that list here
+    };
   },
 
   computed: {
@@ -33,10 +43,7 @@ export default {
     isGroupPendingRemoval() {
       return this.group.marked_for_deletion_on;
     },
-    isLinked() {
-      // TODO: Pass groups that are linked from the backend and cross-check that list here
-      return false;
-    },
+
     visibilityIcon() {
       return VISIBILITY_TYPE_ICON[this.group.visibility];
     },
@@ -49,6 +56,18 @@ export default {
     onClick() {
       this.isLoading = true;
       // TODO: Update with action to send axios request
+      addSubscription(this.subscriptionPath, this.group.full_path)
+        .then(response => {
+          if (response.data.success) {
+            this.isLinked = true;
+          }
+        })
+        .catch(() => {
+          console.error('ERROR!');
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
   },
 
