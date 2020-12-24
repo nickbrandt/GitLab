@@ -426,7 +426,7 @@ describe('diffs/components/app', () => {
       store.state.diffs.currentDiffFileId = '333';
       wrapper.vm.jumpToFile(-1);
 
-      // expect(spy.mock.calls[spy.mock.calls.length - 1]).toEqual(['222.js']);
+      expect(spy.mock.calls[spy.mock.calls.length - 1]).toEqual(['diffs/scrollToFile', '222.js']);
     });
 
     it('does not jump to previous file from the first one', async () => {
