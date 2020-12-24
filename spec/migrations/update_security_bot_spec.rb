@@ -9,7 +9,7 @@ RSpec.describe UpdateSecurityBot do
     it 'skips migration' do
       migrate!
 
-      bot = User.where(user_type: 8).last
+      bot = User.where(user_type: :security_bot).last
 
       expect(bot).to be_nil
     end
@@ -17,12 +17,13 @@ RSpec.describe UpdateSecurityBot do
 
   context 'when bot is confirmed' do
     before do
-      User.security_bot
       allow(User.security_bot).to receive(:update_attributes)
     end
 
     it 'skips migration' do
       expect(User.security_bot).not_to receive(:update_attributes)
+
+      migrate!
     end
   end
 
@@ -32,11 +33,13 @@ RSpec.describe UpdateSecurityBot do
     end
 
     it 'update confirmed_at' do
-      expect(User.security_bot.reload.confirmed_at).to be_falsey
+      Timecop.freeze do
+        expect(User.security_bot.reload.confirmed_at).to be_nil
 
-      migrate!
+        migrate!
 
-      expect(User.security_bot.reload.confirmed_at).to be_truthy
+        expect(User.security_bot.reload.confirmed_at).to eq(Time.zone.now)
+      end
     end
   end
 end

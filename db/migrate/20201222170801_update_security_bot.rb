@@ -10,10 +10,9 @@ class UpdateSecurityBot < ActiveRecord::Migration[6.0]
   end
 
   def up
-    bot = User.where(user_type: User::SECURITY_BOT_TYPE).last
+    bot = User.where(user_type: User::SECURITY_BOT_TYPE, confirmed_at: nil).last
 
     return unless bot
-    return if bot.confirmed_at
 
     bot.update_attribute(:confirmed_at, Time.zone.now)
   end
