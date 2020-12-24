@@ -322,6 +322,19 @@ RSpec.describe Gitlab::Ci::Config::External::Mapper do
         end
       end
 
+      context 'when include variable has an unsupported type for variable expansion' do
+        let(:values) do
+          { include: { project: project.id, file: local_file },
+            image: 'ruby:2.7' }
+        end
+
+        it 'does not invoke expansion for the variable', :aggregate_failures do
+          expect(ExpandVariables).not_to receive(:expand).with(project.id, context_params[:variables])
+
+          expect { subject }.to raise_error(described_class::AmbigiousSpecificationError)
+        end
+      end
+
       context 'when feature flag is turned off' do
         let(:values) do
           { include: full_local_file_path }

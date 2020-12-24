@@ -105,8 +105,19 @@ module Gitlab
             if data.is_a?(String)
               expand(data)
             else
-              data.transform_values do |values|
-                values.is_a?(Array) ? values.map { |value| expand(value) } : expand(values)
+              transform(data)
+            end
+          end
+
+          def transform(data)
+            data.transform_values do |values|
+              case values
+              when Array
+                values.map { |value| expand(value.to_s) }
+              when String
+                expand(values)
+              else
+                values
               end
             end
           end
