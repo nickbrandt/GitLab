@@ -1,3 +1,11 @@
+import {
+  getTimeframeForWeeksView,
+  getTimeframeForMonthsView,
+  getTimeframeForQuartersView,
+} from 'ee/roadmap/utils/roadmap_utils';
+
+import { dateFromString } from 'helpers/datetime_helpers';
+
 export const mockScrollBarSize = 15;
 
 export const mockGroupId = 2;
@@ -93,6 +101,52 @@ export const mockTimeframeWeeksAppend = [
   new Date(2018, 1, 25),
   new Date(2018, 2, 4),
 ];
+
+const OCT_11_2020 = dateFromString('Oct 11 2020');
+export const mockWeekly = {
+  currentDate: OCT_11_2020,
+  /*
+    Each item in timeframe is a Date object.
+
+    timeframe = [ Sep 27 2020, Oct  4 2020, Oct 11 2020, <- current week or currentIndex == 2
+                  Oct 18 2020, Oct 25 2020, Nov  1 2020,
+                  Nov  8 2020 ]
+  */
+  timeframe: getTimeframeForWeeksView(OCT_11_2020),
+};
+
+const DEC_1_2020 = dateFromString('Dec 1 2020');
+export const mockMonthly = {
+  currentDate: DEC_1_2020,
+  /*
+    Each item in timeframe is a Date object.
+
+    timeframe = [ Oct 1 2020, Nov 1 2020, Dec 1 2020, <- current month == index 2
+                  Jan 1 2021, Feb 1 2021, Mar 1 2021,
+                  Apr 1 2021, May 31 2021 ]
+  */
+  timeframe: getTimeframeForMonthsView(DEC_1_2020),
+};
+
+const DEC_25_2020 = dateFromString('Dec 25 2020');
+export const mockQuarterly = {
+  currentDate: DEC_25_2020,
+  /*
+    The format of quarterly timeframes differs from that of the monthly and weekly ones.
+
+    For quarterly, each item in timeframe has the following shape:
+      { quarterSequence: number, range: array<Dates>, year: number }
+
+      Each item in range is a Date object.
+
+      E.g., { 2020 Q2 } = { quarterSequence: 2, range: [ Apr 1 2020, May 1 2020, Jun 30 2020], year 2020 }
+
+    timeframe = [ { 2020 Q2 }, { 2020 Q3 }, { 2020 Q4 }, <- current quarter == index 2
+                  { 2021 Q1 }, { 2021 Q2 }, { 2021 Q3 },
+                  { 2021 Q4 } ]
+  */
+  timeframe: getTimeframeForQuartersView(DEC_25_2020),
+};
 
 export const mockEpic = {
   id: 1,
