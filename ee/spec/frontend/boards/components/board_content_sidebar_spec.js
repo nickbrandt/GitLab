@@ -1,6 +1,7 @@
 import { GlDrawer } from '@gitlab/ui';
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import BoardContentSidebar from 'ee_component/boards/components/board_content_sidebar.vue';
+import { stubComponent } from 'helpers/stub_component';
 import waitForPromises from 'helpers/wait_for_promises';
 import BoardAssigneeDropdown from '~/boards/components/board_assignee_dropdown.vue';
 import IssuableTitle from '~/boards/components/issuable_title.vue';
@@ -12,20 +13,16 @@ describe('ee/BoardContentSidebar', () => {
   let store;
 
   const createComponent = () => {
-    wrapper = mount(BoardContentSidebar, {
+    wrapper = shallowMount(BoardContentSidebar, {
       provide: {
         canUpdate: true,
         rootPath: '',
       },
       store,
       stubs: {
-        'board-sidebar-epic-select': '<div></div>',
-        'board-sidebar-time-tracker': '<div></div>',
-        'board-sidebar-weight-input': '<div></div>',
-        'board-sidebar-labels-select': '<div></div>',
-        'board-sidebar-due-date': '<div></div>',
-        'board-sidebar-subscription': '<div></div>',
-        'board-sidebar-milestone-select': '<div></div>',
+        GlDrawer: stubComponent(GlDrawer, {
+          template: '<div><slot name="header"></slot><slot></slot></div>',
+        }),
       },
       mocks: {
         $apollo: {
@@ -62,7 +59,7 @@ describe('ee/BoardContentSidebar', () => {
   });
 
   it('finds IssuableTitle', () => {
-    expect(wrapper.find(IssuableTitle).text()).toContain('One');
+    expect(wrapper.find(IssuableTitle).props('title')).toContain('One');
   });
 
   it('renders BoardAssigneeDropdown', () => {
