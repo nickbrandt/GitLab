@@ -20,10 +20,6 @@
 
 $atlaskit-border-color: #dfe1e6;
 
-html {
-  font-size: 14px;
-}
-
 .ac-content {
   margin: 20px;
 
@@ -60,6 +56,7 @@ $header-height: 40px;
 }
 
 .jira-connect-user {
+  font-size: $gl-font-size;
   float: right;
   position: relative;
   top: -30px;
@@ -129,5 +126,6 @@ svg {
 }
 
 .browser-limitations-notice {
+  font-size: $gl-font-size;
   margin-top: 32px;
 }
