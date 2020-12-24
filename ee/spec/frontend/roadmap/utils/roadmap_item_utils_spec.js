@@ -1,38 +1,15 @@
 import * as roadmapItemUtils from 'ee/roadmap/utils/roadmap_item_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
-import { dateFromString, parsePikadayDate } from '~/lib/utils/datetime_utility';
-
-import { rawEpics, mockGroupMilestonesQueryResponse } from '../mock_data';
-
-const mockQuarterlyTimeframe = [
-  {
-    range: [
-      dateFromString('Jan 1 2020'),
-      dateFromString('Feb 1 2020'),
-      dateFromString('Mar 1 2020'),
-    ],
-  },
-  {
-    range: [
-      dateFromString('Apr 1 2020'),
-      dateFromString('May 1 2020'),
-      dateFromString('Jun 1 2020'),
-    ],
-  },
-];
-
-const mockMonthlyTimeframe = [
-  dateFromString('Jan 1 2020'),
-  dateFromString('Feb 1 2020'),
-  dateFromString('Mar 1 2020'),
-];
-
-const mockWeeklyTimeframe = [
-  dateFromString('Dec 6 2020'),
-  dateFromString('Dec 13 2020'),
-  dateFromString('Dec 20 2020'),
-];
+import { dateFromString } from 'helpers/datetime_helpers';
+import { parsePikadayDate } from '~/lib/utils/datetime_utility';
+import {
+  rawEpics,
+  mockGroupMilestonesQueryResponse,
+  mockQuarterly,
+  mockMonthly,
+  mockWeekly,
+} from '../mock_data';
 
 describe('processRoadmapItemDates', () => {
   const timeframeStartDate = new Date(2017, 0, 1);
@@ -168,33 +145,44 @@ describe('lastTimeframeIndex', () => {
 
 describe('timeframeStartDate', () => {
   it.each`
-    presetType               | firstItem                       | timeframe
-    ${PRESET_TYPES.QUARTERS} | ${dateFromString('Jan 1 2020')} | ${mockQuarterlyTimeframe}
-    ${PRESET_TYPES.MONTHS}   | ${dateFromString('Jan 1 2020')} | ${mockMonthlyTimeframe}
-    ${PRESET_TYPES.WEEKS}    | ${dateFromString('Dec 6 2020')} | ${mockWeeklyTimeframe}
+    presetType               | startDate                              | timeframe
+    ${PRESET_TYPES.QUARTERS} | ${mockQuarterly.timeframe[0].range[0]} | ${mockQuarterly.timeframe}
+    ${PRESET_TYPES.MONTHS}   | ${mockMonthly.timeframe[0]}            | ${mockMonthly.timeframe}
+    ${PRESET_TYPES.WEEKS}    | ${mockWeekly.timeframe[0]}             | ${mockWeekly.timeframe}
   `(
-    `should return first item of the timeframe range array when preset type is $presetType`,
-    ({ presetType, firstItem, timeframe }) => {
-      expect(roadmapItemUtils.timeframeStartDate(presetType, timeframe)).toEqual(firstItem);
+    `should return starting date for the timeframe range array when preset type is $presetType`,
+    ({ presetType, startDate, timeframe }) => {
+      expect(roadmapItemUtils.timeframeStartDate(presetType, timeframe)).toEqual(startDate);
     },
   );
 });
 
 describe('timeframeEndDate', () => {
   /*
-    Note that for a weekly timeframe, lastItem should point to the ending date of a week.
-    For example, if in mockWeeklyTimeframe, 'Dec 20 2020' is the last item.
-    However, the ending date for that week is 'Dec 27 2020'.
+    Note: there are inconsistencies in how timeframes are generated.
+
+    A monthly timeframe generated with roadmap_util's getTimeframeForMonthsView function -
+      will always set its last item to the ending date for that month.
+      E.g., [ Oct 1, Nov 1, Dec 31 ]
+
+      The same is true of quarterly timeframes generated with getTimeframeForQuarterlyView
+      E.g., [ ..., { range: [ Oct 1, Nov 1, Dec 31 ] }]
+    
+    In comparison, a weekly timeframe won't have its last item set to the ending date for the week.
+      E.g., [ Oct 25, Nov 1, Nov 8 ]
+
+      In this example,
+      roadmapItemUtils.timeframeEndDate([ Oct 25, Nov 1, Nov 8 ]) should return 'Nov 15'
    */
   it.each`
-    presetType               | lastItem                         | timeframe
-    ${PRESET_TYPES.QUARTERS} | ${dateFromString('Jun 1 2020')}  | ${mockQuarterlyTimeframe}
-    ${PRESET_TYPES.MONTHS}   | ${dateFromString('Mar 1 2020')}  | ${mockMonthlyTimeframe}
-    ${PRESET_TYPES.WEEKS}    | ${dateFromString('Dec 27 2020')} | ${mockWeeklyTimeframe}
+    presetType               | endDate                          | timeframe
+    ${PRESET_TYPES.QUARTERS} | ${dateFromString('Dec 31 2021')} | ${mockQuarterly.timeframe}
+    ${PRESET_TYPES.MONTHS}   | ${dateFromString('May 31 2021')} | ${mockMonthly.timeframe}
+    ${PRESET_TYPES.WEEKS}    | ${dateFromString('Nov 15 2020')} | ${mockWeekly.timeframe}
   `(
-    `should return last item of the timeframe range array when preset type is $presetType`,
-    ({ presetType, lastItem, timeframe }) => {
-      expect(roadmapItemUtils.timeframeEndDate(presetType, timeframe)).toEqual(lastItem);
+    `should return ending date for the timeframe range array when preset type is $presetType`,
+    ({ presetType, endDate, timeframe }) => {
+      expect(roadmapItemUtils.timeframeEndDate(presetType, timeframe)).toEqual(endDate);
     },
   );
 });

@@ -117,7 +117,7 @@ export const extractGroupMilestones = (edges) =>
  *
  * @param {Array} timeframe
  */
-export const lastTimeframeIndex = timeframe => timeframe.length - 1;
+export const lastTimeframeIndex = (timeframe) => timeframe.length - 1;
 
 /**
  * Returns first item of the timeframe array

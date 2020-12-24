@@ -238,6 +238,8 @@ export const toggleEpic = ({ state, dispatch }, { parentItem }) => {
  * so that the epic bars get longer to appear infinitely scrolling.
  */
 export const refreshEpicDates = ({ commit, state }) => {
+  const { presetType, timeframe } = state;
+
   const epics = state.epics.map((epic) => {
     // Update child epic dates too
     if (epic.children?.edges?.length > 0) {
@@ -337,15 +339,10 @@ export const receiveMilestonesFailure = ({ commit }) => {
   flash(s__('GroupRoadmap|Something went wrong while fetching milestones'));
 };
 
-<<<<<<< HEAD
-export const refreshMilestoneDates = ({ commit, state, getters }) => {
-  const milestones = state.milestones.map((milestone) =>
-=======
 export const refreshMilestoneDates = ({ commit, state }) => {
   const { presetType, timeframe } = state;
 
-  const milestones = state.milestones.map(milestone =>
->>>>>>> 1290c5ff943 (Move getter methods into roadmap_item_utils.js)
+  const milestones = state.milestones.map((milestone) =>
     roadmapItemUtils.processRoadmapItemDates(
       milestone,
       roadmapItemUtils.timeframeStartDate(presetType, timeframe),
