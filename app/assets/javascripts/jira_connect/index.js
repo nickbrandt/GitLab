@@ -3,6 +3,7 @@ import $ from 'jquery';
 import setConfigs from '@gitlab/ui/dist/config';
 import App from './components/app.vue';
 import Translate from '~/vue_shared/translate';
+import GlFeatureFlagsPlugin from '~/vue_shared/gl_feature_flags_plugin';
 
 const store = {
   state: {
@@ -77,6 +78,7 @@ const initJiraFormHandlers = () => {
 function initJiraConnect() {
   setConfigs();
   Vue.use(Translate);
+  Vue.use(GlFeatureFlagsPlugin);
 
   const el = document.querySelector('.js-jira-connect-app');
 

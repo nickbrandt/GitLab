@@ -2,6 +2,7 @@
 import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import GroupsList from './groups_list.vue';
 import { __ } from '~/locale';
+import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 
 export default {
   name: 'JiraConnectApp',
@@ -13,6 +14,7 @@ export default {
   directives: {
     GlModalDirective,
   },
+  mixins: [glFeatureFlagsMixin()],
   props: {
     namespacesEndpoint: {
       type: String,
@@ -20,6 +22,9 @@ export default {
     },
   },
   computed: {
+    showNewUi() {
+      return this.glFeatures.newJiraConnectUi;
+    },
     state() {
       return this.$root.$data.state || {};
     },
@@ -38,7 +43,8 @@ export default {
 <template>
   <div>
     <div
-      class="gl-display-flex gl-justify-content-space-between gl-mt-5 gl-pb-4 gl-border-b-solid gl-border-b-1 gl-border-b-gray-200"
+      v-if="showNewUi"
+      class="gl-display-flex gl-justify-content-space-between gl-mt-5 gl-mb-5 gl-pb-4 gl-border-b-solid gl-border-b-1 gl-border-b-gray-200"
     >
       <h3>{{ s__('Integrations|Linked namespaces') }}</h3>
       <gl-button
