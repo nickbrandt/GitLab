@@ -106,6 +106,7 @@ export default {
       },
       variables() {
         return {
+          projectPath: this.projectPath,
           content: this.contentModel,
         };
       },
