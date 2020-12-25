@@ -63,7 +63,7 @@ describe('Approvals ApproversSelect', () => {
       ...options,
       propsData,
       localVue,
-      attachToDocument: true,
+      attachTo: document.body,
     });
 
     await waitForPromises();

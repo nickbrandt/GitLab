@@ -58,8 +58,20 @@ Object.entries(jqueryMatchers).forEach(([matcherName, matcherFactory]) => {
 
 expect.extend(customMatchers);
 
-// Tech debt issue TBD
-testUtilsConfig.logModifiedComponents = false;
+testUtilsConfig.deprecationWarningHandler = (method, message) => {
+  const ALLOWED_DEPRECATED_METHODS = [
+    // https://gitlab.com/gitlab-org/gitlab/-/issues/295679
+    'finding components with `find` or `get`',
+
+    // https://gitlab.com/gitlab-org/gitlab/-/issues/295680
+    'finding components with `findAll`',
+
+    'options.attachToDocument is deprecated in favor of options.attachTo and will be removed in a future release',
+  ];
+  if (!ALLOWED_DEPRECATED_METHODS.includes(method)) {
+    global.console.error(message);
+  }
+};
 
 Object.assign(global, {
   requestIdleCallback(cb) {
