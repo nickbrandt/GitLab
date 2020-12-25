@@ -65,8 +65,6 @@ testUtilsConfig.deprecationWarningHandler = (method, message) => {
 
     // https://gitlab.com/gitlab-org/gitlab/-/issues/295680
     'finding components with `findAll`',
-
-    'options.attachToDocument is deprecated in favor of options.attachTo and will be removed in a future release',
   ];
   if (!ALLOWED_DEPRECATED_METHODS.includes(method)) {
     global.console.error(message);
