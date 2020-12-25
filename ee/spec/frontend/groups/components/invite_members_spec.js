@@ -53,7 +53,7 @@ describe('User invites', () => {
     beforeEach(() => {
       wrapper = mount(Component, {
         propsData: { emails: [], docsPath: 'https://some.doc.path' },
-        attachToDocument: true,
+        attachTo: document.body,
       });
 
       clickButton();
