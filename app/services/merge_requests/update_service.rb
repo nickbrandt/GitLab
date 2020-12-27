@@ -126,6 +126,12 @@ module MergeRequests
     override :handle_quick_actions
     def handle_quick_actions(merge_request)
       super
+
+      # Ignore /merge if /rebase is used to avoid an unexpected race
+      params.delete(:merge) if params[:rebase] && params[:merge]
+      # Rebase is handled in MergeRequestActions to provide user feedback
+      params.delete(:rebase)
+
       merge_from_quick_action(merge_request) if params[:merge]
     end
 

@@ -56,6 +56,9 @@ module Gitlab
           access_check.can_push_to_branch?(merge_request.source_branch)
         end
         command :rebase do
+          # This will be used to avoid simultaneous /merge and /rebase actions
+          @updates[:rebase] = true
+
           result = MergeRequests::RebaseService.new(quick_action_target.project, current_user)
                       .execute(quick_action_target)
 

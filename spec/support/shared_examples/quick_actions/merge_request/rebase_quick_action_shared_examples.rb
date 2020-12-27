@@ -14,6 +14,14 @@ RSpec.shared_examples 'rebase quick action' do
       expect(page).not_to have_content('commit behind the target branch')
       expect(merge_request.reload).not_to be_merged
     end
+
+    it 'ignores /merge if /rebase is specified', :sidekiq_inline do
+      fill_in('Description', with: "/merge\n/rebase")
+      click_button('Save changes')
+
+      expect(page).not_to have_content('commit behind the target branch')
+      expect(merge_request.reload).not_to be_merged
+    end
   end
 
   context 'when creating a new note' do
