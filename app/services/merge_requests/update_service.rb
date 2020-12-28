@@ -127,12 +127,12 @@ module MergeRequests
     def handle_quick_actions(merge_request)
       super
 
-      # Ensure this parameter gets used as an attribute
+      # Ensure this parameter does not get used as an attribute
       rebase = params.delete(:rebase)
 
       if rebase
         rebase_from_quick_action(merge_request)
-        # Ignore /merge if /rebase is used to avoid an unexpected race
+        # Ignore "/merge" if "/rebase" is used to avoid an unexpected race
         params.delete(:merge)
       end
 
