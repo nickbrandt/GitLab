@@ -2,19 +2,19 @@
 
 ## Introduction
 
-Observability is an important part of creating a good software system. Observability is about bringing visibility into a system to see and understand the state of each component, with context, to support performance tuning, and debugging. GitLab has a rich and detailed observability platform that includes a set of [monitoring dashboards](https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups) designed for each stage group.
+Observability is about bringing visibility into a system to see and understand the state of each component, with context, to support performance tuning, and debugging. To run a SaaS platform at scale, rich and detailed observability platform is a necessity. We'll take at a look at a set of monitoring dashboards designed for [each stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
 
-The [Stage Group Dashboards](https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups) are a set of dashboards tailored to the needs of Development development engineers. They are designed to bring the Stage Groups closer to understanding how their code operates on GitLab.com. They also help make them more aware of the impact of code changes, deployments, and feature-flag toggles.
+These dashboards are designed to give an insight, to everyone working within a feature category, into how their code operates at GitLab.com scale. They are grouped per stage group to show the impact of feature/code changes, deployments, and feature-flag toggles.
 
 Each stage group has a dashboard consisting of metrics at the application level, such as Rails Web Requests, Rails API Requests, Sidekiq Jobs, and so on. The metrics in each dashboard are filtered and accumulated based on the [GitLab product categories](https://about.gitlab.com/handbook/product/categories/) and [feature categories](feature_categorization/index.md).
 
-The list of dashboards for each stage group is accessible at [https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups](https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups) for GitLab team members only.
+The list of dashboards for each stage group is accessible at [https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups](https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups) (GitLab team members only), or at [the public mirror](https://dashboards.gitlab.com/dashboards?tag=feature_category&tag=stage-groups) (Accessible to everyone with a GitLab.com account, with some limitations).
 
 Please note that the dashboards for stage groups are at a very early stage. All contributions are welcome. If you have any questions or suggestions, please submit an issue in the [Scalability Team issues tracker](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/new).
 
 ## Usage
 
-Inside a stage group dashboard, there are some notable components. In the example below, we use the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1).
+Inside a stage group dashboard, there are some notable components. As an example, we will show the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1).
 
 **Disclaimer**: the stage group dashboard used for example here was chosen arbitrarily.
 
@@ -33,7 +33,7 @@ In each dashboard, there are two filters and some annotations switches on the to
 ![Filters and annotations](img/stage_group_dashboards_filters.png)
 
 - `PROMETHEUS_DS` _(filter)_: filter the selective [Prometheus data sources](https://about.gitlab.com/handbook/engineering/monitoring/#prometheus). Most of the time, you don't need to care about this filter.
-- `environment` _(filter)_: filter the environment the metrics are fetched from. The default setting is production (`gprd`). Read more at [Production Environment](https://about.gitlab.com/handbook/engineering/infrastructure/production/architecture/#environments).
+- `environment` _(filter)_: filter the environment the metrics are fetched from. The default setting is production (`gprd`). Check [Production Environment mapping](https://about.gitlab.com/handbook/engineering/infrastructure/production/architecture/#environments) for other possibilities.
 - `deploy` _(annotations)_: mark a deployment event on the GitLab.com SaaS platform.
 - `canary-deploy` _(annotations)_: mark a [canary deployment](https://about.gitlab.com/handbook/engineering/#sts=Canary%20Testing) event on the GitLab.com SaaS platform.
 - `feature-flags` _(annotations)_: mark the time point where a feature flag is updated.
@@ -76,17 +76,17 @@ All the dashboards are powered by [Grafana](https://grafana.com/), a frontend fo
 
 ### Scenario 1: Verify and debug an issue after a deployment
 
-- A team member in the Code Review group has merged an MR and deployed it into the production.
-- To verify the deployment, that team member accesses the [Code Review group's dashboard](https://dashboards.gitlab.net/d/stage-groups-code_review/stage-groups-group-dashboard-create-code-review?orgId=1).
-- Sidekiq Error Rate panel seems to have an issue. `UpdateMergeRequestsWorker`'s error rate' suddenly increases after their deployment.
+- A team member in the Code Review group has merged an MR which got deployed to production.
+- To verify the deployment, we can check the [Code Review group's dashboard](https://dashboards.gitlab.net/d/stage-groups-code_review/stage-groups-group-dashboard-create-code-review?orgId=1).
+- Sidekiq Error Rate panel shows an elevated error rate, specifically `UpdateMergeRequestsWorker`.
 
 ![Debug 1](img/stage_group_dashboards_debug_1.png)
 
-- Clicking on `Kibana: Kibana Sidekiq failed request logs` link in the Extra links session, that member continues filtering for `UpdateMergeRequestsWorker` and skim through the logs.
+- If we click on `Kibana: Kibana Sidekiq failed request logs` link in the Extra links session, we can filter for `UpdateMergeRequestsWorker`, and read through the logs.
 
 ![Debug 2](img/stage_group_dashboards_debug_2.png)
 
-- That member opens [Sentry](https://sentry.gitlab.net/gitlab/gitlabcom), filter by transaction type, and correlation_id from a Kibana's result item.
+- [Sentry](https://sentry.gitlab.net/gitlab/gitlabcom) gives us a way to find the exception where we can filter by transaction type, and correlation_id from a Kibana's result item.
 
 ![Debug 3](img/stage_group_dashboards_debug_3.png)
 
@@ -94,7 +94,7 @@ All the dashboards are powered by [Grafana](https://grafana.com/), a frontend fo
 
 ## How to customize the dashboard?
 
-All Grafana dashboards at GitLab are generated from the [Jsonnet files](https://github.com/grafana/grafonnet-lib) stored in [the runbook project](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards). Particularly, the stage group dashboards definitions are stored in [/dashboards/stage-groups](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards/stage-groups) subfolder in the Runbook. By convention, each group has a corresponding jsonnet file. The dashboards are synced with GitLab [stage group data](https://gitlab.com/gitlab-com/www-gitlab-com/-/raw/master/data/stages.yml) every month. Expansion and customization are one of the key principles when we design this system. To customize your group's dashboard, you need to edit the corresponding file and follow the [Runbook workflow](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards#dashboard-source). The dashboard is updated after the MR is merged. Looking at an autogenerated file, for example, [product_planning.dashboard.jsonnet](https://gitlab.com/gitlab-com/runbooks/-/blob/master/dashboards/stage-groups/product_planning.dashboard.jsonnet):
+All Grafana dashboards at GitLab are generated from the [Jsonnet files](https://github.com/grafana/grafonnet-lib) stored in [the runbook project](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards). Particularly, the stage group dashboards definitions are stored in [/dashboards/stage-groups](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards/stage-groups) subfolder in the Runbook. By convention, each group has a corresponding jsonnet file. The dashboards are synced with GitLab [stage group data](https://gitlab.com/gitlab-com/www-gitlab-com/-/raw/master/data/stages.yml) every month. Expansion and customization are one of the key principles used when we designed this system. To customize your group's dashboard, you need to edit the corresponding file and follow the [Runbook workflow](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards#dashboard-source). The dashboard is updated after the MR is merged. Looking at an autogenerated file, for example, [product_planning.dashboard.jsonnet](https://gitlab.com/gitlab-com/runbooks/-/blob/master/dashboards/stage-groups/product_planning.dashboard.jsonnet):
 
 ```jsonnet
 // This file is autogenerated using scripts/update_stage_groups_dashboards.rb
