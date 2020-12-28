@@ -8,7 +8,7 @@ module Projects
       push_frontend_feature_flag(:dast_saved_scans, @project, default_enabled: :yaml)
     end
 
-    before_action :authorize_read_on_demand_scans!, only: [:index]
+    before_action :authorize_read_on_demand_scans!, only: :index
     before_action :authorize_create_on_demand_dast_scan!, only: [:new, :edit]
 
     feature_category :dynamic_application_security_testing
