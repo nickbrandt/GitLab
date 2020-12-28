@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Observability is about bringing visibility into a system to see and understand the state of each component, with context, to support performance tuning, and debugging. To run a SaaS platform at scale, rich and detailed observability platform is a necessity. We'll take at a look at a set of monitoring dashboards designed for [each stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
+Observability is about bringing visibility into a system to see and understand the state of each component, with context, to support performance tuning, and debugging. To run a SaaS platform at scale, rich and detailed observability platform is a necessity. We take at a look at a set of monitoring dashboards designed for [each stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
 
-These dashboards are designed to give an insight, to everyone working within a feature category, into how their code operates at GitLab.com scale. They are grouped per stage group to show the impact of feature/code changes, deployments, and feature-flag toggles.
+These dashboards are designed to give an insight, to everyone working in a feature category, into how their code operates at GitLab.com scale. They are grouped per stage group to show the impact of feature/code changes, deployments, and feature-flag toggles.
 
 Each stage group has a dashboard consisting of metrics at the application level, such as Rails Web Requests, Rails API Requests, Sidekiq Jobs, and so on. The metrics in each dashboard are filtered and accumulated based on the [GitLab product categories](https://about.gitlab.com/handbook/product/categories/) and [feature categories](feature_categorization/index.md).
 
@@ -14,7 +14,7 @@ Please note that the dashboards for stage groups are at a very early stage. All 
 
 ## Usage
 
-Inside a stage group dashboard, there are some notable components. As an example, we will show the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1).
+Inside a stage group dashboard, there are some notable components. As an example, we show the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1).
 
 **Disclaimer**: the stage group dashboard used for example here was chosen arbitrarily.
 
@@ -23,7 +23,7 @@ Inside a stage group dashboard, there are some notable components. As an example
 ![Default time filter](img/stage_group_dashboards_time_filter.png)
 
 - By default, all the times are in UTC timezone. [We use UTC when communicating in Engineering](https://about.gitlab.com/handbook/communication/#writing-style-guidelines).
-- All metrics recorded in the GitLab production system have 14-day retention.
+- All metrics recorded in the GitLab production system have [1-year retention](https://gitlab.com/gitlab-cookbooks/gitlab-prometheus/-/blob/master/attributes/prometheus.rb#L40).
 - Alternatively, you can zoom in or filter the time range directly on a graph. Please visit [Grafana Time Range Controls](https://grafana.com/docs/grafana/latest/dashboards/time-range-controls/) for more information.
 
 ### Filters and annotations
@@ -32,7 +32,7 @@ In each dashboard, there are two filters and some annotations switches on the to
 
 ![Filters and annotations](img/stage_group_dashboards_filters.png)
 
-- `PROMETHEUS_DS` _(filter)_: filter the selective [Prometheus data sources](https://about.gitlab.com/handbook/engineering/monitoring/#prometheus). Most of the time, you don't need to care about this filter.
+- `PROMETHEUS_DS` _(filter)_: filter the selective [Prometheus data sources](https://about.gitlab.com/handbook/engineering/monitoring/#prometheus). The default value is `Global`, which aggregates the data from all available data sources. Most of the time, you don't need to care about this filter.
 - `environment` _(filter)_: filter the environment the metrics are fetched from. The default setting is production (`gprd`). Check [Production Environment mapping](https://about.gitlab.com/handbook/engineering/infrastructure/production/architecture/#environments) for other possibilities.
 - `deploy` _(annotations)_: mark a deployment event on the GitLab.com SaaS platform.
 - `canary-deploy` _(annotations)_: mark a [canary deployment](https://about.gitlab.com/handbook/engineering/#sts=Canary%20Testing) event on the GitLab.com SaaS platform.
@@ -52,19 +52,27 @@ Most of the metrics displayed in the panels are self-explanatory in their title 
 - All the rate metrics' units are `requests per second`. The default aggregate time frame is 1 minute.
 - All the rate metrics are more accurate when the data is big enough. The default floating-point precision is 2. In some extremely low panels, you would see `0.00` although there is still some real traffic.
 
-#### Examples
+#### Example 1: time series metrics
 
-![Metrics example 1](img/stage_group_dashboards_metrics_1.png)
+Let's look at an example of a Web Request panel. This panel shows the requests per second of the requests handled by Rails controllers. Taking 3 consecutive data points of `Projects::RawController#show`:
 
-Let's look at an example of a Web Request panel. Taking 3 consecutive data points of `Projects::RawController#show`:
+![Metrics example 1-1](img/stage_group_dashboards_metrics_1_1.png)
 
 - `2020-12-25 00:42:00`: `34.13`. As the default aggregate time frame is 1 minute, it means at the minute 42 (from `2020-12-25 00:42:00` to `2020-12-25 00:42:59` ), there are approximately `34.13 * 60 = ~ 2047` requests processed by the web servers.
+
+![Metrics example 1-2](img/stage_group_dashboards_metrics_1_2.png)
+
 - `2020-12-25 00:43:00`: `31.13`. Similarly, there are approximately `1868` requests from `2020-12-25 00:43:00` to `2020-12-25 00:43:59`
+
+![Metrics example 1-3](img/stage_group_dashboards_metrics_1_3.png)
+
 - `2020-12-25 00:44:00`: `38.27`. Similarly, there are approximately `2296` requests from `2020-12-25 00:44:00` to `2020-12-25 00:44:59`
+
+#### Example 2: decimal fraction
 
 ![Metrics example 2](img/stage_group_dashboards_metrics_2.png)
 
-Let's look at another example of a Sidekiq Error Rate panel. `RepositoryUpdateMirrorWorker` error rate at `2020-12-25 02:04:00` is `0.07`, equivalent to `4.2`. It's weird, right? It turns out that the data point is rounded up. The raw result is `0.06666666667`, equivalent to `4`. You may encounter this type of gotcha frequently in the future.
+You may encounter some gotchas related to decimal fraction and rounding up frequently, especially in low-traffic components. Let's look at an example of a Sidekiq Error Rate panel. `RepositoryUpdateMirrorWorker` error rate at `2020-12-25 02:04:00` is `0.07`, equivalent to `4.2` jobs per minute. What is `4.2 jobs per minute` supposed to mean? It turns out that the data point is rounded up. The raw result is `0.06666666667`, equivalent to `4`. Looking at the raw data via [Inspection](#inspection-and-custom-queries) helps you overcome this issue.
 
 #### Inspection and custom queries
 
@@ -73,8 +81,6 @@ To inspect the raw data of the panel for further calculation, click on the Inspe
 All the dashboards are powered by [Grafana](https://grafana.com/), a frontend for displaying metrics. Grafana consumes the data returned from queries to backend Prometheus data source, then presents them under different visualizations. The stage group dashboards are built to serve the most common use cases with a limited set of filters, and pre-built queries. Grafana provides a way to explore and visualize the metrics data with [Grafana Explore](https://grafana.com/docs/grafana/latest/explore/). This would require some knowledge about [Prometheus Promql query language](https://prometheus.io/docs/prometheus/latest/querying/basics/).
 
 ## How to debug with the dashboards?
-
-### Scenario 1: Verify and debug an issue after a deployment
 
 - A team member in the Code Review group has merged an MR which got deployed to production.
 - To verify the deployment, we can check the [Code Review group's dashboard](https://dashboards.gitlab.net/d/stage-groups-code_review/stage-groups-group-dashboard-create-code-review?orgId=1).
