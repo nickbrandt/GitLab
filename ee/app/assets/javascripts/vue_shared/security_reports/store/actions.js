@@ -204,6 +204,7 @@ export const dismissVulnerability = ({ state, dispatch }, comment) => {
         feedback_type: FEEDBACK_TYPE_DISMISSAL,
         pipeline_id: state.pipelineId,
         project_fingerprint: state.modal.vulnerability.project_fingerprint,
+        finding_uuid: state.modal.vulnerability.uuid,
         vulnerability_data: state.modal.vulnerability,
       },
     })
@@ -367,6 +368,7 @@ export const createNewIssue = ({ state, dispatch }) => {
         feedback_type: FEEDBACK_TYPE_ISSUE,
         category: state.modal.vulnerability.category,
         project_fingerprint: state.modal.vulnerability.project_fingerprint,
+        finding_uuid: state.modal.vulnerability.uuid,
         pipeline_id: state.pipelineId,
         vulnerability_data: state.modal.vulnerability,
       },
@@ -398,6 +400,7 @@ export const createMergeRequest = ({ state, dispatch }) => {
         feedback_type: FEEDBACK_TYPE_MERGE_REQUEST,
         category,
         project_fingerprint,
+        finding_uuid: vulnerability.uuid,
         vulnerability_data: vulnerability,
       },
     })
