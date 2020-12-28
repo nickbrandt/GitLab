@@ -133,6 +133,7 @@ RSpec.describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
 
       context 'when project rule is present' do
         let!(:project_rule) { create(:approval_project_rule, project: target.target_project) }
+        let(:rule_under_test) { target.approval_rules.regular.first }
 
         before do
           user = create(:user)
@@ -140,17 +141,43 @@ RSpec.describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
           create_member_in(user, :old_schema)
         end
 
-        it "sets MR rule's source to project rule without duplication" do
+        it "sets MR rule's source to project rule" do
           described_class.new.perform(target_type, target.id)
 
-          expect(target.approval_rules.regular.first.approval_project_rule).to eq(project_rule)
+          expect(rule_under_test.approval_project_rule).to eq(project_rule)
         end
 
-        context "when modified from the project rule" do
-          it "updates the modified_from_project_rule attribute" do
+        context "when modified from its project rule" do
+          # Due to how the BackgroundMigration interacts with the records
+          #   created by FactoryBot, our default state is to report the newly
+          #   created ApprovalMergeRequestRules as `overridden? == true`
+          #
+          it "sets modified_from_project_rule attribute as true" do
             described_class.new.perform(target_type, target.id)
 
-            expect(target.approval_rules.regular.first.modified_from_project_rule).to be_truthy
+            expect(rule_under_test.modified_from_project_rule).to be_truthy
+          end
+        end
+
+        context "when unmodified from its project rule" do
+          # Because the classes used in the BackgroundMigration are dynamically
+          #   created, we can't interact with them here in RSpec without jumping
+          #   through some intricate hoops, so instead we manually set the attrs
+          #   of the related ApprovalProjectRule to match what FactoryBot will
+          #   create.
+          #
+          before do
+            project_rule.update!(
+              approvals_required: 2,
+              name: ApprovalRuleLike::DEFAULT_NAME,
+              user_ids: [User.last.id]
+            )
+          end
+
+          it "sets modified_from_project_rule attribute as false" do
+            described_class.new.perform(target_type, target.id)
+
+            expect(rule_under_test.modified_from_project_rule).to be_falsy
           end
         end
       end
