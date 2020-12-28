@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Observability is about bringing visibility into a system to see and understand the state of each component, with context, to support performance tuning, and debugging. To run a SaaS platform at scale, rich and detailed observability platform is a necessity. We take at a look at a set of monitoring dashboards designed for [each stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
+Observability is about bringing visibility into a system to see and understand the state of each component, with context, to support performance tuning and debugging. To run a SaaS platform at scale, rich and detailed observability platform is a necessity. We have a set of monitoring dashboards designed for [each stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
 
 These dashboards are designed to give an insight, to everyone working in a feature category, into how their code operates at GitLab.com scale. They are grouped per stage group to show the impact of feature/code changes, deployments, and feature-flag toggles.
 
@@ -14,7 +14,7 @@ Please note that the dashboards for stage groups are at a very early stage. All 
 
 ## Usage
 
-Inside a stage group dashboard, there are some notable components. As an example, we show the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1).
+Inside a stage group dashboard, there are some notable components. Let's look at the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1), chosen at random.
 
 **Disclaimer**: the stage group dashboard used for example here was chosen arbitrarily.
 
@@ -23,7 +23,7 @@ Inside a stage group dashboard, there are some notable components. As an example
 ![Default time filter](img/stage_group_dashboards_time_filter.png)
 
 - By default, all the times are in UTC timezone. [We use UTC when communicating in Engineering](https://about.gitlab.com/handbook/communication/#writing-style-guidelines).
-- All metrics recorded in the GitLab production system have [1-year retention](https://gitlab.com/gitlab-cookbooks/gitlab-prometheus/-/blob/master/attributes/prometheus.rb#L40).
+- All metrics recorded in the GitLab production system have [1-year retention](https://gitlab.com/gitlab-cookbooks/gitlab-prometheus/-/blob/31526b03fef823e2f9b3cda7c75dcd28a12418a3/attributes/prometheus.rb#L40).
 - Alternatively, you can zoom in or filter the time range directly on a graph. Please visit [Grafana Time Range Controls](https://grafana.com/docs/grafana/latest/dashboards/time-range-controls/) for more information.
 
 ### Filters and annotations
@@ -35,7 +35,7 @@ In each dashboard, there are two filters and some annotations switches on the to
 - `PROMETHEUS_DS` _(filter)_: filter the selective [Prometheus data sources](https://about.gitlab.com/handbook/engineering/monitoring/#prometheus). The default value is `Global`, which aggregates the data from all available data sources. Most of the time, you don't need to care about this filter.
 - `environment` _(filter)_: filter the environment the metrics are fetched from. The default setting is production (`gprd`). Check [Production Environment mapping](https://about.gitlab.com/handbook/engineering/infrastructure/production/architecture/#environments) for other possibilities.
 - `deploy` _(annotations)_: mark a deployment event on the GitLab.com SaaS platform.
-- `canary-deploy` _(annotations)_: mark a [canary deployment](https://about.gitlab.com/handbook/engineering/#sts=Canary%20Testing) event on the GitLab.com SaaS platform.
+- `canary-deploy` _(annotations)_: mark a [canary deployment](https://about.gitlab.com/handbook/engineering/#canary-testing) event on the GitLab.com SaaS platform.
 - `feature-flags` _(annotations)_: mark the time point where a feature flag is updated.
 
 This is an example of a feature flag annotation displayed on a dashboard panel:
@@ -50,7 +50,7 @@ Most of the metrics displayed in the panels are self-explanatory in their title 
 
 - The events are counted, measured, accumulated, then collected, and stored as [time series](https://prometheus.io/docs/concepts/data_model/). The data are calculated using statistical methods to produce metrics. It means that metrics are approximately correct and meaningful over a time period. They help you have an overview of the stage of a system over time. They are not meant to give you precise numbers of a discrete event. If you need a higher level of accuracy, please look at another monitoring tool like [logs](https://about.gitlab.com/handbook/engineering/monitoring/#logs). Please read the following examples for more explanations.
 - All the rate metrics' units are `requests per second`. The default aggregate time frame is 1 minute.
-- All the rate metrics are more accurate when the data is big enough. The default floating-point precision is 2. In some extremely low panels, you would see `0.00` although there is still some real traffic.
+- All the rate metrics are more accurate when the data is big enough. The default floating-point precision is 2. In some extremely low traffic cases, you would see `0.00` although there is still some real traffic.
 
 #### Example 1: time series metrics
 
@@ -80,7 +80,7 @@ To inspect the raw data of the panel for further calculation, click on the Inspe
 
 All the dashboards are powered by [Grafana](https://grafana.com/), a frontend for displaying metrics. Grafana consumes the data returned from queries to backend Prometheus data source, then presents them under different visualizations. The stage group dashboards are built to serve the most common use cases with a limited set of filters, and pre-built queries. Grafana provides a way to explore and visualize the metrics data with [Grafana Explore](https://grafana.com/docs/grafana/latest/explore/). This would require some knowledge about [Prometheus Promql query language](https://prometheus.io/docs/prometheus/latest/querying/basics/).
 
-## How to debug with the dashboards?
+## How to debug with the dashboards
 
 - A team member in the Code Review group has merged an MR which got deployed to production.
 - To verify the deployment, we can check the [Code Review group's dashboard](https://dashboards.gitlab.net/d/stage-groups-code_review/stage-groups-group-dashboard-create-code-review?orgId=1).
