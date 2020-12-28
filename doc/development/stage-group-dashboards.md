@@ -44,37 +44,14 @@ This is an example of a feature flag annotation displayed on a dashboard panel:
 
 ### Metrics panels
 
-#### Notable details
+![Metrics panels](img/stage_group_dashboards_metrics.png)
 
 Most of the metrics displayed in the panels are self-explanatory in their title and nearby description, but please note the following:
 
 - The events are counted, measured, accumulated, then collected, and stored as [time series](https://prometheus.io/docs/concepts/data_model/). The data are calculated using statistical methods to produce metrics. It means that metrics are approximately correct and meaningful over a time period. They help you have an overview of the stage of a system over time. They are not meant to give you precise numbers of a discrete event. If you need a higher level of accuracy, please look at another monitoring tool like [logs](https://about.gitlab.com/handbook/engineering/monitoring/#logs). Please read the following examples for more explanations.
-- All the rate metrics' units are `requests per second`. The default aggregate time frame is 1 minute.
-- All the rate metrics are more accurate when the data is big enough. The default floating-point precision is 2. In some extremely low traffic cases, you would see `0.00` although there is still some real traffic.
-
-#### Example 1: time series metrics
-
-Let's look at an example of a Web Request panel. This panel shows the requests per second of the requests handled by Rails controllers. Taking 3 consecutive data points of `Projects::RawController#show`:
-
-![Metrics example 1-1](img/stage_group_dashboards_metrics_1_1.png)
-
-- `2020-12-25 00:42:00`: `34.13`. As the default aggregate time frame is 1 minute, it means at the minute 42 (from `2020-12-25 00:42:00` to `2020-12-25 00:42:59` ), there are approximately `34.13 * 60 = ~ 2047` requests processed by the web servers.
-
-![Metrics example 1-2](img/stage_group_dashboards_metrics_1_2.png)
-
-- `2020-12-25 00:43:00`: `31.13`. Similarly, there are approximately `1868` requests from `2020-12-25 00:43:00` to `2020-12-25 00:43:59`
-
-![Metrics example 1-3](img/stage_group_dashboards_metrics_1_3.png)
-
-- `2020-12-25 00:44:00`: `38.27`. Similarly, there are approximately `2296` requests from `2020-12-25 00:44:00` to `2020-12-25 00:44:59`
-
-#### Example 2: decimal fraction
-
-![Metrics example 2](img/stage_group_dashboards_metrics_2.png)
-
-You may encounter some gotchas related to decimal fraction and rounding up frequently, especially in low-traffic components. Let's look at an example of a Sidekiq Error Rate panel. `RepositoryUpdateMirrorWorker` error rate at `2020-12-25 02:04:00` is `0.07`, equivalent to `4.2` jobs per minute. What is `4.2 jobs per minute` supposed to mean? It turns out that the data point is rounded up. The raw result is `0.06666666667`, equivalent to `4`. Looking at the raw data via [Inspection](#inspection-and-custom-queries) helps you overcome this issue.
-
-#### Inspection and custom queries
+- All the rate metrics' units are `requests per second`. The default aggregate time frame is 1 minute. For example, a panel shows the requests per second number at `2020-12-25 00:42:00` is `34.13`. It means at the minute 42 (from `2020-12-25 00:42:00` to `2020-12-25 00:42:59` ), there are approximately `34.13 * 60 = ~ 2047` requests processed by the web servers.
+- You may encounter some gotchas related to decimal fraction and rounding up frequently, especially in low-traffic cases. For example, the error rate of `RepositoryUpdateMirrorWorker` at `2020-12-25 02:04:00` is `0.07`, equivalent to `4.2` jobs per minute. The raw result is `0.06666666667`, equivalent to 4 jobs per minute.
+- All the rate metrics are more accurate when the data is big enough. The default floating-point precision is 2. In some extremely low panels, you would see `0.00` although there is still some real traffic.
 
 To inspect the raw data of the panel for further calculation, click on the Inspect button from the dropdown menu of a panel. Queries, raw data, and panel JSON structure are available. Read more at [Grafana panel inspection](https://grafana.com/docs/grafana/latest/panels/inspect-panel/).
 
