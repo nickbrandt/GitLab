@@ -11880,9 +11880,6 @@ msgstr ""
 msgid "Failed to save preferences."
 msgstr ""
 
-msgid "Failed to schedule a rebase of %{branch}."
-msgstr ""
-
 msgid "Failed to set due date because the date format is invalid."
 msgstr ""
 

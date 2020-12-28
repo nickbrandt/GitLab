@@ -59,17 +59,9 @@ module Gitlab
           # This will be used to avoid simultaneous /merge and /rebase actions
           @updates[:rebase] = true
 
-          result = MergeRequests::RebaseService.new(quick_action_target.project, current_user)
-                      .execute(quick_action_target)
-
           branch = quick_action_target.source_branch
 
-          @execution_message[:rebase] =
-            if result[:status] == :success
-              _('Scheduled a rebase of branch %{branch}.')
-            else
-              _('Failed to schedule a rebase of %{branch}.')
-            end % { branch: branch }
+          @execution_message[:rebase] = _('Scheduled a rebase of branch %{branch}.') % { branch: branch }
         end
 
         desc 'Toggle the Draft status'
