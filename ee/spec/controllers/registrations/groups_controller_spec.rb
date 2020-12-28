@@ -52,13 +52,16 @@ RSpec.describe Registrations::GroupsController do
   end
 
   describe 'POST #create' do
-    let(:group_params) do
-      { name: 'Group name', path: 'group-path', visibility_level: Gitlab::VisibilityLevel::PRIVATE, emails: ['', ''] }
+    let_it_be(:glm_params) { {} }
+    let_it_be(:trial_form_params) { { trial: 'false' } }
+    let_it_be(:trial_onboarding_issues_enabled) { false }
+    let_it_be(:trial_onboarding_flow_params) { {} }
+    let(:group_params) { { name: 'Group name', path: 'group-path', visibility_level: Gitlab::VisibilityLevel::PRIVATE, emails: ['', ''] } }
+    let(:params) do
+      { group: group_params }.merge(glm_params).merge(trial_form_params).merge(trial_onboarding_flow_params)
     end
 
-    subject { post :create, params: { group: group_params }.merge(trial_form_params) }
-
-    let_it_be(:trial_form_params) { { trial: 'false' } }
+    subject { post :create, params: params }
 
     context 'with an unauthenticated user' do
       it { is_expected.to have_gitlab_http_status(:redirect) }
@@ -68,7 +71,7 @@ RSpec.describe Registrations::GroupsController do
     context 'with an authenticated user' do
       before do
         sign_in(user)
-        stub_experiment_for_subject(onboarding_issues: true)
+        stub_experiment_for_subject(onboarding_issues: true, trial_onboarding_issues: trial_onboarding_issues_enabled)
       end
 
       it 'creates a group' do
@@ -86,6 +89,7 @@ RSpec.describe Registrations::GroupsController do
 
       context 'in experiment group for trial_during_signup' do
         let_it_be(:group) { create(:group) }
+        let_it_be(:glm_params) { { glm_source: 'gitlab.com', glm_content: 'content' } }
         let_it_be(:trial_form_params) do
           {
             trial: 'true',
@@ -119,11 +123,15 @@ RSpec.describe Registrations::GroupsController do
         let_it_be(:apply_trial_params) do
           {
             uid: user.id,
-            trial_user: {
-              namespace_id: group.id,
-              gitlab_com_trial: true,
-              sync_to_gl: true
-            }
+            trial_user: ActionController::Parameters.new(
+              {
+                glm_source: 'gitlab.com',
+                glm_content: 'content',
+                namespace_id: group.id,
+                gitlab_com_trial: true,
+                sync_to_gl: true
+              }
+            ).permit!
           }
         end
 
@@ -166,6 +174,36 @@ RSpec.describe Registrations::GroupsController do
 
       it_behaves_like GroupInviteMembers
 
+      context 'when the trial onboarding is active' do
+        let_it_be(:group) { create(:group) }
+        let_it_be(:trial_onboarding_flow_params) { { trial_onboarding_flow: true, glm_source: 'about.gitlab.com', glm_content: 'content' } }
+        let_it_be(:trial_onboarding_issues_enabled) { true }
+        let_it_be(:apply_trial_params) do
+          {
+            uid: user.id,
+            trial_user: ActionController::Parameters.new(
+              {
+                glm_source: 'about.gitlab.com',
+                glm_content: 'content',
+                namespace_id: group.id,
+                gitlab_com_trial: true,
+                sync_to_gl: true
+              }
+            ).permit!
+          }
+        end
+
+        it 'applies the trial to the group and redirects to the project path' do
+          expect_next_instance_of(::Groups::CreateService) do |service|
+            expect(service).to receive(:execute).and_return(group)
+          end
+          expect_next_instance_of(GitlabSubscriptions::ApplyTrialService) do |service|
+            expect(service).to receive(:execute).with(apply_trial_params).and_return({ success: true })
+          end
+          is_expected.to redirect_to(new_users_sign_up_project_path(namespace_id: group.id, trial: false, trial_onboarding_flow: true))
+        end
+      end
+
       context 'when the group cannot be saved' do
         let(:group_params) { { name: '', path: '' } }
 
@@ -183,6 +221,15 @@ RSpec.describe Registrations::GroupsController do
 
         it { is_expected.to have_gitlab_http_status(:ok) }
         it { is_expected.to render_template(:new) }
+
+        context 'when the trial onboarding is active' do
+          let_it_be(:group) { create(:group) }
+          let_it_be(:trial_onboarding_flow_params) { { trial_onboarding_flow: true } }
+          let_it_be(:trial_onboarding_issues_enabled) { true }
+
+          it { is_expected.not_to receive(:apply_trial) }
+          it { is_expected.to render_template(:new) }
+        end
       end
 
       context 'with the experiment not enabled for user' do
