@@ -2,13 +2,13 @@
 
 ## Introduction
 
-Observability is about bringing visibility into a system to see and understand the state of each component, with context, to support performance tuning and debugging. To run a SaaS platform at scale, rich and detailed observability platform is a necessity. We have a set of monitoring dashboards designed for [each stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
+Observability is about bringing visibility into a system to see and understand the state of each component, with context, to support performance tuning and debugging. To run a SaaS platform at scale, a rich and detailed observability platform is a necessity. We have a set of monitoring dashboards designed for [each stage group](https://about.gitlab.com/handbook/product/categories/#devops-stages).
 
 These dashboards are designed to give an insight, to everyone working in a feature category, into how their code operates at GitLab.com scale. They are grouped per stage group to show the impact of feature/code changes, deployments, and feature-flag toggles.
 
 Each stage group has a dashboard consisting of metrics at the application level, such as Rails Web Requests, Rails API Requests, Sidekiq Jobs, and so on. The metrics in each dashboard are filtered and accumulated based on the [GitLab product categories](https://about.gitlab.com/handbook/product/categories/) and [feature categories](feature_categorization/index.md).
 
-The list of dashboards for each stage group is accessible at [https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups](https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups) (GitLab team members only), or at [the public mirror](https://dashboards.gitlab.com/dashboards?tag=feature_category&tag=stage-groups) (Accessible to everyone with a GitLab.com account, with some limitations).
+The list of dashboards for each stage group is accessible at [https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups](https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups) (GitLab team members only), or at [the public mirror](https://dashboards.gitlab.com/dashboards?tag=feature_category&tag=stage-groups) (accessible to everyone with a GitLab.com account, with some limitations).
 
 Please note that the dashboards for stage groups are at a very early stage. All contributions are welcome. If you have any questions or suggestions, please submit an issue in the [Scalability Team issues tracker](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/new).
 
@@ -88,7 +88,7 @@ stageGroupDashboards.dashboard('product_planning')
 .stageGroupDashboardTrailer()
 ```
 
-We provide basic customization to filter out the components essential to your group's activities. By default, all components `web`, `api`, `git`, and `sidekiq` are available in the dashboard.
+We provide basic customization to filter out the components essential to your group's activities. By default, all components `web`, `api`, `git`, and `sidekiq` are available in the dashboard. We can change this to only show `web` and `api`, or only show `sidekiq`, as in the examples below:
 
 ```jsonnet
 stageGroupDashboards.dashboard('product_planning', components=['web', 'api']).stageGroupDashboardTrailer()
