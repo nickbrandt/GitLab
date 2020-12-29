@@ -1,0 +1,7 @@
+graphql-query-validate:
+  extends:
+    - .static-analysis-base
+  stage: test
+  needs: ["setup-test-env"]
+  script:
+    - bundle exec rake gitlab:graphql:validate
