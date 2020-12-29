@@ -1,3 +1,8 @@
+---
+stage: Enablement
+group: Infrastructure
+info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
+---
 # Dashboards for stage groups
 
 ## Introduction
@@ -15,8 +20,6 @@ Please note that the dashboards for stage groups are at a very early stage. All 
 ## Usage
 
 Inside a stage group dashboard, there are some notable components. Let's look at the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1), chosen at random.
-
-**Disclaimer**: the stage group dashboard used for example here was chosen arbitrarily.
 
 ### Time range controls
 
