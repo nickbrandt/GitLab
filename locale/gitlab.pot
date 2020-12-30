@@ -15129,6 +15129,9 @@ msgstr ""
 msgid "Integrations|Issues created in Jira are shown here once you have created the issues in project setup in Jira."
 msgstr ""
 
+msgid "Integrations|Linked namespaces"
+msgstr ""
+
 msgid "Integrations|Namespaces are your GitLab groups and subgroups that will be linked to this Jira instance."
 msgstr ""
 

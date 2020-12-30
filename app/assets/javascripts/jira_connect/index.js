@@ -31,12 +31,14 @@ const initJiraFormHandlers = () => {
     alert(error);
   };
 
-  AP.getLocation((location) => {
-    $('.js-jira-connect-sign-in').each(function updateSignInLink() {
-      const updatedLink = `${$(this).attr('href')}?return_to=${location}`;
-      $(this).attr('href', updatedLink);
+  if (typeof AP.getLocation === 'function') {
+    AP.getLocation((location) => {
+      $('.js-jira-connect-sign-in').each(function updateSignInLink() {
+        const updatedLink = `${$(this).attr('href')}?return_to=${location}`;
+        $(this).attr('href', updatedLink);
+      });
     });
-  });
+  }
 
   $('#add-subscription-form').on('submit', function onAddSubscriptionForm(e) {
     const actionUrl = $(this).attr('action');
