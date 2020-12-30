@@ -1,5 +1,9 @@
 import Vue from 'vue';
 import $ from 'jquery';
+import setConfigs from '@gitlab/ui/dist/config';
+import Translate from '~/vue_shared/translate';
+import GlFeatureFlagsPlugin from '~/vue_shared/gl_feature_flags_plugin';
+
 import App from './components/app.vue';
 
 const store = {
@@ -74,6 +78,14 @@ function initJiraConnect() {
   const el = document.querySelector('.js-jira-connect-app');
 
   initJiraFormHandlers();
+
+  if (!el) {
+    return null;
+  }
+
+  setConfigs();
+  Vue.use(Translate);
+  Vue.use(GlFeatureFlagsPlugin);
 
   return new Vue({
     el,
