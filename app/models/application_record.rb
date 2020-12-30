@@ -77,4 +77,8 @@ class ApplicationRecord < ActiveRecord::Base
   def self.where_exists(query)
     where('EXISTS (?)', query.select(1))
   end
+
+  def self.declarative_enum(enum_mod)
+    enum enum_mod.key => enum_mod.definition.transform_values { |v| v[:value] }
+  end
 end
