@@ -3,6 +3,7 @@ stage: Enablement
 group: Infrastructure
 info: To determine the technical writer assigned to the Stage/Group associated with this page, see https://about.gitlab.com/handbook/engineering/ux/technical-writing/#assignments
 ---
+
 # Dashboards for stage groups
 
 ## Introduction
@@ -13,13 +14,13 @@ These dashboards are designed to give an insight, to everyone working in a featu
 
 Each stage group has a dashboard consisting of metrics at the application level, such as Rails Web Requests, Rails API Requests, Sidekiq Jobs, and so on. The metrics in each dashboard are filtered and accumulated based on the [GitLab product categories](https://about.gitlab.com/handbook/product/categories/) and [feature categories](feature_categorization/index.md).
 
-The list of dashboards for each stage group is accessible at [https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups](https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups) (GitLab team members only), or at [the public mirror](https://dashboards.gitlab.com/dashboards?tag=feature_category&tag=stage-groups) (accessible to everyone with a GitLab.com account, with some limitations).
+The list of dashboards for each stage group is accessible at <https://dashboards.gitlab.net/dashboards/f/stage-groups/stage-groups> (GitLab team members only), or at [the public mirror](https://dashboards.gitlab.com/dashboards?tag=feature_category&tag=stage-groups) (accessible to everyone with a GitLab.com account, with some limitations).
 
-Please note that the dashboards for stage groups are at a very early stage. All contributions are welcome. If you have any questions or suggestions, please submit an issue in the [Scalability Team issues tracker](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/new).
+The dashboards for stage groups are at a very early stage. All contributions are welcome. If you have any questions or suggestions, please submit an issue in the [Scalability Team issues tracker](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/new).
 
 ## Usage
 
-Inside a stage group dashboard, there are some notable components. Let's look at the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1), chosen at random.
+Inside a stage group dashboard, there are some notable components. Let's take the [Source Code group's dashboard](https://dashboards.gitlab.net/d/stage-groups-source_code/stage-groups-group-dashboard-create-source-code?orgId=1) as an example.
 
 ### Time range controls
 
@@ -27,7 +28,7 @@ Inside a stage group dashboard, there are some notable components. Let's look at
 
 - By default, all the times are in UTC timezone. [We use UTC when communicating in Engineering](https://about.gitlab.com/handbook/communication/#writing-style-guidelines).
 - All metrics recorded in the GitLab production system have [1-year retention](https://gitlab.com/gitlab-cookbooks/gitlab-prometheus/-/blob/31526b03fef823e2f9b3cda7c75dcd28a12418a3/attributes/prometheus.rb#L40).
-- Alternatively, you can zoom in or filter the time range directly on a graph. Please visit [Grafana Time Range Controls](https://grafana.com/docs/grafana/latest/dashboards/time-range-controls/) for more information.
+- Alternatively, you can zoom in or filter the time range directly on a graph. See the [Grafana Time Range Controls](https://grafana.com/docs/grafana/latest/dashboards/time-range-controls/) documentation for more information.
 
 ### Filters and annotations
 
@@ -35,13 +36,15 @@ In each dashboard, there are two filters and some annotations switches on the to
 
 ![Filters and annotations](img/stage_group_dashboards_filters.png)
 
-- `PROMETHEUS_DS` _(filter)_: filter the selective [Prometheus data sources](https://about.gitlab.com/handbook/engineering/monitoring/#prometheus). The default value is `Global`, which aggregates the data from all available data sources. Most of the time, you don't need to care about this filter.
-- `environment` _(filter)_: filter the environment the metrics are fetched from. The default setting is production (`gprd`). Check [Production Environment mapping](https://about.gitlab.com/handbook/engineering/infrastructure/production/architecture/#environments) for other possibilities.
-- `deploy` _(annotations)_: mark a deployment event on the GitLab.com SaaS platform.
-- `canary-deploy` _(annotations)_: mark a [canary deployment](https://about.gitlab.com/handbook/engineering/#canary-testing) event on the GitLab.com SaaS platform.
-- `feature-flags` _(annotations)_: mark the time point where a feature flag is updated.
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `PROMETHEUS_DS` | filter | Filter the selective [Prometheus data sources](https://about.gitlab.com/handbook/engineering/monitoring/#prometheus). The default value is `Global`, which aggregates the data from all available data sources. Most of the time, you don't need to care about this filter. |
+| `environment` | filter | Filter the environment the metrics are fetched from. The default setting is production (`gprd`). Check [Production Environment mapping](https://about.gitlab.com/handbook/engineering/infrastructure/production/architecture/#environments) for other possibilities. |
+| `deploy` | annotation | Mark a deployment event on the GitLab.com SaaS platform. |
+| `canary-deploy` | annotation | Mark a [canary deployment](https://about.gitlab.com/handbook/engineering/#canary-testing) event on the GitLab.com SaaS platform. |
+| `feature-flags` | annotation | Mark the time point where a feature flag is updated.|
 
-This is an example of a feature flag annotation displayed on a dashboard panel:
+This is an example of a feature flag annotation displayed on a dashboard panel.
 
 ![Annotations](img/stage_group_dashboards_annotation.png)
 
@@ -49,7 +52,7 @@ This is an example of a feature flag annotation displayed on a dashboard panel:
 
 ![Metrics panels](img/stage_group_dashboards_metrics.png)
 
-Most of the metrics displayed in the panels are self-explanatory in their title and nearby description, but please note the following:
+Although most of the metrics displayed in the panels are self-explanatory in their title and nearby description, note the following:
 
 - The events are counted, measured, accumulated, then collected, and stored as [time series](https://prometheus.io/docs/concepts/data_model/). The data are calculated using statistical methods to produce metrics. It means that metrics are approximately correct and meaningful over a time period. They help you have an overview of the stage of a system over time. They are not meant to give you precise numbers of a discrete event. If you need a higher level of accuracy, please look at another monitoring tool like [logs](https://about.gitlab.com/handbook/engineering/monitoring/#logs). Please read the following examples for more explanations.
 - All the rate metrics' units are `requests per second`. The default aggregate time frame is 1 minute. For example, a panel shows the requests per second number at `2020-12-25 00:42:00` is `34.13`. It means at the minute 42 (from `2020-12-25 00:42:00` to `2020-12-25 00:42:59` ), there are approximately `34.13 * 60 = ~ 2047` requests processed by the web servers.
@@ -66,21 +69,21 @@ All the dashboards are powered by [Grafana](https://grafana.com/), a frontend fo
 - To verify the deployment, we can check the [Code Review group's dashboard](https://dashboards.gitlab.net/d/stage-groups-code_review/stage-groups-group-dashboard-create-code-review?orgId=1).
 - Sidekiq Error Rate panel shows an elevated error rate, specifically `UpdateMergeRequestsWorker`.
 
-![Debug 1](img/stage_group_dashboards_debug_1.png)
+  ![Debug 1](img/stage_group_dashboards_debug_1.png)
 
 - If we click on `Kibana: Kibana Sidekiq failed request logs` link in the Extra links session, we can filter for `UpdateMergeRequestsWorker`, and read through the logs.
 
-![Debug 2](img/stage_group_dashboards_debug_2.png)
+  ![Debug 2](img/stage_group_dashboards_debug_2.png)
 
-- [Sentry](https://sentry.gitlab.net/gitlab/gitlabcom) gives us a way to find the exception where we can filter by transaction type, and correlation_id from a Kibana's result item.
+- [Sentry](https://sentry.gitlab.net/gitlab/gitlabcom) gives us a way to find the exception where we can filter by transaction type and correlation_id from a Kibana's result item.
 
-![Debug 3](img/stage_group_dashboards_debug_3.png)
+  ![Debug 3](img/stage_group_dashboards_debug_3.png)
 
-- Afterward, a precise exception, including a stack trace, job arguments, and other information, appears. Happy debugging!
+- A precise exception, including a stack trace, job arguments, and other information, should now appear. Happy debugging!
 
-## How to customize the dashboard?
+## How to customize the dashboard
 
-All Grafana dashboards at GitLab are generated from the [Jsonnet files](https://github.com/grafana/grafonnet-lib) stored in [the runbook project](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards). Particularly, the stage group dashboards definitions are stored in [/dashboards/stage-groups](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards/stage-groups) subfolder in the Runbook. By convention, each group has a corresponding jsonnet file. The dashboards are synced with GitLab [stage group data](https://gitlab.com/gitlab-com/www-gitlab-com/-/raw/master/data/stages.yml) every month. Expansion and customization are one of the key principles used when we designed this system. To customize your group's dashboard, you need to edit the corresponding file and follow the [Runbook workflow](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards#dashboard-source). The dashboard is updated after the MR is merged. Looking at an autogenerated file, for example, [product_planning.dashboard.jsonnet](https://gitlab.com/gitlab-com/runbooks/-/blob/master/dashboards/stage-groups/product_planning.dashboard.jsonnet):
+All Grafana dashboards at GitLab are generated from the [Jsonnet files](https://github.com/grafana/grafonnet-lib) stored in [the runbook project](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards). Particularly, the stage group dashboards definitions are stored in [/dashboards/stage-groups](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards/stage-groups) subfolder in the Runbook. By convention, each group has a corresponding jsonnet file. The dashboards are synced with GitLab [stage group data](https://gitlab.com/gitlab-com/www-gitlab-com/-/raw/master/data/stages.yml) every month. Expansion and customization are one of the key principles used when we designed this system. To customize your group's dashboard, you need to edit the corresponding file and follow the [Runbook workflow](https://gitlab.com/gitlab-com/runbooks/-/tree/master/dashboards#dashboard-source). The dashboard is updated after the MR is merged. Looking at an autogenerated file, for example, [`product_planning.dashboard.jsonnet`](https://gitlab.com/gitlab-com/runbooks/-/blob/master/dashboards/stage-groups/product_planning.dashboard.jsonnet):
 
 ```jsonnet
 // This file is autogenerated using scripts/update_stage_groups_dashboards.rb
@@ -91,7 +94,7 @@ stageGroupDashboards.dashboard('product_planning')
 .stageGroupDashboardTrailer()
 ```
 
-We provide basic customization to filter out the components essential to your group's activities. By default, all components `web`, `api`, `git`, and `sidekiq` are available in the dashboard. We can change this to only show `web` and `api`, or only show `sidekiq`, as in the examples below:
+We provide basic customization to filter out the components essential to your group's activities. By default, all components `web`, `api`, `git`, and `sidekiq` are available in the dashboard. We can change this to only show `web` and `api`, or only show `sidekiq`:
 
 ```jsonnet
 stageGroupDashboards.dashboard('product_planning', components=['web', 'api']).stageGroupDashboardTrailer()
@@ -100,7 +103,7 @@ stageGroupDashboards.dashboard('product_planning', components=['sidekiq']).stage
 
 ```
 
-You can also append further information or custom metrics to a dashboard. This is an example that adds some links and a total request rate on the top of the page.
+You can also append further information or custom metrics to a dashboard. This is an example that adds some links and a total request rate on the top of the page:
 
 ```jsonnet
 local stageGroupDashboards = import './stage-group-dashboards.libsonnet';
@@ -142,4 +145,4 @@ stageGroupDashboards.dashboard('source_code')
 
 ![Stage Group Dashboard Customization](img/stage_group_dashboards_time_customization.png)
 
-For deeper customization and more complicated metrics, please read [Grafonnet lib](https://github.com/grafana/grafonnet-lib) and [GitLab Prometheus Metrics](../administration/monitoring/prometheus/gitlab_metrics.md#gitlab-prometheus-metrics).
+For deeper customization and more complicated metrics, visit the [Grafonnet lib](https://github.com/grafana/grafonnet-lib) project and the [GitLab Prometheus Metrics](../administration/monitoring/prometheus/gitlab_metrics.md#gitlab-prometheus-metrics) documentation.
