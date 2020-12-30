@@ -15,12 +15,6 @@ export default {
     GlModalDirective,
   },
   mixins: [glFeatureFlagsMixin()],
-  props: {
-    namespacesEndpoint: {
-      type: String,
-      required: true,
-    },
-  },
   computed: {
     showNewUi() {
       return this.glFeatures.newJiraConnectUi;
@@ -60,7 +54,7 @@ export default {
       :title="s__('Integrations|Link namespaces')"
       :action-cancel="$options.modal.cancelProps"
     >
-      <groups-list :namespaces-endpoint="namespacesEndpoint" />
+      <groups-list />
     </gl-modal>
   </div>
 </template>

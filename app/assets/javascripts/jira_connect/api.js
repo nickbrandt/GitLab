@@ -4,7 +4,7 @@ const getJwt = async () => {
   return AP.context.getToken();
 };
 
-export const removeSubscription = async subscriptionObject => {
+export const removeSubscription = async (subscriptionObject) => {
   const jwt = await getJwt();
 
   return axios.delete(subscriptionObject.path, {

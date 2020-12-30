@@ -14,10 +14,9 @@ export default {
     GlPagination,
     GroupsListItem,
   },
-  props: {
+  inject: {
     namespacesEndpoint: {
-      type: String,
-      required: true,
+      default: '',
     },
   },
   data() {
@@ -45,7 +44,7 @@ export default {
             per_page: this.perPage,
           },
         })
-        .then(response => {
+        .then((response) => {
           const { page, total } = parseIntPagination(normalizeHeaders(response.headers));
           this.page = page;
           this.totalItems = total;
@@ -59,6 +58,7 @@ export default {
   },
 };
 </script>
+
 <template>
   <gl-tabs class="fork-groups gl-px-5">
     <gl-tab :title="__('Groups and subgroups')">
@@ -67,10 +67,14 @@ export default {
         <template v-if="namespaces.length === 0">
           <div class="gl-text-center">
             <!-- TODO: Check copy -->
-            <div class="h5">{{ __('No available namespaces.') }}</div>
+            <div class="h5">{{ s__('Integrations|No available namespaces.') }}</div>
             <p class="gl-mt-5">
               <!-- TODO: Check copy -->
-              {{ __('You must have owner or maintainer permissions to link namespaces.') }}
+              {{
+                s__(
+                  'Integrations|You must have owner or maintainer permissions to link namespaces.',
+                )
+              }}
             </p>
           </div>
         </template>

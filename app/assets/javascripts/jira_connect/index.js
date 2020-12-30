@@ -31,7 +31,7 @@ const initJiraFormHandlers = () => {
   };
 
   if (typeof AP.getLocation === 'function') {
-    AP.getLocation(location => {
+    AP.getLocation((location) => {
       $('.js-jira-connect-sign-in').each(function updateSignInLink() {
         const updatedLink = `${$(this).attr('href')}?return_to=${location}`;
         $(this).attr('href', updatedLink);
@@ -88,19 +88,17 @@ function initJiraConnect() {
     return null;
   }
 
-  const { subscriptionPath, namespacesEndpoint } = el.dataset;
+  const { namespacesEndpoint, subscriptionPath } = el.dataset;
 
   return new Vue({
     el,
     data: {
-      state: store.state,
+      store
     },
     render(createElement) {
       return createElement(App, {
-        props: {
-          namespacesEndpoint,
-        },
         provide: {
+          namespacesEndpoint,
           subscriptionPath,
         },
       });

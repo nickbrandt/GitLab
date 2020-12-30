@@ -57,13 +57,13 @@ export default {
       this.isLoading = true;
       // TODO: Update with action to send axios request
       addSubscription(this.subscriptionPath, this.group.full_path)
-        .then(response => {
+        .then((response) => {
           if (response.data.success) {
             this.isLinked = true;
           }
         })
-        .catch(() => {
-          console.error('ERROR!');
+        .catch((response) => {
+          this.$root.$data.store.setErrorMessage('ERROR!');
         })
         .finally(() => {
           this.isLoading = false;
@@ -74,6 +74,7 @@ export default {
   csrf,
 };
 </script>
+
 <template>
   <li :class="rowClass" class="group-row gl-border-b-1 gl-border-b-solid gl-border-b-gray-200">
     <div class="group-row-contents gl-display-flex gl-align-items-center gl-py-3">
