@@ -22,3 +22,16 @@ export const addSubscription = async (actionUrl, namespace) => {
     namespace_path: namespace,
   });
 };
+
+export const fetchSubscriptions = async (url) => {
+  const jwt = await getJwt();
+
+  return axios.get(url, {
+    headers: {
+      Accept: 'application/json',
+    },
+    params: {
+      jwt,
+    },
+  });
+};

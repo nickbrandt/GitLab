@@ -8,9 +8,13 @@ import GlFeatureFlagsPlugin from '~/vue_shared/gl_feature_flags_plugin';
 const store = {
   state: {
     error: '',
+    subscriptions: [],
   },
   setErrorMessage(errorMessage) {
     this.state.error = errorMessage;
+  },
+  setSubscriptions(subscriptions) {
+    this.state.subscriptions = subscriptions;
   },
 };
 
@@ -93,15 +97,14 @@ function initJiraConnect() {
   return new Vue({
     el,
     data: {
-      store
+      store,
+    },
+    provide: {
+      namespacesEndpoint,
+      subscriptionPath,
     },
     render(createElement) {
-      return createElement(App, {
-        provide: {
-          namespacesEndpoint,
-          subscriptionPath,
-        },
-      });
+      return createElement(App);
     },
   });
 }

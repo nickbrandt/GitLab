@@ -3,6 +3,7 @@ import { GlButton, GlModal, GlModalDirective } from '@gitlab/ui';
 import GroupsList from './groups_list.vue';
 import { __ } from '~/locale';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
+import { fetchSubscriptions } from '~/jira_connect/api';
 
 export default {
   name: 'JiraConnectApp',
@@ -15,16 +16,28 @@ export default {
     GlModalDirective,
   },
   mixins: [glFeatureFlagsMixin()],
+  inject: {
+    subscriptionPath: {
+      default: '',
+    },
+  },
   computed: {
     showNewUi() {
       return this.glFeatures.newJiraConnectUi;
     },
     state() {
-      return this.$root.$data.state || {};
+      return this.$root.store.state || {};
     },
     error() {
       return this.state.error;
     },
+  },
+  mounted() {
+    fetchSubscriptions(this.subscriptionPath)
+      .then((response) => {
+        this.$root.store.setSubscriptions(response.data);
+      })
+      .catch(() => {});
   },
   modal: {
     cancelProps: {
@@ -41,6 +54,7 @@ export default {
       class="gl-display-flex gl-justify-content-space-between gl-mt-5 gl-mb-5 gl-pb-4 gl-border-b-solid gl-border-b-1 gl-border-b-gray-200"
     >
       <h3>{{ s__('Integrations|Linked namespaces') }}</h3>
+      <div v-if="error">{{ error }}</div>
       <gl-button
         v-gl-modal-directive="'add-namespace-modal'"
         category="primary"

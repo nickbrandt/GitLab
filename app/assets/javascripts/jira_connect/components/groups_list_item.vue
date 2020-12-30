@@ -2,7 +2,6 @@
 import { GlButton, GlIcon, GlAvatar, GlTooltipDirective, GlBadge } from '@gitlab/ui';
 import { VISIBILITY_TYPE_ICON, GROUP_VISIBILITY_TYPE } from '~/groups/constants';
 import { addSubscription } from '~/jira_connect/api';
-import csrf from '~/lib/utils/csrf';
 
 export default {
   components: {
@@ -29,11 +28,17 @@ export default {
     return {
       namespaces: null,
       isLoading: false,
-      isLinked: false, // TODO: Pass groups that are linked from the backend and cross-check that list here
     };
   },
-
   computed: {
+    state() {
+      return this.$root.store.state || {};
+    },
+    isLinked() {
+      return this.state.subscriptions.some((subscription) => {
+        return subscription.namespace_id === this.group.id;
+      });
+    },
     rowClass() {
       return {
         'has-description': this.group.description,
@@ -55,23 +60,19 @@ export default {
   methods: {
     onClick() {
       this.isLoading = true;
-      // TODO: Update with action to send axios request
       addSubscription(this.subscriptionPath, this.group.full_path)
-        .then((response) => {
-          if (response.data.success) {
-            this.isLinked = true;
-          }
+        .then(() => {
+          // if (response.data.success) {}
+          // TODO: Reload the page to show the subscription added to the list
         })
         .catch((response) => {
-          this.$root.$data.store.setErrorMessage('ERROR!');
+          this.$root.$data.store.setErrorMessage(response.body.error);
         })
         .finally(() => {
           this.isLoading = false;
         });
     },
   },
-
-  csrf,
 };
 </script>
 

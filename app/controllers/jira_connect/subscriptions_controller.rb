@@ -17,7 +17,8 @@ class JiraConnect::SubscriptionsController < JiraConnect::ApplicationController
   end
 
   before_action :allow_rendering_in_iframe, only: :index
-  before_action :verify_qsh_claim!, only: :index
+  before_action :verify_qsh_claim!, only: :index, if: proc { !request.format.json? }
+  before_action :authenticate_user!, only: :index, if: proc { request.format.json? }
   before_action :authenticate_user!, only: :create
   before_action do
     push_frontend_feature_flag(:new_jira_connect_ui, type: :development)
@@ -25,6 +26,14 @@ class JiraConnect::SubscriptionsController < JiraConnect::ApplicationController
 
   def index
     @subscriptions = current_jira_installation.subscriptions.preload_namespace_route
+
+    respond_to do |format|
+      format.html
+
+      format.json do
+        render json: @subscriptions.to_json
+      end
+    end
   end
 
   def create
