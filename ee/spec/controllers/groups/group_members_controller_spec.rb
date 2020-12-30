@@ -64,8 +64,8 @@ RSpec.describe Groups::GroupMembersController do
         allow(Ability).to receive(:allowed?).and_call_original
         allow(Ability).to receive(:allowed?).with(user, :override_group_member, membership) { true }
       end
-      it 'is successful' do
 
+      it 'is successful' do
         post :override,
              params: {
                group_id: group,
