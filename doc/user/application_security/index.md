@@ -311,7 +311,7 @@ Selecting the button creates a merge request with the solution.
 
 #### Auto-fix merge requests
 
-> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216027) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.5.
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/216027) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.8.
 > - It's [deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
 > - It's disabled on GitLab.com.
 > - It's not recommended for production use.
