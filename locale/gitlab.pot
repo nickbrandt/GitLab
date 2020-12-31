@@ -1322,6 +1322,9 @@ msgstr ""
 msgid "A ready-to-go template for use with iOS Swift apps"
 msgstr ""
 
+msgid "A rebase is already in progress."
+msgstr ""
+
 msgid "A regular expression that will be used to find the test coverage output in the job log. Leave blank to disable"
 msgstr ""
 
