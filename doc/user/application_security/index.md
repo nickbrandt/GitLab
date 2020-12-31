@@ -328,7 +328,7 @@ will still apply.
 
 ![Suggested Solutions Settings](img/suggested_solutions_settings_v13.5.png)
 
-Auto-fix merge requests are authored by the [**GitLab Security Bot**](./security_bot) user and labeled with the
+Auto-fix merge requests are authored by the [**GitLab Security Bot**](security_bot) user and labeled with the
 `gitlab-vulnerability-auto-fix` label.
 
 ##### Enable or disable Auto-fix merge requests **(CORE ONLY)**
