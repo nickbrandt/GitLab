@@ -326,7 +326,7 @@ setting is disabled, [manually applying the suggested patch](#manually-applying-
 and [creating a merge request](#creating-a-merge-request-from-a-vulnerability) from a vulnerability
 will still apply.
 
-![Suggested Solutions Settings](img/suggested_solutions_settings_v13.5.png)
+![Suggested Solutions Settings](img/suggested_solutions_settings_v13.8.png)
 
 Auto-fix merge requests are authored by the [**GitLab Security Bot**](security_bot) user and labeled with the
 `gitlab-vulnerability-auto-fix` label.
