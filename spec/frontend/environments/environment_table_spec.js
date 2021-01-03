@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils';
 import EnvironmentTable from '~/environments/components/environments_table.vue';
 import eventHub from '~/environments/event_hub';
+import DeployBoard from '~/environments/components/deploy_board.vue';
+import CanaryUpdateModal from '~/environments/components/canary_update_modal.vue';
 import { folder, deployBoardMockData } from './mock_data';
 
 const eeOnlyProps = {
@@ -93,7 +95,7 @@ describe('Environment table', () => {
     expect(wrapper.find('.deploy-board-icon').exists()).toBe(true);
   });
 
-  it('should toggle deploy board visibility when arrow is clicked', done => {
+  it('should toggle deploy board visibility when arrow is clicked', (done) => {
     const mockItem = {
       name: 'review',
       size: 1,
@@ -106,11 +108,12 @@ describe('Environment table', () => {
         rollback_url: 'url',
         completion: 100,
         is_completed: true,
+        canary_ingress: { canary_weight: 60 },
       },
       isDeployBoardVisible: false,
     };
 
-    eventHub.$on('toggleDeployBoard', env => {
+    eventHub.$on('toggleDeployBoard', (env) => {
       expect(env.id).toEqual(mockItem.id);
       done();
     });
@@ -128,6 +131,42 @@ describe('Environment table', () => {
     });
 
     wrapper.find('.deploy-board-icon').trigger('click');
+  });
+
+  it('should set the enviornment to change and weight when a change canary weight event is recevied', async () => {
+    const mockItem = {
+      name: 'review',
+      size: 1,
+      environment_path: 'url',
+      logs_path: 'url',
+      id: 1,
+      hasDeployBoard: true,
+      deployBoardData: deployBoardMockData,
+      isDeployBoardVisible: true,
+      isLoadingDeployBoard: false,
+      isEmptyDeployBoard: false,
+    };
+
+    await factory({
+      propsData: {
+        environments: [mockItem],
+        canCreateDeployment: false,
+        canReadEnvironment: true,
+        canaryDeploymentFeatureId: 'canary_deployment',
+        showCanaryDeploymentCallout: true,
+        userCalloutsPath: '/callouts',
+        lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
+        helpCanaryDeploymentsPath: 'help/canary-deployments',
+      },
+    });
+
+    wrapper.find(DeployBoard).vm.$emit('changeCanaryWeight', 40);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find(CanaryUpdateModal).props()).toMatchObject({
+      weight: 40,
+      environment: mockItem,
+    });
   });
 
   it('should render canary callout', async () => {

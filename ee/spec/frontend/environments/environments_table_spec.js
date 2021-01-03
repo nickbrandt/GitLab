@@ -1,7 +1,5 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import EnvironmentAlert from 'ee/environments/components/environment_alert.vue';
-import DeployBoard from 'ee/environments/components/deploy_board_component.vue';
-import CanaryUpdateModal from 'ee/environments/components/canary_update_modal.vue';
 import EnvironmentTable from '~/environments/components/environments_table.vue';
 
 describe('Environment table', () => {
@@ -50,41 +48,5 @@ describe('Environment table', () => {
     );
 
     expect(wrapper.find(EnvironmentAlert).exists()).toBe(true);
-  });
-
-  it('should set the enviornment to change and weight when a change canary weight event is recevied', async () => {
-    const mockItem = {
-      name: 'review',
-      size: 1,
-      environment_path: 'url',
-      logs_path: 'url',
-      id: 1,
-      hasDeployBoard: true,
-      deployBoardData: deployBoardMockData,
-      isDeployBoardVisible: true,
-      isLoadingDeployBoard: false,
-      isEmptyDeployBoard: false,
-    };
-
-    await factory({
-      propsData: {
-        environments: [mockItem],
-        canCreateDeployment: false,
-        canReadEnvironment: true,
-        canaryDeploymentFeatureId: 'canary_deployment',
-        showCanaryDeploymentCallout: true,
-        userCalloutsPath: '/callouts',
-        lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
-        helpCanaryDeploymentsPath: 'help/canary-deployments',
-      },
-    });
-
-    wrapper.find(DeployBoard).vm.$emit('changeCanaryWeight', 40);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.find(CanaryUpdateModal).props()).toMatchObject({
-      weight: 40,
-      environment: mockItem,
-    });
   });
 });
