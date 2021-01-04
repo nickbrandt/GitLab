@@ -45,7 +45,6 @@ RSpec.describe Issuable do
       end
 
       it { is_expected.to validate_presence_of(:project) }
-      it { is_expected.to validate_presence_of(:iid) }
       it { is_expected.to validate_presence_of(:author) }
       it { is_expected.to validate_presence_of(:title) }
       it { is_expected.to validate_length_of(:title).is_at_most(described_class::TITLE_LENGTH_MAX) }

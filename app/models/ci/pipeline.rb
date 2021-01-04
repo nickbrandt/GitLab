@@ -45,7 +45,7 @@ module Ci
     belongs_to :external_pull_request
     belongs_to :ci_ref, class_name: 'Ci::Ref', foreign_key: :ci_ref_id, inverse_of: :pipelines
 
-    has_internal_id :iid, scope: :project, presence: false,
+    has_internal_id :iid, scope: :project,
       track_if: -> { !importing? },
       ensure_if: -> { !importing? },
       init: ->(pipeline, scope) do

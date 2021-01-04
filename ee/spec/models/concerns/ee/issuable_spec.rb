@@ -11,7 +11,6 @@ RSpec.describe EE::Issuable do
         allow(InternalId).to receive(:generate_next).and_return(nil)
       end
 
-      it { is_expected.to validate_presence_of(:iid) }
       it { is_expected.to validate_presence_of(:author) }
       it { is_expected.to validate_presence_of(:title) }
       it { is_expected.to validate_length_of(:title).is_at_most(::Issuable::TITLE_LENGTH_MAX) }

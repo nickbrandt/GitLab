@@ -1,39 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples 'AtomicInternalId' do |validate_presence: true|
+RSpec.shared_examples 'AtomicInternalId' do
   describe '.has_internal_id' do
     describe 'Module inclusion' do
       subject { described_class }
 
       it { is_expected.to include_module(AtomicInternalId) }
-    end
-
-    describe 'Validation' do
-      before do
-        allow_any_instance_of(described_class).to receive(:"ensure_#{scope}_#{internal_id_attribute}!")
-
-        instance.valid?
-      end
-
-      context 'when presence validation is required' do
-        before do
-          skip unless validate_presence
-        end
-
-        it 'validates presence' do
-          expect(instance.errors[internal_id_attribute]).to include("can't be blank")
-        end
-      end
-
-      context 'when presence validation is not required' do
-        before do
-          skip if validate_presence
-        end
-
-        it 'does not validate presence' do
-          expect(instance.errors[internal_id_attribute]).to be_empty
-        end
-      end
     end
 
     describe 'Creating an instance' do
@@ -72,6 +44,41 @@ RSpec.shared_examples 'AtomicInternalId' do |validate_presence: true|
             .with(instance, scope_attrs, usage, internal_id, any_args)
             .and_return(internal_id)
           subject
+        end
+      end
+    end
+
+    describe 'unsetting the instance internal id on rollback' do
+      context 'when the internal id has been changed' do
+        it 'clears it on the instance' do
+          ActiveRecord::Base.transaction(requires_new: true) do
+            instance.save!
+
+            expect(read_internal_id).not_to be_nil
+
+            raise ActiveRecord::Rollback
+          end
+
+          expect(read_internal_id).to be_nil
+        end
+      end
+
+      context 'when the internal id has not been changed' do
+        it 'preserves the value on the instance' do
+          instance.save!
+          original_id = read_internal_id
+
+          expect(original_id).not_to be_nil
+
+          ActiveRecord::Base.transaction(requires_new: true) do
+            instance.save!
+
+            expect(read_internal_id).not_to be_nil
+
+            raise ActiveRecord::Rollback
+          end
+
+          expect(read_internal_id).to eq(original_id)
         end
       end
     end

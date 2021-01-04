@@ -592,7 +592,7 @@ RSpec.describe Ci::Pipeline, :mailer, factory_default: :keep do
   end
 
   describe 'modules' do
-    it_behaves_like 'AtomicInternalId', validate_presence: false do
+    it_behaves_like 'AtomicInternalId' do
       let(:internal_id_attribute) { :iid }
       let(:instance) { build(:ci_pipeline) }
       let(:scope) { :project }
