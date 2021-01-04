@@ -12,6 +12,7 @@ var acceptedMethods = map[string]bool{
 	http.MethodPost:    true,
 	http.MethodPut:     true,
 	http.MethodPatch:   true,
+	http.MethodDelete:  true,
 	http.MethodConnect: true,
 	http.MethodOptions: true,
 	http.MethodTrace:   true,

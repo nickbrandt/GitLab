@@ -1,0 +1,5 @@
+---
+title: Allow DELETE HTTP method
+merge_request:
+author:
+type: security
