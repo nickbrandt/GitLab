@@ -455,6 +455,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
 
   describe '.data' do
     let!(:ud) { build(:usage_data) }
+    let(:error_rate) { Gitlab::Database::PostgresHll::BatchDistinctCounter::ERROR_RATE }
 
     before do
       allow(described_class).to receive(:grafana_embed_usage_data).and_return(2)
@@ -480,7 +481,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
       count_data = subject[:counts]
 
       expect(count_data[:projects]).to eq(4)
-      expect(count_data[:projects_jira_active_users]).to eq(5)
+      expect(count_data[:projects_jira_active_users]).to be_within(error_rate).percent_of(5)
       expect(count_data[:projects_asana_active]).to eq(0)
       expect(count_data[:projects_prometheus_active]).to eq(1)
       expect(count_data[:projects_jenkins_active]).to eq(1)

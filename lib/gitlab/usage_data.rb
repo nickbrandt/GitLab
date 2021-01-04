@@ -416,7 +416,7 @@ module Gitlab
       # rubocop: disable Metrics/AbcSize
       def services_usage
         Service.available_services_names.each_with_object({}) do |service_name, response|
-          response["projects_#{service_name}_active_users".to_sym] = distinct_count(users_per_service_type(type: "#{service_name}_service".camelize), :user_id, batch_size: 5_000, start: project_authorizations_minimum_id, finish: project_authorizations_maximum_id)
+          response["projects_#{service_name}_active_users".to_sym] = estimate_batch_distinct_count(users_per_service_type(type: "#{service_name}_service".camelize), :user_id, start: project_authorizations_minimum_id, finish: project_authorizations_maximum_id)
           response["projects_#{service_name}_active".to_sym] = count(Service.active.where.not(project: nil).where(type: "#{service_name}_service".camelize))
           response["groups_#{service_name}_active".to_sym] = count(Service.active.where.not(group: nil).where(type: "#{service_name}_service".camelize))
           response["templates_#{service_name}_active".to_sym] = count(Service.active.where(template: true, type: "#{service_name}_service".camelize))
@@ -430,12 +430,9 @@ module Gitlab
 
       def users_per_service_type(type:)
         ProjectAuthorization
-          .joins('INNER JOIN projects ON projects.id = project_authorizations.project_id')
-          .joins('INNER JOIN services ON services.project_id = projects.id')
+          .joins('INNER JOIN services ON services.project_id = project_authorizations.project_id')
           .where('services.active = TRUE')
           .where('services.type = ?', type)
-          .where('projects.pending_delete = FALSE')
-          .where('projects.archived = FALSE')
       end
       # rubocop: enable UsageData/LargeTable
 
