@@ -17,7 +17,6 @@ RSpec.describe Resolvers::DastSiteValidationResolver do
 
   before do
     project.add_maintainer(current_user)
-    stub_licensed_features(security_on_demand_scans: true)
   end
 
   specify do
