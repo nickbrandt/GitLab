@@ -1,4 +1,6 @@
 graphql-verify:
+  variables:
+    SETUP_DB: "false"
   extends:
     - .default-retry
     - .rails-cache
