@@ -24,11 +24,7 @@ describe('JiraConnectApp', () => {
 
   describe('template', () => {
     it('renders new UI', () => {
-      createComponent({
-        provide: {
-          glFeatures: { newJiraConnectUi: true },
-        },
-      });
+      createComponent();
 
       expect(findHeader().exists()).toBe(true);
       expect(findHeaderText()).toBe('Linked namespaces');
