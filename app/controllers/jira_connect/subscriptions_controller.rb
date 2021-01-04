@@ -20,7 +20,7 @@ class JiraConnect::SubscriptionsController < JiraConnect::ApplicationController
   before_action :verify_qsh_claim!, only: :index
   before_action :authenticate_user!, only: :create
   before_action do
-    push_frontend_feature_flag(:new_jira_connect_ui, type: :development)
+    push_frontend_feature_flag(:new_jira_connect_ui, type: :development, default_enabled: :yaml)
   end
 
   def index
