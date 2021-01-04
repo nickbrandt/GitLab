@@ -164,11 +164,7 @@ module Gitlab
         definitions = []
 
         ::Find.find(root.to_s) do |path|
-          next unless path.ends_with?('.graphql')
-          next if path.ends_with?('.fragment.graphql')
-          next if path.ends_with?('typedefs.graphql')
-
-          definitions << Definition.new(path, fragments)
+          definitions << Definition.new(path, fragments) if query?(path)
         end
 
         definitions
@@ -190,6 +186,12 @@ module Gitlab
         @known_failures ||= YAML.safe_load(File.read(Rails.root.join('config', 'known_invalid_graphql_queries.yml')))
 
         @known_failures.fetch('filenames', []).any? { |known_failure| path.to_s.ends_with?(known_failure) }
+      end
+
+      def self.query?(path)
+        path.ends_with?('.graphql') &&
+          !path.ends_with?('.fragment.graphql') &&
+          !path.ends_with?('typedefs.graphql')
       end
     end
   end
