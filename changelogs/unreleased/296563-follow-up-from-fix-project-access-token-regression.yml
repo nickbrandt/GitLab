@@ -1,5 +1,5 @@
 ---
-title: 50800 Fix project access token regression
-merge_request:
+title: Fix project access token regression
+merge_request: 50800
 author:
 type: fixed
