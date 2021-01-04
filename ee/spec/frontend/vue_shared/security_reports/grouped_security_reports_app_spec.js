@@ -56,7 +56,9 @@ describe('Grouped security reports app', () => {
     apiFuzzingHelpPath: 'path',
     pipelineId: 123,
     projectId: 321,
+    mrIid: 123,
     projectFullPath: 'path',
+    targetProjectFullPath: 'path',
     apiFuzzingComparisonPath: API_FUZZING_DIFF_ENDPOINT,
     containerScanningComparisonPath: CONTAINER_SCANNING_DIFF_ENDPOINT,
     coverageFuzzingComparisonPath: COVERAGE_FUZZING_DIFF_ENDPOINT,
@@ -77,6 +79,15 @@ describe('Grouped security reports app', () => {
   const createWrapper = (propsData, options, provide) => {
     wrapper = mount(GroupedSecurityReportsApp, {
       propsData,
+      mocks: {
+        $apollo: {
+          queries: {
+            reportArtifacts: {
+              loading: false,
+            },
+          },
+        },
+      },
       data() {
         return {
           dastSummary: defaultDastSummary,
@@ -401,6 +412,8 @@ describe('Grouped security reports app', () => {
         headBlobPath: 'path',
         pipelinePath,
         projectFullPath: 'path',
+        targetProjectFullPath: 'path',
+        mrIid: 123,
       });
     });
 
