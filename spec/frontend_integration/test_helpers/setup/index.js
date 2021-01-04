@@ -4,3 +4,4 @@ import './setup_axios';
 import './setup_serializers';
 import './setup_mock_server';
 import './setup_testing_library';
+import './setup_jest_dom';
