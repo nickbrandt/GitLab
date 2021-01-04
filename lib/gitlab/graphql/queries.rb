@@ -6,7 +6,6 @@ module Gitlab
   module Graphql
     module Queries
       IMPORT_RE = /^#\s*import "(?<path>[^"]+)"$/m.freeze
-      # TODO: validate both the EE and CE versions
       EE_ELSE_CE = /^ee_else_ce/.freeze
       HOME_RE = /^~/.freeze
       HOME_EE = %r{^ee/}.freeze
@@ -125,7 +124,6 @@ module Gitlab
           path.to_s + '/'
         end
 
-        # TODO: move these warnings to the rake task
         def validate(schema)
           return [:client_query, []] if CLIENT_DIRECTIVE.match?(text)
 
