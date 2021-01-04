@@ -163,11 +163,11 @@ Support for [PostgreSQL 9.6 and 10 has been removed in GitLab 13.0](https://abou
 
 #### Additional requirements for GitLab Geo
 
-If you're using [GitLab Geo](../administration/geo/index.md):
-
-- We strongly recommend running Omnibus-managed instances as they are actively
-  developed and tested. We aim to be compatible with most external (not managed
-  by Omnibus) databases (for example, [AWS Relational Database Service (RDS)](https://aws.amazon.com/rds/)) but we don't guarantee compatibility.
+If you're using [GitLab Geo](../administration/geo/index.md), we strongly
+recommend running Omnibus GitLab-managed instances, as we actively develop and
+test based on those. We try to be compatible with most external (not managed by
+Omnibus GitLab) databases (for example, [AWS Relational Database Service (RDS)](https://aws.amazon.com/rds/)),
+but we can't guarantee compatibility.
 
 ## Puma settings
 
