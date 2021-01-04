@@ -112,6 +112,7 @@ module WikiActions
         wiki_page_path(wiki, page)
       )
     else
+      @error = response.message
       render 'shared/wikis/edit'
     end
   rescue WikiPage::PageChangedError, WikiPage::PageRenameError => e
