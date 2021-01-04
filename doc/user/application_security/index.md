@@ -341,13 +341,13 @@ can enable it.
 To enable it:
 
 ```ruby
-Feature.enable(:security_auto_fix)
+Feature.enable(:secure_vulnerability_autofix_indicator)
 ```
 
 To disable it:
 
 ```ruby
-Feature.disable(:security_auto_fix)
+Feature.disable(:secure_vulnerability_autofix_indicator)
 ```
 
 #### Manually applying the suggested patch
