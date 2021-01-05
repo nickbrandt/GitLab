@@ -280,6 +280,25 @@ RSpec.describe API::Issues do
       ])
     end
 
+    context 'with quick actions' do
+      context 'with /relate' do
+        let(:target_issue) { create(:issue) }
+
+        it 'creates a project issue with the right relation' do
+          post api("/projects/#{project.id}/issues", user),
+            params: { title: 'title', description: "note\n/relate #{target_issue.to_reference}" }
+
+          expect(response).to have_gitlab_http_status(:created)
+          expect(json_response['title']).to eq('title')
+          expect(json_response['description']).to eq('note')
+
+          created_issue = Issue.find(json_response['id'])
+
+          expect(created_issue.related_issues(user)).to include(target_issue)
+        end
+      end
+    end
+
     context 'resolving discussions' do
       let(:discussion) { create(:diff_note_on_merge_request).to_discussion }
       let(:merge_request) { discussion.noteable }

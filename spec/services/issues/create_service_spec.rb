@@ -367,6 +367,22 @@ RSpec.describe Issues::CreateService do
           expect(issue.milestone).to eq(milestone)
         end
       end
+
+      context 'with a relate action' do
+        let(:target_issue) { create(:issue) }
+        let(:opts) do
+          {
+            title: 'Title',
+            description: %(Note\n/relate #{target_issue.to_reference})
+          }
+        end
+
+        it 'relates the target issue' do
+          expect(issue).to be_persisted
+          expect(issue.description).to eq('Note')
+          expect(issue.related_issues(issue.author)).to include(target_issue)
+        end
+      end
     end
 
     context 'resolving discussions' do

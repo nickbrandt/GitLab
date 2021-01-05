@@ -284,6 +284,18 @@ RSpec.describe Notes::CreateService do
                 expectation: ->(noteable, can_use_quick_action) {
                   expect(noteable.closed?).to eq(can_use_quick_action)
                 }
+              ),
+              QuickAction.new(
+                action_text: "/relate #{issue_2.to_reference}",
+                expectation: ->(noteable, can_use_quick_action) {
+                  related_issues = noteable.related_issues(noteable.author)
+
+                  if can_use_quick_action
+                    expect(related_issues).to include(issue_2)
+                  else
+                    expect(related_issues).not_to include(issue_2)
+                  end
+                }
               )
             ]
           end
