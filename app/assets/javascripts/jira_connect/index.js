@@ -1,5 +1,9 @@
 import Vue from 'vue';
 import $ from 'jquery';
+import setConfigs from '@gitlab/ui/dist/config';
+import Translate from '~/vue_shared/translate';
+import GlFeatureFlagsPlugin from '~/vue_shared/gl_feature_flags_plugin';
+
 import App from './components/app.vue';
 import { addSubscription, removeSubscription } from '~/jira_connect/api';
 
@@ -28,12 +32,14 @@ const initJiraFormHandlers = () => {
     alert(error);
   };
 
-  AP.getLocation((location) => {
-    $('.js-jira-connect-sign-in').each(function updateSignInLink() {
-      const updatedLink = `${$(this).attr('href')}?return_to=${location}`;
-      $(this).attr('href', updatedLink);
+  if (typeof AP.getLocation === 'function') {
+    AP.getLocation((location) => {
+      $('.js-jira-connect-sign-in').each(function updateSignInLink() {
+        const updatedLink = `${$(this).attr('href')}?return_to=${location}`;
+        $(this).attr('href', updatedLink);
+      });
     });
-  });
+  }
 
   $('#add-subscription-form').on('submit', function onAddSubscriptionForm(e) {
     const addPath = $(this).attr('action');
@@ -62,6 +68,14 @@ function initJiraConnect() {
   const el = document.querySelector('.js-jira-connect-app');
 
   initJiraFormHandlers();
+
+  if (!el) {
+    return null;
+  }
+
+  setConfigs();
+  Vue.use(Translate);
+  Vue.use(GlFeatureFlagsPlugin);
 
   return new Vue({
     el,
