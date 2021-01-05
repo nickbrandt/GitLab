@@ -1,4 +1,5 @@
 <script>
+import { VULNERABILITY_MODAL_ID } from 'ee/vue_shared/security_reports/components/constants';
 import { GlTooltipDirective, GlResizeObserverDirective } from '@gitlab/ui';
 import { mapActions } from 'vuex';
 
@@ -25,10 +26,11 @@ export default {
     this.updateTooltipTitle();
   },
   methods: {
-    ...mapActions(['openModal']),
+    ...mapActions(['setModalData']),
     handleIssueClick() {
-      const { issue, status, openModal } = this;
-      openModal({ issue, status });
+      const { issue, status, setModalData } = this;
+      setModalData({ issue, status });
+      this.$root.$emit('bv::show::modal', VULNERABILITY_MODAL_ID);
     },
     updateTooltipTitle() {
       // Only show the tooltip if the text is truncated with an ellipsis.
