@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils';
 import { GlAlert, GlModal } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
-import CanaryUpdateModal from 'ee/environments/components/canary_update_modal.vue';
-import updateCanaryIngress from 'ee/environments/graphql/mutations/update_canary_ingress.mutation.graphql';
+import CanaryUpdateModal from '~/environments/components/canary_update_modal.vue';
+import updateCanaryIngress from '~/environments/graphql/mutations/update_canary_ingress.mutation.graphql';
 
-describe('ee/environments/components/canary_update_modal.vue', () => {
+describe('/environments/components/canary_update_modal.vue', () => {
   let wrapper;
   let modal;
   let mutate;
