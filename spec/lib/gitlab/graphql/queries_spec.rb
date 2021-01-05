@@ -231,6 +231,48 @@ RSpec.describe Gitlab::Graphql::Queries do
       end
     end
 
+    context 'a mixed client query, valid' do
+      let(:path) { 'mixed_client.query.graphql' }
+
+      it_behaves_like 'a valid GraphQL query for the blog schema'
+
+      it 'is not tagged as a client query' do
+        expect(subject.validate(schema).first).not_to eq :client_query
+      end
+    end
+
+    context 'a mixed client query, with skipped argument' do
+      let(:path) { 'mixed_client_skipped_argument.graphql' }
+
+      it_behaves_like 'a valid GraphQL query for the blog schema'
+    end
+
+    context 'a mixed client query, with unused fragment' do
+      let(:path) { 'mixed_client_unused_fragment.graphql' }
+
+      it_behaves_like 'a valid GraphQL query for the blog schema'
+    end
+
+    context 'a client query, with unused fragment' do
+      let(:path) { 'client_unused_fragment.graphql' }
+
+      it_behaves_like 'a valid GraphQL query for the blog schema'
+
+      it 'is tagged as a client query' do
+        expect(subject.validate(schema).first).to eq :client_query
+      end
+    end
+
+    context 'a mixed client query, invalid' do
+      let(:path) { 'mixed_client_invalid.query.graphql' }
+
+      it_behaves_like 'an invalid GraphQL query for the blog schema' do
+        let(:errors) do
+          contain_exactly(have_attributes(message: include('titlz')))
+        end
+      end
+    end
+
     context 'a query containing a connection directive' do
       let(:path) { 'connection.query.graphql' }
 

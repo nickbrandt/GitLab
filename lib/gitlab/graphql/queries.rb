@@ -12,7 +12,6 @@ module Gitlab
       DOTS_RE = %r{^(\.\./)+}.freeze
       DOT_RE = %r{^\./}.freeze
       IMPLICIT_ROOT = %r{^app/}.freeze
-      CLIENT_DIRECTIVE = /@client/.freeze
       CONN_DIRECTIVE = /@connection\(key: "\w+"\)/.freeze
 
       class WrappedError
@@ -41,6 +40,87 @@ module Gitlab
         end
       end
 
+      # We need to re-write queries to remove all @client fields. Ideally we
+      # would do that as a source-to-source transformation of the AST, but doing it using a
+      # printer is much simpler.
+      class ClientFieldRedactor < GraphQL::Language::Printer
+        attr_reader :fields_printed, :skipped_arguments, :printed_arguments, :used_fragments
+
+        def initialize(skips = true)
+          @skips = skips
+          @fields_printed = 0
+          @in_operation = false
+          @skipped_arguments = [].to_set
+          @printed_arguments = [].to_set
+          @used_fragments = [].to_set
+          @skipped_fragments = [].to_set
+          @used_fragments = [].to_set
+        end
+
+        def print_variable_identifier(variable_identifier)
+          @printed_arguments << variable_identifier.name
+          super
+        end
+
+        def print_fragment_spread(fragment_spread, indent: "")
+          @used_fragments << fragment_spread.name
+          super
+        end
+
+        def print_operation_definition(op, indent: "")
+          @in_operation = true
+          out = +"#{indent}#{op.operation_type}"
+          out << " #{op.name}" if op.name
+
+          # Do these first, so that we detect any skipped arguments
+          dirs = print_directives(op.directives)
+          sels = print_selections(op.selections, indent: indent)
+
+          # remove variable definitions only used in skipped (client) fields
+          vars = op.variables.reject do |v|
+            @skipped_arguments.include?(v.name) && !@printed_arguments.include?(v.name)
+          end
+
+          if vars.any?
+            out << "(#{vars.map { |v| print_variable_definition(v) }.join(", ")})"
+          end
+
+          out + dirs + sels
+        ensure
+          @in_operation = false
+        end
+
+        def print_field(field, indent: '')
+          if skips? && field.directives.any? { |d| d.name == 'client' }
+            skipped = self.class.new(false)
+
+            skipped.print_node(field)
+            @skipped_fragments |= skipped.used_fragments
+            @skipped_arguments |= skipped.printed_arguments
+
+            return ''
+          end
+
+          ret = super
+
+          @fields_printed += 1 if @in_operation && ret != ''
+
+          ret
+        end
+
+        def print_fragment_definition(fragment_def, indent: "")
+          if skips? && @skipped_fragments.include?(fragment_def.name) && !@used_fragments.include?(fragment_def.name)
+            return ''
+          end
+
+          super
+        end
+
+        def skips?
+          @skips
+        end
+      end
+
       class Definition
         attr_reader :file, :imports
 
@@ -54,7 +134,15 @@ module Gitlab
 
         def text(mode: :ce)
           qs = [query] + all_imports(mode: mode).uniq.sort.map { |p| fragment(p).query }
-          qs.join("\n\n").gsub(/\n\n+/, "\n\n")
+          t = qs.join("\n\n").gsub(/\n\n+/, "\n\n")
+
+          return t unless /@client/.match?(t)
+
+          doc = ::GraphQL.parse(t)
+          printer = ClientFieldRedactor.new
+          redacted = doc.dup.to_query_string(printer: printer)
+
+          return redacted if printer.fields_printed > 0
         end
 
         def query
@@ -95,7 +183,7 @@ module Gitlab
         end
 
         def validate(schema)
-          return [:client_query, []] if CLIENT_DIRECTIVE.match?(text)
+          return [:client_query, []] if query.present? && text.nil?
 
           errs = all_errors.presence || schema.validate(text)
           if @ee_else_ce.present?
