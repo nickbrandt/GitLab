@@ -65,7 +65,7 @@ export default {
     },
     handleToggleEvent() {
       return once(() => {
-        if (this.glFeatures.usageDataGroupCodeCoverageVisitTotal) {
+        if (this.glFeatures.usageDataITestingMetricsReportWidgetTotal) {
           api.trackRedisHllUserEvent(this.$options.expandEvent);
         }
       });
@@ -78,7 +78,7 @@ export default {
   methods: {
     ...mapActions(['setEndpoint', 'fetchMetrics']),
   },
-  expandEvent: 'group_code_coverage_visit_total',
+  expandEvent: 'i_testing_metrics_report_widget_total',
 };
 </script>
 <template>

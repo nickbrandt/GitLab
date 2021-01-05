@@ -1,5 +1,5 @@
 ---
-name: usage_data_group_code_coverage_visit_total
+name: usage_data_i_testing_metrics_report_widget_total
 introduced_by_url: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/50790
 rollout_issue_url:
 milestone: '13.8'

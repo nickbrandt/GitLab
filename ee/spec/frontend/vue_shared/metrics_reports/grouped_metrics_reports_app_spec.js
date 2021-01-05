@@ -83,7 +83,7 @@ describe('Grouped metrics reports app', () => {
 
       describe('with :usage_data_group_code_coverage_visit_total enabled', () => {
         beforeEach(() => {
-          mountComponent({ usageDataGroupCodeCoverageVisitTotal: true });
+          mountComponent({ usageDataITestingMetricsReportWidgetTotal: true });
         });
 
         it('tracks group_code_coverage_visit_total metric', () => {
@@ -96,7 +96,7 @@ describe('Grouped metrics reports app', () => {
 
       describe('with :usage_data_group_code_coverage_visit_total disabled', () => {
         beforeEach(() => {
-          mountComponent({ usageDataGroupCodeCoverageVisitTotal: false });
+          mountComponent({ usageDataITestingMetricsReportWidgetTotal: false });
         });
 
         it('does not track group_code_coverage_visit_total metric', () => {
