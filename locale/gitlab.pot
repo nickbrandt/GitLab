@@ -7471,13 +7471,40 @@ msgstr ""
 msgid "ContainerRegistry|CLI Commands"
 msgstr ""
 
+msgid "ContainerRegistry|Cleanup disabled"
+msgstr ""
+
+msgid "ContainerRegistry|Cleanup in progress"
+msgstr ""
+
+msgid "ContainerRegistry|Cleanup incomplete"
+msgstr ""
+
+msgid "ContainerRegistry|Cleanup is currently removing tags"
+msgstr ""
+
+msgid "ContainerRegistry|Cleanup is disabled for this project"
+msgstr ""
+
+msgid "ContainerRegistry|Cleanup pending"
+msgstr ""
+
 msgid "ContainerRegistry|Cleanup policy for tags is disabled"
 msgstr ""
 
 msgid "ContainerRegistry|Cleanup policy successfully saved."
 msgstr ""
 
+msgid "ContainerRegistry|Cleanup ran but some tags were not removed"
+msgstr ""
+
 msgid "ContainerRegistry|Cleanup timed out before it could delete all tags"
+msgstr ""
+
+msgid "ContainerRegistry|Cleanup will run %{time}"
+msgstr ""
+
+msgid "ContainerRegistry|Cleanup will run soon"
 msgstr ""
 
 msgid "ContainerRegistry|Configuration digest: %{digest}"
@@ -9040,9 +9067,6 @@ msgstr ""
 msgid "Default initial branch name"
 msgstr ""
 
-msgid "Default issue template"
-msgstr ""
-
 msgid "Default project deletion protection"
 msgstr ""
 
@@ -9584,6 +9608,9 @@ msgid "Description (optional)"
 msgstr ""
 
 msgid "Description parsed with %{link_start}GitLab Flavored Markdown%{link_end}"
+msgstr ""
+
+msgid "Description parsed with %{link_start}GitLab Flavored Markdown%{link_end}."
 msgstr ""
 
 msgid "Description template"
@@ -25402,7 +25429,7 @@ msgstr ""
 msgid "Set .gitlab-ci.yml to enable or configure SAST security scanning using the GitLab managed template. You can [add variable overrides](https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings) to customize SAST settings."
 msgstr ""
 
-msgid "Set a default template for issue descriptions."
+msgid "Set a default description template to be used for new issues. %{link_start}What are description templates?%{link_end}"
 msgstr ""
 
 msgid "Set a password on your account to pull or push via %{protocol}."
