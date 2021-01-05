@@ -8,13 +8,13 @@ describe('JiraConnect API', () => {
   let mock;
   let response;
 
-  const addPath = 'addPath';
-  const removePath = 'removePath';
-  const namespace = 'namespace';
-  const jwt = 'jwt';
-  const successResponse = { success: true };
+  const mockAddPath = 'addPath';
+  const mockRemovePath = 'removePath';
+  const mockNamespace = 'namespace';
+  const mockJwt = 'jwt';
+  const mockResponse = { success: true };
 
-  const tokenSpy = jest.fn().mockReturnValue(jwt);
+  const tokenSpy = jest.fn().mockReturnValue(mockJwt);
 
   window.AP = {
     context: {
@@ -32,44 +32,44 @@ describe('JiraConnect API', () => {
   });
 
   describe('addSubscription', () => {
-    const makeRequest = () => addSubscription(addPath, namespace);
+    const makeRequest = () => addSubscription(mockAddPath, mockNamespace);
 
     it('returns success response', async () => {
       jest.spyOn(axios, 'post');
       mock
-        .onPost(addPath, {
-          jwt,
-          namespace_path: namespace,
+        .onPost(mockAddPath, {
+          jwt: mockJwt,
+          namespace_path: mockNamespace,
         })
-        .replyOnce(httpStatus.OK, successResponse);
+        .replyOnce(httpStatus.OK, mockResponse);
 
       response = await makeRequest();
 
       expect(tokenSpy).toHaveBeenCalled();
-      expect(axios.post).toHaveBeenCalledWith(addPath, {
-        jwt,
-        namespace_path: namespace,
+      expect(axios.post).toHaveBeenCalledWith(mockAddPath, {
+        jwt: mockJwt,
+        namespace_path: mockNamespace,
       });
-      expect(response.data).toEqual(successResponse);
+      expect(response.data).toEqual(mockResponse);
     });
   });
 
   describe('removeSubscription', () => {
-    const makeRequest = () => removeSubscription(removePath);
+    const makeRequest = () => removeSubscription(mockRemovePath);
 
     it('returns success response', async () => {
       jest.spyOn(axios, 'delete');
-      mock.onDelete(removePath).replyOnce(httpStatus.OK, successResponse);
+      mock.onDelete(mockRemovePath).replyOnce(httpStatus.OK, mockResponse);
 
       response = await makeRequest();
 
       expect(tokenSpy).toHaveBeenCalled();
-      expect(axios.delete).toHaveBeenCalledWith(removePath, {
+      expect(axios.delete).toHaveBeenCalledWith(mockRemovePath, {
         params: {
-          jwt,
+          jwt: mockJwt,
         },
       });
-      expect(response.data).toEqual(successResponse);
+      expect(response.data).toEqual(mockResponse);
     });
   });
 });
