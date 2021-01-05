@@ -31,6 +31,12 @@ module RackAttackSpecHelpers
 
     expect(response).to have_gitlab_http_status(:too_many_requests)
     expect(response).to have_header('Retry-After')
+    expect(response).to have_header('RateLimit-Limit')
+    expect(response).to have_header('RateLimit-Observed')
+    expect(response).to have_header('RateLimit-Remaining')
+    expect(response).to have_header('RateLimit-Reset')
+    expect(response).to have_header('RateLimit-ResetTime')
+    expect(response).to have_header('Retry-After')
   end
 
   def expect_ok(&block)
