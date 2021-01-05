@@ -171,8 +171,8 @@ RSpec.describe Gitlab::Graphql::Queries do
       it_behaves_like 'a valid GraphQL query for the blog schema'
 
       it 'can resolve the ee fields' do
-        expect(subject.text(false)).not_to include('verified')
-        expect(subject.text(true)).to include('verified')
+        expect(subject.text(mode: :ce)).not_to include('verified')
+        expect(subject.text(mode: :ee)).to include('verified')
       end
     end
 

@@ -52,8 +52,8 @@ module Gitlab
           @ee_else_ce = []
         end
 
-        def text(ee = false)
-          qs = [query] + all_imports(ee).uniq.sort.map { |p| fragment(p).query }
+        def text(mode: :ce)
+          qs = [query] + all_imports(mode: mode).uniq.sort.map { |p| fragment(p).query }
           qs.join("\n\n").gsub(/\n\n+/, "\n\n")
         end
 
@@ -77,13 +77,13 @@ module Gitlab
           @query = nil
         end
 
-        def all_imports(ee = false)
+        def all_imports(mode: :ce)
           return [] if query.nil?
 
-          home = ee ? @fragments.home_ee : @fragments.home
+          home = mode == :ee ? @fragments.home_ee : @fragments.home
           eithers = @ee_else_ce.map { |p| home + p }
 
-          (imports + eithers).flat_map { |p| [p] + @fragments.get(p).all_imports(ee) }
+          (imports + eithers).flat_map { |p| [p] + @fragments.get(p).all_imports(mode: mode) }
         end
 
         def all_errors
@@ -93,6 +93,21 @@ module Gitlab
 
           paths.map { |p| fragment(p).all_errors }.reduce(@errors.to_set) { |a, b| a | b }
         end
+
+        def validate(schema)
+          return [:client_query, []] if CLIENT_DIRECTIVE.match?(text)
+
+          errs = all_errors.presence || schema.validate(text)
+          if @ee_else_ce.present?
+            errs += schema.validate(text(mode: :ee))
+          end
+
+          [:validated, errs]
+        rescue ::GraphQL::ParseError => e
+          [:validated, [WrappedError.new(e)]]
+        end
+
+        private
 
         def fragment(path)
           @fragments.get(path)
@@ -122,19 +137,6 @@ module Gitlab
           end
 
           path.to_s + '/'
-        end
-
-        def validate(schema)
-          return [:client_query, []] if CLIENT_DIRECTIVE.match?(text)
-
-          errs = all_errors.presence || schema.validate(text)
-          if @ee_else_ce.present?
-            errs += schema.validate(text(true))
-          end
-
-          [:validated, errs]
-        rescue ::GraphQL::ParseError => e
-          [:validated, [WrappedError.new(e)]]
         end
       end
 
