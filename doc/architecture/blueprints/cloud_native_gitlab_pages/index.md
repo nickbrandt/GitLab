@@ -123,7 +123,7 @@ DRIs:
 |------------------------------|------------------------|
 | Product                      |    Jackie Porter       |
 | Leadership                   |    Daniel Croft        |
-| Engineering                  |    Kamil Trzciński     |
+| Engineering                  |    Vladimir Shushlin   |
 
 Domain Experts:
 
