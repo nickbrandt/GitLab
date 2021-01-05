@@ -56,7 +56,7 @@ module Gitlab
       # Source: https://github.com/rack/rack-attack/blob/v6.3.0/lib/rack/attack/throttle.rb#L33
       period = match_data[:period]
       limit = match_data[:limit]
-      rounded_limit = (limit * 60.seconds / match_data[:period]).ceil
+      rounded_limit = (limit.to_f * 1.minute / match_data[:period]).ceil
       observed = match_data[:count]
       now = match_data[:epoch_time]
       retry_after = period - (now % period)
