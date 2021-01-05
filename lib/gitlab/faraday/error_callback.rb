@@ -43,5 +43,3 @@ module Gitlab
     end
   end
 end
-
-::Faraday::Request.register_middleware(error_callback: -> { ::Gitlab::Faraday::ErrorCallback })
