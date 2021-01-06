@@ -20,26 +20,20 @@ module Types
 
       # Issues one query per pipeline
       def groups(lookahead:)
-        needs_selected = %i[nodes jobs nodes]
-          .reduce(lookahead) { |q, f| q.selection(f) }
-          .selects?(:needs)
-        key = [object.pipeline, object, needs_selected]
+        key = ::Gitlab::Graphql::BatchKey.new(object, lookahead, object_name: :stage)
 
         BatchLoader::GraphQL.for(key).batch(default_value: []) do |keys, loader|
-          by_pipeline = keys.group_by(&:first)
-          include_needs = keys.any? { |k| k[2] }
+          by_pipeline = keys.group_by(&:pipeline)
+          include_needs = keys.any? { |k| k.requires?(%i[nodes jobs nodes needs]) }
 
           by_pipeline.each do |pl, key_group|
             project = pl.project
-            stages = key_group.map(&:second).uniq
-            indexed = stages.index_by(&:id)
+            indexed = key_group.index_by(&:id)
 
-            jobs_for_pipeline(pl, stages.map(&:id), include_needs).each do |stage_id, statuses|
-              stage = indexed[stage_id]
-              groups = ::Ci::Group.fabricate(project, stage, statuses)
-              # we don't know (and do not care) whether this set of jobs was
-              # loaded with needs preloaded as part of the key.
-              [true, false].each { |b| loader.call([pl, stage, b], groups) }
+            jobs_for_pipeline(pl, indexed.keys, include_needs).each do |stage_id, statuses|
+              key = indexed[stage_id]
+              groups = ::Ci::Group.fabricate(project, key.stage, statuses)
+              loader.call(key, groups)
             end
           end
         end
