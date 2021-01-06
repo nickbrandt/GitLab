@@ -26,39 +26,24 @@ module RackAttackSpecHelpers
     { 'AUTHORIZATION' => "Basic #{encoded_login}" }
   end
 
-  # rubocop:disable Metrics/AbcSize
   def expect_rejection(&block)
     yield
 
     expect(response).to have_gitlab_http_status(:too_many_requests)
 
-    expect(response).to have_header('RateLimit-Name')
-    expect(response.headers['RateLimit-Name']).to match(/^throttle_.*$/)
-
-    expect(response).to have_header('Retry-After')
-    expect(response.headers['Retry-After']).to match(/^\d+$/)
-
-    expect(response).to have_header('RateLimit-Limit')
-    expect(response.headers['RateLimit-Limit']).to match(/^\d+$/)
-
-    expect(response).to have_header('RateLimit-Observed')
-    expect(response.headers['RateLimit-Observed']).to match(/^\d+$/)
-
-    expect(response).to have_header('RateLimit-Remaining')
-    expect(response.headers['RateLimit-Remaining']).to match(/^\d+$/)
-
-    expect(response).to have_header('RateLimit-Reset')
-    expect(response.headers['RateLimit-Reset']).to match(/^\d+$/)
-
+    expect(response.headers.to_h).to include(
+      'RateLimit-Limit' => a_string_matching(/^\d+$/),
+      'RateLimit-Name' => a_string_matching(/^throttle_.*$/),
+      'RateLimit-Observed' => a_string_matching(/^\d+$/),
+      'RateLimit-Remaining' => a_string_matching(/^\d+$/),
+      'RateLimit-Reset' => a_string_matching(/^\d+$/),
+      'Retry-After' => a_string_matching(/^\d+$/)
+    )
     expect(response).to have_header('RateLimit-ResetTime')
     expect do
       Time.httpdate(response.headers['RateLimit-ResetTime'])
     end.not_to raise_error
-
-    expect(response).to have_header('Retry-After')
-    expect(response.headers['Retry-After']).to match(/^\d+$/)
   end
-  # rubocop:enable Metrics/AbcSize
 
   def expect_ok(&block)
     yield
