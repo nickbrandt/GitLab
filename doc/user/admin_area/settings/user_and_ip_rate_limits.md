@@ -36,6 +36,24 @@ Retry later
 
 It is possible to customize this response text in the admin area.
 
+## Response headers
+
+When a client exceeds the associated rate limit, the following requests are
+blocked. The server may respond with rate-limiting information allowing the
+requester to retry after a specific period of time. These information are
+attached into the response headers.
+
+| Header                | Example                         | Description                                                                                                                                                                                                             |
+|:----------------------|:--------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `RateLimit-Name`      | `throttle_authenticated_web`    | Name of the throttle the requests are blocked. [This section](#trying-out-throttling-settings-before-enforcing them).                                                                                                   |
+| `RateLimit-Limit`     | `60`                            | Indicate the request quota associated to the client in **1 minute**. If the rate limit period set in the admin area is different from 1 minute, the value of this header is adjusted to 60-minute period approximately. |
+| `RateLimit-Observed`  | `67`                            | Indicate the current request amount associated to the client in the time window                                                                                                                                         |
+| `RateLimit-Remaining` | `0`                             | Indicate the remaining quota in the time window. It is the result of RateLimit-Limit - RateLimit-Remaining.                                                                                                             |
+| `Retry-After`         | `30`                            | Indicate the remaining duration **in seconds** until the quota is reset. This is a [standardized HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)                                    |
+| `RateLimit-Reset`     | `30`                            | An alias of `Retry-After` header                                                                                                                                                                                        |
+| `RateLimit-ResetTime` | `Tue, 05 Jan 2021 11:00:00 GMT` | The point of time in the future that the quest quota is reset. This header is formated as specified in [RFC2616](https://tools.ietf.org/html/rfc2616#section-3.3.1)                                                     |
+
+
 ## Use an HTTP header to bypass rate limiting
 
 > [Introduced](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/622) in GitLab 13.6.
