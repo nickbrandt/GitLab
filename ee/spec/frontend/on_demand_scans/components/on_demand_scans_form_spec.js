@@ -73,7 +73,7 @@ describe('OnDemandScansForm', () => {
     findSiteProfilesSelector().vm.$emit('input', nonValidatedSiteProfile.id);
     return subject.vm.$nextTick();
   };
-  const setupSuccess = (edit = false) => {
+  const setupSuccess = ({ edit = false } = {}) => {
     jest.spyOn(subject.vm.$apollo, 'mutate').mockResolvedValue({
       data: {
         [edit ? 'dastScanUpdate' : 'dastScanCreate']: {
@@ -294,7 +294,7 @@ describe('OnDemandScansForm', () => {
                 dastScan,
               },
             });
-            await setupSuccess(true);
+            await setupSuccess({ edit: true });
             actionFunction();
           });
 
