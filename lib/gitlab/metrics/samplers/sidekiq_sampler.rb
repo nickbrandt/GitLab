@@ -25,6 +25,8 @@ module Gitlab
         end
 
         def sample
+          return unless enabled?
+
           start_time = System.monotonic_time
 
           labels = {}
@@ -35,6 +37,13 @@ module Gitlab
         end
 
         private
+
+        def enabled?
+          # During db:create and db:bootstrap skip feature query as DB is not available yet.
+          return false unless Gitlab::Database.cached_table_exists?('features')
+
+          Feature.enabled?(:run_sidekiq_sampler)
+        end
 
         def read_queues(conn)
           @queues ||= conn.sscan_each("queues").to_a
@@ -72,6 +81,7 @@ module Gitlab
           entry = job_list.first
           return 0 unless entry
 
+          # git push worker
           job = Sidekiq.load_json(entry)
           now = Time.now.to_f
           thence = job["enqueued_at"] || now

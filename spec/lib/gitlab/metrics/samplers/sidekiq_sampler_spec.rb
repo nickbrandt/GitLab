@@ -12,6 +12,7 @@ RSpec.describe Gitlab::Metrics::Samplers::SidekiqSampler do
     let(:jobs) { [[], []] }
 
     before do
+      stub_feature_flags(run_sidekiq_sampler: true)
       stub_redis :sscan_each, 'queues', queues
       stub_redis :pipelined, no_args, jobs
     end
@@ -87,6 +88,19 @@ RSpec.describe Gitlab::Metrics::Samplers::SidekiqSampler do
             sampler.sample
           end
         end
+      end
+    end
+
+    context 'when feature is disabled' do
+      it 'does not sample anything' do
+        stub_feature_flags(run_sidekiq_sampler: false)
+
+        sampler.metrics.each_value do |metric|
+          expect(metric).not_to receive(:set)
+          expect(metric).not_to receive(:increment)
+        end
+
+        sampler.sample
       end
     end
   end
