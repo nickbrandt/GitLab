@@ -20518,9 +20518,6 @@ msgstr ""
 msgid "PipelineCharts|There was an error parsing the data for the charts."
 msgstr ""
 
-msgid "PipelineCharts|Total duration:"
-msgstr ""
-
 msgid "PipelineCharts|Total:"
 msgstr ""
 
