@@ -220,7 +220,7 @@ export default {
     },
   },
   methods: {
-    onSubmit(runAfterCreate = true, button = this.$options.saveAndRunScanBtnId) {
+    onSubmit({ runAfterCreate = true, button = this.$options.saveAndRunScanBtnId } = {}) {
       if (this.glFeatures.dastSavedScans) {
         this.form.showValidation = true;
         if (!this.form.state) {
@@ -505,7 +505,7 @@ export default {
           data-testid="on-demand-scan-save-button"
           :disabled="isSaveButtonDisabled"
           :loading="loading === $options.saveScanBtnId"
-          @click="onSubmit(false, $options.saveScanBtnId)"
+          @click="onSubmit({ runAfterCreate: false, button: $options.saveScanBtnId })"
         >
           {{ s__('OnDemandScans|Save scan') }}
         </gl-button>
