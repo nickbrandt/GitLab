@@ -34,7 +34,6 @@ export const normalizeGraphQLVulnerability = (vulnerability) => {
     return null;
   }
 
-
   const newVulnerability = { ...vulnerability };
 
   if (vulnerability.id) {
