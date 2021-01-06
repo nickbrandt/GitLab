@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 import apolloProvider from './graphql/provider';
 import OnDemandScansForm from './components/on_demand_scans_form.vue';
 
@@ -36,7 +37,7 @@ export default () => {
           helpPagePath,
           projectPath,
           defaultBranch,
-          dastScan: dastScan ? JSON.parse(dastScan) : null,
+          dastScan: dastScan ? convertObjectPropsToCamelCase(JSON.parse(dastScan)) : null,
         },
       });
     },
