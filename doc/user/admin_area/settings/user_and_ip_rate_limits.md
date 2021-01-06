@@ -53,7 +53,6 @@ attached into the response headers.
 | `RateLimit-Reset`     | `30`                            | An alias of `Retry-After` header                                                                                                                                                                                        |
 | `RateLimit-ResetTime` | `Tue, 05 Jan 2021 11:00:00 GMT` | The point of time in the future that the quest quota is reset. This header is formated as specified in [RFC2616](https://tools.ietf.org/html/rfc2616#section-3.3.1)                                                     |
 
-
 ## Use an HTTP header to bypass rate limiting
 
 > [Introduced](https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/622) in GitLab 13.6.
