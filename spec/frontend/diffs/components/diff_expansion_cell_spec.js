@@ -80,8 +80,8 @@ describe('DiffExpansionCell', () => {
     return mount(DiffExpansionCell, { store, propsData });
   };
 
-  const findExpandUp = wrapper => wrapper.find(EXPAND_UP_CLASS);
-  const findExpandDown = wrapper => wrapper.find(EXPAND_DOWN_CLASS);
+  const findExpandUp = (wrapper) => wrapper.find(EXPAND_UP_CLASS);
+  const findExpandDown = (wrapper) => wrapper.find(EXPAND_DOWN_CLASS);
   const findExpandAll = ({ element }) => getByText(element, 'Show all unchanged lines');
 
   describe('top row', () => {
