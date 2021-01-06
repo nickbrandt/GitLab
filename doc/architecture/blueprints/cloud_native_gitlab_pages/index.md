@@ -121,7 +121,7 @@ DRIs:
 
 | Role                         | Who
 |------------------------------|------------------------|
-| Product                      |    Jackie Porter       |
+| Product                      |    Orit Golowinski       |
 | Leadership                   |    Daniel Croft        |
 | Engineering                  |    Vladimir Shushlin   |
 
