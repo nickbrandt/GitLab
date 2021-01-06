@@ -13,9 +13,7 @@ module Gitlab
           end
 
           def valid?
-            strong_memoize(:valid) do
-              errors.nil?
-            end
+            errors.nil?
           end
 
           # errors sorts an array of variables, ignoring unknown variable references,
@@ -26,7 +24,7 @@ module Gitlab
             strong_memoize(:errors) do
               # Check for cyclic dependencies and build error message in that case
               errors = each_strongly_connected_component.filter_map do |component|
-                "#{component.map { |v| v[:key] }.inspect}" if component.size > 1
+                component.map { |v| v[:key] }.inspect if component.size > 1
               end
 
               "circular variable reference detected: #{errors.join(', ')}" if errors.any?
@@ -38,16 +36,14 @@ module Gitlab
           def sort
             return @variables if Feature.disabled?(:variable_inside_variable)
 
-            clear_memoization(:valid)
+            clear_memoization(:errors)
             begin
               # Perform a topological sort
               variables = tsort
-              valid = true
+              strong_memoize(:errors) { nil }
             rescue TSort::Cyclic
               variables = @variables
-              valid = false
             end
-            strong_memoize(:valid) { valid }
 
             variables
           end

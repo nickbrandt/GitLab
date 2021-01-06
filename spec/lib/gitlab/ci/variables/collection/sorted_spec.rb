@@ -3,15 +3,11 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Ci::Variables::Collection::Sorted do
-  let(:variable_inside_variable_enabled) { false }
-
-  before do
-    stub_feature_flags(variable_inside_variable: variable_inside_variable_enabled)
-  end
-
   describe '#errors' do
     context 'when FF :variable_inside_variable is disabled' do
-      let(:variable_inside_variable_enabled) { false }
+      before do
+        stub_feature_flags(variable_inside_variable: false)
+      end
 
       context 'table tests' do
         using RSpec::Parameterized::TableSyntax
@@ -71,7 +67,9 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Sorted do
     end
 
     context 'when FF :variable_inside_variable is enabled' do
-      let(:variable_inside_variable_enabled) { true }
+      before do
+        stub_feature_flags(variable_inside_variable: true)
+      end
 
       context 'table tests' do
         using RSpec::Parameterized::TableSyntax
@@ -118,7 +116,9 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Sorted do
 
   describe '#sort' do
     context 'when FF :variable_inside_variable is disabled' do
-      let(:variable_inside_variable_enabled) { false }
+      before do
+        stub_feature_flags(variable_inside_variable: false)
+      end
 
       context 'table tests' do
         using RSpec::Parameterized::TableSyntax
@@ -174,7 +174,11 @@ RSpec.describe Gitlab::Ci::Variables::Collection::Sorted do
     end
 
     context 'when FF :variable_inside_variable is enabled' do
-      let(:variable_inside_variable_enabled) { true }
+      before do
+        stub_licensed_features(group_saml_group_sync: true)
+        stub_feature_flags(saml_group_links: true)
+        stub_feature_flags(variable_inside_variable: true)
+      end
 
       context 'table tests' do
         using RSpec::Parameterized::TableSyntax
