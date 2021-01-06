@@ -1,35 +1,36 @@
+import $ from 'jquery';
+import { setHTMLFixture } from 'helpers/fixtures';
 import initSearch from '~/search_settings';
+import { expandSection, closeSection } from '~/settings_panels';
+
+jest.mock('~/settings_panels');
 
 describe('search_settings/index', () => {
-  let onExpand;
-  let onCollapse;
   let app;
 
   beforeEach(() => {
-    const searchRoot = document.createElement('div');
     const el = document.createElement('div');
 
-    onExpand = jest.fn();
-    onCollapse = jest.fn();
+    setHTMLFixture('<div id="content-body"></div>');
 
-    app = initSearch({ el, searchRoot, sectionSelector: 'section', onExpand, onCollapse });
+    app = initSearch({ el });
   });
 
   afterEach(() => {
     app.$destroy();
   });
 
-  it('calls onExpand function when expand event is emitted', () => {
+  it('calls settings_panel.onExpand when expand event is emitted', () => {
     const section = { name: 'section' };
     app.$refs.searchSettings.$emit('expand', section);
 
-    expect(onExpand).toHaveBeenCalledWith(section);
+    expect(expandSection).toHaveBeenCalledWith($(section));
   });
 
-  it('calls onCollapse function when collapse event is emitted', () => {
+  it('calls settings_panel.closeSection when collapse event is emitted', () => {
     const section = { name: 'section' };
     app.$refs.searchSettings.$emit('collapse', section);
 
-    expect(onCollapse).toHaveBeenCalledWith(section);
+    expect(closeSection).toHaveBeenCalledWith($(section));
   });
 });

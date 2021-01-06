@@ -1,24 +1,12 @@
-import $ from 'jquery';
-import { expandSection, closeSection } from '~/settings_panels';
-
 const mountSearchSettings = async () => {
-  if (!gon.features?.searchSettingsInPage) {
-    return;
+  const el = document.querySelector('.js-search-settings-app');
+
+  if (el) {
+    const { default: initSearch } = await import(
+      /* webpackChunkName: 'search_settings' */ '~/search_settings'
+    );
+    initSearch({ el });
   }
-
-  const { default: initSearch } = await import('~/search_settings');
-
-  initSearch({
-    el: document.querySelector('.js-search-settings-app'),
-    searchRoot: document.querySelector('#content-body'),
-    sectionSelector: 'section.settings',
-    onCollapse(section) {
-      closeSection($(section));
-    },
-    onExpand(section) {
-      expandSection($(section));
-    },
-  });
 };
 
 export default mountSearchSettings;
