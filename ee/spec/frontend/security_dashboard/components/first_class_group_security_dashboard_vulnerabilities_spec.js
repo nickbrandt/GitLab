@@ -1,11 +1,4 @@
-import {
-  GlAlert,
-  GlTable,
-  GlEmptyState,
-  GlIntersectionObserver,
-  GlLoadingIcon,
-  GlButton,
-} from '@gitlab/ui';
+import { GlAlert, GlTable, GlEmptyState, GlIntersectionObserver, GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import FirstClassGroupVulnerabilities from 'ee/security_dashboard/components/first_class_group_security_dashboard_vulnerabilities.vue';
 import VulnerabilityList from 'ee/security_dashboard/components/vulnerability_list.vue';
@@ -81,7 +74,7 @@ describe('First Class Group Dashboard Vulnerabilities Component', () => {
 
     it('should have an alert that is dismissable', () => {
       const alert = findAlert();
-      alert.find(GlButton).vm.$emit('click');
+      alert.find('button').trigger('click');
       return wrapper.vm.$nextTick(() => {
         expect(alert.exists()).toBe(false);
       });
