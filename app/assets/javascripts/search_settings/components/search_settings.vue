@@ -51,14 +51,16 @@ const clearResults = (params) => {
   clearHighlights();
 };
 
-const includeNode = (node, searchTerm) =>
-  node.textContent.toLowerCase().includes(searchTerm.toLowerCase()) &&
+const includeNode = (node, lowerSearchTerm) =>
+  node.textContent.toLowerCase().includes(lowerSearchTerm) &&
   EXCLUDED_NODES.every((excluded) => !node.parentElement.closest(excluded));
 
 const search = (root, searchTerm) => {
   const iterator = document.createNodeIterator(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
-      return includeNode(node, searchTerm) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      return includeNode(node, searchTerm.toLowerCase())
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_REJECT;
     },
   });
   const results = [];

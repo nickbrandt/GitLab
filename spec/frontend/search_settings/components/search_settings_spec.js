@@ -20,7 +20,8 @@ describe('search_settings/components/search_settings.vue', () => {
     });
   };
 
-  const sectionsCount = () => document.querySelectorAll(SECTION_SELECTOR).length;
+  const sections = () => Array.from(document.querySelectorAll(SECTION_SELECTOR));
+  const sectionsCount = () => sections().length;
   const visibleSectionsCount = () =>
     document.querySelectorAll(`${SECTION_SELECTOR}:not(.${HIDE_CLASS})`).length;
   const highlightedElementsCount = () => document.querySelectorAll(`.${HIGHLIGHT_CLASS}`).length;
@@ -49,6 +50,17 @@ describe('search_settings/components/search_settings.vue', () => {
 
   afterEach(() => {
     wrapper.destroy();
+  });
+
+  it('expands first section and collapses the rest', () => {
+    clearSearch();
+
+    const [firstSection, ...otherSections] = sections();
+
+    expect(wrapper.emitted()).toEqual({
+      expand: [[firstSection]],
+      collapse: otherSections.map((x) => [x]),
+    });
   });
 
   it('hides sections that do not match the search term', () => {

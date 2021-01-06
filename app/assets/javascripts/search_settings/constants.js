@@ -1,22 +1,11 @@
-/**
- * We do not consider these nodes in the search index
- */
+// We do not consider these nodes in the search index
 export const EXCLUDED_NODES = ['OPTION'];
 
-/**
- * Used to hide the sections that do not match
- * the search term
- */
+// Used to hide the sections that do not match * the search term
 export const HIDE_CLASS = 'gl-display-none';
 
-/**
- * used to highlight the text that matches the
- * search term
- */
+// used to highlight the text that matches the * search term
 export const HIGHLIGHT_CLASS = 'gl-bg-orange-50';
 
-/**
- * How many seconds to wait until the user
- * stops typing
- * */
+// How many seconds to wait until the user * stops typing
 export const TYPING_DELAY = 400;
