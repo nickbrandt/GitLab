@@ -131,9 +131,9 @@ export default {
             showValidation: false,
             state: false,
             fields: {
-              name: initFormField({ value: this.dastScan?.name || '' }),
+              name: initFormField({ value: this.dastScan?.name ?? '' }),
               description: initFormField({
-                value: this.dastScan?.description || '',
+                value: this.dastScan?.description ?? '',
                 required: false,
                 skipValidation: true,
               }),
