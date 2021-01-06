@@ -45,13 +45,13 @@ attached into the response headers.
 
 | Header                | Example                         | Description                                                                                                                                                                                                             |
 |:----------------------|:--------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `RateLimit-Name`      | `throttle_authenticated_web`    | Name of the throttle the requests are blocked.                                                                                                                                                                          |
 | `RateLimit-Limit`     | `60`                            | Indicate the request quota associated to the client in **1 minute**. If the rate limit period set in the admin area is different from 1 minute, the value of this header is adjusted to 60-minute period approximately. |
+| `RateLimit-Name`      | `throttle_authenticated_web`    | Name of the throttle the requests are blocked.                                                                                                                                                                          |
 | `RateLimit-Observed`  | `67`                            | Indicate the current request amount associated to the client in the time window                                                                                                                                         |
 | `RateLimit-Remaining` | `0`                             | Indicate the remaining quota in the time window. It is the result of RateLimit-Limit - RateLimit-Remaining.                                                                                                             |
-| `Retry-After`         | `30`                            | Indicate the remaining duration **in seconds** until the quota is reset. This is a [standardized HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)                                    |
 | `RateLimit-Reset`     | `30`                            | An alias of `Retry-After` header                                                                                                                                                                                        |
 | `RateLimit-ResetTime` | `Tue, 05 Jan 2021 11:00:00 GMT` | The point of time in the future that the quest quota is reset. This header is formated as specified in [RFC2616](https://tools.ietf.org/html/rfc2616#section-3.3.1)                                                     |
+| `Retry-After`         | `30`                            | Indicate the remaining duration **in seconds** until the quota is reset. This is a [standardized HTTP header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After)                                    |
 
 ## Use an HTTP header to bypass rate limiting
 
