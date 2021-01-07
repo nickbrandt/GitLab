@@ -532,7 +532,10 @@ endpoints](../../user/admin_area/settings/rate_limits_on_raw_endpoints.md).
 
 ### Rate limiting responses
 
-Please see [list of the headers responded to blocked requests](../admin_area/settings/user_and_ip_rate_limits.md#response-headers) and [customizable response text](../admin_area/settings/user_and_ip_rate_limits.md#response-text) for more information.
+For information on rate limiting responses, see:
+
+- [List of headers on responses to blocked requests](../admin_area/settings/user_and_ip_rate_limits.md#response-headers).
+- [Customizable response text](../admin_area/settings/user_and_ip_rate_limits.md#response-text).
 
 ### Protected paths throttle
 
