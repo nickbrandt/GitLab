@@ -26,8 +26,6 @@ RSpec.describe Gitlab::Faraday::ErrorCallback do
 
       context 'with no callback' do
         it 'uses the default callback' do
-          expect(Gitlab::Faraday::ErrorCallback::Options::DEFAULT_CALLBACK).to receive(:call).and_call_original
-
           expect { subject }.to raise_error(ArgumentError, 'Kaboom!')
         end
       end

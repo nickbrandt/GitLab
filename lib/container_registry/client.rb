@@ -176,7 +176,7 @@ module ContainerRegistry
       yield(conn) if block_given?
 
       conn.request(:retry, RETRY_OPTIONS)
-      conn.request(:error_callback, ERROR_CALLBACK_OPTIONS)
+      conn.request(:gitlab_error_callback, ERROR_CALLBACK_OPTIONS)
       conn.adapter :net_http
     end
 
@@ -226,7 +226,7 @@ module ContainerRegistry
         conn.request :json
 
         conn.request(:retry, RETRY_OPTIONS)
-        conn.request(:error_callback, ERROR_CALLBACK_OPTIONS)
+        conn.request(:gitlab_error_callback, ERROR_CALLBACK_OPTIONS)
         conn.adapter :net_http
       end
     end

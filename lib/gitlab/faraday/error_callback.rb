@@ -29,15 +29,14 @@ module Gitlab
       def call(env)
         @app.call(env)
       rescue => e
-        @options.callback.call(env, e)
+        @options.callback&.call(env, e)
+
         raise
       end
 
       class Options < ::Faraday::Options.new(:callback)
-        DEFAULT_CALLBACK = -> (_env, _exception) { }
-
         def callback
-          self[:callback] || DEFAULT_CALLBACK
+          self[:callback]
         end
       end
     end
