@@ -3000,6 +3000,16 @@
           "possibleTypes": null
         },
         {
+          "kind": "SCALAR",
+          "name": "BigInt",
+          "description": "Represents non-fractional signed whole numeric values. Since the value may exceed the size of a 32-bit integer, it's encoded as a string.",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "Blob",
           "description": null,
@@ -10458,7 +10468,7 @@
               ],
               "type": {
                 "kind": "SCALAR",
-                "name": "Int",
+                "name": "BigInt",
                 "ofType": null
               },
               "isDeprecated": false,
