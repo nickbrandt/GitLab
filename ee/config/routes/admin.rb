@@ -24,6 +24,7 @@ namespace :admin do
       put :revoke
     end
   end
+  resources :user_permission_exports, controller: 'user_permission_exports', only: [:index]
 
   resource :license, only: [:show, :new, :create, :destroy] do
     get :download, on: :member

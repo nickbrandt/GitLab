@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Members
-  class PermissionsExportService
+module UserPermissions
+  class ExportService
     def initialize(current_user)
       @current_user = current_user
     end
