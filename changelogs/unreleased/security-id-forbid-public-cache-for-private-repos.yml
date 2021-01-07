@@ -1,5 +1,0 @@
----
-title: Forbid public cache for private repos
-merge_request: 1117
-author:
-type: security
