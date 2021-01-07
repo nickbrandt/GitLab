@@ -1055,6 +1055,19 @@ entry.
 - Change wording on the project remove fork page. !47878
 
 
+## 13.5.6 (2021-01-07)
+
+### Security (7 changes)
+
+- Forbid public cache for private repos.
+- Deny implicit flow for confidential apps.
+- Update NuGet regular expression to protect against ReDoS.
+- Fix regular expression backtracking issue in package name validation.
+- Upgrade GitLab Pages to 1.28.2.
+- Update trusted OAuth applications to set them as confidential.
+- Upgrade Workhorse to 8.51.2.
+
+
 ## 13.5.5 (2020-12-07)
 
 ### Security (10 changes)
