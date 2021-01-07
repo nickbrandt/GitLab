@@ -14,8 +14,9 @@ import dastSiteProfilesQuery from 'ee/security_configuration/dast_profiles/graph
 import { stubComponent } from 'helpers/stub_component';
 import * as responses from '../mocks/apollo_mocks';
 import { scannerProfiles, siteProfiles } from '../mocks/mock_data';
-import { redirectTo } from '~/lib/utils/url_utility';
+import { redirectTo, setUrlParams } from '~/lib/utils/url_utility';
 
+const URL_HOST = 'https://localhost/';
 const helpPagePath = '/application_security/dast/index#on-demand-scans';
 const projectPath = 'group/project';
 const defaultBranch = 'master';
@@ -44,6 +45,8 @@ const dastScan = {
 
 jest.mock('~/lib/utils/url_utility', () => ({
   isAbsolute: jest.requireActual('~/lib/utils/url_utility').isAbsolute,
+  queryToObject: jest.requireActual('~/lib/utils/url_utility').queryToObject,
+  setUrlParams: jest.requireActual('~/lib/utils/url_utility').setUrlParams,
   redirectTo: jest.fn(),
 }));
 
@@ -502,6 +505,39 @@ describe('OnDemandScansForm', () => {
       expect(summary).toMatch(authEnabledProfile.auth.username);
       expect(summary).toMatch(authEnabledProfile.auth.usernameField);
       expect(summary).toMatch(authEnabledProfile.auth.passwordField);
+    });
+  });
+
+  describe('populate profiles from query params', () => {
+    const [siteProfile] = siteProfiles;
+    const [scannerProfile] = scannerProfiles;
+
+    it('scanner profile', () => {
+      global.jsdom.reconfigure({
+        url: setUrlParams({ scanner_profile_id: 1 }, URL_HOST),
+      });
+      mountShallowSubject();
+
+      expect(subject.find(ScannerProfileSelector).attributes('value')).toBe(scannerProfile.id);
+    });
+
+    it('site profile', () => {
+      global.jsdom.reconfigure({
+        url: setUrlParams({ site_profile_id: 1 }, URL_HOST),
+      });
+      mountShallowSubject();
+
+      expect(subject.find(SiteProfileSelector).attributes('value')).toBe(siteProfile.id);
+    });
+
+    it('both scanner & site profile', () => {
+      global.jsdom.reconfigure({
+        url: setUrlParams({ site_profile_id: 1, scanner_profile_id: 1 }, URL_HOST),
+      });
+      mountShallowSubject();
+
+      expect(subject.find(SiteProfileSelector).attributes('value')).toBe(siteProfile.id);
+      expect(subject.find(ScannerProfileSelector).attributes('value')).toBe(scannerProfile.id);
     });
   });
 });
