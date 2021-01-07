@@ -58,11 +58,15 @@ RSpec.describe MergeRequests::AfterCreateService do
       execute_service
     end
 
-    it 'records an onboarding progress action' do
+    it 'registers an onboarding progress action' do
+      OnboardingProgress.onboard(merge_request.target_project.namespace)
+
       expect_next(OnboardingProgressService, merge_request.target_project.namespace)
         .to receive(:execute).with(action: :merge_request_created).and_call_original
 
-      expect { execute_service }.to change(NamespaceOnboardingAction, :count).by(1)
+      execute_service
+
+      expect(OnboardingProgress.completed?(merge_request.target_project.namespace, :merge_request_created)).to be(true)
     end
   end
 end
