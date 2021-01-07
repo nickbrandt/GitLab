@@ -28,7 +28,6 @@ export const getAddRelatedIssueRequestParams = (reference, defaultProjectId) => 
   return { target_issue_iid: issueId, target_project_id: projectId };
 };
 
-// Normalize vulnerability data returned by graphql.
 export const normalizeGraphQLVulnerability = (vulnerability) => {
   if (!vulnerability) {
     return null;
