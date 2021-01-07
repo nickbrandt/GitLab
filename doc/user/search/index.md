@@ -36,7 +36,7 @@ on the search field on the top-right of your screen:
 
 ### Filtering issue and merge request lists
 
-Follow these steps to filter the **Issues** and **Merge Requests** list pages within projects and
+Follow these steps to filter the **Issues** and **Merge Requests** list pages in projects and
 groups:
 
 1. Click in the field **Search or filter results...**.
@@ -226,7 +226,7 @@ and **Labels**, select multiple issues to add to a list of your choice:
 ## Shortcut
 
 You'll find a shortcut on the search field on the top-right of the project's dashboard to
-quickly access issues and merge requests created or assigned to you within that project:
+quickly access issues and merge requests created or assigned to you in that project:
 
 ![search per project - shortcut](img/project_search.png)
 
@@ -241,12 +241,12 @@ You can also type in this search bar to see autocomplete suggestions for:
 - Recently viewed issues (try and type some word from the title of a recently viewed issue)
 - Recently viewed merge requests (try and type some word from the title of a recently viewed merge request)
 - Recently viewed epics (try and type some word from the title of a recently viewed epic)
-- [GitLab Flavored Markdown](../markdown.md#special-gitlab-references) (GFM) for issues within a project (try and type a GFM reference for an issue)
+- [GitLab Flavored Markdown](../markdown.md#special-gitlab-references) (GFM) for issues in a project (try and type a GFM reference for an issue)
 
 ## Basic search
 
 The Basic search in GitLab is a global search service that allows you to search
-across the entire GitLab instance, within a group, or a single project. Basic search is
+across the entire GitLab instance, in a group, or in a single project. Basic search is
 backed by the database and allows searching in:
 
 - Projects
@@ -261,12 +261,12 @@ backed by the database and allows searching in:
 - Wiki (Project only)
 
 To start a search, type into the search bar on the top-right of the screen. You can always search
-in all GitLab and may also see the options to search within a group or project if you are in the
+in all GitLab and may also see the options to search in a group or project if you are in the
 group or project dashboard.
 
 ![basic search](img/basic_search.png)
 
-Once the results are returned, you can modify the search, select a different type of data to
+After the results are returned, you can modify the search, select a different type of data to
 search, or choose a specific group or project.
 
 ![basic_search_results](img/basic_search_results.png)
@@ -281,7 +281,7 @@ the search field on the top-right of your screen while the project page is open.
 
 ### SHA search
 
-You can quickly access a commit from within the project dashboard by entering the SHA
+You can quickly access a commit from the project dashboard by entering the SHA
 into the search field on the top right of the screen. If a single result is found, you will be
 redirected to the commit result and given the option to return to the search results page.
 
