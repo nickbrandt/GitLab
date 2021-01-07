@@ -18,6 +18,7 @@ describe('~/lib/utils/favicon', () => {
     it('initializes only once when called', async () => {
       expect(FaviconOverlayManager.initialize).not.toHaveBeenCalled();
 
+      // Call twice so we can make sure initialize is only called once
       await call();
       await call();
 
