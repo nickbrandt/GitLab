@@ -174,8 +174,8 @@ id_ecdsa
 #####################
 # Any file ending with _history or .history extension
 #####################
-pry.history
-bash_history
+*.history
+*_history
 ```
 
 ## Prohibited file names
