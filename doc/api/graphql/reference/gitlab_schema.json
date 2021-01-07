@@ -957,7 +957,7 @@
               "args": [
                 {
                   "name": "action",
-                  "description": "The action to be filtered",
+                  "description": "The action to be filtered.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -975,7 +975,7 @@
                 },
                 {
                   "name": "authorId",
-                  "description": "The ID of an author",
+                  "description": "The ID of an author.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -993,7 +993,7 @@
                 },
                 {
                   "name": "projectId",
-                  "description": "The ID of a project",
+                  "description": "The ID of a project.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -1011,7 +1011,7 @@
                 },
                 {
                   "name": "groupId",
-                  "description": "The ID of a group",
+                  "description": "The ID of a group.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -1029,7 +1029,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "The state of the todo",
+                  "description": "The state of the todo.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -1047,7 +1047,7 @@
                 },
                 {
                   "name": "type",
-                  "description": "The type of the todo",
+                  "description": "The type of the todo.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -3542,7 +3542,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "Find a list by its global ID",
+                  "description": "Find a list by its global ID.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ListID",
@@ -3552,7 +3552,7 @@
                 },
                 {
                   "name": "issueFilters",
-                  "description": "Filters applied when getting issue metadata in the board list",
+                  "description": "Filters applied when getting issue metadata in the board list.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "BoardIssueInput",
@@ -3820,7 +3820,7 @@
                 },
                 {
                   "name": "timeframe",
-                  "description": "List items overlapping the given timeframe",
+                  "description": "List items overlapping the given timeframe.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "Timeframe",
@@ -5300,7 +5300,7 @@
               "args": [
                 {
                   "name": "filters",
-                  "description": "Filters applied when selecting issues in the board list",
+                  "description": "Filters applied when selecting issues in the board list.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "BoardIssueInput",
@@ -9160,7 +9160,7 @@
               "args": [
                 {
                   "name": "status",
-                  "description": "Filter pipelines by their status",
+                  "description": "Filter pipelines by their status.",
                   "type": {
                     "kind": "ENUM",
                     "name": "PipelineStatusEnum",
@@ -9170,7 +9170,7 @@
                 },
                 {
                   "name": "ref",
-                  "description": "Filter pipelines by the ref they are run for",
+                  "description": "Filter pipelines by the ref they are run for.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -9180,7 +9180,7 @@
                 },
                 {
                   "name": "sha",
-                  "description": "Filter pipelines by the sha of the commit they are run for",
+                  "description": "Filter pipelines by the sha of the commit they are run for.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -17156,7 +17156,7 @@
               "args": [
                 {
                   "name": "earlierOrEqualToSha",
-                  "description": "The SHA256 of the most recent acceptable version",
+                  "description": "The SHA256 of the most recent acceptable version.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -17166,7 +17166,7 @@
                 },
                 {
                   "name": "earlierOrEqualToId",
-                  "description": "The Global ID of the most recent acceptable version",
+                  "description": "The Global ID of the most recent acceptable version.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "DesignManagementVersionID",
@@ -17615,7 +17615,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "Find a design by its ID",
+                  "description": "Find a design by its ID.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "DesignManagementDesignID",
@@ -17625,7 +17625,7 @@
                 },
                 {
                   "name": "filename",
-                  "description": "Find a design by its filename",
+                  "description": "Find a design by its filename.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -17648,7 +17648,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "The Global ID of the design at this version",
+                  "description": "The Global ID of the design at this version.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -17675,7 +17675,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Filters designs by their ID",
+                  "description": "Filters designs by their ID.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -17693,7 +17693,7 @@
                 },
                 {
                   "name": "filenames",
-                  "description": "Filters designs by their filename",
+                  "description": "Filters designs by their filename.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -17814,7 +17814,7 @@
               "args": [
                 {
                   "name": "sha",
-                  "description": "The SHA256 of a specific version",
+                  "description": "The SHA256 of a specific version.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -17824,7 +17824,7 @@
                 },
                 {
                   "name": "id",
-                  "description": "The Global ID of the version",
+                  "description": "The Global ID of the version.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "DesignManagementVersionID",
@@ -17847,7 +17847,7 @@
               "args": [
                 {
                   "name": "earlierOrEqualToSha",
-                  "description": "The SHA256 of the most recent acceptable version",
+                  "description": "The SHA256 of the most recent acceptable version.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -17857,7 +17857,7 @@
                 },
                 {
                   "name": "earlierOrEqualToId",
-                  "description": "The Global ID of the most recent acceptable version",
+                  "description": "The Global ID of the most recent acceptable version.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "DesignManagementVersionID",
@@ -18276,7 +18276,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "The Global ID of the design at this version",
+                  "description": "The Global ID of the design at this version.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -18303,7 +18303,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "The Global ID of the version",
+                  "description": "The Global ID of the version.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -18809,7 +18809,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "The ID of the DesignAtVersion",
+                  "description": "The ID of the DesignAtVersion.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "DesignManagementDesignAtVersionID",
@@ -18819,7 +18819,7 @@
                 },
                 {
                   "name": "designId",
-                  "description": "The ID of a specific design",
+                  "description": "The ID of a specific design.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "DesignManagementDesignID",
@@ -18829,7 +18829,7 @@
                 },
                 {
                   "name": "filename",
-                  "description": "The filename of a specific design",
+                  "description": "The filename of a specific design.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -18913,7 +18913,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Filters designs by their ID",
+                  "description": "Filters designs by their ID.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -18931,7 +18931,7 @@
                 },
                 {
                   "name": "filenames",
-                  "description": "Filters designs by their filename",
+                  "description": "Filters designs by their filename.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -21881,7 +21881,7 @@
               "args": [
                 {
                   "name": "path",
-                  "description": "Path to a file which defines metrics dashboard eg: 'config/prometheus/common_metrics.yml'",
+                  "description": "Path to a file which defines metrics dashboard eg: 'config/prometheus/common_metrics.yml'.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -22237,7 +22237,7 @@
                 },
                 {
                   "name": "timeframe",
-                  "description": "List items overlapping the given timeframe",
+                  "description": "List items overlapping the given timeframe.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "Timeframe",
@@ -26948,7 +26948,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "The board's ID",
+                  "description": "The board's ID.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -26975,7 +26975,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "Find a board by its ID",
+                  "description": "Find a board by its ID.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "BoardID",
@@ -27168,7 +27168,7 @@
               "args": [
                 {
                   "name": "name",
-                  "description": "Filter the container repositories by their name",
+                  "description": "Filter the container repositories by their name.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -27382,7 +27382,7 @@
                 },
                 {
                   "name": "timeframe",
-                  "description": "List items overlapping the given timeframe",
+                  "description": "List items overlapping the given timeframe.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "Timeframe",
@@ -27621,7 +27621,7 @@
                 },
                 {
                   "name": "timeframe",
-                  "description": "List items overlapping the given timeframe",
+                  "description": "List items overlapping the given timeframe.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "Timeframe",
@@ -27850,7 +27850,7 @@
               "args": [
                 {
                   "name": "search",
-                  "description": "Search query",
+                  "description": "Search query.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -27860,7 +27860,7 @@
                 },
                 {
                   "name": "relations",
-                  "description": "Filter members by the given member relations",
+                  "description": "Filter members by the given member relations.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -27981,7 +27981,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "IID of the issue. For example, \"1\"",
+                  "description": "IID of the issue. For example, \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -27991,7 +27991,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of issues. For example, [1, 2]",
+                  "description": "List of IIDs of issues. For example, [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28009,7 +28009,7 @@
                 },
                 {
                   "name": "labelName",
-                  "description": "Labels applied to this issue",
+                  "description": "Labels applied to this issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28023,7 +28023,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Milestone applied to this issue",
+                  "description": "Milestone applied to this issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28037,7 +28037,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Username of the author of the issue",
+                  "description": "Username of the author of the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28047,7 +28047,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issue",
+                  "description": "Username of a user assigned to the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28057,7 +28057,7 @@
                 },
                 {
                   "name": "assigneeUsernames",
-                  "description": "Usernames of users assigned to the issue",
+                  "description": "Usernames of users assigned to the issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28075,7 +28075,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28085,7 +28085,7 @@
                 },
                 {
                   "name": "createdBefore",
-                  "description": "Issues created before this date",
+                  "description": "Issues created before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28095,7 +28095,7 @@
                 },
                 {
                   "name": "createdAfter",
-                  "description": "Issues created after this date",
+                  "description": "Issues created after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28105,7 +28105,7 @@
                 },
                 {
                   "name": "updatedBefore",
-                  "description": "Issues updated before this date",
+                  "description": "Issues updated before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28115,7 +28115,7 @@
                 },
                 {
                   "name": "updatedAfter",
-                  "description": "Issues updated after this date",
+                  "description": "Issues updated after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28125,7 +28125,7 @@
                 },
                 {
                   "name": "closedBefore",
-                  "description": "Issues closed before this date",
+                  "description": "Issues closed before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28135,7 +28135,7 @@
                 },
                 {
                   "name": "closedAfter",
-                  "description": "Issues closed after this date",
+                  "description": "Issues closed after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28145,7 +28145,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for issue title or description",
+                  "description": "Search query for issue title or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28155,7 +28155,7 @@
                 },
                 {
                   "name": "types",
-                  "description": "Filter issues by the given issue types",
+                  "description": "Filter issues by the given issue types.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28173,7 +28173,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Current state of this issue",
+                  "description": "Current state of this issue.",
                   "type": {
                     "kind": "ENUM",
                     "name": "IssuableState",
@@ -28183,7 +28183,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort issues by this criteria",
+                  "description": "Sort issues by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "IssueSort",
@@ -28300,7 +28300,7 @@
                 },
                 {
                   "name": "timeframe",
-                  "description": "List items overlapping the given timeframe",
+                  "description": "List items overlapping the given timeframe.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "Timeframe",
@@ -28531,7 +28531,7 @@
               "args": [
                 {
                   "name": "iids",
-                  "description": "Array of IIDs of merge requests, for example `[1, 2]`",
+                  "description": "Array of IIDs of merge requests, for example `[1, 2]`.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28613,7 +28613,7 @@
                 },
                 {
                   "name": "mergedAfter",
-                  "description": "Merge requests merged after this date",
+                  "description": "Merge requests merged after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28623,7 +28623,7 @@
                 },
                 {
                   "name": "mergedBefore",
-                  "description": "Merge requests merged before this date",
+                  "description": "Merge requests merged before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28633,7 +28633,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Title of the milestone",
+                  "description": "Title of the milestone.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28643,7 +28643,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort merge requests by this criteria",
+                  "description": "Sort merge requests by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "MergeRequestSort",
@@ -28663,7 +28663,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of the assignee",
+                  "description": "Username of the assignee.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28673,7 +28673,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Username of the author",
+                  "description": "Username of the author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28756,7 +28756,7 @@
                 },
                 {
                   "name": "timeframe",
-                  "description": "List items overlapping the given timeframe",
+                  "description": "List items overlapping the given timeframe.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "Timeframe",
@@ -28766,7 +28766,7 @@
                 },
                 {
                   "name": "ids",
-                  "description": "Array of global milestone IDs, e.g., \"gid://gitlab/Milestone/1\"",
+                  "description": "Array of global milestone IDs, e.g., \"gid://gitlab/Milestone/1\".",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28784,7 +28784,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter milestones by state",
+                  "description": "Filter milestones by state.",
                   "type": {
                     "kind": "ENUM",
                     "name": "MilestoneStateEnum",
@@ -28794,7 +28794,7 @@
                 },
                 {
                   "name": "title",
-                  "description": "The title of the milestone",
+                  "description": "The title of the milestone.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28804,7 +28804,7 @@
                 },
                 {
                   "name": "searchTitle",
-                  "description": "A search string for the title",
+                  "description": "A search string for the title.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28814,7 +28814,7 @@
                 },
                 {
                   "name": "containingDate",
-                  "description": "A date that the milestone contains",
+                  "description": "A date that the milestone contains.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -28824,7 +28824,7 @@
                 },
                 {
                   "name": "includeDescendants",
-                  "description": "Also return milestones in all subgroups and subprojects",
+                  "description": "Also return milestones in all subgroups and subprojects.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -28965,7 +28965,7 @@
               "args": [
                 {
                   "name": "includeSubgroups",
-                  "description": "Include also subgroup projects",
+                  "description": "Include also subgroup projects.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -28975,7 +28975,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search project with most similar names or paths",
+                  "description": "Search project with most similar names or paths.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28985,7 +28985,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort projects by this criteria",
+                  "description": "Sort projects by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "NamespaceProjectSort",
@@ -36273,7 +36273,7 @@
               "args": [
                 {
                   "name": "name",
-                  "description": "Project name or key",
+                  "description": "Project name or key.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -38560,7 +38560,7 @@
               "args": [
                 {
                   "name": "status",
-                  "description": "Filter pipelines by their status",
+                  "description": "Filter pipelines by their status.",
                   "type": {
                     "kind": "ENUM",
                     "name": "PipelineStatusEnum",
@@ -38570,7 +38570,7 @@
                 },
                 {
                   "name": "ref",
-                  "description": "Filter pipelines by the ref they are run for",
+                  "description": "Filter pipelines by the ref they are run for.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -38580,7 +38580,7 @@
                 },
                 {
                   "name": "sha",
-                  "description": "Filter pipelines by the sha of the commit they are run for",
+                  "description": "Filter pipelines by the sha of the commit they are run for.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -41281,7 +41281,7 @@
               "args": [
                 {
                   "name": "from",
-                  "description": "Timestamp marking date and time from which annotations need to be fetched",
+                  "description": "Timestamp marking date and time from which annotations need to be fetched.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -41295,7 +41295,7 @@
                 },
                 {
                   "name": "to",
-                  "description": "Timestamp marking date and time to which annotations need to be fetched",
+                  "description": "Timestamp marking date and time to which annotations need to be fetched.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -46061,7 +46061,7 @@
               "args": [
                 {
                   "name": "includeSubgroups",
-                  "description": "Include also subgroup projects",
+                  "description": "Include also subgroup projects.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -46071,7 +46071,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search project with most similar names or paths",
+                  "description": "Search project with most similar names or paths.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -46081,7 +46081,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort projects by this criteria",
+                  "description": "Sort projects by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "NamespaceProjectSort",
@@ -49187,7 +49187,7 @@
               "args": [
                 {
                   "name": "securityReportTypes",
-                  "description": "Filter jobs by the type of security report they produce",
+                  "description": "Filter jobs by the type of security report they produce.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -50392,7 +50392,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "IID of the alert. For example, \"1\"",
+                  "description": "IID of the alert. For example, \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -50402,7 +50402,7 @@
                 },
                 {
                   "name": "statuses",
-                  "description": "Alerts with the specified statues. For example, [TRIGGERED]",
+                  "description": "Alerts with the specified statues. For example, [TRIGGERED].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -50420,7 +50420,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort alerts by this criteria",
+                  "description": "Sort alerts by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "AlertManagementAlertSort",
@@ -50430,7 +50430,7 @@
                 },
                 {
                   "name": "domain",
-                  "description": "Filter query for given domain",
+                  "description": "Filter query for given domain.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -50454,7 +50454,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issue",
+                  "description": "Username of a user assigned to the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -50487,7 +50487,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issue",
+                  "description": "Username of a user assigned to the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -50510,7 +50510,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "IID of the alert. For example, \"1\"",
+                  "description": "IID of the alert. For example, \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -50520,7 +50520,7 @@
                 },
                 {
                   "name": "statuses",
-                  "description": "Alerts with the specified statues. For example, [TRIGGERED]",
+                  "description": "Alerts with the specified statues. For example, [TRIGGERED].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -50538,7 +50538,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort alerts by this criteria",
+                  "description": "Sort alerts by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "AlertManagementAlertSort",
@@ -50548,7 +50548,7 @@
                 },
                 {
                   "name": "domain",
-                  "description": "Filter query for given domain",
+                  "description": "Filter query for given domain.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -50572,7 +50572,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issue",
+                  "description": "Username of a user assigned to the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -50744,7 +50744,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "The board's ID",
+                  "description": "The board's ID.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -50771,7 +50771,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "Find a board by its ID",
+                  "description": "Find a board by its ID.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "BoardID",
@@ -51023,7 +51023,7 @@
               "args": [
                 {
                   "name": "name",
-                  "description": "Filter the container repositories by their name",
+                  "description": "Filter the container repositories by their name.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51350,7 +51350,7 @@
               "args": [
                 {
                   "name": "name",
-                  "description": "Name of the environment",
+                  "description": "Name of the environment.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51360,7 +51360,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for environment name",
+                  "description": "Search query for environment name.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51370,7 +51370,7 @@
                 },
                 {
                   "name": "states",
-                  "description": "States of environments that should be included in result",
+                  "description": "States of environments that should be included in result.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51401,7 +51401,7 @@
               "args": [
                 {
                   "name": "name",
-                  "description": "Name of the environment",
+                  "description": "Name of the environment.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51411,7 +51411,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for environment name",
+                  "description": "Search query for environment name.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51421,7 +51421,7 @@
                 },
                 {
                   "name": "states",
-                  "description": "States of environments that should be included in result",
+                  "description": "States of environments that should be included in result.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51655,7 +51655,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "IID of the issue. For example, \"1\"",
+                  "description": "IID of the issue. For example, \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51665,7 +51665,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of issues. For example, [1, 2]",
+                  "description": "List of IIDs of issues. For example, [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51683,7 +51683,7 @@
                 },
                 {
                   "name": "labelName",
-                  "description": "Labels applied to this issue",
+                  "description": "Labels applied to this issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51697,7 +51697,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Milestone applied to this issue",
+                  "description": "Milestone applied to this issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51711,7 +51711,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Username of the author of the issue",
+                  "description": "Username of the author of the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51721,7 +51721,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issue",
+                  "description": "Username of a user assigned to the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51731,7 +51731,7 @@
                 },
                 {
                   "name": "assigneeUsernames",
-                  "description": "Usernames of users assigned to the issue",
+                  "description": "Usernames of users assigned to the issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51749,7 +51749,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51759,7 +51759,7 @@
                 },
                 {
                   "name": "createdBefore",
-                  "description": "Issues created before this date",
+                  "description": "Issues created before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -51769,7 +51769,7 @@
                 },
                 {
                   "name": "createdAfter",
-                  "description": "Issues created after this date",
+                  "description": "Issues created after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -51779,7 +51779,7 @@
                 },
                 {
                   "name": "updatedBefore",
-                  "description": "Issues updated before this date",
+                  "description": "Issues updated before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -51789,7 +51789,7 @@
                 },
                 {
                   "name": "updatedAfter",
-                  "description": "Issues updated after this date",
+                  "description": "Issues updated after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -51799,7 +51799,7 @@
                 },
                 {
                   "name": "closedBefore",
-                  "description": "Issues closed before this date",
+                  "description": "Issues closed before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -51809,7 +51809,7 @@
                 },
                 {
                   "name": "closedAfter",
-                  "description": "Issues closed after this date",
+                  "description": "Issues closed after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -51819,7 +51819,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for issue title or description",
+                  "description": "Search query for issue title or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51829,7 +51829,7 @@
                 },
                 {
                   "name": "types",
-                  "description": "Filter issues by the given issue types",
+                  "description": "Filter issues by the given issue types.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51847,7 +51847,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Current state of this issue",
+                  "description": "Current state of this issue.",
                   "type": {
                     "kind": "ENUM",
                     "name": "IssuableState",
@@ -51857,7 +51857,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort issues by this criteria",
+                  "description": "Sort issues by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "IssueSort",
@@ -51904,7 +51904,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "IID of the issue. For example, \"1\"",
+                  "description": "IID of the issue. For example, \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51914,7 +51914,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of issues. For example, [1, 2]",
+                  "description": "List of IIDs of issues. For example, [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51932,7 +51932,7 @@
                 },
                 {
                   "name": "labelName",
-                  "description": "Labels applied to this issue",
+                  "description": "Labels applied to this issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51946,7 +51946,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Milestone applied to this issue",
+                  "description": "Milestone applied to this issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51960,7 +51960,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Username of the author of the issue",
+                  "description": "Username of the author of the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51970,7 +51970,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issue",
+                  "description": "Username of a user assigned to the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -51980,7 +51980,7 @@
                 },
                 {
                   "name": "assigneeUsernames",
-                  "description": "Usernames of users assigned to the issue",
+                  "description": "Usernames of users assigned to the issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -51998,7 +51998,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52008,7 +52008,7 @@
                 },
                 {
                   "name": "createdBefore",
-                  "description": "Issues created before this date",
+                  "description": "Issues created before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52018,7 +52018,7 @@
                 },
                 {
                   "name": "createdAfter",
-                  "description": "Issues created after this date",
+                  "description": "Issues created after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52028,7 +52028,7 @@
                 },
                 {
                   "name": "updatedBefore",
-                  "description": "Issues updated before this date",
+                  "description": "Issues updated before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52038,7 +52038,7 @@
                 },
                 {
                   "name": "updatedAfter",
-                  "description": "Issues updated after this date",
+                  "description": "Issues updated after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52048,7 +52048,7 @@
                 },
                 {
                   "name": "closedBefore",
-                  "description": "Issues closed before this date",
+                  "description": "Issues closed before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52058,7 +52058,7 @@
                 },
                 {
                   "name": "closedAfter",
-                  "description": "Issues closed after this date",
+                  "description": "Issues closed after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52068,7 +52068,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for issue title or description",
+                  "description": "Search query for issue title or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52078,7 +52078,7 @@
                 },
                 {
                   "name": "types",
-                  "description": "Filter issues by the given issue types",
+                  "description": "Filter issues by the given issue types.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52109,7 +52109,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "IID of the issue. For example, \"1\"",
+                  "description": "IID of the issue. For example, \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52119,7 +52119,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of issues. For example, [1, 2]",
+                  "description": "List of IIDs of issues. For example, [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52137,7 +52137,7 @@
                 },
                 {
                   "name": "labelName",
-                  "description": "Labels applied to this issue",
+                  "description": "Labels applied to this issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52151,7 +52151,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Milestone applied to this issue",
+                  "description": "Milestone applied to this issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52165,7 +52165,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Username of the author of the issue",
+                  "description": "Username of the author of the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52175,7 +52175,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of a user assigned to the issue",
+                  "description": "Username of a user assigned to the issue.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52185,7 +52185,7 @@
                 },
                 {
                   "name": "assigneeUsernames",
-                  "description": "Usernames of users assigned to the issue",
+                  "description": "Usernames of users assigned to the issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52203,7 +52203,7 @@
                 },
                 {
                   "name": "assigneeId",
-                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported",
+                  "description": "ID of a user assigned to the issues, \"none\" and \"any\" values are supported.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52213,7 +52213,7 @@
                 },
                 {
                   "name": "createdBefore",
-                  "description": "Issues created before this date",
+                  "description": "Issues created before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52223,7 +52223,7 @@
                 },
                 {
                   "name": "createdAfter",
-                  "description": "Issues created after this date",
+                  "description": "Issues created after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52233,7 +52233,7 @@
                 },
                 {
                   "name": "updatedBefore",
-                  "description": "Issues updated before this date",
+                  "description": "Issues updated before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52243,7 +52243,7 @@
                 },
                 {
                   "name": "updatedAfter",
-                  "description": "Issues updated after this date",
+                  "description": "Issues updated after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52253,7 +52253,7 @@
                 },
                 {
                   "name": "closedBefore",
-                  "description": "Issues closed before this date",
+                  "description": "Issues closed before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52263,7 +52263,7 @@
                 },
                 {
                   "name": "closedAfter",
-                  "description": "Issues closed after this date",
+                  "description": "Issues closed after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52273,7 +52273,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for issue title or description",
+                  "description": "Search query for issue title or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52283,7 +52283,7 @@
                 },
                 {
                   "name": "types",
-                  "description": "Filter issues by the given issue types",
+                  "description": "Filter issues by the given issue types.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52301,7 +52301,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Current state of this issue",
+                  "description": "Current state of this issue.",
                   "type": {
                     "kind": "ENUM",
                     "name": "IssuableState",
@@ -52311,7 +52311,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort issues by this criteria",
+                  "description": "Sort issues by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "IssueSort",
@@ -52432,7 +52432,7 @@
                 },
                 {
                   "name": "timeframe",
-                  "description": "List items overlapping the given timeframe",
+                  "description": "List items overlapping the given timeframe.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "Timeframe",
@@ -52744,7 +52744,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "IID of the merge request, for example `1`",
+                  "description": "IID of the merge request, for example `1`.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -52771,7 +52771,7 @@
               "args": [
                 {
                   "name": "iids",
-                  "description": "Array of IIDs of merge requests, for example `[1, 2]`",
+                  "description": "Array of IIDs of merge requests, for example `[1, 2]`.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52853,7 +52853,7 @@
                 },
                 {
                   "name": "mergedAfter",
-                  "description": "Merge requests merged after this date",
+                  "description": "Merge requests merged after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52863,7 +52863,7 @@
                 },
                 {
                   "name": "mergedBefore",
-                  "description": "Merge requests merged before this date",
+                  "description": "Merge requests merged before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -52873,7 +52873,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Title of the milestone",
+                  "description": "Title of the milestone.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52883,7 +52883,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort merge requests by this criteria",
+                  "description": "Sort merge requests by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "MergeRequestSort",
@@ -52893,7 +52893,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of the assignee",
+                  "description": "Username of the assignee.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52903,7 +52903,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Username of the author",
+                  "description": "Username of the author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52913,7 +52913,7 @@
                 },
                 {
                   "name": "reviewerUsername",
-                  "description": "Username of the reviewer",
+                  "description": "Username of the reviewer.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -53024,7 +53024,7 @@
                 },
                 {
                   "name": "timeframe",
-                  "description": "List items overlapping the given timeframe",
+                  "description": "List items overlapping the given timeframe.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "Timeframe",
@@ -53034,7 +53034,7 @@
                 },
                 {
                   "name": "ids",
-                  "description": "Array of global milestone IDs, e.g., \"gid://gitlab/Milestone/1\"",
+                  "description": "Array of global milestone IDs, e.g., \"gid://gitlab/Milestone/1\".",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -53052,7 +53052,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter milestones by state",
+                  "description": "Filter milestones by state.",
                   "type": {
                     "kind": "ENUM",
                     "name": "MilestoneStateEnum",
@@ -53062,7 +53062,7 @@
                 },
                 {
                   "name": "title",
-                  "description": "The title of the milestone",
+                  "description": "The title of the milestone.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -53072,7 +53072,7 @@
                 },
                 {
                   "name": "searchTitle",
-                  "description": "A search string for the title",
+                  "description": "A search string for the title.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -53082,7 +53082,7 @@
                 },
                 {
                   "name": "containingDate",
-                  "description": "A date that the milestone contains",
+                  "description": "A date that the milestone contains.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -53092,7 +53092,7 @@
                 },
                 {
                   "name": "includeAncestors",
-                  "description": "Also return milestones in the project's parent group and its ancestors",
+                  "description": "Also return milestones in the project's parent group and its ancestors.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -53318,7 +53318,7 @@
               "args": [
                 {
                   "name": "iid",
-                  "description": "IID of the Pipeline, e.g., \"1\"",
+                  "description": "IID of the Pipeline, e.g., \"1\".",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -53359,7 +53359,7 @@
               "args": [
                 {
                   "name": "status",
-                  "description": "Filter pipelines by their status",
+                  "description": "Filter pipelines by their status.",
                   "type": {
                     "kind": "ENUM",
                     "name": "PipelineStatusEnum",
@@ -53369,7 +53369,7 @@
                 },
                 {
                   "name": "ref",
-                  "description": "Filter pipelines by the ref they are run for",
+                  "description": "Filter pipelines by the ref they are run for.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -53379,7 +53379,7 @@
                 },
                 {
                   "name": "sha",
-                  "description": "Filter pipelines by the sha of the commit they are run for",
+                  "description": "Filter pipelines by the sha of the commit they are run for.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -53456,7 +53456,7 @@
               "args": [
                 {
                   "name": "search",
-                  "description": "Search query",
+                  "description": "Search query.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -53466,7 +53466,7 @@
                 },
                 {
                   "name": "relations",
-                  "description": "Filter members by the given member relations",
+                  "description": "Filter members by the given member relations.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -53551,7 +53551,7 @@
               "args": [
                 {
                   "name": "tagName",
-                  "description": "The name of the tag associated to the release",
+                  "description": "The name of the tag associated to the release.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -53578,7 +53578,7 @@
               "args": [
                 {
                   "name": "sort",
-                  "description": "Sort releases by this criteria",
+                  "description": "Sort releases by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "ReleaseSort",
@@ -53971,7 +53971,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "ID of the Sentry issue",
+                  "description": "ID of the Sentry issue.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -54040,7 +54040,7 @@
               "args": [
                 {
                   "name": "active",
-                  "description": "Indicates if the service is active",
+                  "description": "Indicates if the service is active.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -54050,7 +54050,7 @@
                 },
                 {
                   "name": "type",
-                  "description": "Class name of the service",
+                  "description": "Class name of the service.",
                   "type": {
                     "kind": "ENUM",
                     "name": "ServiceType",
@@ -54127,7 +54127,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Array of global snippet ids, e.g., \"gid://gitlab/ProjectSnippet/1\"",
+                  "description": "Array of global snippet ids, e.g., \"gid://gitlab/ProjectSnippet/1\".",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -54145,7 +54145,7 @@
                 },
                 {
                   "name": "visibility",
-                  "description": "The visibility of the snippet",
+                  "description": "The visibility of the snippet.",
                   "type": {
                     "kind": "ENUM",
                     "name": "VisibilityScopesEnum",
@@ -56828,7 +56828,7 @@
               "args": [
                 {
                   "name": "projectPath",
-                  "description": "The project of the CI config",
+                  "description": "The project of the CI config.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -56842,7 +56842,7 @@
                 },
                 {
                   "name": "content",
-                  "description": "Contents of .gitlab-ci.yml",
+                  "description": "Contents of '.gitlab-ci.yml'.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -56981,7 +56981,7 @@
               "args": [
                 {
                   "name": "text",
-                  "description": "Text to echo back",
+                  "description": "Text to echo back.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -57035,7 +57035,7 @@
               "args": [
                 {
                   "name": "fullPath",
-                  "description": "The full path of the project, group or namespace, e.g., \"gitlab-org/gitlab-foss\"",
+                  "description": "The full path of the project, group or namespace, e.g., \"gitlab-org/gitlab-foss\".",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -57076,7 +57076,7 @@
               "args": [
                 {
                   "name": "identifier",
-                  "description": "The type of measurement/statistics to retrieve",
+                  "description": "The type of measurement/statistics to retrieve.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -57090,7 +57090,7 @@
                 },
                 {
                   "name": "recordedAfter",
-                  "description": "Measurement recorded after this date",
+                  "description": "Measurement recorded after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -57100,7 +57100,7 @@
                 },
                 {
                   "name": "recordedBefore",
-                  "description": "Measurement recorded before this date",
+                  "description": "Measurement recorded before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -57258,7 +57258,7 @@
               "args": [
                 {
                   "name": "fullPath",
-                  "description": "The full path of the project, group or namespace, e.g., \"gitlab-org/gitlab-foss\"",
+                  "description": "The full path of the project, group or namespace, e.g., \"gitlab-org/gitlab-foss\".",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -57285,7 +57285,7 @@
               "args": [
                 {
                   "name": "fullPath",
-                  "description": "The full path of the project, group or namespace, e.g., \"gitlab-org/gitlab-foss\"",
+                  "description": "The full path of the project, group or namespace, e.g., \"gitlab-org/gitlab-foss\".",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -57312,7 +57312,7 @@
               "args": [
                 {
                   "name": "membership",
-                  "description": "Limit projects that the current user is a member of",
+                  "description": "Limit projects that the current user is a member of.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -57322,7 +57322,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for project name, path, or description",
+                  "description": "Search query for project name, path, or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -57332,7 +57332,7 @@
                 },
                 {
                   "name": "ids",
-                  "description": "Filter projects by IDs",
+                  "description": "Filter projects by IDs.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -57350,7 +57350,7 @@
                 },
                 {
                   "name": "searchNamespaces",
-                  "description": "Include namespace in project search",
+                  "description": "Include namespace in project search.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -57360,7 +57360,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort order of results",
+                  "description": "Sort order of results.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -57476,7 +57476,7 @@
               "args": [
                 {
                   "name": "platform",
-                  "description": "Platform to generate the instructions for",
+                  "description": "Platform to generate the instructions for.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -57490,7 +57490,7 @@
                 },
                 {
                   "name": "architecture",
-                  "description": "Architecture to generate the instructions for",
+                  "description": "Architecture to generate the instructions for.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -57504,7 +57504,7 @@
                 },
                 {
                   "name": "projectId",
-                  "description": "Project to register the runner for",
+                  "description": "Project to register the runner for.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ProjectID",
@@ -57514,7 +57514,7 @@
                 },
                 {
                   "name": "groupId",
-                  "description": "Group to register the runner for",
+                  "description": "Group to register the runner for.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "GroupID",
@@ -57537,7 +57537,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Array of global snippet ids, e.g., \"gid://gitlab/ProjectSnippet/1\"",
+                  "description": "Array of global snippet ids, e.g., \"gid://gitlab/ProjectSnippet/1\".",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -57555,7 +57555,7 @@
                 },
                 {
                   "name": "visibility",
-                  "description": "The visibility of the snippet",
+                  "description": "The visibility of the snippet.",
                   "type": {
                     "kind": "ENUM",
                     "name": "VisibilityScopesEnum",
@@ -57565,7 +57565,7 @@
                 },
                 {
                   "name": "authorId",
-                  "description": "The ID of an author",
+                  "description": "The ID of an author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "UserID",
@@ -57575,7 +57575,7 @@
                 },
                 {
                   "name": "projectId",
-                  "description": "The ID of a project",
+                  "description": "The ID of a project.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ProjectID",
@@ -57585,7 +57585,7 @@
                 },
                 {
                   "name": "type",
-                  "description": "The type of snippet",
+                  "description": "The type of snippet.",
                   "type": {
                     "kind": "ENUM",
                     "name": "TypeEnum",
@@ -57595,7 +57595,7 @@
                 },
                 {
                   "name": "explore",
-                  "description": "Explore personal snippets",
+                  "description": "Explore personal snippets.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -57658,7 +57658,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "ID of the User",
+                  "description": "ID of the User.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "UserID",
@@ -57668,7 +57668,7 @@
                 },
                 {
                   "name": "username",
-                  "description": "Username of the User",
+                  "description": "Username of the User.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -57691,7 +57691,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "List of user Global IDs",
+                  "description": "List of user Global IDs.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -57709,7 +57709,7 @@
                 },
                 {
                   "name": "usernames",
-                  "description": "List of usernames",
+                  "description": "List of usernames.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -57727,7 +57727,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort users by this criteria",
+                  "description": "Sort users by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "Sort",
@@ -60414,7 +60414,7 @@
               "args": [
                 {
                   "name": "path",
-                  "description": "The path to get the tree for. Default value is the root of the repository",
+                  "description": "The path to get the tree for. Default value is the root of the repository.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -60424,7 +60424,7 @@
                 },
                 {
                   "name": "ref",
-                  "description": "The commit ref to get the tree for. Default value is HEAD",
+                  "description": "The commit ref to get the tree for. Default value is HEAD.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -60434,7 +60434,7 @@
                 },
                 {
                   "name": "recursive",
-                  "description": "Used to get a recursive tree. Default is false",
+                  "description": "Used to get a recursive tree. Default is false.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -64384,7 +64384,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "ID of the Sentry issue",
+                  "description": "ID of the Sentry issue.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -64411,7 +64411,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "ID of the Sentry issue",
+                  "description": "ID of the Sentry issue.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -64438,7 +64438,7 @@
               "args": [
                 {
                   "name": "searchTerm",
-                  "description": "Search query for the Sentry error details",
+                  "description": "Search query for the Sentry error details.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -64448,7 +64448,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Attribute to sort on. Options are frequency, first_seen, last_seen. last_seen is default",
+                  "description": "Attribute to sort on. Options are frequency, first_seen, last_seen. last_seen is default.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -65417,7 +65417,7 @@
               "args": [
                 {
                   "name": "paths",
-                  "description": "Paths of the blobs",
+                  "description": "Paths of the blobs.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -72956,7 +72956,7 @@
               "args": [
                 {
                   "name": "iids",
-                  "description": "Array of IIDs of merge requests, for example `[1, 2]`",
+                  "description": "Array of IIDs of merge requests, for example `[1, 2]`.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -73038,7 +73038,7 @@
                 },
                 {
                   "name": "mergedAfter",
-                  "description": "Merge requests merged after this date",
+                  "description": "Merge requests merged after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -73048,7 +73048,7 @@
                 },
                 {
                   "name": "mergedBefore",
-                  "description": "Merge requests merged before this date",
+                  "description": "Merge requests merged before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -73058,7 +73058,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Title of the milestone",
+                  "description": "Title of the milestone.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73068,7 +73068,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort merge requests by this criteria",
+                  "description": "Sort merge requests by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "MergeRequestSort",
@@ -73098,7 +73098,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Username of the author",
+                  "description": "Username of the author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73108,7 +73108,7 @@
                 },
                 {
                   "name": "reviewerUsername",
-                  "description": "Username of the reviewer",
+                  "description": "Username of the reviewer.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73171,7 +73171,7 @@
               "args": [
                 {
                   "name": "iids",
-                  "description": "Array of IIDs of merge requests, for example `[1, 2]`",
+                  "description": "Array of IIDs of merge requests, for example `[1, 2]`.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -73253,7 +73253,7 @@
                 },
                 {
                   "name": "mergedAfter",
-                  "description": "Merge requests merged after this date",
+                  "description": "Merge requests merged after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -73263,7 +73263,7 @@
                 },
                 {
                   "name": "mergedBefore",
-                  "description": "Merge requests merged before this date",
+                  "description": "Merge requests merged before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -73273,7 +73273,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Title of the milestone",
+                  "description": "Title of the milestone.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73283,7 +73283,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort merge requests by this criteria",
+                  "description": "Sort merge requests by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "MergeRequestSort",
@@ -73313,7 +73313,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of the assignee",
+                  "description": "Username of the assignee.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73323,7 +73323,7 @@
                 },
                 {
                   "name": "reviewerUsername",
-                  "description": "Username of the reviewer",
+                  "description": "Username of the reviewer.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73598,7 +73598,7 @@
               "args": [
                 {
                   "name": "iids",
-                  "description": "Array of IIDs of merge requests, for example `[1, 2]`",
+                  "description": "Array of IIDs of merge requests, for example `[1, 2]`.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -73680,7 +73680,7 @@
                 },
                 {
                   "name": "mergedAfter",
-                  "description": "Merge requests merged after this date",
+                  "description": "Merge requests merged after this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -73690,7 +73690,7 @@
                 },
                 {
                   "name": "mergedBefore",
-                  "description": "Merge requests merged before this date",
+                  "description": "Merge requests merged before this date.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -73700,7 +73700,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Title of the milestone",
+                  "description": "Title of the milestone.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73710,7 +73710,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "Sort merge requests by this criteria",
+                  "description": "Sort merge requests by this criteria.",
                   "type": {
                     "kind": "ENUM",
                     "name": "MergeRequestSort",
@@ -73740,7 +73740,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Username of the author",
+                  "description": "Username of the author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73750,7 +73750,7 @@
                 },
                 {
                   "name": "assigneeUsername",
-                  "description": "Username of the assignee",
+                  "description": "Username of the assignee.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73813,7 +73813,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Array of global snippet ids, e.g., \"gid://gitlab/ProjectSnippet/1\"",
+                  "description": "Array of global snippet ids, e.g., \"gid://gitlab/ProjectSnippet/1\".",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -73831,7 +73831,7 @@
                 },
                 {
                   "name": "visibility",
-                  "description": "The visibility of the snippet",
+                  "description": "The visibility of the snippet.",
                   "type": {
                     "kind": "ENUM",
                     "name": "VisibilityScopesEnum",
@@ -73841,7 +73841,7 @@
                 },
                 {
                   "name": "type",
-                  "description": "The type of snippet",
+                  "description": "The type of snippet.",
                   "type": {
                     "kind": "ENUM",
                     "name": "TypeEnum",
@@ -73904,7 +73904,7 @@
               "args": [
                 {
                   "name": "search",
-                  "description": "Search query",
+                  "description": "Search query.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -73999,7 +73999,7 @@
               "args": [
                 {
                   "name": "action",
-                  "description": "The action to be filtered",
+                  "description": "The action to be filtered.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -74017,7 +74017,7 @@
                 },
                 {
                   "name": "authorId",
-                  "description": "The ID of an author",
+                  "description": "The ID of an author.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -74035,7 +74035,7 @@
                 },
                 {
                   "name": "projectId",
-                  "description": "The ID of a project",
+                  "description": "The ID of a project.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -74053,7 +74053,7 @@
                 },
                 {
                   "name": "groupId",
-                  "description": "The ID of a group",
+                  "description": "The ID of a group.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -74071,7 +74071,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "The state of the todo",
+                  "description": "The state of the todo.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -74089,7 +74089,7 @@
                 },
                 {
                   "name": "type",
-                  "description": "The type of the todo",
+                  "description": "The type of the todo.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
