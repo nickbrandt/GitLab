@@ -36756,9 +36756,6 @@ msgstr ""
 msgid "mrWidget|Jump to first unresolved thread"
 msgstr ""
 
-msgid "mrWidget|Learn more about resolving conflicts"
-msgstr ""
-
 msgid "mrWidget|Loading deployment statistics"
 msgstr ""
 
@@ -36871,9 +36868,6 @@ msgid "mrWidget|This action will add the merge request to the merge train when p
 msgstr ""
 
 msgid "mrWidget|This action will start a merge train when pipeline %{pipelineLink} succeeds."
-msgstr ""
-
-msgid "mrWidget|This feature merges changes from the target branch to the source branch. You cannot use this feature since the source branch is protected."
 msgstr ""
 
 msgid "mrWidget|This merge request failed to be merged automatically"
