@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe BulkImports::EE::Groups::Pipelines::EpicsPipeline do
+RSpec.describe EE::BulkImports::Groups::Pipelines::EpicsPipeline do
   describe '#run' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }
@@ -51,7 +51,7 @@ RSpec.describe BulkImports::EE::Groups::Pipelines::EpicsPipeline do
           {
             klass: BulkImports::Common::Extractors::GraphqlExtractor,
             options: {
-              query: BulkImports::EE::Groups::Graphql::GetEpicsQuery
+              query: EE::BulkImports::Groups::Graphql::GetEpicsQuery
             }
           }
         )
@@ -68,7 +68,7 @@ RSpec.describe BulkImports::EE::Groups::Pipelines::EpicsPipeline do
 
     it 'has loaders' do
       expect(described_class.loaders).to contain_exactly({
-        klass: BulkImports::EE::Groups::Loaders::EpicsLoader, options: nil
+        klass: EE::BulkImports::Groups::Loaders::EpicsLoader, options: nil
       })
     end
   end

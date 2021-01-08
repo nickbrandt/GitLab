@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe BulkImports::EE::Groups::Loaders::EpicsLoader do
+RSpec.describe EE::BulkImports::Groups::Loaders::EpicsLoader do
   describe '#load' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }
