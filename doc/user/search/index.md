@@ -300,3 +300,39 @@ GitLab instance.
 Use advanced queries for more targeted search results.
 
 [Learn how to use the Advanced Search Syntax.](advanced_search_syntax.md)
+
+## Search project settings
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/292941) in GitLab 13.8.
+> - It's [deployed behind a feature flag](../feature_flags.md), disabled by default.
+> - It's disabled on GitLab.com.
+> - It's not recommended for production use.
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-search-project-settings). **(CORE ONLY)**
+
+WARNING:
+This feature might not be available to you. Check the **version history** note above for details.
+
+You can search inside the project’s settings sections by entering a search
+term in the search box located at the top of the page. The search results
+will appear highlighted in the sections that match the search term.
+
+![Search project settings](img/project_search_general_settings_v13_8.png)
+
+### Enable or disable Search project settings **(CORE ONLY)**
+
+Search project settings is under development and not ready for production use. It is
+deployed behind a feature flag that is **disabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../administration/feature_flags.md)
+can enable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:search_settings_in_page)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:search_settings_in_page)
+```
