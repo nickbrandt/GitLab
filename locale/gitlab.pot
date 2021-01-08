@@ -12113,9 +12113,6 @@ msgstr ""
 msgid "FeatureFlags|Feature flags limit reached (%{featureFlagsLimit}). Delete one or more feature flags before adding new ones."
 msgstr ""
 
-msgid "FeatureFlags|Flag becomes read only soon"
-msgstr ""
-
 msgid "FeatureFlags|Flag is read-only"
 msgstr ""
 
@@ -12123,9 +12120,6 @@ msgid "FeatureFlags|Get started with feature flags"
 msgstr ""
 
 msgid "FeatureFlags|Get started with user lists"
-msgstr ""
-
-msgid "FeatureFlags|GitLab is moving to a new way of managing feature flags, and in 13.4, this feature flag will become read-only. Please create a new feature flag."
 msgstr ""
 
 msgid "FeatureFlags|GitLab is moving to a new way of managing feature flags. This feature flag is read-only, and it will be removed in 14.0. Please create a new feature flag."
