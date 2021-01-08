@@ -15,7 +15,7 @@ const createComplianceFrameworksFormApp = (el) => {
     return false;
   }
 
-  const { groupEditPath, groupPath, frameworkId: id = null } = el.dataset;
+  const { groupEditPath, groupPath, scopedLabelsHelpPath, frameworkId: id = null } = el.dataset;
 
   return new Vue({
     el,
@@ -26,6 +26,7 @@ const createComplianceFrameworksFormApp = (el) => {
           groupEditPath,
           groupPath,
           id,
+          scopedLabelsHelpPath,
         },
       });
     },

@@ -1,5 +1,5 @@
 <script>
-import { GlAlert, GlButton, GlForm, GlFormGroup, GlFormInput, GlLoadingIcon } from '@gitlab/ui';
+import { GlAlert, GlButton, GlForm, GlFormGroup, GlFormInput, GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
 
 import { convertToGraphQLId, getIdFromGraphQLId } from '~/graphql_shared/utils';
 import { visitUrl } from '~/lib/utils/url_utility';
@@ -21,7 +21,9 @@ export default {
     GlForm,
     GlFormGroup,
     GlFormInput,
+    GlLink,
     GlLoadingIcon,
+    GlSprintf,
   },
   props: {
     groupPath: {
@@ -36,6 +38,10 @@ export default {
       type: String,
       required: false,
       default: null,
+    },
+    scopedLabelsHelpPath: {
+      type: String,
+      required: true,
     },
   },
   data() {
@@ -157,10 +163,12 @@ export default {
       'ComplianceFrameworks|The ID given produced more than one result. Please try a different compliance framework',
     ),
     titleInputLabel: s__('ComplianceFrameworks|Title'),
+    titleInputDescription: s__('ComplianceFrameworks|Use %{codeStart}::%{codeEnd} to create a %{linkStart}scoped set%{linkEnd} (eg. %{codeStart}SOX::AWS%{codeEnd})'),
     titleInputInvalid: s__('ComplianceFrameworks|A title is required'),
     descriptionInputLabel: s__('ComplianceFrameworks|Description'),
     colorInputLabel: s__('ComplianceFrameworks|Background color'),
     submitBtnText: s__('ComplianceFrameworks|Save changes'),
+    cancelBtnText: s__('ComplianceFrameworks|Cancel'),
   },
 };
 </script>
@@ -173,6 +181,18 @@ export default {
 
     <gl-form v-if="!isLoading" @submit="onSubmit">
       <gl-form-group :label="$options.i18n.titleInputLabel">
+        <template #description>
+          <gl-sprintf :message="$options.i18n.titleInputDescription">
+            <template #code="{ content }">
+              <code>{{ content }}</code>
+            </template>
+
+            <template #link="{ content }">
+              <gl-link :href="scopedLabelsHelpPath" target="_blank">{{ content }}</gl-link>
+            </template>
+          </gl-sprintf>
+        </template>
+
         <gl-form-input
           v-model="complianceFramework.name"
           :invalid-feedback="$options.i18n.titleInputInvalid"
@@ -189,7 +209,10 @@ export default {
         :set-color="complianceFramework.color"
       />
 
-      <gl-button type="submit" variant="success">{{ $options.i18n.submitBtnText }}</gl-button>
+      <div class="gl-display-flex gl-justify-content-space-between gl-pt-5 gl-border-t-1 gl-border-t-solid gl-border-t-gray-100">
+        <gl-button type="submit" variant="success">{{ $options.i18n.submitBtnText }}</gl-button>
+        <gl-button :href="groupEditPath">{{ $options.i18n.cancelBtnText }}</gl-button>
+      </div>
     </gl-form>
   </div>
 </template>
