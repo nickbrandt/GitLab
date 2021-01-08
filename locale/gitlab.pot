@@ -5221,13 +5221,31 @@ msgstr ""
 msgid "ChangeTypeActionLabel|Revert in branch"
 msgstr ""
 
+msgid "ChangeTypeAction|A new branch will be created in your fork and a new merge request will be started."
+msgstr ""
+
 msgid "ChangeTypeAction|Cherry-pick"
 msgstr ""
 
 msgid "ChangeTypeAction|Revert"
 msgstr ""
 
+msgid "ChangeTypeAction|Revert in branch"
+msgstr ""
+
+msgid "ChangeTypeAction|Search branches"
+msgstr ""
+
+msgid "ChangeTypeAction|Start a %{newMergeRequest} with these changes"
+msgstr ""
+
+msgid "ChangeTypeAction|Switch branch"
+msgstr ""
+
 msgid "ChangeTypeAction|This will create a new commit in order to revert the existing changes."
+msgstr ""
+
+msgid "ChangeTypeAction|Your changes will be committed to %{branchName} because a merge request is open."
 msgstr ""
 
 msgid "Changed assignee(s)."
@@ -26174,6 +26192,9 @@ msgid "Something went wrong while editing your comment. Please try again."
 msgstr ""
 
 msgid "Something went wrong while fetching %{listType} list"
+msgstr ""
+
+msgid "Something went wrong while fetching branches"
 msgstr ""
 
 msgid "Something went wrong while fetching comments. Please try again."
