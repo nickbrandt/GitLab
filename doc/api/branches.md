@@ -13,7 +13,7 @@ See also [Protected branches API](protected_branches.md).
 
 ## List repository branches
 
-Get a list of repository branches from a project, sorted by name alphabetically.
+Get a list of repository branches from a project, sorted by update date `desc`.
 
 NOTE:
 This endpoint can be accessed without authentication if the repository is publicly accessible.
