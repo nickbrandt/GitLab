@@ -2,8 +2,7 @@ import { isProjectImportable, isIncompatible, isImporting } from '../utils';
 
 export const isLoading = (state) => state.isLoadingRepos || state.isLoadingNamespaces;
 
-export const importingRepoCount = (state) =>
-  state.repositories.filter(isImporting).length;
+export const importingRepoCount = (state) => state.repositories.filter(isImporting).length;
 
 export const isImportingAnyRepo = (state) => state.repositories.some(isImporting);
 
