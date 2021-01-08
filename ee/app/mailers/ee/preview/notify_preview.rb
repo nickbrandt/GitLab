@@ -50,6 +50,10 @@ module EE
             { truncated: false, rows_expected: 3, rows_written: 3 }
           ).message
         end
+
+        def new_group_member_with_confirmation_email
+          Notify.member_access_granted_email_with_confirmation(member.source_type, member.id).message
+        end
       end
 
       private
