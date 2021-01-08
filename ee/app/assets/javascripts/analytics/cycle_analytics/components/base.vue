@@ -96,9 +96,7 @@ export default {
       return this.featureFlags.hasPathNavigation && !this.hasNoAccessError && this.selectedStage;
     },
     shouldDisplayCreateMultipleValueStreams() {
-      return Boolean(
-        this.featureFlags.hasCreateMultipleValueStreams && !this.isLoadingValueStreams,
-      );
+      return Boolean(!this.shouldRenderEmptyState && !this.isLoadingValueStreams);
     },
     hasDateRangeSet() {
       return this.startDate && this.endDate;
