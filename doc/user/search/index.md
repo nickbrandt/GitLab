@@ -36,6 +36,10 @@ on the search field on the top-right of your screen:
 
 ### Filtering issue and merge request lists
 
+> - Filtering by Epics was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/195704) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 12.9.
+> - Filtering by child Epics was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/9029) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.0.
+> - Filtering by Iterations was [introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/118742) in [GitLab Starter](https://about.gitlab.com/pricing/) 13.6.
+
 Follow these steps to filter the **Issues** and **Merge Requests** list pages within projects and
 groups:
 
@@ -44,15 +48,12 @@ groups:
    - Author
    - Assignee
    - [Milestone](../project/milestones/index.md)
-   - [Iteration](../group/iterations/index.md) ([introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/118742) in [GitLab Starter](https://about.gitlab.com/pricing/) 13.6)
+   - [Iteration](../group/iterations/index.md)
    - Release
    - [Label](../project/labels.md)
    - My-reaction
    - Confidential
-   - Epic ([introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/195704) in GitLab 12.9),
-     including [child epic](../group/epics/index.md#multi-level-child-epics)
-     ([introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/9029) in
-     [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.0)
+   - [Epic and child Epic](../group/epics/index.md) (available only for the group the Epic was created, not for [higher group levels](https://gitlab.com/gitlab-org/gitlab/-/issues/233729)).
    - Search for this text
 1. Select or type the operator to use for filtering the attribute. The following operators are
    available:
