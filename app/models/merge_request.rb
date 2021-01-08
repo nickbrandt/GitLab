@@ -479,13 +479,17 @@ class MergeRequest < ApplicationRecord
   # This is used after project import, to reset the IDs to the correct
   # values. It is not intended to be called without having already scoped the
   # relation.
+  #
+  # Only set `regular` merge request diffs as latest so `merge_head` diff
+  # won't be considered as `MergeRequest#merge_request_diff`.
   def self.set_latest_merge_request_diff_ids!
-    update = '
+    update = "
       latest_merge_request_diff_id = (
         SELECT MAX(id)
         FROM merge_request_diffs
         WHERE merge_requests.id = merge_request_diffs.merge_request_id
-      )'.squish
+        AND merge_request_diffs.diff_type = #{MergeRequestDiff.diff_types[:regular]}
+      )".squish
 
     self.each_batch do |batch|
       batch.update_all(update)
@@ -924,7 +928,7 @@ class MergeRequest < ApplicationRecord
   def create_merge_request_diff
     fetch_ref!
 
-    # n+1: https://gitlab.com/gitlab-org/gitlab-foss/issues/37435
+    # n+1: https://gitlab.com/gitlab-org/gitlab/-/issues/19377
     Gitlab::GitalyClient.allow_n_plus_1_calls do
       merge_request_diffs.create!
       reload_merge_request_diff
@@ -998,7 +1002,7 @@ class MergeRequest < ApplicationRecord
   # rubocop: enable CodeReuse/ServiceClass
 
   def diffable_merge_ref?
-    open? && merge_ref_head.present? && (Feature.enabled?(:display_merge_conflicts_in_diff, project) || can_be_merged?)
+    open? && merge_head_diff.present? && (Feature.enabled?(:display_merge_conflicts_in_diff, project) || can_be_merged?)
   end
 
   # Returns boolean indicating the merge_status should be rechecked in order to
