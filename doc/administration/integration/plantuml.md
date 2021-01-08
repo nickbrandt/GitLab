@@ -112,8 +112,7 @@ To activate the changes, run the following command:
 sudo gitlab-ctl reconfigure
 ```
 
-NOTE:
-The redirection through GitLab **must** be configured
+Note that the redirection through GitLab **must** be configured
 when running [GitLab with TLS](https://docs.gitlab.com/omnibus/settings/ssl.html)
 due to PlantUML's use of the insecure HTTP protocol. Newer browsers such
 as [Google Chrome 86+](https://www.chromestatus.com/feature/4926989725073408)
