@@ -168,7 +168,7 @@ If the existing alert is already `resolved`, GitLab creates a new alert instead.
 
 ![Alert Management List](img/alert_list_v13_1.png)
 
-## Link to your Opsgenie Alerts (depreciated)
+## Link to your Opsgenie Alerts (deprecated)
 
 WARNING:
 We are building deeper integration with Opsgenie and other alerting tools through
