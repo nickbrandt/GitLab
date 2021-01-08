@@ -88,7 +88,7 @@ export default {
     :loading-text="groupedSummaryText"
     :error-text="groupedSummaryText"
     :has-issues="hasMetrics"
-    :should-emit-toggle-event="true"
+    should-emit-toggle-event
     class="mr-widget-border-top grouped-security-reports mr-report"
     @toggleEvent="handleToggleEvent"
   >
