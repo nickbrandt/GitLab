@@ -32,6 +32,7 @@ class MergeRequestDiff < ApplicationRecord
   has_many :merge_request_diff_commits, -> { order(:merge_request_diff_id, :relative_order) }
 
   validates :base_commit_sha, :head_commit_sha, :start_commit_sha, sha: true
+  validates :merge_request_id, uniqueness: { scope: :diff_type }, if: :merge_head?
 
   state_machine :state, initial: :empty do
     event :clean do
@@ -49,6 +50,11 @@ class MergeRequestDiff < ApplicationRecord
     state :overflow_diff_files_limit
     state :overflow_diff_lines_limit
   end
+
+  enum diff_type: {
+    regular: 1,
+    merge_head: 2
+  }
 
   scope :with_files, -> { without_states(:without_files, :empty) }
   scope :viewable, -> { without_state(:empty) }

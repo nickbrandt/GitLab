@@ -16,12 +16,32 @@ RSpec.describe MergeRequestDiff do
   describe 'validations' do
     subject { diff_with_commits }
 
+    it { is_expected.not_to validate_uniqueness_of(:diff_type).scoped_to(:merge_request_id) }
+
     it 'checks sha format of base_commit_sha, head_commit_sha and start_commit_sha' do
       subject.base_commit_sha = subject.head_commit_sha = subject.start_commit_sha = 'foobar'
 
       expect(subject.valid?).to be false
       expect(subject.errors.count).to eq 3
       expect(subject.errors).to all(include('is not a valid SHA'))
+    end
+
+    it 'does not validate uniqueness by default' do
+      expect(build(:merge_request_diff, merge_request: subject.merge_request)).to be_valid
+    end
+
+    context 'when merge request diff is a merge_head type' do
+      it 'is valid' do
+        expect(build(:merge_request_diff, :merge_head, merge_request: subject.merge_request)).to be_valid
+      end
+
+      context 'when merge_head diff exists' do
+        let(:existing_merge_head_diff) { create(:merge_request_diff, :merge_head) }
+
+        it 'validates uniqueness' do
+          expect(build(:merge_request_diff, :merge_head, merge_request: existing_merge_head_diff.merge_request)).not_to be_valid
+        end
+      end
     end
   end
 
