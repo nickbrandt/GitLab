@@ -6,7 +6,7 @@ RSpec.describe 'admin/application_settings/general.html.haml' do
   let(:app_settings) { build(:application_setting) }
   let(:user) { create(:admin) }
 
-  describe 'sourcegraph integration', quarantine: { issue: 'https://gitlab.com/gitlab-org/gitlab/-/issues/296933' } do
+  describe 'sourcegraph integration' do
     let(:sourcegraph_flag) { true }
 
     before do
