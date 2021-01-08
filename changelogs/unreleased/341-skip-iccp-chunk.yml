@@ -1,0 +1,5 @@
+---
+title: 'Image scaling: strip out iCCP chunks in PNG files'
+merge_request: 673
+author:
+type: fixed
