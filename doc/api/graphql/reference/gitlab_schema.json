@@ -26215,20 +26215,6 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "projectPath",
-              "description": "Full project path the requirements are associated with.",
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            },
-            {
               "name": "sort",
               "description": "List requirements by sort order.",
               "type": {
@@ -26272,6 +26258,20 @@
                     "name": "String",
                     "ofType": null
                   }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "projectPath",
+              "description": "Full project path the requirements are associated with.",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
                 }
               },
               "defaultValue": null
@@ -53998,6 +53998,54 @@
               "description": "Find a single requirement",
               "args": [
                 {
+                  "name": "sort",
+                  "description": "List requirements by sort order.",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "Sort",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "state",
+                  "description": "Filter requirements by state.",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "RequirementState",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "search",
+                  "description": "Search query for requirement title.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "authorUsername",
+                  "description": "Filter requirements by author username.",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "iid",
                   "description": "IID of the requirement, e.g., \"1\"",
                   "type": {
@@ -54019,54 +54067,6 @@
                       "ofType": {
                         "kind": "SCALAR",
                         "name": "ID",
-                        "ofType": null
-                      }
-                    }
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "sort",
-                  "description": "List requirements by sort order",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "Sort",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "state",
-                  "description": "Filter requirements by state",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "RequirementState",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "search",
-                  "description": "Search query for requirement title",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "authorUsername",
-                  "description": "Filter requirements by author username",
-                  "type": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "NON_NULL",
-                      "name": null,
-                      "ofType": {
-                        "kind": "SCALAR",
-                        "name": "String",
                         "ofType": null
                       }
                     }
@@ -54101,6 +54101,54 @@
               "description": "Find requirements",
               "args": [
                 {
+                  "name": "sort",
+                  "description": "List requirements by sort order.",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "Sort",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "state",
+                  "description": "Filter requirements by state.",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "RequirementState",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "search",
+                  "description": "Search query for requirement title.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "authorUsername",
+                  "description": "Filter requirements by author username.",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "iid",
                   "description": "IID of the requirement, e.g., \"1\"",
                   "type": {
@@ -54122,54 +54170,6 @@
                       "ofType": {
                         "kind": "SCALAR",
                         "name": "ID",
-                        "ofType": null
-                      }
-                    }
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "sort",
-                  "description": "List requirements by sort order",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "Sort",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "state",
-                  "description": "Filter requirements by state",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "RequirementState",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "search",
-                  "description": "Search query for requirement title",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "authorUsername",
-                  "description": "Filter requirements by author username",
-                  "type": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "NON_NULL",
-                      "name": null,
-                      "ofType": {
-                        "kind": "SCALAR",
-                        "name": "String",
                         "ofType": null
                       }
                     }

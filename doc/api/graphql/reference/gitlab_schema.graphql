@@ -18516,7 +18516,7 @@ type Project {
   """
   requirement(
     """
-    Filter requirements by author username
+    Filter requirements by author username.
     """
     authorUsername: [String!]
 
@@ -18531,17 +18531,17 @@ type Project {
     iids: [ID!]
 
     """
-    Search query for requirement title
+    Search query for requirement title.
     """
     search: String
 
     """
-    List requirements by sort order
+    List requirements by sort order.
     """
     sort: Sort
 
     """
-    Filter requirements by state
+    Filter requirements by state.
     """
     state: RequirementState
   ): Requirement
@@ -18561,7 +18561,7 @@ type Project {
     after: String
 
     """
-    Filter requirements by author username
+    Filter requirements by author username.
     """
     authorUsername: [String!]
 
@@ -18591,17 +18591,17 @@ type Project {
     last: Int
 
     """
-    Search query for requirement title
+    Search query for requirement title.
     """
     search: String
 
     """
-    List requirements by sort order
+    List requirements by sort order.
     """
     sort: Sort
 
     """
-    Filter requirements by state
+    Filter requirements by state.
     """
     state: RequirementState
   ): RequirementConnection
