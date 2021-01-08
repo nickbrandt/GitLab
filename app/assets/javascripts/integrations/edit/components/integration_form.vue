@@ -96,6 +96,9 @@ export default {
 
 <template>
   <div>
+    <!-- helpHtml is trusted input -->
+    <div v-if="helpHtml" v-safe-html:[$options.helpHtmlConfig]="helpHtml"></div>
+
     <override-dropdown
       v-if="defaultState !== null"
       :inherit-from-id="defaultState.id"
@@ -103,9 +106,6 @@ export default {
       :learn-more-path="propsSource.learnMorePath"
       @change="setOverride"
     />
-
-    <!-- helpHtml is trusted input -->
-    <div v-if="helpHtml" v-safe-html:[$options.helpHtmlConfig]="helpHtml"></div>
 
     <active-checkbox v-if="propsSource.showActive" :key="`${currentKey}-active-checkbox`" />
     <jira-trigger-fields
