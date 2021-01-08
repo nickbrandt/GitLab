@@ -616,7 +616,7 @@ RSpec.describe ProjectsController do
           expect { update_project path: 'renamed_path' }
             .not_to change { project.reload.path }
 
-          expect(controller).to set_flash.now[:alert].to(s_('UpdateProject|Cannot rename project because it contains container registry tags!'))
+          expect(controller).to set_flash[:alert].to(s_('UpdateProject|Cannot rename project because it contains container registry tags!'))
           expect(response).to have_gitlab_http_status(:ok)
         end
       end
