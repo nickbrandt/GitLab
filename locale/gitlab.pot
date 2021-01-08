@@ -15342,6 +15342,9 @@ msgstr ""
 msgid "Invite"
 msgstr ""
 
+msgid "Invite \"%{email}\" by email"
+msgstr ""
+
 msgid "Invite \"%{trimmed}\" by email"
 msgstr ""
 
