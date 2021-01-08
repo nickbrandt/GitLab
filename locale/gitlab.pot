@@ -2212,6 +2212,9 @@ msgstr ""
 msgid "AdminUsers|Delete user and contributions"
 msgstr ""
 
+msgid "AdminUsers|Export permissions as CSV"
+msgstr ""
+
 msgid "AdminUsers|External"
 msgstr ""
 
