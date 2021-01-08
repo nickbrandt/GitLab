@@ -1,12 +1,15 @@
 <script>
-import { GlAlert, GlForm, GlFormGroup, GlFormInput, GlLoadingIcon } from '@gitlab/ui';
+import { GlAlert, GlButton, GlForm, GlFormGroup, GlFormInput, GlLoadingIcon } from '@gitlab/ui';
 
 import { convertToGraphQLId, getIdFromGraphQLId } from '~/graphql_shared/utils';
+import { visitUrl } from '~/lib/utils/url_utility';
 import { s__ } from '~/locale';
 import * as Sentry from '~/sentry/wrapper';
 import ColorPicker from '~/vue_shared/components/color_picker/color_picker.vue';
 
 import getComplianceFrameworkQuery from '../graphql/queries/get_compliance_framework.query.graphql';
+import createComplianceFrameworkMutation from '../graphql/queries/create_compliance_framework.mutation.graphql';
+import updateComplianceFrameworkMutation from '../graphql/queries/update_compliance_framework.mutation.graphql';
 
 const FRAMEWORK_GRAPHQL_ID_TYPE = 'ComplianceManagement::Framework';
 
@@ -14,6 +17,7 @@ export default {
   components: {
     ColorPicker,
     GlAlert,
+    GlButton,
     GlForm,
     GlFormGroup,
     GlFormInput,
@@ -21,6 +25,10 @@ export default {
   },
   props: {
     groupPath: {
+      type: String,
+      required: true,
+    },
+    groupEditPath: {
       type: String,
       required: true,
     },
@@ -33,6 +41,7 @@ export default {
   data() {
     return {
       complianceFramework: {},
+      isEditing: Boolean(this.id),
       error: '',
     };
   },
@@ -40,19 +49,24 @@ export default {
     complianceFramework: {
       query: getComplianceFrameworkQuery,
       skip() {
-        return !this.id;
+        return !this.isEditing;
       },
       variables() {
         return {
           fullPath: this.groupPath,
-          complianceFramework: this.id ? convertToGraphQLId(FRAMEWORK_GRAPHQL_ID_TYPE, this.id) : null,
+          complianceFramework: this.isEditing
+            ? convertToGraphQLId(FRAMEWORK_GRAPHQL_ID_TYPE, this.id)
+            : null,
         };
       },
       update(data) {
         const nodes = data.namespace?.complianceFrameworks?.nodes;
 
         if (nodes.length > 1) {
-          throw new Error(this.$options.i18n.multipleResultsIdError);
+          return this.setError(
+            this.$options.i18n.multipleResultsIdError,
+            this.$options.i18n.multipleResultsIdError,
+          );
         }
 
         return {
@@ -61,8 +75,7 @@ export default {
         };
       },
       error(error) {
-        this.error = this.$options.i18n.fetchError;
-        Sentry.captureException(error);
+        this.setError(error, this.$options.i18n.fetchError);
       },
     },
   },
@@ -70,20 +83,84 @@ export default {
     isLoading() {
       return this.$apollo.loading;
     },
-    hasLoaded() {
-      return !this.isLoading && !this.error;
+    mutation() {
+      return this.isEditing ? updateComplianceFrameworkMutation : createComplianceFrameworkMutation;
+    },
+    mutationVariables() {
+      if (this.isEditing) {
+        return {
+          input: {
+            id: this.complianceFramework.id,
+            params: {
+              name: this.complianceFramework.name,
+              description: this.complianceFramework.description,
+              color: this.complianceFramework.color,
+            },
+          },
+        };
+      }
+
+      return {
+        input: {
+          namespacePath: this.groupPath,
+          params: {
+            name: this.complianceFramework.name,
+            description: this.complianceFramework.description,
+            color: this.complianceFramework.color,
+          },
+        },
+      };
+    },
+  },
+  methods: {
+    setError(error, userFriendlyText) {
+      this.error = userFriendlyText;
+      Sentry.captureException(error);
+    },
+    handleComplianceFrameworkSubmission(errors) {
+      if (errors.length) {
+        this.setError(new Error(errors[0]), errors[0]);
+      } else {
+        visitUrl(this.groupEditPath);
+      }
+    },
+    getMutationErrors(data) {
+      if (this.isEditing) {
+        return data?.data?.updateComplianceFramework?.errors || [];
+      }
+
+      return data?.createComplianceFramework?.errors || [];
+    },
+    async onSubmit(event) {
+      event.preventDefault();
+
+      try {
+        const { data } = await this.$apollo.mutate({
+          mutation: this.mutation,
+          variables: this.mutationVariables,
+        });
+
+        this.handleComplianceFrameworkSubmission(this.getMutationErrors(data));
+      } catch (e) {
+        this.setError(e, this.$options.i18n.saveError);
+      }
     },
   },
   i18n: {
     fetchError: s__(
       'ComplianceFrameworks|Error fetching compliance frameworks data. Please refresh the page',
     ),
+    saveError: s__(
+      'ComplianceFrameworks|Unable to save this compliance framework. Please try again',
+    ),
     multipleResultsIdError: s__(
       'ComplianceFrameworks|The ID given produced more than one result. Please try a different compliance framework',
     ),
     titleInputLabel: s__('ComplianceFrameworks|Title'),
+    titleInputInvalid: s__('ComplianceFrameworks|A title is required'),
     descriptionInputLabel: s__('ComplianceFrameworks|Description'),
     colorInputLabel: s__('ComplianceFrameworks|Background color'),
+    submitBtnText: s__('ComplianceFrameworks|Save changes'),
   },
 };
 </script>
@@ -94,16 +171,25 @@ export default {
     </gl-alert>
     <gl-loading-icon v-if="isLoading" size="lg" class="gl-mt-5" />
 
-    <gl-form v-if="hasLoaded">
+    <gl-form v-if="!isLoading" @submit="onSubmit">
       <gl-form-group :label="$options.i18n.titleInputLabel">
-        <gl-form-input :value="complianceFramework.name"/>
+        <gl-form-input
+          v-model="complianceFramework.name"
+          :invalid-feedback="$options.i18n.titleInputInvalid"
+        />
       </gl-form-group>
 
       <gl-form-group :label="$options.i18n.descriptionInputLabel">
-        <gl-form-input :value="complianceFramework.description"/>
+        <gl-form-input v-model="complianceFramework.description" />
       </gl-form-group>
 
-      <color-picker :label="$options.i18n.colorInputLabel" :set-color="complianceFramework.color" />
+      <color-picker
+        v-model="complianceFramework.color"
+        :label="$options.i18n.colorInputLabel"
+        :set-color="complianceFramework.color"
+      />
+
+      <gl-button type="submit" variant="success">{{ $options.i18n.submitBtnText }}</gl-button>
     </gl-form>
   </div>
 </template>
