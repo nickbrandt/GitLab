@@ -22,7 +22,8 @@ import { s__ } from '~/locale';
 import validation from '~/vue_shared/directives/validation';
 import * as Sentry from '~/sentry/wrapper';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
-import { redirectTo } from '~/lib/utils/url_utility';
+import { redirectTo, queryToObject } from '~/lib/utils/url_utility';
+import { convertToGraphQLId } from '~/graphql_shared/utils';
 import {
   ERROR_RUN_SCAN,
   ERROR_FETCH_SCANNER_PROFILES,
@@ -31,6 +32,8 @@ import {
   SCANNER_PROFILES_QUERY,
   SITE_PROFILES_QUERY,
   SITE_PROFILES_EXTENDED_QUERY,
+  TYPE_SITE_PROFILE,
+  TYPE_SCANNER_PROFILE,
 } from '../settings';
 import dastScanCreateMutation from '../graphql/dast_scan_create.mutation.graphql';
 import dastScanUpdateMutation from '../graphql/dast_scan_update.mutation.graphql';
@@ -219,6 +222,16 @@ export default {
       return isFormInvalid || (loading && loading !== saveScanBtnId);
     },
   },
+  created() {
+    const params = queryToObject(window.location.search);
+
+    this.selectedSiteProfileId = params.site_profile_id
+      ? convertToGraphQLId(TYPE_SITE_PROFILE, params.site_profile_id)
+      : this.selectedSiteProfileId;
+    this.selectedScannerProfileId = params.scanner_profile_id
+      ? convertToGraphQLId(TYPE_SCANNER_PROFILE, params.scanner_profile_id)
+      : this.selectedScannerProfileId;
+  },
   methods: {
     onSubmit({ runAfterCreate = true, button = this.$options.saveAndRunScanBtnId } = {}) {
       if (this.glFeatures.dastSavedScans) {
@@ -362,7 +375,7 @@ export default {
             required
           />
         </gl-form-group>
-        <gl-form-group :label="s__('OnDemandScans|Description')">
+        <gl-form-group :label="s__('OnDemandScans|Description (optional)')">
           <gl-form-textarea
             v-model="form.fields.description.value"
             class="mw-460"

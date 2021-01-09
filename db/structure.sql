@@ -11947,6 +11947,32 @@ CREATE SEQUENCE draft_notes_id_seq
 
 ALTER SEQUENCE draft_notes_id_seq OWNED BY draft_notes.id;
 
+CREATE TABLE elastic_reindexing_subtasks (
+    id bigint NOT NULL,
+    elastic_reindexing_task_id bigint NOT NULL,
+    alias_name text NOT NULL,
+    index_name_from text NOT NULL,
+    index_name_to text NOT NULL,
+    elastic_task text NOT NULL,
+    documents_count_target integer,
+    documents_count integer,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    CONSTRAINT check_4910adc798 CHECK ((char_length(elastic_task) <= 255)),
+    CONSTRAINT check_88f56216a4 CHECK ((char_length(alias_name) <= 255)),
+    CONSTRAINT check_a1fbd9faa9 CHECK ((char_length(index_name_from) <= 255)),
+    CONSTRAINT check_f456494bd8 CHECK ((char_length(index_name_to) <= 255))
+);
+
+CREATE SEQUENCE elastic_reindexing_subtasks_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE elastic_reindexing_subtasks_id_seq OWNED BY elastic_reindexing_subtasks.id;
+
 CREATE TABLE elastic_reindexing_tasks (
     id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -14018,7 +14044,7 @@ CREATE TABLE merge_requests (
     merge_jid character varying,
     discussion_locked boolean,
     latest_merge_request_diff_id integer,
-    allow_maintainer_to_push boolean,
+    allow_maintainer_to_push boolean DEFAULT true,
     state_id smallint DEFAULT 1 NOT NULL,
     rebase_jid character varying,
     squash_commit_sha bytea,
@@ -14694,6 +14720,88 @@ CREATE TABLE packages_debian_file_metadata (
     CONSTRAINT check_2ebedda4b6 CHECK ((char_length(component) <= 255)),
     CONSTRAINT check_e6e1fffcca CHECK ((char_length(architecture) <= 255))
 );
+
+CREATE TABLE packages_debian_group_distributions (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    group_id bigint NOT NULL,
+    creator_id bigint,
+    valid_time_duration_seconds integer,
+    file_store smallint DEFAULT 1 NOT NULL,
+    automatic boolean DEFAULT true NOT NULL,
+    automatic_upgrades boolean DEFAULT false NOT NULL,
+    codename text NOT NULL,
+    suite text,
+    origin text,
+    label text,
+    version text,
+    description text,
+    encrypted_signing_keys text,
+    encrypted_signing_keys_iv text,
+    file text,
+    file_signature text,
+    CONSTRAINT check_310ac457b8 CHECK ((char_length(description) <= 255)),
+    CONSTRAINT check_3d6f87fc31 CHECK ((char_length(file_signature) <= 4096)),
+    CONSTRAINT check_3fdadf4a0c CHECK ((char_length(version) <= 255)),
+    CONSTRAINT check_590e18405a CHECK ((char_length(codename) <= 255)),
+    CONSTRAINT check_9b90bc0f07 CHECK ((char_length(encrypted_signing_keys_iv) <= 255)),
+    CONSTRAINT check_b057cd840a CHECK ((char_length(origin) <= 255)),
+    CONSTRAINT check_b811ec1218 CHECK ((char_length(encrypted_signing_keys) <= 2048)),
+    CONSTRAINT check_be5ed8d307 CHECK ((char_length(file) <= 255)),
+    CONSTRAINT check_d3244bfc0b CHECK ((char_length(label) <= 255)),
+    CONSTRAINT check_e7c928a24b CHECK ((char_length(suite) <= 255))
+);
+
+CREATE SEQUENCE packages_debian_group_distributions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE packages_debian_group_distributions_id_seq OWNED BY packages_debian_group_distributions.id;
+
+CREATE TABLE packages_debian_project_distributions (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    project_id bigint NOT NULL,
+    creator_id bigint,
+    valid_time_duration_seconds integer,
+    file_store smallint DEFAULT 1 NOT NULL,
+    automatic boolean DEFAULT true NOT NULL,
+    automatic_upgrades boolean DEFAULT false NOT NULL,
+    codename text NOT NULL,
+    suite text,
+    origin text,
+    label text,
+    version text,
+    description text,
+    encrypted_signing_keys text,
+    encrypted_signing_keys_iv text,
+    file text,
+    file_signature text,
+    CONSTRAINT check_6177ccd4a6 CHECK ((char_length(origin) <= 255)),
+    CONSTRAINT check_6f6b55a4c4 CHECK ((char_length(label) <= 255)),
+    CONSTRAINT check_834dabadb6 CHECK ((char_length(codename) <= 255)),
+    CONSTRAINT check_96965792c2 CHECK ((char_length(version) <= 255)),
+    CONSTRAINT check_a56ae58a17 CHECK ((char_length(suite) <= 255)),
+    CONSTRAINT check_a5a2ac6af2 CHECK ((char_length(file_signature) <= 4096)),
+    CONSTRAINT check_b93154339f CHECK ((char_length(description) <= 255)),
+    CONSTRAINT check_c25603a25b CHECK ((char_length(encrypted_signing_keys) <= 2048)),
+    CONSTRAINT check_cb4ac9599e CHECK ((char_length(file) <= 255)),
+    CONSTRAINT check_d488f8cce3 CHECK ((char_length(encrypted_signing_keys_iv) <= 255))
+);
+
+CREATE SEQUENCE packages_debian_project_distributions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE packages_debian_project_distributions_id_seq OWNED BY packages_debian_project_distributions.id;
 
 CREATE TABLE packages_dependencies (
     id bigint NOT NULL,
@@ -18387,6 +18495,8 @@ ALTER TABLE ONLY diff_note_positions ALTER COLUMN id SET DEFAULT nextval('diff_n
 
 ALTER TABLE ONLY draft_notes ALTER COLUMN id SET DEFAULT nextval('draft_notes_id_seq'::regclass);
 
+ALTER TABLE ONLY elastic_reindexing_subtasks ALTER COLUMN id SET DEFAULT nextval('elastic_reindexing_subtasks_id_seq'::regclass);
+
 ALTER TABLE ONLY elastic_reindexing_tasks ALTER COLUMN id SET DEFAULT nextval('elastic_reindexing_tasks_id_seq'::regclass);
 
 ALTER TABLE ONLY emails ALTER COLUMN id SET DEFAULT nextval('emails_id_seq'::regclass);
@@ -18628,6 +18738,10 @@ ALTER TABLE ONLY packages_build_infos ALTER COLUMN id SET DEFAULT nextval('packa
 ALTER TABLE ONLY packages_conan_file_metadata ALTER COLUMN id SET DEFAULT nextval('packages_conan_file_metadata_id_seq'::regclass);
 
 ALTER TABLE ONLY packages_conan_metadata ALTER COLUMN id SET DEFAULT nextval('packages_conan_metadata_id_seq'::regclass);
+
+ALTER TABLE ONLY packages_debian_group_distributions ALTER COLUMN id SET DEFAULT nextval('packages_debian_group_distributions_id_seq'::regclass);
+
+ALTER TABLE ONLY packages_debian_project_distributions ALTER COLUMN id SET DEFAULT nextval('packages_debian_project_distributions_id_seq'::regclass);
 
 ALTER TABLE ONLY packages_dependencies ALTER COLUMN id SET DEFAULT nextval('packages_dependencies_id_seq'::regclass);
 
@@ -19548,6 +19662,9 @@ ALTER TABLE ONLY diff_note_positions
 ALTER TABLE ONLY draft_notes
     ADD CONSTRAINT draft_notes_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY elastic_reindexing_subtasks
+    ADD CONSTRAINT elastic_reindexing_subtasks_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY elastic_reindexing_tasks
     ADD CONSTRAINT elastic_reindexing_tasks_pkey PRIMARY KEY (id);
 
@@ -19976,6 +20093,12 @@ ALTER TABLE ONLY packages_conan_metadata
 
 ALTER TABLE ONLY packages_debian_file_metadata
     ADD CONSTRAINT packages_debian_file_metadata_pkey PRIMARY KEY (package_file_id);
+
+ALTER TABLE ONLY packages_debian_group_distributions
+    ADD CONSTRAINT packages_debian_group_distributions_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY packages_debian_project_distributions
+    ADD CONSTRAINT packages_debian_project_distributions_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY packages_dependencies
     ADD CONSTRAINT packages_dependencies_pkey PRIMARY KEY (id);
@@ -20915,6 +21038,8 @@ CREATE UNIQUE INDEX index_boards_epic_board_positions_on_epic_board_id_and_epic_
 
 CREATE INDEX index_boards_epic_board_positions_on_epic_id ON boards_epic_board_positions USING btree (epic_id);
 
+CREATE INDEX index_boards_epic_board_positions_on_scoped_relative_position ON boards_epic_board_positions USING btree (epic_board_id, epic_id, relative_position);
+
 CREATE INDEX index_boards_epic_boards_on_group_id ON boards_epic_boards USING btree (group_id);
 
 CREATE INDEX index_boards_epic_lists_on_epic_board_id ON boards_epic_lists USING btree (epic_board_id);
@@ -21392,6 +21517,8 @@ CREATE INDEX index_draft_notes_on_author_id ON draft_notes USING btree (author_i
 CREATE INDEX index_draft_notes_on_discussion_id ON draft_notes USING btree (discussion_id);
 
 CREATE INDEX index_draft_notes_on_merge_request_id ON draft_notes USING btree (merge_request_id);
+
+CREATE INDEX index_elastic_reindexing_subtasks_on_elastic_reindexing_task_id ON elastic_reindexing_subtasks USING btree (elastic_reindexing_task_id);
 
 CREATE UNIQUE INDEX index_elastic_reindexing_tasks_on_in_progress ON elastic_reindexing_tasks USING btree (in_progress) WHERE in_progress;
 
@@ -21949,6 +22076,8 @@ CREATE INDEX index_merge_requests_on_target_project_id_and_iid_and_state_id ON m
 
 CREATE INDEX index_merge_requests_on_target_project_id_and_iid_jira_title ON merge_requests USING btree (target_project_id, iid) WHERE ((title)::text ~ '[A-Z][A-Z_0-9]+-\d+'::text);
 
+CREATE INDEX index_merge_requests_on_target_project_id_and_squash_commit_sha ON merge_requests USING btree (target_project_id, squash_commit_sha);
+
 CREATE INDEX index_merge_requests_on_target_project_id_and_target_branch ON merge_requests USING btree (target_project_id, target_branch) WHERE ((state_id = 1) AND (merge_when_pipeline_succeeds = true));
 
 CREATE INDEX index_merge_requests_on_target_project_id_iid_jira_description ON merge_requests USING btree (target_project_id, iid) WHERE (description ~ '[A-Z][A-Z_0-9]+-\d+'::text);
@@ -22154,6 +22283,14 @@ CREATE UNIQUE INDEX index_packages_composer_metadata_on_package_id_and_target_sh
 CREATE UNIQUE INDEX index_packages_conan_file_metadata_on_package_file_id ON packages_conan_file_metadata USING btree (package_file_id);
 
 CREATE UNIQUE INDEX index_packages_conan_metadata_on_package_id_username_channel ON packages_conan_metadata USING btree (package_id, package_username, package_channel);
+
+CREATE INDEX index_packages_debian_group_distributions_on_creator_id ON packages_debian_group_distributions USING btree (creator_id);
+
+CREATE INDEX index_packages_debian_group_distributions_on_group_id ON packages_debian_group_distributions USING btree (group_id);
+
+CREATE INDEX index_packages_debian_project_distributions_on_creator_id ON packages_debian_project_distributions USING btree (creator_id);
+
+CREATE INDEX index_packages_debian_project_distributions_on_project_id ON packages_debian_project_distributions USING btree (project_id);
 
 CREATE UNIQUE INDEX index_packages_dependencies_on_name_and_version_pattern ON packages_dependencies USING btree (name, version_pattern);
 
@@ -23105,7 +23242,19 @@ CREATE INDEX temporary_index_vulnerabilities_on_id ON vulnerabilities USING btre
 
 CREATE UNIQUE INDEX term_agreements_unique_index ON term_agreements USING btree (user_id, term_id);
 
+CREATE INDEX tmp_index_for_email_unconfirmation_migration ON emails USING btree (id) WHERE (confirmed_at IS NOT NULL);
+
+CREATE INDEX tmp_index_oauth_applications_on_id_where_trusted ON oauth_applications USING btree (id) WHERE (trusted = true);
+
 CREATE INDEX tmp_index_on_vulnerabilities_non_dismissed ON vulnerabilities USING btree (id) WHERE (state <> 2);
+
+CREATE UNIQUE INDEX uniq_pkgs_debian_group_distributions_group_id_and_codename ON packages_debian_group_distributions USING btree (group_id, codename);
+
+CREATE UNIQUE INDEX uniq_pkgs_debian_group_distributions_group_id_and_suite ON packages_debian_group_distributions USING btree (group_id, suite);
+
+CREATE UNIQUE INDEX uniq_pkgs_debian_project_distributions_project_id_and_codename ON packages_debian_project_distributions USING btree (project_id, codename);
+
+CREATE UNIQUE INDEX uniq_pkgs_debian_project_distributions_project_id_and_suite ON packages_debian_project_distributions USING btree (project_id, suite);
 
 CREATE UNIQUE INDEX unique_merge_request_metrics_by_merge_request_id ON merge_request_metrics USING btree (merge_request_id);
 
@@ -24109,6 +24258,9 @@ ALTER TABLE ONLY trending_projects
 ALTER TABLE ONLY project_deploy_tokens
     ADD CONSTRAINT fk_rails_0aca134388 FOREIGN KEY (deploy_token_id) REFERENCES deploy_tokens(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY packages_debian_group_distributions
+    ADD CONSTRAINT fk_rails_0adf75c347 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE RESTRICT;
+
 ALTER TABLE ONLY packages_conan_file_metadata
     ADD CONSTRAINT fk_rails_0afabd9328 FOREIGN KEY (package_file_id) REFERENCES packages_package_files(id) ON DELETE CASCADE;
 
@@ -24895,6 +25047,9 @@ ALTER TABLE ONLY alert_management_alert_assignees
 ALTER TABLE ONLY scim_identities
     ADD CONSTRAINT fk_rails_9421a0bffb FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY packages_debian_project_distributions
+    ADD CONSTRAINT fk_rails_94b95e1f84 FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE SET NULL;
+
 ALTER TABLE ONLY packages_pypi_metadata
     ADD CONSTRAINT fk_rails_9698717cdd FOREIGN KEY (package_id) REFERENCES packages_packages(id) ON DELETE CASCADE;
 
@@ -25255,6 +25410,9 @@ ALTER TABLE ONLY user_callouts
 ALTER TABLE ONLY vulnerability_feedback
     ADD CONSTRAINT fk_rails_debd54e456 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY packages_debian_project_distributions
+    ADD CONSTRAINT fk_rails_df44271a30 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE RESTRICT;
+
 ALTER TABLE ONLY incident_management_oncall_shifts
     ADD CONSTRAINT fk_rails_df4feb286a FOREIGN KEY (rotation_id) REFERENCES incident_management_oncall_rotations(id) ON DELETE CASCADE;
 
@@ -25330,6 +25488,9 @@ ALTER TABLE ONLY snippet_statistics
 ALTER TABLE ONLY project_security_settings
     ADD CONSTRAINT fk_rails_ed4abe1338 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
+ALTER TABLE ONLY packages_debian_group_distributions
+    ADD CONSTRAINT fk_rails_ede0bb937f FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE SET NULL;
+
 ALTER TABLE ONLY experiment_subjects
     ADD CONSTRAINT fk_rails_ede5754774 FOREIGN KEY (experiment_id) REFERENCES experiments(id) ON DELETE CASCADE;
 
@@ -25356,6 +25517,9 @@ ALTER TABLE ONLY requirements
 
 ALTER TABLE ONLY snippet_repositories
     ADD CONSTRAINT fk_rails_f21f899728 FOREIGN KEY (shard_id) REFERENCES shards(id) ON DELETE RESTRICT;
+
+ALTER TABLE ONLY elastic_reindexing_subtasks
+    ADD CONSTRAINT fk_rails_f2cc190164 FOREIGN KEY (elastic_reindexing_task_id) REFERENCES elastic_reindexing_tasks(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY ci_pipeline_chat_data
     ADD CONSTRAINT fk_rails_f300456b63 FOREIGN KEY (chat_name_id) REFERENCES chat_names(id) ON DELETE CASCADE;

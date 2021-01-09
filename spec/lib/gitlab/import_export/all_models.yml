@@ -561,6 +561,7 @@ project:
 - alert_management_http_integrations
 - exported_protected_branches
 - incident_management_oncall_schedules
+- debian_distributions
 award_emoji:
 - awardable
 - user
@@ -723,6 +724,7 @@ epic:
 - user_mentions
 - note_authors
 - boards_epic_user_preferences
+- epic_board_positions
 epic_issue:
 - epic
 - issue
