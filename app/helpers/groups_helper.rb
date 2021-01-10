@@ -68,6 +68,16 @@ module GroupsHelper
       .count
   end
 
+  def cached_open_group_issues_count
+    issues_count = @group.open_issues_count(current_user)
+
+    if issues_count > 1000
+      ActiveSupport::NumberHelper.number_to_human(issues_count, units: { thousand: 'K' }, precision: 1)
+    else
+      number_with_delimiter(issues_count)
+    end
+  end
+
   def group_merge_requests_count(state:)
     MergeRequestsFinder
       .new(current_user, group_id: @group.id, state: state, non_archived: true, include_subgroups: true)

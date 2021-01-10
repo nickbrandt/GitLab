@@ -54,8 +54,7 @@
             %span.nav-item-name
               = _('Issues')
             %span.badge.badge-pill.count
-              = number_with_delimiter(@group.open_issues_count(current_user))
-
+              = cached_open_group_issues_count
           %ul.sidebar-sub-level-items{ data: { qa_selector: 'group_issues_sidebar_submenu'} }
             = nav_link(path: ['groups#issues', 'labels#index', 'milestones#index', 'iterations#index'], html_options: { class: "fly-out-top-item" } ) do
               = link_to issues_group_path(@group) do

@@ -626,12 +626,6 @@ class Group < Namespace
   end
   # rubocop: enable CodeReuse/ServiceClass
 
-  # rubocop: disable CodeReuse/ServiceClass
-  def update_group_issues_counter_cache
-    Groups::OpenIssuesCountService.new(self).refresh_cache
-  end
-  # rubocop: enable CodeReuse/ServiceClass
-
   private
 
   def update_two_factor_requirement
