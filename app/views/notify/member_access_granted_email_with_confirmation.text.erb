@@ -1,8 +1,12 @@
-<% source_type = member_source.model_name.singular %>
-<%= _('You have been granted %{access_level} access to the %{source_name} %{source_type}.') % { access_level: member.human_access, source_name: member_source.human_name, source_type: source_type  } %>
+<% source_link = member_source.web_url %>
 
-<%= member_source.web_url %>
+<%= _('An Enterprise User GitLab account has been created for you by your organization:') %>
+<%= _('Username: %{username}') % { username: @user.username } %>
+<%= _('Email: %{email}') % { email: @user.email } %>
+<%= _('GitLab group: %{source_link}').html_safe % { source_link: source_link } %>
 
-<%= _('If this was a mistake you can leave the %{source_type}.') % { source_type: source_type  } %>
 
-<%= polymorphic_url([member_source], leave: 1) %>
+<%= _('By authenticating with an account tied to an Enterprise e-mail address, it is understood that this account is an Enterprise User. ') %>
+<%= _('To ensure no loss of personal content, an Individual User should create a separate account under their own personal email address, not tied to the Enterprise email domain or name-space.') %>
+<%= _('To get started, click the link below to confirm your account.') %>
+<%= confirmation_url(@user, confirmation_token: @user.confirmation_token) %>
