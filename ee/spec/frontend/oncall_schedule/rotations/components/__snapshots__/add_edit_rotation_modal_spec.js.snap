@@ -5,9 +5,9 @@ exports[`AddEditRotationModal renders rotation modal layout 1`] = `
   actioncancel="[object Object]"
   actionprimary="[object Object]"
   dismisslabel="Close"
-  modalclass=""
+  modalclass="rotations-modal"
   modalid="addRotationModal"
-  size="sm"
+  size="md"
   title="Add rotation"
   titletag="h4"
 >
