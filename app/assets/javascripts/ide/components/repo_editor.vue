@@ -320,11 +320,7 @@ export default {
 
       this.isEditorLoading = false;
 
-      if (this.viewer === viewerTypes.mr && this.file.mrChange) {
-        this.editor.attachMergeRequestModel(this.model);
-      } else {
-        this.editor.attachModel(this.model);
-      }
+      this.editor.attachModel(this.model);
 
       this.model.updateOptions(this.rules);
 

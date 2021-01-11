@@ -1,5 +1,5 @@
 import { debounce } from 'lodash';
-import { editor as monacoEditor, KeyCode, KeyMod, Range } from 'monaco-editor';
+import { KeyCode, KeyMod, Range } from 'monaco-editor';
 import Disposable from '~/ide/lib/common/disposable';
 import { editorOptions } from '~/ide/lib/editor_options';
 import keymap from '~/ide/lib/keymap.json';
@@ -59,7 +59,7 @@ export class EditorWebIdeExtension extends EditorLiteExtension {
   attachModel(model) {
     if (isDiffEditorType(this)) {
       this.setModel({
-        original: model.getOriginalModel(),
+        original: model.file.mrChange ? model.getBaseModel() : model.getOriginalModel(),
         modified: model.getModel(),
       });
 
@@ -78,17 +78,6 @@ export class EditorWebIdeExtension extends EditorLiteExtension {
         return acc;
       }, {}),
     );
-  }
-
-  attachMergeRequestModel(model) {
-    this.setModel({
-      original: model.getBaseModel(),
-      modified: model.getModel(),
-    });
-
-    monacoEditor.createDiffNavigator(this, {
-      alwaysRevealFirst: true,
-    });
   }
 
   clearEditor() {
