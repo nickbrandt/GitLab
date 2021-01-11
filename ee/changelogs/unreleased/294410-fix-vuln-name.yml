@@ -1,5 +1,5 @@
 ---
 title: Fix alignent of vuln names in Security tab
-merge_request:
+merge_request: 51313
 author:
 type: fixed
