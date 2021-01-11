@@ -44,7 +44,7 @@ RSpec.describe Notify do
     end
   end
 
-  let_it_be(:user) { create(:user) }
+  let_it_be(:user, reload: true) { create(:user) }
   let_it_be(:current_user) { create(:user, email: "current@email.com") }
   let_it_be(:assignee) { create(:user, email: 'assignee@example.com', name: 'John Doe') }
   let_it_be(:assignee2) { create(:user, email: 'assignee2@example.com', name: 'Jane Doe') }
@@ -367,6 +367,32 @@ RSpec.describe Notify do
     it 'includes unsubscribe link' do
       unsubscribe_link = "http://localhost/unsubscribes/#{Base64.urlsafe_encode64(user.email)}"
       is_expected.to have_body_text(unsubscribe_link)
+    end
+  end
+
+  describe 'new user was created via saml' do
+    let(:group_member) { create(:group_member, user: user) }
+    let(:group) { group_member.source }
+    let(:recipient) { user }
+
+    subject { described_class.member_access_granted_email_with_confirmation('group', group_member.id) }
+
+    it_behaves_like 'an email sent from GitLab'
+    it_behaves_like 'it should not have Gmail Actions links'
+    it_behaves_like "a user cannot unsubscribe through footer link"
+    it_behaves_like 'appearance header and footer enabled'
+    it_behaves_like 'appearance header and footer not enabled'
+
+    it 'delivers mail to user email' do
+      expect(subject).to deliver_to(recipient.notification_email)
+    end
+
+    it 'contains all the useful information' do
+      is_expected.to have_subject "Welcome to GitLab"
+      is_expected.to have_body_text group.name
+      is_expected.to have_body_text group.web_url
+      is_expected.to have_body_text user.username
+      is_expected.to have_body_text user.email
     end
   end
 end
