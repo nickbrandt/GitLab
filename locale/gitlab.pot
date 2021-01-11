@@ -17670,6 +17670,9 @@ msgstr ""
 msgid "Merged"
 msgstr ""
 
+msgid "Merged (%{linkStart}reverted%{linkEnd})"
+msgstr ""
+
 msgid "Merged (%{reverted})"
 msgstr ""
 
