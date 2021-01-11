@@ -398,7 +398,7 @@ a new set of recovery codes with SSH:
    ```shell
    ssh git@gitlab.com 2fa_recovery_codes
    ```
-   
+
    NOTE:
    On self-managed instances, replace **`gitlab.com`** in the command above
    with the GitLab server hostname (`gitlab.example.com`).
