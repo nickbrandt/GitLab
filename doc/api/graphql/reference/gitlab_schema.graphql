@@ -600,7 +600,7 @@ Filters the alerts based on given domain
 """
 enum AlertManagementDomainFilter {
   """
-  Alerts for operations domain 
+  Alerts for operations domain
   """
   operations
 
