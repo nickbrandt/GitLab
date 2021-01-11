@@ -14786,6 +14786,27 @@ CREATE SEQUENCE packages_build_infos_id_seq
 
 ALTER SEQUENCE packages_build_infos_id_seq OWNED BY packages_build_infos.id;
 
+CREATE TABLE packages_composer_cache_files (
+    id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    delete_at timestamp with time zone,
+    namespace_id integer,
+    file_store smallint DEFAULT 1 NOT NULL,
+    file text NOT NULL,
+    file_sha256 bytea NOT NULL,
+    CONSTRAINT check_84f5ba81f5 CHECK ((char_length(file) <= 255))
+);
+
+CREATE SEQUENCE packages_composer_cache_files_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE packages_composer_cache_files_id_seq OWNED BY packages_composer_cache_files.id;
+
 CREATE TABLE packages_composer_metadata (
     package_id bigint NOT NULL,
     target_sha bytea NOT NULL,
@@ -18947,6 +18968,8 @@ ALTER TABLE ONLY operations_user_lists ALTER COLUMN id SET DEFAULT nextval('oper
 
 ALTER TABLE ONLY packages_build_infos ALTER COLUMN id SET DEFAULT nextval('packages_build_infos_id_seq'::regclass);
 
+ALTER TABLE ONLY packages_composer_cache_files ALTER COLUMN id SET DEFAULT nextval('packages_composer_cache_files_id_seq'::regclass);
+
 ALTER TABLE ONLY packages_conan_file_metadata ALTER COLUMN id SET DEFAULT nextval('packages_conan_file_metadata_id_seq'::regclass);
 
 ALTER TABLE ONLY packages_conan_metadata ALTER COLUMN id SET DEFAULT nextval('packages_conan_metadata_id_seq'::regclass);
@@ -20310,6 +20333,9 @@ ALTER TABLE ONLY operations_user_lists
 
 ALTER TABLE ONLY packages_build_infos
     ADD CONSTRAINT packages_build_infos_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY packages_composer_cache_files
+    ADD CONSTRAINT packages_composer_cache_files_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY packages_composer_metadata
     ADD CONSTRAINT packages_composer_metadata_pkey PRIMARY KEY (package_id);
@@ -22548,6 +22574,8 @@ CREATE UNIQUE INDEX index_ops_feature_flags_issues_on_feature_flag_id_and_issue_
 CREATE UNIQUE INDEX index_ops_strategies_user_lists_on_strategy_id_and_user_list_id ON operations_strategies_user_lists USING btree (strategy_id, user_list_id);
 
 CREATE INDEX index_packages_build_infos_on_pipeline_id ON packages_build_infos USING btree (pipeline_id);
+
+CREATE UNIQUE INDEX index_packages_composer_cache_namespace_and_sha ON packages_composer_cache_files USING btree (namespace_id, file_sha256);
 
 CREATE UNIQUE INDEX index_packages_composer_metadata_on_package_id_and_target_sha ON packages_composer_metadata USING btree (package_id, target_sha);
 
@@ -25531,6 +25559,9 @@ ALTER TABLE ONLY namespace_aggregation_schedules
 
 ALTER TABLE ONLY approval_project_rules_protected_branches
     ADD CONSTRAINT fk_rails_b7567b031b FOREIGN KEY (protected_branch_id) REFERENCES protected_branches(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY packages_composer_cache_files
+    ADD CONSTRAINT fk_rails_b82cea43a0 FOREIGN KEY (namespace_id) REFERENCES namespaces(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY alerts_service_data
     ADD CONSTRAINT fk_rails_b93215a42c FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE;
