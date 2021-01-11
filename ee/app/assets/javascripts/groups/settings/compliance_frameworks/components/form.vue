@@ -1,5 +1,14 @@
 <script>
-import { GlAlert, GlButton, GlForm, GlFormGroup, GlFormInput, GlLink, GlLoadingIcon, GlSprintf } from '@gitlab/ui';
+import {
+  GlAlert,
+  GlButton,
+  GlForm,
+  GlFormGroup,
+  GlFormInput,
+  GlLink,
+  GlLoadingIcon,
+  GlSprintf,
+} from '@gitlab/ui';
 
 import { convertToGraphQLId, getIdFromGraphQLId } from '~/graphql_shared/utils';
 import { visitUrl } from '~/lib/utils/url_utility';
@@ -163,7 +172,9 @@ export default {
       'ComplianceFrameworks|The ID given produced more than one result. Please try a different compliance framework',
     ),
     titleInputLabel: s__('ComplianceFrameworks|Title'),
-    titleInputDescription: s__('ComplianceFrameworks|Use %{codeStart}::%{codeEnd} to create a %{linkStart}scoped set%{linkEnd} (eg. %{codeStart}SOX::AWS%{codeEnd})'),
+    titleInputDescription: s__(
+      'ComplianceFrameworks|Use %{codeStart}::%{codeEnd} to create a %{linkStart}scoped set%{linkEnd} (eg. %{codeStart}SOX::AWS%{codeEnd})',
+    ),
     titleInputInvalid: s__('ComplianceFrameworks|A title is required'),
     descriptionInputLabel: s__('ComplianceFrameworks|Description'),
     colorInputLabel: s__('ComplianceFrameworks|Background color'),
@@ -209,7 +220,9 @@ export default {
         :set-color="complianceFramework.color"
       />
 
-      <div class="gl-display-flex gl-justify-content-space-between gl-pt-5 gl-border-t-1 gl-border-t-solid gl-border-t-gray-100">
+      <div
+        class="gl-display-flex gl-justify-content-space-between gl-pt-5 gl-border-t-1 gl-border-t-solid gl-border-t-gray-100"
+      >
         <gl-button type="submit" variant="success">{{ $options.i18n.submitBtnText }}</gl-button>
         <gl-button :href="groupEditPath">{{ $options.i18n.cancelBtnText }}</gl-button>
       </div>

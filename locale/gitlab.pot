@@ -7284,10 +7284,22 @@ msgstr ""
 msgid "ComplianceDashboard|created by:"
 msgstr ""
 
+msgid "ComplianceFrameworks|A title is required"
+msgstr ""
+
 msgid "ComplianceFrameworks|Add framework"
 msgstr ""
 
 msgid "ComplianceFrameworks|All"
+msgstr ""
+
+msgid "ComplianceFrameworks|Background color"
+msgstr ""
+
+msgid "ComplianceFrameworks|Cancel"
+msgstr ""
+
+msgid "ComplianceFrameworks|Description"
 msgstr ""
 
 msgid "ComplianceFrameworks|Error fetching compliance frameworks data. Please refresh the page"
@@ -7299,7 +7311,22 @@ msgstr ""
 msgid "ComplianceFrameworks|Regulated"
 msgstr ""
 
+msgid "ComplianceFrameworks|Save changes"
+msgstr ""
+
+msgid "ComplianceFrameworks|The ID given produced more than one result. Please try a different compliance framework"
+msgstr ""
+
 msgid "ComplianceFrameworks|There are no compliance frameworks set up yet"
+msgstr ""
+
+msgid "ComplianceFrameworks|Title"
+msgstr ""
+
+msgid "ComplianceFrameworks|Unable to save this compliance framework. Please try again"
+msgstr ""
+
+msgid "ComplianceFrameworks|Use %{codeStart}::%{codeEnd} to create a %{linkStart}scoped set%{linkEnd} (eg. %{codeStart}SOX::AWS%{codeEnd})"
 msgstr ""
 
 msgid "ComplianceFramework|GDPR"
