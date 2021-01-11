@@ -61,9 +61,9 @@ module Gitlab
             def content_hash
               strong_memoize(:content_yaml) do
                 if ::Feature.enabled?(:ci_custom_yaml_tags, context.project, default_enabled: :yaml)
-                  ::Gitlab::Ci::Config::Yaml.load!(content)
+                  ::Gitlab::Ci::Config::Yaml.load!(content, file_location: file_location)
                 else
-                  Gitlab::Config::Loader::Yaml.new(content).load!
+                  External::Reader.new(file_location, content).read
                 end
               end
             rescue Gitlab::Config::Loader::FormatError
@@ -107,6 +107,10 @@ module Gitlab
 
             def expand_context_attrs
               {}
+            end
+
+            def file_location
+              "location:#{location}"
             end
           end
         end

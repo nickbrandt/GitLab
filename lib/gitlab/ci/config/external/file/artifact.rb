@@ -85,6 +85,10 @@ module Gitlab
                 parent_pipeline: context.parent_pipeline
               }
             end
+
+            def file_location
+              "job:#{job_name}/artifact:#{location}"
+            end
           end
         end
       end

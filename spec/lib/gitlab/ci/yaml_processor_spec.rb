@@ -587,7 +587,7 @@ module Gitlab
               EOYML
             end
 
-            it_behaves_like 'has warnings and expected error', /build job: need test is not defined in prior stages/
+            it_behaves_like 'has warnings and expected error', "build job: need test (at: .gitlab-ci.yml / L 3..3 / C 26..30) is not defined in prior stages"
           end
         end
 
@@ -1851,7 +1851,7 @@ module Gitlab
         context 'dependencies to deploy' do
           let(:dependencies) { ['deploy'] }
 
-          it_behaves_like 'returns errors', 'test1 job: dependency deploy is not defined in prior stages'
+          it_behaves_like 'returns errors', 'test1 job: dependency deploy (at: .gitlab-ci.yml / L 11..11 / C 4..10) is not defined in prior stages'
         end
 
         context 'when a job depends on another job that references a not-yet defined stage' do
@@ -2044,7 +2044,7 @@ module Gitlab
         context 'needs to deploy' do
           let(:needs) { ['deploy'] }
 
-          it_behaves_like 'returns errors', 'test1 job: need deploy is not defined in prior stages'
+          it_behaves_like 'returns errors', 'test1 job: need deploy (at: .gitlab-ci.yml / L 15..15 / C 4..10) is not defined in prior stages'
         end
 
         context 'needs and dependencies that are mismatching' do

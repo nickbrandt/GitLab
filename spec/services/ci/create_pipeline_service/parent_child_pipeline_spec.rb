@@ -250,7 +250,7 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
         end
 
         it_behaves_like 'creation failure' do
-          let(:expected_error) { /test job: dependency generator is not defined in prior stages/ }
+          let(:expected_error) { "test job: dependency generator (at: file:.gitlab-ci.yml / L 3..3 / C 13..22) is not defined in prior stages" }
         end
       end
 

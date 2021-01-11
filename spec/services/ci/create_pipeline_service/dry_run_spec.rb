@@ -83,7 +83,7 @@ RSpec.describe Ci::CreatePipelineService do
         it_behaves_like 'returns a non persisted pipeline'
 
         it 'returns a pipeline with errors', :aggregate_failures do
-          error_message = 'build job: need test is not defined in prior stages'
+          error_message = 'build job: need test (at: file:.gitlab-ci.yml / L 3..3 / C 10..14) is not defined in prior stages'
 
           expect(subject.error_messages.map(&:content)).to eq([error_message])
           expect(subject.errors).not_to be_empty

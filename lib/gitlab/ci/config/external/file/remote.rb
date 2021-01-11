@@ -47,6 +47,10 @@ module Gitlab
 
               response.to_s if errors.none?
             end
+
+            def file_location
+              "remote:#{location}"
+            end
           end
         end
       end

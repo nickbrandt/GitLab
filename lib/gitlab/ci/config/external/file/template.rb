@@ -43,6 +43,10 @@ module Gitlab
             def fetch_template_content
               Gitlab::Template::GitlabCiYmlTemplate.find(template_name, project)&.content
             end
+
+            def file_location
+              "template:#{location}"
+            end
           end
         end
       end

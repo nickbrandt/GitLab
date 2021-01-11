@@ -108,7 +108,8 @@ module Gitlab
       end
 
       def build_config_without_custom_tags(config)
-        initial_config = Gitlab::Config::Loader::Yaml.new(config).load!
+        # TODO: 'gitlab-ci.yml' is static for now
+        initial_config = External::Reader.new('.gitlab-ci.yml', config).read
         initial_config = Config::External::Processor.new(initial_config, @context).perform
         initial_config = Config::Extendable.new(initial_config).to_hash
         initial_config = Config::EdgeStagesInjector.new(initial_config).to_hash

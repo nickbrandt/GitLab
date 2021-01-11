@@ -76,6 +76,10 @@ module Gitlab
                 variables: context.variables
               }
             end
+
+            def file_location
+              "project:#{project_name}/ref:#{ref_name}/file:#{location}"
+            end
           end
         end
       end

@@ -7,10 +7,12 @@ module Gitlab
         AVAILABLE_TAGS = [Config::Yaml::Tags::Reference].freeze
 
         class << self
-          def load!(content, project: nil)
+          def load!(content, project: nil, file_location: '.gitlab-ci.yml')
             ensure_custom_tags
 
-            Gitlab::Config::Loader::Yaml.new(content, additional_permitted_classes: AVAILABLE_TAGS).load!
+            # Gitlab::Config::Loader::Yaml.new(content, additional_permitted_classes: AVAILABLE_TAGS).load!
+            # TODO: fix it
+            External::Reader.new(file_location, content).read
           end
 
           private
