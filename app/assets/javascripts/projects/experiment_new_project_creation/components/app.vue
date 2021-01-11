@@ -142,7 +142,7 @@ export default {
   <welcome-page v-if="activeTab === null" :panels="availablePanels" />
   <div v-else class="row">
     <div class="col-lg-3">
-      <div class="text-center" v-html="activePanel.illustration"></div>
+      <div class="gl-text-white" v-html="activePanel.illustration"></div>
       <h4>{{ activePanel.title }}</h4>
       <p>{{ activePanel.description }}</p>
     </div>
