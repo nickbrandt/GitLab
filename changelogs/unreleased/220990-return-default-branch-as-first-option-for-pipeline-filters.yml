@@ -1,5 +1,5 @@
 ---
-title: Change default sorting in EE branches API to updated_desc
+title: Change default sorting in branches API to the last updated date
 merge_request: 51072
 author: Jacopo Beschi @jacopo-beschi
 type: changed
