@@ -65,7 +65,7 @@ RSpec.shared_examples 'rebase quick action' do
       end
 
       context 'when there are conflicts in the merge request' do
-        let!(:merge_request) { create(:merge_request, source_project: project, target_project: project, source_branch: 'conflict-missing-side', target_branch: 'conflict-start', merge_status: :cannot_be_merged) }
+        let_it_be(:merge_request) { create(:merge_request, source_project: project, target_project: project, source_branch: 'conflict-missing-side', target_branch: 'conflict-start', merge_status: :cannot_be_merged) }
 
         it 'does not rebase the MR' do
           add_note("/rebase")
