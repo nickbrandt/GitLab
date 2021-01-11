@@ -371,15 +371,20 @@ RSpec.describe Notify do
   end
 
   describe 'new user was created via saml' do
-    let(:group_member) { create(:group_member, user: user) }
+    let(:group_member) { create(:group_member) }
     let(:group) { group_member.source }
-    let(:recipient) { user }
+    let(:recipient) { group_member.user }
+
+    before do
+      recipient.update!(confirmed_at: nil)
+      recipient.update!(confirmation_token: 'random_string')
+    end
 
     subject { described_class.member_access_granted_email_with_confirmation('group', group_member.id) }
 
     it_behaves_like 'an email sent from GitLab'
     it_behaves_like 'it should not have Gmail Actions links'
-    it_behaves_like "a user cannot unsubscribe through footer link"
+    it_behaves_like 'a user cannot unsubscribe through footer link'
     it_behaves_like 'appearance header and footer enabled'
     it_behaves_like 'appearance header and footer not enabled'
 
@@ -391,8 +396,10 @@ RSpec.describe Notify do
       is_expected.to have_subject "Welcome to GitLab"
       is_expected.to have_body_text group.name
       is_expected.to have_body_text group.web_url
-      is_expected.to have_body_text user.username
-      is_expected.to have_body_text user.email
+      is_expected.to have_body_text recipient.username
+      is_expected.to have_body_text recipient.email
+      is_expected.to have_body_text 'Confirm your account'
+      is_expected.to have_body_text recipient.confirmation_token
     end
   end
 end
