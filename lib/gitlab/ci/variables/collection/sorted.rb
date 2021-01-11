@@ -35,17 +35,9 @@ module Gitlab
           # If a circular variable reference is found, the original array is returned
           def sort
             return @variables if Feature.disabled?(:variable_inside_variable)
+            return @variables if errors
 
-            clear_memoization(:errors)
-            begin
-              # Perform a topological sort
-              variables = tsort
-              strong_memoize(:errors) { nil }
-            rescue TSort::Cyclic
-              variables = @variables
-            end
-
-            variables
+            tsort
           end
 
           private
