@@ -8219,6 +8219,9 @@ msgstr ""
 msgid "CreateValueStreamForm|%{name} (default)"
 msgstr ""
 
+msgid "CreateValueStreamForm|'%{name}' Value Stream created"
+msgstr ""
+
 msgid "CreateValueStreamForm|Add stage"
 msgstr ""
 
@@ -8262,6 +8265,9 @@ msgid "CreateValueStreamForm|Please select a start event first"
 msgstr ""
 
 msgid "CreateValueStreamForm|Recover hidden stage"
+msgstr ""
+
+msgid "CreateValueStreamForm|Restore defaults"
 msgstr ""
 
 msgid "CreateValueStreamForm|Restore stage"
@@ -11518,9 +11524,6 @@ msgid "Example: %{ip_address}. %{read_more_link}."
 msgstr ""
 
 msgid "Example: @sub\\.company\\.com$"
-msgstr ""
-
-msgid "Example: My Value Stream"
 msgstr ""
 
 msgid "Example: Usage = single query. (Requested) / (Capacity) = multiple queries combined into a formula."
@@ -17179,9 +17182,6 @@ msgstr ""
 msgid "Maximum job timeout has a value which could not be accepted"
 msgstr ""
 
-msgid "Maximum length 100 characters"
-msgstr ""
-
 msgid "Maximum lifetime allowable for Personal Access Tokens is active, your expire date must be set before %{maximum_allowable_date}."
 msgstr ""
 
@@ -18411,9 +18411,6 @@ msgid "Name"
 msgstr ""
 
 msgid "Name has already been taken"
-msgstr ""
-
-msgid "Name is required"
 msgstr ""
 
 msgid "Name new label"
@@ -30829,9 +30826,6 @@ msgid "Value Stream Analytics can help you determine your team’s velocity"
 msgstr ""
 
 msgid "Value Stream Analytics gives an overview of how much time it takes to go from idea to production in your project."
-msgstr ""
-
-msgid "Value Stream Name"
 msgstr ""
 
 msgid "ValueStreamAnalyticsStage|We don't have enough data to show this stage."
