@@ -7314,9 +7314,6 @@ msgstr ""
 msgid "ComplianceFrameworks|Save changes"
 msgstr ""
 
-msgid "ComplianceFrameworks|The ID given produced more than one result. Please try a different compliance framework"
-msgstr ""
-
 msgid "ComplianceFrameworks|There are no compliance frameworks set up yet"
 msgstr ""
 
@@ -7324,6 +7321,9 @@ msgid "ComplianceFrameworks|Title"
 msgstr ""
 
 msgid "ComplianceFrameworks|Unable to save this compliance framework. Please try again"
+msgstr ""
+
+msgid "ComplianceFrameworks|Unknown compliance framework given. Please try a different framework or refresh the page"
 msgstr ""
 
 msgid "ComplianceFrameworks|Use %{codeStart}::%{codeEnd} to create a %{linkStart}scoped set%{linkEnd} (eg. %{codeStart}SOX::AWS%{codeEnd})"

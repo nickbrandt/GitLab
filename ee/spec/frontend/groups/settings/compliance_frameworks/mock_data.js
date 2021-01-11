@@ -1,4 +1,4 @@
-export const validFetchResponse = {
+export const validGetResponse = {
   data: {
     namespace: {
       id: 'gid://gitlab/Group/1',
@@ -27,7 +27,7 @@ export const validFetchResponse = {
   },
 };
 
-export const emptyFetchResponse = {
+export const emptyGetResponse = {
   data: {
     namespace: {
       id: 'gid://group-1/Group/1',
@@ -37,6 +37,74 @@ export const emptyFetchResponse = {
         __typename: 'ComplianceFrameworkConnection',
       },
       __typename: 'Namespace',
+    },
+  },
+};
+
+export const validGetOneResponse = {
+  data: {
+    namespace: {
+      id: 'gid://gitlab/Group/1',
+      name: 'Group 1',
+      complianceFrameworks: {
+        nodes: [
+          {
+            id: 'gid://gitlab/ComplianceManagement::Framework/1',
+            name: 'GDPR',
+            description: 'General Data Protection Regulation',
+            color: '#1aaa55',
+            __typename: 'ComplianceFramework',
+          },
+        ],
+        __typename: 'ComplianceFrameworkConnection',
+      },
+      __typename: 'Namespace',
+    },
+  },
+};
+
+export const validCreateResponse = {
+  data: {
+    createComplianceFramework: {
+      framework: {
+        id: 'gid://gitlab/ComplianceManagement::Framework/1',
+        name: 'GDPR',
+        description: 'General Data Protection Regulation',
+        color: '#1aaa55',
+        __typename: 'ComplianceFramework',
+      },
+      errors: [],
+      __typename: 'CreateComplianceFrameworkPayload',
+    },
+  },
+};
+
+export const errorCreateResponse = {
+  data: {
+    createComplianceFramework: {
+      framework: null,
+      errors: ['Invalid values given'],
+      __typename: 'CreateComplianceFrameworkPayload',
+    },
+  },
+};
+
+export const validUpdateResponse = {
+  data: {
+    updateComplianceFramework: {
+      clientMutationId: null,
+      errors: [],
+      __typename: 'UpdateComplianceFrameworkPayload',
+    },
+  },
+};
+
+export const errorUpdateResponse = {
+  data: {
+    updateComplianceFramework: {
+      clientMutationId: null,
+      errors: ['Unknown compliance framework'],
+      __typename: 'UpdateComplianceFrameworkPayload',
     },
   },
 };

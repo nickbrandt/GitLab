@@ -69,19 +69,19 @@ export default {
       variables() {
         return {
           fullPath: this.groupPath,
-          complianceFramework: this.isEditing
-            ? convertToGraphQLId(FRAMEWORK_GRAPHQL_ID_TYPE, this.id)
-            : null,
+          complianceFramework: convertToGraphQLId(FRAMEWORK_GRAPHQL_ID_TYPE, this.id),
         };
       },
       update(data) {
-        const nodes = data.namespace?.complianceFrameworks?.nodes;
+        const nodes = data.namespace?.complianceFrameworks?.nodes || [];
 
-        if (nodes.length > 1) {
-          return this.setError(
-            this.$options.i18n.multipleResultsIdError,
-            this.$options.i18n.multipleResultsIdError,
+        if (!nodes.length) {
+          this.setError(
+            new Error(this.$options.i18n.unknownFrameworkError),
+            this.$options.i18n.fetchError,
           );
+
+          return {};
         }
 
         return {
@@ -126,6 +126,13 @@ export default {
         },
       };
     },
+    validTitle() {
+      if (Object.keys(this.complianceFramework).includes('name')) {
+        return this.complianceFramework.name !== '';
+      }
+
+      return true;
+    },
   },
   methods: {
     setError(error, userFriendlyText) {
@@ -162,14 +169,14 @@ export default {
     },
   },
   i18n: {
+    unknownFrameworkError: s__(
+      'ComplianceFrameworks|Unknown compliance framework given. Please try a different framework or refresh the page',
+    ),
     fetchError: s__(
       'ComplianceFrameworks|Error fetching compliance frameworks data. Please refresh the page',
     ),
     saveError: s__(
       'ComplianceFrameworks|Unable to save this compliance framework. Please try again',
-    ),
-    multipleResultsIdError: s__(
-      'ComplianceFrameworks|The ID given produced more than one result. Please try a different compliance framework',
     ),
     titleInputLabel: s__('ComplianceFrameworks|Title'),
     titleInputDescription: s__(
@@ -191,7 +198,12 @@ export default {
     <gl-loading-icon v-if="isLoading" size="lg" class="gl-mt-5" />
 
     <gl-form v-if="!isLoading" @submit="onSubmit">
-      <gl-form-group :label="$options.i18n.titleInputLabel">
+      <gl-form-group
+        :label="$options.i18n.titleInputLabel"
+        :invalid-feedback="$options.i18n.titleInputInvalid"
+        :state="validTitle"
+        data-testid="name-input-group"
+      >
         <template #description>
           <gl-sprintf :message="$options.i18n.titleInputDescription">
             <template #code="{ content }">
@@ -204,14 +216,11 @@ export default {
           </gl-sprintf>
         </template>
 
-        <gl-form-input
-          v-model="complianceFramework.name"
-          :invalid-feedback="$options.i18n.titleInputInvalid"
-        />
+        <gl-form-input v-model="complianceFramework.name" data-testid="name-input" />
       </gl-form-group>
 
       <gl-form-group :label="$options.i18n.descriptionInputLabel">
-        <gl-form-input v-model="complianceFramework.description" />
+        <gl-form-input v-model="complianceFramework.description" data-testid="description-input" />
       </gl-form-group>
 
       <color-picker
@@ -223,8 +232,12 @@ export default {
       <div
         class="gl-display-flex gl-justify-content-space-between gl-pt-5 gl-border-t-1 gl-border-t-solid gl-border-t-gray-100"
       >
-        <gl-button type="submit" variant="success">{{ $options.i18n.submitBtnText }}</gl-button>
-        <gl-button :href="groupEditPath">{{ $options.i18n.cancelBtnText }}</gl-button>
+        <gl-button type="submit" variant="success" data-testid="submit-btn">{{
+          $options.i18n.submitBtnText
+        }}</gl-button>
+        <gl-button :href="groupEditPath" data-testid="cancel-btn">{{
+          $options.i18n.cancelBtnText
+        }}</gl-button>
       </div>
     </gl-form>
   </div>
