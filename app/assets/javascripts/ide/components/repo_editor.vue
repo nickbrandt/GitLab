@@ -328,6 +328,8 @@ export default {
 
       this.model.updateOptions(this.rules);
 
+      this.editor.updateDimensions();
+
       this.model.onChange((model) => {
         const { file } = model;
         if (!file.active) return;
