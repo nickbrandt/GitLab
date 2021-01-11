@@ -10602,6 +10602,9 @@ msgstr ""
 msgid "Enable Incident Management inbound alert limit"
 msgstr ""
 
+msgid "Enable Invisible Captcha during sign up"
+msgstr ""
+
 msgid "Enable Kroki"
 msgstr ""
 
@@ -10689,7 +10692,7 @@ msgstr ""
 msgid "Enable proxy"
 msgstr ""
 
-msgid "Enable reCAPTCHA or Akismet and set IP limits. For reCAPTCHA, we currently only support %{recaptcha_v2_link_start}v2%{recaptcha_v2_link_end}"
+msgid "Enable reCAPTCHA, Invisible Captcha, Akismet and set IP limits. For reCAPTCHA, we currently only support %{recaptcha_v2_link_start}v2%{recaptcha_v2_link_end}"
 msgstr ""
 
 msgid "Enable shared runners"
@@ -33817,6 +33820,9 @@ msgid "mrWidget|to be merged automatically when the pipeline succeeds"
 msgstr ""
 
 msgid "mrWidget|to start a merge train when the pipeline succeeds"
+msgstr ""
+
+msgid "must be a boolean value"
 msgstr ""
 
 msgid "must be a root namespace"
