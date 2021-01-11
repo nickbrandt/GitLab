@@ -84,6 +84,10 @@ export default {
           date: null,
           time: 0,
         },
+        restrictedTo: {
+          from: 0,
+          to: 0,
+        },
       },
       error: '',
       validationState: {
