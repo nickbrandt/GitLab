@@ -11823,6 +11823,9 @@ msgstr ""
 msgid "Failed to find import label for Jira import."
 msgstr ""
 
+msgid "Failed to generate report, please try again after sometime"
+msgstr ""
+
 msgid "Failed to get ref."
 msgstr ""
 
