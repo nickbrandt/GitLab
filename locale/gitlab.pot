@@ -5044,9 +5044,6 @@ msgstr ""
 msgid "Canary"
 msgstr ""
 
-msgid "Canary Deployments is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application."
-msgstr ""
-
 msgid "Canary Ingress does not exist in the environment."
 msgstr ""
 
@@ -7435,9 +7432,6 @@ msgid "Consistency guarantee method"
 msgstr ""
 
 msgid "Contact Sales to upgrade"
-msgstr ""
-
-msgid "Contact sales to upgrade"
 msgstr ""
 
 msgid "Contact support"
@@ -30309,9 +30303,6 @@ msgid "Updates"
 msgstr ""
 
 msgid "Updating"
-msgstr ""
-
-msgid "Upgrade plan to unlock Canary Deployments feature"
 msgstr ""
 
 msgid "Upgrade your plan"
