@@ -31,7 +31,7 @@ jest.mock('~/lib/utils/url_utility', () => ({
   visitUrl: jest.fn().mockName('visitUrlMock'),
 }));
 
-describe('List', () => {
+describe('Form', () => {
   let wrapper;
   const sentryError = new Error('Network error');
   const sentrySaveError = new Error('Invalid values given');
@@ -71,21 +71,7 @@ describe('List', () => {
     return createMockApollo(requestHandlers);
   }
 
-  function createComponent(props = {}, mountFn = mount) {
-    return mountFn(Form, {
-      localVue,
-      apolloProvider: createMockApollo([]),
-      propsData: {
-        ...defaultPropsData,
-        ...props,
-      },
-      stubs: {
-        GlLoadingIcon,
-      },
-    });
-  }
-
-  function createComponentWithApollo(requestHandlers = [], props = {}, mountFn = mount) {
+  function createComponent(requestHandlers = [], props = {}, mountFn = mount) {
     return mountFn(Form, {
       localVue,
       apolloProvider: createMockApolloProvider(requestHandlers),
@@ -114,7 +100,7 @@ describe('List', () => {
 
   describe('loading', () => {
     beforeEach(() => {
-      wrapper = createComponentWithApollo(
+      wrapper = createComponent(
         [[getComplianceFrameworkQuery, fetchLoading]],
         {
           id: '1',
@@ -135,14 +121,14 @@ describe('List', () => {
 
   describe('display inputs', () => {
     it('shows the correct input and button fields', () => {
-      wrapper = createComponent({}, shallowMount);
+      wrapper = createComponent([], {}, shallowMount);
 
       expect(findLoadingIcon().exists()).toBe(false);
-      expect(findNameInput).toExist();
-      expect(findDescriptionInput).toExist();
-      expect(findColorPicker).toExist();
-      expect(findSubmitBtn).toExist();
-      expect(findCancelBtn).toExist();
+      expect(findNameInput()).toExist();
+      expect(findDescriptionInput()).toExist();
+      expect(findColorPicker()).toExist();
+      expect(findSubmitBtn()).toExist();
+      expect(findCancelBtn()).toExist();
     });
 
     it('shows the name input description', () => {
@@ -183,7 +169,7 @@ describe('List', () => {
     };
 
     it('does not query for existing framework data', async () => {
-      wrapper = createComponentWithApollo([[getComplianceFrameworkQuery, fetch]], {}, shallowMount);
+      wrapper = createComponent([[getComplianceFrameworkQuery, fetch]], {}, shallowMount);
 
       await waitForPromises();
 
@@ -192,7 +178,7 @@ describe('List', () => {
     });
 
     it('saves inputted values and redirects', async () => {
-      wrapper = createComponentWithApollo([[createComplianceFrameworkMutation, create]]);
+      wrapper = createComponent([[createComplianceFrameworkMutation, create]]);
 
       await setFields();
       await waitForPromises();
@@ -204,7 +190,7 @@ describe('List', () => {
 
     it('shows an error when saving fails and does not redirect', async () => {
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponentWithApollo([[createComplianceFrameworkMutation, createWithErrors]]);
+      wrapper = createComponent([[createComplianceFrameworkMutation, createWithErrors]]);
 
       await setFields();
       await waitForPromises();
@@ -218,9 +204,7 @@ describe('List', () => {
 
     it('shows an error when saving causes an exception and does not redirect', async () => {
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponentWithApollo([
-        [createComplianceFrameworkMutation, createWithNetworkErrors],
-      ]);
+      wrapper = createComponent([[createComplianceFrameworkMutation, createWithNetworkErrors]]);
 
       await setFields();
       await waitForPromises();
@@ -254,7 +238,7 @@ describe('List', () => {
     };
 
     it('queries for existing framework data and sets the correct values in the input fields', async () => {
-      wrapper = createComponentWithApollo(
+      wrapper = createComponent(
         [[getComplianceFrameworkQuery, fetchOne]],
         { id: '1' },
         shallowMount,
@@ -271,7 +255,7 @@ describe('List', () => {
 
     it('shows an error if the existing framework query returns no data', async () => {
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponentWithApollo(
+      wrapper = createComponent(
         [[getComplianceFrameworkQuery, fetchEmpty]],
         { id: '1' },
         shallowMount,
@@ -293,7 +277,7 @@ describe('List', () => {
 
     it('shows an error if the existing framework query fails', async () => {
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponentWithApollo(
+      wrapper = createComponent(
         [[getComplianceFrameworkQuery, fetchWithErrors]],
         {
           id: '1',
@@ -312,7 +296,7 @@ describe('List', () => {
     });
 
     it('saves inputted values and redirects', async () => {
-      wrapper = createComponentWithApollo(
+      wrapper = createComponent(
         [
           [getComplianceFrameworkQuery, fetchOne],
           [updateComplianceFrameworkMutation, update],
@@ -333,7 +317,7 @@ describe('List', () => {
 
     it('shows an error when saving fails and does not redirect', async () => {
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponentWithApollo(
+      wrapper = createComponent(
         [
           [getComplianceFrameworkQuery, fetchOne],
           [updateComplianceFrameworkMutation, updateWithErrors],
@@ -356,7 +340,7 @@ describe('List', () => {
 
     it('shows an error when saving causes an exception and does not redirect', async () => {
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponentWithApollo(
+      wrapper = createComponent(
         [
           [getComplianceFrameworkQuery, fetchOne],
           [updateComplianceFrameworkMutation, updateWithNetworkErrors],
