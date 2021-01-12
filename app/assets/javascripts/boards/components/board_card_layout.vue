@@ -81,7 +81,7 @@ export default {
     :data-issue-iid="issue.iid"
     :data-issue-path="issue.referencePath"
     data-testid="board_card"
-    class="board-card gl-p-4 gl-rounded-base"
+    class="board-card gl-p-5 gl-rounded-base"
     @mousedown="mouseDown"
     @mousemove="mouseMove"
     @mouseup="showIssue($event)"
