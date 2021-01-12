@@ -860,17 +860,6 @@ RSpec.describe EE::NotificationService, :mailer do
         group.add_guest(added_user)
         should_only_email(added_user)
       end
-
-      describe 'when notifications are disabled' do
-        before do
-          create_global_setting_for(added_user, :disabled)
-        end
-
-        it 'does not send a notification' do
-          group.add_guest(added_user)
-          should_not_email_anyone
-        end
-      end
     end
   end
 end

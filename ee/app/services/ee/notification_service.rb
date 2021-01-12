@@ -63,9 +63,7 @@ module EE
     end
 
     def new_group_member_with_confirmation(group_member)
-      return true unless group_member.notifiable?(:mention)
-
-      mailer.member_access_granted_email_with_confirmation(group_member.real_source_type, group_member.id).deliver_later
+      mailer.member_access_granted_email_with_confirmation(group_member.id).deliver_later
     end
 
     private

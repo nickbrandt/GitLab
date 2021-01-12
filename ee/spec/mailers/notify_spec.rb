@@ -371,16 +371,11 @@ RSpec.describe Notify do
   end
 
   describe 'new user was created via saml' do
-    let(:group_member) { create(:group_member) }
+    let(:group_member) { create(:group_member, user: create(:user, :unconfirmed)) }
     let(:group) { group_member.source }
     let(:recipient) { group_member.user }
 
-    before do
-      recipient.update!(confirmed_at: nil)
-      recipient.update!(confirmation_token: 'random_string')
-    end
-
-    subject { described_class.member_access_granted_email_with_confirmation('group', group_member.id) }
+    subject { described_class.member_access_granted_email_with_confirmation(group_member.id) }
 
     it_behaves_like 'an email sent from GitLab'
     it_behaves_like 'it should not have Gmail Actions links'
@@ -389,7 +384,7 @@ RSpec.describe Notify do
     it_behaves_like 'appearance header and footer not enabled'
 
     it 'delivers mail to user email' do
-      expect(subject).to deliver_to(recipient.notification_email)
+      expect(subject).to deliver_to(recipient.email)
     end
 
     it 'contains all the useful information' do

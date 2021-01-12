@@ -147,8 +147,8 @@ module EE
       end
     end
 
-    override :available_for_welcome_email?
-    def available_for_welcome_email?
+    override :send_welcome_email?
+    def send_welcome_email?
       !provisioned_by_this_group?
     end
 

@@ -345,27 +345,6 @@ RSpec.describe GroupMember do
     end
   end
 
-<<<<<<< HEAD
-  def webhook_data(group_member, event)
-    {
-      headers: { 'Content-Type' => 'application/json', 'User-Agent' => "GitLab/#{Gitlab::VERSION}", 'X-Gitlab-Event' => 'Member Hook' },
-      body: {
-        created_at: group_member.created_at&.xmlschema,
-        updated_at: group_member.updated_at&.xmlschema,
-        group_name: group.name,
-        group_path: group.path,
-        group_id: group.id,
-        user_username: group_member.user.username,
-        user_name: group_member.user.name,
-        user_email: group_member.user.email,
-        user_id: group_member.user.id,
-        group_access: group_member.human_access,
-        expires_at: group_member.expires_at&.xmlschema,
-        group_plan: 'gold',
-        event_name: event
-      }.to_json
-    }
-=======
   context 'group member welcome email', :sidekiq_inline do
     let_it_be(:group) { create(:group_with_plan, plan: :gold_plan) }
     let(:user) { create(:user) }
@@ -395,6 +374,26 @@ RSpec.describe GroupMember do
         group.add_developer(user)
       end
     end
->>>>>>> 456bbd408c4 (Add specs for group member email)
+  end
+
+  def webhook_data(group_member, event)
+    {
+      headers: { 'Content-Type' => 'application/json', 'User-Agent' => "GitLab/#{Gitlab::VERSION}", 'X-Gitlab-Event' => 'Member Hook' },
+      body: {
+        created_at: group_member.created_at&.xmlschema,
+        updated_at: group_member.updated_at&.xmlschema,
+        group_name: group.name,
+        group_path: group.path,
+        group_id: group.id,
+        user_username: group_member.user.username,
+        user_name: group_member.user.name,
+        user_email: group_member.user.email,
+        user_id: group_member.user.id,
+        group_access: group_member.human_access,
+        expires_at: group_member.expires_at&.xmlschema,
+        group_plan: 'gold',
+        event_name: event
+      }.to_json
+    }
   end
 end
