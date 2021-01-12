@@ -9,10 +9,6 @@ info: "To determine the technical writer assigned to the Stage/Group associated 
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/228893) in GitLab 13.4.
 > - [Feature flag removed](https://gitlab.com/gitlab-org/gitlab/-/258206) in GitLab 13.8
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#configure-your-gitlab-instance-with-gitpod). **(CORE ONLY)**
-
-WARNING:
-This feature might not be available to you. Check the **version history** note above for details.
 
 With [Gitpod](https://gitpod.io/) you can describe your dev environment as code to get fully set
 up, compiled, and tested dev environments for any GitLab project. The dev environments are not only
@@ -45,8 +41,12 @@ can follow the same steps once the integration has been enabled and configured b
 
 ## Configure your GitLab instance with Gitpod **(CORE ONLY)**
 
-If you are new to Gitpod, head over to the [Gitpod documentation](https://www.gitpod.io/docs/self-hosted/latest/self-hosted/)
-and get your instance up and running.
+The integration of Gitpod with GitLab is enabled on GitLab.com and available to all users.
+For GitLab self-managed instances, a GitLab administrator needs to enable it through the admin settings.
+
+First, you (GitLab admin) need to set up a Gitpod instance to integrate with GitLab.
+Head over to the [Gitpod documentation](https://www.gitpod.io/docs/self-hosted/latest/self-hosted/) to
+get your instance up and running. Once done:
 
 1. In GitLab, go to **Admin Area > Settings > General**.
 1. Expand the **Gitpod** configuration section.
