@@ -1166,7 +1166,7 @@ module Gitlab
       end
 
       def remove_foreign_key_if_exists(*args)
-        if foreign_key_exists?(*args)
+        if foreign_key_exists?(**args)
           remove_foreign_key(*args)
         end
       end
