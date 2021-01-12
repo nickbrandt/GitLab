@@ -13787,6 +13787,11 @@ type MergeRequest implements CurrentUserTodos & Noteable {
   autoMergeEnabled: Boolean!
 
   """
+  Selected auto merge strategy
+  """
+  autoMergeStrategy: String
+
+  """
   Array of available auto merge strategies
   """
   availableAutoMergeStrategies: [String!]
@@ -14024,6 +14029,11 @@ type MergeRequest implements CurrentUserTodos & Noteable {
   """
   """
   mergeTrainsCount: Int
+
+  """
+  User who merged this merge request
+  """
+  mergeUser: User
 
   """
   Indicates if the merge has been set to be merged when its pipeline succeeds (MWPS)
