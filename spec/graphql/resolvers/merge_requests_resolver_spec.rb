@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Resolvers::MergeRequestsResolver do
   include GraphqlHelpers
+  include SortingHelper
 
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:milestone) { create(:milestone, project: project) }
@@ -40,7 +41,7 @@ RSpec.describe Resolvers::MergeRequestsResolver do
     #   AND "merge_requests"."iid" = 1 ORDER BY "merge_requests"."id" DESC
     # SELECT "projects".* FROM "projects" WHERE "projects"."id" = 2
     # SELECT "project_features".* FROM "project_features" WHERE "project_features"."project_id" = 2
-    let(:queries_per_project) { 4 }
+    let(:queries_per_project) { 3 }
 
     context 'no arguments' do
       it 'returns all merge requests' do
@@ -250,17 +251,17 @@ RSpec.describe Resolvers::MergeRequestsResolver do
         it 'sorts merge requests ascending' do
           expect(resolve_mr(project, sort: :merged_at_asc))
             .to match_array(mrs)
-            .and be_sorted(->(mr) { [merged_at(mr, 1.year.from_now).to_i, -mr.id] })
+            .and be_sorted(->(mr) { [merged_at(mr), -mr.id] })
         end
 
         it 'sorts merge requests descending' do
           expect(resolve_mr(project, sort: :merged_at_desc))
             .to match_array(mrs)
-            .and be_sorted(->(mr) { [-merged_at(mr).to_i, -mr.id] })
+            .and be_sorted(->(mr) { [-merged_at(mr), -mr.id] })
         end
 
-        def merged_at(mr, when_nil = nil)
-          mr.metrics.merged_at || when_nil
+        def merged_at(mr)
+          nils_last(mr.metrics.merged_at)
         end
 
         context 'when label filter is given and the optimized_issuable_label_filter feature flag is off' do
