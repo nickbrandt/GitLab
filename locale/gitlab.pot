@@ -8827,6 +8827,9 @@ msgstr ""
 msgid "DastProfiles|Do you want to discard your changes?"
 msgstr ""
 
+msgid "DastProfiles|Edit profile"
+msgstr ""
+
 msgid "DastProfiles|Edit scanner profile"
 msgstr ""
 
@@ -8914,6 +8917,9 @@ msgstr ""
 msgid "DastProfiles|Scanner Profiles"
 msgstr ""
 
+msgid "DastProfiles|Scanner name"
+msgstr ""
+
 msgid "DastProfiles|Show debug messages"
 msgstr ""
 
@@ -8921,6 +8927,9 @@ msgid "DastProfiles|Site Profile"
 msgstr ""
 
 msgid "DastProfiles|Site Profiles"
+msgstr ""
+
+msgid "DastProfiles|Site name"
 msgstr ""
 
 msgid "DastProfiles|Spider timeout"
@@ -8941,6 +8950,9 @@ msgstr ""
 msgid "DastProfiles|Turn on AJAX spider"
 msgstr ""
 
+msgid "DastProfiles|URL"
+msgstr ""
+
 msgid "DastProfiles|Username"
 msgstr ""
 
@@ -8948,6 +8960,9 @@ msgid "DastProfiles|Username form field"
 msgstr ""
 
 msgid "DastProfiles|Validated"
+msgstr ""
+
+msgid "DastProfiles|Validation status"
 msgstr ""
 
 msgid "DastSiteValidation|Copy HTTP header to clipboard"
@@ -8960,6 +8975,9 @@ msgid "DastSiteValidation|Download validation text file"
 msgstr ""
 
 msgid "DastSiteValidation|Header validation"
+msgstr ""
+
+msgid "DastSiteValidation|Retry validation"
 msgstr ""
 
 msgid "DastSiteValidation|Step 1 - Choose site validation method"
