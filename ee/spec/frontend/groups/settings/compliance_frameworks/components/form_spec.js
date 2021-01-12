@@ -236,7 +236,7 @@ describe('List', () => {
   describe('edit framework', () => {
     const updateProps = {
       input: {
-        namespacePath: 'group-1',
+        id: 'gid://gitlab/ComplianceManagement::Framework/1',
         params: {
           color: '#000000',
           description: 'Test description',
@@ -312,10 +312,17 @@ describe('List', () => {
     });
 
     it('saves inputted values and redirects', async () => {
-      wrapper = createComponentWithApollo([[updateComplianceFrameworkMutation, update]], {
-        id: '1',
-      });
+      wrapper = createComponentWithApollo(
+        [
+          [getComplianceFrameworkQuery, fetchOne],
+          [updateComplianceFrameworkMutation, update],
+        ],
+        {
+          id: '1',
+        },
+      );
 
+      await waitForPromises();
       await setFields();
       await waitForPromises();
 
@@ -326,8 +333,17 @@ describe('List', () => {
 
     it('shows an error when saving fails and does not redirect', async () => {
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponentWithApollo([[updateComplianceFrameworkMutation, updateWithErrors]]);
+      wrapper = createComponentWithApollo(
+        [
+          [getComplianceFrameworkQuery, fetchOne],
+          [updateComplianceFrameworkMutation, updateWithErrors],
+        ],
+        {
+          id: '1',
+        },
+      );
 
+      await waitForPromises();
       await setFields();
       await waitForPromises();
 
@@ -340,10 +356,17 @@ describe('List', () => {
 
     it('shows an error when saving causes an exception and does not redirect', async () => {
       jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponentWithApollo([
-        [updateComplianceFrameworkMutation, updateWithNetworkErrors],
-      ]);
+      wrapper = createComponentWithApollo(
+        [
+          [getComplianceFrameworkQuery, fetchOne],
+          [updateComplianceFrameworkMutation, updateWithNetworkErrors],
+        ],
+        {
+          id: '1',
+        },
+      );
 
+      await waitForPromises();
       await setFields();
       await waitForPromises();
 

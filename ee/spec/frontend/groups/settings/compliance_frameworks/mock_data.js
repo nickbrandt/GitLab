@@ -103,7 +103,7 @@ export const errorUpdateResponse = {
   data: {
     updateComplianceFramework: {
       clientMutationId: null,
-      errors: ['Unknown compliance framework'],
+      errors: ['Invalid values given'],
       __typename: 'UpdateComplianceFrameworkPayload',
     },
   },

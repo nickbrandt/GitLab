@@ -148,7 +148,7 @@ export default {
     },
     getMutationErrors(data) {
       if (this.isEditing) {
-        return data?.data?.updateComplianceFramework?.errors || [];
+        return data?.updateComplianceFramework?.errors || [];
       }
 
       return data?.createComplianceFramework?.errors || [];
