@@ -3402,7 +3402,7 @@ RSpec.describe API::Projects do
           post api("/projects/#{project.id}/housekeeping", user)
 
           expect(response).to have_gitlab_http_status(:conflict)
-          expect(json_response['message']).to match(/Somebody already triggered housekeeping for this project/)
+          expect(json_response['message']).to match(/Somebody already triggered housekeeping for this resource/)
         end
       end
     end
