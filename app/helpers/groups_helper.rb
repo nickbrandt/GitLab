@@ -68,11 +68,11 @@ module GroupsHelper
       .count
   end
 
-  def cached_open_group_issues_count
-    issues_count = @group.open_issues_count(current_user)
+  def cached_open_group_issues_count(group)
+    issues_count = group.open_issues_count(current_user)
 
     if issues_count > 1000
-      ActiveSupport::NumberHelper.number_to_human(issues_count, units: { thousand: 'K' }, precision: 1)
+      ActiveSupport::NumberHelper.number_to_human(issues_count, units: { thousand: 'K' }, precision: 2)
     else
       number_with_delimiter(issues_count)
     end

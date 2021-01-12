@@ -444,4 +444,37 @@ RSpec.describe GroupsHelper do
       end
     end
   end
+
+  describe `#cached_open_group_issues_count` do
+    let(:current_user) { create(:user) }
+    let(:group) { create(:group, name: 'group') }
+
+    before do
+      allow(helper).to receive(:current_user) { current_user }
+    end
+
+    it 'returns all digits for count value under 1000' do
+      allow(group).to receive(:open_issues_count).with(current_user) { 999 }
+
+      expect(helper.cached_open_group_issues_count(group)).to eq('999')
+    end
+
+    it 'returns truncated digits for count value over 1000' do
+      allow(group).to receive(:open_issues_count).with(current_user) { 2300 }
+
+      expect(helper.cached_open_group_issues_count(group)).to eq('2.3 K')
+    end
+
+    it 'returns truncated digits for count value over 10000' do
+      allow(group).to receive(:open_issues_count).with(current_user) { 12560 }
+
+      expect(helper.cached_open_group_issues_count(group)).to eq('13 K')
+    end
+
+    it 'returns truncated digits for count value over 100000' do
+      allow(group).to receive(:open_issues_count).with(current_user) { 112560 }
+
+      expect(helper.cached_open_group_issues_count(group)).to eq('110 K')
+    end
+  end
 end

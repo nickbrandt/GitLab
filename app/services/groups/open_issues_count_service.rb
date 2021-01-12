@@ -2,7 +2,6 @@
 
 module Groups
   # Service class for counting and caching the number of open issues of a group.
-  # class OpenIssuesCountService < IssuablesCountService
   class OpenIssuesCountService < BaseCountService
     include Gitlab::Utils::StrongMemoize
 
