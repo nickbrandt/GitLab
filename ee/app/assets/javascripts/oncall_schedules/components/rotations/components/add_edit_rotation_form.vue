@@ -54,7 +54,6 @@ export default {
     palette: CHEVRON_SKIPPING_PALETTE_ENUM,
   },
   LENGTH_ENUM,
-  inject: ['projectPath'],
   components: {
     GlForm,
     GlFormGroup,
@@ -68,6 +67,7 @@ export default {
     GlToggle,
     GlCard,
   },
+  inject: ['projectPath'],
   props: {
     form: {
       type: Object,
