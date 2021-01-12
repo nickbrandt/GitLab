@@ -5,6 +5,7 @@ class Wiki
   include HasRepository
   include Gitlab::Utils::StrongMemoize
   include GlobalID::Identification
+  include CanHousekeep
 
   MARKUPS = { # rubocop:disable Style/MultilineIfModifier
     'Markdown' => :markdown,

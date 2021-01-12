@@ -3380,10 +3380,10 @@ RSpec.describe API::Projects do
   end
 
   describe 'POST /projects/:id/housekeeping' do
-    let(:housekeeping) { Projects::HousekeepingService.new(project) }
+    let(:housekeeping) { HousekeepingService.new(project) }
 
     before do
-      allow(Projects::HousekeepingService).to receive(:new).with(project, :gc).and_return(housekeeping)
+      allow(HousekeepingService).to receive(:new).with(project, :gc).and_return(housekeeping)
     end
 
     context 'when authenticated as owner' do
@@ -3397,7 +3397,7 @@ RSpec.describe API::Projects do
 
       context 'when housekeeping lease is taken' do
         it 'returns conflict' do
-          expect(housekeeping).to receive(:execute).once.and_raise(Projects::HousekeepingService::LeaseTaken)
+          expect(housekeeping).to receive(:execute).once.and_raise(HousekeepingService::LeaseTaken)
 
           post api("/projects/#{project.id}/housekeeping", user)
 
