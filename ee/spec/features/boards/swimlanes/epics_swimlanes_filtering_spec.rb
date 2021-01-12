@@ -29,7 +29,7 @@ RSpec.describe 'epics swimlanes filtering', :js do
   let_it_be(:issue7) { create(:labeled_issue, project: project, title: 'ggg', description: '777', labels: [development], relative_position: 2) }
   let_it_be(:issue8) { create(:closed_issue, project: project, title: 'hhh', description: '888') }
 
-  context 'filtering' do
+  context 'filtering', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/266990' do
     before do
       project.add_maintainer(user)
       project.add_maintainer(user2)
@@ -61,7 +61,7 @@ RSpec.describe 'epics swimlanes filtering', :js do
       wait_for_empty_boards((3..4))
     end
 
-    it 'filters by assignee', quarantine: 'https://gitlab.com/gitlab-org/gitlab/-/issues/266990' do
+    it 'filters by assignee' do
       wait_for_all_requests
 
       set_filter("assignee", user.username)
