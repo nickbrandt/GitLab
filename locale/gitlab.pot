@@ -30594,7 +30594,7 @@ msgstr ""
 msgid "UserLists|Enter a comma separated list of user IDs. These IDs should be the users of the system in which the feature flag is set, not GitLab IDs"
 msgstr ""
 
-msgid "UserLists|Feature flag list"
+msgid "UserLists|Feature flag user list"
 msgstr ""
 
 msgid "UserLists|Lists allow you to define a set of users to be used with feature flags. %{linkStart}Read more about feature flag lists.%{linkEnd}"
