@@ -1500,7 +1500,7 @@
           "enumValues": [
             {
               "name": "operations",
-              "description": "Alerts for operations domain ",
+              "description": "Alerts for operations domain",
               "isDeprecated": false,
               "deprecationReason": null
             },

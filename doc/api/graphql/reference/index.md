@@ -4162,7 +4162,7 @@ Filters the alerts based on given domain.
 
 | Value | Description |
 | ----- | ----------- |
-| `operations` | Alerts for operations domain  |
+| `operations` | Alerts for operations domain |
 | `threat_monitoring` | Alerts for threat monitoring domain |
 
 ### AlertManagementIntegrationType
