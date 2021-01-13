@@ -44,7 +44,7 @@ module ApplicationHelper
   #   current_controller?('gitlab/application') # => false
   def current_controller?(*args)
     args.any? do |v|
-      safe_downcase!(v.to_s) == controller.controller_name || safe_downcase!(v.to_s) == controller.controller_path
+      Gitlab::Utils.safe_downcase!(v.to_s) == controller.controller_name || Gitlab::Utils.safe_downcase!(v.to_s) == controller.controller_path
     end
   end
 
@@ -59,7 +59,7 @@ module ApplicationHelper
   #   current_action?(:create)        # => false
   #   current_action?(:new, :create)  # => true
   def current_action?(*args)
-    args.any? { |v| safe_downcase!(v.to_s) == action_name }
+    args.any? { |v| Gitlab::Utils.safe_downcase!(v.to_s) == action_name }
   end
 
   def admin_section?
@@ -394,19 +394,6 @@ module ApplicationHelper
       app.assets.find_asset(name).to_s
     else
       controller.view_context.render(file: Rails.root.join('public/assets', app.assets_manifest.assets[name]).to_s)
-    end
-  end
-
-  # A safe alternative to String#downcase!
-  #
-  # This will make copies of frozen strings but downcase unfrozen
-  # strings in place, reducing allocations.
-
-  def safe_downcase!(str)
-    if str.frozen?
-      str.downcase
-    else
-      str.downcase! || str
     end
   end
 
