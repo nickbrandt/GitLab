@@ -669,23 +669,19 @@ RSpec.describe QuickActions::InterpretService do
 
     shared_examples 'assign_reviewer command' do
       it 'assigns a reviewer to a single user' do
-        _, explanations = service.explain(content, issuable)
         _, updates, message = service.execute(content, issuable)
 
         expect(updates).to eq(reviewer_ids: [developer.id])
         expect(message).to eq("Assigned #{developer.to_reference} as reviewer.")
-        expect(explanations).to eq(["Assigns #{developer.to_reference} as reviewer."])
       end
     end
 
     shared_examples 'unassign_reviewer command' do
       it 'removes a single reviewer' do
-        _, explanations = service.explain(content, issuable)
         _, updates, message = service.execute(content, issuable)
 
         expect(updates).to eq(reviewer_ids: [])
         expect(message).to eq("Removed reviewer #{developer.to_reference}.")
-        expect(explanations).to eq(["Removes reviewer @#{developer.username}."])
       end
     end
 
@@ -2006,6 +2002,28 @@ RSpec.describe QuickActions::InterpretService do
         _, explanations = service.explain(content, issue)
 
         expect(explanations).to eq(["Removes assignee @#{developer.username}."])
+      end
+    end
+
+    describe 'unassign_reviewer command' do
+      let(:content) { '/unassign_reviewer' }
+      let(:merge_request) { create(:merge_request, source_project: project, reviewers: [developer]) }
+
+      it 'includes current assignee reference' do
+        _, explanations = service.explain(content, merge_request)
+
+        expect(explanations).to eq(["Removes reviewer @#{developer.username}."])
+      end
+    end
+
+    describe 'assign_reviewer command' do
+      let(:content) { "/assign_reviewer #{developer.to_reference}" }
+      let(:merge_request) { create(:merge_request, source_project: project, assignees: [developer]) }
+
+      it 'includes only the user reference' do
+        _, explanations = service.explain(content, merge_request)
+
+        expect(explanations).to eq(["Assigns #{developer.to_reference} as reviewer."])
       end
     end
 

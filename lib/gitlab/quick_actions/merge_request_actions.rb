@@ -253,12 +253,12 @@ module Gitlab
       end
 
       def reviewers_to_add(users)
-        if users.present?
-          if quick_action_target.allows_multiple_reviewers?
-            users
-          else
-            [users.first]
-          end
+        return if users.blank?
+
+        if quick_action_target.allows_multiple_reviewers?
+          users
+        else
+          [users.first]
         end
       end
 
