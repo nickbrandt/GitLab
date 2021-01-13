@@ -173,7 +173,6 @@ Once a lifetime for personal access tokens is set, GitLab will:
 > - It is not recommended for production use.
 > - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-optional-enforcement-of-personal-access-token-expiry-feature). **(CORE ONLY)**
 
-GitLab administrators can choose to prevent personal access tokens from expiring automatically. The tokens will be usable after the expiry date, unless they are revoked explicitly.
 
 To do this:
 
@@ -211,3 +210,20 @@ To do this:
 
 NOTE:
 When this ability is disabled, GitLab administrators will still be able to update the name of any user in their instance via the [Admin UI](../index.md#administering-users) or the [API](../../../api/users.md#user-modification)
+
+## Customize session duration for Git Operations when 2FA is enabled
+
+> - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/296669) in GitLab 13.8.
+> - It's deployed behind a feature flag, disabled by default.
+> - It's disabled on GitLab.com.
+> - It's not recommended for production use.
+> - To use it in a GitLab self-managed instances, ask a GitLab administrator to [enable it](../../../security/two+factor_authentication.md#enable-or-disable-two-factor-authentication-2fa-for-git-operations)
+
+GitLab administrators can choose to customize the session duration for Git operations when 2FA is enabled. The default is 15 minutes.
+
+To set a limit on how long these sessions are valid:
+
+1. Navigate to **Admin Area > Settings > General**.
+1. Expand the **Account and limit** section.
+1. Fill in the **Session duration for Git operations when 2FA is enabled (minutes)** field.
+1. Click **Save changes**.

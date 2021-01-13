@@ -17277,6 +17277,9 @@ msgstr ""
 msgid "Maximum delay (Minutes)"
 msgstr ""
 
+msgid "Maximum duration of a session for Git operations."
+msgstr ""
+
 msgid "Maximum duration of a session."
 msgstr ""
 
@@ -25594,6 +25597,9 @@ msgid "Session ID"
 msgstr ""
 
 msgid "Session duration (minutes)"
+msgstr ""
+
+msgid "Session duration for Git operations when 2FA is enabled (minutes)"
 msgstr ""
 
 msgid "Set %{epic_ref} as the parent epic."
