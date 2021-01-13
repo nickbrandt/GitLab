@@ -8,6 +8,8 @@ class Analytics::CycleAnalytics::GroupValueStream < ApplicationRecord
   validates :group, :name, presence: true
   validates :name, length: { minimum: 3, maximum: 100, allow_nil: false }, uniqueness: { scope: :group_id }
 
+  accepts_nested_attributes_for :stages, allow_destroy: true
+
   def custom?
     name != Analytics::CycleAnalytics::Stages::BaseService::DEFAULT_VALUE_STREAM_NAME
   end
