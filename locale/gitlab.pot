@@ -15479,6 +15479,9 @@ msgstr ""
 msgid "Invite member"
 msgstr ""
 
+msgid "Invite members"
+msgstr ""
+
 msgid "Invite team members"
 msgstr ""
 
