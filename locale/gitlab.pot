@@ -11727,7 +11727,13 @@ msgstr ""
 msgid "Experienced"
 msgstr ""
 
+msgid "ExperimentSubject|Expected subject to be of type User, Group, or Project but was %{type}"
+msgstr ""
+
 msgid "ExperimentSubject|Must have exactly one of User, Group, or Project."
+msgstr ""
+
+msgid "ExperimentSubject|subject must be of type User, Group, or Project but was %{obj_class}."
 msgstr ""
 
 msgid "Expiration"

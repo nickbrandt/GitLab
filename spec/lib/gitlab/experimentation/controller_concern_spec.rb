@@ -520,53 +520,218 @@ RSpec.describe Gitlab::Experimentation::ControllerConcern, type: :controller do
     end
   end
 
-  describe '#record_experiment_conversion_event' do
-    let(:user) { build(:user) }
+  describe '#record_experiment_subject' do
+    let(:group) { build(:group) }
+    let(:context) { { a: 42 } }
 
-    before do
-      allow(controller).to receive(:dnt_enabled?).and_return(false)
-      allow(controller).to receive(:current_user).and_return(user)
-      stub_experiment(test_experiment: true)
+    subject(:record_experiment_subject) do
+      controller.record_experiment_subject(:test_experiment, group, context)
     end
 
-    subject(:record_conversion_event) do
-      controller.record_experiment_conversion_event(:test_experiment)
-    end
-
-    it 'records the conversion event for the experiment & user' do
-      expect(::Experiment).to receive(:record_conversion_event).with(:test_experiment, user)
-      record_conversion_event
-    end
-
-    shared_examples 'does not record the conversion event' do
-      it 'does not record the conversion event' do
-        expect(::Experiment).not_to receive(:record_conversion_event)
-        record_conversion_event
-      end
-    end
-
-    context 'when DNT is enabled' do
+    context 'when the experiment is enabled' do
       before do
-        allow(controller).to receive(:dnt_enabled?).and_return(true)
+        stub_experiment(test_experiment: true)
       end
 
-      include_examples 'does not record the conversion event'
-    end
+      context 'the subject is part of the experimental group' do
+        before do
+          stub_experiment_for_subject(test_experiment: true)
+        end
 
-    context 'when there is no current user' do
-      before do
-        allow(controller).to receive(:current_user).and_return(nil)
+        it 'calls add_subject on the Experiment model' do
+          expect(::Experiment).to receive(:add_subject).with(:test_experiment, group, :experimental, context)
+
+          record_experiment_subject
+        end
+
+        context 'with a cookie based rollout strategy' do
+          it 'calls tracking_group with a nil subject' do
+            expect(controller).to receive(:tracking_group).with(:test_experiment, nil, subject: nil).and_return(:experimental)
+            allow(::Experiment).to receive(:add_subject).with(:test_experiment, group, :experimental, context)
+
+            record_experiment_subject
+          end
+        end
+
+        context 'with a group based rollout strategy' do
+          let(:rollout_strategy) { :group }
+
+          it 'calls tracking_group with a group subject' do
+            expect(controller).to receive(:tracking_group).with(:test_experiment, nil, subject: group).and_return(:experimental)
+            allow(::Experiment).to receive(:add_subject).with(:test_experiment, group, :experimental, context)
+
+            record_experiment_subject
+          end
+        end
       end
 
-      include_examples 'does not record the conversion event'
+      context 'the group is part of the control variant' do
+        before do
+          stub_experiment_for_subject(test_experiment: false)
+        end
+
+        it 'calls add_subject on the Experiment model' do
+          expect(::Experiment).to receive(:add_subject).with(:test_experiment, group, :control, context)
+
+          record_experiment_subject
+        end
+      end
     end
 
-    context 'when the experiment is not enabled' do
+    context 'when the experiment is disabled' do
       before do
         stub_experiment(test_experiment: false)
       end
 
-      include_examples 'does not record the conversion event'
+      it 'does not call add_subject on the Experiment model' do
+        expect(::Experiment).not_to receive(:add_subject)
+
+        record_experiment_subject
+      end
+    end
+
+    context 'when there is no group' do
+      let_it_be(:group) { nil }
+
+      before do
+        stub_experiment(test_experiment: true)
+      end
+
+      it 'does not call add_subject on the Experiment model' do
+        expect(::Experiment).not_to receive(:add_subject)
+
+        record_experiment_subject
+      end
+    end
+
+    context 'do not track' do
+      before do
+        stub_experiment(test_experiment: true)
+      end
+
+      context 'is disabled' do
+        before do
+          request.headers['DNT'] = '0'
+          stub_experiment_for_subject(test_experiment: false)
+        end
+
+        it 'calls add_subject on the Experiment model' do
+          expect(::Experiment).to receive(:add_subject).with(:test_experiment, group, :control, context)
+
+          record_experiment_subject
+        end
+      end
+
+      context 'is enabled' do
+        before do
+          request.headers['DNT'] = '1'
+        end
+
+        it 'does not call add_subject on the Experiment model' do
+          expect(::Experiment).not_to receive(:add_subject)
+
+          record_experiment_subject
+        end
+      end
+    end
+  end
+
+  describe '#record_experiment_conversion_event' do
+    context 'implicitly using current_user with ExperimentUser' do
+      let(:user) { build(:user) }
+
+      before do
+        allow(controller).to receive(:dnt_enabled?).and_return(false)
+        allow(controller).to receive(:current_user).and_return(user)
+        stub_experiment(test_experiment: true)
+      end
+
+      subject(:record_conversion_event) do
+        controller.record_experiment_conversion_event(:test_experiment)
+      end
+
+      it 'records the conversion event for the experiment & user' do
+        expect(::Experiment).to receive(:record_conversion_event).with(:test_experiment, user, as_subject: false)
+        record_conversion_event
+      end
+
+      shared_examples 'does not record the conversion event' do
+        it 'does not record the conversion event' do
+          expect(::Experiment).not_to receive(:record_conversion_event)
+          record_conversion_event
+        end
+      end
+
+      context 'when DNT is enabled' do
+        before do
+          allow(controller).to receive(:dnt_enabled?).and_return(true)
+        end
+
+        include_examples 'does not record the conversion event'
+      end
+
+      context 'when there is no current user' do
+        before do
+          allow(controller).to receive(:current_user).and_return(nil)
+        end
+
+        include_examples 'does not record the conversion event'
+      end
+
+      context 'when the experiment is not enabled' do
+        before do
+          stub_experiment(test_experiment: false)
+        end
+
+        include_examples 'does not record the conversion event'
+      end
+    end
+
+    context 'using an explicity subject with ExperimentSubject' do
+      let_it_be(:group) { build(:group) }
+
+      before do
+        allow(controller).to receive(:dnt_enabled?).and_return(false)
+        stub_experiment(test_experiment: true)
+      end
+
+      subject(:record_conversion_event) do
+        controller.record_experiment_conversion_event(:test_experiment, subject: group)
+      end
+
+      it 'records the conversion event for the experiment & group' do
+        expect(::Experiment).to receive(:record_conversion_event).with(:test_experiment, group, as_subject: true)
+        record_conversion_event
+      end
+
+      shared_examples 'does not record the conversion event' do
+        it 'does not record the conversion event' do
+          expect(::Experiment).not_to receive(:record_conversion_event)
+          record_conversion_event
+        end
+      end
+
+      context 'when DNT is enabled' do
+        before do
+          allow(controller).to receive(:dnt_enabled?).and_return(true)
+        end
+
+        include_examples 'does not record the conversion event'
+      end
+
+      context 'when no subject is given' do
+        let_it_be(:group) { nil }
+
+        include_examples 'does not record the conversion event'
+      end
+
+      context 'when the experiment is not enabled' do
+        before do
+          stub_experiment(test_experiment: false)
+        end
+
+        include_examples 'does not record the conversion event'
+      end
     end
   end
 
