@@ -3,7 +3,7 @@
 module EE
   module Emails
     module Members
-      def member_access_granted_email_with_confirmation(member_id)
+      def provisioned_member_access_granted_email(member_id)
         @member_id = member_id
 
         return unless member_exists?

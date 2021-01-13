@@ -375,7 +375,7 @@ RSpec.describe Notify do
     let(:group) { group_member.source }
     let(:recipient) { group_member.user }
 
-    subject { described_class.member_access_granted_email_with_confirmation(group_member.id) }
+    subject { described_class.provisioned_member_access_granted_email(group_member.id) }
 
     it_behaves_like 'an email sent from GitLab'
     it_behaves_like 'it should not have Gmail Actions links'
@@ -388,12 +388,12 @@ RSpec.describe Notify do
     end
 
     it 'contains all the useful information' do
-      is_expected.to have_subject "Welcome to GitLab"
+      is_expected.to have_subject 'Welcome to GitLab'
       is_expected.to have_body_text group.name
       is_expected.to have_body_text group.web_url
       is_expected.to have_body_text recipient.username
       is_expected.to have_body_text recipient.email
-      is_expected.to have_body_text 'Confirm your account'
+      is_expected.to have_body_text 'To get started, click the link below to confirm your account'
       is_expected.to have_body_text recipient.confirmation_token
     end
   end

@@ -63,7 +63,7 @@ module EE
     end
 
     def new_group_member_with_confirmation(group_member)
-      mailer.member_access_granted_email_with_confirmation(group_member.id).deliver_later
+      mailer.provisioned_member_access_granted_email(group_member.id).deliver_later
     end
 
     private
