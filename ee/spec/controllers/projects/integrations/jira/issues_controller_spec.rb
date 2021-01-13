@@ -51,7 +51,7 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
       it 'redirects to the new issue tracker from the old one' do
         get :index, params: { namespace_id: project.namespace, project_id: project }
 
-        expect(response).to redirect_to(project_integrations_jira_issues_path(new_project))
+        expect(response).to redirect_to(Gitlab::Routing.url_helpers.project_integrations_jira_issues_path(new_project))
         expect(response).to have_gitlab_http_status(:moved_permanently)
       end
     end
