@@ -17,20 +17,18 @@ export class CiSchemaExtension extends EditorLiteExtension {
    * @param {String?} opts.ref - Current ref. Defaults to master
    */
   registerCiSchema({ projectNamespace, projectPath, ref = 'master' } = {}) {
-    const ciSchemaUri = Api.buildUrl(Api.projectFileSchemaPath)
+    const ciSchemaPath = Api.buildUrl(Api.projectFileSchemaPath)
       .replace(':namespace_path', projectNamespace)
       .replace(':project_path', projectPath)
       .replace(':ref', ref)
       .replace(':filename', EXTENSION_CI_SCHEMA_FILE_NAME_MATCH);
-    const modelFileName = this.getModel().uri.path.split('/').pop();
-
     // In order for workers loaded from `data://` as the
-    // ones loaded by monaco, we use absolute URLs to fetch
-    // schema files, hence the `location.origin` reference.
-    // This prevents error:
+    // ones loaded by monaco editor, we use absolute URLs
+    // to fetch schema files, hence the `gon.gitlab_url`
+    // reference. This prevents error:
     //   "Failed to execute 'fetch' on 'WorkerGlobalScope'"
-    // eslint-disable-next-line no-restricted-globals
-    const absoluteSchemaUrl = location.origin + ciSchemaUri;
+    const absoluteSchemaUrl = gon.gitlab_url + ciSchemaPath;
+    const modelFileName = this.getModel().uri.path.split('/').pop();
 
     registerSchema({
       uri: absoluteSchemaUrl,
