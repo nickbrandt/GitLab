@@ -1000,8 +1000,6 @@ describe('Actions Notes Store', () => {
         expect(commit.mock.calls).toEqual([
           [mutationTypes.SET_APPLYING_BATCH_STATE, true],
           [mutationTypes.SET_RESOLVING_DISCUSSION, true],
-          [mutationTypes.APPLY_SUGGESTION, batchSuggestionsInfo[0]],
-          [mutationTypes.APPLY_SUGGESTION, batchSuggestionsInfo[1]],
           [mutationTypes.CLEAR_SUGGESTION_BATCH],
           [mutationTypes.SET_APPLYING_BATCH_STATE, false],
           [mutationTypes.SET_RESOLVING_DISCUSSION, false],
@@ -1065,8 +1063,6 @@ describe('Actions Notes Store', () => {
         expect(commit.mock.calls).toEqual([
           [mutationTypes.SET_APPLYING_BATCH_STATE, true],
           [mutationTypes.SET_RESOLVING_DISCUSSION, true],
-          [mutationTypes.APPLY_SUGGESTION, batchSuggestionsInfo[0]],
-          [mutationTypes.APPLY_SUGGESTION, batchSuggestionsInfo[1]],
           [mutationTypes.CLEAR_SUGGESTION_BATCH],
           [mutationTypes.SET_APPLYING_BATCH_STATE, false],
           [mutationTypes.SET_RESOLVING_DISCUSSION, false],
