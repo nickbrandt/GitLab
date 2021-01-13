@@ -504,6 +504,13 @@ entry.
 - Update GitLab Workhorse to v8.57.0.
 
 
+## 13.6.5 (2021-01-13)
+
+### Security (1 change)
+
+- Deny implicit flow for confidential apps.
+
+
 ## 13.6.4 (2021-01-07)
 
 ### Security (7 changes)
