@@ -62,6 +62,7 @@ export default {
           v-gl-tooltip
           :title="__('This pipeline was triggered by a schedule.')"
           variant="info"
+          size="small"
           data-testid="pipeline-url-scheduled"
           >{{ __('Scheduled') }}</gl-badge
         >
@@ -71,6 +72,7 @@ export default {
         v-gl-tooltip
         :title="__('Latest pipeline for the most recent commit on this branch')"
         variant="success"
+        size="small"
         data-testid="pipeline-url-latest"
         >{{ __('latest') }}</gl-badge
       >
@@ -79,6 +81,7 @@ export default {
         v-gl-tooltip
         :title="pipeline.yaml_errors"
         variant="danger"
+        size="small"
         data-testid="pipeline-url-yaml"
         >{{ __('yaml invalid') }}</gl-badge
       >
@@ -87,6 +90,7 @@ export default {
         v-gl-tooltip
         :title="pipeline.failure_reason"
         variant="danger"
+        size="small"
         data-testid="pipeline-url-failure"
         >{{ __('error') }}</gl-badge
       >
@@ -96,7 +100,7 @@ export default {
         tabindex="0"
         data-testid="pipeline-url-autodevops"
         role="button"
-        ><gl-badge variant="info">{{ __('Auto DevOps') }}</gl-badge></gl-link
+        ><gl-badge variant="info" size="small">{{ __('Auto DevOps') }}</gl-badge></gl-link
       >
       <gl-popover
         :target="`pipeline-url-autodevops-${pipeline.id}`"
@@ -122,9 +126,13 @@ export default {
           __('Learn more about Auto DevOps')
         }}</gl-link>
       </gl-popover>
-      <gl-badge v-if="pipeline.flags.stuck" variant="warning" data-testid="pipeline-url-stuck">{{
-        __('stuck')
-      }}</gl-badge>
+      <gl-badge
+        v-if="pipeline.flags.stuck"
+        variant="warning"
+        size="small"
+        data-testid="pipeline-url-stuck"
+        >{{ __('stuck') }}</gl-badge
+      >
       <gl-badge
         v-if="pipeline.flags.detached_merge_request_pipeline"
         v-gl-tooltip
@@ -134,6 +142,7 @@ export default {
           )
         "
         variant="info"
+        size="small"
         data-testid="pipeline-url-detached"
         >{{ __('detached') }}</gl-badge
       >
@@ -142,6 +151,7 @@ export default {
         v-gl-tooltip
         :title="__('Pipeline ran in fork of project')"
         variant="info"
+        size="small"
         data-testid="pipeline-url-fork"
         >{{ __('fork') }}</gl-badge
       >
