@@ -1,10 +1,15 @@
 <script>
-import BoardListHeaderFoss from '~/boards/components/board_list_header_new.vue';
+import BoardListHeaderFoss from '~/boards/components/board_list_header_deprecated.vue';
 import { __, sprintf, s__ } from '~/locale';
+import boardsStore from '~/boards/stores/boards_store';
 
 export default {
   extends: BoardListHeaderFoss,
-  inject: ['weightFeatureAvailable'],
+  data() {
+    return {
+      weightFeatureAvailable: boardsStore.weightFeatureAvailable,
+    };
+  },
   computed: {
     issuesTooltip() {
       const { maxIssueCount } = this.list;
