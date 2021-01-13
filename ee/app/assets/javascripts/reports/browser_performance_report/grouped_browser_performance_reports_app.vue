@@ -69,7 +69,7 @@ export default {
     :neutral-issues="neutralIssues"
     :has-issues="hasIssues"
     :component="$options.componentNames.PerformanceIssueBody"
-    :should-emit-toggle-event="true"
+    should-emit-toggle-event
     class="js-browser-performance-widget mr-widget-border-top mr-report"
     @toggleEvent="handleBrowserPerformanceToggleEvent"
   />
