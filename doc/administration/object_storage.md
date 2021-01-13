@@ -61,10 +61,10 @@ must be enabled, only the following providers can be used:
 - [Google Cloud Storage](#google-cloud-storage-gcs)
 - [Azure Blob storage](#azure-blob-storage)
 
-Background upload isn't supported with the consolidated object storage
-configuration. We recommend enabling direct upload mode because it doesn't
-require a shared folder, and [this setting may become the
-default](https://gitlab.com/gitlab-org/gitlab/-/issues/27331).
+When consolidated object storage is used, direct upload is enabled
+automatically. Background upload is not supported. For storage-specific
+configuration, [direct upload may become the default](https://gitlab.com/gitlab-org/gitlab/-/issues/27331)
+because it does not require a shared folder.
 
 Consolidated object storage configuration can't be used for backups or
 Mattermost. See the [full table for a complete list](#storage-specific-configuration).
