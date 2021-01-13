@@ -81,6 +81,8 @@ module AtomicInternalId
             internal_id_scope_usage,
             init)
           write_attribute(column, value)
+
+          @internal_id_set_manually = false
         end
 
         value
@@ -112,6 +114,7 @@ module AtomicInternalId
         super(value).tap do |v|
           # Indicate the iid was set from externally
           @internal_id_needs_tracking = true
+          @internal_id_set_manually = true
         end
       end
 
@@ -132,6 +135,8 @@ module AtomicInternalId
       end
 
       define_method("clear_#{scope}_#{column}!") do
+        return if @internal_id_set_manually
+
         return unless public_send(:"#{column}_previously_changed?") # rubocop:disable GitlabSecurity/PublicSend
 
         write_attribute(column, nil)

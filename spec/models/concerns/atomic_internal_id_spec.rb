@@ -32,81 +32,6 @@ RSpec.describe AtomicInternalId do
           milestone.save!
         end
       end
-
-      context 'when the save is rolled back' do
-        context 'when no ensure_if condition is given' do
-          it 'clears the instance IID' do
-            expect(milestone).to receive(:clear_project_iid!).and_call_original
-
-            ActiveRecord::Base.transaction(requires_new: true) do
-              milestone.save!
-
-              expect(milestone.iid).to eq(external_iid)
-
-              raise ActiveRecord::Rollback
-            end
-
-            expect(milestone.iid).to be_nil
-          end
-        end
-
-        context 'when an ensure_if condition is given' do
-          let(:test_class) do
-            Class.new(ApplicationRecord) do
-              include AtomicInternalId
-              include Importable
-
-              self.table_name = :milestones
-
-              belongs_to :project
-
-              has_internal_id :iid, scope: :project, track_if: -> { !importing }, ensure_if: -> { !importing }
-
-              def self.name
-                'TestClass'
-              end
-            end
-          end
-
-          let(:instance) { test_class.new(milestone.attributes) }
-
-          context 'when the ensure_if condition evaluates to false' do
-            it 'clears the instance IID' do
-              expect(instance).to receive(:clear_project_iid!).and_call_original
-
-              ActiveRecord::Base.transaction(requires_new: true) do
-                instance.save!
-
-                expect(instance.iid).not_to be_nil
-
-                raise ActiveRecord::Rollback
-              end
-
-              expect(instance.iid).to be_nil
-            end
-          end
-
-          context 'when the ensure_if condition evaluates to true' do
-            before do
-              instance.importing = true
-            end
-
-            it 'does not clear the instance IID' do
-              expect(instance).not_to receive(:clear_project_iid!)
-
-              ActiveRecord::Base.transaction(requires_new: true) do
-                instance.save!
-
-                expect(instance.iid).not_to be_nil
-
-                raise ActiveRecord::Rollback
-              end
-
-              expect(instance.iid).not_to be_nil
-            end
-          end
-        end
-      end
     end
   end
 
@@ -159,6 +84,95 @@ RSpec.describe AtomicInternalId do
       milestone.iid = nil
 
       expect { subject }.to change { milestone.iid }.from(nil).to(iid.to_i)
+    end
+  end
+
+  describe '#clear_scope_iid!' do
+    context 'when no ensure_if condition is given' do
+      it 'clears automatically set IIDs' do
+        expect(milestone).to receive(:clear_project_iid!).and_call_original
+
+        expect_iid_to_be_set_and_rollback(milestone)
+
+        expect(milestone.iid).to be_nil
+      end
+
+      it 'does not clear manually set IIDS' do
+        milestone.iid = external_iid
+
+        expect(milestone).to receive(:clear_project_iid!).and_call_original
+
+        expect_iid_to_be_set_and_rollback(milestone)
+
+        expect(milestone.iid).to eq(external_iid)
+      end
+    end
+
+    context 'when an ensure_if condition is given' do
+      let(:test_class) do
+        Class.new(ApplicationRecord) do
+          include AtomicInternalId
+          include Importable
+
+          self.table_name = :milestones
+
+          belongs_to :project
+
+          has_internal_id :iid, scope: :project, track_if: -> { !importing }, ensure_if: -> { !importing }
+
+          def self.name
+            'TestClass'
+          end
+        end
+      end
+
+      let(:instance) { test_class.new(milestone.attributes) }
+
+      context 'when the ensure_if condition evaluates to true' do
+        it 'clears automatically set IIDs' do
+          expect(instance).to receive(:clear_project_iid!).and_call_original
+
+          expect_iid_to_be_set_and_rollback(instance)
+
+          expect(instance.iid).to be_nil
+        end
+
+        it 'does not clear manually set IIDs' do
+          instance.iid = external_iid
+
+          expect(instance).to receive(:clear_project_iid!).and_call_original
+
+          expect_iid_to_be_set_and_rollback(instance)
+
+          expect(instance.iid).to eq(external_iid)
+        end
+      end
+
+      context 'when the ensure_if condition evaluates to false' do
+        before do
+          instance.importing = true
+        end
+
+        it 'does not clear IIDs' do
+          instance.iid = external_iid
+
+          expect(instance).not_to receive(:clear_project_iid!)
+
+          expect_iid_to_be_set_and_rollback(instance)
+
+          expect(instance.iid).to eq(external_iid)
+        end
+      end
+    end
+
+    def expect_iid_to_be_set_and_rollback(instance)
+      ActiveRecord::Base.transaction(requires_new: true) do
+        instance.save!
+
+        expect(instance.iid).not_to be_nil
+
+        raise ActiveRecord::Rollback
+      end
     end
   end
 

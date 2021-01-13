@@ -50,16 +50,22 @@ RSpec.shared_examples 'AtomicInternalId' do
 
     describe 'unsetting the instance internal id on rollback' do
       context 'when the internal id has been changed' do
-        it 'clears it on the instance' do
-          ActiveRecord::Base.transaction(requires_new: true) do
-            instance.save!
+        context 'when the internal id is automatically set' do
+          it 'clears it on the instance' do
+            expect_iid_to_be_set_and_rollback
+
+            expect(read_internal_id).to be_nil
+          end
+        end
+
+        context 'when the internal id is manually set' do
+          it 'does not clear it on the instance' do
+            write_internal_id(100)
+
+            expect_iid_to_be_set_and_rollback
 
             expect(read_internal_id).not_to be_nil
-
-            raise ActiveRecord::Rollback
           end
-
-          expect(read_internal_id).to be_nil
         end
       end
 
@@ -70,15 +76,19 @@ RSpec.shared_examples 'AtomicInternalId' do
 
           expect(original_id).not_to be_nil
 
-          ActiveRecord::Base.transaction(requires_new: true) do
-            instance.save!
-
-            expect(read_internal_id).not_to be_nil
-
-            raise ActiveRecord::Rollback
-          end
+          expect_iid_to_be_set_and_rollback
 
           expect(read_internal_id).to eq(original_id)
+        end
+      end
+
+      def expect_iid_to_be_set_and_rollback
+        ActiveRecord::Base.transaction(requires_new: true) do
+          instance.save!
+
+          expect(read_internal_id).not_to be_nil
+
+          raise ActiveRecord::Rollback
         end
       end
     end
