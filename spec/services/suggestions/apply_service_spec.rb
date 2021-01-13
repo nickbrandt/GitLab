@@ -116,7 +116,7 @@ RSpec.describe Suggestions::ApplyService do
       let(:message) { "i'm a custom commit message!" }
 
       it "uses the user's commit message" do
-        apply(suggestions, message: message)
+        apply(suggestions, message)
 
         expect(project.repository.commit.message).to(eq(message))
       end
