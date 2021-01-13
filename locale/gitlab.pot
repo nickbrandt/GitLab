@@ -8800,6 +8800,12 @@ msgstr ""
 msgid "DastProfiles|Could not create the site profile. Please try again."
 msgstr ""
 
+msgid "DastProfiles|Could not delete saved scan. Please refresh the page, or try again later."
+msgstr ""
+
+msgid "DastProfiles|Could not delete saved scans:"
+msgstr ""
+
 msgid "DastProfiles|Could not delete scanner profile. Please refresh the page, or try again later."
 msgstr ""
 
@@ -8812,6 +8818,9 @@ msgstr ""
 msgid "DastProfiles|Could not delete site profiles:"
 msgstr ""
 
+msgid "DastProfiles|Could not fetch saved scans. Please refresh the page, or try again later."
+msgstr ""
+
 msgid "DastProfiles|Could not fetch scanner profiles. Please refresh the page, or try again later."
 msgstr ""
 
@@ -8822,6 +8831,9 @@ msgid "DastProfiles|Could not update the scanner profile. Please try again."
 msgstr ""
 
 msgid "DastProfiles|Could not update the site profile. Please try again."
+msgstr ""
+
+msgid "DastProfiles|DAST Scan"
 msgstr ""
 
 msgid "DastProfiles|Debug messages"
@@ -8866,7 +8878,7 @@ msgstr ""
 msgid "DastProfiles|Include debug messages in the DAST console output."
 msgstr ""
 
-msgid "DastProfiles|Manage Profiles"
+msgid "DastProfiles|Manage DAST scans"
 msgstr ""
 
 msgid "DastProfiles|Manage profiles"
@@ -8876,9 +8888,6 @@ msgid "DastProfiles|Minimum = 0 (no timeout enabled), Maximum = 2880 minutes"
 msgstr ""
 
 msgid "DastProfiles|Minimum = 1 second, Maximum = 3600 seconds"
-msgstr ""
-
-msgid "DastProfiles|New Profile"
 msgstr ""
 
 msgid "DastProfiles|New scanner profile"
@@ -8920,6 +8929,12 @@ msgstr ""
 msgid "DastProfiles|Save profile"
 msgstr ""
 
+msgid "DastProfiles|Saved Scans"
+msgstr ""
+
+msgid "DastProfiles|Scan"
+msgstr ""
+
 msgid "DastProfiles|Scan mode"
 msgstr ""
 
@@ -8945,6 +8960,9 @@ msgid "DastProfiles|Site name"
 msgstr ""
 
 msgid "DastProfiles|Spider timeout"
+msgstr ""
+
+msgid "DastProfiles|Target"
 msgstr ""
 
 msgid "DastProfiles|Target URL"
