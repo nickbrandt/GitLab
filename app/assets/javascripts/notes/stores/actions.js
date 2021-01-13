@@ -568,7 +568,6 @@ export const submitSuggestion = (
   dispatch('stopPolling');
 
   return Api.applySuggestion(suggestionId)
-    .then(() => commit(types.APPLY_SUGGESTION, { discussionId, noteId, suggestionId }))
     .then(dispatchResolveDiscussion)
     .catch((err) => {
       const defaultMessage = __(

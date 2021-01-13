@@ -918,7 +918,6 @@ describe('Actions Notes Store', () => {
       testSubmitSuggestion(done, () => {
         expect(commit.mock.calls).toEqual([
           [mutationTypes.SET_RESOLVING_DISCUSSION, true],
-          [mutationTypes.APPLY_SUGGESTION, { discussionId, noteId, suggestionId }],
           [mutationTypes.SET_RESOLVING_DISCUSSION, false],
         ]);
 
