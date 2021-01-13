@@ -79,6 +79,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def self.declarative_enum(enum_mod)
-    enum enum_mod.key => enum_mod.definition.transform_values { |v| v[:value] }
+    values = enum_mod.definition.transform_values { |v| v[:value] }
+    enum(enum_mod.key => values)
   end
 end
