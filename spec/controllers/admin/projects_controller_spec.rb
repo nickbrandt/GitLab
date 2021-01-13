@@ -79,7 +79,7 @@ RSpec.describe Admin::ProjectsController do
   end
 
   describe 'PUT /projects/transfer/:id' do
-    let_it_be(:project, reload: true) { create(:project, :repository) }
+    let_it_be(:project, reload: true) { create(:project) }
     let_it_be(:new_namespace) { create(:namespace) }
 
     it 'updates namespace' do
