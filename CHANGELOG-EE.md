@@ -377,6 +377,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove duplicated BS display properties from member overriding UI. !47126 (Takuya Noguchi)
 
 
+## 13.5.7 (2021-01-13)
+
+- No changes.
+
 ## 13.5.6 (2021-01-07)
 
 - No changes.
