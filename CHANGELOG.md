@@ -1082,6 +1082,13 @@ entry.
 - Change wording on the project remove fork page. !47878
 
 
+## 13.5.7 (2021-01-13)
+
+### Security (1 change)
+
+- Deny implicit flow for confidential apps.
+
+
 ## 13.5.6 (2021-01-07)
 
 ### Security (7 changes)
