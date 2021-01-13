@@ -371,10 +371,10 @@ You can combine one or more of the following:
 
 #### Linking to `/help` in JavaScript
 
-To link to the documentation from a JavaScript or a Vue component, use the `helpPagePath` function from [`help_page_utility.js`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/assets/javascripts/lib/utils/help_page_utility.js):
+To link to the documentation from a JavaScript or a Vue component, use the `helpPagePath` function from [`help_page_helper.js`](https://gitlab.com/gitlab-org/gitlab/-/blob/master/app/assets/javascripts/helpers/help_page_helper.js):
 
 ```javascript
-import { helpPagePath } from '~/lib/utils/help_page_helper';
+import { helpPagePath } from '~/helpers/help_page_helper';
 
 helpPagePath('user/permissions', { anchor: 'anchor-link' })
 // evaluates to '/help/user/permissions#anchor-link' for GitLab.com
