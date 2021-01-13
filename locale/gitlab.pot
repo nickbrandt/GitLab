@@ -5269,6 +5269,9 @@ msgstr ""
 msgid "ChangeTypeAction|Cherry-pick"
 msgstr ""
 
+msgid "ChangeTypeAction|Pick into branch"
+msgstr ""
+
 msgid "ChangeTypeAction|Revert"
 msgstr ""
 
