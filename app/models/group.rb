@@ -620,12 +620,6 @@ class Group < Namespace
     Gitlab::ServiceDesk.supported? && all_projects.service_desk_enabled.exists?
   end
 
-  # rubocop: disable CodeReuse/ServiceClass
-  def open_issues_count(current_user = nil)
-    Groups::OpenIssuesCountService.new(self, current_user).count
-  end
-  # rubocop: enable CodeReuse/ServiceClass
-
   private
 
   def update_two_factor_requirement

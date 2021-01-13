@@ -1,8 +1,5 @@
+- issues_count = group_open_issues_count(@group)
 - merge_requests_count = group_merge_requests_count(state: 'opened')
-- if Feature.enabled?(:cached_sidebar_open_issues_count, @group)
-  - issues_count = cached_open_group_issues_count(@group)
-- else
-  - issues_count = number_with_delimiter(group_issues_count(state: 'opened'))
 
 .nav-sidebar{ class: ("sidebar-collapsed-desktop" if collapsed_sidebar?), **tracking_attrs('groups_side_navigation', 'render', 'groups_side_navigation') }
   .nav-sidebar-inner-scroll
@@ -58,6 +55,7 @@
             %span.nav-item-name
               = _('Issues')
             %span.badge.badge-pill.count= issues_count
+
           %ul.sidebar-sub-level-items{ data: { qa_selector: 'group_issues_sidebar_submenu'} }
             = nav_link(path: ['groups#issues', 'labels#index', 'milestones#index', 'iterations#index'], html_options: { class: "fly-out-top-item" } ) do
               = link_to issues_group_path(@group) do

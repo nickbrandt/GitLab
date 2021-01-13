@@ -445,36 +445,45 @@ RSpec.describe GroupsHelper do
     end
   end
 
-  describe `#cached_open_group_issues_count` do
-    let(:current_user) { create(:user) }
-    let(:group) { create(:group, name: 'group') }
+  describe '#cached_open_group_issues_count' do
+    let_it_be(:current_user) { create(:user) }
+    let_it_be(:group) { create(:group, name: 'group') }
+    let_it_be(:count_service) { Groups::OpenIssuesCountService }
 
     before do
       allow(helper).to receive(:current_user) { current_user }
     end
 
     it 'returns all digits for count value under 1000' do
-      allow(group).to receive(:open_issues_count).with(current_user) { 999 }
+      allow_next_instance_of(count_service) do |service|
+        allow(service).to receive(:count).and_return(999)
+      end
 
       expect(helper.cached_open_group_issues_count(group)).to eq('999')
     end
 
     it 'returns truncated digits for count value over 1000' do
-      allow(group).to receive(:open_issues_count).with(current_user) { 2300 }
+      allow_next_instance_of(count_service) do |service|
+        allow(service).to receive(:count).and_return(2300)
+      end
 
-      expect(helper.cached_open_group_issues_count(group)).to eq('2.3 K')
+      expect(helper.cached_open_group_issues_count(group)).to eq('2.3k')
     end
 
     it 'returns truncated digits for count value over 10000' do
-      allow(group).to receive(:open_issues_count).with(current_user) { 12560 }
+      allow_next_instance_of(count_service) do |service|
+        allow(service).to receive(:count).and_return(12560)
+      end
 
-      expect(helper.cached_open_group_issues_count(group)).to eq('13 K')
+      expect(helper.cached_open_group_issues_count(group)).to eq('12.6k')
     end
 
     it 'returns truncated digits for count value over 100000' do
-      allow(group).to receive(:open_issues_count).with(current_user) { 112560 }
+      allow_next_instance_of(count_service) do |service|
+        allow(service).to receive(:count).and_return(112560)
+      end
 
-      expect(helper.cached_open_group_issues_count(group)).to eq('110 K')
+      expect(helper.cached_open_group_issues_count(group)).to eq('112.6k')
     end
   end
 end

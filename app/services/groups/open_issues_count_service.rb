@@ -28,6 +28,8 @@ module Groups
       end
     end
 
+    private
+
     def cache_options
       super.merge({ expires_in: EXPIRATION_TIME })
     end
