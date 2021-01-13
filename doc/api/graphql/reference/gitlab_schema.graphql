@@ -1280,7 +1280,7 @@ type Board {
     first: Int
 
     """
-    Filters applied when selecting issues on the board
+    Filters applied when selecting issues on the board.
     """
     issueFilters: BoardIssueInput
 
@@ -1450,7 +1450,7 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     after: String
 
     """
-    Filter epics by author
+    Filter epics by author.
     """
     authorUsername: String
 
@@ -1460,7 +1460,7 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     before: String
 
     """
-    Filter epics by given confidentiality
+    Filter epics by given confidentiality.
     """
     confidential: Boolean
 
@@ -1476,27 +1476,27 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     first: Int
 
     """
-    IID of the epic, e.g., "1"
+    IID of the epic, e.g., "1".
     """
     iid: ID
 
     """
-    Filter epics by IID for autocomplete
+    Filter epics by IID for autocomplete.
     """
     iidStartsWith: String
 
     """
-    List of IIDs of epics, e.g., [1, 2]
+    List of IIDs of epics, e.g., [1, 2].
     """
     iids: [ID!]
 
     """
-    Include epics from descendant groups
+    Include epics from descendant groups.
     """
     includeDescendantGroups: Boolean = true
 
     """
-    Filter epics by labels
+    Filter epics by labels.
     """
     labelName: [String!]
 
@@ -1506,17 +1506,17 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     last: Int
 
     """
-    Filter epics by milestone title, computed from epic's issues
+    Filter epics by milestone title, computed from epic's issues.
     """
     milestoneTitle: String
 
     """
-    Search query for epic title or description
+    Search query for epic title or description.
     """
     search: String
 
     """
-    List epics by sort order
+    List epics by sort order.
     """
     sort: EpicSort
 
@@ -1528,7 +1528,7 @@ type BoardEpic implements CurrentUserTodos & Noteable {
     startDate: Time
 
     """
-    Filter epics by state
+    Filter epics by state.
     """
     state: EpicState
 
@@ -8044,7 +8044,7 @@ type Epic implements CurrentUserTodos & Noteable {
     after: String
 
     """
-    Filter epics by author
+    Filter epics by author.
     """
     authorUsername: String
 
@@ -8054,7 +8054,7 @@ type Epic implements CurrentUserTodos & Noteable {
     before: String
 
     """
-    Filter epics by given confidentiality
+    Filter epics by given confidentiality.
     """
     confidential: Boolean
 
@@ -8070,27 +8070,27 @@ type Epic implements CurrentUserTodos & Noteable {
     first: Int
 
     """
-    IID of the epic, e.g., "1"
+    IID of the epic, e.g., "1".
     """
     iid: ID
 
     """
-    Filter epics by IID for autocomplete
+    Filter epics by IID for autocomplete.
     """
     iidStartsWith: String
 
     """
-    List of IIDs of epics, e.g., [1, 2]
+    List of IIDs of epics, e.g., [1, 2].
     """
     iids: [ID!]
 
     """
-    Include epics from descendant groups
+    Include epics from descendant groups.
     """
     includeDescendantGroups: Boolean = true
 
     """
-    Filter epics by labels
+    Filter epics by labels.
     """
     labelName: [String!]
 
@@ -8100,17 +8100,17 @@ type Epic implements CurrentUserTodos & Noteable {
     last: Int
 
     """
-    Filter epics by milestone title, computed from epic's issues
+    Filter epics by milestone title, computed from epic's issues.
     """
     milestoneTitle: String
 
     """
-    Search query for epic title or description
+    Search query for epic title or description.
     """
     search: String
 
     """
-    List epics by sort order
+    List epics by sort order.
     """
     sort: EpicSort
 
@@ -8122,7 +8122,7 @@ type Epic implements CurrentUserTodos & Noteable {
     startDate: Time
 
     """
-    Filter epics by state
+    Filter epics by state.
     """
     state: EpicState
 
@@ -9613,7 +9613,7 @@ type GeoNode {
     first: Int
 
     """
-    Filters registries by their ID
+    Filters registries by their ID.
     """
     ids: [ID!]
 
@@ -9653,7 +9653,7 @@ type GeoNode {
     first: Int
 
     """
-    Filters registries by their ID
+    Filters registries by their ID.
     """
     ids: [ID!]
 
@@ -9728,7 +9728,7 @@ type GeoNode {
     first: Int
 
     """
-    Filters registries by their ID
+    Filters registries by their ID.
     """
     ids: [ID!]
 
@@ -9763,7 +9763,7 @@ type GeoNode {
     first: Int
 
     """
-    Filters registries by their ID
+    Filters registries by their ID.
     """
     ids: [ID!]
 
@@ -9902,7 +9902,7 @@ type Group {
     last: Int
 
     """
-    First day for which to fetch code coverage activity (maximum time window is set to 90 days)
+    First day for which to fetch code coverage activity (maximum time window is set to 90 days).
     """
     startDate: Date!
   ): CodeCoverageActivityConnection
@@ -10023,12 +10023,12 @@ type Group {
   """
   epic(
     """
-    Filter epics by author
+    Filter epics by author.
     """
     authorUsername: String
 
     """
-    Filter epics by given confidentiality
+    Filter epics by given confidentiality.
     """
     confidential: Boolean
 
@@ -10039,42 +10039,42 @@ type Group {
     endDate: Time
 
     """
-    IID of the epic, e.g., "1"
+    IID of the epic, e.g., "1".
     """
     iid: ID
 
     """
-    Filter epics by IID for autocomplete
+    Filter epics by IID for autocomplete.
     """
     iidStartsWith: String
 
     """
-    List of IIDs of epics, e.g., [1, 2]
+    List of IIDs of epics, e.g., [1, 2].
     """
     iids: [ID!]
 
     """
-    Include epics from descendant groups
+    Include epics from descendant groups.
     """
     includeDescendantGroups: Boolean = true
 
     """
-    Filter epics by labels
+    Filter epics by labels.
     """
     labelName: [String!]
 
     """
-    Filter epics by milestone title, computed from epic's issues
+    Filter epics by milestone title, computed from epic's issues.
     """
     milestoneTitle: String
 
     """
-    Search query for epic title or description
+    Search query for epic title or description.
     """
     search: String
 
     """
-    List epics by sort order
+    List epics by sort order.
     """
     sort: EpicSort
 
@@ -10086,7 +10086,7 @@ type Group {
     startDate: Time
 
     """
-    Filter epics by state
+    Filter epics by state.
     """
     state: EpicState
 
@@ -10101,7 +10101,7 @@ type Group {
   """
   epicBoard(
     """
-    Find an epic board by ID
+    Find an epic board by ID.
     """
     id: BoardsEpicBoardID!
   ): EpicBoard
@@ -10141,7 +10141,7 @@ type Group {
     after: String
 
     """
-    Filter epics by author
+    Filter epics by author.
     """
     authorUsername: String
 
@@ -10151,7 +10151,7 @@ type Group {
     before: String
 
     """
-    Filter epics by given confidentiality
+    Filter epics by given confidentiality.
     """
     confidential: Boolean
 
@@ -10167,27 +10167,27 @@ type Group {
     first: Int
 
     """
-    IID of the epic, e.g., "1"
+    IID of the epic, e.g., "1".
     """
     iid: ID
 
     """
-    Filter epics by IID for autocomplete
+    Filter epics by IID for autocomplete.
     """
     iidStartsWith: String
 
     """
-    List of IIDs of epics, e.g., [1, 2]
+    List of IIDs of epics, e.g., [1, 2].
     """
     iids: [ID!]
 
     """
-    Include epics from descendant groups
+    Include epics from descendant groups.
     """
     includeDescendantGroups: Boolean = true
 
     """
-    Filter epics by labels
+    Filter epics by labels.
     """
     labelName: [String!]
 
@@ -10197,17 +10197,17 @@ type Group {
     last: Int
 
     """
-    Filter epics by milestone title, computed from epic's issues
+    Filter epics by milestone title, computed from epic's issues.
     """
     milestoneTitle: String
 
     """
-    Search query for epic title or description
+    Search query for epic title or description.
     """
     search: String
 
     """
-    List epics by sort order
+    List epics by sort order.
     """
     sort: EpicSort
 
@@ -10219,7 +10219,7 @@ type Group {
     startDate: Time
 
     """
-    Filter epics by state
+    Filter epics by state.
     """
     state: EpicState
 
@@ -10349,7 +10349,7 @@ type Group {
     createdBefore: Time
 
     """
-    ID of an epic associated with the issues, "none" and "any" values are supported
+    ID of an epic associated with the issues, "none" and "any" values are supported.
     """
     epicId: String
 
@@ -10374,7 +10374,7 @@ type Group {
     includeSubgroups: Boolean = false
 
     """
-    Iterations applied to the issue
+    Iterations applied to the issue.
     """
     iterationId: [ID]
 
@@ -10745,7 +10745,7 @@ type Group {
     first: Int
 
     """
-    Returns only the projects which have vulnerabilities
+    Returns only the projects which have vulnerabilities.
     """
     hasVulnerabilities: Boolean = false
 
@@ -10830,12 +10830,12 @@ type Group {
     before: String
 
     """
-    List time logs within a date range where the logged date is equal to or before endDate
+    List time logs within a date range where the logged date is equal to or before endDate.
     """
     endDate: Time
 
     """
-    List time-logs within a time range where the logged time is equal to or before endTime
+    List time-logs within a time range where the logged time is equal to or before endTime.
     """
     endTime: Time
 
@@ -10850,12 +10850,12 @@ type Group {
     last: Int
 
     """
-    List time logs within a date range where the logged date is equal to or after startDate
+    List time logs within a date range where the logged date is equal to or after startDate.
     """
     startDate: Time
 
     """
-    List time-logs within a time range where the logged time is equal to or after startTime
+    List time-logs within a time range where the logged time is equal to or after startTime.
     """
     startTime: Time
   ): TimelogConnection!
@@ -10905,12 +10905,12 @@ type Group {
     first: Int
 
     """
-    Returns only the vulnerabilities which have linked issues
+    Returns only the vulnerabilities which have linked issues.
     """
     hasIssues: Boolean
 
     """
-    Returns only the vulnerabilities which have been resolved on default branch
+    Returns only the vulnerabilities which have been resolved on default branch.
     """
     hasResolution: Boolean
 
@@ -10920,32 +10920,32 @@ type Group {
     last: Int
 
     """
-    Filter vulnerabilities by project
+    Filter vulnerabilities by project.
     """
     projectId: [ID!]
 
     """
-    Filter vulnerabilities by report type
+    Filter vulnerabilities by report type.
     """
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by VulnerabilityScanner.externalId
+    Filter vulnerabilities by VulnerabilityScanner.externalId.
     """
     scanner: [String!]
 
     """
-    Filter vulnerabilities by severity
+    Filter vulnerabilities by severity.
     """
     severity: [VulnerabilitySeverity!]
 
     """
-    List vulnerabilities by sort order
+    List vulnerabilities by sort order.
     """
     sort: VulnerabilitySort = severity_desc
 
     """
-    Filter vulnerabilities by state
+    Filter vulnerabilities by state.
     """
     state: [VulnerabilityState!]
   ): VulnerabilityConnection
@@ -10965,7 +10965,7 @@ type Group {
     before: String
 
     """
-    Last day for which to fetch vulnerability history
+    Last day for which to fetch vulnerability history.
     """
     endDate: ISO8601Date!
 
@@ -10980,7 +10980,7 @@ type Group {
     last: Int
 
     """
-    First day for which to fetch vulnerability history
+    First day for which to fetch vulnerability history.
     """
     startDate: ISO8601Date!
   ): VulnerabilitiesCountByDayConnection
@@ -11001,7 +11001,7 @@ type Group {
     before: String
 
     """
-    Last day for which to fetch vulnerability history
+    Last day for which to fetch vulnerability history.
     """
     endDate: ISO8601Date!
 
@@ -11016,7 +11016,7 @@ type Group {
     last: Int
 
     """
-    First day for which to fetch vulnerability history
+    First day for which to fetch vulnerability history.
     """
     startDate: ISO8601Date!
   ): VulnerabilitiesCountByDayAndSeverityConnection @deprecated(reason: "Use `vulnerabilitiesCountByDay`. Deprecated in 13.3.")
@@ -11026,7 +11026,7 @@ type Group {
   """
   vulnerabilityGrades(
     """
-    Include grades belonging to subgroups
+    Include grades belonging to subgroups.
     """
     includeSubgroups: Boolean = false
   ): [VulnerableProjectsByGrade!]!
@@ -11061,27 +11061,27 @@ type Group {
   """
   vulnerabilitySeveritiesCount(
     """
-    Filter vulnerabilities by project
+    Filter vulnerabilities by project.
     """
     projectId: [ID!]
 
     """
-    Filter vulnerabilities by report type
+    Filter vulnerabilities by report type.
     """
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by scanner
+    Filter vulnerabilities by scanner.
     """
     scanner: [String!]
 
     """
-    Filter vulnerabilities by severity
+    Filter vulnerabilities by severity.
     """
     severity: [VulnerabilitySeverity!]
 
     """
-    Filter vulnerabilities by state
+    Filter vulnerabilities by state.
     """
     state: [VulnerabilityState!]
   ): VulnerabilitySeveritiesCount
@@ -11656,27 +11656,27 @@ type InstanceSecurityDashboard {
   """
   vulnerabilitySeveritiesCount(
     """
-    Filter vulnerabilities by project
+    Filter vulnerabilities by project.
     """
     projectId: [ID!]
 
     """
-    Filter vulnerabilities by report type
+    Filter vulnerabilities by report type.
     """
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by scanner
+    Filter vulnerabilities by scanner.
     """
     scanner: [String!]
 
     """
-    Filter vulnerabilities by severity
+    Filter vulnerabilities by severity.
     """
     severity: [VulnerabilitySeverity!]
 
     """
-    Filter vulnerabilities by state
+    Filter vulnerabilities by state.
     """
     state: [VulnerabilityState!]
   ): VulnerabilitySeveritiesCount
@@ -15714,7 +15714,7 @@ type Namespace {
     first: Int
 
     """
-    Returns only the projects which have vulnerabilities
+    Returns only the projects which have vulnerabilities.
     """
     hasVulnerabilities: Boolean = false
 
@@ -17352,7 +17352,7 @@ type Project {
   """
   clusterAgent(
     """
-    Name of the cluster agent
+    Name of the cluster agent.
     """
     name: String!
   ): ClusterAgent
@@ -17492,7 +17492,7 @@ type Project {
   """
   dastSiteProfile(
     """
-    ID of the site profile
+    ID of the site profile.
     """
     id: DastSiteProfileID!
   ): DastSiteProfile
@@ -17548,7 +17548,7 @@ type Project {
     last: Int
 
     """
-    Normalized URL of the target to be scanned
+    Normalized URL of the target to be scanned.
     """
     normalizedTargetUrls: [String!]
   ): DastSiteValidationConnection
@@ -17728,7 +17728,7 @@ type Project {
     createdBefore: Time
 
     """
-    ID of an epic associated with the issues, "none" and "any" values are supported
+    ID of an epic associated with the issues, "none" and "any" values are supported.
     """
     epicId: String
 
@@ -17743,7 +17743,7 @@ type Project {
     iids: [String!]
 
     """
-    Iterations applied to the issue
+    Iterations applied to the issue.
     """
     iterationId: [ID]
 
@@ -17928,7 +17928,7 @@ type Project {
     createdBefore: Time
 
     """
-    ID of an epic associated with the issues, "none" and "any" values are supported
+    ID of an epic associated with the issues, "none" and "any" values are supported.
     """
     epicId: String
 
@@ -17948,7 +17948,7 @@ type Project {
     iids: [String!]
 
     """
-    Iterations applied to the issue
+    Iterations applied to the issue.
     """
     iterationId: [ID]
 
@@ -18567,12 +18567,12 @@ type Project {
     authorUsername: [String!]
 
     """
-    IID of the requirement, e.g., "1"
+    IID of the requirement, e.g., "1".
     """
     iid: ID
 
     """
-    List of IIDs of requirements, e.g., [1, 2]
+    List of IIDs of requirements, e.g., [1, 2].
     """
     iids: [ID!]
 
@@ -18622,12 +18622,12 @@ type Project {
     first: Int
 
     """
-    IID of the requirement, e.g., "1"
+    IID of the requirement, e.g., "1".
     """
     iid: ID
 
     """
-    List of IIDs of requirements, e.g., [1, 2]
+    List of IIDs of requirements, e.g., [1, 2].
     """
     iids: [ID!]
 
@@ -18857,12 +18857,12 @@ type Project {
     first: Int
 
     """
-    Returns only the vulnerabilities which have linked issues
+    Returns only the vulnerabilities which have linked issues.
     """
     hasIssues: Boolean
 
     """
-    Returns only the vulnerabilities which have been resolved on default branch
+    Returns only the vulnerabilities which have been resolved on default branch.
     """
     hasResolution: Boolean
 
@@ -18872,32 +18872,32 @@ type Project {
     last: Int
 
     """
-    Filter vulnerabilities by project
+    Filter vulnerabilities by project.
     """
     projectId: [ID!]
 
     """
-    Filter vulnerabilities by report type
+    Filter vulnerabilities by report type.
     """
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by VulnerabilityScanner.externalId
+    Filter vulnerabilities by VulnerabilityScanner.externalId.
     """
     scanner: [String!]
 
     """
-    Filter vulnerabilities by severity
+    Filter vulnerabilities by severity.
     """
     severity: [VulnerabilitySeverity!]
 
     """
-    List vulnerabilities by sort order
+    List vulnerabilities by sort order.
     """
     sort: VulnerabilitySort = severity_desc
 
     """
-    Filter vulnerabilities by state
+    Filter vulnerabilities by state.
     """
     state: [VulnerabilityState!]
   ): VulnerabilityConnection
@@ -18917,7 +18917,7 @@ type Project {
     before: String
 
     """
-    Last day for which to fetch vulnerability history
+    Last day for which to fetch vulnerability history.
     """
     endDate: ISO8601Date!
 
@@ -18932,7 +18932,7 @@ type Project {
     last: Int
 
     """
-    First day for which to fetch vulnerability history
+    First day for which to fetch vulnerability history.
     """
     startDate: ISO8601Date!
   ): VulnerabilitiesCountByDayConnection
@@ -18967,27 +18967,27 @@ type Project {
   """
   vulnerabilitySeveritiesCount(
     """
-    Filter vulnerabilities by project
+    Filter vulnerabilities by project.
     """
     projectId: [ID!]
 
     """
-    Filter vulnerabilities by report type
+    Filter vulnerabilities by report type.
     """
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by scanner
+    Filter vulnerabilities by scanner.
     """
     scanner: [String!]
 
     """
-    Filter vulnerabilities by severity
+    Filter vulnerabilities by severity.
     """
     severity: [VulnerabilitySeverity!]
 
     """
-    Filter vulnerabilities by state
+    Filter vulnerabilities by state.
     """
     state: [VulnerabilityState!]
   ): VulnerabilitySeveritiesCount
@@ -20055,12 +20055,12 @@ type Query {
     first: Int
 
     """
-    Returns only the vulnerabilities which have linked issues
+    Returns only the vulnerabilities which have linked issues.
     """
     hasIssues: Boolean
 
     """
-    Returns only the vulnerabilities which have been resolved on default branch
+    Returns only the vulnerabilities which have been resolved on default branch.
     """
     hasResolution: Boolean
 
@@ -20070,32 +20070,32 @@ type Query {
     last: Int
 
     """
-    Filter vulnerabilities by project
+    Filter vulnerabilities by project.
     """
     projectId: [ID!]
 
     """
-    Filter vulnerabilities by report type
+    Filter vulnerabilities by report type.
     """
     reportType: [VulnerabilityReportType!]
 
     """
-    Filter vulnerabilities by VulnerabilityScanner.externalId
+    Filter vulnerabilities by VulnerabilityScanner.externalId.
     """
     scanner: [String!]
 
     """
-    Filter vulnerabilities by severity
+    Filter vulnerabilities by severity.
     """
     severity: [VulnerabilitySeverity!]
 
     """
-    List vulnerabilities by sort order
+    List vulnerabilities by sort order.
     """
     sort: VulnerabilitySort = severity_desc
 
     """
-    Filter vulnerabilities by state
+    Filter vulnerabilities by state.
     """
     state: [VulnerabilityState!]
   ): VulnerabilityConnection
@@ -20115,7 +20115,7 @@ type Query {
     before: String
 
     """
-    Last day for which to fetch vulnerability history
+    Last day for which to fetch vulnerability history.
     """
     endDate: ISO8601Date!
 
@@ -20130,7 +20130,7 @@ type Query {
     last: Int
 
     """
-    First day for which to fetch vulnerability history
+    First day for which to fetch vulnerability history.
     """
     startDate: ISO8601Date!
   ): VulnerabilitiesCountByDayConnection
@@ -20152,7 +20152,7 @@ type Query {
     before: String
 
     """
-    Last day for which to fetch vulnerability history
+    Last day for which to fetch vulnerability history.
     """
     endDate: ISO8601Date!
 
@@ -20167,7 +20167,7 @@ type Query {
     last: Int
 
     """
-    First day for which to fetch vulnerability history
+    First day for which to fetch vulnerability history.
     """
     startDate: ISO8601Date!
   ): VulnerabilitiesCountByDayAndSeverityConnection @deprecated(reason: "Use `vulnerabilitiesCountByDay`. Deprecated in 13.3.")
@@ -21121,7 +21121,7 @@ type Requirement {
     last: Int
 
     """
-    List test reports by sort order
+    List test reports by sort order.
     """
     sort: Sort
   ): TestReportConnection
@@ -26121,7 +26121,7 @@ type Vulnerability implements Noteable {
     last: Int
 
     """
-    Filter issue links by link type
+    Filter issue links by link type.
     """
     linkType: VulnerabilityIssueLinkType
   ): VulnerabilityIssueLinkConnection!

@@ -3366,7 +3366,7 @@
               "args": [
                 {
                   "name": "issueFilters",
-                  "description": "Filters applied when selecting issues on the board",
+                  "description": "Filters applied when selecting issues on the board.",
                   "type": {
                     "kind": "INPUT_OBJECT",
                     "name": "BoardIssueInput",
@@ -3866,7 +3866,7 @@
                 },
                 {
                   "name": "iid",
-                  "description": "IID of the epic, e.g., \"1\"",
+                  "description": "IID of the epic, e.g., \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ID",
@@ -3876,7 +3876,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of epics, e.g., [1, 2]",
+                  "description": "List of IIDs of epics, e.g., [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -3894,7 +3894,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter epics by state",
+                  "description": "Filter epics by state.",
                   "type": {
                     "kind": "ENUM",
                     "name": "EpicState",
@@ -3904,7 +3904,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for epic title or description",
+                  "description": "Search query for epic title or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -3914,7 +3914,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "List epics by sort order",
+                  "description": "List epics by sort order.",
                   "type": {
                     "kind": "ENUM",
                     "name": "EpicSort",
@@ -3924,7 +3924,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Filter epics by author",
+                  "description": "Filter epics by author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -3934,7 +3934,7 @@
                 },
                 {
                   "name": "labelName",
-                  "description": "Filter epics by labels",
+                  "description": "Filter epics by labels.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -3952,7 +3952,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Filter epics by milestone title, computed from epic's issues",
+                  "description": "Filter epics by milestone title, computed from epic's issues.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -3962,7 +3962,7 @@
                 },
                 {
                   "name": "iidStartsWith",
-                  "description": "Filter epics by IID for autocomplete",
+                  "description": "Filter epics by IID for autocomplete.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -3972,7 +3972,7 @@
                 },
                 {
                   "name": "includeDescendantGroups",
-                  "description": "Include epics from descendant groups",
+                  "description": "Include epics from descendant groups.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -3982,7 +3982,7 @@
                 },
                 {
                   "name": "confidential",
-                  "description": "Filter epics by given confidentiality",
+                  "description": "Filter epics by given confidentiality.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -22391,7 +22391,7 @@
                 },
                 {
                   "name": "iid",
-                  "description": "IID of the epic, e.g., \"1\"",
+                  "description": "IID of the epic, e.g., \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ID",
@@ -22401,7 +22401,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of epics, e.g., [1, 2]",
+                  "description": "List of IIDs of epics, e.g., [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -22419,7 +22419,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter epics by state",
+                  "description": "Filter epics by state.",
                   "type": {
                     "kind": "ENUM",
                     "name": "EpicState",
@@ -22429,7 +22429,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for epic title or description",
+                  "description": "Search query for epic title or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -22439,7 +22439,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "List epics by sort order",
+                  "description": "List epics by sort order.",
                   "type": {
                     "kind": "ENUM",
                     "name": "EpicSort",
@@ -22449,7 +22449,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Filter epics by author",
+                  "description": "Filter epics by author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -22459,7 +22459,7 @@
                 },
                 {
                   "name": "labelName",
-                  "description": "Filter epics by labels",
+                  "description": "Filter epics by labels.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -22477,7 +22477,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Filter epics by milestone title, computed from epic's issues",
+                  "description": "Filter epics by milestone title, computed from epic's issues.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -22487,7 +22487,7 @@
                 },
                 {
                   "name": "iidStartsWith",
-                  "description": "Filter epics by IID for autocomplete",
+                  "description": "Filter epics by IID for autocomplete.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -22497,7 +22497,7 @@
                 },
                 {
                   "name": "includeDescendantGroups",
-                  "description": "Include epics from descendant groups",
+                  "description": "Include epics from descendant groups.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -22507,7 +22507,7 @@
                 },
                 {
                   "name": "confidential",
-                  "description": "Filter epics by given confidentiality",
+                  "description": "Filter epics by given confidentiality.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -26648,7 +26648,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Filters registries by their ID",
+                  "description": "Filters registries by their ID.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -26747,7 +26747,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Filters registries by their ID",
+                  "description": "Filters registries by their ID.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -26935,7 +26935,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Filters registries by their ID",
+                  "description": "Filters registries by their ID.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -27020,7 +27020,7 @@
               "args": [
                 {
                   "name": "ids",
-                  "description": "Filters registries by their ID",
+                  "description": "Filters registries by their ID.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -27391,7 +27391,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "First day for which to fetch code coverage activity (maximum time window is set to 90 days)",
+                  "description": "First day for which to fetch code coverage activity (maximum time window is set to 90 days).",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -27745,7 +27745,7 @@
                 },
                 {
                   "name": "iid",
-                  "description": "IID of the epic, e.g., \"1\"",
+                  "description": "IID of the epic, e.g., \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ID",
@@ -27755,7 +27755,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of epics, e.g., [1, 2]",
+                  "description": "List of IIDs of epics, e.g., [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -27773,7 +27773,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter epics by state",
+                  "description": "Filter epics by state.",
                   "type": {
                     "kind": "ENUM",
                     "name": "EpicState",
@@ -27783,7 +27783,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for epic title or description",
+                  "description": "Search query for epic title or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -27793,7 +27793,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "List epics by sort order",
+                  "description": "List epics by sort order.",
                   "type": {
                     "kind": "ENUM",
                     "name": "EpicSort",
@@ -27803,7 +27803,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Filter epics by author",
+                  "description": "Filter epics by author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -27813,7 +27813,7 @@
                 },
                 {
                   "name": "labelName",
-                  "description": "Filter epics by labels",
+                  "description": "Filter epics by labels.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -27831,7 +27831,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Filter epics by milestone title, computed from epic's issues",
+                  "description": "Filter epics by milestone title, computed from epic's issues.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -27841,7 +27841,7 @@
                 },
                 {
                   "name": "iidStartsWith",
-                  "description": "Filter epics by IID for autocomplete",
+                  "description": "Filter epics by IID for autocomplete.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -27851,7 +27851,7 @@
                 },
                 {
                   "name": "includeDescendantGroups",
-                  "description": "Include epics from descendant groups",
+                  "description": "Include epics from descendant groups.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -27861,7 +27861,7 @@
                 },
                 {
                   "name": "confidential",
-                  "description": "Filter epics by given confidentiality",
+                  "description": "Filter epics by given confidentiality.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -27884,7 +27884,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "Find an epic board by ID",
+                  "description": "Find an epic board by ID.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -27994,7 +27994,7 @@
                 },
                 {
                   "name": "iid",
-                  "description": "IID of the epic, e.g., \"1\"",
+                  "description": "IID of the epic, e.g., \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ID",
@@ -28004,7 +28004,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of epics, e.g., [1, 2]",
+                  "description": "List of IIDs of epics, e.g., [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28022,7 +28022,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter epics by state",
+                  "description": "Filter epics by state.",
                   "type": {
                     "kind": "ENUM",
                     "name": "EpicState",
@@ -28032,7 +28032,7 @@
                 },
                 {
                   "name": "search",
-                  "description": "Search query for epic title or description",
+                  "description": "Search query for epic title or description.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28042,7 +28042,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "List epics by sort order",
+                  "description": "List epics by sort order.",
                   "type": {
                     "kind": "ENUM",
                     "name": "EpicSort",
@@ -28052,7 +28052,7 @@
                 },
                 {
                   "name": "authorUsername",
-                  "description": "Filter epics by author",
+                  "description": "Filter epics by author.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28062,7 +28062,7 @@
                 },
                 {
                   "name": "labelName",
-                  "description": "Filter epics by labels",
+                  "description": "Filter epics by labels.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28080,7 +28080,7 @@
                 },
                 {
                   "name": "milestoneTitle",
-                  "description": "Filter epics by milestone title, computed from epic's issues",
+                  "description": "Filter epics by milestone title, computed from epic's issues.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28090,7 +28090,7 @@
                 },
                 {
                   "name": "iidStartsWith",
-                  "description": "Filter epics by IID for autocomplete",
+                  "description": "Filter epics by IID for autocomplete.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -28100,7 +28100,7 @@
                 },
                 {
                   "name": "includeDescendantGroups",
-                  "description": "Include epics from descendant groups",
+                  "description": "Include epics from descendant groups.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -28110,7 +28110,7 @@
                 },
                 {
                   "name": "confidential",
-                  "description": "Filter epics by given confidentiality",
+                  "description": "Filter epics by given confidentiality.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -28566,7 +28566,7 @@
                 },
                 {
                   "name": "iterationId",
-                  "description": "Iterations applied to the issue",
+                  "description": "Iterations applied to the issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -28580,7 +28580,7 @@
                 },
                 {
                   "name": "epicId",
-                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -29368,7 +29368,7 @@
                 },
                 {
                   "name": "hasVulnerabilities",
-                  "description": "Returns only the projects which have vulnerabilities",
+                  "description": "Returns only the projects which have vulnerabilities.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -29565,7 +29565,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "List time logs within a date range where the logged date is equal to or after startDate",
+                  "description": "List time logs within a date range where the logged date is equal to or after startDate.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -29575,7 +29575,7 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "List time logs within a date range where the logged date is equal to or before endDate",
+                  "description": "List time logs within a date range where the logged date is equal to or before endDate.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -29585,7 +29585,7 @@
                 },
                 {
                   "name": "startTime",
-                  "description": "List time-logs within a time range where the logged time is equal to or after startTime",
+                  "description": "List time-logs within a time range where the logged time is equal to or after startTime.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -29595,7 +29595,7 @@
                 },
                 {
                   "name": "endTime",
-                  "description": "List time-logs within a time range where the logged time is equal to or before endTime",
+                  "description": "List time-logs within a time range where the logged time is equal to or before endTime.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Time",
@@ -29736,7 +29736,7 @@
               "args": [
                 {
                   "name": "projectId",
-                  "description": "Filter vulnerabilities by project",
+                  "description": "Filter vulnerabilities by project.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -29754,7 +29754,7 @@
                 },
                 {
                   "name": "reportType",
-                  "description": "Filter vulnerabilities by report type",
+                  "description": "Filter vulnerabilities by report type.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -29772,7 +29772,7 @@
                 },
                 {
                   "name": "severity",
-                  "description": "Filter vulnerabilities by severity",
+                  "description": "Filter vulnerabilities by severity.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -29790,7 +29790,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter vulnerabilities by state",
+                  "description": "Filter vulnerabilities by state.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -29808,7 +29808,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -29826,7 +29826,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "List vulnerabilities by sort order",
+                  "description": "List vulnerabilities by sort order.",
                   "type": {
                     "kind": "ENUM",
                     "name": "VulnerabilitySort",
@@ -29836,7 +29836,7 @@
                 },
                 {
                   "name": "hasResolution",
-                  "description": "Returns only the vulnerabilities which have been resolved on default branch",
+                  "description": "Returns only the vulnerabilities which have been resolved on default branch.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -29846,7 +29846,7 @@
                 },
                 {
                   "name": "hasIssues",
-                  "description": "Returns only the vulnerabilities which have linked issues",
+                  "description": "Returns only the vulnerabilities which have linked issues.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -29909,7 +29909,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "First day for which to fetch vulnerability history",
+                  "description": "First day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -29923,7 +29923,7 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "Last day for which to fetch vulnerability history",
+                  "description": "Last day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -29990,7 +29990,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "First day for which to fetch vulnerability history",
+                  "description": "First day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -30004,7 +30004,7 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "Last day for which to fetch vulnerability history",
+                  "description": "Last day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -30071,7 +30071,7 @@
               "args": [
                 {
                   "name": "includeSubgroups",
-                  "description": "Include grades belonging to subgroups",
+                  "description": "Include grades belonging to subgroups.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -30159,7 +30159,7 @@
               "args": [
                 {
                   "name": "projectId",
-                  "description": "Filter vulnerabilities by project",
+                  "description": "Filter vulnerabilities by project.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -30177,7 +30177,7 @@
                 },
                 {
                   "name": "reportType",
-                  "description": "Filter vulnerabilities by report type",
+                  "description": "Filter vulnerabilities by report type.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -30195,7 +30195,7 @@
                 },
                 {
                   "name": "severity",
-                  "description": "Filter vulnerabilities by severity",
+                  "description": "Filter vulnerabilities by severity.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -30213,7 +30213,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter vulnerabilities by state",
+                  "description": "Filter vulnerabilities by state.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -30231,7 +30231,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by scanner.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -31865,7 +31865,7 @@
               "args": [
                 {
                   "name": "projectId",
-                  "description": "Filter vulnerabilities by project",
+                  "description": "Filter vulnerabilities by project.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -31883,7 +31883,7 @@
                 },
                 {
                   "name": "reportType",
-                  "description": "Filter vulnerabilities by report type",
+                  "description": "Filter vulnerabilities by report type.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -31901,7 +31901,7 @@
                 },
                 {
                   "name": "severity",
-                  "description": "Filter vulnerabilities by severity",
+                  "description": "Filter vulnerabilities by severity.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -31919,7 +31919,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter vulnerabilities by state",
+                  "description": "Filter vulnerabilities by state.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -31937,7 +31937,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by scanner.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -46546,7 +46546,7 @@
                 },
                 {
                   "name": "hasVulnerabilities",
-                  "description": "Returns only the projects which have vulnerabilities",
+                  "description": "Returns only the projects which have vulnerabilities.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -51303,7 +51303,7 @@
               "args": [
                 {
                   "name": "name",
-                  "description": "Name of the cluster agent",
+                  "description": "Name of the cluster agent.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -51626,7 +51626,7 @@
               "args": [
                 {
                   "name": "id",
-                  "description": "ID of the site profile",
+                  "description": "ID of the site profile.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -51706,7 +51706,7 @@
               "args": [
                 {
                   "name": "normalizedTargetUrls",
-                  "description": "Normalized URL of the target to be scanned",
+                  "description": "Normalized URL of the target to be scanned.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52322,7 +52322,7 @@
                 },
                 {
                   "name": "iterationId",
-                  "description": "Iterations applied to the issue",
+                  "description": "Iterations applied to the issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52336,7 +52336,7 @@
                 },
                 {
                   "name": "epicId",
-                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -52776,7 +52776,7 @@
                 },
                 {
                   "name": "iterationId",
-                  "description": "Iterations applied to the issue",
+                  "description": "Iterations applied to the issue.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -52790,7 +52790,7 @@
                 },
                 {
                   "name": "epicId",
-                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported",
+                  "description": "ID of an epic associated with the issues, \"none\" and \"any\" values are supported.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -54200,7 +54200,7 @@
                 },
                 {
                   "name": "iid",
-                  "description": "IID of the requirement, e.g., \"1\"",
+                  "description": "IID of the requirement, e.g., \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ID",
@@ -54210,7 +54210,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of requirements, e.g., [1, 2]",
+                  "description": "List of IIDs of requirements, e.g., [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -54303,7 +54303,7 @@
                 },
                 {
                   "name": "iid",
-                  "description": "IID of the requirement, e.g., \"1\"",
+                  "description": "IID of the requirement, e.g., \"1\".",
                   "type": {
                     "kind": "SCALAR",
                     "name": "ID",
@@ -54313,7 +54313,7 @@
                 },
                 {
                   "name": "iids",
-                  "description": "List of IIDs of requirements, e.g., [1, 2]",
+                  "description": "List of IIDs of requirements, e.g., [1, 2].",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -54854,7 +54854,7 @@
               "args": [
                 {
                   "name": "projectId",
-                  "description": "Filter vulnerabilities by project",
+                  "description": "Filter vulnerabilities by project.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -54872,7 +54872,7 @@
                 },
                 {
                   "name": "reportType",
-                  "description": "Filter vulnerabilities by report type",
+                  "description": "Filter vulnerabilities by report type.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -54890,7 +54890,7 @@
                 },
                 {
                   "name": "severity",
-                  "description": "Filter vulnerabilities by severity",
+                  "description": "Filter vulnerabilities by severity.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -54908,7 +54908,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter vulnerabilities by state",
+                  "description": "Filter vulnerabilities by state.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -54926,7 +54926,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -54944,7 +54944,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "List vulnerabilities by sort order",
+                  "description": "List vulnerabilities by sort order.",
                   "type": {
                     "kind": "ENUM",
                     "name": "VulnerabilitySort",
@@ -54954,7 +54954,7 @@
                 },
                 {
                   "name": "hasResolution",
-                  "description": "Returns only the vulnerabilities which have been resolved on default branch",
+                  "description": "Returns only the vulnerabilities which have been resolved on default branch.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -54964,7 +54964,7 @@
                 },
                 {
                   "name": "hasIssues",
-                  "description": "Returns only the vulnerabilities which have linked issues",
+                  "description": "Returns only the vulnerabilities which have linked issues.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -55027,7 +55027,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "First day for which to fetch vulnerability history",
+                  "description": "First day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -55041,7 +55041,7 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "Last day for which to fetch vulnerability history",
+                  "description": "Last day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -55161,7 +55161,7 @@
               "args": [
                 {
                   "name": "projectId",
-                  "description": "Filter vulnerabilities by project",
+                  "description": "Filter vulnerabilities by project.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -55179,7 +55179,7 @@
                 },
                 {
                   "name": "reportType",
-                  "description": "Filter vulnerabilities by report type",
+                  "description": "Filter vulnerabilities by report type.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -55197,7 +55197,7 @@
                 },
                 {
                   "name": "severity",
-                  "description": "Filter vulnerabilities by severity",
+                  "description": "Filter vulnerabilities by severity.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -55215,7 +55215,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter vulnerabilities by state",
+                  "description": "Filter vulnerabilities by state.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -55233,7 +55233,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by scanner",
+                  "description": "Filter vulnerabilities by scanner.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -58255,7 +58255,7 @@
               "args": [
                 {
                   "name": "projectId",
-                  "description": "Filter vulnerabilities by project",
+                  "description": "Filter vulnerabilities by project.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -58273,7 +58273,7 @@
                 },
                 {
                   "name": "reportType",
-                  "description": "Filter vulnerabilities by report type",
+                  "description": "Filter vulnerabilities by report type.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -58291,7 +58291,7 @@
                 },
                 {
                   "name": "severity",
-                  "description": "Filter vulnerabilities by severity",
+                  "description": "Filter vulnerabilities by severity.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -58309,7 +58309,7 @@
                 },
                 {
                   "name": "state",
-                  "description": "Filter vulnerabilities by state",
+                  "description": "Filter vulnerabilities by state.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -58327,7 +58327,7 @@
                 },
                 {
                   "name": "scanner",
-                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId",
+                  "description": "Filter vulnerabilities by VulnerabilityScanner.externalId.",
                   "type": {
                     "kind": "LIST",
                     "name": null,
@@ -58345,7 +58345,7 @@
                 },
                 {
                   "name": "sort",
-                  "description": "List vulnerabilities by sort order",
+                  "description": "List vulnerabilities by sort order.",
                   "type": {
                     "kind": "ENUM",
                     "name": "VulnerabilitySort",
@@ -58355,7 +58355,7 @@
                 },
                 {
                   "name": "hasResolution",
-                  "description": "Returns only the vulnerabilities which have been resolved on default branch",
+                  "description": "Returns only the vulnerabilities which have been resolved on default branch.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -58365,7 +58365,7 @@
                 },
                 {
                   "name": "hasIssues",
-                  "description": "Returns only the vulnerabilities which have linked issues",
+                  "description": "Returns only the vulnerabilities which have linked issues.",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Boolean",
@@ -58428,7 +58428,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "First day for which to fetch vulnerability history",
+                  "description": "First day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -58442,7 +58442,7 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "Last day for which to fetch vulnerability history",
+                  "description": "Last day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -58509,7 +58509,7 @@
               "args": [
                 {
                   "name": "startDate",
-                  "description": "First day for which to fetch vulnerability history",
+                  "description": "First day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -58523,7 +58523,7 @@
                 },
                 {
                   "name": "endDate",
-                  "description": "Last day for which to fetch vulnerability history",
+                  "description": "Last day for which to fetch vulnerability history.",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -61089,7 +61089,7 @@
               "args": [
                 {
                   "name": "sort",
-                  "description": "List test reports by sort order",
+                  "description": "List test reports by sort order.",
                   "type": {
                     "kind": "ENUM",
                     "name": "Sort",
@@ -75723,7 +75723,7 @@
               "args": [
                 {
                   "name": "linkType",
-                  "description": "Filter issue links by link type",
+                  "description": "Filter issue links by link type.",
                   "type": {
                     "kind": "ENUM",
                     "name": "VulnerabilityIssueLinkType",
