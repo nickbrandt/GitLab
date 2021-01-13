@@ -31,11 +31,11 @@ RSpec.describe 'Burnup charts', :js do
   describe 'licensed feature available' do
     before do
       stub_licensed_features(milestone_charts: true)
+      visit group_milestone_path(milestone.group, milestone)
+      wait_for_requests
     end
 
     it 'shows burnup chart, with a point per day' do
-      visit group_milestone_path(milestone.group, milestone)
-
       expect(burnup_chart_points.count).to be(12)
     end
   end
@@ -43,11 +43,11 @@ RSpec.describe 'Burnup charts', :js do
   describe 'licensed feature not available' do
     before do
       stub_licensed_features(milestone_charts: false)
+      visit group_milestone_path(milestone.group, milestone)
+      wait_for_requests
     end
 
     it 'does not show burnup chart' do
-      visit group_milestone_path(milestone.group, milestone)
-
       expect(page).not_to have_selector(burnup_chart_selector)
     end
   end
