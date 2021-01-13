@@ -140,7 +140,7 @@ const language = {
     ],
     heredocBody: [
       [
-        /^([\w\-]+)$/,
+        /([\w\-]+)$/,
         {
           cases: {
             '$1==$S2': [
