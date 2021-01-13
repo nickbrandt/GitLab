@@ -12,7 +12,7 @@ RSpec.describe Groups::OpenIssuesCountService, :use_clean_rails_memory_store_cac
 
   subject { described_class.new(group, user) }
 
-  describe '#self.query' do
+  describe '#relation_for_count' do
     before do
       allow(IssuesFinder).to receive(:new).and_call_original
     end
@@ -34,72 +34,70 @@ RSpec.describe Groups::OpenIssuesCountService, :use_clean_rails_memory_store_cac
     end
 
     context 'when user is provided' do
-      let(:total_count_key) { subject.cache_key(described_class::TOTAL_COUNT_KEY) }
-
       context 'when user can read confidential issues' do
         before do
           group.add_reporter(user)
-          project.add_reporter(user)
         end
 
         it 'returns the right count with confidential issues' do
           expect(subject.count).to eq(2)
-        end
-
-        it 'uses total_open_issues_count cache key' do
-          expect(subject.cache_key_name).to eq('group_total_open_issues_count')
-        end
-
-        context 'when cache is empty' do
-          before do
-            Rails.cache.delete(total_count_key)
-          end
-
-          it 'refreshes cache keys correctly' do
-            subject.count
-
-            expect(Rails.cache.read(total_count_key)).to eq(2)
-          end
-        end
-
-        context 'when count is over the threshold value' do
-          before do
-            Rails.cache.write(total_count_key, 12345)
-          end
-
-          it 'does not refresh cache' do
-            expect(Rails.cache).not_to receive(:write)
-
-            subject.count
-          end
         end
       end
 
       context 'when user cannot read confidential issues' do
         before do
           group.add_guest(user)
-          project.add_guest(user)
         end
 
         it 'does not include confidential issues' do
           expect(subject.count).to eq(1)
         end
+      end
 
-        it 'uses public_open_issues_count cache key' do
-          expect(subject.cache_key_name).to eq('group_public_open_issues_count')
-        end
+      context 'with different cache values' do
+        let(:public_count_key) { subject.cache_key(described_class::PUBLIC_COUNT_KEY) }
+        let(:under_threshold) { described_class::CACHED_COUNT_THRESHOLD - 1 }
+        let(:over_threshold) { described_class::CACHED_COUNT_THRESHOLD + 1 }
 
         context 'when cache is empty' do
-          let(:public_count_key) { subject.cache_key(described_class::PUBLIC_COUNT_KEY) }
-
           before do
             Rails.cache.delete(public_count_key)
           end
 
-          it 'refreshes cache keys correctly' do
-            subject.count
+          it 'refreshes cache if value over threshold' do
+            allow(subject).to receive(:uncached_count).and_return(over_threshold)
 
-            expect(Rails.cache.read(public_count_key)).to eq(1)
+            expect(subject.count).to eq(over_threshold)
+            expect(Rails.cache.read(public_count_key)).to eq(over_threshold)
+          end
+
+          it 'does not refresh cache if value under threshold' do
+            allow(subject).to receive(:uncached_count).and_return(under_threshold)
+
+            expect(subject.count).to eq(under_threshold)
+            expect(Rails.cache.read(public_count_key)).to be_nil
+          end
+        end
+
+        context 'when cached count is under the threshold value' do
+          before do
+            Rails.cache.write(public_count_key, under_threshold)
+          end
+
+          it 'does not refresh cache' do
+            expect(Rails.cache).not_to receive(:write)
+            expect(subject.count).to eq(under_threshold)
+          end
+        end
+
+        context 'when cached count is over the threshold value' do
+          before do
+            Rails.cache.write(public_count_key, over_threshold)
+          end
+
+          it 'does not refresh cache' do
+            expect(Rails.cache).not_to receive(:write)
+            expect(subject.count).to eq(over_threshold)
           end
         end
       end
