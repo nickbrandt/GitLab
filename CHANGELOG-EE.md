@@ -174,6 +174,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Rename code coverage analytics sections. !49931
 
 
+## 13.6.5 (2021-01-13)
+
+- No changes.
+
 ## 13.6.4 (2021-01-07)
 
 - No changes.
