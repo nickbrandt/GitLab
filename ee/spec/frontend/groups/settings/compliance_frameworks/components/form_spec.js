@@ -38,7 +38,6 @@ describe('Form', () => {
   const defaultPropsData = {
     groupPath: 'group-1',
     groupEditPath: 'group-1/edit',
-    scopedLabelsHelpPath: 'help/scoped-labels',
   };
 
   const fetch = jest.fn().mockResolvedValue(validGetResponse);

@@ -1,32 +1,27 @@
 import Vue from 'vue';
-import VueApollo from 'vue-apollo';
 
-import Form from './components/form.vue';
 import createDefaultClient, { fetchPolicies } from '~/lib/graphql';
-
-Vue.use(VueApollo);
-
-const apolloProvider = new VueApollo({
-  defaultClient: createDefaultClient({}, { fetchPolicy: fetchPolicies.NO_CACHE }),
-});
+import Form from './components/form.vue';
+import ComplianceFrameworksService from './services/compliance_frameworks_service';
 
 const createComplianceFrameworksFormApp = (el) => {
   if (!el) {
     return false;
   }
 
-  const { groupEditPath, groupPath, scopedLabelsHelpPath, frameworkId: id = null } = el.dataset;
+  const { groupEditPath, groupPath, frameworkId: id = null } = el.dataset;
 
   return new Vue({
     el,
-    apolloProvider,
     render(createElement) {
       return createElement(Form, {
         props: {
           groupEditPath,
-          groupPath,
-          id,
-          scopedLabelsHelpPath,
+          service: new ComplianceFrameworksService(
+            createDefaultClient({}, { fetchPolicy: fetchPolicies.NO_CACHE }),
+            groupPath,
+            id,
+          ),
         },
       });
     },
