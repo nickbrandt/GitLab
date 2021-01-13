@@ -724,6 +724,9 @@ msgstr ""
 msgid "%{reportType} detected %{totalStart}no%{totalEnd} vulnerabilities."
 msgstr ""
 
+msgid "%{requirementCount} requirements have been selected for export. These will be sent to %{email} as an attachment once finished."
+msgstr ""
+
 msgid "%{retryButtonStart}Try again%{retryButtonEnd} or %{newFileButtonStart}attach a new file%{newFileButtonEnd}."
 msgstr ""
 
@@ -11698,6 +11701,9 @@ msgid "Export merge requests"
 msgstr ""
 
 msgid "Export project"
+msgstr ""
+
+msgid "Export requirements"
 msgstr ""
 
 msgid "Export this group with all related data to a new GitLab instance. Once complete, you can import the data file from the \"New Group\" page."
@@ -26231,6 +26237,9 @@ msgid "Something went wrong while deploying this environment. Please try again."
 msgstr ""
 
 msgid "Something went wrong while editing your comment. Please try again."
+msgstr ""
+
+msgid "Something went wrong while exporting requirements"
 msgstr ""
 
 msgid "Something went wrong while fetching %{listType} list"
