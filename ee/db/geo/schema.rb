@@ -63,7 +63,7 @@ ActiveRecord::Schema.define(version: 2020_12_16_204525) do
     t.index ["success"], name: "index_file_registry_on_success"
   end
 
-  create_table "job_artifact_registry", force: :cascade do |t|
+  create_table "job_artifact_registry", id: :serial, force: :cascade do |t|
     t.datetime_with_timezone "created_at"
     t.datetime_with_timezone "retry_at"
     t.bigint "bytes"
