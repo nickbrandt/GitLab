@@ -6,9 +6,9 @@
 
 - source_title, target_title = format_mr_branch_names(@merge_request)
 
-- vis010 = _('This merge request is from a private project to an internal project.').html_safe
-- vis020 = _('This merge request is from a private project to a public project.').html_safe
-- vis1020 = _('This merge request is from an internal project to a public project.').html_safe
+- vis010 = _('This merge request is from a private project to an internal project.')
+- vis020 = _('This merge request is from a private project to a public project.')
+- vis1020 = _('This merge request is from an internal project to a public project.')
 - i18n = { '010' => vis010, '020' => vis020, '1020' => vis1020 }
 
 - source_level = @merge_request.source_project.visibility_level
@@ -42,5 +42,5 @@
     .gl-alert-body
       = visibilityMismatchString
       %br
-      = _('Review the target project before submitting to avoid exposing %{source} changes.').html_safe % { source: source_visibility }
+      = _('Review the target project before submitting to avoid exposing %{source} changes.') % { source: source_visibility }
 %hr
