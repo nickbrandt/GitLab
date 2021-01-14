@@ -1,5 +1,5 @@
 ---
 title: Fixed applied message showing before discussion gets resolved
-merge_request:
+merge_request: 51605
 author:
 type: fixed
