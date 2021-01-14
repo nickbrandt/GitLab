@@ -21,7 +21,8 @@ RSpec.describe Gitlab::Graphql::Pagination::Keyset::Connection do
     Gitlab::Json.parse(Base64Bp.urlsafe_decode64(cursor))
   end
 
-  context 'regression test for #297358' do
+  # see: https://gitlab.com/gitlab-org/gitlab/-/issues/297358
+  context 'the relation has been preloaded' do
     let(:projects) { Project.all.preload(:issues) }
     let(:nodes) { projects.first.issues }
 

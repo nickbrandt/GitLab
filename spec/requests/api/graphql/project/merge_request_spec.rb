@@ -253,7 +253,8 @@ RSpec.describe 'getting merge request information nested in a project' do
     end
   end
 
-  context 'regression test for #297358' do
+  # see: https://gitlab.com/gitlab-org/gitlab/-/issues/297358
+  context 'when the notes have been preloaded (by participants)' do
     let(:query) do
       <<~GQL
       query($path: ID!) {
