@@ -427,6 +427,7 @@ export default {
           createFlash({
             message: __('Something went wrong while exporting requirements'),
             captureError: true,
+            error: e,
           });
           throw e;
         });
@@ -624,9 +625,6 @@ export default {
     handleImportRequirementsClick() {
       this.$refs.modal.show();
     },
-    handleExportRequirementsClick() {
-      this.$refs.exportModal.show();
-    },
   },
 };
 </script>
@@ -642,7 +640,7 @@ export default {
       @click-tab="handleTabClick"
       @click-new-requirement="handleNewRequirementClick"
       @click-import-requirements="handleImportRequirementsClick"
-      @click-export-requirements="handleExportRequirementsClick"
+      @click-export-requirements="$refs.exportModal.show()"
     />
     <filtered-search-bar
       :namespace="projectPath"

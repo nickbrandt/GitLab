@@ -328,7 +328,12 @@ describe('RequirementsRoot', () => {
         jest.spyOn(wrapper.vm.$apollo, 'mutate').mockRejectedValue(new Error({}));
 
         return wrapper.vm.exportCsv().catch(() => {
-          expect(createFlash).toHaveBeenCalled();
+          expect(createFlash).toHaveBeenCalledWith(
+            expect.objectContaining({
+              message: 'Something went wrong while exporting requirements',
+              captureError: true,
+            }),
+          );
         });
       });
     });
