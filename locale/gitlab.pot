@@ -20634,6 +20634,9 @@ msgstr ""
 msgid "Pipeline Schedules"
 msgstr ""
 
+msgid "Pipeline cannot be run."
+msgstr ""
+
 msgid "Pipeline minutes quota"
 msgstr ""
 
@@ -20965,6 +20968,9 @@ msgid "Pipeline|Run Pipeline"
 msgstr ""
 
 msgid "Pipeline|Run for"
+msgstr ""
+
+msgid "Pipeline|Run for branch name or tag"
 msgstr ""
 
 msgid "Pipeline|Running"
@@ -28020,9 +28026,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "The fork relationship has been removed."
-msgstr ""
-
-msgid "The form contains the following error:"
 msgstr ""
 
 msgid "The form contains the following errors:"
