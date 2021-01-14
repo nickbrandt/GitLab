@@ -32,10 +32,6 @@ export default {
       type: Number,
       required: true,
     },
-    chartEmptyStateSvgPath: {
-      type: String,
-      required: true,
-    },
     wafNoDataSvgPath: {
       type: String,
       required: true,

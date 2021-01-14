@@ -18,7 +18,6 @@ export default () => {
     networkPolicyStatisticsEndpoint,
     environmentsEndpoint,
     networkPoliciesEndpoint,
-    chartEmptyStateSvgPath,
     emptyStateSvgPath,
     wafNoDataSvgPath,
     networkPolicyNoDataSvgPath,
@@ -53,7 +52,6 @@ export default () => {
     render(createElement) {
       return createElement(ThreatMonitoringApp, {
         props: {
-          chartEmptyStateSvgPath,
           wafNoDataSvgPath,
           networkPolicyNoDataSvgPath,
           defaultEnvironmentId: parseInt(defaultEnvironmentId, 10),
