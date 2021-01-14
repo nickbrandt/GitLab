@@ -1,7 +1,7 @@
 #import "~/graphql_shared/fragments/pageInfo.fragment.graphql"
 
 query DastSavedScans($fullPath: ID!, $after: String, $before: String, $first: Int, $last: Int) {
-  project @client {
+  project {
     savedScans(after: $after, before: $before, first: $first, last: $last) {
       pageInfo {
         ...PageInfo
