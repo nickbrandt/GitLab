@@ -92,9 +92,10 @@ module DeclarativeEnum
     private
 
     def method_missing(name, *arguments, value: nil, description: nil, &block)
-      raise KeyCollisionError, "'#{key}' collides with an existing enum key!" if @definition[name.downcase.to_sym]
+      key = name.downcase.to_sym
+      raise KeyCollisionError, "'#{key}' collides with an existing enum key!" if @definition[key]
 
-      @definition[name.downcase.to_sym] = {
+      @definition[key] = {
         value: value,
         description: description
       }
