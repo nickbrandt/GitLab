@@ -13,6 +13,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 >   quick actions when updating the description of issues, epics, and merge requests.
 > - Introduced in [GitLab 13.8](https://gitlab.com/gitlab-org/gitlab/-/issues/292393): when you enter
 >   `/` into a description or comment field, all available quick actions are displayed in a scrollable list.
+> - The rebase quick action was [introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/49800) in GitLab 13.8.
 
 Quick actions are textual shortcuts for common actions on issues, epics, merge requests,
 and commits that are usually done by clicking buttons or dropdowns in the GitLab UI.
