@@ -9694,6 +9694,9 @@ msgstr ""
 msgid "DeploymentFrequencyCharts|Something went wrong while getting deployment frequency data"
 msgstr ""
 
+msgid "Deployments"
+msgstr ""
+
 msgid "Deployment|API"
 msgstr ""
 
