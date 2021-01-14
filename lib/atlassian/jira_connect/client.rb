@@ -45,11 +45,14 @@ module Atlassian
           properties: { projectId: "project-#{project.id}" }
         })
 
-        if r['failedFeatureFlags'].present?
-          errors = r['failedFeatureFlags'].flat_map do |k, errs|
-            errs.map { |e| "#{k}: #{e['message']}" }
+        handle_response(r, 'feature flags') do |data|
+          failed = data['failedFeatureFlags']
+          if failed.present?
+            errors = failed.flat_map do |k, errs|
+              errs.map { |e| "#{k}: #{e['message']}" }
+            end
+            { 'errorMessages' => errors }
           end
-          { 'errorMessages' => errors }
         end
       end
 
@@ -62,7 +65,7 @@ module Atlassian
         return if items.empty?
 
         r = post('/rest/deployments/0.1/bulk', { deployments: items })
-        errors(r, 'rejectedDeployments')
+        handle_response(r, 'deployments') { |data| errors(data, 'rejectedDeployments') }
       end
 
       def store_build_info(project:, pipelines:, update_sequence_id: nil)
@@ -80,7 +83,7 @@ module Atlassian
         return if builds.empty?
 
         r = post('/rest/builds/0.1/bulk', { builds: builds })
-        errors(r, 'rejectedBuilds')
+        handle_response(r, 'builds') { |data| errors(data, 'rejectedBuilds') }
       end
 
       def store_dev_info(project:, commits: nil, branches: nil, merge_requests: nil, update_sequence_id: nil)
@@ -113,8 +116,23 @@ module Atlassian
         { providerMetadata: { product: "GitLab #{Gitlab::VERSION}" } }
       end
 
-      def errors(response, key)
+      def handle_response(response, name, &block)
         data = response.parsed_response
+
+        case response.code
+        when 200 then yield data
+        when 400 then { 'errorMessages' => data.map { |e| e['message'] } }
+        when 401 then { 'errorMessages' => ['Invalid JWT'] }
+        when 403 then { 'errorMessages' => ["App does not support #{name}"] }
+        when 413 then { 'errorMessages' => ['Data too large'] + data.map { |e| e['message'] } }
+        when 429 then { 'errorMessages' => ['Rate limit exceeded'] }
+        when 503 then { 'errorMessages' => ['Service unavailable'] }
+        else
+          { 'errorMessages' => ['Unknown error'], 'response' => data }
+        end
+      end
+
+      def errors(data, key)
         messages = if data[key].present?
                      data[key].flat_map do |rejection|
                        rejection['errors'].map { |e| e['message'] }

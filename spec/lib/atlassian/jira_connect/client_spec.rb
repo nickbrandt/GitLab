@@ -107,6 +107,75 @@ RSpec.describe Atlassian::JiraConnect::Client do
     }
   end
 
+  describe '#handle_response' do
+    let(:errors) { [{ 'message' => 'X' }, { 'message' => 'Y' }] }
+    let(:processed) { subject.send(:handle_response, response, 'foo') { |x| [:data, x] } }
+
+    context 'the response is 200 OK' do
+      let(:response) { double(code: 200, parsed_response: :foo) }
+
+      it 'yields to the block' do
+        expect(processed).to eq [:data, :foo]
+      end
+    end
+
+    context 'the response is 400 bad request' do
+      let(:response) { double(code: 400, parsed_response: errors) }
+
+      it 'extracts the errors messages' do
+        expect(processed).to eq('errorMessages' => %w(X Y))
+      end
+    end
+
+    context 'the response is 401 forbidden' do
+      let(:response) { double(code: 401, parsed_response: nil) }
+
+      it 'reports that our JWT is wrong' do
+        expect(processed).to eq('errorMessages' => ['Invalid JWT'])
+      end
+    end
+
+    context 'the response is 403' do
+      let(:response) { double(code: 403, parsed_response: nil) }
+
+      it 'reports that the App is misconfigured' do
+        expect(processed).to eq('errorMessages' => ['App does not support foo'])
+      end
+    end
+
+    context 'the response is 413' do
+      let(:response) { double(code: 413, parsed_response: errors) }
+
+      it 'extracts the errors messages' do
+        expect(processed).to eq('errorMessages' => ['Data too large', 'X', 'Y'])
+      end
+    end
+
+    context 'the response is 429' do
+      let(:response) { double(code: 429, parsed_response: nil) }
+
+      it 'reports that we exceeded the rate limit' do
+        expect(processed).to eq('errorMessages' => ['Rate limit exceeded'])
+      end
+    end
+
+    context 'the response is 503' do
+      let(:response) { double(code: 503, parsed_response: nil) }
+
+      it 'reports that the service is unavailable' do
+        expect(processed).to eq('errorMessages' => ['Service unavailable'])
+      end
+    end
+
+    context 'the response is anything else' do
+      let(:response) { double(code: 1000, parsed_response: :something) }
+
+      it 'reports that this was unanticipated' do
+        expect(processed).to eq('errorMessages' => ['Unknown error'], 'response' => :something)
+      end
+    end
+  end
+
   describe '#store_deploy_info' do
     let_it_be(:environment) { create(:environment, name: 'DEV', project: project) }
     let_it_be(:deployments) do
