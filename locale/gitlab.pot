@@ -25233,6 +25233,9 @@ msgstr ""
 msgid "See the affected projects in the GitLab admin panel"
 msgstr ""
 
+msgid "See the list of available commands in Slack after setting up this service by entering"
+msgstr ""
+
 msgid "See vulnerability %{vulnerability_link} for any Remediation details."
 msgstr ""
 
@@ -29043,6 +29046,9 @@ msgid "This runner processes jobs for assigned projects only."
 msgstr ""
 
 msgid "This runner will only run on pipelines triggered on protected branches"
+msgstr ""
+
+msgid "This service allows users to perform common operations on this project by entering slash commands in Slack."
 msgstr ""
 
 msgid "This setting can be overridden in each project."
