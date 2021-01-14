@@ -21,7 +21,6 @@ RSpec.describe Gitlab::Geo::GeoNodeStatusCheck do
         /Verified Repositories: /,
         /Wikis: /,
         /Verified Wikis: /,
-        /LFS Objects: /,
         /Attachments: /,
         /CI job artifacts: /,
         /Container repositories: /,

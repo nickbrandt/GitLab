@@ -162,23 +162,6 @@ RSpec.describe Geo::FileUploadService do
       include_examples 'no decoded params'
     end
 
-    context 'LFS Object' do
-      let(:lfs_object) { create(:lfs_object, :with_file) }
-      let(:params) { { id: lfs_object.id, type: 'lfs' } }
-      let(:request_data) { Gitlab::Geo::Replication::LfsTransfer.new(lfs_object).request_data }
-
-      it 'sends LFS file' do
-        service = described_class.new(params, request_data)
-
-        response = service.execute
-
-        expect(response[:code]).to eq(:ok)
-        expect(response[:file].path).to eq(lfs_object.file.path)
-      end
-
-      include_examples 'no decoded params'
-    end
-
     context 'job artifact' do
       let(:job_artifact) { create(:ci_job_artifact, :with_file) }
       let(:params) { { id: job_artifact.id, type: 'job_artifact' } }
