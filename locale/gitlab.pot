@@ -5212,6 +5212,12 @@ msgstr ""
 msgid "Change permissions"
 msgstr ""
 
+msgid "Change reviewer(s)"
+msgstr ""
+
+msgid "Change reviewer(s)."
+msgstr ""
+
 msgid "Change status"
 msgstr ""
 
@@ -5276,6 +5282,9 @@ msgid "ChangeTypeAction|Your changes will be committed to %{branchName} because 
 msgstr ""
 
 msgid "Changed assignee(s)."
+msgstr ""
+
+msgid "Changed reviewer(s)."
 msgstr ""
 
 msgid "Changed the title to \"%{title_param}\"."
