@@ -238,7 +238,7 @@ If the secondary node [has been paused](../../geo/index.md#pausing-and-resuming-
 a point-in-time recovery to the last known state.
 Data that was created on the primary while the secondary was paused will be lost.
 
-1. SSH in to the database node in the **secondary** and trigger PostgreSQL to
+1. SSH in to the Standby Leader database node in the **secondary** and trigger PostgreSQL to
    promote to read-write:
 
    ```shell
