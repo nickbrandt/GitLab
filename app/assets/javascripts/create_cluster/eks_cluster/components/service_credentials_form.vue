@@ -106,7 +106,7 @@ export default {
         )
       }}
     </p>
-    <gl-alert v-if="createRoleError" class="js-invalid-credentials" variant="danger">
+    <gl-alert v-if="createRoleError" class="js-invalid-credentials gl-mb-5" variant="danger" dismissible="false">
       {{ createRoleError }}
     </gl-alert>
     <div class="form-row">
