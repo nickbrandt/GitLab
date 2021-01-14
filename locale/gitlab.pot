@@ -12638,6 +12638,12 @@ msgstr ""
 msgid "For a faster browsing experience, some files are collapsed by default."
 msgstr ""
 
+msgid "For additional information, review your %{link_to} or contact your group owner."
+msgstr ""
+
+msgid "For additional information, review your group membership: %{link_to} or contact your group owner."
+msgstr ""
+
 msgid "For help setting up the Service Desk for your instance, please contact an administrator."
 msgstr ""
 
@@ -13731,6 +13737,12 @@ msgid "Group maintainers can register group runners in the %{link}"
 msgstr ""
 
 msgid "Group members"
+msgstr ""
+
+msgid "Group membership expiration date changed"
+msgstr ""
+
+msgid "Group membership expiration date removed"
 msgstr ""
 
 msgid "Group milestone"
@@ -32639,6 +32651,9 @@ msgstr ""
 msgid "YouTube URL or ID"
 msgstr ""
 
+msgid "Your %{group} membership will now expire in %{days}."
+msgstr ""
+
 msgid "Your %{host} account was signed in to from a new location"
 msgstr ""
 
@@ -32835,6 +32850,9 @@ msgid "Your license is valid from"
 msgstr ""
 
 msgid "Your license will be included in your GitLab backup and will survive upgrades, so in normal usage you should never need to re-upload your %{code_open}.gitlab-license%{code_close} file."
+msgstr ""
+
+msgid "Your membership in %{group} no longer expires."
 msgstr ""
 
 msgid "Your message here"
