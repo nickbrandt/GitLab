@@ -48933,8 +48933,8 @@
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "OBJECT",
-                  "name": "PackageComposerJsonType",
+                  "kind": "SCALAR",
+                  "name": "Time",
                   "ofType": null
                 }
               },
@@ -49608,8 +49608,8 @@
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Time",
+                  "kind": "OBJECT",
+                  "name": "PackageComposerJsonType",
                   "ofType": null
                 }
               },
