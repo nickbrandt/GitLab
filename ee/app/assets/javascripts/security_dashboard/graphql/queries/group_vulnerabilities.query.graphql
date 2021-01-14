@@ -1,5 +1,5 @@
 #import "~/graphql_shared/fragments/pageInfoCursorsOnly.fragment.graphql"
-#import "./vulnerability.fragment.graphql"
+#import "../fragments/vulnerability.fragment.graphql"
 
 query group(
   $fullPath: ID!

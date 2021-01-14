@@ -1,4 +1,4 @@
-#import "./project.fragment.graphql"
+#import "../fragments/project.fragment.graphql"
 
 query group($fullPath: ID!) {
   group(fullPath: $fullPath) {
