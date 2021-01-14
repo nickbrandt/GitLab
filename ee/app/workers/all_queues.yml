@@ -3,6 +3,14 @@
 #
 # Do not edit it manually!
 ---
+- :name: auto_merge:merge_trains_refresh
+  :feature_category: :continuous_integration
+  :has_external_dependencies:
+  :urgency: :low
+  :resource_boundary: :cpu
+  :weight: 3
+  :idempotent: true
+  :tags: []
 - :name: cronjob:active_user_count_threshold
   :feature_category: :provision
   :has_external_dependencies:
