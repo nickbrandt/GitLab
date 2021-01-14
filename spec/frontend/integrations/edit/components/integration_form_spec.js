@@ -1,6 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { mockIntegrationProps } from 'jest/integrations/edit/mock_data';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
+import { setHTMLFixture } from 'helpers/fixtures';
 import { createStore } from '~/integrations/edit/store';
 import IntegrationForm from '~/integrations/edit/components/integration_form.vue';
 import OverrideDropdown from '~/integrations/edit/components/override_dropdown.vue';
@@ -296,18 +297,22 @@ describe('IntegrationForm', () => {
     });
 
     describe('with `helpHtml` prop', () => {
-      const mockTestId = 'jest-helpHtml-test';
-      const mockHelpHtml = document.createElement('div');
-      mockHelpHtml.setAttribute('data-testid', mockTestId);
-      mockHelpHtml.appendChild(document.createElement('svg'));
+      const mockTestId = 'jest-help-html-test';
 
-      const mockHelpHtmlContainer = document.createElement('div');
-      mockHelpHtmlContainer.appendChild(mockHelpHtml);
+      setHTMLFixture(`
+        <div data-testid="${mockTestId}">
+          <svg class="gl-icon">
+            <use></use>
+          </svg>
+        </div>
+      `);
 
       it('renders `helpHtml`', async () => {
+        const mockHelpHtml = document.querySelector(`[data-testid="${mockTestId}"]`);
+
         createComponent({
           props: {
-            helpHtml: mockHelpHtmlContainer.innerHTML,
+            helpHtml: mockHelpHtml.outerHTML,
           },
         });
 
