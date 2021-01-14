@@ -1630,6 +1630,9 @@ msgstr ""
 msgid "Add a comment to this line"
 msgstr ""
 
+msgid "Add a comment to this line or drag for multiple lines"
+msgstr ""
+
 msgid "Add a general comment to this %{noteableDisplayName}."
 msgstr ""
 
