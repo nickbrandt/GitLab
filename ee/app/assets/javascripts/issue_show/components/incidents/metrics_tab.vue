@@ -16,6 +16,7 @@ export default {
     MetricsImage,
     UploadDropzone,
   },
+  inject: ['canUpdate', 'projectId', 'iid'],
   data() {
     return {
       currentFiles: [],
@@ -23,7 +24,6 @@ export default {
       modalUrl: '',
     };
   },
-  inject: ['canUpdate', 'projectId', 'iid'],
   store: createStore(),
   computed: {
     ...mapState(['metricImages', 'isLoadingMetricImages', 'isUploadingImage']),
