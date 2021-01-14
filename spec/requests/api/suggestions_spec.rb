@@ -71,7 +71,7 @@ RSpec.describe API::Suggestions do
 
         message = "cool custom commit message!"
 
-        put api(url, user), params: { message: message }
+        put api(url, user), params: { commit_message: message }
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(project.repository.commit.message).to eq(message)
@@ -143,7 +143,7 @@ RSpec.describe API::Suggestions do
         message = "cool custom commit message!"
 
         put api(url, user), params: { ids: [suggestion.id, suggestion2.id],
-                                      message: message }
+                                      commit_message: message }
 
         expect(response).to have_gitlab_http_status(:ok)
         expect(project.repository.commit.message).to eq(message)
