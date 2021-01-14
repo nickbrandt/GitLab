@@ -156,6 +156,9 @@ module Projects
         deployment = project.pages_deployments.create!(file: file,
                                                        file_count: entries_count,
                                                        file_sha256: sha256)
+
+        raise InvalidStateError, 'build SHA is outdated for this ref' unless latest?
+
         project.update_pages_deployment!(deployment)
       end
 
