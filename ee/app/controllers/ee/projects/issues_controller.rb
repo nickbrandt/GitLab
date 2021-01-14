@@ -48,17 +48,28 @@ module EE
         end
       end
 
-      def create_vulnerability_issue_link(issue)
+      def create_vulnerability_issue_feedback(issue)
         return unless issue.persisted? && vulnerability
 
-        result = VulnerabilityIssueLinks::CreateService.new(
+        feedback_params = {
+          issue: issue,
+          feedback_type: 'issue',
+          category: vulnerability.report_type,
+          project_fingerprint: vulnerability.finding.project_fingerprint,
+          vulnerability_data: vulnerability.as_json
+        }
+
+        feedback_params[:vulnerability_data][:vulnerability_id] = vulnerability.id
+
+        result = VulnerabilityFeedback::CreateService.new(
+          issue.project,
           current_user,
-          vulnerability,
-          issue,
-          link_type: Vulnerabilities::IssueLink.link_types[:created]
+          feedback_params
         ).execute
 
-        flash[:alert] = render_vulnerability_link_alert if result.status == :error
+        result[:message].each do |attribute, error|
+          flash[:alert] = render_vulnerability_link_alert(error)
+        end
       end
 
       def vulnerability
@@ -82,10 +93,13 @@ module EE
         )
       end
 
-      def render_vulnerability_link_alert
+      def render_vulnerability_link_alert(error_message)
         render_to_string(
           partial: 'vulnerabilities/unable_to_link_vulnerability.html.haml',
-          locals: { vulnerability_link: vulnerability_path(vulnerability) }
+          locals: {
+            vulnerability_link: vulnerability_path(vulnerability),
+            error_message: error_message
+          }
         )
       end
 
