@@ -1,58 +1,25 @@
 import { GlAlert, GlLoadingIcon, GlForm, GlFormInput } from '@gitlab/ui';
-import VueApollo from 'vue-apollo';
-import { createLocalVue, mount, shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 
 import waitForPromises from 'helpers/wait_for_promises';
-import createMockApollo from 'jest/helpers/mock_apollo_helper';
 
-import getComplianceFrameworkQuery from 'ee/groups/settings/compliance_frameworks/graphql/queries/get_compliance_framework.query.graphql';
-import createComplianceFrameworkMutation from 'ee/groups/settings/compliance_frameworks/graphql/queries/create_compliance_framework.mutation.graphql';
-import updateComplianceFrameworkMutation from 'ee/groups/settings/compliance_frameworks/graphql/queries/update_compliance_framework.mutation.graphql';
 import Form from 'ee/groups/settings/compliance_frameworks/components/form.vue';
-import { visitUrl } from '~/lib/utils/url_utility';
 import ColorPicker from '~/vue_shared/components/color_picker/color_picker.vue';
-
-import {
-  validGetResponse,
-  validGetOneResponse,
-  emptyGetResponse,
-  validCreateResponse,
-  errorCreateResponse,
-  validUpdateResponse,
-  errorUpdateResponse,
-} from '../mock_data';
-
+import { visitUrl } from '~/lib/utils/url_utility';
 import * as Sentry from '~/sentry/wrapper';
+import { frameworkFoundResponse } from '../mock_data';
 
-const localVue = createLocalVue();
-localVue.use(VueApollo);
-
-jest.mock('~/lib/utils/url_utility', () => ({
-  visitUrl: jest.fn().mockName('visitUrlMock'),
-}));
+jest.mock('~/lib/utils/url_utility');
 
 describe('Form', () => {
   let wrapper;
-  const sentryError = new Error('Network error');
-  const sentrySaveError = new Error('Invalid values given');
-  const defaultPropsData = {
-    groupPath: 'group-1',
-    groupEditPath: 'group-1/edit',
-  };
+  const service = { getComplianceFramework: jest.fn(), putComplianceFramework: jest.fn() };
+  const groupEditPath = 'group-1/edit';
 
-  const fetch = jest.fn().mockResolvedValue(validGetResponse);
-  const fetchOne = jest.fn().mockResolvedValue(validGetOneResponse);
-  const fetchEmpty = jest.fn().mockResolvedValue(emptyGetResponse);
-  const fetchLoading = jest.fn().mockResolvedValue(new Promise(() => {}));
-  const fetchWithErrors = jest.fn().mockRejectedValue(sentryError);
-
-  const create = jest.fn().mockResolvedValue(validCreateResponse);
-  const createWithNetworkErrors = jest.fn().mockRejectedValue(sentryError);
-  const createWithErrors = jest.fn().mockResolvedValue(errorCreateResponse);
-
-  const update = jest.fn().mockResolvedValue(validUpdateResponse);
-  const updateWithNetworkErrors = jest.fn().mockRejectedValue(sentryError);
-  const updateWithErrors = jest.fn().mockResolvedValue(errorUpdateResponse);
+  const networkErrorMessage = 'Network error';
+  const networkError = new Error(networkErrorMessage);
+  const saveErrorMessage = 'Unable to save this compliance framework. Please try again';
+  const saveError = new Error(saveErrorMessage);
 
   const findAlert = () => wrapper.find(GlAlert);
   const findLoadingIcon = () => wrapper.find(GlLoadingIcon);
@@ -64,25 +31,23 @@ describe('Form', () => {
   const findSubmitBtn = () => wrapper.find('[data-testid="submit-btn"]');
   const findCancelBtn = () => wrapper.find('[data-testid="cancel-btn"]');
 
-  function createMockApolloProvider(requestHandlers) {
-    localVue.use(VueApollo);
-
-    return createMockApollo(requestHandlers);
-  }
-
-  function createComponent(requestHandlers = [], props = {}, mountFn = mount) {
+  function createComponent(mountFn = mount) {
     return mountFn(Form, {
-      localVue,
-      apolloProvider: createMockApolloProvider(requestHandlers),
       propsData: {
-        ...defaultPropsData,
-        ...props,
+        groupEditPath,
+        service,
       },
       stubs: {
         GlLoadingIcon,
       },
     });
   }
+
+  const setFields = async () => {
+    await findNameInput().setValue(frameworkFoundResponse.name);
+    await findDescriptionInput().setValue(frameworkFoundResponse.description);
+    await findColorPicker().find(GlFormInput).setValue(frameworkFoundResponse.color);
+  };
 
   beforeEach(() => {
     gon.suggested_label_colors = {
@@ -99,28 +64,74 @@ describe('Form', () => {
 
   describe('loading', () => {
     beforeEach(() => {
-      wrapper = createComponent(
-        [[getComplianceFrameworkQuery, fetchLoading]],
-        {
-          id: '1',
-        },
-        shallowMount,
-      );
+      service.getComplianceFramework.mockReturnValueOnce({});
     });
 
-    it('shows the loader', () => {
+    it('shows the loader on load', () => {
+      wrapper = createComponent(shallowMount);
+
       expect(findLoadingIcon().exists()).toBe(true);
+      expect(findAlert().exists()).toBe(false);
+      expect(findForm().exists()).toBe(false);
     });
 
-    it('does not show the other parts of the app', () => {
+    it('shows the loader on form submission', async () => {
+      wrapper = createComponent();
+
+      await waitForPromises();
+
+      expect(findLoadingIcon().exists()).toBe(false);
+      expect(findAlert().exists()).toBe(false);
+      expect(findForm().exists()).toBe(true);
+
+      await setFields();
+      await findForm().trigger('submit');
+
+      expect(findLoadingIcon().exists()).toBe(true);
       expect(findAlert().exists()).toBe(false);
       expect(findForm().exists()).toBe(false);
     });
   });
 
+  describe('mount', () => {
+    it('shows an error if the `service.getComplianceFramework()` call fails', async () => {
+      jest.spyOn(Sentry, 'captureException');
+      service.getComplianceFramework.mockImplementationOnce(() => {
+        throw networkError;
+      });
+      wrapper = createComponent(shallowMount);
+
+      await waitForPromises();
+
+      expect(findLoadingIcon().exists()).toBe(false);
+      expect(findAlert().text()).toBe(
+        'Error fetching compliance frameworks data. Please refresh the page',
+      );
+      expect(Sentry.captureException.mock.calls[0][0]).toStrictEqual(networkError);
+    });
+
+    it('gets the existing compliance framework and sets the field values', async () => {
+      service.getComplianceFramework.mockReturnValueOnce(frameworkFoundResponse);
+      wrapper = createComponent(shallowMount);
+
+      await waitForPromises();
+
+      expect(findLoadingIcon().exists()).toBe(false);
+      expect(findNameInput().attributes('value')).toBe(frameworkFoundResponse.name);
+      expect(findDescriptionInput().attributes('value')).toBe(frameworkFoundResponse.description);
+      expect(findColorPicker().attributes('value')).toBe(frameworkFoundResponse.color);
+    });
+  });
+
   describe('display inputs', () => {
-    it('shows the correct input and button fields', () => {
-      wrapper = createComponent([], {}, shallowMount);
+    beforeEach(() => {
+      service.getComplianceFramework.mockReturnValueOnce({});
+    });
+
+    it('shows the correct input and button fields', async () => {
+      wrapper = createComponent(shallowMount);
+
+      await waitForPromises();
 
       expect(findLoadingIcon().exists()).toBe(false);
       expect(findNameInput()).toExist();
@@ -130,234 +141,75 @@ describe('Form', () => {
       expect(findCancelBtn()).toExist();
     });
 
-    it('shows the name input description', () => {
+    it('shows the name input description', async () => {
       wrapper = createComponent();
+
+      await waitForPromises();
 
       expect(findNameInputGroup().text()).toContain('Use :: to create a scoped set (eg. SOX::AWS)');
     });
 
     it('shows the name validation if there is no title', async () => {
       wrapper = createComponent();
+      await waitForPromises();
+
+      const feedbackElement = findNameInputGroup().find('.invalid-feedback');
+
+      expect(feedbackElement.classes()).not.toContain('d-block');
+      expect(findSubmitBtn().attributes('disabled')).toBeUndefined();
+
       const nameInput = findNameInput();
 
       await nameInput.setValue('Test');
       await nameInput.setValue('');
 
-      expect(findNameInputGroup().text()).toContain('A title is required');
+      expect(feedbackElement.classes()).toContain('d-block');
+      expect(findSubmitBtn().attributes('disabled')).toBe('disabled');
     });
   });
 
-  describe('new framework', () => {
-    const creationProps = {
-      input: {
-        namespacePath: 'group-1',
-        params: {
-          color: '#1aaa55',
-          description: 'General Data Protection Regulation',
-          name: 'GDPR',
-        },
-      },
-    };
+  describe('on submission', () => {
+    beforeEach(() => {
+      service.getComplianceFramework.mockReturnValueOnce({});
+    });
 
-    const setFields = async () => {
-      await findNameInput().setValue(creationProps.input.params.name);
-      await findDescriptionInput().setValue(creationProps.input.params.description);
-      await findColorPicker().find(GlFormInput).setValue(creationProps.input.params.color);
+    it('shows an error if the `service.putComplianceFramework()` call fails', async () => {
+      service.putComplianceFramework.mockImplementationOnce(() => {
+        throw saveError;
+      });
 
+      jest.spyOn(Sentry, 'captureException');
+      wrapper = createComponent();
+
+      await waitForPromises();
+      await setFields();
       await findForm().trigger('submit');
-    };
-
-    it('does not query for existing framework data', async () => {
-      wrapper = createComponent([[getComplianceFrameworkQuery, fetch]], {}, shallowMount);
-
       await waitForPromises();
 
       expect(findLoadingIcon().exists()).toBe(false);
-      expect(fetch).not.toHaveBeenCalled();
-    });
-
-    it('saves inputted values and redirects', async () => {
-      wrapper = createComponent([[createComplianceFrameworkMutation, create]]);
-
-      await setFields();
-      await waitForPromises();
-
-      expect(findLoadingIcon().exists()).toBe(false);
-      expect(create).toHaveBeenCalledWith(creationProps);
-      expect(visitUrl).toHaveBeenCalledWith(defaultPropsData.groupEditPath);
-    });
-
-    it('shows an error when saving fails and does not redirect', async () => {
-      jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponent([[createComplianceFrameworkMutation, createWithErrors]]);
-
-      await setFields();
-      await waitForPromises();
-
-      expect(findLoadingIcon().exists()).toBe(false);
-      expect(createWithErrors).toHaveBeenCalledWith(creationProps);
       expect(visitUrl).not.toHaveBeenCalled();
-      expect(findAlert().text()).toBe('Invalid values given');
-      expect(Sentry.captureException.mock.calls[0][0]).toStrictEqual(sentrySaveError);
+      expect(findAlert().text()).toBe(`Error: ${saveErrorMessage}`);
+      expect(Sentry.captureException.mock.calls[0][0]).toStrictEqual(saveError);
     });
 
-    it('shows an error when saving causes an exception and does not redirect', async () => {
-      jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponent([[createComplianceFrameworkMutation, createWithNetworkErrors]]);
+    it('returns a successful service response and redirects the user', async () => {
+      service.putComplianceFramework.mockReturnValueOnce({});
 
-      await setFields();
+      wrapper = createComponent();
+
       await waitForPromises();
-
-      expect(findLoadingIcon().exists()).toBe(false);
-      expect(createWithNetworkErrors).toHaveBeenCalledWith(creationProps);
-      expect(visitUrl).not.toHaveBeenCalled();
-      expect(findAlert().text()).toBe('Unable to save this compliance framework. Please try again');
-      expect(Sentry.captureException.mock.calls[0][0].networkError).toBe(sentryError);
-    });
-  });
-
-  describe('edit framework', () => {
-    const updateProps = {
-      input: {
-        id: 'gid://gitlab/ComplianceManagement::Framework/1',
-        params: {
-          color: '#000000',
-          description: 'Test description',
-          name: 'Test',
-        },
-      },
-    };
-
-    const setFields = async () => {
-      await findNameInput().setValue(updateProps.input.params.name);
-      await findDescriptionInput().setValue(updateProps.input.params.description);
-      await findColorPicker().find(GlFormInput).setValue(updateProps.input.params.color);
-
+      await setFields();
       await findForm().trigger('submit');
-    };
-
-    it('queries for existing framework data and sets the correct values in the input fields', async () => {
-      wrapper = createComponent(
-        [[getComplianceFrameworkQuery, fetchOne]],
-        { id: '1' },
-        shallowMount,
-      );
-
       await waitForPromises();
 
+      expect(service.putComplianceFramework).toHaveBeenCalledWith({
+        name: frameworkFoundResponse.name,
+        description: frameworkFoundResponse.description,
+        color: frameworkFoundResponse.color,
+      });
       expect(findLoadingIcon().exists()).toBe(false);
-      expect(fetchOne).toHaveBeenCalledTimes(1);
-      expect(findNameInput().attributes('value')).toBe('GDPR');
-      expect(findDescriptionInput().attributes('value')).toBe('General Data Protection Regulation');
-      expect(findColorPicker().attributes('value')).toBe('#1aaa55');
-    });
-
-    it('shows an error if the existing framework query returns no data', async () => {
-      jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponent(
-        [[getComplianceFrameworkQuery, fetchEmpty]],
-        { id: '1' },
-        shallowMount,
-      );
-
-      await waitForPromises();
-
-      expect(findLoadingIcon().exists()).toBe(false);
-      expect(fetchEmpty).toHaveBeenCalledTimes(1);
-      expect(findAlert().text()).toBe(
-        'Error fetching compliance frameworks data. Please refresh the page',
-      );
-      expect(Sentry.captureException.mock.calls[0][0]).toStrictEqual(
-        new Error(
-          'Unknown compliance framework given. Please try a different framework or refresh the page',
-        ),
-      );
-    });
-
-    it('shows an error if the existing framework query fails', async () => {
-      jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponent(
-        [[getComplianceFrameworkQuery, fetchWithErrors]],
-        {
-          id: '1',
-        },
-        shallowMount,
-      );
-
-      await waitForPromises();
-
-      expect(findLoadingIcon().exists()).toBe(false);
-      expect(fetchWithErrors).toHaveBeenCalledTimes(1);
-      expect(findAlert().text()).toBe(
-        'Error fetching compliance frameworks data. Please refresh the page',
-      );
-      expect(Sentry.captureException.mock.calls[0][0].networkError).toBe(sentryError);
-    });
-
-    it('saves inputted values and redirects', async () => {
-      wrapper = createComponent(
-        [
-          [getComplianceFrameworkQuery, fetchOne],
-          [updateComplianceFrameworkMutation, update],
-        ],
-        {
-          id: '1',
-        },
-      );
-
-      await waitForPromises();
-      await setFields();
-      await waitForPromises();
-
-      expect(findLoadingIcon().exists()).toBe(false);
-      expect(update).toHaveBeenCalledWith(updateProps);
-      expect(visitUrl).toHaveBeenCalledWith(defaultPropsData.groupEditPath);
-    });
-
-    it('shows an error when saving fails and does not redirect', async () => {
-      jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponent(
-        [
-          [getComplianceFrameworkQuery, fetchOne],
-          [updateComplianceFrameworkMutation, updateWithErrors],
-        ],
-        {
-          id: '1',
-        },
-      );
-
-      await waitForPromises();
-      await setFields();
-      await waitForPromises();
-
-      expect(findLoadingIcon().exists()).toBe(false);
-      expect(updateWithErrors).toHaveBeenCalledWith(updateProps);
-      expect(visitUrl).not.toHaveBeenCalled();
-      expect(findAlert().text()).toBe('Invalid values given');
-      expect(Sentry.captureException.mock.calls[0][0]).toStrictEqual(sentrySaveError);
-    });
-
-    it('shows an error when saving causes an exception and does not redirect', async () => {
-      jest.spyOn(Sentry, 'captureException');
-      wrapper = createComponent(
-        [
-          [getComplianceFrameworkQuery, fetchOne],
-          [updateComplianceFrameworkMutation, updateWithNetworkErrors],
-        ],
-        {
-          id: '1',
-        },
-      );
-
-      await waitForPromises();
-      await setFields();
-      await waitForPromises();
-
-      expect(findLoadingIcon().exists()).toBe(false);
-      expect(updateWithNetworkErrors).toHaveBeenCalledWith(updateProps);
-      expect(visitUrl).not.toHaveBeenCalled();
-      expect(findAlert().text()).toBe('Unable to save this compliance framework. Please try again');
-      expect(Sentry.captureException.mock.calls[0][0].networkError).toBe(sentryError);
+      expect(findAlert().exists()).toBe(false);
+      expect(visitUrl).toHaveBeenCalledWith(groupEditPath);
     });
   });
 });

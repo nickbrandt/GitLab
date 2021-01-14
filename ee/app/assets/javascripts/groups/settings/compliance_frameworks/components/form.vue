@@ -53,12 +53,15 @@ export default {
 
       return true;
     },
+    disableSubmitBtn() {
+      return !this.complianceFramework?.title?.length && !this.validTitle;
+    },
     scopedLabelsHelpPath() {
       return helpPagePath('user/project/labels.md', { anchor: 'scoped-labels' });
     },
     isLoading() {
       return !this.isLoaded;
-    }
+    },
   },
   async mounted() {
     this.isLoaded = false;
@@ -149,9 +152,13 @@ export default {
       <div
         class="gl-display-flex gl-justify-content-space-between gl-pt-5 gl-border-t-1 gl-border-t-solid gl-border-t-gray-100"
       >
-        <gl-button type="submit" variant="success" data-testid="submit-btn">{{
-          $options.i18n.submitBtnText
-        }}</gl-button>
+        <gl-button
+          type="submit"
+          variant="success"
+          data-testid="submit-btn"
+          :disabled="disableSubmitBtn"
+          >{{ $options.i18n.submitBtnText }}</gl-button
+        >
         <gl-button :href="groupEditPath" data-testid="cancel-btn">{{
           $options.i18n.cancelBtnText
         }}</gl-button>

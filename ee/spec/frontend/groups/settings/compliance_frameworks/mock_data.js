@@ -41,6 +41,14 @@ export const emptyGetResponse = {
   },
 };
 
+export const frameworkFoundResponse = {
+  id: 'gid://gitlab/ComplianceManagement::Framework/1',
+  name: 'GDPR',
+  description: 'General Data Protection Regulation',
+  color: '#1aaa55',
+  parsedId: 1,
+};
+
 export const validGetOneResponse = {
   data: {
     namespace: {
@@ -105,6 +113,28 @@ export const errorUpdateResponse = {
       clientMutationId: null,
       errors: ['Invalid values given'],
       __typename: 'UpdateComplianceFrameworkPayload',
+    },
+  },
+};
+
+export const createData = {
+  input: {
+    namespacePath: 'group-1',
+    params: {
+      color: '#1aaa55',
+      description: 'General Data Protection Regulation',
+      name: 'GDPR',
+    },
+  },
+};
+
+export const updateData = {
+  input: {
+    id: 'gid://gitlab/ComplianceManagement::Framework/1',
+    params: {
+      color: '#000000',
+      description: 'Test description',
+      name: 'Test',
     },
   },
 };

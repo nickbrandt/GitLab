@@ -8,7 +8,7 @@ import updateComplianceFrameworkMutation from '../graphql/queries/update_complia
 export default class ComplianceFrameworksService {
   #graphQlIdType = 'ComplianceManagement::Framework';
 
-  constructor(client, groupPath, id) {
+  constructor(client, groupPath, id = null) {
     this.client = client;
     this.groupPath = groupPath;
     this.id = id;
@@ -56,20 +56,31 @@ export default class ComplianceFrameworksService {
       ? this.updateMutationVariables(framework)
       : this.createMutationVariables(framework);
 
-    const { data } = await this.client.mutate({
-      mutation,
-      variables,
-    });
+    let response = {};
+
+    try {
+      response = await this.client.mutate({
+        mutation,
+        variables,
+      });
+    } catch (e) {
+      throw new Error(this.#i18n.saveError);
+    }
 
     const errors = this.id
-      ? data?.updateComplianceFramework?.errors
-      : data?.createComplianceFramework?.errors || [];
+      ? response.data?.updateComplianceFramework?.errors
+      : response.data?.createComplianceFramework?.errors || [];
 
     if (errors.length) {
       throw new Error(errors[0]);
     }
 
-    return this.id ? data?.updateComplianceFramework : data?.createComplianceFramework;
+    return this.id
+      ? {}
+      : {
+          ...response.data?.createComplianceFramework?.framework,
+          parsedId: getIdFromGraphQLId(response.data?.createComplianceFramework?.framework.id),
+        };
   }
 
   createMutationVariables(framework) {
