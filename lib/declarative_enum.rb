@@ -76,11 +76,7 @@ module DeclarativeEnum
   end
 
   class Builder
-    class KeyCollisionError < StandardError
-      def initialize(key)
-        super("`#{key}` collides with an existing enum key!")
-      end
-    end
+    KeyCollisionError = Class.new(StandardError)
 
     def initialize(definition, block)
       @definition = definition
@@ -96,7 +92,7 @@ module DeclarativeEnum
     private
 
     def method_missing(name, *arguments, value: nil, description: nil, &block)
-      raise KeyCollisionError.new(name) if @definition[name.downcase.to_sym]
+      raise KeyCollisionError, "'#{key}' collides with an existing enum key!" if @definition[name.downcase.to_sym]
 
       @definition[name.downcase.to_sym] = {
         value: value,
