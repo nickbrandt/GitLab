@@ -65808,12 +65808,6 @@
           "interfaces": null,
           "enumValues": [
             {
-              "name": "ALERTS_SERVICE",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "ASANA_SERVICE",
               "description": null,
               "isDeprecated": false,

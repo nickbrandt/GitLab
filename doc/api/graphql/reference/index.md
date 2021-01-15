@@ -4868,7 +4868,6 @@ State of a Sentry error.
 
 | Value | Description |
 | ----- | ----------- |
-| `ALERTS_SERVICE` |  |
 | `ASANA_SERVICE` |  |
 | `ASSEMBLA_SERVICE` |  |
 | `BAMBOO_SERVICE` |  |
