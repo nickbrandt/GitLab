@@ -26818,9 +26818,6 @@ msgstr ""
 msgid "Stage"
 msgstr ""
 
-msgid "Stage & Commit"
-msgstr ""
-
 msgid "Stage data updated"
 msgstr ""
 
