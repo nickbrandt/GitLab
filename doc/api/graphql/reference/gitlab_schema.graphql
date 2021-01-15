@@ -16051,6 +16051,11 @@ type Note implements ResolvableInterface {
   updatedAt: Time!
 
   """
+  URL to view this Note in the Web UI
+  """
+  url: String
+
+  """
   Permissions for the current user on the resource
   """
   userPermissions: NotePermissions!
