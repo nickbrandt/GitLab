@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe GroupMemberPolicy do
+  include DesignManagementTestHelpers
+
   let(:guest) { create(:user) }
   let(:owner) { create(:user) }
   let(:group) { create(:group, :private) }
@@ -34,8 +36,35 @@ RSpec.describe GroupMemberPolicy do
     let(:membership) { guest.members.first }
 
     it do
-      expect_disallowed(*member_related_permissions)
+      expect_disallowed(:read_design_activity, *member_related_permissions)
       expect_allowed(:read_group)
+    end
+
+    context 'design management is enabled' do
+      before do
+        create(:project, :public, group: group) # Necessary to enable design management
+        enable_design_management
+      end
+
+      specify do
+        expect_allowed(:read_design_activity)
+      end
+    end
+
+    context 'for a private group' do
+      let(:group) { create(:group, :private) }
+
+      specify do
+        expect_disallowed(:read_group, *member_related_permissions)
+      end
+    end
+
+    context 'for an internal group' do
+      let(:group) { create(:group, :internal) }
+
+      specify do
+        expect_disallowed(:read_group, *member_related_permissions)
+      end
     end
   end
 
