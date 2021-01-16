@@ -358,47 +358,21 @@ RSpec.describe Gitlab::Ci::Config::Entry::Processable do
           end
         end
 
-        context 'when root yaml variables are used' do
-          let(:variables) do
-            Gitlab::Ci::Config::Entry::Variables.new(
-              { A: 'root', C: 'root', D: 'root' }
-            ).value
-          end
+        context 'when deps has variables' do
+          let(:variables) { { 'A' => 'root', 'C' => 'root' } }
 
-          it 'does return all variables and overwrite them' do
+          it 'returns total variables' do
             expect(entry.value).to include(
-              variables: { 'A' => 'job', 'B' => 'job', 'C' => 'root', 'D' => 'root' }
+              variables: { 'A' => 'job', 'B' => 'job', 'C' => 'root' }
             )
           end
 
-          context 'when inherit of defaults is disabled' do
-            let(:config) do
-              {
-                variables: { A: 'job', B: 'job' },
-                inherit: { variables: false }
-              }
-            end
-
-            it 'does return only job variables' do
-              expect(entry.value).to include(
-                variables: { 'A' => 'job', 'B' => 'job' }
-              )
-            end
-          end
-
-          context 'when inherit of only specific variable is enabled' do
-            let(:config) do
-              {
-                variables: { A: 'job', B: 'job' },
-                inherit: { variables: ['D'] }
-              }
-            end
-
-            it 'does return only job variables' do
-              expect(entry.value).to include(
-                variables: { 'A' => 'job', 'B' => 'job', 'D' => 'root' }
-              )
-            end
+          it 'returns total variables with detail' do
+            expect(entry.value[:variables_with_detail]).to match_array(
+              [{ key: 'A', value: 'job', public: true, source: 'job' },
+               { key: 'B', value: 'job', public: true, source: 'job' },
+               { key: 'C', value: 'root', public: true, source: 'workflow' }]
+            )
           end
         end
       end
@@ -464,7 +438,8 @@ RSpec.describe Gitlab::Ci::Config::Entry::Processable do
             name: :rspec,
             stage: 'test',
             only: { refs: %w[branches tags] },
-            variables: {}
+            variables: {},
+            variables_with_detail: []
           )
         end
       end

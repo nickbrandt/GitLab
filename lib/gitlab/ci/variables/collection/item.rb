@@ -5,7 +5,7 @@ module Gitlab
     module Variables
       class Collection
         class Item
-          def initialize(key:, value:, public: true, file: false, masked: false)
+          def initialize(key:, value:, public: true, file: false, masked: false, source: nil)
             raise ArgumentError, "`#{key}` must be of type String or nil value, while it was: #{value.class}" unless
               value.is_a?(String) || value.nil?
 

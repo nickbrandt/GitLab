@@ -68,7 +68,7 @@ module Gitlab
             when: job[:when] || 'on_success',
             environment: job[:environment_name],
             coverage_regex: job[:coverage],
-            yaml_variables: transform_to_yaml_variables(job[:variables]),
+            yaml_variables: job[:variables_with_detail],
             needs_attributes: job.dig(:needs, :job),
             interruptible: job[:interruptible],
             only: job[:only],

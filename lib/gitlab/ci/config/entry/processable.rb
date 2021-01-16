@@ -123,7 +123,8 @@ module Gitlab
               stage: stage_value,
               extends: extends,
               rules: rules_value,
-              variables: root_and_job_variables_value,
+              variables: root_and_job_variables_value.to_h,
+              variables_with_detail: variables_with_detail,
               only: only_value,
               except: except_value }.compact
           end
@@ -135,6 +136,20 @@ module Gitlab
             end
 
             root_variables.merge(variables_value.to_h)
+          end
+
+          def variables_with_detail
+            root_variables = @root_variables_value.to_h.map do |key, value|
+              next unless inherit_entry&.variables_entry&.inherit?(key)
+
+              [key, { key: key, value: value, public: true, source: 'workflow' }]
+            end.to_h
+
+            job_variables = variables_value.to_h.map do |key, value|
+              [key, { key: key, value: value, public: true, source: 'job' }]
+            end.to_h
+
+            root_variables.merge(job_variables).values
           end
 
           def manual_action?
