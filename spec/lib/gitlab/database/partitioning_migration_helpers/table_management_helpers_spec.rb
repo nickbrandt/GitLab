@@ -513,7 +513,7 @@ RSpec.describe Gitlab::Database::PartitioningMigrationHelpers::TableManagementHe
     context 'finishing pending background migration jobs' do
       let(:source_table_double) { double('table name') }
       let(:raw_arguments) { [1, 50_000, source_table_double, partitioned_table, source_column] }
-      let(:background_job) { double('background job', args: raw_arguments) }
+      let(:background_job) { double('background job', args: ['background jobs', raw_arguments]) }
 
       before do
         allow(migration).to receive(:table_exists?).with(partitioned_table).and_return(true)
