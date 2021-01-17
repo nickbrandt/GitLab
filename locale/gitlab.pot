@@ -13373,9 +13373,6 @@ msgstr ""
 msgid "GitLabPages|It may take up to 30 minutes before the site is available after the first deployment."
 msgstr ""
 
-msgid "GitLabPages|Learn how to upload your static site and have it served by GitLab by following the %{link_start}documentation on GitLab Pages%{link_end}."
-msgstr ""
-
 msgid "GitLabPages|Learn more."
 msgstr ""
 
@@ -13401,6 +13398,9 @@ msgid "GitLabPages|Removing pages will prevent them from being exposed to the ou
 msgstr ""
 
 msgid "GitLabPages|Save"
+msgstr ""
+
+msgid "GitLabPages|See the %{docs_link_start}GitLab Pages documentation%{docs_link_end} to learn how to upload your static site and have it served by GitLab. You can also follow a %{samples_link_start}sample project%{samples_link_end} or use a %{templates_link_start}GitLab CI template%{templates_link_end}."
 msgstr ""
 
 msgid "GitLabPages|Something went wrong while obtaining the Let's Encrypt certificate for %{domain}. To retry visit your %{link_start}domain details%{link_end}."
