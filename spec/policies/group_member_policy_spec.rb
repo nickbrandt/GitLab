@@ -55,7 +55,7 @@ RSpec.describe GroupMemberPolicy do
       let(:group) { create(:group, :private) }
 
       specify do
-        expect_disallowed(:read_group, *member_related_permissions)
+        expect_disallowed(:read_group, :read_design_activity, *member_related_permissions)
       end
     end
 
