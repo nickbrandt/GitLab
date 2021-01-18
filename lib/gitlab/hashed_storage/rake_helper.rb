@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'find'
-
 module Gitlab
   module HashedStorage
     module RakeHelper
@@ -96,34 +94,28 @@ module Gitlab
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
-      def self.prune(relation_name, relation)
-        root = ENV['GDK_REPOSITORY_ROOT'].presence || '../repositories'
-        dry_run = !ENV['FORCE'].present?
+      def self.prune(relation_name, relation, dry_run: true, root: nil)
+        root ||= '../repositories'
 
         known_paths = Set.new
         listing(relation_name, relation) { |p| known_paths << "#{root}/#{p.repository.disk_path}" }
 
-        marked_for_deletion = Set.new
-        prefix_length = Pathname.new(root).ascend.count
-
-        Find.find("#{root}/@hashed") do |path|
-          path = Pathname.new(path)
-          next unless path.directory?
-
-          path.ascend do |p|
-            base = p.to_s.gsub(/\.(\w+\.)?git$/, '')
-            Find.prune if known_paths.include?(base)
-          end
-
-          if path.ascend.count == prefix_length + 4
-            marked_for_deletion << path
-            Find.prune
-          end
+        marked_for_deletion = Set.new(Dir["#{root}/@hashed/*/*/*"])
+        marked_for_deletion.reject! do |path|
+          base = path.gsub(/\.(\w+\.)?git$/, '')
+          known_paths.include?(base)
         end
 
-        $stdout.puts "Dry run. We would have deleted:" if dry_run
+        if marked_for_deletion.empty?
+          $stdout.puts "No orphaned directories found. Nothing to do!"
+        else
+          n = marked_for_deletion.size
+          $stdout.puts "Found #{n} orphaned #{'directory'.pluralize(n)}"
+          $stdout.puts "Dry run. (Run again with FORCE=1 to delete). We would have deleted:" if dry_run
+        end
 
         marked_for_deletion.each do |p|
+          p = Pathname.new(p)
           if dry_run
             $stdout.puts " - #{p}"
           else
