@@ -4,11 +4,11 @@ require 'spec_helper'
 
 RSpec.describe Admin::DevOpsReportController do
   describe 'show_adoption?' do
-    it 'is false unless the license feature is disabledhttps://gitlab.com/gitlab-org/gitlab/-/issues/298884' do
+    it "is false if license feature 'devops_adoption' is disabled" do
       expect(controller.show_adoption?).to be false
     end
 
-    context 'the license feature is enabled' do
+    context "'devops_adoption' license feature is enabled" do
       before do
         stub_licensed_features(devops_adoption: true)
       end
@@ -19,11 +19,11 @@ RSpec.describe Admin::DevOpsReportController do
         expect(controller.show_adoption?).to be true
       end
 
-      it 'is true if the feature is enabled' do
+      it "is true if the 'devops_adoption_feature' feature is enabled" do
         expect(controller.show_adoption?).to be true
       end
 
-      it 'is false if the feature is disabled' do
+      it "is false if the 'devops_adoption_feature' feature is disabled" do
         stub_feature_flags(devops_adoption_feature: false)
 
         expect(controller.show_adoption?).to be false
