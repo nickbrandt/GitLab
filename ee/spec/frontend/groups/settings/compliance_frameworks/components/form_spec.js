@@ -155,6 +155,7 @@ describe('Form', () => {
 
       const feedbackElement = findNameInputGroup().find('.invalid-feedback');
 
+      await findColorPicker().vm.$emit('validation', true);
       expect(feedbackElement.classes()).not.toContain('d-block');
       expect(findSubmitBtn().attributes('disabled')).toBeUndefined();
 
@@ -165,6 +166,17 @@ describe('Form', () => {
 
       expect(feedbackElement.classes()).toContain('d-block');
       expect(findSubmitBtn().attributes('disabled')).toBe('disabled');
+    });
+
+    it('disables the submit button when the color picker is invalid', async () => {
+      wrapper = createComponent(shallowMount);
+      await waitForPromises();
+
+      await findColorPicker().vm.$emit('validation', true);
+      expect(findSubmitBtn().attributes('disabled')).toBeUndefined();
+
+      await findColorPicker().vm.$emit('validation', false);
+      expect(findSubmitBtn().attributes('disabled')).toBe('true');
     });
   });
 

@@ -43,6 +43,7 @@ export default {
       complianceFramework: {},
       error: '',
       isLoaded: false,
+      validColor: null,
     };
   },
   computed: {
@@ -54,7 +55,7 @@ export default {
       return true;
     },
     disableSubmitBtn() {
-      return !this.complianceFramework?.title?.length && !this.validTitle;
+      return (!this.complianceFramework?.title?.length && !this.validTitle) || !this.validColor;
     },
     scopedLabelsHelpPath() {
       return helpPagePath('user/project/labels.md', { anchor: 'scoped-labels' });
@@ -92,6 +93,9 @@ export default {
       }
 
       this.isLoaded = true;
+    },
+    colorValidation(valid) {
+      this.validColor = valid;
     },
   },
   i18n: {
@@ -147,6 +151,7 @@ export default {
         v-model="complianceFramework.color"
         :label="$options.i18n.colorInputLabel"
         :set-color="complianceFramework.color"
+        @validation="colorValidation"
       />
 
       <div
