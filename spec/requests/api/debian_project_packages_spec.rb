@@ -36,16 +36,16 @@ RSpec.describe API::DebianProjectPackages do
       it_behaves_like 'Debian project repository GET endpoint', :success, 'TODO File'
     end
 
-    describe 'PUT projects/:id/packages/debian/incoming/:file_name' do
+    describe 'PUT projects/:id/packages/debian/:file_name' do
       let(:method) { :put }
-      let(:url) { "/projects/#{project.id}/packages/debian/incoming/#{file_name}" }
+      let(:url) { "/projects/#{project.id}/packages/debian/#{file_name}" }
 
       it_behaves_like 'Debian project repository PUT endpoint', :created, nil
     end
 
-    describe 'PUT projects/:id/packages/debian/incoming/:file_name/authorize' do
+    describe 'PUT projects/:id/packages/debian/:file_name/authorize' do
       let(:method) { :put }
-      let(:url) { "/projects/#{project.id}/packages/debian/incoming/#{file_name}/authorize" }
+      let(:url) { "/projects/#{project.id}/packages/debian/#{file_name}/authorize" }
 
       it_behaves_like 'Debian project repository PUT endpoint', :created, nil, is_authorize: true
     end
