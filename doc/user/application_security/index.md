@@ -317,7 +317,7 @@ Selecting the button creates a merge request with the solution.
 > - It's not recommended for production use.
 > - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-auto-fix-merge-requests). **(CORE ONLY)**
 
-When the auto-fix feature is enabled, remediation merge requests will be automatically created
+When the auto-fix feature is enabled, remediation merge requests are automatically created
 whenever a vulnerability is detected.
 
 This feature is enabled by default but can be opted-out from the project's settings by unchecking
