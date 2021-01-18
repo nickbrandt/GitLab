@@ -20367,6 +20367,11 @@ type Query {
   """
   users(
     """
+    Return only admin users.
+    """
+    admins: Boolean = false
+
+    """
     Returns the elements in the list that come after the specified cursor.
     """
     after: String
