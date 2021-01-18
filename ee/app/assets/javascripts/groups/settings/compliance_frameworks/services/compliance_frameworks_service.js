@@ -53,7 +53,7 @@ export default class ComplianceFrameworksService {
       ? updateComplianceFrameworkMutation
       : createComplianceFrameworkMutation;
     const variables = this.id
-      ? this.updateMutationVariables(framework)
+      ? ComplianceFrameworksService.updateMutationVariables(framework)
       : this.createMutationVariables(framework);
 
     let response = {};
@@ -96,7 +96,7 @@ export default class ComplianceFrameworksService {
     };
   }
 
-  updateMutationVariables(framework) {
+  static updateMutationVariables(framework) {
     return {
       input: {
         id: framework.id,
