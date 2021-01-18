@@ -13400,7 +13400,7 @@ msgstr ""
 msgid "GitLabPages|Save"
 msgstr ""
 
-msgid "GitLabPages|See the %{docs_link_start}GitLab Pages documentation%{docs_link_end} to learn how to upload your static site and have it served by GitLab. You can also follow a %{samples_link_start}sample project%{samples_link_end} or use a %{templates_link_start}GitLab CI template%{templates_link_end}."
+msgid "GitLabPages|See the %{docs_link_start}GitLab Pages documentation%{link_end} to learn how to upload your static site and have it served by GitLab. You can also follow a %{samples_link_start}sample project%{link_end} or use a %{templates_link_start}GitLab CI template%{link_end}."
 msgstr ""
 
 msgid "GitLabPages|Something went wrong while obtaining the Let's Encrypt certificate for %{domain}. To retry visit your %{link_start}domain details%{link_end}."
