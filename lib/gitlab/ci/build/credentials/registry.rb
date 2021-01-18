@@ -8,7 +8,7 @@ module Gitlab
           attr_reader :username, :password
 
           def initialize(build)
-            @username = 'gitlab-ci-token'
+            @username = ::Gitlab::Auth::CI_JOB_USER
             @password = build.token
           end
 
@@ -18,6 +18,10 @@ module Gitlab
 
           def valid?
             Gitlab.config.registry.enabled
+          end
+
+          def type
+            'registry'
           end
         end
       end
