@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import Vue, { nextTick } from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 import mountComponent from 'helpers/vue_mount_component_helper';
 import Api from '~/api';
@@ -185,7 +185,7 @@ describe('mrWidgetOptions', () => {
           describe('when merge request is opened', () => {
             beforeEach((done) => {
               vm.mr.isOpen = true;
-              vm.$nextTick(done);
+              nextTick(done);
             });
 
             it('should render collaboration status', () => {
@@ -196,7 +196,7 @@ describe('mrWidgetOptions', () => {
           describe('when merge request is not opened', () => {
             beforeEach((done) => {
               vm.mr.isOpen = false;
-              vm.$nextTick(done);
+              nextTick(done);
             });
 
             it('should not render collaboration status', () => {
@@ -213,7 +213,7 @@ describe('mrWidgetOptions', () => {
           describe('when merge request is opened', () => {
             beforeEach((done) => {
               vm.mr.isOpen = true;
-              vm.$nextTick(done);
+              nextTick(done);
             });
 
             it('should not render collaboration status', () => {
@@ -229,7 +229,7 @@ describe('mrWidgetOptions', () => {
             Vue.set(vm.mr, 'mergePipelinesEnabled', true);
             Vue.set(vm.mr, 'sourceProjectId', 1);
             Vue.set(vm.mr, 'targetProjectId', 1);
-            vm.$nextTick(done);
+            nextTick(done);
           });
 
           it('should be false', () => {
@@ -242,7 +242,7 @@ describe('mrWidgetOptions', () => {
             Vue.set(vm.mr, 'mergePipelinesEnabled', false);
             Vue.set(vm.mr, 'sourceProjectId', 1);
             Vue.set(vm.mr, 'targetProjectId', 2);
-            vm.$nextTick(done);
+            nextTick(done);
           });
 
           it('should be false', () => {
@@ -255,7 +255,7 @@ describe('mrWidgetOptions', () => {
             Vue.set(vm.mr, 'mergePipelinesEnabled', true);
             Vue.set(vm.mr, 'sourceProjectId', 1);
             Vue.set(vm.mr, 'targetProjectId', 2);
-            vm.$nextTick(done);
+            nextTick(done);
           });
 
           it('should be true', () => {
@@ -298,7 +298,7 @@ describe('mrWidgetOptions', () => {
         it('should tell service to check status if document is visible', () => {
           vm.checkStatus(cb);
 
-          return vm.$nextTick().then(() => {
+          return nextTick().then(() => {
             expect(vm.service.checkStatus).toHaveBeenCalled();
             expect(vm.mr.setData).toHaveBeenCalled();
             expect(vm.handleNotification).toHaveBeenCalledWith(mockData);
@@ -339,7 +339,7 @@ describe('mrWidgetOptions', () => {
 
           vm.fetchPreMergeDeployments();
 
-          return vm.$nextTick().then(() => {
+          return nextTick().then(() => {
             expect(vm.service.fetchDeployments).toHaveBeenCalled();
             expect(vm.mr.deployments.length).toEqual(1);
             expect(vm.mr.deployments[0].id).toBe(1);
@@ -355,7 +355,7 @@ describe('mrWidgetOptions', () => {
 
           vm.fetchActionsContent();
 
-          return vm.$nextTick().then(() => {
+          return nextTick().then(() => {
             expect(vm.service.fetchMergeActionsContent).toHaveBeenCalled();
             expect(document.body.textContent).toContain('hello world');
           });
@@ -517,7 +517,7 @@ describe('mrWidgetOptions', () => {
         `,
           mentioned: '',
         };
-        Vue.nextTick(done);
+        nextTick(done);
       });
 
       it('renders if there are relatedLinks', () => {
@@ -526,7 +526,7 @@ describe('mrWidgetOptions', () => {
 
       it('does not render if state is nothingToMerge', (done) => {
         vm.mr.state = stateKey.nothingToMerge;
-        Vue.nextTick(() => {
+        nextTick(() => {
           expect(vm.$el.querySelector('.close-related-link')).toBeNull();
           done();
         });
@@ -539,7 +539,7 @@ describe('mrWidgetOptions', () => {
         vm.mr.shouldRemoveSourceBranch = true;
         vm.mr.state = 'readyToMerge';
 
-        vm.$nextTick(() => {
+        nextTick(() => {
           const tooltip = vm.$el.querySelector('[data-testid="question-o-icon"]');
 
           expect(vm.$el.textContent).toContain('Deletes source branch');
@@ -556,7 +556,7 @@ describe('mrWidgetOptions', () => {
         vm.mr.shouldRemoveSourceBranch = true;
         vm.mr.state = 'merged';
 
-        vm.$nextTick(() => {
+        nextTick(() => {
           expect(vm.$el.textContent).toContain('The source branch has been deleted');
           expect(vm.$el.textContent).not.toContain('Deletes source branch');
 
@@ -606,7 +606,7 @@ describe('mrWidgetOptions', () => {
           },
         );
 
-        vm.$nextTick(done);
+        nextTick(done);
       });
 
       it('renders multiple deployments', () => {
@@ -738,7 +738,7 @@ describe('mrWidgetOptions', () => {
             },
             cancel_path: '/root/ci-web-terminal/pipelines/127/cancel',
           };
-          vm.$nextTick(done);
+          nextTick(done);
         });
 
         it('renders pipeline block', () => {
@@ -779,7 +779,7 @@ describe('mrWidgetOptions', () => {
               },
             ];
 
-            vm.$nextTick(done);
+            nextTick(done);
           });
 
           it('renders post deployment information', () => {
@@ -792,7 +792,7 @@ describe('mrWidgetOptions', () => {
         beforeEach((done) => {
           vm.mr.state = 'merged';
 
-          vm.$nextTick(done);
+          nextTick(done);
         });
 
         it('does not render pipeline block', () => {
@@ -804,7 +804,7 @@ describe('mrWidgetOptions', () => {
         beforeEach((done) => {
           vm.mr.state = 'archived';
 
-          vm.$nextTick(done);
+          nextTick(done);
         });
 
         it('does not render pipeline block', () => {
@@ -884,7 +884,7 @@ describe('mrWidgetOptions', () => {
       ])('with %s, should not suggest pipeline', async (obj) => {
         Object.assign(vm.mr, obj);
 
-        await vm.$nextTick();
+        await nextTick();
 
         expect(findSuggestPipeline()).toBeNull();
       });
@@ -892,7 +892,7 @@ describe('mrWidgetOptions', () => {
       it('should allow dismiss of the suggest pipeline message', async () => {
         findSuggestPipelineButton().click();
 
-        await vm.$nextTick();
+        await nextTick();
 
         expect(findSuggestPipeline()).toBeNull();
       });
