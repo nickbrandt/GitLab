@@ -49,9 +49,9 @@ module Gitlab
     # reset. This is a standardized HTTP header:
     # https://tools.ietf.org/html/rfc7231#page-69
     #
-    # - RateLimit-Reset: the point of time that the quest quota is reset, in Unix time
+    # - RateLimit-Reset: the point of time that the request quota is reset, in Unix time
     #
-    # - RateLimit-ResetTime: the point of time that the quest quota is reset, in HTTP date format
+    # - RateLimit-ResetTime: the point of time that the request quota is reset, in HTTP date format
     def self.throttled_response_headers(matched, match_data)
       # Match data example:
       # {:discriminator=>"127.0.0.1", :count=>12, :period=>60 seconds, :limit=>1, :epoch_time=>1609833930}
@@ -62,7 +62,7 @@ module Gitlab
       observed = match_data[:count]
       now = match_data[:epoch_time]
       retry_after = period - (now % period)
-      reset_time = Time.at(now + (period - now % period)) # rubocop:disable Rails/TimeZone
+      reset_time = Time.at(now + retry_after) # rubocop:disable Rails/TimeZone
       {
         'RateLimit-Name' => matched.to_s,
         'RateLimit-Limit' => rounded_limit.to_s,
