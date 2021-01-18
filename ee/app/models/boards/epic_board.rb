@@ -14,5 +14,9 @@ module Boards
     def lists
       epic_lists
     end
+
+    def board_type
+      'epic'
+    end
   end
 end

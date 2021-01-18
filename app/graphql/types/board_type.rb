@@ -27,6 +27,11 @@ module Types
           resolver: Resolvers::BoardListsResolver,
           extras: [:lookahead]
 
+    field :board_type,
+          ::Types::Boards::TypeEnum,
+          null: true,
+          description: 'Type of board'
+
     field :web_path, GraphQL::STRING_TYPE, null: false,
           description: 'Web path of the board.'
 

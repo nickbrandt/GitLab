@@ -41,4 +41,8 @@ RSpec.describe Board do
       expect { project.boards.first_board.find(board_A.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  it_behaves_like '#board_type', 'issue' do
+    subject { build(:board) }
+  end
 end

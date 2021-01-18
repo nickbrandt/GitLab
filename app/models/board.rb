@@ -41,6 +41,10 @@ class Board < ApplicationRecord
     lists.merge(List.closed).take
   end
 
+  def board_type
+    'issue'
+  end
+
   def scoped?
     false
   end

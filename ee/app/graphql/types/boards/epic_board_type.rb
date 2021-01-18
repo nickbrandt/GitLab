@@ -21,6 +21,11 @@ module Types
             description: 'Epic board lists.',
             extras: [:lookahead],
             resolver: Resolvers::Boards::EpicListsResolver
+
+      field :board_type,
+            ::Types::Boards::TypeEnum,
+            null: true,
+            description: 'Type of board'
     end
   end
 end

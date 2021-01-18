@@ -243,6 +243,7 @@ Represents a project or group board.
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `assignee` | User | The board assignee |
+| `boardType` | BoardTypeEnum | Type of board |
 | `epics` | BoardEpicConnection | Epics associated with board issues |
 | `hideBacklogList` | Boolean | Whether or not backlog list is hidden |
 | `hideClosedList` | Boolean | Whether or not closed list is hidden |
@@ -1410,6 +1411,7 @@ Represents an epic board.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
+| `boardType` | BoardTypeEnum | Type of board |
 | `id` | BoardsEpicBoardID! | Global ID of the board. |
 | `lists` | EpicListConnection | Epic board lists. |
 | `name` | String | Name of the board. |
@@ -4296,6 +4298,15 @@ Types of blob viewers.
 | `auxiliary` |  |
 | `rich` |  |
 | `simple` |  |
+
+### BoardTypeEnum
+
+The type of object the board can display.
+
+| Value | Description |
+| ----- | ----------- |
+| `EPIC` | Epic board |
+| `ISSUE` | Issue board |
 
 ### CiConfigStatus
 

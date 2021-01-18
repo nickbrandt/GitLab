@@ -23,4 +23,8 @@ RSpec.describe Boards::EpicBoard do
       expect(described_class.order_by_name_asc).to eq [board2, board3, board1]
     end
   end
+
+  it_behaves_like '#board_type', 'epic' do
+    subject { build(:epic_board) }
+  end
 end

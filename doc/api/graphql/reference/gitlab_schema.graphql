@@ -1261,6 +1261,11 @@ type Board {
   assignee: User
 
   """
+  Type of board
+  """
+  boardType: BoardTypeEnum
+
+  """
   Epics associated with board issues
   """
   epics(
@@ -2249,6 +2254,21 @@ type BoardListUpdateLimitMetricsPayload {
   The updated list.
   """
   list: BoardList
+}
+
+"""
+The type of object the board can display
+"""
+enum BoardTypeEnum {
+  """
+  Epic board
+  """
+  EPIC
+
+  """
+  Issue board
+  """
+  ISSUE
 }
 
 """
@@ -8584,6 +8604,11 @@ type EpicAddIssuePayload {
 Represents an epic board
 """
 type EpicBoard {
+  """
+  Type of board
+  """
+  boardType: BoardTypeEnum
+
   """
   Global ID of the board.
   """
