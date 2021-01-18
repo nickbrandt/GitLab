@@ -42,20 +42,33 @@ RSpec.describe ProtectedBranches::CreateService do
       context "when available" do
         before do
           stub_licensed_features(code_owner_approval_required: true)
+          params[:code_owner_approval_required] = code_owner_approval_required
         end
 
-        it "sets code_owner_approval_required to true when param is true" do
-          params[:code_owner_approval_required] = true
+        context "when code_owner_approval_required param is true" do
+          let(:code_owner_approval_required) { true }
 
-          expect { service.execute }.to change(ProtectedBranch, :count).by(1)
-          expect(ProtectedBranch.last.code_owner_approval_required).to be_truthy
+          it "sets code_owner_approval_required to true" do
+            expect { service.execute }.to change(ProtectedBranch, :count).by(1)
+            expect(ProtectedBranch.last.code_owner_approval_required).to be_truthy
+          end
+
+          it_behaves_like 'records an onboarding progress action', :code_owners_enabled do
+            let(:namespace) { target_project.namespace }
+
+            subject { service.execute }
+          end
         end
 
-        it "sets code_owner_approval_required to false when param is false" do
-          params[:code_owner_approval_required] = false
+        context "when code_owner_approval_required param is false" do
+          let(:code_owner_approval_required) { false }
 
-          expect { service.execute }.to change(ProtectedBranch, :count).by(1)
-          expect(ProtectedBranch.last.code_owner_approval_required).to be_falsy
+          it "sets code_owner_approval_required to false" do
+            expect { service.execute }.to change(ProtectedBranch, :count).by(1)
+            expect(ProtectedBranch.last.code_owner_approval_required).to be_falsy
+          end
+
+          it_behaves_like 'does not record an onboarding progress action'
         end
       end
     end
