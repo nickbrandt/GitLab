@@ -15898,6 +15898,9 @@ msgstr ""
 msgid "Integrations|This integration, and inheriting projects were reset."
 msgstr ""
 
+msgid "Integrations|This requires mirroring your GitHub repository to this project. %{docs_link}"
+msgstr ""
+
 msgid "Integrations|To keep this project going, create a new issue."
 msgstr ""
 
