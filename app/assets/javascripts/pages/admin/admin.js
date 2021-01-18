@@ -12,8 +12,6 @@ function showDenylistType() {
 }
 
 export default function adminInit() {
-  const modal = $('.change-owner-holder');
-
   $('input#user_force_random_password').on('change', function randomPasswordClick() {
     const $elems = $('#user_password, #user_password_confirmation');
     if ($(this).attr('checked')) {
@@ -26,18 +24,6 @@ export default function adminInit() {
   $('body').on('click', '.js-toggle-colors-link', (e) => {
     e.preventDefault();
     $('.js-toggle-colors-container').toggleClass('hide');
-  });
-
-  $('.change-owner-link').on('click', function changeOwnerLinkClick(e) {
-    e.preventDefault();
-    $(this).hide();
-    modal.show();
-  });
-
-  $('.change-owner-cancel-link').on('click', (e) => {
-    e.preventDefault();
-    modal.hide();
-    $('.change-owner-link').show();
   });
 
   $('li.project_member, li.group_member').on('ajax:success', refreshCurrentPage);
