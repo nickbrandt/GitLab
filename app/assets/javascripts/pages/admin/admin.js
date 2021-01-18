@@ -28,24 +28,6 @@ export default function adminInit() {
     $('.js-toggle-colors-container').toggleClass('hide');
   });
 
-  $('.log-tabs a').on('click', function logTabsClick(e) {
-    e.preventDefault();
-    $(this).tab('show');
-  });
-
-  $('.log-bottom').on('click', (e) => {
-    e.preventDefault();
-    const $visibleLog = $('.file-content:visible');
-
-    // eslint-disable-next-line no-jquery/no-animate
-    $visibleLog.animate(
-      {
-        scrollTop: $visibleLog.find('ol').height(),
-      },
-      'fast',
-    );
-  });
-
   $('.change-owner-link').on('click', function changeOwnerLinkClick(e) {
     e.preventDefault();
     $(this).hide();
