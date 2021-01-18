@@ -315,7 +315,7 @@ Selecting the button creates a merge request with the solution.
 > - It's [deployed behind a feature flag](../../user/feature_flags.md), disabled by default.
 > - It's disabled on GitLab.com.
 > - It's not recommended for production use.
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-auto-fix-merge-requests). **(CORE ONLY)**
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-auto-fix-merge-requests). **(ULTIMATE ONLY)**
 
 When the auto-fix feature is enabled, remediation merge requests are automatically created
 whenever a vulnerability is detected.
@@ -331,7 +331,7 @@ will still apply.
 Auto-fix merge requests are authored by the [**GitLab Security Bot**](security_bot) user and labeled with the
 `gitlab-vulnerability-auto-fix` label.
 
-##### Enable or disable Auto-fix merge requests **(CORE ONLY)**
+##### Enable or disable Auto-fix merge requests **(ULTIMATE ONLY)**
 
 Auto-fix merge requests is under development and not ready for production use. It is
 deployed behind a feature flag that is **disabled by default**.
@@ -341,13 +341,13 @@ can enable it.
 To enable it:
 
 ```ruby
-Feature.enable(:secure_vulnerability_autofix_indicator)
+Feature.enable(:security_auto_fix)
 ```
 
 To disable it:
 
 ```ruby
-Feature.disable(:secure_vulnerability_autofix_indicator)
+Feature.disable(:security_auto_fix)
 ```
 
 #### Manually applying the suggested patch
