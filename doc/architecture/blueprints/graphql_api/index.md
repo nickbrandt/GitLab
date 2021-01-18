@@ -33,7 +33,7 @@ The [retrospective on our progress](https://gitlab.com/gitlab-org/gitlab/-/issue
 surfaced a few opportunities to streamline our GraphQL development efforts and
 to reduce the risk of performance degradations and possibile outages that may
 be related to the gaps in the essential mechanisms needed to make the GraphQL
-API observable nad operable at scale.
+API observable and operable at scale.
 
 Amongst small improvement to the GraphQL engine itself we want to build a
 comprehensive monitoring dashboard, that will enable team members to make sense
@@ -67,7 +67,7 @@ prerequisite for improving performance and reliability of that service.
 We do not yet have tools that would make it possible for us to answer a
 question of how GraphQL performs and what are the bottlenecks we should
 optimize. This, combined with a pace of GraphQL adoption and the scale in which
-we expect it operate in, imposes a risk of an increased rate of production
+we expect it operate, imposes a risk of an increased rate of production
 incidents what will be difficult to resolve.
 
 We want to build a comprehensive Grafana dashboard that will focus on
@@ -139,7 +139,7 @@ state synchronization mechanisms and hooking into existing ones.
 ## Iterations
 
 1. Build comprehensive Grafana dashboard for GraphQL
-1. Ingest and index GraphQL queriesand in Elastic
+1. Ingest and index GraphQL queries in Elastic
 1. Build a scalable GraphQL state synchronization
 1. Design a better deprecation policy and monitoring
 1. Collaborate with AppSec Team to make GraphQL secure by default
