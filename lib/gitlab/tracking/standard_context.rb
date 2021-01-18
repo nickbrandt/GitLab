@@ -15,6 +15,14 @@ module Gitlab
         SnowplowTracker::SelfDescribingJson.new(GITLAB_STANDARD_SCHEMA_URL, to_h)
       end
 
+      def environment
+        return 'production' if Gitlab.com_and_canary?
+
+        return 'staging' if Gitlab.staging?
+
+        'development'
+      end
+
       private
 
       def to_h
