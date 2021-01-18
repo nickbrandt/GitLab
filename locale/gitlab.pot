@@ -10854,13 +10854,13 @@ msgstr ""
 msgid "End Time"
 msgstr ""
 
-msgid "Ends at %{endsAt}"
-msgstr ""
-
 msgid "Ends at (UTC)"
 msgstr ""
 
 msgid "Ends on"
+msgstr ""
+
+msgid "Ends: %{endsAt}"
 msgstr ""
 
 msgid "Enforce DNS rebinding attack protection"
@@ -15522,6 +15522,9 @@ msgid "Invalid input, please avoid emojis"
 msgstr ""
 
 msgid "Invalid login or password"
+msgstr ""
+
+msgid "Invalid period"
 msgstr ""
 
 msgid "Invalid pin code"
@@ -26935,13 +26938,13 @@ msgstr ""
 msgid "Starts %{startsIn}"
 msgstr ""
 
-msgid "Starts at %{startsAt}"
-msgstr ""
-
 msgid "Starts at (UTC)"
 msgstr ""
 
 msgid "Starts on"
+msgstr ""
+
+msgid "Starts: %{startsAt}"
 msgstr ""
 
 msgid "State your message to activate"
