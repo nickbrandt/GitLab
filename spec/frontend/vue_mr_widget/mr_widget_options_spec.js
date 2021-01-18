@@ -504,29 +504,22 @@ describe('MrWidgetOptions', () => {
     });
 
     describe('rendering relatedLinks', () => {
-      beforeEach((done) => {
-        wrapper.vm.mr.relatedLinks = {
-          assignToMe: null,
-          closing: `
-          <a class="close-related-link" href="#">
-            Close
-          </a>
-        `,
-          mentioned: '',
-        };
-        nextTick(done);
+      beforeEach(() => {
+        createComponent({
+          ...mockData,
+          issues_links: {
+            closing: `
+              <a class="close-related-link" href="#">
+                Close
+              </a>
+            `,
+          },
+        });
+
+        return nextTick();
       });
 
-      // This test was previously written using the toBeDefined() matcher. In
-      // migrating this suite to @vue/test-utils, the matcher had to be
-      // changed, which causes this test to fail. This is because the
-      // toBeDefined() matcher was was incorrectly passing before: it checks
-      // that the result is not `undefined`, and since `querySelector` can only
-      // return `null` or an `HTMLElement`, it could never fail. So, at some
-      // point, the expected behavior was broken or removed in the
-      // implementation.
-      // eslint-disable-next-line jest/no-disabled-tests
-      it.skip('renders if there are relatedLinks', () => {
+      it('renders if there are relatedLinks', () => {
         expect(wrapper.find('.close-related-link').exists()).toBe(true);
       });
 
