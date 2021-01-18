@@ -6,9 +6,9 @@ import updateComplianceFrameworkMutation from 'ee/groups/settings/compliance_fra
 import ComplianceFrameworksService from 'ee/groups/settings/compliance_frameworks/services/compliance_frameworks_service';
 
 import {
-  validGetOneResponse,
+  validFetchOneResponse,
   frameworkFoundResponse,
-  emptyGetResponse,
+  emptyFetchResponse,
   validCreateResponse,
   errorCreateResponse,
   validUpdateResponse,
@@ -27,8 +27,8 @@ describe('ComplianceFrameworksService', () => {
 
   const clientNetworkError = jest.fn().mockRejectedValue(networkError);
 
-  const fetch = jest.fn().mockResolvedValue(validGetOneResponse);
-  const fetchEmpty = jest.fn().mockResolvedValue(emptyGetResponse);
+  const fetch = jest.fn().mockResolvedValue(validFetchOneResponse);
+  const fetchEmpty = jest.fn().mockResolvedValue(emptyFetchResponse);
 
   const create = jest.fn().mockResolvedValue(validCreateResponse);
   const createWithErrors = jest.fn().mockResolvedValue(errorCreateResponse);

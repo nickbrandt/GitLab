@@ -1,4 +1,4 @@
-export const validGetResponse = {
+export const validFetchResponse = {
   data: {
     namespace: {
       id: 'gid://gitlab/Group/1',
@@ -27,7 +27,7 @@ export const validGetResponse = {
   },
 };
 
-export const emptyGetResponse = {
+export const emptyFetchResponse = {
   data: {
     namespace: {
       id: 'gid://group-1/Group/1',
@@ -49,7 +49,7 @@ export const frameworkFoundResponse = {
   parsedId: 1,
 };
 
-export const validGetOneResponse = {
+export const validFetchOneResponse = {
   data: {
     namespace: {
       id: 'gid://gitlab/Group/1',
