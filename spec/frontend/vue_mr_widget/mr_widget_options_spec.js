@@ -858,10 +858,6 @@ describe('MrWidgetOptions', () => {
   describe('suggestPipeline', () => {
     beforeEach(() => {
       mock.onAny().reply(200);
-
-      // This is needed because some grandchildren Bootstrap components throw warnings
-      // https://gitlab.com/gitlab-org/gitlab/issues/208458
-      jest.spyOn(console, 'warn').mockImplementation();
     });
 
     describe('given feature flag is enabled', () => {
