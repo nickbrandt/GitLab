@@ -44,18 +44,8 @@ applyGitLabUIConfig();
 window.jQuery = jQuery;
 window.$ = jQuery;
 
-function disableJQueryAnimations() {
-  $.fx.off = true;
-}
-
-// Disable jQuery animations
-if (gon?.disable_animations) {
-  disableJQueryAnimations();
-}
-
 // inject test utilities if necessary
 if (process.env.NODE_ENV !== 'production' && gon?.test_env) {
-  disableJQueryAnimations();
   import(/* webpackMode: "eager" */ './test_utils/');
 }
 
