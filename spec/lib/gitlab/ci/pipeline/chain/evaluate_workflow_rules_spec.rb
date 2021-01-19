@@ -39,8 +39,7 @@ RSpec.describe Gitlab::Ci::Pipeline::Chain::EvaluateWorkflowRules do
       before do
         allow(step).to receive(:workflow_rules_result)
           .and_return(
-            double(pass?: true,
-                   pipeline_attributes: {})
+            double(pass?: true, variables: {})
           )
 
         step.perform!
@@ -65,12 +64,11 @@ RSpec.describe Gitlab::Ci::Pipeline::Chain::EvaluateWorkflowRules do
         pipeline.yaml_variables = [{ key: 'VAR1', value: 'val1', public: true }]
       end
 
-      context "when rules don't return yaml variables" do
+      context "when rules doesn't return yaml variables" do
         before do
           allow(step).to receive(:workflow_rules_result)
             .and_return(
-              double(pass?: true,
-                     pipeline_attributes: {})
+              double(pass?: true, variables: {})
             )
         end
 
@@ -85,8 +83,7 @@ RSpec.describe Gitlab::Ci::Pipeline::Chain::EvaluateWorkflowRules do
         before do
           allow(step).to receive(:workflow_rules_result)
             .and_return(
-              double(pass?: true,
-                     pipeline_attributes: { yaml_variables: [{ key: 'VAR1', value: 'val2', public: true }] })
+              double(pass?: true, variables: { 'VAR1' => 'val2' })
             )
         end
 

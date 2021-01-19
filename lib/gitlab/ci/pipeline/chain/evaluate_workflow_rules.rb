@@ -23,11 +23,7 @@ module Gitlab
           private
 
           def apply_rules
-            @pipeline.assign_attributes(rules_attributes)
-          end
-
-          def rules_attributes
-            workflow_rules_result.pipeline_attributes(yaml_variables: @pipeline.yaml_variables)
+            @pipeline.yaml_variables = merge_variables(@pipeline.yaml_variables, workflow_rules_result.variables)
           end
 
           def workflow_passed?
