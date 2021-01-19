@@ -22,12 +22,13 @@ export default {
     GlLink,
     GlSprintf,
   },
-  inject: ['configureAgentHelpPath', 'createAgentHelpPath', 'projectPath'],
+  inject: {
+    configureAgentHelpPath: { type: String, default: '' },
+    createAgentHelpPath: { type: String, default: '' },
+    projectPath: { type: String, default: '' },
+  },
   props: {
-    policyAlert: {
-      type: Boolean,
-      required: true,
-    },
+    policyAlert: { type: Boolean, required: true },
   },
   apollo: {
     isAgentInstalled: {
@@ -52,10 +53,22 @@ export default {
 
 <template>
   <div>
-    <gl-alert v-if="policyAlert" variant="warning" :dismissible="false" class="gl-mt-5">
+    <gl-alert
+      v-if="policyAlert"
+      variant="warning"
+      :dismissible="false"
+      class="gl-mt-5"
+      data-testid="policy-alert-high-volume"
+    >
       {{ $options.i18n.HIGH_VOLUME_WARNING }}
     </gl-alert>
-    <gl-alert v-if="!isAgentInstalled" variant="danger" :dismissible="false" class="gl-mt-5">
+    <gl-alert
+      v-if="!isAgentInstalled"
+      variant="danger"
+      :dismissible="false"
+      class="gl-mt-5"
+      data-testid="policy-alert-no-agent"
+    >
       <gl-sprintf :message="$options.i18n.AGENT_REQUIRED">
         <template #installLink="{ content }">
           <gl-link :href="createAgentHelpPath" target="_blank">
@@ -88,7 +101,7 @@ export default {
         class="gl-w-full gl-display-flex gl-justify-content-space-between gl-align-items-center"
       >
         <span>
-          <gl-sprintf :message="$options.i18n.ACTION">
+          <gl-sprintf :message="$options.i18n.ACTION" data-testid="policy-alert-message">
             <template #label="{ content }">
               <label for="actionType" class="text-uppercase gl-font-lg gl-mr-4 gl-mb-0">
                 {{ content }}

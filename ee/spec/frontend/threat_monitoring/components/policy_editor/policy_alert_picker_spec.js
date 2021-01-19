@@ -1,32 +1,60 @@
-import { shallowMount } from '@vue/test-utils';
-import { GlAlert, GlSprintf } from '@gitlab/ui';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import createMockApollo from 'helpers/mock_apollo_helper';
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
+import VueApollo from 'vue-apollo';
 import PolicyAlertPicker from 'ee/threat_monitoring/components/policy_editor/policy_alert_picker.vue';
+import getAgentCount from 'ee/threat_monitoring/graphql/queries/get_agent_count.query.graphql';
+
+const localVue = createLocalVue();
+localVue.use(VueApollo);
 
 describe('PolicyAlertPicker component', () => {
   let wrapper;
 
+  const createMockApolloProvider = ({ agentCount }) => {
+    const getAgentCountHandler = jest
+      .fn()
+      .mockResolvedValue({ data: { project: { clusterAgents: { count: agentCount } } } });
+
+    return createMockApollo([[getAgentCount, getAgentCountHandler]]);
+  };
+
   const defaultProps = { policyAlert: false };
 
   const findAddAlertButton = () => wrapper.find("[data-testid='add-alert']");
-  const findGlAlert = () => wrapper.find(GlAlert);
-  const findGlSprintf = () => wrapper.find(GlSprintf);
+  const findAlertMessage = () => wrapper.findByTestId('policy-alert-message');
+  const findHighVolumeAlert = () => wrapper.findByTestId('policy-alert-high-volume');
+  const findNoAgentAlert = () => wrapper.findByTestId('policy-alert-no-agent');
   const findRemoveAlertButton = () => wrapper.find("[data-testid='remove-alert']");
 
-  const createWrapper = ({ propsData = defaultProps } = {}) => {
-    wrapper = shallowMount(PolicyAlertPicker, {
-      propsData: {
-        ...propsData,
-      },
-    });
+  const createWrapper = async ({ propsData = defaultProps, agentCount = 1 } = {}) => {
+    const apolloProvider = createMockApolloProvider({ agentCount });
+
+    wrapper = extendedWrapper(
+      shallowMount(PolicyAlertPicker, {
+        apolloProvider,
+        localVue,
+        propsData: {
+          ...propsData,
+        },
+        provide: {
+          configureAgentHelpPath: '',
+          createAgentHelpPath: '',
+          projectPath: '',
+        },
+      }),
+    );
+    await wrapper.vm.$nextTick();
   };
 
   afterEach(() => {
     wrapper.destroy();
+    wrapper = null;
   });
 
   describe('default state', () => {
-    beforeEach(() => {
-      createWrapper();
+    beforeEach(async () => {
+      await createWrapper();
     });
 
     it('does render the add alert button', () => {
@@ -34,15 +62,19 @@ describe('PolicyAlertPicker component', () => {
     });
 
     it('does not render the high volume warning', () => {
-      expect(findGlAlert().exists()).toBe(false);
+      expect(findHighVolumeAlert().exists()).toBe(false);
     });
 
     it('does not render the alert message', () => {
-      expect(findGlSprintf().exists()).toBe(false);
+      expect(findAlertMessage().exists()).toBe(false);
     });
 
     it('does not render the remove alert button', () => {
       expect(findRemoveAlertButton().exists()).toBe(false);
+    });
+
+    it('does not show the "no agent" alert when there is an agent, ', () => {
+      expect(findNoAgentAlert().exists()).toBe(false);
     });
 
     it('does emit an event to add the alert', () => {
@@ -52,8 +84,8 @@ describe('PolicyAlertPicker component', () => {
   });
 
   describe('alert enabled', () => {
-    beforeEach(() => {
-      createWrapper({ propsData: { policyAlert: true } });
+    beforeEach(async () => {
+      await createWrapper({ propsData: { policyAlert: true } });
     });
 
     it('does not render the add alert button', () => {
@@ -61,20 +93,36 @@ describe('PolicyAlertPicker component', () => {
     });
 
     it('does render the high volume warning', () => {
-      expect(findGlAlert().exists()).toBe(true);
+      expect(findHighVolumeAlert().exists()).toBe(true);
     });
 
     it('does render the alert message', () => {
-      expect(findGlSprintf().exists()).toBe(true);
+      expect(findAlertMessage().exists()).toBe(true);
     });
 
     it('does render the remove alert button', () => {
       expect(findRemoveAlertButton().exists()).toBe(true);
     });
 
+    it('does not show the "no agent" alert when there is an agent, ', () => {
+      expect(findNoAgentAlert().exists()).toBe(false);
+    });
+
     it('does emit an event to remove the alert', () => {
       findRemoveAlertButton().vm.$emit('click');
       expect(wrapper.emitted('update-alert')).toEqual([[false]]);
+    });
+  });
+
+  describe('no agent installed', () => {
+    it('add alert button is there and there is NOT an agent', async () => {
+      await createWrapper({ agentCount: 0 });
+      expect(findNoAgentAlert().exists()).toBe(true);
+    });
+
+    it('add alert button is NOT there and there is NOT an agent', async () => {
+      await createWrapper({ propsData: { policyAlert: true }, agentCount: 0 });
+      expect(findNoAgentAlert().exists()).toBe(true);
     });
   });
 });
