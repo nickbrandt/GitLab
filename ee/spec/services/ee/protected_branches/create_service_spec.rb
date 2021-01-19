@@ -33,7 +33,7 @@ RSpec.describe ProtectedBranches::CreateService do
           params[:code_owner_approval_required] = true
         end
 
-        it "ignores incoming params and sets code_owner_approval_required to false" do
+        it "ignores incoming params and sets code_owner_approval_required to false", :aggregate_failures do
           expect { service.execute }.to change(ProtectedBranch, :count).by(1)
           expect(ProtectedBranch.last.code_owner_approval_required).to be_falsy
         end
@@ -48,7 +48,7 @@ RSpec.describe ProtectedBranches::CreateService do
         context "when code_owner_approval_required param is true" do
           let(:code_owner_approval_required) { true }
 
-          it "sets code_owner_approval_required to true" do
+          it "sets code_owner_approval_required to true", :aggregate_failures do
             expect { service.execute }.to change(ProtectedBranch, :count).by(1)
             expect(ProtectedBranch.last.code_owner_approval_required).to be_truthy
           end
@@ -63,7 +63,7 @@ RSpec.describe ProtectedBranches::CreateService do
         context "when code_owner_approval_required param is false" do
           let(:code_owner_approval_required) { false }
 
-          it "sets code_owner_approval_required to false" do
+          it "sets code_owner_approval_required to false", :aggregate_failures do
             expect { service.execute }.to change(ProtectedBranch, :count).by(1)
             expect(ProtectedBranch.last.code_owner_approval_required).to be_falsy
           end
@@ -82,7 +82,7 @@ RSpec.describe ProtectedBranches::CreateService do
         )
       end
 
-      it "calls MergeRequest::SyncCodeOwnerApprovalRules to update open MRs" do
+      it "calls MergeRequest::SyncCodeOwnerApprovalRules to update open MRs", :aggregate_failures do
         expect(::MergeRequests::SyncCodeOwnerApprovalRules).to receive(:new).with(merge_request).and_call_original
         expect { service.execute }.to change(ProtectedBranch, :count).by(1)
       end
@@ -93,7 +93,7 @@ RSpec.describe ProtectedBranches::CreateService do
             params[:name] = wildcard
           end
 
-          it "calls MergeRequest::SyncCodeOwnerApprovalRules to update open MRs for #{wildcard}" do
+          it "calls MergeRequest::SyncCodeOwnerApprovalRules to update open MRs for #{wildcard}", :aggregate_failures do
             expect(::MergeRequests::SyncCodeOwnerApprovalRules).to receive(:new).with(merge_request).and_call_original
             expect { service.execute }.to change(ProtectedBranch, :count).by(1)
           end
