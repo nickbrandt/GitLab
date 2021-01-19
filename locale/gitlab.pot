@@ -18469,9 +18469,6 @@ msgstr ""
 msgid "ModalButton|Add projects"
 msgstr ""
 
-msgid "Modal|Cancel"
-msgstr ""
-
 msgid "Modal|Close"
 msgstr ""
 
