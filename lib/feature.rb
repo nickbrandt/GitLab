@@ -54,11 +54,12 @@ class Feature
       persisted_names.include?(feature_name.to_s)
     end
 
-    # use `default_enabled: true` to default the flag to being `enabled`
-    # unless set explicitly.  The default is `disabled`
-    # TODO: remove the `default_enabled:` and read it from the `defintion_yaml`
-    # check: https://gitlab.com/gitlab-org/gitlab/-/issues/30228
     def enabled?(key, thing = nil, type: :development, default_enabled: false)
+      # Display a warning if the `default_enabled` isn't a default value
+      if default_enabled != false && type != :licensed
+        warn "WARNING: The argument `default_enabled` in `Feature.enabled?` is ignored. The `default_enabled` is going to be set to the value specified in `#{key}.yaml` file."
+      end
+
       if check_feature_flags_definition?
         if thing && !thing.respond_to?(:flipper_id)
           raise InvalidFeatureFlagError,
@@ -68,8 +69,8 @@ class Feature
         Feature::Definition.valid_usage!(key, type: type, default_enabled: default_enabled)
       end
 
-      # If `default_enabled: :yaml` we fetch the value from the YAML definition instead.
-      default_enabled = Feature::Definition.default_enabled?(key) if default_enabled == :yaml
+      # :licensed features do not have FF definition YAML file
+      default_enabled = Feature::Definition.default_enabled?(key) if type != :licensed
 
       # During setup the database does not exist yet. So we haven't stored a value
       # for the feature yet and return the default.
