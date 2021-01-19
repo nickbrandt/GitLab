@@ -1,6 +1,7 @@
 import { GlAlert } from '@gitlab/ui';
 import { shallowMount } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import ThreatMonitoringAlerts from 'ee/threat_monitoring/components/alerts/alerts.vue';
 import ThreatMonitoringApp from 'ee/threat_monitoring/components/app.vue';
 import ThreatMonitoringFilters from 'ee/threat_monitoring/components/threat_monitoring_filters.vue';
@@ -38,27 +39,29 @@ describe('ThreatMonitoringApp component', () => {
 
     jest.spyOn(store, 'dispatch').mockImplementation();
 
-    wrapper = shallowMount(ThreatMonitoringApp, {
-      propsData: {
-        defaultEnvironmentId,
-        chartEmptyStateSvgPath,
-        emptyStateSvgPath,
-        wafNoDataSvgPath,
-        networkPolicyNoDataSvgPath,
-        newPolicyPath,
-        showUserCallout: true,
-        userCalloutId,
-        userCalloutsPath,
-        ...propsData,
-      },
-      provide: {
-        documentationPath,
-        glFeatures: { threatMonitoringAlerts: false },
-        ...provide,
-      },
-      store,
-      stubs,
-    });
+    wrapper = extendedWrapper(
+      shallowMount(ThreatMonitoringApp, {
+        propsData: {
+          defaultEnvironmentId,
+          chartEmptyStateSvgPath,
+          emptyStateSvgPath,
+          wafNoDataSvgPath,
+          networkPolicyNoDataSvgPath,
+          newPolicyPath,
+          showUserCallout: true,
+          userCalloutId,
+          userCalloutsPath,
+          ...propsData,
+        },
+        provide: {
+          documentationPath,
+          glFeatures: { threatMonitoringAlerts: false },
+          ...provide,
+        },
+        store,
+        stubs,
+      }),
+    );
   };
 
   const findAlert = () => wrapper.find(GlAlert);
@@ -69,8 +72,8 @@ describe('ThreatMonitoringApp component', () => {
   const findNetworkPolicySection = () => wrapper.find({ ref: 'networkPolicySection' });
   const findNoEnvironmentEmptyStates = () => wrapper.findAll(NoEnvironmentEmptyState);
   const findNetworkPolicyTab = () => wrapper.find({ ref: 'networkPolicyTab' });
-  const findAlertTab = () => wrapper.find('[data-testid="threat-monitoring-alerts-tab"]');
-  const findStatisticsTab = () => wrapper.find('[data-testid="threat-monitoring-statistics-tab"]');
+  const findAlertTab = () => wrapper.findByTestId('threat-monitoring-alerts-tab');
+  const findStatisticsTab = () => wrapper.findByTestId('threat-monitoring-statistics-tab');
 
   afterEach(() => {
     wrapper.destroy();
@@ -93,7 +96,7 @@ describe('ThreatMonitoringApp component', () => {
         expect(store.dispatch).not.toHaveBeenCalled();
       });
 
-      it('shows the no environment empty state', () => {
+      it('shows the "no environment" empty state', () => {
         expect(findNoEnvironmentEmptyStates().length).toBe(2);
       });
 

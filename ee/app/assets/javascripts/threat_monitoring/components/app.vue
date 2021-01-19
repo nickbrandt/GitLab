@@ -170,7 +170,7 @@ export default {
         data-testid="threat-monitoring-statistics-tab"
       >
         <no-environment-empty-state v-if="!isSetUpMaybe" />
-        <div v-else>
+        <template v-else>
           <threat-monitoring-filters />
 
           <threat-monitoring-section
@@ -206,7 +206,7 @@ export default {
             :documentation-path="documentationPath"
             documentation-anchor="container-network-policy"
           />
-        </div>
+        </template>
       </gl-tab>
     </gl-tabs>
   </section>
