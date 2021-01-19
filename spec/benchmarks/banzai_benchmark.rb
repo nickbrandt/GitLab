@@ -12,6 +12,8 @@ if ENV.key?('BENCHMARK')
   #
   # Run by:
   #   BENCHMARK=1 rspec spec/benchmarks/banzai_benchmark.rb
+  # or
+  #   rake benchmark:banzai
   #
   RSpec.describe 'GitLab Markdown Benchmark', :aggregate_failures do
     include MarkupHelper
