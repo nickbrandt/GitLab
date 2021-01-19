@@ -46,11 +46,7 @@ module Security
       end
 
       def collect_analyzer_values(config, key)
-        analyzer_variables = config['analyzers']
-          &.select {|a| a['enabled'] && a['variables'] }
-          &.flat_map {|a| a['variables'] }
-          &.collect {|v| [v['field'], v[key]] }.to_h
-
+        analyzer_variables = analyzer_variables_for(config, key)
         analyzer_variables['SAST_EXCLUDED_ANALYZERS'] = if key == 'value'
                                                           config['analyzers']
                                                           &.reject {|a| a['enabled'] }
@@ -62,6 +58,13 @@ module Security
                                                         end
 
         analyzer_variables
+      end
+
+      def analyzer_variables_for(config, key)
+        config['analyzers']
+          &.select {|a| a['enabled'] && a['variables'] }
+          &.flat_map {|a| a['variables'] }
+          &.collect {|v| [v['field'], v[key]] }.to_h
       end
 
       def update_existing_content!

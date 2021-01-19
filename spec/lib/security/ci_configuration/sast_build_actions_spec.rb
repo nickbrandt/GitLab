@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'fast_spec_helper'
+require 'spec_helper'
 
 RSpec.describe Security::CiConfiguration::SastBuildActions do
   let(:default_sast_values) do
@@ -308,7 +308,9 @@ RSpec.describe Security::CiConfiguration::SastBuildActions do
       subject(:result) { described_class.new(auto_devops_enabled, params, gitlab_ci_content).generate }
 
       before do
-        allow_any_instance_of(described_class).to receive(:auto_devops_stages).and_return(fast_auto_devops_stages)
+        allow_next_instance_of(described_class) do |sast_build_actions|
+          allow(sast_build_actions).to receive(:auto_devops_stages).and_return(fast_auto_devops_stages)
+        end
       end
 
       it 'generates the correct YML' do
