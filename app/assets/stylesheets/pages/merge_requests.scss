@@ -221,7 +221,7 @@ $mr-widget-min-height: 69px;
 
   .mr-widget-pipeline-graph {
     .dropdown-menu {
-      z-index: 300;
+      z-index: $zindex-dropdown-menu;
     }
   }
 
