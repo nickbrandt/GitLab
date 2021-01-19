@@ -21,7 +21,7 @@ describe('WebIDE', () => {
 
     store.state.currentProjectId = 'abcproject';
     store.state.currentBranchId = 'master';
-    store.state.projects.abcproject = { ...projData };
+    store.state.projects.abcproject = projData && { ...projData };
     store.state.trees['abcproject/master'] = {
       tree: [],
       loading: false,
@@ -161,13 +161,13 @@ describe('WebIDE', () => {
     expect(findAlert().text()).toBe(Ide.MSG_CANNOT_PUSH_CODE);
   });
 
-  it('when user can push code, no alert is shown', () => {
+  it.each`
+    desc                           | projData
+    ${'when user can push code'}   | ${{ userPermissions: { pushCode: true } }}
+    ${'when project is not ready'} | ${null}
+  `('$desc, no alert is shown', ({ projData }) => {
     createComponent({
-      projData: {
-        userPermissions: {
-          pushCode: true,
-        },
-      },
+      projData,
     });
 
     expect(findAlert().exists()).toBe(false);

@@ -71,6 +71,7 @@ export default {
       'allBlobs',
       'emptyRepo',
       'currentTree',
+      'hasCurrentProject',
       'editorTheme',
       'getUrlForPath',
     ]),
