@@ -123,7 +123,7 @@ RSpec.describe InviteMembersHelper do
 
       before do
         allow(helper).to receive(:experiment_tracking_category_and_group) { '_track_property_' }
-        allow(helper).to receive(:tracking_label).with(owner)
+        allow(helper).to receive(:tracking_label)
         allow(helper).to receive(:current_user) { owner }
       end
 
@@ -132,8 +132,7 @@ RSpec.describe InviteMembersHelper do
 
         helper.dropdown_invite_members_link(form_model)
 
-        expect(helper).to have_received(:experiment_tracking_category_and_group)
-                            .with(:invite_members_new_dropdown, subject: owner)
+        expect(helper).to have_received(:experiment_tracking_category_and_group).with(:invite_members_new_dropdown)
       end
 
       context 'with experiment enabled' do
