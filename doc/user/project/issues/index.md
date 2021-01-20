@@ -137,7 +137,8 @@ view, you can also make certain changes [in bulk](../bulk_editing.md) to the dis
 For more information, see the [Issue Data and Actions](issue_data_and_actions.md) page
 for a rundown of all the fields and information in an issue.
 
-You can sort a list of issues in several ways, for example by issue creation date, milestone due date. For more information, see the [Sorting and Ordering Issues Lists](sorting_issue_lists.md) page.
+You can sort a list of issues in several ways, for example by issue creation date, milestone due date.
+For more information, see the [Sorting and ordering issue lists](sorting_issue_lists.md) page.
 
 #### Cached issue count
 
