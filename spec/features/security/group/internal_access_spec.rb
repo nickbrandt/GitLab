@@ -90,15 +90,15 @@ RSpec.describe 'Internal Group access' do
       it { is_expected.to be_allowed_for(:admin) }
     end
     context 'when admin mode is disabled' do
-      it { is_expected.to be_allowed_for(:admin) }
+      it { is_expected.to be_denied_for(:admin) }
     end
     it { is_expected.to be_allowed_for(:owner).of(group) }
     it { is_expected.to be_allowed_for(:maintainer).of(group) }
     it { is_expected.to be_allowed_for(:developer).of(group) }
     it { is_expected.to be_allowed_for(:reporter).of(group) }
     it { is_expected.to be_allowed_for(:guest).of(group) }
-    it { is_expected.to be_allowed_for(project_guest) }
-    it { is_expected.to be_allowed_for(:user) }
+    it { is_expected.to be_denied_for(project_guest) }
+    it { is_expected.to be_denied_for(:user) }
     it { is_expected.to be_denied_for(:external) }
     it { is_expected.to be_denied_for(:visitor) }
   end

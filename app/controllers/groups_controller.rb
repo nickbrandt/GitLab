@@ -254,6 +254,7 @@ class GroupsController < Groups::ApplicationController
       :public,
       :request_access_enabled,
       :share_with_group_lock,
+      :hide_members_from_outside_group,
       :visibility_level,
       :parent_id,
       :create_chat_team,

@@ -105,6 +105,7 @@ class Admin::GroupsController < Admin::ApplicationController
       :name,
       :path,
       :request_access_enabled,
+      :hide_members_from_outside_group,
       :visibility_level,
       :require_two_factor_authentication,
       :two_factor_grace_period,

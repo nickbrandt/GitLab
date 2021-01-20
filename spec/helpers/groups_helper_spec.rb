@@ -313,7 +313,7 @@ RSpec.describe GroupsHelper do
     it 'returns all the expected links' do
       links = [
         :overview, :activity, :issues, :labels, :milestones, :merge_requests,
-        :group_members, :settings
+        :members, :settings
       ]
 
       expect(helper.group_sidebar_links).to include(*links)

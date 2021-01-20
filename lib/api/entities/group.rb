@@ -18,6 +18,7 @@ module API
         group.avatar_url(only_path: false)
       end
       expose :request_access_enabled
+      expose :hide_members_from_outside_group
       expose :full_name, :full_path
       expose :created_at
       expose :parent_id

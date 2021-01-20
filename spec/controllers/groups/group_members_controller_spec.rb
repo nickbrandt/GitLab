@@ -17,11 +17,30 @@ RSpec.describe Groups::GroupMembersController do
   end
 
   describe 'GET index' do
-    it 'renders index with 200 status code' do
-      get :index, params: { group_id: group }
+    context 'user with guest access' do
+      before do
+        group.add_guest(user)
+        sign_in(user)
+      end
 
-      expect(response).to have_gitlab_http_status(:ok)
-      expect(response).to render_template(:index)
+      it 'renders index with 200 status code' do
+        get :index, params: { group_id: group }
+
+        expect(response).to have_gitlab_http_status(:ok)
+        expect(response).to render_template(:index)
+      end
+    end
+
+    context 'user with no access permission' do
+      before do
+        sign_in(user)
+      end
+
+      it 'renders index with 403 status code' do
+        get :index, params: { group_id: group }
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
     end
 
     context 'when user can manage members' do

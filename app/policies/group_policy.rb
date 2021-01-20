@@ -101,7 +101,7 @@ class GroupPolicy < BasePolicy
     enable :read_issue_board_list
     enable :read_label
     enable :read_issue_board
-    enable :read_group_member
+    enable :read_board
     enable :read_custom_emoji
   end
 
@@ -110,6 +110,10 @@ class GroupPolicy < BasePolicy
   end
 
   rule { has_access }.enable :read_namespace
+
+  rule { guest }.policy do
+    enable :read_group_members
+  end
 
   rule { developer }.policy do
     enable :admin_milestone

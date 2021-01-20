@@ -14885,6 +14885,7 @@ CREATE TABLE namespace_settings (
     delayed_project_removal boolean,
     resource_access_token_creation_allowed boolean DEFAULT true NOT NULL,
     lock_delayed_project_removal boolean DEFAULT false NOT NULL,
+    hide_members_from_outside_group boolean DEFAULT false NOT NULL
     CONSTRAINT check_0ba93c78c7 CHECK ((char_length(default_branch_name) <= 255))
 );
 

@@ -16280,6 +16280,9 @@ msgstr ""
 msgid "Hide marketing-related entries from help"
 msgstr ""
 
+msgid "Hide member list of top-level and sub-group from outside of the group"
+msgstr ""
+
 msgid "Hide payload"
 msgstr ""
 

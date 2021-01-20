@@ -48,12 +48,27 @@ RSpec.describe 'Groups > Members > Request access' do
     expect(page).not_to have_content group.name
   end
 
+  it 'user cannot see the group members page even after request' do
+    click_link 'Request Access'
+
+    expect(group.requesters.exists?(user_id: user)).to be_truthy
+
+    expect(page).not_to have_content 'Members'
+
+    visit group_group_members_path(group)
+
+    expect(page).not_to have_content group.name
+  end
+
   it 'user is not listed in the group members page' do
     click_link 'Request Access'
 
     expect(group.requesters.exists?(user_id: user)).to be_truthy
 
-    first(:link, 'Members').click
+    sign_out(user)
+    sign_in(owner)
+
+    visit group_group_members_path(group)
 
     page.within('.content') do
       expect(page).not_to have_content(user.name)

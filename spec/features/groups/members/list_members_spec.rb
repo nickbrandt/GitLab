@@ -37,6 +37,7 @@ RSpec.describe 'Groups > Members > List members', :js do
   describe 'showing status of members' do
     before do
       group.add_developer(user2)
+      group.add_guest(user1)
     end
 
     it 'shows the status' do
@@ -44,7 +45,7 @@ RSpec.describe 'Groups > Members > List members', :js do
 
       visit group_group_members_path(nested_group)
 
-      expect(first_row).to have_selector('gl-emoji[data-name="smirk"]')
+      expect(find_row('Mary Jane')).to have_selector('gl-emoji[data-name="smirk"]')
     end
   end
 

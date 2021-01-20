@@ -244,6 +244,7 @@ module EE
 
       rule { auditor }.policy do
         enable :read_group
+        enable :read_group_members
         enable :read_group_security_dashboard
       end
 

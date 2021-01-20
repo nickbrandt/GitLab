@@ -28,9 +28,15 @@ RSpec.describe 'getting group information' do
       )
     end
 
-    it_behaves_like 'a working graphql query' do
+    context 'when guest user requests' do
       before do
-        post_graphql(group_query(public_group))
+        public_group.add_guest(user1)
+      end
+
+      it_behaves_like 'a working graphql query' do
+        before do
+          post_graphql(group_query(public_group), current_user: user1)
+        end
       end
     end
 

@@ -6,12 +6,11 @@ RSpec.describe 'getting group members information' do
   include GraphqlHelpers
 
   let_it_be(:parent_group) { create(:group, :public) }
-  let_it_be(:user) { create(:user) }
-  let_it_be(:user_1) { create(:user, username: 'user') }
+  let_it_be(:user) { create(:user, username: 'user') }
   let_it_be(:user_2) { create(:user, username: 'test') }
 
   before_all do
-    [user_1, user_2].each { |user| parent_group.add_guest(user) }
+    [user, user_2].each { |user| parent_group.add_guest(user) }
   end
 
   context 'when the request is correct' do
@@ -25,7 +24,7 @@ RSpec.describe 'getting group members information' do
       fetch_members
 
       expect(graphql_errors).to be_nil
-      expect_array_response(user_1, user_2)
+      expect_array_response(user, user_2)
     end
 
     it 'returns members that match the search query' do
@@ -58,14 +57,14 @@ RSpec.describe 'getting group members information' do
       fetch_members(group: child_group, args: { relations: [:DIRECT, :INHERITED] })
 
       expect(graphql_errors).to be_nil
-      expect_array_response(child_user, user_1, user_2)
+      expect_array_response(child_user, user, user_2)
     end
 
     it 'returns direct, inherited, and descendant members' do
       fetch_members(group: child_group, args: { relations: [:DIRECT, :INHERITED, :DESCENDANTS] })
 
       expect(graphql_errors).to be_nil
-      expect_array_response(child_user, user_1, user_2, grandchild_user)
+      expect_array_response(child_user, user, user_2, grandchild_user)
     end
 
     it 'returns an error for an invalid member relation' do
@@ -78,10 +77,10 @@ RSpec.describe 'getting group members information' do
   end
 
   context 'when unauthenticated' do
-    it 'returns visible members' do
+    it 'returns no members' do
       fetch_members(current_user: nil)
 
-      expect_array_response(user_1, user_2)
+      expect_nil_response
     end
   end
 
@@ -111,5 +110,10 @@ RSpec.describe 'getting group members information' do
     member_gids = graphql_data_at(:group, :group_members, :edges, :node, :user, :id)
 
     expect(member_gids).to match_array(items.map { |u| global_id_of(u) })
+  end
+
+  def expect_nil_response
+    expect(response).to have_gitlab_http_status(:success)
+    expect(graphql_data_at(:group, :group_members)).to be_nil
   end
 end

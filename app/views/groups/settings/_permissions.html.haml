@@ -16,6 +16,9 @@
             = s_('GroupSettings|Prevent sharing a project within %{group} with other groups').html_safe % { group: group_link }
           %p.js-descr.help-text= share_with_group_lock_help_text(@group)
 
+    .form-group
+      = render 'shared/groups/hide_member_list', form: f
+
     .form-group.gl-mb-3
       .gl-form-checkbox.custom-control.custom-checkbox
         = f.check_box :emails_disabled, checked: @group.emails_disabled?, disabled: !can_disable_group_emails?(@group), class: 'custom-control-input'

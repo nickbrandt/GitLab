@@ -33,6 +33,7 @@ RSpec.describe 'Groups > Members > List members' do
     let(:managed_user) { create(:user, :group_managed, managing_group: managed_group) }
 
     before do
+      sign_in(managed_user)
       managed_group.add_guest(managed_user)
     end
 
