@@ -139,6 +139,14 @@ for a rundown of all the fields and information in an issue.
 
 You can sort a list of issues in several ways, for example by issue creation date, milestone due date. For more information, see the [Sorting and Ordering Issue Lists](sorting_issue_lists.md) page.
 
+Note that, in a group context, the sidebar will display the total count for open issues and this value will be cached if higher than 1000.
+
+A cached value will be rounded to thousands (or millions) and updated every 24 hours.
+
+This feature was deployed behind the feature flag `cached_sidebar_open_issues_count`, that is disabled by default.
+
+![Issues Count](img/issues_count_group_sidebar.png)
+
 ### Issue boards
 
 ![Issue board](img/issue_board.png)
