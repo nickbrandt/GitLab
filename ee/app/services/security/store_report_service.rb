@@ -80,15 +80,25 @@ module Security
       }
 
       begin
-        vulnerability_finding = project
-          .vulnerability_findings
-          .create_with(create_params)
-          .find_or_initialize_by(find_params)
+        # Look for existing Findings using UUID
+        vulnerability_finding = project.vulnerability_findings.find_by(uuid: finding.uuid)
+
+        # If there's no Finding then we're dealing with one of two cases:
+        # 1. The Finding is a new one
+        # 2. The Finding is already saved but has UUIDv4
+        unless vulnerability_finding
+          vulnerability_finding = project.vulnerability_findings
+            .create_with(create_params)
+            .find_or_initialize_by(find_params)
+          vulnerability_finding.uuid = finding.uuid
+        end
 
         vulnerability_finding.save!
         vulnerability_finding
-      rescue ActiveRecord::RecordNotUnique
-        project.vulnerability_findings.find_by!(find_params)
+      rescue ActiveRecord::RecordNotUnique => e
+        Gitlab::ErrorTracking.track_and_raise_exception(e, find_params: find_params, uuid: finding.uuid)
+
+        vulnerability_finding
       rescue ActiveRecord::RecordInvalid => e
         Gitlab::ErrorTracking.track_and_raise_exception(e, create_params: create_params&.dig(:raw_metadata))
       end
