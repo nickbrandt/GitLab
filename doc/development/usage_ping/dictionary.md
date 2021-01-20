@@ -36,9 +36,14 @@ Total deployments count
 | field | value |
 | --- | --- |
 | `key_path` | **counts.deployments** |
+<<<<<<< HEAD
 | `value_type` | integer |
 | `product_stage` | release |
+=======
+| `stage` | release |
+>>>>>>> a52fbd85df8 (Add skip_validation and section)
 | `status` | data_available |
+| `value_type` | integer |
 | `milestone` | 8.12 |
 | `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/735) |
 | `product_group` | `group::ops release` |
@@ -54,12 +59,19 @@ Total number of sites in a Geo deployment
 | field | value |
 | --- | --- |
 | `key_path` | **counts.geo_nodes** |
+| `stage` | enablement |
+| `group` | `group::geo` |
 | `value_type` | integer |
 | `product_category` | disaster_recovery |
+<<<<<<< HEAD
 | `product_stage` | enablement |
 | `status` | data_available |
 | `milestone` | 11.2 |
 | `product_group` | `group::geo` |
+=======
+| `status` | data_available |
+| `milestone` | 11.2 |
+>>>>>>> a52fbd85df8 (Add skip_validation and section)
 | `time_frame` | all |
 | `data_source` | Database |
 | `distribution` | ee |
@@ -72,12 +84,21 @@ Total deployments count for recent 28 days
 | field | value |
 | --- | --- |
 | `key_path` | **counts_monthly.deployments** |
+<<<<<<< HEAD
 | `value_type` | integer |
 | `product_stage` | release |
 | `status` | data_available |
 | `milestone` | 13.2 |
 | `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/35493) |
 | `product_group` | `group::ops release` |
+=======
+| `stage` | release |
+| `group` | `group::ops release` |
+| `value_type` | integer |
+| `status` | data_available |
+| `milestone` | 13.2 |
+| `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/35493) |
+>>>>>>> a52fbd85df8 (Add skip_validation and section)
 | `time_frame` | 28d |
 | `data_source` | Database |
 | `distribution` | ee, ce |
@@ -90,11 +111,17 @@ This metric only returns a value of PostgreSQL in supported versions of GitLab. 
 | field | value |
 | --- | --- |
 | `key_path` | **database.adapter** |
+| `stage` | growth |
+| `group` | `group::enablement distribution` |
 | `value_type` | string |
 | `product_category` | collection |
+<<<<<<< HEAD
 | `product_stage` | growth |
 | `status` | data_available |
 | `product_group` | `group::enablement distribution` |
+=======
+| `status` | data_available |
+>>>>>>> a52fbd85df8 (Add skip_validation and section)
 | `time_frame` | none |
 | `data_source` | Database |
 | `distribution` | ee, ce |
@@ -107,6 +134,7 @@ When the Usage Ping computation was started
 | field | value |
 | --- | --- |
 | `key_path` | **recorded_at** |
+<<<<<<< HEAD
 | `value_type` | string |
 | `product_category` | collection |
 | `product_stage` | growth |
@@ -114,6 +142,16 @@ When the Usage Ping computation was started
 | `milestone` | 8.1 |
 | `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/557) |
 | `product_group` | `group::product intelligence` |
+=======
+| `section` | growth |
+| `stage` | growth |
+| `group` | `group::product intelligence` |
+| `product_category` | collection |
+| `value_type` | string |
+| `status` | data_available |
+| `milestone` | 8.1 |
+| `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/557) |
+>>>>>>> a52fbd85df8 (Add skip_validation and section)
 | `time_frame` | none |
 | `data_source` | Ruby |
 | `distribution` | ee, ce |
@@ -126,13 +164,21 @@ Distinct users count that changed issue title in a group for last recent week
 | field | value |
 | --- | --- |
 | `key_path` | **redis_hll_counters.issues_edit.g_project_management_issue_title_changed_weekly** |
+| `stage` | plan |
+| `group` | `group::project management` |
 | `value_type` | integer |
 | `product_category` | issue_tracking |
+<<<<<<< HEAD
 | `product_stage` | plan |
 | `status` | data_available |
 | `milestone` | 13.6 |
 | `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/issues/229918) |
 | `product_group` | `group::project management` |
+=======
+| `status` | data_available |
+| `milestone` | 13.6 |
+| `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/issues/229918) |
+>>>>>>> a52fbd85df8 (Add skip_validation and section)
 | `time_frame` | 7d |
 | `data_source` | Redis_hll |
 | `distribution` | ee, ce |
@@ -145,13 +191,22 @@ GitLab instance unique identifier
 | field | value |
 | --- | --- |
 | `key_path` | **uuid** |
+| `section` | growth |
+| `stage` | growth |
+| `group` | `group::product intelligence` |
 | `value_type` | string |
 | `product_category` | collection |
+<<<<<<< HEAD
 | `product_stage` | growth |
 | `status` | data_available |
 | `milestone` | 9.1 |
 | `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1521) |
 | `product_group` | `group::product intelligence` |
+=======
+| `status` | data_available |
+| `milestone` | 9.1 |
+| `introduced_by_url` | [Introduced by](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/1521) |
+>>>>>>> a52fbd85df8 (Add skip_validation and section)
 | `time_frame` | none |
 | `data_source` | Database |
 | `distribution` | ee, ce |
