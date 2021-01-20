@@ -97,6 +97,7 @@ export default {
         :invalid-feedback="fieldErrorMessage('name')"
         :data-testid="`custom-stage-name-${index}`"
       >
+        <!-- eslint-disable vue/no-mutating-props -->
         <gl-form-input
           v-model.trim="stage.name"
           :name="`custom-stage-name-${index}`"
@@ -104,6 +105,7 @@ export default {
           required
           @input="$emit('input', { field: 'name', value: $event })"
         />
+        <!-- eslint-enable vue/no-mutating-props -->
       </gl-form-group>
       <stage-field-actions
         v-if="hasMultipleStages"
