@@ -10,7 +10,10 @@ export default {
     GlLink,
     GlSprintf,
   },
-  inject: ['documentationPath', 'emptyStateSvgPath'],
+  inject: {
+    documentationPath: { type: String, default: '' },
+    emptyStateSvgPath: { type: String, default: '' },
+  },
 };
 </script>
 
