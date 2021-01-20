@@ -651,7 +651,7 @@ type AlertManagementHttpIntegration implements AlertManagementIntegration {
 }
 
 """
-Identifier of AlertManagement::HttpIntegration
+Identifier of AlertManagement::HttpIntegration.
 """
 scalar AlertManagementHttpIntegrationID
 
@@ -1053,7 +1053,7 @@ type AlertTodoCreatePayload {
 }
 
 """
-Identifier of Analytics::DevopsAdoption::Segment
+Identifier of Analytics::DevopsAdoption::Segment.
 """
 scalar AnalyticsDevopsAdoptionSegmentID
 
@@ -1233,7 +1233,7 @@ type AwardEmojiTogglePayload {
 }
 
 """
-Identifier of Awardable
+Identifier of Awardable.
 """
 scalar AwardableID
 
@@ -2030,7 +2030,7 @@ type BoardEpicUserPreferences {
 }
 
 """
-Identifier of Board
+Identifier of Board.
 """
 scalar BoardID
 
@@ -2352,12 +2352,12 @@ type BoardListUpdateLimitMetricsPayload {
 }
 
 """
-Identifier of Boards::EpicBoard
+Identifier of Boards::EpicBoard.
 """
 scalar BoardsEpicBoardID
 
 """
-Identifier of Boards::EpicList
+Identifier of Boards::EpicList.
 """
 scalar BoardsEpicListID
 
@@ -3079,7 +3079,7 @@ type CiJobEdge {
 }
 
 """
-Identifier of Ci::Pipeline
+Identifier of Ci::Pipeline.
 """
 scalar CiPipelineID
 
@@ -3405,17 +3405,17 @@ type ClusterAgentTokenEdge {
 }
 
 """
-Identifier of Clusters::Agent
+Identifier of Clusters::Agent.
 """
 scalar ClustersAgentID
 
 """
-Identifier of Clusters::AgentToken
+Identifier of Clusters::AgentToken.
 """
 scalar ClustersAgentTokenID
 
 """
-Identifier of Clusters::Cluster
+Identifier of Clusters::Cluster.
 """
 scalar ClustersClusterID
 
@@ -3863,7 +3863,7 @@ input ComplianceFrameworkInput {
 }
 
 """
-Identifier of ComplianceManagement::Framework
+Identifier of ComplianceManagement::Framework.
 """
 scalar ComplianceManagementFrameworkID
 
@@ -4259,7 +4259,7 @@ type ContainerRepositoryEdge {
 }
 
 """
-Identifier of ContainerRepository
+Identifier of ContainerRepository.
 """
 scalar ContainerRepositoryID
 
@@ -5426,7 +5426,7 @@ type CustomEmojiEdge {
 }
 
 """
-Identifier of CustomEmoji
+Identifier of CustomEmoji.
 """
 scalar CustomEmojiID
 
@@ -5682,7 +5682,7 @@ type DastScannerProfileEdge {
 }
 
 """
-Identifier of DastScannerProfile
+Identifier of DastScannerProfile.
 """
 scalar DastScannerProfileID
 
@@ -5914,7 +5914,7 @@ type DastSiteProfileEdge {
 }
 
 """
-Identifier of DastSiteProfile
+Identifier of DastSiteProfile.
 """
 scalar DastSiteProfileID
 
@@ -6056,7 +6056,7 @@ type DastSiteTokenCreatePayload {
 }
 
 """
-Identifier of DastSiteToken
+Identifier of DastSiteToken.
 """
 scalar DastSiteTokenID
 
@@ -6171,7 +6171,7 @@ type DastSiteValidationEdge {
 }
 
 """
-Identifier of DastSiteValidation
+Identifier of DastSiteValidation.
 """
 scalar DastSiteValidationID
 
@@ -6978,12 +6978,12 @@ type DesignManagementDeletePayload {
 }
 
 """
-Identifier of DesignManagement::DesignAtVersion
+Identifier of DesignManagement::DesignAtVersion.
 """
 scalar DesignManagementDesignAtVersionID
 
 """
-Identifier of DesignManagement::Design
+Identifier of DesignManagement::Design.
 """
 scalar DesignManagementDesignID
 
@@ -7083,7 +7083,7 @@ type DesignManagementUploadPayload {
 }
 
 """
-Identifier of DesignManagement::Version
+Identifier of DesignManagement::Version.
 """
 scalar DesignManagementVersionID
 
@@ -7693,7 +7693,7 @@ input DiffImagePositionInput {
 }
 
 """
-Identifier of DiffNote
+Identifier of DiffNote.
 """
 scalar DiffNoteID
 
@@ -7967,7 +7967,7 @@ type DiscussionEdge {
 }
 
 """
-Identifier of Discussion
+Identifier of Discussion.
 """
 scalar DiscussionID
 
@@ -8173,7 +8173,7 @@ type EnvironmentEdge {
 }
 
 """
-Identifier of Environment
+Identifier of Environment.
 """
 scalar EnvironmentID
 
@@ -8891,7 +8891,7 @@ type EpicHealthStatus {
 }
 
 """
-Identifier of Epic
+Identifier of Epic.
 """
 scalar EpicID
 
@@ -9645,7 +9645,7 @@ type EpicTreeReorderPayload {
 }
 
 """
-Identifier of EpicTreeSorting
+Identifier of EpicTreeSorting.
 """
 scalar EpicTreeSortingID
 
@@ -9972,7 +9972,7 @@ type GeoNode {
 }
 
 """
-Identifier of Gitlab::ErrorTracking::DetailedError
+Identifier of Gitlab::ErrorTracking::DetailedError.
 """
 scalar GitlabErrorTrackingDetailedErrorID
 
@@ -11280,7 +11280,7 @@ type Group {
 }
 
 """
-Identifier of Group
+Identifier of Group.
 """
 scalar GroupID
 
@@ -11608,7 +11608,7 @@ An ISO 8601-encoded date
 scalar ISO8601Date
 
 """
-Identifier of IncidentManagement::OncallParticipant
+Identifier of IncidentManagement::OncallParticipant.
 """
 scalar IncidentManagementOncallParticipantID
 
@@ -11703,7 +11703,7 @@ type IncidentManagementOncallRotationEdge {
 }
 
 """
-Identifier of IncidentManagement::OncallRotation
+Identifier of IncidentManagement::OncallRotation.
 """
 scalar IncidentManagementOncallRotationID
 
@@ -12422,7 +12422,7 @@ type IssueEdge {
 }
 
 """
-Identifier of Issue
+Identifier of Issue.
 """
 scalar IssueID
 
@@ -13307,7 +13307,7 @@ type IterationEdge {
 }
 
 """
-Identifier of Iteration
+Identifier of Iteration.
 """
 scalar IterationID
 
@@ -13812,12 +13812,12 @@ type LabelEdge {
 }
 
 """
-Identifier of Label
+Identifier of Label.
 """
 scalar LabelID
 
 """
-Identifier of List
+Identifier of List.
 """
 scalar ListID
 
@@ -14820,7 +14820,7 @@ type MergeRequestEdge {
 }
 
 """
-Identifier of MergeRequest
+Identifier of MergeRequest.
 """
 scalar MergeRequestID
 
@@ -15457,7 +15457,7 @@ type MetricsDashboardAnnotationEdge {
 }
 
 """
-Identifier of Metrics::Dashboard::Annotation
+Identifier of Metrics::Dashboard::Annotation.
 """
 scalar MetricsDashboardAnnotationID
 
@@ -15572,7 +15572,7 @@ type MilestoneEdge {
 }
 
 """
-Identifier of Milestone
+Identifier of Milestone.
 """
 scalar MilestoneID
 
@@ -16019,7 +16019,7 @@ type NamespaceEdge {
 }
 
 """
-Identifier of Namespace
+Identifier of Namespace.
 """
 scalar NamespaceID
 
@@ -16248,7 +16248,7 @@ type NoteEdge {
 }
 
 """
-Identifier of Note
+Identifier of Note.
 """
 scalar NoteID
 
@@ -16337,7 +16337,7 @@ interface Noteable {
 }
 
 """
-Identifier of Noteable
+Identifier of Noteable.
 """
 scalar NoteableID
 
@@ -17190,7 +17190,7 @@ enum PackageTypeEnum {
 }
 
 """
-Identifier of Packages::Package
+Identifier of Packages::Package.
 """
 scalar PackagesPackageID
 
@@ -19584,7 +19584,7 @@ type ProjectEdge {
 }
 
 """
-Identifier of Project
+Identifier of Project.
 """
 scalar ProjectID
 
@@ -20098,7 +20098,7 @@ type PrometheusIntegrationUpdatePayload {
 }
 
 """
-Identifier of PrometheusService
+Identifier of PrometheusService.
 """
 scalar PrometheusServiceID
 
@@ -23566,7 +23566,7 @@ type SnippetEdge {
 }
 
 """
-Identifier of Snippet
+Identifier of Snippet.
 """
 scalar SnippetID
 
@@ -23954,7 +23954,7 @@ type TerraformStateEdge {
 }
 
 """
-Identifier of Terraform::State
+Identifier of Terraform::State.
 """
 scalar TerraformStateID
 
@@ -24473,7 +24473,7 @@ type TodoEdge {
 }
 
 """
-Identifier of Todo
+Identifier of Todo.
 """
 scalar TodoID
 
@@ -24625,7 +24625,7 @@ enum TodoTargetEnum {
 }
 
 """
-Identifier of Todoable
+Identifier of Todoable.
 """
 scalar TodoableID
 
@@ -26334,7 +26334,7 @@ type UserEdge {
 }
 
 """
-Identifier of User
+Identifier of User.
 """
 scalar UserID
 
@@ -26535,7 +26535,7 @@ type VulnerabilitiesCountByDayEdge {
 }
 
 """
-Identifier of Vulnerabilities::ExternalIssueLink
+Identifier of Vulnerabilities::ExternalIssueLink.
 """
 scalar VulnerabilitiesExternalIssueLinkID
 
@@ -27443,7 +27443,7 @@ enum VulnerabilityGrade {
 }
 
 """
-Identifier of Vulnerability
+Identifier of Vulnerability.
 """
 scalar VulnerabilityID
 
