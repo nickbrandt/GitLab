@@ -1,4 +1,5 @@
 <script>
+import { once } from 'lodash';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import reportsMixin from 'ee/vue_shared/security_reports/mixins/reports_mixin';
 import { componentNames } from 'ee/reports/components/issue_body';
@@ -42,11 +43,16 @@ export default {
     codequalityStatus() {
       return this.checkReportStatus(this.isLoadingCodequality, this.loadingCodequalityFailed);
     },
+    trackViewEvent() {
+      return once(() => {
+        if (this.glFeatures.usageDataITestingFullCodeQualityReportTotal) {
+          api.trackRedisHllUserEvent(this.$options.mountEvent);
+        }
+      });
+    },
   },
-  mounted() {
-    if (this.glFeatures.usageDataITestingFullCodeQualityReportTotal) {
-      api.trackRedisHllUserEvent(this.$options.mountEvent);
-    }
+  updated() {
+    this.trackViewEvent();
   },
   i18n: {
     subHeading: s__('ciReport|This report contains all Code Quality issues in the source branch.'),
