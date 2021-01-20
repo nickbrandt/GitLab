@@ -446,6 +446,8 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
      Aggregation on a `daily` basis does not pull more fine grained data.
    - `feature_flag`: optional. For details, see our [GitLab internal Feature flags](feature_flags/) documentation.
 
+Use one of the following methods to track events:
+
 1. Track event in controller using `RedisTracking` module with `track_redis_hll_event(*controller_actions, name:, feature:, feature_default_enabled: false)`.
 
    Arguments:
@@ -561,21 +563,6 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
 
    api.trackRedisHllUserEvent('my_already_defined_event_name'),
    ```
-
-1. Track event using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event(event_name, values:)`.
-
-   Arguments:
-
-   - `event_name`: event name.
-   - `values`: One value or array of values we count. For example: user_id, visitor_id, user_ids.
-
-1. Track event on context level using base module `Gitlab::UsageDataCounters::HLLRedisCounter.track_event_in_context(event_name, values:, context:)`.
-
-   Arguments:
-
-   - `event_name`: event name.
-   - `values`: values we count. For example: user_id, visitor_id.
-   - `context`: context value. Allowed values are `default`, `free`, `bronze`, `silver`, `gold`, `starter`, `premium`, `ultimate`
 
 1. Get event data using `Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(event_names:, start_date:, end_date:, context: '')`.
 
