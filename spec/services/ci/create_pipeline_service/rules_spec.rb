@@ -168,6 +168,7 @@ RSpec.describe Ci::CreatePipelineService do
           variables:
             VAR4: workflow var 4
             VAR5: workflow var 5
+            VAR7: workflow var 7
 
           workflow:
             rules:
@@ -178,6 +179,7 @@ RSpec.describe Ci::CreatePipelineService do
                 variables:
                   VAR5: overridden workflow var 5
                   VAR6: new workflow var 6
+                  VAR7: overridden workflow var 7
               - when: always
 
           job:
@@ -194,6 +196,7 @@ RSpec.describe Ci::CreatePipelineService do
                 variables:
                   VAR2: overridden var 2
                   VAR3: new var 3
+                  VAR7: overridden var 7
               - when: on_success
           EOY
         end
@@ -231,12 +234,13 @@ RSpec.describe Ci::CreatePipelineService do
         context 'when matching to the second rule' do
           let(:ref) { 'refs/heads/feature' }
 
-          it 'overrides VAR2 and adds VAR3' do
+          it 'overrides VAR2 and VAR7, then adds VAR3' do
             variables = job.scoped_variables_hash
 
             expect(variables['VAR1']).to eq('job var 1')
             expect(variables['VAR2']).to eq('overridden var 2')
             expect(variables['VAR3']).to eq('new var 3')
+            expect(variables['VAR7']).to eq('overridden var 7')
           end
         end
 
