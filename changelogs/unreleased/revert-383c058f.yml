@@ -1,0 +1,5 @@
+---
+title: Revert "Support Git HTTP on toplevel repositories"
+merge_request: 681
+author:
+type: fixed
