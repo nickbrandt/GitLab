@@ -2023,9 +2023,6 @@ msgstr ""
 msgid "AdminSettings|Disable feed token"
 msgstr ""
 
-msgid "AdminSettings|Elasticsearch, PlantUML, Slack application, Third party offers, Snowplow, Amazon EKS have moved to Settings &gt; General."
-msgstr ""
-
 msgid "AdminSettings|Enable shared runners for new projects"
 msgstr ""
 
@@ -2045,6 +2042,9 @@ msgid "AdminSettings|Moved to integrations"
 msgstr ""
 
 msgid "AdminSettings|No required pipeline"
+msgstr ""
+
+msgid "AdminSettings|PlantUML, Slack application, Third party offers, Snowplow, Amazon EKS have moved to Settings &gt; General."
 msgstr ""
 
 msgid "AdminSettings|Required pipeline configuration"
