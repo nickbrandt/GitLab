@@ -10,7 +10,7 @@ gem 'responders', '~> 3.0'
 gem 'sprockets', '~> 3.7.0'
 
 # Default values for AR models
-gem 'default_value_for', '~> 3.3.0'
+gem 'default_value_for', '~> 3.4.0'
 
 # Supported DBs
 gem 'pg', '~> 1.1'
