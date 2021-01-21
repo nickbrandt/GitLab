@@ -1873,7 +1873,8 @@ RSpec.describe Gitlab::Database::MigrationHelpers do
 
         has_internal_id :iid,
           scope: :project,
-          init: ->(s, _scope) { s&.project&.issues&.maximum(:iid) }
+          init: ->(s, _scope) { s&.project&.issues&.maximum(:iid) },
+          presence: false
       end
     end
 

@@ -176,6 +176,69 @@ RSpec.describe AtomicInternalId do
     end
   end
 
+  describe '#validate_scope_iid_exists!' do
+    let(:test_class) do
+      Class.new(ApplicationRecord) do
+        include AtomicInternalId
+        include Importable
+
+        self.table_name = :milestones
+
+        belongs_to :project
+
+        def self.name
+          'TestClass'
+        end
+      end
+    end
+
+    let(:instance) { test_class.new(milestone.attributes) }
+
+    before do
+      test_class.has_internal_id :iid, scope: :project, presence: presence, ensure_if: -> { !importing }
+
+      instance.importing = true
+    end
+
+    context 'when the presence flag is set' do
+      let(:presence) { true }
+
+      it 'raises an error for blank iids on create' do
+        expect do
+          instance.save!
+        end.to raise_error(described_class::MissingValueError, 'iid was unexpectedly blank!')
+      end
+
+      it 'raises an error for blank iids on update' do
+        instance.iid = 100
+        instance.save!
+
+        instance.iid = nil
+
+        expect do
+          instance.save!
+        end.to raise_error(described_class::MissingValueError, 'iid was unexpectedly blank!')
+      end
+    end
+
+    context 'when the presence flag is not set' do
+      let(:presence) { false }
+
+      it 'does not raise an error for blank iids on create' do
+        expect { instance.save! }.not_to raise_error
+      end
+
+      it 'does not raise an error for blank iids on update' do
+        instance.iid = 100
+        instance.save!
+
+        instance.iid = nil
+
+        expect { instance.save! }.not_to raise_error
+      end
+    end
+  end
+
   describe '.with_project_iid_supply' do
     let(:iid) { 100 }
 

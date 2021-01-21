@@ -13,7 +13,7 @@ module Operations
       has_many :strategy_user_lists
       has_many :strategies, through: :strategy_user_lists
 
-      has_internal_id :iid, scope: :project
+      has_internal_id :iid, scope: :project, presence: true
 
       validates :project, presence: true
       validates :name,

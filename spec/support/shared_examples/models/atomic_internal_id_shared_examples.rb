@@ -1,11 +1,69 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples 'AtomicInternalId' do
+RSpec.shared_examples 'AtomicInternalId' do |validate_presence: true|
   describe '.has_internal_id' do
     describe 'Module inclusion' do
       subject { described_class }
 
       it { is_expected.to include_module(AtomicInternalId) }
+    end
+
+    describe 'Validation' do
+      context 'when presence validation is required' do
+        before do
+          skip unless validate_presence
+        end
+
+        context 'when creating an object' do
+          before do
+            allow_any_instance_of(described_class).to receive(:"ensure_#{scope}_#{internal_id_attribute}!")
+          end
+
+          it 'raises an error if the internal id is blank' do
+            expect { instance.save! }.to raise_error(AtomicInternalId::MissingValueError)
+          end
+        end
+
+        context 'when updating an object' do
+          it 'raises an error if the internal id is blank' do
+            instance.save!
+
+            write_internal_id(nil)
+            allow(instance).to receive(:"ensure_#{scope}_#{internal_id_attribute}!")
+
+            expect { instance.save! }.to raise_error(AtomicInternalId::MissingValueError)
+          end
+        end
+      end
+
+      context 'when presence validation is not required' do
+        before do
+          skip if validate_presence
+        end
+
+        context 'when creating an object' do
+          before do
+            allow_any_instance_of(described_class).to receive(:"ensure_#{scope}_#{internal_id_attribute}!")
+          end
+
+          it 'does not raise an error if the internal id is blank' do
+            expect(read_internal_id).to be_nil
+
+            expect { instance.save! }.not_to raise_error
+          end
+        end
+
+        context 'when updating an object' do
+          it 'does not raise an error if the internal id is blank' do
+            instance.save!
+
+            write_internal_id(nil)
+            allow(instance).to receive(:"ensure_#{scope}_#{internal_id_attribute}!")
+
+            expect { instance.save! }.not_to raise_error
+          end
+        end
+      end
     end
 
     describe 'Creating an instance' do

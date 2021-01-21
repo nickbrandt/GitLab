@@ -26,9 +26,11 @@
 module AtomicInternalId
   extend ActiveSupport::Concern
 
+  MissingValueError = Class.new(StandardError)
+
   class_methods do
     def has_internal_id( # rubocop:disable Naming/PredicateName
-      column, scope:, init: :not_given, ensure_if: nil, track_if: nil, hook_names: :create)
+      column, scope:, init: :not_given, ensure_if: nil, track_if: nil, presence: true, hook_names: :create)
       raise "has_internal_id init must not be nil if given." if init.nil?
       raise "has_internal_id needs to be defined on association." unless self.reflect_on_association(scope)
 
@@ -41,6 +43,11 @@ module AtomicInternalId
         # rubocop:enable GitlabSecurity/PublicSend
       end
       after_rollback :"clear_#{scope}_#{column}!", on: hook_names, if: ensure_if
+
+      if presence
+        before_create :"validate_#{column}_exists!"
+        before_update :"validate_#{column}_exists!"
+      end
 
       define_singleton_internal_id_methods(scope, column, init)
       define_instance_internal_id_methods(scope, column, init)
@@ -140,6 +147,12 @@ module AtomicInternalId
         return unless public_send(:"#{column}_previously_changed?") # rubocop:disable GitlabSecurity/PublicSend
 
         write_attribute(column, nil)
+      end
+
+      define_method("validate_#{column}_exists!") do
+        value = read_attribute(column)
+
+        raise MissingValueError, "#{column} was unexpectedly blank!" if value.blank?
       end
     end
 

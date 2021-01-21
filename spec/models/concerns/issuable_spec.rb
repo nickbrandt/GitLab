@@ -50,7 +50,12 @@ RSpec.describe Issuable do
       it { is_expected.to validate_length_of(:title).is_at_most(described_class::TITLE_LENGTH_MAX) }
       it { is_expected.to validate_length_of(:description).is_at_most(described_class::DESCRIPTION_LENGTH_MAX).on(:create) }
 
-      it_behaves_like 'validates description length with custom validation'
+      it_behaves_like 'validates description length with custom validation' do
+        before do
+          allow(InternalId).to receive(:generate_next).and_call_original
+        end
+      end
+
       it_behaves_like 'truncates the description to its allowed maximum length on import'
     end
   end
