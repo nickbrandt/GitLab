@@ -9,7 +9,7 @@ module EE
       prepended do
         before_action :elasticsearch_reindexing_task, only: [:advanced_search]
 
-        feature_category :provision, [:seat_link_payload]
+        feature_category :license, [:seat_link_payload]
         feature_category :source_code_management, [:templates]
         feature_category :global_search, [:advanced_search]
 
