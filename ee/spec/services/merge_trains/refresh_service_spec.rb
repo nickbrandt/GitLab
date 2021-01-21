@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe MergeTrains::RefreshMergeRequestsService do
+RSpec.describe MergeTrains::RefreshService do
   include ExclusiveLeaseHelpers
 
   let(:project) { create(:project) }
@@ -16,7 +16,7 @@ RSpec.describe MergeTrains::RefreshMergeRequestsService do
   end
 
   describe '#execute', :clean_gitlab_redis_queues do
-    subject { service.execute(merge_request) }
+    subject { service.execute(merge_request.target_project_id, merge_request.target_branch) }
 
     let!(:merge_request_1) do
       create(:merge_request, :on_train, train_creator: maintainer_1,
@@ -45,28 +45,6 @@ RSpec.describe MergeTrains::RefreshMergeRequestsService do
       allow(refresh_service_2).to receive(:execute) { refresh_service_2_result }
     end
 
-    shared_examples 'logging results' do |count|
-      context 'when ci_merge_train_logging is enabled' do
-        it 'logs results' do
-          expect(Sidekiq.logger).to receive(:info).exactly(count).times
-
-          subject
-        end
-      end
-
-      context 'when ci_merge_train_logging is disabled' do
-        before do
-          stub_feature_flags(ci_merge_train_logging: false)
-        end
-
-        it 'does not log results' do
-          expect(Sidekiq.logger).not_to receive(:info)
-
-          subject
-        end
-      end
-    end
-
     context 'when merge request 1 is passed' do
       let(:merge_request) { merge_request_1 }
 
@@ -77,45 +55,37 @@ RSpec.describe MergeTrains::RefreshMergeRequestsService do
         subject
       end
 
-      it_behaves_like 'logging results', 3
-
       context 'when refresh service 1 returns error status' do
         let(:refresh_service_1_result) { { status: :error, message: 'Failed to create ref' } }
 
         it 'specifies require_recreate to refresh service 2' do
-          allow(MergeTrains::RefreshMergeRequestService)
+          expect(MergeTrains::RefreshMergeRequestService)
             .to receive(:new).with(project, maintainer_2, require_recreate: true) { refresh_service_2 }
 
           subject
         end
-
-        it_behaves_like 'logging results', 3
       end
 
       context 'when refresh service 1 returns success status and did not create a pipeline' do
         let(:refresh_service_1_result) { { status: :success, pipeline_created: false } }
 
         it 'does not specify require_recreate to refresh service 2' do
-          allow(MergeTrains::RefreshMergeRequestService)
+          expect(MergeTrains::RefreshMergeRequestService)
             .to receive(:new).with(project, maintainer_2, require_recreate: false) { refresh_service_2 }
 
           subject
         end
-
-        it_behaves_like 'logging results', 3
       end
 
       context 'when refresh service 1 returns success status and created a pipeline' do
         let(:refresh_service_1_result) { { status: :success, pipeline_created: true } }
 
         it 'specifies require_recreate to refresh service 2' do
-          allow(MergeTrains::RefreshMergeRequestService)
+          expect(MergeTrains::RefreshMergeRequestService)
             .to receive(:new).with(project, maintainer_2, require_recreate: true) { refresh_service_2 }
 
           subject
         end
-
-        it_behaves_like 'logging results', 3
       end
 
       context 'when merge request 1 is not on a merge train' do
@@ -127,8 +97,6 @@ RSpec.describe MergeTrains::RefreshMergeRequestsService do
 
           subject
         end
-
-        it_behaves_like 'logging results', 0
       end
 
       context 'when merge request 1 was on a merge train' do
@@ -142,8 +110,6 @@ RSpec.describe MergeTrains::RefreshMergeRequestsService do
 
           subject
         end
-
-        it_behaves_like 'logging results', 0
       end
 
       context 'when the other thread has already been processing the merge train' do
@@ -161,13 +127,11 @@ RSpec.describe MergeTrains::RefreshMergeRequestsService do
 
         it 'enqueues the merge request id to BatchPopQueueing' do
           expect_next_instance_of(Gitlab::BatchPopQueueing) do |queuing|
-            expect(queuing).to receive(:enqueue).with([merge_request_1.id], anything).and_call_original
+            expect(queuing).to receive(:enqueue).with([described_class::SIGNAL_FOR_REFRESH_REQUEST], anything).and_call_original
           end
 
           subject
         end
-
-        it_behaves_like 'logging results', 1
       end
     end
 
@@ -180,8 +144,6 @@ RSpec.describe MergeTrains::RefreshMergeRequestsService do
 
         subject
       end
-
-      it_behaves_like 'logging results', 3
     end
   end
 end
