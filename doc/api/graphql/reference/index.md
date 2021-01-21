@@ -1777,6 +1777,7 @@ Describes an incident management on-call rotation.
 | `lengthUnit` | OncallRotationUnitEnum | Unit of the on-call rotation length. |
 | `name` | String! | Name of the on-call rotation. |
 | `participants` | OncallParticipantTypeConnection | Participants of the on-call rotation. |
+| `shifts` | IncidentManagementOncallShiftConnection | Blocks of time for which a participant is on-call within a given timeframe. Timeframe cannot exceed one month. |
 | `startsAt` | Time | Start date of the on-call rotation. |
 
 ### IncidentManagementOncallSchedule
@@ -1790,6 +1791,16 @@ Describes an incident management on-call schedule.
 | `name` | String! | Name of the on-call schedule |
 | `rotations` | IncidentManagementOncallRotationConnection! | On-call rotations for the on-call schedule |
 | `timezone` | String! | Time zone of the on-call schedule |
+
+### IncidentManagementOncallShift
+
+A block of time for which a participant is on-call..
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `endsAt` | Time | End time of the on-call shift. |
+| `participant` | OncallParticipantType | Participant assigned to the on-call shift. |
+| `startsAt` | Time | Start time of the on-call shift. |
 
 ### InstanceSecurityDashboard
 

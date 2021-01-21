@@ -33029,6 +33029,12 @@ msgstr ""
 msgid "[No reason]"
 msgstr ""
 
+msgid "`end_time` should not exceed one month after `start_time`"
+msgstr ""
+
+msgid "`start_time` should precede `end_time`"
+msgstr ""
+
 msgid "a deleted user"
 msgstr ""
 
