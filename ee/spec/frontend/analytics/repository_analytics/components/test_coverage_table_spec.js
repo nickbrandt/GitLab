@@ -262,6 +262,9 @@ describe('Test coverage table component', () => {
             mountFn: mount,
             glFeatures: { usageDataITestingGroupCodeCoverageProjectClickTotal: true },
           });
+          // We have to wait for apollo to make the mock query and fill the table before
+          // we can click on the project link inside the table. Neither `runOnlyPendingTimers`
+          // nor `waitForPromises` work on their own to accomplish this.
           jest.runOnlyPendingTimers();
           await waitForPromises();
           findProjectNameById(id).trigger('click');
@@ -304,6 +307,9 @@ describe('Test coverage table component', () => {
             mountFn: mount,
             glFeatures: { usageDataITestingGroupCodeCoverageProjectClickTotal: false },
           });
+          // We have to wait for apollo to make the mock query and fill the table before
+          // we can click on the project link inside the table. Neither `runOnlyPendingTimers`
+          // nor `waitForPromises` work on their own to accomplish this.
           jest.runOnlyPendingTimers();
           await waitForPromises();
           findProjectNameById(id).trigger('click');
