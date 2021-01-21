@@ -97,7 +97,13 @@ module BillingPlansHelper
   def billing_available_plans(plans_data, current_plan)
     return plans_data unless ::Feature.enabled?(:hide_deprecated_billing_plans)
 
-    plans_data.filter { |plan_data| !plan_data.deprecated? || plan_data.code == current_plan&.code }
+    plans_data.reject do |plan_data|
+      if plan_data.code == current_plan&.code
+        plan_data.deprecated? && plan_data.hide_deprecated_card?
+      else
+        plan_data.deprecated?
+      end
+    end
   end
 
   private
