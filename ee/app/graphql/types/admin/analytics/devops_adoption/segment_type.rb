@@ -15,6 +15,8 @@ module Types
           field :name, GraphQL::STRING_TYPE, null: false,
             description: 'Name of the segment'
 
+          field :namespace, Types::NamespaceType, null: true, description: 'Segment namespace'
+
           field :groups, [Types::GroupType], null: true,
                 description: 'Assigned groups'
 

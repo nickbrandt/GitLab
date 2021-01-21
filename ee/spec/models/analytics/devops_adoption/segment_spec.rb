@@ -9,6 +9,7 @@ RSpec.describe Analytics::DevopsAdoption::Segment, type: :model do
     it { is_expected.to have_many(:segment_selections) }
     it { is_expected.to have_many(:groups) }
     it { is_expected.to have_many(:snapshots) }
+    it { is_expected.to belong_to(:namespace) }
   end
 
   describe 'validation' do
