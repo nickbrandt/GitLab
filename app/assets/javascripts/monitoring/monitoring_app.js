@@ -26,7 +26,13 @@ export default (props = {}) => {
           dashboardProps: { ...dataProps, ...props },
         };
       },
-      template: `<router-view :dashboardProps="dashboardProps"/>`,
+      render(h) {
+        return h('RouterView', {
+          attrs: {
+            dashboardProps: this.dashboardProps,
+          },
+        });
+      },
     });
   }
 };

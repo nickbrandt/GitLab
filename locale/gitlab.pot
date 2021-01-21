@@ -29934,6 +29934,9 @@ msgstr ""
 msgid "Toggle emoji award"
 msgstr ""
 
+msgid "Toggle focus mode"
+msgstr ""
+
 msgid "Toggle navigation"
 msgstr ""
 
