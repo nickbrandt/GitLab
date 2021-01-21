@@ -300,7 +300,7 @@ The Sidekiq dashboard consists of the following elements:
 
 ### Logs
 
-Since GitLab 13.0,Removal of logs view from the admin dashboard was implemented since the logging part does not work in multi-node setups and could cause confusion for administrators by displaying partial information.
+Since GitLab 13.0, **Log** view has been removed from the admin dashboard since the logging does not work in multi-node setups and could cause confusion for administrators by displaying partial information.
 
 For multi-node systems we recommend ingesting the logs into services like Elasticsearch and Splunk.
 
