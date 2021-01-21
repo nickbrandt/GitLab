@@ -62,7 +62,7 @@ module WikiHelper
   def wiki_error_message(error)
     case error
     when WikiPage::PageChangedError
-      page_link = link_to s_("WikiPageConflictMessage|the page"), wiki_page_path(@wiki, @page), target: "_blank"
+      page_link = link_to s_("WikiPageConflictMessage|the page"), wiki_page_path(@wiki, @page), target: "_blank", class: "gl-link"
       (s_("WikiPageConflictMessage|Someone edited the page the same time you did. Please check out %{page_link} and make sure your changes will not unintentionally remove theirs.") % { page_link: page_link }).html_safe
 
     when WikiPage::PageRenameError
