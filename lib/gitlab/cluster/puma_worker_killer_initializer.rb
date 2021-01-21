@@ -35,7 +35,7 @@ module Gitlab
           # regularly rather than rely on OOM behavior for periodic restarting.
           config.rolling_restart_frequency = 43200 # 12 hours in seconds.
 
-          # Spread the rolling restarts out over 1 hour to avoid too many simulatneous
+          # Spread the rolling restarts out over 1 hour to avoid too many simultaneous
           # process startups.
           config.rolling_restart_splay_seconds = 0.0..3600.0 # 0 to 1 hour in seconds.
 
