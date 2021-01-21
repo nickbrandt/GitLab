@@ -13,16 +13,18 @@ module EE
     def get_boards
       return super unless board_type == 'epic'
 
+      existing_boards = ::Boards::EpicBoardsFinder.new(parent).execute
+      return existing_boards if existing_boards.any?
+
       # if no epic board exists, create one for this group
-      board = ::Boards::EpicBoardsFinder.new(parent).execute
-      board || ::Boards::Epics::CreateService.new(parent, current_user).execute
+      [::Boards::Epics::CreateService.new(parent, current_user).execute.payload]
     end
 
     override :get_board
     def get_board
       return super unless board_type == 'epic'
 
-      ::Boards::EpicBoardsFinder.new(parent, id: params[:board_id]).execute
+      ::Boards::EpicBoardsFinder.new(parent, id: params[:board_id]).execute.first
     end
 
     def board_type
