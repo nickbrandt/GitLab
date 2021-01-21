@@ -372,7 +372,7 @@ group :development, :test do
 
   gem 'scss_lint', '~> 0.59.0', require: false
   gem 'haml_lint', '~> 0.36.0', require: false
-  gem 'bundler-audit', '~> 0.6.1', require: false
+  gem 'bundler-audit', '~> 0.7.0.1', require: false
 
   gem 'benchmark-ips', '~> 2.3.0', require: false
 
