@@ -6,13 +6,13 @@ RSpec.describe MergeRequest::MetricsFinder do
   let_it_be(:current_user) { create(:user) }
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:merge_request_not_merged) { create(:merge_request, :unique_branches, source_project: project) }
+  let_it_be(:merged_at) { Time.new(2020, 5, 1) }
   let_it_be(:merge_request_merged) do
     create(:merge_request, :unique_branches, :merged, source_project: project).tap do |mr|
-      mr.metrics.update!(merged_at: Time.new(2020, 5, 1))
+      mr.metrics.update!(merged_at: merged_at)
     end
   end
 
-  let(:merged_at) { merge_request_merged.metrics.merged_at }
   let(:params) do
     {
       target_project: project,

@@ -5,7 +5,7 @@ class MergeRequest::Metrics < ApplicationRecord
   belongs_to :pipeline, class_name: 'Ci::Pipeline', foreign_key: :pipeline_id
   belongs_to :latest_closed_by, class_name: 'User'
   belongs_to :merged_by, class_name: 'User'
-  belongs_to :target_project, class_name: 'Project'
+  belongs_to :target_project, class_name: 'Project', inverse_of: :merge_requests
 
   before_save :ensure_target_project_id
 

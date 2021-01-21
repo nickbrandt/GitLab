@@ -28,14 +28,15 @@ module Resolvers
       argument_names.delete(:merged_before)
       argument_names.delete(:merged_after)
 
+      # no extra filtering arguments are provided
+      return unless argument_names.empty?
+      return unless args[:merged_after] || args[:merged_before]
+
       # Detecting a specific query pattern:
       # mergeRequests(mergedAfter: "X", mergedBefore: "Y") {
       #   count
       # }
-      lookahead.selects?(:count) &&
-        lookahead.selections.size == 1 && # no other nodes are selected
-        (args[:merged_after] || args[:merged_before]) &&
-        argument_names.empty? # no extra filtering arguments are provided
+      lookahead.selects?(:count) && lookahead.selections.size == 1 # no other nodes are selected
     end
   end
 end
