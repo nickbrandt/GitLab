@@ -21,11 +21,11 @@ describe('PolicyAlertPicker component', () => {
 
   const defaultProps = { policyAlert: false };
 
-  const findAddAlertButton = () => wrapper.find("[data-testid='add-alert']");
+  const findAddAlertButton = () => wrapper.findByTestId('add-alert');
   const findAlertMessage = () => wrapper.findByTestId('policy-alert-message');
   const findHighVolumeAlert = () => wrapper.findByTestId('policy-alert-high-volume');
   const findNoAgentAlert = () => wrapper.findByTestId('policy-alert-no-agent');
-  const findRemoveAlertButton = () => wrapper.find("[data-testid='remove-alert']");
+  const findRemoveAlertButton = () => wrapper.findByTestId('remove-alert');
 
   const createWrapper = async ({ propsData = defaultProps, agentCount = 1 } = {}) => {
     const apolloProvider = createMockApolloProvider({ agentCount });
@@ -52,77 +52,129 @@ describe('PolicyAlertPicker component', () => {
     wrapper = null;
   });
 
+  describe('loading', () => {
+    describe('default state', () => {
+      beforeEach(async () => {
+        createWrapper();
+      });
+
+      it('does render the enabled add alert button ', () => {
+        expect(findAddAlertButton().exists()).toBe(true);
+        expect(findAddAlertButton().props('disabled')).toBe(false);
+      });
+
+      it('does not render the "no agent" alert', () => {
+        expect(findNoAgentAlert().exists()).toBe(false);
+      });
+    });
+
+    describe('alert enabled', () => {
+      beforeEach(async () => {
+        createWrapper({ propsData: { policyAlert: true } });
+      });
+
+      it('does render the "high volume" alert', () => {
+        expect(findHighVolumeAlert().exists()).toBe(true);
+      });
+
+      it('does not render the "no agent" alert', () => {
+        expect(findNoAgentAlert().exists()).toBe(false);
+      });
+    });
+  });
+
   describe('default state', () => {
-    beforeEach(async () => {
-      await createWrapper();
+    describe('agent installed', () => {
+      beforeEach(async () => {
+        await createWrapper();
+      });
+
+      it('does render the enabled add alert button ', () => {
+        expect(findAddAlertButton().exists()).toBe(true);
+        expect(findAddAlertButton().props('disabled')).toBe(false);
+      });
+
+      it('does not render the "high volume" alert', () => {
+        expect(findHighVolumeAlert().exists()).toBe(false);
+      });
+
+      it('does not render the alert message', () => {
+        expect(findAlertMessage().exists()).toBe(false);
+      });
+
+      it('does not render the remove alert button', () => {
+        expect(findRemoveAlertButton().exists()).toBe(false);
+      });
+
+      it('does not render the "no agent" alert when there is an agent, ', () => {
+        expect(findNoAgentAlert().exists()).toBe(false);
+      });
+
+      it('does emit an event to add the alert', () => {
+        findAddAlertButton().vm.$emit('click');
+        expect(wrapper.emitted('update-alert')).toEqual([[true]]);
+      });
     });
 
-    it('does render the add alert button', () => {
-      expect(findAddAlertButton().exists()).toBe(true);
-    });
+    describe('no agent installed', () => {
+      beforeEach(async () => {
+        await createWrapper({ agentCount: 0 });
+      });
 
-    it('does not render the high volume warning', () => {
-      expect(findHighVolumeAlert().exists()).toBe(false);
-    });
+      it('does render the "no agent" alert', () => {
+        expect(findNoAgentAlert().exists()).toBe(true);
+      });
 
-    it('does not render the alert message', () => {
-      expect(findAlertMessage().exists()).toBe(false);
-    });
-
-    it('does not render the remove alert button', () => {
-      expect(findRemoveAlertButton().exists()).toBe(false);
-    });
-
-    it('does not show the "no agent" alert when there is an agent, ', () => {
-      expect(findNoAgentAlert().exists()).toBe(false);
-    });
-
-    it('does emit an event to add the alert', () => {
-      findAddAlertButton().vm.$emit('click');
-      expect(wrapper.emitted('update-alert')).toEqual([[true]]);
+      it('does render the disabled add alert button ', async () => {
+        expect(findAddAlertButton().exists()).toBe(true);
+        expect(findAddAlertButton().props('disabled')).toBe(true);
+      });
     });
   });
 
   describe('alert enabled', () => {
-    beforeEach(async () => {
-      await createWrapper({ propsData: { policyAlert: true } });
+    describe('agent installed', () => {
+      beforeEach(async () => {
+        await createWrapper({ propsData: { policyAlert: true } });
+      });
+
+      it('does not render the add alert button', () => {
+        expect(findAddAlertButton().exists()).toBe(false);
+      });
+
+      it('does render the "high volume" alert', () => {
+        expect(findHighVolumeAlert().exists()).toBe(true);
+      });
+
+      it('does render the alert message', () => {
+        expect(findAlertMessage().exists()).toBe(true);
+      });
+
+      it('does render the remove alert button', () => {
+        expect(findRemoveAlertButton().exists()).toBe(true);
+      });
+
+      it('does not render the "no agent" alert', () => {
+        expect(findNoAgentAlert().exists()).toBe(false);
+      });
+
+      it('does emit an event to remove the alert', () => {
+        findRemoveAlertButton().vm.$emit('click');
+        expect(wrapper.emitted('update-alert')).toEqual([[false]]);
+      });
     });
 
-    it('does not render the add alert button', () => {
-      expect(findAddAlertButton().exists()).toBe(false);
-    });
+    describe('no agent installed', () => {
+      beforeEach(async () => {
+        await createWrapper({ propsData: { policyAlert: true }, agentCount: 0 });
+      });
+      it('does render the "no agent" alert', () => {
+        expect(findNoAgentAlert().exists()).toBe(true);
+      });
 
-    it('does render the high volume warning', () => {
-      expect(findHighVolumeAlert().exists()).toBe(true);
-    });
-
-    it('does render the alert message', () => {
-      expect(findAlertMessage().exists()).toBe(true);
-    });
-
-    it('does render the remove alert button', () => {
-      expect(findRemoveAlertButton().exists()).toBe(true);
-    });
-
-    it('does not show the "no agent" alert when there is an agent, ', () => {
-      expect(findNoAgentAlert().exists()).toBe(false);
-    });
-
-    it('does emit an event to remove the alert', () => {
-      findRemoveAlertButton().vm.$emit('click');
-      expect(wrapper.emitted('update-alert')).toEqual([[false]]);
-    });
-  });
-
-  describe('no agent installed', () => {
-    it('add alert button is there and there is NOT an agent', async () => {
-      await createWrapper({ agentCount: 0 });
-      expect(findNoAgentAlert().exists()).toBe(true);
-    });
-
-    it('add alert button is NOT there and there is NOT an agent', async () => {
-      await createWrapper({ propsData: { policyAlert: true }, agentCount: 0 });
-      expect(findNoAgentAlert().exists()).toBe(true);
+      it('does not render the "high volume" alert', async () => {
+        expect(findHighVolumeAlert().exists()).toBe(false);
+      });
     });
   });
 });

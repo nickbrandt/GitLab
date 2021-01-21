@@ -31,7 +31,7 @@ export default {
     policyAlert: { type: Boolean, required: true },
   },
   apollo: {
-    isAgentInstalled: {
+    agentCount: {
       query: getAgentCount,
       variables() {
         return {
@@ -39,29 +39,31 @@ export default {
         };
       },
       update(data) {
-        return Boolean(data?.project?.clusterAgents?.count);
+        return data?.project?.clusterAgents?.count || 0;
       },
     },
   },
   data() {
     return {
-      isAgentInstalled: false,
+      agentCount: 0,
     };
+  },
+  computed: {
+    agentLoading() {
+      return this.$apollo.queries.agentCount.loading;
+    },
+    isAgentInstalled() {
+      return Boolean(this.agentCount) && !this.agentLoading;
+    },
+    spacingClass() {
+      return { 'gl-mt-5': !this.policyAlert && this.isAgentInstalled };
+    },
   },
 };
 </script>
 
 <template>
   <div>
-    <gl-alert
-      v-if="policyAlert"
-      variant="warning"
-      :dismissible="false"
-      class="gl-mt-5"
-      data-testid="policy-alert-high-volume"
-    >
-      {{ $options.i18n.HIGH_VOLUME_WARNING }}
-    </gl-alert>
     <gl-alert
       v-if="!isAgentInstalled"
       variant="danger"
@@ -82,9 +84,18 @@ export default {
         </template>
       </gl-sprintf>
     </gl-alert>
+    <gl-alert
+      v-else-if="policyAlert"
+      variant="warning"
+      :dismissible="false"
+      class="gl-mt-5"
+      data-testid="policy-alert-high-volume"
+    >
+      {{ $options.i18n.HIGH_VOLUME_WARNING }}
+    </gl-alert>
     <div
       class="gl-bg-gray-10 gl-border-solid gl-border-1 gl-border-gray-100 gl-rounded-base gl-p-5"
-      :class="{ 'gl-mt-5': !policyAlert && isAgentInstalled }"
+      :class="spacingClass"
     >
       <gl-button
         v-if="!policyAlert"
