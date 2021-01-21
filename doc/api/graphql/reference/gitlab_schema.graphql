@@ -3808,6 +3808,12 @@ type ComplianceFramework {
   Name of the compliance framework
   """
   name: String!
+
+  """
+  Full path of the compliance pipeline configuration stored in a project
+  repository, such as `.gitlab/compliance/soc2/.gitlab-ci.yml`.
+  """
+  pipelineConfigurationFullPath: String
 }
 
 """
@@ -3860,6 +3866,12 @@ input ComplianceFrameworkInput {
   New name for the compliance framework.
   """
   name: String
+
+  """
+  Full path of the compliance pipeline configuration stored in a project
+  repository, such as `.gitlab/compliance/soc2/.gitlab-ci.yml`.
+  """
+  pipelineConfigurationFullPath: String
 }
 
 """

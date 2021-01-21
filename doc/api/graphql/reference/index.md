@@ -591,6 +591,7 @@ Represents a ComplianceFramework associated with a Project.
 | `description` | String! | Description of the compliance framework |
 | `id` | ID! | Compliance framework ID |
 | `name` | String! | Name of the compliance framework |
+| `pipelineConfigurationFullPath` | String | Full path of the compliance pipeline configuration stored in a project repository, such as `.gitlab/compliance/soc2/.gitlab-ci.yml`. |
 
 ### ConfigureSastPayload
 
