@@ -19516,9 +19516,6 @@ msgstr ""
 msgid "No start date"
 msgstr ""
 
-msgid "No status"
-msgstr ""
-
 msgid "No template"
 msgstr ""
 
