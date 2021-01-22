@@ -1,14 +1,8 @@
 <script>
 import RotationAssignee from 'ee/oncall_schedules/components/rotations/components/rotation_assignee.vue';
-import {
-  PRESET_TYPES,
-  DAYS_IN_WEEK,
-  DAYS_IN_DATE_WEEK,
-  ASSIGNEE_SPACER,
-} from 'ee/oncall_schedules/constants';
-import getShiftTimeUnitWidthQuery from 'ee/oncall_schedules/graphql/queries/get_shift_time_unit_width.query.graphql';
-import { getOverlappingDaysInPeriods } from '~/lib/utils/datetime_utility';
-import { incrementDateByDays } from '../utils';
+import { DAYS_IN_WEEK, DAYS_IN_DATE_WEEK, ASSIGNEE_SPACER } from 'ee/oncall_schedules/constants';
+import { getOverlapDateInPeriods } from '~/lib/utils/datetime_utility';
+import { incrementDateByDays } from '../../../utils';
 
 export default {
   components: {
@@ -35,25 +29,14 @@ export default {
       type: String,
       required: true,
     },
-  },
-  data() {
-    return {
-      shiftTimeUnitWidth: 0,
-    };
-  },
-  apollo: {
     shiftTimeUnitWidth: {
-      query: getShiftTimeUnitWidthQuery,
+      type: Number,
+      required: true,
     },
   },
   computed: {
     currentTimeframeEndsAt() {
-      let UnitOfIncrement = 0;
-      if (this.presetType === PRESET_TYPES.WEEKS) {
-        UnitOfIncrement = DAYS_IN_DATE_WEEK;
-      }
-
-      return incrementDateByDays(this.timeframeItem, UnitOfIncrement);
+      return incrementDateByDays(this.timeframeItem, DAYS_IN_DATE_WEEK);
     },
     daysUntilEndOfTimeFrame() {
       return (
@@ -101,12 +84,11 @@ export default {
     },
     shiftRangeOverlap() {
       try {
-        return getOverlappingDaysInPeriods(
+        return getOverlapDateInPeriods(
           { start: this.timeframeItem, end: this.currentTimeframeEndsAt },
           { start: this.shiftStartsAt, end: this.shiftEndsAt },
         );
       } catch (error) {
-        // TODO: We need to decide the UX implications of a invalid date creation.
         return { daysOverlap: 0 };
       }
     },
@@ -126,7 +108,7 @@ export default {
       return this.timeframe[this.timeframe.length - 1];
     },
     totalShiftRangeOverlap() {
-      return getOverlappingDaysInPeriods(
+      return getOverlapDateInPeriods(
         {
           start: this.timeframeItem,
           end: incrementDateByDays(this.timeFrameEndsAt, DAYS_IN_DATE_WEEK),
