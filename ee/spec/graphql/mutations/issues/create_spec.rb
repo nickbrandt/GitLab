@@ -71,11 +71,8 @@ RSpec.describe Mutations::Issues::Create do
             stub_licensed_features(epics: true)
           end
 
-          it 'is successful' do
+          it 'is successful, and assigns the issue to the epic' do
             expect(subject[:errors]).to be_empty
-          end
-
-          it 'assigns the issue to the epic' do
             expect(mutated_issue).to have_attributes(epic: epic)
           end
 
