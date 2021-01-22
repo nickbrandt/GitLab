@@ -8,7 +8,8 @@ RSpec.describe 'epics swimlanes sidebar', :js do
   let_it_be(:project, reload: true) { create(:project, :public, group: group) }
 
   let_it_be(:board) { create(:board, project: project) }
-  let_it_be(:list) { create(:list, board: board, position: 0) }
+  let_it_be(:label) { create(:label, project: project, name: 'Label 1') }
+  let_it_be(:list) { create(:list, board: board, label: label, position: 0) }
   let_it_be(:epic1) { create(:epic, group: group) }
 
   let_it_be(:issue1, reload: true) { create(:issue, project: project) }
@@ -27,8 +28,6 @@ RSpec.describe 'epics swimlanes sidebar', :js do
       page.find('.dropdown-toggle').click
       page.find('.dropdown-item', text: 'Epic').click
     end
-
-    wait_for_all_requests
   end
 
   context 'notifications subscription' do
