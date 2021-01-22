@@ -212,7 +212,7 @@
   :idempotent: true
   :tags: []
 - :name: cronjob:historical_data
-  :feature_category: :license
+  :feature_category: :utilization
   :has_external_dependencies:
   :urgency: :low
   :resource_boundary: :unknown
