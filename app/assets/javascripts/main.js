@@ -25,6 +25,7 @@ import { deprecatedCreateFlash as Flash, removeFlashClickListener } from './flas
 import initTodoToggle from './header';
 import initLayoutNav from './layout_nav';
 import initAlertHandler from './alert_handler';
+import initTabHandler from './tab_handler';
 import './feature_highlight/feature_highlight_options';
 import LazyLoader from './lazy_loader';
 import initLogoAnimation from './logo';
@@ -174,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initUserTracking();
   initLayoutNav();
   initAlertHandler();
+  initTabHandler();
 
   // Set the default path for all cookies to GitLab's root directory
   Cookies.defaults.path = gon.relative_url_root || '/';

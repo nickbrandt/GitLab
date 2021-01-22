@@ -21,13 +21,13 @@
         = _('Projects that belong to a group are prefixed with the group namespace. Existing projects may be moved into a group.')
 
     .col-lg-9.js-toggle-container
-      %ul.nav.nav-tabs.nav-links.gitlab-tabs{ role: 'tablist' }
+      %ul.nav.gl-nav-tabs.nav-links.gitlab-tabs{ role: 'tablist' }
         %li.nav-item{ role: 'presentation' }
-          %a.nav-link.active{ href: '#create-group-pane', id: 'create-group-tab', role: 'tab', data: { toggle: 'tab', track_label: 'create_group', track_event: 'click_tab', track_value: '' } }
+          %a.nav-link.active{ href: '#create-group-pane', id: 'create-group-tab', role: 'tab', data: { track_label: 'create_group', track_event: 'click_tab', track_value: '' } }
             %span.d-none.d-sm-block= s_('GroupsNew|Create group')
             %span.d-block.d-sm-none= s_('GroupsNew|Create')
         %li.nav-item{ role: 'presentation' }
-          %a.nav-link{ href: '#import-group-pane', id: 'import-group-tab', role: 'tab', data: { toggle: 'tab', track_label: 'import_group', track_event: 'click_tab', track_value: '' } }
+          %a.nav-link{ href: '#import-group-pane', id: 'import-group-tab', role: 'tab', data: { track_label: 'import_group', track_event: 'click_tab', track_value: '' } }
             %span.d-none.d-sm-block= s_('GroupsNew|Import group')
             %span.d-block.d-sm-none= s_('GroupsNew|Import')
 
