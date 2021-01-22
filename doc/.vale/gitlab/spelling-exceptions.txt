@@ -10,6 +10,7 @@ Ansible
 Anthos
 approvers
 architected
+Arel
 Artifactory
 Asana
 Asciidoctor
@@ -63,7 +64,10 @@ bundler
 bundlers
 burndown
 burnup
+burstable
 cacheable
+callstack
+callstacks
 CentOS
 Certbot
 changeset
@@ -139,6 +143,7 @@ Ecto
 Elasticsearch
 enablement
 enqueued
+enqueues
 enum
 enums
 ETag
@@ -237,6 +242,8 @@ kaniko
 Karma
 Kerberos
 keyset
+keytab
+keytabs
 Kibana
 Kinesis
 Knative
@@ -311,6 +318,7 @@ namespaces
 namespacing
 namespacings
 Nanoc
+negatable
 Netlify
 Nokogiri
 npm
@@ -516,6 +524,7 @@ Sysbench
 syslog
 tanuki
 tcpdump
+templated
 Thanos
 throughputs
 Tiller
@@ -644,6 +653,7 @@ Wireshark
 Wordpress
 worktree
 worktrees
+Worldline
 Xcode
 Xeon
 YouTrack
