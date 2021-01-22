@@ -3,7 +3,9 @@ import BindInOut from '~/behaviors/bind_in_out';
 import initFilePickers from '~/file_pickers';
 import Group from '~/group';
 import LinkedTabs from '~/lib/utils/bootstrap_linked_tabs';
+import initVueTabs from '~/vue_tabs';
 import GroupPathValidator from './group_path_validator';
+import GroupTabs from './group_tabs.vue';
 
 new GroupPathValidator(); // eslint-disable-line no-new
 
@@ -12,6 +14,7 @@ initFilePickers();
 
 new Group(); // eslint-disable-line no-new
 
+initVueTabs({ rootSelector: '.js-group-tabs', component: GroupTabs });
 const CONTAINER_SELECTOR = '.group-edit-container .nav-tabs';
 const DEFAULT_ACTION = '#create-group-pane';
 // eslint-disable-next-line no-new
