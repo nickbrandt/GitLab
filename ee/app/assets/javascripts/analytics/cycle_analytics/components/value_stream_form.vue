@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { GlButton, GlForm, GlFormInput, GlFormGroup, GlFormRadioGroup, GlModal } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
 import { sprintf } from '~/locale';
+import { swapArrayItems } from '~/lib/utils/array_utility';
 import {
   DEFAULT_STAGE_CONFIG,
   STAGE_SORT_DIRECTION,
@@ -14,13 +15,6 @@ import {
 import { validateValueStreamName, validateStage } from './create_value_stream_form/utils';
 import DefaultStageFields from './create_value_stream_form/default_stage_fields.vue';
 import CustomStageFields from './create_value_stream_form/custom_stage_fields.vue';
-
-const swapArrayItems = (arr, left, right) => [
-  ...arr.slice(0, left),
-  arr[right],
-  arr[left],
-  ...arr.slice(right + 1, arr.length),
-];
 
 const findStageIndexByName = (stages, target = '') =>
   stages.findIndex(({ name }) => name === target);
