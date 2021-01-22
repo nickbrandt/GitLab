@@ -11,7 +11,7 @@ RSpec.describe ::IncidentManagement::OncallShifts::ReadService do
   let_it_be(:current_user) { user_with_permissions }
 
   let(:params) { { start_time: 15.minutes.since(rotation.starts_at), end_time: 3.weeks.since(rotation.starts_at) } }
-  let(:service) { described_class.new(rotation, current_user, params) }
+  let(:service) { described_class.new(rotation, current_user, **params) }
 
   before_all do
     project.add_reporter(user_with_permissions)
