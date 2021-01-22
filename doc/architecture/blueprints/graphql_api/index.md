@@ -43,7 +43,7 @@ Grafana and Elastic.
 
 It is an opporunity to learn from our experience in evolving the REST API, for
 the scale, and to apply this knowledge onto the GraphQL development efforts. We
-can do that by building N+1 query detection mechanisms and alerting, adding
+can do that by building query-to-feature correlation mechanisms, adding
 scalable state synchronization support and aligning GraphQL with other
 architectural initiatives being executed in parallel, like [the support for
 direct uploads](https://gitlab.com/gitlab-org/gitlab/-/issues/280819).
@@ -73,11 +73,12 @@ incidents what will be difficult to resolve.
 We want to build a comprehensive Grafana dashboard that will focus on
 delivering insights of how GraphQL endpoint performs, while still empowering
 team members with capability of zooming in into details. We want to improve
-logging to make it possible to ingest GraphQL queries into Elastic and index
-them in a way that problems with expensive queries can be detected early.
+logging to make it possible to better correlate GraphQL queries with feature
+using Elastic and to index them in a way that performance problems can be
+detected early.
 
 - Build a comprehensive Grafana dashboard for GraphQL
-- Build a comprehensive logging mechanisms for GraphQL queries
+- Build a GraphQL query-to-feature correlation mechanisms
 
 ### Manage volatile GraphQL data structures
 
@@ -91,7 +92,6 @@ easy to understand.
 
 - Define a deprecation policy that will serve our users better
 - Build a dashboard showing usage of deprecated GraphQL fields
-- Log queries using deprecated GraphQL fields in Elastic
 
 ### Ensure consistency with the rest of the codebase
 
@@ -108,8 +108,8 @@ this knowledge onto GraphQL and make it performant and secure by default.
 
 - Design direct uploads for GraphQL
 - Make GraphQL secure by default
-- Build GraphQL query depth histogram
-- N+1 detection for GraphQL
+- Build GraphQL query depth and complexity histograms
+- Add support for GraphQL etags for existing features
 
 ### Design GraphQL interoperability with REST API
 
@@ -123,7 +123,7 @@ Making it interoperable by exposing a common scheme for resource identifiers is
 a prerequisite for interoperability.
 
 - Make GraphQL and REST API interoperable
-- Design common resource identifiers
+- Design common resource identifiers for both APIs
 
 ### Design scalable state synchronization mechanisms
 
@@ -133,14 +133,14 @@ is an ongoing process that has already surfaced the need of building better
 state synchronization mechanisms and hooking into existing ones.
 
 - Deisgn a scalable state synchronization mechanism
-- Build GraphQL support for e-tags that are used with the REST API
 - Evaluate state synchronization through pub/sub and websockets
+- Build a generic support for GraphQL feature correlation and feature etags
 
 ## Iterations
 
 1. Build comprehensive Grafana dashboard for GraphQL
-1. Ingest and index GraphQL queries in Elastic
 1. Build a scalable GraphQL state synchronization
+1. Build GraphQL feature-to-query correlation mechanisms
 1. Design a better deprecation policy and monitoring
 1. Collaborate with AppSec Team to make GraphQL secure by default
 1. Add support for direct uploads for GraphQL
