@@ -186,6 +186,7 @@ Haml
 hardcode
 hardcoded
 hardcodes
+Haswell
 heatmap
 heatmaps
 Helm
@@ -501,12 +502,15 @@ substrings
 subtree
 subtrees
 sudo
+swappiness
 swimlane
 swimlanes
+Sysbench
 syslog
 tanuki
 tcpdump
 Thanos
+throughputs
 Tiller
 timecop
 todos
