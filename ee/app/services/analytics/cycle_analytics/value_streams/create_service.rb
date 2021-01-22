@@ -9,7 +9,7 @@ module Analytics
         def initialize(group:, params:, current_user:, value_stream: ::Analytics::CycleAnalytics::GroupValueStream.new(group: group))
           @value_stream = value_stream
           @group = group
-          @params = process_params(params)
+          @params = process_params(params.dup)
           @current_user = current_user
         end
 
@@ -22,6 +22,9 @@ module Analytics
           if value_stream.save
             ServiceResponse.success(message: nil, payload: { value_stream: value_stream }, http_status: success_http_status)
           else
+            # workaround to properly index nested stage errors
+            # More info: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/51623#note_490919557
+            value_stream.valid?(:context_to_validate_all_stages)
             ServiceResponse.error(message: 'Invalid parameters', payload: { errors: value_stream.errors, value_stream: value_stream }, http_status: :unprocessable_entity)
           end
         end

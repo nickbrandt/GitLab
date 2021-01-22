@@ -93,8 +93,8 @@ RSpec.describe Groups::Analytics::CycleAnalytics::ValueStreamsController do
           post :create, params: { group_id: group, value_stream: value_stream_params }
 
           expect(response).to have_gitlab_http_status(:unprocessable_entity)
-          stage_error = json_response['payload']['errors']['stages'].first
-          expect(stage_error['errors']['name']).to be_present
+          stage_errors = json_response['payload']['errors']['stages']['0']
+          expect(stage_errors).to be_present
         end
       end
     end
@@ -116,11 +116,11 @@ RSpec.describe Groups::Analytics::CycleAnalytics::ValueStreamsController do
 
         let(:value_stream_params) do
           {
-            name: 'test',
+            name: 'updated name',
             stages: [
               {
                 id: stage.id,
-                name: 'new stage name',
+                name: 'updated stage name',
                 custom: true
               }
             ]
@@ -128,10 +128,12 @@ RSpec.describe Groups::Analytics::CycleAnalytics::ValueStreamsController do
         end
 
         it 'returns a successful 200 response' do
-          put :update, params: { id: value_stream.id, group_id: group, value_stream: { name: 'new name' } }
+          put :update, params: { id: value_stream.id, group_id: group, value_stream: value_stream_params }
 
           expect(response).to have_gitlab_http_status(:ok)
-          expect(json_response['name']).to eq('new name')
+          expect(json_response['name']).to eq('updated name')
+          expect(json_response['id']).to eq(value_stream.id)
+          expect(json_response['stages'].first['title']).to eq('updated stage name')
         end
       end
     end

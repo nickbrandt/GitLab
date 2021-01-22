@@ -13,7 +13,11 @@ RSpec.describe Analytics::CycleAnalytics::ValueStreamErrorsSerializer do
 
     value_stream.validate
 
-    expect(subject[:name]).not_to be_empty
+    expect(subject['name']).not_to be_empty
+  end
+
+  it 'does not contain stage errors' do
+    expect(subject).not_to have_key('stages')
   end
 
   context 'when nested value stream stages are given' do
@@ -28,8 +32,28 @@ RSpec.describe Analytics::CycleAnalytics::ValueStreamErrorsSerializer do
     it 'serializes error on value stream object' do
       value_stream.validate
 
-      stage = subject[:stages].first
-      expect(stage[:errors]).not_to be_empty
+      stage_errors = subject['stages'][0]
+      expect(stage_errors).not_to be_empty
+    end
+  end
+
+  describe '::STAGE_ATTRIBUTE_REGEX' do
+    let(:attribute) { '' }
+
+    subject do
+      attribute.match(described_class::STAGE_ATTRIBUTE_REGEX).captures
+    end
+
+    context 'extracts the index and the stage attribute name' do
+      let(:attribute) { 'stages[0].name' }
+
+      it { is_expected.to eq(%w[0 name]) }
+
+      context 'when large index is given' do
+        let(:attribute) { 'stages[11].name' }
+
+        it { is_expected.to eq(%w[11 name]) }
+      end
     end
   end
 end

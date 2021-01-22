@@ -54,7 +54,7 @@ RSpec.describe Analytics::CycleAnalytics::ValueStreams::CreateService do
           params[:stages].first[:name] = ''
 
           errors = subject.payload[:errors].details
-          expect(errors[:'stages.name']).to eq([{ error: :blank }])
+          expect(errors[:'stages[0].name']).to eq([{ error: :blank }])
         end
       end
 

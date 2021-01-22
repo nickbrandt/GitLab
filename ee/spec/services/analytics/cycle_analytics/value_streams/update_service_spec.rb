@@ -20,6 +20,8 @@ RSpec.describe Analytics::CycleAnalytics::ValueStreams::UpdateService do
 
   subject { described_class.new(value_stream: value_stream, group: group, params: params, current_user: user).execute }
 
+  it_behaves_like 'common value stream service examples'
+
   context 'when the feature is available' do
     before do
       group.add_developer(user)
@@ -59,7 +61,7 @@ RSpec.describe Analytics::CycleAnalytics::ValueStreams::UpdateService do
         it 'returns error' do
           expect(subject).to be_error
           errors = subject.payload[:errors].details
-          expect(errors[:'stages.name']).to eq([{ error: :blank }])
+          expect(errors[:'stages[1].name']).to eq([{ error: :blank }])
         end
       end
     end

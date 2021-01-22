@@ -20,14 +20,13 @@ module Analytics
           processed_params
         end
 
-        # rubocop: disable CodeReuse/ActiveRecord
         def persisted_stage_ids
-          @persisted_stage_ids ||= value_stream.stages.pluck(:id)
+          @persisted_stage_ids ||= value_stream.stages.pluck_primary_key
         end
-        # rubocop: enable CodeReuse/ActiveRecord
 
         def to_be_deleted?(processed_params, stage_id)
-          processed_params[:stages_attributes].none? { |attrs| attrs[:id] == stage_id }
+          processed_params.has_key?(:stages_attributes) &&
+          processed_params[:stages_attributes].none? { |attrs| Integer(attrs[:id]) == stage_id }
         end
 
         def success_http_status
