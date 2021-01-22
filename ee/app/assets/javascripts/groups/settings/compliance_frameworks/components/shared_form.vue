@@ -11,9 +11,8 @@ import {
 } from '@gitlab/ui';
 
 import { helpPagePath } from '~/helpers/help_page_helper';
-import { visitUrl } from '~/lib/utils/url_utility';
+import { validateHexColor } from '~/lib/utils/color_utils';
 import { s__ } from '~/locale';
-import * as Sentry from '~/sentry/wrapper';
 import ColorPicker from '~/vue_shared/components/color_picker/color_picker.vue';
 
 export default {
@@ -29,85 +28,88 @@ export default {
     GlSprintf,
   },
   props: {
+    complianceFramework: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    error: {
+      type: String,
+      required: false,
+      default: null,
+    },
     groupEditPath: {
       type: String,
       required: true,
     },
-    service: {
-      type: Object,
-      required: true,
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
     return {
-      complianceFramework: {},
-      error: '',
-      isLoaded: false,
-      validColor: null,
+      name: null,
+      description: null,
+      color: null,
     };
   },
   computed: {
-    validTitle() {
-      if (Object.keys(this.complianceFramework).includes('name')) {
-        return this.complianceFramework.name !== '';
+    isValidColor() {
+      return validateHexColor(this.color);
+    },
+    isValidName() {
+      if (this.name === null) {
+        return null;
       }
 
-      return true;
+      return Boolean(this.name);
+    },
+    isValidDescription() {
+      if (this.description === null) {
+        return null;
+      }
+
+      return Boolean(this.description);
     },
     disableSubmitBtn() {
-      return (!this.complianceFramework?.title?.length && !this.validTitle) || !this.validColor;
+      return !this.isValidName || !this.isValidDescription || !this.isValidColor;
     },
     scopedLabelsHelpPath() {
       return helpPagePath('user/project/labels.md', { anchor: 'scoped-labels' });
     },
-    isLoading() {
-      return !this.isLoaded;
-    },
   },
-  async mounted() {
-    this.isLoaded = false;
-
-    try {
-      this.complianceFramework = await this.service.getComplianceFramework();
-    } catch (e) {
-      this.setError(e, this.$options.i18n.fetchError);
-    }
-
-    this.isLoaded = true;
-  },
-  methods: {
-    setError(error, userFriendlyText) {
-      this.error = userFriendlyText;
-      Sentry.captureException(error);
-    },
-    async onSubmit(event) {
-      event.preventDefault();
-
-      this.isLoaded = false;
-
-      try {
-        await this.service.putComplianceFramework(this.complianceFramework);
-        visitUrl(this.groupEditPath);
-      } catch (e) {
-        this.setError(e, e.toString());
+  watch: {
+    complianceFramework() {
+      if (this.name === null) {
+        this.name = this.complianceFramework?.name;
       }
 
-      this.isLoaded = true;
+      if (this.description === null) {
+        this.description = this.complianceFramework?.description;
+      }
+
+      if (this.color === null) {
+        this.color = this.complianceFramework?.color;
+      }
     },
-    colorValidation(valid) {
-      this.validColor = valid;
+  },
+  methods: {
+    onSubmit() {
+      const { name, description, color } = this;
+
+      this.$emit('submit', { name, description, color });
     },
   },
   i18n: {
-    fetchError: s__(
-      'ComplianceFrameworks|Error fetching compliance frameworks data. Please refresh the page',
-    ),
     titleInputLabel: s__('ComplianceFrameworks|Title'),
     titleInputDescription: s__(
       'ComplianceFrameworks|Use %{codeStart}::%{codeEnd} to create a %{linkStart}scoped set%{linkEnd} (eg. %{codeStart}SOX::AWS%{codeEnd})',
     ),
     titleInputInvalid: s__('ComplianceFrameworks|A title is required'),
     descriptionInputLabel: s__('ComplianceFrameworks|Description'),
+    descriptionInputInvalid: s__('ComplianceFrameworks|A description is required'),
     colorInputLabel: s__('ComplianceFrameworks|Background color'),
     submitBtnText: s__('ComplianceFrameworks|Save changes'),
     cancelBtnText: s__('ComplianceFrameworks|Cancel'),
@@ -119,13 +121,13 @@ export default {
     <gl-alert v-if="error" class="gl-mt-5" variant="danger" :dismissible="false">
       {{ error }}
     </gl-alert>
-    <gl-loading-icon v-if="isLoading" size="lg" class="gl-mt-5" />
+    <gl-loading-icon v-if="loading" size="lg" class="gl-mt-5" />
 
-    <gl-form v-if="!isLoading" @submit="onSubmit">
+    <gl-form v-if="!loading" @submit.prevent="onSubmit">
       <gl-form-group
         :label="$options.i18n.titleInputLabel"
         :invalid-feedback="$options.i18n.titleInputInvalid"
-        :state="validTitle"
+        :state="isValidName"
         data-testid="name-input-group"
       >
         <template #description>
@@ -140,18 +142,32 @@ export default {
           </gl-sprintf>
         </template>
 
-        <gl-form-input v-model="complianceFramework.name" data-testid="name-input" />
+        <gl-form-input
+          :value="complianceFramework.name"
+          data-testid="name-input"
+          @input="name = $event"
+        />
       </gl-form-group>
 
-      <gl-form-group :label="$options.i18n.descriptionInputLabel">
-        <gl-form-input v-model="complianceFramework.description" data-testid="description-input" />
+      <gl-form-group
+        :label="$options.i18n.descriptionInputLabel"
+        :invalid-feedback="$options.i18n.descriptionInputInvalid"
+        :state="isValidDescription"
+        data-testid="description-input-group"
+      >
+        <gl-form-input
+          :value="complianceFramework.description"
+          data-testid="description-input"
+          @input="description = $event"
+        />
       </gl-form-group>
 
       <color-picker
-        v-model="complianceFramework.color"
+        :value="complianceFramework.color"
         :label="$options.i18n.colorInputLabel"
         :set-color="complianceFramework.color"
-        @validation="colorValidation"
+        :state="isValidColor"
+        @input="color = $event"
       />
 
       <div

@@ -1,8 +1,15 @@
 import Vue from 'vue';
+import VueApollo from 'vue-apollo';
 
+import CreateForm from './components/create_form.vue';
+import EditForm from './components/edit_form.vue';
 import createDefaultClient, { fetchPolicies } from '~/lib/graphql';
-import Form from './components/form.vue';
-import ComplianceFrameworksService from './services/compliance_frameworks_service';
+
+Vue.use(VueApollo);
+
+const apolloProvider = new VueApollo({
+  defaultClient: createDefaultClient({}, { fetchPolicy: fetchPolicies.NO_CACHE }),
+});
 
 const createComplianceFrameworksFormApp = (el) => {
   if (!el) {
@@ -13,16 +20,17 @@ const createComplianceFrameworksFormApp = (el) => {
 
   return new Vue({
     el,
+    apolloProvider,
     render(createElement) {
-      return createElement(Form, {
-        props: {
-          groupEditPath,
-          service: new ComplianceFrameworksService(
-            createDefaultClient({}, { fetchPolicy: fetchPolicies.NO_CACHE }),
-            groupPath,
-            id,
-          ),
-        },
+      let element = CreateForm;
+      let props = { groupEditPath, groupPath };
+
+      if (id) {
+        element = EditForm;
+        props = { ...props, id };
+      }
+      return createElement(element, {
+        props,
       });
     },
   });
