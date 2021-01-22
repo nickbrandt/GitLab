@@ -132,7 +132,7 @@ it to model interactions between GitLab backend and frontend components. This
 is an ongoing process that has already surfaced the need of building better
 state synchronization mechanisms and hooking into existing ones.
 
-- Deisgn a scalable state synchronization mechanism
+- Design a scalable state synchronization mechanism
 - Evaluate state synchronization through pub/sub and websockets
 - Build a generic support for GraphQL feature correlation and feature etags
 
