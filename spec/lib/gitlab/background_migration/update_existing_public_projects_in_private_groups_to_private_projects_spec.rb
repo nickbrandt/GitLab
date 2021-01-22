@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::BackgroundMigration::UpdateExistingPublicProjectsInPrivateGroupsToPrivateProjects, :migration, schema: 20191029191901 do
+RSpec.describe Gitlab::BackgroundMigration::UpdateExistingPublicProjectsInPrivateGroupsToPrivateProjects, :migration, schema: 20210122125120 do
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:project) { projects.find_by_name(name) }
