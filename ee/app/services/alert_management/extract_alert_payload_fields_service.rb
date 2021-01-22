@@ -38,19 +38,11 @@ module AlertManagement
     end
 
     def available?
-      feature_enabled? && license_available?
+      ::Gitlab::AlertManagement.custom_mapping_available?(project)
     end
 
     def allowed?
       current_user&.can?(:admin_operations, project)
-    end
-
-    def feature_enabled?
-      Feature.enabled?(:multiple_http_integrations_custom_mapping, project)
-    end
-
-    def license_available?
-      project&.feature_available?(:multiple_alert_http_integrations)
     end
   end
 end
