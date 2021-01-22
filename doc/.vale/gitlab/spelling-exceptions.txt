@@ -65,6 +65,8 @@ burnup
 cacheable
 CentOS
 Certbot
+changeset
+changesets
 chai
 chatbot
 chatbots
@@ -211,6 +213,7 @@ interdependencies
 interdependency
 interruptible
 Irker
+issuables
 Istio
 Jaeger
 jasmine-jquery
@@ -373,6 +376,10 @@ Rackspace
 Raspbian
 Rdoc
 reachability
+reauthenticate
+reauthenticated
+reauthenticates
+reauthenticating
 rebase
 rebased
 rebases
