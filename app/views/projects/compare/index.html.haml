@@ -1,6 +1,8 @@
 - breadcrumb_title _("Compare Revisions")
 - page_title _("Compare")
 
+= target_projects(@project)
+
 %h3.page-title
   = _("Compare Git revisions")
 .sub-header-block
@@ -13,4 +15,6 @@
   = html_escape(_("Changes are shown as if the %{b_open}source%{b_close} revision was being merged into the %{b_open}target%{b_close} revision.")) % { b_open: '<b>'.html_safe, b_close: '</b>'.html_safe }
 
 .prepend-top-20
+  #js-compare-selector{ data: {refs_project_path: refs_project_path(@project), params_from: params[:from], params_to: params[:to] } }
   = render "form"
+  -# = render "form_sam"

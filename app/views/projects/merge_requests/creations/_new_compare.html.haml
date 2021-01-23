@@ -10,7 +10,7 @@
         .card-header
           Source branch
         .card-body.clearfix
-          .merge-request-select.dropdown
+          .merge-request-select.dropdown.SAMMY
             = f.hidden_field :source_project_id
             = dropdown_toggle @merge_request.source_project_path, { toggle: "dropdown", 'field-name': "#{f.object_name}[source_project_id]", disabled: @merge_request.persisted? }, { toggle_class: "js-compare-dropdown js-source-project" }
             .dropdown-menu.dropdown-menu-selectable.dropdown-source-project
