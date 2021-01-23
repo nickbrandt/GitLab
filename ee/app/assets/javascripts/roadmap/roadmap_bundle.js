@@ -50,6 +50,14 @@ export default () => {
     components: {
       roadmapApp,
     },
+    provide() {
+      const { dataset } = this.$options.el;
+
+      return {
+        newEpicPath: dataset.newEpicPath,
+        listEpicsPath: dataset.listEpicsPath,
+      };
+    },
     data() {
       const supportedPresetTypes = Object.keys(PRESET_TYPES);
       const { dataset } = this.$options.el;
@@ -83,7 +91,6 @@ export default () => {
         basePath: dataset.epicsPath,
         fullPath: dataset.fullPath,
         epicIid: dataset.iid,
-        newEpicEndpoint: dataset.newEpicEndpoint,
         groupLabelsEndpoint: dataset.groupLabelsEndpoint,
         groupMilestonesEndpoint: dataset.groupMilestonesEndpoint,
         epicsState: dataset.epicsState,
@@ -119,7 +126,6 @@ export default () => {
       return createElement('roadmap-app', {
         props: {
           presetType: this.presetType,
-          newEpicEndpoint: this.newEpicEndpoint,
           emptyStateIllustrationPath: this.emptyStateIllustrationPath,
         },
       });
