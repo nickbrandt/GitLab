@@ -17232,9 +17232,6 @@ msgstr ""
 msgid "Make sure you save it - you won't be able to access it again."
 msgstr ""
 
-msgid "Make this epic confidential"
-msgstr ""
-
 msgid "Makes this issue confidential."
 msgstr ""
 
@@ -29031,9 +29028,6 @@ msgid "This environment's canary ingress has been updated recently. Please retry
 msgstr ""
 
 msgid "This epic already has the maximum number of child epics."
-msgstr ""
-
-msgid "This epic and its child elements will only be visible to team members with at minimum Reporter access."
 msgstr ""
 
 msgid "This epic does not exist or you don't have sufficient permission."
