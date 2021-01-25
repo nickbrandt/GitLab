@@ -11,7 +11,7 @@ RSpec.describe 'Projects > Files > User wants to add a .gitignore file', :js do
     visit project_new_blob_path(project, 'master', file_name: '.gitignore')
   end
 
-  it 'user can pick a .gitignore file from the dropdown', :js do
+  it 'user can pick a .gitignore file from the dropdown' do
     expect(page).to have_css('.gitignore-selector')
 
     find('.js-gitignore-selector').click
