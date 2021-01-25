@@ -1,7 +1,6 @@
 <script>
 import Vue from 'vue';
 import { GlCard, GlEmptyState, GlLink, GlSkeletonLoader, GlTable } from '@gitlab/ui';
-import { once } from 'lodash';
 import api from '~/api';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { __, s__ } from '~/locale';
@@ -70,13 +69,6 @@ export default {
     };
   },
   computed: {
-    handleProjectUsageData() {
-      return once(() => {
-        if (this.glFeatures.usageDataITestingGroupCodeCoverageProjectClickTotal) {
-          api.trackRedisHllUserEvent(this.$options.usagePingProjectEvent);
-        }
-      });
-    },
     hasCoverageData() {
       return Boolean(this.selectedCoverageData.length);
     },
@@ -108,6 +100,11 @@ export default {
   methods: {
     handleError() {
       this.hasError = true;
+    },
+    onProjectClick() {
+      if (this.glFeatures.usageDataITestingGroupCodeCoverageProjectClickTotal) {
+        api.trackRedisHllUserEvent(this.$options.usagePingProjectEvent);
+      }
     },
     selectAllProjects(allProjects) {
       this.projectIds = Object.fromEntries(allProjects.map(({ id }) => [id, true]));
@@ -227,7 +224,7 @@ export default {
           target="_blank"
           :href="item.codeCoveragePath"
           :data-testid="`${item.id}-name`"
-          @click="handleProjectUsageData"
+          @click.once="onProjectClick"
         >
           {{ item.name }}
         </gl-link>
