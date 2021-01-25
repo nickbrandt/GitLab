@@ -15,11 +15,11 @@ export default {
     troubleshootingDocsPath() {
       return helpPagePath('ci/troubleshooting', { anchor: 'merge-request-status-messages' });
     },
-    failedMessage() {
-      return s__(
-        `mrWidget|The pipeline for this merge request did not complete. Push a new commit to fix the failure or check the %{linkStart}troubleshooting documentation%{linkEnd} to see other possible actions.`,
-      );
-    },
+  },
+  i18n: {
+    failedMessage: s__(
+      `mrWidget|The pipeline for this merge request did not complete. Push a new commit to fix the failure or check the %{linkStart}troubleshooting documentation%{linkEnd} to see other possible actions.`,
+    ),
   },
 };
 </script>
@@ -29,7 +29,7 @@ export default {
     <status-icon :show-disabled-button="true" status="warning" />
     <div class="media-body space-children">
       <span class="bold">
-        <gl-sprintf :message="failedMessage">
+        <gl-sprintf :message="$options.i18n.failedMessage">
           <template #link="{ content }">
             <gl-link :href="troubleshootingDocsPath" target="_blank">
               {{ content }}
