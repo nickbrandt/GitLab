@@ -22680,7 +22680,7 @@ msgstr ""
 msgid "Projects to index"
 msgstr ""
 
-msgid "Projects will be permanently deleted after a 7-day waiting period."
+msgid "Projects will be permanently deleted after a %{waiting_period}-day waiting period."
 msgstr ""
 
 msgid "Projects will be permanently deleted immediately."
