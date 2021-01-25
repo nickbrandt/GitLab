@@ -149,16 +149,16 @@ RSpec.describe 'Rack Attack global throttles' do
           expect(response).to have_gitlab_http_status(:ok)
         end
 
-        arguments = {
+        arguments = a_hash_including({
           message: 'Rack_Attack',
           env: :throttle,
           remote_ip: '127.0.0.1',
           request_method: 'GET',
           path: '/users/sign_in',
           matched: 'throttle_unauthenticated'
-        }
+        })
 
-        expect(Gitlab::AuthLogger).to receive(:error).with(arguments)
+        expect(Gitlab::AuthLogger).to receive(:error).with(arguments).at_least(:once)
 
         get url_that_does_not_require_authentication
       end
