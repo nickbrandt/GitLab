@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe 'Groups > Billing', :js do
   include StubRequests
+  include SubscriptionPortalHelpers
 
   let_it_be(:user) { create(:user) }
   let_it_be(:group) { create(:group) }
@@ -18,6 +19,7 @@ RSpec.describe 'Groups > Billing', :js do
   end
 
   before do
+    stub_eoa_eligibility_request(group.id)
     stub_full_request("#{EE::SUBSCRIPTIONS_URL}/gitlab_plans?plan=#{plan}&namespace_id=#{group.id}")
       .with(headers: { 'Accept' => 'application/json' })
       .to_return(status: 200, body: File.new(Rails.root.join('ee/spec/fixtures/gitlab_com_plans.json')))
