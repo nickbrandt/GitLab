@@ -14,6 +14,10 @@ module Dast
 
     validate :project_ids_match
 
+    scope :by_project_id, -> (project_id) do
+      where(project_id: project_id)
+    end
+
     private
 
     def project_ids_match
