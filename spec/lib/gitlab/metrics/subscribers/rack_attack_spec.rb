@@ -3,8 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Gitlab::Metrics::Subscribers::RackAttack, :request_store do
-  let(:logger) { double(:logger) }
-  let(:subscriber) { described_class.new(auth_logger: logger) }
+  let(:subscriber) { described_class.new }
 
   describe '.payload' do
     context 'when the request store is empty' do
@@ -78,7 +77,7 @@ RSpec.describe Gitlab::Metrics::Subscribers::RackAttack, :request_store do
       end
 
       it 'logs request information' do
-        expect(logger).to receive(:error).with(
+        expect(Gitlab::AuthLogger).to receive(:error).with(
           message: 'Rack_Attack',
           env: match_type,
           remote_ip: '1.2.3.4',
@@ -109,7 +108,7 @@ RSpec.describe Gitlab::Metrics::Subscribers::RackAttack, :request_store do
         end
 
         it 'logs request information and user id' do
-          expect(logger).to receive(:error).with(
+          expect(Gitlab::AuthLogger).to receive(:error).with(
             message: 'Rack_Attack',
             env: match_type,
             remote_ip: '1.2.3.4',
@@ -141,7 +140,7 @@ RSpec.describe Gitlab::Metrics::Subscribers::RackAttack, :request_store do
         end
 
         it 'logs request information and user meta' do
-          expect(logger).to receive(:error).with(
+          expect(Gitlab::AuthLogger).to receive(:error).with(
             message: 'Rack_Attack',
             env: match_type,
             remote_ip: '1.2.3.4',

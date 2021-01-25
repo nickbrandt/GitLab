@@ -34,10 +34,6 @@ module Gitlab
           }
         end
 
-        def initialize(auth_logger: Gitlab::AuthLogger)
-          @auth_logger = auth_logger
-        end
-
         def redis(event)
           self.class.payload[:rack_attack_redis_count] += 1
           self.class.payload[:rack_attack_redis_duration_s] += event.duration.to_f / 1000
@@ -81,7 +77,11 @@ module Gitlab
             rack_attack_info['meta.user'] = user.username unless user.nil?
           end
 
-          @auth_logger.error(rack_attack_info)
+          logger.error(rack_attack_info)
+        end
+
+        def logger
+          Gitlab::AuthLogger
         end
       end
     end
