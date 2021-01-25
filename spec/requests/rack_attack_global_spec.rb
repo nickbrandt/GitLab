@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe 'Rack Attack global throttles' do
+RSpec.describe 'Rack Attack global throttles', :use_clean_rails_memory_store_caching do
   include RackAttackSpecHelpers
 
   let(:settings) { Gitlab::CurrentSettings.current_application_settings }
