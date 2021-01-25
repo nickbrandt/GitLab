@@ -63,7 +63,7 @@ RSpec.describe Gitlab::BackgroundMigration::UpdateExistingPublicProjectsInPrivat
   end
 
   def create_namespace(name, visibility, options = {})
-    namespaces.create({
+    namespaces.create!({
                         name: name,
                         path: name,
                         type: 'Group',

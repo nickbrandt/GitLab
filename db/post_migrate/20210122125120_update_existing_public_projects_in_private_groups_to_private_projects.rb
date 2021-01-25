@@ -12,7 +12,7 @@ class UpdateExistingPublicProjectsInPrivateGroupsToPrivateProjects < ActiveRecor
   def up
     # Update project's visibility to be the same as the group
     # if it is more restrictive than `PUBLIC`.
-    BackgroundMigrationWorker.bulk_perform_async(
+    bulk_migrate_async(
       [
         [MIGRATION, [PRIVATE]],
         [MIGRATION, [INTERNAL]]
