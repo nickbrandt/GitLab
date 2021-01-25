@@ -8,6 +8,7 @@ module Types
       connection_type_class(Types::CountableConnectionType)
 
       authorize :read_pipeline
+      present_using ::Ci::PipelinePresenter
 
       expose_permissions Types::PermissionTypes::Ci::Pipeline
 
