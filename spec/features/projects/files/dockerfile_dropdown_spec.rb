@@ -11,7 +11,7 @@ RSpec.describe 'Projects > Files > User wants to add a Dockerfile file', :js do
     visit project_new_blob_path(project, 'master', file_name: 'Dockerfile')
   end
 
-  it 'user can pick a Dockerfile file from the dropdown', :js do
+  it 'user can pick a Dockerfile file from the dropdown' do
     expect(page).to have_css('.dockerfile-selector')
 
     find('.js-dockerfile-selector').click
