@@ -320,11 +320,10 @@ Selecting the button creates a merge request with the solution.
 When the auto-fix feature is enabled, remediation merge requests are automatically created
 whenever a vulnerability is detected.
 
-This feature is enabled by default but can be opted-out from the project's settings by unchecking
-the **Suggested Solutions** checkbox in **Security & Compliance > Configuration**. If the auto-fix
-setting is disabled, [manually applying the suggested patch](#manually-applying-the-suggested-patch)
-and [creating a merge request](#creating-a-merge-request-from-a-vulnerability) from a vulnerability
-will still apply.
+To disable the auto-fix feature for a project, go to the project's settings page > **Security & Compliance > Configuration**
+and clear the **Suggested Solutions** checkbox. If the auto-fix
+setting is disabled, you can still [manually apply the suggested patch](#manually-applying-the-suggested-patch)
+and [create a merge request](#creating-a-merge-request-from-a-vulnerability) from a vulnerability.
 
 ![Suggested Solutions Settings](img/suggested_solutions_settings_v13.8.png)
 
