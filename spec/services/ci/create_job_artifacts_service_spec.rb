@@ -181,10 +181,14 @@ RSpec.describe Ci::CreateJobArtifactsService do
     end
 
     context 'when artifact_type is metrics' do
+      before do
+        allow(job).to receive(:user_id).and_return(123)
+      end
+
       let(:params) { { 'artifact_type' => 'metrics', 'artifact_format' => 'gzip' }.with_indifferent_access }
 
       it 'tracks the job user_id' do
-        expect(service).to receive(:track_usage_event).with('i_metrics_report_artifact_uploaders', job.user_id)
+        expect(service).to receive(:track_usage_event).with('i_metrics_report_artifact_uploaders', 123)
 
         subject
       end
