@@ -11,6 +11,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       patch :override, on: :member
     end
 
+    get '/epics/boards', to: redirect('groups/%{group_id}/-/epic_boards')
+
     get '/analytics', to: redirect('groups/%{group_id}/-/analytics/value_stream_analytics')
     resource :contribution_analytics, only: [:show]
 
@@ -140,6 +142,10 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       collection do
         get :recent
       end
+    end
+
+    resources :epic_boards, only: [:index] do
+      resources :lists, module: :boards, only: [:index]
     end
 
     namespace :security do

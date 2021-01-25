@@ -21,8 +21,8 @@
         %span= _('List')
 
     - if Feature.enabled?(:epic_boards, @group)
-      = nav_link(path: 'epic_boards#show', html_options: { class: "#{active_when(params[:board_type] == 'epic') } home" }) do
-        = link_to group_boards_path(group, board_type: "epic"), title: 'Boards' do
+      = nav_link(path: ['epic_boards#index', 'epic_boards#show'], html_options: { class: "home" }) do
+        = link_to group_epic_boards_path(group), title: 'Boards' do
           %span= _('Boards')
 
     = nav_link(path: 'roadmap#show', html_options: { class: 'home' }) do
