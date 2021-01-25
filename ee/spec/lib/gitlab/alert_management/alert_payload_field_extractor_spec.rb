@@ -27,7 +27,8 @@ RSpec.describe Gitlab::AlertManagement::AlertPayloadFieldExtractor do
         time: '2020-12-09T12:34:56',
         discarded_null: nil,
         discarded_bool_true: true,
-        discarded_bool_false: false
+        discarded_bool_false: false,
+        arr: %w[one two three]
       )
     end
 
@@ -38,7 +39,8 @@ RSpec.describe Gitlab::AlertManagement::AlertPayloadFieldExtractor do
         a_field(['float'], 'Float', 'numeric'),
         a_field(%w(nested key), 'Key', 'string'),
         a_field(%w(nested deep key), 'Key', 'string'),
-        a_field(['time'], 'Time', 'datetime')
+        a_field(['time'], 'Time', 'datetime'),
+        a_field(['arr'], 'Arr', 'array')
       )
     end
   end

@@ -56,6 +56,8 @@ module Gitlab
           'string'
         when Numeric
           'numeric'
+        when Array
+          'array'
         end
       end
     end
