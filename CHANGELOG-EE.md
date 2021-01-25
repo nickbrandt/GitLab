@@ -111,6 +111,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Enable DevOps Adoption Report feature flag if any Segments already exist. !51602
 
 
+## 13.7.5 (2021-01-25)
+
+### Fixed (1 change)
+
+- Ensure that only top level groups are fetched for devops adoption. !51565
+
+
 ## 13.7.4 (2021-01-13)
 
 - No changes.
