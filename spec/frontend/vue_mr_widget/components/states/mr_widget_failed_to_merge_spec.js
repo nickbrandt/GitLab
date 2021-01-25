@@ -113,9 +113,9 @@ describe('MRWidgetFailedToMerge', () => {
   describe('while it is not regresing', () => {
     it('renders warning icon and disabled merge button', () => {
       expect(vm.$el.querySelector('.js-ci-status-icon-warning')).not.toBeNull();
-      expect(vm.$el.querySelector('.js-disabled-merge-button').getAttribute('disabled')).toEqual(
-        'disabled',
-      );
+      expect(
+        vm.$el.querySelector('[data-testid="disabled-merge-button"]').getAttribute('disabled'),
+      ).toEqual('disabled');
     });
 
     it('renders given error', () => {
