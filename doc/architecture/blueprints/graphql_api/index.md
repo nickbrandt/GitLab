@@ -37,7 +37,7 @@ API observable and operable at scale.
 
 Amongst small improvement to the GraphQL engine itself we want to build a
 comprehensive monitoring dashboard, that will enable team members to make sense
-of what is happening inside GraphQL. We want to make it possible to define
+of what is happening inside our GraphQL API. We want to make it possible to define
 SLOs, triage breached SLIs and to be able to zoom into relevant details using
 Grafana and Elastic.
 
