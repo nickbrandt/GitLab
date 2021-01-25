@@ -22,7 +22,7 @@ module MembershipActions
       .new(current_user, update_params)
       .execute(member)
 
-    member = result.fetch(:member, nil)
+    member = result[:member]
 
     if result[:status] == :success
       if member.expires?

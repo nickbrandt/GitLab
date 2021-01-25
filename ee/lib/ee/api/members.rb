@@ -23,12 +23,12 @@ module EE
               .new(current_user, { override: true })
               .execute(member, permission: :override)
 
-            updated_member = result.fetch(:member, nil)
+            updated_member = result[:member]
 
             if result[:status] == :success
               present_member(updated_member)
             else
-              render_validation_error!(member)
+              render_validation_error!(updated_member)
             end
           end
 
@@ -45,12 +45,12 @@ module EE
               .new(current_user, { override: false })
               .execute(member, permission: :override)
 
-            updated_member = result.fetch(:member, nil)
+            updated_member = result[:member]
 
             if result[:status] == :success
               present_member(updated_member)
             else
-              render_validation_error!(member)
+              render_validation_error!(updated_member)
             end
           end
 

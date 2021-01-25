@@ -89,18 +89,16 @@ RSpec.describe Groups::GroupMembersController do
         context 'for a user with an un-verified email belonging to a domain different from the allowed domain' do
           let(:email) { 'test@gmail.com' }
 
-          context 'for a user with an email belonging to the allowed domain' do
-            it 'returns error status' do
-              subject
+          it 'returns error status' do
+            subject
 
-              expect(response).to have_gitlab_http_status(:unprocessable_entity)
-            end
+            expect(response).to have_gitlab_http_status(:unprocessable_entity)
+          end
 
-            it 'returns error message' do
-              subject
+          it 'returns error message' do
+            subject
 
-              expect(json_response).to eq({ 'message' => "User email 'test@gmail.com' does not match the allowed domains of gitlab.com" })
-            end
+            expect(json_response).to eq({ 'message' => "User email 'test@gmail.com' does not match the allowed domain of gitlab.com" })
           end
         end
       end

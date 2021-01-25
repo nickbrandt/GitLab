@@ -16,9 +16,9 @@ module Members
         enqueue_delete_todos(member) if downgrading_to_guest?
       end
 
-      return success(member: member) unless member.errors.any?
+      return error(member.errors.full_messages.to_sentence, pass_back: { member: member }) if member.errors.any?
 
-      error(member.errors.full_messages.to_sentence)
+      success(member: member)
     end
 
     private
