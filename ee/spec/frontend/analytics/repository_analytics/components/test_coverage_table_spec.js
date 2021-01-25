@@ -26,6 +26,20 @@ describe('Test coverage table component', () => {
   const findProjectCountById = (id) => wrapper.find(`[data-testid="${id}-count"`);
   const findProjectDateById = (id) => wrapper.find(`[data-testid="${id}-date"`);
 
+  const mockQueryDataNode = {
+    fullPath: 'test/test',
+    name: 'test',
+    id: 1,
+    repository: {
+      rootRef: 'master',
+    },
+    codeCoverageSummary: {
+      averageCoverage: '1.45',
+      coverageCount: '1',
+      lastUpdatedOn: new Date().toISOString(),
+    },
+  };
+
   const createComponent = ({ data = {}, mountFn = shallowMount } = {}) => {
     wrapper = mountFn(TestCoverageTable, {
       localVue,
@@ -151,26 +165,19 @@ describe('Test coverage table component', () => {
       yesterday.setDate(yesterday.getDate() - 1);
       const allCoverageData = [
         {
-          fullPath: '-',
-          id: 1,
+          ...mockQueryDataNode,
           name: 'should be last',
-          repository: { rootRef: 'master' },
-          codeCoveragePath: '#',
           codeCoverageSummary: {
-            averageCoverage: '1.45',
-            coverageCount: '1',
+            ...mockQueryDataNode.codeCoverageSummary,
             lastUpdatedOn: yesterday.toISOString(),
           },
         },
         {
-          fullPath: '-',
-          id: 2,
+          ...mockQueryDataNode,
           name: 'should be first',
-          repository: { rootRef: 'master' },
-          codeCoveragePath: '#',
+          id: 2,
           codeCoverageSummary: {
-            averageCoverage: '1.45',
-            coverageCount: '1',
+            ...mockQueryDataNode.codeCoverageSummary,
             lastUpdatedOn: today.toISOString(),
           },
         },
@@ -205,16 +212,11 @@ describe('Test coverage table component', () => {
             projects: {
               nodes: [
                 {
+                  ...mockQueryDataNode,
                   fullPath,
-                  name: 'test',
                   id,
                   repository: {
                     rootRef,
-                  },
-                  codeCoverageSummary: {
-                    averageCoverage: '1.45',
-                    coverageCount: '1',
-                    lastUpdatedOn: new Date().toISOString(),
                   },
                 },
               ],
@@ -243,17 +245,8 @@ describe('Test coverage table component', () => {
                 projects: {
                   nodes: [
                     {
-                      fullPath: 'test/test',
-                      name: 'test',
+                      ...mockQueryDataNode,
                       id,
-                      repository: {
-                        rootRef: 'master',
-                      },
-                      codeCoverageSummary: {
-                        averageCoverage: '1.45',
-                        coverageCount: '1',
-                        lastUpdatedOn: new Date().toISOString(),
-                      },
                     },
                   ],
                 },
@@ -288,17 +281,8 @@ describe('Test coverage table component', () => {
                 projects: {
                   nodes: [
                     {
-                      fullPath: 'test/test',
-                      name: 'test',
+                      ...mockQueryDataNode,
                       id,
-                      repository: {
-                        rootRef: 'master',
-                      },
-                      codeCoverageSummary: {
-                        averageCoverage: '1.45',
-                        coverageCount: '1',
-                        lastUpdatedOn: new Date().toISOString(),
-                      },
                     },
                   ],
                 },
@@ -332,12 +316,8 @@ describe('Test coverage table component', () => {
             projects: {
               nodes: [
                 {
-                  fullPath: 'test/test',
-                  name: 'test',
+                  ...mockQueryDataNode,
                   id,
-                  repository: {
-                    rootRef: 'master',
-                  },
                   codeCoverageSummary: null,
                 },
               ],
