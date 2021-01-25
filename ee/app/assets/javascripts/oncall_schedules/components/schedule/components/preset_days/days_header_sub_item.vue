@@ -11,6 +11,12 @@ export default {
     GlResizeObserver: GlResizeObserverDirective,
   },
   mixins: [CommonMixin],
+  props: {
+    timeframeItem: {
+      type: Date,
+      required: true,
+    },
+  },
   mounted() {
     this.updateShiftStyles();
   },
@@ -42,6 +48,7 @@ export default {
       >{{ hour }}</span
     >
     <span
+      v-if="isToday"
       :style="getIndicatorStyles($options.PRESET_TYPES.DAYS)"
       class="current-day-indicator-header preset-days"
       data-testid="day-item-sublabel-current-indicator"
