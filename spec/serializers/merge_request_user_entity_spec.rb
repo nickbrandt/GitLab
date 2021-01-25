@@ -31,7 +31,7 @@ RSpec.describe MergeRequestUserEntity do
         user.status # make sure `status` is loaded
       end
 
-      it 'exposes the availibilty attribute' do
+      it 'exposes the availibility attribute' do
         expect(subject[:availability]).to eq('busy')
       end
     end
