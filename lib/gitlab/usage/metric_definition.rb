@@ -82,9 +82,7 @@ module Gitlab
       end
 
       def skip_validation?
-        return false if attributes[:skip_validation].blank?
-
-        attributes[:skip_validation]
+        !!attributes[:skip_validation]
       end
     end
   end
