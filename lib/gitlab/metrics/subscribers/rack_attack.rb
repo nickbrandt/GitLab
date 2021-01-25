@@ -77,6 +77,8 @@ module Gitlab
             rack_attack_info['meta.user'] = user.username unless user.nil?
           end
 
+          Gitlab::InstrumentationHelper.add_instrumentation_data(rack_attack_info)
+
           logger.error(rack_attack_info)
         end
 

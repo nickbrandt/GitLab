@@ -78,12 +78,14 @@ RSpec.describe Gitlab::Metrics::Subscribers::RackAttack, :request_store do
 
       it 'logs request information' do
         expect(Gitlab::AuthLogger).to receive(:error).with(
-          message: 'Rack_Attack',
-          env: match_type,
-          remote_ip: '1.2.3.4',
-          request_method: 'GET',
-          path: '/api/v4/internal/authorized_keys',
-          matched: 'throttle_unauthenticated'
+          include(
+            message: 'Rack_Attack',
+            env: match_type,
+            remote_ip: '1.2.3.4',
+            request_method: 'GET',
+            path: '/api/v4/internal/authorized_keys',
+            matched: 'throttle_unauthenticated'
+          )
         )
         subscriber.send(match_type, event)
       end
@@ -109,13 +111,15 @@ RSpec.describe Gitlab::Metrics::Subscribers::RackAttack, :request_store do
 
         it 'logs request information and user id' do
           expect(Gitlab::AuthLogger).to receive(:error).with(
-            message: 'Rack_Attack',
-            env: match_type,
-            remote_ip: '1.2.3.4',
-            request_method: 'GET',
-            path: '/api/v4/internal/authorized_keys',
-            matched: 'throttle_authenticated_api',
-            user_id: 'not_exist_user_id'
+            include(
+              message: 'Rack_Attack',
+              env: match_type,
+              remote_ip: '1.2.3.4',
+              request_method: 'GET',
+              path: '/api/v4/internal/authorized_keys',
+              matched: 'throttle_authenticated_api',
+              user_id: 'not_exist_user_id'
+            )
           )
           subscriber.send(match_type, event)
         end
@@ -141,14 +145,16 @@ RSpec.describe Gitlab::Metrics::Subscribers::RackAttack, :request_store do
 
         it 'logs request information and user meta' do
           expect(Gitlab::AuthLogger).to receive(:error).with(
-            message: 'Rack_Attack',
-            env: match_type,
-            remote_ip: '1.2.3.4',
-            request_method: 'GET',
-            path: '/api/v4/internal/authorized_keys',
-            matched: 'throttle_authenticated_api',
-            user_id: user.id,
-            'meta.user' => user.username
+            include(
+              message: 'Rack_Attack',
+              env: match_type,
+              remote_ip: '1.2.3.4',
+              request_method: 'GET',
+              path: '/api/v4/internal/authorized_keys',
+              matched: 'throttle_authenticated_api',
+              user_id: user.id,
+              'meta.user' => user.username
+            )
           )
           subscriber.send(match_type, event)
         end
