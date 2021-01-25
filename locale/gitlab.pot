@@ -30119,6 +30119,9 @@ msgstr ""
 msgid "Trigger"
 msgstr ""
 
+msgid "Trigger a pipeline for a branch or tag by generating a trigger token and using it with an API call. The token impersonates a user's project access and permissions."
+msgstr ""
+
 msgid "Trigger cluster reindexing"
 msgstr ""
 
@@ -30153,9 +30156,6 @@ msgid "Trigger was successfully updated."
 msgstr ""
 
 msgid "Triggerer"
-msgstr ""
-
-msgid "Triggers can force a specific branch or tag to get rebuilt with an API call. These tokens will impersonate their associated user including their access to projects and their project permissions."
 msgstr ""
 
 msgid "Troubleshoot and monitor your application with tracing"
