@@ -10,7 +10,7 @@ module Gitlab
     # For more information, please see
     # https://gitlab.com/gitlab-com/gl-infra/scalability/-/issues/751
     class InstrumentedCacheStore
-      NOTIFICATION_CHANNEL = 'rack_attack.redis'
+      NOTIFICATION_CHANNEL = 'redis.rack_attack'
 
       delegate :silence!, :mute, to: :@upstream_store
 

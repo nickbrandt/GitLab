@@ -32,10 +32,10 @@ RSpec.describe Gitlab::RackAttack::InstrumentedCacheStore do
       published = false
 
       begin
-        subscriber = ActiveSupport::Notifications.subscribe("rack_attack.redis") do |*args|
+        subscriber = ActiveSupport::Notifications.subscribe("redis.rack_attack") do |*args|
           published = true
           event = ActiveSupport::Notifications::Event.new(*args)
-          expect(event.name).to eq("rack_attack.redis")
+          expect(event.name).to eq("redis.rack_attack")
           expect(event.duration).to be_a(Float).and(be > 0.0)
           expect(event.payload[:operation]).to eql(operation)
         end
@@ -54,10 +54,10 @@ RSpec.describe Gitlab::RackAttack::InstrumentedCacheStore do
       exception = false
 
       begin
-        subscriber = ActiveSupport::Notifications.subscribe("rack_attack.redis") do |*args|
+        subscriber = ActiveSupport::Notifications.subscribe("redis.rack_attack") do |*args|
           published = true
           event = ActiveSupport::Notifications::Event.new(*args)
-          expect(event.name).to eq("rack_attack.redis")
+          expect(event.name).to eq("redis.rack_attack")
           expect(event.duration).to be_a(Float).and(be > 0.0)
           expect(event.payload[:operation]).to eql(operation)
         end

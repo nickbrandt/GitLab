@@ -32,22 +32,22 @@ RSpec.describe Gitlab::Metrics::Subscribers::RackAttack, :request_store do
     end
   end
 
-  describe '#rack_attack' do
+  describe '#redis' do
     it 'accumulates per-request RackAttack cache usage' do
       freeze_time do
-        subscriber.rack_attack(
+        subscriber.redis(
           ActiveSupport::Notifications::Event.new(
-            'rack_attack.redis', Time.current, Time.current + 1.second, '1', { operation: 'fetch' }
+            'redis.rack_attack', Time.current, Time.current + 1.second, '1', { operation: 'fetch' }
           )
         )
-        subscriber.rack_attack(
+        subscriber.redis(
           ActiveSupport::Notifications::Event.new(
-            'rack_attack.redis', Time.current, Time.current + 2.seconds, '1', { operation: 'write' }
+            'redis.rack_attack', Time.current, Time.current + 2.seconds, '1', { operation: 'write' }
           )
         )
-        subscriber.rack_attack(
+        subscriber.redis(
           ActiveSupport::Notifications::Event.new(
-            'rack_attack.redis', Time.current, Time.current + 3.seconds, '1', { operation: 'read' }
+            'redis.rack_attack', Time.current, Time.current + 3.seconds, '1', { operation: 'read' }
           )
         )
       end
