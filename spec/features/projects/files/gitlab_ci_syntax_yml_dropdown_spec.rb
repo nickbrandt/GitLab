@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe 'Projects > Files > User wants to add a .gitlab-ci.yml file', :js do
+RSpec.describe 'Projects > Files > User wants to add a .gitlab-ci.yml file' do
   include Spec::Support::Helpers::Features::EditorLiteSpecHelpers
 
   before do
