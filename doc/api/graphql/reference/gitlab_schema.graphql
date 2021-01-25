@@ -27764,6 +27764,11 @@ Represents the location of a vulnerability found by a Coverage Fuzzing scan
 """
 type VulnerabilityLocationCoverageFuzzing {
   """
+  Blob path to the vulnerable file
+  """
+  blobPath: String
+
+  """
   Number of the last relevant line in the vulnerable file
   """
   endLine: String
@@ -27819,6 +27824,11 @@ Represents the location of a vulnerability found by a dependency security scan
 """
 type VulnerabilityLocationDependencyScanning {
   """
+  Blob path to the vulnerable file
+  """
+  blobPath: String
+
+  """
   Dependency containing the vulnerability
   """
   dependency: VulnerableDependency
@@ -27833,6 +27843,11 @@ type VulnerabilityLocationDependencyScanning {
 Represents the location of a vulnerability found by a SAST scan
 """
 type VulnerabilityLocationSast {
+  """
+  Blob path to the vulnerable file
+  """
+  blobPath: String
+
   """
   Number of the last relevant line in the vulnerable file
   """
@@ -27863,6 +27878,11 @@ type VulnerabilityLocationSast {
 Represents the location of a vulnerability found by a secret detection scan
 """
 type VulnerabilityLocationSecretDetection {
+  """
+  Blob path to the vulnerable file
+  """
+  blobPath: String
+
   """
   Number of the last relevant line in the vulnerable file
   """
