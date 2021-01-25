@@ -15896,6 +15896,12 @@ msgstr ""
 msgid "IssueAnalytics|Weight"
 msgstr ""
 
+msgid "IssueBoards|An error occurred while assigning the selected epic to the issue."
+msgstr ""
+
+msgid "IssueBoards|An error occurred while fetching the assigned epic of the selected issue."
+msgstr ""
+
 msgid "IssueBoards|An error occurred while setting notifications status. Please try again."
 msgstr ""
 
