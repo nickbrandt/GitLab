@@ -7081,6 +7081,9 @@ msgstr ""
 msgid "Collapse sidebar"
 msgstr ""
 
+msgid "Collapses this file (only for you) until it’s changed again."
+msgstr ""
+
 msgid "Collector hostname"
 msgstr ""
 
@@ -31399,6 +31402,9 @@ msgid "View the performance dashboard at"
 msgstr ""
 
 msgid "View users statistics"
+msgstr ""
+
+msgid "Viewed"
 msgstr ""
 
 msgid "Viewing commit"
