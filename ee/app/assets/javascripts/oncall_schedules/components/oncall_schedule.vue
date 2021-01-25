@@ -173,6 +173,7 @@ export default {
             :preset-type="presetType"
             :rotations="rotations"
             :timeframe="timeframe"
+            :schedule-iid="schedule.iid"
           />
         </div>
       </gl-card>
