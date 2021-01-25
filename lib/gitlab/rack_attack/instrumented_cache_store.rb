@@ -21,9 +21,9 @@ module Gitlab
 
       [:fetch, :read, :read_multi, :write_multi, :fetch_multi, :write, :delete,
        :exist?, :delete_matched, :increment, :decrement, :cleanup, :clear].each do |interface|
-        define_method interface do |*args, &block|
+        define_method interface do |*args, **k_args, &block|
           @notifier.instrument(NOTIFICATION_CHANNEL, operation: interface) do
-            @upstream_store.public_send(interface, *args, &block) # rubocop:disable GitlabSecurity/PublicSend
+            @upstream_store.public_send(interface, *args, **k_args, &block) # rubocop:disable GitlabSecurity/PublicSend
           end
         end
       end
