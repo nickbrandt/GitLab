@@ -104,9 +104,8 @@ class Projects::IssuesController < Projects::ApplicationController
     )
     build_params = issue_create_params.merge(
       merge_request_to_resolve_discussions_of: params[:merge_request_to_resolve_discussions_of],
-      discussion_to_resolve: params[:discussion_to_resolve],
-      confidential: confidential_issue?
-    )
+      discussion_to_resolve: params[:discussion_to_resolve]
+    ).merge(confidential: confidential_issue?)
     service = ::Issues::BuildService.new(project, current_user, build_params)
 
     @issue = @noteable = service.execute
@@ -394,8 +393,7 @@ class Projects::IssuesController < Projects::ApplicationController
   end
 
   def confidential_issue?
-    !!Gitlab::Utils.to_boolean(issue_create_params[:confidential]) ||
-      !!Gitlab::Utils.to_boolean(params[:issue][:confidential])
+    !!Gitlab::Utils.to_boolean(params[:issue][:confidential])
   end
 
   def run_null_hypothesis_experiment
