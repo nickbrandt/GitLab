@@ -238,11 +238,6 @@ RSpec.describe API::Issues do
       expect(json_response['error']).to eq('confidential is invalid')
     end
 
-    it 'returns a 400 bad request if title not given' do
-      post api("/projects/#{project.id}/issues", user), params: { labels: 'label, label2' }
-      expect(response).to have_gitlab_http_status(:bad_request)
-    end
-
     it 'allows special label names' do
       post api("/projects/#{project.id}/issues", user),
         params: {
@@ -269,6 +264,11 @@ RSpec.describe API::Issues do
       expect(json_response['labels']).to include 'label&foo'
       expect(json_response['labels']).to include '?'
       expect(json_response['labels']).to include '&'
+    end
+
+    it 'returns a 400 bad request if title not given' do
+      post api("/projects/#{project.id}/issues", user), params: { labels: 'label, label2' }
+      expect(response).to have_gitlab_http_status(:bad_request)
     end
 
     it 'returns 400 if title is too long' do
