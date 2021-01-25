@@ -1551,10 +1551,7 @@ RSpec.describe Project, factory_default: :keep do
     let(:project) { build(:project) }
 
     it 'picks storage from ApplicationSetting' do
-      expect_next_instance_of(ApplicationSetting) do |instance|
-        expect(instance).to receive(:pick_repository_storage).and_return('picked')
-      end
-      expect(described_class).to receive(:pick_repository_storage).and_call_original
+      expect(Repository).to receive(:pick_storage_shard).and_return('picked')
 
       expect(project.repository_storage).to eq('picked')
     end

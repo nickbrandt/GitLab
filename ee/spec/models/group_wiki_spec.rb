@@ -84,8 +84,8 @@ RSpec.describe GroupWiki do
           let(:shards) { (1..).each }
 
           before do
-            # Force pick_repository_storage to always return a different value
-            allow(Gitlab::CurrentSettings).to receive(:pick_repository_storage) { "storage-#{shards.next}" }
+            # Force pick_storage_shard to always return a different value
+            allow(Repository).to receive(:pick_storage_shard) { "storage-#{shards.next}" }
           end
 
           it 'always returns the same shard when called repeatedly' do
