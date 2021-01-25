@@ -499,14 +499,13 @@ Implemented using Redis methods [PFADD](https://redis.io/commands/pfadd) and [PF
 
 Use one of the following methods to track events:
 
-1. Track event in controller using `RedisTracking` module with `track_redis_hll_event(*controller_actions, name:, feature:, feature_default_enabled: false)`.
+1. Track event in controller using `RedisTracking` module with `track_redis_hll_event(*controller_actions, :name, :if: nil)`.
 
    Arguments:
 
    - `controller_actions`: controller actions we want to track.
    - `name`: event name.
-   - `feature`: feature name, all metrics we track should be under feature flag.
-   - `feature_default_enabled`: feature flag is disabled by default, set to `true` for it to be enabled by default.
+   - `if`: optional custom conditions, using the same format as with Rails callbacks.
 
    Example usage:
 
@@ -516,7 +515,7 @@ Use one of the following methods to track events:
      include RedisTracking
 
      skip_before_action :authenticate_user!, only: :show
-     track_redis_hll_event :index, :show, name: 'g_compliance_example_feature_visitors', feature: :compliance_example_feature, feature_default_enabled: true
+     track_redis_hll_event :index, :show, name: 'g_compliance_example_feature_visitors'
 
      def index
        render html: 'index'
@@ -579,10 +578,6 @@ Use one of the following methods to track events:
 
    API requests are protected by checking for a valid CSRF token.
 
-   To increment the values, the related feature `usage_data_<event_name>` should be
-   set to `default_enabled: true`. For more information, see
-   [Feature flags in development of GitLab](feature_flags/index.md).
-
    ```plaintext
    POST /usage_data/increment_unique_users
    ```
@@ -606,8 +601,6 @@ Use one of the following methods to track events:
 
    Usage Data API is behind  `usage_data_api` feature flag which, as of GitLab 13.7, is
    now set to `default_enabled: true`.
-
-   Each event tracked using Usage Data API is behind a feature flag `usage_data_#{event_name}` which should be `default_enabled: true`
 
    ```javascript
    import api from '~/api';
