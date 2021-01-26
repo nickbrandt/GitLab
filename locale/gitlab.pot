@@ -33509,7 +33509,7 @@ msgid "element is not a hierarchy"
 msgstr ""
 
 msgid "email '%{email}' does not match the allowed domain of %{email_domains}"
-msgid_plural "email '%{email}' does not match the allowed domains of %{email_domains}"
+msgid_plural "email '%{email}' does not match the allowed domains: %{email_domains}"
 msgstr[0] ""
 msgstr[1] ""
 
