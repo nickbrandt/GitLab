@@ -108,7 +108,6 @@ export default {
     async isFetching() {
       if (!this.isFetching) {
         await this.$nextTick();
-        await this.updateResolvableDiscussionsCounts();
         await this.startTaskList();
         await this.checkLocationHash();
       }
@@ -180,7 +179,6 @@ export default {
       'convertToDiscussion',
       'stopPolling',
       'setConfidentiality',
-      'updateResolvableDiscussionsCounts',
     ]),
     discussionIsIndividualNoteAndNotConverted(discussion) {
       return discussion.individual_note && !this.convertedDisscussionIds.includes(discussion.id);

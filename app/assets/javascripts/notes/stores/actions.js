@@ -424,7 +424,7 @@ export const saveNote = ({ commit, dispatch }, noteData) => {
 export const setFetchingState = ({ commit }, fetchingState) =>
   commit(types.SET_NOTES_FETCHING_STATE, fetchingState);
 
-const pollSuccessCallBack = (resp, commit, state, getters, dispatch) => {
+const pollSuccessCallBack = async (resp, commit, state, getters, dispatch) => {
   if (state.isResolvingDiscussion) {
     return null;
   }
@@ -437,8 +437,9 @@ const pollSuccessCallBack = (resp, commit, state, getters, dispatch) => {
   }
 
   if (resp.notes?.length) {
-    dispatch('updateOrCreateNotes', resp.notes);
+    await dispatch('updateOrCreateNotes', resp.notes);
     dispatch('startTaskList');
+    dispatch('updateResolvableDiscussionsCounts');
   }
 
   commit(types.SET_LAST_FETCHED_AT, resp.last_fetched_at);
@@ -449,6 +450,7 @@ const pollSuccessCallBack = (resp, commit, state, getters, dispatch) => {
 const getFetchDataParams = (state) => {
   const endpoint = state.notesData.notesPath;
   const options = {
+    params: { t: new Date().getTime() },
     headers: {
       'X-Last-Fetched-At': state.lastFetchedAt ? `${state.lastFetchedAt}` : undefined,
     },
