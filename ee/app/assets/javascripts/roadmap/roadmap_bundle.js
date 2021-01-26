@@ -56,6 +56,7 @@ export default () => {
       return {
         newEpicPath: dataset.newEpicPath,
         listEpicsPath: dataset.listEpicsPath,
+        epicsDocsPath: dataset.epicsDocsPath,
       };
     },
     data() {
