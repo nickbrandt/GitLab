@@ -9,7 +9,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 Although GitLab has discontinued selling the Bronze and Starter tiers, GitLab
 continues to honor the entitlements of existing Bronze and Starter tier GitLab
 customers for the duration of their contracts at that level.
-​
+
 These features remain available to Bronze and Starter customers, even though
 the tiers are no longer mentioned in GitLab documentation:
 
@@ -49,7 +49,7 @@ the tiers are no longer mentioned in GitLab documentation:
   - Syncing information through LDAP:
     - Groups: [one group](../administration/auth/ldap/ldap-troubleshooting.md#sync-one-group),
       [all groups programmatically](../administration/auth/ldap/index.md#group-sync),
-      [group sync schedule](../administration/auth/ldap/index.md#adjusting-ldap-group-sync-schedule),
+      [group sync schedule](../administration/auth/ldap/index.md#adjusting-ldap-group-sync-schedule), and
       [all groups manually](../administration/auth/ldap/ldap-troubleshooting.md#sync-all-groups)
     - [Configuration settings](../administration/auth/ldap/index.md#ldap-sync-configuration-settings)
     - Users: [all users](../administration/auth/ldap/index.md#user-sync),
