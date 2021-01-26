@@ -232,7 +232,7 @@ has failed or been canceled.
 If a merge request pipeline or merged result pipeline was canceled or failed, you can:
 
 - Re-run the entire pipeline by clicking **Run pipeline** in the pipeline tab in the merge request.
-- [Retry the pipeline](pipelines/index.md#view-pipelines).
+- [Retry only the jobs that failed](pipelines/index.md#view-pipelines). If you re-run the entire pipeline, this is not necessary.
 - Push a new commit to fix the failure.
 
 If the merge train pipeline has failed, you can:
