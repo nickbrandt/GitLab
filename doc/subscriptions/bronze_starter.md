@@ -9,7 +9,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 Although GitLab has discontinued selling the Bronze and Starter tiers, GitLab
 continues to honor the entitlements of existing Bronze and Starter tier GitLab
 customers for the duration of their contracts at that level.
-​
+
 These features remain available to Bronze and Starter customers, even though
 the tiers are no longer mentioned in GitLab documentation:
 
@@ -108,7 +108,6 @@ the tiers are no longer mentioned in GitLab documentation:
   - [Advanced Global Search (Elasticsearch)](../user/search/advanced_global_search.md)
   - [Advanced Search Syntax](../user/search/advanced_search_syntax.md)
 - [Service Desk](../user/project/service_desk.md)
-- [Storage usage statistics](../user/usage_quotas.md#storage-usage-statistics-bronze-only)
 
 The following developer features continue to be available to Starter and
 Bronze-level subscribers:
