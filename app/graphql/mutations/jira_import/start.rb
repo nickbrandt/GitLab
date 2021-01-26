@@ -7,6 +7,8 @@ module Mutations
 
       graphql_name 'JiraImportStart'
 
+      authorize :admin_project
+
       field :jira_import,
             Types::JiraImportType,
             null: true,
@@ -39,12 +41,6 @@ module Mutations
           jira_import: jira_import,
           errors: service_response.errors
         }
-      end
-
-      private
-
-      def authorized_resource?(project)
-        Ability.allowed?(context[:current_user], :admin_project, project)
       end
     end
   end

@@ -7,6 +7,8 @@ module Mutations
 
       graphql_name 'JiraImportUsers'
 
+      authorize :admin_project
+
       field :jira_users,
             [Types::JiraUserType],
             null: true,
@@ -28,12 +30,6 @@ module Mutations
           jira_users: service_response.payload,
           errors: service_response.errors
         }
-      end
-
-      private
-
-      def authorized_resource?(project)
-        Ability.allowed?(context[:current_user], :admin_project, project)
       end
     end
   end
