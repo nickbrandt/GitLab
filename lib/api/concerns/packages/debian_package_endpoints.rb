@@ -6,9 +6,9 @@ module API
       module DebianPackageEndpoints
         extend ActiveSupport::Concern
 
-        DISTRIBUTION_REGEX = %r{[a-zA-Z0-9][a-zA-Z0-9.-]*}.freeze
-        COMPONENT_REGEX = %r{[a-z-]+}.freeze
-        ARCHITECTURE_REGEX = %r{[a-z][a-z0-9]*}.freeze
+        DISTRIBUTION_REGEX = %r{[a-z0-9][a-z0-9.-]*}i.freeze
+        COMPONENT_REGEX = %r{[a-z0-9][a-z0-9.-]*}i.freeze
+        ARCHITECTURE_REGEX = %r{[a-z0-9][-a-z0-9]*}.freeze
         LETTER_REGEX = %r{(lib)?[a-z0-9]}.freeze
         PACKAGE_REGEX = API::NO_SLASH_URL_PART_REGEX
         DISTRIBUTION_REQUIREMENTS = {
@@ -100,8 +100,20 @@ module API
 
                 route_setting :authentication, authenticate_non_public: true
                 get 'Packages' do
-                  # https://gitlab.com/gitlab-org/gitlab/-/issues/5835#note_414103286
-                  'TODO Packages'
+                  relation = "::Packages::Debian::#{project_or_group.class.name}ComponentFile".constantize
+
+                  component_file = relation
+                    .preload_distribution
+                    .with_container(project_or_group)
+                    .with_codename_or_suite(params[:distribution])
+                    .with_component_name(params[:component])
+                    .with_file_type(:packages)
+                    .with_architecture_name(params[:architecture])
+                    .with_compression_type(nil)
+                    .order_created_asc
+                    .last!
+
+                  present_carrierwave_file!(component_file.file)
                 end
               end
             end
