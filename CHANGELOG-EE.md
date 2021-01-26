@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.8.1 (2021-01-26)
+
+### Fixed (2 changes)
+
+- Fix rendering of requirements page for unauthenticated users. !52069
+- Fix browser performance widget issue body. !52088
+
+
 ## 13.8.0 (2021-01-22)
 
 ### Fixed (24 changes, 3 of them are from the community)
