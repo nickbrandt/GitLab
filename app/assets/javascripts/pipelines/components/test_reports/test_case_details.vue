@@ -1,6 +1,6 @@
 <script>
 import { GlModal } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { __, n__, sprintf } from '~/locale';
 import CodeBlock from '~/vue_shared/components/code_block.vue';
 
 export default {
@@ -21,9 +21,29 @@ export default {
         Boolean(classname) && Boolean(formattedTime) && Boolean(name),
     },
   },
+  computed: {
+    failureHistoryMessage() {
+      if (!this.testCase.recent_failures) {
+        return null;
+      }
+
+      return sprintf(
+        n__(
+          'Reports|Failed %{count} time in %{baseBranch} in the last 14 days',
+          'Reports|Failed %{count} times in %{baseBranch} in the last 14 days',
+          this.testCase.recent_failures.count,
+        ),
+        {
+          count: this.testCase.recent_failures.count,
+          baseBranch: this.testCase.recent_failures.base_branch,
+        },
+      );
+    },
+  },
   text: {
     name: __('Name'),
     duration: __('Execution time'),
+    history: __('History'),
     trace: __('System output'),
   },
   modalCloseButton: {
@@ -50,6 +70,13 @@ export default {
       <strong class="gl-text-right col-sm-3">{{ $options.text.duration }}</strong>
       <div class="col-sm-9" data-testid="test-case-duration">
         {{ testCase.formattedTime }}
+      </div>
+    </div>
+
+    <div v-if="testCase.recent_failures" class="gl-display-flex gl-flex-wrap gl-mx-n4 gl-my-3">
+      <strong class="gl-text-right col-sm-3">{{ $options.text.history }}</strong>
+      <div class="col-sm-9" data-testid="test-case-recent-failures">
+        {{ failureHistoryMessage }}
       </div>
     </div>
 
