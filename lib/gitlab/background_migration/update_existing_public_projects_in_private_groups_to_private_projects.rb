@@ -4,7 +4,7 @@
 module Gitlab
   module BackgroundMigration
     class UpdateExistingPublicProjectsInPrivateGroupsToPrivateProjects
-      BATCH_SIZE = 100
+      BATCH_SIZE = 1_000
 
       class Namespace < ActiveRecord::Base
         self.table_name = 'namespaces'
