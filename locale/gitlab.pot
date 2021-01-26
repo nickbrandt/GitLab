@@ -1927,9 +1927,6 @@ msgstr ""
 msgid "AdminArea|Features"
 msgstr ""
 
-msgid "AdminArea|Groups: %{number_of_groups}"
-msgstr ""
-
 msgid "AdminArea|Guest"
 msgstr ""
 
@@ -1963,7 +1960,7 @@ msgstr ""
 msgid "AdminArea|Owner"
 msgstr ""
 
-msgid "AdminArea|Projects: %{number_of_projects}"
+msgid "AdminArea|Projects"
 msgstr ""
 
 msgid "AdminArea|Reporter"
@@ -1987,6 +1984,9 @@ msgstr ""
 msgid "AdminArea|User cap"
 msgstr ""
 
+msgid "AdminArea|Users"
+msgstr ""
+
 msgid "AdminArea|Users statistics"
 msgstr ""
 
@@ -1996,7 +1996,13 @@ msgstr ""
 msgid "AdminArea|Users without a Group and Project"
 msgstr ""
 
-msgid "AdminArea|Users: %{number_of_users}"
+msgid "AdminArea|View latest groups"
+msgstr ""
+
+msgid "AdminArea|View latest projects"
+msgstr ""
+
+msgid "AdminArea|View latest users"
 msgstr ""
 
 msgid "AdminArea|You’re about to stop all jobs.This will halt all current jobs that are running."
@@ -4445,7 +4451,7 @@ msgstr ""
 msgid "Bi-weekly code coverage"
 msgstr ""
 
-msgid "Billable Users:"
+msgid "Billable Users"
 msgstr ""
 
 msgid "Billing"
@@ -15281,6 +15287,9 @@ msgstr ""
 msgid "Instance administrators group already exists"
 msgstr ""
 
+msgid "Instance overview"
+msgstr ""
+
 msgid "InstanceStatistics|Could not load the issues and merge requests chart. Please refresh the page to try again."
 msgstr ""
 
@@ -17460,7 +17469,7 @@ msgstr ""
 msgid "Maximum PyPI package file size in bytes"
 msgstr ""
 
-msgid "Maximum Users:"
+msgid "Maximum Users"
 msgstr ""
 
 msgid "Maximum allowable lifetime for personal access token (days)"
@@ -31166,13 +31175,10 @@ msgstr ""
 msgid "Users in License"
 msgstr ""
 
-msgid "Users in License:"
-msgstr ""
-
 msgid "Users or groups set as approvers in the project's or merge request's settings."
 msgstr ""
 
-msgid "Users over License:"
+msgid "Users over License"
 msgstr ""
 
 msgid "Users requesting access to"
