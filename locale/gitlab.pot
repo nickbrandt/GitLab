@@ -4457,9 +4457,6 @@ msgstr ""
 msgid "BillingPlans|Congratulations, your free trial is activated."
 msgstr ""
 
-msgid "BillingPlans|Current Plan"
-msgstr ""
-
 msgid "BillingPlans|Free upgrade!"
 msgstr ""
 
