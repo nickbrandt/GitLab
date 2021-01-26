@@ -223,8 +223,8 @@ module IssuablesHelper
 
           content_tag(
             :span,
-            '?',
-            class: 'badge badge-pill has-tooltip',
+            sprite_icon('question'),
+            class: 'gl-ml-3 author-link has-tooltip',
             aria: { label: tooltip },
             title: tooltip
           )
