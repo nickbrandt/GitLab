@@ -24,16 +24,18 @@ module MembershipActions
 
     member = result[:member]
 
+    member_data = if member.expires?
+                    {
+                      expires_in: helpers.distance_of_time_in_words_to_now(member.expires_at),
+                      expires_soon: member.expires_soon?,
+                      expires_at_formatted: member.expires_at.to_time.in_time_zone.to_s(:medium)
+                    }
+                  else
+                    {}
+                  end
+
     if result[:status] == :success
-      if member.expires?
-        render json: {
-          expires_in: helpers.distance_of_time_in_words_to_now(member.expires_at),
-          expires_soon: member.expires_soon?,
-          expires_at_formatted: member.expires_at.to_time.in_time_zone.to_s(:medium)
-        }
-      else
-        render json: {}
-      end
+      render json: member_data
     else
       render json: { message: result[:message] }, status: :unprocessable_entity
     end

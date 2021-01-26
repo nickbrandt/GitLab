@@ -30,12 +30,14 @@ module EE
 
         result = ::Members::UpdateService.new(current_user, override_params).execute(member, permission: :override)
 
-        if result[:status] == :success
-          respond_to do |format|
-            format.js { head :ok }
+        respond_to do |format|
+          format.js do
+            if result[:status] == :success
+              head :ok
+            else
+              render json: result[:message], status: :unprocessable_entity
+            end
           end
-        else
-          render json: result[:message], status: :unprocessable_entity
         end
       end
       # rubocop: enable CodeReuse/ActiveRecord
