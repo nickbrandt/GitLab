@@ -31,7 +31,7 @@ module Gitlab
 
         def state_crc32
           strong_memoize(:state_crc32) do
-            Trace::Metadata.using_primary_source do
+            ::Gitlab::Database::Consistency.with_read_consistency do
               build.pending_state&.crc32
             end
           end
@@ -63,7 +63,7 @@ module Gitlab
         #
         def trace_chunks
           strong_memoize(:trace_chunks) do
-            Trace::Metadata.using_primary_source do
+            Ci::BuildTraceChunks.with_read_consistency(build.project) do
               build.trace_chunks.persisted
                 .select(::Ci::BuildTraceChunk.metadata_attributes)
             end
