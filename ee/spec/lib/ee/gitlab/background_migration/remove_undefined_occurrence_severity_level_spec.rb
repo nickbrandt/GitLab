@@ -8,7 +8,6 @@ RSpec.describe Gitlab::BackgroundMigration::RemoveUndefinedOccurrenceSeverityLev
   let(:scanners) { table(:vulnerability_scanners) }
   let(:projects) { table(:projects) }
 
-  # rubocop: disable CodeReuse/ActiveRecord
   it 'updates undefined severity level to unknown' do
     projects.create!(id: 123, namespace_id: 12, name: 'gitlab', path: 'gitlab')
 
@@ -33,7 +32,6 @@ RSpec.describe Gitlab::BackgroundMigration::RemoveUndefinedOccurrenceSeverityLev
 
     expect(vulnerabilities.where(severity: 2).count).to eq(3)
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   def vuln_params(primary_identifier_id)
     uuid = SecureRandom.uuid
