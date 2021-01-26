@@ -6,17 +6,24 @@ RSpec.describe EE::BulkImports::Groups::Pipelines::EpicsPipeline do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:cursor) { 'cursor' }
+  let(:bulk_import) { create(:bulk_import, user: user) }
   let(:entity) do
     create(
       :bulk_import_entity,
       source_full_path: 'source/full/path',
       destination_name: 'My Destination Group',
       destination_namespace: group.full_path,
-      group: group
+      group: group,
+      bulk_import: bulk_import
     )
   end
 
   let(:context) { BulkImports::Pipeline::Context.new(entity) }
+
+  before do
+    stub_licensed_features(epics: true)
+    group.add_owner(user)
+  end
 
   describe '#run' do
     it 'imports group epics into destination group' do
@@ -82,7 +89,8 @@ RSpec.describe EE::BulkImports::Groups::Pipelines::EpicsPipeline do
     it 'has transformers' do
       expect(described_class.transformers)
         .to contain_exactly(
-          { klass: BulkImports::Common::Transformers::ProhibitedAttributesTransformer, options: nil }
+          { klass: BulkImports::Common::Transformers::ProhibitedAttributesTransformer, options: nil },
+          { klass: EE::BulkImports::Groups::Transformers::EpicAttributesTransformer, options: nil }
         )
     end
 
