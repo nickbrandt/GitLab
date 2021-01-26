@@ -17208,6 +17208,12 @@ msgstr ""
 msgid "MRApprovals|Commented by"
 msgstr ""
 
+msgid "MRDiffFile|Changes are too large to be shown."
+msgstr ""
+
+msgid "MRDiffFile|View file @ %{commitSha}"
+msgstr ""
+
 msgid "MRDiff|Show changes only"
 msgstr ""
 
@@ -32424,9 +32430,6 @@ msgid "You are trying to upload something other than an image. Please upload a .
 msgstr ""
 
 msgid "You are using PostgreSQL %{pg_version_current}, but PostgreSQL %{pg_version_minimum} is required for this version of GitLab. Please upgrade your environment to a supported PostgreSQL version, see %{pg_requirements_url} for details."
-msgstr ""
-
-msgid "You can %{linkStart}view the blob%{linkEnd} instead."
 msgstr ""
 
 msgid "You can also create a project from the command line."
