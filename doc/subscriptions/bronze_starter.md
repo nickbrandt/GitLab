@@ -8,7 +8,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 Although GitLab has discontinued selling the Bronze and Starter tiers, GitLab
 continues to honor the entitlements of existing Bronze and Starter tier GitLab
-customers for the duration of their contracts at that level. 
+customers for the duration of their contracts at that level.
 ​
 These features remain available to Bronze and Starter customers, even though
 the tiers are no longer mentioned in GitLab documentation:
