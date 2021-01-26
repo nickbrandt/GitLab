@@ -237,7 +237,8 @@ If a merge request pipeline or merged result pipeline was canceled or failed, yo
 
 If the merge train pipeline has failed, you can:
 
-- Check the failure and determine if you can immediately add the merge request to the train again.
+- Check the failure and determine if you can use the [`/merge` quick action](../user/project/quick_actions.md) to immediately add the merge request to the train again.
+- Re-run the entire pipeline by clicking **Run pipeline** in the pipeline tab in the merge request, then add the merge request to the train again.
 - Push a commit to fix the failure, then add the merge request to the train again.
 
 If the merge train pipeline was canceled before the merge request was merged, without a failure, you can:
