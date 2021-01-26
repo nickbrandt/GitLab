@@ -20,7 +20,7 @@ describe('PipelineFailed', () => {
     wrapper = null;
   });
 
-  it('should display correctly', () => {
+  it('should render error message with a disabled merge button', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
