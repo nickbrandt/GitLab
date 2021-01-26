@@ -56,7 +56,7 @@ RSpec.describe ResourceAccessTokens::RevokeService do
         it 'logs the find error message' do
           subject
 
-          expect(AuditEvent.last.details[:custom_message]).to match(/Attempted to revoke project access token with id: \d+, but failed with message: Failed to find bot user/)
+          expect(AuditEvent.where(author_id: user.id).last.details[:custom_message]).to match(/Attempted to revoke project access token with id: \d+, but failed with message: Failed to find bot user/)
         end
       end
 
@@ -71,7 +71,7 @@ RSpec.describe ResourceAccessTokens::RevokeService do
         it 'logs the permission error message' do
           subject
 
-          expect(AuditEvent.last.details[:custom_message]).to match(/Attempted to revoke project access token with id: \d+, but failed with message: #{user.name} cannot delete #{access_token.user.name}/)
+          expect(AuditEvent.where(author_id: user.id).last.details[:custom_message]).to match(/Attempted to revoke project access token with id: \d+, but failed with message: #{user.name} cannot delete #{access_token.user.name}/)
         end
       end
     end

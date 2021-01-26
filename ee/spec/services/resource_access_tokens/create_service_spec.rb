@@ -101,7 +101,7 @@ RSpec.describe ResourceAccessTokens::CreateService do
           it 'logs the permission error message' do
             subject
 
-            expect(AuditEvent.last.details[:custom_message]).to eq('Attempted to create project access token but failed with message: User does not have permission to create project access token')
+            expect(AuditEvent.where(author_id: user.id).last.details[:custom_message]).to eq('Attempted to create project access token but failed with message: User does not have permission to create project access token')
           end
         end
 
@@ -123,7 +123,7 @@ RSpec.describe ResourceAccessTokens::CreateService do
           it 'logs the provisioning error message' do
             subject
 
-            expect(AuditEvent.last.details[:custom_message]).to eq('Attempted to create project access token but failed with message: Could not provision maintainer access to project access token')
+            expect(AuditEvent.where(author_id: user.id).last.details[:custom_message]).to eq('Attempted to create project access token but failed with message: Could not provision maintainer access to project access token')
           end
         end
       end
