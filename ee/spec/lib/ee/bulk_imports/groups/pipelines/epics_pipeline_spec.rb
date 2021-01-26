@@ -3,18 +3,18 @@
 require 'spec_helper'
 
 RSpec.describe EE::BulkImports::Groups::Pipelines::EpicsPipeline do
+  let(:cursor) { 'cursor' }
   let(:user) { create(:user) }
   let(:group) { create(:group) }
-  let(:cursor) { 'cursor' }
   let(:bulk_import) { create(:bulk_import, user: user) }
   let(:entity) do
     create(
       :bulk_import_entity,
+      group: group,
+      bulk_import: bulk_import,
       source_full_path: 'source/full/path',
       destination_name: 'My Destination Group',
-      destination_namespace: group.full_path,
-      group: group,
-      bulk_import: bulk_import
+      destination_namespace: group.full_path
     )
   end
 
@@ -104,7 +104,10 @@ RSpec.describe EE::BulkImports::Groups::Pipelines::EpicsPipeline do
       {
         'title' => 'epic1',
         'state' => 'closed',
-        'confidential' => true
+        'confidential' => true,
+        'labels' => {
+          'nodes' => []
+        }
       }
     ]
 

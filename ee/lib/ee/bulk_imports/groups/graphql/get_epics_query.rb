@@ -42,6 +42,11 @@ module EE
                         iid
                       }
                     }
+                    labels {
+                      nodes {
+                        title
+                      }
+                    }
                   }
                 }
               }
