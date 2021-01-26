@@ -1,5 +1,5 @@
 ---
 title: Fix margins in social connect button on account settings
-merge_request:
-author:
-type: other
+merge_request: 52581
+author: Yogi (@yo)
+type: changed
