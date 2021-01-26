@@ -15470,6 +15470,9 @@ msgstr ""
 msgid "Integrations|Search Jira issues"
 msgstr ""
 
+msgid "Integrations|Sign in to add namespaces"
+msgstr ""
+
 msgid "Integrations|Standard"
 msgstr ""
 
