@@ -12,12 +12,10 @@ RSpec.describe Gitlab::AlertManagement::AlertPayloadFieldExtractor do
 
   subject(:fields) { extractor.extract(json) }
 
-  context 'plain' do
+  describe '#extract' do
     before do
       payload.merge!(
         str: 'value',
-        int: 23,
-        float: 23.5,
         nested: {
           key: 'level1',
           deep: {
@@ -32,11 +30,9 @@ RSpec.describe Gitlab::AlertManagement::AlertPayloadFieldExtractor do
       )
     end
 
-    it 'works' do
+    it 'returns all the possible field combination and types suggestions' do
       expect(fields).to contain_exactly(
         a_field(['str'], 'Str', 'string'),
-        a_field(['int'], 'Int', 'numeric'),
-        a_field(['float'], 'Float', 'numeric'),
         a_field(%w(nested key), 'Key', 'string'),
         a_field(%w(nested deep key), 'Key', 'string'),
         a_field(['time'], 'Time', 'datetime'),

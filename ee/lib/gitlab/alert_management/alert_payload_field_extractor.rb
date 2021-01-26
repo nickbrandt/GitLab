@@ -31,7 +31,8 @@ module Gitlab
         )
       end
 
-      # TODO: Code duplication with Gitlab::InlineHash#merge_keys ahead!
+      # Code duplication with Gitlab::InlineHash#merge_keys ahead!
+      # See https://gitlab.com/gitlab-org/gitlab/-/issues/299856
       def deep_traverse(hash)
         return to_enum(__method__, hash) unless block_given?
 
@@ -54,8 +55,6 @@ module Gitlab
           'datetime'
         when String
           'string'
-        when Numeric
-          'numeric'
         when Array
           'array'
         end
