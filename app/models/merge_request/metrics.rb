@@ -23,6 +23,12 @@ class MergeRequest::Metrics < ApplicationRecord
   def ensure_target_project_id
     self.target_project_id ||= merge_request.target_project_id
   end
+
+  def self.total_time_to_merge
+    with_valid_time_to_merge
+      .pluck(time_to_merge_expression)
+      .first
+  end
 end
 
 MergeRequest::Metrics.prepend_if_ee('EE::MergeRequest::Metrics')

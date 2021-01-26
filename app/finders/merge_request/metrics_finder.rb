@@ -9,9 +9,9 @@ class MergeRequest::MetricsFinder
   end
 
   def execute
-    items = init_collection
-    return items.none if target_project_missing? || user_not_authorized?
+    return klass.none if target_project.blank? || user_not_authorized?
 
+    items = init_collection
     items = by_target_project(items)
     items = by_merged_after(items)
     items = by_merged_before(items)
@@ -28,19 +28,15 @@ class MergeRequest::MetricsFinder
   end
 
   def by_merged_after(items)
-    items = items.merged_after(params[:merged_after]) if params[:merged_after]
+    return items unless merged_after
 
-    items
+    items.merged_after(merged_after)
   end
 
   def by_merged_before(items)
-    items = items.merged_before(params[:merged_before]) if params[:merged_before]
+    return items unless merged_before
 
-    items
-  end
-
-  def target_project_missing?
-    params[:target_project].blank?
+    items.merged_before(merged_before)
   end
 
   def user_not_authorized?
@@ -57,5 +53,13 @@ class MergeRequest::MetricsFinder
 
   def target_project
     params[:target_project]
+  end
+
+  def merged_after
+    params[:merged_after]
+  end
+
+  def merged_before
+    params[:merged_before]
   end
 end

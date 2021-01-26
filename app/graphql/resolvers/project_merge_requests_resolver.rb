@@ -22,11 +22,7 @@ module Resolvers
     def only_count_is_selected_with_merged_at_filter?(args)
       return unless lookahead
 
-      argument_names = args.keys
-      argument_names.delete(:lookahead)
-      argument_names.delete(:sort)
-      argument_names.delete(:merged_before)
-      argument_names.delete(:merged_after)
+      argument_names = args.except(:lookahead, :sort, :merged_before, :merged_after).keys
 
       # no extra filtering arguments are provided
       return unless argument_names.empty?
@@ -35,8 +31,13 @@ module Resolvers
       # Detecting a specific query pattern:
       # mergeRequests(mergedAfter: "X", mergedBefore: "Y") {
       #   count
+      #   totalTimeToMerge
       # }
-      lookahead.selects?(:count) && lookahead.selections.size == 1 # no other nodes are selected
+      allowed_selected_fields = [:count, :total_time_to_merge]
+      selected_fields = lookahead.selections.map(&:field).map(&:original_name)
+
+      # only the allowed_selected_fields are present
+      (selected_fields - allowed_selected_fields).empty?
     end
   end
 end

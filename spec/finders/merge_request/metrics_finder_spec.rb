@@ -28,11 +28,11 @@ RSpec.describe MergeRequest::MetricsFinder do
       params.delete(:target_project)
     end
 
-    it { expect(subject).to be_empty }
+    it { is_expected.to be_empty }
   end
 
   context 'when the user is not part of the project' do
-    it { expect(subject).to be_empty }
+    it { is_expected.to be_empty }
   end
 
   context 'when user is part of the project' do
@@ -41,11 +41,11 @@ RSpec.describe MergeRequest::MetricsFinder do
     end
 
     it 'returns merge request records' do
-      expect(subject).to eq([merge_request_merged.metrics])
+      is_expected.to eq([merge_request_merged.metrics])
     end
 
     it 'excludes not merged records' do
-      expect(subject).not_to eq([merge_request_not_merged.metrics])
+      is_expected.not_to eq([merge_request_not_merged.metrics])
     end
 
     context 'when only merged_before is given' do
@@ -53,7 +53,7 @@ RSpec.describe MergeRequest::MetricsFinder do
         params.delete(:merged_after)
       end
 
-      it { expect(subject).to eq([merge_request_merged.metrics]) }
+      it { is_expected.to eq([merge_request_merged.metrics]) }
     end
 
     context 'when only merged_after is given' do
@@ -61,7 +61,7 @@ RSpec.describe MergeRequest::MetricsFinder do
         params.delete(:merged_before)
       end
 
-      it { expect(subject).to eq([merge_request_merged.metrics]) }
+      it { is_expected.to eq([merge_request_merged.metrics]) }
     end
 
     context 'when no records matching the date range' do
@@ -70,7 +70,7 @@ RSpec.describe MergeRequest::MetricsFinder do
         params[:merged_after] = merged_at - 2.years
       end
 
-      it { expect(subject).to be_empty }
+      it { is_expected.to be_empty }
     end
   end
 end
