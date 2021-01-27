@@ -27,8 +27,10 @@ module Types
         Gitlab::Graphql::Loaders::BatchModelLoader.new(Project, object.project_id).find
       end
 
-      # NOTE: This method must be kept in sync with `MetadataType.resolve_type`.
-      # This method must never produce data that the discriminator cannot handle.
+      # NOTE: This method must be kept in sync with the union
+      # type: `Types::Packages::MetadataType`.
+      #
+      # `Types::Packages::MetadataType.resolve_type(metadata, ctx)` must never raise.
       def metadata
         case object.package_type
         when 'composer'
