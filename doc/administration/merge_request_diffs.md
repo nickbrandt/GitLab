@@ -225,8 +225,8 @@ of some merge request diffs when [external diffs in object storage](#object-stor
 were enabled. This mainly affected imported merge requests, and was resolved
 with [this merge request](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/31005).
 
-If you are using object storage, have never used on-disk storage for external
-diffs, the "changes" tab for some merge requests fails to load with a 500 error,
+If you are using object storage, or have never used on-disk storage for external
+diffs, the **Changes** tab for some merge requests fails to load with a 500 error,
 and the exception for that error is of this form:
 
 ```plain
