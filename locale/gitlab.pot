@@ -9760,6 +9760,9 @@ msgstr ""
 msgid "DeploymentFrequencyCharts|Something went wrong while getting deployment frequency data"
 msgstr ""
 
+msgid "DeploymentFrequencyCharts|These charts display the frequency of deployments to the production environment, as part of the DORA 4 metrics. The environment must be named %{codeStart}production%{codeEnd} for its data to appear in these charts."
+msgstr ""
+
 msgid "Deployments"
 msgstr ""
 
