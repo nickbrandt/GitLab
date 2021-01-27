@@ -32,8 +32,8 @@ RSpec.describe AlertManagement::ExtractAlertPayloadFieldsService do
           project.add_maintainer(user_with_permissions)
         end
 
-        context 'when payload is a valid JSON' do
-          context 'when payloa has an acceptable size' do
+        context 'when payload is valid JSON' do
+          context 'when payload has an acceptable size' do
             it 'responds with success' do
               is_expected.to be_success
             end
@@ -75,6 +75,8 @@ RSpec.describe AlertManagement::ExtractAlertPayloadFieldsService do
       end
 
       context 'without permissions' do
+        let_it_be(:user) { user_without_permissions }
+
         it 'returns insufficient permissions error' do
           is_expected.to be_error
           expect(response.message).to eq('Insufficient permissions')

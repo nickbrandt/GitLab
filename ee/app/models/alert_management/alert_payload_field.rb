@@ -7,7 +7,10 @@ module AlertManagement
 
     attr_accessor :project, :path, :label, :type
 
-    SUPPORTED_TYPES = %w[array datetime string].freeze
+    ARRAY_TYPE = 'array'
+    DATETIME_TYPE = 'datetime'
+    STRING_TYPE = 'string'
+    SUPPORTED_TYPES = [ARRAY_TYPE, DATETIME_TYPE, STRING_TYPE].freeze
 
     validates :project, presence: true
     validates :label, presence: true

@@ -51,12 +51,12 @@ module Gitlab
 
       def type_of(value)
         case value
-        when /^\d{4}/ # assume it's a datetime
-          'datetime'
-        when String
-          'string'
         when Array
-          'array'
+          ::AlertManagement::AlertPayloadField::ARRAY_TYPE
+        when /^\d{4}/ # assume it's a datetime
+          ::AlertManagement::AlertPayloadField::DATETIME_TYPE
+        when String
+          ::AlertManagement::AlertPayloadField::STRING_TYPE
         end
       end
     end

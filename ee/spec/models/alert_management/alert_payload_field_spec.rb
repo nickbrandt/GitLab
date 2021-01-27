@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe AlertManagement::AlertPayloadField do
   let(:alert_payload_field) { build(:alert_management_alert_payload_field) }
 
-  describe '.validations' do
+  describe 'validations' do
     subject { alert_payload_field }
 
     it { is_expected.to validate_presence_of(:project) }

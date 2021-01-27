@@ -23,6 +23,10 @@ RSpec.describe Gitlab::AlertManagement::AlertPayloadFieldExtractor do
           }
         },
         time: '2020-12-09T12:34:56',
+        time_iso_8601_and_rfc_3339: '2021-01-27T13:01:11+00:00', # ISO 8601 and RFC 3339
+        time_iso_8601: '2021-01-27T13:01:11Z', # ISO 8601
+        time_iso_8601_short: '20210127T130111Z', # ISO 8601
+        time_rfc_3339: '2021-01-27 13:01:11+00:00', # RFC 3339
         discarded_null: nil,
         discarded_bool_true: true,
         discarded_bool_false: false,
@@ -36,6 +40,10 @@ RSpec.describe Gitlab::AlertManagement::AlertPayloadFieldExtractor do
         a_field(%w(nested key), 'Key', 'string'),
         a_field(%w(nested deep key), 'Key', 'string'),
         a_field(['time'], 'Time', 'datetime'),
+        a_field(['time_iso_8601_and_rfc_3339'], 'Time iso 8601 and rfc 3339', 'datetime'),
+        a_field(['time_iso_8601'], 'Time iso 8601', 'datetime'),
+        a_field(['time_iso_8601_short'], 'Time iso 8601 short', 'datetime'),
+        a_field(['time_rfc_3339'], 'Time rfc 3339', 'datetime'),
         a_field(['arr'], 'Arr', 'array')
       )
     end
