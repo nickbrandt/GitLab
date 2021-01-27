@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import ServiceLevelAgreementCell from 'ee/incidents/components/service_level_agreement_cell.vue';
+import ServiceLevelAgreementCell from 'ee/vue_shared/components/incidents/service_level_agreement.vue';
 import { calculateRemainingMilliseconds, formatTime } from '~/lib/utils/datetime_utility';
 
 jest.mock('~/lib/utils/datetime_utility', () => ({
