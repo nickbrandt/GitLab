@@ -68,7 +68,8 @@ module EE
       def vulnerability_issue_build_parameters
         {
           title: _("Investigate vulnerability: %{title}") % { title: vulnerability.title },
-          description: render_vulnerability_description
+          description: render_vulnerability_description,
+          confidential: true
         }
       end
 
@@ -88,11 +89,6 @@ module EE
 
       def populate_vulnerability_id
         self.vulnerability_id = params[:vulnerability_id] if can?(current_user, :read_vulnerability, project)
-      end
-
-      override :confidential_issue?
-      def confidential_issue?
-        vulnerability_id.present? || super
       end
     end
   end
