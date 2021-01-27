@@ -1,5 +1,5 @@
 <script>
-import { GlModal } from '@gitlab/ui';
+import { GlBadge, GlModal } from '@gitlab/ui';
 import { __, n__, sprintf } from '~/locale';
 import CodeBlock from '~/vue_shared/components/code_block.vue';
 
@@ -7,6 +7,7 @@ export default {
   name: 'TestCaseDetails',
   components: {
     CodeBlock,
+    GlBadge,
     GlModal,
   },
   props: {
@@ -76,7 +77,7 @@ export default {
     <div v-if="testCase.recent_failures" class="gl-display-flex gl-flex-wrap gl-mx-n4 gl-my-3">
       <strong class="gl-text-right col-sm-3">{{ $options.text.history }}</strong>
       <div class="col-sm-9" data-testid="test-case-recent-failures">
-        {{ failureHistoryMessage }}
+        <gl-badge variant="warning">{{ failureHistoryMessage }}</gl-badge>
       </div>
     </div>
 
