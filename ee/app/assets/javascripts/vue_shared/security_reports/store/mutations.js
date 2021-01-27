@@ -267,19 +267,11 @@ export default {
     }
   },
 
-  [types.REQUEST_CREATE_ISSUE](state) {
+  [types.REQUEST_CREATE_ISSUE](state, vulnerability) {
     state.isCreatingIssue = true;
-    // reset error in case previous state was error
-    Vue.set(state.modal, 'error', null);
-  },
-
-  [types.RECEIVE_CREATE_ISSUE_SUCCESS](state) {
-    state.isCreatingIssue = false;
-  },
-
-  [types.RECEIVE_CREATE_ISSUE_ERROR](state, error) {
-    Vue.set(state.modal, 'error', error);
-    state.isCreatingIssue = false;
+    visitUrl(vulnerability.create_vulnerability_feedback_issue_path, {
+      params: { vulnerability_id: vulnerability.id },
+    });
   },
 
   [types.REQUEST_CREATE_MERGE_REQUEST](state) {

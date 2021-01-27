@@ -185,29 +185,6 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('RECEIVE_CREATE_ISSUE_SUCCESS', () => {
-    it('should fire the visitUrl function on the issue URL', () => {
-      const payload = { issue_url: 'fakepath.html' };
-      mutations[types.RECEIVE_CREATE_ISSUE_SUCCESS](state, payload);
-
-      expect(visitUrl).toHaveBeenCalledWith(payload.issue_url);
-    });
-  });
-
-  describe('RECEIVE_CREATE_ISSUE_ERROR', () => {
-    beforeEach(() => {
-      mutations[types.RECEIVE_CREATE_ISSUE_ERROR](state);
-    });
-
-    it('should set isCreatingIssue to false', () => {
-      expect(state.isCreatingIssue).toBe(false);
-    });
-
-    it('should set the error state on the modal', () => {
-      expect(state.modal.error).toBe('There was an error creating the issue');
-    });
-  });
-
   describe('REQUEST_CREATE_MERGE_REQUEST', () => {
     beforeEach(() => {
       mutations[types.REQUEST_CREATE_MERGE_REQUEST](state);

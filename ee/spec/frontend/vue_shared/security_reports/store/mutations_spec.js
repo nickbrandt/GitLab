@@ -326,23 +326,6 @@ describe('EE sast reports mutations', () => {
     });
   });
 
-  describe('RECEIVE_CREATE_ISSUE_SUCCESS', () => {
-    it('sets isCreatingIssue prop to false', () => {
-      mutations[types.RECEIVE_CREATE_ISSUE_SUCCESS](stateCopy);
-
-      expect(stateCopy.isCreatingIssue).toEqual(false);
-    });
-  });
-
-  describe('RECEIVE_CREATE_ISSUE_ERROR', () => {
-    it('sets isCreatingIssue prop to false and sets error', () => {
-      mutations[types.RECEIVE_CREATE_ISSUE_ERROR](stateCopy, 'error');
-
-      expect(stateCopy.isCreatingIssue).toEqual(false);
-      expect(stateCopy.modal.error).toEqual('error');
-    });
-  });
-
   describe('REQUEST_CREATE_MERGE_REQUEST', () => {
     it('sets isCreatingMergeRequest prop to true and resets error', () => {
       mutations[types.REQUEST_CREATE_MERGE_REQUEST](stateCopy);

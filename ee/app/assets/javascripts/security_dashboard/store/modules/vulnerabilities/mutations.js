@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { s__, __ } from '~/locale';
+import { s__ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
 import { isSameVulnerability } from './utils';
@@ -59,17 +59,11 @@ export default {
     Vue.set(state.modal, 'error', null);
     Vue.set(state.modal, 'isCommentingOnDismissal', false);
   },
-  [types.REQUEST_CREATE_ISSUE](state) {
+  [types.REQUEST_CREATE_ISSUE](state, vulnerability) {
     state.isCreatingIssue = true;
-    Vue.set(state.modal, 'error', null);
-  },
-  [types.RECEIVE_CREATE_ISSUE_SUCCESS](state, payload) {
-    // We don't cancel the loading state here because we're navigating away from the page
-    visitUrl(payload.issue_url);
-  },
-  [types.RECEIVE_CREATE_ISSUE_ERROR](state) {
-    state.isCreatingIssue = false;
-    Vue.set(state.modal, 'error', __('There was an error creating the issue'));
+    visitUrl(vulnerability.create_vulnerability_feedback_issue_path, {
+      params: { vulnerability_id: vulnerability.id },
+    });
   },
   [types.REQUEST_DISMISS_VULNERABILITY](state) {
     state.isDismissingVulnerability = true;

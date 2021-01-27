@@ -323,48 +323,6 @@ describe('issue creation', () => {
         );
       });
     });
-
-    describe('on error', () => {
-      beforeEach(() => {
-        mock.onPost(vulnerability.create_vulnerability_feedback_issue_path).replyOnce(404, {});
-      });
-
-      it('should dispatch the request and error actions', () => {
-        const flashError = false;
-
-        return testAction(
-          actions.createIssue,
-          { vulnerability, flashError },
-          {},
-          [],
-          [
-            { type: 'requestCreateIssue' },
-            { type: 'receiveCreateIssueError', payload: { flashError } },
-          ],
-        );
-      });
-    });
-  });
-
-  describe('receiveCreateIssueSuccess', () => {
-    it('should commit the success mutation', () => {
-      const data = mockDataVulnerabilities[0];
-
-      return testAction(actions.receiveCreateIssueSuccess, { data }, state, [
-        {
-          type: types.RECEIVE_CREATE_ISSUE_SUCCESS,
-          payload: { data },
-        },
-      ]);
-    });
-  });
-
-  describe('receiveCreateIssueError', () => {
-    it('should commit the error mutation', () => {
-      return testAction(actions.receiveCreateIssueError, {}, state, [
-        { type: types.RECEIVE_CREATE_ISSUE_ERROR },
-      ]);
-    });
   });
 
   describe('requestCreateIssue', () => {

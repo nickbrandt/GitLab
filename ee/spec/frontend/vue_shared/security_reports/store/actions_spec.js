@@ -16,8 +16,6 @@ import {
   dismissVulnerability,
   revertDismissVulnerability,
   requestCreateIssue,
-  receiveCreateIssue,
-  receiveCreateIssueError,
   createNewIssue,
   downloadPatch,
   requestCreateMergeRequest,
@@ -793,43 +791,8 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('receiveCreateIssue', () => {
-    it('commits receive create issue', (done) => {
-      testAction(
-        receiveCreateIssue,
-        null,
-        mockedState,
-        [
-          {
-            type: types.RECEIVE_CREATE_ISSUE_SUCCESS,
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
-  describe('receiveCreateIssueError', () => {
-    it('commits receive create issue error with payload', (done) => {
-      testAction(
-        receiveCreateIssueError,
-        'error',
-        mockedState,
-        [
-          {
-            type: types.RECEIVE_CREATE_ISSUE_ERROR,
-            payload: 'error',
-          },
-        ],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('createNewIssue', () => {
-    it('with success should dispatch `requestCreateIssue` and `receiveCreateIssue`', (done) => {
+    it('with success should dispatch `requestCreateIssue`', (done) => {
       mock.onPost('create_issue_path').reply(200, { issue_path: 'new_issue' });
       mockedState.createVulnerabilityFeedbackIssuePath = 'create_issue_path';
 
@@ -844,29 +807,6 @@ describe('security reports actions', () => {
           },
           {
             type: 'receiveCreateIssue',
-          },
-        ],
-        done,
-      );
-    });
-
-    it('with error should dispatch `receiveCreateIssueError`', (done) => {
-      mock.onPost('create_issue_path').reply(500, {});
-      mockedState.vulnerabilityFeedbackPath = 'create_issue_path';
-      mockedState.canReadVulnerabilityFeedback = true;
-
-      testAction(
-        createNewIssue,
-        null,
-        mockedState,
-        [],
-        [
-          {
-            type: 'requestCreateIssue',
-          },
-          {
-            type: 'receiveCreateIssueError',
-            payload: 'There was an error creating the issue. Please try again.',
           },
         ],
         done,

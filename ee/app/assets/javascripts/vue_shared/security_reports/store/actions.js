@@ -2,12 +2,10 @@ import axios from '~/lib/utils/axios_utils';
 import download from '~/lib/utils/downloader';
 import pollUntilComplete from '~/lib/utils/poll_until_complete';
 import { s__, sprintf } from '~/locale';
-import { visitUrl } from '~/lib/utils/url_utility';
 import toast from '~/vue_shared/plugins/global_toast';
 import { fetchDiffData } from '~/vue_shared/security_reports/store/utils';
 import {
   FEEDBACK_TYPE_DISMISSAL,
-  FEEDBACK_TYPE_ISSUE,
   FEEDBACK_TYPE_MERGE_REQUEST,
 } from '~/vue_shared/security_reports/constants';
 import * as types from './mutation_types';
@@ -340,36 +338,12 @@ export const hideDismissalDeleteButtons = ({ commit }) => {
   commit(types.HIDE_DISMISSAL_DELETE_BUTTONS);
 };
 
-export const requestCreateIssue = ({ commit }) => commit(types.REQUEST_CREATE_ISSUE);
-export const receiveCreateIssue = ({ commit }) => commit(types.RECEIVE_CREATE_ISSUE_SUCCESS);
-export const receiveCreateIssueError = ({ commit }, error) =>
-  commit(types.RECEIVE_CREATE_ISSUE_ERROR, error);
+export const createNewIssue = ({ dispatch }, { vulnerability }) => {
+  dispatch('requestCreateIssue', vulnerability);
+};
 
-export const createNewIssue = ({ state, dispatch }) => {
-  dispatch('requestCreateIssue');
-
-  axios
-    .post(state.createVulnerabilityFeedbackIssuePath, {
-      vulnerability_feedback: {
-        feedback_type: FEEDBACK_TYPE_ISSUE,
-        category: state.modal.vulnerability.category,
-        project_fingerprint: state.modal.vulnerability.project_fingerprint,
-        finding_uuid: state.modal.vulnerability.uuid,
-        pipeline_id: state.pipelineId,
-        vulnerability_data: state.modal.vulnerability,
-      },
-    })
-    .then((response) => {
-      dispatch('receiveCreateIssue');
-      // redirect the user to the created issue
-      visitUrl(response.data.issue_url);
-    })
-    .catch(() =>
-      dispatch(
-        'receiveCreateIssueError',
-        s__('ciReport|There was an error creating the issue. Please try again.'),
-      ),
-    );
+export const requestCreateIssue = ({ commit }, vulnerability) => {
+  commit(types.REQUEST_CREATE_ISSUE, vulnerability);
 };
 
 export const createMergeRequest = ({ state, dispatch }) => {
