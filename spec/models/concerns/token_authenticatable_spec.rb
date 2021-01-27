@@ -53,8 +53,9 @@ RSpec.describe ApplicationSetting, 'TokenAuthenticatable' do
 
         it 'persists new token as an encrypted string' do
           expect(subject).to eq settings.reload.runners_registration_token
+          nonce = TokenWithIv.find_by_hashed_token(settings.read_attribute('runners_registration_token_encrypted')).iv
           expect(settings.read_attribute('runners_registration_token_encrypted'))
-            .to eq Gitlab::CryptoHelper.aes256_gcm_encrypt(subject)
+            .to eq Gitlab::CryptoHelper.aes256_gcm_encrypt(subject, nonce: nonce)
           expect(settings).to be_persisted
         end
 
@@ -243,7 +244,8 @@ RSpec.describe Ci::Build, 'TokenAuthenticatable' do
         it 'persists new token as an encrypted string' do
           build.ensure_token!
 
-          encrypted = Gitlab::CryptoHelper.aes256_gcm_encrypt(build.token)
+          nonce = TokenWithIv.find_by_hashed_token(build.token_encrypted).iv
+          encrypted = Gitlab::CryptoHelper.aes256_gcm_encrypt(build.token, nonce: nonce)
 
           expect(build.read_attribute('token_encrypted')).to eq encrypted
         end
