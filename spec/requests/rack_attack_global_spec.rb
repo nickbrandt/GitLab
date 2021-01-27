@@ -158,7 +158,7 @@ RSpec.describe 'Rack Attack global throttles', :use_clean_rails_memory_store_cac
           matched: 'throttle_unauthenticated'
         })
 
-        expect(Gitlab::AuthLogger).to receive(:error).with(arguments).at_least(:once)
+        expect(Gitlab::AuthLogger).to receive(:error).with(arguments)
 
         get url_that_does_not_require_authentication
       end

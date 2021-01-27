@@ -29,15 +29,11 @@ RSpec.describe Gitlab::RackAttack::InstrumentedCacheStore do
 
   with_them do
     it 'publishes a notification' do
-      published = false
+      event = nil
 
       begin
         subscriber = ActiveSupport::Notifications.subscribe("redis.rack_attack") do |*args|
-          published = true
           event = ActiveSupport::Notifications::Event.new(*args)
-          expect(event.name).to eq("redis.rack_attack")
-          expect(event.duration).to be_a(Float).and(be > 0.0)
-          expect(event.payload[:operation]).to eql(operation)
         end
 
         subject.send(operation, *params) {}
@@ -45,35 +41,39 @@ RSpec.describe Gitlab::RackAttack::InstrumentedCacheStore do
         ActiveSupport::Notifications.unsubscribe(subscriber) if subscriber
       end
 
-      expect(published).to be(true)
+      expect(event).not_to be_nil
+      expect(event.name).to eq("redis.rack_attack")
+      expect(event.duration).to be_a(Float).and(be > 0.0)
+      expect(event.payload[:operation]).to eql(operation)
     end
 
     it 'publishes a notification even if the cache store returns an error' do
-      allow(store).to receive(operation).and_raise("Some thing went wrong")
-      published = false
-      exception = false
+      allow(store).to receive(operation).and_raise('Something went wrong')
+
+      event = nil
+      exception = nil
 
       begin
         subscriber = ActiveSupport::Notifications.subscribe("redis.rack_attack") do |*args|
-          published = true
           event = ActiveSupport::Notifications::Event.new(*args)
-          expect(event.name).to eq("redis.rack_attack")
-          expect(event.duration).to be_a(Float).and(be > 0.0)
-          expect(event.payload[:operation]).to eql(operation)
         end
 
         begin
           subject.send(operation, *params) {}
-        rescue
-          # Ignore the error
-          exception = true
+        rescue => e
+          exception = e
         end
       ensure
         ActiveSupport::Notifications.unsubscribe(subscriber) if subscriber
       end
 
-      expect(published).to be(true)
-      expect(exception).to be(true)
+      expect(event).not_to be_nil
+      expect(event.name).to eq("redis.rack_attack")
+      expect(event.duration).to be_a(Float).and(be > 0.0)
+      expect(event.payload[:operation]).to eql(operation)
+
+      expect(exception).not_to be_nil
+      expect(exception.message).to eql('Something went wrong')
     end
 
     it 'delegates to the upstream store' do
