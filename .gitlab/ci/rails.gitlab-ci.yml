@@ -377,7 +377,7 @@ db:rollback:
     - bundle exec rake db:migrate SKIP_SCHEMA_VERSION_CHECK=true
 
 db:gitlabcom-database-testing:
-  extends: .rails:rules:ee-and-foss-mr-with-migration
+  extends: .rails:rules:db:gitlabcom-database-testing
   stage: test
   image: ruby:2.7-alpine
   needs: []
