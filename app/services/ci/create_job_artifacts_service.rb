@@ -7,6 +7,7 @@ module Ci
     ArtifactsExistError = Class.new(StandardError)
 
     LSIF_ARTIFACT_TYPE = 'lsif'
+    METRICS_REPORT_UPLOAD_EVENT_NAME = 'i_testing_metrics_report_artifact_uploaders'
 
     OBJECT_STORAGE_ERRORS = [
       Errno::EIO,
@@ -157,7 +158,7 @@ module Ci
     def track_artifact_uploader(artifact)
       return unless artifact.file_type == 'metrics'
 
-      track_usage_event('i_metrics_report_artifact_uploaders', @job.user_id)
+      track_usage_event(METRICS_REPORT_UPLOAD_EVENT_NAME, @job.user_id)
     end
 
     def parse_dotenv_artifact(artifact)

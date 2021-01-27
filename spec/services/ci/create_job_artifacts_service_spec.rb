@@ -27,6 +27,14 @@ RSpec.describe Ci::CreateJobArtifactsService do
     UploadedFile.new(upload.path, **params)
   end
 
+  def unique_metrics_report_uploaders
+    Gitlab::UsageDataCounters::HLLRedisCounter.unique_events(
+      event_names: described_class::METRICS_REPORT_UPLOAD_EVENT_NAME,
+      start_date: 2.weeks.ago,
+      end_date: 2.weeks.from_now
+    )
+  end
+
   describe '#execute' do
     subject { service.execute(artifacts_file, params, metadata_file: metadata_file) }
 
@@ -43,9 +51,9 @@ RSpec.describe Ci::CreateJobArtifactsService do
       end
 
       it 'does not track the job user_id' do
-        expect(service).not_to receive(:track_usage_event)
-
         subject
+
+        expect(unique_metrics_report_uploaders).to eq(0)
       end
 
       context 'when metadata file is also uploaded' do
@@ -188,9 +196,9 @@ RSpec.describe Ci::CreateJobArtifactsService do
       let(:params) { { 'artifact_type' => 'metrics', 'artifact_format' => 'gzip' }.with_indifferent_access }
 
       it 'tracks the job user_id' do
-        expect(service).to receive(:track_usage_event).with('i_metrics_report_artifact_uploaders', 123)
-
         subject
+
+        expect(unique_metrics_report_uploaders).to eq(1)
       end
     end
 
