@@ -16,19 +16,6 @@ import importGroupMutation from '../graphql/mutations/import_group.mutation.grap
 import ImportTableRow from './import_table_row.vue';
 import PaginationLinks from '~/vue_shared/components/pagination_links.vue';
 
-const mapApolloMutations = (mutations) =>
-  Object.fromEntries(
-    Object.entries(mutations).map(([key, mutation]) => [
-      key,
-      function mutate(config) {
-        return this.$apollo.mutate({
-          mutation,
-          ...config,
-        });
-      },
-    ]),
-  );
-
 export default {
   components: {
     GlEmptyState,
@@ -106,11 +93,26 @@ export default {
       this.page = page;
     },
 
-    ...mapApolloMutations({
-      setTargetNamespace: setTargetNamespaceMutation,
-      setNewName: setNewNameMutation,
-      importGroup: importGroupMutation,
-    }),
+    updateTargetNamespace(sourceGroupId, targetNamespace) {
+      this.$apollo.mutate({
+        mutation: setTargetNamespaceMutation,
+        variables: { sourceGroupId, targetNamespace },
+      });
+    },
+
+    updateNewName(sourceGroupId, newName) {
+      this.$apollo.mutate({
+        mutation: setNewNameMutation,
+        variables: { sourceGroupId, newName },
+      });
+    },
+
+    importGroup(sourceGroupId) {
+      this.$apollo.mutate({
+        mutation: importGroupMutation,
+        variables: { sourceGroupId },
+      });
+    },
   },
 };
 </script>
@@ -164,17 +166,9 @@ export default {
                 :key="group.id"
                 :group="group"
                 :available-namespaces="availableNamespaces"
-                @update-target-namespace="
-                  setTargetNamespace({
-                    variables: { sourceGroupId: group.id, targetNamespace: $event },
-                  })
-                "
-                @update-new-name="
-                  setNewName({
-                    variables: { sourceGroupId: group.id, newName: $event },
-                  })
-                "
-                @import-group="importGroup({ variables: { sourceGroupId: group.id } })"
+                @update-target-namespace="updateTargetNamespace(group.id, $event)"
+                @update-new-name="updateNewName(group.id, $event)"
+                @import-group="importGroup(group.id)"
               />
             </template>
           </tbody>
