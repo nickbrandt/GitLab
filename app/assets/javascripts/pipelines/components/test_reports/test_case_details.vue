@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     failureHistoryMessage() {
-      if (!this.testCase.recent_failures) {
+      if (!this.hasRecentFailures) {
         return null;
       }
 
@@ -32,13 +32,19 @@ export default {
         n__(
           'Reports|Failed %{count} time in %{baseBranch} in the last 14 days',
           'Reports|Failed %{count} times in %{baseBranch} in the last 14 days',
-          this.testCase.recent_failures.count,
+          this.recentFailures.count,
         ),
         {
-          count: this.testCase.recent_failures.count,
-          baseBranch: this.testCase.recent_failures.base_branch,
+          count: this.recentFailures.count,
+          baseBranch: this.recentFailures.base_branch,
         },
       );
+    },
+    hasRecentFailures() {
+      return Boolean(this.recentFailures);
+    },
+    recentFailures() {
+      return this.testCase.recent_failures;
     },
   },
   text: {
