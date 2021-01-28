@@ -16304,7 +16304,7 @@ msgstr ""
 msgid "Job|Job has been erased"
 msgstr ""
 
-msgid "Job|Job has been erased by"
+msgid "Job|Job has been erased by %{userLink}"
 msgstr ""
 
 msgid "Job|Keep"
