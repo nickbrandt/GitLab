@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Erased block with erased job renders alert with erased text and variant 1`] = `
+<div
+  class="gl-mt-3"
+>
+  <div
+    class="gl-alert gl-alert-warning"
+    role="alert"
+  >
+    <svg
+      aria-hidden="true"
+      class="gl-icon s16 gl-alert-icon gl-alert-icon-no-title"
+      data-testid="warning-icon"
+    >
+      <use
+        href="#warning"
+      />
+    </svg>
+     
+    <!---->
+     
+    <!---->
+     
+    <div
+      class="gl-alert-body"
+    >
+      
+      Job has been erased
+     
+      <time
+        class=""
+        datetime="2016-11-07T11:11:16.525Z"
+        title="Nov 7, 2016 11:11am GMT+0000"
+      >
+        4 years ago
+      </time>
+    </div>
+     
+    <!---->
+  </div>
+</div>
+`;
+
+exports[`Erased block with job erased by user renders alert with erased by text and variant 1`] = `
+<div
+  class="gl-mt-3"
+>
+  <div
+    class="gl-alert gl-alert-warning"
+    role="alert"
+  >
+    <svg
+      aria-hidden="true"
+      class="gl-icon s16 gl-alert-icon gl-alert-icon-no-title"
+      data-testid="warning-icon"
+    >
+      <use
+        href="#warning"
+      />
+    </svg>
+     
+    <!---->
+     
+    <!---->
+     
+    <div
+      class="gl-alert-body"
+    >
+      
+      Job has been erased by
+      
+      <a
+        class="gl-link"
+        href="gitlab.com/root"
+      >
+        root
+      </a>
+       
+      <time
+        class=""
+        datetime="2016-11-07T11:11:16.525Z"
+        title="Nov 7, 2016 11:11am GMT+0000"
+      >
+        4 years ago
+      </time>
+    </div>
+     
+    <!---->
+  </div>
+</div>
+`;
