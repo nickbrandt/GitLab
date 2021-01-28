@@ -69,11 +69,7 @@ module DiffPositionableNote
     result = tracer.trace(self.position)
     return unless result
 
-    if result[:outdated]
-      self.change_position = result[:position]
-    else
-      self.position = result[:position]
-    end
+    self.change_position = result[:position] if result[:outdated]
   end
 
   def diff_refs_match_commit

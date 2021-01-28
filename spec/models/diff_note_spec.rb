@@ -419,11 +419,16 @@ RSpec.describe DiffNote do
         context "when the note is outdated" do
           before do
             allow(merge_request).to receive(:diff_refs).and_return(commit.diff_refs)
+
+            allow_next_instance_of(Gitlab::Diff::PositionTracer) do |tracer|
+              allow(tracer)
+                .to receive(:trace)
+                .and_return(position: position, outdated: true)
+            end
           end
 
-          it "updates the position" do
-            expect(subject.original_position).to eq(position)
-            expect(subject.position).not_to eq(position)
+          it "updates the change_position" do
+            expect(subject.change_position).to eq(position)
           end
         end
       end
