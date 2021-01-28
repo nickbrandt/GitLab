@@ -17292,6 +17292,9 @@ msgstr ""
 msgid "Manage your license"
 msgstr ""
 
+msgid "Manage your project's triggers"
+msgstr ""
+
 msgid "Managed Account"
 msgstr ""
 
@@ -19519,6 +19522,9 @@ msgstr ""
 msgid "No test coverage"
 msgstr ""
 
+msgid "No triggers exist yet. Use the form above to create one."
+msgstr ""
+
 msgid "No vulnerabilities present"
 msgstr ""
 
@@ -20665,6 +20671,9 @@ msgid "Partial token for reference only"
 msgstr ""
 
 msgid "Participants"
+msgstr ""
+
+msgid "Pass job variables"
 msgstr ""
 
 msgid "Passed"
@@ -28874,6 +28883,9 @@ msgstr ""
 msgid "There was an error with the reCAPTCHA. Please solve the reCAPTCHA again."
 msgstr ""
 
+msgid "These examples show how to trigger this project's pipeline for a branch or tag."
+msgstr ""
+
 msgid "These existing issues have a similar title. It might be better to comment there instead of creating another similar issue."
 msgstr ""
 
@@ -30003,6 +30015,9 @@ msgstr ""
 msgid "Toggles :%{name}: emoji award."
 msgstr ""
 
+msgid "Token"
+msgstr ""
+
 msgid "Token valid until revoked"
 msgstr ""
 
@@ -30249,6 +30264,12 @@ msgid "Trigger was successfully updated."
 msgstr ""
 
 msgid "Triggerer"
+msgstr ""
+
+msgid "Triggers|In each example, replace %{code_start}TOKEN%{code_end} with the trigger token you generated and replace %{code_start}REF_NAME%{code_end} with the branch or tag name."
+msgstr ""
+
+msgid "Triggers|To pass variables to the triggered pipeline, add %{code_start}variables[VARIABLE]=VALUE%{code_end} to the API request."
 msgstr ""
 
 msgid "Troubleshoot and monitor your application with tracing"
@@ -30944,10 +30965,16 @@ msgstr ""
 msgid "Use %{code_start}::%{code_end} to create a %{link_start}scoped label set%{link_end} (eg. %{code_start}priority::1%{code_end})"
 msgstr ""
 
+msgid "Use .gitlab-ci.yml"
+msgstr ""
+
 msgid "Use Service Desk to connect with your users (e.g. to offer customer support) through email right inside GitLab"
 msgstr ""
 
 msgid "Use an one time password authenticator on your mobile device or computer to enable two-factor authentication (2FA)."
+msgstr ""
+
+msgid "Use cURL"
 msgstr ""
 
 msgid "Use custom color #FF0000"
@@ -30966,6 +30993,9 @@ msgid "Use template"
 msgstr ""
 
 msgid "Use this token to validate received payloads"
+msgstr ""
+
+msgid "Use webhook"
 msgstr ""
 
 msgid "Use your global notification setting"
@@ -31906,6 +31936,9 @@ msgid "Webhook Logs"
 msgstr ""
 
 msgid "Webhook Settings"
+msgstr ""
+
+msgid "Webhook:"
 msgstr ""
 
 msgid "Webhooks"
@@ -33311,6 +33344,9 @@ msgid "branch name"
 msgstr ""
 
 msgid "by"
+msgstr ""
+
+msgid "cURL:"
 msgstr ""
 
 msgid "can contain only letters of the Base64 alphabet (RFC4648) with the addition of '@', ':' and '.'"
