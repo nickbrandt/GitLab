@@ -1,3 +1,4 @@
+import { CHEVRON_SKIPPING_PALETTE_ENUM, CHEVRON_SKIPPING_SHADE_ENUM } from 'ee/oncall_schedules/constants';
 import { sprintf, __ } from '~/locale';
 
 /**
@@ -27,3 +28,13 @@ export const getFormattedTimezone = (tz) => {
 export const isNameFieldValid = (nameField) => {
   return Boolean(nameField?.length);
 };
+
+/**
+ * Returns a Array of Objects that represent the 30 possible
+ * color combinations for assignees relative to their index
+ *
+ *
+ * @returns {Array}
+ */
+export const assigneeColorCombo = () => CHEVRON_SKIPPING_SHADE_ENUM.map(shade => CHEVRON_SKIPPING_PALETTE_ENUM.map(color => ({ shade, color }))).flat();
+

@@ -9,12 +9,12 @@ import {
   updateStoreAfterRotationAdd,
   updateStoreAfterRotationEdit,
 } from 'ee/oncall_schedules/utils/cache_updates';
-import { isNameFieldValid } from 'ee/oncall_schedules/utils/common_utils';
+import { isNameFieldValid, assigneeColorCombo } from 'ee/oncall_schedules/utils/common_utils';
 import { s__, __ } from '~/locale';
 import createFlash, { FLASH_TYPES } from '~/flash';
 import usersSearchQuery from '~/graphql_shared/queries/users_search.query.graphql';
 import AddEditRotationForm from './add_edit_rotation_form.vue';
-import { format24HourTimeStringFromInt } from '~/lib/utils/datetime_utility';
+import { format24HourTimeStringFromInt, formatDate } from '~/lib/utils/datetime_utility';
 
 export const i18n = {
   rotationCreated: s__('OnCallSchedules|Successfully created a new rotation'),
@@ -27,6 +27,7 @@ export const i18n = {
 export default {
   i18n,
   LENGTH_ENUM,
+  CHEVRON_COMBOS: assigneeColorCombo(),
   components: {
     GlModal,
     GlAlert,
@@ -119,18 +120,18 @@ export default {
         scheduleIid: this.schedule.iid,
         name: this.form.name,
         startsAt: {
-          ...this.form.startsAt,
+          date: formatDate(this.form.startsAt.date, 'yyyy-mm-dd'),
           time: format24HourTimeStringFromInt(this.form.startsAt.time),
         },
         rotationLength: {
           ...this.form.rotationLength,
           length: parseInt(this.form.rotationLength.length, 10),
         },
-        participants: this.form.participants.map(({ username }) => ({
+        participants: this.form.participants.map(({ username }, index) => ({
           username,
           // eslint-disable-next-line @gitlab/require-i18n-strings
-          colorWeight: 'WEIGHT_500',
-          colorPalette: 'BLUE',
+          colorWeight: `WEIGHT_${this.$options.CHEVRON_COMBOS[index].shade.toUpperCase()}`,
+          colorPalette: this.$options.CHEVRON_COMBOS[index].color.toUpperCase(),
         })),
       };
     },

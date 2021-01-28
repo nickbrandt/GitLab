@@ -132,8 +132,8 @@ export const createRotationResponse = {
           nodes: [
             {
               user: { id: 'gid://gitlab/User/50', username: 'project_1_bot3', __typename: 'User' },
-              colorWeight: '500',
-              colorPalette: 'blue',
+              colorWeight: 'WEIGHT_500',
+              colorPalette: 'BLUE',
               __typename: 'OncallParticipantType',
             },
           ],
@@ -160,8 +160,8 @@ export const createRotationResponseWithErrors = {
           nodes: [
             {
               user: { id: 'gid://gitlab/User/50', username: 'project_1_bot3', __typename: 'User' },
-              colorWeight: '500',
-              colorPalette: 'blue',
+              colorWeight: 'WEIGHT_500',
+              colorPalette: 'BLUE',
               __typename: 'OncallParticipantType',
             },
           ],

@@ -111,6 +111,8 @@ const addRotationToStore = (
     ).rotations.nodes = updatedRotations;
   });
 
+  console.log(data)
+
   store.writeQuery({
     query,
     variables,
@@ -215,7 +217,9 @@ export const updateStoreAfterScheduleEdit = (store, query, data, variables) => {
 };
 
 export const updateStoreAfterRotationAdd = (store, query, data, variables) => {
-  if (!hasErrors(data)) {
+  if (hasErrors(data)) {
+    onError(data, UPDATE_SCHEDULE_ERROR);
+  } else {
     addRotationToStore(store, query, data, variables);
   }
 };
