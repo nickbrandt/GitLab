@@ -10095,9 +10095,6 @@ msgstr ""
 msgid "DevopsAdoption|Filter by name"
 msgstr ""
 
-msgid "DevopsAdoption|Group data pending until the start of next month"
-msgstr ""
-
 msgid "DevopsAdoption|Issues"
 msgstr ""
 
