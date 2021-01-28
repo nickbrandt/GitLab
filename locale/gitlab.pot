@@ -15272,6 +15272,15 @@ msgstr[1] ""
 msgid "Instance Configuration"
 msgstr ""
 
+msgid "Instance access request"
+msgstr ""
+
+msgid "Instance access request approved"
+msgstr ""
+
+msgid "Instance access request rejected"
+msgstr ""
+
 msgid "Instance administrators group already exists"
 msgstr ""
 

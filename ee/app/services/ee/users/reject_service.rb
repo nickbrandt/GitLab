@@ -2,13 +2,13 @@
 
 module EE
   module Users
-    module ApproveService
+    module RejectService
       extend ::Gitlab::Utils::Override
 
       private
 
-      override :after_approve_hook
-      def after_approve_hook(user)
+      override :after_reject_hook
+      def after_reject_hook(user)
         super
 
         log_audit_event(user)
@@ -19,7 +19,7 @@ module EE
           current_user,
           user,
           action: :custom,
-          custom_message: _('Instance access request approved')
+          custom_message: _('Instance access request rejected')
         ).for_user.security_event
       end
     end
