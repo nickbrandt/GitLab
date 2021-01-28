@@ -2,7 +2,7 @@
 import { isEmpty } from 'lodash';
 import { GlModal, GlAlert } from '@gitlab/ui';
 import { s__, __ } from '~/locale';
-import getOncallSchedulesQuery from '../graphql/queries/get_oncall_schedules.query.graphql';
+import getOncallSchedulesWithRotations from '../graphql/queries/get_oncall_schedules.query.graphql';
 import createOncallScheduleMutation from '../graphql/mutations/create_oncall_schedule.mutation.graphql';
 import updateOncallScheduleMutation from '../graphql/mutations/update_oncall_schedule.mutation.graphql';
 import AddEditScheduleForm from './add_edit_schedule_form.vue';
@@ -106,8 +106,8 @@ export default {
               timezone: this.form.timezone.identifier,
             },
           },
-          update(store, { data: { oncallScheduleCreate } }) {
-            updateStoreOnScheduleCreate(store, getOncallSchedulesQuery, oncallScheduleCreate, {
+          update(store, { data }) {
+            updateStoreOnScheduleCreate(store, getOncallSchedulesWithRotations, data, {
               projectPath,
             });
           },
@@ -143,7 +143,7 @@ export default {
           mutation: updateOncallScheduleMutation,
           variables: this.editScheduleVariables,
           update(store, { data }) {
-            updateStoreAfterScheduleEdit(store, getOncallSchedulesQuery, data, { projectPath });
+            updateStoreAfterScheduleEdit(store, getOncallSchedulesWithRotations, data, { projectPath });
           },
         })
         .then(

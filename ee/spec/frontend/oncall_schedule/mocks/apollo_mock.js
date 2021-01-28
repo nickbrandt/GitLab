@@ -34,7 +34,7 @@ export const getOncallSchedulesQueryResponse = {
             timezone: {
               identifier: 'Pacific/Honolulu',
             },
-            rotations: mockRotations,
+            rotations: { nodes: [mockRotations] },
           },
         ],
       },
@@ -82,6 +82,7 @@ export const updateScheduleResponse = {
         name: 'Test schedule 2',
         description: 'Description 2 lives here',
         timezone: 'Pacific/Honolulu',
+        rotations: { nodes: [mockRotations] },
       },
     },
   },
@@ -97,6 +98,7 @@ export const updateScheduleResponseWithErrors = {
         name: 'Test schedule 2',
         description: 'Description 2 lives here',
         timezone: 'Pacific/Honolulu',
+        rotations: { nodes: [mockRotations] },
       },
     },
   },
@@ -121,7 +123,7 @@ export const createRotationResponse = {
     oncallRotationCreate: {
       errors: [],
       oncallRotation: {
-        id: '37',
+        id: '44',
         name: 'Test',
         startsAt: '2020-12-17T12:00:00Z',
         length: 5,
@@ -149,7 +151,7 @@ export const createRotationResponseWithErrors = {
     oncallRotationCreate: {
       errors: ['Houston, we have a problem'],
       oncallRotation: {
-        id: '37',
+        id: '44',
         name: 'Test',
         startsAt: '2020-12-17T12:00:00Z',
         length: 5,

@@ -2,7 +2,6 @@
 import { GlAlert, GlButton, GlEmptyState, GlLoadingIcon, GlModalDirective } from '@gitlab/ui';
 import * as Sentry from '~/sentry/wrapper';
 import { s__ } from '~/locale';
-import { fetchPolicies } from '~/lib/graphql';
 import { nWeeksAfter } from '~/lib/utils/datetime_utility';
 import AddScheduleModal from './add_edit_schedule_modal.vue';
 import OncallSchedule from './oncall_schedule.vue';
@@ -48,7 +47,6 @@ export default {
   },
   apollo: {
     schedule: {
-      fetchPolicy: fetchPolicies.CACHE_AND_NETWORK,
       query: getOncallSchedulesWithRotations,
       variables() {
         const startsAt = new Date();
