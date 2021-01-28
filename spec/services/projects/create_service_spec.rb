@@ -53,11 +53,11 @@ RSpec.describe Projects::CreateService, '#execute' do
     end
 
     context 'when path is set' do
-      let(:opts) { { name: 'one.two_three-four' } }
+      let(:opts) { { path: 'one.two_three-four' } }
 
       it 'sets name == path' do
-        expect(project.name).to eq('one.two_three-four')
-        expect(project.path).to eq(project.name)
+        expect(project.path).to eq('one.two_three-four')
+        expect(project.name).to eq(project.path)
       end
     end
 
