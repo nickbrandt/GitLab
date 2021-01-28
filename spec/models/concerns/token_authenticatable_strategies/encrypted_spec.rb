@@ -124,7 +124,7 @@ RSpec.describe TokenAuthenticatableStrategies::Encrypted do
 
       it 'writes encrypted token and removes plaintext token and returns it' do
         expect(instance).to receive(:[]=)
-          .with('some_field_encrypted', any_args)
+          .with('some_field_encrypted', encrypted)
         expect(instance).to receive(:[]=)
           .with('some_field', nil)
 
@@ -137,7 +137,7 @@ RSpec.describe TokenAuthenticatableStrategies::Encrypted do
 
       it 'writes encrypted token and writes plaintext token' do
         expect(instance).to receive(:[]=)
-          .with('some_field_encrypted', any_args)
+          .with('some_field_encrypted', encrypted)
         expect(instance).to receive(:[]=)
           .with('some_field', 'my-value')
 

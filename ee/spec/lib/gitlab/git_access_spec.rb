@@ -758,7 +758,7 @@ RSpec.describe Gitlab::GitAccess do
 
     context 'when maintenance mode is enabled' do
       before do
-        stub_maintenance_mode_setting(true)
+        stub_application_setting(maintenance_mode: true)
       end
 
       it 'blocks git push' do
@@ -770,7 +770,7 @@ RSpec.describe Gitlab::GitAccess do
 
     context 'when maintenance mode is disabled' do
       before do
-        stub_maintenance_mode_setting(false)
+        stub_application_setting(maintenance_mode: false)
       end
 
       it 'allows git push' do

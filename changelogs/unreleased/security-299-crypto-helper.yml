@@ -1,5 +1,0 @@
----
-title: Fix AES-GCM issues in lib/gitlab/crypto_helper.rb
-merge_request:
-author:
-type: security
