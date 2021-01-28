@@ -85,7 +85,7 @@ RSpec.describe ResourceAccessTokens::CreateService do
 
           audit_event = AuditEvent.where(author_id: user.id).last
 
-          expect(audit_event.details[:custom_message]).to eq("Created project access token with id: #{response.payload[:access_token].user.id} with scopes: #{response.payload[:access_token].scopes}")
+          expect(audit_event.details[:custom_message]).to eq("Created project access token with token_id: #{response.payload[:access_token].id} with scopes: #{response.payload[:access_token].scopes}")
           expect(audit_event.details[:target_details]).to match(response.payload[:access_token].user.name)
         end
       end
