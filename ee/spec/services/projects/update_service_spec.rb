@@ -310,18 +310,18 @@ RSpec.describe Projects::UpdateService, '#execute' do
         expect { update_project(project, user, opts) }.to change {
           project
             .reload
-            .compliance_management_frameworks
-        }.from([]).to([framework])
+            .compliance_management_framework
+        }.from(nil).to(framework)
       end
 
       it 'unassigns a framework from a project' do
-        project.compliance_management_frameworks = [framework]
+        project.compliance_management_framework = framework
 
         expect { update_project(project, user, { compliance_framework_setting_attributes: { framework: nil } }) }.to change {
           project
             .reload
-            .compliance_management_frameworks
-        }.from([framework]).to([])
+            .compliance_management_framework
+        }.from(framework).to(nil)
       end
     end
 
@@ -331,7 +331,9 @@ RSpec.describe Projects::UpdateService, '#execute' do
       end
 
       it 'does not set a framework' do
-        expect { update_project(project, user, opts) }.not_to change { project.reload.compliance_management_frameworks.count }
+        update_project(project, user, opts)
+
+        expect(project.reload.compliance_management_framework).not_to be_present
       end
     end
   end
