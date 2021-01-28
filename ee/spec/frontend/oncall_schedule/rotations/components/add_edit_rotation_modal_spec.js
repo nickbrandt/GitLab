@@ -7,7 +7,7 @@ import { addRotationModalId } from 'ee/oncall_schedules/constants';
 import AddEditRotationModal, {
   i18n,
 } from 'ee/oncall_schedules/components/rotations/components/add_edit_rotation_modal.vue';
-import getOncallSchedulesQuery from 'ee/oncall_schedules/graphql/queries/get_oncall_schedules.query.graphql';
+import getOncallSchedulesWithRotationsQuery from 'ee/oncall_schedules/graphql/queries/get_oncall_schedules.query.graphql';
 import createOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/create_oncall_schedule_rotation.mutation.graphql';
 import createFlash, { FLASH_TYPES } from '~/flash';
 import usersSearchQuery from '~/graphql_shared/queries/users_search.query.graphql';
@@ -80,13 +80,13 @@ describe('AddEditRotationModal', () => {
     localVue.use(VueApollo);
 
     fakeApollo = createMockApollo([
-      [getOncallSchedulesQuery, jest.fn().mockResolvedValue(getOncallSchedulesQueryResponse)],
+      [getOncallSchedulesWithRotationsQuery, jest.fn().mockResolvedValue(getOncallSchedulesQueryResponse)],
       [usersSearchQuery, userSearchQueryHandler],
       [createOncallScheduleRotationMutation, createRotationHandler],
     ]);
 
     fakeApollo.clients.defaultClient.cache.writeQuery({
-      query: getOncallSchedulesQuery,
+      query: getOncallSchedulesWithRotationsQuery,
       variables: {
         projectPath: 'group/project',
       },

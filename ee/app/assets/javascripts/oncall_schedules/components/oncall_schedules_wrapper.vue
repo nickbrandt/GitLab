@@ -5,7 +5,7 @@ import { s__ } from '~/locale';
 import { nWeeksAfter } from '~/lib/utils/datetime_utility';
 import AddScheduleModal from './add_edit_schedule_modal.vue';
 import OncallSchedule from './oncall_schedule.vue';
-import getOncallSchedulesWithRotations from '../graphql/queries/get_oncall_schedules.query.graphql';
+import getOncallSchedulesWithRotationsQuery from '../graphql/queries/get_oncall_schedules.query.graphql';
 
 export const addScheduleModalId = 'addScheduleModal';
 
@@ -47,7 +47,7 @@ export default {
   },
   apollo: {
     schedule: {
-      query: getOncallSchedulesWithRotations,
+      query: getOncallSchedulesWithRotationsQuery,
       variables() {
         const startsAt = new Date();
         const endsAt = new Date(nWeeksAfter(startsAt, 2));

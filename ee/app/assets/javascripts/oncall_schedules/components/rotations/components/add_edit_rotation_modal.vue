@@ -1,7 +1,7 @@
 <script>
 import { GlModal, GlAlert } from '@gitlab/ui';
 import { set } from 'lodash';
-import getOncallSchedulesWithRotations from 'ee/oncall_schedules/graphql/queries/get_oncall_schedules.query.graphql';
+import getOncallSchedulesWithRotationsQuery from 'ee/oncall_schedules/graphql/queries/get_oncall_schedules.query.graphql';
 import createOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/create_oncall_schedule_rotation.mutation.graphql';
 import updateOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/update_oncall_schedule_rotation.mutation.graphql';
 import { LENGTH_ENUM } from 'ee/oncall_schedules/constants';
@@ -154,7 +154,7 @@ export default {
           mutation: createOncallScheduleRotationMutation,
           variables: { OncallRotationCreateInput: this.rotationVariables },
           update(store, { data }) {
-            updateStoreAfterRotationAdd(store, getOncallSchedulesWithRotations, { ...data, scheduleIid: schedule.iid }, {
+            updateStoreAfterRotationAdd(store, getOncallSchedulesWithRotationsQuery, { ...data, scheduleIid: schedule.iid }, {
               projectPath,
             });
           },
@@ -194,7 +194,7 @@ export default {
           mutation: updateOncallScheduleRotationMutation,
           variables: { OncallRotationUpdateInput: this.rotationVariables },
           update(store, { data }) {
-            updateStoreAfterRotationEdit(store, getOncallSchedulesWithRotations,  { ...data, scheduleIid: schedule.iid }, {
+            updateStoreAfterRotationEdit(store, getOncallSchedulesWithRotationsQuery,  { ...data, scheduleIid: schedule.iid }, {
               projectPath,
             });
           },
