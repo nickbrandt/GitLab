@@ -77,11 +77,13 @@ describe('On-call schedule', () => {
   const findRotationsHeader = () => wrapper.findByTestId('rotationsHeader');
   const findSchedule = () => wrapper.findByTestId('scheduleBody');
   const findRotations = () => wrapper.findByTestId('rotationsBody');
+  const findRotationsShiftPresetSelect = () => wrapper.findByTestId('shift-preset-select');
   const findAddRotationsBtn = () => findRotationsHeader().find(GlButton);
   const findScheduleTimeline = () => findRotations().find(ScheduleTimelineSection);
   const findRotationsList = () => findRotations().find(RotationsListSection);
   const findLoadPreviousTimeframeBtn = () => wrapper.findByTestId('previous-timeframe-btn');
   const findLoadNextTimeframeBtn = () => wrapper.findByTestId('next-timeframe-btn');
+
 
   it('shows schedule title', () => {
     expect(findScheduleHeader().text()).toBe(mockSchedule.name);
@@ -163,5 +165,13 @@ describe('On-call schedule', () => {
         expect(wrapper.vm.timeframeStartDate).toEqual(mockDate);
       });
     });
+  });
+
+  it('renders rotation shift preset type which updates the preset type on click', async () => {
+    const rotationsShiftPresetSelect = findRotationsShiftPresetSelect();
+    expect(rotationsShiftPresetSelect.exists()).toBe(true);
+    expect(rotationsShiftPresetSelect.props('selected')).toBe('WEEKS');
+    await rotationsShiftPresetSelect.findAllComponents(GlButton).at(1).trigger('click');
+    expect(rotationsShiftPresetSelect.props('selected')).toBe('DAYS');
   });
 });
