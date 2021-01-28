@@ -1,0 +1,5 @@
+---
+title: Ignore bad values sent to `commit_message` in suggestion API
+merge_request: 52746
+author:
+type: fixed
