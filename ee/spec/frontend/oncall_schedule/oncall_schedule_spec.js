@@ -21,8 +21,17 @@ describe('On-call schedule', () => {
 
   const mockWeeksTimeFrame = ['31 Dec 2020', '7 Jan 2021', '14 Jan 2021'];
   const formattedTimezone = '(UTC-09:00) AKST Alaska';
+  
 
-  function createComponent({ schedule } = {}) {
+  function createComponent({ schedule, loading = false } = {}) {
+    const $apollo = {
+      queries: {
+        schedule: {
+          loading,
+        },
+      },
+    };
+
     wrapper = extendedWrapper(
       shallowMount(OnCallSchedule, {
         propsData: {
@@ -30,11 +39,13 @@ describe('On-call schedule', () => {
         },
         provide: {
           timezones: mockTimezones,
+          projectPath: 'path',
         },
         stubs: {
           GlCard,
           GlSprintf,
         },
+        mocks: { $apollo },
       }),
     );
   }
@@ -53,9 +64,11 @@ describe('On-call schedule', () => {
   const findRotationsHeader = () => wrapper.findByTestId('rotationsHeader');
   const findSchedule = () => wrapper.findByTestId('scheduleBody');
   const findRotations = () => wrapper.findByTestId('rotationsBody');
+  const findRotationsShiftPresetSelect = () => wrapper.findByTestId('shift-preset-select');
   const findAddRotationsBtn = () => findRotationsHeader().find(GlButton);
   const findScheduleTimeline = () => findRotations().find(ScheduleTimelineSection);
   const findRotationsList = () => findRotations().find(RotationsListSection);
+
 
   it('shows schedule title', () => {
     expect(findScheduleHeader().text()).toBe(mockSchedule.name);
@@ -92,5 +105,13 @@ describe('On-call schedule', () => {
       rotations: expect.any(Array),
       scheduleIid: mockSchedule.iid,
     });
+  });
+
+  it('renders rotation shift preset type which updates the preset type on click', async () => {
+    const rotationsShiftPresetSelect = findRotationsShiftPresetSelect();
+    expect(rotationsShiftPresetSelect.exists()).toBe(true);
+    expect(rotationsShiftPresetSelect.props('selected')).toBe('WEEKS');
+    await rotationsShiftPresetSelect.findAllComponents(GlButton).at(1).trigger('click');
+    expect(rotationsShiftPresetSelect.props('selected')).toBe('DAYS');
   });
 });

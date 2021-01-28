@@ -4,8 +4,6 @@ import {
   GlCard,
   GlButtonGroup,
   GlButton,
-  GlDropdown,
-  GlDropdownItem,
   GlModalDirective,
   GlTooltipDirective,
 } from '@gitlab/ui';
@@ -50,8 +48,6 @@ export default {
     GlButton,
     GlButtonGroup,
     GlCard,
-    GlDropdown,
-    GlDropdownItem,
     GlSprintf,
     AddEditRotationModal,
     DeleteScheduleModal,
@@ -202,16 +198,15 @@ export default {
           <template #timezone>{{ schedule.timezone }}</template>
         </gl-sprintf>
         | {{ offset }}
-        <gl-dropdown right :text="formatPresetType(presetType)">
-          <gl-dropdown-item
-            v-for="type in $options.PRESET_TYPES"
-            :key="type"
-            :is-check-item="true"
-            :is-checked="type === presetType"
-            @click="switchPresetType(type)"
-            >{{ formatPresetType(type) }}</gl-dropdown-item
-          >
-        </gl-dropdown>
+         <gl-button-group data-testid="shift-preset-change">
+            <gl-button
+              v-for="type in $options.PRESET_TYPES"
+              :key="type"
+              :selected="type === presetType"
+              :title="formatPresetType(type)"
+              @click="switchPresetType(type)"
+            > {{ formatPresetType(type) }} </gl-button>
+          </gl-button-group>
       </p>
       <div class="gl-w-full gl-display-flex gl-align-items-center gl-pb-3">
         <gl-button-group>
