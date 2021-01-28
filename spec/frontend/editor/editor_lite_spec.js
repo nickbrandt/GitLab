@@ -45,18 +45,24 @@ describe('Base editor', () => {
   describe('instance of the Editor', () => {
     let modelSpy;
     let instanceSpy;
+    let use;
     let setModel;
+    let getModel;
     let dispose;
     let modelsStorage;
 
     beforeEach(() => {
       setModel = jest.fn();
+      getModel = jest.fn();
       dispose = jest.fn();
+      use = jest.fn();
       modelsStorage = new Map();
       modelSpy = jest.spyOn(monacoEditor, 'createModel').mockImplementation(() => fakeModel);
       instanceSpy = jest.spyOn(monacoEditor, 'create').mockImplementation(() => ({
         setModel,
+        getModel,
         dispose,
+        use,
         onDidDispose: jest.fn(),
       }));
       jest.spyOn(monacoEditor, 'getModel').mockImplementation((uri) => {
@@ -471,8 +477,13 @@ describe('Base editor', () => {
         const eventSpy = jest.fn().mockImplementation(() => {
           calls.push('event');
         });
-        const useSpy = jest.spyOn(editor, 'use').mockImplementation(() => {
+        const useSpy = jest.fn().mockImplementation(() => {
           calls.push('use');
+        });
+        jest.spyOn(EditorLite, 'decorateInstance').mockImplementation((inst) => {
+          const decoratedInstance = inst;
+          decoratedInstance.use = useSpy;
+          return decoratedInstance;
         });
         editorEl.addEventListener(EDITOR_READY_EVENT, eventSpy);
         instance = instanceConstructor('foo, bar');
@@ -505,12 +516,6 @@ describe('Base editor', () => {
       it('extends all instances if no specific instance is passed', () => {
         editor.use(AlphaExt);
         expect(inst1.alpha()).toEqual(alphaRes);
-        expect(inst2.alpha()).toEqual(alphaRes);
-      });
-
-      it('extends specific instance if it has been passed', () => {
-        editor.use(AlphaExt, inst2);
-        expect(inst1.alpha).toBeUndefined();
         expect(inst2.alpha()).toEqual(alphaRes);
       });
     });

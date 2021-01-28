@@ -6,7 +6,12 @@ import { registerLanguages } from '~/ide/utils';
 import { joinPaths } from '~/lib/utils/url_utility';
 import { uuids } from '~/diffs/utils/uuids';
 import { clearDomElement } from './utils';
-import { EDITOR_LITE_INSTANCE_ERROR_NO_EL, URI_PREFIX, EDITOR_READY_EVENT, EDITOR_TYPE_DIFF } from './constants';
+import {
+  EDITOR_LITE_INSTANCE_ERROR_NO_EL,
+  URI_PREFIX,
+  EDITOR_READY_EVENT,
+  EDITOR_TYPE_DIFF,
+} from './constants';
 
 export default class EditorLite {
   constructor(options = {}) {
@@ -105,7 +110,7 @@ export default class EditorLite {
   static createEditorModel({
     blobPath,
     blobContent,
-    originalBlobContent,
+    blobOriginalContent,
     blobGlobalId,
     instance,
   } = {}) {
@@ -113,19 +118,32 @@ export default class EditorLite {
       return null;
     }
     const uriFilePath = joinPaths(URI_PREFIX, blobGlobalId, blobPath);
-    const existingModel = monacoEditor.getModel(uriFilePath);
-    const model =
-      existingModel || monacoEditor.createModel(blobContent, undefined, Uri.file(uriFilePath));
-    if (!originalBlobContent) {
+    const uri = Uri.file(uriFilePath);
+    const existingModel = monacoEditor.getModel(uri);
+    const model = existingModel || monacoEditor.createModel(blobContent, undefined, uri);
+    if (!blobOriginalContent) {
       instance.setModel(model);
     } else {
       instance.setModel({
-        original: monacoEditor.createModel(originalBlobContent, undefined, Uri.file(uriFilePath)),
+        original: monacoEditor.createModel(blobOriginalContent, undefined, uri),
         modified: model,
       });
     }
     return instance.getModel();
   }
+
+  static decorateInstance = (inst) => {
+    const decoratedInstance = inst;
+    decoratedInstance.updateModelLanguage = (path) => EditorLite.updateModelLanguage(path, inst);
+    decoratedInstance.use = (exts = []) => {
+      const extensions = Array.isArray(exts) ? exts : [exts];
+      extensions.forEach((extension) => {
+        EditorLite.mixIntoInstance(extension, decoratedInstance);
+      });
+      return decoratedInstance;
+    };
+    return decoratedInstance;
+  };
 
   /**
    * Creates a monaco instance with the given options.
@@ -140,7 +158,7 @@ export default class EditorLite {
     el = undefined,
     blobPath = '',
     blobContent = '',
-    originalBlobContent = '',
+    blobOriginalContent = '',
     blobGlobalId = uuids()[0],
     extensions = [],
     diff = false,
@@ -148,37 +166,24 @@ export default class EditorLite {
   } = {}) {
     EditorLite.prepareInstance(el);
 
-    let instance;
     let model;
+    const createEditorFn = diff ? 'createDiffEditor' : 'create';
+    const instance = EditorLite.decorateInstance(
+      monacoEditor[createEditorFn].call(this, el, {
+        ...this.options,
+        ...instanceOptions,
+      }),
+    );
 
-    if (!diff) {
-      instance = monacoEditor.create(el, {
-        ...this.options,
-        ...instanceOptions,
+    if (instanceOptions.model !== null) {
+      model = EditorLite.createEditorModel({
+        blobGlobalId,
+        blobOriginalContent,
+        blobPath,
+        blobContent,
+        instance,
       });
-      if (instanceOptions.model !== null) {
-        model = EditorLite.createEditorModel({ blobGlobalId, blobPath, blobContent, instance });
-      }
-    } else {
-      instance = monacoEditor.createDiffEditor(el, {
-        ...this.options,
-        ...instanceOptions,
-      });
-      if (instanceOptions.model !== null) {
-        model = EditorLite.createEditorModel({
-          blobGlobalId,
-          originalBlobContent,
-          blobPath,
-          blobContent,
-          instance,
-        });
-      }
     }
-
-    Object.assign(instance, {
-      updateModelLanguage: (path) => EditorLite.updateModelLanguage(path, instance),
-      use: (args) => this.use(args, instance),
-    });
 
     instance.onDidDispose(() => {
       const index = this.instances.findIndex((inst) => inst === instance);
@@ -200,6 +205,7 @@ export default class EditorLite {
         model.dispose();
       }
     });
+
     EditorLite.manageDefaultExtensions(instance, el, extensions);
 
     this.instances.push(instance);
@@ -217,19 +223,9 @@ export default class EditorLite {
     this.instances.forEach((instance) => instance.dispose());
   }
 
-  use(exts = [], instance = null) {
-    const extensions = Array.isArray(exts) ? exts : [exts];
-    const initExtensions = (inst) => {
-      extensions.forEach((extension) => {
-        EditorLite.mixIntoInstance(extension, inst);
-      });
-    };
-    if (instance) {
-      initExtensions(instance);
-      return instance;
-    }
+  use(exts) {
     this.instances.forEach((inst) => {
-      initExtensions(inst);
+      inst.use(exts);
     });
     return this;
   }
