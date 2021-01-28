@@ -399,7 +399,7 @@ describe('AppComponent', () => {
         expect(vm.modalTitle).toBe(modalTitle);
       });
 
-      it('emits `bv::show::modal` when actionType is `toggle` and node is enabled', () => {
+      it(`emits ${BV_SHOW_MODAL} when actionType is "toggle" and node is enabled`, () => {
         node.enabled = true;
         vm.showNodeActionModal({
           actionType: NODE_ACTIONS.TOGGLE,
@@ -429,7 +429,7 @@ describe('AppComponent', () => {
         expect(vm.toggleNode).toHaveBeenCalledWith(vm.targetNode);
       });
 
-      it('emits `bv::show::modal` when actionType is not `toggle`', () => {
+      it(`emits ${BV_SHOW_MODAL} when actionType is not "toggle"`, () => {
         node.enabled = true;
         vm.showNodeActionModal({
           actionType: NODE_ACTIONS.REMOVE,
@@ -444,7 +444,7 @@ describe('AppComponent', () => {
     });
 
     describe('hideNodeActionModal', () => {
-      it('emits `bv::hide::modal`', () => {
+      it(`emits ${BV_HIDE_MODAL}`, () => {
         const rootEmit = jest.spyOn(vm.$root, '$emit');
         vm.hideNodeActionModal();
 
