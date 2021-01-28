@@ -36,6 +36,9 @@ export default {
         startsAt: formatDate(this.rotationAssigneeStartsAt, 'mmmm d, yyyy, h:MMtt Z'),
       });
     },
+    rotationRandomID() {
+      return `${this.assignee.user.id}-${Math.random()}`;
+    },
     endsAt() {
       return sprintf(__('Ends: %{endsAt}'), {
         endsAt: formatDate(this.rotationAssigneeEndsAt, 'mmmm d, yyyy, h:MMtt Z'),
@@ -51,7 +54,7 @@ export default {
     :style="rotationAssigneeStyle"
   >
     <gl-token
-      :id="assignee.user.id"
+      :id="rotationRandomID"
       class="gl-w-full gl-h-6 gl-align-items-center"
       :class="chevronClass"
       :view-only="true"
@@ -65,10 +68,10 @@ export default {
       />
     </gl-token>
     <gl-popover
-      :target="assignee.user.id"
+      :target="rotationRandomID"
       :title="assignee.user.username"
       triggers="hover"
-      placement="top"
+      placement="left"
     >
       <p class="gl-m-0" data-testid="rotation-assignee-starts-at">{{ startsAt }}</p>
       <p class="gl-m-0" data-testid="rotation-assignee-ends-at">{{ endsAt }}</p>
