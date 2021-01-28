@@ -19,7 +19,7 @@ RSpec.describe Auth::ContainerRegistryAuthenticationService do
     end
 
     before do
-      stub_maintenance_mode_setting(true)
+      stub_application_setting(maintenance_mode: true)
       project.add_developer(current_user)
     end
 

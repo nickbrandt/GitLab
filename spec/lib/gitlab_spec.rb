@@ -332,13 +332,13 @@ RSpec.describe Gitlab do
 
   describe '.maintenance_mode?' do
     it 'returns true when maintenance mode is enabled' do
-      stub_maintenance_mode_setting(true)
+      stub_application_setting(maintenance_mode: true)
 
       expect(described_class.maintenance_mode?).to eq(true)
     end
 
     it 'returns false when maintenance mode is disabled' do
-      stub_maintenance_mode_setting(false)
+      stub_application_setting(maintenance_mode: false)
 
       expect(described_class.maintenance_mode?).to eq(false)
     end

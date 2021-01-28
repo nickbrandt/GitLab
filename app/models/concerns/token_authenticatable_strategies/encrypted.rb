@@ -85,15 +85,8 @@ module TokenAuthenticatableStrategies
     end
 
     def find_by_encrypted_token(token, unscoped)
-      encrypted_value = Gitlab::CryptoHelper.aes256_gcm_encrypt(token, nonce: find_hashed_iv(token) || Gitlab::CryptoHelper::AES256_GCM_IV_STATIC)
-
+      encrypted_value = Gitlab::CryptoHelper.aes256_gcm_encrypt(token)
       relation(unscoped).find_by(encrypted_field => encrypted_value)
-    end
-
-    def find_hashed_iv(token)
-      token_record = TokenWithIv.find_by_plaintext_token(token)
-
-      token_record&.iv
     end
 
     def insecure_strategy

@@ -118,7 +118,6 @@ module Gitlab
 
   def self.maintenance_mode?
     return false unless ::Feature.enabled?(:maintenance_mode)
-    return false unless ::Gitlab::CurrentSettings.current_application_settings?
 
     ::Gitlab::CurrentSettings.maintenance_mode
   end
