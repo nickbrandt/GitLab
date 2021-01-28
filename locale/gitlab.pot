@@ -1624,9 +1624,6 @@ msgstr ""
 msgid "Add a To Do"
 msgstr ""
 
-msgid "Add a To-Do"
-msgstr ""
-
 msgid "Add a bullet list"
 msgstr ""
 
