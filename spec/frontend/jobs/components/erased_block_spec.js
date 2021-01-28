@@ -33,10 +33,6 @@ describe('Erased block', () => {
       });
     });
 
-    it('renders alert with erased by text and variant', () => {
-      expect(wrapper.element).toMatchSnapshot();
-    });
-
     it('renders username and link', () => {
       expect(findLink().attributes('href')).toEqual('gitlab.com/root');
 
@@ -54,10 +50,6 @@ describe('Erased block', () => {
       createComponent({
         erasedAt,
       });
-    });
-
-    it('renders alert with erased text and variant', () => {
-      expect(wrapper.element).toMatchSnapshot();
     });
 
     it('renders username and link', () => {

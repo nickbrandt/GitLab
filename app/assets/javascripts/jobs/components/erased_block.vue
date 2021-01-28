@@ -1,12 +1,13 @@
 <script>
 import { isEmpty } from 'lodash';
-import { GlAlert, GlLink } from '@gitlab/ui';
+import { GlAlert, GlLink, GlSprintf } from '@gitlab/ui';
 import TimeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
 
 export default {
   components: {
     GlAlert,
     GlLink,
+    GlSprintf,
     TimeagoTooltip,
   },
   props: {
@@ -31,8 +32,11 @@ export default {
   <div class="gl-mt-3">
     <gl-alert variant="warning" :dismissible="false">
       <template v-if="isErasedByUser">
-        {{ s__('Job|Job has been erased by') }}
-        <gl-link :href="user.web_url">{{ user.username }}</gl-link>
+        <gl-sprintf :message="s__('Job|Job has been erased by %{userLink}')">
+          <template #userLink>
+            <gl-link :href="user.web_url" target="_blank">{{ user.username }}</gl-link>
+          </template>
+        </gl-sprintf>
       </template>
 
       <template v-else>
