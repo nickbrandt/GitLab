@@ -1,5 +1,5 @@
 ---
 title: Open email patches and plain diff in new tab from commit page
-merge_request:
-author:
+merge_request: 52899
+author: Yogi (@yo)
 type: changed
