@@ -200,6 +200,11 @@ msgid_plural "%d fixed test results"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d group"
+msgid_plural "%d groups"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d group selected"
 msgid_plural "%d groups selected"
 msgstr[0] ""
@@ -4888,10 +4893,16 @@ msgstr ""
 msgid "BulkImport|Import groups from GitLab"
 msgstr ""
 
-msgid "BulkImport|Importing groups from %{link}"
+msgid "BulkImport|Importing the group failed"
 msgstr ""
 
-msgid "BulkImport|Importing the group failed"
+msgid "BulkImport|No groups available for import"
+msgstr ""
+
+msgid "BulkImport|Showing %{start}-%{end} of %{total} from %{link}"
+msgstr ""
+
+msgid "BulkImport|Showing %{start}-%{end} of %{total} matching filter \"%{filter}\" from %{link}"
 msgstr ""
 
 msgid "BulkImport|To new group"
