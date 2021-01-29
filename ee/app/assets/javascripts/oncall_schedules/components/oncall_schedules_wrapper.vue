@@ -53,7 +53,6 @@ export default {
         };
       },
       update(data) {
-        console.log(data)
         const nodes = data.project?.incidentManagementOncallSchedules?.nodes ?? [];
         return nodes.length ? nodes[nodes.length - 1] : null;
       },

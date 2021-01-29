@@ -5,7 +5,6 @@ import DaysScheduleShift from './days_schedule_shift.vue';
 import WeeksScheduleShift from './weeks_schedule_shift.vue';
 import { getOverlapDateInPeriods, nDaysAfter } from '~/lib/utils/datetime_utility';
 
-
 export default {
   components: {
     DaysScheduleShift,
