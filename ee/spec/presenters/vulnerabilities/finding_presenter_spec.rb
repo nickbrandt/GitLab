@@ -4,7 +4,8 @@ require 'spec_helper'
 
 RSpec.describe Vulnerabilities::FindingPresenter do
   let(:presenter) { described_class.new(occurrence) }
-  let(:occurrence) { build_stubbed(:vulnerabilities_finding) }
+  let(:vulnerability) { create(:vulnerability) }
+  let(:occurrence) { create(:vulnerabilities_finding, vulnerability: vulnerability) }
 
   describe '#title' do
     subject { presenter.title }
