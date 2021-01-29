@@ -23,7 +23,7 @@ const NAME_HEADER = 'name';
 
 const formatter = (value, key, item) => {
   if (key === NAME_HEADER) {
-    return value;
+    return item.namespace.fullName;
   }
 
   if (item.latestSnapshot && item.latestSnapshot[key] === false) {
@@ -154,11 +154,18 @@ export default {
         </div>
       </template>
 
-      <template #cell(name)="{ item }">
+      <template
+        #cell(name)="{
+          item: {
+            namespace: { fullName },
+            latestSnapshot,
+          },
+        }"
+      >
         <div :data-testid="$options.testids.SEGMENT">
-          <strong v-if="item.latestSnapshot">{{ item.name }}</strong>
+          <strong v-if="latestSnapshot">{{ fullName }}</strong>
           <template v-else>
-            <span class="gl-text-gray-400">{{ item.name }}</span>
+            <span class="gl-text-gray-400">{{ fullName }}</span>
             <gl-icon
               v-gl-tooltip.hover="$options.i18n.pendingTooltip"
               name="hourglass"
