@@ -72,13 +72,15 @@ RSpec.describe UserGroupNotificationSettingsFinder do
       end
 
       context 'when the group has parent_id set but that does not belong to any group' do
-        let_it_be(:group) { create(:group) }
-        let_it_be(:groups) { [group] }
-
-        before do
-          # Let's set a parent_id for a group that definitely doesn't exist
-          group.update_columns(parent_id: 19283746)
+        # Let's set a parent_id for a group that definitely doesn't exist
+        let_it_be(:group) do
+          attributes = FactoryBot.attributes_for(:group, parent_id: 19283746)
+          result = Namespace.insert!(attributes)
+          id = result.to_a.first['id']
+          Namespace.find(id)
         end
+
+        let_it_be(:groups) { [group] }
 
         it 'returns a default Global notification setting' do
           expect(subject.count).to eq(1)

@@ -14431,7 +14431,9 @@ CREATE TABLE namespaces (
     shared_runners_enabled boolean DEFAULT true NOT NULL,
     allow_descendants_override_disabled_shared_runners boolean DEFAULT false NOT NULL,
     traversal_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
-    delayed_project_removal boolean DEFAULT false NOT NULL
+    delayed_project_removal boolean DEFAULT false NOT NULL,
+    CONSTRAINT traversal_ids_id CHECK (((array_length(traversal_ids, 1) >= 1) AND (id = traversal_ids[array_length(traversal_ids, 1)]))),
+    CONSTRAINT traversal_ids_parent_id CHECK (((parent_id IS NULL) OR ((parent_id IS NOT NULL) AND (array_length(traversal_ids, 1) >= 2) AND (parent_id = traversal_ids[(array_length(traversal_ids, 1) - 1)]))))
 );
 
 CREATE SEQUENCE namespaces_id_seq

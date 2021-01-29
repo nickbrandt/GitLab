@@ -93,14 +93,20 @@ RSpec.describe Gitlab::PagesTransfer do
     # Store the path before we change it
     let!(:args) { [project.path, subgroup.full_path, new_path] }
 
-    before do
-      # We need to skip hooks, otherwise the directory will be moved
-      # via an ActiveRecord callback
-      subgroup.update_columns(parent_id: group_2.id)
-      subgroup.route.update!(path: new_path)
-    end
+    [false, true].each do |sync_traversal_ids|
+      context "sync_traversal_ids feature flag is #{sync_traversal_ids}" do
+        before do
+          stub_feature_flags(sync_traversal_ids: sync_traversal_ids)
 
-    include_examples 'moving a pages directory'
+          # We need to skip hooks, otherwise the directory will be moved
+          # via an ActiveRecord callback
+          subgroup.update_columns(parent_id: group_2.id, traversal_ids: group_2.traversal_ids + [subgroup.id])
+          subgroup.route.update!(path: new_path)
+        end
+
+        include_examples 'moving a pages directory'
+      end
+    end
   end
 
   describe '#move_project' do

@@ -1,0 +1,5 @@
+---
+title: Store namespace traversal path for faster queries
+merge_request: 52854
+author:
+type: performance

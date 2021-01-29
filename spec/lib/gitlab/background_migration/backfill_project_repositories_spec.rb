@@ -87,17 +87,32 @@ RSpec.describe Gitlab::BackgroundMigration::BackfillProjectRepositories do
           expect(project.disk_path).to eq('zoo/new-test')
         end
 
-        it 'raises OrphanedNamespaceError when any parent namespace does not exist' do
-          subgroup = create(:group, parent: group)
-          project_orphaned_namespace = create(:project, name: 'baz', path: 'baz', namespace: subgroup, storage_version: nil)
-          subgroup.update_column(:parent_id, non_existing_record_id)
+        context "sync_traversal_id feature flag is false" do
+          before do
+            stub_feature_flags(sync_traversal_ids: false)
+          end
 
-          project = described_class.find(project_orphaned_namespace.id)
-          project.route.destroy!
-          subgroup.route.destroy!
+          it 'raises OrphanedNamespaceError when any parent namespace does not exist' do
+            subgroup = create(:group, parent: group)
+            project_orphaned_namespace = create(:project, name: 'baz', path: 'baz', namespace: subgroup, storage_version: nil)
+            subgroup.update_column(:parent_id, non_existing_record_id)
 
-          expect { project.reload.disk_path }
-            .to raise_error(Gitlab::BackgroundMigration::BackfillProjectRepositories::OrphanedNamespaceError)
+            project = described_class.find(project_orphaned_namespace.id)
+            project.route.destroy!
+            subgroup.route.destroy!
+
+            expect { project.reload.disk_path }
+              .to raise_error(Gitlab::BackgroundMigration::BackfillProjectRepositories::OrphanedNamespaceError)
+          end
+        end
+
+        context "sync_traversal_id feature flag is true" do
+          let(:subgroup) { create(:group, parent: group) }
+          let(:project_orphaned_namespace) { create(:project, name: 'baz', path: 'baz', namespace: subgroup, storage_version: nil) }
+
+          it_behaves_like 'traversal_ids constraint violation' do
+            subject { subgroup.update_column(:parent_id, non_existing_record_id) }
+          end
         end
       end
     end

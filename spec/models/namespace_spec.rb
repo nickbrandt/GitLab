@@ -114,6 +114,117 @@ RSpec.describe Namespace do
   describe 'inclusions' do
     it { is_expected.to include_module(Gitlab::VisibilityLevel) }
     it { is_expected.to include_module(Namespaces::Traversal::Recursive) }
+    it { is_expected.to include_module(Namespaces::Traversal::Linear) }
+  end
+
+  shared_examples 'avoids traversal_ids race condition' do
+    let!(:new_root) { create(:namespace) }
+    let(:namespace) { build(:namespace, parent: parent) }
+
+    before do
+      parent.update!(parent: new_root)
+      namespace.save!
+    end
+
+    it { expect(parent.traversal_ids).to eq [new_root.id, parent.id] }
+    it { expect(namespace.traversal_ids).to eq [new_root.id, parent.id, namespace.id] }
+  end
+
+  describe 'constrain traversal_ids in the database' do
+    let!(:parent) { create(:namespace, id: 123, name: 'namespace parent') }
+
+    def insert_namespace!(**attributes)
+      attributes = FactoryBot.attributes_for(:namespace, attributes)
+      Namespace.insert!(attributes)
+    end
+
+    context 'with valid traversal_ids' do
+      where(:id, :parent_id, :traversal_ids) do
+        [
+          [10, nil, [10]],
+          [10, 123, [123, 10]],
+          # We only check the last 2 array items as parent_id and id.
+          [10, 123, [456, 123, 10]],
+          # These must pass due to a limitation of after_create setter timing.
+          [10, nil, []],
+          [10, 123, []]
+        ]
+      end
+
+      with_them do
+        it_behaves_like 'traversal_ids without constraints' do
+          subject { insert_namespace!(id: id, parent_id: parent_id, traversal_ids: traversal_ids) }
+        end
+      end
+    end
+
+    context 'with invalid traversal_ids' do
+      where(:id, :parent_id, :traversal_ids) do
+        [
+          [10, nil, [20]],
+          [10, 123, [10, 20]],
+          [10, 123, [20, 10, 30]]
+          # TODO This should belong here, but it's not possible without triggers
+          # https://gitlab.com/gitlab-org/gitlab/-/issues/321615
+          # [10, nil, []]
+        ]
+      end
+
+      with_them do
+        it_behaves_like 'traversal_ids constraint violation' do
+          subject { insert_namespace!(id: id, parent_id: parent_id, traversal_ids: traversal_ids) }
+        end
+      end
+    end
+  end
+
+  describe 'create' do
+    let(:parent) { create(:namespace) }
+    let(:namespace) { create(:namespace, parent: parent) }
+
+    describe 'initialize traversal_ids' do
+      it { expect(parent.traversal_ids).to eq [parent.id] }
+      it { expect(namespace.traversal_ids).to eq [parent.id, namespace.id] }
+    end
+
+    it_behaves_like 'avoids traversal_ids race condition'
+  end
+
+  describe 'update' do
+    let(:parent) { create(:namespace) }
+    let(:namespace) { create(:namespace, parent: parent) }
+
+    it_behaves_like 'avoids traversal_ids race condition'
+  end
+
+  describe 'assigning a new parent' do
+    let!(:old_parent) { create(:namespace) }
+    let!(:new_parent) { create(:namespace) }
+    let!(:namespace) { create(:namespace, parent: old_parent) }
+
+    before do
+      namespace.update(parent: new_parent)
+    end
+
+    it 'updates traversal_ids' do
+      expect(namespace.reload.traversal_ids).to eq [new_parent.id, namespace.id]
+    end
+  end
+
+  describe 'assigning a new grandparent' do
+    let!(:old_grandparent) { create(:namespace) }
+    let!(:new_grandparent) { create(:namespace) }
+    let!(:parent_namespace) { create(:namespace, parent: old_grandparent) }
+    let!(:namespace) { create(:namespace, parent: parent_namespace) }
+
+    before do
+      parent_namespace.update(parent: new_grandparent)
+    end
+
+    it 'updates traversal_ids for all descendants' do
+      expect(parent_namespace.reload.traversal_ids).to eq [new_grandparent.id, parent_namespace.id]
+      expect(namespace.reload.traversal_ids).to eq [new_grandparent.id, parent_namespace.id, namespace.id]
+    end
   end
 
   describe '#visibility_level_field' do
