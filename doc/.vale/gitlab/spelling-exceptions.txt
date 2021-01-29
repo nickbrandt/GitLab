@@ -58,6 +58,10 @@ boolean
 booleans
 Bootsnap
 browsable
+bugfix
+bugfixed
+bugfixes
+bugfixing
 Bugzilla
 Buildkite
 buildpack
@@ -652,6 +656,7 @@ unverify
 unverifying
 uploader
 uploaders
+upstreams
 upvoted
 upvotes
 URIs
