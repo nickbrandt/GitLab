@@ -37,6 +37,8 @@ module Projects
         end
 
         def show
+          @issue = issue_json
+
           respond_to do |format|
             format.html
             format.json do
