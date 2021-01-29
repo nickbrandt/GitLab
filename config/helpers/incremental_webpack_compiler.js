@@ -9,7 +9,7 @@ const TIMEOUT = 5000;
 
 class NoopCompiler {
   constructor() {
-    this.enabled = false
+    this.enabled = false;
   }
 
   filterEntryPoints(entryPoints) {
