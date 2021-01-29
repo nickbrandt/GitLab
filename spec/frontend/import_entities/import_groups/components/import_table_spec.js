@@ -100,6 +100,18 @@ describe('import table', () => {
     expect(wrapper.findAll(ImportTableRow)).toHaveLength(FAKE_GROUPS.length);
   });
 
+  it('does not render status string when result list is empty', async () => {
+    createComponent({
+      bulkImportSourceGroups: jest.fn().mockResolvedValue({
+        nodes: [],
+        pageInfo: FAKE_PAGE_INFO,
+      }),
+    });
+    await waitForPromises();
+
+    expect(wrapper.text()).not.toContain('Showing 1-0');
+  });
+
   describe('converts row events to mutation invocations', () => {
     beforeEach(() => {
       createComponent({
@@ -174,7 +186,7 @@ describe('import table', () => {
   describe('filters', () => {
     const bulkImportSourceGroupsQueryMock = jest
       .fn()
-      .mockResolvedValue({ nodes: [], pageInfo: FAKE_PAGE_INFO });
+      .mockResolvedValue({ nodes: [FAKE_GROUP], pageInfo: FAKE_PAGE_INFO });
 
     beforeEach(() => {
       createComponent({
@@ -213,7 +225,7 @@ describe('import table', () => {
       findFilterInput().vm.$emit('submit', FILTER_VALUE);
       await waitForPromises();
 
-      expect(wrapper.text()).toContain('Showing 1-0 of 40 groups matching filter "foo"');
+      expect(wrapper.text()).toContain('Showing 1-1 of 40 groups matching filter "foo"');
     });
 
     it('properly resets filter in graphql query when search box is cleared', async () => {

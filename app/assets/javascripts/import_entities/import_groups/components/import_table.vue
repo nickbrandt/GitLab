@@ -123,7 +123,7 @@ export default {
       class="gl-py-5 gl-border-solid gl-border-gray-200 gl-border-0 gl-border-b-1 gl-display-flex gl-align-items-center"
     >
       <span>
-        <gl-sprintf v-if="!$apollo.loading" :message="statusMessage">
+        <gl-sprintf v-if="!$apollo.loading && hasGroups" :message="statusMessage">
           <template #start>
             <strong>{{ paginationInfo.start }}</strong>
           </template>
@@ -176,7 +176,7 @@ export default {
         <pagination-links
           :change="setPage"
           :page-info="bulkImportSourceGroups.pageInfo"
-          class="gl-flex gl-mt-3"
+          class="gl-mt-3"
         />
       </div>
     </template>

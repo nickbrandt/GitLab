@@ -62,7 +62,7 @@ RSpec.describe Import::BulkImportsController do
               ],
               headers: {
                 'x-next-page' => '2',
-                'X-page' => '1',
+                'x-page' => '1',
                 'x-per-page' => '20',
                 'x-total' => '37',
                 'x-total-pages' => '2'
