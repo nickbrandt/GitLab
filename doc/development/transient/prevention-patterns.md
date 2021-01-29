@@ -43,37 +43,6 @@ Including when that expanded content is:
 - **Invisible** (`display: none;`). Some JavaScript requires the element to be visible to work properly (eg.: when taking measurements).
 - **Dynamic content** (AJAX/DOM manipulation).
 
-## Sidekiq jobs with locks
-
-When dealing with asynchronous work via Sidekiq, it is possible have 2 jobs with the same arguments getting worked on at the same time. If not handled correctly, this can result to outdated or inaccurate state.
-
-For example, a worker that updates a state of an object. Before the worker updates the state (e.g. `#update_state`) of the object, it needs to check what the appropriate state should be (e.g. `#check_state`).
-
-When there are 2 jobs being worked on at the same time, it is possible that the order of operations will go like:
-
-1. (Worker A) Calls `#check_state`
-1. (Worker B) Calls `#check_state`
-1. (Worker B) Calls `#update_state`
-1. (Worker A) Calls `#update_state`
-
-In this example, `Worker B` is meant to set the updated status. But `Worker A` calls `#update_state` a little too late.
-
-This can be avoided by utilizing locks. This way, jobs will be worked on one at a time.
-
-## Retry mechanism handling
-
-There are times that an object/record will be on a failed state which can be rechecked.
-
-If an object is in a state that can be rechecked, ensure that appropriate messaging is shown to the user so they know what to do. Also make sure that the retry functionality will be able to reset the state correctly when triggered.
-
-## Error Logging
-
-This doesn't necessarily directly prevents transient bugs but it can help debugging them.
-
-When coding, sometimes we expect some exceptions to be raised and we rescue them.
-
-Logging whenever we rescue an error helps in case it's causing transient bugs that a user may see. While investigating a bug report, it may require the engineer to look into logs of when it happened. Seeing an error being logged can be a signal of something that went wrong which can be handled differently.
-
 ### Using assertions to detect transient bugs caused by unmet conditions
 
 Transient bugs happen in the context of code that executes under the assumption
@@ -120,3 +89,36 @@ by the server-side endpoint satisfies the API contract.
 
 [Debug it!](https://pragprog.com/titles/pbdp/debug-it/) explores techniques to diagnose
 and fix non-determinstic bugs and write software that is easier to debug.
+
+## Backend
+
+### Sidekiq jobs with locks
+
+When dealing with asynchronous work via Sidekiq, it is possible have 2 jobs with the same arguments getting worked on at the same time. If not handled correctly, this can result to outdated or inaccurate state.
+
+For example, a worker that updates a state of an object. Before the worker updates the state (e.g. `#update_state`) of the object, it needs to check what the appropriate state should be (e.g. `#check_state`).
+
+When there are 2 jobs being worked on at the same time, it is possible that the order of operations will go like:
+
+1. (Worker A) Calls `#check_state`
+1. (Worker B) Calls `#check_state`
+1. (Worker B) Calls `#update_state`
+1. (Worker A) Calls `#update_state`
+
+In this example, `Worker B` is meant to set the updated status. But `Worker A` calls `#update_state` a little too late.
+
+This can be avoided by utilizing locks. This way, jobs will be worked on one at a time.
+
+### Retry mechanism handling
+
+There are times that an object/record will be on a failed state which can be rechecked.
+
+If an object is in a state that can be rechecked, ensure that appropriate messaging is shown to the user so they know what to do. Also make sure that the retry functionality will be able to reset the state correctly when triggered.
+
+### Error Logging
+
+This doesn't necessarily directly prevents transient bugs but it can help debugging them.
+
+When coding, sometimes we expect some exceptions to be raised and we rescue them.
+
+Logging whenever we rescue an error helps in case it's causing transient bugs that a user may see. While investigating a bug report, it may require the engineer to look into logs of when it happened. Seeing an error being logged can be a signal of something that went wrong which can be handled differently.
