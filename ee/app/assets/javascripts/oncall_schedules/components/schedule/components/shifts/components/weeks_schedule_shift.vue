@@ -87,7 +87,7 @@ export default {
           ? this.totalShiftRangeOverlap.daysOverlap
           : this.shiftRangeOverlap.daysOverlap;
 
-      return baseWidth;
+      return baseWidth + offset;
     },
     timeFrameIndex() {
       return this.timeframe.indexOf(this.timeframeItem);

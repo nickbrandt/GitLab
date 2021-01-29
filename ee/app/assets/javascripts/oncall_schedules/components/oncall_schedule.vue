@@ -10,7 +10,6 @@ import {
 import { capitalize } from 'lodash';
 import { s__, __ } from '~/locale';
 import * as Sentry from '~/sentry/wrapper';
-import { fetchPolicies } from '~/lib/graphql';
 import {
   formatDate,
   nWeeksBefore,
@@ -68,7 +67,6 @@ export default {
   },
   apollo: {
     rotations: {
-      fetchPolicy: fetchPolicies.CACHE_AND_NETWORK,
       query: getShiftsForRotations,
       variables() {
         const startsAt = this.timeframeStartDate;
@@ -240,6 +238,7 @@ export default {
         <div class="schedule-shell" data-testid="rotationsBody">
           <schedule-timeline-section :preset-type="presetType" :timeframe="timeframe" />
           <rotations-list-section
+            v-show="rotations.nodes.length > 0"
             :preset-type="presetType"
             :rotations="rotations.nodes"
             :timeframe="timeframe"

@@ -111,8 +111,6 @@ const addRotationToStore = (
     ).rotations.nodes = updatedRotations;
   });
 
-  console.log(data)
-
   store.writeQuery({
     query,
     variables,
