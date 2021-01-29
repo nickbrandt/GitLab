@@ -19447,6 +19447,9 @@ msgstr ""
 msgid "No matching results for \"%{query}\""
 msgstr ""
 
+msgid "No matching results..."
+msgstr ""
+
 msgid "No members found"
 msgstr ""
 
@@ -19996,10 +19999,10 @@ msgstr ""
 msgid "OnDemandScans|Could not run the scan. Please try again."
 msgstr ""
 
-msgid "OnDemandScans|Create a new scanner profile"
+msgid "OnDemandScans|Create new scanner profile"
 msgstr ""
 
-msgid "OnDemandScans|Create a new site profile"
+msgid "OnDemandScans|Create new site profile"
 msgstr ""
 
 msgid "OnDemandScans|Description (optional)"
@@ -20011,7 +20014,16 @@ msgstr ""
 msgid "OnDemandScans|For example: Tests the login page for SQL injections"
 msgstr ""
 
+msgid "OnDemandScans|Manage DAST scans"
+msgstr ""
+
 msgid "OnDemandScans|Manage profiles"
+msgstr ""
+
+msgid "OnDemandScans|Manage scanner profiles"
+msgstr ""
+
+msgid "OnDemandScans|Manage site profiles"
 msgstr ""
 
 msgid "OnDemandScans|My daily scan"
