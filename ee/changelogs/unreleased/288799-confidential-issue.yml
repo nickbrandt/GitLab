@@ -1,0 +1,4 @@
+---
+title: 'Geo: Pass GL-ID in a JWT token when proxy-push from secondary'
+author:
+type: security
