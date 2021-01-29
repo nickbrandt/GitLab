@@ -1,5 +1,5 @@
 ---
-title: Add btn-default class for download button in graphs page
-merge_request:
-author:
+title: Add btn-default class for the download button in graphs page
+merge_request: 52857
+author: Yogi (@yo)
 type: other
