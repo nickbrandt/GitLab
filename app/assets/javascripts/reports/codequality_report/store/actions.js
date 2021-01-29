@@ -29,7 +29,7 @@ export const fetchReports = ({ state, dispatch, commit }, diffFeatureFlagEnabled
       ),
     )
     .then((data) => dispatch('receiveReportsSuccess', data))
-    .catch(() => dispatch('receiveReportsError'));
+    .catch((error) => dispatch('receiveReportsError', error));
 };
 
 export const receiveReportsSuccess = ({ commit }, data) => {

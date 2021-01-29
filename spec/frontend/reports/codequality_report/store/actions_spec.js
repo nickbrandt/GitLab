@@ -65,7 +65,7 @@ describe('Codequality Reports actions', () => {
     let mock;
     let diffFeatureFlagEnabled;
 
-    describe('with :codequality_mr_diff feature flag enabled', () => {
+    describe('with codequalityMrDiff feature flag enabled', () => {
       beforeEach(() => {
         diffFeatureFlagEnabled = true;
         localState.reportsPath = `${TEST_HOST}/codequality_reports.json`;
@@ -112,7 +112,7 @@ describe('Codequality Reports actions', () => {
       });
     });
 
-    describe('with :codequality_mr_diff feature flag disabled', () => {
+    describe('with codequalityMrDiff feature flag disabled', () => {
       beforeEach(() => {
         diffFeatureFlagEnabled = false;
         localState.headPath = `${TEST_HOST}/head.json`;
@@ -157,7 +157,7 @@ describe('Codequality Reports actions', () => {
             diffFeatureFlagEnabled,
             localState,
             [{ type: types.REQUEST_REPORTS }],
-            [{ type: 'receiveReportsError' }],
+            [{ type: 'receiveReportsError', payload: expect.any(Error) }],
             done,
           );
         });
