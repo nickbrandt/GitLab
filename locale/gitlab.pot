@@ -33990,6 +33990,12 @@ msgstr ""
 msgid "mrWidget|%{link_start}Learn more about resolving conflicts%{link_end}"
 msgstr ""
 
+msgid "mrWidget|%{mergeError}."
+msgstr ""
+
+msgid "mrWidget|%{mergeError}. Try again."
+msgstr ""
+
 msgid "mrWidget|%{metricsLinkStart} Memory %{metricsLinkEnd} usage %{emphasisStart} decreased %{emphasisEnd} from %{memoryFrom}MB to %{memoryTo}MB"
 msgstr ""
 
@@ -34114,9 +34120,6 @@ msgid "mrWidget|Merge"
 msgstr ""
 
 msgid "mrWidget|Merge failed."
-msgstr ""
-
-msgid "mrWidget|Merge failed: %{mergeError}. Please try again."
 msgstr ""
 
 msgid "mrWidget|Merge locally"
