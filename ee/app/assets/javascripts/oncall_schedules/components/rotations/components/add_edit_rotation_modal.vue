@@ -5,7 +5,6 @@ import getOncallSchedulesWithRotationsQuery from 'ee/oncall_schedules/graphql/qu
 import createOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/create_oncall_schedule_rotation.mutation.graphql';
 import updateOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/update_oncall_schedule_rotation.mutation.graphql';
 import {
-  updateStoreAfterRotationAdd,
   updateStoreAfterRotationEdit,
 } from 'ee/oncall_schedules/utils/cache_updates';
 import { isNameFieldValid, getParticipantsForSave } from 'ee/oncall_schedules/utils/common_utils';
@@ -179,6 +178,7 @@ export default {
             }
 
             this.$refs.addEditScheduleRotationModal.hide();
+            this.$emit('fetchRotationShifts');
             return createFlash({
               message: this.$options.i18n.rotationCreated,
               type: FLASH_TYPES.SUCCESS,
