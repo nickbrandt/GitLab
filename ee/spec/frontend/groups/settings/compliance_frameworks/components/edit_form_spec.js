@@ -10,6 +10,7 @@ import EditForm from 'ee/groups/settings/compliance_frameworks/components/edit_f
 import SharedForm from 'ee/groups/settings/compliance_frameworks/components/shared_form.vue';
 import { visitUrl } from '~/lib/utils/url_utility';
 
+import * as Sentry from '~/sentry/wrapper';
 import {
   validFetchOneResponse,
   emptyFetchResponse,
@@ -18,7 +19,6 @@ import {
   errorUpdateResponse,
 } from '../mock_data';
 
-import * as Sentry from '~/sentry/wrapper';
 
 const localVue = createLocalVue();
 localVue.use(VueApollo);
