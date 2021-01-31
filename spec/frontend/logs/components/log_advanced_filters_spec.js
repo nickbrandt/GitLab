@@ -7,7 +7,6 @@ import { TOKEN_TYPE_POD_NAME } from '~/logs/constants';
 import LogAdvancedFilters from '~/logs/components/log_advanced_filters.vue';
 import { mockPods, mockSearch } from '../mock_data';
 
-
 const module = 'environmentLogs';
 
 describe('LogAdvancedFilters', () => {

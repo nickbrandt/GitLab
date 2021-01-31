@@ -7,7 +7,6 @@ import IssueCardInner from '~/boards/components/issue_card_inner.vue';
 import { ISSUABLE } from '~/boards/constants';
 import { mockLabelList, mockIssue } from '../mock_data';
 
-
 describe('Board card layout', () => {
   let wrapper;
   let store;

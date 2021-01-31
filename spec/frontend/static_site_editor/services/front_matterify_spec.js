@@ -6,7 +6,6 @@ import {
   sourceContentBody as body,
 } from '../mock_data';
 
-
 describe('static_site_editor/services/front_matterify', () => {
   const frontMatterifiedContent = {
     source: content,

@@ -12,7 +12,6 @@ import { diffViewerModes } from '~/ide/constants';
 import { __, sprintf } from '~/locale';
 import { scrollToElement } from '~/lib/utils/common_utils';
 
-
 import { SET_MR_FILE_REVIEWS } from '~/diffs/store/mutation_types';
 import { reviewFile } from '~/diffs/store/actions';
 import { DIFF_FILE_AUTOMATIC_COLLAPSE, DIFF_FILE_MANUAL_COLLAPSE } from '~/diffs/constants';

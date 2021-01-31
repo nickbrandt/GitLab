@@ -8,7 +8,6 @@ import DateTimePicker from '~/vue_shared/components/date_time_picker/date_time_p
 import { metricsDashboardResponse } from '../fixture_data';
 import { mockTimeRange } from '../mock_data';
 
-
 const mockPanel = metricsDashboardResponse.dashboard.panel_groups[0].panels[0];
 
 describe('dashboard invalid url parameters', () => {

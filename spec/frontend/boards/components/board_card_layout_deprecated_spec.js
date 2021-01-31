@@ -18,7 +18,6 @@ import issueCardInner from '~/boards/components/issue_card_inner.vue';
 import { ISSUABLE } from '~/boards/constants';
 import { listObj, boardsMockInterceptor, setMockEndpoints } from '../mock_data';
 
-
 describe('Board card layout', () => {
   let wrapper;
   let mock;

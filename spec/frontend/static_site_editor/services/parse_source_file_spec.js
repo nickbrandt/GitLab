@@ -6,7 +6,6 @@ import {
   sourceContentBody as body,
 } from '../mock_data';
 
-
 describe('static_site_editor/services/parse_source_file', () => {
   const contentComplex = [content, content, content].join('');
   const complexBody = [body, content, content].join('');

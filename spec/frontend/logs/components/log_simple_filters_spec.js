@@ -4,7 +4,6 @@ import { createStore } from '~/logs/stores';
 import LogSimpleFilters from '~/logs/components/log_simple_filters.vue';
 import { mockPods, mockPodName } from '../mock_data';
 
-
 const module = 'environmentLogs';
 
 describe('LogSimpleFilters', () => {
