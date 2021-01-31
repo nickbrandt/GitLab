@@ -5,7 +5,7 @@ module Gitlab
     class File
       include Gitlab::Utils::StrongMemoize
 
-      attr_reader :diff, :repository, :diff_refs, :fallback_diff_refs, :unique_identifier
+      attr_reader :diff, :repository, :diff_refs, :fallback_diff_refs, :unique_identifier, :word_diff
 
       delegate :new_file?, :deleted_file?, :renamed_file?,
         :old_path, :new_path, :a_mode, :b_mode, :mode_changed?,
@@ -30,7 +30,8 @@ module Gitlab
         diff_refs: nil,
         fallback_diff_refs: nil,
         stats: nil,
-        unique_identifier: nil)
+        unique_identifier: nil,
+        word_diff: false)
 
         @diff = diff
         @stats = stats
@@ -39,6 +40,7 @@ module Gitlab
         @fallback_diff_refs = fallback_diff_refs
         @unique_identifier = unique_identifier
         @unfolded = false
+        @word_diff = word_diff
 
         # Ensure items are collected in the the batch
         new_blob_lazy
@@ -169,8 +171,11 @@ module Gitlab
 
       # Array of Gitlab::Diff::Line objects
       def diff_lines
-        @diff_lines ||=
-          Gitlab::Diff::Parser.new.parse(raw_diff.each_line, diff_file: self).to_a
+        @diff_lines ||= if word_diff
+                          Gitlab::Diff::WordDiff::Parser.new.parse(raw_diff.each_line, diff_file: self).to_a
+                        else
+                          Gitlab::Diff::Parser.new.parse(raw_diff.each_line, diff_file: self).to_a
+                        end
       end
 
       # Changes diff_lines according to the given position. That is,
@@ -196,8 +201,11 @@ module Gitlab
       end
 
       def highlighted_diff_lines
-        @highlighted_diff_lines ||=
-          Gitlab::Diff::Highlight.new(self, repository: self.repository).highlight
+        @highlighted_diff_lines ||= if word_diff
+                                      Gitlab::Diff::WordDiff::Highlight.new(self, repository: self.repository).highlight
+                                    else
+                                      Gitlab::Diff::Highlight.new(self, repository: self.repository).highlight
+                                    end
       end
 
       # Array[<Hash>] with right/left keys that contains Gitlab::Diff::Line objects which text is hightlighted

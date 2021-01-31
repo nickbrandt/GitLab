@@ -19,6 +19,7 @@ module Gitlab
 
           @diffable = diffable
           @include_stats = diff_options.delete(:include_stats)
+          @word_diff = diff_options[:word_diff]
           @project = project
           @diff_options = diff_options
           @diff_refs = diff_refs
@@ -113,7 +114,8 @@ module Gitlab
                                  repository: project.repository,
                                  diff_refs: diff_refs,
                                  fallback_diff_refs: fallback_diff_refs,
-                                 stats: stats)
+                                 stats: stats,
+                                 word_diff: @word_diff)
         end
 
         def sort_diffs(diffs)
