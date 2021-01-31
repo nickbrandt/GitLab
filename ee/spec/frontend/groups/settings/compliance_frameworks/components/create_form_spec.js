@@ -12,7 +12,6 @@ import { visitUrl } from '~/lib/utils/url_utility';
 import * as Sentry from '~/sentry/wrapper';
 import { validCreateResponse, errorCreateResponse } from '../mock_data';
 
-
 const localVue = createLocalVue();
 localVue.use(VueApollo);
 

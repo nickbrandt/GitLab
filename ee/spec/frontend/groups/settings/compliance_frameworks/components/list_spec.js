@@ -13,7 +13,6 @@ import EmptyState from 'ee/groups/settings/compliance_frameworks/components/list
 import * as Sentry from '~/sentry/wrapper';
 import { validFetchResponse, emptyFetchResponse } from '../mock_data';
 
-
 const localVue = createLocalVue();
 localVue.use(VueApollo);
 

@@ -19,7 +19,6 @@ import {
   errorUpdateResponse,
 } from '../mock_data';
 
-
 const localVue = createLocalVue();
 localVue.use(VueApollo);
 
