@@ -163,7 +163,9 @@ will be returned to GitLab and will be signed in.
 
 ## SAML Groups
 
-You can require users to be members of a certain group, or assign users `external`, `admin` or `auditor` roles based on group membership. This feature **does not** allow you to
+You can require users to be members of a certain group, or assign users `external`, `admin` or `auditor` roles based on group membership.
+These groups are checked on each SAML login and user attributes updated as necessary.
+This feature **does not** allow you to
 automatically add users to GitLab [Groups](../user/group/index.md).
 
 ### Requirements
