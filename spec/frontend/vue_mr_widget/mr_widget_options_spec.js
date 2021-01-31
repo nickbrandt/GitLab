@@ -11,10 +11,10 @@ import notify from '~/lib/utils/notify';
 import SmartInterval from '~/smart_interval';
 import { setFaviconOverlay } from '~/lib/utils/favicon';
 import { stateKey } from '~/vue_merge_request_widget/stores/state_maps';
-import mockData from './mock_data';
-import { faviconDataUrl, overlayDataUrl } from '../lib/utils/mock_data';
 import { SUCCESS } from '~/vue_merge_request_widget/components/deployment/constants';
 import securityReportDownloadPathsQuery from '~/vue_shared/security_reports/queries/security_report_download_paths.query.graphql';
+import { faviconDataUrl, overlayDataUrl } from '../lib/utils/mock_data';
+import mockData from './mock_data';
 
 jest.mock('~/smart_interval');
 

@@ -15,9 +15,9 @@ import boardsVuexStore from '~/boards/stores';
 import boardsStore from '~/boards/stores/boards_store';
 import BoardCardLayout from '~/boards/components/board_card_layout_deprecated.vue';
 import issueCardInner from '~/boards/components/issue_card_inner.vue';
+import { ISSUABLE } from '~/boards/constants';
 import { listObj, boardsMockInterceptor, setMockEndpoints } from '../mock_data';
 
-import { ISSUABLE } from '~/boards/constants';
 
 describe('Board card layout', () => {
   let wrapper;
