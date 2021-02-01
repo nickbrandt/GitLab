@@ -1,8 +1,8 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import createMockApollo from 'helpers/mock_apollo_helper';
 import VueApollo from 'vue-apollo';
-import waitForPromises from 'helpers/wait_for_promises';
 import { GlModal, GlAlert } from '@gitlab/ui';
+import createMockApollo from 'helpers/mock_apollo_helper';
+import waitForPromises from 'helpers/wait_for_promises';
 import { addRotationModalId } from 'ee/oncall_schedules/constants';
 import AddEditRotationModal, {
   i18n,
