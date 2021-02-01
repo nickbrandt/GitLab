@@ -1,5 +1,5 @@
 ---
-title: Unify Sidekiq error logs
+title: Unwrap Sidekiq exceptions and jobs in the structured logs and metrics
 merge_request: 53006
 author:
 type: changed
