@@ -1,0 +1,5 @@
+---
+title: Unify Sidekiq error logs
+merge_request: 53006
+author:
+type: changed
