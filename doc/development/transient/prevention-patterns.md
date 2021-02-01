@@ -6,7 +6,7 @@ info: To determine the technical writer assigned to the Stage/Group associated w
 
 # Preventing Transient Bugs
 
-This page will cover architectural patterns and tips for developers to follow to prevent transient bugs.
+This page will cover architectural patterns and tips for developers to follow to prevent [transient bugs.](https://about.gitlab.com/handbook/engineering/quality/issue-triage/#transient-bugs)
 
 ## Frontend
 
@@ -23,7 +23,7 @@ That's not always the case and can cause bugs that only happen if the order is s
 
 If your feature requires data from both, ensure that the two have finished loading before working on it.
 
-### Simulate slower connetions when testing manually
+### Simulate slower connections when testing manually
 
 Add a network condition template to your browser's dev tools to enable you to toggle between a slow and a fast connection.
 
