@@ -77,13 +77,12 @@ describe('On-call schedule', () => {
   const findRotationsHeader = () => wrapper.findByTestId('rotationsHeader');
   const findSchedule = () => wrapper.findByTestId('scheduleBody');
   const findRotations = () => wrapper.findByTestId('rotationsBody');
-  const findRotationsShiftPresetSelect = () => wrapper.findByTestId('shift-preset-select');
+  const findRotationsShiftPreset = () => wrapper.findByTestId('shift-preset-change');
   const findAddRotationsBtn = () => findRotationsHeader().find(GlButton);
   const findScheduleTimeline = () => findRotations().find(ScheduleTimelineSection);
   const findRotationsList = () => findRotations().find(RotationsListSection);
   const findLoadPreviousTimeframeBtn = () => wrapper.findByTestId('previous-timeframe-btn');
   const findLoadNextTimeframeBtn = () => wrapper.findByTestId('next-timeframe-btn');
-
 
   it('shows schedule title', () => {
     expect(findScheduleHeader().text()).toBe(mockSchedule.name);
@@ -120,6 +119,17 @@ describe('On-call schedule', () => {
       rotations: expect.any(Array),
       scheduleIid: mockSchedule.iid,
     });
+  });
+
+  it('renders rotation shift preset type which updates the preset type on click', async () => {
+    const rotationsShiftPresetSelect = findRotationsShiftPreset();
+    const presetBtns = rotationsShiftPresetSelect.findAllComponents(GlButton);
+    expect(rotationsShiftPresetSelect.exists()).toBe(true);
+    expect(presetBtns.at(0).attributes('selected')).toBe(undefined);
+    expect(presetBtns.at(1).attributes('selected')).toBe('true');
+    await presetBtns.at(0).vm.$emit('click');
+    expect(presetBtns.at(0).attributes('selected')).toBe('true');
+    expect(presetBtns.at(1).attributes('selected')).toBe(undefined);
   });
 
   describe('Timeframe update', () => {
@@ -165,13 +175,5 @@ describe('On-call schedule', () => {
         expect(wrapper.vm.timeframeStartDate).toEqual(mockDate);
       });
     });
-  });
-
-  it('renders rotation shift preset type which updates the preset type on click', async () => {
-    const rotationsShiftPresetSelect = findRotationsShiftPresetSelect();
-    expect(rotationsShiftPresetSelect.exists()).toBe(true);
-    expect(rotationsShiftPresetSelect.props('selected')).toBe('WEEKS');
-    await rotationsShiftPresetSelect.findAllComponents(GlButton).at(1).trigger('click');
-    expect(rotationsShiftPresetSelect.props('selected')).toBe('DAYS');
   });
 });

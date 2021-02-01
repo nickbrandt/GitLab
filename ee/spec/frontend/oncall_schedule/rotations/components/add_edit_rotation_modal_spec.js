@@ -80,7 +80,10 @@ describe('AddEditRotationModal', () => {
     localVue.use(VueApollo);
 
     fakeApollo = createMockApollo([
-      [getOncallSchedulesWithRotationsQuery, jest.fn().mockResolvedValue(getOncallSchedulesQueryResponse)],
+      [
+        getOncallSchedulesWithRotationsQuery,
+        jest.fn().mockResolvedValue(getOncallSchedulesQueryResponse),
+      ],
       [usersSearchQuery, userSearchQueryHandler],
       [createOncallScheduleRotationMutation, createRotationHandler],
     ]);
@@ -168,9 +171,7 @@ describe('AddEditRotationModal', () => {
       expect(userSearchQueryHandler).toHaveBeenCalledWith({ search: 'root' });
     });
 
-    // Fix is coming in: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/52773/
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('calls a mutation with correct parameters and creates a rotation', async () => {
+    it('calls a mutation with correct parameters and creates a rotation', async () => {
       createComponentWithApollo();
 
       await createRotation(wrapper);
@@ -184,9 +185,7 @@ describe('AddEditRotationModal', () => {
       });
     });
 
-    // Fix is coming in: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/52773/
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('displays alert if mutation had a recoverable error', async () => {
+    it('displays alert if mutation had a recoverable error', async () => {
       createComponentWithApollo({
         createHandler: jest.fn().mockResolvedValue(createRotationResponseWithErrors),
       });

@@ -82,7 +82,7 @@ export default {
       },
       update(data) {
         const nodes = data.project?.incidentManagementOncallSchedules?.nodes ?? [];
-        const schedule = nodes.pop() || {};
+        const schedule = nodes.length ? nodes[nodes.length - 1] : null;
         return schedule?.rotations.nodes ?? [];
       },
       error(error) {
@@ -198,15 +198,17 @@ export default {
           <template #timezone>{{ schedule.timezone }}</template>
         </gl-sprintf>
         | {{ offset }}
-         <gl-button-group data-testid="shift-preset-change">
-            <gl-button
-              v-for="type in $options.PRESET_TYPES"
-              :key="type"
-              :selected="type === presetType"
-              :title="formatPresetType(type)"
-              @click="switchPresetType(type)"
-            > {{ formatPresetType(type) }} </gl-button>
-          </gl-button-group>
+        <gl-button-group data-testid="shift-preset-change">
+          <gl-button
+            v-for="type in $options.PRESET_TYPES"
+            :key="type"
+            :selected="type === presetType"
+            :title="formatPresetType(type)"
+            @click="switchPresetType(type)"
+          >
+            {{ formatPresetType(type) }}
+          </gl-button>
+        </gl-button-group>
       </p>
       <div class="gl-w-full gl-display-flex gl-align-items-center gl-pb-3">
         <gl-button-group>

@@ -154,9 +154,14 @@ export default {
           mutation: createOncallScheduleRotationMutation,
           variables: { OncallRotationCreateInput: this.rotationVariables },
           update(store, { data }) {
-            updateStoreAfterRotationAdd(store, getOncallSchedulesWithRotationsQuery, { ...data, scheduleIid: schedule.iid }, {
-              projectPath,
-            });
+            updateStoreAfterRotationAdd(
+              store,
+              getOncallSchedulesWithRotationsQuery,
+              { ...data, scheduleIid: schedule.iid },
+              {
+                projectPath,
+              },
+            );
           },
         })
         .then(
@@ -194,9 +199,14 @@ export default {
           mutation: updateOncallScheduleRotationMutation,
           variables: { OncallRotationUpdateInput: this.rotationVariables },
           update(store, { data }) {
-            updateStoreAfterRotationEdit(store, getOncallSchedulesWithRotationsQuery,  { ...data, scheduleIid: schedule.iid }, {
-              projectPath,
-            });
+            updateStoreAfterRotationEdit(
+              store,
+              getOncallSchedulesWithRotationsQuery,
+              { ...data, scheduleIid: schedule.iid },
+              {
+                projectPath,
+              },
+            );
           },
         })
         .then(
