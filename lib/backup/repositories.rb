@@ -103,7 +103,7 @@ module Backup
 
     def dump_storage(storage, semaphore, max_storage_concurrency:)
       errors = Queue.new
-      queue = InterlockSizedQueue.new(1)
+      queue = ::Gitlab::InterlockSizedQueue.new(1)
 
       threads = Array.new(max_storage_concurrency) do
         Thread.new do
@@ -301,24 +301,6 @@ module Backup
 
       def custom_hooks_tar
         File.join(repository_backup_path, "custom_hooks.tar")
-      end
-    end
-
-    class InterlockSizedQueue < SizedQueue
-      extend ::Gitlab::Utils::Override
-
-      override :pop
-      def pop(*)
-        ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
-          super
-        end
-      end
-
-      override :push
-      def push(*)
-        ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
-          super
-        end
       end
     end
   end

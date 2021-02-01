@@ -13,7 +13,7 @@ module Pages
     end
 
     def execute
-      @queue = SizedQueue.new(1)
+      @queue = ::Gitlab::InterlockSizedQueue.new(1)
 
       threads = start_migration_threads
 
