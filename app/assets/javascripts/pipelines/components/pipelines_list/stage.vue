@@ -53,7 +53,7 @@ export default {
   data() {
     return {
       isLoading: false,
-      dropdownContent: '',
+      dropdownContent: [],
     };
   },
   computed: {
@@ -77,7 +77,7 @@ export default {
     },
   },
   updated() {
-    if (!this.isCiMiniPipelineGlDropdown && this.dropdownContent.length > 0) {
+    if (!this.isCiMiniPipelineGlDropdown && this.dropdownContent.length) {
       this.stopDropdownClickPropagation();
     }
   },
@@ -161,15 +161,12 @@ export default {
       v-if="isCiMiniPipelineGlDropdown"
       ref="stageGlDropdown"
       v-gl-tooltip.hover
+      data-testid="mini-pipeline-graph-dropdown"
       :title="stage.title"
       variant="link"
       :lazy="true"
       :popper-opts="{ placement: 'bottom' }"
-      :toggle-class="[
-        'mini-pipeline-graph-gl-dropdown-toggle',
-        'js-builds-dropdown-button',
-        triggerButtonClass,
-      ]"
+      :toggle-class="['mini-pipeline-graph-gl-dropdown-toggle', triggerButtonClass]"
       menu-class="mini-pipeline-graph-dropdown-menu"
       @show="onShowDropdown"
     >
