@@ -21,11 +21,11 @@ module Gitlab
           end
 
           def monthly_data
-            aggregated_metrics_data(monthly_time_range)
+            aggregated_metrics_data(**monthly_time_range)
           end
 
           def weekly_data
-            aggregated_metrics_data(weekly_time_range)
+            aggregated_metrics_data(**weekly_time_range)
           end
 
           private
