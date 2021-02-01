@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-require Rails.root.join('db', 'post_migrate', '20210201114748_rename_plan_titles.rb')
+require Rails.root.join('db', 'migrate', '20210201114748_rename_plan_titles.rb')
 
 RSpec.describe RenamePlanTitles do
   let(:plans) { table(:plans) }
