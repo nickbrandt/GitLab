@@ -63,7 +63,7 @@ module VulnerabilitiesHelper
 
   def vulnerability_finding_data(vulnerability)
     data = Vulnerabilities::FindingSerializer.new(current_user: current_user).represent(vulnerability.finding, only: FINDING_FIELDS)
-    data[:location]['blob_path'] = vulnerability.blob_path if data[:location]['file']
+    data[:location].merge!('blob_path' => vulnerability.blob_path).compact!
     data
   end
 end
