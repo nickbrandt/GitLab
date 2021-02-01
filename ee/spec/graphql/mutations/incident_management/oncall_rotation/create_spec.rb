@@ -82,6 +82,42 @@ RSpec.describe Mutations::IncidentManagement::OncallRotation::Create do
         end
       end
 
+      context 'with active period times given' do
+        before do
+          args[:active_period] = {
+            from: '08:00',
+            to: '17:00'
+          }
+        end
+
+        it 'returns the on-call rotation with no errors' do
+          expect(resolve).to match(
+            oncall_rotation: ::IncidentManagement::OncallRotation.last!,
+            errors: be_empty
+          )
+        end
+
+        it 'saves the on-call rotation with active period times' do
+          rotation = resolve[:oncall_rotation]
+
+          expect(rotation.active_period_start.strftime('%H:%M')).to eql('08:00')
+          expect(rotation.active_period_end.strftime('%H:%M')).to eql('17:00')
+        end
+
+        context 'hours rotation length unit' do
+          before do
+            args[:rotation_length][:unit] = ::IncidentManagement::OncallRotation.length_units[:hours]
+          end
+
+          it 'returns errors' do
+            expect(resolve).to match(
+              oncall_rotation: nil,
+              errors: [/Restricted shift times are not available for hourly shifts/]
+            )
+          end
+        end
+      end
+
       describe 'error cases' do
         context 'user cannot be found' do
           before do

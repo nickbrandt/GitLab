@@ -33,6 +33,10 @@ module Mutations
                  required: true,
                  description: 'The rotation length of the on-call rotation.'
 
+        argument :active_period, Types::IncidentManagement::OncallRotationActivePeriodInputType,
+                 required: false,
+                 description: 'The active period of time that the on-call rotation should take place.'
+
         argument :participants,
                  [Types::IncidentManagement::OncallUserInputType],
                  required: true,
@@ -71,13 +75,17 @@ module Mutations
           rotation_length_unit = args[:rotation_length][:unit]
           starts_at = parse_datetime(schedule, args[:starts_at])
           ends_at = parse_datetime(schedule, args[:ends_at]) if args[:ends_at]
+          active_period_start = args.dig(:active_period, :from)
+          active_period_end = args.dig(:active_period, :to)
 
           args.slice(:name).merge(
             length: rotation_length,
             length_unit: rotation_length_unit,
             starts_at: starts_at,
             ends_at: ends_at,
-            participants: find_participants(participants)
+            participants: find_participants(participants),
+            active_period_start: active_period_start,
+            active_period_end: active_period_end
           )
         end
 
