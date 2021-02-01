@@ -31,7 +31,7 @@ class ConfluenceService < Service
   end
 
   def help
-    return unless project && project.wiki_enabled?
+    return unless project&.wiki_enabled?
 
     if activated?
       wiki_url = project.wiki.web_url
