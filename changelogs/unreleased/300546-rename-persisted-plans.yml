@@ -1,0 +1,5 @@
+---
+title: Added post_migration to update plan titles
+merge_request: 53028
+author:
+type: fixed
