@@ -12,6 +12,9 @@ import { __ } from '../../locale';
 import getRefMixin from '../mixins/get_ref';
 import projectShortPathQuery from '../queries/project_short_path.query.graphql';
 import projectPathQuery from '../queries/project_path.query.graphql';
+import eventHub from '../event_hub';
+import { OPEN_UPLOAD_MODAL, UPLOAD_MODAL_ID } from '../constants';
+import UploadModal from './upload_modal.vue';
 
 const ROW_TYPES = {
   header: 'header',
@@ -25,6 +28,7 @@ export default {
     GlDropdownSectionHeader,
     GlDropdownItem,
     GlIcon,
+    UploadModal,
   },
   apollo: {
     projectShortPath: {
@@ -93,6 +97,11 @@ export default {
       required: false,
       default: null,
     },
+    createBlobPath: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -145,6 +154,12 @@ export default {
               class: 'qa-new-file-option',
             },
             text: __('New file'),
+          },
+          {
+            click: () => {
+              eventHub.$emit(OPEN_UPLOAD_MODAL);
+            },
+            text: __('Upload file (new)'),
           },
           {
             attrs: {
@@ -234,6 +249,8 @@ export default {
       }
     },
   },
+  openUploadModal: OPEN_UPLOAD_MODAL,
+  uploadModalId: UPLOAD_MODAL_ID,
 };
 </script>
 
@@ -253,12 +270,22 @@ export default {
             <gl-icon name="chevron-down" :size="16" class="float-left" />
           </template>
           <template v-for="(item, i) in dropdownItems">
-            <component :is="getComponent(item.type)" :key="i" v-bind="item.attrs">
+            <component :is="getComponent(item.type)" v-if="item.click" :key="i" @click="item.click">
+              {{ item.text }}
+            </component>
+            <component :is="getComponent(item.type)" v-else :key="i" v-bind="item.attrs">
               {{ item.text }}
             </component>
           </template>
         </gl-dropdown>
       </li>
     </ol>
+    <upload-modal
+      :ref-branch="ref"
+      :open-modal="$options.openUploadModal"
+      :modal-id="$options.uploadModalId"
+      :user-permissions="userPermissions"
+      :create-blob-path="createBlobPath"
+    />
   </nav>
 </template>

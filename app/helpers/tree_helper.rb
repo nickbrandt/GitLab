@@ -137,6 +137,7 @@ module TreeHelper
       new_dir_path: project_create_dir_path(@project, @ref),
       new_branch_path: new_project_branch_path(@project),
       new_tag_path: new_project_tag_path(@project),
+      create_blob_path: project_create_blob_path(@project, @id),
       can_edit_tree: can_edit_tree?.to_s
     }
 
