@@ -28,3 +28,55 @@
     }
   }
 }
+
+.geo-node-header-grid-columns {
+  grid-template-columns: 1fr 1fr auto;
+  grid-gap: 1rem;
+
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+}
+
+.geo-node-details-grid-columns {
+  grid-gap: 1rem;
+
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: 1fr 3fr;
+  }
+}
+
+.geo-node-replication-details-grid-columns {
+  grid-template-columns: 1fr 1fr 2fr 2fr;
+  grid-gap: 1rem;
+}
+
+.geo-node-core-details-grid-columns {
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
+}
+
+.gl-lg-mt-5 {
+  @include media-breakpoint-up(lg) {
+    margin-top: $gl-spacing-scale-5;
+  }
+}
+
+.gl-lg-mb-5 {
+  @include media-breakpoint-up(lg) {
+    margin-bottom: $gl-spacing-scale-5;
+  }
+}
+
+.gl-lg-my-5 {
+  @include media-breakpoint-up(lg) {
+    margin-top: $gl-spacing-scale-5;
+    margin-bottom: $gl-spacing-scale-5;
+  }
+}
+
+.gl-md-mr-5 {
+  @include media-breakpoint-up(md) {
+    margin-right: $gl-spacing-scale-5;
+  }
+}

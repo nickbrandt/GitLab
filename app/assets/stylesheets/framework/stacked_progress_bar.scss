@@ -28,10 +28,10 @@
   }
 
   .status-green {
-    background-color: $green-500;
+    background-color: $green-400;
 
     &:hover {
-      background-color: $green-600;
+      background-color: $green-500;
     }
   }
 
@@ -45,10 +45,10 @@
   }
 
   .status-red {
-    background-color: $red-500;
+    background-color: $red-400;
 
     &:hover {
-      background-color: $red-600;
+      background-color: $red-500;
     }
   }
 }

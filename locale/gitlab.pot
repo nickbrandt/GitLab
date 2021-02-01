@@ -869,6 +869,9 @@ msgstr[1] ""
 msgid "%{text} is available"
 msgstr ""
 
+msgid "%{timeAgoStr} (%{pendingEvents} events)"
+msgstr ""
+
 msgid "%{timebox_name} should belong either to a project or a group."
 msgstr ""
 
@@ -882,6 +885,9 @@ msgid "%{title} %{operator} %{threshold}"
 msgstr ""
 
 msgid "%{title} changes"
+msgstr ""
+
+msgid "%{title} checksum progress"
 msgstr ""
 
 msgid "%{token}..."
@@ -1884,6 +1890,9 @@ msgid "Add reaction"
 msgstr ""
 
 msgid "Add request manually"
+msgstr ""
+
+msgid "Add site"
 msgstr ""
 
 msgid "Add strikethrough text"
@@ -7653,6 +7662,9 @@ msgstr ""
 msgid "ComplianceFramework|This project is regulated by %{framework}."
 msgstr ""
 
+msgid "Component"
+msgstr ""
+
 msgid "Confidence"
 msgstr ""
 
@@ -9492,6 +9504,12 @@ msgstr ""
 msgid "Data is still calculating..."
 msgstr ""
 
+msgid "Data replication lag"
+msgstr ""
+
+msgid "Data type"
+msgstr ""
+
 msgid "Database update failed"
 msgstr ""
 
@@ -10665,6 +10683,9 @@ msgid "Documentation pages URL"
 msgstr ""
 
 msgid "Documents reindexed: %{processed_documents} (%{percentage}%%)"
+msgstr ""
+
+msgid "Does not match the primary storage configuration"
 msgstr ""
 
 msgid "Domain"
@@ -13201,6 +13222,9 @@ msgstr ""
 msgid "From the Kubernetes cluster details view, applications list, install GitLab Runner."
 msgstr ""
 
+msgid "Full"
+msgstr ""
+
 msgid "Full name"
 msgstr ""
 
@@ -13244,9 +13268,6 @@ msgid "Geo"
 msgstr ""
 
 msgid "Geo Nodes"
-msgstr ""
-
-msgid "Geo Nodes Beta"
 msgstr ""
 
 msgid "Geo Nodes|Cannot remove a primary node if there is a secondary node"
@@ -13606,6 +13627,9 @@ msgstr ""
 msgid "Geo|Waiting for scheduler"
 msgstr ""
 
+msgid "Geo|With GitLab Geo, you can install a special read-only and replicated instance anywhere. %{linkStart}More Information%{linkEnd}"
+msgstr ""
+
 msgid "Geo|You are on a secondary, %{b_open}read-only%{b_close} Geo node."
 msgstr ""
 
@@ -13769,6 +13793,9 @@ msgid "GitLab username"
 msgstr ""
 
 msgid "GitLab uses %{jaeger_link} to monitor distributed systems."
+msgstr ""
+
+msgid "GitLab version"
 msgstr ""
 
 msgid "GitLab will run a background job that will produce pseudonymized CSVs of the GitLab database that will be uploaded to your configured object storage directory."
@@ -16183,6 +16210,9 @@ msgstr ""
 msgid "Internal - The project can be accessed by any logged in user except external users."
 msgstr ""
 
+msgid "Internal URL"
+msgstr ""
+
 msgid "Internal URL (optional)"
 msgstr ""
 
@@ -17355,6 +17385,12 @@ msgstr ""
 msgid "Last edited by %{link_start}%{avatar} %{name}%{link_end}"
 msgstr ""
 
+msgid "Last event ID from primary"
+msgstr ""
+
+msgid "Last event ID processed by cursor"
+msgstr ""
+
 msgid "Last item before this page loaded in your browser:"
 msgstr ""
 
@@ -17952,6 +17988,9 @@ msgid "Logs"
 msgstr ""
 
 msgid "Logs|To see the logs, deploy your code to an environment."
+msgstr ""
+
+msgid "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 
 msgid "Low vulnerabilities present"
@@ -20592,6 +20631,9 @@ msgstr ""
 msgid "Number of %{itemTitle}"
 msgstr ""
 
+msgid "Number of %{title}"
+msgstr ""
+
 msgid "Number of Elasticsearch replicas"
 msgstr ""
 
@@ -21599,6 +21641,9 @@ msgstr ""
 msgid "Pause replication"
 msgstr ""
 
+msgid "Paused"
+msgstr ""
+
 msgid "Paused runners don't accept new jobs"
 msgstr ""
 
@@ -22503,6 +22548,9 @@ msgid "Previous unresolved discussion"
 msgstr ""
 
 msgid "Primary"
+msgstr ""
+
+msgid "Primary site"
 msgstr ""
 
 msgid "Print codes"
@@ -24888,7 +24936,13 @@ msgstr ""
 msgid "Replaces the clone URL root."
 msgstr ""
 
+msgid "Replicated data is verified with the secondary node(s) using checksums"
+msgstr ""
+
 msgid "Replication"
+msgstr ""
+
+msgid "Replication Details"
 msgstr ""
 
 msgid "Replication details"
@@ -24898,6 +24952,18 @@ msgid "Replication enabled"
 msgstr ""
 
 msgid "Replication paused"
+msgstr ""
+
+msgid "Replication slot WAL"
+msgstr ""
+
+msgid "Replication slots"
+msgstr ""
+
+msgid "Replication status"
+msgstr ""
+
+msgid "Replication summary"
 msgstr ""
 
 msgid "Reply by email"
@@ -26099,6 +26165,9 @@ msgstr ""
 msgid "Secondary"
 msgstr ""
 
+msgid "Secondary site"
+msgstr ""
+
 msgid "Seconds"
 msgstr ""
 
@@ -26663,6 +26732,9 @@ msgid "Selected levels cannot be used by non-admin users for groups, projects or
 msgstr ""
 
 msgid "Selecting a GitLab user will add a link to the GitLab user in the descriptions of issues and comments (e.g. \"By %{link_open}@johnsmith%{link_close}\"). It will also associate and/or assign these issues and comments with the selected user."
+msgstr ""
+
+msgid "Selective (%{syncLabel})"
 msgstr ""
 
 msgid "Selective synchronization"
@@ -28262,6 +28334,9 @@ msgstr ""
 msgid "Storage"
 msgstr ""
 
+msgid "Storage config"
+msgstr ""
+
 msgid "Storage nodes for new repositories"
 msgstr ""
 
@@ -28652,10 +28727,16 @@ msgstr ""
 msgid "Synced"
 msgstr ""
 
+msgid "Synchronization"
+msgstr ""
+
 msgid "Synchronization disabled"
 msgstr ""
 
 msgid "Synchronization settings"
+msgstr ""
+
+msgid "Synchronization status"
 msgstr ""
 
 msgid "Syncing…"
@@ -32535,6 +32616,9 @@ msgstr ""
 msgid "Various settings that affect GitLab performance."
 msgstr ""
 
+msgid "Verification"
+msgstr ""
+
 msgid "Verification concurrency limit"
 msgstr ""
 
@@ -32542,6 +32626,9 @@ msgid "Verification information"
 msgstr ""
 
 msgid "Verification status"
+msgstr ""
+
+msgid "Verificaton information"
 msgstr ""
 
 msgid "Verified"
