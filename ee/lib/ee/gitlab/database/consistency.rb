@@ -9,8 +9,8 @@ module EE
         # In EE we are disabling the database load balancing for calls that
         # require read consistency after recent writes.
         #
-        override :use_primary
-        def use_primary(&block)
+        override :with_read_consistency
+        def with_read_consistency(&block)
           ::Gitlab::Database::LoadBalancing::Session
             .current.use_primary(&block)
         end
