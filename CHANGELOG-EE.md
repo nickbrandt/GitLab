@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.8.2 (2021-02-01)
+
+### Security (2 changes)
+
+- Remove Kubernetes IP address from error messages returned in Threat Monitoring.
+- Sanitize XSS in Epic milestone due date.
+
+
 ## 13.8.1 (2021-01-26)
 
 ### Fixed (2 changes)
