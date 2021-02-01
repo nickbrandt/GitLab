@@ -127,6 +127,14 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Enable DevOps Adoption Report feature flag if any Segments already exist. !51602
 
 
+## 13.7.6 (2021-02-01)
+
+### Security (2 changes)
+
+- Remove Kubernetes IP address from error messages returned in Threat Monitoring.
+- Sanitize XSS in Epic milestone due date.
+
+
 ## 13.7.5 (2021-01-25)
 
 ### Fixed (1 change)
