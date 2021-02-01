@@ -31,7 +31,7 @@ export default {
   i18n: DEVOPS_ADOPTION_STRINGS.modal,
   data() {
     return {
-      name: this.segment?.name || '',
+      name: this.segment?.namespace?.fullName || '',
       selectedGroupId: this.segment ? this.groupIdFromSegment() : null,
       filter: '',
       loading: false,
@@ -154,7 +154,7 @@ export default {
       this.$refs.modal.hide();
     },
     groupIdFromSegment() {
-      return this.segment.groups.map(({ id }) => getIdFromGraphQLId(id))[0];
+      return getIdFromGraphQLId(this.segment?.namespace?.id);
     },
     resetForm() {
       this.name = this.segment?.name || '';

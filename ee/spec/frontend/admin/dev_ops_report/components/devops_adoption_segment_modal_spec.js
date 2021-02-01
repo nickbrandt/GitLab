@@ -256,7 +256,7 @@ describe('DevopsAdoptionSegmentModal', () => {
             ? {
                 id: segment.id,
                 groupIds: groupGids[0],
-                name: segment.name,
+                name: segment.namespace.fullName,
               }
             : {
                 groupIds: groupGids[0],
@@ -275,7 +275,7 @@ describe('DevopsAdoptionSegmentModal', () => {
         });
 
         it('resets the form fields', async () => {
-          const name = segment ? 'Segment 1' : '';
+          const name = segment ? 'Group 1' : '';
           const selectedGroupId = segment ? 1 : null;
 
           expect(wrapper.vm.name).toBe(name);
