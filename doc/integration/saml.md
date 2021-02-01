@@ -385,7 +385,7 @@ This setting should be used only to map attributes that are part of the OmniAuth
 `attribute_statements` is used to map Attribute Names in a SAMLResponse to entries
 in the OmniAuth [`info` hash](https://github.com/omniauth/omniauth/wiki/Auth-Hash-Schema#schema-10-and-later).
 
-For example, if your SAMLResponse contains an Attribute called 'EmailAddress',
+For example, if your SAMLResponse contains an Attribute called `EmailAddress`,
 specify `{ email: ['EmailAddress'] }` to map the Attribute to the
 corresponding key in the `info` hash. URI-named Attributes are also supported, e.g.
 `{ email: ['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] }`.
@@ -582,8 +582,8 @@ GitLab will sign the request with the provided private key. GitLab will include 
 
 Avoid user control of the following attributes:
 
-- [`*NameID*`](../user/group/saml_sso/index.md#nameid)
-- *Email* when used with `omniauth_auto_link_saml_user`
+- [`NameID`](../user/group/saml_sso/index.md#nameid)
+- `Email` when used with `omniauth_auto_link_saml_user`
 
 These attributes define the SAML user. If users can change these attributes, they can impersonate others.
 
