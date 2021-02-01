@@ -25802,6 +25802,9 @@ msgstr ""
 msgid "SecurityReports|Comment edited on '%{vulnerabilityName}'"
 msgstr ""
 
+msgid "SecurityReports|Create Jira issue"
+msgstr ""
+
 msgid "SecurityReports|Create issue"
 msgstr ""
 
