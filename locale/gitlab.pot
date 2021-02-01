@@ -17386,6 +17386,30 @@ msgstr ""
 msgid "Learn more."
 msgstr ""
 
+msgid "LearnGitLab|Add code owners"
+msgstr ""
+
+msgid "LearnGitLab|Create a repository"
+msgstr ""
+
+msgid "LearnGitLab|Enable require merge approvals"
+msgstr ""
+
+msgid "LearnGitLab|Invite your colleagues"
+msgstr ""
+
+msgid "LearnGitLab|Run a Security scan using CI/CD"
+msgstr ""
+
+msgid "LearnGitLab|Set-up CI/CD"
+msgstr ""
+
+msgid "LearnGitLab|Start a free trial of GitLab Gold"
+msgstr ""
+
+msgid "LearnGitLab|Submit a merge request (MR)"
+msgstr ""
+
 msgid "Leave"
 msgstr ""
 
