@@ -188,6 +188,24 @@ RSpec.describe Gitlab::SidekiqLogging::StructuredLogger do
           end
         end
       end
+
+      it 'does not modify the wrapped job' do
+        Timecop.freeze(timestamp) do
+          wrapped_job = job.merge(
+            "class" => "ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper",
+            "wrapped" => "TestWorker"
+          )
+          job_copy = wrapped_job.deep_dup
+
+          allow(logger).to receive(:info)
+          allow(subject).to receive(:log_job_start).and_call_original
+          allow(subject).to receive(:log_job_done).and_call_original
+
+          subject.call(wrapped_job, 'test_queue') do
+            expect(wrapped_job).to eq(job_copy)
+          end
+        end
+      end
     end
 
     context 'with SIDEKIQ_LOG_ARGUMENTS disabled' do
