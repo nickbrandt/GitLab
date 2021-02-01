@@ -89,8 +89,6 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
         YAML
       end
 
-      # TODO: This test will be properly implemented in the next MR
-      # for https://gitlab.com/gitlab-org/gitlab/-/issues/39057.
       it 'creates bridge job but still resource group is no-op', :aggregate_failures do
         pipeline = create_pipeline!
 
@@ -98,7 +96,7 @@ RSpec.describe Ci::CreatePipelineService, '#execute' do
 
         expect(pipeline).to be_persisted
         expect(test).to be_a Ci::Bridge
-        expect(project.resource_groups.count).to eq(0)
+        expect(project.resource_groups.count).to eq(1)
       end
     end
   end

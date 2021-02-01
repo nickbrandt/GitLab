@@ -3930,6 +3930,61 @@ It can't start or end with `/`.
 
 For more information, see [Deployments Safety](../environments/deployment_safety.md).
 
+#### Pipeline-level concurrency control with Cross-Project/Parent-Child pipelines
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/39057) in GitLab 13.9.
+
+You can define `resource_group` for downstream pipelines that are sensitive to
+concurrent executions. Downstream pipelines can be triggered by [`trigger` keyword](#trigger)
+and [`resource_group` keyword](#resource_group) can co-exist with it. This is useful to control the
+concurency for deployment pipelines, while running non-sensitive jobs concurrently.
+
+In ths following example, we have two pipeline configurations in a project.
+When a pipeline started running, non-sensitive jobs are executed at first and they
+won't be affected by the concurrent executions in the other pipelines.
+However, when it's about to trigger a deployment (child) pipeline, GitLab ensures that
+there are no other deployment pipelines running, and if it's conflicted,
+the pipeline will wait until it's finished.
+
+```yaml
+# .gitlab-ci.yml (parent pipeline)
+
+build:
+  stage: build
+  script: echo "Building..."
+
+test:
+  stage: test
+  script: echo "Testing..."
+
+deploy:
+  stage: deploy
+  trigger:
+    include: deploy.gitlab-ci.yml
+    strategy: depend
+  resource_group: AWS-production
+```
+
+```yaml
+# deploy.gitlab-ci.yml (child pipeline)
+
+stages:
+  - provision
+  - deploy
+
+provision:
+  stage: provision
+  script: echo "Provisioning..."
+
+deployment:
+  stage: deploy
+  script: echo "Deploying..."
+```
+
+Please note that [`strategy: depend`](#linking-pipelines-with-triggerstrategy)
+must be defined with the `trigger` keyword. This ensures that the lock won't
+be relesed until the downstream pipeline has finished.
+
 ### `release`
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/merge_requests/19298) in GitLab 13.2.
