@@ -1,0 +1,5 @@
+---
+title: Remove Kubernetes IP address from error messages returned in Threat Monitoring
+merge_request:
+author:
+type: security
