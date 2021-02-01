@@ -23,7 +23,7 @@ const NAME_HEADER = 'name';
 
 const formatter = (value, key, item) => {
   if (key === NAME_HEADER) {
-    return item.namespace.fullName;
+    return item.namespace?.fullName;
   }
 
   if (item.latestSnapshot && item.latestSnapshot[key] === false) {
