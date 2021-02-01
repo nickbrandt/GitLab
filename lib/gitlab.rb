@@ -48,6 +48,10 @@ module Gitlab
     Gitlab.config.gitlab.url == COM_URL || gl_subdomain?
   end
 
+  def self.com
+    yield if com?
+  end
+
   def self.staging?
     Gitlab.config.gitlab.url == STAGING_COM_URL
   end
