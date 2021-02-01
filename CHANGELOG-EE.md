@@ -316,6 +316,14 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Rename code coverage analytics sections. !49931
 
 
+## 13.6.6 (2021-02-01)
+
+### Security (2 changes)
+
+- Remove Kubernetes IP address from error messages returned in Threat Monitoring.
+- Sanitize XSS in Epic milestone due date.
+
+
 ## 13.6.5 (2021-01-13)
 
 - No changes.
