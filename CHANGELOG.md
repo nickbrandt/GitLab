@@ -900,6 +900,17 @@ entry.
 - Update GitLab Workhorse to v8.57.0.
 
 
+## 13.6.6 (2021-02-01)
+
+### Security (5 changes)
+
+- Filter sensitive GraphQL variables from logs.
+- Avoid exposing release links when the user cannot read git-tag/repository.
+- Sanitize target branch on MR page.
+- Fix DNS rebinding protection bypass when allowing an IP address in Outbound Requests setting.
+- Add routes for unmatched url for not-get requests.
+
+
 ## 13.6.5 (2021-01-13)
 
 ### Security (1 change)
