@@ -8,6 +8,7 @@ import {
   EDITOR_LITE_INSTANCE_ERROR_NO_EL,
   URI_PREFIX,
   EDITOR_READY_EVENT,
+  EDITOR_TYPE_DIFF,
 } from '~/editor/constants';
 
 describe('Base editor', () => {
@@ -18,7 +19,7 @@ describe('Base editor', () => {
   const blobContent = 'Foo Bar';
   const blobPath = 'test.md';
   const blobGlobalId = 'snippet_777';
-  const fakeModel = { foo: 'bar', dispose: jest.fn() };
+  const fakeModel = { foo: 'bar', dispose: jest.fn(), uri: { path: blobPath } };
 
   beforeEach(() => {
     setFixtures('<div id="editor" data-editor-loading></div>');
@@ -30,6 +31,9 @@ describe('Base editor', () => {
   afterEach(() => {
     editor.dispose();
     editorEl.remove();
+    monacoEditor.getModels().forEach((model) => {
+      model.dispose();
+    });
   });
 
   const createUri = (...paths) => Uri.file([URI_PREFIX, ...paths].join('/'));
@@ -53,6 +57,7 @@ describe('Base editor', () => {
     let getModel;
     let dispose;
     let modelsStorage;
+    let instanceCreateResponse;
 
     beforeEach(() => {
       setModel = jest.fn();
@@ -60,21 +65,24 @@ describe('Base editor', () => {
       dispose = jest.fn();
       use = jest.fn();
       modelsStorage = new Map();
+      modelSpy = jest.spyOn(monacoEditor, 'createModel').mockImplementation(() => fakeModel);
+      jest.spyOn(monacoEditor, 'getModel').mockImplementation((uri) => {
+        return modelsStorage.get(uri.path);
+      });
+      instanceCreateResponse = {
+        setModel,
+        getModel,
+        dispose,
+        use,
+        onDidDispose: jest.fn(),
+      };
     });
 
     describe('instance of the Code Editor', () => {
       beforeEach(() => {
-        modelSpy = jest.spyOn(monacoEditor, 'createModel').mockImplementation(() => fakeModel);
-        instanceSpy = jest.spyOn(monacoEditor, 'create').mockImplementation(() => ({
-          setModel,
-          getModel,
-          dispose,
-          use,
-          onDidDispose: jest.fn(),
-        }));
-        jest.spyOn(monacoEditor, 'getModel').mockImplementation((uri) => {
-          return modelsStorage.get(uri.path);
-        });
+        instanceSpy = jest
+          .spyOn(monacoEditor, 'create')
+          .mockImplementation(() => instanceCreateResponse);
       });
 
       it('throws an error if no dom element is supplied', () => {
@@ -111,7 +119,7 @@ describe('Base editor', () => {
         const a = editor.createInstance(defaultArguments);
         const b = editor.createInstance(defaultArguments);
 
-        expect(a === b).toBe(false);
+        expect(a).toBe(b);
         expect(modelSpy).toHaveBeenCalledTimes(1);
       });
 
@@ -146,7 +154,7 @@ describe('Base editor', () => {
         );
       });
 
-      it('disposes instance when the editor is disposed', () => {
+      it('disposes instance when the global editor is disposed', () => {
         editor.createInstance(defaultArguments);
 
         expect(dispose).not.toHaveBeenCalled();
@@ -155,21 +163,26 @@ describe('Base editor', () => {
 
         expect(dispose).toHaveBeenCalled();
       });
+
+      it("removes the disposed instance from the global editor's storage and disposes the associated model", () => {
+        instanceCreateResponse.getModel = jest.fn().mockReturnValue(fakeModel);
+        instanceCreateResponse.getEditorType = jest.fn().mockReturnValue('code');
+        editor.createInstance(defaultArguments);
+
+        expect(editor.instances).toHaveLength(1);
+        expect(fakeModel.dispose).not.toHaveBeenCalled();
+
+        EditorLite.onInstanceDisposal(editor, instanceCreateResponse);
+        expect(editor.instances).toHaveLength(0);
+        expect(fakeModel.dispose).toHaveBeenCalled();
+      });
     });
 
     describe('instance of the Diff Editor', () => {
       beforeEach(() => {
-        modelSpy = jest.spyOn(monacoEditor, 'createModel').mockImplementation(() => fakeModel);
-        instanceSpy = jest.spyOn(monacoEditor, 'createDiffEditor').mockImplementation(() => ({
-          setModel,
-          getModel,
-          dispose,
-          use,
-          onDidDispose: jest.fn(),
-        }));
-        jest.spyOn(monacoEditor, 'getModel').mockImplementation((uri) => {
-          return modelsStorage.get(uri.path);
-        });
+        instanceSpy = jest
+          .spyOn(monacoEditor, 'createDiffEditor')
+          .mockImplementation(() => instanceCreateResponse);
       });
 
       it('Diff Editor goes through the normal path of Code Editor just with the flag ON', () => {
@@ -197,11 +210,32 @@ describe('Base editor', () => {
 
         expect(modelSpy).toHaveBeenCalledTimes(2);
         expect(modelSpy.mock.calls[0]).toEqual([blobContent, undefined, uri]);
-        expect(modelSpy.mock.calls[1]).toEqual([blobOriginalContent, undefined, uri]);
+        expect(modelSpy.mock.calls[1]).toEqual([blobOriginalContent, 'markdown']);
         expect(setModel).toHaveBeenCalledWith({
           original: expect.anything(),
           modified: fakeModel,
         });
+      });
+
+      it('correctly disposes the diff editor model', () => {
+        const modifiedModel = fakeModel;
+        const originalModel = { ...fakeModel };
+        instanceCreateResponse.getModel = jest.fn().mockReturnValue({
+          original: originalModel,
+          modified: modifiedModel,
+        });
+
+        instanceCreateResponse.getEditorType = jest.fn().mockReturnValue(EDITOR_TYPE_DIFF);
+        editor.createDiffInstance({ ...defaultArguments, blobOriginalContent });
+
+        expect(editor.instances).toHaveLength(1);
+        expect(originalModel.dispose).not.toHaveBeenCalled();
+        expect(modifiedModel.dispose).not.toHaveBeenCalled();
+
+        EditorLite.onInstanceDisposal(editor, instanceCreateResponse);
+        expect(editor.instances).toHaveLength(0);
+        expect(originalModel.dispose).toHaveBeenCalled();
+        expect(modifiedModel.dispose).toHaveBeenCalled();
       });
     });
   });
@@ -293,6 +327,7 @@ describe('Base editor', () => {
       expect(monacoEditor.getModels()).toHaveLength(2);
 
       inst1.dispose();
+
       expect(inst1.getModel()).toBe(null);
       expect(inst2.getModel()).not.toBe(null);
       expect(editor.instances).toHaveLength(1);

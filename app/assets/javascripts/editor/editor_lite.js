@@ -34,15 +34,12 @@ export default class EditorLite {
     monacoEditor.setTheme(theme ? themeName : DEFAULT_THEME);
   }
 
-  static updateModelLanguage(path, instance) {
-    if (!instance) return;
-    const model = instance.getModel();
+  static getModelLanguage(path) {
     const ext = `.${path.split('.').pop()}`;
     const language = monacoLanguages
       .getLanguages()
       .find((lang) => lang.extensions.indexOf(ext) !== -1);
-    const id = language ? language.id : 'plaintext';
-    monacoEditor.setModelLanguage(model, id);
+    return language ? language.id : 'plaintext';
   }
 
   static pushToImportsArray(arr, toImport) {
@@ -113,6 +110,7 @@ export default class EditorLite {
     blobOriginalContent,
     blobGlobalId,
     instance,
+    diff,
   } = {}) {
     if (!instance) {
       return null;
@@ -121,20 +119,28 @@ export default class EditorLite {
     const uri = Uri.file(uriFilePath);
     const existingModel = monacoEditor.getModel(uri);
     const model = existingModel || monacoEditor.createModel(blobContent, undefined, uri);
-    if (!blobOriginalContent) {
+    if (!diff) {
       instance.setModel(model);
-    } else {
-      instance.setModel({
-        original: monacoEditor.createModel(blobOriginalContent, undefined, uri),
-        modified: model,
-      });
+      return model;
     }
-    return instance.getModel();
+    const diffModel = {
+      original: monacoEditor.createModel(
+        blobOriginalContent,
+        EditorLite.getModelLanguage(model.uri.path),
+      ),
+      modified: model,
+    };
+    instance.setModel(diffModel);
+    return diffModel;
   }
 
   static decorateInstance = (inst) => {
     const decoratedInstance = inst;
-    decoratedInstance.updateModelLanguage = (path) => EditorLite.updateModelLanguage(path, inst);
+    decoratedInstance.updateModelLanguage = (path) => {
+      const lang = EditorLite.getModelLanguage(path);
+      const model = decoratedInstance.getModel();
+      return monacoEditor.setModelLanguage(model, lang);
+    };
     decoratedInstance.use = (exts = []) => {
       const extensions = Array.isArray(exts) ? exts : [exts];
       extensions.forEach((extension) => {
@@ -144,6 +150,26 @@ export default class EditorLite {
     };
     return decoratedInstance;
   };
+
+  static onInstanceDisposal(editor, instance, model) {
+    const index = editor.instances.findIndex((inst) => inst === instance);
+    editor.instances.splice(index, 1);
+    const instanceModel = instance.getModel() || model;
+    if (!instanceModel) {
+      return;
+    }
+    if (instance.getEditorType() === EDITOR_TYPE_DIFF) {
+      const { original, modified } = instanceModel;
+      if (original) {
+        original.dispose();
+      }
+      if (modified) {
+        modified.dispose();
+      }
+    } else {
+      instanceModel.dispose();
+    }
+  }
 
   /**
    * Creates a monaco instance with the given options.
@@ -182,28 +208,12 @@ export default class EditorLite {
         blobPath,
         blobContent,
         instance,
+        diff,
       });
     }
 
     instance.onDidDispose(() => {
-      const index = this.instances.findIndex((inst) => inst === instance);
-      this.instances.splice(index, 1);
-      const instanceModel = instance.getModel();
-      if (instanceModel) {
-        if (instance.getEditorType() === EDITOR_TYPE_DIFF) {
-          const { original, modified } = instanceModel;
-          if (original) {
-            original.dispose();
-          }
-          if (modified) {
-            modified.dispose();
-          }
-        } else {
-          instanceModel.dispose();
-        }
-      } else if (model) {
-        model.dispose();
-      }
+      EditorLite.onInstanceDisposal(this, instance, model);
     });
 
     EditorLite.manageDefaultExtensions(instance, el, extensions);
@@ -213,7 +223,7 @@ export default class EditorLite {
   }
 
   createDiffInstance(args) {
-    this.createInstance({
+    return this.createInstance({
       ...args,
       diff: true,
     });
