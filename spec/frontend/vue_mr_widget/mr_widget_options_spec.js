@@ -67,6 +67,7 @@ describe('MrWidgetOptions', () => {
 
   describe('default', () => {
     beforeEach(() => {
+      jest.spyOn(document, 'dispatchEvent');
       return createComponent();
     });
 
@@ -353,6 +354,9 @@ describe('MrWidgetOptions', () => {
           return nextTick().then(() => {
             expect(wrapper.vm.service.fetchMergeActionsContent).toHaveBeenCalled();
             expect(document.body.textContent).toContain('hello world');
+            expect(document.dispatchEvent).toHaveBeenCalledWith(
+              new CustomEvent('merged:UpdateActions'),
+            );
           });
         });
       });

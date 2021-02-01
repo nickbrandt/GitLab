@@ -365,6 +365,7 @@ export default {
             const el = document.createElement('div');
             el.innerHTML = res.data;
             document.body.appendChild(el);
+            document.dispatchEvent(new CustomEvent('merged:UpdateActions'));
             Project.initRefSwitcher();
           }
         })
