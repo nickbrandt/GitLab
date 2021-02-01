@@ -9,6 +9,9 @@ module Gitlab
 
       # NOTE: Arguments are truncated/stringified in sidekiq_logging/json_formatter.rb
       def parse_job(job)
+        if job['wrapped'].present?
+          job['class'] = job.delete('wrapped')
+        end
         # Error information from the previous try is in the payload for
         # displaying in the Sidekiq UI, but is very confusing in logs!
         job = job.except('error_backtrace', 'error_class', 'error_message')

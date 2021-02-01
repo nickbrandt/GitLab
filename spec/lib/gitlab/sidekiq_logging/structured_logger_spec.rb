@@ -89,6 +89,21 @@ RSpec.describe Gitlab::SidekiqLogging::StructuredLogger do
         end
       end
 
+      it 'logs real job wrapped by active job worker' do
+        wrapped_job = job.merge(
+          "class" => "ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper",
+          "wrapped" => "TestWorker"
+        )
+        Timecop.freeze(timestamp) do
+          expect(logger).to receive(:info).with(start_payload).ordered
+          expect(logger).to receive(:info).with(end_payload).ordered
+          expect(subject).to receive(:log_job_start).and_call_original
+          expect(subject).to receive(:log_job_done).and_call_original
+
+          subject.call(wrapped_job, 'test_queue') {}
+        end
+      end
+
       it 'logs an exception in job' do
         Timecop.freeze(timestamp) do
           expect(logger).to receive(:info).with(start_payload)
