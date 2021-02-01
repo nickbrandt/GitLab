@@ -5850,7 +5850,16 @@ msgstr ""
 msgid "Clean up image tags"
 msgstr ""
 
+msgid "Cleanup policies are executed by background workers. This setting defines the maximum number of workers that can run concurrently. Set it to 0 to remove all workers and not execute the cleanup policies."
+msgstr ""
+
+msgid "Cleanup policy maximum number of tags to be deleted"
+msgstr ""
+
 msgid "Cleanup policy maximum processing time (seconds)"
+msgstr ""
+
+msgid "Cleanup policy maximum workers running concurrently"
 msgstr ""
 
 msgid "Clear"
@@ -28798,6 +28807,9 @@ msgid "The maximum file size in megabytes for individual job artifacts."
 msgstr ""
 
 msgid "The maximum file size is %{size}."
+msgstr ""
+
+msgid "The maximum number of tags that a single worker accepts for cleanup. If the number of tags goes above this limit, the list of tags to delete is truncated to this number. To remove this limit, set it to 0."
 msgstr ""
 
 msgid "The merge conflicts for this merge request cannot be resolved through GitLab. Please try to resolve them locally."
