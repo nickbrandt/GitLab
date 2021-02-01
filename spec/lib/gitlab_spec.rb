@@ -95,6 +95,26 @@ RSpec.describe Gitlab do
     end
   end
 
+  describe '.com' do
+    subject { described_class.com { true } }
+
+    before do
+      allow(described_class).to receive(:com?).and_return(gl_com)
+    end
+
+    context 'when on GitLab.com' do
+      let(:gl_com) { true }
+
+      it { is_expected.to be true }
+    end
+
+    context 'when not on GitLab.com' do
+      let(:gl_com) { false }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
   describe '.staging?' do
     subject { described_class.staging? }
 
