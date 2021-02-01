@@ -18,7 +18,7 @@ module Gitlab
         yield
 
         Sidekiq.logger.info log_job_done(job, started_time, base_payload)
-      rescue Sidekiq::JobRetry::Handled => e
+      rescue Sidekiq::JobRetry::Handled => job_exception
         # Sidekiq::JobRetry::Handled is raised by the internal Sidekiq
         # processor. It is a wrapper around real exception indicating an
         # exception is already handled by the Job retrier. The real exception
@@ -26,7 +26,7 @@ module Gitlab
         #
         # For more information:
         # https://github.com/mperham/sidekiq/blob/v5.2.7/lib/sidekiq/processor.rb#L173
-        Sidekiq.logger.warn log_job_done(job, started_time, base_payload, e.cause)
+        Sidekiq.logger.warn log_job_done(job, started_time, base_payload, job_exception.cause || job_exception)
 
         raise
       rescue => job_exception

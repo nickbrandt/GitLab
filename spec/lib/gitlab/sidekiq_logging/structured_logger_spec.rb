@@ -138,6 +138,28 @@ RSpec.describe Gitlab::SidekiqLogging::StructuredLogger do
         end
       end
 
+      it 'keeps Sidekiq::JobRetry::Handled exception if the cause does not exist' do
+        Timecop.freeze(timestamp) do
+          expect(logger).to receive(:info).with(start_payload)
+          expect(logger).to receive(:warn).with(
+            include(
+              'message' => 'TestWorker JID-da883554ee4fe414012f5f42: fail: 0.0 sec',
+              'job_status' => 'fail',
+              'error_class' => 'Sidekiq::JobRetry::Skip',
+              'error_message' => 'Sidekiq::JobRetry::Skip'
+            )
+          )
+          expect(subject).to receive(:log_job_start).and_call_original
+          expect(subject).to receive(:log_job_done).and_call_original
+
+          expect do
+            subject.call(job, 'test_queue') do
+              raise Sidekiq::JobRetry::Skip
+            end
+          end.to raise_error(Sidekiq::JobRetry::Skip)
+        end
+      end
+
       it 'does not modify the job' do
         Timecop.freeze(timestamp) do
           job_copy = job.deep_dup
