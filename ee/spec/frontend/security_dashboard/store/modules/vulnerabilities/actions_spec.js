@@ -281,6 +281,7 @@ describe('downloadPatch', () => {
 });
 
 describe('issue creation', () => {
+  const vulnerability = mockDataVulnerabilities[0];
   let state;
 
   beforeEach(() => {
@@ -288,7 +289,6 @@ describe('issue creation', () => {
   });
 
   describe('createIssue', () => {
-    const vulnerability = mockDataVulnerabilities[0];
     const data = { issue_url: 'fakepath.html' };
     let mock;
 
@@ -300,36 +300,29 @@ describe('issue creation', () => {
       mock.restore();
     });
 
-    describe('on success', () => {
-      beforeEach(() => {
-        mock
-          .onPost(vulnerability.create_vulnerability_feedback_issue_path)
-          .replyOnce(200, { data });
-      });
-
-      it('should dispatch the request and success actions', () => {
-        return testAction(
-          actions.createIssue,
-          { vulnerability },
-          {},
-          [],
-          [
-            { type: 'requestCreateIssue' },
-            {
-              type: 'receiveCreateIssueSuccess',
-              payload: { data },
-            },
-          ],
-        );
-      });
+    it('should dispatch the request action', () => {
+      return testAction(
+        actions.createIssue,
+        { vulnerability },
+        {},
+        [],
+        [
+          { type: 'requestCreateIssue', payload: vulnerability },
+        ],
+      );
     });
   });
 
   describe('requestCreateIssue', () => {
     it('should commit the request mutation', () => {
-      return testAction(actions.requestCreateIssue, {}, state, [
-        { type: types.REQUEST_CREATE_ISSUE },
-      ]);
+      return testAction(
+        actions.requestCreateIssue,
+        vulnerability,
+        state,
+        [
+          { type: types.REQUEST_CREATE_ISSUE, payload: vulnerability },
+        ]
+      );
     });
   });
 });

@@ -172,16 +172,14 @@ describe('vulnerabilities module mutations', () => {
   });
 
   describe('REQUEST_CREATE_ISSUE', () => {
+    const vulnerability = mockData[0];
+
     beforeEach(() => {
-      mutations[types.REQUEST_CREATE_ISSUE](state);
+      mutations[types.REQUEST_CREATE_ISSUE](state, vulnerability);
     });
 
     it('should set isCreatingIssue to true', () => {
       expect(state.isCreatingIssue).toBe(true);
-    });
-
-    it('should nullify the error state on the modal', () => {
-      expect(state.modal.error).toBeNull();
     });
   });
 

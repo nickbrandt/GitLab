@@ -774,43 +774,51 @@ describe('security reports actions', () => {
     });
   });
 
-  describe('requestCreateIssue', () => {
-    it('commits request create issue', (done) => {
-      testAction(
-        requestCreateIssue,
-        null,
-        mockedState,
-        [
-          {
-            type: types.REQUEST_CREATE_ISSUE,
-          },
-        ],
-        [],
-        done,
-      );
+  describe('issue creation', () => {
+    const vulnerability = {
+      id: 1,
+      report_type: 'sast',
+      name: 'Insecure variable usage',
+      severity: 'critical',
+      confidence: 'high'
+    }
+
+    describe('requestCreateIssue', () => {
+
+      it('commits request create issue', (done) => {
+        testAction(
+          requestCreateIssue,
+          { vulnerability },
+          mockedState,
+          [
+            {
+              type: types.REQUEST_CREATE_ISSUE, payload: { vulnerability },
+            },
+          ],
+          [],
+          done,
+        );
+      });
     });
-  });
 
-  describe('createNewIssue', () => {
-    it('with success should dispatch `requestCreateIssue`', (done) => {
-      mock.onPost('create_issue_path').reply(200, { issue_path: 'new_issue' });
-      mockedState.createVulnerabilityFeedbackIssuePath = 'create_issue_path';
+    describe('createNewIssue', () => {
 
-      testAction(
-        createNewIssue,
-        null,
-        mockedState,
-        [],
-        [
-          {
-            type: 'requestCreateIssue',
-          },
-          {
-            type: 'receiveCreateIssue',
-          },
-        ],
-        done,
-      );
+      it('dispatches `requestCreateIssue`', (done) => {
+        mockedState.createVulnerabilityFeedbackIssuePath = 'create_issue_path';
+
+        testAction(
+          createNewIssue,
+          { vulnerability },
+          mockedState,
+          [],
+          [
+            {
+              type: 'requestCreateIssue', payload: vulnerability,
+            },
+          ],
+          done,
+        );
+      });
     });
   });
 

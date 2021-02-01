@@ -318,8 +318,10 @@ describe('EE sast reports mutations', () => {
   });
 
   describe('REQUEST_CREATE_ISSUE', () => {
+    const vulnerability = { id: 1 };
+
     it('sets isCreatingIssue prop to true and resets error', () => {
-      mutations[types.REQUEST_CREATE_ISSUE](stateCopy);
+      mutations[types.REQUEST_CREATE_ISSUE](stateCopy, vulnerability);
 
       expect(stateCopy.isCreatingIssue).toEqual(true);
       expect(stateCopy.modal.error).toBeNull();
