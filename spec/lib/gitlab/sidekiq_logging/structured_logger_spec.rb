@@ -58,7 +58,8 @@ RSpec.describe Gitlab::SidekiqLogging::StructuredLogger do
         'message' => 'TestWorker JID-da883554ee4fe414012f5f42: fail: 0.0 sec',
         'job_status' => 'fail',
         'error_class' => 'ArgumentError',
-        'error_message' => 'some exception'
+        'error_message' => 'Something went wrong',
+        'error_backtrace' => be_a(Array).and(be_present)
       )
     end
 
@@ -91,15 +92,49 @@ RSpec.describe Gitlab::SidekiqLogging::StructuredLogger do
       it 'logs an exception in job' do
         Timecop.freeze(timestamp) do
           expect(logger).to receive(:info).with(start_payload)
-          expect(logger).to receive(:warn).with(hash_including(exception_payload))
+          expect(logger).to receive(:warn).with(include(exception_payload))
           expect(subject).to receive(:log_job_start).and_call_original
           expect(subject).to receive(:log_job_done).and_call_original
 
           expect do
             subject.call(job, 'test_queue') do
-              raise ArgumentError, 'some exception'
+              raise ArgumentError, 'Something went wrong'
             end
           end.to raise_error(ArgumentError)
+        end
+      end
+
+      it 'logs the root cause of an Sidekiq::JobRetry::Skip exception in the job' do
+        Timecop.freeze(timestamp) do
+          expect(logger).to receive(:info).with(start_payload)
+          expect(logger).to receive(:warn).with(include(exception_payload))
+          expect(subject).to receive(:log_job_start).and_call_original
+          expect(subject).to receive(:log_job_done).and_call_original
+
+          expect do
+            subject.call(job, 'test_queue') do
+              raise ArgumentError, 'Something went wrong'
+            rescue
+              raise Sidekiq::JobRetry::Skip
+            end
+          end.to raise_error(Sidekiq::JobRetry::Skip)
+        end
+      end
+
+      it 'logs the root cause of an Sidekiq::JobRetry::Handled exception in the job' do
+        Timecop.freeze(timestamp) do
+          expect(logger).to receive(:info).with(start_payload)
+          expect(logger).to receive(:warn).with(include(exception_payload))
+          expect(subject).to receive(:log_job_start).and_call_original
+          expect(subject).to receive(:log_job_done).and_call_original
+
+          expect do
+            subject.call(job, 'test_queue') do
+              raise ArgumentError, 'Something went wrong'
+            rescue
+              raise Sidekiq::JobRetry::Handled
+            end
+          end.to raise_error(Sidekiq::JobRetry::Handled)
         end
       end
 
