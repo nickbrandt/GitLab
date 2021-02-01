@@ -26,6 +26,8 @@ variables:
   # If not using GitLab's HTTP backend, remove this line and specify TF_HTTP_* variables
   TF_STATE_NAME: default
   TF_CACHE_KEY: default
+  # If your terraform files are in a subdirectory, set TF_ROOT accordingly
+  # TF_ROOT: terraform/production
 ```
 
 This template uses `.latest.`, instead of stable, and may include breaking changes.
