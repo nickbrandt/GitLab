@@ -66,7 +66,6 @@ export default {
   },
   [types.RECEIVE_CREATE_STAGE_ERROR](state) {
     state.isSavingCustomStage = false;
-    // ??
     state.isCreatingCustomStage = false;
     state.isEditingCustomStage = false;
   },
