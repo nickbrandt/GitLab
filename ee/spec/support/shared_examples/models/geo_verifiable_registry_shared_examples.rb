@@ -86,10 +86,20 @@ RSpec.shared_examples 'a Geo verifiable registry' do
       subject.save!
     end
 
-    it 'returns the number of rows which are synced and (pending or failed) verification' do
-      create(registry_class_factory, :synced, verification_state: verification_state_value(:verification_failed), verification_failure: 'foo') # rubocop:disable Rails/SaveBang
+    it 'returns the number of rows which are synced and pending verification' do
+      expect(described_class.needs_verification_count(limit: 3)).to eq(1)
+    end
+
+    it 'includes rows which are synced and failed verification and are due for retry' do
+      create(registry_class_factory, :synced, verification_state: verification_state_value(:verification_failed), verification_failure: 'foo', verification_retry_at: 1.minute.ago) # rubocop:disable Rails/SaveBang
 
       expect(described_class.needs_verification_count(limit: 3)).to eq(2)
+    end
+
+    it 'excludes rows which are synced and failed verification and have a future retry time' do
+      create(registry_class_factory, :synced, verification_state: verification_state_value(:verification_failed), verification_failure: 'foo', verification_retry_at: 1.minute.from_now) # rubocop:disable Rails/SaveBang
+
+      expect(described_class.needs_verification_count(limit: 3)).to eq(1)
     end
 
     it 'excludes rows which are not synced or are not (pending or failed) verification' do
