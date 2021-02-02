@@ -25,7 +25,7 @@ describe('Trigger block', () => {
     wrapper = null;
   });
 
-  describe('with short token', () => {
+  describe('with short token and no variables', () => {
     it('renders short token', () => {
       createComponent({
         trigger: {
@@ -42,6 +42,7 @@ describe('Trigger block', () => {
     beforeEach(() => {
       createComponent({ trigger: { variables: [] } });
     });
+
     it('does not render short token', () => {
       expect(findShortToken().exists()).toBe(false);
     });
@@ -55,30 +56,30 @@ describe('Trigger block', () => {
   describe('with variables', () => {
     describe('hide/reveal variables', () => {
       it('should toggle variables on click', async () => {
+        const hiddenValue = '••••••';
+        const gcsVar = { key: 'UPLOAD_TO_GCS', value: 'false', public: false };
+        const s3Var = { key: 'UPLOAD_TO_S3', value: 'true', public: false };
+
         createComponent({
           trigger: {
-            short_token: 'bd7e',
-            variables: [
-              { key: 'UPLOAD_TO_GCS', value: 'false', public: false },
-              { key: 'UPLOAD_TO_S3', value: 'true', public: false },
-            ],
+            variables: [gcsVar, s3Var],
           },
         });
 
         expect(findRevealButton().text()).toBe('Reveal values');
 
-        expect(findVariableValue(0).text()).toBe('••••••');
-        expect(findVariableValue(1).text()).toBe('••••••');
+        expect(findVariableValue(0).text()).toBe(hiddenValue);
+        expect(findVariableValue(1).text()).toBe(hiddenValue);
 
-        expect(findVariableKey(0).text()).toBe('UPLOAD_TO_GCS');
-        expect(findVariableKey(1).text()).toBe('UPLOAD_TO_S3');
+        expect(findVariableKey(0).text()).toBe(gcsVar.key);
+        expect(findVariableKey(1).text()).toBe(s3Var.key);
 
         await findRevealButton().trigger('click');
 
         expect(findRevealButton().text()).toBe('Hide values');
 
-        expect(findVariableValue(0).text()).toBe('false');
-        expect(findVariableValue(1).text()).toBe('true');
+        expect(findVariableValue(0).text()).toBe(gcsVar.value);
+        expect(findVariableValue(1).text()).toBe(s3Var.value);
       });
     });
   });
