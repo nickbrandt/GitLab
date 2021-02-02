@@ -41,6 +41,9 @@ RSpec.describe Projects::Pipelines::TestsController do
       let(:build_ids) { pipeline.latest_builds.pluck(:id) }
 
       before do
+        build = main_pipeline.builds.last
+        build.update_column(:finished_at, 1.day.ago) # Just to be sure we are included in the report window
+
         # The JUnit fixture for the given build has 3 failures.
         # This service will create 1 test case failure record for each.
         Ci::TestFailureHistoryService.new(main_pipeline).execute
