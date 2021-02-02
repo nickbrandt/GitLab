@@ -11,7 +11,7 @@ module Projects
         def create
           result = ::Ci::PrometheusMetrics::ObserveHistogramsService.new(project, permitted_params).execute
 
-          render json: result.body, status: result.status
+          render json: result.payload, status: result.http_status
         end
 
         private

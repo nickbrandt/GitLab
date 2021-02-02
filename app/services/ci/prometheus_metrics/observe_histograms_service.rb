@@ -3,14 +3,12 @@
 module Ci
   module PrometheusMetrics
     class ObserveHistogramsService
-      Result = Struct.new(:status, :body, keyword_init: true)
-
       class << self
         def available_histograms
           @available_histograms ||= [
             histogram(:pipeline_graph_link_calculation_duration_seconds, 'Total time spent calculating links, in seconds', {}, [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1, 2]),
             histogram(:pipeline_graph_links_total, 'Number of links per graph', {}, [1, 5, 10, 25, 50, 100, 200]),
-            histogram(:pipeline_graph_link_per_job_ratio, 'Ratio of links to job per graph', {}, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+            histogram(:pipeline_graph_links_per_job_ratio, 'Ratio of links to job per graph', {}, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
           ].to_h
         end
 
@@ -27,13 +25,13 @@ module Ci
       end
 
       def execute
-        return Result.new(status: 202, body: {}) unless enabled?
+        return ServiceResponse.success(http_status: :accepted) unless enabled?
 
         params
           .fetch(:histograms, [])
           .each(&method(:observe))
 
-        Result.new(status: 201, body: {})
+        ServiceResponse.success(http_status: :created)
       end
 
       private

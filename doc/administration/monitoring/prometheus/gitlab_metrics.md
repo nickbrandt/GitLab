@@ -121,7 +121,7 @@ The following metrics are available:
 | `ci_report_parser_duration_seconds`                            | Histogram |  13.9 | Time to parse CI/CD report artifacts                                                                  | `parser`                                                |
 | `pipeline_graph_link_calculation_duration_seconds`             | Histogram |  13.9 | Total time spent calculating links, in seconds                                                        | `project`                                               |
 | `pipeline_graph_links_total`                                   | Histogram |  13.9 | Number of links per graph                                                                             | `project`                                               |
-| `pipeline_graph_link_per_job_ratio`                            | Histogram |  13.9 | Ratio of links to job per graph                                                                       | `project`                                               |
+| `pipeline_graph_links_per_job_ratio`                           | Histogram |  13.9 | Ratio of links to job per graph                                                                       | `project`                                               |
 
 ## Metrics controlled by a feature flag
 

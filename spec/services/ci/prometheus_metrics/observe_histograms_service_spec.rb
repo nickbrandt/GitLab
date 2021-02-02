@@ -14,7 +14,7 @@ RSpec.describe Ci::PrometheusMetrics::ObserveHistogramsService do
 
   context 'with empty data' do
     it 'does not raise errors' do
-      expect(subject.status).to eq(201)
+      is_expected.to be_success
     end
   end
 
@@ -23,7 +23,7 @@ RSpec.describe Ci::PrometheusMetrics::ObserveHistogramsService do
       {
         histograms: [
           { name: 'pipeline_graph_link_calculation_duration_seconds', value: '1' },
-          { name: 'pipeline_graph_link_per_job_ratio', value: '0.9' }
+          { name: 'pipeline_graph_links_per_job_ratio', value: '0.9' }
         ]
       }
     end
@@ -33,13 +33,14 @@ RSpec.describe Ci::PrometheusMetrics::ObserveHistogramsService do
 
       expect(histogram_data).to match(a_hash_including({ 0.8 => 0.0, 1 => 1.0, 2 => 1.0 }))
 
-      expect(histogram_data(:pipeline_graph_link_per_job_ratio))
+      expect(histogram_data(:pipeline_graph_links_per_job_ratio))
         .to match(a_hash_including({ 0.8 => 0.0, 0.9 => 1.0, 1 => 1.0 }))
     end
 
     it 'returns an empty body and status code' do
-      expect(subject.status).to eq(201)
-      expect(subject.body).to eq({})
+      is_expected.to be_success
+      expect(subject.http_status).to eq(:created)
+      expect(subject.payload).to eq({})
     end
   end
 
@@ -73,8 +74,9 @@ RSpec.describe Ci::PrometheusMetrics::ObserveHistogramsService do
     end
 
     it 'returns an empty body and status code' do
-      expect(subject.status).to eq(202)
-      expect(subject.body).to eq({})
+      is_expected.to be_success
+      expect(subject.http_status).to eq(:accepted)
+      expect(subject.payload).to eq({})
     end
   end
 
