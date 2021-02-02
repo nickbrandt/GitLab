@@ -1007,20 +1007,17 @@ describe('ee merge request widget options', () => {
 
   describe('CE security report', () => {
     describe.each`
-      context                               | canReadVulnerabilities | hasPipeline | featureFlag | shouldRender
-      ${'user cannot read vulnerabilities'} | ${false}               | ${true}     | ${true}     | ${true}
-      ${'user can read vulnerabilities'}    | ${true}                | ${true}     | ${true}     | ${false}
-      ${'no pipeline'}                      | ${false}               | ${false}    | ${true}     | ${false}
-      ${'the feature flag is disabled'}     | ${false}               | ${true}     | ${false}    | ${false}
-    `('given $context', ({ canReadVulnerabilities, hasPipeline, featureFlag, shouldRender }) => {
+      context                               | canReadVulnerabilities | hasPipeline | shouldRender
+      ${'user cannot read vulnerabilities'} | ${false}               | ${true}     | ${true}
+      ${'user can read vulnerabilities'}    | ${true}                | ${true}     | ${false}
+      ${'no pipeline'}                      | ${false}               | ${false}    | ${false}
+    `('given $context', ({ canReadVulnerabilities, hasPipeline, shouldRender }) => {
       beforeEach(() => {
         gl.mrWidgetData = {
           ...mockData,
           can_read_vulnerabilities: canReadVulnerabilities,
           pipeline: hasPipeline ? mockData.pipeline : undefined,
         };
-
-        gon.features = { coreSecurityMrWidget: featureFlag };
 
         createComponent({
           propsData: { mrData: gl.mrWidgetData },
