@@ -76,7 +76,7 @@ export default {
       query: getShiftsForRotations,
       variables() {
         const startsAt = this.timeframeStartDate;
-        const endsAt = new Date(nWeeksAfter(startsAt, 2));
+        const endsAt = nWeeksAfter(startsAt, 2);
 
         return {
           projectPath: this.projectPath,
@@ -116,7 +116,7 @@ export default {
         case PRESET_TYPES.WEEKS: {
           const firstDayOfTheLastWeek = this.timeframe[this.timeframe.length - 1];
           const firstDayOfTheNextTimeframe = nWeeksAfter(firstDayOfTheLastWeek, 1);
-          const lastDayOfTimeframe = nDaysBefore(new Date(firstDayOfTheNextTimeframe), 1);
+          const lastDayOfTimeframe = nDaysBefore(firstDayOfTheNextTimeframe, 1);
 
           return `${formatDate(this.timeframe[0], 'mmmm d')} - ${formatDate(
             lastDayOfTimeframe,
@@ -142,10 +142,10 @@ export default {
     updateToViewPreviousTimeframe() {
       switch (this.presetType) {
         case PRESET_TYPES.DAYS:
-          this.timeframeStartDate = new Date(nDaysBefore(this.timeframeStartDate, 1));
+          this.timeframeStartDate = nDaysBefore(this.timeframeStartDate, 1);
           break;
         case PRESET_TYPES.WEEKS:
-          this.timeframeStartDate = new Date(nWeeksBefore(this.timeframeStartDate, 2));
+          this.timeframeStartDate = nWeeksBefore(this.timeframeStartDate, 2);
           break;
         default:
           break;
@@ -154,10 +154,10 @@ export default {
     updateToViewNextTimeframe() {
       switch (this.presetType) {
         case PRESET_TYPES.DAYS:
-          this.timeframeStartDate = new Date(nDaysAfter(this.timeframeStartDate, 1));
+          this.timeframeStartDate = nDaysAfter(this.timeframeStartDate, 1);
           break;
         case PRESET_TYPES.WEEKS:
-          this.timeframeStartDate = new Date(nWeeksAfter(this.timeframeStartDate, 2));
+          this.timeframeStartDate = nWeeksAfter(this.timeframeStartDate, 2);
           break;
         default:
           break;
