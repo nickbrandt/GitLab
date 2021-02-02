@@ -269,44 +269,81 @@ RSpec.describe ProjectsHelper do
   describe '#get_project_nav_tabs' do
     using RSpec::Parameterized::TableSyntax
 
-    where(:ability, :nav_tabs) do
-      :read_dependencies                          | [:dependencies]
-      :read_feature_flag                          | [:operations]
-      :read_licenses                              | [:licenses]
-      :read_project_security_dashboard            | [:security, :security_configuration]
-      :read_threat_monitoring                     | [:threat_monitoring]
-      :read_incident_management_oncall_schedule   | [:oncall_schedule]
+    let_it_be(:user) { create(:user) }
+
+    subject { helper.get_project_nav_tabs(project, user) }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+      allow(helper).to receive(:can?).and_return(false)
+      allow(helper).to receive(:can?).with(user, ability, project).and_return(feature_available?)
     end
 
-    with_them do
-      let_it_be(:user) { create(:user) }
-
-      before do
-        allow(helper).to receive(:can?) { false }
-        allow(helper).to receive(:current_user).and_return(user)
+    describe 'tabs' do
+      where(:ability, :nav_tabs) do
+        :read_feature_flag                        | [:operations]
+        :read_incident_management_oncall_schedule | [:oncall_schedule]
       end
 
-      subject do
-        helper.send(:get_project_nav_tabs, project, user)
+      with_them do
+        context 'when the feature is available' do
+          let(:feature_available?) { true }
+
+          it { is_expected.to include(*nav_tabs) }
+        end
+
+        context 'when the feature is not available' do
+          let(:feature_available?) { false }
+
+          it { is_expected.not_to include(*nav_tabs) }
+        end
+      end
+    end
+
+    describe 'Security & Compliance tabs' do
+      where(:ability, :nav_tabs) do
+        :read_project_security_dashboard          | [:security, :security_configuration]
+        :read_on_demand_scans                     | [:on_demand_scans]
+        :read_dependencies                        | [:dependencies]
+        :read_licenses                            | [:licenses]
+        :read_threat_monitoring                   | [:threat_monitoring]
       end
 
-      context 'when the feature is not available' do
+      with_them do
         before do
-          allow(helper).to receive(:can?).with(user, ability, project).and_return(false)
+          allow(helper).to receive(:can?).with(user, :access_security_and_compliance, project).and_return(security_compliance_available?)
         end
 
-        it 'does not include the nav tabs' do
-          is_expected.not_to include(*nav_tabs)
-        end
-      end
+        context 'when the "Security & Compliance" is accessible' do
+          let(:security_compliance_available?) { true }
 
-      context 'when the feature is available' do
-        before do
-          allow(helper).to receive(:can?).with(user, ability, project).and_return(true)
+          context 'when the feature is not available' do
+            let(:feature_available?) { false }
+
+            it { is_expected.not_to include(*nav_tabs) }
+          end
+
+          context 'when the feature is available' do
+            let(:feature_available?) { true }
+
+            it { is_expected.to include(*nav_tabs) }
+          end
         end
 
-        it 'includes the nav tabs' do
-          is_expected.to include(*nav_tabs)
+        context 'when the "Security & Compliance" is not accessible' do
+          let(:security_compliance_available?) { false }
+
+          context 'when the feature is not available' do
+            let(:feature_available?) { false }
+
+            it { is_expected.not_to include(*nav_tabs) }
+          end
+
+          context 'when the feature is available' do
+            let(:feature_available?) { true }
+
+            it { is_expected.not_to include(*nav_tabs) }
+          end
         end
       end
     end
@@ -320,6 +357,7 @@ RSpec.describe ProjectsHelper do
     before do
       allow(helper).to receive(:can?).and_return(false)
       allow(helper).to receive(:current_user).and_return(user)
+      allow(helper).to receive(:can?).with(user, :access_security_and_compliance, project).and_return(true)
     end
 
     context 'when user can read project security dashboard and audit events' do
@@ -372,6 +410,7 @@ RSpec.describe ProjectsHelper do
     before do
       allow(helper).to receive(:can?).and_return(false)
       allow(helper).to receive(:current_user).and_return(user)
+      allow(helper).to receive(:can?).with(user, :access_security_and_compliance, project).and_return(true)
     end
 
     context 'when user can read project security dashboard and audit events' do
@@ -512,5 +551,27 @@ RSpec.describe ProjectsHelper do
         end
       end
     end
+  end
+
+  describe '#project_permissions_settings' do
+    let(:expected_settings) { { requirementsAccessLevel: 20, securityAndComplianceAccessLevel: 10 } }
+
+    subject { helper.project_permissions_settings(project) }
+
+    it { is_expected.to include(expected_settings) }
+  end
+
+  describe '#project_permissions_panel_data' do
+    let(:user) { instance_double(User, admin?: false) }
+    let(:expected_data) { { requirementsAvailable: false, securityAndComplianceAvailable: true } }
+
+    subject { helper.project_permissions_panel_data(project) }
+
+    before do
+      allow(helper).to receive(:current_user).and_return(user)
+      allow(helper).to receive(:can?).and_return(false)
+    end
+
+    it { is_expected.to include(expected_data) }
   end
 end
