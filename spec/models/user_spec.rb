@@ -3174,20 +3174,6 @@ RSpec.describe User do
     end
   end
 
-  describe '#membership_groups' do
-    let!(:user) { create(:user) }
-    let!(:parent_group) { create(:group) }
-    let!(:child_group) { create(:group, parent: parent_group) }
-
-    before do
-      parent_group.add_user(user, Gitlab::Access::MAINTAINER)
-    end
-
-    subject { user.membership_groups }
-
-    it { is_expected.to contain_exactly parent_group, child_group }
-  end
-
   describe '#authorizations_for_projects' do
     let!(:user) { create(:user) }
 

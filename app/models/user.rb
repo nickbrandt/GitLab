@@ -938,11 +938,6 @@ class User < ApplicationRecord
     end
   end
 
-  # Returns the groups a user is a member of, either directly or through a parent group
-  def membership_groups
-    Gitlab::ObjectHierarchy.new(groups).base_and_descendants
-  end
-
   # Returns a relation of groups the user has access to, including their parent
   # and child groups (recursively).
   def all_expanded_groups
