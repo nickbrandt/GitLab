@@ -255,6 +255,15 @@ RSpec.describe Gitlab::Database::LoadBalancing::LoadBalancer, :request_store do
 
       expect { lb.primary_write_location }.to raise_error(RuntimeError)
     end
+
+    it 'fallbacks to #get_replay_write_location when #get_write_location raises error' do
+      connection = double(:connection)
+      allow(lb).to receive(:read_write).and_yield(connection)
+      allow(::Gitlab::Database).to receive(:get_write_location).and_raise(ActiveRecord::StatementInvalid)
+      expect(::Gitlab::Database).to receive(:get_replay_write_location).and_return('0/C73A0D88')
+
+      lb.primary_write_location
+    end
   end
 
   describe '#all_caught_up?' do
