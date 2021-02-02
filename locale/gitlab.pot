@@ -19071,6 +19071,9 @@ msgstr ""
 msgid "More than %{number_commits_distance} commits different with %{default_branch}"
 msgstr ""
 
+msgid "Most relevant"
+msgstr ""
+
 msgid "Most stars"
 msgstr ""
 
@@ -27285,9 +27288,6 @@ msgid "SortOptions|Recent sign in"
 msgstr ""
 
 msgid "SortOptions|Recently starred"
-msgstr ""
-
-msgid "SortOptions|Relevant"
 msgstr ""
 
 msgid "SortOptions|Size"
