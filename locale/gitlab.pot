@@ -23519,9 +23519,6 @@ msgstr ""
 msgid "Promotions|Upgrade plan"
 msgstr ""
 
-msgid "Promotions|Upgrade your plan"
-msgstr ""
-
 msgid "Promotions|Upgrade your plan to activate Contribution Analytics."
 msgstr ""
 
