@@ -58,7 +58,6 @@ module DeprecationToolkitEnv
       spec/support/gitlab_experiment.rb
       activerecord-6.0.3.4/lib/active_record/migration.rb
       devise-4.7.3/lib/devise/test/controller_helpers.rb
-      attr_encrypted-3.1.0/lib/attr_encrypted/adapters/active_record.rb
       grape-1.5.1/lib/grape/middleware/stack.rb
       grape-1.5.1/lib/grape/validations/validators/coerce.rb
       grape_logging-1.8.3/lib/grape_logging/middleware/request_logger.rb
