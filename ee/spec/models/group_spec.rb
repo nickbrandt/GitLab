@@ -20,7 +20,7 @@ RSpec.describe Group do
     it { is_expected.to have_many(:compliance_management_frameworks) }
     it { is_expected.to have_one(:deletion_schedule) }
     it { is_expected.to have_one(:group_wiki_repository) }
-    it { is_expected.to belong_to(:push_rule) }
+    it { is_expected.to belong_to(:push_rule).inverse_of(:group) }
     it { is_expected.to have_many(:saml_group_links) }
     it { is_expected.to have_many(:epics) }
     it { is_expected.to have_many(:epic_boards).inverse_of(:group) }
