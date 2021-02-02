@@ -268,7 +268,6 @@ export default {
   },
 
   [types.REQUEST_CREATE_ISSUE](state, vulnerability) {
-    state.isCreatingIssue = true;
     visitUrl(vulnerability.create_vulnerability_feedback_issue_path, {
       params: { vulnerability_id: vulnerability.id },
     });
