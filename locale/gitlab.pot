@@ -28478,9 +28478,6 @@ msgstr ""
 msgid "TestCases|Something went wrong while creating a test case."
 msgstr ""
 
-msgid "TestCases|Something went wrong while fetching count of test cases."
-msgstr ""
-
 msgid "TestCases|Something went wrong while fetching test case."
 msgstr ""
 
