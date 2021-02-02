@@ -106,8 +106,6 @@ const addRotationToStore = (store, query, { oncallRotationCreate, scheduleIid },
     scheduleToUpdate.rotations.nodes = [...scheduleToUpdate.rotations.nodes, rotation];
   });
 
-  console.log(data)
-
   store.writeQuery({
     query,
     variables,

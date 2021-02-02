@@ -8,6 +8,8 @@ import mockRotations from '../../mocks/mock_rotation.json';
 describe('RotationAssignee', () => {
   let wrapper;
 
+  const mockRandomNumber = 0.391352525;
+
   const assignee = mockRotations[0].shifts.nodes[0];
   const findToken = () => wrapper.findComponent(GlToken);
   const findAvatar = () => wrapper.findComponent(GlAvatarLabeled);
@@ -33,6 +35,7 @@ describe('RotationAssignee', () => {
   }
 
   beforeEach(() => {
+    jest.spyOn(Math, 'random').mockReturnValue(mockRandomNumber);
     createComponent();
   });
 
@@ -53,7 +56,9 @@ describe('RotationAssignee', () => {
     });
 
     it('should render an assignee schedule and rotation information in a popover', () => {
-      expect(findPopOver().attributes('target')).toBe(assignee.id);
+      expect(findPopOver().attributes('target')).toBe(
+        `${assignee.participant.user.id}-${mockRandomNumber}`,
+      );
       expect(findStartsAt().text()).toContain(formattedDate(assignee.startsAt));
       expect(findEndsAt().text()).toContain(formattedDate(assignee.endsAt));
     });

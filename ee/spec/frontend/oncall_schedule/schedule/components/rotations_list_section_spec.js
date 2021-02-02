@@ -14,6 +14,7 @@ describe('RotationsListSectionComponent', () => {
   const mockTimeframeInitialDate = new Date(mockRotations[0].shifts.nodes[0].startsAt);
   const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
   const projectPath = 'group/project';
+  const mockRandomNumber = 0.391352525;
 
   function createComponent({
     presetType = PRESET_TYPES.WEEKS,
@@ -49,6 +50,9 @@ describe('RotationsListSectionComponent', () => {
   describe('when the timeframe includes today', () => {
     beforeEach(() => {
       useFakeDate(2021, 0, 14);
+
+      jest.spyOn(Math, 'random').mockReturnValue(mockRandomNumber);
+
       createComponent();
     });
 

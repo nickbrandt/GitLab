@@ -4,12 +4,12 @@ import { set } from 'lodash';
 import getOncallSchedulesWithRotationsQuery from 'ee/oncall_schedules/graphql/queries/get_oncall_schedules.query.graphql';
 import createOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/create_oncall_schedule_rotation.mutation.graphql';
 import updateOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/update_oncall_schedule_rotation.mutation.graphql';
-import { LENGTH_ENUM } from 'ee/oncall_schedules/constants';
 import {
   updateStoreAfterRotationAdd,
   updateStoreAfterRotationEdit,
 } from 'ee/oncall_schedules/utils/cache_updates';
-import { isNameFieldValid, assigneeColorCombo } from 'ee/oncall_schedules/utils/common_utils';
+import { isNameFieldValid } from 'ee/oncall_schedules/utils/common_utils';
+import { LENGTH_ENUM, ASSIGNEE_COLORS_COMBO } from '../../../constants';
 import { s__, __ } from '~/locale';
 import createFlash, { FLASH_TYPES } from '~/flash';
 import usersSearchQuery from '~/graphql_shared/queries/users_search.query.graphql';
@@ -27,7 +27,6 @@ export const i18n = {
 export default {
   i18n,
   LENGTH_ENUM,
-  CHEVRON_COMBOS: assigneeColorCombo(),
   components: {
     GlModal,
     GlAlert,
@@ -127,12 +126,16 @@ export default {
           ...this.form.rotationLength,
           length: parseInt(this.form.rotationLength.length, 10),
         },
-        participants: this.form.participants.map(({ username }, index) => ({
-          username,
-          // eslint-disable-next-line @gitlab/require-i18n-strings
-          colorWeight: `WEIGHT_${this.$options.CHEVRON_COMBOS[index].shade.toUpperCase()}`,
-          colorPalette: this.$options.CHEVRON_COMBOS[index].color.toUpperCase(),
-        })),
+        participants: this.form.participants.map(({ username }, index) => {
+          const colorIndex = index % ASSIGNEE_COLORS_COMBO.length;
+          const { colorWeight, colorPalette } = ASSIGNEE_COLORS_COMBO[colorIndex];
+
+          return {
+            username,
+            colorWeight,
+            colorPalette,
+          };
+        }),
       };
     },
     isFormValid() {

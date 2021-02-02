@@ -85,7 +85,6 @@ export default {
       }
     },
     shiftWidth() {
-      const offset = this.shiftStartDateOutOfRange ? 0 : 1;
       const baseWidth =
         this.timeFrameIndex === 0
           ? this.totalShiftRangeOverlap.daysOverlap

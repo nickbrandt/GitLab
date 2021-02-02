@@ -82,6 +82,7 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
         >
           <span
             class="gl-w-full gl-h-6 gl-align-items-center gl-token gl-token-default-variant gl-bg-data-viz-blue-500"
+            id="1-0.391352525"
           >
             <span
               class="gl-token-content"
@@ -152,6 +153,7 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
         >
           <span
             class="gl-w-full gl-h-6 gl-align-items-center gl-token gl-token-default-variant gl-bg-data-viz-orange-500"
+            id="2-0.391352525"
           >
             <span
               class="gl-token-content"
