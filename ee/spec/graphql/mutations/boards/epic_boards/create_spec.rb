@@ -20,6 +20,13 @@ RSpec.describe ::Mutations::Boards::EpicBoards::Create do
     end
   end
 
+  context 'field tests' do
+    subject { described_class }
+
+    it { is_expected.to have_graphql_arguments(:groupPath, :name, :hideBacklogList, :hideClosedList) }
+    it { is_expected.to have_graphql_fields(:epic_board).at_least }
+  end
+
   context 'with epic feature enabled and epic_boards feature flag enabled' do
     before do
       stub_licensed_features(epics: true)

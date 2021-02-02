@@ -8977,6 +8977,11 @@ input EpicBoardCreateInput {
   clientMutationId: String
 
   """
+  Full path of the group with which the resource is associated.
+  """
+  groupPath: ID
+
+  """
   Whether or not backlog list is hidden.
   """
   hideBacklogList: Boolean

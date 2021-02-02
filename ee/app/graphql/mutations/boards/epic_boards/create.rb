@@ -11,6 +11,10 @@ module Mutations
 
         authorize :admin_epic_board
 
+        argument :group_path, GraphQL::ID_TYPE,
+                 required: false,
+                 description: 'Full path of the group with which the resource is associated.'
+
         field :epic_board,
               Types::Boards::EpicBoardType,
               null: true,
