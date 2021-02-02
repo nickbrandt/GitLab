@@ -19,7 +19,7 @@
 ### Tasks
 - [ ] Assign this issue to the appropriate Product Manager, Product Designer, or UX Researcher.
 - [ ] Add the appropriate `Group` (such as `~"group::source code"`) label to the issue.  This helps identify and track actionable insights at the group level.
-- [ ] Link this issue back to the original research issue in the GitLab UX Research project and Dovetail project.
+- [ ] Link this issue back to the original research issue in the GitLab UX Research project and the Dovetail project.
 
 
 
