@@ -32,11 +32,7 @@ export default {
         }
       }
 
-      if (
-        window.gon?.features?.paginatedNotes &&
-        note.base_discussion &&
-        type === constants.DIFF_NOTE
-      ) {
+      if (window.gon?.features?.paginatedNotes && note.base_discussion) {
         if (discussion.diff_file) {
           discussion.file_hash = discussion.diff_file.file_hash;
 
@@ -45,7 +41,8 @@ export default {
           );
         }
 
-        discussion.expanded = note.expanded;
+        discussion.resolvable = note.resolvable;
+        discussion.expanded = note.base_discussion.expanded;
         discussion.resolved = note.resolved;
       }
 

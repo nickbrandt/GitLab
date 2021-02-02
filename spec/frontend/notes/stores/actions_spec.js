@@ -291,6 +291,7 @@ describe('Actions Notes Store', () => {
           [
             { type: 'updateOrCreateNotes', payload: discussionMock.notes },
             { type: 'startTaskList' },
+            { type: 'updateResolvableDiscussionsCounts' },
           ],
         ));
     });
@@ -324,6 +325,7 @@ describe('Actions Notes Store', () => {
             { type: 'setLoadingState', payload: false },
             { type: 'updateOrCreateNotes', payload: discussionMock.notes },
             { type: 'startTaskList' },
+            { type: 'updateResolvableDiscussionsCounts' },
           ],
         );
       });
