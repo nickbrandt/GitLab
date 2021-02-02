@@ -195,7 +195,7 @@ RSpec.describe Gitlab::Geo::VerificationState do
     end
   end
 
-  describe '#track_checksum_attempt!' do
+  describe '#track_checksum_attempt!', :aggregate_failures do
     context 'when verification was not yet started' do
       it 'starts verification' do
         expect do
@@ -234,12 +234,39 @@ RSpec.describe Gitlab::Geo::VerificationState do
     end
 
     context 'when an error occurs while yielding' do
-      it 'sets verification_failed' do
-        subject.track_checksum_attempt! do
-          raise 'an error'
-        end
+      context 'when the record was failed' do
+        it 'sets verification_failed and increments verification_retry_count' do
+          subject.verification_failed_with_message!('foo')
 
-        expect(subject.reload.verification_failed?).to be_truthy
+          subject.track_checksum_attempt! do
+            raise 'an error'
+          end
+
+          expect(subject.reload.verification_failed?).to be_truthy
+          expect(subject.verification_retry_count).to eq(2)
+        end
+      end
+    end
+
+    context 'when the yielded block returns nil' do
+      context 'when the record was pending' do
+        it 'sets verification_failed and sets verification_retry_count to 1' do
+          subject.track_checksum_attempt! { nil }
+
+          expect(subject.reload.verification_failed?).to be_truthy
+          expect(subject.verification_retry_count).to eq(1)
+        end
+      end
+
+      context 'when the record was failed' do
+        it 'sets verification_failed and increments verification_retry_count' do
+          subject.verification_failed_with_message!('foo')
+
+          subject.track_checksum_attempt! { nil }
+
+          expect(subject.reload.verification_failed?).to be_truthy
+          expect(subject.verification_retry_count).to eq(2)
+        end
       end
     end
   end
