@@ -450,7 +450,6 @@ const pollSuccessCallBack = async (resp, commit, state, getters, dispatch) => {
 const getFetchDataParams = (state) => {
   const endpoint = state.notesData.notesPath;
   const options = {
-    params: { t: new Date().getTime() },
     headers: {
       'X-Last-Fetched-At': state.lastFetchedAt ? `${state.lastFetchedAt}` : undefined,
     },
