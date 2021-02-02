@@ -57,7 +57,7 @@ not expressed explicitly in the code. A useful debugging technique for such situ
 is placing assertions to make any assumption explicit. They can help detect the cause
 which unmet condition causes the bug.
 
-**Asserting pre-conditions on state mutations**
+#### Asserting pre-conditions on state mutations
 
 A common scenario that leads to transient bugs is when there is a polling service
 that should mutate state only if a user operation is completed. We can use
@@ -80,12 +80,12 @@ export const updateMergeableStatus = ({ state, commit }, payload) => {
 };
 ```
 
-**Asserting API contracts**
+#### Asserting API contracts
 
 Another useful way of using assertions is to detect if the response payload returned
 by the server-side endpoint satisfies the API contract.
 
-**Related reading**
+#### Related reading
 
 [Debug it!](https://pragprog.com/titles/pbdp/debug-it/) explores techniques to diagnose
 and fix non-determinstic bugs and write software that is easier to debug.
@@ -94,9 +94,12 @@ and fix non-determinstic bugs and write software that is easier to debug.
 
 ### Sidekiq jobs with locks
 
-When dealing with asynchronous work via Sidekiq, it is possible have 2 jobs with the same arguments getting worked on at the same time. If not handled correctly, this can result to outdated or inaccurate state.
+When dealing with asynchronous work via Sidekiq, it is possible to have 2 jobs with the same arguments
+getting worked on at the same time. If not handled correctly, this can result in an outdated or inaccurate state.
 
-For example, a worker that updates a state of an object. Before the worker updates the state (e.g. `#update_state`) of the object, it needs to check what the appropriate state should be (e.g. `#check_state`).
+For instance, consider a worker that updates a state of an object. Before the worker updates the state
+(for example, `#update_state`) of the object, it needs to check what the appropriate state should be
+(for example, `#check_state`).
 
 When there are 2 jobs being worked on at the same time, it is possible that the order of operations will go like:
 
@@ -107,18 +110,23 @@ When there are 2 jobs being worked on at the same time, it is possible that the 
 
 In this example, `Worker B` is meant to set the updated status. But `Worker A` calls `#update_state` a little too late.
 
-This can be avoided by utilizing either database locks or `Gitlab::ExclusiveLease`. This way, jobs will be worked on one at a time. This also allows them to be marked as [idempotent](../sidekiq_style_guide.md#idempotent-jobs).
+This can be avoided by utilizing either database locks or `Gitlab::ExclusiveLease`. This way, jobs will be
+worked on one at a time. This also allows them to be marked as [idempotent](../sidekiq_style_guide.md#idempotent-jobs).
 
 ### Retry mechanism handling
 
 There are times that an object/record will be on a failed state which can be rechecked.
 
-If an object is in a state that can be rechecked, ensure that appropriate messaging is shown to the user so they know what to do. Also make sure that the retry functionality will be able to reset the state correctly when triggered.
+If an object is in a state that can be rechecked, ensure that appropriate messaging is shown to the user
+so they know what to do. Also, make sure that the retry functionality will be able to reset the state
+correctly when triggered.
 
 ### Error Logging
 
-This doesn't necessarily directly prevents transient bugs but it can help debugging them.
+Error logging doesn't necessarily directly prevents transient bugs but it can help to debug them.
 
 When coding, sometimes we expect some exceptions to be raised and we rescue them.
 
-Logging whenever we rescue an error helps in case it's causing transient bugs that a user may see. While investigating a bug report, it may require the engineer to look into logs of when it happened. Seeing an error being logged can be a signal of something that went wrong which can be handled differently.
+Logging whenever we rescue an error helps in case it's causing transient bugs that a user may see.
+While investigating a bug report, it may require the engineer to look into logs of when it happened.
+Seeing an error being logged can be a signal of something that went wrong which can be handled differently.
