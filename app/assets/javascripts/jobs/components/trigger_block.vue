@@ -1,12 +1,25 @@
 <script>
-import { GlButton } from '@gitlab/ui';
+import { GlButton, GlTable } from '@gitlab/ui';
 import { __ } from '~/locale';
 
-const HIDDEN_VALUE = '••••••';
-
 export default {
+  fields: [
+    {
+      key: 'key',
+      label: __('Key'),
+      tdAttr: { 'data-testid': 'trigger-build-key' },
+      tdClass: 'gl-w-half gl-font-sm!',
+    },
+    {
+      key: 'value',
+      label: __('Value'),
+      tdAttr: { 'data-testid': 'trigger-build-value' },
+      tdClass: 'gl-w-half gl-font-sm!',
+    },
+  ],
   components: {
     GlButton,
+    GlTable,
   },
   props: {
     trigger: {
@@ -21,7 +34,7 @@ export default {
   },
   computed: {
     hasVariables() {
-      return this.trigger.variables && this.trigger.variables.length > 0;
+      return this.trigger.variables.length > 0;
     },
     getToggleButtonText() {
       return this.showVariableValues ? __('Hide values') : __('Reveal values');
@@ -35,45 +48,36 @@ export default {
       this.showVariableValues = !this.showVariableValues;
     },
     getDisplayValue(value) {
-      return this.showVariableValues ? value : HIDDEN_VALUE;
+      return this.showVariableValues ? value : '••••••';
     },
   },
 };
 </script>
 
 <template>
-  <div class="build-widget block">
+  <div class="block">
     <p
       v-if="trigger.short_token"
-      class="js-short-token"
       :class="{ 'gl-mb-2': hasVariables, 'gl-mb-0': !hasVariables }"
+      data-testid="trigger-short-token"
     >
-      <span class="font-weight-bold">{{ __('Trigger token:') }}</span> {{ trigger.short_token }}
+      <span class="gl-font-weight-bold">{{ __('Trigger token:') }}</span> {{ trigger.short_token }}
     </p>
 
     <template v-if="hasVariables">
-      <p class="trigger-variables-btn-container d-flex">
-        <span class="font-weight-bold">{{ __('Trigger variables:') }}</span>
+      <p class="gl-display-flex gl-justify-content-space-between gl-align-items-center">
+        <span class="gl-font-weight-bold">{{ __('Trigger variables:') }}</span>
 
-        <gl-button
-          v-if="hasValues"
-          class="group js-reveal-variables trigger-variables-btn"
-          size="small"
-          @click="toggleValues"
-          >{{ getToggleButtonText }}</gl-button
-        >
+        <gl-button v-if="hasValues" class="gl-mt-2" size="small" @click="toggleValues">{{
+          getToggleButtonText
+        }}</gl-button>
       </p>
 
-      <table class="js-build-variables trigger-build-variables">
-        <tr v-for="(variable, index) in trigger.variables" :key="`${variable.key}-${index}`">
-          <td class="js-build-variable trigger-build-variable trigger-variables-table-cell">
-            {{ variable.key }}
-          </td>
-          <td class="js-build-value trigger-build-value trigger-variables-table-cell">
-            {{ getDisplayValue(variable.value) }}
-          </td>
-        </tr>
-      </table>
+      <gl-table :items="trigger.variables" :fields="$options.fields" small>
+        <template #cell(value)="data">
+          {{ getDisplayValue(data.value) }}
+        </template>
+      </gl-table>
     </template>
   </div>
 </template>
