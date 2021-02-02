@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  RSpec.describe 'Manage' do
+  RSpec.describe 'Manage', :requires_admin do
     describe 'Add project member' do
       before do
         Runtime::Feature.enable('vue_project_members_list')
