@@ -610,7 +610,7 @@ RSpec.describe ProjectsController do
         it 'does not show any references to the conflicting path' do
           expect { update_project(path: random_name) }.not_to change { project.reload.path }
 
-          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to have_gitlab_http_status(:redirect)
           expect(response.body).not_to include(random_name)
         end
       end
@@ -668,7 +668,7 @@ RSpec.describe ProjectsController do
             .not_to change { project.reload.path }
 
           expect(controller).to set_flash[:alert].to(s_('UpdateProject|Cannot rename project because it contains container registry tags!'))
-          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to have_gitlab_http_status(:redirect)
         end
       end
 
