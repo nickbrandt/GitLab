@@ -16,12 +16,7 @@ RSpec.describe EE::BulkImports::Groups::Pipelines::EpicsPipeline do
     )
   end
 
-  let(:context) do
-    BulkImports::Pipeline::Context.new(
-      current_user: user,
-      entity: entity
-    )
-  end
+  let(:context) { BulkImports::Pipeline::Context.new(entity) }
 
   describe '#run' do
     it 'imports group epics into destination group' do
