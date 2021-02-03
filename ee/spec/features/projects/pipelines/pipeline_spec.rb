@@ -181,6 +181,21 @@ RSpec.describe 'Pipeline', :js do
         end
       end
 
+      context 'when unlicensed' do
+        before do
+          stub_licensed_features(full_codequality_report: false)
+
+          create(:ee_ci_build, :codequality, pipeline: pipeline)
+          visit project_pipeline_path(project, pipeline)
+          wait_for_requests
+        end
+
+        it 'does not show code quality tab' do
+          expect(page).not_to have_content('Code Quality')
+          expect(page).not_to have_css('#js-tab-codequality')
+        end
+      end
+
       context 'with code quality artifact' do
         before do
           create(:ee_ci_build, :codequality, pipeline: pipeline)
