@@ -6,7 +6,7 @@ import getProjectsTestCoverage from 'ee/analytics/repository_analytics/graphql/q
 import createMockApollo from 'helpers/mock_apollo_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 import { getTimeago } from '~/lib/utils/datetime_utility';
-import { defaultTestCoverageTable, projects } from './mock_data';
+import { defaultTestCoverageTable, projects } from '../mock_data';
 import Api from '~/api';
 
 jest.mock('~/api.js');
@@ -40,9 +40,12 @@ describe('Test coverage table component', () => {
     ]);
   };
 
-  const createComponent = (options = {}) => {
-    const { glFeatures = {}, mockApollo, mockData = {}, mountFn = shallowMount } = options;
-
+  const createComponent = ({
+    glFeatures = {},
+    mockApollo,
+    mockData = {},
+    mountFn = shallowMount,
+  } = {}) => {
     wrapper = mountFn(TestCoverageTable, {
       localVue,
       data() {
