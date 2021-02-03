@@ -17,8 +17,8 @@ module Gitlab
             }
           end
 
-          def self.matches?(build, _)
-            build.waiting_for_resource?
+          def self.matches?(processable, _)
+            processable.waiting_for_resource?
           end
         end
       end

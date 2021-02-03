@@ -3934,17 +3934,16 @@ For more information, see [Deployments Safety](../environments/deployment_safety
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/39057) in GitLab 13.9.
 
-You can define `resource_group` for downstream pipelines that are sensitive to
-concurrent executions. Downstream pipelines can be triggered by [`trigger` keyword](#trigger)
-and [`resource_group` keyword](#resource_group) can co-exist with it. This is useful to control the
-concurency for deployment pipelines, while running non-sensitive jobs concurrently.
+You can define `resource_group` for downstream pipelines that are sensitive to concurrent
+executions. The [`trigger` keyword](#trigger) can trigger downstream pipelines. The
+[`resource_group` keyword](#resource_group) can co-exist with it. This is useful to control the
+concurrency for deployment pipelines, while running non-sensitive jobs concurrently.
 
-In ths following example, we have two pipeline configurations in a project.
-When a pipeline started running, non-sensitive jobs are executed at first and they
-won't be affected by the concurrent executions in the other pipelines.
-However, when it's about to trigger a deployment (child) pipeline, GitLab ensures that
-there are no other deployment pipelines running, and if it's conflicted,
-the pipeline will wait until it's finished.
+This example has two pipeline configurations in a project. When a pipeline starts running,
+non-sensitive jobs are executed first and aren't affected by concurrent executions in other
+pipelines. However, GitLab ensures that there are no other deployment pipelines running before
+triggering a deployment (child) pipeline. If other deployment pipelines are running, GitLab waits
+until those pipelines finish before running another one.
 
 ```yaml
 # .gitlab-ci.yml (parent pipeline)
@@ -3981,9 +3980,9 @@ deployment:
   script: echo "Deploying..."
 ```
 
-Please note that [`strategy: depend`](#linking-pipelines-with-triggerstrategy)
-must be defined with the `trigger` keyword. This ensures that the lock won't
-be relesed until the downstream pipeline has finished.
+Note that you must define [`strategy: depend`](#linking-pipelines-with-triggerstrategy)
+with the `trigger` keyword. This ensures that the lock isn't released until the downstream pipeline
+finishes.
 
 ### `release`
 
