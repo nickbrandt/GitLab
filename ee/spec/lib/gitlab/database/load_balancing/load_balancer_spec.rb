@@ -243,8 +243,8 @@ RSpec.describe Gitlab::Database::LoadBalancing::LoadBalancer, :request_store do
   end
 
   describe '#primary_write_location' do
-    it 'returns a String' do
-      expect(lb.primary_write_location).to be_an_instance_of(String)
+    it 'returns a String in the right format' do
+      expect(lb.primary_write_location).to match(/[A-E0-9]{1,8}\/[A-E0-9]{1,8}/)
     end
 
     it 'raises an error if the write location could not be retrieved' do
@@ -254,15 +254,6 @@ RSpec.describe Gitlab::Database::LoadBalancing::LoadBalancer, :request_store do
       allow(connection).to receive(:select_all).and_return([])
 
       expect { lb.primary_write_location }.to raise_error(RuntimeError)
-    end
-
-    it 'fallbacks to #get_replay_write_location when #get_write_location raises error' do
-      connection = double(:connection)
-      allow(lb).to receive(:read_write).and_yield(connection)
-      allow(::Gitlab::Database).to receive(:get_write_location).and_raise(ActiveRecord::StatementInvalid)
-      expect(::Gitlab::Database).to receive(:get_replay_write_location).and_return('0/C73A0D88')
-
-      lb.primary_write_location
     end
   end
 

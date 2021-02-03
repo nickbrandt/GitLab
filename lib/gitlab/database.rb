@@ -260,17 +260,7 @@ module Gitlab
     # @return [String]
     def self.get_write_location(ar_connection)
       row = ar_connection
-        .select_all("SELECT pg_current_wal_insert_lsn()::text AS location")
-        .first
-
-      row['location'] if row
-    end
-
-    # @param [ActiveRecord::Connection] ar_connection
-    # @return [String]
-    def self.get_replay_write_location(ar_connection)
-      row = ar_connection
-              .select_all("SELECT pg_last_wal_replay_lsn()::text AS location")
+              .select_all('SELECT CASE WHEN pg_is_in_recovery() = true THEN pg_last_wal_replay_lsn()::text ELSE pg_current_wal_insert_lsn()::text END AS location;')
               .first
 
       row['location'] if row
