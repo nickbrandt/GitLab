@@ -151,9 +151,12 @@ export default class EditorLite {
     return decoratedInstance;
   };
 
-  static onInstanceDisposal(editor, instance, model) {
+  static removeInstanceFromRegistry(editor, instance) {
     const index = editor.instances.findIndex((inst) => inst === instance);
     editor.instances.splice(index, 1);
+  }
+
+  static disposeInstanceModels(editor, instance, model) {
     const instanceModel = instance.getModel() || model;
     if (!instanceModel) {
       return;
@@ -192,7 +195,6 @@ export default class EditorLite {
   } = {}) {
     EditorLite.prepareInstance(el);
 
-    let model;
     const createEditorFn = diff ? 'createDiffEditor' : 'create';
     const instance = EditorLite.convertMonacoToELInstance(
       monacoEditor[createEditorFn].call(this, el, {
@@ -201,6 +203,7 @@ export default class EditorLite {
       }),
     );
 
+    let model;
     if (instanceOptions.model !== null) {
       model = EditorLite.createEditorModel({
         blobGlobalId,
@@ -213,7 +216,8 @@ export default class EditorLite {
     }
 
     instance.onDidDispose(() => {
-      EditorLite.onInstanceDisposal(this, instance, model);
+      EditorLite.removeInstanceFromRegistry(this, instance);
+      EditorLite.disposeInstanceModels(this, instance, model);
     });
 
     EditorLite.manageDefaultExtensions(instance, el, extensions);
