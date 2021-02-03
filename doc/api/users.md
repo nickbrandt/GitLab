@@ -53,6 +53,9 @@ For example:
 GET /users?username=jack_smith
 ```
 
+NOTE:
+Username search is case insensitive.
+
 In addition, you can filter users based on the states `blocked` and `active`.
 It does not support `active=false` or `blocked=false`. The list of billable users
 is the total number of users minus the blocked users.
@@ -74,8 +77,11 @@ To exclude these users from the users' list, you can use the parameter `exclude_
 GET /users?exclude_internal=true
 ```
 
-NOTE:
-Username search is case insensitive.
+In addition, to exclude external users from the users' list, you can use the parameter `exclude_external=true`.
+
+```plaintext
+GET /users?exclude_external=true
+```
 
 ### For admins
 

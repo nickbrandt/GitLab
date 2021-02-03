@@ -51,6 +51,12 @@ RSpec.describe UsersFinder do
         expect(users).to contain_exactly(user, normal_user, external_user, omniauth_user, admin_user)
       end
 
+      it 'filters by non external users' do
+        users = described_class.new(user, non_external: true).execute
+
+        expect(users).to contain_exactly(user, normal_user, blocked_user, omniauth_user, internal_user, admin_user)
+      end
+
       it 'filters by created_at' do
         filtered_user_before = create(:user, created_at: 3.days.ago)
         filtered_user_after = create(:user, created_at: Time.now + 3.days)
