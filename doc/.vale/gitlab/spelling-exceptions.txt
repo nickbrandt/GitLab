@@ -103,6 +103,7 @@ Conda
 Consul
 Contentful
 Corosync
+Coursier
 cron
 crons
 crontab
@@ -150,6 +151,7 @@ Divio
 Dockerfile
 Dockerfiles
 Dockerize
+Dockerized
 Dockerizing
 dogfood
 dogfooding
@@ -376,6 +378,7 @@ passwordless
 Patroni
 performant
 PgBouncer
+pgLoader
 Phabricator
 phaser
 phasers
@@ -484,6 +487,7 @@ rsync
 rsynced
 rsyncing
 rsyncs
+Rubinius
 Rubix
 Rubocop
 Rubular
@@ -596,6 +600,8 @@ Tokenizers
 tokenizing
 toolchain
 toolchains
+toolkit
+toolkits
 tooltip
 tooltips
 transpile
@@ -699,9 +705,11 @@ unverifying
 uploader
 uploaders
 upstreams
+upvote
 upvoted
 upvotes
 URIs
+Vagrantfile
 validator
 validators
 vendored
