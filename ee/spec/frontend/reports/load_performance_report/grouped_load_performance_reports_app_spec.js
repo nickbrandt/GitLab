@@ -1,16 +1,16 @@
 import { mount, createLocalVue } from '@vue/test-utils';
-import GroupedBrowserPerformanceReportsApp from 'ee/reports/browser_performance_report/grouped_browser_performance_reports_app.vue';
+import GroupedLoadPerformanceReportsApp from 'ee/reports/load_performance_report/grouped_load_performance_reports_app.vue';
 import Api from '~/api';
 
 jest.mock('~/api.js');
 
 const localVue = createLocalVue();
 
-describe('Grouped test reports app', () => {
+describe('Grouped load performance reports app', () => {
   let wrapper;
 
-  const mountComponent = ({ usageDataITestingWebPerformanceWidgetTotal = false } = {}) => {
-    wrapper = mount(GroupedBrowserPerformanceReportsApp, {
+  const mountComponent = ({ usageDataITestingLoadPerformanceWidgetTotal = false } = {}) => {
+    wrapper = mount(GroupedLoadPerformanceReportsApp, {
       localVue,
       propsData: {
         status: '',
@@ -24,7 +24,7 @@ describe('Grouped test reports app', () => {
       },
       provide: {
         glFeatures: {
-          usageDataITestingWebPerformanceWidgetTotal,
+          usageDataITestingLoadPerformanceWidgetTotal,
         },
       },
     });
@@ -38,7 +38,7 @@ describe('Grouped test reports app', () => {
   describe('usage ping events', () => {
     describe('when feature flag is enabled', () => {
       beforeEach(() => {
-        mountComponent({ usageDataITestingWebPerformanceWidgetTotal: true });
+        mountComponent({ usageDataITestingLoadPerformanceWidgetTotal: true });
       });
 
       it('tracks an event when the widget is expanded', () => {
@@ -50,7 +50,7 @@ describe('Grouped test reports app', () => {
 
     describe('when feature flag is disabled', () => {
       beforeEach(() => {
-        mountComponent({ usageDataITestingWebPerformanceWidgetTotal: false });
+        mountComponent({ usageDataITestingLoadPerformanceWidgetTotal: false });
       });
 
       it('tracks an event when the widget is expanded', () => {
