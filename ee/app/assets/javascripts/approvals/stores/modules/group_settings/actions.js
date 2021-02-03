@@ -1,7 +1,7 @@
 import { __ } from '~/locale';
 import axios from '~/lib/utils/axios_utils';
-import * as types from './mutation_types';
 import createFlash from '~/flash';
+import * as types from './mutation_types';
 
 export const fetchSettings = ({ commit }, endpoint) => {
   commit(types.REQUEST_SETTINGS);

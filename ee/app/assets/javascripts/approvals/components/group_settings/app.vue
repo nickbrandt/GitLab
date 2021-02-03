@@ -1,9 +1,9 @@
 <script>
 import { GlSprintf, GlLink } from '@gitlab/ui';
-import ApprovalSettings from '../approval_settings.vue';
 import SettingsBlock from '~/vue_shared/components/settings/settings_block.vue';
 import { helpPagePath } from '~/helpers/help_page_helper';
 import { __ } from '~/locale';
+import ApprovalSettings from '../approval_settings.vue';
 
 export default {
   name: 'GroupApprovalSettingsApp',
