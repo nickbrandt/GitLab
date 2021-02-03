@@ -178,7 +178,7 @@ describe('Base editor', () => {
         editor.createDiffInstance();
         expect(spy).toHaveBeenCalledWith(
           expect.objectContaining({
-            diff: true,
+            isDiff: true,
           }),
         );
       });

@@ -110,7 +110,7 @@ export default class EditorLite {
     blobOriginalContent,
     blobGlobalId,
     instance,
-    diff,
+    isDiff,
   } = {}) {
     if (!instance) {
       return null;
@@ -119,7 +119,7 @@ export default class EditorLite {
     const uri = Uri.file(uriFilePath);
     const existingModel = monacoEditor.getModel(uri);
     const model = existingModel || monacoEditor.createModel(blobContent, undefined, uri);
-    if (!diff) {
+    if (!isDiff) {
       instance.setModel(model);
       return model;
     }
@@ -198,12 +198,12 @@ export default class EditorLite {
     blobOriginalContent = '',
     blobGlobalId = uuids()[0],
     extensions = [],
-    diff = false,
+    isDiff = false,
     ...instanceOptions
   } = {}) {
     EditorLite.prepareInstance(el);
 
-    const createEditorFn = diff ? 'createDiffEditor' : 'create';
+    const createEditorFn = isDiff ? 'createDiffEditor' : 'create';
     const instance = EditorLite.convertMonacoToELInstance(
       monacoEditor[createEditorFn].call(this, el, {
         ...this.options,
@@ -219,7 +219,7 @@ export default class EditorLite {
         blobPath,
         blobContent,
         instance,
-        diff,
+        isDiff,
       });
     }
 
@@ -237,7 +237,7 @@ export default class EditorLite {
   createDiffInstance(args) {
     return this.createInstance({
       ...args,
-      diff: true,
+      isDiff: true,
     });
   }
 
