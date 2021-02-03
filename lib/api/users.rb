@@ -82,6 +82,7 @@ module API
         optional :search, type: String, desc: 'Search for a username'
         optional :active, type: Boolean, default: false, desc: 'Filters only active users'
         optional :external, type: Boolean, default: false, desc: 'Filters only external users'
+        optional :exclude_external, as: :non_external, type: Boolean, default: false, desc: 'Filters only non external users'
         optional :blocked, type: Boolean, default: false, desc: 'Filters only blocked users'
         optional :created_after, type: DateTime, desc: 'Return users created after the specified time'
         optional :created_before, type: DateTime, desc: 'Return users created before the specified time'
