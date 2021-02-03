@@ -1001,7 +1001,6 @@ To link to internal documentation:
 If you need to link to a file in the same directory or in one of the sub-directories use `path/to/file.md` syntax without any prefixes.
 - Don't link relative to root. For example, `/ee/user/gitlab_com/index.md`.
 
-
   Don't:
 
   - `https://docs.gitlab.com/ee/administration/geo/replication/troubleshooting.html`
