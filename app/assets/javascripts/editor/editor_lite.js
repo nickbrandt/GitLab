@@ -135,14 +135,23 @@ export default class EditorLite {
   }
 
   static convertMonacoToELInstance = (inst) => {
-    this.instance = inst;
-    this.instance.updateModelLanguage = (path) => {
-      return EditorLite.instanceUpdateLanguage(inst, path);
+    const editorLiteInstanceAPI = {
+      updateModelLanguage: (path) => {
+        return EditorLite.instanceUpdateLanguage(inst, path);
+      },
+      use: (exts = []) => {
+        return EditorLite.instanceApplyExtension(inst, exts);
+      },
     };
-    this.instance.use = (exts = []) => {
-      return EditorLite.instanceApplyExtension(inst, exts);
+    const handler = {
+      get(target, prop, receiver) {
+        if (Reflect.has(editorLiteInstanceAPI, prop)) {
+          return editorLiteInstanceAPI[prop];
+        }
+        return Reflect.get(target, prop, receiver);
+      },
     };
-    return this.instance;
+    return new Proxy(inst, handler);
   };
 
   static instanceUpdateLanguage(inst, path) {
