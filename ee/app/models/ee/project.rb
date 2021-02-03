@@ -198,7 +198,7 @@ module EE
 
       delegate :auto_rollback_enabled, :auto_rollback_enabled=, :auto_rollback_enabled?, to: :ci_cd_settings
       delegate :closest_gitlab_subscription, to: :namespace
-      delegate :jira_vulnerabilities_integration_enabled?, to: :jira_service, allow_nil: true
+      delegate :jira_vulnerabilities_integration_enabled?, :configured_to_create_issues_from_vulnerabilities?, to: :jira_service, allow_nil: true
 
       delegate :requirements_access_level, :security_and_compliance_access_level, to: :project_feature, allow_nil: true
       delegate :pipeline_configuration_full_path, to: :compliance_management_framework, allow_nil: true

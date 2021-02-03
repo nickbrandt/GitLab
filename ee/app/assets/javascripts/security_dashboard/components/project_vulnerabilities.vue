@@ -16,7 +16,7 @@ export default {
     GlIntersectionObserver,
     VulnerabilityList,
   },
-  inject: ['projectFullPath'],
+  inject: ['projectFullPath', 'hasJiraVulnerabilitiesIntegrationEnabled'],
   props: {
     filters: {
       type: Object,
@@ -42,6 +42,7 @@ export default {
           fullPath: this.projectFullPath,
           first: VULNERABILITIES_PER_PAGE,
           sort: this.sort,
+          includeExternalIssueLinks: this.hasJiraVulnerabilitiesIntegrationEnabled,
           ...this.filters,
         };
       },
