@@ -21,8 +21,6 @@ process.on('unhandledRejection', global.promiseRejectionHandler);
 
 setupManualMocks();
 
-useFakeDate();
-
 afterEach(() =>
   // give Promises a bit more time so they fail the right test
   new Promise(setImmediate).then(() => {

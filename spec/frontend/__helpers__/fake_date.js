@@ -1,11 +1,11 @@
 // Frida Kahlo's birthday (6 = July)
-export const DEFAULT_ARGS = [2020, 6, 6];
+const DEFAULT_ARGS = [2020, 6, 6];
 
 const RealDate = Date;
 
 const isMocked = (val) => Boolean(val.mock);
 
-export const createFakeDateClass = (ctorDefault) => {
+const createFakeDateClass = (ctorDefault) => {
   const FakeDate = new Proxy(RealDate, {
     construct: (target, argArray) => {
       const ctorArgs = argArray.length ? argArray : ctorDefault;
@@ -39,11 +39,20 @@ export const createFakeDateClass = (ctorDefault) => {
   return FakeDate;
 };
 
-export const useFakeDate = (...args) => {
+const useFakeDate = (...args) => {
   const FakeDate = createFakeDateClass(args.length ? args : DEFAULT_ARGS);
   global.Date = FakeDate;
 };
 
-export const useRealDate = () => {
+const useRealDate = () => {
   global.Date = RealDate;
+};
+
+// We use commonjs so that the test environment module can pick this up
+// eslint-disable-next-line import/no-commonjs
+module.exports = {
+  useFakeDate,
+  useRealDate,
+  DEFAULT_ARGS,
+  createFakeDateClass,
 };
