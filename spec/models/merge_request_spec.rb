@@ -3430,7 +3430,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
     context 'when resolve_outdated_diff_discussions is set' do
       let(:project) { create(:project, :repository) }
 
-      subject { create(:merge_request, :with_diffs, source_project: project) }
+      subject { create(:merge_request, source_project: project) }
 
       before do
         discussion
@@ -3452,7 +3452,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
   describe '#branch_merge_base_commit' do
     let(:project) { create(:project, :repository) }
 
-    subject { create(:merge_request, :with_diffs, source_project: project) }
+    subject { create(:merge_request, source_project: project) }
 
     context 'source and target branch exist' do
       it { expect(subject.branch_merge_base_commit.sha).to eq('ae73cb07c9eeaf35924a10f713b364d32b2dd34f') }
@@ -3475,7 +3475,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
     context "with diffs" do
       let(:project) { create(:project, :repository) }
 
-      subject { create(:merge_request, :with_diffs, source_project: project) }
+      subject { create(:merge_request, source_project: project) }
 
       let(:expected_diff_refs) do
         Gitlab::Diff::DiffRefs.new(
@@ -3879,7 +3879,7 @@ RSpec.describe MergeRequest, factory_default: :keep do
   describe '#fetch_ref!' do
     let(:project) { create(:project, :repository) }
 
-    subject { create(:merge_request, :with_diffs, source_project: project) }
+    subject { create(:merge_request, source_project: project) }
 
     it 'fetches the ref correctly' do
       expect { subject.target_project.repository.delete_refs(subject.ref_path) }.not_to raise_error
