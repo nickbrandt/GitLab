@@ -24,6 +24,18 @@ RSpec.describe Pages::DeleteService do
     expect(project.pages_deployed?).to be(false)
   end
 
+  it "doesn't remove anything from the legacy storage if updates on it are disabled", :sidekiq_inline do
+    stub_feature_flags(pages_update_legacy_storage: false)
+
+    expect(project.pages_deployed?).to be(true)
+
+    expect(PagesWorker).not_to receive(:perform_in)
+
+    service.execute
+
+    expect(project.pages_deployed?).to be(false)
+  end
+
   it 'deletes all domains', :sidekiq_inline do
     expect(project.pages_domains.count).to eq(1)
 
