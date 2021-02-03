@@ -47,18 +47,5 @@ RSpec.describe 'User sees new onboarding flow', :js do
 
     expect(page).to have_content('Learn GitLab')
     expect(page).to have_css('.selectable', text: 'Label = ~Novice')
-
-    visit group_path('test')
-
-    expect(page).to have_css('.popover', text: 'Here are all your projects in your group, including the one you just created. To start, let’s take a look at your personalized learning project which will help you learn about GitLab at your own pace. 1 / 2')
-
-    click_on 'Learn GitLab'
-
-    expect(page).to have_content('We prepared tutorials to help you set up GitLab in a way to support your complete software development life cycle.')
-    expect(page).to have_css('.popover', text: 'Go to Issues > Boards to access your personalized learning issue board. 2 / 2')
-
-    page.find('.nav-item-name', text: 'Issues').click
-
-    expect(page).to have_css('.popover', text: 'Go to Issues > Boards to access your personalized learning issue board. 2 / 2')
   end
 end
