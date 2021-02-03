@@ -236,10 +236,11 @@ describe('burndown_chart', () => {
       });
     });
 
-    describe('with day3', () => {
+    describe('when dueDate is in the future', () => {
+      // day3 is before the day4 we set to dueDate in the beforeEach
       useFakeDateFromDay(day3);
 
-      it('if dueDate is in the future, pad data up to current date using last existing value', () => {
+      it('pad data up to current date using last existing value', () => {
         const result = wrapper.vm.padSparseBurnupData([day1, day2]);
 
         expect(result.length).toBe(3);
