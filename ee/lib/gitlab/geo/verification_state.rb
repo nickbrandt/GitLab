@@ -86,6 +86,10 @@ module Gitlab
             transition [:verification_started, :verification_succeeded, :verification_failed] => :verification_pending
           end
         end
+
+        private_class_method :start_verification_batch
+        private_class_method :start_verification_batch_query
+        private_class_method :start_verification_batch_subselect
       end
 
       class_methods do
