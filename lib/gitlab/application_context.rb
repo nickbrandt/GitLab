@@ -27,6 +27,10 @@ module Gitlab
       Labkit::Context.push(application_context.to_lazy_hash)
     end
 
+    def self.current
+      Labkit::Context.current.to_h
+    end
+
     def self.current_context_include?(attribute_name)
       Labkit::Context.current.to_h.include?(Labkit::Context.log_key(attribute_name))
     end
@@ -76,6 +80,14 @@ module Gitlab
 
     def username
       user&.username
+    end
+
+    def user_id
+      user&.id
+    end
+
+    def user_email
+      user&.email
     end
 
     def root_namespace_path
