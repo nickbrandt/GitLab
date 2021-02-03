@@ -135,14 +135,14 @@ export default class EditorLite {
   }
 
   static convertMonacoToELInstance = (inst) => {
-    const decoratedInstance = inst;
-    decoratedInstance.updateModelLanguage = (path) => {
+    this.instance = inst;
+    this.instance.updateModelLanguage = (path) => {
       return EditorLite.instanceUpdateLanguage(inst, path);
     };
-    decoratedInstance.use = (exts = []) => {
+    this.instance.use = (exts = []) => {
       return EditorLite.instanceApplyExtension(inst, exts);
     };
-    return decoratedInstance;
+    return this.instance;
   };
 
   static instanceUpdateLanguage(inst, path) {
