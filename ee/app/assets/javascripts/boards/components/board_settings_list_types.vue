@@ -1,14 +1,8 @@
 <script>
 import { GlAvatarLink, GlAvatarLabeled, GlLink } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { ListType, ListTypeTitles } from '~/boards/constants';
 
 export default {
-  milestone: 'milestone',
-  iteration: 'iteration',
-  assignee: 'assignee',
-  labelMilestoneText: __('Milestone'),
-  labelIterationText: __('Iteration'),
-  labelAssigneeText: __('Assignee'),
   components: {
     GlLink,
     GlAvatarLink,
@@ -24,31 +18,17 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      ListType,
+    };
+  },
   computed: {
-    activeListAssignee() {
-      return this.activeList.assignee;
+    activeListObject() {
+      return this.activeList[this.boardListType];
     },
-    activeListMilestone() {
-      return this.activeList.milestone;
-    },
-    activeListIteration() {
-      return this.activeList.iteration;
-    },
-    listTypeTitle() {
-      switch (this.boardListType) {
-        case this.$options.milestone: {
-          return this.$options.labelMilestoneText;
-        }
-        case this.$options.assignee: {
-          return this.$options.labelAssigneeText;
-        }
-        case this.$options.iteration: {
-          return this.$options.labelIterationText;
-        }
-        default: {
-          return '';
-        }
-      }
+    listTypeHeader() {
+      return ListTypeTitles[this.boardListType] || '';
     },
   },
 };
@@ -56,27 +36,21 @@ export default {
 
 <template>
   <div>
-    <label class="js-list-label gl-display-block">{{ listTypeTitle }}</label>
-    <gl-link
-      v-if="boardListType === $options.milestone"
-      class="js-milestone"
-      :href="activeListMilestone.webUrl"
-      >{{ activeListMilestone.title }}</gl-link
-    >
-    <gl-link v-else-if="boardListType === $options.iteration" :href="activeListIteration.webUrl">{{
-      activeListIteration.title
-    }}</gl-link>
+    <label class="js-list-label gl-display-block">{{ listTypeHeader }}</label>
     <gl-avatar-link
-      v-else-if="boardListType === $options.assignee"
+      v-if="boardListType === ListType.assignee"
       class="js-assignee"
-      :href="activeListAssignee.webUrl"
+      :href="activeListObject.webUrl"
     >
       <gl-avatar-labeled
         :size="32"
-        :label="activeListAssignee.name"
-        :sub-label="`@${activeListAssignee.username}`"
-        :src="activeListAssignee.avatar"
+        :label="activeListObject.name"
+        :sub-label="`@${activeListObject.username}`"
+        :src="activeListObject.avatar"
       />
     </gl-avatar-link>
+    <gl-link v-else class="js-list-title" :href="activeListObject.webUrl">
+      {{ activeListObject.title }}
+    </gl-link>
   </div>
 </template>
