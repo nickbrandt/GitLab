@@ -169,9 +169,23 @@ module Gitlab
             UPDATE #{table_name}
             SET "verification_state" = #{started_enum_value},
               "verification_started_at" = NOW()
-            WHERE #{self.verification_state_model_key} IN (#{relation.select(self.verification_state_model_key).to_sql})
+            WHERE #{self.verification_state_model_key} IN (#{start_verification_batch_subselect(relation).to_sql})
+
             RETURNING #{self.verification_state_model_key}
           SQL
+        end
+
+        # This query locks the rows during the transaction, and skips locked
+        # rows so that this query can be run concurrently, safely and reasonably
+        # efficiently.
+        # See https://gitlab.com/gitlab-org/gitlab/-/issues/300051#note_496889565
+        #
+        # @param [ActiveRecord::Relation] relation with appropriate where, order, and limit defined
+        # @return [String] SQL statement which selects the primary keys to update
+        def start_verification_batch_subselect(relation)
+          relation
+            .select(self.verification_state_model_key)
+            .lock('FOR UPDATE SKIP LOCKED') # rubocop:disable CodeReuse/ActiveRecord
         end
 
         # Overridden in ReplicableRegistry
