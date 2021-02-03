@@ -13,25 +13,31 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
 
   describe 'trial status widget', :aggregate_failures do
     let!(:gitlab_subscription) { create(:gitlab_subscription, :active_trial, namespace: group) }
-    let(:show_widget) { false }
+
+    let(:trials_available) { false }
+    let(:experiment_enabled) { false }
+    let(:eligible_for_widget) { false }
 
     before do
-      allow(view).to receive(:show_trial_status_widget?).and_return(show_widget)
+      allow(view).to receive(:billing_plans_and_trials_available?).and_return(trials_available)
+      allow(view).to receive(:eligible_for_trial_status_widget?).and_return(eligible_for_widget)
+
+      allow(view).to receive(:record_experiment_group)
+      allow(view).to receive(:experiment_enabled?).and_return(experiment_enabled)
+
       render
     end
 
     subject { rendered }
 
-    context 'when the widget should not be shown' do
+    shared_examples 'does not render' do
       it 'does not render' do
         is_expected.not_to have_selector '#js-trial-status-widget'
         is_expected.not_to have_selector '#js-trial-status-popover'
       end
     end
 
-    context 'when the widget should be shown' do
-      let(:show_widget) { true }
-
+    shared_examples 'does render' do
       it 'renders both the widget & popover component initialization elements' do
         is_expected.to have_selector '#js-trial-status-widget'
         is_expected.to have_selector '#js-trial-status-popover'
@@ -42,6 +48,32 @@ RSpec.describe 'layouts/nav/sidebar/_group' do
 
         is_expected.to have_selector "[data-container-id=#{expected_id}]"
         is_expected.to have_selector "[data-target-id=#{expected_id}]"
+      end
+    end
+
+    context 'when billing plans & trials are not available' do
+      include_examples 'does not render'
+    end
+
+    context 'when billing plans & trials are available' do
+      let(:trials_available) { true }
+
+      context 'but the group and/or user are not eligible to see the widget' do
+        include_examples 'does not render'
+      end
+
+      context 'and the group and/or user are eligible to see the widget' do
+        let(:eligible_for_widget) { true }
+
+        context 'but the experiment is not enabled for the group' do
+          include_examples 'does not render'
+        end
+
+        context 'and the experiment is enabled for the group' do
+          let(:experiment_enabled) { true }
+
+          include_examples 'does render'
+        end
       end
     end
   end

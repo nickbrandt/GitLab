@@ -1,5 +1,18 @@
+-# Return early if this app instance does not have namespace plans enabled
+- return unless billing_plans_and_trials_available?
+-# Only top-level groups can have trials & plans
 - root_group = group.root_ancestor
-- return unless show_trial_status_widget?(root_group)
+-# Return without rendering if the top-level group & current user are not
+-# eligible to see the trial status widget
+- return unless eligible_for_trial_status_widget?(root_group)
+
+-# Growth::Conversion experiment-related stuff...
+- experiment_key = :show_trial_status_in_sidebar
+-# * Record the top-level group as a Growth::Conversion experiment participant
+- record_experiment_group(experiment_key, root_group)
+-# * But return without rendering if the group is not receiving the candidate
+-#   variant experience
+- return unless experiment_enabled?(experiment_key, subject: root_group)
 
 = nav_link do
   #js-trial-status-widget{ data: { container_id: 'trial-status-sidebar-widget',
