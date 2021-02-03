@@ -161,7 +161,7 @@ export default class EditorLite {
   }
 
   static instanceApplyExtension(inst, exts = []) {
-    const extensions = Array.isArray(exts) ? exts : [exts];
+    const extensions = [].concat(exts);
     extensions.forEach((extension) => {
       EditorLite.mixIntoInstance(extension, inst);
     });
