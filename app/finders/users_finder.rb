@@ -97,7 +97,6 @@ class UsersFinder
 
   # rubocop: disable CodeReuse/ActiveRecord
   def by_external(users)
-    return users = users.where.not(external: true) unless current_user&.admin?
     return users unless params[:external]
 
     users.external
