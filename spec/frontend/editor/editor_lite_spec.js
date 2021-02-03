@@ -58,7 +58,7 @@ describe('Base editor', () => {
       modelSpy = jest.spyOn(monacoEditor, 'createModel').mockImplementation(() => res);
     };
     const mockDecorateInstance = (decorations) => {
-      jest.spyOn(EditorLite, 'decorateInstance').mockImplementation((inst) => {
+      jest.spyOn(EditorLite, 'convertMonacoToELInstance').mockImplementation((inst) => {
         return Object.assign(inst, decorations);
       });
     };
@@ -82,7 +82,7 @@ describe('Base editor', () => {
 
         expect(modelSpy).not.toHaveBeenCalled();
         expect(instanceSpy).not.toHaveBeenCalled();
-        expect(EditorLite.decorateInstance).not.toHaveBeenCalled();
+        expect(EditorLite.convertMonacoToELInstance).not.toHaveBeenCalled();
       });
 
       it('creates model to be supplied to Monaco editor', () => {
@@ -592,7 +592,7 @@ describe('Base editor', () => {
         const useSpy = jest.fn().mockImplementation(() => {
           calls.push('use');
         });
-        jest.spyOn(EditorLite, 'decorateInstance').mockImplementation((inst) => {
+        jest.spyOn(EditorLite, 'convertMonacoToELInstance').mockImplementation((inst) => {
           const decoratedInstance = inst;
           decoratedInstance.use = useSpy;
           return decoratedInstance;

@@ -134,7 +134,7 @@ export default class EditorLite {
     return diffModel;
   }
 
-  static decorateInstance = (inst) => {
+  static convertMonacoToELInstance = (inst) => {
     const decoratedInstance = inst;
     decoratedInstance.updateModelLanguage = (path) => {
       const lang = EditorLite.getModelLanguage(path);
@@ -194,7 +194,7 @@ export default class EditorLite {
 
     let model;
     const createEditorFn = diff ? 'createDiffEditor' : 'create';
-    const instance = EditorLite.decorateInstance(
+    const instance = EditorLite.convertMonacoToELInstance(
       monacoEditor[createEditorFn].call(this, el, {
         ...this.options,
         ...instanceOptions,
