@@ -78,19 +78,16 @@ export default {
       return !this.disabled && this.listType !== ListType.closed;
     },
     showMilestoneListDetails() {
-      return (
-        this.list.type === 'milestone' &&
-        this.list.milestone &&
-        (this.list.isExpanded || !this.isSwimlanesHeader)
-      );
+      return this.list.type === 'milestone' && this.list.milestone && this.showListDetails;
     },
     showAssigneeListDetails() {
-      return this.list.type === 'assignee' && (this.list.isExpanded || !this.isSwimlanesHeader);
+      return this.list.type === 'assignee' && this.showListDetails;
     },
     showIterationListDetails() {
-      return (
-        this.listType === ListType.iteration && (this.list.isExpanded || !this.isSwimlanesHeader)
-      );
+      return this.listType === ListType.iteration && this.showListDetails;
+    },
+    showListDetails() {
+      return this.list.isExpanded || !this.isSwimlanesHeader;
     },
     issuesCount() {
       return this.list.issuesSize;

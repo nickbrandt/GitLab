@@ -86,21 +86,16 @@ export default {
       return !this.disabled && this.listType !== ListType.closed;
     },
     showMilestoneListDetails() {
-      return (
-        this.listType === ListType.milestone &&
-        this.list.milestone &&
-        (!this.list.collapsed || !this.isSwimlanesHeader)
-      );
+      return this.listType === ListType.milestone && this.list.milestone && this.showListDetails;
     },
     showAssigneeListDetails() {
-      return (
-        this.listType === ListType.assignee && (!this.list.collapsed || !this.isSwimlanesHeader)
-      );
+      return this.listType === ListType.assignee && this.showListDetails;
     },
     showIterationListDetails() {
-      return (
-        this.listType === ListType.iteration && (!this.list.collapsed || !this.isSwimlanesHeader)
-      );
+      return this.listType === ListType.iteration && this.showListDetails;
+    },
+    showListDetails() {
+      return !this.list.collapsed || !this.isSwimlanesHeader;
     },
     issuesCount() {
       return this.list.issuesCount;
