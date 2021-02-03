@@ -7,11 +7,10 @@ jest.mock('~/api.js');
 const localVue = createLocalVue();
 
 describe('Grouped load performance reports app', () => {
-  const Component = localVue.extend(GroupedLoadPerformanceReportsApp);
   let wrapper;
 
   const mountComponent = ({ usageDataITestingLoadPerformanceWidgetTotal = false } = {}) => {
-    wrapper = mount(Component, {
+    wrapper = mount(GroupedLoadPerformanceReportsApp, {
       localVue,
       propsData: {
         status: '',

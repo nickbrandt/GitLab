@@ -1,5 +1,4 @@
 <script>
-import { once } from 'lodash';
 import { componentNames } from 'ee/reports/components/issue_body';
 import ReportSection from '~/reports/components/report_section.vue';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
@@ -46,13 +45,11 @@ export default {
     },
   },
   componentNames,
-  computed: {
+  methods: {
     handleLoadPerformanceToggleEvent() {
-      return once(() => {
-        if (this.glFeatures.usageDataITestingLoadPerformanceWidgetTotal) {
-          api.trackRedisHllUserEvent(this.$options.expandEvent);
-        }
-      });
+      if (this.glFeatures.usageDataITestingLoadPerformanceWidgetTotal) {
+        api.trackRedisHllUserEvent(this.$options.expandEvent);
+      }
     },
   },
   expandEvent: 'i_testing_load_performance_widget_total',
@@ -71,6 +68,6 @@ export default {
     :component="$options.componentNames.PerformanceIssueBody"
     should-emit-toggle-event
     class="js-load-performance-widget mr-widget-border-top mr-report"
-    @toggleEvent="handleLoadPerformanceToggleEvent"
+    @toggleEvent.once="handleLoadPerformanceToggleEvent"
   />
 </template>
