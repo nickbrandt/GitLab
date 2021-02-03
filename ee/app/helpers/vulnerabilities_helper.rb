@@ -74,4 +74,8 @@ module VulnerabilitiesHelper
 
     data
   end
+
+  def vulnerability_scan_data?(vulnerability)
+    vulnerability.scanner.present? || vulnerability.scan.present?
+  end
 end
