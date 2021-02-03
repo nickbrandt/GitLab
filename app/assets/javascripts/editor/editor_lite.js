@@ -137,26 +137,34 @@ export default class EditorLite {
   static convertMonacoToELInstance = (inst) => {
     const decoratedInstance = inst;
     decoratedInstance.updateModelLanguage = (path) => {
-      const lang = EditorLite.getModelLanguage(path);
-      const model = decoratedInstance.getModel();
-      return monacoEditor.setModelLanguage(model, lang);
+      return EditorLite.instanceUpdateLanguage(inst, path);
     };
     decoratedInstance.use = (exts = []) => {
-      const extensions = Array.isArray(exts) ? exts : [exts];
-      extensions.forEach((extension) => {
-        EditorLite.mixIntoInstance(extension, decoratedInstance);
-      });
-      return decoratedInstance;
+      return EditorLite.instanceApplyExtension(inst, exts);
     };
     return decoratedInstance;
   };
 
-  static removeInstanceFromRegistry(editor, instance) {
+  static instanceUpdateLanguage(inst, path) {
+    const lang = EditorLite.getModelLanguage(path);
+    const model = inst.getModel();
+    return monacoEditor.setModelLanguage(model, lang);
+  }
+
+  static instanceApplyExtension(inst, exts = []) {
+    const extensions = Array.isArray(exts) ? exts : [exts];
+    extensions.forEach((extension) => {
+      EditorLite.mixIntoInstance(extension, inst);
+    });
+    return inst;
+  }
+
+  static instanceRemoveFromRegistry(editor, instance) {
     const index = editor.instances.findIndex((inst) => inst === instance);
     editor.instances.splice(index, 1);
   }
 
-  static disposeInstanceModels(editor, instance, model) {
+  static instanceDisposeModels(editor, instance, model) {
     const instanceModel = instance.getModel() || model;
     if (!instanceModel) {
       return;
@@ -216,8 +224,8 @@ export default class EditorLite {
     }
 
     instance.onDidDispose(() => {
-      EditorLite.removeInstanceFromRegistry(this, instance);
-      EditorLite.disposeInstanceModels(this, instance, model);
+      EditorLite.instanceRemoveFromRegistry(this, instance);
+      EditorLite.instanceDisposeModels(this, instance, model);
     });
 
     EditorLite.manageDefaultExtensions(instance, el, extensions);
