@@ -7,8 +7,8 @@ description: 'GrahpQL API architecture foundation'
 
 # GraphQL API
 
-[GraphQL](https://graphql.org/) is an open-source data query and manipulation
-language for APIs, and a runtime for fulfilling queries with existing data.
+[GraphQL](https://graphql.org/) is a data query and manipulation language for
+APIs, and a runtime for fulfilling queries with existing data.
 
 At GitLab we want to adopt GraphQL to make it easier for the wider community to
 interact with GitLab in a reliable way, but also to advance our own product by
@@ -39,7 +39,7 @@ Amongst small improvement to the GraphQL engine itself we want to build a
 comprehensive monitoring dashboard, that will enable team members to make sense
 of what is happening inside our GraphQL API. We want to make it possible to define
 SLOs, triage breached SLIs and to be able to zoom into relevant details using
-Grafana and Elastic.
+Grafana and Elastic. We want to see historical data and predict future usage.
 
 It is an opporunity to learn from our experience in evolving the REST API, for
 the scale, and to apply this knowledge onto the GraphQL development efforts. We
@@ -65,10 +65,10 @@ Being able to see how GraphQL performs in a production environment is a
 prerequisite for improving performance and reliability of that service.
 
 We do not yet have tools that would make it possible for us to answer a
-question of how GraphQL performs and what are the bottlenecks we should
-optimize. This, combined with a pace of GraphQL adoption and the scale in which
-we expect it operate, imposes a risk of an increased rate of production
-incidents what will be difficult to resolve.
+question of how GraphQL performs and what the bottlenecks we should optimize
+are. This, combined with a pace of GraphQL adoption and the scale in which we
+expect it operate, imposes a risk of an increased rate of production incidents
+what will be difficult to resolve.
 
 We want to build a comprehensive Grafana dashboard that will focus on
 delivering insights of how GraphQL endpoint performs, while still empowering
@@ -79,6 +79,8 @@ detected early.
 
 - Build a comprehensive Grafana dashboard for GraphQL
 - Build a GraphQL query-to-feature correlation mechanisms
+- Improve logging GraphQL queries in Elastic
+- Redesign error handling on frontend to surface warnings
 
 ### Manage volatile GraphQL data structures
 
@@ -88,10 +90,12 @@ GraphQL is. On the other hand this is also a reason why versioning of GraphQL
 APIs is considered unnecessary. Instead of versioning the API we want to mark
 some fields as deprecated, but we need to have a way to understand what is the
 usage of deprecated fields, types and a way to visualize it in a way that is
-easy to understand.
+easy to understand. We might want to detect usage of deprecated fields and
+notify users about that we plan to remove them.
 
-- Define a deprecation policy that will serve our users better
-- Build a dashboard showing usage of deprecated GraphQL fields
+- Define a data-informed deprecation policy that will serve our users better
+- Build a dashboard showing usage frequency of deprecated GraphQL fields
+- Build mechanisms required to send deprecated fields usage in usage ping
 
 ### Ensure consistency with the rest of the codebase
 
@@ -107,8 +111,8 @@ We have an extensive experience with evolving out REST API. We want to apply
 this knowledge onto GraphQL and make it performant and secure by default.
 
 - Design direct uploads for GraphQL
-- Make GraphQL secure by default
 - Build GraphQL query depth and complexity histograms
+- Visualize the amount of GraphQL queries reaching limits
 - Add support for GraphQL etags for existing features
 
 ### Design GraphQL interoperability with REST API
@@ -135,20 +139,21 @@ state synchronization mechanisms and hooking into existing ones.
 - Design a scalable state synchronization mechanism
 - Evaluate state synchronization through pub/sub and websockets
 - Build a generic support for GraphQL feature correlation and feature etags
+- Redesign frontend code responsible for managing shared global state
 
 ## Iterations
 
-1. Build comprehensive Grafana dashboard for GraphQL
-1. Build a scalable GraphQL state synchronization
-1. Build GraphQL feature-to-query correlation mechanisms
-1. Design a better deprecation policy and monitoring
-1. Collaborate with AppSec Team to make GraphQL secure by default
-1. Add support for direct uploads for GraphQL
-1. Categorize GraphQL data types and fields by section / stage / group
+1. [Build comprehensive Grafana dashboard for GraphQL](https://gitlab.com/groups/gitlab-com/-/epics/1343)
+1. [Improve logging of GraphQL requests in Elastic](https://gitlab.com/groups/gitlab-org/-/epics/4646)
+1. [Build a scalable state synchronization for GraphQL](https://gitlab.com/groups/gitlab-org/-/epics/5319)
+1. [Build GraphQL feature-to-query correlation mechanisms](https://gitlab.com/groups/gitlab-org/-/epics/5320)
+1. [Design a better data-informed deprecation policy](https://gitlab.com/groups/gitlab-org/-/epics/5321)
+1. [Add support for direct uploads for GraphQL](https://gitlab.com/gitlab-org/gitlab/-/issues/280819)
+1. [Review GraphQL design choices related to security](https://gitlab.com/gitlab-org/security/gitlab/-/issues/339)
 
 ## Status
 
-Current status: working on the blueprint.
+Current status: in approval, assigning DRIs.
 
 ## Who
 
