@@ -75,7 +75,7 @@ describe('ee/oncall_schedules/components/schedule/components/shifts/components/w
       });
       expect(findRotationAssignee().props('rotationAssigneeStyle')).toEqual({
         left: '52px',
-        width: '50px',
+        width: '100px',
       });
     });
   });

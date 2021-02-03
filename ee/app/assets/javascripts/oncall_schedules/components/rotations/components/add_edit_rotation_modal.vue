@@ -8,8 +8,8 @@ import {
   updateStoreAfterRotationAdd,
   updateStoreAfterRotationEdit,
 } from 'ee/oncall_schedules/utils/cache_updates';
-import { isNameFieldValid } from 'ee/oncall_schedules/utils/common_utils';
-import { LENGTH_ENUM, ASSIGNEE_COLORS_COMBO } from '../../../constants';
+import { isNameFieldValid, getParticipantsForSave } from 'ee/oncall_schedules/utils/common_utils';
+import { LENGTH_ENUM } from '../../../constants';
 import { s__, __ } from '~/locale';
 import createFlash, { FLASH_TYPES } from '~/flash';
 import usersSearchQuery from '~/graphql_shared/queries/users_search.query.graphql';
@@ -114,28 +114,26 @@ export default {
       };
     },
     rotationVariables() {
+      const {
+        name,
+        rotationLength,
+        participants,
+        startsAt: { date, time },
+      } = this.form;
+
       return {
         projectPath: this.projectPath,
         scheduleIid: this.schedule.iid,
-        name: this.form.name,
+        name,
         startsAt: {
-          date: formatDate(this.form.startsAt.date, 'yyyy-mm-dd'),
-          time: format24HourTimeStringFromInt(this.form.startsAt.time),
+          date: formatDate(date, 'yyyy-mm-dd'),
+          time: format24HourTimeStringFromInt(time),
         },
         rotationLength: {
-          ...this.form.rotationLength,
-          length: parseInt(this.form.rotationLength.length, 10),
+          ...rotationLength,
+          length: parseInt(rotationLength.length, 10),
         },
-        participants: this.form.participants.map(({ username }, index) => {
-          const colorIndex = index % ASSIGNEE_COLORS_COMBO.length;
-          const { colorWeight, colorPalette } = ASSIGNEE_COLORS_COMBO[colorIndex];
-
-          return {
-            username,
-            colorWeight,
-            colorPalette,
-          };
-        }),
+        participants: getParticipantsForSave(participants),
       };
     },
     isFormValid() {
