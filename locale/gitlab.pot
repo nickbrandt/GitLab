@@ -2096,6 +2096,9 @@ msgstr ""
 msgid "Admin Area"
 msgstr ""
 
+msgid "Admin Mode"
+msgstr ""
+
 msgid "Admin Note"
 msgstr ""
 
@@ -25871,6 +25874,9 @@ msgid "Requests Profiles"
 msgstr ""
 
 msgid "Requests to these domain(s)/address(es) on the local network will be allowed when local requests from hooks and services are not allowed. IP ranges such as 1:0:0:0:0:0:0:0/124 or 127.0.0.0/28 are supported. Domain wildcards are not supported currently. Use comma, semicolon, or newline to separate multiple entries. The allowlist can hold a maximum of 1000 entries. Domains should use IDNA encoding. Ex: example.com, 192.168.1.1, 127.0.0.0/28, xn--itlab-j1a.com."
+msgstr ""
+
+msgid "Require additional authentication for administrative tasks"
 msgstr ""
 
 msgid "Require admin approval for new sign-ups"
