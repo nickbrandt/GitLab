@@ -17,4 +17,14 @@ RSpec.describe JiraTrackerData do
     it { is_expected.to validate_length_of(:proxy_username).is_at_most(255) }
     it { is_expected.to validate_length_of(:proxy_password).is_at_most(255) }
   end
+
+  describe 'encrypted attributes' do
+    subject { described_class.encrypted_attributes.keys }
+
+    it {
+      is_expected.to contain_exactly(
+        :api_url, :password, :proxy_address, :proxy_password, :proxy_port, :proxy_username, :url, :username
+      )
+    }
+  end
 end
