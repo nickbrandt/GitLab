@@ -127,11 +127,12 @@ exports[`AlertsSettingsFormNew with default values renders the initial template 
             <label
               class="gl-display-flex gl-flex-direction-column gl-mb-0 gl-w-max-content gl-my-4 gl-font-weight-normal"
             >
-              <div
+              <span
                 class="gl-toggle-wrapper"
               >
                 <span
                   class="gl-toggle-label"
+                  data-testid="toggle-label"
                 >
                   Active
                 </span>
@@ -141,6 +142,7 @@ exports[`AlertsSettingsFormNew with default values renders the initial template 
                 <button
                   aria-label="Active"
                   class="gl-toggle"
+                  role="switch"
                   type="button"
                 >
                   <span
@@ -157,7 +159,7 @@ exports[`AlertsSettingsFormNew with default values renders the initial template 
                     </svg>
                   </span>
                 </button>
-              </div>
+              </span>
                
               <!---->
             </label>
