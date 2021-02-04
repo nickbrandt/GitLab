@@ -2,9 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe 'User edit profile', :js do
-  include Spec::Support::Helpers::Features::NotesHelpers
-
+RSpec.describe 'User searches their settings', :js do
   let(:user) { create(:user) }
   let(:search_input_placeholder) { 'Search settings' }
 
@@ -12,11 +10,7 @@ RSpec.describe 'User edit profile', :js do
     sign_in(user)
   end
 
-  context 'when seach_settings_in_page feature flag is on' do
-    before do
-      stub_feature_flags(search_settings_in_page: true)
-    end
-
+  context 'when search_settings_in_page feature flag is on' do
     it 'allows searching in the user profile page' do
       search_term = 'Public Avatar'
       hidden_section_name = 'Main settings'
@@ -46,7 +40,7 @@ RSpec.describe 'User edit profile', :js do
     end
   end
 
-  context 'when seach_settings_in_page feature flag is off' do
+  context 'when search_settings_in_page feature flag is off' do
     before do
       stub_feature_flags(search_settings_in_page: false)
       visit(profile_path)
