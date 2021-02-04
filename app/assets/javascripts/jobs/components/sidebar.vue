@@ -94,7 +94,7 @@ export default {
             <gl-link
               v-if="job.cancel_path"
               :href="job.cancel_path"
-              class="btn btn-default gl-text-decoration-none!"
+              class="btn gl-button btn-default gl-text-decoration-none!"
               data-method="post"
               data-testid="cancel-button"
               rel="nofollow"
