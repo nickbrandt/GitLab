@@ -46,9 +46,9 @@ export default {
     ...mapGetters(['hasForwardDeploymentFailure']),
     ...mapState(['job', 'stages', 'jobs', 'selectedStage']),
     retryButtonClass() {
-      let className = 'btn btn-retry';
+      let className = 'btn gl-button btn-retry gl-text-decoration-none!';
       className +=
-        this.job.status && this.job.recoverable ? ' btn-primary' : ' btn-inverted-secondary';
+        this.job.status && this.job.recoverable ? ' btn-confirm-secondary' : ' btn-default';
       return className;
     },
     hasArtifact() {
@@ -94,7 +94,7 @@ export default {
             <gl-link
               v-if="job.cancel_path"
               :href="job.cancel_path"
-              class="btn btn-default"
+              class="btn btn-default gl-text-decoration-none!"
               data-method="post"
               data-testid="cancel-button"
               rel="nofollow"
