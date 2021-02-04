@@ -1910,6 +1910,69 @@
           "possibleTypes": null
         },
         {
+          "kind": "OBJECT",
+          "name": "AlertManagementPayloadAlertField",
+          "description": "Parsed field from an alert used for custom mappings",
+          "fields": [
+            {
+              "name": "label",
+              "description": "Human-readable label of the payload path.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "path",
+              "description": "Path to value inside payload JSON.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": "Type of the parsed value.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "ENUM",
+                "name": "AlertManagementPayloadAlertFieldType",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "INPUT_OBJECT",
           "name": "AlertManagementPayloadAlertFieldInput",
           "description": "Field that are available while modifying the custom mapping attributes for an HTTP integration",
@@ -53964,6 +54027,41 @@
                 "kind": "OBJECT",
                 "name": "AlertManagementIntegrationConnection",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "alertManagementPayloadFields",
+              "description": "Extract alert fields from payload for custom mapping",
+              "args": [
+                {
+                  "name": "payloadExample",
+                  "description": "Sample payload for extracting alert fields for custom mappings.",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AlertManagementPayloadAlertField",
+                    "ofType": null
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null

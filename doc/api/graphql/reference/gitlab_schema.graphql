@@ -743,6 +743,26 @@ enum AlertManagementIntegrationType {
 }
 
 """
+Parsed field from an alert used for custom mappings
+"""
+type AlertManagementPayloadAlertField {
+  """
+  Human-readable label of the payload path.
+  """
+  label: String
+
+  """
+  Path to value inside payload JSON.
+  """
+  path: [String!]
+
+  """
+  Type of the parsed value.
+  """
+  type: AlertManagementPayloadAlertFieldType
+}
+
+"""
 Field that are available while modifying the custom mapping attributes for an HTTP integration
 """
 input AlertManagementPayloadAlertFieldInput {
@@ -18311,6 +18331,16 @@ type Project {
     """
     last: Int
   ): AlertManagementIntegrationConnection
+
+  """
+  Extract alert fields from payload for custom mapping
+  """
+  alertManagementPayloadFields(
+    """
+    Sample payload for extracting alert fields for custom mappings.
+    """
+    payloadExample: String!
+  ): [AlertManagementPayloadAlertField!]
 
   """
   If `only_allow_merge_if_pipeline_succeeds` is true, indicates if merge
