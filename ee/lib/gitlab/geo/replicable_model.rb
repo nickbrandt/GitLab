@@ -72,14 +72,14 @@ module Gitlab
       #
       # @return [Boolean] whether it can generate a checksum
       def checksummable?
-        local? && file_exist?
+        replicator.carrierwave_uploader.file_storage? && file_exist?
       end
 
       # This checks for existence of the file on storage
       #
       # @return [Boolean] whether the file exists on storage
       def file_exist?
-        if local?
+        if replicator.carrierwave_uploader.file_storage?
           File.exist?(replicator.carrierwave_uploader.path)
         else
           replicator.carrierwave_uploader.exists?

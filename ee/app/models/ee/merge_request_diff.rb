@@ -59,8 +59,8 @@ module EE
       super || build_merge_request_diff_detail
     end
 
-    def local?
-      stored_externally? && external_diff_store == ExternalDiffUploader::Store::LOCAL
+    def checksummable?
+      stored_externally? && super
     end
 
     def log_geo_deleted_event
