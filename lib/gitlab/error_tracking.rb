@@ -101,35 +101,17 @@ module Gitlab
       end
 
       def process_exception(exception, sentry: false, logging: true, extra:)
-        exception.try(:sentry_extra_data)&.tap do |data|
-          extra = extra.merge(data) if data.is_a?(Hash)
-        end
-
-        extra = sanitize_request_parameters(extra)
+        extra = build_exception_extra(exception, extra)
 
         if sentry && Raven.configuration.server
           Raven.capture_exception(exception, extra: extra)
         end
 
         if logging
-          # TODO: this logic could migrate into `Gitlab::ExceptionLogFormatter`
-          # and we could also flatten deep nested hashes if required for search
-          # (e.g. if `extra` includes hash of hashes).
-          # In the current implementation, we don't flatten multi-level folded hashes.
           log_hash = {}
-          Raven.context.tags.each { |name, value| log_hash["tags.#{name}"] = value }
-          Raven.context.user.each { |name, value| log_hash["user.#{name}"] = value }
-          Raven.context.extra.merge(extra).each { |name, value| log_hash["extra.#{name}"] = value }
-
-          Gitlab::ExceptionLogFormatter.format!(exception, log_hash)
-
+          Gitlab::ErrorTracking::LogFormatter.format!(exception, extra, log_hash)
           Gitlab::ErrorTracking::Logger.error(log_hash)
         end
-      end
-
-      def sanitize_request_parameters(parameters)
-        filter = ActiveSupport::ParameterFilter.new(::Rails.application.config.filter_parameters)
-        filter.filter(parameters)
       end
 
       def sentry_dsn
@@ -158,6 +140,21 @@ module Gitlab
         else
           inject_context_for_exception(event, ex.cause) if ex.cause.present?
         end
+      end
+
+      def build_exception_extra(exception, extra)
+        inline_extra = exception.try(:sentry_extra_data)
+        if inline_extra.present? && inline_extra.is_a?(Hash)
+          extra = extra.merge(inline_extra)
+        end
+
+        extra = sanitize_request_parameters(extra)
+        extra
+      end
+
+      def sanitize_request_parameters(parameters)
+        filter = ActiveSupport::ParameterFilter.new(::Rails.application.config.filter_parameters)
+        filter.filter(parameters)
       end
     end
   end
