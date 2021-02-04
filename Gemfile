@@ -15,7 +15,7 @@ gem 'default_value_for', '~> 3.4.0'
 # Supported DBs
 gem 'pg', '~> 1.1'
 
-gem 'rugged', '~> 0.28'
+gem 'rugged', '~> 1.0.1'
 gem 'grape-path-helpers', '~> 1.6.1'
 
 gem 'faraday', '~> 1.0'
@@ -266,7 +266,7 @@ gem 'babosa', '~> 1.0.2'
 gem 'loofah', '~> 2.2'
 
 # Working with license
-gem 'licensee', '~> 8.9'
+gem 'licensee', '~> 9.14.1'
 
 # Detect and convert string character encoding
 gem 'charlock_holmes', '~> 0.7.7'
@@ -350,7 +350,7 @@ end
 
 group :development, :test do
   gem 'deprecation_toolkit', '~> 1.5.1', require: false
-  gem 'bullet', '~> 6.1.0'
+  gem 'bullet', '~> 6.1.3'
   gem 'gitlab-pry-byebug', platform: :mri, require: ['pry-byebug', 'pry-byebug/pry_remote_ext']
   gem 'pry-rails', '~> 0.3.9'
   gem 'pry-remote'

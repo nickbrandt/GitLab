@@ -3152,6 +3152,9 @@ msgstr ""
 msgid "An error occurred while fetching branches.  Retry the search."
 msgstr ""
 
+msgid "An error occurred while fetching codequality mr diff reports."
+msgstr ""
+
 msgid "An error occurred while fetching commits.  Retry the search."
 msgstr ""
 
@@ -13627,9 +13630,6 @@ msgstr ""
 msgid "Go full screen"
 msgstr ""
 
-msgid "Go to %{strongStart}Issues%{strongEnd} &gt; %{strongStart}Boards%{strongEnd} to access your personalized learning issue board."
-msgstr ""
-
 msgid "Go to Integrations"
 msgstr ""
 
@@ -14519,9 +14519,6 @@ msgid "Helps reduce alert volume (e.g. if creating too many issues)"
 msgstr ""
 
 msgid "Helps reduce request volume for protected paths"
-msgstr ""
-
-msgid "Here are all your projects in your group, including the one you just created. To start, let’s take a look at your personalized learning project which will help you learn about GitLab at your own pace."
 msgstr ""
 
 msgid "Here you will find recent merge request activity"
@@ -15905,6 +15902,9 @@ msgid "Integrations|Standard"
 msgstr ""
 
 msgid "Integrations|This integration, and inheriting projects were reset."
+msgstr ""
+
+msgid "Integrations|This requires mirroring your GitHub repository to this project. %{docs_link}"
 msgstr ""
 
 msgid "Integrations|To keep this project going, create a new issue."
@@ -23918,6 +23918,9 @@ msgstr ""
 msgid "Re-authentication required"
 msgstr ""
 
+msgid "Re-request review"
+msgstr ""
+
 msgid "Re-verification interval"
 msgstr ""
 
@@ -24735,6 +24738,9 @@ msgid "Requested %{time_ago}"
 msgstr ""
 
 msgid "Requested design version does not exist."
+msgstr ""
+
+msgid "Requested review"
 msgstr ""
 
 msgid "Requested states are invalid"
