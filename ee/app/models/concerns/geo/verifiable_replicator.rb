@@ -138,7 +138,7 @@ module Geo
     # state.
     def verify
       verification_state_tracker.track_checksum_attempt! do
-        model_record.calculate_checksum
+        calculate_checksum
       end
     end
 
@@ -165,12 +165,24 @@ module Geo
       Gitlab::Geo.secondary? ? registry : model_record
     end
 
+    # @abstract
+    # @return [String] a checksum representing the data
+    def calculate_checksum
+      raise NotImplementedError, "#{self.class} does not implement #{__method__}"
+    end
+
     private
 
     def should_primary_verify?
       self.class.verification_enabled? &&
        primary_checksum.nil? && # Some models may populate this as part of creating the record
-       model_record.checksummable?
+       checksummable?
+    end
+
+    # @abstract
+    # @return [Boolean] whether the replicable is capable of checksumming itself
+    def checksummable?
+      raise NotImplementedError, "#{self.class} does not implement #{__method__}"
     end
   end
 end
