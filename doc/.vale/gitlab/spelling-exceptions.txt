@@ -586,11 +586,14 @@ swimlane
 swimlanes
 syncable
 Sysbench
+syscall
+syscalls
 syslog
 tanuki
 tcpdump
 templated
 Thanos
+Thoughtbot
 throughputs
 Tiller
 timebox
@@ -609,6 +612,7 @@ toolkits
 tooltip
 tooltips
 transpile
+transpiled
 transpiles
 transpiling
 Trello
@@ -640,6 +644,7 @@ unchecks
 uncomment
 uncommented
 uncommenting
+uncordon
 unencode
 unencoded
 unencoder
