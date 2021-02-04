@@ -15696,6 +15696,10 @@ enum MergeRequestState {
   all
   closed
   locked
+
+  """
+  Merge Request has been merged
+  """
   merged
   opened
 }
