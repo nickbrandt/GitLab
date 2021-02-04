@@ -299,8 +299,11 @@ RSpec.shared_examples 'a verifiable replicator' do
 
   describe '#after_verifiable_update' do
     it 'calls verify_async if needed' do
+      allow(described_class).to receive(:verification_enabled?).and_return(true)
+      allow(replicator).to receive(:primary_checksum).and_return(nil)
+      allow(model_record).to receive(:checksummable?).and_return(true)
+
       expect(replicator).to receive(:verify_async)
-      expect(replicator).to receive(:needs_checksum?).and_return(true)
 
       replicator.after_verifiable_update
     end

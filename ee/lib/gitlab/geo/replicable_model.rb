@@ -57,17 +57,6 @@ module Gitlab
         self.class.hexdigest(replicator.carrierwave_uploader.path)
       end
 
-      # Checks whether model needs checksum to be performed
-      #
-      # Conditions:
-      # - No checksum is present
-      # - It's capable of generating a checksum of itself
-      #
-      # @return [Boolean]
-      def needs_checksum?
-        verification_checksum.nil? && checksummable?
-      end
-
       # Return whether its capable of generating a checksum of itself
       #
       # @return [Boolean] whether it can generate a checksum
