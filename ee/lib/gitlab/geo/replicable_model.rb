@@ -75,15 +75,15 @@ module Gitlab
         replicator.carrierwave_uploader.file_storage? && file_exist?
       end
 
-      # This checks for existence of the file on storage
+      # Returns whether the file exists on disk or in remote storage
       #
-      # @return [Boolean] whether the file exists on storage
+      # Does a hard check because we are doing these checks for replication or
+      # verification purposes, so we should not just trust the data in the DB if
+      # we don't absolutely have to.
+      #
+      # @return [Boolean] whether the file exists on disk or in remote storage
       def file_exist?
-        if replicator.carrierwave_uploader.file_storage?
-          File.exist?(replicator.carrierwave_uploader.path)
-        else
-          replicator.carrierwave_uploader.exists?
-        end
+        replicator.carrierwave_uploader.file.exists?
       end
 
       def in_replicables_for_current_secondary?
