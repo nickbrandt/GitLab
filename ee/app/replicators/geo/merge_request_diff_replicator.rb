@@ -15,9 +15,5 @@ module Geo
     def carrierwave_uploader
       model_record.external_diff
     end
-
-    def needs_checksum?
-      false
-    end
   end
 end
