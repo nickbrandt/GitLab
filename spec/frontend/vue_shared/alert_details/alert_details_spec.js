@@ -4,17 +4,14 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import waitForPromises from 'helpers/wait_for_promises';
-import AlertDetails from '~/alert_management/components/alert_details.vue';
-import AlertSummaryRow from '~/alert_management/components/alert_summary_row.vue';
-import {
-  ALERTS_SEVERITY_LABELS,
-  trackAlertsDetailsViewsOptions,
-} from '~/alert_management/constants';
-import createIssueMutation from '~/alert_management/graphql/mutations/create_issue_from_alert.mutation.graphql';
+import AlertDetails from '~/vue_shared/alert_details/components/alert_details.vue';
+import AlertSummaryRow from '~/vue_shared/alert_details/components/alert_summary_row.vue';
+import { SEVERITY_LEVELS } from '~/vue_shared/alert_details/constants';
+import createIssueMutation from '~/vue_shared/alert_details/graphql/mutations/alert_issue_create.mutation.graphql';
 import { joinPaths } from '~/lib/utils/url_utility';
 import Tracking from '~/tracking';
 import AlertDetailsTable from '~/vue_shared/components/alert_details_table.vue';
-import mockAlerts from '../mocks/alerts.json';
+import mockAlerts from './mocks/alerts.json';
 
 const mockAlert = mockAlerts[0];
 const environmentName = 'Production';
@@ -29,7 +26,13 @@ describe('AlertDetails', () => {
   const projectId = '1';
   const $router = { replace: jest.fn() };
 
-  function mountComponent({ data, loading = false, mountMethod = shallowMount, stubs = {} } = {}) {
+  function mountComponent({
+    data,
+    loading = false,
+    mountMethod = shallowMount,
+    provide = {},
+    stubs = {},
+  } = {}) {
     wrapper = extendedWrapper(
       mountMethod(AlertDetails, {
         provide: {
@@ -37,6 +40,7 @@ describe('AlertDetails', () => {
           projectPath,
           projectIssuesPath,
           projectId,
+          ...provide,
         },
         data() {
           return {
@@ -112,9 +116,7 @@ describe('AlertDetails', () => {
       });
 
       it('renders severity', () => {
-        expect(wrapper.findByTestId('severity').text()).toBe(
-          ALERTS_SEVERITY_LABELS[mockAlert.severity],
-        );
+        expect(wrapper.findByTestId('severity').text()).toBe(SEVERITY_LEVELS[mockAlert.severity]);
       });
 
       it('renders a title', () => {
@@ -321,16 +323,27 @@ describe('AlertDetails', () => {
   });
 
   describe('Snowplow tracking', () => {
+    const mountOptions = {
+      props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
+      data: { alert: mockAlert },
+      loading: false,
+    };
+
     beforeEach(() => {
       jest.spyOn(Tracking, 'event');
-      mountComponent({
-        props: { alertManagementEnabled: true, userCanEnableAlertManagement: true },
-        data: { alert: mockAlert },
-        loading: false,
-      });
     });
 
-    it('should track alert details page views', () => {
+    it('should not track alert details page views when the tracking options do not exist', () => {
+      mountComponent(mountOptions);
+      expect(Tracking.event).not.toHaveBeenCalled();
+    });
+
+    it('should track alert details page views when the tracking options exist', () => {
+      const trackAlertsDetailsViewsOptions = {
+        category: 'Alert Management',
+        action: 'view_alert_details',
+      };
+      mountComponent({ ...mountOptions, provide: { trackAlertsDetailsViewsOptions } });
       const { category, action } = trackAlertsDetailsViewsOptions;
       expect(Tracking.event).toHaveBeenCalledWith(category, action);
     });

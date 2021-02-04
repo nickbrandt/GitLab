@@ -21,11 +21,11 @@ import { visitUrl, joinPaths } from '~/lib/utils/url_utility';
 import Tracking from '~/tracking';
 import { toggleContainerClasses } from '~/lib/utils/dom_utils';
 import AlertDetailsTable from '~/vue_shared/components/alert_details_table.vue';
-import alertQuery from '../graphql/queries/details.query.graphql';
-import sidebarStatusQuery from '../graphql/queries/sidebar_status.query.graphql';
-import { ALERTS_SEVERITY_LABELS, trackAlertsDetailsViewsOptions } from '../constants';
-import createIssueMutation from '../graphql/mutations/create_issue_from_alert.mutation.graphql';
-import toggleSidebarStatusMutation from '../graphql/mutations/toggle_sidebar_status.mutation.graphql';
+import alertQuery from '../graphql/queries/alert_details.query.graphql';
+import sidebarStatusQuery from '../graphql/queries/alert_sidebar_status.query.graphql';
+import { SEVERITY_LEVELS } from '../constants';
+import createIssueMutation from '../graphql/mutations/alert_issue_create.mutation.graphql';
+import toggleSidebarStatusMutation from '../graphql/mutations/alert_sidebar_status.mutation.graphql';
 import SystemNote from './system_notes/system_note.vue';
 import AlertSidebar from './alert_sidebar.vue';
 import AlertMetrics from './alert_metrics.vue';
@@ -44,7 +44,7 @@ export default {
   directives: {
     SafeHtml: GlSafeHtmlDirective,
   },
-  severityLabels: ALERTS_SEVERITY_LABELS,
+  severityLabels: SEVERITY_LEVELS,
   tabsConfig: [
     {
       id: 'overview',
@@ -88,6 +88,9 @@ export default {
     },
     projectIssuesPath: {
       default: '',
+    },
+    trackAlertsDetailsViewsOptions: {
+      default: null,
     },
   },
   apollo: {
@@ -155,7 +158,9 @@ export default {
     },
   },
   mounted() {
-    this.trackPageViews();
+    if (this.trackAlertsDetailsViewsOptions) {
+      this.trackPageViews();
+    }
     toggleContainerClasses(containerEl, {
       'issuable-bulk-update-sidebar': true,
       'right-sidebar-expanded': true,
@@ -217,7 +222,7 @@ export default {
       return joinPaths(this.projectIssuesPath, issueId);
     },
     trackPageViews() {
-      const { category, action } = trackAlertsDetailsViewsOptions;
+      const { category, action } = this.trackAlertsDetailsViewsOptions;
       Tracking.event(category, action);
     },
   },

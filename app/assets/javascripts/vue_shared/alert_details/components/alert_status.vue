@@ -2,8 +2,7 @@
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Tracking from '~/tracking';
-import updateAlertStatusMutation from '~/graphql_shared/mutations/update_alert_status.mutation.graphql';
-import { trackAlertStatusUpdateOptions } from '../constants';
+import updateAlertStatusMutation from '~/graphql_shared/mutations/alert_status_update.mutation.graphql';
 
 export default {
   i18n: {
@@ -20,6 +19,11 @@ export default {
   components: {
     GlDropdown,
     GlDropdownItem,
+  },
+  inject: {
+    trackAlertStatusUpdateOptions: {
+      default: null,
+    },
   },
   props: {
     projectPath: {
@@ -58,7 +62,9 @@ export default {
           },
         })
         .then((resp) => {
-          this.trackStatusUpdate(status);
+          if (this.trackAlertStatusUpdateOptions) {
+            this.trackStatusUpdate(status);
+          }
           const errors = resp.data?.updateAlertStatus?.errors || [];
 
           if (errors[0]) {
@@ -81,7 +87,7 @@ export default {
         });
     },
     trackStatusUpdate(status) {
-      const { category, action, label } = trackAlertStatusUpdateOptions;
+      const { category, action, label } = this.trackAlertStatusUpdateOptions;
       Tracking.event(category, action, { label, property: status });
     },
   },
