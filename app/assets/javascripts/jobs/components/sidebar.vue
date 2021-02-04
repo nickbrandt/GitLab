@@ -115,7 +115,7 @@ export default {
           <gl-link
             v-if="job.new_issue_path"
             :href="job.new_issue_path"
-            class="btn btn-success btn-inverted float-left mr-2"
+            class="btn gl-button btn-success-secondary float-left mr-2 gl-text-decoration-none!"
             data-testid="job-new-issue"
             >{{ $options.i18n.newIssue }}
           </gl-link>
