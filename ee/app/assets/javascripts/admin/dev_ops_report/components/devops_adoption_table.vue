@@ -229,11 +229,11 @@ export default {
 
       <template #cell(actions)="{ item }">
         <div :data-testid="$options.testids.ACTIONS">
-          <gl-button :id="popoverId(item.name)" category="tertiary" icon="ellipsis_h" />
-          <div :id="popoverContainerId(item.name)">
+          <gl-button :id="popoverId(item.id)" category="tertiary" icon="ellipsis_h" />
+          <div :id="popoverContainerId(item.id)">
             <gl-popover
-              :target="popoverId(item.name)"
-              :container="popoverContainerId(item.name)"
+              :target="popoverId(item.id)"
+              :container="popoverContainerId(item.id)"
               triggers="hover focus"
               placement="left"
             >
