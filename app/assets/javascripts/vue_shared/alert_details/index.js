@@ -4,14 +4,15 @@ import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import createDefaultClient from '~/lib/graphql';
 import AlertDetails from './components/alert_details.vue';
-import sidebarStatusQuery from './graphql/queries/sidebar_status.query.graphql';
+import sidebarStatusQuery from './graphql/queries/alert_sidebar_status.query.graphql';
 import createRouter from './router';
+import { DEFAULT_PAGE, PAGE_CONFIG } from './constants';
 
 Vue.use(VueApollo);
 
 export default (selector) => {
   const domEl = document.querySelector(selector);
-  const { alertId, projectPath, projectIssuesPath, projectId } = domEl.dataset;
+  const { alertId, projectPath, projectIssuesPath, projectId, page = DEFAULT_PAGE } = domEl.dataset;
   const router = createRouter();
 
   const resolvers = {
@@ -48,18 +49,28 @@ export default (selector) => {
     },
   });
 
+  const provide = {
+    projectPath,
+    alertId,
+    projectIssuesPath,
+    projectId,
+  };
+
+  if (page === DEFAULT_PAGE) {
+    const { TRACK_ALERTS_DETAILS_VIEWS_OPTIONS, TRACK_ALERT_STATUS_UPDATE_OPTIONS } = PAGE_CONFIG[
+      page
+    ];
+    provide.trackAlertsDetailsViewsOptions = TRACK_ALERTS_DETAILS_VIEWS_OPTIONS;
+    provide.trackAlertStatusUpdateOptions = TRACK_ALERT_STATUS_UPDATE_OPTIONS;
+  }
+
   // eslint-disable-next-line no-new
   new Vue({
     el: selector,
     components: {
       AlertDetails,
     },
-    provide: {
-      projectPath,
-      alertId,
-      projectIssuesPath,
-      projectId,
-    },
+    provide,
     apolloProvider,
     router,
     render(createElement) {

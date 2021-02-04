@@ -1,11 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import waitForPromises from 'helpers/wait_for_promises';
-import { trackAlertStatusUpdateOptions } from '~/alert_management/constants';
-import AlertManagementStatus from '~/alert_management/components/alert_status.vue';
-import updateAlertStatusMutation from '~/graphql_shared/mutations/update_alert_status.mutation.graphql';
+import AlertManagementStatus from '~/vue_shared/alert_details/components/alert_status.vue';
+import updateAlertStatusMutation from '~/graphql_shared//mutations/alert_status_update.mutation.graphql';
 import Tracking from '~/tracking';
-import mockAlerts from '../mocks/alerts.json';
+import mockAlerts from './mocks/alerts.json';
 
 const mockAlert = mockAlerts[0];
 
@@ -20,7 +19,7 @@ describe('AlertManagementStatus', () => {
     return waitForPromises();
   };
 
-  function mountComponent({ props = {}, loading = false, stubs = {} } = {}) {
+  function mountComponent({ props = {}, provide = {}, loading = false, stubs = {} } = {}) {
     wrapper = shallowMount(AlertManagementStatus, {
       propsData: {
         alert: { ...mockAlert },
@@ -28,6 +27,7 @@ describe('AlertManagementStatus', () => {
         isSidebar: false,
         ...props,
       },
+      provide,
       mocks: {
         $apollo: {
           mutate: jest.fn(),
@@ -134,10 +134,25 @@ describe('AlertManagementStatus', () => {
   describe('Snowplow tracking', () => {
     beforeEach(() => {
       jest.spyOn(Tracking, 'event');
-      mountComponent({});
     });
 
-    it('should track alert status updates', () => {
+    it('should not track alert status updates when the tracking options do not exist', () => {
+      mountComponent({});
+      Tracking.event.mockClear();
+      jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue({});
+      findFirstStatusOption().vm.$emit('click');
+      setImmediate(() => {
+        expect(Tracking.event).not.toHaveBeenCalled();
+      });
+    });
+
+    it('should track alert status updates when the tracking options exist', () => {
+      const trackAlertStatusUpdateOptions = {
+        category: 'Alert Management',
+        action: 'update_alert_status',
+        label: 'Status',
+      };
+      mountComponent({ provide: { trackAlertStatusUpdateOptions } });
       Tracking.event.mockClear();
       jest.spyOn(wrapper.vm.$apollo, 'mutate').mockResolvedValue({});
       findFirstStatusOption().vm.$emit('click');
