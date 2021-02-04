@@ -14,6 +14,8 @@ describe('StatesTable', () => {
         _showDetails: true,
         errorMessages: ['State 1 has errored'],
         name: 'state-1',
+        loadingLock: false,
+        loadingRemove: false,
         lockedAt: '2020-10-13T00:00:00Z',
         lockedByUser: {
           name: 'user-1',
@@ -22,9 +24,11 @@ describe('StatesTable', () => {
         latestVersion: null,
       },
       {
-        _showDetails: false,
+        _showDetails: true,
         errorMessages: [],
         name: 'state-2',
+        loadingLock: false,
+        loadingRemove: true,
         lockedAt: null,
         lockedByUser: null,
         updatedAt: '2020-10-10T00:00:00Z',
@@ -34,6 +38,8 @@ describe('StatesTable', () => {
         _showDetails: false,
         errorMessages: [],
         name: 'state-3',
+        loadingLock: false,
+        loadingRemove: false,
         lockedAt: '2020-10-10T00:00:00Z',
         lockedByUser: {
           name: 'user-2',
@@ -63,6 +69,8 @@ describe('StatesTable', () => {
         _showDetails: true,
         errorMessages: ['State 4 has errored'],
         name: 'state-4',
+        loadingLock: false,
+        loadingRemove: false,
         lockedAt: '2020-10-10T00:00:00Z',
         lockedByUser: null,
         updatedAt: '2020-10-10T00:00:00Z',
@@ -163,14 +171,15 @@ describe('StatesTable', () => {
   });
 
   it.each`
-    errorMessage                               | lineNumber
-    ${defaultProps.states[0].errorMessages[0]} | ${0}
-    ${defaultProps.states[3].errorMessages[0]} | ${1}
-  `('displays table error message "$errorMessage"', ({ errorMessage, lineNumber }) => {
-    const states = wrapper.findAll('[data-testid="terraform-states-table-error"]');
+    alertMessage                                  | lineNumber
+    ${defaultProps.states[0].errorMessages[0]}    | ${0}
+    ${'Removing state-2 and all of its versions'} | ${1}
+    ${defaultProps.states[3].errorMessages[0]}    | ${2}
+  `('displays table error message "$alertMessage"', ({ alertMessage, lineNumber }) => {
+    const states = wrapper.findAll('[data-testid="terraform-states-table-row-message"]');
     const state = states.at(lineNumber);
 
-    expect(state.text()).toBe(errorMessage);
+    expect(state.text()).toMatchInterpolatedText(alertMessage);
   });
 
   describe('when user is a terraform administrator', () => {

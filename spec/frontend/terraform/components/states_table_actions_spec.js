@@ -64,6 +64,11 @@ describe('StatesTableActions', () => {
       localVue,
       propsData,
       stubs: { GlDropdown, GlModal, GlSprintf },
+      mocks: {
+        $toast: {
+          show: jest.fn(),
+        },
+      },
     });
 
     return wrapper.vm.$nextTick();
@@ -89,17 +94,34 @@ describe('StatesTableActions', () => {
   });
 
   describe('when the state is loading', () => {
-    beforeEach(() => {
-      return createComponent({
-        state: {
-          ...defaultProps.state,
-          loadingActions: true,
-        },
+    describe('when lock/unlock is processing', () => {
+      beforeEach(() => {
+        return createComponent({
+          state: {
+            ...defaultProps.state,
+            loadingLock: true,
+          },
+        });
+      });
+
+      it('disables the actions dropdown', () => {
+        expect(findActionsDropdown().props('disabled')).toBe(true);
       });
     });
 
-    it('disables the actions dropdown', () => {
-      expect(findActionsDropdown().props('disabled')).toBe(true);
+    describe('when remove is processing', () => {
+      beforeEach(() => {
+        return createComponent({
+          state: {
+            ...defaultProps.state,
+            loadingRemove: true,
+          },
+        });
+      });
+
+      it('disables the actions dropdown', () => {
+        expect(findActionsDropdown().props('disabled')).toBe(true);
+      });
     });
   });
 
@@ -188,7 +210,8 @@ describe('StatesTableActions', () => {
               ...unlockedProps.state,
               _showDetails: false,
               errorMessages: [],
-              loadingActions: true,
+              loadingLock: true,
+              loadingRemove: false,
             },
           },
           // Apollo fields
@@ -205,7 +228,8 @@ describe('StatesTableActions', () => {
               ...unlockedProps.state,
               _showDetails: true,
               errorMessages: ['There was an error'],
-              loadingActions: false,
+              loadingLock: false,
+              loadingRemove: false,
             },
           },
           // Apollo fields
@@ -235,21 +259,67 @@ describe('StatesTableActions', () => {
       });
 
       describe('when submitting the remove modal', () => {
-        it('does not call the remove mutation when state name is missing', async () => {
-          findRemoveModal().vm.$emit('ok');
-          await wrapper.vm.$nextTick();
+        describe('when state name is missing', () => {
+          beforeEach(() => {
+            findRemoveModal().vm.$emit('ok');
 
-          expect(removeResponse).not.toHaveBeenCalledWith();
+            return waitForPromises();
+          });
+
+          it('does not call the remove mutation', () => {
+            expect(removeResponse).not.toHaveBeenCalledWith();
+          });
         });
 
-        it('calls the remove mutation when state name is present', async () => {
-          await wrapper.setData({ removeConfirmText: defaultProps.state.name });
+        describe('when state name is present', () => {
+          beforeEach(async () => {
+            await wrapper.setData({ removeConfirmText: defaultProps.state.name });
 
-          findRemoveModal().vm.$emit('ok');
-          await wrapper.vm.$nextTick();
+            findRemoveModal().vm.$emit('ok');
 
-          expect(removeResponse).toHaveBeenCalledWith({
-            stateID: defaultProps.state.id,
+            await waitForPromises();
+          });
+
+          it('calls the remove mutation', async () => {
+            expect(removeResponse).toHaveBeenCalledWith({ stateID: defaultProps.state.id });
+          });
+
+          it('calls mutations to set loading and errors', () => {
+            // loading update
+            expect(updateStateResponse).toHaveBeenNthCalledWith(
+              1,
+              {},
+              {
+                terraformState: {
+                  ...defaultProps.state,
+                  _showDetails: true,
+                  errorMessages: [],
+                  loadingLock: false,
+                  loadingRemove: true,
+                },
+              },
+              // Apollo fields
+              expect.any(Object),
+              expect.any(Object),
+            );
+
+            // final update
+            expect(updateStateResponse).toHaveBeenNthCalledWith(
+              2,
+              {},
+              {
+                terraformState: {
+                  ...defaultProps.state,
+                  _showDetails: false,
+                  errorMessages: [],
+                  loadingLock: false,
+                  loadingRemove: false,
+                },
+              },
+              // Apollo fields
+              expect.any(Object),
+              expect.any(Object),
+            );
           });
         });
       });

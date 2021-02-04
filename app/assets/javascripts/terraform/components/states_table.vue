@@ -1,5 +1,14 @@
 <script>
-import { GlAlert, GlBadge, GlIcon, GlLink, GlSprintf, GlTable, GlTooltip } from '@gitlab/ui';
+import {
+  GlAlert,
+  GlBadge,
+  GlIcon,
+  GlLink,
+  GlLoadingIcon,
+  GlSprintf,
+  GlTable,
+  GlTooltip,
+} from '@gitlab/ui';
 import { s__ } from '~/locale';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import CiBadge from '~/vue_shared/components/ci_badge_link.vue';
@@ -14,6 +23,7 @@ export default {
     GlBadge,
     GlIcon,
     GlLink,
+    GlLoadingIcon,
     GlSprintf,
     GlTable,
     GlTooltip,
@@ -69,6 +79,7 @@ export default {
     lockedByUser: s__('Terraform|Locked by %{user} %{timeAgo}'),
     name: s__('Terraform|Name'),
     pipeline: s__('Terraform|Pipeline'),
+    removing: s__('Terraform|Removing %{name} and all of its versions'),
     unknownUser: s__('Terraform|Unknown User'),
     updatedUser: s__('Terraform|%{user} updated %{timeAgo}'),
   },
@@ -193,19 +204,35 @@ export default {
     </template>
 
     <template #row-details="row">
-      <gl-alert
-        data-testid="terraform-states-table-error"
-        variant="danger"
-        @dismiss="row.toggleDetails"
-      >
-        <span
-          v-for="errorMessage in row.item.errorMessages"
-          :key="errorMessage"
-          class="gl-display-flex gl-justify-content-start"
+      <div class="gl-mb-5" data-testid="terraform-states-table-row-message">
+        <p
+          v-if="row.item.loadingRemove"
+          class="gl-display-flex gl-justify-content-start gl-align-items-baseline gl-alert gl-alert-danger gl-ml-5 gl-mr-7 gl-my-0 gl-p-3"
         >
-          {{ errorMessage }}
-        </span>
-      </gl-alert>
+          <gl-loading-icon class="gl-pr-3" />
+
+          <gl-sprintf :message="$options.i18n.removing">
+            <template #name>
+              {{ row.item.name }}
+            </template>
+          </gl-sprintf>
+        </p>
+
+        <gl-alert
+          v-else
+          data-testid="terraform-states-table-error"
+          variant="danger"
+          @dismiss="row.toggleDetails"
+        >
+          <span
+            v-for="errorMessage in row.item.errorMessages"
+            :key="errorMessage"
+            class="gl-display-flex gl-justify-content-start"
+          >
+            {{ errorMessage }}
+          </span>
+        </gl-alert>
+      </div>
     </template>
   </gl-table>
 </template>
