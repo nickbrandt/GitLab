@@ -1,6 +1,5 @@
 query getGroupTestCoverage($groupFullPath: ID!, $startDate: Date!) {
   group(fullPath: $groupFullPath) {
-    fullPath
     codeCoverageActivities(startDate: $startDate) {
       nodes {
         projectCount
