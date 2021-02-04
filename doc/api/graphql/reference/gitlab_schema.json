@@ -43076,7 +43076,7 @@
             },
             {
               "name": "merged",
-              "description": null,
+              "description": "Merge Request has been merged",
               "isDeprecated": false,
               "deprecationReason": null
             }
