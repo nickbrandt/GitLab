@@ -10996,6 +10996,30 @@ CREATE SEQUENCE ci_variables_id_seq
 
 ALTER SEQUENCE ci_variables_id_seq OWNED BY ci_variables.id;
 
+CREATE TABLE clients (
+    id bigint NOT NULL,
+    namespace_id bigint NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
+    name text NOT NULL,
+    email text DEFAULT ''::text NOT NULL,
+    phone text DEFAULT ''::text NOT NULL,
+    description text DEFAULT ''::text NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    CONSTRAINT check_4e0233feb6 CHECK ((char_length(email) <= 255)),
+    CONSTRAINT check_97f0dbd175 CHECK ((char_length(phone) <= 50)),
+    CONSTRAINT check_aeb624e7f4 CHECK ((char_length(name) <= 255))
+);
+
+CREATE SEQUENCE clients_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE clients_id_seq OWNED BY clients.id;
+
 CREATE TABLE cluster_agent_tokens (
     id bigint NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -18653,6 +18677,8 @@ ALTER TABLE ONLY ci_triggers ALTER COLUMN id SET DEFAULT nextval('ci_triggers_id
 
 ALTER TABLE ONLY ci_variables ALTER COLUMN id SET DEFAULT nextval('ci_variables_id_seq'::regclass);
 
+ALTER TABLE ONLY clients ALTER COLUMN id SET DEFAULT nextval('clients_id_seq'::regclass);
+
 ALTER TABLE ONLY cluster_agent_tokens ALTER COLUMN id SET DEFAULT nextval('cluster_agent_tokens_id_seq'::regclass);
 
 ALTER TABLE ONLY cluster_agents ALTER COLUMN id SET DEFAULT nextval('cluster_agents_id_seq'::regclass);
@@ -19784,6 +19810,9 @@ ALTER TABLE ONLY ci_triggers
 
 ALTER TABLE ONLY ci_variables
     ADD CONSTRAINT ci_variables_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY clients
+    ADD CONSTRAINT clients_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY cluster_agent_tokens
     ADD CONSTRAINT cluster_agent_tokens_pkey PRIMARY KEY (id);
@@ -21616,6 +21645,12 @@ CREATE INDEX index_ci_triggers_on_project_id ON ci_triggers USING btree (project
 CREATE INDEX index_ci_variables_on_key ON ci_variables USING btree (key);
 
 CREATE UNIQUE INDEX index_ci_variables_on_project_id_and_key_and_environment_scope ON ci_variables USING btree (project_id, key, environment_scope);
+
+CREATE INDEX index_clients_on_namespace_id ON clients USING btree (namespace_id);
+
+CREATE INDEX index_clients_on_namespace_id_and_email ON clients USING btree (namespace_id, email);
+
+CREATE UNIQUE INDEX index_clients_on_namespace_id_and_name ON clients USING btree (namespace_id, name);
 
 CREATE INDEX index_cluster_agent_tokens_on_agent_id ON cluster_agent_tokens USING btree (agent_id);
 
@@ -24768,6 +24803,9 @@ ALTER TABLE ONLY service_desk_settings
 
 ALTER TABLE ONLY saml_group_links
     ADD CONSTRAINT fk_rails_22e312c530 FOREIGN KEY (group_id) REFERENCES namespaces(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY clients
+    ADD CONSTRAINT fk_rails_23419f36bb FOREIGN KEY (namespace_id) REFERENCES namespaces(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY dast_profiles
     ADD CONSTRAINT fk_rails_23cae5abe1 FOREIGN KEY (dast_scanner_profile_id) REFERENCES dast_scanner_profiles(id) ON DELETE CASCADE;
