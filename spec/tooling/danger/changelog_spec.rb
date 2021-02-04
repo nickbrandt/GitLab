@@ -7,7 +7,8 @@ require_relative '../../../tooling/danger/changelog'
 RSpec.describe Tooling::Danger::Changelog do
   include DangerSpecHelper
 
-  let(:added_files) { nil }
+  let(:added_files) { [] }
+  let(:removed_feature_flag_files) { [] }
   let(:fake_git) { double('fake-git', added_files: added_files) }
 
   let(:mr_labels) { nil }
@@ -19,9 +20,61 @@ RSpec.describe Tooling::Danger::Changelog do
   let(:ee?) { false }
   let(:fake_helper) { double('fake-helper', changes_by_category: changes_by_category, sanitize_mr_title: sanitize_mr_title, ee?: ee?) }
 
+  let(:fake_feature_flag) { double('feature-flag', feature_flag_files: removed_feature_flag_files) }
   let(:fake_danger) { new_fake_danger.include(described_class) }
 
   subject(:changelog) { fake_danger.new(git: fake_git, gitlab: fake_gitlab, helper: fake_helper) }
+
+  describe '#required_reasons' do
+    subject { changelog.required_reasons }
+
+    [
+      'db/migrate/20200000000000_new_migration.rb',
+      'db/post_migrate/20200000000000_new_migration.rb'
+    ].each do |file_path|
+      context "added files contain a migration (#{file_path})" do
+        let(:added_files) { [file_path] }
+
+        it { is_expected.to include(:db_changes) }
+      end
+    end
+
+    [
+      'config/feature_flags/foo.yml',
+      'ee/config/feature_flags/foo.yml'
+    ].each do |file_path|
+      context "removed files contains a feature flag (#{file_path})" do
+        let(:removed_feature_flag_files) { [file_path] }
+
+        context 'when no feature_flag_helper is given' do
+          it { is_expected.to be_empty }
+        end
+
+        context 'when a feature_flag_helper is given' do
+          subject { changelog.required_reasons(feature_flag_helper: fake_feature_flag) }
+
+          it { is_expected.to include(:feature_flag_removed) }
+        end
+      end
+    end
+
+    [
+      'app/models/model.rb',
+      'app/assets/javascripts/file.js'
+    ].each do |file_path|
+      context "added files do not contain a migration (#{file_path})" do
+        let(:added_files) { [file_path] }
+
+        it { is_expected.to be_empty }
+      end
+    end
+
+    context "removed files do not contain a feature flag" do
+      let(:removed_feature_flag_files) { [] }
+
+      it { is_expected.to be_empty }
+    end
+  end
 
   describe '#required?' do
     subject { changelog.required? }
@@ -34,6 +87,25 @@ RSpec.describe Tooling::Danger::Changelog do
         let(:added_files) { [file_path] }
 
         it { is_expected.to be_truthy }
+      end
+    end
+
+    [
+      'config/feature_flags/foo.yml',
+      'ee/config/feature_flags/foo.yml'
+    ].each do |file_path|
+      context "removed files contains a feature flag (#{file_path})" do
+        let(:removed_feature_flag_files) { [file_path] }
+
+        context 'when no feature_flag_helper is given' do
+          it { is_expected.to be_falsey }
+        end
+
+        context 'when a feature_flag_helper is given' do
+          subject { changelog.required?(feature_flag_helper: fake_feature_flag) }
+
+          it { is_expected.to be_truthy }
+        end
       end
     end
 
@@ -174,28 +246,46 @@ RSpec.describe Tooling::Danger::Changelog do
     end
   end
 
-  describe '#required_text' do
+  describe '#required_texts' do
+    let(:sanitize_mr_title) { 'Fake Title' }
     let(:mr_json) { { "iid" => 1234, "title" => sanitize_mr_title } }
 
-    subject { changelog.required_text }
+    subject { changelog.required_texts }
 
-    context "when title is not changed from sanitization", :aggregate_failures do
-      let(:sanitize_mr_title) { 'Fake Title' }
-
+    shared_examples 'changelog required text' do |key|
       specify do
-        expect(subject).to include('CHANGELOG missing')
-        expect(subject).to include('bin/changelog -m 1234 "Fake Title"')
-        expect(subject).not_to include('--ee')
+        expect(subject).to have_key(key)
+        expect(subject[key]).to include('CHANGELOG missing')
+        expect(subject[key]).to include('bin/changelog -m 1234 "Fake Title"')
+        expect(subject[key]).not_to include('--ee')
       end
     end
 
-    context "when title needs sanitization", :aggregate_failures do
-      let(:sanitize_mr_title) { 'DRAFT: Fake Title' }
+    context 'with a new migration file' do
+      let(:added_files) { ['db/migrate/20200000000000_new_migration.rb'] }
 
-      specify do
-        expect(subject).to include('CHANGELOG missing')
-        expect(subject).to include('bin/changelog -m 1234 "Fake Title"')
-        expect(subject).not_to include('--ee')
+      context "when title is not changed from sanitization", :aggregate_failures do
+        it_behaves_like 'changelog required text', :db_changes
+      end
+
+      context "when title needs sanitization", :aggregate_failures do
+        let(:sanitize_mr_title) { 'DRAFT: Fake Title' }
+
+        it_behaves_like 'changelog required text', :db_changes
+      end
+    end
+
+    context 'with a removed feature flag file' do
+      let(:removed_feature_flag_files) { ['config/feature_flags/foo.yml'] }
+
+      context 'when no feature_flag_helper is given' do
+        it { is_expected.to be_empty }
+      end
+
+      context 'when a feature_flag_helper is given' do
+        subject { changelog.required_texts(feature_flag_helper: fake_feature_flag) }
+
+        it_behaves_like 'changelog required text', :feature_flag_removed
       end
     end
   end
