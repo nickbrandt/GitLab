@@ -282,7 +282,7 @@ first time.
   Did you include something unrelated to the overall purpose of the changes? Did
   you forget to remove any debugging code?
 - Consider providing instructions on how to test the merge request. This can be
-  helpful for reviewers not familair with the product feature or area of the codebase.
+  helpful for reviewers not familiar with the product feature or area of the codebase.
 <!-- vale gitlab.FutureTense = NO -->
 - Be grateful for the reviewer's suggestions. ("Good call. I'll make that
   change.")
