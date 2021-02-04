@@ -145,9 +145,9 @@ will take to finish syncing. An example message would be:
 ## Prevent updates to the **primary** node
 
 To ensure that all data is replicated to a secondary site, updates (write requests) need to
-be disabled on the primary site. 
+be disabled on the primary site:
 
-1. Enable [maintenance mode](../../maintenance_mode/index.md)
+1. Enable [maintenance mode](../../maintenance_mode/index.md).
 
 1. Disable non-Geo periodic background jobs on the **primary** node by navigating
    to **Admin Area > Monitoring > Background Jobs > Cron**, pressing `Disable All`,
