@@ -45,17 +45,9 @@ RSpec.describe Gitlab::Diff::WordDiff::Parser do
           a_hash_including(index: 3, old_pos: 4, new_pos: 4, text: 'Old changeNew addition unchanged content', type: 'word-diff'),
           a_hash_including(index: 4, old_pos: 50, new_pos: 50, text: '@@ -50,14 +50,13 @@', type: 'match'),
           a_hash_including(index: 5, old_pos: 50, new_pos: 50, text: 'First change same same same_removed_added_end of the line', type: 'word-diff'),
-          a_hash_including(index: 6, old_pos: 51, new_pos: 51, text: '', type: 'word-diff'),
+          a_hash_including(index: 6, old_pos: 51, new_pos: 51, text: '', type: 'word-diff')
         ]
       )
     end
-
-    it do
-      line = subject[0]
-
-      expect(line.to_hash).to eq ''
-    end
-
-
   end
 end
