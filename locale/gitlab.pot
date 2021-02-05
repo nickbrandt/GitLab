@@ -2789,9 +2789,6 @@ msgstr ""
 msgid "Alerts"
 msgstr ""
 
-msgid "Alerts endpoint is deprecated and should not be created or modified. Use HTTP Integrations instead."
-msgstr ""
-
 msgid "AlertsIntegrations|Alerts will be created through this integration"
 msgstr ""
 
