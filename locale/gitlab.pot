@@ -12089,6 +12089,12 @@ msgstr ""
 msgid "Failed to enqueue the rebase operation, possibly due to a long-lived transaction. Try again later."
 msgstr ""
 
+msgid "Failed to fetch the iteration for this issue. Please try again."
+msgstr ""
+
+msgid "Failed to fetch the iterations for the group. Please try again."
+msgstr ""
+
 msgid "Failed to find import label for Jira import."
 msgstr ""
 
@@ -19849,6 +19855,9 @@ msgid "No issues found"
 msgstr ""
 
 msgid "No iteration"
+msgstr ""
+
+msgid "No iterations found"
 msgstr ""
 
 msgid "No iterations to show"
