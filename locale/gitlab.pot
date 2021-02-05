@@ -2058,6 +2058,9 @@ msgstr ""
 msgid "AdminSettings|Integrations configured here will automatically apply to all projects on this instance."
 msgstr ""
 
+msgid "AdminSettings|Maximum duration of a session for Git operations when 2FA is enabled."
+msgstr ""
+
 msgid "AdminSettings|Moved to integrations"
 msgstr ""
 
@@ -2080,6 +2083,9 @@ msgid "AdminSettings|Service Templates will soon be deprecated."
 msgstr ""
 
 msgid "AdminSettings|Service template allows you to set default values for integrations"
+msgstr ""
+
+msgid "AdminSettings|Session duration for Git operations when 2FA is enabled (minutes)"
 msgstr ""
 
 msgid "AdminSettings|Set an instance-wide auto included %{link_start}pipeline configuration%{link_end}. This pipeline configuration will be run after the project's own configuration."
