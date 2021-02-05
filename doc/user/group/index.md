@@ -862,7 +862,9 @@ With [GitLab Repositories Analytics](repositories_analytics/index.md), you can d
 
 See the overall activity of all projects with code coverage with [GitLab Repositories Analytics](repositories_analytics/index.md).
 
-It displays the current code coverage data available for your projects:
+It displays the current code coverage data available for your projects. In
+[GitLab 13.9 and later](https://gitlab.com/gitlab-org/gitlab/-/issues/215140), it
+also displays a graph of the average code coverage over the last 30 days:
 
 ![Group repositories analytics](img/group_code_coverage_analytics_v13_9.png)
 
