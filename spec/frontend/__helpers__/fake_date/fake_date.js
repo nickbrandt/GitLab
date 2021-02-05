@@ -5,7 +5,9 @@ const RealDate = Date;
 
 const isMocked = (val) => Boolean(val.mock);
 
-const createFakeDateClass = (ctorDefault) => {
+const createFakeDateClass = (ctorDefaultParam = []) => {
+  const ctorDefault = ctorDefaultParam.length ? ctorDefaultParam : DEFAULT_ARGS;
+
   const FakeDate = new Proxy(RealDate, {
     construct: (target, argArray) => {
       const ctorArgs = argArray.length ? argArray : ctorDefault;
@@ -39,20 +41,20 @@ const createFakeDateClass = (ctorDefault) => {
   return FakeDate;
 };
 
-const useFakeDate = (...args) => {
-  const FakeDate = createFakeDateClass(args.length ? args : DEFAULT_ARGS);
+const setGlobalDateToFakeDate = (...args) => {
+  const FakeDate = createFakeDateClass(args);
   global.Date = FakeDate;
 };
 
-const useRealDate = () => {
+const setGlobalDateToRealDate = () => {
   global.Date = RealDate;
 };
 
 // We use commonjs so that the test environment module can pick this up
 // eslint-disable-next-line import/no-commonjs
 module.exports = {
-  useFakeDate,
-  useRealDate,
-  DEFAULT_ARGS,
+  setGlobalDateToFakeDate,
+  setGlobalDateToRealDate,
   createFakeDateClass,
+  RealDate,
 };
