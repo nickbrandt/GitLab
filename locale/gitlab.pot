@@ -11828,6 +11828,9 @@ msgstr ""
 msgid "Except policy:"
 msgstr ""
 
+msgid "Exceptions"
+msgstr ""
+
 msgid "Excess storage"
 msgstr ""
 
@@ -20795,6 +20798,12 @@ msgstr ""
 msgid "Package type must be PyPi"
 msgstr ""
 
+msgid "PackageRegistry|%{boldStart}Allow duplicates%{boldEnd} - Packages with the same name and version are accepted."
+msgstr ""
+
+msgid "PackageRegistry|%{boldStart}Do not allow duplicates%{boldEnd} - Packages with the same name and version are rejected."
+msgstr ""
+
 msgid "PackageRegistry|%{name} version %{version} was first created %{datetime}"
 msgstr ""
 
@@ -20805,6 +20814,9 @@ msgid "PackageRegistry|Add NuGet Source"
 msgstr ""
 
 msgid "PackageRegistry|Add composer registry"
+msgstr ""
+
+msgid "PackageRegistry|An error occurred while saving the settings"
 msgstr ""
 
 msgid "PackageRegistry|App group: %{group}"
@@ -20951,6 +20963,9 @@ msgstr ""
 msgid "PackageRegistry|Package updated by commit %{link} on branch %{branch}, built by pipeline %{pipeline}, and published to the registry %{datetime}"
 msgstr ""
 
+msgid "PackageRegistry|Packages can be published if their name or version matches this regex"
+msgstr ""
+
 msgid "PackageRegistry|Pip Command"
 msgstr ""
 
@@ -20967,6 +20982,12 @@ msgid "PackageRegistry|Recipe: %{recipe}"
 msgstr ""
 
 msgid "PackageRegistry|Remove package"
+msgstr ""
+
+msgid "PackageRegistry|Settings for Maven packages"
+msgstr ""
+
+msgid "PackageRegistry|Settings saved successfully"
 msgstr ""
 
 msgid "PackageRegistry|Sorry, your filter produced no results"
