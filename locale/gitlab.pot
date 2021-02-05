@@ -21461,9 +21461,6 @@ msgstr ""
 msgid "Pipelines|Clear Runner Caches"
 msgstr ""
 
-msgid "Pipelines|Continuous Integration can help catch bugs by running your tests automatically, while Continuous Deployment can help you deliver code to your product environment."
-msgstr ""
-
 msgid "Pipelines|Copy trigger token"
 msgstr ""
 
