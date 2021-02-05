@@ -36,8 +36,7 @@ export default {
 <template>
   <p class="gl-display-flex gl-justify-content-space-between gl-mb-2">
     <span v-if="hasTitle"
-      ><b>{{ title }}</b
-      >: {{ value }}</span
+      ><b>{{ title }}:</b> {{ value }}</span
     >
     <gl-link v-if="hasHelpURL" :href="helpUrl" target="_blank" rel="noopener noreferrer nofollow">
       <gl-icon name="question-o" />

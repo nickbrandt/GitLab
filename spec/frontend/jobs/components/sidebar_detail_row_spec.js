@@ -9,7 +9,7 @@ describe('Sidebar detail row', () => {
   const value = 'this is the value';
   const helpUrl = '/help/ci/runners/README.html';
 
-  const findHelpLink = () => wrapper.find(GlLink);
+  const findHelpLink = () => wrapper.findComponent(GlLink);
 
   const createComponent = (props) => {
     wrapper = shallowMount(SidebarDetailRow, {
