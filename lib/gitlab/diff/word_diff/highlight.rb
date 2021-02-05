@@ -41,7 +41,7 @@ module Gitlab
         def highlight_line(diff_line)
           return unless diff_file && diff_file.diff_refs
 
-          blob_lines[diff_line.new_pos - 1]&.html_safe
+          blob_lines[diff_line.index]&.html_safe
         end
 
         def blob_lines
