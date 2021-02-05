@@ -5037,6 +5037,26 @@ msgstr ""
 msgid "CI/CD settings"
 msgstr ""
 
+msgid "CICDAnalytics|%{percent}%{percentSymbol}"
+msgstr ""
+
+msgid "CICDAnalytics|All time"
+msgstr ""
+
+msgid "CICDAnalytics|Projects with releases"
+msgstr ""
+
+msgid "CICDAnalytics|Release"
+msgid_plural "CICDAnalytics|Releases"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "CICDAnalytics|Releases"
+msgstr ""
+
+msgid "CICDAnalytics|Something went wrong while fetching release statistics"
+msgstr ""
+
 msgid "CICD|Add a %{base_domain_link_start}base domain%{link_end} to your %{kubernetes_cluster_link_start}Kubernetes cluster%{link_end} for your deployment strategy to work."
 msgstr ""
 
