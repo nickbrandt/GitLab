@@ -864,7 +864,7 @@ See the overall activity of all projects with code coverage with [GitLab Reposit
 
 It displays the current code coverage data available for your projects:
 
-![Group repositories analytics](img/group_code_coverage_analytics_v13_7.png)
+![Group repositories analytics](img/group_code_coverage_analytics_v13_9.png)
 
 ## Dependency Proxy
 
