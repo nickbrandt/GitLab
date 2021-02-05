@@ -4,7 +4,7 @@ const path = require('path');
 const { ErrorWithStack } = require('jest-util');
 const JSDOMEnvironment = require('jest-environment-jsdom');
 const { TEST_HOST } = require('./__helpers__/test_constants');
-const { useFakeDate } = require('./__helpers__/fake_date');
+const { setGlobalDateToFakeDate } = require('./__helpers__/fake_date/fake_date');
 
 const ROOT_PATH = path.resolve(__dirname, '../..');
 
@@ -13,8 +13,9 @@ class CustomEnvironment extends JSDOMEnvironment {
     // Setup testURL so that window.location is setup properly
     super({ ...config, testURL: TEST_HOST }, context);
 
-    // This lets jsdom use the fake date for things like document.cookie
-    useFakeDate();
+    // Fake the `Date` for `jsdom` which fixes things like document.cookie
+    // https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39496#note_503084332
+    setGlobalDateToFakeDate();
 
     Object.assign(context.console, {
       error(...args) {
