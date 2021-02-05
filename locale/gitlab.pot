@@ -7548,15 +7548,6 @@ msgstr ""
 msgid "CompareBranches|%{source_branch} and %{target_branch} are the same."
 msgstr ""
 
-msgid "CompareBranches|Compare"
-msgstr ""
-
-msgid "CompareBranches|Source"
-msgstr ""
-
-msgid "CompareBranches|Target"
-msgstr ""
-
 msgid "CompareBranches|There isn't anything to compare."
 msgstr ""
 
@@ -26651,9 +26642,6 @@ msgid "Select assignee"
 msgstr ""
 
 msgid "Select branch"
-msgstr ""
-
-msgid "Select branch/tag"
 msgstr ""
 
 msgid "Select due date"
