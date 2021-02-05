@@ -2,7 +2,7 @@
 stage: none
 group: unassigned
 comments: false
-description: 'GrahpQL API architecture foundation'
+description: 'GraphQL API architecture foundation'
 ---
 
 # GraphQL API
@@ -31,17 +31,17 @@ Most of the work around the GraphQL ecosystem has been done by volunteers that a
 
 The [retrospective on our progress](https://gitlab.com/gitlab-org/gitlab/-/issues/235659)
 surfaced a few opportunities to streamline our GraphQL development efforts and
-to reduce the risk of performance degradations and possibile outages that may
+to reduce the risk of performance degradations and possible outages that may
 be related to the gaps in the essential mechanisms needed to make the GraphQL
 API observable and operable at scale.
 
-Amongst small improvement to the GraphQL engine itself we want to build a
+Amongst small improvements to the GraphQL engine itself we want to build a
 comprehensive monitoring dashboard, that will enable team members to make sense
 of what is happening inside our GraphQL API. We want to make it possible to define
 SLOs, triage breached SLIs and to be able to zoom into relevant details using
 Grafana and Elastic. We want to see historical data and predict future usage.
 
-It is an opporunity to learn from our experience in evolving the REST API, for
+It is an opportunity to learn from our experience in evolving the REST API, for
 the scale, and to apply this knowledge onto the GraphQL development efforts. We
 can do that by building query-to-feature correlation mechanisms, adding
 scalable state synchronization support and aligning GraphQL with other
@@ -91,7 +91,7 @@ APIs is considered unnecessary. Instead of versioning the API we want to mark
 some fields as deprecated, but we need to have a way to understand what is the
 usage of deprecated fields, types and a way to visualize it in a way that is
 easy to understand. We might want to detect usage of deprecated fields and
-notify users about that we plan to remove them.
+notify users that we plan to remove them.
 
 - Define a data-informed deprecation policy that will serve our users better
 - Build a dashboard showing usage frequency of deprecated GraphQL fields
@@ -99,15 +99,15 @@ notify users about that we plan to remove them.
 
 ### Ensure consistency with the rest of the codebase
 
-GraphQL is not the only thing we work on, but it cuts across entire
+GraphQL is not the only thing we work on, but it cuts across the entire
 application. It is being used to expose data collected and processed in almost
-every part of our product. It makes it tighly coupled with our monolithic
+every part of our product. It makes it tightly coupled with our monolithic
 codebase.
 
 We need to ensure that how we use GraphQL is consistent with other mechanisms
 we've designed to improve performance and reliability of GitLab.
 
-We have an extensive experience with evolving out REST API. We want to apply
+We have extensive experience with evolving our REST API. We want to apply
 this knowledge onto GraphQL and make it performant and secure by default.
 
 - Design direct uploads for GraphQL
