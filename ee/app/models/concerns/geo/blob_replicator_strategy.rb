@@ -72,7 +72,7 @@ module Geo
     # we don't absolutely have to.
     #
     # @return [Boolean] whether the file exists on disk or in remote storage
-    def file_exist?
+    def file_exists?
       carrierwave_uploader.file.exists?
     end
 
@@ -90,7 +90,7 @@ module Geo
     #
     # @return [Boolean] whether it can generate a checksum
     def checksummable?
-      carrierwave_uploader.file_storage? && file_exist?
+      carrierwave_uploader.file_storage? && file_exists?
     end
   end
 end

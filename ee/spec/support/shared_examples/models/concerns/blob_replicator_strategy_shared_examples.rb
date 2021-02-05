@@ -182,7 +182,7 @@ RSpec.shared_examples 'a blob replicator' do
 
       context 'when the file does not exist' do
         it 'raises an error' do
-          allow(subject).to receive(:file_exist?).and_return(false)
+          allow(subject).to receive(:file_exists?).and_return(false)
 
           expect { subject.calculate_checksum }.to raise_error('File is not checksummable')
         end
