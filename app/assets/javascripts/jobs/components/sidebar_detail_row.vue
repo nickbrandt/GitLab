@@ -38,7 +38,7 @@ export default {
     <span v-if="hasTitle"
       ><b>{{ title }}:</b> {{ value }}</span
     >
-    <gl-link v-if="hasHelpURL" :href="helpUrl" target="_blank" rel="noopener noreferrer nofollow">
+    <gl-link v-if="hasHelpURL" :href="helpUrl" target="_blank">
       <gl-icon name="question-o" />
     </gl-link>
   </p>
