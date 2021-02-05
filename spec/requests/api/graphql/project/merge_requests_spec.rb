@@ -407,10 +407,12 @@ RSpec.describe 'getting merge request listings nested in a project' do
       end
 
       let(:query) do
+        # Note: __typename meta field is always requested by the FE
         graphql_query_for(:project, { full_path: project.full_path },
         <<~QUERY
-        mergeRequests(mergedAfter: "2020-01-01", mergedBefore: "2020-01-05", first: 0) {
+        mergeRequests(mergedAfter: "2020-01-01", mergedBefore: "2020-01-05", first: 0, sourceBranches: null, labels: null) {
           count
+          __typename
         }
         QUERY
         )
