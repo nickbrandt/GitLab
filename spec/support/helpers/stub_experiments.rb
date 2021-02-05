@@ -16,7 +16,7 @@ module StubExperiments
     end
   end
 
-  # Stub Experiment for user with `key: true/false`
+  # Stub Experiment for any subject with `key: true/false`
   #
   # @param [Hash] experiment where key is feature name and value is boolean whether enabled or not.
   #

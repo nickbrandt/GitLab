@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :experiment_subject do
     experiment
-    user
+    subject { association :user }
     variant { :control }
   end
 end

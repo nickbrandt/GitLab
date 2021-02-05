@@ -53,6 +53,7 @@ module Namespaces
     end
 
     def experiment_add_group(group, experiment_enabled_for_group)
+      # FIXME: replace with record_experiment_subject or Experiment.add_subject
       variant = experiment_enabled_for_group ? GROUP_EXPERIMENTAL : GROUP_CONTROL
       Experiment.add_group(:in_product_marketing_emails, variant: variant, group: group)
     end

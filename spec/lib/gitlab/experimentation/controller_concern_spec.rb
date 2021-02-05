@@ -520,6 +520,90 @@ RSpec.describe Gitlab::Experimentation::ControllerConcern, type: :controller do
     end
   end
 
+  describe '#record_experiment_subject' do
+    let(:xp_subject) { build(:group) }
+    let(:context) { { some_key: "a value" } }
+    let(:dnt_enabled) { false }
+    let(:experiment_active) { true }
+    let(:experiment_enabled_for_subject) { true }
+
+    before do
+      allow(controller).to receive(:dnt_enabled?).and_return(dnt_enabled)
+      stub_experiment(test_experiment: experiment_active)
+      stub_experiment_for_subject(test_experiment: experiment_enabled_for_subject)
+    end
+
+    subject(:record_experiment_subject) do
+      controller.record_experiment_subject(:test_experiment, xp_subject, context)
+    end
+
+    context 'when the given subject is in the candidate' do
+      it 'defers to the Experiment model to record the subject' do
+        expect(::Experiment).to receive(:add_subject).with(:test_experiment, subject: xp_subject, variant: :experimental, context: context)
+
+        record_experiment_subject
+      end
+    end
+
+    context 'when the given subject is in the control' do
+      let(:experiment_enabled_for_subject) { false }
+
+      it 'defers to the Experiment model to record the subject' do
+        expect(::Experiment).to receive(:add_subject).with(:test_experiment, subject: xp_subject, variant: :control, context: context)
+
+        record_experiment_subject
+      end
+    end
+
+    context 'using a cookie-based rollout strategy' do
+      let(:rollout_strategy) { :cookie }
+
+      it 'uses nil as the tracking_group subject' do
+        expect(controller).to receive(:tracking_group).with(:test_experiment, nil, subject: nil)
+        allow(::Experiment).to receive(:add_subject)
+
+        record_experiment_subject
+      end
+    end
+
+    context 'using a group-based rollout strategy' do
+      let(:rollout_strategy) { :group }
+
+      it 'uses the provided subject as the tracking_group subject' do
+        expect(controller).to receive(:tracking_group).with(:test_experiment, nil, subject: xp_subject)
+        allow(::Experiment).to receive(:add_subject)
+
+        record_experiment_subject
+      end
+    end
+
+    shared_examples 'does not record the experiment subject' do
+      it 'does not record the experiment subject' do
+        expect(::Experiment).not_to receive(:add_subject)
+
+        record_experiment_subject
+      end
+    end
+
+    context 'when DNT is enabled' do
+      let(:dnt_enabled) { true }
+
+      include_examples 'does not record the experiment subject'
+    end
+
+    context 'when the experiment is not active' do
+      let(:experiment_active) { false }
+
+      include_examples 'does not record the experiment subject'
+    end
+
+    context 'when a nil subject is given' do
+      let(:xp_subject) { nil }
+
+      include_examples 'does not record the experiment subject'
+    end
+  end
+
   describe '#record_experiment_conversion_event' do
     let(:user) { build(:user) }
 
@@ -565,6 +649,53 @@ RSpec.describe Gitlab::Experimentation::ControllerConcern, type: :controller do
       before do
         stub_experiment(test_experiment: false)
       end
+
+      include_examples 'does not record the conversion event'
+    end
+  end
+
+  describe '#record_experiment_conversion_event_for_subject' do
+    let(:xp_subject) { build(:project) }
+    let(:dnt_enabled) { false }
+    let(:experiment_active) { true }
+
+    before do
+      allow(controller).to receive(:dnt_enabled?).and_return(dnt_enabled)
+      stub_experiment(test_experiment: experiment_active)
+    end
+
+    subject(:record_conversion_event_for_subject) do
+      controller.record_experiment_conversion_event_for_subject(:test_experiment, xp_subject)
+    end
+
+    it 'records the conversion event for the experiment & subject' do
+      expect(::Experiment).to receive(:record_conversion_event_for_subject).with(:test_experiment, xp_subject)
+
+      record_conversion_event_for_subject
+    end
+
+    shared_examples 'does not record the conversion event' do
+      it 'does not record the conversion event' do
+        expect(::Experiment).not_to receive(:record_conversion_event)
+
+        record_conversion_event_for_subject
+      end
+    end
+
+    context 'when DNT is enabled' do
+      let(:dnt_enabled) { true }
+
+      include_examples 'does not record the conversion event'
+    end
+
+    context 'when the subject is nil' do
+      let(:xp_subject) { nil }
+
+      include_examples 'does not record the conversion event'
+    end
+
+    context 'when the experiment is not active' do
+      let(:experiment_active) { false }
 
       include_examples 'does not record the conversion event'
     end

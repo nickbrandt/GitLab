@@ -67,9 +67,20 @@ module Gitlab
         return if dnt_enabled?
         return unless Experimentation.active?(experiment_key) && current_user
 
-        subject = Experimentation.rollout_strategy(experiment_key) == :cookie ? nil : current_user
+        variant_subject = Experimentation.rollout_strategy(experiment_key) == :cookie ? nil : current_user
+        variant = tracking_group(experiment_key, nil, subject: variant_subject)
 
-        ::Experiment.add_user(experiment_key, tracking_group(experiment_key, nil, subject: subject), current_user, context)
+        ::Experiment.add_user(experiment_key, variant, current_user, context)
+      end
+
+      def record_experiment_subject(experiment_key, subject, context = {})
+        return if dnt_enabled?
+        return unless Experimentation.active?(experiment_key) && subject
+
+        variant_subject = Experimentation.rollout_strategy(experiment_key) == :cookie ? nil : subject
+        variant = tracking_group(experiment_key, nil, subject: variant_subject)
+
+        ::Experiment.add_subject(experiment_key, subject: subject, variant: variant, context: context)
       end
 
       def record_experiment_conversion_event(experiment_key)
@@ -78,6 +89,14 @@ module Gitlab
         return unless Experimentation.active?(experiment_key)
 
         ::Experiment.record_conversion_event(experiment_key, current_user)
+      end
+
+      def record_experiment_conversion_event_for_subject(experiment_key, subject)
+        return if dnt_enabled?
+        return unless subject.present?
+        return unless Experimentation.active?(experiment_key)
+
+        ::Experiment.record_conversion_event_for_subject(experiment_key, subject)
       end
 
       def experiment_tracking_category_and_group(experiment_key, subject: nil)

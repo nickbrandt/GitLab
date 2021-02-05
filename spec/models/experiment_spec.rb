@@ -69,6 +69,7 @@ RSpec.describe Experiment do
     end
   end
 
+  # FIXME: replace with specs for `.add_subject`
   describe '.add_group' do
     let_it_be(:experiment_name) { :experiment_key }
     let_it_be(:variant) { :control }
@@ -165,6 +166,7 @@ RSpec.describe Experiment do
     end
   end
 
+  # FIXME: replace with '#record_subject_and_variant!'
   describe '#record_group_and_variant!' do
     let_it_be(:group) { create(:group) }
     let_it_be(:variant) { :control }
