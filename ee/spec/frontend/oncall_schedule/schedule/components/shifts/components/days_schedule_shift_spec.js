@@ -59,7 +59,7 @@ describe('ee/oncall_schedules/components/schedule/components/shifts/components/d
       createComponent({ data: { shiftTimeUnitWidth: CELL_WIDTH } });
       expect(findRotationAssignee().props('rotationAssigneeStyle')).toEqual({
         left: '0px',
-        width: '250px',
+        width: '248px',
       });
     });
 
@@ -80,7 +80,7 @@ describe('ee/oncall_schedules/components/schedule/components/shifts/components/d
       });
       expect(findRotationAssignee().props('rotationAssigneeStyle')).toEqual({
         left: '452px',
-        width: '650px',
+        width: '598px',
       });
     });
   });
