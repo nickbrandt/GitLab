@@ -141,7 +141,6 @@ describe('AddEditRotationModal', () => {
       findModal().vm.$emit('primary', { preventDefault: jest.fn() });
       expect(mutate).toHaveBeenCalledWith({
         mutation: expect.any(Object),
-        update: expect.anything(),
         variables: { OncallRotationCreateInput: expect.objectContaining({ projectPath }) },
       });
     });
@@ -173,6 +172,7 @@ describe('AddEditRotationModal', () => {
 
     it('calls a mutation with correct parameters and creates a rotation', async () => {
       createComponentWithApollo();
+      expect(wrapper.emitted('fetchRotationShifts')).toBeUndefined();
 
       await createRotation(wrapper);
       await awaitApolloDomMock();
@@ -183,6 +183,7 @@ describe('AddEditRotationModal', () => {
         message: i18n.rotationCreated,
         type: FLASH_TYPES.SUCCESS,
       });
+      expect(wrapper.emitted('fetchRotationShifts')).toHaveLength(1);
     });
 
     it('displays alert if mutation had a recoverable error', async () => {

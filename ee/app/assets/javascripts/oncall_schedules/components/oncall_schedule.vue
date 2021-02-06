@@ -260,9 +260,13 @@ export default {
       :modal-id="$options.editScheduleModalId"
       is-edit-mode
     />
-    <add-edit-rotation-modal :schedule="schedule" :modal-id="$options.addRotationModalId" @fetchRotationShifts="fetchRotationShifts" />
     <add-edit-rotation-modal
-      :schedule="schedule" 
+      :schedule="schedule"
+      :modal-id="$options.addRotationModalId"
+      @fetchRotationShifts="fetchRotationShifts"
+    />
+    <add-edit-rotation-modal
+      :schedule="schedule"
       :modal-id="$options.editRotationModalId"
       is-edit-mode
     />

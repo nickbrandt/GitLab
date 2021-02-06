@@ -1,5 +1,11 @@
 <script>
-import { GlButtonGroup, GlButton, GlLoadingIcon, GlTooltipDirective, GlModalDirective } from '@gitlab/ui';
+import {
+  GlButtonGroup,
+  GlButton,
+  GlLoadingIcon,
+  GlTooltipDirective,
+  GlModalDirective,
+} from '@gitlab/ui';
 import DeleteRotationModal from 'ee/oncall_schedules/components/rotations/components/delete_rotation_modal.vue';
 import ScheduleShiftWrapper from 'ee/oncall_schedules/components/schedule/components/shifts/components/schedule_shift_wrapper.vue';
 import {
@@ -52,8 +58,9 @@ export default {
     },
     loading: {
       type: Boolean,
-      required: true,
-    }
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -93,8 +100,7 @@ export default {
 <template>
   <div class="list-section">
     <gl-loading-icon v-if="loading" />
-       <div
-       v-else-if="rotations.length === 0 && !loading" class="list-item list-item-empty clearfix">
+    <div v-else-if="rotations.length === 0 && !loading" class="list-item list-item-empty clearfix">
       <span
         class="details-cell gl-display-flex gl-justify-content-space-between gl-align-items-center gl-pl-3"
       >

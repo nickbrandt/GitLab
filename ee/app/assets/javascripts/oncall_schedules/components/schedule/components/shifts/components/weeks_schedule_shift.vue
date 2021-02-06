@@ -38,9 +38,9 @@ export default {
       return nDaysAfter(this.timeframeItem, DAYS_IN_DATE_WEEK);
     },
     daysUntilEndOfTimeFrame() {
-     if(this.currentTimeframeEndsAt.getMonth() !== this.timeframeItem.getMonth()) {
-       // TODO: Handle Edge case where timeframe spans two different months
-     }
+      if (this.currentTimeframeEndsAt.getMonth() !== this.timeframeItem.getMonth()) {
+        // TODO: Handle Edge case where timeframe spans two different months
+      }
 
       return (
         this.currentTimeframeEndsAt.getDate() -

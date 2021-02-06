@@ -226,10 +226,7 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
     >
       <!---->
        
-      <div>
-        <!---->
-        <!---->
-      </div>
+      <div />
     </span>
   </div>
    

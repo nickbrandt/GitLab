@@ -4,9 +4,7 @@ import { set } from 'lodash';
 import getOncallSchedulesWithRotationsQuery from 'ee/oncall_schedules/graphql/queries/get_oncall_schedules.query.graphql';
 import createOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/create_oncall_schedule_rotation.mutation.graphql';
 import updateOncallScheduleRotationMutation from 'ee/oncall_schedules/graphql/mutations/update_oncall_schedule_rotation.mutation.graphql';
-import {
-  updateStoreAfterRotationEdit,
-} from 'ee/oncall_schedules/utils/cache_updates';
+import { updateStoreAfterRotationEdit } from 'ee/oncall_schedules/utils/cache_updates';
 import { isNameFieldValid, getParticipantsForSave } from 'ee/oncall_schedules/utils/common_utils';
 import { LENGTH_ENUM } from 'ee/oncall_schedules/constants';
 import { s__, __ } from '~/locale';
@@ -148,22 +146,11 @@ export default {
   methods: {
     createRotation() {
       this.loading = true;
-      const { projectPath, schedule } = this;
 
       this.$apollo
         .mutate({
           mutation: createOncallScheduleRotationMutation,
           variables: { OncallRotationCreateInput: this.rotationVariables },
-          update(store, { data }) {
-            updateStoreAfterRotationAdd(
-              store,
-              getOncallSchedulesWithRotationsQuery,
-              { ...data, scheduleIid: schedule.iid },
-              {
-                projectPath,
-              },
-            );
-          },
         })
         .then(
           ({

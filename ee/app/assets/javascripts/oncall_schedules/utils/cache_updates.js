@@ -87,7 +87,12 @@ const updateScheduleFromStore = (store, query, { oncallScheduleUpdate }, variabl
   });
 };
 
-const updateRotationFromStore = (store, query, { oncallRotationUpdate, scheduleIid }, variables) => {
+const updateRotationFromStore = (
+  store,
+  query,
+  { oncallRotationUpdate, scheduleIid },
+  variables,
+) => {
   const rotation = oncallRotationUpdate?.oncallRotation;
   if (!rotation) {
     return;
