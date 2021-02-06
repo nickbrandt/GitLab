@@ -1,9 +1,9 @@
 <script>
 import { PRESET_TYPES, DAYS_IN_DATE_WEEK } from 'ee/oncall_schedules/constants';
 import getShiftTimeUnitWidthQuery from 'ee/oncall_schedules/graphql/queries/get_shift_time_unit_width.query.graphql';
+import { getOverlapDateInPeriods, nDaysAfter } from '~/lib/utils/datetime_utility';
 import DaysScheduleShift from './days_schedule_shift.vue';
 import WeeksScheduleShift from './weeks_schedule_shift.vue';
-import { getOverlapDateInPeriods, nDaysAfter } from '~/lib/utils/datetime_utility';
 
 export default {
   components: {
