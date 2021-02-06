@@ -72,6 +72,15 @@ export default {
     hasBlobChanges() {
       return this.actions.length > 0;
     },
+    hasNoChanges() {
+      return (
+        this.actions.every(
+          (action) => !action.content && !action.filePath && !action.previousPath,
+        ) &&
+        !this.snippet.title &&
+        !this.snippet.description
+      );
+    },
     hasValidBlobs() {
       return this.actions.every((x) => x.content);
     },
@@ -116,7 +125,7 @@ export default {
     onBeforeUnload(e = {}) {
       const returnValue = __('Are you sure you want to lose unsaved changes?');
 
-      if (!this.hasBlobChanges || this.isUpdating) return undefined;
+      if (!this.hasBlobChanges || this.hasNoChanges || this.isUpdating) return undefined;
 
       Object.assign(e, { returnValue });
       return returnValue;

@@ -167,6 +167,8 @@ describe('Snippet Edit app', () => {
     visibilityLevel,
     blobActions: [],
   });
+  const setTitle = (val) => wrapper.find(TitleField).vm.$emit('input', val);
+  const setDescription = (val) => wrapper.find(SnippetDescriptionEdit).vm.$emit('input', val);
 
   // Ideally we wouldn't call this method directly, but we don't have a way to trigger
   // apollo responses yet.
@@ -341,11 +343,30 @@ describe('Snippet Edit app', () => {
     });
 
     describe('on before unload', () => {
+      const caseNoActions = () => triggerBlobActions([]);
+      const caseEmptyAction = () => triggerBlobActions([testEntries.empty.diff]);
+      const caseSomeActions = () => triggerBlobActions([testEntries.updated.diff]);
+      const caseTitleIsSet = () => {
+        caseEmptyAction();
+        setTitle('test');
+      };
+      const caseDescriptionIsSet = () => {
+        caseEmptyAction();
+        setDescription('test');
+      };
+      const caseClickSubmitBtn = () => {
+        caseSomeActions();
+        clickSubmitBtn();
+      };
+
       it.each`
         condition                       | expectPrevented | action
-        ${'there are no actions'}       | ${false}        | ${() => triggerBlobActions([])}
-        ${'there are actions'}          | ${true}         | ${() => triggerBlobActions([testEntries.updated.diff])}
-        ${'the snippet is being saved'} | ${false}        | ${() => clickSubmitBtn()}
+        ${'there are no actions'}       | ${false}        | ${caseNoActions}
+        ${'there is an empty action'}   | ${false}        | ${caseEmptyAction}
+        ${'there are actions'}          | ${true}         | ${caseSomeActions}
+        ${'the title is set'}           | ${true}         | ${caseTitleIsSet}
+        ${'the description is set'}     | ${true}         | ${caseDescriptionIsSet}
+        ${'the snippet is being saved'} | ${false}        | ${caseClickSubmitBtn}
       `(
         'handles before unload prevent when $condition (expectPrevented=$expectPrevented)',
         ({ expectPrevented, action }) => {
