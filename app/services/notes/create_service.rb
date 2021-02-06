@@ -29,8 +29,9 @@ module Notes
         note_saved = note.with_transaction_returning_status do
           break false if only_commands
 
-          before_save(note)
-          note.save
+          note.save.tap do
+            update_discussions(note)
+          end
         end
 
         when_saved(note) if note_saved
@@ -57,7 +58,7 @@ module Notes
       @quick_actions_service ||= QuickActionsService.new(project, current_user)
     end
 
-    def before_save(note)
+    def update_discussions(note)
       # Ensure that individual notes that are promoted into discussions are
       # updated in a transaction with the note creation to avoid inconsistencies:
       # https://gitlab.com/gitlab-org/gitlab/-/issues/301237
