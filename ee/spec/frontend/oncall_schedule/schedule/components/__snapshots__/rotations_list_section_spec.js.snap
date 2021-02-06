@@ -78,7 +78,7 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
       <div>
         <div
           class="gl-absolute gl-h-7 gl-mt-3 gl-z-index-1 gl-overflow-hidden"
-          style="left: 0px; width: 0px;"
+          style="left: 0px; width: -2px;"
         >
           <span
             class="gl-w-full gl-h-6 gl-align-items-center gl-token gl-token-default-variant gl-bg-data-viz-blue-500"
@@ -149,7 +149,7 @@ exports[`RotationsListSectionComponent when the timeframe includes today renders
         </div>
         <div
           class="gl-absolute gl-h-7 gl-mt-3 gl-z-index-1 gl-overflow-hidden"
-          style="left: 2px; width: 0px;"
+          style="left: 2px; width: -2px;"
         >
           <span
             class="gl-w-full gl-h-6 gl-align-items-center gl-token gl-token-default-variant gl-bg-data-viz-orange-500"
