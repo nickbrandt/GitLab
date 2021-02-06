@@ -9,12 +9,12 @@ import {
   updateStoreAfterRotationEdit,
 } from 'ee/oncall_schedules/utils/cache_updates';
 import { isNameFieldValid, getParticipantsForSave } from 'ee/oncall_schedules/utils/common_utils';
-import { LENGTH_ENUM } from '../../../constants';
+import { LENGTH_ENUM } from 'ee/oncall_schedules/constants';
 import { s__, __ } from '~/locale';
 import createFlash, { FLASH_TYPES } from '~/flash';
+import { format24HourTimeStringFromInt, formatDate } from '~/lib/utils/datetime_utility';
 import usersSearchQuery from '~/graphql_shared/queries/users_search.query.graphql';
 import AddEditRotationForm from './add_edit_rotation_form.vue';
-import { format24HourTimeStringFromInt, formatDate } from '~/lib/utils/datetime_utility';
 
 export const i18n = {
   rotationCreated: s__('OnCallSchedules|Successfully created a new rotation'),
