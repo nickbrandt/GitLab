@@ -79,7 +79,7 @@ export const defaultCustomStageFields = { ...defaultFields, custom: true };
  *
  * More information: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/49094#note_464116439
  */
-export const BASE_DEFAULT_STAGE_CONFIG = [
+const BASE_DEFAULT_STAGE_CONFIG = [
   {
     id: 'issue',
     startEventIdentifier: ['issue_created'],
