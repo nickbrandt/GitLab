@@ -1579,6 +1579,42 @@
               "deprecationReason": null
             },
             {
+              "name": "payloadAttributeMappings",
+              "description": "The custom mapping of GitLab alert attributes to fields from the payload_example.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AlertManagementPayloadAlertMappingField",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "payloadExample",
+              "description": "The example of an alert payload.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JsonString",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "token",
               "description": "Token used to authenticate alert notification requests.",
               "args": [
@@ -1706,6 +1742,42 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "payloadAttributeMappings",
+              "description": "The custom mapping of GitLab alert attributes to fields from the payload_example.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AlertManagementPayloadAlertMappingField",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "payloadExample",
+              "description": "The example of an alert payload.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JsonString",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -2145,6 +2217,83 @@
         },
         {
           "kind": "OBJECT",
+          "name": "AlertManagementPayloadAlertMappingField",
+          "description": "Parsed field (with its name) from an alert used for custom mappings",
+          "fields": [
+            {
+              "name": "fieldName",
+              "description": "A GitLab alert field name.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "ENUM",
+                "name": "AlertManagementPayloadAlertFieldName",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "label",
+              "description": "Human-readable label of the payload path.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "path",
+              "description": "Path to value inside payload JSON.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": "Type of the parsed value.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "ENUM",
+                "name": "AlertManagementPayloadAlertFieldType",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "AlertManagementPrometheusIntegration",
           "description": "An endpoint and credentials used to accept Prometheus alerts for a project",
           "fields": [
@@ -2203,6 +2352,42 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "payloadAttributeMappings",
+              "description": "The custom mapping of GitLab alert attributes to fields from the payload_example.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AlertManagementPayloadAlertMappingField",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "payloadExample",
+              "description": "The example of an alert payload.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JsonString",
                 "ofType": null
               },
               "isDeprecated": false,

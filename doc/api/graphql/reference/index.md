@@ -274,6 +274,8 @@ An endpoint and credentials used to accept alerts for a project.
 | `apiUrl` | String | URL at which Prometheus metrics can be queried to populate the metrics dashboard. |
 | `id` | ID! | ID of the integration. |
 | `name` | String | Name of the integration. |
+| `payloadAttributeMappings` | AlertManagementPayloadAlertMappingField! => Array | The custom mapping of GitLab alert attributes to fields from the payload_example. |
+| `payloadExample` | JsonString | The example of an alert payload. |
 | `token` | String | Token used to authenticate alert notification requests. |
 | `type` | AlertManagementIntegrationType! | Type of integration. |
 | `url` | String | Endpoint which accepts alert notifications. |
@@ -288,6 +290,17 @@ Parsed field from an alert used for custom mappings.
 | `path` | String! => Array | Path to value inside payload JSON. |
 | `type` | AlertManagementPayloadAlertFieldType | Type of the parsed value. |
 
+### AlertManagementPayloadAlertMappingField
+
+Parsed field (with its name) from an alert used for custom mappings.
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `fieldName` | AlertManagementPayloadAlertFieldName | A GitLab alert field name. |
+| `label` | String | Human-readable label of the payload path. |
+| `path` | String! => Array | Path to value inside payload JSON. |
+| `type` | AlertManagementPayloadAlertFieldType | Type of the parsed value. |
+
 ### AlertManagementPrometheusIntegration
 
 An endpoint and credentials used to accept Prometheus alerts for a project.
@@ -298,6 +311,8 @@ An endpoint and credentials used to accept Prometheus alerts for a project.
 | `apiUrl` | String | URL at which Prometheus metrics can be queried to populate the metrics dashboard. |
 | `id` | ID! | ID of the integration. |
 | `name` | String | Name of the integration. |
+| `payloadAttributeMappings` | AlertManagementPayloadAlertMappingField! => Array | The custom mapping of GitLab alert attributes to fields from the payload_example. |
+| `payloadExample` | JsonString | The example of an alert payload. |
 | `token` | String | Token used to authenticate alert notification requests. |
 | `type` | AlertManagementIntegrationType! | Type of integration. |
 | `url` | String | Endpoint which accepts alert notifications. |

@@ -56,3 +56,5 @@ module Types
     end
   end
 end
+
+Types::AlertManagement::IntegrationType.include_if_ee('::EE::Types::AlertManagement::IntegrationType')

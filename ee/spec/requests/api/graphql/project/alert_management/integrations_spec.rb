@@ -5,13 +5,36 @@ RSpec.describe 'getting Alert Management Integrations' do
   include ::Gitlab::Routing.url_helpers
   include GraphqlHelpers
 
+  let_it_be(:payload_example) do
+    {
+      alert: {
+        desc: 'Alert description',
+        name: 'Alert name'
+      }
+    }
+  end
+
+  let_it_be(:payload_attribute_mapping) do
+    {
+      title: { path: %w(alert name), type: 'string' },
+      description: { path: %w(alert desc), type: 'string', label: 'Description' }
+    }
+  end
+
   let_it_be(:project) { create(:project, :repository) }
   let_it_be(:current_user) { create(:user) }
   let_it_be(:prometheus_service) { create(:prometheus_service, project: project) }
   let_it_be(:project_alerting_setting) { create(:project_alerting_setting, project: project) }
-  let_it_be(:active_http_integration) { create(:alert_management_http_integration, project: project) }
   let_it_be(:inactive_http_integration) { create(:alert_management_http_integration, :inactive, project: project) }
   let_it_be(:other_project_http_integration) { create(:alert_management_http_integration) }
+  let_it_be(:active_http_integration) do
+    create(
+      :alert_management_http_integration,
+      project: project,
+      payload_example: payload_example,
+      payload_attribute_mapping: payload_attribute_mapping
+    )
+  end
 
   let(:fields) do
     <<~QUERY
@@ -31,6 +54,7 @@ RSpec.describe 'getting Alert Management Integrations' do
 
   before do
     stub_licensed_features(multiple_alert_http_integrations: true)
+    stub_feature_flags(multiple_http_integrations_custom_mapping: project)
   end
 
   context 'with integrations' do
@@ -67,7 +91,22 @@ RSpec.describe 'getting Alert Management Integrations' do
             'active' => active_http_integration.active,
             'token' => active_http_integration.token,
             'url' => active_http_integration.url,
-            'apiUrl' => nil
+            'apiUrl' => nil,
+            'payloadExample' => payload_example.to_json,
+            'payloadAttributeMappings' => [
+              {
+                'fieldName' => 'TITLE',
+                'label' => nil,
+                'path' => %w(alert name),
+                'type' => 'STRING'
+              },
+              {
+                'fieldName' => 'DESCRIPTION',
+                'label' => 'Description',
+                'path' => %w(alert desc),
+                'type' => 'STRING'
+              }
+            ]
           },
           {
             'id' => GitlabSchema.id_from_object(inactive_http_integration).to_s,
@@ -76,7 +115,9 @@ RSpec.describe 'getting Alert Management Integrations' do
             'active' => inactive_http_integration.active,
             'token' => inactive_http_integration.token,
             'url' => inactive_http_integration.url,
-            'apiUrl' => nil
+            'apiUrl' => nil,
+            'payloadExample' => "{}",
+            'payloadAttributeMappings' => []
           },
           {
             'id' => GitlabSchema.id_from_object(prometheus_service).to_s,
@@ -85,7 +126,9 @@ RSpec.describe 'getting Alert Management Integrations' do
             'active' => prometheus_service.manual_configuration?,
             'token' => project_alerting_setting.token,
             'url' => "http://localhost/#{project.full_path}/prometheus/alerts/notify.json",
-            'apiUrl' => prometheus_service.api_url
+            'apiUrl' => prometheus_service.api_url,
+            'payloadExample' => "{}",
+            'payloadAttributeMappings' => []
           }
         )
       end
