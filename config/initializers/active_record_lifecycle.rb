@@ -13,7 +13,7 @@ if defined?(ActiveRecord::Base) && !Gitlab::Runtime.sidekiq?
 end
 
 if defined?(ActiveRecord::Base)
-  Gitlab::Cluster::LifecycleEvents.on_master_start do
+  Gitlab::Cluster::LifecycleEvents.on_before_fork do
     raise 'ActiveRecord connection not established. Unable to start.' unless Gitlab::Database.exists?
 
     # the following is highly recommended for Rails + "preload_app true"

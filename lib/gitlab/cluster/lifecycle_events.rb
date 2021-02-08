@@ -83,6 +83,11 @@ module Gitlab
           end
         end
 
+        def on_before_fork(&block)
+          # Defer block execution
+          (@before_fork_hooks ||= []) << block
+        end
+
         # Read the config/initializers/cluster_events_before_phased_restart.rb
         def on_before_blackout_period(&block)
           # Defer block execution
@@ -171,13 +176,6 @@ module Gitlab
             raise FatalError, e if USE_FATAL_LIFECYCLE_EVENTS
           end
         end
-
-        # Use `on_master_start` outside of this class to support both Clustered and Single configs
-        def on_before_fork(&block)
-          # Defer block execution
-          (@before_fork_hooks ||= []) << block
-        end
-
 
         def in_clustered_puma?
           return false unless Gitlab::Runtime.puma?
