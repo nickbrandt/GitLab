@@ -153,6 +153,7 @@ class License < ApplicationRecord
     insights
     issuable_health_status
     jira_vulnerabilities_integration
+    jira_issue_association_enforcement
     license_scanning
     personal_access_token_expiration_policy
     project_activity_analytics

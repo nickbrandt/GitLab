@@ -23061,6 +23061,9 @@ msgstr ""
 msgid "ProjectSettings|Require"
 msgstr ""
 
+msgid "ProjectSettings|Require an associated issue from Jira"
+msgstr ""
+
 msgid "ProjectSettings|Requirements"
 msgstr ""
 
