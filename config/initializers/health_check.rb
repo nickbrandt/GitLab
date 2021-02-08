@@ -11,8 +11,14 @@ HealthCheck.setup do |config|
   end
 end
 
-Gitlab::Cluster::LifecycleEvents.on_master_start do
-  Gitlab::HealthChecks::MasterCheck.register_master
+if Gitlab::Cluster::LifecycleEvents.in_clustered_environment?
+  Gitlab::Cluster::LifecycleEvents.on_before_fork do
+    Gitlab::HealthChecks::MasterCheck.register_master
+  end
+else
+  Gitlab::Cluster::LifecycleEvents.on_master_start do
+    Gitlab::HealthChecks::MasterCheck.register_master
+  end
 end
 
 Gitlab::Cluster::LifecycleEvents.on_before_blackout_period do
