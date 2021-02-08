@@ -35309,6 +35309,12 @@ msgstr ""
 msgid "this document"
 msgstr ""
 
+msgid "this issue cannot be assigned to a confidential epic since it is public"
+msgstr ""
+
+msgid "this issue cannot be made public since it belongs to a confidential epic"
+msgstr ""
+
 msgid "time summary"
 msgstr ""
 
