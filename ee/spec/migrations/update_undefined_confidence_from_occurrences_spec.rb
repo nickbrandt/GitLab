@@ -8,8 +8,8 @@ RSpec.describe UpdateUndefinedConfidenceFromOccurrences, :migration do
   let(:identifiers) { table(:vulnerability_identifiers) }
   let(:scanners) { table(:vulnerability_scanners) }
   let(:projects) { table(:projects) }
-  let(:vul1) { attributes_for_vulnerability_finding(id: 1, report_type: 2, confidence: 5) }
-  let(:vul2) { attributes_for_vulnerability_finding(id: 2, report_type: 2, confidence: 5) }
+  let(:vul1) { attributes_for_vulnerability_finding(id: 1) }
+  let(:vul2) { attributes_for_vulnerability_finding(id: 2) }
 
   before do
     stub_const("#{described_class}::BATCH_SIZE", 2)
@@ -108,7 +108,7 @@ RSpec.describe UpdateUndefinedConfidenceFromOccurrences, :migration do
 
   private
 
-  def attributes_for_vulnerability_finding(id:, report_type:, confidence:)
+  def attributes_for_vulnerability_finding(id:, report_type: 2, confidence: 5)
     uuid = SecureRandom.uuid
     {
       id: id,
