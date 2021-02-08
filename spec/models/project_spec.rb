@@ -4117,7 +4117,7 @@ RSpec.describe Project, factory_default: :keep do
     end
   end
 
-  describe '#remove_pages' do
+  describe '#legacy_remove_pages' do
     let(:project) { create(:project).tap { |project| project.mark_pages_as_deployed } }
     let(:pages_metadatum) { project.pages_metadatum }
     let(:namespace) { project.namespace }
@@ -4136,7 +4136,7 @@ RSpec.describe Project, factory_default: :keep do
       expect_any_instance_of(Gitlab::PagesTransfer).to receive(:rename_project).and_return(true)
       expect(PagesWorker).to receive(:perform_in).with(5.minutes, :remove, namespace.full_path, anything)
 
-      expect { project.remove_pages }.to change { pages_metadatum.reload.deployed }.from(true).to(false)
+      expect { project.legacy_remove_pages }.to change { pages_metadatum.reload.deployed }.from(true).to(false)
     end
 
     it 'does nothing if updates on legacy storage are disabled' do
@@ -4145,11 +4145,11 @@ RSpec.describe Project, factory_default: :keep do
       expect(Gitlab::PagesTransfer).not_to receive(:new)
       expect(PagesWorker).not_to receive(:perform_in)
 
-      project.remove_pages
+      project.legacy_remove_pages
     end
 
     it 'is run when the project is destroyed' do
-      expect(project).to receive(:remove_pages).and_call_original
+      expect(project).to receive(:legacy_remove_pages).and_call_original
 
       expect { project.destroy }.not_to raise_error
     end
