@@ -10120,7 +10120,7 @@ msgstr ""
 msgid "DevopsAdoption|Adopted"
 msgstr ""
 
-msgid "DevopsAdoption|An error occured while deleting the group. Please try again."
+msgid "DevopsAdoption|An error occured while removing the group. Please try again."
 msgstr ""
 
 msgid "DevopsAdoption|An error occured while saving the group. Please try again."
@@ -10129,7 +10129,7 @@ msgstr ""
 msgid "DevopsAdoption|Approvals"
 msgstr ""
 
-msgid "DevopsAdoption|Are you sure that you would like to delete %{name}?"
+msgid "DevopsAdoption|Are you sure that you would like to remove %{name} from the table?"
 msgstr ""
 
 msgid "DevopsAdoption|At least 1 MR opened"
@@ -10150,10 +10150,7 @@ msgstr ""
 msgid "DevopsAdoption|At least 1 security scan of any type run in pipeline"
 msgstr ""
 
-msgid "DevopsAdoption|Confirm delete Group"
-msgstr ""
-
-msgid "DevopsAdoption|Delete Group"
+msgid "DevopsAdoption|Confirm remove Group"
 msgstr ""
 
 msgid "DevopsAdoption|Deploys"
@@ -10187,6 +10184,12 @@ msgid "DevopsAdoption|Not adopted"
 msgstr ""
 
 msgid "DevopsAdoption|Pipelines"
+msgstr ""
+
+msgid "DevopsAdoption|Remove Group"
+msgstr ""
+
+msgid "DevopsAdoption|Remove Group from the table"
 msgstr ""
 
 msgid "DevopsAdoption|Runner configured for project/group"

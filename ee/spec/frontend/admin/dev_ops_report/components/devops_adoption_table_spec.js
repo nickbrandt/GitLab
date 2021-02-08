@@ -137,7 +137,7 @@ describe('DevopsAdoptionTable', () => {
       const button = findColSubComponent(TEST_IDS.ACTIONS, GlButton);
 
       expect(button.exists()).toBe(true);
-      expect(button.props('icon')).toBe('ellipsis_h');
+      expect(button.props('icon')).toBe('remove');
       expect(button.props('category')).toBe('tertiary');
     });
   });

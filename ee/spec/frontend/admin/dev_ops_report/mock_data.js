@@ -133,4 +133,4 @@ export const genericErrorMessage = 'An error occured while saving the group. Ple
 export const dataErrorMessage = 'Name already taken.';
 
 export const genericDeleteErrorMessage =
-  'An error occured while deleting the group. Please try again.';
+  'An error occured while removing the group. Please try again.';

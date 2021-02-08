@@ -1,12 +1,5 @@
 <script>
-import {
-  GlTable,
-  GlButton,
-  GlPopover,
-  GlModalDirective,
-  GlTooltipDirective,
-  GlIcon,
-} from '@gitlab/ui';
+import { GlTable, GlButton, GlModalDirective, GlTooltipDirective, GlIcon } from '@gitlab/ui';
 import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 import {
   DEVOPS_ADOPTION_TABLE_TEST_IDS,
@@ -62,7 +55,6 @@ export default {
     GlTable,
     DevopsAdoptionTableCellFlag,
     GlButton,
-    GlPopover,
     LocalStorageSync,
     DevopsAdoptionDeleteModal,
     GlIcon,
@@ -104,12 +96,6 @@ export default {
     };
   },
   methods: {
-    popoverContainerId(name) {
-      return `popover_container_id_for_${name}`;
-    },
-    popoverId(name) {
-      return `popover_id_for_${name}`;
-    },
     setSelectedSegment(segment) {
       this.$emit('set-selected-segment', segment);
     },
@@ -229,23 +215,13 @@ export default {
 
       <template #cell(actions)="{ item }">
         <div :data-testid="$options.testids.ACTIONS">
-          <gl-button :id="popoverId(item.id)" category="tertiary" icon="ellipsis_h" />
-          <div :id="popoverContainerId(item.id)">
-            <gl-popover
-              :target="popoverId(item.id)"
-              :container="popoverContainerId(item.id)"
-              triggers="hover focus"
-              placement="left"
-            >
-              <gl-button
-                v-gl-modal="$options.devopsSegmentDeleteModalId"
-                category="tertiary"
-                variant="danger"
-                @click="setSelectedSegment(item)"
-                >{{ $options.i18n.deleteButton }}</gl-button
-              >
-            </gl-popover>
-          </div>
+          <gl-button
+            v-gl-modal="$options.devopsSegmentDeleteModalId"
+            v-gl-tooltip.hover="$options.i18n.removeButton"
+            category="tertiary"
+            icon="remove"
+            @click="setSelectedSegment(item)"
+          />
         </div>
       </template>
     </gl-table>
