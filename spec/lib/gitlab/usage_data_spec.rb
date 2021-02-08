@@ -746,6 +746,7 @@ RSpec.describe Gitlab::UsageData, :aggregate_failures do
     it { is_expected.to include(:package_events_i_package_delete_package_by_user) }
     it { is_expected.to include(:package_events_i_package_conan_push_package) }
     it { is_expected.to include(:project_integration_activity_slack) }
+    it { is_expected.to include(:project_integration_activity_mattermost) }
   end
 
   describe '.usage_data_counters' do

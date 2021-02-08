@@ -116,6 +116,15 @@ RSpec.shared_examples 'slack or mattermost notifications' do |service_name|
       @wiki_page_sample_data = Gitlab::DataBuilder::WikiPage.build(@wiki_page, user, 'create')
     end
 
+    it 'increases the usage data counter' do
+      expect(Gitlab::UsageDataCounters::ProjectIntegrationActivityCounter).to receive(:count).with(service_name.downcase)
+      expect_next_instance_of(Slack::Messenger) do |slack_messenger|
+        expect(slack_messenger).to receive(:ping)
+      end
+
+      chat_service.execute(data)
+    end
+
     it "calls #{service_name} API for push events" do
       chat_service.execute(data)
 
