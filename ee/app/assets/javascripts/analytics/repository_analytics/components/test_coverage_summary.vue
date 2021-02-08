@@ -32,8 +32,8 @@ export default {
           startDate: new Date(Date.now() - THIRTY_DAYS),
         };
       },
-      result(res) {
-        const groupCoverage = res.data?.group?.codeCoverageActivities?.nodes;
+      result({ data }) {
+        const groupCoverage = data.group.codeCoverageActivities.nodes;
         const { projectCount, averageCoverage, coverageCount } =
           groupCoverage?.[groupCoverage.length - 1] || {};
 
@@ -74,27 +74,24 @@ export default {
       isLoading: false,
     };
   },
-  i18n: {
-    cardTitle: __('Overall Activity'),
-  },
   computed: {
     metrics() {
       return [
         {
           key: 'projectCount',
           value: this.projectCount,
-          label: s__('RepositoriesAnalytics|Projects with Coverage'),
+          label: this.$options.text.metrics.projectCountLabel,
         },
         {
           key: 'averageCoverage',
           value: this.averageCoverage,
           unit: '%',
-          label: s__('RepositoriesAnalytics|Average Coverage by Job'),
+          label: this.$options.text.metrics.averageCoverageLabel,
         },
         {
           key: 'coverageCount',
           value: this.coverageCount,
-          label: s__('RepositoriesAnalytics|Jobs with Coverage'),
+          label: this.$options.text.metrics.coverageCountLabel,
         },
       ];
     },
@@ -127,12 +124,23 @@ export default {
     yAxisName: __('Coverage'),
     xAxisName: __('Date'),
     graphName: s__('RepositoriesAnalytics|Average coverage'),
+    graphTooltipMessage: __('Code Coverage: %{coveragePercentage}%{percentSymbol}'),
+    metrics: {
+      cardTitle: __('Overall Activity'),
+      projectCountLabel: s__('RepositoriesAnalytics|Projects with Coverage'),
+      averageCoverageLabel: s__('RepositoriesAnalytics|Average Coverage by Job'),
+      coverageCountLabel: s__('RepositoriesAnalytics|Jobs with Coverage'),
+    },
   },
 };
 </script>
 <template>
   <div>
-    <metric-card :title="$options.i18n.cardTitle" :metrics="metrics" :is-loading="isLoading" />
+    <metric-card
+      :title="$options.text.metrics.cardTitle"
+      :metrics="metrics"
+      :is-loading="isLoading"
+    />
 
     <gl-card>
       <template #header>
@@ -153,7 +161,7 @@ export default {
           {{ tooltipTitle }}
         </template>
         <template #tooltip-content>
-          <gl-sprintf :message="__('Code Coverage: %{coveragePercentage}%{percentSymbol}')">
+          <gl-sprintf :message="$options.text.graphTooltipMessage">
             <template #coveragePercentage>
               {{ coveragePercentage }}
             </template>

@@ -3,6 +3,7 @@ import { mount, createLocalVue } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 import TestCoverageSummary from 'ee/analytics/repository_analytics/components/test_coverage_summary.vue';
 import getGroupTestCoverage from 'ee/analytics/repository_analytics/graphql/queries/get_group_test_coverage.query.graphql';
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import waitForPromises from 'helpers/wait_for_promises';
 
@@ -15,8 +16,8 @@ describe('Test coverage table component', () => {
   const findProjectsWithTests = () => wrapper.find('.js-metric-card-item:nth-child(1) h3');
   const findAverageCoverage = () => wrapper.find('.js-metric-card-item:nth-child(2) h3');
   const findTotalCoverages = () => wrapper.find('.js-metric-card-item:nth-child(3) h3');
-  const findGroupCoverageChart = () => wrapper.find('[data-testid="group-coverage-chart"]');
-  const findChartLoadingState = () => wrapper.find('[data-testid="group-coverage-chart-loading"]');
+  const findGroupCoverageChart = () => wrapper.findByTestId('group-coverage-chart');
+  const findChartLoadingState = () => wrapper.findByTestId('group-coverage-chart-loading');
   const findLoadingState = () => wrapper.find(GlSkeletonLoading);
 
   const createComponent = ({ data = {} } = {}, withApollo = false) => {
@@ -50,7 +51,7 @@ describe('Test coverage table component', () => {
       };
     }
 
-    wrapper = mount(TestCoverageSummary, props);
+    wrapper = extendedWrapper(mount(TestCoverageSummary, props));
   };
 
   afterEach(() => {
