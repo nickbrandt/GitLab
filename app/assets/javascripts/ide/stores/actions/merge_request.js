@@ -147,70 +147,83 @@ export const getMergeRequestVersions = (
     }
   });
 
-export const openMergeRequest = (
-  { dispatch, state, getters },
+export const openMergeRequest = async (
+  { dispatch, getters },
   { projectId, targetProjectId, mergeRequestId } = {},
-) =>
-  dispatch('getMergeRequestData', {
+) => {
+  try {
+    const mr = await dispatch('getMergeRequestData', {
+      projectId,
+      targetProjectId,
+      mergeRequestId,
+    });
+
+    await dispatch('setCurrentBranchId', mr.source_branch);
+
+    await dispatch('getBranchData', {
+      projectId,
+      branchId: mr.source_branch,
+    });
+
+    const branch = getters.findBranch(projectId, mr.source_branch);
+
+    await dispatch('getFiles', {
+      projectId,
+      branchId: mr.source_branch,
+      ref: branch.commit.id,
+    });
+
+    await dispatch('getMergeRequestVersions', {
+      projectId,
+      targetProjectId,
+      mergeRequestId,
+    });
+
+    await dispatch('openMergeRequestChanges', { projectId, targetProjectId, mergeRequestId });
+  } catch (e) {
+    flash(__('Error while loading the merge request. Please try again.'));
+    throw e;
+  }
+};
+
+export const openMergeRequestChanges = async (
+  { state, dispatch, getters },
+  { projectId, targetProjectId, mergeRequestId },
+) => {
+  const mrChanges = await dispatch('getMergeRequestChanges', {
     projectId,
     targetProjectId,
     mergeRequestId,
-  })
-    .then((mr) => {
-      dispatch('setCurrentBranchId', mr.source_branch);
+  });
 
-      return dispatch('getBranchData', {
-        projectId,
-        branchId: mr.source_branch,
-      }).then(() => {
-        const branch = getters.findBranch(projectId, mr.source_branch);
+  if (!mrChanges.changes.length) {
+    return;
+  }
 
-        return dispatch('getFiles', {
-          projectId,
-          branchId: mr.source_branch,
-          ref: branch.commit.id,
+  await dispatch('updateActivityBarView', leftSidebarViews.review.name);
+
+  // Load all file data for mr changes
+  await Promise.all(
+    mrChanges.changes.map(async (change, ind) => {
+      const changeTreeEntry = state.entries[change.new_path];
+
+      if (changeTreeEntry) {
+        await dispatch('setFileMrChange', {
+          file: changeTreeEntry,
+          mrChange: change,
         });
-      });
-    })
-    .then(() =>
-      dispatch('getMergeRequestVersions', {
-        projectId,
-        targetProjectId,
-        mergeRequestId,
-      }),
-    )
-    .then(() =>
-      dispatch('getMergeRequestChanges', {
-        projectId,
-        targetProjectId,
-        mergeRequestId,
-      }),
-    )
-    .then((mrChanges) => {
-      if (mrChanges.changes.length) {
-        dispatch('updateActivityBarView', leftSidebarViews.review.name);
-      }
 
-      mrChanges.changes.forEach((change, ind) => {
-        const changeTreeEntry = state.entries[change.new_path];
-
-        if (changeTreeEntry) {
-          dispatch('setFileMrChange', {
-            file: changeTreeEntry,
-            mrChange: change,
+        if (ind < 10) {
+          await dispatch('getFileData', {
+            path: change.new_path,
+            makeFileActive: ind === 0,
+            openFile: true,
           });
-
-          if (ind < 10) {
-            dispatch('getFileData', {
-              path: change.new_path,
-              makeFileActive: ind === 0,
-              openFile: true,
-            });
-          }
         }
-      });
-    })
-    .catch((e) => {
-      flash(__('Error while loading the merge request. Please try again.'));
-      throw e;
-    });
+      }
+    }),
+  );
+
+  // Open the first change in the router
+  dispatch('router/push', getters.getUrlForPath(mrChanges.changes[0].new_path));
+};
