@@ -17,7 +17,6 @@ describe('Test reports suite table', () => {
   const {
     test_suites: [testSuite],
   } = getJSONFixture('pipelines/test_report.json');
-  console.log(JSON.stringify(testSuite.test_cases));
 
   testSuite.test_cases = [...testSuite.test_cases, ...skippedTestCases];
   const testCases = testSuite.test_cases;
@@ -92,8 +91,6 @@ describe('Test reports suite table', () => {
       const row = findCaseRowAtIndex(0);
       const fileLink = findLinkForRow(row);
       const button = row.find(GlButton);
-
-      console.log(fileLink.attributes('href'), file);
 
       expect(fileLink.attributes('href')).toBe(filePath);
       expect(row.text()).toContain(file);
