@@ -82,14 +82,6 @@ module Gitlab
       user&.username
     end
 
-    def user_id
-      user&.id
-    end
-
-    def user_email
-      user&.email
-    end
-
     def root_namespace_path
       if namespace
         namespace.full_path_components.first
