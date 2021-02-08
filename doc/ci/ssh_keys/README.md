@@ -47,7 +47,7 @@ contained) and you want to deploy your code in a private server, you need a way
 to access it. This is where an SSH key pair comes in handy.
 
 1. You first need to create an SSH key pair. For more information, follow
-   the instructions to [generate an SSH key](../../ssh/README.md#generating-a-new-ssh-key-pair).
+   the instructions to [generate an SSH key](../../ssh/README.md#generate-an-ssh-key-pair).
    **Do not** add a passphrase to the SSH key, or the `before_script` will
    prompt for it.
 
@@ -123,7 +123,7 @@ on, and use that key for all projects that are run on this machine.
    ```
 
 1. Generate the SSH key pair as described in the instructions to
-   [generate an SSH key](../../ssh/README.md#generating-a-new-ssh-key-pair).
+   [generate an SSH key](../../ssh/README.md#generate-an-ssh-key-pair).
    **Do not** add a passphrase to the SSH key, or the `before_script` will
    prompt for it.
 
