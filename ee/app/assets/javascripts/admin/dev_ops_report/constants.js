@@ -53,7 +53,7 @@ export const DEVOPS_ADOPTION_STRINGS = {
     noResults: s__('DevopsAdoption|No filter results.'),
   },
   table: {
-    deleteButton: s__('DevopsAdoption|Delete Group'),
+    removeButton: s__('DevopsAdoption|Remove Group from the table'),
     headers: {
       name: {
         label: __('Group'),
@@ -89,11 +89,13 @@ export const DEVOPS_ADOPTION_STRINGS = {
     },
   },
   deleteModal: {
-    title: s__('DevopsAdoption|Confirm delete Group'),
-    confirmationMessage: s__('DevopsAdoption|Are you sure that you would like to delete %{name}?'),
+    title: s__('DevopsAdoption|Confirm remove Group'),
+    confirmationMessage: s__(
+      'DevopsAdoption|Are you sure that you would like to remove %{name} from the table?',
+    ),
     cancel: __('Cancel'),
-    confirm: s__('DevopsAdoption|Delete Group'),
-    error: s__('DevopsAdoption|An error occured while deleting the group. Please try again.'),
+    confirm: s__('DevopsAdoption|Remove Group'),
+    error: s__('DevopsAdoption|An error occured while removing the group. Please try again.'),
   },
   tableCell: {
     trueText: s__('DevopsAdoption|Adopted'),
