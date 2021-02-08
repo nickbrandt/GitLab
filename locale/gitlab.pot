@@ -19566,6 +19566,9 @@ msgstr ""
 msgid "New User"
 msgstr ""
 
+msgid "New application"
+msgstr ""
+
 msgid "New branch"
 msgstr ""
 
@@ -28133,6 +28136,12 @@ msgstr ""
 msgid "System Info"
 msgstr ""
 
+msgid "System OAuth applications"
+msgstr ""
+
+msgid "System OAuth applications don't belong to any user and can only be managed by admins"
+msgstr ""
+
 msgid "System default (%{default})"
 msgstr ""
 
@@ -30718,6 +30727,9 @@ msgid "Triggers|To pass variables to the triggered pipeline, add %{code_start}va
 msgstr ""
 
 msgid "Troubleshoot and monitor your application with tracing"
+msgstr ""
+
+msgid "Trusted"
 msgstr ""
 
 msgid "Try again"
