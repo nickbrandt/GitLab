@@ -1,45 +1,47 @@
 .row
   .col-md-6
-    .card
-      .card-header
+    .gl-card.gl-mb-5
+      .gl-card-header
         = _('Licensed to')
-      %ul.content-list
-        - @license.licensee.each do |label, value|
-          %li
-            %span.light= succeed(':') { label }
-            %strong= value
+      .gl-card-body
+        %ul.content-list
+          - @license.licensee.each do |label, value|
+            %li
+              %span.light= succeed(':') { label }
+              %strong= value
 
-    .card.js-license-info-panel
+    .gl-card.js-license-info-panel.gl-mb-5
       .gl-card-header
         = _('Details')
-      %ul.content-list
-        %li
-          %span.light= _('Plan:')
-          %strong= @license.plan.capitalize
-          - unless @license.ultimate?
-            = ' - '
-            = link_to _('Contact Sales to upgrade'),
-              'https://about.gitlab.com/sales/?inapplink=contactsalessm',
-              class: 'inline-link',
-              target: :_blank,
-              rel: :noreferrer
-        %li
-          %span.light= _('Uploaded:')
-          %strong= time_ago_with_tooltip @license.created_at
-        %li
-          %span.light= _('Started:')
-          %strong= time_ago_with_tooltip @license.starts_at
-        %li
-          %span.light
-            = render 'license_status'
+      .gl-card-body
+        %ul.content-list
+          %li
+            %span.light= _('Plan:')
+            %strong= @license.plan.capitalize
+            - unless @license.ultimate?
+              = ' - '
+              = link_to _('Contact Sales to upgrade'),
+                'https://about.gitlab.com/sales/?inapplink=contactsalessm',
+                class: 'inline-link',
+                target: :_blank,
+                rel: :noreferrer
+          %li
+            %span.light= _('Uploaded:')
+            %strong= time_ago_with_tooltip @license.created_at
+          %li
+            %span.light= _('Started:')
+            %strong= time_ago_with_tooltip @license.starts_at
+          %li
+            %span.light
+              = render 'license_status'
 
-          - if @license.expired?
-            %span.badge.badge-danger.float-right
-              %strong= _('Expired')
-        %li
-          %span.light= _('License ID:')
-          %strong= @license.license_id
-          = clipboard_button(text: @license.license_id, title: _("Copy ID"), class: "btn-transparent btn-clipboard")
+            - if @license.expired?
+              %span.badge.badge-danger.float-right
+                %strong= _('Expired')
+          %li
+            %span.light= _('License ID:')
+            %strong= @license.license_id
+            = clipboard_button(text: @license.license_id, title: _("Copy ID"), class: "btn-transparent btn-clipboard")
 
 
   .col-md-6
