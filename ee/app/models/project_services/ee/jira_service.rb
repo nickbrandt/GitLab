@@ -66,7 +66,7 @@ module EE
             description: description
           }
         )
-        log_usage(:issue_create, current_user)
+        log_usage(:create_issue, current_user)
         issue
       end
     end

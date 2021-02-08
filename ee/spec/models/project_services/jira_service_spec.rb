@@ -163,7 +163,7 @@ RSpec.describe JiraService do
 
         expect(Gitlab::UsageDataCounters::HLLRedisCounter)
           .to receive(:track_event)
-          .with('i_ecosystem_jira_service_issue_create', values: user.id)
+          .with('i_ecosystem_jira_service_create_issue', values: user.id)
 
         jira_service.create_issue('x', 'y', user)
       end
