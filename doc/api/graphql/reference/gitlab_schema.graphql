@@ -2483,6 +2483,13 @@ type BurnupChartDailyTotals {
   scopeWeight: Int!
 }
 
+type CiApplicationSettings {
+  """
+  Whether to keep the latest jobs artifacts.
+  """
+  keepLatestArtifact: Boolean
+}
+
 type CiBuildNeed {
   """
   Name of the job we need to complete.
@@ -20797,6 +20804,11 @@ type PromoteToEpicPayload {
 }
 
 type Query {
+  """
+  CI related settings that apply to the entire instance.
+  """
+  ciApplicationSettings: CiApplicationSettings
+
   """
   Get linted and processed contents of a CI config. Should not be requested more than once per request.
   """
