@@ -497,6 +497,18 @@ RSpec.describe 'Admin updates settings' do
         expect(page).to have_content "Application settings saved successfully"
         expect(current_settings.issues_create_limit).to eq(0)
       end
+
+      it 'changes Notes rate limits settings' do
+        visit network_admin_application_settings_path
+
+        page.within('.as-note-limits') do
+          fill_in 'Max requests per second per user', with: 0
+          click_button 'Save changes'
+        end
+
+        expect(page).to have_content "Application settings saved successfully"
+        expect(current_settings.issues_create_limit).to eq(0)
+      end
     end
 
     context 'Preferences page' do

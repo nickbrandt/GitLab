@@ -81,6 +81,7 @@ Example response:
   "npm_package_requests_forwarding": true,
   "snippet_size_limit": 52428800,
   "issues_create_limit": 300,
+  "notes_create_limit": 300,
   "raw_blob_request_limit": 300,
   "wiki_page_max_content_bytes": 52428800,
   "require_admin_approval_after_user_signup": false,
@@ -175,6 +176,7 @@ Example response:
   "npm_package_requests_forwarding": true,
   "snippet_size_limit": 52428800,
   "issues_create_limit": 300,
+  "notes_create_limit": 300,
   "raw_blob_request_limit": 300,
   "wiki_page_max_content_bytes": 52428800,
   "require_admin_approval_after_user_signup": false,
@@ -306,6 +308,7 @@ listed in the descriptions of the relevant settings.
 | `invisible_captcha_enabled`              | boolean          | no                                   | <!-- vale gitlab.Spelling = NO --> Enable Invisible Captcha <!-- vale gitlab.Spelling = YES --> spam detection during sign-up. Disabled by default. |
 | `issues_create_limit`                    | integer          | no                                   | Max number of issue creation requests per minute per user. Disabled by default.|
 | `local_markdown_version`                 | integer          | no                                   | Increase this value when any cached Markdown should be invalidated. |
+| `notes_create_limit`                     | integer          | no                                   | Max number of notes creation requests per minute per user. Default is `300`. Set to `0` to disable.|
 | `maintenance_mode_message`               | string           | no                                   | **(PREMIUM)** Message displayed when instance is in maintenance mode |
 | `maintenance_mode`                       | boolean          | no                                   | **(PREMIUM)** When instance is in maintenance mode, non-administrative users can sign in with read-only access and make read-only API requests |
 | `max_artifacts_size`                     | integer          | no                                   | Maximum artifacts size in MB |

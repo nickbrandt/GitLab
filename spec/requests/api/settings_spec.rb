@@ -118,6 +118,7 @@ RSpec.describe API::Settings, 'Settings' do
             push_event_activities_limit: 2,
             snippet_size_limit: 5,
             issues_create_limit: 300,
+            notes_create_limit: 300,
             raw_blob_request_limit: 300,
             spam_check_endpoint_enabled: true,
             spam_check_endpoint_url: 'https://example.com/spam_check',
@@ -162,6 +163,7 @@ RSpec.describe API::Settings, 'Settings' do
         expect(json_response['push_event_activities_limit']).to eq(2)
         expect(json_response['snippet_size_limit']).to eq(5)
         expect(json_response['issues_create_limit']).to eq(300)
+        expect(json_response['notes_create_limit']).to eq(300)
         expect(json_response['raw_blob_request_limit']).to eq(300)
         expect(json_response['spam_check_endpoint_enabled']).to be_truthy
         expect(json_response['spam_check_endpoint_url']).to eq('https://example.com/spam_check')
