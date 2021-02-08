@@ -170,7 +170,12 @@ class ApplicationController < ActionController::Base
   end
 
   def log_exception(exception)
-    Gitlab::ErrorTracking.track_exception(exception)
+    # At this point, the controller already exits set_current_context around
+    # block. To maintain the context while handling error exception, we need to
+    # set the context again
+    set_current_context do
+      Gitlab::ErrorTracking.track_exception(exception)
+    end
 
     backtrace_cleaner = request.env["action_dispatch.backtrace_cleaner"]
     application_trace = ActionDispatch::ExceptionWrapper.new(backtrace_cleaner, exception).application_trace
