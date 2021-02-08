@@ -987,7 +987,7 @@ describe('Value Stream Analytics actions', () => {
         { ...hiddenStage, ...mockEvents },
       ],
     };
-    const createResp = { id: 'new value stream', is_custom: true, ...payload };
+    const updateResp = { id: 'new value stream', is_custom: true, ...payload };
 
     beforeEach(() => {
       state = { currentGroup };
@@ -995,7 +995,7 @@ describe('Value Stream Analytics actions', () => {
 
     describe('with no errors', () => {
       beforeEach(() => {
-        mock.onPut(endpoints.valueStreamData).replyOnce(httpStatusCodes.OK, createResp);
+        mock.onPut(endpoints.valueStreamData).replyOnce(httpStatusCodes.OK, updateResp);
       });
 
       it(`commits the ${types.REQUEST_UPDATE_VALUE_STREAM} and ${types.RECEIVE_UPDATE_VALUE_STREAM_SUCCESS} actions`, () => {
@@ -1004,11 +1004,10 @@ describe('Value Stream Analytics actions', () => {
           payload,
           state,
           [
-            {
-              type: types.REQUEST_UPDATE_VALUE_STREAM,
-            },
+            { type: types.REQUEST_UPDATE_VALUE_STREAM },
+            { type: types.RECEIVE_UPDATE_VALUE_STREAM_SUCCESS, payload: updateResp },
           ],
-          [{ type: 'receiveUpdateValueStreamSuccess', payload: createResp }],
+          [{ type: 'fetchCycleAnalyticsData' }],
         );
       });
     });
@@ -1022,19 +1021,13 @@ describe('Value Stream Analytics actions', () => {
       });
 
       it(`commits the ${types.REQUEST_UPDATE_VALUE_STREAM} and ${types.RECEIVE_UPDATE_VALUE_STREAM_ERROR} actions `, () => {
-        return testAction(
-          actions.updateValueStream,
-          payload,
-          state,
-          [
-            { type: types.REQUEST_UPDATE_VALUE_STREAM },
-            {
-              type: types.RECEIVE_UPDATE_VALUE_STREAM_ERROR,
-              payload: { message, data: payload, errors },
-            },
-          ],
-          [],
-        );
+        return testAction(actions.updateValueStream, payload, state, [
+          { type: types.REQUEST_UPDATE_VALUE_STREAM },
+          {
+            type: types.RECEIVE_UPDATE_VALUE_STREAM_ERROR,
+            payload: { message, data: payload, errors },
+          },
+        ]);
       });
     });
   });

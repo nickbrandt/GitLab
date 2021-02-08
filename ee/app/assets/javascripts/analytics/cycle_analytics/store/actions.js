@@ -354,11 +354,6 @@ export const createValueStream = ({ commit, dispatch, getters }, data) => {
     });
 };
 
-export const receiveUpdateValueStreamSuccess = ({ commit, dispatch }, valueStream = {}) => {
-  commit(types.RECEIVE_UPDATE_VALUE_STREAM_SUCCESS, valueStream);
-  return dispatch('fetchCycleAnalyticsData');
-};
-
 export const updateValueStream = (
   { commit, dispatch, getters },
   { id: valueStreamId, ...data },
@@ -367,7 +362,10 @@ export const updateValueStream = (
   commit(types.REQUEST_UPDATE_VALUE_STREAM);
 
   return Api.cycleAnalyticsUpdateValueStream({ groupId: currentGroupPath, valueStreamId, data })
-    .then(({ data: newValueStream }) => dispatch('receiveUpdateValueStreamSuccess', newValueStream))
+    .then(({ data: newValueStream }) => {
+      commit(types.RECEIVE_UPDATE_VALUE_STREAM_SUCCESS, newValueStream);
+      return dispatch('fetchCycleAnalyticsData');
+    })
     .catch(({ response } = {}) => {
       const { data: { message, payload: { errors } } = null } = response;
       commit(types.RECEIVE_UPDATE_VALUE_STREAM_ERROR, { message, errors, data });
