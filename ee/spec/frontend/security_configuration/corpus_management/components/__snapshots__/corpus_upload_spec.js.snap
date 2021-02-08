@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Corpus Upload component renders header 1`] = `
+<div
+  class="gl-h-11 gl-bg-gray-10 gl-display-flex gl-justify-content-space-between gl-align-items-center"
+>
+  <div
+    class="gl-ml-5"
+  >
+    
+    Total Size:
+    
+    <span
+      class="gl-font-weight-bold"
+    >
+      381.47 MiB
+    </span>
+  </div>
+   
+  <gl-button-stub
+    buttontextclasses=""
+    category="primary"
+    class="gl-mr-5"
+    icon=""
+    size="medium"
+    variant="success"
+  >
+    
+    New corpus
+  
+  </gl-button-stub>
+</div>
+`;
