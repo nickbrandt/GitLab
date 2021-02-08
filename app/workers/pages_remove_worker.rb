@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO: remove this worker https://gitlab.com/gitlab-org/gitlab/-/issues/320775
 class PagesRemoveWorker # rubocop:disable Scalability/IdempotentWorker
   include ApplicationWorker
 
@@ -11,6 +12,6 @@ class PagesRemoveWorker # rubocop:disable Scalability/IdempotentWorker
     project = Project.find_by_id(project_id)
     return unless project
 
-    project.remove_pages
+    project.legacy_remove_pages
   end
 end
