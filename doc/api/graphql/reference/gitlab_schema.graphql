@@ -11620,9 +11620,24 @@ type Group {
     first: Int
 
     """
+    Include labels from ancestor groups.
+    """
+    includeAncestorGroups: Boolean = false
+
+    """
+    Include labels from descendant groups.
+    """
+    includeDescendantGroups: Boolean = false
+
+    """
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    Include only group level labels.
+    """
+    onlyGroupLabels: Boolean = false
 
     """
     A search term to find labels with.
@@ -19833,6 +19848,11 @@ type Project {
     Returns the first _n_ elements from the list.
     """
     first: Int
+
+    """
+    Include labels from ancestor groups.
+    """
+    includeAncestorGroups: Boolean = false
 
     """
     Returns the last _n_ elements from the list.
