@@ -83,11 +83,6 @@ module Gitlab
           end
         end
 
-        def on_before_fork(&block)
-          # Defer block execution
-          (@before_fork_hooks ||= []) << block
-        end
-
         # Read the config/initializers/cluster_events_before_phased_restart.rb
         def on_before_blackout_period(&block)
           # Defer block execution
@@ -147,6 +142,20 @@ module Gitlab
           @puma_options = options
         end
 
+        def in_clustered_environment?
+          # Sidekiq doesn't fork
+          return false if Gitlab::Runtime.sidekiq?
+
+          # Unicorn always forks
+          return true if Gitlab::Runtime.unicorn?
+
+          # Puma sometimes forks
+          return true if in_clustered_puma?
+
+          # Default assumption is that we don't fork
+          false
+        end
+
         private
 
         def call(name, hooks)
@@ -163,19 +172,12 @@ module Gitlab
           end
         end
 
-        def in_clustered_environment?
-          # Sidekiq doesn't fork
-          return false if Gitlab::Runtime.sidekiq?
-
-          # Unicorn always forks
-          return true if Gitlab::Runtime.unicorn?
-
-          # Puma sometimes forks
-          return true if in_clustered_puma?
-
-          # Default assumption is that we don't fork
-          false
+        # Use `on_master_start` outside of this class to support both Clustered and Single configs
+        def on_before_fork(&block)
+          # Defer block execution
+          (@before_fork_hooks ||= []) << block
         end
+
 
         def in_clustered_puma?
           return false unless Gitlab::Runtime.puma?

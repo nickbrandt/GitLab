@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 if /darwin/ =~ RUBY_PLATFORM
-  Gitlab::Cluster::LifecycleEvents.on_before_fork do
+  Gitlab::Cluster::LifecycleEvents.on_master_start do
     require 'fiddle'
 
     # Dynamically load Foundation.framework, ~implicitly~ initialising
