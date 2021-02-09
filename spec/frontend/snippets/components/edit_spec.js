@@ -3,6 +3,7 @@ import { GlLoadingIcon } from '@gitlab/ui';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { merge } from 'lodash';
+import { useFakeDate } from 'helpers/fake_date';
 import waitForPromises from 'helpers/wait_for_promises';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import { stubComponent } from 'helpers/stub_component';
@@ -94,6 +95,8 @@ const localVue = createLocalVue();
 localVue.use(VueApollo);
 
 describe('Snippet Edit app', () => {
+  useFakeDate();
+
   let wrapper;
   let getSpy;
 
