@@ -12,7 +12,7 @@ module Gitlab
         # processor should be removed.
         def process(payload)
           context_payload = Gitlab::ErrorTracking::ContextPayloadGenerator.generate(nil, {})
-          context_payload.merge!(payload)
+          payload.deep_merge!(context_payload)
         end
       end
     end
