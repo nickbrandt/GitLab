@@ -1,10 +1,10 @@
 import setHighlightClass from 'ee_else_ce/search/highlight_blob_search_result';
 import { queryToObject } from '~/lib/utils/url_utility';
 import Project from '~/pages/projects/project';
-import createStore from './store';
-import { initTopbar } from './topbar';
 import { initSidebar } from './sidebar';
 import { initSearchSort } from './sort';
+import createStore from './store';
+import { initTopbar } from './topbar';
 
 export const initSearchApp = () => {
   // Similar to url_utility.decodeUrlParameter

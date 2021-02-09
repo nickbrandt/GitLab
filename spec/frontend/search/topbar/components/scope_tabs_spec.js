@@ -1,6 +1,6 @@
-import Vuex from 'vuex';
-import { createLocalVue, mount } from '@vue/test-utils';
 import { GlTabs, GlTab, GlBadge } from '@gitlab/ui';
+import { createLocalVue, mount } from '@vue/test-utils';
+import Vuex from 'vuex';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 import { MOCK_QUERY, MOCK_SCOPE_TABS } from 'jest/search/mock_data';
 import ScopeTabs from '~/search/topbar/components/scope_tabs.vue';
