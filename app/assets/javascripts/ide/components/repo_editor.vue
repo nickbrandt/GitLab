@@ -295,7 +295,7 @@ export default {
     setupEditor() {
       if (!this.file || !this.editor || this.file.loading) return;
 
-      this.editor.bootstrapInstance();
+      this.editor.updateDimensions();
 
       const head = this.getStagedFile(this.file.path);
 
@@ -305,8 +305,6 @@ export default {
       );
 
       this.model.updateOptions(this.rules);
-
-      this.editor.updateDimensions();
 
       this.model.onChange((model) => {
         const { file } = model;

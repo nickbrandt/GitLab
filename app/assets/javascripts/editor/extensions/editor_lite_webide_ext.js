@@ -38,16 +38,36 @@ export class EditorWebIdeExtension extends EditorLiteExtension {
         }
       }
     });
+
+    EditorWebIdeExtension.addActions(instance);
   }
 
-  bootstrapInstance() {
-    if (isDiffEditorType(this)) {
-      this.updateOptions({
-        renderSideBySide: EditorWebIdeExtension.renderSideBySide(this.getDomNode()),
-      });
-    }
+  static addActions(instance) {
+    const { store } = instance;
+    const getKeyCode = (key) => {
+      const monacoKeyMod = key.indexOf('KEY_') === 0;
 
-    this.addCommands();
+      return monacoKeyMod ? KeyCode[key] : KeyMod[key];
+    };
+
+    keymap.forEach((command) => {
+      const keybindings = command.bindings.map((binding) => {
+        const keys = binding.split('+');
+
+        // eslint-disable-next-line no-bitwise
+        return keys.length > 1 ? getKeyCode(keys[0]) | getKeyCode(keys[1]) : getKeyCode(keys[0]);
+      });
+
+      instance.addAction({
+        id: command.id,
+        label: command.label,
+        keybindings,
+        run() {
+          store.dispatch(command.action.name, command.action.params);
+          return null;
+        },
+      });
+    });
   }
 
   createModel(file, head = null) {
@@ -78,10 +98,6 @@ export class EditorWebIdeExtension extends EditorLiteExtension {
         return acc;
       }, {}),
     );
-  }
-
-  clearEditor() {
-    this.setModel(null);
   }
 
   updateDimensions() {
@@ -131,33 +147,5 @@ export class EditorWebIdeExtension extends EditorLiteExtension {
 
   static renderSideBySide(domElement) {
     return domElement.offsetWidth >= 700;
-  }
-
-  addCommands() {
-    const { store } = this;
-    const getKeyCode = (key) => {
-      const monacoKeyMod = key.indexOf('KEY_') === 0;
-
-      return monacoKeyMod ? KeyCode[key] : KeyMod[key];
-    };
-
-    keymap.forEach((command) => {
-      const keybindings = command.bindings.map((binding) => {
-        const keys = binding.split('+');
-
-        // eslint-disable-next-line no-bitwise
-        return keys.length > 1 ? getKeyCode(keys[0]) | getKeyCode(keys[1]) : getKeyCode(keys[0]);
-      });
-
-      this.addAction({
-        id: command.id,
-        label: command.label,
-        keybindings,
-        run() {
-          store.dispatch(command.action.name, command.action.params);
-          return null;
-        },
-      });
-    });
   }
 }
