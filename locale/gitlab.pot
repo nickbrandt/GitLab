@@ -7196,6 +7196,9 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
+msgid "Code Coverage: %{coveragePercentage}"
+msgstr ""
+
 msgid "Code Coverage: %{coveragePercentage}%{percentSymbol}"
 msgstr ""
 
@@ -20916,7 +20919,7 @@ msgstr ""
 msgid "Outdent"
 msgstr ""
 
-msgid "Overall Activity"
+msgid "Overall activity"
 msgstr ""
 
 msgid "Overridden"

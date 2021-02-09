@@ -1,17 +1,13 @@
 import { GlDeprecatedSkeletonLoading as GlSkeletonLoading } from '@gitlab/ui';
-import { mount, createLocalVue } from '@vue/test-utils';
-import VueApollo from 'vue-apollo';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import TestCoverageSummary from 'ee/analytics/repository_analytics/components/test_coverage_summary.vue';
-import getGroupTestCoverage from 'ee/analytics/repository_analytics/graphql/queries/get_group_test_coverage.query.graphql';
 import { extendedWrapper } from 'helpers/vue_test_utils_helper';
-import createMockApollo from 'helpers/mock_apollo_helper';
-import waitForPromises from 'helpers/wait_for_promises';
+import MetricCard from '~/analytics/shared/components/metric_card.vue';
 
 const localVue = createLocalVue();
 
 describe('Test coverage table component', () => {
   let wrapper;
-  let fakeApollo;
 
   const findProjectsWithTests = () => wrapper.find('.js-metric-card-item:nth-child(1) h3');
   const findAverageCoverage = () => wrapper.find('.js-metric-card-item:nth-child(2) h3');
@@ -20,38 +16,34 @@ describe('Test coverage table component', () => {
   const findChartLoadingState = () => wrapper.findByTestId('group-coverage-chart-loading');
   const findLoadingState = () => wrapper.find(GlSkeletonLoading);
 
-  const createComponent = ({ data = {} } = {}, withApollo = false) => {
-    fakeApollo = createMockApollo([[getGroupTestCoverage, jest.fn().mockResolvedValue()]]);
-
-    const props = {
-      localVue,
-      data() {
-        return {
-          projectCount: null,
-          averageCoverage: null,
-          coverageCount: null,
-          hasError: false,
-          isLoading: false,
-          ...data,
-        };
-      },
-    };
-    if (withApollo) {
-      localVue.use(VueApollo);
-      props.apolloProvider = fakeApollo;
-    } else {
-      props.mocks = {
-        $apollo: {
-          queries: {
-            group: {
-              query: jest.fn().mockResolvedValue(),
+  const createComponent = ({ data = {} } = {}) => {
+    wrapper = extendedWrapper(
+      shallowMount(TestCoverageSummary, {
+        localVue,
+        data() {
+          return {
+            projectCount: null,
+            averageCoverage: null,
+            coverageCount: null,
+            hasError: false,
+            isLoading: false,
+            ...data,
+          };
+        },
+        mocks: {
+          $apollo: {
+            queries: {
+              group: {
+                query: jest.fn().mockResolvedValue(),
+              },
             },
           },
         },
-      };
-    }
-
-    wrapper = extendedWrapper(mount(TestCoverageSummary, props));
+        stubs: {
+          MetricCard,
+        },
+      }),
+    );
   };
 
   afterEach(() => {
@@ -97,16 +89,16 @@ describe('Test coverage table component', () => {
       expect(findTotalCoverages().text()).toBe(coverageCount);
     });
 
-    it('renders area chart', () => {
+    it('renders area chart with correct data', () => {
       createComponent({
         data: {
           groupCoverageChartData: [
             {
               name: 'test',
               data: [
-                ['Jan 10', 77.9],
-                ['Jan 11', 78.7],
-                ['Jan 12', 79.6],
+                ['2020-01-10', 77.9],
+                ['2020-01-11', 78.7],
+                ['2020-01-12', 79.6],
               ],
             },
           ],
@@ -114,30 +106,29 @@ describe('Test coverage table component', () => {
       });
 
       expect(findGroupCoverageChart().exists()).toBe(true);
+      expect(findGroupCoverageChart().props('data')).toMatchSnapshot();
     });
-  });
 
-  describe('when group has no coverage', () => {
-    it('renders empty metrics', async () => {
+    it('formats the area chart labels correctly', () => {
       createComponent({
-        withApollo: true,
-        data: {},
-        queryData: {
-          data: {
-            group: {
-              codeCoverageActivities: {
-                nodes: [],
-              },
+        data: {
+          groupCoverageChartData: [
+            {
+              name: 'test',
+              data: [
+                ['2020-01-10', 77.9],
+                ['2020-01-11', 78.7],
+                ['2020-01-12', 79.6],
+              ],
             },
-          },
+          ],
         },
       });
-      jest.runOnlyPendingTimers();
-      await waitForPromises();
 
-      expect(findProjectsWithTests().text()).toBe('-');
-      expect(findAverageCoverage().text()).toBe('-');
-      expect(findTotalCoverages().text()).toBe('-');
+      expect(findGroupCoverageChart().props('option').xAxis.axisLabel.formatter('2020-01-10')).toBe(
+        'Jan 10',
+      );
+      expect(findGroupCoverageChart().props('option').yAxis.axisLabel.formatter(80)).toBe('80%');
     });
   });
 });

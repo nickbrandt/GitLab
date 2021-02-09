@@ -5,7 +5,10 @@ import { __, s__ } from '~/locale';
 import MetricCard from '~/analytics/shared/components/metric_card.vue';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import ChartSkeletonLoader from '~/vue_shared/components/resizable_chart/skeleton_loader.vue';
+import { SUPPORTED_FORMATS, getFormatter } from '~/lib/utils/unit_format';
 import getGroupTestCoverage from '../graphql/queries/get_group_test_coverage.query.graphql';
+
+const formatPercent = getFormatter(SUPPORTED_FORMATS.percentHundred);
 
 export default {
   name: 'TestCoverageSummary',
@@ -29,7 +32,7 @@ export default {
 
         return {
           groupFullPath: this.groupFullPath,
-          startDate: new Date(Date.now() - THIRTY_DAYS),
+          startDate: formatDate(new Date(Date.now() - THIRTY_DAYS), 'yyyy-mm-dd'),
         };
       },
       result({ data }) {
@@ -42,11 +45,8 @@ export default {
         this.coverageCount = coverageCount;
         this.groupCoverageChartData = [
           {
-            name: this.$options.text.graphName,
-            data: groupCoverage.map((coverage) => [
-              formatDate(coverage.date, 'mmm dd'),
-              coverage.averageCoverage,
-            ]),
+            name: this.$options.i18n.graphName,
+            data: groupCoverage.map((coverage) => [coverage.date, coverage.averageCoverage]),
           },
         ];
       },
@@ -80,34 +80,44 @@ export default {
         {
           key: 'projectCount',
           value: this.projectCount,
-          label: this.$options.text.metrics.projectCountLabel,
+          label: this.$options.i18n.metrics.projectCountLabel,
         },
         {
           key: 'averageCoverage',
           value: this.averageCoverage,
           unit: '%',
-          label: this.$options.text.metrics.averageCoverageLabel,
+          label: this.$options.i18n.metrics.averageCoverageLabel,
         },
         {
           key: 'coverageCount',
           value: this.coverageCount,
-          label: this.$options.text.metrics.coverageCountLabel,
+          label: this.$options.i18n.metrics.coverageCountLabel,
         },
       ];
     },
     chartOptions() {
       return {
         xAxis: {
-          name: this.$options.text.xAxisName,
-          type: 'category',
+          name: this.$options.i18n.xAxisName,
+          type: 'time',
+          axisLabel: {
+            formatter: (value) => formatDate(value, 'mmm dd'),
+          },
         },
         yAxis: {
-          name: this.$options.text.yAxisName,
+          name: this.$options.i18n.yAxisName,
           type: 'value',
           min: 0,
           max: 100,
           axisLabel: {
-            formatter: (value) => `${value}%`,
+            /**
+             * We can't do `formatter: formatPercent` because
+             * formatter passes in a second argument of index, which
+             * formatPercent takes in as the number of decimal points
+             * we should include after. This formats 100 as 100.00000%
+             * instead of 100%.
+             */
+            formatter: (value) => formatPercent(value),
           },
         },
       };
@@ -115,18 +125,18 @@ export default {
   },
   methods: {
     formatTooltipText(params) {
-      this.tooltipTitle = params.value;
-      this.coveragePercentage = params.seriesData?.[0]?.data?.[1];
+      this.tooltipTitle = formatDate(params.value, 'mmm dd');
+      this.coveragePercentage = formatPercent(params.seriesData?.[0]?.data?.[1], 2);
     },
   },
-  text: {
+  i18n: {
     graphCardHeader: s__('RepositoriesAnalytics|Average test coverage last 30 days'),
     yAxisName: __('Coverage'),
     xAxisName: __('Date'),
     graphName: s__('RepositoriesAnalytics|Average coverage'),
-    graphTooltipMessage: __('Code Coverage: %{coveragePercentage}%{percentSymbol}'),
+    graphTooltipMessage: __('Code Coverage: %{coveragePercentage}'),
     metrics: {
-      cardTitle: __('Overall Activity'),
+      cardTitle: __('Overall activity'),
       projectCountLabel: s__('RepositoriesAnalytics|Projects with Coverage'),
       averageCoverageLabel: s__('RepositoriesAnalytics|Average Coverage by Job'),
       coverageCountLabel: s__('RepositoriesAnalytics|Jobs with Coverage'),
@@ -137,14 +147,14 @@ export default {
 <template>
   <div>
     <metric-card
-      :title="$options.text.metrics.cardTitle"
+      :title="$options.i18n.metrics.cardTitle"
       :metrics="metrics"
       :is-loading="isLoading"
     />
 
     <gl-card>
       <template #header>
-        <h5>{{ $options.text.graphCardHeader }}</h5>
+        <h5>{{ $options.i18n.graphCardHeader }}</h5>
       </template>
 
       <chart-skeleton-loader v-if="isLoading" data-testid="group-coverage-chart-loading" />
@@ -161,11 +171,10 @@ export default {
           {{ tooltipTitle }}
         </template>
         <template #tooltip-content>
-          <gl-sprintf :message="$options.text.graphTooltipMessage">
+          <gl-sprintf :message="$options.i18n.graphTooltipMessage">
             <template #coveragePercentage>
               {{ coveragePercentage }}
             </template>
-            <template #percentSymbol>%</template>
           </gl-sprintf>
         </template>
       </gl-area-chart>
