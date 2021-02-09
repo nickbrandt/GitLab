@@ -57430,6 +57430,16 @@
                     }
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "lastTestReportState",
+                  "description": "The state of latest requirement test report.",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "TestReportState",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -57531,6 +57541,16 @@
                         "ofType": null
                       }
                     }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "lastTestReportState",
+                  "description": "The state of latest requirement test report.",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "TestReportState",
+                    "ofType": null
                   },
                   "defaultValue": null
                 },
