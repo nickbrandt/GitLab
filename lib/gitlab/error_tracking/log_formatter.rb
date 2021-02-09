@@ -3,6 +3,9 @@
 module Gitlab
   module ErrorTracking
     class LogFormatter
+      # Note: all the accesses to Raven's contexts here are to keep the
+      # backward-compatibility to Sentry's built-in integrations. In future,
+      # they can be removed.
       def self.format!(payload, exception, context_payload)
         Gitlab::ExceptionLogFormatter.format!(exception, payload)
         append_user_to_log!(payload, context_payload)
@@ -29,6 +32,7 @@ module Gitlab
         extra = extra.except(:server)
 
         sidekiq_extra = extra[:sidekiq]
+        # The extra value for sidekiq is a hash whose keys are strings.
         if sidekiq_extra.is_a?(Hash) && sidekiq_extra.key?('args')
           sidekiq_extra = sidekiq_extra.dup
           sidekiq_extra['args'] = Gitlab::ErrorTracking::Processor::SidekiqProcessor.loggable_arguments(

@@ -61,6 +61,9 @@ module Gitlab
       end
 
       def current_context
+        # In case Gitlab::ErrorTracking is used when the app starts
+        return {} unless defined?(::Gitlab::ApplicationContext)
+
         ::Gitlab::ApplicationContext.current.to_h
       end
     end
