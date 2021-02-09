@@ -210,7 +210,7 @@ RSpec.describe Projects::Integrations::Jira::IssuesController do
 
       it 'returns JSON response' do
         expect_next_found_instance_of(JiraService) do |service|
-          expect(service).to receive(:find_issue).with('1', { expand: 'renderedFields' }).and_return(jira_issue)
+          expect(service).to receive(:find_issue).with('1', rendered_fields: true).and_return(jira_issue)
         end
 
         expect_next_instance_of(Integrations::Jira::IssueDetailSerializer) do |serializer|
