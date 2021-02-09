@@ -626,3 +626,12 @@ Set the limit to `0` to allow any file size.
 ### Package versions returned
 
 When asking for versions of a given NuGet package name, the GitLab Package Registry returns a maximum of 300 versions.
+
+## Automatically retargeting merge requests
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/320902) in GitLab 13.9.
+
+Maximum of 4 merge requests point to the currently being merged
+will be automatically retargeted upon merge.
+
+More information can be found in the [Automatically retargeting merge requests](../user/project/merge_requests/getting_started.md#automatically-retargeting-merge-requests).
