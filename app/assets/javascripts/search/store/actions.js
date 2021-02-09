@@ -83,21 +83,36 @@ export const applyQuery = ({ state }) => {
 };
 
 export const resetQuery = ({ state }, snippets = false) => {
-  let defaultQuery = {
-    page: null,
-    state: null,
-    confidential: null,
-    nav_source: null,
-  };
+  // the only params that should remain on query resets
+  const searchGenericParams = [
+    'search',
+    'scope',
+    'project_id',
+    'group_id',
+    'repository_ref',
+    'snippets',
+    'sort',
+    'force_search_results',
+  ];
+
+  let defaultParams = Object.fromEntries(
+    Object.entries(state.query).map(([key, value]) => {
+      if (searchGenericParams.includes(key)) {
+        return [key, value];
+      }
+
+      return [key, null];
+    }),
+  );
 
   if (snippets) {
-    defaultQuery = {
+    defaultParams = {
+      ...defaultParams,
       snippets: true,
       group_id: null,
       project_id: null,
-      ...defaultQuery,
     };
   }
 
-  visitUrl(setUrlParams({ ...state.query, ...defaultQuery }));
+  visitUrl(setUrlParams({ ...defaultParams }));
 };

@@ -1,0 +1,5 @@
+---
+title: Search clear URL params when changing tabs
+merge_request: 53751
+author:
+type: fixed

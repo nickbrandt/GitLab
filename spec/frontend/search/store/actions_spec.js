@@ -9,6 +9,7 @@ import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import {
   MOCK_QUERY,
+  MOCK_COMPLEX_QUERY,
   MOCK_GROUPS,
   MOCK_PROJECT,
   MOCK_PROJECTS,
@@ -122,10 +123,8 @@ describe('Global Search Store Actions', () => {
       return testAction(actions.resetQuery, null, state, [], [], () => {
         expect(urlUtils.setUrlParams).toHaveBeenCalledWith({
           ...state.query,
-          page: null,
           state: null,
           confidential: null,
-          nav_source: null,
         });
         expect(urlUtils.visitUrl).toHaveBeenCalled();
       });
@@ -136,13 +135,32 @@ describe('Global Search Store Actions', () => {
     return testAction(actions.resetQuery, true, state, [], [], () => {
       expect(urlUtils.setUrlParams).toHaveBeenCalledWith({
         ...state.query,
+        state: null,
+        confidential: null,
+        group_id: null,
+        project_id: null,
+        snippets: true,
+      });
+    });
+  });
+
+  it('filters out non-default params', () => {
+    state = createState({ query: MOCK_COMPLEX_QUERY });
+
+    return testAction(actions.resetQuery, null, state, [], [], () => {
+      expect(urlUtils.setUrlParams).toHaveBeenCalledWith({
+        search: 'test',
+        scope: 'wiki_blobs',
+        group_id: 'group_1',
+        project_id: 'project_1',
+        snippets: false,
+        sort: 'created_asc',
+        repository_ref: null,
         page: null,
         state: null,
         confidential: null,
         nav_source: null,
-        group_id: null,
-        project_id: null,
-        snippets: true,
+        search_code: null,
       });
     });
   });
