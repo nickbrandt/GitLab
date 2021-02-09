@@ -1,4 +1,5 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
+import { GlIcon } from '@gitlab/ui';
 import ciIcon from '~/vue_shared/components/ci_icon.vue';
 
 describe('CI Icon component', () => {
@@ -10,7 +11,7 @@ describe('CI Icon component', () => {
   });
 
   it('should render a span element with an svg', () => {
-    wrapper = mount(ciIcon, {
+    wrapper = shallowMount(ciIcon, {
       propsData: {
         status: {
           icon: 'status_success',
@@ -19,7 +20,7 @@ describe('CI Icon component', () => {
     });
 
     expect(wrapper.find('span').exists()).toBe(true);
-    expect(wrapper.find('span > svg').exists()).toBe(true);
+    expect(wrapper.find(GlIcon).exists()).toBe(true);
   });
 
   describe('rendering a status', () => {
@@ -35,7 +36,7 @@ describe('CI Icon component', () => {
       ${'status_canceled'} | ${'canceled'} | ${'ci-status-icon-canceled'}
       ${'status_manual'}   | ${'manual'}   | ${'ci-status-icon-manual'}
     `('should render a $group status', ({ icon, group, cssClass }) => {
-      wrapper = mount(ciIcon, {
+      wrapper = shallowMount(ciIcon, {
         propsData: {
           status: {
             icon,
