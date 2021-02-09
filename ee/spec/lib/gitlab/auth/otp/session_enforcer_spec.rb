@@ -6,8 +6,13 @@ RSpec.describe Gitlab::Auth::Otp::SessionEnforcer, :clean_gitlab_redis_shared_st
   let_it_be(:key) { create(:key)}
 
   describe '#update_session' do
+    let(:redis) { double(:redis) }
+
+    before do
+      stub_licensed_features(git_two_factor_enforcement: true)
+    end
+
     it 'registers a session in Redis' do
-      redis = double(:redis)
       expect(Gitlab::Redis::SharedState).to receive(:with).and_yield(redis)
       session_expiry_in_seconds = Gitlab::CurrentSettings.git_two_factor_session_expiry.minutes.to_i
 
@@ -20,10 +25,26 @@ RSpec.describe Gitlab::Auth::Otp::SessionEnforcer, :clean_gitlab_redis_shared_st
 
       described_class.new(key).update_session
     end
+
+    context 'when licensed feature is not available' do
+      before do
+        stub_licensed_features(git_two_factor_enforcement: false)
+      end
+
+      it 'does not register a session in Redis' do
+        expect(redis).not_to receive(:setex)
+
+        described_class.new(key).update_session
+      end
+    end
   end
 
   describe '#access_restricted?' do
     subject { described_class.new(key).access_restricted? }
+
+    before do
+      stub_licensed_features(git_two_factor_enforcement: true)
+    end
 
     context 'with existing session' do
       before do
