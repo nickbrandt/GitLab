@@ -1,10 +1,9 @@
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import { GlDropdown, GlLoadingIcon, GlDropdownSectionHeader } from '@gitlab/ui';
-import MockAdapter from 'axios-mock-adapter';
 import { TEST_HOST } from 'spec/test_constants';
-import axios from '~/lib/utils/axios_utils';
-import BoardsSelector from '~/boards/components/boards_selector.vue';
+import BoardsSelector from '~/boards/components/boards_selector_deprecated.vue';
+import boardsStore from '~/boards/stores/boards_store';
 
 const throttleDuration = 1;
 
@@ -24,7 +23,6 @@ describe('BoardsSelector', () => {
   let wrapper;
   let allBoardsResponse;
   let recentBoardsResponse;
-  let mock;
   const boards = boardGenerator(20);
   const recentBoards = boardGenerator(5);
 
@@ -41,7 +39,6 @@ describe('BoardsSelector', () => {
   const findDropdown = () => wrapper.find(GlDropdown);
 
   beforeEach(() => {
-    mock = new MockAdapter(axios);
     const $apollo = {
       queries: {
         boards: {
@@ -49,6 +46,14 @@ describe('BoardsSelector', () => {
         },
       },
     };
+
+    boardsStore.setEndpoints({
+      boardsEndpoint: '',
+      recentBoardsEndpoint: '',
+      listsEndpoint: '',
+      bulkUpdatePath: '',
+      boardId: '',
+    });
 
     allBoardsResponse = Promise.resolve({
       data: {
@@ -62,6 +67,9 @@ describe('BoardsSelector', () => {
     recentBoardsResponse = Promise.resolve({
       data: recentBoards,
     });
+
+    boardsStore.allBoards = jest.fn(() => allBoardsResponse);
+    boardsStore.recentBoards = jest.fn(() => recentBoardsResponse);
 
     wrapper = mount(BoardsSelector, {
       propsData: {
@@ -87,10 +95,6 @@ describe('BoardsSelector', () => {
       },
       mocks: { $apollo },
       attachTo: document.body,
-      provide: {
-        fullPath: '',
-        recentBoardsEndpoint: `${TEST_HOST}/recent`,
-      },
     });
 
     wrapper.vm.$apollo.addSmartQuery = jest.fn((_, options) => {
@@ -99,8 +103,6 @@ describe('BoardsSelector', () => {
       });
     });
 
-    mock.onGet(`${TEST_HOST}/recent`).replyOnce(200, recentBoards);
-
     // Emits gl-dropdown show event to simulate the dropdown is opened at initialization time
     findDropdown().vm.$emit('show');
   });
@@ -108,7 +110,6 @@ describe('BoardsSelector', () => {
   afterEach(() => {
     wrapper.destroy();
     wrapper = null;
-    mock.restore();
   });
 
   describe('loading', () => {
@@ -132,8 +133,7 @@ describe('BoardsSelector', () => {
       return Promise.all([allBoardsResponse, recentBoardsResponse]).then(() => nextTick());
     });
 
-    it('hides loading spinner', async () => {
-      await wrapper.vm.$nextTick();
+    it('hides loading spinner', () => {
       expect(getLoadingIcon().exists()).toBe(false);
     });
 

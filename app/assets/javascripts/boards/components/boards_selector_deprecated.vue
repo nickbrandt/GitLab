@@ -12,12 +12,11 @@ import {
 
 import httpStatusCodes from '~/lib/utils/http_status';
 
-import axios from '~/lib/utils/axios_utils';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import projectQuery from '../graphql/project_boards.query.graphql';
 import groupQuery from '../graphql/group_boards.query.graphql';
 
-import eventHub from '../eventhub';
+import boardsStore from '../stores/boards_store';
 import BoardForm from './board_form.vue';
 
 const MIN_BOARDS_TO_VIEW_RECENT = 10;
@@ -36,7 +35,6 @@ export default {
   directives: {
     GlModalDirective,
   },
-  inject: ['fullPath', 'recentBoardsEndpoint'],
   props: {
     currentBoard: {
       type: Object,
@@ -101,11 +99,12 @@ export default {
       scrollFadeInitialized: false,
       boards: [],
       recentBoards: [],
+      state: boardsStore.state,
       throttledSetScrollFade: throttle(this.setScrollFade, this.throttleDuration),
       contentClientHeight: 0,
       maxPosition: 0,
+      store: boardsStore,
       filterTerm: '',
-      currentPage: '',
     };
   },
   computed: {
@@ -115,13 +114,16 @@ export default {
     loading() {
       return this.loadingRecentBoards || Boolean(this.loadingBoards);
     },
+    currentPage() {
+      return this.state.currentPage;
+    },
     filteredBoards() {
       return this.boards.filter((board) =>
         board.name.toLowerCase().includes(this.filterTerm.toLowerCase()),
       );
     },
     board() {
-      return this.currentBoard;
+      return this.state.currentBoard;
     },
     showDelete() {
       return this.boards.length > 1;
@@ -146,14 +148,11 @@ export default {
     },
   },
   created() {
-    eventHub.$on('showBoardModal', this.showPage);
-  },
-  beforeDestroy() {
-    eventHub.$off('showBoardModal', this.showPage);
+    boardsStore.setCurrentBoard(this.currentBoard);
   },
   methods: {
     showPage(page) {
-      this.currentPage = page;
+      boardsStore.showPage(page);
     },
     cancel() {
       this.showPage('');
@@ -165,7 +164,7 @@ export default {
 
       this.$apollo.addSmartQuery('boards', {
         variables() {
-          return { fullPath: this.fullPath };
+          return { fullPath: this.state.endpoints.fullPath };
         },
         query() {
           return this.groupId ? groupQuery : projectQuery;
@@ -183,10 +182,8 @@ export default {
       });
 
       this.loadingRecentBoards = true;
-      // Follow up to fetch recent boards using GraphQL
-      // https://gitlab.com/gitlab-org/gitlab/-/issues/300985
-      axios
-        .get(this.recentBoardsEndpoint)
+      boardsStore
+        .recentBoards()
         .then((res) => {
           this.recentBoards = res.data;
         })
@@ -352,7 +349,7 @@ export default {
         :weights="weights"
         :enable-scoped-labels="enabledScopedLabels"
         :current-board="currentBoard"
-        :current-page="currentPage"
+        :current-page="state.currentPage"
         @cancel="cancel"
       />
     </span>
