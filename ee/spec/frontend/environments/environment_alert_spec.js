@@ -23,6 +23,8 @@ describe('Environment Alert', () => {
     });
   };
 
+  const findSeverityBadge = () => wrapper.find(SeverityBadge);
+
   beforeEach(() => {
     factory();
   });
@@ -59,14 +61,17 @@ describe('Environment Alert', () => {
       expect(link.attributes('href')).toBe('/alert/details');
     });
 
-    it('should show a severity badge', () => {
-      expect(wrapper.find(SeverityBadge).props('severity')).toBe('CRITICAL');
+    it('should show a severity badge with the correct severity', () => {
+      const badge = findSeverityBadge();
+      expect(badge.exists()).toBe(true);
+      expect(badge.props('severity')).toBe('CRITICAL');
     });
   });
 
   describe('has no alert', () => {
     it('should display nothing', () => {
       expect(wrapper.find('[data-testid="alert"]').exists()).toBe(false);
+      expect(findSeverityBadge().exists()).toBe(false);
     });
   });
 });
