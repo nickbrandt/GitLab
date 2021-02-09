@@ -8,16 +8,18 @@ RSpec.describe Gitlab::ErrorTracking do
   let(:exception) { RuntimeError.new('boom') }
   let(:issue_url) { 'http://gitlab.com/gitlab-org/gitlab-foss/issues/1' }
 
+  let(:user) { create(:user) }
+
   let(:sentry_payload) do
     {
       tags: {
         program: 'test',
         locale: 'en',
-        feature_category: nil,
+        feature_category: 'feature_a',
         correlation_id: 'cid'
       },
       user: {
-        username: nil
+        username: user.username
       },
       extra: {
         some_other_info: 'info',
@@ -32,9 +34,9 @@ RSpec.describe Gitlab::ErrorTracking do
       'exception.message' => 'boom',
       'tags.program' => 'test',
       'tags.locale' => 'en',
-      'tags.feature_category' => nil,
+      'tags.feature_category' => 'feature_a',
       'tags.correlation_id' => 'cid',
-      'user.username' => nil,
+      'user.username' => user.username,
       'extra.some_other_info' => 'info',
       'extra.issue_url' => 'http://gitlab.com/gitlab-org/gitlab-foss/issues/1'
     }
@@ -49,6 +51,12 @@ RSpec.describe Gitlab::ErrorTracking do
 
     described_class.configure do |config|
       config.encoding = 'json'
+    end
+  end
+
+  around do |example|
+    Gitlab::ApplicationContext.with_context(user: user, feature_category: 'feature_a') do
+      example.run
     end
   end
 
