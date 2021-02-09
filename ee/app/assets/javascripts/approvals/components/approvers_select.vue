@@ -7,6 +7,8 @@ import { loadCSSFile } from '~/lib/utils/css_utils';
 import { __ } from '~/locale';
 import { TYPE_USER, TYPE_GROUP } from '../constants';
 
+const DEVELOPER_ACCESS_LEVEL = 30;
+
 function addType(type) {
   return (items) => items.map((obj) => Object.assign(obj, { type }));
 }
@@ -135,13 +137,11 @@ export default {
         .then((results) => ({ results }));
     },
     fetchGroups(term) {
-      // Don't includeAll when search is empty. Otherwise, the user could get a lot of garbage choices.
-      // https://gitlab.com/gitlab-org/gitlab/issues/11566
-      const includeAll = term.trim().length > 0;
+      const hasTerm = term.trim().length > 0;
 
-      return Api.groups(term, {
+      return Api.projectGroups(this.projectId, {
         skip_groups: this.skipGroupIds,
-        all_available: includeAll,
+        ...(hasTerm ? { search: term } : {}),
       });
     },
     fetchUsers(term) {

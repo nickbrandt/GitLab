@@ -76,7 +76,7 @@ describe('Approvals ApproversSelect', () => {
   };
 
   beforeEach(() => {
-    jest.spyOn(Api, 'groups').mockResolvedValue(TEST_GROUPS);
+    jest.spyOn(Api, 'projectGroups').mockResolvedValue(TEST_GROUPS);
     jest.spyOn(Api, 'projectUsers').mockReturnValue(Promise.resolve(TEST_USERS));
   });
 
@@ -126,7 +126,12 @@ describe('Approvals ApproversSelect', () => {
     });
 
     it('fetches all available groups', () => {
-      expect(Api.groups).toHaveBeenCalledWith(term, { skip_groups: [], all_available: true });
+      expect(Api.projectGroups).toHaveBeenCalledWith(TEST_PROJECT_ID, {
+        skip_groups: [],
+        with_shared: true,
+        shared_min_access_level: 30,
+        search: term,
+      });
     });
 
     it('fetches users', () => {
@@ -157,9 +162,10 @@ describe('Approvals ApproversSelect', () => {
     });
 
     it('skips groups and does not fetch all available', () => {
-      expect(Api.groups).toHaveBeenCalledWith('', {
+      expect(Api.projectGroups).toHaveBeenCalledWith(TEST_PROJECT_ID, {
         skip_groups: skipGroupIds,
-        all_available: false,
+        with_shared: true,
+        shared_min_access_level: 30,
       });
     });
 
