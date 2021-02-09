@@ -159,53 +159,50 @@ Rule mode supports the following rule types:
 - [Level 4](https://docs.cilium.io/en/v1.8/policy/language/#layer-4-examples)
   can be added to all other rules.
 
-### Configureing Policy Alerts
-
-> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3438) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.9.
-
-The policy alert allows you to track what impact your policy is having. It can be enabled in the Policy Editor UI or with YAML using the `metadata.annotations` property.
-
-![Policy Editor UI](img/threat_monitoring_add_policy_alert_ui_v13_9.png)
-
-```yaml
-metadata:
-  annotations:
-    app.gitlab.com/alert: 'true'
-```
-
-Once added the UI will update with a warning about the dangers of too many alerts.
-
-![Alert Configured UI](img/threat_monitoring_policy_alert_configured_ui_v13_9.png)
-
-If you have not [configured the agent](../../project/clusters/protect/container_network_security/quick_start_guide.md), alerts will not be available to you and will guide you to the appropriate documentation ([install](../../clusters/agent/repository.md), [configure a Kubernetes Agent for this project](../../clusters/agent/index.md#create-an-agent-record-in-gitlab))
-
-![Policy Alerts Not Available ](img/threat_monitoring_policy_alerts_unavailable_v13_9.png)
-
 Once your policy is complete, save it by pressing the **Save policy**
 button at the bottom of the editor. Existing policies can also be
 removed from the editor interface by clicking the **Delete policy**
 button at the bottom of the editor.
 
-To view your alerts, view the alert list
+### Configuring Network Policy Alerts
+
+> [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3438) and [enabled by default](https://gitlab.com/gitlab-org/gitlab/-/issues/287676) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.9.
+
+You can use policy alerts to track your policy's impact. There are two ways to enable policy alerts:
+
+- In the policy editor UI, by clicking **Add alert**.
+- With YAML, through the `metadata.annotations` property.
+
+  ```yaml
+  metadata:
+    annotations:
+      app.gitlab.com/alert: 'true'
+  ```
+
+Once added, the UI updates and displays a warning about the dangers of too many alerts.
+
+Alerts are only available if you've [installed](../../clusters/agent/repository.md)
+and [configured](../../clusters/agent/index.md#create-an-agent-record-in-gitlab)
+a Kubernetes Agent for this project.
+
+![Policy Editor UI](img/threat_monitoring_add_policy_alert_ui_v13_9.png)
 
 ### Container Network Policy Alert list
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3438) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.9.
 
-The policy alert list allows you to view the policy activity. Alerts can be sorgedd by date/time and status.
+The policy alert list displays your policy's alert activity. You can sort the list by the
+**Date and time** column, and the **Status** column. Use the selector menu in the **Status** column
+to set the status for each alert:
+
+- Unreviewed
+- In review
+- Resolved
+- Dismissed
+
+By default, the list doesn't display resolved or dismissed alerts. To show these alerts, clear the
+checkbox **Hide dismissed alerts**.
 
 ![Policy Alert List](img/threat_monitoring_policy_alert_list_v13_9.png)
 
-Policy alert statuses can be updaded to reflect that the alert has been seen and dealt with
-
-![Policy Alert Status](img/threat_monitoring_policy_alert_status_v13_9.png)
-
-By default the list filters out any resolved/dismissed alerts, but toggled on/off
-
-![Policy Alert Status Filter](img/threat_monitoring_hide_resolved_policy_alerts_v13_9.png)
-
-By default, the policy alerts are not enabled, so the policy alert list will guide you this documentation to enable it
-
-![Policy Alerts Disabled](img/threat_monitoring_policy_alerts_disabled_v13_9.png)
-
-> [Additional work](https://gitlab.com/groups/gitlab-org/-/epics/5041) coming in [GitLab Ultimate](https://about.gitlab.com/pricing/).
+For information on work in progress for the alerts dashboard, see [this epic](https://gitlab.com/groups/gitlab-org/-/epics/5041).
