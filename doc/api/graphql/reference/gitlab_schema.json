@@ -6683,6 +6683,33 @@
         },
         {
           "kind": "OBJECT",
+          "name": "CiApplicationSettings",
+          "description": null,
+          "fields": [
+            {
+              "name": "keepLatestArtifact",
+              "description": "Whether to keep the latest jobs artifacts.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "CiBuildNeed",
           "description": null,
           "fields": [
@@ -60807,6 +60834,20 @@
           "name": "Query",
           "description": null,
           "fields": [
+            {
+              "name": "ciApplicationSettings",
+              "description": "CI related settings that apply to the entire instance.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CiApplicationSettings",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "ciConfig",
               "description": "Get linted and processed contents of a CI config. Should not be requested more than once per request.",

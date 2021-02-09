@@ -86,6 +86,25 @@ be updated for artifacts created before this setting was changed.
 The administrator may need to manually search for and expire previously-created
 artifacts, as described in the [troubleshooting documentation](../../../administration/troubleshooting/gitlab_rails_cheat_sheet.md#remove-artifacts-more-than-a-week-old).
 
+## Keep the latest artifacts for all jobs in the latest successful pipelines **(CORE ONLY)**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab/-/merge_requests/50889) in GitLab Core 13.9.
+
+When enabled (default), the artifacts for the most recent pipeline for a ref are
+locked against deletion and kept regardless of the expiry time.
+
+When disabled, the latest artifacts for any **new** successful or fixed pipelines
+are allowed to expire.
+
+This setting takes precedence over the [project level setting](../../../ci/pipelines/job_artifacts.md#keep-artifacts-from-most-recent-successful-jobs).
+If disabled at the instance level, you cannot enable this per-project.
+
+When you disable the feature, the latest artifacts do not immediately expire.
+A new pipeline must run before the latest artifacts can expire and be deleted.
+
+NOTE:
+All application settings have a [customizable cache expiry interval](../../../administration/application_settings_cache.md) which can delay the settings affect.
+
 ## Shared runners pipeline minutes quota **(PREMIUM SELF)**
 
 > [Moved](https://about.gitlab.com/blog/2021/01/26/new-gitlab-product-subscription-model/) to GitLab Premium in 13.9.
