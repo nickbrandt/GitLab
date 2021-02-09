@@ -407,6 +407,12 @@ Represents the total number of issues and their weights for a particular day.
 | `scopeCount` | Int! | Number of issues as of this day |
 | `scopeWeight` | Int! | Total weight of issues as of this day |
 
+### CiApplicationSettings
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `keepLatestArtifact` | Boolean | Whether to keep the latest jobs artifacts. |
+
 ### CiBuildNeed
 
 | Field | Type | Description |
