@@ -27,7 +27,7 @@ module Gitlab
           config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
           config.processors << ::Gitlab::ErrorTracking::Processor::SidekiqProcessor
           config.processors << ::Gitlab::ErrorTracking::Processor::GrpcErrorProcessor
-          config.processors << ::Gitlab::ErrorTracking::Processor::ApplicationContextProcessor
+          config.processors << ::Gitlab::ErrorTracking::Processor::ContextPayloadProcessor
 
           # Sanitize authentication headers
           config.sanitize_http_headers = %w[Authorization Private-Token]
@@ -101,15 +101,15 @@ module Gitlab
       end
 
       def process_exception(exception, sentry: false, logging: true, extra:)
-        extra = build_exception_extra(exception, extra)
+        context_payload = Gitlab::ErrorTracking::ContextPayloadGenerator.generate(exception, extra)
 
         if sentry && Raven.configuration.server
-          Raven.capture_exception(exception, extra: extra)
+          Raven.capture_exception(exception, **context_payload)
         end
 
         if logging
           log_hash = {}
-          Gitlab::ErrorTracking::LogFormatter.format!(exception, extra, log_hash)
+          Gitlab::ErrorTracking::LogFormatter.format!(log_hash, exception, context_payload)
           Gitlab::ErrorTracking::Logger.error(log_hash)
         end
       end
@@ -140,21 +140,6 @@ module Gitlab
         else
           inject_context_for_exception(event, ex.cause) if ex.cause.present?
         end
-      end
-
-      def build_exception_extra(exception, extra)
-        inline_extra = exception.try(:sentry_extra_data)
-        if inline_extra.present? && inline_extra.is_a?(Hash)
-          extra = extra.merge(inline_extra)
-        end
-
-        extra = sanitize_request_parameters(extra)
-        extra
-      end
-
-      def sanitize_request_parameters(parameters)
-        filter = ActiveSupport::ParameterFilter.new(::Rails.application.config.filter_parameters)
-        filter.filter(parameters)
       end
     end
   end

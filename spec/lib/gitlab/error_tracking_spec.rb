@@ -8,23 +8,44 @@ RSpec.describe Gitlab::ErrorTracking do
   let(:exception) { RuntimeError.new('boom') }
   let(:issue_url) { 'http://gitlab.com/gitlab-org/gitlab-foss/issues/1' }
 
-  let(:expected_payload_includes) do
-    [
-      { 'exception.class' => 'RuntimeError' },
-      { 'exception.message' => 'boom' },
-      { 'tags.correlation_id' => 'cid' },
-      { 'extra.some_other_info' => 'info' },
-      { 'extra.issue_url' => 'http://gitlab.com/gitlab-org/gitlab-foss/issues/1' }
-    ]
+  let(:sentry_payload) do
+    {
+      tags: {
+        program: 'test',
+        locale: 'en',
+        feature_category: nil,
+        correlation_id: 'cid'
+      },
+      user: {
+        username: nil
+      },
+      extra: {
+        some_other_info: 'info',
+        issue_url: 'http://gitlab.com/gitlab-org/gitlab-foss/issues/1'
+      }
+    }
   end
 
-  let(:sentry_event) { Gitlab::Json.parse(Raven.client.transport.events.last[1]) }
+  let(:logger_payload) do
+    {
+      'exception.class' => 'RuntimeError',
+      'exception.message' => 'boom',
+      'tags.program' => 'test',
+      'tags.locale' => 'en',
+      'tags.feature_category' => nil,
+      'tags.correlation_id' => 'cid',
+      'user.username' => nil,
+      'extra.some_other_info' => 'info',
+      'extra.issue_url' => 'http://gitlab.com/gitlab-org/gitlab-foss/issues/1'
+    }
+  end
 
   before do
     stub_sentry_settings
 
     allow(described_class).to receive(:sentry_dsn).and_return(Gitlab.config.sentry.dsn)
     allow(Labkit::Correlation::CorrelationId).to receive(:current_id).and_return('cid')
+    allow(I18n).to receive(:locale).and_return('en')
 
     described_class.configure do |config|
       config.encoding = 'json'
@@ -38,10 +59,15 @@ RSpec.describe Gitlab::ErrorTracking do
       end
 
       it 'raises the exception' do
-        expect(Raven).to receive(:capture_exception)
+        expect(Raven).to receive(:capture_exception).with(exception, sentry_payload)
 
-        expect { described_class.track_and_raise_for_dev_exception(exception) }
-          .to raise_error(RuntimeError)
+        expect do
+          described_class.track_and_raise_for_dev_exception(
+            exception,
+            issue_url: issue_url,
+            some_other_info: 'info'
+          )
+        end.to raise_error(RuntimeError, /boom/)
       end
     end
 
@@ -51,19 +77,7 @@ RSpec.describe Gitlab::ErrorTracking do
       end
 
       it 'logs the exception with all attributes passed' do
-        expected_extras = {
-          some_other_info: 'info',
-          issue_url: 'http://gitlab.com/gitlab-org/gitlab-foss/issues/1'
-        }
-
-        expected_tags = {
-          correlation_id: 'cid'
-        }
-
-        expect(Raven).to receive(:capture_exception)
-                           .with(exception,
-                            tags: a_hash_including(expected_tags),
-                            extra: a_hash_including(expected_extras))
+        expect(Raven).to receive(:capture_exception).with(exception, sentry_payload)
 
         described_class.track_and_raise_for_dev_exception(
           exception,
@@ -73,8 +87,7 @@ RSpec.describe Gitlab::ErrorTracking do
       end
 
       it 'calls Gitlab::ErrorTracking::Logger.error with formatted payload' do
-        expect(Gitlab::ErrorTracking::Logger).to receive(:error)
-          .with(a_hash_including(*expected_payload_includes))
+        expect(Gitlab::ErrorTracking::Logger).to receive(:error).with(logger_payload)
 
         described_class.track_and_raise_for_dev_exception(
           exception,
@@ -87,15 +100,19 @@ RSpec.describe Gitlab::ErrorTracking do
 
   describe '.track_and_raise_exception' do
     it 'always raises the exception' do
-      expect(Raven).to receive(:capture_exception)
+      expect(Raven).to receive(:capture_exception).with(exception, sentry_payload)
 
-      expect { described_class.track_and_raise_exception(exception) }
-        .to raise_error(RuntimeError)
+      expect do
+        described_class.track_and_raise_for_dev_exception(
+          exception,
+          issue_url: issue_url,
+          some_other_info: 'info'
+        )
+      end.to raise_error(RuntimeError, /boom/)
     end
 
     it 'calls Gitlab::ErrorTracking::Logger.error with formatted payload' do
-      expect(Gitlab::ErrorTracking::Logger).to receive(:error)
-        .with(a_hash_including(*expected_payload_includes))
+      expect(Gitlab::ErrorTracking::Logger).to receive(:error).with(logger_payload)
 
       expect do
         described_class.track_and_raise_exception(
@@ -120,17 +137,16 @@ RSpec.describe Gitlab::ErrorTracking do
     it 'calls Raven.capture_exception' do
       track_exception
 
-      expect(Raven).to have_received(:capture_exception)
-                   .with(exception,
-                         tags: a_hash_including(correlation_id: 'cid'),
-                         extra: a_hash_including(some_other_info: 'info', issue_url: issue_url))
+      expect(Raven).to have_received(:capture_exception).with(
+        exception,
+        sentry_payload
+      )
     end
 
     it 'calls Gitlab::ErrorTracking::Logger.error with formatted payload' do
       track_exception
 
-      expect(Gitlab::ErrorTracking::Logger).to have_received(:error)
-                                           .with(a_hash_including(*expected_payload_includes))
+      expect(Gitlab::ErrorTracking::Logger).to have_received(:error).with(logger_payload)
     end
 
     context 'with filterable parameters' do
@@ -139,8 +155,9 @@ RSpec.describe Gitlab::ErrorTracking do
       it 'filters parameters' do
         track_exception
 
-        expect(Gitlab::ErrorTracking::Logger).to have_received(:error)
-                                             .with(hash_including({ 'extra.test' => 1, 'extra.my_token' => '[FILTERED]' }))
+        expect(Gitlab::ErrorTracking::Logger).to have_received(:error).with(
+          hash_including({ 'extra.test' => 1, 'extra.my_token' => '[FILTERED]' })
+        )
       end
     end
 
@@ -151,8 +168,9 @@ RSpec.describe Gitlab::ErrorTracking do
       it 'includes the extra data from the exception in the tracking information' do
         track_exception
 
-        expect(Raven).to have_received(:capture_exception)
-                     .with(exception, a_hash_including(extra: a_hash_including(extra_info)))
+        expect(Raven).to have_received(:capture_exception).with(
+          exception, a_hash_including(extra: a_hash_including(extra_info))
+        )
       end
     end
 
@@ -163,8 +181,9 @@ RSpec.describe Gitlab::ErrorTracking do
       it 'just includes the other extra info' do
         track_exception
 
-        expect(Raven).to have_received(:capture_exception)
-                     .with(exception, a_hash_including(extra: a_hash_including(extra)))
+        expect(Raven).to have_received(:capture_exception).with(
+          exception, a_hash_including(extra: a_hash_including(extra))
+        )
       end
     end
 
@@ -176,7 +195,13 @@ RSpec.describe Gitlab::ErrorTracking do
           track_exception
 
           expect(Gitlab::ErrorTracking::Logger).to have_received(:error).with(
-            hash_including({ 'extra.sidekiq' => { 'class' => 'PostReceive', 'args' => ['1', '{"id"=>2, "name"=>"hello"}', 'some-value', 'another-value'] } }))
+            hash_including(
+              'extra.sidekiq' => {
+                'class' => 'PostReceive',
+                'args' => ['1', '{"id"=>2, "name"=>"hello"}', 'some-value', 'another-value']
+              }
+            )
+          )
         end
       end
 
@@ -186,9 +211,17 @@ RSpec.describe Gitlab::ErrorTracking do
         it 'filters sensitive arguments before sending' do
           track_exception
 
+          sentry_event = Gitlab::Json.parse(Raven.client.transport.events.last[1])
+
           expect(sentry_event.dig('extra', 'sidekiq', 'args')).to eq(['[FILTERED]', 1, 2])
           expect(Gitlab::ErrorTracking::Logger).to have_received(:error).with(
-            hash_including('extra.sidekiq' => { 'class' => 'UnknownWorker', 'args' => ['[FILTERED]', '1', '2'] }))
+            hash_including(
+              'extra.sidekiq' => {
+                'class' => 'UnknownWorker',
+                'args' => ['[FILTERED]', '1', '2']
+              }
+            )
+          )
         end
       end
     end
