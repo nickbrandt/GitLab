@@ -4,6 +4,7 @@ import { GlButton, GlFriendlyWrap, GlLink, GlPagination } from '@gitlab/ui';
 import { getJSONFixture } from 'helpers/fixtures';
 import SuiteTable from '~/pipelines/components/test_reports/test_suite_table.vue';
 import * as getters from '~/pipelines/stores/test_reports/getters';
+import { formatFilePath } from '~/pipelines/stores/test_reports/utils';
 import { TestStatus } from '~/pipelines/constants';
 import skippedTestCases from './mock_data';
 
@@ -85,8 +86,7 @@ describe('Test reports suite table', () => {
 
     it('renders the file name for the test with a copy button', () => {
       const { file } = testCases[0];
-      // remove `./` from the beginning of the file path
-      const relativeFile = file.replace(/^\.?\//, '');
+      const relativeFile = formatFilePath(file);
       const filePath = `${blobPath}/${relativeFile}`;
       const row = findCaseRowAtIndex(0);
       const fileLink = findLinkForRow(row);

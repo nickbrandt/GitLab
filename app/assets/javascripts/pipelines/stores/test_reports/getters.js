@@ -1,4 +1,4 @@
-import { addIconStatus, formattedTime } from './utils';
+import { addIconStatus, formatFilePath, formattedTime } from './utils';
 
 export const getTestSuites = (state) => {
   const { test_suites: testSuites = [] } = state.testReports;
@@ -20,13 +20,7 @@ export const getSuiteTests = (state) => {
   return testCases
     .map((testCase) => ({
       ...testCase,
-      /**
-       * filePath is the file string appended onto the blob path.
-       * We need to make sure the file string doesn't start with `./` when appending.
-       * Even though we could leave the `/` at the beginning, we can't guarantee that the
-       * file string will have `/` at the beginning so we should just remove it and add it manually
-       */
-      filePath: testCase.file ? `${state.blobPath}/${testCase.file.replace(/^\.?\//, '')}` : null,
+      filePath: testCase.file ? `${state.blobPath}/${formatFilePath(testCase.file)}` : null,
     }))
     .map(addIconStatus)
     .slice(start, start + perPage);
