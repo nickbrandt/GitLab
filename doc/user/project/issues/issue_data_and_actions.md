@@ -200,7 +200,7 @@ allowing many formatting options.
 
 You can mention a user or a group present in your GitLab instance with `@username` or
 `@groupname`. All mentioned users are notified via to-do items and emails,
-unless they have disabled all notifications in their profile settings.
+unless they have disabled all [notifications](#notifications) in their user settings.
 This is controlled in the [notification settings](../../profile/notifications.md).
 
 Mentions for yourself (the current logged in user) are highlighted
@@ -244,8 +244,8 @@ Also:
 
 - You can mention a user or a group present in your GitLab instance with
   `@username` or `@groupname` and they are notified via to-do items
-  and emails, unless they have [disabled all notifications](#notifications)
-  in their profile settings.
+  and emails, unless they have disabled all [notifications](#notifications)
+  in their user settings.
 - Mentions for yourself (the current logged-in user) are highlighted
   in a different color, which allows you to quickly see which comments involve you.
 
