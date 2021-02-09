@@ -1,112 +1,74 @@
 import { debounce } from 'lodash';
-import { editor as monacoEditor, KeyCode, KeyMod, Range } from 'monaco-editor';
-import DecorationsController from '~/ide/lib/decorations/controller';
-import DirtyDiffController from '~/ide/lib/diff/controller';
+import { KeyCode, KeyMod, Range } from 'monaco-editor';
 import Disposable from '~/ide/lib/common/disposable';
-import ModelManager from '~/ide/lib/common/model_manager';
-import { editorOptions, defaultEditorOptions, defaultDiffEditorOptions } from '~/ide/lib/editor_options';
-import { themes } from '~/ide/lib/themes';
-import languages from '~/ide/lib/languages';
+import { editorOptions } from '~/ide/lib/editor_options';
 import keymap from '~/ide/lib/keymap.json';
-import { clearDomElement } from '~/editor/utils';
-import { registerLanguages } from '~/ide/utils';
+import { EditorLiteExtension } from '~/editor/extensions/editor_lite_extension_base';
+import { EDITOR_TYPE_DIFF } from '~/editor/constants';
 
-function setupThemes() {
-  themes.forEach((theme) => {
-    monacoEditor.defineTheme(theme.name, theme.data);
-  });
-}
+const isDiffEditorType = (instance) => {
+  return instance.getEditorType() === EDITOR_TYPE_DIFF;
+};
 
-export default class Editor {
-  static create(...args) {
-    if (!this.editorInstance) {
-      this.editorInstance = new Editor(...args);
-    }
-    return this.editorInstance;
-  }
-
-  constructor(store, options = {}) {
-    this.currentModel = null;
-    this.instance = null;
-    this.dirtyDiffController = null;
-    this.disposable = new Disposable();
-    this.modelManager = new ModelManager();
-    this.decorationsController = new DecorationsController(this);
-    this.options = {
-      ...defaultEditorOptions,
+export class EditorWebIdeExtension extends EditorLiteExtension {
+  constructor({ instance, modelManager, ...options } = {}) {
+    super({
+      instance,
       ...options,
-    };
-    this.diffOptions = {
-      ...defaultDiffEditorOptions,
-      ...options,
-    };
-    this.store = store;
+      modelManager,
+      disposable: new Disposable(),
+      debouncedUpdate: debounce(() => {
+        instance.updateDimensions();
+      }, 200),
+    });
 
-    setupThemes();
-    registerLanguages(...languages);
+    window.addEventListener('resize', instance.debouncedUpdate, false);
 
-    this.debouncedUpdate = debounce(() => {
-      this.updateDimensions();
-    }, 200);
+    instance.onDidDispose(() => {
+      window.removeEventListener('resize', instance.debouncedUpdate);
+
+      // catch any potential errors with disposing the error
+      // this is mainly for tests caused by elements not existing
+      try {
+        instance.disposable.dispose();
+      } catch (e) {
+        if (process.env.NODE_ENV !== 'test') {
+          // eslint-disable-next-line no-console
+          console.error(e);
+        }
+      }
+    });
   }
 
-  createInstance(domElement) {
-    if (!this.instance) {
-      clearDomElement(domElement);
-
-      this.disposable.add(
-        (this.instance = monacoEditor.create(domElement, {
-          ...this.options,
-        })),
-        (this.dirtyDiffController = new DirtyDiffController(
-          this.modelManager,
-          this.decorationsController,
-        )),
-      );
-
-      this.addCommands();
-
-      window.addEventListener('resize', this.debouncedUpdate, false);
+  bootstrapInstance() {
+    if (isDiffEditorType(this)) {
+      this.updateOptions({
+        renderSideBySide: EditorWebIdeExtension.renderSideBySide(this.getDomNode()),
+      });
     }
-  }
 
-  createDiffInstance(domElement) {
-    if (!this.instance) {
-      clearDomElement(domElement);
-
-      this.disposable.add(
-        (this.instance = monacoEditor.createDiffEditor(domElement, {
-          ...this.diffOptions,
-          renderSideBySide: Editor.renderSideBySide(domElement),
-        })),
-      );
-
-      this.addCommands();
-
-      window.addEventListener('resize', this.debouncedUpdate, false);
-    }
+    this.addCommands();
   }
 
   createModel(file, head = null) {
-    return this.modelManager.addModel(file, head);
+    const model = this.modelManager.addModel(file, head);
+    this.attachModel(model);
+    return model;
   }
 
   attachModel(model) {
-    if (this.isDiffEditorType) {
-      this.instance.setModel({
-        original: model.getOriginalModel(),
+    if (isDiffEditorType(this)) {
+      this.setModel({
+        original: model.file.mrChange ? model.getBaseModel() : model.getOriginalModel(),
         modified: model.getModel(),
       });
 
       return;
     }
 
-    this.instance.setModel(model.getModel());
-    if (this.dirtyDiffController) this.dirtyDiffController.attachModel(model);
+    this.setModel(model.getModel());
 
-    this.currentModel = model;
-
-    this.instance.updateOptions(
+    this.updateOptions(
       editorOptions.reduce((acc, obj) => {
         Object.keys(obj).forEach((key) => {
           Object.assign(acc, {
@@ -116,80 +78,44 @@ export default class Editor {
         return acc;
       }, {}),
     );
-
-    if (this.dirtyDiffController) this.dirtyDiffController.reDecorate(model);
-  }
-
-  attachMergeRequestModel(model) {
-    this.instance.setModel({
-      original: model.getBaseModel(),
-      modified: model.getModel(),
-    });
-
-    monacoEditor.createDiffNavigator(this.instance, {
-      alwaysRevealFirst: true,
-    });
   }
 
   clearEditor() {
-    if (this.instance) {
-      this.instance.setModel(null);
-    }
-  }
-
-  dispose() {
-    window.removeEventListener('resize', this.debouncedUpdate);
-
-    // catch any potential errors with disposing the error
-    // this is mainly for tests caused by elements not existing
-    try {
-      this.disposable.dispose();
-
-      this.instance = null;
-    } catch (e) {
-      this.instance = null;
-
-      if (process.env.NODE_ENV !== 'test') {
-        // eslint-disable-next-line no-console
-        console.error(e);
-      }
-    }
+    this.setModel(null);
   }
 
   updateDimensions() {
-    if (this.instance) {
-      this.instance.layout();
-      this.updateDiffView();
-    }
+    this.layout();
+    this.updateDiffView();
   }
 
-  setPosition({ lineNumber, column }) {
-    this.instance.revealPositionInCenter({
+  setPos({ lineNumber, column }) {
+    this.revealPositionInCenter({
       lineNumber,
       column,
     });
-    this.instance.setPosition({
+    this.setPosition({
       lineNumber,
       column,
     });
   }
 
   onPositionChange(cb) {
-    if (!this.instance.onDidChangeCursorPosition) return;
+    if (!this.onDidChangeCursorPosition) return;
 
-    this.disposable.add(this.instance.onDidChangeCursorPosition((e) => cb(this.instance, e)));
+    this.disposable.add(this.onDidChangeCursorPosition((e) => cb(this, e)));
   }
 
   updateDiffView() {
-    if (!this.isDiffEditorType) return;
+    if (!isDiffEditorType(this)) return;
 
-    this.instance.updateOptions({
-      renderSideBySide: Editor.renderSideBySide(this.instance.getDomNode()),
+    this.updateOptions({
+      renderSideBySide: EditorWebIdeExtension.renderSideBySide(this.getDomNode()),
     });
   }
 
   replaceSelectedText(text) {
-    let selection = this.instance.getSelection();
+    let selection = this.getSelection();
     const range = new Range(
       selection.startLineNumber,
       selection.startColumn,
@@ -197,14 +123,10 @@ export default class Editor {
       selection.endColumn,
     );
 
-    this.instance.executeEdits('', [{ range, text }]);
+    this.executeEdits('', [{ range, text }]);
 
-    selection = this.instance.getSelection();
-    this.instance.setPosition({ lineNumber: selection.endLineNumber, column: selection.endColumn });
-  }
-
-  get isDiffEditorType() {
-    return this.instance.getEditorType() === 'vs.editor.IDiffEditor';
+    selection = this.getSelection();
+    this.setPosition({ lineNumber: selection.endLineNumber, column: selection.endColumn });
   }
 
   static renderSideBySide(domElement) {
@@ -227,7 +149,7 @@ export default class Editor {
         return keys.length > 1 ? getKeyCode(keys[0]) | getKeyCode(keys[1]) : getKeyCode(keys[0]);
       });
 
-      this.instance.addAction({
+      this.addAction({
         id: command.id,
         label: command.label,
         keybindings,

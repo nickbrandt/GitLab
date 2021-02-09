@@ -2,6 +2,7 @@
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { viewerInformationForPath } from '~/vue_shared/components/content_viewer/lib/viewer_utils';
 import { deprecatedCreateFlash as flash } from '~/flash';
+import { __ } from '~/locale';
 import ContentViewer from '~/vue_shared/components/content_viewer/content_viewer.vue';
 import DiffViewer from '~/vue_shared/components/diff_viewer/diff_viewer.vue';
 import {
@@ -12,20 +13,23 @@ import {
   WEBIDE_MEASURE_FILE_AFTER_INTERACTION,
 } from '~/performance/constants';
 import { performanceMarkAndMeasure } from '~/performance/utils';
-import { __ } from '~/locale';
-import Editor from '../lib/editor';
-import {
-  leftSidebarViews,
-  viewerTypes,
-  FILE_VIEW_MODE_EDITOR,
-  FILE_VIEW_MODE_PREVIEW,
-} from '../constants';
+import { defaultDiffEditorOptions, defaultEditorOptions } from '~/ide/lib/editor_options';
+import ModelManager from '~/ide/lib/common/model_manager';
+import { EDITOR_TYPE_DIFF } from '~/editor/constants';
+import EditorLite from '~/editor/editor_lite';
+import { EditorWebIdeExtension } from '~/editor/extensions/editor_lite_webide_ext';
 import eventHub from '../eventhub';
 import { extractMarkdownImagesFromEntries } from '../stores/utils';
 import { getFileEditorOrDefault } from '../stores/modules/editor/utils';
 import { getPathParent, readFileAsDataURL, registerSchema, isTextFile } from '../utils';
 import { getRulesWithTraversal } from '../lib/editorconfig/parser';
 import mapRulesToMonaco from '../lib/editorconfig/rules_mapper';
+import {
+  leftSidebarViews,
+  viewerTypes,
+  FILE_VIEW_MODE_EDITOR,
+  FILE_VIEW_MODE_PREVIEW,
+} from '../constants';
 import FileTemplatesBar from './file_templates/bar.vue';
 
 export default {
@@ -46,6 +50,8 @@ export default {
       content: '',
       images: {},
       rules: {},
+      globalEditor: null,
+      modelManager: new ModelManager(),
     };
   },
   computed: {
@@ -181,11 +187,11 @@ export default {
     },
   },
   beforeDestroy() {
-    this.editor.dispose();
+    this.globalEditor.dispose();
   },
   mounted() {
-    if (!this.editor) {
-      this.editor = Editor.create(this.$store, this.editorOptions);
+    if (!this.globalEditor) {
+      this.globalEditor = new EditorLite();
     }
     this.initEditor();
 
@@ -210,8 +216,6 @@ export default {
       if (this.shouldHideEditor && (this.file.content || this.file.raw)) {
         return;
       }
-
-      this.editor.clearEditor();
 
       this.registerSchemaForFile();
 
@@ -251,20 +255,47 @@ export default {
         return;
       }
 
-      this.editor.dispose();
+      const isDiff = this.viewer !== viewerTypes.edit;
+      const shouldDisposeEditor = isDiff !== (this.editor?.getEditorType() === EDITOR_TYPE_DIFF);
 
-      this.$nextTick(() => {
-        if (this.viewer === viewerTypes.edit) {
-          this.editor.createInstance(this.$refs.editor);
-        } else {
-          this.editor.createDiffInstance(this.$refs.editor);
-        }
-
+      if (this.editor && !shouldDisposeEditor) {
         this.setupEditor();
-      });
+      } else {
+        if (this.editor && shouldDisposeEditor) {
+          this.editor.dispose();
+        }
+        const instanceOptions = isDiff ? defaultDiffEditorOptions : defaultEditorOptions;
+        const method = isDiff ? 'createDiffInstance' : 'createInstance';
+
+        this.editor = this.globalEditor[method]({
+          el: this.$refs.editor,
+          blobPath: this.file.path,
+          blobGlobalId: this.file.key,
+          blobContent: this.content || this.file.content,
+          ...instanceOptions,
+          ...this.editorOptions,
+        });
+
+        this.editor.use(
+          new EditorWebIdeExtension({
+            instance: this.editor,
+            modelManager: this.modelManager,
+            store: this.$store,
+            file: this.file,
+            options: this.editorOptions,
+          }),
+        );
+
+        this.$nextTick(() => {
+          this.setupEditor();
+        });
+      }
     },
+
     setupEditor() {
-      if (!this.file || !this.editor.instance || this.file.loading) return;
+      if (!this.file || !this.editor || this.file.loading) return;
+
+      this.editor.bootstrapInstance();
 
       const head = this.getStagedFile(this.file.path);
 
@@ -273,13 +304,9 @@ export default {
         this.file.staged && this.file.key.indexOf('unstaged-') === 0 ? head : null,
       );
 
-      if (this.viewer === viewerTypes.mr && this.file.mrChange) {
-        this.editor.attachMergeRequestModel(this.model);
-      } else {
-        this.editor.attachModel(this.model);
-      }
-
       this.model.updateOptions(this.rules);
+
+      this.editor.updateDimensions();
 
       this.model.onChange((model) => {
         const { file } = model;
@@ -298,7 +325,7 @@ export default {
         });
       });
 
-      this.editor.setPosition({
+      this.editor.setPos({
         lineNumber: this.fileEditor.editorRow,
         column: this.fileEditor.editorColumn,
       });
@@ -344,7 +371,7 @@ export default {
       });
     },
     onPaste(event) {
-      const editor = this.editor.instance;
+      const { editor } = this;
       const reImage = /^image\/(png|jpg|jpeg|gif)$/;
       const file = event.clipboardData.files[0];
 
@@ -414,6 +441,7 @@ export default {
     <div
       v-show="showEditor"
       ref="editor"
+      :key="`content-editor`"
       :class="{
         'is-readonly': isCommitModeActive,
         'is-deleted': file.deleted,
