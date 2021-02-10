@@ -153,7 +153,7 @@ state synchronization mechanisms and hooking into existing ones.
 
 ## Status
 
-Current status: in approval, assigning DRIs.
+Current status: in progress.
 
 ## Who
 
@@ -176,8 +176,8 @@ DRIs:
 
 | Role                         | Who
 |------------------------------|------------------------|
-| Product                      |                        |
-| Leadership                   |                        |
+| Leadership                   | Darva Satcher          |
+| Product                      | Patrick Deuley         |
 | Engineering                  |                        |
 
 <!-- vale gitlab.Spelling = YES -->
