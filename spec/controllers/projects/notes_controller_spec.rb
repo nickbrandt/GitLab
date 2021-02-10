@@ -764,7 +764,7 @@ RSpec.describe Projects::NotesController do
       end
 
       it 'allows user in allow-list to create notes' do
-        stub_config_setting(notes_rate_limit_users_allowlist: "#{user.username}")
+        stub_application_setting(notes_create_limit_allowlist_raw: ["#{user.username}"])
         3.times { create! }
 
         create!

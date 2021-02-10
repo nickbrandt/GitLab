@@ -295,7 +295,7 @@ RSpec.shared_examples 'noteable API' do |parent_type, noteable_type, id_name|
       end
 
       it 'allows user in allow-list to create notes' do
-        stub_config_setting(notes_rate_limit_users_allowlist: "#{user.username}, username1, username2")
+        stub_application_setting(notes_create_limit_allowlist_raw: ["#{user.username}"])
         subject
 
         expect(response).to have_gitlab_http_status(:created)

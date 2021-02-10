@@ -77,7 +77,7 @@ RSpec.shared_examples 'a Note mutation when there are rate limit validation erro
 
   context 'when the user is in the allowlist' do
     before do
-      stub_config_setting(notes_rate_limit_users_allowlist: "#{current_user.username}")
+      stub_application_setting(notes_create_limit_allowlist_raw: ["#{current_user.username}"])
     end
 
     it_behaves_like 'a Note mutation that creates a Note'

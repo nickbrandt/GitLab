@@ -120,6 +120,11 @@ RSpec.describe ApplicationSetting do
     it { is_expected.not_to allow_value(5.5).for(:notes_create_limit) }
     it { is_expected.not_to allow_value(-2).for(:notes_create_limit) }
 
+    it { is_expected.to allow_value(['username'] * 100).for(:notes_create_limit_allowlist) }
+    it { is_expected.not_to allow_value(['username'] * 101).for(:notes_create_limit_allowlist) }
+    it { is_expected.not_to allow_value(nil).for(:notes_create_limit_allowlist) }
+    it { is_expected.to allow_value([]).for(:notes_create_limit_allowlist) }
+
     context 'help_page_documentation_base_url validations' do
       it { is_expected.to allow_value(nil).for(:help_page_documentation_base_url) }
       it { is_expected.to allow_value('https://docs.gitlab.com').for(:help_page_documentation_base_url) }
