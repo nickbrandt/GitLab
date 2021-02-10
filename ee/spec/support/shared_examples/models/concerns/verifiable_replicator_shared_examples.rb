@@ -12,6 +12,12 @@
 RSpec.shared_examples 'a verifiable replicator' do
   include EE::GeoHelpers
 
+  describe 'events' do
+    it 'has checksum_succeeded event' do
+      expect(described_class.supported_events).to include(:checksum_succeeded)
+    end
+  end
+
   describe '.verification_enabled?' do
     context 'when replication is enabled' do
       before do
@@ -402,6 +408,88 @@ RSpec.shared_examples 'a verifiable replicator' do
     end
   end
 
+  describe '#handle_after_checksum_succeeded' do
+    context 'on a Geo primary' do
+      before do
+        stub_primary_node
+      end
+
+      it 'creates checksum_succeeded event' do
+        expect { replicator.handle_after_checksum_succeeded }.to change { ::Geo::Event.count }.by(1)
+        expect(::Geo::Event.last.event_name).to eq 'checksum_succeeded'
+      end
+
+      it 'is called on verification success' do
+        model_record.verification_started
+
+        expect { model_record.verification_succeeded_with_checksum!('abc123', Time.current) }.to change { ::Geo::Event.count }.by(1)
+        expect(::Geo::Event.last.event_name).to eq 'checksum_succeeded'
+      end
+    end
+
+    context 'on a Geo secondary' do
+      before do
+        stub_secondary_node
+      end
+
+      it 'does not create an event' do
+        expect { replicator.handle_after_checksum_succeeded }.not_to change { ::Geo::Event.count }
+      end
+    end
+  end
+
+  describe '#consume_event_checksum_succeeded' do
+    context 'with a persisted model_record' do
+      before do
+        model_record.save!
+      end
+
+      context 'on a Geo primary' do
+        before do
+          stub_primary_node
+        end
+
+        it 'does nothing' do
+          expect(replicator).not_to receive(:registry)
+
+          replicator.consume_event_checksum_succeeded
+        end
+      end
+
+      context 'on a Geo secondary' do
+        let(:registry) { replicator.registry }
+
+        before do
+          stub_secondary_node
+        end
+
+        context 'with a registry which is verified' do
+          it 'sets state to verification_pending' do
+            registry.verification_started
+            registry.verification_succeeded_with_checksum!('foo', Time.current)
+
+            expect do
+              replicator.consume_event_checksum_succeeded
+            end.to change { registry.reload.verification_state }
+              .from(verification_state_value(:verification_succeeded))
+              .to(verification_state_value(:verification_pending))
+          end
+        end
+
+        context 'with a registry which is pending verification' do
+          it 'does not change state from verification_pending' do
+            registry.save!
+
+            expect do
+              replicator.consume_event_checksum_succeeded
+            end.not_to change { registry.reload.verification_state }
+              .from(verification_state_value(:verification_pending))
+          end
+        end
+      end
+    end
+  end
+
   context 'integration tests' do
     before do
       model_record.save!
@@ -457,5 +545,9 @@ RSpec.shared_examples 'a verifiable replicator' do
         end
       end
     end
+  end
+
+  def verification_state_value(state_name)
+    model_record.class.verification_state_value(state_name)
   end
 end

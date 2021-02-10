@@ -9,6 +9,10 @@ module Geo
     DEFAULT_VERIFICATION_BATCH_SIZE = 10
     DEFAULT_REVERIFICATION_BATCH_SIZE = 1000
 
+    included do
+      event :checksum_succeeded
+    end
+
     class_methods do
       extend Gitlab::Utils::Override
 
@@ -150,6 +154,20 @@ module Geo
 
         registry_class.synced.verification_failed.count
       end
+    end
+
+    def handle_after_checksum_succeeded
+      return false unless Gitlab::Geo.primary?
+      return unless self.class.verification_enabled?
+
+      publish(:checksum_succeeded, **event_params)
+    end
+
+    # Called by Gitlab::Geo::Replicator#consume
+    def consume_event_checksum_succeeded(**params)
+      return unless Gitlab::Geo.secondary?
+
+      registry.verification_pending!
     end
 
     # Schedules a verification job after a model record is created/updated
