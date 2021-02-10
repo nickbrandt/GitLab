@@ -42,6 +42,10 @@ RSpec.describe 'Projects > Audit Events', :js do
       allow(LicenseHelper).to receive(:show_promotions?).and_return(true)
     end
 
+    include_context '"Security & Compliance" permissions' do
+      let(:response) { inspect_requests { visit project_audit_events_path(project) }.first }
+    end
+
     it 'returns 200' do
       reqs = inspect_requests do
         visit project_audit_events_path(project)
