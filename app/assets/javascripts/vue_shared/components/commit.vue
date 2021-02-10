@@ -134,7 +134,7 @@ export default {
         : null;
     },
     refUrl() {
-      return this.commitRef.ref_url ?? this.commitRef.path;
+      return this.commitRef.ref_url || this.commitRef.path;
     },
   },
 };
@@ -156,9 +156,15 @@ export default {
         class="ref-name"
         >{{ mergeRequestRef.iid }}</gl-link
       >
-      <gl-link v-else v-gl-tooltip :href="refUrl" :title="commitRef.name" class="ref-name">{{
-        commitRef.name
-      }}</gl-link>
+      <gl-link
+        v-else
+        v-gl-tooltip
+        :href="refUrl"
+        :title="commitRef.name"
+        class="ref-name"
+        data-testid="ref-name"
+        >{{ commitRef.name }}</gl-link
+      >
     </template>
     <gl-icon name="commit" class="commit-icon js-commit-icon" />
 

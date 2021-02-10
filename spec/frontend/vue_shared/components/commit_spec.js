@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import { GlIcon } from '@gitlab/ui';
 import CommitComponent from '~/vue_shared/components/commit.vue';
 import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
+import { extendedWrapper } from 'helpers/vue_test_utils_helper';
 
 describe('Commit component', () => {
   let props;
@@ -13,11 +14,14 @@ describe('Commit component', () => {
   };
 
   const findUserAvatar = () => wrapper.find(UserAvatarLink);
+  const findRefName = () => wrapper.findByTestId('ref-name');
 
   const createComponent = (propsData) => {
-    wrapper = shallowMount(CommitComponent, {
-      propsData,
-    });
+    wrapper = extendedWrapper(
+      shallowMount(CommitComponent, {
+        propsData,
+      }),
+    );
   };
 
   afterEach(() => {
@@ -235,8 +239,8 @@ describe('Commit component', () => {
 
       createComponent(props);
 
-      expect(wrapper.find('.ref-name').exists()).toBe(true);
-      expect(wrapper.find('.ref-name').attributes('href')).toBe(props.commitRef.path);
+      expect(findRefName().exists()).toBe(true);
+      expect(findRefName().attributes('href')).toBe(props.commitRef.path);
     });
   });
 });
