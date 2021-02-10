@@ -3,11 +3,12 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueApollo from 'vue-apollo';
 
 import List from 'ee/groups/settings/compliance_frameworks/components/list.vue';
-import EmptyState from 'ee/groups/settings/compliance_frameworks/components/list_empty_state.vue';
 import ListItem from 'ee/groups/settings/compliance_frameworks/components/list_item.vue';
 import getComplianceFrameworkQuery from 'ee/groups/settings/compliance_frameworks/graphql/queries/get_compliance_framework.query.graphql';
 import createMockApollo from 'helpers/mock_apollo_helper';
 import waitForPromises from 'helpers/wait_for_promises';
+import { PIPELINE_CONFIGURATION_PATH_FORMAT } from 'ee/groups/settings/compliance_frameworks/constants';
+import EmptyState from 'ee/groups/settings/compliance_frameworks/components/list_empty_state.vue';
 
 import * as Sentry from '~/sentry/wrapper';
 import { validFetchResponse, emptyFetchResponse } from '../mock_data';
@@ -160,6 +161,9 @@ describe('List', () => {
               parsedId: expect.any(Number),
               name: expect.any(String),
               description: expect.any(String),
+              pipelineConfigurationFullPath: expect.stringMatching(
+                PIPELINE_CONFIGURATION_PATH_FORMAT,
+              ),
               color: expect.stringMatching(/^#([0-9A-F]{3}){1,2}$/i),
             },
           }),
