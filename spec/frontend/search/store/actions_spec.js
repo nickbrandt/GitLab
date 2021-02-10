@@ -119,7 +119,7 @@ describe('Global Search Store Actions', () => {
   });
 
   describe('resetQuery', () => {
-    it('calls visitUrl and setParams with empty values', () => {
+    it('does not reset generic params', () => {
       return testAction(actions.resetQuery, null, state, [], [], () => {
         expect(urlUtils.setUrlParams).toHaveBeenCalledWith({
           ...state.query,
@@ -131,7 +131,7 @@ describe('Global Search Store Actions', () => {
     });
   });
 
-  it('calls setUrlParams with snippets, group_id, and project_id when snippets param is true', () => {
+  it('calls visitUrl and setUrlParams with snippets, group_id, and project_id when snippets param is true', () => {
     return testAction(actions.resetQuery, true, state, [], [], () => {
       expect(urlUtils.setUrlParams).toHaveBeenCalledWith({
         ...state.query,
@@ -141,10 +141,11 @@ describe('Global Search Store Actions', () => {
         project_id: null,
         snippets: true,
       });
+      expect(urlUtils.visitUrl).toHaveBeenCalled();
     });
   });
 
-  it('filters out non-default params', () => {
+  it('calls visitUrl and setUrlParms with filtered non-default params', () => {
     state = createState({ query: MOCK_COMPLEX_QUERY });
 
     return testAction(actions.resetQuery, null, state, [], [], () => {
@@ -162,6 +163,7 @@ describe('Global Search Store Actions', () => {
         nav_source: null,
         search_code: null,
       });
+      expect(urlUtils.visitUrl).toHaveBeenCalled();
     });
   });
 });
