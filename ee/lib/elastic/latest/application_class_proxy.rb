@@ -186,6 +186,18 @@ module Elastic
               order: 'desc'
             }
           })
+        when :updated_at_asc
+          query_hash.merge(sort: {
+            updated_at: {
+              order: 'asc'
+            }
+          })
+        when :updated_at_desc
+          query_hash.merge(sort: {
+            updated_at: {
+              order: 'desc'
+            }
+          })
         else
           query_hash
         end
