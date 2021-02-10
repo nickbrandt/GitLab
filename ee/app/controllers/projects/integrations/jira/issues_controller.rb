@@ -14,6 +14,7 @@ module Projects
 
         before_action :check_feature_enabled!
         before_action :check_issues_show_enabled!, only: :show
+        before_action :issue_json, only: :show
 
         before_action do
           push_frontend_feature_flag(:jira_issues_integration, project, type: :licensed, default_enabled: true)
@@ -37,8 +38,6 @@ module Projects
         end
 
         def show
-          @issue = issue_json
-
           respond_to do |format|
             format.html
             format.json do
@@ -66,8 +65,8 @@ module Projects
         end
 
         def issue_json
-          ::Integrations::Jira::IssueDetailSerializer.new
-            .represent(project.jira_service.find_issue(params[:id], rendered_fields: true), project: project)
+          @issue_json ||= ::Integrations::Jira::IssueDetailSerializer.new
+              .represent(project.jira_service.find_issue(params[:id], rendered_fields: true), project: project)
         end
 
         def finder
