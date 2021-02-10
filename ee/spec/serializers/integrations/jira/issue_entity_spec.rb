@@ -119,5 +119,5 @@ RSpec.describe Integrations::Jira::IssueEntity do
     it 'sets `gitlab_web_url` to nil' do
       expect(subject[:gitlab_web_url]).to eq(nil)
     end
-  end 
+  end
 end
