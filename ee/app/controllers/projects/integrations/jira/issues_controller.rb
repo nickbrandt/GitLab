@@ -66,7 +66,7 @@ module Projects
 
         def issue_json
           ::Integrations::Jira::IssueDetailSerializer.new
-            .represent(project.jira_service.find_issue(params[:id], { expand: 'renderedFields' }), project: project)
+            .represent(project.jira_service.find_issue(params[:id], rendered_fields: true), project: project)
         end
 
         def finder
