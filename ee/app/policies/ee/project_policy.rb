@@ -144,6 +144,11 @@ module EE
         @subject.feature_available?(:code_review_analytics, @user)
       end
 
+      with_scope :subject
+      condition(:issue_analytics_enabled) do
+        @subject.feature_available?(:issues_analytics, @user)
+      end
+
       condition(:status_page_available) do
         @subject.feature_available?(:status_page, @user)
       end
@@ -176,6 +181,12 @@ module EE
         prevent :create_merge_request_in
         prevent :create_merge_request_from
         prevent :push_code
+      end
+
+      rule { analytics_disabled }.policy do
+        prevent(:read_project_merge_request_analytics)
+        prevent(:read_code_review_analytics)
+        prevent(:read_issue_analytics)
       end
 
       rule { feature_flags_related_issues_disabled | repository_disabled }.policy do
@@ -353,6 +364,8 @@ module EE
       rule { locked_merge_request_committer_setting }.policy do
         prevent :modify_merge_request_committer_setting
       end
+
+      rule { issue_analytics_enabled }.enable :read_issue_analytics
 
       rule { can?(:read_merge_request) & code_review_analytics_enabled }.enable :read_code_review_analytics
 
