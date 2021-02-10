@@ -133,6 +133,9 @@ export default {
         ? sprintf(__("%{username}'s avatar"), { username: this.author.username })
         : null;
     },
+    refUrl() {
+      return this.commitRef.ref_url ?? this.commitRef.path;
+    },
   },
 };
 </script>
@@ -153,14 +156,9 @@ export default {
         class="ref-name"
         >{{ mergeRequestRef.iid }}</gl-link
       >
-      <gl-link
-        v-else
-        v-gl-tooltip
-        :href="commitRef.ref_url"
-        :title="commitRef.name"
-        class="ref-name"
-        >{{ commitRef.name }}</gl-link
-      >
+      <gl-link v-else v-gl-tooltip :href="refUrl" :title="commitRef.name" class="ref-name">{{
+        commitRef.name
+      }}</gl-link>
     </template>
     <gl-icon name="commit" class="commit-icon js-commit-icon" />
 

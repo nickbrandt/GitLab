@@ -223,4 +223,20 @@ describe('Commit component', () => {
       expect(wrapper.find('.ref-name').exists()).toBe(false);
     });
   });
+
+  describe('When commitRef has a path property instead of ref_url property', () => {
+    it('should render path as href attribute', () => {
+      props = {
+        commitRef: {
+          name: 'master',
+          path: 'http://localhost/namespace2/gitlabhq/tree/master',
+        },
+      };
+
+      createComponent(props);
+
+      expect(wrapper.find('.ref-name').exists()).toBe(true);
+      expect(wrapper.find('.ref-name').attributes('href')).toBe(props.commitRef.path);
+    });
+  });
 });
