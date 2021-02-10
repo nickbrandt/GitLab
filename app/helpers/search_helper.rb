@@ -124,20 +124,20 @@ module SearchHelper
   def search_sort_options
     [
       {
-      title: _('Created date'),
-      sortable: true,
-      sortParam: {
-        asc: 'created_asc',
-        desc: 'created_desc'
-      }
+        title: _('Created date'),
+        sortable: true,
+        sortParam: {
+          asc: 'created_asc',
+          desc: 'created_desc'
+        }
       },
       {
-      title: _('Last updated'),
-      sortable: true,
-      sortParam: {
-        asc: 'updated_asc',
-        desc: 'updated_desc'
-      }
+        title: _('Last updated'),
+        sortable: true,
+        sortParam: {
+          asc: 'updated_asc',
+          desc: 'updated_desc'
+        }
       }
     ]
   end
