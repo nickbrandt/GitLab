@@ -27890,7 +27890,7 @@
           "inputFields": [
             {
               "name": "id",
-              "description": "The ID of the epic_issue or epic that is being moved",
+              "description": "The ID of the epic_issue or epic that is being moved.",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -27904,7 +27904,7 @@
             },
             {
               "name": "adjacentReferenceId",
-              "description": "The ID of the epic_issue or issue that the actual epic or issue is switched with",
+              "description": "The ID of the epic_issue or issue that the actual epic or issue is switched with.",
               "type": {
                 "kind": "SCALAR",
                 "name": "EpicTreeSortingID",
@@ -27914,7 +27914,7 @@
             },
             {
               "name": "relativePosition",
-              "description": "The type of the switch, after or before allowed",
+              "description": "The type of the switch, after or before allowed.",
               "type": {
                 "kind": "ENUM",
                 "name": "MoveType",
@@ -27924,7 +27924,7 @@
             },
             {
               "name": "newParentId",
-              "description": "ID of the new parent epic",
+              "description": "ID of the new parent epic.",
               "type": {
                 "kind": "SCALAR",
                 "name": "EpicID",
@@ -28233,7 +28233,7 @@
           "fields": [
             {
               "name": "createdAt",
-              "description": "Timestamp of when the issue was created",
+              "description": "Timestamp of when the issue was created.",
               "args": [
 
               ],
@@ -28247,7 +28247,7 @@
             },
             {
               "name": "externalTracker",
-              "description": "Type of external tracker",
+              "description": "Type of external tracker.",
               "args": [
 
               ],
@@ -28261,7 +28261,7 @@
             },
             {
               "name": "relativeReference",
-              "description": "Relative reference of the issue in the external tracker",
+              "description": "Relative reference of the issue in the external tracker.",
               "args": [
 
               ],
@@ -28275,7 +28275,7 @@
             },
             {
               "name": "status",
-              "description": "Status of the issue in the external tracker",
+              "description": "Status of the issue in the external tracker.",
               "args": [
 
               ],
@@ -28289,7 +28289,7 @@
             },
             {
               "name": "title",
-              "description": "Title of the issue in the external tracker",
+              "description": "Title of the issue in the external tracker.",
               "args": [
 
               ],
@@ -28303,7 +28303,7 @@
             },
             {
               "name": "updatedAt",
-              "description": "Timestamp of when the issue was updated",
+              "description": "Timestamp of when the issue was updated.",
               "args": [
 
               ],
@@ -28317,7 +28317,7 @@
             },
             {
               "name": "webUrl",
-              "description": "URL to the issue in the external tracker",
+              "description": "URL to the issue in the external tracker.",
               "args": [
 
               ],
@@ -28354,7 +28354,7 @@
           "fields": [
             {
               "name": "containerRepositoriesMaxCapacity",
-              "description": "The maximum concurrency of container repository sync for this secondary node",
+              "description": "The maximum concurrency of container repository sync for this secondary node.",
               "args": [
 
               ],
@@ -28368,7 +28368,7 @@
             },
             {
               "name": "enabled",
-              "description": "Indicates whether this Geo node is enabled",
+              "description": "Indicates whether this Geo node is enabled.",
               "args": [
 
               ],
@@ -28382,7 +28382,7 @@
             },
             {
               "name": "filesMaxCapacity",
-              "description": "The maximum concurrency of LFS/attachment backfill for this secondary node",
+              "description": "The maximum concurrency of LFS/attachment backfill for this secondary node.",
               "args": [
 
               ],
@@ -28396,7 +28396,7 @@
             },
             {
               "name": "id",
-              "description": "ID of this GeoNode",
+              "description": "ID of this GeoNode.",
               "args": [
 
               ],
@@ -28414,7 +28414,7 @@
             },
             {
               "name": "internalUrl",
-              "description": "The URL defined on the primary node that secondary nodes should use to contact it",
+              "description": "The URL defined on the primary node that secondary nodes should use to contact it.",
               "args": [
 
               ],
@@ -28428,7 +28428,7 @@
             },
             {
               "name": "mergeRequestDiffRegistries",
-              "description": "Find merge request diff registries on this Geo node",
+              "description": "Find merge request diff registries on this Geo node.",
               "args": [
                 {
                   "name": "ids",
@@ -28499,7 +28499,7 @@
             },
             {
               "name": "minimumReverificationInterval",
-              "description": "The interval (in days) in which the repository verification is valid. Once expired, it will be reverified",
+              "description": "The interval (in days) in which the repository verification is valid. Once expired, it will be reverified.",
               "args": [
 
               ],
@@ -28513,7 +28513,7 @@
             },
             {
               "name": "name",
-              "description": "The unique identifier for this Geo node",
+              "description": "The unique identifier for this Geo node.",
               "args": [
 
               ],
@@ -28527,7 +28527,7 @@
             },
             {
               "name": "packageFileRegistries",
-              "description": "Package file registries of the GeoNode",
+              "description": "Package file registries of the GeoNode.",
               "args": [
                 {
                   "name": "ids",
@@ -28598,7 +28598,7 @@
             },
             {
               "name": "primary",
-              "description": "Indicates whether this Geo node is the primary",
+              "description": "Indicates whether this Geo node is the primary.",
               "args": [
 
               ],
@@ -28612,7 +28612,7 @@
             },
             {
               "name": "reposMaxCapacity",
-              "description": "The maximum concurrency of repository backfill for this secondary node",
+              "description": "The maximum concurrency of repository backfill for this secondary node.",
               "args": [
 
               ],
@@ -28626,7 +28626,7 @@
             },
             {
               "name": "selectiveSyncNamespaces",
-              "description": "The namespaces that should be synced, if `selective_sync_type` == `namespaces`",
+              "description": "The namespaces that should be synced, if `selective_sync_type` == `namespaces`.",
               "args": [
                 {
                   "name": "after",
@@ -28679,7 +28679,7 @@
             },
             {
               "name": "selectiveSyncShards",
-              "description": "The repository storages whose projects should be synced, if `selective_sync_type` == `shards`",
+              "description": "The repository storages whose projects should be synced, if `selective_sync_type` == `shards`.",
               "args": [
 
               ],
@@ -28701,7 +28701,7 @@
             },
             {
               "name": "selectiveSyncType",
-              "description": "Indicates if syncing is limited to only specific groups, or shards",
+              "description": "Indicates if syncing is limited to only specific groups, or shards.",
               "args": [
 
               ],
@@ -28715,7 +28715,7 @@
             },
             {
               "name": "snippetRepositoryRegistries",
-              "description": "Find snippet repository registries on this Geo node",
+              "description": "Find snippet repository registries on this Geo node.",
               "args": [
                 {
                   "name": "ids",
@@ -28786,7 +28786,7 @@
             },
             {
               "name": "syncObjectStorage",
-              "description": "Indicates if this secondary node will replicate blobs in Object Storage",
+              "description": "Indicates if this secondary node will replicate blobs in Object Storage.",
               "args": [
 
               ],
@@ -28800,7 +28800,7 @@
             },
             {
               "name": "terraformStateVersionRegistries",
-              "description": "Find terraform state version registries on this Geo node",
+              "description": "Find terraform state version registries on this Geo node.",
               "args": [
                 {
                   "name": "ids",
@@ -28871,7 +28871,7 @@
             },
             {
               "name": "url",
-              "description": "The user-facing URL for this Geo node",
+              "description": "The user-facing URL for this Geo node.",
               "args": [
 
               ],
@@ -28885,7 +28885,7 @@
             },
             {
               "name": "verificationMaxCapacity",
-              "description": "The maximum concurrency of repository verification for this secondary node",
+              "description": "The maximum concurrency of repository verification for this secondary node.",
               "args": [
 
               ],
@@ -32549,7 +32549,7 @@
           "fields": [
             {
               "name": "releaseStats",
-              "description": "Statistics related to releases within the group",
+              "description": "Statistics related to releases within the group.",
               "args": [
 
               ],
@@ -33494,7 +33494,7 @@
           "fields": [
             {
               "name": "description",
-              "description": "Description of the on-call schedule",
+              "description": "Description of the on-call schedule.",
               "args": [
 
               ],
@@ -33508,7 +33508,7 @@
             },
             {
               "name": "iid",
-              "description": "Internal ID of the on-call schedule",
+              "description": "Internal ID of the on-call schedule.",
               "args": [
 
               ],
@@ -33526,7 +33526,7 @@
             },
             {
               "name": "name",
-              "description": "Name of the on-call schedule",
+              "description": "Name of the on-call schedule.",
               "args": [
 
               ],
@@ -33544,7 +33544,7 @@
             },
             {
               "name": "rotations",
-              "description": "On-call rotations for the on-call schedule",
+              "description": "On-call rotations for the on-call schedule.",
               "args": [
                 {
                   "name": "after",
@@ -33601,7 +33601,7 @@
             },
             {
               "name": "timezone",
-              "description": "Time zone of the on-call schedule",
+              "description": "Time zone of the on-call schedule.",
               "args": [
 
               ],
@@ -33911,7 +33911,7 @@
           "fields": [
             {
               "name": "projects",
-              "description": "Projects selected in Instance Security Dashboard",
+              "description": "Projects selected in Instance Security Dashboard.",
               "args": [
                 {
                   "name": "after",
@@ -33968,7 +33968,7 @@
             },
             {
               "name": "vulnerabilityGrades",
-              "description": "Represents vulnerable project counts for each grade",
+              "description": "Represents vulnerable project counts for each grade.",
               "args": [
 
               ],
@@ -33994,7 +33994,7 @@
             },
             {
               "name": "vulnerabilityScanners",
-              "description": "Vulnerability scanners reported on the vulnerabilities from projects selected in Instance Security Dashboard",
+              "description": "Vulnerability scanners reported on the vulnerabilities from projects selected in Instance Security Dashboard.",
               "args": [
                 {
                   "name": "after",
@@ -34047,7 +34047,7 @@
             },
             {
               "name": "vulnerabilitySeveritiesCount",
-              "description": "Counts for each vulnerability severity from projects selected in Instance Security Dashboard",
+              "description": "Counts for each vulnerability severity from projects selected in Instance Security Dashboard.",
               "args": [
                 {
                   "name": "projectId",
@@ -37675,7 +37675,7 @@
           "fields": [
             {
               "name": "createdAt",
-              "description": "Timestamp of iteration creation",
+              "description": "Timestamp of iteration creation.",
               "args": [
 
               ],
@@ -37693,7 +37693,7 @@
             },
             {
               "name": "description",
-              "description": "Description of the iteration",
+              "description": "Description of the iteration.",
               "args": [
 
               ],
@@ -37721,7 +37721,7 @@
             },
             {
               "name": "dueDate",
-              "description": "Timestamp of the iteration due date",
+              "description": "Timestamp of the iteration due date.",
               "args": [
 
               ],
@@ -37735,7 +37735,7 @@
             },
             {
               "name": "id",
-              "description": "ID of the iteration",
+              "description": "ID of the iteration.",
               "args": [
 
               ],
@@ -37753,7 +37753,7 @@
             },
             {
               "name": "iid",
-              "description": "Internal ID of the iteration",
+              "description": "Internal ID of the iteration.",
               "args": [
 
               ],
@@ -37771,7 +37771,7 @@
             },
             {
               "name": "report",
-              "description": "Historically accurate report about the timebox",
+              "description": "Historically accurate report about the timebox.",
               "args": [
 
               ],
@@ -37785,7 +37785,7 @@
             },
             {
               "name": "scopedPath",
-              "description": "Web path of the iteration, scoped to the query parent. Only valid for Project parents. Returns null in other contexts",
+              "description": "Web path of the iteration, scoped to the query parent. Only valid for Project parents. Returns null in other contexts.",
               "args": [
 
               ],
@@ -37799,7 +37799,7 @@
             },
             {
               "name": "scopedUrl",
-              "description": "Web URL of the iteration, scoped to the query parent. Only valid for Project parents. Returns null in other contexts",
+              "description": "Web URL of the iteration, scoped to the query parent. Only valid for Project parents. Returns null in other contexts.",
               "args": [
 
               ],
@@ -37813,7 +37813,7 @@
             },
             {
               "name": "startDate",
-              "description": "Timestamp of the iteration start date",
+              "description": "Timestamp of the iteration start date.",
               "args": [
 
               ],
@@ -37827,7 +37827,7 @@
             },
             {
               "name": "state",
-              "description": "State of the iteration",
+              "description": "State of the iteration.",
               "args": [
 
               ],
@@ -37845,7 +37845,7 @@
             },
             {
               "name": "title",
-              "description": "Title of the iteration",
+              "description": "Title of the iteration.",
               "args": [
 
               ],
@@ -37863,7 +37863,7 @@
             },
             {
               "name": "updatedAt",
-              "description": "Timestamp of last iteration update",
+              "description": "Timestamp of last iteration update.",
               "args": [
 
               ],
@@ -37881,7 +37881,7 @@
             },
             {
               "name": "webPath",
-              "description": "Web path of the iteration",
+              "description": "Web path of the iteration.",
               "args": [
 
               ],
@@ -37899,7 +37899,7 @@
             },
             {
               "name": "webUrl",
-              "description": "Web URL of the iteration",
+              "description": "Web URL of the iteration.",
               "args": [
 
               ],
@@ -42209,7 +42209,7 @@
             },
             {
               "name": "mergeRequestDiffId",
-              "description": "ID of the Merge Request diff",
+              "description": "ID of the Merge Request diff.",
               "args": [
 
               ],
@@ -43909,7 +43909,7 @@
           "fields": [
             {
               "name": "fileName",
-              "description": "File name of the metric image",
+              "description": "File name of the metric image.",
               "args": [
 
               ],
@@ -43923,7 +43923,7 @@
             },
             {
               "name": "filePath",
-              "description": "File path of the metric image",
+              "description": "File path of the metric image.",
               "args": [
 
               ],
@@ -43937,7 +43937,7 @@
             },
             {
               "name": "id",
-              "description": "ID of the metric upload",
+              "description": "ID of the metric upload.",
               "args": [
 
               ],
@@ -43955,7 +43955,7 @@
             },
             {
               "name": "iid",
-              "description": "Internal ID of the metric upload",
+              "description": "Internal ID of the metric upload.",
               "args": [
 
               ],
@@ -43973,7 +43973,7 @@
             },
             {
               "name": "url",
-              "description": "URL of the metric source",
+              "description": "URL of the metric source.",
               "args": [
 
               ],
@@ -44439,7 +44439,7 @@
             },
             {
               "name": "report",
-              "description": "Historically accurate report about the timebox",
+              "description": "Historically accurate report about the timebox.",
               "args": [
 
               ],
@@ -51940,7 +51940,7 @@
             },
             {
               "name": "packageFileId",
-              "description": "ID of the PackageFile",
+              "description": "ID of the PackageFile.",
               "args": [
 
               ],
@@ -64636,7 +64636,7 @@
           "fields": [
             {
               "name": "author",
-              "description": "Author of the requirement",
+              "description": "Author of the requirement.",
               "args": [
 
               ],
@@ -64654,7 +64654,7 @@
             },
             {
               "name": "createdAt",
-              "description": "Timestamp of when the requirement was created",
+              "description": "Timestamp of when the requirement was created.",
               "args": [
 
               ],
@@ -64672,7 +64672,7 @@
             },
             {
               "name": "description",
-              "description": "Description of the requirement",
+              "description": "Description of the requirement.",
               "args": [
 
               ],
@@ -64700,7 +64700,7 @@
             },
             {
               "name": "id",
-              "description": "ID of the requirement",
+              "description": "ID of the requirement.",
               "args": [
 
               ],
@@ -64718,7 +64718,7 @@
             },
             {
               "name": "iid",
-              "description": "Internal ID of the requirement",
+              "description": "Internal ID of the requirement.",
               "args": [
 
               ],
@@ -64736,7 +64736,7 @@
             },
             {
               "name": "lastTestReportManuallyCreated",
-              "description": "Indicates if latest test report was created by user",
+              "description": "Indicates if latest test report was created by user.",
               "args": [
 
               ],
@@ -64750,7 +64750,7 @@
             },
             {
               "name": "lastTestReportState",
-              "description": "Latest requirement test report state",
+              "description": "Latest requirement test report state.",
               "args": [
 
               ],
@@ -64764,7 +64764,7 @@
             },
             {
               "name": "project",
-              "description": "Project to which the requirement belongs",
+              "description": "Project to which the requirement belongs.",
               "args": [
 
               ],
@@ -64782,7 +64782,7 @@
             },
             {
               "name": "state",
-              "description": "State of the requirement",
+              "description": "State of the requirement.",
               "args": [
 
               ],
@@ -64800,7 +64800,7 @@
             },
             {
               "name": "testReports",
-              "description": "Test reports of the requirement",
+              "description": "Test reports of the requirement.",
               "args": [
                 {
                   "name": "sort",
@@ -64863,7 +64863,7 @@
             },
             {
               "name": "title",
-              "description": "Title of the requirement",
+              "description": "Title of the requirement.",
               "args": [
 
               ],
@@ -64891,7 +64891,7 @@
             },
             {
               "name": "updatedAt",
-              "description": "Timestamp of when the requirement was last updated",
+              "description": "Timestamp of when the requirement was last updated.",
               "args": [
 
               ],
@@ -65178,7 +65178,7 @@
           "fields": [
             {
               "name": "archived",
-              "description": "Number of archived requirements",
+              "description": "Number of archived requirements.",
               "args": [
 
               ],
@@ -65192,7 +65192,7 @@
             },
             {
               "name": "opened",
-              "description": "Number of opened requirements",
+              "description": "Number of opened requirements.",
               "args": [
 
               ],
@@ -67185,7 +67185,7 @@
           "fields": [
             {
               "name": "requestMethod",
-              "description": "The HTTP request method used to access the URL",
+              "description": "The HTTP request method used to access the URL.",
               "args": [
 
               ],
@@ -67199,7 +67199,7 @@
             },
             {
               "name": "url",
-              "description": "The URL scanned by the scanner",
+              "description": "The URL scanned by the scanner.",
               "args": [
 
               ],
@@ -67449,7 +67449,7 @@
           "fields": [
             {
               "name": "scannedResources",
-              "description": "A list of the first 20 scanned resources",
+              "description": "A list of the first 20 scanned resources.",
               "args": [
                 {
                   "name": "after",
@@ -67502,7 +67502,7 @@
             },
             {
               "name": "scannedResourcesCount",
-              "description": "Total number of scanned resources",
+              "description": "Total number of scanned resources.",
               "args": [
 
               ],
@@ -67516,7 +67516,7 @@
             },
             {
               "name": "scannedResourcesCsvPath",
-              "description": "Path to download all the scanned resources in CSV format",
+              "description": "Path to download all the scanned resources in CSV format.",
               "args": [
 
               ],
@@ -67530,7 +67530,7 @@
             },
             {
               "name": "vulnerabilitiesCount",
-              "description": "Total number of vulnerabilities",
+              "description": "Total number of vulnerabilities.",
               "args": [
 
               ],
@@ -70880,7 +70880,7 @@
             },
             {
               "name": "snippetRepositoryId",
-              "description": "ID of the Snippet Repository",
+              "description": "ID of the Snippet Repository.",
               "args": [
 
               ],
@@ -72259,7 +72259,7 @@
             },
             {
               "name": "terraformStateVersionId",
-              "description": "ID of the terraform state version",
+              "description": "ID of the terraform state version.",
               "args": [
 
               ],
@@ -72402,7 +72402,7 @@
           "fields": [
             {
               "name": "author",
-              "description": "Author of the test report",
+              "description": "Author of the test report.",
               "args": [
 
               ],
@@ -72416,7 +72416,7 @@
             },
             {
               "name": "createdAt",
-              "description": "Timestamp of when the test report was created",
+              "description": "Timestamp of when the test report was created.",
               "args": [
 
               ],
@@ -72434,7 +72434,7 @@
             },
             {
               "name": "id",
-              "description": "ID of the test report",
+              "description": "ID of the test report.",
               "args": [
 
               ],
@@ -72452,7 +72452,7 @@
             },
             {
               "name": "state",
-              "description": "State of the test report",
+              "description": "State of the test report.",
               "args": [
 
               ],
@@ -72628,7 +72628,7 @@
           "fields": [
             {
               "name": "complete",
-              "description": "Completed issues metrics",
+              "description": "Completed issues metrics.",
               "args": [
 
               ],
@@ -72642,7 +72642,7 @@
             },
             {
               "name": "incomplete",
-              "description": "Incomplete issues metrics",
+              "description": "Incomplete issues metrics.",
               "args": [
 
               ],
@@ -72656,7 +72656,7 @@
             },
             {
               "name": "total",
-              "description": "Total issues metrics",
+              "description": "Total issues metrics.",
               "args": [
 
               ],
@@ -72683,7 +72683,7 @@
           "fields": [
             {
               "name": "count",
-              "description": "The count metric",
+              "description": "The count metric.",
               "args": [
 
               ],
@@ -72701,7 +72701,7 @@
             },
             {
               "name": "weight",
-              "description": "The weight metric",
+              "description": "The weight metric.",
               "args": [
 
               ],
@@ -72732,7 +72732,7 @@
           "fields": [
             {
               "name": "burnupTimeSeries",
-              "description": "Daily scope and completed totals for burnup charts",
+              "description": "Daily scope and completed totals for burnup charts.",
               "args": [
 
               ],
@@ -72754,7 +72754,7 @@
             },
             {
               "name": "stats",
-              "description": "Represents the time report stats for the timebox",
+              "description": "Represents the time report stats for the timebox.",
               "args": [
 
               ],
@@ -72781,7 +72781,7 @@
           "fields": [
             {
               "name": "report",
-              "description": "Historically accurate report about the timebox",
+              "description": "Historically accurate report about the timebox.",
               "args": [
 
               ],
@@ -72856,7 +72856,7 @@
           "fields": [
             {
               "name": "issue",
-              "description": "The issue that logged time was added to",
+              "description": "The issue that logged time was added to.",
               "args": [
 
               ],
@@ -72870,7 +72870,7 @@
             },
             {
               "name": "note",
-              "description": "The note where the quick action to add the logged time was executed",
+              "description": "The note where the quick action to add the logged time was executed.",
               "args": [
 
               ],
@@ -72884,7 +72884,7 @@
             },
             {
               "name": "spentAt",
-              "description": "Timestamp of when the time tracked was spent at",
+              "description": "Timestamp of when the time tracked was spent at.",
               "args": [
 
               ],
@@ -72898,7 +72898,7 @@
             },
             {
               "name": "timeSpent",
-              "description": "The time spent displayed in seconds",
+              "description": "The time spent displayed in seconds.",
               "args": [
 
               ],
@@ -72916,7 +72916,7 @@
             },
             {
               "name": "user",
-              "description": "The user that logged the time",
+              "description": "The user that logged the time.",
               "args": [
 
               ],
@@ -78802,7 +78802,7 @@
             },
             {
               "name": "date",
-              "description": "Date for the count",
+              "description": "Date for the count.",
               "args": [
 
               ],
@@ -78892,7 +78892,7 @@
             },
             {
               "name": "total",
-              "description": "Total number of vulnerabilities on a particular day",
+              "description": "Total number of vulnerabilities on a particular day.",
               "args": [
 
               ],
@@ -78941,7 +78941,7 @@
           "fields": [
             {
               "name": "count",
-              "description": "Number of vulnerabilities",
+              "description": "Number of vulnerabilities.",
               "args": [
 
               ],
@@ -78955,7 +78955,7 @@
             },
             {
               "name": "day",
-              "description": "Date for the count",
+              "description": "Date for the count.",
               "args": [
 
               ],
@@ -78969,7 +78969,7 @@
             },
             {
               "name": "severity",
-              "description": "Severity of the counted vulnerabilities",
+              "description": "Severity of the counted vulnerabilities.",
               "args": [
 
               ],
@@ -79230,7 +79230,7 @@
           "fields": [
             {
               "name": "confirmedAt",
-              "description": "Timestamp of when the vulnerability state was changed to confirmed",
+              "description": "Timestamp of when the vulnerability state was changed to confirmed.",
               "args": [
 
               ],
@@ -79258,7 +79258,7 @@
             },
             {
               "name": "description",
-              "description": "Description of the vulnerability",
+              "description": "Description of the vulnerability.",
               "args": [
 
               ],
@@ -79272,7 +79272,7 @@
             },
             {
               "name": "details",
-              "description": "Details of the vulnerability",
+              "description": "Details of the vulnerability.",
               "args": [
 
               ],
@@ -79298,7 +79298,7 @@
             },
             {
               "name": "detectedAt",
-              "description": "Timestamp of when the vulnerability was first detected",
+              "description": "Timestamp of when the vulnerability was first detected.",
               "args": [
 
               ],
@@ -79373,7 +79373,7 @@
             },
             {
               "name": "dismissedAt",
-              "description": "Timestamp of when the vulnerability state was changed to dismissed",
+              "description": "Timestamp of when the vulnerability state was changed to dismissed.",
               "args": [
 
               ],
@@ -79401,7 +79401,7 @@
             },
             {
               "name": "externalIssueLinks",
-              "description": "List of external issue links related to the vulnerability",
+              "description": "List of external issue links related to the vulnerability.",
               "args": [
                 {
                   "name": "after",
@@ -79472,7 +79472,7 @@
             },
             {
               "name": "id",
-              "description": "GraphQL ID of the vulnerability",
+              "description": "GraphQL ID of the vulnerability.",
               "args": [
 
               ],
@@ -79516,7 +79516,7 @@
             },
             {
               "name": "issueLinks",
-              "description": "List of issue links related to the vulnerability",
+              "description": "List of issue links related to the vulnerability.",
               "args": [
                 {
                   "name": "linkType",
@@ -79583,7 +79583,7 @@
             },
             {
               "name": "location",
-              "description": "Location metadata for the vulnerability. Its fields depend on the type of security scan that found the vulnerability",
+              "description": "Location metadata for the vulnerability. Its fields depend on the type of security scan that found the vulnerability.",
               "args": [
 
               ],
@@ -79682,7 +79682,7 @@
             },
             {
               "name": "project",
-              "description": "The project on which the vulnerability was found",
+              "description": "The project on which the vulnerability was found.",
               "args": [
 
               ],
@@ -79710,7 +79710,7 @@
             },
             {
               "name": "resolvedAt",
-              "description": "Timestamp of when the vulnerability state was changed to resolved",
+              "description": "Timestamp of when the vulnerability state was changed to resolved.",
               "args": [
 
               ],
@@ -79738,7 +79738,7 @@
             },
             {
               "name": "resolvedOnDefaultBranch",
-              "description": "Indicates whether the vulnerability is fixed on the default branch or not",
+              "description": "Indicates whether the vulnerability is fixed on the default branch or not.",
               "args": [
 
               ],
@@ -79798,7 +79798,7 @@
             },
             {
               "name": "title",
-              "description": "Title of the vulnerability",
+              "description": "Title of the vulnerability.",
               "args": [
 
               ],
@@ -79812,7 +79812,7 @@
             },
             {
               "name": "userNotesCount",
-              "description": "Number of user notes attached to the vulnerability",
+              "description": "Number of user notes attached to the vulnerability.",
               "args": [
 
               ],
@@ -79848,7 +79848,7 @@
             },
             {
               "name": "vulnerabilityPath",
-              "description": "URL to the vulnerability's details page",
+              "description": "URL to the vulnerability's details page.",
               "args": [
 
               ],
@@ -81509,7 +81509,7 @@
           "fields": [
             {
               "name": "externalIssue",
-              "description": "The external issue attached to the issue link",
+              "description": "The external issue attached to the issue link.",
               "args": [
 
               ],
@@ -81523,7 +81523,7 @@
             },
             {
               "name": "id",
-              "description": "GraphQL ID of the external issue link",
+              "description": "GraphQL ID of the external issue link.",
               "args": [
 
               ],
@@ -81541,7 +81541,7 @@
             },
             {
               "name": "linkType",
-              "description": "Type of the external issue link",
+              "description": "Type of the external issue link.",
               "args": [
 
               ],
@@ -81987,7 +81987,7 @@
           "fields": [
             {
               "name": "externalId",
-              "description": "External ID of the vulnerability identifier",
+              "description": "External ID of the vulnerability identifier.",
               "args": [
 
               ],
@@ -82001,7 +82001,7 @@
             },
             {
               "name": "externalType",
-              "description": "External type of the vulnerability identifier",
+              "description": "External type of the vulnerability identifier.",
               "args": [
 
               ],
@@ -82015,7 +82015,7 @@
             },
             {
               "name": "name",
-              "description": "Name of the vulnerability identifier",
+              "description": "Name of the vulnerability identifier.",
               "args": [
 
               ],
@@ -82029,7 +82029,7 @@
             },
             {
               "name": "url",
-              "description": "URL of the vulnerability identifier",
+              "description": "URL of the vulnerability identifier.",
               "args": [
 
               ],
@@ -82056,7 +82056,7 @@
           "fields": [
             {
               "name": "id",
-              "description": "GraphQL ID of the vulnerability",
+              "description": "GraphQL ID of the vulnerability.",
               "args": [
 
               ],
@@ -82074,7 +82074,7 @@
             },
             {
               "name": "issue",
-              "description": "The issue attached to issue link",
+              "description": "The issue attached to issue link.",
               "args": [
 
               ],
@@ -82092,7 +82092,7 @@
             },
             {
               "name": "linkType",
-              "description": "Type of the issue link",
+              "description": "Type of the issue link.",
               "args": [
 
               ],
@@ -82299,7 +82299,7 @@
           "fields": [
             {
               "name": "dependency",
-              "description": "Dependency containing the vulnerability",
+              "description": "Dependency containing the vulnerability.",
               "args": [
 
               ],
@@ -82313,7 +82313,7 @@
             },
             {
               "name": "image",
-              "description": "Name of the vulnerable container image",
+              "description": "Name of the vulnerable container image.",
               "args": [
 
               ],
@@ -82327,7 +82327,7 @@
             },
             {
               "name": "operatingSystem",
-              "description": "Operating system that runs on the vulnerable container image",
+              "description": "Operating system that runs on the vulnerable container image.",
               "args": [
 
               ],
@@ -82354,7 +82354,7 @@
           "fields": [
             {
               "name": "blobPath",
-              "description": "Blob path to the vulnerable file",
+              "description": "Blob path to the vulnerable file.",
               "args": [
 
               ],
@@ -82368,7 +82368,7 @@
             },
             {
               "name": "endLine",
-              "description": "Number of the last relevant line in the vulnerable file",
+              "description": "Number of the last relevant line in the vulnerable file.",
               "args": [
 
               ],
@@ -82382,7 +82382,7 @@
             },
             {
               "name": "file",
-              "description": "Path to the vulnerable file",
+              "description": "Path to the vulnerable file.",
               "args": [
 
               ],
@@ -82396,7 +82396,7 @@
             },
             {
               "name": "startLine",
-              "description": "Number of the first relevant line in the vulnerable file",
+              "description": "Number of the first relevant line in the vulnerable file.",
               "args": [
 
               ],
@@ -82410,7 +82410,7 @@
             },
             {
               "name": "vulnerableClass",
-              "description": "Class containing the vulnerability",
+              "description": "Class containing the vulnerability.",
               "args": [
 
               ],
@@ -82424,7 +82424,7 @@
             },
             {
               "name": "vulnerableMethod",
-              "description": "Method containing the vulnerability",
+              "description": "Method containing the vulnerability.",
               "args": [
 
               ],
@@ -82451,7 +82451,7 @@
           "fields": [
             {
               "name": "hostname",
-              "description": "Domain name of the vulnerable request",
+              "description": "Domain name of the vulnerable request.",
               "args": [
 
               ],
@@ -82465,7 +82465,7 @@
             },
             {
               "name": "param",
-              "description": "Query parameter for the URL on which the vulnerability occurred",
+              "description": "Query parameter for the URL on which the vulnerability occurred.",
               "args": [
 
               ],
@@ -82479,7 +82479,7 @@
             },
             {
               "name": "path",
-              "description": "URL path and query string of the vulnerable request",
+              "description": "URL path and query string of the vulnerable request.",
               "args": [
 
               ],
@@ -82493,7 +82493,7 @@
             },
             {
               "name": "requestMethod",
-              "description": "HTTP method of the vulnerable request",
+              "description": "HTTP method of the vulnerable request.",
               "args": [
 
               ],
@@ -82520,7 +82520,7 @@
           "fields": [
             {
               "name": "blobPath",
-              "description": "Blob path to the vulnerable file",
+              "description": "Blob path to the vulnerable file.",
               "args": [
 
               ],
@@ -82534,7 +82534,7 @@
             },
             {
               "name": "dependency",
-              "description": "Dependency containing the vulnerability",
+              "description": "Dependency containing the vulnerability.",
               "args": [
 
               ],
@@ -82548,7 +82548,7 @@
             },
             {
               "name": "file",
-              "description": "Path to the vulnerable file",
+              "description": "Path to the vulnerable file.",
               "args": [
 
               ],
@@ -82575,7 +82575,7 @@
           "fields": [
             {
               "name": "blobPath",
-              "description": "Blob path to the vulnerable file",
+              "description": "Blob path to the vulnerable file.",
               "args": [
 
               ],
@@ -82589,7 +82589,7 @@
             },
             {
               "name": "endLine",
-              "description": "Number of the last relevant line in the vulnerable file",
+              "description": "Number of the last relevant line in the vulnerable file.",
               "args": [
 
               ],
@@ -82603,7 +82603,7 @@
             },
             {
               "name": "file",
-              "description": "Path to the vulnerable file",
+              "description": "Path to the vulnerable file.",
               "args": [
 
               ],
@@ -82617,7 +82617,7 @@
             },
             {
               "name": "startLine",
-              "description": "Number of the first relevant line in the vulnerable file",
+              "description": "Number of the first relevant line in the vulnerable file.",
               "args": [
 
               ],
@@ -82631,7 +82631,7 @@
             },
             {
               "name": "vulnerableClass",
-              "description": "Class containing the vulnerability",
+              "description": "Class containing the vulnerability.",
               "args": [
 
               ],
@@ -82645,7 +82645,7 @@
             },
             {
               "name": "vulnerableMethod",
-              "description": "Method containing the vulnerability",
+              "description": "Method containing the vulnerability.",
               "args": [
 
               ],
@@ -82672,7 +82672,7 @@
           "fields": [
             {
               "name": "blobPath",
-              "description": "Blob path to the vulnerable file",
+              "description": "Blob path to the vulnerable file.",
               "args": [
 
               ],
@@ -82686,7 +82686,7 @@
             },
             {
               "name": "endLine",
-              "description": "Number of the last relevant line in the vulnerable file",
+              "description": "Number of the last relevant line in the vulnerable file.",
               "args": [
 
               ],
@@ -82700,7 +82700,7 @@
             },
             {
               "name": "file",
-              "description": "Path to the vulnerable file",
+              "description": "Path to the vulnerable file.",
               "args": [
 
               ],
@@ -82714,7 +82714,7 @@
             },
             {
               "name": "startLine",
-              "description": "Number of the first relevant line in the vulnerable file",
+              "description": "Number of the first relevant line in the vulnerable file.",
               "args": [
 
               ],
@@ -82728,7 +82728,7 @@
             },
             {
               "name": "vulnerableClass",
-              "description": "Class containing the vulnerability",
+              "description": "Class containing the vulnerability.",
               "args": [
 
               ],
@@ -82742,7 +82742,7 @@
             },
             {
               "name": "vulnerableMethod",
-              "description": "Method containing the vulnerability",
+              "description": "Method containing the vulnerability.",
               "args": [
 
               ],
@@ -83201,7 +83201,7 @@
           "fields": [
             {
               "name": "externalId",
-              "description": "External ID of the vulnerability scanner",
+              "description": "External ID of the vulnerability scanner.",
               "args": [
 
               ],
@@ -83215,7 +83215,7 @@
             },
             {
               "name": "name",
-              "description": "Name of the vulnerability scanner",
+              "description": "Name of the vulnerability scanner.",
               "args": [
 
               ],
@@ -83229,7 +83229,7 @@
             },
             {
               "name": "reportType",
-              "description": "Type of the vulnerability report",
+              "description": "Type of the vulnerability report.",
               "args": [
 
               ],
@@ -83243,7 +83243,7 @@
             },
             {
               "name": "vendor",
-              "description": "Vendor of the vulnerability scanner",
+              "description": "Vendor of the vulnerability scanner.",
               "args": [
 
               ],
@@ -83632,7 +83632,7 @@
           "fields": [
             {
               "name": "package",
-              "description": "The package associated with the vulnerable dependency",
+              "description": "The package associated with the vulnerable dependency.",
               "args": [
 
               ],
@@ -83646,7 +83646,7 @@
             },
             {
               "name": "version",
-              "description": "The version of the vulnerable dependency",
+              "description": "The version of the vulnerable dependency.",
               "args": [
 
               ],
@@ -83673,7 +83673,7 @@
           "fields": [
             {
               "name": "name",
-              "description": "The name of the vulnerable package",
+              "description": "The name of the vulnerable package.",
               "args": [
 
               ],
@@ -83700,7 +83700,7 @@
           "fields": [
             {
               "name": "count",
-              "description": "Number of projects within this grade",
+              "description": "Number of projects within this grade.",
               "args": [
 
               ],
@@ -83718,7 +83718,7 @@
             },
             {
               "name": "grade",
-              "description": "Grade based on the highest severity vulnerability present",
+              "description": "Grade based on the highest severity vulnerability present.",
               "args": [
 
               ],
@@ -83736,7 +83736,7 @@
             },
             {
               "name": "projects",
-              "description": "Projects within this grade",
+              "description": "Projects within this grade.",
               "args": [
                 {
                   "name": "after",
