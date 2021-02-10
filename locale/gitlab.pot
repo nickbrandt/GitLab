@@ -12309,9 +12309,6 @@ msgstr ""
 msgid "Failed to load group activity metrics. Please try again."
 msgstr ""
 
-msgid "Failed to load groups & users."
-msgstr ""
-
 msgid "Failed to load groups, users and deploy keys."
 msgstr ""
 
