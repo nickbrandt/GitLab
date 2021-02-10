@@ -2376,6 +2376,12 @@ msgstr ""
 msgid "AdminUsers|Unblock user %{username}?"
 msgstr ""
 
+msgid "AdminUsers|Unlock"
+msgstr ""
+
+msgid "AdminUsers|Unlock user %{username}?"
+msgstr ""
+
 msgid "AdminUsers|User will not be able to access git repositories"
 msgstr ""
 
