@@ -138,7 +138,8 @@ module TreeHelper
       new_branch_path: new_project_branch_path(@project),
       new_tag_path: new_project_tag_path(@project),
       create_blob_path: project_create_blob_path(@project, @id),
-      can_edit_tree: can_edit_tree?.to_s
+      can_edit_tree: can_edit_tree?.to_s,
+      patch_branch_name: patch_branch_name(@ref)
     }
 
     if can?(current_user, :fork_project, @project) && can?(current_user, :create_merge_request_in, @project)

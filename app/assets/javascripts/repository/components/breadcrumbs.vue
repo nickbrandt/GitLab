@@ -102,6 +102,11 @@ export default {
       required: false,
       default: null,
     },
+    patchBranchName: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -286,6 +291,7 @@ export default {
       :modal-id="$options.uploadModalId"
       :user-permissions="userPermissions"
       :create-blob-path="createBlobPath"
+      :patch-branch-name="patchBranchName"
     />
   </nav>
 </template>

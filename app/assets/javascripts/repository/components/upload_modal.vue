@@ -1,12 +1,13 @@
 <script>
-import { GlModal, GlSprintf, GlLink } from '@gitlab/ui';
+import { GlModal, GlSprintf } from '@gitlab/ui';
 import axios from '~/lib/utils/axios_utils';
+import { ContentTypeMultipartFormData } from '~/lib/utils/headers';
+import UploadDropzone from '~/vue_shared/components/upload_dropzone/upload_dropzone.vue';
 import eventHub from '../event_hub';
-import { __ } from '~/locale';
 import { I18N_UPLOAD_MODAL } from '../constants';
 
 export default {
-  components: { GlModal, GlSprintf, GlLink },
+  components: { GlModal, GlSprintf, UploadDropzone },
   props: {
     openModal: {
       type: String,
@@ -27,7 +28,11 @@ export default {
     createBlobPath: {
       type: String,
       required: true,
-    }
+    },
+    patchBranchName: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -43,7 +48,10 @@ export default {
         text: I18N_UPLOAD_MODAL.actionCancelText,
         attributes: [{ 'data-testid': 'cancel-commit' }],
       },
-      commitMessage: __('Upload New File'),
+      commitMessage: I18N_UPLOAD_MODAL.commitMessage,
+      createMergeRequest: true,
+      file: null,
+      branchName: this.patchBranchName,
     };
   },
   mounted() {
@@ -53,13 +61,19 @@ export default {
     show() {
       this.$root.$emit('bv::show::modal', this.modalId);
     },
-    handlePrimary() {
-      const data = new FormData(this.$refs.uploadForm)
-      axios.post(this.createBlobPath, data)
+    async handlePrimary() {
+      const options = { headers: { ...ContentTypeMultipartFormData } };
+      const formData = new FormData();
+      formData.append('file', this.file);
+      formData.append('branch_name', this.branchName);
+      formData.append('create_merge_request', this.createMergeRequest);
+      formData.append('commit_message', this.commitMessage);
+      const result = await axios.post(this.createBlobPath, formData, options);
+      window.location.href = result.data.filePath;
     },
-    onFileInputChange(e) {
-      console.log(e.target.files)
-    }
+    saveFile(files) {
+      [this.file] = files;
+    },
   },
   i18n: I18N_UPLOAD_MODAL,
 };
@@ -76,8 +90,15 @@ export default {
     :action-primary="actionPrimary"
     @primary="handlePrimary"
   >
-    <form :action="createBlobPath" class="js-quick-submit js-upload-blob-form" ref="uploadForm" method="post">
-      <input type="file" name="file" id="file" @change="onFileInputChange" />
+    <form ref="uploadForm" class="js-quick-submit js-upload-blob-form" @submit="handlePrimary">
+      <upload-dropzone
+        :drop-description-message="$options.i18n.dropDescription"
+        :is-file-valid="() => true"
+        :valid-file-mimetypes="['*.*']"
+        class="gl-h-200!"
+        @change="saveFile"
+      />
+      <!-- <input id="file" type="file" name="file" />
       <div class="dropzone">
         <div class="dropzone-previews blob-upload-dropzone-previews">
           <p class="dz-message light">
@@ -92,7 +113,7 @@ export default {
             </gl-sprintf>
           </p>
         </div>
-      </div>
+      </div> -->
       <br />
       <div
         class="dropzone-alerts gl-alert gl-alert-danger gl-mb-5 data"
@@ -101,7 +122,7 @@ export default {
 
       <div class="form-group row commit_message-group">
         <label for="commit_message" class="col-form-label col-sm-2">{{
-          $options.i18n.commitMessage
+          $options.i18n.commitMessageLabel
         }}</label>
         <div class="col-sm-10">
           <div class="commit-message-container">
@@ -113,7 +134,7 @@ export default {
               rows="3"
               class="form-control js-commit-message"
               required
-              :placeholder="$options.i18n.commitMessage"
+              :placeholder="$options.i18n.commitMessageLabel"
             ></textarea>
           </div>
         </div>
@@ -129,17 +150,18 @@ export default {
             type="text"
             name="branch_name"
             class="form-control js-branch-name ref-name"
-            :value="refBranch"
+            :value="branchName"
             required
           />
           <div class="js-create-merge-request-container">
             <div class="form-check gl-mt-3">
               <input
+                v-if="userPermissions.pushCode"
                 id="create_merge_request"
+                v-model="createMergeRequest"
                 type="checkbox"
                 name="create_merge_request"
                 class="js-create-merge-request form-check-input"
-                checked
               />
               <label for="create_merge_request" class="form-check-label">
                 <gl-sprintf
@@ -157,12 +179,12 @@ export default {
         </div>
       </div>
       <div v-else>
-        <input type="hidden" name="branch_name" />
+        <input v-model="branchName" type="hidden" name="branch_name" />
         <input
           v-if="!userPermissions.pushCode"
+          v-model="createMergeRequest"
           type="hidden"
           name="create_merge_request"
-          value="1"
         />
       </div>
       <input type="hidden" name="original_branch" :value="refBranch" class="js-original-branch" />
