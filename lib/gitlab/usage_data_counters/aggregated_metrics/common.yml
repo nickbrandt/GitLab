@@ -50,6 +50,7 @@
   ]
 - name: i_testing_paid_monthly_active_user_total
   operator: OR
+  source: redis
   events: [
   'i_testing_web_performance_widget_total',
   'i_testing_full_code_quality_report_total',
