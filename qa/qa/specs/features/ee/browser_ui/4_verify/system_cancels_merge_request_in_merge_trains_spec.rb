@@ -80,9 +80,13 @@ module QA
 
         Page::MergeRequest::Show.perform do |show|
           show.has_pipeline_status?('passed')
-          show.try_to_merge!
 
-          show.wait_until(reload: false) { show.has_content? 'started a merge train' }
+          # Due to this behavior https://gitlab.com/gitlab-org/gitlab/-/issues/321001
+          # I'm going to retry this action until the train starts
+          show.retry_until(max_attempts: 3) do
+            show.try_to_merge!
+            show.wait_until(max_duration: 10, reload: false, raise_on_failure: false) { show.has_content? 'started a merge train' }
+          end
         end
       end
 
