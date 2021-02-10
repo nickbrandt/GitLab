@@ -9,6 +9,7 @@ class EpicPolicy < BasePolicy
   condition(:confidential, scope: :subject) do
     @subject.confidential?
   end
+  condition(:unconfirmed_user) { @user && !@user.confirmed? }
 
   rule { can?(:read_epic) }.policy do
     enable :read_epic_iid
@@ -34,5 +35,11 @@ class EpicPolicy < BasePolicy
 
   rule { ~anonymous & can?(:read_epic) }.policy do
     enable :create_todo
+  end
+
+  # Unconfirmed users cannot create, edit or remove notes
+  rule { unconfirmed_user }.policy do
+    prevent :create_note
+    prevent :admin_note
   end
 end

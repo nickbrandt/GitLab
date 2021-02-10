@@ -5,6 +5,7 @@ class IssuablePolicy < BasePolicy
 
   condition(:locked, scope: :subject, score: 0) { @subject.discussion_locked? }
   condition(:is_project_member) { @user && @subject.project && @subject.project.team.member?(@user) }
+  condition(:unconfirmed_user) { @user && !@user.confirmed? }
 
   desc "User is the assignee or author"
   condition(:assignee_or_author) do
@@ -25,6 +26,12 @@ class IssuablePolicy < BasePolicy
     prevent :admin_note
     prevent :resolve_note
     prevent :award_emoji
+  end
+
+  # Unconfirmed users cannot create, edit or remove notes
+  rule { unconfirmed_user }.policy do
+    prevent :create_note
+    prevent :admin_note
   end
 end
 

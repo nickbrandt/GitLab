@@ -46,6 +46,12 @@ RSpec.describe 'Adding a Note' do
       expect(mutation_response['note']['confidential']).to eq(true)
     end
 
+    context 'when the user is unconfirmed' do
+      let_it_be(:current_user) { create(:user, :unconfirmed) }
+
+      it_behaves_like 'a Note mutation when the user does not have permission'
+    end
+
     describe 'creating Notes in reply to a discussion' do
       context 'when the user does not have permission to create notes on the discussion' do
         let(:discussion) { create(:discussion_note).to_discussion }

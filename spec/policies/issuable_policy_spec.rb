@@ -36,6 +36,16 @@ RSpec.describe IssuablePolicy, models: true do
       end
     end
 
+    context 'when user is unconfirmed' do
+      before do
+        user.update_attribute(:confirmed_at, nil)
+      end
+
+      it 'does not allow them to create nor admin a note' do
+        expect(policies).to be_disallowed(:create_note, :admin_note)
+      end
+    end
+
     context 'when discussion is locked for the issuable' do
       let(:issue) { create(:issue, project: project, discussion_locked: true) }
 

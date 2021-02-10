@@ -33,6 +33,14 @@ RSpec.describe 'Adding a Note to an Epic' do
   context 'when the user has permission' do
     let(:group) { create(:group, :public) }
 
-    it_behaves_like 'a Note mutation that creates a Note'
+    context 'when the user is unconfirmed' do
+      let_it_be(:current_user) { create(:user, :unconfirmed) }
+
+      it_behaves_like 'a Note mutation when the user does not have permission'
+    end
+
+    context 'when the user has permission' do
+      it_behaves_like 'a Note mutation that creates a Note'
+    end
   end
 end
