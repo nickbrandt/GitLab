@@ -16,7 +16,14 @@ export default {
     GlIntersectionObserver,
     VulnerabilityList,
   },
-  inject: ['projectFullPath', 'hasJiraVulnerabilitiesIntegrationEnabled'],
+  inject: {
+    projectFullPath: {
+      default: '',
+    },
+    hasJiraVulnerabilitiesIntegrationEnabled: {
+      default: false,
+    },
+  },
   props: {
     filters: {
       type: Object,

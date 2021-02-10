@@ -37,15 +37,18 @@ export default {
     target="__blank"
     class="gl-display-inline-flex gl-align-items-center gl-flex-shrink-0"
   >
-    <span class="gl-mr-3">
-      <span
-        v-if="isJira"
-        v-safe-html="$options.jiraLogo"
-        class="gl-min-h-6 gl-display-inline-flex gl-align-items-center"
-        data-testid="jira-logo"
-      ></span>
-      <gl-icon v-else :class="{ cgreen: issue.state === $options.STATE_OPENED }" :name="iconName" />
-    </span>
+    <span
+      v-if="isJira"
+      v-safe-html="$options.jiraLogo"
+      class="gl-min-h-6 gl-mr-3 gl-display-inline-flex gl-align-items-center"
+      data-testid="jira-logo"
+    ></span>
+    <gl-icon
+      v-else
+      class="gl-mr-1"
+      :class="{ 'gl-text-green-600': issue.state === $options.STATE_OPENED }"
+      :name="iconName"
+    />
     #{{ issue.iid }}
     <gl-icon v-if="isJira" :size="12" name="external-link" class="gl-ml-1" />
   </gl-link>
