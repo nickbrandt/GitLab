@@ -8,32 +8,32 @@ RSpec.describe 'CI Lint', :js do
   let(:project) { create(:project, :repository) }
   let(:user) { create(:user) }
 
-  let(:content_selector) { '.content .view-lines' }
+  let(:content_selector) { '.gl-editor-lite .view-lines' }
+  let(:yaml_content_correct) do
+    File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml'))
+  end
+  let(:yaml_content_wrong) { 'value: cannot have :' }
 
   before do
     project.add_developer(user)
     sign_in(user)
 
     visit project_ci_lint_path(project)
-    editor_set_value(yaml_content)
-
-    wait_for('YAML content') do
-      find(content_selector).text.present?
-    end
+    wait_for_all_requests
   end
 
   describe 'YAML parsing' do
     shared_examples 'validates the YAML' do
-      before do
-        click_on 'Validate'
-      end
-
       context 'YAML is correct' do
-        let(:yaml_content) do
-          File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml'))
-        end
-
         it 'parses Yaml and displays the jobs' do
+          wait_for_requests
+
+          editor_set_value(yaml_content_correct)
+
+          click_on 'Validate'
+
+          wait_for_all_requests
+
           expect(page).to have_content('Status: Syntax is correct')
 
           within "table" do
@@ -48,11 +48,13 @@ RSpec.describe 'CI Lint', :js do
       end
 
       context 'YAML is incorrect' do
-        let(:yaml_content) { 'value: cannot have :' }
-
         it 'displays information about an error' do
+          editor_set_value(yaml_content_wrong)
+
+          click_on 'Validate'
+
           expect(page).to have_content('Status: Syntax is incorrect')
-          expect(page).to have_selector(content_selector, text: yaml_content)
+          expect(editor_get_value).to have_content(yaml_content_wrong)
         end
       end
     end
@@ -69,17 +71,13 @@ RSpec.describe 'CI Lint', :js do
   end
 
   describe 'YAML clearing' do
-    before do
-      click_on 'Clear'
-    end
-
     context 'YAML is present' do
-      let(:yaml_content) do
-        File.read(Rails.root.join('spec/support/gitlab_stubs/gitlab_ci.yml'))
-      end
-
       it 'YAML content is cleared' do
-        expect(page).to have_field(class: 'inputarea', with: '', visible: false, type: 'textarea')
+        editor_set_value(yaml_content_correct)
+
+        click_on 'Clear'
+
+        expect(editor_get_value).to have_content('')
       end
     end
   end

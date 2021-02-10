@@ -64,18 +64,7 @@ export default {
     },
   },
   mounted() {
-    this.editor = initEditorLite({
-      el: this.$refs.editor,
-      blobPath: this.fileName,
-      blobContent: this.value,
-      blobGlobalId: this.fileGlobalId,
-      extensions: this.extensions,
-      ...this.editorOptions,
-    });
-
-    this.editor.onDidChangeModelContent(
-      debounce(this.onFileChange.bind(this), CONTENT_UPDATE_DEBOUNCE),
-    );
+    this.setupInstance();
   },
   beforeDestroy() {
     this.editor.dispose();
@@ -86,6 +75,26 @@ export default {
     },
     getEditor() {
       return this.editor;
+    },
+    setupInstance() {
+      window.requestAnimationFrame(() => {
+        if (this.$el.offsetParent === null) {
+          this.setupInstance();
+        } else {
+          this.editor = initEditorLite({
+            el: this.$refs.editor,
+            blobPath: this.fileName,
+            blobContent: this.value,
+            blobGlobalId: this.fileGlobalId,
+            extensions: this.extensions,
+            ...this.editorOptions,
+          });
+
+          this.editor.onDidChangeModelContent(
+            debounce(this.onFileChange.bind(this), CONTENT_UPDATE_DEBOUNCE),
+          );
+        }
+      });
     },
   },
   readyEvent: EDITOR_READY_EVENT,
