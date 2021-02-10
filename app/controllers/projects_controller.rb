@@ -92,12 +92,12 @@ class ProjectsController < Projects::ApplicationController
 
     if result[:status] == :success
       flash[:notice] = _("Project '%{project_name}' was successfully updated.") % { project_name: @project.name }
+      redirect_to(edit_project_path(@project, anchor: 'js-general-project-settings'))
     else
       flash[:alert] = result[:message]
-      @project.reset
+      render 'edit'
     end
 
-    redirect_to(edit_project_path(@project, anchor: 'js-general-project-settings'))
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
