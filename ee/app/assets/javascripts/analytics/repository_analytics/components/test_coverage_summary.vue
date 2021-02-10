@@ -1,6 +1,7 @@
 <script>
+import chartEmptyStateIllustration from '@gitlab/svgs/dist/illustrations/chart-empty-state.svg';
 import { GlAreaChart } from '@gitlab/ui/dist/charts';
-import { GlCard, GlSprintf } from '@gitlab/ui';
+import { GlCard, GlSprintf, GlSafeHtmlDirective as SafeHtml } from '@gitlab/ui';
 import { __, s__ } from '~/locale';
 import MetricCard from '~/analytics/shared/components/metric_card.vue';
 import { formatDate } from '~/lib/utils/datetime_utility';
@@ -18,6 +19,9 @@ export default {
     GlCard,
     GlSprintf,
     MetricCard,
+  },
+  directives: {
+    SafeHtml,
   },
   inject: {
     groupFullPath: {
@@ -75,6 +79,9 @@ export default {
     };
   },
   computed: {
+    isChartEmpty() {
+      return !this.groupCoverageChartData?.[0]?.data?.length;
+    },
     metrics() {
       return [
         {
@@ -130,18 +137,20 @@ export default {
     },
   },
   i18n: {
+    emptyChart: s__('RepositoriesAnalytics|No test coverage to display'),
     graphCardHeader: s__('RepositoriesAnalytics|Average test coverage last 30 days'),
     yAxisName: __('Coverage'),
     xAxisName: __('Date'),
     graphName: s__('RepositoriesAnalytics|Average coverage'),
     graphTooltipMessage: __('Code Coverage: %{coveragePercentage}'),
     metrics: {
-      cardTitle: __('Overall activity'),
+      cardTitle: s__('RepositoriesAnalytics|Overall activity'),
       projectCountLabel: s__('RepositoriesAnalytics|Projects with Coverage'),
       averageCoverageLabel: s__('RepositoriesAnalytics|Average Coverage by Job'),
       coverageCountLabel: s__('RepositoriesAnalytics|Jobs with Coverage'),
     },
   },
+  chartEmptyStateIllustration,
 };
 </script>
 <template>
@@ -158,6 +167,19 @@ export default {
       </template>
 
       <chart-skeleton-loader v-if="isLoading" data-testid="group-coverage-chart-loading" />
+
+      <div
+        v-else-if="isChartEmpty"
+        class="d-flex flex-column justify-content-center gl-my-7"
+        data-testid="group-coverage-chart-empty"
+      >
+        <div
+          v-safe-html="$options.chartEmptyStateIllustration"
+          class="gl-my-5 svg-w-100 d-flex align-items-center"
+          data-testid="chart-empty-state-illustration"
+        ></div>
+        <h5 class="text-center">{{ $options.i18n.emptyChart }}</h5>
+      </div>
 
       <gl-area-chart
         v-else

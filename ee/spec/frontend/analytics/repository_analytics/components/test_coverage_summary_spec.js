@@ -14,6 +14,7 @@ describe('Test coverage table component', () => {
   const findTotalCoverages = () => wrapper.find('.js-metric-card-item:nth-child(3) h3');
   const findGroupCoverageChart = () => wrapper.findByTestId('group-coverage-chart');
   const findChartLoadingState = () => wrapper.findByTestId('group-coverage-chart-loading');
+  const findChartEmptyState = () => wrapper.findByTestId('group-coverage-chart-empty');
   const findLoadingState = () => wrapper.find(GlSkeletonLoading);
 
   const createComponent = ({ data = {} } = {}) => {
@@ -58,6 +59,13 @@ describe('Test coverage table component', () => {
       expect(findProjectsWithTests().text()).toBe('-');
       expect(findAverageCoverage().text()).toBe('-');
       expect(findTotalCoverages().text()).toBe('-');
+    });
+
+    it('renders empty chart state', () => {
+      createComponent();
+
+      expect(findChartEmptyState().exists()).toBe(true);
+      expect(findGroupCoverageChart().exists()).toBe(false);
     });
   });
 
