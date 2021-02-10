@@ -2,44 +2,16 @@ import { formatFilePath, formattedTime } from '~/pipelines/stores/test_reports/u
 
 describe('Test reports utils', () => {
   describe('formatFilePath', () => {
-    describe('when file string starts with "./"', () => {
-      it('should return the file string without the beginning "./"', () => {
-        const result = formatFilePath('./test.js');
-
-        expect(result).toBe('test.js');
-      });
-    });
-
-    describe('when file string starts with "/"', () => {
-      it('should return the file string without the beginning "/"', () => {
-        const result = formatFilePath('/test.js');
-
-        expect(result).toBe('test.js');
-      });
-    });
-
-    describe('when file string starts with more than one "/"', () => {
-      it('should return the file string without any of the beginning "/"', () => {
-        const result = formatFilePath('.//////////////test.js');
-
-        expect(result).toBe('test.js');
-      });
-    });
-
-    describe('when file string starts without either "." or "/"', () => {
-      it('should return the file string without change', () => {
-        const result = formatFilePath('test.js');
-
-        expect(result).toBe('test.js');
-      });
-    });
-
-    describe('when file string contains but does not start with "./"', () => {
-      it('should return the file string without change', () => {
-        const result = formatFilePath('mock/path./test.js');
-
-        expect(result).toBe('mock/path./test.js');
-      });
+    it.each`
+      file                        | expected
+      ${'./test.js'}              | ${'test.js'}
+      ${'/test.js'}               | ${'test.js'}
+      ${'.//////////////test.js'} | ${'test.js'}
+      ${'test.js'}                | ${'test.js'}
+      ${'mock/path./test.js'}     | ${'mock/path./test.js'}
+      ${'./mock/path./test.js'}   | ${'mock/path./test.js'}
+    `('should format $file to be $expected', ({ file, expected }) => {
+      expect(formatFilePath(file)).toBe(expected);
     });
   });
 
