@@ -12297,9 +12297,6 @@ msgstr ""
 msgid "Failed to update issues, please try again."
 msgstr ""
 
-msgid "Failed to update tag!"
-msgstr ""
-
 msgid "Failed to update the Canary Ingress."
 msgstr ""
 
