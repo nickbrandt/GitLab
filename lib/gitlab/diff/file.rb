@@ -172,7 +172,7 @@ module Gitlab
       # Array of Gitlab::Diff::Line objects
       def diff_lines
         @diff_lines ||= if word_diff
-                          Gitlab::Diff::WordDiff::Parser.new.parse(raw_diff.each_line, diff_file: self).to_a
+                          Gitlab::WordDiff::Parser.new.parse(raw_diff.each_line, diff_file: self).to_a
                         else
                           Gitlab::Diff::Parser.new.parse(raw_diff.each_line, diff_file: self).to_a
                         end
@@ -202,7 +202,7 @@ module Gitlab
 
       def highlighted_diff_lines
         @highlighted_diff_lines ||= if word_diff
-                                      Gitlab::Diff::WordDiff::Highlight.new(self, repository: self.repository).highlight
+                                      Gitlab::WordDiff::Highlight.new(self, repository: self.repository).highlight
                                     else
                                       Gitlab::Diff::Highlight.new(self, repository: self.repository).highlight
                                     end

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Gitlab::Diff::WordDiff::Highlight do
+RSpec.describe Gitlab::WordDiff::Highlight do
   include RepoHelpers
 
   subject(:diff_highlight) { described_class.new(diff_file, repository: project.repository) }
