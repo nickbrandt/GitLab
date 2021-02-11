@@ -16,6 +16,36 @@ function decodeUrlParameter(val) {
   return decodeURIComponent(val.replace(/\+/g, '%20'));
 }
 
+/**
+ * Safely encodes a string to be used as a path
+ *
+ * Note: This function DOES encode typical URL parts like ?, =, &, #, and +
+ * If you need to use search parameters or URL fragments, they should be
+ *     added AFTER calling this function, not before.
+ *
+ * @param {String} potentiallyUnsafePath
+ * @returns {String}
+ */
+export function encodeSaferUrl(potentiallyUnsafePath) {
+  const unencode = ['%2F'];
+  const encode = ['#', '!', '~', '\\*', "'", '\\(', '\\)'];
+  let saferPath = encodeURIComponent(potentiallyUnsafePath);
+
+  unencode.forEach((code) => {
+    saferPath = saferPath.replace(new RegExp(code, 'g'), decodeURIComponent(code));
+  });
+  encode.forEach((code) => {
+    const encodedValue = code
+      .codePointAt(code.length - 1)
+      .toString(16)
+      .toUpperCase();
+
+    saferPath = saferPath.replace(new RegExp(code, 'g'), `%${encodedValue}`);
+  });
+
+  return saferPath;
+}
+
 export function cleanLeadingSeparator(path) {
   return path.replace(PATH_SEPARATOR_LEADING_REGEX, '');
 }
