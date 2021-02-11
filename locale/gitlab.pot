@@ -7829,13 +7829,7 @@ msgstr ""
 msgid "ContainerRegistry|Expiration policy will run in %{time}"
 msgstr ""
 
-msgid "ContainerRegistry|Filter by name"
-msgstr ""
-
 msgid "ContainerRegistry|If you are not already logged in, you need to authenticate to the Container Registry by using your GitLab username and password. If you have %{twofaDocLinkStart}Two-Factor Authentication%{twofaDocLinkEnd} enabled, use a %{personalAccessTokensDocLinkStart}Personal Access Token%{personalAccessTokensDocLinkEnd} instead of a password."
-msgstr ""
-
-msgid "ContainerRegistry|Image Repositories"
 msgstr ""
 
 msgid "ContainerRegistry|Image repository deletion failed"
