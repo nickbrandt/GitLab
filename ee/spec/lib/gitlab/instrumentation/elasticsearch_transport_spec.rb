@@ -62,7 +62,6 @@ RSpec.describe ::Gitlab::Instrumentation::ElasticsearchTransportInterceptor, :el
     allow(Labkit::Correlation::CorrelationId).to receive(:current_or_new_id).and_return('new-correlation-id')
 
     elasticsearch_url = Gitlab::CurrentSettings.elasticsearch_url[0]
-    stub_request(:any, elasticsearch_url)
 
     Project.__elasticsearch__.client
       .perform_request(:get, '/')
@@ -75,7 +74,6 @@ RSpec.describe ::Gitlab::Instrumentation::ElasticsearchTransportInterceptor, :el
     allow(Labkit::Correlation::CorrelationId).to receive(:current_or_new_id).and_return('new-correlation-id')
 
     elasticsearch_url = Gitlab::CurrentSettings.elasticsearch_url[0]
-    stub_request(:any, elasticsearch_url)
 
     Project.__elasticsearch__.client
       .perform_request(:get, '/', {}, nil, { 'X-Opaque-Id': 'original-opaque-id' })
