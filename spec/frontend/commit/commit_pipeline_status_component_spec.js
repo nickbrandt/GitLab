@@ -142,7 +142,7 @@ describe('Commit pipeline status component', () => {
       });
 
       it('renders CI icon', () => {
-        expect(findCiIcon().attributes('title')).toEqual('Pipeline: pending');
+        expect(findCiIcon().attributes('title')).toEqual('Pipeline: running');
         expect(findCiIcon().props('status')).toEqual(mockCiStatus);
       });
     });
