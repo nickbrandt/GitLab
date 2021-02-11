@@ -194,32 +194,32 @@ is set for deletion, the merge request widget displays the
 
 ![Delete source branch status](img/remove_source_branch_status.png)
 
-### Automatically retargeting merge requests
+### Branch retargeting on merge **(FREE SELF)**
 
 > - [Introduced](https://gitlab.com/gitlab-org/gitlab/-/issues/320902) in GitLab 13.9.
 > - It's [deployed behind a feature flag](../../feature_flags.md), disabled by default.
 > - It's disabled on GitLab.com.
 > - It's not recommended for production use.
-> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-automatically-retargeting-merge-requests). **(FREE SELF)**
+> - To use it in GitLab self-managed instances, ask a GitLab administrator to [enable it](#enable-or-disable-branch-retargeting-on-merge).
 
-It is common to have a number of merge requests in a chain,
-when one depends on another. For example:
+In specific circumstances, GitLab can retarget the destination branch of
+open merge request, if the destination branch merges while the merge request is
+open. Merge requests are often chained in this manner, with one merge request
+depending on another:
 
-- Merge Request A: merge `feature-A` into `master`
-- Merge Request B: merge `feature-B` into `feature-A`
+- **Merge request 1**: merge `feature-alpha` into `master`.
+- **Merge Request 2**: merge `feature-beta` into `feature-alpha`.
 
-We can distinguish two workflows:
+These merge requests are usually handled in one of these ways:
 
-- the MR A is merged into `master` first, and then MR B is retargeted onto `master`
-- the MR B is merged into `feature-A` branch, and then MR A is merged into `master`
+- Merge request 1 is merged into `master` first. Merge request 2 is then
+  retargeted to `master`.
+- Merge request 2 is merged into `feature-alpha`. The updated merge request 1, which
+  now contains the contents of `feature-alpha` and `feature-beta`, is merged into `master`.
 
-Upon merge of `MR A` does automatically retarget the `MR B` onto `master`.
-This relieves user from having to perform this operation manually.
-
-This feature works only in following cases:
-
-- The MR A needs to be in a main project (forks are not supported), as we, GitLab, cannot change the target project of MR B
-- Only 4 MR's of type B are retargeted automatically this way
+GitLab retargets up to four merge requests when their target branch is merged into
+`master`, so you don't need to perform this operation manually. Merge requests from
+forks are not retargeted.
 
 ## Recommendations and best practices for Merge Requests
 
@@ -258,7 +258,7 @@ Feature.disable(:reviewer_approval_rules)
 Feature.disable(:reviewer_approval_rules, Project.find(<project id>))
 ```
 
-### Enable or disable Automatically retargeting merge requests **(FREE SELF)**
+### Enable or disable branch retargeting on merge **(FREE SELF)**
 
 Automatically retargeting merge requests is under development but ready for production use.
 It is deployed behind a feature flag that is **enabled by default**.
