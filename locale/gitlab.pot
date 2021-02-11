@@ -7501,6 +7501,12 @@ msgstr ""
 msgid "Compliance Dashboard"
 msgstr ""
 
+msgid "Compliance framework"
+msgstr ""
+
+msgid "Compliance framework  (optional)"
+msgstr ""
+
 msgid "Compliance framework (optional)"
 msgstr ""
 
@@ -8833,6 +8839,9 @@ msgid "Customer Portal"
 msgstr ""
 
 msgid "Customizable by an administrator."
+msgstr ""
+
+msgid "Customizable by owners."
 msgstr ""
 
 msgid "Customize colors"
@@ -19954,6 +19963,9 @@ msgstr ""
 msgid "No commits present here"
 msgstr ""
 
+msgid "No compliance frameworks are in use."
+msgstr ""
+
 msgid "No compliance frameworks are in use. Create one using the GraphQL API."
 msgstr ""
 
@@ -26372,7 +26384,7 @@ msgstr ""
 msgid "Select projects"
 msgstr ""
 
-msgid "Select required regulatory standard"
+msgid "Select required regulatory standard."
 msgstr ""
 
 msgid "Select reviewer(s)"
