@@ -4,6 +4,6 @@ class AddNotesCreateLimitAllowlistToApplicationSettings < ActiveRecord::Migratio
   DOWNTIME = false
 
   def change
-    add_column :application_settings, :notes_create_limit_allowlist, :string, array: true, limit: 255, default: []
+    add_column :application_settings, :notes_create_limit_allowlist, :text, array: true, default: [], null: false
   end
 end
