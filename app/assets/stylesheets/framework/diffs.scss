@@ -1024,6 +1024,13 @@ table.code {
   }
 }
 
+// Notes tweaks for the Changes tab ONLY
+.diff-tr {
+  .timeline-discussion-body {
+    clear: left;
+  }
+}
+
 .files:not([data-can-create-note]) .frame {
   cursor: auto;
 }
