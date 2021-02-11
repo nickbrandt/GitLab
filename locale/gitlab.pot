@@ -1027,9 +1027,6 @@ msgstr ""
 msgid "+ %{numberOfHiddenAssignees} more"
 msgstr ""
 
-msgid "+ %{numberOfHiddenReviewers} more"
-msgstr ""
-
 msgid "+%d more"
 msgid_plural "+%d more"
 msgstr[0] ""
@@ -7832,13 +7829,7 @@ msgstr ""
 msgid "ContainerRegistry|Expiration policy will run in %{time}"
 msgstr ""
 
-msgid "ContainerRegistry|Filter by name"
-msgstr ""
-
 msgid "ContainerRegistry|If you are not already logged in, you need to authenticate to the Container Registry by using your GitLab username and password. If you have %{twofaDocLinkStart}Two-Factor Authentication%{twofaDocLinkEnd} enabled, use a %{personalAccessTokensDocLinkStart}Personal Access Token%{personalAccessTokensDocLinkEnd} instead of a password."
-msgstr ""
-
-msgid "ContainerRegistry|Image Repositories"
 msgstr ""
 
 msgid "ContainerRegistry|Image repository deletion failed"
@@ -20257,7 +20248,10 @@ msgstr ""
 msgid "Notes|Collapse replies"
 msgstr ""
 
-msgid "Notes|Private comments are accessible by internal staff only"
+msgid "Notes|Confidential comments are only visible to project members"
+msgstr ""
+
+msgid "Notes|Make this comment confidential"
 msgstr ""
 
 msgid "Notes|Show all activity"
@@ -20270,6 +20264,9 @@ msgid "Notes|Show history only"
 msgstr ""
 
 msgid "Notes|This comment has changed since you started editing, please review the %{open_link}updated comment%{close_link} to ensure information is not lost"
+msgstr ""
+
+msgid "Notes|This comment is confidential and only visible to project members"
 msgstr ""
 
 msgid "Notes|You're only seeing %{boldStart}other activity%{boldEnd} in the feed. To add a comment, switch to one of the following options."
