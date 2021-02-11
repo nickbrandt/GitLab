@@ -20,6 +20,8 @@ import { DAST_SITE_VALIDATION_STATUS } from 'ee/security_configuration/dast_site
 import { initFormField } from 'ee/security_configuration/utils';
 import { s__ } from '~/locale';
 import validation from '~/vue_shared/directives/validation';
+import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
+import { serializeFormObject } from '~/lib/utils/forms';
 import * as Sentry from '~/sentry/wrapper';
 import glFeatureFlagsMixin from '~/vue_shared/mixins/gl_feature_flags_mixin';
 import { redirectTo, queryToObject } from '~/lib/utils/url_utility';
@@ -41,6 +43,8 @@ import dastOnDemandScanCreateMutation from '../graphql/dast_on_demand_scan_creat
 import ProfileSelectorSummaryCell from './profile_selector/summary_cell.vue';
 import ScannerProfileSelector from './profile_selector/scanner_profile_selector.vue';
 import SiteProfileSelector from './profile_selector/site_profile_selector.vue';
+
+export const ON_DEMAND_SCANS_STORAGE_KEY = 'on-demand-scans-new-form';
 
 const createProfilesApolloOptions = (name, field, { fetchQuery, fetchError }) => ({
   query: fetchQuery,
@@ -80,6 +84,7 @@ export default {
     GlLink,
     GlSkeletonLoader,
     GlSprintf,
+    LocalStorageSync,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -157,6 +162,7 @@ export default {
       errorType: null,
       errors: [],
       showAlert: false,
+      clearStorage: false,
     };
   },
   computed: {
@@ -229,6 +235,14 @@ export default {
       } = this;
       return isFormInvalid || (loading && loading !== saveScanBtnId);
     },
+    formFieldValues() {
+      const { selectedScannerProfileId, selectedSiteProfileId } = this;
+      return {
+        ...serializeFormObject(this.form.fields),
+        selectedScannerProfileId,
+        selectedSiteProfileId,
+      };
+    },
   },
   created() {
     const params = queryToObject(window.location.search);
@@ -264,8 +278,7 @@ export default {
         input = {
           ...input,
           ...(this.isEdit ? { id: this.dastScan.id } : {}),
-          name: this.form.fields.name.value,
-          description: this.form.fields.description.value,
+          ...serializeFormObject(this.form.fields),
           runAfterCreate,
         };
       }
@@ -285,7 +298,9 @@ export default {
             this.loading = false;
           } else if (this.glFeatures.dastSavedScans && !runAfterCreate) {
             redirectTo(response.dastProfile.editPath);
+            this.clearStorage = true;
           } else {
+            this.clearStorage = true;
             redirectTo(response.pipelineUrl);
           }
         })
@@ -305,12 +320,31 @@ export default {
       this.errors = [];
       this.showAlert = false;
     },
+    updateFromStorage(val) {
+      const { selectedSiteProfileId, selectedScannerProfileId, name, description } = val;
+
+      this.form.fields.name.value = name ?? this.form.fields.name.value;
+      this.form.fields.description.value = description ?? this.form.fields.description.value;
+
+      // precedence is given to profile IDs passed from the query params
+      this.selectedSiteProfileId = this.selectedSiteProfileId ?? selectedSiteProfileId;
+      this.selectedScannerProfileId = this.selectedScannerProfileId ?? selectedScannerProfileId;
+    },
   },
+  ON_DEMAND_SCANS_STORAGE_KEY,
 };
 </script>
 
 <template>
   <gl-form novalidate @submit.prevent="onSubmit()">
+    <local-storage-sync
+      v-if="glFeatures.dastSavedScans && !isEdit"
+      as-json
+      :storage-key="$options.ON_DEMAND_SCANS_STORAGE_KEY"
+      :clear="clearStorage"
+      :value="formFieldValues"
+      @input="updateFromStorage"
+    />
     <header class="gl-mb-6">
       <div class="gl-mt-6 gl-display-flex">
         <h2 class="gl-flex-grow-1 gl-my-0">{{ title }}</h2>
