@@ -26,7 +26,7 @@ describe('EE - DastProfiles', () => {
     const defaultMocks = {
       $apollo: {
         queries: {
-          savedScans: {
+          dastProfiles: {
             fetchMore: jest.fn().mockResolvedValue(),
           },
           siteProfiles: {
@@ -139,7 +139,7 @@ describe('EE - DastProfiles', () => {
 
     describe.each`
       tabName               | index | givenLocationHash
-      ${'Saved Scans'}      | ${0}  | ${'saved-scans'}
+      ${'Saved Scans'}      | ${0}  | ${'dast-profiles'}
       ${'Site Profiles'}    | ${1}  | ${'site-profiles'}
       ${'Scanner Profiles'} | ${2}  | ${'scanner-profiles'}
     `('with location hash set to "$givenLocationHash"', ({ tabName, index, givenLocationHash }) => {
@@ -173,7 +173,7 @@ describe('EE - DastProfiles', () => {
 
   describe.each`
     description                | profileType
-    ${'Saved Scans List'}      | ${'savedScans'}
+    ${'Saved Scans List'}      | ${'dastProfiles'}
     ${'Site Profiles List'}    | ${'siteProfiles'}
     ${'Scanner Profiles List'} | ${'scannerProfiles'}
   `('$description', ({ profileType }) => {
