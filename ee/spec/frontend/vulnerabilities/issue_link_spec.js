@@ -33,7 +33,7 @@ describe('IssueLink component', () => {
     wrapper = null;
   });
 
-  describe.each([true, false])('both internal and Jira issues', (isJira) => {
+  describe.each([true, false])('internal and Jira issues with "isJira" set to "%s"', (isJira) => {
     const issue = createIssue();
 
     beforeEach(() => {
@@ -51,7 +51,7 @@ describe('IssueLink component', () => {
     });
   });
 
-  describe('with internal issues', () => {
+  describe('internal issues', () => {
     describe.each`
       state       | icon
       ${'opened'} | ${'issue-open-m'}
@@ -67,7 +67,7 @@ describe('IssueLink component', () => {
     });
   });
 
-  describe('with Jira issues', () => {
+  describe('Jira issues', () => {
     beforeEach(() => {
       wrapper = createWrapper({
         propsData: { issue: createIssue(), isJira: true },
