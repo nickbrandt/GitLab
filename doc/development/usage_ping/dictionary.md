@@ -1617,7 +1617,7 @@ Total number of sites in a Geo deployment
 | `product_stage` | enablement |
 | `product_group` | `group::geo` |
 | `product_category` | `disaster_recovery` |
-| `value_type` | integer |
+| `value_type` | number |
 | `status` | data_available |
 | `milestone` | 11.2 |
 | `time_frame` | all |
