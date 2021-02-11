@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 13.8.4 (2021-02-11)
+
+### Security (1 change)
+
+- Geo: Pass GL-ID in a JWT token when proxy-push from secondary.
+
+
 ## 13.8.3 (2021-02-05)
 
 ### Fixed (2 changes)
