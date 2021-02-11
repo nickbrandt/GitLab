@@ -13,6 +13,8 @@ import dastScannerProfilesQuery from 'ee/security_configuration/dast_profiles/gr
 import dastSiteProfilesQuery from 'ee/security_configuration/dast_profiles/graphql/dast_site_profiles.query.graphql';
 import { stubComponent } from 'helpers/stub_component';
 import { redirectTo, setUrlParams } from '~/lib/utils/url_utility';
+import { useLocalStorageSpy } from 'helpers/local_storage_helper';
+import LocalStorageSync from '~/vue_shared/components/local_storage_sync.vue';
 import * as responses from '../mocks/apollo_mocks';
 import { scannerProfiles, siteProfiles } from '../mocks/mock_data';
 
@@ -43,12 +45,15 @@ const dastScan = {
   siteProfileId: validatedSiteProfile.id,
 };
 
+useLocalStorageSpy();
 jest.mock('~/lib/utils/url_utility', () => ({
   isAbsolute: jest.requireActual('~/lib/utils/url_utility').isAbsolute,
   queryToObject: jest.requireActual('~/lib/utils/url_utility').queryToObject,
   setUrlParams: jest.requireActual('~/lib/utils/url_utility').setUrlParams,
   redirectTo: jest.fn(),
 }));
+
+const LOCAL_STORAGE_KEY = 'on-demand-scans-new-form';
 
 describe('OnDemandScansForm', () => {
   let localVue;
@@ -143,6 +148,7 @@ describe('OnDemandScansForm', () => {
           },
           stubs: {
             GlFormInput: GlFormInputStub,
+            LocalStorageSync,
           },
         },
         { ...options, localVue, apolloProvider },
@@ -164,6 +170,7 @@ describe('OnDemandScansForm', () => {
   afterEach(() => {
     subject.destroy();
     subject = null;
+    localStorage.clear();
   });
 
   it('renders properly', () => {
@@ -209,6 +216,45 @@ describe('OnDemandScansForm', () => {
     });
 
     it('populates the fields with passed values', () => {
+      expect(findNameInput().attributes('value')).toBe(dastScan.name);
+      expect(findDescriptionInput().attributes('value')).toBe(dastScan.description);
+      expect(findScannerProfilesSelector().attributes('value')).toBe(dastScan.scannerProfileId);
+      expect(findSiteProfilesSelector().attributes('value')).toBe(dastScan.siteProfileId);
+    });
+  });
+
+  describe('local storage', () => {
+    it('get updated when form is modified', async () => {
+      mountShallowSubject();
+
+      await setValidFormData();
+
+      expect(localStorage.setItem.mock.calls).toEqual([
+        [
+          LOCAL_STORAGE_KEY,
+          JSON.stringify({
+            name: 'My daily scan',
+            selectedScannerProfileId: 'gid://gitlab/DastScannerProfile/1',
+            selectedSiteProfileId: 'gid://gitlab/DastSiteProfile/1',
+          }),
+        ],
+      ]);
+    });
+
+    it('reload the form data when available', async () => {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify({
+          name: dastScan.name,
+          description: dastScan.description,
+          selectedScannerProfileId: dastScan.scannerProfileId,
+          selectedSiteProfileId: dastScan.siteProfileId,
+        }),
+      );
+
+      mountShallowSubject();
+      await subject.vm.$nextTick();
+
       expect(findNameInput().attributes('value')).toBe(dastScan.name);
       expect(findDescriptionInput().attributes('value')).toBe(dastScan.description);
       expect(findScannerProfilesSelector().attributes('value')).toBe(dastScan.scannerProfileId);
@@ -271,7 +317,6 @@ describe('OnDemandScansForm', () => {
               variables: {
                 input: {
                   name: 'My daily scan',
-                  description: '',
                   dastScannerProfileId: passiveScannerProfile.id,
                   dastSiteProfileId: nonValidatedSiteProfile.id,
                   fullPath: projectPath,
@@ -287,6 +332,10 @@ describe('OnDemandScansForm', () => {
 
           it('does not show an alert', async () => {
             expect(findAlert().exists()).toBe(false);
+          });
+
+          it('clears local storage', () => {
+            expect(localStorage.removeItem.mock.calls).toEqual([[LOCAL_STORAGE_KEY]]);
           });
         });
 
@@ -538,6 +587,26 @@ describe('OnDemandScansForm', () => {
 
       expect(subject.find(SiteProfileSelector).attributes('value')).toBe(siteProfile.id);
       expect(subject.find(ScannerProfileSelector).attributes('value')).toBe(scannerProfile.id);
+    });
+
+    it('when local storage data is available', async () => {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify({
+          selectedScannerProfileId: dastScan.scannerProfileId,
+          selectedSiteProfileId: dastScan.siteProfileId,
+        }),
+      );
+
+      global.jsdom.reconfigure({
+        url: setUrlParams({ site_profile_id: 1, scanner_profile_id: 1 }, URL_HOST),
+      });
+
+      mountShallowSubject();
+      await subject.vm.$nextTick();
+
+      expect(findScannerProfilesSelector().attributes('value')).toBe(scannerProfile.id);
+      expect(findSiteProfilesSelector().attributes('value')).toBe(siteProfile.id);
     });
   });
 });
