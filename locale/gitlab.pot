@@ -22961,6 +22961,9 @@ msgstr ""
 msgid "Project ID"
 msgstr ""
 
+msgid "Project Templates"
+msgstr ""
+
 msgid "Project URL"
 msgstr ""
 
