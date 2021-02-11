@@ -220,7 +220,7 @@ RSpec.describe PersonalAccessToken do
 
     with_them do
       before do
-        stub_licensed_features(enforce_pat_expiration: licensed)
+        stub_licensed_features(enforce_personal_access_token_expiration: licensed)
         stub_application_setting(enforce_pat_expiration: application_setting)
       end
 
@@ -254,7 +254,7 @@ RSpec.describe PersonalAccessToken do
 
     with_them do
       before do
-        stub_licensed_features(enforce_pat_expiration: licensed)
+        stub_licensed_features(enforce_personal_access_token_expiration: licensed)
       end
 
       it { expect(subject).to be result }
