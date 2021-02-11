@@ -1,4 +1,4 @@
-.js-git-clone-holder.input-group
+.js-git-clone-holder.input-group.btn-group
   .input-group-prepend
     - if allowed_protocols_present?
       .input-group-text.clone-dropdown-btn.btn
@@ -16,7 +16,7 @@
           = http_clone_button(container)
         = render_if_exists 'shared/kerberos_clone_button', container: container
 
-  = text_field_tag :clone_url, default_url_to_repo(container), class: "js-select-on-focus form-control gl-form-input", readonly: true, aria: { label: _('Repository clone URL') }
+  = text_field_tag :clone_url, default_url_to_repo(container), class: "js-select-on-focus btn gl-button", readonly: true, aria: { label: _('Repository clone URL') }
   .input-group-append
     = clipboard_button(target: '#clone_url', title: _("Copy URL"), class: "input-group-text gl-button btn-default btn-clipboard")
 
