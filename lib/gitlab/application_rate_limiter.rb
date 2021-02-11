@@ -150,7 +150,7 @@ module Gitlab
         scoped_user = [options[:scope]].flatten.find { |s| s.is_a?(User) }
         return unless scoped_user
 
-        scoped_user.username.downcase.in?(options[:users_allowlist].map(&:downcase))
+        scoped_user.username.downcase.in?(options[:users_allowlist])
       end
     end
   end

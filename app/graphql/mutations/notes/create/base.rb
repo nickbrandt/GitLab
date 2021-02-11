@@ -65,7 +65,7 @@ module Mutations
 
         def rate_limit_throttled?
           rate_limiter = ::Gitlab::ApplicationRateLimiter
-          allowlist = Gitlab::CurrentSettings.current_application_settings.notes_create_limit_allowlist_raw
+          allowlist = Gitlab::CurrentSettings.current_application_settings.notes_create_limit_allowlist
 
           rate_limiter.throttled?(:notes_create, scope: [current_user], users_allowlist: allowlist)
         end

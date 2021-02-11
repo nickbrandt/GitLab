@@ -763,8 +763,9 @@ RSpec.describe Projects::NotesController do
         4.times { create! }
       end
 
-      it 'allows user in allow-list to create notes' do
-        stub_application_setting(notes_create_limit_allowlist_raw: ["#{user.username}"])
+      it 'allows user in allow-list to create notes, even if the case is different' do
+        user.update_attribute(:username, user.username.titleize)
+        stub_application_setting(notes_create_limit_allowlist: ["#{user.username.downcase}"])
         3.times { create! }
 
         create!

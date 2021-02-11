@@ -105,6 +105,6 @@ class Projects::NotesController < Projects::ApplicationController
   end
 
   def rate_limit_users_allowlist
-    Gitlab::CurrentSettings.current_application_settings.notes_create_limit_allowlist_raw
+    Gitlab::CurrentSettings.current_application_settings.notes_create_limit_allowlist
   end
 end

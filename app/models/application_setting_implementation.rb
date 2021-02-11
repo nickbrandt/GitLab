@@ -276,7 +276,7 @@ module ApplicationSettingImplementation
   end
 
   def notes_create_limit_allowlist_raw=(values)
-    self.notes_create_limit_allowlist = strings_to_array(values)
+    self.notes_create_limit_allowlist = strings_to_array(values).map(&:downcase)
   end
 
   def asset_proxy_allowlist=(values)
