@@ -78,18 +78,42 @@ describe('EE - DastSavedScansList', () => {
   });
 
   describe('run scan', () => {
-    it('redirects to the running pipeline page on success', async () => {
-      const pipelineUrl = '/pipeline/url';
+    const pipelineUrl = '/pipeline/url';
+    const successHandler = jest.fn().mockResolvedValue({
+      data: {
+        dastProfileRun: {
+          pipelineUrl,
+          errors: [],
+        },
+      },
+    });
+
+    it('puts the clicked button in the loading state and disabled other buttons', async () => {
       createFullComponent({
         propsData: { profiles: savedScans },
         mocks: {
           $apollo: {
-            mutate: jest.fn().mockResolvedValue({
-              dastProfileRun: {
-                pipelineUrl,
-                errors: [],
-              },
-            }),
+            mutate: successHandler,
+          },
+        },
+      });
+      const buttons = wrapper.findAll('[data-testid="dast-scan-run-button"]');
+
+      expect(buttons.at(0).props('loading')).toBe(false);
+      expect(buttons.at(1).props('disabled')).toBe(false);
+
+      await buttons.at(0).trigger('click');
+
+      expect(buttons.at(0).props('loading')).toBe(true);
+      expect(buttons.at(1).props('disabled')).toBe(true);
+    });
+
+    it('redirects to the running pipeline page on success', async () => {
+      createFullComponent({
+        propsData: { profiles: savedScans },
+        mocks: {
+          $apollo: {
+            mutate: successHandler,
           },
         },
       });

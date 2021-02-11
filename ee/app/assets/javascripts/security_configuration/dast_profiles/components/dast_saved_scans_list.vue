@@ -19,11 +19,17 @@ export default {
       required: true,
     },
   },
+  data: () => ({
+    isRunningScan: null,
+  }),
   methods: {
     async runScan({ id }) {
+      this.isRunningScan = id;
       try {
         const {
-          dastProfileRun: { pipelineUrl, errors },
+          data: {
+            dastProfileRun: { pipelineUrl, errors },
+          },
         } = await this.$apollo.mutate({
           mutation: dastProfileRunMutation,
           variables: {
@@ -44,6 +50,7 @@ export default {
       }
     },
     handleError(error) {
+      this.isRunningScan = null;
       createFlash({ message: ERROR_MESSAGES[ERROR_RUN_SCAN], error, captureError: true });
     },
   },
@@ -58,9 +65,14 @@ export default {
     </template>
 
     <template #actions="{ profile }">
-      <gl-button size="small" data-testid="dast-scan-run-button" @click="runScan(profile)">{{
-        s__('DastProfiles|Run scan')
-      }}</gl-button>
+      <gl-button
+        size="small"
+        data-testid="dast-scan-run-button"
+        :loading="isRunningScan === profile.id"
+        :disabled="Boolean(isRunningScan)"
+        @click="runScan(profile)"
+        >{{ s__('DastProfiles|Run scan') }}</gl-button
+      >
     </template>
   </profiles-list>
 </template>
