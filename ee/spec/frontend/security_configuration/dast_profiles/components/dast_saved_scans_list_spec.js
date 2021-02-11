@@ -1,5 +1,6 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import { merge } from 'lodash';
+import { ERROR_RUN_SCAN, ERROR_MESSAGES } from 'ee/on_demand_scans/settings';
 import Component from 'ee/security_configuration/dast_profiles/components/dast_saved_scans_list.vue';
 import ProfilesList from 'ee/security_configuration/dast_profiles/components/dast_profiles_list.vue';
 import waitForPromises from 'helpers/wait_for_promises';
@@ -124,31 +125,48 @@ describe('EE - DastSavedScansList', () => {
       expect(createFlash).not.toHaveBeenCalled();
     });
 
-    it('create a flash error on failure', async () => {
+    it('passes the error message down to the list on failure but does not block errors passed by the parent', async () => {
+      const initialErrorMessage = 'Initial error message';
+      const finalErrorMessage = 'Final error message';
+
       createFullComponent({
-        propsData: { profiles: savedScans },
+        propsData: {
+          profiles: savedScans,
+          errorMessage: initialErrorMessage,
+        },
         mocks: {
           $apollo: {
             mutate: jest.fn().mockRejectedValue(),
           },
         },
       });
+      const profilesList = findProfileList();
+
+      expect(profilesList.props('errorMessage')).toBe(initialErrorMessage);
+
       wrapper.findByTestId('dast-scan-run-button').trigger('click');
       await waitForPromises();
 
-      expect(createFlash).toHaveBeenCalled();
+      expect(profilesList.props('errorMessage')).toBe(ERROR_MESSAGES[ERROR_RUN_SCAN]);
       expect(redirectTo).not.toHaveBeenCalled();
+
+      await wrapper.setProps({ errorMessage: finalErrorMessage });
+
+      expect(profilesList.props('errorMessage')).toBe(finalErrorMessage);
     });
 
-    it('create a flash error if the API responds with errors-as-data', async () => {
+    it('passes the error message and details down to the list if the API responds with errors-as-data', async () => {
+      const errors = ['error-as-data'];
       createFullComponent({
         propsData: { profiles: savedScans },
         mocks: {
           $apollo: {
             mutate: jest.fn().mockResolvedValue({
-              dastProfileRun: {
-                pipelineUrl: null,
-                errors: ['error-as-data'],
+              data: {
+                dastProfileRun: {
+                  pipelineUrl: null,
+                  errors,
+                },
               },
             }),
           },
@@ -157,7 +175,8 @@ describe('EE - DastSavedScansList', () => {
       wrapper.findByTestId('dast-scan-run-button').trigger('click');
       await waitForPromises();
 
-      expect(createFlash).toHaveBeenCalled();
+      expect(findProfileList().props('errorMessage')).toBe(ERROR_MESSAGES[ERROR_RUN_SCAN]);
+      expect(findProfileList().props('errorDetails')).toBe(errors);
       expect(redirectTo).not.toHaveBeenCalled();
     });
   });

@@ -1,7 +1,7 @@
 <script>
 import { GlButton } from '@gitlab/ui';
+import * as Sentry from '~/sentry/wrapper';
 import { redirectTo } from '~/lib/utils/url_utility';
-import createFlash from '~/flash';
 import { ERROR_RUN_SCAN, ERROR_MESSAGES } from 'ee/on_demand_scans/settings';
 import dastProfileRunMutation from '../graphql/dast_profile_run.mutation.graphql';
 import ProfilesList from './dast_profiles_list.vue';
@@ -18,13 +18,43 @@ export default {
       type: String,
       required: true,
     },
+    errorMessage: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    errorDetails: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   data: () => ({
     isRunningScan: null,
+    hasRunScanError: false,
+    runScanErrors: [],
   }),
+  computed: {
+    error() {
+      if (this.hasRunScanError) {
+        return {
+          errorMessage: ERROR_MESSAGES[ERROR_RUN_SCAN],
+          errorDetails: this.runScanErrors,
+        };
+      }
+      const { errorMessage, errorDetails } = this;
+      return { errorMessage, errorDetails };
+    },
+  },
+  watch: {
+    errorMessage() {
+      this.hasRunScanError = false;
+    },
+  },
   methods: {
     async runScan({ id }) {
       this.isRunningScan = id;
+      this.hasRunScanError = false;
       try {
         const {
           data: {
@@ -41,24 +71,34 @@ export default {
         });
 
         if (errors.length) {
-          this.handleError();
+          this.handleRunScanError({ errors });
         } else {
           redirectTo(pipelineUrl);
         }
       } catch (error) {
-        this.handleError(error);
+        this.handleRunScanError(error);
       }
     },
-    handleError(error) {
+    handleRunScanError({ exception = null, errors = [] } = {}) {
       this.isRunningScan = null;
-      createFlash({ message: ERROR_MESSAGES[ERROR_RUN_SCAN], error, captureError: true });
+      this.hasRunScanError = true;
+      this.runScanErrors = errors;
+      if (exception !== null) {
+        Sentry.captureException(exception);
+      }
     },
   },
 };
 </script>
 
 <template>
-  <profiles-list :full-path="fullPath" v-bind="$attrs" v-on="$listeners">
+  <profiles-list
+    :full-path="fullPath"
+    :error-message="error.errorMessage"
+    :error-details="error.errorDetails"
+    v-bind="$attrs"
+    v-on="$listeners"
+  >
     <!-- eslint-disable-next-line vue/valid-v-slot -->
     <template #cell(dastScannerProfile.scanType)="{ value }">
       <scan-type-badge :scan-type="value" />
