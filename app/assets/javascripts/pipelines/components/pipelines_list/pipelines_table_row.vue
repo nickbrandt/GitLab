@@ -355,7 +355,7 @@ export default {
           :title="$options.i18n.redeployTitle"
           :disabled="isRetrying"
           :loading="isRetrying"
-          class="js-pipelines-retry-button btn-retry"
+          class="js-pipelines-retry-button"
           data-qa-selector="pipeline_retry_button"
           icon="repeat"
           variant="default"
