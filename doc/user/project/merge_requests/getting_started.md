@@ -208,7 +208,7 @@ open. Merge requests are often chained in this manner, with one merge request
 depending on another:
 
 - **Merge request 1**: merge `feature-alpha` into `master`.
-- **Merge Request 2**: merge `feature-beta` into `feature-alpha`.
+- **Merge request 2**: merge `feature-beta` into `feature-alpha`.
 
 These merge requests are usually handled in one of these ways:
 

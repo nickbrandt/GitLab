@@ -132,6 +132,12 @@ RSpec.describe MergeRequests::PostMergeService do
     end
 
     context 'for a merge request chain' do
+      before do
+        ::MergeRequests::UpdateService
+          .new(project, user, force_remove_source_branch: '1')
+          .execute(merge_request)
+      end
+
       context 'when there is another MR' do
         let!(:another_merge_request) do
           create(:merge_request,
@@ -142,11 +148,19 @@ RSpec.describe MergeRequests::PostMergeService do
           )
         end
 
+        shared_examples 'does not retarget merge request' do
+          it 'another merge request is unchanged' do
+            expect { subject }.not_to change { another_merge_request.reload.target_branch }
+              .from(merge_request.source_branch)
+          end
+        end
+
         shared_examples 'retargets merge request' do
           it 'another merge request is retargeted' do
             expect(SystemNoteService)
               .to receive(:change_branch).once
-              .with(another_merge_request, another_merge_request.project, user, 'target',
+              .with(another_merge_request, another_merge_request.project, user,
+                'target', 'delete',
                 merge_request.source_branch, merge_request.target_branch)
 
             expect { subject }.to change { another_merge_request.reload.target_branch }
@@ -159,17 +173,17 @@ RSpec.describe MergeRequests::PostMergeService do
               stub_feature_flags(retarget_merge_requests: false)
             end
 
-            it 'another merge request is unchanged' do
-              expect { subject }.not_to change { another_merge_request.reload.target_branch }
-                .from(merge_request.source_branch)
-            end
+            include_examples 'does not retarget merge request'
           end
-        end
 
-        shared_examples 'does not retarget merge request' do
-          it 'another merge request is unchanged' do
-            expect { subject }.not_to change { another_merge_request.reload.target_branch }
-              .from(merge_request.source_branch)
+          context 'when source branch is to be kept' do
+            before do
+              ::MergeRequests::UpdateService
+                .new(project, user, force_remove_source_branch: false)
+                .execute(merge_request)
+            end
+
+            include_examples 'does not retarget merge request'
           end
         end
 

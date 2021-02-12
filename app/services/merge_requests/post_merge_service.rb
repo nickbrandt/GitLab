@@ -35,7 +35,8 @@ module MergeRequests
       return unless Feature.enabled?(:retarget_merge_requests, merge_request.target_project)
 
       # we can only retarget MRs that are targeting the same project
-      return unless merge_request.for_same_project?
+      # and have a remove source branch set
+      return unless merge_request.for_same_project? && merge_request.remove_source_branch?
 
       # find another merge requests that
       # - as a target have a current source project and branch
@@ -51,7 +52,9 @@ module MergeRequests
         next unless can?(current_user, :update_merge_request, other_merge_request.source_project)
 
         ::MergeRequests::UpdateService
-          .new(other_merge_request.source_project, current_user, target_branch: merge_request.target_branch)
+          .new(other_merge_request.source_project, current_user,
+            target_branch: merge_request.target_branch,
+            target_branch_was_deleted: true)
           .execute(other_merge_request)
       end
     end
