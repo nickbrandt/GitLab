@@ -33,14 +33,6 @@ module Types
       def active
         prometheus_service.manual_configuration?
       end
-
-      def payload_example
-        {}
-      end
-
-      def payload_attribute_mappings
-        []
-      end
     end
   end
 end

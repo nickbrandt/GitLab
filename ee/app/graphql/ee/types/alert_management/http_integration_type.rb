@@ -3,10 +3,10 @@
 module EE
   module Types
     module AlertManagement
-      module IntegrationType
+      module HttpIntegrationType
         extend ActiveSupport::Concern
 
-        included do
+        prepended do
           field :payload_example, ::Types::JsonStringType,
                 null: true,
                 description: 'The example of an alert payload.'
