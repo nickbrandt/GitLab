@@ -147,6 +147,45 @@ describe('issue_note', () => {
     });
   });
 
+  describe('avatar sizes in diffs', () => {
+    const line = {
+      line_code: 'abc_1_1',
+      type: null,
+      old_line: '1',
+      new_line: '1',
+    };
+
+    it('should render 24px avatars for top level comments', () => {
+      wrapper.setProps({
+        note: { ...note },
+        discussionRoot: true,
+        line,
+      });
+
+      return wrapper.vm.$nextTick().then(() => {
+        const avatar = wrapper.find(UserAvatarLink);
+        const avatarProps = avatar.props();
+
+        expect(avatarProps.imgSize).toBe(24);
+      });
+    });
+
+    it('should render 16px avatars for replies in a thread', () => {
+      wrapper.setProps({
+        note: { ...note },
+        discussionRoot: false,
+        line,
+      });
+
+      return wrapper.vm.$nextTick().then(() => {
+        const avatar = wrapper.find(UserAvatarLink);
+        const avatarProps = avatar.props();
+
+        expect(avatarProps.imgSize).toBe(16);
+      });
+    });
+  });
+
   it('should render user information', () => {
     const { author } = note;
     const avatar = wrapper.find(UserAvatarLink);

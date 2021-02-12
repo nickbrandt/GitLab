@@ -179,6 +179,13 @@ export default {
 
       return null;
     },
+    avatarSize() {
+      // Use a different size if shown on a Merge Request Diff
+      if (this.line) {
+        return this.discussionRoot ? 24 : 16;
+      }
+      return 40;
+    },
   },
   created() {
     const line = this.note.position?.line_range?.start || this.line;
@@ -375,7 +382,7 @@ export default {
         :link-href="author.path"
         :img-src="author.avatar_url"
         :img-alt="author.name"
-        :img-size="40"
+        :img-size="avatarSize"
       >
         <slot slot="avatar-badge" name="avatar-badge"></slot>
       </user-avatar-link>
