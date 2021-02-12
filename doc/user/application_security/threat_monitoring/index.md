@@ -187,6 +187,25 @@ a Kubernetes Agent for this project.
 
 ![Policy Editor UI](img/threat_monitoring_add_policy_alert_ui_v13_9.png)
 
+#### Enable or disable Policy Alerts **(FREE SELF)**
+
+Policy Alerts is under development but ready for production use.
+It is deployed behind a feature flag that is **enabled by default**.
+[GitLab administrators with access to the GitLab Rails console](../../../administration/feature_flags.md)
+can opt to disable it.
+
+To enable it:
+
+```ruby
+Feature.enable(:threat_monitoring_alerts)
+```
+
+To disable it:
+
+```ruby
+Feature.disable(:threat_monitoring_alerts)
+```
+
 ### Container Network Policy Alert list
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3438) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.9.
