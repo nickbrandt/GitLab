@@ -616,11 +616,15 @@ $system-note-svg-size: 16px;
 
 .note-header-info {
   min-width: 0;
-  padding-bottom: $gl-padding-8;
 
   &.discussion {
     padding-bottom: 0;
   }
+}
+
+.note-header-info,
+.note-actions {
+  padding-bottom: $gl-padding-8;
 }
 
 .system-note .note-header-info {

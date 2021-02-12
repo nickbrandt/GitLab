@@ -1029,6 +1029,15 @@ table.code {
   .timeline-discussion-body {
     clear: left;
   }
+
+  .timeline-entry img.avatar {
+    margin-right: $gl-padding-8;
+  }
+
+  // tiny adjustment to vertical align with the note header text
+  .discussion-collapsible .timeline-icon {
+    padding-top: 2px;
+  }
 }
 
 .files:not([data-can-create-note]) .frame {
