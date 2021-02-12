@@ -95,6 +95,7 @@ class ProjectsController < Projects::ApplicationController
       redirect_to(edit_project_path(@project, anchor: 'js-general-project-settings'))
     else
       flash[:alert] = result[:message]
+      @project.reset
       render 'edit'
     end
 
