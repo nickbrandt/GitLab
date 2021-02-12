@@ -30223,6 +30223,9 @@ msgstr ""
 msgid "Threat Monitoring"
 msgstr ""
 
+msgid "ThreatMonitoring|Alert Details"
+msgstr ""
+
 msgid "ThreatMonitoring|Alerts"
 msgstr ""
 
