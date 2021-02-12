@@ -51,6 +51,7 @@ RSpec.describe Integrations::Jira::IssueEntity do
       status: 'To Do',
       labels: [
         {
+          title: 'backend',
           name: 'backend',
           color: '#EBECF0',
           text_color: '#283856'
