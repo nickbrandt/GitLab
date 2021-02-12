@@ -6,16 +6,6 @@ module Security
 
     POLICIES_BASE_PATH = '.gitlab/security-policies/'
 
-    SCAN_TEMPLATES = {
-      'api_fuzzing'         => 'API-Fuzzing',
-      'container_scanning'  => 'Container-Scanning',
-      'coverage_fuzzing'    => 'Coverage-Fuzzing',
-      'dependency_scanning' => 'Dependency-Scanning',
-      'license_scanning'    => 'License-Scanning',
-      'sast'                => 'SAST',
-      'secret_detection'    => 'Secret-Detection'
-    }.freeze
-
     ON_DEMAND_SCANS = %w[dast].freeze
 
     belongs_to :project, inverse_of: :security_orchestration_policy_configuration
@@ -42,15 +32,6 @@ module Security
         .repository
         .blob_data_at(security_policy_management_project.default_branch, path)
         .then { |config| Gitlab::Config::Loader::Yaml.new(config).load! }
-    end
-
-    def scan_templates(branch)
-      active_policies
-        .select { |policy| applicable_for_branch?(policy, branch) }
-        .flat_map { |policy| policy[:actions].pluck(:scan) }
-        .uniq
-        .then { |scans| SCAN_TEMPLATES.values_at(*scans) }
-        .compact
     end
 
     def on_demand_scan_actions(branch)
