@@ -105,6 +105,8 @@ module EE
       has_many :incident_management_oncall_schedules, class_name: 'IncidentManagement::OncallSchedule', inverse_of: :project
       has_many :incident_management_oncall_rotations, class_name: 'IncidentManagement::OncallRotation', through: :incident_management_oncall_schedules, source: :rotations
 
+      has_one :security_orchestration_policy_configuration, class_name: 'Security::OrchestrationPolicyConfiguration', foreign_key: :project_id, inverse_of: :project
+
       elastic_index_dependant_association :issues, on_change: :visibility_level
 
       scope :with_shared_runners_limit_enabled, -> do
