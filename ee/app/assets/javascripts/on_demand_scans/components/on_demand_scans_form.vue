@@ -255,7 +255,7 @@ export default {
       : this.selectedScannerProfileId;
   },
   methods: {
-    onSubmit({ runAfterCreate = true, button = this.$options.saveAndRunScanBtnId } = {}) {
+    onSubmit({ runAfter = true, button = this.$options.saveAndRunScanBtnId } = {}) {
       if (this.glFeatures.dastSavedScans) {
         this.form.showValidation = true;
         if (!this.form.state) {
@@ -279,7 +279,7 @@ export default {
           ...input,
           ...(this.isEdit ? { id: this.dastScan.id } : {}),
           ...serializeFormObject(this.form.fields),
-          runAfterCreate,
+          [this.isEdit ? 'runAfterUpdate' : 'runAfterCreate']: runAfter,
         };
       }
 
@@ -296,7 +296,7 @@ export default {
           if (errors?.length) {
             this.showErrors(ERROR_RUN_SCAN, errors);
             this.loading = false;
-          } else if (this.glFeatures.dastSavedScans && !runAfterCreate) {
+          } else if (this.glFeatures.dastSavedScans && !runAfter) {
             redirectTo(response.dastProfile.editPath);
             this.clearStorage = true;
           } else {
@@ -565,7 +565,7 @@ export default {
           data-testid="on-demand-scan-save-button"
           :disabled="isSaveButtonDisabled"
           :loading="loading === $options.saveScanBtnId"
-          @click="onSubmit({ runAfterCreate: false, button: $options.saveScanBtnId })"
+          @click="onSubmit({ runAfter: false, button: $options.saveScanBtnId })"
         >
           {{ s__('OnDemandScans|Save scan') }}
         </gl-button>
