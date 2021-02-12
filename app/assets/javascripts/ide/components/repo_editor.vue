@@ -420,6 +420,7 @@ export default {
           <a
             href="javascript:void(0);"
             role="button"
+            data-testid="edit-tab"
             @click.prevent="updateEditor({ viewMode: $options.FILE_VIEW_MODE_EDITOR })"
           >
             {{ __('Edit') }}
@@ -429,6 +430,7 @@ export default {
           <a
             href="javascript:void(0);"
             role="button"
+            data-testid="preview-tab"
             @click.prevent="updateEditor({ viewMode: $options.FILE_VIEW_MODE_PREVIEW })"
             >{{ previewMode.previewTitle }}</a
           >
