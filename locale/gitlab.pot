@@ -29563,9 +29563,6 @@ msgstr ""
 msgid "There was an error fetching the Node's Groups"
 msgstr ""
 
-msgid "There was an error fetching the Search Counts"
-msgstr ""
-
 msgid "There was an error fetching the deploy freezes."
 msgstr ""
 
