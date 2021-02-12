@@ -118,7 +118,7 @@ Proposal:
 | Author                       | Grzegorz Bizon          |
 | Architecture Evolution Coach | Kamil Trzciński         |
 | Engineering Leader           | Darby Frey              |
-| Product Manager              | TBD                     |
+| Product Manager              | Jackie Porter           |
 | Domain Expert / Verify       | Fabio Pitino            |
 | Domain Expert / Database     | Jose Finotto            |
 | Domain Expert / PostgreSQL   | Nikolay Samokhvalov     |
@@ -128,7 +128,7 @@ DRIs:
 | Role                         | Who
 |------------------------------|------------------------|
 | Leadership                   | Darby Frey             |
-| Product                      | TBD                    |
+| Product                      | Jackie Porter          |
 | Engineering                  | Grzegorz Bizon         |
 
 <!-- vale gitlab.Spelling = YES -->
