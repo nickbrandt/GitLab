@@ -21672,6 +21672,9 @@ msgstr ""
 msgid "Pipelines|Copy trigger token"
 msgstr ""
 
+msgid "Pipelines|Could not load merged YAML content"
+msgstr ""
+
 msgid "Pipelines|Description"
 msgstr ""
 
@@ -21706,6 +21709,9 @@ msgid "Pipelines|Lint"
 msgstr ""
 
 msgid "Pipelines|Loading Pipelines"
+msgstr ""
+
+msgid "Pipelines|Merged YAML is view only"
 msgstr ""
 
 msgid "Pipelines|More Information"
@@ -21778,6 +21784,9 @@ msgid "Pipelines|Trigger user has insufficient permissions to project"
 msgstr ""
 
 msgid "Pipelines|Validating GitLab CI configuration…"
+msgstr ""
+
+msgid "Pipelines|View merged YAML"
 msgstr ""
 
 msgid "Pipelines|Visualize"
