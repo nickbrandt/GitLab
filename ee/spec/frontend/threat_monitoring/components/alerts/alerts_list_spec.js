@@ -134,6 +134,10 @@ describe('AlertsList component', () => {
       expect(wrapper.vm.sort).toBe('STATUS_ASC');
       expect(findStatusColumnHeader().attributes('aria-sort')).toBe('ascending');
     });
+
+    it('navigates to the alert details page on title click', () => {
+      expect(findIdColumn().attributes('href')).toBe('/alerts/01');
+    });
   });
 
   describe('empty state', () => {
