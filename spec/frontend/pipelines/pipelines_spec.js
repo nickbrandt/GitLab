@@ -22,6 +22,9 @@ import { pipelineWithStages, stageReply, users, mockSearch, branches } from './m
 
 jest.mock('~/flash');
 
+const projectPath = '/twitter/flight';
+const pipelinesEndpoint = `${projectPath}/pipelines.json`;
+
 describe('Pipelines', () => {
   const jsonFixtureName = 'pipelines/pipelines.json';
 
@@ -32,19 +35,19 @@ describe('Pipelines', () => {
   let mock;
 
   const paths = {
-    endpoint: 'twitter/flight/pipelines.json',
+    endpoint: pipelinesEndpoint,
     autoDevopsHelpPath: '/help/topics/autodevops/index.md',
     helpPagePath: '/help/ci/quick_start/README',
     emptyStateSvgPath: '/assets/illustrations/pipelines_empty.svg',
     errorStateSvgPath: '/assets/illustrations/pipelines_failed.svg',
     noPipelinesSvgPath: '/assets/illustrations/pipelines_pending.svg',
     ciLintPath: '/ci/lint',
-    resetCachePath: '/twitter/flight/settings/ci_cd/reset_cache',
-    newPipelinePath: '/twitter/flight/pipelines/new',
+    resetCachePath: `/${projectPath}/settings/ci_cd/reset_cache`,
+    newPipelinePath: `/${projectPath}/pipelines/new`,
   };
 
   const noPermissions = {
-    endpoint: 'twitter/flight/pipelines.json',
+    endpoint: pipelinesEndpoint,
     autoDevopsHelpPath: '/help/topics/autodevops/index.md',
     helpPagePath: '/help/ci/quick_start/README',
     emptyStateSvgPath: '/assets/illustrations/pipelines_empty.svg',
@@ -106,52 +109,18 @@ describe('Pipelines', () => {
     window.history.pushState.mockReset();
   });
 
-  describe('With permission', () => {
-    describe('With pipelines in main tab', () => {
-      beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(200, pipelinesResponse);
-        createComponent();
-        return waitForPromises();
-      });
-
-      it('renders tabs', () => {
-        expect(findTab('all').text()).toContain('All');
-      });
-
-      it('renders Run Pipeline link', () => {
-        expect(findRunPipelineButton().attributes('href')).toBe(paths.newPipelinePath);
-      });
-
-      it('renders CI Lint link', () => {
-        expect(findCiLintButton().attributes('href')).toBe(paths.ciLintPath);
-      });
-
-      it('renders Clear Runner Cache button', () => {
-        expect(findCleanCacheButton().text()).toBe('Clear Runner Caches');
-      });
-
-      it('renders pipelines table', () => {
-        expect(wrapper.findAll('.gl-responsive-table-row')).toHaveLength(
-          pipelinesResponse.pipelines.length + 1,
-        );
+  describe('when no pipelines exist', () => {
+    beforeEach(() => {
+      mock.onGet(pipelinesEndpoint).reply(200, {
+        pipelines: [],
+        count: { all: '0' },
       });
     });
 
-    describe('Without pipelines on main tab with CI', () => {
-      beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(200, {
-          pipelines: [],
-          count: {
-            all: 0,
-            pending: 0,
-            running: 0,
-            finished: 0,
-          },
-        });
-
+    describe('when CI is enabled and user has permissions', () => {
+      beforeEach(async () => {
         createComponent();
-
-        return waitForPromises();
+        await waitForPromises();
       });
 
       it('renders tabs', () => {
@@ -183,21 +152,10 @@ describe('Pipelines', () => {
       });
     });
 
-    describe('Without pipelines nor CI', () => {
-      beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(200, {
-          pipelines: [],
-          count: {
-            all: 0,
-            pending: 0,
-            running: 0,
-            finished: 0,
-          },
-        });
-
+    describe('when CI is not enabled and user has permissions', () => {
+      beforeEach(async () => {
         createComponent({ hasGitlabCi: false, canCreatePipeline: true, ...paths });
-
-        return waitForPromises();
+        await waitForPromises();
       });
 
       it('renders empty state', () => {
@@ -213,70 +171,30 @@ describe('Pipelines', () => {
       });
     });
 
-    describe('When API returns error', () => {
-      beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(500, {});
-        createComponent({ hasGitlabCi: false, canCreatePipeline: true, ...paths });
-
-        return waitForPromises();
-      });
-
-      it('renders tabs', () => {
-        expect(findTab('all').text()).toContain('All');
-      });
-
-      it('renders buttons', () => {
-        expect(findRunPipelineButton().attributes('href')).toBe(paths.newPipelinePath);
-
-        expect(findCiLintButton().attributes('href')).toBe(paths.ciLintPath);
-        expect(findCleanCacheButton().text()).toBe('Clear Runner Caches');
-      });
-
-      it('renders error state', () => {
-        expect(findBlankState().text()).toContain('There was an error fetching the pipelines.');
-      });
-    });
-  });
-
-  describe('Without permission', () => {
-    describe('With pipelines in main tab', () => {
-      beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(200, pipelinesResponse);
-
+    describe('when CI is not enabled and user has no permissions', () => {
+      beforeEach(async () => {
         createComponent({ hasGitlabCi: false, canCreatePipeline: false, ...noPermissions });
-
-        return waitForPromises();
+        await waitForPromises();
       });
 
-      it('renders tabs', () => {
-        expect(findTab('all').text()).toContain('All');
+      it('renders empty state without button to set CI', () => {
+        expect(findEmptyState().text()).toBe(
+          'This project is not currently set up to run pipelines.',
+        );
+
+        expect(findEmptyState().find(GlButton).exists()).toBeFalsy();
       });
 
-      it('does not render buttons', () => {
+      it('does not render tabs or buttons', () => {
+        expect(findTab('all').exists()).toBe(false);
         expect(findRunPipelineButton().exists()).toBeFalsy();
         expect(findCiLintButton().exists()).toBeFalsy();
         expect(findCleanCacheButton().exists()).toBeFalsy();
       });
-
-      it('renders pipelines table', () => {
-        expect(wrapper.findAll('.gl-responsive-table-row')).toHaveLength(
-          pipelinesResponse.pipelines.length + 1,
-        );
-      });
     });
 
-    describe('Without pipelines on main tab with CI', () => {
+    describe('when CI is enabled and user has no permissions', () => {
       beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(200, {
-          pipelines: [],
-          count: {
-            all: 0,
-            pending: 0,
-            running: 0,
-            finished: 0,
-          },
-        });
-
         createComponent({ hasGitlabCi: true, canCreatePipeline: false, ...noPermissions });
 
         return waitForPromises();
@@ -296,74 +214,62 @@ describe('Pipelines', () => {
         expect(wrapper.find('.empty-state h4').text()).toBe('There are currently no pipelines.');
       });
     });
+  });
 
-    describe('Without pipelines nor CI', () => {
-      beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(200, {
-          pipelines: [],
-          count: {
-            all: 0,
-            pending: 0,
-            running: 0,
-            finished: 0,
-          },
-        });
-
-        createComponent({ hasGitlabCi: false, canCreatePipeline: false, ...noPermissions });
-
-        return waitForPromises();
-      });
-
-      it('renders empty state without button to set CI', () => {
-        expect(findEmptyState().text()).toBe(
-          'This project is not currently set up to run pipelines.',
-        );
-
-        expect(findEmptyState().find(GlButton).exists()).toBeFalsy();
-      });
-
-      it('does not render tabs or buttons', () => {
-        expect(findTab('all').exists()).toBe(false);
-        expect(findRunPipelineButton().exists()).toBeFalsy();
-        expect(findCiLintButton().exists()).toBeFalsy();
-        expect(findCleanCacheButton().exists()).toBeFalsy();
-      });
+  describe('when pipelines exist', () => {
+    beforeEach(() => {
+      mock.onGet(pipelinesEndpoint).reply(200, pipelinesResponse);
     });
 
-    describe('When API returns error', () => {
-      beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(500, {});
-
-        createComponent({ hasGitlabCi: false, canCreatePipeline: true, ...noPermissions });
-
-        return waitForPromises();
+    describe('when user has no permissions', () => {
+      beforeEach(async () => {
+        createComponent({ hasGitlabCi: true, canCreatePipeline: false, ...noPermissions });
+        await waitForPromises();
       });
 
       it('renders tabs', () => {
         expect(findTab('all').text()).toContain('All');
       });
 
-      it('does not renders buttons', () => {
+      it('does not render buttons', () => {
         expect(findRunPipelineButton().exists()).toBeFalsy();
         expect(findCiLintButton().exists()).toBeFalsy();
         expect(findCleanCacheButton().exists()).toBeFalsy();
       });
 
-      it('renders error state', () => {
-        expect(wrapper.find('.empty-state').text()).toContain(
-          'There was an error fetching the pipelines.',
+      it('renders pipelines table', () => {
+        expect(wrapper.findAll('.gl-responsive-table-row')).toHaveLength(
+          pipelinesResponse.pipelines.length + 1,
         );
       });
     });
-  });
 
-  describe('successful request', () => {
-    describe('with pipelines', () => {
-      beforeEach(() => {
-        mock.onGet('twitter/flight/pipelines.json').reply(200, pipelinesResponse);
-
+    describe('when user has permissions', () => {
+      beforeEach(async () => {
         createComponent();
-        return waitForPromises();
+        await waitForPromises();
+      });
+
+      it('renders tabs', () => {
+        expect(findTab('all').text()).toContain('All');
+      });
+
+      it('renders Run Pipeline link', () => {
+        expect(findRunPipelineButton().attributes('href')).toBe(paths.newPipelinePath);
+      });
+
+      it('renders CI Lint link', () => {
+        expect(findCiLintButton().attributes('href')).toBe(paths.ciLintPath);
+      });
+
+      it('renders Clear Runner Cache button', () => {
+        expect(findCleanCacheButton().text()).toBe('Clear Runner Caches');
+      });
+
+      it('renders pipelines table', () => {
+        expect(wrapper.findAll('.gl-responsive-table-row')).toHaveLength(
+          pipelinesResponse.pipelines.length + 1,
+        );
       });
 
       it('should render table', () => {
@@ -389,6 +295,7 @@ describe('Pipelines', () => {
       });
 
       it('should make an API request when using tabs', () => {
+        // TODO check how to refactor this one
         createComponent({ hasGitlabCi: true, canCreatePipeline: true, ...paths });
         jest.spyOn(wrapper.vm.service, 'getPipelines');
 
@@ -401,10 +308,52 @@ describe('Pipelines', () => {
           });
         });
       });
+
+      // Pipeline filters:
+      describe('Pipeline filters', () => {
+        let updateContentMock;
+
+        beforeEach(async () => {
+          updateContentMock = jest.spyOn(wrapper.vm, 'updateContent');
+        });
+
+        it('updates request data and query params on filter submit', async () => {
+          const expectedQueryParams = {
+            page: '1',
+            scope: 'all',
+            username: 'root',
+            ref: 'master',
+            status: 'pending',
+          };
+
+          findFilteredSearch().vm.$emit('submit', mockSearch);
+          await nextTick();
+
+          expect(wrapper.vm.requestData).toEqual(expectedQueryParams);
+          expect(updateContentMock).toHaveBeenCalledWith(expectedQueryParams);
+        });
+
+        it('does not add query params if raw text search is used', async () => {
+          const expectedQueryParams = { page: '1', scope: 'all' };
+
+          findFilteredSearch().vm.$emit('submit', ['rawText']);
+          await nextTick();
+
+          expect(wrapper.vm.requestData).toEqual(expectedQueryParams);
+          expect(updateContentMock).toHaveBeenCalledWith(expectedQueryParams);
+        });
+
+        it('displays a warning message if raw text search is used', () => {
+          findFilteredSearch().vm.$emit('submit', ['rawText']);
+
+          expect(createFlash).toHaveBeenCalledTimes(1);
+          expect(createFlash).toHaveBeenCalledWith(RAW_TEXT_WARNING, 'warning');
+        });
+      });
     });
   });
 
-  describe('When there are multiple pages of pipelines available', () => {
+  describe('when there are multiple pages of pipelines available', () => {
     const mockPageSize = 2;
     const mockPageHeaders = ({ page = 1 } = {}) => {
       return {
@@ -424,7 +373,7 @@ describe('Pipelines', () => {
     beforeEach(async () => {
       const pages = chunk(pipelinesResponse.pipelines, mockPageSize);
 
-      mock.onGet(paths.endpoint, { params: { scope: 'all', page: '1' } }).reply(
+      mock.onGet(pipelinesEndpoint, { params: { scope: 'all', page: '1' } }).reply(
         200,
         {
           pipelines: pages[0],
@@ -432,7 +381,7 @@ describe('Pipelines', () => {
         },
         mockPageHeaders({ page: 1 }),
       );
-      mock.onGet(paths.endpoint, { params: { scope: 'all', page: '2' } }).reply(
+      mock.onGet(pipelinesEndpoint, { params: { scope: 'all', page: '2' } }).reply(
         200,
         {
           pipelines: pages[1],
@@ -478,7 +427,7 @@ describe('Pipelines', () => {
 
     describe('when user changes tabs', () => {
       beforeEach(async () => {
-        mock.onGet(paths.endpoint, { params: { scope: 'running', page: '1' } }).reply(
+        mock.onGet(pipelinesEndpoint, { params: { scope: 'running', page: '1' } }).reply(
           200,
           {
             pipelines: [pipelinesResponse.pipelines[0]],
@@ -507,22 +456,17 @@ describe('Pipelines', () => {
     });
   });
 
-  describe('User Interaction', () => {
+  describe('when a pipeline with stages exists', () => {
     describe('updates results when a staged is clicked', () => {
       beforeEach(() => {
         const copyPipeline = { ...pipelineWithStages };
         copyPipeline.id += 1;
 
-        mock.onGet(paths.endpoint, { scope: 'all', page: '1' }).reply(
+        mock.onGet(pipelinesEndpoint, { scope: 'all', page: '1' }).reply(
           200,
           {
             pipelines: [pipelineWithStages],
-            count: {
-              all: 1,
-              finished: 1,
-              pending: 0,
-              running: 0,
-            },
+            count: { all: '1' },
           },
           {
             'POLL-INTERVAL': 100,
@@ -538,7 +482,7 @@ describe('Pipelines', () => {
           const stopMock = jest.spyOn(wrapper.vm.poll, 'stop');
           const restartMock = jest.spyOn(wrapper.vm.poll, 'restart');
           const cancelMock = jest.spyOn(wrapper.vm.service.cancelationSource, 'cancel');
-          mock.onGet('twitter/flight/pipelines.json').reply(200, pipelinesResponse);
+          mock.onGet(pipelinesEndpoint).reply(200, pipelinesResponse);
 
           await waitForPromises();
 
@@ -558,7 +502,7 @@ describe('Pipelines', () => {
         it('stops polling & restarts polling', () => {
           const stopMock = jest.spyOn(wrapper.vm.poll, 'stop');
           const restartMock = jest.spyOn(wrapper.vm.poll, 'restart');
-          mock.onGet('twitter/flight/pipelines.json').reply(200, pipelinesResponse);
+          mock.onGet(pipelinesEndpoint).reply(200, pipelinesResponse);
 
           return waitForPromises()
             .then(() => {
@@ -569,6 +513,59 @@ describe('Pipelines', () => {
               expect(restartMock).toHaveBeenCalled();
             });
         });
+      });
+    });
+  });
+
+  describe('when pipelines cannot be loaded', () => {
+    beforeEach(async () => {
+      mock.onGet(pipelinesEndpoint).reply(500, {});
+    });
+
+    describe('when user has no permissions', () => {
+      beforeEach(async () => {
+        createComponent({ hasGitlabCi: false, canCreatePipeline: true, ...noPermissions });
+
+        await waitForPromises();
+      });
+
+      it('renders tabs', () => {
+        expect(findTab('all').text()).toContain('All');
+      });
+
+      it('does not renders buttons', () => {
+        expect(findRunPipelineButton().exists()).toBeFalsy();
+        expect(findCiLintButton().exists()).toBeFalsy();
+        expect(findCleanCacheButton().exists()).toBeFalsy();
+      });
+
+      it('renders error state', () => {
+        expect(wrapper.find('.empty-state').text()).toContain(
+          'There was an error fetching the pipelines.',
+        );
+      });
+    });
+
+    describe('when user has permissions', () => {
+      beforeEach(async () => {
+        createComponent();
+
+        await waitForPromises();
+      });
+
+      it('renders tabs', () => {
+        expect(findTab('all').text()).toContain('All');
+      });
+
+      it('renders buttons', () => {
+        expect(findRunPipelineButton().attributes('href')).toBe(paths.newPipelinePath);
+
+        expect(findCiLintButton().attributes('href')).toBe(paths.ciLintPath);
+        expect(findCleanCacheButton().text()).toBe('Clear Runner Caches');
+      });
+
+      it('renders error state', () => {
+        expect(findBlankState().text()).toContain('There was an error fetching the pipelines.');
       });
     });
   });
@@ -710,52 +707,6 @@ describe('Pipelines', () => {
           expect(findNavigationControls().exists()).toBe(false);
         });
       });
-    });
-  });
-
-  describe('Pipeline filters', () => {
-    let updateContentMock;
-
-    beforeEach(() => {
-      mock.onGet(paths.endpoint).reply(200, pipelinesResponse);
-      createComponent();
-
-      updateContentMock = jest.spyOn(wrapper.vm, 'updateContent');
-
-      return waitForPromises();
-    });
-
-    it('updates request data and query params on filter submit', async () => {
-      const expectedQueryParams = {
-        page: '1',
-        scope: 'all',
-        username: 'root',
-        ref: 'master',
-        status: 'pending',
-      };
-
-      findFilteredSearch().vm.$emit('submit', mockSearch);
-      await nextTick();
-
-      expect(wrapper.vm.requestData).toEqual(expectedQueryParams);
-      expect(updateContentMock).toHaveBeenCalledWith(expectedQueryParams);
-    });
-
-    it('does not add query params if raw text search is used', async () => {
-      const expectedQueryParams = { page: '1', scope: 'all' };
-
-      findFilteredSearch().vm.$emit('submit', ['rawText']);
-      await nextTick();
-
-      expect(wrapper.vm.requestData).toEqual(expectedQueryParams);
-      expect(updateContentMock).toHaveBeenCalledWith(expectedQueryParams);
-    });
-
-    it('displays a warning message if raw text search is used', () => {
-      findFilteredSearch().vm.$emit('submit', ['rawText']);
-
-      expect(createFlash).toHaveBeenCalledTimes(1);
-      expect(createFlash).toHaveBeenCalledWith(RAW_TEXT_WARNING, 'warning');
     });
   });
 });
