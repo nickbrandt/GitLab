@@ -126,14 +126,13 @@ any pods. The policy itself is still deployed to the corresponding deployment na
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3403) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.4.
 
-The policy editor allows you to create, edit, and delete policies. To
-create a new policy click the **New policy** button located in the
-**Policy** tab's header. To edit an existing policy, click**Edit
-policy** in the selected policy drawer.
+You can use the policy editor to create, edit, and delete policies.
 
-Note that the policy editor only supports the
-[CiliumNetworkPolicy](https://docs.cilium.io/en/v1.8/policy/)specification. Regular Kubernetes
-[NetworkPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#networkpolicy-v1-networking-k8s-io)
+- To create a new policy, click the **New policy** button located in the **Policy** tab's header.
+- To edit an existing policy, click **Edit policy** in the selected policy drawer.
+
+The policy editor only supports the [CiliumNetworkPolicy](https://docs.cilium.io/en/v1.8/policy/)
+specification. Regular Kubernetes [NetworkPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#networkpolicy-v1-networking-k8s-io)
 resources aren't supported.
 
 The policy editor has two modes:
@@ -168,9 +167,15 @@ button at the bottom of the editor.
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/3438) and [enabled by default](https://gitlab.com/gitlab-org/gitlab/-/issues/287676) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 13.9.
 
-You can use policy alerts to track your policy's impact. There are two ways to enable policy alerts:
+You can use policy alerts to track your policy's impact. Alerts are only available if you've
+[installed](../../clusters/agent/repository.md)
+and [configured](../../clusters/agent/index.md#create-an-agent-record-in-gitlab)
+a Kubernetes Agent for this project.
 
-- In the policy editor UI, by clicking **Add alert**.
+There are two ways to create policy alerts:
+
+- In the [policy editor UI](#container-network-policy-editor),
+  by clicking **Add alert**.
 - With YAML, through the `metadata.annotations` property.
 
   ```yaml
@@ -180,12 +185,6 @@ You can use policy alerts to track your policy's impact. There are two ways to e
   ```
 
 Once added, the UI updates and displays a warning about the dangers of too many alerts.
-
-Alerts are only available if you've [installed](../../clusters/agent/repository.md)
-and [configured](../../clusters/agent/index.md#create-an-agent-record-in-gitlab)
-a Kubernetes Agent for this project.
-
-![Policy Editor UI](img/threat_monitoring_add_policy_alert_ui_v13_9.png)
 
 #### Enable or disable Policy Alerts **(FREE SELF)**
 
