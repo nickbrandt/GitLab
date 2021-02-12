@@ -176,7 +176,7 @@ There are two ways to create policy alerts:
 
 - In the [policy editor UI](#container-network-policy-editor),
   by clicking **Add alert**.
-- With YAML, through the `metadata.annotations` property.
+- In the policy editor's YAML mode, through the `metadata.annotations` property:
 
   ```yaml
   metadata:
