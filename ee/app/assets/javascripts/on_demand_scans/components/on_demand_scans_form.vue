@@ -575,7 +575,7 @@ export default {
         </gl-button>
         <gl-button
           data-testid="on-demand-scan-cancel-button"
-          :disabled="loading"
+          :disabled="Boolean(loading)"
           @click="onCancelClicked"
         >
           {{ __('Cancel') }}
