@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 42.1.1 (2021-02-12)
+
+- No changes.
+
 ## 13.8.4 (2021-02-11)
 
 ### Security (1 change)
