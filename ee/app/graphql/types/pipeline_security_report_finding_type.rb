@@ -8,16 +8,16 @@ module Types
     description 'Represents vulnerability finding of a security report on the pipeline'
 
     field :report_type, VulnerabilityReportTypeEnum, null: true,
-          description: "Type of the security report that found the vulnerability finding"  
+          description: 'Type of the security report that found the vulnerability finding.'
 
     field :name, GraphQL::STRING_TYPE, null: true,
-          description: 'Name of the vulnerability finding'
+          description: 'Name of the vulnerability finding.'
 
     field :severity, VulnerabilitySeverityEnum, null: true,
-          description: "Severity of the vulnerability finding" 
+          description: 'Severity of the vulnerability finding.'
 
     field :confidence, GraphQL::STRING_TYPE, null: true,
-          description: "Type of the security report that found the vulnerability "      
+          description: 'Type of the security report that found the vulnerability.'
 
     field :scanner, VulnerabilityScannerType, null: true,
           description: 'Scanner metadata for the vulnerability.'
@@ -26,23 +26,23 @@ module Types
           description: 'Identifiers of the vulnerabilit finding.'
 
     field :project_fingerprint, GraphQL::STRING_TYPE, null: true,
-          description: 'Name of the vulnerability finding'
-    
+          description: 'Name of the vulnerability finding.'
+
     field :uuid, GraphQL::STRING_TYPE, null: true,
-          description: 'Name of the vulnerability finding'
+          description: 'Name of the vulnerability finding.'
 
     field :project, ::Types::ProjectType, null: true,
-          description: 'The project on which the vulnerability finding was found',
-          authorize: :read_project          
+          description: 'The project on which the vulnerability finding was found.',
+          authorize: :read_project
 
     field :description, GraphQL::STRING_TYPE, null: true,
-          description: 'Description of the vulnerability finding'
-  
+          description: 'Description of the vulnerability finding.'
+
     field :location, VulnerabilityLocationType, null: true,
-          description: 'Location metadata for the vulnerability. Its fields depend on the type of security scan that found the vulnerability'
+          description: 'Location metadata for the vulnerability. Its fields depend on the type of security scan that found the vulnerability.'
 
     field :solution, GraphQL::STRING_TYPE, null: true,
-          description: "URL to the vulnerability's details page"
+          description: "URL to the vulnerability's details page."
 
     def location
       object.location&.merge(report_type: object.report_type)

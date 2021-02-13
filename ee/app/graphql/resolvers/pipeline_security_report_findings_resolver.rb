@@ -6,7 +6,7 @@ module Resolvers
 
     alias_method :pipeline, :object
 
-    argument :report_type, [GraphQL::STRING_TYPE], 
+    argument :report_type, [GraphQL::STRING_TYPE],
              required: false,
              description: 'Filter vulnerability findings by report type.'
 
@@ -14,7 +14,7 @@ module Resolvers
              required: false,
              description: 'Filter vulnerability findings by severity.'
 
-    argument :scanner, [GraphQL::STRING_TYPE], 
+    argument :scanner, [GraphQL::STRING_TYPE],
              required: false,
              description: 'Filter vulnerability findings by Scanner.externalId.'
 
@@ -23,6 +23,3 @@ module Resolvers
     end
   end
 end
-
- 
-  

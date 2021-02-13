@@ -2964,7 +2964,7 @@ Information about pagination in a connection.
 | `path` | String | Relative path to the pipeline's page. |
 | `project` | Project | Project the pipeline belongs to. |
 | `retryable` | Boolean! | Specifies if a pipeline can be retried. |
-| `securityReportFindings` | PipelineSecurityReportFindingConnection | Vulnerability findings reported on the pipeline |
+| `securityReportFindings` | PipelineSecurityReportFindingConnection | Vulnerability findings reported on the pipeline. |
 | `securityReportSummary` | SecurityReportSummary | Vulnerability and scanned resource counts for each security scanner of the pipeline. |
 | `sha` | String! | SHA of the pipeline's commit. |
 | `sourceJob` | CiJob | Job where pipeline was triggered from. |
@@ -3035,18 +3035,18 @@ Represents vulnerability finding of a security report on the pipeline.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| `confidence` | String | Type of the security report that found the vulnerability  |
-| `description` | String | Description of the vulnerability finding |
+| `confidence` | String | Type of the security report that found the vulnerability. |
+| `description` | String | Description of the vulnerability finding. |
 | `identifiers` | VulnerabilityIdentifier! => Array | Identifiers of the vulnerabilit finding. |
-| `location` | VulnerabilityLocation | Location metadata for the vulnerability. Its fields depend on the type of security scan that found the vulnerability |
-| `name` | String | Name of the vulnerability finding |
-| `project` | Project | The project on which the vulnerability finding was found |
-| `projectFingerprint` | String | Name of the vulnerability finding |
-| `reportType` | VulnerabilityReportType | Type of the security report that found the vulnerability finding |
+| `location` | VulnerabilityLocation | Location metadata for the vulnerability. Its fields depend on the type of security scan that found the vulnerability. |
+| `name` | String | Name of the vulnerability finding. |
+| `project` | Project | The project on which the vulnerability finding was found. |
+| `projectFingerprint` | String | Name of the vulnerability finding. |
+| `reportType` | VulnerabilityReportType | Type of the security report that found the vulnerability finding. |
 | `scanner` | VulnerabilityScanner | Scanner metadata for the vulnerability. |
-| `severity` | VulnerabilitySeverity | Severity of the vulnerability finding |
-| `solution` | String | URL to the vulnerability's details page |
-| `uuid` | String | Name of the vulnerability finding |
+| `severity` | VulnerabilitySeverity | Severity of the vulnerability finding. |
+| `solution` | String | URL to the vulnerability's details page. |
+| `uuid` | String | Name of the vulnerability finding. |
 
 ### Project
 

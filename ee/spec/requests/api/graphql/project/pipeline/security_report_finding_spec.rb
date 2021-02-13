@@ -42,7 +42,7 @@ RSpec.describe 'Query.project(fullPath).pipeline(iid).securityReportFinding' do
                   visibility
                 }
               }
-            }    
+            }
           }
         }
       }
@@ -63,7 +63,7 @@ RSpec.describe 'Query.project(fullPath).pipeline(iid).securityReportFinding' do
   end
 
   it 'returns all the queried fields' do
-    security_report_finding = security_report_findings.first 
+    security_report_finding = security_report_findings.first
 
     expect(security_report_finding.dig('project', 'fullPath')).to eq(project.full_path)
     expect(security_report_finding.dig('project', 'visibility')).to eq(project.visibility)

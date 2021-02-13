@@ -17,7 +17,7 @@ module EE
           field :security_report_findings,
             ::Types::PipelineSecurityReportFindingType.connection_type,
             null: true,
-            description: 'Vulnerability findings reported on the pipeline',
+            description: 'Vulnerability findings reported on the pipeline.',
             resolver: ::Resolvers::PipelineSecurityReportFindingsResolver
         end
       end

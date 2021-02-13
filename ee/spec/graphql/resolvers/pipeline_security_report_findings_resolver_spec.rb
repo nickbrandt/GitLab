@@ -14,11 +14,13 @@ RSpec.describe Resolvers::PipelineSecurityReportFindingsResolver do
     let_it_be(:low_vulnerability_finding) { build(:vulnerabilities_finding, severity: :low, report_type: :dast, project: project) }
     let_it_be(:critical_vulnerability_finding) { build(:vulnerabilities_finding, severity: :critical, report_type: :sast, project: project) }
     let_it_be(:high_vulnerability_finding) { build(:vulnerabilities_finding, severity: :high, report_type: :container_scanning, project: project) }
- 
+
     let(:params) { {} }
 
-    before do 
-      allow_any_instance_of(Security::PipelineVulnerabilitiesFinder).to receive_message_chain(:execute, :findings).and_return(returned_findings)
+    before do
+      allow_next_instance_of(Security::PipelineVulnerabilitiesFinder) do |instance|
+        allow(instance).to receive_message_chain(:execute, :findings).and_return(returned_findings)
+      end
     end
 
     context 'when given severities' do
