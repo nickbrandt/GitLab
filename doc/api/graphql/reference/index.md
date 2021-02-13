@@ -5111,6 +5111,15 @@ Possible identifier types for a measurement.
 | `PROJECTS` | Project count |
 | `USERS` | User count |
 
+### MergeRequestNewState
+
+New state to apply to a merge request..
+
+| Value | Description |
+| ----- | ----------- |
+| `CLOSED` | Close the merge request if it is open. |
+| `OPEN` | Open the merge request if it is closed. |
+
 ### MergeRequestSort
 
 Values for sorting merge requests.
