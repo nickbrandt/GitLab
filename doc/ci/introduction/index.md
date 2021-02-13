@@ -6,7 +6,7 @@ description: "An overview of Continuous Integration, Continuous Delivery, and Co
 type: concepts
 ---
 
-# Introduction to CI/CD with GitLab
+# Introduction to CI/CD with GitLab **(FREE)**
 
 This document presents an overview of the concepts of Continuous Integration,
 Continuous Delivery, and Continuous Deployment, as well as an introduction to
