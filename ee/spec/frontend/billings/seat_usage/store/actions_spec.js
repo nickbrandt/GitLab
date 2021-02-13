@@ -6,7 +6,7 @@ import * as actions from 'ee/billings/seat_usage/store/actions';
 import { mockDataSeats } from 'ee_jest/billings/mock_data';
 import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
-import Api from '~/api';
+import Api from 'ee/api';
 
 jest.mock('~/flash');
 
@@ -43,8 +43,6 @@ describe('seats actions', () => {
       });
 
       expect(spy).toBeCalledWith(state.namespaceId, expect.objectContaining(payload));
-
-      spy.mockRestore();
     });
 
     describe('on success', () => {
