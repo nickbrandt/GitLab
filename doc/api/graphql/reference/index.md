@@ -1767,6 +1767,7 @@ Relationship between an epic and an issue.
 | `author` | User! | User that created the issue. |
 | `blocked` | Boolean! | Indicates the issue is blocked. |
 | `blockedByCount` | Int | Count of issues blocking this issue. |
+| `blockedByIssues` | IssueConnection | Issues blocking this issue. |
 | `closedAt` | Time | Timestamp of when the issue was closed. |
 | `confidential` | Boolean! | Indicates the issue is confidential. |
 | `createNoteEmail` | String | User specific email address for the issue. |
@@ -2144,6 +2145,7 @@ A block of time for which a participant is on-call.
 | `author` | User! | User that created the issue. |
 | `blocked` | Boolean! | Indicates the issue is blocked. |
 | `blockedByCount` | Int | Count of issues blocking this issue. |
+| `blockedByIssues` | IssueConnection | Issues blocking this issue. |
 | `closedAt` | Time | Timestamp of when the issue was closed. |
 | `confidential` | Boolean! | Indicates the issue is confidential. |
 | `createNoteEmail` | String | User specific email address for the issue. |
