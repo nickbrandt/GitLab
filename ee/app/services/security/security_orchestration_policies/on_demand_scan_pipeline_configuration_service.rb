@@ -28,10 +28,10 @@ module Security
       end
 
       def prepare_on_demand_scan_configuration(action)
-        result = prepare_on_demand_scan_params(action[:site_profile], action[:scan_profile])
+        result = prepare_on_demand_scan_params(action[:site_profile], action[:scanner_profile])
         return error_script(result.message) unless result.success?
 
-        ci_configuration = YAML.safe_load(::Ci::DastScanCiConfigurationService.new(@project).execute(result.payload[:params]))
+        ci_configuration = YAML.safe_load(::Ci::DastScanCiConfigurationService.new(project).execute(result.payload[:params]))
 
         dast_on_demand_template[:dast].deep_merge(
           'variables' => dast_on_demand_template[:variables].deep_merge(ci_configuration['variables']),
@@ -39,12 +39,12 @@ module Security
         )
       end
 
-      def prepare_on_demand_scan_params(site_profile_name, scan_profile_name)
+      def prepare_on_demand_scan_params(site_profile_name, scanner_profile_name)
         site_profile = DastSiteProfilesFinder.new(project_id: project.id, name: site_profile_name).execute.first
-        scanner_profile = DastScannerProfilesFinder.new(project_ids: [project.id], name: scan_profile_name).execute.first
+        scanner_profile = DastScannerProfilesFinder.new(project_ids: [project.id], name: scanner_profile_name).execute.first if scanner_profile_name.present?
 
         DastOnDemandScans::ParamsCreateService
-          .new(container: @project, params: { dast_site_profile: site_profile, dast_scanner_profile: scanner_profile })
+          .new(container: project, params: { dast_site_profile: site_profile, dast_scanner_profile: scanner_profile })
           .execute
       end
 

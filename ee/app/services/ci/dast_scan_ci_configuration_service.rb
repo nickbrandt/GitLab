@@ -17,6 +17,8 @@ module Ci
 
     def self.ci_template_raw
       <<~YAML
+        stages:
+          - dast
         include:
           - template: DAST-On-Demand-Scan.gitlab-ci.yml
       YAML

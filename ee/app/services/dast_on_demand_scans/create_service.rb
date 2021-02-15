@@ -31,7 +31,7 @@ module DastOnDemandScans
     end
 
     def create_pipeline
-      params_result = DastOnDemandScans::ParamsCreateService.new(container, current_user, params).execute
+      params_result = DastOnDemandScans::ParamsCreateService.new(container: container, current_user: current_user, params: params).execute
 
       return params_result unless params_result.success?
 

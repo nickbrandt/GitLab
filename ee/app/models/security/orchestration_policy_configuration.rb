@@ -21,7 +21,7 @@ module Security
     def active_policies
       security_policy_management_project
         .repository
-        .ls_files(security_policy_management_project.default_branch)
+        .ls_files(security_policy_management_project.default_branch_or_master)
         .grep(/\A#{Regexp.escape(POLICIES_BASE_PATH)}.+\.(yml|yaml)\z/)
         .map { |path| policy_at(path) }
         .select { |config| config[:enabled] }
@@ -30,7 +30,7 @@ module Security
     def policy_at(path)
       security_policy_management_project
         .repository
-        .blob_data_at(security_policy_management_project.default_branch, path)
+        .blob_data_at(security_policy_management_project.default_branch_or_master, path)
         .then { |config| Gitlab::Config::Loader::Yaml.new(config).load! }
     end
 
