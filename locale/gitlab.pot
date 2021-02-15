@@ -738,9 +738,6 @@ msgstr ""
 msgid "%{reportType} detected %{totalStart}no%{totalEnd} vulnerabilities."
 msgstr ""
 
-msgid "%{requirementCount} requirements have been selected for export. These will be sent to %{email} as an attachment once finished."
-msgstr ""
-
 msgid "%{retryButtonStart}Try again%{retryButtonEnd} or %{newFileButtonStart}attach a new file%{newFileButtonEnd}."
 msgstr ""
 
@@ -2545,6 +2542,9 @@ msgid "Advanced Search with Elasticsearch"
 msgstr ""
 
 msgid "Advanced Settings"
+msgstr ""
+
+msgid "Advanced export options"
 msgstr ""
 
 msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
@@ -12112,6 +12112,9 @@ msgid "Explore public groups"
 msgstr ""
 
 msgid "Export"
+msgstr ""
+
+msgid "Export %{requirementsCount} requirements?"
 msgstr ""
 
 msgid "Export as CSV"
@@ -22149,6 +22152,9 @@ msgstr ""
 msgid "Please select at least one filter to see results"
 msgstr ""
 
+msgid "Please select what should be included in each exported requirement."
+msgstr ""
+
 msgid "Please set a new password before proceeding."
 msgstr ""
 
@@ -29750,6 +29756,9 @@ msgid "These runners are specific to this project."
 msgstr ""
 
 msgid "These variables are inherited from the parent group."
+msgstr ""
+
+msgid "These will be sent to %{email} in an attachment once finished."
 msgstr ""
 
 msgid "Third Party Advisory Link"
