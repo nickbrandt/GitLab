@@ -23,6 +23,20 @@ function decodeUrlParameter(val) {
  * If you need to use search parameters or URL fragments, they should be
  *     added AFTER calling this function, not before.
  *
+ * Usecase: An image filename is stored verbatim, and you need to load it in
+ *     the browser.
+ *
+ * Example: /some_path/file #1.jpg      ==> /some_path/file%20%231.jpg
+ * Example: /some-path/file! Final!.jpg ==> /some-path/file%21%20Final%21.jpg
+ *
+ * Essentially, if a character *could* present a problem in a URL, it's escaped
+ *     to the hexadecimal representation instead. This means it's a bit more
+ *     aggressive than encodeURIComponent: that built-in function doesn't
+ *     encode some characters that *could* be problematic, so this function
+ *     adds them (#, !, ~, *, ', (, and )).
+ *     Additionally, encodeURIComponent *does* encode `/`, but we want safer
+ *     URLs, not non-functional URLs, so this function DEcodes slashes ('%2F').
+ *
  * @param {String} potentiallyUnsafePath
  * @returns {String}
  */
