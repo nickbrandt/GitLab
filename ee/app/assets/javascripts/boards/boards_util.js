@@ -1,3 +1,4 @@
+import { sortBy } from 'lodash';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import { objectToQuery } from '~/lib/utils/url_utility';
 import { getIdFromGraphQLId } from '~/graphql_shared/utils';
@@ -35,13 +36,12 @@ export function formatListEpics(listEpics) {
   let listEpicsCount;
 
   const listData = listEpics.nodes.reduce((map, list) => {
-    // TODO update when list.epics.count is available
+    // TODO update when list.epics.count is available: https://gitlab.com/gitlab-org/gitlab/-/issues/301017
     listEpicsCount = list.epics.edges.length;
-    const sortedEpics = list.epics.edges.map((epicNode) => ({
+    let sortedEpics = list.epics.edges.map((epicNode) => ({
       ...epicNode.node,
     }));
-    // TODO update when relativePosition is available on epic
-    // sortedEpics = sortBy(sortedEpics, 'relativePosition');
+    sortedEpics = sortBy(sortedEpics, 'relativePosition');
 
     return {
       ...map,
