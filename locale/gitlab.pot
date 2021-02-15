@@ -9059,7 +9059,7 @@ msgstr ""
 msgid "DAG visualization requires at least 3 dependent jobs."
 msgstr ""
 
-msgid "DAST Profiles"
+msgid "DAST Scans"
 msgstr ""
 
 msgid "DNS"
@@ -9215,7 +9215,13 @@ msgstr ""
 msgid "DastProfiles|New site profile"
 msgstr ""
 
-msgid "DastProfiles|No profiles created yet"
+msgid "DastProfiles|No scanner profiles created yet"
+msgstr ""
+
+msgid "DastProfiles|No scans saved yet"
+msgstr ""
+
+msgid "DastProfiles|No site profiles created yet"
 msgstr ""
 
 msgid "DastProfiles|Not Validated"
