@@ -173,6 +173,7 @@ class License < ApplicationRecord
     subepics
     threat_monitoring
     vulnerability_auto_fix
+    evaluate_group_level_compliance_pipeline
   ]
   EEU_FEATURES.freeze
 

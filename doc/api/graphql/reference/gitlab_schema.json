@@ -10821,7 +10821,7 @@
             },
             {
               "name": "pipelineConfigurationFullPath",
-              "description": "Full path of the compliance pipeline configuration stored in a project repository, such as `.gitlab/compliance/soc2/.gitlab-ci.yml`.",
+              "description": "Full path of the compliance pipeline configuration stored in a project repository, such as `.gitlab/.compliance-gitlab-ci.yml@compliance/hippa`.",
               "args": [
 
               ],
@@ -10991,7 +10991,7 @@
             },
             {
               "name": "pipelineConfigurationFullPath",
-              "description": "Full path of the compliance pipeline configuration stored in a project repository, such as `.gitlab/compliance/soc2/.gitlab-ci.yml`.",
+              "description": "Full path of the compliance pipeline configuration stored in a project repository, such as `.gitlab/.compliance-gitlab-ci.yml@compliance/hippa`.",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -53950,7 +53950,7 @@
             },
             {
               "name": "configSource",
-              "description": "Configuration source of the pipeline (UNKNOWN_SOURCE, REPOSITORY_SOURCE, AUTO_DEVOPS_SOURCE, WEBIDE_SOURCE, REMOTE_SOURCE, EXTERNAL_PROJECT_SOURCE, BRIDGE_SOURCE, PARAMETER_SOURCE)",
+              "description": "Configuration source of the pipeline (UNKNOWN_SOURCE, REPOSITORY_SOURCE, AUTO_DEVOPS_SOURCE, WEBIDE_SOURCE, REMOTE_SOURCE, EXTERNAL_PROJECT_SOURCE, BRIDGE_SOURCE, PARAMETER_SOURCE, COMPLIANCE_SOURCE)",
               "args": [
 
               ],
@@ -54844,6 +54844,12 @@
             },
             {
               "name": "PARAMETER_SOURCE",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "COMPLIANCE_SOURCE",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null

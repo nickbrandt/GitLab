@@ -3973,7 +3973,7 @@ type ComplianceFramework {
 
   """
   Full path of the compliance pipeline configuration stored in a project
-  repository, such as `.gitlab/compliance/soc2/.gitlab-ci.yml`.
+  repository, such as `.gitlab/.compliance-gitlab-ci.yml@compliance/hippa`.
   """
   pipelineConfigurationFullPath: String
 }
@@ -4031,7 +4031,7 @@ input ComplianceFrameworkInput {
 
   """
   Full path of the compliance pipeline configuration stored in a project
-  repository, such as `.gitlab/compliance/soc2/.gitlab-ci.yml`.
+  repository, such as `.gitlab/.compliance-gitlab-ci.yml@compliance/hippa`.
   """
   pipelineConfigurationFullPath: String
 }
@@ -18383,7 +18383,7 @@ type Pipeline {
   """
   Configuration source of the pipeline (UNKNOWN_SOURCE, REPOSITORY_SOURCE,
   AUTO_DEVOPS_SOURCE, WEBIDE_SOURCE, REMOTE_SOURCE, EXTERNAL_PROJECT_SOURCE,
-  BRIDGE_SOURCE, PARAMETER_SOURCE)
+  BRIDGE_SOURCE, PARAMETER_SOURCE, COMPLIANCE_SOURCE)
   """
   configSource: PipelineConfigSourceEnum
 
@@ -18654,6 +18654,7 @@ type PipelineCancelPayload {
 enum PipelineConfigSourceEnum {
   AUTO_DEVOPS_SOURCE
   BRIDGE_SOURCE
+  COMPLIANCE_SOURCE
   EXTERNAL_PROJECT_SOURCE
   PARAMETER_SOURCE
   REMOTE_SOURCE
