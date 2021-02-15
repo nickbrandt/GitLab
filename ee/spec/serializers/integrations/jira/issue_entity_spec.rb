@@ -56,6 +56,7 @@ RSpec.describe Integrations::Jira::IssueEntity do
         { name: 'assignee' }
       ],
       web_url: 'http://jira.com/browse/GL-5',
+      gitlab_web_url: Gitlab::Routing.url_helpers.project_integrations_jira_issue_path(project, 'GL-5'),
       references: { relative: 'GL-5' },
       external_tracker: 'jira'
     )
@@ -107,6 +108,16 @@ RSpec.describe Integrations::Jira::IssueEntity do
 
     it 'returns an empty array' do
       expect(subject).to include(labels: [])
+    end
+  end
+
+  context 'feature flag "jira_issues_show_integration" is disabled' do
+    before do
+      stub_feature_flags(jira_issues_show_integration: false)
+    end
+
+    it 'sets `gitlab_web_url` to nil' do
+      expect(subject[:gitlab_web_url]).to eq(nil)
     end
   end
 end
