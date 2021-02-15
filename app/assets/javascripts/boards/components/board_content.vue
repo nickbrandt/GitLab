@@ -20,11 +20,6 @@ export default {
     GlAlert,
   },
   mixins: [glFeatureFlagMixin()],
-  inject: {
-    isEpicBoard: {
-      default: false,
-    },
-  },
   props: {
     lists: {
       type: Array,
@@ -41,7 +36,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(['boardLists', 'error']),
+    ...mapState(['boardLists', 'error', 'isEpicBoard']),
     ...mapGetters(['isSwimlanesOn']),
     boardListsToUse() {
       return this.glFeatures.graphqlBoardLists || this.isSwimlanesOn || this.isEpicBoard

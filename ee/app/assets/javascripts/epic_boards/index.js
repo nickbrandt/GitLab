@@ -61,7 +61,6 @@ export default () => {
         ? parseInt($boardApp.dataset.boardWeight, 10)
         : null,
       scopedLabelsAvailable: parseBoolean($boardApp.dataset.scopedLabels),
-      isEpicBoard: true,
     },
     store,
     apolloProvider,

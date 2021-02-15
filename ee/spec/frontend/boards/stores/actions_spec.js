@@ -136,16 +136,16 @@ describe('performSearch', () => {
 });
 
 describe('fetchLists', () => {
-  it('should dispatch fetchIssueLists action when isEpicBoard is false on state', () => {
-    testAction({
+  it('should dispatch fetchIssueLists action when isEpicBoard is false on state', async () => {
+    await testAction({
       action: actions.fetchLists,
       state: { isEpicBoard: false },
       expectedActions: [{ type: 'fetchIssueLists' }],
     });
   });
 
-  it('should dispatch fetchEpicLists action when isEpicBoard is true on state', () => {
-    testAction({
+  it('should dispatch fetchEpicLists action when isEpicBoard is true on state', async () => {
+    await testAction({
       action: actions.fetchLists,
       state: { isEpicBoard: true },
       expectedActions: [{ type: 'fetchEpicLists' }],
@@ -174,39 +174,33 @@ describe('fetchEpicLists', () => {
 
   const formattedLists = formatBoardLists(queryResponse.data.group.epicBoard.lists);
 
-  it('should commit mutations RECEIVE_BOARD_LISTS_SUCCESS on success', (done) => {
+  it('should commit mutations RECEIVE_BOARD_LISTS_SUCCESS on success', async () => {
     jest.spyOn(gqlClient, 'query').mockResolvedValue(queryResponse);
 
-    testAction(
-      actions.fetchEpicLists,
-      {},
+    await testAction({
+      action: actions.fetchEpicLists,
       state,
-      [
+      expectedMutations: [
         {
           type: types.RECEIVE_BOARD_LISTS_SUCCESS,
           payload: formattedLists,
         },
       ],
-      [],
-      done,
-    );
+    });
   });
 
-  it('should commit mutations RECEIVE_BOARD_LISTS_FAILURE on failure', (done) => {
+  it('should commit mutations RECEIVE_BOARD_LISTS_FAILURE on failure', async () => {
     jest.spyOn(gqlClient, 'query').mockResolvedValue(Promise.reject());
 
-    testAction(
-      actions.fetchEpicLists,
-      {},
+    await testAction({
+      action: actions.fetchEpicLists,
       state,
-      [
+      expectedMutations: [
         {
           type: types.RECEIVE_BOARD_LISTS_FAILURE,
         },
       ],
-      [],
-      done,
-    );
+    });
   });
 });
 

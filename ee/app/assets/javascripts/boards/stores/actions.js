@@ -30,14 +30,14 @@ import {
 
 import { EpicFilterType, IterationFilterType, GroupByParamType } from '../constants';
 import epicQuery from '../graphql/epic.query.graphql';
+import epicBoardListsQuery from '../graphql/epic_board_lists.query.graphql';
 import epicsSwimlanesQuery from '../graphql/epics_swimlanes.query.graphql';
 import issueMoveListMutation from '../graphql/issue_move_list.mutation.graphql';
 import issueSetEpicMutation from '../graphql/issue_set_epic.mutation.graphql';
 import issueSetWeightMutation from '../graphql/issue_set_weight.mutation.graphql';
 import listUpdateLimitMetricsMutation from '../graphql/list_update_limit_metrics.mutation.graphql';
-import updateBoardEpicUserPreferencesMutation from '../graphql/updateBoardEpicUserPreferences.mutation.graphql';
-import epicBoardListsQuery from '../graphql/epic_board_lists.query.graphql';
 import listsEpicsQuery from '../graphql/lists_epics.query.graphql';
+import updateBoardEpicUserPreferencesMutation from '../graphql/updateBoardEpicUserPreferences.mutation.graphql';
 
 import boardsStoreEE from './boards_store_ee';
 import * as types from './mutation_types';
@@ -318,6 +318,7 @@ export default {
 
     if (state.isEpicBoard) {
       // This currently always fails. Epics will be loaded and displayed in the next iteration
+      // Issue: https://gitlab.com/gitlab-org/gitlab/-/issues/233438
       return fetchAndFormatListEpics(state, variables)
         .then(({ listEpics, listPageInfo }) => {
           commit(types.RECEIVE_ITEMS_FOR_LIST_SUCCESS, {

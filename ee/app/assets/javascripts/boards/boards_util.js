@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash';
+import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import { objectToQuery } from '~/lib/utils/url_utility';
-import { getIdFromGraphQLId } from '~/graphql_shared/utils';
 import {
   IterationFilterType,
   IterationIDs,
