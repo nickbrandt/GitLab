@@ -958,12 +958,6 @@ RSpec.describe ApplicationSetting do
 
   it_behaves_like 'application settings examples'
 
-  describe 'repository_storages_weighted_attributes' do
-    it 'returns the keys for repository_storages_weighted' do
-      expect(subject.class.repository_storages_weighted_attributes).to eq([:repository_storages_weighted_default])
-    end
-  end
-
   describe 'kroki_format_supported?' do
     it 'returns true when Excalidraw is enabled' do
       subject.kroki_formats_excalidraw = true
