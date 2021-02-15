@@ -53370,7 +53370,7 @@
             },
             {
               "name": "NPM",
-              "description": "Packages from the NPM package manager",
+              "description": "Packages from the npm package manager",
               "isDeprecated": false,
               "deprecationReason": null
             },
