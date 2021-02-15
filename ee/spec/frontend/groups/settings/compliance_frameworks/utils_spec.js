@@ -1,7 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
-import httpStatus from '~/lib/utils/http_status';
 import * as Utils from 'ee/groups/settings/compliance_frameworks/utils';
 import axios from '~/lib/utils/axios_utils';
+import httpStatus from '~/lib/utils/http_status';
 
 const GET_RAW_FILE_ENDPOINT = /\/api\/(.*)\/projects\/bar%2Fbaz\/repository\/files\/foo\.ya?ml\/raw/;
 
