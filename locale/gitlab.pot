@@ -30863,12 +30863,6 @@ msgstr ""
 msgid "Toggle thread"
 msgstr ""
 
-msgid "ToggleButton|Toggle Status: OFF"
-msgstr ""
-
-msgid "ToggleButton|Toggle Status: ON"
-msgstr ""
-
 msgid "Toggled :%{name}: emoji award."
 msgstr ""
 
