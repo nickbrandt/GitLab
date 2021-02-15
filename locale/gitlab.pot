@@ -18272,9 +18272,6 @@ msgstr ""
 msgid "Maximum Maven package file size in bytes"
 msgstr ""
 
-msgid "Maximum NPM package file size in bytes"
-msgstr ""
-
 msgid "Maximum NuGet package file size in bytes"
 msgstr ""
 
@@ -18330,6 +18327,9 @@ msgid "Maximum job timeout has a value which could not be accepted"
 msgstr ""
 
 msgid "Maximum lifetime allowable for Personal Access Tokens is active, your expire date must be set before %{maximum_allowable_date}."
+msgstr ""
+
+msgid "Maximum npm package file size in bytes"
 msgstr ""
 
 msgid "Maximum number of %{name} (%{count}) exceeded"
@@ -21314,9 +21314,6 @@ msgstr ""
 msgid "PackageRegistry|Maven XML"
 msgstr ""
 
-msgid "PackageRegistry|NPM"
-msgstr ""
-
 msgid "PackageRegistry|NuGet"
 msgstr ""
 
@@ -21401,6 +21398,9 @@ msgstr ""
 msgid "PackageRegistry|You may also need to setup authentication using an auth token. %{linkStart}See the documentation%{linkEnd} to find out more."
 msgstr ""
 
+msgid "PackageRegistry|npm"
+msgstr ""
+
 msgid "PackageRegistry|npm command"
 msgstr ""
 
@@ -21422,13 +21422,13 @@ msgstr ""
 msgid "PackageType|Maven"
 msgstr ""
 
-msgid "PackageType|NPM"
-msgstr ""
-
 msgid "PackageType|NuGet"
 msgstr ""
 
 msgid "PackageType|PyPI"
+msgstr ""
+
+msgid "PackageType|npm"
 msgstr ""
 
 msgid "Packages"
@@ -33199,7 +33199,7 @@ msgstr ""
 msgid "When enabled, any user visiting %{host} will be able to create an account."
 msgstr ""
 
-msgid "When enabled, if an NPM package isn't found in the GitLab Registry, we will attempt to pull from the global NPM registry."
+msgid "When enabled, if an npm package isn't found in the GitLab Registry, we will attempt to pull from the global npm registry."
 msgstr ""
 
 msgid "When enabled, users cannot use GitLab until the terms have been accepted."
