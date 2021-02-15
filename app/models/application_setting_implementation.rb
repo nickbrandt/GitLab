@@ -293,10 +293,6 @@ module ApplicationSettingImplementation
     Array(read_attribute(:repository_storages))
   end
 
-  def repository_storages_weighted
-    read_attribute(:repository_storages_weighted)
-  end
-
   def commit_email_hostname
     super.presence || self.class.default_commit_email_hostname
   end
