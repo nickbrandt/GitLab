@@ -20290,6 +20290,11 @@ type Project {
     iids: [ID!]
 
     """
+    The state of latest requirement test report.
+    """
+    lastTestReportState: TestReportState
+
+    """
     Search query for requirement title.
     """
     search: String
@@ -20348,6 +20353,11 @@ type Project {
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    The state of latest requirement test report.
+    """
+    lastTestReportState: TestReportState
 
     """
     Search query for requirement title.
