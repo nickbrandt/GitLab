@@ -18179,7 +18179,7 @@ enum PackageTypeEnum {
   MAVEN
 
   """
-  Packages from the NPM package manager
+  Packages from the npm package manager
   """
   NPM
 
