@@ -976,6 +976,9 @@ msgstr ""
 msgid "'%{name}' Value Stream deleted"
 msgstr ""
 
+msgid "'%{name}' Value Stream saved"
+msgstr ""
+
 msgid "'%{name}' stage already exists"
 msgstr ""
 
@@ -8692,7 +8695,7 @@ msgstr ""
 msgid "CreateValueStreamForm|'%{name}' Value Stream created"
 msgstr ""
 
-msgid "CreateValueStreamForm|'%{name}' Value Stream edited"
+msgid "CreateValueStreamForm|'%{name}' Value Stream saved"
 msgstr ""
 
 msgid "CreateValueStreamForm|Add another stage"
@@ -25936,6 +25939,9 @@ msgid "Save %{name} size limits"
 msgstr ""
 
 msgid "Save Changes"
+msgstr ""
+
+msgid "Save Value Stream"
 msgstr ""
 
 msgid "Save application"
