@@ -502,6 +502,7 @@ class ApplicationSetting < ApplicationRecord
             inclusion: { in: [true, false], message: _('must be a boolean value') }
 
   before_validation :ensure_uuid!
+  before_validation :coerce_repository_storages_weighted, if: :repository_storages_weighted_changed?
 
   before_save :ensure_runners_registration_token
   before_save :ensure_health_check_access_token

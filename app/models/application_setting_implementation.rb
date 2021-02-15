@@ -465,16 +465,20 @@ module ApplicationSettingImplementation
       invalid.empty?
   end
 
+  def coerce_repository_storages_weighted
+    repository_storages_weighted.transform_values!(&:to_i)
+  end
+
   def check_repository_storages_weighted
     invalid = repository_storages_weighted.keys - Gitlab.config.repositories.storages.keys
-    errors.add(:repository_storages_weighted, "can't include: %{invalid_storages}" % { invalid_storages: invalid.join(", ") }) unless
+    errors.add(:repository_storages_weighted, _("can't include: %{invalid_storages}") % { invalid_storages: invalid.join(", ") }) unless
       invalid.empty?
 
     repository_storages_weighted.each do |key, val|
       next unless val.present?
 
-      errors.add(:"repository_storages_weighted_#{key}", "value must be an integer") unless val.is_a?(Integer)
-      errors.add(:"repository_storages_weighted_#{key}", "value must be between 0 and 100") unless val.between?(0, 100)
+      errors.add(:repository_storages_weighted, _("value for '%{storage}' must be an integer") % { storage: key }) unless val.is_a?(Integer)
+      errors.add(:repository_storages_weighted, _("value for '%{storage}' must be between 0 and 100") % { storage: key }) unless val.between?(0, 100)
     end
   end
 

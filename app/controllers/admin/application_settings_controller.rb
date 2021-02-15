@@ -249,7 +249,8 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       disabled_oauth_sign_in_sources: [],
       import_sources: [],
       repository_storages: [],
-      restricted_visibility_levels: []
+      restricted_visibility_levels: [],
+      repository_storages_weighted: {}
     ]
   end
 
