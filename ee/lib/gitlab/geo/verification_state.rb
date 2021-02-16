@@ -85,7 +85,7 @@ module Gitlab
           end
 
           event :verification_pending do
-            transition [:verification_started, :verification_succeeded, :verification_failed] => :verification_pending
+            transition [:verification_pending, :verification_started, :verification_succeeded, :verification_failed] => :verification_pending
           end
         end
 
@@ -313,6 +313,8 @@ module Gitlab
         if resource_updated_during_checksum?(calculation_started_at)
           # just let backfill pick it up
           self.verification_pending!
+        elsif Gitlab::Geo.primary?
+          self.replicator.handle_after_checksum_succeeded
         end
       end
 
