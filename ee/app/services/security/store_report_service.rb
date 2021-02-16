@@ -96,9 +96,16 @@ module Security
         vulnerability_finding.save!
         vulnerability_finding
       rescue ActiveRecord::RecordNotUnique => e
-        Gitlab::ErrorTracking.track_and_raise_exception(e, find_params: find_params, uuid: finding.uuid)
+        # This might happen if we're processing another report in parallel and it finds the same Finding
+        # faster. In that case we need to perform the lookup again
 
-        vulnerability_finding
+        by_uuid = project.vulnerability_findings.reset.find_by(uuid: finding.uuid)
+        return by_uuid if by_uuid
+
+        by_find_params = project.vulnerability_findings.reset.find_by(find_params)
+        return by_find_params if by_find_params
+
+        Gitlab::ErrorTracking.track_and_raise_exception(e, find_params: find_params, uuid: finding.uuid)
       rescue ActiveRecord::RecordInvalid => e
         Gitlab::ErrorTracking.track_and_raise_exception(e, create_params: create_params&.dig(:raw_metadata))
       end
