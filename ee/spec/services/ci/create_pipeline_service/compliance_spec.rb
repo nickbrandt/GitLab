@@ -54,7 +54,7 @@ RSpec.describe Ci::CreatePipelineService do
     end
 
     it do
-      expect(execute.processables.map(&:name)).to eq(%w(compliance_build compliance_test))
+      expect(execute.processables.map(&:name)).to contain_exactly('compliance_build', 'compliance_test')
     end
   end
 
