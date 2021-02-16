@@ -18638,6 +18638,11 @@ type Pipeline {
   Permissions for the current user on the resource
   """
   userPermissions: PipelinePermissions!
+
+  """
+  Indicates if a pipeline has warnings.
+  """
+  warnings: Boolean!
 }
 
 type PipelineAnalytics {
