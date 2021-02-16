@@ -34,6 +34,9 @@ module EE
                     due_date_is_fixed: dueDateIsFixed
                     relative_position: relativePosition
                     confidential
+                    author {
+                      public_email: publicEmail
+                    }
                     parent {
                       iid
                     }
