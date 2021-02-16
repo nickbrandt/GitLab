@@ -58,14 +58,14 @@ RSpec.shared_examples 'a verifiable replicator' do
         allow(described_class).to receive(:verification_enabled?).and_return(true)
       end
 
-      it 'returns the number of available replicables where verification succeeded' do
-        model_record.verification_started!
+      it 'returns the number of available verifiables where verification succeeded' do
+        model_record.verification_started
         model_record.verification_succeeded_with_checksum!('some checksum', Time.current)
 
         expect(described_class.checksummed_count).to eq(1)
       end
 
-      it 'excludes other verification states' do
+      it 'excludes non-success verification states' do
         model_record.verification_started!
 
         expect(described_class.checksummed_count).to eq(0)
@@ -95,7 +95,7 @@ RSpec.shared_examples 'a verifiable replicator' do
         allow(described_class).to receive(:verification_enabled?).and_return(true)
       end
 
-      it 'returns the number of available replicables where verification failed' do
+      it 'returns the number of available verifiables where verification failed' do
         model_record.verification_started!
         model_record.verification_failed_with_message!('some error message')
 

@@ -128,7 +128,7 @@ module Geo
         # Bonus: This causes the progress bar to be hidden.
         return unless verification_enabled?
 
-        model.available_replicables.verification_succeeded.count
+        model.verification_succeeded.count
       end
 
       def checksum_failed_count
@@ -136,7 +136,15 @@ module Geo
         # Bonus: This causes the progress bar to be hidden.
         return unless verification_enabled?
 
-        model.available_replicables.verification_failed.count
+        model.verification_failed.count
+      end
+
+      def checksum_total_count
+        # When verification is disabled, this returns nil.
+        # Bonus: This causes the progress bar to be hidden.
+        return unless verification_enabled?
+
+        model.available_verifiables.count
       end
 
       def verified_count
@@ -153,6 +161,14 @@ module Geo
         return unless verification_enabled?
 
         registry_class.synced.verification_failed.count
+      end
+
+      def verification_total_count
+        # When verification is disabled, this returns nil.
+        # Bonus: This causes the progress bar to be hidden.
+        return unless verification_enabled?
+
+        registry_class.synced.available_verifiables.count
       end
     end
 
