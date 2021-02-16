@@ -42,15 +42,15 @@ module Tooling
       This merge request requires a changelog entry because it [%<reason>s](https://docs.gitlab.com/ee/development/changelog.html#what-warrants-a-changelog-entry).
       MSG
 
-      def required_reasons(feature_flag_helper: nil)
+      def required_reasons
         [].tap do |reasons|
-          reasons << :db_changes if git.added_files.any? { |path| path =~ %r{\Adb/(migrate|post_migrate)/} }
-          reasons << :feature_flag_removed if feature_flag_helper&.respond_to?(:feature_flag_files) && feature_flag_helper.feature_flag_files(change_type: :deleted).any?
+          reasons << :db_changes if helper.changes.added.has_category?(:migration)
+          reasons << :feature_flag_removed if helper.changes.deleted.has_category?(:feature_flag)
         end
       end
 
-      def required?(feature_flag_helper: nil)
-        required_reasons(feature_flag_helper: feature_flag_helper).any?
+      def required?
+        required_reasons.any?
       end
 
       def optional?
@@ -58,7 +58,7 @@ module Tooling
       end
 
       def found
-        @found ||= git.added_files.find { |path| path =~ %r{\A(ee/)?(changelogs/unreleased)(-ee)?/} }
+        @found ||= helper.changes.added.by_category(:changelog).files.first
       end
 
       def ee_changelog?
@@ -67,38 +67,34 @@ module Tooling
 
       def modified_text
         CHANGELOG_MODIFIED_URL_TEXT +
-          format(OPTIONAL_CHANGELOG_MESSAGE, mr_iid: mr_iid, mr_title: sanitized_mr_title)
+          format(OPTIONAL_CHANGELOG_MESSAGE, mr_iid: helper.mr_iid, mr_title: sanitized_mr_title)
       end
 
-      def required_texts(feature_flag_helper: nil)
-        required_reasons(feature_flag_helper: feature_flag_helper).each_with_object({}) do |required_reason, memo|
+      def required_texts
+        required_reasons.each_with_object({}) do |required_reason, memo|
           memo[required_reason] =
             CHANGELOG_MISSING_URL_TEXT +
-              format(REQUIRED_CHANGELOG_MESSAGE, reason: REQUIRED_CHANGELOG_REASONS.fetch(required_reason), mr_iid: mr_iid, mr_title: sanitized_mr_title)
+              format(REQUIRED_CHANGELOG_MESSAGE, reason: REQUIRED_CHANGELOG_REASONS.fetch(required_reason), mr_iid: helper.mr_iid, mr_title: sanitized_mr_title)
         end
       end
 
       def optional_text
         CHANGELOG_MISSING_URL_TEXT +
-          format(OPTIONAL_CHANGELOG_MESSAGE, mr_iid: mr_iid, mr_title: sanitized_mr_title)
+          format(OPTIONAL_CHANGELOG_MESSAGE, mr_iid: helper.mr_iid, mr_title: sanitized_mr_title)
       end
 
       private
 
-      def mr_iid
-        gitlab.mr_json["iid"]
-      end
-
       def sanitized_mr_title
-        TitleLinting.sanitize_mr_title(gitlab.mr_json["title"])
+        TitleLinting.sanitize_mr_title(helper.mr_title)
       end
 
       def categories_need_changelog?
-        (helper.changes_by_category.keys - NO_CHANGELOG_CATEGORIES).any?
+        (helper.changes.categories - NO_CHANGELOG_CATEGORIES).any?
       end
 
       def without_no_changelog_label?
-        (gitlab.mr_labels & NO_CHANGELOG_LABELS).empty?
+        (helper.mr_labels & NO_CHANGELOG_LABELS).empty?
       end
     end
   end
