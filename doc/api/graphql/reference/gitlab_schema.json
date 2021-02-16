@@ -40561,7 +40561,7 @@
                 "name": "String",
                 "ofType": null
               },
-              "defaultValue": "\"#428BCA\""
+              "defaultValue": "\"#6699cc\""
             },
             {
               "name": "clientMutationId",
