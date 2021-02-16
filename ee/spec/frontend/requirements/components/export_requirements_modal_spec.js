@@ -1,5 +1,5 @@
-import { shallowMount } from '@vue/test-utils';
 import { GlModal, GlFormCheckbox } from '@gitlab/ui';
+import { shallowMount } from '@vue/test-utils';
 
 import ExportRequirementsModal from 'ee/requirements/components/export_requirements_modal.vue';
 
