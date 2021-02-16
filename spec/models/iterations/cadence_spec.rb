@@ -2,16 +2,16 @@
 
 require 'spec_helper'
 
-RSpec.describe Iteration::Cadence do
+RSpec.describe Iterations::Cadence do
   describe 'associations' do
-    subject { build(:iteration_cadence) }
+    subject { build(:iterations_cadence) }
 
     it { is_expected.to belong_to(:group) }
-    it { is_expected.to have_many(:iterations).inverse_of(:iteration_cadence) }
+    it { is_expected.to have_many(:iterations).inverse_of(:iterations_cadence) }
   end
 
   describe 'validations' do
-    subject { build(:iteration_cadence) }
+    subject { build(:iterations_cadence) }
 
     it { is_expected.to validate_presence_of(:title) }
     it { is_expected.to validate_presence_of(:start_date) }

@@ -9,7 +9,7 @@ module Gitlab
       end
 
       class IterationCadence < ApplicationRecord
-        self.table_name = 'iteration_cadences'
+        self.table_name = 'iterations_cadences'
 
         include BulkInsertSafe
       end
@@ -19,13 +19,13 @@ module Gitlab
       end
 
       def perform(*group_ids)
-        create_iteration_cadences(group_ids)
-        assign_iteration_cadences(group_ids)
+        create_iterations_cadences(group_ids)
+        assign_iterations_cadences(group_ids)
       end
 
       private
 
-      def create_iteration_cadences(group_ids)
+      def create_iterations_cadences(group_ids)
         groups_with_cadence = IterationCadence.select(:group_id)
         new_cadences = Group.where(id: group_ids).where.not(id: groups_with_cadence).map do |group|
           last_iteration = Iteration.where(group_id: group.id).order(:start_date)&.last
@@ -47,9 +47,9 @@ module Gitlab
         IterationCadence.bulk_insert!(new_cadences.compact)
       end
 
-      def assign_iteration_cadences(group_ids)
+      def assign_iterations_cadences(group_ids)
         IterationCadence.where(group_id: group_ids).each do |cadence|
-          Iteration.where(iteration_cadence_id: nil).where(group_id: cadence.group_id).update_all(iteration_cadence_id: cadence.id)
+          Iteration.where(iterations_cadence_id: nil).where(group_id: cadence.group_id).update_all(iterations_cadence_id: cadence.id)
         end
       end
     end

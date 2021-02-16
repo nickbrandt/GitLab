@@ -16,7 +16,7 @@ class Iteration < ApplicationRecord
 
   belongs_to :project
   belongs_to :group
-  belongs_to :iteration_cadence, class_name: 'Iteration::Cadence', foreign_key: :iteration_cadence_id, inverse_of: :iterations
+  belongs_to :iterations_cadence, class_name: 'Iterations::Cadence', foreign_key: :iterations_cadence_id, inverse_of: :iterations
 
   has_internal_id :iid, scope: :project
   has_internal_id :iid, scope: :group
@@ -29,7 +29,7 @@ class Iteration < ApplicationRecord
   validate :no_project, unless: :skip_project_validation
   validate :validate_group
 
-  before_create :set_iteration_cadence
+  before_create :set_iterations_cadence
 
   scope :upcoming, -> { with_state(:upcoming) }
   scope :started, -> { with_state(:started) }
@@ -141,25 +141,25 @@ class Iteration < ApplicationRecord
   end
 
   # TODO: this method should be removed as part of https://gitlab.com/gitlab-org/gitlab/-/issues/296099
-  def set_iteration_cadence
-    return if iteration_cadence
+  def set_iterations_cadence
+    return if iterations_cadence
     # For now we support only group iterations
     # issue to clarify project iterations: https://gitlab.com/gitlab-org/gitlab/-/issues/299864
     return unless group
 
-    self.iteration_cadence = group.iteration_cadences.first || create_default_cadence
+    self.iterations_cadence = group.iterations_cadences.first || create_default_cadence
   end
 
   def create_default_cadence
     cadence_title = "#{group.name} Iterations"
 
-    Iteration::Cadence.create!(group: group, title: cadence_title, start_date: start_date)
+    Iterations::Cadence.create!(group: group, title: cadence_title, start_date: start_date)
   end
 
   # TODO: remove this as part of https://gitlab.com/gitlab-org/gitlab/-/issues/296100
   def validate_group
-    return unless iteration_cadence
-    return if iteration_cadence.group_id == group_id
+    return unless iterations_cadence
+    return if iterations_cadence.group_id == group_id
 
     errors.add(:group, s_('is not valid. The iteration group has to match the iteration cadence group.'))
   end

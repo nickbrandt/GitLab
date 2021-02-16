@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-class Iteration::Cadence < ApplicationRecord
-  self.table_name = 'iteration_cadences'
+class Iterations::Cadence < ApplicationRecord
+  self.table_name = 'iterations_cadences'
 
   belongs_to :group
-  has_many :iterations, foreign_key: :iteration_cadence_id, inverse_of: :iteration_cadence
+  has_many :iterations, foreign_key: :iterations_cadence_id, inverse_of: :iterations_cadence
 
   validates :title, presence: true
   validates :start_date, presence: true

@@ -5,7 +5,7 @@ FactoryBot.define do
     n.days.from_now
   end
 
-  factory :iteration_cadence, class: 'Iteration::Cadence' do
+  factory :iterations_cadence, class: 'Iterations::Cadence' do
     title
     group
     start_date { generate(:cadence_sequential_date) }
