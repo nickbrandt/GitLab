@@ -68,7 +68,7 @@ describe('Test reports suite table', () => {
     beforeEach(() => createComponent());
 
     it('renders the correct number of rows', () => {
-      expect(allCaseRows().length).toBe(testCases.length);
+      expect(allCaseRows()).toHaveLength(testCases.length);
     });
 
     it.each([
@@ -125,7 +125,7 @@ describe('Test reports suite table', () => {
         })),
       });
 
-      expect(allCaseRows().length).toBe(testCases.length);
+      expect(allCaseRows()).toHaveLength(testCases.length);
     });
   });
 
@@ -139,7 +139,7 @@ describe('Test reports suite table', () => {
         })),
       });
 
-      expect(allCaseRows().length).toBe(testCases.length);
+      expect(allCaseRows()).toHaveLength(testCases.length);
     });
   });
 });
