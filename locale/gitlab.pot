@@ -20862,10 +20862,10 @@ msgstr ""
 msgid "Open errors"
 msgstr ""
 
-msgid "Open in Xcode"
+msgid "Open in file view"
 msgstr ""
 
-msgid "Open in file view"
+msgid "Open in your IDE"
 msgstr ""
 
 msgid "Open issues"
@@ -32453,6 +32453,9 @@ msgstr ""
 msgid "Visit settings page"
 msgstr ""
 
+msgid "Visual Studio Code"
+msgstr ""
+
 msgid "VisualReviewApp|%{stepStart}Step 1%{stepEnd}. Copy the following script:"
 msgstr ""
 
@@ -33284,6 +33287,9 @@ msgid "Write your release notes or drag your files here…"
 msgstr ""
 
 msgid "Wrong extern UID provided. Make sure Auth0 is configured correctly."
+msgstr ""
+
+msgid "Xcode"
 msgstr ""
 
 msgid "YYYY-MM-DD"
