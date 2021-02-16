@@ -311,9 +311,21 @@ RSpec.describe Gitlab::GitalyClient do
         end
       end
 
-      context 'when RequestStore is enabled with git_env', :request_store do
+      context 'when RequestStore is enabled with empty git_env', :request_store do
         before do
-          Gitlab::SafeRequestStore[:gitlab_git_env] = true
+          Gitlab::SafeRequestStore[:gitlab_git_env] = {}
+        end
+
+        it 'disables force-routing to primary' do
+          expect(described_class.request_kwargs('default', timeout: 1)[:metadata][policy]).to be_nil
+        end
+      end
+
+      context 'when RequestStore is enabled with populated git_env', :request_store do
+        before do
+          Gitlab::SafeRequestStore[:gitlab_git_env] = {
+            "GIT_OBJECT_DIRECTORY_RELATIVE" => "foo/bar"
+          }
         end
 
         it 'enables force-routing to primary' do
