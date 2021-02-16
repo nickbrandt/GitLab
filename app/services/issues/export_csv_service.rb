@@ -5,6 +5,12 @@ module Issues
     include Gitlab::Routing.url_helpers
     include GitlabRoutingHelper
 
+    def initialize(issuables_relation, project)
+      super
+
+      @labels = @issuables.labels_hash
+    end
+
     def email(user)
       Notify.issues_csv_email(user, project, csv_data, csv_builder.status).deliver_now
     end
@@ -41,7 +47,7 @@ module Issues
     end
 
     def issue_labels(issue)
-      issuables.labels_hash[issue.id].sort.join(',').presence
+      @labels[issue.id].sort.join(',').presence
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
