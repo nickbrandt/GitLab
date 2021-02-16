@@ -111,6 +111,7 @@ RSpec.describe Security::StoreReportService, '#execute' do
   context 'with existing data from previous pipeline' do
     let(:scanner) { build(:vulnerabilities_scanner, project: project, external_id: 'bandit', name: 'Bandit') }
     let(:identifier) { build(:vulnerabilities_identifier, project: project, fingerprint: 'e6dd15eda2137be0034977a85b300a94a4f243a3') }
+    let(:different_identifier) { build(:vulnerabilities_identifier, project: project, fingerprint: 'fa47ee81f079e5c38ea6edb700b44eaeb62f67ee') }
     let!(:new_artifact) { create(:ee_ci_job_artifact, :sast, job: new_build) }
     let(:new_build) { create(:ci_build, pipeline: new_pipeline) }
     let(:new_pipeline) { create(:ci_pipeline, project: project) }
@@ -128,13 +129,25 @@ RSpec.describe Security::StoreReportService, '#execute' do
         location_fingerprint: 'd869ba3f0b3347eb2749135a437dc07c8ae0f420')
     end
 
+    let!(:vulnerability) { create(:vulnerability, findings: [finding], project: project) }
+
     let(:uuid_v5_components) do
       "#{finding.report_type}-#{finding.primary_identifier.fingerprint}-#{finding.location_fingerprint}-#{finding.project_id}"
     end
 
     let(:desired_uuid) { Gitlab::UUID.v5(uuid_v5_components) }
 
-    let!(:vulnerability) { create(:vulnerability, findings: [finding], project: project) }
+    let!(:finding_with_uuidv5) do
+      create(:vulnerabilities_finding,
+        pipelines: [pipeline],
+        identifiers: [different_identifier],
+        primary_identifier: different_identifier,
+        scanner: scanner,
+        project: project,
+        location_fingerprint: '34661e23abcf78ff80dfcc89d0700437612e3f88')
+    end
+
+    let!(:vulnerability_with_uuid5) { create(:vulnerability, findings: [finding_with_uuidv5], project: project) }
 
     before do
       project.add_developer(user)
@@ -142,6 +155,10 @@ RSpec.describe Security::StoreReportService, '#execute' do
     end
 
     subject { described_class.new(new_pipeline, new_report).execute }
+
+    it 'does not change existing UUIDv5' do
+      expect { subject }.not_to change(finding_with_uuidv5, :uuid)
+    end
 
     it 'updates UUIDv4 to UUIDv5' do
       subject
