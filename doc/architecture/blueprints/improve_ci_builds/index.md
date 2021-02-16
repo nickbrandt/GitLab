@@ -96,16 +96,31 @@ and the amount of queries executed using the table. This significantly hinders
 the development velocity and contributes to incidents on the production
 environment.
 
+## Proposal
+
+We want to start from migrating primary keys what is the most urgent thing. We
+will need to create a new column and copy all the ids. It means that building
+reliable and fast background migrations is a prerequisite for getting it done.
+
+We will also need better background migrations to migrate data out of the
+`ci_builds` table and to setup partitioning for this table once we settle on
+our partitioning strategy for it.
+
+There are multiple ways to partition `ci_builds` table, but because the
+importance and relevance of a pipeline data decays with time, we might want to
+use a pipeline creation date as a partitioning key. Choosing the viable
+strategy for partitioning this table is in the scope of this blueprint.
+
 ## Iterations
 
-1. Redesign background migrations to make them reliable
-1. Migrate primary key of `ci_builds` table to 64-bit integer
-1. Migrate eligible data out of the `ci_builds` table
-1. Devise a partitioning strategy for `ci_builds` table
+1. [Redesign background migrations to make them reliable](https://gitlab.com/groups/gitlab-org/-/epics/5415)
+1. [Migrate primary key of `ci_builds` table to 64-bit integer](https://gitlab.com/groups/gitlab-org/-/epics/5416)
+1. [Migrate eligible data out of the `ci_builds` table](https://gitlab.com/groups/gitlab-org/-/epics/4685)
+1. [Devise a partitioning strategy for `ci_builds` table](https://gitlab.com/groups/gitlab-org/-/epics/5417)
 
 ## Status
 
-Blueprint in progress.
+Blueprint in approval.
 
 ## Who
 
@@ -130,5 +145,8 @@ DRIs:
 | Leadership                   | Darby Frey             |
 | Product                      | Jackie Porter          |
 | Engineering                  | Grzegorz Bizon         |
+| Domain Expert / Verify       | Fabio Pitino           |
+| Domain Expert / Database     | Jose Finotto           |
+| Domain Expert / PostgreSQL   | Nikolay Samokhvalov    |
 
 <!-- vale gitlab.Spelling = YES -->
