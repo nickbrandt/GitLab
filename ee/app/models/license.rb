@@ -144,6 +144,7 @@ class License < ApplicationRecord
     dast
     dependency_scanning
     devops_adoption
+    dora4_analytics
     enforce_personal_access_token_expiration
     enforce_ssh_key_expiration
     enterprise_templates
@@ -157,7 +158,6 @@ class License < ApplicationRecord
     jira_issue_association_enforcement
     license_scanning
     personal_access_token_expiration_policy
-    project_activity_analytics
     prometheus_alerts
     pseudonymizer
     quality_management
