@@ -64,6 +64,7 @@ RSpec.describe Groups::EpicBoardsController do
     context 'when format is HTML' do
       it 'renders template' do
         # epic board visits not supported yet
+        # https://gitlab.com/gitlab-org/gitlab/-/issues/321625
         expect { read_board board: board }.not_to change(BoardGroupRecentVisit, :count)
 
         expect(response).to render_template :show
@@ -74,6 +75,7 @@ RSpec.describe Groups::EpicBoardsController do
         let(:group) { private_group }
 
         before do
+          # sign in some other user not in the private group
           sign_in(other_user)
         end
 
