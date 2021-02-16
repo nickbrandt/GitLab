@@ -2,24 +2,21 @@
 
 module Ci
   module Minutes
-    # Track usage of Shared Runners minutes at root namespace level.
-    # This class ensures that we keep 1 record per namespace per month.
-    class NamespaceMonthlyUsage < ApplicationRecord
-      self.table_name = "ci_namespace_monthly_usages"
+    # Track usage of Shared Runners minutes at root project level.
+    # This class ensures that we keep 1 record per project per month.
+    class ProjectMonthlyUsage < ApplicationRecord
+      self.table_name = "ci_project_monthly_usages"
 
-      belongs_to :namespace
+      belongs_to :project
 
-      scope :current_month, -> { where(date: Time.current.utc.beginning_of_month) }
+      scope :current_month, -> { where(date: Time.current.beginning_of_month) }
 
       # We should pretty much always use this method to access data for the current month
       # since this will lazily create an entry if it doesn't exist.
-      # For example, on the 1st of each month, when we update the usage for a namespace,
+      # For example, on the 1st of each month, when we update the usage for a project,
       # we will automatically generate new records and reset usage for the current month.
-      #
-      # Here we will also do any recalculation of additional minutes based on the
-      # previous month usage.
-      def self.find_or_create_current(namespace)
-        current_month.safe_find_or_create_by(namespace: namespace)
+      def self.find_or_create_current(project)
+        current_month.safe_find_or_create_by(project: project)
       end
 
       def self.increase_usage(usage, amount)

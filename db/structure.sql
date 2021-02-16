@@ -10721,6 +10721,23 @@ CREATE SEQUENCE ci_platform_metrics_id_seq
 
 ALTER SEQUENCE ci_platform_metrics_id_seq OWNED BY ci_platform_metrics.id;
 
+CREATE TABLE ci_project_monthly_usages (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    date date NOT NULL,
+    amount_used numeric(18,2) DEFAULT 0.0 NOT NULL,
+    CONSTRAINT ci_project_monthly_usages_year_month_constraint CHECK ((date = date_trunc('month'::text, (date)::timestamp with time zone)))
+);
+
+CREATE SEQUENCE ci_project_monthly_usages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE ci_project_monthly_usages_id_seq OWNED BY ci_project_monthly_usages.id;
+
 CREATE TABLE ci_refs (
     id bigint NOT NULL,
     project_id bigint NOT NULL,
@@ -18785,6 +18802,8 @@ ALTER TABLE ONLY ci_pipelines_config ALTER COLUMN pipeline_id SET DEFAULT nextva
 
 ALTER TABLE ONLY ci_platform_metrics ALTER COLUMN id SET DEFAULT nextval('ci_platform_metrics_id_seq'::regclass);
 
+ALTER TABLE ONLY ci_project_monthly_usages ALTER COLUMN id SET DEFAULT nextval('ci_project_monthly_usages_id_seq'::regclass);
+
 ALTER TABLE ONLY ci_refs ALTER COLUMN id SET DEFAULT nextval('ci_refs_id_seq'::regclass);
 
 ALTER TABLE ONLY ci_resource_groups ALTER COLUMN id SET DEFAULT nextval('ci_resource_groups_id_seq'::regclass);
@@ -19909,6 +19928,9 @@ ALTER TABLE ONLY ci_pipelines
 
 ALTER TABLE ONLY ci_platform_metrics
     ADD CONSTRAINT ci_platform_metrics_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY ci_project_monthly_usages
+    ADD CONSTRAINT ci_project_monthly_usages_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY ci_refs
     ADD CONSTRAINT ci_refs_pkey PRIMARY KEY (id);
@@ -21746,6 +21768,8 @@ CREATE INDEX index_ci_pipelines_on_status_and_id ON ci_pipelines USING btree (st
 CREATE INDEX index_ci_pipelines_on_user_id_and_created_at_and_config_source ON ci_pipelines USING btree (user_id, created_at, config_source);
 
 CREATE INDEX index_ci_pipelines_on_user_id_and_created_at_and_source ON ci_pipelines USING btree (user_id, created_at, source);
+
+CREATE UNIQUE INDEX index_ci_project_monthly_usages_on_project_id_and_date ON ci_project_monthly_usages USING btree (project_id, date);
 
 CREATE UNIQUE INDEX index_ci_refs_on_project_id_and_ref_path ON ci_refs USING btree (project_id, ref_path);
 
@@ -25265,6 +25289,9 @@ ALTER TABLE ONLY resource_iteration_events
 
 ALTER TABLE ONLY status_page_settings
     ADD CONSTRAINT fk_rails_506e5ba391 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY ci_project_monthly_usages
+    ADD CONSTRAINT fk_rails_508bcd4aa6 FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY project_repository_storage_moves
     ADD CONSTRAINT fk_rails_5106dbd44a FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
