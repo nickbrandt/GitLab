@@ -1,6 +1,6 @@
 import { deprecatedCreateFlash as flash } from '~/flash';
 import { __ } from '~/locale';
-import { leftSidebarViews, PERMISSION_READ_MR } from '../../constants';
+import { leftSidebarViews, PERMISSION_READ_MR, MAX_MR_FILES_AUTO_OPEN } from '../../constants';
 import service from '../../services';
 import * as types from '../mutation_types';
 
@@ -152,7 +152,9 @@ export const openMergeRequestChanges = async ({ dispatch, getters, state, commit
     .map((change) => ({ entry: state.entries[change.new_path], change }))
     .filter((x) => x.entry);
 
-  const pathsToOpen = entryChanges.slice(0, 10).map(({ change }) => change.new_path);
+  const pathsToOpen = entryChanges
+    .slice(0, MAX_MR_FILES_AUTO_OPEN)
+    .map(({ change }) => change.new_path);
 
   // If there are no changes with entries, do nothing.
   if (!entryChanges.length) {

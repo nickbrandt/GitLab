@@ -1,6 +1,6 @@
 import { basename } from 'path';
-import { useOverclockTimers } from 'test_helpers/utils/overclock_timers';
 import { getMergeRequests, getMergeRequestWithChanges } from 'test_helpers/fixtures';
+import { useOverclockTimers } from 'test_helpers/utils/overclock_timers';
 import * as ideHelper from './helpers/ide_helper';
 import startWebIDE from './helpers/start';
 

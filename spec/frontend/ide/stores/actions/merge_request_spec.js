@@ -1,9 +1,9 @@
 import MockAdapter from 'axios-mock-adapter';
 import { range } from 'lodash';
-import testAction from 'helpers/vuex_action_helper';
 import { TEST_HOST } from 'helpers/test_constants';
+import testAction from 'helpers/vuex_action_helper';
 import { deprecatedCreateFlash as createFlash } from '~/flash';
-import { leftSidebarViews, PERMISSION_READ_MR } from '~/ide/constants';
+import { leftSidebarViews, PERMISSION_READ_MR, MAX_MR_FILES_AUTO_OPEN } from '~/ide/constants';
 import service from '~/ide/services';
 import { createStore } from '~/ide/stores';
 import {
@@ -395,7 +395,7 @@ describe('IDE store merge request actions', () => {
         (acc, { path }) => Object.assign(acc, { [path]: path, type: 'blob' }),
         {},
       );
-      const pathsToOpen = changes.slice(0, 10).map((x) => x.new_path);
+      const pathsToOpen = changes.slice(0, MAX_MR_FILES_AUTO_OPEN).map((x) => x.new_path);
 
       return testAction({
         action: openMergeRequestChanges,
