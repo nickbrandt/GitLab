@@ -15,6 +15,11 @@ module EE
                 null: true,
                 description: 'The custom mapping of GitLab alert attributes to fields from the payload_example.',
                 resolver: ::Resolvers::AlertManagement::PayloadAlertMappingFieldResolver
+
+          field :payload_alert_fields, [::Types::AlertManagement::PayloadAlertFieldType],
+                null: true,
+                description: 'Extract alert fields from payload example for custom mapping.',
+                resolver: ::Resolvers::AlertManagement::PersistedPayloadAlertFieldResolver
         end
       end
     end

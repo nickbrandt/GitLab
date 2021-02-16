@@ -18,6 +18,7 @@ RSpec.describe GitlabSchema.types['AlertManagementHttpIntegration'] do
       api_url
       payload_example
       payload_attribute_mappings
+      payload_alert_fields
     ]
 
     expect(described_class).to have_graphql_fields(*expected_fields)

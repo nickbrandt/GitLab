@@ -8,8 +8,6 @@ module Resolvers
       alias_method :integration, :object
 
       def resolve
-        return [] unless integration.is_a?(::AlertManagement::HttpIntegration)
-
         integration.payload_attribute_mapping.map do |field_name, mapping|
           ::AlertManagement::AlertPayloadField.new(
             project: integration.project,

@@ -1579,6 +1579,28 @@
               "deprecationReason": null
             },
             {
+              "name": "payloadAlertFields",
+              "description": "Extract alert fields from payload example for custom mapping.",
+              "args": [
+
+              ],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AlertManagementPayloadAlertField",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "payloadAttributeMappings",
               "description": "The custom mapping of GitLab alert attributes to fields from the payload_example.",
               "args": [

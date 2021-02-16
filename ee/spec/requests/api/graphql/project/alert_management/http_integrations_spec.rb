@@ -107,6 +107,18 @@ RSpec.describe 'getting Alert Management HTTP Integrations' do
                 'path' => %w(alert desc),
                 'type' => 'STRING'
               }
+            ],
+            'payloadAlertFields' => [
+              {
+                'label' => 'Name',
+                'path' => %w(alert name),
+                'type' => 'STRING'
+              },
+              {
+                'label' => 'Desc',
+                'path' => %w(alert desc),
+                'type' => 'STRING'
+              }
             ]
           },
           {
@@ -118,7 +130,8 @@ RSpec.describe 'getting Alert Management HTTP Integrations' do
             'url' => inactive_http_integration.url,
             'apiUrl' => nil,
             'payloadExample' => "{}",
-            'payloadAttributeMappings' => []
+            'payloadAttributeMappings' => [],
+            'payloadAlertFields' => []
           }
         )
       end

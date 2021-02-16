@@ -274,6 +274,7 @@ An endpoint and credentials used to accept alerts for a project.
 | `apiUrl` | String | URL at which Prometheus metrics can be queried to populate the metrics dashboard. |
 | `id` | ID! | ID of the integration. |
 | `name` | String | Name of the integration. |
+| `payloadAlertFields` | AlertManagementPayloadAlertField! => Array | Extract alert fields from payload example for custom mapping. |
 | `payloadAttributeMappings` | AlertManagementPayloadAlertMappingField! => Array | The custom mapping of GitLab alert attributes to fields from the payload_example. |
 | `payloadExample` | JsonString | The example of an alert payload. |
 | `token` | String | Token used to authenticate alert notification requests. |

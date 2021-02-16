@@ -635,6 +635,11 @@ type AlertManagementHttpIntegration implements AlertManagementIntegration {
   name: String
 
   """
+  Extract alert fields from payload example for custom mapping.
+  """
+  payloadAlertFields: [AlertManagementPayloadAlertField!]
+
+  """
   The custom mapping of GitLab alert attributes to fields from the payload_example.
   """
   payloadAttributeMappings: [AlertManagementPayloadAlertMappingField!]
