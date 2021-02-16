@@ -105,8 +105,8 @@ export default {
           thClass,
         },
         {
-          key: 'manage',
-          label: s__('SecurityConfiguration|Manage'),
+          key: 'configure',
+          label: s__('SecurityConfiguration|Configure'),
           thClass,
         },
       ];

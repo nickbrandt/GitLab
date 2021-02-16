@@ -95,8 +95,8 @@ describe('ManageFeature component', () => {
       });
     });
 
-    it('shows the DAST Profiles manage button', () => {
-      const button = findTestId('manageButton');
+    it('shows the DAST Profiles configure button', () => {
+      const button = findTestId('configureButton');
       expect(button.exists()).toBe(true);
       expect(button.attributes('href')).toBe(feature.configuration_path);
     });
