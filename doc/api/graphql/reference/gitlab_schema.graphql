@@ -1528,7 +1528,7 @@ enum BlobViewersType {
 }
 
 """
-Represents a project or group board
+Represents a project or group issue board
 """
 type Board {
   """
@@ -9415,7 +9415,7 @@ type EpicBoard {
   hideClosedList: Boolean
 
   """
-  Global ID of the board.
+  Global ID of the epic board.
   """
   id: BoardsEpicBoardID!
 
@@ -9450,9 +9450,19 @@ type EpicBoard {
   ): EpicListConnection
 
   """
-  Name of the board.
+  Name of the epic board.
   """
   name: String
+
+  """
+  Web path of the epic board.
+  """
+  webPath: String!
+
+  """
+  Web URL of the epic board.
+  """
+  webUrl: String!
 }
 
 """
