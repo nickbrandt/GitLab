@@ -96,7 +96,7 @@ RSpec.describe Gitlab::Ci::Config::SecurityOrchestrationPolicies::Processor do
                 variables: {
                   DAST_VERSION: 1,
                   SECURE_ANALYZERS_PREFIX: 'registry.gitlab.com/gitlab-org/security-products/analyzers',
-                  DAST_WEBSITE: 'http://example1.test',
+                  DAST_WEBSITE: dast_site_profile.dast_site.url,
                   DAST_FULL_SCAN_ENABLED: 'false',
                   DAST_USE_AJAX_SPIDER: 'false',
                   DAST_DEBUG: 'false'
