@@ -11007,6 +11007,7 @@ CREATE TABLE cluster_agents (
     updated_at timestamp with time zone NOT NULL,
     project_id bigint NOT NULL,
     name text NOT NULL,
+    created_by_user_id bigint,
     CONSTRAINT check_3498369510 CHECK ((char_length(name) <= 255))
 );
 
@@ -21796,6 +21797,8 @@ CREATE INDEX index_cluster_agent_tokens_on_agent_id ON cluster_agent_tokens USIN
 
 CREATE UNIQUE INDEX index_cluster_agent_tokens_on_token_encrypted ON cluster_agent_tokens USING btree (token_encrypted);
 
+CREATE INDEX index_cluster_agents_on_created_by_user_id ON cluster_agents USING btree (created_by_user_id);
+
 CREATE UNIQUE INDEX index_cluster_agents_on_project_id_and_name ON cluster_agents USING btree (project_id, name);
 
 CREATE UNIQUE INDEX index_cluster_groups_on_cluster_id_and_group_id ON cluster_groups USING btree (cluster_id, group_id);
@@ -24721,6 +24724,9 @@ ALTER TABLE ONLY design_management_designs_versions
 
 ALTER TABLE ONLY analytics_devops_adoption_segments
     ADD CONSTRAINT fk_f5aa768998 FOREIGN KEY (namespace_id) REFERENCES namespaces(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY cluster_agents
+    ADD CONSTRAINT fk_f7d43dee13 FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY protected_tag_create_access_levels
     ADD CONSTRAINT fk_f7dfda8c51 FOREIGN KEY (protected_tag_id) REFERENCES protected_tags(id) ON DELETE CASCADE;
