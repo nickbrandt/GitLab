@@ -15923,6 +15923,21 @@ Identifier of MergeRequest.
 scalar MergeRequestID
 
 """
+New state to apply to a merge request.
+"""
+enum MergeRequestNewState {
+  """
+  Close the merge request if it is open.
+  """
+  CLOSED
+
+  """
+  Open the merge request if it is closed.
+  """
+  OPEN
+}
+
+"""
 Check permissions for the current user on a merge request
 """
 type MergeRequestPermissions {
@@ -16420,6 +16435,11 @@ input MergeRequestUpdateInput {
   The project the merge request to mutate is in.
   """
   projectPath: ID!
+
+  """
+  The action to perform to change the state.
+  """
+  state: MergeRequestNewState
 
   """
   Target branch of the merge request.
