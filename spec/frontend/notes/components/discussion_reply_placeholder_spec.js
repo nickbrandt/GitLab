@@ -31,6 +31,6 @@ describe('ReplyPlaceholder', () => {
   });
 
   it('should render reply button', () => {
-    expect(findTextarea().element.placeholder).toEqual(placeholderText);
+    expect(findTextarea().attributes('placeholder')).toEqual(placeholderText);
   });
 });
