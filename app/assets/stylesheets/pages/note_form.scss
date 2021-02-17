@@ -309,7 +309,8 @@ table {
     border-radius: $gl-border-radius-base;
     width: 100%;
     resize: none;
-    padding: $gl-padding-4 $gl-padding-12;
+    padding: $gl-padding-8 $gl-padding-12;
+    line-height: 1;
     border-color: $border-color;
     background-color: $white;
 
