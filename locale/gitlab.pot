@@ -18620,9 +18620,6 @@ msgstr ""
 msgid "MergeRequestDiffs|Select comment starting line"
 msgstr ""
 
-msgid "MergeRequests|Add a reply"
-msgstr ""
-
 msgid "MergeRequests|An error occurred while checking whether another squash is in progress."
 msgstr ""
 
@@ -18630,9 +18627,6 @@ msgid "MergeRequests|An error occurred while saving the draft comment."
 msgstr ""
 
 msgid "MergeRequests|Failed to squash. Should be done manually."
-msgstr ""
-
-msgid "MergeRequests|Reply..."
 msgstr ""
 
 msgid "MergeRequests|Resolve this thread in a new issue"
@@ -19909,6 +19903,9 @@ msgid "New deploy key"
 msgstr ""
 
 msgid "New directory"
+msgstr ""
+
+msgid "New discussion"
 msgstr ""
 
 msgid "New environment"
@@ -24840,7 +24837,7 @@ msgstr ""
 msgid "Reply to this email directly or %{view_it_on_gitlab}."
 msgstr ""
 
-msgid "Reply..."
+msgid "Reply…"
 msgstr ""
 
 msgid "Repo by URL"
@@ -27947,7 +27944,7 @@ msgstr ""
 msgid "Start a Free Ultimate Trial"
 msgstr ""
 
-msgid "Start a new discussion..."
+msgid "Start a new discussion…"
 msgstr ""
 
 msgid "Start a new merge request"
