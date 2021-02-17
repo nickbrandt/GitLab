@@ -36,6 +36,7 @@ export default {
       <template v-else-if="renderReplyPlaceholder">
         <reply-placeholder
           :placeholder-text="__('Start a new discussion…')"
+          :label-text="__('New discussion')"
           @focus="$emit('showNewDiscussionForm')"
         />
       </template>
