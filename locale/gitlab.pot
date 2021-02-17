@@ -7291,6 +7291,9 @@ msgstr ""
 msgid "Collapse approvers"
 msgstr ""
 
+msgid "Collapse issues"
+msgstr ""
+
 msgid "Collapse milestones"
 msgstr ""
 
@@ -12068,6 +12071,9 @@ msgstr ""
 msgid "Expand file"
 msgstr ""
 
+msgid "Expand issues"
+msgstr ""
+
 msgid "Expand milestones"
 msgstr ""
 
@@ -16669,6 +16675,9 @@ msgstr ""
 msgid "Issues with comments, merge requests with diffs and comments, labels, milestones, snippets, and other project entities"
 msgstr ""
 
+msgid "Issues with label %{label}"
+msgstr ""
+
 msgid "Issues with no epic assigned"
 msgstr ""
 
@@ -17246,6 +17255,9 @@ msgid "Labels can be applied to issues and merge requests to categorize them."
 msgstr ""
 
 msgid "Labels can be applied to issues and merge requests."
+msgstr ""
+
+msgid "Labels with no issues in this iteration:"
 msgstr ""
 
 msgid "Labels|%{spanStart}Promote label%{spanEnd} %{labelTitle} %{spanStart}to Group Label?%{spanEnd}"
@@ -20143,6 +20155,9 @@ msgid "No grouping"
 msgstr ""
 
 msgid "No issues found"
+msgstr ""
+
+msgid "No issues found for the selected labels"
 msgstr ""
 
 msgid "No iteration"
